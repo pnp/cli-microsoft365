@@ -1,7 +1,7 @@
 import assert from 'assert';
 import sinon from 'sinon';
-import request from "../request.js";
-import { sinonUtil } from "./sinonUtil.js";
+import request from '../request.js';
+import { sinonUtil } from './sinonUtil.js';
 import { roleAssignment } from './roleAssignment.js';
 
 describe('utils/roleAssignment', () => {
@@ -27,21 +27,21 @@ describe('utils/roleAssignment', () => {
     ]);
   });
 
-  it('correctly assign a directory (Entra ID) role specified by id with administrative unit scope to a user specified by id', async () => {
-    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/roleManagement/directory/roleAssignments') {
+  it('correctly assigns a directory (Entra ID) role specified by id with administrative unit scope to a user specified by id', async () => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/roleManagement/directory/roleAssignments' && 
+        JSON.stringify(opts.data) === JSON.stringify({
+          "roleDefinitionId": roleDefinitionId,
+          "principalId": userId,
+          "directoryScopeId": `/administrativeUnits/${administrativeUnitId}`
+        })) {
         return unifieRoleAssignmentWithAdministrativeUnitScopeResponse;
       }
 
       throw 'Invalid request';
     });
 
-    const unifiedRoleAssignment = await roleAssignment.createEntraIDRoleAssignmentWithAdministrativeUnitScope(roleDefinitionId, userId, administrativeUnitId);
-    assert.deepStrictEqual(postStub.lastCall.args[0].data, {
-      roleDefinitionId: roleDefinitionId,
-      principalId: userId,
-      directoryScopeId: `/administrativeUnits/${administrativeUnitId}`
-    });
+    const unifiedRoleAssignment = await roleAssignment.createRoleAssignmentWithAdministrativeUnitScope(roleDefinitionId, userId, administrativeUnitId);
     assert.deepStrictEqual(unifiedRoleAssignment, {
       "id": "BH21sHQtUEyvox7IA_Eu_mm3jqnUe4lEhvatluHIWb7-1",
       "roleDefinitionId": "fe930be7-5e62-47db-91af-98c3a49a38b1",
@@ -50,21 +50,21 @@ describe('utils/roleAssignment', () => {
     });
   });
 
-  it('correctly assign a directory (Entra ID) role specified by id with tenant scope to a user specified by id', async () => {
-    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/roleManagement/directory/roleAssignments') {
+  it('correctly assigns a directory (Entra ID) role specified by id with tenant scope to a user specified by id', async () => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/roleManagement/directory/roleAssignments' &&
+        JSON.stringify(opts.data) === JSON.stringify({
+          "roleDefinitionId": roleDefinitionId,
+          "principalId": userId,
+          "directoryScopeId": '/'
+        })) {
         return unifieRoleAssignmentWithTenantScopeResponse;
       }
 
       throw 'Invalid request';
     });
 
-    const unifiedRoleAssignment = await roleAssignment.createEntraIDRoleAssignmentWithTenantScope(roleDefinitionId, userId);
-    assert.deepStrictEqual(postStub.lastCall.args[0].data, {
-      roleDefinitionId: roleDefinitionId,
-      principalId: userId,
-      directoryScopeId: '/'
-    });
+    const unifiedRoleAssignment = await roleAssignment.createRoleAssignmentWithTenantScope(roleDefinitionId, userId);
     assert.deepStrictEqual(unifiedRoleAssignment, {
       "id": "BH21sHQtUEyvox7IA_Eu_mm3jqnUe4lEhvatluHIWb7-1",
       "roleDefinitionId": "fe930be7-5e62-47db-91af-98c3a49a38b1",
@@ -73,10 +73,17 @@ describe('utils/roleAssignment', () => {
     });
   });
 
-  it('handles random API error', async () => {
+  it('correctly handles random API error when createRoleAssignmentWithAdministrativeUnitScope is called', async () => {
     const errorMessage = 'Something went wrong';
     sinon.stub(request, 'post').rejects(new Error(errorMessage));
 
-    await assert.rejects(roleAssignment.createEntraIDRoleAssignment('','',''), new Error(errorMessage));
+    await assert.rejects(roleAssignment.createRoleAssignmentWithAdministrativeUnitScope(roleDefinitionId, userId, administrativeUnitId), new Error(errorMessage));
+  });
+
+  it('correctly handles random API error when createRoleAssignmentWithTenantScope is called', async () => {
+    const errorMessage = 'Something went wrong';
+    sinon.stub(request, 'post').rejects(new Error(errorMessage));
+
+    await assert.rejects(roleAssignment.createRoleAssignmentWithTenantScope(roleDefinitionId, userId), new Error(errorMessage));
   });
 });

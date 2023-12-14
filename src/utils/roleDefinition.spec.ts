@@ -1,8 +1,8 @@
 import assert from 'assert';
 import sinon from 'sinon';
-import { cli } from "../cli/cli.js";
-import request from "../request.js";
-import { sinonUtil } from "./sinonUtil.js";
+import { cli } from '../cli/cli.js';
+import request from '../request.js';
+import { sinonUtil } from './sinonUtil.js';
 import { roleDefinition } from './roleDefinition.js';
 import { formatting } from './formatting.js';
 import { settingsNames } from '../settingsNames.js';
@@ -85,7 +85,7 @@ describe('utils/roleDefinition', () => {
       return 'Invalid Request';
     });
 
-    const actual = await roleDefinition.getDirectoryRoleDefinitionByDisplayName(displayName);
+    const actual = await roleDefinition.getRoleDefinitionByDisplayName(displayName);
     assert.deepStrictEqual(actual, {
       "id": "729827e3-9c14-49f7-bb1b-9608f156bbb8",
       "description": "Can reset passwords for non-administrators and Helpdesk Administrators.",
@@ -133,7 +133,7 @@ describe('utils/roleDefinition', () => {
 
     sinon.stub(cli, 'handleMultipleResultsFound').resolves(roleDefinitionResponse);
 
-    const actual = await roleDefinition.getDirectoryRoleDefinitionByDisplayName(displayName);
+    const actual = await roleDefinition.getRoleDefinitionByDisplayName(displayName);
     assert.deepStrictEqual(actual, {
       "id": "729827e3-9c14-49f7-bb1b-9608f156bbb8",
       "description": "Can reset passwords for non-administrators and Helpdesk Administrators.",
@@ -174,7 +174,7 @@ describe('utils/roleDefinition', () => {
       throw 'Invalid Request';
     });
 
-    await assert.rejects(roleDefinition.getDirectoryRoleDefinitionByDisplayName(invalidDisplayName)), Error(`The specified role definition '${invalidDisplayName}' does not exist.`);
+    await assert.rejects(roleDefinition.getRoleDefinitionByDisplayName(invalidDisplayName)), Error(`The specified role definition '${invalidDisplayName}' does not exist.`);
   });
 
   it('throws error message when multiple role definition were found using getDirectoryRoleDefinitionByDisplayName', async () => {
@@ -199,7 +199,7 @@ describe('utils/roleDefinition', () => {
       return 'Invalid Request';
     });
 
-    await assert.rejects(roleDefinition.getDirectoryRoleDefinitionByDisplayName(displayName),
+    await assert.rejects(roleDefinition.getRoleDefinitionByDisplayName(displayName),
       Error(`Multiple role definitions with name '${displayName}' found. Found: ${roleDefinitionResponse.id}, ${customRoleDefinitionResponse.id}.`));
   });
 });

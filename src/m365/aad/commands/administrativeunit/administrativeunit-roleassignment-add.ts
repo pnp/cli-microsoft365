@@ -1,12 +1,12 @@
-import GlobalOptions from "../../../../GlobalOptions.js";
-import { Logger } from "../../../../cli/Logger.js";
-import { aadAdministrativeUnit } from "../../../../utils/aadAdministrativeUnit.js";
-import { aadUser } from "../../../../utils/aadUser.js";
-import { roleAssignment } from "../../../../utils/roleAssignment.js";
-import { roleDefinition } from "../../../../utils/roleDefinition.js";
-import { validation } from "../../../../utils/validation.js";
-import GraphCommand from "../../../base/GraphCommand.js";
-import commands from "../../commands.js";
+import GlobalOptions from '../../../../GlobalOptions.js';
+import { Logger } from '../../../../cli/Logger.js';
+import { aadAdministrativeUnit } from '../../../../utils/aadAdministrativeUnit.js';
+import { aadUser } from '../../../../utils/aadUser.js';
+import { roleAssignment } from '../../../../utils/roleAssignment.js';
+import { roleDefinition } from '../../../../utils/roleDefinition.js';
+import { validation } from '../../../../utils/validation.js';
+import GraphCommand from '../../../base/GraphCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -37,7 +37,6 @@ class AadAdministrativeUnitRoleAssignmentAddCommand extends GraphCommand {
     this.#initOptions();
     this.#initValidators();
     this.#initOptionSets();
-    this.#initTypes();
   }
 
   #initTelemetry(): void {
@@ -79,15 +78,15 @@ class AadAdministrativeUnitRoleAssignmentAddCommand extends GraphCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (args.options.administrativeUnitId && !validation.isValidGuid(args.options.administrativeUnitId as string)) {
+        if (args.options.administrativeUnitId && !validation.isValidGuid(args.options.administrativeUnitId)) {
           return `${args.options.administrativeUnitId} is not a valid GUID`;
         }
 
-        if (args.options.roleDefinitionId && !validation.isValidGuid(args.options.roleDefinitionId as string)) {
+        if (args.options.roleDefinitionId && !validation.isValidGuid(args.options.roleDefinitionId)) {
           return `${args.options.roleDefinitionId} is not a valid GUID`;
         }
 
-        if (args.options.userId && !validation.isValidGuid(args.options.userId as string)) {
+        if (args.options.userId && !validation.isValidGuid(args.options.userId)) {
           return `${args.options.userId} is not a valid GUID`;
         }
 
@@ -102,29 +101,35 @@ class AadAdministrativeUnitRoleAssignmentAddCommand extends GraphCommand {
     this.optionSets.push({ options: ['userId', 'userName'] });
   }
 
-  #initTypes(): void {
-    this.types.string.push('administrativeUnitName', 'roleName', 'userName');
-  }
-
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
-      let administrativeUnitId = args.options.administrativeUnitId;
-      let roleDefinitionId = args.options.roleDefinitionId;
-      let userId = args.options.userId;
+      let { administrativeUnitId, roleDefinitionId, userId } = args.options;
 
       if (args.options.administrativeUnitName) {
+        if (this.verbose) {
+          await logger.logToStderr(`Retrieving administrative unit by its name '${args.options.administrativeUnitName}'`);
+        }
+
         administrativeUnitId = (await aadAdministrativeUnit.getAdministrativeUnitByDisplayName(args.options.administrativeUnitName)).id;
       }
 
       if (args.options.roleDefinitionName) {
-        roleDefinitionId = (await roleDefinition.getDirectoryRoleDefinitionByDisplayName(args.options.roleDefinitionName)).id;
+        if (this.verbose) {
+          await logger.logToStderr(`Retrieving role definition by its name '${args.options.roleDefinitionName}'`);
+        }
+
+        roleDefinitionId = (await roleDefinition.getRoleDefinitionByDisplayName(args.options.roleDefinitionName)).id;
       }
 
       if (args.options.userName) {
+        if (this.verbose) {
+          await logger.logToStderr(`Retrieving user by UPN '${args.options.userName}'`);
+        }
+
         userId = await aadUser.getUserIdByUpn(args.options.userName);
       }
 
-      const unifiedRoleAssignment = await roleAssignment.createEntraIDRoleAssignmentWithAdministrativeUnitScope(roleDefinitionId!, userId!, administrativeUnitId!);
+      const unifiedRoleAssignment = await roleAssignment.createRoleAssignmentWithAdministrativeUnitScope(roleDefinitionId!, userId!, administrativeUnitId!);
 
       await logger.log(unifiedRoleAssignment);
     }

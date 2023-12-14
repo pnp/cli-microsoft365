@@ -1,7 +1,20 @@
-import { UnifiedRoleAssignment } from "@microsoft/microsoft-graph-types";
-import request, { CliRequestOptions } from "../request.js";
+import { UnifiedRoleAssignment } from '@microsoft/microsoft-graph-types';
+import request, { CliRequestOptions } from '../request.js';
 
 const graphResource = 'https://graph.microsoft.com';
+
+const getRequestOptions = (roleDefinitionId: string, principalId: string, directoryScopeId: string): CliRequestOptions => ({
+  url: `${graphResource}/v1.0/roleManagement/directory/roleAssignments`,
+  headers: {
+    accept: 'application/json;odata.metadata=none'
+  },
+  responseType: 'json',
+  data: {
+    roleDefinitionId: roleDefinitionId,
+    principalId: principalId,
+    directoryScopeId: directoryScopeId
+  }
+});
 
 /**
  * Utils for RBAC.
@@ -9,36 +22,27 @@ const graphResource = 'https://graph.microsoft.com';
  *  - Directory (Entra ID)
  */
 export const roleAssignment = {
+
   /**
-   * Assigns a specific role to a principal and defines a set of resources (scope) that the access applies to.
-   * Directory (Entra ID) RBAC provider
+   * Assigns a specific role to a principal with scope to an administrative unit
    * @param roleDefinitionId Role which lists the actions that can be performed
    * @param principalId Object that represents a user, group, service principal, or managed identity that is requesting access to resources
-   * @param directoryScopeId Set of resources that the access applies to
-   * @returns
+   * @param administrativeUnitId Administrative unit which represents a current scope for a role assignment
+   * @returns Returns unified role assignment object that represents a role definition assigned to a principal with scope to an administrative unit
    */
-  async createEntraIDRoleAssignment(roleDefinitionId: string, principalId: string, directoryScopeId: string): Promise<UnifiedRoleAssignment> {
-    const requestOptions: CliRequestOptions = {
-      url: `${graphResource}/v1.0/roleManagement/directory/roleAssignments`,
-      headers: {
-        accept: 'application/json;odata.metadata=none'
-      },
-      responseType: 'json',
-      data: {
-        roleDefinitionId: roleDefinitionId,
-        principalId: principalId,
-        directoryScopeId: directoryScopeId
-      }
-    };
-
+  async createRoleAssignmentWithAdministrativeUnitScope(roleDefinitionId: string, principalId: string, administrativeUnitId: string): Promise<UnifiedRoleAssignment> {
+    const requestOptions = getRequestOptions(roleDefinitionId, principalId, `/administrativeUnits/${administrativeUnitId}`);
     return await request.post<UnifiedRoleAssignment>(requestOptions);
   },
 
-  async createEntraIDRoleAssignmentWithAdministrativeUnitScope(roleDefinitionId: string, principalId: string, administrativeUnitId: string): Promise<UnifiedRoleAssignment> {
-    return await this.createEntraIDRoleAssignment(roleDefinitionId, principalId, `/administrativeUnits/${administrativeUnitId}`);
-  },
-
-  async createEntraIDRoleAssignmentWithTenantScope(roleDefinitionId: string, principalId: string): Promise<UnifiedRoleAssignment> {
-    return await this.createEntraIDRoleAssignment(roleDefinitionId, principalId, '/');
+  /**
+   * Assigns a specific role to a principal with scope to the whole tenant
+   * @param roleDefinitionId Role which lists the actions that can be performed
+   * @param principalId Object that represents a user, group, service principal, or managed identity that is requesting access to resources
+   * @returns Returns unified role assignment object that represents a role definition assigned to a principal with scope to the whole tenant
+   */
+  async createRoleAssignmentWithTenantScope(roleDefinitionId: string, principalId: string): Promise<UnifiedRoleAssignment> {
+    const requestOptions = getRequestOptions(roleDefinitionId, principalId, '/');
+    return await request.post<UnifiedRoleAssignment>(requestOptions);
   }
 };

@@ -16,6 +16,7 @@ import { aadUser } from '../../../../utils/aadUser.js';
 import { roleAssignment } from '../../../../utils/roleAssignment.js';
 import { roleDefinition } from '../../../../utils/roleDefinition.js';
 import { settingsNames } from '../../../../settingsNames.js';
+import request from '../../../../request.js';
 
 describe(commands.ADMINISTRATIVEUNIT_ROLEASSIGNMENT_ADD, () => {
   const roleDefinitionId = 'fe930be7-5e62-47db-91af-98c3a49a38b1';
@@ -59,16 +60,16 @@ describe(commands.ADMINISTRATIVEUNIT_ROLEASSIGNMENT_ADD, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
-    (command as any).pollingInterval = 0;
   });
 
   afterEach(() => {
     sinonUtil.restore([
       aadAdministrativeUnit.getAdministrativeUnitByDisplayName,
       aadUser.getUserIdByUpn,
-      roleAssignment.createEntraIDRoleAssignmentWithAdministrativeUnitScope,
-      roleDefinition.getDirectoryRoleDefinitionByDisplayName,
-      cli.getSettingWithDefaultValue
+      roleAssignment.createRoleAssignmentWithAdministrativeUnitScope,
+      roleDefinition.getRoleDefinitionByDisplayName,
+      cli.getSettingWithDefaultValue,
+      request.post
     ]);
   });
 
@@ -254,8 +255,8 @@ describe(commands.ADMINISTRATIVEUNIT_ROLEASSIGNMENT_ADD, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('correctly assign a role specified by id to and administrative unit specified by id and to a user specified by id', async () => {
-    sinon.stub(roleAssignment, 'createEntraIDRoleAssignmentWithAdministrativeUnitScope').withArgs(roleDefinitionId, userId, administrativeUnitId).resolves(unifiedRoleAssignment);
+  it('correctly assigns a role specified by id to and administrative unit specified by id and to a user specified by id', async () => {
+    sinon.stub(roleAssignment, 'createRoleAssignmentWithAdministrativeUnitScope').withArgs(roleDefinitionId, userId, administrativeUnitId).resolves(unifiedRoleAssignment);
 
     await command.action(logger, {
       options: {
@@ -264,29 +265,105 @@ describe(commands.ADMINISTRATIVEUNIT_ROLEASSIGNMENT_ADD, () => {
         userId: userId
       }
     });
-    //assert.strictEqual(loggerLogSpy.lastCall,'');
+
     assert(loggerLogSpy.calledOnceWithExactly(unifiedRoleAssignment));
   });
 
-  it('correctly assign a role specified by name to and administrative unit specified by name and to a user specified by name', async () => {
+  it('correctly assigns a role specified by name to and administrative unit specified by name and to a user specified by name (verbose)', async () => {
     sinon.stub(aadAdministrativeUnit, 'getAdministrativeUnitByDisplayName').withArgs(administrativeUnitName).resolves({ id: administrativeUnitId, displayName: administrativeUnitName });
     sinon.stub(aadUser, 'getUserIdByUpn').withArgs(userName).resolves(userId);
-    sinon.stub(roleDefinition, 'getDirectoryRoleDefinitionByDisplayName').withArgs(roleDefinitionName).resolves({ id: roleDefinitionId, displayName: roleDefinitionName });
-    sinon.stub(roleAssignment, 'createEntraIDRoleAssignmentWithAdministrativeUnitScope').withArgs(roleDefinitionId, userId, administrativeUnitId).resolves(unifiedRoleAssignment);
+    sinon.stub(roleDefinition, 'getRoleDefinitionByDisplayName').withArgs(roleDefinitionName).resolves({ id: roleDefinitionId, displayName: roleDefinitionName });
+    sinon.stub(roleAssignment, 'createRoleAssignmentWithAdministrativeUnitScope').withArgs(roleDefinitionId, userId, administrativeUnitId).resolves(unifiedRoleAssignment);
 
     await command.action(logger, {
       options: {
         administrativeUnitName: administrativeUnitName,
         roleDefinitionName: roleDefinitionName,
-        userName: userName
+        userName: userName,
+        verbose: true
       }
     });
     assert(loggerLogSpy.calledOnceWithExactly(unifiedRoleAssignment));
   });
 
   it('correctly handles error', async () => {
-    sinon.stub(roleAssignment, 'createEntraIDRoleAssignmentWithAdministrativeUnitScope').throws(Error('Invalid request'));
+    sinon.stub(roleAssignment, 'createRoleAssignmentWithAdministrativeUnitScope').throws(Error('Invalid request'));
 
-    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('Invalid request'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        administrativeUnitId: administrativeUnitId,
+        roleDefinitionId: roleDefinitionId,
+        userId: userId
+      }
+    }), new CommandError('Invalid request'));
+  });
+
+  it('fails if an administrative unit specified by name was not found', async () => {
+    sinon.stub(aadAdministrativeUnit, 'getAdministrativeUnitByDisplayName').withArgs(administrativeUnitName).throws(Error("The specified administrative unit 'Marketing Department' does not exist."));
+    sinon.stub(aadUser, 'getUserIdByUpn').withArgs(userName).resolves(userId);
+    sinon.stub(roleDefinition, 'getRoleDefinitionByDisplayName').withArgs(roleDefinitionName).resolves({ id: roleDefinitionId, displayName: roleDefinitionName });
+    sinon.stub(roleAssignment, 'createRoleAssignmentWithAdministrativeUnitScope').withArgs(roleDefinitionId, userId, administrativeUnitId).resolves(unifiedRoleAssignment);
+
+    await assert.rejects(command.action(logger, {
+      options: {
+        administrativeUnitName: administrativeUnitName,
+        roleDefinitionName: roleDefinitionName,
+        userName: userName
+      }
+    }), new CommandError("The specified administrative unit 'Marketing Department' does not exist."));
+  });
+
+  it('fails if a role definition specified by name was not found', async () => {
+    sinon.stub(aadAdministrativeUnit, 'getAdministrativeUnitByDisplayName').withArgs(administrativeUnitName).resolves({ id: administrativeUnitId, displayName: administrativeUnitName });
+    sinon.stub(aadUser, 'getUserIdByUpn').withArgs(userName).resolves(userId);
+    sinon.stub(roleDefinition, 'getRoleDefinitionByDisplayName').withArgs(roleDefinitionName).throws(Error("The specified role definition 'User Administrator' does not exist."));
+    sinon.stub(roleAssignment, 'createRoleAssignmentWithAdministrativeUnitScope').withArgs(roleDefinitionId, userId, administrativeUnitId).resolves(unifiedRoleAssignment);
+
+    await assert.rejects(command.action(logger, {
+      options: {
+        administrativeUnitName: administrativeUnitName,
+        roleDefinitionName: roleDefinitionName,
+        userName: userName
+      }
+    }), new CommandError("The specified role definition 'User Administrator' does not exist."));
+  });
+
+  it('fails if a user specified by UPN was not found', async () => {
+    sinon.stub(aadAdministrativeUnit, 'getAdministrativeUnitByDisplayName').withArgs(administrativeUnitName).resolves({ id: administrativeUnitId, displayName: administrativeUnitName });
+    sinon.stub(aadUser, 'getUserIdByUpn').withArgs(userName).throws(Error("The specified user with user name AdeleVance@contoso.com does not exist."));
+    sinon.stub(roleDefinition, 'getRoleDefinitionByDisplayName').withArgs(roleDefinitionName).resolves({ id: roleDefinitionId, displayName: roleDefinitionName });
+    sinon.stub(roleAssignment, 'createRoleAssignmentWithAdministrativeUnitScope').withArgs(roleDefinitionId, userId, administrativeUnitId).resolves(unifiedRoleAssignment);
+
+    await assert.rejects(command.action(logger, {
+      options: {
+        administrativeUnitName: administrativeUnitName,
+        roleDefinitionName: roleDefinitionName,
+        userName: userName
+      }
+    }), new CommandError("The specified user with user name AdeleVance@contoso.com does not exist."));
+  });
+
+  it('correctly handles API OData error when creating role assignment with an administrative unit scope failed', async () => {
+    sinon.stub(aadAdministrativeUnit, 'getAdministrativeUnitByDisplayName').withArgs(administrativeUnitName).resolves({ id: administrativeUnitId, displayName: administrativeUnitName });
+    sinon.stub(aadUser, 'getUserIdByUpn').withArgs(userName).resolves(userId);
+    sinon.stub(roleDefinition, 'getRoleDefinitionByDisplayName').withArgs(roleDefinitionName).resolves({ id: roleDefinitionId, displayName: roleDefinitionName });
+    sinon.stub(request, 'post').rejects({
+      error: {
+        'odata.error': {
+          code: '-1, InvalidOperationException',
+          message: {
+            value: 'Invalid request'
+          }
+        }
+      }
+    });
+
+    await assert.rejects(command.action(logger, {
+      options: {
+        administrativeUnitName: administrativeUnitName,
+        roleDefinitionName: roleDefinitionName,
+        userName: userName
+      }
+    }), new CommandError("Invalid request"));
   });
 });

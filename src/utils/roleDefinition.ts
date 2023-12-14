@@ -1,9 +1,7 @@
-import { RoleDefinition } from "@microsoft/microsoft-graph-types";
-import { odata } from "./odata.js";
-import { formatting } from "./formatting.js";
-import { cli } from "../cli/cli.js";
-
-const graphResource = 'https://graph.microsoft.com';
+import { RoleDefinition } from '@microsoft/microsoft-graph-types';
+import { odata } from './odata.js';
+import { formatting } from './formatting.js';
+import { cli } from '../cli/cli.js';
 
 export const roleDefinition = {
   /**
@@ -12,7 +10,9 @@ export const roleDefinition = {
    * @returns The role definition.
    * @throws Error when role definition was not found.
    */
-  async getDirectoryRoleDefinitionByDisplayName(displayName: string): Promise<RoleDefinition> {
+  async getRoleDefinitionByDisplayName(displayName: string): Promise<RoleDefinition> {
+    const graphResource = 'https://graph.microsoft.com';
+
     const roleDefinitions = await odata.getAllItems<RoleDefinition>(`${graphResource}/v1.0/roleManagement/directory/roleDefinitions?$filter=displayName eq '${formatting.encodeQueryParameter(displayName)}'`);
 
     if (roleDefinitions.length === 0) {
