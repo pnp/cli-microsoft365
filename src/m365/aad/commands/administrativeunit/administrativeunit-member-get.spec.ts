@@ -1,9 +1,9 @@
 import assert from 'assert';
-import sinon from "sinon";
+import sinon from 'sinon';
 import auth from '../../../../Auth.js';
-import { CommandInfo } from "../../../../cli/CommandInfo.js";
-import { Logger } from "../../../../cli/Logger.js";
-import commands from "../../commands.js";
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
+import { Logger } from '../../../../cli/Logger.js';
+import commands from '../../commands.js';
 import { telemetry } from '../../../../telemetry.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
@@ -19,7 +19,6 @@ describe(commands.ADMINISTRATIVEUNIT_MEMBER_GET, () => {
   const administrativeUnitId = 'fc33aa61-cf0e-46b6-9506-f633347202ab';
   const administrativeUnitName = 'European Division';
   const userId = '64131a70-beb9-4ccb-b590-4401e58446ec';
-  const userName = 'PradeepG@4wrvkx.onmicrosoft.com';
 
   const userTransformedResponse = {
     "id": "64131a70-beb9-4ccb-b590-4401e58446ec",
@@ -72,7 +71,6 @@ describe(commands.ADMINISTRATIVEUNIT_MEMBER_GET, () => {
     sinonUtil.restore([
       request.get,
       aadAdministrativeUnit.getAdministrativeUnitByDisplayName,
-      aadAdministrativeUnit.getMemberIdByName,
       cli.getSettingWithDefaultValue
     ]);
   });
@@ -93,19 +91,6 @@ describe(commands.ADMINISTRATIVEUNIT_MEMBER_GET, () => {
   it('passes validation when member id and administrativeUnitId are GUIDs', async () => {
     const actual = await command.validate({ options: { id: userId, administrativeUnitId: administrativeUnitId } }, commandInfo);
     assert.strictEqual(actual, true);
-  });
-
-  it('fails validation when both member id and name options are passed', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { id: userId, name: userName, administrativeUnitId: administrativeUnitId } }, commandInfo);
-    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if member id is not a valid GUID', async () => {
@@ -173,7 +158,7 @@ describe(commands.ADMINISTRATIVEUNIT_MEMBER_GET, () => {
     assert(loggerLogSpy.calledOnceWithExactly(userTransformedResponse));
   });
 
-  it('get member info for an administrative unit specified by name and member specified by id', async () => {
+  it('get member info for an administrative unit specified by name and member specified by id (verbose)', async () => {
     sinon.stub(aadAdministrativeUnit, 'getAdministrativeUnitByDisplayName').withArgs(administrativeUnitName).resolves({ id: administrativeUnitId, displayName: administrativeUnitName });
 
     sinon.stub(request, 'get').callsFake(async (opts) => {
@@ -199,7 +184,7 @@ describe(commands.ADMINISTRATIVEUNIT_MEMBER_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { id: userId, administrativeUnitName: administrativeUnitName } });
+    await command.action(logger, { options: { id: userId, administrativeUnitName: administrativeUnitName, verbose: true } });
 
     assert(loggerLogSpy.calledOnceWithExactly(userTransformedResponse));
   });
@@ -211,35 +196,19 @@ describe(commands.ADMINISTRATIVEUNIT_MEMBER_GET, () => {
     await assert.rejects(command.action(logger, { options: { id: userId, administrativeUnitId: administrativeUnitId } }), new CommandError(errorMessage));
   });
 
-  it('get member info for an administrative unit specified by id and member specified by name', async () => {
-    sinon.stub(aadAdministrativeUnit, 'getMemberIdByName').withArgs(userName).resolves(userId);
-
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/directory/administrativeUnits/${administrativeUnitId}/members/${userId}`) {
-        return {
-          "@odata.type": "#microsoft.graph.user",
-          "id": "64131a70-beb9-4ccb-b590-4401e58446ec",
-          "businessPhones": [
-            "+20 255501070"
-          ],
-          "displayName": "Pradeep Gupta",
-          "givenName": "Pradeep",
-          "jobTitle": "Accountant",
-          "mail": "PradeepG@4wrvkx.onmicrosoft.com",
-          "mobilePhone": null,
-          "officeLocation": "98/2202",
-          "preferredLanguage": "en-US",
-          "surname": "Gupta",
-          "userPrincipalName": "PradeepG@4wrvkx.onmicrosoft.com"
-        };
+  it('correctly handles API OData error', async () => {
+    sinon.stub(request, 'get').rejects({
+      error: {
+        'odata.error': {
+          code: '-1, InvalidOperationException',
+          message: {
+            value: 'Invalid request'
+          }
+        }
       }
-
-      throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { administrativeUnitId: administrativeUnitId, name: userName } });
-
-    assert(loggerLogSpy.calledOnceWithExactly(userTransformedResponse));
+    await assert.rejects(command.action(logger, { options: { id: userId, administrativeUnitId: administrativeUnitId } } as any), new CommandError('Invalid request'));
   });
 
   it('retrieves selected properties of a member for an administrative unit specified by id and member specified by id', async () => {

@@ -1,19 +1,18 @@
-import { DirectoryObject } from "@microsoft/microsoft-graph-types";
-import GlobalOptions from "../../../../GlobalOptions.js";
-import GraphCommand from "../../../base/GraphCommand.js";
+import { DirectoryObject } from '@microsoft/microsoft-graph-types';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
-import { Logger } from "../../../../cli/Logger.js";
-import { validation } from "../../../../utils/validation.js";
-import { aadAdministrativeUnit } from "../../../../utils/aadAdministrativeUnit.js";
-import request, { CliRequestOptions } from "../../../../request.js";
+import { Logger } from '../../../../cli/Logger.js';
+import { validation } from '../../../../utils/validation.js';
+import { aadAdministrativeUnit } from '../../../../utils/aadAdministrativeUnit.js';
+import request, { CliRequestOptions } from '../../../../request.js';
 
 interface CommandArgs {
   options: Options;
 }
 
 export interface Options extends GlobalOptions {
-  id?: string;
-  name?: string;
+  id: string;
   administrativeUnitId?: string;
   administrativeUnitName?: string;
   properties?: string;
@@ -47,7 +46,6 @@ class AadAdministrativeUnitMemberGetCommand extends GraphCommand {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
         id: typeof args.options.id !== 'undefined',
-        name: typeof args.options.name !== 'undefined',
         administrativeUnitId: typeof args.options.administrativeUnitId !== 'undefined',
         administrativeUnitName: typeof args.options.administrativeUnitName !== 'undefined',
         properties: typeof args.options.properties !== 'undefined'
@@ -58,10 +56,7 @@ class AadAdministrativeUnitMemberGetCommand extends GraphCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '-i, --id [id]'
-      },
-      {
-        option: 'd, --name [name]'
+        option: '-i, --id <id>'
       },
       {
         option: '-u, --administrativeUnitId [administrativeUnitId]'
@@ -78,11 +73,11 @@ class AadAdministrativeUnitMemberGetCommand extends GraphCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (args.options.id && !validation.isValidGuid(args.options.id as string)) {
+        if (args.options.id && !validation.isValidGuid(args.options.id)) {
           return `${args.options.id} is not a valid GUID`;
         }
 
-        if (args.options.administrativeUnitId && !validation.isValidGuid(args.options.administrativeUnitId as string)) {
+        if (args.options.administrativeUnitId && !validation.isValidGuid(args.options.administrativeUnitId)) {
           return `${args.options.administrativeUnitId} is not a valid GUID`;
         }
 
@@ -92,24 +87,22 @@ class AadAdministrativeUnitMemberGetCommand extends GraphCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push({ options: ['id', 'name'] });
     this.optionSets.push({ options: ['administrativeUnitId', 'administrativeUnitName'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     let administrativeUnitId = args.options.administrativeUnitId;
-    let memberId = args.options.id;
 
     try {
       if (args.options.administrativeUnitName) {
+        if (this.verbose) {
+          await logger.logToStderr(`Retrieving Administrative Unit Id...`);
+        }
+
         administrativeUnitId = (await aadAdministrativeUnit.getAdministrativeUnitByDisplayName(args.options.administrativeUnitName)).id!;
       }
 
-      if (args.options.name) {
-        memberId = await aadAdministrativeUnit.getMemberIdByName(args.options.name);
-      }
-
-      const url = this.getRequestUrl(administrativeUnitId!, memberId!, args.options);
+      const url = this.getRequestUrl(administrativeUnitId!, args.options.id, args.options);
 
       const requestOptions: CliRequestOptions = {
         url: url,
@@ -148,7 +141,10 @@ class AadAdministrativeUnitMemberGetCommand extends GraphCommand {
       }
 
       if (expandProperties.length > 0) {
-        const fieldExpands = expandProperties.map(p => `${p.split('/')[0]}($select=${p.split('/')[1]})`);
+        const fieldExpands = expandProperties.map(p => {
+          const properties = p.split('/');
+          return `${properties[0]}($select=${properties[1]})`;
+        });
         queryParameters.push(`$expand=${fieldExpands.join(',')}`);
       }
     }

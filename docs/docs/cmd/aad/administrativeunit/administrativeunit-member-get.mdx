@@ -15,11 +15,8 @@ m365 aad administrativeunit member get [options]
 ## Options
 
 ```md definition-list
-`-i, --id [id]`
-: The id of a member to be retrieved. Specify either `id` or `name`.
-
-`-d, --name [name]`
-: The name of a member to be retrieved. Specify either `id` or `name`.
+`-i, --id <id>`
+: The id of a member to be retrieved.
 
 `-u, --administrativeUnitId [administrativeUnitId]`
 : The id of the administrative unit. Specify either `administrativeUnitId` or `administrativeUnitName`.
@@ -33,6 +30,12 @@ m365 aad administrativeunit member get [options]
 
 <Global />
 
+## Remarks
+
+To get the member of a hidden membership in an administrative unit, the `Member.Read.Hidden` permission is required.
+
+When the `properties` option includes values with a `/`, for example: `manager/displayName`, an additional `$expand` query parameter will be included on manager.
+
 ## Examples
 
 Get information about a member specified by id from an administrative unit specified by id
@@ -45,18 +48,6 @@ Get information about a member specified by id from an administrative unit speci
 
 ```sh
 m365 aad administrativeunit member get --id 64131a70-beb9-4ccb-b590-4401e58446ec --administrativeUnitName 'Marketing Division' 
-```
-
-Get information about a member specified by id from an administrative unit specified by name
-
-```sh
-m365 aad administrativeunit member get --id 64131a70-beb9-4ccb-b590-4401e58446ec --administrativeUnitName 'Marketing Division' 
-```
-
-Get information about a member specified by name from an administrative unit specified by id. Return the id and displayName
-
-```sh
-m365 aad administrativeunit member get --name john.doe@contoso.com --administrativeUnitId 03c4c9dc-6f0c-4c4f-a4e6-0c9ed80f54c7 --properties 'id,displayName'
 ```
 
 ## Response
@@ -136,4 +127,4 @@ m365 aad administrativeunit member get --name john.doe@contoso.com --administrat
 
 ## More information
 
-- Administrative units: https://learn.microsoft.com/entra/identity/role-based-access-control/administrative-units
+[Administrative units](https://learn.microsoft.com/entra/identity/role-based-access-control/administrative-units)
