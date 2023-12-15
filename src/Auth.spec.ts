@@ -2083,6 +2083,10 @@ describe('Auth', () => {
     assert.strictEqual(Auth.getResourceFromUrl('https://api.powerbi.com'), 'https://analysis.windows.net/powerbi/api');
   });
 
+  it('correctly retrieves resource for https://api.flow.microsoft.com', () => {
+    assert.strictEqual(Auth.getResourceFromUrl('https://api.flow.microsoft.com'), 'https://management.azure.com/');
+  });
+
   it('returns undefined if access token is not set when determining auth type', () => {
     assert.strictEqual(accessToken.isAppOnlyAccessToken(''), undefined);
   });

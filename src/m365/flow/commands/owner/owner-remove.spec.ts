@@ -24,8 +24,8 @@ describe(commands.OWNER_REMOVE, () => {
   const userName = 'john@contoso.com';
   const groupId = '37a0264d-fea4-4e87-8e5e-e574ff878cf2';
   const groupName = 'Test Group';
-  const requestUrlNoAdmin = `https://management.azure.com/providers/Microsoft.ProcessSimple/environments/${formatting.encodeQueryParameter(environmentName)}/flows/${formatting.encodeQueryParameter(flowName)}/modifyPermissions?api-version=2016-11-01`;
-  const requestUrlAdmin = `https://management.azure.com/providers/Microsoft.ProcessSimple/scopes/admin/environments/${formatting.encodeQueryParameter(environmentName)}/flows/${formatting.encodeQueryParameter(flowName)}/modifyPermissions?api-version=2016-11-01`;
+  const requestUrlNoAdmin = `https://api.flow.microsoft.com/providers/Microsoft.ProcessSimple/environments/${formatting.encodeQueryParameter(environmentName)}/flows/${formatting.encodeQueryParameter(flowName)}/modifyPermissions?api-version=2016-11-01`;
+  const requestUrlAdmin = `https://api.flow.microsoft.com/providers/Microsoft.ProcessSimple/scopes/admin/environments/${formatting.encodeQueryParameter(environmentName)}/flows/${formatting.encodeQueryParameter(flowName)}/modifyPermissions?api-version=2016-11-01`;
   const requestBodyUser = { 'delete': [{ 'id': userId }] };
   const requestBodyGroup = { 'delete': [{ 'id': groupId }] };
 

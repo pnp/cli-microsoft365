@@ -1,7 +1,8 @@
 import { Logger } from '../../../cli/Logger.js';
 import GlobalOptions from '../../../GlobalOptions.js';
 import { formatting } from '../../../utils/formatting.js';
-import { AzmgmtItemsListCommand } from '../../base/AzmgmtItemsListCommand.js';
+import { odata } from '../../../utils/odata.js';
+import PowerAutomateCommand from '../../base/PowerAutomateCommand.js';
 import commands from '../commands.js';
 
 interface CommandArgs {
@@ -15,7 +16,16 @@ interface Options extends GlobalOptions {
   asAdmin?: boolean;
 }
 
-class FlowListCommand extends AzmgmtItemsListCommand<{ name: string, id: string, displayName: string, properties: { displayName: string } }> {
+interface PowerAutomateFlow {
+  name: string;
+  id: string;
+  displayName: string;
+  properties: {
+    displayName: string;
+  }
+}
+
+class FlowListCommand extends PowerAutomateCommand {
   private allowedSharingStatuses = ['all', 'personal', 'ownedByMe', 'sharedWithMe'];
 
   public get name(): string {
@@ -91,37 +101,39 @@ class FlowListCommand extends AzmgmtItemsListCommand<{ name: string, id: string,
         includeSolutions
       } = args.options;
 
+      let items: PowerAutomateFlow[] = [];
+
       if (sharingStatus === 'personal') {
         const url = this.getApiUrl(environmentName, asAdmin, includeSolutions, 'personal');
-        await this.getAllItems(url, logger, true);
+        items = await odata.getAllItems<PowerAutomateFlow>(url);
       }
       else if (sharingStatus === 'sharedWithMe') {
         const url = this.getApiUrl(environmentName, asAdmin, includeSolutions, 'team');
-        await this.getAllItems(url, logger, true);
+        items = await odata.getAllItems<PowerAutomateFlow>(url);
       }
       else if (sharingStatus === 'all') {
         let url = this.getApiUrl(environmentName, asAdmin, includeSolutions, 'personal');
-        await this.getAllItems(url, logger, true);
+        items = await odata.getAllItems<PowerAutomateFlow>(url);
 
         url = this.getApiUrl(environmentName, asAdmin, includeSolutions, 'team');
-        await this.getAllItems(url, logger, false);
+        items = await odata.getAllItems<PowerAutomateFlow>(url);
       }
       else {
         const url = this.getApiUrl(environmentName, asAdmin, includeSolutions);
-        await this.getAllItems(url, logger, true);
+        items = await odata.getAllItems<PowerAutomateFlow>(url);
       }
 
       // Remove duplicates
-      this.items = this.items.filter((flow, index, self) =>
+      items = items.filter((flow, index, self) =>
         index === self.findIndex(f => f.id === flow.id)
       );
 
-      if (this.items.length > 0) {
-        this.items.forEach(i => {
+      if (items.length > 0) {
+        items.forEach(i => {
           i.displayName = i.properties.displayName;
         });
 
-        await logger.log(this.items);
+        await logger.log(items);
       }
       else {
         if (this.verbose) {
@@ -135,7 +147,7 @@ class FlowListCommand extends AzmgmtItemsListCommand<{ name: string, id: string,
   }
 
   private getApiUrl(environmentName: string, asAdmin?: boolean, includeSolutionFlows?: boolean, filter?: 'personal' | 'team',): string {
-    let url = `${this.resource}providers/Microsoft.ProcessSimple${asAdmin ? '/scopes/admin' : ''}/environments/${formatting.encodeQueryParameter(environmentName)}/flows?api-version=2016-11-01`;
+    let url = `${this.resource}/providers/Microsoft.ProcessSimple${asAdmin ? '/scopes/admin' : ''}/environments/${formatting.encodeQueryParameter(environmentName)}/flows?api-version=2016-11-01`;
 
     if (filter === 'personal') {
       url += `&$filter=search('personal')`;
