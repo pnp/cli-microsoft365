@@ -123,7 +123,7 @@ describe(commands.OWNER_ENSURE, () => {
     };
 
     const postRequestStub = sinon.stub(request, 'post').callsFake(async opts => {
-      if (opts.url === `https://management.azure.com/providers/Microsoft.ProcessSimple/environments/${formatting.encodeQueryParameter(validEnvironmentName)}/flows/${formatting.encodeQueryParameter(validFlowName)}/modifyPermissions?api-version=2016-11-01`) {
+      if (opts.url === `https://api.flow.microsoft.com/providers/Microsoft.ProcessSimple/environments/${formatting.encodeQueryParameter(validEnvironmentName)}/flows/${formatting.encodeQueryParameter(validFlowName)}/modifyPermissions?api-version=2016-11-01`) {
         return;
       }
 
@@ -152,7 +152,7 @@ describe(commands.OWNER_ENSURE, () => {
     sinon.stub(aadUser, 'getUserIdByUpn').resolves(validUserId);
 
     const postRequestStub = sinon.stub(request, 'post').callsFake(async opts => {
-      if (opts.url === `https://management.azure.com/providers/Microsoft.ProcessSimple/environments/${formatting.encodeQueryParameter(validEnvironmentName)}/flows/${formatting.encodeQueryParameter(validFlowName)}/modifyPermissions?api-version=2016-11-01`) {
+      if (opts.url === `https://api.flow.microsoft.com/providers/Microsoft.ProcessSimple/environments/${formatting.encodeQueryParameter(validEnvironmentName)}/flows/${formatting.encodeQueryParameter(validFlowName)}/modifyPermissions?api-version=2016-11-01`) {
         return;
       }
 
@@ -179,7 +179,7 @@ describe(commands.OWNER_ENSURE, () => {
     };
 
     const postRequestStub = sinon.stub(request, 'post').callsFake(async opts => {
-      if (opts.url === `https://management.azure.com/providers/Microsoft.ProcessSimple/scopes/admin/environments/${formatting.encodeQueryParameter(validEnvironmentName)}/flows/${formatting.encodeQueryParameter(validFlowName)}/modifyPermissions?api-version=2016-11-01`) {
+      if (opts.url === `https://api.flow.microsoft.com/providers/Microsoft.ProcessSimple/scopes/admin/environments/${formatting.encodeQueryParameter(validEnvironmentName)}/flows/${formatting.encodeQueryParameter(validFlowName)}/modifyPermissions?api-version=2016-11-01`) {
         return;
       }
 
@@ -208,7 +208,7 @@ describe(commands.OWNER_ENSURE, () => {
     sinon.stub(aadGroup, 'getGroupIdByDisplayName').resolves(validGroupId);
 
     const postRequestStub = sinon.stub(request, 'post').callsFake(async opts => {
-      if (opts.url === `https://management.azure.com/providers/Microsoft.ProcessSimple/scopes/admin/environments/${formatting.encodeQueryParameter(validEnvironmentName)}/flows/${formatting.encodeQueryParameter(validFlowName)}/modifyPermissions?api-version=2016-11-01`) {
+      if (opts.url === `https://api.flow.microsoft.com/providers/Microsoft.ProcessSimple/scopes/admin/environments/${formatting.encodeQueryParameter(validEnvironmentName)}/flows/${formatting.encodeQueryParameter(validFlowName)}/modifyPermissions?api-version=2016-11-01`) {
         return;
       }
 
@@ -250,7 +250,7 @@ describe(commands.OWNER_ENSURE, () => {
     sinon.stub(cli, 'handleMultipleResultsFound').resolves({ id: validGroupId });
 
     const postRequestStub = sinon.stub(request, 'post').callsFake(async opts => {
-      if (opts.url === `https://management.azure.com/providers/Microsoft.ProcessSimple/scopes/admin/environments/${formatting.encodeQueryParameter(validEnvironmentName)}/flows/${formatting.encodeQueryParameter(validFlowName)}/modifyPermissions?api-version=2016-11-01`) {
+      if (opts.url === `https://api.flow.microsoft.com/providers/Microsoft.ProcessSimple/scopes/admin/environments/${formatting.encodeQueryParameter(validEnvironmentName)}/flows/${formatting.encodeQueryParameter(validFlowName)}/modifyPermissions?api-version=2016-11-01`) {
         return;
       }
 

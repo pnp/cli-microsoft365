@@ -79,7 +79,7 @@ describe(commands.RUN_GET, () => {
 
   it('retrieves information about the specified run', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://management.azure.com/providers/Microsoft.ProcessSimple/environments/${environmentName}/flows/${flowName}/runs/${runName}?api-version=2016-11-01`) {
+      if (opts.url === `https://api.flow.microsoft.com/providers/Microsoft.ProcessSimple/environments/${environmentName}/flows/${flowName}/runs/${runName}?api-version=2016-11-01`) {
         return flowResponse;
       }
 
@@ -92,7 +92,7 @@ describe(commands.RUN_GET, () => {
 
   it('renders empty string for endTime, if the run specified is still running', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://management.azure.com/providers/Microsoft.ProcessSimple/environments/${environmentName}/flows/${flowName}/runs/${runName}?api-version=2016-11-01`) {
+      if (opts.url === `https://api.flow.microsoft.com/providers/Microsoft.ProcessSimple/environments/${environmentName}/flows/${flowName}/runs/${runName}?api-version=2016-11-01`) {
         return flowResponseNoEndTime;
       }
 
@@ -105,7 +105,7 @@ describe(commands.RUN_GET, () => {
 
   it('retrieves information about the specified run including trigger information', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://management.azure.com/providers/Microsoft.ProcessSimple/environments/${environmentName}/flows/${flowName}/runs/${runName}?api-version=2016-11-01`) {
+      if (opts.url === `https://api.flow.microsoft.com/providers/Microsoft.ProcessSimple/environments/${environmentName}/flows/${flowName}/runs/${runName}?api-version=2016-11-01`) {
         return flowResponse;
       }
 

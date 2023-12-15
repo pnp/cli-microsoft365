@@ -2,7 +2,7 @@ import { Logger } from '../../../cli/Logger.js';
 import GlobalOptions from '../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../request.js';
 import { formatting } from '../../../utils/formatting.js';
-import AzmgmtCommand from '../../base/AzmgmtCommand.js';
+import PowerAutomateCommand from '../../base/PowerAutomateCommand.js';
 import commands from '../commands.js';
 
 interface CommandArgs {
@@ -40,7 +40,7 @@ interface Flow {
   triggers: string;
 }
 
-class FlowGetCommand extends AzmgmtCommand {
+class FlowGetCommand extends PowerAutomateCommand {
   public get name(): string {
     return commands.GET;
   }
@@ -88,7 +88,7 @@ class FlowGetCommand extends AzmgmtCommand {
     }
 
     const requestOptions: CliRequestOptions = {
-      url: `${this.resource}providers/Microsoft.ProcessSimple/${args.options.asAdmin ? 'scopes/admin/' : ''}environments/${formatting.encodeQueryParameter(args.options.environmentName)}/flows/${formatting.encodeQueryParameter(args.options.name)}?api-version=2016-11-01`,
+      url: `${this.resource}/providers/Microsoft.ProcessSimple/${args.options.asAdmin ? 'scopes/admin/' : ''}environments/${formatting.encodeQueryParameter(args.options.environmentName)}/flows/${formatting.encodeQueryParameter(args.options.name)}?api-version=2016-11-01`,
       headers: {
         accept: 'application/json'
       },

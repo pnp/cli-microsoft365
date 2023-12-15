@@ -163,7 +163,7 @@ describe(commands.RUN_LIST, () => {
 
   it('retrieves all runs for a specific flow', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://management.azure.com/providers/Microsoft.ProcessSimple/environments/${environmentName}/flows/${flowName}/runs?api-version=2016-11-01`) {
+      if (opts.url === `https://api.flow.microsoft.com/providers/Microsoft.ProcessSimple/environments/${environmentName}/flows/${flowName}/runs?api-version=2016-11-01`) {
         if (opts.headers &&
           opts.headers.accept &&
           (opts.headers.accept as string).indexOf('application/json') === 0) {
@@ -171,7 +171,7 @@ describe(commands.RUN_LIST, () => {
         }
       }
 
-      throw 'Invalid request';
+      throw 'Invalid request ' + opts.url;
     });
 
     await command.action(logger, { options: { environmentName: environmentName, flowName: flowName, verbose: true } });
@@ -180,7 +180,7 @@ describe(commands.RUN_LIST, () => {
 
   it('retrieves all runs for a specific flow as admin', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://management.azure.com/providers/Microsoft.ProcessSimple/scopes/admin/environments/${environmentName}/flows/${flowName}/runs?api-version=2016-11-01`) {
+      if (opts.url === `https://api.flow.microsoft.com/providers/Microsoft.ProcessSimple/scopes/admin/environments/${environmentName}/flows/${flowName}/runs?api-version=2016-11-01`) {
         if (opts.headers &&
           opts.headers.accept &&
           (opts.headers.accept as string).indexOf('application/json') === 0) {
@@ -197,7 +197,7 @@ describe(commands.RUN_LIST, () => {
 
   it('retrieves all runs with a specific status for a specific flow', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://management.azure.com/providers/Microsoft.ProcessSimple/environments/${environmentName}/flows/${flowName}/runs?api-version=2016-11-01&$filter=status eq '${status}'`) {
+      if (opts.url === `https://api.flow.microsoft.com/providers/Microsoft.ProcessSimple/environments/${environmentName}/flows/${flowName}/runs?api-version=2016-11-01&$filter=status eq '${status}'`) {
         if (opts.headers &&
           opts.headers.accept &&
           (opts.headers.accept as string).indexOf('application/json') === 0) {
@@ -214,7 +214,7 @@ describe(commands.RUN_LIST, () => {
 
   it('retrieves all runs between two dates for a specific flow', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://management.azure.com/providers/Microsoft.ProcessSimple/environments/${environmentName}/flows/${flowName}/runs?api-version=2016-11-01&$filter=startTime ge ${triggerStartTime} and startTime lt ${triggerEndTime}`) {
+      if (opts.url === `https://api.flow.microsoft.com/providers/Microsoft.ProcessSimple/environments/${environmentName}/flows/${flowName}/runs?api-version=2016-11-01&$filter=startTime ge ${triggerStartTime} and startTime lt ${triggerEndTime}`) {
         if (opts.headers &&
           opts.headers.accept &&
           (opts.headers.accept as string).indexOf('application/json') === 0) {

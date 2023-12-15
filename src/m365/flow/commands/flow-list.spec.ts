@@ -619,7 +619,7 @@ describe(commands.LIST, () => {
 
   it('retrieves available Flows when specifying sharingStatus ownedByMe', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://management.azure.com/providers/Microsoft.ProcessSimple/environments/${environmentId}/flows?api-version=2016-11-01`) {
+      if (opts.url === `https://api.flow.microsoft.com/providers/Microsoft.ProcessSimple/environments/${environmentId}/flows?api-version=2016-11-01`) {
         return flowResponse;
       }
 
@@ -632,10 +632,10 @@ describe(commands.LIST, () => {
 
   it('retrieves available Flows when specifying sharingStatus all', async () => {
     const getStub = sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://management.azure.com/providers/Microsoft.ProcessSimple/environments/${environmentId}/flows?api-version=2016-11-01&$filter=search('team')`) {
+      if (opts.url === `https://api.flow.microsoft.com/providers/Microsoft.ProcessSimple/environments/${environmentId}/flows?api-version=2016-11-01&$filter=search('team')`) {
         return flowResponse;
       }
-      if (opts.url === `https://management.azure.com/providers/Microsoft.ProcessSimple/environments/${environmentId}/flows?api-version=2016-11-01&$filter=search('personal')`) {
+      if (opts.url === `https://api.flow.microsoft.com/providers/Microsoft.ProcessSimple/environments/${environmentId}/flows?api-version=2016-11-01&$filter=search('personal')`) {
         return flowResponse;
       }
 
@@ -648,7 +648,7 @@ describe(commands.LIST, () => {
 
   it('retrieves available Flows when specifying sharingStatus personal', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://management.azure.com/providers/Microsoft.ProcessSimple/environments/${environmentId}/flows?api-version=2016-11-01&$filter=search('personal')`) {
+      if (opts.url === `https://api.flow.microsoft.com/providers/Microsoft.ProcessSimple/environments/${environmentId}/flows?api-version=2016-11-01&$filter=search('personal')`) {
         return flowResponse;
       }
 
@@ -661,7 +661,7 @@ describe(commands.LIST, () => {
 
   it('retrieves available Flows when specifying sharingStatus sharedWithMe', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://management.azure.com/providers/Microsoft.ProcessSimple/environments/${environmentId}/flows?api-version=2016-11-01&$filter=search('team')`) {
+      if (opts.url === `https://api.flow.microsoft.com/providers/Microsoft.ProcessSimple/environments/${environmentId}/flows?api-version=2016-11-01&$filter=search('team')`) {
         return flowResponse;
       }
 
@@ -679,7 +679,7 @@ describe(commands.LIST, () => {
           opts.headers.accept &&
           (opts.headers.accept as string).indexOf('application/json') === 0) {
           return {
-            "nextLink": "https://management.azure.com/providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c5/flows?api-version=2016-11-01&%24skiptoken=eyJuZXh0TWFya2VyIjoiMjAxOTAyMDRUMTg1NDU2Wi02YTA5NGQwMi02NDFhLTQ4OTEtYjRkZi00NDA1OTRmMjZjODUifQ%3d%3d",
+            "nextLink": "https://api.flow.microsoft.com/providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c5/flows?api-version=2016-11-01&%24skiptoken=eyJuZXh0TWFya2VyIjoiMjAxOTAyMDRUMTg1NDU2Wi02YTA5NGQwMi02NDFhLTQ4OTEtYjRkZi00NDA1OTRmMjZjODUifQ%3d%3d",
             "value": [
               {
                 "name": "1c6ee23a-a835-44bc-a4f5-462b658efc13",
@@ -1212,7 +1212,7 @@ describe(commands.LIST, () => {
           opts.headers.accept &&
           (opts.headers.accept as string).indexOf('application/json') === 0) {
           return {
-            "nextLink": "https://emea.api.flow.microsoft.com:11777/providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c5/flows?api-version=2016-11-01&%24skiptoken=eyJuZXh0TWFya2VyIjoiMjAxOTAyMDRUMTg1NDU2Wi02YTA5NGQwMi02NDFhLTQ4OTEtYjRkZi00NDA1OTRmMjZjODUifQ%3d%3d",
+            "nextLink": "https://api.flow.microsoft.com/providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c5/flows?api-version=2016-11-01&%24skiptoken=eyJuZXh0TWFya2VyIjoiMjAxOTAyMDRUMTg1NDU2Wi02YTA5NGQwMi02NDFhLTQ4OTEtYjRkZi00NDA1OTRmMjZjODUifQ%3d%3d",
             "value": [
               {
                 "name": "1c6ee23a-a835-44bc-a4f5-462b658efc13",
@@ -1273,10 +1273,6 @@ describe(commands.LIST, () => {
         }
       }
       else {
-        if ((opts.url as string).indexOf('https://emea.api.flow.microsoft.com:11777') > -1) {
-          throw 'Invalid request';
-        }
-
         return {
           "value": [
             {
@@ -1523,7 +1519,7 @@ describe(commands.LIST, () => {
 
   it('retrieves flows including flows from solutions', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === 'https://management.azure.com/providers/Microsoft.ProcessSimple/environments/${environmentId}/flows?api-version=2016-11-01&include=includeSolutionCloudFlows') {
+      if (opts.url === 'https://api.flow.microsoft.com/providers/Microsoft.ProcessSimple/environments/${environmentId}/flows?api-version=2016-11-01&include=includeSolutionCloudFlows') {
         return {
           value: [
             {
@@ -1548,7 +1544,7 @@ describe(commands.LIST, () => {
 
   it('retrieves flows and removes duplicates', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === 'https://management.azure.com/providers/Microsoft.ProcessSimple/environments/${environmentId}/flows?api-version=2016-11-01') {
+      if (opts.url === 'https://api.flow.microsoft.com/providers/Microsoft.ProcessSimple/environments/${environmentId}/flows?api-version=2016-11-01') {
         return {
           value: [
             {
@@ -1582,7 +1578,7 @@ describe(commands.LIST, () => {
           opts.headers.accept &&
           (opts.headers.accept as string).indexOf('application/json') === 0) {
           return {
-            "nextLink": "https://management.azure.comproviders/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c5/flows?api-version=2016-11-01&%24skiptoken=eyJuZXh0TWFya2VyIjoiMjAxOTAyMDRUMTg1NDU2Wi02YTA5NGQwMi02NDFhLTQ4OTEtYjRkZi00NDA1OTRmMjZjODUifQ%3d%3d",
+            "nextLink": "https://api.flow.microsoft.comproviders/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c5/flows?api-version=2016-11-01&%24skiptoken=eyJuZXh0TWFya2VyIjoiMjAxOTAyMDRUMTg1NDU2Wi02YTA5NGQwMi02NDFhLTQ4OTEtYjRkZi00NDA1OTRmMjZjODUifQ%3d%3d",
             "value": [
               {
                 "name": "1c6ee23a-a835-44bc-a4f5-462b658efc13",

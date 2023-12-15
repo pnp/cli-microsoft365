@@ -1,8 +1,9 @@
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import { formatting } from '../../../../utils/formatting.js';
+import { odata } from '../../../../utils/odata.js';
 import { validation } from '../../../../utils/validation.js';
-import { AzmgmtItemsListCommand } from '../../../base/AzmgmtItemsListCommand.js';
+import PowerAutomateCommand from '../../../base/PowerAutomateCommand.js';
 import commands from '../../commands.js';
 
 interface CommandArgs {
@@ -18,7 +19,17 @@ interface Options extends GlobalOptions {
   asAdmin?: boolean;
 }
 
-class FlowRunListCommand extends AzmgmtItemsListCommand<{ name: string, startTime: string, status: string, properties: { startTime: string, status: string } }> {
+interface PowerAutomateFlowRun {
+  name: string;
+  startTime: string;
+  status: string;
+  properties: {
+    startTime: string;
+    status: string;
+  }
+}
+
+class FlowRunListCommand extends PowerAutomateCommand {
   public readonly allowedStatusses: string[] = ['Succeeded', 'Running', 'Failed', 'Cancelled'];
 
   public get name(): string {
@@ -105,21 +116,22 @@ class FlowRunListCommand extends AzmgmtItemsListCommand<{ name: string, startTim
       await logger.logToStderr(`Retrieving list of runs for Microsoft Flow ${args.options.flowName}...`);
     }
 
-    let url: string = `${this.resource}providers/Microsoft.ProcessSimple/${args.options.asAdmin ? 'scopes/admin/' : ''}environments/${formatting.encodeQueryParameter(args.options.environmentName)}/flows/${formatting.encodeQueryParameter(args.options.flowName)}/runs?api-version=2016-11-01`;
+    let url: string = `${this.resource}/providers/Microsoft.ProcessSimple/${args.options.asAdmin ? 'scopes/admin/' : ''}environments/${formatting.encodeQueryParameter(args.options.environmentName)}/flows/${formatting.encodeQueryParameter(args.options.flowName)}/runs?api-version=2016-11-01`;
     const filters = this.getFilters(args.options);
     if (filters.length > 0) {
       url += `&$filter=${filters.join(' and ')}`;
     }
     try {
-      await this.getAllItems(url, logger, true);
+      const items = await odata.getAllItems<PowerAutomateFlowRun>(url);
 
-      if (args.options.output !== 'json' && this.items.length > 0) {
-        this.items.forEach(i => {
+      if (args.options.output !== 'json' && items.length > 0) {
+        items.forEach(i => {
           i.startTime = i.properties.startTime;
           i.status = i.properties.status;
         });
       }
-      await logger.log(this.items);
+
+      await logger.log(items);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
