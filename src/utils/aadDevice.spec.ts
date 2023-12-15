@@ -43,7 +43,7 @@ describe('utils/aadDevice', () => {
     assert.deepStrictEqual(actual, { id: deviceId, displayName: displayName });
   });
 
-  it('handles selecting single deivce when multiple devices with the specified name found using getDeviceByDisplayName and cli is set to prompt', async () => {
+  it('handles selecting single device when multiple devices with the specified name found using getDeviceByDisplayName and cli is set to prompt', async () => {
     sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/devices?$filter=displayName eq '${formatting.encodeQueryParameter(displayName)}'`) {
         return {
