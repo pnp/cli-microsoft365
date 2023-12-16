@@ -3,7 +3,7 @@ import GlobalOptions from '../../../../GlobalOptions.js';
 import commands from '../../commands.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { validation } from '../../../../utils/validation.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 
 interface CommandArgs {
@@ -90,14 +90,9 @@ class AadUserRemoveCommand extends GraphCommand {
       await this.deleteUser(args);
     }
     else {
-      const result = await Cli.prompt<{ continue: boolean }>({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: `Are you sure you want to remove user '${args.options.id || args.options.userName}'?`
-      });
+      const result = await cli.promptForConfirmation({ message: `Are you sure you want to remove user '${args.options.id || args.options.userName}'?` });
 
-      if (result.continue) {
+      if (result) {
         await this.deleteUser(args);
       }
     }

@@ -1,7 +1,7 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
@@ -15,7 +15,6 @@ import command from './group-member-add.js';
 import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.GROUP_MEMBER_ADD, () => {
-  let cli: Cli;
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -66,13 +65,12 @@ describe(commands.GROUP_MEMBER_ADD, () => {
   };
 
   before(() => {
-    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
-    commandInfo = Cli.getCommandInfo(command);
+    commandInfo = cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -95,7 +93,8 @@ describe(commands.GROUP_MEMBER_ADD, () => {
     sinonUtil.restore([
       request.get,
       request.post,
-      cli.getSettingWithDefaultValue
+      cli.getSettingWithDefaultValue,
+      cli.handleMultipleResultsFound
     ]);
   });
 
@@ -564,5 +563,75 @@ describe(commands.GROUP_MEMBER_ADD, () => {
         userNames: 'Alex.Wilber@contoso.com'
       }
     }), new CommandError('The selected permission level is not valid.'));
+  });
+
+  it('handles error when multiple groups with the specified displayName found', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
+    sinon.stub(request, 'get').callsFake(async opts => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq 'Azure%20AD%20Group%20name'&$select=id`) {
+        return {
+          value: [
+            { id: '9b1b1e42-794b-4c71-93ac-5ed92488b67f' },
+            { id: '9b1b1e42-794b-4c71-93ac-5ed92488b67g' }
+          ]
+        };
+      }
+
+      return 'Invalid Request';
+    });
+
+    sinon.stub(request, 'post').rejects('POST request executed');
+
+    await assert.rejects(command.action(logger, {
+      options: {
+        webUrl: "https://contoso.sharepoint.com/sites/SiteA",
+        groupId: 32,
+        aadGroupNames: "Azure AD Group name"
+      }
+    }), new CommandError("Resource 'Azure AD Group name' does not exist."));
+  });
+
+  it('handles selecting single result when multiple groups with the specified name found and cli is set to prompt', async () => {
+    sinon.stub(request, 'get').callsFake(async opts => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq 'Azure%20AD%20Group%20name'&$select=id`) {
+        return {
+          value: [
+            { id: '9b1b1e42-794b-4c71-93ac-5ed92488b67f' },
+            { id: '9b1b1e42-794b-4c71-93ac-5ed92488b67g' }
+          ]
+        };
+      }
+
+      if (opts.url === `https://contoso.sharepoint.com/sites/SiteA/_api/web/sitegroups/GetById('32')?$select=Id`) {
+        return groupResponse;
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinon.stub(cli, 'handleMultipleResultsFound').resolves({ id: '9b1b1e42-794b-4c71-93ac-5ed92488b67f' });
+
+    sinon.stub(request, 'post').callsFake(async opts => {
+      if (opts.url === 'https://contoso.sharepoint.com/sites/SiteA/_api/SP.Web.ShareObject' &&
+        opts.data) {
+        return jsonSingleUser;
+      }
+
+      throw `Invalid request ${JSON.stringify(opts)}`;
+    });
+
+    await command.action(logger, {
+      options: {
+        debug: true, webUrl: "https://contoso.sharepoint.com/sites/SiteA", groupId: 32, aadGroupNames: "Azure AD Group name"
+      }
+    });
+    assert(loggerLogSpy.calledWith(jsonSingleUser.UsersAddedToGroup));
   });
 });

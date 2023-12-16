@@ -2,7 +2,7 @@ import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
 import { CommandError } from '../../../../Command.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import request from '../../../../request.js';
@@ -26,7 +26,7 @@ describe(commands.CHATBOT_REMOVE, () => {
 
   let log: string[];
   let logger: Logger;
-  let promptOptions: any;
+  let promptIssued: boolean = false;
   let loggerLogToStderrSpy: sinon.SinonSpy;
 
   before(() => {
@@ -35,7 +35,7 @@ describe(commands.CHATBOT_REMOVE, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
-    commandInfo = Cli.getCommandInfo(command);
+    commandInfo = cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -52,19 +52,20 @@ describe(commands.CHATBOT_REMOVE, () => {
       }
     };
     loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
-    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
-      promptOptions = options;
-      return { continue: false };
+    sinon.stub(cli, 'promptForConfirmation').callsFake(() => {
+      promptIssued = true;
+      return Promise.resolve(false);
     });
-    promptOptions = undefined;
+
+    promptIssued = false;
   });
 
   afterEach(() => {
     sinonUtil.restore([
       request.post,
       powerPlatform.getDynamicsInstanceApiUrl,
-      Cli.prompt,
-      Cli.executeCommandWithOutput
+      cli.promptForConfirmation,
+      cli.executeCommandWithOutput
     ]);
   });
 
@@ -101,23 +102,18 @@ describe(commands.CHATBOT_REMOVE, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('prompts before removing the specified chatbot owned by the currently signed-in user when confirm option not passed', async () => {
+  it('prompts before removing the specified chatbot owned by the currently signed-in user when force option not passed', async () => {
     await command.action(logger, {
       options: {
         environmentName: validEnvironment,
         id: validId
       }
     });
-    let promptIssued = false;
-
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
 
     assert(promptIssued);
   });
 
-  it('aborts removing the specified chatbot owned by the currently signed-in user when confirm option not passed and prompt not confirmed', async () => {
+  it('aborts removing the specified chatbot owned by the currently signed-in user when force option not passed and prompt not confirmed', async () => {
     const postSpy = sinon.spy(request, 'post');
 
     await command.action(logger, {
@@ -132,7 +128,7 @@ describe(commands.CHATBOT_REMOVE, () => {
   it('removes the specified chatbot owned by the currently signed-in user when prompt confirmed by name', async () => {
     sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').callsFake(async () => envUrl);
 
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
+    sinon.stub(cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
       if (command === ppChatbotGetCommand) {
         return ({
           stdout: `{ "authenticationtrigger": 0, "_owningbusinessunit_value": "6da087c1-1c4d-ed11-bba1-000d3a2caf7f", "statuscode": 1, "createdon": "2022-11-19T10:42:22Z", "statecode": 0, "schemaname": "new_bot_23f5f58697fd43d595eb451c9797a53d", "_ownerid_value": "5fa787c1-1c4d-ed11-bba1-000d3a2caf7f", "name": "CLI 365 Chatbot", "solutionid": "fd140aae-4df4-11dd-bd17-0019b9312238", "ismanaged": false, "versionnumber": 1429641, "publishedon": "2022-11-19T19:19:53Z", "timezoneruleversionnumber": 0, "language": 1033, "_modifiedby_value": "5fa787c1-1c4d-ed11-bba1-000d3a2caf7f", "overwritetime": "1900-01-01T00:00:00Z", "modifiedon": "2022-11-19T20:19:57Z", "componentstate": 0, "botid": "3a081d91-5ea8-40a7-8ac9-abbaa3fcb893", "_createdby_value": "5fa787c1-1c4d-ed11-bba1-000d3a2caf7f", "componentidunique": "cdcd6496-e25d-4ad1-91cf-3f4d547fdd23", "authenticationmode": 1, "_owninguser_value": "5fa787c1-1c4d-ed11-bba1-000d3a2caf7f", "accesscontrolpolicy": 0, "runtimeprovider": 0, "_publishedby_value": null, "authenticationconfiguration": null, "authorizedsecuritygroupids": null, "overriddencreatedon": null, "applicationmanifestinformation": null, "importsequencenumber": null, "synchronizationstatus": null, "_modifiedonbehalfby_value": null, "template": null, "_providerconnectionreferenceid_value": null, "configuration": null, "utcconversiontimezonecode": null, "_createdonbehalfby_value": null, "iconbase64": null, "supportedlanguages": null, "_owningteam_value": null, "iscustomizable": { "Value": true, "CanBeChanged": true, "ManagedPropertyLogicalName": "iscustomizableanddeletable" } }`
@@ -150,10 +146,8 @@ describe(commands.CHATBOT_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
     await command.action(logger, {
       options: {
         verbose: true,

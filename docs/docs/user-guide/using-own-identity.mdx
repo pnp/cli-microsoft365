@@ -81,7 +81,7 @@ For the purpose of this tutorial we only want to grant read access to SharePoint
 
 [![SharePoint Online Delegated permissions](../images/using-own-identity/spo-delegated-permissions.png)](../images/using-own-identity/spo-delegated-permissions.png)
 
-:::caution
+:::warning
 
 Note that the `AllSites.Read` permission does not directly grant the signed-in user access to all sites in SharePoint Online. As we authenticate as the signed-in user, that user must still have access to the SharePoint sites that we want to return information about, otherwise the SharePoint Online API calls will fail with a `401 Unauthorized` error.
 
@@ -91,7 +91,7 @@ You will be presented with the `Configured permissions` section again but this t
 
 [![SharePoint Online Configured permissions](../images/using-own-identity/spo-configured-permissions.png)](../images/using-own-identity/spo-configured-permissions.png)
 
-:::caution
+:::warning
 
 Note that when executing tenant level SharePoint Online commands, the CLI will attempt to autodiscover your tenant URL.
 

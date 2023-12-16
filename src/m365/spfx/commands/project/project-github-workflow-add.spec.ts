@@ -3,7 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import sinon from 'sinon';
 import { CommandError } from '../../../../Command.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { telemetry } from '../../../../telemetry.js';
@@ -23,7 +23,7 @@ describe(commands.PROJECT_GITHUB_WORKFLOW_ADD, () => {
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     sinon.stub(session, 'getId').callsFake(() => '');
-    commandInfo = Cli.getCommandInfo(command);
+    commandInfo = cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -44,6 +44,7 @@ describe(commands.PROJECT_GITHUB_WORKFLOW_ADD, () => {
   afterEach(() => {
     sinonUtil.restore([
       (command as any).getProjectRoot,
+      (command as any).getProjectVersion,
       fs.existsSync,
       fs.readFileSync,
       fs.writeFileSync
@@ -116,6 +117,38 @@ describe(commands.PROJECT_GITHUB_WORKFLOW_ADD, () => {
       return '';
     });
 
+    sinon.stub(command as any, 'getProjectVersion').returns('1.16.0');
+
+    const writeFileSyncStub: sinon.SinonStub = sinon.stub(fs, 'writeFileSync').resolves({});
+
+    await command.action(logger, { options: { debug: true } } as any);
+    assert(writeFileSyncStub.calledWith(path.join(process.cwd(), projectPath, '/.github', 'workflows', 'deploy-spfx-solution.yml')), 'workflow file not created');
+  });
+
+  it('creates a default workflow for SPFx 1.18.x', async () => {
+    sinon.stub(command as any, 'getProjectRoot').returns(path.join(process.cwd(), projectPath));
+
+    sinon.stub(fs, 'existsSync').callsFake((fakePath) => {
+      if (fakePath.toString().endsWith('.github')) {
+        return true;
+      }
+      else if (fakePath.toString().endsWith('workflows')) {
+        return true;
+      }
+
+      return false;
+    });
+
+    sinon.stub(fs, 'readFileSync').callsFake((path, options) => {
+      if (path.toString().endsWith('package.json') && options === 'utf-8') {
+        return '{"name": "test"}';
+      }
+
+      return '';
+    });
+
+    sinon.stub(command as any, 'getProjectVersion').returns('1.18.0');
+
     const writeFileSyncStub: sinon.SinonStub = sinon.stub(fs, 'writeFileSync').resolves({});
 
     await command.action(logger, { options: { debug: true } } as any);
@@ -149,6 +182,8 @@ describe(commands.PROJECT_GITHUB_WORKFLOW_ADD, () => {
       return '';
     });
 
+    sinon.stub(command as any, 'getProjectVersion').returns('1.16.0');
+
     const writeFileSyncStub: sinon.SinonStub = sinon.stub(fs, 'writeFileSync').resolves({});
 
     await command.action(logger, { options: { name: 'test', branchName: 'dev', manuallyTrigger: true, skipFeatureDeployment: true, overwrite: true, loginMethod: 'user', scope: 'sitecollection' } } as any);
@@ -177,9 +212,101 @@ describe(commands.PROJECT_GITHUB_WORKFLOW_ADD, () => {
       return false;
     });
 
+    sinon.stub(command as any, 'getProjectVersion').returns('1.18.0');
+
     sinon.stub(fs, 'writeFileSync').callsFake(() => { throw 'error'; });
 
     await assert.rejects(command.action(logger, { options: {} } as any),
       new CommandError('error'));
+  });
+
+  it('handles error with unknown version of SPFx', async () => {
+    sinon.stub(command as any, 'getProjectRoot').returns(path.join(process.cwd(), projectPath));
+
+    sinon.stub(fs, 'readFileSync').callsFake((path, options) => {
+      if (path.toString().endsWith('package.json') && options === 'utf-8') {
+        return '{"name": "test"}';
+      }
+
+      return '';
+    });
+
+    sinon.stub(fs, 'existsSync').callsFake((fakePath) => {
+      if (fakePath.toString().endsWith('.github')) {
+        return true;
+      }
+      else if (fakePath.toString().endsWith('workflows')) {
+        return true;
+      }
+
+      return false;
+    });
+
+    sinon.stub(command as any, 'getProjectVersion').returns(undefined);
+
+    sinon.stub(fs, 'writeFileSync').callsFake(() => { throw 'error'; });
+
+    await assert.rejects(command.action(logger, { options: {} } as any),
+      new CommandError(`Unable to determine the version of the current SharePoint Framework project`, undefined));
+  });
+
+  it('handles error with unknown minor version of SPFx when missing minor version', async () => {
+    sinon.stub(command as any, 'getProjectRoot').returns(path.join(process.cwd(), projectPath));
+
+    sinon.stub(fs, 'readFileSync').callsFake((path, options) => {
+      if (path.toString().endsWith('package.json') && options === 'utf-8') {
+        return '{"name": "test"}';
+      }
+
+      return '';
+    });
+
+    sinon.stub(fs, 'existsSync').callsFake((fakePath) => {
+      if (fakePath.toString().endsWith('.github')) {
+        return true;
+      }
+      else if (fakePath.toString().endsWith('workflows')) {
+        return true;
+      }
+
+      return false;
+    });
+
+    sinon.stub(command as any, 'getProjectVersion').returns('1');
+
+    sinon.stub(fs, 'writeFileSync').callsFake(() => { throw 'error'; });
+
+    await assert.rejects(command.action(logger, { options: {} } as any),
+      new CommandError(`Unable to determine the minor version of the current SharePoint Framework project`, undefined));
+  });
+
+  it('handles error with unknown minor version of SPFx when minor version is NaN', async () => {
+    sinon.stub(command as any, 'getProjectRoot').returns(path.join(process.cwd(), projectPath));
+
+    sinon.stub(fs, 'readFileSync').callsFake((path, options) => {
+      if (path.toString().endsWith('package.json') && options === 'utf-8') {
+        return '{"name": "test"}';
+      }
+
+      return '';
+    });
+
+    sinon.stub(fs, 'existsSync').callsFake((fakePath) => {
+      if (fakePath.toString().endsWith('.github')) {
+        return true;
+      }
+      else if (fakePath.toString().endsWith('workflows')) {
+        return true;
+      }
+
+      return false;
+    });
+
+    sinon.stub(command as any, 'getProjectVersion').returns('1.aaa.0');
+
+    sinon.stub(fs, 'writeFileSync').callsFake(() => { throw 'error'; });
+
+    await assert.rejects(command.action(logger, { options: {} } as any),
+      new CommandError(`Unable to determine the minor version of the current SharePoint Framework project`, undefined));
   });
 });

@@ -1,7 +1,7 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
 import request from '../../../../request.js';
@@ -15,7 +15,6 @@ import command from './business-get.js';
 import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.BUSINESS_GET, () => {
-  let cli: Cli;
   const validId = 'mail@contoso.onmicrosoft.com';
   const validName = 'Valid Business';
 
@@ -34,7 +33,6 @@ describe(commands.BUSINESS_GET, () => {
   let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
-    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
@@ -62,9 +60,9 @@ describe(commands.BUSINESS_GET, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.get,
-      Cli.executeCommandWithOutput,
+      cli.executeCommandWithOutput,
       cli.getSettingWithDefaultValue,
-      Cli.handleMultipleResultsFound
+      cli.handleMultipleResultsFound
     ]);
   });
 
@@ -149,7 +147,15 @@ describe(commands.BUSINESS_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    sinon.stub(Cli, 'handleMultipleResultsFound').resolves(businessResponse);
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName: string, defaultValue: any) => {
+      if (settingName === 'prompt') {
+        return true;
+      }
+
+      return defaultValue;
+    });
+
+    sinon.stub(cli, 'handleMultipleResultsFound').resolves(businessResponse);
 
     await command.action(logger, { options: { name: validName } });
     assert(loggerLogSpy.calledWith(businessResponse));

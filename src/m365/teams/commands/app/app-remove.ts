@@ -1,4 +1,4 @@
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
@@ -102,14 +102,9 @@ class TeamsAppRemoveCommand extends GraphCommand {
       await removeApp();
     }
     else {
-      const result = await Cli.prompt<{ continue: boolean }>({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: `Are you sure you want to remove the Teams app ${args.options.id || args.options.name} from the app catalog?`
-      });
+      const result = await cli.promptForConfirmation({ message: `Are you sure you want to remove the Teams app ${args.options.id || args.options.name} from the app catalog?` });
 
-      if (result.continue) {
+      if (result) {
         await removeApp();
       }
     }
@@ -141,7 +136,7 @@ class TeamsAppRemoveCommand extends GraphCommand {
 
     if (response.value.length > 1) {
       const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', response.value);
-      const result = await Cli.handleMultipleResultsFound<{ id: string; }>(`Multiple Teams apps with name '${options.name}' found.`, resultAsKeyValuePair);
+      const result = await cli.handleMultipleResultsFound<{ id: string; }>(`Multiple Teams apps with name '${options.name}' found.`, resultAsKeyValuePair);
       return result.id;
     }
 

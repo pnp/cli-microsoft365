@@ -1,4 +1,4 @@
-import { Cli, CommandOutput } from '../../../../cli/Cli.js';
+import { cli, CommandOutput } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import Command from '../../../../Command.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
@@ -156,7 +156,7 @@ class PaAppGetCommand extends PowerAppsCommand {
       verbose: this.verbose
     };
 
-    return await Cli.executeCommandWithOutput(paAppListCommand as Command, { options: { ...options, _: [] } });
+    return await cli.executeCommandWithOutput(paAppListCommand as Command, { options: { ...options, _: [] } });
   }
 
   private setProperties(app: any): any {

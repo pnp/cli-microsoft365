@@ -1,4 +1,4 @@
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
@@ -95,7 +95,7 @@ class PpSolutionGetCommand extends PowerPlatformCommand {
       const dynamicsApiUrl = await powerPlatform.getDynamicsInstanceApiUrl(args.options.environmentName, args.options.asAdmin);
       const res = await this.getSolution(dynamicsApiUrl, args.options);
 
-      if (!args.options.output || !Cli.shouldTrimOutput(args.options.output)) {
+      if (!args.options.output || !cli.shouldTrimOutput(args.options.output)) {
         await logger.log(res);
       }
       else {

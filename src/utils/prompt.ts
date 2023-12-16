@@ -1,19 +1,74 @@
-import { Cli } from '../cli/Cli.js';
+import { Separator } from '@inquirer/core';
 import { settingsNames } from '../settingsNames.js';
+import { cli } from '../cli/cli.js';
 
-let inquirer: typeof import('inquirer') | undefined;
+let inquirerInput: typeof import('@inquirer/input') | undefined;
+let inquirerConfirm: typeof import('@inquirer/confirm') | undefined;
+let inquirerSelect: typeof import('@inquirer/select') | undefined;
+
+export interface Choice<T> {
+  name: string;
+  value: T;
+  description?: string;
+}
+
+export interface InputConfig {
+  message: string | Promise<string> | (() => Promise<string>);
+  default?: string | undefined;
+  transformer?: ((value: string, { isFinal }: {
+    isFinal: boolean;
+  }) => string) | undefined;
+  validate?: ((value: string) => string | boolean | Promise<string | boolean>) | undefined;
+}
+
+export interface ConfirmationConfig {
+  message: string | Promise<string> | (() => Promise<string>);
+  default?: boolean | undefined;
+  transformer?: ((value: boolean) => string) | undefined;
+}
+
+export interface SelectionConfig<Value> {
+  message: string | Promise<string> | (() => Promise<string>);
+  choices: readonly (Separator | Choice<Value>)[];
+  pageSize?: number | undefined;
+}
 
 export const prompt = {
-  /* c8 ignore next 10 */
-  async forInput<T>(config: any, answers?: any): Promise<T> {
-    if (!inquirer) {
-      inquirer = await import('inquirer');
+  /* c8 ignore next 9 */
+  async forInput(config: InputConfig): Promise<string> {
+    if (!inquirerInput) {
+      inquirerInput = await import('@inquirer/input');
     }
 
-    const cli = Cli.getInstance();
     const errorOutput: string = cli.getSettingWithDefaultValue(settingsNames.errorOutput, 'stderr');
-    const prompt = inquirer.createPromptModule({ output: errorOutput === 'stderr' ? process.stderr : process.stdout });
 
-    return await prompt(config, answers) as any;
+    return inquirerInput.default(config, { output: errorOutput === 'stderr' ? process.stderr : process.stdout });
+  },
+
+  /* c8 ignore next 9 */
+  async forConfirmation(config: ConfirmationConfig): Promise<boolean> {
+    if (!inquirerConfirm) {
+      inquirerConfirm = await import('@inquirer/confirm');
+    }
+
+    const errorOutput: string = cli.getSettingWithDefaultValue(settingsNames.errorOutput, 'stderr');
+
+    return inquirerConfirm.default(config, { output: errorOutput === 'stderr' ? process.stderr : process.stdout });
+  },
+
+  /* c8 ignore next 14 */
+  async forSelection<T>(config: SelectionConfig<T>): Promise<T> {
+    if (!inquirerSelect) {
+      inquirerSelect = await import('@inquirer/select');
+    }
+
+    const errorOutput: string = cli.getSettingWithDefaultValue(settingsNames.errorOutput, 'stderr');
+    const promptPageSizeCap: number = cli.getSettingWithDefaultValue(settingsNames.promptListPageSize, 7);
+
+    if (!config.pageSize) {
+      config.pageSize = Math.min(config.choices.length, promptPageSizeCap);
+    }
+
+    return inquirerSelect.default(config, { output: errorOutput === 'stderr' ? process.stderr : process.stdout });
   }
 };

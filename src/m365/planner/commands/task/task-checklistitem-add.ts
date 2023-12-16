@@ -1,6 +1,6 @@
 import { PlannerTaskDetails } from '@microsoft/microsoft-graph-types';
 import { v4 } from 'uuid';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
@@ -85,7 +85,7 @@ class PlannerTaskChecklistItemAddCommand extends GraphCommand {
       };
 
       const result = await request.patch<PlannerTaskDetails>(requestOptions);
-      if (!Cli.shouldTrimOutput(args.options.output)) {
+      if (!cli.shouldTrimOutput(args.options.output)) {
         await logger.log(result.checklist);
       }
       else {

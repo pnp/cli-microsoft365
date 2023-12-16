@@ -2,7 +2,7 @@ import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
 import { CommandError } from '../../../../Command.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { telemetry } from '../../../../telemetry.js';
@@ -40,7 +40,7 @@ describe(commands.TENANT_COMMANDSET_ADD, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
-    commandInfo = Cli.getCommandInfo(command);
+    commandInfo = cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -60,8 +60,8 @@ describe(commands.TENANT_COMMANDSET_ADD, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      Cli.executeCommand,
-      Cli.executeCommandWithOutput
+      cli.executeCommand,
+      cli.executeCommandWithOutput
     ]);
   });
 
@@ -80,7 +80,7 @@ describe(commands.TENANT_COMMANDSET_ADD, () => {
 
   it('adds a tenant-wide ListView Command Set for lists', async () => {
     let executeCommandCalled = false;
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command, args): Promise<any> => {
+    sinon.stub(cli, 'executeCommandWithOutput').callsFake(async (command, args): Promise<any> => {
       if (command === spoListItemListCommand) {
         if (args.options.listUrl === `${urlUtil.getServerRelativeSiteUrl(appCatalogUrl)}/Lists/ComponentManifests`) {
           return { 'stdout': JSON.stringify(solutionResponse) };
@@ -95,7 +95,7 @@ describe(commands.TENANT_COMMANDSET_ADD, () => {
       throw 'Invalid request';
     });
 
-    sinon.stub(Cli, 'executeCommand').callsFake(async (command): Promise<void> => {
+    sinon.stub(cli, 'executeCommand').callsFake(async (command): Promise<void> => {
       if (command === spoListItemAddCommand) {
         executeCommandCalled = true;
         return;
@@ -109,7 +109,7 @@ describe(commands.TENANT_COMMANDSET_ADD, () => {
 
   it('adds a tenant-wide ListView Command Set for libraries', async () => {
     let executeCommandCalled = false;
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command, args): Promise<any> => {
+    sinon.stub(cli, 'executeCommandWithOutput').callsFake(async (command, args): Promise<any> => {
       if (command === spoListItemListCommand) {
         if (args.options.listUrl === `${urlUtil.getServerRelativeSiteUrl(appCatalogUrl)}/Lists/ComponentManifests`) {
           return { 'stdout': JSON.stringify(solutionResponse) };
@@ -124,7 +124,7 @@ describe(commands.TENANT_COMMANDSET_ADD, () => {
       throw 'Invalid request';
     });
 
-    sinon.stub(Cli, 'executeCommand').callsFake(async (command): Promise<void> => {
+    sinon.stub(cli, 'executeCommand').callsFake(async (command): Promise<void> => {
       if (command === spoListItemAddCommand) {
         executeCommandCalled = true;
         return;
@@ -138,7 +138,7 @@ describe(commands.TENANT_COMMANDSET_ADD, () => {
 
   it('adds a tenant-wide ListView Command Set for the SitePages library', async () => {
     let executeCommandCalled = false;
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command, args): Promise<any> => {
+    sinon.stub(cli, 'executeCommandWithOutput').callsFake(async (command, args): Promise<any> => {
       if (command === spoListItemListCommand) {
         if (args.options.listUrl === `${urlUtil.getServerRelativeSiteUrl(appCatalogUrl)}/Lists/ComponentManifests`) {
           return { 'stdout': JSON.stringify(solutionResponse) };
@@ -153,7 +153,7 @@ describe(commands.TENANT_COMMANDSET_ADD, () => {
       throw 'Invalid request';
     });
 
-    sinon.stub(Cli, 'executeCommand').callsFake(async (command): Promise<void> => {
+    sinon.stub(cli, 'executeCommand').callsFake(async (command): Promise<void> => {
       if (command === spoListItemAddCommand) {
         executeCommandCalled = true;
         return;
@@ -167,7 +167,7 @@ describe(commands.TENANT_COMMANDSET_ADD, () => {
 
   it('adds a tenant-wide ListView Command Set to a specific webtemplate and location including clientSideComponentProperties', async () => {
     let executeCommandCalled = false;
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command, args): Promise<any> => {
+    sinon.stub(cli, 'executeCommandWithOutput').callsFake(async (command, args): Promise<any> => {
       if (command === spoListItemListCommand) {
         if (args.options.listUrl === `${urlUtil.getServerRelativeSiteUrl(appCatalogUrl)}/Lists/ComponentManifests`) {
           return { 'stdout': JSON.stringify(solutionResponse) };
@@ -182,7 +182,7 @@ describe(commands.TENANT_COMMANDSET_ADD, () => {
       throw 'Invalid request';
     });
 
-    sinon.stub(Cli, 'executeCommand').callsFake(async (command): Promise<void> => {
+    sinon.stub(cli, 'executeCommand').callsFake(async (command): Promise<void> => {
       if (command === spoListItemAddCommand) {
         executeCommandCalled = true;
         return;
@@ -195,7 +195,7 @@ describe(commands.TENANT_COMMANDSET_ADD, () => {
   });
 
   it('throws an error when no app catalog is found', async () => {
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
+    sinon.stub(cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
       if (command === spoTenantAppCatalogUrlGetCommand) {
         return { 'stdout': null };
       }
@@ -207,7 +207,7 @@ describe(commands.TENANT_COMMANDSET_ADD, () => {
   });
 
   it('throws an error when specific client side component is not found in manifest list', async () => {
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command, args): Promise<any> => {
+    sinon.stub(cli, 'executeCommandWithOutput').callsFake(async (command, args): Promise<any> => {
       if (command === spoListItemListCommand) {
         if (args.options.listUrl === `${urlUtil.getServerRelativeSiteUrl(appCatalogUrl)}/Lists/ComponentManifests`) {
           return { 'stdout': JSON.stringify([]) };
@@ -224,7 +224,7 @@ describe(commands.TENANT_COMMANDSET_ADD, () => {
   });
 
   it('throws an error when the manifest of a specific client side component is not of type ListView Command Set', async () => {
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command, args): Promise<any> => {
+    sinon.stub(cli, 'executeCommandWithOutput').callsFake(async (command, args): Promise<any> => {
       if (command === spoListItemListCommand) {
         if (args.options.listUrl === `${urlUtil.getServerRelativeSiteUrl(appCatalogUrl)}/Lists/ComponentManifests`) {
           const faultyClientComponentManifest = "{\"id\":\"6b2a54c5-3317-49eb-8621-1bbb76263629\",\"alias\":\"HelloWorldCommandSet\",\"componentType\":\"Extension\",\"extensionType\":\"FormCustomizer\",\"version\":\"0.0.1\",\"manifestVersion\":2,\"loaderConfig\":{\"internalModuleBaseUrls\":[\"HTTPS://SPCLIENTSIDEASSETLIBRARY/\"],\"entryModuleId\":\"hello-world-command-set\",\"scriptResources\":{\"hello-world-command-set\":{\"type\":\"path\",\"path\":\"hello-world-command-set_b47769f9eca3d3b6c4d5.js\"},\"HelloWorldCommandSetStrings\":{\"type\":\"path\",\"path\":\"HelloWorldCommandSetStrings_en-us_72ca11838ac9bae2790a8692c260e1ac.js\"},\"@microsoft/sp-application-base\":{\"type\":\"component\",\"id\":\"4df9bb86-ab0a-4aab-ab5f-48bf167048fb\",\"version\":\"1.15.2\"},\"@microsoft/sp-core-library\":{\"type\":\"component\",\"id\":\"7263c7d0-1d6a-45ec-8d85-d4d1d234171b\",\"version\":\"1.15.2\"}}},\"mpnId\":\"Undefined-1.15.2\",\"clientComponentDeveloper\":\"\"}";
@@ -244,7 +244,7 @@ describe(commands.TENANT_COMMANDSET_ADD, () => {
   });
 
   it('throws an error when solution is not found in app catalog', async () => {
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command, args): Promise<any> => {
+    sinon.stub(cli, 'executeCommandWithOutput').callsFake(async (command, args): Promise<any> => {
       if (command === spoListItemListCommand) {
         if (args.options.listUrl === `${urlUtil.getServerRelativeSiteUrl(appCatalogUrl)}/Lists/ComponentManifests`) {
           return { 'stdout': JSON.stringify(solutionResponse) };
@@ -264,7 +264,7 @@ describe(commands.TENANT_COMMANDSET_ADD, () => {
   });
 
   it('throws an error when solution does not contain extension that can be deployed tenant-wide', async () => {
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command, args): Promise<any> => {
+    sinon.stub(cli, 'executeCommandWithOutput').callsFake(async (command, args): Promise<any> => {
       if (command === spoListItemListCommand) {
         if (args.options.listUrl === `${urlUtil.getServerRelativeSiteUrl(appCatalogUrl)}/Lists/ComponentManifests`) {
           return { 'stdout': JSON.stringify(solutionResponse) };
@@ -286,7 +286,7 @@ describe(commands.TENANT_COMMANDSET_ADD, () => {
   });
 
   it('throws an error when solution is not deployed globally', async () => {
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command, args): Promise<any> => {
+    sinon.stub(cli, 'executeCommandWithOutput').callsFake(async (command, args): Promise<any> => {
       if (command === spoListItemListCommand) {
         if (args.options.listUrl === `${urlUtil.getServerRelativeSiteUrl(appCatalogUrl)}/Lists/ComponentManifests`) {
           return { 'stdout': JSON.stringify(solutionResponse) };

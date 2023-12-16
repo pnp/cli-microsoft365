@@ -1,5 +1,5 @@
 import { Application, AppRole, AppRoleAssignment, OAuth2PermissionGrant, PermissionScope, RequiredResourceAccess, ResourceAccess, ServicePrincipal } from '@microsoft/microsoft-graph-types';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import Command from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
@@ -231,7 +231,7 @@ class AppPermissionListCommand extends AppCommand {
       verbose: this.verbose
     };
 
-    const output = await Cli.executeCommandWithOutput(appGetCommand as Command, { options: { ...options, _: [] } });
+    const output = await cli.executeCommandWithOutput(appGetCommand as Command, { options: { ...options, _: [] } });
 
     if (this.debug) {
       await logger.logToStderr(output.stderr);

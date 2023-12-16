@@ -1,7 +1,7 @@
 import assert from 'assert';
 import fs from 'fs';
 import sinon from 'sinon';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { telemetry } from '../../../../telemetry.js';
@@ -31,8 +31,8 @@ describe(commands.PACKAGE_GENERATE, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     (command as any).archive = admZipMock;
-    commandInfo = Cli.getCommandInfo(command);
-    Cli.getInstance().config;
+    commandInfo = cli.getCommandInfo(command);
+    cli.getConfig;
   });
 
   beforeEach(() => {

@@ -4,6 +4,7 @@ import auth, { Auth, CloudType } from './Auth.js';
 import { Logger } from './cli/Logger.js';
 import { app } from './utils/app.js';
 import { formatting } from './utils/formatting.js';
+import { timings } from './cli/timings.js';
 
 export interface CliRequestOptions extends AxiosRequestConfig {
   fullResponse?: boolean;
@@ -151,6 +152,8 @@ class Request {
   }
 
   public execute<TResponse>(options: CliRequestOptions, resolve?: (res: TResponse) => void, reject?: (error: any) => void): Promise<TResponse> {
+    const start = process.hrtime.bigint();
+
     if (!this._logger) {
       return Promise.reject('Logger not set on the request object');
     }
@@ -187,6 +190,9 @@ class Request {
             resolve((options.responseType === 'stream' || options.fullResponse) ? res : res.data);
           }
           else {
+            const end = process.hrtime.bigint();
+            timings.api.push(Number(end - start));
+
             _resolve((options.responseType === 'stream' || options.fullResponse) ? res : res.data);
           }
         }, (error: AxiosError): void => {
@@ -209,6 +215,9 @@ class Request {
               reject(error);
             }
             else {
+              const end = process.hrtime.bigint();
+              timings.api.push(Number(end - start));
+
               _reject(error);
             }
           }

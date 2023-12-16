@@ -1,4 +1,4 @@
-import { Cli } from '../../../cli/Cli.js';
+import { cli } from '../../../cli/cli.js';
 import { Logger } from '../../../cli/Logger.js';
 import GlobalOptions from '../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../request.js';
@@ -254,7 +254,7 @@ class YammerSearchCommand extends YammerCommand {
     try {
       await this.getAllItems(logger, args, 1);
 
-      if (!Cli.shouldTrimOutput(args.options.output)) {
+      if (!cli.shouldTrimOutput(args.options.output)) {
         await logger.log(
           {
             summary: this.summary,
