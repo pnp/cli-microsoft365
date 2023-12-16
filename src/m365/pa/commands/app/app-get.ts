@@ -17,7 +17,7 @@ interface Options extends GlobalOptions {
   name?: string;
   displayName?: string;
   environmentName?: string;
-  asAdmin: boolean;
+  asAdmin?: boolean;
 }
 
 class PaAppGetCommand extends PowerAppsCommand {
@@ -47,7 +47,7 @@ class PaAppGetCommand extends PowerAppsCommand {
       Object.assign(this.telemetryProperties, {
         name: typeof args.options.name !== 'undefined',
         displayName: typeof args.options.displayName !== 'undefined',
-        asAdmin: args.options.asAdmin === true,
+        asAdmin: !!args.options.asAdmin,
         environmentName: typeof args.options.environmentName !== 'undefined'
       });
     });
@@ -153,7 +153,9 @@ class PaAppGetCommand extends PowerAppsCommand {
     const options: GlobalOptions = {
       output: 'json',
       debug: this.debug,
-      verbose: this.verbose
+      verbose: this.verbose,
+      environmentName: args.options.environmentName,
+      asAdmin: args.options.asAdmin
     };
 
     return await cli.executeCommandWithOutput(paAppListCommand as Command, { options: { ...options, _: [] } });
