@@ -2,7 +2,7 @@ import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
 import { CommandError } from '../../../../Command.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import request from '../../../../request.js';
@@ -21,8 +21,7 @@ describe(commands.APPLICATIONCUSTOMIZER_REMOVE, () => {
   const id = '14125658-a9bc-4ddf-9c75-1b5767c9a337';
   const clientSideComponentId = '015e0fcf-fe9d-4037-95af-0a4776cdfbb4';
   const title = 'SiteGuidedTour';
-  let promptOptions: any;
-  let cli: Cli;
+  let promptIssued: boolean = false;
   let log: any[];
   let logger: Logger;
   let requests: any[];
@@ -114,13 +113,19 @@ describe(commands.APPLICATIONCUSTOMIZER_REMOVE, () => {
   };
 
   before(() => {
-    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     sinon.stub(session, 'getId').callsFake(() => '');
     auth.service.connected = true;
-    commandInfo = Cli.getCommandInfo(command);
+    commandInfo = cli.getCommandInfo(command);
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName: string, defaultValue: any) => {
+      if (settingName === 'prompt') {
+        return false;
+      }
+
+      return defaultValue;
+    });
   });
 
   beforeEach(() => {
@@ -137,20 +142,22 @@ describe(commands.APPLICATIONCUSTOMIZER_REMOVE, () => {
       }
     };
     requests = [];
-    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
-      promptOptions = options;
-      return { continue: false };
+    sinon.stub(cli, 'promptForConfirmation').callsFake(() => {
+      promptIssued = true;
+      return Promise.resolve(false);
     });
-    promptOptions = undefined;
+
+    promptIssued = false;
   });
 
   afterEach(() => {
     sinonUtil.restore([
       request.get,
       request.delete,
-      Cli.prompt,
-      Cli.handleMultipleResultsFound,
-      cli.getSettingWithDefaultValue
+      cli.getSettingWithDefaultValue,
+      cli.handleMultipleResultsFound,
+      cli.promptForConfirmation,
+      cli.handleMultipleResultsFound
     ]);
   });
 
@@ -212,16 +219,12 @@ describe(commands.APPLICATIONCUSTOMIZER_REMOVE, () => {
 
   it('should prompt before removing application customizer when confirmation argument not passed', async () => {
     await command.action(logger, { options: { webUrl: webUrl, id: id } });
-    let promptIssued = false;
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
     assert(promptIssued);
   });
 
   it('aborts removing application customizer when prompt not confirmed', async () => {
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: false });
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(false);
     await command.action(logger, { options: { webUrl: webUrl, id: id } });
     assert(requests.length === 0);
   });
@@ -328,7 +331,7 @@ describe(commands.APPLICATIONCUSTOMIZER_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinon.stub(Cli, 'handleMultipleResultsFound').resolves(singleResponse.value[0]);
+    sinon.stub(cli, 'handleMultipleResultsFound').resolves(singleResponse.value[0]);
 
     const deleteCallsSpy: sinon.SinonStub = defaultDeleteCallsStub();
     await command.action(logger, { options: { verbose: true, title: title, webUrl: webUrl, scope: 'Web', force: true } } as any);
@@ -344,8 +347,8 @@ describe(commands.APPLICATIONCUSTOMIZER_REMOVE, () => {
     });
 
     const deleteCallsSpy: sinon.SinonStub = defaultDeleteCallsStub();
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, { options: { verbose: true, id: id, webUrl: webUrl, scope: 'Web' } } as any);
     assert(deleteCallsSpy.calledOnce);

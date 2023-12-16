@@ -1,4 +1,4 @@
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import Command from '../../../../Command.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
@@ -151,14 +151,9 @@ class SpoFileRoleAssignmentRemoveCommand extends SpoCommand {
       await removeRoleAssignment();
     }
     else {
-      const result = await Cli.prompt<{ continue: boolean }>({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: `Are you sure you want to remove role assignment from file ${args.options.fileUrl || args.options.fileId} from site ${args.options.webUrl}?`
-      });
+      const result = await cli.promptForConfirmation({ message: `Are you sure you want to remove role assignment from file ${args.options.fileUrl || args.options.fileId} from site ${args.options.webUrl}?` });
 
-      if (result.continue) {
+      if (result) {
         await removeRoleAssignment();
       }
     }
@@ -177,7 +172,7 @@ class SpoFileRoleAssignmentRemoveCommand extends SpoCommand {
       verbose: this.verbose
     };
 
-    const output = await Cli.executeCommandWithOutput(spoFileGetCommand as Command, { options: { ...options, _: [] } });
+    const output = await cli.executeCommandWithOutput(spoFileGetCommand as Command, { options: { ...options, _: [] } });
     const getFileOutput = JSON.parse(output.stdout);
     return getFileOutput.ServerRelativeUrl;
   }
@@ -192,7 +187,7 @@ class SpoFileRoleAssignmentRemoveCommand extends SpoCommand {
       verbose: this.verbose
     };
 
-    const output = await Cli.executeCommandWithOutput(spoUserGetCommand as Command, { options: { ...userGetCommandOptions, _: [] } });
+    const output = await cli.executeCommandWithOutput(spoUserGetCommand as Command, { options: { ...userGetCommandOptions, _: [] } });
     const getUserOutput = JSON.parse(output.stdout);
     return getUserOutput.Id;
   }
@@ -206,7 +201,7 @@ class SpoFileRoleAssignmentRemoveCommand extends SpoCommand {
       verbose: this.verbose
     };
 
-    const output = await Cli.executeCommandWithOutput(spoGroupGetCommand as Command, { options: { ...groupGetCommandOptions, _: [] } });
+    const output = await cli.executeCommandWithOutput(spoGroupGetCommand as Command, { options: { ...groupGetCommandOptions, _: [] } });
     const getGroupOutput = JSON.parse(output.stdout);
     return getGroupOutput.Id;
   }

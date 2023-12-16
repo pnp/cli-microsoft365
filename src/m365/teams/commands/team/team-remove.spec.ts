@@ -1,7 +1,7 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
@@ -16,7 +16,7 @@ import command from './team-remove.js';
 describe(commands.TEAM_REMOVE, () => {
   let log: string[];
   let logger: Logger;
-  let promptOptions: any;
+  let promptIssued: boolean = false;
   let commandInfo: CommandInfo;
 
   before(() => {
@@ -25,7 +25,7 @@ describe(commands.TEAM_REMOVE, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
-    commandInfo = Cli.getCommandInfo(command);
+    commandInfo = cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -42,18 +42,19 @@ describe(commands.TEAM_REMOVE, () => {
       }
     };
 
-    promptOptions = undefined;
-    sinon.stub(Cli, 'prompt').callsFake(async (options) => {
-      promptOptions = options;
-      return { continue: false };
+    sinon.stub(cli, 'promptForConfirmation').callsFake(() => {
+      promptIssued = true;
+      return Promise.resolve(false);
     });
+
+    promptIssued = false;
   });
 
   afterEach(() => {
     sinonUtil.restore([
       request.get,
       request.delete,
-      Cli.prompt
+      cli.promptForConfirmation
     ]);
   });
 
@@ -113,33 +114,23 @@ describe(commands.TEAM_REMOVE, () => {
     } as any), new CommandError('The specified team does not exist in the Microsoft Teams'));
   });
 
-  it('prompts before removing the specified team by id when confirm option not passed', async () => {
+  it('prompts before removing the specified team by id when force option not passed', async () => {
     await command.action(logger, { options: { id: "00000000-0000-0000-0000-000000000000" } });
-    let promptIssued = false;
-
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
     assert(promptIssued);
   });
 
-  it('prompts before removing the specified team by name when confirm option not passed (debug)', async () => {
+  it('prompts before removing the specified team by name when force option not passed (debug)', async () => {
     await command.action(logger, { options: { debug: true, name: "Finance" } });
-    let promptIssued = false;
-
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
     assert(promptIssued);
   });
 
-  it('aborts removing the specified team when confirm option not passed and prompt not confirmed', async () => {
+  it('aborts removing the specified team when force option not passed and prompt not confirmed', async () => {
     const postSpy = sinon.spy(request, 'delete');
     await command.action(logger, { options: { id: "00000000-0000-0000-0000-000000000000" } });
     assert(postSpy.notCalled);
   });
 
-  it('aborts removing the specified team when confirm option not passed and prompt not confirmed (debug)', async () => {
+  it('aborts removing the specified team when force option not passed and prompt not confirmed (debug)', async () => {
     const postSpy = sinon.spy(request, 'delete');
     await command.action(logger, { options: { debug: true, id: "00000000-0000-0000-0000-000000000000" } });
     assert(postSpy.notCalled);
@@ -157,8 +148,8 @@ describe(commands.TEAM_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, { options: { debug: true, id: "00000000-0000-0000-0000-000000000000" } });
     assert(teamsDeleteCallIssued);
@@ -220,8 +211,8 @@ describe(commands.TEAM_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await assert.rejects(command.action(logger, { options: { id: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee' } } as any), new CommandError('No team found with Group Id 8231f9f2-701f-4c6e-93ce-ecb563e3c1ee'));
   });

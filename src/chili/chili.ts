@@ -1,12 +1,12 @@
 import fs from 'fs';
-import inquirer from 'inquirer';
 import ora from 'ora';
 import path from 'path';
 import url from 'url';
-import { Cli } from '../cli/Cli.js';
+import { cli } from '../cli/cli.js';
 import request, { CliRequestOptions } from '../request.js';
 import { settingsNames } from '../settingsNames.js';
 import { md } from '../utils/md.js';
+import { prompt } from '../utils/prompt.js';
 
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
@@ -39,7 +39,6 @@ let history: {
   prompt: string;
   response: string;
 }[] = [];
-const cli = Cli.getInstance();
 const showSpinner = cli.getSettingWithDefaultValue<boolean>(settingsNames.showSpinner, true) && typeof global.it === 'undefined';
 
 request.logger = {
@@ -118,12 +117,7 @@ async function startConversation(args: string[]): Promise<void> {
 }
 
 async function promptForPrompt(): Promise<string> {
-  const answer = await inquirer.prompt<{ prompt: string }>([{
-    type: 'input',
-    name: 'prompt',
-    message: '🌶️  How can I help you?'
-  }]);
-  return answer.prompt;
+  return await prompt.forInput({ message: '🌶️  How can I help you?' });
 }
 
 async function runConversationTurn(conversationId: number, question: string): Promise<void> {
@@ -169,63 +163,59 @@ async function runConversationTurn(conversationId: number, question: string): Pr
     console.log('');
   }
 
-  const result = await inquirer.prompt<{ chat: string }>([{
-    type: 'list',
-    name: 'chat',
-    message: 'What would you like to do next?',
-    choices: [
-      {
-        name: '📝 I want to know more',
-        value: 'ask'
-      },
-      {
-        name: '👋 I know enough. Thanks!',
-        value: 'end'
-      },
-      {
-        name: '🔄 I want to ask about something else',
-        value: 'new'
-      }
-    ]
-  }]);
+  const choices = [
+    {
+      name: '📝 I want to know more',
+      value: 'ask'
+    },
+    {
+      name: '👋 I know enough. Thanks!',
+      value: 'end'
+    },
+    {
+      name: '🔄 I want to ask about something else',
+      value: 'new'
+    }
+  ];
 
-  switch (result.chat) {
+  const result = await prompt.forSelection({ message: 'What would you like to do next?', choices });
+
+  switch (result) {
     case 'ask':
       const prompt = await promptForPrompt();
-      return await runConversationTurn(conversationId, prompt);
+      await runConversationTurn(conversationId, prompt);
+      break;
     case 'end':
       await endConversation(conversationId);
       console.log('');
       console.log('🌶️   Bye!');
-      return;
+      break;
     case 'new':
       initialPrompt = '';
-      return startConversation([]);
+      await startConversation([]);
+      break;
   }
 }
 
 async function rateResponse(messageId: number): Promise<void> {
-  const result = await inquirer.prompt<{ rating: number }>([{
-    type: 'list',
-    name: 'rating',
-    message: 'Was this helpful?',
-    choices: [
-      {
-        name: '👍 Yes',
-        value: 1
-      },
-      {
-        name: '👎 No',
-        value: -1
-      },
-      {
-        name: '🤔 Not sure/skip',
-        value: 0
-      }
-    ]
-  }]);
+  const choices = [
+    {
+      name: '👍 Yes',
+      value: 1
+    },
+    {
+      name: '👎 No',
+      value: -1
+    },
+    {
+      name: '🤔 Not sure/skip',
+      value: 0
+    }
+  ];
 
-  if (result.rating === 0) {
+  const rating = await prompt.forSelection({ message: 'Was this helpful?', choices });
+
+  if (rating === 0) {
     return;
   }
 
@@ -246,7 +236,7 @@ async function rateResponse(messageId: number): Promise<void> {
       // eslint-disable-next-line camelcase
       message_id: messageId,
       // eslint-disable-next-line camelcase
-      rating_value: result.rating
+      rating_value: rating
     }
   };
 

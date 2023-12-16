@@ -1,5 +1,5 @@
 import GlobalOptions from '../../../GlobalOptions.js';
-import { Cli } from '../../../cli/Cli.js';
+import { cli } from '../../../cli/cli.js';
 import { Logger } from '../../../cli/Logger.js';
 import request, { CliRequestOptions } from '../../../request.js';
 import { formatting } from '../../../utils/formatting.js';
@@ -105,14 +105,9 @@ class FlowRemoveCommand extends AzmgmtCommand {
       await removeFlow();
     }
     else {
-      const result = await Cli.prompt<{ continue: boolean }>({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: `Are you sure you want to remove the Microsoft Flow ${args.options.name}?`
-      });
+      const result = await cli.promptForConfirmation({ message: `Are you sure you want to remove the Microsoft Flow ${args.options.name}?` });
 
-      if (result.continue) {
+      if (result) {
         await removeFlow();
       }
     }

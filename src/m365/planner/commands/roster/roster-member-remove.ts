@@ -1,4 +1,4 @@
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
@@ -100,14 +100,9 @@ class PlannerRosterMemberRemoveCommand extends GraphCommand {
       await this.removeRosterMember(args);
     }
     else {
-      const result = await Cli.prompt<{ continue: boolean }>({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: `Are you sure you want to remove member '${args.options.userId || args.options.userName}'?`
-      });
+      const result = await cli.promptForConfirmation({ message: `Are you sure you want to remove member '${args.options.userId || args.options.userName}'?` });
 
-      if (result.continue) {
+      if (result) {
         await this.removeRosterMember(args);
       }
     }
@@ -147,14 +142,9 @@ class PlannerRosterMemberRemoveCommand extends GraphCommand {
     if (!args.options.force) {
       const rosterMembers = await odata.getAllItems(`${this.resource}/beta/planner/rosters/${args.options.rosterId}/members?$select=Id`);
       if (rosterMembers.length === 1) {
-        const result = await Cli.prompt<{ continue: boolean }>({
-          type: 'confirm',
-          name: 'continue',
-          default: false,
-          message: `You are about to remove the last member of this Roster. When this happens, the Roster and all its contents will be deleted within 30 days. Are you sure you want to proceed?`
-        });
+        const result = await cli.promptForConfirmation({ message: `You are about to remove the last member of this Roster. When this happens, the Roster and all its contents will be deleted within 30 days. Are you sure you want to proceed?` });
 
-        return result.continue;
+        return result;
       }
     }
 

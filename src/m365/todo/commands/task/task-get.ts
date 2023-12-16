@@ -1,4 +1,4 @@
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
@@ -100,7 +100,7 @@ class TodoTaskGetCommand extends GraphCommand {
 
       const item: ToDoTask = await request.get(requestOptions);
 
-      if (!Cli.shouldTrimOutput(args.options.output)) {
+      if (!cli.shouldTrimOutput(args.options.output)) {
         await logger.log(item);
       }
       else {

@@ -1,7 +1,7 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
@@ -16,7 +16,6 @@ import command from './m365group-recyclebinitem-restore.js';
 import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.M365GROUP_RECYCLEBINITEM_RESTORE, () => {
-  let cli: Cli;
   const validGroupId = '00000000-0000-0000-0000-000000000000';
   const validGroupDisplayName = 'Dev Team';
   const validGroupMailNickname = 'Devteam';
@@ -63,13 +62,19 @@ describe(commands.M365GROUP_RECYCLEBINITEM_RESTORE, () => {
   let commandInfo: CommandInfo;
 
   before(() => {
-    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
-    commandInfo = Cli.getCommandInfo(command);
+    commandInfo = cli.getCommandInfo(command);
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName: string, defaultValue: any) => {
+      if (settingName === 'prompt') {
+        return false;
+      }
+
+      return defaultValue;
+    });
   });
 
   beforeEach(() => {
@@ -93,7 +98,7 @@ describe(commands.M365GROUP_RECYCLEBINITEM_RESTORE, () => {
       request.post,
       global.setTimeout,
       cli.getSettingWithDefaultValue,
-      Cli.handleMultipleResultsFound
+      cli.handleMultipleResultsFound
     ]);
   });
 
@@ -254,7 +259,7 @@ describe(commands.M365GROUP_RECYCLEBINITEM_RESTORE, () => {
       throw 'Invalid request';
     });
 
-    sinon.stub(Cli, 'handleMultipleResultsFound').resolves(singleGroupsResponse.value[0]);
+    sinon.stub(cli, 'handleMultipleResultsFound').resolves(singleGroupsResponse.value[0]);
 
     await command.action(logger, {
       options: {

@@ -1,7 +1,7 @@
 import assert from 'assert';
 import fs from 'fs';
 import sinon from 'sinon';
-import { Cli } from '../../cli/Cli.js';
+import { cli } from '../../cli/cli.js';
 import { CommandInfo } from '../../cli/CommandInfo.js';
 import { Logger } from '../../cli/Logger.js';
 import Command, { CommandError } from '../../Command.js';
@@ -32,7 +32,7 @@ describe('AppCommand', () => {
   let commandInfo: CommandInfo;
 
   before(() => {
-    commandInfo = Cli.getCommandInfo(new MockCommand());
+    commandInfo = cli.getCommandInfo(new MockCommand());
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
   });
 
@@ -56,7 +56,7 @@ describe('AppCommand', () => {
     sinonUtil.restore([
       fs.existsSync,
       fs.readFileSync,
-      Cli.prompt
+      cli.handleMultipleResultsFound
     ]);
   });
 
@@ -121,7 +121,7 @@ describe('AppCommand', () => {
         }
       ]
     }));
-    const cliPromptStub = sinon.stub(Cli, 'prompt').callsFake(async () => (
+    const cliPromptStub = sinon.stub(cli, 'handleMultipleResultsFound').callsFake(async () => (
       { appIdIndex: 0 }
     ));
     await assert.rejects(cmd.action(logger, { options: {} }));
@@ -142,7 +142,7 @@ describe('AppCommand', () => {
         }
       ]
     }));
-    sinon.stub(Cli, 'prompt').resolves({ appIdIndex: 1 });
+    sinon.stub(cli, 'handleMultipleResultsFound').resolves({ appIdIndex: 1 });
     sinon.stub(Command.prototype, 'action').resolves();
 
     try {

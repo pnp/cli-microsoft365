@@ -1,4 +1,4 @@
-import { Cli, CommandOutput } from '../../../../cli/Cli.js';
+import { cli, CommandOutput } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import Command from '../../../../Command.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
@@ -90,7 +90,7 @@ class SpoHubSiteGetCommand extends SpoCommand {
         throw 'includeAssociatedSites option is only allowed with json output mode';
       }
 
-      if (args.options.includeAssociatedSites === true && args.options.output && !Cli.shouldTrimOutput(args.options.output)) {
+      if (args.options.includeAssociatedSites === true && args.options.output && !cli.shouldTrimOutput(args.options.output)) {
         const spoAdminUrl = await spo.getSpoAdminUrl(logger, this.debug);
         const associatedSitesCommandOutput = await this.getAssociatedSites(spoAdminUrl, hubSite.SiteId, logger, args);
         const associatedSites: AssociatedSite[] = JSON.parse((associatedSitesCommandOutput as CommandOutput).stdout) as AssociatedSite[];
@@ -115,7 +115,7 @@ class SpoHubSiteGetCommand extends SpoCommand {
       fields: 'Title,SiteUrl,SiteId'
     };
 
-    return Cli.executeCommandWithOutput(spoListItemListCommand as Command, { options: { ...options, _: [] } });
+    return cli.executeCommandWithOutput(spoListItemListCommand as Command, { options: { ...options, _: [] } });
   }
 
   private async getHubSiteById(spoUrl: string, options: Options): Promise<HubSite> {
@@ -154,7 +154,7 @@ class SpoHubSiteGetCommand extends SpoCommand {
 
     if (hubSites.length > 1) {
       const resultAsKeyValuePair = formatting.convertArrayToHashTable('ID', hubSites);
-      return await Cli.handleMultipleResultsFound<HubSite>(`Multiple hub sites with ${options.title || options.url} found.`, resultAsKeyValuePair);
+      return await cli.handleMultipleResultsFound<HubSite>(`Multiple hub sites with ${options.title || options.url} found.`, resultAsKeyValuePair);
     }
 
     return hubSites[0];

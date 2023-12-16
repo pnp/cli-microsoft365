@@ -2,7 +2,7 @@ import assert from 'assert';
 import fs from 'fs';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
@@ -18,7 +18,7 @@ describe(commands.GROUPSETTING_REMOVE, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
-  let promptOptions: any;
+  let promptIssued: boolean = false;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -27,7 +27,7 @@ describe(commands.GROUPSETTING_REMOVE, () => {
     sinon.stub(session, 'getId').returns('');
     sinon.stub(fs, 'readFileSync').returns('abc');
     auth.service.connected = true;
-    commandInfo = Cli.getCommandInfo(command);
+    commandInfo = cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -43,18 +43,19 @@ describe(commands.GROUPSETTING_REMOVE, () => {
         log.push(msg);
       }
     };
-    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
-      promptOptions = options;
-      return { continue: false };
+    sinon.stub(cli, 'promptForConfirmation').callsFake(() => {
+      promptIssued = true;
+      return Promise.resolve(false);
     });
-    promptOptions = undefined;
+
+    promptIssued = false;
   });
 
   afterEach(() => {
     sinonUtil.restore([
       request.delete,
       global.setTimeout,
-      Cli.prompt
+      cli.promptForConfirmation
     ]);
   });
 
@@ -71,7 +72,7 @@ describe(commands.GROUPSETTING_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('removes the specified group setting without prompting for confirmation when confirm option specified', async () => {
+  it('removes the specified group setting without prompting for confirmation when force option specified', async () => {
     const deleteRequestStub = sinon.stub(request, 'delete').callsFake(async (opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groupSettings/28beab62-7540-4db1-a23f-29a6018a3848') {
         return;
@@ -84,7 +85,7 @@ describe(commands.GROUPSETTING_REMOVE, () => {
     assert(deleteRequestStub.called);
   });
 
-  it('removes the specified group setting without prompting for confirmation when confirm option specified (debug)', async () => {
+  it('removes the specified group setting without prompting for confirmation when force option specified (debug)', async () => {
     const deleteRequestStub = sinon.stub(request, 'delete').callsFake(async (opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groupSettings/28beab62-7540-4db1-a23f-29a6018a3848') {
         return;
@@ -97,24 +98,14 @@ describe(commands.GROUPSETTING_REMOVE, () => {
     assert(deleteRequestStub.called);
   });
 
-  it('prompts before removing the specified group setting when confirm option not passed', async () => {
+  it('prompts before removing the specified group setting when force option not passed', async () => {
     await command.action(logger, { options: { id: '28beab62-7540-4db1-a23f-29a6018a3848' } });
-    let promptIssued = false;
-
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
 
     assert(promptIssued);
   });
 
-  it('prompts before removing the specified group setting when confirm option not passed (debug)', async () => {
+  it('prompts before removing the specified group setting when force option not passed (debug)', async () => {
     await command.action(logger, { options: { debug: true, id: '28beab62-7540-4db1-a23f-29a6018a3848' } });
-    let promptIssued = false;
-
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
 
     assert(promptIssued);
   });
@@ -136,8 +127,8 @@ describe(commands.GROUPSETTING_REMOVE, () => {
   it('removes the group setting when prompt confirmed', async () => {
     const postStub = sinon.stub(request, 'delete').callsFake(() => Promise.resolve());
 
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, { options: { id: '28beab62-7540-4db1-a23f-29a6018a3848' } });
     assert(postStub.called);
@@ -146,8 +137,8 @@ describe(commands.GROUPSETTING_REMOVE, () => {
   it('removes the group setting when prompt confirmed (debug)', async () => {
     const deleteStub = sinon.stub(request, 'delete').resolves();
 
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, { options: { debug: true, id: '28beab62-7540-4db1-a23f-29a6018a3848' } });
     assert(deleteStub.called);

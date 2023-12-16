@@ -1,4 +1,4 @@
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import Command from '../../../../Command.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
@@ -127,14 +127,9 @@ class SpoEventreceiverRemoveCommand extends SpoCommand {
       await this.removeEventReceiver(args.options);
     }
     else {
-      const result = await Cli.prompt<{ continue: boolean }>({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: `Are you sure you want to remove event receiver with ${args.options.id ? `id ${args.options.id}` : `name ${args.options.name}`}?`
-      });
+      const result = await cli.promptForConfirmation({ message: `Are you sure you want to remove event receiver with ${args.options.id ? `id ${args.options.id}` : `name ${args.options.name}`}?` });
 
-      if (result.continue) {
+      if (result) {
         await this.removeEventReceiver(args.options);
       }
     }
@@ -190,7 +185,7 @@ class SpoEventreceiverRemoveCommand extends SpoCommand {
       verbose: this.verbose
     };
 
-    const commandOutput = await Cli.executeCommandWithOutput(getCommand as Command, { options: { ...getOptions, _: [] } });
+    const commandOutput = await cli.executeCommandWithOutput(getCommand as Command, { options: { ...getOptions, _: [] } });
     const eventReceiver: EventReceiver = JSON.parse(commandOutput.stdout);
 
     return eventReceiver.ReceiverId;

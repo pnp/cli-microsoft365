@@ -1,7 +1,7 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
@@ -23,7 +23,7 @@ describe(commands.FILE_ROLEINHERITANCE_RESET, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
-  let promptOptions: any;
+  let promptIssued: boolean = false;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -31,7 +31,7 @@ describe(commands.FILE_ROLEINHERITANCE_RESET, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
-    commandInfo = Cli.getCommandInfo(command);
+    commandInfo = cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -47,17 +47,18 @@ describe(commands.FILE_ROLEINHERITANCE_RESET, () => {
         log.push(msg);
       }
     };
-    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
-      promptOptions = options;
-      return { continue: false };
+    sinon.stub(cli, 'promptForConfirmation').callsFake(() => {
+      promptIssued = true;
+      return Promise.resolve(false);
     });
-    promptOptions = undefined;
+
+    promptIssued = false;
   });
 
   afterEach(() => {
     sinonUtil.restore([
-      Cli.prompt,
-      Cli.executeCommandWithOutput,
+      cli.promptForConfirmation,
+      cli.executeCommandWithOutput,
       request.post
     ]);
   });
@@ -90,7 +91,7 @@ describe(commands.FILE_ROLEINHERITANCE_RESET, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('prompts before breaking role inheritance for the file when confirm option not passed', async () => {
+  it('prompts before breaking role inheritance for the file when force option not passed', async () => {
     await command.action(logger, {
       options: {
         webUrl: webUrl,
@@ -98,16 +99,11 @@ describe(commands.FILE_ROLEINHERITANCE_RESET, () => {
       }
     });
 
-    let promptIssued = false;
-
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
 
     assert(promptIssued);
   });
 
-  it('aborts breaking role inheritance for the file when confirm option is not passed and prompt not confirmed', async () => {
+  it('aborts breaking role inheritance for the file when force option is not passed and prompt not confirmed', async () => {
     const postSpy = sinon.spy(request, 'post');
 
     await command.action(logger, {
@@ -161,7 +157,7 @@ describe(commands.FILE_ROLEINHERITANCE_RESET, () => {
   });
 
   it('breaks role inheritance on file by Id when prompt confirmed', async () => {
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
+    sinon.stub(cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
       if (command === spoFileGetCommand) {
         return ({
           stdout: '{"LinkingUri": "https://contoso.sharepoint.com/sites/project-x/documents/Test1.docx?d=wc39926a80d2c4067afa6cff9902eb866","Name": "Test1.docx","ServerRelativeUrl": "/sites/project-x/documents/Test1.docx","UniqueId": "b2307a39-e878-458b-bc90-03bc578531d6"}'
@@ -179,8 +175,8 @@ describe(commands.FILE_ROLEINHERITANCE_RESET, () => {
       throw 'Invalid request';
     });
 
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
       options: {

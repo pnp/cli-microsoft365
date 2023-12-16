@@ -2,10 +2,10 @@ import AdmZip from 'adm-zip';
 import fs from 'fs';
 import path from 'path';
 import { v4 } from 'uuid';
-import { Cli, CommandOutput } from '../../../../cli/Cli.js';
-import { Logger } from '../../../../cli/Logger.js';
 import Command from '../../../../Command.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
+import { Logger } from '../../../../cli/Logger.js';
+import { CommandOutput, cli } from '../../../../cli/cli.js';
 import AnonymousCommand from '../../../base/AnonymousCommand.js';
 import spoWebGetCommand, { Options as SpoWebGetCommandOptions } from '../../../spo/commands/web/web-get.js';
 import commands from '../../commands.js';
@@ -230,7 +230,7 @@ class VivaConnectionsAppCreateCommand extends AnonymousCommand {
       debug: this.debug,
       verbose: this.verbose
     };
-    return Cli.executeCommandWithOutput(spoWebGetCommand as Command, { options: { ...options, _: [] } });
+    return cli.executeCommandWithOutput(spoWebGetCommand as Command, { options: { ...options, _: [] } });
   }
 }
 

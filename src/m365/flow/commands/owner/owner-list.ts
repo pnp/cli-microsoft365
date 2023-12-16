@@ -1,4 +1,4 @@
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import { formatting } from '../../../../utils/formatting.js';
@@ -97,7 +97,7 @@ class FlowOwnerListCommand extends AzmgmtCommand {
       }
 
       const response = await odata.getAllItems<FlowPermissionResponse>(`${this.resource}providers/Microsoft.ProcessSimple/${args.options.asAdmin ? 'scopes/admin/' : ''}environments/${formatting.encodeQueryParameter(args.options.environmentName)}/flows/${formatting.encodeQueryParameter(args.options.flowName)}/permissions?api-version=2016-11-01`);
-      if (!Cli.shouldTrimOutput(args.options.output)) {
+      if (!cli.shouldTrimOutput(args.options.output)) {
         await logger.log(response);
       }
       else {

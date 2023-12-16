@@ -2,7 +2,7 @@ import assert from 'assert';
 import os from 'os';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
@@ -16,7 +16,6 @@ import command from './approleassignment-add.js';
 import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.APPROLEASSIGNMENT_ADD, () => {
-  let cli: Cli;
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -43,13 +42,12 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
   };
 
   before(() => {
-    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
-    commandInfo = Cli.getCommandInfo(command);
+    commandInfo = cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -73,7 +71,7 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
       request.get,
       request.post,
       cli.getSettingWithDefaultValue,
-      Cli.handleMultipleResultsFound
+      cli.handleMultipleResultsFound
     ]);
   });
 
@@ -248,7 +246,7 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
       throw 'Invalid request';
     });
 
-    sinon.stub(Cli, 'handleMultipleResultsFound').resolves({ id: '24448e9c-d0fa-43d1-a1dd-e279720969a0' });
+    sinon.stub(cli, 'handleMultipleResultsFound').resolves({ id: '24448e9c-d0fa-43d1-a1dd-e279720969a0' });
 
     await command.action(logger, { options: { debug: true, appDisplayName: 'test', resource: 'SharePoint', scopes: 'Scope1' } });
     assert.deepEqual(loggerLogSpy.lastCall.args[0][0], {

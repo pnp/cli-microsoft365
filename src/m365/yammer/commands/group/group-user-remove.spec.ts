@@ -1,7 +1,7 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
@@ -25,7 +25,7 @@ describe(commands.GROUP_USER_REMOVE, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
-    commandInfo = Cli.getCommandInfo(command);
+    commandInfo = cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -47,7 +47,7 @@ describe(commands.GROUP_USER_REMOVE, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.delete,
-      Cli.prompt
+      cli.promptForConfirmation
     ]);
   });
 
@@ -73,9 +73,7 @@ describe(commands.GROUP_USER_REMOVE, () => {
       };
     });
 
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred.'));
   });
@@ -103,9 +101,7 @@ describe(commands.GROUP_USER_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, { options: { debug: true, groupId: 1231231 } });
 
@@ -133,9 +129,7 @@ describe(commands.GROUP_USER_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, { options: { debug: true, groupId: 1231231, id: 989998789 } });
 
@@ -143,9 +137,7 @@ describe(commands.GROUP_USER_REMOVE, () => {
   });
 
   it('prompts before removal when confirmation argument not passed', async () => {
-    const promptStub: sinon.SinonStub = sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: false }
-    ));
+    const promptStub: sinon.SinonStub = sinon.stub(cli, 'promptForConfirmation').resolves(false);
 
     await command.action(logger, { options: { groupId: 1231231, id: 989998789 } });
 
@@ -153,9 +145,7 @@ describe(commands.GROUP_USER_REMOVE, () => {
   });
 
   it('aborts execution when prompt not confirmed', async () => {
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: false }
-    ));
+    sinon.stub(cli, 'promptForConfirmation').resolves(false);
 
     await command.action(logger, { options: { groupId: 1231231, id: 989998789 } });
 

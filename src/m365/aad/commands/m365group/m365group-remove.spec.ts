@@ -1,7 +1,7 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
@@ -21,7 +21,7 @@ describe(commands.M365GROUP_REMOVE, () => {
   let logger: Logger;
   let loggerLogToStderrSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
-  let promptOptions: any;
+  let promptIssued: boolean = false;
 
   const groupId = '3e6e705d-6fb5-4ca7-84dc-3c8f5154fe2c';
 
@@ -104,7 +104,7 @@ describe(commands.M365GROUP_REMOVE, () => {
     sinon.stub(aadGroup, 'isUnifiedGroup').resolves(true);
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
-    commandInfo = Cli.getCommandInfo(command);
+    commandInfo = cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -125,12 +125,13 @@ describe(commands.M365GROUP_REMOVE, () => {
     const futureDate = new Date();
     futureDate.setSeconds(futureDate.getSeconds() + 1800);
     sinon.stub(spo, 'ensureFormDigest').callsFake(() => { return Promise.resolve({ FormDigestValue: 'abc', FormDigestTimeoutSeconds: 1800, FormDigestExpiresAt: futureDate, WebFullUrl: 'https://contoso.sharepoint.com/teams/sales' }); });
-    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
-      promptOptions = options;
-      return { continue: false };
+    sinon.stub(cli, 'promptForConfirmation').callsFake(async () => {
+      promptIssued = true;
+      return false;
     });
+
+    promptIssued = false;
     loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
-    promptOptions = undefined;
   });
 
   afterEach(() => {
@@ -140,7 +141,7 @@ describe(commands.M365GROUP_REMOVE, () => {
       request.delete,
       spo.getSpoAdminUrl,
       spo.ensureFormDigest,
-      Cli.prompt
+      cli.promptForConfirmation
     ]);
   });
 
@@ -168,13 +169,8 @@ describe(commands.M365GROUP_REMOVE, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('prompts before removing the specified group when confirm option not passed', async () => {
+  it('prompts before removing the specified group when force option not passed', async () => {
     await command.action(logger, { options: { id: '28beab62-7540-4db1-a23f-29a6018a3848' } });
-    let promptIssued = false;
-
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
 
     assert(promptIssued);
   });
@@ -190,10 +186,8 @@ describe(commands.M365GROUP_REMOVE, () => {
     defaultGetStub();
     const deletedGroupSpy: sinon.SinonStub = defaultPostStub();
 
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, { options: { id: groupId, verbose: true } });
     assert(deletedGroupSpy.calledOnce);
@@ -229,6 +223,8 @@ describe(commands.M365GROUP_REMOVE, () => {
 
   it('handles error if unexpected error occurs while deleting site from the recycle bin', async () => {
     const getCallStub: sinon.SinonStub = sinon.stub(request, 'get');
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     getCallStub.withArgs(sinon.match({ url: `https://graph.microsoft.com/v1.0/groups/${groupId}/drive?$select=webUrl` }))
       .resolves({ webUrl: "https://contoso.sharepoint.com/teams/sales/Shared%20Documents" });

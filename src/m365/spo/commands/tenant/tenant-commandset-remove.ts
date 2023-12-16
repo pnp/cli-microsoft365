@@ -1,4 +1,4 @@
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
@@ -98,14 +98,9 @@ class SpoTenantCommandSetRemoveCommand extends SpoCommand {
         return await this.removeTenantCommandSet(logger, args);
       }
 
-      const result = await Cli.prompt<{ continue: boolean }>({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: `Are you sure you want to remove the tenant commandset ${args.options.id || args.options.title || args.options.clientSideComponentId}?`
-      });
+      const result = await cli.promptForConfirmation({ message: `Are you sure you want to remove the tenant commandset ${args.options.id || args.options.title || args.options.clientSideComponentId}?` });
 
-      if (result.continue) {
+      if (result) {
         await this.removeTenantCommandSet(logger, args);
       }
     }
@@ -168,7 +163,7 @@ class SpoTenantCommandSetRemoveCommand extends SpoCommand {
 
     if (listItemInstances.length > 1) {
       const resultAsKeyValuePair = formatting.convertArrayToHashTable('Id', listItemInstances);
-      const result = await Cli.handleMultipleResultsFound<ListItemInstance>(`Multiple command sets with ${args.options.title || args.options.clientSideComponentId} were found.`, resultAsKeyValuePair);
+      const result = await cli.handleMultipleResultsFound<ListItemInstance>(`Multiple command sets with ${args.options.title || args.options.clientSideComponentId} were found.`, resultAsKeyValuePair);
       return result.Id;
     }
 

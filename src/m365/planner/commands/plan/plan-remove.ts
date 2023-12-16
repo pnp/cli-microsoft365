@@ -1,5 +1,5 @@
 import { PlannerPlan } from '@microsoft/microsoft-graph-types';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
@@ -130,13 +130,9 @@ class PlannerPlanRemoveCommand extends GraphCommand {
       await removePlan();
     }
     else {
-      const result = await Cli.prompt<{ continue: boolean }>({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: `Are you sure you want to remove the plan ${args.options.id || args.options.title}?`
-      });
-      if (result.continue) {
+      const result = await cli.promptForConfirmation({ message: `Are you sure you want to remove the plan ${args.options.id || args.options.title}?` });
+
+      if (result) {
         await removePlan();
       }
     }

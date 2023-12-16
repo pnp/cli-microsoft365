@@ -1,7 +1,7 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
@@ -18,7 +18,7 @@ describe(commands.TASK_CHECKLISTITEM_REMOVE, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
-  let promptOptions: any;
+  let promptIssued: boolean = false;
   const validTaskId = '2Vf8JHgsBUiIf-nuvBtv-ZgAAYw2';
   const validId = '71175';
 
@@ -46,8 +46,8 @@ describe(commands.TASK_CHECKLISTITEM_REMOVE, () => {
       accessToken: 'abc',
       expiresOn: new Date()
     };
-    sinon.stub(Cli.getInstance().config, 'all').value({});
-    commandInfo = Cli.getCommandInfo(command);
+    sinon.stub(cli.getConfig(), 'all').value({});
+    commandInfo = cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -63,19 +63,19 @@ describe(commands.TASK_CHECKLISTITEM_REMOVE, () => {
         log.push(msg);
       }
     };
-    promptOptions = undefined;
-
-    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
-      promptOptions = options;
-      return { continue: true };
+    sinon.stub(cli, 'promptForConfirmation').callsFake(() => {
+      promptIssued = true;
+      return Promise.resolve(true);
     });
+
+    promptIssued = false;
   });
 
   afterEach(() => {
     sinonUtil.restore([
       request.get,
       request.patch,
-      Cli.prompt
+      cli.promptForConfirmation
     ]);
   });
 
@@ -93,11 +93,11 @@ describe(commands.TASK_CHECKLISTITEM_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('prompts before removal when confirm option not passed', async () => {
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
-      promptOptions = options;
-      return { continue: false };
+  it('prompts before removal when force option not passed', async () => {
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').callsFake(() => {
+      promptIssued = true;
+      return Promise.resolve(false);
     });
 
     await command.action(logger, {
@@ -106,12 +106,6 @@ describe(commands.TASK_CHECKLISTITEM_REMOVE, () => {
         id: validId
       }
     });
-
-    let promptIssued = false;
-
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
 
     assert(promptIssued);
   });

@@ -2,7 +2,7 @@ import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
 import { CommandError } from '../../../../Command.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import request from '../../../../request.js';
@@ -15,11 +15,9 @@ import command from './list-retentionlabel-remove.js';
 import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.LIST_RETENTIONLABEL_REMOVE, () => {
-  let cli: Cli;
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
-  let promptOptions: any;
   const listResponse = {
     "RootFolder": {
       "ServerRelativeUrl": "/sites/team1/Shared Documents"
@@ -27,13 +25,19 @@ describe(commands.LIST_RETENTIONLABEL_REMOVE, () => {
   };
 
   before(() => {
-    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
-    commandInfo = Cli.getCommandInfo(command);
+    commandInfo = cli.getCommandInfo(command);
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName: string, defaultValue: any) => {
+      if (settingName === 'prompt') {
+        return false;
+      }
+
+      return defaultValue;
+    });
   });
 
   beforeEach(() => {
@@ -49,17 +53,13 @@ describe(commands.LIST_RETENTIONLABEL_REMOVE, () => {
         log.push(msg);
       }
     };
-    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
-      promptOptions = options;
-      return { continue: false };
-    });
   });
 
   afterEach(() => {
     sinonUtil.restore([
       request.get,
       request.post,
-      Cli.prompt,
+      cli.promptForConfirmation,
       cli.getSettingWithDefaultValue
     ]);
   });
@@ -77,55 +77,48 @@ describe(commands.LIST_RETENTIONLABEL_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('prompts before removing the retentionlabel on the specified list when confirm option not passed (listTitle)', async () => {
+  it('prompts before removing the retentionlabel on the specified list when force option not passed (listTitle)', async () => {
+    const confirmationStub = sinon.stub(cli, 'promptForConfirmation').resolves(false);
+
     await command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/team1',
         listTitle: 'MyLibrary'
       }
     });
-    let promptIssued = false;
 
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
-
-    assert(promptIssued);
+    assert(confirmationStub.calledOnce);
   });
 
-  it('prompts before removing the retentionlabel on the specified list when confirm option not passed (listId)', async () => {
+  it('prompts before removing the retentionlabel on the specified list when force option not passed (listId)', async () => {
+    const confirmationStub = sinon.stub(cli, 'promptForConfirmation').resolves(false);
+
     await command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/team1',
         listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF'
       }
     });
-    let promptIssued = false;
 
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
-
-    assert(promptIssued);
+    assert(confirmationStub.calledOnce);
   });
 
-  it('prompts before removing the retentionlabel on the specified list when confirm option not passed (listUrl)', async () => {
+  it('prompts before removing the retentionlabel on the specified list when force option not passed (listUrl)', async () => {
+    const confirmationStub = sinon.stub(cli, 'promptForConfirmation').resolves(false);
+
     await command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/team1',
         listUrl: '/sites/team1/MyLibrary'
       }
     });
-    let promptIssued = false;
 
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
-
-    assert(promptIssued);
+    assert(confirmationStub.calledOnce);
   });
 
   it('aborts removing list retentionlabel when prompt not confirmed', async () => {
+    sinon.stub(cli, 'promptForConfirmation').resolves(false);
+
     const getSpy = sinon.spy(request, 'get');
     await command.action(logger, {
       options: {
@@ -282,10 +275,8 @@ describe(commands.LIST_RETENTIONLABEL_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await assert.doesNotReject(command.action(logger, {
       options: {

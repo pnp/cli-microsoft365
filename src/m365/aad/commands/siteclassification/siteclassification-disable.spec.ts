@@ -1,7 +1,7 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
 import request from '../../../../request.js';
@@ -15,7 +15,7 @@ import command from './siteclassification-disable.js';
 describe(commands.SITECLASSIFICATION_DISABLE, () => {
   let log: string[];
   let logger: Logger;
-  let promptOptions: any;
+  let promptIssued: boolean = false;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -38,18 +38,19 @@ describe(commands.SITECLASSIFICATION_DISABLE, () => {
         log.push(msg);
       }
     };
-    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
-      promptOptions = options;
-      return { continue: false };
+    sinon.stub(cli, 'promptForConfirmation').callsFake(() => {
+      promptIssued = true;
+      return Promise.resolve(false);
     });
-    promptOptions = undefined;
+
+    promptIssued = false;
   });
 
   afterEach(() => {
     sinonUtil.restore([
       request.get,
       request.delete,
-      Cli.prompt
+      cli.promptForConfirmation
     ]);
   });
 
@@ -67,13 +68,8 @@ describe(commands.SITECLASSIFICATION_DISABLE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('prompts before disabling siteclassification when confirm option not passed', async () => {
+  it('prompts before disabling siteclassification when force option not passed', async () => {
     await command.action(logger, { options: {} });
-    let promptIssued = false;
-
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
 
     assert(promptIssued);
   });
@@ -488,8 +484,8 @@ describe(commands.SITECLASSIFICATION_DISABLE, () => {
 
   it('aborts removing the group when prompt not confirmed', async () => {
     const postSpy = sinon.spy(request, 'delete');
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: false });
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(false);
 
     await command.action(logger, { options: {} });
     assert(postSpy.notCalled);
@@ -577,8 +573,8 @@ describe(commands.SITECLASSIFICATION_DISABLE, () => {
       throw 'Invalid request';
     });
 
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, { options: {} });
     assert(deleteRequestIssued);

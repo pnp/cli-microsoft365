@@ -1,4 +1,4 @@
-import { Cli, CommandOutput } from '../../../../cli/Cli.js';
+import { cli, CommandOutput } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import Command from '../../../../Command.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
@@ -142,7 +142,7 @@ class SpoGroupMemberRemoveCommand extends SpoCommand {
       verbose: args.options.verbose
     };
 
-    const userGetOutput: CommandOutput = await Cli.executeCommandWithOutput(aadUserGetCommand as Command, { options: { ...options, _: [] } });
+    const userGetOutput: CommandOutput = await cli.executeCommandWithOutput(aadUserGetCommand as Command, { options: { ...options, _: [] } });
     const userOutput = JSON.parse(userGetOutput.stdout);
     return userOutput.userPrincipalName;
   }
@@ -155,14 +155,9 @@ class SpoGroupMemberRemoveCommand extends SpoCommand {
       await this.removeUserfromSPGroup(logger, args);
     }
     else {
-      const result = await Cli.prompt<{ continue: boolean }>({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: `Are you sure you want to remove user ${args.options.userName || args.options.userId || args.options.email || args.options.aadGroupId || args.options.aadGroupName} from the SharePoint group?`
-      });
+      const result = await cli.promptForConfirmation({ message: `Are you sure you want to remove user ${args.options.userName || args.options.userId || args.options.email || args.options.aadGroupId || args.options.aadGroupName} from the SharePoint group?` });
 
-      if (result.continue) {
+      if (result) {
         await this.removeUserfromSPGroup(logger, args);
       }
     }
@@ -221,23 +216,23 @@ class SpoGroupMemberRemoveCommand extends SpoCommand {
       options.groupName = args.options.groupName;
     }
 
-    const output = await Cli.executeCommandWithOutput(SpoGroupMemberListCommand as Command, { options: { ...options, _: [] } });
+    const output = await cli.executeCommandWithOutput(SpoGroupMemberListCommand as Command, { options: { ...options, _: [] } });
     const getGroupMemberListOutput = JSON.parse(output.stdout);
 
-    let foundgroups: any;
+    let foundGroups: any;
 
     if (args.options.aadGroupId) {
-      foundgroups = getGroupMemberListOutput.filter((x: any) => { return x.LoginName.indexOf(args.options.aadGroupId) > -1 && (x.LoginName.indexOf("c:0o.c|federateddirectoryclaimprovider|") === 0 || x.LoginName.indexOf("c:0t.c|tenant|") === 0); });
+      foundGroups = getGroupMemberListOutput.filter((x: any) => { return x.LoginName.indexOf(args.options.aadGroupId) > -1 && (x.LoginName.indexOf("c:0o.c|federateddirectoryclaimprovider|") === 0 || x.LoginName.indexOf("c:0t.c|tenant|") === 0); });
     }
     else {
-      foundgroups = getGroupMemberListOutput.filter((x: any) => { return x.Title === args.options.aadGroupName && (x.LoginName.indexOf("c:0o.c|federateddirectoryclaimprovider|") === 0 || x.LoginName.indexOf("c:0t.c|tenant|") === 0); });
+      foundGroups = getGroupMemberListOutput.filter((x: any) => { return x.Title === args.options.aadGroupName && (x.LoginName.indexOf("c:0o.c|federateddirectoryclaimprovider|") === 0 || x.LoginName.indexOf("c:0t.c|tenant|") === 0); });
     }
 
-    if (foundgroups.length === 0) {
+    if (foundGroups.length === 0) {
       throw `The Azure AD group ${args.options.aadGroupId || args.options.aadGroupName} is not found in SharePoint group ${args.options.groupId || args.options.groupName}`;
     }
 
-    return foundgroups[0].Id;
+    return foundGroups[0].Id;
   }
 }
 

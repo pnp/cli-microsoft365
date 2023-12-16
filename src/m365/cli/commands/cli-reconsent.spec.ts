@@ -1,7 +1,7 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import { CommandError } from '../../../Command.js';
-import { Cli } from '../../../cli/Cli.js';
+import { cli } from '../../../cli/cli.js';
 import { Logger } from '../../../cli/Logger.js';
 import { telemetry } from '../../../telemetry.js';
 import { browserUtil } from '../../../utils/browserUtil.js';
@@ -13,7 +13,6 @@ import command from './cli-reconsent.js';
 describe(commands.RECONSENT, () => {
   let log: string[];
   let logger: Logger;
-  let cli: Cli;
   let getSettingWithDefaultValueStub: sinon.SinonStub;
   let loggerLogSpy: sinon.SinonSpy;
   let openStub: sinon.SinonStub;
@@ -26,7 +25,6 @@ describe(commands.RECONSENT, () => {
 
   beforeEach(() => {
     log = [];
-    cli = Cli.getInstance();
     logger = {
       log: async (msg: string) => {
         log.push(msg);

@@ -1,7 +1,7 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
@@ -33,7 +33,7 @@ describe(commands.SITESCRIPT_GET, () => {
     });
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
-    commandInfo = Cli.getCommandInfo(command);
+    commandInfo = cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -101,7 +101,7 @@ describe(commands.SITESCRIPT_GET, () => {
     });
 
     await command.action(logger, { options: { id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' } });
-    assert(loggerLogSpy.calledWith({
+    assert(loggerLogSpy.calledOnceWithExactly({
       "Content": JSON.stringify({
         "$schema": "schema.json",
         "actions": [
@@ -149,7 +149,7 @@ describe(commands.SITESCRIPT_GET, () => {
     });
 
     await command.action(logger, { options: { debug: true, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' } });
-    assert(loggerLogSpy.calledWith({
+    assert(loggerLogSpy.calledOnceWithExactly({
       "Content": JSON.stringify({
         "$schema": "schema.json",
         "actions": [
@@ -165,6 +165,48 @@ describe(commands.SITESCRIPT_GET, () => {
       "Id": "0f27a016-d277-4bb4-b3c3-b5b040c9559b",
       "Title": "Contoso",
       "Version": 1
+    }));
+  });
+
+  it('gets the specified site script contents', async () => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GetSiteScriptMetadata`) > -1 &&
+        JSON.stringify(opts.data) === JSON.stringify({
+          id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b'
+        })) {
+        return {
+          "Content": JSON.stringify({
+            "$schema": "schema.json",
+            "actions": [
+              {
+                "verb": "applyTheme",
+                "themeName": "Contoso Theme"
+              }
+            ],
+            "bindata": {},
+            "version": 1
+          }),
+          "Description": "My contoso script",
+          "Id": "0f27a016-d277-4bb4-b3c3-b5b040c9559b",
+          "Title": "Contoso",
+          "Version": 1
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b', content: true } });
+    assert(loggerLogSpy.calledOnceWithExactly({
+      "$schema": "schema.json",
+      "actions": [
+        {
+          "verb": "applyTheme",
+          "themeName": "Contoso Theme"
+        }
+      ],
+      "bindata": {},
+      "version": 1
     }));
   });
 

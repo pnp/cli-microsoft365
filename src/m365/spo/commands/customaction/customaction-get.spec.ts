@@ -2,7 +2,7 @@ import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
 import { CommandError } from '../../../../Command.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import request from '../../../../request.js';
@@ -15,7 +15,6 @@ import command from './customaction-get.js';
 import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.CUSTOMACTION_GET, () => {
-  let cli: Cli;
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -66,13 +65,19 @@ describe(commands.CUSTOMACTION_GET, () => {
 
 
   before(() => {
-    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
-    commandInfo = Cli.getCommandInfo(command);
+    commandInfo = cli.getCommandInfo(command);
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName: string, defaultValue: any) => {
+      if (settingName === 'prompt') {
+        return false;
+      }
+
+      return defaultValue;
+    });
   });
 
   beforeEach(() => {
@@ -95,7 +100,7 @@ describe(commands.CUSTOMACTION_GET, () => {
     sinonUtil.restore([
       request.get,
       cli.getSettingWithDefaultValue,
-      Cli.handleMultipleResultsFound
+      cli.handleMultipleResultsFound
     ]);
   });
 
@@ -186,7 +191,7 @@ describe(commands.CUSTOMACTION_GET, () => {
   });
 
   it('handles selecting single result when multiple custom actions sets with the specified name found and cli is set to prompt', async () => {
-    sinon.stub(Cli, 'handleMultipleResultsFound').resolves({
+    sinon.stub(cli, 'handleMultipleResultsFound').resolves({
       ClientSideComponentId: '015e0fcf-fe9d-4037-95af-0a4776cdfbb4',
       ClientSideComponentProperties: '{"testMessage":"Test message"}',
       CommandUIExtension: null,
@@ -682,7 +687,7 @@ describe(commands.CUSTOMACTION_GET, () => {
   });
 
   it('handles selecting single result when multiple custom actions sets with the specified ClientSideComponentId found and cli is set to prompt', async () => {
-    sinon.stub(Cli, 'handleMultipleResultsFound').resolves({
+    sinon.stub(cli, 'handleMultipleResultsFound').resolves({
       ClientSideComponentId: '015e0fcf-fe9d-4037-95af-0a4776cdfbb4',
       ClientSideComponentProperties: '{"testMessage":"Test message"}',
       CommandUIExtension: null,

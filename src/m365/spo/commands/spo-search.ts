@@ -1,5 +1,5 @@
 import { isNumber } from 'util';
-import { Cli } from '../../../cli/Cli.js';
+import { cli } from '../../../cli/cli.js';
 import { Logger } from '../../../cli/Logger.js';
 import GlobalOptions from '../../../GlobalOptions.js';
 import request from '../../../request.js';
@@ -326,7 +326,7 @@ class SpoSearchCommand extends SpoCommand {
       await logger.log(this.getParsedOutput(args, results));
     }
 
-    if (!args.options.output || Cli.shouldTrimOutput(args.options.output)) {
+    if (!args.options.output || cli.shouldTrimOutput(args.options.output)) {
       await logger.log("# Rows: " + results[results.length - 1].PrimaryQueryResult.RelevantResults.TotalRows);
       await logger.log("# Rows (Including duplicates): " + results[results.length - 1].PrimaryQueryResult.RelevantResults.TotalRowsIncludingDuplicates);
       await logger.log("Elapsed Time: " + this.getElapsedTime(results));

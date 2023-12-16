@@ -1,4 +1,4 @@
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import config from '../../../../config.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
@@ -115,14 +115,9 @@ class SpoCdnOriginRemoveCommand extends SpoCommand {
       await removeCdnOrigin();
     }
     else {
-      const result = await Cli.prompt<{ continue: boolean }>({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: `Are you sure you want to delete the ${args.options.origin} CDN origin?`
-      });
+      const result = await cli.promptForConfirmation({ message: `Are you sure you want to delete the ${args.options.origin} CDN origin?` });
 
-      if (result.continue) {
+      if (result) {
         await removeCdnOrigin();
       }
     }

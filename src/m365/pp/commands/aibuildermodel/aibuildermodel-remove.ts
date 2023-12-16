@@ -1,4 +1,4 @@
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import Command from '../../../../Command.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
@@ -98,14 +98,9 @@ class PpAiBuilderModelRemoveCommand extends PowerPlatformCommand {
       await this.deleteAiBuilderModel(args);
     }
     else {
-      const result = await Cli.prompt<{ continue: boolean }>({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: `Are you sure you want to remove AI builder model '${args.options.id || args.options.name}'?`
-      });
+      const result = await cli.promptForConfirmation({ message: `Are you sure you want to remove AI builder model '${args.options.id || args.options.name}'?` });
 
-      if (result.continue) {
+      if (result) {
         await this.deleteAiBuilderModel(args);
       }
     }
@@ -124,7 +119,7 @@ class PpAiBuilderModelRemoveCommand extends PowerPlatformCommand {
       verbose: this.verbose
     };
 
-    const output = await Cli.executeCommandWithOutput(ppAiBuilderModelGetCommand as Command, { options: { ...options, _: [] } });
+    const output = await cli.executeCommandWithOutput(ppAiBuilderModelGetCommand as Command, { options: { ...options, _: [] } });
     const getAiBuilderModelOutput = JSON.parse(output.stdout);
     return getAiBuilderModelOutput.msdyn_aimodelid;
   }

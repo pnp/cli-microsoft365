@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import Command, { CommandError } from '../../../../Command.js';
 import spoServicePrincipalGrantAddCommand, { Options as SpoServicePrincipalGrantAddCommandOptions } from '../../../spo/commands/serviceprincipal/serviceprincipal-grant-add.js';
@@ -46,7 +46,7 @@ class SpfxProjectPermissionSGrantCommand extends BaseProjectCommand {
 
         let output = null;
         try {
-          output = await Cli.executeCommandWithOutput(spoServicePrincipalGrantAddCommand as Command, { options: { ...options, _: [] } });
+          output = await cli.executeCommandWithOutput(spoServicePrincipalGrantAddCommand as Command, { options: { ...options, _: [] } });
         }
         catch (err: any) {
           if (err.error && err.error.message.indexOf('already exists') > -1) {

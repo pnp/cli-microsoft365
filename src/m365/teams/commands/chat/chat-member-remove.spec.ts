@@ -2,7 +2,7 @@ import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
 import { CommandError } from '../../../../Command.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import request from '../../../../request.js';
@@ -43,7 +43,7 @@ describe(commands.CHAT_MEMBER_REMOVE, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
-  let promptOptions: any;
+  let promptIssued: boolean = false;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -51,7 +51,7 @@ describe(commands.CHAT_MEMBER_REMOVE, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
-    commandInfo = Cli.getCommandInfo(command);
+    commandInfo = cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -67,18 +67,19 @@ describe(commands.CHAT_MEMBER_REMOVE, () => {
         log.push(msg);
       }
     };
-    sinon.stub(Cli, 'prompt').callsFake(async (options) => {
-      promptOptions = options;
-      return { continue: false };
+    sinon.stub(cli, 'promptForConfirmation').callsFake(() => {
+      promptIssued = true;
+      return Promise.resolve(false);
     });
-    promptOptions = undefined;
+
+    promptIssued = false;
   });
 
   afterEach(() => {
     sinonUtil.restore([
       odata.getAllItems,
       request.delete,
-      Cli.prompt
+      cli.promptForConfirmation
     ]);
   });
 
@@ -145,8 +146,8 @@ describe(commands.CHAT_MEMBER_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, { options: { chatId: chatId, userName: userPrincipalName, verbose: true } });
     assert(deleteStub.called);
@@ -178,19 +179,14 @@ describe(commands.CHAT_MEMBER_REMOVE, () => {
       new CommandError(`Member with userId '${userId}' could not be found in the chat.`));
   });
 
-  it('prompts before removing the specified message when confirm option not passed', async () => {
+  it('prompts before removing the specified message when force option not passed', async () => {
     await command.action(logger, { options: { chatId: chatId, id: chatMemberId } });
 
-    let promptIssued = false;
-
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
 
     assert(promptIssued);
   });
 
-  it('aborts removing the specified chat member when confirm option not passed and prompt not confirmed', async () => {
+  it('aborts removing the specified chat member when force option not passed and prompt not confirmed', async () => {
     const deleteStub = sinon.stub(request, 'delete').resolves();
 
     await command.action(logger, { options: { chatId: chatId, userId: userId } });

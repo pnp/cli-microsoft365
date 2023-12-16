@@ -1,5 +1,5 @@
 import auth from '../../../../Auth.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import Command from '../../../../Command.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
@@ -130,7 +130,7 @@ class TeamsMeetingAttendancereportListCommand extends GraphCommand {
       verbose: this.verbose
     };
 
-    const output = await Cli.executeCommandWithOutput(aadUserGetCommand as Command, { options: { ...options, _: [] } });
+    const output = await cli.executeCommandWithOutput(aadUserGetCommand as Command, { options: { ...options, _: [] } });
     const getUserOutput = JSON.parse(output.stdout);
     return getUserOutput.id;
   }
