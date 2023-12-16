@@ -16,7 +16,7 @@ interface Options extends GlobalOptions {
   name: string;
   force?: boolean;
   environmentName?: string;
-  asAdmin: boolean;
+  asAdmin?: boolean;
 }
 
 class PaAppRemoveCommand extends PowerAppsCommand {
@@ -40,7 +40,7 @@ class PaAppRemoveCommand extends PowerAppsCommand {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
         force: typeof args.options.force !== 'undefined',
-        asAdmin: args.options.asAdmin === true,
+        asAdmin: !!args.options.asAdmin,
         environmentName: typeof args.options.environmentName !== 'undefined'
       });
     });
@@ -55,10 +55,10 @@ class PaAppRemoveCommand extends PowerAppsCommand {
         option: '-f, --force'
       },
       {
-        option: '-e, --environmentName [environmentName]'
+        option: '--asAdmin'
       },
       {
-        option: '--asAdmin'
+        option: '-e, --environmentName [environmentName]'
       }
     );
   }
@@ -71,11 +71,11 @@ class PaAppRemoveCommand extends PowerAppsCommand {
         }
 
         if (args.options.asAdmin && !args.options.environmentName) {
-          return 'When specifying the asAdmin option the environment option is required as well';
+          return 'When specifying the asAdmin option, the environment option is required as well.';
         }
 
         if (args.options.environmentName && !args.options.asAdmin) {
-          return 'When specifying the environment option the asAdmin option is required as well';
+          return 'When specifying the environment option, the asAdmin option is required as well.';
         }
 
         return true;
@@ -89,8 +89,16 @@ class PaAppRemoveCommand extends PowerAppsCommand {
     }
 
     const removePaApp = async (): Promise<void> => {
+      let endpoint;
+      if (args.options.asAdmin) {
+        endpoint = `${this.resource}/providers/Microsoft.PowerApps/scopes/admin/environments/${formatting.encodeQueryParameter(args.options.environmentName!)}/apps/${formatting.encodeQueryParameter(args.options.name)}?api-version=2017-08-01`;
+      }
+      else {
+        endpoint = `${this.resource}/providers/Microsoft.PowerApps/apps/${formatting.encodeQueryParameter(args.options.name)}?api-version=2017-08-01`;
+      }
+
       const requestOptions: CliRequestOptions = {
-        url: `${this.resource}/providers/Microsoft.PowerApps${args.options.asAdmin ? '/scopes/admin' : ''}${args.options.environmentName ? '/environments/' + formatting.encodeQueryParameter(args.options.environmentName) : ''}/apps/${formatting.encodeQueryParameter(args.options.name)}?api-version=2017-08-01`,
+        url: endpoint,
         fullResponse: true,
         headers: {
           accept: 'application/json'
