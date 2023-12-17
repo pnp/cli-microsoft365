@@ -1,6 +1,6 @@
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
-import request from '../../../../request.js';
+import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
@@ -75,7 +75,12 @@ class SpoSiteRecycleBinItemRestoreCommand extends SpoCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push({ options: ['ids', 'allPrimary', 'allSecondary'] });
+    this.optionSets.push(
+      {
+        options: ['ids'],
+        runsWhen: (args) => args.options.allPrimary !== undefined && args.options.allSecondary !== undefined
+      }
+    );
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -106,7 +111,7 @@ class SpoSiteRecycleBinItemRestoreCommand extends SpoCommand {
 
         await Promise.all(
           idsChunks.map((idsChunk: string[]) => {
-            const requestOptions: any = {
+            const requestOptions: CliRequestOptions = {
               url: requestUrl,
               headers: {
                 'accept': 'application/json;odata=nometadata',
@@ -123,7 +128,7 @@ class SpoSiteRecycleBinItemRestoreCommand extends SpoCommand {
         );
       }
       else {
-        const requestOptions: any = {
+        const requestOptions: CliRequestOptions = {
           url: requestUrl,
           headers: {
             'accept': 'application/json;odata=nometadata',

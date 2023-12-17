@@ -142,16 +142,12 @@ describe(commands.SITE_RECYCLEBINITEM_RESTORE, () => {
       throw 'Invalid request';
     });
 
-    const result = await command.action(logger, {
+    await command.action(logger, {
       options: {
-        output: 'json',
-        debug: true,
         siteUrl: 'https://contoso.sharepoint.com/site',
         allPrimary: true
       }
     });
-
-    assert.equal(result, undefined);
   });
 
   it('restores all items from the second-stage recycle bin', async () => {
@@ -163,16 +159,12 @@ describe(commands.SITE_RECYCLEBINITEM_RESTORE, () => {
       throw 'Invalid request';
     });
 
-    const result = await command.action(logger, {
+    await command.action(logger, {
       options: {
-        output: 'json',
-        debug: true,
         siteUrl: 'https://contoso.sharepoint.com',
         allSecondary: true
       }
     });
-
-    assert.equal(result, undefined);
   });
 
   it('catches error when restores all items from recycle bin', async () => {
