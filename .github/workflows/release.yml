@@ -86,7 +86,16 @@ jobs:
         with:
           node-version: 18
 
-      - name: Install dependencies
+      - name: Cache node modules
+        id: cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            **/docs/node_modules
+          key: docs_node_modules-${{ hashFiles('**/docs/package-lock.json') }}
+
+      - name: Restore dependencies
+        if: steps.cache.outputs.cache-hit != 'true'
         run: npm ci
         working-directory: docs
         
