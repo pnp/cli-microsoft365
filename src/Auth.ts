@@ -329,7 +329,7 @@ export class Auth {
           piiLoggingEnabled: false,
           logLevel: debug ? LogLevel.Verbose : LogLevel.Error
         },
-        proxyUrl: process.env.HTTP_PROXY || process.env.HTTTPS_PROXY
+        proxyUrl: process.env.HTTP_PROXY || process.env.HTTPS_PROXY
       }
     };
   }
