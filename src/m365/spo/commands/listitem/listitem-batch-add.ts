@@ -202,7 +202,7 @@ class SpoListItemBatchAddCommand extends SpoCommand {
       batchBody.push(`Accept: application/json;odata=nometadata\n`);
       batchBody.push(`Content-Type: application/json;odata=verbose\n`);
       batchBody.push(`If-Match: *\n\n`);
-      batchBody.push(`{\n"formValues": ${JSON.stringify(item)}\n}`);
+      batchBody.push(`{\n"formValues": ${JSON.stringify(this.formatFormValues(item))}\n}`);
     });
 
     // close batch body
@@ -211,6 +211,16 @@ class SpoListItemBatchAddCommand extends SpoCommand {
     batchBody.push(`--batch_${batchId}--\n`);
 
     return batchBody;
+  }
+
+  private formatFormValues(input: FormValues[]): FormValues[] {
+    // Fix for PS 7
+    const output: FormValues[] = input.map(obj => ({
+      FieldName: obj.FieldName.replace(/\\"/g, ''),
+      FieldValue: obj.FieldValue.replace(/\\"/g, '')
+    }));
+
+    return output;
   }
 
   private parseBatchResponseBody(response: string): BatchResult[] {
