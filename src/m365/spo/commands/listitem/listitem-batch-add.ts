@@ -130,7 +130,7 @@ class SpoListItemBatchAddCommand extends SpoCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       if (this.verbose) {
-        logger.logToStderr(`Starting to create batch items from csv ${args.options.filePath ? `at path ${args.options.filePath}` : 'from content'}`);
+        await logger.logToStderr(`Starting to create batch items from csv ${args.options.filePath ? `at path ${args.options.filePath}` : 'from content'}`);
       }
       const csvContent = args.options.filePath ? fs.readFileSync(args.options.filePath, 'utf8') : args.options.csvContent;
       const jsonContent = formatting.parseCsvToJson(csvContent!);
@@ -215,12 +215,10 @@ class SpoListItemBatchAddCommand extends SpoCommand {
 
   private formatFormValues(input: FormValues[]): FormValues[] {
     // Fix for PS 7
-    const output: FormValues[] = input.map(obj => ({
+    return input.map(obj => ({
       FieldName: obj.FieldName.replace(/\\"/g, ''),
       FieldValue: obj.FieldValue.replace(/\\"/g, '')
     }));
-
-    return output;
   }
 
   private parseBatchResponseBody(response: string): BatchResult[] {
