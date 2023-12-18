@@ -78,7 +78,7 @@ class SpoSiteRecycleBinItemRestoreCommand extends SpoCommand {
     this.optionSets.push(
       {
         options: ['ids'],
-        runsWhen: (args) => args.options.allPrimary !== undefined && args.options.allSecondary !== undefined
+        runsWhen: (args) => args.options.allPrimary === undefined && args.options.allSecondary === undefined
       }
     );
   }
@@ -90,18 +90,9 @@ class SpoSiteRecycleBinItemRestoreCommand extends SpoCommand {
 
     let requestUrl: string = `${args.options.siteUrl}/_api`;
 
-    if (args.options.ids) {
-      requestUrl += `/site/RecycleBin/RestoreByIds`;
-    }
-    else if (args.options.allPrimary) {
-      requestUrl += `/web/RecycleBin/RestoreAll`;
-    }
-    else if (args.options.allSecondary) {
-      requestUrl += `/site/RecycleBin/RestoreAll`;
-    }
-
     try {
       if (args.options.ids) {
+        requestUrl += `/site/RecycleBin/RestoreByIds`;
         const ids: string[] = formatting.splitAndTrim(args.options.ids);
         const idsChunks: string[][] = [];
 
@@ -128,21 +119,33 @@ class SpoSiteRecycleBinItemRestoreCommand extends SpoCommand {
         );
       }
       else {
-        const requestOptions: CliRequestOptions = {
-          url: requestUrl,
-          headers: {
-            'accept': 'application/json;odata=nometadata',
-            'content-type': 'application/json'
-          },
-          responseType: 'json'
-        };
+        if (args.options.allPrimary) {
+          requestUrl += `/web/RecycleBin/RestoreAll`;
+          await this.restoreRecycleBinItems(requestUrl);
+        }
 
-        await request.post(requestOptions);
+        if (args.options.allSecondary) {
+          requestUrl += `/site/RecycleBin/RestoreAll`;
+          await this.restoreRecycleBinItems(requestUrl);
+        }
       }
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
+  }
+
+  private async restoreRecycleBinItems(requestUrl: string): Promise<void> {
+    const requestOptions: CliRequestOptions = {
+      url: requestUrl,
+      headers: {
+        'accept': 'application/json;odata=nometadata',
+        'content-type': 'application/json'
+      },
+      responseType: 'json'
+    };
+
+    return await request.post(requestOptions);
   }
 }
 

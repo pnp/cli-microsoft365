@@ -12,7 +12,6 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './site-recyclebinitem-restore.js';
-import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.SITE_RECYCLEBINITEM_RESTORE, () => {
   let cli: Cli;
@@ -47,7 +46,8 @@ describe(commands.SITE_RECYCLEBINITEM_RESTORE, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      request.post
+      request.post,
+      cli.getSettingWithDefaultValue
     ]);
   });
 
@@ -99,17 +99,22 @@ describe(commands.SITE_RECYCLEBINITEM_RESTORE, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation if ids, allPrimary, and allSecondary options are passed (multiple options)', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
+  it('validates for a correct input with ids', async () => {
+    const actual = await command.validate({
+      options: {
+        siteUrl: 'https://contoso.sharepoint.com', ids: '5fb84a1f-6ab5-4d07-a6aa-31bba6de9526,5fb84a1f-6ab5-4d07-a6aa-31bba6de9527'
       }
+    }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
 
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { ids: '5fb84a1f-6ab5-4d07-a6aa-31bba6de9526,5fb84a1f-6ab5-4d07-a6aa-31bba6de9527', allPrimary: true, allSecondary: true } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('validates for a correct input with allPrimary and allSecondary', async () => {
+    const actual = await command.validate({
+      options: {
+        siteUrl: 'https://contoso.sharepoint.com', allPrimary: true, allSecondary: true
+      }
+    }, commandInfo);
+    assert.strictEqual(actual, true);
   });
 
   it('restores specified items from the recycle bin', async () => {
