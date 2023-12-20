@@ -147,6 +147,46 @@ describe(commands.PAGE_ADD, () => {
 
   it('creates new modern page (debug)', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso.sharepoint.com/sites/team-a/_api/sitepages/pages') {
+        return {
+          AbsoluteUrl: "https://contoso.sharepoint.com/sites/team-a/SitePages/page.aspx",
+          AuthorByline: null,
+          BannerImageUrl: null,
+          BannerThumbnailUrl: null,
+          CallToAction: "",
+          Categories: null,
+          ContentTypeId: "0x0101009D1CB255DA76424F860D91F20E6C411800E6E49A01957D70448B30039A5116311C",
+          Description: null,
+          DoesUserHaveEditPermission: true,
+          FileName: "page.aspx",
+          FirstPublished: "0001-01-01T08:00:00Z",
+          Id: 34,
+          IsPageCheckedOutToCurrentUser: true,
+          IsWebWelcomePage: false,
+          Modified: "2023-12-20T22:12:35Z",
+          PageLayoutType: "Article",
+          Path: {
+            DecodedUrl: "SitePages/page.aspx"
+          },
+          PromotedState: 0,
+          Title: "page",
+          TopicHeader: null,
+          UniqueId: "64201083-46ba-4966-8bc5-b0cb31e3456c",
+          Url: "SitePages/page.aspx",
+          Version: "0.1",
+          VersionInfo: {
+            LastVersionCreated: "0001-01-01T00:00:00",
+            LastVersionCreatedBy: ""
+          },
+          AlternativeUrlMap: "{\"UserPhotoAspx\":\"https://contoso.sharepoint.com/_vti_bin/afdcache.ashx/_userprofile/userphoto.jpg\",\"MediaTAThumbnailPathUrl\":\"https://westeurope1-mediap.svc.ms/transform/thumbnail?provider=spo&inputFormat={.fileType}&cs=UEFHRVN8U1BP&docid={.spHost}/_api/v2.0/sharePoint:{.resourceUrl}:/driveItem&w={.widthValue}&oauth_token=bearer%20{.oauthToken}\",\"MediaTAThumbnailHostUrl\":\"https://westeurope1-mediap.svc.ms\",\"AFDCDNEnabled\":\"True\",\"CurrentSiteCDNPolicy\":\"True\",\"PublicCDNEnabled\":\"True\",\"PrivateCDNEnabled\":\"True\"}",
+          AuthoringMetadata: null,
+          CanvasContent1: "[]",
+          CoAuthState: null,
+          Language: null,
+          LayoutWebpartsContent: null,
+          SitePageFlags: ""
+        };
+      }
       if ((opts.url as string).indexOf(`/_api/web/GetFolderByServerRelativePath(DecodedUrl='/sites/team-a/sitepages')/files/AddTemplateFile`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
           urlOfFile: '/sites/team-a/sitepages/page.aspx',
@@ -213,7 +253,7 @@ describe(commands.PAGE_ADD, () => {
         return;
       }
 
-      throw 'Invalid request';
+      throw 'Invalid request: ' + opts.url;
     });
     sinon.stub(cli, 'executeCommand').callsFake(async (command): Promise<any> => {
       if (command === spoListItemSetCommand) {
@@ -249,33 +289,44 @@ describe(commands.PAGE_ADD, () => {
         return;
       }
 
-      if ((opts.url as string).indexOf(`/_api/web/GetFolderByServerRelativePath(DecodedUrl='/sitepages')/files/AddTemplateFile`) > -1 &&
-        JSON.stringify(opts.data) === JSON.stringify({
-          urlOfFile: '/sitepages/page.aspx',
-          templateFileType: 3
-        })) {
+      if (opts.url === 'https://contoso.sharepoint.com/_api/sitepages/pages') {
         return {
-          "CheckInComment": "",
-          "CheckOutType": 2,
-          "ContentTag": "{64201083-46BA-4966-8BC5-B0CB31E3456C},1,0",
-          "CustomizedPageStatus": 1,
-          "ETag": "\"{64201083-46BA-4966-8BC5-B0CB31E3456C},1\"",
-          "Exists": true,
-          "IrmEnabled": false,
-          "Length": "780",
-          "Level": 2,
-          "LinkingUri": null,
-          "LinkingUrl": "",
-          "MajorVersion": 0,
-          "MinorVersion": 1,
-          "Name": "page.aspx",
-          "ServerRelativeUrl": "/SitePages/page.aspx",
-          "TimeCreated": "2018-03-18T20:44:17Z",
-          "TimeLastModified": "2018-03-18T20:44:17Z",
-          "Title": null,
-          "UIVersion": 1,
-          "UIVersionLabel": "0.1",
-          "UniqueId": "64201083-46ba-4966-8bc5-b0cb31e3456c"
+          AbsoluteUrl: "https://contoso.sharepoint.com/SitePages/page.aspx",
+          AuthorByline: null,
+          BannerImageUrl: null,
+          BannerThumbnailUrl: null,
+          CallToAction: "",
+          Categories: null,
+          ContentTypeId: "0x0101009D1CB255DA76424F860D91F20E6C411800E6E49A01957D70448B30039A5116311C",
+          Description: null,
+          DoesUserHaveEditPermission: true,
+          FileName: "page.aspx",
+          FirstPublished: "0001-01-01T08:00:00Z",
+          Id: 34,
+          IsPageCheckedOutToCurrentUser: true,
+          IsWebWelcomePage: false,
+          Modified: "2023-12-20T22:12:35Z",
+          PageLayoutType: "Article",
+          Path: {
+            DecodedUrl: "SitePages/page.aspx"
+          },
+          PromotedState: 0,
+          Title: "page",
+          TopicHeader: null,
+          UniqueId: "64201083-46ba-4966-8bc5-b0cb31e3456c",
+          Url: "SitePages/page.aspx",
+          Version: "0.1",
+          VersionInfo: {
+            LastVersionCreated: "0001-01-01T00:00:00",
+            LastVersionCreatedBy: ""
+          },
+          AlternativeUrlMap: "{\"UserPhotoAspx\":\"https://contoso.sharepoint.com/_vti_bin/afdcache.ashx/_userprofile/userphoto.jpg\",\"MediaTAThumbnailPathUrl\":\"https://westeurope1-mediap.svc.ms/transform/thumbnail?provider=spo&inputFormat={.fileType}&cs=UEFHRVN8U1BP&docid={.spHost}/_api/v2.0/sharePoint:{.resourceUrl}:/driveItem&w={.widthValue}&oauth_token=bearer%20{.oauthToken}\",\"MediaTAThumbnailHostUrl\":\"https://westeurope1-mediap.svc.ms\",\"AFDCDNEnabled\":\"True\",\"CurrentSiteCDNPolicy\":\"True\",\"PublicCDNEnabled\":\"True\",\"PrivateCDNEnabled\":\"True\"}",
+          AuthoringMetadata: null,
+          CanvasContent1: "[]",
+          CoAuthState: null,
+          Language: null,
+          LayoutWebpartsContent: null,
+          SitePageFlags: ""
         };
       }
 
@@ -317,33 +368,44 @@ describe(commands.PAGE_ADD, () => {
 
   it('automatically appends the .aspx extension', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/GetFolderByServerRelativePath(DecodedUrl='/sites/team-a/sitepages')/files/AddTemplateFile`) > -1 &&
-        JSON.stringify(opts.data) === JSON.stringify({
-          urlOfFile: '/sites/team-a/sitepages/page.aspx',
-          templateFileType: 3
-        })) {
+      if (opts.url === 'https://contoso.sharepoint.com/sites/team-a/_api/sitepages/pages') {
         return {
-          "CheckInComment": "",
-          "CheckOutType": 2,
-          "ContentTag": "{64201083-46BA-4966-8BC5-B0CB31E3456C},1,0",
-          "CustomizedPageStatus": 1,
-          "ETag": "\"{64201083-46BA-4966-8BC5-B0CB31E3456C},1\"",
-          "Exists": true,
-          "IrmEnabled": false,
-          "Length": "780",
-          "Level": 2,
-          "LinkingUri": null,
-          "LinkingUrl": "",
-          "MajorVersion": 0,
-          "MinorVersion": 1,
-          "Name": "page.aspx",
-          "ServerRelativeUrl": "/sites/team-a/SitePages/page.aspx",
-          "TimeCreated": "2018-03-18T20:44:17Z",
-          "TimeLastModified": "2018-03-18T20:44:17Z",
-          "Title": null,
-          "UIVersion": 1,
-          "UIVersionLabel": "0.1",
-          "UniqueId": "64201083-46ba-4966-8bc5-b0cb31e3456c"
+          AbsoluteUrl: "https://contoso.sharepoint.com/sites/team-a/SitePages/page.aspx",
+          AuthorByline: null,
+          BannerImageUrl: null,
+          BannerThumbnailUrl: null,
+          CallToAction: "",
+          Categories: null,
+          ContentTypeId: "0x0101009D1CB255DA76424F860D91F20E6C411800E6E49A01957D70448B30039A5116311C",
+          Description: null,
+          DoesUserHaveEditPermission: true,
+          FileName: "page.aspx",
+          FirstPublished: "0001-01-01T08:00:00Z",
+          Id: 34,
+          IsPageCheckedOutToCurrentUser: true,
+          IsWebWelcomePage: false,
+          Modified: "2023-12-20T22:12:35Z",
+          PageLayoutType: "Article",
+          Path: {
+            DecodedUrl: "SitePages/page.aspx"
+          },
+          PromotedState: 0,
+          Title: "page",
+          TopicHeader: null,
+          UniqueId: "64201083-46ba-4966-8bc5-b0cb31e3456c",
+          Url: "SitePages/page.aspx",
+          Version: "0.1",
+          VersionInfo: {
+            LastVersionCreated: "0001-01-01T00:00:00",
+            LastVersionCreatedBy: ""
+          },
+          AlternativeUrlMap: "{\"UserPhotoAspx\":\"https://contoso.sharepoint.com/_vti_bin/afdcache.ashx/_userprofile/userphoto.jpg\",\"MediaTAThumbnailPathUrl\":\"https://westeurope1-mediap.svc.ms/transform/thumbnail?provider=spo&inputFormat={.fileType}&cs=UEFHRVN8U1BP&docid={.spHost}/_api/v2.0/sharePoint:{.resourceUrl}:/driveItem&w={.widthValue}&oauth_token=bearer%20{.oauthToken}\",\"MediaTAThumbnailHostUrl\":\"https://westeurope1-mediap.svc.ms\",\"AFDCDNEnabled\":\"True\",\"CurrentSiteCDNPolicy\":\"True\",\"PublicCDNEnabled\":\"True\",\"PrivateCDNEnabled\":\"True\"}",
+          AuthoringMetadata: null,
+          CanvasContent1: "[]",
+          CoAuthState: null,
+          Language: null,
+          LayoutWebpartsContent: null,
+          SitePageFlags: ""
         };
       }
 
@@ -375,33 +437,44 @@ describe(commands.PAGE_ADD, () => {
 
   it('sets page title when specified', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/GetFolderByServerRelativePath(DecodedUrl='/sites/team-a/sitepages')/files/AddTemplateFile`) > -1 &&
-        JSON.stringify(opts.data) === JSON.stringify({
-          urlOfFile: '/sites/team-a/sitepages/page.aspx',
-          templateFileType: 3
-        })) {
+      if (opts.url === 'https://contoso.sharepoint.com/sites/team-a/_api/sitepages/pages') {
         return {
-          "CheckInComment": "",
-          "CheckOutType": 2,
-          "ContentTag": "{64201083-46BA-4966-8BC5-B0CB31E3456C},1,0",
-          "CustomizedPageStatus": 1,
-          "ETag": "\"{64201083-46BA-4966-8BC5-B0CB31E3456C},1\"",
-          "Exists": true,
-          "IrmEnabled": false,
-          "Length": "780",
-          "Level": 2,
-          "LinkingUri": null,
-          "LinkingUrl": "",
-          "MajorVersion": 0,
-          "MinorVersion": 1,
-          "Name": "page.aspx",
-          "ServerRelativeUrl": "/sites/team-a/SitePages/page.aspx",
-          "TimeCreated": "2018-03-18T20:44:17Z",
-          "TimeLastModified": "2018-03-18T20:44:17Z",
-          "Title": null,
-          "UIVersion": 1,
-          "UIVersionLabel": "0.1",
-          "UniqueId": "64201083-46ba-4966-8bc5-b0cb31e3456c"
+          AbsoluteUrl: "https://contoso.sharepoint.com/sites/team-a/SitePages/page.aspx",
+          AuthorByline: null,
+          BannerImageUrl: null,
+          BannerThumbnailUrl: null,
+          CallToAction: "",
+          Categories: null,
+          ContentTypeId: "0x0101009D1CB255DA76424F860D91F20E6C411800E6E49A01957D70448B30039A5116311C",
+          Description: null,
+          DoesUserHaveEditPermission: true,
+          FileName: "page.aspx",
+          FirstPublished: "0001-01-01T08:00:00Z",
+          Id: 34,
+          IsPageCheckedOutToCurrentUser: true,
+          IsWebWelcomePage: false,
+          Modified: "2023-12-20T22:12:35Z",
+          PageLayoutType: "Article",
+          Path: {
+            DecodedUrl: "SitePages/page.aspx"
+          },
+          PromotedState: 0,
+          Title: "page",
+          TopicHeader: null,
+          UniqueId: "64201083-46ba-4966-8bc5-b0cb31e3456c",
+          Url: "SitePages/page.aspx",
+          Version: "0.1",
+          VersionInfo: {
+            LastVersionCreated: "0001-01-01T00:00:00",
+            LastVersionCreatedBy: ""
+          },
+          AlternativeUrlMap: "{\"UserPhotoAspx\":\"https://contoso.sharepoint.com/_vti_bin/afdcache.ashx/_userprofile/userphoto.jpg\",\"MediaTAThumbnailPathUrl\":\"https://westeurope1-mediap.svc.ms/transform/thumbnail?provider=spo&inputFormat={.fileType}&cs=UEFHRVN8U1BP&docid={.spHost}/_api/v2.0/sharePoint:{.resourceUrl}:/driveItem&w={.widthValue}&oauth_token=bearer%20{.oauthToken}\",\"MediaTAThumbnailHostUrl\":\"https://westeurope1-mediap.svc.ms\",\"AFDCDNEnabled\":\"True\",\"CurrentSiteCDNPolicy\":\"True\",\"PublicCDNEnabled\":\"True\",\"PrivateCDNEnabled\":\"True\"}",
+          AuthoringMetadata: null,
+          CanvasContent1: "[]",
+          CoAuthState: null,
+          Language: null,
+          LayoutWebpartsContent: null,
+          SitePageFlags: ""
         };
       }
 
@@ -450,33 +523,44 @@ describe(commands.PAGE_ADD, () => {
         return;
       }
 
-      if ((opts.url as string).indexOf(`/_api/web/GetFolderByServerRelativePath(DecodedUrl='/sites/team-a/sitepages')/files/AddTemplateFile`) > -1 &&
-        JSON.stringify(opts.data) === JSON.stringify({
-          urlOfFile: '/sites/team-a/sitepages/page.aspx',
-          templateFileType: 3
-        })) {
+      if (opts.url === 'https://contoso.sharepoint.com/sites/team-a/_api/sitepages/pages') {
         return {
-          "CheckInComment": "",
-          "CheckOutType": 2,
-          "ContentTag": "{64201083-46BA-4966-8BC5-B0CB31E3456C},1,0",
-          "CustomizedPageStatus": 1,
-          "ETag": "\"{64201083-46BA-4966-8BC5-B0CB31E3456C},1\"",
-          "Exists": true,
-          "IrmEnabled": false,
-          "Length": "780",
-          "Level": 2,
-          "LinkingUri": null,
-          "LinkingUrl": "",
-          "MajorVersion": 0,
-          "MinorVersion": 1,
-          "Name": "page.aspx",
-          "ServerRelativeUrl": "/sites/team-a/SitePages/page.aspx",
-          "TimeCreated": "2018-03-18T20:44:17Z",
-          "TimeLastModified": "2018-03-18T20:44:17Z",
-          "Title": null,
-          "UIVersion": 1,
-          "UIVersionLabel": "0.1",
-          "UniqueId": "64201083-46ba-4966-8bc5-b0cb31e3456c"
+          AbsoluteUrl: "https://contoso.sharepoint.com/sites/team-a/SitePages/page.aspx",
+          AuthorByline: null,
+          BannerImageUrl: null,
+          BannerThumbnailUrl: null,
+          CallToAction: "",
+          Categories: null,
+          ContentTypeId: "0x0101009D1CB255DA76424F860D91F20E6C411800E6E49A01957D70448B30039A5116311C",
+          Description: null,
+          DoesUserHaveEditPermission: true,
+          FileName: "page.aspx",
+          FirstPublished: "0001-01-01T08:00:00Z",
+          Id: 34,
+          IsPageCheckedOutToCurrentUser: true,
+          IsWebWelcomePage: false,
+          Modified: "2023-12-20T22:12:35Z",
+          PageLayoutType: "Article",
+          Path: {
+            DecodedUrl: "SitePages/page.aspx"
+          },
+          PromotedState: 0,
+          Title: "page",
+          TopicHeader: null,
+          UniqueId: "64201083-46ba-4966-8bc5-b0cb31e3456c",
+          Url: "SitePages/page.aspx",
+          Version: "0.1",
+          VersionInfo: {
+            LastVersionCreated: "0001-01-01T00:00:00",
+            LastVersionCreatedBy: ""
+          },
+          AlternativeUrlMap: "{\"UserPhotoAspx\":\"https://contoso.sharepoint.com/_vti_bin/afdcache.ashx/_userprofile/userphoto.jpg\",\"MediaTAThumbnailPathUrl\":\"https://westeurope1-mediap.svc.ms/transform/thumbnail?provider=spo&inputFormat={.fileType}&cs=UEFHRVN8U1BP&docid={.spHost}/_api/v2.0/sharePoint:{.resourceUrl}:/driveItem&w={.widthValue}&oauth_token=bearer%20{.oauthToken}\",\"MediaTAThumbnailHostUrl\":\"https://westeurope1-mediap.svc.ms\",\"AFDCDNEnabled\":\"True\",\"CurrentSiteCDNPolicy\":\"True\",\"PublicCDNEnabled\":\"True\",\"PrivateCDNEnabled\":\"True\"}",
+          AuthoringMetadata: null,
+          CanvasContent1: "[]",
+          CoAuthState: null,
+          Language: null,
+          LayoutWebpartsContent: null,
+          SitePageFlags: ""
         };
       }
 
@@ -531,33 +615,44 @@ describe(commands.PAGE_ADD, () => {
         return;
       }
 
-      if ((opts.url as string).indexOf(`/_api/web/GetFolderByServerRelativePath(DecodedUrl='/sites/team-a/sitepages')/files/AddTemplateFile`) > -1 &&
-        JSON.stringify(opts.data) === JSON.stringify({
-          urlOfFile: '/sites/team-a/sitepages/page.aspx',
-          templateFileType: 3
-        })) {
+      if (opts.url === 'https://contoso.sharepoint.com/sites/team-a/_api/sitepages/pages') {
         return {
-          "CheckInComment": "",
-          "CheckOutType": 2,
-          "ContentTag": "{64201083-46BA-4966-8BC5-B0CB31E3456C},1,0",
-          "CustomizedPageStatus": 1,
-          "ETag": "\"{64201083-46BA-4966-8BC5-B0CB31E3456C},1\"",
-          "Exists": true,
-          "IrmEnabled": false,
-          "Length": "780",
-          "Level": 2,
-          "LinkingUri": null,
-          "LinkingUrl": "",
-          "MajorVersion": 0,
-          "MinorVersion": 1,
-          "Name": "page.aspx",
-          "ServerRelativeUrl": "/sites/team-a/SitePages/page.aspx",
-          "TimeCreated": "2018-03-18T20:44:17Z",
-          "TimeLastModified": "2018-03-18T20:44:17Z",
-          "Title": null,
-          "UIVersion": 1,
-          "UIVersionLabel": "0.1",
-          "UniqueId": "64201083-46ba-4966-8bc5-b0cb31e3456c"
+          AbsoluteUrl: "https://contoso.sharepoint.com/sites/team-a/SitePages/page.aspx",
+          AuthorByline: null,
+          BannerImageUrl: null,
+          BannerThumbnailUrl: null,
+          CallToAction: "",
+          Categories: null,
+          ContentTypeId: "0x0101009D1CB255DA76424F860D91F20E6C411800E6E49A01957D70448B30039A5116311C",
+          Description: null,
+          DoesUserHaveEditPermission: true,
+          FileName: "page.aspx",
+          FirstPublished: "0001-01-01T08:00:00Z",
+          Id: 34,
+          IsPageCheckedOutToCurrentUser: true,
+          IsWebWelcomePage: false,
+          Modified: "2023-12-20T22:12:35Z",
+          PageLayoutType: "Article",
+          Path: {
+            DecodedUrl: "SitePages/page.aspx"
+          },
+          PromotedState: 0,
+          Title: "page",
+          TopicHeader: null,
+          UniqueId: "64201083-46ba-4966-8bc5-b0cb31e3456c",
+          Url: "SitePages/page.aspx",
+          Version: "0.1",
+          VersionInfo: {
+            LastVersionCreated: "0001-01-01T00:00:00",
+            LastVersionCreatedBy: ""
+          },
+          AlternativeUrlMap: "{\"UserPhotoAspx\":\"https://contoso.sharepoint.com/_vti_bin/afdcache.ashx/_userprofile/userphoto.jpg\",\"MediaTAThumbnailPathUrl\":\"https://westeurope1-mediap.svc.ms/transform/thumbnail?provider=spo&inputFormat={.fileType}&cs=UEFHRVN8U1BP&docid={.spHost}/_api/v2.0/sharePoint:{.resourceUrl}:/driveItem&w={.widthValue}&oauth_token=bearer%20{.oauthToken}\",\"MediaTAThumbnailHostUrl\":\"https://westeurope1-mediap.svc.ms\",\"AFDCDNEnabled\":\"True\",\"CurrentSiteCDNPolicy\":\"True\",\"PublicCDNEnabled\":\"True\",\"PrivateCDNEnabled\":\"True\"}",
+          AuthoringMetadata: null,
+          CanvasContent1: "[]",
+          CoAuthState: null,
+          Language: null,
+          LayoutWebpartsContent: null,
+          SitePageFlags: ""
         };
       }
 
@@ -627,33 +722,44 @@ describe(commands.PAGE_ADD, () => {
         return;
       }
 
-      if ((opts.url as string).indexOf(`/_api/web/GetFolderByServerRelativePath(DecodedUrl='/sites/team-a/sitepages')/files/AddTemplateFile`) > -1 &&
-        JSON.stringify(opts.data) === JSON.stringify({
-          urlOfFile: '/sites/team-a/sitepages/page.aspx',
-          templateFileType: 3
-        })) {
+      if (opts.url === 'https://contoso.sharepoint.com/sites/team-a/_api/sitepages/pages') {
         return {
-          "CheckInComment": "",
-          "CheckOutType": 2,
-          "ContentTag": "{64201083-46BA-4966-8BC5-B0CB31E3456C},1,0",
-          "CustomizedPageStatus": 1,
-          "ETag": "\"{64201083-46BA-4966-8BC5-B0CB31E3456C},1\"",
-          "Exists": true,
-          "IrmEnabled": false,
-          "Length": "780",
-          "Level": 2,
-          "LinkingUri": null,
-          "LinkingUrl": "",
-          "MajorVersion": 0,
-          "MinorVersion": 1,
-          "Name": "page.aspx",
-          "ServerRelativeUrl": "/sites/team-a/SitePages/page.aspx",
-          "TimeCreated": "2018-03-18T20:44:17Z",
-          "TimeLastModified": "2018-03-18T20:44:17Z",
-          "Title": null,
-          "UIVersion": 1,
-          "UIVersionLabel": "0.1",
-          "UniqueId": "64201083-46ba-4966-8bc5-b0cb31e3456c"
+          AbsoluteUrl: "https://contoso.sharepoint.com/sites/team-a/SitePages/page.aspx",
+          AuthorByline: null,
+          BannerImageUrl: null,
+          BannerThumbnailUrl: null,
+          CallToAction: "",
+          Categories: null,
+          ContentTypeId: "0x0101009D1CB255DA76424F860D91F20E6C411800E6E49A01957D70448B30039A5116311C",
+          Description: null,
+          DoesUserHaveEditPermission: true,
+          FileName: "page.aspx",
+          FirstPublished: "0001-01-01T08:00:00Z",
+          Id: 34,
+          IsPageCheckedOutToCurrentUser: true,
+          IsWebWelcomePage: false,
+          Modified: "2023-12-20T22:12:35Z",
+          PageLayoutType: "Article",
+          Path: {
+            DecodedUrl: "SitePages/page.aspx"
+          },
+          PromotedState: 0,
+          Title: "page",
+          TopicHeader: null,
+          UniqueId: "64201083-46ba-4966-8bc5-b0cb31e3456c",
+          Url: "SitePages/page.aspx",
+          Version: "0.1",
+          VersionInfo: {
+            LastVersionCreated: "0001-01-01T00:00:00",
+            LastVersionCreatedBy: ""
+          },
+          AlternativeUrlMap: "{\"UserPhotoAspx\":\"https://contoso.sharepoint.com/_vti_bin/afdcache.ashx/_userprofile/userphoto.jpg\",\"MediaTAThumbnailPathUrl\":\"https://westeurope1-mediap.svc.ms/transform/thumbnail?provider=spo&inputFormat={.fileType}&cs=UEFHRVN8U1BP&docid={.spHost}/_api/v2.0/sharePoint:{.resourceUrl}:/driveItem&w={.widthValue}&oauth_token=bearer%20{.oauthToken}\",\"MediaTAThumbnailHostUrl\":\"https://westeurope1-mediap.svc.ms\",\"AFDCDNEnabled\":\"True\",\"CurrentSiteCDNPolicy\":\"True\",\"PublicCDNEnabled\":\"True\",\"PrivateCDNEnabled\":\"True\"}",
+          AuthoringMetadata: null,
+          CanvasContent1: "[]",
+          CoAuthState: null,
+          Language: null,
+          LayoutWebpartsContent: null,
+          SitePageFlags: ""
         };
       }
 
@@ -722,33 +828,44 @@ describe(commands.PAGE_ADD, () => {
         return;
       }
 
-      if ((opts.url as string).indexOf(`/_api/web/GetFolderByServerRelativePath(DecodedUrl='/sites/team-a/sitepages')/files/AddTemplateFile`) > -1 &&
-        JSON.stringify(opts.data) === JSON.stringify({
-          urlOfFile: '/sites/team-a/sitepages/page.aspx',
-          templateFileType: 3
-        })) {
+      if (opts.url === 'https://contoso.sharepoint.com/sites/team-a/_api/sitepages/pages') {
         return {
-          "CheckInComment": "",
-          "CheckOutType": 2,
-          "ContentTag": "{64201083-46BA-4966-8BC5-B0CB31E3456C},1,0",
-          "CustomizedPageStatus": 1,
-          "ETag": "\"{64201083-46BA-4966-8BC5-B0CB31E3456C},1\"",
-          "Exists": true,
-          "IrmEnabled": false,
-          "Length": "780",
-          "Level": 2,
-          "LinkingUri": null,
-          "LinkingUrl": "",
-          "MajorVersion": 0,
-          "MinorVersion": 1,
-          "Name": "page.aspx",
-          "ServerRelativeUrl": "/sites/team-a/SitePages/page.aspx",
-          "TimeCreated": "2018-03-18T20:44:17Z",
-          "TimeLastModified": "2018-03-18T20:44:17Z",
-          "Title": null,
-          "UIVersion": 1,
-          "UIVersionLabel": "0.1",
-          "UniqueId": "64201083-46ba-4966-8bc5-b0cb31e3456c"
+          AbsoluteUrl: "https://contoso.sharepoint.com/sites/team-a/SitePages/page.aspx",
+          AuthorByline: null,
+          BannerImageUrl: null,
+          BannerThumbnailUrl: null,
+          CallToAction: "",
+          Categories: null,
+          ContentTypeId: "0x0101009D1CB255DA76424F860D91F20E6C411800E6E49A01957D70448B30039A5116311C",
+          Description: null,
+          DoesUserHaveEditPermission: true,
+          FileName: "page.aspx",
+          FirstPublished: "0001-01-01T08:00:00Z",
+          Id: 34,
+          IsPageCheckedOutToCurrentUser: true,
+          IsWebWelcomePage: false,
+          Modified: "2023-12-20T22:12:35Z",
+          PageLayoutType: "Article",
+          Path: {
+            DecodedUrl: "SitePages/page.aspx"
+          },
+          PromotedState: 0,
+          Title: "page",
+          TopicHeader: null,
+          UniqueId: "64201083-46ba-4966-8bc5-b0cb31e3456c",
+          Url: "SitePages/page.aspx",
+          Version: "0.1",
+          VersionInfo: {
+            LastVersionCreated: "0001-01-01T00:00:00",
+            LastVersionCreatedBy: ""
+          },
+          AlternativeUrlMap: "{\"UserPhotoAspx\":\"https://contoso.sharepoint.com/_vti_bin/afdcache.ashx/_userprofile/userphoto.jpg\",\"MediaTAThumbnailPathUrl\":\"https://westeurope1-mediap.svc.ms/transform/thumbnail?provider=spo&inputFormat={.fileType}&cs=UEFHRVN8U1BP&docid={.spHost}/_api/v2.0/sharePoint:{.resourceUrl}:/driveItem&w={.widthValue}&oauth_token=bearer%20{.oauthToken}\",\"MediaTAThumbnailHostUrl\":\"https://westeurope1-mediap.svc.ms\",\"AFDCDNEnabled\":\"True\",\"CurrentSiteCDNPolicy\":\"True\",\"PublicCDNEnabled\":\"True\",\"PrivateCDNEnabled\":\"True\"}",
+          AuthoringMetadata: null,
+          CanvasContent1: "[]",
+          CoAuthState: null,
+          Language: null,
+          LayoutWebpartsContent: null,
+          SitePageFlags: ""
         };
       }
 
@@ -790,33 +907,44 @@ describe(commands.PAGE_ADD, () => {
 
   it('creates new modern page with comments enabled', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/GetFolderByServerRelativePath(DecodedUrl='/sites/team-a/sitepages')/files/AddTemplateFile`) > -1 &&
-        JSON.stringify(opts.data) === JSON.stringify({
-          urlOfFile: '/sites/team-a/sitepages/page.aspx',
-          templateFileType: 3
-        })) {
+      if (opts.url === 'https://contoso.sharepoint.com/sites/team-a/_api/sitepages/pages') {
         return {
-          "CheckInComment": "",
-          "CheckOutType": 2,
-          "ContentTag": "{64201083-46BA-4966-8BC5-B0CB31E3456C},1,0",
-          "CustomizedPageStatus": 1,
-          "ETag": "\"{64201083-46BA-4966-8BC5-B0CB31E3456C},1\"",
-          "Exists": true,
-          "IrmEnabled": false,
-          "Length": "780",
-          "Level": 2,
-          "LinkingUri": null,
-          "LinkingUrl": "",
-          "MajorVersion": 0,
-          "MinorVersion": 1,
-          "Name": "page.aspx",
-          "ServerRelativeUrl": "/sites/team-a/SitePages/page.aspx",
-          "TimeCreated": "2018-03-18T20:44:17Z",
-          "TimeLastModified": "2018-03-18T20:44:17Z",
-          "Title": null,
-          "UIVersion": 1,
-          "UIVersionLabel": "0.1",
-          "UniqueId": "64201083-46ba-4966-8bc5-b0cb31e3456c"
+          AbsoluteUrl: "https://contoso.sharepoint.com/sites/team-a/SitePages/page.aspx",
+          AuthorByline: null,
+          BannerImageUrl: null,
+          BannerThumbnailUrl: null,
+          CallToAction: "",
+          Categories: null,
+          ContentTypeId: "0x0101009D1CB255DA76424F860D91F20E6C411800E6E49A01957D70448B30039A5116311C",
+          Description: null,
+          DoesUserHaveEditPermission: true,
+          FileName: "page.aspx",
+          FirstPublished: "0001-01-01T08:00:00Z",
+          Id: 34,
+          IsPageCheckedOutToCurrentUser: true,
+          IsWebWelcomePage: false,
+          Modified: "2023-12-20T22:12:35Z",
+          PageLayoutType: "Article",
+          Path: {
+            DecodedUrl: "SitePages/page.aspx"
+          },
+          PromotedState: 0,
+          Title: "page",
+          TopicHeader: null,
+          UniqueId: "64201083-46ba-4966-8bc5-b0cb31e3456c",
+          Url: "SitePages/page.aspx",
+          Version: "0.1",
+          VersionInfo: {
+            LastVersionCreated: "0001-01-01T00:00:00",
+            LastVersionCreatedBy: ""
+          },
+          AlternativeUrlMap: "{\"UserPhotoAspx\":\"https://contoso.sharepoint.com/_vti_bin/afdcache.ashx/_userprofile/userphoto.jpg\",\"MediaTAThumbnailPathUrl\":\"https://westeurope1-mediap.svc.ms/transform/thumbnail?provider=spo&inputFormat={.fileType}&cs=UEFHRVN8U1BP&docid={.spHost}/_api/v2.0/sharePoint:{.resourceUrl}:/driveItem&w={.widthValue}&oauth_token=bearer%20{.oauthToken}\",\"MediaTAThumbnailHostUrl\":\"https://westeurope1-mediap.svc.ms\",\"AFDCDNEnabled\":\"True\",\"CurrentSiteCDNPolicy\":\"True\",\"PublicCDNEnabled\":\"True\",\"PrivateCDNEnabled\":\"True\"}",
+          AuthoringMetadata: null,
+          CanvasContent1: "[]",
+          CoAuthState: null,
+          Language: null,
+          LayoutWebpartsContent: null,
+          SitePageFlags: ""
         };
       }
 
@@ -850,33 +978,44 @@ describe(commands.PAGE_ADD, () => {
     let savedAsDraft = false;
 
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/GetFolderByServerRelativePath(DecodedUrl='/sites/team-a/sitepages')/files/AddTemplateFile`) > -1 &&
-        JSON.stringify(opts.data) === JSON.stringify({
-          urlOfFile: '/sites/team-a/sitepages/page.aspx',
-          templateFileType: 3
-        })) {
+      if (opts.url === 'https://contoso.sharepoint.com/sites/team-a/_api/sitepages/pages') {
         return {
-          "CheckInComment": "",
-          "CheckOutType": 2,
-          "ContentTag": "{64201083-46BA-4966-8BC5-B0CB31E3456C},1,0",
-          "CustomizedPageStatus": 1,
-          "ETag": "\"{64201083-46BA-4966-8BC5-B0CB31E3456C},1\"",
-          "Exists": true,
-          "IrmEnabled": false,
-          "Length": "780",
-          "Level": 2,
-          "LinkingUri": null,
-          "LinkingUrl": "",
-          "MajorVersion": 0,
-          "MinorVersion": 1,
-          "Name": "page.aspx",
-          "ServerRelativeUrl": "/sites/team-a/SitePages/page.aspx",
-          "TimeCreated": "2018-03-18T20:44:17Z",
-          "TimeLastModified": "2018-03-18T20:44:17Z",
-          "Title": null,
-          "UIVersion": 1,
-          "UIVersionLabel": "0.1",
-          "UniqueId": "64201083-46ba-4966-8bc5-b0cb31e3456c"
+          AbsoluteUrl: "https://contoso.sharepoint.com/sites/team-a/SitePages/page.aspx",
+          AuthorByline: null,
+          BannerImageUrl: null,
+          BannerThumbnailUrl: null,
+          CallToAction: "",
+          Categories: null,
+          ContentTypeId: "0x0101009D1CB255DA76424F860D91F20E6C411800E6E49A01957D70448B30039A5116311C",
+          Description: null,
+          DoesUserHaveEditPermission: true,
+          FileName: "page.aspx",
+          FirstPublished: "0001-01-01T08:00:00Z",
+          Id: 34,
+          IsPageCheckedOutToCurrentUser: true,
+          IsWebWelcomePage: false,
+          Modified: "2023-12-20T22:12:35Z",
+          PageLayoutType: "Article",
+          Path: {
+            DecodedUrl: "SitePages/page.aspx"
+          },
+          PromotedState: 0,
+          Title: "page",
+          TopicHeader: null,
+          UniqueId: "64201083-46ba-4966-8bc5-b0cb31e3456c",
+          Url: "SitePages/page.aspx",
+          Version: "0.1",
+          VersionInfo: {
+            LastVersionCreated: "0001-01-01T00:00:00",
+            LastVersionCreatedBy: ""
+          },
+          AlternativeUrlMap: "{\"UserPhotoAspx\":\"https://contoso.sharepoint.com/_vti_bin/afdcache.ashx/_userprofile/userphoto.jpg\",\"MediaTAThumbnailPathUrl\":\"https://westeurope1-mediap.svc.ms/transform/thumbnail?provider=spo&inputFormat={.fileType}&cs=UEFHRVN8U1BP&docid={.spHost}/_api/v2.0/sharePoint:{.resourceUrl}:/driveItem&w={.widthValue}&oauth_token=bearer%20{.oauthToken}\",\"MediaTAThumbnailHostUrl\":\"https://westeurope1-mediap.svc.ms\",\"AFDCDNEnabled\":\"True\",\"CurrentSiteCDNPolicy\":\"True\",\"PublicCDNEnabled\":\"True\",\"PrivateCDNEnabled\":\"True\"}",
+          AuthoringMetadata: null,
+          CanvasContent1: "[]",
+          CoAuthState: null,
+          Language: null,
+          LayoutWebpartsContent: null,
+          SitePageFlags: ""
         };
       }
 
@@ -941,33 +1080,44 @@ describe(commands.PAGE_ADD, () => {
 
   it('creates new modern page and publishes it', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/GetFolderByServerRelativePath(DecodedUrl='/sites/team-a/sitepages')/files/AddTemplateFile`) > -1 &&
-        JSON.stringify(opts.data) === JSON.stringify({
-          urlOfFile: '/sites/team-a/sitepages/page.aspx',
-          templateFileType: 3
-        })) {
+      if (opts.url === 'https://contoso.sharepoint.com/sites/team-a/_api/sitepages/pages') {
         return {
-          "CheckInComment": "",
-          "CheckOutType": 2,
-          "ContentTag": "{64201083-46BA-4966-8BC5-B0CB31E3456C},1,0",
-          "CustomizedPageStatus": 1,
-          "ETag": "\"{64201083-46BA-4966-8BC5-B0CB31E3456C},1\"",
-          "Exists": true,
-          "IrmEnabled": false,
-          "Length": "780",
-          "Level": 2,
-          "LinkingUri": null,
-          "LinkingUrl": "",
-          "MajorVersion": 0,
-          "MinorVersion": 1,
-          "Name": "page.aspx",
-          "ServerRelativeUrl": "/sites/team-a/SitePages/page.aspx",
-          "TimeCreated": "2018-03-18T20:44:17Z",
-          "TimeLastModified": "2018-03-18T20:44:17Z",
-          "Title": null,
-          "UIVersion": 1,
-          "UIVersionLabel": "0.1",
-          "UniqueId": "64201083-46ba-4966-8bc5-b0cb31e3456c"
+          AbsoluteUrl: "https://contoso.sharepoint.com/sites/team-a/SitePages/page.aspx",
+          AuthorByline: null,
+          BannerImageUrl: null,
+          BannerThumbnailUrl: null,
+          CallToAction: "",
+          Categories: null,
+          ContentTypeId: "0x0101009D1CB255DA76424F860D91F20E6C411800E6E49A01957D70448B30039A5116311C",
+          Description: null,
+          DoesUserHaveEditPermission: true,
+          FileName: "page.aspx",
+          FirstPublished: "0001-01-01T08:00:00Z",
+          Id: 34,
+          IsPageCheckedOutToCurrentUser: true,
+          IsWebWelcomePage: false,
+          Modified: "2023-12-20T22:12:35Z",
+          PageLayoutType: "Article",
+          Path: {
+            DecodedUrl: "SitePages/page.aspx"
+          },
+          PromotedState: 0,
+          Title: "page",
+          TopicHeader: null,
+          UniqueId: "64201083-46ba-4966-8bc5-b0cb31e3456c",
+          Url: "SitePages/page.aspx",
+          Version: "0.1",
+          VersionInfo: {
+            LastVersionCreated: "0001-01-01T00:00:00",
+            LastVersionCreatedBy: ""
+          },
+          AlternativeUrlMap: "{\"UserPhotoAspx\":\"https://contoso.sharepoint.com/_vti_bin/afdcache.ashx/_userprofile/userphoto.jpg\",\"MediaTAThumbnailPathUrl\":\"https://westeurope1-mediap.svc.ms/transform/thumbnail?provider=spo&inputFormat={.fileType}&cs=UEFHRVN8U1BP&docid={.spHost}/_api/v2.0/sharePoint:{.resourceUrl}:/driveItem&w={.widthValue}&oauth_token=bearer%20{.oauthToken}\",\"MediaTAThumbnailHostUrl\":\"https://westeurope1-mediap.svc.ms\",\"AFDCDNEnabled\":\"True\",\"CurrentSiteCDNPolicy\":\"True\",\"PublicCDNEnabled\":\"True\",\"PrivateCDNEnabled\":\"True\"}",
+          AuthoringMetadata: null,
+          CanvasContent1: "[]",
+          CoAuthState: null,
+          Language: null,
+          LayoutWebpartsContent: null,
+          SitePageFlags: ""
         };
       }
 
@@ -1052,33 +1202,44 @@ describe(commands.PAGE_ADD, () => {
         return;
       }
 
-      if ((opts.url as string).indexOf(`/_api/web/GetFolderByServerRelativePath(DecodedUrl='/sites/team-a/sitepages')/files/AddTemplateFile`) > -1 &&
-        JSON.stringify(opts.data) === JSON.stringify({
-          urlOfFile: '/sites/team-a/sitepages/page.aspx',
-          templateFileType: 3
-        })) {
+      if (opts.url === 'https://contoso.sharepoint.com/sites/team-a/_api/sitepages/pages') {
         return {
-          "CheckInComment": "",
-          "CheckOutType": 2,
-          "ContentTag": "{64201083-46BA-4966-8BC5-B0CB31E3456C},1,0",
-          "CustomizedPageStatus": 1,
-          "ETag": "\"{64201083-46BA-4966-8BC5-B0CB31E3456C},1\"",
-          "Exists": true,
-          "IrmEnabled": false,
-          "Length": "780",
-          "Level": 2,
-          "LinkingUri": null,
-          "LinkingUrl": "",
-          "MajorVersion": 0,
-          "MinorVersion": 1,
-          "Name": "page.aspx",
-          "ServerRelativeUrl": "/sites/team-a/SitePages/page.aspx",
-          "TimeCreated": "2018-03-18T20:44:17Z",
-          "TimeLastModified": "2018-03-18T20:44:17Z",
-          "Title": null,
-          "UIVersion": 1,
-          "UIVersionLabel": "0.1",
-          "UniqueId": "64201083-46ba-4966-8bc5-b0cb31e3456c"
+          AbsoluteUrl: "https://contoso.sharepoint.com/sites/team-a/SitePages/page.aspx",
+          AuthorByline: null,
+          BannerImageUrl: null,
+          BannerThumbnailUrl: null,
+          CallToAction: "",
+          Categories: null,
+          ContentTypeId: "0x0101009D1CB255DA76424F860D91F20E6C411800E6E49A01957D70448B30039A5116311C",
+          Description: null,
+          DoesUserHaveEditPermission: true,
+          FileName: "page.aspx",
+          FirstPublished: "0001-01-01T08:00:00Z",
+          Id: 34,
+          IsPageCheckedOutToCurrentUser: true,
+          IsWebWelcomePage: false,
+          Modified: "2023-12-20T22:12:35Z",
+          PageLayoutType: "Article",
+          Path: {
+            DecodedUrl: "SitePages/page.aspx"
+          },
+          PromotedState: 0,
+          Title: "page",
+          TopicHeader: null,
+          UniqueId: "64201083-46ba-4966-8bc5-b0cb31e3456c",
+          Url: "SitePages/page.aspx",
+          Version: "0.1",
+          VersionInfo: {
+            LastVersionCreated: "0001-01-01T00:00:00",
+            LastVersionCreatedBy: ""
+          },
+          AlternativeUrlMap: "{\"UserPhotoAspx\":\"https://contoso.sharepoint.com/_vti_bin/afdcache.ashx/_userprofile/userphoto.jpg\",\"MediaTAThumbnailPathUrl\":\"https://westeurope1-mediap.svc.ms/transform/thumbnail?provider=spo&inputFormat={.fileType}&cs=UEFHRVN8U1BP&docid={.spHost}/_api/v2.0/sharePoint:{.resourceUrl}:/driveItem&w={.widthValue}&oauth_token=bearer%20{.oauthToken}\",\"MediaTAThumbnailHostUrl\":\"https://westeurope1-mediap.svc.ms\",\"AFDCDNEnabled\":\"True\",\"CurrentSiteCDNPolicy\":\"True\",\"PublicCDNEnabled\":\"True\",\"PrivateCDNEnabled\":\"True\"}",
+          AuthoringMetadata: null,
+          CanvasContent1: "[]",
+          CoAuthState: null,
+          Language: null,
+          LayoutWebpartsContent: null,
+          SitePageFlags: ""
         };
       }
 
