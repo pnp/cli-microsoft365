@@ -2,7 +2,7 @@ import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
 import { CommandError } from '../../../../Command.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import request from '../../../../request.js';
@@ -24,8 +24,8 @@ describe(commands.OWNER_REMOVE, () => {
   const userName = 'john@contoso.com';
   const groupId = '37a0264d-fea4-4e87-8e5e-e574ff878cf2';
   const groupName = 'Test Group';
-  const requestUrlNoAdmin = `https://management.azure.com/providers/Microsoft.ProcessSimple/environments/${formatting.encodeQueryParameter(environmentName)}/flows/${formatting.encodeQueryParameter(flowName)}/modifyPermissions?api-version=2016-11-01`;
-  const requestUrlAdmin = `https://management.azure.com/providers/Microsoft.ProcessSimple/scopes/admin/environments/${formatting.encodeQueryParameter(environmentName)}/flows/${formatting.encodeQueryParameter(flowName)}/modifyPermissions?api-version=2016-11-01`;
+  const requestUrlNoAdmin = `https://api.flow.microsoft.com/providers/Microsoft.ProcessSimple/environments/${formatting.encodeQueryParameter(environmentName)}/flows/${formatting.encodeQueryParameter(flowName)}/modifyPermissions?api-version=2016-11-01`;
+  const requestUrlAdmin = `https://api.flow.microsoft.com/providers/Microsoft.ProcessSimple/scopes/admin/environments/${formatting.encodeQueryParameter(environmentName)}/flows/${formatting.encodeQueryParameter(flowName)}/modifyPermissions?api-version=2016-11-01`;
   const requestBodyUser = { 'delete': [{ 'id': userId }] };
   const requestBodyGroup = { 'delete': [{ 'id': groupId }] };
 
@@ -33,7 +33,6 @@ describe(commands.OWNER_REMOVE, () => {
   let logger: Logger;
   let commandInfo: CommandInfo;
   let promptIssued: boolean = false;
-  let cli: Cli;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -41,8 +40,7 @@ describe(commands.OWNER_REMOVE, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
-    commandInfo = Cli.getCommandInfo(command);
-    cli = Cli.getInstance();
+    commandInfo = cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -58,7 +56,7 @@ describe(commands.OWNER_REMOVE, () => {
         log.push(msg);
       }
     };
-    sinon.stub(Cli, 'promptForConfirmation').callsFake(() => {
+    sinon.stub(cli, 'promptForConfirmation').callsFake(() => {
       promptIssued = true;
       return Promise.resolve(false);
     });
@@ -73,8 +71,8 @@ describe(commands.OWNER_REMOVE, () => {
       aadGroup.getGroupIdByDisplayName,
       aadUser.getUserIdByUpn,
       cli.getSettingWithDefaultValue,
-      Cli.handleMultipleResultsFound,
-      Cli.promptForConfirmation
+      cli.handleMultipleResultsFound,
+      cli.promptForConfirmation
     ]);
   });
 
@@ -119,8 +117,8 @@ describe(commands.OWNER_REMOVE, () => {
   });
 
   it('deletes owner from flow by groupId as admin when prompt confirmed', async () => {
-    sinonUtil.restore(Cli.promptForConfirmation);
-    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
     const postStub = sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === requestUrlAdmin) {
         return;
@@ -192,7 +190,7 @@ describe(commands.OWNER_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinon.stub(Cli, 'handleMultipleResultsFound').resolves({ id: '37a0264d-fea4-4e87-8e5e-e574ff878cf2' });
+    sinon.stub(cli, 'handleMultipleResultsFound').resolves({ id: '37a0264d-fea4-4e87-8e5e-e574ff878cf2' });
 
     const postStub = sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === requestUrlAdmin) {
@@ -227,8 +225,8 @@ describe(commands.OWNER_REMOVE, () => {
 
   it('aborts removing the specified owner from a flow when option not passed and prompt not confirmed', async () => {
     const postSpy = sinon.spy(request, 'post');
-    sinonUtil.restore(Cli.promptForConfirmation);
-    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(false);
 
     await command.action(logger, { options: { environmentName: environmentName, flowName: flowName, useName: userName } });
     assert(postSpy.notCalled);

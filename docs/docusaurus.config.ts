@@ -1,8 +1,10 @@
-// @ts-check
-// Note: type annotations allow type checking and IDEs autocompletion
+import type { Config } from '@docusaurus/types';
+import type * as Preset from '@docusaurus/preset-classic';
+import LightCodeTheme from './src/config/lightCodeTheme';
+import DarkCodeTheme from './src/config/darkCodeTheme';
+import definitionList from './src/remark/definitionLists';
 
-/** @type {import('@docusaurus/types').Config} */
-const config = {
+const config: Config = {
   title: 'CLI for Microsoft 365',
   titleDelimiter: '-',
   tagline: 'Docs',
@@ -17,11 +19,21 @@ const config = {
 
   i18n: {
     defaultLocale: 'en',
-    locales: ['en'],
+    locales: ['en']
+  },
+
+  markdown: {
+    format: 'mdx',
+    mermaid: true,
+    mdx1Compat: {
+      comments: false,
+      admonitions: false,
+      headingIds: true
+    }
   },
 
   customFields: {
-    mendableAnonKey: 'd3313d54-6f8e-40e0-90d3-4095019d4be7',
+    mendableAnonKey: 'd3313d54-6f8e-40e0-90d3-4095019d4be7'
   },
 
   plugins: [
@@ -37,24 +49,23 @@ const config = {
   presets: [
     [
       'classic',
-      /** @type {import('@docusaurus/preset-classic').Options} */
-      ({
+      {
         docs: {
           routeBasePath: '/',
-          sidebarPath: require.resolve('./src/config/sidebars.js'),
+          sidebarPath: './src/config/sidebars.ts',
           editUrl: 'https://github.com/pnp/cli-microsoft365/blob/main/docs',
           showLastUpdateTime: true,
-          remarkPlugins: []
+          remarkPlugins: [definitionList]
         },
         blog: false,
         theme: {
-          customCss: require.resolve('./src/scss/Global.module.scss'),
+          customCss: ['./src/scss/Global.module.scss']
         },
         gtag: {
           trackingID: 'G-DH3T88LK5K',
           anonymizeIP: true
         }
-      })
+      } satisfies Preset.Options
     ]
   ],
 
@@ -64,8 +75,7 @@ const config = {
   themes: ['@docusaurus/theme-mermaid'],
 
   themeConfig:
-    /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
-    ({
+    {
       image: 'img/cli-m365-site-preview.png',
       navbar: {
         title: '',
@@ -75,45 +85,45 @@ const config = {
           src: 'img/pnp-cli-microsoft365-white.svg'
         },
         items: [
-          {            
+          {
             type: 'docSidebar',
-            label: 'Home',            
+            label: 'Home',
             sidebarId: 'home',
             position: 'left'
           },
-          {            
+          {
             type: 'docSidebar',
-            label: 'User Guide',            
+            label: 'User Guide',
             sidebarId: 'userGuide',
             position: 'left'
           },
-          {            
+          {
             type: 'docSidebar',
-            label: 'Commands',            
+            label: 'Commands',
             sidebarId: 'commands',
             position: 'left'
           },
-          {            
+          {
             type: 'docSidebar',
-            label: 'Concepts',            
+            label: 'Concepts',
             sidebarId: 'concepts',
             position: 'left'
           },
-          {            
+          {
             type: 'docSidebar',
-            label: 'Sample Scripts',            
+            label: 'Sample Scripts',
             sidebarId: 'sampleScripts',
             position: 'left'
           },
-          {            
+          {
             type: 'docSidebar',
-            label: 'Contributing',            
+            label: 'Contributing',
             sidebarId: 'contributing',
             position: 'left'
           },
-          {            
+          {
             type: 'docSidebar',
-            label: 'About',            
+            label: 'About',
             sidebarId: 'about',
             position: 'left'
           },
@@ -125,9 +135,9 @@ const config = {
         ]
       },
       prism: {
-        theme: require('./src/config/lightCodeTheme.js'),
-        darkTheme: require('./src/config/darkCodeTheme.js'),
-        additionalLanguages: ['powershell', 'csv']
+        additionalLanguages: ['powershell', 'csv', 'json'],
+        theme: LightCodeTheme,
+        darkTheme: DarkCodeTheme
       },
       announcementBar: {
         id: 'join_discord',
@@ -140,20 +150,14 @@ const config = {
           </a>`,
         backgroundColor: '#1b1c23',
         textColor: '#f5f5f5',
-        isCloseable: true,
+        isCloseable: true
       },
       algolia: {
         appId: 'YIG8WGD5U1',
         apiKey: '018d6fd75ad721a096ca38a1599d43a7',
         indexName: 'cli-microsoft365'
       }
-    })
+    } satisfies Preset.ThemeConfig
 };
 
-async function createConfig() {
-  const definitionLists = (await import('./src/remark/definitionLists.mjs')).default;
-  config.presets[0][1].docs.remarkPlugins.push(definitionLists);
-  return config;
-}
-
-module.exports = createConfig;
+export default config;

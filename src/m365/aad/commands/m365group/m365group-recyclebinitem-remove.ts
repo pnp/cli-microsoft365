@@ -1,5 +1,5 @@
 import { Group } from '@microsoft/microsoft-graph-types';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
@@ -105,7 +105,7 @@ class AadM365GroupRecycleBinItemRemoveCommand extends GraphCommand {
       await removeGroup();
     }
     else {
-      const result = await Cli.promptForConfirmation({ message: `Are you sure you want to remove the group '${args.options.id || args.options.displayName || args.options.mailNickname}'?` });
+      const result = await cli.promptForConfirmation({ message: `Are you sure you want to remove the group '${args.options.id || args.options.displayName || args.options.mailNickname}'?` });
 
       if (result) {
         await removeGroup();
@@ -146,7 +146,7 @@ class AadM365GroupRecycleBinItemRemoveCommand extends GraphCommand {
 
     if (groups.length > 1) {
       const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', groups);
-      const result = await Cli.handleMultipleResultsFound<Group>(`Multiple groups with name '${displayName || mailNickname}' found.`, resultAsKeyValuePair);
+      const result = await cli.handleMultipleResultsFound<Group>(`Multiple groups with name '${displayName || mailNickname}' found.`, resultAsKeyValuePair);
       return result.id!;
     }
 

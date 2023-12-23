@@ -1,10 +1,10 @@
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { odata } from '../../../../utils/odata.js';
 import { validation } from '../../../../utils/validation.js';
-import AzmgmtCommand from '../../../base/AzmgmtCommand.js';
+import PowerAutomateCommand from '../../../base/PowerAutomateCommand.js';
 import commands from '../../commands.js';
 
 interface FlowPermissionResponse {
@@ -35,7 +35,7 @@ interface Options extends GlobalOptions {
   asAdmin?: boolean;
 }
 
-class FlowOwnerListCommand extends AzmgmtCommand {
+class FlowOwnerListCommand extends PowerAutomateCommand {
   public get name(): string {
     return commands.OWNER_LIST;
   }
@@ -96,8 +96,8 @@ class FlowOwnerListCommand extends AzmgmtCommand {
         await logger.logToStderr(`Listing owners for flow ${args.options.flowName} in environment ${args.options.environmentName}`);
       }
 
-      const response = await odata.getAllItems<FlowPermissionResponse>(`${this.resource}providers/Microsoft.ProcessSimple/${args.options.asAdmin ? 'scopes/admin/' : ''}environments/${formatting.encodeQueryParameter(args.options.environmentName)}/flows/${formatting.encodeQueryParameter(args.options.flowName)}/permissions?api-version=2016-11-01`);
-      if (!Cli.shouldTrimOutput(args.options.output)) {
+      const response = await odata.getAllItems<FlowPermissionResponse>(`${this.resource}/providers/Microsoft.ProcessSimple/${args.options.asAdmin ? 'scopes/admin/' : ''}environments/${formatting.encodeQueryParameter(args.options.environmentName)}/flows/${formatting.encodeQueryParameter(args.options.flowName)}/permissions?api-version=2016-11-01`);
+      if (!cli.shouldTrimOutput(args.options.output)) {
         await logger.log(response);
       }
       else {

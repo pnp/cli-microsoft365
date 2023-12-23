@@ -1,7 +1,7 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
@@ -38,7 +38,7 @@ describe(commands.GROUP_SET, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
-    commandInfo = Cli.getCommandInfo(command);
+    commandInfo = cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -61,7 +61,7 @@ describe(commands.GROUP_SET, () => {
     sinonUtil.restore([
       request.post,
       request.patch,
-      Cli.executeCommandWithOutput
+      cli.executeCommandWithOutput
     ]);
   });
 
@@ -160,7 +160,7 @@ describe(commands.GROUP_SET, () => {
   });
 
   it('successfully updates group owner by ownerEmail, retrieves group by id', async () => {
-    sinon.stub(Cli, 'executeCommandWithOutput').resolves({
+    sinon.stub(cli, 'executeCommandWithOutput').resolves({
       stdout: JSON.stringify(userInfoResponse),
       stderr: ''
     });
@@ -194,7 +194,7 @@ describe(commands.GROUP_SET, () => {
   });
 
   it('successfully updates group owner by ownerUserName, retrieves group by name', async () => {
-    sinon.stub(Cli, 'executeCommandWithOutput').resolves({
+    sinon.stub(cli, 'executeCommandWithOutput').resolves({
       stdout: JSON.stringify(userInfoResponse),
       stderr: ''
     });

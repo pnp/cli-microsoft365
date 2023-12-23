@@ -1,9 +1,7 @@
-import { AdministrativeUnit } from "@microsoft/microsoft-graph-types";
-import { odata } from "./odata.js";
-import { formatting } from "./formatting.js";
-import { Cli } from "../cli/Cli.js";
-
-const graphResource = 'https://graph.microsoft.com';
+import { AdministrativeUnit } from '@microsoft/microsoft-graph-types';
+import { odata } from './odata.js';
+import { formatting } from './formatting.js';
+import { cli } from '../cli/cli.js';
 
 export const aadAdministrativeUnit = {
   /**
@@ -13,6 +11,7 @@ export const aadAdministrativeUnit = {
    * @throws Error when administrative unit was not found.
    */
   async getAdministrativeUnitByDisplayName(displayName: string): Promise<AdministrativeUnit> {
+    const graphResource = 'https://graph.microsoft.com';
     const administrativeUnits = await odata.getAllItems<AdministrativeUnit>(`${graphResource}/v1.0/directory/administrativeUnits?$filter=displayName eq '${formatting.encodeQueryParameter(displayName)}'`);
 
     if (administrativeUnits.length === 0) {
@@ -21,7 +20,7 @@ export const aadAdministrativeUnit = {
 
     if (administrativeUnits.length > 1) {
       const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', administrativeUnits);
-      const selectedAdministrativeUnit = await Cli.handleMultipleResultsFound<AdministrativeUnit>(`Multiple administrative units with name '${displayName}' found.`, resultAsKeyValuePair);
+      const selectedAdministrativeUnit = await cli.handleMultipleResultsFound<AdministrativeUnit>(`Multiple administrative units with name '${displayName}' found.`, resultAsKeyValuePair);
       return selectedAdministrativeUnit;
     }
 

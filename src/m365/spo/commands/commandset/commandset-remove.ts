@@ -7,7 +7,7 @@ import request, { CliRequestOptions } from '../../../../request.js';
 import { CustomAction } from '../customaction/customaction.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { spo } from '../../../../utils/spo.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 
 interface CommandArgs {
   options: Options;
@@ -112,7 +112,7 @@ class SpoCommandSetRemoveCommand extends SpoCommand {
       await this.deleteCommandset(args);
     }
     else {
-      const result = await Cli.promptForConfirmation({ message: `Are you sure you want to remove command set '${args.options.clientSideComponentId || args.options.title || args.options.id}'?` });
+      const result = await cli.promptForConfirmation({ message: `Are you sure you want to remove command set '${args.options.clientSideComponentId || args.options.title || args.options.id}'?` });
 
       if (result) {
         await this.deleteCommandset(args);
@@ -142,7 +142,7 @@ class SpoCommandSetRemoveCommand extends SpoCommand {
 
     if (commandSets.length > 1) {
       const resultAsKeyValuePair = formatting.convertArrayToHashTable('Id', commandSets);
-      return await Cli.handleMultipleResultsFound<CustomAction>(`Multiple user commandsets with ${options.title ? `title '${options.title}'` : `ClientSideComponentId '${options.clientSideComponentId}'`} found.`, resultAsKeyValuePair);
+      return await cli.handleMultipleResultsFound<CustomAction>(`Multiple user commandsets with ${options.title ? `title '${options.title}'` : `ClientSideComponentId '${options.clientSideComponentId}'`} found.`, resultAsKeyValuePair);
     }
 
     return commandSets[0];

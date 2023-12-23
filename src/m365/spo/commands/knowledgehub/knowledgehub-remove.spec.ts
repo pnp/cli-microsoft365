@@ -1,7 +1,7 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
 import config from '../../../../config.js';
@@ -65,7 +65,7 @@ describe(commands.KNOWLEDGEHUB_REMOVE, () => {
       }
     };
     requests = [];
-    sinon.stub(Cli, 'promptForConfirmation').callsFake(() => {
+    sinon.stub(cli, 'promptForConfirmation').callsFake(() => {
       promptIssued = true;
       return Promise.resolve(false);
     });
@@ -74,7 +74,7 @@ describe(commands.KNOWLEDGEHUB_REMOVE, () => {
   });
 
   afterEach(() => {
-    sinonUtil.restore(Cli.promptForConfirmation);
+    sinonUtil.restore(cli.promptForConfirmation);
   });
 
   after(() => {
@@ -127,16 +127,16 @@ describe(commands.KNOWLEDGEHUB_REMOVE, () => {
   });
 
   it('aborts removing Knowledge Hub settings from tenant when prompt not confirmed', async () => {
-    sinonUtil.restore(Cli.promptForConfirmation);
-    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(false);
 
     await command.action(logger, { options: { debug: true } });
     assert(requests.length === 0);
   });
 
   it('removes removing Knowledge Hub settings from tenant when prompt confirmed', async () => {
-    sinonUtil.restore(Cli.promptForConfirmation);
-    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, { options: { debug: true } });
   });

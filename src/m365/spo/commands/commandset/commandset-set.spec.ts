@@ -2,7 +2,7 @@ import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
 import { CommandError } from '../../../../Command.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import request from '../../../../request.js';
@@ -16,7 +16,6 @@ import command from './commandset-set.js';
 import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.COMMANDSET_SET, () => {
-  let cli: Cli;
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
@@ -116,13 +115,12 @@ describe(commands.COMMANDSET_SET, () => {
   //#endregion
 
   before(() => {
-    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
-    commandInfo = Cli.getCommandInfo(command);
+    commandInfo = cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -145,7 +143,7 @@ describe(commands.COMMANDSET_SET, () => {
       request.get,
       request.post,
       cli.getSettingWithDefaultValue,
-      Cli.handleMultipleResultsFound
+      cli.handleMultipleResultsFound
     ]);
   });
 
@@ -349,7 +347,7 @@ describe(commands.COMMANDSET_SET, () => {
       throw `Invalid request`;
     });
 
-    sinon.stub(Cli, 'handleMultipleResultsFound').resolves(commandsetSingleResponse.value[0]);
+    sinon.stub(cli, 'handleMultipleResultsFound').resolves(commandsetSingleResponse.value[0]);
 
     await command.action(logger, { options: { verbose: true, webUrl: validUrl, title: validTitle, newTitle: validNewTitle, listType: 'Library', location: 'Both' } });
     assert(updateRequestIssued);

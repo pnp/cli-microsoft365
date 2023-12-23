@@ -1,10 +1,10 @@
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { validation } from '../../../../utils/validation.js';
-import AzmgmtCommand from '../../../base/AzmgmtCommand.js';
+import PowerAutomateCommand from '../../../base/PowerAutomateCommand.js';
 import commands from '../../commands.js';
 
 interface CommandArgs {
@@ -18,7 +18,7 @@ interface Options extends GlobalOptions {
   force?: boolean;
 }
 
-class FlowRunCancelCommand extends AzmgmtCommand {
+class FlowRunCancelCommand extends PowerAutomateCommand {
   public get name(): string {
     return commands.RUN_CANCEL;
   }
@@ -79,7 +79,7 @@ class FlowRunCancelCommand extends AzmgmtCommand {
 
     const cancelFlow = async (): Promise<void> => {
       const requestOptions: CliRequestOptions = {
-        url: `${this.resource}providers/Microsoft.ProcessSimple/environments/${formatting.encodeQueryParameter(args.options.environmentName)}/flows/${formatting.encodeQueryParameter(args.options.flowName)}/runs/${formatting.encodeQueryParameter(args.options.name)}/cancel?api-version=2016-11-01`,
+        url: `${this.resource}/providers/Microsoft.ProcessSimple/environments/${formatting.encodeQueryParameter(args.options.environmentName)}/flows/${formatting.encodeQueryParameter(args.options.flowName)}/runs/${formatting.encodeQueryParameter(args.options.name)}/cancel?api-version=2016-11-01`,
         headers: {
           accept: 'application/json'
         },
@@ -98,7 +98,7 @@ class FlowRunCancelCommand extends AzmgmtCommand {
       await cancelFlow();
     }
     else {
-      const result = await Cli.promptForConfirmation({ message: `Are you sure you want to cancel the flow run ${args.options.name}?` });
+      const result = await cli.promptForConfirmation({ message: `Are you sure you want to cancel the flow run ${args.options.name}?` });
 
       if (result) {
         await cancelFlow();

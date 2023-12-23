@@ -1,5 +1,5 @@
 import fs from 'fs';
-import { Cli } from '../../cli/Cli.js';
+import { cli } from '../../cli/cli.js';
 import { Logger } from '../../cli/Logger.js';
 import Command, { CommandArgs, CommandError } from '../../Command.js';
 import GlobalOptions from '../../GlobalOptions.js';
@@ -91,7 +91,7 @@ export default abstract class AppCommand extends Command {
 
     if (this.m365rcJson.apps.length > 1) {
       const resultAsKeyValuePair = formatting.convertArrayToHashTable('appIdIndex', this.m365rcJson.apps);
-      const result = await Cli.handleMultipleResultsFound<{ appIdIndex: number }>(`Multiple Azure AD apps found in ${m365rcJsonPath}.`, resultAsKeyValuePair);
+      const result = await cli.handleMultipleResultsFound<{ appIdIndex: number }>(`Multiple Azure AD apps found in ${m365rcJsonPath}.`, resultAsKeyValuePair);
       this.appId = ((this.m365rcJson as M365RcJson).apps as M365RcJsonApp[])[result.appIdIndex].appId;
       await super.action(logger, args);
     }

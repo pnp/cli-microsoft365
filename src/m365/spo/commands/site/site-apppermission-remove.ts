@@ -1,5 +1,5 @@
 import { IdentitySet, Permission } from '@microsoft/microsoft-graph-types';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request from '../../../../request.js';
@@ -144,7 +144,7 @@ class SpoSiteAppPermissionRemoveCommand extends GraphCommand {
       await this.removeSiteAppPermission(logger, args.options);
     }
     else {
-      const result = await Cli.promptForConfirmation({ message: `Are you sure you want to remove the specified application permission from site ${args.options.siteUrl}?` });
+      const result = await cli.promptForConfirmation({ message: `Are you sure you want to remove the specified application permission from site ${args.options.siteUrl}?` });
 
       if (result) {
         await this.removeSiteAppPermission(logger, args.options);

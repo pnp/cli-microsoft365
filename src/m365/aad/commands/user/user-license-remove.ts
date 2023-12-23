@@ -3,7 +3,7 @@ import GlobalOptions from '../../../../GlobalOptions.js';
 import commands from '../../commands.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { validation } from '../../../../utils/validation.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 
 interface CommandArgs {
@@ -98,7 +98,7 @@ class AadUserLicenseRemoveCommand extends GraphCommand {
       await this.deleteUserLicenses(args);
     }
     else {
-      const result = await Cli.promptForConfirmation({ message: `Are you sure you want to remove the licenses for the user '${args.options.userId || args.options.userName}'?` });
+      const result = await cli.promptForConfirmation({ message: `Are you sure you want to remove the licenses for the user '${args.options.userId || args.options.userName}'?` });
 
       if (result) {
         await this.deleteUserLicenses(args);

@@ -7,7 +7,7 @@ import { CommandError } from './Command.js';
 import { FileTokenStorage } from './auth/FileTokenStorage.js';
 import { TokenStorage } from './auth/TokenStorage.js';
 import { msalCachePlugin } from './auth/msalCachePlugin.js';
-import { Cli } from './cli/Cli.js';
+import { cli } from './cli/cli.js';
 import { Logger } from './cli/Logger.js';
 import config from './config.js';
 import request from './request.js';
@@ -284,7 +284,7 @@ export class Auth {
       privateKey: certificatePrivateKey as string
     };
 
-    let azureCloudInstance: AzureCloudInstance = 0;
+    let azureCloudInstance: AzureCloudInstance = AzureCloudInstance.None;
     switch (this.service.cloudType) {
       case CloudType.Public:
         azureCloudInstance = AzureCloudInstance.AzurePublic;
@@ -420,7 +420,6 @@ export class Auth {
       await logger.logToStderr('');
     }
 
-    const cli = Cli.getInstance();
     cli.spinner.text = response.message;
     cli.spinner.spinner = {
       frames: ['🌶️ ']
@@ -432,11 +431,11 @@ export class Auth {
       cli.spinner.start();
     }
 
-    if (Cli.getInstance().getSettingWithDefaultValue<boolean>(settingsNames.autoOpenLinksInBrowser, false)) {
+    if (cli.getSettingWithDefaultValue<boolean>(settingsNames.autoOpenLinksInBrowser, false)) {
       browserUtil.open(response.verificationUri);
     }
 
-    if (Cli.getInstance().getSettingWithDefaultValue<boolean>(settingsNames.copyDeviceCodeToClipboard, false)) {
+    if (cli.getSettingWithDefaultValue<boolean>(settingsNames.copyDeviceCodeToClipboard, false)) {
       // _clipboardy is never set before hitting this line, but this check
       // is implemented so that we can support lazy loading
       // but also stub it for testing
@@ -698,6 +697,10 @@ export class Auth {
       resource === 'https://api.powerapps.com' ||
       resource.endsWith('.api.bap.microsoft.com')) {
       resource = 'https://service.powerapps.com/';
+    }
+
+    if (resource === 'https://api.flow.microsoft.com') {
+      resource = 'https://management.azure.com/';
     }
 
     if (resource === 'https://api.powerbi.com') {

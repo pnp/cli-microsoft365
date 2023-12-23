@@ -10,7 +10,7 @@ import authServer from './AuthServer.js';
 import { CommandError } from './Command.js';
 import { FileTokenStorage } from './auth/FileTokenStorage.js';
 import { TokenStorage } from './auth/TokenStorage.js';
-import { Cli } from './cli/Cli.js';
+import { cli } from './cli/cli.js';
 import { Logger } from './cli/Logger.js';
 import request from './request.js';
 import { accessToken } from "./utils/accessToken.js";
@@ -44,7 +44,6 @@ const mockTokenCachePlugin: msal.ICachePlugin = {
 describe('Auth', () => {
   let log: any[];
   let auth: Auth;
-  let cli: Cli;
   let response: DeviceCodeResponse;
   let openStub: sinon.SinonStub;
   let clipboardStub: sinon.SinonStub;
@@ -85,7 +84,6 @@ describe('Auth', () => {
 
   beforeEach(() => {
     log = [];
-    cli = Cli.getInstance();
     auth = new Auth();
     response = {
       deviceCode: "",
@@ -114,7 +112,7 @@ describe('Auth', () => {
     readFileSyncStub.restore();
     initializeServerStub.restore();
     sinonUtil.restore([
-      cli.config.get,
+      cli.getConfig().get,
       request.get,
       (auth as any).getClientApplication,
       (auth as any).getDeviceCodeResponse,
@@ -276,14 +274,24 @@ describe('Auth', () => {
   });
 
   it('handles failure response when retrieving new access token', (done) => {
-    sinon.stub(auth as any, 'getClientApplication').callsFake(_ => publicApplication);
-    sinon.stub(publicApplication, 'acquireTokenSilent').callsFake(_ => Promise.resolve(null));
+    auth.service.certificate = base64EncodedPemCert;
+    auth.service.authType = AuthType.Certificate;
 
-    auth.ensureAccessToken(resource, logger).then(() => {
+    let originalGetConfidentialClient = (auth as any).getConfidentialClient;
+    originalGetConfidentialClient = originalGetConfidentialClient.bind(auth);
+    sinon.stub(auth as any, 'getConfidentialClient').callsFake(async (logger, debug, thumbprint, cert) => {
+      const confidentialApplication = await originalGetConfidentialClient(logger, debug, thumbprint, cert);
+      sinon.stub(confidentialApplication, 'acquireTokenByClientCredential').callsFake(_ => Promise.resolve(null));
+      return confidentialApplication;
+    });
+    sinon.stub(tokenCache, 'getAllAccounts').callsFake(() => []);
+    sinon.stub(auth, 'storeConnectionInfo').callsFake(() => Promise.resolve());
+
+    auth.ensureAccessToken(resource, logger, true).then(() => {
       done('Got access token');
-    }, (err) => {
+    }, () => {
       try {
-        assert.strictEqual(err, 'Failed to retrieve an access token. Please try again');
+        assert(loggerLogToStderrSpy.calledWith('getTokenPromise authentication result is null'));
         done();
       }
       catch (e) {
@@ -294,7 +302,7 @@ describe('Auth', () => {
 
   it('handles empty response when retrieving new access token', (done) => {
     sinon.stub(auth as any, 'getClientApplication').callsFake(_ => publicApplication);
-    sinon.stub(publicApplication, 'acquireTokenSilent').callsFake(_ => Promise.resolve(null));
+    sinon.stub(publicApplication, 'acquireTokenSilent').callsFake(_ => Promise.reject('An error has occurred'));
 
     auth.ensureAccessToken(resource, logger, true).then(() => {
       done('Got access token');
@@ -384,7 +392,7 @@ describe('Auth', () => {
   });
 
   it('retrieves new access token using existing refresh token when refresh forced', (done) => {
-    const config = cli.config;
+    const config = cli.getConfig();
     sinon.stub(config, 'get').callsFake((() => { }) as any);
     const now = new Date();
     now.setSeconds(now.getSeconds() + 1);
@@ -413,7 +421,7 @@ describe('Auth', () => {
   });
 
   it('retrieves access token using device code authentication flow when no refresh token available and no authType specified', (done) => {
-    const config = cli.config;
+    const config = cli.getConfig();
     sinon.stub(config, 'get').callsFake((() => 'value'));
     sinon.stub(auth as any, 'getClientApplication').callsFake(_ => publicApplication);
     sinon.stub(tokenCache, 'getAllAccounts').callsFake(() => []);
@@ -463,7 +471,7 @@ describe('Auth', () => {
   });
 
   it('retrieves token using device code authentication flow when authType deviceCode specified', (done) => {
-    const config = cli.config;
+    const config = cli.getConfig();
     sinon.stub(config, 'get').callsFake((() => 'value'));
     sinon.stub(auth as any, 'getClientApplication').callsFake(_ => publicApplication);
     sinon.stub(tokenCache, 'getAllAccounts').callsFake(() => []);
@@ -2073,6 +2081,10 @@ describe('Auth', () => {
 
   it('correctly retrieves resource for https://api.powerbi.com', () => {
     assert.strictEqual(Auth.getResourceFromUrl('https://api.powerbi.com'), 'https://analysis.windows.net/powerbi/api');
+  });
+
+  it('correctly retrieves resource for https://api.flow.microsoft.com', () => {
+    assert.strictEqual(Auth.getResourceFromUrl('https://api.flow.microsoft.com'), 'https://management.azure.com/');
   });
 
   it('returns undefined if access token is not set when determining auth type', () => {

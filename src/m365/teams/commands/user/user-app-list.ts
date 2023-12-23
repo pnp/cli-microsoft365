@@ -1,5 +1,5 @@
 import { TeamsAppDefinition, TeamsAppInstallation } from '@microsoft/microsoft-graph-types';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
@@ -88,7 +88,7 @@ class TeamsUserAppListCommand extends GraphCommand {
         (i as any).appId = appId;
       });
 
-      if (!Cli.shouldTrimOutput(args.options.output)) {
+      if (!cli.shouldTrimOutput(args.options.output)) {
         await logger.log(items);
       }
       else {

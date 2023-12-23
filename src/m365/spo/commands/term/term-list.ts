@@ -1,5 +1,5 @@
 import { AxiosRequestConfig } from 'axios';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import config from '../../../../config.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
@@ -138,7 +138,7 @@ class SpoTermListCommand extends SpoCommand {
         }
       }
 
-      if (!args.options.output || !Cli.shouldTrimOutput(args.options.output)) {
+      if (!args.options.output || !cli.shouldTrimOutput(args.options.output)) {
         await logger.log(terms);
       }
       else if (!args.options.includeChildTerms) {

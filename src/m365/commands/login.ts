@@ -10,7 +10,7 @@ import { accessToken } from '../../utils/accessToken.js';
 import { misc } from '../../utils/misc.js';
 import commands from './commands.js';
 import { settingsNames } from '../../settingsNames.js';
-import { Cli } from '../../cli/Cli.js';
+import { cli } from '../../cli/cli.js';
 
 interface CommandArgs {
   options: Options;
@@ -51,7 +51,7 @@ class LoginCommand extends Command {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        authType: args.options.authType || Cli.getInstance().getSettingWithDefaultValue<string>(settingsNames.authType, 'deviceCode'),
+        authType: args.options.authType || cli.getSettingWithDefaultValue<string>(settingsNames.authType, 'deviceCode'),
         cloud: args.options.cloud ?? CloudType.Public
       });
     });
@@ -97,7 +97,7 @@ class LoginCommand extends Command {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        const authType = args.options.authType || Cli.getInstance().getSettingWithDefaultValue<string>(settingsNames.authType, 'deviceCode');
+        const authType = args.options.authType || cli.getSettingWithDefaultValue<string>(settingsNames.authType, 'deviceCode');
 
         if (authType === 'password') {
           if (!args.options.userName) {
@@ -159,7 +159,7 @@ class LoginCommand extends Command {
         await logger.logToStderr(`Signing in to Microsoft 365...`);
       }
 
-      const authType = args.options.authType || Cli.getInstance().getSettingWithDefaultValue<string>(settingsNames.authType, 'deviceCode');
+      const authType = args.options.authType || cli.getSettingWithDefaultValue<string>(settingsNames.authType, 'deviceCode');
       auth.service.appId = args.options.appId || config.cliAadAppId;
       auth.service.tenant = args.options.tenant || config.tenant;
 

@@ -1,6 +1,6 @@
 import assert from 'assert';
 import sinon from 'sinon';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { settingsNames } from '../../../../settingsNames.js';
@@ -18,7 +18,7 @@ describe(commands.CONFIG_GET, () => {
   let commandInfo: CommandInfo;
 
   before(() => {
-    commandInfo = Cli.getCommandInfo(command);
+    commandInfo = cli.getCommandInfo(command);
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     sinon.stub(session, 'getId').callsFake(() => '');
@@ -41,7 +41,7 @@ describe(commands.CONFIG_GET, () => {
   });
 
   afterEach(() => {
-    sinonUtil.restore(Cli.getInstance().config.get);
+    sinonUtil.restore(cli.getConfig().get);
   });
 
   after(() => {
@@ -57,14 +57,14 @@ describe(commands.CONFIG_GET, () => {
   });
 
   it(`gets value of the specified property`, async () => {
-    const config = Cli.getInstance().config;
+    const config = cli.getConfig();
     sinon.stub(config, 'get').callsFake(_ => 'json');
     await command.action(logger, { options: { key: settingsNames.output } });
     assert(loggerSpy.calledWith('json'));
   });
 
   it(`returns undefined if the specified setting is not configured`, async () => {
-    const config = Cli.getInstance().config;
+    const config = cli.getConfig();
     sinon.stub(config, 'get').callsFake(_ => undefined);
     await command.action(logger, { options: { key: settingsNames.output } });
     assert(loggerSpy.calledWith(undefined));

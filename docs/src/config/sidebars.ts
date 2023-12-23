@@ -1,7 +1,6 @@
-// @ts-check
+import type { SidebarsConfig } from '@docusaurus/plugin-content-docs';
 
-/** @type {import('@docusaurus/plugin-content-docs').SidebarsConfig} */
-const sidebars = {
+const sidebars: SidebarsConfig = {
   home: [
     'index',
     'v7-upgrade-guidance',
@@ -27,27 +26,42 @@ const sidebars = {
     {
       'Azure Active Directory (aad)': [
         {
-            administrativeunit: [
-              {
-                type: 'doc',
-                label: 'administrativeunit add',
-                id: 'cmd/aad/administrativeunit/administrativeunit-add'
-              },
-              {
-                type: 'doc',
-                label: 'administrativeunit get',
-                id: 'cmd/aad/administrativeunit/administrativeunit-get'
-              },
-              {
-                type: 'doc',
-                label: 'administrativeunit list',
-                id: 'cmd/aad/administrativeunit/administrativeunit-list'
-              },
-              {
-                type: 'doc',
-                label: 'administrativeunit remove',
-                id: 'cmd/aad/administrativeunit/administrativeunit-remove'
-              }
+          administrativeunit: [
+            {
+              type: 'doc',
+              label: 'administrativeunit add',
+              id: 'cmd/aad/administrativeunit/administrativeunit-add'
+            },
+            {
+              type: 'doc',
+              label: 'administrativeunit get',
+              id: 'cmd/aad/administrativeunit/administrativeunit-get'
+            },
+            {
+              type: 'doc',
+              label: 'administrativeunit list',
+              id: 'cmd/aad/administrativeunit/administrativeunit-list'
+            },
+            {
+              type: 'doc',
+              label: 'administrativeunit remove',
+              id: 'cmd/aad/administrativeunit/administrativeunit-remove'
+            },
+            {
+              type: 'doc',
+              label: 'administrativeunit member add',
+              id: 'cmd/aad/administrativeunit/administrativeunit-member-add'
+            },
+            {
+              type: 'doc',
+              label: 'administrativeunit member get',
+              id: 'cmd/aad/administrativeunit/administrativeunit-member-get'
+            },
+            {
+              type: 'doc',
+              label: 'administrativeunit member list',
+              id: 'cmd/aad/administrativeunit/administrativeunit-member-list'
+            }
           ]
         },
         {
@@ -76,6 +90,11 @@ const sidebars = {
               type: 'doc',
               label: 'app set',
               id: 'cmd/aad/app/app-set'
+            },
+            {
+              type: 'doc',
+              label: 'app permission add',
+              id: 'cmd/aad/app/app-permission-add'
             },
             {
               type: 'doc',
@@ -4354,4 +4373,4 @@ const sidebars = {
   ]
 };
 
-module.exports = sidebars;
+export default sidebars;

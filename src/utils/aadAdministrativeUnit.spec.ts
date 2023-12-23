@@ -1,9 +1,9 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import { aadAdministrativeUnit } from './aadAdministrativeUnit.js';
-import { Cli } from "../cli/Cli.js";
-import request from "../request.js";
-import { sinonUtil } from "./sinonUtil.js";
+import { cli } from '../cli/cli.js';
+import request from '../request.js';
+import { sinonUtil } from './sinonUtil.js';
 import { formatting } from './formatting.js';
 import { settingsNames } from '../settingsNames.js';
 
@@ -15,17 +15,11 @@ describe('utils/aadAdministrativeUnit', () => {
   const secondDisplayName = 'Asian Division';
   const invalidDisplayName = 'European';
 
-  let cli: Cli;
-
-  before(() => {
-    cli = Cli.getInstance();
-  });
-
   afterEach(() => {
     sinonUtil.restore([
       request.get,
       cli.getSettingWithDefaultValue,
-      Cli.handleMultipleResultsFound
+      cli.handleMultipleResultsFound
     ]);
   });
 
@@ -63,7 +57,7 @@ describe('utils/aadAdministrativeUnit', () => {
       return 'Invalid Request';
     });
 
-    sinon.stub(Cli, 'handleMultipleResultsFound').resolves({ id: administrativeUnitId, displayName: displayName });
+    sinon.stub(cli, 'handleMultipleResultsFound').resolves({ id: administrativeUnitId, displayName: displayName });
 
     const actual = await aadAdministrativeUnit.getAdministrativeUnitByDisplayName(displayName);
     assert.deepStrictEqual(actual, { id: administrativeUnitId, displayName: displayName });

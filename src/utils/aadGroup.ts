@@ -3,7 +3,7 @@ import request, { CliRequestOptions } from "../request.js";
 import { formatting } from "./formatting.js";
 import { odata } from "./odata.js";
 import { Logger } from '../cli/Logger.js';
-import { Cli } from '../cli/Cli.js';
+import { cli } from '../cli/cli.js';
 
 const graphResource = 'https://graph.microsoft.com';
 
@@ -47,7 +47,7 @@ export const aadGroup = {
 
     if (groups.length > 1) {
       const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', groups);
-      return await Cli.handleMultipleResultsFound<Group>(`Multiple groups with name '${displayName}' found.`, resultAsKeyValuePair);
+      return await cli.handleMultipleResultsFound<Group>(`Multiple groups with name '${displayName}' found.`, resultAsKeyValuePair);
     }
 
     return groups[0];
@@ -68,7 +68,7 @@ export const aadGroup = {
 
     if (groups.length > 1) {
       const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', groups);
-      const result = await Cli.handleMultipleResultsFound<Group>(`Multiple groups with name '${displayName}' found.`, resultAsKeyValuePair);
+      const result = await cli.handleMultipleResultsFound<Group>(`Multiple groups with name '${displayName}' found.`, resultAsKeyValuePair);
       return result.id!;
     }
 

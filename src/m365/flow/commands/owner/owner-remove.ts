@@ -1,4 +1,4 @@
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
@@ -6,7 +6,7 @@ import { aadGroup } from '../../../../utils/aadGroup.js';
 import { aadUser } from '../../../../utils/aadUser.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { validation } from '../../../../utils/validation.js';
-import AzmgmtCommand from '../../../base/AzmgmtCommand.js';
+import PowerAutomateCommand from '../../../base/PowerAutomateCommand.js';
 import commands from '../../commands.js';
 
 interface CommandArgs {
@@ -24,7 +24,7 @@ interface Options extends GlobalOptions {
   force?: boolean;
 }
 
-class FlowOwnerRemoveCommand extends AzmgmtCommand {
+class FlowOwnerRemoveCommand extends PowerAutomateCommand {
   public get name(): string {
     return commands.OWNER_REMOVE;
   }
@@ -134,7 +134,7 @@ class FlowOwnerRemoveCommand extends AzmgmtCommand {
         }
 
         const requestOptions: CliRequestOptions = {
-          url: `${this.resource}providers/Microsoft.ProcessSimple/${args.options.asAdmin ? 'scopes/admin/' : ''}environments/${formatting.encodeQueryParameter(args.options.environmentName)}/flows/${formatting.encodeQueryParameter(args.options.flowName)}/modifyPermissions?api-version=2016-11-01`,
+          url: `${this.resource}/providers/Microsoft.ProcessSimple/${args.options.asAdmin ? 'scopes/admin/' : ''}environments/${formatting.encodeQueryParameter(args.options.environmentName)}/flows/${formatting.encodeQueryParameter(args.options.flowName)}/modifyPermissions?api-version=2016-11-01`,
           headers: {
             accept: 'application/json'
           },
@@ -154,7 +154,7 @@ class FlowOwnerRemoveCommand extends AzmgmtCommand {
         await removeFlowOwner();
       }
       else {
-        const result = await Cli.promptForConfirmation({ message: `Are you sure you want to remove owner '${args.options.groupId || args.options.groupName || args.options.userId || args.options.userName}' from the specified flow?` });
+        const result = await cli.promptForConfirmation({ message: `Are you sure you want to remove owner '${args.options.groupId || args.options.groupName || args.options.userId || args.options.userName}' from the specified flow?` });
 
         if (result) {
           await removeFlowOwner();
