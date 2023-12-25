@@ -1,6 +1,7 @@
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
+import { formatting } from '../../../../utils/formatting.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
@@ -11,7 +12,8 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   id: string;
-  userId: string;
+  userId?: string;
+  userName?: string;
 }
 
 class TeamsUserAppAddCommand extends GraphCommand {
@@ -26,8 +28,19 @@ class TeamsUserAppAddCommand extends GraphCommand {
   constructor() {
     super();
 
+    this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initOptionSets();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        userId: typeof args.options.userId !== 'undefined',
+        userName: typeof args.options.userName !== 'undefined'
+      });
+    });
   }
 
   #initOptions(): void {
@@ -36,7 +49,10 @@ class TeamsUserAppAddCommand extends GraphCommand {
         option: '--id <id>'
       },
       {
-        option: '--userId <userId>'
+        option: '--userId [userId]'
+      },
+      {
+        option: '--userName [userName]'
       }
     );
   }
@@ -48,8 +64,12 @@ class TeamsUserAppAddCommand extends GraphCommand {
           return `${args.options.id} is not a valid GUID`;
         }
 
-        if (!validation.isValidGuid(args.options.userId)) {
+        if (args.options.userId && !validation.isValidGuid(args.options.userId)) {
           return `${args.options.userId} is not a valid GUID`;
+        }
+
+        if (args.options.userName && !validation.isValidUserPrincipalName(args.options.userName)) {
+          return `${args.options.userName} is not a valid userName`;
         }
 
         return true;
@@ -57,11 +77,16 @@ class TeamsUserAppAddCommand extends GraphCommand {
     );
   }
 
+  #initOptionSets(): void {
+    this.optionSets.push({ options: ['userId', 'userName'] });
+  }
+
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    const userId: string = (args.options.userId ?? args.options.userName) as string;
     const endpoint: string = `${this.resource}/v1.0`;
 
     const requestOptions: CliRequestOptions = {
-      url: `${endpoint}/users/${args.options.userId}/teamwork/installedApps`,
+      url: `${endpoint}/users/${formatting.encodeQueryParameter(userId)}/teamwork/installedApps`,
       headers: {
         'content-type': 'application/json;odata=nometadata',
         'accept': 'application/json;odata.metadata=none'

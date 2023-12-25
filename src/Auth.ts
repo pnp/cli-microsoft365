@@ -699,6 +699,10 @@ export class Auth {
       resource = 'https://service.powerapps.com/';
     }
 
+    if (resource === 'https://api.flow.microsoft.com') {
+      resource = 'https://management.azure.com/';
+    }
+
     if (resource === 'https://api.powerbi.com') {
       // api.powerbi.com is not a valid resource
       // we need to use https://analysis.windows.net/powerbi/api instead

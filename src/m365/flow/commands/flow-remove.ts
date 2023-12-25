@@ -4,8 +4,8 @@ import { Logger } from '../../../cli/Logger.js';
 import request, { CliRequestOptions } from '../../../request.js';
 import { formatting } from '../../../utils/formatting.js';
 import { validation } from '../../../utils/validation.js';
-import AzmgmtCommand from '../../base/AzmgmtCommand.js';
 import commands from '../commands.js';
+import PowerAutomateCommand from '../../base/PowerAutomateCommand.js';
 
 interface CommandArgs {
   options: Options;
@@ -18,7 +18,7 @@ interface Options extends GlobalOptions {
   force?: boolean;
 }
 
-class FlowRemoveCommand extends AzmgmtCommand {
+class FlowRemoveCommand extends PowerAutomateCommand {
   public get name(): string {
     return commands.REMOVE;
   }
@@ -80,7 +80,7 @@ class FlowRemoveCommand extends AzmgmtCommand {
 
     const removeFlow = async (): Promise<void> => {
       const requestOptions: CliRequestOptions = {
-        url: `${this.resource}providers/Microsoft.ProcessSimple/${args.options.asAdmin ? 'scopes/admin/' : ''}environments/${formatting.encodeQueryParameter(args.options.environmentName)}/flows/${formatting.encodeQueryParameter(args.options.name)}?api-version=2016-11-01`,
+        url: `${this.resource}/providers/Microsoft.ProcessSimple/${args.options.asAdmin ? 'scopes/admin/' : ''}environments/${formatting.encodeQueryParameter(args.options.environmentName)}/flows/${formatting.encodeQueryParameter(args.options.name)}?api-version=2016-11-01`,
         fullResponse: true,
         headers: {
           accept: 'application/json'

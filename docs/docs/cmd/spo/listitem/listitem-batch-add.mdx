@@ -13,11 +13,14 @@ m365 spo listitem batch add [options]
 ## Options
 
 ```md definition-list
-`-p, --filePath <filePath>`
-: The absolute or relative path to a flat file containing the list items.
-
 `-u, --webUrl <webUrl>`
 : URL of the site.
+
+`-p, --filePath [filePath]`
+: The absolute or relative path to a flat file containing the list items. Specify `filePath` or `csvContent`, but not both.
+
+`-c, --csvContent [csvContent]`
+: A string content in CSV-format containing the list items. Specify `filePath` or `csvContent`, but not both.
 
 `-l, --listId [listId]`
 : ID of the list. Specify either `listTitle`, `listId` or `listUrl`, but not multiple.
@@ -52,6 +55,25 @@ Add a batch of items to a list retrieved by title in a specific site
 
 ```sh
 m365 spo listitem batch add --filePath "C:\Path\To\Csv\CsvFile.csv" --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle "Demo List"
+```
+
+Add a batch of items to a list retrieved by title in a specific site using csv content
+
+```sh
+$obj = @(
+  [PSCustomObject]@{
+    Title = "Item A"
+    Age = 10
+  },
+  [PSCustomObject]@{
+    Title = "Item B"
+    Age = 20
+  }
+) 
+
+$csvContent = $obj | ConvertTo-Csv -NoTypeInformation -Delimiter "," | Out-String | ForEach-Object { $_.Replace('"','\"') }
+
+m365 spo listitem batch add --csvContent $csvContent --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle "Demo List"
 ```
 
 Add a batch of items to a list retrieved by Id in a specific site

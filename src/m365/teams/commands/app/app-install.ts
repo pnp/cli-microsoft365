@@ -14,7 +14,8 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  id: string;
+  id?: string;
+  name?: string;
   teamId?: string;
   userId?: string;
   userName?: string;
@@ -41,6 +42,8 @@ class TeamsAppInstallCommand extends GraphCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
+        id: typeof args.options.id !== 'undefined',
+        name: typeof args.options.name !== 'undefined',
         teamId: typeof args.options.teamId !== 'undefined',
         userId: typeof args.options.userId !== 'undefined',
         userName: typeof args.options.userName !== 'undefined'
@@ -50,7 +53,8 @@ class TeamsAppInstallCommand extends GraphCommand {
 
   #initOptions(): void {
     this.options.unshift(
-      { option: '--id <id>' },
+      { option: '-i, --id [id]' },
+      { option: '-n, --name [name]' },
       { option: '--teamId [teamId]' },
       { option: '--userId [userId]' },
       { option: '--userName [userName]' }
@@ -60,7 +64,7 @@ class TeamsAppInstallCommand extends GraphCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (!validation.isValidGuid(args.options.id)) {
+        if (args.options.id && !validation.isValidGuid(args.options.id)) {
           return `${args.options.id} is not a valid GUID`;
         }
 
@@ -81,11 +85,13 @@ class TeamsAppInstallCommand extends GraphCommand {
 
   #initOptionSets(): void {
     this.optionSets.push({ options: ['teamId', 'userId', 'userName'] });
+    this.optionSets.push({ options: ['id', 'name'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       await this.validateUser(args, logger);
+      const appId: string = await this.getAppId(args.options);
 
       let url: string = `${this.resource}/v1.0`;
       if (args.options.teamId) {
@@ -103,7 +109,7 @@ class TeamsAppInstallCommand extends GraphCommand {
         },
         responseType: 'json',
         data: {
-          'teamsApp@odata.bind': `${this.resource}/v1.0/appCatalogs/teamsApps/${args.options.id}`
+          'teamsApp@odata.bind': `${this.resource}/v1.0/appCatalogs/teamsApps/${appId}`
         }
       };
 
@@ -147,6 +153,35 @@ class TeamsAppInstallCommand extends GraphCommand {
 
       throw `User with ID ${args.options.userId} not found. Original error: ${err.error.message}`;
     }
+  }
+
+  private async getAppId(options: Options): Promise<string> {
+    if (options.id) {
+      return options.id;
+    }
+
+    const requestOptions: CliRequestOptions = {
+      url: `${this.resource}/v1.0/appCatalogs/teamsApps?$filter=displayName eq '${formatting.encodeQueryParameter(options.name as string)}'`,
+      headers: {
+        accept: 'application/json;odata.metadata=none'
+      },
+      responseType: 'json'
+    };
+
+    const response = await request.get<{ value: { id: string; }[] }>(requestOptions);
+    const app: { id: string; } | undefined = response.value[0];
+
+    if (!app) {
+      throw `The specified Teams app does not exist`;
+    }
+
+    if (response.value.length > 1) {
+      const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', response.value);
+      const result = await cli.handleMultipleResultsFound<{ id: string; }>(`Multiple Teams apps with name ${options.name} found.`, resultAsKeyValuePair);
+      return result.id;
+    }
+
+    return app.id;
   }
 }
 

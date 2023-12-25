@@ -49,6 +49,16 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
+              label: 'administrativeunit member add',
+              id: 'cmd/aad/administrativeunit/administrativeunit-member-add'
+            },
+            {
+              type: 'doc',
+              label: 'administrativeunit member get',
+              id: 'cmd/aad/administrativeunit/administrativeunit-member-get'
+            },
+            {
+              type: 'doc',
               label: 'administrativeunit member list',
               id: 'cmd/aad/administrativeunit/administrativeunit-member-list'
             },
@@ -85,6 +95,11 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'app set',
               id: 'cmd/aad/app/app-set'
+            },
+            {
+              type: 'doc',
+              label: 'app permission add',
+              id: 'cmd/aad/app/app-permission-add'
             },
             {
               type: 'doc',

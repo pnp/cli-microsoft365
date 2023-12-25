@@ -84,24 +84,35 @@ describe(commands.LISTITEM_BATCH_ADD, () => {
     sinon.stub(fs, 'readFileSync').callsFake(_ => csvContent);
     sinon.stub(request, 'post').callsFake(async (opts: any) => {
       if (opts.url === `${webUrl}/_api/$batch`) {
-        return Promise.resolve(mockBatchSuccessfulResponse);
+        return mockBatchSuccessfulResponse;
       }
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, filePath: filePath, listId: listId, verbose: true } } as any);
+    await command.action(logger, { options: { webUrl: webUrl, filePath: filePath, listId: listId, verbose: true } });
+  });
+
+  it('adds items in batch to a sharepoint list retrieved by id with csv content', async () => {
+    sinon.stub(request, 'post').callsFake(async (opts: any) => {
+      if (opts.url === `${webUrl}/_api/$batch`) {
+        return mockBatchSuccessfulResponse;
+      }
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { webUrl: webUrl, csvContent: csvContent, listId: listId, verbose: true } });
   });
 
   it('adds items in batch to a sharepoint list retrieved by title', async () => {
     sinon.stub(fs, 'readFileSync').callsFake(_ => csvContent);
     sinon.stub(request, 'post').callsFake(async (opts: any) => {
       if (opts.url === `${webUrl}/_api/$batch`) {
-        return Promise.resolve(mockBatchSuccessfulResponse);
+        return mockBatchSuccessfulResponse;
       }
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, filePath: filePath, listTitle: listTitle, verbose: true } } as any);
+    await command.action(logger, { options: { webUrl: webUrl, filePath: filePath, listTitle: listTitle, verbose: true } });
   });
 
   it('adds 150 items in batch to a sharepoint list retrieved by url', async () => {
@@ -114,12 +125,12 @@ describe(commands.LISTITEM_BATCH_ADD, () => {
     sinon.stub(request, 'post').callsFake(async (opts: any) => {
       if (opts.url === `${webUrl}/_api/$batch`) {
         amountOfRequestsInBody += opts.data.match(/POST/g).length;
-        return Promise.resolve(mockBatchSuccessfulResponse);
+        return mockBatchSuccessfulResponse;
       }
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, filePath: filePath, listUrl: listUrl, verbose: true } } as any);
+    await command.action(logger, { options: { webUrl: webUrl, filePath: filePath, listUrl: listUrl, verbose: true } });
     assert.strictEqual(amountOfRequestsInBody, 150);
   });
 
@@ -133,7 +144,7 @@ describe(commands.LISTITEM_BATCH_ADD, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: webUrl, filePath: filePath, listUrl: listUrl, verbose: true } } as any), new CommandError(errorMessage));
+    await assert.rejects(command.action(logger, { options: { webUrl: webUrl, filePath: filePath, listUrl: listUrl, verbose: true } }), new CommandError(errorMessage));
   });
 
   it('throws an error when batch api returns partly unsuccessful results', async () => {
@@ -141,12 +152,12 @@ describe(commands.LISTITEM_BATCH_ADD, () => {
     sinon.stub(fs, 'readFileSync').callsFake(_ => csvContent);
     sinon.stub(request, 'post').callsFake(async (opts: any) => {
       if (opts.url === `${webUrl}/_api/$batch`) {
-        return Promise.resolve(mockBatchFailedResponse);
+        return mockBatchFailedResponse;
       }
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: webUrl, filePath: filePath, listUrl: listUrl, verbose: true } } as any), new CommandError(errorMessage));
+    await assert.rejects(command.action(logger, { options: { webUrl: webUrl, filePath: filePath, listUrl: listUrl, verbose: true } }), new CommandError(errorMessage));
   });
 
   it('throws an error when the SharePoint list cannot be found by title', async () => {
@@ -158,7 +169,7 @@ describe(commands.LISTITEM_BATCH_ADD, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: webUrl, filePath: filePath, listTitle: listTitle, verbose: true } } as any,), new CommandError(`List 'nonexistentlist' does not exist at site with URL 'https://contoso.sharepoint.com/sites/sales'.`));
+    await assert.rejects(command.action(logger, { options: { webUrl: webUrl, filePath: filePath, listTitle: listTitle, verbose: true } }), new CommandError(`List 'nonexistentlist' does not exist at site with URL 'https://contoso.sharepoint.com/sites/sales'.`));
   });
 
   it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {

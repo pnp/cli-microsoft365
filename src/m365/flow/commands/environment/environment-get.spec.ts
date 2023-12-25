@@ -126,7 +126,7 @@ describe(commands.ENVIRONMENT_GET, () => {
 
   it('retrieves information about the specified environment (debug)', async () => {
     sinon.stub(request, 'get').callsFake(async opts => {
-      if ((opts.url === `https://management.azure.com/providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c5?api-version=2016-11-01`)) {
+      if ((opts.url === `https://api.flow.microsoft.com/providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c5?api-version=2016-11-01`)) {
         return flowResponse;
       }
 
@@ -139,7 +139,7 @@ describe(commands.ENVIRONMENT_GET, () => {
 
   it('retrieves information about the specified environment', async () => {
     sinon.stub(request, 'get').callsFake(async opts => {
-      if ((opts.url === `https://management.azure.com/providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c5?api-version=2016-11-01`)) {
+      if ((opts.url === `https://api.flow.microsoft.com/providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c5?api-version=2016-11-01`)) {
         return flowResponse;
       }
 
@@ -152,7 +152,7 @@ describe(commands.ENVIRONMENT_GET, () => {
 
   it('retrieves information about the specified environment with output text', async () => {
     sinon.stub(request, 'get').callsFake(async opts => {
-      if ((opts.url === `https://management.azure.com/providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c5?api-version=2016-11-01`)) {
+      if ((opts.url === `https://api.flow.microsoft.com/providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c5?api-version=2016-11-01`)) {
         return flowResponse;
       }
 
@@ -165,7 +165,7 @@ describe(commands.ENVIRONMENT_GET, () => {
 
   it('retrieves information about the default environment', async () => {
     sinon.stub(request, 'get').callsFake(async opts => {
-      if ((opts.url === `https://management.azure.com/providers/Microsoft.ProcessSimple/environments/~default?api-version=2016-11-01`)) {
+      if ((opts.url === `https://api.flow.microsoft.com/providers/Microsoft.ProcessSimple/environments/~default?api-version=2016-11-01`)) {
         return flowResponse;
       }
 
