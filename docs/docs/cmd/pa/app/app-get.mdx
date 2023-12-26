@@ -22,10 +22,10 @@ m365 pa app get [options]
 : The display name of the Microsoft Power App to get information about.
 
 `--asAdmin`
-: Set, to get the Power App as admin. Otherwise will return only your own app.
+: Run the command as admin for apps you don't have permission to.
 
 `-e, --environmentName [environmentName]`
-: The name of the environment for which to retrieve the specified app.
+: The name of the environment. Required when using `asAdmin`.
 ```
 
 <Global />
@@ -38,7 +38,7 @@ This command is based on an API that is currently in preview and is subject to c
 
 :::
 
-As a maker, you are able to retrieve the Power Apps you own. As administrator, you are also able to retrieve Power Apps from other users. To get the app from another user, use the `asAdmin` option and make sure to specify the `environment` option as well.
+As a maker, you are able to retrieve the Power Apps you have permission to. As an administrator, you are also able to retrieve Power Apps from other users you don't have permission to. To get the app from another user, use the `asAdmin` option and make sure to specify the `environment` option as well.
 
 
 If you try to retrieve a non-existing Microsoft Power App, you will get the `Request failed with status code 404` error.
