@@ -1,0 +1,95 @@
+import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# aad app permission list
+
+Lists the application and delegated permissions for a specified AAD Application Registration
+
+## Usage
+
+```sh
+m365 aad app permission list [options]
+```
+
+## Options
+
+```md definition-list
+`-i, --appId [appId]`
+: Client ID of the Application Registration to retrieve the permissions for. Specify `appId` or `appObjectId` but not both.
+
+`--appObjectId [appObjectId]`
+: Object ID of the Application Registration to retrieve the permissions for. Specify `appId` or `appObjectId` but not both.
+
+`--type [type]`
+: The type of permissions to retrieve. Allowed values: `delegated`, `application`, `all`. Defaults to `all`.
+```
+
+<Global />
+
+## Examples
+
+Retrieves all permissions for an AAD app registration
+
+```sh
+m365 aad app permission list --appId 'f1417aa3-bf0b-4cc5-a845-a0b2cf11f690'
+```
+
+Retrieves all delegated permissions for an AAD app registration
+
+```sh
+m365 aad app permission list --appId 'f1417aa3-bf0b-4cc5-a845-a0b2cf11f690' --type delegated
+```
+
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  [
+    {
+      "resource": "Microsoft Graph",
+      "resourceId": "00000003-0000-0000-c000-000000000000",
+      "permission": "User.Read",
+      "type": "Delegated"
+    }
+  ]
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  resource                      resourceId                            permission                         type
+  ----------------------------  ------------------------------------  ---------------------------------  -----------
+  Microsoft Graph               00000003-0000-0000-c000-000000000000  User.Read                          Delegated
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  resource,resourceId,permission,type
+  Microsoft Graph,00000003-0000-0000-c000-000000000000,User.Read,Delegated
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # aad app permission list --appId "2bf26ae1-9be3-425f-a393-5fe8390e3a36"
+
+  Date: 27/12/2023
+
+  Property | Value
+  ---------|-------
+  resource | Microsoft Graph
+  resourceId | 00000003-0000-0000-c000-000000000000
+  permission | User.Read
+  type | Delegated
+  ```
+
+  </TabItem>
+</Tabs>
+
