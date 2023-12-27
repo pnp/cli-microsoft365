@@ -240,6 +240,11 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
+              label: 'app permission list',
+              id: 'cmd/entra/app/app-permission-list'
+            },
+            {
+              type: 'doc',
               label: 'app role add',
               id: 'cmd/entra/app/app-role-add'
             },
