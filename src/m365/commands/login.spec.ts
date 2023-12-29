@@ -320,13 +320,6 @@ describe(commands.LOGIN, () => {
     assert.strictEqual(auth.service.connected, true);
   });
 
-  it(`Don't start login flow if the CLI is signed in using Managed Identity`, async () => {
-    sinon.stub(auth, 'ensureAccessToken').callsFake(() => Promise.resolve(''));
-
-    await command.action(logger, { options: { ensure: true, authType: 'identity' } });
-    assert.strictEqual(auth.service.connected, true);
-  });
-
   it(`Don't start login flow if the CLI is signed in using the specified app and to the specified tenant`, async () => {
     sinon.stub(auth, 'ensureAccessToken').callsFake(() => Promise.resolve(''));
 

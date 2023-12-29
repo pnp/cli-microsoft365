@@ -241,8 +241,7 @@ class LoginCommand extends Command {
         (args.options.ensure && !auth.connection.active) ||
         (args.options.ensure && (args.options.userName && args.options.userName !== auth.connection.userName)) ||
         (args.options.ensure && (args.options.certificateFile && (auth.connection.certificate !== fs.readFileSync(args.options.certificateFile as string, 'base64')))) ||
-        (args.options.ensure && args.options.appId && args.options.appId !== auth.connection.appId && (!args.options.tenant || args.options.tenant !== auth.connection.tenant)) ||
-        (args.options.ensure && args.options.authType !== 'identity' && auth.connection.authType !== AuthType.DeviceCode)
+        (args.options.ensure && args.options.appId && args.options.appId !== auth.connection.appId && (!args.options.tenant || args.options.tenant !== auth.connection.tenant))
       ) {
         deactivate();
       }
