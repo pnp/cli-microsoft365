@@ -32,9 +32,9 @@ We removed several aliases to align commands with our naming convention. The fol
 
 Alias | Command | Reason
 --|--|--
-`aad app delete` | [aad app remove](./cmd/aad/app/app-remove.mdx) | Removed to align with the naming convention.
-`aad app role delete` | [aad app role remove](./cmd/aad/app/app-role-remove.mdx) | Removed to align with the naming convention.
-`aad o365group restore` | [aad o365group recyclebinitem restore](./cmd/aad/m365group/m365group-recyclebinitem-restore.mdx) | Renamed to better match intention and naming convention.
+`entra app delete` | [entra app remove](./cmd/entra/app/app-remove.mdx) | Removed to align with the naming convention.
+`entra app role delete` | [entra app role remove](./cmd/entra/app/app-role-remove.mdx) | Removed to align with the naming convention.
+`entra o365group restore` | [entra o365group recyclebinitem restore](./cmd/entra/m365group/m365group-recyclebinitem-restore.mdx) | Renamed to better match intention and naming convention.
 `outlook sendmail` | [outlook mail send](./cmd/outlook/mail/mail-send.mdx) | Renamed to better match intention and naming convention.
 `planner plan details get` | [planner plan get](./cmd/planner/plan/plan-get.mdx) | Functionality merged in a single get-command.
 `planner task details get` | [planner task get](./cmd/planner/task/task-get.mdx) | Functionality merged in a single get-command.
@@ -191,7 +191,7 @@ Update your scripts to expect a single object instead of an array.
 
 ## Updated `spo group user <verb>` commands
 
-We've renamed the `spo group user <verb>` commands to `spo group member <verb>` to better cover all possible scenarios. In the near future we'll be adding support to add Azure AD Groups as group member. Using `spo group member` better fits the intended situation of adding either users or Azure AD groups.
+We've renamed the `spo group user <verb>` commands to `spo group member <verb>` to better cover all possible scenarios. In the near future we'll be adding support to add Entra ID Groups as group member. Using `spo group member` better fits the intended situation of adding either users or Entra ID groups.
 
 As a side issue, we've also updated the response output of the `spo group member list` command in JSON output mode. This returned a member array within a parent `value` object. In the new situation, the command returns the array without the parent `value` object.
 
@@ -241,19 +241,19 @@ We've updated the following commands and options:
 
 Command|Old option|New option
 --|--|--
-[aad approleassignment add](./cmd/aad/approleassignment/approleassignment-add.mdx)|`objectId`|`appObjectId`
-[aad approleassignment add](./cmd/aad/approleassignment/approleassignment-add.mdx)|`displayName`|`appDisplayName`
-[aad approleassignment list](./cmd/aad/approleassignment/approleassignment-list.mdx)|`objectId`|`appObjectId`
-[aad approleassignment list](./cmd/aad/approleassignment/approleassignment-list.mdx)|`displayName`|`appDisplayName`
-[aad approleassignment remove](./cmd/aad/approleassignment/approleassignment-remove.mdx)|`objectId`|`appObjectId`
-[aad approleassignment remove](./cmd/aad/approleassignment/approleassignment-remove.mdx)|`displayName`|`appDisplayName`
-[aad o365group add](./cmd/aad/m365group/m365group-add.mdx)|`isPrivate [isPrivate]`|`isPrivate` (changed to flag)
-[aad o365group recyclebinitem list](./cmd/aad/m365group/m365group-recyclebinitem-list.mdx)|`displayName`|`groupDisplayName`
-[aad o365group recyclebinitem list](./cmd/aad/m365group/m365group-recyclebinitem-list.mdx)|`mailNickname`|`groupMailNickname`
-[aad o365group teamify](./cmd/aad/m365group/m365group-teamify.mdx)|`groupId`|`id`
-[aad policy list](./cmd/aad/policy/policy-list.mdx)|`policyType`|`type`
-[aad sp get](./cmd/aad/sp/sp-get.mdx)|`displayName`|`appDisplayName`
-[aad sp get](./cmd/aad/sp/sp-get.mdx)|`objectId`|`appObjectId`
+[entra approleassignment add](./cmd/entra/approleassignment/approleassignment-add.mdx)|`objectId`|`appObjectId`
+[entra approleassignment add](./cmd/entra/approleassignment/approleassignment-add.mdx)|`displayName`|`appDisplayName`
+[entra approleassignment list](./cmd/entra/approleassignment/approleassignment-list.mdx)|`objectId`|`appObjectId`
+[entra approleassignment list](./cmd/entra/approleassignment/approleassignment-list.mdx)|`displayName`|`appDisplayName`
+[entra approleassignment remove](./cmd/entra/approleassignment/approleassignment-remove.mdx)|`objectId`|`appObjectId`
+[entra approleassignment remove](./cmd/entra/approleassignment/approleassignment-remove.mdx)|`displayName`|`appDisplayName`
+[entra o365group add](./cmd/entra/m365group/m365group-add.mdx)|`isPrivate [isPrivate]`|`isPrivate` (changed to flag)
+[entra o365group recyclebinitem list](./cmd/entra/m365group/m365group-recyclebinitem-list.mdx)|`displayName`|`groupDisplayName`
+[entra o365group recyclebinitem list](./cmd/entra/m365group/m365group-recyclebinitem-list.mdx)|`mailNickname`|`groupMailNickname`
+[entra o365group teamify](./cmd/entra/m365group/m365group-teamify.mdx)|`groupId`|`id`
+[entra policy list](./cmd/entra/policy/policy-list.mdx)|`policyType`|`type`
+[entra sp get](./cmd/entra/sp/sp-get.mdx)|`displayName`|`appDisplayName`
+[entra sp get](./cmd/entra/sp/sp-get.mdx)|`objectId`|`appObjectId`
 [flow disable](./cmd/flow/flow-disable.mdx)|`environment`|`environmentName`
 [flow enable](./cmd/flow/flow-enable.mdx)|`environment`|`environmentName`
 [flow export](./cmd/flow/flow-export.mdx)|`environment`|`environmentName`

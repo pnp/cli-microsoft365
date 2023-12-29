@@ -5,50 +5,50 @@ import TabItem from '@theme/TabItem';
 
 The v7 of CLI for Microsoft 365 introduces several breaking changes. To help you upgrade to the latest version of CLI for Microsoft 365, we've listed those changes along with any actions you may need to take.
 
-## Azure Active Directory
+## Entra ID
 
-### Renamed `aad o365group` commands to `aad m365group`
+### Renamed `entra o365group` commands to `entra m365group`
 
-In version 7 of the CLI for Microsoft 365, we have renamed all `aad o365group` commands to `aad m365group`. It has been some time since Office 365 was renamed to Microsoft 365. Office 365 groups have been named Microsoft 365 groups since then. It was time for CLI for Microsoft 365 to go along with this change.
+In version 7 of the CLI for Microsoft 365, we have renamed all `entra o365group` commands to `entra m365group`. It has been some time since Office 365 was renamed to Microsoft 365. Office 365 groups have been named Microsoft 365 groups since then. It was time for CLI for Microsoft 365 to go along with this change.
 
 #### What action do I need to take?
 
-Replace every `aad o365group` command with its `aad m365group` equivalent in your scripts.
+Replace every `entra o365group` command with its `entra m365group` equivalent in your scripts.
 
 
-### Removed `deleted` flag from certain `aad` commands
+### Removed `deleted` flag from certain `entra` commands
 
-In previous versions of CLI for Microsoft 365, we had a few commands under the Azure AD group that had a `--deleted` flag. This flag was used to get deleted users and groups in Azure AD. In this major release, we have removed this flag from the commands. To get all deleted users and groups in your tenant, you should now use different commands.
+In previous versions of CLI for Microsoft 365, we had a few commands under the Entra ID group that had a `--deleted` flag. This flag was used to get deleted users and groups in Entra ID. In this major release, we have removed this flag from the commands. To get all deleted users and groups in your tenant, you should now use different commands.
 
 **Affected commands:**
 
 Old way | New way
 --- | ---
-`aad group list --deleted` [^1] | [aad m365group recyclebinitem list](./cmd/aad/m365group/m365group-recyclebinitem-list.mdx)
-`aad o365group list --deleted` | [aad m365group recyclebinitem list](./cmd/aad/m365group/m365group-recyclebinitem-list.mdx)
-`aad user list --deleted` | [aad user recyclebinitem list](./cmd/aad/user/user-recyclebinitem-list.mdx)
+`entra group list --deleted` [^1] | [entra m365group recyclebinitem list](./cmd/entra/m365group/m365group-recyclebinitem-list.mdx)
+`entra o365group list --deleted` | [entra m365group recyclebinitem list](./cmd/entra/m365group/m365group-recyclebinitem-list.mdx)
+`entra user list --deleted` | [entra user recyclebinitem list](./cmd/entra/user/user-recyclebinitem-list.mdx)
 
 #### What action do I need to take?
 
 Use the above table to replace the old commands with the new ones in your scripts.
 
-### All `aad m365group` commands now only work with Microsoft 365 groups
+### All `entra m365group` commands now only work with Microsoft 365 groups
 
-Previously using `aad m365group` commands allowed to retrieve, update, or remove other than just M365 groups. In version 7 of the CLI for Microsoft 365, we added an additional validation that will throw an error when you are using the command against groups that are not unified (Microsoft 365 group).
+Previously using `entra m365group` commands allowed to retrieve, update, or remove other than just M365 groups. In version 7 of the CLI for Microsoft 365, we added an additional validation that will throw an error when you are using the command against groups that are not unified (Microsoft 365 group).
 
 **Affected commands:**
 
-- [aad m365group get](./cmd/aad/m365group/m365group-get.mdx)
-- [aad m365group remove](./cmd/aad/m365group/m365group-remove.mdx)
-- [aad m365group renew](./cmd/aad/m365group/m365group-renew.mdx)
-- [aad m365group set](./cmd/aad/m365group/m365group-set.mdx)
-- [aad m365group teamify](./cmd/aad/m365group/m365group-teamify.mdx)
-- [aad m365group conversation list](./cmd/aad/m365group/m365group-conversation-list.mdx)
-- [aad m365group conversation post list](./cmd/aad/m365group/m365group-conversation-post-list.mdx)
-- [aad m365group user add](./cmd/aad/m365group/m365group-user-add.mdx)
-- [aad m365group user list](./cmd/aad/m365group/m365group-user-list.mdx)
-- [aad m365group user remove](./cmd/aad/m365group/m365group-user-remove.mdx)
-- [aad m365group user set](./cmd/aad/m365group/m365group-user-set.mdx)
+- [entra m365group get](./cmd/entra/m365group/m365group-get.mdx)
+- [entra m365group remove](./cmd/entra/m365group/m365group-remove.mdx)
+- [entra m365group renew](./cmd/entra/m365group/m365group-renew.mdx)
+- [entra m365group set](./cmd/entra/m365group/m365group-set.mdx)
+- [entra m365group teamify](./cmd/entra/m365group/m365group-teamify.mdx)
+- [entra m365group conversation list](./cmd/entra/m365group/m365group-conversation-list.mdx)
+- [entra m365group conversation post list](./cmd/entra/m365group/m365group-conversation-post-list.mdx)
+- [entra m365group user add](./cmd/entra/m365group/m365group-user-add.mdx)
+- [entra m365group user list](./cmd/entra/m365group/m365group-user-list.mdx)
+- [entra m365group user remove](./cmd/entra/m365group/m365group-user-remove.mdx)
+- [entra m365group user set](./cmd/entra/m365group/m365group-user-set.mdx)
 
 #### What action do I need to take?
 
@@ -351,7 +351,7 @@ In the past versions of CLI for Microsoft 365, the command [teams meeting list](
               "id": "b2091e18-7882-4efe-b7d1-90703f5a5c65",
               "displayName": null,
               "tenantId": "ad4f158a-97c7-4914-a9bd-038ecde40ff3",
-              "identityProvider": "AAD"
+              "identityProvider": "ENTRA"
             }
           }
         },
@@ -366,7 +366,7 @@ In the past versions of CLI for Microsoft 365, the command [teams meeting list](
                 "id": "52bd2d9c-2d89-416f-96c4-ca94245e22c8",
                 "displayName": null,
                 "tenantId": "ad4f158a-97c7-4914-a9bd-038ecde40ff3",
-                "identityProvider": "AAD"
+                "identityProvider": "ENTRA"
               }
             }
           }
@@ -425,12 +425,12 @@ We've updated the following commands and options:
 
 Command|Old option|New option
 --|--|--
-[aad app set](./cmd/aad/app/app-set.mdx)|`uri`|`uris`
-[aad approleassignment add](./cmd/aad/approleassignment/approleassignment-add.mdx)|`scope`|`scopes`
-[aad approleassignment remove](./cmd/aad/approleassignment/approleassignment-remove.mdx)|`scope`|`scopes`
-[aad group get](./cmd/aad/group/group-get.mdx)|`title`|`displayName`
-[aad user set](./cmd/aad/user/user-set.mdx)|`objectId`|`id`
-[aad user set](./cmd/aad/user/user-set.mdx)|`userPrincipalName`|`userName`
+[entra app set](./cmd/entra/app/app-set.mdx)|`uri`|`uris`
+[entra approleassignment add](./cmd/entra/approleassignment/approleassignment-add.mdx)|`scope`|`scopes`
+[entra approleassignment remove](./cmd/entra/approleassignment/approleassignment-remove.mdx)|`scope`|`scopes`
+[entra group get](./cmd/entra/group/group-get.mdx)|`title`|`displayName`
+[entra user set](./cmd/entra/user/user-set.mdx)|`objectId`|`id`
+[entra user set](./cmd/entra/user/user-set.mdx)|`userPrincipalName`|`userName`
 [flow connector export](./cmd/pa/connector/connector-export.mdx)|`connector`|`name`
 [flow export](./cmd/teams/channel/channel-member-add.mdx)|`id`|`name`
 [graph subscription add](./cmd/graph/subscription/subscription-add.mdx)|`changeType`|`changeTypes`

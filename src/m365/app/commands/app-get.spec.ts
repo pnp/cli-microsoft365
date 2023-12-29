@@ -173,6 +173,6 @@ describe(commands.GET, () => {
       }
     });
     const call: sinon.SinonSpyCall = loggerLogToStderrSpy.firstCall;
-    assert(call.args[0].includes('Executing command aad app get with options'));
+    assert(call.args[0].includes('Executing command entra app get with options'));
   });
 });

@@ -10,7 +10,7 @@ import { formatting } from '../../../../utils/formatting.js';
 import { ClientSvcResponse, ClientSvcResponseContents, FormDigestInfo, spo, SpoOperation } from '../../../../utils/spo.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
 import { validation } from '../../../../utils/validation.js';
-import aadM365GroupSetCommand, { Options as AadM365GroupSetCommandOptions } from '../../../aad/commands/m365group/m365group-set.js';
+import aadM365GroupSetCommand, { Options as AadM365GroupSetCommandOptions } from '../../../entra/commands/m365group/m365group-set.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 import { SharingCapabilities } from '../site/SharingCapabilities.js';

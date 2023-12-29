@@ -24,43 +24,43 @@ const sidebars: SidebarsConfig = {
     'cmd/status',
     'cmd/version',
     {
-      'Azure Active Directory (aad)': [
+      'Entra ID (entra)': [
         {
           administrativeunit: [
             {
               type: 'doc',
               label: 'administrativeunit add',
-              id: 'cmd/aad/administrativeunit/administrativeunit-add'
+              id: 'cmd/entra/administrativeunit/administrativeunit-add'
             },
             {
               type: 'doc',
               label: 'administrativeunit get',
-              id: 'cmd/aad/administrativeunit/administrativeunit-get'
+              id: 'cmd/entra/administrativeunit/administrativeunit-get'
             },
             {
               type: 'doc',
               label: 'administrativeunit list',
-              id: 'cmd/aad/administrativeunit/administrativeunit-list'
+              id: 'cmd/entra/administrativeunit/administrativeunit-list'
             },
             {
               type: 'doc',
               label: 'administrativeunit remove',
-              id: 'cmd/aad/administrativeunit/administrativeunit-remove'
+              id: 'cmd/entra/administrativeunit/administrativeunit-remove'
             },
             {
               type: 'doc',
               label: 'administrativeunit member add',
-              id: 'cmd/aad/administrativeunit/administrativeunit-member-add'
+              id: 'cmd/entra/administrativeunit/administrativeunit-member-add'
             },
             {
               type: 'doc',
               label: 'administrativeunit member get',
-              id: 'cmd/aad/administrativeunit/administrativeunit-member-get'
+              id: 'cmd/entra/administrativeunit/administrativeunit-member-get'
             },
             {
               type: 'doc',
               label: 'administrativeunit member list',
-              id: 'cmd/aad/administrativeunit/administrativeunit-member-list'
+              id: 'cmd/entra/administrativeunit/administrativeunit-member-list'
             }
           ]
         },
@@ -69,47 +69,47 @@ const sidebars: SidebarsConfig = {
             {
               type: 'doc',
               label: 'app add',
-              id: 'cmd/aad/app/app-add'
+              id: 'cmd/entra/app/app-add'
             },
             {
               type: 'doc',
               label: 'app get',
-              id: 'cmd/aad/app/app-get'
+              id: 'cmd/entra/app/app-get'
             },
             {
               type: 'doc',
               label: 'app list',
-              id: 'cmd/aad/app/app-list'
+              id: 'cmd/entra/app/app-list'
             },
             {
               type: 'doc',
               label: 'app remove',
-              id: 'cmd/aad/app/app-remove'
+              id: 'cmd/entra/app/app-remove'
             },
             {
               type: 'doc',
               label: 'app set',
-              id: 'cmd/aad/app/app-set'
+              id: 'cmd/entra/app/app-set'
             },
             {
               type: 'doc',
               label: 'app permission add',
-              id: 'cmd/aad/app/app-permission-add'
+              id: 'cmd/entra/app/app-permission-add'
             },
             {
               type: 'doc',
               label: 'app role add',
-              id: 'cmd/aad/app/app-role-add'
+              id: 'cmd/entra/app/app-role-add'
             },
             {
               type: 'doc',
               label: 'app role list',
-              id: 'cmd/aad/app/app-role-list'
+              id: 'cmd/entra/app/app-role-list'
             },
             {
               type: 'doc',
               label: 'app role remove',
-              id: 'cmd/aad/app/app-role-remove'
+              id: 'cmd/entra/app/app-role-remove'
             }
           ]
         },
@@ -118,17 +118,17 @@ const sidebars: SidebarsConfig = {
             {
               type: 'doc',
               label: 'approleassignment add',
-              id: 'cmd/aad/approleassignment/approleassignment-add'
+              id: 'cmd/entra/approleassignment/approleassignment-add'
             },
             {
               type: 'doc',
               label: 'approleassignment list',
-              id: 'cmd/aad/approleassignment/approleassignment-list'
+              id: 'cmd/entra/approleassignment/approleassignment-list'
             },
             {
               type: 'doc',
               label: 'approleassignment remove',
-              id: 'cmd/aad/approleassignment/approleassignment-remove'
+              id: 'cmd/entra/approleassignment/approleassignment-remove'
             }
           ]
         },
@@ -137,22 +137,22 @@ const sidebars: SidebarsConfig = {
             {
               type: 'doc',
               label: 'group get',
-              id: 'cmd/aad/group/group-get'
+              id: 'cmd/entra/group/group-get'
             },
             {
               type: 'doc',
               label: 'group list',
-              id: 'cmd/aad/group/group-list'
+              id: 'cmd/entra/group/group-list'
             },
             {
               type: 'doc',
               label: 'group remove',
-              id: 'cmd/aad/group/group-remove'
+              id: 'cmd/entra/group/group-remove'
             },
             {
               type: 'doc',
               label: 'group user list',
-              id: 'cmd/aad/group/group-user-list'
+              id: 'cmd/entra/group/group-user-list'
             }
           ]
         },
@@ -161,27 +161,27 @@ const sidebars: SidebarsConfig = {
             {
               type: 'doc',
               label: 'groupsetting add',
-              id: 'cmd/aad/groupsetting/groupsetting-add'
+              id: 'cmd/entra/groupsetting/groupsetting-add'
             },
             {
               type: 'doc',
               label: 'groupsetting get',
-              id: 'cmd/aad/groupsetting/groupsetting-get'
+              id: 'cmd/entra/groupsetting/groupsetting-get'
             },
             {
               type: 'doc',
               label: 'groupsetting list',
-              id: 'cmd/aad/groupsetting/groupsetting-list'
+              id: 'cmd/entra/groupsetting/groupsetting-list'
             },
             {
               type: 'doc',
               label: 'groupsetting remove',
-              id: 'cmd/aad/groupsetting/groupsetting-remove'
+              id: 'cmd/entra/groupsetting/groupsetting-remove'
             },
             {
               type: 'doc',
               label: 'groupsetting set',
-              id: 'cmd/aad/groupsetting/groupsetting-set'
+              id: 'cmd/entra/groupsetting/groupsetting-set'
             }
           ]
         },
@@ -190,12 +190,12 @@ const sidebars: SidebarsConfig = {
             {
               type: 'doc',
               label: 'groupsettingtemplate get',
-              id: 'cmd/aad/groupsettingtemplate/groupsettingtemplate-get'
+              id: 'cmd/entra/groupsettingtemplate/groupsettingtemplate-get'
             },
             {
               type: 'doc',
               label: 'groupsettingtemplate list',
-              id: 'cmd/aad/groupsettingtemplate/groupsettingtemplate-list'
+              id: 'cmd/entra/groupsettingtemplate/groupsettingtemplate-list'
             }
           ]
         },
@@ -204,7 +204,7 @@ const sidebars: SidebarsConfig = {
             {
               type: 'doc',
               label: 'license list',
-              id: 'cmd/aad/license/license-list'
+              id: 'cmd/entra/license/license-list'
             }
           ]
         },
@@ -213,112 +213,112 @@ const sidebars: SidebarsConfig = {
             {
               type: 'doc',
               label: 'm365group add',
-              id: 'cmd/aad/m365group/m365group-add'
+              id: 'cmd/entra/m365group/m365group-add'
             },
             {
               type: 'doc',
               label: 'm365group get',
-              id: 'cmd/aad/m365group/m365group-get'
+              id: 'cmd/entra/m365group/m365group-get'
             },
             {
               type: 'doc',
               label: 'm365group list',
-              id: 'cmd/aad/m365group/m365group-list'
+              id: 'cmd/entra/m365group/m365group-list'
             },
             {
               type: 'doc',
               label: 'm365group remove',
-              id: 'cmd/aad/m365group/m365group-remove'
+              id: 'cmd/entra/m365group/m365group-remove'
             },
             {
               type: 'doc',
               label: 'm365group renew',
-              id: 'cmd/aad/m365group/m365group-renew'
+              id: 'cmd/entra/m365group/m365group-renew'
             },
             {
               type: 'doc',
               label: 'm365group set',
-              id: 'cmd/aad/m365group/m365group-set'
+              id: 'cmd/entra/m365group/m365group-set'
             },
             {
               type: 'doc',
               label: 'm365group teamify',
-              id: 'cmd/aad/m365group/m365group-teamify'
+              id: 'cmd/entra/m365group/m365group-teamify'
             },
             {
               type: 'doc',
               label: 'm365group conversation list',
-              id: 'cmd/aad/m365group/m365group-conversation-list'
+              id: 'cmd/entra/m365group/m365group-conversation-list'
             },
             {
               type: 'doc',
               label: 'm365group conversation post list',
-              id: 'cmd/aad/m365group/m365group-conversation-post-list'
+              id: 'cmd/entra/m365group/m365group-conversation-post-list'
             },
             {
               type: 'doc',
               label: 'm365group recyclebinitem clear',
-              id: 'cmd/aad/m365group/m365group-recyclebinitem-clear'
+              id: 'cmd/entra/m365group/m365group-recyclebinitem-clear'
             },
             {
               type: 'doc',
               label: 'm365group recyclebinitem list',
-              id: 'cmd/aad/m365group/m365group-recyclebinitem-list'
+              id: 'cmd/entra/m365group/m365group-recyclebinitem-list'
             },
             {
               type: 'doc',
               label: 'm365group recyclebinitem remove',
-              id: 'cmd/aad/m365group/m365group-recyclebinitem-remove'
+              id: 'cmd/entra/m365group/m365group-recyclebinitem-remove'
             },
             {
               type: 'doc',
               label: 'm365group recyclebinitem restore',
-              id: 'cmd/aad/m365group/m365group-recyclebinitem-restore'
+              id: 'cmd/entra/m365group/m365group-recyclebinitem-restore'
             },
             {
               type: 'doc',
               label: 'm365group report activitycounts',
-              id: 'cmd/aad/m365group/m365group-report-activitycounts'
+              id: 'cmd/entra/m365group/m365group-report-activitycounts'
             },
             {
               type: 'doc',
               label: 'm365group report activitydetail',
-              id: 'cmd/aad/m365group/m365group-report-activitydetail'
+              id: 'cmd/entra/m365group/m365group-report-activitydetail'
             },
             {
               type: 'doc',
               label: 'm365group report activityfilecounts',
-              id: 'cmd/aad/m365group/m365group-report-activityfilecounts'
+              id: 'cmd/entra/m365group/m365group-report-activityfilecounts'
             },
             {
               type: 'doc',
               label: 'm365group report activitygroupcounts',
-              id: 'cmd/aad/m365group/m365group-report-activitygroupcounts'
+              id: 'cmd/entra/m365group/m365group-report-activitygroupcounts'
             },
             {
               type: 'doc',
               label: 'm365group report activitystorage',
-              id: 'cmd/aad/m365group/m365group-report-activitystorage'
+              id: 'cmd/entra/m365group/m365group-report-activitystorage'
             },
             {
               type: 'doc',
               label: 'm365group user add',
-              id: 'cmd/aad/m365group/m365group-user-add'
+              id: 'cmd/entra/m365group/m365group-user-add'
             },
             {
               type: 'doc',
               label: 'm365group user list',
-              id: 'cmd/aad/m365group/m365group-user-list'
+              id: 'cmd/entra/m365group/m365group-user-list'
             },
             {
               type: 'doc',
               label: 'm365group user remove',
-              id: 'cmd/aad/m365group/m365group-user-remove'
+              id: 'cmd/entra/m365group/m365group-user-remove'
             },
             {
               type: 'doc',
               label: 'm365group user set',
-              id: 'cmd/aad/m365group/m365group-user-set'
+              id: 'cmd/entra/m365group/m365group-user-set'
             }
           ]
         },
@@ -327,22 +327,22 @@ const sidebars: SidebarsConfig = {
             {
               type: 'doc',
               label: 'oauth2grant add',
-              id: 'cmd/aad/oauth2grant/oauth2grant-add'
+              id: 'cmd/entra/oauth2grant/oauth2grant-add'
             },
             {
               type: 'doc',
               label: 'oauth2grant list',
-              id: 'cmd/aad/oauth2grant/oauth2grant-list'
+              id: 'cmd/entra/oauth2grant/oauth2grant-list'
             },
             {
               type: 'doc',
               label: 'oauth2grant remove',
-              id: 'cmd/aad/oauth2grant/oauth2grant-remove'
+              id: 'cmd/entra/oauth2grant/oauth2grant-remove'
             },
             {
               type: 'doc',
               label: 'oauth2grant set',
-              id: 'cmd/aad/oauth2grant/oauth2grant-set'
+              id: 'cmd/entra/oauth2grant/oauth2grant-set'
             }
           ]
         },
@@ -351,7 +351,7 @@ const sidebars: SidebarsConfig = {
             {
               type: 'doc',
               label: 'policy list',
-              id: 'cmd/aad/policy/policy-list'
+              id: 'cmd/entra/policy/policy-list'
             }
           ]
         },
@@ -360,22 +360,22 @@ const sidebars: SidebarsConfig = {
             {
               type: 'doc',
               label: 'siteclassification disable',
-              id: 'cmd/aad/siteclassification/siteclassification-disable'
+              id: 'cmd/entra/siteclassification/siteclassification-disable'
             },
             {
               type: 'doc',
               label: 'siteclassification enable',
-              id: 'cmd/aad/siteclassification/siteclassification-enable'
+              id: 'cmd/entra/siteclassification/siteclassification-enable'
             },
             {
               type: 'doc',
               label: 'siteclassification get',
-              id: 'cmd/aad/siteclassification/siteclassification-get'
+              id: 'cmd/entra/siteclassification/siteclassification-get'
             },
             {
               type: 'doc',
               label: 'siteclassification set',
-              id: 'cmd/aad/siteclassification/siteclassification-set'
+              id: 'cmd/entra/siteclassification/siteclassification-set'
             }
           ]
         },
@@ -384,17 +384,17 @@ const sidebars: SidebarsConfig = {
             {
               type: 'doc',
               label: 'sp add',
-              id: 'cmd/aad/sp/sp-add'
+              id: 'cmd/entra/sp/sp-add'
             },
             {
               type: 'doc',
               label: 'sp get',
-              id: 'cmd/aad/sp/sp-get'
+              id: 'cmd/entra/sp/sp-get'
             },
             {
               type: 'doc',
               label: 'sp list',
-              id: 'cmd/aad/sp/sp-list'
+              id: 'cmd/entra/sp/sp-list'
             }
           ]
         },
@@ -403,82 +403,82 @@ const sidebars: SidebarsConfig = {
             {
               type: 'doc',
               label: 'user add',
-              id: 'cmd/aad/user/user-add'
+              id: 'cmd/entra/user/user-add'
             },
             {
               type: 'doc',
               label: 'user get',
-              id: 'cmd/aad/user/user-get'
+              id: 'cmd/entra/user/user-get'
             },
             {
               type: 'doc',
               label: 'user hibp',
-              id: 'cmd/aad/user/user-hibp'
+              id: 'cmd/entra/user/user-hibp'
             },
             {
               type: 'doc',
               label: 'user list',
-              id: 'cmd/aad/user/user-list'
+              id: 'cmd/entra/user/user-list'
             },
             {
               type: 'doc',
               label: 'user remove',
-              id: 'cmd/aad/user/user-remove'
+              id: 'cmd/entra/user/user-remove'
             },
             {
               type: 'doc',
               label: 'user set',
-              id: 'cmd/aad/user/user-set'
+              id: 'cmd/entra/user/user-set'
             },
             {
               type: 'doc',
               label: 'user guest add',
-              id: 'cmd/aad/user/user-guest-add'
+              id: 'cmd/entra/user/user-guest-add'
             },
             {
               type: 'doc',
               label: 'user license add',
-              id: 'cmd/aad/user/user-license-add'
+              id: 'cmd/entra/user/user-license-add'
             },
             {
               type: 'doc',
               label: 'user license list',
-              id: 'cmd/aad/user/user-license-list'
+              id: 'cmd/entra/user/user-license-list'
             },
             {
               type: 'doc',
               label: 'user license remove',
-              id: 'cmd/aad/user/user-license-remove'
+              id: 'cmd/entra/user/user-license-remove'
             },
             {
               type: 'doc',
               label: 'user password validate',
-              id: 'cmd/aad/user/user-password-validate'
+              id: 'cmd/entra/user/user-password-validate'
             },
             {
               type: 'doc',
               label: 'user recyclebinitem clear',
-              id: 'cmd/aad/user/user-recyclebinitem-clear'
+              id: 'cmd/entra/user/user-recyclebinitem-clear'
             },
             {
               type: 'doc',
               label: 'user recyclebinitem list',
-              id: 'cmd/aad/user/user-recyclebinitem-list'
+              id: 'cmd/entra/user/user-recyclebinitem-list'
             },
             {
               type: 'doc',
               label: 'user recyclebinitem remove',
-              id: 'cmd/aad/user/user-recyclebinitem-remove'
+              id: 'cmd/entra/user/user-recyclebinitem-remove'
             },
             {
               type: 'doc',
               label: 'user recyclebinitem restore',
-              id: 'cmd/aad/user/user-recyclebinitem-restore'
+              id: 'cmd/entra/user/user-recyclebinitem-restore'
             },
             {
               type: 'doc',
               label: 'user signin list',
-              id: 'cmd/aad/user/user-signin-list'
+              id: 'cmd/entra/user/user-signin-list'
             }
           ]
         }
@@ -4038,7 +4038,7 @@ const sidebars: SidebarsConfig = {
             {
               type: 'doc',
               label: 'user add',
-              id: 'cmd/aad/m365group/m365group-user-add'
+              id: 'cmd/entra/m365group/m365group-user-add'
             },
             {
               type: 'doc',
@@ -4048,12 +4048,12 @@ const sidebars: SidebarsConfig = {
             {
               type: 'doc',
               label: 'user remove',
-              id: 'cmd/aad/m365group/m365group-user-remove'
+              id: 'cmd/entra/m365group/m365group-user-remove'
             },
             {
               type: 'doc',
               label: 'user set',
-              id: 'cmd/aad/m365group/m365group-user-set'
+              id: 'cmd/entra/m365group/m365group-user-set'
             },
             {
               type: 'doc',

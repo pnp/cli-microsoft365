@@ -6,7 +6,7 @@ import GlobalOptions from '../../../../GlobalOptions.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 import { odata } from '../../../../utils/odata.js';
 import { validation } from '../../../../utils/validation.js';
-import aadUserGetCommand, { Options as AadUserGetCommandOptions } from '../../../aad/commands/user/user-get.js';
+import aadUserGetCommand, { Options as AadUserGetCommandOptions } from '../../../entra/commands/user/user-get.js';
 import GraphCommand from "../../../base/GraphCommand.js";
 import commands from '../../commands.js';
 

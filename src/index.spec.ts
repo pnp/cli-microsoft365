@@ -2,7 +2,7 @@ import assert from 'assert';
 import fs from 'fs';
 import path from 'path';
 import url from 'url';
-import * as aadCommands from './m365/aad/commands.js';
+import * as aadCommands from './m365/entra/commands.js';
 import * as cliCommands from './m365/cli/commands.js';
 import * as globalCommands from './m365/commands/commands.js';
 import * as flowCommands from './m365/flow/commands.js';
