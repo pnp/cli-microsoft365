@@ -3,7 +3,7 @@ import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import Command from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
-import appGetCommand, { Options as AppGetCommandOptions } from '../../../aad/commands/app/app-get.js';
+import appGetCommand, { Options as AppGetCommandOptions } from '../../../entra/commands/app/app-get.js';
 import AppCommand from '../../../base/AppCommand.js';
 import commands from '../../commands.js';
 

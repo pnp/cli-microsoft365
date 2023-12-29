@@ -11,7 +11,7 @@ import { accessToken } from '../../../../utils/accessToken.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
-import userGetCommand from '../../../aad/commands/user/user-get.js';
+import userGetCommand from '../../../entra/commands/user/user-get.js';
 import commands from '../../commands.js';
 import command from './meeting-attendancereport-list.js';
 

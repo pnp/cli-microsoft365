@@ -55,7 +55,7 @@ Uninstalls an app from the specified users and / or unpublish it from the Micros
     if ($Uninstall) {
       if ($CurrentUser) {
         # Getting the reference of the currently connected user
-        $user = m365 aad user get --id "@meId" -o json | ConvertFrom-Json
+        $user = m365 entra user get --id "@meId" -o json | ConvertFrom-Json
 
         if ($user) {
           $Users += $user.userPrincipalName
@@ -64,7 +64,7 @@ Uninstalls an app from the specified users and / or unpublish it from the Micros
 
       if ($Users.Length -gt 0) {
         $Users | ForEach-Object {
-          $user = m365 aad user get --userName $_ -o json | ConvertFrom-Json
+          $user = m365 entra user get --userName $_ -o json | ConvertFrom-Json
           $userApp = m365 teams user app list --userId $user.id --query "[?appId == '$($app.id)']" -o json | ConvertFrom-Json
 
           if ($userApp) {

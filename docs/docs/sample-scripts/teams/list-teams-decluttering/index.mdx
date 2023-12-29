@@ -86,7 +86,7 @@ For a full overview and a complete decluttering experience, the calling user nee
       $SPOSite, $TeamUsers, $TeamOwners, $TeamMembers, $TeamGuests, $TeamChannels = $null
 
       Write-Progress -Activity "Getting infos for team" -PercentComplete (100 * $i / $Global:AllTeamsInOrg.Length) -Status "$($Team.DisplayName)"
-      $TeamGroup = m365 aad m365group get --id $Team.id --includeSiteUrl | ConvertFrom-Json
+      $TeamGroup = m365 entra m365group get --id $Team.id --includeSiteUrl | ConvertFrom-Json
       if ($TeamGroup.siteUrl) {
         $SPOSite = m365 spo site get --url $TeamGroup.siteUrl | ConvertFrom-Json
         $SPOSite = m365 spo site list --filter "Url -eq '$($TeamGroup.siteUrl)'" | ConvertFrom-Json

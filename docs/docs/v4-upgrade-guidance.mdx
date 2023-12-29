@@ -51,20 +51,20 @@ In `spo listitem` commands, we were returning raw data from the SharePoint API, 
 
 If you read list item IDs in scripts built using CLI for Microsoft 365, update your code to use the `Id` property.
 
-## Separated `aad o365group user list` from `teams user list`
+## Separated `entra o365group user list` from `teams user list`
 
-In the previous versions of CLI for Microsoft 365, the `teams user list` command was an alias of the `aad o365group user list` command and you could use either name in conjunction with Teams- or Office 365 groups-specific options. This led to confusion. As the CLI for Microsoft 365 evolved, we decided to split the commands and use only options specific to each workload.
+In the previous versions of CLI for Microsoft 365, the `teams user list` command was an alias of the `entra o365group user list` command and you could use either name in conjunction with Teams- or Office 365 groups-specific options. This led to confusion. As the CLI for Microsoft 365 evolved, we decided to split the commands and use only options specific to each workload.
 
 ***What action do I need to take?***
 
-In the `aad o365group user list` command, you can only use the `--groupId` option which is now required. Use this command when working with Office 365 groups.
+In the `entra o365group user list` command, you can only use the `--groupId` option which is now required. Use this command when working with Office 365 groups.
 
 When working with Microsoft Teams teams, use the `teams user list` command for which you need to use the required `--teamId` option.
 
-## Separated `aad o365group get` from `teams team get`
+## Separated `entra o365group get` from `teams team get`
 
-In the previous version of CLI for Microsoft 365, the `teams team get` command was an alias of the `aad o365group get` command. The `aad o365group get` command uses the `groups` endpoint from Microsoft Graph to retrieve information about Office 365 groups. With the release of the `teams` endpoint on Microsoft Graph, which returns specific information about Microsoft Teams teams, we decided to separate the two commands to allow you to retrieve the relevant information that you need to work with both workloads.
+In the previous version of CLI for Microsoft 365, the `teams team get` command was an alias of the `entra o365group get` command. The `entra o365group get` command uses the `groups` endpoint from Microsoft Graph to retrieve information about Office 365 groups. With the release of the `teams` endpoint on Microsoft Graph, which returns specific information about Microsoft Teams teams, we decided to separate the two commands to allow you to retrieve the relevant information that you need to work with both workloads.
 
 ***What action do I need to take?***
 
-If you use the `aad o365group get` command to retrieve information about Office 365 groups, you don't need to change anything. If you use the `teams team get` command to retrieve information about Teams, verify the new type of data returned by the command. Depending on your scripts, you might need to additionally run the `aad o365group get` command to get additional information about the underlying Office 365 group.
+If you use the `entra o365group get` command to retrieve information about Office 365 groups, you don't need to change anything. If you use the `teams team get` command to retrieve information about Teams, verify the new type of data returned by the command. Depending on your scripts, you might need to additionally run the `entra o365group get` command to get additional information about the underlying Office 365 group.

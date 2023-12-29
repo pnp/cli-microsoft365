@@ -26,6 +26,10 @@ describe(commands.LOGIN, () => {
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     sinon.stub(session, 'getId').callsFake(() => '');
     commandInfo = cli.getCommandInfo(command);
+    auth.service.accessTokens[auth.defaultResource] = {
+      expiresOn: '123',
+      accessToken: 'abc'
+    };
   });
 
   beforeEach(() => {

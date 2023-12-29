@@ -25,7 +25,7 @@ Every team needs an owner, at least one. Common best practice is that you should
 
       Write-host "Handling team: " -NoNewline -ForegroundColor Yellow
       Write-host $team.DisplayName -ForegroundColor Yellow
-      $group = m365 aad m365group get --id $team.id -o json | ConvertFrom-Json
+      $group = m365 entra m365group get --id $team.id -o json | ConvertFrom-Json
       $users = m365 teams user list --teamId $team.id -o json | ConvertFrom-Json
       $owners = @($users | Where-Object { $_.userType -eq "Owner" })
       $members = @($users | Where-Object { $_.userType -eq "Member" }).Length
@@ -68,7 +68,7 @@ Every team needs an owner, at least one. Common best practice is that you should
       echo "Handling team: ${displayName}"
 
       teamId=`echo $team | jq '.id'`
-      group=`m365 aad m365group get --id ${teamId} -o json`
+      group=`m365 entra m365group get --id ${teamId} -o json`
       users=`m365 teams user list --teamId ${teamId} -o json`
 
       groupId=`echo $team | jq '.id'`

@@ -12,7 +12,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { spo } from '../../../../utils/spo.js';
-import aadM365GroupSetCommand from '../../../aad/commands/m365group/m365group-set.js';
+import aadM365GroupSetCommand from '../../../entra/commands/m365group/m365group-set.js';
 import commands from '../../commands.js';
 import spoSiteDesignApplyCommand from '../sitedesign/sitedesign-apply.js';
 import command from './site-set.js';

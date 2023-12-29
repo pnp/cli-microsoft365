@@ -1,7 +1,7 @@
 import { cli } from '../../../cli/cli.js';
 import { Logger } from '../../../cli/Logger.js';
 import Command from '../../../Command.js';
-import aadAppGetCommand, { Options as AadAppGetCommandOptions } from '../../aad/commands/app/app-get.js';
+import aadAppGetCommand, { Options as AadAppGetCommandOptions } from '../../entra/commands/app/app-get.js';
 import AppCommand, { AppCommandArgs } from '../../base/AppCommand.js';
 import commands from '../commands.js';
 
