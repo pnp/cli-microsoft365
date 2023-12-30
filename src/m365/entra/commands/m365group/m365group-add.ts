@@ -28,7 +28,7 @@ interface Options extends GlobalOptions {
   welcomeEmailDisabled?: boolean;
 }
 
-class AadM365GroupAddCommand extends GraphCommand {
+class EntraM365GroupAddCommand extends GraphCommand {
   private static numRepeat: number = 15;
   private pollingInterval: number = 500;
   private allowedVisibilities: string[] = ['Private', 'Public', 'HiddenMembership'];
@@ -233,7 +233,7 @@ class AadM365GroupAddCommand extends GraphCommand {
           data: fs.readFileSync(fullPath)
         };
 
-        await this.setGroupLogo(requestOptionsPhoto, AadM365GroupAddCommand.numRepeat, logger);
+        await this.setGroupLogo(requestOptionsPhoto, EntraM365GroupAddCommand.numRepeat, logger);
       }
 
       if (ownerIds.length !== 0) {
@@ -318,7 +318,7 @@ class AadM365GroupAddCommand extends GraphCommand {
     }
     catch (err: any) {
       if (--retryLeft > 0) {
-        await setTimeout(this.pollingInterval * (AadM365GroupAddCommand.numRepeat - retryLeft));
+        await setTimeout(this.pollingInterval * (EntraM365GroupAddCommand.numRepeat - retryLeft));
         await this.setGroupLogo(requestOptions, retryLeft, logger);
       }
       else {
@@ -341,4 +341,4 @@ class AadM365GroupAddCommand extends GraphCommand {
   }
 }
 
-export default new AadM365GroupAddCommand();
+export default new EntraM365GroupAddCommand();

@@ -36,7 +36,7 @@ interface Options extends GlobalOptions {
   removeManager?: boolean;
 }
 
-class AadUserSetCommand extends GraphCommand {
+class EntraUserSetCommand extends GraphCommand {
   public get name(): string {
     return commands.USER_SET;
   }
@@ -383,4 +383,4 @@ class AadUserSetCommand extends GraphCommand {
   }
 }
 
-export default new AadUserSetCommand();
+export default new EntraUserSetCommand();

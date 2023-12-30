@@ -20,7 +20,7 @@ interface Options extends GlobalOptions {
   groupId?: string;
 }
 
-class AadM365GroupUserAddCommand extends GraphCommand {
+class EntraM365GroupUserAddCommand extends GraphCommand {
   public get name(): string {
     return commands.M365GROUP_USER_ADD;
   }
@@ -133,4 +133,4 @@ class AadM365GroupUserAddCommand extends GraphCommand {
   }
 }
 
-export default new AadM365GroupUserAddCommand();
+export default new EntraM365GroupUserAddCommand();

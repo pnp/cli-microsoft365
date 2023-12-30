@@ -15,7 +15,7 @@ interface Options extends GlobalOptions {
   id: string;
 }
 
-class AadUserRecycleBinItemRestoreCommand extends GraphCommand {
+class EntraUserRecycleBinItemRestoreCommand extends GraphCommand {
   public get name(): string {
     return commands.USER_RECYCLEBINITEM_RESTORE;
   }
@@ -77,4 +77,4 @@ class AadUserRecycleBinItemRestoreCommand extends GraphCommand {
   }
 }
 
-export default new AadUserRecycleBinItemRestoreCommand();
+export default new EntraUserRecycleBinItemRestoreCommand();

@@ -19,7 +19,7 @@ interface Options extends GlobalOptions {
   appId?: string;
 }
 
-class AadUserSigninListCommand extends GraphCommand {
+class EntraUserSigninListCommand extends GraphCommand {
   public get name(): string {
     return commands.USER_SIGNIN_LIST;
   }
@@ -126,4 +126,4 @@ class AadUserSigninListCommand extends GraphCommand {
   }
 }
 
-export default new AadUserSigninListCommand();
+export default new EntraUserSigninListCommand();

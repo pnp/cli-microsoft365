@@ -20,7 +20,7 @@ interface ExtendedGroup extends Group {
   groupType?: string;
 }
 
-class AadGroupListCommand extends GraphCommand {
+class EntraGroupListCommand extends GraphCommand {
   private static readonly groupTypes: string[] = ['microsoft365', 'security', 'distribution', 'mailEnabledSecurity'];
 
   public get name(): string {
@@ -59,7 +59,7 @@ class AadGroupListCommand extends GraphCommand {
     this.options.unshift(
       {
         option: '--type [type]',
-        autocomplete: AadGroupListCommand.groupTypes
+        autocomplete: EntraGroupListCommand.groupTypes
       }
     );
   }
@@ -67,7 +67,7 @@ class AadGroupListCommand extends GraphCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (args.options.type && AadGroupListCommand.groupTypes.every(g => g.toLowerCase() !== args.options.type?.toLowerCase())) {
+        if (args.options.type && EntraGroupListCommand.groupTypes.every(g => g.toLowerCase() !== args.options.type?.toLowerCase())) {
           return `${args.options.type} is not a valid type value. Allowed values microsoft365|security|distribution|mailEnabledSecurity.`;
         }
 
@@ -82,7 +82,7 @@ class AadGroupListCommand extends GraphCommand {
       let useConsistencyLevelHeader = false;
 
       if (args.options.type) {
-        const groupType = AadGroupListCommand.groupTypes.find(g => g.toLowerCase() === args.options.type?.toLowerCase());
+        const groupType = EntraGroupListCommand.groupTypes.find(g => g.toLowerCase() === args.options.type?.toLowerCase());
 
         switch (groupType) {
           case 'microsoft365':
@@ -145,4 +145,4 @@ class AadGroupListCommand extends GraphCommand {
   }
 }
 
-export default new AadGroupListCommand();
+export default new EntraGroupListCommand();

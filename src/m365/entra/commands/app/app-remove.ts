@@ -19,7 +19,7 @@ interface Options extends GlobalOptions {
   force?: boolean;
 }
 
-class AadAppRemoveCommand extends GraphCommand {
+class EntraAppRemoveCommand extends GraphCommand {
   public get name(): string {
     return commands.APP_REMOVE;
   }
@@ -157,4 +157,4 @@ class AadAppRemoveCommand extends GraphCommand {
   }
 }
 
-export default new AadAppRemoveCommand();
+export default new EntraAppRemoveCommand();

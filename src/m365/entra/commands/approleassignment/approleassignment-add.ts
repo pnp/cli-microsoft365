@@ -28,7 +28,7 @@ interface Options extends GlobalOptions {
   scopes: string;
 }
 
-class AadAppRoleAssignmentAddCommand extends GraphCommand {
+class EntraAppRoleAssignmentAddCommand extends GraphCommand {
   public get name(): string {
     return commands.APPROLEASSIGNMENT_ADD;
   }
@@ -249,4 +249,4 @@ class AadAppRoleAssignmentAddCommand extends GraphCommand {
   }
 }
 
-export default new AadAppRoleAssignmentAddCommand();
+export default new EntraAppRoleAssignmentAddCommand();

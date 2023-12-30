@@ -25,7 +25,7 @@ export interface Options extends GlobalOptions {
   logoPath?: string;
 }
 
-class AadM365GroupSetCommand extends GraphCommand {
+class EntraM365GroupSetCommand extends GraphCommand {
   private static numRepeat: number = 15;
   private pollingInterval: number = 500;
 
@@ -195,7 +195,7 @@ class AadM365GroupSetCommand extends GraphCommand {
           data: fs.readFileSync(fullPath)
         };
 
-        await this.setGroupLogo(requestOptions, AadM365GroupSetCommand.numRepeat, logger);
+        await this.setGroupLogo(requestOptions, EntraM365GroupSetCommand.numRepeat, logger);
       }
       else if (this.debug) {
         await logger.logToStderr('logoPath not set. Skipping');
@@ -276,7 +276,7 @@ class AadM365GroupSetCommand extends GraphCommand {
     }
     catch (err: any) {
       if (--retryLeft > 0) {
-        await setTimeout(this.pollingInterval * (AadM365GroupSetCommand.numRepeat - retryLeft));
+        await setTimeout(this.pollingInterval * (EntraM365GroupSetCommand.numRepeat - retryLeft));
         await this.setGroupLogo(requestOptions, retryLeft, logger);
       }
       else {
@@ -299,4 +299,4 @@ class AadM365GroupSetCommand extends GraphCommand {
   }
 }
 
-export default new AadM365GroupSetCommand();
+export default new EntraM365GroupSetCommand();

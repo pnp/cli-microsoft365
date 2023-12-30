@@ -22,7 +22,7 @@ interface Options extends GlobalOptions {
   id?: string;
 }
 
-class AadAppRoleRemoveCommand extends GraphCommand {
+class EntraAppRoleRemoveCommand extends GraphCommand {
   public get name(): string {
     return commands.APP_ROLE_REMOVE;
   }
@@ -248,4 +248,4 @@ class AadAppRoleRemoveCommand extends GraphCommand {
   }
 }
 
-export default new AadAppRoleRemoveCommand();
+export default new EntraAppRoleRemoveCommand();

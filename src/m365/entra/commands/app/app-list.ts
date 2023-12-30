@@ -5,7 +5,7 @@ import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 import aadCommands from '../../aadCommands.js';
 
-class AadAppListCommand extends GraphCommand {
+class EntraAppListCommand extends GraphCommand {
   public get name(): string {
     return commands.APP_LIST;
   }
@@ -33,4 +33,4 @@ class AadAppListCommand extends GraphCommand {
   }
 }
 
-export default new AadAppListCommand();
+export default new EntraAppListCommand();

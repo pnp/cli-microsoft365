@@ -26,7 +26,7 @@ interface Options extends GlobalOptions {
   certificateDisplayName?: string;
 }
 
-class AadAppSetCommand extends GraphCommand {
+class EntraAppSetCommand extends GraphCommand {
   private static aadApplicationPlatform: string[] = ['spa', 'web', 'publicClient'];
 
   public get name(): string {
@@ -79,7 +79,7 @@ class AadAppSetCommand extends GraphCommand {
       { option: '--certificateDisplayName [certificateDisplayName]' },
       {
         option: '--platform [platform]',
-        autocomplete: AadAppSetCommand.aadApplicationPlatform
+        autocomplete: EntraAppSetCommand.aadApplicationPlatform
       },
       { option: '--redirectUrisToRemove [redirectUrisToRemove]' }
     );
@@ -105,8 +105,8 @@ class AadAppSetCommand extends GraphCommand {
         }
 
         if (args.options.platform &&
-          AadAppSetCommand.aadApplicationPlatform.indexOf(args.options.platform) < 0) {
-          return `${args.options.platform} is not a valid value for platform. Allowed values are ${AadAppSetCommand.aadApplicationPlatform.join(', ')}`;
+          EntraAppSetCommand.aadApplicationPlatform.indexOf(args.options.platform) < 0) {
+          return `${args.options.platform} is not a valid value for platform. Allowed values are ${EntraAppSetCommand.aadApplicationPlatform.join(', ')}`;
         }
 
         return true;
@@ -370,4 +370,4 @@ class AadAppSetCommand extends GraphCommand {
   }
 }
 
-export default new AadAppSetCommand();
+export default new EntraAppSetCommand();

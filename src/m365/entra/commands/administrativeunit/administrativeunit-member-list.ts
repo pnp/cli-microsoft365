@@ -26,7 +26,7 @@ interface DirectoryObjectEx extends DirectoryObject {
   type: string;
 }
 
-class AadAdministrativeUnitMemberListCommand extends GraphCommand {
+class EntraAdministrativeUnitMemberListCommand extends GraphCommand {
   public get name(): string {
     return commands.ADMINISTRATIVEUNIT_MEMBER_LIST;
   }
@@ -192,4 +192,4 @@ class AadAdministrativeUnitMemberListCommand extends GraphCommand {
   }
 }
 
-export default new AadAdministrativeUnitMemberListCommand();
+export default new EntraAdministrativeUnitMemberListCommand();

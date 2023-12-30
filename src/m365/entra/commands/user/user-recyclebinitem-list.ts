@@ -5,7 +5,7 @@ import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 import aadCommands from '../../aadCommands.js';
 
-class AadUserRecycleBinItemListCommand extends GraphCommand {
+class EntraUserRecycleBinItemListCommand extends GraphCommand {
   public get name(): string {
     return commands.USER_RECYCLEBINITEM_LIST;
   }
@@ -35,4 +35,4 @@ class AadUserRecycleBinItemListCommand extends GraphCommand {
     }
   }
 }
-export default new AadUserRecycleBinItemListCommand();
+export default new EntraUserRecycleBinItemListCommand();

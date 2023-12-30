@@ -19,7 +19,7 @@ interface Options extends GlobalOptions {
   sendInvitationMessage?: boolean;
 }
 
-class AadUserGuestAddCommand extends GraphCommand {
+class EntraUserGuestAddCommand extends GraphCommand {
   public get name(): string {
     return commands.USER_GUEST_ADD;
   }
@@ -120,4 +120,4 @@ class AadUserGuestAddCommand extends GraphCommand {
   }
 }
 
-export default new AadUserGuestAddCommand();
+export default new EntraUserGuestAddCommand();

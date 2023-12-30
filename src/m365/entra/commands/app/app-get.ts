@@ -22,7 +22,7 @@ export interface Options extends GlobalOptions {
   save?: boolean;
 }
 
-class AadAppGetCommand extends GraphCommand {
+class EntraAppGetCommand extends GraphCommand {
   public get name(): string {
     return commands.APP_GET;
   }
@@ -193,4 +193,4 @@ class AadAppGetCommand extends GraphCommand {
   }
 }
 
-export default new AadAppGetCommand();
+export default new EntraAppGetCommand();

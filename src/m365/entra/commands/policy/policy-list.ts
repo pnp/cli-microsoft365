@@ -23,7 +23,7 @@ const policyEndPoints: any = {
   tokenlifetime: "tokenLifetimePolicies"
 };
 
-class AadPolicyListCommand extends GraphCommand {
+class EntraPolicyListCommand extends GraphCommand {
   private static readonly supportedPolicyTypes: string[] = ['activityBasedTimeout', 'authorization', 'claimsMapping', 'homeRealmDiscovery', 'identitySecurityDefaultsEnforcement', 'tokenIssuance', 'tokenLifetime'];
 
   public get name(): string {
@@ -58,7 +58,7 @@ class AadPolicyListCommand extends GraphCommand {
     this.options.unshift(
       {
         option: '-t, --type [type]',
-        autocomplete: AadPolicyListCommand.supportedPolicyTypes
+        autocomplete: EntraPolicyListCommand.supportedPolicyTypes
       }
     );
   }
@@ -68,8 +68,8 @@ class AadPolicyListCommand extends GraphCommand {
       async (args: CommandArgs) => {
         if (args.options.type) {
           const policyType: string = args.options.type.toLowerCase();
-          if (!AadPolicyListCommand.supportedPolicyTypes.find(p => p.toLowerCase() === policyType)) {
-            return `${args.options.type} is not a valid type. Allowed values are ${AadPolicyListCommand.supportedPolicyTypes.join(', ')}`;
+          if (!EntraPolicyListCommand.supportedPolicyTypes.find(p => p.toLowerCase() === policyType)) {
+            return `${args.options.type} is not a valid type. Allowed values are ${EntraPolicyListCommand.supportedPolicyTypes.join(', ')}`;
           }
         }
 
@@ -128,4 +128,4 @@ class AadPolicyListCommand extends GraphCommand {
   }
 }
 
-export default new AadPolicyListCommand();
+export default new EntraPolicyListCommand();

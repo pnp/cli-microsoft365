@@ -19,7 +19,7 @@ interface Options extends GlobalOptions {
   orphaned?: boolean;
 }
 
-class AadM365GroupListCommand extends GraphCommand {
+class EntraM365GroupListCommand extends GraphCommand {
   public get name(): string {
     return commands.M365GROUP_LIST;
   }
@@ -132,4 +132,4 @@ class AadM365GroupListCommand extends GraphCommand {
   }
 }
 
-export default new AadM365GroupListCommand();
+export default new EntraM365GroupListCommand();

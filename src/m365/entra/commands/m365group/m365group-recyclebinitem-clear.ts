@@ -16,7 +16,7 @@ interface Options extends GlobalOptions {
   force?: boolean;
 }
 
-class AadM365GroupRecycleBinItemClearCommand extends GraphCommand {
+class EntraM365GroupRecycleBinItemClearCommand extends GraphCommand {
   public get name(): string {
     return commands.M365GROUP_RECYCLEBINITEM_CLEAR;
   }
@@ -100,4 +100,4 @@ class AadM365GroupRecycleBinItemClearCommand extends GraphCommand {
   }
 }
 
-export default new AadM365GroupRecycleBinItemClearCommand();
+export default new EntraM365GroupRecycleBinItemClearCommand();

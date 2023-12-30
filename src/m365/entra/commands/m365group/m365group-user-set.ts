@@ -21,7 +21,7 @@ interface Options extends GlobalOptions {
   userName: string;
 }
 
-class AadM365GroupUserSetCommand extends GraphCommand {
+class EntraM365GroupUserSetCommand extends GraphCommand {
   public get name(): string {
     return commands.M365GROUP_USER_SET;
   }
@@ -212,4 +212,4 @@ class AadM365GroupUserSetCommand extends GraphCommand {
   }
 }
 
-export default new AadM365GroupUserSetCommand();
+export default new EntraM365GroupUserSetCommand();

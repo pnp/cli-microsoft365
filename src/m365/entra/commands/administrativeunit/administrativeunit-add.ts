@@ -16,7 +16,7 @@ interface Options extends GlobalOptions {
   hiddenMembership?: boolean;
 }
 
-class AadAdministrativeUnitAddCommand extends GraphCommand {
+class EntraAdministrativeUnitAddCommand extends GraphCommand {
   public get name(): string {
     return commands.ADMINISTRATIVEUNIT_ADD;
   }
@@ -83,4 +83,4 @@ class AadAdministrativeUnitAddCommand extends GraphCommand {
   }
 }
 
-export default new AadAdministrativeUnitAddCommand();
+export default new EntraAdministrativeUnitAddCommand();

@@ -18,7 +18,7 @@ interface Options extends GlobalOptions {
   force?: boolean;
 }
 
-class AadUserLicenseRemoveCommand extends GraphCommand {
+class EntraUserLicenseRemoveCommand extends GraphCommand {
 
   public get name(): string {
     return commands.USER_LICENSE_REMOVE;
@@ -133,4 +133,4 @@ class AadUserLicenseRemoveCommand extends GraphCommand {
   }
 }
 
-export default new AadUserLicenseRemoveCommand();
+export default new EntraUserLicenseRemoveCommand();

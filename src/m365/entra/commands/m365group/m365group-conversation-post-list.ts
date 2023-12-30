@@ -19,7 +19,7 @@ interface Options extends GlobalOptions {
   threadId: string;
 }
 
-class AadM365GroupConversationPostListCommand extends GraphCommand {
+class EntraM365GroupConversationPostListCommand extends GraphCommand {
   public get name(): string {
     return commands.M365GROUP_CONVERSATION_POST_LIST;
   }
@@ -111,4 +111,4 @@ class AadM365GroupConversationPostListCommand extends GraphCommand {
   }
 }
 
-export default new AadM365GroupConversationPostListCommand();
+export default new EntraM365GroupConversationPostListCommand();

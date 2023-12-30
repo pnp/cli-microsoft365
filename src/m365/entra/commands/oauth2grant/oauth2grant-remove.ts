@@ -15,7 +15,7 @@ interface Options extends GlobalOptions {
   grantId: string;
 }
 
-class AadOAuth2GrantRemoveCommand extends GraphCommand {
+class EntraOAuth2GrantRemoveCommand extends GraphCommand {
   public get name(): string {
     return commands.OAUTH2GRANT_REMOVE;
   }
@@ -80,4 +80,4 @@ class AadOAuth2GrantRemoveCommand extends GraphCommand {
   }
 }
 
-export default new AadOAuth2GrantRemoveCommand();
+export default new EntraOAuth2GrantRemoveCommand();

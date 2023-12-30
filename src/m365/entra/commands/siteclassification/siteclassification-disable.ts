@@ -15,7 +15,7 @@ interface Options extends GlobalOptions {
   force?: boolean;
 }
 
-class AadSiteClassificationDisableCommand extends GraphCommand {
+class EntraSiteClassificationDisableCommand extends GraphCommand {
   public get name(): string {
     return commands.SITECLASSIFICATION_DISABLE;
   }
@@ -109,4 +109,4 @@ class AadSiteClassificationDisableCommand extends GraphCommand {
   }
 }
 
-export default new AadSiteClassificationDisableCommand();
+export default new EntraSiteClassificationDisableCommand();

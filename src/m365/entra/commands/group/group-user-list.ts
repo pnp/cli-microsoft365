@@ -25,7 +25,7 @@ interface ExtendedUser extends User {
   roles: string[];
 }
 
-class AadGroupUserListCommand extends GraphCommand {
+class EntraGroupUserListCommand extends GraphCommand {
   public get name(): string {
     return commands.GROUP_USER_LIST;
   }
@@ -205,4 +205,4 @@ class AadGroupUserListCommand extends GraphCommand {
   }
 }
 
-export default new AadGroupUserListCommand();
+export default new EntraGroupUserListCommand();

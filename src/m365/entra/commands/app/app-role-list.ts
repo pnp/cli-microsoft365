@@ -19,7 +19,7 @@ interface Options extends GlobalOptions {
   appName?: string;
 }
 
-class AadAppRoleListCommand extends GraphCommand {
+class EntraAppRoleListCommand extends GraphCommand {
   public get name(): string {
     return commands.APP_ROLE_LIST;
   }
@@ -117,4 +117,4 @@ class AadAppRoleListCommand extends GraphCommand {
   }
 }
 
-export default new AadAppRoleListCommand();
+export default new EntraAppRoleListCommand();

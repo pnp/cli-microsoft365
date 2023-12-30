@@ -73,9 +73,9 @@ interface AppPermissions {
   scope: string[];
 }
 
-class AadAppAddCommand extends GraphCommand {
-  private static aadApplicationPlatform: string[] = ['spa', 'web', 'publicClient'];
-  private static aadAppScopeConsentBy: string[] = ['admins', 'adminsAndUsers'];
+class EntraAppAddCommand extends GraphCommand {
+  private static entraApplicationPlatform: string[] = ['spa', 'web', 'publicClient'];
+  private static entraAppScopeConsentBy: string[] = ['admins', 'adminsAndUsers'];
   private manifest: any;
   private appName: string = '';
   private appPermissions: AppPermissions[] = [];
@@ -136,7 +136,7 @@ class AadAppAddCommand extends GraphCommand {
       },
       {
         option: '-p, --platform [platform]',
-        autocomplete: AadAppAddCommand.aadApplicationPlatform
+        autocomplete: EntraAppAddCommand.entraApplicationPlatform
       },
       {
         option: '--implicitFlow'
@@ -158,7 +158,7 @@ class AadAppAddCommand extends GraphCommand {
       },
       {
         option: '--scopeConsentBy [scopeConsentBy]',
-        autocomplete: AadAppAddCommand.aadAppScopeConsentBy
+        autocomplete: EntraAppAddCommand.entraAppScopeConsentBy
       },
       {
         option: '--scopeAdminConsentDisplayName [scopeAdminConsentDisplayName]'
@@ -191,8 +191,8 @@ class AadAppAddCommand extends GraphCommand {
     this.validators.push(
       async (args: CommandArgs) => {
         if (args.options.platform &&
-          AadAppAddCommand.aadApplicationPlatform.indexOf(args.options.platform) < 0) {
-          return `${args.options.platform} is not a valid value for platform. Allowed values are ${AadAppAddCommand.aadApplicationPlatform.join(', ')}`;
+          EntraAppAddCommand.entraApplicationPlatform.indexOf(args.options.platform) < 0) {
+          return `${args.options.platform} is not a valid value for platform. Allowed values are ${EntraAppAddCommand.entraApplicationPlatform.join(', ')}`;
         }
 
         if (args.options.redirectUris && !args.options.platform) {
@@ -226,8 +226,8 @@ class AadAppAddCommand extends GraphCommand {
         }
 
         if (args.options.scopeConsentBy &&
-          AadAppAddCommand.aadAppScopeConsentBy.indexOf(args.options.scopeConsentBy) < 0) {
-          return `${args.options.scopeConsentBy} is not a valid value for scopeConsentBy. Allowed values are ${AadAppAddCommand.aadAppScopeConsentBy.join(', ')}`;
+          EntraAppAddCommand.entraAppScopeConsentBy.indexOf(args.options.scopeConsentBy) < 0) {
+          return `${args.options.scopeConsentBy} is not a valid value for scopeConsentBy. Allowed values are ${EntraAppAddCommand.entraAppScopeConsentBy.join(', ')}`;
         }
 
         if (args.options.manifest) {
@@ -983,4 +983,4 @@ class AadAppAddCommand extends GraphCommand {
   }
 }
 
-export default new AadAppAddCommand();
+export default new EntraAppAddCommand();

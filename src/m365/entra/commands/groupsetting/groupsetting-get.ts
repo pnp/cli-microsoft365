@@ -14,7 +14,7 @@ interface Options extends GlobalOptions {
   id: string;
 }
 
-class AadGroupSettingGetCommand extends GraphCommand {
+class EntraGroupSettingGetCommand extends GraphCommand {
   public get name(): string {
     return commands.GROUPSETTING_GET;
   }
@@ -73,4 +73,4 @@ class AadGroupSettingGetCommand extends GraphCommand {
   }
 }
 
-export default new AadGroupSettingGetCommand();
+export default new EntraGroupSettingGetCommand();

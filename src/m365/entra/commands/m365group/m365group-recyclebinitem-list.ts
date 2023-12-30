@@ -16,7 +16,7 @@ interface Options extends GlobalOptions {
   groupMailNickname?: string;
 }
 
-class AadM365GroupRecycleBinItemListCommand extends GraphCommand {
+class EntraM365GroupRecycleBinItemListCommand extends GraphCommand {
   public get name(): string {
     return commands.M365GROUP_RECYCLEBINITEM_LIST;
   }
@@ -77,4 +77,4 @@ class AadM365GroupRecycleBinItemListCommand extends GraphCommand {
   }
 }
 
-export default new AadM365GroupRecycleBinItemListCommand();
+export default new EntraM365GroupRecycleBinItemListCommand();

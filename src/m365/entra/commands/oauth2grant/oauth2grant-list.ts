@@ -15,7 +15,7 @@ interface Options extends GlobalOptions {
   spObjectId: string;
 }
 
-class AadOAuth2GrantListCommand extends GraphCommand {
+class EntraOAuth2GrantListCommand extends GraphCommand {
   public get name(): string {
     return commands.OAUTH2GRANT_LIST;
   }
@@ -85,4 +85,4 @@ class AadOAuth2GrantListCommand extends GraphCommand {
   }
 }
 
-export default new AadOAuth2GrantListCommand();
+export default new EntraOAuth2GrantListCommand();

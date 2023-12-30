@@ -25,7 +25,7 @@ interface Options extends GlobalOptions {
   force?: boolean;
 }
 
-class AadM365GroupUserRemoveCommand extends GraphCommand {
+class EntraM365GroupUserRemoveCommand extends GraphCommand {
   public get name(): string {
     return commands.M365GROUP_USER_REMOVE;
   }
@@ -172,4 +172,4 @@ class AadM365GroupUserRemoveCommand extends GraphCommand {
   }
 }
 
-export default new AadM365GroupUserRemoveCommand();
+export default new EntraM365GroupUserRemoveCommand();

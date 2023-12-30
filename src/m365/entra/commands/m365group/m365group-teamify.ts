@@ -18,7 +18,7 @@ interface Options extends GlobalOptions {
   mailNickname?: string;
 }
 
-class AadM365GroupTeamifyCommand extends GraphCommand {
+class EntraM365GroupTeamifyCommand extends GraphCommand {
   public get name(): string {
     return commands.M365GROUP_TEAMIFY;
   }
@@ -147,4 +147,4 @@ class AadM365GroupTeamifyCommand extends GraphCommand {
   }
 }
 
-export default new AadM365GroupTeamifyCommand();
+export default new EntraM365GroupTeamifyCommand();

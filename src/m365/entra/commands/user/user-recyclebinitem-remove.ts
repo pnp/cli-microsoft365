@@ -16,7 +16,7 @@ interface Options extends GlobalOptions {
   force?: boolean;
 }
 
-class AadUserRecycleBinItemRemoveCommand extends GraphCommand {
+class EntraUserRecycleBinItemRemoveCommand extends GraphCommand {
   public get name(): string {
     return commands.USER_RECYCLEBINITEM_REMOVE;
   }
@@ -99,4 +99,4 @@ class AadUserRecycleBinItemRemoveCommand extends GraphCommand {
   }
 }
 
-export default new AadUserRecycleBinItemRemoveCommand();
+export default new EntraUserRecycleBinItemRemoveCommand();

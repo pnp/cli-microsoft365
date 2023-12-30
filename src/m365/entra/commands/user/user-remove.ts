@@ -17,7 +17,7 @@ interface Options extends GlobalOptions {
   force?: boolean;
 }
 
-class AadUserRemoveCommand extends GraphCommand {
+class EntraUserRemoveCommand extends GraphCommand {
 
   public get name(): string {
     return commands.USER_REMOVE;
@@ -121,4 +121,4 @@ class AadUserRemoveCommand extends GraphCommand {
   }
 }
 
-export default new AadUserRemoveCommand();
+export default new EntraUserRemoveCommand();

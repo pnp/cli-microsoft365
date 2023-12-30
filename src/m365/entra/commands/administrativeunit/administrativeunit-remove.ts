@@ -19,7 +19,7 @@ interface Options extends GlobalOptions {
   force?: boolean
 }
 
-class AadAdministrativeUnitRemoveCommand extends GraphCommand {
+class EntraAdministrativeUnitRemoveCommand extends GraphCommand {
   public get name(): string {
     return commands.ADMINISTRATIVEUNIT_REMOVE;
   }
@@ -126,4 +126,4 @@ class AadAdministrativeUnitRemoveCommand extends GraphCommand {
   }
 }
 
-export default new AadAdministrativeUnitRemoveCommand();
+export default new EntraAdministrativeUnitRemoveCommand();

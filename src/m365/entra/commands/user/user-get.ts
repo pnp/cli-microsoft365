@@ -21,7 +21,7 @@ export interface Options extends GlobalOptions {
   withManager?: boolean;
 }
 
-class AadUserGetCommand extends GraphCommand {
+class EntraUserGetCommand extends GraphCommand {
   public get name(): string {
     return commands.USER_GET;
   }
@@ -151,4 +151,4 @@ class AadUserGetCommand extends GraphCommand {
   }
 }
 
-export default new AadUserGetCommand();
+export default new EntraUserGetCommand();

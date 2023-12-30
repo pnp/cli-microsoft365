@@ -31,7 +31,7 @@ enum ScopeType {
   Scope = 'Scope'
 }
 
-class AadAppPermissionAddCommand extends GraphCommand {
+class EntraAppPermissionAddCommand extends GraphCommand {
   public get name(): string {
     return commands.APP_PERMISSION_ADD;
   }
@@ -313,4 +313,4 @@ class AadAppPermissionAddCommand extends GraphCommand {
   }
 }
 
-export default new AadAppPermissionAddCommand();
+export default new EntraAppPermissionAddCommand();

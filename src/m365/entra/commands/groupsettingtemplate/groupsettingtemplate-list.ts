@@ -5,7 +5,7 @@ import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 import aadCommands from '../../aadCommands.js';
 
-class AadGroupSettingTemplateListCommand extends GraphCommand {
+class EntraGroupSettingTemplateListCommand extends GraphCommand {
   public get name(): string {
     return commands.GROUPSETTINGTEMPLATE_LIST;
   }
@@ -33,4 +33,4 @@ class AadGroupSettingTemplateListCommand extends GraphCommand {
   }
 }
 
-export default new AadGroupSettingTemplateListCommand();
+export default new EntraGroupSettingTemplateListCommand();

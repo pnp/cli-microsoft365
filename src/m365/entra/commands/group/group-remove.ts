@@ -18,7 +18,7 @@ interface Options extends GlobalOptions {
   force?: boolean
 }
 
-class AadGroupRemoveCommand extends GraphCommand {
+class EntraGroupRemoveCommand extends GraphCommand {
   public get name(): string {
     return commands.GROUP_REMOVE;
   }
@@ -129,4 +129,4 @@ class AadGroupRemoveCommand extends GraphCommand {
   }
 }
 
-export default new AadGroupRemoveCommand();
+export default new EntraGroupRemoveCommand();

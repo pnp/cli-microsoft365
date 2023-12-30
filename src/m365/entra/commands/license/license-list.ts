@@ -4,7 +4,7 @@ import GraphCommand from '../../../base/GraphCommand.js';
 import aadCommands from '../../aadCommands.js';
 import commands from '../../commands.js';
 
-class AadLicenseListCommand extends GraphCommand {
+class EntraLicenseListCommand extends GraphCommand {
   public get name(): string {
     return commands.LICENSE_LIST;
   }
@@ -36,4 +36,4 @@ class AadLicenseListCommand extends GraphCommand {
   }
 }
 
-export default new AadLicenseListCommand();
+export default new EntraLicenseListCommand();

@@ -6,7 +6,7 @@ import commands from '../../commands.js';
 import { SiteClassificationSettings } from './SiteClassificationSettings.js';
 import aadCommands from '../../aadCommands.js';
 
-class AadSiteClassificationGetCommand extends GraphCommand {
+class EntraSiteClassificationGetCommand extends GraphCommand {
   public get name(): string {
     return commands.SITECLASSIFICATION_GET;
   }
@@ -92,4 +92,4 @@ class AadSiteClassificationGetCommand extends GraphCommand {
   }
 }
 
-export default new AadSiteClassificationGetCommand();
+export default new EntraSiteClassificationGetCommand();

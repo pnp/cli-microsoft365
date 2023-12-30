@@ -16,7 +16,7 @@ interface Options extends GlobalOptions {
   ids: string;
 }
 
-class AadUserLicenseAddCommand extends GraphCommand {
+class EntraUserLicenseAddCommand extends GraphCommand {
   public get name(): string {
     return commands.USER_LICENSE_ADD;
   }
@@ -106,4 +106,4 @@ class AadUserLicenseAddCommand extends GraphCommand {
   }
 }
 
-export default new AadUserLicenseAddCommand();
+export default new EntraUserLicenseAddCommand();

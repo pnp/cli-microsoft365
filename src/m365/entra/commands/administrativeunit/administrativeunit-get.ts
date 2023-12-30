@@ -17,7 +17,7 @@ export interface Options extends GlobalOptions {
   displayName?: string;
 }
 
-class AadAdministrativeUnitGetCommand extends GraphCommand {
+class EntraAdministrativeUnitGetCommand extends GraphCommand {
   public get name(): string {
     return commands.ADMINISTRATIVEUNIT_GET;
   }
@@ -112,4 +112,4 @@ class AadAdministrativeUnitGetCommand extends GraphCommand {
   }
 }
 
-export default new AadAdministrativeUnitGetCommand();
+export default new EntraAdministrativeUnitGetCommand();

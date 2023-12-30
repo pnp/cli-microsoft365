@@ -14,7 +14,7 @@ interface Options extends GlobalOptions {
   tag?: string;
 }
 
-class AadSpListCommand extends GraphCommand {
+class EntraSpListCommand extends GraphCommand {
   public get name(): string {
     return commands.SP_LIST;
   }
@@ -88,4 +88,4 @@ class AadSpListCommand extends GraphCommand {
   }
 }
 
-export default new AadSpListCommand();
+export default new EntraSpListCommand();

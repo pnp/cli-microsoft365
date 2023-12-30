@@ -33,7 +33,7 @@ interface Options extends GlobalOptions {
   description: string;
 }
 
-class AadAppRoleAddCommand extends GraphCommand {
+class EntraAppRoleAddCommand extends GraphCommand {
   private static readonly allowedMembers: string[] = ['usersGroups', 'applications', 'both'];
 
   public get name(): string {
@@ -75,7 +75,7 @@ class AadAppRoleAddCommand extends GraphCommand {
       { option: '-n, --name <name>' },
       { option: '-d, --description <description>' },
       {
-        option: '-m, --allowedMembers <allowedMembers>', autocomplete: AadAppRoleAddCommand.allowedMembers
+        option: '-m, --allowedMembers <allowedMembers>', autocomplete: EntraAppRoleAddCommand.allowedMembers
       },
       { option: '-c, --claim <claim>' }
     );
@@ -86,8 +86,8 @@ class AadAppRoleAddCommand extends GraphCommand {
       async (args: CommandArgs) => {
         const { allowedMembers, claim } = args.options;
 
-        if (AadAppRoleAddCommand.allowedMembers.indexOf(allowedMembers) < 0) {
-          return `${allowedMembers} is not a valid value for allowedMembers. Valid values are ${AadAppRoleAddCommand.allowedMembers.join(', ')}`;
+        if (EntraAppRoleAddCommand.allowedMembers.indexOf(allowedMembers) < 0) {
+          return `${allowedMembers} is not a valid value for allowedMembers. Valid values are ${EntraAppRoleAddCommand.allowedMembers.join(', ')}`;
         }
 
         if (claim.length > 120) {
@@ -213,4 +213,4 @@ class AadAppRoleAddCommand extends GraphCommand {
   }
 }
 
-export default new AadAppRoleAddCommand();
+export default new EntraAppRoleAddCommand();

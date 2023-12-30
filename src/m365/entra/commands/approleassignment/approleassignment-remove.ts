@@ -23,7 +23,7 @@ interface Options extends GlobalOptions {
   force?: boolean;
 }
 
-class AadAppRoleAssignmentRemoveCommand extends GraphCommand {
+class EntraAppRoleAssignmentRemoveCommand extends GraphCommand {
   public get name(): string {
     return commands.APPROLEASSIGNMENT_REMOVE;
   }
@@ -235,4 +235,4 @@ class AadAppRoleAssignmentRemoveCommand extends GraphCommand {
   }
 }
 
-export default new AadAppRoleAssignmentRemoveCommand();
+export default new EntraAppRoleAssignmentRemoveCommand();

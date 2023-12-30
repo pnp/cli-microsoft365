@@ -15,7 +15,7 @@ interface Options extends GlobalOptions {
   templateId: string;
 }
 
-class AadGroupSettingAddCommand extends GraphCommand {
+class EntraGroupSettingAddCommand extends GraphCommand {
   public get name(): string {
     return commands.GROUPSETTING_ADD;
   }
@@ -126,4 +126,4 @@ class AadGroupSettingAddCommand extends GraphCommand {
   }
 }
 
-export default new AadGroupSettingAddCommand();
+export default new EntraGroupSettingAddCommand();

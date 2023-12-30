@@ -16,7 +16,7 @@ interface Options extends GlobalOptions {
   groupId: string;
 }
 
-class AadM365GroupConversationListCommand extends GraphCommand {
+class EntraM365GroupConversationListCommand extends GraphCommand {
   public get name(): string {
     return commands.M365GROUP_CONVERSATION_LIST;
   }
@@ -77,4 +77,4 @@ class AadM365GroupConversationListCommand extends GraphCommand {
   }
 }
 
-export default new AadM365GroupConversationListCommand();
+export default new EntraM365GroupConversationListCommand();

@@ -15,7 +15,7 @@ interface Options extends GlobalOptions {
   properties?: string;
 }
 
-class AadUserListCommand extends GraphCommand {
+class EntraUserListCommand extends GraphCommand {
   public get name(): string {
     return commands.USER_LIST;
   }
@@ -108,4 +108,4 @@ class AadUserListCommand extends GraphCommand {
   }
 }
 
-export default new AadUserListCommand();
+export default new EntraUserListCommand();

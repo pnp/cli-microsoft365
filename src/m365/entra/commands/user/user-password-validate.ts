@@ -13,7 +13,7 @@ interface Options extends GlobalOptions {
   password: string;
 }
 
-class AadUserPasswordValidateCommand extends GraphCommand {
+class EntraUserPasswordValidateCommand extends GraphCommand {
   public get name(): string {
     return commands.USER_PASSWORD_VALIDATE;
   }
@@ -62,4 +62,4 @@ class AadUserPasswordValidateCommand extends GraphCommand {
   }
 }
 
-export default new AadUserPasswordValidateCommand();
+export default new EntraUserPasswordValidateCommand();

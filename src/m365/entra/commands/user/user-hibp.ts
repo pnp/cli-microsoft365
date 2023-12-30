@@ -17,7 +17,7 @@ interface Options extends GlobalOptions {
   domain?: string
 }
 
-class AadUserHibpCommand extends AnonymousCommand {
+class EntraUserHibpCommand extends AnonymousCommand {
   public get name(): string {
     return commands.USER_HIBP;
   }
@@ -97,4 +97,4 @@ class AadUserHibpCommand extends AnonymousCommand {
   }
 }
 
-export default new AadUserHibpCommand();
+export default new EntraUserHibpCommand();

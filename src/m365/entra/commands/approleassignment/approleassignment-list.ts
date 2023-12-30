@@ -18,7 +18,7 @@ interface Options extends GlobalOptions {
   appObjectId?: string;
 }
 
-class AadAppRoleAssignmentListCommand extends GraphCommand {
+class EntraAppRoleAssignmentListCommand extends GraphCommand {
   public get name(): string {
     return commands.APPROLEASSIGNMENT_LIST;
   }
@@ -194,4 +194,4 @@ class AadAppRoleAssignmentListCommand extends GraphCommand {
   }
 }
 
-export default new AadAppRoleAssignmentListCommand();
+export default new EntraAppRoleAssignmentListCommand();

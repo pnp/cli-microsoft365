@@ -15,7 +15,7 @@ interface Options extends GlobalOptions {
   scope: string;
 }
 
-class AadOAuth2GrantSetCommand extends GraphCommand {
+class EntraOAuth2GrantSetCommand extends GraphCommand {
   public get name(): string {
     return commands.OAUTH2GRANT_SET;
   }
@@ -70,4 +70,4 @@ class AadOAuth2GrantSetCommand extends GraphCommand {
   }
 }
 
-export default new AadOAuth2GrantSetCommand();
+export default new EntraOAuth2GrantSetCommand();

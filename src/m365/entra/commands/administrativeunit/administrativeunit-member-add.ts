@@ -25,7 +25,7 @@ interface Options extends GlobalOptions {
   deviceName?: string;
 }
 
-class AadAdministrativeUnitMemberAddCommand extends GraphCommand {
+class EntraAdministrativeUnitMemberAddCommand extends GraphCommand {
   public get name(): string {
     return commands.ADMINISTRATIVEUNIT_MEMBER_ADD;
   }
@@ -187,4 +187,4 @@ class AadAdministrativeUnitMemberAddCommand extends GraphCommand {
   }
 }
 
-export default new AadAdministrativeUnitMemberAddCommand();
+export default new EntraAdministrativeUnitMemberAddCommand();

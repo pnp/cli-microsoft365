@@ -17,7 +17,7 @@ interface Options extends GlobalOptions {
   guestUsageGuidelinesUrl?: string;
 }
 
-class AadSiteClassificationEnableCommand extends GraphCommand {
+class EntraSiteClassificationEnableCommand extends GraphCommand {
   public get name(): string {
     return commands.SITECLASSIFICATION_ENABLE;
   }
@@ -155,4 +155,4 @@ class AadSiteClassificationEnableCommand extends GraphCommand {
   }
 }
 
-export default new AadSiteClassificationEnableCommand();
+export default new EntraSiteClassificationEnableCommand();

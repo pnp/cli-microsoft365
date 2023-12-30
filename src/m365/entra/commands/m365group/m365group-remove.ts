@@ -22,7 +22,7 @@ interface Options extends GlobalOptions {
   skipRecycleBin: boolean;
 }
 
-class AadM365GroupRemoveCommand extends GraphCommand {
+class EntraM365GroupRemoveCommand extends GraphCommand {
   private static maxRetries: number = 10;
   private intervalInMs: number = 5000;
 
@@ -160,14 +160,14 @@ class AadM365GroupRemoveCommand extends GraphCommand {
   }
 
   private async deleteM365GroupFromRecycleBin(logger: Logger, id: string): Promise<void> {
-    for (let retries = 0; retries < AadM365GroupRemoveCommand.maxRetries; retries++) {
+    for (let retries = 0; retries < EntraM365GroupRemoveCommand.maxRetries; retries++) {
       if (await this.isM365GroupInDeletedItemsList(id)) {
         await this.removeM365GroupPermanently(logger, id);
         return;
       }
       else {
         if (this.verbose) {
-          await logger.logToStderr(`Group has not been deleted yet. Waiting for ${this.intervalInMs / 1000} seconds before the next attempt. ${AadM365GroupRemoveCommand.maxRetries - retries} attempts remaining...`);
+          await logger.logToStderr(`Group has not been deleted yet. Waiting for ${this.intervalInMs / 1000} seconds before the next attempt. ${EntraM365GroupRemoveCommand.maxRetries - retries} attempts remaining...`);
         }
 
         await setTimeout(this.intervalInMs);
@@ -240,4 +240,4 @@ class AadM365GroupRemoveCommand extends GraphCommand {
   }
 }
 
-export default new AadM365GroupRemoveCommand();
+export default new EntraM365GroupRemoveCommand();

@@ -17,7 +17,7 @@ interface Options extends GlobalOptions {
   includeSiteUrl: boolean;
 }
 
-class AadM365GroupGetCommand extends GraphCommand {
+class EntraM365GroupGetCommand extends GraphCommand {
   public get name(): string {
     return commands.M365GROUP_GET;
   }
@@ -93,4 +93,4 @@ class AadM365GroupGetCommand extends GraphCommand {
   }
 }
 
-export default new AadM365GroupGetCommand();
+export default new EntraM365GroupGetCommand();

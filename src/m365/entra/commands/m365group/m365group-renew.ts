@@ -15,7 +15,7 @@ interface Options extends GlobalOptions {
   id: string;
 }
 
-class AadM365GroupRenewCommand extends GraphCommand {
+class EntraM365GroupRenewCommand extends GraphCommand {
   public get name(): string {
     return commands.M365GROUP_RENEW;
   }
@@ -82,4 +82,4 @@ class AadM365GroupRenewCommand extends GraphCommand {
   }
 }
 
-export default new AadM365GroupRenewCommand();
+export default new EntraM365GroupRenewCommand();

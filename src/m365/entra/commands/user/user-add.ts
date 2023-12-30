@@ -35,7 +35,7 @@ interface Options extends GlobalOptions {
   managerUserName?: string;
 }
 
-class AadUserAddCommand extends GraphCommand {
+class EntraUserAddCommand extends GraphCommand {
   public get name(): string {
     return commands.USER_ADD;
   }
@@ -301,4 +301,4 @@ class AadUserAddCommand extends GraphCommand {
   }
 }
 
-export default new AadUserAddCommand();
+export default new EntraUserAddCommand();
