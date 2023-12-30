@@ -20,7 +20,7 @@ Removes the wiki tab of a Microsoft Teams Team's channel.
   $groupMailNickname = "Architecture"
   $channelName = "General"
 
-  $groups = m365 aad m365group list --query "[?mailNickname=='$groupMailNickname']" -o json | ConvertFrom-Json
+  $groups = m365 entra m365group list --query "[?mailNickname=='$groupMailNickname']" -o json | ConvertFrom-Json
   if ($null -eq $groups) { Write-Error "A team with the mailNickname $groupMailNickname was not found" }
   else {
     $channels = m365 teams channel list --teamId $groups[0].id --query "[?displayName=='$channelName']" -o json | ConvertFrom-Json
@@ -49,7 +49,7 @@ Removes the wiki tab of a Microsoft Teams Team's channel.
   channelName="Channel"
   wikiTabId="com.microsoft.teamspace.tab.wiki"
 
-  groups=$(m365 aad m365group list -o json | jq '.[] | select(.mailNickname == "'"$groupMailNickname"'")')
+  groups=$(m365 entra m365group list -o json | jq '.[] | select(.mailNickname == "'"$groupMailNickname"'")')
   if [ -z "$groups" ]; then
     echo "A team with the mailNickname $groupMailNickname was not found"
   else
