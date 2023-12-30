@@ -13,6 +13,7 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './groupsettingtemplate-get.js';
 import { settingsNames } from '../../../../settingsNames.js';
+import aadCommands from '../../aadCommands.js';
 
 describe(commands.GROUPSETTINGTEMPLATE_GET, () => {
   let log: string[];
@@ -64,6 +65,16 @@ describe(commands.GROUPSETTINGTEMPLATE_GET, () => {
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
+  });
+
+  it('defines alias', () => {
+    const alias = command.alias();
+    assert.notStrictEqual(typeof alias, 'undefined');
+  });
+
+  it('defines correct alias', () => {
+    const alias = command.alias();
+    assert.deepStrictEqual(alias, [aadCommands.GROUPSETTINGTEMPLATE_GET]);
   });
 
   it('retrieves group setting template by id', async () => {

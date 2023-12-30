@@ -13,6 +13,7 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './user-add.js';
 import { settingsNames } from '../../../../settingsNames.js';
+import aadCommands from '../../aadCommands.js';
 
 describe(commands.USER_ADD, () => {
   const graphBaseUrl = 'https://graph.microsoft.com/v1.0/users';
@@ -121,6 +122,16 @@ describe(commands.USER_ADD, () => {
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
+  });
+
+  it('defines alias', () => {
+    const alias = command.alias();
+    assert.notStrictEqual(typeof alias, 'undefined');
+  });
+
+  it('defines correct alias', () => {
+    const alias = command.alias();
+    assert.deepStrictEqual(alias, [aadCommands.USER_ADD]);
   });
 
   it('creates Azure AD user using a preset password but requiring the user to change it the next login', async () => {

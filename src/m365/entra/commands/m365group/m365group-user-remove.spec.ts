@@ -15,6 +15,7 @@ import commands from '../../commands.js';
 import command from './m365group-user-remove.js';
 import { settingsNames } from '../../../../settingsNames.js';
 import { aadGroup } from '../../../../utils/aadGroup.js';
+import aadCommands from '../../aadCommands.js';
 
 describe(commands.M365GROUP_USER_REMOVE, () => {
   let log: string[];
@@ -82,7 +83,7 @@ describe(commands.M365GROUP_USER_REMOVE, () => {
 
   it('defines correct alias', () => {
     const alias = command.alias();
-    assert.strictEqual((alias && alias.indexOf(teamsCommands.USER_REMOVE) > -1), true);
+    assert.deepStrictEqual(alias, [teamsCommands.USER_REMOVE, aadCommands.M365GROUP_USER_REMOVE]);
   });
 
   it('fails validation if the groupId is not a valid guid.', async () => {

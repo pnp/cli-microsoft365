@@ -15,6 +15,7 @@ import commands from '../../commands.js';
 import { spo } from '../../../../utils/spo.js';
 import command from './m365group-remove.js';
 import { aadGroup } from '../../../../utils/aadGroup.js';
+import aadCommands from '../../aadCommands.js';
 
 describe(commands.M365GROUP_REMOVE, () => {
   let log: string[];
@@ -157,6 +158,16 @@ describe(commands.M365GROUP_REMOVE, () => {
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
+  });
+
+  it('defines alias', () => {
+    const alias = command.alias();
+    assert.notStrictEqual(typeof alias, 'undefined');
+  });
+
+  it('defines correct alias', () => {
+    const alias = command.alias();
+    assert.deepStrictEqual(alias, [aadCommands.M365GROUP_REMOVE]);
   });
 
   it('fails validation if the id is not a valid GUID', async () => {

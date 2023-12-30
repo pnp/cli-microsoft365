@@ -12,6 +12,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './user-license-add.js';
+import aadCommands from '../../aadCommands.js';
 
 describe(commands.USER_LICENSE_ADD, () => {
   let commandInfo: CommandInfo;
@@ -80,6 +81,16 @@ describe(commands.USER_LICENSE_ADD, () => {
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
+  });
+
+  it('defines alias', () => {
+    const alias = command.alias();
+    assert.notStrictEqual(typeof alias, 'undefined');
+  });
+
+  it('defines correct alias', () => {
+    const alias = command.alias();
+    assert.deepStrictEqual(alias, [aadCommands.USER_LICENSE_ADD]);
   });
 
   it('fails validation if ids is not a valid guid.', async () => {

@@ -13,6 +13,7 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './user-hibp.js';
 import { settingsNames } from '../../../../settingsNames.js';
+import aadCommands from '../../aadCommands.js';
 
 describe(commands.USER_HIBP, () => {
   let log: string[];
@@ -60,6 +61,16 @@ describe(commands.USER_HIBP, () => {
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
+  });
+
+  it('defines alias', () => {
+    const alias = command.alias();
+    assert.notStrictEqual(typeof alias, 'undefined');
+  });
+
+  it('defines correct alias', () => {
+    const alias = command.alias();
+    assert.deepStrictEqual(alias, [aadCommands.USER_HIBP]);
   });
 
   it('fails validation if userName and apiKey is not specified', async () => {

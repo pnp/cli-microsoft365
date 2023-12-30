@@ -15,6 +15,7 @@ import commands from '../../commands.js';
 import command from './m365group-user-set.js';
 import { settingsNames } from '../../../../settingsNames.js';
 import { aadGroup } from '../../../../utils/aadGroup.js';
+import aadCommands from '../../aadCommands.js';
 
 describe(commands.M365GROUP_USER_SET, () => {
   let log: string[];
@@ -76,7 +77,7 @@ describe(commands.M365GROUP_USER_SET, () => {
 
   it('defines correct alias', () => {
     const alias = command.alias();
-    assert.strictEqual((alias && alias.indexOf(teamsCommands.USER_SET) > -1), true);
+    assert.deepStrictEqual(alias, [teamsCommands.USER_SET, aadCommands.M365GROUP_USER_SET]);
   });
 
   it('fails validation if the groupId is not a valid guid.', async () => {

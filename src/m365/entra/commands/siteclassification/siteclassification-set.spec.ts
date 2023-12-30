@@ -12,6 +12,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './siteclassification-set.js';
+import aadCommands from '../../aadCommands.js';
 
 describe(commands.SITECLASSIFICATION_SET, () => {
   let log: string[];
@@ -60,6 +61,16 @@ describe(commands.SITECLASSIFICATION_SET, () => {
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
+  });
+
+  it('defines alias', () => {
+    const alias = command.alias();
+    assert.notStrictEqual(typeof alias, 'undefined');
+  });
+
+  it('defines correct alias', () => {
+    const alias = command.alias();
+    assert.deepStrictEqual(alias, [aadCommands.SITECLASSIFICATION_SET]);
   });
 
   it('fails validation if none of the options are specified', async () => {

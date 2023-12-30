@@ -12,6 +12,7 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import request from '../../../../request.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
+import aadCommands from '../../aadCommands.js';
 
 describe(commands.ADMINISTRATIVEUNIT_ADD, () => {
   const administrativeUnitReponse: any = {
@@ -69,6 +70,16 @@ describe(commands.ADMINISTRATIVEUNIT_ADD, () => {
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
+  });
+
+  it('defines alias', () => {
+    const alias = command.alias();
+    assert.notStrictEqual(typeof alias, 'undefined');
+  });
+
+  it('defines correct alias', () => {
+    const alias = command.alias();
+    assert.deepStrictEqual(alias, [aadCommands.ADMINISTRATIVEUNIT_ADD]);
   });
 
   it('creates an administrative unit with a specific display name', async () => {

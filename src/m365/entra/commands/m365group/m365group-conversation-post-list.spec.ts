@@ -14,6 +14,7 @@ import commands from '../../commands.js';
 import command from './m365group-conversation-post-list.js';
 import { settingsNames } from '../../../../settingsNames.js';
 import { aadGroup } from '../../../../utils/aadGroup.js';
+import aadCommands from '../../aadCommands.js';
 
 describe(commands.M365GROUP_CONVERSATION_POST_LIST, () => {
   let log: string[];
@@ -119,6 +120,16 @@ describe(commands.M365GROUP_CONVERSATION_POST_LIST, () => {
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
+  });
+
+  it('defines alias', () => {
+    const alias = command.alias();
+    assert.notStrictEqual(typeof alias, 'undefined');
+  });
+
+  it('defines correct alias', () => {
+    const alias = command.alias();
+    assert.deepStrictEqual(alias, [aadCommands.M365GROUP_CONVERSATION_POST_LIST]);
   });
 
   it('defines correct properties for the default output', () => {

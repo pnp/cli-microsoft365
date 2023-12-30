@@ -13,6 +13,7 @@ import request from '../../../../request.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { CommandError } from '../../../../Command.js';
 import { aadAdministrativeUnit } from '../../../../utils/aadAdministrativeUnit.js';
+import aadCommands from '../../aadCommands.js';
 
 describe(commands.ADMINISTRATIVEUNIT_GET, () => {
   let log: string[];
@@ -80,6 +81,16 @@ describe(commands.ADMINISTRATIVEUNIT_GET, () => {
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
+  });
+
+  it('defines alias', () => {
+    const alias = command.alias();
+    assert.notStrictEqual(typeof alias, 'undefined');
+  });
+
+  it('defines correct alias', () => {
+    const alias = command.alias();
+    assert.deepStrictEqual(alias, [aadCommands.ADMINISTRATIVEUNIT_GET]);
   });
 
   it('retrieves information about the specified administrative unit by id', async () => {
