@@ -159,7 +159,7 @@ describe(commands.USER_APP_ADD, () => {
       }
     } as any);
   });
-  
+
   it('adds app by id from the catalog for the specified user by name', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users/admin%40contoso.com/teamwork/installedApps` &&
@@ -177,10 +177,10 @@ describe(commands.USER_APP_ADD, () => {
       }
     } as any);
   });
-  
+
   it('adds app by name from the catalog for the specified user', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users/c527a470-a882-481c-981c-ee6efaba85c7/teamwork/installedApps?$expand=teamsAppDefinition&$filter=teamsAppDefinition/displayName eq 'TeamsApp'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/appCatalogs/teamsApps?$filter=displayName eq 'TeamsApp'`) {
         return {
           "value": [
             {
@@ -213,7 +213,7 @@ describe(commands.USER_APP_ADD, () => {
 
   it('fails to get teams app when app by name does not exists', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users/c527a470-a882-481c-981c-ee6efaba85c7/teamwork/installedApps?$expand=teamsAppDefinition&$filter=teamsAppDefinition/displayName eq 'TeamsApp'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/appCatalogs/teamsApps?$filter=displayName eq 'TeamsApp'`) {
         return { value: [] };
       }
 
@@ -233,7 +233,7 @@ describe(commands.USER_APP_ADD, () => {
     let addRequestIssued = false;
 
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users/c527a470-a882-481c-981c-ee6efaba85c7/teamwork/installedApps?$expand=teamsAppDefinition&$filter=teamsAppDefinition/displayName eq 'TeamsApp'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/appCatalogs/teamsApps?$filter=displayName eq 'TeamsApp'`) {
         return {
           "value": [
             {

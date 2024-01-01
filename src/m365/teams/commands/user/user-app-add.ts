@@ -83,7 +83,7 @@ class TeamsUserAppAddCommand extends GraphCommand {
       }
     );
   }
-  
+
   #initOptionSets(): void {
     this.optionSets.push({ options: ['id', 'name'] });
     this.optionSets.push({ options: ['userId', 'userName'] });
@@ -124,7 +124,7 @@ class TeamsUserAppAddCommand extends GraphCommand {
     }
 
     const requestOptions: CliRequestOptions = {
-      url: `${this.resource}/v1.0/users/${args.options.userId}/teamwork/installedApps?$expand=teamsAppDefinition&$filter=teamsAppDefinition/displayName eq '${formatting.encodeQueryParameter(args.options.name as string)}'`,
+      url: `${this.resource}/v1.0/appCatalogs/teamsApps?$filter=displayName eq '${formatting.encodeQueryParameter(args.options.name as string)}'`,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },
