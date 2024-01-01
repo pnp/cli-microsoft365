@@ -481,4 +481,24 @@ describe('urlUtil/urlUtil', () => {
     const actual = urlUtil.urlCombine('https://contoso.sharepoint.com/sites/team1', '/sites/team1/Shared Documents/MyFolder/');
     assert.strictEqual(actual, 'https://contoso.sharepoint.com/sites/team1/sites/team1/Shared Documents/MyFolder');
   });
+
+  it('should return the correct target site absolute URL when the targetUrl is relative and starts with "/"', () => {
+    const actual = urlUtil.getTargetSiteAbsoluteUrl('https://contoso.sharepoint.com', '/teams/sales/Shared Documents/temp/123/234');
+    assert.strictEqual(actual, 'https://contoso.sharepoint.com/teams/sales');
+  });
+
+  it('should return the correct target site absolute URL when the targetUrl is an absolute SharePoint URL', () => {
+    const actual = urlUtil.getTargetSiteAbsoluteUrl('https://contoso.sharepoint.com', 'https://contoso-my.sharepoint.com/personal/john_contoso_onmicrosoft_com/Documents/123');
+    assert.strictEqual(actual, 'https://contoso-my.sharepoint.com/personal/john_contoso_onmicrosoft_com');
+  });
+
+  it('should return the correct target site absolute URL when the webUrl is not the root site', () => {
+    const actual = urlUtil.getTargetSiteAbsoluteUrl('https://contoso.sharepoint.com/teams/sales', '/Shared Documents/temp');
+    assert.strictEqual(actual, 'https://contoso.sharepoint.com');
+  });
+
+  it('should return the correct target site absolute URL when the targetUrl does not match SharePoint URL pattern', () => {
+    const actual = urlUtil.getTargetSiteAbsoluteUrl('https://contoso.sharepoint.com', 'https://example.com/some/path');
+    assert.strictEqual(actual, 'https://example.com');
+  });
 });

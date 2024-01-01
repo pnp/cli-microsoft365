@@ -1,9 +1,9 @@
-import { Drive, DriveItem, Site } from '@microsoft/microsoft-graph-types';
+import { Drive, DriveItem } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../cli/Logger.js';
 import GlobalOptions from '../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../request.js';
-import { formatting } from '../../../utils/formatting.js';
 import { urlUtil } from '../../../utils/urlUtil.js';
+import { spo } from '../../../utils/spo.js';
 import { validation } from '../../../utils/validation.js';
 import GraphCommand from '../../base/GraphCommand.js';
 import commands from '../commands.js';
@@ -75,15 +75,17 @@ class FileCopyCommand extends GraphCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
-      const sourcePath: string = this.getAbsoluteUrl(args.options.webUrl, args.options.sourceUrl);
-      const destinationPath: string = this.getAbsoluteUrl(args.options.webUrl, args.options.targetUrl);
+      const { webUrl, sourceUrl, targetUrl, newName, verbose } = args.options;
+
+      const sourcePath: string = this.getAbsoluteUrl(webUrl, sourceUrl);
+      const destinationPath: string = this.getAbsoluteUrl(webUrl, targetUrl);
 
       if (this.verbose) {
         logger.logToStderr(`Copying file '${sourcePath}' to '${destinationPath}'...`);
       }
 
       const copyUrl: string = await this.getCopyUrl(args.options, sourcePath, logger);
-      const { targetDriveId, targetItemId } = await this.getTargetDriveAndItemId(args.options.webUrl, args.options.targetUrl, logger);
+      const { targetDriveId, targetItemId } = await this.getTargetDriveAndItemId(webUrl, targetUrl, logger, verbose);
 
       const requestOptions: CliRequestOptions = {
         url: copyUrl,
@@ -100,7 +102,7 @@ class FileCopyCommand extends GraphCommand {
       };
 
       if (args.options.newName) {
-        requestOptions.data.name = args.options.newName;
+        requestOptions.data.name = newName;
       }
 
       await request.post(requestOptions);
@@ -110,51 +112,31 @@ class FileCopyCommand extends GraphCommand {
     }
   }
 
-  private async getCopyUrl(options: Options, sourceUrl: string, logger: Logger): Promise<string> {
-    const folderUrl: URL = new URL(sourceUrl);
-    const siteId: string = await this.getSiteId(options.webUrl, logger);
-    const drive: Drive = await this.getDocumentLibrary(siteId, folderUrl, options.sourceUrl, logger);
+  private async getCopyUrl(options: Options, sourcePath: string, logger: Logger): Promise<string> {
+    const { webUrl, sourceUrl, verbose, nameConflictBehavior } = options;
+    const folderUrl: URL = new URL(sourcePath);
+    const siteId: string = await spo.getSiteId(webUrl, logger, verbose);
+    const drive: Drive = await this.getDocumentLibrary(siteId, folderUrl, sourceUrl, logger);
     const itemId: string = await this.getStartingFolderId(drive, folderUrl, logger);
 
-    const queryParameters: string = options.nameConflictBehavior === 'replace'
-      ? '@microsoft.graph.conflictBehavior=replace'
-      : options.nameConflictBehavior === 'rename'
-        ? '@microsoft.graph.conflictBehavior=rename'
-        : '';
+    const queryParameters: string = nameConflictBehavior && nameConflictBehavior !== 'fail'
+      ? `@microsoft.graph.conflictBehavior=${nameConflictBehavior}`
+      : '';
 
-    const copyUrl: string = `${this.resource}/v1.0/sites/${siteId}/drives/${drive.id}/items/${itemId}/copy${queryParameters ? '?' + queryParameters : ''}`;
+    const copyUrl: string = `${this.resource}/v1.0/sites/${siteId}/drives/${drive.id}/items/${itemId}/copy${queryParameters ? `?${queryParameters}` : ''}`;
 
     return copyUrl;
   }
 
-  private async getTargetDriveAndItemId(webUrl: string, targetUrl: string, logger: Logger): Promise<{ targetDriveId: string, targetItemId: string }> {
-    const targetSiteUrl: string = this.getTargetSiteUrl(webUrl, targetUrl);
-    const targetSiteId: string = await this.getSiteId(targetSiteUrl, logger);
+  private async getTargetDriveAndItemId(webUrl: string, targetUrl: string, logger: Logger, verbose?: boolean): Promise<{ targetDriveId: string, targetItemId: string }> {
+    const targetSiteUrl: string = urlUtil.getTargetSiteAbsoluteUrl(webUrl, targetUrl);
+    const targetSiteId: string = await spo.getSiteId(targetSiteUrl, logger, verbose);
     const targetFolderUrl: URL = new URL(this.getAbsoluteUrl(targetSiteUrl, targetUrl));
     const targetDrive: Drive = await this.getDocumentLibrary(targetSiteId, targetFolderUrl, targetUrl, logger);
     const targetDriveId: string = targetDrive.id as string;
     const targetItemId: string = await this.getStartingFolderId(targetDrive, targetFolderUrl, logger);
 
     return { targetDriveId, targetItemId };
-  }
-
-  private async getSiteId(webUrl: string, logger: Logger): Promise<string> {
-    if (this.verbose) {
-      logger.logToStderr(`Getting site id for URL: ${webUrl}...`);
-    }
-
-    const url: URL = new URL(webUrl);
-    const requestOptions: CliRequestOptions = {
-      url: `${this.resource}/v1.0/sites/${formatting.encodeQueryParameter(url.host)}:${url.pathname}?$select=id`,
-      headers: {
-        accept: 'application/json;odata.metadata=none'
-      },
-      responseType: 'json'
-    };
-
-    const site: Site = await request.get<Site>(requestOptions);
-
-    return site.id as string;
   }
 
   private async getDocumentLibrary(siteId: string, folderUrl: URL, folderUrlFromUser: string, logger: Logger): Promise<Drive> {
@@ -212,42 +194,6 @@ class FileCopyCommand extends GraphCommand {
 
   private getAbsoluteUrl(webUrl: string, url: string): string {
     return url.startsWith('https://') ? url : urlUtil.getAbsoluteUrl(webUrl, url);
-  }
-
-  /**
- * Get the site URL from the target SharePoint URL.
- *
- * @param {string} webUrl - The base web URL.
- * @param {string} url - The target SharePoint URL.
- * @returns {string} - The target site URL.
- * 
- * * Example Scenarios:
- * - webUrl = "https://contoso.sharepoint.com" and targetUrl = "/teams/Important/Shared Documents/temp/123/234",
- *    returns "https://contoso.sharepoint.com/teams/Important".
- * - webUrl = "https://contoso.sharepoint.com" and targetUrl = "https://contoso-my.sharepoint.com/personal/john_contoso_onmicrosoft_com/Documents/123",
- *    returns "https://contoso-my.sharepoint.com/personal/john_contoso_onmicrosoft_com".
- * - webUrl = "https://contoso.sharepoint.com/teams/finance" and targetUrl = "/Shared Documents/temp",
- *    returns "https://contoso.sharepoint.com".
- * - webUrl = "https://contoso.sharepoint.com" and targetUrl = "/teams/sales/Shared Documents/temp",
- *    returns "https://contoso.sharepoint.com/teams/sales".
- */
-  private getTargetSiteUrl(webUrl: string, url: string): string {
-    const fullUrl: string = url.startsWith('https://') ? url : urlUtil.getAbsoluteUrl(webUrl, url);
-
-    // Pattern to match SharePoint URLs
-    const urlPattern = /https:\/\/[\w\-]+\.sharepoint\.com\/(teams|sites|personal)\/([\w\-]+)/;
-
-    const match = fullUrl.match(urlPattern);
-
-    if (match) {
-      // If a match is found, return the matched URL
-      return match[0];
-    }
-    else {
-      // Extract the root URL
-      const rootUrl = new URL(fullUrl);
-      return rootUrl.origin;
-    }
   }
 }
 

@@ -51,10 +51,16 @@ Copy a file to a document library in another site collection and rename the file
 m365 file copy --webUrl https://contoso.sharepoint.com --sourceUrl "/Shared Documents/Document.pdf" --targetUrl "/sites/IT/Shared Documents" --newName "newName.pdf"
 ```
 
+Copy a file to a document library in another site collection and rename the file if a file with the same name already exists.
+
+```sh
+m365 file copy --webUrl https://contoso.sharepoint.com --sourceUrl "/Shared Documents/Document.pdf" --targetUrl "/sites/IT/Shared Documents" --nameConflictBehavior rename
+```
+
 Copy a file to Onedrive for business 
 
 ```sh
-m365 file copy --webUrl https://contoso.sharepoint.com --sourceUrl "/Shared Documents/Document.pdf" --targetUrl ""https://contoso-my.sharepoint.com/personal/john_contoso_onmicrosoft_com/documents"
+m365 file copy --webUrl https://contoso.sharepoint.com --sourceUrl "/Shared Documents/Document.pdf" --targetUrl "https://contoso-my.sharepoint.com/personal/john_contoso_onmicrosoft_com/documents"
 ```
 
 ## Response
