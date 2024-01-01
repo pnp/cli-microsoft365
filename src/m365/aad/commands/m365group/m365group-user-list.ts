@@ -103,6 +103,10 @@ class AadM365GroupUserListCommand extends GraphCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
+      if (args.options.role === 'Guest') {
+        this.warn(logger, `Value 'Guest' for the option role is deprecated.`);
+      }
+
       const groupId = await this.getGroupId(args.options, logger);
       const isUnifiedGroup = await aadGroup.isUnifiedGroup(groupId);
 

@@ -280,6 +280,40 @@ describe(commands.M365GROUP_USER_LIST, () => {
     ]));
   });
 
+  it('correctly lists all guests in a Microsoft 365 group by group id', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/Owners/microsoft.graph.user?$select=id,displayName,userPrincipalName,givenName,surname,userType`) {
+        return {
+          "value": [{ "id": "00000000-0000-0000-0000-000000000001", "displayName": "Karl Matteson", "userPrincipalName": "karl.matteson@contoso.onmicrosoft.com", "givenName": "Karl", "surname": "Matteson", "userType": "Member" }]
+        };
+      }
+
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/Members/microsoft.graph.user?$select=id,displayName,userPrincipalName,givenName,surname,userType`) {
+        return {
+          "value": [
+            { "id": "00000000-0000-0000-0000-000000000000", "displayName": "Anne Matthews", "userPrincipalName": "annematthews_gmail.com#EXT#@nachan365.onmicrosoft.com", "givenName": "Anne", "surname": "Matthews", "userType": "Guest" },
+            { "id": "00000000-0000-0000-0000-000000000001", "displayName": "Karl Matteson", "userPrincipalName": "karl.matteson@contoso.onmicrosoft.com", "givenName": "Karl", "surname": "Matteson", "userType": "Member" }
+          ]
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { groupId: "00000000-0000-0000-0000-000000000000", role: "Guest" } });
+    assert(loggerLogSpy.calledOnceWithExactly([
+      {
+        "id": "00000000-0000-0000-0000-000000000000",
+        "displayName": "Anne Matthews",
+        "userPrincipalName": "annematthews_gmail.com#EXT#@nachan365.onmicrosoft.com",
+        "userType": "Guest",
+        "givenName": "Anne",
+        "surname": "Matthews",
+        "roles": ["Member"]
+      }
+    ]));
+  });
+
   it('correctly lists all users in a Microsoft 365 group by group id (debug)', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/Owners/microsoft.graph.user?$select=id,displayName,userPrincipalName,givenName,surname,userType`) {
