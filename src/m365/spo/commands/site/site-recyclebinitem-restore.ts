@@ -125,7 +125,7 @@ class SpoSiteRecycleBinItemRestoreCommand extends SpoCommand {
         }
 
         if (args.options.allSecondary) {
-          requestUrl += `/site/RecycleBin/RestoreAll`;
+          requestUrl += `/site/GetRecyclebinItems(rowLimit=2000000000,itemState=2)/RestoreAll`;
           await this.restoreRecycleBinItems(requestUrl);
         }
       }
