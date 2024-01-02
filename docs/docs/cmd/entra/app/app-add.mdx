@@ -4,7 +4,7 @@ import TabItem from '@theme/TabItem';
 
 # entra app add
 
-Creates new Entra ID app registration
+Creates new Entra app registration
 
 ## Usage
 
@@ -73,7 +73,7 @@ m365 aad app add [options]
 : When specified, grants application & delegated permissions through admin consent.
 
 `--manifest [manifest]`
-: Entra ID app manifest as retrieved from the Azure Portal to create the app registration from. Specify either `name` or `manifest` but not both.
+: App manifest as retrieved from Entra ID to create the app registration from. Specify either `name` or `manifest` but not both.
 
 `--save`
 : Use to store the information about the created app in a local file.
@@ -83,7 +83,7 @@ m365 aad app add [options]
 
 ## Remarks
 
-You can use this command to create a new Entra registration either by specifying the different configuration settings through the corresponding options or by using the manifest.
+You can use this command to create a new Entra app registration either by specifying the different configuration settings through the corresponding options or by using the manifest.
 
 If you don't use the manifest, you must specify the name of the Entra app registration using the `name` option. If you use the manifest, you can skip the `name` option assuming the manifest contains the `displayName` property.
 
@@ -167,7 +167,7 @@ Create new Entra app registration with Application ID URI set to a fixed value
 m365 entra app add --name 'My Entra app' --uri https://contoso.onmicrosoft.com/myapp
 ```
 
-Create new EntraD app registration with Application ID URI set to a value that contains the ID of the app registration, designated with the `_appId_` token and a custom API scope that can be consented by both admins and users
+Create new Entra app registration with Application ID URI set to a value that contains the ID of the app registration, designated with the `_appId_` token and a custom API scope that can be consented by both admins and users
 
 ```sh
 m365 entra app add --name 'My Entra app' --uri api://caf406b91cd4.ngrok.io/_appId_ --scopeName access_as_user --scopeAdminConsentDescription 'Access as a user' --scopeAdminConsentDisplayName 'Access as a user' --scopeConsentBy adminsAndUsers

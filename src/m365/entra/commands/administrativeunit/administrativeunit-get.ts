@@ -30,7 +30,6 @@ class EntraAdministrativeUnitGetCommand extends GraphCommand {
     return [aadCommands.ADMINISTRATIVEUNIT_GET];
   }
 
-
   constructor() {
     super();
 

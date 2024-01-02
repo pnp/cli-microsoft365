@@ -191,7 +191,7 @@ Update your scripts to expect a single object instead of an array.
 
 ## Updated `spo group user <verb>` commands
 
-We've renamed the `spo group user <verb>` commands to `spo group member <verb>` to better cover all possible scenarios. In the near future we'll be adding support to add Entra ID Groups as group member. Using `spo group member` better fits the intended situation of adding either users or Entra ID groups.
+We've renamed the `spo group user <verb>` commands to `spo group member <verb>` to better cover all possible scenarios. In the near future we'll be adding support to add Entra groups as group member. Using `spo group member` better fits the intended situation of adding either users or Entra groups.
 
 As a side issue, we've also updated the response output of the `spo group member list` command in JSON output mode. This returned a member array within a parent `value` object. In the new situation, the command returns the array without the parent `value` object.
 

@@ -31,7 +31,7 @@ class EntraGroupUserListCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'Lists users of a specific Entra ID group';
+    return 'Lists users of a specific Entra group';
   }
 
   public alias(): string[] | undefined {

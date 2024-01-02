@@ -24,7 +24,7 @@ class EntraGroupRemoveCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'Removes an Entra ID group';
+    return 'Removes an Entra group';
   }
 
   public alias(): string[] | undefined {

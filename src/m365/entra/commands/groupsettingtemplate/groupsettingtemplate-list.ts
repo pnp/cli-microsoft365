@@ -11,7 +11,7 @@ class EntraGroupSettingTemplateListCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'Lists Entra ID group settings templates';
+    return 'Lists Entra group settings templates';
   }
 
   public alias(): string[] | undefined {

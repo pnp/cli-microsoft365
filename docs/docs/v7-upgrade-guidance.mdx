@@ -18,7 +18,7 @@ Replace every `entra o365group` command with its `entra m365group` equivalent in
 
 ### Removed `deleted` flag from certain `entra` commands
 
-In previous versions of CLI for Microsoft 365, we had a few commands under the Entra ID group that had a `--deleted` flag. This flag was used to get deleted users and groups in Entra ID. In this major release, we have removed this flag from the commands. To get all deleted users and groups in your tenant, you should now use different commands.
+In previous versions of CLI for Microsoft 365, we had a few commands under the Entra group that had a `--deleted` flag. This flag was used to get deleted users and groups in Entra ID. In this major release, we have removed this flag from the commands. To get all deleted users and groups in your tenant, you should now use different commands.
 
 **Affected commands:**
 
@@ -351,7 +351,7 @@ In the past versions of CLI for Microsoft 365, the command [teams meeting list](
               "id": "b2091e18-7882-4efe-b7d1-90703f5a5c65",
               "displayName": null,
               "tenantId": "ad4f158a-97c7-4914-a9bd-038ecde40ff3",
-              "identityProvider": "ENTRA"
+              "identityProvider": "AAD"
             }
           }
         },
@@ -366,7 +366,7 @@ In the past versions of CLI for Microsoft 365, the command [teams meeting list](
                 "id": "52bd2d9c-2d89-416f-96c4-ca94245e22c8",
                 "displayName": null,
                 "tenantId": "ad4f158a-97c7-4914-a9bd-038ecde40ff3",
-                "identityProvider": "ENTRA"
+                "identityProvider": "AAD"
               }
             }
           }

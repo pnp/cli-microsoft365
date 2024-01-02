@@ -6,7 +6,7 @@
     "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/entra/delete-m365-groups",
     "creationDateTime": "2020-03-15",
     "updateDateTime": "2023-07-28",
-    "shortDescription": "this script deletes the Entra ID groups you no longer need.",
+    "shortDescription": "this script deletes the Entra groups you no longer need.",
     "longDescription": [
       "There are so many different ways to create Microsoft 365 groups. Teams, Planner, SharePoint team sites, etc. — you can accumulate a lot of them very fast. Use this script below to delete the ones you no longer need."
     ],

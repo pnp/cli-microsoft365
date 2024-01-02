@@ -22,7 +22,7 @@ class EntraGroupGetCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'Gets information about the specified Entra ID Group';
+    return 'Gets information about the specified Entra group';
   }
 
   public alias(): string[] | undefined {

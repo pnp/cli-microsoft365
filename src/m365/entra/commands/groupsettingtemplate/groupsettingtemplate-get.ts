@@ -22,7 +22,7 @@ class EntraGroupSettingTemplateGetCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'Gets information about the specified Entra ID group settings template';
+    return 'Gets information about the specified Entra group settings template';
   }
 
   public alias(): string[] | undefined {
