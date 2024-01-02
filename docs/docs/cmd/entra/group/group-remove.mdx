@@ -1,10 +1,16 @@
 import Global from '/docs/cmd/_global.mdx';
 
-# aad group remove
+# entra group remove
 
-Removes an Azure AD group
+Removes an Entra group
 
 ## Usage
+
+```sh
+m365 entra group remove [options]
+```
+
+## Alias
 
 ```sh
 m365 aad group remove [options]
@@ -14,10 +20,10 @@ m365 aad group remove [options]
 
 ```md definition-list
 `-i, --id [id]`
-: The ID of the Azure AD group. Specify either `id` or `displayName` but not both.
+: The ID of the Entra group. Specify either `id` or `displayName` but not both.
 
 `-n, --displayName [displayName]`
-: The display name of the Azure AD group. Specify either `id` or `displayName` but not both.
+: The display name of the Entra group. Specify either `id` or `displayName` but not both.
 
 `-f, --force`
 : Don't prompt for confirmation.
@@ -27,16 +33,16 @@ m365 aad group remove [options]
 
 ## Examples
 
-Remove an Azure AD group by display name
+Remove an Entra group by display name
 
 ```sh
-m365 aad group remove --displayName Developers
+m365 entra group remove --displayName Developers
 ```
 
-Remove an Azure AD group by ID
+Remove an Entra group by ID
 
 ```sh
-m365 aad group remove --id 016bf125-195b-43c5-a1a0-28ccd3192c6d
+m365 entra group remove --id 016bf125-195b-43c5-a1a0-28ccd3192c6d
 ```
 
 ## Response
