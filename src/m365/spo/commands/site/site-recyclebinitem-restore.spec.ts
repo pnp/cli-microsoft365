@@ -155,7 +155,7 @@ describe(commands.SITE_RECYCLEBINITEM_RESTORE, () => {
 
   it('restores all items from the second-stage recycle bin', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/_api/site/RecycleBin/RestoreAll') {
+      if (opts.url === 'https://contoso.sharepoint.com/_api/site/GetRecyclebinItems(rowLimit=2000000000,itemState=2)/RestoreAll') {
         return;
       }
 
