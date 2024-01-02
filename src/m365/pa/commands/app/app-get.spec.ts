@@ -20,7 +20,6 @@ describe(commands.APP_GET, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
-  let loggerLogToStderrSpy: sinon.SinonSpy;
 
   const apps = [
     {
@@ -517,7 +516,6 @@ describe(commands.APP_GET, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
-    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
   });
 
   afterEach(() => {
@@ -714,8 +712,12 @@ describe(commands.APP_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, displayName: 'NoAppFound' } });
-    assert(loggerLogToStderrSpy.calledWith(`No app found with displayName 'NoAppFound'`));
+    await assert.rejects(command.action(logger, {
+      options: {
+        verbose: true,
+        displayName: 'NoAppFound'
+      }
+    } as any), new CommandError(`No app found with displayName 'NoAppFound'.`));
   });
 
   it('correctly handles no apps found using displayName (debug)', async () => {
@@ -726,8 +728,12 @@ describe(commands.APP_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, displayName: 'Playwright' } });
-    assert(loggerLogToStderrSpy.calledWith(`No apps found`));
+    await assert.rejects(command.action(logger, {
+      options: {
+        verbose: true,
+        displayName: 'Playwright'
+      }
+    } as any), new CommandError('No apps found.'));
   });
 
   it('correctly handles API OData error', async () => {
