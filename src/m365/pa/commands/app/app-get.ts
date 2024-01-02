@@ -106,19 +106,16 @@ class PaAppGetCommand extends PowerAppsCommand {
           const app = allApps.find((a: any) => {
             return a.properties.displayName.toLowerCase() === `${args.options.displayName}`.toLowerCase();
           });
+
           if (!!app) {
             await logger.log(this.setProperties(app));
           }
           else {
-            if (this.verbose) {
-              await logger.logToStderr(`No app found with displayName '${args.options.displayName}'`);
-            }
+            throw `No app found with displayName '${args.options.displayName}'`;
           }
         }
         else {
-          if (this.verbose) {
-            await logger.logToStderr('No apps found');
-          }
+          throw 'No apps found';
         }
       }
     }
