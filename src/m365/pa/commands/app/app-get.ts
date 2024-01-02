@@ -97,10 +97,7 @@ class PaAppGetCommand extends PowerAppsCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       if (args.options.name) {
-        let endpoint = `${this.resource}/providers/Microsoft.PowerApps/apps/${formatting.encodeQueryParameter(args.options.name)}?api-version=2016-11-01`;
-        if (args.options.asAdmin) {
-          endpoint = `${this.resource}/providers/Microsoft.PowerApps/scopes/admin/environments/${formatting.encodeQueryParameter(args.options.environmentName!)}/apps/${formatting.encodeQueryParameter(args.options.name)}?api-version=2016-11-01`;
-        }
+        const endpoint = `${this.resource}/providers/Microsoft.PowerApps${args.options.asAdmin ? '/scopes/admin/environments/' + formatting.encodeQueryParameter(args.options.environmentName!) : ''}/apps/${formatting.encodeQueryParameter(args.options.name)}?api-version=2016-11-01`;
 
         const requestOptions: CliRequestOptions = {
           url: endpoint,
