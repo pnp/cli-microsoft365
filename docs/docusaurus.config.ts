@@ -1,5 +1,6 @@
 import type { Config } from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
+import type { Options as ClientRedirectsOptions } from '@docusaurus/plugin-client-redirects';
 import LightCodeTheme from './src/config/lightCodeTheme';
 import DarkCodeTheme from './src/config/darkCodeTheme';
 import definitionList from './src/remark/definitionLists';
@@ -43,6 +44,18 @@ const config: Config = {
       {
         excludeAliases: ['console']
       }
+    ],
+    [
+      'client-redirects',
+      {
+        createRedirects(routePath) {
+          if (routePath.includes('/entra')) {
+            return [routePath.replace('/entra', '/aad')];
+          }
+
+          return [];
+        }
+      } satisfies ClientRedirectsOptions
     ]
   ],
 
@@ -69,9 +82,6 @@ const config: Config = {
     ]
   ],
 
-  markdown: {
-    mermaid: true,
-  },
   themes: ['@docusaurus/theme-mermaid'],
 
   themeConfig:
