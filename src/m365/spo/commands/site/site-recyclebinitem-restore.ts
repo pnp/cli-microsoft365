@@ -31,7 +31,6 @@ class SpoSiteRecycleBinItemRestoreCommand extends SpoCommand {
 
     this.#initOptions();
     this.#initValidators();
-    this.#initOptionSets();
   }
 
   #initOptions(): void {
@@ -69,16 +68,12 @@ class SpoSiteRecycleBinItemRestoreCommand extends SpoCommand {
           }
         }
 
-        return true;
-      }
-    );
-  }
+        if ((!args.options.ids && !args.options.allPrimary && !args.options.allSecondary)
+          || (args.options.ids && (args.options.allPrimary || args.options.allSecondary))) {
+          return 'Specify ids or allPrimary and/or allSecondary';
+        }
 
-  #initOptionSets(): void {
-    this.optionSets.push(
-      {
-        options: ['ids'],
-        runsWhen: (args) => args.options.allPrimary === undefined && args.options.allSecondary === undefined
+        return true;
       }
     );
   }
@@ -125,7 +120,7 @@ class SpoSiteRecycleBinItemRestoreCommand extends SpoCommand {
         }
 
         if (args.options.allSecondary) {
-          requestUrl += `/site/GetRecyclebinItems(rowLimit=2000000000,itemState=2)/RestoreAll`;
+          requestUrl = `${args.options.siteUrl}/_api/site/GetRecyclebinItems(rowLimit=2000000000,itemState=2)/RestoreAll`;
           await this.restoreRecycleBinItems(requestUrl);
         }
       }
