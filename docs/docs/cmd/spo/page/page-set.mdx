@@ -63,9 +63,9 @@ m365 spo page set --name page.aspx --webUrl https://contoso.sharepoint.com/sites
 
 Note, how the content option has escaped double quotes `'[{\"controlType\": 4,\"id\": \"42b8afe8-dafe-4c11-bfbf-df5ef5b1feb7\",\"position\": {\"layoutIndex\": 1,\"zoneIndex\": 1,\"sectionIndex\": 1,\"sectionFactor\": 12,\"controlIndex\": 1},\"addedFromPersistedData\": true,\"innerHTML\":\"<p>Hello World</p>\"}]'` compared to execution from bash `''[{"controlType": 4,"id": "42b8afe8-dafe-4c11-bfbf-df5ef5b1feb7","position": {"layoutIndex": 1,"zoneIndex": 1,"sectionIndex": 1,"sectionFactor": 12,"controlIndex": 1},"addedFromPersistedData": true,"innerHTML":"<p>Hello World</p>"}]'`.
 
-:::warning Escaping JSON in PowerShell
+:::warning[Escaping JSON in PowerShell]
 
-    When using the `--content` option it's possible to enter a JSON string. In PowerShell 5 to 7.2 [specific escaping rules](./../../../user-guide/using-cli.mdx#escaping-double-quotes-in-powershell) apply due to an issue. Remember that you can also use [file tokens](./../../../user-guide/using-cli.mdx#passing-complex-content-into-cli-options) instead.
+When using the `--content` option it's possible to enter a JSON string. In PowerShell 5 to 7.2 [specific escaping rules](./../../../user-guide/using-cli.mdx#escaping-double-quotes-in-powershell) apply due to an issue. Remember that you can also use [file tokens](./../../../user-guide/using-cli.mdx#passing-complex-content-into-cli-options) instead.
 
 :::
 
