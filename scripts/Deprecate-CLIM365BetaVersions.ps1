@@ -11,7 +11,7 @@ if ($versionsToDeprecate.Length -eq 0) {
   return
 }
 
-Write-Host "Deprecating $($versionsToDeprecate.Length) versions of the package)"
+Write-Host "Deprecating $($versionsToDeprecate.Length) versions of the package"
 
 $index = 0
 $total = $versionsToDeprecate.Length
