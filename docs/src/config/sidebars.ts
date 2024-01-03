@@ -24,6 +24,143 @@ const sidebars: SidebarsConfig = {
     'cmd/status',
     'cmd/version',
     {
+      'Adaptive Card (adaptivecard)': [
+        {
+          type: 'doc',
+          label: 'send',
+          id: 'cmd/adaptivecard/adaptivecard-send'
+        }
+      ]
+    },
+    {
+      'Bookings (booking)': [
+        {
+          business: [
+            {
+              type: 'doc',
+              label: 'business get',
+              id: 'cmd/booking/business/business-get'
+            },
+            {
+              type: 'doc',
+              label: 'business list',
+              id: 'cmd/booking/business/business-list'
+            }
+          ]
+        }
+      ]
+    },
+    {
+      'CLI (cli)': [
+        {
+          type: 'doc',
+          label: 'consent',
+          id: 'cmd/cli/cli-consent'
+        },
+        {
+          type: 'doc',
+          label: 'doctor',
+          id: 'cmd/cli/cli-doctor'
+        },
+        {
+          type: 'doc',
+          label: 'issue',
+          id: 'cmd/cli/cli-issue'
+        },
+        {
+          type: 'doc',
+          label: 'reconsent',
+          id: 'cmd/cli/cli-reconsent'
+        },
+        {
+          completion: [
+            {
+              type: 'doc',
+              label: 'completion clink update',
+              id: 'cmd/cli/completion/completion-clink-update'
+            },
+            {
+              type: 'doc',
+              label: 'completion pwsh setup',
+              id: 'cmd/cli/completion/completion-pwsh-setup'
+            },
+            {
+              type: 'doc',
+              label: 'completion pwsh update',
+              id: 'cmd/cli/completion/completion-pwsh-update'
+            },
+            {
+              type: 'doc',
+              label: 'completion sh setup',
+              id: 'cmd/cli/completion/completion-sh-setup'
+            },
+            {
+              type: 'doc',
+              label: 'completion sh update',
+              id: 'cmd/cli/completion/completion-sh-update'
+            }
+          ]
+        },
+        {
+          config: [
+            {
+              type: 'doc',
+              label: 'config get',
+              id: 'cmd/cli/config/config-get'
+            },
+            {
+              type: 'doc',
+              label: 'config list',
+              id: 'cmd/cli/config/config-list'
+            },
+            {
+              type: 'doc',
+              label: 'config reset',
+              id: 'cmd/cli/config/config-reset'
+            },
+            {
+              type: 'doc',
+              label: 'config set',
+              id: 'cmd/cli/config/config-set'
+            }
+          ]
+        }
+      ]
+    },
+    {
+      'Context (context)': [
+        {
+          type: 'doc',
+          label: 'init',
+          id: 'cmd/context/context-init'
+        },
+        {
+          type: 'doc',
+          label: 'remove',
+          id: 'cmd/context/context-remove'
+        },
+        {
+          option: [
+            {
+              type: 'doc',
+              label: 'list',
+              id: 'cmd/context/option/option-list'
+            },
+            {
+              type: 'doc',
+              label: 'remove',
+              id: 'cmd/context/option/option-remove'
+            },
+            {
+              type: 'doc',
+              label: 'set',
+              id: 'cmd/context/option/option-set'
+            }
+          ]
+        }
+      ]
+    },
+    {
       'Entra ID (entra)': [
         {
           administrativeunit: [
@@ -479,143 +616,6 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'user signin list',
               id: 'cmd/entra/user/user-signin-list'
-            }
-          ]
-        }
-      ]
-    },
-    {
-      'Adaptive Card (adaptivecard)': [
-        {
-          type: 'doc',
-          label: 'send',
-          id: 'cmd/adaptivecard/adaptivecard-send'
-        }
-      ]
-    },
-    {
-      'Bookings (booking)': [
-        {
-          business: [
-            {
-              type: 'doc',
-              label: 'business get',
-              id: 'cmd/booking/business/business-get'
-            },
-            {
-              type: 'doc',
-              label: 'business list',
-              id: 'cmd/booking/business/business-list'
-            }
-          ]
-        }
-      ]
-    },
-    {
-      'CLI (cli)': [
-        {
-          type: 'doc',
-          label: 'consent',
-          id: 'cmd/cli/cli-consent'
-        },
-        {
-          type: 'doc',
-          label: 'doctor',
-          id: 'cmd/cli/cli-doctor'
-        },
-        {
-          type: 'doc',
-          label: 'issue',
-          id: 'cmd/cli/cli-issue'
-        },
-        {
-          type: 'doc',
-          label: 'reconsent',
-          id: 'cmd/cli/cli-reconsent'
-        },
-        {
-          completion: [
-            {
-              type: 'doc',
-              label: 'completion clink update',
-              id: 'cmd/cli/completion/completion-clink-update'
-            },
-            {
-              type: 'doc',
-              label: 'completion pwsh setup',
-              id: 'cmd/cli/completion/completion-pwsh-setup'
-            },
-            {
-              type: 'doc',
-              label: 'completion pwsh update',
-              id: 'cmd/cli/completion/completion-pwsh-update'
-            },
-            {
-              type: 'doc',
-              label: 'completion sh setup',
-              id: 'cmd/cli/completion/completion-sh-setup'
-            },
-            {
-              type: 'doc',
-              label: 'completion sh update',
-              id: 'cmd/cli/completion/completion-sh-update'
-            }
-          ]
-        },
-        {
-          config: [
-            {
-              type: 'doc',
-              label: 'config get',
-              id: 'cmd/cli/config/config-get'
-            },
-            {
-              type: 'doc',
-              label: 'config list',
-              id: 'cmd/cli/config/config-list'
-            },
-            {
-              type: 'doc',
-              label: 'config reset',
-              id: 'cmd/cli/config/config-reset'
-            },
-            {
-              type: 'doc',
-              label: 'config set',
-              id: 'cmd/cli/config/config-set'
-            }
-          ]
-        }
-      ]
-    },
-    {
-      'Context (context)': [
-        {
-          type: 'doc',
-          label: 'init',
-          id: 'cmd/context/context-init'
-        },
-        {
-          type: 'doc',
-          label: 'remove',
-          id: 'cmd/context/context-remove'
-        },
-        {
-          option: [
-            {
-              type: 'doc',
-              label: 'list',
-              id: 'cmd/context/option/option-list'
-            },
-            {
-              type: 'doc',
-              label: 'remove',
-              id: 'cmd/context/option/option-remove'
-            },
-            {
-              type: 'doc',
-              label: 'set',
-              id: 'cmd/context/option/option-set'
             }
           ]
         }
