@@ -77,6 +77,26 @@ describe(commands.SITE_RECYCLEBINITEM_RESTORE, () => {
     assert.notStrictEqual(actual, true);
   });
 
+  it('fails validation if no options are specified', async () => {
+    const actual = await command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if ids and allPrimary options are specified together', async () => {
+    const actual = await command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com', ids: '5fb84a1f-6ab5-4d07-a6aa-31bba6de9526', allPrimary: true } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if ids and allSecondary options are specified together', async () => {
+    const actual = await command.validate({ options: { siteUrl: 'https://contoso.sharepoinrestores all items from the first-stage and second-stage recycle binst.com', ids: '5fb84a1f-6ab5-4d07-a6aa-31bba6de9526', allSecondary: true } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('passes validation if allPrimary and allSecondary options are specified together', async () => {
+    const actual = await command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com', allPrimary: true, allSecondary: true } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
   it('passes validation if the siteUrl and ids options are valid', async () => {
     const actual = await command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com', ids: '5fb84a1f-6ab5-4d07-a6aa-31bba6de9526' } }, commandInfo);
     assert.strictEqual(actual, true);
@@ -94,24 +114,6 @@ describe(commands.SITE_RECYCLEBINITEM_RESTORE, () => {
 
   it('passes validation when multiple IDs with a space after the comma are specified', async () => {
     const actual = await command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com', ids: '5fb84a1f-6ab5-4d07-a6aa-31bba6de9526, 5fb84a1f-6ab5-4d07-a6aa-31bba6de9527' } }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
-
-  it('validates for a correct input with ids', async () => {
-    const actual = await command.validate({
-      options: {
-        siteUrl: 'https://contoso.sharepoint.com', ids: '5fb84a1f-6ab5-4d07-a6aa-31bba6de9526,5fb84a1f-6ab5-4d07-a6aa-31bba6de9527'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
-
-  it('validates for a correct input with allPrimary and allSecondary', async () => {
-    const actual = await command.validate({
-      options: {
-        siteUrl: 'https://contoso.sharepoint.com', allPrimary: true, allSecondary: true
-      }
-    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
@@ -138,7 +140,7 @@ describe(commands.SITE_RECYCLEBINITEM_RESTORE, () => {
 
   it('restores all items from the first-stage recycle bin', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/site/_api/web/RecycleBin/RestoreAll') {
+      if (opts.url === 'https://contoso.sharepoint.com/_api/web/RecycleBin/RestoreAll') {
         return;
       }
 
@@ -147,7 +149,7 @@ describe(commands.SITE_RECYCLEBINITEM_RESTORE, () => {
 
     await command.action(logger, {
       options: {
-        siteUrl: 'https://contoso.sharepoint.com/site',
+        siteUrl: 'https://contoso.sharepoint.com',
         allPrimary: true
       }
     });
@@ -165,6 +167,28 @@ describe(commands.SITE_RECYCLEBINITEM_RESTORE, () => {
     await command.action(logger, {
       options: {
         siteUrl: 'https://contoso.sharepoint.com',
+        allSecondary: true
+      }
+    });
+  });
+
+  it('restores all items from the first-stage and second-stage recycle bins', async () => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso.sharepoint.com/_api/web/RecycleBin/RestoreAll') {
+        return;
+      }
+
+      if (opts.url === 'https://contoso.sharepoint.com/_api/site/GetRecyclebinItems(rowLimit=2000000000,itemState=2)/RestoreAll') {
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options: {
+        siteUrl: 'https://contoso.sharepoint.com',
+        allPrimary: true,
         allSecondary: true
       }
     });
