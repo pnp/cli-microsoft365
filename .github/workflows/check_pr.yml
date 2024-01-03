@@ -9,7 +9,7 @@ jobs:
     strategy:
       matrix:
         os: [macos-latest, windows-latest, ubuntu-latest]
-        node: [18]
+        node: [20]
 
     steps:
       - uses: actions/checkout@v3
@@ -49,13 +49,13 @@ jobs:
       matrix:
         os: [macos-latest, windows-latest, ubuntu-latest]
         # node versions to run tests on
-        nodeRun: [18]
-        # node versions on which code was built and should be tested
-        nodeBuild: [18]
+        nodeRun: [20]
+        # node version on which code was built and should be tested
+        nodeBuild: [20]
         include:
           - os: ubuntu-latest
-            nodeRun: 20
-            nodeBuild: 18
+            nodeRun: 18
+            nodeBuild: 20
 
     steps:
       - name: Configure pagefile
@@ -90,21 +90,21 @@ jobs:
         if: steps.cache.outputs.cache-hit != 'true'
         run: npm ci
       - name: Test with coverage
-        # we run coverage only on Node@18
-        if: matrix.nodeRun == 18
+        # we run coverage only on Node that was use to build
+        if: matrix.nodeRun == matrix.nodeBuild
         run: npm test
       - name: Test without coverage
         # we want to run tests on older Node versions to ensure that code works
-        if: matrix.nodeRun != 18
+        if: matrix.nodeRun != matrix.nodeBuild
         run: npm run test:test
       - name: Compress output (non-Windows)
-        if: matrix.nodeRun == 18 && matrix.os != 'windows-latest' && always()
+        if: matrix.nodeRun == matrix.nodeBuild && matrix.os != 'windows-latest' && always()
         run: tar -cvf coverage.tar coverage
       - name: Compress output (Windows)
-        if: matrix.nodeRun == 18 && matrix.os == 'windows-latest' && always()
+        if: matrix.nodeRun == matrix.nodeBuild && matrix.os == 'windows-latest' && always()
         run: 7z a -ttar -r coverage.tar coverage
       - uses: actions/upload-artifact@v3
-        if: matrix.nodeRun == 18 && always()
+        if: matrix.nodeRun == matrix.nodeBuild && always()
         with:
           name: coverage-${{ matrix.os }}-${{ matrix.nodeRun }}
           path: coverage.tar
@@ -116,7 +116,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: 18
+          node-version: 20
 
       - name: Cache node modules
         id: cache
