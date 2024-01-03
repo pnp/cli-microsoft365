@@ -139,13 +139,13 @@ class SpoSiteRecycleBinItemRestoreCommand extends SpoCommand {
     const requestOptions: CliRequestOptions = {
       url: requestUrl,
       headers: {
-        'accept': 'application/json;odata=nometadata',
+        accept: 'application/json;odata=nometadata',
         'content-type': 'application/json'
       },
       responseType: 'json'
     };
 
-    return await request.post(requestOptions);
+    return request.post(requestOptions);
   }
 }
 
