@@ -186,7 +186,7 @@ class Request {
 
           const proxyUrl = process.env.HTTP_PROXY || process.env.HTTPS_PROXY;
           if (proxyUrl) {
-            options.proxy = this.createProxyConfigFromString(proxyUrl);
+            options.proxy = this.createProxyConfigFromUrl(proxyUrl);
           }
           return this.req(options);
         })
@@ -237,9 +237,8 @@ class Request {
     options.url = options.url!.replace(hostname, cloudUrl);
   }
 
-  private createProxyConfigFromString(url: string): AxiosProxyConfig {
+  private createProxyConfigFromUrl(url: string): AxiosProxyConfig {
     const parsedUrl = new URL(url);
-    const hostname = parsedUrl.hostname;
     const port = parsedUrl.port || (url.toLowerCase().startsWith('https') ? 443 : 80);
     let authObject = null;
     if (parsedUrl.username && parsedUrl.password) {
@@ -248,7 +247,7 @@ class Request {
         password: parsedUrl.password
       };
     }
-    return { host: hostname, port: Number(port), protocol: 'http', ...(authObject && { auth: authObject }) };
+    return { host: parsedUrl.hostname, port: Number(port), protocol: 'http', ...(authObject && { auth: authObject }) };
   }
 }
 

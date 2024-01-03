@@ -396,10 +396,14 @@ describe('Request', () => {
   });
 
   it('returns response of a successful GET request, with a proxy url', (done) => {
+    let outcome = false;
     sinon.stub(process, 'env').value({ 'HTTPS_PROXY': 'http://proxy.contoso.com:8080' });
 
     sinon.stub(_request as any, 'req').callsFake((options) => {
       _options = options as CliRequestOptions;
+      if (_options.proxy && _options.proxy.host === 'proxy.contoso.com' && _options.proxy.port === 8080 && _options.proxy.protocol === 'http') {
+        outcome = true;
+      }
       return Promise.resolve({ data: {} });
     });
 
@@ -408,6 +412,7 @@ describe('Request', () => {
         url: 'https://contoso.sharepoint.com/'
       })
       .then(() => {
+        assert(outcome);
         done();
       }, (err) => {
         done(err);
@@ -415,10 +420,14 @@ describe('Request', () => {
   });
 
   it('returns response of a successful GET request, with a proxy url and defaults port to 80', (done) => {
+    let outcome = false;
     sinon.stub(process, 'env').value({ 'HTTPS_PROXY': 'http://proxy.contoso.com' });
 
     sinon.stub(_request as any, 'req').callsFake((options) => {
       _options = options as CliRequestOptions;
+      if (_options.proxy && _options.proxy.host === 'proxy.contoso.com' && _options.proxy.port === 80 && _options.proxy.protocol === 'http') {
+        outcome = true;
+      }
       return Promise.resolve({ data: {} });
     });
 
@@ -427,6 +436,7 @@ describe('Request', () => {
         url: 'https://contoso.sharepoint.com/'
       })
       .then(() => {
+        assert(outcome);
         done();
       }, (err) => {
         done(err);
@@ -434,10 +444,14 @@ describe('Request', () => {
   });
 
   it('returns response of a successful GET request, with a proxy url and defaults port to 443', (done) => {
+    let outcome = false;
     sinon.stub(process, 'env').value({ 'HTTPS_PROXY': 'https://proxy.contoso.com' });
 
     sinon.stub(_request as any, 'req').callsFake((options) => {
       _options = options as CliRequestOptions;
+      if (_options.proxy && _options.proxy.host === 'proxy.contoso.com' && _options.proxy.port === 443 && _options.proxy.protocol === 'http') {
+        outcome = true;
+      }
       return Promise.resolve({ data: {} });
     });
 
@@ -446,6 +460,7 @@ describe('Request', () => {
         url: 'https://contoso.sharepoint.com/'
       })
       .then(() => {
+        assert(outcome);
         done();
       }, (err) => {
         done(err);
@@ -453,10 +468,18 @@ describe('Request', () => {
   });
 
   it('returns response of a successful GET request, with a proxy url with username and password', (done) => {
+    let outcome = false;
     sinon.stub(process, 'env').value({ 'HTTPS_PROXY': 'http://username:password@proxy.contoso.com:8080' });
 
     sinon.stub(_request as any, 'req').callsFake((options) => {
       _options = options as CliRequestOptions;
+      if (_options.proxy && _options.proxy.host === 'proxy.contoso.com'
+        && _options.proxy.port === 8080
+        && _options.proxy.protocol === 'http'
+        && _options.proxy.auth?.username === 'username'
+        && _options.proxy.auth?.password === 'password') {
+        outcome = true;
+      }
       return Promise.resolve({ data: {} });
     });
 
@@ -465,6 +488,7 @@ describe('Request', () => {
         url: 'https://contoso.sharepoint.com/'
       })
       .then(() => {
+        assert(outcome);
         done();
       }, (err) => {
         done(err);
