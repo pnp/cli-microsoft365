@@ -34,6 +34,13 @@ describe('utils/md', () => {
     assert(cliCompletionClinkUpdateHelpPlain.includes('OPTIONS'));
   });
 
+  it('properly formats admonition title', () => {
+    const spoTenantCommandsetAddHelp = fs.readFileSync(path.join(__dirname, '..', '..', 'docs', 'docs', 'cmd', 'spo', 'tenant', 'tenant-commandset-add.mdx'), 'utf8');
+    const spoTenantCommandsetAddHelpPlain = md.md2plain(spoTenantCommandsetAddHelp, path.join(__dirname, '..', '..', 'docs'));
+    assert(spoTenantCommandsetAddHelpPlain.includes('Escaping JSON in PowerShell'), `Doesn't include admonition title`);
+    assert(!spoTenantCommandsetAddHelpPlain.includes('[Escaping JSON in PowerShell]'), `Includes admonition title as a link`);
+  });
+
   it('converts definition lists', () => {
     assert(cliCompletionClinkUpdateHelpPlain.includes('  Runs command with verbose logging'));
     assert(cliCompletionClinkUpdateHelpPlain.includes('  Runs command with debug logging'));

@@ -16,8 +16,9 @@ function convertHeadings(md: string): string {
 }
 
 function convertAdmonitions(md: string): string {
-  const regex = new RegExp(/^:::(\w+)([\s\S]*?):::$/, 'gm');
-  return md.replace(regex, (_, label: string, content: string) => label.toLocaleUpperCase() + EOL + EOL + content.trim());
+  const regex = new RegExp(/^:::(\w+)(?:\[([^\]]+)\])?([\s\S]*?):::$/, 'gm');
+  return md.replace(regex, (_, label: string, title: string | undefined, content: string) =>
+    label.toLocaleUpperCase() + (title ? EOL + EOL + title : '') + EOL + EOL + content.trim());
 }
 
 function includeContent(md: string, rootFolder: string): string {
