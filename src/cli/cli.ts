@@ -166,6 +166,8 @@ async function execute(rawArgs: string[]): Promise<void> {
     return cli.closeWithError(validationResult, cli.optionsFromArgs, true);
   }
 
+  cli.optionsFromArgs = removeShortOptions(cli.optionsFromArgs);
+
   const end = process.hrtime.bigint();
   timings.core.push(Number(end - start));
 
