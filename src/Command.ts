@@ -358,6 +358,10 @@ export default abstract class Command {
   }
 
   protected handleRejectedODataPromise(res: any): void {
+    if (cli.optionsFromArgs?.options.debug && res.stack) {
+      throw new CommandError(res.stack);
+    }
+
     if (res.error) {
       try {
         const err: ODataError = JSON.parse(res.error);
@@ -397,6 +401,10 @@ export default abstract class Command {
   }
 
   protected handleRejectedODataJsonPromise(response: any): void {
+    if (cli.optionsFromArgs?.options.debug && response.stack) {
+      throw new CommandError(response.stack);
+    }
+
     if (response.error &&
       response.error['odata.error'] &&
       response.error['odata.error'].message) {
