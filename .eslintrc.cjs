@@ -13,6 +13,7 @@ const dictionary = [
   'approve',
   'assessment',
   'assets',
+  'assignment',
   'audit',
   'bin',
   'builder',

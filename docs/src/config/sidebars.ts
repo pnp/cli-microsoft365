@@ -198,6 +198,11 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'administrativeunit member list',
               id: 'cmd/entra/administrativeunit/administrativeunit-member-list'
+            },
+            {
+              type: 'doc',
+              label: 'administrativeunit roleassignment add',
+              id: 'cmd/entra/administrativeunit/administrativeunit-roleassignment-add'
             }
           ]
         },
