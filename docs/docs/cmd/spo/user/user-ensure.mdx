@@ -18,16 +18,25 @@ m365 spo user ensure [options]
 `-u, --webUrl <webUrl>`
 : Absolute URL of the site.
 
+`--entraId [--entraId]`
+: Id of the user in Entra. Specify either `aadId`, `entraId`, or `userName`.
+
 `--aadId [--aadId]`
-: Id of the user in Azure AD. Specify either `aadId` or `userName` but not both.
+: (deprecated. Use `entraId` instead) Id of the user in Azure AD. Specify either `aadId`, `entraId`, or `userName`.
 
 `--userName [userName]`
-: User's UPN (user principal name, e.g. john@contoso.com). Specify either `aadId` or `userName` but not both.
+: User's UPN (user principal name, e.g. john@contoso.com). Specify either `aadId`, `entraId`, or `userName`.
 ```
 
 <Global />
 
 ## Examples
+
+Ensures a user by its Entra Id
+
+```sh
+m365 spo user ensure --webUrl https://contoso.sharepoint.com/sites/project --entraId e254750a-eaa4-44f6-9517-b74f65cdb747
+```
 
 Ensures a user by its Azure AD Id
 
