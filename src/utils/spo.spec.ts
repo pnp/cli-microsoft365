@@ -2201,7 +2201,7 @@ describe('utils/spo', () => {
       throw 'Invalid request';
     });
 
-    const actual = await spo.systemUpdateListItem(webUrl, requestUrl, '1', logger, true, { Title: 'NewTitle', customColumn: 'My custom column' }, 'Item');
+    const actual = await spo.systemUpdateListItem(requestUrl, '1', logger, true, { Title: 'NewTitle', customColumn: 'My custom column' }, 'Item');
     assert.strictEqual(actual, listItemResponse);
   });
 
@@ -2321,7 +2321,7 @@ describe('utils/spo', () => {
     });
 
     try {
-      await spo.systemUpdateListItem(webUrl, requestUrl, '1', logger, true);
+      await spo.systemUpdateListItem(requestUrl, '1', logger, true);
       assert.fail('No error message thrown.');
     }
     catch (ex) {

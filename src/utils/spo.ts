@@ -1511,13 +1511,25 @@ export const spo = {
   },
 
   /**
-  * Retrieves the unique identifier (ID) of an item in a list.
-  * @param requestUrl The base URL without query parameters, pointing to the specific resource or endpoint that returns information about the list.
+  * Updates a list item with system update
+  * @param webUrl Web url
+  * @param requestUrl The base URL without query parameters, pointing to the specific list where the item resides. This URL should represent the list.
+  * @param id The id of the list item
+  * @param properties An object of the properties that should be updated
+  * @param contentTypeName The name of the content type to update
   * @param logger The logger object
   * @param verbose If in verbose mode
-  * @returns List id as string
+  * @returns The updated list item object
   */
-  async getListId(requestUrl: string, logger?: Logger, verbose?: boolean): Promise<string> {
+  async systemUpdateListItem(requestUrl: string, id: string, logger: Logger, verbose: boolean, properties?: object, contentTypeName?: string): Promise<ListItemInstance> {
+    if (verbose && logger) {
+      logger.logToStderr(`getting request digest for systemUpdate request`);
+    }
+
+    const parsedUrl = new URL(requestUrl);
+    const serverRelativeSiteUrl = requestUrl.match(new RegExp('/sites/[A-Za-z0-9-]*'))![0];
+    const webUrl = `${parsedUrl.protocol}//${parsedUrl.host}${serverRelativeSiteUrl}`;
+
     if (verbose && logger) {
       logger.logToStderr(`Getting list id...`);
     }
@@ -1531,26 +1543,8 @@ export const spo = {
     };
 
     const list = await request.get<{ Id: string; }>(listRequestOptions);
-    return list.Id;
-  },
 
-  /**
-  * Updates a list item with system update
-  * @param webUrl Web url
-  * @param requestUrl The base URL without query parameters, pointing to the specific list where the item resides. This URL should represent the list.
-  * @param id The id of the list item
-  * @param properties An object of the properties that should be updated
-  * @param contentTypeName The name of the content type to update
-  * @param logger The logger object
-  * @param verbose If in verbose mode
-  * @returns The updated list item object
-  */
-  async systemUpdateListItem(webUrl: string, requestUrl: string, id: string, logger: Logger, verbose: boolean, properties?: object, contentTypeName?: string): Promise<ListItemInstance> {
-    if (verbose && logger) {
-      logger.logToStderr(`getting request digest for systemUpdate request`);
-    }
-
-    const listId = await spo.getListId(requestUrl, logger, verbose);
+    const listId = list.Id;
     const res = await spo.getRequestDigest(webUrl);
 
     const formDigestValue = res.FormDigestValue;
@@ -1777,11 +1771,14 @@ export const spo = {
   * @returns The updated listitem object
   */
   async updateListItem(requestUrl: string, id: string, properties?: object, contentTypeName?: string): Promise<any> {
-    const requestBodyOptions: any = [];
-
-    properties && Object.keys(properties).forEach(key => {
-      requestBodyOptions.push({ FieldName: key, FieldValue: (<any>properties)[key].toString() });
-    });
+    const requestBodyOptions: any[] = [
+      ...(properties
+        ? Object.keys(properties).map((key: string) => ({
+          FieldName: key,
+          FieldValue: (<any>properties)[key].toString()
+        }))
+        : [])
+    ];
 
     const requestBody: {
       formValues: {
