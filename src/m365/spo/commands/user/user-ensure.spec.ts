@@ -16,7 +16,7 @@ import command from './user-ensure.js';
 
 describe(commands.USER_ENSURE, () => {
   const validUserName = 'john@contoso.com';
-  const validAadId = '2056d2f6-3257-4253-8cfc-b73393e414e5';
+  const validEntraId = '2056d2f6-3257-4253-8cfc-b73393e414e5';
   const validWebUrl = 'https://contoso.sharepoint.com';
   const ensuredUserResponse = {
     Id: 35,
@@ -99,6 +99,23 @@ describe(commands.USER_ENSURE, () => {
     assert(loggerLogSpy.calledWith(ensuredUserResponse));
   });
 
+  it('ensures user for a specific web by entraId', async () => {
+    sinon.stub(aadUser, 'getUpnByUserId').callsFake(async () => {
+      return validUserName;
+    });
+
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `${validWebUrl}/_api/web/ensureuser`) {
+        return ensuredUserResponse;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { verbose: true, webUrl: validWebUrl, entraId: validEntraId } });
+    assert(loggerLogSpy.calledWith(ensuredUserResponse));
+  });
+
   it('ensures user for a specific web by aadId', async () => {
     sinon.stub(aadUser, 'getUpnByUserId').callsFake(async () => {
       return validUserName;
@@ -112,7 +129,7 @@ describe(commands.USER_ENSURE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true, webUrl: validWebUrl, aadId: validAadId } });
+    await command.action(logger, { options: { verbose: true, webUrl: validWebUrl, aadId: validEntraId } });
     assert(loggerLogSpy.calledWith(ensuredUserResponse));
   });
 
@@ -133,7 +150,7 @@ describe(commands.USER_ENSURE, () => {
       };
     });
 
-    await assert.rejects(command.action(logger, { options: { verbose: true, webUrl: validWebUrl, aadId: validAadId } }), new CommandError(`Resource '${validAadId}' does not exist or one of its queried reference-property objects are not present.`));
+    await assert.rejects(command.action(logger, { options: { verbose: true, webUrl: validWebUrl, entraId: validEntraId } }), new CommandError(`Resource '${validEntraId}' does not exist or one of its queried reference-property objects are not present.`));
   });
 
   it('throws error message when no user was found with a specific user name', async () => {
@@ -160,7 +177,12 @@ describe(commands.USER_ENSURE, () => {
   });
 
   it('fails validation if webUrl is not a valid url', async () => {
-    const actual = await command.validate({ options: { webUrl: 'invalid', aadId: validAadId } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'invalid', entraId: validEntraId } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if entraId is not a valid id', async () => {
+    const actual = await command.validate({ options: { webUrl: validWebUrl, entraId: 'invalid' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
@@ -174,8 +196,13 @@ describe(commands.USER_ENSURE, () => {
     assert.notStrictEqual(actual, true);
   });
 
+  it('passes validation if the url is valid and entraId is a valid id', async () => {
+    const actual = await command.validate({ options: { webUrl: validWebUrl, entraId: validEntraId } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
   it('passes validation if the url is valid and aadId is a valid id', async () => {
-    const actual = await command.validate({ options: { webUrl: validWebUrl, aadId: validAadId } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: validWebUrl, aadId: validEntraId } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 

@@ -33,18 +33,24 @@ m365 spo group member add [options]
 `--userIds [userIds]`
 : The user Id of the user to add as a member. (Id of the site user, for example: 14) If multiple users need to be added, the Ids have to be comma-separated. Specify either `userIds`, `userNames`, `emails`, `aadGroupIds` or `aadGroupNames`.
 
+`--entraGroupIds [entraGroupIds]`
+: The object Id of the Entra group to add as a member. If multiple groups need to be added, the Ids have to be comma-separated. Specify either `userIds`, `userNames`, `emails`, `aadGroupIds`, `entraGroupIds`, `aadGroupNames`, or `entraGroupNames`.
+
 `--aadGroupIds [aadGroupIds]`
-: The object Id of the Azure AD group to add as a member. If multiple groups need to be added, the Ids have to be comma-separated. Specify either `userIds`, `userNames`, `emails`, `aadGroupIds` or `aadGroupNames`.
+: (deprecated. Use `entraGroupIds` instead) The object Id of the Azure AD group to add as a member. If multiple groups need to be added, the Ids have to be comma-separated. Specify either `userIds`, `userNames`, `emails`, `aadGroupIds`, `entraGroupIds`, `aadGroupNames`, or `entraGroupNames`.
+
+`--entraGroupNames [entraGroupNames]`
+: The name of the Entra group to add as a member. If multiple groups need to be added, they have to be comma-separated. Specify either `userIds`, `userNames`, `emails`, `aadGroupIds`, `entraGroupIds`, `aadGroupNames`, or `entraGroupNames`.
 
 `--aadGroupNames [aadGroupNames]`
-: The name of the Azure AD group to add as a member. If multiple groups need to be added, they have to be comma-separated. Specify either `userIds`, `userNames`, `emails`, `aadGroupIds` or `aadGroupNames`.
+: (deprecated. Use `entraGroupNames` instead) The name of the Azure AD group to add as a member. If multiple groups need to be added, they have to be comma-separated. Specify either `userIds`, `userNames`, `emails`, `aadGroupIds`, `entraGroupIds`, `aadGroupNames`, or `entraGroupNames`.
 ```
 
 <Global />
 
 ## Remarks
 
-For the `userIds`, `userNames`, `emails`, `aadGroupIds` or `aadGroupNames` options you can specify multiple values by separating them with a comma. If one of the specified entries is not valid, the command will fail with an error message showing the list of invalid values.
+For the `userIds`, `userNames`, `emails`, `aadGroupIds`, `entraGroupIds`, `aadGroupNames`, or `entraGroupNames` options you can specify multiple values by separating them with a comma. If one of the specified entries is not valid, the command will fail with an error message showing the list of invalid values.
 
 ## Examples
 
@@ -84,11 +90,17 @@ Add multiple users with the userIds parameter to a SharePoint group with the gro
 m365 spo group member add --webUrl https://contoso.sharepoint.com/sites/SiteA --groupId 5 --userIds "5,12"
 ```
 
-Add multiple users with the aadGroupNames parameter to a SharePoint group with the groupId parameter 
+Add multiple users with the entraGroupIds parameter to a SharePoint group with the groupId parameter.
   
- ```sh 
- m365 spo group member add --webUrl https://contoso.sharepoint.com/sites/SiteA --groupId 5 --aadGroupNames "Azure group one, Azure group two" 
- ``` 
+```sh 
+m365 spo group member add --webUrl https://contoso.sharepoint.com/sites/SiteA --groupId 5 --entraGroupIds "f2fb2f10-cfd2-4054-8ffd-64533657a5ab,3e86049e-89e6-4c27-bccb-d7549f0bbd06"
+```
+
+Add multiple users with the entraGroupNames parameter to a SharePoint group with the groupId parameter.
+  
+```sh 
+m365 spo group member add --webUrl https://contoso.sharepoint.com/sites/SiteA --groupId 5 --entraGroupNames "Azure group one, Azure group two" 
+```
 
 ## Response
 

@@ -31,11 +31,17 @@ m365 spo group member remove [options]
 `--userId [userId]`
 : The user Id (Id of the site user, eg. 14) of the user to remove as a member. Specify either `userName`, `email`, `userId`, `aadGroupId` or `aadGroupName`.
 
+`--entraGroupId [entraGroupId]`
+: The object Id of the Entra group to remove as a member. Specify either `userName`, `email`, `userId`, `aadGroupId`, `entraGroupId`, `aadGroupName`, or `entraGroupName`.
+
 `--aadGroupId [aadGroupId]`
-: The object Id of the Azure AD group to remove as a member. Specify either `userName`, `email`, `userId`, `aadGroupId` or `aadGroupName`.
+: (deprecated. Use `entraGroupId` instead) The object Id of the Azure AD group to remove as a member. Specify either `userName`, `email`, `userId`, `aadGroupId`, `entraGroupId`, `aadGroupName`, or `entraGroupName`.
+
+`--entraGroupName [entraGroupName]`
+: The name of the Entra group to remove as a member. Specify either `userName`, `email`, `userId`, `aadGroupId`, `entraGroupId`, `aadGroupName`, or `entraGroupName`.
 
 `--aadGroupName [aadGroupName]`
-: The name of the Azure AD group to remove as a member. Specify either `userName`, `email`, `userId`, `aadGroupId` or `aadGroupName`.
+: (deprecated. Use `entraGroupName` instead) The name of the Azure AD group to remove as a member. Specify either `userName`, `email`, `userId`, `aadGroupId`, `entraGroupId`, `aadGroupName`, or `entraGroupName`.
 ```
 
 <Global />
@@ -60,16 +66,16 @@ Remove a user from a SharePoint group by email.
 m365 spo group member remove --webUrl https://contoso.sharepoint.com/sites/SiteA --groupName "Site A Visitors" --userId 14
 ```
 
-Remove an Azure AD group from a SharePoint group based on the Azure AD group name on a given web.
+Remove an Entra group from a SharePoint group based on the Entra group name on a given web.
 
 ```sh
-m365 spo group member remove --webUrl https://contoso.sharepoint.com/sites/SiteA --groupId 5 --aadGroupName "Azure AD Security Group"
+m365 spo group member remove --webUrl https://contoso.sharepoint.com/sites/SiteA --groupId 5 --entraGroupName "Azure AD Security Group"
 ```
 
-Remove an Azure AD group from a SharePoint group based on the Azure AD group ID on a given web.
+Remove an Entra group from a SharePoint group based on the Entra group ID on a given web.
 
 ```sh
-m365 spo group member remove --webUrl https://contoso.sharepoint.com/sites/SiteA --groupName "Site A Visitors" --aadGroupId "5786b8e8-c495-4734-b345-756733960730"
+m365 spo group member remove --webUrl https://contoso.sharepoint.com/sites/SiteA --groupName "Site A Visitors" --entraGroupId "5786b8e8-c495-4734-b345-756733960730"
 ```
 
 ## Response
