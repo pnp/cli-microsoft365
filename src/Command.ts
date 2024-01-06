@@ -515,7 +515,7 @@ export default abstract class Command {
     if (cli.currentCommandName &&
       cli.currentCommandName.indexOf(deprecated) === 0) {
       const chalk = (await import('chalk')).default;
-      await logger.logToStderr(chalk.yellow(`Command '${deprecated}' is deprecated. Please use '${recommended}' instead`));
+      await logger.logToStderr(chalk.yellow(`Command '${deprecated}' is deprecated. Please use '${recommended}' instead.`));
     }
   }
 

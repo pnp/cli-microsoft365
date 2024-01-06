@@ -244,7 +244,7 @@ describe('Command', () => {
       cli.currentCommandName = 'mc1';
       const mock = new MockCommand1();
       await mock.commandAction(logger);
-      assert(loggerLogToStderrSpy.calledWith(chalk.yellow(`Command 'mc1' is deprecated. Please use 'mock-command' instead`)));
+      assert(loggerLogToStderrSpy.calledWith(chalk.yellow(`Command 'mc1' is deprecated. Please use 'mock-command' instead.`)));
     }
     catch (err: any) {
       assert.fail(err);

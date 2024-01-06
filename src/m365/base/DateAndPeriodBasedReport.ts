@@ -3,7 +3,7 @@ import GlobalOptions from '../../GlobalOptions.js';
 import { formatting } from '../../utils/formatting.js';
 import PeriodBasedReport from './PeriodBasedReport.js';
 
-interface CommandArgs {
+export interface CommandArgs {
   options: DateAndPeriodBasedOptions;
 }
 
