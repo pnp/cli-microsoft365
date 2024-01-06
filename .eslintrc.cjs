@@ -239,7 +239,7 @@ module.exports = {
     },
     {
       "files": [
-        "**/yammer/**"
+        "**/viva/commands/engage/**"
       ],
       "rules": {
         "camelcase": "off"

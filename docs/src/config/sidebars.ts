@@ -4176,133 +4176,113 @@ const sidebars: SidebarsConfig = {
               id: 'cmd/viva/connections/connections-app-create'
             }
           ]
-        }
-      ]
-    },
-    {
-      'Yammer (yammer)': [
-        {
-          type: 'doc',
-          label: 'search',
-          id: 'cmd/yammer/yammer-search'
         },
         {
-          group: [
+          engage: [
             {
               type: 'doc',
-              label: 'group list',
-              id: 'cmd/yammer/group/group-list'
+              label: 'engage search',
+              id: 'cmd/viva/engage/engage-search'
             },
             {
               type: 'doc',
-              label: 'group user add',
-              id: 'cmd/yammer/group/group-user-add'
+              label: 'engage group list',
+              id: 'cmd/viva/engage/engage-group-list'
             },
             {
               type: 'doc',
-              label: 'group user remove',
-              id: 'cmd/yammer/group/group-user-remove'
-            }
-          ]
-        },
-        {
-          message: [
-            {
-              type: 'doc',
-              label: 'message add',
-              id: 'cmd/yammer/message/message-add'
+              label: 'engage group user add',
+              id: 'cmd/viva/engage/engage-group-user-add'
             },
             {
               type: 'doc',
-              label: 'message get',
-              id: 'cmd/yammer/message/message-get'
+              label: 'engage group user remove',
+              id: 'cmd/viva/engage/engage-group-user-remove'
             },
             {
               type: 'doc',
-              label: 'message list',
-              id: 'cmd/yammer/message/message-list'
+              label: 'engage message add',
+              id: 'cmd/viva/engage/engage-message-add'
             },
             {
               type: 'doc',
-              label: 'message remove',
-              id: 'cmd/yammer/message/message-remove'
+              label: 'engage message get',
+              id: 'cmd/viva/engage/engage-message-get'
             },
             {
               type: 'doc',
-              label: 'message like set',
-              id: 'cmd/yammer/message/message-like-set'
-            }
-          ]
-        },
-        {
-          network: [
-            {
-              type: 'doc',
-              label: 'network list',
-              id: 'cmd/yammer/network/network-list'
-            }
-          ]
-        },
-        {
-          report: [
-            {
-              type: 'doc',
-              label: 'report activitycounts',
-              id: 'cmd/yammer/report/report-activitycounts'
+              label: 'engage message list',
+              id: 'cmd/viva/engage/engage-message-list'
             },
             {
               type: 'doc',
-              label: 'report activityusercounts',
-              id: 'cmd/yammer/report/report-activityusercounts'
+              label: 'engage message remove',
+              id: 'cmd/viva/engage/engage-message-remove'
             },
             {
               type: 'doc',
-              label: 'report activityuserdetail',
-              id: 'cmd/yammer/report/report-activityuserdetail'
+              label: 'engage message like set',
+              id: 'cmd/viva/engage/engage-message-like-set'
             },
             {
               type: 'doc',
-              label: 'report deviceusagedistributionusercounts',
-              id: 'cmd/yammer/report/report-deviceusagedistributionusercounts'
+              label: 'engage network list',
+              id: 'cmd/viva/engage/engage-network-list'
             },
             {
               type: 'doc',
-              label: 'report deviceusageusercounts',
-              id: 'cmd/yammer/report/report-deviceusageusercounts'
+              label: 'engage report activitycounts',
+              id: 'cmd/viva/engage/engage-report-activitycounts'
             },
             {
               type: 'doc',
-              label: 'report deviceusageuserdetail',
-              id: 'cmd/yammer/report/report-deviceusageuserdetail'
+              label: 'engage report activityusercounts',
+              id: 'cmd/viva/engage/engage-report-activityusercounts'
             },
             {
               type: 'doc',
-              label: 'report groupsactivitycounts',
-              id: 'cmd/yammer/report/report-groupsactivitycounts'
+              label: 'engage report activityuserdetail',
+              id: 'cmd/viva/engage/engage-report-activityuserdetail'
             },
             {
               type: 'doc',
-              label: 'report groupsactivitydetail',
-              id: 'cmd/yammer/report/report-groupsactivitydetail'
+              label: 'engage report deviceusagedistributionusercounts',
+              id: 'cmd/viva/engage/engage-report-deviceusagedistributionusercounts'
             },
             {
               type: 'doc',
-              label: 'report groupsactivitygroupcounts',
-              id: 'cmd/yammer/report/report-groupsactivitygroupcounts'
-            }
-          ]
-        },
-        {
-          user: [
-            {
-              type: 'doc',
-              label: 'user get',
-              id: 'cmd/yammer/user/user-get'
+              label: 'engage report deviceusageusercounts',
+              id: 'cmd/viva/engage/engage-report-deviceusageusercounts'
             },
             {
               type: 'doc',
-              label: 'user list',
-              id: 'cmd/yammer/user/user-list'
+              label: 'engage report deviceusageuserdetail',
+              id: 'cmd/viva/engage/engage-report-deviceusageuserdetail'
+            },
+            {
+              type: 'doc',
+              label: 'engage report groupsactivitycounts',
+              id: 'cmd/viva/engage/engage-report-groupsactivitycounts'
+            },
+            {
+              type: 'doc',
+              label: 'engage report groupsactivitydetail',
+              id: 'cmd/viva/engage/engage-report-groupsactivitydetail'
+            },
+            {
+              type: 'doc',
+              label: 'engage report groupsactivitygroupcounts',
+              id: 'cmd/viva/engage/engage-report-groupsactivitygroupcounts'
+            },
+            {
+              type: 'doc',
+              label: 'engage user get',
+              id: 'cmd/viva/engage/engage-user-get'
+            },
+            {
+              type: 'doc',
+              label: 'engage user list',
+              id: 'cmd/viva/engage/engage-user-list'
             }
           ]
         }

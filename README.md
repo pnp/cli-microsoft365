@@ -75,10 +75,11 @@
 - Unified login
   - Access all your Microsoft 365 workloads
 - Supported workloads
-  - Azure Active Directory
   - Bookings
+  - Microsoft Entra ID
   - Microsoft Teams
   - Microsoft To Do
+  - Microsoft Viva
   - OneDrive
   - OneNote
   - Outlook
@@ -90,7 +91,6 @@
   - Skype for Business
   - SharePoint Online
   - To Do
-  - Yammer
 - Supported authentication methods
   - Azure Managed Identity
   - Certificate
