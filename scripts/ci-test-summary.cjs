@@ -11,22 +11,17 @@ class TestSummaryReporter {
   destination;
 
   constructor(runner, options) {
-    this._indents = 0;
-    const stats = runner.stats;
-
     new mocha.reporters.Min(runner, options);
 
+    if (!process.env.GITHUB_STEP_SUMMARY) {
+      return;
+    }
+
+    const stats = runner.stats;
     runner
       .on(EVENT_RUN_BEGIN, () => {
-        if (process.env.GITHUB_STEP_SUMMARY) {
-          // Capturing the value of GITHUB_STEP_SUMMARY to use later
-          this.destination = process.env.GITHUB_STEP_SUMMARY;
-        } else {
-          console.error(
-            `Destination not found, please ensure GITHUB_STEP_SUMMARY is set and valid. GITHUB_STEP_SUMMARY: ${process.env.GITHUB_STEP_SUMMARY}`
-          );
-          process.exit(1);
-        }
+        // Capturing the value of GITHUB_STEP_SUMMARY to use later
+        this.destination = process.env.GITHUB_STEP_SUMMARY;
       })
       .on(EVENT_TEST_FAIL, (test, _) => {
         const testPath = test.titlePath();
