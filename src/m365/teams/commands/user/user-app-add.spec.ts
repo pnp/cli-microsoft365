@@ -12,6 +12,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './user-app-add.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.USER_APP_ADD, () => {
   let log: string[];
@@ -45,7 +46,10 @@ describe(commands.USER_APP_ADD, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      request.post
+      request.get,
+      request.post,
+      cli.getSettingWithDefaultValue,
+      cli.handleMultipleResultsFound
     ]);
   });
 
@@ -92,6 +96,32 @@ describe(commands.USER_APP_ADD, () => {
     assert.notStrictEqual(actual, true);
   });
 
+  it('fails validation if id and name are specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
+    const actual = await command.validate({ options: { id: '15d7a78e-fd77-4599-97a5-dbb6372846c5', name: 'TeamsApp', userId: '15d7a78e-fd77-4599-97a5-dbb6372846c5' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if neither id nor name are specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
+    const actual = await command.validate({ options: { userId: '15d7a78e-fd77-4599-97a5-dbb6372846c5' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
   it('passes validation when the input is correct', async () => {
     const actual = await command.validate({
       options: {
@@ -112,7 +142,7 @@ describe(commands.USER_APP_ADD, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('adds app from the catalog for the specified user by id', async () => {
+  it('adds app by id from the catalog for the specified user by id', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users/c527a470-a882-481c-981c-ee6efaba85c7/teamwork/installedApps` &&
         JSON.stringify(opts.data) === `{"teamsApp@odata.bind":"https://graph.microsoft.com/v1.0/appCatalogs/teamsApps/4440558e-8c73-4597-abc7-3644a64c4bce"}`) {
@@ -130,7 +160,7 @@ describe(commands.USER_APP_ADD, () => {
     } as any);
   });
 
-  it('adds app from the catalog for the specified user by name', async () => {
+  it('adds app by id from the catalog for the specified user by name', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users/admin%40contoso.com/teamwork/installedApps` &&
         JSON.stringify(opts.data) === `{"teamsApp@odata.bind":"https://graph.microsoft.com/v1.0/appCatalogs/teamsApps/4440558e-8c73-4597-abc7-3644a64c4bce"}`) {
@@ -146,6 +176,95 @@ describe(commands.USER_APP_ADD, () => {
         id: '4440558e-8c73-4597-abc7-3644a64c4bce'
       }
     } as any);
+  });
+
+  it('adds app by name from the catalog for the specified user', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/appCatalogs/teamsApps?$filter=displayName eq 'TeamsApp'`) {
+        return {
+          "value": [
+            {
+              "id": "YzUyN2E0NzAtYTg4Mi00ODFjLTk4MWMtZWU2ZWZhYmE4NWM3IyM0ZDFlYTA0Ny1mMTk2LTQ1MGQtYjJlOS0wZDI4NTViYTA1YTY=",
+              "displayName": "TeamsApp"
+            }
+          ]
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users/c527a470-a882-481c-981c-ee6efaba85c7/teamwork/installedApps` &&
+        JSON.stringify(opts.data) === `{"teamsApp@odata.bind":"https://graph.microsoft.com/v1.0/appCatalogs/teamsApps/YzUyN2E0NzAtYTg4Mi00ODFjLTk4MWMtZWU2ZWZhYmE4NWM3IyM0ZDFlYTA0Ny1mMTk2LTQ1MGQtYjJlOS0wZDI4NTViYTA1YTY="}`) {
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options: {
+        userId: 'c527a470-a882-481c-981c-ee6efaba85c7',
+        name: 'TeamsApp'
+      }
+    } as any);
+  });
+
+  it('fails to get teams app when app by name does not exists', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/appCatalogs/teamsApps?$filter=displayName eq 'TeamsApp'`) {
+        return { value: [] };
+      }
+
+      throw 'Invalid request';
+    });
+
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: true,
+        userId: 'c527a470-a882-481c-981c-ee6efaba85c7',
+        name: 'TeamsApp'
+      }
+    } as any), new CommandError('The specified Teams app does not exist'));
+  });
+
+  it('handles selecting single result when multiple teams apps with the specified name found and cli is set to prompt', async () => {
+    let addRequestIssued = false;
+
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/appCatalogs/teamsApps?$filter=displayName eq 'TeamsApp'`) {
+        return {
+          "value": [
+            {
+              "id": "ZDczZWVjZmQtYzFkNS00MzY2LWJkMjEtZDUyOTM1ZThkYjkxIyMxLjYuMC4wIyNQdWJsaXNoZWQ=",
+              "displayName": "TeamsApp"
+            },
+            {
+              "id": "NmY0ODM2N2EtMjVmMC00NjNmLTlmMGQtMmFiZTBiYmYzNzRjIyMxLjAuMCMjUHVibGlzaGVk",
+              "displayName": "TeamsApp"
+            }
+          ]
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinon.stub(cli, 'handleMultipleResultsFound').resolves({ id: "ZDczZWVjZmQtYzFkNS00MzY2LWJkMjEtZDUyOTM1ZThkYjkxIyMxLjYuMC4wIyNQdWJsaXNoZWQ=" });
+
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users/c527a470-a882-481c-981c-ee6efaba85c7/teamwork/installedApps` &&
+        JSON.stringify(opts.data) === `{"teamsApp@odata.bind":"https://graph.microsoft.com/v1.0/appCatalogs/teamsApps/ZDczZWVjZmQtYzFkNS00MzY2LWJkMjEtZDUyOTM1ZThkYjkxIyMxLjYuMC4wIyNQdWJsaXNoZWQ="}`) {
+        addRequestIssued = true;
+        return Promise.resolve();
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { verbose: true, userId: 'c527a470-a882-481c-981c-ee6efaba85c7', name: 'TeamsApp' } });
+    assert(addRequestIssued);
   });
 
   it('correctly handles error while installing teams app', async () => {
