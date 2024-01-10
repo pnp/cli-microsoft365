@@ -22,6 +22,7 @@ export default {
   APPROLEASSIGNMENT_ADD: `${prefix} approleassignment add`,
   APPROLEASSIGNMENT_LIST: `${prefix} approleassignment list`,
   APPROLEASSIGNMENT_REMOVE: `${prefix} approleassignment remove`,
+  GROUP_ADD: `${prefix} group add`,
   GROUP_GET: `${prefix} group get`,
   GROUP_LIST: `${prefix} group list`,
   GROUP_REMOVE: `${prefix} group remove`,

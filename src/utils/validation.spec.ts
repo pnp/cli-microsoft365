@@ -476,4 +476,74 @@ describe('validation/validation', () => {
     const expected = false;
     assert.strictEqual(actual, expected);
   });
+
+  it('isValidMailNickname returns true when mailNickname is valid', () => {
+    const result = validation.isValidMailNickname('nickname');
+    assert.strictEqual(result, true);
+  });
+
+  it('isValidMailNickname returns false when mailNickname contains \\', () => {
+    const result = validation.isValidMailNickname('nicknam\\e');
+    assert.strictEqual(result, false);
+  });
+
+  it('isValidMailNickname returns false when mailNickname contains <', () => {
+    const result = validation.isValidMailNickname('<nickname');
+    assert.strictEqual(result, false);
+  });
+
+  it('isValidMailNickname returns false when mailNickname contains >', () => {
+    const result = validation.isValidMailNickname('nickname>');
+    assert.strictEqual(result, false);
+  });
+
+  it('isValidMailNickname returns false when mailNickname contains (', () => {
+    const result = validation.isValidMailNickname('(nickname');
+    assert.strictEqual(result, false);
+  });
+
+  it('isValidMailNickname returns false when mailNickname contains )', () => {
+    const result = validation.isValidMailNickname('nickname)');
+    assert.strictEqual(result, false);
+  });
+
+  it('isValidMailNickname returns false when mailNickname contains [', () => {
+    const result = validation.isValidMailNickname('[nickname');
+    assert.strictEqual(result, false);
+  });
+
+  it('isValidMailNickname returns false when mailNickname contains ]', () => {
+    const result = validation.isValidMailNickname('nickname]');
+    assert.strictEqual(result, false);
+  });
+
+  it('isValidMailNickname returns false when mailNickname contains @', () => {
+    const result = validation.isValidMailNickname('nick@name');
+    assert.strictEqual(result, false);
+  });
+
+  it('isValidMailNickname returns false when mailNickname contains space', () => {
+    const result = validation.isValidMailNickname('nick name');
+    assert.strictEqual(result, false);
+  });
+
+  it('isValidMailNickname returns false when mailNickname contains "', () => {
+    const result = validation.isValidMailNickname('nick"name');
+    assert.strictEqual(result, false);
+  });
+
+  it('isValidMailNickname returns false when mailNickname contains ;', () => {
+    const result = validation.isValidMailNickname('nick;name');
+    assert.strictEqual(result, false);
+  });
+
+  it('isValidMailNickname returns false when mailNickname contains :', () => {
+    const result = validation.isValidMailNickname('nick:name');
+    assert.strictEqual(result, false);
+  });
+
+  it('isValidMailNickname returns false when mailNickname contains ,', () => {
+    const result = validation.isValidMailNickname('nick,name');
+    assert.strictEqual(result, false);
+  });
 });
