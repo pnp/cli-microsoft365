@@ -370,5 +370,11 @@ export const validation = {
     }
 
     return false;
+  },
+
+  isValidMailNickname(mailNickname: string): boolean {
+    const mailNicknameRegEx = new RegExp(/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]*$/i);
+
+    return mailNicknameRegEx.test(mailNickname);
   }
 };
