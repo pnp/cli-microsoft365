@@ -14,7 +14,7 @@ import { RoleDefinition } from '../m365/spo/commands/roledefinition/RoleDefiniti
 import { RoleType } from '../m365/spo/commands/roledefinition/RoleType.js';
 import { DeletedSiteProperties } from '../m365/spo/commands/site/DeletedSiteProperties.js';
 import { SiteProperties } from '../m365/spo/commands/site/SiteProperties.js';
-import { aadGroup } from './aadGroup.js';
+import { entraGroup } from './entraGroup.js';
 import { SharingCapabilities } from '../m365/spo/commands/site/SharingCapabilities.js';
 import { WebProperties } from '../m365/spo/commands/web/WebProperties.js';
 
@@ -1213,7 +1213,7 @@ export const spo = {
         }
 
         if (typeof isPublic !== 'undefined') {
-          promises.push(aadGroup.setGroup(groupId as string, (isPublic === false), logger, verbose));
+          promises.push(entraGroup.setGroup(groupId as string, (isPublic === false), logger, verbose));
         }
         if (typeof owners !== 'undefined') {
           promises.push(spo.setGroupifiedSiteOwners(spoAdminUrl, groupId, owners, logger, verbose));

@@ -2,7 +2,7 @@ import { User } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import { CliRequestOptions } from '../../../../request.js';
-import { aadGroup } from '../../../../utils/aadGroup.js';
+import { entraGroup } from '../../../../utils/entraGroup.js';
 import { odata } from '../../../../utils/odata.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
@@ -152,7 +152,7 @@ class EntraGroupUserListCommand extends GraphCommand {
       await logger.logToStderr('Retrieving Group Id...');
     }
 
-    return await aadGroup.getGroupIdByDisplayName(options.groupDisplayName!);
+    return await entraGroup.getGroupIdByDisplayName(options.groupDisplayName!);
   }
 
   private async getUsers(options: Options, role: string, groupId: string, logger: Logger): Promise<ExtendedUser[]> {

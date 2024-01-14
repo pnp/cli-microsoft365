@@ -2,7 +2,7 @@ import { Event } from '@microsoft/microsoft-graph-types';
 import auth from '../../../../Auth.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import { Logger } from '../../../../cli/Logger.js';
-import { aadUser } from '../../../../utils/aadUser.js';
+import { entraUser } from '../../../../utils/entraUser.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 import { odata } from '../../../../utils/odata.js';
 import { validation } from '../../../../utils/validation.js';
@@ -146,7 +146,7 @@ class TeamsMeetingListCommand extends GraphCommand {
       requestUrl += `users/${options.userId || options.userName}`;
     }
     else if (options.email) {
-      const userId = await aadUser.getUserIdByEmail(options.email);
+      const userId = await entraUser.getUserIdByEmail(options.email);
       requestUrl += `users/${userId}`;
     }
     else {

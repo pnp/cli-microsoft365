@@ -1,7 +1,7 @@
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
-import { aadUser } from '../../../../utils/aadUser.js';
+import { entraUser } from '../../../../utils/entraUser.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
@@ -129,7 +129,7 @@ class SpoUserEnsureCommand extends SpoCommand {
       await logger.logToStderr(`Retrieving user principal name for user with id ${entraId}`);
     }
 
-    return await aadUser.getUpnByUserId(entraId);
+    return await entraUser.getUpnByUserId(entraId);
   }
 }
 

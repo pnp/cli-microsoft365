@@ -5,7 +5,7 @@ import { validation } from "../../../../utils/validation.js";
 import request, { CliRequestOptions } from "../../../../request.js";
 import GraphCommand from "../../../base/GraphCommand.js";
 import commands from "../../commands.js";
-import { aadAdministrativeUnit } from "../../../../utils/aadAdministrativeUnit.js";
+import { entraAdministrativeUnit } from "../../../../utils/entraAdministrativeUnit.js";
 import aadCommands from "../../aadCommands.js";
 
 interface CommandArgs {
@@ -88,7 +88,7 @@ class EntraAdministrativeUnitGetCommand extends GraphCommand {
         administrativeUnit = await this.getAdministrativeUnitById(args.options.id);
       }
       else {
-        administrativeUnit = await aadAdministrativeUnit.getAdministrativeUnitByDisplayName(args.options.displayName!);
+        administrativeUnit = await entraAdministrativeUnit.getAdministrativeUnitByDisplayName(args.options.displayName!);
       }
 
       await logger.log(administrativeUnit);

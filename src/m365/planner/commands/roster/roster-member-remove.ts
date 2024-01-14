@@ -2,7 +2,7 @@ import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
-import { aadUser } from '../../../../utils/aadUser.js';
+import { entraUser } from '../../../../utils/entraUser.js';
 import { odata } from '../../../../utils/odata.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
@@ -113,7 +113,7 @@ class PlannerRosterMemberRemoveCommand extends GraphCommand {
       return args.options.userId;
     }
 
-    return aadUser.getUserIdByUpn(args.options.userName!);
+    return entraUser.getUserIdByUpn(args.options.userName!);
   }
 
   private async removeRosterMember(args: CommandArgs): Promise<void> {

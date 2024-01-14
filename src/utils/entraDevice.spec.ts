@@ -1,6 +1,6 @@
 import assert from 'assert';
 import sinon from 'sinon';
-import { aadDevice } from './aadDevice.js';
+import { entraDevice } from './entraDevice.js';
 import { cli } from "../cli/cli.js";
 import request from "../request.js";
 import { sinonUtil } from "./sinonUtil.js";
@@ -39,7 +39,7 @@ describe('utils/aadDevice', () => {
       return 'Invalid Request';
     });
 
-    const actual = await aadDevice.getDeviceByDisplayName(displayName);
+    const actual = await entraDevice.getDeviceByDisplayName(displayName);
     assert.deepStrictEqual(actual, { id: deviceId, displayName: displayName });
   });
 
@@ -59,7 +59,7 @@ describe('utils/aadDevice', () => {
 
     sinon.stub(cli, 'handleMultipleResultsFound').resolves({ id: deviceId, displayName: displayName });
 
-    const actual = await aadDevice.getDeviceByDisplayName(displayName);
+    const actual = await entraDevice.getDeviceByDisplayName(displayName);
     assert.deepStrictEqual(actual, { id: deviceId, displayName: displayName });
   });
 
@@ -75,7 +75,7 @@ describe('utils/aadDevice', () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
-    await assert.rejects(aadDevice.getDeviceByDisplayName(invalidDisplayName)), Error(`The specified device '${invalidDisplayName}' does not exist.`);
+    await assert.rejects(entraDevice.getDeviceByDisplayName(invalidDisplayName)), Error(`The specified device '${invalidDisplayName}' does not exist.`);
   });
 
   it('throws error message when multiple devices were found using getDeviceByDisplayName', async () => {
@@ -100,6 +100,6 @@ describe('utils/aadDevice', () => {
       return 'Invalid Request';
     });
 
-    await assert.rejects(aadDevice.getDeviceByDisplayName(displayName), Error(`Multiple devices with name '${displayName}' found. Found: ${deviceId}.`));
+    await assert.rejects(entraDevice.getDeviceByDisplayName(displayName), Error(`Multiple devices with name '${displayName}' found. Found: ${deviceId}.`));
   });
 });

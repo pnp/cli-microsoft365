@@ -7,8 +7,8 @@ import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import request from '../../../../request.js';
 import { telemetry } from '../../../../telemetry.js';
-import { aadGroup } from '../../../../utils/aadGroup.js';
-import { aadUser } from '../../../../utils/aadUser.js';
+import { entraGroup } from '../../../../utils/entraGroup.js';
+import { entraUser } from '../../../../utils/entraUser.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
@@ -293,7 +293,7 @@ describe(commands.APP_PERMISSION_ENSURE, () => {
   });
 
   it('updates permissions to a Power App by userName', async () => {
-    sinon.stub(aadUser, 'getUserIdByUpn').resolves(validUserId);
+    sinon.stub(entraUser, 'getUserIdByUpn').resolves(validUserId);
 
     const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://api.powerapps.com/providers/Microsoft.PowerApps/apps/${validAppName}/modifyPermissions?api-version=2022-11-01`) {
@@ -323,7 +323,7 @@ describe(commands.APP_PERMISSION_ENSURE, () => {
   });
 
   it('updates permissions to a Power App by groupName', async () => {
-    sinon.stub(aadGroup, 'getGroupByDisplayName').resolves(groupResponse);
+    sinon.stub(entraGroup, 'getGroupByDisplayName').resolves(groupResponse);
 
     const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://api.powerapps.com/providers/Microsoft.PowerApps/apps/${validAppName}/modifyPermissions?api-version=2022-11-01`) {

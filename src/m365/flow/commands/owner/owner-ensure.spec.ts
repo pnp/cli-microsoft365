@@ -7,8 +7,8 @@ import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import request from '../../../../request.js';
 import { telemetry } from '../../../../telemetry.js';
-import { aadGroup } from '../../../../utils/aadGroup.js';
-import { aadUser } from '../../../../utils/aadUser.js';
+import { entraGroup } from '../../../../utils/entraGroup.js';
+import { entraUser } from '../../../../utils/entraUser.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
@@ -57,8 +57,8 @@ describe(commands.OWNER_ENSURE, () => {
     sinonUtil.restore([
       request.get,
       request.post,
-      aadGroup.getGroupByDisplayName,
-      aadUser.getUserIdByUpn,
+      entraGroup.getGroupByDisplayName,
+      entraUser.getUserIdByUpn,
       cli.getSettingWithDefaultValue,
       cli.handleMultipleResultsFound
     ]);
@@ -149,7 +149,7 @@ describe(commands.OWNER_ENSURE, () => {
       ]
     };
 
-    sinon.stub(aadUser, 'getUserIdByUpn').resolves(validUserId);
+    sinon.stub(entraUser, 'getUserIdByUpn').resolves(validUserId);
 
     const postRequestStub = sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === `https://api.flow.microsoft.com/providers/Microsoft.ProcessSimple/environments/${formatting.encodeQueryParameter(validEnvironmentName)}/flows/${formatting.encodeQueryParameter(validFlowName)}/modifyPermissions?api-version=2016-11-01`) {
@@ -205,7 +205,7 @@ describe(commands.OWNER_ENSURE, () => {
       ]
     };
 
-    sinon.stub(aadGroup, 'getGroupIdByDisplayName').resolves(validGroupId);
+    sinon.stub(entraGroup, 'getGroupIdByDisplayName').resolves(validGroupId);
 
     const postRequestStub = sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === `https://api.flow.microsoft.com/providers/Microsoft.ProcessSimple/scopes/admin/environments/${formatting.encodeQueryParameter(validEnvironmentName)}/flows/${formatting.encodeQueryParameter(validFlowName)}/modifyPermissions?api-version=2016-11-01`) {

@@ -3,7 +3,7 @@ import { formatting } from "./formatting.js";
 
 const graphResource = 'https://graph.microsoft.com';
 
-export const aadUser = {
+export const entraUser = {
   /**
    * Retrieve the id of a user by its UPN.
    * @param upn User UPN.

@@ -7,7 +7,7 @@ import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import request from '../../../../request.js';
 import { telemetry } from '../../../../telemetry.js';
-import { aadUser } from '../../../../utils/aadUser.js';
+import { entraUser } from '../../../../utils/entraUser.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
@@ -69,7 +69,7 @@ describe(commands.USER_ENSURE, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.post,
-      aadUser.getUpnByUserId
+      entraUser.getUpnByUserId
     ]);
   });
 
@@ -117,7 +117,7 @@ describe(commands.USER_ENSURE, () => {
   });
 
   it('ensures user for a specific web by aadId', async () => {
-    sinon.stub(aadUser, 'getUpnByUserId').callsFake(async () => {
+    sinon.stub(entraUser, 'getUpnByUserId').callsFake(async () => {
       return validUserName;
     });
 
@@ -134,7 +134,7 @@ describe(commands.USER_ENSURE, () => {
   });
 
   it('throws error message when no user was found with a specific id', async () => {
-    sinon.stub(aadUser, 'getUpnByUserId').callsFake(async (id) => {
+    sinon.stub(entraUser, 'getUpnByUserId').callsFake(async (id) => {
       throw {
         "error": {
           "error": {

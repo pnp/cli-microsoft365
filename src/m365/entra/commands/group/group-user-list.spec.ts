@@ -7,7 +7,7 @@ import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
 import request from '../../../../request.js';
 import { telemetry } from '../../../../telemetry.js';
-import { aadGroup } from '../../../../utils/aadGroup.js';
+import { entraGroup } from '../../../../utils/entraGroup.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
@@ -55,7 +55,7 @@ describe(commands.GROUP_USER_LIST, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.get,
-      aadGroup.getGroupIdByDisplayName,
+      entraGroup.getGroupIdByDisplayName,
       cli.getSettingWithDefaultValue,
       cli.handleMultipleResultsFound
     ]);
@@ -159,7 +159,7 @@ describe(commands.GROUP_USER_LIST, () => {
   });
 
   it('correctly lists all users in a Azure AD group by name', async () => {
-    sinon.stub(aadGroup, 'getGroupIdByDisplayName').resolves(groupId);
+    sinon.stub(entraGroup, 'getGroupIdByDisplayName').resolves(groupId);
 
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/2c1ba4c4-cd9b-4417-832f-92a34bc34b2a/Owners/microsoft.graph.user?$select=id,displayName,userPrincipalName,givenName,surname`) {

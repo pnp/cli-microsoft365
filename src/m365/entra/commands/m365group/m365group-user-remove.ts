@@ -2,7 +2,7 @@ import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request from '../../../../request.js';
-import { aadGroup } from '../../../../utils/aadGroup.js';
+import { entraGroup } from '../../../../utils/entraGroup.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
@@ -99,7 +99,7 @@ class EntraM365GroupUserRemoveCommand extends GraphCommand {
 
     const removeUser = async (): Promise<void> => {
       try {
-        const isUnifiedGroup = await aadGroup.isUnifiedGroup(groupId);
+        const isUnifiedGroup = await entraGroup.isUnifiedGroup(groupId);
 
         if (!isUnifiedGroup) {
           throw Error(`Specified group with id '${groupId}' is not a Microsoft 365 group.`);

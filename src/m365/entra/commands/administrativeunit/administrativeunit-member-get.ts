@@ -4,7 +4,7 @@ import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { validation } from '../../../../utils/validation.js';
-import { aadAdministrativeUnit } from '../../../../utils/aadAdministrativeUnit.js';
+import { entraAdministrativeUnit } from '../../../../utils/entraAdministrativeUnit.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import aadCommands from '../../aadCommands.js';
 
@@ -103,7 +103,7 @@ class EntraAdministrativeUnitMemberGetCommand extends GraphCommand {
           await logger.logToStderr(`Retrieving Administrative Unit Id...`);
         }
 
-        administrativeUnitId = (await aadAdministrativeUnit.getAdministrativeUnitByDisplayName(args.options.administrativeUnitName)).id!;
+        administrativeUnitId = (await entraAdministrativeUnit.getAdministrativeUnitByDisplayName(args.options.administrativeUnitName)).id!;
       }
 
       const url = this.getRequestUrl(administrativeUnitId!, args.options.id, args.options);

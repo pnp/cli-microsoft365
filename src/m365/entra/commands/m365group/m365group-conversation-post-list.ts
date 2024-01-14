@@ -1,7 +1,7 @@
 import { Post } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
-import { aadGroup } from '../../../../utils/aadGroup.js';
+import { entraGroup } from '../../../../utils/entraGroup.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { odata } from '../../../../utils/odata.js';
 import { validation } from '../../../../utils/validation.js';
@@ -87,7 +87,7 @@ class EntraM365GroupConversationPostListCommand extends GraphCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       const retrievedgroupId = await this.getGroupId(args);
-      const isUnifiedGroup = await aadGroup.isUnifiedGroup(retrievedgroupId);
+      const isUnifiedGroup = await entraGroup.isUnifiedGroup(retrievedgroupId);
 
       if (!isUnifiedGroup) {
         throw Error(`Specified group with id '${retrievedgroupId}' is not a Microsoft 365 group.`);
@@ -106,7 +106,7 @@ class EntraM365GroupConversationPostListCommand extends GraphCommand {
       return formatting.encodeQueryParameter(args.options.groupId);
     }
 
-    const group = await aadGroup.getGroupByDisplayName(args.options.groupDisplayName!);
+    const group = await entraGroup.getGroupByDisplayName(args.options.groupDisplayName!);
     return group.id!;
   }
 }

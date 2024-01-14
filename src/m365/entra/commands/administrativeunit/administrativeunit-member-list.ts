@@ -4,7 +4,7 @@ import { odata } from '../../../../utils/odata.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
-import { aadAdministrativeUnit } from '../../../../utils/aadAdministrativeUnit.js';
+import { entraAdministrativeUnit } from '../../../../utils/entraAdministrativeUnit.js';
 import { validation } from '../../../../utils/validation.js';
 import { CliRequestOptions } from '../../../../request.js';
 import aadCommands from '../../aadCommands.js';
@@ -114,7 +114,7 @@ class EntraAdministrativeUnitMemberListCommand extends GraphCommand {
 
     try {
       if (args.options.administrativeUnitName) {
-        administrativeUnitId = (await aadAdministrativeUnit.getAdministrativeUnitByDisplayName(args.options.administrativeUnitName)).id;
+        administrativeUnitId = (await entraAdministrativeUnit.getAdministrativeUnitByDisplayName(args.options.administrativeUnitName)).id;
       }
 
       let results;
