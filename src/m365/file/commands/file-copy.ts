@@ -101,8 +101,12 @@ class FileCopyCommand extends GraphCommand {
         }
       };
 
-      if (args.options.newName) {
-        requestOptions.data.name = newName;
+      if (newName) {
+        const sourceFileName = sourcePath.substring(sourcePath.lastIndexOf('/') + 1);
+        const sourceFileExtension = sourceFileName.includes('.') ? sourceFileName.substring(sourceFileName.lastIndexOf('.')) : '';
+        const newNameExtension = newName.includes('.') ? newName.substring(newName.lastIndexOf('.')) : '';
+
+        requestOptions.data.name = newNameExtension ? `${newName.replace(newNameExtension, "")}${sourceFileExtension}` : `${newName}${sourceFileExtension}`;
       }
 
       await request.post(requestOptions);

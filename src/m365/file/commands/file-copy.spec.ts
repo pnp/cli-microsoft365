@@ -110,6 +110,10 @@ describe(commands.COPY, () => {
               }
             ]
           };
+        case 'https://graph.microsoft.com/v1.0/drives/b!k6NJ6ubjYEehsullOeFTchyG4mbZlhhEp1wO0bymi0KkhVdx52mJQ5y68EfLYQYU/root:/folder1?$select=id':
+          return {
+            "id": "01YNDLPYN6Y2GOVW7725BZO354PWSELRRZ"
+          };
         default:
           throw `Invalid GET request: ${url}`;
       }
@@ -187,6 +191,19 @@ describe(commands.COPY, () => {
     assert.notStrictEqual(actual, true);
   });
 
+  it('passes validation with valid options', async () => {
+    const actual = await command.validate({
+      options: {
+        webUrl: 'https://contoso.sharepoint.com',
+        sourceUrl: '/Shared Documents/file.pdf',
+        targetUrl: '/teams/finance/Shared Documents',
+        newName: 'file1',
+        nameConflictBehavior: 'rename'
+      }
+    }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
   it('copies file from source to target', async () => {
     const getStub: sinon.SinonStub = defaultGetStub();
     const postStub: sinon.SinonStub = defaultPostStub();
@@ -259,7 +276,51 @@ describe(commands.COPY, () => {
         newName: 'file1.pdf'
       }
     }));
+  });
 
+  it('copies file by renaming with a new name and a different extension when a file with the same name already exists.', async () => {
+    defaultGetStub();
+    defaultPostStub();
+
+    await assert.doesNotReject(command.action(logger, {
+      options: {
+        webUrl: 'https://contoso.sharepoint.com',
+        sourceUrl: '/Shared Documents/file.pdf',
+        targetUrl: '/teams/finance/Shared Documents',
+        nameConflictBehavior: 'rename',
+        newName: 'file2_renamed.docx'
+      }
+    }));
+  });
+
+  it('copies file by renaming with a new name and no extension when a file with the same name already exists.', async () => {
+    defaultGetStub();
+    defaultPostStub();
+
+    await assert.doesNotReject(command.action(logger, {
+      options: {
+        webUrl: 'https://contoso.sharepoint.com',
+        sourceUrl: '/Shared Documents/file.pdf',
+        targetUrl: '/teams/finance/Shared Documents',
+        nameConflictBehavior: 'rename',
+        newName: 'file3_renamed'
+      }
+    }));
+  });
+
+  it('copies folder by renaming when a folder with the same name already exists.', async () => {
+    defaultGetStub();
+    defaultPostStub();
+
+    await assert.doesNotReject(command.action(logger, {
+      options: {
+        webUrl: 'https://contoso.sharepoint.com',
+        sourceUrl: '/Shared Documents/folder1',
+        targetUrl: '/teams/finance/Shared Documents',
+        nameConflictBehavior: 'rename',
+        newName: 'folder1_renamed'
+      }
+    }));
   });
 
   it('handles error if unexpected error occurs', async () => {
