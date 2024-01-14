@@ -2,7 +2,7 @@ import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
-import { aadGroup } from '../../../../utils/aadGroup.js';
+import { entraGroup } from '../../../../utils/entraGroup.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
@@ -108,7 +108,7 @@ class EntraM365GroupTeamifyCommand extends GraphCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       const groupId = await this.getGroupId(args.options);
-      const isUnifiedGroup = await aadGroup.isUnifiedGroup(groupId);
+      const isUnifiedGroup = await entraGroup.isUnifiedGroup(groupId);
 
       if (!isUnifiedGroup) {
         throw Error(`Specified group with id '${groupId}' is not a Microsoft 365 group.`);

@@ -5,7 +5,7 @@ import { odata } from '../../../../utils/odata.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
-import { aadGroup } from '../../../../utils/aadGroup.js';
+import { entraGroup } from '../../../../utils/entraGroup.js';
 import aadCommands from '../../aadCommands.js';
 
 interface CommandArgs {
@@ -62,7 +62,7 @@ class EntraM365GroupConversationListCommand extends GraphCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
-      const isUnifiedGroup = await aadGroup.isUnifiedGroup(args.options.groupId);
+      const isUnifiedGroup = await entraGroup.isUnifiedGroup(args.options.groupId);
 
       if (!isUnifiedGroup) {
         throw Error(`Specified group with id '${args.options.groupId}' is not a Microsoft 365 group.`);

@@ -7,7 +7,7 @@ import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import request from '../../../../request.js';
 import { telemetry } from '../../../../telemetry.js';
-import { aadUser } from '../../../../utils/aadUser.js';
+import { entraUser } from '../../../../utils/entraUser.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
@@ -68,7 +68,7 @@ describe(commands.MEETING_ADD, () => {
       accessToken.isAppOnlyAccessToken,
       request.get,
       request.post,
-      aadUser.getUserIdByEmail,
+      entraUser.getUserIdByEmail,
       fakeTimers
     ]);
   });

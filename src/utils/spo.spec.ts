@@ -7,7 +7,7 @@ import { RoleDefinition } from '../m365/spo/commands/roledefinition/RoleDefiniti
 import request from '../request.js';
 import { sinonUtil } from '../utils/sinonUtil.js';
 import { FormDigestInfo, spo } from '../utils/spo.js';
-import { aadGroup } from './aadGroup.js';
+import { entraGroup } from './entraGroup.js';
 import { formatting } from './formatting.js';
 
 const stubPostResponses: any = (
@@ -1746,7 +1746,7 @@ describe('utils/spo', () => {
       FormDigestExpiresAt: new Date(),
       WebFullUrl: 'https://contoso.sharepoint.com'
     });
-    sinon.stub(aadGroup, 'setGroup').resolves();
+    sinon.stub(entraGroup, 'setGroup').resolves();
     sinon.stub(spo, 'setGroupifiedSiteOwners').resolves();
     sinon.stub(spo, 'applySiteDesign').resolves();
 

@@ -2,7 +2,7 @@ import { PlannerBucket, PlannerPlan, PlannerTask, PlannerTaskDetails, User } fro
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
-import { aadGroup } from '../../../../utils/aadGroup.js';
+import { entraGroup } from '../../../../utils/entraGroup.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { planner } from '../../../../utils/planner.js';
 import { validation } from '../../../../utils/validation.js';
@@ -342,7 +342,7 @@ class PlannerTaskAddCommand extends GraphCommand {
       return args.options.ownerGroupId;
     }
 
-    const group = await aadGroup.getGroupByDisplayName(args.options.ownerGroupName!);
+    const group = await entraGroup.getGroupByDisplayName(args.options.ownerGroupName!);
     return group.id!;
   }
 

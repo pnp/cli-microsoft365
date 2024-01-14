@@ -1,7 +1,7 @@
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
-import { aadGroup } from '../../../../utils/aadGroup.js';
+import { entraGroup } from '../../../../utils/entraGroup.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
@@ -99,7 +99,7 @@ class EntraM365GroupUserAddCommand extends GraphCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       const providedGroupId: string = (typeof args.options.groupId !== 'undefined') ? args.options.groupId : args.options.teamId as string;
-      const isUnifiedGroup = await aadGroup.isUnifiedGroup(providedGroupId);
+      const isUnifiedGroup = await entraGroup.isUnifiedGroup(providedGroupId);
 
       if (!isUnifiedGroup) {
         throw Error(`Specified group with id '${providedGroupId}' is not a Microsoft 365 group.`);

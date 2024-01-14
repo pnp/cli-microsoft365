@@ -1,4 +1,4 @@
-import { aadAdministrativeUnit } from '../../../../utils/aadAdministrativeUnit.js';
+import { entraAdministrativeUnit } from '../../../../utils/entraAdministrativeUnit.js';
 import GlobalOptions from "../../../../GlobalOptions.js";
 import { Logger } from "../../../../cli/Logger.js";
 import { validation } from "../../../../utils/validation.js";
@@ -95,7 +95,7 @@ class EntraAdministrativeUnitRemoveCommand extends GraphCommand {
         let administrativeUnitId = args.options.id;
 
         if (args.options.displayName) {
-          const administrativeUnit = await aadAdministrativeUnit.getAdministrativeUnitByDisplayName(args.options.displayName);
+          const administrativeUnit = await entraAdministrativeUnit.getAdministrativeUnitByDisplayName(args.options.displayName);
           administrativeUnitId = administrativeUnit.id;
         }
 

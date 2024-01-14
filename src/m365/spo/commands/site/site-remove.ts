@@ -4,7 +4,7 @@ import { Logger } from '../../../../cli/Logger.js';
 import config from '../../../../config.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request from '../../../../request.js';
-import { aadGroup } from '../../../../utils/aadGroup.js';
+import { entraGroup } from '../../../../utils/entraGroup.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { ClientSvcResponse, ClientSvcResponseContents, FormDigestInfo, spo, SpoOperation } from '../../../../utils/spo.js';
 import { validation } from '../../../../utils/validation.js';
@@ -113,7 +113,7 @@ class SpoSiteRemoveCommand extends SpoCommand {
           }
 
           try {
-            const group = await aadGroup.getGroupById(groupId);
+            const group = await entraGroup.getGroupById(groupId);
             if (args.options.skipRecycleBin || args.options.wait) {
               await logger.logToStderr(chalk.yellow(`Entered site is a groupified site. Hence, the parameters 'skipRecycleBin' and 'wait' will not be applicable.`));
             }

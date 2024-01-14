@@ -3,7 +3,7 @@ import { odata } from './odata.js';
 import { formatting } from './formatting.js';
 import { cli } from '../cli/cli.js';
 
-export const aadAdministrativeUnit = {
+export const entraAdministrativeUnit = {
   /**
    * Get an administrative unit by its display name.
    * @param displayName Administrative unit display name.

@@ -3,7 +3,7 @@ import auth from '../../../../Auth.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import { Logger } from '../../../../cli/Logger.js';
 import request, { CliRequestOptions } from '../../../../request.js';
-import { aadUser } from '../../../../utils/aadUser.js';
+import { entraUser } from '../../../../utils/entraUser.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { validation } from '../../../../utils/validation.js';
@@ -137,10 +137,10 @@ class TeamsMeetingGetCommand extends GraphCommand {
     }
 
     if (options.userName) {
-      return aadUser.getUserIdByUpn(options.userName);
+      return entraUser.getUserIdByUpn(options.userName);
     }
 
-    return aadUser.getUserIdByEmail(options.email!);
+    return entraUser.getUserIdByEmail(options.email!);
   }
 }
 

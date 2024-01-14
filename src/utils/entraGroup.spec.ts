@@ -1,7 +1,7 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import request from "../request.js";
-import { aadGroup } from './aadGroup.js';
+import { entraGroup } from './entraGroup.js';
 import { formatting } from './formatting.js';
 import { sinonUtil } from "./sinonUtil.js";
 import { Logger } from '../cli/Logger.js';
@@ -16,7 +16,7 @@ const singleGroupResponse = {
   displayName: validGroupName
 };
 
-describe('utils/aadGroup', () => {
+describe('utils/entraGroup', () => {
   let logger: Logger;
   let log: string[];
 
@@ -53,7 +53,7 @@ describe('utils/aadGroup', () => {
       return 'Invalid Request';
     });
 
-    const actual = await aadGroup.getGroupById(validGroupId);
+    const actual = await entraGroup.getGroupById(validGroupId);
     assert.strictEqual(actual, singleGroupResponse);
   });
 
@@ -66,7 +66,7 @@ describe('utils/aadGroup', () => {
       return 'Invalid Request';
     });
 
-    await assert.rejects(aadGroup.getGroupByDisplayName(validGroupName), Error(`The specified group '${validGroupName}' does not exist.`));
+    await assert.rejects(entraGroup.getGroupByDisplayName(validGroupName), Error(`The specified group '${validGroupName}' does not exist.`));
   });
 
   it('throws error message when multiple groups were found using getGroupByDisplayName', async () => {
@@ -91,7 +91,7 @@ describe('utils/aadGroup', () => {
       return 'Invalid Request';
     });
 
-    await assert.rejects(aadGroup.getGroupByDisplayName(validGroupName), Error("Multiple groups with name 'Group name' found. Found: 00000000-0000-0000-0000-000000000000."));
+    await assert.rejects(entraGroup.getGroupByDisplayName(validGroupName), Error("Multiple groups with name 'Group name' found. Found: 00000000-0000-0000-0000-000000000000."));
   });
 
   it('correctly get single group by name using getGroupByDisplayName', async () => {
@@ -107,7 +107,7 @@ describe('utils/aadGroup', () => {
       return 'Invalid Request';
     });
 
-    const actual = await aadGroup.getGroupByDisplayName(validGroupName);
+    const actual = await entraGroup.getGroupByDisplayName(validGroupName);
     assert.deepStrictEqual(actual, singleGroupResponse);
   });
 
@@ -124,7 +124,7 @@ describe('utils/aadGroup', () => {
       return 'Invalid Request';
     });
 
-    const actual = await aadGroup.getGroupIdByDisplayName(validGroupName);
+    const actual = await entraGroup.getGroupIdByDisplayName(validGroupName);
     assert.deepStrictEqual(actual, singleGroupResponse.id);
   });
 
@@ -137,7 +137,7 @@ describe('utils/aadGroup', () => {
       return 'Invalid Request';
     });
 
-    await assert.rejects(aadGroup.getGroupIdByDisplayName(validGroupName), Error(`The specified group '${validGroupName}' does not exist.`));
+    await assert.rejects(entraGroup.getGroupIdByDisplayName(validGroupName), Error(`The specified group '${validGroupName}' does not exist.`));
   });
 
   it('throws error message when multiple groups were found using getGroupIdByDisplayName', async () => {
@@ -162,7 +162,7 @@ describe('utils/aadGroup', () => {
       return 'Invalid Request';
     });
 
-    await assert.rejects(aadGroup.getGroupIdByDisplayName(validGroupName), Error(`Multiple groups with name 'Group name' found. Found: 00000000-0000-0000-0000-000000000000.`));
+    await assert.rejects(entraGroup.getGroupIdByDisplayName(validGroupName), Error(`Multiple groups with name 'Group name' found. Found: 00000000-0000-0000-0000-000000000000.`));
   });
 
   it('handles selecting single result when multiple groups with the specified name found using getGroupIdByDisplayName and cli is set to prompt', async () => {
@@ -181,7 +181,7 @@ describe('utils/aadGroup', () => {
 
     sinon.stub(cli, 'handleMultipleResultsFound').resolves({ id: validGroupId });
 
-    const actual = await aadGroup.getGroupIdByDisplayName(validGroupName);
+    const actual = await entraGroup.getGroupIdByDisplayName(validGroupName);
     assert.deepStrictEqual(actual, validGroupId);
   });
 
@@ -194,7 +194,7 @@ describe('utils/aadGroup', () => {
       return 'Invalid Request';
     });
 
-    await aadGroup.setGroup(validGroupId, true, logger, true);
+    await entraGroup.setGroup(validGroupId, true, logger, true);
     assert(patchStub.called);
   });
 
@@ -207,7 +207,7 @@ describe('utils/aadGroup', () => {
       return 'Invalid Request';
     });
 
-    await aadGroup.setGroup(validGroupId, false, logger, true);
+    await entraGroup.setGroup(validGroupId, false, logger, true);
     assert(patchStub.called);
   });
 
@@ -227,7 +227,7 @@ describe('utils/aadGroup', () => {
 
     sinon.stub(cli, 'handleMultipleResultsFound').resolves({ id: validGroupId, displayName: validGroupName });
 
-    const actual = await aadGroup.getGroupByDisplayName(validGroupName);
+    const actual = await entraGroup.getGroupByDisplayName(validGroupName);
     assert.deepStrictEqual(actual, singleGroupResponse);
   });
 
@@ -243,7 +243,7 @@ describe('utils/aadGroup', () => {
 
       return 'Invalid Request';
     });
-    const actual = await aadGroup.isUnifiedGroup(validGroupId);
+    const actual = await entraGroup.isUnifiedGroup(validGroupId);
     assert.deepStrictEqual(actual, true);
   });
 
@@ -257,7 +257,7 @@ describe('utils/aadGroup', () => {
 
       return 'Invalid Request';
     });
-    const actual = await aadGroup.isUnifiedGroup(validGroupId);
+    const actual = await entraGroup.isUnifiedGroup(validGroupId);
     assert.deepStrictEqual(actual, false);
   });
 }); 

@@ -2,7 +2,7 @@ import { Notebook } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
-import { aadGroup } from '../../../../utils/aadGroup.js';
+import { entraGroup } from '../../../../utils/entraGroup.js';
 import { odata } from '../../../../utils/odata.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
@@ -122,7 +122,7 @@ class OneNoteNotebookListCommand extends GraphCommand {
   }
 
   private async getGroupId(groupName: string): Promise<string> {
-    const group = await aadGroup.getGroupByDisplayName(groupName);
+    const group = await entraGroup.getGroupByDisplayName(groupName);
     return group.id!;
   }
 

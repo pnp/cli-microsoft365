@@ -12,10 +12,10 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import command from './administrativeunit-member-add.js';
-import { aadAdministrativeUnit } from '../../../../utils/aadAdministrativeUnit.js';
-import { aadGroup } from '../../../../utils/aadGroup.js';
-import { aadUser } from '../../../../utils/aadUser.js';
-import { aadDevice } from '../../../../utils/aadDevice.js';
+import { entraAdministrativeUnit } from '../../../../utils/entraAdministrativeUnit.js';
+import { entraGroup } from '../../../../utils/entraGroup.js';
+import { entraUser } from '../../../../utils/entraUser.js';
+import { entraDevice } from '../../../../utils/entraDevice.js';
 import { settingsNames } from '../../../../settingsNames.js';
 import aadCommands from '../../aadCommands.js';
 
@@ -60,10 +60,10 @@ describe(commands.ADMINISTRATIVEUNIT_MEMBER_ADD, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.post,
-      aadAdministrativeUnit.getAdministrativeUnitByDisplayName,
-      aadUser.getUserIdByUpn,
-      aadGroup.getGroupIdByDisplayName,
-      aadDevice.getDeviceByDisplayName,
+      entraAdministrativeUnit.getAdministrativeUnitByDisplayName,
+      entraUser.getUserIdByUpn,
+      entraGroup.getGroupIdByDisplayName,
+      entraDevice.getDeviceByDisplayName,
       cli.getSettingWithDefaultValue,
       cli.handleMultipleResultsFound,
       cli.promptForSelection
@@ -374,8 +374,8 @@ describe(commands.ADMINISTRATIVEUNIT_MEMBER_ADD, () => {
   });
 
   it('adds a user specified by its name to an administrative unit specified by its name (verbose)', async () => {
-    sinon.stub(aadUser, 'getUserIdByUpn').withArgs(userName).resolves(userId);
-    sinon.stub(aadAdministrativeUnit, 'getAdministrativeUnitByDisplayName').withArgs(administrativeUnitName).resolves({ id: administrativeUnitId, displayName: administrativeUnitName });
+    sinon.stub(entraUser, 'getUserIdByUpn').withArgs(userName).resolves(userId);
+    sinon.stub(entraAdministrativeUnit, 'getAdministrativeUnitByDisplayName').withArgs(administrativeUnitName).resolves({ id: administrativeUnitId, displayName: administrativeUnitName });
 
     const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/directory/administrativeUnits/${administrativeUnitId}/members/$ref`) {
@@ -405,8 +405,8 @@ describe(commands.ADMINISTRATIVEUNIT_MEMBER_ADD, () => {
   });
 
   it('adds a group specified by its name to an administrative unit specified by its name (verbose)', async () => {
-    sinon.stub(aadGroup, 'getGroupIdByDisplayName').withArgs(groupName).resolves(groupId);
-    sinon.stub(aadAdministrativeUnit, 'getAdministrativeUnitByDisplayName').withArgs(administrativeUnitName).resolves({ id: administrativeUnitId, displayName: administrativeUnitName });
+    sinon.stub(entraGroup, 'getGroupIdByDisplayName').withArgs(groupName).resolves(groupId);
+    sinon.stub(entraAdministrativeUnit, 'getAdministrativeUnitByDisplayName').withArgs(administrativeUnitName).resolves({ id: administrativeUnitId, displayName: administrativeUnitName });
 
     const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/directory/administrativeUnits/${administrativeUnitId}/members/$ref`) {
@@ -436,8 +436,8 @@ describe(commands.ADMINISTRATIVEUNIT_MEMBER_ADD, () => {
   });
 
   it('adds a device specified by its name to an administrative unit specified by its name (verbose)', async () => {
-    sinon.stub(aadDevice, 'getDeviceByDisplayName').withArgs(deviceName).resolves({ id: deviceId, displayName: deviceName });
-    sinon.stub(aadAdministrativeUnit, 'getAdministrativeUnitByDisplayName').withArgs(administrativeUnitName).resolves({ id: administrativeUnitId, displayName: administrativeUnitName });
+    sinon.stub(entraDevice, 'getDeviceByDisplayName').withArgs(deviceName).resolves({ id: deviceId, displayName: deviceName });
+    sinon.stub(entraAdministrativeUnit, 'getAdministrativeUnitByDisplayName').withArgs(administrativeUnitName).resolves({ id: administrativeUnitId, displayName: administrativeUnitName });
 
     const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/directory/administrativeUnits/${administrativeUnitId}/members/$ref`) {

@@ -5,7 +5,7 @@ import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { validation } from '../../../../utils/validation.js';
-import aadUserGetCommand, { Options as AadUserGetCommandOptions } from '../../../entra/commands/user/user-get.js';
+import entraUserGetCommand, { Options as EntraUserGetCommandOptions } from '../../../entra/commands/user/user-get.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 
@@ -131,14 +131,14 @@ class TeamsAppInstallCommand extends GraphCommand {
       await logger.logToStderr(`Checking if user ${args.options.userId} exists...`);
     }
 
-    const options: AadUserGetCommandOptions = {
+    const options: EntraUserGetCommandOptions = {
       id: args.options.userId,
       output: 'json',
       debug: args.options.debug,
       verbose: args.options.verbose
     };
     try {
-      const res = await cli.executeCommandWithOutput(aadUserGetCommand as Command, { options: { ...options, _: [] } });
+      const res = await cli.executeCommandWithOutput(entraUserGetCommand as Command, { options: { ...options, _: [] } });
 
       if (this.verbose) {
         await logger.logToStderr(res.stderr);

@@ -1,13 +1,13 @@
 import GlobalOptions from "../../../../GlobalOptions.js";
 import { Logger } from "../../../../cli/Logger.js";
-import { aadAdministrativeUnit } from "../../../../utils/aadAdministrativeUnit.js";
-import { aadGroup } from "../../../../utils/aadGroup.js";
-import { aadUser } from "../../../../utils/aadUser.js";
+import { entraAdministrativeUnit } from "../../../../utils/entraAdministrativeUnit.js";
+import { entraGroup } from "../../../../utils/entraGroup.js";
+import { entraUser } from "../../../../utils/entraUser.js";
 import { validation } from "../../../../utils/validation.js";
 import GraphCommand from "../../../base/GraphCommand.js";
 import commands from "../../commands.js";
 import request, { CliRequestOptions } from "../../../../request.js";
-import { aadDevice } from "../../../../utils/aadDevice.js";
+import { entraDevice } from "../../../../utils/entraDevice.js";
 import aadCommands from "../../aadCommands.js";
 
 interface CommandArgs {
@@ -129,7 +129,7 @@ class EntraAdministrativeUnitMemberAddCommand extends GraphCommand {
           await logger.logToStderr(`Retrieving Administrative Unit Id...`);
         }
 
-        administrativeUnitId = (await aadAdministrativeUnit.getAdministrativeUnitByDisplayName(args.options.administrativeUnitName)).id!;
+        administrativeUnitId = (await entraAdministrativeUnit.getAdministrativeUnitByDisplayName(args.options.administrativeUnitName)).id!;
       }
 
       if (args.options.userId || args.options.userName) {
@@ -141,7 +141,7 @@ class EntraAdministrativeUnitMemberAddCommand extends GraphCommand {
             await logger.logToStderr(`Retrieving User Id...`);
           }
 
-          memberId = await aadUser.getUserIdByUpn(args.options.userName);
+          memberId = await entraUser.getUserIdByUpn(args.options.userName);
         }
       }
       else if (args.options.groupId || args.options.groupName) {
@@ -153,7 +153,7 @@ class EntraAdministrativeUnitMemberAddCommand extends GraphCommand {
             await logger.logToStderr(`Retrieving Group Id...`);
           }
 
-          memberId = await aadGroup.getGroupIdByDisplayName(args.options.groupName);
+          memberId = await entraGroup.getGroupIdByDisplayName(args.options.groupName);
         }
       }
       else if (args.options.deviceId || args.options.deviceName) {
@@ -165,7 +165,7 @@ class EntraAdministrativeUnitMemberAddCommand extends GraphCommand {
             await logger.logToStderr(`Device with name ${args.options.deviceName} retrieved, returned id: ${memberId}`);
           }
 
-          memberId = (await aadDevice.getDeviceByDisplayName(args.options.deviceName)).id;
+          memberId = (await entraDevice.getDeviceByDisplayName(args.options.deviceName)).id;
         }
       }
 

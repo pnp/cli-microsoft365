@@ -1,7 +1,7 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import request from '../request.js';
-import { aadUser } from './aadUser.js';
+import { entraUser } from './entraUser.js';
 import { formatting } from './formatting.js';
 import { sinonUtil } from './sinonUtil.js';
 
@@ -10,7 +10,7 @@ const validUserId = '2056d2f6-3257-4253-8cfc-b73393e414e5';
 const userResponse = { value: [{ id: validUserId }] };
 const userPrincipalNameResponse = { userPrincipalName: validUserName };
 
-describe('utils/aadUser', () => {
+describe('utils/entraUser', () => {
   afterEach(() => {
     sinonUtil.restore([
       request.get
@@ -26,7 +26,7 @@ describe('utils/aadUser', () => {
       return 'Invalid Request';
     });
 
-    const actual = await aadUser.getUserIdByUpn(validUserName);
+    const actual = await entraUser.getUserIdByUpn(validUserName);
     assert.strictEqual(actual, validUserId);
   });
 
@@ -39,7 +39,7 @@ describe('utils/aadUser', () => {
       return 'Invalid Request';
     });
 
-    const actual = await aadUser.getUserIdByEmail(validUserName);
+    const actual = await entraUser.getUserIdByEmail(validUserName);
     assert.strictEqual(actual, validUserId);
   });
 
@@ -52,7 +52,7 @@ describe('utils/aadUser', () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(aadUser.getUserIdByUpn(validUserName), Error(`The specified user with user name ${validUserName} does not exist.`));
+    await assert.rejects(entraUser.getUserIdByUpn(validUserName), Error(`The specified user with user name ${validUserName} does not exist.`));
   });
 
   it('throws error message when no user was found with a specific mail', async () => {
@@ -64,7 +64,7 @@ describe('utils/aadUser', () => {
       throw `Invalid request`;
     });
 
-    await assert.rejects(aadUser.getUserIdByEmail(validUserName), Error(`The specified user with email ${validUserName} does not exist`));
+    await assert.rejects(entraUser.getUserIdByEmail(validUserName), Error(`The specified user with email ${validUserName} does not exist`));
   });
 
   it('correctly get upn by user id', async () => {
@@ -76,7 +76,7 @@ describe('utils/aadUser', () => {
       return 'Invalid Request';
     });
 
-    const actual = await aadUser.getUpnByUserId(validUserId);
+    const actual = await entraUser.getUpnByUserId(validUserId);
     assert.strictEqual(actual, validUserName);
   });
 }); 

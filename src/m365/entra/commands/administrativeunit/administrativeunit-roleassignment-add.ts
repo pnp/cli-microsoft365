@@ -1,7 +1,7 @@
 import GlobalOptions from '../../../../GlobalOptions.js';
 import { Logger } from '../../../../cli/Logger.js';
-import { aadAdministrativeUnit } from '../../../../utils/aadAdministrativeUnit.js';
-import { aadUser } from '../../../../utils/aadUser.js';
+import { entraAdministrativeUnit } from '../../../../utils/entraAdministrativeUnit.js';
+import { entraUser } from '../../../../utils/entraUser.js';
 import { roleAssignment } from '../../../../utils/roleAssignment.js';
 import { roleDefinition } from '../../../../utils/roleDefinition.js';
 import { validation } from '../../../../utils/validation.js';
@@ -110,7 +110,7 @@ class EntraAdministrativeUnitRoleAssignmentAddCommand extends GraphCommand {
           await logger.logToStderr(`Retrieving administrative unit by its name '${args.options.administrativeUnitName}'`);
         }
 
-        administrativeUnitId = (await aadAdministrativeUnit.getAdministrativeUnitByDisplayName(args.options.administrativeUnitName)).id;
+        administrativeUnitId = (await entraAdministrativeUnit.getAdministrativeUnitByDisplayName(args.options.administrativeUnitName)).id;
       }
 
       if (args.options.roleDefinitionName) {
@@ -126,7 +126,7 @@ class EntraAdministrativeUnitRoleAssignmentAddCommand extends GraphCommand {
           await logger.logToStderr(`Retrieving user by UPN '${args.options.userName}'`);
         }
 
-        userId = await aadUser.getUserIdByUpn(args.options.userName);
+        userId = await entraUser.getUserIdByUpn(args.options.userName);
       }
 
       const unifiedRoleAssignment = await roleAssignment.createRoleAssignmentWithAdministrativeUnitScope(roleDefinitionId!, userId!, administrativeUnitId!);

@@ -4,7 +4,7 @@ import GlobalOptions from '../../../../GlobalOptions.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 import request, { CliRequestOptions } from '../../../../request.js';
-import { aadGroup } from '../../../../utils/aadGroup.js';
+import { entraGroup } from '../../../../utils/entraGroup.js';
 import { validation } from '../../../../utils/validation.js';
 import aadCommands from '../../aadCommands.js';
 
@@ -99,7 +99,7 @@ class EntraGroupRemoveCommand extends GraphCommand {
         let groupId = args.options.id;
 
         if (args.options.displayName) {
-          groupId = await aadGroup.getGroupIdByDisplayName(args.options.displayName);
+          groupId = await entraGroup.getGroupIdByDisplayName(args.options.displayName);
         }
 
         const requestOptions: CliRequestOptions = {

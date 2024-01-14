@@ -1,7 +1,7 @@
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
-import { aadGroup } from '../../../../utils/aadGroup.js';
+import { entraGroup } from '../../../../utils/entraGroup.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import aadCommands from '../../aadCommands.js';
@@ -64,13 +64,13 @@ class EntraM365GroupGetCommand extends GraphCommand {
     let group: GroupExtended;
 
     try {
-      const isUnifiedGroup = await aadGroup.isUnifiedGroup(args.options.id);
+      const isUnifiedGroup = await entraGroup.isUnifiedGroup(args.options.id);
 
       if (!isUnifiedGroup) {
         throw Error(`Specified group with id '${args.options.id}' is not a Microsoft 365 group.`);
       }
 
-      group = await aadGroup.getGroupById(args.options.id);
+      group = await entraGroup.getGroupById(args.options.id);
 
       if (args.options.includeSiteUrl) {
         const requestOptions: CliRequestOptions = {

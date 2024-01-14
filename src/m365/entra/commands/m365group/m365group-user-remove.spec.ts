@@ -14,7 +14,7 @@ import teamsCommands from '../../../teams/commands.js';
 import commands from '../../commands.js';
 import command from './m365group-user-remove.js';
 import { settingsNames } from '../../../../settingsNames.js';
-import { aadGroup } from '../../../../utils/aadGroup.js';
+import { entraGroup } from '../../../../utils/entraGroup.js';
 import aadCommands from '../../aadCommands.js';
 
 describe(commands.M365GROUP_USER_REMOVE, () => {
@@ -28,7 +28,7 @@ describe(commands.M365GROUP_USER_REMOVE, () => {
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
-    sinon.stub(aadGroup, 'isUnifiedGroup').resolves(true);
+    sinon.stub(entraGroup, 'isUnifiedGroup').resolves(true);
     auth.service.connected = true;
     commandInfo = cli.getCommandInfo(command);
   });
@@ -624,8 +624,8 @@ describe(commands.M365GROUP_USER_REMOVE, () => {
   it('throws error when the group is not a unified group', async () => {
     const groupId = '3f04e370-cbc6-4091-80fe-1d038be2ad06';
 
-    sinonUtil.restore(aadGroup.isUnifiedGroup);
-    sinon.stub(aadGroup, 'isUnifiedGroup').resolves(false);
+    sinonUtil.restore(entraGroup.isUnifiedGroup);
+    sinon.stub(entraGroup, 'isUnifiedGroup').resolves(false);
 
     await assert.rejects(command.action(logger, { options: { groupId: groupId, userName: 'anne.matthews@contoso.onmicrosoft.com', force: true } } as any),
       new CommandError(`Specified group with id '${groupId}' is not a Microsoft 365 group.`));
