@@ -32,19 +32,13 @@ m365 spo user ensure [options]
 
 ## Examples
 
-Ensures a user by its Entra Id
+Ensures a user by its Entra Id.
 
 ```sh
 m365 spo user ensure --webUrl https://contoso.sharepoint.com/sites/project --entraId e254750a-eaa4-44f6-9517-b74f65cdb747
 ```
 
-Ensures a user by its Azure AD Id
-
-```sh
-m365 spo user ensure --webUrl https://contoso.sharepoint.com/sites/project --aadId e254750a-eaa4-44f6-9517-b74f65cdb747
-```
-
-Ensures a user by its user principal name
+Ensures a user by its user principal name.
 
 ```sh
 m365 spo user ensure --webUrl https://contoso.sharepoint.com/sites/project --userName john@contoso.com
