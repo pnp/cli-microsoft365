@@ -84,7 +84,7 @@ class TeamsChatListCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const isAppOnlyAccessToken: boolean | undefined = accessToken.isAppOnlyAccessToken(auth.service.accessTokens[this.resource].accessToken);
+    const isAppOnlyAccessToken: boolean | undefined = accessToken.isAppOnlyAccessToken(auth.connection.accessTokens[this.resource].accessToken);
 
     if (isAppOnlyAccessToken && !args.options.userId && !args.options.userName) {
       throw `The option 'userId' or 'userName' is required when obtaining chats using app only permissions`;

@@ -31,8 +31,8 @@ describe(commands.SITEDESIGN_TASK_REMOVE, () => {
       FormDigestExpiresAt: new Date(),
       WebFullUrl: 'https://contoso.sharepoint.com'
     });
-    auth.service.connected = true;
-    auth.service.spoUrl = 'https://contoso.sharepoint.com';
+    auth.connection.active = true;
+    auth.connection.spoUrl = 'https://contoso.sharepoint.com';
     commandInfo = cli.getCommandInfo(command);
   });
 
@@ -62,7 +62,7 @@ describe(commands.SITEDESIGN_TASK_REMOVE, () => {
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
+    auth.connection.active = false;
   });
 
   it('has correct name', () => {

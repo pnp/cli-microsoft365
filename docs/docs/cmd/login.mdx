@@ -44,6 +44,9 @@ m365 login [options]
 
 `--cloud [cloud]`
 : Cloud to connect to. Allowed values `Public`, `USGov`, `USGovHigh`, `USGovDoD` and `China`. Default `Public`
+
+`--connectionName [connectionName]`
+: Specify an optional name to make switching between connections easier.
 ```
 
 <Global />
@@ -64,12 +67,24 @@ Managed identity in Azure Cloud Shell is the identity of the user. It is neither
 
 When connecting to clouds other than `Public`, you'll need to use an Azure AD application registered in a directory provisioned in that cloud. If you try to login using the default Azure AD application, login will fail.
 
+:::tip
+
+When signing in with multiple identities, every signin will be saved as a connection. You can list available connections using [m365 connection list](./connection/connection-list.mdx) and switch between connections using [m365 connection use](./connection/connection-use.mdx) 
+
+:::
+
 ## Examples
 
 Log in to Microsoft 365 using the device code
 
 ```sh
 m365 login
+```
+
+Log in to Microsoft 365 using the device code and set the connection name
+
+```sh
+m365 login --connectionName 'myworkaccount'
 ```
 
 Log in to Microsoft 365 using the device code in debug mode including detailed debug information in the console output

@@ -34,9 +34,9 @@ describe(commands.CDN_ORIGIN_ADD, () => {
         WebFullUrl: 'https://contoso.sharepoint.com'
       }
     );
-    auth.service.connected = true;
-    auth.service.spoUrl = 'https://contoso.sharepoint.com';
-    auth.service.tenantId = 'abc';
+    auth.connection.active = true;
+    auth.connection.spoUrl = 'https://contoso.sharepoint.com';
+    auth.connection.spoTenantId = 'abc';
     sinon.stub(request, 'post').callsFake(async (opts) => {
       requests.push(opts);
 
@@ -79,9 +79,9 @@ describe(commands.CDN_ORIGIN_ADD, () => {
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
-    auth.service.spoUrl = undefined;
-    auth.service.tenantId = undefined;
+    auth.connection.active = false;
+    auth.connection.spoUrl = undefined;
+    auth.connection.spoTenantId = undefined;
   });
 
   it('has correct name', () => {

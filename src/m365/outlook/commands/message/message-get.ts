@@ -57,7 +57,7 @@ class OutlookMessageGetCommand extends GraphCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
-      const isAppOnlyAccessToken: boolean | undefined = accessToken.isAppOnlyAccessToken(auth.service.accessTokens[this.resource].accessToken);
+      const isAppOnlyAccessToken: boolean | undefined = accessToken.isAppOnlyAccessToken(auth.connection.accessTokens[this.resource].accessToken);
       if (this.verbose) {
         await logger.logToStderr(`Retrieving message with id ${args.options.id} using ${isAppOnlyAccessToken ? 'app only permissions' : 'delegated permissions'}`);
       }

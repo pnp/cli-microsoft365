@@ -26,7 +26,7 @@ describe(commands.OPEN, () => {
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
-    auth.service.connected = true;
+    auth.connection.active = true;
     sinon.stub(fs, 'existsSync').returns(true);
     sinon.stub(fs, 'readFileSync').returns(JSON.stringify({
       "apps": [
@@ -64,7 +64,7 @@ describe(commands.OPEN, () => {
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
+    auth.connection.active = false;
   });
 
   it('has correct name', () => {

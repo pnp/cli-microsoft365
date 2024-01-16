@@ -6,7 +6,6 @@ import Command, {
 } from '../../Command.js';
 import config from '../../config.js';
 import GlobalOptions from '../../GlobalOptions.js';
-import { accessToken } from '../../utils/accessToken.js';
 import { misc } from '../../utils/misc.js';
 import commands from './commands.js';
 import { settingsNames } from '../../settingsNames.js';
@@ -27,6 +26,7 @@ interface Options extends GlobalOptions {
   appId?: string;
   tenant?: string;
   secret?: string;
+  connectionName?: string;
 }
 
 class LoginCommand extends Command {
@@ -90,7 +90,10 @@ class LoginCommand extends Command {
       {
         option: '--cloud [cloud]',
         autocomplete: misc.getEnums(CloudType)
-      }
+      },
+      {
+        option: '--connectionName [connectionName]'
+      },
     );
   }
 
@@ -152,7 +155,7 @@ class LoginCommand extends Command {
       await logger.logToStderr(`Logging out from Microsoft 365...`);
     }
 
-    const logout: () => void = (): void => auth.service.logout();
+    const deactivate: () => void = (): void => auth.connection.deactivate();
 
     const login: () => Promise<void> = async (): Promise<void> => {
       if (this.verbose) {
@@ -160,44 +163,45 @@ class LoginCommand extends Command {
       }
 
       const authType = args.options.authType || cli.getSettingWithDefaultValue<string>(settingsNames.authType, 'deviceCode');
-      auth.service.appId = args.options.appId || config.cliAadAppId;
-      auth.service.tenant = args.options.tenant || config.tenant;
+      auth.connection.appId = args.options.appId || config.cliAadAppId;
+      auth.connection.tenant = args.options.tenant || config.tenant;
+      auth.connection.name = args.options.connectionName;
 
       switch (authType) {
         case 'password':
-          auth.service.authType = AuthType.Password;
-          auth.service.userName = args.options.userName;
-          auth.service.password = args.options.password;
+          auth.connection.authType = AuthType.Password;
+          auth.connection.userName = args.options.userName;
+          auth.connection.password = args.options.password;
           break;
         case 'certificate':
-          auth.service.authType = AuthType.Certificate;
-          auth.service.certificate = args.options.certificateBase64Encoded ? args.options.certificateBase64Encoded : fs.readFileSync(args.options.certificateFile as string, 'base64');
-          auth.service.thumbprint = args.options.thumbprint;
-          auth.service.password = args.options.password;
+          auth.connection.authType = AuthType.Certificate;
+          auth.connection.certificate = args.options.certificateBase64Encoded ? args.options.certificateBase64Encoded : fs.readFileSync(args.options.certificateFile as string, 'base64');
+          auth.connection.thumbprint = args.options.thumbprint;
+          auth.connection.password = args.options.password;
           break;
         case 'identity':
-          auth.service.authType = AuthType.Identity;
-          auth.service.userName = args.options.userName;
+          auth.connection.authType = AuthType.Identity;
+          auth.connection.userName = args.options.userName;
           break;
         case 'browser':
-          auth.service.authType = AuthType.Browser;
+          auth.connection.authType = AuthType.Browser;
           break;
         case 'secret':
-          auth.service.authType = AuthType.Secret;
-          auth.service.secret = args.options.secret;
+          auth.connection.authType = AuthType.Secret;
+          auth.connection.secret = args.options.secret;
           break;
       }
 
       if (args.options.cloud) {
-        auth.service.cloudType = CloudType[args.options.cloud as keyof typeof CloudType];
+        auth.connection.cloudType = CloudType[args.options.cloud as keyof typeof CloudType];
       }
       else {
-        auth.service.cloudType = CloudType.Public;
+        auth.connection.cloudType = CloudType.Public;
       }
 
       try {
         await auth.ensureAccessToken(auth.defaultResource, logger, this.debug);
-        auth.service.connected = true;
+        auth.connection.active = true;
       }
       catch (error: any) {
         if (this.debug) {
@@ -209,39 +213,11 @@ class LoginCommand extends Command {
         throw new CommandError(error.message);
       }
 
-      if (this.debug) {
-        await logger.log({
-          connectedAs: accessToken.getUserNameFromAccessToken(auth.service.accessTokens[auth.defaultResource].accessToken),
-          authType: AuthType[auth.service.authType],
-          appId: auth.service.appId,
-          appTenant: auth.service.tenant,
-          accessToken: JSON.stringify(auth.service.accessTokens, null, 2),
-          cloudType: CloudType[auth.service.cloudType]
-        });
-      }
-      else {
-        await logger.log({
-          connectedAs: accessToken.getUserNameFromAccessToken(auth.service.accessTokens[auth.defaultResource].accessToken),
-          authType: AuthType[auth.service.authType],
-          appId: auth.service.appId,
-          appTenant: auth.service.tenant,
-          cloudType: CloudType[auth.service.cloudType]
-        });
-      }
+      await logger.log(auth.getIdentityDetails(auth.connection, this.debug));
     };
 
-    try {
-      await auth.clearConnectionInfo();
-    }
-    catch (error: any) {
-      if (this.debug) {
-        await logger.logToStderr(new CommandError(error));
-      }
-    }
-    finally {
-      logout();
-      await login();
-    }
+    deactivate();
+    await login();
   }
 
   public async action(logger: Logger, args: CommandArgs): Promise<void> {

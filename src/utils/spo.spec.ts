@@ -49,7 +49,7 @@ describe('utils/spo', () => {
   let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
-    auth.service.connected = true;
+    auth.connection.active = true;
   });
 
   beforeEach(() => {
@@ -81,13 +81,13 @@ describe('utils/spo', () => {
       spo.getTenantId,
       global.setTimeout
     ]);
-    auth.service.spoUrl = undefined;
-    auth.service.tenantId = undefined;
+    auth.connection.spoUrl = undefined;
+    auth.connection.spoTenantId = undefined;
   });
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
+    auth.connection.active = false;
   });
 
   it('reuses current digestcontext when expireat is a future date', (done) => {
@@ -270,7 +270,7 @@ describe('utils/spo', () => {
   });
 
   it('retrieves tenant app catalog url', async () => {
-    auth.service.spoUrl = 'https://contoso.sharepoint.com';
+    auth.connection.spoUrl = 'https://contoso.sharepoint.com';
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/_api/SP_TenantSettings_Current') {
         return Promise.resolve({ CorporateCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' });
@@ -285,7 +285,7 @@ describe('utils/spo', () => {
   });
 
   it('returns null when tenant app catalog not configured', async () => {
-    auth.service.spoUrl = 'https://contoso.sharepoint.com';
+    auth.connection.spoUrl = 'https://contoso.sharepoint.com';
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/_api/SP_TenantSettings_Current') {
         return Promise.resolve({ CorporateCatalogUrl: null });
@@ -300,7 +300,7 @@ describe('utils/spo', () => {
 
   it('handles error when retrieving SPO URL failed while retrieving tenant app catalog url', (done) => {
     const errorMessage = 'Couldn\'t retrieve SharePoint URL';
-    auth.service.spoUrl = undefined;
+    auth.connection.spoUrl = undefined;
 
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/SP_TenantSettings_Current') > -1) {
@@ -327,7 +327,7 @@ describe('utils/spo', () => {
 
   it('handles error when retrieving the tenant app catalog URL fails', (done) => {
     const errorMessage = 'Couldn\'t retrieve tenant app catalog URL';
-    auth.service.spoUrl = 'https://contoso.sharepoint.com';
+    auth.connection.spoUrl = 'https://contoso.sharepoint.com';
 
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/SP_TenantSettings_Current') > -1) {

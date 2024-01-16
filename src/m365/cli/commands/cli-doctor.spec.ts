@@ -25,7 +25,7 @@ describe(commands.DOCTOR, () => {
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     sinon.stub(session, 'getId').callsFake(() => '');
-    auth.service.connected = true;
+    auth.connection.active = true;
     sinon.stub(cli.getConfig(), 'all').value({});
   });
 
@@ -56,7 +56,7 @@ describe(commands.DOCTOR, () => {
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
+    auth.connection.active = false;
   });
 
   it('has correct name', () => {
@@ -75,7 +75,7 @@ describe(commands.DOCTOR, () => {
     const jwt64 = Buffer.from(jwt).toString('base64');
     const accessToken = `abc.${jwt64}.def`;
 
-    sinon.stub(auth.service, 'accessTokens').value({
+    sinon.stub(auth.connection, 'accessTokens').value({
       'https://graph.microsoft.com': { 'expiresOn': '2021-07-04T09:52:18.000Z', 'accessToken': `${accessToken}` }
     });
     sinon.stub(os, 'platform').returns('win32');
@@ -83,9 +83,9 @@ describe(commands.DOCTOR, () => {
     sinon.stub(os, 'release').returns('10.0.19043');
     sinon.stub(packageJSON, 'version').value('3.11.0');
     sinon.stub(process, 'version').value('v14.17.0');
-    sinon.stub(auth.service, 'appId').value('31359c7f-bd7e-475c-86db-fdb8c937548e');
-    sinon.stub(auth.service, 'tenant').value('common');
-    sinon.stub(auth.service, 'authType').value(0);
+    sinon.stub(auth.connection, 'appId').value('31359c7f-bd7e-475c-86db-fdb8c937548e');
+    sinon.stub(auth.connection, 'tenant').value('common');
+    sinon.stub(auth.connection, 'authType').value(0);
     sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
 
     await command.action(logger, { options: {} });
@@ -144,7 +144,7 @@ describe(commands.DOCTOR, () => {
     jwt64 = Buffer.from(jwt5).toString('base64');
     const accessToken5 = `abc.${jwt64}.def`;
 
-    sinon.stub(auth.service, 'accessTokens').value({
+    sinon.stub(auth.connection, 'accessTokens').value({
       'https://graph.microsoft.com': { 'expiresOn': '2021-07-04T09:52:18.000Z', 'accessToken': `${accessToken1}` },
       'https://mydev.sharepoint.com': { 'expiresOn': '2021-07-04T09:52:18.000Z', 'accessToken': `${accessToken2}` },
       'https://mydev-admin.sharepoint.com': { 'expiresOn': '2021-07-04T09:52:18.000Z', 'accessToken': `${accessToken3}` },
@@ -156,9 +156,9 @@ describe(commands.DOCTOR, () => {
     sinon.stub(os, 'release').returns('10.0.19043');
     sinon.stub(packageJSON, 'version').value('3.11.0');
     sinon.stub(process, 'version').value('v14.17.0');
-    sinon.stub(auth.service, 'appId').value('31359c7f-bd7e-475c-86db-fdb8c937548e');
-    sinon.stub(auth.service, 'tenant').value('common');
-    sinon.stub(auth.service, 'authType').value(0);
+    sinon.stub(auth.connection, 'appId').value('31359c7f-bd7e-475c-86db-fdb8c937548e');
+    sinon.stub(auth.connection, 'tenant').value('common');
+    sinon.stub(auth.connection, 'authType').value(0);
     sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
 
     await command.action(logger, { options: {} });
@@ -195,7 +195,7 @@ describe(commands.DOCTOR, () => {
     const jwt64 = Buffer.from(jwt).toString('base64');
     const accessToken = `abc.${jwt64}.def`;
 
-    sinon.stub(auth.service, 'accessTokens').value({
+    sinon.stub(auth.connection, 'accessTokens').value({
       'https://graph.microsoft.com': { 'expiresOn': '2021-07-04T09:52:18.000Z', 'accessToken': `${accessToken}` }
     });
     sinon.stub(os, 'platform').returns('win32');
@@ -203,9 +203,9 @@ describe(commands.DOCTOR, () => {
     sinon.stub(os, 'release').returns('10.0.19043');
     sinon.stub(packageJSON, 'version').value('3.11.0');
     sinon.stub(process, 'version').value('v14.17.0');
-    sinon.stub(auth.service, 'appId').value('31359c7f-bd7e-475c-86db-fdb8c937548e');
-    sinon.stub(auth.service, 'tenant').value('common');
-    sinon.stub(auth.service, 'authType').value(0);
+    sinon.stub(auth.connection, 'appId').value('31359c7f-bd7e-475c-86db-fdb8c937548e');
+    sinon.stub(auth.connection, 'tenant').value('common');
+    sinon.stub(auth.connection, 'authType').value(0);
     sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
 
     await command.action(logger, { options: {} });
@@ -238,7 +238,7 @@ describe(commands.DOCTOR, () => {
     jwt64 = Buffer.from(jwt2).toString('base64');
     const accessToken2 = `abc.${jwt64}.def`;
 
-    sinon.stub(auth.service, 'accessTokens').value({
+    sinon.stub(auth.connection, 'accessTokens').value({
       'https://graph.microsoft.com': { 'expiresOn': '2021-07-04T09:52:18.000Z', 'accessToken': `${accessToken1}` },
       'https://mydev.sharepoint.com': { 'expiresOn': '2021-07-04T09:52:18.000Z', 'accessToken': `${accessToken2}` }
     });
@@ -247,9 +247,9 @@ describe(commands.DOCTOR, () => {
     sinon.stub(os, 'release').returns('10.0.19043');
     sinon.stub(packageJSON, 'version').value('3.11.0');
     sinon.stub(process, 'version').value('v14.17.0');
-    sinon.stub(auth.service, 'appId').value('31359c7f-bd7e-475c-86db-fdb8c937548e');
-    sinon.stub(auth.service, 'tenant').value('common');
-    sinon.stub(auth.service, 'authType').value(0);
+    sinon.stub(auth.connection, 'appId').value('31359c7f-bd7e-475c-86db-fdb8c937548e');
+    sinon.stub(auth.connection, 'tenant').value('common');
+    sinon.stub(auth.connection, 'authType').value(0);
     sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
 
     await command.action(logger, { options: {} });
@@ -276,7 +276,7 @@ describe(commands.DOCTOR, () => {
     const jwt64 = Buffer.from(jwt).toString('base64');
     const accessToken = `abc.${jwt64}.def`;
 
-    sinon.stub(auth.service, 'accessTokens').value({
+    sinon.stub(auth.connection, 'accessTokens').value({
       'https://graph.microsoft.com': { 'expiresOn': '2021-07-04T09:52:18.000Z', 'accessToken': `${accessToken}` }
     });
     sinon.stub(os, 'platform').returns('win32');
@@ -284,9 +284,9 @@ describe(commands.DOCTOR, () => {
     sinon.stub(os, 'release').returns('10.0.19043');
     sinon.stub(packageJSON, 'version').value('3.11.0');
     sinon.stub(process, 'version').value('v14.17.0');
-    sinon.stub(auth.service, 'appId').value('31359c7f-bd7e-475c-86db-fdb8c937548e');
-    sinon.stub(auth.service, 'tenant').value('common');
-    sinon.stub(auth.service, 'authType').value(0);
+    sinon.stub(auth.connection, 'appId').value('31359c7f-bd7e-475c-86db-fdb8c937548e');
+    sinon.stub(auth.connection, 'tenant').value('common');
+    sinon.stub(auth.connection, 'authType').value(0);
     sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
 
     await command.action(logger, { options: {} });
@@ -319,7 +319,7 @@ describe(commands.DOCTOR, () => {
     const jwt64 = Buffer.from(jwt).toString('base64');
     const accessToken = `abc.${jwt64}.def`;
 
-    sinon.stub(auth.service, 'accessTokens').value({
+    sinon.stub(auth.connection, 'accessTokens').value({
       'https://graph.microsoft.com': { 'expiresOn': '2021-07-04T09:52:18.000Z', 'accessToken': `${accessToken}` }
     });
 
@@ -328,9 +328,9 @@ describe(commands.DOCTOR, () => {
     sinon.stub(os, 'release').returns('10.0.19043');
     sinon.stub(packageJSON, 'version').value('3.11.0');
     sinon.stub(process, 'version').value('v14.17.0');
-    sinon.stub(auth.service, 'appId').value('31359c7f-bd7e-475c-86db-fdb8c937548e');
-    sinon.stub(auth.service, 'tenant').value('common');
-    sinon.stub(auth.service, 'authType').value(0);
+    sinon.stub(auth.connection, 'appId').value('31359c7f-bd7e-475c-86db-fdb8c937548e');
+    sinon.stub(auth.connection, 'tenant').value('common');
+    sinon.stub(auth.connection, 'authType').value(0);
     sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
 
     await command.action(logger, { options: {} });
@@ -356,7 +356,7 @@ describe(commands.DOCTOR, () => {
     const jwt64 = Buffer.from(jwt).toString('base64');
     const accessToken = `abc.${jwt64}.def`;
 
-    sinon.stub(auth.service, 'accessTokens').value({
+    sinon.stub(auth.connection, 'accessTokens').value({
       'https://graph.microsoft.com': { 'expiresOn': '2021-07-04T09:52:18.000Z', 'accessToken': `${accessToken}` }
     });
     sinon.stub(os, 'platform').returns('win32');
@@ -364,9 +364,9 @@ describe(commands.DOCTOR, () => {
     sinon.stub(os, 'release').returns('10.0.19043');
     sinon.stub(packageJSON, 'version').value('3.11.0');
     sinon.stub(process, 'version').value('v14.17.0');
-    sinon.stub(auth.service, 'appId').value('31359c7f-bd7e-475c-86db-fdb8c937548e');
-    sinon.stub(auth.service, 'tenant').value('common');
-    sinon.stub(auth.service, 'authType').value(2);
+    sinon.stub(auth.connection, 'appId').value('31359c7f-bd7e-475c-86db-fdb8c937548e');
+    sinon.stub(auth.connection, 'tenant').value('common');
+    sinon.stub(auth.connection, 'authType').value(2);
     sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
 
     await command.action(logger, { options: {} });
@@ -392,7 +392,7 @@ describe(commands.DOCTOR, () => {
     const jwt64 = Buffer.from(jwt).toString('base64');
     const accessToken = `abc.${jwt64}.def`;
 
-    sinon.stub(auth.service, 'accessTokens').value({
+    sinon.stub(auth.connection, 'accessTokens').value({
       'https://graph.microsoft.com': { 'expiresOn': '2021-07-04T09:52:18.000Z', 'accessToken': `${accessToken}` }
     });
     sinon.stub(os, 'platform').returns('win32');
@@ -400,9 +400,9 @@ describe(commands.DOCTOR, () => {
     sinon.stub(os, 'release').returns('10.0.19043');
     sinon.stub(packageJSON, 'version').value('3.11.0');
     sinon.stub(process, 'version').value('v14.17.0');
-    sinon.stub(auth.service, 'appId').value('31359c7f-bd7e-475c-86db-fdb8c937548e');
-    sinon.stub(auth.service, 'tenant').value('923d42f0-6d23-41eb-b68d-c036d242654f');
-    sinon.stub(auth.service, 'authType').value(2);
+    sinon.stub(auth.connection, 'appId').value('31359c7f-bd7e-475c-86db-fdb8c937548e');
+    sinon.stub(auth.connection, 'tenant').value('923d42f0-6d23-41eb-b68d-c036d242654f');
+    sinon.stub(auth.connection, 'authType').value(2);
     sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
 
     await command.action(logger, { options: { debug: true } });
@@ -428,7 +428,7 @@ describe(commands.DOCTOR, () => {
     const jwt64 = Buffer.from(jwt).toString('base64');
     const accessToken = `abc.${jwt64}.def`;
 
-    sinon.stub(auth.service, 'accessTokens').value({
+    sinon.stub(auth.connection, 'accessTokens').value({
       'https://graph.microsoft.com': { 'expiresOn': '2021-07-04T09:52:18.000Z', 'accessToken': `${accessToken}` }
     });
     sinon.stub(os, 'platform').returns('win32');
@@ -436,9 +436,9 @@ describe(commands.DOCTOR, () => {
     sinon.stub(os, 'release').returns('10.0.19043');
     sinon.stub(packageJSON, 'version').value('3.11.0');
     sinon.stub(process, 'version').value('v14.17.0');
-    sinon.stub(auth.service, 'appId').value('31359c7f-bd7e-475c-86db-fdb8c937548e');
-    sinon.stub(auth.service, 'tenant').value('common');
-    sinon.stub(auth.service, 'authType').value(2);
+    sinon.stub(auth.connection, 'appId').value('31359c7f-bd7e-475c-86db-fdb8c937548e');
+    sinon.stub(auth.connection, 'tenant').value('common');
+    sinon.stub(auth.connection, 'authType').value(2);
     sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
 
     await command.action(logger, { options: { debug: true } });
@@ -464,7 +464,7 @@ describe(commands.DOCTOR, () => {
     const jwt64 = Buffer.from(jwt).toString('base64');
     const accessToken = `abc.${jwt64}.def`;
 
-    sinon.stub(auth.service, 'accessTokens').value({
+    sinon.stub(auth.connection, 'accessTokens').value({
       'https://graph.microsoft.com': { 'expiresOn': '2021-07-04T09:52:18.000Z', 'accessToken': `${accessToken}` }
     });
     sinon.stub(os, 'platform').returns('win32');
@@ -472,9 +472,9 @@ describe(commands.DOCTOR, () => {
     sinon.stub(os, 'release').returns('10.0.19043');
     sinon.stub(packageJSON, 'version').value('3.11.0');
     sinon.stub(process, 'version').value('v14.17.0');
-    sinon.stub(auth.service, 'appId').value('31359c7f-bd7e-475c-86db-fdb8c937548e');
-    sinon.stub(auth.service, 'tenant').value('common');
-    sinon.stub(auth.service, 'authType').value(2);
+    sinon.stub(auth.connection, 'appId').value('31359c7f-bd7e-475c-86db-fdb8c937548e');
+    sinon.stub(auth.connection, 'tenant').value('common');
+    sinon.stub(auth.connection, 'authType').value(2);
     sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': 'docker' });
 
     await command.action(logger, { options: { debug: true } });
@@ -493,7 +493,7 @@ describe(commands.DOCTOR, () => {
   });
 
   it('returns empty roles and scopes in diagnostic information when access token is empty', async () => {
-    sinon.stub(auth.service, 'accessTokens').value({
+    sinon.stub(auth.connection, 'accessTokens').value({
       'https://graph.microsoft.com': { 'expiresOn': '2021-07-04T09:52:18.000Z', 'accessToken': '' }
     });
     sinon.stub(os, 'platform').returns('win32');
@@ -501,9 +501,9 @@ describe(commands.DOCTOR, () => {
     sinon.stub(os, 'release').returns('10.0.19043');
     sinon.stub(packageJSON, 'version').value('3.11.0');
     sinon.stub(process, 'version').value('v14.17.0');
-    sinon.stub(auth.service, 'appId').value('31359c7f-bd7e-475c-86db-fdb8c937548e');
-    sinon.stub(auth.service, 'tenant').value('common');
-    sinon.stub(auth.service, 'authType').value(2);
+    sinon.stub(auth.connection, 'appId').value('31359c7f-bd7e-475c-86db-fdb8c937548e');
+    sinon.stub(auth.connection, 'tenant').value('common');
+    sinon.stub(auth.connection, 'authType').value(2);
     sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
 
     await command.action(logger, { options: { debug: true } });
@@ -523,7 +523,7 @@ describe(commands.DOCTOR, () => {
 
 
   it('returns empty roles and scopes in diagnostic information when access token is invalid', async () => {
-    sinon.stub(auth.service, 'accessTokens').value({
+    sinon.stub(auth.connection, 'accessTokens').value({
       'https://graph.microsoft.com': { 'expiresOn': '2021-07-04T09:52:18.000Z', 'accessToken': 'a.b.c.d' }
     });
     sinon.stub(os, 'platform').returns('win32');
@@ -531,9 +531,9 @@ describe(commands.DOCTOR, () => {
     sinon.stub(os, 'release').returns('10.0.19043');
     sinon.stub(packageJSON, 'version').value('3.11.0');
     sinon.stub(process, 'version').value('v14.17.0');
-    sinon.stub(auth.service, 'appId').value('31359c7f-bd7e-475c-86db-fdb8c937548e');
-    sinon.stub(auth.service, 'tenant').value('common');
-    sinon.stub(auth.service, 'authType').value(2);
+    sinon.stub(auth.connection, 'appId').value('31359c7f-bd7e-475c-86db-fdb8c937548e');
+    sinon.stub(auth.connection, 'tenant').value('common');
+    sinon.stub(auth.connection, 'authType').value(2);
     sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
 
     await command.action(logger, { options: { debug: true } });
@@ -559,7 +559,7 @@ describe(commands.DOCTOR, () => {
     const jwt64 = Buffer.from(jwt).toString('base64');
     const accessToken = `abc.${jwt64}.def`;
 
-    sinon.stub(auth.service, 'accessTokens').value({
+    sinon.stub(auth.connection, 'accessTokens').value({
       'https://graph.microsoft.com': { 'expiresOn': '2021-07-04T09:52:18.000Z', 'accessToken': `${accessToken}` }
     });
     sinon.stub(os, 'platform').returns('win32');
@@ -567,9 +567,9 @@ describe(commands.DOCTOR, () => {
     sinon.stub(os, 'release').returns('10.0.19043');
     sinon.stub(packageJSON, 'version').value('3.11.0');
     sinon.stub(process, 'version').value('v14.17.0');
-    sinon.stub(auth.service, 'appId').value('31359c7f-bd7e-475c-86db-fdb8c937548e');
-    sinon.stub(auth.service, 'tenant').value('common');
-    sinon.stub(auth.service, 'authType').value(0);
+    sinon.stub(auth.connection, 'appId').value('31359c7f-bd7e-475c-86db-fdb8c937548e');
+    sinon.stub(auth.connection, 'tenant').value('common');
+    sinon.stub(auth.connection, 'authType').value(0);
     sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
     sinonUtil.restore(cli.getConfig().all);
     sinon.stub(cli.getConfig(), 'all').value({ "showHelpOnFailure": false });

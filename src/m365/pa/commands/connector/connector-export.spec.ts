@@ -31,7 +31,7 @@ describe(commands.CONNECTOR_EXPORT, () => {
     sinon.stub(session, 'getId').returns('');
     mkdirSyncStub = sinon.stub(fs, 'mkdirSync').returns('');
     writeFileSyncStub = sinon.stub(fs, 'writeFileSync').returns();
-    auth.service.connected = true;
+    auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
   });
 
@@ -62,7 +62,7 @@ describe(commands.CONNECTOR_EXPORT, () => {
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
+    auth.connection.active = false;
   });
 
   it('has correct name', () => {

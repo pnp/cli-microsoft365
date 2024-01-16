@@ -27,7 +27,7 @@ describe(commands.M365GROUP_TEAMIFY, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     sinon.stub(entraGroup, 'isUnifiedGroup').resolves(true);
-    auth.service.connected = true;
+    auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
   });
 
@@ -58,7 +58,7 @@ describe(commands.M365GROUP_TEAMIFY, () => {
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
+    auth.connection.active = false;
   });
 
   it('has correct name', () => {

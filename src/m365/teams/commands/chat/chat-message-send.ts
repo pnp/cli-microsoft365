@@ -112,7 +112,7 @@ class TeamsChatMessageSendCommand extends GraphCommand {
 
   private async ensureChatIdByUserEmails(userEmailsOption: string): Promise<string> {
     const userEmails = userEmailsOption.trim().toLowerCase().split(',').filter(e => e && e !== '');
-    const currentUserEmail = accessToken.getUserNameFromAccessToken(auth.service.accessTokens[this.resource].accessToken).toLowerCase();
+    const currentUserEmail = accessToken.getUserNameFromAccessToken(auth.connection.accessTokens[this.resource].accessToken).toLowerCase();
     const existingChats = await chatUtil.findExistingChatsByParticipants([currentUserEmail, ...userEmails]);
 
     if (!existingChats || existingChats.length === 0) {

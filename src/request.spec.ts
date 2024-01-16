@@ -847,7 +847,7 @@ describe('Request', () => {
 
   it(`updates the URL for the China cloud`, async () => {
     let url;
-    auth.service.cloudType = CloudType.China;
+    auth.connection.cloudType = CloudType.China;
     sinon.stub(_request as any, 'req').callsFake((options: any) => {
       url = options.url;
       return Promise.resolve({ data: {} });
@@ -860,7 +860,7 @@ describe('Request', () => {
 
   it(`updates the URL for the USGov cloud`, async () => {
     let url;
-    auth.service.cloudType = CloudType.USGov;
+    auth.connection.cloudType = CloudType.USGov;
     sinon.stub(_request as any, 'req').callsFake((options: any) => {
       url = options.url;
       return Promise.resolve({ data: {} });
@@ -873,7 +873,7 @@ describe('Request', () => {
 
   it(`updates the URL for the USGovDoD cloud`, async () => {
     let url;
-    auth.service.cloudType = CloudType.USGovDoD;
+    auth.connection.cloudType = CloudType.USGovDoD;
     sinon.stub(_request as any, 'req').callsFake((options: any) => {
       url = options.url;
       return Promise.resolve({ data: {} });
@@ -886,7 +886,7 @@ describe('Request', () => {
 
   it(`updates the URL for the USGovHigh cloud`, async () => {
     let url;
-    auth.service.cloudType = CloudType.USGovHigh;
+    auth.connection.cloudType = CloudType.USGovHigh;
     sinon.stub(_request as any, 'req').callsFake((options: any) => {
       url = options.url;
       return Promise.resolve({ data: {} });

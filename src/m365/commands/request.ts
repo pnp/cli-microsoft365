@@ -190,8 +190,8 @@ class RequestCommand extends Command {
       return url.replace('@graph', 'https://graph.microsoft.com/v1.0');
     }
     if (url.startsWith('@spo')) {
-      if (auth.service.spoUrl) {
-        return url.replace('@spo', auth.service.spoUrl);
+      if (auth.connection.spoUrl) {
+        return url.replace('@spo', auth.connection.spoUrl);
       }
 
       throw `SharePoint root site URL is unknown. Please set your SharePoint URL using command 'spo set'.`;

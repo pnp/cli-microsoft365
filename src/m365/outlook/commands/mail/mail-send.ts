@@ -145,7 +145,7 @@ class OutlookMailSendCommand extends GraphCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
-      const isAppOnlyAccessToken: boolean | undefined = accessToken.isAppOnlyAccessToken(auth.service.accessTokens[this.resource].accessToken);
+      const isAppOnlyAccessToken: boolean | undefined = accessToken.isAppOnlyAccessToken(auth.connection.accessTokens[this.resource].accessToken);
       if (isAppOnlyAccessToken === true && !args.options.sender) {
         throw `Specify a upn or user id in the 'sender' option when using app only authentication.`;
       }

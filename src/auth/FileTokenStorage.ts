@@ -9,7 +9,11 @@ export class FileTokenStorage implements TokenStorage {
   }
 
   public static connectionInfoFilePath(): string {
-    return path.join(os.homedir(), '.cli-m365-tokens.json');
+    return path.join(os.homedir(), '.cli-m365-connection.json');
+  }
+
+  public static allConnectionsFilePath(): string {
+    return path.join(os.homedir(), '.cli-m365-all-connections.json');
   }
 
   constructor(private filePath: string) {

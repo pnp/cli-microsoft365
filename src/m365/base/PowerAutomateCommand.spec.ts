@@ -39,37 +39,37 @@ describe('PowerAutomateCommand', () => {
   });
 
   it(`doesn't throw error when not connected`, () => {
-    auth.service.connected = false;
+    auth.connection.active = false;
     (cmd as any).initAction({ options: {} }, {});
   });
 
   it('throws error when connected to USGov cloud', () => {
-    auth.service.connected = true;
-    auth.service.cloudType = CloudType.USGov;
+    auth.connection.active = true;
+    auth.connection.cloudType = CloudType.USGov;
     assert.throws(() => (cmd as any).initAction({ options: {} }, {}), cloudError);
   });
 
   it('throws error when connected to USGovHigh cloud', () => {
-    auth.service.connected = true;
-    auth.service.cloudType = CloudType.USGovHigh;
+    auth.connection.active = true;
+    auth.connection.cloudType = CloudType.USGovHigh;
     assert.throws(() => (cmd as any).initAction({ options: {} }, {}), cloudError);
   });
 
   it('throws error when connected to USGovDoD cloud', () => {
-    auth.service.connected = true;
-    auth.service.cloudType = CloudType.USGovDoD;
+    auth.connection.active = true;
+    auth.connection.cloudType = CloudType.USGovDoD;
     assert.throws(() => (cmd as any).initAction({ options: {} }, {}), cloudError);
   });
 
   it('throws error when connected to China cloud', () => {
-    auth.service.connected = true;
-    auth.service.cloudType = CloudType.China;
+    auth.connection.active = true;
+    auth.connection.cloudType = CloudType.China;
     assert.throws(() => (cmd as any).initAction({ options: {} }, {}), cloudError);
   });
 
   it(`doesn't throw error when connected to public cloud`, () => {
-    auth.service.connected = true;
-    auth.service.cloudType = CloudType.Public;
+    auth.connection.active = true;
+    auth.connection.cloudType = CloudType.Public;
     assert.doesNotThrow(() => (cmd as any).initAction({ options: {} }, {}));
   });
 });

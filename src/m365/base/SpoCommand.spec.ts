@@ -49,7 +49,7 @@ describe('SpoCommand', () => {
   let log: string[];
 
   before(() => {
-    auth.service.connected = true;
+    auth.connection.active = true;
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
@@ -77,13 +77,13 @@ describe('SpoCommand', () => {
       auth.storeConnectionInfo,
       auth.restoreAuth
     ]);
-    auth.service.spoUrl = undefined;
-    auth.service.tenantId = undefined;
+    auth.connection.spoUrl = undefined;
+    auth.connection.spoTenantId = undefined;
   });
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
+    auth.connection.active = false;
   });
 
   it('correctly reports an error while restoring auth info', async () => {
@@ -188,7 +188,7 @@ describe('SpoCommand', () => {
 
   it('resolves server-relative URLs in known options to absolute when SPO URL available', async () => {
     const command = new MockCommand();
-    auth.service.spoUrl = 'https://contoso.sharepoint.com';
+    auth.connection.spoUrl = 'https://contoso.sharepoint.com';
     const options = {
       url: '/'
     };
@@ -198,7 +198,7 @@ describe('SpoCommand', () => {
 
   it('leaves absolute URLs as-is', async () => {
     const command = new MockCommand();
-    auth.service.spoUrl = 'https://contoso.sharepoint.com';
+    auth.connection.spoUrl = 'https://contoso.sharepoint.com';
     const options = {
       url: 'https://contoso.sharepoint.com/sites/contoso'
     };
@@ -208,7 +208,7 @@ describe('SpoCommand', () => {
 
   it('leaves site-relative URLs as-is', async () => {
     const command = new MockCommand();
-    auth.service.spoUrl = 'https://contoso.sharepoint.com';
+    auth.connection.spoUrl = 'https://contoso.sharepoint.com';
     const options = {
       url: 'sites/contoso'
     };
@@ -218,7 +218,7 @@ describe('SpoCommand', () => {
 
   it('leaves server-relative URLs as-is in unknown options', async () => {
     const command = new MockCommand();
-    auth.service.spoUrl = 'https://contoso.sharepoint.com';
+    auth.connection.spoUrl = 'https://contoso.sharepoint.com';
     const options = {
       nonProcessedUrl: '/'
     };
@@ -235,7 +235,7 @@ describe('SpoCommand', () => {
   });
 
   it('Shows an error when CLI is connected with authType "Secret"', async () => {
-    sinon.stub(auth.service, 'authType').value(5);
+    sinon.stub(auth.connection, 'authType').value(5);
 
     const mock = new MockCommand();
     await assert.rejects(mock.action(logger, { options: {} }),

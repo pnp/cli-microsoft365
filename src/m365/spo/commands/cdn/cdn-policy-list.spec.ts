@@ -25,9 +25,9 @@ describe(commands.CDN_POLICY_LIST, () => {
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
-    auth.service.connected = true;
-    auth.service.spoUrl = 'https://contoso.sharepoint.com';
-    auth.service.tenantId = 'abc';
+    auth.connection.active = true;
+    auth.connection.spoUrl = 'https://contoso.sharepoint.com';
+    auth.connection.spoTenantId = 'abc';
     commandInfo = cli.getCommandInfo(command);
   });
 
@@ -55,9 +55,9 @@ describe(commands.CDN_POLICY_LIST, () => {
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
-    auth.service.spoUrl = undefined;
-    auth.service.tenantId = undefined;
+    auth.connection.active = false;
+    auth.connection.spoUrl = undefined;
+    auth.connection.spoTenantId = undefined;
   });
 
   it('has correct name', () => {

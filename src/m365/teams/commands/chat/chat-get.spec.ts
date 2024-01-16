@@ -44,9 +44,9 @@ describe(commands.CHAT_GET, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     sinon.stub(accessToken, 'getUserNameFromAccessToken').returns('MeganB@M365x214355.onmicrosoft.com');
-    auth.service.connected = true;
-    if (!auth.service.accessTokens[auth.defaultResource]) {
-      auth.service.accessTokens[auth.defaultResource] = {
+    auth.connection.active = true;
+    if (!auth.connection.accessTokens[auth.defaultResource]) {
+      auth.connection.accessTokens[auth.defaultResource] = {
         expiresOn: '123',
         accessToken: 'abc'
       };
@@ -107,8 +107,8 @@ describe(commands.CHAT_GET, () => {
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
-    auth.service.accessTokens = {};
+    auth.connection.active = false;
+    auth.connection.accessTokens = {};
   });
 
   it('has correct name', () => {

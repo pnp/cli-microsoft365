@@ -251,10 +251,10 @@ class EntraUserSetCommand extends GraphCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       if (args.options.currentPassword) {
-        if (args.options.id && args.options.id !== accessToken.getUserIdFromAccessToken(auth.service.accessTokens[auth.defaultResource].accessToken)) {
+        if (args.options.id && args.options.id !== accessToken.getUserIdFromAccessToken(auth.connection.accessTokens[auth.defaultResource].accessToken)) {
           throw `You can only change your own password. Please use --id @meId to reference to your own userId`;
         }
-        else if (args.options.userName && args.options.userName.toLowerCase() !== accessToken.getUserNameFromAccessToken(auth.service.accessTokens[auth.defaultResource].accessToken).toLowerCase()) {
+        else if (args.options.userName && args.options.userName.toLowerCase() !== accessToken.getUserNameFromAccessToken(auth.connection.accessTokens[auth.defaultResource].accessToken).toLowerCase()) {
           throw 'You can only change your own password. Please use --userName @meUserName to reference to your own user principal name';
         }
       }
