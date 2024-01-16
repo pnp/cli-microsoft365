@@ -23,7 +23,7 @@ describe(commands.GET, () => {
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
-    auth.service.connected = true;
+    auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
   });
 
@@ -44,12 +44,12 @@ describe(commands.GET, () => {
   });
 
   afterEach(() => {
-    auth.service.spoUrl = undefined;
+    auth.connection.spoUrl = undefined;
   });
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
+    auth.connection.active = false;
   });
 
   it('has correct name', () => {
@@ -61,7 +61,7 @@ describe(commands.GET, () => {
   });
 
   it('gets SPO URL when no URL was get previously', async () => {
-    auth.service.spoUrl = undefined;
+    auth.connection.spoUrl = undefined;
 
     await command.action(logger, {
       options: {
@@ -75,7 +75,7 @@ describe(commands.GET, () => {
   });
 
   it('gets SPO URL when other URL was get previously', async () => {
-    auth.service.spoUrl = 'https://northwind.sharepoint.com';
+    auth.connection.spoUrl = 'https://northwind.sharepoint.com';
 
     await command.action(logger, {
       options: {
@@ -89,10 +89,10 @@ describe(commands.GET, () => {
   });
 
   it('throws error when trying to get SPO URL when not logged in to M365', async () => {
-    auth.service.connected = false;
+    auth.connection.active = false;
 
     await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('Log in to Microsoft 365 first'));
-    assert.strictEqual(auth.service.spoUrl, undefined);
+    assert.strictEqual(auth.connection.spoUrl, undefined);
   });
 
   it('Contains the correct options', () => {

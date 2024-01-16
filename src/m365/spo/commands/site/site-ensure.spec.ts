@@ -61,7 +61,7 @@ describe(commands.SITE_ENSURE, () => {
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
-    auth.service.connected = true;
+    auth.connection.active = true;
   });
 
   beforeEach(() => {
@@ -89,7 +89,7 @@ describe(commands.SITE_ENSURE, () => {
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
+    auth.connection.active = false;
   });
 
   it('has correct name', () => {
@@ -190,11 +190,5 @@ describe(commands.SITE_ENSURE, () => {
     sinon.stub(spo, 'getWeb').resolves(webResponse);
 
     await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team1', title: 'Team 1', type: 'CommunicationSite' } } as any));
-  });
-
-  it('returns error when no properties to update specified', async () => {
-    sinon.stub(spo, 'getWeb').resolves(webResponse);
-
-    await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team1' } } as any));
   });
 });

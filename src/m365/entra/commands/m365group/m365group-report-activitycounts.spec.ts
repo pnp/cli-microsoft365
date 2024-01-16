@@ -20,7 +20,7 @@ describe(commands.M365GROUP_REPORT_ACTIVITYCOUNTS, () => {
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
-    auth.service.connected = true;
+    auth.connection.active = true;
   });
 
   beforeEach(() => {
@@ -47,7 +47,7 @@ describe(commands.M365GROUP_REPORT_ACTIVITYCOUNTS, () => {
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
+    auth.connection.active = false;
   });
 
   it('has correct name', () => {

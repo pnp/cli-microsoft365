@@ -79,8 +79,8 @@ describe(commands.APPLICATIONCUSTOMIZER_GET, () => {
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
-    auth.service.connected = true;
-    auth.service.spoUrl = webUrl;
+    auth.connection.active = true;
+    auth.connection.spoUrl = webUrl;
     commandInfo = cli.getCommandInfo(command);
   });
 
@@ -110,8 +110,8 @@ describe(commands.APPLICATIONCUSTOMIZER_GET, () => {
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
-    auth.service.spoUrl = undefined;
+    auth.connection.active = false;
+    auth.connection.spoUrl = undefined;
   });
 
   it('has correct name', () => {

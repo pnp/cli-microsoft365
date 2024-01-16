@@ -25,7 +25,7 @@ describe(commands.M365GROUP_RECYCLEBINITEM_CLEAR, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     sinon.stub(fs, 'readFileSync').returns('abc');
-    auth.service.connected = true;
+    auth.connection.active = true;
   });
 
   beforeEach(() => {
@@ -59,7 +59,7 @@ describe(commands.M365GROUP_RECYCLEBINITEM_CLEAR, () => {
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
+    auth.connection.active = false;
   });
 
   it('has correct name', () => {

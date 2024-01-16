@@ -44,8 +44,8 @@ describe(commands.SENSITIVITYLABEL_GET, () => {
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
-    auth.service.connected = true;
-    auth.service.accessTokens[(command as any).resource] = {
+    auth.connection.active = true;
+    auth.connection.accessTokens[(command as any).resource] = {
       accessToken: 'abc',
       expiresOn: new Date()
     };
@@ -79,8 +79,8 @@ describe(commands.SENSITIVITYLABEL_GET, () => {
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
-    auth.service.accessTokens = {};
+    auth.connection.active = false;
+    auth.connection.accessTokens = {};
   });
 
   it('has correct name', () => {

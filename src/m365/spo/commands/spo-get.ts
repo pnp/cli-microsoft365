@@ -18,7 +18,7 @@ class SpoGetCommand extends SpoCommand {
 
   public async commandAction(logger: Logger): Promise<void> {
     const spoContext: SpoContext = {
-      SpoUrl: auth.service.spoUrl ? auth.service.spoUrl : ''
+      SpoUrl: auth.connection.spoUrl ? auth.connection.spoUrl : ''
     };
     await logger.log(spoContext);
   }

@@ -128,6 +128,30 @@ const sidebars: SidebarsConfig = {
       ]
     },
     {
+      'Connections (connection)': [
+        {
+          type: 'doc',
+          label: 'list',
+          id: 'cmd/connection/connection-list'
+        },
+        {
+          type: 'doc',
+          label: 'remove',
+          id: 'cmd/connection/connection-remove'
+        },
+        {
+          type: 'doc',
+          label: 'set',
+          id: 'cmd/connection/connection-set'
+        },
+        {
+          type: 'doc',
+          label: 'use',
+          id: 'cmd/connection/connection-use'
+        }
+      ]
+    },
+    {
       'Context (context)': [
         {
           type: 'doc',

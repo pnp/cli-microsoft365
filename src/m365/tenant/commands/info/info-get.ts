@@ -75,7 +75,7 @@ class TenantInfoGetCommand extends GraphCommand {
     const tenantId: string | undefined = args.options.tenantId;
 
     if (!domainName && !tenantId) {
-      const userName: string = accessToken.getUserNameFromAccessToken(auth.service.accessTokens[auth.defaultResource].accessToken);
+      const userName: string = accessToken.getUserNameFromAccessToken(auth.connection.accessTokens[auth.defaultResource].accessToken);
       domainName = userName.split('@')[1];
     }
 

@@ -52,15 +52,15 @@ class UtilAccessTokenGetCommand extends Command {
     let resource: string = args.options.resource;
 
     if (resource.toLowerCase() === 'sharepoint') {
-      if (auth.service.spoUrl) {
-        resource = auth.service.spoUrl;
+      if (auth.connection.spoUrl) {
+        resource = auth.connection.spoUrl;
       }
       else {
         throw `SharePoint URL undefined. Use the 'm365 spo set --url https://contoso.sharepoint.com' command to set the URL`;
       }
     }
     else if (resource.toLowerCase() === 'graph') {
-      resource = Auth.getEndpointForResource('https://graph.microsoft.com', auth.service.cloudType);
+      resource = Auth.getEndpointForResource('https://graph.microsoft.com', auth.connection.cloudType);
     }
 
     try {

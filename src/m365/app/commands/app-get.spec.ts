@@ -32,7 +32,7 @@ describe(commands.GET, () => {
         }
       ]
     }));
-    auth.service.connected = true;
+    auth.connection.active = true;
   });
 
   beforeEach(() => {
@@ -60,7 +60,7 @@ describe(commands.GET, () => {
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
+    auth.connection.active = false;
   });
 
   it('has correct name', () => {

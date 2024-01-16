@@ -47,7 +47,7 @@ describe(commands.LISTITEM_BATCH_SET, () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    auth.service.connected = true;
+    auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
   });
 
@@ -90,7 +90,7 @@ describe(commands.LISTITEM_BATCH_SET, () => {
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
+    auth.connection.active = false;
   });
 
   it('has correct name', () => {

@@ -25,7 +25,7 @@ describe(commands.ENGAGE_USER_GET, () => {
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     sinon.stub(session, 'getId').callsFake(() => '');
-    auth.service.connected = true;
+    auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
   });
 
@@ -54,7 +54,7 @@ describe(commands.ENGAGE_USER_GET, () => {
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
+    auth.connection.active = false;
   });
 
   it('has correct name', () => {

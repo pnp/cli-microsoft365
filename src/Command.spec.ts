@@ -148,7 +148,7 @@ describe('Command', () => {
 
   beforeEach(() => {
     telemetryCommandName = null;
-    auth.service.connected = true;
+    auth.connection.active = true;
     cli.currentCommandName = undefined;
   });
 
@@ -158,12 +158,12 @@ describe('Command', () => {
       accessToken.isAppOnlyAccessToken,
       accessToken.getUserIdFromAccessToken
     ]);
-    auth.service.connected = false;
+    auth.connection.active = false;
   });
 
   after(() => {
     sinon.restore();
-    auth.service.accessTokens = {};
+    auth.connection.accessTokens = {};
   });
 
   it('returns true by default', async () => {
@@ -556,7 +556,7 @@ describe('Command', () => {
   });
 
   it('handles option with @meid token and spaces', async () => {
-    auth.service.accessTokens[auth.defaultResource] = {
+    auth.connection.accessTokens[auth.defaultResource] = {
       expiresOn: '',
       accessToken: ''
     };
@@ -569,7 +569,7 @@ describe('Command', () => {
   });
 
   it('handles option with @meusername token and spaces', async () => {
-    auth.service.accessTokens[auth.defaultResource] = {
+    auth.connection.accessTokens[auth.defaultResource] = {
       expiresOn: '',
       accessToken: ''
     };
@@ -582,7 +582,7 @@ describe('Command', () => {
   });
 
   it('handles @meid with application permissions', async () => {
-    auth.service.accessTokens[auth.defaultResource] = {
+    auth.connection.accessTokens[auth.defaultResource] = {
       expiresOn: '',
       accessToken: ''
     };
@@ -593,7 +593,7 @@ describe('Command', () => {
   });
 
   it('handles @meusername with application permissions', async () => {
-    auth.service.accessTokens[auth.defaultResource] = {
+    auth.connection.accessTokens[auth.defaultResource] = {
       expiresOn: '',
       accessToken: ''
     };

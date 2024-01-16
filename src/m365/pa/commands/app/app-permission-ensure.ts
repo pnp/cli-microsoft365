@@ -209,7 +209,7 @@ class PaAppPermissionEnsureCommand extends PowerAppsCommand {
       return userId;
     }
 
-    return accessToken.getTenantIdFromAccessToken(Auth.service.accessTokens[Auth.defaultResource].accessToken);
+    return accessToken.getTenantIdFromAccessToken(Auth.connection.accessTokens[Auth.defaultResource].accessToken);
   }
 }
 

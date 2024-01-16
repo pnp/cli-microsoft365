@@ -158,7 +158,7 @@ class Request {
       return Promise.reject('Logger not set on the request object');
     }
 
-    this.updateRequestForCloudType(options, auth.service.cloudType);
+    this.updateRequestForCloudType(options, auth.connection.cloudType);
 
     return new Promise<TResponse>((_resolve: (res: TResponse) => void, _reject: (error: any) => void): void => {
       ((): Promise<string> => {
