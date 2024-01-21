@@ -2,11 +2,17 @@ import Global from '/docs/cmd/_global.mdx';
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-# aad app permission list
+# entra app permission list
 
-Lists the application and delegated permissions for a specified AAD Application Registration
+Lists the application and delegated permissions for a specified Entra Application Registration
 
 ## Usage
+
+```sh
+m365 entra app permission list [options]
+```
+
+## Alias
 
 ```sh
 m365 aad app permission list [options]
@@ -29,16 +35,16 @@ m365 aad app permission list [options]
 
 ## Examples
 
-Retrieves all permissions for an AAD app registration
+Retrieves all permissions for an Entra app registration
 
 ```sh
-m365 aad app permission list --appId 'f1417aa3-bf0b-4cc5-a845-a0b2cf11f690'
+m365 entra app permission list --appId 'f1417aa3-bf0b-4cc5-a845-a0b2cf11f690'
 ```
 
-Retrieves all delegated permissions for an AAD app registration
+Retrieves all delegated permissions for an Entra app registration
 
 ```sh
-m365 aad app permission list --appId 'f1417aa3-bf0b-4cc5-a845-a0b2cf11f690' --type delegated
+m365 entra app permission list --appId 'f1417aa3-bf0b-4cc5-a845-a0b2cf11f690' --type delegated
 ```
 
 ## Response
@@ -78,7 +84,7 @@ m365 aad app permission list --appId 'f1417aa3-bf0b-4cc5-a845-a0b2cf11f690' --ty
   <TabItem value="Markdown">
 
   ```md
-  # aad app permission list --appId "2bf26ae1-9be3-425f-a393-5fe8390e3a36"
+  # entra app permission list --appId "2bf26ae1-9be3-425f-a393-5fe8390e3a36"
 
   Date: 27/12/2023
 
