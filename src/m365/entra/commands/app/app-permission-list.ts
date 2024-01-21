@@ -30,7 +30,7 @@ interface ServicePrincipalInfo {
   id?: string;
 }
 
-class AadAppPermissionListCommand extends GraphCommand {
+class EntraAppPermissionListCommand extends GraphCommand {
   private allowedTypes: string[] = ['delegated', 'application', 'all'];
 
   public get name(): string {
@@ -38,7 +38,7 @@ class AadAppPermissionListCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'Lists the application and delegated permissions for a specified AAD Application Registration';
+    return 'Lists the application and delegated permissions for a specified Entra Application Registration';
   }
 
   constructor() {
@@ -261,4 +261,4 @@ class AadAppPermissionListCommand extends GraphCommand {
   }
 }
 
-export default new AadAppPermissionListCommand();
+export default new EntraAppPermissionListCommand();

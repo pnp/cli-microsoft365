@@ -390,7 +390,7 @@ describe(commands.APP_PERMISSION_LIST, () => {
     assert(loggerLogSpy.calledWith(allUnkownServicePrincipalPermissionsResponse));
   });
 
-  it('handles error when retrieving AAD app registration', async () => {
+  it('handles error when retrieving Entra app registration', async () => {
     sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications/${appObjectId}`) {
         return application;
