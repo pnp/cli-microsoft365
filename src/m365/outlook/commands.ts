@@ -5,6 +5,7 @@ export default {
   MESSAGE_GET: `${prefix} message get`,
   MESSAGE_LIST: `${prefix} message list`,
   MESSAGE_MOVE: `${prefix} message move`,
+  MESSAGE_REMOVE: `${prefix} message remove`,
   REPORT_MAILACTIVITYCOUNTS: `${prefix} report mailactivitycounts`,
   REPORT_MAILACTIVITYUSERCOUNTS: `${prefix} report mailactivityusercounts`,
   REPORT_MAILACTIVITYUSERDETAIL: `${prefix} report mailactivityuserdetail`,
