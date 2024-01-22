@@ -198,7 +198,7 @@ class SpoPageAddCommand extends SpoCommand {
             const listUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, listServerRelativeUrl);
             const requestUrl = `${args.options.webUrl}/_api/web/GetList('${formatting.encodeQueryParameter(listUrl)}')`;
 
-            await spo.systemUpdateListItem(requestUrl, listItemId, logger, this.verbose, listItemSetOptions, undefined);
+            await spo.systemUpdateListItem(requestUrl, listItemId, logger, this.verbose, listItemSetOptions);
             break;
           case 'Template':
             requestOptions.url = `${args.options.webUrl}/_api/SitePages/Pages(${listItemId})/SavePageAsTemplate`;

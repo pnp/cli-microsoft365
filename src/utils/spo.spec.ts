@@ -2193,7 +2193,7 @@ describe('utils/spo', () => {
           ]);
         }
 
-        if (opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009">\n      <Actions>\n        \n    <Method Name="ParseAndSetFieldValue" Id="1" ObjectPathId="147">\n      <Parameters>\n        <Parameter Type="String">Title</Parameter>\n        <Parameter Type="String">NewTitle</Parameter>\n      </Parameters>\n    </Method>\n    <Method Name="ParseAndSetFieldValue" Id="1" ObjectPathId="147">\n      <Parameters>\n        <Parameter Type="String">customColumn</Parameter>\n        <Parameter Type="String">My custom column</Parameter>\n      </Parameters>\n    </Method>\n    <Method Name="ParseAndSetFieldValue" Id="1" ObjectPathId="147">\n      <Parameters>\n        <Parameter Type="String">ContentType</Parameter>\n        <Parameter Type="String">Item</Parameter>\n      </Parameters>\n    </Method>\n        <Method Name="SystemUpdate" Id="2" ObjectPathId="147" />\n      </Actions>\n      <ObjectPaths>\n        <Identity Id="147" Name="d704ae73-d5ed-459e-80b0-b8103c5fb6e0|8f2be65d-f195-4699-b0de-24aca3384ba9:site:0ead8b78-89e5-427f-b1bc-6e5a77ac191c:web:4c076c07-e3f1-49a8-ad01-dbb70b263cd7:list:f64041f2-9818-4b67-92ff-3bc5dbbef27e:item:1,1" />\n      </ObjectPaths>\n    </Request>`) {
+        if (opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009">\n      <Actions>\n        \n    <Method Name="ParseAndSetFieldValue" Id="1" ObjectPathId="147">\n      <Parameters>\n        <Parameter Type="String">Title</Parameter>\n        <Parameter Type="String">NewTitle</Parameter>\n      </Parameters>\n    </Method>\n    <Method Name="ParseAndSetFieldValue" Id="2" ObjectPathId="147">\n      <Parameters>\n        <Parameter Type="String">customColumn</Parameter>\n        <Parameter Type="String">My custom column</Parameter>\n      </Parameters>\n    </Method>\n    <Method Name="ParseAndSetFieldValue" Id="3" ObjectPathId="147">\n      <Parameters>\n        <Parameter Type="String">ContentType</Parameter>\n        <Parameter Type="String">Item</Parameter>\n      </Parameters>\n    </Method>\n        <Method Name="SystemUpdate" Id="4" ObjectPathId="147" />\n      </Actions>\n      <ObjectPaths>\n        <Identity Id="147" Name="d704ae73-d5ed-459e-80b0-b8103c5fb6e0|8f2be65d-f195-4699-b0de-24aca3384ba9:site:0ead8b78-89e5-427f-b1bc-6e5a77ac191c:web:4c076c07-e3f1-49a8-ad01-dbb70b263cd7:list:f64041f2-9818-4b67-92ff-3bc5dbbef27e:item:1,1" />\n      </ObjectPaths>\n    </Request>`) {
           return ']SchemaVersion":"15.0.0.0","LibraryVersion":"16.0.7618.1204","ErrorInfo":null,"TraceCorrelationId":"3e3e629e-f0e9-5000-9f31-c6758b453a4a"';
         }
       }
@@ -2202,6 +2202,71 @@ describe('utils/spo', () => {
     });
 
     const actual = await spo.systemUpdateListItem(requestUrl, '1', logger, true, { Title: 'NewTitle', customColumn: 'My custom column' }, 'Item');
+    assert.strictEqual(actual, listItemResponse);
+  });
+
+  it(`sets the content type of the list item with system update`, async () => {
+    const listItemResponse = {
+      Attachments: false,
+      AuthorId: 3,
+      ContentTypeId: '0x0100B21BD271A810EE488B570BE49963EA34',
+      Created: '2018-03-15T10:43:10Z',
+      EditorId: 3,
+      GUID: 'ea093c7b-8ae6-4400-8b75-e2d01154dffc',
+      ID: 1,
+      Modified: '2018-03-15T10:52:10Z',
+      Title: 'NewTitle'
+    };
+    const listUrl = '/lists/TestList';
+    const requestUrl = `https://contoso.sharepoint.com/_api/web/GetList('${formatting.encodeQueryParameter(listUrl)}')`;
+
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/_api/web/GetList('${formatting.encodeQueryParameter(listUrl)}')?$select=Id`) {
+        return { Id: 'f64041f2-9818-4b67-92ff-3bc5dbbef27e' };
+      }
+
+      if (opts.url === `https://contoso.sharepoint.com/_api/web/GetList('${formatting.encodeQueryParameter(listUrl)}')/items(1)`) {
+        return listItemResponse;
+      }
+
+      throw 'Invalid request';
+    });
+
+
+    sinon.stub(spo, 'getRequestDigest').resolves({
+      FormDigestValue: 'ABC',
+      FormDigestTimeoutSeconds: 1800,
+      FormDigestExpiresAt: new Date(),
+      WebFullUrl: 'https://contoso.sharepoint.com'
+    });
+
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/_vti_bin/client.svc/ProcessQuery`) {
+        if (opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Query Id="1" ObjectPathId="5"><Query SelectAllProperties="false"><Properties><Property Name="ServerRelativeUrl" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Property Id="5" ParentId="3" Name="Web" /><StaticProperty Id="3" TypeId="{3747adcd-a3c3-41b9-bfab-4a64dd2f1e0a}" Name="Current" /></ObjectPaths></Request>`) {
+          return JSON.stringify([
+            {
+              "SchemaVersion": "15.0.0.0",
+              "LibraryVersion": "16.0.7618.1204",
+              "ErrorInfo": null,
+              "TraceCorrelationId": "3e3e629e-30cc-5000-9f31-cf83b8e70021"
+            },
+            {
+              "_ObjectType_": "SP.Web",
+              "_ObjectIdentity_": "d704ae73-d5ed-459e-80b0-b8103c5fb6e0|8f2be65d-f195-4699-b0de-24aca3384ba9:site:0ead8b78-89e5-427f-b1bc-6e5a77ac191c:web:4c076c07-e3f1-49a8-ad01-dbb70b263cd7",
+              "ServerRelativeUrl": "\\u002fsites\\u002fprojectx"
+            }
+          ]);
+        }
+
+        if (opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009">\n      <Actions>\n        \n    <Method Name="ParseAndSetFieldValue" Id="1" ObjectPathId="147">\n      <Parameters>\n        <Parameter Type="String">ContentType</Parameter>\n        <Parameter Type="String">Item</Parameter>\n      </Parameters>\n    </Method>\n        <Method Name="SystemUpdate" Id="2" ObjectPathId="147" />\n      </Actions>\n      <ObjectPaths>\n        <Identity Id="147" Name="d704ae73-d5ed-459e-80b0-b8103c5fb6e0|8f2be65d-f195-4699-b0de-24aca3384ba9:site:0ead8b78-89e5-427f-b1bc-6e5a77ac191c:web:4c076c07-e3f1-49a8-ad01-dbb70b263cd7:list:f64041f2-9818-4b67-92ff-3bc5dbbef27e:item:1,1" />\n      </ObjectPaths>\n    </Request>`) {
+          return ']SchemaVersion":"15.0.0.0","LibraryVersion":"16.0.7618.1204","ErrorInfo":null,"TraceCorrelationId":"3e3e629e-f0e9-5000-9f31-c6758b453a4a"';
+        }
+      }
+
+      throw 'Invalid request';
+    });
+
+    const actual = await spo.systemUpdateListItem(requestUrl, '1', logger, true, undefined, 'Item');
     assert.strictEqual(actual, listItemResponse);
   });
 
@@ -2312,7 +2377,7 @@ describe('utils/spo', () => {
           ]);
         }
 
-        if (opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009">\n      <Actions>\n        \n        <Method Name="SystemUpdate" Id="2" ObjectPathId="147" />\n      </Actions>\n      <ObjectPaths>\n        <Identity Id="147" Name="d704ae73-d5ed-459e-80b0-b8103c5fb6e0|8f2be65d-f195-4699-b0de-24aca3384ba9:site:0ead8b78-89e5-427f-b1bc-6e5a77ac191c:web:4c076c07-e3f1-49a8-ad01-dbb70b263cd7:list:f64041f2-9818-4b67-92ff-3bc5dbbef27e:item:1,1" />\n      </ObjectPaths>\n    </Request>`) {
+        if (opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009">\n      <Actions>\n        \n    <Method Name="ParseAndSetFieldValue" Id="1" ObjectPathId="147">\n      <Parameters>\n        <Parameter Type="String">Title</Parameter>\n        <Parameter Type="String">NewTitle</Parameter>\n      </Parameters>\n    </Method>\n        <Method Name="SystemUpdate" Id="2" ObjectPathId="147" />\n      </Actions>\n      <ObjectPaths>\n        <Identity Id="147" Name="d704ae73-d5ed-459e-80b0-b8103c5fb6e0|8f2be65d-f195-4699-b0de-24aca3384ba9:site:0ead8b78-89e5-427f-b1bc-6e5a77ac191c:web:4c076c07-e3f1-49a8-ad01-dbb70b263cd7:list:f64041f2-9818-4b67-92ff-3bc5dbbef27e:item:1,1" />\n      </ObjectPaths>\n    </Request>`) {
           return 'ErrorMessage": "systemUpdate error"}';
         }
       }
@@ -2321,11 +2386,39 @@ describe('utils/spo', () => {
     });
 
     try {
-      await spo.systemUpdateListItem(requestUrl, '1', logger, true);
+      await spo.systemUpdateListItem(requestUrl, '1', logger, true, { Title: 'NewTitle' });
       assert.fail('No error message thrown.');
     }
     catch (ex) {
       assert.deepStrictEqual(ex, `Error occurred in systemUpdate operation - ErrorMessage": "systemUpdate error"}`);
+    }
+  });
+
+  it(`handles no contenttype or properties error when updating list item`, async () => {
+    const listUrl = '/sites/sales/lists/TestList';
+    const requestUrl = `https://contoso.sharepoint.com/sites/sales/_api/web/GetList('${formatting.encodeQueryParameter(listUrl)}')`;
+
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/sales/_api/web/GetList('${formatting.encodeQueryParameter(listUrl)}')?$select=Id`) {
+        return { Id: 'f64041f2-9818-4b67-92ff-3bc5dbbef27e' };
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinon.stub(spo, 'getRequestDigest').resolves({
+      FormDigestValue: 'ABC',
+      FormDigestTimeoutSeconds: 1800,
+      FormDigestExpiresAt: new Date(),
+      WebFullUrl: 'https://contoso.sharepoint.com'
+    });
+
+    try {
+      await spo.systemUpdateListItem(requestUrl, '1', logger, true);
+      assert.fail('No error message thrown.');
+    }
+    catch (ex) {
+      assert.deepStrictEqual(ex, `Either properties or contentTypeName must be provided for systemUpdateListItem.`);
     }
   });
 

@@ -497,8 +497,6 @@ describe(commands.FILE_GET, () => {
     assert.strictEqual(getStub.lastCall.args[0].url, `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFileByServerRelativePath(DecodedUrl=@f)?@f='%2Fsites%2Fproject-x%2FDocuments%2FTest1.docx'`);
   });
 
-
-
   it('uses correct API url when tenant root URL option is passed', async () => {
     const getStub: any = sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/web/GetFileByServerRelativePath(') > -1) {

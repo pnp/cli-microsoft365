@@ -205,7 +205,7 @@ class SpoPageSetCommand extends SpoCommand {
           listItemSetOptions.PromotedState = 0;
           listItemSetOptions.BannerImageUrl = `${resource}/_layouts/15/images/sitepagethumbnail.png, /_layouts/15/images/sitepagethumbnail.png`;
         }
-        await spo.systemUpdateListItem(requestUrl, itemId, logger, this.verbose, listItemSetOptions, undefined);
+        await spo.systemUpdateListItem(requestUrl, itemId, logger, this.verbose, listItemSetOptions);
       }
       if (args.options.promoteAs) {
         const requestOptions: CliRequestOptions = {
@@ -234,7 +234,7 @@ class SpoPageSetCommand extends SpoCommand {
               PromotedState: 2,
               FirstPublishedDate: new Date().toISOString()
             };
-            await spo.systemUpdateListItem(requestUrl, newsPageItemId, logger, this.verbose, listItemSetOptions, undefined);
+            await spo.systemUpdateListItem(requestUrl, newsPageItemId, logger, this.verbose, listItemSetOptions);
             break;
           case 'Template':
             const templateItem = await spo.getFileAsListItemByUrl(args.options.webUrl, serverRelativeFileUrl, logger, this.verbose);
@@ -346,7 +346,7 @@ class SpoPageSetCommand extends SpoCommand {
         const listItemSetOptions: any = {
           PromotedState: 0
         };
-        await spo.systemUpdateListItem(requestUrl, fileId, logger, this.verbose, listItemSetOptions, undefined);
+        await spo.systemUpdateListItem(requestUrl, fileId, logger, this.verbose, listItemSetOptions);
       }
 
       let requestOptions: CliRequestOptions;
