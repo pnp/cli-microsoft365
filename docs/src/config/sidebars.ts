@@ -1059,6 +1059,11 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'message move',
               id: 'cmd/outlook/message/message-move'
+            },
+            {
+              type: 'doc',
+              label: 'message remove',
+              id: 'cmd/outlook/message/message-remove'
             }
           ]
         },
