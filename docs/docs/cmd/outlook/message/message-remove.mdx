@@ -28,6 +28,14 @@ m365 outlook message remove [options]
 
 <Global />
 
+## Remarks
+
+:::info
+
+This command will permanently delete the Outlook message. To move a message to the trash bin, use [outlook message move](https://pnp.github.io/cli-microsoft365/cmd/outlook/message/message-move) instead.
+
+:::
+
 ## Examples
 
 Remove a specific message for the currently signed-in user
@@ -53,3 +61,7 @@ Remove a specific message from a specific mailbox specified by user UPN using ap
 ```
 m365 outlook message remove --id AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OABGAAAAAAAiQ8W967B7TKBjgx9rVEURBwAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAAiIsqMbYjsT5e-T7KzowPTAALvuv07AAA= --userName john.doe@contoso.com
 ```
+
+## Response
+
+The command won't return a response on success
