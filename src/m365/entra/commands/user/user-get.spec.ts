@@ -64,8 +64,7 @@ describe(commands.USER_GET, () => {
       accessToken.getUserIdFromAccessToken,
       accessToken.getUserNameFromAccessToken,
       cli.getSettingWithDefaultValue,
-      aadUser.getUserIdByEmail,
-      aadUser.getUserIdByUpn
+      aadUser.getUserIdByEmail
     ]);
   });
 
@@ -134,9 +133,8 @@ describe(commands.USER_GET, () => {
   });
 
   it('retrieves user using user name', async () => {
-    sinon.stub(aadUser, 'getUserIdByUpn').withArgs(userName).resolves(userId);
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users/${userId}`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users/${userName}`) {
         return resultValue;
       }
 
@@ -148,7 +146,6 @@ describe(commands.USER_GET, () => {
   });
 
   it('retrieves user using user name and with their direct manager', async () => {
-    sinon.stub(aadUser, 'getUserIdByUpn').withArgs(userName).resolves(userId);
     const resultValueWithManger: any = { ...resultValue };
     resultValueWithManger.manager = {
       "displayName": "John Doe",
@@ -157,7 +154,7 @@ describe(commands.USER_GET, () => {
       "mail": "john.doe@contoso.onmicrosoft.com"
     };
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users/${userId}?$expand=manager($select=displayName,userPrincipalName,id,mail)`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users/${userName}?$expand=manager($select=displayName,userPrincipalName,id,mail)`) {
         return resultValueWithManger;
       }
 
@@ -169,9 +166,8 @@ describe(commands.USER_GET, () => {
   });
 
   it('retrieves user using @meusername token', async () => {
-    sinon.stub(aadUser, 'getUserIdByUpn').withArgs(userName).resolves(userId);
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users/${userId}`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users/${userName}`) {
         return resultValue;
       }
 
@@ -199,9 +195,8 @@ describe(commands.USER_GET, () => {
   });
 
   it('retrieves only the specified properties', async () => {
-    sinon.stub(aadUser, 'getUserIdByUpn').withArgs(userName).resolves(userId);
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users/${userId}?$select=id,mail`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users/${userName}?$select=id,mail`) {
         return { "id": "userId", "mail": null };
       }
 
@@ -212,13 +207,6 @@ describe(commands.USER_GET, () => {
     assert(loggerLogSpy.calledWith({ "id": "userId", "mail": null }));
   });
 
-  it('fails to get user when user with provided user name does not exists', async () => {
-    sinon.stub(aadUser, 'getUserIdByUpn').withArgs(userName).throws(Error(`The specified user with user name ${userName} does not exist.`));
-
-    await assert.rejects(command.action(logger, { options: { userName: userName } }),
-      new CommandError(`The specified user with user name ${userName} does not exist.`));
-  });
-
   it('fails to get user when user with provided email does not exists', async () => {
     sinon.stub(aadUser, 'getUserIdByEmail').withArgs(userName).throws(Error(`The specified user with email ${userName} does not exist`));
 
@@ -226,7 +214,7 @@ describe(commands.USER_GET, () => {
       new CommandError(`The specified user with email ${userName} does not exist`));
   });
 
-  it('correctly handles user not found', async () => {
+  it('correctly handles error when user provided by id was not found', async () => {
     sinon.stub(request, 'get').rejects({
       "error": {
         "code": "Request_ResourceNotFound",
@@ -240,6 +228,22 @@ describe(commands.USER_GET, () => {
 
     await assert.rejects(command.action(logger, { options: { id: '68be84bf-a585-4776-80b3-30aa5207aa22' } } as any),
       new CommandError(`Resource '68be84bf-a585-4776-80b3-30aa5207aa22' does not exist or one of its queried reference-property objects are not present.`));
+  });
+
+  it('correctly handles error when user provided by userName was not found', async () => {
+    sinon.stub(request, 'get').rejects({
+      "error": {
+        "code": "Request_ResourceNotFound",
+        "message": `Resource '${userName}' does not exist or one of its queried reference-property objects are not present.`,
+        "innerError": {
+          "request-id": "9b0df954-93b5-4de9-8b99-43c204a8aaf8",
+          "date": "2018-04-24T18:56:48"
+        }
+      }
+    });
+
+    await assert.rejects(command.action(logger, { options: { userName: userName } } as any),
+      new CommandError(`Resource '${userName}' does not exist or one of its queried reference-property objects are not present.`));
   });
   
   it('fails validation if id or email or userName options are not passed', async () => {

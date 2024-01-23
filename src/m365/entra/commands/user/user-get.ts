@@ -100,7 +100,8 @@ class EntraUserGetCommand extends GraphCommand {
       let userId = args.options.id;
 
       if (args.options.userName) {
-        userId = await aadUser.getUserIdByUpn(args.options.userName);
+        // single user can be retrieved also by user principal name
+        userId = args.options.userName;
       }
       else if (args.options.email) {
         userId = await aadUser.getUserIdByEmail(args.options.email);
