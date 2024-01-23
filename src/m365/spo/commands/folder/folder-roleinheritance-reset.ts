@@ -33,6 +33,7 @@ class SpoFolderRoleInheritanceResetCommand extends SpoCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initTypes();
   }
 
   #initTelemetry(): void {
@@ -61,6 +62,11 @@ class SpoFolderRoleInheritanceResetCommand extends SpoCommand {
     this.validators.push(
       async (args: CommandArgs) => validation.isValidSharePointUrl(args.options.webUrl)
     );
+  }
+
+  #initTypes(): void {
+    this.types.string.push('webUrl', 'folderUrl');
+    this.types.boolean.push('force');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

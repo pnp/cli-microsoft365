@@ -36,6 +36,7 @@ class SpoFolderGetCommand extends SpoCommand {
     this.#initOptions();
     this.#initValidators();
     this.#initOptionSets();
+    this.#initTypes();
   }
 
   #initTelemetry(): void {
@@ -86,6 +87,10 @@ class SpoFolderGetCommand extends SpoCommand {
 
   #initOptionSets(): void {
     this.optionSets.push({ options: ['url', 'id'] });
+  }
+
+  #initTypes(): void {
+    this.types.string.push('webUrl', 'url', 'id');
   }
 
   protected getExcludedOptionsWithUrls(): string[] | undefined {

@@ -42,6 +42,7 @@ class SpoFolderRoleAssignmentAddCommand extends SpoCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initTypes();
   }
 
   #initTelemetry(): void {
@@ -119,6 +120,10 @@ class SpoFolderRoleAssignmentAddCommand extends SpoCommand {
         return true;
       }
     );
+  }
+
+  #initTypes(): void {
+    this.types.string.push('webUrl', 'folderUrl', 'upn', 'groupName', 'roleDefinitionName');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

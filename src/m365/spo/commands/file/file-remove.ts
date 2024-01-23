@@ -40,6 +40,7 @@ class SpoFileRemoveCommand extends SpoCommand {
     this.#initOptions();
     this.#initValidators();
     this.#initOptionSets();
+    this.#initTypes();
   }
 
   #initTelemetry(): void {
@@ -93,6 +94,11 @@ class SpoFileRemoveCommand extends SpoCommand {
 
   #initOptionSets(): void {
     this.optionSets.push({ options: ['id', 'url'] });
+  }
+
+  #initTypes(): void {
+    this.types.string.push('webUrl', 'id', 'url');
+    this.types.boolean.push('recycle', 'force');
   }
 
   protected getExcludedOptionsWithUrls(): string[] | undefined {

@@ -86,7 +86,8 @@ class SpoFileVersionRemoveCommand extends SpoCommand {
   }
 
   #initTypes(): void {
-    this.types.string.push('label');
+    this.types.string.push('webUrl', 'label', 'fileUrl', 'fileId');
+    this.types.boolean.push('force');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

@@ -41,6 +41,7 @@ class SpoFileCheckinCommand extends SpoCommand {
     this.#initOptions();
     this.#initValidators();
     this.#initOptionSets();
+    this.#initTypes();
   }
 
   #initTelemetry(): void {
@@ -108,6 +109,10 @@ class SpoFileCheckinCommand extends SpoCommand {
 
   #initOptionSets(): void {
     this.optionSets.push({ options: ['url', 'id'] });
+  }
+
+  #initTypes(): void {
+    this.types.string.push('webUrl', 'url', 'id', 'type', 'comment');
   }
 
   protected getExcludedOptionsWithUrls(): string[] | undefined {

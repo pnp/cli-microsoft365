@@ -64,13 +64,14 @@ class SpoFileSharingInfoGetCommand extends SpoCommand {
     this.#initOptions();
     this.#initValidators();
     this.#initOptionSets();
+    this.#initTypes();
   }
 
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        fileId: (!(!args.options.fileId)).toString(),
-        fileUrl: (!(!args.options.fileUrl)).toString()
+        fileId: typeof args.options.fileId !== 'undefined',
+        fileUrl: typeof args.options.fileUrl !== 'undefined'
       });
     });
   }
@@ -110,6 +111,10 @@ class SpoFileSharingInfoGetCommand extends SpoCommand {
 
   #initOptionSets(): void {
     this.optionSets.push({ options: ['fileId', 'fileUrl'] });
+  }
+
+  #initTypes(): void {
+    this.types.string.push('webUrl', 'fileId', 'fileUrl');
   }
 
   protected getExcludedOptionsWithUrls(): string[] | undefined {

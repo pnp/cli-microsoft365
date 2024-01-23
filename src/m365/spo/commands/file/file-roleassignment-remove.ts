@@ -42,6 +42,7 @@ class SpoFileRoleAssignmentRemoveCommand extends SpoCommand {
     this.#initOptions();
     this.#initValidators();
     this.#initOptionSets();
+    this.#initTypes();
   }
 
   #initTelemetry(): void {
@@ -109,6 +110,11 @@ class SpoFileRoleAssignmentRemoveCommand extends SpoCommand {
       { options: ['fileUrl', 'fileId'] },
       { options: ['upn', 'groupName', 'principalId'] }
     );
+  }
+
+  #initTypes(): void {
+    this.types.string.push('webUrl', 'fileUrl', 'fileId', 'upn', 'groupName');
+    this.types.boolean.push('force');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
