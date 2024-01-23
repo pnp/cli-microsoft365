@@ -35,6 +35,7 @@ class SpoFileVersionClearCommand extends SpoCommand {
     this.#initOptions();
     this.#initValidators();
     this.#initOptionSets();
+    this.#initTypes();
   }
 
   #initTelemetry(): void {
@@ -42,7 +43,7 @@ class SpoFileVersionClearCommand extends SpoCommand {
       Object.assign(this.telemetryProperties, {
         fileUrl: args.options.fileUrl,
         fileId: args.options.fileId,
-        force: (!!args.options.force).toString()
+        force: !!args.options.force
       });
     });
   }
@@ -78,6 +79,11 @@ class SpoFileVersionClearCommand extends SpoCommand {
 
   #initOptionSets(): void {
     this.optionSets.push({ options: ['fileUrl', 'fileId'] });
+  }
+
+  #initTypes(): void {
+    this.types.string.push('webUrl', 'fileUrl', 'fileId');
+    this.types.boolean.push('force');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

@@ -41,6 +41,7 @@ class SpoFileGetCommand extends SpoCommand {
     this.#initOptions();
     this.#initValidators();
     this.#initOptionSets();
+    this.#initTypes();
   }
 
   #initTelemetry(): void {
@@ -127,6 +128,11 @@ class SpoFileGetCommand extends SpoCommand {
 
   #initOptionSets(): void {
     this.optionSets.push({ options: ['id', 'url'] });
+  }
+
+  #initTypes(): void {
+    this.types.string.push('webUrl', 'url', 'id', 'path');
+    this.types.boolean.push('asString', 'asListItem', 'asFile', 'withPermissions');
   }
 
   protected getExcludedOptionsWithUrls(): string[] | undefined {

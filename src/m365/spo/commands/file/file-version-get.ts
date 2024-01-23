@@ -80,7 +80,7 @@ class SpoFileVersionGetCommand extends SpoCommand {
   }
 
   #initTypes(): void {
-    this.types.string.push('label');
+    this.types.string.push('webUrl', 'label', 'fileUrl', 'fileId');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

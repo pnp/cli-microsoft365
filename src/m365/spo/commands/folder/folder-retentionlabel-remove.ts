@@ -38,6 +38,7 @@ class SpoFolderRetentionLabelRemoveCommand extends SpoCommand {
     this.#initOptions();
     this.#initValidators();
     this.#initOptionSets();
+    this.#initTypes();
   }
 
   #initTelemetry(): void {
@@ -87,6 +88,11 @@ class SpoFolderRetentionLabelRemoveCommand extends SpoCommand {
 
   #initOptionSets(): void {
     this.optionSets.push({ options: ['folderUrl', 'folderId'] });
+  }
+
+  #initTypes(): void {
+    this.types.string.push('webUrl', 'folderUrl', 'folderId');
+    this.types.boolean.push('force');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

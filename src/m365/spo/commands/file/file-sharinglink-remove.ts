@@ -16,7 +16,7 @@ interface Options extends GlobalOptions {
   fileUrl?: string;
   fileId?: string;
   id: string;
-  force?: boolean
+  force?: boolean;
 }
 
 class SpoFileSharingLinkRemoveCommand extends SpoCommand {
@@ -35,6 +35,7 @@ class SpoFileSharingLinkRemoveCommand extends SpoCommand {
     this.#initOptions();
     this.#initValidators();
     this.#initOptionSets();
+    this.#initTypes();
   }
 
   #initTelemetry(): void {
@@ -86,6 +87,11 @@ class SpoFileSharingLinkRemoveCommand extends SpoCommand {
 
   #initOptionSets(): void {
     this.optionSets.push({ options: ['fileUrl', 'fileId'] });
+  }
+
+  #initTypes(): void {
+    this.types.string.push('webUrl', 'fileUrl', 'fileId', 'id');
+    this.types.boolean.push('force');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

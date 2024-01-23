@@ -39,6 +39,7 @@ class SpoFileMoveCommand extends SpoCommand {
     this.#initOptions();
     this.#initValidators();
     this.#initOptionSets();
+    this.#initTypes();
   }
 
   #initTelemetry(): void {
@@ -107,6 +108,11 @@ class SpoFileMoveCommand extends SpoCommand {
 
   #initOptionSets(): void {
     this.optionSets.push({ options: ['sourceUrl', 'sourceId'] });
+  }
+
+  #initTypes(): void {
+    this.types.string.push('webUrl', 'sourceUrl', 'sourceId', 'targetUrl', 'newName', 'nameConflictBehavior');
+    this.types.boolean.push('retainEditorAndModified', 'bypassSharedLock');
   }
 
   protected getExcludedOptionsWithUrls(): string[] | undefined {

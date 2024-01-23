@@ -45,6 +45,7 @@ class SpoFileRoleAssignmentAddCommand extends SpoCommand {
     this.#initOptions();
     this.#initValidators();
     this.#initOptionSets();
+    this.#initTypes();
   }
 
   #initTelemetry(): void {
@@ -121,6 +122,10 @@ class SpoFileRoleAssignmentAddCommand extends SpoCommand {
       { options: ['principalId', 'upn', 'groupName'] },
       { options: ['roleDefinitionId', 'roleDefinitionName'] }
     );
+  }
+
+  #initTypes(): void {
+    this.types.string.push('webUrl', 'fileUrl', 'fileId', 'upn', 'groupName', 'roleDefinitionName');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

@@ -38,6 +38,7 @@ class SpoFileRetentionLabelEnsureCommand extends SpoCommand {
     this.#initOptions();
     this.#initValidators();
     this.#initOptionSets();
+    this.#initTypes();
   }
 
   #initTelemetry(): void {
@@ -90,6 +91,10 @@ class SpoFileRetentionLabelEnsureCommand extends SpoCommand {
 
   #initOptionSets(): void {
     this.optionSets.push({ options: ['fileUrl', 'fileId'] });
+  }
+
+  #initTypes(): void {
+    this.types.string.push('webUrl', 'name', 'fileUrl', 'fileId', 'assetId');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
