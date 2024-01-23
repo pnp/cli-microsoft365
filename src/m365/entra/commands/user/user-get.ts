@@ -95,27 +95,27 @@ class EntraUserGetCommand extends GraphCommand {
     this.optionSets.push({ options: ['id', 'userName', 'email'] });
   }
 
-  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {  
-    let userId = args.options.id;
-
-    if (args.options.userName) {
-      userId = await aadUser.getUserIdByUpn(args.options.userName);
-    }
-    else if (args.options.email) {
-      userId = await aadUser.getUserIdByEmail(args.options.email);
-    }
-
-    const requestUrl: string = this.getRequestUrl(userId!, args.options);
-
-    const requestOptions: CliRequestOptions = {
-      url: requestUrl,
-      headers: {
-        accept: 'application/json;odata.metadata=none'
-      },
-      responseType: 'json'
-    };
-
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
+      let userId = args.options.id;
+
+      if (args.options.userName) {
+        userId = await aadUser.getUserIdByUpn(args.options.userName);
+      }
+      else if (args.options.email) {
+        userId = await aadUser.getUserIdByEmail(args.options.email);
+      }
+
+      const requestUrl: string = this.getRequestUrl(userId!, args.options);
+
+      const requestOptions: CliRequestOptions = {
+        url: requestUrl,
+        headers: {
+          accept: 'application/json;odata.metadata=none'
+        },
+        responseType: 'json'
+      };
+
       const user = await request.get<User>(requestOptions);
       await logger.log(user);
     }

@@ -212,6 +212,20 @@ describe(commands.USER_GET, () => {
     assert(loggerLogSpy.calledWith({ "id": "userId", "mail": null }));
   });
 
+  it('fails to get user when user with provided user name does not exists', async () => {
+    sinon.stub(aadUser, 'getUserIdByUpn').withArgs(userName).throws(Error(`The specified user with user name ${userName} does not exist.`));
+
+    await assert.rejects(command.action(logger, { options: { userName: userName } }),
+      new CommandError(`The specified user with user name ${userName} does not exist.`));
+  });
+
+  it('fails to get user when user with provided email does not exists', async () => {
+    sinon.stub(aadUser, 'getUserIdByEmail').withArgs(userName).throws(Error(`The specified user with email ${userName} does not exist`));
+
+    await assert.rejects(command.action(logger, { options: { email: userName } }),
+      new CommandError(`The specified user with email ${userName} does not exist`));
+  });
+
   it('correctly handles user not found', async () => {
     sinon.stub(request, 'get').rejects({
       "error": {
