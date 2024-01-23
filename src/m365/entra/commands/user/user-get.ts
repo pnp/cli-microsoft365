@@ -2,12 +2,11 @@ import { User } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
-import { formatting } from '../../../../utils/formatting.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
-import { cli } from '../../../../cli/cli.js';
 import aadCommands from '../../aadCommands.js';
+import { aadUser } from '../../../../utils/aadUser.js';
 
 interface CommandArgs {
   options: Options;
@@ -96,26 +95,17 @@ class EntraUserGetCommand extends GraphCommand {
     this.optionSets.push({ options: ['id', 'userName', 'email'] });
   }
 
-  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const properties: string = args.options.properties ?
-      `&$select=${args.options.properties.split(',').map(p => formatting.encodeQueryParameter(p.trim())).join(',')}` :
-      '';
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {  
+    let userId = args.options.id;
 
-    let requestUrl: string = `${this.resource}/v1.0/users`;
-
-    if (args.options.id) {
-      requestUrl += `?$filter=id eq '${formatting.encodeQueryParameter(args.options.id as string)}'${properties}`;
-    }
-    else if (args.options.userName) {
-      requestUrl += `?$filter=userPrincipalName eq '${formatting.encodeQueryParameter(args.options.userName as string)}'${properties}`;
+    if (args.options.userName) {
+      userId = await aadUser.getUserIdByUpn(args.options.userName);
     }
     else if (args.options.email) {
-      requestUrl += `?$filter=mail eq '${formatting.encodeQueryParameter(args.options.email as string)}'${properties}`;
+      userId = await aadUser.getUserIdByEmail(args.options.email);
     }
 
-    if (args.options.withManager) {
-      requestUrl += '&$expand=manager($select=displayName,userPrincipalName,id,mail)';
-    }
+    const requestUrl: string = this.getRequestUrl(userId!, args.options);
 
     const requestOptions: CliRequestOptions = {
       url: requestUrl,
@@ -126,28 +116,35 @@ class EntraUserGetCommand extends GraphCommand {
     };
 
     try {
-      const res = await request.get<{ value: User[] }>(requestOptions);
-
-      const identifier = args.options.id ? `id ${args.options.id}`
-        : args.options.userName ? `user name ${args.options.userName}`
-          : `email ${args.options.email}`;
-
-      if (res.value.length === 0) {
-        throw `The specified user with ${identifier} does not exist`;
-      }
-
-      if (res.value.length > 1) {
-        const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', res.value);
-        const result = await cli.handleMultipleResultsFound<User>(`Multiple users with ${identifier} found.`, resultAsKeyValuePair);
-        await logger.log(result);
-      }
-      else {
-        await logger.log(res.value[0]);
-      }
+      const user = await request.get<User>(requestOptions);
+      await logger.log(user);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
+  }
+
+  private getRequestUrl(userId: string, options: Options): string {
+    const queryParameters: string[] = [];
+
+    if (options.properties) {
+      const allProperties = options.properties.split(',');
+      const selectProperties = allProperties.filter(prop => !prop.includes('/'));
+
+      if (selectProperties.length > 0) {
+        queryParameters.push(`$select=${selectProperties}`);
+      }
+    }
+
+    if (options.withManager) {
+      queryParameters.push('$expand=manager($select=displayName,userPrincipalName,id,mail)');
+    }
+
+    const queryString = queryParameters.length > 0
+      ? `?${queryParameters.join('&')}`
+      : '';
+
+    return `${this.resource}/v1.0/users/${userId}${queryString}`;
   }
 }
 

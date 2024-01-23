@@ -8,7 +8,6 @@ import { CommandError } from '../../../../Command.js';
 import request from '../../../../request.js';
 import { telemetry } from '../../../../telemetry.js';
 import { accessToken } from '../../../../utils/accessToken.js';
-import { formatting } from '../../../../utils/formatting.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
@@ -16,6 +15,7 @@ import commands from '../../commands.js';
 import command from './user-get.js';
 import { settingsNames } from '../../../../settingsNames.js';
 import aadCommands from '../../aadCommands.js';
+import { aadUser } from '../../../../utils/aadUser.js';
 
 describe(commands.USER_GET, () => {
   const userId = "68be84bf-a585-4776-80b3-30aa5207aa21";
@@ -56,7 +56,6 @@ describe(commands.USER_GET, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
-    (command as any).items = [];
   });
 
   afterEach(() => {
@@ -65,7 +64,8 @@ describe(commands.USER_GET, () => {
       accessToken.getUserIdFromAccessToken,
       accessToken.getUserNameFromAccessToken,
       cli.getSettingWithDefaultValue,
-      cli.handleMultipleResultsFound
+      aadUser.getUserIdByEmail,
+      aadUser.getUserIdByUpn
     ]);
   });
 
@@ -94,8 +94,8 @@ describe(commands.USER_GET, () => {
 
   it('retrieves user using id', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=id eq '${userId}'`) {
-        return { value: [resultValue] };
+      if (opts.url === `https://graph.microsoft.com/v1.0/users/${userId}`) {
+        return resultValue;
       }
 
       throw 'Invalid request';
@@ -107,8 +107,8 @@ describe(commands.USER_GET, () => {
 
   it('retrieves user using @userid token', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=id eq '${userId}'`) {
-        return { value: [resultValue] };
+      if (opts.url === `https://graph.microsoft.com/v1.0/users/${userId}`) {
+        return resultValue;
       }
 
       throw 'Invalid request';
@@ -122,8 +122,8 @@ describe(commands.USER_GET, () => {
 
   it('retrieves user using id (debug)', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=id eq '${userId}'`) {
-        return { value: [resultValue] };
+      if (opts.url === `https://graph.microsoft.com/v1.0/users/${userId}`) {
+        return resultValue;
       }
 
       throw 'Invalid request';
@@ -134,9 +134,10 @@ describe(commands.USER_GET, () => {
   });
 
   it('retrieves user using user name', async () => {
+    sinon.stub(aadUser, 'getUserIdByUpn').withArgs(userName).resolves(userId);
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq '${formatting.encodeQueryParameter(userName)}'`) {
-        return { value: [resultValue] };
+      if (opts.url === `https://graph.microsoft.com/v1.0/users/${userId}`) {
+        return resultValue;
       }
 
       throw 'Invalid request';
@@ -147,6 +148,7 @@ describe(commands.USER_GET, () => {
   });
 
   it('retrieves user using user name and with their direct manager', async () => {
+    sinon.stub(aadUser, 'getUserIdByUpn').withArgs(userName).resolves(userId);
     const resultValueWithManger: any = { ...resultValue };
     resultValueWithManger.manager = {
       "displayName": "John Doe",
@@ -155,8 +157,8 @@ describe(commands.USER_GET, () => {
       "mail": "john.doe@contoso.onmicrosoft.com"
     };
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq '${formatting.encodeQueryParameter(userName)}'&$expand=manager($select=displayName,userPrincipalName,id,mail)`) {
-        return { value: [resultValueWithManger] };
+      if (opts.url === `https://graph.microsoft.com/v1.0/users/${userId}?$expand=manager($select=displayName,userPrincipalName,id,mail)`) {
+        return resultValueWithManger;
       }
 
       throw 'Invalid request';
@@ -167,9 +169,10 @@ describe(commands.USER_GET, () => {
   });
 
   it('retrieves user using @meusername token', async () => {
+    sinon.stub(aadUser, 'getUserIdByUpn').withArgs(userName).resolves(userId);
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq '${formatting.encodeQueryParameter(userName)}'`) {
-        return { value: [resultValue] };
+      if (opts.url === `https://graph.microsoft.com/v1.0/users/${userId}`) {
+        return resultValue;
       }
 
       throw 'Invalid request';
@@ -182,9 +185,10 @@ describe(commands.USER_GET, () => {
   });
 
   it('retrieves user using email', async () => {
+    sinon.stub(aadUser, 'getUserIdByEmail').withArgs(userName).resolves(userId);
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=mail eq '${formatting.encodeQueryParameter(userName)}'`) {
-        return { value: [resultValue] };
+      if (opts.url === `https://graph.microsoft.com/v1.0/users/${userId}`) {
+        return resultValue;
       }
 
       throw 'Invalid request';
@@ -195,9 +199,10 @@ describe(commands.USER_GET, () => {
   });
 
   it('retrieves only the specified properties', async () => {
+    sinon.stub(aadUser, 'getUserIdByUpn').withArgs(userName).resolves(userId);
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq '${formatting.encodeQueryParameter(userName)}'&$select=id,mail`) {
-        return { value: [{ "id": "userId", "mail": null }] };
+      if (opts.url === `https://graph.microsoft.com/v1.0/users/${userId}?$select=id,mail`) {
+        return { "id": "userId", "mail": null };
       }
 
       throw 'Invalid request';
@@ -222,95 +227,7 @@ describe(commands.USER_GET, () => {
     await assert.rejects(command.action(logger, { options: { id: '68be84bf-a585-4776-80b3-30aa5207aa22' } } as any),
       new CommandError(`Resource '68be84bf-a585-4776-80b3-30aa5207aa22' does not exist or one of its queried reference-property objects are not present.`));
   });
-
-  it('fails to get user when user with provided id does not exists', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=id eq '${userId}'`) {
-        return { value: [] };
-      }
-
-      throw `The specified user with id ${userId} does not exist`;
-    });
-
-    await assert.rejects(command.action(logger, { options: { id: userId } }),
-      new CommandError(`The specified user with id ${userId} does not exist`));
-  });
-
-  it('fails to get user when user with provided user name does not exists', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq '${formatting.encodeQueryParameter(userName)}'`) {
-        return { value: [] };
-      }
-
-      throw `The specified user with user name ${userName} does not exist`;
-    });
-
-    await assert.rejects(command.action(logger, { options: { userName: userName } }),
-      new CommandError(`The specified user with user name ${userName} does not exist`));
-  });
-
-  it('fails to get user when user with provided email does not exists', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=mail eq '${formatting.encodeQueryParameter(userName)}'`) {
-        return { value: [] };
-      }
-
-      throw `The specified user with email ${userName} does not exist`;
-    });
-
-    await assert.rejects(command.action(logger, { options: { email: userName } }),
-      new CommandError(`The specified user with email ${userName} does not exist`));
-  });
-
-  it('handles error when multiple users with the specified email found', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=mail eq '${formatting.encodeQueryParameter(userName)}'`) {
-        return {
-          value: [
-            resultValue,
-            { id: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', userPrincipalName: 'DebraB@contoso.onmicrosoft.com' }
-          ]
-        };
-      }
-
-      throw 'Invalid request';
-    });
-
-    await assert.rejects(command.action(logger, {
-      options: {
-        email: userName
-      }
-    }), new CommandError("Multiple users with email AarifS@contoso.onmicrosoft.com found. Found: 68be84bf-a585-4776-80b3-30aa5207aa21, 9b1b1e42-794b-4c71-93ac-5ed92488b67f."));
-  });
-
-  it('handles selecting single result when multiple users with the specified email found and cli is set to prompt', async () => {
-    sinon.stub(request, 'get').callsFake(async opts => {
-      if ((opts.url as string).indexOf('https://graph.microsoft.com/v1.0/users?$filter') > -1) {
-        return {
-          value: [
-            resultValue,
-            { id: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', userPrincipalName: 'DebraB@contoso.onmicrosoft.com' }
-          ]
-        };
-      }
-
-      throw 'Invalid request';
-    });
-
-    sinon.stub(cli, 'handleMultipleResultsFound').resolves(resultValue);
-
-    await command.action(logger, { options: { email: userName } });
-    assert(loggerLogSpy.calledWith(resultValue));
-  });
-
+  
   it('fails validation if id or email or userName options are not passed', async () => {
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
       if (settingName === settingsNames.prompt) {
