@@ -382,7 +382,7 @@ describe(commands.APP_INSTALL, () => {
 
   it('installs app from the catalog the user specified with userId', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=id eq 'c527a470-a882-481c-981c-ee6efaba85c7'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users/c527a470-a882-481c-981c-ee6efaba85c7`) {
         return {
           "value": [
             {
@@ -426,7 +426,7 @@ describe(commands.APP_INSTALL, () => {
 
   it('installs app from the catalog the user specified with userId (debug)', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=id eq 'c527a470-a882-481c-981c-ee6efaba85c7'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users/c527a470-a882-481c-981c-ee6efaba85c7`) {
         return {
           "value": [
             {
@@ -529,7 +529,7 @@ describe(commands.APP_INSTALL, () => {
 
   it(`correctly handles error when trying to install an app for a user that doesn't exist (invalid user ID)`, async () => {
     sinon.stub(request, 'get').callsFake(async opts => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=id eq 'c527a470-a882-481c-981c-ee6efaba85c7'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users/c527a470-a882-481c-981c-ee6efaba85c7`) {
         throw {
           "error": {
             "code": "Request_ResourceNotFound",
@@ -557,7 +557,7 @@ describe(commands.APP_INSTALL, () => {
 
   it(`correctly handles error when trying to install an app for a user that doesn't exist (invalid user ID; debug)`, async () => {
     sinon.stub(request, 'get').callsFake(async opts => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=id eq 'c527a470-a882-481c-981c-ee6efaba85c7'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users/c527a470-a882-481c-981c-ee6efaba85c7`) {
         throw {
           "error": {
             "code": "Request_ResourceNotFound",
