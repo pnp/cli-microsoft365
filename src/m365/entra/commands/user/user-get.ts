@@ -7,6 +7,7 @@ import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 import aadCommands from '../../aadCommands.js';
 import { aadUser } from '../../../../utils/aadUser.js';
+import { formatting } from '../../../../utils/formatting.js';
 
 interface CommandArgs {
   options: Options;
@@ -97,17 +98,17 @@ class EntraUserGetCommand extends GraphCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
-      let userId = args.options.id;
+      let userIdOrPrincipalName = args.options.id;
 
       if (args.options.userName) {
         // single user can be retrieved also by user principal name
-        userId = args.options.userName;
+        userIdOrPrincipalName = formatting.encodeQueryParameter(args.options.userName);
       }
       else if (args.options.email) {
-        userId = await aadUser.getUserIdByEmail(args.options.email);
+        userIdOrPrincipalName = await aadUser.getUserIdByEmail(args.options.email);
       }
 
-      const requestUrl: string = this.getRequestUrl(userId!, args.options);
+      const requestUrl: string = this.getRequestUrl(userIdOrPrincipalName!, args.options);
 
       const requestOptions: CliRequestOptions = {
         url: requestUrl,
@@ -125,7 +126,7 @@ class EntraUserGetCommand extends GraphCommand {
     }
   }
 
-  private getRequestUrl(userId: string, options: Options): string {
+  private getRequestUrl(userIdOrPrincipalName: string, options: Options): string {
     const queryParameters: string[] = [];
 
     if (options.properties) {
@@ -145,7 +146,10 @@ class EntraUserGetCommand extends GraphCommand {
       ? `?${queryParameters.join('&')}`
       : '';
 
-    return `${this.resource}/v1.0/users/${userId}${queryString}`;
+    // user principal name can start with $ but it violates the OData URL convention, so it must be enclosed in parenthesis and single quotes
+    return userIdOrPrincipalName.startsWith('%24')
+      ? `${this.resource}/v1.0/users('${userIdOrPrincipalName}')${queryString}`
+      : `${this.resource}/v1.0/users/${userIdOrPrincipalName}${queryString}`;
   }
 }
 
