@@ -1,0 +1,282 @@
+import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# entra user registrationdetails list
+
+Retrieves a list of the authentication methods registered for users
+
+## Usage
+
+```sh
+m365 entra user registrationdetails list [options]
+```
+
+## Alias
+
+```sh
+m365 aad user registrationdetails list [options]
+```
+
+## Options
+
+```md definition-list
+`--isAdmin [isAdmin]`
+: Filter for users who are admins. Allowed values are `true` or `false`. If not specified, returns all users.
+
+`--userType [userType]`
+: Filter for members or guest users. Allowed values are `member` or `guest`. If not specified, returns all users.
+
+`--userPreferredMethodForSecondaryAuthentication [userPreferredMethodForSecondaryAuthentication]`
+: Filter users by selected method as default second-factor authentication. Allowed values are `push`, `oath`, `voiceMobile`, `voiceAlternateMobile`, `voiceOffice`, `sms` or `none`. Specify either one method or more methods separated by a comma.
+
+`--systemPreferredAuthenticationMethods [systemPreferredAuthenticationMethods]`
+: Filter users by most secure authentication methods registered for second-factor authentication. Allowed values are `push`, `oath`, `voiceMobile`, `voiceAlternateMobile`, `voiceOffice`, `sms` or `none`. Specify either one method or more methods separated by a comma.
+
+`--isSelfServicePasswordResetRegistered [isSelfServicePasswordResetRegistered]`
+: Filter for users who have registered for self-service password reset. Allowed values are `true` or `false`. If not specified, returns all users.
+
+`--isSelfServicePasswordResetEnabled [isSelfServicePasswordResetEnabled]`
+: Filter for users who have been enabled for self-service password reset. Allowed values are `true` or `false`. If not specified, returns all users.
+
+`--isSelfServicePasswordResetCapable [isSelfServicePasswordResetCapable]`
+: Filter for users who are ready to perform self-service password reset. Allowed values are `true` or `false`. If not specified, returns all users.
+
+`--isMfaRegistered [isMfaRegistered]`
+: Filter for users who are registered for multi-factor authentication. Allowed values are `true` or `false`. If not specified, returns all users.
+
+`--isMfaCapable [isMfaCapable]`
+: Filter for users who are ready to perform password reset or multi-factor authentication. Allowed values are `true` or `false`. If not specified, returns all users.
+
+`--isPasswordlessCapable [isPasswordlessCapable]`
+: Filter for user who have registered a password less strong authentication method. Allowed values are `true` or `false`. If not specified, returns all users.
+
+`--isSystemPreferredAuthenticationMethodEnabled [isSystemPreferredAuthenticationMethodEnabled]`
+: Filter for users who have enabled system preferred authentication method. Allowed values are `true` or `false`. If not specified, returns all users.
+
+`--methodsRegistered [methodsRegistered]`
+: Filter users by registered methods used during registration. Allowed values are `mobilePhone`, `email`, `fido2`, `microsoftAuthenticatorPush` or `softwareOneTimePasscode`. Specify either one method or more methods separated by a comma.
+
+`--userIds [userIds]`
+: Filter users by ids. Specify at most 20 ids separated by a comma.
+
+`--userPrincipalNames [userPrincipalNames]`
+: Filter users by user principal names. Specify at most 20 UPN separated by a comma.
+
+`-p, --properties [properties]`
+: Comma-separated list of properties to retrieve.
+```
+
+<Global />
+
+## Remarks
+
+Using the `--properties` option, you can specify a comma-separated list of registration details properties to retrieve from the Microsoft Graph. If you don't specify any properties, the command will retrieve user's account name, registered methods and timestamp of last update.
+
+:::info
+
+When multiple values are specified for `--userPreferredMethodForSecondaryAuthentication` option, the command returns registration details with at least one specified selected method as default second-factor authentication.
+
+When multiple values are specified for `--systemPreferredAuthenticationMethods` option, the command returns registration details with at least one specified most secure authentication methods registered for second-factor authentication.
+
+When multiple values are specified for `--registeredMethods` option, the command returns registration details with at least one specified registered methods used during registration.
+
+:::
+
+## Examples
+
+Retrieve registration details for all users
+
+```sh
+m365 entra user registrationdetails list
+```
+
+Retrieve user registration details and returns only specific properties
+
+```sh
+m365 entra user registrationdetails list --properties 'id,isAdmin'
+```
+
+Retrieve registration details for admins
+
+```sh
+m365 entra user registrationdetails list --isAdmin true
+```
+
+Retrieve registration details for guest users
+
+```sh
+m365 entra user registrationdetails list --userType guest
+```
+
+Retrieve registration details for users who selected push authentication method as the default second-factor for performing multifactor authentication
+
+```sh
+m365 entra user registrationdetails list --userPreferredMethodForSecondaryAuthentication push
+```
+
+Retrieve registration details for users who selected either sms or push authentication method as the default second-factor for performing multifactor authentication
+
+```sh
+m365 entra user registrationdetails list --userPreferredMethodForSecondaryAuthentication 'sms,push'
+```
+
+Retrieve registration details for users with push authentication method as the most secure authentication method among the registered methods for second factor authentication determined by the system
+
+```sh
+m365 entra user registrationdetails list --systemPreferredAuthenticationMethods push
+```
+
+Retrieve registration details for users with either sms or push authentication method as the most secure authentication methods among the registered methods for second factor authentication determined by the system
+
+```sh
+m365 entra user registrationdetails list --systemPreferredAuthenticationMethods 'sms,push'
+```
+
+Retrieve registration details for users who have used Microsoft Authenticator app during registration
+
+```sh
+m365 entra user registrationdetails list --methodsRegistered microsoftAuthenticatorPush
+```
+
+Retrieve registration details for users who have used either Microsoft Authenticator app or mobile phone during registration
+
+```sh
+m365 entra user registrationdetails list --methodsRegistered 'microsoftAuthenticatorPush,mobilePhone'
+```
+
+Retrieve registration details for users who are not registered for multi-factor authentication
+
+```sh
+m365 entra user registrationdetails list --isMfaRegistered false
+```
+
+Retrieve registration details for users specified by id
+
+```sh
+m365 entra user registrationdetails list --userIds '121bca22-1a6b-455b-9e5d-64c5ef5e471d,fec200ce-a7a9-42cd-9717-3a3179a99b72'
+```
+
+Retrieve registration details for users specified by user principal names
+
+```sh
+m365 entra user registrationdetails list --userPrincipalNames 'AdeleV@contoso.com,johndoe@contoso.com'
+```
+
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  [
+    {
+      "id": "61b0c52f-a902-4769-9a09-c6628335b00a",
+      "userPrincipalName": "AdeleV@4wrvkx.onmicrosoft.com",
+      "userDisplayName": "Adele Vance",
+      "userType": "member",
+      "isAdmin": false,
+      "isSsprRegistered": false,
+      "isSsprEnabled": false,
+      "isSsprCapable": false,
+      "isMfaRegistered": false,
+      "isMfaCapable": false,
+      "isPasswordlessCapable": false,
+      "methodsRegistered": [],
+      "isSystemPreferredAuthenticationMethodEnabled": false,
+      "systemPreferredAuthenticationMethods": [],
+      "userPreferredMethodForSecondaryAuthentication": "none",
+      "lastUpdatedDateTime": "2024-01-23T19:37:43.7170699Z"
+    },
+    {
+      "id": "ebd27dbd-75f2-4ef8-bd51-102c3faf62ec",
+      "userPrincipalName": "john.doe@4wrvkx.onmicrosoft.com",
+      "userDisplayName": "John Doe",
+      "userType": "member",
+      "isAdmin": false,
+      "isSsprRegistered": false,
+      "isSsprEnabled": false,
+      "isSsprCapable": false,
+      "isMfaRegistered": true,
+      "isMfaCapable": true,
+      "isPasswordlessCapable": false,
+      "methodsRegistered": [
+        "microsoftAuthenticatorPush",
+        "softwareOneTimePasscode"
+      ],
+      "isSystemPreferredAuthenticationMethodEnabled": false,
+      "systemPreferredAuthenticationMethods": [],
+      "userPreferredMethodForSecondaryAuthentication": "push",
+      "lastUpdatedDateTime": "2024-01-23T19:37:43.7165489Z"
+    }
+  ]
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  userPrincipalName                                methodsRegistered                                                     lastUpdatedDateTime
+  -----------------------------------------------  --------------------------------------------------------------------  ----------------------------
+  AdeleV@4wrvkx.onmicrosoft.com                                                                                          2024-01-23T19:37:43.7170699Z
+  john.doe@4wrvkx.onmicrosoft.com                  microsoftAuthenticatorPush,softwareOneTimePasscode                    2024-01-23T19:37:43.7165489Z
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  id,userPrincipalName,userDisplayName,userType,isAdmin,isSsprRegistered,isSsprEnabled,isSsprCapable,isMfaRegistered,isMfaCapable,isPasswordlessCapable,isSystemPreferredAuthenticationMethodEnabled,userPreferredMethodForSecondaryAuthentication,lastUpdatedDateTime
+  61b0c52f-a902-4769-9a09-c6628335b00a,AdeleV@4wrvkx.onmicrosoft.com,Adele Vance,member,,,,,,,,,none,2024-01-23T19:37:43.7170699Z
+  ebd27dbd-75f2-4ef8-bd51-102c3faf62ec,john.doe@4wrvkx.onmicrosoft.com,John Doe,member,,,,,1,1,,,push,2024-01-23T19:37:43.7165489Z
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # entra user registrationdetails list
+
+  Date: 1/27/2024
+
+  ## 61b0c52f-a902-4769-9a09-c6628335b00a
+
+  Property | Value
+  ---------|-------
+  id | 61b0c52f-a902-4769-9a09-c6628335b00a
+  userPrincipalName | AdeleV@4wrvkx.onmicrosoft.com
+  userDisplayName | Adele Vance
+  userType | member
+  isAdmin | false
+  isSsprRegistered | false
+  isSsprEnabled | false
+  isSsprCapable | false
+  isMfaRegistered | false
+  isMfaCapable | false
+  isPasswordlessCapable | false
+  isSystemPreferredAuthenticationMethodEnabled | false
+  userPreferredMethodForSecondaryAuthentication | none
+  lastUpdatedDateTime | 2024-01-23T19:37:43.7170699Z
+
+  ## ebd27dbd-75f2-4ef8-bd51-102c3faf62ec
+
+  Property | Value
+  ---------|-------
+  id | ebd27dbd-75f2-4ef8-bd51-102c3faf62ec
+  userPrincipalName | john.doe@4wrvkx.onmicrosoft.com
+  userDisplayName | John Doe
+  userType | member
+  isAdmin | false
+  isSsprRegistered | false
+  isSsprEnabled | false
+  isSsprCapable | false
+  isMfaRegistered | true
+  isMfaCapable | true
+  isPasswordlessCapable | false
+  isSystemPreferredAuthenticationMethodEnabled | false
+  userPreferredMethodForSecondaryAuthentication | push
+  lastUpdatedDateTime | 2024-01-23T19:37:43.7165489Z
+  ```
+
+  </TabItem>
+</Tabs>
