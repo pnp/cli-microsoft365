@@ -639,6 +639,11 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
+              label: 'user registrationdetails list',
+              id: 'cmd/entra/user/user-registrationdetails-list'
+            },
+            {
+              type: 'doc',
               label: 'user signin list',
               id: 'cmd/entra/user/user-signin-list'
             }

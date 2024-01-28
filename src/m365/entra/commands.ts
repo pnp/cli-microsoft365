@@ -83,6 +83,7 @@ export default {
   USER_RECYCLEBINITEM_CLEAR: `${prefix} user recyclebinitem clear`,
   USER_RECYCLEBINITEM_LIST: `${prefix} user recyclebinitem list`,
   USER_RECYCLEBINITEM_REMOVE: `${prefix} user recyclebinitem remove`,
+  USER_REGISTRATIONDETAILS_LIST: `${prefix} user registrationdetails list`,
   USER_REMOVE: `${prefix} user remove`,
   USER_RECYCLEBINITEM_RESTORE: `${prefix} user recyclebinitem restore`,
   USER_SET: `${prefix} user set`,
