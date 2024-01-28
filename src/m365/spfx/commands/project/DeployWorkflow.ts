@@ -1,6 +1,7 @@
-import { gitHubWorkflow } from "./project-github-workflow-model";
+import { AzureDevOpsPipeline } from "./project-azuredevops-pipeline-model";
+import { GitHubWorkflow } from "./project-github-workflow-model";
 
-export const workflow: gitHubWorkflow = {
+export const workflow: GitHubWorkflow = {
   name: "Deploy Solution {{ name }}",
   on: {
     push: {
@@ -54,4 +55,116 @@ export const workflow: gitHubWorkflow = {
       ]
     }
   }
+};
+
+export const pipeline: AzureDevOpsPipeline = {
+  name: "Deploy Solution",
+  trigger: {
+    branches: {
+      include: [
+        "main"
+      ]
+    }
+  },
+  pool: {
+    vmImage: "ubuntu-latest"
+  },
+  variables: [
+    {
+      name: "CertificateBase64Encoded",
+      value: ""
+    },
+    {
+      name: "CertificateSecureFileId",
+      value: ""
+    },
+    {
+      name: "CertificatePassword",
+      value: ""
+    },
+    {
+      name: "EntraAppId",
+      value: ""
+    },
+    {
+      name: "UserName",
+      value: ""
+    },
+    {
+      name: "Password",
+      value: ""
+    },
+    {
+      name: "TenantId",
+      value: ""
+    },
+    {
+      name: "SharePointBaseUrl",
+      value: ""
+    },
+    {
+      name: "PackageName",
+      value: ""
+    },
+    {
+      name: "SiteAppCatalogUrl",
+      value: ""
+    }
+  ],
+  stages: [
+    {
+      stage: "Build_and_Deploy",
+      jobs: [
+        {
+          job: "Build_and_Deploy",
+          steps: [
+            {
+              task: "NodeTool@0",
+              displayName: "Use Node.js",
+              inputs: {
+                versionSpec: "18.x"
+              }
+            },
+            {
+              task: "Npm@1",
+              displayName: "Run npm install",
+              inputs: {
+                command: "install"
+              }
+            },
+            {
+              task: "Gulp@0",
+              displayName: "Gulp bundle",
+              inputs: {
+                gulpFile: "./gulpfile.js",
+                targets: "bundle",
+                arguments: "--ship"
+              }
+            },
+            {
+              task: "Gulp@0",
+              displayName: "Gulp package",
+              inputs: {
+                targets: "package-solution",
+                arguments: "--ship"
+              }
+            },
+            {
+              task: "Npm@1",
+              displayName: "Install CLI for Microsoft 365",
+              inputs: {
+                command: "custom",
+                verbose: false,
+                customCommand: "install -g @pnp/cli-microsoft365"
+              }
+            },
+            {
+              script: "\n{{login}} \nm365 spo set --url '$(SharePointBaseUrl)' \n{{addApp}} \n{{deploy}}\n",
+              displayName: "CLI for Microsoft 365 Deploy App"
+            }
+          ]
+        }
+      ]
+    }
+  ]
 };
