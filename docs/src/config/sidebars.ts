@@ -1843,6 +1843,11 @@ const sidebars: SidebarsConfig = {
           project: [
             {
               type: 'doc',
+              label: 'project azuredevops pipeline add',
+              id: 'cmd/spfx/project/project-azuredevops-pipeline-add'
+            },
+            {
+              type: 'doc',
               label: 'project doctor',
               id: 'cmd/spfx/project/project-doctor'
             },
