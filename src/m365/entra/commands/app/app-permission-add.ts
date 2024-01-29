@@ -104,7 +104,6 @@ class EntraAppPermissionAddCommand extends GraphCommand {
       const appObject = await this.getAppObject(args.options);
       const servicePrincipals = await this.getServicePrincipals();
       const appPermissions: AppPermission[] = [];
-
       if (args.options.delegatedPermissions) {
         const delegatedPermissions = await this.getRequiredResourceAccessForApis(servicePrincipals, args.options.delegatedPermissions, ScopeType.Scope, appPermissions, logger);
         this.addPermissionsToResourceArray(delegatedPermissions, appObject.requiredResourceAccess!);
@@ -139,14 +138,9 @@ class EntraAppPermissionAddCommand extends GraphCommand {
   }
 
   private async getAppObject(options: Options): Promise<Application> {
-    let apps: Application[];
-
-    if (options.appObjectId) {
-      apps = await odata.getAllItems<Application>(`${this.resource}/v1.0/applications/${options.appObjectId}?$select=id,appId,requiredResourceAccess`);
-    }
-    else {
-      apps = await odata.getAllItems<Application>(`${this.resource}/v1.0/applications(appId='${options.appId}')?$select=id,appId,requiredResourceAccess`);
-    }
+    const apps = options.appObjectId
+      ? await odata.getAllItems<Application>(`${this.resource}/v1.0/applications?$filter=id eq '${options.appObjectId}'&$select=id,appId,requiredResourceAccess`)
+      : await odata.getAllItems<Application>(`${this.resource}/v1.0/applications?$filter=appId eq '${options.appId}'&$select=id,appId,requiredResourceAccess`);
 
     if (apps.length === 0) {
       throw `App with ${options.appObjectId ? 'object id' : 'client id'} ${options.appObjectId ? options.appObjectId : options.appId} not found in Entra ID (Azure AD)`;
