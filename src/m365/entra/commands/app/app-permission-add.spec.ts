@@ -98,7 +98,7 @@ describe(commands.APP_PERMISSION_ADD, () => {
       switch (url) {
         case 'https://graph.microsoft.com/v1.0/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames':
           return servicePrincipals;
-        case `https://graph.microsoft.com/v1.0/applications/${appObjectId}?$select=id,appId,requiredResourceAccess`:
+        case `https://graph.microsoft.com/v1.0/applications?$filter=id eq '${appObjectId}'&$select=id,appId,requiredResourceAccess`:
           return applications;
         default:
           throw 'Invalid request';
@@ -121,7 +121,7 @@ describe(commands.APP_PERMISSION_ADD, () => {
       switch (url) {
         case 'https://graph.microsoft.com/v1.0/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames':
           return servicePrincipals;
-        case `https://graph.microsoft.com/v1.0/applications(appId='${appId}')?$select=id,appId,requiredResourceAccess`:
+        case `https://graph.microsoft.com/v1.0/applications?$filter=appId eq '${appId}'&$select=id,appId,requiredResourceAccess`:
           return applications;
         default:
           throw 'Invalid request';
@@ -145,7 +145,7 @@ describe(commands.APP_PERMISSION_ADD, () => {
       switch (url) {
         case 'https://graph.microsoft.com/v1.0/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames':
           return servicePrincipals;
-        case `https://graph.microsoft.com/v1.0/applications(appId='${appId}')?$select=id,appId,requiredResourceAccess`:
+        case `https://graph.microsoft.com/v1.0/applications?$filter=appId eq '${appId}'&$select=id,appId,requiredResourceAccess`:
           return applications;
         default:
           throw 'Invalid request';
@@ -178,7 +178,7 @@ describe(commands.APP_PERMISSION_ADD, () => {
       switch (url) {
         case 'https://graph.microsoft.com/v1.0/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames':
           return servicePrincipals;
-        case `https://graph.microsoft.com/v1.0/applications(appId='${appId}')?$select=id,appId,requiredResourceAccess`:
+        case `https://graph.microsoft.com/v1.0/applications?$filter=appId eq '${appId}'&$select=id,appId,requiredResourceAccess`:
           return applications;
         default:
           throw 'Invalid request';
@@ -214,7 +214,7 @@ describe(commands.APP_PERMISSION_ADD, () => {
       switch (url) {
         case 'https://graph.microsoft.com/v1.0/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames':
           return servicePrincipals;
-        case `https://graph.microsoft.com/v1.0/applications(appId='${appId}')?$select=id,appId,requiredResourceAccess`:
+        case `https://graph.microsoft.com/v1.0/applications?$filter=appId eq '${appId}'&$select=id,appId,requiredResourceAccess`:
           return [];
         default:
           throw 'Invalid request';
@@ -230,7 +230,7 @@ describe(commands.APP_PERMISSION_ADD, () => {
       switch (url) {
         case 'https://graph.microsoft.com/v1.0/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames':
           return servicePrincipals;
-        case `https://graph.microsoft.com/v1.0/applications/${appObjectId}?$select=id,appId,requiredResourceAccess`:
+        case `https://graph.microsoft.com/v1.0/applications?$filter=id eq '${appObjectId}'&$select=id,appId,requiredResourceAccess`:
           return [];
         default:
           throw 'Invalid request';
@@ -249,7 +249,7 @@ describe(commands.APP_PERMISSION_ADD, () => {
       switch (url) {
         case 'https://graph.microsoft.com/v1.0/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames':
           return servicePrincipals;
-        case `https://graph.microsoft.com/v1.0/applications(appId='${appId}')?$select=id,appId,requiredResourceAccess`:
+        case `https://graph.microsoft.com/v1.0/applications?$filter=appId eq '${appId}'&$select=id,appId,requiredResourceAccess`:
           return applications;
         default:
           throw 'Invalid request';
@@ -269,7 +269,7 @@ describe(commands.APP_PERMISSION_ADD, () => {
       switch (url) {
         case 'https://graph.microsoft.com/v1.0/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames':
           return servicePrincipals;
-        case `https://graph.microsoft.com/v1.0/applications(appId='${appId}')?$select=id,appId,requiredResourceAccess`:
+        case `https://graph.microsoft.com/v1.0/applications?$filter=appId eq '${appId}'&$select=id,appId,requiredResourceAccess`:
           return applications;
         default:
           throw 'Invalid request';
