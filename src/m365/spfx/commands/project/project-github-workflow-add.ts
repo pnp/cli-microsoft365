@@ -110,6 +110,10 @@ class SpfxProjectGithubWorkflowAddCommand extends BaseProjectCommand {
       throw new CommandError(`Couldn't find project root folder`, SpfxProjectGithubWorkflowAddCommand.ERROR_NO_PROJECT_ROOT_FOLDER);
     }
 
+    if (!args.options.overwrite) {
+      await this.warn(logger, `We recommend always using the --overwrite option and it will become the default behavior in next major release. Overwriting your sppkg file on every deployment is required to make continuous delivery of the latest version of your app which is the aim of the continuous delivery pipeline.`);
+    }
+
     const solutionPackageJsonFile: string = path.join(this.projectRootPath, 'package.json');
     const packageJson: string = fs.readFileSync(solutionPackageJsonFile, 'utf-8');
     const solutionName = JSON.parse(packageJson).name;
