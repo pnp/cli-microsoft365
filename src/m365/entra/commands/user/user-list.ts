@@ -12,6 +12,7 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
+  type?: string;
   properties?: string;
 }
 
@@ -42,24 +43,43 @@ class EntraUserListCommand extends GraphCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        properties: args.options.properties
+        type: typeof args.options.type !== 'undefined',
+        properties: typeof args.options.properties !== 'undefined'
       });
     });
   }
 
   #initOptions(): void {
     this.options.unshift(
+      {
+        option: "--type [type]",
+        autocomplete: ["Member", "Guest"]
+      },
       { option: '-p, --properties [properties]' }
     );
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
-      let filter: string = '';
-      const properties: string[] = args.options.properties ?
-        args.options.properties.split(',').map(p => p.trim()) :
-        ['userPrincipalName', 'displayName'];
+      const selectProperties: string = args.options.properties ?
+        `${args.options.properties.split(',').filter(f => f.toLowerCase() !== 'id').concat('id').map(p => p.trim()).join(',')}` :
+        'id,displayName,mail,userPrincipalName';
+      const allSelectProperties: string[] = selectProperties.split(',');
+      const propertiesWithSlash: string[] = allSelectProperties.filter(item => item.includes('/'));
 
+      let fieldExpand: string = '';
+      propertiesWithSlash.forEach(p => {
+        if (fieldExpand.length > 0) {
+          fieldExpand += ',';
+        }
+
+        fieldExpand += `${p.split('/')[0]}($select=${p.split('/')[1]})`;
+      });
+
+      const expandParam = fieldExpand.length > 0 ? `&$expand=${fieldExpand}` : '';
+      const selectParam = allSelectProperties.filter(item => !item.includes('/'));
+
+      let filter: string = '';
       try {
         filter = this.getFilter(args.options);
       }
@@ -67,7 +87,7 @@ class EntraUserListCommand extends GraphCommand {
         throw ex;
       }
 
-      const url: string = `${this.resource}/v1.0/users?$select=${properties.join(',')}${(filter.length > 0 ? '&' + filter : '')}&$top=100`;
+      const url: string = `${this.resource}/v1.0/users?$select=${selectParam}${expandParam}${(filter.length > 0 ? '&' + filter : '')}&$top=100`;
       const users = await odata.getAllItems<User>(url);
       await logger.log(users);
     }
@@ -76,9 +96,10 @@ class EntraUserListCommand extends GraphCommand {
     }
   }
 
-  private getFilter(options: any): string {
+  private getFilter(options: Options): string {
     const filters: any = {};
     const excludeOptions: string[] = [
+      'type',
       'properties',
       'p',
       'd',
@@ -99,9 +120,21 @@ class EntraUserListCommand extends GraphCommand {
         filters[key] = formatting.encodeQueryParameter(options[key].toString());
       }
     });
+
+
     let filter: string = Object.keys(filters).map(key => `startsWith(${key}, '${filters[key]}')`).join(' and ');
     if (filter.length > 0) {
       filter = '$filter=' + filter;
+    }
+
+    if (options.type) {
+      const filterType: string = `userType eq '${options.type}'`;
+      if (filter.length > 0) {
+        filter += ` and ${filterType}`;
+      }
+      else {
+        filter = `$filter=${filterType}`;
+      }
     }
 
     return filter;
