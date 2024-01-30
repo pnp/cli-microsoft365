@@ -139,7 +139,7 @@ class SpfxProjectGithubWorkflowAddCommand extends BaseProjectCommand {
   }
 
   private updateWorkflow(solutionName: string, workflow: gitHubWorkflow, options: GlobalOptions): void {
-    workflow.name = workflow.name.replace('{{ name }}', options.name ?? solutionName);
+    workflow.name = options.name ? options.name : workflow.name.replace('{{ name }}', solutionName);
 
     if (options.branchName) {
       workflow.on.push.branches[0] = options.branchName;
