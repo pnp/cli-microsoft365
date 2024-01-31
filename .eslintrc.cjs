@@ -29,6 +29,7 @@ const dictionary = [
   'customizer',
   'dataverse',
   'default',
+  'enterprise',
   'entra',
   'event',
   'eventreceiver',

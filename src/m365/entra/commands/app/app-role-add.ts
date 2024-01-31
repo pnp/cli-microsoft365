@@ -45,7 +45,7 @@ class EntraAppRoleAddCommand extends GraphCommand {
   }
 
   public alias(): string[] | undefined {
-    return [aadCommands.APP_ROLE_ADD];
+    return [aadCommands.APP_ROLE_ADD, commands.APPREGISTRATION_ROLE_ADD];
   }
 
   constructor() {

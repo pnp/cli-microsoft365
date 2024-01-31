@@ -211,7 +211,7 @@ describe(commands.APP_ADD, () => {
 
   it('defines correct alias', () => {
     const alias = command.alias();
-    assert.deepStrictEqual(alias, [aadCommands.APP_ADD]);
+    assert.deepStrictEqual(alias, [aadCommands.APP_ADD, commands.APPREGISTRATION_ADD]);
   });
 
   it('creates AAD app reg with just the name', async () => {

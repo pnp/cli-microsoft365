@@ -11,11 +11,11 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './sp-add.js';
+import command from './enterpriseapp-add.js';
 import { settingsNames } from '../../../../settingsNames.js';
 import aadCommands from '../../aadCommands.js';
 
-describe(commands.SP_ADD, () => {
+describe(commands.ENTERPRISEAPP_ADD, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -62,7 +62,7 @@ describe(commands.SP_ADD, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name, commands.SP_ADD);
+    assert.strictEqual(command.name, commands.ENTERPRISEAPP_ADD);
   });
 
   it('has a description', () => {
@@ -76,7 +76,7 @@ describe(commands.SP_ADD, () => {
 
   it('defines correct alias', () => {
     const alias = command.alias();
-    assert.deepStrictEqual(alias, [aadCommands.SP_ADD]);
+    assert.deepStrictEqual(alias, [aadCommands.SP_ADD, commands.SP_ADD]);
   });
 
   it('fails validation if neither the appId, appName, nor objectId option specified', async () => {
@@ -205,7 +205,7 @@ describe(commands.SP_ADD, () => {
       new CommandError('An error has occurred'));
   });
 
-  it('fails when the specified Azure AD app does not exist', async () => {
+  it('fails when the specified Entra app does not exist', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/v1.0/applications?$filter=id eq `) > -1) {
         return {
@@ -223,10 +223,10 @@ describe(commands.SP_ADD, () => {
         debug: true,
         objectId: '59e617e5-e447-4adc-8b88-00af644d7c92'
       }
-    }), new CommandError(`The specified Azure AD app doesn't exist`));
+    }), new CommandError(`The specified Entra app doesn't exist`));
   });
 
-  it('fails when Azure AD app with same name exists', async () => {
+  it('fails when Entra app with same name exists', async () => {
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
       if (settingName === settingsNames.prompt) {
         return false;
@@ -262,10 +262,10 @@ describe(commands.SP_ADD, () => {
         debug: true,
         appName: 'Test App'
       }
-    }), new CommandError("Multiple Azure AD apps with name 'Test App' found. Found: ee091f63-9e48-4697-8462-7cfbf7410b8e, e9fd0957-049f-40d0-8d1d-112320fb1cbd."));
+    }), new CommandError("Multiple Entra apps with name 'Test App' found. Found: ee091f63-9e48-4697-8462-7cfbf7410b8e, e9fd0957-049f-40d0-8d1d-112320fb1cbd."));
   });
 
-  it('handles selecting single result when multiple Azure AD apps with the specified name found and cli is set to prompt', async () => {
+  it('handles selecting single result when multiple Entra apps with the specified name found and cli is set to prompt', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/applications?$filter=displayName eq 'Test%20App'`) {
         return {
@@ -319,7 +319,7 @@ describe(commands.SP_ADD, () => {
     }));
   });
 
-  it('adds a service principal to a registered Azure AD app by appId', async () => {
+  it('creates an enterprise application for a registered Entra app by appId', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/servicePrincipals`) {
         return {
@@ -343,7 +343,7 @@ describe(commands.SP_ADD, () => {
     }));
   });
 
-  it('adds a service principal to a registered Azure AD app by appName', async () => {
+  it('creates an enterprise application for a registered Entra app by appName', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/v1.0/applications?$filter=displayName eq `) > -1) {
         return {
@@ -385,7 +385,7 @@ describe(commands.SP_ADD, () => {
     }));
   });
 
-  it('adds a service principal to a registered Azure AD app by objectId', async () => {
+  it('creates an enterprise application for a registered Entra app by objectId', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/v1.0/applications?$filter=id eq `) > -1) {
         return {

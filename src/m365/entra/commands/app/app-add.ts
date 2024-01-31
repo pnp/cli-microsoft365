@@ -89,7 +89,7 @@ class EntraAppAddCommand extends GraphCommand {
   }
 
   public alias(): string[] | undefined {
-    return [aadCommands.APP_ADD];
+    return [aadCommands.APP_ADD, commands.APPREGISTRATION_ADD];
   }
 
   constructor() {

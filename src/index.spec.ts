@@ -2,7 +2,7 @@ import assert from 'assert';
 import fs from 'fs';
 import path from 'path';
 import url from 'url';
-import * as aadCommands from './m365/entra/commands.js';
+import * as entraCommands from './m365/entra/commands.js';
 import * as cliCommands from './m365/cli/commands.js';
 import * as globalCommands from './m365/commands/commands.js';
 import * as flowCommands from './m365/flow/commands.js';
@@ -26,7 +26,7 @@ describe('Lazy loading commands', () => {
   it('has all commands stored in correct paths that allow lazy loading', () => {
     const commandCollections: any[] = [
       globalCommands.default,
-      aadCommands.default,
+      entraCommands.default,
       cliCommands.default,
       flowCommands.default,
       graphCommands.default,
@@ -44,6 +44,18 @@ describe('Lazy loading commands', () => {
       yammerCommands.default
     ];
     const aliases: string[] = [
+      'entra sp add',
+      'entra sp get',
+      'entra sp list',
+      'entra appregistration add',
+      'entra appregistration get',
+      'entra appregistration list',
+      'entra appregistration remove',
+      'entra appregistration set',
+      'entra appregistration permission add',
+      'entra appregistration role add',
+      'entra appregistration role list',
+      'entra appregistration role remove',
       'consent',
       'flow connector export',
       'flow connector list',

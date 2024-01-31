@@ -75,7 +75,7 @@ describe(commands.APP_ROLE_LIST, () => {
 
   it('defines correct alias', () => {
     const alias = command.alias();
-    assert.deepStrictEqual(alias, [aadCommands.APP_ROLE_LIST]);
+    assert.deepStrictEqual(alias, [aadCommands.APP_ROLE_LIST, commands.APPREGISTRATION_ROLE_LIST]);
   });
 
   it('defines correct properties for the default output', () => {

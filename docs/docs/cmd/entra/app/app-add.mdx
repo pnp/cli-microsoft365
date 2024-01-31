@@ -16,6 +16,7 @@ m365 entra app add [options]
 
 ```sh
 m365 aad app add [options]
+m365 entra appregistration add [options]
 ```
 
 ## Options
@@ -109,7 +110,7 @@ After creating the Entra app registration, this command returns the app ID and o
 
 If you want to store the information about the created Entra app registration, use the `--save` option. This is useful when you build solutions connected to Microsoft 365 and want to easily manage app registrations used with your solution. When you use the `--save` option, after you create the app registration, the command will write its ID and name to the `.m365rc.json` file in the current directory. If the file already exists, it will add the information about the to it, allowing you to track multiple apps. If the file doesn't exist, the command will create it.
 
-When specifying `--grantAdminConsent` option, a service principal will be created for the app registration.
+When specifying `--grantAdminConsent` option, an enterprise application will be created for the app registration.
 
 ## Examples
 
