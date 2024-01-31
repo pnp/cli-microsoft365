@@ -78,7 +78,7 @@ describe(commands.APP_GET, () => {
 
   it('defines correct alias', () => {
     const alias = command.alias();
-    assert.deepStrictEqual(alias, [aadCommands.APP_GET]);
+    assert.deepStrictEqual(alias, [aadCommands.APP_GET, commands.APPREGISTRATION_GET]);
   });
 
   it('handles error when the app specified with the appId not found', async () => {

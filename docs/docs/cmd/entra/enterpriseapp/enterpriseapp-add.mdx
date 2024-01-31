@@ -2,33 +2,34 @@ import Global from '/docs/cmd/_global.mdx';
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-# entra sp add
+# entra enterpriseapp add
 
-Adds a service principal to a registered Entra app
+Creates an enterprise application (or service principal) for a registered Entra app
 
 ## Usage
 
 ```sh
-m365 entra sp add [options]
+m365 entra enterpriseapp add [options]
 ```
 
 ## Alias
 
 ```sh
 m365 aad sp add [options]
+m365 entra sp add [options]
 ```
 
 ## Options
 
 ```md definition-list
 `--appId [appId]`
-: ID of the application to which the service principal should be added
+: ID of the app for which the enterprise application should be created
 
 `--appName [appName]`
-: Display name of the application to which the service principal should be added
+: Display name of the app for which the enterprise application should be created
 
 `--objectId [objectId]`
-: ObjectId of the application to which the service principal should be added
+: ObjectId of the app for which the enterprise application should be created
 ```
 
 <Global />
@@ -37,26 +38,26 @@ m365 aad sp add [options]
 
 Specify either the `appId`, `appName` or `objectId`. If you specify more than one option value, the command will fail with an error.
 
-If you register an application in the portal, an application object as well as a service principal object are automatically created in your home tenant. If you register an application using CLI for Microsoft 365 or the Microsoft Graph, you'll need to create the service principal separately. To register/create an application using the CLI for Microsoft 365, use the [m365 entra app add](../app/app-add.mdx) command.
+If you register an application in the portal, an application object as well as an enterprise application object are automatically created in your home tenant. If you register an application using CLI for Microsoft 365 or the Microsoft Graph, you'll need to create the enterprise application separately. To register/create an application using the CLI for Microsoft 365, use the [m365 entra app add](../app/app-add.mdx) command.
 
 ## Examples
 
-Adds a service principal to a registered Entra app with appId _b2307a39-e878-458b-bc90-03bc578531d6_.
+Creates an enterprise application for a registered Entra app with appId _b2307a39-e878-458b-bc90-03bc578531d6_.
 
 ```sh
-m365 entra sp add --appId b2307a39-e878-458b-bc90-03bc578531d6
+m365 entra enterpriseapp add --appId b2307a39-e878-458b-bc90-03bc578531d6
 ```
 
-Adds a service principal to a registered Entra app with appName _Microsoft Graph_.
+Creates an enterprise application for a registered Entra app with appName _Microsoft Graph_.
 
 ```sh
-m365 entra sp add --appName "Microsoft Graph"
+m365 entra enterpriseapp add --appName "Microsoft Graph"
 ```
 
-Adds a service principal to a registered Entra app with objectId _b2307a39-e878-458b-bc90-03bc578531d6_.
+Creates an enterprise application for a registered Entra app with objectId _b2307a39-e878-458b-bc90-03bc578531d6_.
 
 ```sh
-m365 entra sp add --objectId b2307a39-e878-458b-bc90-03bc578531d6
+m365 entra enterpriseapp add --objectId b2307a39-e878-458b-bc90-03bc578531d6
 ```
 
 ## Response
@@ -171,7 +172,7 @@ m365 entra sp add --objectId b2307a39-e878-458b-bc90-03bc578531d6
   <TabItem value="Markdown">
 
   ```md
-  # entra sp add --appId "8da75b6a-4272-4b17-8ee1-20ba66e2b06f"
+  # entra enterpriseapp add --appId "8da75b6a-4272-4b17-8ee1-20ba66e2b06f"
 
   Date: 2023-06-02
 
@@ -195,5 +196,5 @@ m365 entra sp add --objectId b2307a39-e878-458b-bc90-03bc578531d6
 
 ## More information
 
-- Application and service principal objects in Entra ID (Azure AD): [https://learn.microsoft.com/azure/active-directory/develop/active-directory-application-objects](https://learn.microsoft.com/azure/active-directory/develop/active-directory-application-objects)
+- Application and enterprise application objects in Entra ID (Azure AD): [https://learn.microsoft.com/azure/active-directory/develop/active-directory-application-objects](https://learn.microsoft.com/azure/active-directory/develop/active-directory-application-objects)
 - Create servicePrincipal: [https://learn.microsoft.com/graph/api/serviceprincipal-post-serviceprincipals?view=graph-rest-1.0](https://learn.microsoft.com/graph/api/serviceprincipal-post-serviceprincipals?view=graph-rest-1.0)

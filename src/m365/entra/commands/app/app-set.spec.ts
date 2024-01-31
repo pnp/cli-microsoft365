@@ -81,7 +81,7 @@ describe(commands.APP_SET, () => {
 
   it('defines correct alias', () => {
     const alias = command.alias();
-    assert.deepStrictEqual(alias, [aadCommands.APP_SET]);
+    assert.deepStrictEqual(alias, [aadCommands.APP_SET, commands.APPREGISTRATION_SET]);
   });
 
   it('updates uris for the specified appId', async () => {

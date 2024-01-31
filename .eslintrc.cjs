@@ -30,6 +30,7 @@ const dictionary = [
   'dataverse',
   'default',
   'details',
+  'enterprise',
   'entra',
   'event',
   'eventreceiver',

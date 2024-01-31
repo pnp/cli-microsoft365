@@ -73,7 +73,7 @@ describe(commands.APP_ROLE_ADD, () => {
 
   it('defines correct alias', () => {
     const alias = command.alias();
-    assert.deepStrictEqual(alias, [aadCommands.APP_ROLE_ADD]);
+    assert.deepStrictEqual(alias, [aadCommands.APP_ROLE_ADD, commands.APPREGISTRATION_ROLE_ADD]);
   });
 
   it('creates app role for the specified appId, app has no roles', async () => {

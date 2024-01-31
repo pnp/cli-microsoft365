@@ -81,7 +81,7 @@ describe(commands.APP_ROLE_REMOVE, () => {
 
   it('defines correct alias', () => {
     const alias = command.alias();
-    assert.deepStrictEqual(alias, [aadCommands.APP_ROLE_REMOVE]);
+    assert.deepStrictEqual(alias, [aadCommands.APP_ROLE_REMOVE, commands.APPREGISTRATION_ROLE_REMOVE]);
   });
 
   it('deletes an app role when the role is in enabled state and valid appObjectId, role claim and --force option specified', async () => {

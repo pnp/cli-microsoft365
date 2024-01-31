@@ -32,7 +32,7 @@ class EntraAppRoleRemoveCommand extends GraphCommand {
   }
 
   public alias(): string[] | undefined {
-    return [aadCommands.APP_ROLE_REMOVE];
+    return [aadCommands.APP_ROLE_REMOVE, commands.APPREGISTRATION_ROLE_REMOVE];
   }
 
   constructor() {

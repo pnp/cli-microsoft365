@@ -15,7 +15,7 @@ class EntraAppListCommand extends GraphCommand {
   }
 
   public alias(): string[] | undefined {
-    return [aadCommands.APP_LIST];
+    return [aadCommands.APP_LIST, commands.APPREGISTRATION_LIST];
   }
 
   public defaultProperties(): string[] | undefined {

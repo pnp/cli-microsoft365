@@ -18,17 +18,17 @@ interface Options extends GlobalOptions {
   objectId?: string;
 }
 
-class EntraSpAddCommand extends GraphCommand {
+class EntraEnterpriseAppAddCommand extends GraphCommand {
   public get name(): string {
-    return commands.SP_ADD;
+    return commands.ENTERPRISEAPP_ADD;
   }
 
   public get description(): string {
-    return 'Adds a service principal to a registered Entra app';
+    return 'Creates an enterprise application (or service principal) for a registered Entra app';
   }
 
   public alias(): string[] | undefined {
-    return [aadCommands.SP_ADD];
+    return [aadCommands.SP_ADD, commands.SP_ADD];
   }
 
   constructor() {
@@ -110,12 +110,12 @@ class EntraSpAddCommand extends GraphCommand {
     const spItem: { appId: string } | undefined = response.value[0];
 
     if (!spItem) {
-      throw `The specified Azure AD app doesn't exist`;
+      throw `The specified Entra app doesn't exist`;
     }
 
     if (response.value.length > 1) {
       const resultAsKeyValuePair = formatting.convertArrayToHashTable('appId', response.value);
-      const result = await cli.handleMultipleResultsFound<{ appId: string }>(`Multiple Azure AD apps with name '${args.options.appName}' found.`, resultAsKeyValuePair);
+      const result = await cli.handleMultipleResultsFound<{ appId: string }>(`Multiple Entra apps with name '${args.options.appName}' found.`, resultAsKeyValuePair);
       return result.appId;
     }
 
@@ -149,4 +149,4 @@ class EntraSpAddCommand extends GraphCommand {
   }
 }
 
-export default new EntraSpAddCommand();
+export default new EntraEnterpriseAppAddCommand();

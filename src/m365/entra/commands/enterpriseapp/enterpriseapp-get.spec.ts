@@ -11,11 +11,11 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './sp-get.js';
+import command from './enterpriseapp-get.js';
 import { settingsNames } from '../../../../settingsNames.js';
 import aadCommands from '../../aadCommands.js';
 
-describe(commands.SP_GET, () => {
+describe(commands.ENTERPRISEAPP_GET, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -76,7 +76,7 @@ describe(commands.SP_GET, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name, commands.SP_GET);
+    assert.strictEqual(command.name, commands.ENTERPRISEAPP_GET);
   });
 
   it('has a description', () => {
@@ -90,10 +90,10 @@ describe(commands.SP_GET, () => {
 
   it('defines correct alias', () => {
     const alias = command.alias();
-    assert.deepStrictEqual(alias, [aadCommands.SP_GET]);
+    assert.deepStrictEqual(alias, [aadCommands.SP_GET, commands.SP_GET]);
   });
 
-  it('retrieves information about the specified service principal using its display name', async () => {
+  it('retrieves information about the specified enterprise application using its display name', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/v1.0/servicePrincipals?$filter=displayName eq `) > -1) {
         return spAppInfo;
@@ -110,7 +110,7 @@ describe(commands.SP_GET, () => {
     assert(loggerLogSpy.calledWith(spAppInfo));
   });
 
-  it('retrieves information about the specified service principal using its appId', async () => {
+  it('retrieves information about the specified enterprise application using its appId', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/v1.0/servicePrincipals?$filter=appId eq `) > -1) {
         return spAppInfo;
@@ -127,7 +127,7 @@ describe(commands.SP_GET, () => {
     assert(loggerLogSpy.calledWith(spAppInfo));
   });
 
-  it('retrieves information about the specified service principal using its appObjectId', async () => {
+  it('retrieves information about the specified enterprise application using its appObjectId', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/v1.0/servicePrincipals?$filter=objectId eq `) > -1) {
         return spAppInfo;
@@ -160,7 +160,7 @@ describe(commands.SP_GET, () => {
       new CommandError('An error has occurred'));
   });
 
-  it('fails when Azure AD app with same name exists', async () => {
+  it('fails when Entra app with same name exists', async () => {
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
       if (settingName === settingsNames.prompt) {
         return false;
@@ -208,10 +208,10 @@ describe(commands.SP_GET, () => {
         debug: true,
         appDisplayName: 'foo'
       }
-    }), new CommandError("Multiple Azure AD apps with name 'foo' found. Found: be559819-b036-470f-858b-281c4e808403, 93d75ef9-ba9b-4361-9a47-1f6f7478f05f."));
+    }), new CommandError("Multiple Entra apps with name 'foo' found. Found: be559819-b036-470f-858b-281c4e808403, 93d75ef9-ba9b-4361-9a47-1f6f7478f05f."));
   });
 
-  it('handles selecting single result when multiple Azure AD apps with the specified name found and cli is set to prompt', async () => {
+  it('handles selecting single result when multiple Entra apps with the specified name found and cli is set to prompt', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/servicePrincipals?$filter=displayName eq 'foo'`) {
         return {
@@ -256,7 +256,7 @@ describe(commands.SP_GET, () => {
     assert(loggerLogSpy.calledWith(spAppInfo));
   });
 
-  it('fails when the specified Azure AD app does not exist', async () => {
+  it('fails when the specified Entra app does not exist', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/v1.0/servicePrincipals?$filter=displayName eq `) > -1) {
         return {
@@ -273,7 +273,7 @@ describe(commands.SP_GET, () => {
         debug: true,
         appDisplayName: 'Test App'
       }
-    }), new CommandError(`The specified Azure AD app does not exist`));
+    }), new CommandError(`The specified Entra app does not exist`));
   });
 
   it('fails validation if neither the appId nor the appDisplayName option specified', async () => {

@@ -285,6 +285,25 @@ const sidebars: SidebarsConfig = {
           ]
         },
         {
+          enterpriseapp: [
+            {
+              type: 'doc',
+              label: 'enterpriseapp add',
+              id: 'cmd/entra/enterpriseapp/enterpriseapp-add'
+            },
+            {
+              type: 'doc',
+              label: 'enterpriseapp get',
+              id: 'cmd/entra/enterpriseapp/enterpriseapp-get'
+            },
+            {
+              type: 'doc',
+              label: 'enterpriseapp list',
+              id: 'cmd/entra/enterpriseapp/enterpriseapp-list'
+            }
+          ]
+        },
+        {
           group: [
             {
               type: 'doc',
@@ -538,25 +557,6 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'siteclassification set',
               id: 'cmd/entra/siteclassification/siteclassification-set'
-            }
-          ]
-        },
-        {
-          'service principal (sp)': [
-            {
-              type: 'doc',
-              label: 'sp add',
-              id: 'cmd/entra/sp/sp-add'
-            },
-            {
-              type: 'doc',
-              label: 'sp get',
-              id: 'cmd/entra/sp/sp-get'
-            },
-            {
-              type: 'doc',
-              label: 'sp list',
-              id: 'cmd/entra/sp/sp-list'
             }
           ]
         },

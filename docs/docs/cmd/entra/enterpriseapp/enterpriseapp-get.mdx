@@ -2,33 +2,34 @@ import Global from '/docs/cmd/_global.mdx';
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-# entra sp get
+# entra enterpriseapp get
 
-Gets information about the specific service principal
+Gets information about an enterprise application (or service principal)
 
 ## Usage
 
 ```sh
-m365 entra sp get [options]
+m365 entra enterpriseapp get [options]
 ```
 
 ## Alias
 
 ```sh
 m365 aad sp get [options]
+m365 entra sp get [options]
 ```
 
 ## Options
 
 ```md definition-list
 `-i, --appId [appId]`
-: ID of the application for which the service principal should be retrieved
+: ID of the application for which the enterprise application should be retrieved
 
 `-n, --appDisplayName [appDisplayName]`
-: Display name of the application for which the service principal should be retrieved
+: Display name of the application for which the enterprise application should be retrieved
 
 `--appObjectId [appObjectId]`
-: ObjectId of the application for which the service principal should be retrieved
+: ObjectId of the application for which the enterprise application should be retrieved
 ```
 
 <Global />
@@ -39,22 +40,22 @@ Specify either the `appId`, `appObjectId` or `appDisplayName`. If you specify mo
 
 ## Examples
 
-Return details about the service principal with appId _b2307a39-e878-458b-bc90-03bc578531d6_.
+Return details about the enterprise application with appId _b2307a39-e878-458b-bc90-03bc578531d6_.
 
 ```sh
-m365 entra sp get --appId b2307a39-e878-458b-bc90-03bc578531d6
+m365 entra enterpriseapp get --appId b2307a39-e878-458b-bc90-03bc578531d6
 ```
 
-Return details about the _Microsoft Graph_ service principal.
+Return details about the _Microsoft Graph_ enterprise application.
 
 ```sh
-m365 entra sp get --appDisplayName "Microsoft Graph"
+m365 entra enterpriseapp get --appDisplayName "Microsoft Graph"
 ```
 
-Return details about the service principal with ObjectId _b2307a39-e878-458b-bc90-03bc578531dd_.
+Return details about the enterprise application with ObjectId _b2307a39-e878-458b-bc90-03bc578531dd_.
 
 ```sh
-m365 entra sp get --appObjectId b2307a39-e878-458b-bc90-03bc578531dd
+m365 entra enterpriseapp get --appObjectId b2307a39-e878-458b-bc90-03bc578531dd
 ```
 
 ## Response
@@ -197,7 +198,7 @@ m365 entra sp get --appObjectId b2307a39-e878-458b-bc90-03bc578531dd
   <TabItem value="Markdown">
 
   ```md
-  # entra sp get --appId "ac7c9b4b-83b0-4a5e-ace2-a3530162c8f8"
+  # entra enterpriseapp get --appId "ac7c9b4b-83b0-4a5e-ace2-a3530162c8f8"
 
   Date: 2023-06-02
 
@@ -223,5 +224,5 @@ m365 entra sp get --appObjectId b2307a39-e878-458b-bc90-03bc578531dd
 
 ## More information
 
-- Application and service principal objects in Entra ID (Azure AD): [https://learn.microsoft.com/azure/active-directory/develop/active-directory-application-objects](https://learn.microsoft.com/azure/active-directory/develop/active-directory-application-objects)
+- Application and enterprise application objects in Entra ID (Azure AD): [https://learn.microsoft.com/azure/active-directory/develop/active-directory-application-objects](https://learn.microsoft.com/azure/active-directory/develop/active-directory-application-objects)
 - Get servicePrincipal: [https://learn.microsoft.com/graph/api/serviceprincipal-get?view=graph-rest-1.0](https://learn.microsoft.com/graph/api/serviceprincipal-get?view=graph-rest-1.0)

@@ -8,15 +8,15 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './sp-list.js';
+import command from './enterpriseapp-list.js';
 import aadCommands from '../../aadCommands.js';
 
-describe(commands.SP_LIST, () => {
+describe(commands.ENTERPRISEAPP_LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
 
-  const displayName = "My custom service principal";
+  const displayName = "My custom enterprise application";
   const tag = "WindowsAzureActiveDirectoryIntegratedApp";
   const servicePrincipalResponse: any = {
     value: [
@@ -25,7 +25,7 @@ describe(commands.SP_LIST, () => {
         deletedDateTime: null,
         accountEnabled: true,
         alternativeNames: [],
-        appDisplayName: "My custom service principal",
+        appDisplayName: "My custom enterprise application",
         appDescription: null,
         appId: "a62ef842-f9ef-49cf-9119-31b85ea58445",
         applicationTemplateId: null,
@@ -34,7 +34,7 @@ describe(commands.SP_LIST, () => {
         createdDateTime: "2022-11-28T20:32:11Z",
         description: null,
         disabledByMicrosoftStatus: null,
-        displayName: "My custom service principal",
+        displayName: "My custom enterprise application",
         homepage: null,
         loginUrl: null,
         logoutUrl: null,
@@ -71,13 +71,13 @@ describe(commands.SP_LIST, () => {
         keyCredentials: [],
         oauth2PermissionScopes: [
           {
-            adminConsentDescription: "Allow the application to access My custom service principal on behalf of the signed -in user.",
-            adminConsentDisplayName: "Access My custom service principal",
+            adminConsentDescription: "Allow the application to access My custom enterprise application on behalf of the signed -in user.",
+            adminConsentDisplayName: "Access My custom enterprise application",
             id: "907a8cea-411a-461a-bb30-261e52febcca",
             isEnabled: true,
             type: "User",
-            userConsentDescription: "Allow the application to access My custom service principal on your behalf.",
-            userConsentDisplayName: "Access My custom service principal",
+            userConsentDescription: "Allow the application to access My custom enterprise application on your behalf.",
+            userConsentDisplayName: "Access My custom enterprise application",
             value: "user_impersonation"
           }
         ],
@@ -128,7 +128,7 @@ describe(commands.SP_LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name, commands.SP_LIST);
+    assert.strictEqual(command.name, commands.ENTERPRISEAPP_LIST);
   });
 
   it('has a description', () => {
@@ -142,14 +142,14 @@ describe(commands.SP_LIST, () => {
 
   it('defines correct alias', () => {
     const alias = command.alias();
-    assert.deepStrictEqual(alias, [aadCommands.SP_LIST]);
+    assert.deepStrictEqual(alias, [aadCommands.SP_LIST, commands.SP_LIST]);
   });
 
   it('defines correct properties for the default output', () => {
     assert.deepStrictEqual(command.defaultProperties(), ['appId', 'displayName', 'tag']);
   });
 
-  it('list all service principals', async () => {
+  it('list all enterprise applications', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/servicePrincipals`) {
         return servicePrincipalResponse;
@@ -162,7 +162,7 @@ describe(commands.SP_LIST, () => {
     assert(loggerLogSpy.calledWith(servicePrincipalResponse.value));
   });
 
-  it('list all service principals with the given display name', async () => {
+  it('list all enterprise applications with the given display name', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/servicePrincipals?$filter=(displayName eq '${displayName}')`) {
         return servicePrincipalResponse;
@@ -175,7 +175,7 @@ describe(commands.SP_LIST, () => {
     assert(loggerLogSpy.calledWith(servicePrincipalResponse.value));
   });
 
-  it('list all service principals with the given tag', async () => {
+  it('list all enterprise applications with the given tag', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/servicePrincipals?$filter=(tags/any(t:t eq 'WindowsAzureActiveDirectoryIntegratedApp'))`) {
         return servicePrincipalResponse;
@@ -192,7 +192,7 @@ describe(commands.SP_LIST, () => {
     const error = {
       'odata.error': {
         message: {
-          value: "The service principals could not be retrieved"
+          value: "The enterprise applications could not be retrieved"
         }
       }
     };

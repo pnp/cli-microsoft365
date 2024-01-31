@@ -67,7 +67,7 @@ describe(commands.APP_LIST, () => {
 
   it('defines correct alias', () => {
     const alias = command.alias();
-    assert.deepStrictEqual(alias, [aadCommands.APP_LIST]);
+    assert.deepStrictEqual(alias, [aadCommands.APP_LIST, commands.APPREGISTRATION_LIST]);
   });
 
   it('defines correct properties for the default output', () => {

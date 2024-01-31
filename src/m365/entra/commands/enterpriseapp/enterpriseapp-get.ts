@@ -18,17 +18,17 @@ interface Options extends GlobalOptions {
   appObjectId?: string;
 }
 
-class EntraSpGetCommand extends GraphCommand {
+class EntraEnterpriseAppGetCommand extends GraphCommand {
   public get name(): string {
-    return commands.SP_GET;
+    return commands.ENTERPRISEAPP_GET;
   }
 
   public get description(): string {
-    return 'Gets information about the specific service principal';
+    return 'Gets information about an Enterprise Application';
   }
 
   public alias(): string[] | undefined {
-    return [aadCommands.SP_GET];
+    return [aadCommands.SP_GET, commands.SP_GET];
   }
 
   constructor() {
@@ -110,12 +110,12 @@ class EntraSpGetCommand extends GraphCommand {
     const spItem: { id: string } | undefined = response.value[0];
 
     if (!spItem) {
-      throw `The specified Azure AD app does not exist`;
+      throw `The specified Entra app does not exist`;
     }
 
     if (response.value.length > 1) {
       const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', response.value);
-      const result = await cli.handleMultipleResultsFound<{ id: string }>(`Multiple Azure AD apps with name '${args.options.appDisplayName}' found.`, resultAsKeyValuePair);
+      const result = await cli.handleMultipleResultsFound<{ id: string }>(`Multiple Entra apps with name '${args.options.appDisplayName}' found.`, resultAsKeyValuePair);
       return result.id;
     }
 
@@ -124,7 +124,7 @@ class EntraSpGetCommand extends GraphCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      await logger.logToStderr(`Retrieving service principal information...`);
+      await logger.logToStderr(`Retrieving enterprise application information...`);
     }
 
     try {
@@ -148,4 +148,4 @@ class EntraSpGetCommand extends GraphCommand {
   }
 }
 
-export default new EntraSpGetCommand();
+export default new EntraEnterpriseAppGetCommand();

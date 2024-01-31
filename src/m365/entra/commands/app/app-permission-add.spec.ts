@@ -90,7 +90,7 @@ describe(commands.APP_PERMISSION_ADD, () => {
 
   it('defines correct alias', () => {
     const alias = command.alias();
-    assert.deepStrictEqual(alias, [aadCommands.APP_PERMISSION_ADD]);
+    assert.deepStrictEqual(alias, [aadCommands.APP_PERMISSION_ADD, commands.APPREGISTRATION_PERMISSION_ADD]);
   });
 
   it('adds application permissions to app specified by appObjectId without granting admin consent', async () => {

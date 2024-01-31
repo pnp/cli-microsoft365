@@ -29,7 +29,7 @@ class EntraAppRoleListCommand extends GraphCommand {
   }
 
   public alias(): string[] | undefined {
-    return [aadCommands.APP_ROLE_LIST];
+    return [aadCommands.APP_ROLE_LIST, commands.APPREGISTRATION_ROLE_LIST];
   }
 
   constructor() {

@@ -14,9 +14,9 @@ interface Options extends GlobalOptions {
   tag?: string;
 }
 
-class EntraSpListCommand extends GraphCommand {
+class EntraEnterpriseAppListCommand extends GraphCommand {
   public get name(): string {
-    return commands.SP_LIST;
+    return commands.ENTERPRISEAPP_LIST;
   }
 
   public defaultProperties(): string[] | undefined {
@@ -24,11 +24,11 @@ class EntraSpListCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'Lists the service principals in the directory';
+    return 'Lists the enterprise applications (or service principals) in Entra ID';
   }
 
   public alias(): string[] | undefined {
-    return [aadCommands.SP_LIST];
+    return [aadCommands.SP_LIST, commands.SP_LIST];
   }
 
   constructor() {
@@ -60,7 +60,7 @@ class EntraSpListCommand extends GraphCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      await logger.logToStderr(`Retrieving service principal information...`);
+      await logger.logToStderr(`Retrieving enterprise application information...`);
     }
 
     try {
@@ -88,4 +88,4 @@ class EntraSpListCommand extends GraphCommand {
   }
 }
 
-export default new EntraSpListCommand();
+export default new EntraEnterpriseAppListCommand();

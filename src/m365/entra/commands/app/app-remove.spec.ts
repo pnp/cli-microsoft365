@@ -107,7 +107,7 @@ describe(commands.APP_REMOVE, () => {
 
   it('defines correct alias', () => {
     const alias = command.alias();
-    assert.deepStrictEqual(alias, [aadCommands.APP_REMOVE]);
+    assert.deepStrictEqual(alias, [aadCommands.APP_REMOVE, commands.APPREGISTRATION_REMOVE]);
   });
 
   it('fails validation if appId and name specified', async () => {

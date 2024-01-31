@@ -7,11 +7,11 @@ The v5 of CLI for Microsoft 365 introduces several breaking changes. To help you
 In CLI for Microsoft 365 we have commands that allow you to manage Entra apps. Some of these commands were using the Entra Graph API, which has been [deprecated](https://docs.microsoft.com/graph/migrate-azure-ad-graph-faq#how-is-microsoft-graph-different-from-azure-ad-graph-and-why-should-i-migrate-my-apps) since June 30, 2020 and which will be retired on June 30, 2022. To guarantee that the CLI for Microsoft 365 will keep working, we migrated the affected commands to use the Microsoft Graph. Here's the list of the affected commands:
 
 - [entra oauth2grant list](./cmd/entra/oauth2grant/oauth2grant-list.mdx)
-- [entra sp get](./cmd/entra/sp/sp-get.mdx)
+- [entra enterpriseapp get](./cmd/entra/enterpriseapp/enterpriseapp-get.mdx)
 
 ### What action do I need to take?
 
-While the options of the commands haven't changed, the data returned by the command might be different. If you use either command in a script, please verify that the script is working as intended. Here are the differences in the data returned by the [entra oauth2grant list](https://docs.microsoft.com/graph/migrate-azure-ad-graph-property-differences#oauth2permissionsgrant-property-differences) and [entra sp get](https://docs.microsoft.com/graph/migrate-azure-ad-graph-property-differences#serviceprincipal-property-differences) commands.
+While the options of the commands haven't changed, the data returned by the command might be different. If you use either command in a script, please verify that the script is working as intended. Here are the differences in the data returned by the [entra oauth2grant list](https://docs.microsoft.com/graph/migrate-azure-ad-graph-property-differences#oauth2permissionsgrant-property-differences) and [entra enterpriseapp get](https://docs.microsoft.com/graph/migrate-azure-ad-graph-property-differences#serviceprincipal-property-differences) commands.
 
 ## In `entra oauth2grant list` renamed `clientId` to `spObjectId`
 

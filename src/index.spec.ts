@@ -37,6 +37,7 @@ describe('Lazy loading commands', () => {
       adaptiveCardCommands.default,
       appCommands.default,
       bookingCommands.default,
+      entraCommands.default,
       cliCommands.default,
       entraCommands.default,
       fileCommands.default,
@@ -60,6 +61,18 @@ describe('Lazy loading commands', () => {
       utilCommands.default
     ];
     const aliases: string[] = [
+      'entra sp add',
+      'entra sp get',
+      'entra sp list',
+      'entra appregistration add',
+      'entra appregistration get',
+      'entra appregistration list',
+      'entra appregistration remove',
+      'entra appregistration set',
+      'entra appregistration permission add',
+      'entra appregistration role add',
+      'entra appregistration role list',
+      'entra appregistration role remove',
       'consent',
       'flow connector export',
       'flow connector list',
