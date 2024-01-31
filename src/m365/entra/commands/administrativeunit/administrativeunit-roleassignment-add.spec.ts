@@ -17,6 +17,7 @@ import { roleAssignment } from '../../../../utils/roleAssignment.js';
 import { roleDefinition } from '../../../../utils/roleDefinition.js';
 import { settingsNames } from '../../../../settingsNames.js';
 import request from '../../../../request.js';
+import aadCommands from '../../aadCommands.js';
 
 describe(commands.ADMINISTRATIVEUNIT_ROLEASSIGNMENT_ADD, () => {
   const roleDefinitionId = 'fe930be7-5e62-47db-91af-98c3a49a38b1';
@@ -84,6 +85,16 @@ describe(commands.ADMINISTRATIVEUNIT_ROLEASSIGNMENT_ADD, () => {
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
+  });
+
+  it('defines alias', () => {
+    const alias = command.alias();
+    assert.notStrictEqual(typeof alias, 'undefined');
+  });
+
+  it('defines correct alias', () => {
+    const alias = command.alias();
+    assert.deepStrictEqual(alias, [aadCommands.ADMINISTRATIVEUNIT_ROLEASSIGNMENT_ADD]);
   });
 
   it('passes validation if administrative unit id, role definition id and user id are passed', async () => {

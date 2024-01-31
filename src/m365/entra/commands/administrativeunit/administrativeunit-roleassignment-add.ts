@@ -6,6 +6,7 @@ import { roleAssignment } from '../../../../utils/roleAssignment.js';
 import { roleDefinition } from '../../../../utils/roleDefinition.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
+import aadCommands from '../../aadCommands.js';
 import commands from '../../commands.js';
 
 interface CommandArgs {
@@ -28,6 +29,10 @@ class EntraAdministrativeUnitRoleAssignmentAddCommand extends GraphCommand {
 
   public get description(): string {
     return 'Assigns a Microsoft Entra role with administrative unit scope to a user';
+  }
+
+  public alias(): string[] | undefined {
+    return [aadCommands.ADMINISTRATIVEUNIT_ROLEASSIGNMENT_ADD];
   }
 
   constructor() {
