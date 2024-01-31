@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/powershell:alpine-3.17
+FROM waldekm/powershell:alpine-3.18
 
 LABEL name="CLI for Microsoft 365 Development" \
   description="Development container for contributing to CLI for Microsoft 365" \
@@ -22,7 +22,7 @@ RUN apk add --no-cache \
   shadow \
   zsh \
   jq \
-  nodejs \
+  nodejs-current \
   npm
 
 RUN useradd \
