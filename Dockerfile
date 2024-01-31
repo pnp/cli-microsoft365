@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/powershell:alpine-3.17
+FROM waldekm/powershell:alpine-3.18
 
 ARG CLI_VERSION=latest
 
@@ -21,7 +21,7 @@ RUN apk add --no-cache \
   bash \
   shadow \
   bash-completion \
-  nodejs \
+  nodejs-current \
   npm \
   python3 \
   py3-pip
