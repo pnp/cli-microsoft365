@@ -14,15 +14,15 @@ jobs:
         node: [20]
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Use Node.js ${{ matrix.node }}
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node }}
           registry-url: 'https://registry.npmjs.org'
       - name: Cache node modules
         id: cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             **/node_modules
@@ -39,7 +39,7 @@ jobs:
         if: matrix.os == 'windows-latest'
         run: 7z a -ttar -xr!node_modules -r build.tar .
       - name: Upload build artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: build-${{ matrix.os }}-${{ matrix.node }}
           path: build.tar
@@ -62,12 +62,11 @@ jobs:
     steps:
       - name: Configure pagefile
         if: matrix.os == 'windows-latest'
-        uses: al-cheb/configure-pagefile-action@v1.3
+        uses: al-cheb/configure-pagefile-action@v1.4
         with:
           minimum-size: 16GB
-          maximum-size: 16GB
           disk-root: "C:"
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: build-${{ matrix.os }}-${{ matrix.nodeBuild }}
       - name: Unpack build artifact (non-Windows)
@@ -77,13 +76,13 @@ jobs:
         if: matrix.os == 'windows-latest'
         run: 7z x build.tar && del build.tar
       - name: Use Node.js ${{ matrix.nodeRun }}
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.nodeRun }}
           registry-url: 'https://registry.npmjs.org'
       - name: Cache node modules
         id: cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             **/node_modules
@@ -105,7 +104,7 @@ jobs:
       - name: Compress output (Windows)
         if: matrix.nodeRun == matrix.nodeBuild && matrix.os == 'windows-latest' && always()
         run: 7z a -ttar -r coverage.tar coverage
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         if: matrix.nodeRun == matrix.nodeBuild && always()
         with:
           name: coverage-${{ matrix.os }}-${{ matrix.nodeRun }}
@@ -115,17 +114,17 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           # Number of commits to fetch. 0 indicates all history for all branches and tags. Default: 1
           fetch-depth: 0
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
           node-version: 20
 
       - name: Cache node modules
         id: cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             **/docs/node_modules
@@ -153,19 +152,19 @@ jobs:
       id-token: write
 
     steps:
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: build-ubuntu-latest-20
       - name: Unpack build artifact
         run: tar -xvf build.tar && rm build.tar
       - name: Use Node.js 20
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: 20
           registry-url: 'https://registry.npmjs.org'
       - name: Cache node modules
         id: cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             **/node_modules
@@ -182,10 +181,11 @@ jobs:
       - name: Compress output
         run: tar -cvf build.tar --exclude node_modules ./
       - name: Upload build artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: build-ubuntu-latest-20
           path: build.tar
+          overwrite: true
   deploy_docs:
     if: github.repository_owner == 'pnp'
     needs: publish_next
@@ -209,13 +209,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: build-ubuntu-latest-20
       - name: Unpack build artifact
         run: tar -xvf build.tar && rm build.tar
       - name: Use Node.js 20
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: 20
           registry-url: 'https://registry.npmjs.org'
@@ -235,14 +235,14 @@ jobs:
       - name: Wait for npm publish
         run: node scripts/wait-npm-publish.js next ${{ steps.package_version.outputs.version }}
       - name: Build and push ${{ steps.package_version.outputs.version }}
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v5
         with:
           push: true
           tags: m365pnp/cli-microsoft365:${{ steps.package_version.outputs.version }}
           build-args: |
             CLI_VERSION=${{ steps.package_version.outputs.version }}
       - name: Build and push next
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v5
         with:
           push: true
           tags: m365pnp/cli-microsoft365:next
