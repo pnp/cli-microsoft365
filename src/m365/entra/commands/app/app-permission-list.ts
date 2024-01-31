@@ -79,7 +79,7 @@ class EntraAppPermissionListCommand extends GraphCommand {
           return `${args.options.appObjectId} is not a valid GUID`;
         }
 
-        if (args.options.type && this.allowedTypes.map(x => x.toLowerCase()).indexOf(args.options.type.toLowerCase()) === -1) {
+        if (args.options.type && this.allowedTypes.indexOf(args.options.type.toLowerCase()) === -1) {
           return `${args.options.type} is not a valid type. Allowed types are ${this.allowedTypes.join(', ')}`;
         }
 
@@ -136,24 +136,24 @@ class EntraAppPermissionListCommand extends GraphCommand {
     };
 
     const application = await request.get<Application>(requestOptions);
+    const requiredResourceAccess = application.requiredResourceAccess as RequiredResourceAccess[];
 
-    if ((application.requiredResourceAccess as RequiredResourceAccess[]).length === 0) {
+    if (requiredResourceAccess.length === 0) {
       return [];
     }
 
     const servicePrincipalsToResolve: ServicePrincipalInfo[] =
-      (application.requiredResourceAccess as RequiredResourceAccess[])
-        .map(resourceAccess => {
-          return {
-            appId: resourceAccess.resourceAppId as string
-          };
-        });
+      requiredResourceAccess.map(resourceAccess => {
+        return {
+          appId: resourceAccess.resourceAppId as string
+        };
+      });
     const servicePrincipals = await Promise
       .all(servicePrincipalsToResolve.map(servicePrincipalInfo =>
         this.getServicePrincipal(servicePrincipalInfo, permissionType, logger) as ServicePrincipal));
 
     const apiPermissions: ApiPermission[] = [];
-    (application.requiredResourceAccess as RequiredResourceAccess[]).forEach(requiredResourceAccess => {
+    requiredResourceAccess.forEach(requiredResourceAccess => {
       const servicePrincipal = servicePrincipals
         .find(servicePrincipal => servicePrincipal?.appId === requiredResourceAccess.resourceAppId as string);
       const resourceName = servicePrincipal?.displayName as string ?? requiredResourceAccess.resourceAppId as string;
@@ -178,21 +178,18 @@ class EntraAppPermissionListCommand extends GraphCommand {
       return permissionId;
     }
 
-    switch (permissionType) {
-      case 'Role':
-        return (servicePrincipal.appRoles as AppRole[])
-          .find(appRole => appRole.id === permissionId)?.value as string ?? permissionId;
-      case 'Scope':
-        return (servicePrincipal.oauth2PermissionScopes as PermissionScope[])
-          .find(permissionScope => permissionScope.id === permissionId)?.value as string ?? permissionId;
+    if (permissionType === 'Role') {
+      return (servicePrincipal.appRoles as AppRole[])
+        .find(appRole => appRole.id === permissionId)?.value as string ?? permissionId;
     }
-    /* c8 ignore next 4 */
-    // permissionType is either 'Scope' or 'Role' but we need a safe default
-    // to avoid building errors. This code will never be reached.
-    return permissionId;
+    else {
+      // permissionType === 'Scope'
+      return (servicePrincipal.oauth2PermissionScopes as PermissionScope[])
+        .find(permissionScope => permissionScope.id === permissionId)?.value as string ?? permissionId;
+    }
   }
 
-  private async getServicePrincipal(servicePrincipalInfo: ServicePrincipalInfo, permissionType: string, logger: Logger): Promise<ServicePrincipal | undefined> {
+  private async getServicePrincipal(servicePrincipalInfo: ServicePrincipalInfo, permissionType: string, logger: Logger): Promise<ServicePrincipal | null> {
     if (this.verbose) {
       await logger.logToStderr(`Retrieving service principal ${servicePrincipalInfo.appId}`);
     }
@@ -207,9 +204,8 @@ class EntraAppPermissionListCommand extends GraphCommand {
 
     const response = await request.get<{ value: ServicePrincipal[] } | ServicePrincipal>(requestOptions);
 
-    if ((servicePrincipalInfo.id) ||
-      (servicePrincipalInfo.appId && (response as { value: ServicePrincipal[] }).value.length === 0)) {
-      return undefined;
+    if (servicePrincipalInfo.appId && (response as { value: ServicePrincipal[] }).value.length === 0) {
+      return null;
     }
 
     const servicePrincipal = (response as { value: ServicePrincipal[] }).value[0];
@@ -225,6 +221,7 @@ class EntraAppPermissionListCommand extends GraphCommand {
       },
       responseType: 'json'
     };
+
     const appRolesRequestOptions: CliRequestOptions = {
       url: `${this.resource}/v1.0/servicePrincipals/${servicePrincipal.id}/appRoles`,
       headers: {
@@ -234,27 +231,14 @@ class EntraAppPermissionListCommand extends GraphCommand {
     };
 
     let permissions: any;
+    if (permissionType === 'all' || permissionType === 'delegated') {
+      permissions = await request.get<{ value: PermissionScope[] }>(oauth2PermissionScopesRequestOptions);
+      servicePrincipal.oauth2PermissionScopes = permissions.value as PermissionScope[];
+    }
 
-    switch (permissionType) {
-      case 'all':
-        permissions = await Promise.all([
-          request.get<{ value: PermissionScope[] }>(oauth2PermissionScopesRequestOptions),
-          request.get<{ value: AppRole[] }>(appRolesRequestOptions)
-        ]);
-
-        servicePrincipal.oauth2PermissionScopes = permissions[0].value as PermissionScope[];
-        servicePrincipal.appRoles = permissions[1].value as AppRole[];
-        break;
-
-      case 'delegated':
-        permissions = await request.get<{ value: PermissionScope[] }>(oauth2PermissionScopesRequestOptions);
-        servicePrincipal.oauth2PermissionScopes = permissions.value as PermissionScope[];
-        break;
-
-      case 'application':
-        permissions = await request.get<{ value: AppRole[] }>(appRolesRequestOptions);
-        servicePrincipal.appRoles = permissions.value as AppRole[];
-        break;
+    if (permissionType === 'all' || permissionType === 'application') {
+      permissions = await request.get<{ value: AppRole[] }>(appRolesRequestOptions);
+      servicePrincipal.appRoles = permissions.value as AppRole[];
     }
 
     return servicePrincipal;
