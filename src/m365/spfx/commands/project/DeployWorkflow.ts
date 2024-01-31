@@ -15,11 +15,11 @@ export const workflow: gitHubWorkflow = {
       steps: [
         {
           name: "Checkout",
-          uses: "actions/checkout@v3.5.3"
+          uses: "actions/checkout@v4"
         },
         {
           name: "Use Node.js",
-          uses: "actions/setup-node@v3.7.0",
+          uses: "actions/setup-node@v4",
           with: {
             "node-version": "18.x"
           }
