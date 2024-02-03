@@ -38,7 +38,8 @@ export const workflow: gitHubWorkflow = {
           with: {
             "CERTIFICATE_ENCODED": "${{ secrets.CERTIFICATE_ENCODED }}",
             "CERTIFICATE_PASSWORD": "${{ secrets.CERTIFICATE_PASSWORD }}",
-            "APP_ID": "${{ secrets.APP_ID }}"
+            "APP_ID": "${{ secrets.APP_ID }}",
+            "TENANT": "${{ secrets.TENANT_ID }}"
           }
         },
         {
