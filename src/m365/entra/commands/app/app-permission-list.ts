@@ -182,11 +182,10 @@ class EntraAppPermissionListCommand extends GraphCommand {
       return (servicePrincipal.appRoles as AppRole[])
         .find(appRole => appRole.id === permissionId)?.value as string ?? permissionId;
     }
-    else {
-      // permissionType === 'Scope'
-      return (servicePrincipal.oauth2PermissionScopes as PermissionScope[])
-        .find(permissionScope => permissionScope.id === permissionId)?.value as string ?? permissionId;
-    }
+
+    // permissionType === 'Scope'
+    return (servicePrincipal.oauth2PermissionScopes as PermissionScope[])
+      .find(permissionScope => permissionScope.id === permissionId)?.value as string ?? permissionId;
   }
 
   private async getServicePrincipal(servicePrincipalInfo: ServicePrincipalInfo, permissionType: string, logger: Logger): Promise<ServicePrincipal | null> {
@@ -202,13 +201,13 @@ class EntraAppPermissionListCommand extends GraphCommand {
       responseType: 'json'
     };
 
-    const response = await request.get<{ value: ServicePrincipal[] } | ServicePrincipal>(requestOptions);
+    const response = await request.get<{ value: ServicePrincipal[] }>(requestOptions);
 
-    if (servicePrincipalInfo.appId && (response as { value: ServicePrincipal[] }).value.length === 0) {
+    if (servicePrincipalInfo.appId && response.value.length === 0) {
       return null;
     }
 
-    const servicePrincipal = (response as { value: ServicePrincipal[] }).value[0];
+    const servicePrincipal = response.value[0];
 
     if (this.verbose) {
       await logger.logToStderr(`Retrieving permissions for service principal ${servicePrincipal.id}...`);
