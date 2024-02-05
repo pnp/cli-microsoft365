@@ -100,7 +100,7 @@ describe(commands.USER_ENSURE, () => {
   });
 
   it('ensures user for a specific web by entraId', async () => {
-    sinon.stub(aadUser, 'getUpnByUserId').callsFake(async () => {
+    sinon.stub(entraUser, 'getUpnByUserId').callsFake(async () => {
       return validUserName;
     });
 
