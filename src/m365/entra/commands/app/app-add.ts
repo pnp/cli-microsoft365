@@ -254,6 +254,8 @@ class EntraAppAddCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    this.showDeprecationWarning(logger, aadCommands.APP_ADD, commands.APP_ADD);
+
     try {
       const apis = await this.resolveApis(args, logger);
       let appInfo: any = await this.createAppRegistration(args, apis, logger);

@@ -81,6 +81,8 @@ class EntraSiteClassificationSetCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    this.showDeprecationWarning(logger, aadCommands.SITECLASSIFICATION_SET, commands.SITECLASSIFICATION_SET);
+
     try {
       let requestOptions: CliRequestOptions = {
         url: `${this.resource}/v1.0/groupSettings`,

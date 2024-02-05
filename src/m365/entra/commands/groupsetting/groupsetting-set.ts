@@ -60,6 +60,8 @@ class EntraGroupSettingSetCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    this.showDeprecationWarning(logger, aadCommands.GROUPSETTING_SET, commands.GROUPSETTING_SET);
+
     if (this.verbose) {
       await logger.logToStderr(`Retrieving group setting with id '${args.options.id}'...`);
     }

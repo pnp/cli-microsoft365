@@ -83,6 +83,8 @@ class EntraUserGuestAddCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    this.showDeprecationWarning(logger, aadCommands.USER_GUEST_ADD, commands.USER_GUEST_ADD);
+
     try {
       const requestOptions: CliRequestOptions = {
         url: `${this.resource}/v1.0/invitations`,

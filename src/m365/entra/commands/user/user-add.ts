@@ -206,6 +206,8 @@ class EntraUserAddCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    this.showDeprecationWarning(logger, aadCommands.USER_ADD, commands.USER_ADD);
+
     if (this.verbose) {
       await logger.logToStderr(`Adding user to AAD with displayName ${args.options.displayName} and userPrincipalName ${args.options.userName}`);
     }

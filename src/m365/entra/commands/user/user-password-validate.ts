@@ -41,6 +41,8 @@ class EntraUserPasswordValidateCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    this.showDeprecationWarning(logger, aadCommands.USER_PASSWORD_VALIDATE, commands.USER_PASSWORD_VALIDATE);
+
     try {
       const requestOptions: CliRequestOptions = {
         url: `${this.resource}/beta/users/validatePassword`,

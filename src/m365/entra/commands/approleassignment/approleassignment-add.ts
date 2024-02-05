@@ -102,6 +102,8 @@ class EntraAppRoleAssignmentAddCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    this.showDeprecationWarning(logger, aadCommands.APPROLEASSIGNMENT_ADD, commands.APPROLEASSIGNMENT_ADD);
+
     let objectId: string = '';
     let queryFilter: string = '';
     if (args.options.appId) {

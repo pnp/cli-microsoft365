@@ -90,6 +90,8 @@ class EntraGroupRemoveCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    this.showDeprecationWarning(logger, aadCommands.GROUP_REMOVE, commands.GROUP_REMOVE);
+
     const removeGroup = async (): Promise<void> => {
       if (this.verbose) {
         await logger.logToStderr(`Removing group ${args.options.id || args.options.displayName}...`);

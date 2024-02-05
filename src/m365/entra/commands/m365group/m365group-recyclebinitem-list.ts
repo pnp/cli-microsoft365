@@ -61,6 +61,8 @@ class EntraM365GroupRecycleBinItemListCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    this.showDeprecationWarning(logger, aadCommands.M365GROUP_RECYCLEBINITEM_LIST, commands.M365GROUP_RECYCLEBINITEM_LIST);
+
     try {
       const filter: string = `?$filter=groupTypes/any(c:c+eq+'Unified')`;
       const displayNameFilter: string = args.options.groupDisplayName ? ` and startswith(DisplayName,'${formatting.encodeQueryParameter(args.options.groupDisplayName).replace(/'/g, `''`)}')` : '';

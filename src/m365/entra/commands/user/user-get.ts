@@ -97,6 +97,8 @@ class EntraUserGetCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    this.showDeprecationWarning(logger, aadCommands.USER_GET, commands.USER_GET);
+
     try {
       let userIdOrPrincipalName = args.options.id;
 

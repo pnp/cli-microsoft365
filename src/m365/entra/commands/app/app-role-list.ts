@@ -67,6 +67,8 @@ class EntraAppRoleListCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    this.showDeprecationWarning(logger, aadCommands.APP_ROLE_LIST, commands.APP_ROLE_LIST);
+
     try {
       const objectId = await this.getAppObjectId(args, logger);
       const appRoles = await odata.getAllItems<AppRole>(`${this.resource}/v1.0/myorganization/applications/${objectId}/appRoles`);

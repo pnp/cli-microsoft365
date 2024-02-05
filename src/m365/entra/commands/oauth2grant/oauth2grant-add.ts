@@ -67,6 +67,8 @@ class EntraOAuth2GrantAddCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    this.showDeprecationWarning(logger, aadCommands.OAUTH2GRANT_ADD, commands.OAUTH2GRANT_ADD);
+
     if (this.verbose) {
       await logger.logToStderr(`Granting the service principal specified permissions...`);
     }

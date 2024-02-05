@@ -84,6 +84,8 @@ class EntraAppGetCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    this.showDeprecationWarning(logger, aadCommands.APP_GET, commands.APP_GET);
+
     try {
       const appObjectId = await this.getAppObjectId(args);
       const appInfo = await this.getAppInfo(appObjectId);

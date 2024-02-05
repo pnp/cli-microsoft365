@@ -23,6 +23,8 @@ class EntraAdministrativeUnitListCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger): Promise<void> {
+    this.showDeprecationWarning(logger, aadCommands.ADMINISTRATIVEUNIT_LIST, commands.ADMINISTRATIVEUNIT_LIST);
+
     try {
       const results = await odata.getAllItems<AdministrativeUnit>(`${this.resource}/v1.0/directory/administrativeUnits`);
       await logger.log(results);

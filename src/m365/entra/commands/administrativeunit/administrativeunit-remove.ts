@@ -90,6 +90,8 @@ class EntraAdministrativeUnitRemoveCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    this.showDeprecationWarning(logger, aadCommands.ADMINISTRATIVEUNIT_REMOVE, commands.ADMINISTRATIVEUNIT_REMOVE);
+
     const removeAdministrativeUnit = async (): Promise<void> => {
       try {
         let administrativeUnitId = args.options.id;
