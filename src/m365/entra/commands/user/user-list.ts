@@ -54,6 +54,8 @@ class EntraUserListCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    await this.showDeprecationWarning(logger, aadCommands.USER_LIST, commands.USER_LIST);
+
     try {
       let filter: string = '';
       const properties: string[] = args.options.properties ?

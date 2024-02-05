@@ -22,6 +22,8 @@ class EntraLicenseListCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger): Promise<void> {
+    await this.showDeprecationWarning(logger, aadCommands.LICENSE_LIST, commands.LICENSE_LIST);
+
     if (this.verbose) {
       await logger.logToStderr(`Retrieving the commercial subscriptions that an organization has acquired`);
     }

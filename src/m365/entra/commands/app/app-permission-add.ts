@@ -100,6 +100,8 @@ class EntraAppPermissionAddCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    await this.showDeprecationWarning(logger, aadCommands.APP_PERMISSION_ADD, commands.APP_PERMISSION_ADD);
+
     try {
       const appObject = await this.getAppObject(args.options);
       const servicePrincipals = await this.getServicePrincipals();

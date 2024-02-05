@@ -119,6 +119,8 @@ class EntraAppSetCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    await this.showDeprecationWarning(logger, aadCommands.APP_SET, commands.APP_SET);
+
     try {
       let objectId = await this.getAppObjectId(args, logger);
       objectId = await this.configureUri(args, objectId, logger);

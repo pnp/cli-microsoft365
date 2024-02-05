@@ -107,6 +107,8 @@ class EntraM365GroupUserListCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    await this.showDeprecationWarning(logger, aadCommands.M365GROUP_USER_LIST, commands.M365GROUP_USER_LIST);
+
     try {
       if (args.options.role === 'Guest') {
         this.warn(logger, `Value 'Guest' for the option role is deprecated. Use --filter "userType eq 'Guest'" instead.`);

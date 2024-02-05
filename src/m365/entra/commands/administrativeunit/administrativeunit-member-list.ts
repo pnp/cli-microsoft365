@@ -110,6 +110,8 @@ class EntraAdministrativeUnitMemberListCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    await this.showDeprecationWarning(logger, aadCommands.ADMINISTRATIVEUNIT_MEMBER_LIST, commands.ADMINISTRATIVEUNIT_MEMBER_LIST);
+
     let administrativeUnitId = args.options.administrativeUnitId;
 
     try {

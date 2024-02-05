@@ -59,6 +59,8 @@ class EntraAdministrativeUnitAddCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    await this.showDeprecationWarning(logger, aadCommands.ADMINISTRATIVEUNIT_ADD, commands.ADMINISTRATIVEUNIT_ADD);
+
     const requestOptions: CliRequestOptions = {
       url: `${this.resource}/v1.0/directory/administrativeUnits`,
       headers: {

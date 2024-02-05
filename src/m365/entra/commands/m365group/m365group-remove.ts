@@ -82,6 +82,8 @@ class EntraM365GroupRemoveCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    await this.showDeprecationWarning(logger, aadCommands.M365GROUP_REMOVE, commands.M365GROUP_REMOVE);
+
     const removeGroup = async (): Promise<void> => {
       if (this.verbose) {
         await logger.logToStderr(`Removing Microsoft 365 Group: ${args.options.id}...`);

@@ -82,6 +82,8 @@ class EntraM365GroupRecycleBinItemRestoreCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    await this.showDeprecationWarning(logger, aadCommands.M365GROUP_RECYCLEBINITEM_RESTORE, commands.M365GROUP_RECYCLEBINITEM_RESTORE);
+
     if (this.verbose) {
       await logger.logToStderr(`Restoring Microsoft 365 Group: ${args.options.id || args.options.displayName || args.options.mailNickname}...`);
     }

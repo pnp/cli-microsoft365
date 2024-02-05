@@ -73,6 +73,8 @@ class EntraUserHibpCommand extends AnonymousCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    await this.showDeprecationWarning(logger, aadCommands.USER_HIBP, commands.USER_HIBP);
+
     try {
       const requestOptions: CliRequestOptions = {
         url: `https://haveibeenpwned.com/api/v3/breachedaccount/${formatting.encodeQueryParameter(args.options.userName)}${(args.options.domain ? `?domain=${formatting.encodeQueryParameter(args.options.domain)}` : '')}`,
