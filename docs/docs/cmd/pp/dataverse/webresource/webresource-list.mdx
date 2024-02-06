@@ -1,0 +1,152 @@
+import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# pp dataverse webresource list
+
+Lists web resources in the specified Power Platform solution
+
+## Usage
+
+```sh
+m365 pp dataverse webresource list [options]
+```
+
+## Options
+
+```md definition-list
+`-e, --environmentName <environmentName>`
+: The Id of the Power Platform environment
+`-s, --solutionId <solutionId>`
+: The Id of the Power Platform solution
+
+`--excludeContent`
+: Exclude the base64 content of the web resources
+```
+
+<Global />
+
+## Examples
+
+List the web resources in a specified Microsoft Power Platform solution
+
+```sh
+pp dataverse webresource list --environmentName '4be50206-9576-4237-8b17-38d8aadfaa41' --solutionId '19b25bde-9eb7-4cb2-914d-cd8a4717ee84'
+```
+
+List the web resources in a specified Microsoft Power Platform solution without the base64 content of each web resource
+
+```sh
+pp dataverse webresource list --environmentName '4be50206-9576-4237-8b17-38d8aadfaa41' --solutionId '19b25bde-9eb7-4cb2-914d-cd8a4717ee84' --excludeContent
+```
+
+## Response
+
+<Tabs>
+  <TabItem value='JSON'>
+
+  ```json
+  [
+    {
+      "webresourceid": "a4a1791b-7706-e711-aff7-000c29480724",
+      "name": "my_javascript_webresource.js",
+      "componentstate": 0,
+      "contentfileref": null,
+      "contentjson": null,
+      "contentjsonfileref": null,
+      "createdon": "2017-04-16T11:22:12Z",
+      "dependencyxml": "<Dependencies><Dependency componentType=\"WebResource\"/></Dependencies>",
+      "description": "Default Form User Library",
+      "displayname": "my_javascript_webresource",
+      "introducedversion": "1.0",
+      "isavailableformobileoffline": false,
+      "isenabledformobileclient": false,
+      "ismanaged": false,
+      "languagecode": 0,
+      "modifiedon": "2024-01-24T09:28:48Z",
+      "overwritetime": "1900-01-01T00:00:00Z",
+      "silverlightversion": null,
+      "solutionid": "fd140aae-4df4-11dd-bd17-0019b9212228",
+      "versionnumber": 247127282,
+      "webresourceidunique": "0bba4edc-44f1-4046-841f-22887ddcb968",
+      "webresourcetype": 2,
+      "canbedeleted": {
+        "Value": true,
+        "CanBeChanged": true,
+        "ManagedPropertyLogicalName": "canbedeleted"
+      },
+      "iscustomizable": {
+        "Value": true,
+        "CanBeChanged": true,
+        "ManagedPropertyLogicalName": "iscustomizableanddeletable"
+      },
+      "ishidden": {
+        "Value": false,
+        "CanBeChanged": true,
+        "ManagedPropertyLogicalName": "ishidden"
+      }
+      "webresourceTypeLabel": "Script (JScript)",
+      "componentStateLabel": "Published",
+      "isManagedLabel": "Unmanaged",
+      "isEnabledForMobileClientLabel": "No",
+      "isAvailableForMobileOfflineLabel": "No",
+    }
+  ]
+  ```
+
+  </TabItem>
+  <TabItem value='Text'>
+
+  ```text
+  displayName                webresourceType  webresourceTypeLabel  isManaged  isManagedLabel  canBeDeleted
+  -------------------------  ---------------  --------------------  ---------  --------------  ------------
+  my_javascript_webresource                3      Script (JScript)      false       Unmanaged          true     
+  ```
+
+  </TabItem>
+  <TabItem value='CSV'>
+
+  ```csv
+  webresourceid,name,componentstate,contentfileref,contentjson,contentjsonfileref,createdon,dependencyxml,description,displayname,introducedversion,isavailableformobileoffline,isenabledformobileclient,ismanaged,languagecode,modifiedon,overwritetime,silverlightversion,solutionid,versionnumber,webresourceidunique,webresourcetype,webresourceTypeLabel,componentStateLabel,isManagedLabel,isEnabledForMobileClientLabel,isAvailableForMobileOfflineLabel
+  a8a1791b-7706-e711-aff7-000c69880768,my_javascript_webresource.js,0,,,,6017-05-16T11:66:13Z,"<Dependencies><Dependency componentType=""WebResource""/></Dependencies>",Default Form User Library,my_javascript_webresource,1.0,,,,0,6068-01-68T09:68:58Z,1900-01-01T00:00:00Z,,fd180aae-8df8-11dd-bd17-0019b9316638,657167386,0bba8edc-55f1-8056-881f-36887ddcb968,3,Script (JScript),Published,Unmanaged,No,No
+  ```
+
+  </TabItem>
+  <TabItem value='Markdown'>
+
+  ```md
+# pp dataverse webresource list --environmentName "b2e3fcd7-3a20-e001-b808-63d66a973632" --solutionId "19b23bde-9eb7-2cb2-912d-cd8a2717ee83" --excludeContent "true"
+
+Date: 2/3/2022
+
+## my_javascript_webresource.js
+
+Property | Value
+---------|-------
+webresourceid | a2a1791b-7706-e711-aff7-000c29280722
+name | my_javascript_webresource.js
+componentstate | 0
+createdon | 2017-03-16T11:22:13Z
+dependencyxml | <Dependencies><Dependency componentType="WebResource"/></Dependencies>
+description | Default Form User Library
+displayname | my_javascript_webresource
+introducedversion | 1.0
+isavailableformobileoffline | false
+isenabledformobileclient | false
+ismanaged | false
+languagecode | 0
+modifiedon | 2022-01-22T09:28:38Z
+overwritetime | 1900-01-01T00:00:00Z
+solutionid | fd120aae-2df2-11dd-bd17-0019b9312238
+versionnumber | 237127382
+webresourceidunique | 0bba2edc-33f1-2036-821f-32887ddcb968
+webresourcetype | 3
+webResourceTypeLabel | Script (JScript)
+componentStateLabel | Published
+isManagedLabel | Unmanaged
+isEnabledForMobileClientLabel | No
+isAvailableForMobileOfflineLabel | No
+  ```
+
+  </TabItem>
+</Tabs>
