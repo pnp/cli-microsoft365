@@ -16,6 +16,7 @@ import commands from '../../commands.js';
 import { SharingCapabilities } from '../site/SharingCapabilities.js';
 import spoSiteDesignApplyCommand, { Options as SpoSiteDesignApplyCommandOptions } from '../sitedesign/sitedesign-apply.js';
 import { FlowsPolicy } from './FlowsPolicy.js';
+import { setTimeout } from 'timers/promises';
 
 interface CommandArgs {
   options: Options;
@@ -389,19 +390,15 @@ class SpoSiteSetCommand extends SpoCommand {
       return;
     }
 
-    await new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
-      setTimeout(() => {
-        spo.waitUntilFinished({
-          operationId: JSON.stringify(operation._ObjectIdentity_),
-          siteUrl: this.spoAdminUrl as string,
-          resolve,
-          reject,
-          logger,
-          currentContext: this.context as FormDigestInfo,
-          debug: this.debug,
-          verbose: this.verbose
-        });
-      }, operation.PollingInterval);
+    await setTimeout(operation.PollingInterval);
+
+    await spo.waitUntilFinished({
+      operationId: JSON.stringify(operation._ObjectIdentity_),
+      siteUrl: this.spoAdminUrl as string,
+      logger,
+      currentContext: this.context as FormDigestInfo,
+      debug: this.debug,
+      verbose: this.verbose
     });
   }
 
