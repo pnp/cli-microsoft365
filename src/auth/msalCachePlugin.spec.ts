@@ -29,95 +29,42 @@ describe('msalCachePlugin', () => {
     ]);
   });
 
-  it(`restores token cache from the cache storage`, (done) => {
-    sinon.stub((msalCachePlugin as any).fileTokenStorage, 'get').callsFake(() => '');
-    msalCachePlugin
-      .beforeCacheAccess(mockCacheContext)
-      .then(() => {
-        try {
-          assert(mockCacheDeserializeSpy.called);
-          done();
-        }
-        catch (ex) {
-          done(ex);
-        }
-      }, ex => done(ex));
+  it(`restores token cache from the cache storage`, async () => {
+    sinon.stub((msalCachePlugin as any).fileTokenStorage, 'get').returns('');
+    await msalCachePlugin.beforeCacheAccess(mockCacheContext);
+    assert(mockCacheDeserializeSpy.called);
   });
 
-  it(`doesn't fail restoring cache if cache file not found`, (done) => {
-    sinon.stub((msalCachePlugin as any).fileTokenStorage, 'get').callsFake(() => Promise.reject('File not found'));
-    msalCachePlugin
-      .beforeCacheAccess(mockCacheContext)
-      .then(() => {
-        try {
-          assert(mockCacheDeserializeSpy.notCalled);
-          done();
-        }
-        catch (ex) {
-          done(ex);
-        }
-      }, ex => done(ex));
+  it(`doesn't fail restoring cache if cache file not found`, async () => {
+    sinon.stub((msalCachePlugin as any).fileTokenStorage, 'get').rejects('File not found');
+    await msalCachePlugin.beforeCacheAccess(mockCacheContext);
+    assert(mockCacheDeserializeSpy.notCalled);
   });
 
-  it(`doesn't fail restoring cache if an error has occurred`, (done) => {
-    sinon.stub((msalCachePlugin as any).fileTokenStorage, 'get').callsFake(() => Promise.reject('An error has occurred'));
-    msalCachePlugin
-      .beforeCacheAccess(mockCacheContext)
-      .then(() => {
-        try {
-          assert(mockCacheDeserializeSpy.notCalled);
-          done();
-        }
-        catch (ex) {
-          done(ex);
-        }
-      }, ex => done(ex));
+  it(`doesn't fail restoring cache if an error has occurred`, async () => {
+    sinon.stub((msalCachePlugin as any).fileTokenStorage, 'get').rejects('An error has occurred');
+    await msalCachePlugin.beforeCacheAccess(mockCacheContext);
+    assert(mockCacheDeserializeSpy.notCalled);
   });
 
-  it(`persists cache on disk when cache changed`, (done) => {
-    sinon.stub((msalCachePlugin as any).fileTokenStorage, 'set').callsFake(() => Promise.resolve());
+  it(`persists cache on disk when cache changed`, async () => {
+    sinon.stub((msalCachePlugin as any).fileTokenStorage, 'set').resolves();
     mockCacheContext.hasChanged = true;
-    msalCachePlugin
-      .afterCacheAccess(mockCacheContext)
-      .then(() => {
-        try {
-          assert(mockCacheSerializeSpy.called);
-          done();
-        }
-        catch (ex) {
-          done(ex);
-        }
-      }, ex => done(ex));
+
+    await msalCachePlugin.afterCacheAccess(mockCacheContext);
+    assert(mockCacheSerializeSpy.called);
   });
 
-  it(`doesn't persist cache on disk when cache not changed`, (done) => {
-    sinon.stub((msalCachePlugin as any).fileTokenStorage, 'set').callsFake(() => Promise.resolve());
-    msalCachePlugin
-      .afterCacheAccess(mockCacheContext)
-      .then(() => {
-        try {
-          assert(mockCacheSerializeSpy.notCalled);
-          done();
-        }
-        catch (ex) {
-          done(ex);
-        }
-      }, ex => done(ex));
+  it(`doesn't persist cache on disk when cache not changed`, async () => {
+    sinon.stub((msalCachePlugin as any).fileTokenStorage, 'set').resolves();
+    await msalCachePlugin.afterCacheAccess(mockCacheContext);
+    assert(mockCacheSerializeSpy.notCalled);
   });
 
-  it(`doesn't throw exception when persisting cache failed`, (done) => {
-    sinon.stub((msalCachePlugin as any).fileTokenStorage, 'set').callsFake(() => Promise.reject('An error has occurred'));
+  it(`doesn't throw exception when persisting cache failed`, async () => {
+    sinon.stub((msalCachePlugin as any).fileTokenStorage, 'set').rejects('An error has occurred');
     mockCacheContext.hasChanged = true;
-    msalCachePlugin
-      .afterCacheAccess(mockCacheContext)
-      .then(() => {
-        try {
-          assert(mockCacheSerializeSpy.called);
-          done();
-        }
-        catch (ex) {
-          done(ex);
-        }
-      }, ex => done(ex));
+    await msalCachePlugin.afterCacheAccess(mockCacheContext);
+    assert(mockCacheSerializeSpy.called);
   });
 });
