@@ -19,6 +19,7 @@ describe(commands.TENANT_RECYCLEBINITEM_REMOVE, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  //let waitUntilFinishedStub: sinon.SinonStub;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -34,6 +35,8 @@ describe(commands.TENANT_RECYCLEBINITEM_REMOVE, () => {
       FormDigestExpiresAt: new Date(),
       WebFullUrl: 'https://contoso.sharepoint.com'
     });
+    //waitUntilFinishedStub = 
+    sinon.stub(spo, 'waitUntilFinished').resolves();
   });
 
   beforeEach(() => {
@@ -55,8 +58,8 @@ describe(commands.TENANT_RECYCLEBINITEM_REMOVE, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.post,
-      global.setTimeout,
-      cli.promptForConfirmation
+      cli.promptForConfirmation,
+      spo.waitUntilFinished
     ]);
   });
 
@@ -101,7 +104,7 @@ describe(commands.TENANT_RECYCLEBINITEM_REMOVE, () => {
             }, 16, {
               "IsNull": false
             }, 17, {
-              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SpoOperation", "_ObjectIdentity_": "5e0d879f-207a-2000-5eb4-5be71488a82a|908bed80-a04a-4433-b4a0-883d9847d110:1fdd85e0-9a94-4593-8ab0-5ad1b834475f\nSpoOperation\nRemoveDeletedSite\n637392077403920220\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fhr\n67edbe85-2b95-4c7b-a34a-1abbcd68dbe4", "PollingInterval": 15000, "IsComplete": true
+              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SpoOperation", "_ObjectIdentity_": "5e0d879f-207a-2000-5eb4-5be71488a82a|908bed80-a04a-4433-b4a0-883d9847d110:1fdd85e0-9a94-4593-8ab0-5ad1b834475f\nSpoOperation\nRemoveDeletedSite\n637392077403920220\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fhr\n67edbe85-2b95-4c7b-a34a-1abbcd68dbe4", "PollingInterval": 0, "IsComplete": true
             }
           ]);
         }
@@ -131,7 +134,7 @@ describe(commands.TENANT_RECYCLEBINITEM_REMOVE, () => {
             }, 16, {
               "IsNull": false
             }, 17, {
-              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SpoOperation", "_ObjectIdentity_": "5e0d879f-207a-2000-5eb4-5be71488a82a|908bed80-a04a-4433-b4a0-883d9847d110:1fdd85e0-9a94-4593-8ab0-5ad1b834475f\nSpoOperation\nRemoveDeletedSite\n637392077403920220\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fhr\n67edbe85-2b95-4c7b-a34a-1abbcd68dbe4", "PollingInterval": 15000, "IsComplete": true
+              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SpoOperation", "_ObjectIdentity_": "5e0d879f-207a-2000-5eb4-5be71488a82a|908bed80-a04a-4433-b4a0-883d9847d110:1fdd85e0-9a94-4593-8ab0-5ad1b834475f\nSpoOperation\nRemoveDeletedSite\n637392077403920220\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fhr\n67edbe85-2b95-4c7b-a34a-1abbcd68dbe4", "PollingInterval": 0, "IsComplete": true
             }
           ]);
         }
@@ -159,7 +162,7 @@ describe(commands.TENANT_RECYCLEBINITEM_REMOVE, () => {
             }, 16, {
               "IsNull": false
             }, 17, {
-              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SpoOperation", "_ObjectIdentity_": "5e0d879f-207a-2000-5eb4-5be71488a82a|908bed80-a04a-4433-b4a0-883d9847d110:1fdd85e0-9a94-4593-8ab0-5ad1b834475f\nSpoOperation\nRemoveDeletedSite\n637392077403920220\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fhr\n67edbe85-2b95-4c7b-a34a-1abbcd68dbe4", "PollingInterval": 15000, "IsComplete": true
+              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SpoOperation", "_ObjectIdentity_": "5e0d879f-207a-2000-5eb4-5be71488a82a|908bed80-a04a-4433-b4a0-883d9847d110:1fdd85e0-9a94-4593-8ab0-5ad1b834475f\nSpoOperation\nRemoveDeletedSite\n637392077403920220\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fhr\n67edbe85-2b95-4c7b-a34a-1abbcd68dbe4", "PollingInterval": 0, "IsComplete": true
             }
           ]);
         }
@@ -187,7 +190,7 @@ describe(commands.TENANT_RECYCLEBINITEM_REMOVE, () => {
             }, 16, {
               "IsNull": false
             }, 17, {
-              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SpoOperation", "_ObjectIdentity_": "5e0d879f-207a-2000-5eb4-5be71488a82a|908bed80-a04a-4433-b4a0-883d9847d110:1fdd85e0-9a94-4593-8ab0-5ad1b834475f\nSpoOperation\nRemoveDeletedSite\n637392077403920220\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fhr\n67edbe85-2b95-4c7b-a34a-1abbcd68dbe4", "PollingInterval": 15000, "IsComplete": true
+              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SpoOperation", "_ObjectIdentity_": "5e0d879f-207a-2000-5eb4-5be71488a82a|908bed80-a04a-4433-b4a0-883d9847d110:1fdd85e0-9a94-4593-8ab0-5ad1b834475f\nSpoOperation\nRemoveDeletedSite\n637392077403920220\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fhr\n67edbe85-2b95-4c7b-a34a-1abbcd68dbe4", "PollingInterval": 0, "IsComplete": true
             }
           ]);
         }
@@ -215,7 +218,7 @@ describe(commands.TENANT_RECYCLEBINITEM_REMOVE, () => {
             }, 16, {
               "IsNull": false
             }, 17, {
-              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SpoOperation", "_ObjectIdentity_": "5e0d879f-207a-2000-5eb4-5be71488a82a|908bed80-a04a-4433-b4a0-883d9847d110:1fdd85e0-9a94-4593-8ab0-5ad1b834475f\nSpoOperation\nRemoveDeletedSite\n637392077403920220\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fhr\n67edbe85-2b95-4c7b-a34a-1abbcd68dbe4", "IsComplete": false, "PollingInterval": 15000
+              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SpoOperation", "_ObjectIdentity_": "5e0d879f-207a-2000-5eb4-5be71488a82a|908bed80-a04a-4433-b4a0-883d9847d110:1fdd85e0-9a94-4593-8ab0-5ad1b834475f\nSpoOperation\nRemoveDeletedSite\n637392077403920220\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fhr\n67edbe85-2b95-4c7b-a34a-1abbcd68dbe4", "IsComplete": false, "PollingInterval": 0
             }
           ]);
         }
@@ -226,18 +229,13 @@ describe(commands.TENANT_RECYCLEBINITEM_REMOVE, () => {
             {
               "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.20509.12004", "ErrorInfo": null, "TraceCorrelationId": "47ac7b9f-6025-2000-3d94-fb3bb82b6a31"
             }, 39, {
-              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SpoOperation", "_ObjectIdentity_": "47ac7b9f-6025-2000-3d94-fb3bb82b6a31|908bed80-a04a-4433-b4a0-883d9847d110:1fdd85e0-9a94-4593-8ab0-5ad1b834475f\nSpoOperation\nRemoveDeletedSite\n637361531422835228\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fhr\n00000000-0000-0000-0000-000000000000", "IsComplete": true, "PollingInterval": 5000
+              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SpoOperation", "_ObjectIdentity_": "47ac7b9f-6025-2000-3d94-fb3bb82b6a31|908bed80-a04a-4433-b4a0-883d9847d110:1fdd85e0-9a94-4593-8ab0-5ad1b834475f\nSpoOperation\nRemoveDeletedSite\n637361531422835228\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fhr\n00000000-0000-0000-0000-000000000000", "IsComplete": true, "PollingInterval": 0
             }
           ]);
         }
       }
 
       throw 'Invalid request';
-    });
-
-    sinon.stub(global, 'setTimeout').callsFake((fn) => {
-      fn();
-      return {} as any;
     });
 
     await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/hr', force: true, wait: true } });
@@ -259,7 +257,7 @@ describe(commands.TENANT_RECYCLEBINITEM_REMOVE, () => {
             }, 16, {
               "IsNull": false
             }, 17, {
-              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SpoOperation", "_ObjectIdentity_": "5e0d879f-207a-2000-5eb4-5be71488a82a|908bed80-a04a-4433-b4a0-883d9847d110:1fdd85e0-9a94-4593-8ab0-5ad1b834475f\nSpoOperation\nRemoveDeletedSite\n637392077403920220\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fhr\n67edbe85-2b95-4c7b-a34a-1abbcd68dbe4", "IsComplete": false, "PollingInterval": 15000
+              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SpoOperation", "_ObjectIdentity_": "5e0d879f-207a-2000-5eb4-5be71488a82a|908bed80-a04a-4433-b4a0-883d9847d110:1fdd85e0-9a94-4593-8ab0-5ad1b834475f\nSpoOperation\nRemoveDeletedSite\n637392077403920220\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fhr\n67edbe85-2b95-4c7b-a34a-1abbcd68dbe4", "IsComplete": false, "PollingInterval": 0
             }
           ]);
         }
@@ -270,18 +268,13 @@ describe(commands.TENANT_RECYCLEBINITEM_REMOVE, () => {
             {
               "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.20509.12004", "ErrorInfo": null, "TraceCorrelationId": "47ac7b9f-6025-2000-3d94-fb3bb82b6a31"
             }, 39, {
-              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SpoOperation", "_ObjectIdentity_": "47ac7b9f-6025-2000-3d94-fb3bb82b6a31|908bed80-a04a-4433-b4a0-883d9847d110:1fdd85e0-9a94-4593-8ab0-5ad1b834475f\nSpoOperation\nRemoveDeletedSite\n637361531422835228\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fhr\n00000000-0000-0000-0000-000000000000", "IsComplete": true, "PollingInterval": 5000
+              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SpoOperation", "_ObjectIdentity_": "47ac7b9f-6025-2000-3d94-fb3bb82b6a31|908bed80-a04a-4433-b4a0-883d9847d110:1fdd85e0-9a94-4593-8ab0-5ad1b834475f\nSpoOperation\nRemoveDeletedSite\n637361531422835228\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fhr\n00000000-0000-0000-0000-000000000000", "IsComplete": true, "PollingInterval": 0
             }
           ]);
         }
       }
 
       throw 'Invalid request';
-    });
-
-    sinon.stub(global, 'setTimeout').callsFake((fn) => {
-      fn();
-      return {} as any;
     });
 
     await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/hr', force: true, wait: true, debug: true } });
@@ -303,7 +296,7 @@ describe(commands.TENANT_RECYCLEBINITEM_REMOVE, () => {
             }, 16, {
               "IsNull": false
             }, 17, {
-              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SpoOperation", "_ObjectIdentity_": "5e0d879f-207a-2000-5eb4-5be71488a82a|908bed80-a04a-4433-b4a0-883d9847d110:1fdd85e0-9a94-4593-8ab0-5ad1b834475f\nSpoOperation\nRemoveDeletedSite\n637392077403920220\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fhr\n67edbe85-2b95-4c7b-a34a-1abbcd68dbe4", "IsComplete": false, "PollingInterval": 15000
+              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SpoOperation", "_ObjectIdentity_": "5e0d879f-207a-2000-5eb4-5be71488a82a|908bed80-a04a-4433-b4a0-883d9847d110:1fdd85e0-9a94-4593-8ab0-5ad1b834475f\nSpoOperation\nRemoveDeletedSite\n637392077403920220\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fhr\n67edbe85-2b95-4c7b-a34a-1abbcd68dbe4", "IsComplete": false, "PollingInterval": 0
             }
           ]);
         }
@@ -314,18 +307,13 @@ describe(commands.TENANT_RECYCLEBINITEM_REMOVE, () => {
             {
               "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.20509.12004", "ErrorInfo": null, "TraceCorrelationId": "47ac7b9f-6025-2000-3d94-fb3bb82b6a31"
             }, 39, {
-              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SpoOperation", "_ObjectIdentity_": "47ac7b9f-6025-2000-3d94-fb3bb82b6a31|908bed80-a04a-4433-b4a0-883d9847d110:1fdd85e0-9a94-4593-8ab0-5ad1b834475f\nSpoOperation\nRemoveDeletedSite\n637361531422835228\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fhr\n00000000-0000-0000-0000-000000000000", "IsComplete": true, "PollingInterval": 5000
+              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SpoOperation", "_ObjectIdentity_": "47ac7b9f-6025-2000-3d94-fb3bb82b6a31|908bed80-a04a-4433-b4a0-883d9847d110:1fdd85e0-9a94-4593-8ab0-5ad1b834475f\nSpoOperation\nRemoveDeletedSite\n637361531422835228\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fhr\n00000000-0000-0000-0000-000000000000", "IsComplete": true, "PollingInterval": 0
             }
           ]);
         }
       }
 
       throw 'Invalid request';
-    });
-
-    sinon.stub(global, 'setTimeout').callsFake((fn) => {
-      fn();
-      return {} as any;
     });
 
     await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/hr', force: true, wait: true, verbose: true } });
