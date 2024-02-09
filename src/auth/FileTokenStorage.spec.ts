@@ -22,24 +22,18 @@ describe('FileTokenStorage', () => {
     assert.strictEqual(FileTokenStorage.msalCacheFilePath(), path.join(os.homedir(), '.cli-m365-msal.json'));
   });
 
-  it('fails retrieving connection info from file if the token file doesn\'t exist', (done) => {
-    sinon.stub(fs, 'existsSync').callsFake(() => false);
-    fileStorage
-      .get()
-      .then(() => {
-        done('Expected fail but passed instead');
-      }, (err) => {
-        try {
-          assert.strictEqual(err, 'File not found');
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      });
+  it('fails retrieving connection info from file if the token file doesn\'t exist', async () => {
+    sinon.stub(fs, 'existsSync').returns(false);
+    try {
+      await fileStorage.get();
+      assert.fail('Expected fail but passed instead');
+    }
+    catch (err) {
+      assert.strictEqual(err, 'File not found');
+    }
   });
 
-  it('returns connection info from file', (done) => {
+  it('returns connection info from file', async () => {
     const tokensFile: Service = {
       accessTokens: {},
       appId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
@@ -50,22 +44,13 @@ describe('FileTokenStorage', () => {
       connected: false,
       logout: () => { }
     };
-    sinon.stub(fs, 'existsSync').callsFake(() => true);
-    sinon.stub(fs, 'readFileSync').callsFake(() => JSON.stringify(tokensFile));
-    fileStorage
-      .get()
-      .then((connectionInfo) => {
-        try {
-          assert.strictEqual(connectionInfo, JSON.stringify(tokensFile));
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      });
+    sinon.stub(fs, 'existsSync').returns(true);
+    sinon.stub(fs, 'readFileSync').returns(JSON.stringify(tokensFile));
+    const connectionInfo = await fileStorage.get();
+    assert.strictEqual(connectionInfo, JSON.stringify(tokensFile));
   });
 
-  it('saves the connection info in the file when the file doesn\'t exist', (done) => {
+  it('saves the connection info in the file when the file doesn\'t exist', async () => {
     const expected: Service = {
       accessTokens: {},
       appId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
@@ -77,22 +62,13 @@ describe('FileTokenStorage', () => {
       logout: () => { }
     };
     let actual: string = '';
-    sinon.stub(fs, 'existsSync').callsFake(() => false);
+    sinon.stub(fs, 'existsSync').returns(false);
     sinon.stub(fs, 'writeFile').callsFake((path, token) => { actual = token as string; }).callsArgWith(3, null);
-    fileStorage
-      .set(JSON.stringify(expected))
-      .then(() => {
-        try {
-          assert.strictEqual(actual, JSON.stringify(expected));
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      });
+    await fileStorage.set(JSON.stringify(expected));
+    assert.strictEqual(actual, JSON.stringify(expected));
   });
 
-  it('saves the connection info in the file when the file is empty', (done) => {
+  it('saves the connection info in the file when the file is empty', async () => {
     const expected: Service = {
       accessTokens: {},
       appId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
@@ -104,23 +80,14 @@ describe('FileTokenStorage', () => {
       logout: () => { }
     };
     let actual: string = '';
-    sinon.stub(fs, 'existsSync').callsFake(() => true);
-    sinon.stub(fs, 'readFileSync').callsFake(() => '');
-    sinon.stub(fs, 'writeFile').callsFake((path, token) => { actual = token as string; }).callsArgWith(3, null);
-    fileStorage
-      .set(JSON.stringify(expected))
-      .then(() => {
-        try {
-          assert.strictEqual(actual, JSON.stringify(expected));
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      });
+    sinon.stub(fs, 'existsSync').returns(true);
+    sinon.stub(fs, 'readFileSync').returns('');
+    sinon.stub(fs, 'writeFile').callsFake((_, token) => { actual = token as string; }).callsArgWith(3, null);
+    await fileStorage.set(JSON.stringify(expected));
+    assert.strictEqual(actual, JSON.stringify(expected));
   });
 
-  it('saves the connection info in the file when the file contains an empty JSON object', (done) => {
+  it('saves the connection info in the file when the file contains an empty JSON object', async () => {
     const expected: Service = {
       accessTokens: {},
       appId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
@@ -132,23 +99,15 @@ describe('FileTokenStorage', () => {
       logout: () => { }
     };
     let actual: string = '';
-    sinon.stub(fs, 'existsSync').callsFake(() => true);
-    sinon.stub(fs, 'readFileSync').callsFake(() => '{}');
-    sinon.stub(fs, 'writeFile').callsFake((path, token) => { actual = token as string; }).callsArgWith(3, null);
-    fileStorage
-      .set(JSON.stringify(expected))
-      .then(() => {
-        try {
-          assert.strictEqual(actual, JSON.stringify(expected));
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      });
+    sinon.stub(fs, 'existsSync').returns(true);
+    sinon.stub(fs, 'readFileSync').returns('{}');
+    sinon.stub(fs, 'writeFile').callsFake((_, token) => { actual = token as string; }).callsArgWith(3, null);
+
+    await fileStorage.set(JSON.stringify(expected));
+    assert.strictEqual(actual, JSON.stringify(expected));
   });
 
-  it('saves the connection info in the file when the file contains no access tokens', (done) => {
+  it('saves the connection info in the file when the file contains no access tokens', async () => {
     const expected: Service = {
       accessTokens: {},
       appId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
@@ -160,23 +119,15 @@ describe('FileTokenStorage', () => {
       logout: () => { }
     };
     let actual: string = '';
-    sinon.stub(fs, 'existsSync').callsFake(() => true);
-    sinon.stub(fs, 'readFileSync').callsFake(() => '{"accessTokens":{},"authType":0,"connected":false}');
-    sinon.stub(fs, 'writeFile').callsFake((path, token) => { actual = token as string; }).callsArgWith(3, null);
-    fileStorage
-      .set(JSON.stringify(expected))
-      .then(() => {
-        try {
-          assert.strictEqual(actual, JSON.stringify(expected));
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      });
+    sinon.stub(fs, 'existsSync').returns(true);
+    sinon.stub(fs, 'readFileSync').returns('{"accessTokens":{},"authType":0,"connected":false}');
+    sinon.stub(fs, 'writeFile').callsFake((_, token) => { actual = token as string; }).callsArgWith(3, null);
+
+    await fileStorage.set(JSON.stringify(expected));
+    assert.strictEqual(actual, JSON.stringify(expected));
   });
 
-  it('adds the connection info to the file when the file contains access tokens', (done) => {
+  it('adds the connection info to the file when the file contains access tokens', async () => {
     const expected: Service = {
       accessTokens: {},
       appId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
@@ -188,8 +139,8 @@ describe('FileTokenStorage', () => {
       logout: () => { }
     };
     let actual: string = '';
-    sinon.stub(fs, 'existsSync').callsFake(() => true);
-    sinon.stub(fs, 'readFileSync').callsFake(() => JSON.stringify({
+    sinon.stub(fs, 'existsSync').returns(true);
+    sinon.stub(fs, 'readFileSync').returns(JSON.stringify({
       accessTokens: {
         "https://contoso.sharepoint.com": {
           expiresOn: '123',
@@ -200,130 +151,85 @@ describe('FileTokenStorage', () => {
       connected: true,
       refreshToken: 'ref'
     }));
-    sinon.stub(fs, 'writeFile').callsFake((path, token) => { actual = token as string; }).callsArgWith(3, null);
-    fileStorage
-      .set(JSON.stringify(expected))
-      .then(() => {
-        try {
-          assert.strictEqual(actual, JSON.stringify(expected));
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      });
+    sinon.stub(fs, 'writeFile').callsFake((_, token) => { actual = token as string; }).callsArgWith(3, null);
+    await fileStorage.set(JSON.stringify(expected));
+    assert.strictEqual(actual, JSON.stringify(expected));
   });
 
-  it('correctly handles error when writing to the file failed', (done) => {
-    sinon.stub(fs, 'existsSync').callsFake(() => false);
-    sinon.stub(fs, 'writeFile').callsFake(() => { }).callsArgWith(3, { message: 'An error has occurred' });
-    fileStorage
-      .set('abc')
-      .then(() => {
-        done('Fail expected but passed instead');
-      }, (err) => {
-        try {
-          assert.strictEqual(err, 'An error has occurred');
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      });
+  it('correctly handles error when writing to the file failed', async () => {
+    sinon.stub(fs, 'existsSync').returns(false);
+    sinon.stub(fs, 'writeFile').returns().callsArgWith(3, { message: 'An error has occurred' });
+    try {
+      await fileStorage.set('abc');
+      assert.fail('Expected fail but passed instead');
+    }
+    catch (err) {
+      assert.strictEqual(err, 'An error has occurred');
+    }
   });
 
-  it('succeeds with removing if the token file doesn\'t exist', (done) => {
-    sinon.stub(fs, 'existsSync').callsFake(() => false);
-    fileStorage
-      .remove()
-      .then(() => {
-        done();
-      }, () => {
-        done('Pass expected but failed instead');
-      });
+  it('succeeds with removing if the token file doesn\'t exist', async () => {
+    const writeStub = sinon.stub(fs, 'writeFile');
+    sinon.stub(fs, 'existsSync').returns(false);
+
+    await fileStorage.remove();
+    assert(writeStub.notCalled);
   });
 
-  it('succeeds with removing if the token file is empty', (done) => {
-    sinon.stub(fs, 'existsSync').callsFake(() => true);
-    sinon.stub(fs, 'readFileSync').callsFake(() => '');
-    sinon.stub(fs, 'writeFile').callsFake(() => '').callsArgWith(3, null);
-    fileStorage
-      .remove()
-      .then(() => {
-        done();
-      }, () => {
-        done('Pass expected but failed instead');
-      });
+  it('succeeds with removing if the token file is empty', async () => {
+    sinon.stub(fs, 'existsSync').returns(true);
+    sinon.stub(fs, 'readFileSync').returns('');
+    const writeStub = sinon.stub(fs, 'writeFile').returns().callsArgWith(3, null);
+
+    await fileStorage.remove();
+    assert(writeStub.called);
   });
 
-  it('succeeds with removing if the token file contains empty JSON object', (done) => {
-    sinon.stub(fs, 'existsSync').callsFake(() => true);
-    sinon.stub(fs, 'readFileSync').callsFake(() => '{}');
-    sinon.stub(fs, 'writeFile').callsFake(() => '').callsArgWith(3, null);
-    fileStorage
-      .remove()
-      .then(() => {
-        done();
-      }, () => {
-        done('Pass expected but failed instead');
-      });
+  it('succeeds with removing if the token file contains empty JSON object', async () => {
+    sinon.stub(fs, 'existsSync').returns(true);
+    sinon.stub(fs, 'readFileSync').returns('{}');
+    const writeStub = sinon.stub(fs, 'writeFile').returns().callsArgWith(3, null);
+
+    await fileStorage.remove();
+    assert(writeStub.called);
   });
 
-  it('succeeds with removing if the token file contains no services', (done) => {
-    sinon.stub(fs, 'existsSync').callsFake(() => true);
-    sinon.stub(fs, 'readFileSync').callsFake(() => JSON.stringify({ services: {} }));
-    sinon.stub(fs, 'writeFile').callsFake(() => { }).callsArgWith(3, null);
-    fileStorage
-      .remove()
-      .then(() => {
-        done();
-      }, () => {
-        done('Pass expected but failed instead');
-      });
+  it('succeeds with removing if the token file contains no services', async () => {
+    sinon.stub(fs, 'existsSync').returns(true);
+    sinon.stub(fs, 'readFileSync').returns(JSON.stringify({ services: {} }));
+    const writeStub = sinon.stub(fs, 'writeFile').returns().callsArgWith(3, null);
+
+    await fileStorage.remove();
+    assert(writeStub.called);
   });
 
-  it('succeeds when connection info successfully removed from the token file', (done) => {
-    sinon.stub(fs, 'existsSync').callsFake(() => true);
-    sinon.stub(fs, 'readFileSync').callsFake(() => JSON.stringify({
+  it('succeeds when connection info successfully removed from the token file', async () => {
+    sinon.stub(fs, 'existsSync').returns(true);
+    sinon.stub(fs, 'readFileSync').returns(JSON.stringify({
       services: {
         'abc': 'def'
       }
     }));
-    sinon.stub(fs, 'writeFile').callsFake(() => { }).callsArgWith(3, null);
-    fileStorage
-      .remove()
-      .then(() => {
-        try {
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }, () => {
-        done('Pass expected but failed instead');
-      });
+    const writeStub = sinon.stub(fs, 'writeFile').returns().callsArgWith(3, null);
+
+    await fileStorage.remove();
+    assert(writeStub.called);
   });
 
-  it('correctly handles error when writing updated tokens to the token file', (done) => {
-    sinon.stub(fs, 'existsSync').callsFake(() => true);
-    sinon.stub(fs, 'readFileSync').callsFake(() => JSON.stringify({
+  it('correctly handles error when writing updated tokens to the token file', async () => {
+    sinon.stub(fs, 'existsSync').returns(true);
+    sinon.stub(fs, 'readFileSync').returns(JSON.stringify({
       services: {
         'abc': 'def'
       }
     }));
-    sinon.stub(fs, 'writeFile').callsFake(() => { }).callsArgWith(3, { message: 'An error has occurred' });
-    fileStorage
-      .remove()
-      .then(() => {
-        done('Fail expected but passed instead');
-      }, (err) => {
-        try {
-          assert.strictEqual(err, 'An error has occurred');
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      });
+    sinon.stub(fs, 'writeFile').returns().callsArgWith(3, { message: 'An error has occurred' });
+    try {
+      await fileStorage.remove();
+      assert.fail('Expected fail but passed instead');
+    }
+    catch (err) {
+      assert.strictEqual(err, 'An error has occurred');
+    }
   });
 });
