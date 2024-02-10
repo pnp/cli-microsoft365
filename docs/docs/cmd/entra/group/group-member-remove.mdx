@@ -1,0 +1,96 @@
+import Global from '/docs/cmd/_global.mdx';
+
+# entra group member remove
+
+Removes members from a Microsoft Entra group
+
+## Usage
+
+```sh
+m365 entra group member remove [options]
+```
+
+## Options
+
+```md definition-list
+`-i, --groupId [groupId]`
+: The ID of the Entra ID group. Specify `groupId` or `groupName` but not both.
+
+`-n, --groupName [groupName]`
+: The display name of the Entra ID group. Specify `groupId` or `groupName` but not both.
+
+`--userIds [userIds]`
+: Microsoft Entra user IDs. You can also pass a comma-separated list of IDs. Specify either `userIds`, `userNames`, `subgroupIds` or `subgroupNames` but not multiple.
+
+`--userNames [userNames]`
+: The user principal names of users. You can also pass a comma-separated list of UPNs. Specify either `userIds`, `userNames`, `subgroupIds` or `subgroupNames` but not multiple.
+
+`--subgroupIds [subgroupIds]`
+: Microsoft Entra group IDs. You can also pass a comma-separated list of IDs. Specify either `userIds`, `userNames`, `subgroupIds` or `subgroupNames` but not multiple.
+
+`--subgroupNames [subgroupNames]`
+: The display names of Microsoft Entra groups. You can also pass a comma-separated list of group display names. Specify either `userIds`, `userNames`, `subgroupIds` or `subgroupNames` but not multiple.
+
+`-r, --role [role]`
+: The role to be removed from the users. Valid values: `Owner`, `Member`. Defaults to both.
+
+`--suppressNotFound`
+: Suppress errors when a user was not found in a group.
+
+`-f, --force`
+: Don't prompt for confirmation.
+```
+
+<Global />
+
+## Remarks
+
+:::tip
+
+When you use the `suppressNotFound` option, the command will not return an error if a user is not found as either an owner or a member of the group.
+This feature proves useful when you need to remove a user from a group, but you are uncertain whether the user holds the role of a member or an owner within that group.
+Without using this option, you would need to manually verify the user's role in the group before proceeding with removal.
+
+:::
+
+## Examples
+
+Remove a single user specified by ID as member from a group specified by display name
+
+```sh
+m365 entra group member remove --groupName Developers --userIds 098b9f52-f48c-4401-819f-29c33794c3f5 --role Member
+```
+
+Remove multiple users specified by ID from a group specified by ID
+
+```sh
+m365 entra group member remove --groupId a03c0c35-ef9a-419b-8cab-f89e0a8d2d2a --userIds "098b9f52-f48c-4401-819f-29c33794c3f5,f1e06e31-3abf-4746-83c2-1513d71f38b8"
+```
+
+Remove a single user specified by UPN as an owner from a group specified by display name
+
+```sh
+m365 entra group member remove --groupName Developers --userNames john.doe@contoso.com --role Owner
+```
+
+Remove multiple users specified by UPN from a group specified by ID
+
+```sh
+m365 entra group member remove --groupId a03c0c35-ef9a-419b-8cab-f89e0a8d2d2a --userNames "john.doe@contoso.com,adele.vance@contoso.com"
+```
+
+Remove a single user specified by ID as owner and member of the group and suppress errors when the user was not found as owner or member
+
+```sh
+m365 entra group member remove --groupName Developers --userIds 098b9f52-f48c-4401-819f-29c33794c3f5 --suppressNotFound
+```
+
+Remove 2 nested groups referenced by id from a security group
+
+```sh
+m365 entra group member remove --groupName Developers --subgroupIds "b51b6157-839f-4d92-8dab-ac61b53c6c40,1e793f86-8dc6-4df6-8037-649ef9a22330" --role Member
+```
+
+## Response
+
+The command doesn't return a response on success.

@@ -40,6 +40,7 @@ export default {
   GROUP_ADD: `${prefix} group add`,
   GROUP_GET: `${prefix} group get`,
   GROUP_LIST: `${prefix} group list`,
+  GROUP_MEMBER_REMOVE: `${prefix} group member remove`,
   GROUP_REMOVE: `${prefix} group remove`,
   GROUP_SET: `${prefix} group set`,
   GROUP_MEMBER_ADD: `${prefix} group member add`,
