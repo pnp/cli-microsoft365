@@ -329,420 +329,226 @@ describe('cli', () => {
     sinon.restore();
   });
 
-  it('shows generic help when no command specified', (done) => {
-    cli
-      .execute([])
-      .then(_ => {
-        try {
-          assert(cliLogStub.calledWith(`CLI for Microsoft 365 v${packageJSON.version}`));
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }, e => done(e));
+  it('shows generic help when no command specified', async () => {
+    await cli.execute([]);
+    assert(cliLogStub.calledWith(`CLI for Microsoft 365 v${packageJSON.version}`));
   });
 
-  it('exits with 0 code when no command specified', (done) => {
-    cli
-      .execute([])
-      .then(_ => {
-        try {
-          assert(processExitStub.calledWith(0));
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }, e => done(e));
+  it('exits with 0 code when no command specified', async () => {
+    await cli.execute([]);
+    assert(processExitStub.calledWith(0));
   });
 
-  it('shows generic help when help command and no command name specified', (done) => {
-    cli
-      .execute(['help'])
-      .then(_ => {
-        try {
-          assert(cliLogStub.calledWith(`CLI for Microsoft 365 v${packageJSON.version}`));
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }, e => done(e));
+  it('shows generic help when help command and no command name specified', async () => {
+    await cli.execute(['help']);
+    assert(cliLogStub.calledWith(`CLI for Microsoft 365 v${packageJSON.version}`));
   });
 
-  it('shows generic help when --help option specified', (done) => {
-    cli
-      .execute(['--help'])
-      .then(_ => {
-        try {
-          assert(cliLogStub.calledWith(`CLI for Microsoft 365 v${packageJSON.version}`));
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }, e => done(e));
+  it('shows generic help when --help option specified', async () => {
+    await cli.execute(['--help']);
+    assert(cliLogStub.calledWith(`CLI for Microsoft 365 v${packageJSON.version}`));
   });
 
-  it('shows generic help when -h option specified', (done) => {
-    cli
-      .execute(['-h'])
-      .then(_ => {
-        try {
-          assert(cliLogStub.calledWith(`CLI for Microsoft 365 v${packageJSON.version}`));
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }, e => done(e));
+  it('shows generic help when -h option specified', async () => {
+    await cli.execute(['-h']);
+    assert(cliLogStub.calledWith(`CLI for Microsoft 365 v${packageJSON.version}`));
   });
 
-  it('shows help for the specific command when help specified followed by a valid command name', (done) => {
+  it('shows help for the specific command when help specified followed by a valid command name', async () => {
     sinon.stub(fs, 'existsSync').callsFake((path) => path.toString().endsWith('.mdx') || path.toString().endsWith('-mock.js'));
     const originalFsReadFileSync = fs.readFileSync;
-    sinon.stub(fs, 'readFileSync').callsFake(() => originalFsReadFileSync(path.join(rootFolder, '..', '..', 'docs', 'docs', 'cmd', 'cli', 'completion', 'completion-clink-update.mdx'), 'utf8'));
+    sinon.stub(fs, 'readFileSync').returns(originalFsReadFileSync(path.join(rootFolder, '..', '..', 'docs', 'docs', 'cmd', 'cli', 'completion', 'completion-clink-update.mdx'), 'utf8'));
     cli.commandToExecute = cli.commands.find(c => c.name === 'cli mock');
-    cli
-      .execute(['help', 'cli', 'mock'])
-      .then(_ => {
-        try {
-          assert(md2plainSpy.called);
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }, e => done(e));
+
+    await cli.execute(['help', 'cli', 'mock']);
+    assert(md2plainSpy.called);
   });
 
-  it('shows help for the specific command when valid command name specified followed by --help', (done) => {
+  it('shows help for the specific command when valid command name specified followed by --help', async () => {
     sinon.stub(fs, 'existsSync').callsFake((path) => path.toString().endsWith('.mdx') || path.toString().endsWith('-mock.js'));
     const originalFsReadFileSync = fs.readFileSync;
-    sinon.stub(fs, 'readFileSync').callsFake(() => originalFsReadFileSync(path.join(rootFolder, '..', '..', 'docs', 'docs', 'cmd', 'cli', 'completion', 'completion-clink-update.mdx'), 'utf8'));
+    sinon.stub(fs, 'readFileSync').returns(originalFsReadFileSync(path.join(rootFolder, '..', '..', 'docs', 'docs', 'cmd', 'cli', 'completion', 'completion-clink-update.mdx'), 'utf8'));
     cli.commandToExecute = cli.commands.find(c => c.name === 'cli mock');
-    cli
-      .execute(['cli', 'mock', '--help'])
-      .then(_ => {
-        try {
-          assert(md2plainSpy.called);
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }, e => done(e));
+
+    await cli.execute(['cli', 'mock', '--help']);
+    assert(md2plainSpy.called);
   });
 
-  it('shows help for the specific command when valid command name specified followed by -h', (done) => {
+  it('shows help for the specific command when valid command name specified followed by -h', async () => {
     sinon.stub(fs, 'existsSync').callsFake((path) => path.toString().endsWith('.mdx') || path.toString().endsWith('-mock.js'));
     const originalFsReadFileSync = fs.readFileSync;
-    sinon.stub(fs, 'readFileSync').callsFake(() => originalFsReadFileSync(path.join(rootFolder, '..', '..', 'docs', 'docs', 'cmd', 'cli', 'completion', 'completion-clink-update.mdx'), 'utf8'));
+    sinon.stub(fs, 'readFileSync').returns(originalFsReadFileSync(path.join(rootFolder, '..', '..', 'docs', 'docs', 'cmd', 'cli', 'completion', 'completion-clink-update.mdx'), 'utf8'));
     cli.commandToExecute = cli.commands.find(c => c.name === 'cli mock');
-    cli
-      .execute(['cli', 'mock', '-h'])
-      .then(_ => {
-        try {
-          assert(md2plainSpy.called);
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }, e => done(e));
+
+    await cli.execute(['cli', 'mock', '-h']);
+    assert(md2plainSpy.called);
   });
 
-  it('shows help for the specific command when valid command name specified followed by -h (single-word command)', (done) => {
+  it('shows help for the specific command when valid command name specified followed by -h (single-word command)', async () => {
     sinonUtil.restore(cli.loadAllCommandsInfo);
-    cli
-      .execute(['status', '-h'])
-      .then(_ => {
-        try {
-          assert(md2plainSpy.called);
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }, e => done(e));
+
+    await cli.execute(['status', '-h']);
+    assert(md2plainSpy.called);
   });
 
-  it('shows help for the specific command when help specified followed by a valid command alias', (done) => {
+  it('shows help for the specific command when help specified followed by a valid command alias', async () => {
     sinon.stub(fs, 'existsSync').callsFake((path) => path.toString().endsWith('.mdx') || path.toString().endsWith('-mock.js'));
     const originalFsReadFileSync = fs.readFileSync;
-    sinon.stub(fs, 'readFileSync').callsFake(() => originalFsReadFileSync(path.join(rootFolder, '..', '..', 'docs', 'docs', 'cmd', 'cli', 'completion', 'completion-clink-update.mdx'), 'utf8'));
+    sinon.stub(fs, 'readFileSync').returns(originalFsReadFileSync(path.join(rootFolder, '..', '..', 'docs', 'docs', 'cmd', 'cli', 'completion', 'completion-clink-update.mdx'), 'utf8'));
     cli.commandToExecute = cli.commands.find(c => c.aliases?.some(a => a === 'cli mock alt'));
-    cli
-      .execute(['help', 'cli', 'mock', 'alt'])
-      .then(_ => {
-        try {
-          assert(md2plainSpy.called);
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }, e => done(e));
+
+    await cli.execute(['help', 'cli', 'mock', 'alt']);
+    assert(md2plainSpy.called);
   });
 
-  it('shows full help when specified -h with a number', (done) => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(() => 'full');
-    cli
-      .execute(['cli', 'completion', 'clink', 'update', '-h', '1'])
-      .then(_ => {
-        try {
-          assert(log.some(l => l.indexOf('OPTIONS') > -1), 'Options section not found');
-          assert(log.some(l => l.indexOf('EXAMPLES') > -1), 'Examples section not found');
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }, e => done(e));
+  it('shows full help when specified -h with a number', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').returns('full');
+
+    await cli.execute(['cli', 'completion', 'clink', 'update', '-h', '1']);
+    assert(log.some(l => l.indexOf('OPTIONS') > -1), 'Options section not found');
+    assert(log.some(l => l.indexOf('EXAMPLES') > -1), 'Examples section not found');
   });
 
-  it('shows full help when specified -h with full', (done) => {
-    cli
-      .execute(['cli', 'completion', 'clink', 'update', '-h', 'full'])
-      .then(_ => {
-        try {
-          assert(log.some(l => l.indexOf('OPTIONS') > -1), 'Options section not found');
-          assert(log.some(l => l.indexOf('EXAMPLES') > -1), 'Examples section not found');
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }, e => done(e));
+  it('shows full help when specified -h with full', async () => {
+    await cli.execute(['cli', 'completion', 'clink', 'update', '-h', 'full']);
+    assert(log.some(l => l.indexOf('OPTIONS') > -1), 'Options section not found');
+    assert(log.some(l => l.indexOf('EXAMPLES') > -1), 'Examples section not found');
   });
 
-  it('shows help with options section when specified -h with options', (done) => {
-    cli
-      .execute(['cli', 'completion', 'clink', 'update', '-h', 'options'])
-      .then(_ => {
-        try {
-          assert(log.some(l => l.indexOf('OPTIONS') > -1), 'Options section not found');
-          assert(log.some(l => l.indexOf('EXAMPLES') === -1), 'Examples section found');
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }, e => done(e));
+  it('shows help with options section when specified -h with options', async () => {
+    await cli.execute(['cli', 'completion', 'clink', 'update', '-h', 'options']);
+    assert(log.some(l => l.indexOf('OPTIONS') > -1), 'Options section not found');
+    assert(log.some(l => l.indexOf('EXAMPLES') === -1), 'Examples section found');
   });
 
-  it('shows help with examples section when specified -h with examples', (done) => {
-    cli
-      .execute(['cli', 'completion', 'clink', 'update', '-h', 'examples'])
-      .then(_ => {
-        try {
-          assert(log.some(l => l.indexOf('OPTIONS') === -1), 'Options section found');
-          assert(log.some(l => l.indexOf('EXAMPLES') > -1), 'Examples section not found');
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }, e => done(e));
+  it('shows help with examples section when specified -h with examples', async () => {
+    await cli.execute(['cli', 'completion', 'clink', 'update', '-h', 'examples']);
+    assert(log.some(l => l.indexOf('OPTIONS') === -1), 'Options section found');
+    assert(log.some(l => l.indexOf('EXAMPLES') > -1), 'Examples section not found');
   });
 
-  it('shows help with remarks section when specified -h with remarks', (done) => {
-    cli
-      .execute(['cli', 'completion', 'clink', 'update', '-h', 'remarks'])
-      .then(_ => {
-        try {
-          assert(log.some(l => l.indexOf('REMARKS') > -1), 'Remarks section not found');
-          assert(log.some(l => l.indexOf('OPTIONS') === -1), 'Options section found');
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }, e => done(e));
+  it('shows help with remarks section when specified -h with remarks', async () => {
+    await cli.execute(['cli', 'completion', 'clink', 'update', '-h', 'remarks']);
+    assert(log.some(l => l.indexOf('REMARKS') > -1), 'Remarks section not found');
+    assert(log.some(l => l.indexOf('OPTIONS') === -1), 'Options section found');
   });
 
-  it('shows error when specified -h with an invalid value', (done) => {
-    cli
-      .execute(['cli', 'completion', 'clink', 'update', '-h', 'invalid'])
-      .then(_ => done('Expected error to be thrown'), _ => {
-        try {
-          assert(cliErrorStub.getCalls().some(c => c.firstArg.indexOf('Unknown help mode invalid. Allowed values are') > -1));
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      });
+  it('shows error when specified -h with an invalid value', async () => {
+    try {
+      await cli.execute(['cli', 'completion', 'clink', 'update', '-h', 'invalid']);
+      assert.fail('Error not thrown');
+    }
+    catch {
+      assert(cliErrorStub.getCalls().some(c => c.firstArg.indexOf('Unknown help mode invalid. Allowed values are') > -1));
+    }
+
   });
 
-  it(`passes options validation if the command doesn't allow unknown options and specified options match command options`, (done) => {
+  it(`passes options validation if the command doesn't allow unknown options and specified options match command options`, async () => {
     cli.commandToExecute = cli.commands.find(c => c.name === 'cli mock');
-    cli
-      .execute(['cli', 'mock', '-x', '123', '-y', '456'])
-      .then(_ => {
-        try {
-          assert(mockCommandActionSpy.called);
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }, e => done(e));
+
+    await cli.execute(['cli', 'mock', '-x', '123', '-y', '456']);
+    assert(mockCommandActionSpy.called);
   });
 
-  it(`succeeds running with truthy/falsy values 'true' and 'false'`, (done) => {
+  it(`succeeds running with truthy/falsy values 'true' and 'false'`, async () => {
     cli.commandToExecute = cli.commands.find(c => c.name === 'cli mock boolean rewrite');
-    cli
-      .execute(['cli', 'mock', 'boolean', 'rewrite', '--booleanParameterX', 'true', '--booleanParameterY', 'false', '--output', 'text'])
-      .then(_ => {
-        try {
-          assert(cliLogStub.calledWith(`booleanParameterX: true`));
-          assert(cliLogStub.calledWith(`booleanParameterY: false`));
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }, e => done(e));
+
+    await cli.execute(['cli', 'mock', 'boolean', 'rewrite', '--booleanParameterX', 'true', '--booleanParameterY', 'false', '--output', 'text']);
+    assert(cliLogStub.calledWith(`booleanParameterX: true`));
+    assert(cliLogStub.calledWith(`booleanParameterY: false`));
   });
 
-  it(`rewrites a truthy/falsy values '1' and '0' to 'true' and 'false' respectively`, (done) => {
+  it(`rewrites a truthy/falsy values '1' and '0' to 'true' and 'false' respectively`, async () => {
     cli.commandToExecute = cli.commands.find(c => c.name === 'cli mock boolean rewrite');
-    cli
-      .execute(['cli', 'mock', 'boolean', 'rewrite', '--booleanParameterX', '1', '--booleanParameterY', '0', '--output', 'text'])
-      .then(_ => {
-        try {
-          assert(cliLogStub.calledWith(`booleanParameterX: true`));
-          assert(cliLogStub.calledWith(`booleanParameterY: false`));
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }, e => done(e));
+
+    await cli.execute(['cli', 'mock', 'boolean', 'rewrite', '--booleanParameterX', '1', '--booleanParameterY', '0', '--output', 'text']);
+    assert(cliLogStub.calledWith(`booleanParameterX: true`));
+    assert(cliLogStub.calledWith(`booleanParameterY: false`));
   });
 
-  it(`rewrites a truthy/falsy values 'on' and 'off' to 'true' and 'false' respectively`, (done) => {
+  it(`rewrites a truthy/falsy values 'on' and 'off' to 'true' and 'false' respectively`, async () => {
     cli.commandToExecute = cli.commands.find(c => c.name === 'cli mock boolean rewrite');
-    cli
-      .execute(['cli', 'mock', 'boolean', 'rewrite', '--booleanParameterX', 'on', '--booleanParameterY', 'off', '--output', 'text'])
-      .then(_ => {
-        try {
-          assert(cliLogStub.calledWith(`booleanParameterX: true`));
-          assert(cliLogStub.calledWith(`booleanParameterY: false`));
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }, e => done(e));
+
+    await cli.execute(['cli', 'mock', 'boolean', 'rewrite', '--booleanParameterX', 'on', '--booleanParameterY', 'off', '--output', 'text']);
+    assert(cliLogStub.calledWith(`booleanParameterX: true`));
+    assert(cliLogStub.calledWith(`booleanParameterY: false`));
   });
 
-  it(`rewrites a truthy/falsy values 'yes' and 'no' to 'true' and 'false' respectively`, (done) => {
+  it(`rewrites a truthy/falsy values 'yes' and 'no' to 'true' and 'false' respectively`, async () => {
     cli.commandToExecute = cli.commands.find(c => c.name === 'cli mock boolean rewrite');
-    cli
-      .execute(['cli', 'mock', 'boolean', 'rewrite', '--booleanParameterX', 'yes', '--booleanParameterY', 'no', '--output', 'text'])
-      .then(_ => {
-        try {
-          assert(cliLogStub.calledWith(`booleanParameterX: true`));
-          assert(cliLogStub.calledWith(`booleanParameterY: false`));
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }, e => done(e));
+
+    await cli.execute(['cli', 'mock', 'boolean', 'rewrite', '--booleanParameterX', 'yes', '--booleanParameterY', 'no', '--output', 'text']);
+    assert(cliLogStub.calledWith(`booleanParameterX: true`));
+    assert(cliLogStub.calledWith(`booleanParameterY: false`));
   });
 
-  it(`rewrites a truthy/falsy values 'True' and 'False' to 'true' and 'false' respectively`, (done) => {
+  it(`rewrites a truthy/falsy values 'True' and 'False' to 'true' and 'false' respectively`, async () => {
     cli.commandToExecute = cli.commands.find(c => c.name === 'cli mock boolean rewrite');
-    cli
-      .execute(['cli', 'mock', 'boolean', 'rewrite', '--booleanParameterX', 'True', '--booleanParameterY', 'False', '--output', 'text'])
-      .then(_ => {
-        try {
-          assert(cliLogStub.calledWith(`booleanParameterX: true`));
-          assert(cliLogStub.calledWith(`booleanParameterY: false`));
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }, e => done(e));
+
+    await cli.execute(['cli', 'mock', 'boolean', 'rewrite', '--booleanParameterX', 'True', '--booleanParameterY', 'False', '--output', 'text']);
+    assert(cliLogStub.calledWith(`booleanParameterX: true`));
+    assert(cliLogStub.calledWith(`booleanParameterY: false`));
   });
 
-  it(`rewrites a truthy/falsy values 'yes' and 'no' to 'true' and 'false' respectively (using shorts)`, (done) => {
+  it(`rewrites a truthy/falsy values 'yes' and 'no' to 'true' and 'false' respectively (using shorts)`, async () => {
     cli.commandToExecute = cli.commands.find(c => c.name === 'cli mock boolean rewrite');
-    cli
-      .execute(['cli', 'mock', 'boolean', 'rewrite', '-x', 'yes', '-y', 'no', '--output', 'text'])
-      .then(_ => {
-        try {
-          assert(cliLogStub.calledWith(`booleanParameterX: true`));
-          assert(cliLogStub.calledWith(`booleanParameterY: false`));
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }, e => done(e));
+
+    await cli.execute(['cli', 'mock', 'boolean', 'rewrite', '-x', 'yes', '-y', 'no', '--output', 'text']);
+    assert(cliLogStub.calledWith(`booleanParameterX: true`));
+    assert(cliLogStub.calledWith(`booleanParameterY: false`));
   });
 
-  it(`shows error when a boolean option does not contain a correct truthy/falsy value`, (done) => {
+  it(`shows error when a boolean option does not contain a correct truthy/falsy value`, async () => {
     cli.commandToExecute = cli.commands.find(c => c.name === 'cli mock boolean rewrite');
-    cli
-      .execute(['cli', 'mock', 'boolean', 'rewrite', '--booleanParameterX', 'folse'])
-      .then(_ => done('Promise fulfilled while error expected'), _ => {
-        assert(cliErrorStub.calledWith(chalk.red(`Error: The value 'folse' for option '--booleanParameterX' is not a valid boolean`)));
-        done();
-      });
+
+    try {
+      await cli.execute(['cli', 'mock', 'boolean', 'rewrite', '--booleanParameterX', 'folse']);
+      assert.fail('Error not thrown');
+    }
+    catch {
+      assert(cliErrorStub.calledWith(chalk.red(`Error: The value 'folse' for option '--booleanParameterX' is not a valid boolean`)));
+    }
   });
 
-  it(`fails options validation if the command doesn't allow unknown options and specified options match command options`, (done) => {
+  it(`fails options validation if the command doesn't allow unknown options and specified options match command options`, async () => {
     cli.commandToExecute = cli.commands.find(c => c.name === 'cli mock');
-    cli
-      .execute(['cli', 'mock', '-x', '123', '--paramZ'])
-      .then(_ => done('Promise fulfilled while error expected'), _ => {
-        try {
-          assert(cliErrorStub.calledWith(chalk.red(`Error: Invalid option: 'paramZ'${os.EOL}`)));
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      });
+
+    try {
+      await cli.execute(['cli', 'mock', '-x', '123', '--paramZ']);
+      assert.fail('Error not thrown');
+    }
+    catch {
+      assert(cliErrorStub.calledWith(chalk.red(`Error: Invalid option: 'paramZ'${os.EOL}`)));
+    }
   });
 
-  it(`doesn't execute command action when option validation failed`, (done) => {
+  it(`doesn't execute command action when option validation failed`, async () => {
     cli.commandToExecute = cli.commands.find(c => c.name === 'cli mock');
-    cli
-      .execute(['cli', 'mock', '-x', '123', '--paramZ'])
-      .then(_ => done('Promise fulfilled while error expected'), _ => {
-        try {
-          assert(mockCommandActionSpy.notCalled);
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      });
+
+    try {
+      await cli.execute(['cli', 'mock', '-x', '123', '--paramZ']);
+      assert.fail('Error not thrown');
+    }
+    catch {
+      assert(mockCommandActionSpy.notCalled);
+    }
   });
 
-  it(`exits with exit code 1 when option validation failed`, (done) => {
+  it(`exits with exit code 1 when option validation failed`, async () => {
     cli.commandToExecute = cli.commands.find(c => c.name === 'cli mock');
-    cli
-      .execute(['cli', 'mock', '-x', '123', '--paramZ'])
-      .then(_ => done('Promise fulfilled while error expected'), _ => {
-        try {
-          assert(processExitStub.calledWith(1));
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      });
+
+    try {
+      await cli.execute(['cli', 'mock', '-x', '123', '--paramZ']);
+      assert.fail('Error not thrown');
+    }
+    catch {
+      assert(processExitStub.calledWith(1));
+    }
+
   });
 
-  it(`does not prompt and fails validation if a required option is missing`, (done) => {
+  it(`does not prompt and fails validation if a required option is missing`, async () => {
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
       if (settingName === settingsNames.prompt) {
         return undefined;
@@ -751,20 +557,17 @@ describe('cli', () => {
     });
 
     cli.commandToExecute = cli.commands.find(c => c.name === 'cli mock');
-    cli
-      .execute(['cli', 'mock'])
-      .then(_ => done('Promise fulfilled while error expected'), _ => {
-        try {
-          assert(cliErrorStub.calledWith(chalk.red(`Error: Required option parameterX not specified`)));
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      });
+
+    try {
+      await cli.execute(['cli', 'mock']);
+      assert.fail('Error not thrown');
+    }
+    catch {
+      assert(cliErrorStub.calledWith(chalk.red(`Error: Required option parameterX not specified`)));
+    }
   });
 
-  it(`shows validation error when no option from a required set is specified`, (done) => {
+  it(`shows validation error when no option from a required set is specified`, async () => {
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
       if (settingName === settingsNames.prompt) {
         return false;
@@ -774,20 +577,17 @@ describe('cli', () => {
     });
 
     cli.commandToExecute = cli.commands.find(c => c.name === 'cli mock optionsets');
-    cli
-      .execute(['cli', 'mock', 'optionsets'])
-      .then(_ => done('Promise fulfilled while error expected'), _ => {
-        try {
-          assert(cliErrorStub.calledWith(chalk.red('Error: Specify one of the following options: opt1, opt2.')));
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      });
+
+    try {
+      await cli.execute(['cli', 'mock', 'optionsets']);
+      assert.fail('Error not thrown');
+    }
+    catch {
+      assert(cliErrorStub.calledWith(chalk.red('Error: Specify one of the following options: opt1, opt2.')));
+    }
   });
 
-  it(`shows validation error when multiple options from a required set are specified`, (done) => {
+  it(`shows validation error when multiple options from a required set are specified`, async () => {
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
       if (settingName === settingsNames.prompt) {
         return false;
@@ -797,35 +597,24 @@ describe('cli', () => {
     });
 
     cli.commandToExecute = cli.commands.find(c => c.name === 'cli mock optionsets');
-    cli
-      .execute(['cli', 'mock', 'optionsets', '--opt1', 'testvalue', '--opt2', 'testvalue'])
-      .then(_ => done('Promise fulfilled while error expected'), _ => {
-        try {
-          assert(cliErrorStub.calledWith(chalk.red('Error: Specify one of the following options: opt1, opt2, but not multiple.')));
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      });
+
+    try {
+      await cli.execute(['cli', 'mock', 'optionsets', '--opt1', 'testvalue', '--opt2', 'testvalue']);
+      assert.fail('Error not thrown');
+    }
+    catch {
+      assert(cliErrorStub.calledWith(chalk.red('Error: Specify one of the following options: opt1, opt2, but not multiple.')));
+    }
   });
 
-  it(`passes validation when one option from a required set is specified`, (done) => {
+  it(`passes validation when one option from a required set is specified`, async () => {
     cli.commandToExecute = cli.commands.find(c => c.name === 'cli mock optionsets');
-    cli
-      .execute(['cli', 'mock', 'optionsets', '--opt1', 'testvalue'])
-      .then(_ => {
-        try {
-          assert(cliErrorStub.notCalled);
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }, _ => done('Promise rejected while success expected'));
+
+    await cli.execute(['cli', 'mock', 'optionsets', '--opt1', 'testvalue']);
+    assert(cliErrorStub.notCalled);
   });
 
-  it(`shows validation error when no option from a dependent set is set`, (done) => {
+  it(`shows validation error when no option from a dependent set is set`, async () => {
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
       if (settingName === settingsNames.prompt) {
         return false;
@@ -835,35 +624,23 @@ describe('cli', () => {
     });
 
     cli.commandToExecute = cli.commands.find(c => c.name === 'cli mock optionsets');
-    cli
-      .execute(['cli', 'mock', 'optionsets', '--opt2', 'testvalue'])
-      .then(_ => done('Promise fulfilled while error expected'), _ => {
-        try {
-          assert(cliErrorStub.calledWith(chalk.red('Error: Specify one of the following options: opt3, opt4.')));
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      });
+    try {
+      await cli.execute(['cli', 'mock', 'optionsets', '--opt2', 'testvalue']);
+      assert.fail('Error not thrown');
+    }
+    catch {
+      assert(cliErrorStub.calledWith(chalk.red('Error: Specify one of the following options: opt3, opt4.')));
+    }
   });
 
-  it(`passes validation when one option from a dependent set is specified`, (done) => {
+  it(`passes validation when one option from a dependent set is specified`, async () => {
     cli.commandToExecute = cli.commands.find(c => c.name === 'cli mock optionsets');
-    cli
-      .execute(['cli', 'mock', 'optionsets', '--opt2', 'testvalue', '--opt3', 'testvalue'])
-      .then(_ => {
-        try {
-          assert(cliErrorStub.notCalled);
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }, _ => done('Promise rejected while success expected'));
+
+    await cli.execute(['cli', 'mock', 'optionsets', '--opt2', 'testvalue', '--opt3', 'testvalue']);
+    assert(cliErrorStub.notCalled);
   });
 
-  it(`shows validation error when multiple options from an optional set are specified`, (done) => {
+  it(`shows validation error when multiple options from an optional set are specified`, async () => {
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
       if (settingName === settingsNames.prompt) {
         return false;
@@ -873,35 +650,24 @@ describe('cli', () => {
     });
 
     cli.commandToExecute = cli.commands.find(c => c.name === 'cli mock optionsets');
-    cli
-      .execute(['cli', 'mock', 'optionsets', '--opt1', 'testvalue', '--opt5', 'testvalue', '--opt6', 'testvalue'])
-      .then(_ => done('Promise fulfilled while error expected'), _ => {
-        try {
-          assert(cliErrorStub.calledWith(chalk.red('Error: Specify one of the following options: opt5, opt6, but not multiple.')));
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      });
+
+    try {
+      await cli.execute(['cli', 'mock', 'optionsets', '--opt1', 'testvalue', '--opt5', 'testvalue', '--opt6', 'testvalue']);
+      assert.fail('Error not thrown');
+    }
+    catch {
+      assert(cliErrorStub.calledWith(chalk.red('Error: Specify one of the following options: opt5, opt6, but not multiple.')));
+    }
   });
 
-  it(`passes validation when one option from an optional set is specified`, (done) => {
+  it(`passes validation when one option from an optional set is specified`, async () => {
     cli.commandToExecute = cli.commands.find(c => c.name === 'cli mock optionsets');
-    cli
-      .execute(['cli', 'mock', 'optionsets', '--opt2', 'testvalue', '--opt3', 'testvalue', '--opt5', 'testvalue'])
-      .then(_ => {
-        try {
-          assert(cliErrorStub.notCalled);
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }, _ => done('Promise rejected while success expected'));
+
+    await cli.execute(['cli', 'mock', 'optionsets', '--opt2', 'testvalue', '--opt3', 'testvalue', '--opt5', 'testvalue']);
+    assert(cliErrorStub.notCalled);
   });
 
-  it(`prompts for required options`, (done) => {
+  it(`prompts for required options`, async () => {
     const promptStub: sinon.SinonStub = sinon.stub(prompt, 'forInput').resolves("test");
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
       if (settingName === settingsNames.prompt) {
@@ -911,17 +677,9 @@ describe('cli', () => {
     });
 
     cli.commandToExecute = cli.commands.find(c => c.name === 'cli mock');
-    cli
-      .execute(['cli', 'mock'])
-      .then(_ => {
-        try {
-          assert(promptStub.called);
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }, e => done(e));
+
+    await cli.execute(['cli', 'mock']);
+    assert(promptStub.called);
   });
 
   it(`prompts for required options when autocomplete has items`, async () => {
@@ -1036,301 +794,158 @@ describe('cli', () => {
     assert(promptStub.calledOnce);
   });
 
-  it(`calls command's validation method when defined`, (done) => {
+  it(`calls command's validation method when defined`, async () => {
     const mockCommandValidateSpy: sinon.SinonSpy = sinon.spy(mockCommandWithValidation, 'validate');
     cli.commandToExecute = cli.commands.find(c => c.name === 'cli mock1 validation');
-    cli
-      .execute(['cli', 'mock1', 'validation', '-x', '123'])
-      .then(_ => {
-        try {
-          assert(mockCommandValidateSpy.called);
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }, e => done(e));
+
+    await cli.execute(['cli', 'mock1', 'validation', '-x', '123']);
+    assert(mockCommandValidateSpy.called);
   });
 
-  it(`passes validation when the command's validate method returns true`, (done) => {
-    sinon.stub(mockCommandWithValidation, 'validate').callsFake(() => Promise.resolve(true));
+  it(`passes validation when the command's validate method returns true`, async () => {
+    sinon.stub(mockCommandWithValidation, 'validate').resolves(true);
     const mockCommandWithValidationActionSpy: sinon.SinonSpy = sinon.spy(mockCommandWithValidation, 'action');
 
     cli.commandToExecute = cli.commands.find(c => c.name === 'cli mock1 validation');
-    cli
-      .execute(['cli', 'mock1', 'validation', '-x', '123'])
-      .then(_ => {
-        try {
-          assert(mockCommandWithValidationActionSpy.called);
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }, e => done(e));
+
+    await cli.execute(['cli', 'mock1', 'validation', '-x', '123']);
+    assert(mockCommandWithValidationActionSpy.called);
   });
 
-  it(`fails validation when the command's validate method returns a string`, (done) => {
-    sinon.stub(mockCommandWithValidation, 'validate').callsFake(() => Promise.resolve('Error'));
+  it(`fails validation when the command's validate method returns a string`, async () => {
+    sinon.stub(mockCommandWithValidation, 'validate').resolves('Error');
     const mockCommandWithValidationActionSpy: sinon.SinonSpy = sinon.spy(mockCommandWithValidation, 'action');
 
     cli.commandToExecute = cli.commands.find(c => c.name === 'cli mock1 validation');
-    cli
-      .execute(['cli', 'mock1', 'validation', '-x', '123'])
-      .then(_ => done('Promise fulfilled while error expected'), _ => {
-        try {
-          assert(mockCommandWithValidationActionSpy.notCalled);
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      });
+
+    try {
+      await cli.execute(['cli', 'mock1', 'validation', '-x', '123']);
+      assert.fail('Error not thrown');
+    }
+    catch {
+      assert(mockCommandWithValidationActionSpy.notCalled);
+    }
   });
 
-  it(`executes command when validation passed`, (done) => {
+  it(`executes command when validation passed`, async () => {
     cli.commandToExecute = cli.commands.find(c => c.name === 'cli mock');
-    cli
-      .execute(['cli', 'mock', '-x', '123'])
-      .then(_ => {
-        try {
-          assert(mockCommandActionSpy.called);
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }, e => done(e));
+
+    await cli.execute(['cli', 'mock', '-x', '123']);
+    assert(mockCommandActionSpy.called);
   });
 
-  it(`writes DONE when executing command in verbose mode succeeded`, (done) => {
+  it(`writes DONE when executing command in verbose mode succeeded`, async () => {
     cli.commandToExecute = cli.commands.find(c => c.name === 'cli mock');
-    cli
-      .execute(['cli', 'mock', '-x', '123', '--verbose'])
-      .then(_ => {
-        try {
-          assert(cliErrorStub.calledWith(chalk.green('DONE')));
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }, e => done(e));
+
+    await cli.execute(['cli', 'mock', '-x', '123', '--verbose']);
+    assert(cliErrorStub.calledWith(chalk.green('DONE')));
   });
 
-  it(`writes DONE when executing command in debug mode succeeded`, (done) => {
+  it(`writes DONE when executing command in debug mode succeeded`, async () => {
     cli.commandToExecute = cli.commands.find(c => c.name === 'cli mock');
-    cli
-      .execute(['cli', 'mock', '-x', '123', '--debug'])
-      .then(_ => {
-        try {
-          assert(cliErrorStub.calledWith(chalk.green('DONE')));
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }, e => done(e));
+
+    await cli.execute(['cli', 'mock', '-x', '123', '--debug']);
+    assert(cliErrorStub.calledWith(chalk.green('DONE')));
   });
 
-  it('executes the specified command', (done) => {
-    cli
-      .executeCommand(mockCommand, { options: { _: [] } })
-      .then(_ => {
-        try {
-          assert(mockCommandActionSpy.called);
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }, e => done(e));
+  it('executes the specified command', async () => {
+    await cli.executeCommand(mockCommand, { options: { _: [] } });
+    assert(mockCommandActionSpy.called);
   });
 
-  it('logs command name when executing command in debug mode', (done) => {
-    cli
-      .executeCommand(mockCommand, { options: { debug: true, _: [] } })
-      .then(_ => {
-        try {
-          assert(cliErrorStub.calledWith('Executing command cli mock with options {"options":{"debug":true,"_":[]}}'));
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }, e => done(e));
+  it('logs command name when executing command in debug mode', async () => {
+    await cli.executeCommand(mockCommand, { options: { debug: true, _: [] } });
+    assert(cliErrorStub.calledWith('Executing command cli mock with options {"options":{"debug":true,"_":[]}}'));
   });
 
-  it('calls confirmation prompt tool when command shows prompt', (done) => {
+  it('calls confirmation prompt tool when command shows prompt', async () => {
     const promptStub: sinon.SinonStub = sinon.stub(prompt, 'forConfirmation').resolves(true);
     const mockCommandWithConfirmationPrompt = new MockCommandWithConfirmationPrompt();
 
-    cli
-      .executeCommand(mockCommandWithConfirmationPrompt, { options: { _: [] } })
-      .then(_ => {
-        try {
-          assert(promptStub.called);
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }, e => done(e));
+    await cli.executeCommand(mockCommandWithConfirmationPrompt, { options: { _: [] } });
+    assert(promptStub.called);
   });
 
-  it('prints command output with formatting', (done) => {
+  it('prints command output with formatting', async () => {
     const commandWithOutput: MockCommandWithOutput = new MockCommandWithOutput();
-    cli
-      .executeCommand(commandWithOutput, { options: { _: [] } })
-      .then(_ => {
-        try {
-          assert(cliLogStub.called, 'cli.log not called');
-          assert(cliFormatOutputSpy.called, 'cli.formatOutput not called');
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }, e => done(e));
+
+    await cli.executeCommand(commandWithOutput, { options: { _: [] } });
+    assert(cliLogStub.called, 'cli.log not called');
+    assert(cliFormatOutputSpy.called, 'cli.formatOutput not called');
   });
 
-  it('prints command output without formatting', (done) => {
+  it('prints command output without formatting', async () => {
     const commandWithOutput: MockCommandWithRawOutput = new MockCommandWithRawOutput();
-    cli
-      .executeCommand(commandWithOutput, { options: { _: [] } })
-      .then(_ => {
-        try {
-          assert(cliLogStub.called, 'cli.log not called');
-          assert(cliFormatOutputSpy.notCalled, 'cli.formatOutput called');
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }, e => done(e));
+
+    await cli.executeCommand(commandWithOutput, { options: { _: [] } });
+    assert(cliLogStub.called, 'cli.log not called');
+    assert(cliFormatOutputSpy.notCalled, 'cli.formatOutput called');
   });
 
-  it('returns command output when executing command with output', (done) => {
+  it('returns command output when executing command with output', async () => {
     const commandWithOutput: MockCommandWithOutput = new MockCommandWithOutput();
-    cli
-      .executeCommandWithOutput(commandWithOutput, { options: { _: [], output: 'text' } })
-      .then((output: CommandOutput) => {
-        try {
-          assert.strictEqual(output.stdout, 'Command output');
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }, e => done(e));
+
+    const output: CommandOutput = await cli.executeCommandWithOutput(commandWithOutput, { options: { _: [], output: 'text' } });
+    assert.strictEqual(output.stdout, 'Command output');
   });
 
-  it('returns raw command output when executing command with output', (done) => {
+  it('returns raw command output when executing command with output', async () => {
     const commandWithOutput: MockCommandWithRawOutput = new MockCommandWithRawOutput();
-    cli
-      .executeCommandWithOutput(commandWithOutput, { options: { _: [], output: 'text' } })
-      .then((output: CommandOutput) => {
-        try {
-          assert.strictEqual(output.stdout, 'Raw output');
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }, e => done(e));
+
+    const output = await cli.executeCommandWithOutput(commandWithOutput, { options: { _: [], output: 'text' } });
+    assert.strictEqual(output.stdout, 'Raw output');
   });
 
-  it('returns debug command output when executing command with output in debug mode', (done) => {
+  it('returns debug command output when executing command with output in debug mode', async () => {
     const commandWithOutput: MockCommandWithRawOutput = new MockCommandWithRawOutput();
-    cli
-      .executeCommandWithOutput(commandWithOutput, { options: { _: [], debug: true, output: 'text' } })
-      .then((output: CommandOutput) => {
-        try {
-          assert.strictEqual(output.stdout, 'Raw output');
-          assert.strictEqual(output.stderr, ['Executing command cli mock output with options {"options":{"_":[],"debug":true,"output":"text"}}', 'Debug output'].join(os.EOL));
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }, e => done(e));
+
+    const output = await cli.executeCommandWithOutput(commandWithOutput, { options: { _: [], debug: true, output: 'text' } });
+    assert.strictEqual(output.stdout, 'Raw output');
+    assert.strictEqual(output.stderr, ['Executing command cli mock output with options {"options":{"_":[],"debug":true,"output":"text"}}', 'Debug output'].join(os.EOL));
   });
 
-  it('captures command stdout output in a listener when specified', (done) => {
+  it('captures command stdout output in a listener when specified', async () => {
     let output: string = '';
     const commandWithOutput: MockCommandWithOutput = new MockCommandWithOutput();
-    cli
-      .executeCommandWithOutput(commandWithOutput, { options: { _: [], output: 'text' } }, {
-        stdout: (message) => output = message
-      })
-      .then(_ => {
-        try {
-          assert.strictEqual(output, 'Command output');
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }, e => done(e));
+
+    await cli.executeCommandWithOutput(commandWithOutput, { options: { _: [], output: 'text' } }, {
+      stdout: (message) => output = message
+    });
+    assert.strictEqual(output, 'Command output');
   });
 
-  it('captures command raw stdout output in a listener when specified', (done) => {
+  it('captures command raw stdout output in a listener when specified', async () => {
     let output: string = '';
     const commandWithOutput: MockCommandWithRawOutput = new MockCommandWithRawOutput();
-    cli
-      .executeCommandWithOutput(commandWithOutput, { options: { _: [], output: 'text' } }, {
-        stdout: (message) => output = message
-      })
-      .then(_ => {
-        try {
-          assert.strictEqual(output, 'Raw output');
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }, e => done(e));
+
+    await cli.executeCommandWithOutput(commandWithOutput, { options: { _: [], output: 'text' } }, {
+      stdout: (message) => output = message
+    });
+    assert.strictEqual(output, 'Raw output');
   });
 
-  it('captures command stderr output in a listener when specified', (done) => {
+  it('captures command stderr output in a listener when specified', async () => {
     const output: string[] = [];
     const commandWithOutput: MockCommandWithRawOutput = new MockCommandWithRawOutput();
-    cli
-      .executeCommandWithOutput(commandWithOutput, { options: { _: [], output: 'text', debug: true } }, {
-        stderr: (message) => output.push(message)
-      })
-      .then(_ => {
-        try {
-          assert.deepStrictEqual(output, ['Executing command cli mock output with options {"options":{"_":[],"output":"text","debug":true}}', 'Debug output']);
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }, e => done(e));
+    await cli.executeCommandWithOutput(commandWithOutput, { options: { _: [], output: 'text', debug: true } }, {
+      stderr: (message) => output.push(message)
+    });
+
+    assert.deepStrictEqual(output, ['Executing command cli mock output with options {"options":{"_":[],"output":"text","debug":true}}', 'Debug output']);
   });
 
-  it('calls prompt tool when command shows prompt and executed with output', (done) => {
+  it('calls prompt tool when command shows prompt and executed with output', async () => {
     const promptStub: sinon.SinonStub = sinon.stub(prompt, 'forConfirmation').resolves(true);
     const mockCommandWithConfirmationPrompt = new MockCommandWithConfirmationPrompt();
 
-    cli
-      .executeCommandWithOutput(mockCommandWithConfirmationPrompt, { options: { _: [] } })
-      .then(_ => {
-        try {
-          assert(promptStub.called);
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }, e => done(e));
+    await cli.executeCommandWithOutput(mockCommandWithConfirmationPrompt, { options: { _: [] } });
+    assert(promptStub.called);
   });
 
   it('calls prompt tool when command shows interactive prompt and executed with output', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((() => true));
+    sinon.stub(cli, 'getSettingWithDefaultValue').returns(true);
 
-    const promptStub: sinon.SinonStub = sinon.stub(prompt, 'forSelection').callsFake(() => Promise.resolve("test") as any);
+    const promptStub: sinon.SinonStub = sinon.stub(prompt, 'forSelection').resolves("test" as any);
     const mockCommandWithHandleMultipleResultsFound = new MockCommandWithHandleMultipleResultsFound();
 
     await cli.executeCommandWithOutput(mockCommandWithHandleMultipleResultsFound, { options: { _: [] } });
@@ -1338,26 +953,21 @@ describe('cli', () => {
   });
 
   it('throws error when interactive mode not set', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((() => false));
+    sinon.stub(cli, 'getSettingWithDefaultValue').returns(false);
     await assert.rejects((cli.handleMultipleResultsFound(`Multiple values with name found.`, { '1': { 'id': '1', 'title': 'Option1' }, '2': { 'id': '2', 'title': 'Option2' } })
     ), 'error');
   });
 
-  it('correctly handles error when executing command', (done) => {
-    sinon.stub(mockCommand, 'commandAction').callsFake(() => { throw 'Error'; });
-    cli
-      .executeCommand(mockCommand, { options: { _: [] } })
-      .then(_ => {
-        done('Command succeeded while expected fail');
-      }, e => {
-        try {
-          assert.strictEqual(e, 'Error');
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      });
+  it('correctly handles error when executing command', async () => {
+    sinon.stub(mockCommand, 'commandAction').throws(new Error('Error'));
+
+    try {
+      await cli.executeCommand(mockCommand, { options: { _: [] } });
+      assert.fail('Command succeeded while expected fail');
+    }
+    catch (e: any) {
+      assert.strictEqual(e.message, 'Error');
+    }
   });
 
   it('correctly handles error when executing command (execute)', async () => {
@@ -1366,21 +976,16 @@ describe('cli', () => {
     assert.rejects(cli.execute(['cli', 'completion', 'clink', 'update']), new Error('Error'));
   });
 
-  it('correctly handles error when executing command with output', (done) => {
-    sinon.stub(mockCommand, 'commandAction').callsFake(() => { throw 'Error'; });
-    cli
-      .executeCommandWithOutput(mockCommand, { options: { _: [] } })
-      .then(_ => {
-        done('Command succeeded while expected fail');
-      }, e => {
-        try {
-          assert.strictEqual(e.error, 'Error');
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      });
+  it('correctly handles error when executing command with output', async () => {
+    sinon.stub(mockCommand, 'commandAction').throws(new Error('Error'));
+
+    try {
+      await cli.executeCommandWithOutput(mockCommand, { options: { _: [] } });
+      assert.fail('Command succeeded while expected fail');
+    }
+    catch (e: any) {
+      assert.strictEqual(e.error.message, 'Error');
+    }
   });
 
   it(`loads all commands, when the matched file doesn't contain command`, async () => {
@@ -1391,7 +996,7 @@ describe('cli', () => {
   });
 
   it(`loads all commands, when exception was thrown when loading a command file`, async () => {
-    sinon.stub(cli, 'loadCommandFromFile').returns(Promise.resolve());
+    sinon.stub(cli, 'loadCommandFromFile').resolves();
     await cli.loadCommandFromArgs(['status']);
 
     assert.strictEqual(cli.commandToExecute, undefined);
@@ -1779,21 +1384,15 @@ describe('cli', () => {
     }, chalk.red('Error: JMESPath query error. ArgumentError: contains() takes 2 arguments but received 1. See https://jmespath.org/specification.html for more information'));
   });
 
-  it(`prints commands grouped per service when no command specified`, (done) => {
+  it(`prints commands grouped per service when no command specified`, async () => {
     cli.loadCommandFromArgs(['status']);
     cli.loadCommandFromArgs(['spo', 'site', 'list']);
     cli.printAvailableCommands();
 
-    try {
-      assert(cliLogStub.calledWith('  cli *  8 commands'));
-      done();
-    }
-    catch (e) {
-      done(e);
-    }
+    assert(cliLogStub.calledWith('  cli *  8 commands'));
   });
 
-  it(`prints commands from the specified group`, (done) => {
+  it(`prints commands from the specified group`, async () => {
     cli.loadCommandFromArgs(['status']);
     cli.loadCommandFromArgs(['spo', 'site', 'list']);
     cli.optionsFromArgs = {
@@ -1803,16 +1402,10 @@ describe('cli', () => {
     };
     cli.printAvailableCommands();
 
-    try {
-      assert(cliLogStub.calledWith('  cli mock *        5 commands'));
-      done();
-    }
-    catch (e) {
-      done(e);
-    }
+    assert(cliLogStub.calledWith('  cli mock *        5 commands'));
   });
 
-  it(`prints commands from the root group when the specified string doesn't match any group`, (done) => {
+  it(`prints commands from the root group when the specified string doesn't match any group`, () => {
     cli.loadCommandFromArgs(['status']);
     cli.loadCommandFromArgs(['spo', 'site', 'list']);
     cli.optionsFromArgs = {
@@ -1822,123 +1415,79 @@ describe('cli', () => {
     };
     cli.printAvailableCommands();
 
+    assert(cliLogStub.calledWith('  cli *  8 commands'));
+  });
+
+  it(`runs properly when context file not found`, async () => {
+    sinon.stub(fs, 'existsSync').returns(false);
+    cli.commandToExecute = cli.commands.find(c => c.name === 'cli mock');
+
+    await cli.execute(['cli', 'mock', '--parameterX', '123', '--output', 'json']);
+    assert(cliLogStub.called);
+  });
+
+  it(`populates option from context file`, async () => {
+    sinon.stub(fs, 'existsSync').callsFake((path) => path.toString() === '.m365rc.json');
+    sinon.stub(fs, 'readFileSync').onCall(0).returns('{"context": {"parameterY": "456"}}').onCall(1).returns('{}');
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return undefined;
+      }
+      return defaultValue;
+    });
+    cli.commandToExecute = cli.commands.find(c => c.name === 'cli mock');
+
+    await cli.execute(['cli', 'mock', '--parameterX', '123', '--output', 'text']);
+    assert(cliLogStub.called);
+  });
+
+  it(`populates option from context file (debug mode)`, async () => {
+    sinon.stub(fs, 'existsSync').callsFake((path) => path.toString() === '.m365rc.json');
+    sinon.stub(fs, 'readFileSync').onCall(0).returns('{"context": {"parameterY": "456"}}').onCall(1).returns('{}');
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return undefined;
+      }
+      return defaultValue;
+    });
+    cli.commandToExecute = cli.commands.find(c => c.name === 'cli mock');
+
+    await cli.execute(['cli', 'mock', '--parameterX', '123', '--output', 'text', '--debug']);
+    assert(cliLogStub.called);
+  });
+
+  it(`runs properly when context m365rc file found but without any context`, async () => {
+    sinon.stub(fs, 'existsSync').callsFake((path) => path.toString() === '.m365rc.json');
+    sinon.stub(fs, 'readFileSync').onCall(0).returns('{}').onCall(1).returns('{}');
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return undefined;
+      }
+      return defaultValue;
+    });
+    cli.commandToExecute = cli.commands.find(c => c.name === 'cli mock');
+
+    await cli.execute(['cli', 'mock', '--parameterX', '123', '--output', 'text']);
+    assert(cliLogStub.called);
+  });
+
+  it(`throws error when context json parse fails`, async () => {
+    sinon.stub(fs, 'existsSync').callsFake((path) => path.toString() === '.m365rc.json');
+    sinon.stub(fs, 'readFileSync').onCall(0).returns('I will not parse').onCall(1).returns('{}');
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return undefined;
+      }
+      return defaultValue;
+    });
+    cli.commandToExecute = cli.commands.find(c => c.name === 'cli mock');
     try {
-      assert(cliLogStub.calledWith('  cli *  8 commands'));
-      done();
+      await cli.execute(['cli', 'mock', '--parameterX', '123', '--output', 'text']);
+      assert.fail(`Didn't fail while expected`);
     }
-    catch (e) {
-      done(e);
+    catch {
+      assert(cliErrorStub.calledWith(chalk.red('Error: Error parsing .m365rc.json')));
     }
-  });
-
-  it(`runs properly when context file not found`, (done) => {
-    sinon.stub(fs, 'existsSync').callsFake(_ => false);
-    cli.commandToExecute = cli.commands.find(c => c.name === 'cli mock');
-    cli
-      .execute(['cli', 'mock', '--parameterX', '123', '--output', 'json'])
-      .then(_ => {
-        try {
-          assert(cliLogStub.called);
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }, e => done(e));
-  });
-
-  it(`populates option from context file`, (done) => {
-    sinon.stub(fs, 'existsSync').callsFake((path) => path.toString() === '.m365rc.json');
-    sinon.stub(fs, 'readFileSync').onCall(0).callsFake(_ => '{"context": {"parameterY": "456"}}').onCall(1).callsFake(_ => '{}');
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return undefined;
-      }
-      return defaultValue;
-    });
-    cli.commandToExecute = cli.commands.find(c => c.name === 'cli mock');
-    cli
-      .execute(['cli', 'mock', '--parameterX', '123', '--output', 'text'])
-      .then(_ => {
-        try {
-          assert(cliLogStub.called);
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }, e => done(e));
-  });
-
-  it(`populates option from context file (debug mode)`, (done) => {
-    sinon.stub(fs, 'existsSync').callsFake((path) => path.toString() === '.m365rc.json');
-    sinon.stub(fs, 'readFileSync').onCall(0).callsFake(_ => '{"context": {"parameterY": "456"}}').onCall(1).callsFake(_ => '{}');
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return undefined;
-      }
-      return defaultValue;
-    });
-    cli.commandToExecute = cli.commands.find(c => c.name === 'cli mock');
-    cli
-      .execute(['cli', 'mock', '--parameterX', '123', '--output', 'text', '--debug'])
-      .then(_ => {
-        try {
-          assert(cliLogStub.called);
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }, e => done(e));
-  });
-
-  it(`runs properly when context m365rc file found but without any context`, (done) => {
-    sinon.stub(fs, 'existsSync').callsFake((path) => path.toString() === '.m365rc.json');
-    sinon.stub(fs, 'readFileSync').onCall(0).callsFake(_ => '{}').onCall(1).callsFake(_ => '{}');
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return undefined;
-      }
-      return defaultValue;
-    });
-    cli.commandToExecute = cli.commands.find(c => c.name === 'cli mock');
-    cli
-      .execute(['cli', 'mock', '--parameterX', '123', '--output', 'text'])
-      .then(_ => {
-        try {
-          assert(cliLogStub.called);
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }, e => done(e));
-  });
-
-  it(`throws error when context json parse fails`, (done) => {
-    sinon.stub(fs, 'existsSync').callsFake((path) => path.toString() === '.m365rc.json');
-    sinon.stub(fs, 'readFileSync').onCall(0).callsFake(_ => 'I will not parse').onCall(1).callsFake(_ => '{}');
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return undefined;
-      }
-      return defaultValue;
-    });
-    cli.commandToExecute = cli.commands.find(c => c.name === 'cli mock');
-    cli
-      .execute(['cli', 'mock', '--parameterX', '123', '--output', 'text'])
-      .then(_ => {
-        done('Promise completed while error expected');
-      }, _ => {
-        try {
-          assert(cliErrorStub.calledWith(chalk.red('Error: Error parsing .m365rc.json')));
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      });
   });
 
   it(`exits with the specified exit code`, async () => {
@@ -1964,94 +1513,68 @@ describe('cli', () => {
     }
   });
 
-  it(`replaces option value with the content of the specified file when value starts with @ and the specified file exists`, (done) => {
+  it(`replaces option value with the content of the specified file when value starts with @ and the specified file exists`, async () => {
     sinon.stub(fs, 'existsSync').callsFake((path) => path.toString().endsWith('.txt'));
-    sinon.stub(fs, 'readFileSync').callsFake(_ => 'abc');
+    sinon.stub(fs, 'readFileSync').returns('abc');
     cli.commandToExecute = cli.commands.find(c => c.name === 'cli mock');
-    cli
-      .execute(['cli', 'mock', '-x', '@file.txt', '-o', 'text'])
-      .then(_ => {
-        try {
-          assert(cliLogStub.calledWith('abc'));
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }, e => done(`Error: ${e}`));
+
+    await cli.execute(['cli', 'mock', '-x', '@file.txt', '-o', 'text']);
+    assert(cliLogStub.calledWith('abc'));
   });
 
-  it(`returns error when reading file contents failed`, (done) => {
-    sinon.stub(fs, 'existsSync').callsFake(_ => true);
-    sinon.stub(fs, 'readFileSync').callsFake(_ => { throw 'An error has occurred'; });
+  it(`returns error when reading file contents failed`, async () => {
+    sinon.stub(fs, 'existsSync').returns(true);
+    sinon.stub(fs, 'readFileSync').throws(new CommandError('An error has occurred'));
     cli.commandToExecute = cli.commands.find(c => c.name === 'cli mock');
-    cli
-      .execute(['cli', 'mock', '-x', '@file.txt'])
-      .then(_ => {
-        done('Promise completed while error expected');
-      }, _ => {
-        try {
-          assert(cliErrorStub.calledWith(chalk.red(`Error: An error has occurred`)));
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      });
+
+    try {
+      await cli.execute(['cli', 'mock', '-x', '@file.txt']);
+      assert.fail('Promise completed while error expected');
+    }
+    catch {
+      assert(cliErrorStub.calledWith(chalk.red(`Error: An error has occurred`)));
+    }
   });
 
-  it(`leaves the original value if the file specified in @ value doesn't exist`, (done) => {
-    sinon.stub(fs, 'existsSync').callsFake(_ => false);
+  it(`leaves the original value if the file specified in @ value doesn't exist`, async () => {
+    sinon.stub(fs, 'existsSync').returns(false);
     cli.commandToExecute = cli.commands.find(c => c.name === 'cli mock');
-    cli
-      .execute(['cli', 'mock', '-x', '@file.txt', '-o', 'text'])
-      .then(_ => {
-        try {
-          assert(cliLogStub.calledWith('@file.txt'));
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }, e => done(`Error: ${e}`));
+
+    await cli.execute(['cli', 'mock', '-x', '@file.txt', '-o', 'text']);
+    assert(cliLogStub.calledWith('@file.txt'));
   });
 
-  it(`closes with error when processing options failed`, (done) => {
-    sinon.stub(mockCommand, 'processOptions').callsFake(() => Promise.reject('Error'));
+  it(`closes with error when processing options failed`, async () => {
+    sinon.stub(mockCommand, 'processOptions').rejects('Error');
     cli.commandToExecute = cli.commands.find(c => c.name === 'cli mock');
-    cli
-      .execute(['cli', 'mock', '-x', '123'])
-      .then(_ => {
-        done('Passed while error expected');
-      }, e => {
-        try {
-          assert.strictEqual(e.name, 'Error');
-          done();
-        }
-        catch (er) {
-          done(er);
-        }
-      });
+
+    try {
+      await cli.execute(['cli', 'mock', '-x', '123']);
+      assert.fail('Promise completed while error expected');
+    }
+    catch (e: any) {
+      assert.strictEqual(e.name, 'Error');
+    }
   });
 
   it(`logs output to console`, () => {
     sinonUtil.restore(cli.log);
-    const consoleLogSpy: sinon.SinonSpy = sinon.stub(console, 'log').callsFake(() => { });
+    const consoleLogSpy: sinon.SinonSpy = sinon.stub(console, 'log').returns();
     cli.log('Message');
     assert(consoleLogSpy.calledWith('Message'));
   });
 
   it(`logs empty line to console when no message specified`, () => {
     sinonUtil.restore(cli.log);
-    const consoleLogSpy: sinon.SinonSpy = sinon.stub(console, 'log').callsFake(() => { });
+    const consoleLogSpy: sinon.SinonSpy = sinon.stub(console, 'log').returns();
     cli.log();
     assert(consoleLogSpy.calledWith());
   });
 
   it(`logs error to console stderr`, async () => {
     sinonUtil.restore(cli.error);
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((name, defaultValue) => defaultValue);
-    const consoleErrorStub = sinon.stub(console, 'error').callsFake(() => { });
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((_, defaultValue) => defaultValue);
+    const consoleErrorStub = sinon.stub(console, 'error').returns();
 
     await cli.error('Message');
     assert(consoleErrorStub.calledWith('Message'));
@@ -2059,10 +1582,10 @@ describe('cli', () => {
 
   it(`logs error to console stdout when stdout configured as error output`, async () => {
     const config = cli.getConfig();
-    sinon.stub(config, 'get').callsFake(() => 'stdout');
+    sinon.stub(config, 'get').returns('stdout');
     sinonUtil.restore(cli.error);
-    const consoleErrorSpy: sinon.SinonSpy = sinon.stub(console, 'error').callsFake(() => { });
-    const consoleLogSpy: sinon.SinonSpy = sinon.stub(console, 'log').callsFake(() => { });
+    const consoleErrorSpy: sinon.SinonSpy = sinon.stub(console, 'error').returns();
+    const consoleLogSpy: sinon.SinonSpy = sinon.stub(console, 'log').returns();
 
     await cli.error('Message');
     assert(consoleErrorSpy.notCalled, 'console.error called');
@@ -2091,46 +1614,27 @@ describe('cli', () => {
     assert.strictEqual(spyShouldTrimOutput, false);
   });
 
-  it('does not show help when output is set to none', (done) => {
+  it('does not show help when output is set to none', async () => {
     cli.commandToExecute = cli.commands.find(c => c.name === 'cli completion clink update');
-    cli
-      .execute(['cli', 'completion', 'clink', 'update', '-h', 'examples', '--output', 'none'])
-      .then(_ => {
-        try {
-          assert.strictEqual(log.length === 0, true);
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }, e => done(e));
+
+    await cli.execute(['cli', 'completion', 'clink', 'update', '-h', 'examples', '--output', 'none']);
+    assert.strictEqual(log.length === 0, true);
   });
 
-  it(`shows no output on successful run with output set to none`, (done) => {
+  it(`shows no output on successful run with output set to none`, async () => {
     cli.commandToExecute = cli.commands.find(c => c.name === 'cli mock boolean rewrite');
-    cli
-      .execute(['cli', 'mock', 'boolean', 'rewrite', '--booleanParameterX', 'true', '--booleanParameterY', 'false', '--output', 'none'])
-      .then(_ => {
-        try {
-          assert.strictEqual(cliLogStub.notCalled, true);
-          assert.strictEqual(cliErrorStub.notCalled, true);
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }, e => done(e));
+
+    await cli.execute(['cli', 'mock', 'boolean', 'rewrite', '--booleanParameterX', 'true', '--booleanParameterY', 'false', '--output', 'none']);
+    assert.strictEqual(cliLogStub.notCalled, true);
+    assert.strictEqual(cliErrorStub.notCalled, true);
   });
 
-  it(`shows no output when a validation error occurs in and output is set to none`, (done) => {
+  it(`shows no output when a validation error occurs in and output is set to none`, async () => {
     cli.commandToExecute = cli.commands.find(c => c.name === 'cli mock boolean rewrite');
-    cli
-      .execute(['cli', 'mock', 'boolean', 'rewrite', '--booleanParameterX', 'folse', '--output', 'none'])
-      .then(_ => {
-        assert(cliErrorStub.notCalled);
-        assert(cliLogStub.notCalled);
-        done();
-      }, _ => done('Promise fulfilled with error, no error expected'));
+
+    await cli.execute(['cli', 'mock', 'boolean', 'rewrite', '--booleanParameterX', 'folse', '--output', 'none']);
+    assert(cliErrorStub.notCalled);
+    assert(cliLogStub.notCalled);
   });
 
   it('for completion commands loads full command info', async () => {
