@@ -48,7 +48,4 @@ RUN bash -c 'echo "export PATH=$PATH:/home/cli-microsoft365/.npm-global/bin:/hom
   && pwsh -c 'm365 cli completion pwsh setup --profile $profile' \
   && pwsh -c 'Add-Content -Path $PROFILE -Value "`r`Set-Alias -Name m365? -Value m365_chili"'
 
-RUN pip install setuptools==58
-RUN pip install jmespath-terminal
-
 CMD [ "bash", "-l" ]
