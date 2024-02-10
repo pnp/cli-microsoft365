@@ -6,6 +6,12 @@ sidebar_position: 4
 
 ## v7.5.0 (beta)
 
+### New commands
+
+**Entra ID**
+
+- [entra group user add](../cmd/entra/group/group-user-add.mdx) - adds a user to a Microsoft Entra ID group [#5471](https://github.com/pnp/cli-microsoft365/issues/5471)
+
 ### Changes
 
 - fixed [entra app permission add](../cmd/entra/app/app-permission-add.mdx) throwing an error [#5802](https://github.com/pnp/cli-microsoft365/issues/5802)
@@ -13,6 +19,8 @@ sidebar_position: 4
 - added [user guide](../user-guide/using-cli-vs-code-extension.mdx) for CLI for Microsoft 365 Visual Studio Code extension [#5796](https://github.com/pnp/cli-microsoft365/issues/5796)
 - fixed incorrect short option in docs for [spo listitem list](../cmd/spo/listitem/listitem-list.mdx) command [#5822](https://github.com/pnp/cli-microsoft365/pull/5822)
 - renamed internal CLI utilities from `aad` to `entra` [#5757](https://github.com/pnp/cli-microsoft365/issues/5757)
+- added request header Prefer: include-unknown-enum-members when reading connection schema [#5826](https://github.com/pnp/cli-microsoft365/issues/5826)
+- updated Docker images to use Node@20 [#5809](https://github.com/pnp/cli-microsoft365/pull/5809)
 
 ## [v7.4.0](https://github.com/pnp/cli-microsoft365/releases/tag/v7.4.0)
 
