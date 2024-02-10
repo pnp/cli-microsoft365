@@ -7,7 +7,7 @@ export async function executeCommand(commandName: string, options: any, listener
   cli.loadAllCommandsInfo();
   await cli.loadCommandFromArgs(commandName.split(' '));
   if (!cli.commandToExecute) {
-    return Promise.reject(`Command not found: ${commandName}`);
+    throw `Command not found: ${commandName}`;
   }
 
   return cli.executeCommandWithOutput(cli.commandToExecute.command, { options: options ?? {} }, listener);
