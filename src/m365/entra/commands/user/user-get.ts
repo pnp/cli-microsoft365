@@ -6,7 +6,7 @@ import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 import aadCommands from '../../aadCommands.js';
-import { aadUser } from '../../../../utils/aadUser.js';
+import { entraUser } from '../../../../utils/entraUser.js';
 import { formatting } from '../../../../utils/formatting.js';
 
 interface CommandArgs {
@@ -105,7 +105,7 @@ class EntraUserGetCommand extends GraphCommand {
         userIdOrPrincipalName = formatting.encodeQueryParameter(args.options.userName);
       }
       else if (args.options.email) {
-        userIdOrPrincipalName = await aadUser.getUserIdByEmail(args.options.email);
+        userIdOrPrincipalName = await entraUser.getUserIdByEmail(args.options.email);
       }
 
       const requestUrl: string = this.getRequestUrl(userIdOrPrincipalName!, args.options);

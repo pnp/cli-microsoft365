@@ -15,7 +15,7 @@ import commands from '../../commands.js';
 import command from './user-get.js';
 import { settingsNames } from '../../../../settingsNames.js';
 import aadCommands from '../../aadCommands.js';
-import { aadUser } from '../../../../utils/aadUser.js';
+import { entraUser } from '../../../../utils/entraUser.js';
 import { formatting } from '../../../../utils/formatting.js';
 
 describe(commands.USER_GET, () => {
@@ -69,7 +69,7 @@ describe(commands.USER_GET, () => {
       accessToken.getUserIdFromAccessToken,
       accessToken.getUserNameFromAccessToken,
       cli.getSettingWithDefaultValue,
-      aadUser.getUserIdByEmail
+      entraUser.getUserIdByEmail
     ]);
   });
 
@@ -212,7 +212,7 @@ describe(commands.USER_GET, () => {
   });
 
   it('retrieves user using email', async () => {
-    sinon.stub(aadUser, 'getUserIdByEmail').withArgs(userName).resolves(userId);
+    sinon.stub(entraUser, 'getUserIdByEmail').withArgs(userName).resolves(userId);
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users/${userId}`) {
         return resultValue;
@@ -239,7 +239,7 @@ describe(commands.USER_GET, () => {
   });
 
   it('fails to get user when user with provided email does not exists', async () => {
-    sinon.stub(aadUser, 'getUserIdByEmail').withArgs(userName).throws(Error(`The specified user with email ${userName} does not exist`));
+    sinon.stub(entraUser, 'getUserIdByEmail').withArgs(userName).throws(Error(`The specified user with email ${userName} does not exist`));
 
     await assert.rejects(command.action(logger, { options: { email: userName } }),
       new CommandError(`The specified user with email ${userName} does not exist`));
