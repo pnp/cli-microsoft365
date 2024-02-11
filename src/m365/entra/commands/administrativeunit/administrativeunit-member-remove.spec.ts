@@ -12,10 +12,10 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import command from './administrativeunit-member-remove.js';
-import { aadAdministrativeUnit } from '../../../../utils/aadAdministrativeUnit.js';
-import { aadGroup } from '../../../../utils/aadGroup.js';
-import { aadUser } from '../../../../utils/aadUser.js';
-import { aadDevice } from '../../../../utils/aadDevice.js';
+import { entraAdministrativeUnit } from '../../../../utils/entraAdministrativeUnit.js';
+import { entraGroup } from '../../../../utils/entraGroup.js';
+import { entraUser } from '../../../../utils/entraUser.js';
+import { entraDevice } from '../../../../utils/entraDevice.js';
 import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.ADMINISTRATIVEUNIT_MEMBER_REMOVE, () => {
@@ -66,10 +66,10 @@ describe(commands.ADMINISTRATIVEUNIT_MEMBER_REMOVE, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.delete,
-      aadAdministrativeUnit.getAdministrativeUnitByDisplayName,
-      aadUser.getUserIdByUpn,
-      aadGroup.getGroupIdByDisplayName,
-      aadDevice.getDeviceByDisplayName,
+      entraAdministrativeUnit.getAdministrativeUnitByDisplayName,
+      entraUser.getUserIdByUpn,
+      entraGroup.getGroupIdByDisplayName,
+      entraDevice.getDeviceByDisplayName,
       cli.getSettingWithDefaultValue,
       cli.handleMultipleResultsFound,
       cli.promptForConfirmation
@@ -465,8 +465,8 @@ describe(commands.ADMINISTRATIVEUNIT_MEMBER_REMOVE, () => {
   });
 
   it('removes the member specified by name from administrative unit specified by displayName while prompting for confirmation', async () => {
-    sinon.stub(aadAdministrativeUnit, 'getAdministrativeUnitByDisplayName').resolves({ id: administrativeUnitId, displayName: administrativeUnitName });
-    sinon.stub(aadUser, 'getUserIdByUpn').withArgs(userName).resolves(userId);
+    sinon.stub(entraAdministrativeUnit, 'getAdministrativeUnitByDisplayName').resolves({ id: administrativeUnitId, displayName: administrativeUnitName });
+    sinon.stub(entraUser, 'getUserIdByUpn').withArgs(userName).resolves(userId);
 
     const deleteRequestStub = sinon.stub(request, 'delete').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/directory/administrativeUnits/${administrativeUnitId}/members/${userId}/$ref`) {
@@ -510,8 +510,8 @@ describe(commands.ADMINISTRATIVEUNIT_MEMBER_REMOVE, () => {
   });
 
   it('removes a user specified by its name from an administrative unit specified by its name (verbose)', async () => {
-    sinon.stub(aadUser, 'getUserIdByUpn').withArgs(userName).resolves(userId);
-    sinon.stub(aadAdministrativeUnit, 'getAdministrativeUnitByDisplayName').withArgs(administrativeUnitName).resolves({ id: administrativeUnitId, displayName: administrativeUnitName });
+    sinon.stub(entraUser, 'getUserIdByUpn').withArgs(userName).resolves(userId);
+    sinon.stub(entraAdministrativeUnit, 'getAdministrativeUnitByDisplayName').withArgs(administrativeUnitName).resolves({ id: administrativeUnitId, displayName: administrativeUnitName });
 
     const deleteRequestStub = sinon.stub(request, 'delete').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/directory/administrativeUnits/${administrativeUnitId}/members/${userId}/$ref`) {
@@ -539,8 +539,8 @@ describe(commands.ADMINISTRATIVEUNIT_MEMBER_REMOVE, () => {
   });
 
   it('removes a group specified by its name from an administrative unit specified by its name (verbose)', async () => {
-    sinon.stub(aadGroup, 'getGroupIdByDisplayName').withArgs(groupName).resolves(groupId);
-    sinon.stub(aadAdministrativeUnit, 'getAdministrativeUnitByDisplayName').withArgs(administrativeUnitName).resolves({ id: administrativeUnitId, displayName: administrativeUnitName });
+    sinon.stub(entraGroup, 'getGroupIdByDisplayName').withArgs(groupName).resolves(groupId);
+    sinon.stub(entraAdministrativeUnit, 'getAdministrativeUnitByDisplayName').withArgs(administrativeUnitName).resolves({ id: administrativeUnitId, displayName: administrativeUnitName });
 
     const deleteRequestStub = sinon.stub(request, 'delete').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/directory/administrativeUnits/${administrativeUnitId}/members/${groupId}/$ref`) {
@@ -568,8 +568,8 @@ describe(commands.ADMINISTRATIVEUNIT_MEMBER_REMOVE, () => {
   });
 
   it('removes a device specified by its name from an administrative unit specified by its name (verbose)', async () => {
-    sinon.stub(aadDevice, 'getDeviceByDisplayName').withArgs(deviceName).resolves({ id: deviceId, displayName: deviceName });
-    sinon.stub(aadAdministrativeUnit, 'getAdministrativeUnitByDisplayName').withArgs(administrativeUnitName).resolves({ id: administrativeUnitId, displayName: administrativeUnitName });
+    sinon.stub(entraDevice, 'getDeviceByDisplayName').withArgs(deviceName).resolves({ id: deviceId, displayName: deviceName });
+    sinon.stub(entraAdministrativeUnit, 'getAdministrativeUnitByDisplayName').withArgs(administrativeUnitName).resolves({ id: administrativeUnitId, displayName: administrativeUnitName });
 
     const deleteRequestStub = sinon.stub(request, 'delete').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/directory/administrativeUnits/${administrativeUnitId}/members/${deviceId}/$ref`) {
