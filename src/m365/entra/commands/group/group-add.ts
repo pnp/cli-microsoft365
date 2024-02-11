@@ -6,7 +6,7 @@ import aadCommands from '../../aadCommands.js';
 import { validation } from '../../../../utils/validation.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { Logger } from '../../../../cli/Logger.js';
-import { aadUser } from '../../../../utils/aadUser.js';
+import { entraUser } from '../../../../utils/entraUser.js';
 
 interface CommandArgs {
   options: Options;
@@ -100,20 +100,34 @@ class EntraGroupAddCommand extends GraphCommand {
           }
         }
 
-        if (args.options.ownerIds && !validation.isValidGuidArray(args.options.ownerIds.split(','))) {
-          return `Value for option 'ownerIds' is not a list of valid user IDs.`;
+        if (args.options.ownerIds) {
+          const ids = args.options.ownerIds.split(',').map(i => i.trim());
+          if (!validation.isValidGuidArray(ids)) {
+            const invalidGuid = ids.find(id => !validation.isValidGuid(id));
+            return `'${invalidGuid}' is not a valid GUID for option 'ownerIds'.`;
+          }
         }
 
-        if (args.options.ownerUserNames && !validation.isValidUserPrincipalNameArray(args.options.ownerUserNames.split(','))) {
-          return `Value for option 'ownerUserNames' is not a list of valid user principal names.`;
+        if (args.options.ownerUserNames) {
+          const isValidUserPrincipalNameArray = validation.isValidUserPrincipalNameArray(args.options.ownerUserNames.split(',').map(u => u.trim()));
+          if (isValidUserPrincipalNameArray !== true) {
+            return `User principal name '${isValidUserPrincipalNameArray}' is invalid for option 'ownerUserNames'.`;
+          }
         }
 
-        if (args.options.memberIds && !validation.isValidGuidArray(args.options.memberIds.split(','))) {
-          return `Value for option 'memberIds' is not a list of valid user IDs.`;
+        if (args.options.memberIds) {
+          const ids = args.options.memberIds.split(',').map(i => i.trim());
+          if (!validation.isValidGuidArray(ids)) {
+            const invalidGuid = ids.find(id => !validation.isValidGuid(id));
+            return `'${invalidGuid}' is not a valid GUID for option 'memberIds'.`;
+          }
         }
 
-        if (args.options.memberUserNames && !validation.isValidUserPrincipalNameArray(args.options.memberUserNames.split(','))) {
-          return `Value for option 'memberUserNames' is not a list of valid user principal names.`;
+        if (args.options.memberUserNames) {
+          const isValidUserPrincipalNameArray = validation.isValidUserPrincipalNameArray(args.options.memberUserNames.split(',').map(u => u.trim()));
+          if (isValidUserPrincipalNameArray !== true) {
+            return `User principal name '${isValidUserPrincipalNameArray}' is invalid for option 'memberUserNames'.`;
+          }
         }
 
         if (['microsoft365', 'security'].indexOf(args.options.type) === -1) {
@@ -226,7 +240,7 @@ class EntraGroupAddCommand extends GraphCommand {
       await logger.logToStderr('Retrieving ID(s) of user(s)...');
     }
 
-    return aadUser.getUserIdsByUpns(userArr);
+    return entraUser.getUserIdsByUpns(userArr);
   }
 
   private async addUsers(groupId: string, role: string, userIds: string[]): Promise<void> {

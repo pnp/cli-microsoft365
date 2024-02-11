@@ -12,7 +12,7 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import command from './group-add.js';
-import { aadUser } from '../../../../utils/aadUser.js';
+import { entraUser } from '../../../../utils/entraUser.js';
 import { CommandError } from '../../../../Command.js';
 
 describe(commands.GROUP_ADD, () => {
@@ -206,7 +206,7 @@ describe(commands.GROUP_ADD, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.post,
-      aadUser.getUserIdsByUpns
+      entraUser.getUserIdsByUpns
     ]);
   });
 
@@ -371,7 +371,7 @@ describe(commands.GROUP_ADD, () => {
   });
 
   it('successfully creates group with owners specified by user names', async () => {
-    sinon.stub(aadUser, 'getUserIdsByUpns').withArgs(userUpns).resolves(userIds);
+    sinon.stub(entraUser, 'getUserIdsByUpns').withArgs(userUpns).resolves(userIds);
 
     const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups') {
@@ -395,7 +395,7 @@ describe(commands.GROUP_ADD, () => {
   });
 
   it('successfully creates group with members specified by user names', async () => {
-    sinon.stub(aadUser, 'getUserIdsByUpns').withArgs(userUpns).resolves(userIds);
+    sinon.stub(entraUser, 'getUserIdsByUpns').withArgs(userUpns).resolves(userIds);
 
     const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups') {
