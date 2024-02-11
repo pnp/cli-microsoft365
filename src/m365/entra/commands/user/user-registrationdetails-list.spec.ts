@@ -13,7 +13,7 @@ import { CommandError } from '../../../../Command.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { cli } from '../../../../cli/cli.js';
-import { aadUser } from '../../../../utils/aadUser.js';
+import { entraUser } from '../../../../utils/entraUser.js';
 import { formatting } from '../../../../utils/formatting.js';
 
 describe(commands.USER_REGISTRATIONDETAILS_LIST, () => {
@@ -116,7 +116,7 @@ describe(commands.USER_REGISTRATIONDETAILS_LIST, () => {
     sinonUtil.restore([
       request.get,
       cli.getSettingWithDefaultValue,
-      aadUser.getUpnByUserId
+      entraUser.getUpnByUserId
     ]);
   });
 
@@ -245,7 +245,7 @@ describe(commands.USER_REGISTRATIONDETAILS_LIST, () => {
 
       throw 'Invalid request';
     });
-    sinon.stub(aadUser, 'getUpnByUserId').callsFake(async (opts) => {
+    sinon.stub(entraUser, 'getUpnByUserId').callsFake(async (opts) => {
       if (opts === '7167b488-1ffb-43f1-9547-35969469bada') {
         return 'joe.guest_external#EXT#@contoso.com';
       }

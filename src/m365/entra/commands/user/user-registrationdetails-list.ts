@@ -5,7 +5,7 @@ import commands from '../../commands.js';
 import aadCommands from '../../aadCommands.js';
 import { odata } from '../../../../utils/odata.js';
 import { UserRegistrationDetails } from '@microsoft/microsoft-graph-types';
-import { aadUser } from '../../../../utils/aadUser.js';
+import { entraUser } from '../../../../utils/entraUser.js';
 import { validation } from '../../../../utils/validation.js';
 import { formatting } from '../../../../utils/formatting.js';
 
@@ -208,7 +208,7 @@ class EntraUserRegistrationDetailsListCommand extends GraphCommand {
     const ids = userIds.split(',').map(m => m.trim());
     const userUpns: string[] = [];
     for (let i = 0; i < ids.length; i++) {
-      const userUpn = await aadUser.getUpnByUserId(ids[i]);
+      const userUpn = await entraUser.getUpnByUserId(ids[i]);
       userUpns.push(userUpn);
     }
     return userUpns;
