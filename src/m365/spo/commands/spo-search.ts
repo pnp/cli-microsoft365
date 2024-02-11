@@ -180,12 +180,17 @@ class SpoSearchCommand extends SpoCommand {
         if (args.options.sortList && !/^([a-z0-9_]+:(ascending|descending))(,([a-z0-9_]+:(ascending|descending)))*$/gi.test(args.options.sortList)) {
           return `sortlist parameter value '${args.options.sortList}' does not match the required pattern (=comma-separated list of '<property>:(ascending|descending)'-pattern)`;
         }
+
         if (args.options.rowLimit && !isNumber(args.options.rowLimit)) {
           return `${args.options.rowLimit} is not a valid number`;
         }
 
         if (args.options.startRow && !isNumber(args.options.startRow)) {
           return `${args.options.startRow} is not a valid number`;
+        }
+
+        if (args.options.startRow && args.options.allResults) {
+          return 'You cannot specify startRow when allResults is set';
         }
 
         if (args.options.culture && !isNumber(args.options.culture)) {
@@ -212,9 +217,7 @@ class SpoSearchCommand extends SpoCommand {
         await logger.logToStderr(`Executing search query '${args.options.queryText}' on site at ${webUrl}...`);
       }
 
-      const startRow = args.options.startRow ? args.options.startRow : 0;
-
-      const results: SearchResult[] = await this.executeSearchQuery(logger, args, webUrl, [], startRow);
+      const results: SearchResult[] = await this.executeSearchQuery(logger, args, webUrl, []);
       this.printResults(logger, args, results);
     }
     catch (err: any) {
@@ -222,8 +225,8 @@ class SpoSearchCommand extends SpoCommand {
     }
   }
 
-  private async executeSearchQuery(logger: Logger, args: CommandArgs, webUrl: string, resultSet: SearchResult[], startRow: number): Promise<SearchResult[]> {
-    const requestUrl: string = await this.getRequestUrl(webUrl, logger, args, startRow);
+  private async executeSearchQuery(logger: Logger, args: CommandArgs, webUrl: string, resultSet: SearchResult[], lastDocId: string = '0'): Promise<SearchResult[]> {
+    const requestUrl: string = await this.getRequestUrl(webUrl, logger, args, lastDocId);
     const requestOptions: any = {
       url: requestUrl,
       headers: {
@@ -235,29 +238,43 @@ class SpoSearchCommand extends SpoCommand {
     const searchResult: SearchResult = await request.get(requestOptions);
     resultSet.push(searchResult);
 
-    if (args.options.allResults && startRow + searchResult.PrimaryQueryResult.RelevantResults.RowCount < searchResult.PrimaryQueryResult.RelevantResults.TotalRows) {
-      const nextStartRow = startRow + searchResult.PrimaryQueryResult.RelevantResults.RowCount;
-      return this.executeSearchQuery(logger, args, webUrl, resultSet, nextStartRow);
+    const rowLimit = args.options.rowLimit ? args.options.rowLimit : 500;
+
+    if (args.options.allResults && searchResult.PrimaryQueryResult.RelevantResults.RowCount === rowLimit) {
+      if (this.verbose) {
+        await logger.logToStderr(`Processing search query, retrieved ${resultSet.length * searchResult.PrimaryQueryResult.RelevantResults.RowCount} of ${resultSet[0].PrimaryQueryResult.RelevantResults.TotalRows} items...`);
+      }
+
+      // When running in allResults mode, paging is done using the DocId property
+      // This is a more stable way than using the StartRow property.
+      // Explanation: https://learn.microsoft.com/sharepoint/dev/general-development/pagination-for-large-result-sets
+      const lastRow = searchResult.PrimaryQueryResult.RelevantResults.Table.Rows[searchResult.PrimaryQueryResult.RelevantResults.RowCount - 1];
+      const newLastDocId = lastRow.Cells.filter(cell => cell.Key === 'DocId')[0].Value;
+
+      return this.executeSearchQuery(logger, args, webUrl, resultSet, newLastDocId);
     }
 
     return resultSet;
   }
 
-  private async getRequestUrl(webUrl: string, logger: Logger, args: CommandArgs, startRow: number): Promise<string> {
+  private async getRequestUrl(webUrl: string, logger: Logger, args: CommandArgs, lastDocId: string): Promise<string> {
     // get the list of selected properties
     const selectPropertiesArray: string[] = this.getSelectPropertiesArray(args);
 
+    // get the sort list
+    const sortList = this.getSortList(args);
+
     // transform arg data to query string parameters
     const propertySelectRequestString: string = `&selectproperties='${formatting.encodeQueryParameter(selectPropertiesArray.join(","))}'`;
-    const startRowRequestString: string = `&startrow=${startRow ? startRow : 0}`;
-    const rowLimitRequestString: string = args.options.rowLimit ? `&rowlimit=${args.options.rowLimit}` : ``;
+    const startRowRequestString: string = `&startrow=${args.options.startRow ? args.options.startRow : 0}`;
+    const rowLimitRequestString: string = args.options.rowLimit ? `&rowlimit=${args.options.rowLimit}` : (args.options.allResults ? `&rowlimit=500` : '');
     const sourceIdRequestString: string = args.options.sourceId ? `&sourceid='${args.options.sourceId}'` : ``;
     const trimDuplicatesRequestString: string = `&trimduplicates=${args.options.trimDuplicates ? args.options.trimDuplicates : "false"}`;
     const enableStemmingRequestString: string = `&enablestemming=${typeof (args.options.enableStemming) === 'undefined' ? "true" : args.options.enableStemming}`;
     const cultureRequestString: string = args.options.culture ? `&culture=${args.options.culture}` : ``;
     const refinementFiltersRequestString: string = args.options.refinementFilters ? `&refinementfilters='${args.options.refinementFilters}'` : ``;
     const queryTemplateRequestString: string = args.options.queryTemplate ? `&querytemplate='${args.options.queryTemplate}'` : ``;
-    const sortListRequestString: string = args.options.sortList ? `&sortList='${formatting.encodeQueryParameter(args.options.sortList)}'` : ``;
+    const sortListRequestString: string = sortList ? `&sortList='${sortList}'` : ``;
     const rankingModelIdRequestString: string = args.options.rankingModelId ? `&rankingmodelid='${args.options.rankingModelId}'` : ``;
     const propertiesRequestString: string = this.getPropertiesRequestString(args);
     const refinersRequestString: string = args.options.refiners ? `&refiners='${args.options.refiners}'` : ``;
@@ -267,9 +284,10 @@ class SpoSearchCommand extends SpoCommand {
     const processBestBetsRequestString: string = typeof (args.options.processBestBets) === 'undefined' ? `` : `&processbestbets=${args.options.processBestBets}`;
     const enableQueryRulesRequestString: string = typeof (args.options.enableQueryRules) === 'undefined' ? `` : `&enablequeryrules=${args.options.enableQueryRules}`;
     const processPersonalFavoritesRequestString: string = typeof (args.options.processPersonalFavorites) === 'undefined' ? `` : `&processpersonalfavorites=${args.options.processPersonalFavorites}`;
+    const indexDocIdQueryText = args.options.allResults ? ` IndexDocId>${lastDocId}` : '';
 
     // construct single requestUrl
-    const requestUrl = `${webUrl}/_api/search/query?querytext='${args.options.queryText}'`.concat(
+    const requestUrl = `${webUrl}/_api/search/query?querytext='${args.options.queryText}${indexDocIdQueryText}'`.concat(
       propertySelectRequestString,
       startRowRequestString,
       rowLimitRequestString,
@@ -313,9 +331,32 @@ class SpoSearchCommand extends SpoCommand {
   }
 
   private getSelectPropertiesArray(args: CommandArgs): string[] {
-    return args.options.selectProperties
+    const selectProperties = args.options.selectProperties
       ? args.options.selectProperties.split(",")
       : ["Title", "OriginalPath"];
+
+    if (args.options.allResults) {
+      selectProperties.push("DocId");
+    }
+
+    return selectProperties;
+  }
+
+  private getSortList(args: CommandArgs): string {
+    const sortList = [];
+    if (args.options.allResults) {
+      sortList.push(formatting.encodeQueryParameter(`[DocId]:ascending`));
+    }
+
+    if (args.options.sortList) {
+      const sortListArray = args.options.sortList.split(",");
+
+      sortListArray.forEach(sortItem => {
+        sortList.push(formatting.encodeQueryParameter(sortItem));
+      });
+    }
+
+    return sortList.join(",");
   }
 
   private async printResults(logger: Logger, args: CommandArgs, results: SearchResult[]): Promise<void> {

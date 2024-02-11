@@ -23,6 +23,10 @@ enum TestID {
   QueryDocuments_WithStartRow1Test,
   QueryDocuments_NoStartRowTest,
   QueryDocuments_NoParameterTest,
+  QueryDocuments_WithDocId0Test,
+  QueryDocuments_WithDocId1Test,
+  QueryDocuments_WithDocId2Test,
+  QueryDocuments_WithDocIdAllTest,
   QueryAll_WithRowLimitTest,
   QueryAll_WithSourceIdTest,
   QueryAll_WithTrimDuplicatesTest,
@@ -154,7 +158,7 @@ describe(commands.SEARCH, () => {
           "ResultTitleUrl": null,
           "RowCount": rows.length,
           "Table": {
-            "Rows": fakeRows
+            "Rows": rows
           },
           "TotalRows": returnArrayLength,
           "TotalRowsIncludingDuplicates": returnArrayLength
@@ -194,6 +198,27 @@ describe(commands.SEARCH, () => {
 
       executedTest = TestID.QueryDocuments_NoParameterTest;
       return getQueryResult(rows);
+    }
+    if (urlContains(opts, `QUERYTEXT=\'ISDOCUMENT:1 INDEXDOCID>0\'`)) {
+      const rows = filterRows(fakeRows, 'ISDOCUMENT', 'TRUE');
+
+      if (urlContains(opts, 'ROWLIMIT=500')) {
+        executedTest = TestID.QueryDocuments_WithDocIdAllTest;
+        return getQueryResult(rows, 4);
+      }
+      else {
+        executedTest = TestID.QueryDocuments_WithDocId0Test;
+        return getQueryResult([rows[0]], 2);
+      }
+    }
+    if (urlContains(opts, `QUERYTEXT=\'ISDOCUMENT:1 INDEXDOCID>1\'`)) {
+      const rows = filterRows(fakeRows, 'ISDOCUMENT', 'TRUE');
+      executedTest = TestID.QueryDocuments_WithDocId1Test;
+      return getQueryResult([rows[1]], 1);
+    }
+    if (urlContains(opts, `QUERYTEXT=\'ISDOCUMENT:1 INDEXDOCID>2\'`)) {
+      executedTest = TestID.QueryDocuments_WithDocId2Test;
+      return getQueryResult([], 0);
     }
     if (urlContains(opts, 'QUERYTEXT=\'*\'')) {
       let rows = fakeRows;
@@ -381,8 +406,7 @@ describe(commands.SEARCH, () => {
         rowLimit: 1
       }
     });
-    assert.strictEqual(returnArrayLength, 2);
-    assert.strictEqual(executedTest, TestID.QueryDocuments_WithStartRow1Test);
+    assert.strictEqual(executedTest, TestID.QueryDocuments_WithDocId2Test);
   });
 
   it('executes search request with trimDuplicates', async () => {
@@ -463,11 +487,26 @@ describe(commands.SEARCH, () => {
         output: 'json',
         queryText: 'IsDocument:1',
         allResults: true,
+        verbose: true,
         rowLimit: 1
       }
     });
-    assert.strictEqual(returnArrayLength, 2);
-    assert.strictEqual(executedTest, TestID.QueryDocuments_WithStartRow1Test);
+    assert.strictEqual(executedTest, TestID.QueryDocuments_WithDocId2Test);
+  });
+
+  it('executes search request with \'allResults\' and no rowlimit', async () => {
+    sinon.stub(request, 'get').callsFake(getFakes);
+
+    await command.action(logger, {
+      options: {
+        output: 'json',
+        queryText: 'IsDocument:1',
+        allResults: true,
+        verbose: true
+      }
+    });
+    assert.strictEqual(returnArrayLength, 4);
+    assert.strictEqual(executedTest, TestID.QueryDocuments_WithDocIdAllTest);
   });
 
   it('executes search request with selectProperties', async () => {
@@ -821,6 +860,17 @@ describe(commands.SEARCH, () => {
     const actual = await command.validate({
       options: {
         startRow: '1X',
+        queryText: '*'
+      }
+    }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if startRow is set together with allResults', async () => {
+    const actual = await command.validate({
+      options: {
+        startRow: 1,
+        allResults: true,
         queryText: '*'
       }
     }, commandInfo);

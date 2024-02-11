@@ -25,7 +25,7 @@ m365 spo search [options]
 : The web against which we want to execute the query. If the parameter is not defined, the query is executed against the web that's used when logging in to the SPO environment.
 
 `--allResults`
-: Set, to get all results of the search query, instead of the number specified by the `rowlimit` (default: 10)
+: Set, to get all results of the search query in batches of 500.
 
 `--rowLimit [rowLimit]`
 : The number of rows to be returned. When the `allResults` option is used, the specified value will define the size of retrieved batches
@@ -55,7 +55,7 @@ m365 spo search [options]
 : The ID of the ranking model to use for the query.
 
 `--startRow [startRow]`
-: The first row that is included in the search results that are returned. You use this parameter when you want to implement paging for search results.
+: The first row that is included in the search results that are returned. You use this parameter when you want to implement manual paging for search results.
 
 `--properties [properties]`
 : Additional properties for the query.
@@ -89,6 +89,10 @@ m365 spo search [options]
 ```
 
 <Global />
+
+## Remarks
+
+When using the `--allResults` option, you cannot use the `--startRow` option. Only use `--startRow` for manual paging purposes.
 
 ## Examples
 
