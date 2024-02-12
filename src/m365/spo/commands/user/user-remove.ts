@@ -45,13 +45,13 @@ class SpoUserRemoveCommand extends SpoCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        id: (!(!args.options.id)).toString(),
-        loginName: (!(!args.options.loginName)).toString(),
-        email: (!(!args.options.email)).toString(),
-        userName: (!(!args.options.userName)).toString(),
-        entraGroupId: (!(!args.options.entraGroupId)).toString(),
-        entraGroupName: (!(!args.options.entraGroupName)).toString(),
-        force: (!(!args.options.force)).toString()
+        id: typeof args.options.id  !== 'undefined',
+        loginName: typeof args.options.loginName !== 'undefined',
+        email: typeof args.options.email !== 'undefined',
+        userName: typeof args.options.userName !== 'undefined',
+        entraGroupId: typeof args.options.entraGroupId !== 'undefined',
+        entraGroupName: typeof args.options.entraGroupName !== 'undefined',
+        force: !!args.options.force
       });
     });
   }
