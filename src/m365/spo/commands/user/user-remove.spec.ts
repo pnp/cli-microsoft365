@@ -613,7 +613,6 @@ describe(commands.USER_REMOVE, () => {
     } as any), new CommandError('An error has occurred'));
   });
 
-
   it('handles generic error when user not found when username is passed without prompting with confirmation argument', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       requests.push(opts);
