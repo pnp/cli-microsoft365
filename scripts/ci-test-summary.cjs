@@ -55,7 +55,7 @@ class TestSummaryReporter {
       if (this.testResult.stats.failed > 0) {
         this.summary = this.summary.addHeading('Failed tests', 3);
         this.summary = this.summary
-          .addRaw(this.generateAccordian('', null, this.testResult.failedTests))
+          .addRaw(this.generateAccordion('', null, this.testResult.failedTests))
           .addSeparator();
       }
       this.writeStatsTable();
@@ -68,31 +68,31 @@ class TestSummaryReporter {
     }
   }
 
-  generateAccordian(suitePrefix, suiteName, suiteObject) {
+  generateAccordion(suitePrefix, suiteName, suiteObject) {
     if (typeof suiteObject !== 'object') {
       // Item is a test, not a suite
       return `${suitePrefix}❌ ${suiteObject}<br />`;
     }
     let detailsContent = '';
 
-    // Generate accordian for each item in suite
+    // Generate accordion for each item in suite
     Object.keys(suiteObject).forEach(
       (item) =>
         (detailsContent =
           detailsContent +
-          this.generateAccordian(
+          this.generateAccordion(
             `${suitePrefix}${this.suiteIndenter}`,
             item,
             suiteObject[item]
           ))
     );
 
-    // First level does not require accordian
+    // First level does not require accordion
     if (suiteName === null) {
       return detailsContent;
     }
 
-    // Return an accordian for the suite
+    // Return an accordion for the suite
     return `
       <details>
         <summary>${suitePrefix}${suiteName}</summary>
