@@ -212,6 +212,7 @@ describe(commands.USER_REMOVE, () => {
     const actual = await command.validate({ options: { webUrl: validWebUrl, email: 'invalid' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
+  
   it('passes validation url is valid and id is passed', async () => {
     const actual = await command.validate({ options: { webUrl: validWebUrl, id: 1 } }, commandInfo);
     assert.strictEqual(actual, true);
