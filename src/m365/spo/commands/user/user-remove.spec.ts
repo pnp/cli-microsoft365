@@ -11,6 +11,7 @@ import { telemetry } from '../../../../telemetry.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
+import { spo } from '../../../../utils/spo.js';
 import commands from '../../commands.js';
 import command from './user-remove.js';
 import { settingsNames } from '../../../../settingsNames.js';
@@ -88,6 +89,21 @@ describe(commands.USER_REMOVE, () => {
       "serviceProvisioningErrors": []
     }]
   };
+  const userResponse = {
+    "Id": 10,
+    "IsHiddenInUI": false,
+    "LoginName": validLoginName,
+    "Title": "John Doe",
+    "PrincipalType": 1,
+    "Email": validEmail,
+    "Expiration": "",
+    "IsEmailAuthenticationGuestUser": false,
+    "IsShareByEmailGuestUser": false,
+    "IsSiteAdmin": false,
+    "UserId": { "NameId": "10010001b0c19a2", "NameIdIssuer": "urn:federation:microsoftonline" },
+    "UserPrincipalName": validUserName
+  };
+
   let log: any[];
   let requests: any[];
   let logger: Logger;
@@ -129,6 +145,7 @@ describe(commands.USER_REMOVE, () => {
       request.post,
       request.get,
       cli.promptForConfirmation,
+      spo.getUserByEmail,
       cli.getSettingWithDefaultValue
     ]);
   });
@@ -212,7 +229,7 @@ describe(commands.USER_REMOVE, () => {
     const actual = await command.validate({ options: { webUrl: validWebUrl, email: 'invalid' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
-  
+
   it('passes validation url is valid and id is passed', async () => {
     const actual = await command.validate({ options: { webUrl: validWebUrl, id: 1 } }, commandInfo);
     assert.strictEqual(actual, true);
@@ -271,7 +288,7 @@ describe(commands.USER_REMOVE, () => {
   it('removes user by id successfully without prompting with confirmation argument', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
       requests.push(opts);
-      if ((opts.url as string).indexOf('_api/web/siteusers/removebyid(10)') > -1) {
+      if (opts.url === `${validWebUrl}/_api/web/siteusers/removebyid(10)`) {
         return true;
       }
       throw 'Invalid request';
@@ -279,14 +296,14 @@ describe(commands.USER_REMOVE, () => {
 
     await command.action(logger, {
       options: {
-        webUrl: "https://contoso.sharepoint.com/subsite",
+        webUrl: validWebUrl,
         id: 10,
         force: true
       }
     });
     let correctRequestIssued = false;
     requests.forEach(r => {
-      if (r.url.indexOf(`_api/web/siteusers/removebyid(10)`) > -1 &&
+      if (r.url === `${validWebUrl}/_api/web/siteusers/removebyid(10)` &&
         r.headers['accept'] === 'application/json;odata=nometadata') {
         correctRequestIssued = true;
       }
@@ -297,7 +314,7 @@ describe(commands.USER_REMOVE, () => {
   it('removes user by login name successfully without prompting with confirmation argument', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
       requests.push(opts);
-      if (opts.url === "https://contoso.sharepoint.com/subsite/_api/web/siteusers/removeByLoginName('i%3A0%23.f%7Cmembership%7Cparker%40tenant.onmicrosoft.com')") {
+      if (opts.url === `${validWebUrl}/_api/web/siteusers/removeByLoginName('i%3A0%23.f%7Cmembership%7Cparker%40tenant.onmicrosoft.com')`) {
         return true;
       }
       throw 'Invalid request';
@@ -305,14 +322,14 @@ describe(commands.USER_REMOVE, () => {
 
     await command.action(logger, {
       options: {
-        webUrl: "https://contoso.sharepoint.com/subsite",
+        webUrl: validWebUrl,
         loginName: "i:0#.f|membership|parker@tenant.onmicrosoft.com",
         force: true
       }
     });
     let correctRequestIssued = false;
     requests.forEach(r => {
-      if (r.url.indexOf(`_api/web/siteusers/removeByLoginName('i%3A0%23.f%7Cmembership%7Cparker%40tenant.onmicrosoft.com')`) > -1 &&
+      if (r.url === `${validWebUrl}/_api/web/siteusers/removeByLoginName('i%3A0%23.f%7Cmembership%7Cparker%40tenant.onmicrosoft.com')` &&
         r.headers['accept'] === 'application/json;odata=nometadata') {
         correctRequestIssued = true;
       }
@@ -323,7 +340,7 @@ describe(commands.USER_REMOVE, () => {
   it('removes user by id successfully from web when prompt confirmed', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
       requests.push(opts);
-      if ((opts.url as string).indexOf('_api/web/siteusers/removebyid(10)') > -1) {
+      if (opts.url === `${validWebUrl}/_api/web/siteusers/removebyid(10)`) {
         return true;
       }
       throw 'Invalid request';
@@ -333,13 +350,13 @@ describe(commands.USER_REMOVE, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
     await command.action(logger, {
       options: {
-        webUrl: "https://contoso.sharepoint.com/subsite",
+        webUrl: validWebUrl,
         id: 10
       }
     });
     let correctRequestIssued = false;
     requests.forEach(r => {
-      if (r.url.indexOf(`_api/web/siteusers/removebyid(10)`) > -1 &&
+      if (r.url === `${validWebUrl}/_api/web/siteusers/removebyid(10)` &&
         r.headers['accept'] === 'application/json;odata=nometadata') {
         correctRequestIssued = true;
       }
@@ -350,7 +367,7 @@ describe(commands.USER_REMOVE, () => {
   it('removes user by login name successfully from web when prompt confirmed', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
       requests.push(opts);
-      if ((opts.url as string).indexOf(`_api/web/siteusers/removeByLoginName`) > -1) {
+      if (opts.url === `${validWebUrl}/_api/web/siteusers/removeByLoginName('${formatting.encodeQueryParameter(validLoginName)}')`) {
         return true;
       }
       throw 'Invalid request';
@@ -366,7 +383,7 @@ describe(commands.USER_REMOVE, () => {
     });
     let correctRequestIssued = false;
     requests.forEach(r => {
-      if (r.url.indexOf(`_api/web/siteusers/removeByLoginName`) > -1 &&
+      if (r.url === `${validWebUrl}/_api/web/siteusers/removeByLoginName('${formatting.encodeQueryParameter(validLoginName)}')` &&
         r.headers['accept'] === 'application/json;odata=nometadata') {
         correctRequestIssued = true;
       }
@@ -377,7 +394,7 @@ describe(commands.USER_REMOVE, () => {
   it('removes user from web successfully without prompting with confirmation argument (verbose)', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
       requests.push(opts);
-      if ((opts.url as string).indexOf('_api/web/siteusers/removebyid(10)') > -1) {
+      if (opts.url === `${validWebUrl}/_api/web/siteusers/removebyid(10)`) {
         return true;
       }
       throw 'Invalid request';
@@ -386,14 +403,14 @@ describe(commands.USER_REMOVE, () => {
     await command.action(logger, {
       options: {
         verbose: true,
-        webUrl: "https://contoso.sharepoint.com/subsite",
+        webUrl: validWebUrl,
         id: 10,
         force: true
       }
     });
     let correctRequestIssued = false;
     requests.forEach(r => {
-      if (r.url.indexOf(`_api/web/siteusers/removebyid(10)`) > -1 &&
+      if (r.url === `${validWebUrl}/_api/web/siteusers/removebyid(10)` &&
         r.headers['accept'] === 'application/json;odata=nometadata') {
         correctRequestIssued = true;
       }
@@ -404,7 +421,7 @@ describe(commands.USER_REMOVE, () => {
   it('removes user from web successfully without prompting with confirmation argument (debug)', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
       requests.push(opts);
-      if ((opts.url as string).indexOf('_api/web/siteusers/removebyid(10)') > -1) {
+      if (opts.url === `${validWebUrl}/_api/web/siteusers/removebyid(10)`) {
         return true;
       }
       throw 'Invalid request';
@@ -413,14 +430,14 @@ describe(commands.USER_REMOVE, () => {
     await command.action(logger, {
       options: {
         debug: true,
-        webUrl: "https://contoso.sharepoint.com/subsite",
+        webUrl: validWebUrl,
         id: 10,
         force: true
       }
     });
     let correctRequestIssued = false;
     requests.forEach(r => {
-      if (r.url.indexOf(`_api/web/siteusers/removebyid(10)`) > -1 &&
+      if (r.url === `${validWebUrl}/_api/web/siteusers/removebyid(10)` &&
         r.headers['accept'] === 'application/json;odata=nometadata') {
         correctRequestIssued = true;
       }
@@ -428,36 +445,16 @@ describe(commands.USER_REMOVE, () => {
     assert(correctRequestIssued);
   });
 
-  it('removes email by username successfully without prompting with confirmation argument', async () => {
+  it('removes user by email successfully without prompting with confirmation argument', async () => {
     let removeRequestIssued = false;
-
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`_api/web/siteusers/GetByEmail('${formatting.encodeQueryParameter(validEmail)}')`) > -1) {
-        return {
-          "Id": 10,
-          "IsHiddenInUI": false,
-          "LoginName": validLoginName,
-          "Title": "John Doe",
-          "PrincipalType": 1,
-          "Email": validEmail,
-          "Expiration": "",
-          "IsEmailAuthenticationGuestUser": false,
-          "IsShareByEmailGuestUser": false,
-          "IsSiteAdmin": false,
-          "UserId": { "NameId": "10010001b0c19a2", "NameIdIssuer": "urn:federation:microsoftonline" },
-          "UserPrincipalName": validUserName
-        };
-      }
-      throw 'Invalid request';
-    });
-
+    sinon.stub(spo, 'getUserByEmail').resolves(userResponse);
     sinon.stub(request, 'post').callsFake(async (opts) => {
       requests.push(opts);
-      if ((opts.url as string).indexOf('_api/web/siteusers/removebyid(10)') > -1) {
+      if (opts.url === `${validWebUrl}/_api/web/siteusers/removebyid(10)`) {
         removeRequestIssued = true;
         return Promise.resolve();
       }
-      throw 'Invalid request';
+      throw `Invalid request`;
     });
 
     await command.action(logger, {
@@ -474,33 +471,20 @@ describe(commands.USER_REMOVE, () => {
   it('removes user by username successfully without prompting with confirmation argument', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       requests.push(opts);
-      if ((opts.url as string).indexOf(`_api/web/siteusers?$filter=UserPrincipalName eq ('${formatting.encodeQueryParameter(validUserName)}')`) > -1) {
+      if (opts.url === `${validWebUrl}/_api/web/siteusers?$filter=UserPrincipalName eq ('${formatting.encodeQueryParameter(validUserName)}')`) {
         return {
-          "value": [{
-            "Id": 10,
-            "IsHiddenInUI": false,
-            "LoginName": validLoginName,
-            "Title": "John Doe",
-            "PrincipalType": 1,
-            "Email": validEmail,
-            "Expiration": "",
-            "IsEmailAuthenticationGuestUser": false,
-            "IsShareByEmailGuestUser": false,
-            "IsSiteAdmin": false,
-            "UserId": { "NameId": "10010001b0c19a2", "NameIdIssuer": "urn:federation:microsoftonline" },
-            "UserPrincipalName": validUserName
-          }]
+          "value": [userResponse]
         };
       }
-      throw 'Invalid request';
+      throw `Invalid request`;
     });
 
     sinon.stub(request, 'post').callsFake(async (opts) => {
       requests.push(opts);
-      if ((opts.url as string).indexOf('_api/web/siteusers/removebyid(10)') > -1) {
+      if (opts.url === `${validWebUrl}/_api/web/siteusers/removebyid(10)`) {
         return true;
       }
-      throw 'Invalid request';
+      throw `Invalid request`;
     });
 
     await command.action(logger, {
@@ -525,7 +509,7 @@ describe(commands.USER_REMOVE, () => {
 
     sinon.stub(request, 'post').callsFake(async (opts) => {
       requests.push(opts);
-      if ((opts.url as string).indexOf(`${validWebUrl}/_api/web/siteusers/removeByLoginName('c:0o.c|federateddirectoryclaimprovider|${validEntraGroupId}')`) > -1) {
+      if (opts.url === `${validWebUrl}/_api/web/siteusers/removeByLoginName('c:0o.c|federateddirectoryclaimprovider|${validEntraGroupId}')`) {
         return true;
       }
       throw 'Invalid request';
@@ -598,7 +582,7 @@ describe(commands.USER_REMOVE, () => {
   it('handles error when removing user using from web', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
       requests.push(opts);
-      if ((opts.url as string).indexOf('_api/web/siteusers/removebyid(10)') > -1) {
+      if (opts.url === `${validWebUrl}/_api/web/siteusers/removebyid(10)`) {
         throw 'An error has occurred';
       }
       throw 'Invalid request';
@@ -616,7 +600,7 @@ describe(commands.USER_REMOVE, () => {
   it('handles generic error when user not found when username is passed without prompting with confirmation argument', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       requests.push(opts);
-      if ((opts.url as string).indexOf(`_api/web/siteusers?$filter=UserPrincipalName eq ('${formatting.encodeQueryParameter(validUserName)}')`) > -1) {
+      if (opts.url === `${validWebUrl}/_api/web/siteusers?$filter=UserPrincipalName eq ('${formatting.encodeQueryParameter(validUserName)}')`) {
         return { "value": [] };
       }
       throw 'Invalid request';
@@ -624,7 +608,7 @@ describe(commands.USER_REMOVE, () => {
 
     sinon.stub(request, 'post').callsFake(async (opts) => {
       requests.push(opts);
-      if ((opts.url as string).indexOf('_api/web/siteusers/removebyid(10)') > -1) {
+      if (opts.url === `${validWebUrl}/_api/web/siteusers/removebyid(10)`) {
         return Promise.resolve();
       }
       throw 'Invalid request';

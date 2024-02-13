@@ -2,6 +2,7 @@ import { Group } from '@microsoft/microsoft-graph-types';
 import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
+import { spo } from '../../../../utils/spo.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { aadGroup } from '../../../../utils/aadGroup.js';
@@ -12,7 +13,6 @@ import commands from '../../commands.js';
 interface CommandArgs {
   options: Options;
 }
-
 interface Options extends GlobalOptions {
   webUrl: string;
   id?: string;
@@ -45,7 +45,7 @@ class SpoUserRemoveCommand extends SpoCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        id: typeof args.options.id  !== 'undefined',
+        id: typeof args.options.id !== 'undefined',
         loginName: typeof args.options.loginName !== 'undefined',
         email: typeof args.options.email !== 'undefined',
         userName: typeof args.options.userName !== 'undefined',
@@ -145,18 +145,21 @@ class SpoUserRemoveCommand extends SpoCommand {
       else if (options.loginName) {
         requestUrl += `removeByLoginName('${formatting.encodeQueryParameter(options.loginName as string)}')`;
       }
-      else if (options.email || options.userName) {
+      else if (options.email) {
+        const user = await spo.getUserByEmail(options.webUrl, options.email, logger, this.verbose);
+        requestUrl += `removebyid(${user.Id})`;
+      }
+      else if (options.userName) {
         const user = await this.getUser(options.webUrl, options);
 
-        if (user?.Title) {
-          if (this.verbose) {
-            await logger.logToStderr(`Removing user ${user.Title} ...`);
-          }
-          requestUrl += `removebyid(${user.Id})`;
-        }
-        else {
+        if (!user) {
           throw new Error(`User not found: ${options.userName}`);
         }
+
+        if (this.verbose) {
+          await logger.logToStderr(`Removing user ${user.Title} ...`);
+        }
+        requestUrl += `removebyid(${user.Id})`;
       }
       else if (options.entraGroupId || options.entraGroupName) {
         const entraGroup = await this.getEntraGroup(options.webUrl, options);
@@ -189,14 +192,7 @@ class SpoUserRemoveCommand extends SpoCommand {
   }
 
   private async getUser(webUrl: string, options: GlobalOptions): Promise<any> {
-    let requestUrl: string = '';
-    if (options.email) {
-      requestUrl = `${options.webUrl}/_api/web/siteusers/GetByEmail('${formatting.encodeQueryParameter(options.email)}')`;
-    }
-    else if (options.userName) {
-      requestUrl = `${options.webUrl}/_api/web/siteusers?$filter=UserPrincipalName eq ('${formatting.encodeQueryParameter(options.userName)}')`;
-    }
-
+    const requestUrl: string = `${options.webUrl}/_api/web/siteusers?$filter=UserPrincipalName eq ('${formatting.encodeQueryParameter(options.userName)}')`;
     const requestOptions: CliRequestOptions = {
       url: requestUrl,
       headers: {
@@ -206,12 +202,9 @@ class SpoUserRemoveCommand extends SpoCommand {
     };
 
     const userInstance = await request.get(requestOptions);
-    if (options.email) {
-      return userInstance;
-    }
-    else if (options.userName) {
-      return (userInstance as { value: any[] }).value[0];
-    }
+    return (userInstance as {
+      value: spoUser[];
+    }).value[0];
   }
 
   private async getEntraGroup(webUrl: string, options: GlobalOptions): Promise<any> {
@@ -229,3 +222,22 @@ class SpoUserRemoveCommand extends SpoCommand {
 }
 
 export default new SpoUserRemoveCommand();
+
+interface spoUser {
+  Id: number;
+  IsHiddenInUI: boolean;
+  Title: string;
+  PrincipalType: number;
+  Email: string;
+  Expiration: string;
+  IsEmailAuthenticationGuestUser: boolean;
+  IsShareByEmailGuestUser: boolean;
+  IsSiteAdmin: boolean;
+  UserId: {
+    NameId: string;
+    NameIdIssuer: string;
+    urn: string;
+  };
+  UserPrincipalName: string;
+};
+// Add your code or comments here

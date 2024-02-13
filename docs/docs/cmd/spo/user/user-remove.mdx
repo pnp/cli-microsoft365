@@ -14,25 +14,25 @@ m365 spo user remove [options]
 
 ```md definition-list
 `-u, --webUrl <webUrl>`
-: URL of the web to remove user
+: URL of the web to remove user. Use either `id` or `loginName` or `email`, `userName`, `entraGroupId`, or `entraGroupName` , but not all.
 
 `--id [id]`
-: ID of the user to remove from web
+: ID of the user to remove from web. Use either `id` or `loginName` or `email`, `userName`, `entraGroupId`, or `entraGroupName` , but not all.
 
 `--loginName [loginName]`
-: Login name of the site user to remove
+: Login name of the user to remove from web. Use either `id` or `loginName` or `email`, `userName`, `entraGroupId`, or `entraGroupName` , but not all.
 
 `--userName [userName]`
-: User name of the user to remove from web
+: User name of the user to remove from web. Use either `id` or `loginName` or `email`, `userName`, `entraGroupId`, or `entraGroupName` , but not all.
 
 `--email [email]`
-: Email of the user to remove from web
+: Email of the user to remove from web. Use either `id` or `loginName` or `email`, `userName`, `entraGroupId`, or `entraGroupName` , but not all.
 
 `--entraGroupId [entraGroupId]`
-: Object ID of the Entra group ID to remove
+: Object ID of the Entra group ID to remove. Use either `id` or `loginName` or `email`, `userName`, `entraGroupId`, or `entraGroupName` , but not all.
 
 `--entraGroupName [entraGroupName]`
-: Name of the Entra group to remove
+: Name of the Entra group to remove. Use either `id` or `loginName` or `email`, `userName`, `entraGroupId`, or `entraGroupName` , but not all.
 
 `-f, --force`
 : Do not prompt for confirmation before removing user from web
@@ -40,43 +40,39 @@ m365 spo user remove [options]
 
 <Global />
 
-## Remarks
-
-Use only one of those options: `id` or `loginName` or `email`, `userName`, `entraGroupId`, or `entraGroupName`
-
 ## Examples
 
-Removes user with id _10_ from a web without prompting for confirmation
+Removes user by id from a web without prompting for confirmation
 
 ```sh
 m365 spo user remove --webUrl "https://contoso.sharepoint.com/sites/HR" --id 10 --force
 ```
 
-Removes user with login name _i:0#.f|membership|john.doe@mytenant.onmicrosoft.com_ from a web
+Removes user by loginName from a web
 
 ```sh
 m365 spo user remove --webUrl "https://contoso.sharepoint.com/sites/HR" --loginName "i:0#.f|membership|john.doe@mytenant.onmicrosoft.com"
 ```
 
-Removes user with user name _john.doe_hotmail.com#ext#@mytenant.onmicrosoft.com_ from a web
+Removes user by userName from a web
 
 ```sh
 m365 spo user remove --webUrl "https://contoso.sharepoint.com/sites/HR" --userName "john.doe_hotmail.com#ext#@mytenant.onmicrosoft.com"
 ```
 
-Removes user with email _john.doe@mytenant.onmicrosoft.com_ from a web
+Removes user by email from a web
 
 ```sh
 m365 spo user remove --webUrl "https://contoso.sharepoint.com/sites/HR" --email "john.doe@mytenant.onmicrosoft.com"
 ```
 
-Removes user with entraGroupId _f832a493-de73-4fef-87ed-8c6fffd91be6_ from a web
+Removes user by entraGroupId from a web
 
 ```sh
 m365 spo user remove --webUrl "https://contoso.sharepoint.com/sites/HR" --entraGroupId f832a493-de73-4fef-87ed-8c6fffd91be6
 ```
 
-Removes user with entraGroupName "Test Members" from a web
+Removes user by entraGroupName from a web
 
 ```sh
 m365 spo user remove --webUrl _https://contoso.sharepoint.com/sites/HR_ --entraGroupName "Test Members"
