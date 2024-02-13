@@ -5,7 +5,7 @@ import { cli } from "../cli/cli.js";
 
 const graphResource = 'https://graph.microsoft.com';
 
-export const aadDevice = {
+export const entraDevice = {
   /**
    * Get a device by its display name.
    * @param displayName Device display name.

@@ -39,6 +39,7 @@ class SpoFolderRoleAssignmentRemoveCommand extends SpoCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initTypes();
   }
 
   #initTelemetry(): void {
@@ -47,7 +48,7 @@ class SpoFolderRoleAssignmentRemoveCommand extends SpoCommand {
         principalId: typeof args.options.principalId !== 'undefined',
         upn: typeof args.options.upn !== 'undefined',
         groupName: typeof args.options.groupName !== 'undefined',
-        force: (!(!args.options.force)).toString()
+        force: !!args.options.force
       });
     });
   }
@@ -99,6 +100,11 @@ class SpoFolderRoleAssignmentRemoveCommand extends SpoCommand {
         return true;
       }
     );
+  }
+
+  #initTypes(): void {
+    this.types.string.push('webUrl', 'folderUrl', 'upn', 'groupName');
+    this.types.boolean.push('force');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

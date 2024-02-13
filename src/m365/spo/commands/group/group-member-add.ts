@@ -1,8 +1,8 @@
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
-import { aadGroup } from '../../../../utils/aadGroup.js';
-import { aadUser } from '../../../../utils/aadUser.js';
+import { entraGroup } from '../../../../utils/entraGroup.js';
+import { entraUser } from '../../../../utils/entraUser.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { spo } from '../../../../utils/spo.js';
 import { validation } from '../../../../utils/validation.js';
@@ -242,15 +242,14 @@ class SpoGroupMemberAddCommand extends SpoCommand {
           if (this.verbose) {
             await logger.logToStderr(`Getting ID of Azure AD group ${trimmedIdentifier}`);
           }
-
-          const groupId = await aadGroup.getGroupIdByDisplayName(trimmedIdentifier);
+          const groupId = await entraGroup.getGroupIdByDisplayName(trimmedIdentifier);
           validUserNames.push(groupId);
         }
         else {
           if (this.verbose) {
             await logger.logToStderr(`Getting Azure AD ID for user ${trimmedIdentifier}`);
           }
-          const upn = await aadUser.getUserIdByEmail(trimmedIdentifier);
+          const upn = await entraUser.getUserIdByEmail(trimmedIdentifier);
           validUserNames.push(upn);
         }
       }

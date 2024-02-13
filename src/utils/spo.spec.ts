@@ -7,7 +7,7 @@ import { RoleDefinition } from '../m365/spo/commands/roledefinition/RoleDefiniti
 import request from '../request.js';
 import { sinonUtil } from '../utils/sinonUtil.js';
 import { FormDigestInfo, spo } from '../utils/spo.js';
-import { aadGroup } from './aadGroup.js';
+import { entraGroup } from './entraGroup.js';
 import { formatting } from './formatting.js';
 
 const stubPostResponses: any = (
@@ -1746,7 +1746,7 @@ describe('utils/spo', () => {
       FormDigestExpiresAt: new Date(),
       WebFullUrl: 'https://contoso.sharepoint.com'
     });
-    sinon.stub(aadGroup, 'setGroup').resolves();
+    sinon.stub(entraGroup, 'setGroup').resolves();
     sinon.stub(spo, 'setGroupifiedSiteOwners').resolves();
     sinon.stub(spo, 'applySiteDesign').resolves();
 
@@ -2067,5 +2067,20 @@ describe('utils/spo', () => {
     });
 
     await assert.doesNotReject(spo.removeDefaultRetentionLabelFromList('https://contoso.sharepoint.com/sites/project-x', 'https://contoso.sharepoint.com/sites/project-x/list', logger, true));
+  });
+
+  it('returns the correct site ID for a valid site', async () => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      const expectedUrl = 'https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com:/?$select=id';
+      if (opts.url === expectedUrl) {
+        return Promise.resolve({ id: 'contoso.sharepoint.com,ea49a393-e3e6-4760-a1b2-e96539e15372,66e2861c-96d9-4418-a75c-0ed1bca68b42' });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    const id = await spo.getSiteId('https://contoso.sharepoint.com', logger);
+
+    assert.strictEqual(id, 'contoso.sharepoint.com,ea49a393-e3e6-4760-a1b2-e96539e15372,66e2861c-96d9-4418-a75c-0ed1bca68b42');
   });
 });

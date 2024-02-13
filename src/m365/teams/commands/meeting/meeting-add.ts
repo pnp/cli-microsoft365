@@ -1,7 +1,7 @@
 import auth from '../../../../Auth.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import { Logger } from '../../../../cli/Logger.js';
-import { aadUser } from '../../../../utils/aadUser.js';
+import { entraUser } from '../../../../utils/entraUser.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from "../../../base/GraphCommand.js";
@@ -149,7 +149,7 @@ class TeamsMeetingAddCommand extends GraphCommand {
         await logger.logToStderr(`Retrieving Organizer Id...`);
       }
 
-      const organizerId = await aadUser.getUserIdByEmail(options.organizerEmail);
+      const organizerId = await entraUser.getUserIdByEmail(options.organizerEmail);
       requestUrl = `${this.resource}/v1.0/users/${organizerId}`;
     }
 

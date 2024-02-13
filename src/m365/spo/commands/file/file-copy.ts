@@ -37,6 +37,7 @@ class SpoFileCopyCommand extends SpoCommand {
     this.#initOptions();
     this.#initValidators();
     this.#initOptionSets();
+    this.#initTypes();
   }
 
   #initTelemetry(): void {
@@ -106,6 +107,11 @@ class SpoFileCopyCommand extends SpoCommand {
 
   #initOptionSets(): void {
     this.optionSets.push({ options: ['sourceUrl', 'sourceId'] });
+  }
+
+  #initTypes(): void {
+    this.types.string.push('webUrl', 'sourceUrl', 'sourceId', 'targetUrl', 'newName', 'nameConflictBehavior');
+    this.types.boolean.push('resetAuthorAndCreated', 'bypassSharedLock');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

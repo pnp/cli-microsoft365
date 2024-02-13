@@ -5,7 +5,7 @@ import GlobalOptions from '../../../../GlobalOptions.js';
 import request from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { validation } from '../../../../utils/validation.js';
-import aadUserGetCommand, { Options as AadUserGetCommandOptions } from '../../../entra/commands/user/user-get.js';
+import entraUserGetCommand, { Options as EntraUserGetCommandOptions } from '../../../entra/commands/user/user-get.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 import SpoGroupMemberListCommand, { Options as SpoGroupMemberListCommandOptions } from './group-member-list.js';
@@ -149,14 +149,14 @@ class SpoGroupMemberRemoveCommand extends SpoCommand {
       await logger.logToStderr(`Retrieving information about the user ${args.options.email}`);
     }
 
-    const options: AadUserGetCommandOptions = {
+    const options: EntraUserGetCommandOptions = {
       email: args.options.email,
       output: 'json',
       debug: args.options.debug,
       verbose: args.options.verbose
     };
 
-    const userGetOutput: CommandOutput = await cli.executeCommandWithOutput(aadUserGetCommand as Command, { options: { ...options, _: [] } });
+    const userGetOutput: CommandOutput = await cli.executeCommandWithOutput(entraUserGetCommand as Command, { options: { ...options, _: [] } });
     const userOutput = JSON.parse(userGetOutput.stdout);
     return userOutput.userPrincipalName;
   }

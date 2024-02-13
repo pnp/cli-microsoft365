@@ -12,7 +12,7 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import command from './administrativeunit-remove.js';
-import { aadAdministrativeUnit } from '../../../../utils/aadAdministrativeUnit.js';
+import { entraAdministrativeUnit } from '../../../../utils/entraAdministrativeUnit.js';
 import aadCommands from '../../aadCommands.js';
 
 describe(commands.ADMINISTRATIVEUNIT_REMOVE, () => {
@@ -57,7 +57,7 @@ describe(commands.ADMINISTRATIVEUNIT_REMOVE, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.delete,
-      aadAdministrativeUnit.getAdministrativeUnitByDisplayName,
+      entraAdministrativeUnit.getAdministrativeUnitByDisplayName,
       cli.handleMultipleResultsFound,
       cli.promptForConfirmation
     ]);
@@ -100,7 +100,7 @@ describe(commands.ADMINISTRATIVEUNIT_REMOVE, () => {
   });
 
   it('removes the specified administrative unit by displayName while prompting for confirmation', async () => {
-    sinon.stub(aadAdministrativeUnit, 'getAdministrativeUnitByDisplayName').resolves({ id: administrativeUnitId, displayName: displayName });
+    sinon.stub(entraAdministrativeUnit, 'getAdministrativeUnitByDisplayName').resolves({ id: administrativeUnitId, displayName: displayName });
 
     const deleteRequestStub = sinon.stub(request, 'delete').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/directory/administrativeUnits/${administrativeUnitId}`) {

@@ -1,8 +1,8 @@
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
-import { aadGroup } from '../../../../utils/aadGroup.js';
-import { aadUser } from '../../../../utils/aadUser.js';
+import { entraGroup } from '../../../../utils/entraGroup.js';
+import { entraUser } from '../../../../utils/entraUser.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { validation } from '../../../../utils/validation.js';
 import PowerAutomateCommand from '../../../base/PowerAutomateCommand.js';
@@ -128,13 +128,13 @@ class FlowOwnerEnsureCommand extends PowerAutomateCommand {
         id = args.options.userId;
       }
       else if (args.options.userName) {
-        id = await aadUser.getUserIdByUpn(args.options.userName);
+        id = await entraUser.getUserIdByUpn(args.options.userName);
       }
       else if (args.options.groupId) {
         id = args.options.groupId;
       }
       else {
-        id = await aadGroup.getGroupIdByDisplayName(args.options.groupName!);
+        id = await entraGroup.getGroupIdByDisplayName(args.options.groupName!);
       }
 
       let type: string;

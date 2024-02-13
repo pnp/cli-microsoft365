@@ -46,6 +46,7 @@ class SpoFolderListCommand extends SpoCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initTypes();
   }
 
   #initTelemetry(): void {
@@ -73,7 +74,7 @@ class SpoFolderListCommand extends SpoCommand {
         option: '--filter [filter]'
       },
       {
-        option: '-r, --recursive [recursive]'
+        option: '-r, --recursive'
       }
     );
   }
@@ -82,6 +83,11 @@ class SpoFolderListCommand extends SpoCommand {
     this.validators.push(
       async (args: CommandArgs) => validation.isValidSharePointUrl(args.options.webUrl)
     );
+  }
+
+  #initTypes(): void {
+    this.types.string.push('webUrl', 'parentFolderUrl', 'fields', 'filter');
+    this.types.boolean.push('recursive');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

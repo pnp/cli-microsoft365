@@ -2,7 +2,7 @@ import { PlannerBucket } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
-import { aadGroup } from '../../../../utils/aadGroup.js';
+import { entraGroup } from '../../../../utils/entraGroup.js';
 import { planner } from '../../../../utils/planner.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
@@ -231,7 +231,7 @@ class PlannerBucketSetCommand extends GraphCommand {
       return ownerGroupId;
     }
 
-    const group = await aadGroup.getGroupByDisplayName(ownerGroupName!);
+    const group = await entraGroup.getGroupByDisplayName(ownerGroupName!);
     return group.id!;
   }
 }

@@ -240,6 +240,11 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
+              label: 'app permission list',
+              id: 'cmd/entra/app/app-permission-list'
+            },
+            {
+              type: 'doc',
               label: 'app role add',
               id: 'cmd/entra/app/app-role-add'
             },
@@ -278,6 +283,11 @@ const sidebars: SidebarsConfig = {
           group: [
             {
               type: 'doc',
+              label: 'group add',
+              id: 'cmd/entra/group/group-add'
+            },
+            {
+              type: 'doc',
               label: 'group get',
               id: 'cmd/entra/group/group-get'
             },
@@ -290,6 +300,11 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'group remove',
               id: 'cmd/entra/group/group-remove'
+            },
+            {
+              type: 'doc',
+              label: 'group user add',
+              id: 'cmd/entra/group/group-user-add'
             },
             {
               type: 'doc',
@@ -693,6 +708,11 @@ const sidebars: SidebarsConfig = {
               id: 'cmd/file/convert/convert-pdf'
             }
           ]
+        },
+        {
+          type: 'doc',
+          label: 'copy',
+          id: 'cmd/file/file-copy'
         },
         {
           type: 'doc',

@@ -7,7 +7,7 @@ import { cli } from '../cli/cli.js';
 
 const graphResource = 'https://graph.microsoft.com';
 
-export const aadGroup = {
+export const entraGroup = {
   /**
    * Retrieve a single group.
    * @param id Group ID.

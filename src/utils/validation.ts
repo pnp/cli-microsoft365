@@ -31,6 +31,11 @@ export const validation = {
     return guidRegEx.test(guid);
   },
 
+  isValidUserPrincipalNameArray(upns: string[]): boolean | string {
+    const invalidGuid = upns.find(upn => !this.isValidUserPrincipalName(upn));
+    return invalidGuid || true;
+  },
+
   isValidUserPrincipalName(upn: string): boolean {
     const upnRegEx = new RegExp(/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/i);
 
@@ -365,5 +370,11 @@ export const validation = {
     }
 
     return false;
+  },
+
+  isValidMailNickname(mailNickname: string): boolean {
+    const mailNicknameRegEx = new RegExp(/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]*$/i);
+
+    return mailNicknameRegEx.test(mailNickname);
   }
 };

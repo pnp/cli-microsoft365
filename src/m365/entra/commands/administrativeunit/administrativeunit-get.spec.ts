@@ -12,7 +12,7 @@ import command from './administrativeunit-get.js';
 import request from '../../../../request.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { CommandError } from '../../../../Command.js';
-import { aadAdministrativeUnit } from '../../../../utils/aadAdministrativeUnit.js';
+import { entraAdministrativeUnit } from '../../../../utils/entraAdministrativeUnit.js';
 import aadCommands from '../../aadCommands.js';
 
 describe(commands.ADMINISTRATIVEUNIT_GET, () => {
@@ -65,7 +65,7 @@ describe(commands.ADMINISTRATIVEUNIT_GET, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.get,
-      aadAdministrativeUnit.getAdministrativeUnitByDisplayName,
+      entraAdministrativeUnit.getAdministrativeUnitByDisplayName,
       cli.handleMultipleResultsFound
     ]);
   });
@@ -107,7 +107,7 @@ describe(commands.ADMINISTRATIVEUNIT_GET, () => {
   });
 
   it('retrieves information about the specified administrative unit by displayName', async () => {
-    sinon.stub(aadAdministrativeUnit, 'getAdministrativeUnitByDisplayName').resolves(administrativeUnitsReponse.value[0]);
+    sinon.stub(entraAdministrativeUnit, 'getAdministrativeUnitByDisplayName').resolves(administrativeUnitsReponse.value[0]);
 
     await command.action(logger, { options: { displayName: validDisplayName } });
     assert(loggerLogSpy.calledOnceWithExactly(administrativeUnitsReponse.value[0]));

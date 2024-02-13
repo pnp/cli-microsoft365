@@ -1,6 +1,6 @@
 import assert from 'assert';
 import sinon from 'sinon';
-import { aadAdministrativeUnit } from './aadAdministrativeUnit.js';
+import { entraAdministrativeUnit } from './entraAdministrativeUnit.js';
 import { cli } from '../cli/cli.js';
 import request from '../request.js';
 import { sinonUtil } from './sinonUtil.js';
@@ -8,7 +8,7 @@ import { formatting } from './formatting.js';
 import { settingsNames } from '../settingsNames.js';
 
 
-describe('utils/aadAdministrativeUnit', () => {
+describe('utils/entraAdministrativeUnit', () => {
   const administrativeUnitId = 'fc33aa61-cf0e-46b6-9506-f633347202ab';
   const secondAdministrativeUnitId = 'fc33aa61-cf0e-1234-9506-f633347202ab';
   const displayName = 'European Division';
@@ -39,7 +39,7 @@ describe('utils/aadAdministrativeUnit', () => {
       return 'Invalid Request';
     });
 
-    const actual = await aadAdministrativeUnit.getAdministrativeUnitByDisplayName(displayName);
+    const actual = await entraAdministrativeUnit.getAdministrativeUnitByDisplayName(displayName);
     assert.deepStrictEqual(actual, { id: administrativeUnitId, displayName: displayName });
   });
 
@@ -59,7 +59,7 @@ describe('utils/aadAdministrativeUnit', () => {
 
     sinon.stub(cli, 'handleMultipleResultsFound').resolves({ id: administrativeUnitId, displayName: displayName });
 
-    const actual = await aadAdministrativeUnit.getAdministrativeUnitByDisplayName(displayName);
+    const actual = await entraAdministrativeUnit.getAdministrativeUnitByDisplayName(displayName);
     assert.deepStrictEqual(actual, { id: administrativeUnitId, displayName: displayName });
   });
 
@@ -72,7 +72,7 @@ describe('utils/aadAdministrativeUnit', () => {
       throw 'Invalid Request';
     });
 
-    await assert.rejects(aadAdministrativeUnit.getAdministrativeUnitByDisplayName(invalidDisplayName)), Error(`The specified administrative unit '${invalidDisplayName}' does not exist.`);
+    await assert.rejects(entraAdministrativeUnit.getAdministrativeUnitByDisplayName(invalidDisplayName)), Error(`The specified administrative unit '${invalidDisplayName}' does not exist.`);
   });
 
   it('throws error message when multiple administrative units were found using getAdministrativeUnitByDisplayName', async () => {
@@ -97,6 +97,6 @@ describe('utils/aadAdministrativeUnit', () => {
       return 'Invalid Request';
     });
 
-    await assert.rejects(aadAdministrativeUnit.getAdministrativeUnitByDisplayName(displayName), Error(`Multiple administrative units with name '${displayName}' found. Found: ${administrativeUnitId}.`));
+    await assert.rejects(entraAdministrativeUnit.getAdministrativeUnitByDisplayName(displayName), Error(`Multiple administrative units with name '${displayName}' found. Found: ${administrativeUnitId}.`));
   });
 });

@@ -81,18 +81,19 @@ class SpoFileAddCommand extends SpoCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initTypes();
   }
 
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        contentType: (!(!args.options.contentType)).toString(),
-        checkOut: args.options.checkOut || false,
-        checkInComment: (!(!args.options.checkInComment)).toString(),
-        approve: args.options.approve || false,
-        approveComment: (!(!args.options.approveComment)).toString(),
-        publish: args.options.publish || false,
-        publishComment: (!(!args.options.publishComment)).toString()
+        contentType: typeof args.options.contentType !== 'undefined',
+        checkOut: !!args.options.checkOut,
+        checkInComment: typeof args.options.checkInComment !== 'undefined',
+        approve: !!args.options.approve,
+        approveComment: typeof args.options.approveComment !== 'undefined',
+        publish: !!args.options.publish,
+        publishComment: typeof args.options.publishComment !== 'undefined'
       });
     });
   }
@@ -155,6 +156,11 @@ class SpoFileAddCommand extends SpoCommand {
         return true;
       }
     );
+  }
+
+  #initTypes(): void {
+    this.types.string.push('webUrl', 'folder', 'path', 'contentType', 'checkInComment', 'approveComment', 'publishComment');
+    this.types.boolean.push('checkOut', 'approve', 'publish');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

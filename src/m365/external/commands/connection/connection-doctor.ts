@@ -339,7 +339,8 @@ class ExternalConnectionDoctorCommand extends GraphCommand {
     const requestOptions: CliRequestOptions = {
       url: `${this.resource}/v1.0/external/connections/${args.options.id}/schema`,
       headers: {
-        accept: 'application/json;odata.metadata=none'
+        accept: 'application/json;odata.metadata=none',
+        prefer: 'include-unknown-enum-members'
       },
       responseType: 'json'
     };

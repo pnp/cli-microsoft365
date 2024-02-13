@@ -5,7 +5,7 @@ import { odata } from '../../../../utils/odata.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
-import { aadGroup } from '../../../../utils/aadGroup.js';
+import { entraGroup } from '../../../../utils/entraGroup.js';
 import { CliRequestOptions } from '../../../../request.js';
 import aadCommands from '../../aadCommands.js';
 
@@ -113,7 +113,7 @@ class EntraM365GroupUserListCommand extends GraphCommand {
       }
 
       const groupId = await this.getGroupId(args.options, logger);
-      const isUnifiedGroup = await aadGroup.isUnifiedGroup(groupId);
+      const isUnifiedGroup = await entraGroup.isUnifiedGroup(groupId);
 
       if (!isUnifiedGroup) {
         throw Error(`Specified group '${args.options.groupId || args.options.groupDisplayName}' is not a Microsoft 365 group.`);
@@ -160,7 +160,7 @@ class EntraM365GroupUserListCommand extends GraphCommand {
       await logger.logToStderr('Retrieving Group Id...');
     }
 
-    return await aadGroup.getGroupIdByDisplayName(options.groupDisplayName!);
+    return await entraGroup.getGroupIdByDisplayName(options.groupDisplayName!);
   }
 
   private async getUsers(options: Options, role: string, groupId: string, logger: Logger): Promise<ExtendedUser[]> {

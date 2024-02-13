@@ -33,6 +33,7 @@ class SpoFileSharingLinkGetCommand extends SpoCommand {
     this.#initOptions();
     this.#initValidators();
     this.#initOptionSets();
+    this.#initTypes();
   }
 
   #initTelemetry(): void {
@@ -80,6 +81,10 @@ class SpoFileSharingLinkGetCommand extends SpoCommand {
 
   #initOptionSets(): void {
     this.optionSets.push({ options: ['fileUrl', 'fileId'] });
+  }
+
+  #initTypes(): void {
+    this.types.string.push('webUrl', 'fileUrl', 'fileId', 'id');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

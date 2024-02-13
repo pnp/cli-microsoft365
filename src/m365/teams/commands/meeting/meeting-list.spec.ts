@@ -7,7 +7,7 @@ import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import request from '../../../../request.js';
 import { telemetry } from '../../../../telemetry.js';
-import { aadUser } from '../../../../utils/aadUser.js';
+import { entraUser } from '../../../../utils/entraUser.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
@@ -178,7 +178,7 @@ describe(commands.MEETING_LIST, () => {
       accessToken.isAppOnlyAccessToken,
       request.get,
       request.post,
-      aadUser.getUserIdByEmail
+      entraUser.getUserIdByEmail
     ]);
   });
 
@@ -342,7 +342,7 @@ describe(commands.MEETING_LIST, () => {
   it('logs meetings for a user specified by email', async () => {
     sinonUtil.restore(accessToken.isAppOnlyAccessToken);
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
-    sinon.stub(aadUser, 'getUserIdByEmail').resolves(userId);
+    sinon.stub(entraUser, 'getUserIdByEmail').resolves(userId);
 
     sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users/${userId}/events?$filter=start/dateTime ge '${startDateTime}'&$select=onlineMeeting`) {
@@ -494,7 +494,7 @@ describe(commands.MEETING_LIST, () => {
   it('retrieves meetings correctly when specifying email', async () => {
     sinonUtil.restore(accessToken.isAppOnlyAccessToken);
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
-    sinon.stub(aadUser, 'getUserIdByEmail').resolves(userId);
+    sinon.stub(entraUser, 'getUserIdByEmail').resolves(userId);
 
     sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users/${userId}/events?$filter=start/dateTime ge '${startDateTime}'&$select=onlineMeeting`) {

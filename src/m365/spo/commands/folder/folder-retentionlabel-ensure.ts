@@ -37,6 +37,7 @@ class SpoFolderRetentionLabelEnsureCommand extends SpoCommand {
     this.#initOptions();
     this.#initValidators();
     this.#initOptionSets();
+    this.#initTypes();
   }
 
   #initTelemetry(): void {
@@ -85,6 +86,10 @@ class SpoFolderRetentionLabelEnsureCommand extends SpoCommand {
 
   #initOptionSets(): void {
     this.optionSets.push({ options: ['folderUrl', 'folderId'] });
+  }
+
+  #initTypes(): void {
+    this.types.string.push('webUrl', 'name', 'folderUrl', 'folderId');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

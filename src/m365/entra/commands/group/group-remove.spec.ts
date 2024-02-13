@@ -9,7 +9,7 @@ import { CommandError } from '../../../../Command.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
-import { aadGroup } from '../../../../utils/aadGroup.js';
+import { entraGroup } from '../../../../utils/entraGroup.js';
 import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import command from './group-remove.js';
@@ -53,7 +53,7 @@ describe(commands.GROUP_REMOVE, () => {
     sinonUtil.restore([
       request.get,
       request.delete,
-      aadGroup.getGroupIdByDisplayName,
+      entraGroup.getGroupIdByDisplayName,
       cli.getSettingWithDefaultValue,
       cli.handleMultipleResultsFound,
       cli.promptForConfirmation
@@ -99,7 +99,7 @@ describe(commands.GROUP_REMOVE, () => {
   it('removes the specified group by displayName when passing the force option', async () => {
     const confirmationStub = sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
-    sinon.stub(aadGroup, 'getGroupIdByDisplayName').resolves(groupId);
+    sinon.stub(entraGroup, 'getGroupIdByDisplayName').resolves(groupId);
 
     const deleteRequestStub = sinon.stub(request, 'delete').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/${groupId}`) {
@@ -117,7 +117,7 @@ describe(commands.GROUP_REMOVE, () => {
   it('removes the specified group by displayName while prompting for confirmation', async () => {
     const confirmationStub = sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
-    sinon.stub(aadGroup, 'getGroupIdByDisplayName').resolves(groupId);
+    sinon.stub(entraGroup, 'getGroupIdByDisplayName').resolves(groupId);
 
     const deleteRequestStub = sinon.stub(request, 'delete').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/${groupId}`) {

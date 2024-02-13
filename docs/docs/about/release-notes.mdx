@@ -4,7 +4,32 @@ sidebar_position: 4
 
 # Release notes
 
-## v7.4.0 (beta)
+## v7.5.0 (beta)
+
+### New commands
+
+**Entra ID**
+
+- [entra group user add](../cmd/entra/group/group-user-add.mdx) - adds a user to a Microsoft Entra ID group [#5471](https://github.com/pnp/cli-microsoft365/issues/5471)
+- [entra group add](../cmd/entra/group/group-add.mdx) - creates a Microsoft Entra group [#5476](https://github.com/pnp/cli-microsoft365/issues/5476)
+- [entra app permission list](../cmd/entra/app/app-permission-list.mdx) - lists the application and delegated permissions for a specified Entra Application Registration [#5668](https://github.com/pnp/cli-microsoft365/issues/5668)
+
+**File:**
+
+- [file copy](../cmd/file/file-copy.mdx) - copies a file to another location using the Microsoft Graph [#4623](https://github.com/pnp/cli-microsoft365/issues/4623)
+
+### Changes
+
+- fixed [entra app permission add](../cmd/entra/app/app-permission-add.mdx) throwing an error [#5802](https://github.com/pnp/cli-microsoft365/issues/5802)
+- fixed [spfx project github workflow add](../cmd/spfx/project/project-github-workflow-add.mdx) workflow naming [#5805](https://github.com/pnp/cli-microsoft365/issues/5805)
+- added [user guide](../user-guide/using-cli-vs-code-extension.mdx) for CLI for Microsoft 365 Visual Studio Code extension [#5796](https://github.com/pnp/cli-microsoft365/issues/5796)
+- fixed incorrect short option in docs for [spo listitem list](../cmd/spo/listitem/listitem-list.mdx) command [#5822](https://github.com/pnp/cli-microsoft365/pull/5822)
+- renamed internal CLI utilities from `aad` to `entra` [#5757](https://github.com/pnp/cli-microsoft365/issues/5757)
+- added request header Prefer: include-unknown-enum-members when reading connection schema [#5826](https://github.com/pnp/cli-microsoft365/issues/5826)
+- updated Docker images to use Node@20 [#5809](https://github.com/pnp/cli-microsoft365/pull/5809)
+- updated 'm365 entra user get' command to use correct query to Graph API [#5788](https://github.com/pnp/cli-microsoft365/issues/5788)
+
+## [v7.4.0](https://github.com/pnp/cli-microsoft365/releases/tag/v7.4.0)
 
 ### New commands
 
@@ -31,6 +56,7 @@ sidebar_position: 4
 - extended 'teams user app add' command with support for specifying name of the app [#5703](https://github.com/pnp/cli-microsoft365/issues/5703)
 - extended 'm365 flow run get' with the ability to retrieve the action information [#1828](https://github.com/pnp/cli-microsoft365/issues/1828)
 - updated 'spo group member add', 'spo group member remove', and 'spo user ensure' commands options [#5745](https://github.com/pnp/cli-microsoft365/issues/5745)
+- fixed spo folder commands don't support folders with numerical names ending [#5789](https://github.com/pnp/cli-microsoft365/issues/5789)
 
 ## [v7.3.0](https://github.com/pnp/cli-microsoft365/releases/tag/v7.3.0)
 

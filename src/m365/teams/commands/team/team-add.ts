@@ -3,7 +3,7 @@ import { setTimeout } from 'timers/promises';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import { Logger } from '../../../../cli/Logger.js';
 import request, { CliRequestOptions } from '../../../../request.js';
-import { aadGroup } from '../../../../utils/aadGroup.js';
+import { entraGroup } from '../../../../utils/entraGroup.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 
@@ -142,8 +142,8 @@ class TeamsTeamAddCommand extends GraphCommand {
       }
       else {
         await this.waitUntilTeamFinishedProvisioning(teamsAsyncOperation, requestOptions, logger);
-        const aadGroup = await this.getAadGroup(teamsAsyncOperation.targetResourceId!, logger);
-        await logger.log(aadGroup);
+        const entraGroup = await this.getEntraGroup(teamsAsyncOperation.targetResourceId!, logger);
+        await logger.log(entraGroup);
       }
     }
     catch (err: any) {
@@ -171,18 +171,18 @@ class TeamsTeamAddCommand extends GraphCommand {
     }
   }
 
-  private async getAadGroup(id: string, logger: Logger): Promise<Group> {
+  private async getEntraGroup(id: string, logger: Logger): Promise<Group> {
     let group: Group;
 
     try {
-      group = await aadGroup.getGroupById(id);
+      group = await entraGroup.getGroupById(id);
     }
     catch {
       if (this.verbose) {
         await logger.logToStderr(`Error occurred on retrieving the aad group. Retrying in ${this.pollingInterval / 1000} seconds.`);
       }
       await setTimeout(this.pollingInterval);
-      return await this.getAadGroup(id, logger);
+      return await this.getEntraGroup(id, logger);
     }
 
     return group!;

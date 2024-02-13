@@ -6,7 +6,7 @@ import GlobalOptions from '../../../../GlobalOptions.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 import { odata } from '../../../../utils/odata.js';
 import { validation } from '../../../../utils/validation.js';
-import aadUserGetCommand, { Options as AadUserGetCommandOptions } from '../../../entra/commands/user/user-get.js';
+import entraUserGetCommand, { Options as EntraUserGetCommandOptions } from '../../../entra/commands/user/user-get.js';
 import GraphCommand from "../../../base/GraphCommand.js";
 import commands from '../../commands.js';
 
@@ -122,7 +122,7 @@ class TeamsMeetingAttendancereportListCommand extends GraphCommand {
   }
 
   private async getUserId(userName?: string, email?: string): Promise<string> {
-    const options: AadUserGetCommandOptions = {
+    const options: EntraUserGetCommandOptions = {
       email: email,
       userName: userName,
       output: 'json',
@@ -130,7 +130,7 @@ class TeamsMeetingAttendancereportListCommand extends GraphCommand {
       verbose: this.verbose
     };
 
-    const output = await cli.executeCommandWithOutput(aadUserGetCommand as Command, { options: { ...options, _: [] } });
+    const output = await cli.executeCommandWithOutput(entraUserGetCommand as Command, { options: { ...options, _: [] } });
     const getUserOutput = JSON.parse(output.stdout);
     return getUserOutput.id;
   }

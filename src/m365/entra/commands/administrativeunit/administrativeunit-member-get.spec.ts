@@ -12,7 +12,7 @@ import command from './administrativeunit-member-get.js';
 import request from '../../../../request.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { CommandError } from '../../../../Command.js';
-import { aadAdministrativeUnit } from '../../../../utils/aadAdministrativeUnit.js';
+import { entraAdministrativeUnit } from '../../../../utils/entraAdministrativeUnit.js';
 import { settingsNames } from '../../../../settingsNames.js';
 import aadCommands from '../../aadCommands.js';
 
@@ -71,7 +71,7 @@ describe(commands.ADMINISTRATIVEUNIT_MEMBER_GET, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.get,
-      aadAdministrativeUnit.getAdministrativeUnitByDisplayName,
+      entraAdministrativeUnit.getAdministrativeUnitByDisplayName,
       cli.getSettingWithDefaultValue
     ]);
   });
@@ -170,7 +170,7 @@ describe(commands.ADMINISTRATIVEUNIT_MEMBER_GET, () => {
   });
 
   it('get member info for an administrative unit specified by name and member specified by id (verbose)', async () => {
-    sinon.stub(aadAdministrativeUnit, 'getAdministrativeUnitByDisplayName').withArgs(administrativeUnitName).resolves({ id: administrativeUnitId, displayName: administrativeUnitName });
+    sinon.stub(entraAdministrativeUnit, 'getAdministrativeUnitByDisplayName').withArgs(administrativeUnitName).resolves({ id: administrativeUnitId, displayName: administrativeUnitName });
 
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/directory/administrativeUnits/${administrativeUnitId}/members/${userId}`) {

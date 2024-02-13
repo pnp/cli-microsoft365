@@ -7,7 +7,7 @@ import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import request from '../../../../request.js';
 import { telemetry } from '../../../../telemetry.js';
-import { aadUser } from '../../../../utils/aadUser.js';
+import { entraUser } from '../../../../utils/entraUser.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
@@ -58,7 +58,7 @@ describe(commands.ROSTER_MEMBER_ADD, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.post,
-      aadUser.getUserIdByUpn
+      entraUser.getUserIdByUpn
     ]);
   });
 
@@ -119,7 +119,7 @@ describe(commands.ROSTER_MEMBER_ADD, () => {
   });
 
   it('adds a new member to the roster by userName', async () => {
-    sinon.stub(aadUser, 'getUserIdByUpn').resolves(validUserId);
+    sinon.stub(entraUser, 'getUserIdByUpn').resolves(validUserId);
 
     sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/beta/planner/rosters/${validRosterId}/members`) {

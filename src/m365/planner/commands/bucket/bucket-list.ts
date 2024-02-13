@@ -1,7 +1,7 @@
 import { PlannerBucket } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
-import { aadGroup } from '../../../../utils/aadGroup.js';
+import { entraGroup } from '../../../../utils/entraGroup.js';
 import { odata } from '../../../../utils/odata.js';
 import { planner } from '../../../../utils/planner.js';
 import { validation } from '../../../../utils/validation.js';
@@ -132,7 +132,7 @@ class PlannerBucketListCommand extends GraphCommand {
       return args.options.ownerGroupId;
     }
 
-    const group = await aadGroup.getGroupByDisplayName(args.options.ownerGroupName!);
+    const group = await entraGroup.getGroupByDisplayName(args.options.ownerGroupName!);
     return group.id!;
   }
 }

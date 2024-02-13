@@ -12,7 +12,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './m365group-user-list.js';
-import { aadGroup } from '../../../../utils/aadGroup.js';
+import { entraGroup } from '../../../../utils/entraGroup.js';
 import aadCommands from '../../aadCommands.js';
 
 describe(commands.M365GROUP_USER_LIST, () => {
@@ -26,7 +26,7 @@ describe(commands.M365GROUP_USER_LIST, () => {
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
-    sinon.stub(aadGroup, 'isUnifiedGroup').resolves(true);
+    sinon.stub(entraGroup, 'isUnifiedGroup').resolves(true);
     auth.service.connected = true;
     commandInfo = cli.getCommandInfo(command);
   });
@@ -179,7 +179,7 @@ describe(commands.M365GROUP_USER_LIST, () => {
   });
 
   it('correctly lists all users in a Microsoft 365 group by group name', async () => {
-    sinon.stub(aadGroup, 'getGroupIdByDisplayName').resolves('00000000-0000-0000-0000-000000000000');
+    sinon.stub(entraGroup, 'getGroupIdByDisplayName').resolves('00000000-0000-0000-0000-000000000000');
 
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/Owners/microsoft.graph.user?$select=id,displayName,userPrincipalName,givenName,surname,userType`) {
@@ -441,8 +441,8 @@ describe(commands.M365GROUP_USER_LIST, () => {
   it('throws error when the group by id is not a unified group', async () => {
     const groupId = '3f04e370-cbc6-4091-80fe-1d038be2ad06';
 
-    sinonUtil.restore(aadGroup.isUnifiedGroup);
-    sinon.stub(aadGroup, 'isUnifiedGroup').resolves(false);
+    sinonUtil.restore(entraGroup.isUnifiedGroup);
+    sinon.stub(entraGroup, 'isUnifiedGroup').resolves(false);
 
     await assert.rejects(command.action(logger, { options: { verbose: true, groupId: groupId } } as any),
       new CommandError(`Specified group '${groupId}' is not a Microsoft 365 group.`));
@@ -451,8 +451,8 @@ describe(commands.M365GROUP_USER_LIST, () => {
   it('throws error when the group by name is not a unified group', async () => {
     const groupDisplayName = 'CLI Test Group';
 
-    sinonUtil.restore(aadGroup.isUnifiedGroup);
-    sinon.stub(aadGroup, 'isUnifiedGroup').resolves(false);
+    sinonUtil.restore(entraGroup.isUnifiedGroup);
+    sinon.stub(entraGroup, 'isUnifiedGroup').resolves(false);
 
     await assert.rejects(command.action(logger, { options: { verbose: true, groupDisplayName: groupDisplayName } } as any),
       new CommandError(`Specified group '${groupDisplayName}' is not a Microsoft 365 group.`));

@@ -7,8 +7,8 @@ import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import request from '../../../../request.js';
 import { telemetry } from '../../../../telemetry.js';
-import { aadGroup } from '../../../../utils/aadGroup.js';
-import { aadUser } from '../../../../utils/aadUser.js';
+import { entraGroup } from '../../../../utils/entraGroup.js';
+import { entraUser } from '../../../../utils/entraUser.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { settingsNames } from '../../../../settingsNames.js';
 import { pid } from '../../../../utils/pid.js';
@@ -68,8 +68,8 @@ describe(commands.OWNER_REMOVE, () => {
     sinonUtil.restore([
       request.get,
       request.post,
-      aadGroup.getGroupIdByDisplayName,
-      aadUser.getUserIdByUpn,
+      entraGroup.getGroupIdByDisplayName,
+      entraUser.getUserIdByUpn,
       cli.getSettingWithDefaultValue,
       cli.handleMultipleResultsFound,
       cli.promptForConfirmation
@@ -103,7 +103,7 @@ describe(commands.OWNER_REMOVE, () => {
   });
 
   it('deletes owner from flow by userName', async () => {
-    sinon.stub(aadUser, 'getUserIdByUpn').resolves(userId);
+    sinon.stub(entraUser, 'getUserIdByUpn').resolves(userId);
     const postStub = sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === requestUrlNoAdmin) {
         return;
@@ -132,7 +132,7 @@ describe(commands.OWNER_REMOVE, () => {
   });
 
   it('deletes owner from flow by groupName as admin', async () => {
-    sinon.stub(aadGroup, 'getGroupIdByDisplayName').resolves(groupId);
+    sinon.stub(entraGroup, 'getGroupIdByDisplayName').resolves(groupId);
     const postStub = sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === requestUrlAdmin) {
         return;

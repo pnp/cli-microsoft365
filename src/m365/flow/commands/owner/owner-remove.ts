@@ -2,8 +2,8 @@ import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
-import { aadGroup } from '../../../../utils/aadGroup.js';
-import { aadUser } from '../../../../utils/aadUser.js';
+import { entraGroup } from '../../../../utils/entraGroup.js';
+import { entraUser } from '../../../../utils/entraUser.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { validation } from '../../../../utils/validation.js';
 import PowerAutomateCommand from '../../../base/PowerAutomateCommand.js';
@@ -124,13 +124,13 @@ class FlowOwnerRemoveCommand extends PowerAutomateCommand {
           idToRemove = args.options.userId;
         }
         else if (args.options.userName) {
-          idToRemove = await aadUser.getUserIdByUpn(args.options.userName);
+          idToRemove = await entraUser.getUserIdByUpn(args.options.userName);
         }
         else if (args.options.groupId) {
           idToRemove = args.options.groupId;
         }
         else {
-          idToRemove = await aadGroup.getGroupIdByDisplayName(args.options.groupName!);
+          idToRemove = await entraGroup.getGroupIdByDisplayName(args.options.groupName!);
         }
 
         const requestOptions: CliRequestOptions = {

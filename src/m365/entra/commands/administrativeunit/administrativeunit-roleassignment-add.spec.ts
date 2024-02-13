@@ -11,8 +11,8 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
-import { aadAdministrativeUnit } from '../../../../utils/aadAdministrativeUnit.js';
-import { aadUser } from '../../../../utils/aadUser.js';
+import { entraAdministrativeUnit } from '../../../../utils/entraAdministrativeUnit.js';
+import { entraUser } from '../../../../utils/entraUser.js';
 import { roleAssignment } from '../../../../utils/roleAssignment.js';
 import { roleDefinition } from '../../../../utils/roleDefinition.js';
 import { settingsNames } from '../../../../settingsNames.js';
@@ -64,8 +64,8 @@ describe(commands.ADMINISTRATIVEUNIT_ROLEASSIGNMENT_ADD, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      aadAdministrativeUnit.getAdministrativeUnitByDisplayName,
-      aadUser.getUserIdByUpn,
+      entraAdministrativeUnit.getAdministrativeUnitByDisplayName,
+      entraUser.getUserIdByUpn,
       roleAssignment.createRoleAssignmentWithAdministrativeUnitScope,
       roleDefinition.getRoleDefinitionByDisplayName,
       cli.getSettingWithDefaultValue,
@@ -270,8 +270,8 @@ describe(commands.ADMINISTRATIVEUNIT_ROLEASSIGNMENT_ADD, () => {
   });
 
   it('correctly assigns a role specified by name to and administrative unit specified by name and to a user specified by name (verbose)', async () => {
-    sinon.stub(aadAdministrativeUnit, 'getAdministrativeUnitByDisplayName').withArgs(administrativeUnitName).resolves({ id: administrativeUnitId, displayName: administrativeUnitName });
-    sinon.stub(aadUser, 'getUserIdByUpn').withArgs(userName).resolves(userId);
+    sinon.stub(entraAdministrativeUnit, 'getAdministrativeUnitByDisplayName').withArgs(administrativeUnitName).resolves({ id: administrativeUnitId, displayName: administrativeUnitName });
+    sinon.stub(entraUser, 'getUserIdByUpn').withArgs(userName).resolves(userId);
     sinon.stub(roleDefinition, 'getRoleDefinitionByDisplayName').withArgs(roleDefinitionName).resolves({ id: roleDefinitionId, displayName: roleDefinitionName });
     sinon.stub(roleAssignment, 'createRoleAssignmentWithAdministrativeUnitScope').withArgs(roleDefinitionId, userId, administrativeUnitId).resolves(unifiedRoleAssignment);
 
@@ -299,8 +299,8 @@ describe(commands.ADMINISTRATIVEUNIT_ROLEASSIGNMENT_ADD, () => {
   });
 
   it('fails if an administrative unit specified by name was not found', async () => {
-    sinon.stub(aadAdministrativeUnit, 'getAdministrativeUnitByDisplayName').withArgs(administrativeUnitName).throws(Error("The specified administrative unit 'Marketing Department' does not exist."));
-    sinon.stub(aadUser, 'getUserIdByUpn').withArgs(userName).resolves(userId);
+    sinon.stub(entraAdministrativeUnit, 'getAdministrativeUnitByDisplayName').withArgs(administrativeUnitName).throws(Error("The specified administrative unit 'Marketing Department' does not exist."));
+    sinon.stub(entraUser, 'getUserIdByUpn').withArgs(userName).resolves(userId);
     sinon.stub(roleDefinition, 'getRoleDefinitionByDisplayName').withArgs(roleDefinitionName).resolves({ id: roleDefinitionId, displayName: roleDefinitionName });
     sinon.stub(roleAssignment, 'createRoleAssignmentWithAdministrativeUnitScope').withArgs(roleDefinitionId, userId, administrativeUnitId).resolves(unifiedRoleAssignment);
 
@@ -314,8 +314,8 @@ describe(commands.ADMINISTRATIVEUNIT_ROLEASSIGNMENT_ADD, () => {
   });
 
   it('fails if a role definition specified by name was not found', async () => {
-    sinon.stub(aadAdministrativeUnit, 'getAdministrativeUnitByDisplayName').withArgs(administrativeUnitName).resolves({ id: administrativeUnitId, displayName: administrativeUnitName });
-    sinon.stub(aadUser, 'getUserIdByUpn').withArgs(userName).resolves(userId);
+    sinon.stub(entraAdministrativeUnit, 'getAdministrativeUnitByDisplayName').withArgs(administrativeUnitName).resolves({ id: administrativeUnitId, displayName: administrativeUnitName });
+    sinon.stub(entraUser, 'getUserIdByUpn').withArgs(userName).resolves(userId);
     sinon.stub(roleDefinition, 'getRoleDefinitionByDisplayName').withArgs(roleDefinitionName).throws(Error("The specified role definition 'User Administrator' does not exist."));
     sinon.stub(roleAssignment, 'createRoleAssignmentWithAdministrativeUnitScope').withArgs(roleDefinitionId, userId, administrativeUnitId).resolves(unifiedRoleAssignment);
 
@@ -329,8 +329,8 @@ describe(commands.ADMINISTRATIVEUNIT_ROLEASSIGNMENT_ADD, () => {
   });
 
   it('fails if a user specified by UPN was not found', async () => {
-    sinon.stub(aadAdministrativeUnit, 'getAdministrativeUnitByDisplayName').withArgs(administrativeUnitName).resolves({ id: administrativeUnitId, displayName: administrativeUnitName });
-    sinon.stub(aadUser, 'getUserIdByUpn').withArgs(userName).throws(Error("The specified user with user name AdeleVance@contoso.com does not exist."));
+    sinon.stub(entraAdministrativeUnit, 'getAdministrativeUnitByDisplayName').withArgs(administrativeUnitName).resolves({ id: administrativeUnitId, displayName: administrativeUnitName });
+    sinon.stub(entraUser, 'getUserIdByUpn').withArgs(userName).throws(Error("The specified user with user name AdeleVance@contoso.com does not exist."));
     sinon.stub(roleDefinition, 'getRoleDefinitionByDisplayName').withArgs(roleDefinitionName).resolves({ id: roleDefinitionId, displayName: roleDefinitionName });
     sinon.stub(roleAssignment, 'createRoleAssignmentWithAdministrativeUnitScope').withArgs(roleDefinitionId, userId, administrativeUnitId).resolves(unifiedRoleAssignment);
 
@@ -344,8 +344,8 @@ describe(commands.ADMINISTRATIVEUNIT_ROLEASSIGNMENT_ADD, () => {
   });
 
   it('correctly handles API OData error when creating role assignment with an administrative unit scope failed', async () => {
-    sinon.stub(aadAdministrativeUnit, 'getAdministrativeUnitByDisplayName').withArgs(administrativeUnitName).resolves({ id: administrativeUnitId, displayName: administrativeUnitName });
-    sinon.stub(aadUser, 'getUserIdByUpn').withArgs(userName).resolves(userId);
+    sinon.stub(entraAdministrativeUnit, 'getAdministrativeUnitByDisplayName').withArgs(administrativeUnitName).resolves({ id: administrativeUnitId, displayName: administrativeUnitName });
+    sinon.stub(entraUser, 'getUserIdByUpn').withArgs(userName).resolves(userId);
     sinon.stub(roleDefinition, 'getRoleDefinitionByDisplayName').withArgs(roleDefinitionName).resolves({ id: roleDefinitionId, displayName: roleDefinitionName });
     sinon.stub(request, 'post').rejects({
       error: {
