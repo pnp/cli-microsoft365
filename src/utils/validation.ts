@@ -376,5 +376,12 @@ export const validation = {
     const mailNicknameRegEx = new RegExp(/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]*$/i);
 
     return mailNicknameRegEx.test(mailNickname);
+  },
+
+  isValidISODuration(duration: string): boolean {
+    const durationRegEx: RegExp = new RegExp(
+      /^P(?!$)((\d+Y)|(\d+\.\d+Y$))?((\d+M)|(\d+\.\d+M$))?((\d+W)|(\d+\.\d+W$))?((\d+D)|(\d+\.\d+D$))?(T(?=\d)((\d+H)|(\d+\.\d+H$))?((\d+M)|(\d+\.\d+M$))?(\d+(\.\d+)?S)?)??$/);
+
+    return durationRegEx.test(duration);
   }
 };
