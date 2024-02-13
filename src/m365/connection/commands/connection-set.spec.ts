@@ -122,7 +122,7 @@ describe(commands.SET, () => {
 
   it('passes validation if name and newName are correctly set', async () => {
     const actual = await command.validate({ options: { name: 'oldname', newName: 'newname' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it(`fails with error if the connection cannot be found`, async () => {
