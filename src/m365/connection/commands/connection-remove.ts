@@ -3,6 +3,7 @@ import auth from '../../../Auth.js';
 import commands from '../commands.js';
 import Command, { CommandError } from '../../../Command.js';
 import GlobalOptions from '../../../GlobalOptions.js';
+import { cli } from '../../../cli/cli.js';
 
 interface CommandArgs {
   options: Options;
@@ -10,6 +11,7 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   name: string;
+  force?: boolean;
 }
 
 class ConnectionRemoveCommand extends Command {
@@ -18,31 +20,57 @@ class ConnectionRemoveCommand extends Command {
   }
 
   public get description(): string {
-    return "When signed in with multiple identities, switch to another connection";
+    return 'Remove the specified connection';
   }
 
   constructor() {
     super();
 
+    this.#initTelemetry();
     this.#initOptions();
+  }
+
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        force: (!(!args.options.force)).toString()
+      });
+    });
   }
 
   #initOptions(): void {
     this.options.unshift(
       {
         option: '-n, --name <name>'
+      },
+      {
+        option: '-f, --force'
       }
     );
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const connection = await auth.getConnection(args.options.name);
+    const deleteConnection = async (): Promise<void> => {
+      const connection = await auth.getConnection(args.options.name);
 
-    if (this.verbose) {
-      await logger.logToStderr(`Removing connection '${connection.identityName}', appId: ${connection.appId}, tenantId: ${connection.identityTenantId}...`);
+      if (this.verbose) {
+        await logger.logToStderr(`Removing connection '${connection.identityName}', appId: ${connection.appId}, tenantId: ${connection.identityTenantId}...`);
+      }
+
+      await auth.removeConnectionInfo(connection, logger, this.debug);
+    };
+
+    if (args.options.force) {
+      await deleteConnection();
     }
+    else {
+      const result = await cli.promptForConfirmation({ message: `Are you sure you want to remove the connection?` });
 
-    await auth.removeConnectionInfo(logger, this.debug, connection);
+      if (result) {
+        await deleteConnection();
+      }
+    }
   }
 
   public async action(logger: Logger, args: CommandArgs): Promise<void> {

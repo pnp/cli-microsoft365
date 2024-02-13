@@ -26,7 +26,13 @@ class StatusCommand extends Command {
         throw new CommandError(`Your login has expired. Sign in again to continue. ${err.message}`);
       }
 
-      await logger.log(auth.getIdentityDetails(auth.connection, this.debug));
+      const details = auth.getConnectionDetails(auth.connection);
+
+      if (this.debug) {
+        (details as any).accessTokens = JSON.stringify(auth.connection.accessTokens, null, 2);
+      }
+
+      await logger.log(details);
     }
     else {
       const connections = await auth.getAllConnections();

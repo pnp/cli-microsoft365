@@ -12,7 +12,7 @@ import { settingsNames } from '../../../settingsNames.js';
 import { sinonUtil } from '../../../utils/sinonUtil.js';
 import { CommandError } from '../../../Command.js';
 import { cli } from '../../../cli/cli.js';
-import { IdentityDetails } from '../../commands/identityDetails.js';
+import { ConnectionDetails } from '../../commands/ConnectionDetails.js';
 
 describe(commands.USE, () => {
   let log: string[];
@@ -45,24 +45,6 @@ describe(commands.USE, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     commandInfo = cli.getCommandInfo(command);
-  });
-
-  beforeEach(() => {
-    log = [];
-    logger = {
-      log: async (msg: string) => {
-        log.push(msg);
-      },
-      logRaw: async (msg: string) => {
-        log.push(msg);
-      },
-      logToStderr: async (msg: string) => {
-        log.push(msg);
-      }
-    };
-    loggerLogSpy = sinon.spy(logger, 'log');
-
-    sinon.stub(auth, 'ensureAccessToken').resolves();
 
     auth.connection.active = true;
     auth.connection.authType = AuthType.DeviceCode;
@@ -113,8 +95,25 @@ describe(commands.USE, () => {
     ];
   });
 
+  beforeEach(() => {
+    log = [];
+    logger = {
+      log: async (msg: string) => {
+        log.push(msg);
+      },
+      logRaw: async (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: async (msg: string) => {
+        log.push(msg);
+      }
+    };
+    loggerLogSpy = sinon.spy(logger, 'log');
+
+    sinon.stub(auth, 'ensureAccessToken').resolves();
+  });
+
   afterEach(() => {
-    auth.connection.deactivate();
     sinonUtil.restore([
       cli.getSettingWithDefaultValue,
       auth.ensureAccessToken,
@@ -123,6 +122,7 @@ describe(commands.USE, () => {
   });
 
   after(() => {
+    auth.connection.deactivate();
     sinon.restore();
   });
 
@@ -133,12 +133,6 @@ describe(commands.USE, () => {
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
   });
-
-  it('fails validation if the id is not a valid guid', async () => {
-    const actual = await command.validate({ options: { id: 'abc' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
 
   it('fails validation if name is not specified', async () => {
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
@@ -170,19 +164,18 @@ describe(commands.USE, () => {
   });
 
   it(`switches to the 'Contoso Application' identity using the name option`, async () => {
-    await assert.doesNotReject(command.action(logger, { options: { name: 'acd6df42-10a9-4315-8928-53334f1c9d01' } }));
+    await command.action(logger, { options: { name: 'acd6df42-10a9-4315-8928-53334f1c9d01' } });
     assert(loggerLogSpy.calledOnceWithExactly(mockContosoApplicationIdentityResponse));
   });
 
   it(`switches to the user identity using the name option`, async () => {
-    await assert.doesNotReject(command.action(logger, { options: { name: '028de82d-7fd9-476e-a9fd-be9714280ff3' } }));
+    await command.action(logger, { options: { name: '028de82d-7fd9-476e-a9fd-be9714280ff3' } });
     assert(loggerLogSpy.calledOnceWithExactly(mockUserIdentityResponse));
   });
 
   it(`switches to the user identity using the name option (debug)`, async () => {
-    await assert.doesNotReject(command.action(logger, { options: { name: '028de82d-7fd9-476e-a9fd-be9714280ff3', debug: true } }));
-    const logged = loggerLogSpy.args[0][0] as unknown as IdentityDetails;
-    assert(loggerLogSpy.calledOnce);
+    await command.action(logger, { options: { name: '028de82d-7fd9-476e-a9fd-be9714280ff3', debug: true } });
+    const logged = loggerLogSpy.args[0][0] as unknown as ConnectionDetails;
     assert.strictEqual(logged.connectedAs, mockUserIdentityResponse.connectedAs);
   });
 });

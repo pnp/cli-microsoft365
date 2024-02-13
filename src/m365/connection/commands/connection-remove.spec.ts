@@ -16,35 +16,16 @@ import { cli } from '../../../cli/cli.js';
 describe(commands.REMOVE, () => {
   let log: string[];
   let logger: Logger;
-  let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'clearConnectionInfo').resolves();
     sinon.stub(auth, 'storeConnectionInfo').resolves();
-    sinon.stub(auth, 'removeConnectionInfo').resolves();
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     commandInfo = cli.getCommandInfo(command);
-  });
 
-  beforeEach(() => {
-    log = [];
-    logger = {
-      log: async (msg: string) => {
-        log.push(msg);
-      },
-      logRaw: async (msg: string) => {
-        log.push(msg);
-      },
-      logToStderr: async (msg: string) => {
-        log.push(msg);
-      }
-    };
-    loggerLogSpy = sinon.spy(logger, 'log');
-
-    sinon.stub(auth, 'ensureAccessToken').resolves();
 
     auth.connection.active = true;
     auth.connection.authType = AuthType.DeviceCode;
@@ -95,16 +76,35 @@ describe(commands.REMOVE, () => {
     ];
   });
 
+  beforeEach(() => {
+    log = [];
+    logger = {
+      log: async (msg: string) => {
+        log.push(msg);
+      },
+      logRaw: async (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: async (msg: string) => {
+        log.push(msg);
+      }
+    };
+
+    sinon.stub(auth, 'ensureAccessToken').resolves();
+  });
+
   afterEach(() => {
-    auth.connection.deactivate();
     sinonUtil.restore([
-      cli.getSettingWithDefaultValue,
       auth.ensureAccessToken,
+      auth.removeConnectionInfo,
+      cli.getSettingWithDefaultValue,
+      cli.promptForConfirmation,
       cli.handleMultipleResultsFound
     ]);
   });
 
   after(() => {
+    auth.connection.deactivate();
     sinon.restore();
   });
 
@@ -130,6 +130,7 @@ describe(commands.REMOVE, () => {
   });
 
   it(`fails with error if the connection cannot be found`, async () => {
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
     await assert.rejects(command.action(logger, { options: { name: 'Non-existent connection' } }), new CommandError(`The connection 'Non-existent connection' cannot be found`));
   });
 
@@ -145,13 +146,37 @@ describe(commands.REMOVE, () => {
     }
   });
 
-  it(`removes the 'Contoso Application' connection using the name option`, async () => {
-    await assert.doesNotReject(command.action(logger, { options: { name: 'acd6df42-10a9-4315-8928-53334f1c9d01' } }));
-    assert(loggerLogSpy.notCalled);
+  it(`removes the 'Contoso Application' connection when prompt is confirmed`, async () => {
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
+    const removeStub = sinon.stub(auth, 'removeConnectionInfo').resolves();
+    await command.action(logger, { options: { name: 'acd6df42-10a9-4315-8928-53334f1c9d01' } });
+    assert(removeStub.calledOnce);
   });
 
-  it(`removes the user connection using the name option (debug)`, async () => {
-    await assert.doesNotReject(command.action(logger, { options: { name: '028de82d-7fd9-476e-a9fd-be9714280ff3', debug: true } }));
-    assert(loggerLogSpy.notCalled);
+  it(`removes the 'Contoso Application' connection and not prompting for confirmation`, async () => {
+    const removeStub = sinon.stub(auth, 'removeConnectionInfo').resolves();
+    await command.action(logger, { options: { name: 'acd6df42-10a9-4315-8928-53334f1c9d01', force: true } });
+    assert(removeStub.calledOnce);
+  });
+
+
+  it('aborts removing the connection when prompt not confirmed', async () => {
+    sinon.stub(cli, 'promptForConfirmation').resolves(false);
+    const removeStub = sinon.stub(auth, 'removeConnectionInfo').resolves();
+
+    await command.action(logger, {
+      options: {
+        name: 'acd6df42-10a9-4315-8928-53334f1c9d01'
+      }
+    });
+    assert(removeStub.notCalled);
+  });
+
+  it(`removes the user connection when prompt is confirmed (debug)`, async () => {
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
+    const removeStub = sinon.stub(auth, 'removeConnectionInfo').resolves();
+
+    await command.action(logger, { options: { name: '028de82d-7fd9-476e-a9fd-be9714280ff3', debug: true } });
+    assert(removeStub.calledOnce);
   });
 });

@@ -93,7 +93,7 @@ class LoginCommand extends Command {
       },
       {
         option: '--connectionName [connectionName]'
-      },
+      }
     );
   }
 
@@ -213,7 +213,14 @@ class LoginCommand extends Command {
         throw new CommandError(error.message);
       }
 
-      await logger.log(auth.getIdentityDetails(auth.connection, this.debug));
+      const details = auth.getConnectionDetails(auth.connection);
+
+      if (this.debug) {
+        (details as any).accessToken = JSON.stringify(auth.connection.accessTokens, null, 2);
+      }
+
+
+      await logger.log(details);
     };
 
     deactivate();

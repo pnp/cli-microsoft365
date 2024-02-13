@@ -112,7 +112,6 @@ describe(commands.LIST, () => {
     auth.connection.deactivate();
   });
 
-
   it('has correct name', () => {
     assert.strictEqual(command.name, commands.LIST);
   });
@@ -122,11 +121,60 @@ describe(commands.LIST, () => {
   });
 
   it('defines correct properties for the default output', () => {
-    assert.deepStrictEqual(command.defaultProperties(), ['name', 'connectedAs', 'authType']);
+    assert.deepStrictEqual(command.defaultProperties(), ['name', 'connectedAs', 'authType', 'active']);
   });
 
-  it('shows a list of signed in identities', async () => {
-    await assert.doesNotReject(command.action(logger, { options: {} }));
+  it('shows a list of connections', async () => {
+    await command.action(logger, { options: {} });
+    assert(loggerLogSpy.calledOnceWithExactly(mockListResponse));
+  });
+
+  it('shows an empty list of connections', async () => {
+    sinon.stub(auth, 'getAllConnections').resolves([]);
+    await command.action(logger, { options: {} });
+    assert(loggerLogSpy.calledOnceWithExactly([]));
+    sinonUtil.restore((auth as any).getAllConnections);
+  });
+
+  it('shows an list with one connection', async () => {
+    const mockConnectionsList = [
+      {
+        authType: AuthType.DeviceCode,
+        active: true,
+        name: '028de82d-7fd9-476e-a9fd-be9714280ff3',
+        identityName: 'alexw@contoso.com',
+        identityId: '028de82d-7fd9-476e-a9fd-be9714280ff3',
+        identityTenantId: 'db308122-52f3-4241-af92-1734aa6e2e50',
+        appId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
+        tenant: 'common',
+        cloudType: CloudType.Public,
+        certificateType: CertificateType.Unknown,
+        accessTokens: {
+          'https://graph.microsoft.com': {
+            expiresOn: (new Date()).toISOString(),
+            accessToken: 'abc'
+          }
+        }
+      }
+    ];
+
+    const mockConnectionsResponse = [
+      {
+        "name": "028de82d-7fd9-476e-a9fd-be9714280ff3",
+        "connectedAs": "alexw@contoso.com",
+        "authType": "DeviceCode",
+        "active": true
+      }
+    ];
+
+    sinon.stub((auth as any), 'getAllConnections').resolves(mockConnectionsList);
+    await command.action(logger, { options: {} });
+    assert(loggerLogSpy.calledOnceWithExactly(mockConnectionsResponse));
+    sinonUtil.restore((auth as any).getAllConnections);
+  });
+
+  it('shows a list of connections (debug)', async () => {
+    await command.action(logger, { options: { debug: true } });
     assert(loggerLogSpy.calledOnceWithExactly(mockListResponse));
   });
 

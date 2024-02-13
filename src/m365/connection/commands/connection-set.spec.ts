@@ -8,7 +8,6 @@ import { session } from '../../../utils/session.js';
 import commands from '../commands.js';
 import command from './connection-set.js';
 import { CommandInfo } from '../../../cli/CommandInfo.js';
-import { settingsNames } from '../../../settingsNames.js';
 import { sinonUtil } from '../../../utils/sinonUtil.js';
 import { CommandError } from '../../../Command.js';
 import { cli } from '../../../cli/cli.js';
@@ -16,7 +15,6 @@ import { cli } from '../../../cli/cli.js';
 describe(commands.SET, () => {
   let log: string[];
   let logger: Logger;
-  let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
 
   before(() => {
@@ -26,22 +24,6 @@ describe(commands.SET, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     commandInfo = cli.getCommandInfo(command);
-  });
-
-  beforeEach(() => {
-    log = [];
-    logger = {
-      log: async (msg: string) => {
-        log.push(msg);
-      },
-      logRaw: async (msg: string) => {
-        log.push(msg);
-      },
-      logToStderr: async (msg: string) => {
-        log.push(msg);
-      }
-    };
-    loggerLogSpy = sinon.spy(logger, 'log');
 
     sinon.stub(auth, 'ensureAccessToken').resolves();
 
@@ -94,16 +76,34 @@ describe(commands.SET, () => {
     ];
   });
 
+  beforeEach(() => {
+    log = [];
+    logger = {
+      log: async (msg: string) => {
+        log.push(msg);
+      },
+      logRaw: async (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: async (msg: string) => {
+        log.push(msg);
+      }
+    };
+
+    auth.connection.name = '028de82d-7fd9-476e-a9fd-be9714280ff3';
+    (auth as any)._allConnections[0].name = '028de82d-7fd9-476e-a9fd-be9714280ff3';
+    (auth as any)._allConnections[1].name = 'acd6df42-10a9-4315-8928-53334f1c9d01';
+  });
+
   afterEach(() => {
-    auth.connection.deactivate();
     sinonUtil.restore([
-      cli.getSettingWithDefaultValue,
       auth.ensureAccessToken,
       cli.handleMultipleResultsFound
     ]);
   });
 
   after(() => {
+    auth.connection.deactivate();
     sinon.restore();
   });
 
@@ -115,21 +115,22 @@ describe(commands.SET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if neither id or name is specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
+  it('fails validation if newName is the same as name', async () => {
+    const actual = await command.validate({ options: { name: 'test', newName: 'test' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
 
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: {} }, commandInfo);
+  it('passes validation if name and newName are correctly set', async () => {
+    const actual = await command.validate({ options: { name: 'oldname', newName: 'newname' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it(`fails with error if the connection cannot be found`, async () => {
     await assert.rejects(command.action(logger, { options: { name: 'Non-existent connection', newName: 'something new' } }), new CommandError(`The connection 'Non-existent connection' cannot be found`));
+  });
+
+  it(`fails with error if the newName is already in use`, async () => {
+    await assert.rejects(command.action(logger, { options: { name: 'acd6df42-10a9-4315-8928-53334f1c9d01', newName: '028de82d-7fd9-476e-a9fd-be9714280ff3' } }), new CommandError(`The connection name '028de82d-7fd9-476e-a9fd-be9714280ff3' is already in use`));
   });
 
   it('fails with error when restoring auth information leads to error', async () => {
@@ -145,12 +146,12 @@ describe(commands.SET, () => {
   });
 
   it(`Updates the 'Contoso Application' connection`, async () => {
-    await assert.doesNotReject(command.action(logger, { options: { name: 'acd6df42-10a9-4315-8928-53334f1c9d01', newName: 'ContosoApplication' } }));
-    assert(loggerLogSpy.notCalled);
+    await command.action(logger, { options: { name: 'acd6df42-10a9-4315-8928-53334f1c9d01', newName: 'ContosoApplication' } });
+    assert.strictEqual((auth as any)._allConnections[1].name, 'ContosoApplication');
   });
 
   it(`Updates the active user connection (debug)`, async () => {
-    await assert.doesNotReject(command.action(logger, { options: { name: '028de82d-7fd9-476e-a9fd-be9714280ff3', newName: 'myalias', debug: true } }));
-    assert(loggerLogSpy.notCalled);
+    await command.action(logger, { options: { name: '028de82d-7fd9-476e-a9fd-be9714280ff3', newName: 'myalias', debug: true } });
+    assert.strictEqual(auth.connection.name, 'myalias');
   });
 });

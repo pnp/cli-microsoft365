@@ -9,26 +9,28 @@ class ConnectionListCommand extends Command {
   }
 
   public get description(): string {
-    return "Show the list of available connections";
+    return 'Show the list of available connections';
   }
 
   public defaultProperties(): string[] | undefined {
-    return ['name', 'connectedAs', 'authType'];
+    return ['name', 'connectedAs', 'authType', 'active'];
   }
 
   public async commandAction(logger: Logger): Promise<void> {
     const availableConnections = await auth.getAllConnections();
 
-    await logger.log(availableConnections.map(i => {
-      const isCurrentConnection = auth.connection?.name === i.name;
+    const output = availableConnections.map(connection => {
+      const isCurrentConnection = connection.name === auth.connection?.name;
 
       return {
-        name: i.name,
-        connectedAs: i.identityName,
-        authType: AuthType[i.authType],
+        name: connection.name,
+        connectedAs: connection.identityName,
+        authType: AuthType[connection.authType],
         active: isCurrentConnection
       };
-    }));
+    }).sort((a, b) => a.name!.localeCompare(b.name!));
+
+    await logger.log(output);
   }
 
   public async action(logger: Logger, args: CommandArgs): Promise<void> {

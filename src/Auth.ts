@@ -14,7 +14,7 @@ import request from './request.js';
 import { settingsNames } from './settingsNames.js';
 import { browserUtil } from './utils/browserUtil.js';
 import * as accessTokenUtil from './utils/accessToken.js';
-import { IdentityDetails } from './m365/commands/identityDetails.js';
+import { ConnectionDetails } from './m365/commands/ConnectionDetails.js';
 
 interface Hash<TValue> {
   [key: string]: TValue;
@@ -229,12 +229,13 @@ export class Auth {
     // no account. Also (for cert auth) clientApplication is instantiated later
     // after inspecting the specified cert and calculating thumbprint if one
     // wasn't specified
-    if (this.connection.authType !== AuthType.Certificate
-      && this.connection.authType !== AuthType.Secret
-      && this.connection.authType !== AuthType.Identity) {
+    if (this.connection.authType !== AuthType.Certificate &&
+      this.connection.authType !== AuthType.Secret &&
+      this.connection.authType !== AuthType.Identity) {
       this.clientApplication = await this.getPublicClient(logger, debug);
       if (this.clientApplication) {
         const accounts = await this.clientApplication.getTokenCache().getAllAccounts();
+        // if there is an account in the cache and it's active, we can try to get the token silently
         if (accounts.filter(a => a.localAccountId === this.connection.identityId).length > 0 && this.connection.active === true) {
           getTokenPromise = this.ensureAccessTokenSilent.bind(this);
         }
@@ -776,21 +777,21 @@ export class Auth {
     await msalCache.remove();
   }
 
-  public async removeConnectionInfo(logger: Logger, debug: boolean, connection: Connection): Promise<void> {
+  public async removeConnectionInfo(connection: Connection, logger: Logger, debug: boolean): Promise<void> {
     const allConnections = await this.getAllConnections();
     const isCurrentConnection = this.connection.name === connection.name;
 
     this._allConnections = allConnections.filter(c => c.name !== connection.name);
 
     // When using an application identity, there is no account in the MSAL TokenCache
-    if (this.connection.authType !== AuthType.Certificate
-      && this.connection.authType !== AuthType.Secret
-      && this.connection.authType !== AuthType.Identity) {
+    if (this.connection.authType !== AuthType.Certificate &&
+      this.connection.authType !== AuthType.Secret &&
+      this.connection.authType !== AuthType.Identity) {
       this.clientApplication = await this.getPublicClient(logger, debug);
 
       if (this.clientApplication) {
         const tokenCache = this.clientApplication.getTokenCache();
-        const account = await tokenCache.getAccountByLocalId(connection!.identityId!);
+        const account = await tokenCache.getAccountByLocalId(connection.identityId!);
         if (account !== null) {
           await tokenCache.removeAccount(account);
         }
@@ -846,6 +847,10 @@ export class Auth {
   public async updateConnection(oldName: string, newName: string): Promise<void> {
     const allConnections = await this.getAllConnections();
 
+    if (allConnections.filter(c => c.name === newName).length > 0) {
+      throw new CommandError(`The connection name '${newName}' is already in use`);
+    }
+
     allConnections.forEach(c => {
       if (c.name === oldName) {
         c.name = newName;
@@ -870,19 +875,15 @@ export class Auth {
     return connections[0];
   }
 
-  public getIdentityDetails(identity: Connection, debug: boolean): IdentityDetails {
-    const details: IdentityDetails = {
-      connectionName: identity.name!,
-      connectedAs: identity.identityName!,
-      authType: AuthType[identity.authType],
-      appId: identity.appId,
-      appTenant: identity.tenant,
-      cloudType: CloudType[identity.cloudType]
+  public getConnectionDetails(connection: Connection): ConnectionDetails {
+    const details: ConnectionDetails = {
+      connectionName: connection.name!,
+      connectedAs: connection.identityName!,
+      authType: AuthType[connection.authType],
+      appId: connection.appId,
+      appTenant: connection.tenant,
+      cloudType: CloudType[connection.cloudType]
     };
-
-    if (debug) {
-      details.accessTokens = JSON.stringify(identity.accessTokens, null, 2);
-    }
 
     return details;
   }

@@ -18,7 +18,7 @@ class ConnectionUseCommand extends Command {
   }
 
   public get description(): string {
-    return "When signed in with multiple identities, switch to another connection";
+    return 'Activate the specified Microsoft 365 tenant connection';
   }
 
   constructor() {
@@ -44,7 +44,13 @@ class ConnectionUseCommand extends Command {
 
     await auth.switchToConnection(connection);
 
-    await logger.log(auth.getIdentityDetails(auth.connection, this.debug));
+    const details = auth.getConnectionDetails(auth.connection);
+
+    if (this.debug) {
+      (details as any).accessTokens = JSON.stringify(auth.connection.accessTokens, null, 2);
+    }
+
+    await logger.log(details);
   }
 
   public async action(logger: Logger, args: CommandArgs): Promise<void> {

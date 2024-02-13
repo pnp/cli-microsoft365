@@ -19,14 +19,16 @@ class ConnectionSetCommand extends Command {
   }
 
   public get description(): string {
-    return "When signed in with multiple identities, update a specified connection";
+    return 'Rename the specified connection';
   }
 
   constructor() {
     super();
 
     this.#initOptions();
+    this.#initValidators();
   }
+
 
   #initOptions(): void {
     this.options.unshift(
@@ -35,6 +37,18 @@ class ConnectionSetCommand extends Command {
       },
       {
         option: '--newName <newName>'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (args.options.name === args.options.newName) {
+          return `Choose a name different from the current one`;
+        }
+
+        return true;
       }
     );
   }

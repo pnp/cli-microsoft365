@@ -2008,7 +2008,7 @@ describe('Auth', () => {
     sinon.stub(auth, 'getConnectionStorage').returns(mockStorage1);
     sinon.stub(auth, 'getAllConnectionsStorage').returns(mockStorage2);
 
-    await auth.removeConnectionInfo(logger, false, auth.connection);
+    await auth.removeConnectionInfo(auth.connection, logger, false);
     assert(mockStorageSetStub1.called, 'Active connection Storage not removed');
     assert(mockStorageSetStub2.called, 'All connections Storage not cleared');
   });
