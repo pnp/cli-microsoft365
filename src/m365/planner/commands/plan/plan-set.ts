@@ -104,8 +104,18 @@ class PlannerPlanSetCommand extends GraphCommand {
           return 'Specify either shareWithUserIds or shareWithUserNames but not both';
         }
 
-        if (args.options.shareWithUserIds && !validation.isValidGuidArray(args.options.shareWithUserIds.split(','))) {
-          return 'shareWithUserIds contains invalid GUID';
+        if (args.options.shareWithUserIds) {
+          const isValidGUIDArrayResult = validation.isValidGuidArray(args.options.shareWithUserIds);
+          if (isValidGUIDArrayResult !== true) {
+            return `The following GUIDs are invalid for the option 'shareWithUserIds': ${isValidGUIDArrayResult}.`;
+          }
+        }
+
+        if (args.options.shareWithUserNames) {
+          const isValidUPNArrayResult = validation.isValidUserPrincipalNameArray(args.options.shareWithUserNames);
+          if (isValidUPNArrayResult !== true) {
+            return `The following user principal names are invalid for the option 'shareWithUserNames': ${isValidUPNArrayResult}.`;
+          }
         }
 
         const allowedCategories: string[] = [
