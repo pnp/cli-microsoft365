@@ -88,6 +88,47 @@ export const entraUser = {
   },
 
   /**
+   * Retrieve the IDs of users by their mail. There is no guarantee that the order of the returned IDs will match the order of the specified mails.
+   * @param emails Array of user mails.
+   * @returns Array of user IDs.
+   */
+  async getUserIdsByEmails(emails: string[]): Promise<string[]> {
+    const userIds: string[] = [];
+
+    for (let i = 0; i < emails.length; i += 20) {
+      const emailsChunk = emails.slice(i, i + 20);
+      const requestOptions: CliRequestOptions = {
+        url: `${graphResource}/v1.0/$batch`,
+        headers: {
+          accept: 'application/json;odata.metadata=none'
+        },
+        responseType: 'json',
+        data: {
+          requests: emailsChunk.map((email, index) => ({
+            id: index + 1,
+            method: 'GET',
+            url: `/users?$filter=mail eq '${formatting.encodeQueryParameter(email)}'&$select=id`,
+            headers: {
+              accept: 'application/json;odata.metadata=none'
+            }
+          }))
+        }
+      };
+      const res = await request.post<{ responses: { id: number; status: number; body: { id: string } }[] }>(requestOptions);
+
+      for (const response of res.responses) {
+        if (response.status !== 200) {
+          throw Error(`The specified user with mail '${emailsChunk[response.id - 1]}' does not exist.`);
+        }
+
+        userIds.push(response.body.id);
+      }
+    }
+
+    return userIds;
+  },
+
+  /**
    * Retrieve the UPN of a user by its ID.
    * @param id User ID.
    */
