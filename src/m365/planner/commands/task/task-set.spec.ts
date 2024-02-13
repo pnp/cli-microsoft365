@@ -362,6 +362,17 @@ describe(commands.TASK_SET, () => {
     assert.notStrictEqual(actual, true);
   });
 
+  it('fails validation if assignedToUserNames contains invalid user principal name', async () => {
+    const assignedToUserNames = ['john.doe@contoso.com', 'foo'];
+    const actual = await command.validate({
+      options: {
+        id: 'Z-RLQGfppU6H3663DBzfs5gAMD3o',
+        assignedToUserNames: assignedToUserNames.join(',')
+      }
+    }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
   it('fails validation when both assignedToUserIds and assignedToUserNames are specified', async () => {
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
       if (settingName === settingsNames.prompt) {

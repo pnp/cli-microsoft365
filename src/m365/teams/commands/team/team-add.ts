@@ -105,39 +105,45 @@ class TeamsTeamAddCommand extends GraphCommand {
     this.validators.push(
       async (args: CommandArgs) => {
         if (args.options.ownerUserNames) {
-          const isValidUserPrincipalNameArray = validation.isValidUserPrincipalNameArray(formatting.splitAndTrim(args.options.ownerUserNames));
-          if (isValidUserPrincipalNameArray !== true) {
-            return `Owner username '${isValidUserPrincipalNameArray}' is invalid for option 'ownerUserNames'.`;
+          const isValidUPNArrayResult = validation.isValidUserPrincipalNameArray(args.options.ownerUserNames);
+          if (isValidUPNArrayResult !== true) {
+            return `The following user principal names are invalid for the option 'ownerUserNames': ${isValidUPNArrayResult}.`;
           }
         }
 
         if (args.options.ownerEmails) {
-          const isValidUserPrincipalNameArray = validation.isValidUserPrincipalNameArray(formatting.splitAndTrim(args.options.ownerEmails));
-          if (isValidUserPrincipalNameArray !== true) {
-            return `Owner email '${isValidUserPrincipalNameArray}' is invalid for option 'ownerEmails'.`;
+          const isValidUPNArrayResult = validation.isValidUserPrincipalNameArray(args.options.ownerEmails);
+          if (isValidUPNArrayResult !== true) {
+            return `The following user principal names are invalid for the option 'ownerEmails': ${isValidUPNArrayResult}.`;
           }
         }
 
-        if (args.options.ownerIds && !validation.isValidGuidArray(formatting.splitAndTrim(args.options.ownerIds))) {
-          return `The option 'ownerIds' contains one or more invalid GUIDs.`;
+        if (args.options.ownerIds) {
+          const isValidGUIDArrayResult = validation.isValidGuidArray(args.options.ownerIds);
+          if (isValidGUIDArrayResult !== true) {
+            return `The following GUIDs are invalid for the option 'ownerIds': ${isValidGUIDArrayResult}.`;
+          }
         }
 
         if (args.options.memberUserNames) {
-          const isValidUserPrincipalNameArray = validation.isValidUserPrincipalNameArray(formatting.splitAndTrim(args.options.memberUserNames));
-          if (isValidUserPrincipalNameArray !== true) {
-            return `Member username '${isValidUserPrincipalNameArray}' is invalid for option 'memberUserNames'.`;
+          const isValidUPNArrayResult = validation.isValidUserPrincipalNameArray(args.options.memberUserNames);
+          if (isValidUPNArrayResult !== true) {
+            return `The following user principal names are invalid for the option 'memberUserNames': ${isValidUPNArrayResult}.`;
           }
         }
 
         if (args.options.memberEmails) {
-          const isValidUserPrincipalNameArray = validation.isValidUserPrincipalNameArray(formatting.splitAndTrim(args.options.memberEmails));
-          if (isValidUserPrincipalNameArray !== true) {
-            return `Member email '${isValidUserPrincipalNameArray}' is invalid for option 'memberEmails'.`;
+          const isValidUPNArrayResult = validation.isValidUserPrincipalNameArray(args.options.memberEmails);
+          if (isValidUPNArrayResult !== true) {
+            return `The following user principal names are invalid for the option 'memberEmails': ${isValidUPNArrayResult}.`;
           }
         }
 
-        if (args.options.memberIds && !validation.isValidGuidArray(formatting.splitAndTrim(args.options.memberIds))) {
-          return `The option 'memberIds' contains one or more invalid GUIDs`;
+        if (args.options.memberIds) {
+          const isValidGUIDArrayResult = validation.isValidGuidArray(args.options.memberIds);
+          if (isValidGUIDArrayResult !== true) {
+            return `The following GUIDs are invalid for the option 'memberIds': ${isValidGUIDArrayResult}.`;
+          }
         }
 
         return true;

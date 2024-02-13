@@ -109,8 +109,9 @@ class SpoNavigationNodeAddCommand extends SpoCommand {
             return 'The maximum amount of audienceIds per navigation node exceeded. The maximum amount of auciendeIds is 10.';
           }
 
-          if (!validation.isValidGuidArray(audienceIdsSplitted)) {
-            return 'The option audienceIds contains one or more invalid GUIDs';
+          const isValidGUIDArrayResult = validation.isValidGuidArray(args.options.audienceIds);
+          if (isValidGUIDArrayResult !== true) {
+            return `The following GUIDs are invalid for the option 'audienceIds': ${isValidGUIDArrayResult}.`;
           }
         }
 
