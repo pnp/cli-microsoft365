@@ -4,8 +4,8 @@ import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import { spo } from '../../../../utils/spo.js';
 import request, { CliRequestOptions } from '../../../../request.js';
+import { entraGroup } from '../../../../utils/entraGroup.js';
 import { formatting } from '../../../../utils/formatting.js';
-import { aadGroup } from '../../../../utils/aadGroup.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
@@ -210,11 +210,11 @@ class SpoUserRemoveCommand extends SpoCommand {
   private async getEntraGroup(webUrl: string, options: GlobalOptions): Promise<any> {
     let group: Group;
     if (options.entraGroupId) {
-      group = await aadGroup.getGroupById(options.entraGroupId);
+      group = await entraGroup.getGroupById(options.entraGroupId);
       return group;
     }
     else if (options.entraGroupName) {
-      group = await aadGroup.getGroupByDisplayName(options.entraGroupName);
+      group = await entraGroup.getGroupByDisplayName(options.entraGroupName);
       return group;
     }
 
