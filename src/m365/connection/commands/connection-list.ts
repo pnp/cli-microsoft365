@@ -28,7 +28,14 @@ class ConnectionListCommand extends Command {
         authType: AuthType[connection.authType],
         active: isCurrentConnection
       };
-    }).sort((a, b) => a.name!.localeCompare(b.name!));
+    }).sort((a, b) => {
+      // name is never expected to be empty on existing connections
+      /* c8 ignore next 2 */
+      const aName = a.name || '';
+      const bName = b.name || '';
+
+      return aName.localeCompare(bName);
+    });
 
     await logger.log(output);
   }

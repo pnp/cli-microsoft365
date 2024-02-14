@@ -29,7 +29,6 @@ class ConnectionSetCommand extends Command {
     this.#initValidators();
   }
 
-
   #initOptions(): void {
     this.options.unshift(
       {
@@ -60,7 +59,7 @@ class ConnectionSetCommand extends Command {
       await logger.logToStderr(`Updating connection '${connection.identityName}', appId: ${connection.appId}, tenantId: ${connection.identityTenantId}...`);
     }
 
-    await auth.updateConnection(connection.name!, args.options.newName);
+    await auth.updateConnection(args.options.name, args.options.newName);
   }
 
   public async action(logger: Logger, args: CommandArgs): Promise<void> {

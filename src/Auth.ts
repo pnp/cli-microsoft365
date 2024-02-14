@@ -421,8 +421,14 @@ export class Auth {
     const account = await (this.clientApplication as Msal.ClientApplication)
       .getTokenCache().getAccountByLocalId(this.connection.identityId as string);
 
+    // account is never expected to be undefined, this check is implemented to make that explicit
+    /* c8 ignore next 3 */
+    if (!account) {
+      throw 'Account not found, cannot retrieve access token silently';
+    }
+
     return (this.clientApplication as Msal.ClientApplication).acquireTokenSilent({
-      account: account!,
+      account: account,
       scopes: [`${resource}/.default`],
       forceRefresh: fetchNew
     });
@@ -784,14 +790,15 @@ export class Auth {
     this._allConnections = allConnections.filter(c => c.name !== connection.name);
 
     // When using an application identity, there is no account in the MSAL TokenCache
-    if (this.connection.authType !== AuthType.Certificate &&
+    if (connection.identityId &&
+      this.connection.authType !== AuthType.Certificate &&
       this.connection.authType !== AuthType.Secret &&
       this.connection.authType !== AuthType.Identity) {
       this.clientApplication = await this.getPublicClient(logger, debug);
 
       if (this.clientApplication) {
         const tokenCache = this.clientApplication.getTokenCache();
-        const account = await tokenCache.getAccountByLocalId(connection.identityId!);
+        const account = await tokenCache.getAccountByLocalId(connection.identityId);
         if (account !== null) {
           await tokenCache.removeAccount(account);
         }
@@ -877,8 +884,8 @@ export class Auth {
 
   public getConnectionDetails(connection: Connection): ConnectionDetails {
     const details: ConnectionDetails = {
-      connectionName: connection.name!,
-      connectedAs: connection.identityName!,
+      connectionName: connection.name || '',
+      connectedAs: connection.identityName || '',
       authType: AuthType[connection.authType],
       appId: connection.appId,
       appTenant: connection.tenant,
