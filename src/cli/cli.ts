@@ -22,6 +22,7 @@ import { CommandOptionInfo } from './CommandOptionInfo.js';
 import { Logger } from './Logger.js';
 import { SelectionConfig, ConfirmationConfig, prompt } from '../utils/prompt.js';
 import { timings } from './timings.js';
+import chalk from 'chalk';
 const require = createRequire(import.meta.url);
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
@@ -120,7 +121,7 @@ async function execute(rawArgs: string[]): Promise<void> {
     parsedArgs.h ||
     parsedArgs.help) {
     if (parsedArgs.output !== 'none') {
-      printHelp(await getHelpMode(parsedArgs));
+      await printHelp(await getHelpMode(parsedArgs));
     }
     return;
   }
@@ -652,7 +653,7 @@ function getFirstNonUndefinedArrayItem(arr: any[]): any {
   return undefined;
 }
 
-function printHelp(helpMode: string, exitCode: number = 0): void {
+async function printHelp(helpMode: string, exitCode: number = 0): Promise<void> {
   const properties: any = {};
 
   if (cli.commandToExecute) {
@@ -660,6 +661,10 @@ function printHelp(helpMode: string, exitCode: number = 0): void {
     printCommandHelp(helpMode);
   }
   else {
+    if (cli.currentCommandName && !cli.commands.some(command => command.name.startsWith(cli.currentCommandName!))) {
+      await cli.error(chalk.red(`Command '${cli.currentCommandName}' was not found. Below you can find the commands and command groups you can use. For detailed information on a command group, use 'm365 [command group] --help'.`));
+    }
+
     cli.log();
     cli.log(`CLI for Microsoft 365 v${app.packageJson().version}`);
     cli.log(`${app.packageJson().description} `);
@@ -878,7 +883,7 @@ async function closeWithError(error: any, args: CommandArgs, showHelpIfEnabled: 
 
   if (showHelpIfEnabled &&
     await cli.getSettingWithDefaultValue<boolean>(settingsNames.showHelpOnFailure, showHelpIfEnabled)) {
-    printHelp(await getHelpMode(args.options), exitCode);
+    await printHelp(await getHelpMode(args.options), exitCode);
   }
   else {
     process.exit(exitCode);
