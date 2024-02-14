@@ -7,6 +7,7 @@ import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 import { cli } from '../../../../cli/cli.js';
 import { validation } from '../../../../utils/validation.js';
+import { formatting } from '../../../../utils/formatting.js';
 
 interface CommandArgs {
   options: Options;
@@ -25,7 +26,7 @@ class OutlookMessageRemoveCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'Removes a specifc message from a mailbox';
+    return 'Removes a specific message from a mailbox';
   }
 
   constructor() {
@@ -33,6 +34,8 @@ class OutlookMessageRemoveCommand extends GraphCommand {
 
     this.#initTelemetry();
     this.#initOptions();
+    this.#initValidators();
+    this.#initTypes();
   }
 
   #initTelemetry(): void {
@@ -62,9 +65,29 @@ class OutlookMessageRemoveCommand extends GraphCommand {
     );
   }
 
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (args.options.userId && !validation.isValidGuid(args.options.userId)) {
+          return `The value '${args.options.userId}' for 'userId' option is not a valid GUID`;
+        }
+
+        if (args.options.userName && !validation.isValidUserPrincipalName(args.options.userName)) {
+          return `The value '${args.options.userName}' for 'userName' option is not a valid user principal name`;
+        }
+
+        return true;
+      }
+    );
+  }
+
+  #initTypes(): void {
+    this.types.string.push('id', 'userId', 'userName');
+  }
+
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const isAppOnlyAccessToken: boolean | undefined = accessToken.isAppOnlyAccessToken(auth.service.accessTokens[this.resource].accessToken);
-    let requestUrl = '';
+    let principalUrl = '';
 
     if (isAppOnlyAccessToken) {
       if (!args.options.userId && !args.options.userName) {
@@ -75,45 +98,29 @@ class OutlookMessageRemoveCommand extends GraphCommand {
         throw `Both options 'userId' and 'userName' cannot be set when removing a message using application permissions`;
       }
 
-      if (args.options.userId && !validation.isValidGuid(args.options.userId)) {
-        throw `The value '${args.options.userId}' for 'userId' option is not a valid GUID`;
-      }
-
-      if (args.options.userName && !validation.isValidUserPrincipalName(args.options.userName)) {
-        throw `The value '${args.options.userName}' for 'userName' option is not a valid user principal name`;
-      }
-
-      requestUrl += `users/${args.options.userId ? args.options.userId : args.options.userName}`;
+      principalUrl += `users/${args.options.userId || formatting.encodeQueryParameter(args.options.userName!)}`;
     }
     else {
       if (args.options.userId && args.options.userName) {
         throw `Both options 'userId' and 'userName' cannot be set when removing a message using delegated permissions`;
       }
 
-      if (args.options.userId && !validation.isValidGuid(args.options.userId)) {
-        throw `The value '${args.options.userId}' for 'userId' option is not a valid GUID`;
-      }
-
-      if (args.options.userName && !validation.isValidUserPrincipalName(args.options.userName)) {
-        throw `The value '${args.options.userName}' for 'userName' option is not a valid user principal name`;
-      }
-
       if (args.options.userId || args.options.userName) {
-        requestUrl += `users/${args.options.userId ? args.options.userId : args.options.userName}`;
+        principalUrl += `users/${args.options.userId || formatting.encodeQueryParameter(args.options.userName!) }`;
       }
       else {
-        requestUrl += 'me';
+        principalUrl += 'me';
       }
     }
 
     const removeMessage = async (): Promise<void> => {
       try {
         if (this.verbose) {
-          await logger.logToStderr(`Removing message with id ${args.options.id} using ${isAppOnlyAccessToken ? 'application permissions' : 'delegated permissions'}`);
+          await logger.logToStderr(`Removing message with id ${args.options.id} using ${isAppOnlyAccessToken ? 'application' : 'delegated'} permissions`);
         }
 
         const requestOptions: CliRequestOptions = {
-          url: `${this.resource}/v1.0/${requestUrl}/messages/${args.options.id}`,
+          url: `${this.resource}/v1.0/${principalUrl}/messages/${args.options.id}`,
           headers: {
             accept: 'application/json;odata.metadata=none'
           }
