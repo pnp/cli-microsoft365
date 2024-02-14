@@ -19,6 +19,7 @@ import { session } from '../utils/session.js';
 import { sinonUtil } from '../utils/sinonUtil.js';
 import { cli, CommandOutput } from './cli.js';
 import { Logger } from './Logger.js';
+import { browserUtil } from '../utils/browserUtil.js';
 
 const require = createRequire(import.meta.url);
 const packageJSON = require('../../package.json');
@@ -321,7 +322,8 @@ describe('cli', () => {
       cli.getSettingWithDefaultValue,
       cli.loadAllCommandsInfo,
       cli.getConfig().get,
-      cli.loadCommandFromFile
+      cli.loadCommandFromFile,
+      browserUtil.open
     ]);
   });
 
@@ -370,6 +372,14 @@ describe('cli', () => {
     sinon.stub(fs, 'existsSync').callsFake((path) => path.toString().endsWith('.mdx') || path.toString().endsWith('-mock.js'));
     const originalFsReadFileSync = fs.readFileSync;
     sinon.stub(fs, 'readFileSync').returns(originalFsReadFileSync(path.join(rootFolder, '..', '..', 'docs', 'docs', 'cmd', 'cli', 'completion', 'completion-clink-update.mdx'), 'utf8'));
+    const config = cli.getConfig();
+    sinon.stub(config, 'get').callsFake((settingName) => {
+      if (settingName === settingsNames.helpTarget) {
+        return 'console';
+      }
+      return undefined;
+    });
+
     cli.commandToExecute = cli.commands.find(c => c.name === 'cli mock');
 
     await cli.execute(['help', 'cli', 'mock']);
@@ -380,6 +390,13 @@ describe('cli', () => {
     sinon.stub(fs, 'existsSync').callsFake((path) => path.toString().endsWith('.mdx') || path.toString().endsWith('-mock.js'));
     const originalFsReadFileSync = fs.readFileSync;
     sinon.stub(fs, 'readFileSync').returns(originalFsReadFileSync(path.join(rootFolder, '..', '..', 'docs', 'docs', 'cmd', 'cli', 'completion', 'completion-clink-update.mdx'), 'utf8'));
+    const config = cli.getConfig();
+    sinon.stub(config, 'get').callsFake((settingName) => {
+      if (settingName === settingsNames.helpTarget) {
+        return 'console';
+      }
+      return undefined;
+    });
     cli.commandToExecute = cli.commands.find(c => c.name === 'cli mock');
 
     await cli.execute(['cli', 'mock', '--help']);
@@ -390,6 +407,13 @@ describe('cli', () => {
     sinon.stub(fs, 'existsSync').callsFake((path) => path.toString().endsWith('.mdx') || path.toString().endsWith('-mock.js'));
     const originalFsReadFileSync = fs.readFileSync;
     sinon.stub(fs, 'readFileSync').returns(originalFsReadFileSync(path.join(rootFolder, '..', '..', 'docs', 'docs', 'cmd', 'cli', 'completion', 'completion-clink-update.mdx'), 'utf8'));
+    const config = cli.getConfig();
+    sinon.stub(config, 'get').callsFake((settingName) => {
+      if (settingName === settingsNames.helpTarget) {
+        return 'console';
+      }
+      return undefined;
+    });
     cli.commandToExecute = cli.commands.find(c => c.name === 'cli mock');
 
     await cli.execute(['cli', 'mock', '-h']);
@@ -398,6 +422,13 @@ describe('cli', () => {
 
   it('shows help for the specific command when valid command name specified followed by -h (single-word command)', async () => {
     sinonUtil.restore(cli.loadAllCommandsInfo);
+    const config = cli.getConfig();
+    sinon.stub(config, 'get').callsFake((settingName) => {
+      if (settingName === settingsNames.helpTarget) {
+        return 'console';
+      }
+      return undefined;
+    });
 
     await cli.execute(['status', '-h']);
     assert(md2plainSpy.called);
@@ -409,37 +440,79 @@ describe('cli', () => {
     sinon.stub(fs, 'readFileSync').returns(originalFsReadFileSync(path.join(rootFolder, '..', '..', 'docs', 'docs', 'cmd', 'cli', 'completion', 'completion-clink-update.mdx'), 'utf8'));
     cli.commandToExecute = cli.commands.find(c => c.aliases?.some(a => a === 'cli mock alt'));
 
+    const config = cli.getConfig();
+    sinon.stub(config, 'get').callsFake((settingName) => {
+      if (settingName === settingsNames.helpTarget) {
+        return 'console';
+      }
+      return undefined;
+    });
     await cli.execute(['help', 'cli', 'mock', 'alt']);
     assert(md2plainSpy.called);
   });
 
   it('shows full help when specified -h with a number', async () => {
+    const config = cli.getConfig();
+    sinon.stub(config, 'get').callsFake((settingName) => {
+      if (settingName === settingsNames.helpTarget) {
+        return 'console';
+      }
+      return undefined;
+    });
     sinon.stub(cli, 'getSettingWithDefaultValue').returns('full');
-
     await cli.execute(['cli', 'completion', 'clink', 'update', '-h', '1']);
+
     assert(log.some(l => l.indexOf('OPTIONS') > -1), 'Options section not found');
     assert(log.some(l => l.indexOf('EXAMPLES') > -1), 'Examples section not found');
   });
 
   it('shows full help when specified -h with full', async () => {
+    const config = cli.getConfig();
+    sinon.stub(config, 'get').callsFake((settingName) => {
+      if (settingName === settingsNames.helpTarget) {
+        return 'console';
+      }
+      return undefined;
+    });
     await cli.execute(['cli', 'completion', 'clink', 'update', '-h', 'full']);
     assert(log.some(l => l.indexOf('OPTIONS') > -1), 'Options section not found');
     assert(log.some(l => l.indexOf('EXAMPLES') > -1), 'Examples section not found');
   });
 
   it('shows help with options section when specified -h with options', async () => {
+    const config = cli.getConfig();
+    sinon.stub(config, 'get').callsFake((settingName) => {
+      if (settingName === settingsNames.helpTarget) {
+        return 'console';
+      }
+      return undefined;
+    });
     await cli.execute(['cli', 'completion', 'clink', 'update', '-h', 'options']);
     assert(log.some(l => l.indexOf('OPTIONS') > -1), 'Options section not found');
     assert(log.some(l => l.indexOf('EXAMPLES') === -1), 'Examples section found');
   });
 
   it('shows help with examples section when specified -h with examples', async () => {
+    const config = cli.getConfig();
+    sinon.stub(config, 'get').callsFake((settingName) => {
+      if (settingName === settingsNames.helpTarget) {
+        return 'console';
+      }
+      return undefined;
+    });
     await cli.execute(['cli', 'completion', 'clink', 'update', '-h', 'examples']);
     assert(log.some(l => l.indexOf('OPTIONS') === -1), 'Options section found');
     assert(log.some(l => l.indexOf('EXAMPLES') > -1), 'Examples section not found');
   });
 
   it('shows help with remarks section when specified -h with remarks', async () => {
+    const config = cli.getConfig();
+    sinon.stub(config, 'get').callsFake((settingName) => {
+      if (settingName === settingsNames.helpTarget) {
+        return 'console';
+      }
+      return undefined;
+    });
     await cli.execute(['cli', 'completion', 'clink', 'update', '-h', 'remarks']);
     assert(log.some(l => l.indexOf('REMARKS') > -1), 'Remarks section not found');
     assert(log.some(l => l.indexOf('OPTIONS') === -1), 'Options section found');
@@ -454,6 +527,27 @@ describe('cli', () => {
       assert(cliErrorStub.getCalls().some(c => c.firstArg.indexOf('Unknown help mode invalid. Allowed values are') > -1));
     }
 
+  });
+
+  it('shows help for command in browser when --help option specified and --helpTarget is set to web', async () => {
+    const config = cli.getConfig();
+    sinon.stub(config, 'get').callsFake((settingName) => {
+      if (settingName === settingsNames.helpTarget) {
+        return 'web';
+      }
+      return undefined;
+    });
+
+    const browserStub = sinon.stub(browserUtil, 'open').callsFake(async (url: string) => {
+      if (url === 'https://pnp.github.io/cli-microsoft365/cmd/cli/completion/completion-clink-update') {
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await cli.execute(['cli', 'completion', 'clink', 'update', '-h']);
+    assert(browserStub.lastCall.args[0] === 'https://pnp.github.io/cli-microsoft365/cmd/cli/completion/completion-clink-update');
   });
 
   it(`passes options validation if the command doesn't allow unknown options and specified options match command options`, async () => {
@@ -561,6 +655,14 @@ describe('cli', () => {
   });
 
   it(`does not prompt and fails validation if a required option is missing`, async () => {
+    const config = cli.getConfig();
+    sinon.stub(config, 'get').callsFake((settingName) => {
+      if (settingName === settingsNames.helpTarget) {
+        return 'console';
+      }
+      return undefined;
+    });
+
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
       if (settingName === settingsNames.prompt) {
         return undefined;
@@ -580,6 +682,14 @@ describe('cli', () => {
   });
 
   it(`shows validation error when no option from a required set is specified`, async () => {
+    const config = cli.getConfig();
+    sinon.stub(config, 'get').callsFake((settingName) => {
+      if (settingName === settingsNames.helpTarget) {
+        return 'console';
+      }
+      return undefined;
+    });
+
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
       if (settingName === settingsNames.prompt) {
         return false;
@@ -600,6 +710,14 @@ describe('cli', () => {
   });
 
   it(`shows validation error when multiple options from a required set are specified`, async () => {
+    const config = cli.getConfig();
+    sinon.stub(config, 'get').callsFake((settingName) => {
+      if (settingName === settingsNames.helpTarget) {
+        return 'console';
+      }
+      return undefined;
+    });
+
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
       if (settingName === settingsNames.prompt) {
         return false;
@@ -627,6 +745,14 @@ describe('cli', () => {
   });
 
   it(`shows validation error when no option from a dependent set is set`, async () => {
+    const config = cli.getConfig();
+    sinon.stub(config, 'get').callsFake((settingName) => {
+      if (settingName === settingsNames.helpTarget) {
+        return 'console';
+      }
+      return undefined;
+    });
+
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
       if (settingName === settingsNames.prompt) {
         return false;
@@ -653,6 +779,14 @@ describe('cli', () => {
   });
 
   it(`shows validation error when multiple options from an optional set are specified`, async () => {
+    const config = cli.getConfig();
+    sinon.stub(config, 'get').callsFake((settingName) => {
+      if (settingName === settingsNames.helpTarget) {
+        return 'console';
+      }
+      return undefined;
+    });
+
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
       if (settingName === settingsNames.prompt) {
         return false;
@@ -825,6 +959,13 @@ describe('cli', () => {
   });
 
   it(`fails validation when the command's validate method returns a string`, async () => {
+    const config = cli.getConfig();
+    sinon.stub(config, 'get').callsFake((settingName) => {
+      if (settingName === settingsNames.helpTarget) {
+        return 'console';
+      }
+      return undefined;
+    });
     sinon.stub(mockCommandWithValidation, 'validate').resolves('Error');
     const mockCommandWithValidationActionSpy: sinon.SinonSpy = sinon.spy(mockCommandWithValidation, 'action');
 
