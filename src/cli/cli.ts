@@ -660,6 +660,10 @@ function printHelp(helpMode: string, exitCode: number = 0): void {
     printCommandHelp(helpMode);
   }
   else {
+    if (cli.currentCommandName) {
+      cli.error(`Command '${cli.currentCommandName}' not found. Please find a list of available commands below.`);
+    }
+
     cli.log();
     cli.log(`CLI for Microsoft 365 v${app.packageJson().version}`);
     cli.log(`${app.packageJson().description} `);

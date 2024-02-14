@@ -334,6 +334,18 @@ describe('cli', () => {
     assert(cliLogStub.calledWith(`CLI for Microsoft 365 v${packageJSON.version}`));
   });
 
+  it('shows message that command cannot be found when an unknown command is entered', async () => {
+    const commandName = 'unknown';
+    await cli.execute([commandName]);
+    assert(cliErrorStub.calledWith(`Command '${commandName}' not found. Please find a list of available commands below.`));
+  });
+
+  it('shows message that command cannot be found when a uncompleted command is entered', async () => {
+    const commandName = 'spo site';
+    await cli.execute([commandName]);
+    assert(cliErrorStub.calledWith(`Command '${commandName}' not found. Please find a list of available commands below.`));
+  });
+
   it('exits with 0 code when no command specified', async () => {
     await cli.execute([]);
     assert(processExitStub.calledWith(0));
