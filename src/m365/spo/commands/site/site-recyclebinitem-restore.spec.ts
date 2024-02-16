@@ -88,7 +88,7 @@ describe(commands.SITE_RECYCLEBINITEM_RESTORE, () => {
   });
 
   it('fails validation if ids and allSecondary options are specified together', async () => {
-    const actual = await command.validate({ options: { siteUrl: 'https://contoso.sharepoinrestores all items from the first-stage and second-stage recycle binst.com', ids: '5fb84a1f-6ab5-4d07-a6aa-31bba6de9526', allSecondary: true } }, commandInfo);
+    const actual = await command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com', ids: '5fb84a1f-6ab5-4d07-a6aa-31bba6de9526', allSecondary: true } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
@@ -139,7 +139,7 @@ describe(commands.SITE_RECYCLEBINITEM_RESTORE, () => {
   });
 
   it('restores all items from the first-stage recycle bin', async () => {
-    sinon.stub(request, 'post').callsFake(async (opts) => {
+    const postRequestSpy = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/_api/web/RecycleBin/RestoreAll') {
         return;
       }
@@ -153,10 +153,12 @@ describe(commands.SITE_RECYCLEBINITEM_RESTORE, () => {
         allPrimary: true
       }
     });
+
+    assert(postRequestSpy.calledOnce, 'postRequestSpy.calledOnce');
   });
 
   it('restores all items from the second-stage recycle bin', async () => {
-    sinon.stub(request, 'post').callsFake(async (opts) => {
+    const postRequestSpy = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/_api/site/GetRecyclebinItems(rowLimit=2000000000,itemState=2)/RestoreAll') {
         return;
       }
@@ -170,15 +172,13 @@ describe(commands.SITE_RECYCLEBINITEM_RESTORE, () => {
         allSecondary: true
       }
     });
+
+    assert(postRequestSpy.calledOnce, 'postRequestSpy.calledOnce');
   });
 
   it('restores all items from the first-stage and second-stage recycle bins', async () => {
-    sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/_api/web/RecycleBin/RestoreAll') {
-        return;
-      }
-
-      if (opts.url === 'https://contoso.sharepoint.com/_api/site/GetRecyclebinItems(rowLimit=2000000000,itemState=2)/RestoreAll') {
+    const postRequestSpy = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso.sharepoint.com/_api/site/RecycleBin/RestoreAll') {
         return;
       }
 
@@ -192,6 +192,8 @@ describe(commands.SITE_RECYCLEBINITEM_RESTORE, () => {
         allSecondary: true
       }
     });
+
+    assert(postRequestSpy.calledOnce, 'postRequestSpy.calledOnce');
   });
 
   it('catches error when restores all items from recycle bin', async () => {
