@@ -11,6 +11,7 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import flowCommands from '../../../flow/commands.js';
 import commands from '../../commands.js';
 import command from './connector-list.js';
+import { accessToken } from '../../../../utils/accessToken.js';
 
 describe(commands.CONNECTOR_LIST, () => {
   let log: string[];
@@ -23,6 +24,7 @@ describe(commands.CONNECTOR_LIST, () => {
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
+    sinon.stub(accessToken, 'assertDelegatedAccessToken').returns();
     auth.connection.active = true;
   });
 

@@ -14,6 +14,7 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import ppAiBuilderModelGetCommand from './aibuildermodel-get.js';
 import command from './aibuildermodel-remove.js';
+import { accessToken } from '../../../../utils/accessToken.js';
 
 describe(commands.AIBUILDERMODEL_REMOVE, () => {
   let commandInfo: CommandInfo;
@@ -72,6 +73,7 @@ describe(commands.AIBUILDERMODEL_REMOVE, () => {
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
+    sinon.stub(accessToken, 'assertDelegatedAccessToken').returns();
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
   });
@@ -90,9 +92,9 @@ describe(commands.AIBUILDERMODEL_REMOVE, () => {
       }
     };
     loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
-    sinon.stub(cli, 'promptForConfirmation').callsFake(() => {
+    sinon.stub(cli, 'promptForConfirmation').callsFake(async () => {
       promptIssued = true;
-      return Promise.resolve(false);
+      return false;
     });
 
     promptIssued = false;

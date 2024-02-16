@@ -8,6 +8,7 @@ import { pid } from '../../utils/pid.js';
 import { session } from '../../utils/session.js';
 import { sinonUtil } from '../../utils/sinonUtil.js';
 import PowerBICommand from './PowerBICommand.js';
+import { accessToken } from '../../utils/accessToken.js';
 
 class MockCommand extends PowerBICommand {
   public get name(): string {
@@ -27,9 +28,14 @@ class MockCommand extends PowerBICommand {
 
 describe('PowerBICommand', () => {
   before(() => {
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
+    auth.connection.accessTokens[auth.defaultResource] = {
+      expiresOn: 'abc',
+      accessToken: 'abc'
+    };
   });
 
   afterEach(() => {
@@ -38,6 +44,8 @@ describe('PowerBICommand', () => {
 
   after(() => {
     sinon.restore();
+    auth.connection.active = false;
+    auth.connection.accessTokens = {};
   });
 
   it('correctly reports an error while restoring auth info', async () => {
@@ -95,5 +103,13 @@ describe('PowerBICommand', () => {
   it('returns correct api resource', () => {
     const command = new MockCommand();
     assert.strictEqual((command as any).resource, 'https://api.powerbi.com');
+  });
+
+  it('throws error when using application-only permissions', () => {
+    const cmd = new MockCommand();
+    sinonUtil.restore(accessToken.isAppOnlyAccessToken);
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
+    auth.connection.active = true;
+    assert.throws(() => (cmd as any).initAction({ options: {} }, {}), new CommandError('This command does not support application-only permissions.'));
   });
 });

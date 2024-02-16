@@ -14,6 +14,7 @@ import commands from '../../commands.js';
 import { settingsNames } from '../../../../settingsNames.js';
 import command from './engage-search.js';
 import yammerCommands from './yammerCommands.js';
+import { accessToken } from '../../../../utils/accessToken.js';
 
 describe(commands.ENGAGE_SEARCH, () => {
   let log: string[];
@@ -207,6 +208,7 @@ describe(commands.ENGAGE_SEARCH, () => {
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
+    sinon.stub(accessToken, 'assertDelegatedAccessToken').returns();
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
   });
@@ -332,7 +334,7 @@ describe(commands.ENGAGE_SEARCH, () => {
   });
 
   it('returns all items', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/search.json?search=contents&page=1') {
         return searchResults;
       }
@@ -361,7 +363,7 @@ describe(commands.ENGAGE_SEARCH, () => {
   });
 
   it('returns long search result', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/search.json?search=contents&page=1') {
         return longSearchResult;
       }
@@ -378,7 +380,7 @@ describe(commands.ENGAGE_SEARCH, () => {
   });
 
   it('returns the summary', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/search.json?search=contents&page=1') {
         return searchResults;
       }
@@ -394,7 +396,7 @@ describe(commands.ENGAGE_SEARCH, () => {
   });
 
   it('trims the output message', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/search.json?search=contents&page=1') {
         return messageTrimming;
       }
@@ -415,7 +417,7 @@ describe(commands.ENGAGE_SEARCH, () => {
   });
 
   it('trims the output message with message filter', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/search.json?search=contents&page=1') {
         return messageTrimming;
       }
@@ -436,7 +438,7 @@ describe(commands.ENGAGE_SEARCH, () => {
   });
 
   it('returns message output', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/search.json?search=contents&page=1') {
         return searchResults;
       }
@@ -454,7 +456,7 @@ describe(commands.ENGAGE_SEARCH, () => {
   });
 
   it('returns topic output', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/search.json?search=contents&page=1') {
         return searchResults;
       }
@@ -473,7 +475,7 @@ describe(commands.ENGAGE_SEARCH, () => {
   });
 
   it('returns groups output', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/search.json?search=contents&page=1') {
         return searchResults;
       }
@@ -489,7 +491,7 @@ describe(commands.ENGAGE_SEARCH, () => {
   });
 
   it('returns users output', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/search.json?search=contents&page=1') {
         return searchResults;
       }
@@ -507,7 +509,7 @@ describe(commands.ENGAGE_SEARCH, () => {
   });
 
   it('returns limited results', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/search.json?search=contents&page=1') {
         return searchResults;
       }
@@ -527,7 +529,7 @@ describe(commands.ENGAGE_SEARCH, () => {
   });
 
   it('returns all results', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/search.json?search=contents&page=1') {
         return searchResults;
       }
@@ -550,7 +552,7 @@ describe(commands.ENGAGE_SEARCH, () => {
   });
 
   it('handles error in loop', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/search.json?search=contents&page=1') {
         return longSearchResult;
       }

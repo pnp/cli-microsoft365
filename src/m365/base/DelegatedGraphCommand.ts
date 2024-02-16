@@ -1,13 +1,13 @@
-import Command, { CommandArgs } from '../../Command.js';
 import auth from '../../Auth.js';
-import { accessToken } from '../../utils/accessToken.js';
+import { CommandArgs } from '../../Command.js';
 import { Logger } from '../../cli/Logger.js';
+import { accessToken } from '../../utils/accessToken.js';
+import GraphCommand from './GraphCommand.js';
 
-export default abstract class PowerBICommand extends Command {
-  protected get resource(): string {
-    return 'https://api.powerbi.com';
-  }
-
+/**
+ * This command class is for delegated-only Graph commands.  
+ */
+export default abstract class DelegatedGraphCommand extends GraphCommand {
   protected initAction(args: CommandArgs, logger: Logger): void {
     super.initAction(args, logger);
 
@@ -18,5 +18,4 @@ export default abstract class PowerBICommand extends Command {
 
     accessToken.assertDelegatedAccessToken();
   }
-
 }
