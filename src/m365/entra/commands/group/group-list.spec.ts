@@ -22,7 +22,7 @@ describe(commands.GROUP_LIST, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
-  const userId = '00000000-0000-0000-0000-000000000000';
+  const userId = '1390ca35-6bce-4e42-8981-8180d19edc84';
   const userName = 'john@contoso.com';
 
   before(() => {
