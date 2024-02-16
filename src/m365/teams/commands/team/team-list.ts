@@ -7,6 +7,8 @@ import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 import { validation } from '../../../../utils/validation.js';
 import { formatting } from '../../../../utils/formatting.js';
+import { accessToken } from '../../../../utils/accessToken.js';
+import auth from '../../../../Auth.js';
 
 interface CommandArgs {
   options: Options;
@@ -78,7 +80,7 @@ class TeamsTeamListCommand extends GraphCommand {
         }
 
         if (args.options.userName && !validation.isValidUserPrincipalName(args.options.userName)) {
-          return `${args.options.userId} is not a valid UPN for userName.`;
+          return `${args.options.userName} is not a valid UPN for userName.`;
         }
 
         if ((args.options.userId || args.options.userName) && !args.options.joined && !args.options.associated) {
@@ -121,6 +123,10 @@ class TeamsTeamListCommand extends GraphCommand {
     try {
       let endpoint = `${this.resource}/v1.0`;
       if (args.options.joined || args.options.associated) {
+        if (!args.options.userId && !args.options.userName && accessToken.isAppOnlyAccessToken(auth.service.accessTokens[this.resource].accessToken)) {
+          throw `You must specify either userId or userName when using application only permissions and specifying the ${args.options.joined ? 'joined' : 'associated'} option`;
+        }
+
         endpoint += args.options.userId || args.options.userName ? `/users/${args.options.userId || formatting.encodeQueryParameter(args.options.userName!)}` : '/me';
         endpoint += args.options.joined ? '/joinedTeams' : '/teamwork/associatedTeams';
         endpoint += '?$select=id';

@@ -13,19 +13,32 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './group-list.js';
 import aadCommands from '../../aadCommands.js';
+import { accessToken } from '../../../../utils/accessToken.js';
+import { settingsNames } from '../../../../settingsNames.js';
+import { formatting } from '../../../../utils/formatting.js';
 
 describe(commands.GROUP_LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  const userId = '00000000-0000-0000-0000-000000000000';
+  const userName = 'john@contoso.com';
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
+    sinon.stub(cli, 'getSettingWithDefaultValue').returnsArg(1);
     auth.connection.active = true;
+    if (!auth.connection.accessTokens[auth.defaultResource]) {
+      auth.connection.accessTokens[auth.defaultResource] = {
+        expiresOn: 'abc',
+        accessToken: 'abc'
+      };
+    }
     commandInfo = cli.getCommandInfo(command);
   });
 
@@ -48,7 +61,8 @@ describe(commands.GROUP_LIST, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      request.get
+      request.get,
+      cli.getSettingWithDefaultValue
     ]);
   });
 
@@ -97,7 +111,61 @@ describe(commands.GROUP_LIST, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('lists all aad groups in the tenant (verbose)', async () => {
+  it('fails validation if userId is not a valid GUID', async () => {
+    const actual = await command.validate({ options: { joined: true, userId: 'invalid' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if userName is not a valid UPN', async () => {
+    const actual = await command.validate({ options: { joined: true, userName: 'invalid' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation userName is used without joined or associated option', async () => {
+    const actual = await command.validate({ options: { userName: userName } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation userId is used without joined or associated option', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
+    const actual = await command.validate({ options: { userId: userId } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if both userId and userName are used', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
+    const actual = await command.validate({ options: { joined: true, userId: userId, userName: userName } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if both joined and associated options are used', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
+    const actual = await command.validate({ options: { joined: true, associated: true } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('lists all entra groups in the tenant (verbose)', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups`) {
         return {
@@ -203,7 +271,7 @@ describe(commands.GROUP_LIST, () => {
     ]));
   });
 
-  it('lists all aad Groups in the tenant (text)', async () => {
+  it('lists all entra groups in the tenant (text)', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups`) {
         return {
@@ -355,7 +423,7 @@ describe(commands.GROUP_LIST, () => {
 
   it('lists all distribution groups in the tenant', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=securityEnabled eq false and mailEnabled eq true`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=securityEnabled eq false and mailEnabled eq true&$count=true`) {
         return {
           "value": [
             {
@@ -395,7 +463,7 @@ describe(commands.GROUP_LIST, () => {
 
   it('lists all security groups in the tenant', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=securityEnabled eq true and mailEnabled eq false`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=securityEnabled eq true and mailEnabled eq false&$count=true`) {
         return {
           "value": [
             {
@@ -463,6 +531,174 @@ describe(commands.GROUP_LIST, () => {
         "securityEnabled": true
       }
     ]));
+  });
+
+  it('lists all groups in a tenant that the currently signed in user is a part of', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/me/memberOf/microsoft.graph.group`) {
+        return {
+          "value": [
+            {
+              "id": "00e21c97-7800-4bc1-8024-a400aba6f46d",
+              "description": "Code Challenge",
+              "displayName": "Code Challenge",
+              "groupTypes": [],
+              "mail": "CodeChallenge@dev1802.onmicrosoft.com",
+              "mailEnabled": true,
+              "mailNickname": "CodeChallenge",
+              "securityEnabled": true
+            }
+          ]
+        };
+      }
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { joined: true } });
+    assert(loggerLogSpy.calledOnceWithExactly([
+      {
+        "id": "00e21c97-7800-4bc1-8024-a400aba6f46d",
+        "description": "Code Challenge",
+        "displayName": "Code Challenge",
+        "groupTypes": [],
+        "mail": "CodeChallenge@dev1802.onmicrosoft.com",
+        "mailEnabled": true,
+        "mailNickname": "CodeChallenge",
+        "securityEnabled": true
+      }
+    ]));
+  });
+
+  it('lists all groups in a tenant that the currently signed in user is associated with', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/me/transitiveMemberOf/microsoft.graph.group`) {
+        return {
+          "value": [
+            {
+              "id": "00e21c97-7800-4bc1-8024-a400aba6f46d",
+              "description": "Code Challenge",
+              "displayName": "Code Challenge",
+              "groupTypes": [],
+              "mail": "CodeChallenge@dev1802.onmicrosoft.com",
+              "mailEnabled": true,
+              "mailNickname": "CodeChallenge",
+              "securityEnabled": true
+            }
+          ]
+        };
+      }
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { associated: true } });
+    assert(loggerLogSpy.calledOnceWithExactly([
+      {
+        "id": "00e21c97-7800-4bc1-8024-a400aba6f46d",
+        "description": "Code Challenge",
+        "displayName": "Code Challenge",
+        "groupTypes": [],
+        "mail": "CodeChallenge@dev1802.onmicrosoft.com",
+        "mailEnabled": true,
+        "mailNickname": "CodeChallenge",
+        "securityEnabled": true
+      }
+    ]));
+  });
+
+  it('lists all groups in a tenant user specified by id is associated with', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users/${userId}/transitiveMemberOf/microsoft.graph.group`) {
+        return {
+          "value": [
+            {
+              "id": "00e21c97-7800-4bc1-8024-a400aba6f46d",
+              "description": "Code Challenge",
+              "displayName": "Code Challenge",
+              "groupTypes": [],
+              "mail": "CodeChallenge@dev1802.onmicrosoft.com",
+              "mailEnabled": true,
+              "mailNickname": "CodeChallenge",
+              "securityEnabled": true
+            }
+          ]
+        };
+      }
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { userId: userId, associated: true } });
+    assert(loggerLogSpy.calledOnceWithExactly([
+      {
+        "id": "00e21c97-7800-4bc1-8024-a400aba6f46d",
+        "description": "Code Challenge",
+        "displayName": "Code Challenge",
+        "groupTypes": [],
+        "mail": "CodeChallenge@dev1802.onmicrosoft.com",
+        "mailEnabled": true,
+        "mailNickname": "CodeChallenge",
+        "securityEnabled": true
+      }
+    ]));
+  });
+
+  it('lists all groups in a tenant user specified by id is a part of', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users/${formatting.encodeQueryParameter(userName)}/memberOf/microsoft.graph.group`) {
+        return {
+          "value": [
+            {
+              "id": "00e21c97-7800-4bc1-8024-a400aba6f46d",
+              "description": "Code Challenge",
+              "displayName": "Code Challenge",
+              "groupTypes": [],
+              "mail": "CodeChallenge@dev1802.onmicrosoft.com",
+              "mailEnabled": true,
+              "mailNickname": "CodeChallenge",
+              "securityEnabled": true
+            }
+          ]
+        };
+      }
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { userName: userName, joined: true } });
+    assert(loggerLogSpy.calledOnceWithExactly([
+      {
+        "id": "00e21c97-7800-4bc1-8024-a400aba6f46d",
+        "description": "Code Challenge",
+        "displayName": "Code Challenge",
+        "groupTypes": [],
+        "mail": "CodeChallenge@dev1802.onmicrosoft.com",
+        "mailEnabled": true,
+        "mailNickname": "CodeChallenge",
+        "securityEnabled": true
+      }
+    ]));
+  });
+
+  it('throws error when retrieving all joined groups for the current logged in user when using application permissions', async () => {
+    sinonUtil.restore(accessToken.isAppOnlyAccessToken);
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
+
+    await assert.rejects(command.action(logger, {
+      options: {
+        verbose: true,
+        joined: true
+      }
+    }), new CommandError('You must specify either userId or userName when using application only permissions and specifying the joined option'));
+  });
+
+  it('throws error when retrieving all associated groups for the current logged in user when using application permissions', async () => {
+    sinonUtil.restore(accessToken.isAppOnlyAccessToken);
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
+
+    await assert.rejects(command.action(logger, {
+      options: {
+        verbose: true,
+        associated: true
+      }
+    }), new CommandError('You must specify either userId or userName when using application only permissions and specifying the associated option'));
   });
 
   it('handles random API error', async () => {
