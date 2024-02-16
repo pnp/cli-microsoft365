@@ -68,9 +68,8 @@ class SpoSiteRecycleBinItemRestoreCommand extends SpoCommand {
           }
         }
 
-        if ((!args.options.ids && !args.options.allPrimary && !args.options.allSecondary)
-          || (args.options.ids && (args.options.allPrimary || args.options.allSecondary))) {
-          return 'Specify ids or allPrimary and/or allSecondary';
+        if (args.options.ids && (args.options.allPrimary || args.options.allSecondary)) {
+          return `Option 'ids' cannot be used with 'allPrimary' or 'allSecondary'`;
         }
 
         return true;
@@ -83,11 +82,11 @@ class SpoSiteRecycleBinItemRestoreCommand extends SpoCommand {
       await logger.logToStderr(`Restoring items from recycle bin at ${args.options.siteUrl}...`);
     }
 
-    let requestUrl: string = `${args.options.siteUrl}/_api`;
+    let baseUrl: string = `${args.options.siteUrl}/_api`;
 
     try {
       if (args.options.ids) {
-        requestUrl += `/site/RecycleBin/RestoreByIds`;
+        const requestUrl = baseUrl + `/site/RecycleBin/RestoreByIds`;
         const ids: string[] = formatting.splitAndTrim(args.options.ids);
         const idsChunks: string[][] = [];
 
@@ -114,14 +113,14 @@ class SpoSiteRecycleBinItemRestoreCommand extends SpoCommand {
         );
       }
       else {
-        if (args.options.allPrimary) {
-          requestUrl += `/web/RecycleBin/RestoreAll`;
-          await this.restoreRecycleBinItems(requestUrl);
+        if (args.options.allPrimary && args.options.allSecondary) {
+          await this.restoreRecycleBinStage(baseUrl + '/site/RecycleBin/RestoreAll');
         }
-
-        if (args.options.allSecondary) {
-          requestUrl = `${args.options.siteUrl}/_api/site/GetRecyclebinItems(rowLimit=2000000000,itemState=2)/RestoreAll`;
-          await this.restoreRecycleBinItems(requestUrl);
+        else if (args.options.allPrimary) {
+          await this.restoreRecycleBinStage(baseUrl + '/web/RecycleBin/RestoreAll');
+        }
+        else if (args.options.allSecondary) {
+          await this.restoreRecycleBinStage(baseUrl + '/site/GetRecyclebinItems(rowLimit=2000000000,itemState=2)/RestoreAll');
         }
       }
     }
@@ -130,7 +129,7 @@ class SpoSiteRecycleBinItemRestoreCommand extends SpoCommand {
     }
   }
 
-  private async restoreRecycleBinItems(requestUrl: string): Promise<void> {
+  private async restoreRecycleBinStage(requestUrl: string): Promise<void> {
     const requestOptions: CliRequestOptions = {
       url: requestUrl,
       headers: {
