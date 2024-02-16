@@ -23,9 +23,29 @@ m365 aad group list [options]
 ```md definition-list
 `--type [type]`
 : Filter the results to only groups of a given type. Allowed values: `microsoft365`, `security`, `distribution`, `mailEnabledSecurity`. By default, all groups are listed.
+
+`-j, --joined`
+: Show only groups that the user is a direct member of. Specify either `joined` or `associated` but not both.
+
+`-a, --associated`
+: Show only groups that the user is associated with. This includes groups with direct or transitive membership. Specify either `joined` or `associated` but not both.
+
+`--userId [userId]`
+: The ID of the user. Specify either `userId` or `userName` but not both. Specify only when using `joined` or `associated` options.
+
+`--userName [userName]`
+: The user principal name of the user. Specify either `userId` or `userName` but not both. Specify only when using `joined` or `associated` options.
 ```
 
 <Global />
+
+## Remarks
+
+:::note
+
+When you are using application permissions and you try to get the joined or associated teams, you have to specify either `userId` or `userName`.
+
+:::
 
 ## Examples
 
@@ -39,6 +59,18 @@ List all security groups defined in Entra ID.
 
 ```sh
 m365 entra group list --type security
+```
+
+Lists all groups defined in Entra ID that a specific user specified by id is member of.
+
+```sh
+m365 entra group list --userId '92ae483b-1a59-4a93-b596-7966d9a6bf1a' --joined
+```
+
+Lists all groups defined in Entra ID that a specific user specified by user principal name is associated with.
+
+```sh
+m365 entra group list --userName 'john@contoso.com' --associated
 ```
 
 ## Response

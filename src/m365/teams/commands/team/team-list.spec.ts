@@ -14,6 +14,7 @@ import commands from '../../commands.js';
 import { formatting } from '../../../../utils/formatting.js';
 import command from './team-list.js';
 import { settingsNames } from '../../../../settingsNames.js';
+import { accessToken } from '../../../../utils/accessToken.js';
 
 describe(commands.TEAM_LIST, () => {
   const userId = '2630257f-11d4-4244-b4a1-3707b79f142d';
@@ -210,6 +211,12 @@ describe(commands.TEAM_LIST, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
+    if (!auth.connection.accessTokens[auth.defaultResource]) {
+      auth.connection.accessTokens[auth.defaultResource] = {
+        expiresOn: 'abc',
+        accessToken: 'abc'
+      };
+    }
     commandInfo = cli.getCommandInfo(command);
     sinon.stub(cli, 'getSettingWithDefaultValue').returnsArg(1);
   });
@@ -482,6 +489,30 @@ describe(commands.TEAM_LIST, () => {
       }))
     });
     assert(loggerLogSpy.calledOnceWith(commandResponse));
+  });
+
+  it('throws error when retrieving all joined teams for the current logged in user when using application permissions', async () => {
+    sinonUtil.restore(accessToken.isAppOnlyAccessToken);
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
+
+    await assert.rejects(command.action(logger, {
+      options: {
+        verbose: true,
+        joined: true
+      }
+    }), new CommandError('You must specify either userId or userName when using application only permissions and specifying the joined option'));
+  });
+
+  it('throws error when retrieving all associated teams for the current logged in user when using application permissions', async () => {
+    sinonUtil.restore(accessToken.isAppOnlyAccessToken);
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
+
+    await assert.rejects(command.action(logger, {
+      options: {
+        verbose: true,
+        associated: true
+      }
+    }), new CommandError('You must specify either userId or userName when using application only permissions and specifying the associated option'));
   });
 
   it('handles API error correctly', async () => {
