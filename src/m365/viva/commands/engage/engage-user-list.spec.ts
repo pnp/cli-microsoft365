@@ -74,9 +74,9 @@ describe(commands.ENGAGE_USER_LIST, () => {
     const chalk = (await import('chalk')).default;
     const loggerErrSpy = sinon.spy(logger, 'logToStderr');
     const commandNameStub = sinon.stub(cli, 'currentCommandName').value(yammerCommands.USER_LIST);
-    sinon.stub(request, 'get').resolves([{ "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Adam Doe" }]);
+    sinon.stub(request, 'get').resolves([{ 'type': 'user', 'id': 1496550647, 'network_id': 801445, 'state': 'active', 'full_name': 'Adam Doe' }]);
 
-    await command.action(logger, { options: {} } as any);
+    await command.action(logger, { options: {} });
     assert.deepStrictEqual(loggerErrSpy.firstCall.firstArg, chalk.yellow(`Command '${yammerCommands.USER_LIST}' is deprecated. Please use '${commands.ENGAGE_USER_LIST}' instead.`));
 
     sinonUtil.restore([loggerErrSpy, commandNameStub]);

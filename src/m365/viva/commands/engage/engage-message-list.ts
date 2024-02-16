@@ -96,7 +96,7 @@ class VivaEngageMessageListCommand extends VivaEngageCommand {
         }
 
         if (args.options.feedType && VivaEngageMessageListCommand.feedTypes.indexOf(args.options.feedType) < 0) {
-          return `${args.options.feedType} is not a valid value for the feedType option. Allowed values are ${VivaEngageMessageListCommand.feedTypes.join('|')}`;
+          return `${args.options.feedType} is not a valid value for the feedType option. Allowed values are ${VivaEngageMessageListCommand.feedTypes.join(', ')}`;
         }
 
         if (args.options.olderThanId && typeof args.options.olderThanId !== 'number') {

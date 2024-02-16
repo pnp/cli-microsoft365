@@ -244,7 +244,7 @@ describe(commands.ENGAGE_GROUP_LIST, () => {
     const commandNameStub = sinon.stub(cli, 'currentCommandName').value(yammerCommands.GROUP_LIST);
     sinon.stub(request, 'get').resolves([]);
 
-    await command.action(logger, { options: {} } as any);
+    await command.action(logger, { options: {} });
     assert.deepStrictEqual(loggerErrSpy.firstCall.firstArg, chalk.yellow(`Command '${yammerCommands.GROUP_LIST}' is deprecated. Please use '${commands.ENGAGE_GROUP_LIST}' instead.`));
 
     sinonUtil.restore([loggerErrSpy, commandNameStub]);

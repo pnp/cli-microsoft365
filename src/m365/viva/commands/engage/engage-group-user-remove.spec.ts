@@ -76,7 +76,7 @@ describe(commands.ENGAGE_GROUP_USER_REMOVE, () => {
     const commandNameStub = sinon.stub(cli, 'currentCommandName').value(yammerCommands.GROUP_USER_REMOVE);
     sinon.stub(request, 'delete').resolves();
 
-    await command.action(logger, { options: { groupId: 1231231, id: 989998789, force: true } } as any);
+    await command.action(logger, { options: { groupId: 1231231, id: 989998789, force: true } });
     assert.deepStrictEqual(loggerErrSpy.firstCall.firstArg, chalk.yellow(`Command '${yammerCommands.GROUP_USER_REMOVE}' is deprecated. Please use '${commands.ENGAGE_GROUP_USER_REMOVE}' instead.`));
 
     sinonUtil.restore([loggerErrSpy, commandNameStub]);

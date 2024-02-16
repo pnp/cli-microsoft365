@@ -70,7 +70,7 @@ describe(commands.ENGAGE_REPORT_GROUPSACTIVITYGROUPCOUNTS, () => {
     const commandNameStub = sinon.stub(cli, 'currentCommandName').value(yammerCommands.REPORT_GROUPSACTIVITYGROUPCOUNTS);
     sinon.stub(request, 'get').resolves('Report Refresh Date,Total,Active,Report Date,Report Period');
 
-    await command.action(logger, { options: { period: 'D7' } } as any);
+    await command.action(logger, { options: { period: 'D7' } });
     assert.deepStrictEqual(loggerErrSpy.firstCall.firstArg, chalk.yellow(`Command '${yammerCommands.REPORT_GROUPSACTIVITYGROUPCOUNTS}' is deprecated. Please use '${commands.ENGAGE_REPORT_GROUPSACTIVITYGROUPCOUNTS}' instead.`));
 
     sinonUtil.restore([loggerErrSpy, commandNameStub]);

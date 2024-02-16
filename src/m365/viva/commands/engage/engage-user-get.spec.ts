@@ -78,7 +78,7 @@ describe(commands.ENGAGE_USER_GET, () => {
     const chalk = (await import('chalk')).default;
     const loggerErrSpy = sinon.spy(logger, 'logToStderr');
     const commandNameStub = sinon.stub(cli, 'currentCommandName').value(yammerCommands.USER_GET);
-    sinon.stub(request, 'get').resolves({ "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "John Doe" });
+    sinon.stub(request, 'get').resolves({ 'type': 'user', 'id': 1496550646, 'network_id': 801445, 'state': 'active', 'full_name': 'John Doe' });
 
     await command.action(logger, { options: { email: 'pl@nubo.eu' } });
     assert.deepStrictEqual(loggerErrSpy.firstCall.firstArg, chalk.yellow(`Command '${yammerCommands.USER_GET}' is deprecated. Please use '${commands.ENGAGE_USER_GET}' instead.`));

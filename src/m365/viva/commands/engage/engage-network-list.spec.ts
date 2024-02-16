@@ -76,7 +76,7 @@ describe(commands.ENGAGE_NETWORK_LIST, () => {
     const commandNameStub = sinon.stub(cli, 'currentCommandName').value(yammerCommands.NETWORK_LIST);
     sinon.stub(request, 'get').resolves();
 
-    await command.action(logger, { options: {} } as any);
+    await command.action(logger, { options: {} });
     assert.deepStrictEqual(loggerErrSpy.firstCall.firstArg, chalk.yellow(`Command '${yammerCommands.NETWORK_LIST}' is deprecated. Please use '${commands.ENGAGE_NETWORK_LIST}' instead.`));
 
     sinonUtil.restore([loggerErrSpy, commandNameStub]);

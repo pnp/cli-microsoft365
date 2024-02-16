@@ -81,7 +81,7 @@ describe(commands.ENGAGE_MESSAGE_GET, () => {
     const commandNameStub = sinon.stub(cli, 'currentCommandName').value(yammerCommands.MESSAGE_GET);
     sinon.stub(request, 'get').resolves(firstMessage);
 
-    await command.action(logger, { options: { id: 10123190123123 } } as any);
+    await command.action(logger, { options: { id: 10123190123123 } });
     assert.deepStrictEqual(loggerErrSpy.firstCall.firstArg, chalk.yellow(`Command '${yammerCommands.MESSAGE_GET}' is deprecated. Please use '${commands.ENGAGE_MESSAGE_GET}' instead.`));
 
     sinonUtil.restore([loggerErrSpy, commandNameStub]);

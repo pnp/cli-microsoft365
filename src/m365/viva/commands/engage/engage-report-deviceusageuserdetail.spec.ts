@@ -70,7 +70,7 @@ describe(commands.ENGAGE_REPORT_DEVICEUSAGEUSERDETAIL, () => {
     const commandNameStub = sinon.stub(cli, 'currentCommandName').value(yammerCommands.REPORT_DEVICEUSAGEUSERDETAIL);
     sinon.stub(request, 'get').resolves('Report Refresh Date,User Principal Name,Display Name,User State,State Change Date,Last Activity Date,Used Web,Used Windows Phone,Used Android Phone,Used iPhone,Used iPad,Used Others,Report Period');
 
-    await command.action(logger, { options: { period: 'D7' } } as any);
+    await command.action(logger, { options: { period: 'D7' } });
     assert.deepStrictEqual(loggerErrSpy.firstCall.firstArg, chalk.yellow(`Command '${yammerCommands.REPORT_DEVICEUSAGEUSERDETAIL}' is deprecated. Please use '${commands.ENGAGE_REPORT_DEVICEUSAGEUSERDETAIL}' instead.`));
 
     sinonUtil.restore([loggerErrSpy, commandNameStub]);

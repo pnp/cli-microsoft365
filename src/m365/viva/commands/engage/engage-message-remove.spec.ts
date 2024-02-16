@@ -77,7 +77,7 @@ describe(commands.ENGAGE_MESSAGE_REMOVE, () => {
     const commandNameStub = sinon.stub(cli, 'currentCommandName').value(yammerCommands.MESSAGE_REMOVE);
     sinon.stub(request, 'delete').resolves();
 
-    await command.action(logger, { options: { id: 10123190123123, force: true } } as any);
+    await command.action(logger, { options: { id: 10123190123123, force: true } });
     assert.deepStrictEqual(loggerErrSpy.firstCall.firstArg, chalk.yellow(`Command '${yammerCommands.MESSAGE_REMOVE}' is deprecated. Please use '${commands.ENGAGE_MESSAGE_REMOVE}' instead.`));
 
     sinonUtil.restore([loggerErrSpy, commandNameStub]);

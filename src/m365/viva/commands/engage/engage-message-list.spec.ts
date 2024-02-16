@@ -100,7 +100,7 @@ describe(commands.ENGAGE_MESSAGE_LIST, () => {
     const commandNameStub = sinon.stub(cli, 'currentCommandName').value(yammerCommands.MESSAGE_LIST);
     sinon.stub(request, 'get').resolves(secondMessageBatch);
 
-    await command.action(logger, { options: { feedType: 'Top' } } as any);
+    await command.action(logger, { options: { feedType: 'Top' } });
     assert.deepStrictEqual(loggerErrSpy.firstCall.firstArg, chalk.yellow(`Command '${yammerCommands.MESSAGE_LIST}' is deprecated. Please use '${commands.ENGAGE_MESSAGE_LIST}' instead.`));
 
     sinonUtil.restore([loggerErrSpy, commandNameStub]);

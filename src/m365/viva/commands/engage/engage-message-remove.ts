@@ -74,7 +74,7 @@ class VivaEngageMessageRemoveCommand extends VivaEngageCommand {
       await this.removeMessage(args.options);
     }
     else {
-      const result = await cli.promptForConfirmation({ message: `Are you sure you want to remove the VivaEngage message ${args.options.id}?` });
+      const result = await cli.promptForConfirmation({ message: `Are you sure you want to remove the Viva Engage message ${args.options.id}?` });
 
       if (result) {
         await this.removeMessage(args.options);

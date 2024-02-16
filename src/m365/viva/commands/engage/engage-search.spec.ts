@@ -259,7 +259,7 @@ describe(commands.ENGAGE_SEARCH, () => {
     const commandNameStub = sinon.stub(cli, 'currentCommandName').value(yammerCommands.SEARCH);
     sinon.stub(request, 'get').resolves(searchResults);
 
-    await command.action(logger, { options: { queryText: 'contents' } } as any);
+    await command.action(logger, { options: { queryText: 'contents' } });
     assert.deepStrictEqual(loggerErrSpy.firstCall.firstArg, chalk.yellow(`Command '${yammerCommands.SEARCH}' is deprecated. Please use '${commands.ENGAGE_SEARCH}' instead.`));
 
     sinonUtil.restore([loggerErrSpy, commandNameStub]);

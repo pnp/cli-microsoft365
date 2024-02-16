@@ -74,7 +74,7 @@ describe(commands.ENGAGE_GROUP_USER_ADD, () => {
     const commandNameStub = sinon.stub(cli, 'currentCommandName').value(yammerCommands.GROUP_USER_ADD);
     sinon.stub(request, 'post').resolves();
 
-    await command.action(logger, { options: { groupId: 1231231, id: 989998789 } } as any);
+    await command.action(logger, { options: { groupId: 1231231, id: 989998789 } });
     assert.deepStrictEqual(loggerErrSpy.firstCall.firstArg, chalk.yellow(`Command '${yammerCommands.GROUP_USER_ADD}' is deprecated. Please use '${commands.ENGAGE_GROUP_USER_ADD}' instead.`));
 
     sinonUtil.restore([loggerErrSpy, commandNameStub]);

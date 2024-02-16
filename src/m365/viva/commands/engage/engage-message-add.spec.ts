@@ -76,7 +76,7 @@ describe(commands.ENGAGE_MESSAGE_ADD, () => {
     const commandNameStub = sinon.stub(cli, 'currentCommandName').value(yammerCommands.MESSAGE_ADD);
     sinon.stub(request, 'post').resolves(firstMessage);
 
-    await command.action(logger, { options: { body: "send a letter to me", groupId: 13114941440 } } as any);
+    await command.action(logger, { options: { body: 'send a letter to me', groupId: 13114941440 } });
     assert.deepStrictEqual(loggerErrSpy.firstCall.firstArg, chalk.yellow(`Command '${yammerCommands.MESSAGE_ADD}' is deprecated. Please use '${commands.ENGAGE_MESSAGE_ADD}' instead.`));
 
     sinonUtil.restore([loggerErrSpy, commandNameStub]);

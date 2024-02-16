@@ -70,7 +70,7 @@ describe(commands.ENGAGE_REPORT_GROUPSACTIVITYDETAIL, () => {
     const commandNameStub = sinon.stub(cli, 'currentCommandName').value(yammerCommands.REPORT_GROUPSACTIVITYDETAIL);
     sinon.stub(request, 'get').resolves('Report Refresh Date,Group Display Name,Is Deleted,Owner Principal Name,Last Activity Date,Group Type,Microsoft 365 Connected,Member Count,Posted Count,Read Count,Liked Count,Report Period');
 
-    await command.action(logger, { options: { period: 'D7' } } as any);
+    await command.action(logger, { options: { period: 'D7' } });
     assert.deepStrictEqual(loggerErrSpy.firstCall.firstArg, chalk.yellow(`Command '${yammerCommands.REPORT_GROUPSACTIVITYDETAIL}' is deprecated. Please use '${commands.ENGAGE_REPORT_GROUPSACTIVITYDETAIL}' instead.`));
 
     sinonUtil.restore([loggerErrSpy, commandNameStub]);
