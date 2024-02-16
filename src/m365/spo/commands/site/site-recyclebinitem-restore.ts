@@ -83,7 +83,7 @@ class SpoSiteRecycleBinItemRestoreCommand extends SpoCommand {
       await logger.logToStderr(`Restoring items from recycle bin at ${args.options.siteUrl}...`);
     }
 
-    let baseUrl: string = `${args.options.siteUrl}/_api`;
+    const baseUrl: string = `${args.options.siteUrl}/_api`;
 
     try {
       if (args.options.ids) {
