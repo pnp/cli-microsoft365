@@ -68,8 +68,9 @@ class SpoSiteRecycleBinItemRestoreCommand extends SpoCommand {
           }
         }
 
-        if (args.options.ids && (args.options.allPrimary || args.options.allSecondary)) {
-          return `Option 'ids' cannot be used with 'allPrimary' or 'allSecondary'`;
+        if ((!args.options.ids && !args.options.allPrimary && !args.options.allSecondary)
+          || (args.options.ids && (args.options.allPrimary || args.options.allSecondary))) {
+          return 'Specify ids or allPrimary and/or allSecondary';
         }
 
         return true;
