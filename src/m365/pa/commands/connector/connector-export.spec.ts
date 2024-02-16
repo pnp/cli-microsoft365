@@ -15,6 +15,7 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import flowCommands from '../../../flow/commands.js';
 import commands from '../../commands.js';
 import command from './connector-export.js';
+import { accessToken } from '../../../../utils/accessToken.js';
 
 describe(commands.CONNECTOR_EXPORT, () => {
   let log: string[];
@@ -31,6 +32,11 @@ describe(commands.CONNECTOR_EXPORT, () => {
     sinon.stub(session, 'getId').returns('');
     mkdirSyncStub = sinon.stub(fs, 'mkdirSync').returns('');
     writeFileSyncStub = sinon.stub(fs, 'writeFileSync').returns();
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
+    auth.connection.accessTokens[auth.defaultResource] = {
+      expiresOn: 'abc',
+      accessToken: 'abc'
+    };
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
   });

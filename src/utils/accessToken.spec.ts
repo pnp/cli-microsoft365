@@ -1,7 +1,29 @@
 import assert from 'assert';
 import { accessToken } from '../utils/accessToken.js';
+import { sinonUtil } from './sinonUtil.js';
+import sinon from 'sinon';
+import auth from '../Auth.js';
 
 describe('utils/accessToken', () => {
+
+  before(() => {
+    auth.service.accessTokens[auth.defaultResource] = {
+      expiresOn: 'abc',
+      accessToken: 'abc'
+    };
+  });
+
+  afterEach(() => {
+    sinonUtil.restore([
+      accessToken.isAppOnlyAccessToken
+    ]);
+  });
+
+  after(() => {
+    sinon.restore();
+    auth.service.connected = false;
+  });
+
   it('isAppOnlyAccessToken returns undefined when access token is undefined', () => {
     const actual = accessToken.isAppOnlyAccessToken(undefined as any);
     assert.strictEqual(actual, undefined);
@@ -110,5 +132,15 @@ describe('utils/accessToken', () => {
   it('returns empty user id when incomplete access token passed', () => {
     const actual = accessToken.getUserIdFromAccessToken('abc.def');
     assert.strictEqual(actual, '');
+  });
+
+  it('returns when ensuring delegated access token using the proper access token', () => {
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
+    accessToken.ensureDelegatedAccessToken();
+  });
+
+  it('throws error when trying to ensure delegated access token with application only token', () => {
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
+    assert.throws(() => accessToken.ensureDelegatedAccessToken());
   });
 });

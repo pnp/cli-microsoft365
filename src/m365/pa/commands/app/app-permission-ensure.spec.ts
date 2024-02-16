@@ -90,6 +90,7 @@ describe(commands.APP_PERMISSION_ENSURE, () => {
       expiresOn: '123',
       accessToken: 'abc'
     };
+    commandInfo = cli.getCommandInfo(command);
   });
 
   beforeEach(() => {

@@ -14,6 +14,7 @@ import commands from '../../commands.js';
 import paAppListCommand from '../app/app-list.js';
 import command from './app-get.js';
 import { settingsNames } from '../../../../settingsNames.js';
+import { accessToken } from '../../../../utils/accessToken.js';
 
 describe(commands.APP_GET, () => {
   let log: string[];
@@ -498,6 +499,11 @@ describe(commands.APP_GET, () => {
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
+    auth.service.accessTokens[auth.defaultResource] = {
+      expiresOn: 'abc',
+      accessToken: 'abc'
+    };
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
   });
