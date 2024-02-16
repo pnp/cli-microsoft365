@@ -52,6 +52,7 @@ describe(commands.CHAT_MESSAGE_SEND, () => {
         accessToken: 'abc'
       };
     }
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
     commandInfo = cli.getCommandInfo(command);
   });
 

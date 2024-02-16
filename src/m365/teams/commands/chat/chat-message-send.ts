@@ -91,6 +91,8 @@ class TeamsChatMessageSendCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    accessToken.ensureDelegatedAccessToken();
+
     try {
       const chatId = await this.getChatId(logger, args);
       await this.sendChatMessage(chatId as string, args);

@@ -4,6 +4,8 @@ import auth, { CloudType } from '../../Auth.js';
 import { CommandError } from '../../Command.js';
 import { telemetry } from '../../telemetry.js';
 import PowerPlatformCommand from './PowerPlatformCommand.js';
+import { accessToken } from '../../utils/accessToken.js';
+import { sinonUtil } from '../../utils/sinonUtil.js';
 
 class MockCommand extends PowerPlatformCommand {
   public get name(): string {
@@ -27,10 +29,16 @@ describe('PowerPlatformCommand', () => {
 
   before(() => {
     sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
+    auth.service.accessTokens[auth.defaultResource] = {
+      expiresOn: 'abc',
+      accessToken: 'abc'
+    };
   });
 
   after(() => {
     sinon.restore();
+    auth.service.connected = false;
   });
 
   it('returns correct bapi resource', () => {
@@ -71,5 +79,13 @@ describe('PowerPlatformCommand', () => {
     auth.connection.active = true;
     auth.connection.cloudType = CloudType.Public;
     assert.doesNotThrow(() => (cmd as any).initAction({ options: {} }, {}));
+  });
+
+  it('throws error when trying to use the command using application only permissions', () => {
+    sinonUtil.restore(accessToken.isAppOnlyAccessToken);
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
+    auth.service.connected = true;
+    auth.service.cloudType = CloudType.Public;
+    assert.throws(() => (cmd as any).initAction({ options: {} }, {}));
   });
 });

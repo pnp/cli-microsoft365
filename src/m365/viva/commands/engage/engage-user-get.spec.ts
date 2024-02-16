@@ -13,6 +13,7 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './engage-user-get.js';
 import yammerCommands from './yammerCommands.js';
+import { accessToken } from '../../../../utils/accessToken.js';
 
 describe(commands.ENGAGE_USER_GET, () => {
   let log: string[];
@@ -21,10 +22,15 @@ describe(commands.ENGAGE_USER_GET, () => {
   let commandInfo: CommandInfo;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
+    auth.connection.accessTokens[auth.defaultResource] = {
+      expiresOn: 'abc',
+      accessToken: 'abc'
+    };
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
   });
@@ -58,7 +64,7 @@ describe(commands.ENGAGE_USER_GET, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.ENGAGE_USER_GET), true);
+    assert.strictEqual(command.name, commands.ENGAGE_USER_GET);
   });
 
   it('has a description', () => {
@@ -87,61 +93,51 @@ describe(commands.ENGAGE_USER_GET, () => {
   });
 
   it('calls user by e-mail', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/users/by_email.json?email=pl%40nubo.eu') {
-        return Promise.resolve(
-          [{ "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "John Doe" }]
-        );
+        return [{ "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "John Doe" }];
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
     await command.action(logger, { options: { email: "pl@nubo.eu" } } as any);
     assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 1496550646);
   });
 
   it('calls user by id', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/users/1496550646.json') {
-        return Promise.resolve(
-          { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "John Doe" }
-        );
+        return { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "John Doe" };
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
     await command.action(logger, { options: { id: 1496550646 } } as any);
     assert.strictEqual(loggerLogSpy.lastCall.args[0].id, 1496550646);
   });
 
   it('calls the current user and json', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/users/current.json') {
-        return Promise.resolve(
-          { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "John Doe" }
-        );
+        return { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "John Doe" };
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
     await command.action(logger, { options: { output: 'json' } } as any);
     assert.strictEqual(loggerLogSpy.lastCall.args[0].id, 1496550646);
   });
 
   it('correctly handles error', async () => {
-    sinon.stub(request, 'get').callsFake(() => {
-      return Promise.reject({
-        "error": {
-          "base": "An error has occurred."
-        }
-      });
+    sinon.stub(request, 'get').callsFake(async () => {
+      throw { "error": { "base": "An error has occurred." } };
     });
 
     await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred.'));
   });
 
   it('correctly handles 404 error', async () => {
-    sinon.stub(request, 'get').callsFake(() => {
-      return Promise.reject({
+    sinon.stub(request, 'get').callsFake(async () => {
+      throw {
         "statusCode": 404
-      });
+      };
     });
 
     await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('Not found (404)'));

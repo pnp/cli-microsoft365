@@ -14,6 +14,7 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import ppSolutionGetCommand from './solution-get.js';
 import command from './solution-remove.js';
+import { accessToken } from '../../../../utils/accessToken.js';
 
 describe(commands.SOLUTION_REMOVE, () => {
   let commandInfo: CommandInfo;
@@ -34,6 +35,11 @@ describe(commands.SOLUTION_REMOVE, () => {
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
+    auth.connection.accessTokens[auth.defaultResource] = {
+      expiresOn: 'abc',
+      accessToken: 'abc'
+    };
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
   });

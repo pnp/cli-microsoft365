@@ -13,6 +13,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './app-export.js';
+import { accessToken } from '../../../../utils/accessToken.js';
 
 describe(commands.APP_EXPORT, () => {
   let log: string[];
@@ -152,6 +153,11 @@ describe(commands.APP_EXPORT, () => {
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
+    auth.service.accessTokens[auth.defaultResource] = {
+      expiresOn: 'abc',
+      accessToken: 'abc'
+    };
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
   });

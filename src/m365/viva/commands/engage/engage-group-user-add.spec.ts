@@ -13,6 +13,7 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './engage-group-user-add.js';
 import yammerCommands from './yammerCommands.js';
+import { accessToken } from '../../../../utils/accessToken.js';
 
 describe(commands.ENGAGE_GROUP_USER_ADD, () => {
   let log: string[];
@@ -24,6 +25,11 @@ describe(commands.ENGAGE_GROUP_USER_ADD, () => {
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
+    auth.connection.accessTokens[auth.defaultResource] = {
+      expiresOn: 'abc',
+      accessToken: 'abc'
+    };
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
   });

@@ -1,3 +1,5 @@
+import auth from "../Auth.js";
+
 export const accessToken = {
   isAppOnlyAccessToken(accessToken: string): boolean | undefined {
     let isAppOnlyAccessToken: boolean | undefined;
@@ -91,5 +93,16 @@ export const accessToken = {
     }
 
     return userId;
+  },
+
+  /**
+   * Ensures that the provided access token is a delegated access token.
+   * @throws {string} Will throw an error if the access token is an application-only access token.
+   */
+  ensureDelegatedAccessToken(): void {
+    const accessToken = auth.service.accessTokens[auth.defaultResource].accessToken;
+    if (this.isAppOnlyAccessToken(accessToken)) {
+      throw 'This command does not support application-only permissions.';
+    }
   }
 };

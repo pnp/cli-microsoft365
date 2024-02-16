@@ -14,6 +14,7 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import ppAiBuilderModelGetCommand from './aibuildermodel-get.js';
 import command from './aibuildermodel-remove.js';
+import { accessToken } from '../../../../utils/accessToken.js';
 
 describe(commands.AIBUILDERMODEL_REMOVE, () => {
   let commandInfo: CommandInfo;
@@ -72,6 +73,11 @@ describe(commands.AIBUILDERMODEL_REMOVE, () => {
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
+    auth.connection.accessTokens[auth.defaultResource] = {
+      expiresOn: 'abc',
+      accessToken: 'abc'
+    };
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
   });

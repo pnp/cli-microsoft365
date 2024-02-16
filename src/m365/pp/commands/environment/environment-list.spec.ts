@@ -10,6 +10,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './environment-list.js';
+import { accessToken } from '../../../../utils/accessToken.js';
 
 describe(commands.ENVIRONMENT_LIST, () => {
   let log: string[];
@@ -21,6 +22,11 @@ describe(commands.ENVIRONMENT_LIST, () => {
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
+    auth.connection.accessTokens[auth.defaultResource] = {
+      expiresOn: 'abc',
+      accessToken: 'abc'
+    };
     auth.connection.active = true;
   });
 
