@@ -2,7 +2,7 @@ import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request from '../../../../request.js';
-import GraphCommand from '../../../base/GraphCommand.js';
+import ToDoCommand from '../../../base/ToDoCommand.js';
 import commands from '../../commands.js';
 
 interface CommandArgs {
@@ -15,7 +15,7 @@ interface Options extends GlobalOptions {
   force?: boolean;
 }
 
-class TodoListRemoveCommand extends GraphCommand {
+class TodoListRemoveCommand extends ToDoCommand {
   public get name(): string {
     return commands.LIST_REMOVE;
   }
