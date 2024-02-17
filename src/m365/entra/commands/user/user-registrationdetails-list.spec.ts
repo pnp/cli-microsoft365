@@ -20,7 +20,7 @@ describe(commands.USER_REGISTRATIONDETAILS_LIST, () => {
   const registrationDetails = [
     {
       "id": "61b0c52f-a902-4769-9a09-c6628335b00a",
-      "userPrincipalName": "AdeleV@4wrvkx.onmicrosoft.com",
+      "userPrincipalName": "AdeleV@contoso.onmicrosoft.com",
       "userDisplayName": "Adele Vance",
       "userType": "member",
       "isAdmin": false,
@@ -38,7 +38,7 @@ describe(commands.USER_REGISTRATIONDETAILS_LIST, () => {
     },
     {
       "id": "f9e0ee63-73dc-48a9-aa97-e5159ec11705",
-      "userPrincipalName": "JohannaL@4wrvkx.onmicrosoft.com",
+      "userPrincipalName": "JohannaL@contoso.onmicrosoft.com",
       "userDisplayName": "Johanna Lorenz",
       "userType": "member",
       "isAdmin": false,
@@ -59,7 +59,7 @@ describe(commands.USER_REGISTRATIONDETAILS_LIST, () => {
     },
     {
       "id": "abcd1234-e024-4bc6-8e98-123458962525",
-      "userPrincipalName": "JohnDoe@4wrvkx.onmicrosoft.com",
+      "userPrincipalName": "JohnDoe@contoso.onmicrosoft.com",
       "userDisplayName": "John Doe",
       "userType": "member",
       "isAdmin": true,

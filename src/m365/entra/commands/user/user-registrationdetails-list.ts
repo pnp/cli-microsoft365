@@ -61,17 +61,17 @@ class EntraUserRegistrationDetailsListCommand extends GraphCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        isAdmin: typeof args.options.isAdmin !== 'undefined',
+        isAdmin: !!args.options.isAdmin,
         userType: typeof args.options.userType !== 'undefined',
         userPreferredMethodForSecondaryAuthentication: typeof args.options.userPreferredMethodForSecondaryAuthentication !== 'undefined',
         systemPreferredAuthenticationMethods: typeof args.options.systemPreferredAuthenticationMethods !== 'undefined',
-        isSelfServicePasswordResetRegistered: typeof args.options.isSelfServicePasswordResetRegistered !== 'undefined',
-        isSelfServicePasswordResetEnabled: typeof args.options.isSelfServicePasswordResetEnabled !== 'undefined',
-        isSelfServicePasswordResetCapable: typeof args.options.isSelfServicePasswordResetCapable !== 'undefined',
-        isMfaRegistered: typeof args.options.isMfaRegistered !== 'undefined',
-        isMfaCapable: typeof args.options.isMfaCapable !== 'undefined',
-        isPasswordlessCapable: typeof args.options.isPasswordlessCapable !== 'undefined',
-        isSystemPreferredAuthenticationMethodEnabled: typeof args.options.isSystemPreferredAuthenticationMethodEnabled !== 'undefined',
+        isSelfServicePasswordResetRegistered: !!args.options.isSelfServicePasswordResetRegistered,
+        isSelfServicePasswordResetEnabled: !!args.options.isSelfServicePasswordResetEnabled,
+        isSelfServicePasswordResetCapable: !!args.options.isSelfServicePasswordResetCapable,
+        isMfaRegistered: !!args.options.isMfaRegistered,
+        isMfaCapable: !!args.options.isMfaCapable,
+        isPasswordlessCapable: !!args.options.isPasswordlessCapable,
+        isSystemPreferredAuthenticationMethodEnabled: !!args.options.isSystemPreferredAuthenticationMethodEnabled,
         methodsRegistered: typeof args.options.methodsRegistered !== 'undefined',
         userIds: typeof args.options.userIds !== 'undefined',
         userPrincipalNames: typeof args.options.userPrincipalNames !== 'undefined',
@@ -145,7 +145,7 @@ class EntraUserRegistrationDetailsListCommand extends GraphCommand {
 
         if (args.options.userPreferredMethodForSecondaryAuthentication) {
           const methods = args.options.userPreferredMethodForSecondaryAuthentication.split(',').map(m => m.trim());
-          const invalidMethods = methods.filter(m => authenticationMethods.indexOf(m) === -1);
+          const invalidMethods = methods.filter(m => !authenticationMethods.includes(m));
           if (invalidMethods.length > 0) {
             return `'${args.options.userPreferredMethodForSecondaryAuthentication}' is not a valid userPreferredMethodForSecondaryAuthentication value. Invalid values: ${invalidMethods.join(',')}. Allowed values ${authenticationMethods.join('|')}`;
           }
@@ -153,7 +153,7 @@ class EntraUserRegistrationDetailsListCommand extends GraphCommand {
 
         if (args.options.systemPreferredAuthenticationMethods) {
           const methods = args.options.systemPreferredAuthenticationMethods.split(',').map(m => m.trim());
-          const invalidMethods = methods.filter(m => authenticationMethods.indexOf(m) === -1);
+          const invalidMethods = methods.filter(m => !authenticationMethods.includes(m));
           if (invalidMethods.length > 0) {
             return `'${args.options.systemPreferredAuthenticationMethods}' is not a valid systemPreferredAuthenticationMethods value. Invalid values: ${invalidMethods.join(',')}. Allowed values ${authenticationMethods.join('|')}`;
           }
@@ -161,26 +161,25 @@ class EntraUserRegistrationDetailsListCommand extends GraphCommand {
 
         if (args.options.methodsRegistered) {
           const methods = args.options.methodsRegistered.split(',').map(m => m.trim());
-          const invalidMethods = methods.filter(m => methodsRegistered.indexOf(m) === -1);
+          const invalidMethods = methods.filter(m => !methodsRegistered.includes(m));
           if (invalidMethods.length > 0) {
             return `'${args.options.methodsRegistered}' is not a valid methodsRegistered value. Invalid values: ${invalidMethods.join(',')}. Allowed values ${methodsRegistered.join('|')}`;
           }
         }
 
         if (args.options.userIds) {
-          const ids = args.options.userIds.split(',').map(m => m.trim());
-          const invalidIds = ids.filter(id => !validation.isValidGuid(id));
-          if (invalidIds.length > 0) {
-            return `'${args.options.userIds}' is not a valid list of user IDs. Invalid values: ${invalidIds.join(',')}`;
+          const ids = args.options.userIds.split(',').map(i => i.trim());
+          if (!validation.isValidGuidArray(ids)) {
+            const invalidGuid = ids.find(id => !validation.isValidGuid(id));
+            return `'${invalidGuid}' is not a valid GUID for option 'userIds'.`;
           }
         }
 
         if (args.options.userPrincipalNames) {
-          const upns = args.options.userPrincipalNames.split(',').map(upn => upn.trim());
-          const invalidUpns = upns.filter(upn => !validation.isValidUserPrincipalName(upn));
-          if (invalidUpns.length > 0) {
-            return `'${args.options.userPrincipalNames}' is not a valid list of user principal names. Invalid values: ${invalidUpns.join(',')}`;
-          }          
+          const isValidUserPrincipalNameArray = validation.isValidUserPrincipalNameArray(args.options.userPrincipalNames.split(',').map(u => u.trim()));
+          if (isValidUserPrincipalNameArray !== true) {
+            return `User principal name '${isValidUserPrincipalNameArray}' is invalid for option 'userPrincipalNames'.`;
+          }
         }
 
         return true;
@@ -191,9 +190,12 @@ class EntraUserRegistrationDetailsListCommand extends GraphCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       let userUpns: string[] = []; 
+
       if (args.options.userIds) {
-        userUpns = await this.getUserUpns(args.options.userIds);
+        const ids = args.options.userIds.split(',').map(m => m.trim());
+        userUpns = await Promise.all(ids.map(id => entraUser.getUpnByUserId(id)));
       }
+
       const requestUrl = this.getRequestUrl(args.options, userUpns);
       const result = await odata.getAllItems<UserRegistrationDetails>(requestUrl);
 
@@ -202,16 +204,6 @@ class EntraUserRegistrationDetailsListCommand extends GraphCommand {
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
-  }
-
-  private async getUserUpns(userIds: string): Promise<string[]> {
-    const ids = userIds.split(',').map(m => m.trim());
-    const userUpns: string[] = [];
-    for (let i = 0; i < ids.length; i++) {
-      const userUpn = await entraUser.getUpnByUserId(ids[i]);
-      userUpns.push(userUpn);
-    }
-    return userUpns;
   }
 
   private getRequestUrl(options: Options, userUpns: string[]): string {
@@ -223,59 +215,48 @@ class EntraUserRegistrationDetailsListCommand extends GraphCommand {
  
     const filters: string[] = [];
     if (options.isAdmin !== undefined) {
-      filters.push(`isAdmin eq ${options.isAdmin ? true : false}`);
+      filters.push(`isAdmin eq ${options.isAdmin}`);
     }
 
     if (options.isMfaCapable !== undefined) {
-      filters.push(`isMfaCapable eq ${options.isMfaCapable ? true : false}`);
+      filters.push(`isMfaCapable eq ${options.isMfaCapable}`);
     }
 
     if (options.isMfaRegistered !== undefined) {
-      filters.push(`isMfaRegistered eq ${options.isMfaRegistered ? true : false}`);
+      filters.push(`isMfaRegistered eq ${options.isMfaRegistered}`);
     }
 
     if (options.isPasswordlessCapable !== undefined) {
-      filters.push(`isPasswordlessCapable eq ${options.isPasswordlessCapable ? true : false}`);
+      filters.push(`isPasswordlessCapable eq ${options.isPasswordlessCapable}`);
     }
 
     if (options.isSelfServicePasswordResetCapable !== undefined) {
-      filters.push(`isSelfServicePasswordResetCapable eq ${options.isSelfServicePasswordResetCapable ? true : false}`);
+      filters.push(`isSelfServicePasswordResetCapable eq ${options.isSelfServicePasswordResetCapable}`);
     }
 
     if (options.isSelfServicePasswordResetEnabled !== undefined) {
-      filters.push(`isSelfServicePasswordResetEnabled eq ${options.isSelfServicePasswordResetEnabled ? true : false}`);
+      filters.push(`isSelfServicePasswordResetEnabled eq ${options.isSelfServicePasswordResetEnabled}`);
     }
 
     if (options.isSelfServicePasswordResetRegistered !== undefined) {
-      filters.push(`isSelfServicePasswordResetRegistered eq ${options.isSelfServicePasswordResetRegistered ? true : false}`);
+      filters.push(`isSelfServicePasswordResetRegistered eq ${options.isSelfServicePasswordResetRegistered}`);
     }
 
     if (options.isSystemPreferredAuthenticationMethodEnabled !== undefined) {
-      filters.push(`isSystemPreferredAuthenticationMethodEnabled eq ${options.isSystemPreferredAuthenticationMethodEnabled ? true : false}`);
+      filters.push(`isSystemPreferredAuthenticationMethodEnabled eq ${options.isSystemPreferredAuthenticationMethodEnabled}`);
     }
 
-    const methodsRegistered: string[] = [];
-    if (options.methodsRegistered) {
-      const methods = options.methodsRegistered.split(',').map(m => m.trim());
-      methods.forEach(method => {
-        methodsRegistered.push(`methodsRegistered/any(m:m eq '${method}')`);
-      });
+    const methodsRegistered = options.methodsRegistered?.split(',').map(method => `methodsRegistered/any(m:m eq '${method.trim()}')`);
+    const methodsRegisteredFilter = methodsRegistered?.join(' or ');
+    if (methodsRegisteredFilter) {
+      filters.push(`(${methodsRegisteredFilter})`);
     }
 
-    if (methodsRegistered.length > 0) {
-      filters.push(`(${methodsRegistered.join(' or ')})`);
-    }
+    const systemPreferredAuthenticationMethods = options.systemPreferredAuthenticationMethods?.split(',').map(method => `systemPreferredAuthenticationMethods/any(m:m eq '${method.trim()}')`);
+    const systemPreferredAuthenticationMethodsFilter = systemPreferredAuthenticationMethods?.join(' or ');
 
-    const systemPreferredAuthenticationMethods: string[] = [];
-    if (options.systemPreferredAuthenticationMethods) {
-      const methods = options.systemPreferredAuthenticationMethods.split(',').map(m => m.trim());
-      methods.forEach(method => {
-        systemPreferredAuthenticationMethods.push(`systemPreferredAuthenticationMethods/any(m:m eq '${method}')`);
-      });
-    }
-
-    if (systemPreferredAuthenticationMethods.length > 0) {
-      filters.push(`(${systemPreferredAuthenticationMethods.join(' or ')})`);
+    if (systemPreferredAuthenticationMethodsFilter) {
+      filters.push(`(${systemPreferredAuthenticationMethodsFilter})`);
     }
 
     const userUPNs: string[] = [];
@@ -296,16 +277,11 @@ class EntraUserRegistrationDetailsListCommand extends GraphCommand {
       filters.push(`(${userUPNs.join(' or ')})`);
     }
 
-    const userPreferredMethodForSecondaryAuthentication: string[] = [];
-    if (options.userPreferredMethodForSecondaryAuthentication) {
-      const methods = options.userPreferredMethodForSecondaryAuthentication.split(',').map(m => m.trim());
-      methods.forEach(method => {
-        userPreferredMethodForSecondaryAuthentication.push(`userPreferredMethodForSecondaryAuthentication eq '${method}'`);
-      });
-    }
+    const userPreferredMethodForSecondaryAuthentication = options.userPreferredMethodForSecondaryAuthentication?.split(',').map(method => `userPreferredMethodForSecondaryAuthentication eq '${method.trim()}'`);
+    const userPreferredMethodForSecondaryAuthenticationFilter = userPreferredMethodForSecondaryAuthentication?.join(' or ');
 
-    if (userPreferredMethodForSecondaryAuthentication.length > 0) {
-      filters.push(`(${userPreferredMethodForSecondaryAuthentication.join(' or ')})`);
+    if (userPreferredMethodForSecondaryAuthenticationFilter) {
+      filters.push(`(${userPreferredMethodForSecondaryAuthenticationFilter})`);
     }
 
     if (options.userType) {

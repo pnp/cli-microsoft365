@@ -109,12 +109,6 @@ Retrieve registration details for guest users
 m365 entra user registrationdetails list --userType guest
 ```
 
-Retrieve registration details for users who selected push authentication method as the default second-factor for performing multifactor authentication
-
-```sh
-m365 entra user registrationdetails list --userPreferredMethodForSecondaryAuthentication push
-```
-
 Retrieve registration details for users who selected either sms or push authentication method as the default second-factor for performing multifactor authentication
 
 ```sh
@@ -127,40 +121,10 @@ Retrieve registration details for users with push authentication method as the m
 m365 entra user registrationdetails list --systemPreferredAuthenticationMethods push
 ```
 
-Retrieve registration details for users with either sms or push authentication method as the most secure authentication methods among the registered methods for second factor authentication determined by the system
-
-```sh
-m365 entra user registrationdetails list --systemPreferredAuthenticationMethods 'sms,push'
-```
-
-Retrieve registration details for users who have used Microsoft Authenticator app during registration
-
-```sh
-m365 entra user registrationdetails list --methodsRegistered microsoftAuthenticatorPush
-```
-
 Retrieve registration details for users who have used either Microsoft Authenticator app or mobile phone during registration
 
 ```sh
 m365 entra user registrationdetails list --methodsRegistered 'microsoftAuthenticatorPush,mobilePhone'
-```
-
-Retrieve registration details for users who are not registered for multi-factor authentication
-
-```sh
-m365 entra user registrationdetails list --isMfaRegistered false
-```
-
-Retrieve registration details for users specified by id
-
-```sh
-m365 entra user registrationdetails list --userIds '121bca22-1a6b-455b-9e5d-64c5ef5e471d,fec200ce-a7a9-42cd-9717-3a3179a99b72'
-```
-
-Retrieve registration details for users specified by user principal names
-
-```sh
-m365 entra user registrationdetails list --userPrincipalNames 'AdeleV@contoso.com,johndoe@contoso.com'
 ```
 
 ## Response
@@ -172,7 +136,7 @@ m365 entra user registrationdetails list --userPrincipalNames 'AdeleV@contoso.co
   [
     {
       "id": "61b0c52f-a902-4769-9a09-c6628335b00a",
-      "userPrincipalName": "AdeleV@4wrvkx.onmicrosoft.com",
+      "userPrincipalName": "AdeleV@contoso.onmicrosoft.com",
       "userDisplayName": "Adele Vance",
       "userType": "member",
       "isAdmin": false,
@@ -190,7 +154,7 @@ m365 entra user registrationdetails list --userPrincipalNames 'AdeleV@contoso.co
     },
     {
       "id": "ebd27dbd-75f2-4ef8-bd51-102c3faf62ec",
-      "userPrincipalName": "john.doe@4wrvkx.onmicrosoft.com",
+      "userPrincipalName": "john.doe@contoso.onmicrosoft.com",
       "userDisplayName": "John Doe",
       "userType": "member",
       "isAdmin": false,
@@ -218,8 +182,8 @@ m365 entra user registrationdetails list --userPrincipalNames 'AdeleV@contoso.co
   ```text
   userPrincipalName                                methodsRegistered                                                     lastUpdatedDateTime
   -----------------------------------------------  --------------------------------------------------------------------  ----------------------------
-  AdeleV@4wrvkx.onmicrosoft.com                                                                                          2024-01-23T19:37:43.7170699Z
-  john.doe@4wrvkx.onmicrosoft.com                  microsoftAuthenticatorPush,softwareOneTimePasscode                    2024-01-23T19:37:43.7165489Z
+  AdeleV@contoso.onmicrosoft.com                                                                                          2024-01-23T19:37:43.7170699Z
+  john.doe@contoso.onmicrosoft.com                  microsoftAuthenticatorPush,softwareOneTimePasscode                    2024-01-23T19:37:43.7165489Z
   ```
 
   </TabItem>
@@ -227,8 +191,8 @@ m365 entra user registrationdetails list --userPrincipalNames 'AdeleV@contoso.co
 
   ```csv
   id,userPrincipalName,userDisplayName,userType,isAdmin,isSsprRegistered,isSsprEnabled,isSsprCapable,isMfaRegistered,isMfaCapable,isPasswordlessCapable,isSystemPreferredAuthenticationMethodEnabled,userPreferredMethodForSecondaryAuthentication,lastUpdatedDateTime
-  61b0c52f-a902-4769-9a09-c6628335b00a,AdeleV@4wrvkx.onmicrosoft.com,Adele Vance,member,,,,,,,,,none,2024-01-23T19:37:43.7170699Z
-  ebd27dbd-75f2-4ef8-bd51-102c3faf62ec,john.doe@4wrvkx.onmicrosoft.com,John Doe,member,,,,,1,1,,,push,2024-01-23T19:37:43.7165489Z
+  61b0c52f-a902-4769-9a09-c6628335b00a,AdeleV@contoso.onmicrosoft.com,Adele Vance,member,,,,,,,,,none,2024-01-23T19:37:43.7170699Z
+  ebd27dbd-75f2-4ef8-bd51-102c3faf62ec,john.doe@contoso.onmicrosoft.com,John Doe,member,,,,,1,1,,,push,2024-01-23T19:37:43.7165489Z
   ```
 
   </TabItem>
@@ -244,7 +208,7 @@ m365 entra user registrationdetails list --userPrincipalNames 'AdeleV@contoso.co
   Property | Value
   ---------|-------
   id | 61b0c52f-a902-4769-9a09-c6628335b00a
-  userPrincipalName | AdeleV@4wrvkx.onmicrosoft.com
+  userPrincipalName | AdeleV@contoso.onmicrosoft.com
   userDisplayName | Adele Vance
   userType | member
   isAdmin | false
@@ -263,7 +227,7 @@ m365 entra user registrationdetails list --userPrincipalNames 'AdeleV@contoso.co
   Property | Value
   ---------|-------
   id | ebd27dbd-75f2-4ef8-bd51-102c3faf62ec
-  userPrincipalName | john.doe@4wrvkx.onmicrosoft.com
+  userPrincipalName | john.doe@contoso.onmicrosoft.com
   userDisplayName | John Doe
   userType | member
   isAdmin | false
