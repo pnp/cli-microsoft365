@@ -358,6 +358,11 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
+              label: 'group set',
+              id: 'cmd/entra/group/group-set'
+            },
+            {
+              type: 'doc',
               label: 'group user add',
               id: 'cmd/entra/group/group-user-add'
             },
