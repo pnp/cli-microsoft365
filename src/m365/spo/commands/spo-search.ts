@@ -265,12 +265,12 @@ class SpoSearchCommand extends SpoCommand {
     const sortList = this.getSortList(args);
 
     // transform arg data to query string parameters
-    const propertySelectRequestString: string = `&selectproperties='${formatting.encodeQueryParameter(selectPropertiesArray.join(","))}'`;
+    const propertySelectRequestString: string = `&selectproperties='${formatting.encodeQueryParameter(selectPropertiesArray.join(','))}'`;
     const startRowRequestString: string = `&startrow=${args.options.startRow ? args.options.startRow : 0}`;
     const rowLimitRequestString: string = args.options.rowLimit ? `&rowlimit=${args.options.rowLimit}` : (args.options.allResults ? `&rowlimit=500` : '');
     const sourceIdRequestString: string = args.options.sourceId ? `&sourceid='${args.options.sourceId}'` : ``;
-    const trimDuplicatesRequestString: string = `&trimduplicates=${args.options.trimDuplicates ? args.options.trimDuplicates : "false"}`;
-    const enableStemmingRequestString: string = `&enablestemming=${typeof (args.options.enableStemming) === 'undefined' ? "true" : args.options.enableStemming}`;
+    const trimDuplicatesRequestString: string = `&trimduplicates=${args.options.trimDuplicates ? args.options.trimDuplicates : 'false'}`;
+    const enableStemmingRequestString: string = `&enablestemming=${typeof (args.options.enableStemming) === 'undefined' ? 'true' : args.options.enableStemming}`;
     const cultureRequestString: string = args.options.culture ? `&culture=${args.options.culture}` : ``;
     const refinementFiltersRequestString: string = args.options.refinementFilters ? `&refinementfilters='${args.options.refinementFilters}'` : ``;
     const queryTemplateRequestString: string = args.options.queryTemplate ? `&querytemplate='${args.options.queryTemplate}'` : ``;
@@ -320,7 +320,7 @@ class SpoSearchCommand extends SpoCommand {
     let properties = args.options.properties ? args.options.properties : '';
 
     if (args.options.sourceName) {
-      if (properties && !properties.endsWith(",")) {
+      if (properties && !properties.endsWith(',')) {
         properties += `,`;
       }
 
@@ -332,11 +332,11 @@ class SpoSearchCommand extends SpoCommand {
 
   private getSelectPropertiesArray(args: CommandArgs): string[] {
     const selectProperties = args.options.selectProperties
-      ? args.options.selectProperties.split(",")
-      : ["Title", "OriginalPath"];
+      ? args.options.selectProperties.split(',')
+      : ['Title', 'OriginalPath'];
 
     if (args.options.allResults) {
-      selectProperties.push("DocId");
+      selectProperties.filter(p => p.toLowerCase() !== 'docid').push('DocId');
     }
 
     return selectProperties;
@@ -345,18 +345,18 @@ class SpoSearchCommand extends SpoCommand {
   private getSortList(args: CommandArgs): string {
     const sortList = [];
     if (args.options.allResults) {
-      sortList.push(formatting.encodeQueryParameter(`[DocId]:ascending`));
+      sortList.push(formatting.encodeQueryParameter('[DocId]:ascending'));
     }
 
     if (args.options.sortList) {
-      const sortListArray = args.options.sortList.split(",");
+      const sortListArray = args.options.sortList.split(',');
 
       sortListArray.forEach(sortItem => {
         sortList.push(formatting.encodeQueryParameter(sortItem));
       });
     }
 
-    return sortList.join(",");
+    return sortList.join(',');
   }
 
   private async printResults(logger: Logger, args: CommandArgs, results: SearchResult[]): Promise<void> {
@@ -368,9 +368,9 @@ class SpoSearchCommand extends SpoCommand {
     }
 
     if (!args.options.output || cli.shouldTrimOutput(args.options.output)) {
-      await logger.log("# Rows: " + results[results.length - 1].PrimaryQueryResult.RelevantResults.TotalRows);
-      await logger.log("# Rows (Including duplicates): " + results[results.length - 1].PrimaryQueryResult.RelevantResults.TotalRowsIncludingDuplicates);
-      await logger.log("Elapsed Time: " + this.getElapsedTime(results));
+      await logger.log('# Rows: ' + results[results.length - 1].PrimaryQueryResult.RelevantResults.TotalRows);
+      await logger.log('# Rows (Including duplicates): ' + results[results.length - 1].PrimaryQueryResult.RelevantResults.TotalRowsIncludingDuplicates);
+      await logger.log('Elapsed Time: ' + this.getElapsedTime(results));
     }
   }
 
