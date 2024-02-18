@@ -139,7 +139,7 @@ describe(commands.SITE_RECYCLEBINITEM_RESTORE, () => {
   });
 
   it('restores all items from the first-stage recycle bin', async () => {
-    const postRequestSpy = sinon.stub(request, 'post').callsFake(async (opts) => {
+    const postRequestStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/_api/web/RecycleBin/RestoreAll') {
         return;
       }
@@ -154,12 +154,12 @@ describe(commands.SITE_RECYCLEBINITEM_RESTORE, () => {
       }
     });
 
-    assert(postRequestSpy.calledOnce, 'postRequestSpy.calledOnce');
+    assert(postRequestStub.calledOnce);
   });
 
   it('restores all items from the second-stage recycle bin', async () => {
-    const postRequestSpy = sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/_api/site/GetRecyclebinItems(rowLimit=2000000000,itemState=2)/RestoreAll') {
+    const postRequestStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso.sharepoint.com/_api/site/GetRecycleBinItems(rowLimit=2000000000,itemState=2)/RestoreAll') {
         return;
       }
 
@@ -173,11 +173,11 @@ describe(commands.SITE_RECYCLEBINITEM_RESTORE, () => {
       }
     });
 
-    assert(postRequestSpy.calledOnce, 'postRequestSpy.calledOnce');
+    assert(postRequestStub.calledOnce);
   });
 
   it('restores all items from the first-stage and second-stage recycle bins', async () => {
-    const postRequestSpy = sinon.stub(request, 'post').callsFake(async (opts) => {
+    const postRequestStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/_api/site/RecycleBin/RestoreAll') {
         return;
       }
@@ -193,7 +193,7 @@ describe(commands.SITE_RECYCLEBINITEM_RESTORE, () => {
       }
     });
 
-    assert(postRequestSpy.calledOnce, 'postRequestSpy.calledOnce');
+    assert(postRequestStub.calledOnce);
   });
 
   it('catches error when restores all items from recycle bin', async () => {
