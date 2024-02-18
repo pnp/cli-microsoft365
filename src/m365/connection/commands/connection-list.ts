@@ -2,6 +2,7 @@ import { Logger } from '../../../cli/Logger.js';
 import auth, { AuthType } from '../../../Auth.js';
 import commands from '../commands.js';
 import Command, { CommandArgs, CommandError } from '../../../Command.js';
+import assert from 'assert';
 
 class ConnectionListCommand extends Command {
   public get name(): string {
@@ -29,10 +30,13 @@ class ConnectionListCommand extends Command {
         active: isCurrentConnection
       };
     }).sort((a, b) => {
-      // name is never expected to be empty on existing connections
-      /* c8 ignore next 2 */
-      const aName = a.name || '';
-      const bName = b.name || '';
+
+      // Asserting name because it is optional, but required at this point.
+      assert(a.name !== undefined);
+      assert(b.name !== undefined);
+
+      const aName = a.name;
+      const bName = b.name;
 
       return aName.localeCompare(bName);
     });

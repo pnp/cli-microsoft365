@@ -15,6 +15,7 @@ import { settingsNames } from './settingsNames.js';
 import { browserUtil } from './utils/browserUtil.js';
 import * as accessTokenUtil from './utils/accessToken.js';
 import { ConnectionDetails } from './m365/commands/ConnectionDetails.js';
+import assert from 'assert';
 
 interface Hash<TValue> {
   [key: string]: TValue;
@@ -418,14 +419,14 @@ export class Auth {
       await logger.logToStderr(`Retrieving new access token silently`);
     }
 
-    const account = await (this.clientApplication as Msal.ClientApplication)
-      .getTokenCache().getAccountByLocalId(this.connection.identityId as string);
+    // Asserting identityId because it is expected to be available at this point.
+    assert(this.connection.identityId !== undefined);
 
-    // account is never expected to be undefined, this check is implemented to make that explicit
-    /* c8 ignore next 3 */
-    if (!account) {
-      throw 'Account not found, cannot retrieve access token silently';
-    }
+    const account = await (this.clientApplication as Msal.ClientApplication)
+      .getTokenCache().getAccountByLocalId(this.connection.identityId);
+
+    // Asserting account because it is expected to be available at this point.
+    assert(account !== null);
 
     return (this.clientApplication as Msal.ClientApplication).acquireTokenSilent({
       account: account,
@@ -789,9 +790,11 @@ export class Auth {
 
     this._allConnections = allConnections.filter(c => c.name !== connection.name);
 
+    // Asserting identityId because it is optional, but required at this point.
+    assert(connection.identityId !== undefined);
+
     // When using an application identity, there is no account in the MSAL TokenCache
-    if (connection.identityId &&
-      this.connection.authType !== AuthType.Certificate &&
+    if (this.connection.authType !== AuthType.Certificate &&
       this.connection.authType !== AuthType.Secret &&
       this.connection.authType !== AuthType.Identity) {
       this.clientApplication = await this.getPublicClient(logger, debug);
@@ -851,18 +854,16 @@ export class Auth {
     await this.storeConnectionInfo();
   }
 
-  public async updateConnection(oldName: string, newName: string): Promise<void> {
+  public async updateConnection(connection: Connection, newName: string): Promise<void> {
     const allConnections = await this.getAllConnections();
+    const existingConnection = allConnections.find(c => c.name === newName);
+    const oldName = connection.name;
 
-    if (allConnections.filter(c => c.name === newName).length > 0) {
+    if (existingConnection) {
       throw new CommandError(`The connection name '${newName}' is already in use`);
     }
 
-    allConnections.forEach(c => {
-      if (c.name === oldName) {
-        c.name = newName;
-      }
-    });
+    connection.name = newName;
 
     if (this.connection.name === oldName) {
       this._connection.name = newName;
@@ -873,19 +874,23 @@ export class Auth {
 
   public async getConnection(name: string): Promise<Connection> {
     const allConnections = await this.getAllConnections();
-    const connections = allConnections.filter(i => i.name === name);
+    const connection = allConnections.find(i => i.name === name);
 
-    if (!connections || connections.length === 0) {
+    if (!connection) {
       throw new CommandError(`The connection '${name}' cannot be found`);
     }
 
-    return connections[0];
+    return connection;
   }
 
   public getConnectionDetails(connection: Connection): ConnectionDetails {
+    // Asserting name and identityId because they are optional, but required at this point.    
+    assert(connection.identityName !== undefined);
+    assert(connection.name !== undefined);
+
     const details: ConnectionDetails = {
-      connectionName: connection.name || '',
-      connectedAs: connection.identityName || '',
+      connectionName: connection.name,
+      connectedAs: connection.identityName,
       authType: AuthType[connection.authType],
       appId: connection.appId,
       appTenant: connection.tenant,
