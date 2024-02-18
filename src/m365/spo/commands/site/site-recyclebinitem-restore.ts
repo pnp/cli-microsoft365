@@ -31,6 +31,7 @@ class SpoSiteRecycleBinItemRestoreCommand extends SpoCommand {
 
     this.#initOptions();
     this.#initValidators();
+    this.#initTypes();
   }
 
   #initOptions(): void {
@@ -70,12 +71,17 @@ class SpoSiteRecycleBinItemRestoreCommand extends SpoCommand {
 
         if ((!args.options.ids && !args.options.allPrimary && !args.options.allSecondary)
           || (args.options.ids && (args.options.allPrimary || args.options.allSecondary))) {
-          return 'Specify ids or allPrimary and/or allSecondary';
+          return `Option 'ids' cannot be used with 'allPrimary' or 'allSecondary'`;
         }
 
         return true;
       }
     );
+  }
+
+  #initTypes(): void {
+    this.types.string.push('siteUrl', 'ids');
+    this.types.boolean.push('allPrimary', 'allSecondary');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -87,7 +93,7 @@ class SpoSiteRecycleBinItemRestoreCommand extends SpoCommand {
 
     try {
       if (args.options.ids) {
-        const requestUrl = baseUrl + `/site/RecycleBin/RestoreByIds`;
+        const requestUrl = baseUrl + '/site/RecycleBin/RestoreByIds';
         const ids: string[] = formatting.splitAndTrim(args.options.ids);
         const idsChunks: string[][] = [];
 
@@ -121,7 +127,7 @@ class SpoSiteRecycleBinItemRestoreCommand extends SpoCommand {
           await this.restoreRecycleBinStage(baseUrl + '/web/RecycleBin/RestoreAll');
         }
         else if (args.options.allSecondary) {
-          await this.restoreRecycleBinStage(baseUrl + '/site/GetRecyclebinItems(rowLimit=2000000000,itemState=2)/RestoreAll');
+          await this.restoreRecycleBinStage(baseUrl + '/site/GetRecycleBinItems(rowLimit=2000000000,itemState=2)/RestoreAll');
         }
       }
     }
