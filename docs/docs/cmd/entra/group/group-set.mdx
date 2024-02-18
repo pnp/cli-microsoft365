@@ -1,0 +1,99 @@
+import Global from '/docs/cmd/_global.mdx';
+
+# entra group set
+
+Updates a Microsoft Entra group
+
+## Usage
+
+```sh
+m365 entra group set [options]
+```
+
+## Alias
+
+```sh
+m365 aad group set [options]
+```
+
+## Options
+
+```md definition-list
+`-i, --id [id]`	
+: The ID of the Microsoft Entra ID group to update. Specify either `id` or `displayName` but not both.
+
+`-n, --displayName [displayName]`	
+: The display name of the Microsoft Entra ID group to update. Specify either `id` or `displayName` but not both.
+
+`--newDisplayName [newDisplayName]`	
+: The new display name of the Microsoft Entra ID group. The maximum length is 256 characters.
+
+`--description [description]`
+: The new description for the group.
+
+`--mailNickname [mailNickname]`
+: The new mail alias for the group (part before the @). Maximum length is 64 characters.
+
+`--ownerIds [ownerIds]`
+: Comma-separated list of IDs of Microsoft Entra ID users that will be group owners.
+
+`--ownerUserNames [ownerUserNames]`
+: Comma-separated list of UPNs of Microsoft Entra ID users that will be group owners.
+
+`--memberIds [memberIds]`
+: Comma-separated list of IDs of Microsoft Entra ID users that will be group members.
+
+`--memberUserNames [memberUserNames]`
+: Comma-separated list of UPNs of Microsoft Entra ID users that will be group members.
+
+`--visibility [visibility]`
+: Specifies the group join policy and group content visibility for Microsoft 365 groups. Possible values are: `Private` or `Public`. Specify only when targeting a Microsoft 365 group.
+```
+
+<Global />
+
+## Remarks
+
+:::info
+
+The `visibility` option affects the behavior of the group.
+
+With the `Public` visibility:
+- Anyone can join the group without needing owner permission. 
+- Anyone can view the attributes of the group. 
+- Anyone can see the members of the group.
+
+With the `Private` visibilty:
+- Owner permission is needed to join the group.
+- Anyone can view the attributes of the group.
+- Anyone can see the members of the group.
+
+:::
+
+This command allows using unknown options. For a comprehensive list of group properties, please refer to the [Graph documentation page](https://learn.microsoft.com/graph/api/resources/group?view=graph-rest-1.0#properties).
+
+If the specified option is not found, you will receive a `Resource 'xyz' does not exist or one of its queried reference-property objects are not present.` error.
+
+## Examples
+
+Update the display name of a group specified by the display name
+
+```sh
+m365 entra group set --displayName Developers --newDisplayName Developers
+```
+
+Set the owners of a group to the specified people
+
+```sh
+m365 entra group set --id 57fd6b33-54eb-42b0-9ea0-8a9ac04eab7d --owners "john.doe@contoso.com,adele.vance@contoso.com"
+```
+
+Update the description and mail nickname of a group
+
+```sh
+m365 entra group set --id 57fd6b33-54eb-42b0-9ea0-8a9ac04eab7d --description "All developers of the company" --mailNickname developers
+```
+
+## Response
+
+The command won't return a response on success.
