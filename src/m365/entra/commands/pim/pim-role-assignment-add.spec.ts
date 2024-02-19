@@ -10,7 +10,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
-import command from './pim-roleassignment-add.js';
+import command from './pim-role-assignment-add.js';
 import aadCommands from '../../aadCommands.js';
 import { entraUser } from '../../../../utils/entraUser.js';
 import { entraGroup } from '../../../../utils/entraGroup.js';
@@ -18,7 +18,7 @@ import { accessToken } from '../../../../utils/accessToken.js';
 import { roleDefinition } from '../../../../utils/roleDefinition.js';
 import { CommandError } from '../../../../Command.js';
 
-describe(commands.PIM_ROLEASSIGNMENT_ADD, () => {
+describe(commands.PIM_ROLE_ASSIGNMENT_ADD, () => {
   const roleDefinitionId = 'f1417aa3-bf0b-4cc5-a845-a0b2cf11f690';
   const roleDefinitionName = 'SharePoint Administrator';
   const userId = '61b0c52f-a902-4769-9a09-c6628335b00a';
@@ -227,7 +227,7 @@ describe(commands.PIM_ROLEASSIGNMENT_ADD, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name, commands.PIM_ROLEASSIGNMENT_ADD);
+    assert.strictEqual(command.name, commands.PIM_ROLE_ASSIGNMENT_ADD);
   });
 
   it('has a description', () => {
@@ -241,7 +241,7 @@ describe(commands.PIM_ROLEASSIGNMENT_ADD, () => {
 
   it('defines correct alias', () => {
     const alias = command.alias();
-    assert.deepStrictEqual(alias, [aadCommands.PIM_ROLEASSIGNMENT_ADD]);
+    assert.deepStrictEqual(alias, [aadCommands.PIM_ROLE_ASSIGNMENT_ADD]);
   });
 
   it('passes validation when roleDefinitionId is a valid GUID', async () => {
