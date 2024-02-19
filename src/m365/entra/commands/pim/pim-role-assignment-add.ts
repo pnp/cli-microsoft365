@@ -34,7 +34,7 @@ interface Options extends GlobalOptions {
 
 class EntraPimRoleAssignmentAddCommand extends GraphCommand {
   public get name(): string {
-    return commands.PIM_ROLEASSIGNMENT_ADD;
+    return commands.PIM_ROLE_ASSIGNMENT_ADD;
   }
 
   public get description(): string {
@@ -42,7 +42,7 @@ class EntraPimRoleAssignmentAddCommand extends GraphCommand {
   }
 
   public alias(): string[] | undefined {
-    return [aadCommands.PIM_ROLEASSIGNMENT_ADD];
+    return [aadCommands.PIM_ROLE_ASSIGNMENT_ADD];
   }
 
   constructor() {

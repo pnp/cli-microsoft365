@@ -2,14 +2,14 @@ import Global from '/docs/cmd/_global.mdx';
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-# entra pim roleassignment add
+# entra pim role assignment add
 
 Request activation of an Entra ID role assignment for a user or group.
 
 ## Usage
 
 ```sh
-m365 entra pim roleassignment add [options]
+m365 entra pim role assignment add [options]
 ```
 
 ## Options
@@ -76,43 +76,43 @@ When specifying the scope of the assignment, use
 Request activation of the SharePoint Administrator Entra ID role assignment for the current user.
 
 ```sh
-m365 entra pim roleassignment add --roleDefinitionName 'SharePoint Administrator'
+m365 entra pim role assignment add --roleDefinitionName 'SharePoint Administrator'
 ```
 
 Request activation of an Entra ID role assignment for the current user.
 
 ```sh
-m365 entra pim roleassignment add --roleDefinitionId 'f1417aa3-bf0b-4cc5-a845-a0b2cf11f690'
+m365 entra pim role assignment add --roleDefinitionId 'f1417aa3-bf0b-4cc5-a845-a0b2cf11f690'
 ```
 
 Request activation of an Entra ID role assignment for the current user with a justification and max duration of 4 hours.
 
 ```sh
-m365 entra pim roleassignment add --roleDefinitionId 'f1417aa3-bf0b-4cc5-a845-a0b2cf11f690' --justification 'Need Global Admin to release application xyz to production' --duration 'PT4H'
+m365 entra pim role assignment add --roleDefinitionId 'f1417aa3-bf0b-4cc5-a845-a0b2cf11f690' --justification 'Need Global Admin to release application xyz to production' --duration 'PT4H'
 ```
 
 Request activation of an Entra ID role assignment for a specified user with tenant scope.
 
 ```sh
-m365 entra pim roleassignment add --roleDefinitionId 'f1417aa3-bf0b-4cc5-a845-a0b2cf11f690' --userId '3488d6b8-6b2e-41c3-9583-1991205323c2' --directoryScopeId '/'
+m365 entra pim role assignment add --roleDefinitionId 'f1417aa3-bf0b-4cc5-a845-a0b2cf11f690' --userId '3488d6b8-6b2e-41c3-9583-1991205323c2' --directoryScopeId '/'
 ```
 
 Request activation of the User Administrator Entra ID role assignment for a specified group with administrative unit scope.
 
 ```sh
-m365 entra pim roleassignment add --roleDefinitionName 'User Administrator' --groupId '3488d6b8-6b2e-41c3-9583-1991205323c2' --directoryScopeId '/administrativeUnits/03c4c9dc-6f0c-4c4f-a4e6-0c9ed80f54c7'
+m365 entra pim role assignment add --roleDefinitionName 'User Administrator' --groupId '3488d6b8-6b2e-41c3-9583-1991205323c2' --directoryScopeId '/administrativeUnits/03c4c9dc-6f0c-4c4f-a4e6-0c9ed80f54c7'
 ```
 
 Request activation of the Application Administrator Entra ID role assignment for a specified group with scope to a specific application.
 
 ```sh
-m365 entra pim roleassignment add --roleDefinitionName 'Application Administrator' --groupName 'Applications admins' --directoryScopeId '/03c4c9dc-6f0c-4c4f-a4e6-0c9ed80f54c7'
+m365 entra pim role assignment add --roleDefinitionName 'Application Administrator' --groupName 'Applications admins' --directoryScopeId '/03c4c9dc-6f0c-4c4f-a4e6-0c9ed80f54c7'
 ```
 
 Request activation of an Entra ID role assignment for a specific period of two days.
 
 ```sh
-m365 entra pim roleassignment add --roleDefinitionName 'Global Administrator' --userName 'admin-john@contoso.com' --startDateTime '2024-01-10T09:00:00Z' --endDateTime '2024-01-11T17:00:00Z'
+m365 entra pim role assignment add --roleDefinitionName 'Global Administrator' --userName 'admin-john@contoso.com' --startDateTime '2024-01-10T09:00:00Z' --endDateTime '2024-01-11T17:00:00Z'
 ```
 
 ## Response
