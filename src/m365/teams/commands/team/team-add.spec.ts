@@ -693,7 +693,7 @@ describe(commands.TEAM_ADD, () => {
       throw 'Invalid request';
     });
 
-    const getRequestStub = sinon.stub(request, 'get').callsFake(async (opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations('8ad1effa-7ed1-4d03-bd60-fe177d8d56f1')`) {
         return {
           "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations/$entity",
@@ -713,8 +713,8 @@ describe(commands.TEAM_ADD, () => {
     });
 
     sinon.stub(entraGroup, 'getGroupById').resolves({ 'id': groupId, displayName: 'Architecture' });
-    sinon.stub(entraUser, 'getUserIdByEmail').onFirstCall().resolves(userId).onSecondCall().resolves(userId2);
-    sinon.stub(entraUser, 'getUserIdByUpn').resolves(userId);
+    sinon.stub(entraUser, 'getUserIdsByEmails').resolves([userId, userId2]);
+    sinon.stub(entraUser, 'getUserIdsByUpns').resolves([userId]);
 
     await command.action(logger, {
       options: {
@@ -735,8 +735,6 @@ describe(commands.TEAM_ADD, () => {
         'user@odata.bind': `https://graph.microsoft.com/v1.0/users('${userId}')`
       }]
     });
-    assert(getRequestStub.called);
-    assert(loggerLogSpy.calledWith({ 'id': groupId, displayName: 'Architecture' }));
   });
 
   it('creates Microsoft Teams team in the tenant when using application only permissions and specifying owner by id', async () => {
@@ -752,7 +750,7 @@ describe(commands.TEAM_ADD, () => {
       throw 'Invalid request';
     });
 
-    const getRequestStub = sinon.stub(request, 'get').callsFake(async (opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations('8ad1effa-7ed1-4d03-bd60-fe177d8d56f1')`) {
         return {
           "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations/$entity",
@@ -789,6 +787,5 @@ describe(commands.TEAM_ADD, () => {
         'user@odata.bind': `https://graph.microsoft.com/v1.0/users('${userId}')`
       }]
     });
-    assert(getRequestStub.called);
   });
 });

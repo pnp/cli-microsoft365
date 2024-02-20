@@ -10,6 +10,7 @@ import { validation } from '../../../../utils/validation.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 import auth from '../../../../Auth.js';
 import { entraUser } from '../../../../utils/entraUser.js';
+import { formatting } from '../../../../utils/formatting.js';
 
 interface CommandArgs {
   options: Options;
@@ -104,38 +105,38 @@ class TeamsTeamAddCommand extends GraphCommand {
     this.validators.push(
       async (args: CommandArgs) => {
         if (args.options.ownerUserNames) {
-          const isValidUserPrincipalNameArray = validation.isValidUserPrincipalNameArray(args.options.ownerUserNames.split(',').map(u => u.trim()));
+          const isValidUserPrincipalNameArray = validation.isValidUserPrincipalNameArray(formatting.splitAndTrim(args.options.ownerUserNames));
           if (isValidUserPrincipalNameArray !== true) {
             return `Owner username '${isValidUserPrincipalNameArray}' is invalid for option 'ownerUserNames'.`;
           }
         }
 
         if (args.options.ownerEmails) {
-          const isValidUserPrincipalNameArray = validation.isValidUserPrincipalNameArray(args.options.ownerEmails.split(',').map(u => u.trim()));
+          const isValidUserPrincipalNameArray = validation.isValidUserPrincipalNameArray(formatting.splitAndTrim(args.options.ownerEmails));
           if (isValidUserPrincipalNameArray !== true) {
             return `Owner email '${isValidUserPrincipalNameArray}' is invalid for option 'ownerEmails'.`;
           }
         }
 
-        if (args.options.ownerIds && !validation.isValidGuidArray(args.options.ownerIds.split(','))) {
+        if (args.options.ownerIds && !validation.isValidGuidArray(formatting.splitAndTrim(args.options.ownerIds))) {
           return `The option 'ownerIds' contains one or more invalid GUIDs.`;
         }
 
         if (args.options.memberUserNames) {
-          const isValidUserPrincipalNameArray = validation.isValidUserPrincipalNameArray(args.options.memberUserNames.split(',').map(u => u.trim()));
+          const isValidUserPrincipalNameArray = validation.isValidUserPrincipalNameArray(formatting.splitAndTrim(args.options.memberUserNames));
           if (isValidUserPrincipalNameArray !== true) {
             return `Member username '${isValidUserPrincipalNameArray}' is invalid for option 'memberUserNames'.`;
           }
         }
 
         if (args.options.memberEmails) {
-          const isValidUserPrincipalNameArray = validation.isValidUserPrincipalNameArray(args.options.memberEmails.split(',').map(u => u.trim()));
+          const isValidUserPrincipalNameArray = validation.isValidUserPrincipalNameArray(formatting.splitAndTrim(args.options.memberEmails));
           if (isValidUserPrincipalNameArray !== true) {
             return `Member email '${isValidUserPrincipalNameArray}' is invalid for option 'memberEmails'.`;
           }
         }
 
-        if (args.options.memberIds && !validation.isValidGuidArray(args.options.memberIds.split(','))) {
+        if (args.options.memberIds && !validation.isValidGuidArray(formatting.splitAndTrim(args.options.memberIds))) {
           return `The option 'memberIds' contains one or more invalid GUIDs`;
         }
 
@@ -216,14 +217,15 @@ class TeamsTeamAddCommand extends GraphCommand {
     let members: TeamMember[] = [];
 
     if (args.options.ownerEmails || args.options.ownerIds || args.options.ownerUserNames) {
-      members = await this.retrieveMembersToAdd(members, 'owner', args.options.ownerEmails, args.options.ownerIds, args.options.ownerUserNames);
+      await this.retrieveMembersToAdd(members, 'owner', args.options.ownerEmails, args.options.ownerIds, args.options.ownerUserNames);
     }
 
     if (args.options.memberEmails || args.options.memberIds || args.options.memberUserNames) {
-      members = await this.retrieveMembersToAdd(members, 'member', args.options.memberEmails, args.options.memberIds, args.options.memberUserNames);
+      await this.retrieveMembersToAdd(members, 'member', args.options.memberEmails, args.options.memberIds, args.options.memberUserNames);
     }
 
-    if (members.length > 0 && members.filter(y => y.roles.includes('owner')).length > 0 && accessToken.isAppOnlyAccessToken(auth.service.accessTokens[this.resource].accessToken)) {
+    // We filter out the first owner here and add it to the request body when we are using application only permissions. This is required or the Graph API will throw an error.
+    if (members.length > 0 && members.filter(y => y.roles.includes('owner')).length > 0 && isAppOnlyAccessToken) {
       const groupOwner = members.filter(y => y.roles.includes('owner')).slice(0, 1);
       members = members.filter(y => y !== groupOwner[0]);
       requestBody.members = groupOwner;
@@ -321,27 +323,23 @@ class TeamsTeamAddCommand extends GraphCommand {
     return group!;
   }
 
-  private async retrieveMembersToAdd(members: TeamMember[], role: string, emails?: string, ids?: string, userNames?: string): Promise<any[]> {
+  private async retrieveMembersToAdd(members: TeamMember[], role: string, emails?: string, ids?: string, userNames?: string): Promise<void> {
     let itemsToProcess: string[] = [];
 
     if (emails) {
-      for (const email of emails.split(',')) {
-        const userId = await entraUser.getUserIdByEmail(email);
-        itemsToProcess.push(userId);
-      }
+      itemsToProcess = await entraUser.getUserIdsByEmails(formatting.splitAndTrim(emails));
     }
     else if (ids) {
-      itemsToProcess = ids.split(',');
+      itemsToProcess = formatting.splitAndTrim(ids);
     }
     else if (userNames) {
-      for (const un of userNames.split(',')) {
-        const userId = await entraUser.getUserIdByUpn(un);
-        itemsToProcess.push(userId);
-      }
+      itemsToProcess = await entraUser.getUserIdsByUpns(formatting.splitAndTrim(userNames));
     }
 
     itemsToProcess.map((item: string) => {
-      if (!members.some((y: TeamMember) => y['user@odata.bind'] === `https://graph.microsoft.com/v1.0/users('${item}')`)) {
+      const member = members.find((y: TeamMember) => y['user@odata.bind'] === `https://graph.microsoft.com/v1.0/users('${item}')`);
+
+      if (!member) {
         members.push({
           '@odata.type': '#microsoft.graph.aadUserConversationMember',
           'user@odata.bind': `https://graph.microsoft.com/v1.0/users('${item}')`,
@@ -349,12 +347,9 @@ class TeamsTeamAddCommand extends GraphCommand {
         });
       }
       else {
-        const returnObject = members.find((y: TeamMember) => y['user@odata.bind'] === `https://graph.microsoft.com/v1.0/users('${item}')`);
-        returnObject?.roles.push(role);
+        member.roles.push(role);
       }
     });
-
-    return members;
   }
 }
 
