@@ -139,7 +139,7 @@ class EntraUserRegistrationDetailsListCommand extends GraphCommand {
       async (args: CommandArgs) => {
         if (args.options.userType) {
           if (['member', 'guest'].every(type => type !== args.options.userType)) {
-            return `'${args.options.userType}' is not a valid userType value. Allowed values member|guest`;
+            return `'${args.options.userType}' is not a valid userType value. Allowed values member, guest`;
           }
         }
 
@@ -147,7 +147,7 @@ class EntraUserRegistrationDetailsListCommand extends GraphCommand {
           const methods = args.options.userPreferredMethodForSecondaryAuthentication.split(',').map(m => m.trim());
           const invalidMethods = methods.filter(m => !authenticationMethods.includes(m));
           if (invalidMethods.length > 0) {
-            return `'${args.options.userPreferredMethodForSecondaryAuthentication}' is not a valid userPreferredMethodForSecondaryAuthentication value. Invalid values: ${invalidMethods.join(',')}. Allowed values ${authenticationMethods.join('|')}`;
+            return `'${args.options.userPreferredMethodForSecondaryAuthentication}' is not a valid userPreferredMethodForSecondaryAuthentication value. Invalid values: ${invalidMethods.join(',')}. Allowed values ${authenticationMethods.join(', ')}`;
           }
         }
 
@@ -155,7 +155,7 @@ class EntraUserRegistrationDetailsListCommand extends GraphCommand {
           const methods = args.options.systemPreferredAuthenticationMethods.split(',').map(m => m.trim());
           const invalidMethods = methods.filter(m => !authenticationMethods.includes(m));
           if (invalidMethods.length > 0) {
-            return `'${args.options.systemPreferredAuthenticationMethods}' is not a valid systemPreferredAuthenticationMethods value. Invalid values: ${invalidMethods.join(',')}. Allowed values ${authenticationMethods.join('|')}`;
+            return `'${args.options.systemPreferredAuthenticationMethods}' is not a valid systemPreferredAuthenticationMethods value. Invalid values: ${invalidMethods.join(',')}. Allowed values ${authenticationMethods.join(', ')}`;
           }
         }
 
@@ -163,7 +163,7 @@ class EntraUserRegistrationDetailsListCommand extends GraphCommand {
           const methods = args.options.methodsRegistered.split(',').map(m => m.trim());
           const invalidMethods = methods.filter(m => !methodsRegistered.includes(m));
           if (invalidMethods.length > 0) {
-            return `'${args.options.methodsRegistered}' is not a valid methodsRegistered value. Invalid values: ${invalidMethods.join(',')}. Allowed values ${methodsRegistered.join('|')}`;
+            return `'${args.options.methodsRegistered}' is not a valid methodsRegistered value. Invalid values: ${invalidMethods.join(',')}. Allowed values ${methodsRegistered.join(', ')}`;
           }
         }
 
