@@ -92,7 +92,7 @@ describe(commands.USER_REGISTRATIONDETAILS_LIST, () => {
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
-    auth.service.connected = true;
+    auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
   });
 
@@ -122,7 +122,7 @@ describe(commands.USER_REGISTRATIONDETAILS_LIST, () => {
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
+    auth.connection.active = false;
   });
 
   it('has correct name', () => {
@@ -230,7 +230,7 @@ describe(commands.USER_REGISTRATIONDETAILS_LIST, () => {
 
   it('should get a filtered list of user registration details when bool options are set to true', async () => {
     const filter = 'isAdmin eq true and isMfaCapable eq true and isMfaRegistered eq true and isPasswordlessCapable eq true and isSelfServicePasswordResetCapable eq true ' +
-      'and isSelfServicePasswordResetEnabled eq true and isSelfServicePasswordResetRegistered eq true and isSystemPreferredAuthenticationMethodEnabled eq true ' + 
+      'and isSelfServicePasswordResetEnabled eq true and isSelfServicePasswordResetRegistered eq true and isSystemPreferredAuthenticationMethodEnabled eq true ' +
       `and (methodsRegistered/any(m:m eq 'fido2') or methodsRegistered/any(m:m eq 'microsoftAuthenticatorPush')) ` +
       `and (systemPreferredAuthenticationMethods/any(m:m eq 'oath') or systemPreferredAuthenticationMethods/any(m:m eq 'voiceMobile') or systemPreferredAuthenticationMethods/any(m:m eq 'push')) ` +
       `and (userPrincipalName eq '${formatting.encodeQueryParameter('joe.guest_external#EXT#@contoso.com')}' or userPrincipalName eq '${formatting.encodeQueryParameter('PradeepG@contoso.com')}' or userPrincipalName eq '${formatting.encodeQueryParameter('john.doe@contoso.com')}' or userPrincipalName eq '${formatting.encodeQueryParameter('adele.vance@contoso.com')}') ` +
@@ -267,7 +267,7 @@ describe(commands.USER_REGISTRATIONDETAILS_LIST, () => {
         isSelfServicePasswordResetRegistered: true,
         isMfaCapable: true,
         isMfaRegistered: true,
-        isPasswordlessCapable: true,        
+        isPasswordlessCapable: true,
         isSystemPreferredAuthenticationMethodEnabled: true,
         methodsRegistered: 'fido2, microsoftAuthenticatorPush',
         userIds: '7167b488-1ffb-43f1-9547-35969469bada, 6dcd4ce0-4f89-11d3-9a0c-0305e82c3302',
@@ -319,7 +319,7 @@ describe(commands.USER_REGISTRATIONDETAILS_LIST, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { } }),
+    await assert.rejects(command.action(logger, { options: {} }),
       new CommandError('Invalid request'));
   });
 });
