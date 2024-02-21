@@ -337,13 +337,13 @@ describe('cli', () => {
   it('shows message that command cannot be found when an unknown command is entered', async () => {
     const commandName = 'unknown';
     await cli.execute([commandName]);
-    assert(cliErrorStub.calledWith(`Command '${commandName}' not found. Please find a list of available commands below.`));
+    assert(cliErrorStub.calledWith(chalk.red(`Command '${cli.currentCommandName}' was not found. Below you can find the commands and command groups you can use. For detailed information on a command group, use 'm365 [command group] --help'.`)));
   });
 
-  it('shows message that command cannot be found when a uncompleted command is entered', async () => {
-    const commandName = 'spo site';
+  it('does not show message that command cannot be found when a uncompleted command is entered', async () => {
+    const commandName = 'cli mock';
     await cli.execute([commandName]);
-    assert(cliErrorStub.calledWith(`Command '${commandName}' not found. Please find a list of available commands below.`));
+    assert(cliErrorStub.notCalled);
   });
 
   it('exits with 0 code when no command specified', async () => {
