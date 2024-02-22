@@ -14,7 +14,7 @@ m365 spo site recyclebinitem restore [options]
 
 ```md definition-list
 `-u, --siteUrl <siteUrl>`
-: URL of the site for which to restore the recycle bin items.
+: URL of the site.
 
 `-i, --ids [ids]`
 : List of ids of items which will be restored from the site recycle bin. Specify `ids` or `allPrimary` and/or `allSecondary`.
@@ -36,19 +36,19 @@ Restore specific items by given ids from recycle bin of given site.
 m365 spo site recyclebinitem restore --siteUrl https://contoso.sharepoint.com/sites/project --ids "ae6f97a7-280e-48d6-b481-0ea986c323da,aadbf916-1f71-42ee-abf2-8ee4802ae291"
 ```
 
-Restore all items from the first-stage recycle bin of given site.
+Restore all items from the first-stage recycle bin of a given site.
 
 ```sh
 m365 spo site recyclebinitem restore --siteUrl https://contoso.sharepoint.com/sites/project --allPrimary
 ```
 
-Restore all items from the second-stage recycle bin of given site.
+Restore all items from the second-stage recycle bin of a given site.
 
 ```sh
 m365 spo site recyclebinitem restore --siteUrl https://contoso.sharepoint.com --allSecondary
 ```
 
-Restore all items from both the first-stage and second-stage recycle bins of given site.
+Restore all items from both the first-stage and second-stage recycle bins of a given site.
 
 ```sh
 m365 spo site recyclebinitem restore --siteUrl https://contoso.sharepoint.com --allPrimary --allSecondary
