@@ -1525,7 +1525,7 @@ export const spo = {
 
   /**
   * Updates a list item with system update
-  * @param requestUrl The base URL without query parameters, pointing to the specific list where the item resides. This URL should represent the list.
+  * @param absoluteListUrl The absolute base URL without query parameters, pointing to the specific list where the item resides. This URL should represent the list.
   * @param itemId The id of the list item
   * @param properties An object of the properties that should be updated
   * @param contentTypeName The name of the content type to update
@@ -1533,14 +1533,14 @@ export const spo = {
   * @param verbose If in verbose mode
   * @returns The updated list item object
   */
-  async systemUpdateListItem(requestUrl: string, itemId: string, logger: Logger, verbose: boolean, properties?: object, contentTypeName?: string): Promise<ListItemInstance> {
+  async systemUpdateListItem(absoluteListUrl: string, itemId: string, logger: Logger, verbose: boolean, properties?: object, contentTypeName?: string): Promise<ListItemInstance> {
     if (!properties && !contentTypeName) {
       // Neither properties nor contentTypeName provided, no need to proceed
       throw 'Either properties or contentTypeName must be provided for systemUpdateListItem.';
     }
 
-    const parsedUrl = new URL(requestUrl);
-    const serverRelativeSiteMatch = requestUrl.match(new RegExp('/sites/[^/]+'));
+    const parsedUrl = new URL(absoluteListUrl);
+    const serverRelativeSiteMatch = absoluteListUrl.match(new RegExp('/sites/[^/]+'));
     const webUrl = `${parsedUrl.protocol}//${parsedUrl.host}${serverRelativeSiteMatch ?? ''}`;
 
     if (verbose && logger) {
@@ -1548,7 +1548,7 @@ export const spo = {
     }
 
     const listRequestOptions: CliRequestOptions = {
-      url: `${requestUrl}?$select=Id`,
+      url: `${absoluteListUrl}?$select=Id`,
       headers: {
         'accept': 'application/json;odata=nometadata'
       },
@@ -1614,7 +1614,7 @@ export const spo = {
     const id = Number(itemId);
 
     const requestOptionsItems: CliRequestOptions = {
-      url: `${requestUrl}/items(${id})`,
+      url: `${absoluteListUrl}/items(${id})`,
       headers: {
         'accept': 'application/json;odata=nometadata'
       },
@@ -1776,7 +1776,7 @@ export const spo = {
 
     const identityObject = json.find(x => { return x._ObjectIdentity_; });
     if (identityObject) {
-      return identityObject['_ObjectIdentity_'];
+      return identityObject._ObjectIdentity_;
     }
 
     throw 'Cannot proceed. _ObjectIdentity_ not found'; // this is not supposed to happen
