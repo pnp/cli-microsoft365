@@ -2806,6 +2806,11 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
+              label: 'listitem batch remove',
+              id: 'cmd/spo/listitem/listitem-batch-remove'
+            },
+            {
+              type: 'doc',
               label: 'listitem batch set',
               id: 'cmd/spo/listitem/listitem-batch-set'
             },
