@@ -1405,7 +1405,7 @@ describe('cli', () => {
     assert(cliLogStub.calledWith('  cli mock *        5 commands'));
   });
 
-  it(`prints commands from the root group when the specified string doesn't match any group`, async () => {
+  it(`prints commands from the root group when the specified string doesn't match any group`, () => {
     cli.loadCommandFromArgs(['status']);
     cli.loadCommandFromArgs(['spo', 'site', 'list']);
     cli.optionsFromArgs = {
