@@ -63,7 +63,7 @@ describe('FileTokenStorage', () => {
     };
     let actual: string = '';
     sinon.stub(fs, 'existsSync').returns(false);
-    sinon.stub(fs, 'writeFile').callsFake((path, token) => { actual = token as string; }).callsArgWith(3, null);
+    sinon.stub(fs, 'writeFile').callsFake((_, token) => { actual = token as string; }).callsArgWith(3, null);
     await fileStorage.set(JSON.stringify(expected));
     assert.strictEqual(actual, JSON.stringify(expected));
   });
