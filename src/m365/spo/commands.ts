@@ -165,6 +165,7 @@ export default {
   LISTITEM_ATTACHMENT_REMOVE: `${prefix} listitem attachment remove`,
   LISTITEM_ATTACHMENT_SET: `${prefix} listitem attachment set`,
   LISTITEM_BATCH_ADD: `${prefix} listitem batch add`,
+  LISTITEM_BATCH_REMOVE: `${prefix} listitem batch remove`,
   LISTITEM_BATCH_SET: `${prefix} listitem batch set`,
   LISTITEM_GET: `${prefix} listitem get`,
   LISTITEM_ISRECORD: `${prefix} listitem isrecord`,
