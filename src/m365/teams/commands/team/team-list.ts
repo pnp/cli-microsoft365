@@ -123,7 +123,7 @@ class TeamsTeamListCommand extends GraphCommand {
     try {
       let endpoint = `${this.resource}/v1.0`;
       if (args.options.joined || args.options.associated) {
-        if (!args.options.userId && !args.options.userName && accessToken.isAppOnlyAccessToken(auth.service.accessTokens[this.resource].accessToken)) {
+        if (!args.options.userId && !args.options.userName && accessToken.isAppOnlyAccessToken(auth.connection.accessTokens[this.resource].accessToken)) {
           throw `You must specify either userId or userName when using application only permissions and specifying the ${args.options.joined ? 'joined' : 'associated'} option`;
         }
 
