@@ -181,7 +181,7 @@ class EntraM365GroupSetCommand extends GraphCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
-      if ((args.options.allowExternalSenders !== undefined || args.options.autoSubscribeNewMembers !== undefined) && accessToken.isAppOnlyAccessToken(auth.service.accessTokens[this.resource].accessToken)) {
+      if ((args.options.allowExternalSenders !== undefined || args.options.autoSubscribeNewMembers !== undefined) && accessToken.isAppOnlyAccessToken(auth.connection.accessTokens[this.resource].accessToken)) {
         throw `Option 'allowExternalSenders' and 'autoSubscribeNewMembers' can only be used with delegated permissions.`;
       }
 
