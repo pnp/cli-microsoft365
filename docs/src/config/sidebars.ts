@@ -552,6 +552,15 @@ const sidebars: SidebarsConfig = {
           ]
         },
         {
+          pim: [
+            {
+              type: 'doc',
+              label: 'pim role assignment list',
+              id: 'cmd/entra/pim/pim-role-assignment-list'
+            }
+          ]
+        },
+        {
           policy: [
             {
               type: 'doc',
