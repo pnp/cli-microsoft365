@@ -175,7 +175,7 @@ class TeamsTeamAddCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const isAppOnlyAccessToken = accessToken.isAppOnlyAccessToken(auth.service.accessTokens[this.resource].accessToken);
+    const isAppOnlyAccessToken = accessToken.isAppOnlyAccessToken(auth.connection.accessTokens[this.resource].accessToken)!;
 
     if (isAppOnlyAccessToken && !args.options.ownerUserNames && !args.options.ownerIds && !args.options.ownerEmails) {
       this.handleError(`Specify at least 'ownerUserNames', 'ownerIds' or 'ownerEmails' when using application permissions.`);
