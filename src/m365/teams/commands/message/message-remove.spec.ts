@@ -34,13 +34,15 @@ describe(commands.MESSAGE_REMOVE, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
-    auth.service.accessTokens[auth.defaultResource] = {
-      expiresOn: 'abc',
-      accessToken: 'abc'
-    };
     sinon.stub(team, 'getTeamId').resolves(teamId);
     sinon.stub(team, 'getChannelId').resolves(channelId);
-    auth.service.connected = true;
+    auth.connection.active = true;
+    if (!auth.connection.accessTokens[auth.defaultResource]) {
+      auth.connection.accessTokens[auth.defaultResource] = {
+        expiresOn: 'abc',
+        accessToken: 'abc'
+      };
+    }
     commandInfo = cli.getCommandInfo(command);
   });
 
@@ -74,7 +76,7 @@ describe(commands.MESSAGE_REMOVE, () => {
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
+    auth.connection.active = false;
   });
 
   it('has correct name', () => {
