@@ -194,7 +194,7 @@ class EntraPimRoleAssignmentAddCommand extends GraphCommand {
           await logger.logToStderr(`Retrieving id of the current user`);
         }
 
-        const token = auth.service.accessTokens[auth.defaultResource].accessToken;
+        const token = auth.connection.accessTokens[auth.defaultResource].accessToken;
         const isAppOnlyAccessToken = accessToken.isAppOnlyAccessToken(token);
         if (isAppOnlyAccessToken) {
           throw 'When running with application permissions either userId, userName, groupId or groupName is required';

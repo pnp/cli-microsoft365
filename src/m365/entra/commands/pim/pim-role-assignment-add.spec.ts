@@ -187,7 +187,7 @@ describe(commands.PIM_ROLE_ASSIGNMENT_ADD, () => {
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
-    auth.service.connected = true;
+    auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
   });
 
@@ -223,7 +223,7 @@ describe(commands.PIM_ROLE_ASSIGNMENT_ADD, () => {
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
+    auth.connection.active = false;
   });
 
   it('has correct name', () => {
@@ -466,7 +466,7 @@ describe(commands.PIM_ROLE_ASSIGNMENT_ADD, () => {
   });
 
   it('correctly requests activation of role specified by id for a current user', async () => {
-    auth.service.accessTokens[auth.defaultResource] = {
+    auth.connection.accessTokens[auth.defaultResource] = {
       expiresOn: '',
       accessToken: ''
     };
@@ -507,7 +507,7 @@ describe(commands.PIM_ROLE_ASSIGNMENT_ADD, () => {
   });
 
   it('fails activation of role specified by id for a current user when running as app', async () => {
-    auth.service.accessTokens[auth.defaultResource] = {
+    auth.connection.accessTokens[auth.defaultResource] = {
       expiresOn: '',
       accessToken: ''
     };
@@ -517,7 +517,7 @@ describe(commands.PIM_ROLE_ASSIGNMENT_ADD, () => {
   });
 
   it('throws an error during self activation when role assignment does not exist', async () => {
-    auth.service.accessTokens[auth.defaultResource] = {
+    auth.connection.accessTokens[auth.defaultResource] = {
       expiresOn: '',
       accessToken: ''
     };
