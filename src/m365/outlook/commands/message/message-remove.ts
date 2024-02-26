@@ -69,11 +69,11 @@ class OutlookMessageRemoveCommand extends GraphCommand {
     this.validators.push(
       async (args: CommandArgs) => {
         if (args.options.userId && !validation.isValidGuid(args.options.userId)) {
-          return `The value '${args.options.userId}' for 'userId' option is not a valid GUID`;
+          return `Value '${args.options.userId}' is not a valid GUID for option 'userId'.`;
         }
 
         if (args.options.userName && !validation.isValidUserPrincipalName(args.options.userName)) {
-          return `The value '${args.options.userName}' for 'userName' option is not a valid user principal name`;
+          return `Value '${args.options.userName}' is not a valid user principal name for option 'userName'.`;
         }
 
         return true;
@@ -83,40 +83,39 @@ class OutlookMessageRemoveCommand extends GraphCommand {
 
   #initTypes(): void {
     this.types.string.push('id', 'userId', 'userName');
+    this.types.boolean.push('force');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const isAppOnlyAccessToken: boolean | undefined = accessToken.isAppOnlyAccessToken(auth.service.accessTokens[this.resource].accessToken);
+    const isAppOnlyAccessToken: boolean | undefined = accessToken.isAppOnlyAccessToken(auth.connection.accessTokens[this.resource].accessToken);
     let principalUrl = '';
 
     if (isAppOnlyAccessToken) {
       if (!args.options.userId && !args.options.userName) {
-        throw `The option 'userId' or 'userName' is required when removing a message using application permissions`;
+        throw `The option 'userId' or 'userName' is required when removing a message using application permissions.`;
       }
 
       if (args.options.userId && args.options.userName) {
-        throw `Both options 'userId' and 'userName' cannot be set when removing a message using application permissions`;
+        throw `Both options 'userId' and 'userName' cannot be used together when removing a message using application permissions.`;
       }
-
-      principalUrl += `users/${args.options.userId || formatting.encodeQueryParameter(args.options.userName!)}`;
     }
     else {
       if (args.options.userId && args.options.userName) {
-        throw `Both options 'userId' and 'userName' cannot be set when removing a message using delegated permissions`;
+        throw `Both options 'userId' and 'userName' cannot be used together when removing a message using delegated permissions.`;
       }
+    }
 
-      if (args.options.userId || args.options.userName) {
-        principalUrl += `users/${args.options.userId || formatting.encodeQueryParameter(args.options.userName!) }`;
-      }
-      else {
-        principalUrl += 'me';
-      }
+    if (args.options.userId || args.options.userName) {
+      principalUrl += `users/${args.options.userId || formatting.encodeQueryParameter(args.options.userName!)}`;
+    }
+    else {
+      principalUrl += 'me';
     }
 
     const removeMessage = async (): Promise<void> => {
       try {
         if (this.verbose) {
-          await logger.logToStderr(`Removing message with id ${args.options.id} using ${isAppOnlyAccessToken ? 'application' : 'delegated'} permissions`);
+          await logger.logToStderr(`Removing message with 'id' ${args.options.id} using ${isAppOnlyAccessToken ? 'application' : 'delegated'} permissions.`);
         }
 
         const requestOptions: CliRequestOptions = {

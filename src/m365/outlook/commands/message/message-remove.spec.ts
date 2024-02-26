@@ -30,8 +30,8 @@ describe(commands.MESSAGE_REMOVE, () => {
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
-    auth.service.connected = true;
-    auth.service.accessTokens[auth.defaultResource] = {
+    auth.connection.active = true;
+    auth.connection.accessTokens[auth.defaultResource] = {
       expiresOn: 'abc',
       accessToken: 'abc'
     };
@@ -69,8 +69,8 @@ describe(commands.MESSAGE_REMOVE, () => {
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
-    auth.service.accessTokens = {};
+    auth.connection.active = false;
+    auth.connection.accessTokens = {};
   });
 
   it('has correct name', () => {
@@ -191,20 +191,20 @@ describe(commands.MESSAGE_REMOVE, () => {
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
 
     await assert.rejects(command.action(logger, { options: { id: messageId } } as any),
-      new CommandError(`The option 'userId' or 'userName' is required when removing a message using application permissions`));
+      new CommandError(`The option 'userId' or 'userName' is required when removing a message using application permissions.`));
   });
 
   it('throws an error when both userId and userName are defined when removing a message using application permissions', async () => {
     sinonUtil.restore([accessToken.isAppOnlyAccessToken]);
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
 
-    await assert.rejects(command.action(logger, { options: { id: messageId, userId: userId, userName: userPrincipalName } } as any),
-      new CommandError(`Both options 'userId' and 'userName' cannot be set when removing a message using application permissions`));
+    await assert.rejects(command.action(logger, { options: { id: messageId, userId: userId, userName: userPrincipalName } }),
+      new CommandError(`Both options 'userId' and 'userName' cannot be used together when removing a message using application permissions.`));
   });
 
   it('throws an error when both userId and userName are defined when removing a message using delegated permissions', async () => {
-    await assert.rejects(command.action(logger, { options: { id: messageId, userId: userId, userName: userPrincipalName } } as any),
-      new CommandError(`Both options 'userId' and 'userName' cannot be set when removing a message using delegated permissions`));
+    await assert.rejects(command.action(logger, { options: { id: messageId, userId: userId, userName: userPrincipalName } }),
+      new CommandError(`Both options 'userId' and 'userName' cannot be used together when removing a message using delegated permissions.`));
   });
 
   it('correctly handles API errors', async () => {
