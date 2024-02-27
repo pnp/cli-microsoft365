@@ -13,12 +13,21 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './message-list.js';
 import { settingsNames } from '../../../../settingsNames.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { accessToken } from '../../../../utils/accessToken.js';
 
 describe(commands.MESSAGE_LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  const folderId = 'AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OAAuAAAAAAAiQ8W967B7TKBjgx9rVEURAQAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAA=';
+  const folderName = 'Inbox';
+  const startTime = '2023-12-16';
+  const endTime = '2024-01-16';
+  const userId = 'fe36f75e-c103-410b-a18a-2bf6df06ac3a';
+  const userName = 'john@contoso.com';
+
   // #region emailResponse
   const emailResponse: any = {
     "value": [
@@ -354,6 +363,10 @@ describe(commands.MESSAGE_LIST, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
+    auth.connection.accessTokens[auth.defaultResource] = {
+      expiresOn: 'abc',
+      accessToken: 'abc'
+    };
     commandInfo = cli.getCommandInfo(command);
   });
 
@@ -372,19 +385,22 @@ describe(commands.MESSAGE_LIST, () => {
     };
     loggerLogSpy = sinon.spy(logger, 'log');
     (command as any).items = [];
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
   });
 
   afterEach(() => {
     sinonUtil.restore([
       request.get,
       cli.getSettingWithDefaultValue,
-      cli.handleMultipleResultsFound
+      cli.handleMultipleResultsFound,
+      accessToken.isAppOnlyAccessToken
     ]);
   });
 
   after(() => {
     sinon.restore();
     auth.connection.active = false;
+    auth.connection.accessTokens = {};
   });
 
   it('has correct name', () => {
@@ -399,9 +415,17 @@ describe(commands.MESSAGE_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['subject', 'receivedDateTime']);
   });
 
+  it('throws error when using application only permissions and not specifying userId or userName', async () => {
+    sinonUtil.restore(accessToken.isAppOnlyAccessToken);
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
+
+    await assert.rejects(command.action(logger, { options: {} } as any),
+      new CommandError('You must specify either the userId or userName option when using an app-only access token'));
+  });
+
   it('lists messages from the folder with name specified using well-known-name', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/me/mailFolders/inbox/messages?$top=50`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/me/mailFolders/inbox/messages`) {
         return emailResponse;
       }
 
@@ -414,7 +438,7 @@ describe(commands.MESSAGE_LIST, () => {
 
   it('lists messages from the folder with name specified using well-known-name (debug)', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/me/mailFolders/inbox/messages?$top=50`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/me/mailFolders/inbox/messages`) {
         return emailResponse;
       }
 
@@ -427,7 +451,7 @@ describe(commands.MESSAGE_LIST, () => {
 
   it('lists messages from the folder with id specified using well-known-name', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/me/mailFolders/inbox/messages?$top=50`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/me/mailFolders/inbox/messages`) {
         return emailResponse;
       }
 
@@ -440,7 +464,7 @@ describe(commands.MESSAGE_LIST, () => {
 
   it('lists messages from the folder with the specified name', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/me/mailFolders/AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OAAuAAAAAAAiQ8W967B7TKBjgx9rVEURAQAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAA=/messages?$top=50`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/me/mailFolders/AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OAAuAAAAAAAiQ8W967B7TKBjgx9rVEURAQAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAA=/messages`) {
         return emailResponse;
       }
       else if (opts.url === `https://graph.microsoft.com/v1.0/me/mailFolders?$filter=displayName eq 'Inbox'&$select=id`) {
@@ -462,7 +486,7 @@ describe(commands.MESSAGE_LIST, () => {
 
   it('lists messages from the folder with the specified id', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/me/mailFolders/AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OAAuAAAAAAAiQ8W967B7TKBjgx9rVEURAQAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAA=/messages?$top=50`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/me/mailFolders/AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OAAuAAAAAAAiQ8W967B7TKBjgx9rVEURAQAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAA=/messages`) {
         return emailResponse;
       }
 
@@ -470,6 +494,58 @@ describe(commands.MESSAGE_LIST, () => {
     });
 
     await command.action(logger, { options: { folderId: 'AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OAAuAAAAAAAiQ8W967B7TKBjgx9rVEURAQAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAA=' } });
+    assert(loggerLogSpy.calledWith(emailOutput));
+  });
+
+  it('lists messages from me endpoint', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/me/messages`) {
+        return emailResponse;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: {} });
+    assert(loggerLogSpy.calledWith(emailOutput));
+  });
+
+  it('lists messages from me endpoint with a specified startTime', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/me/messages?$filter=receivedDateTime ge ${formatting.encodeQueryParameter(startTime)}`) {
+        return emailResponse;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { startTime: startTime } });
+    assert(loggerLogSpy.calledWith(emailOutput));
+  });
+
+  it('lists messages from me endpoint with a specified endTime and specifying a user by id', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users/${userId}/messages?$filter=receivedDateTime le ${formatting.encodeQueryParameter(endTime)}`) {
+        return emailResponse;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { userId: userId, endTime: endTime } });
+    assert(loggerLogSpy.calledWith(emailOutput));
+  });
+
+  it('lists messages from me endpoint with a specified start and endTime and specifying a user by name', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users/${userName}/messages?$filter=receivedDateTime ge ${formatting.encodeQueryParameter(startTime)} and receivedDateTime le ${formatting.encodeQueryParameter(endTime)}`) {
+        return emailResponse;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { startTime: startTime, endTime: endTime, userName: userName } });
     assert(loggerLogSpy.calledWith(emailOutput));
   });
 
@@ -531,7 +607,7 @@ describe(commands.MESSAGE_LIST, () => {
         };
       }
 
-      if (opts.url === `https://graph.microsoft.com/v1.0/me/mailFolders/AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OAAuAAAAAAAiQ8W967B7TKBjgx9rVEURAQAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAA=/messages?$top=50`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/me/mailFolders/AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OAAuAAAAAAAiQ8W967B7TKBjgx9rVEURAQAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAA=/messages`) {
         return emailResponse;
       }
 
@@ -548,7 +624,7 @@ describe(commands.MESSAGE_LIST, () => {
 
   it('returns all message properties in JSON output mode', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/me/mailFolders/inbox/messages?$top=50`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/me/mailFolders/inbox/messages`) {
         return emailResponse;
       }
 
@@ -566,7 +642,44 @@ describe(commands.MESSAGE_LIST, () => {
       new CommandError('An error has occurred'));
   });
 
-  it('fails validation if neither folderId nor folderName are specified', async () => {
+  it('passes validation if both start and endTime are valid ISO datetimes', async () => {
+    const actual = await command.validate({ options: { startTime: startTime, endTime: endTime } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('fails validation if startTime is not a valid ISO datetime', async () => {
+    const actual = await command.validate({ options: { startTime: 'invalid' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if endTime is not a valid ISO datetime', async () => {
+    const actual = await command.validate({ options: { endTime: 'invalid' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if endTime is in the future', async () => {
+    const endTime = new Date();
+    endTime.setHours(endTime.getHours() + 1);
+    const actual = await command.validate({ options: { endTime: endTime.toISOString() } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if startTime is in the future', async () => {
+    const startTime = new Date();
+    startTime.setHours(startTime.getHours() + 1);
+    const actual = await command.validate({ options: { startTime: startTime.toISOString() } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if endTime is before startTime', async () => {
+    const startTime = new Date();
+    const endTime = new Date(startTime);
+    endTime.setTime(endTime.getTime() - 1);
+    const actual = await command.validate({ options: { startTime: startTime.toISOString(), endTime: endTime.toISOString() } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if both folderId and folderName are specified', async () => {
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
       if (settingName === settingsNames.prompt) {
         return false;
@@ -575,35 +688,27 @@ describe(commands.MESSAGE_LIST, () => {
       return defaultValue;
     });
 
-    const actual = await command.validate({ options: {} }, commandInfo);
+    const actual = await command.validate({ options: { folderId: folderId, folderName: folderName } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if both folderId nor folderName are specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { folderId: 'AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OAAuAAAAAAAiQ8W967B7TKBjgx9rVEURAQAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAA=', folderName: 'Inbox' } }, commandInfo);
+  it('fails validation if userId is not a valid GUID', async () => {
+    const actual = await command.validate({ options: { userId: 'invalid' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if folderId is specified', async () => {
-    const actual = await command.validate({ options: { folderId: 'AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OAAuAAAAAAAiQ8W967B7TKBjgx9rVEURAQAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAA=' } }, commandInfo);
+  it('fails validation if userName is not a valid user principal name', async () => {
+    const actual = await command.validate({ options: { userName: 'invalid' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('passes validation if userId is a valid GUID', async () => {
+    const actual = await command.validate({ options: { userId: userId } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if folderName is specified', async () => {
-    const actual = await command.validate({ options: { folderName: 'Inbox' } }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
-
-  it('passes validation if a well-known-name is specified as folderId', async () => {
-    const actual = await command.validate({ options: { folderId: 'inbox' } }, commandInfo);
+  it('passes validation if userName is a valid user principal name', async () => {
+    const actual = await command.validate({ options: { userName: userName } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 });
