@@ -16,7 +16,6 @@ import commands from '../../commands.js';
 import command from './threatassessment-add.js';
 
 describe(commands.THREATASSESSMENT_ADD, () => {
-
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;

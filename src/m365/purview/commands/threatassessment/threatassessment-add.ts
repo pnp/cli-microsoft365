@@ -120,7 +120,7 @@ class PurviewThreatAssessmentAddCommand extends GraphCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
 
-      if (accessToken.isAppOnlyAccessToken(auth.service.accessTokens[this.resource].accessToken)) {
+      if (accessToken.isAppOnlyAccessToken(auth.connection.accessTokens[this.resource].accessToken)) {
         throw 'This command currently does not support app only permissions.';
       }
 
