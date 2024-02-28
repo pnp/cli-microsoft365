@@ -7,7 +7,6 @@ import 'node-forge';
 import sinon from 'sinon';
 import { Auth, AuthType, CertificateType, CloudType, Connection, InteractiveAuthorizationCodeResponse, InteractiveAuthorizationErrorResponse } from './Auth.js';
 import authServer from './AuthServer.js';
-import { CommandError } from './Command.js';
 import { FileTokenStorage } from './auth/FileTokenStorage.js';
 import { TokenStorage } from './auth/TokenStorage.js';
 import { cli } from './cli/cli.js';
@@ -75,9 +74,9 @@ describe('Auth', () => {
   const base64EncodedPemCert = 'QmFnIEF0dHJpYnV0ZXMNCiAgICBsb2NhbEtleUlEOiBDQyBGNCBGMiBBMyBDMyBEMiAwOSBDNSAxMiBCMyA3MiA0QiBCOCA4MyBBNSA0NyA0QyAwOSAyMSBEQyANCnN1YmplY3Q9QyA9IEFVLCBTVCA9IFNvbWUtU3RhdGUsIE8gPSBJbnRlcm5ldCBXaWRnaXRzIFB0eSBMdGQNCg0KaXNzdWVyPUMgPSBBVSwgU1QgPSBTb21lLVN0YXRlLCBPID0gSW50ZXJuZXQgV2lkZ2l0cyBQdHkgTHRkDQoNCi0tLS0tQkVHSU4gQ0VSVElGSUNBVEUtLS0tLQ0KTUlJRGF6Q0NBbE9nQXdJQkFnSVVXb25VNFM0RTcxRjVZMU5zU0xYbUlhZ1dkNVl3RFFZSktvWklodmNOQVFFTA0KQlFBd1JURUxNQWtHQTFVRUJoTUNRVlV4RXpBUkJnTlZCQWdNQ2xOdmJXVXRVM1JoZEdVeElUQWZCZ05WQkFvTQ0KR0VsdWRHVnlibVYwSUZkcFpHZHBkSE1nVUhSNUlFeDBaREFlRncweE9UQTNNVEl5TVRVek1qbGFGdzB5TURBMw0KTVRFeU1UVXpNamxhTUVVeEN6QUpCZ05WQkFZVEFrRlZNUk13RVFZRFZRUUlEQXBUYjIxbExWTjBZWFJsTVNFdw0KSHdZRFZRUUtEQmhKYm5SbGNtNWxkQ0JYYVdSbmFYUnpJRkIwZVNCTWRHUXdnZ0VpTUEwR0NTcUdTSWIzRFFFQg0KQVFVQUE0SUJEd0F3Z2dFS0FvSUJBUUNsa01lQXlKbTJkMy95aEV0NHZGYjYrYjEyUGxRSDB4VGx1a1BoK2xScg0KOXJDNk5DM3dObnoySm5vbE1HclhuZVp2TlN5czFONVpSTm0yTjhQdy9QOExxeHJSenFFOFBNVC96NnN1UFhSUg0KWm5hZ2xaUklXb0NNR25pRVlDZVJHZnI4R2JpUXcwYlZEeXFuSnJaZjByS0pHbnZUNlY3QmpUdFloRWIzeXhoNA0KSmNUSnIrVDl0OEFYaldmemt6alBZdklxYmhha3FxcHd1SEVPYkh4T201cHVERTFBNVJOZm8wamcrTmZtVko5VQ0KMWR1RjVzdmE2NVQ5Q1RtdEdlbVNlUGlzWmgxZmhoOS94QmJwTCs0RUJWUXZqdEZXWk5zMVJHMW9QUllscmpzaQ0KTXFsaHNUdjhDZXI5cWUxcVNTdHFjMmJsc3hGek1zNmxZOHAvUHIrYm5uR3pBZ01CQUFHalV6QlJNQjBHQTFVZA0KRGdRV0JCU203cWFreXQwY2xxN0lnRFRWdkUrWEpaNFU5akFmQmdOVkhTTUVHREFXZ0JTbTdxYWt5dDBjbHE3SQ0KZ0RUVnZFK1hKWjRVOWpBUEJnTlZIUk1CQWY4RUJUQURBUUgvTUEwR0NTcUdTSWIzRFFFQkN3VUFBNElCQVFBYQ0KQnVqTytveU0yL0Q0SzNpS3lqVDVzbHF2UFVlVzFrZVVXYVdSVDZXRTY0VkFPbTlPZzU1bkIyOE5TSVVXampXMA0KdTJEUHF3SzJiOEFXalEveWp3S3NUMXVTdzcyQ0VEY2o3SkE1VXA5UWpBa0hIZmFoQWtOd0o5M0llcmFBdTEyVQ0KN25FRDdIN20yeGZscDVwM0dadzNHUE0rZmpBaDZLOUZIRDI0bWdGUTh4b2JPQSttVEVvV2ZIVVQrZ1pUMGxYdQ0KazFrVTJVelVOd2dwc3c4V04wNFFzWU5XcFF5d3ppUWtuZTQzNW5tdmxZOGZRc2hPSnErK0JCS0thd0xEcjk3bA0KRTBYQUxEZDZlVVhQenZ5OU1xZlozeUswRmUzMy8zbnZnUnE4QWZ3azRsbzhac2ZYWUlSTXA3b3BER0VmaUZmNQ0KM3JTTGxSZG9TNDQ4OVFZRnAyYUQNCi0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0NCkJhZyBBdHRyaWJ1dGVzDQogICAgbG9jYWxLZXlJRDogQ0MgRjQgRjIgQTMgQzMgRDIgMDkgQzUgMTIgQjMgNzIgNEIgQjggODMgQTUgNDcgNEMgMDkgMjEgREMgDQpLZXkgQXR0cmlidXRlczogPE5vIEF0dHJpYnV0ZXM+DQotLS0tLUJFR0lOIFBSSVZBVEUgS0VZLS0tLS0NCk1JSUV2Z0lCQURBTkJna3Foa2lHOXcwQkFRRUZBQVNDQktnd2dnU2tBZ0VBQW9JQkFRQ2xrTWVBeUptMmQzL3kNCmhFdDR2RmI2K2IxMlBsUUgweFRsdWtQaCtsUnI5ckM2TkMzd05uejJKbm9sTUdyWG5lWnZOU3lzMU41WlJObTINCk44UHcvUDhMcXhyUnpxRThQTVQvejZzdVBYUlJabmFnbFpSSVdvQ01HbmlFWUNlUkdmcjhHYmlRdzBiVkR5cW4NCkpyWmYwcktKR252VDZWN0JqVHRZaEViM3l4aDRKY1RKcitUOXQ4QVhqV2Z6a3pqUFl2SXFiaGFrcXFwd3VIRU8NCmJIeE9tNXB1REUxQTVSTmZvMGpnK05mbVZKOVUxZHVGNXN2YTY1VDlDVG10R2VtU2VQaXNaaDFmaGg5L3hCYnANCkwrNEVCVlF2anRGV1pOczFSRzFvUFJZbHJqc2lNcWxoc1R2OENlcjlxZTFxU1N0cWMyYmxzeEZ6TXM2bFk4cC8NClByK2Jubkd6QWdNQkFBRUNnZ0VBUjRsMytqZ3kybmxseWtiSlNXQ3ZnSCs2RWtZNkRxdHd3eFlwVUpIV09sUDcNCjVtaTNWS3htY0FFT0U5V0l4S05RTnNyV0E5TnlRMFlSZjc4MnBZRGJQcEp1NHlxUjFqSTN1SVJsWlhSZU52RzcNCjNnVGpiaVBVbVRTeTBCZXY0TzFGMmZuUEdwV1ZuR2VTT1dqcnNobWExTXlocGwyV2VMRHFiSU96R2t3aHhYOXkNClRhRFd5MjErbDFpNVNGWUZTdHdXOWlhOXRORTFTTTU4WnpQWk0yK0NDdHhQVEFBQXRJRmZXUVdTbnhodUxMenMNCjNyVDRVOGNLZzJITVBXb29rOS9peWxsa0xEVXBPanhJR2tHWXdheDVnR2xvR0xZYWVoelc5Q3hobzgvc3A4WjUNCkVNNVFvczVJSTF2K21pNHhHa0RTdW4rbDYzcDN5Nm54T3pqM1h1MzRlUUtCZ1FEUDNtRWttN2lVaTlhRUxweXYNCkIxeDFlRFR2UmEwcllZMHZUaXFrYzhyUGc0NU1uOUNWRWZqdnV3YkN4M21tTExabThqZVY3ZTFHWjZJeXYreEUNCmcxeFkrUTd0RUlCb1FwWThlemg0UVYvMXRkZkhiUzNPcGdIbHVqMGd5MWxqT2QrbkxzS2RNQWRlYVF3Uy9WK2MNCk51Sks0Y3oyQWl6UXU1dHQ4WHdoOGdvU0Z3S0JnUURMNXRjZnF0VmdMQWJmMnJQbEhBLzdNcU1sWGpqNUQ0ejkNCjZmTWlCVDdOWHlYUGx6a2pJQkxOdG9OWlBCVTFzeERFb2tiNUtyTlhLTUtIaU9nTkQ0cWtDYkdnRFk2WUdaS3cNCkg4bDlLWDBaM2pwcEp0TURvQ21yQW9hSmZTUXNreGJXSDd4VlFGVzdPVWQ0dHMxZ3FDbTBUTFVxeW9lcW1EK3INCmg3WFlaa2RxeFFLQmdBK2NpZnN2M3NyNVBhRXJ4d1MyTHRGN3Q2NElzNXJBZHRRSXNOY3RBeHhXcXdkQ01XNGcNCnJXdUR4bHcya3dKUjlWa0I4LzdFb2I5WjVTcWVrMllKMzVPbkVPSHBEVnZITkhWU1k4bFVUNXFxajR3Z3ZRSDYNCkljWlpHR0l3STRSNlFqdlNIVGVrOWNpM1p2cStJTUlndFJvZW4wQVNwYjcvZUFybnlnVGFvcnI5QW9HQkFJT3QNCllOSEhqaUtjYkJnV2NjU01tZGw4T3hXL3dvVTlRSzBkYjNGUjk5dkREWFVCVU5uWk5hdDVxVnR3VExZd0hLMFANCnEwdndBbjlRQ0VoazVvN0FzYVQ3eWFUMS9GZEhkSTZmQ0l6MnhSNTJnRHcxNFdIZkJlbTFLTk1UYU5BTWNWdjQNCmhMUjlacUFRL3BIN1k2aC9FT2VwL2ZsVGI4ZUFxT1dLTDZvL2F2R05Bb0dCQUlHc0c1VExuSmlPU044SUtGU04NCmJmK3IrNkhWL2R6MkluNjhSR255MTB0OGpwbUpPbGgrdXRncGtvOXI2Y09uWGY4VHM2SFAveTBtbDl5YXhvMlANCm52c2wwcFlseFQxQy9taXJaZWxYKzFaQTltdFpHT2RxbzZhdVZUM1drcXBpb3c2WUtzbzl2Z2RHWmRWRUxiMEINCnUvdyt4UjBvN21aSEpwVEdmS09KdE53MQ0KLS0tLS1FTkQgUFJJVkFURSBLRVktLS0tLQ0K';
   const base64EncodedPfxCert = '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';
   const tokenCache = {
-    getAllAccounts: () => Promise.resolve([{ localAccountId: identityId }]),
-    getAccountByLocalId: (localAccountId: string) => Promise.resolve({ localAccountId: localAccountId }),
-    removeAccount: () => Promise.resolve()
+    getAllAccounts: async () => { return [{ localAccountId: identityId }]; },
+    getAccountByLocalId: async (localAccountId: string) => { return { localAccountId: localAccountId }; },
+    removeAccount: async () => { return; }
   };
 
   const httpServerResponse = <InteractiveAuthorizationCodeResponse>{
@@ -155,17 +154,8 @@ describe('Auth', () => {
       accessToken: 'abc'
     };
 
-    auth.ensureAccessToken(resource, logger).then((accessToken) => {
-      try {
-        assert.strictEqual(accessToken, auth.connection.accessTokens[resource].accessToken);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    }, (err) => {
-      done(err);
-    });
+    const accessToken = await auth.ensureAccessToken(resource, logger);
+    assert.strictEqual(accessToken, auth.connection.accessTokens[resource].accessToken);
   });
 
   it('returns existing access token if still valid (debug)', async () => {
@@ -176,17 +166,8 @@ describe('Auth', () => {
       accessToken: 'abc'
     };
 
-    auth.ensureAccessToken(resource, logger, true).then((accessToken) => {
-      try {
-        assert.strictEqual(accessToken, auth.connection.accessTokens[resource].accessToken);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    }, (err) => {
-      done(err);
-    });
+    const accessToken = await auth.ensureAccessToken(resource, logger, true);
+    assert.strictEqual(accessToken, auth.connection.accessTokens[resource].accessToken);
   });
 
   it('returns existing access token if still valid (token stored as a Date)', async () => {
@@ -197,22 +178,13 @@ describe('Auth', () => {
       accessToken: 'abc'
     };
 
-    auth.ensureAccessToken(resource, logger).then((accessToken) => {
-      try {
-        assert.strictEqual(accessToken, auth.connection.accessTokens[resource].accessToken);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    }, (err) => {
-      done(err);
-    });
+    const accessToken = await auth.ensureAccessToken(resource, logger);
+    assert.strictEqual(accessToken, auth.connection.accessTokens[resource].accessToken);
   });
 
-  it('retrieves new access token silently if already signed in', (done) => {
-    sinon.stub(auth as any, 'getPublicClient').callsFake(_ => publicApplication);
-    const acquireTokenSilentStub = sinon.stub(publicApplication, 'acquireTokenSilent').callsFake(_ => Promise.resolve({
+  it('retrieves new access token silently if already signed in', async () => {
+    sinon.stub(auth as any, 'getPublicClient').returns(publicApplication);
+    const acquireTokenSilentStub = sinon.stub(publicApplication, 'acquireTokenSilent').resolves({
       expiresOn: new Date(),
       accessToken: 'abc'
     } as any);
@@ -221,9 +193,9 @@ describe('Auth', () => {
     assert(acquireTokenSilentStub.called);
   });
 
-  it('retrieves new access token silently if already signed in (debug)', (done) => {
-    sinon.stub(auth as any, 'getPublicClient').callsFake(_ => publicApplication);
-    const acquireTokenSilentStub = sinon.stub(publicApplication, 'acquireTokenSilent').callsFake(_ => Promise.resolve({
+  it('retrieves new access token silently if already signed in (debug)', async () => {
+    sinon.stub(auth as any, 'getPublicClient').returns(publicApplication);
+    const acquireTokenSilentStub = sinon.stub(publicApplication, 'acquireTokenSilent').resolves({
       expiresOn: new Date(),
       accessToken: 'abc'
     } as any);
@@ -232,9 +204,9 @@ describe('Auth', () => {
     assert(acquireTokenSilentStub.called);
   });
 
-  it('handles error when retrieving new access token silently', (done) => {
-    sinon.stub(auth as any, 'getPublicClient').callsFake(_ => publicApplication);
-    sinon.stub(publicApplication, 'acquireTokenSilent').callsFake(_ => Promise.reject('An error has occurred'));
+  it('handles error when retrieving new access token silently', async () => {
+    sinon.stub(auth as any, 'getPublicClient').returns(publicApplication);
+    sinon.stub(publicApplication, 'acquireTokenSilent').rejects('An error has occurred');
 
     try {
       await auth.ensureAccessToken(resource, logger);
@@ -245,9 +217,9 @@ describe('Auth', () => {
     }
   });
 
-  it('handles error when retrieving new access token silently (debug)', (done) => {
-    sinon.stub(auth as any, 'getPublicClient').callsFake(_ => publicApplication);
-    sinon.stub(publicApplication, 'acquireTokenSilent').callsFake(_ => Promise.reject({
+  it('handles error when retrieving new access token silently (debug)', async () => {
+    sinon.stub(auth as any, 'getPublicClient').returns(publicApplication);
+    sinon.stub(publicApplication, 'acquireTokenSilent').rejects({
       errorCode: 'error',
       errorMessage: 'AADSTS00000 An error has occurred'
     });
@@ -261,7 +233,7 @@ describe('Auth', () => {
     }
   });
 
-  it('handles failure response when retrieving new access token', (done) => {
+  it('handles failure response when retrieving new access token', async () => {
     auth.connection.certificate = base64EncodedPemCert;
     auth.connection.authType = AuthType.Certificate;
 
@@ -283,9 +255,9 @@ describe('Auth', () => {
     }
   });
 
-  it('handles empty response when retrieving new access token', (done) => {
-    sinon.stub(auth as any, 'getPublicClient').callsFake(_ => publicApplication);
-    sinon.stub(publicApplication, 'acquireTokenSilent').callsFake(_ => Promise.reject('An error has occurred'));
+  it('handles empty response when retrieving new access token', async () => {
+    sinon.stub(auth as any, 'getPublicClient').returns(publicApplication);
+    sinon.stub(publicApplication, 'acquireTokenSilent').rejects('An error has occurred');
 
     try {
       await auth.ensureAccessToken(resource, logger, true);
@@ -296,9 +268,9 @@ describe('Auth', () => {
     }
   });
 
-  it('shows AAD error when retrieving new access token silently failed', (done) => {
-    sinon.stub(auth as any, 'getPublicClient').callsFake(_ => publicApplication);
-    sinon.stub(publicApplication, 'acquireTokenSilent').callsFake(_ => Promise.reject({
+  it('shows AAD error when retrieving new access token silently failed', async () => {
+    sinon.stub(auth as any, 'getPublicClient').returns(publicApplication);
+    sinon.stub(publicApplication, 'acquireTokenSilent').rejects({
       errorCode: 'error',
       errorMessage: 'AADSTS00000 An error has occurred'
     });
@@ -315,10 +287,10 @@ describe('Auth', () => {
     }
   });
 
-  it('shows AAD error when invalid AAD app used', (done) => {
-    sinon.stub(auth as any, 'getPublicClient').callsFake(_ => publicApplication);
+  it('shows AAD error when invalid AAD app used', async () => {
+    sinon.stub(auth as any, 'getPublicClient').returns(publicApplication);
     sinon.stub(tokenCache, 'getAllAccounts').resolves([]);
-    sinon.stub(publicApplication, 'acquireTokenByDeviceCode').callsFake(_ => Promise.reject({
+    sinon.stub(publicApplication, 'acquireTokenByDeviceCode').rejects({
       errorCode: 'invalid_client',
       errorMessage: `AADSTS7000218: The request body must contain the following parameter: 'client_assertion' or 'client_secret'.`
     });
@@ -341,8 +313,8 @@ describe('Auth', () => {
       expiresOn: now.toISOString(),
       accessToken: 'abc'
     };
-    sinon.stub(auth as any, 'getPublicClient').callsFake(_ => publicApplication);
-    sinon.stub(publicApplication, 'acquireTokenSilent').callsFake(_ => Promise.resolve({
+    sinon.stub(auth as any, 'getPublicClient').returns(publicApplication);
+    sinon.stub(publicApplication, 'acquireTokenSilent').resolves({
       expiresOn: new Date(),
       accessToken: 'acc'
     } as any);
@@ -360,8 +332,8 @@ describe('Auth', () => {
       expiresOn: now.toISOString(),
       accessToken: 'abc'
     };
-    sinon.stub(auth as any, 'getPublicClient').callsFake(_ => publicApplication);
-    sinon.stub(publicApplication, 'acquireTokenSilent').callsFake(_ => Promise.resolve({
+    sinon.stub(auth as any, 'getPublicClient').returns(publicApplication);
+    sinon.stub(publicApplication, 'acquireTokenSilent').resolves({
       expiresOn: new Date(),
       accessToken: 'acc'
     } as any);
@@ -372,10 +344,10 @@ describe('Auth', () => {
 
   it('retrieves access token using device code authentication flow when no refresh token available and no authType specified', async () => {
     const config = cli.getConfig();
-    sinon.stub(config, 'get').callsFake((() => 'value'));
-    sinon.stub(auth as any, 'getPublicClient').callsFake(_ => publicApplication);
+    sinon.stub(config, 'get').returns('value');
+    sinon.stub(auth as any, 'getPublicClient').returns(publicApplication);
     sinon.stub(tokenCache, 'getAllAccounts').resolves([]);
-    sinon.stub(publicApplication, 'acquireTokenByDeviceCode').callsFake(_ => Promise.resolve({
+    sinon.stub(publicApplication, 'acquireTokenByDeviceCode').resolves({
       expiresOn: new Date(),
       accessToken: 'acc'
     } as any);
@@ -412,52 +384,52 @@ describe('Auth', () => {
 
   it('retrieves token using device code authentication flow when authType deviceCode specified', async () => {
     const config = cli.getConfig();
-    sinon.stub(config, 'get').callsFake((() => 'value'));
-    sinon.stub(auth as any, 'getPublicClient').callsFake(_ => publicApplication);
+    sinon.stub(config, 'get').returns('value');
+    sinon.stub(auth as any, 'getPublicClient').returns(publicApplication);
     sinon.stub(tokenCache, 'getAllAccounts').resolves([]);
-    const acquireTokenByDeviceCodeStub = sinon.stub(publicApplication, 'acquireTokenByDeviceCode').callsFake(_ => Promise.resolve({
+    const acquireTokenByDeviceCodeStub = sinon.stub(publicApplication, 'acquireTokenByDeviceCode').resolves({
       expiresOn: new Date(),
       accessToken: 'acc'
-    } as any));
+    } as any);
     auth.connection.authType = AuthType.DeviceCode;
 
     await auth.ensureAccessToken(resource, logger);
     assert(acquireTokenByDeviceCodeStub.called);
   });
 
-  it('retrieves token using password flow when authType password specified', (done) => {
-    sinon.stub(auth as any, 'getPublicClient').callsFake(_ => publicApplication);
+  it('retrieves token using password flow when authType password specified', async () => {
+    sinon.stub(auth as any, 'getPublicClient').returns(publicApplication);
     sinon.stub(tokenCache, 'getAllAccounts').resolves([]);
-    const acquireTokenByUsernamePasswordStub = sinon.stub(publicApplication, 'acquireTokenByUsernamePassword').callsFake(_ => Promise.resolve({
+    const acquireTokenByUsernamePasswordStub = sinon.stub(publicApplication, 'acquireTokenByUsernamePassword').resolves({
       expiresOn: new Date(),
       accessToken: 'acc'
-    } as any));
+    } as any);
     auth.connection.authType = AuthType.Password;
 
     await auth.ensureAccessToken(resource, logger);
     assert(acquireTokenByUsernamePasswordStub.called);
   });
 
-  it('retrieves token using password flow when authType password specified (debug)', (done) => {
-    sinon.stub(auth as any, 'getPublicClient').callsFake(_ => publicApplication);
+  it('retrieves token using password flow when authType password specified (debug)', async () => {
+    sinon.stub(auth as any, 'getPublicClient').returns(publicApplication);
     sinon.stub(tokenCache, 'getAllAccounts').resolves([]);
-    const acquireTokenByUsernamePasswordStub = sinon.stub(publicApplication, 'acquireTokenByUsernamePassword').callsFake(_ => Promise.resolve({
+    const acquireTokenByUsernamePasswordStub = sinon.stub(publicApplication, 'acquireTokenByUsernamePassword').resolves({
       expiresOn: new Date(),
       accessToken: 'acc'
-    } as any));
+    } as any);
     auth.connection.authType = AuthType.Password;
 
     await auth.ensureAccessToken(resource, logger, true);
     assert(acquireTokenByUsernamePasswordStub.called);
   });
 
-  it('handles error when retrieving token using password flow failed', (done) => {
-    sinon.stub(auth as any, 'getPublicClient').callsFake(_ => publicApplication);
+  it('handles error when retrieving token using password flow failed', async () => {
+    sinon.stub(auth as any, 'getPublicClient').returns(publicApplication);
     sinon.stub(tokenCache, 'getAllAccounts').resolves([]);
-    sinon.stub(publicApplication, 'acquireTokenByUsernamePassword').callsFake(_ => Promise.reject({
+    sinon.stub(publicApplication, 'acquireTokenByUsernamePassword').rejects({
       errorCode: 'error',
       errorMessage: `An error has occurred`
-    }));
+    });
     auth.connection.authType = AuthType.Password;
 
     try {
@@ -469,13 +441,13 @@ describe('Auth', () => {
     }
   });
 
-  it('uses browser auth and retrieves a successful response', (done) => {
-    sinon.stub(auth as any, 'getPublicClient').callsFake(_ => publicApplication);
+  it('uses browser auth and retrieves a successful response', async () => {
+    sinon.stub(auth as any, 'getPublicClient').returns(publicApplication);
     sinon.stub(tokenCache, 'getAllAccounts').resolves([]);
-    const acquireTokenByCodeStub = sinon.stub(publicApplication, 'acquireTokenByCode').callsFake(_ => Promise.resolve({
+    const acquireTokenByCodeStub = sinon.stub(publicApplication, 'acquireTokenByCode').resolves({
       expiresOn: new Date(),
       accessToken: 'acc'
-    } as any));
+    } as any);
     auth.connection.authType = AuthType.Browser;
 
     await auth.ensureAccessToken(resource, logger, false);
@@ -486,13 +458,13 @@ describe('Auth', () => {
     assert.deepStrictEqual(args.scopes, ['https://contoso.sharepoint.com/.default'], 'Incorrect scopes');
   });
 
-  it('uses browser auth and retrieves a successful response (debug)', (done) => {
-    sinon.stub(auth as any, 'getPublicClient').callsFake(_ => publicApplication);
+  it('uses browser auth and retrieves a successful response (debug)', async () => {
+    sinon.stub(auth as any, 'getPublicClient').returns(publicApplication);
     sinon.stub(tokenCache, 'getAllAccounts').resolves([]);
-    const acquireTokenByCodeStub = sinon.stub(publicApplication, 'acquireTokenByCode').callsFake(_ => Promise.resolve({
+    const acquireTokenByCodeStub = sinon.stub(publicApplication, 'acquireTokenByCode').resolves({
       expiresOn: new Date(),
       accessToken: 'acc'
-    } as any));
+    } as any);
     auth.connection.authType = AuthType.Browser;
 
     await auth.ensureAccessToken(resource, logger, true);
@@ -503,10 +475,10 @@ describe('Auth', () => {
     assert.deepStrictEqual(args.scopes, ['https://contoso.sharepoint.com/.default'], 'Incorrect scopes');
   });
 
-  it('uses browser auth and retrieves an unsuccessful response', (done) => {
-    sinon.stub(auth as any, 'getPublicClient').callsFake(_ => publicApplication);
+  it('uses browser auth and retrieves an unsuccessful response', async () => {
+    sinon.stub(auth as any, 'getPublicClient').returns(publicApplication);
     sinon.stub(tokenCache, 'getAllAccounts').resolves([]);
-    const acquireTokenByCodeStub = sinon.stub(publicApplication, 'acquireTokenByCode').callsFake(_ => Promise.resolve({
+    const acquireTokenByCodeStub = sinon.stub(publicApplication, 'acquireTokenByCode').resolves({
       expiresOn: new Date(),
       accessToken: 'acc'
     } as any);
@@ -517,7 +489,7 @@ describe('Auth', () => {
     };
 
     initializeServerStub.restore();
-    initializeServerStub = sinon.stub((auth as any)._authServer, 'initializeServer').callsFake(((connection: Connection, resource: string, resolve: (error: InteractiveAuthorizationCodeResponse) => void, reject: (error: InteractiveAuthorizationErrorResponse) => void) => {
+    initializeServerStub = sinon.stub((auth as any)._authServer, 'initializeServer').callsFake(((_: Connection, resource: string, resolve: (error: InteractiveAuthorizationCodeResponse) => void, reject: (error: InteractiveAuthorizationErrorResponse) => void) => {
       reject(error);
     }) as any);
     auth.connection.authType = AuthType.Browser;
@@ -532,10 +504,10 @@ describe('Auth', () => {
     }
   });
 
-  it('uses browser auth and retrieves an unsuccessful response (debug)', (done) => {
-    sinon.stub(auth as any, 'getPublicClient').callsFake(_ => publicApplication);
+  it('uses browser auth and retrieves an unsuccessful response (debug)', async () => {
+    sinon.stub(auth as any, 'getPublicClient').returns(publicApplication);
     sinon.stub(tokenCache, 'getAllAccounts').resolves([]);
-    const acquireTokenByCodeStub = sinon.stub(publicApplication, 'acquireTokenByCode').callsFake(_ => Promise.resolve({
+    const acquireTokenByCodeStub = sinon.stub(publicApplication, 'acquireTokenByCode').resolves({
       expiresOn: new Date(),
       accessToken: 'acc'
     } as any);
@@ -566,9 +538,9 @@ describe('Auth', () => {
       errorCode: 'error',
       errorMessage: `An error has occurred`
     };
-    sinon.stub(auth as any, 'getPublicClient').callsFake(_ => publicApplication);
+    sinon.stub(auth as any, 'getPublicClient').returns(publicApplication);
     sinon.stub(tokenCache, 'getAllAccounts').resolves([]);
-    sinon.stub(publicApplication, 'acquireTokenByCode').callsFake(_ => Promise.reject(error));
+    sinon.stub(publicApplication, 'acquireTokenByCode').rejects(error);
     auth.connection.authType = AuthType.Browser;
 
     try {
@@ -585,9 +557,9 @@ describe('Auth', () => {
       errorCode: 'error',
       errorMessage: `An error has occurred`
     };
-    sinon.stub(auth as any, 'getPublicClient').callsFake(_ => publicApplication);
+    sinon.stub(auth as any, 'getPublicClient').returns(publicApplication);
     sinon.stub(tokenCache, 'getAllAccounts').resolves([]);
-    sinon.stub(publicApplication, 'acquireTokenByCode').callsFake(_ => Promise.reject(error));
+    sinon.stub(publicApplication, 'acquireTokenByCode').rejects(error);
     auth.connection.authType = AuthType.Browser;
 
     try {
@@ -599,7 +571,7 @@ describe('Auth', () => {
     }
   });
 
-  it('retrieves token using certificate flow when authType certificate specified', (done) => {
+  it('retrieves token using certificate flow when authType certificate specified', async () => {
     auth.connection.certificate = base64EncodedPemCert;
     auth.connection.authType = AuthType.Certificate;
 
@@ -623,7 +595,7 @@ describe('Auth', () => {
     assert.strictEqual(actualThumbprint, "ccf4f2a3c3d209c512b3724bb883a5474c0921dc");
   });
 
-  it('retrieves token using certificate flow when authType certificate specified (debug)', (done) => {
+  it('retrieves token using certificate flow when authType certificate specified (debug)', async () => {
     auth.connection.certificate = base64EncodedPemCert;
     auth.connection.authType = AuthType.Certificate;
 
@@ -647,7 +619,7 @@ describe('Auth', () => {
     assert.strictEqual(actualThumbprint, "ccf4f2a3c3d209c512b3724bb883a5474c0921dc");
   });
 
-  it('retrieves token using certificate flow when authType certificate and thumbprint specified ', (done) => {
+  it('retrieves token using certificate flow when authType certificate and thumbprint specified ', async () => {
     auth.connection.certificate = base64EncodedPemCert;
     auth.connection.thumbprint = 'ccf4f2a3c3d209c512b3724bb883a5474c0921dc';
     auth.connection.authType = AuthType.Certificate;
@@ -672,7 +644,7 @@ describe('Auth', () => {
     assert.strictEqual(actualThumbprint, "ccf4f2a3c3d209c512b3724bb883a5474c0921dc");
   });
 
-  it('retrieves token using certificate flow when authType certificate and thumbprint specified (debug)', (done) => {
+  it('retrieves token using certificate flow when authType certificate and thumbprint specified (debug)', async () => {
     auth.connection.certificate = base64EncodedPemCert;
     auth.connection.thumbprint = 'ccf4f2a3c3d209c512b3724bb883a5474c0921dc';
     auth.connection.authType = AuthType.Certificate;
@@ -697,7 +669,7 @@ describe('Auth', () => {
     assert.strictEqual(actualThumbprint, "ccf4f2a3c3d209c512b3724bb883a5474c0921dc");
   });
 
-  it('retrieves token using PFX certificate flow when authType certificate specified', (done) => {
+  it('retrieves token using PFX certificate flow when authType certificate specified', async () => {
     auth.connection.password = 'pass@word1';
     auth.connection.certificate = base64EncodedPfxCert;
     auth.connection.authType = AuthType.Certificate;
@@ -724,7 +696,7 @@ describe('Auth', () => {
     assert.strictEqual(actualThumbprint, 'ccf4f2a3c3d209c512b3724bb883a5474c0921dc');
   });
 
-  it('retrieves token using PFX certificate flow when authType certificate specified (debug)', (done) => {
+  it('retrieves token using PFX certificate flow when authType certificate specified (debug)', async () => {
     auth.connection.authType = AuthType.Certificate;
     auth.connection.password = 'pass@word1';
     auth.connection.certificate = base64EncodedPfxCert;
@@ -751,7 +723,7 @@ describe('Auth', () => {
     assert.strictEqual(actualThumbprint, 'ccf4f2a3c3d209c512b3724bb883a5474c0921dc');
   });
 
-  it('retrieves token using certificate flow when authType certificate and certificateType specified ', (done) => {
+  it('retrieves token using certificate flow when authType certificate and certificateType specified ', async () => {
     auth.connection.authType = AuthType.Certificate;
     auth.connection.certificate = base64EncodedPemCert;
     auth.connection.certificateType = CertificateType.Base64;
@@ -773,7 +745,7 @@ describe('Auth', () => {
     assert(acquireTokenByClientCredentialStub.called);
   });
 
-  it('retrieves token using certificate flow when authType certificate and certificateType specified (debug)', (done) => {
+  it('retrieves token using certificate flow when authType certificate and certificateType specified (debug)', async () => {
     auth.connection.authType = AuthType.Certificate;
     auth.connection.certificate = base64EncodedPemCert;
     auth.connection.certificateType = CertificateType.Base64;
@@ -795,7 +767,7 @@ describe('Auth', () => {
     assert(acquireTokenByClientCredentialStub.called);
   });
 
-  it('retrieves token using PFX certificate flow when authType certificate and thumbprint specified', (done) => {
+  it('retrieves token using PFX certificate flow when authType certificate and thumbprint specified', async () => {
     auth.connection.authType = AuthType.Certificate;
     auth.connection.password = 'pass@word1';
     auth.connection.certificate = base64EncodedPfxCert;
@@ -822,7 +794,7 @@ describe('Auth', () => {
     assert.strictEqual(actualThumbprint, 'ccf4f2a3c3d209c512b3724bb883a5474c0921dc');
   });
 
-  it('retrieves token using PFX certificate flow when authType certificate and thumbprint specified (debug)', (done) => {
+  it('retrieves token using PFX certificate flow when authType certificate and thumbprint specified (debug)', async () => {
     auth.connection.authType = AuthType.Certificate;
     auth.connection.password = 'pass@word1';
     auth.connection.certificate = base64EncodedPfxCert;
@@ -849,7 +821,7 @@ describe('Auth', () => {
     assert.strictEqual(actualThumbprint, 'ccf4f2a3c3d209c512b3724bb883a5474c0921dc');
   });
 
-  it('retrieves token using PFX certificate flow when authType certificate and certificateType specified (debug)', (done) => {
+  it('retrieves token using PFX certificate flow when authType certificate and certificateType specified (debug)', async () => {
     auth.connection.authType = AuthType.Certificate;
     auth.connection.password = 'pass@word1';
     auth.connection.certificate = base64EncodedPfxCert;
@@ -876,7 +848,7 @@ describe('Auth', () => {
     assert.strictEqual(actualThumbprint, 'ccf4f2a3c3d209c512b3724bb883a5474c0921dc');
   });
 
-  it('handles error when PFX certificate flow when authType certificate specified (debug)', (done) => {
+  it('handles error when PFX certificate flow when authType certificate specified (debug)', async () => {
     auth.connection.authType = AuthType.Certificate;
     auth.connection.certificate = base64EncodedPfxCert;
     auth.connection.password = 'abc';
@@ -902,7 +874,7 @@ describe('Auth', () => {
     }
   });
 
-  it('handles error when retrieving token using certificate flow failed', (done) => {
+  it('handles error when retrieving token using certificate flow failed', async () => {
     auth.connection.authType = AuthType.Certificate;
     auth.connection.certificate = base64EncodedPemCert;
 
@@ -924,7 +896,7 @@ describe('Auth', () => {
     }
   });
 
-  it('logs error when retrieving token using certificate flow failed in debug mode', (done) => {
+  it('logs error when retrieving token using certificate flow failed in debug mode', async () => {
     auth.connection.authType = AuthType.Certificate;
     auth.connection.certificate = base64EncodedPemCert;
 
@@ -946,100 +918,67 @@ describe('Auth', () => {
     }
   });
 
-  it('calls api with correct params using system managed identity flow when authType identity and Azure VM api', (done) => {
-    const requestStub = sinon.stub(request, 'get').callsFake(() => {
-      return Promise.resolve({
-        "access_token": "eyJ0eXAiOiJKV1QiLCJ...",
-        "client_id": "a04566df-9a65-4e90-ae3d-574572a16423",
-        "expires_in": "86399",
-        "expires_on": "1587847593",
-        "ext_expires_in": "86399",
-        "not_before": "1587760893",
-        "resource": "https://contoso.sharepoint.com/",
-        "token_type": "Bearer"
-      });
+  it('calls api with correct params using system managed identity flow when authType identity and Azure VM api', async () => {
+    const requestStub = sinon.stub(request, 'get').resolves({
+      "access_token": "eyJ0eXAiOiJKV1QiLCJ...",
+      "client_id": "a04566df-9a65-4e90-ae3d-574572a16423",
+      "expires_in": "86399",
+      "expires_on": "1587847593",
+      "ext_expires_in": "86399",
+      "not_before": "1587760893",
+      "resource": "https://contoso.sharepoint.com/",
+      "token_type": "Bearer"
     });
 
     auth.connection.authType = AuthType.Identity;
     auth.connection.userName = undefined;
-    auth.ensureAccessToken(resource, logger, true).then(() => {
-      try {
-        assert.strictEqual(requestStub.lastCall.args[0].url, 'http://169.254.169.254/metadata/identity/oauth2/token?resource=https%3A%2F%2Fcontoso.sharepoint.com&api-version=2018-02-01');
-        assert.strictEqual((requestStub.lastCall.args[0] as any).headers.Metadata, true);
-        assert.strictEqual((requestStub.lastCall.args[0] as any).headers['x-anonymous'], true);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    }, (err) => {
-      done(err);
-    });
+    await auth.ensureAccessToken(resource, logger, true);
+    assert.strictEqual(requestStub.lastCall.args[0].url, 'http://169.254.169.254/metadata/identity/oauth2/token?resource=https%3A%2F%2Fcontoso.sharepoint.com&api-version=2018-02-01');
+    assert.strictEqual((requestStub.lastCall.args[0] as any).headers.Metadata, true);
+    assert.strictEqual((requestStub.lastCall.args[0] as any).headers['x-anonymous'], true);
   });
 
-  it('gets token using system managed identity flow when authType identity and Azure VM api', (done) => {
-    sinon.stub(request, 'get').callsFake(() => {
-      return Promise.resolve({
-        "access_token": "eyJ0eXAiOiJKV1QiLCJ...",
-        "client_id": "a04566df-9a65-4e90-ae3d-574572a16423",
-        "expires_in": "86399",
-        "expires_on": "1587847593",
-        "ext_expires_in": "86399",
-        "not_before": "1587760893",
-        "resource": "https://contoso.sharepoint.com/",
-        "token_type": "Bearer"
-      });
+  it('gets token using system managed identity flow when authType identity and Azure VM api', async () => {
+    sinon.stub(request, 'get').resolves({
+      "access_token": "eyJ0eXAiOiJKV1QiLCJ...",
+      "client_id": "a04566df-9a65-4e90-ae3d-574572a16423",
+      "expires_in": "86399",
+      "expires_on": "1587847593",
+      "ext_expires_in": "86399",
+      "not_before": "1587760893",
+      "resource": "https://contoso.sharepoint.com/",
+      "token_type": "Bearer"
     });
 
 
     auth.connection.authType = AuthType.Identity;
     auth.connection.userName = undefined;
-    auth.ensureAccessToken(resource, logger, true).then((accessToken) => {
-      try {
-        assert.strictEqual(accessToken, 'eyJ0eXAiOiJKV1QiLCJ...');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    }, (err) => {
-      done(err);
-    });
+    const accessToken = await auth.ensureAccessToken(resource, logger, true);
+    assert.strictEqual(accessToken, 'eyJ0eXAiOiJKV1QiLCJ...');
   });
 
-  it('calls api with correct params user-assigned managed identity flow when authType identity and client_id and Azure VM api', (done) => {
-    const requestStub = sinon.stub(request, 'get').callsFake(() => {
-      return Promise.resolve({
-        "access_token": "eyJ0eXAiOiJKV1QiLCJ...",
-        "client_id": "a04566df-9a65-4e90-ae3d-574572a16423",
-        "expires_in": "86399",
-        "expires_on": "1587847593",
-        "ext_expires_in": "86399",
-        "not_before": "1587760893",
-        "resource": "https://contoso.sharepoint.com/",
-        "token_type": "Bearer"
-      });
+  it('calls api with correct params user-assigned managed identity flow when authType identity and client_id and Azure VM api', async () => {
+    const requestStub = sinon.stub(request, 'get').resolves({
+      "access_token": "eyJ0eXAiOiJKV1QiLCJ...",
+      "client_id": "a04566df-9a65-4e90-ae3d-574572a16423",
+      "expires_in": "86399",
+      "expires_on": "1587847593",
+      "ext_expires_in": "86399",
+      "not_before": "1587760893",
+      "resource": "https://contoso.sharepoint.com/",
+      "token_type": "Bearer"
     });
 
     auth.connection.authType = AuthType.Identity;
     auth.connection.userName = 'a04566df-9a65-4e90-ae3d-574572a16423';
-    auth.ensureAccessToken(resource, logger, true).then(() => {
-      try {
-        assert.strictEqual(requestStub.lastCall.args[0].url, 'http://169.254.169.254/metadata/identity/oauth2/token?resource=https%3A%2F%2Fcontoso.sharepoint.com&api-version=2018-02-01&client_id=a04566df-9a65-4e90-ae3d-574572a16423');
-        assert.strictEqual((requestStub.lastCall.args[0] as any).headers.Metadata, true);
-        assert.strictEqual((requestStub.lastCall.args[0] as any).headers['x-anonymous'], true);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    }, (err) => {
-      done(err);
-    });
+    await auth.ensureAccessToken(resource, logger, true);
+    assert.strictEqual(requestStub.lastCall.args[0].url, 'http://169.254.169.254/metadata/identity/oauth2/token?resource=https%3A%2F%2Fcontoso.sharepoint.com&api-version=2018-02-01&client_id=a04566df-9a65-4e90-ae3d-574572a16423');
+    assert.strictEqual((requestStub.lastCall.args[0] as any).headers.Metadata, true);
+    assert.strictEqual((requestStub.lastCall.args[0] as any).headers['x-anonymous'], true);
   });
 
-  it('calls api with correct params user-assigned managed identity flow when authType identity and principal_id and Azure VM api', (done) => {
-    const requestStub = sinon.stub(request, 'get').callsFake((opts) => {
+  it('calls api with correct params user-assigned managed identity flow when authType identity and principal_id and Azure VM api', async () => {
+    const requestStub = sinon.stub(request, 'get').callsFake(async (opts) => {
 
       if ((opts.url as string).indexOf('&client_id=') !== -1) {
 
@@ -1060,23 +999,14 @@ describe('Auth', () => {
 
     auth.connection.authType = AuthType.Identity;
     auth.connection.userName = 'a04566df-9a65-4e90-ae3d-574572a16423';
-    auth.ensureAccessToken(resource, logger, true).then(() => {
-      try {
-        assert.strictEqual(requestStub.lastCall.args[0].url, 'http://169.254.169.254/metadata/identity/oauth2/token?resource=https%3A%2F%2Fcontoso.sharepoint.com&api-version=2018-02-01&principal_id=a04566df-9a65-4e90-ae3d-574572a16423');
-        assert.strictEqual((requestStub.lastCall.args[0] as any).headers.Metadata, true);
-        assert.strictEqual((requestStub.lastCall.args[0] as any).headers['x-anonymous'], true);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    }, (err) => {
-      done(err);
-    });
+    await auth.ensureAccessToken(resource, logger, true);
+    assert.strictEqual(requestStub.lastCall.args[0].url, 'http://169.254.169.254/metadata/identity/oauth2/token?resource=https%3A%2F%2Fcontoso.sharepoint.com&api-version=2018-02-01&principal_id=a04566df-9a65-4e90-ae3d-574572a16423');
+    assert.strictEqual((requestStub.lastCall.args[0] as any).headers.Metadata, true);
+    assert.strictEqual((requestStub.lastCall.args[0] as any).headers['x-anonymous'], true);
   });
 
-  it('retrieves token using user-assigned managed identity flow when authType identity and principal_id and Azure VM api', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+  it('retrieves token using user-assigned managed identity flow when authType identity and principal_id and Azure VM api', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
 
       if ((opts.url as string).indexOf('&client_id=') !== -1) {
 
@@ -1097,21 +1027,13 @@ describe('Auth', () => {
 
     auth.connection.authType = AuthType.Identity;
     auth.connection.userName = 'a04566df-9a65-4e90-ae3d-574572a16423';
-    auth.ensureAccessToken(resource, logger, true).then((accessToken) => {
-      try {
-        assert.strictEqual(accessToken, 'eyJ0eXAiOiJKV1QiLCJ...');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    }, (err) => {
-      done(err);
-    });
+    const accessToken = await auth.ensureAccessToken(resource, logger, true);
+
+    assert.strictEqual(accessToken, 'eyJ0eXAiOiJKV1QiLCJ...');
   });
 
-  it('handles error when using user-assigned managed identity flow when authType identity and principal_id and Azure VM api', (done) => {
-    const requestStub = sinon.stub(request, 'get').callsFake((opts) => {
+  it('handles error when using user-assigned managed identity flow when authType identity and principal_id and Azure VM api', async () => {
+    const requestStub = sinon.stub(request, 'get').callsFake(async (opts) => {
 
       if ((opts.url as string).indexOf('&client_id=') !== -1) {
 
@@ -1123,24 +1045,19 @@ describe('Auth', () => {
 
     auth.connection.authType = AuthType.Identity;
     auth.connection.userName = 'a04566df-9a65-4e90-ae3d-574572a16423';
-    auth.ensureAccessToken(resource, logger, true).then(() => {
-      done(new Error('something is wrong'));
-    }, (err) => {
-      try {
-        assert.strictEqual(requestStub.lastCall.args[0].url, 'http://169.254.169.254/metadata/identity/oauth2/token?resource=https%3A%2F%2Fcontoso.sharepoint.com&api-version=2018-02-01&principal_id=a04566df-9a65-4e90-ae3d-574572a16423');
-        assert.strictEqual((requestStub.lastCall.args[0] as any).headers.Metadata, true);
-        assert.strictEqual((requestStub.lastCall.args[0] as any).headers['x-anonymous'], true);
-        assert.strictEqual(err.error.error_description, 'Identity not found');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    try {
+      await auth.ensureAccessToken(resource, logger, true);
+    }
+    catch (err: any) {
+      assert.strictEqual(requestStub.lastCall.args[0].url, 'http://169.254.169.254/metadata/identity/oauth2/token?resource=https%3A%2F%2Fcontoso.sharepoint.com&api-version=2018-02-01&principal_id=a04566df-9a65-4e90-ae3d-574572a16423');
+      assert.strictEqual((requestStub.lastCall.args[0] as any).headers.Metadata, true);
+      assert.strictEqual((requestStub.lastCall.args[0] as any).headers['x-anonymous'], true);
+      assert.strictEqual(err.error.error_description, 'Identity not found');
+    }
   });
 
-  it('handles EACCES error when using user-assigned managed identity flow when authType identity and principal_id and Azure VM api', (done) => {
-    const requestStub = sinon.stub(request, 'get').callsFake((opts) => {
+  it('handles EACCES error when using user-assigned managed identity flow when authType identity and principal_id and Azure VM api', async () => {
+    const requestStub = sinon.stub(request, 'get').callsFake(async (opts) => {
 
       if ((opts.url as string).indexOf('&client_id=') !== -1) {
 
@@ -1152,87 +1069,61 @@ describe('Auth', () => {
 
     auth.connection.authType = AuthType.Identity;
     auth.connection.userName = 'a04566df-9a65-4e90-ae3d-574572a16423';
-    auth.ensureAccessToken(resource, logger, true).then(() => {
-      done(new Error('something is wrong'));
-    }, (err) => {
-      try {
-        assert.strictEqual(requestStub.lastCall.args[0].url, 'http://169.254.169.254/metadata/identity/oauth2/token?resource=https%3A%2F%2Fcontoso.sharepoint.com&api-version=2018-02-01&principal_id=a04566df-9a65-4e90-ae3d-574572a16423');
-        assert.strictEqual((requestStub.lastCall.args[0] as any).headers.Metadata, true);
-        assert.strictEqual((requestStub.lastCall.args[0] as any).headers['x-anonymous'], true);
-        assert.notStrictEqual(err.indexOf('Error while logging with Managed Identity. Please check if a Managed Identity is assigned to the current Azure resource.'), -1);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    try {
+      await auth.ensureAccessToken(resource, logger, true);
+    }
+    catch (err: any) {
+      assert.strictEqual(requestStub.lastCall.args[0].url, 'http://169.254.169.254/metadata/identity/oauth2/token?resource=https%3A%2F%2Fcontoso.sharepoint.com&api-version=2018-02-01&principal_id=a04566df-9a65-4e90-ae3d-574572a16423');
+      assert.strictEqual((requestStub.lastCall.args[0] as any).headers.Metadata, true);
+      assert.strictEqual((requestStub.lastCall.args[0] as any).headers['x-anonymous'], true);
+      assert.notStrictEqual(err.indexOf('Error while logging with Managed Identity. Please check if a Managed Identity is assigned to the current Azure resource.'), -1);
+    }
   });
 
   it('calls api with correct params using system managed identity flow when authType identity and Azure Function api', async () => {
     process.env.IDENTITY_ENDPOINT = 'http://127.0.0.1:41932/MSI/token/';
     process.env.IDENTITY_HEADER = 'AFBA957766234A0CA9F3B6FA3D9582C7';
-    const requestStub = sinon.stub(request, 'get').callsFake(() => {
-      return Promise.resolve({
-        "access_token": "eyJ0eXAiOiJKV1QiLCJ...",
-        "client_id": "a04566df-9a65-4e90-ae3d-574572a16423",
-        "expires_in": "86399",
-        "expires_on": "1587847593",
-        "ext_expires_in": "86399",
-        "not_before": "1587760893",
-        "resource": "https://contoso.sharepoint.com/",
-        "token_type": "Bearer"
-      });
+    const requestStub = sinon.stub(request, 'get').resolves({
+      "access_token": "eyJ0eXAiOiJKV1QiLCJ...",
+      "client_id": "a04566df-9a65-4e90-ae3d-574572a16423",
+      "expires_in": "86399",
+      "expires_on": "1587847593",
+      "ext_expires_in": "86399",
+      "not_before": "1587760893",
+      "resource": "https://contoso.sharepoint.com/",
+      "token_type": "Bearer"
     });
 
     auth.connection.authType = AuthType.Identity;
     auth.connection.userName = undefined;
-    auth.ensureAccessToken(resource, logger, true).then(() => {
-      try {
-        assert.strictEqual(requestStub.lastCall.args[0].url, 'http://127.0.0.1:41932/MSI/token/?resource=https%3A%2F%2Fcontoso.sharepoint.com&api-version=2019-08-01');
-        assert.strictEqual((requestStub.lastCall.args[0] as any).headers.Metadata, true);
-        assert.strictEqual((requestStub.lastCall.args[0] as any).headers['x-anonymous'], true);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    }, (err) => {
-      done(err);
-    });
+    await auth.ensureAccessToken(resource, logger, true);
+
+    assert.strictEqual(requestStub.lastCall.args[0].url, 'http://127.0.0.1:41932/MSI/token/?resource=https%3A%2F%2Fcontoso.sharepoint.com&api-version=2019-08-01');
+    assert.strictEqual((requestStub.lastCall.args[0] as any).headers.Metadata, true);
+    assert.strictEqual((requestStub.lastCall.args[0] as any).headers['x-anonymous'], true);
   });
 
   it('calls api with correct params using system managed identity flow when authType identity and Azure Cloud Shell api', async () => {
     process.env = {
       IDENTITY_ENDPOINT: 'http://localhost:50342/oauth2/token'
     };
-    const requestStub = sinon.stub(request, 'get').callsFake(() => {
-      return Promise.resolve({
-        "access_token": "eyJ0eXAiOiJKV1QiLCJ...",
-        "client_id": "a04566df-9a65-4e90-ae3d-574572a16423",
-        "expires_in": "86399",
-        "expires_on": "1587847593",
-        "ext_expires_in": "86399",
-        "not_before": "1587760893",
-        "resource": "https://contoso.sharepoint.com/",
-        "token_type": "Bearer"
-      });
+    const requestStub = sinon.stub(request, 'get').resolves({
+      "access_token": "eyJ0eXAiOiJKV1QiLCJ...",
+      "client_id": "a04566df-9a65-4e90-ae3d-574572a16423",
+      "expires_in": "86399",
+      "expires_on": "1587847593",
+      "ext_expires_in": "86399",
+      "not_before": "1587760893",
+      "resource": "https://contoso.sharepoint.com/",
+      "token_type": "Bearer"
     });
 
     auth.connection.authType = AuthType.Identity;
     auth.connection.userName = undefined;
-    auth.ensureAccessToken(resource, logger, true).then(() => {
-      try {
-        assert.strictEqual(requestStub.lastCall.args[0].url, 'http://localhost:50342/oauth2/token?resource=https%3A%2F%2Fcontoso.sharepoint.com');
-        assert.strictEqual((requestStub.lastCall.args[0] as any).headers.Metadata, true);
-        assert.strictEqual((requestStub.lastCall.args[0] as any).headers['x-anonymous'], true);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    }, (err) => {
-      done(err);
-    });
+    await auth.ensureAccessToken(resource, logger, true);
+    assert.strictEqual(requestStub.lastCall.args[0].url, 'http://localhost:50342/oauth2/token?resource=https%3A%2F%2Fcontoso.sharepoint.com');
+    assert.strictEqual((requestStub.lastCall.args[0] as any).headers.Metadata, true);
+    assert.strictEqual((requestStub.lastCall.args[0] as any).headers['x-anonymous'], true);
   });
 
   it('fails with error when authType identity and Azure Cloud Shell api and IDENTITY_ENDPOINT, but userName option specified', async () => {
@@ -1240,57 +1131,41 @@ describe('Auth', () => {
       IDENTITY_ENDPOINT: 'http://localhost:50342/oauth2/token',
       ACC_CLOUD: 'abc'
     };
-    sinon.stub(request, 'get').callsFake(() => {
-      return Promise.resolve();
-    });
+    sinon.stub(request, 'get').resolves();
 
     auth.connection.authType = AuthType.Identity;
     auth.connection.userName = 'abc';
-    auth.ensureAccessToken(resource, logger, true).then(() => {
-      done(new Error('something is wrong'));
-    }, (err) => {
-      try {
-        assert.notStrictEqual(err.indexOf('Azure Cloud Shell does not support user-managed identity. You can execute the command without the --userName option to login with user identity'), -1);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    try {
+      await auth.ensureAccessToken(resource, logger, true);
+
+    }
+    catch (err: any) {
+      assert.notStrictEqual(err.indexOf('Azure Cloud Shell does not support user-managed identity. You can execute the command without the --userName option to login with user identity'), -1);
+    }
   });
 
   it('calls api with correct params using MSI when authType identity and Azure Cloud Shell api', async () => {
     process.env = {
       MSI_ENDPOINT: 'http://localhost:50342/oauth2/token'
     };
-    const requestStub = sinon.stub(request, 'get').callsFake(() => {
-      return Promise.resolve({
-        "access_token": "eyJ0eXAiOiJKV1QiLCJ...",
-        "client_id": "a04566df-9a65-4e90-ae3d-574572a16423",
-        "expires_in": "86399",
-        "expires_on": "1587847593",
-        "ext_expires_in": "86399",
-        "not_before": "1587760893",
-        "resource": "https://contoso.sharepoint.com/",
-        "token_type": "Bearer"
-      });
+    const requestStub = sinon.stub(request, 'get').resolves({
+      "access_token": "eyJ0eXAiOiJKV1QiLCJ...",
+      "client_id": "a04566df-9a65-4e90-ae3d-574572a16423",
+      "expires_in": "86399",
+      "expires_on": "1587847593",
+      "ext_expires_in": "86399",
+      "not_before": "1587760893",
+      "resource": "https://contoso.sharepoint.com/",
+      "token_type": "Bearer"
     });
 
     auth.connection.authType = AuthType.Identity;
     auth.connection.userName = undefined;
-    auth.ensureAccessToken(resource, logger, true).then(() => {
-      try {
-        assert.strictEqual(requestStub.lastCall.args[0].url, 'http://localhost:50342/oauth2/token?resource=https%3A%2F%2Fcontoso.sharepoint.com');
-        assert.strictEqual((requestStub.lastCall.args[0] as any).headers.Metadata, true);
-        assert.strictEqual((requestStub.lastCall.args[0] as any).headers['x-anonymous'], true);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    }, (err) => {
-      done(err);
-    });
+    await auth.ensureAccessToken(resource, logger, true);
+
+    assert.strictEqual(requestStub.lastCall.args[0].url, 'http://localhost:50342/oauth2/token?resource=https%3A%2F%2Fcontoso.sharepoint.com');
+    assert.strictEqual((requestStub.lastCall.args[0] as any).headers.Metadata, true);
+    assert.strictEqual((requestStub.lastCall.args[0] as any).headers['x-anonymous'], true);
   });
 
   it('fails with error when authType identity and Azure Cloud Shell api and MSI_ENDPOINT, but userName option specified', async () => {
@@ -1298,87 +1173,63 @@ describe('Auth', () => {
       MSI_ENDPOINT: 'http://localhost:50342/oauth2/token',
       ACC_CLOUD: 'abc'
     };
-    sinon.stub(request, 'get').callsFake(() => {
-      return Promise.resolve();
-    });
+    sinon.stub(request, 'get').resolves();
 
     auth.connection.authType = AuthType.Identity;
     auth.connection.userName = 'abc';
-    auth.ensureAccessToken(resource, logger, true).then(() => {
-      done(new Error('something is wrong'));
-    }, (err) => {
-      try {
-        assert.notStrictEqual(err.indexOf('Azure Cloud Shell does not support user-managed identity. You can execute the command without the --userName option to login with user identity'), -1);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    try {
+      await auth.ensureAccessToken(resource, logger, true);
+    }
+    catch (err: any) {
+      assert.notStrictEqual(err.indexOf('Azure Cloud Shell does not support user-managed identity. You can execute the command without the --userName option to login with user identity'), -1);
+    }
   });
 
   it('handles error when using system managed identity flow when authType identity and Azure Function api', async () => {
     process.env.IDENTITY_ENDPOINT = 'http://127.0.0.1:41932/MSI/token/';
     process.env.IDENTITY_HEADER = 'AFBA957766234A0CA9F3B6FA3D9582C7';
-    const requestStub = sinon.stub(request, 'get').callsFake(() => {
-      return Promise.reject({ error: { "StatusCode": 400, "Message": "No Managed Identity found for specified ClientId/ResourceId/PrincipalId.", "CorrelationId": "0507ee4d-c15f-421a-b96b-e71e351bc69a" } });
-    });
+    const requestStub = sinon.stub(request, 'get').rejects({ error: { "StatusCode": 400, "Message": "No Managed Identity found for specified ClientId/ResourceId/PrincipalId.", "CorrelationId": "0507ee4d-c15f-421a-b96b-e71e351bc69a" } });
 
     auth.connection.authType = AuthType.Identity;
     auth.connection.userName = undefined;
-    auth.ensureAccessToken(resource, logger, true).then(() => {
-      done(new Error('something is wrong'));
-    }, (err) => {
-      try {
-        assert.strictEqual(requestStub.lastCall.args[0].url, 'http://127.0.0.1:41932/MSI/token/?resource=https%3A%2F%2Fcontoso.sharepoint.com&api-version=2019-08-01');
-        assert.strictEqual((requestStub.lastCall.args[0] as any).headers.Metadata, true);
-        assert.strictEqual((requestStub.lastCall.args[0] as any).headers['x-anonymous'], true);
-        assert.notStrictEqual(err.error.Message.indexOf('No Managed Identity found'), -1);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    try {
+      await auth.ensureAccessToken(resource, logger, true);
+    }
+    catch (err: any) {
+      assert.strictEqual(requestStub.lastCall.args[0].url, 'http://127.0.0.1:41932/MSI/token/?resource=https%3A%2F%2Fcontoso.sharepoint.com&api-version=2019-08-01');
+      assert.strictEqual((requestStub.lastCall.args[0] as any).headers.Metadata, true);
+      assert.strictEqual((requestStub.lastCall.args[0] as any).headers['x-anonymous'], true);
+      assert.notStrictEqual(err.error.Message.indexOf('No Managed Identity found'), -1);
+    }
   });
 
   it('calls api with correct params using user-assigned managed identity flow when authType identity and client_id and Azure Functions api', async () => {
     process.env.IDENTITY_ENDPOINT = 'http://127.0.0.1:41932/MSI/token/';
     process.env.IDENTITY_HEADER = 'AFBA957766234A0CA9F3B6FA3D9582C7';
-    const requestStub = sinon.stub(request, 'get').callsFake(() => {
-      return Promise.resolve({
-        "access_token": "eyJ0eXAiOiJKV1QiLCJ...",
-        "client_id": "a04566df-9a65-4e90-ae3d-574572a16423",
-        "expires_in": "86399",
-        "expires_on": "1587847593",
-        "ext_expires_in": "86399",
-        "not_before": "1587760893",
-        "resource": "https://contoso.sharepoint.com/",
-        "token_type": "Bearer"
-      });
+    const requestStub = sinon.stub(request, 'get').resolves({
+      "access_token": "eyJ0eXAiOiJKV1QiLCJ...",
+      "client_id": "a04566df-9a65-4e90-ae3d-574572a16423",
+      "expires_in": "86399",
+      "expires_on": "1587847593",
+      "ext_expires_in": "86399",
+      "not_before": "1587760893",
+      "resource": "https://contoso.sharepoint.com/",
+      "token_type": "Bearer"
     });
 
     auth.connection.authType = AuthType.Identity;
     auth.connection.userName = 'a04566df-9a65-4e90-ae3d-574572a16423';
-    auth.ensureAccessToken(resource, logger, true).then(() => {
-      try {
-        assert.strictEqual(requestStub.lastCall.args[0].url, 'http://127.0.0.1:41932/MSI/token/?resource=https%3A%2F%2Fcontoso.sharepoint.com&api-version=2019-08-01&client_id=a04566df-9a65-4e90-ae3d-574572a16423');
-        assert.strictEqual((requestStub.lastCall.args[0] as any).headers.Metadata, true);
-        assert.strictEqual((requestStub.lastCall.args[0] as any).headers['x-anonymous'], true);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    }, (err) => {
-      done(err);
-    });
+    await auth.ensureAccessToken(resource, logger, true);
+
+    assert.strictEqual(requestStub.lastCall.args[0].url, 'http://127.0.0.1:41932/MSI/token/?resource=https%3A%2F%2Fcontoso.sharepoint.com&api-version=2019-08-01&client_id=a04566df-9a65-4e90-ae3d-574572a16423');
+    assert.strictEqual((requestStub.lastCall.args[0] as any).headers.Metadata, true);
+    assert.strictEqual((requestStub.lastCall.args[0] as any).headers['x-anonymous'], true);
   });
 
   it('calls api with correct params using user-assigned managed identity flow when authType identity and principal_id and Azure Functions api', async () => {
     process.env.IDENTITY_ENDPOINT = 'http://127.0.0.1:41932/MSI/token/';
     process.env.IDENTITY_HEADER = 'AFBA957766234A0CA9F3B6FA3D9582C7';
-    const requestStub = sinon.stub(request, 'get').callsFake((opts) => {
+    const requestStub = sinon.stub(request, 'get').callsFake(async (opts) => {
 
       if ((opts.url as string).indexOf('&client_id=') !== -1) {
 
@@ -1390,25 +1241,16 @@ describe('Auth', () => {
 
     auth.connection.authType = AuthType.Identity;
     auth.connection.userName = 'a04566df-9a65-4e90-ae3d-574572a16423';
-    auth.ensureAccessToken(resource, logger, true).then(() => {
-      try {
-        assert.strictEqual(requestStub.lastCall.args[0].url, 'http://127.0.0.1:41932/MSI/token/?resource=https%3A%2F%2Fcontoso.sharepoint.com&api-version=2019-08-01&principal_id=a04566df-9a65-4e90-ae3d-574572a16423');
-        assert.strictEqual((requestStub.lastCall.args[0] as any).headers.Metadata, true);
-        assert.strictEqual((requestStub.lastCall.args[0] as any).headers['x-anonymous'], true);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    }, (err) => {
-      done(err);
-    });
+    await auth.ensureAccessToken(resource, logger, true);
+    assert.strictEqual(requestStub.lastCall.args[0].url, 'http://127.0.0.1:41932/MSI/token/?resource=https%3A%2F%2Fcontoso.sharepoint.com&api-version=2019-08-01&principal_id=a04566df-9a65-4e90-ae3d-574572a16423');
+    assert.strictEqual((requestStub.lastCall.args[0] as any).headers.Metadata, true);
+    assert.strictEqual((requestStub.lastCall.args[0] as any).headers['x-anonymous'], true);
   });
 
   it('handles error when using user-assigned managed identity flow when authType identity and principal_id and Azure Functions api', async () => {
     process.env.IDENTITY_ENDPOINT = 'http://127.0.0.1:41932/MSI/token/';
     process.env.IDENTITY_HEADER = 'AFBA957766234A0CA9F3B6FA3D9582C7';
-    const requestStub = sinon.stub(request, 'get').callsFake((opts) => {
+    const requestStub = sinon.stub(request, 'get').callsFake(async (opts) => {
 
       if ((opts.url as string).indexOf('&client_id=') !== -1) {
 
@@ -1420,26 +1262,21 @@ describe('Auth', () => {
 
     auth.connection.authType = AuthType.Identity;
     auth.connection.userName = 'a04566df-9a65-4e90-ae3d-574572a16423';
-    auth.ensureAccessToken(resource, logger, true).then(() => {
-      done(new Error('something is wrong'));
-    }, (err) => {
-      try {
-        assert.strictEqual(requestStub.lastCall.args[0].url, 'http://127.0.0.1:41932/MSI/token/?resource=https%3A%2F%2Fcontoso.sharepoint.com&api-version=2019-08-01&principal_id=a04566df-9a65-4e90-ae3d-574572a16423');
-        assert.strictEqual((requestStub.lastCall.args[0] as any).headers.Metadata, true);
-        assert.strictEqual((requestStub.lastCall.args[0] as any).headers['x-anonymous'], true);
-        assert.notStrictEqual(err.error.Message.indexOf('No Managed Identity found'), -1);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    try {
+      await auth.ensureAccessToken(resource, logger, true);
+    }
+    catch (err: any) {
+      assert.strictEqual(requestStub.lastCall.args[0].url, 'http://127.0.0.1:41932/MSI/token/?resource=https%3A%2F%2Fcontoso.sharepoint.com&api-version=2019-08-01&principal_id=a04566df-9a65-4e90-ae3d-574572a16423');
+      assert.strictEqual((requestStub.lastCall.args[0] as any).headers.Metadata, true);
+      assert.strictEqual((requestStub.lastCall.args[0] as any).headers['x-anonymous'], true);
+      assert.notStrictEqual(err.error.Message.indexOf('No Managed Identity found'), -1);
+    }
   });
 
   it('handles EACCES error when using user-assigned managed identity flow when authType identity and principal_id and Azure Functions api', async () => {
     process.env.IDENTITY_ENDPOINT = 'http://127.0.0.1:41932/MSI/token/';
     process.env.IDENTITY_HEADER = 'AFBA957766234A0CA9F3B6FA3D9582C7';
-    const requestStub = sinon.stub(request, 'get').callsFake((opts) => {
+    const requestStub = sinon.stub(request, 'get').callsFake(async (opts) => {
 
       if ((opts.url as string).indexOf('&client_id=') !== -1) {
 
@@ -1451,51 +1288,40 @@ describe('Auth', () => {
 
     auth.connection.authType = AuthType.Identity;
     auth.connection.userName = 'a04566df-9a65-4e90-ae3d-574572a16423';
-    auth.ensureAccessToken(resource, logger, false).then(() => {
-      done(new Error('something is wrong'));
-    }, (err) => {
-      try {
-        assert.strictEqual(requestStub.lastCall.args[0].url, 'http://127.0.0.1:41932/MSI/token/?resource=https%3A%2F%2Fcontoso.sharepoint.com&api-version=2019-08-01&principal_id=a04566df-9a65-4e90-ae3d-574572a16423');
-        assert.strictEqual((requestStub.lastCall.args[0] as any).headers.Metadata, true);
-        assert.strictEqual((requestStub.lastCall.args[0] as any).headers['x-anonymous'], true);
-        assert.notStrictEqual(err.indexOf('Error while logging with Managed Identity. Please check if a Managed Identity is assigned to the current Azure resource.'), -1);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+
+    try {
+      await auth.ensureAccessToken(resource, logger, false);
+    }
+    catch (err: any) {
+      assert.strictEqual(requestStub.lastCall.args[0].url, 'http://127.0.0.1:41932/MSI/token/?resource=https%3A%2F%2Fcontoso.sharepoint.com&api-version=2019-08-01&principal_id=a04566df-9a65-4e90-ae3d-574572a16423');
+      assert.strictEqual((requestStub.lastCall.args[0] as any).headers.Metadata, true);
+      assert.strictEqual((requestStub.lastCall.args[0] as any).headers['x-anonymous'], true);
+      assert.notStrictEqual(err.indexOf('Error while logging with Managed Identity. Please check if a Managed Identity is assigned to the current Azure resource.'), -1);
+    }
   });
 
   it('handles undefined error when using user-assigned managed identity flow when authType identity and client_id and Azure Functions api', async () => {
     process.env.IDENTITY_ENDPOINT = 'http://127.0.0.1:41932/MSI/token/';
     process.env.IDENTITY_HEADER = 'AFBA957766234A0CA9F3B6FA3D9582C7';
-    const requestStub = sinon.stub(request, 'get').callsFake(() => {
-      return Promise.reject({ error: { "error": "invalid_request", "error_description": "Undefined" } });
-    });
+    const requestStub = sinon.stub(request, 'get').rejects({ error: { "error": "invalid_request", "error_description": "Undefined" } });
 
     auth.connection.authType = AuthType.Identity;
     auth.connection.userName = 'a04566df-9a65-4e90-ae3d-574572a16423';
-    auth.ensureAccessToken(resource, logger, true).then(() => {
-      done(new Error('something is wrong'));
-    }, (err) => {
-      try {
-        assert.strictEqual(requestStub.lastCall.args[0].url, 'http://127.0.0.1:41932/MSI/token/?resource=https%3A%2F%2Fcontoso.sharepoint.com&api-version=2019-08-01&client_id=a04566df-9a65-4e90-ae3d-574572a16423');
-        assert.strictEqual((requestStub.lastCall.args[0] as any).headers.Metadata, true);
-        assert.strictEqual((requestStub.lastCall.args[0] as any).headers['x-anonymous'], true);
-        assert.notStrictEqual(err.error.error_description.indexOf('Undefined'), -1);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    try {
+      await auth.ensureAccessToken(resource, logger, true);
+    }
+    catch (err: any) {
+      assert.strictEqual(requestStub.lastCall.args[0].url, 'http://127.0.0.1:41932/MSI/token/?resource=https%3A%2F%2Fcontoso.sharepoint.com&api-version=2019-08-01&client_id=a04566df-9a65-4e90-ae3d-574572a16423');
+      assert.strictEqual((requestStub.lastCall.args[0] as any).headers.Metadata, true);
+      assert.strictEqual((requestStub.lastCall.args[0] as any).headers['x-anonymous'], true);
+      assert.notStrictEqual(err.error.error_description.indexOf('Undefined'), -1);
+    }
   });
 
   it('handles undefined error when using user-assigned managed identity flow when authType identity and principal_id and Azure Functions api', async () => {
     process.env.IDENTITY_ENDPOINT = 'http://127.0.0.1:41932/MSI/token/';
     process.env.IDENTITY_HEADER = 'AFBA957766234A0CA9F3B6FA3D9582C7';
-    const requestStub = sinon.stub(request, 'get').callsFake((opts) => {
+    const requestStub = sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('&client_id=') !== -1) {
 
         throw { error: { "StatusCode": 400, "Message": "No Managed Identity found for specified ClientId/ResourceId/PrincipalId.", "CorrelationId": "0507ee4d-c15f-421a-b96b-e71e351bc69a" } };
@@ -1505,20 +1331,15 @@ describe('Auth', () => {
 
     auth.connection.authType = AuthType.Identity;
     auth.connection.userName = 'a04566df-9a65-4e90-ae3d-574572a16423';
-    auth.ensureAccessToken(resource, logger, true).then(() => {
-      done(new Error('something is wrong'));
-    }, (err) => {
-      try {
-        assert.strictEqual(requestStub.lastCall.args[0].url, 'http://127.0.0.1:41932/MSI/token/?resource=https%3A%2F%2Fcontoso.sharepoint.com&api-version=2019-08-01&principal_id=a04566df-9a65-4e90-ae3d-574572a16423');
-        assert.strictEqual((requestStub.lastCall.args[0] as any).headers.Metadata, true);
-        assert.strictEqual((requestStub.lastCall.args[0] as any).headers['x-anonymous'], true);
-        assert.notStrictEqual(err.error.error.indexOf('Undefined'), -1);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    try {
+      await auth.ensureAccessToken(resource, logger, true);
+    }
+    catch (err: any) {
+      assert.strictEqual(requestStub.lastCall.args[0].url, 'http://127.0.0.1:41932/MSI/token/?resource=https%3A%2F%2Fcontoso.sharepoint.com&api-version=2019-08-01&principal_id=a04566df-9a65-4e90-ae3d-574572a16423');
+      assert.strictEqual((requestStub.lastCall.args[0] as any).headers.Metadata, true);
+      assert.strictEqual((requestStub.lastCall.args[0] as any).headers['x-anonymous'], true);
+      assert.notStrictEqual(err.error.error.indexOf('Undefined'), -1);
+    }
   });
 
   it('calls api with correct params using system managed identity flow when authType identity and Azure Function api using the old env variables', async () => {
@@ -1526,42 +1347,32 @@ describe('Auth', () => {
       MSI_ENDPOINT: 'http://127.0.0.1:41932/MSI/token/',
       MSI_SECRET: 'AFBA957766234A0CA9F3B6FA3D9582C7'
     };
-    const requestStub = sinon.stub(request, 'get').callsFake(() => {
-      return Promise.resolve(JSON.stringify({
-        "access_token": "eyJ0eXAiOiJKV1QiLCJ...",
-        "client_id": "a04566df-9a65-4e90-ae3d-574572a16423",
-        "expires_in": "86399",
-        "expires_on": "1587847593",
-        "ext_expires_in": "86399",
-        "not_before": "1587760893",
-        "resource": "https://contoso.sharepoint.com/",
-        "token_type": "Bearer"
-      }));
-    });
+    const requestStub = sinon.stub(request, 'get').resolves(JSON.stringify({
+      "access_token": "eyJ0eXAiOiJKV1QiLCJ...",
+      "client_id": "a04566df-9a65-4e90-ae3d-574572a16423",
+      "expires_in": "86399",
+      "expires_on": "1587847593",
+      "ext_expires_in": "86399",
+      "not_before": "1587760893",
+      "resource": "https://contoso.sharepoint.com/",
+      "token_type": "Bearer"
+    }));
 
     auth.connection.authType = AuthType.Identity;
     auth.connection.userName = undefined;
-    auth.ensureAccessToken(resource, logger, true).then(() => {
-      try {
-        assert.strictEqual(requestStub.lastCall.args[0].url, 'http://127.0.0.1:41932/MSI/token/?resource=https%3A%2F%2Fcontoso.sharepoint.com&api-version=2019-08-01');
-        assert.strictEqual((requestStub.lastCall.args[0] as any).headers.Metadata, true);
-        assert.strictEqual((requestStub.lastCall.args[0] as any).headers['x-anonymous'], true);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    }, (err) => {
-      done(err);
-    });
+    await auth.ensureAccessToken(resource, logger, true);
+
+    assert.strictEqual(requestStub.lastCall.args[0].url, 'http://127.0.0.1:41932/MSI/token/?resource=https%3A%2F%2Fcontoso.sharepoint.com&api-version=2019-08-01');
+    assert.strictEqual((requestStub.lastCall.args[0] as any).headers.Metadata, true);
+    assert.strictEqual((requestStub.lastCall.args[0] as any).headers['x-anonymous'], true);
   });
 
-  it('returns access token if persisting connection fails', (done) => {
+  it('returns access token if persisting connection fails', async () => {
     sinonUtil.restore(auth.storeConnectionInfo);
-    sinon.stub(auth as any, 'getPublicClient').callsFake(_ => publicApplication);
+    sinon.stub(auth as any, 'getPublicClient').returns(publicApplication);
     sinon.stub(tokenCache, 'getAllAccounts').resolves([]);
-    sinon.stub(auth, 'storeConnectionInfo').callsFake(() => Promise.reject('An error has occurred'));
-    sinon.stub(publicApplication, 'acquireTokenByDeviceCode').callsFake(_ => Promise.resolve({
+    sinon.stub(auth, 'storeConnectionInfo').rejects('An error has occurred');
+    sinon.stub(publicApplication, 'acquireTokenByDeviceCode').resolves({
       expiresOn: new Date(),
       accessToken: 'acc'
     } as any);
@@ -1570,12 +1381,12 @@ describe('Auth', () => {
     assert.strictEqual(accessToken, 'acc');
   });
 
-  it('logs error message if persisting connection fails in debug mode', (done) => {
+  it('logs error message if persisting connection fails in debug mode', async () => {
     sinonUtil.restore(auth.storeConnectionInfo);
-    sinon.stub(auth as any, 'getPublicClient').callsFake(_ => publicApplication);
+    sinon.stub(auth as any, 'getPublicClient').returns(publicApplication);
     sinon.stub(tokenCache, 'getAllAccounts').resolves([]);
-    sinon.stub(auth, 'storeConnectionInfo').callsFake(() => Promise.reject('An error has occurred'));
-    sinon.stub(publicApplication, 'acquireTokenByDeviceCode').callsFake(_ => Promise.resolve({
+    sinon.stub(auth, 'storeConnectionInfo').rejects('An error has occurred');
+    sinon.stub(publicApplication, 'acquireTokenByDeviceCode').resolves({
       expiresOn: new Date(),
       accessToken: 'acc'
     } as any);
@@ -1583,29 +1394,16 @@ describe('Auth', () => {
     const accessToken = await auth.ensureAccessToken(resource, logger, true);
 
     assert.strictEqual(accessToken, 'acc');
-    assert(loggerLogToStderrSpy.calledWith(new CommandError('An error has occurred')));
   });
 
-  it('configures FileTokenStorage as active connection storage', (done) => {
+  it('configures FileTokenStorage as active connection storage', async () => {
     const actual = auth.getConnectionStorage();
-    try {
-      assert(actual instanceof FileTokenStorage);
-      done();
-    }
-    catch (e) {
-      done(e);
-    }
+    assert(actual instanceof FileTokenStorage);
   });
 
-  it('configures FileTokenStorage as connections storage', (done) => {
+  it('configures FileTokenStorage as connections storage', async () => {
     const actual = auth.getAllConnectionsStorage();
-    try {
-      assert(actual instanceof FileTokenStorage);
-      done();
-    }
-    catch (e) {
-      done(e);
-    }
+    assert(actual instanceof FileTokenStorage);
   });
 
   it('configures MSAL cache storage as token storage', async () => {
@@ -1614,94 +1412,51 @@ describe('Auth', () => {
     assert.strictEqual((actual as any).filePath, FileTokenStorage.msalCacheFilePath());
   });
 
-  it('restores authentication', (done) => {
-    auth
-      .restoreAuth()
-      .then(() => {
-        try {
-          assert.strictEqual(auth.connection.active, true);
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }, (err) => {
-        done(err);
-      });
+  it('restores authentication', async () => {
+    await auth.restoreAuth();
+    assert.strictEqual(auth.connection.active, true);
   });
 
-  it(`doesn't restore authentication when already restored`, (done) => {
+  it(`doesn't restore authentication when already restored`, async () => {
     sinonUtil.restore((auth as any).getConnectionInfoFromStorage);
-    const getConnectionInfoFromStorageStub = sinon.stub(auth as any, 'getConnectionInfoFromStorage').callsFake(() => Promise.resolve());
+    const getConnectionInfoFromStorageStub = sinon.stub(auth as any, 'getConnectionInfoFromStorage').resolves();
     auth.connection.active = true;
 
-    auth
-      .restoreAuth()
-      .then(() => {
-        try {
-          assert(getConnectionInfoFromStorageStub.notCalled);
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      });
+    await auth.restoreAuth();
+    assert(getConnectionInfoFromStorageStub.notCalled);
   });
 
-  it('handles error when restoring authentication', (done) => {
+  it('handles error when restoring authentication', async () => {
     auth.connection.active = false;
     sinonUtil.restore((auth as any).getConnectionInfoFromStorage);
-    sinon.stub(auth as any, 'getConnectionInfoFromStorage').callsFake(() => Promise.reject('An error has occurred'));
+    sinon.stub(auth as any, 'getConnectionInfoFromStorage').rejects('An error has occurred');
 
-    auth
-      .restoreAuth()
-      .then(() => {
-        try {
-          assert.strictEqual(auth.connection.active, false);
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }, (err) => {
-        done(err);
-      });
+    await auth.restoreAuth();
+    assert.strictEqual(auth.connection.active, false);
   });
 
-  it('doesn\'t fail when restoring authentication from an incorrect JSON string', (done) => {
+  it('doesn\'t fail when restoring authentication from an incorrect JSON string', async () => {
     auth.connection.active = false;
     const mockStorage = {
       get: async () => { return 'abc'; }
     };
     sinonUtil.restore((auth as any).getConnectionInfoFromStorage);
-    sinon.stub(auth, 'getConnectionStorage').callsFake(() => mockStorage as any);
+    sinon.stub(auth, 'getConnectionStorage').returns(mockStorage as any);
 
-    auth
-      .restoreAuth()
-      .then(() => {
-        assert.strictEqual(auth.connection.active, false);
-        done();
-      }, (err) => {
-        done(err);
-      });
+    await auth.restoreAuth();
+    assert.strictEqual(auth.connection.active, false);
   });
 
-  it('doesn\'t fail when restoring authentication failed', (done) => {
+  it('doesn\'t fail when restoring authentication failed', async () => {
     auth.connection.active = false;
     const mockStorage = {
       get: async () => { throw 'abc'; }
     };
     sinonUtil.restore((auth as any).getConnectionInfoFromStorage);
-    sinon.stub(auth, 'getConnectionStorage').callsFake(() => mockStorage as any);
+    sinon.stub(auth, 'getConnectionStorage').returns(mockStorage as any);
 
-    auth
-      .restoreAuth()
-      .then(() => {
-        assert.strictEqual(auth.connection.active, false);
-        done();
-      }, (err) => {
-        done(err);
-      });
+    await auth.restoreAuth();
+    assert.strictEqual(auth.connection.active, false);
   });
 
   it('stores connection information in the configured token storage', async () => {
@@ -1741,7 +1496,7 @@ describe('Auth', () => {
     const mockStorage2 = new MockTokenStorage();
     const mockStorageSetStub1 = sinon.stub(mockStorage1, 'remove').resolves();
     const mockStorageSetStub2 = sinon.stub(mockStorage2, 'set').resolves();
-    sinon.stub(auth as any, 'getPublicClient').callsFake(_ => publicApplication);
+    sinon.stub(auth as any, 'getPublicClient').returns(publicApplication);
     sinon.stub(auth, 'getConnectionStorage').returns(mockStorage1);
     sinon.stub(auth, 'getAllConnectionsStorage').returns(mockStorage2);
 
@@ -1862,7 +1617,7 @@ describe('Auth', () => {
     assert(actualClientApp instanceof msal.ConfidentialClientApplication);
   });
 
-  it('retrieves token using client secret flow when authType "secret" specified', (done) => {
+  it('retrieves token using client secret flow when authType "secret" specified', async () => {
     auth.connection.authType = AuthType.Secret;
     auth.connection.secret = "SomeSecretValue";
 
@@ -1925,7 +1680,7 @@ describe('Auth', () => {
   it(`handles failure while loading all connections from storage if not already loaded`, async () => {
     sinonUtil.restore((auth as any).getAllConnectionsFromStorage);
     const mockStorage = {
-      get: () => Promise.reject('Invalid!')
+      get: async () => { throw 'Invalid!'; }
     };
     const stub = sinon.stub(auth, 'getAllConnectionsStorage').callsFake(() => mockStorage as any);
 
