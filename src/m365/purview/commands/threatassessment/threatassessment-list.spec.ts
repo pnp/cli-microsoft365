@@ -14,88 +14,8 @@ import command from './threatassessment-list.js';
 
 describe(commands.THREATASSESSMENT_LIST, () => {
   //#region Mocked Responses
-  let commandInfo: CommandInfo;
-  const threatAssesmentResponse: any = {
-    "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#informationProtection/threatAssessmentRequests",
-    "value": [
-      {
-        "@odata.type": "#microsoft.graph.mailAssessmentRequest",
-        "id": "49c5ef5b-1f65-444a-e6b9-08d772ea2059",
-        "createdDateTime": "2019-11-27T03:30:18.6890937Z",
-        "contentType": "mail",
-        "expectedAssessment": "block",
-        "category": "spam",
-        "status": "pending",
-        "requestSource": "administrator",
-        "recipientEmail": "tifc@a830edad9050849eqtpwbjzxodq.onmicrosoft.com",
-        "destinationRoutingReason": "notJunk",
-        "messageUri": "https://graph.microsoft.com/v1.0/users/c52ce8db-3e4b-4181-93c4-7d6b6bffaf60/messages/AAMkADU3MWUxOTU0LWNlOTEt=",
-        "createdBy": {
-          "user": {
-            "id": "c52ce8db-3e4b-4181-93c4-7d6b6bffaf60",
-            "displayName": "Ronald Admin"
-          }
-        }
-      },
-      {
-        "@odata.type": "#microsoft.graph.emailFileAssessmentRequest",
-        "id": "ab2ad9b3-2213-4091-ae0c-08d76ddbcacf",
-        "createdDateTime": "2019-11-20T17:05:06.4088076Z",
-        "contentType": "mail",
-        "expectedAssessment": "block",
-        "category": "malware",
-        "status": "completed",
-        "requestSource": "administrator",
-        "recipientEmail": "tifc@a830edad9050849EQTPWBJZXODQ.onmicrosoft.com",
-        "destinationRoutingReason": "notJunk",
-        "contentData": "",
-        "createdBy": {
-          "user": {
-            "id": "c52ce8db-3e4b-4181-93c4-7d6b6bffaf60",
-            "displayName": "Ronald Admin"
-          }
-        }
-      },
-      {
-        "@odata.type": "#microsoft.graph.fileAssessmentRequest",
-        "id": "18406a56-7209-4720-a250-08d772fccdaa",
-        "createdDateTime": "2019-11-27T05:44:00.4051536Z",
-        "contentType": "file",
-        "expectedAssessment": "block",
-        "category": "malware",
-        "status": "completed",
-        "requestSource": "administrator",
-        "fileName": "b3d5b715-4b88-4bbb-b0ae-9a9281a3f18a.csv",
-        "contentData": "",
-        "createdBy": {
-          "user": {
-            "id": "c52ce8db-3e4b-4181-93c4-7d6b6bffaf60",
-            "displayName": "Ronald Admin"
-          }
-        }
-      },
-      {
-        "@odata.type": "#microsoft.graph.urlAssessmentRequest",
-        "id": "723c35be-8b5a-47ae-29c0-08d76ddb7f5b",
-        "createdDateTime": "2019-11-20T17:02:59.8160832Z",
-        "contentType": "url",
-        "expectedAssessment": "unblock",
-        "category": "phishing",
-        "status": "completed",
-        "requestSource": "administrator",
-        "url": "http://test.com",
-        "createdBy": {
-          "user": {
-            "id": "c52ce8db-3e4b-4181-93c4-7d6b6bffaf60",
-            "displayName": "Ronald Admin"
-          }
-        }
-      }
-    ]
-  };
-
-  const threatAssesmentMailResponse: any = [{
-    "@odata.type": "#microsoft.graph.mailAssessmentRequest",
+  const threatAssessmentMailItem: any = {
+    "type": "mail",
     "id": "49c5ef5b-1f65-444a-e6b9-08d772ea2059",
     "createdDateTime": "2019-11-27T03:30:18.6890937Z",
     "contentType": "mail",
@@ -112,10 +32,10 @@ describe(commands.THREATASSESSMENT_LIST, () => {
         "displayName": "Ronald Admin"
       }
     }
-  }];
+  };
 
-  const threatAssesmentEmailFileResponse: any = [{
-    "@odata.type": "#microsoft.graph.emailFileAssessmentRequest",
+  const threatAssessmentEmailFileItem: any = {
+    "type": "emailFile",
     "id": "ab2ad9b3-2213-4091-ae0c-08d76ddbcacf",
     "createdDateTime": "2019-11-20T17:05:06.4088076Z",
     "contentType": "mail",
@@ -132,10 +52,10 @@ describe(commands.THREATASSESSMENT_LIST, () => {
         "displayName": "Ronald Admin"
       }
     }
-  }];
+  };
 
-  const threatAssesmentFileResponse: any = [{
-    "@odata.type": "#microsoft.graph.fileAssessmentRequest",
+  const threatAssessmentFileItem: any = {
+    "type": "file",
     "id": "18406a56-7209-4720-a250-08d772fccdaa",
     "createdDateTime": "2019-11-27T05:44:00.4051536Z",
     "contentType": "file",
@@ -151,10 +71,10 @@ describe(commands.THREATASSESSMENT_LIST, () => {
         "displayName": "Ronald Admin"
       }
     }
-  }];
+  };
 
-  const threatAssesmentUrlResponse: any = [{
-    "@odata.type": "#microsoft.graph.urlAssessmentRequest",
+  const threatAssessmentUrlItem: any = {
+    "type": "url",
     "id": "723c35be-8b5a-47ae-29c0-08d76ddb7f5b",
     "createdDateTime": "2019-11-20T17:02:59.8160832Z",
     "contentType": "url",
@@ -169,12 +89,13 @@ describe(commands.THREATASSESSMENT_LIST, () => {
         "displayName": "Ronald Admin"
       }
     }
-  }];
+  };
   //#endregion
 
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
 
   before(() => {
     commandInfo = cli.getCommandInfo(command);
@@ -220,7 +141,7 @@ describe(commands.THREATASSESSMENT_LIST, () => {
   });
 
   it('defines correct properties for the default output', () => {
-    assert.deepStrictEqual(command.defaultProperties(), ['id', 'contentType', 'category']);
+    assert.deepStrictEqual(command.defaultProperties(), ['id', 'type', 'category']);
   });
 
   it('fails validation if specified type is invalid ', async () => {
@@ -233,81 +154,277 @@ describe(commands.THREATASSESSMENT_LIST, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('retrieves threat assesments', async () => {
+  it('retrieves threat assessments', async () => {
     sinon.stub(request, 'get').callsFake(async opts => {
       if ((opts.url === `https://graph.microsoft.com/v1.0/informationProtection/threatAssessmentRequests`)) {
-        return threatAssesmentResponse;
+        return {
+          "value": [
+            {
+              "@odata.type": "#microsoft.graph.mailAssessmentRequest",
+              "id": "49c5ef5b-1f65-444a-e6b9-08d772ea2059",
+              "createdDateTime": "2019-11-27T03:30:18.6890937Z",
+              "contentType": "mail",
+              "expectedAssessment": "block",
+              "category": "spam",
+              "status": "pending",
+              "requestSource": "administrator",
+              "recipientEmail": "tifc@a830edad9050849eqtpwbjzxodq.onmicrosoft.com",
+              "destinationRoutingReason": "notJunk",
+              "messageUri": "https://graph.microsoft.com/v1.0/users/c52ce8db-3e4b-4181-93c4-7d6b6bffaf60/messages/AAMkADU3MWUxOTU0LWNlOTEt=",
+              "createdBy": {
+                "user": {
+                  "id": "c52ce8db-3e4b-4181-93c4-7d6b6bffaf60",
+                  "displayName": "Ronald Admin"
+                }
+              }
+            },
+            {
+              "@odata.type": "#microsoft.graph.fileAssessmentRequest",
+              "id": "18406a56-7209-4720-a250-08d772fccdaa",
+              "createdDateTime": "2019-11-27T05:44:00.4051536Z",
+              "contentType": "file",
+              "expectedAssessment": "block",
+              "category": "malware",
+              "status": "completed",
+              "requestSource": "administrator",
+              "fileName": "b3d5b715-4b88-4bbb-b0ae-9a9281a3f18a.csv",
+              "contentData": "",
+              "createdBy": {
+                "user": {
+                  "id": "c52ce8db-3e4b-4181-93c4-7d6b6bffaf60",
+                  "displayName": "Ronald Admin"
+                }
+              }
+            }
+          ]
+        };
       }
 
       throw 'Invalid request';
     });
 
     await command.action(logger, { options: { verbose: true } });
-    assert(loggerLogSpy.calledWith(threatAssesmentResponse.value));
+    assert(loggerLogSpy.calledOnceWithExactly([threatAssessmentMailItem, threatAssessmentFileItem]));
   });
 
-  it('retrieves threat assesments with type mail', async () => {
+  it('retrieves threat assessments with type mail', async () => {
     sinon.stub(request, 'get').callsFake(async opts => {
-      if ((opts.url === `https://graph.microsoft.com/v1.0/informationProtection/threatAssessmentRequests`)) {
-        return threatAssesmentResponse;
+      if ((opts.url === `https://graph.microsoft.com/v1.0/informationProtection/threatAssessmentRequests?$filter=contentType eq 'mail'`)) {
+        return {
+          "value": [
+            {
+              "@odata.type": "#microsoft.graph.mailAssessmentRequest",
+              "id": "49c5ef5b-1f65-444a-e6b9-08d772ea2059",
+              "createdDateTime": "2019-11-27T03:30:18.6890937Z",
+              "contentType": "mail",
+              "expectedAssessment": "block",
+              "category": "spam",
+              "status": "pending",
+              "requestSource": "administrator",
+              "recipientEmail": "tifc@a830edad9050849eqtpwbjzxodq.onmicrosoft.com",
+              "destinationRoutingReason": "notJunk",
+              "messageUri": "https://graph.microsoft.com/v1.0/users/c52ce8db-3e4b-4181-93c4-7d6b6bffaf60/messages/AAMkADU3MWUxOTU0LWNlOTEt=",
+              "createdBy": {
+                "user": {
+                  "id": "c52ce8db-3e4b-4181-93c4-7d6b6bffaf60",
+                  "displayName": "Ronald Admin"
+                }
+              }
+            },
+            {
+              "@odata.type": "#microsoft.graph.emailFileAssessmentRequest",
+              "id": "ab2ad9b3-2213-4091-ae0c-08d76ddbcacf",
+              "createdDateTime": "2019-11-20T17:05:06.4088076Z",
+              "contentType": "mail",
+              "expectedAssessment": "block",
+              "category": "malware",
+              "status": "completed",
+              "requestSource": "administrator",
+              "recipientEmail": "tifc@a830edad9050849EQTPWBJZXODQ.onmicrosoft.com",
+              "destinationRoutingReason": "notJunk",
+              "contentData": "",
+              "createdBy": {
+                "user": {
+                  "id": "c52ce8db-3e4b-4181-93c4-7d6b6bffaf60",
+                  "displayName": "Ronald Admin"
+                }
+              }
+            }
+          ]
+        };
       }
 
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true, type: 'mail' } });
-    assert(loggerLogSpy.calledWith(threatAssesmentMailResponse));
+    await command.action(logger, { options: { type: 'mail' } });
+    assert(loggerLogSpy.calledOnceWithExactly([threatAssessmentMailItem]));
   });
 
-  it('retrieves threat assesments with type emailFile', async () => {
+  it('retrieves threat assessments with type emailFile', async () => {
     sinon.stub(request, 'get').callsFake(async opts => {
-      if ((opts.url === `https://graph.microsoft.com/v1.0/informationProtection/threatAssessmentRequests`)) {
-        return threatAssesmentResponse;
+      if ((opts.url === `https://graph.microsoft.com/v1.0/informationProtection/threatAssessmentRequests?$filter=contentType eq 'mail'`)) {
+        return {
+          "value": [
+            {
+              "@odata.type": "#microsoft.graph.mailAssessmentRequest",
+              "id": "49c5ef5b-1f65-444a-e6b9-08d772ea2059",
+              "createdDateTime": "2019-11-27T03:30:18.6890937Z",
+              "contentType": "mail",
+              "expectedAssessment": "block",
+              "category": "spam",
+              "status": "pending",
+              "requestSource": "administrator",
+              "recipientEmail": "tifc@a830edad9050849eqtpwbjzxodq.onmicrosoft.com",
+              "destinationRoutingReason": "notJunk",
+              "messageUri": "https://graph.microsoft.com/v1.0/users/c52ce8db-3e4b-4181-93c4-7d6b6bffaf60/messages/AAMkADU3MWUxOTU0LWNlOTEt=",
+              "createdBy": {
+                "user": {
+                  "id": "c52ce8db-3e4b-4181-93c4-7d6b6bffaf60",
+                  "displayName": "Ronald Admin"
+                }
+              }
+            },
+            {
+              "@odata.type": "#microsoft.graph.emailFileAssessmentRequest",
+              "id": "ab2ad9b3-2213-4091-ae0c-08d76ddbcacf",
+              "createdDateTime": "2019-11-20T17:05:06.4088076Z",
+              "contentType": "mail",
+              "expectedAssessment": "block",
+              "category": "malware",
+              "status": "completed",
+              "requestSource": "administrator",
+              "recipientEmail": "tifc@a830edad9050849EQTPWBJZXODQ.onmicrosoft.com",
+              "destinationRoutingReason": "notJunk",
+              "contentData": "",
+              "createdBy": {
+                "user": {
+                  "id": "c52ce8db-3e4b-4181-93c4-7d6b6bffaf60",
+                  "displayName": "Ronald Admin"
+                }
+              }
+            }
+          ]
+        };
       }
 
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true, type: 'emailFile' } });
-    assert(loggerLogSpy.calledWith(threatAssesmentEmailFileResponse));
+    await command.action(logger, { options: { type: 'emailFile' } });
+    assert(loggerLogSpy.calledOnceWithExactly([threatAssessmentEmailFileItem]));
   });
 
-  it('retrieves threat assesments with type File', async () => {
+  it('retrieves threat assessments with type File', async () => {
     sinon.stub(request, 'get').callsFake(async opts => {
-      if ((opts.url === `https://graph.microsoft.com/v1.0/informationProtection/threatAssessmentRequests`)) {
-        return threatAssesmentResponse;
+      if ((opts.url === `https://graph.microsoft.com/v1.0/informationProtection/threatAssessmentRequests?$filter=contentType eq 'file'`)) {
+        return {
+          "value": [
+            {
+              "@odata.type": "#microsoft.graph.fileAssessmentRequest",
+              "id": "18406a56-7209-4720-a250-08d772fccdaa",
+              "createdDateTime": "2019-11-27T05:44:00.4051536Z",
+              "contentType": "file",
+              "expectedAssessment": "block",
+              "category": "malware",
+              "status": "completed",
+              "requestSource": "administrator",
+              "fileName": "b3d5b715-4b88-4bbb-b0ae-9a9281a3f18a.csv",
+              "contentData": "",
+              "createdBy": {
+                "user": {
+                  "id": "c52ce8db-3e4b-4181-93c4-7d6b6bffaf60",
+                  "displayName": "Ronald Admin"
+                }
+              }
+            }
+          ]
+        };
       }
 
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true, type: 'file' } });
-    assert(loggerLogSpy.calledWith(threatAssesmentFileResponse));
+    await command.action(logger, { options: { type: 'file' } });
+    assert(loggerLogSpy.calledOnceWithExactly([threatAssessmentFileItem]));
   });
 
-  it('retrieves threat assesments with type Url', async () => {
+  it('retrieves threat assessments with type Url', async () => {
     sinon.stub(request, 'get').callsFake(async opts => {
-      if ((opts.url === `https://graph.microsoft.com/v1.0/informationProtection/threatAssessmentRequests`)) {
-        return threatAssesmentResponse;
+      if ((opts.url === `https://graph.microsoft.com/v1.0/informationProtection/threatAssessmentRequests?$filter=contentType eq 'url'`)) {
+        return {
+          "value": [
+            {
+              "@odata.type": "#microsoft.graph.urlAssessmentRequest",
+              "id": "723c35be-8b5a-47ae-29c0-08d76ddb7f5b",
+              "createdDateTime": "2019-11-20T17:02:59.8160832Z",
+              "contentType": "url",
+              "expectedAssessment": "unblock",
+              "category": "phishing",
+              "status": "completed",
+              "requestSource": "administrator",
+              "url": "http://test.com",
+              "createdBy": {
+                "user": {
+                  "id": "c52ce8db-3e4b-4181-93c4-7d6b6bffaf60",
+                  "displayName": "Ronald Admin"
+                }
+              }
+            }
+          ]
+        };
       }
 
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true, type: 'url' } });
-    assert(loggerLogSpy.calledWith(threatAssesmentUrlResponse));
+    await command.action(logger, { options: { type: 'url' } });
+    assert(loggerLogSpy.calledOnceWithExactly([threatAssessmentUrlItem]));
+  });
+
+  it('retrieves threat assessments with unknown future value', async () => {
+    sinon.stub(request, 'get').callsFake(async opts => {
+      if ((opts.url === `https://graph.microsoft.com/v1.0/informationProtection/threatAssessmentRequests?$filter=contentType eq 'url'`)) {
+        return {
+          "value": [
+            {
+              "@odata.type": "#microsoft.graph.unknownFutureValueAssessmentRequest",
+              "id": "723c35be-8b5a-47ae-29c0-08d76ddb7f5b",
+              "createdDateTime": "2019-11-20T17:02:59.8160832Z",
+              "contentType": "url",
+              "expectedAssessment": "unblock",
+              "category": "phishing",
+              "status": "completed",
+              "requestSource": "administrator",
+              "url": "http://test.com",
+              "createdBy": {
+                "user": {
+                  "id": "c52ce8db-3e4b-4181-93c4-7d6b6bffaf60",
+                  "displayName": "Ronald Admin"
+                }
+              }
+            }
+          ]
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { type: 'url' } });
+    assert(loggerLogSpy.calledOnceWithExactly([{ ...threatAssessmentUrlItem, type: 'Unknown' }]));
   });
 
   it('correctly handles random API error', async () => {
     const error = {
       error: {
-        message: 'The threat assesments could not be retrieved'
+        message: 'The threat assessments could not be retrieved'
       }
     };
     sinon.stub(request, 'get').callsFake(async () => { throw error; });
 
     await assert.rejects(command.action(logger, {
       options: {}
-    }), new CommandError('The threat assesments could not be retrieved'));
+    }), new CommandError('The threat assessments could not be retrieved'));
   });
 });

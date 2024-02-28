@@ -24,7 +24,7 @@ class PurviewThreatAssessmentListCommand extends GraphCommand {
   }
 
   public defaultProperties(): string[] | undefined {
-    return ['id', 'contentType', 'category'];
+    return ['id', 'type', 'category'];
   }
 
   constructor() {
@@ -55,10 +55,10 @@ class PurviewThreatAssessmentListCommand extends GraphCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-
         if (args.options.type && PurviewThreatAssessmentListCommand.allowedTypes.indexOf(args.options.type) < 0) {
-          return `${args.options.type} is not a valid type. Valid types are ${PurviewThreatAssessmentListCommand.allowedTypes.join(', ')}`;
+          return `${args.options.type} is not a valid type. Allowed values are ${PurviewThreatAssessmentListCommand.allowedTypes.join(', ')}`;
         }
+
         return true;
       }
     );
@@ -66,37 +66,66 @@ class PurviewThreatAssessmentListCommand extends GraphCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Retrieving a list of threat assessments`);
+      logger.logToStderr('Retrieving a list of threat assessments');
     }
 
     try {
-      const items = await odata.getAllItems<any>(`${this.resource}/v1.0/informationProtection/threatAssessmentRequests`, 'minimal');
-      if (args.options.type) {
-        let type: string;
-        switch (args.options.type) {
-          case 'mail':
-            type = '#microsoft.graph.mailAssessmentRequest';
-            break;
-          case 'file':
-            type = '#microsoft.graph.fileAssessmentRequest';
-            break;
-          case 'emailFile':
-            type = '#microsoft.graph.emailFileAssessmentRequest';
-            break;
-          case 'url':
-            type = '#microsoft.graph.urlAssessmentRequest';
-            break;
-        }
+      const filter = this.getFilterQuery(args.options);
+      const items = await odata.getAllItems<any>(`${this.resource}/v1.0/informationProtection/threatAssessmentRequests${filter}`, 'minimal');
 
-        const filteredItems = items.filter(item => item['@odata.type'] === type);
-        logger.log(filteredItems);
+      let itemsToReturn = [];
+
+      switch (args.options.type) {
+        case 'mail':
+          itemsToReturn = items.filter(item => item['@odata.type'] === '#microsoft.graph.mailAssessmentRequest');
+          break;
+        case 'emailFile':
+          itemsToReturn = items.filter(item => item['@odata.type'] === '#microsoft.graph.emailFileAssessmentRequest');
+          break;
+        default:
+          itemsToReturn = items;
+          break;
       }
-      else {
-        logger.log(items);
+
+      for (const item of itemsToReturn) {
+        item['type'] = this.getConvertedType(item['@odata.type']);
+        delete item['@odata.type'];
       }
+
+      await logger.log(itemsToReturn);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
+    }
+  }
+
+  // Content type is not equal to type. 
+  // Threat assessments of type emailFile have contentType mail as well.
+  // This function gets the correct filter URL to be able to query the least amount of data
+  private getFilterQuery(options: Options): string {
+    if (options.type === undefined) {
+      return '';
+    }
+
+    if (options.type === 'emailFile') {
+      return `?$filter=contentType eq 'mail'`;
+    }
+
+    return `?$filter=contentType eq '${options.type}'`;
+  }
+
+  private getConvertedType(type: string): string {
+    switch (type) {
+      case '#microsoft.graph.mailAssessmentRequest':
+        return 'mail';
+      case '#microsoft.graph.fileAssessmentRequest':
+        return 'file';
+      case '#microsoft.graph.emailFileAssessmentRequest':
+        return 'emailFile';
+      case '#microsoft.graph.urlAssessmentRequest':
+        return 'url';
+      default:
+        return 'Unknown';
     }
   }
 }

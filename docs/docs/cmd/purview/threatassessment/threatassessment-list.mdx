@@ -16,7 +16,7 @@ m365 purview threatassessment list [options]
 
 ```md definition-list
 `-t, --type [type]`
-: The type of threat assessment to retrieve. Supports `mail`, `file`, `emailFile` and `url`.
+: The type of threat assessment to retrieve. Allowed values are `mail`, `file`, `emailFile` and `url`.
 ```
 
 <Global />
@@ -43,7 +43,7 @@ m365 purview threatassessment list --type mail
   ```json
   [
     {
-      "@odata.type": "#microsoft.graph.mailAssessmentRequest",
+      "type": "mail",
       "id": "49c5ef5b-1f65-444a-e6b9-08d772ea2059",
       "createdDateTime": "2019-11-27T03:30:18.6890937Z",
       "contentType": "mail",
@@ -68,7 +68,7 @@ m365 purview threatassessment list --type mail
   <TabItem value="Text">
 
   ```text
-  id                                    contentType  category
+  id                                    type  category
   ------------------------------------  -----------  --------
   49c5ef5b-1f65-444a-e6b9-08d772ea2059  mail         spam
   ```
@@ -77,7 +77,7 @@ m365 purview threatassessment list --type mail
   <TabItem value="CSV">
 
   ```csv
-  id,contentType,category
+  id,type,category
   49c5ef5b-1f65-444a-e6b9-08d772ea2059,mail,spam
   ```
 
@@ -93,7 +93,7 @@ m365 purview threatassessment list --type mail
 
   Property | Value
   ---------|-------
-  @odata.type | #microsoft.graph.mailAssessmentRequest
+  type | mail
   id | 49c5ef5b-1f65-444a-e6b9-08d772ea2059
   createdDateTime | 2019-11-27T03:30:18.6890937Z
   contentType | mail
