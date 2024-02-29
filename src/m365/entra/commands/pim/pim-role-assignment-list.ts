@@ -3,7 +3,6 @@ import GlobalOptions from '../../../../GlobalOptions.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
-import aadCommands from '../../aadCommands.js';
 import { validation } from '../../../../utils/validation.js';
 import { entraUser } from '../../../../utils/entraUser.js';
 import { entraGroup } from '../../../../utils/entraGroup.js';
@@ -29,11 +28,6 @@ class EntraPimRoleAssignmentListCommand extends GraphCommand {
 
   public get description(): string {
     return 'Retrieves a list of Entra role assignments for a user or group';
-  }
-
-
-  public alias(): string[] | undefined {
-    return [aadCommands.PIM_ROLE_ASSIGNMENT_LIST];
   }
 
   constructor() {
