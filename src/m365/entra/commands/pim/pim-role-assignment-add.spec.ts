@@ -11,7 +11,6 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import command from './pim-role-assignment-add.js';
-import aadCommands from '../../aadCommands.js';
 import { entraUser } from '../../../../utils/entraUser.js';
 import { entraGroup } from '../../../../utils/entraGroup.js';
 import { accessToken } from '../../../../utils/accessToken.js';
@@ -234,16 +233,6 @@ describe(commands.PIM_ROLE_ASSIGNMENT_ADD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('defines alias', () => {
-    const alias = command.alias();
-    assert.notStrictEqual(typeof alias, 'undefined');
-  });
-
-  it('defines correct alias', () => {
-    const alias = command.alias();
-    assert.deepStrictEqual(alias, [aadCommands.PIM_ROLE_ASSIGNMENT_ADD]);
-  });
-
   it('passes validation when roleDefinitionId is a valid GUID', async () => {
     const actual = await command.validate({ options: { roleDefinitionId: roleDefinitionId } }, commandInfo);
     assert.strictEqual(actual, true);
@@ -271,6 +260,16 @@ describe(commands.PIM_ROLE_ASSIGNMENT_ADD, () => {
 
   it('passes validation when duration is a valid ISO 8601 duration', async () => {
     const actual = await command.validate({ options: { roleDefinitionId: roleDefinitionId, duration: 'P3Y6M4DT12H30M5S' } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('passes validation when directoryScopeId is limited to an administrative unit and the administrative unit id is a valid GUID', async () => {
+    const actual = await command.validate({ options: { roleDefinitionId: roleDefinitionId, directoryScopeId: '/administrativeUnits/81bb36e4-f4c6-4984-8e56-d4f8feae9e09' } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('passes validation when directoryScopeId is limited to a service principal and the service principal id is a valid GUID', async () => {
+    const actual = await command.validate({ options: { roleDefinitionId: roleDefinitionId, directoryScopeId: '/94446d35-4df6-45da-a17f-c601310a8342' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
@@ -304,9 +303,50 @@ describe(commands.PIM_ROLE_ASSIGNMENT_ADD, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when both endDateTime and duration are specified', async () => {
-    const actual = await command.validate({ options: { roleDefinitionId: roleDefinitionId, duration: 'P3Y6M4DT12H30M5S', endDateTime: '2024-02-20T08:00:00Z' } }, commandInfo);
+  it('fails validation when directoryScopeId is limited to an administrative unit and the administrative unit id is not a valid GUID', async () => {
+    const actual = await command.validate({ options: { roleDefinitionId: roleDefinitionId, directoryScopeId: '/administrativeUnits/foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation when directoryScopeId is limited to a service principal and the service principal id is a valid GUID', async () => {
+    const actual = await command.validate({ options: { roleDefinitionId: roleDefinitionId, directoryScopeId: '/foo' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('correctly requests activation of role specified by id for a user specified by id with default expiration and with tenant-wide scope', async () => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/roleManagement/directory/roleAssignmentScheduleRequests' &&
+        JSON.stringify(opts.data) === JSON.stringify({
+          "principalId": userId,
+          "roleDefinitionId": roleDefinitionId,
+          "directoryScopeId": "/",
+          "action": "adminAssign",
+          "justification": "Need SharePoint Administrator role",
+          "scheduleInfo": {
+            "expiration": {
+              "duration": "PT8H",
+              "type": "afterDuration"
+            }
+          },
+          "ticketInfo": {
+          }
+        })) {
+        return roleAssignmentResponseNoExpiration;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options:
+      {
+        roleDefinitionId: roleDefinitionId,
+        userId: userId,
+        directoryScopeId: '/',
+        justification: 'Need SharePoint Administrator role'
+      }
+    });
+    assert(loggerLogSpy.calledOnceWithExactly(roleAssignmentResponseNoExpiration));
   });
 
   it('correctly requests activation of role specified by id for a user specified by id with no expiration and with tenant-wide scope', async () => {
@@ -338,7 +378,8 @@ describe(commands.PIM_ROLE_ASSIGNMENT_ADD, () => {
         roleDefinitionId: roleDefinitionId,
         userId: userId,
         directoryScopeId: '/',
-        justification: 'Need SharePoint Administrator role'
+        justification: 'Need SharePoint Administrator role',
+        noExpiration: true
       }
     });
     assert(loggerLogSpy.calledOnceWithExactly(roleAssignmentResponseNoExpiration));
@@ -459,6 +500,7 @@ describe(commands.PIM_ROLE_ASSIGNMENT_ADD, () => {
         justification: 'Need User Administrator role for group, ticket details included',
         ticketSystem: 'JIRA',
         ticketNumber: 'MSFT-2024',
+        noExpiration: true,
         verbose: true
       }
     });
@@ -500,6 +542,7 @@ describe(commands.PIM_ROLE_ASSIGNMENT_ADD, () => {
       {
         roleDefinitionId: roleDefinitionId,
         justification: 'Need SharePoint Administrator role',
+        noExpiration: true,
         verbose: true
       }
     });
@@ -556,7 +599,7 @@ describe(commands.PIM_ROLE_ASSIGNMENT_ADD, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { roleDefinitionId: roleDefinitionId, justification: 'Need SharePoint Administrator role' } }), new CommandError(error.error.message));
+    await assert.rejects(command.action(logger, { options: { roleDefinitionId: roleDefinitionId, justification: 'Need SharePoint Administrator role', noExpiration: true } }), new CommandError(error.error.message));
   });
 
   it('throws an error during admin assignment when role assignment already exists', async () => {
@@ -593,6 +636,6 @@ describe(commands.PIM_ROLE_ASSIGNMENT_ADD, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { roleDefinitionId: roleDefinitionId, userId: userId, justification: 'Need SharePoint Administrator role' } }), new CommandError(error.error.message));
+    await assert.rejects(command.action(logger, { options: { roleDefinitionId: roleDefinitionId, userId: userId, justification: 'Need SharePoint Administrator role', noExpiration: true } }), new CommandError(error.error.message));
   });
 });

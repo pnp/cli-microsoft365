@@ -4,7 +4,6 @@ import { Logger } from '../../../../cli/Logger.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
-import aadCommands from '../../aadCommands.js';
 import { roleDefinition } from '../../../../utils/roleDefinition.js';
 import { validation } from '../../../../utils/validation.js';
 import { entraUser } from '../../../../utils/entraUser.js';
@@ -30,6 +29,7 @@ interface Options extends GlobalOptions {
   duration?: string;
   ticketNumber?: string;
   ticketSystem?: string;
+  noExpiration?: boolean;
 }
 
 class EntraPimRoleAssignmentAddCommand extends GraphCommand {
@@ -39,10 +39,6 @@ class EntraPimRoleAssignmentAddCommand extends GraphCommand {
 
   public get description(): string {
     return 'Request activation of an Entra ID role assignment for a user or group';
-  }
-
-  public alias(): string[] | undefined {
-    return [aadCommands.PIM_ROLE_ASSIGNMENT_ADD];
   }
 
   constructor() {
@@ -69,7 +65,8 @@ class EntraPimRoleAssignmentAddCommand extends GraphCommand {
         endDateTime: typeof args.options.endDateTime !== 'undefined',
         duration: typeof args.options.duration !== 'undefined',
         ticketNumber: typeof args.options.ticketNumber !== 'undefined',
-        ticketSystem: typeof args.options.ticketSystem !== 'undefined'
+        ticketSystem: typeof args.options.ticketSystem !== 'undefined',
+        noExpiration: !!args.options.noExpiration
       });
     });
   }
@@ -114,6 +111,9 @@ class EntraPimRoleAssignmentAddCommand extends GraphCommand {
       },
       {
         option: "--ticketSystem [ticketSystem]"
+      },
+      {
+        option: "--no-expiration"
       }
     );
   }
@@ -145,8 +145,16 @@ class EntraPimRoleAssignmentAddCommand extends GraphCommand {
           return `${args.options.duration} is not a valid ISO 8601 duration`;
         }
 
-        if (args.options.endDateTime && args.options.duration) {
-          return `Specify either 'endDateTime' or 'duration' but not both`;
+        if (args.options.directoryScopeId) {
+          if (args.options.directoryScopeId !== '/') {
+            const scopeParts = args.options.directoryScopeId.split('/');
+            if (scopeParts.length === 2 && !validation.isValidGuid(scopeParts[1])) {
+              return `${scopeParts[1]} is not a valid GUID`;
+            }
+            else if (scopeParts.length === 3 && !validation.isValidGuid(scopeParts[2])) {
+              return `${scopeParts[2]} is not a valid GUID`;
+            }
+          }
         }
 
         return true;
@@ -156,51 +164,34 @@ class EntraPimRoleAssignmentAddCommand extends GraphCommand {
 
   #initOptionSets(): void {
     this.optionSets.push({ options: ['roleDefinitionName', 'roleDefinitionId'] });
+    this.optionSets.push({
+      options: ['noExpiration', 'endDateTime', 'duration'],
+      runsWhen: (args) => {
+        return !args.options.noExpiration && args.options.endDateTime !== undefined || args.options.duration !== undefined;
+      }
+    });
+    this.optionSets.push({
+      options: ['userId', 'userName', 'groupId', 'groupName'],
+      runsWhen: (args) => {
+        return args.options.userId !== undefined || args.options.userName !== undefined || args.options.groupId !== undefined || args.options.groupName !== undefined;
+      }
+    });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    let roleDefinitionId = args.options.roleDefinitionId;
-    let principalId = args.options.userId;
     let action = 'adminAssign';
 
     try {
-      if (args.options.roleDefinitionName) {
-        if (this.verbose) {
-          await logger.logToStderr(`Retrieving role definition by its name '${args.options.roleDefinitionName}'`);
-        }
-
-        roleDefinitionId = (await roleDefinition.getRoleDefinitionByDisplayName(args.options.roleDefinitionName)).id;
+      const token = auth.connection.accessTokens[auth.defaultResource].accessToken;
+      const isAppOnlyAccessToken = accessToken.isAppOnlyAccessToken(token);
+      if (isAppOnlyAccessToken) {
+        throw 'When running with application permissions either userId, userName, groupId or groupName is required';
       }
 
-      if (args.options.userName) {
-        if (this.verbose) {
-          await logger.logToStderr(`Retrieving user by its name '${args.options.userName}'`);
-        }
+      const roleDefinitionId = await this.getRoleDefinitionId(args.options, logger);
+      const principalId = await this.getPrincipalId(args.options, logger);
 
-        principalId = await entraUser.getUserIdByUpn(args.options.userName);
-      }
-      else if (args.options.groupId) {
-        principalId = args.options.groupId;
-      }
-      else if (args.options.groupName) {
-        if (this.verbose) {
-          await logger.logToStderr(`Retrieving group by its name '${args.options.groupName}'`);
-        }
-
-        principalId = await entraGroup.getGroupIdByDisplayName(args.options.groupName);
-      }
-      else if (!args.options.userId) {
-        if (this.verbose) {
-          await logger.logToStderr(`Retrieving id of the current user`);
-        }
-
-        const token = auth.connection.accessTokens[auth.defaultResource].accessToken;
-        const isAppOnlyAccessToken = accessToken.isAppOnlyAccessToken(token);
-        if (isAppOnlyAccessToken) {
-          throw 'When running with application permissions either userId, userName, groupId or groupName is required';
-        }
-
-        principalId = accessToken.getUserIdFromAccessToken(token);
+      if (!args.options.userId && !args.options.userName && !args.options.groupId && !args.options.groupName) {
         action = 'selfActivate';
       }
 
@@ -219,7 +210,7 @@ class EntraPimRoleAssignmentAddCommand extends GraphCommand {
           scheduleInfo: {
             startDateTime: args.options.startDateTime,
             expiration: {
-              duration: args.options.duration,
+              duration: this.getDuration(args.options),
               endDateTime: args.options.endDateTime,
               type: this.getExpirationType(args.options)
             }
@@ -240,16 +231,69 @@ class EntraPimRoleAssignmentAddCommand extends GraphCommand {
     }
   }
 
-  private getExpirationType(options: Options): string {
-    if (options.duration) {
-      return 'afterDuration';
+  private async getRoleDefinitionId(options: Options, logger: Logger): Promise<string> {
+    if (options.roleDefinitionId) {
+      return options.roleDefinitionId;
     }
 
+    if (this.verbose) {
+      await logger.logToStderr(`Retrieving role definition by its name '${options.roleDefinitionName}'`);
+    }
+
+    const role = await roleDefinition.getRoleDefinitionByDisplayName(options.roleDefinitionName!);
+    return role.id!;
+  }
+
+  private async getPrincipalId(options: Options, logger: Logger): Promise<string> {
+    let principalId = options.userId;
+
+    if (options.userName) {
+      if (this.verbose) {
+        await logger.logToStderr(`Retrieving user by its name '${options.userName}'`);
+      }
+
+      principalId = await entraUser.getUserIdByUpn(options.userName);
+    }
+    else if (options.groupId) {
+      principalId = options.groupId;
+    }
+    else if (options.groupName) {
+      if (this.verbose) {
+        await logger.logToStderr(`Retrieving group by its name '${options.groupName}'`);
+      }
+
+      principalId = await entraGroup.getGroupIdByDisplayName(options.groupName);
+    }
+    else if (!options.userId) {
+      if (this.verbose) {
+        await logger.logToStderr(`Retrieving id of the current user`);
+      }
+
+      const token = auth.connection.accessTokens[auth.defaultResource].accessToken;
+      principalId = accessToken.getUserIdFromAccessToken(token);
+    }
+
+    return principalId!;
+  }
+
+  private getExpirationType(options: Options): string {
     if (options.endDateTime) {
       return 'afterDateTime';
     }
 
-    return 'noExpiration';
+    if (options.noExpiration) {
+      return 'noExpiration';
+    }
+
+    return 'afterDuration';
+  }
+
+  private getDuration(options: Options): string | undefined {
+    if (!options.duration && !options.endDateTime && !options.noExpiration) {
+      return 'PT8H';
+    }
+
+    return options.duration;
   }
 }
 
