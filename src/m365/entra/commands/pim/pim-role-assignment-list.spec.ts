@@ -11,7 +11,6 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import command from './pim-role-assignment-list.js';
-import aadCommands from '../../aadCommands.js';
 import { entraUser } from '../../../../utils/entraUser.js';
 import { entraGroup } from '../../../../utils/entraGroup.js';
 import { CommandError } from '../../../../Command.js';
@@ -160,16 +159,6 @@ describe(commands.PIM_ROLE_ASSIGNMENT_LIST, () => {
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
-  });
-
-  it('defines alias', () => {
-    const alias = command.alias();
-    assert.notStrictEqual(typeof alias, 'undefined');
-  });
-
-  it('defines correct alias', () => {
-    const alias = command.alias();
-    assert.deepStrictEqual(alias, [aadCommands.PIM_ROLE_ASSIGNMENT_LIST]);
   });
 
   it('passes validation when userId is a valid GUID', async () => {
