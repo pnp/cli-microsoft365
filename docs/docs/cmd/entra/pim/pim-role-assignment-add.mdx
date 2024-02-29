@@ -65,12 +65,6 @@ To use this command you must be **Privileged Role Administrator**.
 
 :::
 
-When specifying the scope of the assignment, use 
-
-- `'/'` for tenant-wide scope
-- `'/administrativeUnits/{administrative_unit_id}'` for scope limited to the administrative unit
-- `'/{application_object_id}'` for scope limited to the application
-
 ## Examples
 
 Request activation of the SharePoint Administrator Entra ID role assignment for the current user.
@@ -221,4 +215,4 @@ m365 entra pim role assignment add --roleDefinitionName 'Global Administrator' -
 
 ## More information
 
-- Role assignment request: https://learn.microsoft.com/graph/api/rbacapplication-post-roleassignmentschedulerequests?view=graph-rest-1.0
+- Role assignment request: https://learn.microsoft.com/graph/api/rbacapplication-post-roleassignmentschedulerequests
