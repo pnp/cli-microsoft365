@@ -22,6 +22,7 @@ import { CommandOptionInfo } from './CommandOptionInfo.js';
 import { Logger } from './Logger.js';
 import { SelectionConfig, ConfirmationConfig, prompt } from '../utils/prompt.js';
 import { timings } from './timings.js';
+import chalk from 'chalk';
 const require = createRequire(import.meta.url);
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
@@ -660,6 +661,10 @@ function printHelp(helpMode: string, exitCode: number = 0): void {
     printCommandHelp(helpMode);
   }
   else {
+    if (cli.currentCommandName && !cli.commands.some(command => command.name.startsWith(cli.currentCommandName!))) {
+      cli.error(chalk.red(`Command '${cli.currentCommandName}' was not found. Below you can find the commands and command groups you can use. For detailed information on a command group, use 'm365 [command group] --help'.`));
+    }
+
     cli.log();
     cli.log(`CLI for Microsoft 365 v${app.packageJson().version}`);
     cli.log(`${app.packageJson().description} `);
