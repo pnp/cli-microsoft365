@@ -209,7 +209,6 @@ describe(commands.USER_REMOVE, () => {
     assert.notStrictEqual(actual, true);
   });
 
-
   it('fails validation if entraGroupId is not a valid id', async () => {
     const actual = await command.validate({ options: { webUrl: validWebUrl, entraGroupId: 'invalid' } }, commandInfo);
     assert.notStrictEqual(actual, true);
