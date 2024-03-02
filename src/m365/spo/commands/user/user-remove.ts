@@ -9,6 +9,7 @@ import { formatting } from '../../../../utils/formatting.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
+import { CommandError } from '../../../../Command.js';
 
 interface CommandArgs {
   options: Options;
@@ -149,7 +150,7 @@ class SpoUserRemoveCommand extends SpoCommand {
         requestUrl += `removebyid(${user.Id})`;
       }
       else if (options.userName) {
-        const user = await this.getUser(options.webUrl, options);
+        const user = await this.getUser(options);
 
         if (!user) {
           throw new CommandError(`User not found: ${options.userName}`);
@@ -163,16 +164,16 @@ class SpoUserRemoveCommand extends SpoCommand {
       else if (options.entraGroupId || options.entraGroupName) {
         const entraGroup = await this.getEntraGroup(options.webUrl, options);
         if (this.verbose) {
-          await logger.logToStderr(`Removing entra group ${entraGroup.displayName} ...`);
+          await logger.logToStderr(`Removing entra group ${entraGroup?.displayName} ...`);
         }
         //for entra groups, M365 groups have an associated email and security groups don't
-        if (entraGroup.mail) {
+        if (entraGroup?.mail) {
           //M365 group is prefixed with c:0o.c|federateddirectoryclaimprovider
           requestUrl += `removeByLoginName('c:0o.c|federateddirectoryclaimprovider|${entraGroup.id}')`;
         }
         else {
           //security group is prefixed with c:0t.c|tenant
-          requestUrl += `removeByLoginName('c:0t.c|tenant|${entraGroup.id}')`;
+          requestUrl += `removeByLoginName('c:0t.c|tenant|${entraGroup?.id}')`;
         }
       }
 
@@ -190,7 +191,7 @@ class SpoUserRemoveCommand extends SpoCommand {
     }
   }
 
-  private async getUser(webUrl: string, options: GlobalOptions): Promise<any> {
+  private async getUser(options: GlobalOptions): Promise<any> {
     const requestUrl: string = `${options.webUrl}/_api/web/siteusers?$filter=UserPrincipalName eq ('${formatting.encodeQueryParameter(options.userName)}')`;
     const requestOptions: CliRequestOptions = {
       url: requestUrl,
@@ -206,8 +207,8 @@ class SpoUserRemoveCommand extends SpoCommand {
     }).value[0];
   }
 
-  private async getEntraGroup(webUrl: string, options: GlobalOptions): Promise<any> {
-    let group: Group;
+  private async getEntraGroup(webUrl: string, options: GlobalOptions): Promise<Group | undefined> {
+    let group: Group | undefined;
     if (options.entraGroupId) {
       group = await entraGroup.getGroupById(options.entraGroupId);
       return group;
@@ -216,7 +217,7 @@ class SpoUserRemoveCommand extends SpoCommand {
       group = await entraGroup.getGroupByDisplayName(options.entraGroupName);
       return group;
     }
-
+    return undefined;
   }
 }
 
