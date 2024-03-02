@@ -22,7 +22,8 @@ interface Options extends GlobalOptions {
   userName?: string;
   groupId?: string;
   groupName?: string;
-  directoryScopeId?: string;
+  administrativeUnitId?: string;
+  applicationId?: string;
   justification?: string;
   startDateTime?: string;
   endDateTime?: string;
@@ -59,7 +60,8 @@ class EntraPimRoleAssignmentAddCommand extends GraphCommand {
         userName: typeof args.options.userName !== 'undefined',
         groupId: typeof args.options.groupId !== 'undefined',
         groupName: typeof args.options.groupName !== 'undefined',
-        directoryScopeId: typeof args.options.directoryScopeId !== 'undefined',
+        administrativeUnitId: typeof args.options.administrativeUnitId !== 'undefined',
+        applicationId: typeof args.options.applicationId !== 'undefined',
         justification: typeof args.options.justification !== 'undefined',
         startDateTime: typeof args.options.startDateTime !== 'undefined',
         endDateTime: typeof args.options.endDateTime !== 'undefined',
@@ -92,7 +94,10 @@ class EntraPimRoleAssignmentAddCommand extends GraphCommand {
         option: "--groupName [groupName]"
       },
       {
-        option: "--directoryScopeId [directoryScopeId]"
+        option: "--administrativeUnitId [administrativeUnitId]"
+      },
+      {
+        option: "--applicationId [applicationId]"
       },
       {
         option: "-j, --justification [justification]"
@@ -145,16 +150,12 @@ class EntraPimRoleAssignmentAddCommand extends GraphCommand {
           return `${args.options.duration} is not a valid ISO 8601 duration`;
         }
 
-        if (args.options.directoryScopeId) {
-          if (args.options.directoryScopeId !== '/') {
-            const scopeParts = args.options.directoryScopeId.split('/');
-            if (scopeParts.length === 2 && !validation.isValidGuid(scopeParts[1])) {
-              return `${scopeParts[1]} is not a valid GUID`;
-            }
-            else if (scopeParts.length === 3 && !validation.isValidGuid(scopeParts[2])) {
-              return `${scopeParts[2]} is not a valid GUID`;
-            }
-          }
+        if (args.options.administrativeUnitId && !validation.isValidGuid(args.options.administrativeUnitId)) {
+          return `${args.options.administrativeUnitId} is not a valid GUID`;
+        }
+
+        if (args.options.applicationId && !validation.isValidGuid(args.options.applicationId)) {
+          return `${args.options.applicationId} is not a valid GUID`;
         }
 
         return true;
@@ -174,6 +175,12 @@ class EntraPimRoleAssignmentAddCommand extends GraphCommand {
       options: ['userId', 'userName', 'groupId', 'groupName'],
       runsWhen: (args) => {
         return args.options.userId !== undefined || args.options.userName !== undefined || args.options.groupId !== undefined || args.options.groupName !== undefined;
+      }
+    });
+    this.optionSets.push({
+      options: ['administrativeUnitId', 'applicationId'],
+      runsWhen: (args) => {
+        return args.options.administrativeUnitId !== undefined || args.options.applicationId !== undefined;
       }
     });
   }
@@ -204,7 +211,7 @@ class EntraPimRoleAssignmentAddCommand extends GraphCommand {
         data: {
           principalId: principalId,
           roleDefinitionId: roleDefinitionId,
-          directoryScopeId: args.options.directoryScopeId ?? '/',
+          directoryScopeId: this.getDirectoryScope(args.options),
           action: action,
           justification: args.options.justification,
           scheduleInfo: {
@@ -294,6 +301,18 @@ class EntraPimRoleAssignmentAddCommand extends GraphCommand {
     }
 
     return options.duration;
+  }
+
+  private getDirectoryScope(options: Options): string {
+    if (options.administrativeUnitId) {
+      return `/administrativeUnits/${options.administrativeUnitId}`;
+    }
+
+    if (options.applicationId) {
+      return `/${options.applicationId}`;
+    }
+
+    return '/';
   }
 }
 
