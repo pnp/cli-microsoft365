@@ -263,13 +263,13 @@ describe(commands.PIM_ROLE_ASSIGNMENT_ADD, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when directoryScopeId is limited to an administrative unit and the administrative unit id is a valid GUID', async () => {
-    const actual = await command.validate({ options: { roleDefinitionId: roleDefinitionId, directoryScopeId: '/administrativeUnits/81bb36e4-f4c6-4984-8e56-d4f8feae9e09' } }, commandInfo);
+  it('passes validation when administrativeUnitId is a valid GUID', async () => {
+    const actual = await command.validate({ options: { roleDefinitionId: roleDefinitionId, administrativeUnitId: '81bb36e4-f4c6-4984-8e56-d4f8feae9e09' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when directoryScopeId is limited to a service principal and the service principal id is a valid GUID', async () => {
-    const actual = await command.validate({ options: { roleDefinitionId: roleDefinitionId, directoryScopeId: '/94446d35-4df6-45da-a17f-c601310a8342' } }, commandInfo);
+  it('passes validation when applicationId is a valid GUID', async () => {
+    const actual = await command.validate({ options: { roleDefinitionId: roleDefinitionId, applicationId: '94446d35-4df6-45da-a17f-c601310a8342' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
@@ -303,13 +303,13 @@ describe(commands.PIM_ROLE_ASSIGNMENT_ADD, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when directoryScopeId is limited to an administrative unit and the administrative unit id is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { roleDefinitionId: roleDefinitionId, directoryScopeId: '/administrativeUnits/foo' } }, commandInfo);
+  it('fails validation when administrativeUnitId is not a valid GUID', async () => {
+    const actual = await command.validate({ options: { roleDefinitionId: roleDefinitionId, administrativeUnitId: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when directoryScopeId is limited to a service principal and the service principal id is a valid GUID', async () => {
-    const actual = await command.validate({ options: { roleDefinitionId: roleDefinitionId, directoryScopeId: '/foo' } }, commandInfo);
+  it('fails validation when applicationId is not a valid GUID', async () => {
+    const actual = await command.validate({ options: { roleDefinitionId: roleDefinitionId, applicationId: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
@@ -342,7 +342,6 @@ describe(commands.PIM_ROLE_ASSIGNMENT_ADD, () => {
       {
         roleDefinitionId: roleDefinitionId,
         userId: userId,
-        directoryScopeId: '/',
         justification: 'Need SharePoint Administrator role'
       }
     });
@@ -377,7 +376,6 @@ describe(commands.PIM_ROLE_ASSIGNMENT_ADD, () => {
       {
         roleDefinitionId: roleDefinitionId,
         userId: userId,
-        directoryScopeId: '/',
         justification: 'Need SharePoint Administrator role',
         noExpiration: true
       }
@@ -418,7 +416,7 @@ describe(commands.PIM_ROLE_ASSIGNMENT_ADD, () => {
       {
         roleDefinitionName: roleDefinitionName,
         userName: userName,
-        directoryScopeId: '/administrativeUnits/81bb36e4-f4c6-4984-8e56-d4f8feae9e09',
+        administrativeUnitId: '81bb36e4-f4c6-4984-8e56-d4f8feae9e09',
         startDateTime: '2024-02-12T08:00:00Z',
         duration: 'PT4H',
         justification: 'Need SharePoint Administrator role for admin unit for half day',
@@ -457,7 +455,7 @@ describe(commands.PIM_ROLE_ASSIGNMENT_ADD, () => {
       {
         roleDefinitionId: roleDefinitionId,
         groupId: groupId,
-        directoryScopeId: '/94446d35-4df6-45da-a17f-c601310a8342',
+        applicationId: '94446d35-4df6-45da-a17f-c601310a8342',
         endDateTime: '2024-02-12T12:00:00Z',
         justification: 'Need Application Administrator role for group for two days'
       }
