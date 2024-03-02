@@ -153,7 +153,7 @@ class SpoUserRemoveCommand extends SpoCommand {
         const user = await this.getUser(options.webUrl, options);
 
         if (!user) {
-          throw new Error(`User not found: ${options.userName}`);
+          throw new CommandError(`User not found: ${options.userName}`);
         }
 
         if (this.verbose) {
