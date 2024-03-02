@@ -1877,6 +1877,19 @@ const sidebars: SidebarsConfig = {
       ]
     },
     {
+      'SharePoint Embedded (spe)': [
+        {
+          containertype: [
+            {
+              type: 'doc',
+              label: 'containertype add',
+              id: 'cmd/spe/containertype/containertype-add'
+            }
+          ]
+        }
+      ]
+    },
+    {
       'SharePoint Framework (spfx)': [
         {
           type: 'doc',
