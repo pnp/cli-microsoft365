@@ -93,8 +93,7 @@ class SpoUserRemoveCommand extends SpoCommand {
           return isValidSharePointUrl;
         }
 
-        if (args.options.id &&
-          typeof args.options.id !== 'number') {
+        if (args.options.id && isNaN(parseInt(args.options.id))) {
           return `Specified id ${args.options.id} is not a number`;
         }
 
