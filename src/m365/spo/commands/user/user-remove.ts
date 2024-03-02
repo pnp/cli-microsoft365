@@ -211,13 +211,11 @@ class SpoUserRemoveCommand extends SpoCommand {
     let group: Group | undefined;
     if (options.entraGroupId) {
       group = await entraGroup.getGroupById(options.entraGroupId);
-      return group;
     }
     else if (options.entraGroupName) {
       group = await entraGroup.getGroupByDisplayName(options.entraGroupName);
-      return group;
     }
-    return undefined;
+    return group;
   }
 }
 

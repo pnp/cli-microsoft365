@@ -597,6 +597,17 @@ describe(commands.USER_REMOVE, () => {
   });
 
   it('handles generic error when user not found when username is passed without prompting with confirmation argument', async () => {
+    const err = `User not found: ${validUserName}`;
+    const error = {
+      error: {
+        code: undefined,
+        message: {
+          code: undefined,
+          message: err
+        }
+      }
+    };
+
     sinon.stub(request, 'get').callsFake(async (opts) => {
       requests.push(opts);
       if (opts.url === `${validWebUrl}/_api/web/siteusers?$filter=UserPrincipalName eq ('${formatting.encodeQueryParameter(validUserName)}')`) {
@@ -610,7 +621,7 @@ describe(commands.USER_REMOVE, () => {
       if (opts.url === `${validWebUrl}/_api/web/siteusers/removebyid(10)`) {
         return Promise.resolve();
       }
-      throw 'Invalid request';
+      throw error;
     });
 
     await assert.rejects(command.action(logger, {
@@ -620,7 +631,7 @@ describe(commands.USER_REMOVE, () => {
         userName: validUserName,
         force: true
       }
-    }), new CommandError(`User not found: ${validUserName}`));;
+    }), new CommandError(error.error.message as any));;
   });
 
 });
