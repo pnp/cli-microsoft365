@@ -49,7 +49,7 @@ class TenantIdGetCommand extends Command {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     let domainName: string | undefined = args.options.domainName;
     if (!domainName) {
-      const userName: string = accessToken.getUserNameFromAccessToken(auth.service.accessTokens[auth.defaultResource].accessToken);
+      const userName: string = accessToken.getUserNameFromAccessToken(auth.connection.accessTokens[auth.defaultResource].accessToken);
       domainName = userName.split('@')[1];
     }
 

@@ -37,9 +37,9 @@ describe(commands.USER_GET, () => {
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
-    auth.service.connected = true;
-    if (!auth.service.accessTokens[auth.defaultResource]) {
-      auth.service.accessTokens[auth.defaultResource] = {
+    auth.connection.active = true;
+    if (!auth.connection.accessTokens[auth.defaultResource]) {
+      auth.connection.accessTokens[auth.defaultResource] = {
         expiresOn: '123',
         accessToken: 'abc'
       };
@@ -75,7 +75,7 @@ describe(commands.USER_GET, () => {
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
+    auth.connection.active = false;
   });
 
   it('has correct name', () => {

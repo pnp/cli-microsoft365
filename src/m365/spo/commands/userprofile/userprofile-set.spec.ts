@@ -28,8 +28,8 @@ describe(commands.USERPROFILE_SET, () => {
       FormDigestExpiresAt: new Date(),
       WebFullUrl: 'https://contoso.sharepoint.com'
     });
-    auth.service.connected = true;
-    auth.service.spoUrl = spoUrl;
+    auth.connection.active = true;
+    auth.connection.spoUrl = spoUrl;
   });
 
   beforeEach(() => {
@@ -55,8 +55,8 @@ describe(commands.USERPROFILE_SET, () => {
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
-    auth.service.spoUrl = undefined;
+    auth.connection.active = false;
+    auth.connection.spoUrl = undefined;
   });
 
   it('has correct name', () => {

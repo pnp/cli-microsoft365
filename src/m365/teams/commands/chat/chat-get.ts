@@ -121,7 +121,7 @@ class TeamsChatGetCommand extends GraphCommand {
 
   private async getChatIdByParticipants(participantsString: string): Promise<string> {
     const participants = participantsString.trim().toLowerCase().split(',').filter(e => e && e !== '');
-    const currentUserEmail = accessToken.getUserNameFromAccessToken(auth.service.accessTokens[this.resource].accessToken).toLowerCase();
+    const currentUserEmail = accessToken.getUserNameFromAccessToken(auth.connection.accessTokens[this.resource].accessToken).toLowerCase();
     const existingChats = await chatUtil.findExistingChatsByParticipants([currentUserEmail, ...participants]);
 
     if (!existingChats || existingChats.length === 0) {

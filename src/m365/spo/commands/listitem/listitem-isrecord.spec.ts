@@ -106,7 +106,7 @@ describe(commands.LISTITEM_ISRECORD, () => {
       FormDigestExpiresAt: new Date(),
       WebFullUrl: 'https://contoso.sharepoint.com'
     }));
-    auth.service.connected = true;
+    auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
   });
 
@@ -137,7 +137,7 @@ describe(commands.LISTITEM_ISRECORD, () => {
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
+    auth.connection.active = false;
   });
 
   it('has correct name', () => {

@@ -29,8 +29,8 @@ describe(commands.SITE_ADD, () => {
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     sinon.stub(session, 'getId').callsFake(() => '');
-    auth.service.connected = true;
-    auth.service.spoUrl = 'https://contoso.sharepoint.com';
+    auth.connection.active = true;
+    auth.connection.spoUrl = 'https://contoso.sharepoint.com';
     commandInfo = cli.getCommandInfo(command);
   });
 
@@ -66,8 +66,8 @@ describe(commands.SITE_ADD, () => {
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
-    auth.service.spoUrl = undefined;
+    auth.connection.active = false;
+    auth.connection.spoUrl = undefined;
   });
 
   it('has correct name', () => {

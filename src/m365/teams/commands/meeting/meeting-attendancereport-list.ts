@@ -82,7 +82,7 @@ class TeamsMeetingAttendancereportListCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const isAppOnlyAccessToken: boolean | undefined = accessToken.isAppOnlyAccessToken(auth.service.accessTokens[this.resource].accessToken);
+    const isAppOnlyAccessToken: boolean | undefined = accessToken.isAppOnlyAccessToken(auth.connection.accessTokens[this.resource].accessToken);
     if (isAppOnlyAccessToken && !args.options.userId && !args.options.userName && !args.options.email) {
       this.handleError(`The option 'userId', 'userName' or 'email' is required when retrieving meeting attendance report using app only permissions`);
     }

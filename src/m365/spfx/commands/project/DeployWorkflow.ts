@@ -15,11 +15,11 @@ export const workflow: gitHubWorkflow = {
       steps: [
         {
           name: "Checkout",
-          uses: "actions/checkout@v3.5.3"
+          uses: "actions/checkout@v4"
         },
         {
           name: "Use Node.js",
-          uses: "actions/setup-node@v3.7.0",
+          uses: "actions/setup-node@v4",
           with: {
             "node-version": "18.x"
           }
@@ -38,7 +38,8 @@ export const workflow: gitHubWorkflow = {
           with: {
             "CERTIFICATE_ENCODED": "${{ secrets.CERTIFICATE_ENCODED }}",
             "CERTIFICATE_PASSWORD": "${{ secrets.CERTIFICATE_PASSWORD }}",
-            "APP_ID": "${{ secrets.APP_ID }}"
+            "APP_ID": "${{ secrets.APP_ID }}",
+            "TENANT": "${{ secrets.TENANT_ID }}"
           }
         },
         {

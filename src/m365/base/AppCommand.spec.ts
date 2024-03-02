@@ -90,7 +90,7 @@ describe('AppCommand', () => {
     sinon.stub(fs, 'readFileSync').returns(JSON.stringify({
       apps: []
     }));
-    await assert.rejects(cmd.action(logger, { options: {} }), new CommandError('No Azure AD apps found in .m365rc.json'));
+    await assert.rejects(cmd.action(logger, { options: {} }), new CommandError('No Entra apps found in .m365rc.json'));
   });
 
   it(`returns error if the specified appId not found in the .m365rc.json file`, async () => {

@@ -19,6 +19,7 @@ describe(commands.TASK_SET, () => {
   let logger: Logger;
   let commandInfo: CommandInfo;
   let patchStub: sinon.SinonStub<[options: CliRequestOptions]>;
+  let loggerLogSpy: sinon.SinonSpy;
 
   const getRequestData = {
     "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#users('4cb2b035-ad76-406c-bdc4-6c72ad403a22')/todo/lists",
@@ -52,7 +53,7 @@ describe(commands.TASK_SET, () => {
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
-    auth.service.connected = true;
+    auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
   });
 
@@ -69,6 +70,7 @@ describe(commands.TASK_SET, () => {
         log.push(msg);
       }
     };
+    loggerLogSpy = sinon.spy(logger, 'log');
     (command as any).items = [];
     patchStub = sinon.stub(request, 'patch').callsFake(async (opts: any) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/me/todo/lists/AQMkADlhMTRkOGEzLWQ1M2QtNGVkNS04NjdmLWU0NzJhMjZmZWNmMwAuAAADKvwNgAMNPE_zFNRJXVrU1wEAhHKQZHItDEOVCn8U3xuA2AABmQeVPwAAAA==/tasks/abc`) {
@@ -97,7 +99,7 @@ describe(commands.TASK_SET, () => {
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
+    auth.connection.active = false;
   });
 
   it('has correct name', () => {
@@ -116,7 +118,7 @@ describe(commands.TASK_SET, () => {
         listId: 'AQMkADlhMTRkOGEzLWQ1M2QtNGVkNS04NjdmLWU0NzJhMjZmZWNmMwAuAAADKvwNgAMNPE_zFNRJXVrU1wEAhHKQZHItDEOVCn8U3xuA2AABmQeVPwAAAA=='
       }
     } as any);
-    assert.strictEqual(JSON.stringify(log[0]), JSON.stringify(patchRequestData));
+    assert(loggerLogSpy.calledWith(patchRequestData));
   });
 
   it('updates tasks for list using listName (debug)', async () => {
@@ -129,7 +131,7 @@ describe(commands.TASK_SET, () => {
         debug: true
       }
     } as any);
-    assert.strictEqual(JSON.stringify(log[0]), JSON.stringify(patchRequestData));
+    assert(loggerLogSpy.calledWith(patchRequestData));
   });
 
   it('updates tasks for list with bodyContent and bodyContentType', async () => {

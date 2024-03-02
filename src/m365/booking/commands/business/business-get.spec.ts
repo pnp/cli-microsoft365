@@ -38,7 +38,7 @@ describe(commands.BUSINESS_GET, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
 
-    auth.service.connected = true;
+    auth.connection.active = true;
   });
 
   beforeEach(() => {
@@ -68,8 +68,8 @@ describe(commands.BUSINESS_GET, () => {
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
-    auth.service.spoUrl = undefined;
+    auth.connection.active = false;
+    auth.connection.spoUrl = undefined;
   });
 
   it('has correct name', () => {

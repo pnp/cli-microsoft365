@@ -55,8 +55,8 @@ describe(commands.TENANT_COMMANDSET_SET, () => {
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
-    auth.service.connected = true;
-    auth.service.spoUrl = spoUrl;
+    auth.connection.active = true;
+    auth.connection.spoUrl = spoUrl;
     commandInfo = cli.getCommandInfo(command);
   });
 
@@ -84,7 +84,7 @@ describe(commands.TENANT_COMMANDSET_SET, () => {
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
+    auth.connection.active = false;
   });
 
   it('has correct name', () => {

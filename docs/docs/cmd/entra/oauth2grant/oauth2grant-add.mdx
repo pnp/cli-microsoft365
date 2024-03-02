@@ -33,11 +33,11 @@ m365 aad oauth2grant add [options]
 
 ## Remarks
 
-Before you can grant service principal OAuth2 permissions, you need its `objectId`. You can retrieve it using the [entra sp get](../sp/sp-get.mdx) command.
+Before you can grant service principal OAuth2 permissions, you need its `objectId`. You can retrieve it using the [entra enterpriseapp get](../enterpriseapp/enterpriseapp-get.mdx) command.
 
-The resource for which you want to grant permissions is designated using its `objectId`. You can retrieve it using the [entra sp get](../sp/sp-get.mdx) command, the same way you would retrieve the `objectId` of the service principal.
+The resource for which you want to grant permissions is designated using its `objectId`. You can retrieve it using the [entra enterpriseapp get](../enterpriseapp/enterpriseapp-get.mdx) command, the same way you would retrieve the `objectId` of the service principal.
 
-When granting OAuth2 permissions, you have to specify which permission scopes you want to grant the service principal. You can get the list of available permission scopes either from the resource documentation or from the `appRoles` property when retrieving information about the service principal using the [entra sp get](../sp/sp-get.mdx) command. Multiple permission scopes can be specified separated by a space.
+When granting OAuth2 permissions, you have to specify which permission scopes you want to grant the service principal. You can get the list of available permission scopes either from the resource documentation or from the `appRoles` property when retrieving information about the service principal using the [entra enterpriseapp get](../enterpriseapp/enterpriseapp-get.mdx) command. Multiple permission scopes can be specified separated by a space.
 
 When granting OAuth2 permissions, the values of the `clientId` and `resourceId` properties form a unique key. If a grant for the same `clientId`-`resourceId` pair already exists, running the `entra oauth2grant add` command will fail with an error. If you want to change permissions on an existing OAuth2 grant use the [entra oauth2grant set](./oauth2grant-set.mdx) command instead.
 

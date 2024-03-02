@@ -22,7 +22,7 @@ describe(commands.USER_PASSWORD_VALIDATE, () => {
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
-    auth.service.connected = true;
+    auth.connection.active = true;
   });
 
   beforeEach(() => {
@@ -50,7 +50,7 @@ describe(commands.USER_PASSWORD_VALIDATE, () => {
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
+    auth.connection.active = false;
   });
 
   it('has correct name', () => {

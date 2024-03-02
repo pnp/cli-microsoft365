@@ -27,7 +27,7 @@ describe(commands.CACHE_REMOVE, () => {
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
-    auth.service.connected = true;
+    auth.connection.active = true;
     sinon.stub(cli.getConfig(), 'all').value({});
     commandInfo = cli.getCommandInfo(command);
   });
@@ -60,7 +60,7 @@ describe(commands.CACHE_REMOVE, () => {
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
+    auth.connection.active = false;
   });
 
   it('has correct name', () => {

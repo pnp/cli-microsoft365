@@ -27,7 +27,7 @@ describe(commands.APP_GET, () => {
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
-    auth.service.connected = true;
+    auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
   });
 
@@ -60,7 +60,7 @@ describe(commands.APP_GET, () => {
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
+    auth.connection.active = false;
   });
 
   it('has correct name', () => {
@@ -78,7 +78,7 @@ describe(commands.APP_GET, () => {
 
   it('defines correct alias', () => {
     const alias = command.alias();
-    assert.deepStrictEqual(alias, [aadCommands.APP_GET]);
+    assert.deepStrictEqual(alias, [aadCommands.APP_GET, commands.APPREGISTRATION_GET]);
   });
 
   it('handles error when the app specified with the appId not found', async () => {

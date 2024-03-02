@@ -29,6 +29,8 @@ const dictionary = [
   'customizer',
   'dataverse',
   'default',
+  'details',
+  'enterprise',
   'entra',
   'event',
   'eventreceiver',
@@ -77,6 +79,7 @@ const dictionary = [
   'records',
   'recycle',
   'resolver',
+  'registration',
   'retention',
   'role',
   'room',
@@ -142,7 +145,8 @@ module.exports = {
     "**/package-generate/assets/**",
     "**/test-projects/**",
     "clientsidepages.ts",
-    "*.js"
+    "*.js",
+    "*.cjs"
   ],
   "rules": {
     "cli-microsoft365/correct-command-class-name": ["error", sortedDictionary, capitalized],
@@ -239,7 +243,7 @@ module.exports = {
     },
     {
       "files": [
-        "**/yammer/**"
+        "**/viva/commands/engage/**"
       ],
       "rules": {
         "camelcase": "off"

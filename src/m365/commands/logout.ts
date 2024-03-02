@@ -17,7 +17,7 @@ class LogoutCommand extends Command {
       await logger.logToStderr('Logging out from Microsoft 365...');
     }
 
-    const logout: () => void = (): void => auth.service.logout();
+    const deactivate: () => void = (): void => auth.connection.deactivate();
 
     try {
       await auth.clearConnectionInfo();
@@ -28,7 +28,7 @@ class LogoutCommand extends Command {
       }
     }
     finally {
-      logout();
+      deactivate();
     }
   }
 

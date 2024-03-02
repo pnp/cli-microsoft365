@@ -29,8 +29,8 @@ describe(commands.THEME_GET, () => {
       FormDigestExpiresAt: new Date(),
       WebFullUrl: 'https://contoso.sharepoint.com'
     });
-    auth.service.connected = true;
-    auth.service.spoUrl = 'https://contoso.sharepoint.com';
+    auth.connection.active = true;
+    auth.connection.spoUrl = 'https://contoso.sharepoint.com';
   });
 
   beforeEach(() => {
@@ -57,8 +57,8 @@ describe(commands.THEME_GET, () => {
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
-    auth.service.spoUrl = undefined;
+    auth.connection.active = false;
+    auth.connection.spoUrl = undefined;
   });
 
   it('has correct name', () => {

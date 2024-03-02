@@ -4,15 +4,31 @@ sidebar_position: 4
 
 # Release notes
 
-## v7.5.0 (beta)
+## v7.6.0 (beta)
+
+### New commands
+
+**Purview:**
+
+- [purview threatassessment add](../cmd/purview/threatassessment/threatassessment-add.mdx) - creates a threat assessment [#4428](https://github.com/pnp/cli-microsoft365/issues/4428)
+- [purview threatassessment list](../cmd/purview/threatassessment/threatassessment-list.mdx) - get a list of threat assessments [#4426](https://github.com/pnp/cli-microsoft365/issues/4426)
+
+### Changes
+
+- refactored 'auth' and 'chili' files to async/await. [#5145](https://github.com/pnp/cli-microsoft365/issues/5145)
+- refactored 'cli' files to async/await. [#5146](https://github.com/pnp/cli-microsoft365/issues/5146)
+
+## [v7.5.0](https://github.com/pnp/cli-microsoft365/releases/tag/v7.5.0)
 
 ### New commands
 
 **Entra ID**
 
+- [entra administrativeunit member remove](../cmd/entra/administrativeunit/administrativeunit-member-remove.mdx) - removes a member (user, group, or device) from an administrative unit [#5734](https://github.com/pnp/cli-microsoft365/issues/5734)
+- [entra app permission list](../cmd/entra/app/app-permission-list.mdx) - lists the application and delegated permissions for a specified Entra Application Registration [#5668](https://github.com/pnp/cli-microsoft365/issues/5668)
 - [entra group user add](../cmd/entra/group/group-user-add.mdx) - adds a user to a Microsoft Entra ID group [#5471](https://github.com/pnp/cli-microsoft365/issues/5471)
 - [entra group add](../cmd/entra/group/group-add.mdx) - creates a Microsoft Entra group [#5476](https://github.com/pnp/cli-microsoft365/issues/5476)
-- [entra app permission list](../cmd/entra/app/app-permission-list.mdx) - lists the application and delegated permissions for a specified Entra Application Registration [#5668](https://github.com/pnp/cli-microsoft365/issues/5668)
+- [entra user registrationdetails list](../cmd/entra/user/user-registrationdetails-list.mdx) - retrieves a list of the authentication methods registered for users [#5773](https://github.com/pnp/cli-microsoft365/issues/5773)
 
 **File:**
 
@@ -28,6 +44,16 @@ sidebar_position: 4
 - added request header Prefer: include-unknown-enum-members when reading connection schema [#5826](https://github.com/pnp/cli-microsoft365/issues/5826)
 - updated Docker images to use Node@20 [#5809](https://github.com/pnp/cli-microsoft365/pull/5809)
 - updated 'm365 entra user get' command to use correct query to Graph API [#5788](https://github.com/pnp/cli-microsoft365/issues/5788)
+- added tests and coverage summary to workflow [#3288](https://github.com/pnp/cli-microsoft365/issues/3288)
+- renamed 'yammer' to 'viva engage' [#5573](https://github.com/pnp/cli-microsoft365/issues/5573)
+- updated workflow actions
+- fixed the guide and 'spfx project github workflow add' command [#5814](https://github.com/pnp/cli-microsoft365/issues/5814)
+- renamed 'entra sp' to 'entra enterpriseapp' [#5680](https://github.com/pnp/cli-microsoft365/issues/5680)
+- added additional example for 'spo theme set' [#5819](https://github.com/pnp/cli-microsoft365/issues/5819)
+- added response section for remaning commands in docs [#5851](https://github.com/pnp/cli-microsoft365/issues/5851)
+- removed base command 'AzmgmtCommand' and 'AzmgmtItemsListCommand' [#5858](https://github.com/pnp/cli-microsoft365/issues/5858)
+- fixed paging in SharePoint search using allResults [#5710](https://github.com/pnp/cli-microsoft365/issues/5710)
+- added support for signing in with multiple identities [#3587](https://github.com/pnp/cli-microsoft365/issues/3587)
 
 ## [v7.4.0](https://github.com/pnp/cli-microsoft365/releases/tag/v7.4.0)
 
@@ -377,7 +403,7 @@ sidebar_position: 4
 
 **Entra ID:**
 
-- [entra sp list](../cmd/entra/sp/sp-list.mdx) - lists the service principals in the directory [#2461](https://github.com/pnp/cli-microsoft365/issues/2461)
+- [entra enterpriseapp list](../cmd/entra/enterpriseapp/enterpriseapp-list.mdx) - lists the service principals in the directory [#2461](https://github.com/pnp/cli-microsoft365/issues/2461)
 
 ### Changes
 
@@ -1566,7 +1592,7 @@ sidebar_position: 4
 ### Changes
 
 - updated 'entra oauth2grant list' to use MS Graph [#2710](https://github.com/pnp/cli-microsoft365/issues/2710)
-- updated the 'entra sp get' command to use MS Graph [#2754](https://github.com/pnp/cli-microsoft365/issues/2754)
+- updated the 'entra enterpriseapp get' command to use MS Graph [#2754](https://github.com/pnp/cli-microsoft365/issues/2754)
 - extended 'entra oauth2grant remove' with confirm [#2785](https://github.com/pnp/cli-microsoft365/issues/2785)
 - renamed clientId to spObjectId in entra oauth2grant list [#2786](https://github.com/pnp/cli-microsoft365/issues/2786)
 - fixed flow get as admin [#2984](https://github.com/pnp/cli-microsoft365/issues/2984)
@@ -1683,7 +1709,7 @@ sidebar_position: 4
 
 **Entra ID:**
 
-- [entra sp add](../cmd/entra/sp/sp-add.mdx) - adds a service principal to a registered Entra app [#2583](https://github.com/pnp/cli-microsoft365/issues/2583)
+- [entra enterpriseapp add](../cmd/entra/enterpriseapp/enterpriseapp-add.mdx) - adds a service principal to a registered Entra app [#2583](https://github.com/pnp/cli-microsoft365/issues/2583)
 
 **File:**
 
@@ -2175,7 +2201,7 @@ sidebar_position: 4
 
 **Yammer:**
 
-- [yammer search](../cmd/yammer/yammer-search.mdx) - returns a list of messages, users, topics and groups that match the specified query [#1454](https://github.com/pnp/cli-microsoft365/issues/1454)
+- [yammer search](../cmd/viva/engage/engage-search.mdx) - returns a list of messages, users, topics and groups that match the specified query [#1454](https://github.com/pnp/cli-microsoft365/issues/1454)
 
 ### Changes
 
@@ -2435,9 +2461,9 @@ sidebar_position: 4
 
 **Yammer:**
 
-- [yammer group user add](../cmd/yammer/group/group-user-add.mdx) - adds a user to a Yammer Group [#1456](https://github.com/pnp/cli-microsoft365/issues/1456)
-- [yammer group user remove](../cmd/yammer/group/group-user-remove.mdx) - removes a user from a Yammer group [#1457](https://github.com/pnp/cli-microsoft365/issues/1457)
-- [yammer message like set](../cmd/yammer/message/message-like-set.mdx) - likes or unlikes a Yammer message [#1455](https://github.com/pnp/cli-microsoft365/issues/1455)
+- [yammer group user add](../cmd/viva/engage/engage-group-user-add.mdx) - adds a user to a Yammer Group [#1456](https://github.com/pnp/cli-microsoft365/issues/1456)
+- [yammer group user remove](../cmd/viva/engage/engage-group-user-remove.mdx) - removes a user from a Yammer group [#1457](https://github.com/pnp/cli-microsoft365/issues/1457)
+- [yammer message like set](../cmd/viva/engage/engage-message-like-set.mdx) - likes or unlikes a Yammer message [#1455](https://github.com/pnp/cli-microsoft365/issues/1455)
 
 ### Changes
 
@@ -2474,7 +2500,7 @@ sidebar_position: 4
 - added suggesting upgrading dependency @microsoft/sp-http [#1516](https://github.com/pnp/cli-microsoft365/issues/1516)
 - added the 'Add custom client-side web part to modern page' sample script [#1438](https://github.com/pnp/cli-microsoft365/issues/1438)
 - added CodeTour report for spfx project upgrade [#1592](https://github.com/pnp/cli-microsoft365/issues/1592)
-- extended 'entra sp get' with --objectId option [#1567](https://github.com/pnp/cli-microsoft365/issues/1567)
+- extended 'entra enterpriseapp get' with --objectId option [#1567](https://github.com/pnp/cli-microsoft365/issues/1567)
 - removed reserved shortcut from 'entra approleassignment list' objectId option [#1607](https://github.com/pnp/cli-microsoft365/issues/1607)
 
 ## [v2.9.0](https://github.com/pnp/cli-microsoft365/releases/tag/v2.9.0)
@@ -2499,14 +2525,14 @@ sidebar_position: 4
 
 **Yammer:**
 
-- [yammer report activitycounts](../cmd/yammer/report/report-activitycounts.mdx) - gets the trends on the amount of Yammer activity in your organization by how many messages were posted, read, and liked [#1383](https://github.com/pnp/cli-microsoft365/issues/1383)
-- [yammer report activityusercounts](../cmd/yammer/report/report-activityusercounts.mdx) - gets the trends on the number of unique users who posted, read, and liked Yammer messages [#1384](https://github.com/pnp/cli-microsoft365/issues/1384)
-- [yammer report activityuserdetail](../cmd/yammer/report/report-activityuserdetail.mdx) - gets details about Yammer activity by user [#1382](https://github.com/pnp/cli-microsoft365/issues/1382)
-- [yammer report deviceusagedistributionusercounts](../cmd/yammer/report/report-deviceusagedistributionusercounts.mdx) - gets the number of users by device type [#1386](https://github.com/pnp/cli-microsoft365/issues/1386)
-- [yammer report deviceusageusercounts](../cmd/yammer/report/report-deviceusageusercounts.mdx) - gets the number of daily users by device type [#1387](https://github.com/pnp/cli-microsoft365/issues/1387)
-- [yammer report deviceusageuserdetail](../cmd/yammer/report/report-deviceusageuserdetail.mdx) - gets details about Yammer device usage by user [#1287](https://github.com/pnp/cli-microsoft365/issues/1287)
-- [yammer report groupsactivitydetail](../cmd/yammer/report/report-groupsactivitydetail.mdx) - gets details about Yammer groups activity by group [#1388](https://github.com/pnp/cli-microsoft365/issues/1388)
-- [yammer report groupsactivitygroupcounts](../cmd/yammer/report/report-groupsactivitygroupcounts.mdx) - gets the total number of groups that existed and how many included group conversation activity [#1389](https://github.com/pnp/cli-microsoft365/issues/1389)
+- [yammer report activitycounts](../cmd/viva/engage/engage-report-activitycounts.mdx) - gets the trends on the amount of Yammer activity in your organization by how many messages were posted, read, and liked [#1383](https://github.com/pnp/cli-microsoft365/issues/1383)
+- [yammer report activityusercounts](../cmd/viva/engage/engage-report-activityusercounts.mdx) - gets the trends on the number of unique users who posted, read, and liked Yammer messages [#1384](https://github.com/pnp/cli-microsoft365/issues/1384)
+- [yammer report activityuserdetail](../cmd/viva/engage/engage-report-activityuserdetail.mdx) - gets details about Yammer activity by user [#1382](https://github.com/pnp/cli-microsoft365/issues/1382)
+- [yammer report deviceusagedistributionusercounts](../cmd/viva/engage/engage-report-deviceusagedistributionusercounts.mdx) - gets the number of users by device type [#1386](https://github.com/pnp/cli-microsoft365/issues/1386)
+- [yammer report deviceusageusercounts](../cmd/viva/engage/engage-report-deviceusageusercounts.mdx) - gets the number of daily users by device type [#1387](https://github.com/pnp/cli-microsoft365/issues/1387)
+- [yammer report deviceusageuserdetail](../cmd/viva/engage/engage-report-deviceusageuserdetail.mdx) - gets details about Yammer device usage by user [#1287](https://github.com/pnp/cli-microsoft365/issues/1287)
+- [yammer report groupsactivitydetail](../cmd/viva/engage/engage-report-groupsactivitydetail.mdx) - gets details about Yammer groups activity by group [#1388](https://github.com/pnp/cli-microsoft365/issues/1388)
+- [yammer report groupsactivitygroupcounts](../cmd/viva/engage/engage-report-groupsactivitygroupcounts.mdx) - gets the total number of groups that existed and how many included group conversation activity [#1389](https://github.com/pnp/cli-microsoft365/issues/1389)
 
 ### Changes
 
@@ -2554,7 +2580,7 @@ sidebar_position: 4
 
 **Yammer:**
 
-- [yammer report groupsactivitycounts](../cmd/yammer/report/report-groupsactivitycounts.mdx) - gets the number of Yammer messages posted, read, and liked in groups [#1390](https://github.com/pnp/cli-microsoft365/issues/1390)
+- [yammer report groupsactivitycounts](../cmd/viva/engage/engage-report-groupsactivitycounts.mdx) - gets the number of Yammer messages posted, read, and liked in groups [#1390](https://github.com/pnp/cli-microsoft365/issues/1390)
 
 ### Changes
 
@@ -2592,7 +2618,7 @@ sidebar_position: 4
 
 **Yammer:**
 
-- [yammer message add](../cmd/yammer/message/message-add.mdx) - posts a Yammer network message on behalf of the current user [#1101](https://github.com/pnp/cli-microsoft365/issues/1101)
+- [yammer message add](../cmd/viva/engage/engage-message-add.mdx) - posts a Yammer network message on behalf of the current user [#1101](https://github.com/pnp/cli-microsoft365/issues/1101)
 
 ### Changes
 
@@ -2628,7 +2654,7 @@ sidebar_position: 4
 
 **Yammer:**
 
-- [yammer group list](../cmd/yammer/group/group-list.mdx) - returns the list of groups in a Yammer network or the groups for a specific user [#1185](https://github.com/pnp/cli-microsoft365/issues/1185)
+- [yammer group list](../cmd/viva/engage/engage-group-list.mdx) - returns the list of groups in a Yammer network or the groups for a specific user [#1185](https://github.com/pnp/cli-microsoft365/issues/1185)
 
 ### Changes
 
@@ -2692,7 +2718,7 @@ sidebar_position: 4
 
 **Yammer:**
 
-- [yammer message remove](../cmd/yammer/message/message-remove.mdx) - removes a Yammer message [#1106](https://github.com/pnp/cli-microsoft365/issues/1106)
+- [yammer message remove](../cmd/viva/engage/engage-message-remove.mdx) - removes a Yammer message [#1106](https://github.com/pnp/cli-microsoft365/issues/1106)
 
 **Power Apps:**
 
@@ -2713,9 +2739,9 @@ sidebar_position: 4
 
 **Yammer:**
 
-- [yammer message get](../cmd/yammer/message/message-get.mdx) - returns a Yammer message [#1105](https://github.com/pnp/cli-microsoft365/issues/1105)
-- [yammer message list](../cmd/yammer/message/message-list.mdx) - returns all accessible messages from the user's Yammer network [#1104](https://github.com/pnp/cli-microsoft365/issues/1104)
-- [yammer user list](../cmd/yammer/user/user-list.mdx) - returns users from the current network [#1113](https://github.com/pnp/cli-microsoft365/issues/1113)
+- [yammer message get](../cmd/viva/engage/engage-message-get.mdx) - returns a Yammer message [#1105](https://github.com/pnp/cli-microsoft365/issues/1105)
+- [yammer message list](../cmd/viva/engage/engage-message-list.mdx) - returns all accessible messages from the user's Yammer network [#1104](https://github.com/pnp/cli-microsoft365/issues/1104)
+- [yammer user list](../cmd/viva/engage/engage-user-list.mdx) - returns users from the current network [#1113](https://github.com/pnp/cli-microsoft365/issues/1113)
 
 ### Changes
 
@@ -2756,8 +2782,8 @@ sidebar_position: 4
 
 **Yammer:**
 
-- [yammer network list](../cmd/yammer/network/network-list.mdx) - returns a list of networks to which the current user has access [#1115](https://github.com/pnp/cli-microsoft365/issues/1115)
-- [yammer user get](../cmd/yammer/user/user-get.mdx) - retrieves the current user or searches for a user by ID or e-mail [#1107](https://github.com/pnp/cli-microsoft365/issues/1107)
+- [yammer network list](../cmd/viva/engage/engage-network-list.mdx) - returns a list of networks to which the current user has access [#1115](https://github.com/pnp/cli-microsoft365/issues/1115)
+- [yammer user get](../cmd/viva/engage/engage-user-get.mdx) - retrieves the current user or searches for a user by ID or e-mail [#1107](https://github.com/pnp/cli-microsoft365/issues/1107)
 
 ### Changes
 
@@ -3512,7 +3538,7 @@ sidebar_position: 4
 - entra login - log in to the Entra ID Graph [#160](https://github.com/pnp/cli-microsoft365/issues/160)
 - entra logout - log out from Entra ID Graph [#161](https://github.com/pnp/cli-microsoft365/issues/161)
 - entra status - shows Entra ID Graph login status [#162](https://github.com/pnp/cli-microsoft365/issues/162)
-- [entra sp get](../cmd/entra/sp/sp-get.mdx) - gets information about the specific service principal [#158](https://github.com/pnp/cli-microsoft365/issues/158)
+- [entra enterpriseapp get](../cmd/entra/enterpriseapp/enterpriseapp-get.mdx) - gets information about the specific service principal [#158](https://github.com/pnp/cli-microsoft365/issues/158)
 - [entra oauth2grant list](../cmd/entra/oauth2grant/oauth2grant-list.mdx) - lists OAuth2 permission grants for the specified service principal [#159](https://github.com/pnp/cli-microsoft365/issues/159)
 - [entra oauth2grant add](../cmd/entra/oauth2grant/oauth2grant-add.mdx) - grant the specified service principal OAuth2 permissions to the specified resource [#164](https://github.com/pnp/cli-microsoft365/issues/164)
 - [entra oauth2grant set](../cmd/entra/oauth2grant/oauth2grant-set.mdx) - update OAuth2 permissions for the service principal [#163](https://github.com/pnp/cli-microsoft365/issues/163)

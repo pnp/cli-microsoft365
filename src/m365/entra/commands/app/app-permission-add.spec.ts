@@ -35,7 +35,7 @@ describe(commands.APP_PERMISSION_ADD, () => {
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
-    auth.service.connected = true;
+    auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName: string, defaultValue: any) => {
       if (settingName === 'prompt') {
@@ -72,7 +72,7 @@ describe(commands.APP_PERMISSION_ADD, () => {
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
+    auth.connection.active = false;
   });
 
   it('has correct name', () => {
@@ -90,7 +90,7 @@ describe(commands.APP_PERMISSION_ADD, () => {
 
   it('defines correct alias', () => {
     const alias = command.alias();
-    assert.deepStrictEqual(alias, [aadCommands.APP_PERMISSION_ADD]);
+    assert.deepStrictEqual(alias, [aadCommands.APP_PERMISSION_ADD, commands.APPREGISTRATION_PERMISSION_ADD]);
   });
 
   it('adds application permissions to app specified by appObjectId without granting admin consent', async () => {

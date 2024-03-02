@@ -8,7 +8,7 @@ import { sinonUtil } from "./sinonUtil.js";
 describe('utils/powerPlatform', () => {
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
-    auth.service.connected = true;
+    auth.connection.active = true;
   });
 
   afterEach(() => {
@@ -19,7 +19,7 @@ describe('utils/powerPlatform', () => {
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
+    auth.connection.active = false;
   });
 
   it('returns correct dynamics url as admin', async () => {

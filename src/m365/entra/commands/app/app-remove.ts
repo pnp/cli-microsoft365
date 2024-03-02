@@ -29,7 +29,7 @@ class EntraAppRemoveCommand extends GraphCommand {
   }
 
   public alias(): string[] | undefined {
-    return [aadCommands.APP_REMOVE];
+    return [aadCommands.APP_REMOVE, commands.APPREGISTRATION_REMOVE];
   }
 
   constructor() {

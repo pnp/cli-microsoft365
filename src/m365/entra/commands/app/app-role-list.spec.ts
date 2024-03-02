@@ -26,7 +26,7 @@ describe(commands.APP_ROLE_LIST, () => {
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
-    auth.service.connected = true;
+    auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
   });
 
@@ -57,7 +57,7 @@ describe(commands.APP_ROLE_LIST, () => {
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
+    auth.connection.active = false;
   });
 
   it('has correct name', () => {
@@ -75,7 +75,7 @@ describe(commands.APP_ROLE_LIST, () => {
 
   it('defines correct alias', () => {
     const alias = command.alias();
-    assert.deepStrictEqual(alias, [aadCommands.APP_ROLE_LIST]);
+    assert.deepStrictEqual(alias, [aadCommands.APP_ROLE_LIST, commands.APPREGISTRATION_ROLE_LIST]);
   });
 
   it('defines correct properties for the default output', () => {

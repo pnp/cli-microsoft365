@@ -37,8 +37,8 @@ class CliDoctorCommand extends Command {
     const roles: string[] = [];
     const scopes: Map<string, string[]> = new Map<string, string[]>();
 
-    Object.keys(auth.service.accessTokens).forEach(resource => {
-      const accessToken: string = auth.service.accessTokens[resource].accessToken;
+    Object.keys(auth.connection.accessTokens).forEach(resource => {
+      const accessToken: string = auth.connection.accessTokens[resource].accessToken;
 
       this.getRolesFromAccessToken(accessToken).forEach(role => roles.push(role));
       const [res, scp] = this.getScopesFromAccessToken(accessToken);
@@ -55,9 +55,9 @@ class CliDoctorCommand extends Command {
       },
       cliVersion: app.packageJson().version,
       nodeVersion: process.version,
-      cliAadAppId: auth.service.appId,
-      cliAadAppTenant: validation.isValidGuid(auth.service.tenant) ? 'single' : auth.service.tenant,
-      authMode: AuthType[auth.service.authType],
+      cliAadAppId: auth.connection.appId,
+      cliAadAppTenant: validation.isValidGuid(auth.connection.tenant) ? 'single' : auth.connection.tenant,
+      authMode: AuthType[auth.connection.authType],
       cliEnvironment: process.env.CLIMICROSOFT365_ENV ? process.env.CLIMICROSOFT365_ENV : '',
       cliConfig: cli.getConfig().all,
       roles: roles,

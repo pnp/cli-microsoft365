@@ -26,7 +26,7 @@ describe(commands.APP_ROLE_REMOVE, () => {
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
-    auth.service.connected = true;
+    auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
   });
 
@@ -63,7 +63,7 @@ describe(commands.APP_ROLE_REMOVE, () => {
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
+    auth.connection.active = false;
   });
 
   it('has correct name', () => {
@@ -81,7 +81,7 @@ describe(commands.APP_ROLE_REMOVE, () => {
 
   it('defines correct alias', () => {
     const alias = command.alias();
-    assert.deepStrictEqual(alias, [aadCommands.APP_ROLE_REMOVE]);
+    assert.deepStrictEqual(alias, [aadCommands.APP_ROLE_REMOVE, commands.APPREGISTRATION_ROLE_REMOVE]);
   });
 
   it('deletes an app role when the role is in enabled state and valid appObjectId, role claim and --force option specified', async () => {

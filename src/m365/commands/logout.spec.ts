@@ -51,19 +51,19 @@ describe(commands.LOGOUT, () => {
   });
 
   it('logs out from Microsoft 365 when logged in', async () => {
-    auth.service.connected = true;
+    auth.connection.active = true;
     await command.action(logger, { options: { debug: true } });
-    assert(!auth.service.connected);
+    assert(!auth.connection.active);
   });
 
   it('logs out from Microsoft 365 when not logged in', async () => {
-    auth.service.connected = false;
+    auth.connection.active = false;
     await command.action(logger, { options: { debug: true } });
-    assert(!auth.service.connected);
+    assert(!auth.connection.active);
   });
 
   it('clears persisted connection info when logging out', async () => {
-    auth.service.connected = true;
+    auth.connection.active = true;
     await command.action(logger, { options: { debug: true } });
     assert(authClearConnectionInfoStub.called);
   });
@@ -71,8 +71,8 @@ describe(commands.LOGOUT, () => {
   it('correctly handles error while clearing persisted connection info', async () => {
     sinonUtil.restore(auth.clearConnectionInfo);
     sinon.stub(auth, 'clearConnectionInfo').callsFake(() => Promise.reject('An error has occurred'));
-    const logoutSpy = sinon.spy(auth.service, 'logout');
-    auth.service.connected = true;
+    const logoutSpy = sinon.spy(auth.connection, 'deactivate');
+    auth.connection.active = true;
 
     try {
       await command.action(logger, { options: {} });
@@ -81,15 +81,15 @@ describe(commands.LOGOUT, () => {
     finally {
       sinonUtil.restore([
         auth.clearConnectionInfo,
-        auth.service.logout
+        auth.connection.deactivate
       ]);
     }
   });
 
   it('correctly handles error while clearing persisted connection info (debug)', async () => {
     sinon.stub(auth, 'clearConnectionInfo').callsFake(() => Promise.reject('An error has occurred'));
-    const logoutSpy = sinon.spy(auth.service, 'logout');
-    auth.service.connected = true;
+    const logoutSpy = sinon.spy(auth.connection, 'deactivate');
+    auth.connection.active = true;
 
     try {
       await command.action(logger, { options: { debug: true } });
@@ -98,7 +98,7 @@ describe(commands.LOGOUT, () => {
     finally {
       sinonUtil.restore([
         auth.clearConnectionInfo,
-        auth.service.logout
+        auth.connection.deactivate
       ]);
     }
   });

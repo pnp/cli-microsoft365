@@ -8,7 +8,7 @@ class M365GroupReportActivityGroupCountsCommand extends PeriodBasedReport {
   }
 
   public get description(): string {
-    return 'Get the daily total number of groups and how many of them were active based on email conversations, Yammer posts, and SharePoint file activities';
+    return 'Get the daily total number of groups and how many of them were active based on email conversations, Viva Engage posts, and SharePoint file activities';
   }
 
   public alias(): string[] | undefined {

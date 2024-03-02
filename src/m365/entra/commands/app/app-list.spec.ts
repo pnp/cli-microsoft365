@@ -22,7 +22,7 @@ describe(commands.APP_LIST, () => {
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
-    auth.service.connected = true;
+    auth.connection.active = true;
   });
 
   beforeEach(() => {
@@ -49,7 +49,7 @@ describe(commands.APP_LIST, () => {
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
+    auth.connection.active = false;
   });
 
   it('has correct name', () => {
@@ -67,7 +67,7 @@ describe(commands.APP_LIST, () => {
 
   it('defines correct alias', () => {
     const alias = command.alias();
-    assert.deepStrictEqual(alias, [aadCommands.APP_LIST]);
+    assert.deepStrictEqual(alias, [aadCommands.APP_LIST, commands.APPREGISTRATION_LIST]);
   });
 
   it('defines correct properties for the default output', () => {

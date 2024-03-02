@@ -80,7 +80,7 @@ class FileConvertPdfCommand extends GraphCommand {
     let targetIsLocalFile: boolean = true;
     let error: any;
 
-    const isAppOnlyAccessToken: boolean | undefined = accessToken.isAppOnlyAccessToken(auth.service.accessTokens[auth.defaultResource].accessToken);
+    const isAppOnlyAccessToken: boolean | undefined = accessToken.isAppOnlyAccessToken(auth.connection.accessTokens[auth.defaultResource].accessToken);
     if (typeof isAppOnlyAccessToken === 'undefined') {
       throw 'Unable to determine authentication type';
     }

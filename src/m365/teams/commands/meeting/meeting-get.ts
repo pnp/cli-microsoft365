@@ -78,7 +78,7 @@ class TeamsMeetingGetCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const isAppOnlyAccessToken: boolean | undefined = accessToken.isAppOnlyAccessToken(auth.service.accessTokens[this.resource].accessToken);
+    const isAppOnlyAccessToken: boolean | undefined = accessToken.isAppOnlyAccessToken(auth.connection.accessTokens[this.resource].accessToken);
     if (isAppOnlyAccessToken) {
       if (!args.options.userId && !args.options.userName && !args.options.email) {
         this.handleError(`The option 'userId', 'userName' or 'email' is required when retrieving meetings using app only permissions`);

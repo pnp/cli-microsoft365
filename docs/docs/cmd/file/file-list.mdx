@@ -1,4 +1,6 @@
 import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 # file list
 
@@ -48,3 +50,101 @@ Return all files from the _Important_ folder in the _Shared Documents_ document 
 ```sh
 m365 file list --webUrl https://contoso.sharepoint.com/sites/project-x --folderUrl 'Shared Documents/Important'
 ```
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  [
+    {
+      "@microsoft.graph.downloadUrl": "https://contoso.sharepoint.com/_layouts/15/download.aspx?UniqueId=9bdc8c49-644a-4875-aaa3-82914fb23226&Translate=false&tempauth=&ApiVersion=2.0",
+      "createdDateTime": "2024-02-14T22:41:41Z",
+      "eTag": "\"{9BDC8C49-644A-4875-AAA3-82914FB23226},1\"",
+      "id": "013TMHP6SJRTOJWSTEOVEKVI4CSFH3EMRG",
+      "lastModifiedDateTime": "2024-02-14T22:41:41Z",
+      "name": "Document.docx",
+      "webUrl": "https://contoso.sharepoint.com/_layouts/15/Doc.aspx?sourcedoc=%7B9BDC8C49-644A-4875-AAA3-82914FB23226%7D&file=Document.Docx&action=default&mobileredirect=true",
+      "cTag": "\"c:{9BDC8C49-644A-4875-AAA3-82914FB23226},2\"",
+      "size": 41554,
+      "createdBy": {
+        "user": {
+          "email": "john@contoso.com",
+          "id": "fe36f75e-c103-410b-a18a-2bf6df06ac3a",
+          "displayName": "John Doe"
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "john@contoso.com",
+          "id": "fe36f75e-c103-410b-a18a-2bf6df06ac3a",
+          "displayName": "John Doe"
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!T4-bE44OMEa7ClAUQtubZID9tc40pGJKpguycvELod_YogR_WYHeSaTWzIZ6qMyU",
+        "id": "013TMHP6V6Y2GOVW7725BZO354PWSELRRZ",
+        "name": "TEST",
+        "path": "/drives/b!T4-bE44OMEa7ClAUQtubZID9tc40pGJKpguycvELod_YogR_WYHeSaTWzIZ6qMyU/root:",
+        "siteId": "0f9b8f4f-0e8e-4630-bb0a-501442db9b64"
+      },
+      "file": {
+        "mimeType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "hashes": {
+          "quickXorHash": "MX9jeQT/AfhDDMpYygXlCPYI/kc="
+        }
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2024-02-14T22:41:41Z",
+        "lastModifiedDateTime": "2024-02-14T22:41:41Z"
+      },
+      "shared": {
+        "scope": "users"
+      },
+      "lastModifiedByUser": "John Doe"
+    }
+  ]
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  lastModifiedByUser: John Doe
+  name              : Document.docx
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  @microsoft.graph.downloadUrl,createdDateTime,eTag,id,lastModifiedDateTime,name,webUrl,cTag,size,lastModifiedByUser
+  https://contoso.sharepoint.com/_layouts/15/download.aspx?UniqueId=9bdc8c49-644a-4875-aaa3-82914fb23226&Translate=false&tempauth=&ApiVersion=2.0,2024-02-14T22:41:41Z,"""{9BDC8C49-644A-4875-AAA3-82914FB23226},1""",013TMHP6SJRTOJWSTEOVEKVI4CSFH3EMRG,2024-02-14T22:41:41Z,Thailand.xlsx,https://contoso.sharepoint.com/_layouts/15/Doc.aspx?sourcedoc=%7B9BDC8C49-644A-4875-AAA3-82914FB23226%7D&file=Document.docx&action=default&mobileredirect=true,"""c:{9BDC8C49-644A-4875-AAA3-82914FB23226},2""",41554,John Doe
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # file list --webUrl "https://contoso.sharepoint.com" --folderUrl "Test"
+
+  Date: 14/02/2024
+
+  ## Document.docx (013TMHP6SJRTOJWSTEOVEKVI4CSFH3EMRG)
+
+  Property | Value
+  ---------|-------
+  @microsoft.graph.downloadUrl | https://contoso.sharepoint.com/\_layouts/15/download.aspx?UniqueId=9bdc8c49-644a-4875-aaa3-82914fb23226&Translate=false&tempauth=&ApiVersion=2.0
+  createdDateTime | 2024-02-14T22:41:41Z
+  eTag | "{9BDC8C49-644A-4875-AAA3-82914FB23226},1"
+  id | 013TMHP6SJRTOJWSTEOVEKVI4CSFH3EMRG
+  lastModifiedDateTime | 2024-02-14T22:41:41Z
+  name | Document.docx
+  webUrl | https://contoso.sharepoint.com/\_layouts/15/Doc.aspx?sourcedoc=%7B9BDC8C49-644A-4875-AAA3-82914FB23226%7D&file=Thailand.xlsx&action=default&mobileredirect=true
+  cTag | "c:{9BDC8C49-644A-4875-AAA3-82914FB23226},2"
+  size | 41554
+  lastModifiedByUser | John Doe
+  ```
+
+  </TabItem>
+</Tabs>

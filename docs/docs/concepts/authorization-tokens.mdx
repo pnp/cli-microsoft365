@@ -50,8 +50,8 @@ CLI for Microsoft 365 requires the following permissions to Microsoft 365 servic
   - Access the directory as the signed-in user
 - Windows Azure Service Management API
   - Access Azure Service Management as organization users
-- Yammer
-  - Read and write to the Yammer platform
+- Viva Engage
+  - Read and write to the Viva Engage platform
 
 :::warning
 
@@ -67,12 +67,12 @@ After completing the OAuth flow, the CLI receives from Azure Active Directory a 
 
 ## Services and commands
 
-Each command in the CLI for Microsoft 365 belongs to a service, for example the [spo site add](../cmd/spo/site/site-add.mdx) command, which creates a new modern site, belongs to the SharePoint Online service, while the [entra sp get](../cmd/entra/sp/sp-get.mdx) command, which lists Azure Active Directory service principals, belongs to the Azure Active Directory Graph service. Each service in Microsoft 365 is a different Azure Active Directory authorization resource and requires a separate access token. When working with the CLI, you can be simultaneously connected to multiple services. Each command in the CLI knows which Microsoft 365 service it communicates with and for which resource it should have a valid access token.
+Each command in the CLI for Microsoft 365 belongs to a service, for example the [spo site add](../cmd/spo/site/site-add.mdx) command, which creates a new modern site, belongs to the SharePoint Online service, while the [entra enterpriseapp get](../cmd/entra/enterpriseapp/enterpriseapp-get.mdx) command, which lists Azure Active Directory service principals, belongs to the Azure Active Directory Graph service. Each service in Microsoft 365 is a different Azure Active Directory authorization resource and requires a separate access token. When working with the CLI, you can be simultaneously connected to multiple services. Each command in the CLI knows which Microsoft 365 service it communicates with and for which resource it should have a valid access token.
 
 ## Communicating with Microsoft 365
 
 Before a command can log in to Microsoft 365, it requires a valid access token. CLI for Microsoft 365 automatically obtains the access token for the particular web request without you having to worry about it.
 
-## Yammer commands are executed in the context of the current logged in user
+## Viva Engage commands are executed in the context of the current logged in user
 
-Yammer commands require the delegated 'user_impersonation' permission to be granted for the Azure AD application. Yammer commands are executed in the context of the currently logged in user. Certificate-based authentication with app_only permissions is currently not supported by Azure AD.
+Viva Engage commands require the delegated 'user_impersonation' permission to be granted for the Azure AD application. Viva Engage commands are executed in the context of the currently logged in user. Certificate-based authentication with app_only permissions is currently not supported by Azure AD.

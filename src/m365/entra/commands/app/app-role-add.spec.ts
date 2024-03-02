@@ -25,7 +25,7 @@ describe(commands.APP_ROLE_ADD, () => {
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
-    auth.service.connected = true;
+    auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
   });
 
@@ -55,7 +55,7 @@ describe(commands.APP_ROLE_ADD, () => {
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
+    auth.connection.active = false;
   });
 
   it('has correct name', () => {
@@ -73,7 +73,7 @@ describe(commands.APP_ROLE_ADD, () => {
 
   it('defines correct alias', () => {
     const alias = command.alias();
-    assert.deepStrictEqual(alias, [aadCommands.APP_ROLE_ADD]);
+    assert.deepStrictEqual(alias, [aadCommands.APP_ROLE_ADD, commands.APPREGISTRATION_ROLE_ADD]);
   });
 
   it('creates app role for the specified appId, app has no roles', async () => {

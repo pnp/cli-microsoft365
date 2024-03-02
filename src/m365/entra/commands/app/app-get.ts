@@ -32,7 +32,7 @@ class EntraAppGetCommand extends GraphCommand {
   }
 
   public alias(): string[] | undefined {
-    return [aadCommands.APP_GET];
+    return [aadCommands.APP_GET, commands.APPREGISTRATION_GET];
   }
 
   constructor() {

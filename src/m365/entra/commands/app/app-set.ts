@@ -38,7 +38,7 @@ class EntraAppSetCommand extends GraphCommand {
   }
 
   public alias(): string[] | undefined {
-    return [aadCommands.APP_SET];
+    return [aadCommands.APP_SET, commands.APPREGISTRATION_SET];
   }
 
   constructor() {

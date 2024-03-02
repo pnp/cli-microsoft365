@@ -286,7 +286,7 @@ export default abstract class Command {
 
     this.initAction(args, logger);
 
-    if (!auth.service.connected) {
+    if (!auth.connection.active) {
       throw new CommandError('Log in to Microsoft 365 first');
     }
 
@@ -439,6 +439,10 @@ export default abstract class Command {
     request.debug = this.debug;
     request.logger = logger;
 
+    if (this.debug && auth.connection.identityName !== undefined) {
+      logger.logToStderr(`Executing command as '${auth.connection.identityName}', appId: ${auth.connection.appId}, tenantId: ${auth.connection.identityTenantId}`);
+    }
+
     telemetry.trackEvent(this.getUsedCommandName(), this.getTelemetryProperties(args));
   }
 
@@ -483,11 +487,11 @@ export default abstract class Command {
   }
 
   private loadValuesFromAccessToken(args: CommandArgs): void {
-    if (!auth.service.accessTokens[auth.defaultResource]) {
+    if (!auth.connection.accessTokens[auth.defaultResource]) {
       return;
     }
 
-    const token = auth.service.accessTokens[auth.defaultResource].accessToken;
+    const token = auth.connection.accessTokens[auth.defaultResource].accessToken;
     const optionNames: string[] = Object.getOwnPropertyNames(args.options);
     optionNames.forEach(option => {
       const value = args.options[option];
@@ -497,7 +501,7 @@ export default abstract class Command {
 
       const lowerCaseValue = value.toLowerCase().trim();
       if (lowerCaseValue === '@meid' || lowerCaseValue === '@meusername') {
-        const isAppOnlyAccessToken = accessToken.isAppOnlyAccessToken(auth.service.accessTokens[auth.defaultResource].accessToken);
+        const isAppOnlyAccessToken = accessToken.isAppOnlyAccessToken(auth.connection.accessTokens[auth.defaultResource].accessToken);
         if (isAppOnlyAccessToken) {
           throw `It's not possible to use ${value} with application permissions`;
         }
@@ -515,7 +519,7 @@ export default abstract class Command {
     if (cli.currentCommandName &&
       cli.currentCommandName.indexOf(deprecated) === 0) {
       const chalk = (await import('chalk')).default;
-      await logger.logToStderr(chalk.yellow(`Command '${deprecated}' is deprecated. Please use '${recommended}' instead`));
+      await logger.logToStderr(chalk.yellow(`Command '${deprecated}' is deprecated. Please use '${recommended}' instead.`));
     }
   }
 

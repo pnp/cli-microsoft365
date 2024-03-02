@@ -13,6 +13,9 @@ import config from './config.js';
 import request from './request.js';
 import { settingsNames } from './settingsNames.js';
 import { browserUtil } from './utils/browserUtil.js';
+import * as accessTokenUtil from './utils/accessToken.js';
+import { ConnectionDetails } from './m365/commands/ConnectionDetails.js';
+import assert from 'assert';
 
 interface Hash<TValue> {
   [key: string]: TValue;
@@ -41,8 +44,19 @@ export enum CloudType {
   China
 }
 
-export class Service {
-  connected: boolean = false;
+export class Connection {
+  active: boolean = false;
+  // The name of the connection as specified by the user. 
+  // If not specified, the localAccountId of the identity is used.
+  name?: string;
+  // The userName or Application Name of the Identity.  
+  identityName?: string;
+  // The localAccountId of the account in the MSAL Token Store
+  // or application identities, no account is available. 
+  // In those scenario's the 'oid' claim from the access token is used.
+  identityId?: string;
+  // The id of the tenant where the identity is located
+  identityTenantId?: string;
   authType: AuthType = AuthType.DeviceCode;
   userName?: string;
   password?: string;
@@ -52,7 +66,8 @@ export class Service {
   thumbprint?: string;
   accessTokens: Hash<AccessToken>;
   spoUrl?: string;
-  tenantId?: string;
+  // SharePoint tenantId used to execute CSOM requests
+  spoTenantId?: string;
   // ID of the Azure AD app used to authenticate
   appId: string;
   // ID of the tenant where the Azure AD app is registered; common if multitenant
@@ -66,17 +81,22 @@ export class Service {
     this.cloudType = CloudType.Public;
   }
 
-  public logout(): void {
-    this.connected = false;
+  public deactivate(): void {
+    this.active = false;
+    this.name = undefined;
+    this.identityName = undefined;
+    this.identityId = undefined;
+    this.identityTenantId = undefined;
     this.accessTokens = {};
     this.authType = AuthType.DeviceCode;
     this.userName = undefined;
     this.password = undefined;
     this.certificateType = CertificateType.Unknown;
+    this.cloudType = CloudType.Public;
     this.certificate = undefined;
     this.thumbprint = undefined;
     this.spoUrl = undefined;
-    this.tenantId = undefined;
+    this.spoTenantId = undefined;
     this.appId = config.cliAadAppId;
     this.tenant = config.tenant;
   }
@@ -101,20 +121,36 @@ export class Auth {
   private _clipboardy: typeof clipboard | undefined;
   private _authServer: AuthServer | undefined;
   private deviceCodeRequest?: Msal.DeviceCodeRequest;
-  private _service: Service;
+  private _connection: Connection;
   private clientApplication: Msal.ClientApplication | undefined;
   private static cloudEndpoints: any[] = [];
 
-  public get service(): Service {
-    return this._service;
+  // A list of all connections, including the active one
+  private _allConnections: Connection[] | undefined;
+
+  // Retrieves the connections from the file store if it's not already loaded
+  public async getAllConnections(): Promise<Connection[]> {
+    if (this._allConnections === undefined) {
+      try {
+        this._allConnections = await this.getAllConnectionsFromStorage();
+      }
+      catch {
+        this._allConnections = [];
+      }
+    }
+    return this._allConnections;
+  }
+
+  public get connection(): Connection {
+    return this._connection;
   }
 
   public get defaultResource(): string {
-    return Auth.getEndpointForResource('https://graph.microsoft.com', this._service.cloudType);
+    return Auth.getEndpointForResource('https://graph.microsoft.com', this._connection.cloudType);
   }
 
   constructor() {
-    this._service = new Service();
+    this._connection = new Connection();
   }
 
   // we need to init cloud endpoints here, because we're using CloudType enum
@@ -150,13 +186,13 @@ export class Auth {
 
   public async restoreAuth(): Promise<void> {
     // check if auth has been restored previously
-    if (this._service.connected) {
+    if (this._connection.active) {
       return Promise.resolve();
     }
 
     try {
-      const service: Service = await this.getServiceConnectionInfo<Service>();
-      this._service = Object.assign(this._service, service);
+      const connection: Connection = await this.getConnectionInfoFromStorage();
+      this._connection = Object.assign(this._connection, connection);
     }
     catch {
     }
@@ -164,7 +200,7 @@ export class Auth {
 
   public async ensureAccessToken(resource: string, logger: Logger, debug: boolean = false, fetchNew: boolean = false): Promise<string> {
     const now: Date = new Date();
-    const accessToken: AccessToken | undefined = this.service.accessTokens[resource];
+    const accessToken: AccessToken | undefined = this.connection.accessTokens[resource];
     const expiresOn: Date = accessToken && accessToken.expiresOn ?
       // if expiresOn is serialized from the service file, it's set as a string
       // if it's coming from MSAL, it's a Date
@@ -190,22 +226,25 @@ export class Auth {
 
     let getTokenPromise: ((resource: string, logger: Logger, debug: boolean, fetchNew: boolean) => Promise<AccessToken | null>) | undefined;
 
-    // when using cert, you can't retrieve token silently, because there is
-    // no account. Also cert auth instantiates clientApplication itself
+    // When using an application identity, you can't retrieve the access token silently, because there is
+    // no account. Also (for cert auth) clientApplication is instantiated later
     // after inspecting the specified cert and calculating thumbprint if one
     // wasn't specified
-    if (this.service.authType !== AuthType.Certificate) {
-      this.clientApplication = await this.getClientApplication(logger, debug);
+    if (this.connection.authType !== AuthType.Certificate &&
+      this.connection.authType !== AuthType.Secret &&
+      this.connection.authType !== AuthType.Identity) {
+      this.clientApplication = await this.getPublicClient(logger, debug);
       if (this.clientApplication) {
         const accounts = await this.clientApplication.getTokenCache().getAllAccounts();
-        if (accounts.length > 0) {
+        // if there is an account in the cache and it's active, we can try to get the token silently
+        if (accounts.filter(a => a.localAccountId === this.connection.identityId).length > 0 && this.connection.active === true) {
           getTokenPromise = this.ensureAccessTokenSilent.bind(this);
         }
       }
     }
 
     if (!getTokenPromise) {
-      switch (this.service.authType) {
+      switch (this.connection.authType) {
         case AuthType.DeviceCode:
           getTokenPromise = this.ensureAccessTokenWithDeviceCode.bind(this);
           break;
@@ -242,11 +281,16 @@ export class Auth {
       }
     }
 
-    this.service.accessTokens[resource] = {
+    this.connection.accessTokens[resource] = {
       expiresOn: response.expiresOn,
       accessToken: response.accessToken
     };
-    this.service.connected = true;
+    this.connection.active = true;
+    this.connection.identityName = accessTokenUtil.accessToken.getUserNameFromAccessToken(response.accessToken);
+    this.connection.identityId = accessTokenUtil.accessToken.getUserIdFromAccessToken(response.accessToken);
+    this.connection.identityTenantId = accessTokenUtil.accessToken.getTenantIdFromAccessToken(response.accessToken);
+    this.connection.name = this.connection.name || this.connection.identityId;
+
     try {
       await this.storeConnectionInfo();
     }
@@ -260,22 +304,6 @@ export class Auth {
     return response.accessToken;
   }
 
-  private async getClientApplication(logger: Logger, debug: boolean): Promise<Msal.ClientApplication | undefined> {
-    switch (this.service.authType) {
-      case AuthType.DeviceCode:
-      case AuthType.Password:
-      case AuthType.Browser:
-        return await this.getPublicClient(logger, debug);
-      case AuthType.Certificate:
-        return await this.getConfidentialClient(logger, debug, this.service.thumbprint as string, this.service.password, undefined);
-      case AuthType.Identity:
-        // msal-node doesn't support managed identity so we need to do it manually
-        return undefined;
-      case AuthType.Secret:
-        return await this.getConfidentialClient(logger, debug, undefined, undefined, this.service.secret);
-    }
-  }
-
   private async getAuthClientConfiguration(logger: Logger, debug: boolean, certificateThumbprint?: string, certificatePrivateKey?: string, clientSecret?: string): Promise<Msal.Configuration> {
     const msal: typeof Msal = await import('@azure/msal-node');
     const { LogLevel } = msal;
@@ -285,7 +313,7 @@ export class Auth {
     };
 
     let azureCloudInstance: AzureCloudInstance = AzureCloudInstance.None;
-    switch (this.service.cloudType) {
+    switch (this.connection.cloudType) {
       case CloudType.Public:
         azureCloudInstance = AzureCloudInstance.AzurePublic;
         break;
@@ -300,11 +328,11 @@ export class Auth {
     }
 
     const config = {
-      clientId: this.service.appId,
-      authority: `${Auth.getEndpointForResource('https://login.microsoftonline.com', this.service.cloudType)}/${this.service.tenant}`,
+      clientId: this.connection.appId,
+      authority: `${Auth.getEndpointForResource('https://login.microsoftonline.com', this.connection.cloudType)}/${this.connection.tenant}`,
       azureCloudOptions: {
         azureCloudInstance,
-        tenant: this.service.tenant
+        tenant: this.connection.tenant
       }
     };
 
@@ -338,11 +366,11 @@ export class Auth {
     const msal: typeof Msal = await import('@azure/msal-node');
     const { PublicClientApplication } = msal;
 
-    if (this.service.authType === AuthType.Password &&
-      this.service.tenant === 'common') {
+    if (this.connection.authType === AuthType.Password &&
+      this.connection.tenant === 'common') {
       // common is not supported for the password flow and must be changed to
       // organizations
-      this.service.tenant = 'organizations';
+      this.connection.tenant = 'organizations';
     }
 
     return new PublicClientApplication(await this.getAuthClientConfiguration(logger, debug));
@@ -365,7 +393,7 @@ export class Auth {
         this._authServer = (await import('./AuthServer.js')).default;
       }
 
-      (this._authServer as AuthServer).initializeServer(this.service, resource, resolve, reject, logger, debug);
+      (this._authServer as AuthServer).initializeServer(this.connection, resource, resolve, reject, logger, debug);
     });
   }
 
@@ -391,10 +419,17 @@ export class Auth {
       await logger.logToStderr(`Retrieving new access token silently`);
     }
 
-    const accounts = await (this.clientApplication as Msal.ClientApplication)
-      .getTokenCache().getAllAccounts();
+    // Asserting identityId because it is expected to be available at this point.
+    assert(this.connection.identityId !== undefined);
+
+    const account = await (this.clientApplication as Msal.ClientApplication)
+      .getTokenCache().getAccountByLocalId(this.connection.identityId);
+
+    // Asserting account because it is expected to be available at this point.
+    assert(account !== null);
+
     return (this.clientApplication as Msal.ClientApplication).acquireTokenSilent({
-      account: accounts[0],
+      account: account,
       scopes: [`${resource}/.default`],
       forceRefresh: fetchNew
     });
@@ -455,8 +490,8 @@ export class Auth {
     }
 
     return (this.clientApplication as Msal.PublicClientApplication).acquireTokenByUsernamePassword({
-      username: this.service.userName as string,
-      password: this.service.password as string,
+      username: this.connection.userName as string,
+      password: this.connection.password as string,
       scopes: [`${resource}/.default`]
     });
   }
@@ -470,9 +505,9 @@ export class Auth {
     }
 
     let cert: string = '';
-    const buf = Buffer.from(this.service.certificate as string, 'base64');
+    const buf = Buffer.from(this.connection.certificate as string, 'base64');
 
-    if (this.service.certificateType === CertificateType.Unknown || this.service.certificateType === CertificateType.Base64) {
+    if (this.connection.certificateType === CertificateType.Unknown || this.connection.certificateType === CertificateType.Base64) {
       // First time this method is called, we don't know if certificate is PEM or PFX (type is Unknown)
       // We assume it is PEM but when parsing of PEM fails, we assume it could be PFX
       // Type is persisted on service so subsequent calls only run through the correct parsing flow
@@ -480,23 +515,23 @@ export class Auth {
         cert = buf.toString('utf8');
         const pemObjs = pem.decode(cert);
 
-        if (this.service.thumbprint === undefined) {
+        if (this.connection.thumbprint === undefined) {
           const pemCertObj = pemObjs.find(pem => pem.type === "CERTIFICATE");
           const pemCertStr: string = pem.encode(pemCertObj!);
           const pemCert = pki.certificateFromPem(pemCertStr);
 
-          this.service.thumbprint = await this.calculateThumbprint(pemCert);
+          this.connection.thumbprint = await this.calculateThumbprint(pemCert);
         }
       }
       catch (e) {
-        this.service.certificateType = CertificateType.Binary;
+        this.connection.certificateType = CertificateType.Binary;
       }
     }
 
-    if (this.service.certificateType === CertificateType.Binary) {
+    if (this.connection.certificateType === CertificateType.Binary) {
       const p12Asn1 = asn1.fromDer(buf.toString('binary'), false);
 
-      const p12Parsed = pkcs12.pkcs12FromAsn1(p12Asn1, false, this.service.password);
+      const p12Parsed = pkcs12.pkcs12FromAsn1(p12Asn1, false, this.connection.password);
 
       let keyBags: any = p12Parsed.getBags({ bagType: pki.oids.pkcs8ShroudedKeyBag });
       const pkcs8ShroudedKeyBag = keyBags[pki.oids.pkcs8ShroudedKeyBag][0];
@@ -522,22 +557,22 @@ export class Auth {
       // convert a PKCS#8 ASN.1 PrivateKeyInfo to PEM
       cert = pki.privateKeyInfoToPem(privateKeyInfo);
 
-      if (this.service.thumbprint === undefined) {
+      if (this.connection.thumbprint === undefined) {
         const certBags = p12Parsed.getBags({ bagType: pki.oids.certBag });
         const certBag = (certBags[pki.oids.certBag]!)[0];
 
-        this.service.thumbprint = await this.calculateThumbprint(certBag.cert!);
+        this.connection.thumbprint = await this.calculateThumbprint(certBag.cert!);
       }
     }
 
-    this.clientApplication = await this.getConfidentialClient(logger, debug, this.service.thumbprint as string, cert);
+    this.clientApplication = await this.getConfidentialClient(logger, debug, this.connection.thumbprint as string, cert);
     return (this.clientApplication as Msal.ConfidentialClientApplication).acquireTokenByClientCredential({
       scopes: [`${resource}/.default`]
     });
   }
 
   private async ensureAccessTokenWithIdentity(resource: string, logger: Logger, debug: boolean): Promise<AccessToken | null> {
-    const userName = this.service.userName;
+    const userName = this.connection.userName;
     if (debug) {
       await logger.logToStderr('Will try to retrieve access token using identity...');
     }
@@ -672,7 +707,7 @@ export class Auth {
   }
 
   private async ensureAccessTokenWithSecret(resource: string, logger: Logger, debug: boolean): Promise<AccessToken | null> {
-    this.clientApplication = await this.getConfidentialClient(logger, debug, undefined, undefined, this.service.secret);
+    this.clientApplication = await this.getConfidentialClient(logger, debug, undefined, undefined, this.connection.secret);
     return (this.clientApplication as Msal.ConfidentialClientApplication).acquireTokenByClientCredential({
       scopes: [`${resource}/.default`]
     });
@@ -713,32 +748,87 @@ export class Auth {
     return resource;
   }
 
-  private async getServiceConnectionInfo<TConn>(): Promise<TConn> {
-    const tokenStorage = this.getTokenStorage();
+  private async getConnectionInfoFromStorage<TConn>(): Promise<TConn> {
+    const tokenStorage = this.getConnectionStorage();
     const json: string = await tokenStorage.get();
     return JSON.parse(json);
   }
 
-  public storeConnectionInfo(): Promise<void> {
-    const tokenStorage = this.getTokenStorage();
-    return tokenStorage.set(JSON.stringify(this.service));
+  public async storeConnectionInfo(): Promise<void> {
+    const connectionStorage = this.getConnectionStorage();
+    await connectionStorage.set(JSON.stringify(this.connection));
+
+    let allConnections = await this.getAllConnections();
+
+    if (this.connection.active) {
+      allConnections = allConnections.filter(c => c.identityId !== this.connection.identityId);
+      allConnections.forEach(c => c.active = false);
+      allConnections = [{ ...this.connection as any }, ...allConnections];
+    }
+
+    this._allConnections = allConnections;
+    const allConnectionsStorage = this.getAllConnectionsStorage();
+    await allConnectionsStorage.set(JSON.stringify(allConnections));
   }
 
   public async clearConnectionInfo(): Promise<void> {
-    const tokenStorage = this.getTokenStorage();
-    await tokenStorage.remove();
+    const connectionStorage = this.getConnectionStorage();
+    const allConnectionsStorage = this.getAllConnectionsStorage();
+
+    await connectionStorage.remove();
+    await allConnectionsStorage.remove();
+
     // we need to manually clear MSAL cache, because MSAL doesn't have support
     // for logging out when using cert-based auth
     const msalCache = this.getMsalCacheStorage();
     await msalCache.remove();
   }
 
-  public getTokenStorage(): TokenStorage {
+  public async removeConnectionInfo(connection: Connection, logger: Logger, debug: boolean): Promise<void> {
+    const allConnections = await this.getAllConnections();
+    const isCurrentConnection = this.connection.name === connection.name;
+
+    this._allConnections = allConnections.filter(c => c.name !== connection.name);
+
+    // Asserting identityId because it is optional, but required at this point.
+    assert(connection.identityId !== undefined);
+
+    // When using an application identity, there is no account in the MSAL TokenCache
+    if (this.connection.authType !== AuthType.Certificate &&
+      this.connection.authType !== AuthType.Secret &&
+      this.connection.authType !== AuthType.Identity) {
+      this.clientApplication = await this.getPublicClient(logger, debug);
+
+      if (this.clientApplication) {
+        const tokenCache = this.clientApplication.getTokenCache();
+        const account = await tokenCache.getAccountByLocalId(connection.identityId);
+        if (account !== null) {
+          await tokenCache.removeAccount(account);
+        }
+      }
+    }
+
+    const connectionStorage = this.getConnectionStorage();
+    const allConnectionsStorage = this.getAllConnectionsStorage();
+
+    await allConnectionsStorage.set(JSON.stringify(this._allConnections));
+
+    if (isCurrentConnection) {
+      await connectionStorage.remove();
+      this.connection.deactivate();
+    }
+  }
+
+  public getConnectionStorage(): TokenStorage {
     return new FileTokenStorage(FileTokenStorage.connectionInfoFilePath());
   }
 
   private getMsalCacheStorage(): TokenStorage {
     return new FileTokenStorage(FileTokenStorage.msalCacheFilePath());
+  }
+
+  public getAllConnectionsStorage(): TokenStorage {
+    return new FileTokenStorage(FileTokenStorage.allConnectionsFilePath());
   }
 
   public static getEndpointForResource(resource: string, cloudType: CloudType): string {
@@ -749,6 +839,65 @@ export class Auth {
     else {
       return resource;
     }
+  }
+
+  private async getAllConnectionsFromStorage(): Promise<Connection[]> {
+    const connectionStorage = this.getAllConnectionsStorage();
+    const json: string = await connectionStorage.get();
+    return JSON.parse(json);
+  }
+
+  public async switchToConnection(connection: Connection): Promise<void> {
+    this.connection.deactivate();
+    this._connection = Object.assign(this._connection, connection);
+    this._connection.active = true;
+    await this.storeConnectionInfo();
+  }
+
+  public async updateConnection(connection: Connection, newName: string): Promise<void> {
+    const allConnections = await this.getAllConnections();
+    const existingConnection = allConnections.find(c => c.name === newName);
+    const oldName = connection.name;
+
+    if (existingConnection) {
+      throw new CommandError(`The connection name '${newName}' is already in use`);
+    }
+
+    connection.name = newName;
+
+    if (this.connection.name === oldName) {
+      this._connection.name = newName;
+    }
+
+    await this.storeConnectionInfo();
+  }
+
+  public async getConnection(name: string): Promise<Connection> {
+    const allConnections = await this.getAllConnections();
+    const connection = allConnections.find(i => i.name === name);
+
+    if (!connection) {
+      throw new CommandError(`The connection '${name}' cannot be found`);
+    }
+
+    return connection;
+  }
+
+  public getConnectionDetails(connection: Connection): ConnectionDetails {
+    // Asserting name and identityId because they are optional, but required at this point.    
+    assert(connection.identityName !== undefined);
+    assert(connection.name !== undefined);
+
+    const details: ConnectionDetails = {
+      connectionName: connection.name,
+      connectedAs: connection.identityName,
+      authType: AuthType[connection.authType],
+      appId: connection.appId,
+      appTenant: connection.tenant,
+      cloudType: CloudType[connection.cloudType]
+    };
+
+    return details;
   }
 }
 

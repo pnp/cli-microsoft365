@@ -117,7 +117,7 @@ class TeamsMeetingAddCommand extends GraphCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
-      const isAppOnlyAccessToken = accessToken.isAppOnlyAccessToken(auth.service.accessTokens[this.resource].accessToken)!;
+      const isAppOnlyAccessToken = accessToken.isAppOnlyAccessToken(auth.connection.accessTokens[this.resource].accessToken)!;
 
       if (isAppOnlyAccessToken && !args.options.organizerEmail) {
         throw `The option 'organizerEmail' is required when creating a meeting using app only permissions`;

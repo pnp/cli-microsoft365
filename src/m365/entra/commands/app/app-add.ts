@@ -89,7 +89,7 @@ class EntraAppAddCommand extends GraphCommand {
   }
 
   public alias(): string[] | undefined {
-    return [aadCommands.APP_ADD];
+    return [aadCommands.APP_ADD, commands.APPREGISTRATION_ADD];
   }
 
   constructor() {
@@ -261,7 +261,7 @@ class EntraAppAddCommand extends GraphCommand {
       // directory. If we in the future extend the command with allowing
       // users to create AAD app in a different directory, we'll need to
       // adjust this
-      appInfo.tenantId = accessToken.getTenantIdFromAccessToken(auth.service.accessTokens[auth.defaultResource].accessToken);
+      appInfo.tenantId = accessToken.getTenantIdFromAccessToken(auth.connection.accessTokens[auth.defaultResource].accessToken);
       appInfo = await this.updateAppFromManifest(args, appInfo);
       appInfo = await this.grantAdminConsent(appInfo, args.options.grantAdminConsent, logger);
       appInfo = await this.configureUri(args, appInfo, logger);

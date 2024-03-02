@@ -1,8 +1,8 @@
 . $(Join-Path . Register-CLIM365Completion.ps1)
 
 $tests = @{
-  "m365" = @("aad","accesstoken","consent","flow","graph","help","login","logout","onedrive","outlook","pa","planner","spfx","spo","status","teams","tenant","yammer");
-  "m365 " = @("aad","accesstoken","consent","flow","graph","help","login","logout","onedrive","outlook","pa","planner","spfx","spo","status","teams","tenant","yammer");
+  "m365" = @("aad","accesstoken","consent","flow","graph","help","login","logout","onedrive","outlook","pa","planner","spfx","spo","status","teams","tenant","viva");
+  "m365 " = @("aad","accesstoken","consent","flow","graph","help","login","logout","onedrive","outlook","pa","planner","spfx","spo","status","teams","tenant","viva");
   "m365 s" = @("spfx","spo","status");
   "m365 spo" = @("app","apppage","cdn","contenttype","contenttypehub","customaction","externaluser","feature","field","file","folder","get","hidedefaultthemes","homesite","hubsite","list","listitem","mail","navigation","orgassetslibrary","orgnewssite","page","propertybag","report","search","serviceprincipal","set","site","sitedesign","sitescript","sp","storageentity","tenant","term","theme","web");
   "m365 spo site" = @("add","appcatalog","classic","commsite","get","groupify","inplacerecordsmanagement","list","rename","set");

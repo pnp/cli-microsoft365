@@ -122,7 +122,7 @@ async function execute(rawArgs: string[]): Promise<void> {
     if (parsedArgs.output !== 'none') {
       printHelp(await getHelpMode(parsedArgs));
     }
-    return Promise.resolve();
+    return;
   }
 
   delete (cli.optionsFromArgs.options as any)._;

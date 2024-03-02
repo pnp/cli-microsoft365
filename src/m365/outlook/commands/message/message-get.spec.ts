@@ -83,8 +83,8 @@ describe(commands.MESSAGE_GET, () => {
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
-    auth.service.connected = true;
-    auth.service.accessTokens[auth.defaultResource] = {
+    auth.connection.active = true;
+    auth.connection.accessTokens[auth.defaultResource] = {
       expiresOn: 'abc',
       accessToken: 'abc'
     };
@@ -119,8 +119,8 @@ describe(commands.MESSAGE_GET, () => {
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
-    auth.service.accessTokens = {};
+    auth.connection.active = false;
+    auth.connection.accessTokens = {};
   });
 
   it('has correct name', () => {

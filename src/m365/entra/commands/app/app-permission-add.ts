@@ -41,7 +41,7 @@ class EntraAppPermissionAddCommand extends GraphCommand {
   }
 
   public alias(): string[] | undefined {
-    return [aadCommands.APP_PERMISSION_ADD];
+    return [aadCommands.APP_PERMISSION_ADD, commands.APPREGISTRATION_PERMISSION_ADD];
   }
 
   constructor() {

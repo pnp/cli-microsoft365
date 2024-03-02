@@ -34,10 +34,10 @@ describe(commands.INFO_GET, () => {
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
-    auth.service.connected = true;
+    auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
-    if (!auth.service.accessTokens[auth.defaultResource]) {
-      auth.service.accessTokens[auth.defaultResource] = {
+    if (!auth.connection.accessTokens[auth.defaultResource]) {
+      auth.connection.accessTokens[auth.defaultResource] = {
         expiresOn: '123',
         accessToken: 'abc'
       };
@@ -68,7 +68,7 @@ describe(commands.INFO_GET, () => {
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
+    auth.connection.active = false;
   });
 
   it('has correct name', () => {

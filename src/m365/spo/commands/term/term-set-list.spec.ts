@@ -33,8 +33,8 @@ describe(commands.TERM_SET_LIST, () => {
       FormDigestExpiresAt: new Date(),
       WebFullUrl: 'https://contoso.sharepoint.com'
     });
-    auth.service.spoUrl = 'https://contoso.sharepoint.com';
-    auth.service.connected = true;
+    auth.connection.spoUrl = 'https://contoso.sharepoint.com';
+    auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
   });
 
@@ -63,8 +63,8 @@ describe(commands.TERM_SET_LIST, () => {
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
-    auth.service.spoUrl = undefined;
+    auth.connection.active = false;
+    auth.connection.spoUrl = undefined;
   });
 
   it('has correct name', () => {

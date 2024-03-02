@@ -20,7 +20,7 @@ describe(commands.ACCESSTOKEN_GET, () => {
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
-    auth.service.connected = true;
+    auth.connection.active = true;
   });
 
   beforeEach(() => {
@@ -43,8 +43,8 @@ describe(commands.ACCESSTOKEN_GET, () => {
     sinonUtil.restore([
       auth.ensureAccessToken
     ]);
-    auth.service.accessTokens = {};
-    auth.service.spoUrl = undefined;
+    auth.connection.accessTokens = {};
+    auth.connection.spoUrl = undefined;
   });
 
   after(() => {
@@ -62,7 +62,7 @@ describe(commands.ACCESSTOKEN_GET, () => {
   it('retrieves access token for the specified resource', async () => {
     const d: Date = new Date();
     d.setMinutes(d.getMinutes() + 1);
-    auth.service.accessTokens['https://graph.microsoft.com'] = {
+    auth.connection.accessTokens['https://graph.microsoft.com'] = {
       expiresOn: d.toString(),
       accessToken: 'ABC'
     };
@@ -74,8 +74,8 @@ describe(commands.ACCESSTOKEN_GET, () => {
   it('retrieves access token for SharePoint when sharepoint specified as the resource and SPO URL previously retrieved', async () => {
     const d: Date = new Date();
     d.setMinutes(d.getMinutes() + 1);
-    auth.service.spoUrl = 'https://contoso.sharepoint.com';
-    auth.service.accessTokens['https://contoso.sharepoint.com'] = {
+    auth.connection.spoUrl = 'https://contoso.sharepoint.com';
+    auth.connection.accessTokens['https://contoso.sharepoint.com'] = {
       expiresOn: d.toString(),
       accessToken: 'ABC'
     };
@@ -93,7 +93,7 @@ describe(commands.ACCESSTOKEN_GET, () => {
   it('returns error when sharepoint specified as resource and SPO URL not available', async () => {
     const d: Date = new Date();
     d.setMinutes(d.getMinutes() + 1);
-    auth.service.accessTokens['https://contoso.sharepoint.com'] = {
+    auth.connection.accessTokens['https://contoso.sharepoint.com'] = {
       expiresOn: d.toString(),
       accessToken: 'ABC'
     };
@@ -104,7 +104,7 @@ describe(commands.ACCESSTOKEN_GET, () => {
   it('retrieves access token for graph.microsoft.com when graph specified as the resource', async () => {
     const d: Date = new Date();
     d.setMinutes(d.getMinutes() + 1);
-    auth.service.accessTokens['https://graph.microsoft.com'] = {
+    auth.connection.accessTokens['https://graph.microsoft.com'] = {
       expiresOn: d.toString(),
       accessToken: 'ABC'
     };

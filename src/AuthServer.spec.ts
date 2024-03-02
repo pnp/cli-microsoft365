@@ -25,12 +25,12 @@ describe('AuthServer', () => {
   beforeEach(() => {
     log = [];
     auth = new Auth();
-    auth.service.appId = '9bc3ab49-b65d-410a-85ad-de819febfddc';
-    auth.service.tenant = '9bc3ab49-b65d-410a-85ad-de819febfddd';
+    auth.connection.appId = '9bc3ab49-b65d-410a-85ad-de819febfddc';
+    auth.connection.tenant = '9bc3ab49-b65d-410a-85ad-de819febfddd';
     openStub = sinon.stub(browserUtil, 'open').callsFake(async () => { return; });
     callbackResolveStub = sinon.stub().callsFake(() => { });
     callbackRejectStub = sinon.stub().callsFake(() => { });
-    authServer.initializeServer(auth.service, auth.defaultResource, callbackResolveStub, callbackRejectStub, logger, true);
+    authServer.initializeServer(auth.connection, auth.defaultResource, callbackResolveStub, callbackRejectStub, logger, true);
     const address = authServer.server.address() as AddressInfo;
     serverUrl = `http://localhost:${address?.port}`;
   });
@@ -148,7 +148,7 @@ describe('AuthServer', () => {
       openStub = sinon.stub(browserUtil, 'open').callsFake(async () => {
         throw '';
       });
-      authServer.initializeServer(auth.service, auth.defaultResource, callbackResolveStub, callbackRejectStub, logger, true);
+      authServer.initializeServer(auth.connection, auth.defaultResource, callbackResolveStub, callbackRejectStub, logger, true);
       setTimeout(() => {
         assert(callbackRejectStub.called);
         assert(callbackRejectStub.args[0][0].error === "Can't open the default browser");
