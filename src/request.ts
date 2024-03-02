@@ -1,4 +1,4 @@
-import Axios, { AxiosError, AxiosInstance, AxiosPromise, AxiosProxyConfig, AxiosRequestConfig, AxiosResponse } from 'axios';
+import Axios, { AxiosError, AxiosInstance, AxiosProxyConfig, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { Stream } from 'stream';
 import auth, { Auth, CloudType } from './Auth.js';
 import { Logger } from './cli/Logger.js';
@@ -151,84 +151,77 @@ class Request {
     return this.execute(options);
   }
 
-  public execute<TResponse>(options: CliRequestOptions, resolve?: (res: TResponse) => void, reject?: (error: any) => void): Promise<TResponse> {
+  public async execute<TResponse>(options: CliRequestOptions): Promise<TResponse> {
     const start = process.hrtime.bigint();
 
     if (!this._logger) {
-      return Promise.reject('Logger not set on the request object');
+      throw 'Logger not set on the request object';
     }
 
     this.updateRequestForCloudType(options, auth.connection.cloudType);
 
-    return new Promise<TResponse>((_resolve: (res: TResponse) => void, _reject: (error: any) => void): void => {
-      ((): Promise<string> => {
-        if (options.headers && options.headers['x-anonymous']) {
-          return Promise.resolve('');
+    try {
+      let accessToken = '';
+
+      if (options.headers && options.headers['x-anonymous']) {
+        accessToken = '';
+      }
+      else {
+        const url = options.headers && options.headers['x-resource'] ? options.headers['x-resource'] : options.url;
+        const resource: string = Auth.getResourceFromUrl(url as string);
+        accessToken = await auth.ensureAccessToken(resource, this._logger as Logger, this._debug);
+      }
+
+      if (options.headers) {
+        if (options.headers['x-anonymous']) {
+          delete options.headers['x-anonymous'];
         }
-        else {
-          const url = options.headers && options.headers['x-resource'] ? options.headers['x-resource'] : options.url;
-          const resource: string = Auth.getResourceFromUrl(url as string);
-          return auth.ensureAccessToken(resource, this._logger as Logger, this._debug);
+        if (options.headers['x-resource']) {
+          delete options.headers['x-resource'];
         }
-      })()
-        .then((accessToken: string): AxiosPromise<TResponse> => {
-          if (options.headers) {
-            if (options.headers['x-anonymous']) {
-              delete options.headers['x-anonymous'];
-            }
-            if (options.headers['x-resource']) {
-              delete options.headers['x-resource'];
-            }
-            if (accessToken !== '') {
-              options.headers.authorization = `Bearer ${accessToken}`;
-            }
-          }
+        if (accessToken !== '') {
+          options.headers.authorization = `Bearer ${accessToken}`;
+        }
+      }
 
-          const proxyUrl = process.env.HTTP_PROXY || process.env.HTTPS_PROXY;
-          if (proxyUrl) {
-            options.proxy = this.createProxyConfigFromUrl(proxyUrl);
-          }
-          return this.req(options);
-        })
-        .then((res: any): void => {
-          if (resolve) {
-            resolve((options.responseType === 'stream' || options.fullResponse) ? res : res.data);
-          }
-          else {
-            const end = process.hrtime.bigint();
-            timings.api.push(Number(end - start));
+      const proxyUrl = process.env.HTTP_PROXY || process.env.HTTPS_PROXY;
+      if (proxyUrl) {
+        options.proxy = this.createProxyConfigFromUrl(proxyUrl);
+      }
 
-            _resolve((options.responseType === 'stream' || options.fullResponse) ? res : res.data);
-          }
-        }, (error: AxiosError): void => {
-          if (error && error.response &&
-            (error.response.status === 429 ||
-              error.response.status === 503)) {
-            let retryAfter: number = parseInt(error.response.headers['retry-after'] || '10');
-            if (isNaN(retryAfter)) {
-              retryAfter = 10;
-            }
-            if (this._debug) {
-              (this._logger as Logger).log(`Request throttled. Waiting ${retryAfter}sec before retrying...`);
-            }
-            setTimeout(() => {
-              this.execute(options, resolve || _resolve, reject || _reject);
-            }, retryAfter * 1000);
-          }
-          else {
-            if (reject) {
-              reject(error);
-            }
-            else {
-              const end = process.hrtime.bigint();
-              timings.api.push(Number(end - start));
+      const res = await this.req(options);
 
-              _reject(error);
-            }
-          }
-        });
-    });
+      const end = process.hrtime.bigint();
+      timings.api.push(Number(end - start));
+
+      if (options.responseType === 'stream' || options.fullResponse) {
+        return res as any;
+      }
+      else {
+        return res.data;
+      }
+    }
+    catch (error: any) {
+      const end = process.hrtime.bigint();
+      timings.api.push(Number(end - start));
+
+      if (error && error.response && (error.response.status === 429 || error.response.status === 503)) {
+        let retryAfter: number = parseInt(error.response.headers['retry-after'] || '10');
+        if (isNaN(retryAfter)) {
+          retryAfter = 10;
+        }
+        if (this._debug) {
+          await (this._logger as Logger).log(`Request throttled. Waiting ${retryAfter} sec before retrying...`);
+        }
+        await new Promise(resolve => setTimeout(resolve, retryAfter * 1000));
+        return this.execute(options);
+      }
+      else {
+        throw error;
+      }
+    }
   }
+
 
   private updateRequestForCloudType(options: AxiosRequestConfig, cloudType: CloudType): void {
     const url = new URL(options.url!);

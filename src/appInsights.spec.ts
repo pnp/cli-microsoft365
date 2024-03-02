@@ -18,7 +18,7 @@ describe('appInsights', () => {
   });
 
   it('adds -dev label to version logged in the telemetry when CLI ran locally', async () => {
-    sinon.stub(fs, 'existsSync').callsFake(() => true);
+    sinon.stub(fs, 'existsSync').returns(true);
     const i: any = await import(`./appInsights.js#${Math.random()}`);
     assert(i.default.commonProperties.version.indexOf('-dev') > -1);
   });
@@ -38,7 +38,7 @@ describe('appInsights', () => {
   });
 
   it('sets env logged in the telemetry to \'docker\' when CLI run in CLI docker image', async () => {
-    sinon.stub(fs, 'existsSync').callsFake(() => false);
+    sinon.stub(fs, 'existsSync').returns(false);
     process.env.CLIMICROSOFT365_ENV = 'docker';
     const i: any = await import(`./appInsights.js#${Math.random()}`);
     assert(i.default.commonProperties.env === 'docker');

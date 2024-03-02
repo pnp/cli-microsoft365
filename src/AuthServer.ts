@@ -37,40 +37,40 @@ export class AuthServer {
     this.httpServer = http.createServer(this.httpRequest).listen(0, this.httpListener);
   };
 
-  private httpListener = (): void => {
+  private httpListener = async (): Promise<void> => {
     const requestState = Math.random().toString(16).substr(2, 20);
     const address = this.httpServer.address() as AddressInfo;
     this.generatedServerUrl = `http://localhost:${address.port}`;
     const url = `${Auth.getEndpointForResource('https://login.microsoftonline.com', this.connection.cloudType)}/${this.connection.tenant}/oauth2/authorize?response_type=code&client_id=${this.connection.appId}&redirect_uri=${this.generatedServerUrl}&state=${requestState}&resource=${this.resource}&prompt=select_account`;
     if (this.debug) {
-      this.logger.logToStderr('Redirect URL:');
-      this.logger.logToStderr(url);
-      this.logger.logToStderr('');
+      await this.logger.logToStderr('Redirect URL:');
+      await this.logger.logToStderr(url);
+      await this.logger.logToStderr('');
     }
-    this.openUrl(url);
+    await this.openUrl(url);
   };
 
-  private openUrl(url: string): void {
-    browserUtil.open(url)
-      .then(_ => {
-        this.logger.logToStderr("To sign in, use the web browser that just has been opened. Please sign-in there.");
-      })
-      .catch(_ => {
-        const errorResponse: InteractiveAuthorizationErrorResponse = {
-          error: "Can't open the default browser",
-          errorDescription: "Was not able to open a browser instance. Try again later or use a different authentication method."
-        };
+  private async openUrl(url: string): Promise<void> {
+    try {
+      await browserUtil.open(url);
+      await this.logger.logToStderr("To sign in, use the web browser that just has been opened. Please sign-in there.");
+    }
+    catch {
+      const errorResponse: InteractiveAuthorizationErrorResponse = {
+        error: "Can't open the default browser",
+        errorDescription: "Was not able to open a browser instance. Try again later or use a different authentication method."
+      };
 
-        this.reject(errorResponse);
-        this.httpServer.close();
-      });
+      this.reject(errorResponse);
+      this.httpServer.close();
+    }
   }
 
-  private httpRequest = (request: IncomingMessage, response: ServerResponse): void => {
+  private httpRequest = async (request: IncomingMessage, response: ServerResponse): Promise<void> => {
     if (this.debug) {
-      this.logger.logToStderr('Response:');
-      this.logger.logToStderr(request.url);
-      this.logger.logToStderr('');
+      await this.logger.logToStderr('Response:');
+      await this.logger.logToStderr(request.url);
+      await this.logger.logToStderr('');
     }
 
     // url.parse is deprecated but we can't move to URL, because it doesn't

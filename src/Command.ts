@@ -165,7 +165,7 @@ export default abstract class Command {
 
       if (!prompted) {
         prompted = true;
-        cli.error('🌶️  Provide values for the following parameters:');
+        await cli.error('🌶️  Provide values for the following parameters:');
       }
 
       const answer = optionInfo.autocomplete !== undefined
@@ -176,7 +176,7 @@ export default abstract class Command {
     }
 
     if (prompted) {
-      cli.error('');
+      await cli.error('');
     }
 
     this.processOptions(args.options);
@@ -220,22 +220,22 @@ export default abstract class Command {
   }
 
   private async promptForOptionSetNameAndValue(args: CommandArgs, optionSet: OptionSet): Promise<void> {
-    cli.error(`🌶️  Please specify one of the following options:`);
+    await cli.error(`🌶️  Please specify one of the following options:`);
 
     const selectedOptionName = await prompt.forSelection<string>({ message: `Option to use:`, choices: optionSet.options.map((choice: any) => { return { name: choice, value: choice }; }) });
     const optionValue = await prompt.forInput({ message: `${selectedOptionName}:` });
 
     args.options[selectedOptionName] = optionValue;
-    cli.error('');
+    await cli.error('');
   }
 
   private async promptForSpecificOption(args: CommandArgs, commonOptions: string[]): Promise<void> {
-    cli.error(`🌶️  Multiple options for an option set specified. Please specify the correct option that you wish to use.`);
+    await cli.error(`🌶️  Multiple options for an option set specified. Please specify the correct option that you wish to use.`);
 
     const selectedOptionName = await prompt.forSelection({ message: `Option to use:`, choices: commonOptions.map((choice: any) => { return { name: choice, value: choice }; }) });
 
     commonOptions.filter(y => y !== selectedOptionName).map(optionName => args.options[optionName] = undefined);
-    cli.error('');
+    await cli.error('');
   }
 
   private async validateOutput(args: CommandArgs): Promise<string | boolean> {
