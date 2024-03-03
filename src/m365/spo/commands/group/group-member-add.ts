@@ -1,8 +1,8 @@
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
-import { aadGroup } from '../../../../utils/aadGroup.js';
-import { aadUser } from '../../../../utils/aadUser.js';
+import { entraGroup } from '../../../../utils/entraGroup.js';
+import { entraUser } from '../../../../utils/entraUser.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { spo } from '../../../../utils/spo.js';
 import { validation } from '../../../../utils/validation.js';
@@ -21,7 +21,9 @@ interface Options extends GlobalOptions {
   userNames?: string;
   emails?: string;
   userIds?: string;
+  entraGroupIds?: string;
   aadGroupIds?: string;
+  entraGroupNames?: string;
   aadGroupNames?: string;
 }
 
@@ -55,7 +57,9 @@ class SpoGroupMemberAddCommand extends SpoCommand {
         userNames: typeof args.options.userNames !== 'undefined',
         emails: typeof args.options.emails !== 'undefined',
         userIds: typeof args.options.userIds !== 'undefined',
+        entraGroupIds: typeof args.options.entraGroupIds !== 'undefined',
         aadGroupIds: typeof args.options.aadGroupIds !== 'undefined',
+        entraGroupNames: typeof args.options.entraGroupNames !== 'undefined',
         aadGroupNames: typeof args.options.aadGroupNames !== 'undefined'
       });
     });
@@ -82,7 +86,13 @@ class SpoGroupMemberAddCommand extends SpoCommand {
         option: '--userIds [userIds]'
       },
       {
+        option: '--entraGroupIds [entraGroupIds]'
+      },
+      {
         option: '--aadGroupIds [aadGroupIds]'
+      },
+      {
+        option: '--entraGroupNames [entraGroupNames]'
       },
       {
         option: '--aadGroupNames [aadGroupNames]'
@@ -115,6 +125,10 @@ class SpoGroupMemberAddCommand extends SpoCommand {
           return `${args.options.emails} contains one or more invalid email addresses`;
         }
 
+        if (args.options.entraGroupIds && args.options.entraGroupIds.split(',').some(e => !validation.isValidGuid(e))) {
+          return `${args.options.entraGroupIds} contains one or more invalid GUIDs`;
+        }
+
         if (args.options.aadGroupIds && args.options.aadGroupIds.split(',').some(e => !validation.isValidGuid(e))) {
           return `${args.options.aadGroupIds} contains one or more invalid GUIDs`;
         }
@@ -127,12 +141,24 @@ class SpoGroupMemberAddCommand extends SpoCommand {
   #initOptionSets(): void {
     this.optionSets.push(
       { options: ['groupId', 'groupName'] },
-      { options: ['userNames', 'emails', 'userIds', 'aadGroupIds', 'aadGroupNames'] }
+      { options: ['userNames', 'emails', 'userIds', 'entraGroupIds', 'aadGroupIds', 'entraGroupNames', 'aadGroupNames'] }
     );
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
+      if (args.options.aadGroupIds) {
+        args.options.entraGroupIds = args.options.aadGroupIds;
+
+        this.warn(logger, `Option 'aadGroupIds' is deprecated. Please use 'entraGroupIds' instead`);
+      }
+
+      if (args.options.aadGroupNames) {
+        args.options.entraGroupNames = args.options.aadGroupNames;
+
+        this.warn(logger, `Option 'aadGroupNames' is deprecated. Please use 'entraGroupNames' instead`);
+      }
+
       const groupId = await this.getGroupId(args, logger);
       const resolvedUsernameList = await this.getValidUsers(args, logger);
 
@@ -193,10 +219,11 @@ class SpoGroupMemberAddCommand extends SpoCommand {
     }
 
     const validUserNames: string[] = [];
-    const identifiers: string = args.options.userNames ?? args.options.emails ?? args.options.aadGroupIds ?? args.options.aadGroupNames ?? args.options.userIds!.toString();
+    const identifiers: string = args.options.userNames ?? args.options.emails ?? args.options.entraGroupIds ?? args.options.entraGroupNames ?? args.options.userIds!.toString();
 
     await Promise.all(identifiers.split(',').map(async identifier => {
       const trimmedIdentifier = identifier.trim();
+
       try {
         if (args.options.userIds) {
           if (this.verbose) {
@@ -208,21 +235,21 @@ class SpoGroupMemberAddCommand extends SpoCommand {
         else if (args.options.userNames) {
           validUserNames.push(trimmedIdentifier);
         }
-        else if (args.options.aadGroupIds) {
+        else if (args.options.entraGroupIds) {
           validUserNames.push(trimmedIdentifier);
         }
-        else if (args.options.aadGroupNames) {
+        else if (args.options.entraGroupNames) {
           if (this.verbose) {
             await logger.logToStderr(`Getting ID of Azure AD group ${trimmedIdentifier}`);
           }
-          const groupId = await aadGroup.getGroupIdByDisplayName(trimmedIdentifier);
+          const groupId = await entraGroup.getGroupIdByDisplayName(trimmedIdentifier);
           validUserNames.push(groupId);
         }
         else {
           if (this.verbose) {
             await logger.logToStderr(`Getting Azure AD ID for user ${trimmedIdentifier}`);
           }
-          const upn = await aadUser.getUserIdByEmail(trimmedIdentifier);
+          const upn = await entraUser.getUserIdByEmail(trimmedIdentifier);
           validUserNames.push(upn);
         }
       }

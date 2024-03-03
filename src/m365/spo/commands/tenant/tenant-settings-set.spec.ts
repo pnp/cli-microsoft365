@@ -2,7 +2,7 @@ import assert from 'assert';
 import chalk from 'chalk';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
@@ -47,10 +47,10 @@ describe(commands.TENANT_SETTINGS_SET, () => {
       FormDigestExpiresAt: new Date(),
       WebFullUrl: 'https://contoso.sharepoint.com'
     });
-    auth.service.connected = true;
-    auth.service.spoUrl = 'https://contoso-admin.sharepoint.com';
-    auth.service.tenantId = '6648899e-a042-6000-ee90-5bfa05d08b79|908bed80-a04a-4433-b4a0-883d9847d11d:ea1787c6-7ce2-4e71-be47-5e0deb30f9ee&#xA;Tenant';
-    commandInfo = Cli.getCommandInfo(command);
+    auth.connection.active = true;
+    auth.connection.spoUrl = 'https://contoso-admin.sharepoint.com';
+    auth.connection.spoTenantId = '6648899e-a042-6000-ee90-5bfa05d08b79|908bed80-a04a-4433-b4a0-883d9847d11d:ea1787c6-7ce2-4e71-be47-5e0deb30f9ee&#xA;Tenant';
+    commandInfo = cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -77,9 +77,9 @@ describe(commands.TENANT_SETTINGS_SET, () => {
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
-    auth.service.spoUrl = undefined;
-    auth.service.tenantId = undefined;
+    auth.connection.active = false;
+    auth.connection.spoUrl = undefined;
+    auth.connection.spoTenantId = undefined;
   });
 
   it('has correct name', () => {

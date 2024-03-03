@@ -1,4 +1,4 @@
-import { Cli, CommandOutput } from '../../../../cli/Cli.js';
+import { cli, CommandOutput } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import Command from '../../../../Command.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
@@ -45,6 +45,7 @@ class SpoFileRoleAssignmentAddCommand extends SpoCommand {
     this.#initOptions();
     this.#initValidators();
     this.#initOptionSets();
+    this.#initTypes();
   }
 
   #initTelemetry(): void {
@@ -123,6 +124,10 @@ class SpoFileRoleAssignmentAddCommand extends SpoCommand {
     );
   }
 
+  #initTypes(): void {
+    this.types.string.push('webUrl', 'fileUrl', 'fileId', 'upn', 'groupName', 'roleDefinitionName');
+  }
+
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
       await logger.logToStderr(`Adding role assignment to file in site at ${args.options.webUrl}...`);
@@ -173,7 +178,7 @@ class SpoFileRoleAssignmentAddCommand extends SpoCommand {
       verbose: this.verbose
     };
 
-    const output: CommandOutput = await Cli.executeCommandWithOutput(spoRoleDefinitionListCommand as Command, { options: { ...roleDefinitionListCommandOptions, _: [] } });
+    const output: CommandOutput = await cli.executeCommandWithOutput(spoRoleDefinitionListCommand as Command, { options: { ...roleDefinitionListCommandOptions, _: [] } });
     const getRoleDefinitionListOutput = JSON.parse(output.stdout);
     const roleDefinitionId: number = getRoleDefinitionListOutput.find((role: RoleDefinition) => role.Name === options.roleDefinitionName).Id;
     return roleDefinitionId;
@@ -188,7 +193,7 @@ class SpoFileRoleAssignmentAddCommand extends SpoCommand {
       verbose: this.verbose
     };
 
-    const output: CommandOutput = await Cli.executeCommandWithOutput(spoGroupGetCommand as Command, { options: { ...groupGetCommandOptions, _: [] } });
+    const output: CommandOutput = await cli.executeCommandWithOutput(spoGroupGetCommand as Command, { options: { ...groupGetCommandOptions, _: [] } });
     const getGroupOutput = JSON.parse(output.stdout);
     return getGroupOutput.Id;
   }
@@ -203,7 +208,7 @@ class SpoFileRoleAssignmentAddCommand extends SpoCommand {
       verbose: this.verbose
     };
 
-    const output: CommandOutput = await Cli.executeCommandWithOutput(spoUserGetCommand as Command, { options: { ...userGetCommandOptions, _: [] } });
+    const output: CommandOutput = await cli.executeCommandWithOutput(spoUserGetCommand as Command, { options: { ...userGetCommandOptions, _: [] } });
     const getUserOutput = JSON.parse(output.stdout);
     return getUserOutput.Id;
   }
@@ -221,7 +226,7 @@ class SpoFileRoleAssignmentAddCommand extends SpoCommand {
       verbose: this.verbose
     };
 
-    const output = await Cli.executeCommandWithOutput(spoFileGetCommand as Command, { options: { ...options, _: [] } });
+    const output = await cli.executeCommandWithOutput(spoFileGetCommand as Command, { options: { ...options, _: [] } });
     const getFileOutput = JSON.parse(output.stdout);
     return getFileOutput.ServerRelativeUrl;
   }

@@ -4,7 +4,7 @@ import TabItem from '@theme/TabItem';
 
 # spo applicationcustomizer get
 
-Get an application customizer that is added to a site.
+Get an application customizer that is added to a site
 
 ## Usage
 
@@ -19,13 +19,13 @@ m365 spo applicationcustomizer get [options]
 : URL of the site.
 
 `-t, --title [title]`
-: The title of the Application Customizer. Specify either `title`, `id`, or `clientSideComponentId`.
+: The title of the Application Customizer. Specify either `title`, `id` or `clientSideComponentId`.
 
 `-i, --id [id]`
-: The id of the Application Customizer. Specify either `title`, `id`, or `clientSideComponentId`.
+: The id of the Application Customizer. Specify either `title`, `id` or `clientSideComponentId`.
 
 `-c, --clientSideComponentId  [clientSideComponentId]`
-: The Client Side Component Id (GUID) of the application customizer. Specify either `title`, `id`, or `clientSideComponentId`.
+: The Client Side Component Id (GUID) of the application customizer. Specify either `title`, `id` or `clientSideComponentId`.
 
 `-s, --scope [scope]`
 : Scope of the application customizer. Allowed values: `Site`, `Web`, `All`. Defaults to `All`.
@@ -58,6 +58,10 @@ Retrieves an application customizer by title available at the site scope.
 ```sh
 m365 spo applicationcustomizer get --title "Some customizer" --webUrl https://contoso.sharepoint.com/sites/sales --scope site
 ```
+
+## Remarks
+
+This command can be used for retrieving an application customizer from a specific site. To retrieve an application customizer that's installed tenant-wide, view our dedicated [spo tenant applicationcustomizer get](../tenant/tenant-applicationcustomizer-get.mdx) command.
 
 ## Response
 
@@ -125,7 +129,7 @@ m365 spo applicationcustomizer get --title "Some customizer" --webUrl https://co
   <TabItem value="Markdown">
 
   ```md
-  # spo applicationcustomizer get --title "Some customizer" --webUrl "https://nachan365.sharepoint.com/sites/spdemo" --scope "Web"
+  # spo applicationcustomizer get --title "Some customizer" --webUrl "https://contoso.sharepoint.com/sites/sales" --scope "Web"
 
   Date: 3/6/2023
 
@@ -144,7 +148,6 @@ m365 spo applicationcustomizer get --title "Some customizer" --webUrl https://co
   Name | Some customizer
   RegistrationId | null
   RegistrationType | 0
-  Rights | {"High":0,"Low":0}
   Scope | Web
   ScriptBlock | null
   ScriptSrc | null
@@ -156,4 +159,3 @@ m365 spo applicationcustomizer get --title "Some customizer" --webUrl https://co
 
   </TabItem>
 </Tabs>
-

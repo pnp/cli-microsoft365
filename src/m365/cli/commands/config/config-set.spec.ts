@@ -1,6 +1,6 @@
 import assert from 'assert';
 import sinon from 'sinon';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { settingsNames } from '../../../../settingsNames.js';
@@ -17,7 +17,7 @@ describe(commands.CONFIG_SET, () => {
   let commandInfo: CommandInfo;
 
   before(() => {
-    commandInfo = Cli.getCommandInfo(command);
+    commandInfo = cli.getCommandInfo(command);
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     sinon.stub(session, 'getId').callsFake(() => '');
@@ -39,7 +39,7 @@ describe(commands.CONFIG_SET, () => {
   });
 
   afterEach(() => {
-    sinonUtil.restore(Cli.getInstance().config.set);
+    sinonUtil.restore(cli.getConfig().set);
   });
 
   after(() => {
@@ -55,7 +55,7 @@ describe(commands.CONFIG_SET, () => {
   });
 
   it(`sets ${settingsNames.showHelpOnFailure} property`, async () => {
-    const config = Cli.getInstance().config;
+    const config = cli.getConfig();
     let actualKey: string = '', actualValue: any;
     sinon.stub(config, 'set').callsFake(((key: string, value: any) => {
       actualKey = key;
@@ -67,7 +67,7 @@ describe(commands.CONFIG_SET, () => {
   });
 
   it(`sets ${settingsNames.autoOpenLinksInBrowser} property`, async () => {
-    const config = Cli.getInstance().config;
+    const config = cli.getConfig();
     let actualKey: string = '', actualValue: any;
     sinon.stub(config, 'set').callsFake(((key: string, value: any) => {
       actualKey = key;
@@ -80,9 +80,8 @@ describe(commands.CONFIG_SET, () => {
 
   it(`sets ${settingsNames.output} property to 'text'`, async () => {
     const output = "text";
-    const config = Cli.getInstance().config;
+    const config = cli.getConfig();
     let actualKey: string = '', actualValue: any;
-    sinon.restore();
     sinon.stub(config, 'set').callsFake(((key: string, value: any) => {
       actualKey = key;
       actualValue = value;
@@ -95,9 +94,8 @@ describe(commands.CONFIG_SET, () => {
 
   it(`sets ${settingsNames.output} property to 'json'`, async () => {
     const output = "json";
-    const config = Cli.getInstance().config;
+    const config = cli.getConfig();
     let actualKey: string = '', actualValue: any;
-    sinon.restore();
     sinon.stub(config, 'set').callsFake(((key: string, value: any) => {
       actualKey = key;
       actualValue = value;
@@ -110,9 +108,8 @@ describe(commands.CONFIG_SET, () => {
 
   it(`sets ${settingsNames.output} property to 'csv'`, async () => {
     const output = "csv";
-    const config = Cli.getInstance().config;
+    const config = cli.getConfig();
     let actualKey: string = '', actualValue: any;
-    sinon.restore();
     sinon.stub(config, 'set').callsFake(((key: string, value: any) => {
       actualKey = key;
       actualValue = value;
@@ -124,7 +121,7 @@ describe(commands.CONFIG_SET, () => {
   });
 
   it(`sets ${settingsNames.csvHeader} property`, async () => {
-    const config = Cli.getInstance().config;
+    const config = cli.getConfig();
     let actualKey: string = '', actualValue: any;
     sinon.stub(config, 'set').callsFake(((key: string, value: any) => {
       actualKey = key;
@@ -136,7 +133,7 @@ describe(commands.CONFIG_SET, () => {
   });
 
   it(`sets ${settingsNames.csvQuoted} property`, async () => {
-    const config = Cli.getInstance().config;
+    const config = cli.getConfig();
     let actualKey: string = '', actualValue: any;
     sinon.stub(config, 'set').callsFake(((key: string, value: any) => {
       actualKey = key;
@@ -148,7 +145,7 @@ describe(commands.CONFIG_SET, () => {
   });
 
   it(`sets ${settingsNames.csvQuotedEmpty} property`, async () => {
-    const config = Cli.getInstance().config;
+    const config = cli.getConfig();
     let actualKey: string = '', actualValue: any;
     sinon.stub(config, 'set').callsFake(((key: string, value: any) => {
       actualKey = key;
@@ -160,7 +157,7 @@ describe(commands.CONFIG_SET, () => {
   });
 
   it(`sets ${settingsNames.prompt} property`, async () => {
-    const config = Cli.getInstance().config;
+    const config = cli.getConfig();
     let actualKey: string = '', actualValue: any;
     sinon.stub(config, 'set').callsFake(((key: string, value: any) => {
       actualKey = key;
@@ -169,6 +166,30 @@ describe(commands.CONFIG_SET, () => {
     await command.action(logger, { options: { key: settingsNames.prompt, value: false } });
     assert.strictEqual(actualKey, settingsNames.prompt, 'Invalid key');
     assert.strictEqual(actualValue, false, 'Invalid value');
+  });
+
+  it(`sets ${settingsNames.authType} property`, async () => {
+    const config = cli.getConfig();
+    let actualKey: string = '', actualValue: any;
+    sinon.stub(config, 'set').callsFake(((key: string, value: any) => {
+      actualKey = key;
+      actualValue = value;
+    }) as any);
+    await command.action(logger, { options: { key: settingsNames.authType, value: 'deviceCode' } });
+    assert.strictEqual(actualKey, settingsNames.authType, 'Invalid key');
+    assert.strictEqual(actualValue, 'deviceCode', 'Invalid value');
+  });
+
+  it(`sets ${settingsNames.promptListPageSize} property`, async () => {
+    const config = cli.getConfig();
+    let actualKey: string = '', actualValue: any;
+    sinon.stub(config, 'set').callsFake(((key: string, value: any) => {
+      actualKey = key;
+      actualValue = value;
+    }) as any);
+    await command.action(logger, { options: { key: settingsNames.promptListPageSize, value: 10 } });
+    assert.strictEqual(actualKey, settingsNames.promptListPageSize, 'Invalid key');
+    assert.strictEqual(actualValue, 10, 'Invalid value');
   });
 
   it('supports specifying key and value', () => {
@@ -222,6 +243,41 @@ describe(commands.CONFIG_SET, () => {
     assert.strictEqual(actual, true);
   });
 
+  it('fails validation if specified authType is invalid', async () => {
+    const actual = await command.validate({ options: { key: settingsNames.authType, value: 'invalid' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('passes validation for authType type deviceCode', async () => {
+    const actual = await command.validate({ options: { key: settingsNames.authType, value: 'deviceCode' } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('passes validation for authType type browser', async () => {
+    const actual = await command.validate({ options: { key: settingsNames.authType, value: 'browser' } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('passes validation for authType type certificate', async () => {
+    const actual = await command.validate({ options: { key: settingsNames.authType, value: 'certificate' } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('passes validation for authType type password', async () => {
+    const actual = await command.validate({ options: { key: settingsNames.authType, value: 'password' } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('passes validation for authType type identity', async () => {
+    const actual = await command.validate({ options: { key: settingsNames.authType, value: 'identity' } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('passes validation for authType type secret', async () => {
+    const actual = await command.validate({ options: { key: settingsNames.authType, value: 'secret' } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
   it('fails validation if specified error output type is invalid', async () => {
     const actual = await command.validate({ options: { key: settingsNames.errorOutput, value: 'invalid' } }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -264,6 +320,26 @@ describe(commands.CONFIG_SET, () => {
 
   it('passes validation for help mode full', async () => {
     const actual = await command.validate({ options: { key: settingsNames.helpMode, value: 'full' } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('fails validation if specified promptListPageSize value is a string', async () => {
+    const actual = await command.validate({ options: { key: settingsNames.promptListPageSize, value: 'invalid' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if specified promptListPageSize value is 0', async () => {
+    const actual = await command.validate({ options: { key: settingsNames.promptListPageSize, value: 0 } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if specified promptListPageSize value is negative', async () => {
+    const actual = await command.validate({ options: { key: settingsNames.promptListPageSize, value: -1 } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('passes validation for number value in promptListPageSize', async () => {
+    const actual = await command.validate({ options: { key: settingsNames.promptListPageSize, value: 10 } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 });

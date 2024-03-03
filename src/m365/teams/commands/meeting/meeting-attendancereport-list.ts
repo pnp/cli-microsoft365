@@ -1,12 +1,12 @@
 import auth from '../../../../Auth.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import Command from '../../../../Command.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 import { odata } from '../../../../utils/odata.js';
 import { validation } from '../../../../utils/validation.js';
-import aadUserGetCommand, { Options as AadUserGetCommandOptions } from '../../../aad/commands/user/user-get.js';
+import entraUserGetCommand, { Options as EntraUserGetCommandOptions } from '../../../entra/commands/user/user-get.js';
 import GraphCommand from "../../../base/GraphCommand.js";
 import commands from '../../commands.js';
 
@@ -82,7 +82,7 @@ class TeamsMeetingAttendancereportListCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const isAppOnlyAccessToken: boolean | undefined = accessToken.isAppOnlyAccessToken(auth.service.accessTokens[this.resource].accessToken);
+    const isAppOnlyAccessToken: boolean | undefined = accessToken.isAppOnlyAccessToken(auth.connection.accessTokens[this.resource].accessToken);
     if (isAppOnlyAccessToken && !args.options.userId && !args.options.userName && !args.options.email) {
       this.handleError(`The option 'userId', 'userName' or 'email' is required when retrieving meeting attendance report using app only permissions`);
     }
@@ -122,7 +122,7 @@ class TeamsMeetingAttendancereportListCommand extends GraphCommand {
   }
 
   private async getUserId(userName?: string, email?: string): Promise<string> {
-    const options: AadUserGetCommandOptions = {
+    const options: EntraUserGetCommandOptions = {
       email: email,
       userName: userName,
       output: 'json',
@@ -130,7 +130,7 @@ class TeamsMeetingAttendancereportListCommand extends GraphCommand {
       verbose: this.verbose
     };
 
-    const output = await Cli.executeCommandWithOutput(aadUserGetCommand as Command, { options: { ...options, _: [] } });
+    const output = await cli.executeCommandWithOutput(entraUserGetCommand as Command, { options: { ...options, _: [] } });
     const getUserOutput = JSON.parse(output.stdout);
     return getUserOutput.id;
   }

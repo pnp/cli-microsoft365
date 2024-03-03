@@ -13,8 +13,11 @@ m365 teams app install [options]
 ## Options
 
 ```md definition-list
-`--id <id>`
-: The ID of the app to install
+`-i, --id [id]`
+: ID of the app to update. Specify either id or name, but not both
+
+`-n, --name [name]`
+: The display name of the app to update. Specify either id or name, but not both
 
 `--teamId [teamId]`
 : The ID of the Microsoft Teams team to which to install the app
@@ -50,6 +53,12 @@ Install a personal app for the user specified using their ID
 
 ```sh
 m365 teams app install --id 4440558e-8c73-4597-abc7-3644a64c4bce --userId 2609af39-7775-4f94-a3dc-0dd67657e900
+```
+
+Install an app with name _Test app_ from the catalog in a Microsoft Teams team
+
+```sh
+m365 teams app install --name "Test app" --teamId 2609af39-7775-4f94-a3dc-0dd67657e900
 ```
 
 ## Response

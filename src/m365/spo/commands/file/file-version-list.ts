@@ -37,6 +37,7 @@ class SpoFileVersionListCommand extends SpoCommand {
     this.#initOptions();
     this.#initValidators();
     this.#initOptionSets();
+    this.#initTypes();
   }
 
   #initTelemetry(): void {
@@ -76,6 +77,10 @@ class SpoFileVersionListCommand extends SpoCommand {
 
   #initOptionSets(): void {
     this.optionSets.push({ options: ['fileUrl', 'fileId'] });
+  }
+
+  #initTypes(): void {
+    this.types.string.push('webUrl', 'fileUrl', 'fileId');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

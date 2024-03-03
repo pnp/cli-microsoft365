@@ -1,4 +1,4 @@
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import Command from '../../../../Command.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
@@ -37,6 +37,7 @@ class SpoFileRoleInheritanceResetCommand extends SpoCommand {
     this.#initOptions();
     this.#initValidators();
     this.#initOptionSets();
+    this.#initTypes();
   }
 
   #initTelemetry(): void {
@@ -87,6 +88,11 @@ class SpoFileRoleInheritanceResetCommand extends SpoCommand {
     this.optionSets.push({ options: ['fileId', 'fileUrl'] });
   }
 
+  #initTypes(): void {
+    this.types.string.push('webUrl', 'fileUrl', 'fileId');
+    this.types.boolean.push('force');
+  }
+
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const resetFileRoleInheritance = async (): Promise<void> => {
       if (this.verbose) {
@@ -114,14 +120,9 @@ class SpoFileRoleInheritanceResetCommand extends SpoCommand {
       await resetFileRoleInheritance();
     }
     else {
-      const result = await Cli.prompt<{ continue: boolean }>({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: `Are you sure you want to reset the role inheritance of file ${args.options.fileUrl || args.options.fileId} located in site ${args.options.webUrl}?`
-      });
+      const result = await cli.promptForConfirmation({ message: `Are you sure you want to reset the role inheritance of file ${args.options.fileUrl || args.options.fileId} located in site ${args.options.webUrl}?` });
 
-      if (result.continue) {
+      if (result) {
         await resetFileRoleInheritance();
       }
     }
@@ -140,7 +141,7 @@ class SpoFileRoleInheritanceResetCommand extends SpoCommand {
       verbose: this.verbose
     };
 
-    const output = await Cli.executeCommandWithOutput(spoFileGetCommand as Command, { options: { ...options, _: [] } });
+    const output = await cli.executeCommandWithOutput(spoFileGetCommand as Command, { options: { ...options, _: [] } });
     const getFileOutput = JSON.parse(output.stdout);
     return getFileOutput.ServerRelativeUrl;
   }

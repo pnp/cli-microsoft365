@@ -22,7 +22,7 @@ This is a community-owned product, as Microsoft uses product names that begin wi
 
 If you have scripts using `@pnp/office365-cli` then we would encourage you to update your installed package to use the new package name, `@pnp/cli-microsoft365`, this will ensure that you get all the latest updates and patches.
 
-:::caution
+:::warning
 
 The `@pnp/office365-cli` package will still remain on npm, but will be deprecated following the release of v3. It will not receive any updates or fixes, therefore we would strongly recommend that you should plan to upgrade to the new package.
 
@@ -38,15 +38,15 @@ After upgrading to v3, `@pnp/cli-microsoft365`, any scripts that use the `o365` 
 
 ## Renaming of CLI environment variables
 
-In Office 365 CLI v2, we provided two environment variables, `OFFICE365CLI_AADAPPID` and `OFFICE365CLI_TENANT`. These environment variable could be updated to point the CLI to your own custom Azure Active Directory identity to use for logging into your Microsoft 365 tenant instead of using the multi-tenant PnP Management Shell identity used as the default identity.
+In Office 365 CLI v2, we provided two environment variables, `OFFICE365CLI_AADAPPID` and `OFFICE365CLI_TENANT`. These environment variable could be updated to point the CLI to your own custom Entra identity to use for logging into your Microsoft 365 tenant instead of using the multi-tenant PnP Management Shell identity used as the default identity.
 
-Find out more about this feature: [Using your own Azure AD identity](user-guide/using-own-identity.mdx)
+Find out more about this feature: [Using your own Entra identity](user-guide/using-own-identity.mdx)
 
 These environment variables have been renamed following the rename of the package.
 
 ***What action do I need to take?***
 
-After upgrading to v3, `@pnp/cli-microsoft365`, any scripts that make use of a custom Azure AD identity for authentication will need to update the setting of the environment variables to use the new names, `CLIMICROSOFT365_AADAPPID` and `CLIMICROSOFT365_TENANT`.
+After upgrading to v3, `@pnp/cli-microsoft365`, any scripts that make use of a custom Entra identity for authentication will need to update the setting of the environment variables to use the new names, `CLIMICROSOFT365_AADAPPID` and `CLIMICROSOFT365_TENANT`.
 
 ## Removal of the global `--pretty` option
 
@@ -72,7 +72,7 @@ In Office 365 CLI v2, we provided an option called `--outputFile` on certain com
 
 ***What action do I need to take?***
 
-After upgrading to v3, `@pnp/cli-microsoft365`, any scripts that use the `--outputFile` option should be updated. Remove the option and replace with a shell command to send the output to a file, for example, `m365 aad o365group report activitycounts --period D7 --output json --outputFile "o365groupactivitycounts.json"` becomes `m365 aad o365group report activitycounts --period D7 --output json > "o365groupactivitycounts.json"`
+After upgrading to v3, `@pnp/cli-microsoft365`, any scripts that use the `--outputFile` option should be updated. Remove the option and replace with a shell command to send the output to a file, for example, `m365 entra o365group report activitycounts --period D7 --output json --outputFile "o365groupactivitycounts.json"` becomes `m365 entra o365group report activitycounts --period D7 --output json > "o365groupactivitycounts.json"`
 
 ## Removal of deprecated aliases
 

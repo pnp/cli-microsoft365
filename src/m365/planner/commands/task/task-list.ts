@@ -2,7 +2,7 @@ import { PlannerPlan, PlannerTask } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
-import { aadGroup } from '../../../../utils/aadGroup.js';
+import { entraGroup } from '../../../../utils/entraGroup.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { odata } from '../../../../utils/odata.js';
 import { planner } from '../../../../utils/planner.js';
@@ -214,7 +214,7 @@ class PlannerTaskListCommand extends GraphCommand {
       return formatting.encodeQueryParameter(args.options.ownerGroupId);
     }
 
-    const group = await aadGroup.getGroupByDisplayName(args.options.ownerGroupName!);
+    const group = await entraGroup.getGroupByDisplayName(args.options.ownerGroupName!);
     return group.id!;
   }
 

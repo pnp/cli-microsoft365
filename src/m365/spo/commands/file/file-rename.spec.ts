@@ -1,7 +1,7 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
@@ -39,8 +39,8 @@ describe(commands.FILE_RENAME, () => {
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
-    auth.service.connected = true;
-    commandInfo = Cli.getCommandInfo(command);
+    auth.connection.active = true;
+    commandInfo = cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -64,13 +64,13 @@ describe(commands.FILE_RENAME, () => {
     sinonUtil.restore([
       request.get,
       request.post,
-      Cli.executeCommand
+      cli.executeCommand
     ]);
   });
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
+    auth.connection.active = false;
   });
 
   it('has correct name', () => {
@@ -92,7 +92,7 @@ describe(commands.FILE_RENAME, () => {
   });
 
   it('forcefully renames file from a non-root site in the root folder of a document library when a file with the same name exists (or it doesn\'t?)', async () => {
-    sinon.stub(Cli, 'executeCommand').resolves();
+    sinon.stub(cli, 'executeCommand').resolves();
 
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string) === 'https://contoso.sharepoint.com/sites/portal/_api/web/GetFileByServerRelativePath(DecodedUrl=\'%2Fsites%2Fportal%2FShared%20Documents%2Fabc.pdf\')/ListItemAllFields/ValidateUpdateListItem()') {
@@ -152,7 +152,7 @@ describe(commands.FILE_RENAME, () => {
         message: 'File does not exist'
       }
     };
-    sinon.stub(Cli, 'executeCommand').rejects(fileDeleteError);
+    sinon.stub(cli, 'executeCommand').rejects(fileDeleteError);
 
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string) === 'https://contoso.sharepoint.com/sites/portal/_api/web/GetFileByServerRelativePath(DecodedUrl=\'%2Fsites%2Fportal%2FShared%20Documents%2Fabc.pdf\')/ListItemAllFields/ValidateUpdateListItem()') {
@@ -188,7 +188,7 @@ describe(commands.FILE_RENAME, () => {
       stderr: ''
     };
 
-    sinon.stub(Cli, 'executeCommand').rejects(fileDeleteError);
+    sinon.stub(cli, 'executeCommand').rejects(fileDeleteError);
 
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string) === `https://contoso.sharepoint.com/sites/portal/_api/web/GetFileByServerRelativePath(DecodedUrl='%2Fsites%2Fportal%2FShared%20Documents%2Fabc.pdf')?$select=UniqueId`) {

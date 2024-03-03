@@ -2,7 +2,7 @@ import assert from 'assert';
 import fs from 'fs';
 import path from 'path';
 import sinon from 'sinon';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
@@ -597,18 +597,18 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
   });
 
   it('passes validation when json output specified', async () => {
-    assert.strictEqual(await command.validate({ options: { output: 'json' } }, Cli.getCommandInfo(command)), true);
+    assert.strictEqual(await command.validate({ options: { output: 'json' } }, cli.getCommandInfo(command)), true);
   });
 
   it('passes validation when text output specified', async () => {
-    assert.strictEqual(await command.validate({ options: { output: 'text' } }, Cli.getCommandInfo(command)), true);
+    assert.strictEqual(await command.validate({ options: { output: 'text' } }, cli.getCommandInfo(command)), true);
   });
 
   it('passes validation when md output specified', async () => {
-    assert.strictEqual(await command.validate({ options: { output: 'md' } }, Cli.getCommandInfo(command)), true);
+    assert.strictEqual(await command.validate({ options: { output: 'md' } }, cli.getCommandInfo(command)), true);
   });
 
   it('fails validation when csv output specified', async () => {
-    assert.notStrictEqual(await command.validate({ options: { output: 'csv' } }, Cli.getCommandInfo(command)), true);
+    assert.notStrictEqual(await command.validate({ options: { output: 'csv' } }, cli.getCommandInfo(command)), true);
   });
 });

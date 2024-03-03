@@ -53,7 +53,7 @@ Use the CLI for Microsoft 365 to migrate an existing plan to a SharePoint Online
 
           $assignedUsers = @()
           foreach ($userId in $($task.assignments | ForEach-Object { $($_).PSObject.Properties.Name })) {
-              $assignedUsers += "{'Key':'i:0#.f|membership|$(m365 aad user get --id $userId --query "userPrincipalName" | ConvertFrom-Json)'}"
+              $assignedUsers += "{'Key':'i:0#.f|membership|$(m365 entra user get --id $userId --query "userPrincipalName" | ConvertFrom-Json)'}"
           }
 
           $checklist = $null;

@@ -3,7 +3,7 @@ import fs from 'fs';
 import sinon from 'sinon';
 import auth from '../../../Auth.js';
 import { CommandError } from '../../../Command.js';
-import { Cli } from '../../../cli/Cli.js';
+import { cli } from '../../../cli/cli.js';
 import { CommandInfo } from '../../../cli/CommandInfo.js';
 import { Logger } from '../../../cli/Logger.js';
 import { telemetry } from '../../../telemetry.js';
@@ -16,7 +16,6 @@ import command from './app-open.js';
 describe(commands.OPEN, () => {
   let log: string[];
   let logger: Logger;
-  let cli: Cli;
   let openStub: sinon.SinonStub;
   let getSettingWithDefaultValueStub: sinon.SinonStub;
   let loggerLogSpy: sinon.SinonSpy;
@@ -27,7 +26,7 @@ describe(commands.OPEN, () => {
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
-    auth.service.connected = true;
+    auth.connection.active = true;
     sinon.stub(fs, 'existsSync').returns(true);
     sinon.stub(fs, 'readFileSync').returns(JSON.stringify({
       "apps": [
@@ -37,12 +36,11 @@ describe(commands.OPEN, () => {
         }
       ]
     }));
-    commandInfo = Cli.getCommandInfo(command);
+    commandInfo = cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
     log = [];
-    cli = Cli.getInstance();
     logger = {
       log: async (msg: string) => {
         log.push(msg);
@@ -66,7 +64,7 @@ describe(commands.OPEN, () => {
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
+    auth.connection.active = false;
   });
 
   it('has correct name', () => {

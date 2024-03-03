@@ -7,7 +7,7 @@ import { RoleDefinition } from '../m365/spo/commands/roledefinition/RoleDefiniti
 import request from '../request.js';
 import { sinonUtil } from '../utils/sinonUtil.js';
 import { FormDigestInfo, spo } from '../utils/spo.js';
-import { aadGroup } from './aadGroup.js';
+import { entraGroup } from './entraGroup.js';
 import { formatting } from './formatting.js';
 
 const stubPostResponses: any = (
@@ -49,7 +49,7 @@ describe('utils/spo', () => {
   let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
-    auth.service.connected = true;
+    auth.connection.active = true;
   });
 
   beforeEach(() => {
@@ -81,13 +81,13 @@ describe('utils/spo', () => {
       spo.getTenantId,
       global.setTimeout
     ]);
-    auth.service.spoUrl = undefined;
-    auth.service.tenantId = undefined;
+    auth.connection.spoUrl = undefined;
+    auth.connection.spoTenantId = undefined;
   });
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
+    auth.connection.active = false;
   });
 
   it('reuses current digestcontext when expireat is a future date', (done) => {
@@ -270,7 +270,7 @@ describe('utils/spo', () => {
   });
 
   it('retrieves tenant app catalog url', async () => {
-    auth.service.spoUrl = 'https://contoso.sharepoint.com';
+    auth.connection.spoUrl = 'https://contoso.sharepoint.com';
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/_api/SP_TenantSettings_Current') {
         return Promise.resolve({ CorporateCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' });
@@ -285,7 +285,7 @@ describe('utils/spo', () => {
   });
 
   it('returns null when tenant app catalog not configured', async () => {
-    auth.service.spoUrl = 'https://contoso.sharepoint.com';
+    auth.connection.spoUrl = 'https://contoso.sharepoint.com';
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/_api/SP_TenantSettings_Current') {
         return Promise.resolve({ CorporateCatalogUrl: null });
@@ -300,7 +300,7 @@ describe('utils/spo', () => {
 
   it('handles error when retrieving SPO URL failed while retrieving tenant app catalog url', (done) => {
     const errorMessage = 'Couldn\'t retrieve SharePoint URL';
-    auth.service.spoUrl = undefined;
+    auth.connection.spoUrl = undefined;
 
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/SP_TenantSettings_Current') > -1) {
@@ -327,7 +327,7 @@ describe('utils/spo', () => {
 
   it('handles error when retrieving the tenant app catalog URL fails', (done) => {
     const errorMessage = 'Couldn\'t retrieve tenant app catalog URL';
-    auth.service.spoUrl = 'https://contoso.sharepoint.com';
+    auth.connection.spoUrl = 'https://contoso.sharepoint.com';
 
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/SP_TenantSettings_Current') > -1) {
@@ -1746,7 +1746,7 @@ describe('utils/spo', () => {
       FormDigestExpiresAt: new Date(),
       WebFullUrl: 'https://contoso.sharepoint.com'
     });
-    sinon.stub(aadGroup, 'setGroup').resolves();
+    sinon.stub(entraGroup, 'setGroup').resolves();
     sinon.stub(spo, 'setGroupifiedSiteOwners').resolves();
     sinon.stub(spo, 'applySiteDesign').resolves();
 
@@ -1967,7 +1967,7 @@ describe('utils/spo', () => {
     }
   });
 
-  it(`retrieves web properties susccessfully`, async () => {
+  it(`retrieves web properties successfully`, async () => {
     const webResponse = {
       value: [{
         AllowRssFeeds: false,
@@ -2015,5 +2015,72 @@ describe('utils/spo', () => {
 
     const actual = await spo.getWeb('https://contoso.sharepoint.com', logger, true);
     assert.deepStrictEqual(actual, webResponse);
+  });
+
+  it(`applies a retention label to list items successfully`, async () => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/SP_CompliancePolicy_SPPolicyStoreProxy_SetComplianceTagOnBulkItems`
+        && JSON.stringify(opts.data) === '{"listUrl":"https://contoso.sharepoint.com/sites/project-x/list","complianceTagValue":"Some label","itemIds":[1]}') {
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await assert.doesNotReject(spo.applyRetentionLabelToListItems('https://contoso.sharepoint.com/sites/project-x', 'Some label', 'https://contoso.sharepoint.com/sites/project-x/list', [1], logger, true));
+  });
+
+  it(`removes a retention label from list items successfully`, async () => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/SP_CompliancePolicy_SPPolicyStoreProxy_SetComplianceTagOnBulkItems`
+        && JSON.stringify(opts.data) === '{"listUrl":"https://contoso.sharepoint.com/sites/project-x/list","complianceTagValue":"","itemIds":[1]}') {
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await assert.doesNotReject(spo.removeRetentionLabelFromListItems('https://contoso.sharepoint.com/sites/project-x', 'https://contoso.sharepoint.com/sites/project-x/list', [1], logger, true));
+  });
+
+  it(`applies a default retention label to a list successfully`, async () => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/SP_CompliancePolicy_SPPolicyStoreProxy_SetListComplianceTag`
+        && JSON.stringify(opts.data) === '{"listUrl":"https://contoso.sharepoint.com/sites/project-x/list","complianceTagValue":"Some label","blockDelete":false,"blockEdit":false,"syncToItems":true}') {
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await assert.doesNotReject(spo.applyDefaultRetentionLabelToList('https://contoso.sharepoint.com/sites/project-x', 'Some label', 'https://contoso.sharepoint.com/sites/project-x/list', true, logger, true));
+  });
+
+  it(`removes a default retention label from a list successfully`, async () => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/SP_CompliancePolicy_SPPolicyStoreProxy_SetListComplianceTag`
+        && JSON.stringify(opts.data) === '{"listUrl":"https://contoso.sharepoint.com/sites/project-x/list","complianceTagValue":"","blockDelete":false,"blockEdit":false,"syncToItems":false}') {
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await assert.doesNotReject(spo.removeDefaultRetentionLabelFromList('https://contoso.sharepoint.com/sites/project-x', 'https://contoso.sharepoint.com/sites/project-x/list', logger, true));
+  });
+
+  it('returns the correct site ID for a valid site', async () => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      const expectedUrl = 'https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com:/?$select=id';
+      if (opts.url === expectedUrl) {
+        return Promise.resolve({ id: 'contoso.sharepoint.com,ea49a393-e3e6-4760-a1b2-e96539e15372,66e2861c-96d9-4418-a75c-0ed1bca68b42' });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    const id = await spo.getSiteId('https://contoso.sharepoint.com', logger);
+
+    assert.strictEqual(id, 'contoso.sharepoint.com,ea49a393-e3e6-4760-a1b2-e96539e15372,66e2861c-96d9-4418-a75c-0ed1bca68b42');
   });
 });

@@ -137,6 +137,26 @@ describe('validation/validation', () => {
     assert.strictEqual(result, true);
   });
 
+  it('isValidUserPrincipalNameArray returns true if valid username array', () => {
+    const result = validation.isValidUserPrincipalNameArray(['john.doe@contoso.com', 'adele@contoso.onmicrosoft.com']);
+    assert.strictEqual(result, true);
+  });
+
+  it('isValidUserPrincipalNameArray returns falsy value of invalid username array', () => {
+    const result = validation.isValidUserPrincipalNameArray(['john.doe@contoso.com', 'foo']);
+    assert.strictEqual(result, 'foo');
+  });
+
+  it('isValidUserPrincipalNameArray returns true with @meusername token', () => {
+    const result = validation.isValidUserPrincipalNameArray(['john.doe@contoso.com', '@meusername']);
+    assert.strictEqual(result, true);
+  });
+
+  it('isValidUserPrincipalNameArray returns true with @meusername token and spaces', () => {
+    const result = validation.isValidUserPrincipalNameArray(['john.doe@contoso.com', '@meusername ']);
+    assert.strictEqual(result, true);
+  });
+
   it('isValidUserPrincipalName returns true if valid username', () => {
     const result = validation.isValidUserPrincipalName('John@Contoso.com');
     assert.strictEqual(result, true);
@@ -455,5 +475,75 @@ describe('validation/validation', () => {
     const actual = validation.isValidTheme(theme);
     const expected = false;
     assert.strictEqual(actual, expected);
+  });
+
+  it('isValidMailNickname returns true when mailNickname is valid', () => {
+    const result = validation.isValidMailNickname('nickname');
+    assert.strictEqual(result, true);
+  });
+
+  it('isValidMailNickname returns false when mailNickname contains \\', () => {
+    const result = validation.isValidMailNickname('nicknam\\e');
+    assert.strictEqual(result, false);
+  });
+
+  it('isValidMailNickname returns false when mailNickname contains <', () => {
+    const result = validation.isValidMailNickname('<nickname');
+    assert.strictEqual(result, false);
+  });
+
+  it('isValidMailNickname returns false when mailNickname contains >', () => {
+    const result = validation.isValidMailNickname('nickname>');
+    assert.strictEqual(result, false);
+  });
+
+  it('isValidMailNickname returns false when mailNickname contains (', () => {
+    const result = validation.isValidMailNickname('(nickname');
+    assert.strictEqual(result, false);
+  });
+
+  it('isValidMailNickname returns false when mailNickname contains )', () => {
+    const result = validation.isValidMailNickname('nickname)');
+    assert.strictEqual(result, false);
+  });
+
+  it('isValidMailNickname returns false when mailNickname contains [', () => {
+    const result = validation.isValidMailNickname('[nickname');
+    assert.strictEqual(result, false);
+  });
+
+  it('isValidMailNickname returns false when mailNickname contains ]', () => {
+    const result = validation.isValidMailNickname('nickname]');
+    assert.strictEqual(result, false);
+  });
+
+  it('isValidMailNickname returns false when mailNickname contains @', () => {
+    const result = validation.isValidMailNickname('nick@name');
+    assert.strictEqual(result, false);
+  });
+
+  it('isValidMailNickname returns false when mailNickname contains space', () => {
+    const result = validation.isValidMailNickname('nick name');
+    assert.strictEqual(result, false);
+  });
+
+  it('isValidMailNickname returns false when mailNickname contains "', () => {
+    const result = validation.isValidMailNickname('nick"name');
+    assert.strictEqual(result, false);
+  });
+
+  it('isValidMailNickname returns false when mailNickname contains ;', () => {
+    const result = validation.isValidMailNickname('nick;name');
+    assert.strictEqual(result, false);
+  });
+
+  it('isValidMailNickname returns false when mailNickname contains :', () => {
+    const result = validation.isValidMailNickname('nick:name');
+    assert.strictEqual(result, false);
+  });
+
+  it('isValidMailNickname returns false when mailNickname contains ,', () => {
+    const result = validation.isValidMailNickname('nick,name');
+    assert.strictEqual(result, false);
   });
 });

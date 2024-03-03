@@ -3,7 +3,7 @@ import fs from 'fs';
 import sinon from 'sinon';
 import { PassThrough } from 'stream';
 import auth from '../../../../Auth.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
@@ -17,20 +17,18 @@ import command from './file-get.js';
 import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.FILE_GET, () => {
-  let cli: Cli;
   let log: any[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
 
   before(() => {
-    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
-    auth.service.connected = true;
-    commandInfo = Cli.getCommandInfo(command);
+    auth.connection.active = true;
+    commandInfo = cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -59,7 +57,7 @@ describe(commands.FILE_GET, () => {
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
+    auth.connection.active = false;
   });
 
   it('has correct name', () => {
@@ -439,6 +437,25 @@ describe(commands.FILE_GET, () => {
       }
     });
     assert.strictEqual(getStub.lastCall.args[0].url, `https://contoso.sharepoint.com/_api/web/GetFileByServerRelativePath(DecodedUrl=@f)?@f='%2FDocuments%2FTest1.docx'`);
+  });
+
+  it('uses correct API url when tenant root URL option is passed in combination with asListItem', async () => {
+    const getStub: any = sinon.stub(request, 'get').callsFake(async (opts) => {
+      if ((opts.url as string).indexOf('/_api/web/GetFileByServerRelativePath(') > -1) {
+        return { ListItemAllFields: { Id: 1, ID: 1 } };
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options: {
+        url: '/Documents/Test1.docx',
+        webUrl: 'https://contoso.sharepoint.com',
+        asListItem: true
+      }
+    });
+    assert.strictEqual(getStub.lastCall.args[0].url, `https://contoso.sharepoint.com/_api/web/GetFileByServerRelativePath(DecodedUrl=@f)?$expand=ListItemAllFields&@f='%2FDocuments%2FTest1.docx'`);
   });
 
   it('should handle promise rejection', async () => {

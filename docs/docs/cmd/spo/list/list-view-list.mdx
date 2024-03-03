@@ -16,7 +16,7 @@ m365 spo list view list [options]
 
 ```md definition-list
  `-u, --webUrl <webUrl>`
-: URL of the site where the list is located
+: URL of the site where the list is located.
 
  `-i, --listId [listId]`
 : ID of the list for which to list configured views. Specify either `listId`, `listTitle`, or `listUrl`.
@@ -32,19 +32,19 @@ m365 spo list view list [options]
 
 ## Examples
 
-List all views for a list by title
+List all views for a list by title.
 
 ```sh
 m365 spo list view list --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle Documents
 ```
 
-List all views for a list by ID
+List all views for a list by ID.
 
 ```sh
 m365 spo list view list --webUrl https://contoso.sharepoint.com/sites/project-x --listId 0cd891ef-afce-4e55-b836-fce03286cccf
 ```
 
-List all views for a list by URL
+List all views for a list by URL.
 
 ```sh
 m365 spo list view list --webUrl https://contoso.sharepoint.com/sites/project-x --listUrl '/sites/project-x/lists/Events'
@@ -149,7 +149,6 @@ m365 spo list view list --webUrl https://contoso.sharepoint.com/sites/project-x 
   BaseViewId | 1
   CalendarViewStyles | null
   ColumnWidth | null
-  ContentTypeId | {"StringValue":"0x"}
   CustomFormatter |
   CustomOrder | null
   DefaultView | true
@@ -179,7 +178,6 @@ m365 spo list view list --webUrl https://contoso.sharepoint.com/sites/project-x 
   RequiresClientIntegration | false
   RowLimit | 30
   Scope | 0
-  ServerRelativePath | {"DecodedUrl":"/teams/AllStars/Lists/My List/AllItems.aspx"}
   ServerRelativeUrl | /teams/AllStars/Lists/My List/AllItems.aspx
   StyleId | null
   TabularView | true
@@ -195,4 +193,3 @@ m365 spo list view list --webUrl https://contoso.sharepoint.com/sites/project-x 
 
   </TabItem>
 </Tabs>
-

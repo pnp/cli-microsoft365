@@ -12,6 +12,7 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   id: string;
+  content?: boolean;
 }
 
 class SpoSiteScriptGetCommand extends SpoCommand {
@@ -34,6 +35,9 @@ class SpoSiteScriptGetCommand extends SpoCommand {
     this.options.unshift(
       {
         option: '-i, --id <id>'
+      },
+      {
+        option: '-c, --content'
       }
     );
   }
@@ -65,8 +69,14 @@ class SpoSiteScriptGetCommand extends SpoCommand {
         responseType: 'json'
       };
 
-      const res: any = await request.post(requestOptions);
-      await logger.log(res);
+      const response: any = await request.post(requestOptions);
+
+      if (args.options.content === true) {
+        await logger.log(JSON.parse(response.Content));
+        return;
+      }
+
+      await logger.log(response);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);

@@ -1,10 +1,10 @@
 import { CommandArgs } from '../../../../Command.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { odata } from '../../../../utils/odata.js';
-import AzmgmtCommand from '../../../base/AzmgmtCommand.js';
+import PowerAutomateCommand from '../../../base/PowerAutomateCommand.js';
 import commands from '../../commands.js';
 
-class FlowEnvironmentListCommand extends AzmgmtCommand {
+class FlowEnvironmentListCommand extends PowerAutomateCommand {
   public get name(): string {
     return commands.ENVIRONMENT_LIST;
   }
@@ -23,12 +23,14 @@ class FlowEnvironmentListCommand extends AzmgmtCommand {
     }
 
     try {
-      const res = await odata.getAllItems<{ name: string, displayName: string; properties: { displayName: string } }>(`${this.resource}providers/Microsoft.ProcessSimple/environments?api-version=2016-11-01`);
+      const res = await odata.getAllItems<{ name: string, displayName: string; properties: { displayName: string } }>(`${this.resource}/providers/Microsoft.ProcessSimple/environments?api-version=2016-11-01`);
 
-      if (args.options.output !== 'json' && res.length > 0) {
-        res.forEach(e => {
-          e.displayName = e.properties.displayName;
-        });
+      if (res.length > 0) {
+        if (args.options.output !== 'json') {
+          res.forEach(e => {
+            e.displayName = e.properties.displayName;
+          });
+        }
 
         await logger.log(res);
       }

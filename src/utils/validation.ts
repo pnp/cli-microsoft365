@@ -12,8 +12,11 @@ export const validation = {
 
     const guidRegEx: RegExp = new RegExp(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);
 
-    // verify if the guid is a valid guid. @meid will be replaced in a later stage with the actual user id of the logged in user
-    return guidRegEx.test(guid) || guid.toLowerCase().trim() === '@meid';
+    // verify if the guid is a valid guid. @meid will be replaced in a later
+    // stage with the actual user id of the logged in user
+    // we also need to make it toString in case the args is resolved as number
+    // or boolean
+    return guidRegEx.test(guid) || guid.toString().toLowerCase().trim() === '@meid';
   },
 
   isValidTeamsChannelId(guid: string): boolean {
@@ -26,6 +29,11 @@ export const validation = {
     const guidRegEx: RegExp = new RegExp(/^19:[0-9a-zA-Z-_]+(@thread\.v2|@unq\.gbl\.spaces)$/i);
 
     return guidRegEx.test(guid);
+  },
+
+  isValidUserPrincipalNameArray(upns: string[]): boolean | string {
+    const invalidGuid = upns.find(upn => !this.isValidUserPrincipalName(upn));
+    return invalidGuid || true;
   },
 
   isValidUserPrincipalName(upn: string): boolean {
@@ -362,5 +370,11 @@ export const validation = {
     }
 
     return false;
+  },
+
+  isValidMailNickname(mailNickname: string): boolean {
+    const mailNicknameRegEx = new RegExp(/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]*$/i);
+
+    return mailNicknameRegEx.test(mailNickname);
   }
 };

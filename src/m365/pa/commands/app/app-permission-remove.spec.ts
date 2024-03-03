@@ -2,13 +2,13 @@ import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
 import { CommandError } from '../../../../Command.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import request from '../../../../request.js';
 import { telemetry } from '../../../../telemetry.js';
-import { aadGroup } from '../../../../utils/aadGroup.js';
-import { aadUser } from '../../../../utils/aadUser.js';
+import { entraGroup } from '../../../../utils/entraGroup.js';
+import { entraUser } from '../../../../utils/entraUser.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
@@ -17,11 +17,10 @@ import commands from '../../commands.js';
 import command from './app-permission-remove.js';
 
 describe(commands.APP_PERMISSION_REMOVE, () => {
-  let cli: Cli;
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
-  let promptOptions: any;
+  let promptIssued: boolean = false;
 
   const validEnvironmentName = 'Default-6a2903af-9c03-4c02-a50b-e7419599925b';
   const validAppName = '784670e6-199a-4993-ae13-4b6747a0cd5d';
@@ -58,17 +57,16 @@ describe(commands.APP_PERMISSION_REMOVE, () => {
   const tenantId = '174290ec-373f-4d4c-89ea-9801dad0acd9';
 
   before(() => {
-    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
-    auth.service.connected = true;
-    auth.service.accessTokens[auth.defaultResource] = {
+    auth.connection.active = true;
+    auth.connection.accessTokens[auth.defaultResource] = {
       expiresOn: '123',
       accessToken: 'abc'
     };
-    commandInfo = Cli.getCommandInfo(command);
+    commandInfo = cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -85,10 +83,12 @@ describe(commands.APP_PERMISSION_REMOVE, () => {
       }
     };
 
-    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
-      promptOptions = options;
-      return { continue: false };
+    sinon.stub(cli, 'promptForConfirmation').callsFake(() => {
+      promptIssued = true;
+      return Promise.resolve(false);
     });
+
+    promptIssued = false;
 
     sinon.stub(accessToken, 'getTenantIdFromAccessToken').returns(tenantId);
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((_, defaultValue) => defaultValue);
@@ -98,17 +98,17 @@ describe(commands.APP_PERMISSION_REMOVE, () => {
     sinonUtil.restore([
       request.post,
       cli.getSettingWithDefaultValue,
-      Cli.prompt,
-      aadUser.getUserIdByUpn,
-      aadGroup.getGroupByDisplayName,
+      cli.promptForConfirmation,
+      entraUser.getUserIdByUpn,
+      entraGroup.getGroupByDisplayName,
       accessToken.getTenantIdFromAccessToken
     ]);
   });
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
-    auth.service.accessTokens = {};
+    auth.connection.active = false;
+    auth.connection.accessTokens = {};
   });
 
   it('has correct name', () => {
@@ -183,11 +183,6 @@ describe(commands.APP_PERMISSION_REMOVE, () => {
         userId: validUserId
       }
     });
-    let promptIssued = false;
-
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
 
     assert(promptIssued);
   });
@@ -218,8 +213,8 @@ describe(commands.APP_PERMISSION_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     const requestBody = {
       delete: [{ id: `tenant-${tenantId}` }]
@@ -264,7 +259,7 @@ describe(commands.APP_PERMISSION_REMOVE, () => {
   });
 
   it('removes permissions for a Power App by using UPN', async () => {
-    sinon.stub(aadUser, 'getUserIdByUpn').resolves(validUserId);
+    sinon.stub(entraUser, 'getUserIdByUpn').resolves(validUserId);
 
     const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://api.powerapps.com/providers/Microsoft.PowerApps/apps/${validAppName}/modifyPermissions?api-version=2022-11-01`) {
@@ -283,7 +278,7 @@ describe(commands.APP_PERMISSION_REMOVE, () => {
   });
 
   it('removes permissions for a Power App by using group name', async () => {
-    sinon.stub(aadGroup, 'getGroupByDisplayName').resolves(groupResponse);
+    sinon.stub(entraGroup, 'getGroupByDisplayName').resolves(groupResponse);
 
     const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://api.powerapps.com/providers/Microsoft.PowerApps/apps/${validAppName}/modifyPermissions?api-version=2022-11-01`) {

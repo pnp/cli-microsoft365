@@ -1,12 +1,12 @@
 import chalk from 'chalk';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { validation } from '../../../../utils/validation.js';
-import AzmgmtCommand from '../../../base/AzmgmtCommand.js';
 import commands from '../../commands.js';
+import PowerAutomateCommand from '../../../base/PowerAutomateCommand.js';
 
 interface CommandArgs {
   options: Options;
@@ -19,7 +19,7 @@ interface Options extends GlobalOptions {
   name: string;
 }
 
-class FlowRunResubmitCommand extends AzmgmtCommand {
+class FlowRunResubmitCommand extends PowerAutomateCommand {
   public get name(): string {
     return commands.RUN_RESUBMIT;
   }
@@ -87,7 +87,7 @@ class FlowRunResubmitCommand extends AzmgmtCommand {
         }
 
         const requestOptions: CliRequestOptions = {
-          url: `${this.resource}providers/Microsoft.ProcessSimple/environments/${formatting.encodeQueryParameter(args.options.environmentName)}/flows/${formatting.encodeQueryParameter(args.options.flowName)}/triggers/${formatting.encodeQueryParameter(triggerName)}/histories/${formatting.encodeQueryParameter(args.options.name)}/resubmit?api-version=2016-11-01`,
+          url: `${this.resource}/providers/Microsoft.ProcessSimple/environments/${formatting.encodeQueryParameter(args.options.environmentName)}/flows/${formatting.encodeQueryParameter(args.options.flowName)}/triggers/${formatting.encodeQueryParameter(triggerName)}/histories/${formatting.encodeQueryParameter(args.options.name)}/resubmit?api-version=2016-11-01`,
           headers: {
             accept: 'application/json'
           },
@@ -105,14 +105,9 @@ class FlowRunResubmitCommand extends AzmgmtCommand {
       await resubmitFlow();
     }
     else {
-      const result = await Cli.prompt<{ continue: boolean }>({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: `Are you sure you want to resubmit the flow with run ${args.options.name}?`
-      });
+      const result = await cli.promptForConfirmation({ message: `Are you sure you want to resubmit the flow with run ${args.options.name}?` });
 
-      if (result.continue) {
+      if (result) {
         await resubmitFlow();
       }
     }
@@ -120,7 +115,7 @@ class FlowRunResubmitCommand extends AzmgmtCommand {
 
   private async getTriggerName(environment: string, flow: string): Promise<string> {
     const requestOptions: CliRequestOptions = {
-      url: `${this.resource}providers/Microsoft.ProcessSimple/environments/${formatting.encodeQueryParameter(environment)}/flows/${formatting.encodeQueryParameter(flow)}/triggers?api-version=2016-11-01`,
+      url: `${this.resource}/providers/Microsoft.ProcessSimple/environments/${formatting.encodeQueryParameter(environment)}/flows/${formatting.encodeQueryParameter(flow)}/triggers?api-version=2016-11-01`,
       headers: {
         accept: 'application/json'
       },

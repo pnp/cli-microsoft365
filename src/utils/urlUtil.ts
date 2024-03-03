@@ -198,5 +198,40 @@ export const urlUtil = {
     }
 
     return `${baseUrl}/${relativeUrl}`;
+  },
+
+  /**
+   * Get the absolute URL from the target SharePoint URL.
+   * @param {string} webUrl - The base web URL.
+   * @param {string} url - The target SharePoint URL.
+   * @returns {string} - The target site absolute URL.
+   * 
+   * Example Scenarios:
+   * - webUrl = "https://contoso.sharepoint.com" and targetUrl = "/teams/sales/Shared Documents/temp/123/234",
+   *    returns "https://contoso.sharepoint.com/teams/sales".
+   * - webUrl = "https://contoso.sharepoint.com" and targetUrl = "https://contoso-my.sharepoint.com/personal/john_contoso_onmicrosoft_com/Documents/123",
+   *    returns "https://contoso-my.sharepoint.com/personal/john_contoso_onmicrosoft_com".
+   * - webUrl = "https://contoso.sharepoint.com/teams/sales" and targetUrl = "/Shared Documents/temp",
+   *    returns "https://contoso.sharepoint.com".
+   * - webUrl = "https://contoso.sharepoint.com" and targetUrl = "/teams/sales/Shared Documents/temp",
+   *    returns "https://contoso.sharepoint.com/teams/sales".
+  */
+  getTargetSiteAbsoluteUrl(webUrl: string, url: string): string {
+    const fullUrl: string = url.startsWith('https://') ? url : urlUtil.getAbsoluteUrl(webUrl, url);
+
+    // Pattern to match SharePoint URLs
+    const urlPattern = /https:\/\/[\w\-]+\.sharepoint\.com\/(teams|sites|personal)\/([\w\-]+)/;
+
+    const match = fullUrl.match(urlPattern);
+
+    if (match) {
+      // If a match is found, return the matched URL
+      return match[0];
+    }
+    else {
+      // Extract the root URL
+      const rootUrl = new URL(fullUrl);
+      return rootUrl.origin;
+    }
   }
 };

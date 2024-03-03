@@ -1,9 +1,10 @@
-import Axios, { AxiosError, AxiosInstance, AxiosPromise, AxiosRequestConfig, AxiosResponse } from 'axios';
+import Axios, { AxiosError, AxiosInstance, AxiosPromise, AxiosProxyConfig, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { Stream } from 'stream';
 import auth, { Auth, CloudType } from './Auth.js';
 import { Logger } from './cli/Logger.js';
 import { app } from './utils/app.js';
 import { formatting } from './utils/formatting.js';
+import { timings } from './cli/timings.js';
 
 export interface CliRequestOptions extends AxiosRequestConfig {
   fullResponse?: boolean;
@@ -151,11 +152,13 @@ class Request {
   }
 
   public execute<TResponse>(options: CliRequestOptions, resolve?: (res: TResponse) => void, reject?: (error: any) => void): Promise<TResponse> {
+    const start = process.hrtime.bigint();
+
     if (!this._logger) {
       return Promise.reject('Logger not set on the request object');
     }
 
-    this.updateRequestForCloudType(options, auth.service.cloudType);
+    this.updateRequestForCloudType(options, auth.connection.cloudType);
 
     return new Promise<TResponse>((_resolve: (res: TResponse) => void, _reject: (error: any) => void): void => {
       ((): Promise<string> => {
@@ -180,6 +183,11 @@ class Request {
               options.headers.authorization = `Bearer ${accessToken}`;
             }
           }
+
+          const proxyUrl = process.env.HTTP_PROXY || process.env.HTTPS_PROXY;
+          if (proxyUrl) {
+            options.proxy = this.createProxyConfigFromUrl(proxyUrl);
+          }
           return this.req(options);
         })
         .then((res: any): void => {
@@ -187,6 +195,9 @@ class Request {
             resolve((options.responseType === 'stream' || options.fullResponse) ? res : res.data);
           }
           else {
+            const end = process.hrtime.bigint();
+            timings.api.push(Number(end - start));
+
             _resolve((options.responseType === 'stream' || options.fullResponse) ? res : res.data);
           }
         }, (error: AxiosError): void => {
@@ -209,6 +220,9 @@ class Request {
               reject(error);
             }
             else {
+              const end = process.hrtime.bigint();
+              timings.api.push(Number(end - start));
+
               _reject(error);
             }
           }
@@ -221,6 +235,19 @@ class Request {
     const hostname = `${url.protocol}//${url.hostname}`;
     const cloudUrl: string = Auth.getEndpointForResource(hostname, cloudType);
     options.url = options.url!.replace(hostname, cloudUrl);
+  }
+
+  private createProxyConfigFromUrl(url: string): AxiosProxyConfig {
+    const parsedUrl = new URL(url);
+    const port = parsedUrl.port || (url.toLowerCase().startsWith('https') ? 443 : 80);
+    let authObject = null;
+    if (parsedUrl.username && parsedUrl.password) {
+      authObject = {
+        username: parsedUrl.username,
+        password: parsedUrl.password
+      };
+    }
+    return { host: parsedUrl.hostname, port: Number(port), protocol: 'http', ...(authObject && { auth: authObject }) };
   }
 }
 

@@ -160,7 +160,7 @@ class TodoTaskSetCommand extends GraphCommand {
     const data = this.mapRequestBody(args.options);
 
     try {
-      const listId: string = await this.getTodoListId(args);
+      const listId: string = await this.getTodoListId(args.options);
       const requestOptions: CliRequestOptions = {
         url: `${endpoint}/me/todo/lists/${listId}/tasks/${formatting.encodeQueryParameter(args.options.id)}`,
         headers: {
@@ -179,29 +179,27 @@ class TodoTaskSetCommand extends GraphCommand {
     }
   }
 
-  private getTodoListId(args: CommandArgs): Promise<string> {
-    if (args.options.listId) {
-      return Promise.resolve(args.options.listId);
+  private async getTodoListId(options: GlobalOptions): Promise<string> {
+    if (options.listId) {
+      return options.listId;
     }
 
     const requestOptions: any = {
-      url: `${this.resource}/v1.0/me/todo/lists?$filter=displayName eq '${escape(args.options.listName as string)}'`,
+      url: `${this.resource}/v1.0/me/todo/lists?$filter=displayName eq '${escape(options.listName as string)}'`,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },
       responseType: 'json'
     };
 
-    return request.get<{ value: [{ id: string }] }>(requestOptions)
-      .then(response => {
-        const taskList: { id: string } | undefined = response.value[0];
+    const response = await request.get<{ value: [{ id: string }] }>(requestOptions);
+    const taskList: { id: string } | undefined = response.value[0];
 
-        if (!taskList) {
-          return Promise.reject(`The specified task list does not exist`);
-        }
+    if (!taskList) {
+      throw `The specified task list does not exist`;
+    }
 
-        return Promise.resolve(taskList.id);
-      });
+    return taskList.id;
   }
 
   private getDateTimeTimeZone(dateTime: string): { dateTime: string, timeZone: string } {

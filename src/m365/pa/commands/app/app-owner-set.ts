@@ -1,7 +1,7 @@
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
-import { aadUser } from '../../../../utils/aadUser.js';
+import { entraUser } from '../../../../utils/entraUser.js';
 import { validation } from '../../../../utils/validation.js';
 import PowerAppsCommand from '../../../base/PowerAppsCommand.js';
 import commands from '../../commands.js';
@@ -128,7 +128,7 @@ class PaAppOwnerSetCommand extends PowerAppsCommand {
       return options.userId;
     }
 
-    return aadUser.getUserIdByUpn(options.userName!);
+    return entraUser.getUserIdByUpn(options.userName!);
   }
 }
 

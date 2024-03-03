@@ -1,4 +1,4 @@
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import Command from '../../../../Command.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
@@ -39,6 +39,7 @@ class SpoFileSharingLinkClearCommand extends SpoCommand {
     this.#initOptions();
     this.#initValidators();
     this.#initOptionSets();
+    this.#initTypes();
   }
 
   #initTelemetry(): void {
@@ -98,6 +99,11 @@ class SpoFileSharingLinkClearCommand extends SpoCommand {
     this.optionSets.push({ options: ['fileUrl', 'fileId'] });
   }
 
+  #initTypes(): void {
+    this.types.string.push('webUrl', 'fileUrl', 'fileId', 'scope');
+    this.types.boolean.push('force');
+  }
+
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const clearSharingLinks: () => Promise<void> = async (): Promise<void> => {
       try {
@@ -129,14 +135,9 @@ class SpoFileSharingLinkClearCommand extends SpoCommand {
       await clearSharingLinks();
     }
     else {
-      const result = await Cli.prompt<{ continue: boolean }>({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: `Are you sure you want to clear the sharing links of file ${args.options.fileUrl || args.options.fileId}${args.options.scope ? ` with scope ${args.options.scope}` : ''}?`
-      });
+      const result = await cli.promptForConfirmation({ message: `Are you sure you want to clear the sharing links of file ${args.options.fileUrl || args.options.fileId}${args.options.scope ? ` with scope ${args.options.scope}` : ''}?` });
 
-      if (result.continue) {
+      if (result) {
         await clearSharingLinks();
       }
     }
@@ -152,7 +153,7 @@ class SpoFileSharingLinkClearCommand extends SpoCommand {
       verbose: this.verbose
     };
 
-    const commandOutput = await Cli.executeCommandWithOutput(spoFileSharingLinkListCommand as Command, { options: { ...sharingLinkListOptions, _: [] } });
+    const commandOutput = await cli.executeCommandWithOutput(spoFileSharingLinkListCommand as Command, { options: { ...sharingLinkListOptions, _: [] } });
     const outputParsed = JSON.parse(commandOutput.stdout);
     return outputParsed;
   }

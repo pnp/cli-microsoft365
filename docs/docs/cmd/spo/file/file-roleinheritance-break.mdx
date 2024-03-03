@@ -14,19 +14,19 @@ m365 spo file roleinheritance break [options]
 
 ```md definition-list
 `-u, --webUrl <webUrl>`
-: URL of the site where the file is located
+: URL of the site where the file is located.
 
 `--fileUrl [fileUrl]`
-: The server- or site-relative decoded URL of the file. Specify either `fileUrl` or `fileId` but not both
+: The server- or site-relative decoded URL of the file. Specify either `fileUrl` or `fileId` but not both.
 
 `i, --fileId [fileId]`
-: The UniqueId (GUID) of the file. Specify either `fileUrl` or `fileId` but not both
+: The UniqueId (GUID) of the file. Specify either `fileUrl` or `fileId` but not both.
 
 `-c, --clearExistingPermissions`
-: Clear all existing permissions from the file
+: Clear all existing permissions from the file.
 
 `-f, --force`
-: Don't prompt for confirmation
+: Don't prompt for confirmation.
 ```
 
 <Global />
@@ -56,3 +56,7 @@ Break the inheritance of a file with a specific server-relative URL and clear al
 ```sh
 m365 spo file roleinheritance break --webUrl "https://contoso.sharepoint.com/sites/project-x" --fileUrl "/sites/project-x/documents/Test1.docx" --clearExistingPermissions
 ```
+
+## Response
+
+The command won't return a response on success.

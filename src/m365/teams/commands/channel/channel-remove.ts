@@ -1,9 +1,9 @@
 import { Channel, Group } from '@microsoft/microsoft-graph-types';
 import GlobalOptions from '../../../../GlobalOptions.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import request, { CliRequestOptions } from '../../../../request.js';
-import { aadGroup } from '../../../../utils/aadGroup.js';
+import { entraGroup } from '../../../../utils/entraGroup.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
@@ -130,14 +130,9 @@ class TeamsChannelRemoveCommand extends GraphCommand {
     }
     else {
       const channel = args.options.name ? args.options.name : args.options.id;
-      const result = await Cli.prompt<{ continue: boolean }>({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: `Are you sure you want to remove the channel ${channel} from team ${args.options.teamId || args.options.teamName}?`
-      });
+      const result = await cli.promptForConfirmation({ message: `Are you sure you want to remove the channel ${channel} from team ${args.options.teamId || args.options.teamName}?` });
 
-      if (result.continue) {
+      if (result) {
         await removeChannel();
       }
     }
@@ -148,7 +143,7 @@ class TeamsChannelRemoveCommand extends GraphCommand {
       return args.options.teamId;
     }
 
-    const group: Group = await aadGroup.getGroupByDisplayName(args.options.teamName!);
+    const group: Group = await entraGroup.getGroupByDisplayName(args.options.teamName!);
 
     if ((group as ExtendedGroup).resourceProvisioningOptions.indexOf('Team') === -1) {
       throw 'The specified team does not exist';

@@ -1,10 +1,10 @@
 import Auth from '../../../../Auth.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import request, { CliRequestOptions } from '../../../../request.js';
-import { aadGroup } from '../../../../utils/aadGroup.js';
-import { aadUser } from '../../../../utils/aadUser.js';
+import { entraGroup } from '../../../../utils/entraGroup.js';
+import { entraUser } from '../../../../utils/entraUser.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 import { validation } from '../../../../utils/validation.js';
 import PowerAppsCommand from '../../../base/PowerAppsCommand.js';
@@ -138,14 +138,9 @@ class PaAppPermissionRemoveCommand extends PowerAppsCommand {
         await this.removeAppPermission(logger, args.options);
       }
       else {
-        const result = await Cli.prompt<{ continue: boolean }>({
-          type: 'confirm',
-          name: 'continue',
-          default: false,
-          message: `Are you sure you want to remove the permissions of '${args.options.userId || args.options.userName || args.options.groupId || args.options.groupName || (args.options.tenant && 'everyone')}' from the Power App '${args.options.appName}'?`
-        });
+        const result = await cli.promptForConfirmation({ message: `Are you sure you want to remove the permissions of '${args.options.userId || args.options.userName || args.options.groupId || args.options.groupName || (args.options.tenant && 'everyone')}' from the Power App '${args.options.appName}'?` });
 
-        if (result.continue) {
+        if (result) {
           await this.removeAppPermission(logger, args.options);
         }
       }
@@ -187,15 +182,15 @@ class PaAppPermissionRemoveCommand extends PowerAppsCommand {
       return options.userId;
     }
     if (options.groupName) {
-      const group = await aadGroup.getGroupByDisplayName(options.groupName);
+      const group = await entraGroup.getGroupByDisplayName(options.groupName);
       return group.id!;
     }
     if (options.userName) {
-      const userId = await aadUser.getUserIdByUpn(options.userName);
+      const userId = await entraUser.getUserIdByUpn(options.userName);
       return userId;
     }
 
-    return `tenant-${accessToken.getTenantIdFromAccessToken(Auth.service.accessTokens[Auth.defaultResource].accessToken)}`;
+    return `tenant-${accessToken.getTenantIdFromAccessToken(Auth.connection.accessTokens[Auth.defaultResource].accessToken)}`;
   }
 }
 

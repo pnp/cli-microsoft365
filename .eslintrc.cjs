@@ -5,6 +5,7 @@ const dictionary = [
   'activation',
   'activations',
   'adaptive',
+  'administrative',
   'ai',
   'app',
   'application',
@@ -12,9 +13,11 @@ const dictionary = [
   'approve',
   'assessment',
   'assets',
+  'assignment',
   'audit',
   'bin',
   'builder',
+  'card',
   'catalog',
   'checklist',
   'client',
@@ -26,6 +29,9 @@ const dictionary = [
   'customizer',
   'dataverse',
   'default',
+  'details',
+  'enterprise',
+  'entra',
   'event',
   'eventreceiver',
   'external',
@@ -47,6 +53,7 @@ const dictionary = [
   'installed',
   'is',
   'issue',
+  'item',
   'label',
   'list',
   'link',
@@ -67,9 +74,12 @@ const dictionary = [
   'permission',
   'place',
   'policy',
+  'profile',
   'property',
   'records',
   'recycle',
+  'resolver',
+  'registration',
   'retention',
   'role',
   'room',
@@ -88,8 +98,12 @@ const dictionary = [
   'table',
   'teams',
   'threat',
+  'to',
+  'todo',
   'token',
   'type',
+  'unit',
+  'url',
   'user',
   'web',
   'webhook'
@@ -131,11 +145,13 @@ module.exports = {
     "**/package-generate/assets/**",
     "**/test-projects/**",
     "clientsidepages.ts",
-    "*.js"
+    "*.js",
+    "*.cjs"
   ],
   "rules": {
     "cli-microsoft365/correct-command-class-name": ["error", sortedDictionary, capitalized],
     "cli-microsoft365/correct-command-name": "error",
+    "cli-microsoft365/no-by-server-relative-url-usage": "error",
     "indent": "off",
     "@typescript-eslint/indent": [
       "error",
@@ -227,7 +243,7 @@ module.exports = {
     },
     {
       "files": [
-        "**/yammer/**"
+        "**/viva/commands/engage/**"
       ],
       "rules": {
         "camelcase": "off"

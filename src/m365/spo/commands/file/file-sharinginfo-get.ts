@@ -1,4 +1,4 @@
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
@@ -64,13 +64,14 @@ class SpoFileSharingInfoGetCommand extends SpoCommand {
     this.#initOptions();
     this.#initValidators();
     this.#initOptionSets();
+    this.#initTypes();
   }
 
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        fileId: (!(!args.options.fileId)).toString(),
-        fileUrl: (!(!args.options.fileUrl)).toString()
+        fileId: typeof args.options.fileId !== 'undefined',
+        fileUrl: typeof args.options.fileUrl !== 'undefined'
       });
     });
   }
@@ -112,6 +113,10 @@ class SpoFileSharingInfoGetCommand extends SpoCommand {
     this.optionSets.push({ options: ['fileId', 'fileUrl'] });
   }
 
+  #initTypes(): void {
+    this.types.string.push('webUrl', 'fileId', 'fileUrl');
+  }
+
   protected getExcludedOptionsWithUrls(): string[] | undefined {
     return ['fileUrl'];
   }
@@ -139,7 +144,7 @@ class SpoFileSharingInfoGetCommand extends SpoCommand {
       // typically, we don't do this, but in this case, we need to due to
       // the complexity of the retrieved object and the fact that we can't
       // use the generic way of simplifying the output
-      if (!Cli.shouldTrimOutput(args.options.output)) {
+      if (!cli.shouldTrimOutput(args.options.output)) {
         await logger.log(res);
       }
       else {

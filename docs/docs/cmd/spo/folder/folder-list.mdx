@@ -35,19 +35,19 @@ m365 spo folder list [options]
 
 ## Examples
 
-Gets list of folders under a parent folder with site-relative URL
+Gets list of folders under a parent folder with site-relative URL.
 
 ```sh
 m365 spo folder list --webUrl https://contoso.sharepoint.com/sites/project-x --parentFolderUrl '/Shared Documents'
 ```
 
-Gets recursive list of folders under a specific folder on a specific site
+Gets recursive list of folders under a specific folder on a specific site.
 
 ```sh
 m365 spo folder list --webUrl https://contoso.sharepoint.com/sites/project-x --parentFolderUrl '/sites/project-x/Shared Documents' --recursive
 ```
 
-Return a filtered list of folders and only return the list item ID
+Return a filtered list of folders and only return the list item ID.
 
 ```sh
 m365 spo folder list --webUrl https://contoso.sharepoint.com/sites/project-x --parentFolderUrl '/Shared Documents' --fields ListItemAllFields/Id --filter "startswith(Name,'Folder')"
@@ -118,4 +118,3 @@ m365 spo folder list --webUrl https://contoso.sharepoint.com/sites/project-x --p
 
   </TabItem>
 </Tabs>
-

@@ -6,7 +6,7 @@ import { powerPlatform } from '../../../../utils/powerPlatform.js';
 import { validation } from '../../../../utils/validation.js';
 import PowerPlatformCommand from '../../../base/PowerPlatformCommand.js';
 import commands from '../../commands.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 
 interface CommandArgs {
   options: Options;
@@ -122,7 +122,7 @@ class PpChatbotGetCommand extends PowerPlatformCommand {
 
     if (result.value.length > 1) {
       const resultAsKeyValuePair = formatting.convertArrayToHashTable('botid', result.value);
-      return await Cli.handleMultipleResultsFound(`Multiple chatbots with name '${options.name}' found.`, resultAsKeyValuePair);
+      return await cli.handleMultipleResultsFound(`Multiple chatbots with name '${options.name}' found.`, resultAsKeyValuePair);
     }
 
     if (result.value.length === 0) {

@@ -2,7 +2,7 @@ import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
-import AzmgmtCommand from '../../../base/AzmgmtCommand.js';
+import PowerAutomateCommand from '../../../base/PowerAutomateCommand.js';
 import commands from '../../commands.js';
 import { FlowEnvironmentDetails } from './FlowEnvironmentDetails.js';
 
@@ -14,7 +14,7 @@ interface Options extends GlobalOptions {
   name?: string;
 }
 
-class FlowEnvironmentGetCommand extends AzmgmtCommand {
+class FlowEnvironmentGetCommand extends PowerAutomateCommand {
   public get name(): string {
     return commands.ENVIRONMENT_GET;
   }
@@ -55,7 +55,7 @@ class FlowEnvironmentGetCommand extends AzmgmtCommand {
       await logger.logToStderr(`Retrieving information about Microsoft Flow environment ${args.options.name ?? ''}...`);
     }
 
-    let requestUrl = `${this.resource}providers/Microsoft.ProcessSimple/environments/`;
+    let requestUrl = `${this.resource}/providers/Microsoft.ProcessSimple/environments/`;
 
     if (args.options.name) {
       requestUrl += `${formatting.encodeQueryParameter(args.options.name)}`;

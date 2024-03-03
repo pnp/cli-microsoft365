@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/powershell:alpine-3.17
+FROM waldekm/powershell:alpine-3.18
 
 ARG CLI_VERSION=latest
 
@@ -8,8 +8,6 @@ LABEL name="m365pnp/cli-microsoft365:${CLI_VERSION}" \
   maintainers="Waldek Mastykarz <waldek@mastykarz.nl>, \
   Garry Trinder <garry.trinder@live.com>, \
   Albert-Jan Schot <appie@digiwijs.nl>, \
-  Rabia Williams <rabiawilliams@gmail.com>, \
-  Patrick Lamber <patrick@nubo.eu>, \
   Arjun Menon <arjun.umenon@gmail.com>, \
   Adam Wojcik <adam.wojcik.it@gmail.com>, \
   Martin Lingstuyl <mlingstuyl@live.com>, \
@@ -23,7 +21,7 @@ RUN apk add --no-cache \
   bash \
   shadow \
   bash-completion \
-  nodejs \
+  nodejs-current \
   npm \
   python3 \
   py3-pip
@@ -49,8 +47,5 @@ RUN bash -c 'echo "export PATH=$PATH:/home/cli-microsoft365/.npm-global/bin:/hom
   && bash -c 'm365 cli completion sh setup' \
   && pwsh -c 'm365 cli completion pwsh setup --profile $profile' \
   && pwsh -c 'Add-Content -Path $PROFILE -Value "`r`Set-Alias -Name m365? -Value m365_chili"'
-
-RUN pip install setuptools==58
-RUN pip install jmespath-terminal
 
 CMD [ "bash", "-l" ]

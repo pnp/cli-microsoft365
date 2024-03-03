@@ -2,7 +2,7 @@ import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
 import { CommandError } from '../../../../Command.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import request from '../../../../request.js';
@@ -35,26 +35,24 @@ describe(commands.CHAT_MESSAGE_SEND, () => {
   const messageSentResponse: any = { "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#chats('19%3A2da4c29f6d7041eca70b638b43d45437%40thread.v2')/messages/$entity", "id": "1616991463150", "replyToId": null, "etag": "1616991463150", "messageType": "message", "createdDateTime": "2021-03-29T04:17:43.15Z", "lastModifiedDateTime": "2021-03-29T04:17:43.15Z", "lastEditedDateTime": null, "deletedDateTime": null, "subject": null, "summary": null, "chatId": "19:2da4c29f6d7041eca70b638b43d45437@thread.v2", "importance": "normal", "locale": "en-us", "webUrl": null, "channelIdentity": null, "policyViolation": null, "eventDetail": null, "from": { "application": null, "device": null, "conversation": null, "user": { "id": "8ea0e38b-efb3-4757-924a-5f94061cf8c2", "displayName": "Robin Kline", "userIdentityType": "aadUser" } }, "body": { "contentType": "text", "content": "Hello World" }, "attachments": [], "mentions": [], "reactions": [] };
   //#endregion
 
-  let cli: Cli;
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
 
   before(() => {
-    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
-    auth.service.connected = true;
-    if (!auth.service.accessTokens[auth.defaultResource]) {
-      auth.service.accessTokens[auth.defaultResource] = {
+    auth.connection.active = true;
+    if (!auth.connection.accessTokens[auth.defaultResource]) {
+      auth.connection.accessTokens[auth.defaultResource] = {
         expiresOn: '123',
         accessToken: 'abc'
       };
     }
-    commandInfo = Cli.getCommandInfo(command);
+    commandInfo = cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -109,13 +107,13 @@ describe(commands.CHAT_MESSAGE_SEND, () => {
       request.post,
       accessToken.getUserNameFromAccessToken,
       cli.getSettingWithDefaultValue,
-      Cli.handleMultipleResultsFound
+      cli.handleMultipleResultsFound
     ]);
   });
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
+    auth.connection.active = false;
   });
 
   it('has correct name', () => {
@@ -428,7 +426,7 @@ describe(commands.CHAT_MESSAGE_SEND, () => {
   });
 
   it('handles selecting single result when multiple chats with the specified name found and cli is set to prompt', async () => {
-    sinon.stub(Cli, 'handleMultipleResultsFound').resolves(singleChatByNameResponse.value[0]);
+    sinon.stub(cli, 'handleMultipleResultsFound').resolves(singleChatByNameResponse.value[0]);
 
     await command.action(logger, {
       options: {
@@ -457,7 +455,7 @@ describe(commands.CHAT_MESSAGE_SEND, () => {
   });
 
   it('handles selecting single result when multiple chats by user email found and cli is set to prompt', async () => {
-    sinon.stub(Cli, 'handleMultipleResultsFound').resolves(chatCreatedResponse);
+    sinon.stub(cli, 'handleMultipleResultsFound').resolves(chatCreatedResponse);
 
     sinonUtil.restore(request.post);
     sinon.stub(request, 'post').callsFake((opts) => {

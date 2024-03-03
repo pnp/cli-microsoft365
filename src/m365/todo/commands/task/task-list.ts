@@ -1,4 +1,4 @@
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request from '../../../../request.js';
@@ -61,9 +61,9 @@ class TodoTaskListCommand extends GraphCommand {
     this.optionSets.push({ options: ['listId', 'listName'] });
   }
 
-  private getTodoListId(args: CommandArgs): Promise<string> {
+  private async getTodoListId(args: CommandArgs): Promise<string> {
     if (args.options.listId) {
-      return Promise.resolve(args.options.listId);
+      return args.options.listId;
     }
 
     const requestOptions: any = {
@@ -74,16 +74,14 @@ class TodoTaskListCommand extends GraphCommand {
       responseType: 'json'
     };
 
-    return request.get<{ value: [{ id: string }] }>(requestOptions)
-      .then(response => {
-        const taskList: { id: string } | undefined = response.value[0];
+    const response: any = await request.get<{ value: [{ id: string }] }>(requestOptions);
+    const taskList: { id: string } | undefined = response.value[0];
 
-        if (!taskList) {
-          return Promise.reject(`The specified task list does not exist`);
-        }
+    if (!taskList) {
+      throw `The specified task list does not exist`;
+    }
 
-        return Promise.resolve(taskList.id);
-      });
+    return taskList.id;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -92,7 +90,7 @@ class TodoTaskListCommand extends GraphCommand {
       const endpoint: string = `${this.resource}/v1.0/me/todo/lists/${listId}/tasks`;
       const items: ToDoTask[] = await odata.getAllItems(endpoint);
 
-      if (!Cli.shouldTrimOutput(args.options.output)) {
+      if (!cli.shouldTrimOutput(args.options.output)) {
         await logger.log(items);
       }
       else {

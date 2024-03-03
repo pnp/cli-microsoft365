@@ -1,4 +1,4 @@
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
@@ -7,6 +7,7 @@ import { urlUtil } from '../../../../utils/urlUtil.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
+import { spo } from '../../../../utils/spo.js';
 import { ListInstance } from './ListInstance.js';
 
 interface CommandArgs {
@@ -91,14 +92,9 @@ class SpoListRetentionLabelRemoveCommand extends SpoCommand {
       await this.removeListRetentionLabel(logger, args);
     }
     else {
-      const result = await Cli.prompt<{ continue: boolean }>({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: `Are you sure you want to remove the retention label from list '${args.options.listId || args.options.listTitle || args.options.listUrl}'?`
-      });
+      const result = await cli.promptForConfirmation({ message: `Are you sure you want to remove the retention label from list '${args.options.listId || args.options.listTitle || args.options.listUrl}'?` });
 
-      if (result.continue) {
+      if (result) {
         await this.removeListRetentionLabel(logger, args);
       }
     }
@@ -113,22 +109,7 @@ class SpoListRetentionLabelRemoveCommand extends SpoCommand {
       const listServerRelativeUrl: string = await this.getListServerRelativeUrl(args, logger);
       const listAbsoluteUrl: string = urlUtil.getAbsoluteUrl(args.options.webUrl, listServerRelativeUrl);
 
-      const requestOptions: CliRequestOptions = {
-        url: `${args.options.webUrl}/_api/SP_CompliancePolicy_SPPolicyStoreProxy_SetListComplianceTag`,
-        headers: {
-          'accept': 'application/json;odata=nometadata'
-        },
-        data: {
-          listUrl: listAbsoluteUrl,
-          complianceTagValue: '',
-          blockDelete: false,
-          blockEdit: false,
-          syncToItems: false
-        },
-        responseType: 'json'
-      };
-
-      await request.post(requestOptions);
+      await spo.removeDefaultRetentionLabelFromList(args.options.webUrl, listAbsoluteUrl, logger, args.options.verbose);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
@@ -144,23 +125,24 @@ class SpoListRetentionLabelRemoveCommand extends SpoCommand {
       return urlUtil.getServerRelativePath(args.options.webUrl, args.options.listUrl);
     }
 
-    let listRestUrl = '';
+    let requestUrl = `${args.options.webUrl}/_api/web/`;
+
     if (args.options.listId) {
-      listRestUrl = `lists(guid'${formatting.encodeQueryParameter(args.options.listId)}')/`;
+      requestUrl += `lists(guid'${formatting.encodeQueryParameter(args.options.listId)}')/`;
     }
     else {
-      listRestUrl = `lists/getByTitle('${formatting.encodeQueryParameter(args.options.listTitle as string)}')/`;
+      requestUrl += `lists/getByTitle('${formatting.encodeQueryParameter(args.options.listTitle as string)}')/`;
     }
 
     const requestOptions: CliRequestOptions = {
-      url: `${args.options.webUrl}/_api/web/${listRestUrl}?$expand=RootFolder&$select=RootFolder/ServerRelativeUrl`,
+      url: `${requestUrl}?$expand=RootFolder&$select=RootFolder/ServerRelativeUrl`,
       headers: {
         'accept': 'application/json;odata=nometadata'
       },
       responseType: 'json'
     };
 
-    const listInstance: ListInstance = await request.get<ListInstance>(requestOptions);
+    const listInstance = await request.get<ListInstance>(requestOptions);
     return listInstance.RootFolder.ServerRelativeUrl;
   }
 }

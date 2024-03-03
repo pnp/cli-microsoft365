@@ -1,7 +1,7 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
@@ -20,12 +20,12 @@ describe(commands.SITEDESIGN_RUN_LIST, () => {
   let commandInfo: CommandInfo;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
-    auth.service.connected = true;
-    commandInfo = Cli.getCommandInfo(command);
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
+    auth.connection.active = true;
+    commandInfo = cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -52,11 +52,11 @@ describe(commands.SITEDESIGN_RUN_LIST, () => {
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
+    auth.connection.active = false;
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.SITEDESIGN_RUN_LIST), true);
+    assert.strictEqual(command.name, commands.SITEDESIGN_RUN_LIST);
   });
 
   it('has a description', () => {
@@ -68,9 +68,9 @@ describe(commands.SITEDESIGN_RUN_LIST, () => {
   });
 
   it('gets information about site designs applied to the specified site', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GetSiteDesignRun`) > -1) {
-        return Promise.resolve({
+        return {
           "value": [
             {
               "ID": "b4411557-308b-4545-a3c4-55297d5cd8c8",
@@ -91,10 +91,10 @@ describe(commands.SITEDESIGN_RUN_LIST, () => {
               "WebID": "e87e4ab8-2732-4a90-836d-9b3d0cd3a5cf"
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a' } });
@@ -119,9 +119,9 @@ describe(commands.SITEDESIGN_RUN_LIST, () => {
   });
 
   it('gets information about the specified site design applied to the specified site', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GetSiteDesignRun`) > -1) {
-        return Promise.resolve({
+        return {
           "value": [
             {
               "ID": "b4411557-308b-4545-a3c4-55297d5cd8c8",
@@ -133,10 +133,10 @@ describe(commands.SITEDESIGN_RUN_LIST, () => {
               "WebID": "e87e4ab8-2732-4a90-836d-9b3d0cd3a5cf"
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', siteDesignId: 'b4411557-308b-4545-a3c4-55297d5cd8c8' } });
@@ -152,9 +152,9 @@ describe(commands.SITEDESIGN_RUN_LIST, () => {
   });
 
   it('outputs all information in JSON output mode', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GetSiteDesignRun`) > -1) {
-        return Promise.resolve({
+        return {
           "value": [
             {
               "ID": "b4411557-308b-4545-a3c4-55297d5cd8c8",
@@ -175,10 +175,10 @@ describe(commands.SITEDESIGN_RUN_LIST, () => {
               "WebID": "e87e4ab8-2732-4a90-836d-9b3d0cd3a5cf"
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', output: 'json' } });
@@ -205,9 +205,7 @@ describe(commands.SITEDESIGN_RUN_LIST, () => {
   });
 
   it('correctly handles OData error when retrieving information about site designs', async () => {
-    sinon.stub(request, 'post').callsFake(() => {
-      return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
-    });
+    sinon.stub(request, 'post').rejects({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
 
     await assert.rejects(command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a' } } as any), new CommandError('An error has occurred'));
   });

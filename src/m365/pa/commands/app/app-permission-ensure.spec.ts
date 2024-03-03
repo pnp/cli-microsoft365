@@ -2,13 +2,13 @@ import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
 import { CommandError } from '../../../../Command.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import request from '../../../../request.js';
 import { telemetry } from '../../../../telemetry.js';
-import { aadGroup } from '../../../../utils/aadGroup.js';
-import { aadUser } from '../../../../utils/aadUser.js';
+import { entraGroup } from '../../../../utils/entraGroup.js';
+import { entraUser } from '../../../../utils/entraUser.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
@@ -17,7 +17,6 @@ import commands from '../../commands.js';
 import command from './app-permission-ensure.js';
 
 describe(commands.APP_PERMISSION_ENSURE, () => {
-  let cli: Cli;
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
@@ -81,14 +80,13 @@ describe(commands.APP_PERMISSION_ENSURE, () => {
   };
 
   before(() => {
-    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
-    auth.service.connected = true;
-    commandInfo = Cli.getCommandInfo(command);
-    auth.service.accessTokens[auth.defaultResource] = {
+    auth.connection.active = true;
+    commandInfo = cli.getCommandInfo(command);
+    auth.connection.accessTokens[auth.defaultResource] = {
       expiresOn: '123',
       accessToken: 'abc'
     };
@@ -121,8 +119,8 @@ describe(commands.APP_PERMISSION_ENSURE, () => {
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
-    auth.service.accessTokens = {};
+    auth.connection.active = false;
+    auth.connection.accessTokens = {};
   });
 
   it('has correct name', () => {
@@ -295,7 +293,7 @@ describe(commands.APP_PERMISSION_ENSURE, () => {
   });
 
   it('updates permissions to a Power App by userName', async () => {
-    sinon.stub(aadUser, 'getUserIdByUpn').resolves(validUserId);
+    sinon.stub(entraUser, 'getUserIdByUpn').resolves(validUserId);
 
     const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://api.powerapps.com/providers/Microsoft.PowerApps/apps/${validAppName}/modifyPermissions?api-version=2022-11-01`) {
@@ -325,7 +323,7 @@ describe(commands.APP_PERMISSION_ENSURE, () => {
   });
 
   it('updates permissions to a Power App by groupName', async () => {
-    sinon.stub(aadGroup, 'getGroupByDisplayName').resolves(groupResponse);
+    sinon.stub(entraGroup, 'getGroupByDisplayName').resolves(groupResponse);
 
     const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://api.powerapps.com/providers/Microsoft.PowerApps/apps/${validAppName}/modifyPermissions?api-version=2022-11-01`) {

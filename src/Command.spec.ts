@@ -2,7 +2,7 @@ import assert from 'assert';
 import chalk from 'chalk';
 import sinon from 'sinon';
 import auth from './Auth.js';
-import { Cli } from './cli/Cli.js';
+import { cli } from './cli/cli.js';
 import { Logger } from './cli/Logger.js';
 import Command, {
   CommandError
@@ -130,7 +130,6 @@ describe('Command', () => {
   let telemetryCommandName: any;
   let logger: Logger;
   let loggerLogToStderrSpy: sinon.SinonSpy;
-  let cli: Cli;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -145,12 +144,11 @@ describe('Command', () => {
       logToStderr: async () => { }
     };
     loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
-    cli = Cli.getInstance();
   });
 
   beforeEach(() => {
     telemetryCommandName = null;
-    auth.service.connected = true;
+    auth.connection.active = true;
     cli.currentCommandName = undefined;
   });
 
@@ -160,17 +158,17 @@ describe('Command', () => {
       accessToken.isAppOnlyAccessToken,
       accessToken.getUserIdFromAccessToken
     ]);
-    auth.service.connected = false;
+    auth.connection.active = false;
   });
 
   after(() => {
     sinon.restore();
-    auth.service.accessTokens = {};
+    auth.connection.accessTokens = {};
   });
 
   it('returns true by default', async () => {
     const cmd = new MockCommand2();
-    assert.strictEqual(await cmd.validate({ options: {} }, Cli.getCommandInfo(cmd)), true);
+    assert.strictEqual(await cmd.validate({ options: {} }, cli.getCommandInfo(cmd)), true);
   });
 
   it('removes optional arguments from command name', () => {
@@ -246,7 +244,7 @@ describe('Command', () => {
       cli.currentCommandName = 'mc1';
       const mock = new MockCommand1();
       await mock.commandAction(logger);
-      assert(loggerLogToStderrSpy.calledWith(chalk.yellow(`Command 'mc1' is deprecated. Please use 'mock-command' instead`)));
+      assert(loggerLogToStderrSpy.calledWith(chalk.yellow(`Command 'mc1' is deprecated. Please use 'mock-command' instead.`)));
     }
     catch (err: any) {
       assert.fail(err);
@@ -534,31 +532,31 @@ describe('Command', () => {
 
   it('passes validation when csv output specified', async () => {
     const cmd = new MockCommand2();
-    assert.strictEqual(await cmd.validate({ options: { output: 'csv' } }, Cli.getCommandInfo(cmd)), true);
+    assert.strictEqual(await cmd.validate({ options: { output: 'csv' } }, cli.getCommandInfo(cmd)), true);
   });
 
   it('passes validation when json output specified', async () => {
     const cmd = new MockCommand2();
-    assert.strictEqual(await cmd.validate({ options: { output: 'json' } }, Cli.getCommandInfo(cmd)), true);
+    assert.strictEqual(await cmd.validate({ options: { output: 'json' } }, cli.getCommandInfo(cmd)), true);
   });
 
   it('passes validation when text output specified', async () => {
     const cmd = new MockCommand2();
-    assert.strictEqual(await cmd.validate({ options: { output: 'text' } }, Cli.getCommandInfo(cmd)), true);
+    assert.strictEqual(await cmd.validate({ options: { output: 'text' } }, cli.getCommandInfo(cmd)), true);
   });
 
   it('passes validation when no output specified', async () => {
     const cmd = new MockCommand2();
-    assert.strictEqual(await cmd.validate({ options: {} }, Cli.getCommandInfo(cmd)), true);
+    assert.strictEqual(await cmd.validate({ options: {} }, cli.getCommandInfo(cmd)), true);
   });
 
   it('fails validation when invalid output specified', async () => {
     const cmd = new MockCommand2();
-    assert.notStrictEqual(await cmd.validate({ options: { output: 'invalid' } }, Cli.getCommandInfo(cmd)), true);
+    assert.notStrictEqual(await cmd.validate({ options: { output: 'invalid' } }, cli.getCommandInfo(cmd)), true);
   });
 
   it('handles option with @meid token and spaces', async () => {
-    auth.service.accessTokens[auth.defaultResource] = {
+    auth.connection.accessTokens[auth.defaultResource] = {
       expiresOn: '',
       accessToken: ''
     };
@@ -571,7 +569,7 @@ describe('Command', () => {
   });
 
   it('handles option with @meusername token and spaces', async () => {
-    auth.service.accessTokens[auth.defaultResource] = {
+    auth.connection.accessTokens[auth.defaultResource] = {
       expiresOn: '',
       accessToken: ''
     };
@@ -584,7 +582,7 @@ describe('Command', () => {
   });
 
   it('handles @meid with application permissions', async () => {
-    auth.service.accessTokens[auth.defaultResource] = {
+    auth.connection.accessTokens[auth.defaultResource] = {
       expiresOn: '',
       accessToken: ''
     };
@@ -595,7 +593,7 @@ describe('Command', () => {
   });
 
   it('handles @meusername with application permissions', async () => {
-    auth.service.accessTokens[auth.defaultResource] = {
+    auth.connection.accessTokens[auth.defaultResource] = {
       expiresOn: '',
       accessToken: ''
     };

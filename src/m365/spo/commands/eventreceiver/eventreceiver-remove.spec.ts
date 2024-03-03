@@ -1,7 +1,7 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
@@ -18,7 +18,7 @@ describe(commands.EVENTRECEIVER_REMOVE, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
-  let promptOptions: any;
+  let promptIssued: boolean = false;
 
   const eventReceiverResponse = JSON.stringify(
     {
@@ -38,8 +38,8 @@ describe(commands.EVENTRECEIVER_REMOVE, () => {
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
-    auth.service.connected = true;
-    commandInfo = Cli.getCommandInfo(command);
+    auth.connection.active = true;
+    commandInfo = cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -57,25 +57,25 @@ describe(commands.EVENTRECEIVER_REMOVE, () => {
     };
     (command as any).items = [];
 
-    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
-      promptOptions = options;
-      return { continue: false };
+    sinon.stub(cli, 'promptForConfirmation').callsFake(() => {
+      promptIssued = true;
+      return Promise.resolve(false);
     });
 
-    promptOptions = undefined;
+    promptIssued = false;
   });
 
   afterEach(() => {
     sinonUtil.restore([
-      Cli.executeCommandWithOutput,
-      Cli.prompt,
+      cli.executeCommandWithOutput,
+      cli.promptForConfirmation,
       request.delete
     ]);
   });
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
+    auth.connection.active = false;
   });
 
   it('has correct name', () => {
@@ -146,14 +146,8 @@ describe(commands.EVENTRECEIVER_REMOVE, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('prompts before removing the event receiver when confirm option not passed', async () => {
+  it('prompts before removing the event receiver when force option not passed', async () => {
     await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/portal', scope: 'site', name: 'PnP Test Receiver' } });
-
-    let promptIssued = false;
-
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
 
     assert(promptIssued);
   });
@@ -173,7 +167,7 @@ describe(commands.EVENTRECEIVER_REMOVE, () => {
       throw 'Invalid request URL: ' + opts.url;
     });
 
-    sinon.stub(Cli, 'executeCommandWithOutput').resolves({
+    sinon.stub(cli, 'executeCommandWithOutput').resolves({
       stdout: eventReceiverResponse,
       stderr: ''
     });
@@ -191,12 +185,12 @@ describe(commands.EVENTRECEIVER_REMOVE, () => {
       throw 'Invalid request URL: ' + opts.url;
     });
 
-    sinon.stub(Cli, 'executeCommandWithOutput').resolves({
+    sinon.stub(cli, 'executeCommandWithOutput').resolves({
       stdout: eventReceiverResponse,
       stderr: ''
     });
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/portal', scope: 'site', name: 'PnP Test Receiver' } });
     assert(requestDeleteStub.called);
@@ -211,13 +205,13 @@ describe(commands.EVENTRECEIVER_REMOVE, () => {
       throw 'Invalid request URL: ' + opts.url;
     });
 
-    sinon.stub(Cli, 'executeCommandWithOutput').resolves({
+    sinon.stub(cli, 'executeCommandWithOutput').resolves({
       stdout: eventReceiverResponse,
       stderr: ''
     });
 
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/portal', name: 'PnP Test Receiver', listUrl: '/sites/portal/Lists/rerlist' } });
     assert(requestDeleteStub.called);
@@ -232,13 +226,13 @@ describe(commands.EVENTRECEIVER_REMOVE, () => {
       throw 'Invalid request URL: ' + opts.url;
     });
 
-    sinon.stub(Cli, 'executeCommandWithOutput').resolves({
+    sinon.stub(cli, 'executeCommandWithOutput').resolves({
       stdout: eventReceiverResponse,
       stderr: ''
     });
 
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/portal', name: 'PnP Test Receiver', listId: '8fccab0d-78e5-4037-a6a7-0168f9359cd4' } });
     assert(requestDeleteStub.called);
@@ -253,13 +247,13 @@ describe(commands.EVENTRECEIVER_REMOVE, () => {
       throw 'Invalid request URL: ' + opts.url;
     });
 
-    sinon.stub(Cli, 'executeCommandWithOutput').resolves({
+    sinon.stub(cli, 'executeCommandWithOutput').resolves({
       stdout: eventReceiverResponse,
       stderr: ''
     });
 
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/portal', scope: 'site', id: '625b1f4c-2869-457f-8b41-bed72059bb2b' } });
     assert(requestDeleteStub.called);
@@ -274,13 +268,13 @@ describe(commands.EVENTRECEIVER_REMOVE, () => {
       throw 'Invalid request URL: ' + opts.url;
     });
 
-    sinon.stub(Cli, 'executeCommandWithOutput').resolves({
+    sinon.stub(cli, 'executeCommandWithOutput').resolves({
       stdout: eventReceiverResponse,
       stderr: ''
     });
 
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/portal', listTitle: 'Documents', name: 'PnP Test Receiver' } });
     assert(requestDeleteStub.called);
@@ -289,7 +283,7 @@ describe(commands.EVENTRECEIVER_REMOVE, () => {
   it('correctly handles API OData error', async () => {
     const errorMessage = 'Something went wrong';
 
-    sinon.stub(Cli, 'executeCommandWithOutput').resolves({
+    sinon.stub(cli, 'executeCommandWithOutput').resolves({
       stdout: eventReceiverResponse,
       stderr: ''
     });

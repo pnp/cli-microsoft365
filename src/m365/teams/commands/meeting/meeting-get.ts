@@ -3,7 +3,7 @@ import auth from '../../../../Auth.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import { Logger } from '../../../../cli/Logger.js';
 import request, { CliRequestOptions } from '../../../../request.js';
-import { aadUser } from '../../../../utils/aadUser.js';
+import { entraUser } from '../../../../utils/entraUser.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { validation } from '../../../../utils/validation.js';
@@ -78,7 +78,7 @@ class TeamsMeetingGetCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const isAppOnlyAccessToken: boolean | undefined = accessToken.isAppOnlyAccessToken(auth.service.accessTokens[this.resource].accessToken);
+    const isAppOnlyAccessToken: boolean | undefined = accessToken.isAppOnlyAccessToken(auth.connection.accessTokens[this.resource].accessToken);
     if (isAppOnlyAccessToken) {
       if (!args.options.userId && !args.options.userName && !args.options.email) {
         this.handleError(`The option 'userId', 'userName' or 'email' is required when retrieving meetings using app only permissions`);
@@ -137,10 +137,10 @@ class TeamsMeetingGetCommand extends GraphCommand {
     }
 
     if (options.userName) {
-      return aadUser.getUserIdByUpn(options.userName);
+      return entraUser.getUserIdByUpn(options.userName);
     }
 
-    return aadUser.getUserIdByEmail(options.email!);
+    return entraUser.getUserIdByEmail(options.email!);
   }
 }
 

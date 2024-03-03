@@ -2,7 +2,7 @@ import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
 import { CommandError } from '../../../../Command.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import request from '../../../../request.js';
@@ -23,7 +23,6 @@ describe(commands.APPLICATIONCUSTOMIZER_SET, () => {
   const title = 'SiteGuidedTour';
   const newTitle = 'New Title';
   const clientSideComponentProperties = '{"testMessage":"Updated message"}';
-  let cli: Cli;
   let log: any[];
   let logger: Logger;
 
@@ -113,13 +112,19 @@ describe(commands.APPLICATIONCUSTOMIZER_SET, () => {
   };
 
   before(() => {
-    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     sinon.stub(session, 'getId').callsFake(() => '');
-    auth.service.connected = true;
-    commandInfo = Cli.getCommandInfo(command);
+    auth.connection.active = true;
+    commandInfo = cli.getCommandInfo(command);
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName: string, defaultValue: any) => {
+      if (settingName === 'prompt') {
+        return false;
+      }
+
+      return defaultValue;
+    });
   });
 
   beforeEach(() => {
@@ -141,14 +146,14 @@ describe(commands.APPLICATIONCUSTOMIZER_SET, () => {
     sinonUtil.restore([
       request.get,
       request.post,
-      Cli.handleMultipleResultsFound,
+      cli.handleMultipleResultsFound,
       cli.getSettingWithDefaultValue
     ]);
   });
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
+    auth.connection.active = false;
   });
 
   it('has a correct name', () => {
@@ -301,7 +306,7 @@ describe(commands.APPLICATIONCUSTOMIZER_SET, () => {
       throw 'Invalid request';
     });
 
-    sinon.stub(Cli, 'handleMultipleResultsFound').resolves(singleResponse.value[0]);
+    sinon.stub(cli, 'handleMultipleResultsFound').resolves(singleResponse.value[0]);
 
     const updateCallsSpy: sinon.SinonStub = defaultUpdateCallsStub();
     await command.action(logger, { options: { verbose: true, title: title, webUrl: webUrl, scope: 'Site', newTitle: newTitle } } as any);

@@ -35,7 +35,7 @@ m365 planner plan get [options]
 
 ## Remarks
 
-:::caution
+:::warning
 
 When using `rosterId`, the command is based on an API that is currently in preview and is subject to change once the API reached general availability.
 
@@ -43,25 +43,25 @@ When using `rosterId`, the command is based on an API that is currently in previ
 
 ## Examples
 
-Returns the Microsoft Planner plan by id
+Returns the Microsoft Planner plan by id.
 
 ```sh
 m365 planner plan get --id "gndWOTSK60GfPQfiDDj43JgACDCb"
 ```
 
-Returns the Microsoft Planner plan by title and owner group id 
+Returns the Microsoft Planner plan by title and owner group id.
 
 ```sh
 m365 planner plan get --title "MyPlan" --ownerGroupId "233e43d0-dc6a-482e-9b4e-0de7a7bce9b4"
 ```
 
-Returns the Microsoft Planner plan by title and owner group name
+Returns the Microsoft Planner plan by title and owner group name.
 
 ```sh
 m365 planner plan get --title "MyPlan" --ownerGroupName "My Planner Group"
 ```
 
-Returns the Microsoft Planner plan by roster id
+Returns the Microsoft Planner plan by roster id.
 
 ```sh
 m365 planner plan get --rosterId "FeMZFDoK8k2oWmuGE-XFHZcAEwtn"
@@ -161,12 +161,7 @@ m365 planner plan get --rosterId "FeMZFDoK8k2oWmuGE-XFHZcAEwtn"
   owner | ebf3b108-5234-4e22-b93d-656d7dae5874
   title | My Planner Plan
   id | xqQg5FS2LkCp935s-FIFm2QAFkHM
-  createdBy | {"user":{"displayName":null,"id":"dd8b99a7-77c6-4238-a609-396d27844921"},"application":{"displayName":null,"id":"31359c7f-bd7e-475c-86db-fdb8c937548e"}}
-  container | {"containerId":"ebf3b108-5234-4e22-b93d-656d7dae5874","type":"group","url":"https://graph.microsoft.com/v1.0/groups/ebf3b108-5234-4e22-b93d-656d7dae5874"}
-  sharedWith | {"aa089c1a-0ca8-4b36-ae2e-c5d60f054a2c":true,"ebf3b108-5234-4e22-b93d-656d7dae5874":true}
-  categoryDescriptions | {"category1":null,"category2":null,"category3":null,"category4":null,"category5":null,"category6":null,"category7":null,"category8":null,"category9":null,"category10":null,"category11":null,"category12":null,"category13":null,"category14":null,"category15":null,"category16":null,"category17":null,"category18":null,"category19":null,"category20":null,"category21":null,"category22":null,"category23":null,"category24":null,"category25":null}
   ```
 
   </TabItem>
 </Tabs>
-

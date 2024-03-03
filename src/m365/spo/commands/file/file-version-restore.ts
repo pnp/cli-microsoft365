@@ -1,4 +1,4 @@
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
@@ -86,7 +86,8 @@ class SpoFileVersionRestoreCommand extends SpoCommand {
   }
 
   #initTypes(): void {
-    this.types.string.push('label');
+    this.types.string.push('webUrl', 'label', 'fileUrl', 'fileId');
+    this.types.boolean.push('force');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -99,14 +100,9 @@ class SpoFileVersionRestoreCommand extends SpoCommand {
         await this.restoreVersion(args);
       }
       else {
-        const result = await Cli.prompt<{ continue: boolean }>({
-          type: 'confirm',
-          name: 'continue',
-          default: false,
-          message: `Are you sure you want to restore the version ${args.options.label} from file ${args.options.fileId || args.options.fileUrl}'?`
-        });
+        const result = await cli.promptForConfirmation({ message: `Are you sure you want to restore the version ${args.options.label} from file ${args.options.fileId || args.options.fileUrl}'?` });
 
-        if (result.continue) {
+        if (result) {
           await this.restoreVersion(args);
         }
       }

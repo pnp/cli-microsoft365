@@ -8,7 +8,7 @@ import { telemetry } from '../../../../telemetry.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import commands from '../../commands.js';
 import { formatting } from '../../../../utils/formatting.js';
@@ -16,7 +16,6 @@ import command from './team-list.js';
 import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.TEAM_LIST, () => {
-  let cli: Cli;
   const userId = '2630257f-11d4-4244-b4a1-3707b79f142d';
   const userName = 'john.doe@contoso.com';
 
@@ -210,9 +209,8 @@ describe(commands.TEAM_LIST, () => {
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
-    auth.service.connected = true;
-    commandInfo = Cli.getCommandInfo(command);
-    cli = Cli.getInstance();
+    auth.connection.active = true;
+    commandInfo = cli.getCommandInfo(command);
     sinon.stub(cli, 'getSettingWithDefaultValue').returnsArg(1);
   });
 
@@ -251,7 +249,7 @@ describe(commands.TEAM_LIST, () => {
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
+    auth.connection.active = false;
   });
 
   it('has correct name', () => {

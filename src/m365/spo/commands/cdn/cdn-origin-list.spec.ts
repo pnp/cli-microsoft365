@@ -1,7 +1,7 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
@@ -25,10 +25,10 @@ describe(commands.CDN_ORIGIN_LIST, () => {
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
-    auth.service.connected = true;
-    auth.service.spoUrl = 'https://contoso.sharepoint.com';
-    auth.service.tenantId = 'abc';
-    commandInfo = Cli.getCommandInfo(command);
+    auth.connection.active = true;
+    auth.connection.spoUrl = 'https://contoso.sharepoint.com';
+    auth.connection.spoTenantId = 'abc';
+    commandInfo = cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -56,9 +56,9 @@ describe(commands.CDN_ORIGIN_LIST, () => {
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
-    auth.service.spoUrl = undefined;
-    auth.service.tenantId = undefined;
+    auth.connection.active = false;
+    auth.connection.spoUrl = undefined;
+    auth.connection.spoTenantId = undefined;
   });
 
   it('has correct name', () => {

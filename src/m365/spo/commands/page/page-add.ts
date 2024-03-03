@@ -1,5 +1,4 @@
-import { Auth } from '../../../../Auth.js';
-import { Cli, CommandOutput } from '../../../../cli/Cli.js';
+import { cli, CommandOutput } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import Command from '../../../../Command.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
@@ -126,11 +125,9 @@ class SpoPageAddCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const resource = Auth.getResourceFromUrl(args.options.webUrl);
     let requestDigest: string = '';
     let itemId: string = '';
     let pageName: string = args.options.name;
-    const serverRelativeSiteUrl: string = urlUtil.getServerRelativeSiteUrl(args.options.webUrl);
     const fileNameWithoutExtension: string = pageName.replace('.aspx', '');
     let bannerImageUrl: string = '';
     let canvasContent1: string = '';
@@ -150,41 +147,23 @@ class SpoPageAddCommand extends SpoCommand {
       requestDigest = reqDigest.FormDigestValue;
 
       let requestOptions: CliRequestOptions = {
-        url: `${args.options.webUrl}/_api/web/getfolderbyserverrelativeurl('${serverRelativeSiteUrl}/sitepages')/files/AddTemplateFile`,
+        url: `${args.options.webUrl}/_api/sitepages/pages`,
+        responseType: 'json',
         headers: {
-          'X-RequestDigest': requestDigest,
           'content-type': 'application/json;odata=nometadata',
           accept: 'application/json;odata=nometadata'
         },
         data: {
-          urlOfFile: `${serverRelativeSiteUrl}/sitepages/${pageName}`,
-          templateFileType: 3
-        },
-        responseType: 'json'
+          PageLayoutType: args.options.layoutType || 'Article',
+          Name: pageName,
+          PromotedState: args.options.promoteAs === 'NewsPage' ? 2 : 0,
+          Title: pageTitle
+        }
       };
 
-      const template = await request.post<{ UniqueId: string }>(requestOptions);
+      const template = await request.post<{ UniqueId: string, Id: string }>(requestOptions);
       itemId = template.UniqueId;
       const listItemId = await this.getFileListItemId(args.options.webUrl, serverRelativeFileUrl);
-      const layoutType: string = args.options.layoutType || 'Article';
-
-      const listItemSetOptions: spoListItemSetOptions = {
-        webUrl: args.options.webUrl,
-        listUrl: listServerRelativeUrl,
-        id: listItemId,
-        systemUpdate: true,
-        ContentTypeId: '0x0101009D1CB255DA76424F860D91F20E6C4118',
-        Title: pageTitle,
-        ClientSideApplicationId: 'b6917cb1-93a0-4b97-a84d-7cf49975d4ec',
-        PageLayoutType: layoutType,
-        verbose: this.verbose,
-        debug: this.debug
-      };
-      if (args.options.layoutType === 'Article') {
-        listItemSetOptions.PromotedState = 0;
-        listItemSetOptions.BannerImageUrl = `${resource}/_layouts/15/images/sitepagethumbnail.png, /_layouts/15/images/sitepagethumbnail.png`;
-      }
-      await Cli.executeCommand(spoListItemSetCommand as Command, { options: { ...listItemSetOptions, _: [] } });
 
       const pageProps = await Page.checkout(pageName, args.options.webUrl, logger, this.debug, this.verbose);
       if (pageProps) {
@@ -221,12 +200,11 @@ class SpoPageAddCommand extends SpoCommand {
               listUrl: listServerRelativeUrl,
               id: listItemId,
               systemUpdate: true,
-              PromotedState: 2,
               FirstPublishedDate: new Date().toISOString(),
               verbose: this.verbose,
               debug: this.debug
             };
-            await Cli.executeCommand(spoListItemSetCommand as Command, { options: { ...listItemSetOptions, _: [] } });
+            await cli.executeCommand(spoListItemSetCommand as Command, { options: { ...listItemSetOptions, _: [] } });
             break;
           case 'Template':
             requestOptions.url = `${args.options.webUrl}/_api/SitePages/Pages(${listItemId})/SavePageAsTemplate`;
@@ -357,7 +335,7 @@ class SpoPageAddCommand extends SpoCommand {
       verbose: this.verbose,
       debug: this.debug
     };
-    const fileGetOutput: CommandOutput = await Cli.executeCommandWithOutput(spoFileGetCommand as Command, { options: { ...fileGetOptions, _: [] } });
+    const fileGetOutput: CommandOutput = await cli.executeCommandWithOutput(spoFileGetCommand as Command, { options: { ...fileGetOptions, _: [] } });
     const fileGetOutputJson = JSON.parse(fileGetOutput.stdout);
     return fileGetOutputJson.Id;
   }

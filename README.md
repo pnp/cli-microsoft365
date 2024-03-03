@@ -75,10 +75,11 @@
 - Unified login
   - Access all your Microsoft 365 workloads
 - Supported workloads
-  - Azure Active Directory
   - Bookings
+  - Microsoft Entra ID
   - Microsoft Teams
   - Microsoft To Do
+  - Microsoft Viva
   - OneDrive
   - OneNote
   - Outlook
@@ -90,7 +91,6 @@
   - Skype for Business
   - SharePoint Online
   - To Do
-  - Yammer
 - Supported authentication methods
   - Azure Managed Identity
   - Certificate
@@ -191,7 +191,7 @@ m365 spo site get --url https://contoso.sharepoint.com --output text
 
 ## Build
 
-To build and run this CLI locally, you will need [`node`](https://nodejs.org) `>= 18.0.0` installed.
+To build and run this CLI locally, you will need [`node`](https://nodejs.org) `>= 20.0.0` installed.
 
 ```sh
 # Clone this repository

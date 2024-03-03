@@ -1,16 +1,14 @@
-import { AxiosRequestConfig } from 'axios';
-import { Cli } from '../../../../cli/Cli.js';
+import * as url from 'url';
 import { Logger } from '../../../../cli/Logger.js';
-import Command from '../../../../Command.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
-import { formatting } from '../../../../utils/formatting.js';
-import { urlUtil } from '../../../../utils/urlUtil.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
-import spoListItemRetentionLabelEnsureCommand, { Options as SpoListItemRetentionLabelEnsureCommandOptions } from '../listitem/listitem-retentionlabel-ensure.js';
 import { FileProperties } from './FileProperties.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { urlUtil } from '../../../../utils/urlUtil.js';
+import { spo } from '../../../../utils/spo.js';
 
 interface CommandArgs {
   options: Options;
@@ -40,6 +38,7 @@ class SpoFileRetentionLabelEnsureCommand extends SpoCommand {
     this.#initOptions();
     this.#initValidators();
     this.#initOptionSets();
+    this.#initTypes();
   }
 
   #initTelemetry(): void {
@@ -94,35 +93,29 @@ class SpoFileRetentionLabelEnsureCommand extends SpoCommand {
     this.optionSets.push({ options: ['fileUrl', 'fileId'] });
   }
 
+  #initTypes(): void {
+    this.types.string.push('webUrl', 'name', 'fileUrl', 'fileId', 'assetId');
+  }
+
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       const fileProperties = await this.getFileProperties(logger, args);
+      const parsedUrl = url.parse(args.options.webUrl);
+      const tenantUrl: string = `${parsedUrl.protocol}//${parsedUrl.hostname}`;
+      const listAbsoluteUrl = urlUtil.urlCombine(tenantUrl, fileProperties.listServerRelativeUrl);
 
       if (args.options.assetId) {
-        await this.applyAssetId(args.options.webUrl, fileProperties.ListItemAllFields.ParentList.Id, fileProperties.ListItemAllFields.Id, args.options.assetId);
+        await this.applyAssetId(args.options.webUrl, fileProperties.listServerRelativeUrl, fileProperties.listItemId, args.options.assetId);
       }
 
-      const options: SpoListItemRetentionLabelEnsureCommandOptions = {
-        webUrl: args.options.webUrl,
-        listId: fileProperties.ListItemAllFields.ParentList.Id,
-        listItemId: fileProperties.ListItemAllFields.Id,
-        name: args.options.name,
-        output: 'json',
-        debug: this.debug,
-        verbose: this.verbose
-      };
-
-      const spoListItemRetentionLabelEnsureCommandOutput = await Cli.executeCommandWithOutput(spoListItemRetentionLabelEnsureCommand as Command, { options: { ...options, _: [] } });
-      if (this.verbose) {
-        await logger.logToStderr(spoListItemRetentionLabelEnsureCommandOutput.stderr);
-      }
+      await spo.applyRetentionLabelToListItems(args.options.webUrl, args.options.name, listAbsoluteUrl, [parseInt(fileProperties.listItemId)], logger, args.options.verbose);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
   }
 
-  private async getFileProperties(logger: Logger, args: CommandArgs): Promise<FileProperties> {
+  private async getFileProperties(logger: Logger, args: CommandArgs): Promise<{ listItemId: string, listServerRelativeUrl: string }> {
     if (this.verbose) {
       await logger.logToStderr(`Retrieving list and item information for file '${args.options.fileId || args.options.fileUrl}' in site at ${args.options.webUrl}...`);
     }
@@ -137,24 +130,23 @@ class SpoFileRetentionLabelEnsureCommand extends SpoCommand {
       requestUrl += `GetFileByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(serverRelativeUrl)}')`;
     }
 
-    const requestOptions: AxiosRequestConfig = {
-      url: `${requestUrl}?$expand=ListItemAllFields,ListItemAllFields/ParentList&$select=ServerRelativeUrl,ListItemAllFields/ParentList/Id,ListItemAllFields/Id`,
+    const requestOptions: CliRequestOptions = {
+      url: `${requestUrl}?$expand=ListItemAllFields,ListItemAllFields/ParentList/RootFolder&$select=ServerRelativeUrl,ListItemAllFields/ParentList/RootFolder/ServerRelativeUrl,ListItemAllFields/Id`,
       headers: {
         'accept': 'application/json;odata=nometadata'
       },
       responseType: 'json'
     };
 
-    return request.get<FileProperties>(requestOptions);
+    const response = await request.get<FileProperties>(requestOptions);
+    return { listItemId: response.ListItemAllFields.Id, listServerRelativeUrl: response.ListItemAllFields.ParentList.RootFolder.ServerRelativeUrl };
   }
 
-  private async applyAssetId(webUrl: string, listId: string, listItemId: string, assetId: string): Promise<void> {
-    const requestUrl = `${webUrl}/_api/web/lists(guid'${formatting.encodeQueryParameter(listId)}')`;
-
+  private async applyAssetId(webUrl: string, listServerRelativeUrl: string, listItemId: string, assetId: string): Promise<void> {
     const requestBody = { "formValues": [{ "FieldName": "ComplianceAssetId", "FieldValue": assetId }] };
 
     const requestOptions: CliRequestOptions = {
-      url: `${requestUrl}/items(${listItemId})/ValidateUpdateListItem()`,
+      url: `${webUrl}/_api/web/GetList(@listUrl)/items(${listItemId})/ValidateUpdateListItem()?@listUrl='${formatting.encodeQueryParameter(listServerRelativeUrl)}'`,
       headers: {
         'accept': 'application/json;odata=nometadata'
       },

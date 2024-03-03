@@ -6,7 +6,7 @@ import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 import { HubSite } from './HubSite.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { formatting } from '../../../../utils/formatting.js';
 
 interface CommandArgs {
@@ -177,7 +177,7 @@ class SpoHubSiteConnectCommand extends SpoCommand {
     }
     if (filteredHubSites.length > 1) {
       const resultAsKeyValuePair = formatting.convertArrayToHashTable('ID', filteredHubSites);
-      return await Cli.handleMultipleResultsFound<HubSite>(`Multiple hub sites with name '${title}' found.`, resultAsKeyValuePair);
+      return await cli.handleMultipleResultsFound<HubSite>(`Multiple hub sites with name '${title}' found.`, resultAsKeyValuePair);
     }
 
     return filteredHubSites[0];

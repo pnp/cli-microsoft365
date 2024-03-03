@@ -2,8 +2,8 @@ import Auth from '../../../../Auth.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import { Logger } from '../../../../cli/Logger.js';
 import request, { CliRequestOptions } from '../../../../request.js';
-import { aadGroup } from '../../../../utils/aadGroup.js';
-import { aadUser } from '../../../../utils/aadUser.js';
+import { entraGroup } from '../../../../utils/entraGroup.js';
+import { entraUser } from '../../../../utils/entraUser.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 import { validation } from '../../../../utils/validation.js';
 import PowerAppsCommand from '../../../base/PowerAppsCommand.js';
@@ -201,15 +201,15 @@ class PaAppPermissionEnsureCommand extends PowerAppsCommand {
       return options.userId;
     }
     if (options.groupName) {
-      const group = await aadGroup.getGroupByDisplayName(options.groupName);
+      const group = await entraGroup.getGroupByDisplayName(options.groupName);
       return group.id!;
     }
     if (options.userName) {
-      const userId = await aadUser.getUserIdByUpn(options.userName);
+      const userId = await entraUser.getUserIdByUpn(options.userName);
       return userId;
     }
 
-    return accessToken.getTenantIdFromAccessToken(Auth.service.accessTokens[Auth.defaultResource].accessToken);
+    return accessToken.getTenantIdFromAccessToken(Auth.connection.accessTokens[Auth.defaultResource].accessToken);
   }
 }
 

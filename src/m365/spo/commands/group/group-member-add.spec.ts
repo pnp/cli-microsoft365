@@ -1,7 +1,7 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
@@ -15,7 +15,6 @@ import command from './group-member-add.js';
 import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.GROUP_MEMBER_ADD, () => {
-  let cli: Cli;
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -66,13 +65,12 @@ describe(commands.GROUP_MEMBER_ADD, () => {
   };
 
   before(() => {
-    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
-    auth.service.connected = true;
-    commandInfo = Cli.getCommandInfo(command);
+    auth.connection.active = true;
+    commandInfo = cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -95,13 +93,14 @@ describe(commands.GROUP_MEMBER_ADD, () => {
     sinonUtil.restore([
       request.get,
       request.post,
-      cli.getSettingWithDefaultValue
+      cli.getSettingWithDefaultValue,
+      cli.handleMultipleResultsFound
     ]);
   });
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
+    auth.connection.active = false;
   });
 
   it('has correct name', () => {
@@ -190,6 +189,26 @@ describe(commands.GROUP_MEMBER_ADD, () => {
     assert.notStrictEqual(actual, true);
   });
 
+  it('fails validation if both emails and entraGroupIds options are passed', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
+    const actual = await command.validate({
+      options: {
+        webUrl: "https://contoso.sharepoint.com/sites/SiteA",
+        groupId: 32,
+        emails: "Alex.Wilber@contoso.com",
+        entraGroupIds: "56ca9023-3449-4e98-a96a-69e81a6f4983"
+      }
+    }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
   it('fails validation if both emails and aadGroupIds options are passed', async () => {
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
       if (settingName === settingsNames.prompt) {
@@ -205,6 +224,26 @@ describe(commands.GROUP_MEMBER_ADD, () => {
         groupId: 32,
         emails: "Alex.Wilber@contoso.com",
         aadGroupIds: "56ca9023-3449-4e98-a96a-69e81a6f4983"
+      }
+    }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if both userIds and entraGroupNames options are passed', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
+    const actual = await command.validate({
+      options: {
+        webUrl: "https://contoso.sharepoint.com/sites/SiteA",
+        groupId: 32,
+        userIds: 5,
+        entraGroupNames: "Azure AD Group name"
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -250,7 +289,7 @@ describe(commands.GROUP_MEMBER_ADD, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if userNames, emails, userIds, aadGroupIds or aadGroupNames options are not passed', async () => {
+  it('fails validation if userNames, emails, userIds, entraGroupIds, aadGroupIds, entraGroupNames, or aadGroupNames options are not passed', async () => {
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
       if (settingName === settingsNames.prompt) {
         return false;
@@ -290,6 +329,11 @@ describe(commands.GROUP_MEMBER_ADD, () => {
 
   it('fails validation if emails is Invalid', async () => {
     const actual = await command.validate({ options: { webUrl: "https://contoso.sharepoint.com/sites/SiteA", groupId: 32, emails: "Alex.Wilber@contoso.com,9" } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if entraGroupIds is Invalid', async () => {
+    const actual = await command.validate({ options: { webUrl: "https://contoso.sharepoint.com/sites/SiteA", groupId: 32, entraGroupIds: "56ca9023-3449-4e98-a96a-69e81a6f4983,9" } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
@@ -432,6 +476,35 @@ describe(commands.GROUP_MEMBER_ADD, () => {
     assert(loggerLogSpy.calledWith(jsonSingleUser.UsersAddedToGroup));
   });
 
+  it('adds user to a SharePoint Group by groupId and entraGroupIds (Debug)', async () => {
+    sinon.stub(request, 'post').callsFake(async opts => {
+      if (opts.url === 'https://contoso.sharepoint.com/sites/SiteA/_api/SP.Web.ShareObject' &&
+        opts.data) {
+        return jsonSingleUser;
+      }
+
+      throw `Invalid request ${JSON.stringify(opts)}`;
+    });
+
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/SiteA/_api/web/sitegroups/GetById('32')?$select=Id`) {
+        return groupResponse;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options: {
+        debug: true,
+        webUrl: "https://contoso.sharepoint.com/sites/SiteA",
+        groupId: 32,
+        entraGroupIds: "56ca9023-3449-4e98-a96a-69e81a6f4983"
+      }
+    });
+    assert(loggerLogSpy.calledWith(jsonSingleUser.UsersAddedToGroup));
+  });
+
   it('adds user to a SharePoint Group by groupId and aadGroupIds (Debug)', async () => {
     sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/SiteA/_api/SP.Web.ShareObject' &&
@@ -461,7 +534,7 @@ describe(commands.GROUP_MEMBER_ADD, () => {
     assert(loggerLogSpy.calledWith(jsonSingleUser.UsersAddedToGroup));
   });
 
-  it('adds user to a SharePoint Group by groupId and aadGroupNames (Debug)', async () => {
+  it('adds user to a SharePoint Group by groupId and entraGroupNames (Debug)', async () => {
     sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/SiteA/_api/SP.Web.ShareObject' &&
         opts.data) {
@@ -470,6 +543,7 @@ describe(commands.GROUP_MEMBER_ADD, () => {
 
       throw `Invalid request ${JSON.stringify(opts)}`;
     });
+
     sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq 'Azure%20AD%20Group%20name'&$select=id`) {
         return {
@@ -485,6 +559,45 @@ describe(commands.GROUP_MEMBER_ADD, () => {
 
       throw `Invalid request ${JSON.stringify(opts)}`;
     });
+
+    await command.action(logger, {
+      options: {
+        debug: true,
+        webUrl: "https://contoso.sharepoint.com/sites/SiteA",
+        groupId: 32,
+        entraGroupNames: "Azure AD Group name"
+      }
+    });
+
+    assert(loggerLogSpy.calledWith(jsonSingleUser.UsersAddedToGroup));
+  });
+
+  it('adds user to a SharePoint Group by groupId and aadGroupNames (Debug)', async () => {
+    sinon.stub(request, 'post').callsFake(async opts => {
+      if (opts.url === 'https://contoso.sharepoint.com/sites/SiteA/_api/SP.Web.ShareObject' &&
+        opts.data) {
+        return jsonSingleUser;
+      }
+
+      throw `Invalid request ${JSON.stringify(opts)}`;
+    });
+
+    sinon.stub(request, 'get').callsFake(async opts => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq 'Azure%20AD%20Group%20name'&$select=id`) {
+        return {
+          value: [{
+            id: 'Group name'
+          }]
+        };
+      }
+
+      if (opts.url === `https://contoso.sharepoint.com/sites/SiteA/_api/web/sitegroups/GetById('32')?$select=Id`) {
+        return groupResponse;
+      }
+
+      throw `Invalid request ${JSON.stringify(opts)}`;
+    });
+
     await command.action(logger, {
       options: {
         debug: true,
@@ -493,6 +606,7 @@ describe(commands.GROUP_MEMBER_ADD, () => {
         aadGroupNames: "Azure AD Group name"
       }
     });
+
     assert(loggerLogSpy.calledWith(jsonSingleUser.UsersAddedToGroup));
   });
 
@@ -564,5 +678,75 @@ describe(commands.GROUP_MEMBER_ADD, () => {
         userNames: 'Alex.Wilber@contoso.com'
       }
     }), new CommandError('The selected permission level is not valid.'));
+  });
+
+  it('handles error when multiple groups with the specified displayName found', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
+    sinon.stub(request, 'get').callsFake(async opts => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq 'Azure%20AD%20Group%20name'&$select=id`) {
+        return {
+          value: [
+            { id: '9b1b1e42-794b-4c71-93ac-5ed92488b67f' },
+            { id: '9b1b1e42-794b-4c71-93ac-5ed92488b67g' }
+          ]
+        };
+      }
+
+      return 'Invalid Request';
+    });
+
+    sinon.stub(request, 'post').rejects('POST request executed');
+
+    await assert.rejects(command.action(logger, {
+      options: {
+        webUrl: "https://contoso.sharepoint.com/sites/SiteA",
+        groupId: 32,
+        entraGroupNames: "Azure AD Group name"
+      }
+    }), new CommandError("Resource 'Azure AD Group name' does not exist."));
+  });
+
+  it('handles selecting single result when multiple groups with the specified name found and cli is set to prompt', async () => {
+    sinon.stub(request, 'get').callsFake(async opts => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq 'Azure%20AD%20Group%20name'&$select=id`) {
+        return {
+          value: [
+            { id: '9b1b1e42-794b-4c71-93ac-5ed92488b67f' },
+            { id: '9b1b1e42-794b-4c71-93ac-5ed92488b67g' }
+          ]
+        };
+      }
+
+      if (opts.url === `https://contoso.sharepoint.com/sites/SiteA/_api/web/sitegroups/GetById('32')?$select=Id`) {
+        return groupResponse;
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinon.stub(cli, 'handleMultipleResultsFound').resolves({ id: '9b1b1e42-794b-4c71-93ac-5ed92488b67f' });
+
+    sinon.stub(request, 'post').callsFake(async opts => {
+      if (opts.url === 'https://contoso.sharepoint.com/sites/SiteA/_api/SP.Web.ShareObject' &&
+        opts.data) {
+        return jsonSingleUser;
+      }
+
+      throw `Invalid request ${JSON.stringify(opts)}`;
+    });
+
+    await command.action(logger, {
+      options: {
+        debug: true, webUrl: "https://contoso.sharepoint.com/sites/SiteA", groupId: 32, entraGroupNames: "Azure AD Group name"
+      }
+    });
+    assert(loggerLogSpy.calledWith(jsonSingleUser.UsersAddedToGroup));
   });
 });

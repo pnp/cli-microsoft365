@@ -32,6 +32,7 @@ class SpoFolderRenameCommand extends SpoCommand {
 
     this.#initOptions();
     this.#initValidators();
+    this.#initTypes();
   }
 
   #initOptions(): void {
@@ -52,6 +53,10 @@ class SpoFolderRenameCommand extends SpoCommand {
     this.validators.push(
       async (args: CommandArgs) => validation.isValidSharePointUrl(args.options.webUrl)
     );
+  }
+
+  #initTypes(): void {
+    this.types.string.push('webUrl', 'url', 'name');
   }
 
   protected getExcludedOptionsWithUrls(): string[] | undefined {

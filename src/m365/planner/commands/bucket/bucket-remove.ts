@@ -1,9 +1,9 @@
 import { PlannerBucket } from '@microsoft/microsoft-graph-types';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
-import { aadGroup } from '../../../../utils/aadGroup.js';
+import { entraGroup } from '../../../../utils/entraGroup.js';
 import { planner } from '../../../../utils/planner.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
@@ -162,14 +162,9 @@ class PlannerBucketRemoveCommand extends GraphCommand {
       await removeBucket();
     }
     else {
-      const result = await Cli.prompt<{ continue: boolean }>({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: `Are you sure you want to remove the bucket ${args.options.id || args.options.name}?`
-      });
+      const result = await cli.promptForConfirmation({ message: `Are you sure you want to remove the bucket ${args.options.id || args.options.name}?` });
 
-      if (result.continue) {
+      if (result) {
         await removeBucket();
       }
     }
@@ -206,7 +201,7 @@ class PlannerBucketRemoveCommand extends GraphCommand {
 
     if (filteredBuckets.length > 1) {
       const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', filteredBuckets);
-      return await Cli.handleMultipleResultsFound<PlannerBucket>(`Multiple buckets with name '${args.options.name}' found.`, resultAsKeyValuePair);
+      return await cli.handleMultipleResultsFound<PlannerBucket>(`Multiple buckets with name '${args.options.name}' found.`, resultAsKeyValuePair);
     }
 
     return filteredBuckets[0];
@@ -236,7 +231,7 @@ class PlannerBucketRemoveCommand extends GraphCommand {
       return ownerGroupId;
     }
 
-    const group = await aadGroup.getGroupByDisplayName(ownerGroupName!);
+    const group = await entraGroup.getGroupByDisplayName(ownerGroupName!);
     return group.id!;
   }
 }

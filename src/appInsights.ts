@@ -9,7 +9,6 @@ import fs from 'fs';
 import path from 'path';
 import url from 'url';
 import { app } from './utils/app.js';
-import { pid } from './utils/pid.js';
 
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 const config = appInsights.setup('6b908c80-d09f-4cf6-8274-e54349a0149a');
@@ -19,18 +18,19 @@ config.setInternalLogging(false, false);
 // in the telemetry
 const version: string = `${app.packageJson().version}${fs.existsSync(path.join(__dirname, `..${path.sep}src`)) ? '-dev' : ''}`;
 const env: string = process.env.CLIMICROSOFT365_ENV !== undefined ? process.env.CLIMICROSOFT365_ENV : '';
-((appInsights as any).default as typeof appInsights).defaultClient.commonProperties = {
+const appInsightsClient: appInsights.TelemetryClient = ((appInsights as any).default as typeof appInsights).defaultClient;
+appInsightsClient.commonProperties = {
   version: version,
   node: process.version,
-  shell: pid.getProcessName(process.ppid) || '',
   env: env,
   ci: Boolean(process.env.CI).toString()
 };
 
-((appInsights as any).default as typeof appInsights).defaultClient.context.tags['ai.session.id'] =
-  crypto.randomBytes(24).toString('base64');
-((appInsights as any).default as typeof appInsights).defaultClient.context.tags['ai.cloud.roleInstance'] =
-  crypto.createHash('sha256').update(((appInsights as any).default as typeof appInsights).defaultClient.context.tags['ai.cloud.roleInstance']).digest('hex');
-delete ((appInsights as any).default as typeof appInsights).defaultClient.context.tags['ai.cloud.role'];
+appInsightsClient.config.proxyHttpUrl = process.env.HTTP_PROXY ?? '';
+appInsightsClient.config.proxyHttpsUrl = process.env.HTTPS_PROXY ?? '';
 
-export default ((appInsights as any).default as typeof appInsights).defaultClient;
+appInsightsClient.context.tags['ai.cloud.roleInstance'] = crypto.createHash('sha256').update(appInsightsClient.context.tags['ai.cloud.roleInstance']).digest('hex');
+delete appInsightsClient.context.tags['ai.cloud.role'];
+delete appInsightsClient.context.tags['ai.cloud.roleName'];
+
+export default appInsightsClient;

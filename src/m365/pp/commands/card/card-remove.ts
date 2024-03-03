@@ -1,4 +1,4 @@
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import Command from '../../../../Command.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
@@ -98,14 +98,9 @@ class PpCardRemoveCommand extends PowerPlatformCommand {
       await this.deleteCard(args);
     }
     else {
-      const result = await Cli.prompt<{ continue: boolean }>({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: `Are you sure you want to remove card '${args.options.id || args.options.name}'?`
-      });
+      const result = await cli.promptForConfirmation({ message: `Are you sure you want to remove card '${args.options.id || args.options.name}'?` });
 
-      if (result.continue) {
+      if (result) {
         await this.deleteCard(args);
       }
     }
@@ -124,7 +119,7 @@ class PpCardRemoveCommand extends PowerPlatformCommand {
       verbose: this.verbose
     };
 
-    const output = await Cli.executeCommandWithOutput(ppCardGetCommand as Command, { options: { ...options, _: [] } });
+    const output = await cli.executeCommandWithOutput(ppCardGetCommand as Command, { options: { ...options, _: [] } });
     const getCardOutput = JSON.parse(output.stdout);
     return getCardOutput.cardid;
   }

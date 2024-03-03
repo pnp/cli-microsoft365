@@ -1,7 +1,7 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
@@ -24,8 +24,8 @@ describe(commands.APP_UNINSTALL, () => {
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
-    auth.service.connected = true;
-    commandInfo = Cli.getCommandInfo(command);
+    auth.connection.active = true;
+    commandInfo = cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -48,13 +48,13 @@ describe(commands.APP_UNINSTALL, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.delete,
-      Cli.prompt
+      cli.promptForConfirmation
     ]);
   });
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
+    auth.connection.active = false;
   });
 
   it('has correct name', () => {
@@ -104,7 +104,7 @@ describe(commands.APP_UNINSTALL, () => {
       throw 'Invalid request';
     });
 
-    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
     await command.action(logger, {
       options: {
         teamId: 'c527a470-a882-481c-981c-ee6efaba85c7',
@@ -115,7 +115,7 @@ describe(commands.APP_UNINSTALL, () => {
   });
 
   it('aborts uninstalling an app from a Microsoft Teams team when prompt not confirmed', async () => {
-    sinon.stub(Cli, 'prompt').resolves({ continue: false });
+    sinon.stub(cli, 'promptForConfirmation').resolves(false);
     command.action(logger, {
       options: {
         teamId: 'c527a470-a882-481c-981c-ee6efaba85c7',

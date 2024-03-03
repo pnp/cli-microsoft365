@@ -3,7 +3,7 @@ import fs from 'fs';
 import sinon from 'sinon';
 import { PassThrough } from 'stream';
 import auth from '../../Auth.js';
-import { Cli } from '../../cli/Cli.js';
+import { cli } from '../../cli/cli.js';
 import { CommandInfo } from '../../cli/CommandInfo.js';
 import { Logger } from '../../cli/Logger.js';
 import { CommandError } from '../../Command.js';
@@ -48,9 +48,9 @@ describe(commands.REQUEST, () => {
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     sinon.stub(session, 'getId').callsFake(() => '');
-    auth.service.connected = true;
+    auth.connection.active = true;
     sinon.stub(auth, 'ensureAccessToken').callsFake(() => Promise.resolve('ABC'));
-    commandInfo = Cli.getCommandInfo(command);
+    commandInfo = cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -79,9 +79,9 @@ describe(commands.REQUEST, () => {
 
   after(() => {
     sinon.restore();
-    auth.service.accessTokens = {};
-    auth.service.connected = false;
-    auth.service.spoUrl = undefined;
+    auth.connection.accessTokens = {};
+    auth.connection.active = false;
+    auth.connection.spoUrl = undefined;
   });
 
   it('has correct name', () => {
@@ -339,7 +339,7 @@ describe(commands.REQUEST, () => {
   });
 
   it('successfully executes a GET request to a SharePoint API endpoint with the @spo token', async () => {
-    auth.service.spoUrl = 'https://contoso.sharepoint.com';
+    auth.connection.spoUrl = 'https://contoso.sharepoint.com';
     sinon.stub(request, 'execute').callsFake(async (opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/_api/web') {
         return mockSPOWebJSONResponse;
@@ -358,7 +358,7 @@ describe(commands.REQUEST, () => {
   });
 
   it('throws error when using the @spo token when there is nog spoUrl in the auth service', async () => {
-    auth.service.spoUrl = undefined;
+    auth.connection.spoUrl = undefined;
     await assert.rejects(command.action(logger, {
       options: {
         url: '@spo/_api/web',

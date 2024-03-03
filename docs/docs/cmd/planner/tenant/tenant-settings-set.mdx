@@ -46,19 +46,19 @@ To use this command you must be a global administrator.
 
 ## Examples
 
-Disable Microsoft Planner in the tenant
+Disable Microsoft Planner in the tenant.
 
 ```sh
 m365 planner tenant settings set --isPlannerAllowed false
 ```
 
-Disable Outlook calendar sync and mobile push notifications
+Disable Outlook calendar sync and mobile push notifications.
 
 ```sh
 m365 planner tenant settings set --allowCalendarSharing false --allowPlannerMobilePushNotifications false
 ```
 
-Enable Microsoft Planner but disallow roster plans to be created
+Enable Microsoft Planner but disallow roster plans to be created.
 
 ```sh
 m365 planner tenant settings set --isPlannerAllowed true --allowRosterCreation false
@@ -120,9 +120,7 @@ m365 planner tenant settings set --isPlannerAllowed true --allowRosterCreation f
   allowTenantMoveWithDataMigration | false
   allowRosterCreation | true
   allowPlannerMobilePushNotifications | true
-  disallowedSharedWithContainerTypes | []
   ```
 
   </TabItem>
 </Tabs>
-

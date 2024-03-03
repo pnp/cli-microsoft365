@@ -91,7 +91,7 @@ Installs or updates a Microsoft Teams app from a provided zipped manifest and th
 
   if ($CurrentUser) {
     # Getting the reference of the currently connected user
-    $user = m365 aad user get --id "@meId" -o json | ConvertFrom-Json
+    $user = m365 entra user get --id "@meId" -o json | ConvertFrom-Json
 
     if ($user) {
       $Users += $user.userPrincipalName
@@ -102,7 +102,7 @@ Installs or updates a Microsoft Teams app from a provided zipped manifest and th
   if ($Users.Length -gt 0 -and $Install) {
     $Users | ForEach-Object {
       # Getting the specified user
-      $user = m365 aad user get --userName $_ -o json | ConvertFrom-Json
+      $user = m365 entra user get --userName $_ -o json | ConvertFrom-Json
     
       if ($user) {
         $userApp = m365 teams user app list --userId $user.id --query "[?appId == '$($app.id)']" -o json | ConvertFrom-Json

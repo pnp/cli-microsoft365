@@ -1,7 +1,7 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import { telemetry } from '../../../../telemetry.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
@@ -37,7 +37,7 @@ describe(commands.CONFIG_LIST, () => {
   });
 
   afterEach(() => {
-    sinonUtil.restore(Cli.getInstance().config.all);
+    sinonUtil.restore(cli.getConfig().all);
   });
 
   after(() => {
@@ -53,7 +53,7 @@ describe(commands.CONFIG_LIST, () => {
   });
 
   it('returns a list of all the self set properties', async () => {
-    const config = Cli.getInstance().config;
+    const config = cli.getConfig();
     sinon.stub(config, 'all').value({ 'errorOutput': 'stdout' });
 
     await command.action(logger, { options: {} });

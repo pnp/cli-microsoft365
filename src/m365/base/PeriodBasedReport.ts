@@ -4,7 +4,7 @@ import request, { CliRequestOptions } from '../../request.js';
 import { formatting } from '../../utils/formatting.js';
 import GraphCommand from "./GraphCommand.js";
 
-interface CommandArgs {
+export interface CommandArgs {
   options: UsagePeriodOptions;
 }
 

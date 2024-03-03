@@ -17,28 +17,34 @@ export interface GraphResponseError {
   }
 }
 
-export const odata = {
-  async getAllItems<T>(url: string, metadata?: 'none' | 'minimal' | 'full'): Promise<T[]> {
-    let items: T[] = [];
+function getAllItems<T>(url: string): Promise<T[]>;
+function getAllItems<T>(options: CliRequestOptions): Promise<T[]>;
+function getAllItems<T>(url: string, metadata: 'none' | 'minimal' | 'full'): Promise<T[]>;
 
-    const requestOptions: CliRequestOptions = {
-      url: url,
-      headers: {
-        accept: `application/json;odata.metadata=${metadata ?? 'none'}`,
-        'odata-version': '4.0'
-      },
-      responseType: 'json'
-    };
+async function getAllItems<T>(param1: unknown, metadata?: 'none' | 'minimal' | 'full'): Promise<T[]> {
+  let items: T[] = [];
 
-    const res = await request.get<ODataResponse<T>>(requestOptions);
-    items = res.value;
+  const requestOptions: CliRequestOptions = typeof param1 !== 'string' ? param1 as CliRequestOptions : {
+    url: param1 as string,
+    headers: {
+      accept: `application/json;odata.metadata=${metadata ?? 'none'}`,
+      'odata-version': '4.0'
+    },
+    responseType: 'json'
+  };
 
-    const nextLink = res['@odata.nextLink'] ?? res.nextLink;
-    if (nextLink) {
-      const nextPageItems = await odata.getAllItems<T>(nextLink, metadata);
-      items = items.concat(nextPageItems);
-    }
+  const res = await request.get<ODataResponse<T>>(requestOptions);
+  items = res.value;
 
-    return items;
+  const nextLink = res['@odata.nextLink'] ?? res.nextLink;
+  if (nextLink) {
+    const nextPageItems = await odata.getAllItems<T>({ ...requestOptions, url: nextLink });
+    items = items.concat(nextPageItems);
   }
+
+  return items;
+}
+
+export const odata = {
+  getAllItems
 };

@@ -1,10 +1,10 @@
 import chalk from 'chalk';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import config from '../../../../config.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request from '../../../../request.js';
-import { aadGroup } from '../../../../utils/aadGroup.js';
+import { entraGroup } from '../../../../utils/entraGroup.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { ClientSvcResponse, ClientSvcResponseContents, FormDigestInfo, spo, SpoOperation } from '../../../../utils/spo.js';
 import { validation } from '../../../../utils/validation.js';
@@ -85,14 +85,9 @@ class SpoSiteRemoveCommand extends SpoCommand {
       await this.removeSite(logger, args);
     }
     else {
-      const result = await Cli.prompt<{ continue: boolean }>({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: `Are you sure you want to remove the site ${args.options.url}?`
-      });
+      const result = await cli.promptForConfirmation({ message: `Are you sure you want to remove the site ${args.options.url}?` });
 
-      if (result.continue) {
+      if (result) {
         await this.removeSite(logger, args);
       }
     }
@@ -118,7 +113,7 @@ class SpoSiteRemoveCommand extends SpoCommand {
           }
 
           try {
-            const group = await aadGroup.getGroupById(groupId);
+            const group = await entraGroup.getGroupById(groupId);
             if (args.options.skipRecycleBin || args.options.wait) {
               await logger.logToStderr(chalk.yellow(`Entered site is a groupified site. Hence, the parameters 'skipRecycleBin' and 'wait' will not be applicable.`));
             }

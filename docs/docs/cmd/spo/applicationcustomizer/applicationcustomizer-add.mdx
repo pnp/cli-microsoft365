@@ -2,7 +2,7 @@ import Global from '/docs/cmd/_global.mdx';
 
 # spo applicationcustomizer add
 
-Add an application customizer to a site.
+Add an application customizer to a site
 
 ## Usage
 
@@ -23,7 +23,7 @@ m365 spo applicationcustomizer add [options]
 : Client-side component ID of the application customizer (GUID).
 
 `--clientSideComponentProperties [clientSideComponentProperties]`
-: JSON string with application customizer properties
+: JSON string with application customizer properties.
 
 `-s, --scope [scope]`
 : Scope of the application customizer. Allowed values: `Site`, `Web`. Defaults to `Site`.
@@ -41,11 +41,13 @@ m365 spo applicationcustomizer add --webUrl https://contoso.sharepoint.com/sites
 
 Note, how the clientSideComponentProperties option has escaped double quotes `'{\"testMessage\":\"Test message\"}'` compared to execution from bash `'{"testMessage":"Test message"}'`.
 
-:::caution Escaping JSON in PowerShell
+:::warning[Escaping JSON in PowerShell]
 
 When using the `--clientSideComponentProperties` option it's possible to enter a JSON string. In PowerShell 5 to 7.2 [specific escaping rules](./../../../user-guide/using-cli.mdx#escaping-double-quotes-in-powershell) apply due to an issue. Remember that you can also use [file tokens](./../../../user-guide/using-cli.mdx#passing-complex-content-into-cli-options) instead.
 
 :::
+
+This command can be used for configuring an application customizer on a specific site. To configure an application customizer tenant-wide, view our dedicated [spo tenant applicationcustomizer add](../tenant/tenant-applicationcustomizer-add.mdx) command.
 
 ## Examples
 

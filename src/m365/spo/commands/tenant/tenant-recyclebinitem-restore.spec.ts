@@ -1,7 +1,7 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
@@ -17,15 +17,16 @@ describe(commands.TENANT_RECYCLEBINITEM_RESTORE, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
-    auth.service.connected = true;
-    auth.service.spoUrl = 'https://contoso.sharepoint.com';
-    commandInfo = Cli.getCommandInfo(command);
+    auth.connection.active = true;
+    auth.connection.spoUrl = 'https://contoso.sharepoint.com';
+    commandInfo = cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -41,6 +42,7 @@ describe(commands.TENANT_RECYCLEBINITEM_RESTORE, () => {
         log.push(msg);
       }
     };
+    loggerLogSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -52,8 +54,8 @@ describe(commands.TENANT_RECYCLEBINITEM_RESTORE, () => {
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
-    auth.service.spoUrl = undefined;
+    auth.connection.active = false;
+    auth.connection.spoUrl = undefined;
   });
 
   it('has correct name', () => {
@@ -89,6 +91,42 @@ describe(commands.TENANT_RECYCLEBINITEM_RESTORE, () => {
     });
 
     await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/hr' } });
+  });
+
+  it(`restores deleted site collection from the tenant recycle bin and waits for completion`, async () => {
+    const postRequestStub = sinon.stub(request, 'post');
+    postRequestStub.onFirstCall().callsFake(async (opts) => {
+      if (opts.url === 'https://contoso-admin.sharepoint.com/_api/SPOInternalUseOnly.Tenant/RestoreDeletedSite') {
+        if (opts.headers && JSON.stringify(opts.data) === JSON.stringify({ siteUrl: 'https://contoso.sharepoint.com/sites/hr' })) {
+          return "{\"HasTimedout\":false,\"IsComplete\":false,\"PollingInterval\":100}";
+        }
+      }
+
+      throw 'Invalid request';
+    });
+
+    postRequestStub.onSecondCall().callsFake(async (opts) => {
+      if (opts.url === 'https://contoso-admin.sharepoint.com/_api/SPOInternalUseOnly.Tenant/RestoreDeletedSite') {
+        if (opts.headers && JSON.stringify(opts.data) === JSON.stringify({ siteUrl: 'https://contoso.sharepoint.com/sites/hr' })) {
+          return "{\"HasTimedout\":false,\"IsComplete\":false,\"PollingInterval\":100}";
+        }
+      }
+
+      throw 'Invalid request';
+    });
+
+    postRequestStub.onThirdCall().callsFake(async (opts) => {
+      if (opts.url === 'https://contoso-admin.sharepoint.com/_api/SPOInternalUseOnly.Tenant/RestoreDeletedSite') {
+        if (opts.headers && JSON.stringify(opts.data) === JSON.stringify({ siteUrl: 'https://contoso.sharepoint.com/sites/hr' })) {
+          return "{\"HasTimedout\":false,\"IsComplete\":true,\"PollingInterval\":100}";
+        }
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/hr', wait: true, verbose: true } });
+    assert(loggerLogSpy.calledWith({ HasTimedout: false, IsComplete: true, PollingInterval: 100 }));
   });
 
   it('handles error when the site to restore is not found', async () => {

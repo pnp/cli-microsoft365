@@ -2,7 +2,7 @@ import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
 import { CommandError } from '../../../../Command.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import request from '../../../../request.js';
@@ -17,8 +17,8 @@ import command from './owner-list.js';
 describe(commands.OWNER_LIST, () => {
   const environmentName = 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6';
   const flowName = '1c6ee23a-a835-44bc-a4f5-462b658efc12';
-  const requestUrl = `https://management.azure.com/providers/Microsoft.ProcessSimple/environments/${formatting.encodeQueryParameter(environmentName)}/flows/${formatting.encodeQueryParameter(flowName)}/permissions?api-version=2016-11-01`;
-  const requestUrlAdmin = `https://management.azure.com/providers/Microsoft.ProcessSimple/scopes/admin/environments/${formatting.encodeQueryParameter(environmentName)}/flows/${formatting.encodeQueryParameter(flowName)}/permissions?api-version=2016-11-01`;
+  const requestUrl = `https://api.flow.microsoft.com/providers/Microsoft.ProcessSimple/environments/${formatting.encodeQueryParameter(environmentName)}/flows/${formatting.encodeQueryParameter(flowName)}/permissions?api-version=2016-11-01`;
+  const requestUrlAdmin = `https://api.flow.microsoft.com/providers/Microsoft.ProcessSimple/scopes/admin/environments/${formatting.encodeQueryParameter(environmentName)}/flows/${formatting.encodeQueryParameter(flowName)}/permissions?api-version=2016-11-01`;
   const ownerResponseJson = [{ 'name': '8323f7fe-e8a4-46c4-b5ea-f4864887d160', 'id': '/providers/Microsoft.ProcessSimple/environments/Default-e1dd4023-a656-480a-8a0e-c1b1eec51e1d/flows/d2642355-a6b8-4662-a418-ce3741584031/permissions/8323f7fe-e8a4-46c4-b5ea-f4864887d160', 'type': '/providers/Microsoft.ProcessSimple/environments/flows/permissions', 'properties': { 'roleName': 'CanEdit', 'permissionType': 'Principal', 'principal': { 'id': '8323f7fe-e8a4-46c4-b5ea-f4864887d160', 'type': 'User' } } }, { 'name': 'fe36f75e-c103-410b-a18a-2bf6df06ac3a', 'id': '/providers/Microsoft.ProcessSimple/environments/Default-e1dd4023-a656-480a-8a0e-c1b1eec51e1d/flows/d2642355-a6b8-4662-a418-ce3741584031/permissions/fe36f75e-c103-410b-a18a-2bf6df06ac3a', 'type': '/providers/Microsoft.ProcessSimple/environments/flows/permissions', 'properties': { 'roleName': 'Owner', 'permissionType': 'Principal', 'principal': { 'id': 'fe36f75e-c103-410b-a18a-2bf6df06ac3a', 'type': 'User' } } }];
   const ownerResponse = { value: ownerResponseJson };
   const ownerResponseText = [{ 'roleName': 'CanEdit', 'id': '8323f7fe-e8a4-46c4-b5ea-f4864887d160', 'type': 'User' }, { 'roleName': 'Owner', 'id': 'fe36f75e-c103-410b-a18a-2bf6df06ac3a', 'type': 'User' }];
@@ -33,7 +33,7 @@ describe(commands.OWNER_LIST, () => {
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
-    auth.service.connected = true;
+    auth.connection.active = true;
   });
 
   beforeEach(() => {
@@ -50,7 +50,7 @@ describe(commands.OWNER_LIST, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
-    commandInfo = Cli.getCommandInfo(command);
+    commandInfo = cli.getCommandInfo(command);
   });
 
   afterEach(() => {
@@ -61,7 +61,7 @@ describe(commands.OWNER_LIST, () => {
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
+    auth.connection.active = false;
   });
 
   it('has correct name', () => {

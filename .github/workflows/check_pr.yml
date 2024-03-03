@@ -9,18 +9,18 @@ jobs:
     strategy:
       matrix:
         os: [macos-latest, windows-latest, ubuntu-latest]
-        node: [18]
+        node: [20]
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Use Node.js ${{ matrix.node }}
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node }}
           registry-url: 'https://registry.npmjs.org'
       - name: Cache node modules
         id: cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             **/node_modules
@@ -37,7 +37,7 @@ jobs:
         if: matrix.os == 'windows-latest'
         run: 7z a -ttar -xr!node_modules -r build.tar .
       - name: Upload build artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: build-${{ matrix.os }}-${{ matrix.node }}
           path: build.tar
@@ -49,23 +49,22 @@ jobs:
       matrix:
         os: [macos-latest, windows-latest, ubuntu-latest]
         # node versions to run tests on
-        nodeRun: [18]
-        # node versions on which code was built and should be tested
-        nodeBuild: [18]
+        nodeRun: [20]
+        # node version on which code was built and should be tested
+        nodeBuild: [20]
         include:
           - os: ubuntu-latest
-            nodeRun: 20
-            nodeBuild: 18
+            nodeRun: 18
+            nodeBuild: 20
 
     steps:
       - name: Configure pagefile
         if: matrix.os == 'windows-latest'
-        uses: al-cheb/configure-pagefile-action@v1.3
+        uses: al-cheb/configure-pagefile-action@v1.4
         with:
           minimum-size: 16GB
-          maximum-size: 16GB
           disk-root: "C:"
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: build-${{ matrix.os }}-${{ matrix.nodeBuild }}
       - name: Unpack build artifact (non-Windows)
@@ -75,13 +74,13 @@ jobs:
         if: matrix.os == 'windows-latest'
         run: 7z x build.tar && del build.tar
       - name: Use Node.js ${{ matrix.nodeRun }}
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.nodeRun }}
           registry-url: 'https://registry.npmjs.org'
       - name: Cache node modules
         id: cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             **/node_modules
@@ -90,21 +89,21 @@ jobs:
         if: steps.cache.outputs.cache-hit != 'true'
         run: npm ci
       - name: Test with coverage
-        # we run coverage only on Node@18
-        if: matrix.nodeRun == 18
+        # we run coverage only on Node that was used to build
+        if: matrix.nodeRun == matrix.nodeBuild
         run: npm test
       - name: Test without coverage
         # we want to run tests on older Node versions to ensure that code works
-        if: matrix.nodeRun != 18
+        if: matrix.nodeRun != matrix.nodeBuild
         run: npm run test:test
       - name: Compress output (non-Windows)
-        if: matrix.nodeRun == 18 && matrix.os != 'windows-latest' && always()
+        if: matrix.nodeRun == matrix.nodeBuild && matrix.os != 'windows-latest' && always()
         run: tar -cvf coverage.tar coverage
       - name: Compress output (Windows)
-        if: matrix.nodeRun == 18 && matrix.os == 'windows-latest' && always()
+        if: matrix.nodeRun == matrix.nodeBuild && matrix.os == 'windows-latest' && always()
         run: 7z a -ttar -r coverage.tar coverage
-      - uses: actions/upload-artifact@v3
-        if: matrix.nodeRun == 18 && always()
+      - uses: actions/upload-artifact@v4
+        if: matrix.nodeRun == matrix.nodeBuild && always()
         with:
           name: coverage-${{ matrix.os }}-${{ matrix.nodeRun }}
           path: coverage.tar
@@ -113,12 +112,21 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
 
-      - name: Install dependencies
+      - name: Cache node modules
+        id: cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            **/docs/node_modules
+          key: docs_node_modules-${{ hashFiles('**/docs/package-lock.json') }}
+
+      - name: Restore dependencies
+        if: steps.cache.outputs.cache-hit != 'true'
         run: npm ci
         working-directory: docs
         

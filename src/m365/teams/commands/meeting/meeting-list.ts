@@ -2,7 +2,7 @@ import { Event } from '@microsoft/microsoft-graph-types';
 import auth from '../../../../Auth.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import { Logger } from '../../../../cli/Logger.js';
-import { aadUser } from '../../../../utils/aadUser.js';
+import { entraUser } from '../../../../utils/entraUser.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 import { odata } from '../../../../utils/odata.js';
 import { validation } from '../../../../utils/validation.js';
@@ -114,7 +114,7 @@ class TeamsMeetingListCommand extends GraphCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
-      const isAppOnlyAccessToken = accessToken.isAppOnlyAccessToken(auth.service.accessTokens[this.resource].accessToken)!;
+      const isAppOnlyAccessToken = accessToken.isAppOnlyAccessToken(auth.connection.accessTokens[this.resource].accessToken)!;
       if (isAppOnlyAccessToken && !args.options.userId && !args.options.userName && !args.options.email) {
         throw `The option 'userId', 'userName' or 'email' is required when retrieving meetings using app only permissions`;
       }
@@ -122,7 +122,7 @@ class TeamsMeetingListCommand extends GraphCommand {
         throw `The options 'userId', 'userName' and 'email' cannot be used when retrieving meetings using delegated permissions`;
       }
       if (this.verbose) {
-        await logger.logToStderr(`Retrieving meetings for user: ${args.options.userId || args.options.userName || args.options.email || accessToken.getUserNameFromAccessToken(auth.service.accessTokens[this.resource].accessToken)}...`);
+        await logger.logToStderr(`Retrieving meetings for user: ${args.options.userId || args.options.userName || args.options.email || accessToken.getUserNameFromAccessToken(auth.connection.accessTokens[this.resource].accessToken)}...`);
       }
 
       const graphBaseUrl = await this.getGraphBaseUrl(args.options);
@@ -146,7 +146,7 @@ class TeamsMeetingListCommand extends GraphCommand {
       requestUrl += `users/${options.userId || options.userName}`;
     }
     else if (options.email) {
-      const userId = await aadUser.getUserIdByEmail(options.email);
+      const userId = await entraUser.getUserIdByEmail(options.email);
       requestUrl += `users/${userId}`;
     }
     else {

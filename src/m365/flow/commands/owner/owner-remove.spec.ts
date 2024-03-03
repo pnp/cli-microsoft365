@@ -2,14 +2,15 @@ import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
 import { CommandError } from '../../../../Command.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import request from '../../../../request.js';
 import { telemetry } from '../../../../telemetry.js';
-import { aadGroup } from '../../../../utils/aadGroup.js';
-import { aadUser } from '../../../../utils/aadUser.js';
+import { entraGroup } from '../../../../utils/entraGroup.js';
+import { entraUser } from '../../../../utils/entraUser.js';
 import { formatting } from '../../../../utils/formatting.js';
+import { settingsNames } from '../../../../settingsNames.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
@@ -23,23 +24,23 @@ describe(commands.OWNER_REMOVE, () => {
   const userName = 'john@contoso.com';
   const groupId = '37a0264d-fea4-4e87-8e5e-e574ff878cf2';
   const groupName = 'Test Group';
-  const requestUrlNoAdmin = `https://management.azure.com/providers/Microsoft.ProcessSimple/environments/${formatting.encodeQueryParameter(environmentName)}/flows/${formatting.encodeQueryParameter(flowName)}/modifyPermissions?api-version=2016-11-01`;
-  const requestUrlAdmin = `https://management.azure.com/providers/Microsoft.ProcessSimple/scopes/admin/environments/${formatting.encodeQueryParameter(environmentName)}/flows/${formatting.encodeQueryParameter(flowName)}/modifyPermissions?api-version=2016-11-01`;
+  const requestUrlNoAdmin = `https://api.flow.microsoft.com/providers/Microsoft.ProcessSimple/environments/${formatting.encodeQueryParameter(environmentName)}/flows/${formatting.encodeQueryParameter(flowName)}/modifyPermissions?api-version=2016-11-01`;
+  const requestUrlAdmin = `https://api.flow.microsoft.com/providers/Microsoft.ProcessSimple/scopes/admin/environments/${formatting.encodeQueryParameter(environmentName)}/flows/${formatting.encodeQueryParameter(flowName)}/modifyPermissions?api-version=2016-11-01`;
   const requestBodyUser = { 'delete': [{ 'id': userId }] };
   const requestBodyGroup = { 'delete': [{ 'id': groupId }] };
 
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
-  let promptOptions: any;
+  let promptIssued: boolean = false;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
-    auth.service.connected = true;
-    commandInfo = Cli.getCommandInfo(command);
+    auth.connection.active = true;
+    commandInfo = cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -55,25 +56,29 @@ describe(commands.OWNER_REMOVE, () => {
         log.push(msg);
       }
     };
-    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
-      promptOptions = options;
-      return { continue: false };
+    sinon.stub(cli, 'promptForConfirmation').callsFake(() => {
+      promptIssued = true;
+      return Promise.resolve(false);
     });
-    promptOptions = undefined;
+
+    promptIssued = false;
   });
 
   afterEach(() => {
     sinonUtil.restore([
-      aadGroup.getGroupIdByDisplayName,
-      aadUser.getUserIdByUpn,
-      Cli.prompt,
-      request.post
+      request.get,
+      request.post,
+      entraGroup.getGroupIdByDisplayName,
+      entraUser.getUserIdByUpn,
+      cli.getSettingWithDefaultValue,
+      cli.handleMultipleResultsFound,
+      cli.promptForConfirmation
     ]);
   });
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
+    auth.connection.active = false;
   });
 
   it('has correct name', () => {
@@ -98,7 +103,7 @@ describe(commands.OWNER_REMOVE, () => {
   });
 
   it('deletes owner from flow by userName', async () => {
-    sinon.stub(aadUser, 'getUserIdByUpn').resolves(userId);
+    sinon.stub(entraUser, 'getUserIdByUpn').resolves(userId);
     const postStub = sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === requestUrlNoAdmin) {
         return;
@@ -112,8 +117,8 @@ describe(commands.OWNER_REMOVE, () => {
   });
 
   it('deletes owner from flow by groupId as admin when prompt confirmed', async () => {
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
     const postStub = sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === requestUrlAdmin) {
         return;
@@ -127,7 +132,66 @@ describe(commands.OWNER_REMOVE, () => {
   });
 
   it('deletes owner from flow by groupName as admin', async () => {
-    sinon.stub(aadGroup, 'getGroupIdByDisplayName').resolves(groupId);
+    sinon.stub(entraGroup, 'getGroupIdByDisplayName').resolves(groupId);
+    const postStub = sinon.stub(request, 'post').callsFake(async opts => {
+      if (opts.url === requestUrlAdmin) {
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { verbose: true, environmentName: environmentName, flowName: flowName, groupName: groupName, asAdmin: true, force: true } });
+    assert.deepStrictEqual(postStub.lastCall.args[0].data, requestBodyGroup);
+  });
+
+  it('handles error when multiple groups with the specified name found', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
+    sinon.stub(request, 'get').callsFake(async opts => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(groupName)}'&$select=id`) {
+        return {
+          value: [
+            { id: '9b1b1e42-794b-4c71-93ac-5ed92488b67f' },
+            { id: '9b1b1e42-794b-4c71-93ac-5ed92488b67g' }
+          ]
+        };
+      }
+
+      return 'Invalid Request';
+    });
+
+    sinon.stub(request, 'post').rejects('POST request executed');
+
+    await assert.rejects(command.action(logger, {
+      options: {
+        verbose: true, environmentName: environmentName, flowName: flowName, groupName: groupName, asAdmin: true, force: true
+      }
+    }), new CommandError(`Multiple groups with name 'Test Group' found. Found: 9b1b1e42-794b-4c71-93ac-5ed92488b67f, 9b1b1e42-794b-4c71-93ac-5ed92488b67g.`));
+  });
+
+  it('handles selecting single result when multiple groups with the name found and cli is set to prompt', async () => {
+    sinon.stub(request, 'get').callsFake(async opts => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(groupName)}'&$select=id`) {
+        return {
+          value: [
+            { id: '9b1b1e42-794b-4c71-93ac-5ed92488b67f' },
+            { id: '37a0264d-fea4-4e87-8e5e-e574ff878cf2' }
+          ]
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinon.stub(cli, 'handleMultipleResultsFound').resolves({ id: '37a0264d-fea4-4e87-8e5e-e574ff878cf2' });
+
     const postStub = sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === requestUrlAdmin) {
         return;
@@ -153,21 +217,16 @@ describe(commands.OWNER_REMOVE, () => {
       new CommandError(error.error.message));
   });
 
-  it('prompts before removing the specified owner from a flow when confirm option not passed', async () => {
+  it('prompts before removing the specified owner from a flow when force option not passed', async () => {
     await command.action(logger, { options: { environmentName: environmentName, flowName: flowName, useName: userName } });
-    let promptIssued = false;
-
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
 
     assert(promptIssued);
   });
 
   it('aborts removing the specified owner from a flow when option not passed and prompt not confirmed', async () => {
     const postSpy = sinon.spy(request, 'post');
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: false });
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(false);
 
     await command.action(logger, { options: { environmentName: environmentName, flowName: flowName, useName: userName } });
     assert(postSpy.notCalled);

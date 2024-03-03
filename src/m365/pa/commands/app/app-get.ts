@@ -1,4 +1,4 @@
-import { Cli, CommandOutput } from '../../../../cli/Cli.js';
+import { cli, CommandOutput } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import Command from '../../../../Command.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
@@ -16,6 +16,8 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   name?: string;
   displayName?: string;
+  environmentName?: string;
+  asAdmin?: boolean;
 }
 
 class PaAppGetCommand extends PowerAppsCommand {
@@ -44,7 +46,9 @@ class PaAppGetCommand extends PowerAppsCommand {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
         name: typeof args.options.name !== 'undefined',
-        displayName: typeof args.options.displayName !== 'undefined'
+        displayName: typeof args.options.displayName !== 'undefined',
+        asAdmin: !!args.options.asAdmin,
+        environmentName: typeof args.options.environmentName !== 'undefined'
       });
     });
   }
@@ -56,6 +60,12 @@ class PaAppGetCommand extends PowerAppsCommand {
       },
       {
         option: '-d, --displayName [displayName]'
+      },
+      {
+        option: '-e, --environmentName [environmentName]'
+      },
+      {
+        option: '--asAdmin'
       }
     );
   }
@@ -65,6 +75,14 @@ class PaAppGetCommand extends PowerAppsCommand {
       async (args: CommandArgs) => {
         if (args.options.name && !validation.isValidGuid(args.options.name)) {
           return `${args.options.name} is not a valid GUID`;
+        }
+
+        if (args.options.asAdmin && !args.options.environmentName) {
+          return 'When specifying the asAdmin option, the environment option is required as well.';
+        }
+
+        if (args.options.environmentName && !args.options.asAdmin) {
+          return 'When specifying the environment option, the asAdmin option is required as well.';
         }
 
         return true;
@@ -79,8 +97,14 @@ class PaAppGetCommand extends PowerAppsCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       if (args.options.name) {
+        let endpoint = `${this.resource}/providers/Microsoft.PowerApps`;
+        if (args.options.asAdmin) {
+          endpoint += `/scopes/admin/environments/${formatting.encodeQueryParameter(args.options.environmentName!)}`;
+        }
+        endpoint += `/apps/${formatting.encodeQueryParameter(args.options.name)}?api-version=2016-11-01`;
+
         const requestOptions: CliRequestOptions = {
-          url: `${this.resource}/providers/Microsoft.PowerApps/apps/${formatting.encodeQueryParameter(args.options.name)}?api-version=2016-11-01`,
+          url: endpoint,
           headers: {
             accept: 'application/json'
           },
@@ -100,25 +124,21 @@ class PaAppGetCommand extends PowerAppsCommand {
         }
 
         const getAppsOutput = await this.getApps(args, logger);
-
-        const allApps: any = JSON.parse(getAppsOutput.stdout);
-        if (allApps.length > 0) {
+        if (getAppsOutput.stdout && JSON.parse(getAppsOutput.stdout).length > 0) {
+          const allApps: any[] = JSON.parse(getAppsOutput.stdout);
           const app = allApps.find((a: any) => {
             return a.properties.displayName.toLowerCase() === `${args.options.displayName}`.toLowerCase();
           });
+
           if (!!app) {
             await logger.log(this.setProperties(app));
           }
           else {
-            if (this.verbose) {
-              await logger.logToStderr(`No app found with displayName '${args.options.displayName}'`);
-            }
+            throw `No app found with displayName '${args.options.displayName}'.`;
           }
         }
         else {
-          if (this.verbose) {
-            await logger.logToStderr('No apps found');
-          }
+          throw 'No apps found.';
         }
       }
     }
@@ -135,10 +155,12 @@ class PaAppGetCommand extends PowerAppsCommand {
     const options: GlobalOptions = {
       output: 'json',
       debug: this.debug,
-      verbose: this.verbose
+      verbose: this.verbose,
+      environmentName: args.options.environmentName,
+      asAdmin: args.options.asAdmin
     };
 
-    return await Cli.executeCommandWithOutput(paAppListCommand as Command, { options: { ...options, _: [] } });
+    return await cli.executeCommandWithOutput(paAppListCommand as Command, { options: { ...options, _: [] } });
   }
 
   private setProperties(app: any): any {

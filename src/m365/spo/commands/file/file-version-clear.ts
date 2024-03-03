@@ -1,4 +1,4 @@
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
@@ -35,6 +35,7 @@ class SpoFileVersionClearCommand extends SpoCommand {
     this.#initOptions();
     this.#initValidators();
     this.#initOptionSets();
+    this.#initTypes();
   }
 
   #initTelemetry(): void {
@@ -42,7 +43,7 @@ class SpoFileVersionClearCommand extends SpoCommand {
       Object.assign(this.telemetryProperties, {
         fileUrl: args.options.fileUrl,
         fileId: args.options.fileId,
-        force: (!!args.options.force).toString()
+        force: !!args.options.force
       });
     });
   }
@@ -80,6 +81,11 @@ class SpoFileVersionClearCommand extends SpoCommand {
     this.optionSets.push({ options: ['fileUrl', 'fileId'] });
   }
 
+  #initTypes(): void {
+    this.types.string.push('webUrl', 'fileUrl', 'fileId');
+    this.types.boolean.push('force');
+  }
+
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
       await logger.logToStderr(`Deletes all version history of the file ${args.options.fileUrl || args.options.fileId} at site ${args.options.webUrl}...`);
@@ -90,14 +96,9 @@ class SpoFileVersionClearCommand extends SpoCommand {
         await this.clearVersions(args);
       }
       else {
-        const result = await Cli.prompt<{ continue: boolean }>({
-          type: 'confirm',
-          name: 'continue',
-          default: false,
-          message: `Are you sure you want to delete all version history for file ${args.options.fileId || args.options.fileUrl}'?`
-        });
+        const result = await cli.promptForConfirmation({ message: `Are you sure you want to delete all version history for file ${args.options.fileId || args.options.fileUrl}'?` });
 
-        if (result.continue) {
+        if (result) {
           await this.clearVersions(args);
         }
       }

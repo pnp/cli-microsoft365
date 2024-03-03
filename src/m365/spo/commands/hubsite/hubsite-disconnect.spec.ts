@@ -1,7 +1,7 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
@@ -16,7 +16,6 @@ import command from './hubsite-disconnect.js';
 import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.HUBSITE_DISCONNECT, () => {
-  let cli: Cli;
   const spoAdminUrl = 'https://contoso-admin.sharepoint.com';
   const id = '55b979e7-36b6-4968-b3af-6ae221a3483f';
   const title = 'Hub Site';
@@ -45,17 +44,16 @@ describe(commands.HUBSITE_DISCONNECT, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
-  let promptOptions: any;
+  let promptIssued: boolean = false;
   let patchStub: sinon.SinonStub<[options: CliRequestOptions]>;
 
   before(() => {
-    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
-    auth.service.connected = true;
-    commandInfo = Cli.getCommandInfo(command);
+    auth.connection.active = true;
+    commandInfo = cli.getCommandInfo(command);
 
     sinon.stub(spo, 'getSpoAdminUrl').resolves(spoAdminUrl);
     patchStub = sinon.stub(request, 'patch').callsFake(async (opts) => {
@@ -64,6 +62,13 @@ describe(commands.HUBSITE_DISCONNECT, () => {
       }
 
       throw 'Invalid requet URL: ' + opts.url;
+    });
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName: string, defaultValue: any) => {
+      if (settingName === 'prompt') {
+        return false;
+      }
+
+      return defaultValue;
     });
   });
 
@@ -80,25 +85,26 @@ describe(commands.HUBSITE_DISCONNECT, () => {
         log.push(msg);
       }
     };
-    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
-      promptOptions = options;
-      return { continue: false };
+    sinon.stub(cli, 'promptForConfirmation').callsFake(() => {
+      promptIssued = true;
+      return Promise.resolve(false);
     });
-    promptOptions = undefined;
+
+    promptIssued = false;
   });
 
   afterEach(() => {
     sinonUtil.restore([
       request.get,
-      Cli.prompt,
       cli.getSettingWithDefaultValue,
-      Cli.handleMultipleResultsFound
+      cli.promptForConfirmation,
+      cli.handleMultipleResultsFound
     ]);
   });
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
+    auth.connection.active = false;
   });
 
   it('has correct name', () => {
@@ -136,11 +142,6 @@ describe(commands.HUBSITE_DISCONNECT, () => {
 
   it('prompts before disconnecting the hub site when confirmation argument not passed', async () => {
     await command.action(logger, { options: { id: id } });
-    let promptIssued = false;
-
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
 
     assert(promptIssued);
   });
@@ -234,8 +235,8 @@ describe(commands.HUBSITE_DISCONNECT, () => {
       throw 'Invalid request URL: ' + opts.url;
     });
 
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
       options: {
@@ -308,7 +309,7 @@ describe(commands.HUBSITE_DISCONNECT, () => {
       throw 'Invalid request URL: ' + opts.url;
     });
 
-    sinon.stub(Cli, 'handleMultipleResultsFound').resolves({
+    sinon.stub(cli, 'handleMultipleResultsFound').resolves({
       Title: title,
       ID: id,
       'odata.etag': etagValue

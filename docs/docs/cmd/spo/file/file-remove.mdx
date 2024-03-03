@@ -20,45 +20,49 @@ m365 spo page template remove
 
 ```md definition-list
 `-u, --webUrl <webUrl>`
-: URL of the site where the file to remove is located
+: URL of the site where the file to remove is located.
 
 `-i, --id [id]`
-: The ID of the file to remove. Specify either `id` or `url` but not both
+: The ID of the file to remove. Specify either `id` or `url` but not both.
 
 `--url [url]`
-: The server- or site-relative decoded URL of the file to remove. Specify either `id` or `url` but not both
+: The server- or site-relative decoded URL of the file to remove. Specify either `id` or `url` but not both.
 
 `--recycle`
-: Recycle the file instead of actually deleting it
+: Recycle the file instead of actually deleting it.
 
 `-f, --force`
-: Don't prompt for confirming removing the file
+: Don't prompt for confirming removing the file.
 ```
 
 <Global />
 
 ## Examples
 
-Remove file by ID
+Remove file by ID.
 
 ```sh
 m365 spo file remove --webUrl https://contoso.sharepoint.com/sites/project-x --id 0cd891ef-afce-4e55-b836-fce03286cccf
 ```
 
-Remove the file by site-relative URL
+Remove the file by site-relative URL.
 
 ```sh
 m365 spo file remove --webUrl https://contoso.sharepoint.com/sites/project-x --url "/Shared Documents/Test.docx"
 ```
 
-Move the file by server-relative URL to the recycle bin
+Move the file by server-relative URL to the recycle bin.
 
 ```sh
 m365 spo file remove --webUrl https://contoso.sharepoint.com/sites/project-x --url "/sites/project-x/SharedDocuments/Test.docx" --recycle
 ```
 
-Remove a page template by site-relative URL
+Remove a page template by site-relative URL.
 
 ```sh
 m365 spo page template remove --webUrl https://contoso.sharepoint.com/sites/project-x --url "/Shared Documents/Forms/Template.dotx"
 ```
+
+## Response
+
+The command won't return a response on success.

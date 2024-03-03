@@ -1,4 +1,4 @@
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
@@ -15,6 +15,8 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   name: string;
   force?: boolean;
+  environmentName?: string;
+  asAdmin?: boolean;
 }
 
 class PaAppRemoveCommand extends PowerAppsCommand {
@@ -37,7 +39,9 @@ class PaAppRemoveCommand extends PowerAppsCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        force: typeof args.options.force !== 'undefined'
+        force: typeof args.options.force !== 'undefined',
+        asAdmin: !!args.options.asAdmin,
+        environmentName: typeof args.options.environmentName !== 'undefined'
       });
     });
   }
@@ -49,6 +53,12 @@ class PaAppRemoveCommand extends PowerAppsCommand {
       },
       {
         option: '-f, --force'
+      },
+      {
+        option: '--asAdmin'
+      },
+      {
+        option: '-e, --environmentName [environmentName]'
       }
     );
   }
@@ -58,6 +68,14 @@ class PaAppRemoveCommand extends PowerAppsCommand {
       async (args: CommandArgs) => {
         if (!validation.isValidGuid(args.options.name)) {
           return `${args.options.name} is not a valid GUID`;
+        }
+
+        if (args.options.asAdmin && !args.options.environmentName) {
+          return 'When specifying the asAdmin option, the environment option is required as well.';
+        }
+
+        if (args.options.environmentName && !args.options.asAdmin) {
+          return 'When specifying the environment option, the asAdmin option is required as well.';
         }
 
         return true;
@@ -71,8 +89,14 @@ class PaAppRemoveCommand extends PowerAppsCommand {
     }
 
     const removePaApp = async (): Promise<void> => {
+      let endpoint = `${this.resource}/providers/Microsoft.PowerApps`;
+      if (args.options.asAdmin) {
+        endpoint += `/scopes/admin/environments/${formatting.encodeQueryParameter(args.options.environmentName!)}`;
+      }
+      endpoint += `/apps/${formatting.encodeQueryParameter(args.options.name)}?api-version=2017-08-01`;
+
       const requestOptions: CliRequestOptions = {
-        url: `${this.resource}/providers/Microsoft.PowerApps/apps/${formatting.encodeQueryParameter(args.options.name)}?api-version=2017-08-01`,
+        url: endpoint,
         fullResponse: true,
         headers: {
           accept: 'application/json'
@@ -97,14 +121,9 @@ class PaAppRemoveCommand extends PowerAppsCommand {
       await removePaApp();
     }
     else {
-      const result = await Cli.prompt<{ continue: boolean }>({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: `Are you sure you want to remove the Microsoft Power App ${args.options.name}?`
-      });
+      const result = await cli.promptForConfirmation({ message: `Are you sure you want to remove the Microsoft Power App ${args.options.name}?` });
 
-      if (result.continue) {
+      if (result) {
         await removePaApp();
       }
     }

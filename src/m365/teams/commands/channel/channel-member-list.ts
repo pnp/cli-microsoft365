@@ -2,7 +2,7 @@ import { Channel, ConversationMember, Group } from '@microsoft/microsoft-graph-t
 import GlobalOptions from '../../../../GlobalOptions.js';
 import { Logger } from '../../../../cli/Logger.js';
 import request, { CliRequestOptions } from '../../../../request.js';
-import { aadGroup } from '../../../../utils/aadGroup.js';
+import { entraGroup } from '../../../../utils/entraGroup.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { odata } from '../../../../utils/odata.js';
 import { validation } from '../../../../utils/validation.js';
@@ -139,7 +139,7 @@ class TeamsChannelMemberListCommand extends GraphCommand {
       return args.options.teamId;
     }
 
-    const group = await aadGroup.getGroupByDisplayName(args.options.teamName!);
+    const group = await entraGroup.getGroupByDisplayName(args.options.teamName!);
     if ((group as ExtendedGroup).resourceProvisioningOptions.indexOf('Team') === -1) {
       throw 'The specified team does not exist in the Microsoft Teams';
     }

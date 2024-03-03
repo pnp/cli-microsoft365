@@ -1,4 +1,4 @@
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
@@ -59,15 +59,9 @@ class SpoPageRemoveCommand extends SpoCommand {
       await this.removePage(logger, args);
     }
     else {
-      const result = await Cli.prompt<{ continue: boolean }>(
-        {
-          type: 'confirm',
-          name: 'continue',
-          default: false,
-          message: `Are you sure you want to remove the page '${args.options.name}'?`
-        });
+      const result = await cli.promptForConfirmation({ message: `Are you sure you want to remove the page '${args.options.name}'?` });
 
-      if (result.continue) {
+      if (result) {
         await this.removePage(logger, args);
       }
     }
@@ -91,7 +85,7 @@ class SpoPageRemoveCommand extends SpoCommand {
 
       const requestOptions: CliRequestOptions = {
         url: `${args.options
-          .webUrl}/_api/web/getfilebyserverrelativeurl('${urlUtil.getServerRelativeSiteUrl(args.options.webUrl)}/sitepages/${pageName}')`,
+          .webUrl}/_api/web/GetFileByServerRelativePath(DecodedUrl='${urlUtil.getServerRelativeSiteUrl(args.options.webUrl)}/sitepages/${pageName}')`,
         headers: {
           'X-RequestDigest': requestDigest,
           'X-HTTP-Method': 'DELETE',

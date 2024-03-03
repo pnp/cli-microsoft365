@@ -1,7 +1,7 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
@@ -32,8 +32,8 @@ describe(commands.PAGE_TEXT_ADD, () => {
       FormDigestExpiresAt: new Date(),
       WebFullUrl: 'https://contoso.sharepoint.com'
     });
-    auth.service.connected = true;
-    commandInfo = Cli.getCommandInfo(command);
+    auth.connection.active = true;
+    commandInfo = cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -62,7 +62,7 @@ describe(commands.PAGE_TEXT_ADD, () => {
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
+    auth.connection.active = false;
   });
 
   it('has correct name', () => {
@@ -75,7 +75,7 @@ describe(commands.PAGE_TEXT_ADD, () => {
 
   it('adds text to an empty modern page', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/page.aspx')?$expand=ListItemAllFields/ClientSideApplicationId`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/GetFileByServerRelativePath(DecodedUrl='/sites/team-a/SitePages/page.aspx')?$expand=ListItemAllFields/ClientSideApplicationId`) > -1) {
         return {
           ListItemAllFields: {
             CommentsDisabled: false,
@@ -141,7 +141,7 @@ describe(commands.PAGE_TEXT_ADD, () => {
     });
 
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === "https://contoso.sharepoint.com/sites/team-a/_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/ListItemAllFields") {
+      if (opts.url === "https://contoso.sharepoint.com/sites/team-a/_api/web/GetFileByServerRelativePath(DecodedUrl='/sites/team-a/sitepages/page.aspx')/ListItemAllFields") {
         return {};
       }
 
@@ -161,7 +161,7 @@ describe(commands.PAGE_TEXT_ADD, () => {
 
   it('adds text to an empty modern page (debug)', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/team-a/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/page.aspx')?$expand=ListItemAllFields/ClientSideApplicationId`) > -1) {
+      if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/team-a/_api/web/GetFileByServerRelativePath(DecodedUrl='/sites/team-a/SitePages/page.aspx')?$expand=ListItemAllFields/ClientSideApplicationId`) > -1) {
         return {
           ListItemAllFields: {
             CommentsDisabled: false,
@@ -227,7 +227,7 @@ describe(commands.PAGE_TEXT_ADD, () => {
     });
 
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/team-a/_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/ListItemAllFields`) > -1 &&
+      if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/team-a/_api/web/GetFileByServerRelativePath(DecodedUrl='/sites/team-a/sitepages/page.aspx')/ListItemAllFields`) > -1 &&
         JSON.stringify(opts.data).indexOf(`&quot;,&quot;position&quot;&#58;&#123;&quot;controlIndex&quot;&#58;1,&quot;sectionFactor&quot;&#58;12,&quot;sectionIndex&quot;&#58;1,&quot;zoneIndex&quot;&#58;1&#125;&#125;\\"><div data-sp-rte=\\"\\"><p>Hello world</p></div></div></div>"}`) > -1) {
         return {};
       }
@@ -249,7 +249,7 @@ describe(commands.PAGE_TEXT_ADD, () => {
 
   it('adds text to an empty modern page on root of tenant (debug)', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/_api/web/getfilebyserverrelativeurl('/SitePages/page.aspx')?$expand=ListItemAllFields/ClientSideApplicationId`) > -1) {
+      if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/_api/web/GetFileByServerRelativePath(DecodedUrl='/SitePages/page.aspx')?$expand=ListItemAllFields/ClientSideApplicationId`) > -1) {
         return {
           ListItemAllFields: {
             CommentsDisabled: false,
@@ -315,7 +315,7 @@ describe(commands.PAGE_TEXT_ADD, () => {
     });
 
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/_api/web/getfilebyserverrelativeurl('/sitepages/page.aspx')/ListItemAllFields`) > -1 &&
+      if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/_api/web/GetFileByServerRelativePath(DecodedUrl='/sitepages/page.aspx')/ListItemAllFields`) > -1 &&
         JSON.stringify(opts.data).indexOf(`&quot;,&quot;position&quot;&#58;&#123;&quot;controlIndex&quot;&#58;1,&quot;sectionFactor&quot;&#58;12,&quot;sectionIndex&quot;&#58;1,&quot;zoneIndex&quot;&#58;1&#125;&#125;\\"><div data-sp-rte=\\"\\"><p>Hello world</p></div></div></div>"}`) > -1) {
         return {};
       }
@@ -339,7 +339,7 @@ describe(commands.PAGE_TEXT_ADD, () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (
         (opts.url as string).indexOf(
-          `/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/page.aspx')?$expand=ListItemAllFields/ClientSideApplicationId`
+          `/_api/web/GetFileByServerRelativePath(DecodedUrl='/sites/team-a/SitePages/page.aspx')?$expand=ListItemAllFields/ClientSideApplicationId`
         ) > -1
       ) {
         return {
@@ -407,7 +407,7 @@ describe(commands.PAGE_TEXT_ADD, () => {
     });
 
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === "https://contoso.sharepoint.com/sites/team-a/_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/ListItemAllFields") {
+      if (opts.url === "https://contoso.sharepoint.com/sites/team-a/_api/web/GetFileByServerRelativePath(DecodedUrl='/sites/team-a/sitepages/page.aspx')/ListItemAllFields") {
         return {};
       }
 
@@ -429,7 +429,7 @@ describe(commands.PAGE_TEXT_ADD, () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (
         (opts.url as string).indexOf(
-          `/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/page.aspx')?$expand=ListItemAllFields/ClientSideApplicationId`
+          `/_api/web/GetFileByServerRelativePath(DecodedUrl='/sites/team-a/SitePages/page.aspx')?$expand=ListItemAllFields/ClientSideApplicationId`
         ) > -1
       ) {
         return {
@@ -497,7 +497,7 @@ describe(commands.PAGE_TEXT_ADD, () => {
     });
 
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === "https://contoso.sharepoint.com/sites/team-a/_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/ListItemAllFields") {
+      if (opts.url === "https://contoso.sharepoint.com/sites/team-a/_api/web/GetFileByServerRelativePath(DecodedUrl='/sites/team-a/sitepages/page.aspx')/ListItemAllFields") {
         return {};
       }
 
@@ -520,7 +520,7 @@ describe(commands.PAGE_TEXT_ADD, () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (
         (opts.url as string).indexOf(
-          `/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/page.aspx')?$expand=ListItemAllFields/ClientSideApplicationId`
+          `/_api/web/GetFileByServerRelativePath(DecodedUrl='/sites/team-a/SitePages/page.aspx')?$expand=ListItemAllFields/ClientSideApplicationId`
         ) > -1
       ) {
         return {
@@ -588,7 +588,7 @@ describe(commands.PAGE_TEXT_ADD, () => {
     });
 
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === "https://contoso.sharepoint.com/sites/team-a/_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/ListItemAllFields") {
+      if (opts.url === "https://contoso.sharepoint.com/sites/team-a/_api/web/GetFileByServerRelativePath(DecodedUrl='/sites/team-a/sitepages/page.aspx')/ListItemAllFields") {
         return {};
       }
 
@@ -608,7 +608,7 @@ describe(commands.PAGE_TEXT_ADD, () => {
 
   it('correctly handles OData error when adding text to a non-existing page', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/foo.aspx')?$expand=ListItemAllFields/ClientSideApplicationId`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/GetFileByServerRelativePath(DecodedUrl='/sites/team-a/SitePages/foo.aspx')?$expand=ListItemAllFields/ClientSideApplicationId`) > -1) {
         throw { error: { 'odata.error': { message: { value: 'The file /sites/team-a/SitePages/foo.aspx does not exist' } } } };
       }
 
@@ -627,7 +627,7 @@ describe(commands.PAGE_TEXT_ADD, () => {
 
   it('correctly handles OData error when adding text to a page', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/page.aspx')?$expand=ListItemAllFields/ClientSideApplicationId`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/GetFileByServerRelativePath(DecodedUrl='/sites/team-a/SitePages/page.aspx')?$expand=ListItemAllFields/ClientSideApplicationId`) > -1) {
         return {
           ListItemAllFields: {
             CommentsDisabled: false,
@@ -708,7 +708,7 @@ describe(commands.PAGE_TEXT_ADD, () => {
 
   it('correctly handles error if target page is not a modern page', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/page.aspx')?$expand=ListItemAllFields/ClientSideApplicationId`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/GetFileByServerRelativePath(DecodedUrl='/sites/team-a/SitePages/page.aspx')?$expand=ListItemAllFields/ClientSideApplicationId`) > -1) {
         return {
           ListItemAllFields: {
             CommentsDisabled: false,
@@ -777,7 +777,7 @@ describe(commands.PAGE_TEXT_ADD, () => {
 
   it('correctly handles invalid section error when adding text to modern page', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/page.aspx')?$expand=ListItemAllFields/ClientSideApplicationId`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/GetFileByServerRelativePath(DecodedUrl='/sites/team-a/SitePages/page.aspx')?$expand=ListItemAllFields/ClientSideApplicationId`) > -1) {
         return {
           ListItemAllFields: {
             CommentsDisabled: false,
@@ -855,7 +855,7 @@ describe(commands.PAGE_TEXT_ADD, () => {
 
   it('correctly handles invalid column error when adding text to modern page', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/page.aspx')?$expand=ListItemAllFields/ClientSideApplicationId`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/GetFileByServerRelativePath(DecodedUrl='/sites/team-a/SitePages/page.aspx')?$expand=ListItemAllFields/ClientSideApplicationId`) > -1) {
         return {
           ListItemAllFields: {
             CommentsDisabled: false,
@@ -934,7 +934,7 @@ describe(commands.PAGE_TEXT_ADD, () => {
 
   it('correctly handles error when parsing modern page contents', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/page.aspx')?$expand=ListItemAllFields/ClientSideApplicationId`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/GetFileByServerRelativePath(DecodedUrl='/sites/team-a/SitePages/page.aspx')?$expand=ListItemAllFields/ClientSideApplicationId`) > -1) {
         return {
           ListItemAllFields: {
             CommentsDisabled: false,

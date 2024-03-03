@@ -1,7 +1,7 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
@@ -27,20 +27,24 @@ describe(commands.CHANNEL_MEMBER_REMOVE, () => {
     ]
   };
 
-  let cli: Cli;
   let log: string[];
   let logger: Logger;
-  let promptOptions: any;
   let commandInfo: CommandInfo;
 
   before(() => {
-    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
-    auth.service.connected = true;
-    commandInfo = Cli.getCommandInfo(command);
+    auth.connection.active = true;
+    commandInfo = cli.getCommandInfo(command);
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName: string, defaultValue: any) => {
+      if (settingName === 'prompt') {
+        return false;
+      }
+
+      return defaultValue;
+    });
   });
 
   beforeEach(() => {
@@ -57,22 +61,18 @@ describe(commands.CHANNEL_MEMBER_REMOVE, () => {
       }
     };
 
-    promptOptions = undefined;
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
-    sinon.stub(Cli, 'prompt').callsFake(async (options) => {
-      promptOptions = options;
-      return { continue: true };
-    });
     (command as any).items = [];
   });
 
   afterEach(() => {
     sinonUtil.restore([
-      Cli.prompt,
+      cli.promptForConfirmation,
       request.get,
       request.delete,
       cli.getSettingWithDefaultValue,
-      Cli.handleMultipleResultsFound
+      cli.handleMultipleResultsFound
     ]);
   });
 
@@ -454,7 +454,7 @@ describe(commands.CHANNEL_MEMBER_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinon.stub(Cli, 'handleMultipleResultsFound').resolves({
+    sinon.stub(cli, 'handleMultipleResultsFound').resolves({
       "id": "00000",
       "displayName": "User",
       "userId": "00000000-0000-0000-0000-000000000000",
@@ -596,8 +596,8 @@ describe(commands.CHANNEL_MEMBER_REMOVE, () => {
 
   it('aborts user removal when prompt not confirmed', async () => {
     const postSpy = sinon.spy(request, 'delete');
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: false });
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(false);
 
     await command.action(logger, {
       options: {
@@ -609,12 +609,9 @@ describe(commands.CHANNEL_MEMBER_REMOVE, () => {
     assert(postSpy.notCalled);
   });
 
-  it('prompts before user removal when confirm option not passed', async () => {
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async (options) => {
-      promptOptions = options;
-      return { continue: false };
-    });
+  it('prompts before user removal when force option not passed', async () => {
+    sinonUtil.restore(cli.promptForConfirmation);
+    const confirmationStub = sinon.stub(cli, 'promptForConfirmation').resolves(false);
 
     await command.action(logger, {
       options: {
@@ -623,13 +620,8 @@ describe(commands.CHANNEL_MEMBER_REMOVE, () => {
         id: '00000'
       }
     });
-    let promptIssued = false;
 
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
-
-    assert(promptIssued);
+    assert(confirmationStub.calledOnce);
   });
 
   it('correctly handles error when retrieving all teams', async () => {

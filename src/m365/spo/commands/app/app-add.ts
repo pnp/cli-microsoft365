@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import GlobalOptions from '../../../../GlobalOptions.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { spo } from '../../../../utils/spo.js';
@@ -126,7 +126,7 @@ class SpoAppAddCommand extends SpoAppBaseCommand {
       const res = await request.post<string>(requestOptions);
 
       const json: { UniqueId: string; } = JSON.parse(res);
-      if (!Cli.shouldTrimOutput(args.options.output)) {
+      if (!cli.shouldTrimOutput(args.options.output)) {
         await logger.log(json);
       }
       else {

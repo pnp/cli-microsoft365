@@ -58,7 +58,7 @@ Repeat the above step to also store the account password which should be named `
 
 Using the `Add new secret` link, enter the `APP_ID` into the `Name` field and the (client) id of the AAD application to connect to your Microsoft 365 tenant with, e.g. `d355e6f0-0aec-4b1f-b458-7040f91bc297`.
 
-Repeat the above step to also store the application's encoded certificate which should be named `CERTIFICATE_ENCODED`. If your certificate is encrypted with a password, then repeat one last time the previous step with a secret called `CERTIFICATE_PASSWORD`.
+Repeat the above step to also store the application's encoded certificate which should be named `CERTIFICATE_ENCODED` and the tenant id which should be named `TENANT_ID`. If your certificate is encrypted with a password, then repeat one last time the previous step with a secret called `CERTIFICATE_PASSWORD`.
 
 #### Setup workflow
 
@@ -137,6 +137,7 @@ We will update the initial configuration as shown below, replacing the existing 
           APP_ID: ${{ secrets.APP_ID }}
           CERTIFICATE_ENCODED: ${{ secrets.CERTIFICATE_ENCODED }}
           CERTIFICATE_PASSWORD: ${{ secrets.CERTIFICATE_PASSWORD }}
+          TENANT: ${{ secrets.TENANT_ID }}
 ```
 
 The `uses` property tells the build agent to use the `CLI for Microsoft 365` GitHub Action for the step, this will automatically become available when the workflow is triggered, no installation is required.
@@ -181,12 +182,13 @@ The `CLI for Microsoft 365 Login` action provides an optional input to specify a
           APP_ID: ${{ secrets.APP_ID }}
           CERTIFICATE_ENCODED: ${{ secrets.CERTIFICATE_ENCODED }}
           CERTIFICATE_PASSWORD: ${{ secrets.CERTIFICATE_PASSWORD }}
+          TENANT: ${{ secrets.TENANT_ID }}
           CLI_VERSION: next
 ```
 
 #### Specify the tenant to connect to
 
-Depending on the context, you could have to specify the tenant id if you have access to multiple tenants.
+Depending on the context, you will need to specify the tenant id.
 
 The `CLI for Microsoft 365 Login` allows you to indicate the targeting tenant (default `common`). It can be `organization` (if using an Azure AD app which is multitenant) or a tenant id.
 
@@ -249,6 +251,7 @@ jobs:
         APP_ID: ${{ secrets.APP_ID }}
         CERTIFICATE_ENCODED: ${{ secrets.CERTIFICATE_ENCODED }}
         CERTIFICATE_PASSWORD: ${{ secrets.CERTIFICATE_PASSWORD }}
+        TENANT: ${{ secrets.TENANT_ID }}
 
     - name: Deploy app to tenant app catalog
       id: M365clideploy
@@ -311,7 +314,7 @@ View on [GitHub Marketplace](https://github.com/marketplace/actions/cli-for-micr
 | `APP_ID`                | App ID of the Azure AD application to use for certificate authentication  | Optional (but required if `authType` is `certificate`) |
 | `CERTIFICATE_ENCODED`   | Base64-encoded string with certificate private key                        | Optional (but required if `authType` is `certificate`) |
 | `CERTIFICATE_PASSWORD`  | Password for the certificate                                              | Optional                                               |
-| `TENANT`                | ID of the tenant from which accounts should be able to authenticate       | Optional                                               |
+| `TENANT`                | ID of the tenant from which accounts should be able to authenticate       | Optional (but required if `authType` is `certificate`)                                              |
 | `CLI_VERSION`           | Accepts `latest`, `next` or a specific version tag                        | Optional                                               |
 
 ### Microsoft 365 Deploy App
@@ -344,7 +347,7 @@ View on [GitHub Marketplace](https://github.com/marketplace/actions/cli-for-micr
 | `M365_CLI_SCRIPT`      | The script to run            | Required |
 | `IS_POWERSHELL`        | Used only with `M365_CLI_SCRIPT`. If `true`, `M365_CLI_SCRIPT` will be passed as a PowerShell script, otherwise the assumption is `bash` script. Default is `false` | Optional |
 
-:::caution
+:::warning
 
 One of `M365_CLI_SCRIPT_PATH` / `M365_CLI_SCRIPT` is mandatory, in case both are defined `M365_CLI_SCRIPT_PATH` gets preference.
 

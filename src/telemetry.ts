@@ -1,30 +1,39 @@
-import appInsights from "./appInsights.js";
-import { Cli } from "./cli/Cli.js";
-import { settingsNames } from "./settingsNames.js";
+import child_process from 'child_process';
+import path from 'path';
+import url from 'url';
+import { cli } from './cli/cli.js';
+import { settingsNames } from './settingsNames.js';
+import { pid } from './utils/pid.js';
+import { session } from './utils/session.js';
 
-class Telemetry {
-  public trackEvent(commandName: string, properties: any): void {
-    if (Cli.getInstance().getSettingWithDefaultValue<boolean>(settingsNames.disableTelemetry, false)) {
-      return;
-    }
+const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
-    appInsights.trackEvent({
-      name: commandName,
-      properties
+function trackTelemetry(object: any): void {
+  try {
+    const child = child_process.spawn('node', [path.join(__dirname, 'telemetryRunner.js')], {
+      stdio: ['pipe', 'ignore', 'ignore'],
+      detached: true
     });
-    appInsights.flush();
-  }
+    child.unref();
 
-  public trackException(exception: any): void {
-    if (Cli.getInstance().getSettingWithDefaultValue<boolean>(settingsNames.disableTelemetry, false)) {
-      return;
-    }
+    object.shell = pid.getProcessName(process.ppid) || '';
+    object.session = session.getId(process.ppid);
 
-    appInsights.trackException({
-      exception
-    });
-    appInsights.flush();
+    child.stdin.write(JSON.stringify(object));
+    child.stdin.end();
   }
+  catch { }
 }
 
-export const telemetry = new Telemetry();
+export const telemetry = {
+  trackEvent: (commandName: string, properties: any): void => {
+    if (cli.getSettingWithDefaultValue<boolean>(settingsNames.disableTelemetry, false)) {
+      return;
+    }
+
+    trackTelemetry({
+      commandName,
+      properties
+    });
+  }
+};

@@ -4,7 +4,7 @@ import request, { CliRequestOptions } from '../../../../request.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
-import { aadUser } from '../../../../utils/aadUser.js';
+import { entraUser } from '../../../../utils/entraUser.js';
 
 interface CommandArgs {
   options: Options;
@@ -112,7 +112,7 @@ class PlannerRosterMemberGetCommand extends GraphCommand {
       return args.options.userId;
     }
 
-    return aadUser.getUserIdByUpn(args.options.userName!);
+    return entraUser.getUserIdByUpn(args.options.userName!);
   }
 }
 

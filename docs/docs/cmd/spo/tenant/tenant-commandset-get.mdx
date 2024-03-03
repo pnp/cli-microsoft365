@@ -4,7 +4,7 @@ import TabItem from '@theme/TabItem';
 
 # spo tenant commandset get
 
-Get a ListView Command Set that is installed tenant wide
+Get a ListView Command Set that is installed tenant-wide
 
 ## Usage
 
@@ -26,6 +26,10 @@ m365 spo tenant commandset get [options]
 ```
 
 <Global />
+
+## Remarks
+
+This command can be used for retrieving a ListView Command Set that's installed tenant-wide. To retrieve a ListView Command Set from a specific site, view our dedicated [spo commandset get](../commandset/commandset-get.mdx) command.
 
 ## Examples
 
@@ -142,7 +146,6 @@ m365 spo tenant commandset get --clientSideComponentId 7096cded-b83d-4eab-96f0-d
   GUID | 14125658-a9bc-4ddf-9c75-1b5767c9a337
   ComplianceAssetId | null
   TenantWideExtensionComponentId | 7096cded-b83d-4eab-96f0-df477ed7c0bc
-  TenantWideExtensionComponentProperties | {"testMessage":"Test message"}
   TenantWideExtensionWebTemplate | null
   TenantWideExtensionListTemplate | 101
   TenantWideExtensionLocation | ClientSideExtension.ListViewCommandSet.ContextMenu

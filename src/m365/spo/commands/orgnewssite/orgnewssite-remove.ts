@@ -1,4 +1,4 @@
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import config from '../../../../config.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
@@ -65,14 +65,9 @@ class SpoOrgNewsSiteRemoveCommand extends SpoCommand {
       await this.removeOrgNewsSite(logger, args.options.url);
     }
     else {
-      const result = await Cli.prompt<{ continue: boolean }>({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: `Are you sure you want to remove ${args.options.url} from the list of organizational news sites?`
-      });
+      const result = await cli.promptForConfirmation({ message: `Are you sure you want to remove ${args.options.url} from the list of organizational news sites?` });
 
-      if (result.continue) {
+      if (result) {
         await this.removeOrgNewsSite(logger, args.options.url);
       }
     }

@@ -1,7 +1,7 @@
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
-import { aadUser } from '../../../../utils/aadUser.js';
+import { entraUser } from '../../../../utils/entraUser.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
@@ -120,7 +120,7 @@ class PlannerRosterMemberAddCommand extends GraphCommand {
       return args.options.userId;
     }
 
-    const userId = await aadUser.getUserIdByUpn(args.options.userName!);
+    const userId = await entraUser.getUserIdByUpn(args.options.userName!);
 
     return userId;
   }

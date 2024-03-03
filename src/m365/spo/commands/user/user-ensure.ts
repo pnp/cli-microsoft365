@@ -1,7 +1,7 @@
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
-import { aadUser } from '../../../../utils/aadUser.js';
+import { entraUser } from '../../../../utils/entraUser.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
@@ -12,6 +12,7 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   webUrl: string;
+  entraId?: string;
   aadId?: string;
   userName?: string;
 }
@@ -37,6 +38,7 @@ class SpoUserEnsureCommand extends SpoCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
+        entraId: typeof args.options.entraId !== 'undefined',
         aadId: typeof args.options.aadId !== 'undefined',
         userName: typeof args.options.userName !== 'undefined'
       });
@@ -47,6 +49,9 @@ class SpoUserEnsureCommand extends SpoCommand {
     this.options.unshift(
       {
         option: '-u, --webUrl <webUrl>'
+      },
+      {
+        option: '--entraId [entraId]'
       },
       {
         option: '--aadId [aadId]'
@@ -65,6 +70,10 @@ class SpoUserEnsureCommand extends SpoCommand {
           return isValidSharePointUrl;
         }
 
+        if (args.options.entraId && !validation.isValidGuid(args.options.entraId)) {
+          return `${args.options.entraId} is not a valid GUID.`;
+        }
+
         if (args.options.aadId && !validation.isValidGuid(args.options.aadId)) {
           return `${args.options.aadId} is not a valid GUID.`;
         }
@@ -79,17 +88,23 @@ class SpoUserEnsureCommand extends SpoCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push({ options: ['aadId', 'userName'] });
+    this.optionSets.push({ options: ['entraId', 'aadId', 'userName'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    if (args.options.aadId) {
+      args.options.entraId = args.options.aadId;
+
+      this.warn(logger, `Option 'aadId' is deprecated. Please use 'entraId' instead`);
+    }
+
     if (this.verbose) {
-      await logger.logToStderr(`Ensuring user ${args.options.aadId || args.options.userName} at site ${args.options.webUrl}`);
+      await logger.logToStderr(`Ensuring user ${args.options.entraId || args.options.userName} at site ${args.options.webUrl}`);
     }
 
     try {
       const requestBody = {
-        logonName: args.options.userName || await this.getUpnByUserId(args.options.aadId!, logger)
+        logonName: args.options.userName || await this.getUpnByUserId(args.options.entraId!, logger)
       };
 
       const requestOptions: CliRequestOptions = {
@@ -109,12 +124,12 @@ class SpoUserEnsureCommand extends SpoCommand {
     }
   }
 
-  private async getUpnByUserId(aadId: string, logger: Logger): Promise<string> {
+  private async getUpnByUserId(entraId: string, logger: Logger): Promise<string> {
     if (this.verbose) {
-      await logger.logToStderr(`Retrieving user principal name for user with id ${aadId}`);
+      await logger.logToStderr(`Retrieving user principal name for user with id ${entraId}`);
     }
 
-    return await aadUser.getUpnByUserId(aadId);
+    return await entraUser.getUpnByUserId(entraId);
   }
 }
 

@@ -3,7 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
@@ -31,8 +31,8 @@ describe(commands.CONNECTOR_EXPORT, () => {
     sinon.stub(session, 'getId').returns('');
     mkdirSyncStub = sinon.stub(fs, 'mkdirSync').returns('');
     writeFileSyncStub = sinon.stub(fs, 'writeFileSync').returns();
-    auth.service.connected = true;
-    commandInfo = Cli.getCommandInfo(command);
+    auth.connection.active = true;
+    commandInfo = cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -62,7 +62,7 @@ describe(commands.CONNECTOR_EXPORT, () => {
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
+    auth.connection.active = false;
   });
 
   it('has correct name', () => {

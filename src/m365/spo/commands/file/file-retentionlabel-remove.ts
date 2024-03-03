@@ -1,15 +1,14 @@
-import { AxiosRequestConfig } from 'axios';
-import { Cli } from '../../../../cli/Cli.js';
+import * as url from 'url';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
-import Command from '../../../../Command.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
-import request from '../../../../request.js';
+import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
+import { spo } from '../../../../utils/spo.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
-import spoListItemRetentionLabelRemoveCommand, { Options as SpoListItemRetentionLabelRemoveCommandOptions } from '../listitem/listitem-retentionlabel-remove.js';
 import { FileProperties } from './FileProperties.js';
 
 interface CommandArgs {
@@ -39,6 +38,7 @@ class SpoFileRetentionLabelRemoveCommand extends SpoCommand {
     this.#initOptions();
     this.#initValidators();
     this.#initOptionSets();
+    this.#initTypes();
   }
 
   #initTelemetry(): void {
@@ -90,57 +90,42 @@ class SpoFileRetentionLabelRemoveCommand extends SpoCommand {
     this.optionSets.push({ options: ['fileUrl', 'fileId'] });
   }
 
+  #initTypes(): void {
+    this.types.string.push('webUrl', 'fileUrl', 'fileId');
+    this.types.boolean.push('force');
+  }
+
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (args.options.force) {
       await this.removeFileRetentionLabel(logger, args);
     }
     else {
-      const result = await Cli.prompt<{ continue: boolean }>({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: `Are you sure you want to remove the retentionlabel from file ${args.options.fileId || args.options.fileUrl} located in site ${args.options.webUrl}?`
-      });
+      const result = await cli.promptForConfirmation({ message: `Are you sure you want to remove the retentionlabel from file ${args.options.fileId || args.options.fileUrl} located in site ${args.options.webUrl}?` });
 
-      if (result.continue) {
+      if (result) {
         await this.removeFileRetentionLabel(logger, args);
       }
     }
   }
 
   private async removeFileRetentionLabel(logger: Logger, args: CommandArgs): Promise<void> {
-    if (this.verbose) {
-      await logger.logToStderr(`Removing retention label from file ${args.options.fileId || args.options.fileUrl} in site at ${args.options.webUrl}...`);
-    }
     try {
-      const fileProperties = await this.getFileProperties(args);
-      const options: SpoListItemRetentionLabelRemoveCommandOptions = {
-        webUrl: args.options.webUrl,
-        listId: fileProperties.listId,
-        listItemId: fileProperties.id,
-        force: true,
-        output: 'json',
-        debug: this.debug,
-        verbose: this.verbose
-      };
+      const fileProperties = await this.getFileProperties(logger, args);
+      const parsedUrl = url.parse(args.options.webUrl);
+      const tenantUrl: string = `${parsedUrl.protocol}//${parsedUrl.hostname}`;
+      const listAbsoluteUrl = urlUtil.urlCombine(tenantUrl, fileProperties.listServerRelativeUrl);
 
-      const spoListItemRetentionLabelRemoveCommandOutput = await Cli.executeCommandWithOutput(spoListItemRetentionLabelRemoveCommand as Command, { options: { ...options, _: [] } });
-      if (this.verbose) {
-        await logger.logToStderr(spoListItemRetentionLabelRemoveCommandOutput.stderr);
-      }
+      await spo.removeRetentionLabelFromListItems(args.options.webUrl, listAbsoluteUrl, [parseInt(fileProperties.listItemId)], logger, args.options.verbose);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
   }
 
-  private async getFileProperties(args: CommandArgs): Promise<{ id: string, listId: string }> {
-    const requestOptions: AxiosRequestConfig = {
-      headers: {
-        'accept': 'application/json;odata=nometadata'
-      },
-      responseType: 'json'
-    };
+  private async getFileProperties(logger: Logger, args: CommandArgs): Promise<{ listItemId: string, listServerRelativeUrl: string }> {
+    if (this.verbose) {
+      logger.logToStderr(`Retrieving list and item information for file '${args.options.fileId || args.options.fileUrl}' in site at ${args.options.webUrl}...`);
+    }
 
     let requestUrl = `${args.options.webUrl}/_api/web/`;
 
@@ -152,10 +137,16 @@ class SpoFileRetentionLabelRemoveCommand extends SpoCommand {
       requestUrl += `GetFileByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(serverRelativeUrl)}')`;
     }
 
-    requestOptions.url = `${requestUrl}?$expand=ListItemAllFields,ListItemAllFields/ParentList&$select=ListItemAllFields/ParentList/Id,ListItemAllFields/Id`;
+    const requestOptions: CliRequestOptions = {
+      url: `${requestUrl}?$expand=ListItemAllFields,ListItemAllFields/ParentList/RootFolder&$select=ServerRelativeUrl,ListItemAllFields/ParentList/RootFolder/ServerRelativeUrl,ListItemAllFields/Id`,
+      headers: {
+        'accept': 'application/json;odata=nometadata'
+      },
+      responseType: 'json'
+    };
 
     const response = await request.get<FileProperties>(requestOptions);
-    return { id: response.ListItemAllFields.Id, listId: response.ListItemAllFields.ParentList.Id };
+    return { listItemId: response.ListItemAllFields.Id, listServerRelativeUrl: response.ListItemAllFields.ParentList.RootFolder.ServerRelativeUrl };
   }
 }
 

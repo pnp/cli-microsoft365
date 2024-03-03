@@ -16,11 +16,11 @@ describe(commands.ACCESSTOKEN_GET, () => {
   let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    auth.service.connected = true;
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
+    auth.connection.active = true;
   });
 
   beforeEach(() => {
@@ -43,8 +43,8 @@ describe(commands.ACCESSTOKEN_GET, () => {
     sinonUtil.restore([
       auth.ensureAccessToken
     ]);
-    auth.service.accessTokens = {};
-    auth.service.spoUrl = undefined;
+    auth.connection.accessTokens = {};
+    auth.connection.spoUrl = undefined;
   });
 
   after(() => {
@@ -52,7 +52,7 @@ describe(commands.ACCESSTOKEN_GET, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.ACCESSTOKEN_GET), true);
+    assert.strictEqual(command.name, commands.ACCESSTOKEN_GET);
   });
 
   it('has a description', () => {
@@ -62,7 +62,7 @@ describe(commands.ACCESSTOKEN_GET, () => {
   it('retrieves access token for the specified resource', async () => {
     const d: Date = new Date();
     d.setMinutes(d.getMinutes() + 1);
-    auth.service.accessTokens['https://graph.microsoft.com'] = {
+    auth.connection.accessTokens['https://graph.microsoft.com'] = {
       expiresOn: d.toString(),
       accessToken: 'ABC'
     };
@@ -74,8 +74,8 @@ describe(commands.ACCESSTOKEN_GET, () => {
   it('retrieves access token for SharePoint when sharepoint specified as the resource and SPO URL previously retrieved', async () => {
     const d: Date = new Date();
     d.setMinutes(d.getMinutes() + 1);
-    auth.service.spoUrl = 'https://contoso.sharepoint.com';
-    auth.service.accessTokens['https://contoso.sharepoint.com'] = {
+    auth.connection.spoUrl = 'https://contoso.sharepoint.com';
+    auth.connection.accessTokens['https://contoso.sharepoint.com'] = {
       expiresOn: d.toString(),
       accessToken: 'ABC'
     };
@@ -85,7 +85,7 @@ describe(commands.ACCESSTOKEN_GET, () => {
   });
 
   it('correctly handles error when retrieving access token', async () => {
-    sinon.stub(auth, 'ensureAccessToken').callsFake(() => Promise.reject('An error has occurred'));
+    sinon.stub(auth, 'ensureAccessToken').rejects(new Error('An error has occurred'));
 
     await assert.rejects(command.action(logger, { options: { resource: 'https://graph.microsoft.com' } } as any), new CommandError('An error has occurred'));
   });
@@ -93,7 +93,7 @@ describe(commands.ACCESSTOKEN_GET, () => {
   it('returns error when sharepoint specified as resource and SPO URL not available', async () => {
     const d: Date = new Date();
     d.setMinutes(d.getMinutes() + 1);
-    auth.service.accessTokens['https://contoso.sharepoint.com'] = {
+    auth.connection.accessTokens['https://contoso.sharepoint.com'] = {
       expiresOn: d.toString(),
       accessToken: 'ABC'
     };
@@ -104,7 +104,7 @@ describe(commands.ACCESSTOKEN_GET, () => {
   it('retrieves access token for graph.microsoft.com when graph specified as the resource', async () => {
     const d: Date = new Date();
     d.setMinutes(d.getMinutes() + 1);
-    auth.service.accessTokens['https://graph.microsoft.com'] = {
+    auth.connection.accessTokens['https://graph.microsoft.com'] = {
       expiresOn: d.toString(),
       accessToken: 'ABC'
     };

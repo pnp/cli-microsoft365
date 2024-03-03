@@ -32,7 +32,7 @@ describe(commands.GET, () => {
         }
       ]
     }));
-    auth.service.connected = true;
+    auth.connection.active = true;
   });
 
   beforeEach(() => {
@@ -60,7 +60,7 @@ describe(commands.GET, () => {
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
+    auth.connection.active = false;
   });
 
   it('has correct name', () => {
@@ -173,6 +173,6 @@ describe(commands.GET, () => {
       }
     });
     const call: sinon.SinonSpyCall = loggerLogToStderrSpy.firstCall;
-    assert(call.args[0].includes('Executing command aad app get with options'));
+    assert(call.args[0].includes('Executing command entra app get with options'));
   });
 });

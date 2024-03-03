@@ -1,4 +1,4 @@
-import { Cli } from "../../../../cli/Cli.js";
+import { cli } from "../../../../cli/cli.js";
 import { Logger } from "../../../../cli/Logger.js";
 import GlobalOptions from "../../../../GlobalOptions.js";
 import { settingsNames } from "../../../../settingsNames.js";
@@ -65,10 +65,10 @@ class CliConfigResetCommand extends AnonymousCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (args.options.key) {
-      Cli.getInstance().config.delete(args.options.key);
+      cli.getConfig().delete(args.options.key);
     }
     else {
-      Cli.getInstance().config.clear();
+      cli.getConfig().clear();
     }
   }
 }

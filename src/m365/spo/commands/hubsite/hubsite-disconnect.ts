@@ -1,4 +1,4 @@
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
@@ -124,14 +124,9 @@ class SpoHubSiteDisconnectCommand extends SpoCommand {
       await disconnectHubSite();
     }
     else {
-      const result = await Cli.prompt<{ continue: boolean }>({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: `Are you sure you want disconnect hub site '${args.options.id || args.options.title || args.options.url}' from its parent hub site?`
-      });
+      const result = await cli.promptForConfirmation({ message: `Are you sure you want disconnect hub site '${args.options.id || args.options.title || args.options.url}' from its parent hub site?` });
 
-      if (result.continue) {
+      if (result) {
         await disconnectHubSite();
       }
     }
@@ -170,7 +165,7 @@ class SpoHubSiteDisconnectCommand extends SpoCommand {
 
     if (filteredHubSites.length > 1) {
       const resultAsKeyValuePair = formatting.convertArrayToHashTable('ID', filteredHubSites);
-      const result = await Cli.handleMultipleResultsFound<HubSite>(`Multiple hub sites with name '${options.title}' found.`, resultAsKeyValuePair);
+      const result = await cli.handleMultipleResultsFound<HubSite>(`Multiple hub sites with name '${options.title}' found.`, resultAsKeyValuePair);
       return result as { 'odata.etag': string, ID: string };
     }
 

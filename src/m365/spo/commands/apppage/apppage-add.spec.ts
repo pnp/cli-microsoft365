@@ -1,7 +1,7 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
@@ -23,8 +23,8 @@ describe(commands.APPPAGE_ADD, () => {
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
-    auth.service.connected = true;
-    commandInfo = Cli.getCommandInfo(command);
+    auth.connection.active = true;
+    commandInfo = cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -51,7 +51,7 @@ describe(commands.APPPAGE_ADD, () => {
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
+    auth.connection.active = false;
   });
 
   it('has correct name', () => {
@@ -81,7 +81,7 @@ describe(commands.APPPAGE_ADD, () => {
       throw 'Invalid request';
     });
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/SitePages/lp4blf70.aspx')?$expand=ListItemAllFields`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/GetFileByServerRelativePath(DecodedUrl='/SitePages/lp4blf70.aspx')?$expand=ListItemAllFields`) > -1) {
         return {
           "ListItemAllFields": {
             "FileSystemObjectType": 0,
@@ -166,7 +166,7 @@ describe(commands.APPPAGE_ADD, () => {
       throw 'Invalid request';
     });
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/SitePages/lp4blf70.aspx')?$expand=ListItemAllFields`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/GetFileByServerRelativePath(DecodedUrl='/SitePages/lp4blf70.aspx')?$expand=ListItemAllFields`) > -1) {
         return {
           "ListItemAllFields": {
             "FileSystemObjectType": 0,
@@ -252,7 +252,7 @@ describe(commands.APPPAGE_ADD, () => {
       throw 'Invalid request';
     });
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/SitePages/lp4blf70.aspx')?$expand=ListItemAllFields`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/GetFileByServerRelativePath(DecodedUrl='/SitePages/lp4blf70.aspx')?$expand=ListItemAllFields`) > -1) {
         throw 'Page not found';
       }
       throw 'Invalid request';
@@ -275,7 +275,7 @@ describe(commands.APPPAGE_ADD, () => {
       throw 'Invalid request';
     });
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/SitePages/lp4blf70.aspx')?$expand=ListItemAllFields`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/GetFileByServerRelativePath(DecodedUrl='/SitePages/lp4blf70.aspx')?$expand=ListItemAllFields`) > -1) {
         return {
           "ListItemAllFields": {
             "FileSystemObjectType": 0,

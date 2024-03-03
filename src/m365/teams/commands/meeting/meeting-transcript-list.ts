@@ -1,7 +1,7 @@
 import auth from '../../../../Auth.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import { Logger } from '../../../../cli/Logger.js';
-import { aadUser } from '../../../../utils/aadUser.js';
+import { entraUser } from '../../../../utils/entraUser.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 import { odata } from '../../../../utils/odata.js';
 import { validation } from '../../../../utils/validation.js';
@@ -97,7 +97,7 @@ class TeamsMeetingTranscriptListCommand extends GraphCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
-      const isAppOnlyAccessToken: boolean | undefined = accessToken.isAppOnlyAccessToken(auth.service.accessTokens[this.resource].accessToken);
+      const isAppOnlyAccessToken: boolean | undefined = accessToken.isAppOnlyAccessToken(auth.connection.accessTokens[this.resource].accessToken);
       if (this.verbose) {
         await logger.logToStderr(`Retrieving transcript list for the given meeting...`);
       }
@@ -119,7 +119,7 @@ class TeamsMeetingTranscriptListCommand extends GraphCommand {
           if (this.verbose) {
             await logger.logToStderr(`Getting user ID for user with email '${args.options.email}'.`);
           }
-          const userId: string = await aadUser.getUserIdByEmail(args.options.email!);
+          const userId: string = await entraUser.getUserIdByEmail(args.options.email!);
           requestUrl += userId;
         }
       }

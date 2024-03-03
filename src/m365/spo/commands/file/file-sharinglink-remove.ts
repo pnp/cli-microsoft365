@@ -1,4 +1,4 @@
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
@@ -16,7 +16,7 @@ interface Options extends GlobalOptions {
   fileUrl?: string;
   fileId?: string;
   id: string;
-  force?: boolean
+  force?: boolean;
 }
 
 class SpoFileSharingLinkRemoveCommand extends SpoCommand {
@@ -35,6 +35,7 @@ class SpoFileSharingLinkRemoveCommand extends SpoCommand {
     this.#initOptions();
     this.#initValidators();
     this.#initOptionSets();
+    this.#initTypes();
   }
 
   #initTelemetry(): void {
@@ -88,6 +89,11 @@ class SpoFileSharingLinkRemoveCommand extends SpoCommand {
     this.optionSets.push({ options: ['fileUrl', 'fileId'] });
   }
 
+  #initTypes(): void {
+    this.types.string.push('webUrl', 'fileUrl', 'fileId', 'id');
+    this.types.boolean.push('force');
+  }
+
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const removeSharingLink = async (): Promise<void> => {
       try {
@@ -115,14 +121,9 @@ class SpoFileSharingLinkRemoveCommand extends SpoCommand {
       await removeSharingLink();
     }
     else {
-      const result = await Cli.prompt<{ continue: boolean }>({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: `Are you sure you want to remove sharing link ${args.options.id} of file ${args.options.fileUrl || args.options.fileId}?`
-      });
+      const result = await cli.promptForConfirmation({ message: `Are you sure you want to remove sharing link ${args.options.id} of file ${args.options.fileUrl || args.options.fileId}?` });
 
-      if (result.continue) {
+      if (result) {
         await removeSharingLink();
       }
     }

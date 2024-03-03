@@ -14,9 +14,10 @@ import { RoleDefinition } from '../m365/spo/commands/roledefinition/RoleDefiniti
 import { RoleType } from '../m365/spo/commands/roledefinition/RoleType.js';
 import { DeletedSiteProperties } from '../m365/spo/commands/site/DeletedSiteProperties.js';
 import { SiteProperties } from '../m365/spo/commands/site/SiteProperties.js';
-import { aadGroup } from './aadGroup.js';
+import { entraGroup } from './entraGroup.js';
 import { SharingCapabilities } from '../m365/spo/commands/site/SharingCapabilities.js';
 import { WebProperties } from '../m365/spo/commands/web/WebProperties.js';
+import { Site } from '@microsoft/microsoft-graph-types';
 
 export interface ContextInfo {
   FormDigestTimeoutSeconds: number;
@@ -158,12 +159,12 @@ export const spo = {
   },
 
   async getSpoUrl(logger: Logger, debug: boolean): Promise<string> {
-    if (auth.service.spoUrl) {
+    if (auth.connection.spoUrl) {
       if (debug) {
-        await logger.logToStderr(`SPO URL previously retrieved ${auth.service.spoUrl}. Returning...`);
+        await logger.logToStderr(`SPO URL previously retrieved ${auth.connection.spoUrl}. Returning...`);
       }
 
-      return Promise.resolve(auth.service.spoUrl);
+      return Promise.resolve(auth.connection.spoUrl);
     }
 
     return new Promise<string>(async (resolve: (spoUrl: string) => void, reject: (error: any) => void): Promise<void> => {
@@ -182,14 +183,14 @@ export const spo = {
       request
         .get<{ webUrl: string }>(requestOptions)
         .then((res: { webUrl: string }): Promise<void> => {
-          auth.service.spoUrl = res.webUrl;
+          auth.connection.spoUrl = res.webUrl;
           return auth.storeConnectionInfo();
         })
         .then((): void => {
-          resolve(auth.service.spoUrl as string);
+          resolve(auth.connection.spoUrl as string);
         }, (err: any): void => {
-          if (auth.service.spoUrl) {
-            resolve(auth.service.spoUrl);
+          if (auth.connection.spoUrl) {
+            resolve(auth.connection.spoUrl);
           }
           else {
             reject(err);
@@ -211,12 +212,12 @@ export const spo = {
   },
 
   async getTenantId(logger: Logger, debug: boolean): Promise<string> {
-    if (auth.service.tenantId) {
+    if (auth.connection.spoTenantId) {
       if (debug) {
-        await logger.logToStderr(`SPO Tenant ID previously retrieved ${auth.service.tenantId}. Returning...`);
+        await logger.logToStderr(`SPO Tenant ID previously retrieved ${auth.connection.spoTenantId}. Returning...`);
       }
 
-      return Promise.resolve(auth.service.tenantId);
+      return Promise.resolve(auth.connection.spoTenantId);
     }
 
     return new Promise<string>(async (resolve: (spoUrl: string) => void, reject: (error: any) => void): Promise<void> => {
@@ -246,14 +247,14 @@ export const spo = {
         })
         .then((res: string): Promise<void> => {
           const json: string[] = JSON.parse(res);
-          auth.service.tenantId = (json[json.length - 1] as any)._ObjectIdentity_.replace('\n', '&#xA;');
+          auth.connection.spoTenantId = (json[json.length - 1] as any)._ObjectIdentity_.replace('\n', '&#xA;');
           return auth.storeConnectionInfo();
         })
         .then((): void => {
-          resolve(auth.service.tenantId as string);
+          resolve(auth.connection.spoTenantId as string);
         }, (err: any): void => {
-          if (auth.service.tenantId) {
-            resolve(auth.service.tenantId);
+          if (auth.connection.spoTenantId) {
+            resolve(auth.connection.spoTenantId);
           }
           else {
             reject(err);
@@ -1213,7 +1214,7 @@ export const spo = {
         }
 
         if (typeof isPublic !== 'undefined') {
-          promises.push(aadGroup.setGroup(groupId as string, (isPublic === false), logger, verbose));
+          promises.push(entraGroup.setGroup(groupId as string, (isPublic === false), logger, verbose));
         }
         if (typeof owners !== 'undefined') {
           promises.push(spo.setGroupifiedSiteOwners(spoAdminUrl, groupId, owners, logger, verbose));
@@ -1453,5 +1454,153 @@ export const spo = {
     const webProperties: WebProperties = await request.get<WebProperties>(requestOptions);
 
     return webProperties;
+  },
+
+  /**
+   * Applies the retention label to the items in the given list.
+   * @param webUrl The url of the web
+   * @param name The name of the label
+   * @param listAbsoluteUrl The absolute Url to the list
+   * @param itemIds The list item Ids to apply the label to. (A maximum 100 is allowed)
+   * @param logger The logger object
+   * @param verbose Set for verbose logging
+   */
+  async applyRetentionLabelToListItems(webUrl: string, name: string, listAbsoluteUrl: string, itemIds: number[], logger?: Logger, verbose?: boolean): Promise<void> {
+    if (verbose && logger) {
+      logger.logToStderr(`Applying retention label '${name}' to item(s) in list '${listAbsoluteUrl}'...`);
+    }
+
+    const requestOptions: CliRequestOptions = {
+      url: `${webUrl}/_api/SP_CompliancePolicy_SPPolicyStoreProxy_SetComplianceTagOnBulkItems`,
+      headers: {
+        'accept': 'application/json;odata=nometadata'
+      },
+      data: {
+        listUrl: listAbsoluteUrl,
+        complianceTagValue: name,
+        itemIds: itemIds
+      },
+      responseType: 'json'
+    };
+
+    await request.post(requestOptions);
+  },
+
+  /**
+   * Removes the retention label from the items in the given list.
+   * @param webUrl The url of the web
+   * @param listAbsoluteUrl The absolute Url to the list
+   * @param itemIds The list item Ids to clear the label from (A maximum 100 is allowed)
+   * @param logger The logger object
+   * @param verbose Set for verbose logging
+   */
+  async removeRetentionLabelFromListItems(webUrl: string, listAbsoluteUrl: string, itemIds: number[], logger?: Logger, verbose?: boolean): Promise<void> {
+    if (verbose && logger) {
+      logger.logToStderr(`Removing retention label from item(s) in list '${listAbsoluteUrl}'...`);
+    }
+
+    const requestOptions: CliRequestOptions = {
+      url: `${webUrl}/_api/SP_CompliancePolicy_SPPolicyStoreProxy_SetComplianceTagOnBulkItems`,
+      headers: {
+        'accept': 'application/json;odata=nometadata'
+      },
+      data: {
+        listUrl: listAbsoluteUrl,
+        complianceTagValue: '',
+        itemIds: itemIds
+      },
+      responseType: 'json'
+    };
+
+    await request.post(requestOptions);
+  },
+
+  /**
+   * Applies a default retention label to a list or library.
+   * @param webUrl The url of the web
+   * @param name The name of the label
+   * @param listAbsoluteUrl The absolute Url to the list
+   * @param syncToItems If the label needs to be synced to existing items/files.
+   * @param logger The logger object
+   * @param verbose Set for verbose logging
+   */
+  async applyDefaultRetentionLabelToList(webUrl: string, name: string, listAbsoluteUrl: string, syncToItems?: boolean, logger?: Logger, verbose?: boolean): Promise<void> {
+    if (verbose && logger) {
+      logger.logToStderr(`Applying default retention label '${name}' to the list '${listAbsoluteUrl}'...`);
+    }
+
+    const requestOptions: CliRequestOptions = {
+      url: `${webUrl}/_api/SP_CompliancePolicy_SPPolicyStoreProxy_SetListComplianceTag`,
+      headers: {
+        'accept': 'application/json;odata=nometadata'
+      },
+      data: {
+        listUrl: listAbsoluteUrl,
+        complianceTagValue: name,
+        blockDelete: false,
+        blockEdit: false,
+        syncToItems: syncToItems || false
+      },
+      responseType: 'json'
+    };
+
+    await request.post(requestOptions);
+  },
+
+  /**
+   * Removes the default retention label from a list or library.
+   * @param webUrl The url of the web
+   * @param listAbsoluteUrl The absolute Url to the list
+   * @param logger The logger object
+   * @param verbose Set for verbose logging
+   */
+  async removeDefaultRetentionLabelFromList(webUrl: string, listAbsoluteUrl: string, logger?: Logger, verbose?: boolean): Promise<void> {
+    if (verbose && logger) {
+      logger.logToStderr(`Removing the default retention label from the list '${listAbsoluteUrl}'...`);
+    }
+
+    const requestOptions: CliRequestOptions = {
+      url: `${webUrl}/_api/SP_CompliancePolicy_SPPolicyStoreProxy_SetListComplianceTag`,
+      headers: {
+        'accept': 'application/json;odata=nometadata'
+      },
+      data: {
+        listUrl: listAbsoluteUrl,
+        complianceTagValue: '',
+        blockDelete: false,
+        blockEdit: false,
+        syncToItems: false
+      },
+      responseType: 'json'
+    };
+
+    await request.post(requestOptions);
+  },
+
+
+  /**
+   * Retrieves the site ID for a given web URL.
+   * @param webUrl The web URL for which to retrieve the site ID.
+   * @param logger The logger object.
+   * @param verbose Set for verbose logging
+   * @returns A promise that resolves to the site ID.
+   */
+  async getSiteId(webUrl: string, logger?: Logger, verbose?: boolean): Promise<string> {
+    if (verbose && logger) {
+      logger.logToStderr(`Getting site id for URL: ${webUrl}...`);
+    }
+
+    const url: URL = new URL(webUrl);
+    const requestOptions: CliRequestOptions = {
+      url: `https://graph.microsoft.com/v1.0/sites/${formatting.encodeQueryParameter(url.host)}:${url.pathname}?$select=id`,
+      headers: {
+        accept: 'application/json;odata.metadata=none'
+      },
+      responseType: 'json'
+    };
+
+    const site: Site = await request.get<Site>(requestOptions);
+
+    return site.id as string;
   }
 };

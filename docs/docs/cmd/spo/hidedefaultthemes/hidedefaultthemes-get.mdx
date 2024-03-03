@@ -1,4 +1,6 @@
 import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 # spo hidedefaultthemes get
 
@@ -24,12 +26,45 @@ To use this command you have to have permissions to access the tenant admin site
 
 ## Examples
 
-Get the current value of the HideDefaultThemes setting
+Get the current value of the HideDefaultThemes setting.
 
 ```sh
 m365 spo hidedefaultthemes get
 ```
 
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  false
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  false
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  false
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  false
+  ```
+
+  </TabItem>
+</Tabs>
+
 ## More information
 
-- SharePoint site theming: [https://docs.microsoft.com/en-us/sharepoint/dev/declarative-customization/site-theming/sharepoint-site-theming-overview](https://docs.microsoft.com/en-us/sharepoint/dev/declarative-customization/site-theming/sharepoint-site-theming-overview)
+- SharePoint site theming: [https://learn.microsoft.com/sharepoint/dev/declarative-customization/site-theming/sharepoint-site-theming-overview](https://learn.microsoft.com/sharepoint/dev/declarative-customization/site-theming/sharepoint-site-theming-overview)

@@ -46,7 +46,7 @@ m365 spo tenant commandset add --title "YourAppCustomizer" --clientSideComponent
 
 Note, how the clientSideComponentProperties option has escaped double quotes `'{\"testMessage\":\"Test message\"}'` compared to execution from bash `'{"testMessage":"Test message"}'`.
 
-:::caution Escaping JSON in PowerShell
+:::warning[Escaping JSON in PowerShell]
 
 When using the `--clientSideComponentProperties` option it's possible to enter a JSON string. In PowerShell 5 to 7.2 [specific escaping rules](./../../../user-guide/using-cli.mdx#escaping-double-quotes-in-powershell) apply due to an issue. Remember that you can also use [file tokens](./../../../user-guide/using-cli.mdx#passing-complex-content-into-cli-options) instead.
 
@@ -57,6 +57,8 @@ When using the `--clientSideComponentProperties` option it's possible to enter a
 To use this command, you need to be a SharePoint Admin.
 
 :::
+
+This command can be used for configuring a tenant-wide ListView Command Set. To configure a ListView Command Set on a specific site, view our dedicated [spo commandset add](../commandset/commandset-add.mdx) command.
 
 ## Examples
 
@@ -170,7 +172,6 @@ m365 spo tenant commandset  add --title "Some customizer" --clientSideComponentI
   GUID | 14125658-a9bc-4ddf-9c75-1b5767c9a337
   ComplianceAssetId | null
   TenantWideExtensionComponentId | 7096cded-b83d-4eab-96f0-df477ed7c0bc
-  TenantWideExtensionComponentProperties | {"testMessage":"Test message"}
   TenantWideExtensionWebTemplate | null
   TenantWideExtensionListTemplate | 101
   TenantWideExtensionLocation | ClientSideExtension.ListViewCommandSet.ContextMenu

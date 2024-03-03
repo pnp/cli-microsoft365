@@ -71,7 +71,9 @@ class SpfxProjectDoctorCommand extends BaseProjectCommand {
     '1.17.2',
     '1.17.3',
     '1.17.4',
-    '1.18.0'
+    '1.18.0',
+    '1.18.1',
+    '1.18.2'
   ];
 
   protected get allowedOutputs(): string[] {
@@ -283,6 +285,7 @@ class SpfxProjectDoctorCommand extends BaseProjectCommand {
   }
 
   private getMdReport(findings: FindingToReport[]): string {
+    const projectName = this.getProject(this.projectRootPath as string).packageSolutionJson?.solution?.name;
     const findingsToReport: string[] = [];
     const reportData: ReportData = this.getReportData(findings);
 
@@ -312,7 +315,7 @@ ${f.resolution}
     });
 
     const s: string[] = [
-      `# Validate project ${path.basename(this.projectRootPath as string)}`, os.EOL,
+      `# Validate project ${projectName}`, os.EOL,
       os.EOL,
       `Date: ${(new Date().toLocaleDateString())}`, os.EOL,
       os.EOL,
@@ -343,8 +346,9 @@ ${f.resolution}
   }
 
   private getTourReport(findings: FindingToReport[]): string {
+    const projectName = this.getProject(this.projectRootPath as string).packageSolutionJson?.solution?.name;
     const tourFindings: FindingTour = {
-      title: `Validate project ${path.basename(this.projectRootPath as string)}`,
+      title: `Validate project ${projectName}`,
       steps: []
     };
 

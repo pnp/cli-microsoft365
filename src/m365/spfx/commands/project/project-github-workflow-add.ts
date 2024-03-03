@@ -139,7 +139,7 @@ class SpfxProjectGithubWorkflowAddCommand extends BaseProjectCommand {
   }
 
   private updateWorkflow(solutionName: string, workflow: gitHubWorkflow, options: GlobalOptions): void {
-    workflow.name = workflow.name.replace('{{ name }}', options.name ?? solutionName);
+    workflow.name = options.name ? options.name : workflow.name.replace('{{ name }}', solutionName);
 
     if (options.branchName) {
       workflow.on.push.branches[0] = options.branchName;
@@ -148,6 +148,24 @@ class SpfxProjectGithubWorkflowAddCommand extends BaseProjectCommand {
     if (options.manuallyTrigger) {
       // eslint-disable-next-line camelcase
       workflow.on.workflow_dispatch = null;
+    }
+
+    const version = this.getProjectVersion();
+
+    if (!version) {
+      throw `Unable to determine the version of the current SharePoint Framework project`;
+    }
+
+    const match = version.match(/^(\d+)\.(\d+)\.(\d+)$/);
+    const minorVersionString = match ? match[2] : null;
+    const minorVersion = minorVersionString ? Number(minorVersionString) : null;
+
+    if (minorVersion === null || isNaN(minorVersion)) {
+      throw `Unable to determine the minor version of the current SharePoint Framework project`;
+    }
+
+    if (minorVersion < 18) {
+      this.getNodeAction(workflow).with!['node-version'] = '16.x';
     }
 
     if (options.skipFeatureDeployment) {
@@ -186,6 +204,11 @@ class SpfxProjectGithubWorkflowAddCommand extends BaseProjectCommand {
   private getDeployAction(workflow: gitHubWorkflow): gitHubWorkflowStep {
     const steps = this.getWorkFlowSteps(workflow);
     return steps.find(step => step.uses && step.uses.indexOf('action-cli-deploy') >= 0)!;
+  }
+
+  private getNodeAction(workflow: gitHubWorkflow): gitHubWorkflowStep {
+    const steps = this.getWorkFlowSteps(workflow);
+    return steps.find(step => step.uses && step.uses.indexOf('actions/setup-node@') >= 0)!;
   }
 
   private getWorkFlowSteps(workflow: gitHubWorkflow): gitHubWorkflowStep[] {

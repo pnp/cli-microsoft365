@@ -1,4 +1,4 @@
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import { odata } from '../../../../utils/odata.js';
@@ -40,6 +40,7 @@ class SpoFileSharingLinkListCommand extends SpoCommand {
     this.#initOptions();
     this.#initValidators();
     this.#initOptionSets();
+    this.#initTypes();
   }
 
   #initTelemetry(): void {
@@ -95,6 +96,10 @@ class SpoFileSharingLinkListCommand extends SpoCommand {
     this.optionSets.push({ options: ['fileId', 'fileUrl'] });
   }
 
+  #initTypes(): void {
+    this.types.string.push('webUrl', 'fileId', 'fileUrl', 'scope');
+  }
+
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
       await logger.logToStderr(`Retrieving sharing links for file ${args.options.fileId || args.options.fileUrl}...`);
@@ -109,7 +114,7 @@ class SpoFileSharingLinkListCommand extends SpoCommand {
 
       const sharingLinks = await odata.getAllItems<any>(url);
 
-      if (!args.options.output || !Cli.shouldTrimOutput(args.options.output)) {
+      if (!args.options.output || !cli.shouldTrimOutput(args.options.output)) {
         await logger.log(sharingLinks);
       }
       else {

@@ -2,7 +2,7 @@ import Global from '/docs/cmd/_global.mdx';
 
 # spo commandset remove
 
-Remove a ListView Command Set that is added to a site.
+Remove a ListView Command Set that is added to a site
 
 ## Usage
 
@@ -26,13 +26,17 @@ m365 spo commandset remove [options]
 : The id of the ListView Command Set. Specify either `title`, `id` or `clientSideComponentId`.
 
 `-s, --scope [scope]`
-: Scope of the ListView Command Set. Allowed values: `Site`, `Web`, `All`. Defaults to `All`.
+: Scope of the ListView Command Set. Allowed values are: `Site`, `Web`, `All`. Defaults to `All`.
 
 `-f, --force`
-: Don't prompt for confirming removal of the ListView Command Set
+: Don't prompt for confirming removal of the ListView Command Set.
 ```
 
 <Global />
+
+## Remarks
+
+This command can be used for removing a ListView Command Set from a specific site. To remove a ListView Command Set that's installed tenant-wide, view our dedicated [spo tenant commandset remove](../tenant/tenant-commandset-remove.mdx) command.
 
 ## Examples
 

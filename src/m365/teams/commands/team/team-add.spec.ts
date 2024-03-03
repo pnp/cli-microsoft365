@@ -2,12 +2,12 @@ import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
 import { CommandError } from '../../../../Command.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import request from '../../../../request.js';
 import { telemetry } from '../../../../telemetry.js';
-import { aadGroup } from '../../../../utils/aadGroup.js';
+import { entraGroup } from '../../../../utils/entraGroup.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
@@ -25,8 +25,8 @@ describe(commands.TEAM_ADD, () => {
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
-    auth.service.connected = true;
-    commandInfo = Cli.getCommandInfo(command);
+    auth.connection.active = true;
+    commandInfo = cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -51,13 +51,13 @@ describe(commands.TEAM_ADD, () => {
     sinonUtil.restore([
       request.post,
       request.get,
-      aadGroup.getGroupById
+      entraGroup.getGroupById
     ]);
   });
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
+    auth.connection.active = false;
   });
 
   it('has correct name', () => {
@@ -90,7 +90,7 @@ describe(commands.TEAM_ADD, () => {
       }
       throw 'Invalid request';
     });
-    const aadGroupStub = sinon.stub(aadGroup, 'getGroupById').callsFake(async (groupId: string) => {
+    const aadGroupStub = sinon.stub(entraGroup, 'getGroupById').callsFake(async (groupId: string) => {
       if (firstCall) {
         firstCall = false;
         throw {

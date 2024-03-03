@@ -1,6 +1,6 @@
 import os from 'os';
 import auth, { AuthType } from '../../../Auth.js';
-import { Cli } from '../../../cli/Cli.js';
+import { cli } from '../../../cli/cli.js';
 import { Logger } from '../../../cli/Logger.js';
 import Command from '../../../Command.js';
 import { app } from '../../../utils/app.js';
@@ -21,7 +21,7 @@ interface CliDiagnosticInfo {
   cliVersion: string;
   cliConfig: any;
   roles: string[];
-  scopes: string[];
+  scopes: object;
 }
 
 class CliDoctorCommand extends Command {
@@ -35,13 +35,16 @@ class CliDoctorCommand extends Command {
 
   public async commandAction(logger: Logger): Promise<void> {
     const roles: string[] = [];
-    const scopes: string[] = [];
+    const scopes: Map<string, string[]> = new Map<string, string[]>();
 
-    Object.keys(auth.service.accessTokens).forEach(resource => {
-      const accessToken: string = auth.service.accessTokens[resource].accessToken;
+    Object.keys(auth.connection.accessTokens).forEach(resource => {
+      const accessToken: string = auth.connection.accessTokens[resource].accessToken;
 
       this.getRolesFromAccessToken(accessToken).forEach(role => roles.push(role));
-      this.getScopesFromAccessToken(accessToken).forEach(scope => scopes.push(scope));
+      const [res, scp] = this.getScopesFromAccessToken(accessToken);
+      if (res !== "") {
+        scopes.set(res, scp);
+      }
     });
 
     const diagnosticInfo: CliDiagnosticInfo = {
@@ -52,13 +55,13 @@ class CliDoctorCommand extends Command {
       },
       cliVersion: app.packageJson().version,
       nodeVersion: process.version,
-      cliAadAppId: auth.service.appId,
-      cliAadAppTenant: validation.isValidGuid(auth.service.tenant) ? 'single' : auth.service.tenant,
-      authMode: AuthType[auth.service.authType],
+      cliAadAppId: auth.connection.appId,
+      cliAadAppTenant: validation.isValidGuid(auth.connection.tenant) ? 'single' : auth.connection.tenant,
+      authMode: AuthType[auth.connection.authType],
       cliEnvironment: process.env.CLIMICROSOFT365_ENV ? process.env.CLIMICROSOFT365_ENV : '',
-      cliConfig: Cli.getInstance().config.all,
+      cliConfig: cli.getConfig().all,
       roles: roles,
-      scopes: scopes
+      scopes: Object.fromEntries(scopes)
     };
 
     await logger.log(diagnosticInfo);
@@ -85,26 +88,28 @@ class CliDoctorCommand extends Command {
     return roles;
   }
 
-  private getScopesFromAccessToken(accessToken: string): string[] {
+  private getScopesFromAccessToken(accessToken: string): [string, string[]] {
+    let resource: string = "";
     let scopes: string[] = [];
 
     if (!accessToken || accessToken.length === 0) {
-      return scopes;
+      return [resource, scopes];
     }
 
     const chunks = accessToken.split('.');
     if (chunks.length !== 3) {
-      return scopes;
+      return [resource, scopes];
     }
 
     const tokenString: string = Buffer.from(chunks[1], 'base64').toString();
 
-    const token: { scp: string } = JSON.parse(tokenString);
+    const token: { aud: string, scp: string } = JSON.parse(tokenString);
     if (token.scp?.length > 0) {
+      resource = token.aud.replace(/(-my|-admin).sharepoint.com/, '.sharepoint.com');
       scopes = token.scp.split(' ');
     }
 
-    return scopes;
+    return [resource, scopes];
   }
 }
 

@@ -2,7 +2,7 @@ import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
 import { CommandError } from '../../../../Command.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import config from '../../../../config.js';
@@ -53,14 +53,12 @@ describe(commands.TERM_GET, () => {
   const csomResponseByName = [{ "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.23325.12003", "ErrorInfo": null, "TraceCorrelationId": "47ff93a0-c06c-6000-110c-be1cdced2038" }, 2, { "IsNull": false }, 3, { "_ObjectIdentity_": "47ff93a0-c06c-6000-110c-be1cdced2038|fec14c62-7c3b-481b-851b-c80d7802b224:ss:" }, 5, { "IsNull": false }, 6, { "_ObjectIdentity_": "47ff93a0-c06c-6000-110c-be1cdced2038|fec14c62-7c3b-481b-851b-c80d7802b224:st:kTm3XibpGUiE5nxBtVMTfw==" }, 8, { "IsNull": false }, 10, { "IsNull": false }, 11, { "_ObjectIdentity_": "47ff93a0-c06c-6000-110c-be1cdced2038|fec14c62-7c3b-481b-851b-c80d7802b224:gr:kTm3XibpGUiE5nxBtVMTf25aOnte4ElDn7uvWBPvXfg=" }, 13, { "IsNull": false }, 15, { "IsNull": false }, 16, { "_ObjectIdentity_": "47ff93a0-c06c-6000-110c-be1cdced2038|fec14c62-7c3b-481b-851b-c80d7802b224:se:kTm3XibpGUiE5nxBtVMTf25aOnte4ElDn7uvWBPvXfjuQ1jPsltwT78ny15SLpmt" }, 18, { "IsNull": false }, 22, { "IsNull": false }, 23, { "_ObjectType_": "SP.Taxonomy.TermCollection", "_Child_Items_": [{ "_ObjectType_": "SP.Taxonomy.Term", "_ObjectIdentity_": "47ff93a0-c06c-6000-110c-be1cdced2038|fec14c62-7c3b-481b-851b-c80d7802b224:te:kTm3XibpGUiE5nxBtVMTf25aOnte4ElDn7uvWBPvXfjuQ1jPsltwT78ny15SLpmtK3lNMyYAhkSlk6IDG1ZBBA==", "CreatedDate": "\/Date(1675790684037)\/", "Id": "\/Guid(334d792b-0026-4486-a593-a2031b564104)\/", "LastModifiedDate": "\/Date(1675790684037)\/", "Name": "Test Term", "CustomProperties": {}, "CustomSortOrder": null, "IsAvailableForTagging": true, "Owner": "i:0#.f|membership|joe@contoso.com", "Description": "", "IsDeprecated": false, "IsKeyword": false, "IsPinned": false, "IsPinnedRoot": false, "IsReused": false, "IsRoot": true, "IsSourceTerm": true, "LocalCustomProperties": {}, "MergedTermIds": [], "PathOfTerm": "Test Term", "TermsCount": 1 }] }];
   //#endregion
 
-  let cli: Cli;
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
 
   before(() => {
-    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
@@ -71,9 +69,9 @@ describe(commands.TERM_GET, () => {
       FormDigestExpiresAt: new Date(),
       WebFullUrl: 'https://contoso.sharepoint.com'
     });
-    auth.service.connected = true;
-    auth.service.spoUrl = 'https://contoso.sharepoint.com';
-    commandInfo = Cli.getCommandInfo(command);
+    auth.connection.active = true;
+    auth.connection.spoUrl = 'https://contoso.sharepoint.com';
+    commandInfo = cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -96,14 +94,14 @@ describe(commands.TERM_GET, () => {
     sinonUtil.restore([
       request.post,
       cli.getSettingWithDefaultValue,
-      Cli.handleMultipleResultsFound
+      cli.handleMultipleResultsFound
     ]);
   });
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
-    auth.service.spoUrl = undefined;
+    auth.connection.active = false;
+    auth.connection.spoUrl = undefined;
   });
 
   it('has correct name', () => {
@@ -276,7 +274,7 @@ describe(commands.TERM_GET, () => {
       throw 'Invalid request';
     });
 
-    sinon.stub(Cli, 'handleMultipleResultsFound').resolves({ "_ObjectType_": "SP.Taxonomy.Term", "_ObjectIdentity_": "b50094a0-80a4-6000-110c-b074a0d4c336|fec14c62-7c3b-481b-851b-c80d7802b224:te:kTm3XibpGUiE5nxBtVMTf25aOnte4ElDn7uvWBPvXfjuQ1jPsltwT78ny15SLpmtEP0Wk4LJvk+y0GrLwtClew==", "CreatedDate": "\/Date(1675790717780)\/", "Id": "\/Guid(9316fd10-c982-4fbe-b2d0-6acbc2d0a57b)\/", "LastModifiedDate": "\/Date(1675790717780)\/", "Name": "Test Child Term", "CustomProperties": {}, "CustomSortOrder": null, "IsAvailableForTagging": true, "Owner": "i:0#.f|membership|joe@contoso.com", "Description": "", "IsDeprecated": false, "IsKeyword": false, "IsPinned": false, "IsPinnedRoot": false, "IsReused": false, "IsRoot": false, "IsSourceTerm": true, "LocalCustomProperties": {}, "MergedTermIds": [], "PathOfTerm": "Test Term;Test Child Term", "TermsCount": 0 });
+    sinon.stub(cli, 'handleMultipleResultsFound').resolves({ "_ObjectType_": "SP.Taxonomy.Term", "_ObjectIdentity_": "b50094a0-80a4-6000-110c-b074a0d4c336|fec14c62-7c3b-481b-851b-c80d7802b224:te:kTm3XibpGUiE5nxBtVMTf25aOnte4ElDn7uvWBPvXfjuQ1jPsltwT78ny15SLpmtEP0Wk4LJvk+y0GrLwtClew==", "CreatedDate": "\/Date(1675790717780)\/", "Id": "\/Guid(9316fd10-c982-4fbe-b2d0-6acbc2d0a57b)\/", "LastModifiedDate": "\/Date(1675790717780)\/", "Name": "Test Child Term", "CustomProperties": {}, "CustomSortOrder": null, "IsAvailableForTagging": true, "Owner": "i:0#.f|membership|joe@contoso.com", "Description": "", "IsDeprecated": false, "IsKeyword": false, "IsPinned": false, "IsPinnedRoot": false, "IsReused": false, "IsRoot": false, "IsSourceTerm": true, "LocalCustomProperties": {}, "MergedTermIds": [], "PathOfTerm": "Test Term;Test Child Term", "TermsCount": 0 });
 
     await command.action(logger, {
       options: {

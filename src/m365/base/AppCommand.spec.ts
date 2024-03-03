@@ -1,12 +1,13 @@
 import assert from 'assert';
 import fs from 'fs';
 import sinon from 'sinon';
-import { Cli } from '../../cli/Cli.js';
+import { cli } from '../../cli/cli.js';
 import { CommandInfo } from '../../cli/CommandInfo.js';
 import { Logger } from '../../cli/Logger.js';
 import Command, { CommandError } from '../../Command.js';
 import { sinonUtil } from '../../utils/sinonUtil.js';
 import AppCommand from './AppCommand.js';
+import { telemetry } from '../../telemetry.js';
 
 class MockCommand extends AppCommand {
   public get name(): string {
@@ -31,7 +32,8 @@ describe('AppCommand', () => {
   let commandInfo: CommandInfo;
 
   before(() => {
-    commandInfo = Cli.getCommandInfo(new MockCommand());
+    commandInfo = cli.getCommandInfo(new MockCommand());
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
   });
 
   beforeEach(() => {
@@ -54,8 +56,12 @@ describe('AppCommand', () => {
     sinonUtil.restore([
       fs.existsSync,
       fs.readFileSync,
-      Cli.prompt
+      cli.handleMultipleResultsFound
     ]);
+  });
+
+  after(() => {
+    sinon.restore();
   });
 
   it('defines correct resource', () => {
@@ -84,7 +90,7 @@ describe('AppCommand', () => {
     sinon.stub(fs, 'readFileSync').returns(JSON.stringify({
       apps: []
     }));
-    await assert.rejects(cmd.action(logger, { options: {} }), new CommandError('No Azure AD apps found in .m365rc.json'));
+    await assert.rejects(cmd.action(logger, { options: {} }), new CommandError('No Entra apps found in .m365rc.json'));
   });
 
   it(`returns error if the specified appId not found in the .m365rc.json file`, async () => {
@@ -115,7 +121,7 @@ describe('AppCommand', () => {
         }
       ]
     }));
-    const cliPromptStub = sinon.stub(Cli, 'prompt').callsFake(async () => (
+    const cliPromptStub = sinon.stub(cli, 'handleMultipleResultsFound').callsFake(async () => (
       { appIdIndex: 0 }
     ));
     await assert.rejects(cmd.action(logger, { options: {} }));
@@ -136,7 +142,7 @@ describe('AppCommand', () => {
         }
       ]
     }));
-    sinon.stub(Cli, 'prompt').resolves({ appIdIndex: 1 });
+    sinon.stub(cli, 'handleMultipleResultsFound').resolves({ appIdIndex: 1 });
     sinon.stub(Command.prototype, 'action').resolves();
 
     try {

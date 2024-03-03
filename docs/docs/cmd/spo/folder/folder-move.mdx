@@ -29,7 +29,7 @@ m365 spo folder move [options]
 : The new name of the destination folder.
 
 `--nameConflictBehavior [nameConflictBehavior]`
-: Behavior when a file or folder with the same name is already present at the destination. Possible values: `fail`, `rename`. The default is `fail`.
+: Behavior when a file or folder with the same name is already present at the destination. Allowed values: `fail`, `rename`. Defaults to `fail`.
 
 `--retainEditorAndModified`
 : Use this option to retain the editor and modified date. When not specified, these values are reset.
@@ -51,25 +51,25 @@ When you specify a value for `nameConflictBehavior`, consider the following:
 
 ## Examples
 
-Move a folder to a document library in another site collection by server-relative URL
+Move a folder to a document library in another site collection by server-relative URL.
 
 ```sh
 m365 spo folder move --webUrl https://contoso.sharepoint.com/sites/project-x --sourceUrl "/sites/project-x/Shared Documents/Reports" --targetUrl "/sites/project-y/Shared Documents/Reports January"
 ```
 
-Move a folder to another location using site-relative URLs and rename it
+Move a folder to another location using site-relative URLs and rename it.
 
 ```sh
 m365 spo folder move --webUrl https://contoso.sharepoint.com/sites/project-x --sourceUrl "/Shared Documents/Reports" --targetUrl "/sites/project-y/Shared Documents" --newName "Reports January"
 ```
 
-Move a folder to another location and use a new name on conflict
+Move a folder to another location and use a new name on conflict.
 
 ```sh
 m365 spo folder move --webUrl https://contoso.sharepoint.com/sites/project-x --sourceUrl "/sites/project-x/Shared Documents/Reports" --targetUrl "/sites/project-y/Shared Documents/Project files" --nameConflictBehavior rename
 ```
 
-Move a folder referenced by its ID to another document library and retain editor and modified date
+Move a folder referenced by its ID to another document library and retain editor and modified date.
 
 ```sh
 m365 spo folder move --webUrl https://contoso.sharepoint.com/sites/project-x --sourceId b8cc341b-9c11-4f2d-aa2b-0ce9c18bcba2 --targetUrl "/sites/project-x/Project files" --retainEditorAndModified

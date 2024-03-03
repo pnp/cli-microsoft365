@@ -55,8 +55,8 @@ describe(commands.TASK_REFERENCE_LIST, () => {
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
-    auth.service.connected = true;
-    auth.service.accessTokens[(command as any).resource] = {
+    auth.connection.active = true;
+    auth.connection.accessTokens[(command as any).resource] = {
       accessToken: 'abc',
       expiresOn: new Date()
     };
@@ -87,8 +87,8 @@ describe(commands.TASK_REFERENCE_LIST, () => {
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
-    auth.service.accessTokens = {};
+    auth.connection.active = false;
+    auth.connection.accessTokens = {};
   });
 
   it('has correct name', () => {

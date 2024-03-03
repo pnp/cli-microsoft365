@@ -1,25 +1,24 @@
 import assert from 'assert';
 import sinon from 'sinon';
-import appInsights from '../../../../appInsights.js';
 import auth from '../../../../Auth.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
 import request from '../../../../request.js';
+import { telemetry } from '../../../../telemetry.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import spoWebRetentionLabelListCommand from '../web/web-retentionlabel-list.js';
 import command from './listitem-retentionlabel-ensure.js';
 import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.LISTITEM_RETENTIONLABEL_ENSURE, () => {
 
   //#region Mock Responses
-  const mockSpoWebRetentionLabelListResponseArray = [
+  const retentionLabelListMock = [
     {
       "AcceptMessagesOnlyFromSendersOrMembers": false,
       "AccessType": null,
@@ -47,29 +46,38 @@ describe(commands.LISTITEM_RETENTIONLABEL_ENSURE, () => {
       "UnlockedAsDefault": false
     }
   ];
+
+  const retentionLabelListMockResponse = {
+    "odata.metadata": "https://contoso.sharepoint.com/sites/project-x/_api/$metadata#Collection(SP.CompliancePolicy.ComplianceTag)",
+    "value": retentionLabelListMock
+  };
+
+  const listDetailsMock = {
+    "RootFolder": {
+      "ServerRelativeUrl": "/sites/project-x/list"
+    }
+  };
   //#endregion
 
-  const webUrl = 'https://contoso.sharepoint.com';
+  const webUrl = 'https://contoso.sharepoint.com/sites/project-x';
   const listUrl = '/sites/project-x/list';
   const listTitle = 'test';
   const listId = 'b2307a39-e878-458b-bc90-03bc578531d6';
   const labelName = 'Some label';
   const labelId = 'def61080-111c-4aea-b72f-5b60e516e36c';
 
-  let cli: Cli;
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
   let loggerLogStderrSpy: sinon.SinonSpy;
 
   before(() => {
-    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     sinon.stub(session, 'getId').callsFake(() => '');
-    auth.service.connected = true;
-    commandInfo = Cli.getCommandInfo(command);
+    auth.connection.active = true;
+    commandInfo = cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -86,27 +94,19 @@ describe(commands.LISTITEM_RETENTIONLABEL_ENSURE, () => {
       }
     };
     loggerLogStderrSpy = sinon.spy(logger, 'logToStderr');
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === spoWebRetentionLabelListCommand) {
-        return { stdout: JSON.stringify(mockSpoWebRetentionLabelListResponseArray) };
-      }
-
-      throw 'Unknown case';
-    });
   });
 
   afterEach(() => {
     sinonUtil.restore([
       request.get,
       request.post,
-      Cli.executeCommandWithOutput,
       cli.getSettingWithDefaultValue
     ]);
   });
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
+    auth.connection.active = false;
   });
 
   it('has correct name', () => {
@@ -205,9 +205,16 @@ describe(commands.LISTITEM_RETENTIONLABEL_ENSURE, () => {
   });
 
   it('applies a retentionlabel based on listId and name without assetId', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/lists(guid'${listId}')?$expand=RootFolder&$select=RootFolder/ServerRelativeUrl`) {
+        return listDetailsMock;
+      }
+
+      throw 'Invalid request';
+    });
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/_api/web/lists(guid'${formatting.encodeQueryParameter(listId)}')/items(1)/SetComplianceTag()`
-        && JSON.stringify(opts.data) === '{"complianceTag":"Some label","isTagPolicyHold":true,"isTagPolicyRecord":false,"isEventBasedTag":true,"isTagSuperLock":false,"isUnlockedAsDefault":false}') {
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/SP_CompliancePolicy_SPPolicyStoreProxy_SetComplianceTagOnBulkItems`
+        && JSON.stringify(opts.data) === '{"listUrl":"https://contoso.sharepoint.com/sites/project-x/list","complianceTagValue":"Some label","itemIds":[1]}') {
         return;
       }
 
@@ -227,13 +234,23 @@ describe(commands.LISTITEM_RETENTIONLABEL_ENSURE, () => {
   });
 
   it('applies a retentionlabel based on listId, id and with assetId (debug)', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/lists(guid'${listId}')?$expand=RootFolder&$select=RootFolder/ServerRelativeUrl`) {
+        return listDetailsMock;
+      }
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/SP.CompliancePolicy.SPPolicyStoreProxy.GetAvailableTagsForSite(siteUrl=@a1)?@a1='${formatting.encodeQueryParameter(webUrl)}'`) {
+        return retentionLabelListMockResponse;
+      }
+
+      throw 'Invalid request';
+    });
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/_api/web/lists(guid'${formatting.encodeQueryParameter(listId)}')/items(1)/SetComplianceTag()`
-        && JSON.stringify(opts.data) === '{"complianceTag":"Some label","isTagPolicyHold":true,"isTagPolicyRecord":false,"isEventBasedTag":true,"isTagSuperLock":false,"isUnlockedAsDefault":false}') {
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/SP_CompliancePolicy_SPPolicyStoreProxy_SetComplianceTagOnBulkItems`
+        && JSON.stringify(opts.data) === '{"listUrl":"https://contoso.sharepoint.com/sites/project-x/list","complianceTagValue":"Some label","itemIds":[1]}') {
         return;
       }
 
-      if (opts.url === `https://contoso.sharepoint.com/_api/web/lists(guid'${listId}')/items(${1})/ValidateUpdateListItem()`) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/lists(guid'${listId}')/items(1)/ValidateUpdateListItem()`) {
         return {
           "value": [
             {
@@ -251,6 +268,7 @@ describe(commands.LISTITEM_RETENTIONLABEL_ENSURE, () => {
       throw 'Invalid request';
     });
 
+
     await assert.doesNotReject(command.action(logger, {
       options: {
         debug: true,
@@ -264,13 +282,23 @@ describe(commands.LISTITEM_RETENTIONLABEL_ENSURE, () => {
   });
 
   it('applies a retentionlabel based on listTitle, id and assetId (debug)', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/lists/getByTitle('${formatting.encodeQueryParameter(listTitle)}')?$expand=RootFolder&$select=RootFolder/ServerRelativeUrl`) {
+        return listDetailsMock;
+      }
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/SP.CompliancePolicy.SPPolicyStoreProxy.GetAvailableTagsForSite(siteUrl=@a1)?@a1='${formatting.encodeQueryParameter(webUrl)}'`) {
+        return retentionLabelListMockResponse;
+      }
+
+      throw 'Invalid request';
+    });
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/_api/web/lists/getByTitle('${formatting.encodeQueryParameter(listTitle)}')/items(1)/SetComplianceTag()`
-        && JSON.stringify(opts.data) === '{"complianceTag":"Some label","isTagPolicyHold":true,"isTagPolicyRecord":false,"isEventBasedTag":true,"isTagSuperLock":false,"isUnlockedAsDefault":false}') {
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/SP_CompliancePolicy_SPPolicyStoreProxy_SetComplianceTagOnBulkItems`
+        && JSON.stringify(opts.data) === '{"listUrl":"https://contoso.sharepoint.com/sites/project-x/list","complianceTagValue":"Some label","itemIds":[1]}') {
         return;
       }
 
-      if (opts.url === `https://contoso.sharepoint.com/_api/web/lists/getByTitle('${formatting.encodeQueryParameter(listTitle)}')/items(${1})/ValidateUpdateListItem()`) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/lists/getByTitle('${formatting.encodeQueryParameter(listTitle)}')/items(${1})/ValidateUpdateListItem()`) {
         return {
           "value": [
             {
@@ -301,13 +329,20 @@ describe(commands.LISTITEM_RETENTIONLABEL_ENSURE, () => {
   });
 
   it('applies a retentionlabel based on listUrl, id and assetId (debug)', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/SP.CompliancePolicy.SPPolicyStoreProxy.GetAvailableTagsForSite(siteUrl=@a1)?@a1='${formatting.encodeQueryParameter(webUrl)}'`) {
+        return retentionLabelListMockResponse;
+      }
+
+      throw 'Invalid request';
+    });
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/_api/web/GetList(@listUrl)/items(1)/SetComplianceTag()?@listUrl='${formatting.encodeQueryParameter(listUrl)}'`
-        && JSON.stringify(opts.data) === '{"complianceTag":"Some label","isTagPolicyHold":true,"isTagPolicyRecord":false,"isEventBasedTag":true,"isTagSuperLock":false,"isUnlockedAsDefault":false}') {
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/SP_CompliancePolicy_SPPolicyStoreProxy_SetComplianceTagOnBulkItems`
+        && JSON.stringify(opts.data) === '{"listUrl":"https://contoso.sharepoint.com/sites/project-x/list","complianceTagValue":"Some label","itemIds":[1]}') {
         return;
       }
 
-      if (opts.url === `https://contoso.sharepoint.com/_api/web/GetList(@listUrl)/items(${1})/ValidateUpdateListItem()?@listUrl='${formatting.encodeQueryParameter(listUrl)}'`) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetList(@listUrl)/items(${1})/ValidateUpdateListItem()?@listUrl='${formatting.encodeQueryParameter(listUrl)}'`) {
         return {
           "value": [
             {
@@ -338,15 +373,57 @@ describe(commands.LISTITEM_RETENTIONLABEL_ENSURE, () => {
   });
 
   it('throws an error when a retentionlabel cannot be found on the site', async () => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/SP_CompliancePolicy_SPPolicyStoreProxy_SetComplianceTagOnBulkItems`
+        && JSON.stringify(opts.data) === '{"listUrl":"https://contoso.sharepoint.com/sites/project-x/list","complianceTagValue":"Some non-existing label","itemIds":[1]}') {
+        throw {
+          error: {
+            "odata.error": {
+              "code": "-1, System.NotSupportedException",
+              "message": {
+                "lang": "nl-NL",
+                "value": "Cannot find retention label with name: Some non-existing label"
+              }
+            }
+          }
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
     await assert.rejects(command.action(logger, {
       options: {
         debug: false,
-        listId: listId,
+        listUrl: listUrl,
         webUrl: webUrl,
         listItemId: 1,
         name: 'Some non-existing label'
       }
-    }), new CommandError('The specified retention label does not exist'));
+    }), new CommandError('Cannot find retention label with name: Some non-existing label'));
+  });
+
+  it('throws an error when a retentionlabel cannot be found by id on the site', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/SP.CompliancePolicy.SPPolicyStoreProxy.GetAvailableTagsForSite(siteUrl=@a1)?@a1='${formatting.encodeQueryParameter(webUrl)}'`) {
+        return {
+          "odata.metadata": "https://contoso.sharepoint.com/sites/project-x/_api/$metadata#Collection(SP.CompliancePolicy.ComplianceTag)",
+          "value": []
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: false,
+        listUrl: listUrl,
+        webUrl: webUrl,
+        listItemId: 1,
+        id: 'invalid'
+      }
+    }), new CommandError('The specified retention label does not exist or is not published to this SharePoint site. Use the name of the label if you want to apply an unpublished label.'));
   });
 
   it('correctly handles API OData error', async () => {

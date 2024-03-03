@@ -47,11 +47,13 @@ m365 spo tenant applicationcustomizer set --id 3 --clientSideComponentProperties
 
 Note, how the clientSideComponentProperties option (--clientSideComponentProperties) has escaped double quotes `'{\"someProperty\":\"Some value\"}'` compared to execution from bash `'{"someProperty": "Some value"}'`.
 
-:::caution Escaping JSON in PowerShell
+:::warning[Escaping JSON in PowerShell]
     
 When using the `--clientSideComponentProperties` option it's possible to enter a JSON string. In PowerShell 5 to 7.2 [specific escaping rules](./../../../user-guide/using-cli.mdx#escaping-double-quotes-in-powershell) apply due to an issue. Remember that you can also use [file tokens](./../../../user-guide/using-cli.mdx#passing-complex-content-into-cli-options) instead.
 
 :::
+
+This command can be used for updating an application customizer that's installed tenant-wide. To update an application customizer from a specific site, view our dedicated [spo applicationcustomizer set](../applicationcustomizer/applicationcustomizer-set.mdx) command.
 
 ## Examples
 

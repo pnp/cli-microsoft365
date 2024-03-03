@@ -1,4 +1,4 @@
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
@@ -107,14 +107,9 @@ class SpoListItemRoleInheritanceResetCommand extends SpoCommand {
       await this.resetListItemRoleInheritance(args.options);
     }
     else {
-      const result = await Cli.prompt<{ continue: boolean }>({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: `Are you sure you want to reset the role inheritance of ${args.options.listItemId} in list ${args.options.listId ?? args.options.listTitle}?`
-      });
+      const result = await cli.promptForConfirmation({ message: `Are you sure you want to reset the role inheritance of ${args.options.listItemId} in list ${args.options.listId ?? args.options.listTitle}?` });
 
-      if (result.continue) {
+      if (result) {
         await this.resetListItemRoleInheritance(args.options);
       }
     }

@@ -65,7 +65,7 @@ This script will retrieve all environments as an Administrator and loop through 
     Write-Host -f Green "Processing: $($flows.Count) flows"
 
     $flows | ForEach-Object {
-      $createUser = m365 aad user get --id $_.properties.creator.userId | ConvertFrom-Json
+      $createUser = m365 entra user get --id $_.properties.creator.userId | ConvertFrom-Json
 
       $results += [pscustomobject]@{
         type          = "flow"

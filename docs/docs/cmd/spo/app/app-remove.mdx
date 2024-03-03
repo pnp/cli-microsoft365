@@ -14,16 +14,16 @@ m365 spo app remove [options]
 
 ```md definition-list
 `-i, --id <id>`
-: ID of the app to remove. Needs to be available in the app catalog
+: ID of the app to remove. Needs to be available in the app catalog.
 
 `-u, --appCatalogUrl [appCatalogUrl]`
-: URL of the tenant or site collection app catalog. It must be specified when the scope is `sitecollection`
+: URL of the tenant or site collection app catalog. It must be specified when the scope is `sitecollection`.
 
 `-s, --appCatalogScope [appCatalogScope]`
-: Scope of the app catalog: `tenant,sitecollection`. Default `tenant`
+: Scope of the app catalog. Allowed values: `tenant`, `sitecollection`. Defaults to `tenant`.
 
 `-f, --force`
-: Don't prompt for confirming removing the app
+: Don't prompt for confirming removing the app.
 ```
 
 <Global />
@@ -44,24 +44,28 @@ Remove the specified app from the tenant app catalog. Try to resolve the URL of 
 m365 spo app remove --id 058140e3-0e37-44fc-a1d3-79c487d371a3
 ```
 
-Remove the specified app from the tenant app catalog located at _https://contoso.sharepoint.com/sites/apps_. Additionally, will prompt for confirmation before actually retracting the app.
+Remove the specified app from the tenant app catalog. Additionally, will prompt for confirmation before actually retracting the app.
 
 ```sh
 m365 spo app remove --id 058140e3-0e37-44fc-a1d3-79c487d371a3 --appCatalogUrl https://contoso.sharepoint.com/sites/apps
 ```
 
-Remove the specified app from the tenant app catalog located at _https://contoso.sharepoint.com/sites/apps_. Don't prompt for confirmation.
+Remove the specified app from the tenant app catalog. Don't prompt for confirmation.
 
 ```sh
 m365 spo app remove --id 058140e3-0e37-44fc-a1d3-79c487d371a3 --appCatalogUrl https://contoso.sharepoint.com/sites/apps --force
 ```
 
-Remove the specified app from a site collection app catalog of site _https://contoso.sharepoint.com/sites/site1_.
+Remove the specified app from a site collection app catalog of the specified site.
 
 ```sh
 m365 spo app remove --id d95f8c94-67a1-4615-9af8-361ad33be93c --appCatalogScope sitecollection --appCatalogUrl https://contoso.sharepoint.com/sites/site1/AppCatalog
 ```
 
+## Response
+
+The command won't return a response on success.
+
 ## More information
 
-- Application Lifecycle Management (ALM) APIs: [https://docs.microsoft.com/en-us/sharepoint/dev/apis/alm-api-for-spfx-add-ins](https://docs.microsoft.com/en-us/sharepoint/dev/apis/alm-api-for-spfx-add-ins)
+- Application Lifecycle Management (ALM) APIs: [https://learn.microsoft.com/sharepoint/dev/apis/alm-api-for-spfx-add-ins](https://learn.microsoft.com/sharepoint/dev/apis/alm-api-for-spfx-add-ins)

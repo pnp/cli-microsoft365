@@ -1,11 +1,11 @@
-import { Cli, CommandOutput } from '../../../../cli/Cli.js';
+import { cli, CommandOutput } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import Command from '../../../../Command.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { validation } from '../../../../utils/validation.js';
-import aadUserGetCommand, { Options as AadUserGetCommandOptions } from '../../../aad/commands/user/user-get.js';
+import entraUserGetCommand, { Options as EntraUserGetCommandOptions } from '../../../entra/commands/user/user-get.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 import SpoGroupMemberListCommand, { Options as SpoGroupMemberListCommandOptions } from './group-member-list.js';
@@ -21,7 +21,9 @@ interface Options extends GlobalOptions {
   userName?: string;
   email?: string;
   userId?: number;
+  entraGroupId?: string;
   aadGroupId?: string;
+  entraGroupName?: string;
   aadGroupName?: string;
   force?: boolean;
 }
@@ -52,8 +54,10 @@ class SpoGroupMemberRemoveCommand extends SpoCommand {
         userName: (!(!args.options.userName)).toString(),
         email: (!(!args.options.email)).toString(),
         userId: (!(!args.options.userId)).toString(),
+        entraGroupId: (!(!args.options.entraGroupId)).toString(),
         aadGroupId: (!(!args.options.groupId)).toString(),
-        aadGroupName: (!(!args.options.groupName)).toString(),
+        entraGroupName: (!(!args.options.entraGroupName)).toString(),
+        aadGroupName: (!(!args.options.aadGroupName)).toString(),
         force: (!(!args.options.force)).toString()
       });
     });
@@ -80,7 +84,13 @@ class SpoGroupMemberRemoveCommand extends SpoCommand {
         option: '--userId [userId]'
       },
       {
+        option: '--entraGroupId [entraGroupId]'
+      },
+      {
         option: '--aadGroupId [aadGroupId]'
+      },
+      {
+        option: '--entraGroupName [entraGroupName]'
       },
       {
         option: '--aadGroupName [aadGroupName]'
@@ -110,6 +120,10 @@ class SpoGroupMemberRemoveCommand extends SpoCommand {
           return `${args.options.email} is not a valid email`;
         }
 
+        if (args.options.entraGroupId && !validation.isValidGuid(args.options.entraGroupId as string)) {
+          return `${args.options.entraGroupId} is not a valid GUID`;
+        }
+
         if (args.options.aadGroupId && !validation.isValidGuid(args.options.aadGroupId as string)) {
           return `${args.options.aadGroupId} is not a valid GUID`;
         }
@@ -122,7 +136,7 @@ class SpoGroupMemberRemoveCommand extends SpoCommand {
   #initOptionSets(): void {
     this.optionSets.push(
       { options: ['groupName', 'groupId'] },
-      { options: ['userName', 'email', 'userId', 'aadGroupId', 'aadGroupName'] }
+      { options: ['userName', 'email', 'userId', 'entraGroupId', 'aadGroupId', 'entraGroupName', 'aadGroupName'] }
     );
   }
 
@@ -135,19 +149,31 @@ class SpoGroupMemberRemoveCommand extends SpoCommand {
       await logger.logToStderr(`Retrieving information about the user ${args.options.email}`);
     }
 
-    const options: AadUserGetCommandOptions = {
+    const options: EntraUserGetCommandOptions = {
       email: args.options.email,
       output: 'json',
       debug: args.options.debug,
       verbose: args.options.verbose
     };
 
-    const userGetOutput: CommandOutput = await Cli.executeCommandWithOutput(aadUserGetCommand as Command, { options: { ...options, _: [] } });
+    const userGetOutput: CommandOutput = await cli.executeCommandWithOutput(entraUserGetCommand as Command, { options: { ...options, _: [] } });
     const userOutput = JSON.parse(userGetOutput.stdout);
     return userOutput.userPrincipalName;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    if (args.options.aadGroupId) {
+      args.options.entraGroupId = args.options.aadGroupId;
+
+      this.warn(logger, `Option 'aadGroupId' is deprecated. Please use 'entraGroupId' instead`);
+    }
+
+    if (args.options.aadGroupName) {
+      args.options.entraGroupName = args.options.aadGroupName;
+
+      this.warn(logger, `Option 'aadGroupName' is deprecated. Please use 'entraGroupName' instead`);
+    }
+
     if (args.options.force) {
       if (this.debug) {
         await logger.logToStderr('Confirmation bypassed by entering confirm option. Removing the user from SharePoint Group...');
@@ -155,14 +181,9 @@ class SpoGroupMemberRemoveCommand extends SpoCommand {
       await this.removeUserfromSPGroup(logger, args);
     }
     else {
-      const result = await Cli.prompt<{ continue: boolean }>({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: `Are you sure you want to remove user ${args.options.userName || args.options.userId || args.options.email || args.options.aadGroupId || args.options.aadGroupName} from the SharePoint group?`
-      });
+      const result = await cli.promptForConfirmation({ message: `Are you sure you want to remove user ${args.options.userName || args.options.userId || args.options.email || args.options.entraGroupId || args.options.entraGroupName} from the SharePoint group?` });
 
-      if (result.continue) {
+      if (result) {
         await this.removeUserfromSPGroup(logger, args);
       }
     }
@@ -170,7 +191,7 @@ class SpoGroupMemberRemoveCommand extends SpoCommand {
 
   private async removeUserfromSPGroup(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      await logger.logToStderr(`Removing User ${args.options.userName || args.options.email || args.options.userId || args.options.aadGroupId || args.options.aadGroupName} from Group: ${args.options.groupId || args.options.groupName}`);
+      await logger.logToStderr(`Removing User ${args.options.userName || args.options.email || args.options.userId || args.options.entraGroupId || args.options.entraGroupName} from Group: ${args.options.groupId || args.options.groupName}`);
     }
 
     let requestUrl: string = `${args.options.webUrl}/_api/web/sitegroups/${args.options.groupId
@@ -186,8 +207,8 @@ class SpoGroupMemberRemoveCommand extends SpoCommand {
       requestUrl += `/users/removeByLoginName(@LoginName)?@LoginName='${formatting.encodeQueryParameter(loginName)}'`;
     }
     else {
-      const aadGroupId = await this.getGroupId(args);
-      requestUrl += `/users/RemoveById(${aadGroupId})`;
+      const entraGroupId = await this.getGroupId(args);
+      requestUrl += `/users/RemoveById(${entraGroupId})`;
     }
 
     const requestOptions: any = {
@@ -221,23 +242,23 @@ class SpoGroupMemberRemoveCommand extends SpoCommand {
       options.groupName = args.options.groupName;
     }
 
-    const output = await Cli.executeCommandWithOutput(SpoGroupMemberListCommand as Command, { options: { ...options, _: [] } });
+    const output = await cli.executeCommandWithOutput(SpoGroupMemberListCommand as Command, { options: { ...options, _: [] } });
     const getGroupMemberListOutput = JSON.parse(output.stdout);
 
-    let foundgroups: any;
+    let foundGroups: any;
 
-    if (args.options.aadGroupId) {
-      foundgroups = getGroupMemberListOutput.filter((x: any) => { return x.LoginName.indexOf(args.options.aadGroupId) > -1 && (x.LoginName.indexOf("c:0o.c|federateddirectoryclaimprovider|") === 0 || x.LoginName.indexOf("c:0t.c|tenant|") === 0); });
+    if (args.options.entraGroupId) {
+      foundGroups = getGroupMemberListOutput.filter((x: any) => { return x.LoginName.indexOf(args.options.entraGroupId) > -1 && (x.LoginName.indexOf("c:0o.c|federateddirectoryclaimprovider|") === 0 || x.LoginName.indexOf("c:0t.c|tenant|") === 0); });
     }
     else {
-      foundgroups = getGroupMemberListOutput.filter((x: any) => { return x.Title === args.options.aadGroupName && (x.LoginName.indexOf("c:0o.c|federateddirectoryclaimprovider|") === 0 || x.LoginName.indexOf("c:0t.c|tenant|") === 0); });
+      foundGroups = getGroupMemberListOutput.filter((x: any) => { return x.Title === args.options.entraGroupName && (x.LoginName.indexOf("c:0o.c|federateddirectoryclaimprovider|") === 0 || x.LoginName.indexOf("c:0t.c|tenant|") === 0); });
     }
 
-    if (foundgroups.length === 0) {
-      throw `The Azure AD group ${args.options.aadGroupId || args.options.aadGroupName} is not found in SharePoint group ${args.options.groupId || args.options.groupName}`;
+    if (foundGroups.length === 0) {
+      throw `The Azure AD group ${args.options.entraGroupId || args.options.entraGroupName} is not found in SharePoint group ${args.options.groupId || args.options.groupName}`;
     }
 
-    return foundgroups[0].Id;
+    return foundGroups[0].Id;
   }
 }
 

@@ -4,7 +4,7 @@ import os from 'os';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
 import { CommandError } from '../../../../Command.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import request from '../../../../request.js';
@@ -28,6 +28,7 @@ describe(commands.LISTITEM_BATCH_ADD, () => {
   //#region Mock Responses
   const mockBatchFailedResponse = "--batchresponse_18052adb-c218-412b-bd1c-c324b0f428f6\r\nContent-Type: application/http\r\nContent-Transfer-Encoding: binary\r\n\r\nHTTP/1.1 200 OK\r\nCONTENT-TYPE: application/json;odata=nometadata;streaming=true;charset=utf-8\r\n\r\n{\"value\":[{\"ErrorCode\":0,\"ErrorMessage\":null,\"FieldName\":\"ContentType\",\"FieldValue\":\"Item\",\"HasException\":false,\"ItemId\":0},{\"ErrorCode\":0,\"ErrorMessage\":null,\"FieldName\":\"Title\",\"FieldValue\":\"Title A\",\"HasException\":false,\"ItemId\":0},{\"ErrorCode\":0,\"ErrorMessage\":null,\"FieldName\":\"SomeDateTime\",\"FieldValue\":\"2023-01-01 00:00:00\",\"HasException\":false,\"ItemId\":0},{\"ErrorCode\":0,\"ErrorMessage\":null,\"FieldName\":\"Id\",\"FieldValue\":\"31\",\"HasException\":false,\"ItemId\":0}]}\r\n--batchresponse_18052adb-c218-412b-bd1c-c324b0f428f6\r\nContent-Type: application/http\r\nContent-Transfer-Encoding: binary\r\n\r\nHTTP/1.1 200 OK\r\nCONTENT-TYPE: application/json;odata=nometadata;streaming=true;charset=utf-8\r\n\r\n{\"value\":[{\"ErrorCode\":0,\"ErrorMessage\":null,\"FieldName\":\"ContentType\",\"FieldValue\":\"Item\",\"HasException\":false,\"ItemId\":0},{\"ErrorCode\":0,\"ErrorMessage\":null,\"FieldName\":\"Title\",\"FieldValue\":\"Title B\",\"HasException\":false,\"ItemId\":0},{\"ErrorCode\":-2146232832,\"ErrorMessage\":\"You must specify a valid date within the range of 1/1/1900 and 12/31/8900.\",\"FieldName\":\"SomeDateTime\",\"FieldValue\":\"2023-01-01T00:00:00Z\",\"HasException\":true,\"ItemId\":0},{\"ErrorCode\":0,\"ErrorMessage\":null,\"FieldName\":\"Id\",\"FieldValue\":\"0\",\"HasException\":false,\"ItemId\":0}]}\r\n--batchresponse_18052adb-c218-412b-bd1c-c324b0f428f6\r\nContent-Type: application/http\r\nContent-Transfer-Encoding: binary\r\n\r\nHTTP/1.1 200 OK\r\nCONTENT-TYPE: application/json;odata=nometadata;streaming=true;charset=utf-8\r\n\r\n{\"value\":[{\"ErrorCode\":0,\"ErrorMessage\":null,\"FieldName\":\"ContentType\",\"FieldValue\":\"Item\",\"HasException\":false,\"ItemId\":0},{\"ErrorCode\":0,\"ErrorMessage\":null,\"FieldName\":\"Title\",\"FieldValue\":\"Title C\",\"HasException\":false,\"ItemId\":0},{\"ErrorCode\":-2146232832,\"ErrorMessage\":\"You must specify a valid date within the range of 1/1/1900 and 12/31/8900.\",\"FieldName\":\"SomeDateTime\",\"FieldValue\":\"2023-01-01T00:00:00Z\",\"HasException\":true,\"ItemId\":0},{\"ErrorCode\":0,\"ErrorMessage\":null,\"FieldName\":\"Id\",\"FieldValue\":\"0\",\"HasException\":false,\"ItemId\":0}]}\r\n--batchresponse_18052adb-c218-412b-bd1c-c324b0f428f6\r\nContent-Type: application/http\r\nContent-Transfer-Encoding: binary\r\n\r\nHTTP/1.1 200 OK\r\nCONTENT-TYPE: application/json;odata=nometadata;streaming=true;charset=utf-8\r\n\r\n{\"value\":[{\"ErrorCode\":0,\"ErrorMessage\":null,\"FieldName\":\"Id\",\"FieldValue\":\"0\",\"HasException\":false,\"ItemId\":0}]}\r\n--batchresponse_18052adb-c218-412b-bd1c-c324b0f428f6--\r\n";
   const mockBatchSuccessfulResponse = "--batchresponse_50b4ef4d-f4df-491f-b89f-640b23d9954e\r\nContent-Type: application/http\r\nContent-Transfer-Encoding: binary\r\n\r\nHTTP/1.1 200 OK\r\nCONTENT-TYPE: application/json;odata=nometadata;streaming=true;charset=utf-8\r\n\r\n{\"value\":[{\"ErrorCode\":0,\"ErrorMessage\":null,\"FieldName\":\"ContentType\",\"FieldValue\":\"Item\",\"HasException\":false,\"ItemId\":0},{\"ErrorCode\":0,\"ErrorMessage\":null,\"FieldName\":\"Title\",\"FieldValue\":\"Title A\",\"HasException\":false,\"ItemId\":0},{\"ErrorCode\":0,\"ErrorMessage\":null,\"FieldName\":\"SomeDateTime\",\"FieldValue\":\"2023-01-01 00:00:00\",\"HasException\":false,\"ItemId\":0},{\"ErrorCode\":0,\"ErrorMessage\":null,\"FieldName\":\"Id\",\"FieldValue\":\"32\",\"HasException\":false,\"ItemId\":0}]}\r\n--batchresponse_50b4ef4d-f4df-491f-b89f-640b23d9954e\r\nContent-Type: application/http\r\nContent-Transfer-Encoding: binary\r\n\r\nHTTP/1.1 200 OK\r\nCONTENT-TYPE: application/json;odata=nometadata;streaming=true;charset=utf-8\r\n\r\n{\"value\":[{\"ErrorCode\":0,\"ErrorMessage\":null,\"FieldName\":\"ContentType\",\"FieldValue\":\"Item\",\"HasException\":false,\"ItemId\":0},{\"ErrorCode\":0,\"ErrorMessage\":null,\"FieldName\":\"Title\",\"FieldValue\":\"Title B\",\"HasException\":false,\"ItemId\":0},{\"ErrorCode\":0,\"ErrorMessage\":null,\"FieldName\":\"SomeDateTime\",\"FieldValue\":\"2023-01-01 00:00:00\",\"HasException\":false,\"ItemId\":0},{\"ErrorCode\":0,\"ErrorMessage\":null,\"FieldName\":\"Id\",\"FieldValue\":\"33\",\"HasException\":false,\"ItemId\":0}]}\r\n--batchresponse_50b4ef4d-f4df-491f-b89f-640b23d9954e\r\nContent-Type: application/http\r\nContent-Transfer-Encoding: binary\r\n\r\nHTTP/1.1 200 OK\r\nCONTENT-TYPE: application/json;odata=nometadata;streaming=true;charset=utf-8\r\n\r\n{\"value\":[{\"ErrorCode\":0,\"ErrorMessage\":null,\"FieldName\":\"ContentType\",\"FieldValue\":\"Item\",\"HasException\":false,\"ItemId\":0},{\"ErrorCode\":0,\"ErrorMessage\":null,\"FieldName\":\"Title\",\"FieldValue\":\"Title C\",\"HasException\":false,\"ItemId\":0},{\"ErrorCode\":0,\"ErrorMessage\":null,\"FieldName\":\"SomeDateTime\",\"FieldValue\":\"2023-01-01 00:00:00\",\"HasException\":false,\"ItemId\":0},{\"ErrorCode\":0,\"ErrorMessage\":null,\"FieldName\":\"Id\",\"FieldValue\":\"34\",\"HasException\":false,\"ItemId\":0}]}\r\n--batchresponse_50b4ef4d-f4df-491f-b89f-640b23d9954e\r\nContent-Type: application/http\r\nContent-Transfer-Encoding: binary\r\n\r\nHTTP/1.1 200 OK\r\nCONTENT-TYPE: application/json;odata=nometadata;streaming=true;charset=utf-8\r\n\r\n{\"value\":[{\"ErrorCode\":0,\"ErrorMessage\":null,\"FieldName\":\"Id\",\"FieldValue\":\"0\",\"HasException\":false,\"ItemId\":0}]}\r\n--batchresponse_50b4ef4d-f4df-491f-b89f-640b23d9954e--\r\n";
+  const mockBatchListErrorResponse = "--batchresponse_50b4ef4d-f4df-491f-b89f-640b23d9954e\r\nContent-Type: application/http\r\nContent-Transfer-Encoding: binary\r\n\r\nHTTP/1.1 404 Not Found\r\nCONTENT-TYPE: application/json;odata=nometadata;streaming=true;charset=utf-8\r\n\r\n{\"value\":[{\"ErrorCode\":0,\"ErrorMessage\":null,\"FieldName\":\"ContentType\",\"FieldValue\":\"Item\",\"HasException\":false,\"ItemId\":0},{\"ErrorCode\":0,\"ErrorMessage\":null,\"FieldName\":\"Title\",\"FieldValue\":\"Title A\",\"HasException\":false,\"ItemId\":0},{\"ErrorCode\":0,\"ErrorMessage\":null,\"FieldName\":\"SomeDateTime\",\"FieldValue\":\"2023-01-01 00:00:00\",\"HasException\":false,\"ItemId\":0},{\"ErrorCode\":0,\"ErrorMessage\":null,\"FieldName\":\"Id\",\"FieldValue\":\"32\",\"HasException\":false,\"ItemId\":0}]}\r\n--batchresponse_50b4ef4d-f4df-491f-b89f-640b23d9954e\r\nContent-Type: application/http\r\nContent-Transfer-Encoding: binary\r\n\r\nHTTP/1.1 200 OK\r\nCONTENT-TYPE: application/json;odata=nometadata;streaming=true;charset=utf-8\r\n\r\n{\"value\":[{\"ErrorCode\":0,\"ErrorMessage\":null,\"FieldName\":\"ContentType\",\"FieldValue\":\"Item\",\"HasException\":false,\"ItemId\":0},{\"ErrorCode\":0,\"ErrorMessage\":null,\"FieldName\":\"Title\",\"FieldValue\":\"Title B\",\"HasException\":false,\"ItemId\":0},{\"ErrorCode\":0,\"ErrorMessage\":null,\"FieldName\":\"SomeDateTime\",\"FieldValue\":\"2023-01-01 00:00:00\",\"HasException\":false,\"ItemId\":0},{\"ErrorCode\":0,\"ErrorMessage\":null,\"FieldName\":\"Id\",\"FieldValue\":\"33\",\"HasException\":false,\"ItemId\":0}]}\r\n--batchresponse_50b4ef4d-f4df-491f-b89f-640b23d9954e\r\nContent-Type: application/http\r\nContent-Transfer-Encoding: binary\r\n\r\nHTTP/1.1 200 OK\r\nCONTENT-TYPE: application/json;odata=nometadata;streaming=true;charset=utf-8\r\n\r\n{\"value\":[{\"ErrorCode\":0,\"ErrorMessage\":null,\"FieldName\":\"ContentType\",\"FieldValue\":\"Item\",\"HasException\":false,\"ItemId\":0},{\"ErrorCode\":0,\"ErrorMessage\":null,\"FieldName\":\"Title\",\"FieldValue\":\"Title C\",\"HasException\":false,\"ItemId\":0},{\"ErrorCode\":0,\"ErrorMessage\":null,\"FieldName\":\"SomeDateTime\",\"FieldValue\":\"2023-01-01 00:00:00\",\"HasException\":false,\"ItemId\":0},{\"ErrorCode\":0,\"ErrorMessage\":null,\"FieldName\":\"Id\",\"FieldValue\":\"34\",\"HasException\":false,\"ItemId\":0}]}\r\n--batchresponse_50b4ef4d-f4df-491f-b89f-640b23d9954e\r\nContent-Type: application/http\r\nContent-Transfer-Encoding: binary\r\n\r\nHTTP/1.1 200 OK\r\nCONTENT-TYPE: application/json;odata=nometadata;streaming=true;charset=utf-8\r\n\r\n{\"error\":{\"code\":\"-1, System.ArgumentException\",\"message\":{\"lang\":\"en-US\",\"value\":\"List 'nonexistentlist' does not exist at site with URL 'https://contoso.sharepoint.com/sites/sales'.\"}}}\r\n--batchresponse_50b4ef4d-f4df-491f-b89f-640b23d9954e--\r\n";
   //#endregion
 
   let commandInfo: CommandInfo;
@@ -39,8 +40,8 @@ describe(commands.LISTITEM_BATCH_ADD, () => {
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     sinon.stub(session, 'getId').callsFake(() => '');
-    auth.service.connected = true;
-    commandInfo = Cli.getCommandInfo(command);
+    auth.connection.active = true;
+    commandInfo = cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -68,7 +69,7 @@ describe(commands.LISTITEM_BATCH_ADD, () => {
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
+    auth.connection.active = false;
   });
 
   it('has correct name', () => {
@@ -83,24 +84,35 @@ describe(commands.LISTITEM_BATCH_ADD, () => {
     sinon.stub(fs, 'readFileSync').callsFake(_ => csvContent);
     sinon.stub(request, 'post').callsFake(async (opts: any) => {
       if (opts.url === `${webUrl}/_api/$batch`) {
-        return Promise.resolve(mockBatchSuccessfulResponse);
+        return mockBatchSuccessfulResponse;
       }
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, filePath: filePath, listId: listId, verbose: true } } as any);
+    await command.action(logger, { options: { webUrl: webUrl, filePath: filePath, listId: listId, verbose: true } });
+  });
+
+  it('adds items in batch to a sharepoint list retrieved by id with csv content', async () => {
+    sinon.stub(request, 'post').callsFake(async (opts: any) => {
+      if (opts.url === `${webUrl}/_api/$batch`) {
+        return mockBatchSuccessfulResponse;
+      }
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { webUrl: webUrl, csvContent: csvContent, listId: listId, verbose: true } });
   });
 
   it('adds items in batch to a sharepoint list retrieved by title', async () => {
     sinon.stub(fs, 'readFileSync').callsFake(_ => csvContent);
     sinon.stub(request, 'post').callsFake(async (opts: any) => {
       if (opts.url === `${webUrl}/_api/$batch`) {
-        return Promise.resolve(mockBatchSuccessfulResponse);
+        return mockBatchSuccessfulResponse;
       }
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, filePath: filePath, listTitle: listTitle, verbose: true } } as any);
+    await command.action(logger, { options: { webUrl: webUrl, filePath: filePath, listTitle: listTitle, verbose: true } });
   });
 
   it('adds 150 items in batch to a sharepoint list retrieved by url', async () => {
@@ -113,12 +125,12 @@ describe(commands.LISTITEM_BATCH_ADD, () => {
     sinon.stub(request, 'post').callsFake(async (opts: any) => {
       if (opts.url === `${webUrl}/_api/$batch`) {
         amountOfRequestsInBody += opts.data.match(/POST/g).length;
-        return Promise.resolve(mockBatchSuccessfulResponse);
+        return mockBatchSuccessfulResponse;
       }
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, filePath: filePath, listUrl: listUrl, verbose: true } } as any);
+    await command.action(logger, { options: { webUrl: webUrl, filePath: filePath, listUrl: listUrl, verbose: true } });
     assert.strictEqual(amountOfRequestsInBody, 150);
   });
 
@@ -132,7 +144,7 @@ describe(commands.LISTITEM_BATCH_ADD, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: webUrl, filePath: filePath, listUrl: listUrl, verbose: true } } as any), new CommandError(errorMessage));
+    await assert.rejects(command.action(logger, { options: { webUrl: webUrl, filePath: filePath, listUrl: listUrl, verbose: true } }), new CommandError(errorMessage));
   });
 
   it('throws an error when batch api returns partly unsuccessful results', async () => {
@@ -140,12 +152,24 @@ describe(commands.LISTITEM_BATCH_ADD, () => {
     sinon.stub(fs, 'readFileSync').callsFake(_ => csvContent);
     sinon.stub(request, 'post').callsFake(async (opts: any) => {
       if (opts.url === `${webUrl}/_api/$batch`) {
-        return Promise.resolve(mockBatchFailedResponse);
+        return mockBatchFailedResponse;
       }
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: webUrl, filePath: filePath, listUrl: listUrl, verbose: true } } as any), new CommandError(errorMessage));
+    await assert.rejects(command.action(logger, { options: { webUrl: webUrl, filePath: filePath, listUrl: listUrl, verbose: true } }), new CommandError(errorMessage));
+  });
+
+  it('throws an error when the SharePoint list cannot be found by title', async () => {
+    sinon.stub(fs, 'readFileSync').callsFake(_ => csvContent);
+    sinon.stub(request, 'post').callsFake(async (opts: any) => {
+      if (opts.url === `${webUrl}/_api/$batch`) {
+        return Promise.resolve(mockBatchListErrorResponse);
+      }
+      throw 'Invalid request';
+    });
+
+    await assert.rejects(command.action(logger, { options: { webUrl: webUrl, filePath: filePath, listTitle: listTitle, verbose: true } }), new CommandError(`List 'nonexistentlist' does not exist at site with URL 'https://contoso.sharepoint.com/sites/sales'.`));
   });
 
   it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {

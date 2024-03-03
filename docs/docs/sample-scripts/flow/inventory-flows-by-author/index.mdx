@@ -67,7 +67,7 @@ The `bash` version of this script uses an external file to process owner mapping
       $userMap = @{}
       $uniqueOwners | ForEach-Object {
           Write-Host "Querying graph for userid $_..."
-          m365 aad user get --id $_ --output json  | ConvertFrom-Json
+          m365 entra user get --id $_ --output json  | ConvertFrom-Json
       } | ForEach-Object {
           $userMap.Add($_.id, @{
                   upn = $_.userPrincipalName
@@ -160,7 +160,7 @@ The `bash` version of this script uses an external file to process owner mapping
   i=0
   for ownerId in $uniqueOwners; do
       echo "Querying graph for userid $ownerId..."
-      echo $(m365 aad user get --id $ownerId --output json) >> $TMP_OWNERS
+      echo $(m365 entra user get --id $ownerId --output json) >> $TMP_OWNERS
       if [[ $i -lt $ownerCount-1 ]]; then
           echo "," >> $TMP_OWNERS
       fi

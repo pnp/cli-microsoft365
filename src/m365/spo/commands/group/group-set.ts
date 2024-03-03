@@ -1,10 +1,10 @@
-import { Cli, CommandOutput } from '../../../../cli/Cli.js';
+import { cli, CommandOutput } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import Command from '../../../../Command.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { validation } from '../../../../utils/validation.js';
-import aadUserGetCommand, { Options as AadUserGetCommandOptions } from '../../../aad/commands/user/user-get.js';
+import entraUserGetCommand, { Options as EntraUserGetCommandOptions } from '../../../entra/commands/user/user-get.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 
@@ -188,7 +188,7 @@ class SpoGroupSetCommand extends SpoCommand {
   }
 
   private async getOwnerId(options: Options): Promise<number> {
-    const cmdOptions: AadUserGetCommandOptions = {
+    const cmdOptions: EntraUserGetCommandOptions = {
       userName: options.ownerUserName,
       email: options.ownerEmail,
       output: 'json',
@@ -196,7 +196,7 @@ class SpoGroupSetCommand extends SpoCommand {
       verbose: options.verbose
     };
 
-    const output: CommandOutput = await Cli.executeCommandWithOutput(aadUserGetCommand as Command, { options: { ...cmdOptions, _: [] } });
+    const output: CommandOutput = await cli.executeCommandWithOutput(entraUserGetCommand as Command, { options: { ...cmdOptions, _: [] } });
     const getUserOutput = JSON.parse(output.stdout);
 
     const requestOptions: CliRequestOptions = {

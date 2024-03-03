@@ -1,10 +1,11 @@
 import fs from 'fs';
-import { Cli } from '../../cli/Cli.js';
+import { cli } from '../../cli/cli.js';
 import { Logger } from '../../cli/Logger.js';
 import Command, { CommandArgs, CommandError } from '../../Command.js';
 import GlobalOptions from '../../GlobalOptions.js';
 import { validation } from '../../utils/validation.js';
 import { M365RcJson, M365RcJsonApp } from './M365RcJson.js';
+import { formatting } from '../../utils/formatting.js';
 
 export interface AppCommandArgs {
   options: AppCommandOptions;
@@ -71,7 +72,7 @@ export default abstract class AppCommand extends Command {
 
     if (!this.m365rcJson.apps ||
       this.m365rcJson.apps.length === 0) {
-      throw new CommandError(`No Azure AD apps found in ${m365rcJsonPath}`);
+      throw new CommandError(`No Entra apps found in ${m365rcJsonPath}`);
     }
 
     if (args.options.appId) {
@@ -89,19 +90,8 @@ export default abstract class AppCommand extends Command {
     }
 
     if (this.m365rcJson.apps.length > 1) {
-      const result = await Cli.prompt<{ appIdIndex: number }>({
-        message: `Multiple Azure AD apps found in ${m365rcJsonPath}. Which app would you like to use?`,
-        type: 'list',
-        choices: this.m365rcJson.apps.map((app, i) => {
-          return {
-            name: `${app.name} (${app.appId})`,
-            value: i
-          };
-        }),
-        default: 0,
-        name: 'appIdIndex'
-      });
-
+      const resultAsKeyValuePair = formatting.convertArrayToHashTable('appIdIndex', this.m365rcJson.apps);
+      const result = await cli.handleMultipleResultsFound<{ appIdIndex: number }>(`Multiple Entra apps found in ${m365rcJsonPath}.`, resultAsKeyValuePair);
       this.appId = ((this.m365rcJson as M365RcJson).apps as M365RcJsonApp[])[result.appIdIndex].appId;
       await super.action(logger, args);
     }

@@ -1,6 +1,6 @@
 import { DOMParser } from '@xmldom/xmldom';
 import GlobalOptions from '../../../../GlobalOptions.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { md } from '../../../../utils/md.js';
@@ -187,7 +187,7 @@ class GraphChangelogListCommand extends AnonymousCommand {
     } as Changelog;
 
     Array.from(xmlDoc.getElementsByTagName('item')).forEach((item: any) => {
-      const description: string = Cli.shouldTrimOutput(args.options.output) ?
+      const description: string = cli.shouldTrimOutput(args.options.output) ?
         md.md2plain(item.getElementsByTagName('description').item(0).textContent, '') :
         item.getElementsByTagName('description').item(0).textContent;
 
@@ -195,7 +195,7 @@ class GraphChangelogListCommand extends AnonymousCommand {
         guid: item.getElementsByTagName('guid').item(0).textContent,
         category: item.getElementsByTagName('category').item(1).textContent,
         title: item.getElementsByTagName('title').item(0).textContent,
-        description: Cli.shouldTrimOutput(args.options.output) ?
+        description: cli.shouldTrimOutput(args.options.output) ?
           description.length > 50 ? `${description.substring(0, 47)}...` : description :
           description,
         pubDate: new Date(item.getElementsByTagName('pubDate').item(0).textContent)

@@ -3,7 +3,7 @@ import fs from 'fs';
 import sinon from 'sinon';
 import { PassThrough } from 'stream';
 import auth from '../../../../Auth.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
@@ -29,9 +29,9 @@ describe(commands.CONVERT_PDF, () => {
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
-    auth.service.connected = true;
+    auth.connection.active = true;
     unlinkSyncStub = sinon.stub(fs, 'unlinkSync').returns();
-    commandInfo = Cli.getCommandInfo(command);
+    commandInfo = cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -76,7 +76,7 @@ describe(commands.CONVERT_PDF, () => {
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
+    auth.connection.active = false;
   });
 
   it('has correct name', () => {
@@ -89,7 +89,7 @@ describe(commands.CONVERT_PDF, () => {
 
   describe('app-only auth', () => {
     before(() => {
-      auth.service.accessTokens[auth.defaultResource] = {
+      auth.connection.accessTokens[auth.defaultResource] = {
         expiresOn: '123',
         accessToken: 'eyJ0eXAiOiJKV1QiLCJub25jZSI6IlFQaVN1ck1VX3gtT2YzdzA1YV9XZzZzNFBZRFUwU2NneHlOeDE0eVctRWciLCJhbGciOiJSUzI1NiIsIng1dCI6Ik1yNS1BVWliZkJpaTdOZDFqQmViYXhib1hXMCIsImtpZCI6Ik1yNS1BVWliZkJpaTdOZDFqQmViYXhib1hXMCJ9.eyJhdWQiOiJodHRwczovL2dyYXBoLm1pY3Jvc29mdC5jb20iLCJpc3MiOiJodHRwczovL3N0cy53aW5kb3dzLm5ldC9iNjYyMzEzZi0xNGZjLTQzYTItOWE3YS1kMmUyN2Y0ZjM0NzgvIiwiaWF0IjoxNjQ0ODQ1MDc3LCJuYmYiOjE2NDQ4NDUwNzcsImV4cCI6MTY0NDg0ODk3NywiYWlvIjoiRTJaZ1lEaW1McEgwTSt5QTk5NmczbWZUUXlYN0FBPT0iLCJhcHBfZGlzcGxheW5hbWUiOiJHZXRUZWFtc0xpc3QiLCJhcHBpZCI6IjgyYTIzMzFhLTExYjItNDY3MC1iMDYxLTg3YTg2MDgxMjhhNiIsImFwcGlkYWNyIjoiMSIsImlkcCI6Imh0dHBzOi8vc3RzLndpbmRvd3MubmV0L2I2NjIzMTNmLTE0ZmMtNDNhMi05YTdhLWQyZTI3ZjRmMzQ3OC8iLCJpZHR5cCI6ImFwcCIsIm9pZCI6IjM4NTRiYjA4LTNjMmMtNGI1Ny05NWZjLTI0ZTA3OGQzODY4NSIsInJoIjoiMC5BVndBUHpGaXR2d1Vva09hZXRMaWYwODBlQU1BQUFBQUFBQUF3QUFBQUFBQUFBQmNBQUEuIiwicm9sZXMiOlsiVGVhbVNldHRpbmdzLlJlYWRXcml0ZS5BbGwiLCJUZWFtTWVtYmVyLlJlYWQuQWxsIiwiR3JvdXAuUmVhZC5BbGwiLCJEaXJlY3RvcnkuUmVhZC5BbGwiLCJUZWFtLlJlYWRCYXNpYy5BbGwiLCJUZWFtU2V0dGluZ3MuUmVhZC5BbGwiLCJPcmdhbml6YXRpb24uUmVhZC5BbGwiLCJBdWRpdExvZy5SZWFkLkFsbCJdLCJzdWIiOiIzODU0YmIwOC0zYzJjLTRiNTctOTVmYy0yNGUwNzhkMzg2ODUiLCJ0ZW5hbnRfcmVnaW9uX3Njb3BlIjoiRVUiLCJ0aWQiOiJiNjYyMzEzZi0xNGZjLTQzYTItOWE3YS1kMmUyN2Y0ZjM0NzgiLCJ1dGkiOiI3RVkyWnVXV2JFYVF0T3piVVlwOUFBIiwidmVyIjoiMS4wIiwid2lkcyI6WyIwOTk3YTFkMC0wZDFkLTRhY2ItYjQwOC1kNWNhNzMxMjFlOTAiXSwieG1zX3RjZHQiOjEzMDI1NDMzMTB9.N9yvmkCedti2fzT44VfBkN7GvuCInrIgiMgNxdyZeAyxnbdZjEhxHmNdU6HLLHQ3J-GonpPdt28dKwYxgLcrSibGzSPVHddh6MDPYutSwfIxh2oRanxhgFOWVJADfbFoCxsRFDhKJNT39bsauIUiRNzGzbb6dvWuZQ8LrgWjZzjae2qxVxj9jvYgjXEypeYZgLvPOzJiBCuluAMH3TjPuS-CuglFK_edn4CS-ztCwM0hmDFD5BLNZqng5P2KqGTEgjkMKoyIJ8yTGBJpASfdqqEFqWzQwcQ9ese924qNC3hJR_5TWHp2Fl73bpdhwBHRL5UwGTPi9_ysYdndKhXwgA' // {} simulating app-only auth
       };
@@ -1663,7 +1663,7 @@ describe(commands.CONVERT_PDF, () => {
 
   describe('user auth', () => {
     before(() => {
-      auth.service.accessTokens[auth.defaultResource] = {
+      auth.connection.accessTokens[auth.defaultResource] = {
         expiresOn: '123',
         accessToken: '123.eyJ1cG4iOiJzdGV2ZUBjb250b3NvLmNvbSJ9.456' // {upn: "steve@contoso.com"}
       };
@@ -1734,7 +1734,7 @@ describe(commands.CONVERT_PDF, () => {
   });
 
   it('returns error when unable to detect authentication type', async () => {
-    auth.service.accessTokens[auth.defaultResource] = {
+    auth.connection.accessTokens[auth.defaultResource] = {
       expiresOn: '123',
       accessToken: '123.YQ==.456' // 'a' simulating invalid token
     };

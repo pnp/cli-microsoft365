@@ -1,4 +1,4 @@
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import config from '../../../../config.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
@@ -69,14 +69,9 @@ class SpoStorageEntityRemoveCommand extends SpoCommand {
       await this.removeTenantProperty(logger, args);
     }
     else {
-      const result = await Cli.prompt<{ continue: boolean }>({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: `Are you sure you want to delete the ${args.options.key} tenant property?`
-      });
+      const result = await cli.promptForConfirmation({ message: `Are you sure you want to delete the ${args.options.key} tenant property?` });
 
-      if (result.continue) {
+      if (result) {
         await this.removeTenantProperty(logger, args);
       }
     }

@@ -21,7 +21,7 @@ describe(commands.GET, () => {
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
-    auth.service.connected = true;
+    auth.connection.active = true;
   });
 
   beforeEach(() => {
@@ -48,7 +48,7 @@ describe(commands.GET, () => {
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
+    auth.connection.active = false;
   });
 
   it('has correct name', () => {
@@ -745,7 +745,7 @@ describe(commands.GET, () => {
                 "userId": "da8f7aea-cf43-497f-ad62-c2feae89a194",
                 "userType": "ActiveDirectory"
               },
-              "flowTriggerUri": "https://management.azure.com:443/providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c5/flows/3989cb59-ce1a-4a5c-bb78-257c5c39381d/triggers/Every_day/run?api-version=2016-11-01",
+              "flowTriggerUri": "https://api.flow.microsoft.com:443/providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c5/flows/3989cb59-ce1a-4a5c-bb78-257c5c39381d/triggers/Every_day/run?api-version=2016-11-01",
               "installationStatus": "Installed",
               "provisioningMethod": "FromDefinition",
               "flowFailureAlertSubscribed": true,
@@ -1435,7 +1435,7 @@ describe(commands.GET, () => {
           "userId": "da8f7aea-cf43-497f-ad62-c2feae89a194",
           "userType": "ActiveDirectory"
         },
-        "flowTriggerUri": "https://management.azure.com:443/providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c5/flows/3989cb59-ce1a-4a5c-bb78-257c5c39381d/triggers/Every_day/run?api-version=2016-11-01",
+        "flowTriggerUri": "https://api.flow.microsoft.com:443/providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c5/flows/3989cb59-ce1a-4a5c-bb78-257c5c39381d/triggers/Every_day/run?api-version=2016-11-01",
         "installationStatus": "Installed",
         "provisioningMethod": "FromDefinition",
         "flowFailureAlertSubscribed": true,
@@ -2130,7 +2130,7 @@ describe(commands.GET, () => {
                 "userId": "da8f7aea-cf43-497f-ad62-c2feae89a194",
                 "userType": "ActiveDirectory"
               },
-              "flowTriggerUri": "https://management.azure.com:443/providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c5/flows/3989cb59-ce1a-4a5c-bb78-257c5c39381d/triggers/Every_day/run?api-version=2016-11-01",
+              "flowTriggerUri": "https://api.flow.microsoft.com:443/providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c5/flows/3989cb59-ce1a-4a5c-bb78-257c5c39381d/triggers/Every_day/run?api-version=2016-11-01",
               "installationStatus": "Installed",
               "provisioningMethod": "FromDefinition",
               "flowFailureAlertSubscribed": true,
@@ -2820,7 +2820,7 @@ describe(commands.GET, () => {
           "userId": "da8f7aea-cf43-497f-ad62-c2feae89a194",
           "userType": "ActiveDirectory"
         },
-        "flowTriggerUri": "https://management.azure.com:443/providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c5/flows/3989cb59-ce1a-4a5c-bb78-257c5c39381d/triggers/Every_day/run?api-version=2016-11-01",
+        "flowTriggerUri": "https://api.flow.microsoft.com:443/providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c5/flows/3989cb59-ce1a-4a5c-bb78-257c5c39381d/triggers/Every_day/run?api-version=2016-11-01",
         "installationStatus": "Installed",
         "provisioningMethod": "FromDefinition",
         "flowFailureAlertSubscribed": true,
@@ -3519,7 +3519,7 @@ describe(commands.GET, () => {
                 "userId": "da8f7aea-cf43-497f-ad62-c2feae89a194",
                 "userType": "ActiveDirectory"
               },
-              "flowTriggerUri": "https://management.azure.com:443/providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c5/flows/3989cb59-ce1a-4a5c-bb78-257c5c39381d/triggers/Every_day/run?api-version=2016-11-01",
+              "flowTriggerUri": "https://api.flow.microsoft.com:443/providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c5/flows/3989cb59-ce1a-4a5c-bb78-257c5c39381d/triggers/Every_day/run?api-version=2016-11-01",
               "installationStatus": "Installed",
               "provisioningMethod": "FromDefinition",
               "flowFailureAlertSubscribed": true,
@@ -4213,7 +4213,7 @@ describe(commands.GET, () => {
           "userId": "da8f7aea-cf43-497f-ad62-c2feae89a194",
           "userType": "ActiveDirectory"
         },
-        "flowTriggerUri": "https://management.azure.com:443/providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c5/flows/3989cb59-ce1a-4a5c-bb78-257c5c39381d/triggers/Every_day/run?api-version=2016-11-01",
+        "flowTriggerUri": "https://api.flow.microsoft.com:443/providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c5/flows/3989cb59-ce1a-4a5c-bb78-257c5c39381d/triggers/Every_day/run?api-version=2016-11-01",
         "installationStatus": "Installed",
         "provisioningMethod": "FromDefinition",
         "flowFailureAlertSubscribed": true,
@@ -4908,7 +4908,7 @@ describe(commands.GET, () => {
                 "userId": "da8f7aea-cf43-497f-ad62-c2feae89a194",
                 "userType": "ActiveDirectory"
               },
-              "flowTriggerUri": "https://management.azure.com:443/providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c5/flows/3989cb59-ce1a-4a5c-bb78-257c5c39381d/triggers/Every_day/run?api-version=2016-11-01",
+              "flowTriggerUri": "https://api.flow.microsoft.com:443/providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c5/flows/3989cb59-ce1a-4a5c-bb78-257c5c39381d/triggers/Every_day/run?api-version=2016-11-01",
               "installationStatus": "Installed",
               "provisioningMethod": "FromDefinition",
               "flowFailureAlertSubscribed": true,
@@ -5598,7 +5598,7 @@ describe(commands.GET, () => {
           "userId": "da8f7aea-cf43-497f-ad62-c2feae89a194",
           "userType": "ActiveDirectory"
         },
-        "flowTriggerUri": "https://management.azure.com:443/providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c5/flows/3989cb59-ce1a-4a5c-bb78-257c5c39381d/triggers/Every_day/run?api-version=2016-11-01",
+        "flowTriggerUri": "https://api.flow.microsoft.com:443/providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c5/flows/3989cb59-ce1a-4a5c-bb78-257c5c39381d/triggers/Every_day/run?api-version=2016-11-01",
         "installationStatus": "Installed",
         "provisioningMethod": "FromDefinition",
         "flowFailureAlertSubscribed": true,
@@ -6288,7 +6288,7 @@ describe(commands.GET, () => {
           "userId": "da8f7aea-cf43-497f-ad62-c2feae89a194",
           "userType": "ActiveDirectory"
         },
-        "flowTriggerUri": "https://management.azure.com:443/providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c5/flows/3989cb59-ce1a-4a5c-bb78-257c5c39381d/triggers/Every_day/run?api-version=2016-11-01",
+        "flowTriggerUri": "https://api.flow.microsoft.com:443/providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c5/flows/3989cb59-ce1a-4a5c-bb78-257c5c39381d/triggers/Every_day/run?api-version=2016-11-01",
         "installationStatus": "Installed",
         "provisioningMethod": "FromDefinition",
         "flowFailureAlertSubscribed": true,
@@ -6990,7 +6990,7 @@ describe(commands.GET, () => {
               "userId": "da8f7aea-cf43-497f-ad62-c2feae89a194",
               "userType": "ActiveDirectory"
             },
-            "flowTriggerUri": "https://management.azure.com:443/providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c5/flows/3989cb59-ce1a-4a5c-bb78-257c5c39381d/triggers/Every_day/run?api-version=2016-11-01",
+            "flowTriggerUri": "https://api.flow.microsoft.com:443/providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c5/flows/3989cb59-ce1a-4a5c-bb78-257c5c39381d/triggers/Every_day/run?api-version=2016-11-01",
             "installationStatus": "Installed",
             "provisioningMethod": "FromDefinition",
             "flowFailureAlertSubscribed": true,
@@ -7678,7 +7678,7 @@ describe(commands.GET, () => {
           "userId": "da8f7aea-cf43-497f-ad62-c2feae89a194",
           "userType": "ActiveDirectory"
         },
-        "flowTriggerUri": "https://management.azure.com:443/providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c5/flows/3989cb59-ce1a-4a5c-bb78-257c5c39381d/triggers/Every_day/run?api-version=2016-11-01",
+        "flowTriggerUri": "https://api.flow.microsoft.com:443/providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c5/flows/3989cb59-ce1a-4a5c-bb78-257c5c39381d/triggers/Every_day/run?api-version=2016-11-01",
         "installationStatus": "Installed",
         "provisioningMethod": "FromDefinition",
         "flowFailureAlertSubscribed": true,
