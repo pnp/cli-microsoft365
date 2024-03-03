@@ -52,7 +52,7 @@ describe('utils/md', () => {
   });
 
   it('keeps only label when hyperlink URL is relative', () => {
-    assert(loginHelpPlain.includes('create a custom Azure AD application'));
+    assert(loginHelpPlain.includes('create a custom Microsoft Entra ID application'));
     assert(!loginHelpPlain.includes('(../user-guide/using-own-identity.mdx)'));
   });
 
