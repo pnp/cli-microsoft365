@@ -12,9 +12,9 @@ Before you can use CLI for Microsoft 365 commands to manage your tenant, you hav
 
 ## Microsoft 365 services
 
-Using the CLI for Microsoft 365 you can manage different areas of an Microsoft 365 tenant. Currently, commands for working with SharePoint Online, Azure Active Directory, Microsoft Graph and the Azure Management Service are available, but more commands for other services will be added in the future.
+Using the CLI for Microsoft 365 you can manage different areas of an Microsoft 365 tenant. Currently, commands for working with SharePoint Online, Microsoft Entra ID, Microsoft Graph and the Azure Management Service are available, but more commands for other services will be added in the future.
 
-Commands in the CLI for Microsoft 365 are organized into services. For example, all commands that manage SharePoint Online begin with `spo` (`spo app list`, `spo cdn get`, etc.) and commands for working with the Azure AD begin with `aad`. After logging in to Microsoft 365, you can communicate with any Microsoft 365 service supported by the CLI for Microsoft 365 and it will automatically retrieve the necessary access token.
+Commands in the CLI for Microsoft 365 are organized into services. For example, all commands that manage SharePoint Online begin with `spo` (`spo app list`, `spo cdn get`, etc.) and commands for working with the Microsoft Entra ID begin with `aad`. After logging in to Microsoft 365, you can communicate with any Microsoft 365 service supported by the CLI for Microsoft 365 and it will automatically retrieve the necessary access token.
 
 ### Log in to Microsoft 365
 
@@ -30,7 +30,7 @@ If you are using the CLI for Microsoft 365 for the first time, you will be also 
 
 [![Granting the CLI for Microsoft 365 the necessary permissions](../images/consent.png)](../images/consent.png)
 
-The device code flow is the recommended approach for command-line tools to authenticate with resources secured with Azure AD. Because the authentication process is handled in the browser by Azure AD itself, it allows you to benefit of rich security features such as multi-factor authentication or conditional access. The device code flow is interactive and requires user interaction which might be limiting if you want to use the CLI for Microsoft 365 in your continuous deployment setup which is fully automated and doesn't involve user interaction.
+The device code flow is the recommended approach for command-line tools to authenticate with resources secured with Microsoft Entra ID. Because the authentication process is handled in the browser by Microsoft Entra ID itself, it allows you to benefit of rich security features such as multi-factor authentication or conditional access. The device code flow is interactive and requires user interaction which might be limiting if you want to use the CLI for Microsoft 365 in your continuous deployment setup which is fully automated and doesn't involve user interaction.
 
 #### Log in using user name and password
 
@@ -42,7 +42,7 @@ To log in to Microsoft 365 using your user name and password, execute:
 m365 login --authType password --userName user@contoso.com --password pass@word1
 ```
 
-Using credentials to log in to Microsoft 365 is convenient in automation scenarios where you cannot authenticate interactively. The downside of this way of authenticating is, that it doesn't allow you to use any of the advanced security features that Azure AD offers. If your account for example uses multi-factor authentication, logging in to Microsoft 365 using credentials will fail.
+Using credentials to log in to Microsoft 365 is convenient in automation scenarios where you cannot authenticate interactively. The downside of this way of authenticating is, that it doesn't allow you to use any of the advanced security features that Microsoft Entra ID offers. If your account for example uses multi-factor authentication, logging in to Microsoft 365 using credentials will fail.
 
 :::warning
 
@@ -54,7 +54,7 @@ Generally, you should use the default device code flow. If you need to use a non
 
 #### Log in using a certificate
 
-Another way to log in to Microsoft 365 in the CLI for Microsoft 365 is by using a certificate. To use this authentication method, set the `CLIMICROSOFT365_AADAPPID` environment variable to the ID of the Azure AD application that you want to use to authenticate the CLI for Microsoft 365 and the `CLIMICROSOFT365_TENANT` environment variable to the ID of your Azure AD directory. When calling the login command, set the `authType` option to `certificate` and specify the path to the certificate private key using the `certificateFile` option. Optionally, you can specify the certificate's thumbprint using the `thumbprint` option. If not specified, CLI will automatically calculate it from the specified certificate.
+Another way to log in to Microsoft 365 in the CLI for Microsoft 365 is by using a certificate. To use this authentication method, set the `CLIMICROSOFT365_AADAPPID` environment variable to the ID of the Microsoft Entra ID application that you want to use to authenticate the CLI for Microsoft 365 and the `CLIMICROSOFT365_TENANT` environment variable to the ID of your Microsoft Entra ID directory. When calling the login command, set the `authType` option to `certificate` and specify the path to the certificate private key using the `certificateFile` option. Optionally, you can specify the certificate's thumbprint using the `thumbprint` option. If not specified, CLI will automatically calculate it from the specified certificate.
 
 To log in to Microsoft 365 using a Personal Information Exchange (.pfx) file, execute:
 
@@ -70,7 +70,7 @@ m365 login --authType certificate --certificateFile /Users/user/dev/localhost.pe
 
 Logging in to Microsoft 365 using a certificate is convenient for automation scenarios where you cannot authenticate interactively but also don't want to use credentials.
 
-Because there is no user context when logging in using a certificate, you will typically create a new Azure AD application, specific to your organization and grant it the required permissions.
+Because there is no user context when logging in using a certificate, you will typically create a new Microsoft Entra ID application, specific to your organization and grant it the required permissions.
 
 :::warning
 
@@ -118,7 +118,7 @@ At this point the `privateKeyWithPassphrase.pem` file can be used to log in the 
 
 #### Log in using a secret
 
-CLI for Microsoft 365 also supports login using a secret. To use this authentication method, set the `CLIMICROSOFT365_AADAPPID` environment variable to the ID of the Azure AD application that you want to use to authenticate the CLI for Microsoft 365 and the `CLIMICROSOFT365_TENANT` environment variable to the ID of your Azure AD directory. When calling the login command, set the `authType` option to `secret` and specify the client secret value. 
+CLI for Microsoft 365 also supports login using a secret. To use this authentication method, set the `CLIMICROSOFT365_AADAPPID` environment variable to the ID of the Microsoft Entra ID application that you want to use to authenticate the CLI for Microsoft 365 and the `CLIMICROSOFT365_TENANT` environment variable to the ID of your Microsoft Entra ID directory. When calling the login command, set the `authType` option to `secret` and specify the client secret value. 
 
 To log in to Microsoft 365 using a secret, execute:
 
@@ -128,7 +128,7 @@ m365 login --authType secret --secret topSeCr3t@007
 
 Logging in to Microsoft 365 using a secret is convenient for automation scenarios where you cannot authenticate interactively but also don't want to use credentials.
 
-Because there is no user context when logging in using a secret, you will typically create a new Azure AD application, specific to your organization and grant it the required permissions.
+Because there is no user context when logging in using a secret, you will typically create a new Microsoft Entra ID application, specific to your organization and grant it the required permissions.
 
 :::warning
 
@@ -140,7 +140,7 @@ Logging in using a secret gives the CLI for Microsoft 365 app-only access to Mic
 
 :::warning
 
-Currently, SharePoint does not support authentication using Azure AD App ID and Secret. CLI for Microsoft 365 commands that call the SharePoint APIs will fail while logged in to Microsoft 365 using a Secret.
+Currently, SharePoint does not support authentication using Microsoft Entra ID App ID and Secret. CLI for Microsoft 365 commands that call the SharePoint APIs will fail while logged in to Microsoft 365 using a Secret.
 
 :::
 
@@ -174,7 +174,7 @@ This option is especially useful if you have conditional access policies configu
 
 To see if you're logged in to Microsoft 365 and if so, with which account, use the `status` command.
 
-If you're logged in to Microsoft 365 using a certificate, the `status` command will show the name of the Azure AD application used to log in.
+If you're logged in to Microsoft 365 using a certificate, the `status` command will show the name of the Microsoft Entra ID application used to log in.
 
 ### Log out from Microsoft 365
 
@@ -194,21 +194,21 @@ Some SharePoint commands in the CLI for Microsoft 365 require access to tenant-l
 
 ## Authorize with Microsoft 365
 
-To authorize for communicating with Microsoft 365 API, the CLI for Microsoft 365 uses the OAuth 2.0 protocol. When using the default device code flow, you authenticate with Azure AD in the web browser. After authenticating, CLI for Microsoft 365 will attempt to retrieve a valid access token for the specified Microsoft 365 service. If you have insufficient permissions to access the particular service, authorization will fail with an adequate error.
+To authorize for communicating with Microsoft 365 API, the CLI for Microsoft 365 uses the OAuth 2.0 protocol. When using the default device code flow, you authenticate with Microsoft Entra ID in the web browser. After authenticating, CLI for Microsoft 365 will attempt to retrieve a valid access token for the specified Microsoft 365 service. If you have insufficient permissions to access the particular service, authorization will fail with an adequate error.
 
-If you authenticate using credentials, the authentication and authorization are a part of the same request that CLI for Microsoft 365 issues towards Azure AD. If either authentication or authorization fails, you will see a corresponding error message explaining what went wrong.
+If you authenticate using credentials, the authentication and authorization are a part of the same request that CLI for Microsoft 365 issues towards Microsoft Entra ID. If either authentication or authorization fails, you will see a corresponding error message explaining what went wrong.
 
-## Re-consent the PnP Microsoft 365 Management Shell Azure AD application
+## Re-consent the PnP Microsoft 365 Management Shell Microsoft Entra ID application
 
-CLI for Microsoft 365 uses the _PnP Microsoft 365 Management Shell_ Azure AD application to log in to your Microsoft 365 tenant on your behalf. As we add new commands to the CLI, it's possible, that new permissions will be added to the _PnP Microsoft 365 Management Shell_ Azure AD application. To be able to use the newly added commands which depend on these new permissions, you will have to re-approve the _PnP Microsoft 365 Management Shell_ Azure AD application in your Azure AD. This process is also known as _re-consenting the Azure AD application_.
+CLI for Microsoft 365 uses the _PnP Microsoft 365 Management Shell_ Microsoft Entra ID application to log in to your Microsoft 365 tenant on your behalf. As we add new commands to the CLI, it's possible, that new permissions will be added to the _PnP Microsoft 365 Management Shell_ Microsoft Entra ID application. To be able to use the newly added commands which depend on these new permissions, you will have to re-approve the _PnP Microsoft 365 Management Shell_ Microsoft Entra ID application in your Microsoft Entra ID. This process is also known as _re-consenting the Microsoft Entra ID application_.
 
-To re-consent the _PnP Microsoft 365 Management Shell_ application in your Azure AD, in the command line execute:
+To re-consent the _PnP Microsoft 365 Management Shell_ application in your Microsoft Entra ID, in the command line execute:
 
 ```sh
 m365 cli reconsent
 ```
 
-CLI for Microsoft 365 will provide you with a URL that you should open in the web browser and sign in with your organizational account. After authenticating, Azure AD will prompt you to approve the new set of permissions. Once you approved the permissions, you will be redirected to an empty page. You can now use all commands in the CLI for Microsoft 365.
+CLI for Microsoft 365 will provide you with a URL that you should open in the web browser and sign in with your organizational account. After authenticating, Microsoft Entra ID will prompt you to approve the new set of permissions. Once you approved the permissions, you will be redirected to an empty page. You can now use all commands in the CLI for Microsoft 365.
 
 ## Logging in to Microsoft 365 via a proxy
 

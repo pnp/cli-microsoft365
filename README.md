@@ -153,7 +153,7 @@ Use the `login` command to start the Device Code login flow to authenticate with
 m365 login
 ```
 
->On your first login you will be asked to consent to several permissions that the `PnP Management Shell` multi-tenant app requires for the commands to work successfully against your tenant. If you want to create your own identity to use with the CLI, refer to the [Using your own Azure AD Identity](https://pnp.github.io/cli-microsoft365/user-guide/using-own-identity/) guide.
+>On your first login you will be asked to consent to several permissions that the `PnP Management Shell` multi-tenant app requires for the commands to work successfully against your tenant. If you want to create your own identity to use with the CLI, refer to the [Using your own Microsoft Entra ID Identity](https://pnp.github.io/cli-microsoft365/user-guide/using-own-identity/) guide.
 
 >For alternative authentication methods and usage, refer to the [login](https://pnp.github.io/cli-microsoft365/cmd/login/) command documentation
 

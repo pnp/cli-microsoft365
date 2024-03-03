@@ -26,7 +26,7 @@ Author: [Veronique Lengelle](https://x.com/veronicageek)
   #Get all the Teams
   $allTeams = m365 teams team list -o json | ConvertFrom-Json
 
-  #Find the user in Azure AD
+  #Find the user in Microsoft Entra ID
   $userToFindInAD = m365 entra user get --userName $userToFind -o json | ConvertFrom-Json
   $userToFindID = $userToFindInAD.Id
 
@@ -88,7 +88,7 @@ Author: [Veronique Lengelle](https://x.com/veronicageek)
       #Get all the Teams
       $allTeams = m365 teams team list -o json | ConvertFrom-Json
 
-      #Find the user in Azure AD
+      #Find the user in Microsoft Entra ID
       $userToFindInAD = m365 entra user get --userName $userToFind -o json | ConvertFrom-Json
       $userToFindID = $userToFindInAD.Id
 

@@ -45,7 +45,7 @@ You may have two options when registering secrets in order to log in to your ten
 
 * Using username / password (perfect to test your workflow, in a dev context, for personal usage) ==> **delegated secrets**
     * *In that case, the CLI commands will run as if it was you (list item updates, site creation...)*
-* Using Azure AD (AAD) application id / certificate (perfect in a production context, without creating any dependencies to an account) ==> **application secrets**
+* Using Microsoft Entra ID application id / certificate (perfect in a production context, without creating any dependencies to an account) ==> **application secrets**
     * *Here, the CLI commands will run through an app, not a user*
 
 ##### Delegated secrets
@@ -190,7 +190,7 @@ The `CLI for Microsoft 365 Login` action provides an optional input to specify a
 
 Depending on the context, you will need to specify the tenant id.
 
-The `CLI for Microsoft 365 Login` allows you to indicate the targeting tenant (default `common`). It can be `organization` (if using an Azure AD app which is multitenant) or a tenant id.
+The `CLI for Microsoft 365 Login` allows you to indicate the targeting tenant (default `common`). It can be `organization` (if using an Microsoft Entra ID app which is multitenant) or a tenant id.
 
 ```yaml
   name: CI
@@ -311,7 +311,7 @@ View on [GitHub Marketplace](https://github.com/marketplace/actions/cli-for-micr
 | ------------------------|---------------------------------------------------------------------------| -------------------------------------------------------|
 | `ADMIN_USERNAME`        | The username of the account used to login                                 | Optional (but required if `authType` is `password`)    |
 | `ADMIN_PASSWORD`        | The password of the account used to login                                 | Optional (but required if `authType` is `password`)    |
-| `APP_ID`                | App ID of the Azure AD application to use for certificate authentication  | Optional (but required if `authType` is `certificate`) |
+| `APP_ID`                | App ID of the Microsoft Entra ID application to use for certificate authentication  | Optional (but required if `authType` is `certificate`) |
 | `CERTIFICATE_ENCODED`   | Base64-encoded string with certificate private key                        | Optional (but required if `authType` is `certificate`) |
 | `CERTIFICATE_PASSWORD`  | Password for the certificate                                              | Optional                                               |
 | `TENANT`                | ID of the tenant from which accounts should be able to authenticate       | Optional (but required if `authType` is `certificate`)                                              |
