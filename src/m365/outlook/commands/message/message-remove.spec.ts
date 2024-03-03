@@ -190,7 +190,7 @@ describe(commands.MESSAGE_REMOVE, () => {
     sinonUtil.restore([accessToken.isAppOnlyAccessToken]);
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
 
-    await assert.rejects(command.action(logger, { options: { id: messageId } } as any),
+    await assert.rejects(command.action(logger, { options: { id: messageId } }),
       new CommandError(`The option 'userId' or 'userName' is required when removing a message using application permissions.`));
   });
 

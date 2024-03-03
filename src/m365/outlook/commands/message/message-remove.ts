@@ -87,7 +87,7 @@ class OutlookMessageRemoveCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const isAppOnlyAccessToken: boolean | undefined = accessToken.isAppOnlyAccessToken(auth.connection.accessTokens[this.resource].accessToken);
+    const isAppOnlyAccessToken: boolean | undefined = accessToken.isAppOnlyAccessToken(auth.connection.accessTokens[auth.defaultResource].accessToken);
     let principalUrl = '';
 
     if (isAppOnlyAccessToken) {
@@ -115,7 +115,7 @@ class OutlookMessageRemoveCommand extends GraphCommand {
     const removeMessage = async (): Promise<void> => {
       try {
         if (this.verbose) {
-          await logger.logToStderr(`Removing message with 'id' ${args.options.id} using ${isAppOnlyAccessToken ? 'application' : 'delegated'} permissions.`);
+          await logger.logToStderr(`Removing message with id '${args.options.id}' using ${isAppOnlyAccessToken ? 'application' : 'delegated'} permissions.`);
         }
 
         const requestOptions: CliRequestOptions = {
