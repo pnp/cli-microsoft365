@@ -2,13 +2,13 @@
   {
     "name": "pnp-grant-api-permissions-aad",
     "source": "pnp",
-    "title": "Grant API permissions to SharePoint Azure AD Application",
+    "title": "Grant API permissions to SharePoint Microsoft Entra ID Application",
     "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/spo/grant-api-permissions-aad",
     "creationDateTime": "2021-03-19",
     "updateDateTime": "2023-02-28",
-    "shortDescription": "Grants API permissions to SharePoint Azure AD Application.",
+    "shortDescription": "Grants API permissions to SharePoint Microsoft Entra ID Application.",
     "longDescription": [
-      "Grants API permissions to SharePoint Azure AD Application."
+      "Grants API permissions to SharePoint Microsoft Entra ID Application."
     ],
     "products": [
       "SharePoint"

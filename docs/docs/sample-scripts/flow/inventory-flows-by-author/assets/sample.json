@@ -6,9 +6,9 @@
     "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/flow/inventory-flows-by-author",
     "creationDateTime": "2020-05-05",
     "updateDateTime": "2023-02-28",
-    "shortDescription": "This script retrieves Flows from the Default Environment and maps creator information from Azure AD to list Flows by owner.",
+    "shortDescription": "This script retrieves Flows from the Default Environment and maps creator information from Microsoft Entra ID to list Flows by owner.",
     "longDescription": [
-      "The [Power Automate Admin Center](https://admin.flow.microsoft.com) provides a list of the Flows in your tenant, but there is no way to easily export Flows from the Flow admin center for governance activities. This script retrieves Flows from the Default Environment and maps creator information from Azure AD to list Flows by owner, state and trigger type."
+      "The [Power Automate Admin Center](https://admin.flow.microsoft.com) provides a list of the Flows in your tenant, but there is no way to easily export Flows from the Flow admin center for governance activities. This script retrieves Flows from the Default Environment and maps creator information from Microsoft Entra ID to list Flows by owner, state and trigger type."
     ],
     "products": [
       "Power Automate"

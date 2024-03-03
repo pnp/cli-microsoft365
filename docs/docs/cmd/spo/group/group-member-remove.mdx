@@ -35,13 +35,13 @@ m365 spo group member remove [options]
 : The object Id of the Entra group to remove as a member. Specify either `userName`, `email`, `userId`, `aadGroupId`, `entraGroupId`, `aadGroupName`, or `entraGroupName`.
 
 `--aadGroupId [aadGroupId]`
-: (deprecated. Use `entraGroupId` instead) The object Id of the Azure AD group to remove as a member. Specify either `userName`, `email`, `userId`, `aadGroupId`, `entraGroupId`, `aadGroupName`, or `entraGroupName`.
+: (deprecated. Use `entraGroupId` instead) The object Id of the Microsoft Entra ID group to remove as a member. Specify either `userName`, `email`, `userId`, `aadGroupId`, `entraGroupId`, `aadGroupName`, or `entraGroupName`.
 
 `--entraGroupName [entraGroupName]`
 : The name of the Entra group to remove as a member. Specify either `userName`, `email`, `userId`, `aadGroupId`, `entraGroupId`, `aadGroupName`, or `entraGroupName`.
 
 `--aadGroupName [aadGroupName]`
-: (deprecated. Use `entraGroupName` instead) The name of the Azure AD group to remove as a member. Specify either `userName`, `email`, `userId`, `aadGroupId`, `entraGroupId`, `aadGroupName`, or `entraGroupName`.
+: (deprecated. Use `entraGroupName` instead) The name of the Microsoft Entra ID group to remove as a member. Specify either `userName`, `email`, `userId`, `aadGroupId`, `entraGroupId`, `aadGroupName`, or `entraGroupName`.
 ```
 
 <Global />
@@ -69,7 +69,7 @@ m365 spo group member remove --webUrl https://contoso.sharepoint.com/sites/SiteA
 Remove an Entra group from a SharePoint group based on the Entra group name on a given web.
 
 ```sh
-m365 spo group member remove --webUrl https://contoso.sharepoint.com/sites/SiteA --groupId 5 --entraGroupName "Azure AD Security Group"
+m365 spo group member remove --webUrl https://contoso.sharepoint.com/sites/SiteA --groupId 5 --entraGroupName "Microsoft Entra ID Security Group"
 ```
 
 Remove an Entra group from a SharePoint group based on the Entra group ID on a given web.

@@ -20,16 +20,16 @@ m365 pa app permission ensure [options]
 : Permission level given to the app. Valid values: `CanEdit`, `CanView`. Sharing with the entire tenant is only supported with `CanView` role.
 
 `--userId [userId]`
-: The Azure AD ID of the user. Specify either `userId`, `userName`, `groupId`, `groupName`, or `tenant`.
+: The Microsoft Entra ID ID of the user. Specify either `userId`, `userName`, `groupId`, `groupName`, or `tenant`.
 
 `--userName [userName]`
 : The user principal name of the user. Specify either `userId`, `userName`, `groupId`, `groupName`, or `tenant`.
 
 `--groupId [groupId]`
-: The Azure AD ID of the group. Specify either `userId`, `userName`, `groupId`, `groupName`, or `tenant`.
+: The Microsoft Entra ID ID of the group. Specify either `userId`, `userName`, `groupId`, `groupName`, or `tenant`.
 
 `--groupName [groupName]`
-: The name of the Azure AD group. Specify either `userId`, `userName`, `groupId`, `groupName`, or `tenant`.
+: The name of the Microsoft Entra ID group. Specify either `userId`, `userName`, `groupId`, `groupName`, or `tenant`.
 
 `--tenant`
 : Share the app with the entire tenant. When specifying this, only `CanView` role is supported. Specify either `userId`, `userName`, `groupId`, `groupName`, or `tenant`.

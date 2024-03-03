@@ -35,13 +35,13 @@ m365 spo tenant settings set [options]
 : Specifies URL of the form to load in the Start a Site dialog. The valid values are: "" (default) - Blank by default, this will also remove or clear any value that has been set. Full URL - Example:"https://contoso.sharepoint.com/path/to/form"
 
 `--ShowEveryoneClaim [ShowEveryoneClaim]`
-: Enables the administrator to hide the Everyone claim in the People Picker. When users share an item with Everyone, it is accessible to all authenticated users in the tenant's Azure Active Directory, including any active external users who have previously accepted invitations. Note, that some SharePoint system resources such as templates and pages are required to be shared with Everyone and this type of sharing does not expose any user data or metadata. Allowed values `true`, `false`
+: Enables the administrator to hide the Everyone claim in the People Picker. When users share an item with Everyone, it is accessible to all authenticated users in the tenant's Microsoft Entra ID, including any active external users who have previously accepted invitations. Note, that some SharePoint system resources such as templates and pages are required to be shared with Everyone and this type of sharing does not expose any user data or metadata. Allowed values `true`, `false`
 
 `--ShowAllUsersClaim [ShowAllUsersClaim]`
-: Enables the administrator to hide the All Users claim groups in People Picker. When users share an item with "All Users (x)", it is accessible to all organization members in the tenant's Azure Active Directory who have authenticated via this method. When users share an item with "All Users (x)" it is accessible to all organization members in the tenant that used NTLM to authenticate with SharePoint. Allowed values `true`, `false`
+: Enables the administrator to hide the All Users claim groups in People Picker. When users share an item with "All Users (x)", it is accessible to all organization members in the tenant's Microsoft Entra ID who have authenticated via this method. When users share an item with "All Users (x)" it is accessible to all organization members in the tenant that used NTLM to authenticate with SharePoint. Allowed values `true`, `false`
 
 `--ShowEveryoneExceptExternalUsersClaim [ShowEveryoneExceptExternalUsersClaim]`
-: Enables the administrator to hide the "Everyone except external users" claim in the People Picker. When users share an item with "Everyone except external users", it is accessible to all organization members in the tenant's Azure Active Directory, but not to any users who have previously accepted invitations. Allowed values `true`, `false`
+: Enables the administrator to hide the "Everyone except external users" claim in the People Picker. When users share an item with "Everyone except external users", it is accessible to all organization members in the tenant's Microsoft Entra ID, but not to any users who have previously accepted invitations. Allowed values `true`, `false`
 
 `--SearchResolveExactEmailOrUPN [SearchResolveExactEmailOrUPN]`
 : Removes the search capability from People Picker. Note, recently resolved names will still appear in the list until the browser cache is cleared or expired. SharePoint Administrators will still be able to use starts with or partial name matching when enabled. Allowed values `true`, `false`
@@ -59,7 +59,7 @@ m365 spo tenant settings set [options]
 : Creates a Shared with Everyone folder in every user's new OneDrive for Business document library. The valid values are: True (default) - The Shared with Everyone folder is created. False - No folder is created when the site and OneDrive for Business document library are created. Allowed values `true`, `false`
 
 `--SignInAccelerationDomain [SignInAccelerationDomain]`
-: Specifies the home realm discovery value to be sent to Azure Active Directory (AAD) during the user sign-in process. When the organization uses a third-party identity provider, this prevents the user from seeing the Azure Active Directory Home Realm Discovery web page and ensures the user only sees their company's Identity Provider's portal. This value can also be used with Azure Active Directory Premium to customize the Azure Active Directory login page. Acceleration will not occur on-site collections that are shared externally. This value should be configured with the login domain that is used by your company (that is, example@contoso.com). If your company has multiple third-party identity providers, configuring the sign-in acceleration value will break sign-in for your organization. The valid values are: "" (default) - Blank by default, this will also remove or clear any value that has been set. Login Domain - For example: "contoso.com". No value assigned by default
+: Specifies the home realm discovery value to be sent to Microsoft Entra ID during the user sign-in process. When the organization uses a third-party identity provider, this prevents the user from seeing the Microsoft Entra ID Home Realm Discovery web page and ensures the user only sees their company's Identity Provider's portal. This value can also be used with Microsoft Entra ID Premium to customize the Microsoft Entra ID login page. Acceleration will not occur on-site collections that are shared externally. This value should be configured with the login domain that is used by your company (that is, example@contoso.com). If your company has multiple third-party identity providers, configuring the sign-in acceleration value will break sign-in for your organization. The valid values are: "" (default) - Blank by default, this will also remove or clear any value that has been set. Login Domain - For example: "contoso.com". No value assigned by default
 
 `--EnableGuestSignInAcceleration [EnableGuestSignInAcceleration]`
 : Accelerates guest-enabled site collections as well as member-only site collections when the SignInAccelerationDomain parameter is set. Allowed values `true`, `false`
@@ -263,10 +263,10 @@ m365 spo tenant settings set [options]
 : Enables or disables comments on lists. Allowed values `true`, `false`
 
 `--EnableAzureADB2BIntegration [EnableAzureADB2BIntegration]`
-: Enables the preview for OneDrive and SharePoint integration with Azure AD B2B. Allowed values `true`, `false`. Azure AD one-time passcode needs to be enabled for this integration to work. For more information see [http://aka.ms/spo-b2b-integration](https://aka.ms/spo-b2b-integration).
+: Enables the preview for OneDrive and SharePoint integration with Microsoft Entra ID B2B. Allowed values `true`, `false`. Microsoft Entra ID one-time passcode needs to be enabled for this integration to work. For more information see [http://aka.ms/spo-b2b-integration](https://aka.ms/spo-b2b-integration).
 
 `--SyncAadB2BManagementPolicy [SyncAadB2BManagementPolicy]`
-: Syncs Azure B2B Management Policies. Allowed values `true`, `false`. For more information, see [SharePoint and OneDrive integration with Azure AD B2B](https://aka.ms/spo-b2b-integration).
+: Syncs Azure B2B Management Policies. Allowed values `true`, `false`. For more information, see [SharePoint and OneDrive integration with Microsoft Entra ID B2B](https://aka.ms/spo-b2b-integration).
 ```
 
 <Global />
@@ -293,14 +293,14 @@ Sets multiple tenant global settings at once
 m365 spo tenant settings set --UserVoiceForFeedbackEnabled true --HideSyncButtonOnODB true --AllowedDomainListForSyncClient c9b1909e-901a-0000-2cdb-e91c3f46320a,c9b1909e-901a-0000-2cdb-e91c3f463201
 ```
 
-Enable Azure AD B2B integration for SharePoint and OneDrive and sync the Azure AD B2B management policies
+Enable Microsoft Entra ID B2B integration for SharePoint and OneDrive and sync the Microsoft Entra ID B2B management policies
 
 ```sh
 m365 spo tenant settings set --EnableAzureADB2BIntegration true
 m365 spo tenant settings set --SyncAadB2BManagementPolicy true
 ```
 
-Disable Azure AD B2B integration for SharePoint and OneDrive
+Disable Microsoft Entra ID B2B integration for SharePoint and OneDrive
 
 ```sh
 m365 spo tenant settings set --EnableAzureADB2BIntegration false
