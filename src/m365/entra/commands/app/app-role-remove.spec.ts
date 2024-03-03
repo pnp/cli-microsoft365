@@ -1346,7 +1346,7 @@ describe(commands.APP_ROLE_REMOVE, () => {
         claim: 'Product.Read',
         force: true
       }
-    }), new CommandError(`Multiple Azure AD application registration with name 'App-Name' found. Found: 5b31c38c-2584-42f0-aa47-657fb3a84230, a39c738c-939e-433b-930d-b02f2931a08b.`));
+    }), new CommandError(`Multiple Microsoft Entra application registrations with name 'App-Name' found. Found: 5b31c38c-2584-42f0-aa47-657fb3a84230, a39c738c-939e-433b-930d-b02f2931a08b.`));
   });
 
   it('handles selecting single result when multiple apps with the specified name found and cli is set to prompt', async () => {
@@ -1991,7 +1991,7 @@ describe(commands.APP_ROLE_REMOVE, () => {
   });
 
   it('aborts deleting app role when prompt is not confirmed', async () => {
-    // represents the aad app get request called when the prompt is confirmed
+    // represents the Microsoft Entra app get request called when the prompt is confirmed
     const patchStub = sinon.stub(request, 'get');
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(false);
@@ -2001,7 +2001,7 @@ describe(commands.APP_ROLE_REMOVE, () => {
   });
 
   it('aborts deleting app role when prompt is not confirmed (debug)', async () => {
-    // represents the aad app get request called when the prompt is confirmed
+    // represents the Microsoft Entra app get request called when the prompt is confirmed
     const patchStub = sinon.stub(request, 'get');
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(false);
@@ -2053,7 +2053,7 @@ describe(commands.APP_ROLE_REMOVE, () => {
         name: 'App-Role',
         force: true
       }
-    }), new CommandError(`No Azure AD application registration with ID 9b1b1e42-794b-4c71-93ac-5ed92488b67f found`));
+    }), new CommandError(`No Microsoft Entra application registration with ID 9b1b1e42-794b-4c71-93ac-5ed92488b67f found`));
   });
 
   it('handles error when the app specified with appName not found', async () => {
@@ -2071,7 +2071,7 @@ describe(commands.APP_ROLE_REMOVE, () => {
         name: 'App-Role',
         force: true
       }
-    }), new CommandError(`No Azure AD application registration with name My app found`));
+    }), new CommandError(`No Microsoft Entra application registration with name My app found`));
   });
 
   it('fails validation if appId and appObjectId specified', async () => {

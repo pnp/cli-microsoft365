@@ -3461,7 +3461,7 @@ export const spOnlineApplication =
       "allowedMemberTypes": [
         "Application"
       ],
-      "description": "Allows an app to read all service usage reports without a signed-in user.  Services that provide usage reports include Office 365 and Azure Active Directory.",
+      "description": "Allows an app to read all service usage reports without a signed-in user.  Services that provide usage reports include Office 365 and Microsoft Entra ID.",
       "displayName": "Read all usage reports",
       "id": "230c1aed-a721-4c5d-9cb4-a90514e508ef",
       "isEnabled": true,
@@ -8414,12 +8414,12 @@ export const spOnlineOauth2PermissionScope =
       "value": "RecordsManagement.ReadWrite.All"
     },
     {
-      "adminConsentDescription": "Allows an app to read all service usage reports on behalf of the signed-in user.  Services that provide usage reports include Office 365 and Azure Active Directory.",
+      "adminConsentDescription": "Allows an app to read all service usage reports on behalf of the signed-in user.  Services that provide usage reports include Office 365 and Microsoft Entra ID.",
       "adminConsentDisplayName": "Read all usage reports",
       "id": "02e97553-ed7b-43d0-ab3c-f8bace0d040c",
       "isEnabled": true,
       "type": "Admin",
-      "userConsentDescription": "Allows an app to read all service usage reports on your behalf. Services that provide usage reports include Office 365 and Azure Active Directory.",
+      "userConsentDescription": "Allows an app to read all service usage reports on your behalf. Services that provide usage reports include Office 365 and Microsoft Entra ID.",
       "userConsentDisplayName": "Read all usage reports",
       "value": "Reports.Read.All"
     },

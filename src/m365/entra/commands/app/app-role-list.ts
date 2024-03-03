@@ -85,7 +85,7 @@ class EntraAppRoleListCommand extends GraphCommand {
     const { appId, appName } = args.options;
 
     if (this.verbose) {
-      await logger.logToStderr(`Retrieving information about Azure AD app ${appId ? appId : appName}...`);
+      await logger.logToStderr(`Retrieving information about Microsoft Entra app ${appId ? appId : appName}...`);
     }
 
     const filter: string = appId ?
@@ -108,11 +108,11 @@ class EntraAppRoleListCommand extends GraphCommand {
 
     if (res.value.length === 0) {
       const applicationIdentifier = appId ? `ID ${appId}` : `name ${appName}`;
-      throw `No Azure AD application registration with ${applicationIdentifier} found`;
+      throw `No Microsoft Entra application registration with ${applicationIdentifier} found`;
     }
 
     const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', res.value);
-    const result = await cli.handleMultipleResultsFound<{ id: string }>(`Multiple Azure AD application registration with name '${appName}' found.`, resultAsKeyValuePair);
+    const result = await cli.handleMultipleResultsFound<{ id: string }>(`Multiple Microsoft Entra application registrations with name '${appName}' found.`, resultAsKeyValuePair);
     return result.id;
   }
 }

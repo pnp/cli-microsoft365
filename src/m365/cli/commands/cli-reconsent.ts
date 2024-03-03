@@ -13,14 +13,14 @@ class CliReconsentCommand extends AnonymousCommand {
   }
 
   public get description(): string {
-    return 'Returns Azure AD URL to open in the browser to re-consent CLI for Microsoft 365 permissions';
+    return 'Returns URL to open in the browser to re-consent CLI for Microsoft 365 Microsoft Entra permissions';
   }
 
   public async commandAction(logger: Logger): Promise<void> {
     const url = `https://login.microsoftonline.com/${config.tenant}/oauth2/authorize?client_id=${config.cliAadAppId}&response_type=code&prompt=admin_consent`;
 
     if (cli.getSettingWithDefaultValue<boolean>(settingsNames.autoOpenLinksInBrowser, false) === false) {
-      await logger.log(`To re-consent the PnP Microsoft 365 Management Shell Azure AD application navigate in your web browser to ${url}`);
+      await logger.log(`To re-consent the PnP Microsoft 365 Management Shell Microsoft Entra application navigate in your web browser to ${url}`);
       return;
     }
 

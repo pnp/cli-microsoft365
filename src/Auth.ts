@@ -68,9 +68,9 @@ export class Connection {
   spoUrl?: string;
   // SharePoint tenantId used to execute CSOM requests
   spoTenantId?: string;
-  // ID of the Azure AD app used to authenticate
+  // ID of the Microsoft Entra ID app used to authenticate
   appId: string;
-  // ID of the tenant where the Azure AD app is registered; common if multitenant
+  // ID of the tenant where the Microsoft Entra app is registered; common if multi-tenant
   tenant: string;
   cloudType: CloudType = CloudType.Public;
 

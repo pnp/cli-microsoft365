@@ -240,14 +240,14 @@ class SpoGroupMemberAddCommand extends SpoCommand {
         }
         else if (args.options.entraGroupNames) {
           if (this.verbose) {
-            await logger.logToStderr(`Getting ID of Azure AD group ${trimmedIdentifier}`);
+            await logger.logToStderr(`Getting ID of Microsoft Entra group ${trimmedIdentifier}`);
           }
           const groupId = await entraGroup.getGroupIdByDisplayName(trimmedIdentifier);
           validUserNames.push(groupId);
         }
         else {
           if (this.verbose) {
-            await logger.logToStderr(`Getting Azure AD ID for user ${trimmedIdentifier}`);
+            await logger.logToStderr(`Getting Microsoft Entra ID for user ${trimmedIdentifier}`);
           }
           const upn = await entraUser.getUserIdByEmail(trimmedIdentifier);
           validUserNames.push(upn);

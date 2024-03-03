@@ -18,7 +18,7 @@ class CliConsentCommand extends AnonymousCommand {
   }
 
   public get description(): string {
-    return 'Consent additional permissions for the Azure AD application used by the CLI for Microsoft 365';
+    return 'Consent additional permissions for the Microsoft Entra application used by the CLI for Microsoft 365';
   }
 
   constructor() {

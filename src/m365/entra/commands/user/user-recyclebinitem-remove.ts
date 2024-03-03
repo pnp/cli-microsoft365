@@ -71,7 +71,7 @@ class EntraUserRecycleBinItemRemoveCommand extends GraphCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const clearRecycleBinItem: () => Promise<void> = async (): Promise<void> => {
       if (this.verbose) {
-        await logger.logToStderr(`Permanently deleting user with id ${args.options.id} from Azure Active Directory`);
+        await logger.logToStderr(`Permanently deleting user with id ${args.options.id} from Microsoft Entra ID`);
       }
 
       try {

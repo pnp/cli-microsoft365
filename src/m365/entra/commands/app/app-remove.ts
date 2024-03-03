@@ -87,7 +87,7 @@ class EntraAppRemoveCommand extends GraphCommand {
         const objectId = await this.getObjectId(args, logger);
 
         if (this.verbose) {
-          await logger.logToStderr(`Deleting Azure AD app ${objectId}...`);
+          await logger.logToStderr(`Deleting Microsoft Entra app ${objectId}...`);
         }
 
         const requestOptions: CliRequestOptions = {
@@ -125,7 +125,7 @@ class EntraAppRemoveCommand extends GraphCommand {
     const { appId, name } = args.options;
 
     if (this.verbose) {
-      await logger.logToStderr(`Retrieving information about Azure AD app ${appId ? appId : name}...`);
+      await logger.logToStderr(`Retrieving information about Microsoft Entra app ${appId ? appId : name}...`);
     }
 
     const filter: string = appId ?
@@ -148,11 +148,11 @@ class EntraAppRemoveCommand extends GraphCommand {
 
     if (res.value.length === 0) {
       const applicationIdentifier = appId ? `ID ${appId}` : `name ${name}`;
-      throw `No Azure AD application registration with ${applicationIdentifier} found`;
+      throw `No Microsoft Entra application registration with ${applicationIdentifier} found`;
     }
 
     const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', res.value);
-    const result = await cli.handleMultipleResultsFound<{ id: string }>(`Multiple Azure AD application registration with name '${name}' found.`, resultAsKeyValuePair);
+    const result = await cli.handleMultipleResultsFound<{ id: string }>(`Multiple Microsoft Entra application registration with name '${name}' found.`, resultAsKeyValuePair);
     return result.id;
   }
 }

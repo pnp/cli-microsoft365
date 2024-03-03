@@ -94,7 +94,7 @@ describe(commands.APP_GET, () => {
       options: {
         appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f'
       }
-    }), new CommandError(`No Azure AD application registration with ID 9b1b1e42-794b-4c71-93ac-5ed92488b67f found`));
+    }), new CommandError(`No Microsoft Entra application registration with ID 9b1b1e42-794b-4c71-93ac-5ed92488b67f found`));
   });
 
   it('handles error when the app with the specified the name not found', async () => {
@@ -110,7 +110,7 @@ describe(commands.APP_GET, () => {
       options: {
         name: 'My app'
       }
-    }), new CommandError(`No Azure AD application registration with name My app found`));
+    }), new CommandError(`No Microsoft Entra application registration with name My app found`));
   });
 
   it('handles error when multiple apps with the specified name found', async () => {
@@ -139,7 +139,7 @@ describe(commands.APP_GET, () => {
       options: {
         name: 'My app'
       }
-    }), new CommandError(`Multiple Azure AD application registration with name 'My app' found. Found: 9b1b1e42-794b-4c71-93ac-5ed92488b67f, 9b1b1e42-794b-4c71-93ac-5ed92488b67g.`));
+    }), new CommandError(`Multiple Microsoft Entra application registrations with name 'My app' found. Found: 9b1b1e42-794b-4c71-93ac-5ed92488b67f, 9b1b1e42-794b-4c71-93ac-5ed92488b67g.`));
   });
 
   it('handles selecting single result when multiple apps with the specified name found and cli is set to prompt', async () => {
@@ -280,7 +280,7 @@ describe(commands.APP_GET, () => {
     assert.strictEqual(actual, true);
   });
 
-  it(`should get an Azure AD app registration by its app (client) ID. Doesn't save the app info if not requested`, async () => {
+  it(`should get an Microsoft Entra app registration by its app (client) ID. Doesn't save the app info if not requested`, async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=appId eq '9b1b1e42-794b-4c71-93ac-5ed92488b67f'&$select=id`) {
         return {
@@ -322,7 +322,7 @@ describe(commands.APP_GET, () => {
     assert(fsWriteFileSyncSpy.notCalled);
   });
 
-  it(`should get an Azure AD app registration by its name. Doesn't save the app info if not requested`, async () => {
+  it(`should get an Microsoft Entra app registration by its name. Doesn't save the app info if not requested`, async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=displayName eq 'My%20App'&$select=id`) {
         return {
@@ -364,7 +364,7 @@ describe(commands.APP_GET, () => {
     assert(fsWriteFileSyncSpy.notCalled);
   });
 
-  it(`should get an Azure AD app registration by its object ID. Doesn't save the app info if not requested`, async () => {
+  it(`should get an Microsoft Entra app registration by its object ID. Doesn't save the app info if not requested`, async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications/340a4aa3-1af6-43ac-87d8-189819003952`) {
         return {
@@ -391,7 +391,7 @@ describe(commands.APP_GET, () => {
     assert(fsWriteFileSyncSpy.notCalled);
   });
 
-  it(`should get an Azure AD app registration by its app (client) ID. Creates the file it doesn't exist`, async () => {
+  it(`should get an Microsoft Entra app registration by its app (client) ID. Creates the file it doesn't exist`, async () => {
     let fileContents: string | undefined;
     let filePath: string | undefined;
     sinon.stub(request, 'get').callsFake(async (opts) => {
@@ -446,7 +446,7 @@ describe(commands.APP_GET, () => {
     }, null, 2));
   });
 
-  it(`should get an Azure AD app registration by its app (client) ID. Writes to the existing empty file`, async () => {
+  it(`should get an Microsoft Entra app registration by its app (client) ID. Writes to the existing empty file`, async () => {
     let fileContents: string | undefined;
     let filePath: string | undefined;
     sinon.stub(request, 'get').callsFake(async (opts) => {
@@ -502,7 +502,7 @@ describe(commands.APP_GET, () => {
     }, null, 2));
   });
 
-  it(`should get an Azure AD app registration by its app (client) ID. Adds to the existing file contents`, async () => {
+  it(`should get an Microsoft Entra app registration by its app (client) ID. Adds to the existing file contents`, async () => {
     let fileContents: string | undefined;
     let filePath: string | undefined;
     sinon.stub(request, 'get').callsFake(async (opts) => {
@@ -570,7 +570,7 @@ describe(commands.APP_GET, () => {
     }, null, 2));
   });
 
-  it(`should get an Azure AD app registration by its app (client) ID. Adds to the existing file contents (Debug)`, async () => {
+  it(`should get an Microsoft Entra app registration by its app (client) ID. Adds to the existing file contents (Debug)`, async () => {
     let fileContents: string | undefined;
     let filePath: string | undefined;
     sinon.stub(request, 'get').callsFake(async (opts) => {

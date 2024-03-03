@@ -116,7 +116,7 @@ describe(commands.GROUP_USER_LIST, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('correctly lists all users in a Azure AD group by id', async () => {
+  it('correctly lists all users in a Microsoft Entra group by id', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/2c1ba4c4-cd9b-4417-832f-92a34bc34b2a/Owners/microsoft.graph.user?$select=id,displayName,userPrincipalName,givenName,surname`) {
         return {
@@ -158,7 +158,7 @@ describe(commands.GROUP_USER_LIST, () => {
     ]));
   });
 
-  it('correctly lists all users in a Azure AD group by name', async () => {
+  it('correctly lists all users in a Microsoft Entra group by name', async () => {
     sinon.stub(entraGroup, 'getGroupIdByDisplayName').resolves(groupId);
 
     sinon.stub(request, 'get').callsFake(async (opts) => {
@@ -202,7 +202,7 @@ describe(commands.GROUP_USER_LIST, () => {
     ]));
   });
 
-  it('correctly lists all owners in a Azure AD group', async () => {
+  it('correctly lists all owners in a Microsoft Entra group', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/2c1ba4c4-cd9b-4417-832f-92a34bc34b2a/Owners/microsoft.graph.user?$select=id,displayName,userPrincipalName,givenName,surname`) {
         return {
@@ -225,7 +225,7 @@ describe(commands.GROUP_USER_LIST, () => {
     ]));
   });
 
-  it('handles error when multiple Azure AD groups with the specified displayName found', async () => {
+  it('handles error when multiple Microsoft Entra groups with the specified displayName found', async () => {
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
       if (settingName === settingsNames.prompt) {
         return false;
@@ -254,7 +254,7 @@ describe(commands.GROUP_USER_LIST, () => {
     }), new CommandError(`Multiple groups with name 'CLI Test Group' found. Found: 9b1b1e42-794b-4c71-93ac-5ed92488b67f, 9b1b1e42-794b-4c71-93ac-5ed92488b67g.`));
   });
 
-  it('handles selecting single result when multiple Azure AD groups with the specified name found and cli is set to prompt', async () => {
+  it('handles selecting single result when multiple Microsoft Entra groups with the specified name found and cli is set to prompt', async () => {
     sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(groupDisplayName)}'&$select=id`) {
         return {
@@ -289,7 +289,7 @@ describe(commands.GROUP_USER_LIST, () => {
     ]));
   });
 
-  it('correctly lists all members in a Azure AD group', async () => {
+  it('correctly lists all members in a Microsoft Entra group', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/2c1ba4c4-cd9b-4417-832f-92a34bc34b2a/Members/microsoft.graph.user?$select=id,displayName,userPrincipalName,givenName,surname`) {
         return {
@@ -325,7 +325,7 @@ describe(commands.GROUP_USER_LIST, () => {
     ]));
   });
 
-  it('correctly lists properties for all users in a Azure AD group', async () => {
+  it('correctly lists properties for all users in a Microsoft Entra group', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/2c1ba4c4-cd9b-4417-832f-92a34bc34b2a/Owners/microsoft.graph.user?$select=displayName,mail,id&$expand=memberof($select=id),memberof($select=displayName)`) {
         return {
@@ -354,7 +354,7 @@ describe(commands.GROUP_USER_LIST, () => {
     ]));
   });
 
-  it('correctly lists all guest users in a Azure AD group', async () => {
+  it('correctly lists all guest users in a Microsoft Entra group', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/2c1ba4c4-cd9b-4417-832f-92a34bc34b2a/Owners/microsoft.graph.user?$select=id,displayName,userPrincipalName,givenName,surname&$filter=userType%20eq%20'Guest'&$count=true`) {
         return {

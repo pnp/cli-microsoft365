@@ -318,6 +318,6 @@ describe(commands.TENANT_SETTINGS_SET, () => {
         EnableAzureADB2BIntegration: true
       }
     });
-    assert.strictEqual(loggerStderrLogSpy.calledWith(chalk.yellow("WARNING: Make sure to also enable the Azure AD one-time passcode authentication preview. If it is not enabled then SharePoint will not use Azure AD B2B even if EnableAzureADB2BIntegration is set to true. Learn more at http://aka.ms/spo-b2b-integration.")), true);
+    assert.strictEqual(loggerStderrLogSpy.calledWith(chalk.yellow("WARNING: Make sure to also enable the Microsoft Entra one-time passcode authentication preview. If it is not enabled then SharePoint will not use Microsoft Entra B2B even if EnableAzureADB2BIntegration is set to true. Learn more at http://aka.ms/spo-b2b-integration.")), true);
   });
 });

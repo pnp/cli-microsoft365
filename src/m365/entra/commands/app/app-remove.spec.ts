@@ -245,10 +245,10 @@ describe(commands.APP_REMOVE, () => {
       if ((opts.url as string).indexOf(`/v1.0/myorganization/applications?$filter=`) > -1) {
         return { value: [] };
       }
-      throw "No Azure AD application registration with ID myapp found";
+      throw "No Microsoft Entra application registration with ID myapp found";
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: true, appId: 'd75be2e1-0204-4f95-857d-51a37cf40be8', force: true } } as any), new CommandError("No Azure AD application registration with ID d75be2e1-0204-4f95-857d-51a37cf40be8 found"));
+    await assert.rejects(command.action(logger, { options: { debug: true, appId: 'd75be2e1-0204-4f95-857d-51a37cf40be8', force: true } } as any), new CommandError("No Microsoft Entra application registration with ID d75be2e1-0204-4f95-857d-51a37cf40be8 found"));
   });
 
   it('fails to get app by name when app does not exists', async () => {
@@ -257,10 +257,10 @@ describe(commands.APP_REMOVE, () => {
       if ((opts.url as string).indexOf(`/v1.0/myorganization/applications?$filter=`) > -1) {
         return { value: [] };
       }
-      throw 'No Azure AD application registration with name myapp found';
+      throw 'No Microsoft Entra application registration with name myapp found';
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: true, name: 'myapp', force: true } } as any), new CommandError("No Azure AD application registration with name myapp found"));
+    await assert.rejects(command.action(logger, { options: { debug: true, name: 'myapp', force: true } } as any), new CommandError("No Microsoft Entra application registration with name myapp found"));
   });
 
   it('fails when multiple apps with same name exists', async () => {
@@ -288,7 +288,7 @@ describe(commands.APP_REMOVE, () => {
         };
       }
 
-      throw "Multiple Azure AD application registration with name 'myapp' found.";
+      throw "Multiple Microsoft Entra application registration with name 'myapp' found.";
     });
 
     await assert.rejects(command.action(logger, {
@@ -297,7 +297,7 @@ describe(commands.APP_REMOVE, () => {
         name: 'myapp',
         force: true
       }
-    }), new CommandError("Multiple Azure AD application registration with name 'myapp' found. Found: d75be2e1-0204-4f95-857d-51a37cf40be8, 340a4aa3-1af6-43ac-87d8-189819003952."));
+    }), new CommandError("Multiple Microsoft Entra application registration with name 'myapp' found. Found: d75be2e1-0204-4f95-857d-51a37cf40be8, 340a4aa3-1af6-43ac-87d8-189819003952."));
   });
 
   it('handles selecting single result when multiple apps with the specified name found and cli is set to prompt', async () => {
@@ -313,7 +313,7 @@ describe(commands.APP_REMOVE, () => {
         };
       }
 
-      throw "Multiple Azure AD application registration with name 'myapp' found.";
+      throw "Multiple Microsoft Entra application registration with name 'myapp' found.";
     });
 
     sinon.stub(cli, 'handleMultipleResultsFound').resolves({ id: 'd75be2e1-0204-4f95-857d-51a37cf40be8' });

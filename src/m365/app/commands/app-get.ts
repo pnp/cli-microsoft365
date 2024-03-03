@@ -11,7 +11,7 @@ class AppGetCommand extends AppCommand {
   }
 
   public get description(): string {
-    return 'Retrieves information about the current Azure AD app';
+    return 'Retrieves information about the current Microsoft Entra app';
   }
 
   public async commandAction(logger: Logger, args: AppCommandArgs): Promise<void> {
