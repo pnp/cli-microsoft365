@@ -120,7 +120,6 @@ class EntraUserListCommand extends GraphCommand {
     }
 
     if (options.type) {
-      const filterType: string = `userType eq '${options.type}'`;
       filter += filter.length > 0 ? ` and userType eq '${options.type}'` : `userType eq '${options.type}'`;
     }
 
