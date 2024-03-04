@@ -25,7 +25,7 @@ interface Options extends GlobalOptions {
   enableSpellingModification?: boolean;
 }
 
-class SearchCommand extends GraphCommand {
+class SearchSearchCommand extends GraphCommand {
   private allowedScopes: string[] = ['chatMessage', 'message', 'event', 'drive', 'driveItem', 'list', 'listItem', 'site', 'bookmark', 'acronym', 'person'];
 
   public get name(): string {
@@ -237,4 +237,4 @@ class SearchCommand extends GraphCommand {
   }
 }
 
-export default new SearchCommand();
+export default new SearchSearchCommand();
