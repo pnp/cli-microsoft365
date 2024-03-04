@@ -94,10 +94,10 @@ describe(commands.USER_LIST, () => {
 
   it('retrieves only the specified user properties', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users?$select=displayName,mail,id&$top=100`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users?$select=displayName,mail&$top=100`) {
         return {
           "value": [
-            { "displayName": "Aarif Sherzai", "mail": "AarifS@contoso.onmicrosoft.com", "id": "1f5595b2-aa07-445d-9801-a45ea18160b2" }, { "displayName": "Achim Maier", "mail": "AchimM@contoso.onmicrosoft.com", "id": "717f1683-00fa-488c-b68d-5d0051f6bcfa" }
+            { "displayName": "Aarif Sherzai", "mail": "AarifS@contoso.onmicrosoft.com" }, { "displayName": "Achim Maier", "mail": "AchimM@contoso.onmicrosoft.com" }
           ]
         };
       }
@@ -107,13 +107,13 @@ describe(commands.USER_LIST, () => {
 
     await command.action(logger, { options: { properties: 'displayName,mail' } });
     assert(loggerLogSpy.calledWith([
-      { "displayName": "Aarif Sherzai", "mail": "AarifS@contoso.onmicrosoft.com", "id": "1f5595b2-aa07-445d-9801-a45ea18160b2" }, { "displayName": "Achim Maier", "mail": "AchimM@contoso.onmicrosoft.com", "id": "717f1683-00fa-488c-b68d-5d0051f6bcfa" }
+      { "displayName": "Aarif Sherzai", "mail": "AarifS@contoso.onmicrosoft.com" }, { "displayName": "Achim Maier", "mail": "AchimM@contoso.onmicrosoft.com" }
     ]));
   });
 
   it('retrieves properties for all users with properties option includes values with a slash', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users?$select=displayName,id&$expand=manager($select=displayName),manager($select=department)&$top=100`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users?$select=displayName&$expand=manager($select=displayName),manager($select=department)&$top=100`) {
         return {
           "value": [
             { "displayName": "Aarif Sherzai", "manager": { "displayName": "Jon Doe", "department": "IT" } }, { "displayName": "Achim Maier", "manager": { "displayName": "Jon Doe", "department": "IT" } }
@@ -168,7 +168,7 @@ describe(commands.USER_LIST, () => {
     ]));
   });
 
-  it('lists users in the tenant with the guest type', async () => {
+  it('lists users in the tenant with the guest type and surname', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users?$select=id,displayName,mail,userPrincipalName&$filter=startsWith(surname, 'S') and userType eq 'Guest'&$top=100`) {
         return {
@@ -182,25 +182,6 @@ describe(commands.USER_LIST, () => {
     });
 
     await command.action(logger, { options: { surname: 'S', type: 'Guest' } });
-    assert(loggerLogSpy.calledWith([
-      { "id": "7dc52cef-c513-4a53-bd43-93e9f6727911", "displayName": "Aarif Sherzai", "mail": "AarifS@fabrikam.onmicrosoft.com", "userPrincipalName": "AarifS_fabrikam.onmicrosoft.com#EXT#@contoso.onmicrosoft.com" }
-    ]));
-  });
-
-  it('lists users in the tenant with the guest type and surname', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users?$select=id,displayName,mail,userPrincipalName&$filter=userType eq 'Guest'&$top=100`) {
-        return {
-          "value": [
-            { "id": "7dc52cef-c513-4a53-bd43-93e9f6727911", "displayName": "Aarif Sherzai", "mail": "AarifS@fabrikam.onmicrosoft.com", "userPrincipalName": "AarifS_fabrikam.onmicrosoft.com#EXT#@contoso.onmicrosoft.com" }
-          ]
-        };
-      }
-
-      throw 'Invalid request';
-    });
-
-    await command.action(logger, { options: { type: 'Guest' } });
     assert(loggerLogSpy.calledWith([
       { "id": "7dc52cef-c513-4a53-bd43-93e9f6727911", "displayName": "Aarif Sherzai", "mail": "AarifS@fabrikam.onmicrosoft.com", "userPrincipalName": "AarifS_fabrikam.onmicrosoft.com#EXT#@contoso.onmicrosoft.com" }
     ]));
