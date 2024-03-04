@@ -61,20 +61,13 @@ class EntraUserListCommand extends GraphCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
-      const selectProperties: string = args.options.properties ?
-        `${args.options.properties.split(',').filter(f => f.toLowerCase() !== 'id').concat('id').map(p => p.trim()).join(',')}` :
-        'id,displayName,mail,userPrincipalName';
-      const allSelectProperties: string[] = selectProperties.split(',');
-      const propertiesWithSlash: string[] = allSelectProperties.filter(item => item.includes('/'));
+      const selectProperties = args.options.properties ? args.options.properties : 'id,displayName,mail,userPrincipalName';
+      const allSelectProperties = selectProperties.split(',');
+      const propertiesWithSlash = allSelectProperties.filter(item => item.includes('/'));
 
-      let fieldExpand: string = '';
-      propertiesWithSlash.forEach(p => {
-        if (fieldExpand.length > 0) {
-          fieldExpand += ',';
-        }
-
-        fieldExpand += `${p.split('/')[0]}($select=${p.split('/')[1]})`;
-      });
+      const fieldExpand = propertiesWithSlash
+        .map(p => `${p.split('/')[0]}($select=${p.split('/')[1]})`)
+        .join(',');
 
       const expandParam = fieldExpand.length > 0 ? `&$expand=${fieldExpand}` : '';
       const selectParam = allSelectProperties.filter(item => !item.includes('/'));
@@ -87,7 +80,7 @@ class EntraUserListCommand extends GraphCommand {
         throw ex;
       }
 
-      const url: string = `${this.resource}/v1.0/users?$select=${selectParam}${expandParam}${(filter.length > 0 ? '&' + filter : '')}&$top=100`;
+      const url = `${this.resource}/v1.0/users?$select=${selectParam}${expandParam}${(filter.length > 0 ? '&' + filter : '')}&$top=100`;
       const users = await odata.getAllItems<User>(url);
       await logger.log(users);
     }
@@ -121,20 +114,14 @@ class EntraUserListCommand extends GraphCommand {
       }
     });
 
-
     let filter: string = Object.keys(filters).map(key => `startsWith(${key}, '${filters[key]}')`).join(' and ');
     if (filter.length > 0) {
-      filter = '$filter=' + filter;
+      filter = `$filter=${filter}`;
     }
 
     if (options.type) {
       const filterType: string = `userType eq '${options.type}'`;
-      if (filter.length > 0) {
-        filter += ` and ${filterType}`;
-      }
-      else {
-        filter = `$filter=${filterType}`;
-      }
+      filter += filter.length > 0 ? ` and userType eq '${options.type}'` : `userType eq '${options.type}'`;
     }
 
     return filter;
