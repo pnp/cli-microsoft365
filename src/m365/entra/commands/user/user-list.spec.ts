@@ -187,6 +187,25 @@ describe(commands.USER_LIST, () => {
     ]));
   });
 
+  it('lists users in the tenant with the guest type', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users?$select=id,displayName,mail,userPrincipalName&$filter=startsWith(surname, 'S') and userType eq 'Guest'&$top=100`) {
+        return {
+          "value": [
+            { "id": "7dc52cef-c513-4a53-bd43-93e9f6727911", "displayName": "Aarif Sherzai", "mail": "AarifS@fabrikam.onmicrosoft.com", "userPrincipalName": "AarifS_fabrikam.onmicrosoft.com#EXT#@contoso.onmicrosoft.com" }
+          ]
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { surname: 'S', type: 'Guest' } });
+    assert(loggerLogSpy.calledWith([
+      { "id": "7dc52cef-c513-4a53-bd43-93e9f6727911", "displayName": "Aarif Sherzai", "mail": "AarifS@fabrikam.onmicrosoft.com", "userPrincipalName": "AarifS_fabrikam.onmicrosoft.com#EXT#@contoso.onmicrosoft.com" }
+    ]));
+  });
+  
   it('escapes special characters in filters', async () => {
     const displayName = 'O\'Brien';
     sinon.stub(request, 'get').callsFake(async (opts) => {
