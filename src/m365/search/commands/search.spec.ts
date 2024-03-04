@@ -42,7 +42,7 @@ describe(commandName, () => {
               "conversationId": "AAQkAGRlM2Y5YTkzLWI2NzAtNDczOS05YWMyLTJhZGY2MGExMGU0MgAQAMc0n1gdmdxAgAfGlWKhSm4=",
               "isRead": false,
               "isDraft": false,
-              "webLink": "https://outlook.office365.com/owa/?ItemID=AAMkAAA%3D&exvsurl=1&viewmodel=ReadMessageItem",
+              "webLink": "https://outlook.office365.com/owa/?ItemID=AAMkAGRlM2Y5YTkzLWI2NzAtNDczOS05YWMyLTJhZGY2MGExMGU0MgBGAAAAAABIbfA8TbuRR7JKOZPl5FPxBwB8kpUvTuxuSYh8eqNsOdGBAAAAAAEMAAB8kpUvTuxuSYh8eqNsOdGBAAD30FHPAAA%3D&exvsurl=1&viewmodel=ReadMessageItem",
               "inferenceClassification": "focused",
               "replyTo": [
                 {
