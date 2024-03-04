@@ -20,6 +20,7 @@ const sidebars: SidebarsConfig = {
     'cmd/login',
     'cmd/logout',
     'cmd/request',
+    'cmd/search',
     'cmd/setup',
     'cmd/status',
     'cmd/version',
