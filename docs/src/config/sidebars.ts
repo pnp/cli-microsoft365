@@ -766,6 +766,11 @@ const sidebars: SidebarsConfig = {
           type: 'doc',
           label: 'list',
           id: 'cmd/file/file-list'
+        },
+        {
+          type: 'doc',
+          label: 'move',
+          id: 'cmd/file/file-move'
         }
       ]
     },
