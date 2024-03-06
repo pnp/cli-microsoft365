@@ -179,7 +179,7 @@ class TeamsTabGetCommand extends GraphCommand {
       this.teamId = await this.getTeamId(args);
       this.channelId = await this.getChannelId(args);
       const tabId: string = await this.getTabId(args);
-      const endpoint: string = `${this.resource}/v1.0/teams/${formatting.encodeQueryParameter(this.teamId)}/channels/${formatting.encodeQueryParameter(this.channelId)}/tabs/${formatting.encodeQueryParameter(tabId)}`;
+      const endpoint: string = `${this.resource}/v1.0/teams/${formatting.encodeQueryParameter(this.teamId)}/channels/${formatting.encodeQueryParameter(this.channelId)}/tabs/${formatting.encodeQueryParameter(tabId)}?$expand=teamsApp`;
 
       const requestOptions: CliRequestOptions = {
         url: endpoint,
@@ -190,6 +190,7 @@ class TeamsTabGetCommand extends GraphCommand {
       };
 
       const res: TeamsTab = await request.get<TeamsTab>(requestOptions);
+      (res as any).teamsAppTabId = res.teamsApp!.id;
       await logger.log(res);
     }
     catch (err: any) {

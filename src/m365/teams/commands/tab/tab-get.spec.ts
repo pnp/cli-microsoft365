@@ -290,7 +290,7 @@ describe(commands.TAB_GET, () => {
 
   it('correctly handles teams tabs request failure due to wrong channel id', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/teams/00000000-0000-0000-0000-000000000000/channels/29%3A00000000000000000000000000000000%40thread.skype/tabs/00000000-0000-0000-0000-000000000000') {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/teams/00000000-0000-0000-0000-000000000000/channels/29%3A00000000000000000000000000000000%40thread.skype/tabs/00000000-0000-0000-0000-000000000000?$expand=teamsApp') {
         throw {
           "error": {
             "code": "Invalid request",
@@ -316,7 +316,7 @@ describe(commands.TAB_GET, () => {
 
   it('should get a Microsoft Teams Tab by id', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/teams/00000000-0000-0000-0000-000000000000/channels/19%3A00000000000000000000000000000000%40thread.skype/tabs/00000000-0000-0000-0000-000000000000`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams/00000000-0000-0000-0000-000000000000/channels/19%3A00000000000000000000000000000000%40thread.skype/tabs/00000000-0000-0000-0000-000000000000?$expand=teamsApp`) {
         return {
           "id": "00000000-0000-0000-0000-000000000000",
           "displayName": "TeamsTab",
@@ -327,7 +327,8 @@ describe(commands.TAB_GET, () => {
             "removeUrl": "https://contoso.sharepoint.com/sites/PrototypeTeam/_layouts/15/TeamsLogon.aspx?SPFX=true&dest=/sites/PrototypeTeam/_layouts/15/teamshostedapp.aspx%3Flist=7d7f911a-bf19-46a0-86d9-187c3f32cce2%26id=2%26webPartInstanceId=1c8e5fda-7fd7-416f-9930-b3e90f009ea5%26removeTab",
             "websiteUrl": null,
             "dateAdded": "2020-07-18T19:27:22.03Z"
-          }
+          },
+          "teamsApp": { "id": "2a527703-1f6f-4559-a332-d8a7d288cd88", "externalId": null, "displayName": "Website", "distributionMethod": "store" }
         };
       }
       throw 'Invalid request';
@@ -341,6 +342,7 @@ describe(commands.TAB_GET, () => {
         id: '00000000-0000-0000-0000-000000000000'
       }
     });
+
     assert(loggerLogSpy.calledWith({
       "id": "00000000-0000-0000-0000-000000000000",
       "displayName": "TeamsTab",
@@ -351,13 +353,15 @@ describe(commands.TAB_GET, () => {
         "removeUrl": "https://contoso.sharepoint.com/sites/PrototypeTeam/_layouts/15/TeamsLogon.aspx?SPFX=true&dest=/sites/PrototypeTeam/_layouts/15/teamshostedapp.aspx%3Flist=7d7f911a-bf19-46a0-86d9-187c3f32cce2%26id=2%26webPartInstanceId=1c8e5fda-7fd7-416f-9930-b3e90f009ea5%26removeTab",
         "websiteUrl": null,
         "dateAdded": "2020-07-18T19:27:22.03Z"
-      }
+      },
+      "teamsApp": { "id": "2a527703-1f6f-4559-a332-d8a7d288cd88", "externalId": null, "displayName": "Website", "distributionMethod": "store" },
+      "teamsAppTabId": "2a527703-1f6f-4559-a332-d8a7d288cd88"
     }));
   });
 
   it('fails when team name does not exist', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/v1.0/groups?$filter=displayName eq '`) > -1) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq 'Team%20Name'`) {
         return {
           "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#teams",
           "@odata.count": 1,
@@ -399,7 +403,7 @@ describe(commands.TAB_GET, () => {
 
   it('should get a Microsoft Teams Tab by Team name', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/v1.0/groups?$filter=displayName eq '`) > -1) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq 'Team%20Name'`) {
         return {
           "value": [
             {
@@ -425,7 +429,7 @@ describe(commands.TAB_GET, () => {
         };
       }
 
-      if ((opts.url as string).indexOf(`/channels?$filter=displayName eq '`) > -1) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams/00000000-0000-0000-0000-000000000000/channels?$filter=displayName eq 'Channel%20Name'`) {
         return {
           "value": [
             {
@@ -440,7 +444,7 @@ describe(commands.TAB_GET, () => {
         };
       }
 
-      if ((opts.url as string).indexOf(`/tabs?$filter=displayName eq '`) > -1) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams/00000000-0000-0000-0000-000000000000/channels/19%3A00000000-0000-0000-0000-000000000000/tabs?$filter=displayName eq 'Tab%20Name'`) {
         return {
           "value": [
             {
@@ -459,7 +463,7 @@ describe(commands.TAB_GET, () => {
         };
       }
 
-      if ((opts.url as string).indexOf(`/tabs/`) > -1) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams/00000000-0000-0000-0000-000000000000/channels/19%3A00000000-0000-0000-0000-000000000000/tabs/00000000-0000-0000-0000-000000000000?$expand=teamsApp`) {
         return {
           "id": "00000000-0000-0000-0000-000000000000",
           "displayName": "TeamsTab",
@@ -470,7 +474,8 @@ describe(commands.TAB_GET, () => {
             "removeUrl": "https://contoso.sharepoint.com/sites/PrototypeTeam/_layouts/15/TeamsLogon.aspx?SPFX=true&dest=/sites/PrototypeTeam/_layouts/15/teamshostedapp.aspx%3Flist=7d7f911a-bf19-46a0-86d9-187c3f32cce2%26id=2%26webPartInstanceId=1c8e5fda-7fd7-416f-9930-b3e90f009ea5%26removeTab",
             "websiteUrl": null,
             "dateAdded": "2020-07-18T19:27:22.03Z"
-          }
+          },
+          "teamsApp": { "id": "2a527703-1f6f-4559-a332-d8a7d288cd88", "externalId": null, "displayName": "Website", "distributionMethod": "store" }
         };
       }
 
@@ -485,6 +490,7 @@ describe(commands.TAB_GET, () => {
         name: 'Tab Name'
       }
     });
+
     assert(loggerLogSpy.calledWith({
       "id": "00000000-0000-0000-0000-000000000000",
       "displayName": "TeamsTab",
@@ -495,13 +501,15 @@ describe(commands.TAB_GET, () => {
         "removeUrl": "https://contoso.sharepoint.com/sites/PrototypeTeam/_layouts/15/TeamsLogon.aspx?SPFX=true&dest=/sites/PrototypeTeam/_layouts/15/teamshostedapp.aspx%3Flist=7d7f911a-bf19-46a0-86d9-187c3f32cce2%26id=2%26webPartInstanceId=1c8e5fda-7fd7-416f-9930-b3e90f009ea5%26removeTab",
         "websiteUrl": null,
         "dateAdded": "2020-07-18T19:27:22.03Z"
-      }
+      },
+      "teamsApp": { "id": "2a527703-1f6f-4559-a332-d8a7d288cd88", "externalId": null, "displayName": "Website", "distributionMethod": "store" },
+      "teamsAppTabId": "2a527703-1f6f-4559-a332-d8a7d288cd88"
     }));
   });
 
   it('should get a Microsoft Teams Tab by Channel name', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/channels?$filter=displayName eq '`) > -1) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams/00000000-0000-0000-0000-000000000000/channels?$filter=displayName eq 'Channel%20Name'`) {
         return {
           "value": [
             {
@@ -516,7 +524,7 @@ describe(commands.TAB_GET, () => {
         };
       }
 
-      if ((opts.url as string).indexOf(`/tabs?$filter=displayName eq '`) > -1) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams/00000000-0000-0000-0000-000000000000/channels/19%3A00000000-0000-0000-0000-000000000000/tabs?$filter=displayName eq 'Tab%20Name'`) {
         return {
           "value": [
             {
@@ -535,7 +543,7 @@ describe(commands.TAB_GET, () => {
         };
       }
 
-      if ((opts.url as string).indexOf(`/tabs/`) > -1) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams/00000000-0000-0000-0000-000000000000/channels/19%3A00000000-0000-0000-0000-000000000000/tabs/00000000-0000-0000-0000-000000000000?$expand=teamsApp`) {
         return {
           "id": "00000000-0000-0000-0000-000000000000",
           "displayName": "TeamsTab",
@@ -546,7 +554,8 @@ describe(commands.TAB_GET, () => {
             "removeUrl": "https://contoso.sharepoint.com/sites/PrototypeTeam/_layouts/15/TeamsLogon.aspx?SPFX=true&dest=/sites/PrototypeTeam/_layouts/15/teamshostedapp.aspx%3Flist=7d7f911a-bf19-46a0-86d9-187c3f32cce2%26id=2%26webPartInstanceId=1c8e5fda-7fd7-416f-9930-b3e90f009ea5%26removeTab",
             "websiteUrl": null,
             "dateAdded": "2020-07-18T19:27:22.03Z"
-          }
+          },
+          "teamsApp": { "id": "2a527703-1f6f-4559-a332-d8a7d288cd88", "externalId": null, "displayName": "Website", "distributionMethod": "store" }
         };
       }
 
@@ -561,6 +570,7 @@ describe(commands.TAB_GET, () => {
         name: 'Tab Name'
       }
     });
+
     assert(loggerLogSpy.calledWith({
       "id": "00000000-0000-0000-0000-000000000000",
       "displayName": "TeamsTab",
@@ -571,13 +581,15 @@ describe(commands.TAB_GET, () => {
         "removeUrl": "https://contoso.sharepoint.com/sites/PrototypeTeam/_layouts/15/TeamsLogon.aspx?SPFX=true&dest=/sites/PrototypeTeam/_layouts/15/teamshostedapp.aspx%3Flist=7d7f911a-bf19-46a0-86d9-187c3f32cce2%26id=2%26webPartInstanceId=1c8e5fda-7fd7-416f-9930-b3e90f009ea5%26removeTab",
         "websiteUrl": null,
         "dateAdded": "2020-07-18T19:27:22.03Z"
-      }
+      },
+      "teamsApp": { "id": "2a527703-1f6f-4559-a332-d8a7d288cd88", "externalId": null, "displayName": "Website", "distributionMethod": "store" },
+      "teamsAppTabId": "2a527703-1f6f-4559-a332-d8a7d288cd88"
     }));
   });
 
   it('fails to get channel when channel does not exists', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/channels?$filter=displayName eq '`) > -1) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams/00000000-0000-0000-0000-000000000000/channels?$filter=displayName eq 'Channel%20Name'`) {
         return { value: [] };
       }
       throw 'Invalid request';
@@ -595,7 +607,7 @@ describe(commands.TAB_GET, () => {
 
   it('fails to get tab when tab does not exists', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/tabs?$filter=displayName eq '`) > -1) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams/00000000-0000-0000-0000-000000000000/channels/19%3A00000000000000000000000000000000%40thread.skype/tabs?$filter=displayName eq 'Tab%20Name'`) {
         return { value: [] };
       }
       throw 'Invalid request';
