@@ -22,10 +22,13 @@ m365 aad app permission list [options]
 
 ```md definition-list
 `-i, --appId [appId]`
-: Client ID of the Application Registration to retrieve the permissions for. Specify `appId` or `appObjectId` but not both.
+: Client ID of the Entra application registration to retrieve the permissions for. Specify either `appId`, `appName` or `appObjectId`.
+
+`-n, --appName [appName]`
+: Display name of the Entra application registration to add the API permissions to. Specify either `appId`, `appName` or `appObjectId`.
 
 `--appObjectId [appObjectId]`
-: Object ID of the Application Registration to retrieve the permissions for. Specify `appId` or `appObjectId` but not both.
+: Object ID of the Entra application registration to retrieve the permissions for. Specify either `appId`, `appName` or `appObjectId`.
 
 `--type [type]`
 : The type of permissions to retrieve. Allowed values: `delegated`, `application`, `all`. Defaults to `all`.
@@ -39,16 +42,22 @@ For best performance use the `objectId` option to reference the Entra applicatio
 
 ## Examples
 
-Retrieves all permissions for an Entra app registration
+Retrieves all permissions for an Entra application registration specified by client id.
 
 ```sh
 m365 entra app permission list --appId 'f1417aa3-bf0b-4cc5-a845-a0b2cf11f690'
 ```
 
-Retrieves all delegated permissions for an Entra app registration
+Retrieves all permissions for an Entra application registration by specified by app display name.
 
 ```sh
-m365 entra app permission list --appId 'f1417aa3-bf0b-4cc5-a845-a0b2cf11f690' --type delegated
+m365 entra app permission list --appName 'Contoso App'
+```
+
+Retrieves all delegated permissions for an Entra application registration specified by object id.
+
+```sh
+m365 entra app permission list --appObjectId '64381cda-d40d-4fb0-bce2-bece391546a2' --type delegated
 ```
 
 ## Response

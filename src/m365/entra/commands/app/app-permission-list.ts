@@ -6,6 +6,7 @@ import request, { CliRequestOptions } from "../../../../request.js";
 import { Logger } from "../../../../cli/Logger.js";
 import { validation } from "../../../../utils/validation.js";
 import { formatting } from "../../../../utils/formatting.js";
+import { cli } from "../../../../cli/cli.js";
 
 interface CommandArgs {
   options: Options;
@@ -13,6 +14,7 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   appId?: string;
+  appName?: string;
   appObjectId?: string;
   type?: string;
 }
@@ -53,6 +55,7 @@ class EntraAppPermissionListCommand extends GraphCommand {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
         appId: typeof args.options.appId !== 'undefined',
+        appName: typeof args.options.appName !== 'undefined',
         appObjectId: typeof args.options.appObjectId !== 'undefined',
         type: typeof args.options.type !== 'undefined'
       });
@@ -62,6 +65,7 @@ class EntraAppPermissionListCommand extends GraphCommand {
   #initOptions(): void {
     this.options.unshift(
       { option: '-i, --appId [appId]' },
+      { option: '-n, --appName [appName]' },
       { option: '--appObjectId [appObjectId]' },
       { option: '--type [type]', autocomplete: this.allowedTypes }
     );
@@ -88,7 +92,7 @@ class EntraAppPermissionListCommand extends GraphCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push({ options: ['appId', 'appObjectId'] });
+    this.optionSets.push({ options: ['appId', 'appName', 'appObjectId'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -108,8 +112,14 @@ class EntraAppPermissionListCommand extends GraphCommand {
       return options.appObjectId;
     }
 
+    const { appId, appName } = options;
+
+    const filter: string = appId ?
+      `appId eq '${formatting.encodeQueryParameter(appId)}'` :
+      `displayName eq '${formatting.encodeQueryParameter(appName as string)}'`;
+
     const requestOptions: CliRequestOptions = {
-      url: `${this.resource}/v1.0/myorganization/applications?$filter=appId eq '${formatting.encodeQueryParameter(options.appId!)}'&$select=id`,
+      url: `${this.resource}/v1.0/myorganization/applications?$filter=${filter}&$select=id`,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },
@@ -118,11 +128,18 @@ class EntraAppPermissionListCommand extends GraphCommand {
 
     const res = await request.get<{ value: { id: string }[] }>(requestOptions);
 
-    if (res.value.length === 0) {
-      throw `No Microsoft Entra application registration with ID ${options.appId} found`;
+    if (res.value.length === 1) {
+      return res.value[0].id;
     }
 
-    return res.value[0].id;
+    if (res.value.length === 0) {
+      const applicationIdentifier = appId ? `ID ${appId}` : `name ${appName}`;
+      throw `No Microsoft Entra application registration with ${applicationIdentifier} found`;
+    }
+
+    const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', res.value);
+    const result = await cli.handleMultipleResultsFound<{ id: string }>(`Multiple Entra application registrations with name '${appName}' found.`, resultAsKeyValuePair);
+    return result.id;
   }
 
   private async getAppRegPermissions(appObjectId: string, permissionType: string, logger: Logger): Promise<ApiPermission[]> {
