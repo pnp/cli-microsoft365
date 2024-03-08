@@ -9,7 +9,6 @@ import { formatting } from '../../../../utils/formatting.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
-import { CommandError } from '../../../../Command.js';
 
 interface CommandArgs {
   options: Options;
@@ -153,7 +152,7 @@ class SpoUserRemoveCommand extends SpoCommand {
         const user = await this.getUser(options);
 
         if (!user) {
-          throw new CommandError(`User not found: ${options.userName}`);
+          throw new Error(`User not found: ${options.userName}`);
         }
 
         if (this.verbose) {
