@@ -214,7 +214,7 @@ describe(commands.USER_REMOVE, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if id is not a valid id', async () => {
+  it('fails validation if id is not a valid number', async () => {
     const actual = await command.validate({ options: { webUrl: validWebUrl, id: 'invalid' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
