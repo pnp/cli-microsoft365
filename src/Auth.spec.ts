@@ -304,7 +304,7 @@ describe('Auth', () => {
       done('Got access token');
     }, () => {
       try {
-        assert(loggerLogToStderrSpy.calledWith('getTokenPromise authentication result is null'));
+        assert(loggerLogToStderrSpy.calledWith('getTokenPromise authentication result is null.'));
         done();
       }
       catch (e) {
@@ -321,7 +321,7 @@ describe('Auth', () => {
       done('Got access token');
     }, () => {
       try {
-        assert(loggerLogToStderrSpy.calledWith('getTokenPromise authentication result is null'));
+        assert(loggerLogToStderrSpy.calledWith('getTokenPromise authentication result is null.'));
         done();
       }
       catch (e) {
