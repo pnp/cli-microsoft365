@@ -10,6 +10,23 @@ import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 
+interface SpoUser {
+  Id: number;
+  IsHiddenInUI: boolean;
+  Title: string;
+  PrincipalType: number;
+  Email: string;
+  Expiration: string;
+  IsEmailAuthenticationGuestUser: boolean;
+  IsShareByEmailGuestUser: boolean;
+  IsSiteAdmin: boolean;
+  UserId: {
+    NameId: string;
+    NameIdIssuer: string;
+    urn: string;
+  };
+  UserPrincipalName: string;
+};
 interface CommandArgs {
   options: Options;
 }
@@ -161,7 +178,7 @@ class SpoUserRemoveCommand extends SpoCommand {
         requestUrl += `removebyid(${user.Id})`;
       }
       else if (options.entraGroupId || options.entraGroupName) {
-        const entraGroup = await this.getEntraGroup(options.webUrl, options);
+        const entraGroup = await this.getEntraGroup(options);
         if (this.verbose) {
           await logger.logToStderr(`Removing entra group ${entraGroup?.displayName} ...`);
         }
@@ -202,38 +219,13 @@ class SpoUserRemoveCommand extends SpoCommand {
 
     const userInstance = await request.get(requestOptions);
     return (userInstance as {
-      value: spoUser[];
+      value: SpoUser[];
     }).value[0];
   }
 
-  private async getEntraGroup(webUrl: string, options: GlobalOptions): Promise<Group | undefined> {
-    let group: Group | undefined;
-    if (options.entraGroupId) {
-      group = await entraGroup.getGroupById(options.entraGroupId);
-    }
-    else if (options.entraGroupName) {
-      group = await entraGroup.getGroupByDisplayName(options.entraGroupName);
-    }
-    return group;
+  private async getEntraGroup(options: GlobalOptions): Promise<Group> {
+    return options.entraGroupId ? await entraGroup.getGroupById(options.entraGroupId) : await entraGroup.getGroupByDisplayName(options.entraGroupName);
   }
 }
 
 export default new SpoUserRemoveCommand();
-
-interface spoUser {
-  Id: number;
-  IsHiddenInUI: boolean;
-  Title: string;
-  PrincipalType: number;
-  Email: string;
-  Expiration: string;
-  IsEmailAuthenticationGuestUser: boolean;
-  IsShareByEmailGuestUser: boolean;
-  IsSiteAdmin: boolean;
-  UserId: {
-    NameId: string;
-    NameIdIssuer: string;
-    urn: string;
-  };
-  UserPrincipalName: string;
-};
