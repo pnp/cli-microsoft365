@@ -154,7 +154,7 @@ describe(commands.APP_EXPORT, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
-    auth.service.accessTokens[auth.defaultResource] = {
+    auth.connection.accessTokens[auth.defaultResource] = {
       expiresOn: 'abc',
       accessToken: 'abc'
     };

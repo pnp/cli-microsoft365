@@ -30,16 +30,16 @@ describe('PowerAppsCommand', () => {
   before(() => {
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
-    auth.service.accessTokens[auth.defaultResource] = {
+    auth.connection.accessTokens[auth.defaultResource] = {
       expiresOn: 'abc',
       accessToken: 'abc'
     };
-    auth.service.connected = true;
+    auth.connection.active = true;
   });
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
+    auth.connection.active = false;
   });
 
   it('returns correct resource', () => {
@@ -85,8 +85,8 @@ describe('PowerAppsCommand', () => {
   it('throws error when trying to use the command using application only permissions', () => {
     sinonUtil.restore(accessToken.isAppOnlyAccessToken);
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
-    auth.service.connected = true;
-    auth.service.cloudType = CloudType.Public;
+    auth.connection.active = true;
+    auth.connection.cloudType = CloudType.Public;
     assert.throws(() => (cmd as any).initAction({ options: {} }, {}));
   });
 });

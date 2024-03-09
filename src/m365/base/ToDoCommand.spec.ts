@@ -26,21 +26,21 @@ describe('ToDoCommand', () => {
 
   before(() => {
     sinon.stub(telemetry, 'trackEvent').returns();
-    auth.service.accessTokens[auth.defaultResource] = {
+    auth.connection.accessTokens[auth.defaultResource] = {
       expiresOn: 'abc',
       accessToken: 'abc'
     };
-    auth.service.connected = true;
+    auth.connection.active = true;
   });
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
+    auth.connection.active = false;
   });
 
   it('throws error when trying to use the command using application only permissions', () => {
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
-    auth.service.connected = true;
+    auth.connection.active = true;
     assert.throws(() => (cmd as any).initAction({ options: {} }, {}));
   });
 });

@@ -36,7 +36,7 @@ describe('VivaEngageCommand', () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
-    auth.service.accessTokens[auth.defaultResource] = {
+    auth.connection.accessTokens[auth.defaultResource] = {
       expiresOn: 'abc',
       accessToken: 'abc'
     };
@@ -142,7 +142,7 @@ describe('VivaEngageCommand', () => {
     const cmd = new MockCommand();
     sinonUtil.restore(accessToken.isAppOnlyAccessToken);
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
-    auth.service.connected = true;
+    auth.connection.active = true;
     assert.throws(() => (cmd as any).initAction({ options: {} }, {}));
   });
 });
