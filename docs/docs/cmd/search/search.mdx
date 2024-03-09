@@ -15,7 +15,7 @@ m365 search [options]
 ## Options
 
 ```md definition-list
-`-q --queryString [queryString]`
+`-q --queryText [queryText]`
 : Query to be executed in Keyword Query Language (KQL) format.
 
 `-s, --scopes <scopes>`
@@ -53,7 +53,7 @@ m365 search [options]
 
 ## Remarks
 
-The `queryString` option supports [Keyword Query Language](https://learn.microsoft.com/graph/api/resources/search-api-overview#keyword-query-language-kql-support) (KQL).
+The `queryText` option supports [Keyword Query Language](https://learn.microsoft.com/graph/api/resources/search-api-overview#keyword-query-language-kql-support) (KQL).
 
 The `sortBy` option allows to specify the order. By default, the order is ascending. If you want to apply descending order, add `:desc` to the property name, like `createdDateTime:desc`.
 
@@ -62,13 +62,13 @@ The `sortBy` option allows to specify the order. By default, the order is ascend
 Queries messages in the current user mailbox that contain the string "contoso" in any part of the message (the sender name, subject, message body, or any attachments). The query returns the first 100 results. The search results are ordered by createdDateTime descending and id descending and date ascending
 
 ```sh
-m365 search --scopes 'message' --query 'contoso' --size 100 --sortBy 'createdDateTime:desc,id:desc,date'
+m365 search --scopes 'message' --queryText 'contoso' --size 100 --sortBy 'createdDateTime:desc,id:desc,date'
 ```
 
 Queries list items and sites that contain the string "accountt" and requests a spelling modification for the query.
 
 ```sh
-m365 search --scopes 'listItem, site' --query 'accountt' --enableSpellingSuggestion --enableSpellingModification
+m365 search --scopes 'listItem, site' --queryText 'accountt' --enableSpellingSuggestion --enableSpellingModification
 ```
 
 ## Response
@@ -229,7 +229,7 @@ When we make use of the option `resultsOnly` the response will differ.
   <TabItem value="Markdown">
 
   ```md
-  # search --scopes "driveItem" --queryString "OpenAPI" --resultsOnly "true"
+  # search --scopes "driveItem" --queryText "OpenAPI" --resultsOnly "true"
 
   Date: 3/3/2024
 

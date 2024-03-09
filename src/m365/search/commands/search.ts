@@ -12,7 +12,7 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  queryString?: string;
+  queryText?: string;
   scopes: string;
   startIndex?: number;
   pageSize?: number;
@@ -64,7 +64,7 @@ class SearchSearchCommand extends GraphCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '-q --queryString [queryString]'
+        option: '-q --queryText [queryText]'
       },
       {
         option: '-s, --scopes <scopes>',
@@ -154,7 +154,7 @@ class SearchSearchCommand extends GraphCommand {
               {
                 "entityTypes": args.options.scopes.split(',').map(scope => scope.trim()),
                 "query": {
-                  "queryString": args.options.queryString ?? '*'
+                  "queryString": args.options.queryText ?? '*'
                 },
                 "enableTopResults": args.options.enableTopResults,
                 "from": startIndex,

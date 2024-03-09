@@ -575,7 +575,7 @@ describe(commandName, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('successfully returns search response when queryString is not specified', async () => {
+  it('successfully returns search response when queryText is not specified', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/search/query' &&
         JSON.stringify(opts.data) === JSON.stringify({
@@ -627,7 +627,7 @@ describe(commandName, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { scopes: 'message', queryString: 'contoso' } });
+    await command.action(logger, { options: { scopes: 'message', queryText: 'contoso' } });
     assert(loggerLogSpy.calledOnceWithExactly(fullSearchResponse));
   });
 
@@ -655,7 +655,7 @@ describe(commandName, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { scopes: 'message', queryString: 'contoso', resultsOnly: true } });
+    await command.action(logger, { options: { scopes: 'message', queryText: 'contoso', resultsOnly: true } });
     assert(loggerLogSpy.calledOnceWithExactly(resultsOnlySearchResponse));
   });
 
@@ -683,7 +683,7 @@ describe(commandName, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { scopes: 'message', queryString: 'contoso', pageSize: 1 } });
+    await command.action(logger, { options: { scopes: 'message', queryText: 'contoso', pageSize: 1 } });
     assert(loggerLogSpy.calledOnceWithExactly(fullSearchResponse));
   });
 
@@ -711,7 +711,7 @@ describe(commandName, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { scopes: 'message', queryString: 'contoso', startIndex: 10 } });
+    await command.action(logger, { options: { scopes: 'message', queryText: 'contoso', startIndex: 10 } });
     assert(loggerLogSpy.calledOnceWithExactly(fullSearchResponse));
   });
 
@@ -743,7 +743,7 @@ describe(commandName, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { scopes: 'message', queryString: 'contoso', select: 'subject,importance' } });
+    await command.action(logger, { options: { scopes: 'message', queryText: 'contoso', select: 'subject,importance' } });
     assert(loggerLogSpy.calledOnceWithExactly(selectedPropertiesSearchResponse));
   });
 
@@ -781,7 +781,7 @@ describe(commandName, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { scopes: 'driveItem', queryString: 'contoso', sortBy: 'name:desc,createdDateTime' } });
+    await command.action(logger, { options: { scopes: 'driveItem', queryText: 'contoso', sortBy: 'name:desc,createdDateTime' } });
     assert(loggerLogSpy.calledOnceWithExactly(selectedPropertiesSearchResponse));
   });
 
@@ -812,7 +812,7 @@ describe(commandName, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { scopes: 'driveItem', queryString: 'contoso', enableSpellingModification: true, enableSpellingSuggestion: true } });
+    await command.action(logger, { options: { scopes: 'driveItem', queryText: 'contoso', enableSpellingModification: true, enableSpellingSuggestion: true } });
     assert(loggerLogSpy.calledOnceWithExactly(spellingCorrectionSearchResponse));
   });
 
@@ -859,7 +859,7 @@ describe(commandName, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { scopes: 'message', queryString: 'contoso', allResults: true } });
+    await command.action(logger, { options: { scopes: 'message', queryText: 'contoso', allResults: true } });
     assert(loggerLogSpy.calledOnceWithExactly(allResults));
   });
 
@@ -921,19 +921,6 @@ describe(commandName, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { scopes: 'message', queryString: '' } }), new CommandError('SearchRequest Invalid (EntityRequest Invalid (searchRequest -> query is invalid (queryString required)))'));
+    await assert.rejects(command.action(logger, { options: { scopes: 'message', queryText: '' } }), new CommandError('SearchRequest Invalid (EntityRequest Invalid (searchRequest -> query is invalid (queryString required)))'));
   });
 });
-
-
-
-
-
-
-
-
-
-
-
-
-// Access to OneDriveFile in Graph API requires the following permissions: Files.Read.All or Sites.Read.All or Files.ReadWrite.All or Sites.ReadWrite.All. However, the application only has the following permissions granted: Mail.ReadWrite, User.Read
