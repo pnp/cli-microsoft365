@@ -1,5 +1,6 @@
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { odata } from '../../../../utils/odata.js';
 import { validation } from '../../../../utils/validation.js';
@@ -16,6 +17,7 @@ interface Options extends GlobalOptions {
   status?: string;
   triggerStartTime?: string;
   triggerEndTime?: string;
+  withTrigger?: boolean
   asAdmin?: boolean;
 }
 
@@ -26,7 +28,13 @@ interface PowerAutomateFlowRun {
   properties: {
     startTime: string;
     status: string;
+    trigger: {
+      outputsLink: {
+        uri: string;
+      }
+    }
   }
+  triggerInformation?: any;
 }
 
 class FlowRunListCommand extends PowerAutomateCommand {
@@ -58,6 +66,7 @@ class FlowRunListCommand extends PowerAutomateCommand {
         status: typeof args.options.status !== 'undefined',
         triggerStartTime: typeof args.options.triggerStartTime !== 'undefined',
         triggerEndTime: typeof args.options.triggerEndTime !== 'undefined',
+        withTrigger: !!args.options.withTrigger,
         asAdmin: !!args.options.asAdmin
       });
     });
@@ -80,6 +89,9 @@ class FlowRunListCommand extends PowerAutomateCommand {
       },
       {
         option: '--triggerEndTime [triggerEndTime]'
+      },
+      {
+        option: '--withTrigger'
       },
       {
         option: '--asAdmin'
@@ -106,6 +118,10 @@ class FlowRunListCommand extends PowerAutomateCommand {
           return `'${args.options.triggerEndTime}' is not a valid datetime.`;
         }
 
+        if (args.options.output !== 'json' && args.options.withTrigger) {
+          return 'The --withTrigger option is only available when output is set to json';
+        }
+
         return true;
       }
     );
@@ -123,6 +139,10 @@ class FlowRunListCommand extends PowerAutomateCommand {
     }
     try {
       const items = await odata.getAllItems<PowerAutomateFlowRun>(url);
+
+      if (args.options.withTrigger) {
+        await this.retrieveTriggerInformation(items);
+      }
 
       if (args.options.output !== 'json' && items.length > 0) {
         items.forEach(i => {
@@ -150,6 +170,23 @@ class FlowRunListCommand extends PowerAutomateCommand {
       filters.push(`startTime lt ${options.triggerEndTime}`);
     }
     return filters;
+  }
+
+  private async retrieveTriggerInformation(items: PowerAutomateFlowRun[]): Promise<void> {
+    const tasks = items.map(async (item: PowerAutomateFlowRun) => {
+      const requestOptions: CliRequestOptions = {
+        url: item.properties.trigger.outputsLink.uri,
+        headers: {
+          accept: 'application/json',
+          'x-anonymous': true
+        },
+        responseType: 'json'
+      };
+      const response = await request.get<{ body: any }>(requestOptions);
+      item.triggerInformation = response.body;
+    });
+
+    await Promise.all(tasks);
   }
 }
 
