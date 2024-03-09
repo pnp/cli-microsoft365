@@ -11,7 +11,7 @@ export default abstract class PowerBICommand extends Command {
   protected initAction(args: CommandArgs, logger: Logger): void {
     super.initAction(args, logger);
 
-    if (!auth.service.connected) {
+    if (!auth.connection.active) {
       // we fail no login in the base command command class
       return;
     }

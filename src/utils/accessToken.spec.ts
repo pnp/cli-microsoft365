@@ -7,7 +7,7 @@ import auth from '../Auth.js';
 describe('utils/accessToken', () => {
 
   before(() => {
-    auth.service.accessTokens[auth.defaultResource] = {
+    auth.connection.accessTokens[auth.defaultResource] = {
       expiresOn: 'abc',
       accessToken: 'abc'
     };
@@ -21,7 +21,7 @@ describe('utils/accessToken', () => {
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
+    auth.connection.active = false;
   });
 
   it('isAppOnlyAccessToken returns undefined when access token is undefined', () => {

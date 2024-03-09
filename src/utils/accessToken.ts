@@ -100,7 +100,7 @@ export const accessToken = {
    * @throws {string} Will throw an error if the access token is an application-only access token.
    */
   ensureDelegatedAccessToken(): void {
-    const accessToken = auth.service.accessTokens[auth.defaultResource].accessToken;
+    const accessToken = auth.connection.accessTokens[auth.defaultResource].accessToken;
     if (this.isAppOnlyAccessToken(accessToken)) {
       throw 'This command does not support application-only permissions.';
     }
