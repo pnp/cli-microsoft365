@@ -172,7 +172,7 @@ export const spo = {
         await logger.logToStderr('Error while storing connection info');
       }
     }
-    return auth.service.spoUrl;
+    return auth.connection.spoUrl;
   },
 
   async getSpoAdminUrl(logger: Logger, debug: boolean): Promise<string> {
@@ -207,7 +207,7 @@ export const spo = {
 
     const res: string = await request.post(tenantInfoRequestOptions);
     const json: string[] = JSON.parse(res);
-    auth.connection.tenantId = (json[json.length - 1] as any)._ObjectIdentity_.replace('\n', '&#xA;');
+    auth.connection.spoTenantId = (json[json.length - 1] as any)._ObjectIdentity_.replace('\n', '&#xA;');
     try {
       await auth.storeConnectionInfo();
     }
@@ -216,7 +216,7 @@ export const spo = {
         await logger.logToStderr('Error while storing connection info');
       }
     }
-    return auth.connection.tenantId as string;
+    return auth.connection.spoTenantId as string;
   },
 
   /**
