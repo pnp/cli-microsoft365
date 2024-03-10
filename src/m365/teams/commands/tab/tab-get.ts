@@ -190,7 +190,6 @@ class TeamsTabGetCommand extends GraphCommand {
       };
 
       const res: TeamsTab = await request.get<TeamsTab>(requestOptions);
-      (res as any).teamsAppTabId = res.teamsApp!.id;
       await logger.log(res);
     }
     catch (err: any) {

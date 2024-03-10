@@ -354,8 +354,7 @@ describe(commands.TAB_GET, () => {
         "websiteUrl": null,
         "dateAdded": "2020-07-18T19:27:22.03Z"
       },
-      "teamsApp": { "id": "2a527703-1f6f-4559-a332-d8a7d288cd88", "externalId": null, "displayName": "Website", "distributionMethod": "store" },
-      "teamsAppTabId": "2a527703-1f6f-4559-a332-d8a7d288cd88"
+      "teamsApp": { "id": "2a527703-1f6f-4559-a332-d8a7d288cd88", "externalId": null, "displayName": "Website", "distributionMethod": "store" }
     }));
   });
 
@@ -502,8 +501,7 @@ describe(commands.TAB_GET, () => {
         "websiteUrl": null,
         "dateAdded": "2020-07-18T19:27:22.03Z"
       },
-      "teamsApp": { "id": "2a527703-1f6f-4559-a332-d8a7d288cd88", "externalId": null, "displayName": "Website", "distributionMethod": "store" },
-      "teamsAppTabId": "2a527703-1f6f-4559-a332-d8a7d288cd88"
+      "teamsApp": { "id": "2a527703-1f6f-4559-a332-d8a7d288cd88", "externalId": null, "displayName": "Website", "distributionMethod": "store" }
     }));
   });
 
@@ -582,8 +580,7 @@ describe(commands.TAB_GET, () => {
         "websiteUrl": null,
         "dateAdded": "2020-07-18T19:27:22.03Z"
       },
-      "teamsApp": { "id": "2a527703-1f6f-4559-a332-d8a7d288cd88", "externalId": null, "displayName": "Website", "distributionMethod": "store" },
-      "teamsAppTabId": "2a527703-1f6f-4559-a332-d8a7d288cd88"
+      "teamsApp": { "id": "2a527703-1f6f-4559-a332-d8a7d288cd88", "externalId": null, "displayName": "Website", "distributionMethod": "store" }
     }));
   });
 
