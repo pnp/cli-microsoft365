@@ -11,20 +11,20 @@ There is an article ["Using your own Microsoft Entra ID identity"](./using-own-i
 
 ## I get "Error: AADSTS700025: Client is public so 'client_assertion' should not be presented"
 
-If you want to authenticate the CLI using and certificate, you shouldn't treat the application as a public client. You should set the default client type your Microsoft Entra ID application to "NO." More information can be found in this issue [#948](https://github.com/pnp/cli-microsoft365/issues/948#issuecomment-487145809).
+If you want to authenticate the CLI using and certificate, you shouldn't treat the application as a public client. You should set the default client type your Microsoft Entra application to "NO." More information can be found in this issue [#948](https://github.com/pnp/cli-microsoft365/issues/948#issuecomment-487145809).
 
-## What is the minimum set of Microsoft Entra ID app permissions to execute SharePoint commands with a certificate CLI login
+## What is the minimum set of Microsoft Entra app permissions to execute SharePoint commands with a certificate CLI login
 
-When you decide to use the CLI with your own Microsoft Entra ID app to execute SharePoint CLI commands, you need to grant it at least the  Microsoft Graph `Sites.Read.All` permission, and then any other scopes required by the commands you'd like to execute. For example, if you'd like to list all the sites within your tenant using the `m365 spo site list` command, then the minimum permissions for your app would be Microsoft Graph `Sites.Read.All` and SharePoint `Sites.Manage.All`.
+When you decide to use the CLI with your own Microsoft Entra app to execute SharePoint CLI commands, you need to grant it at least the  Microsoft Graph `Sites.Read.All` permission, and then any other scopes required by the commands you'd like to execute. For example, if you'd like to list all the sites within your tenant using the `m365 spo site list` command, then the minimum permissions for your app would be Microsoft Graph `Sites.Read.All` and SharePoint `Sites.Manage.All`.
 
 - your application requires the Microsoft Graph `Sites.Read.All` permission because the `m365 login` command is using `https://graph.microsoft.com/v1.0/sites/root?$select=webUrl` API to dynamically find the root SharePoint site URL and use it to get a token for the SharePoint resource from Microsoft Identity dynamically.
 - your application requires the SharePoint `Sites.Manage.All` permission to list the sites since the CLI uses SharePoint APIs to do that from the `spo site list` command, and the minimum permissions to list sites is `Sites.Manage.All`.
 
-[![Microsoft Entra ID application permissions highlighted in Microsoft Entra ID](../images/cli-certificate-caveats/min-app-permissions-to-list-SP-sites.png)](../images/cli-certificate-caveats/min-app-permissions-to-list-SP-sites.png)
+[![Microsoft Entra application permissions highlighted in Microsoft Entra ID](../images/cli-certificate-caveats/min-app-permissions-to-list-SP-sites.png)](../images/cli-certificate-caveats/min-app-permissions-to-list-SP-sites.png)
 
 ## I get an error: 403, "AccessDenied Either scp or roles claim need to be present in the token" when executing a CLI for Microsoft 365 SharePoint command. What does it mean
 
-It means that the Microsoft Entra ID application that the CLI is running under does not have Microsoft Graph `Sites.Read.All` application permission granted. If you are trying to use the CLI with a certificate login and SharePoint, you would have to allow Microsoft Graph `Sites.Read.All` application permissions to the Microsoft Entra ID app.
+It means that the Microsoft Entra application that the CLI is running under does not have Microsoft Graph `Sites.Read.All` application permission granted. If you are trying to use the CLI with a certificate login and SharePoint, you would have to allow Microsoft Graph `Sites.Read.All` application permissions to the Microsoft Entra app.
 
 ## I am using CLI with a certificate, but when I execute the `spo site add` I get error "Insufficient privileges to complete the operation."
 
@@ -36,11 +36,11 @@ If your goal is to create team sites, you can use the `m365 entra m365group add`
 
 You would need the Microsoft Graph `Group.Create` and `User.Read.All` application permissions.
 
-[![Microsoft Entra ID application permissions](../images/cli-certificate-caveats/min-app-permissions-create-m365group.png)](../images/cli-certificate-caveats/min-app-permissions-create-m365group.png)
+[![Microsoft Entra application permissions](../images/cli-certificate-caveats/min-app-permissions-create-m365group.png)](../images/cli-certificate-caveats/min-app-permissions-create-m365group.png)
 
 ### What are the minimum permissions required to use the `m365 entra m365group add` command and the `m365 spo site set` command
 
-[![Microsoft Entra ID application permissions](../images/cli-certificate-caveats/min-permissions-team-site.png)](../images/cli-certificate-caveats/min-permissions-team-site.png)
+[![Microsoft Entra application permissions](../images/cli-certificate-caveats/min-permissions-team-site.png)](../images/cli-certificate-caveats/min-permissions-team-site.png)
 
 You would need the Microsoft Graph `Group.Create` and `User.Read.All` application permissions together with SharePoint `Sites.FullControl.All` application permission.
 

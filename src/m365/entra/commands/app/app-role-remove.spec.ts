@@ -1991,7 +1991,7 @@ describe(commands.APP_ROLE_REMOVE, () => {
   });
 
   it('aborts deleting app role when prompt is not confirmed', async () => {
-    // represents the aad app get request called when the prompt is confirmed
+    // represents the Microsoft Entra ID get request called when the prompt is confirmed
     const patchStub = sinon.stub(request, 'get');
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(false);
@@ -2001,7 +2001,7 @@ describe(commands.APP_ROLE_REMOVE, () => {
   });
 
   it('aborts deleting app role when prompt is not confirmed (debug)', async () => {
-    // represents the aad app get request called when the prompt is confirmed
+    // represents the Microsoft Entra ID get request called when the prompt is confirmed
     const patchStub = sinon.stub(request, 'get');
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(false);

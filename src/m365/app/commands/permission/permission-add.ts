@@ -35,7 +35,7 @@ class AppPermissionAddCommand extends AppCommand {
   }
 
   public get description(): string {
-    return 'Adds the specified application and/or delegated permissions to the current AAD app API permissions';
+    return 'Adds the specified application and/or delegated permissions to the current Microsoft Entra app API permissions';
   }
 
   constructor() {
@@ -116,7 +116,7 @@ class AppPermissionAddCommand extends AppCommand {
     const apps = await odata.getAllItems<Application>(`${this.resource}/v1.0/myorganization/applications?$filter=appId eq '${formatting.encodeQueryParameter(this.appId!)}'&$select=id,requiredResourceAccess`);
 
     if (apps.length === 0) {
-      throw `App with id ${this.appId} not found in Azure Active Directory`;
+      throw `App with id ${this.appId} not found in Microsoft Entra ID`;
     }
 
     return apps[0];

@@ -54,7 +54,7 @@ Generally, you should use the default device code flow. If you need to use a non
 
 #### Log in using a certificate
 
-Another way to log in to Microsoft 365 in the CLI for Microsoft 365 is by using a certificate. To use this authentication method, set the `CLIMICROSOFT365_AADAPPID` environment variable to the ID of the Microsoft Entra ID application that you want to use to authenticate the CLI for Microsoft 365 and the `CLIMICROSOFT365_TENANT` environment variable to the ID of your Microsoft Entra ID directory. When calling the login command, set the `authType` option to `certificate` and specify the path to the certificate private key using the `certificateFile` option. Optionally, you can specify the certificate's thumbprint using the `thumbprint` option. If not specified, CLI will automatically calculate it from the specified certificate.
+Another way to log in to Microsoft 365 in the CLI for Microsoft 365 is by using a certificate. To use this authentication method, set the `CLIMICROSOFT365_AADAPPID` environment variable to the ID of the Microsoft Entra application that you want to use to authenticate the CLI for Microsoft 365 and the `CLIMICROSOFT365_TENANT` environment variable to the ID of your Microsoft Entra ID directory. When calling the login command, set the `authType` option to `certificate` and specify the path to the certificate private key using the `certificateFile` option. Optionally, you can specify the certificate's thumbprint using the `thumbprint` option. If not specified, CLI will automatically calculate it from the specified certificate.
 
 To log in to Microsoft 365 using a Personal Information Exchange (.pfx) file, execute:
 
@@ -70,7 +70,7 @@ m365 login --authType certificate --certificateFile /Users/user/dev/localhost.pe
 
 Logging in to Microsoft 365 using a certificate is convenient for automation scenarios where you cannot authenticate interactively but also don't want to use credentials.
 
-Because there is no user context when logging in using a certificate, you will typically create a new Microsoft Entra ID application, specific to your organization and grant it the required permissions.
+Because there is no user context when logging in using a certificate, you will typically create a new Microsoft Entra application, specific to your organization and grant it the required permissions.
 
 :::warning
 
@@ -118,7 +118,7 @@ At this point the `privateKeyWithPassphrase.pem` file can be used to log in the 
 
 #### Log in using a secret
 
-CLI for Microsoft 365 also supports login using a secret. To use this authentication method, set the `CLIMICROSOFT365_AADAPPID` environment variable to the ID of the Microsoft Entra ID application that you want to use to authenticate the CLI for Microsoft 365 and the `CLIMICROSOFT365_TENANT` environment variable to the ID of your Microsoft Entra ID directory. When calling the login command, set the `authType` option to `secret` and specify the client secret value. 
+CLI for Microsoft 365 also supports login using a secret. To use this authentication method, set the `CLIMICROSOFT365_AADAPPID` environment variable to the ID of the Microsoft Entra application that you want to use to authenticate the CLI for Microsoft 365 and the `CLIMICROSOFT365_TENANT` environment variable to the ID of your Microsoft Entra ID directory. When calling the login command, set the `authType` option to `secret` and specify the client secret value. 
 
 To log in to Microsoft 365 using a secret, execute:
 
@@ -128,7 +128,7 @@ m365 login --authType secret --secret topSeCr3t@007
 
 Logging in to Microsoft 365 using a secret is convenient for automation scenarios where you cannot authenticate interactively but also don't want to use credentials.
 
-Because there is no user context when logging in using a secret, you will typically create a new Microsoft Entra ID application, specific to your organization and grant it the required permissions.
+Because there is no user context when logging in using a secret, you will typically create a new Microsoft Entra application, specific to your organization and grant it the required permissions.
 
 :::warning
 
@@ -140,7 +140,7 @@ Logging in using a secret gives the CLI for Microsoft 365 app-only access to Mic
 
 :::warning
 
-Currently, SharePoint does not support authentication using Microsoft Entra ID App ID and Secret. CLI for Microsoft 365 commands that call the SharePoint APIs will fail while logged in to Microsoft 365 using a Secret.
+Currently, SharePoint does not support authentication using Microsoft Entra app ID and Secret. CLI for Microsoft 365 commands that call the SharePoint APIs will fail while logged in to Microsoft 365 using a Secret.
 
 :::
 
@@ -174,7 +174,7 @@ This option is especially useful if you have conditional access policies configu
 
 To see if you're logged in to Microsoft 365 and if so, with which account, use the `status` command.
 
-If you're logged in to Microsoft 365 using a certificate, the `status` command will show the name of the Microsoft Entra ID application used to log in.
+If you're logged in to Microsoft 365 using a certificate, the `status` command will show the name of the Microsoft Entra application used to log in.
 
 ### Log out from Microsoft 365
 
@@ -198,9 +198,9 @@ To authorize for communicating with Microsoft 365 API, the CLI for Microsoft 365
 
 If you authenticate using credentials, the authentication and authorization are a part of the same request that CLI for Microsoft 365 issues towards Microsoft Entra ID. If either authentication or authorization fails, you will see a corresponding error message explaining what went wrong.
 
-## Re-consent the PnP Microsoft 365 Management Shell Microsoft Entra ID application
+## Re-consent the PnP Microsoft 365 Management Shell Microsoft Entra application
 
-CLI for Microsoft 365 uses the _PnP Microsoft 365 Management Shell_ Microsoft Entra ID application to log in to your Microsoft 365 tenant on your behalf. As we add new commands to the CLI, it's possible, that new permissions will be added to the _PnP Microsoft 365 Management Shell_ Microsoft Entra ID application. To be able to use the newly added commands which depend on these new permissions, you will have to re-approve the _PnP Microsoft 365 Management Shell_ Microsoft Entra ID application in your Microsoft Entra ID. This process is also known as _re-consenting the Microsoft Entra ID application_.
+CLI for Microsoft 365 uses the _PnP Microsoft 365 Management Shell_ Microsoft Entra application to log in to your Microsoft 365 tenant on your behalf. As we add new commands to the CLI, it's possible, that new permissions will be added to the _PnP Microsoft 365 Management Shell_ Microsoft Entra application. To be able to use the newly added commands which depend on these new permissions, you will have to re-approve the _PnP Microsoft 365 Management Shell_ Microsoft Entra application in your Microsoft Entra ID. This process is also known as _re-consenting the Microsoft Entra application_.
 
 To re-consent the _PnP Microsoft 365 Management Shell_ application in your Microsoft Entra ID, in the command line execute:
 

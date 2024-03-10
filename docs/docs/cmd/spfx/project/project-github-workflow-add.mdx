@@ -44,9 +44,9 @@ m365 spfx project github workflow add [options]
 
 The `spfx project github workflow add` will create a workflow .yml file in the `.github/workflows` directory in your project. If such directory does not exist the command will automatically create it.
 
-For the `application` login method the command does not register AAD application nor create the required certificate. In order for you to proceed you will need to first obtain (create) a self-signed certificate and register a new AAD application with certificate authentication. After that in GitHub repo settings, you will need to create the following secrets:
+For the `application` login method the command does not register Microsoft Entra nor create the required certificate. In order for you to proceed you will need to first obtain (create) a self-signed certificate and register a new Microsoft Entra with certificate authentication. After that in GitHub repo settings, you will need to create the following secrets:
 
-- `APP_ID` - client id of the registered AAD application
+- `APP_ID` - client id of the registered Microsoft Entra
 - `CERTIFICATE_ENCODED` - application's encoded certificate
 - `CERTIFICATE_PASSWORD` - certificate password. This applies only if the certificate is encoded which is the recommended approach
 

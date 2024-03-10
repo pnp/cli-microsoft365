@@ -29,7 +29,7 @@ class AppPermissionListCommand extends AppCommand {
   }
 
   public get description(): string {
-    return 'Lists API permissions for the current AAD app';
+    return 'Lists API permissions for the current Microsoft Entra app';
   }
 
   public async commandAction(logger: Logger): Promise<void> {

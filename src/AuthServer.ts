@@ -97,7 +97,7 @@ export class AuthServer {
         errorDescription: queryString.error_description as string
       };
 
-      body = "<p>Oops! Azure Active Directory replied with an error message.</p>";
+      body = "<p>Oops! Microsoft Entra ID replied with an error message.</p>";
       body += `<p>${errorMessage.error}</p>`;
       if (errorMessage.errorDescription !== undefined) {
         body += `<p>${errorMessage.errorDescription}</p>`;

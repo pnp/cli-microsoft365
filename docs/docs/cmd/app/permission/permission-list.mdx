@@ -4,7 +4,7 @@ import TabItem from '@theme/TabItem';
 
 # app permission list
 
-Lists API permissions for the current AAD app
+Lists API permissions for the current Microsoft Entra app
 
 ## Usage
 
@@ -16,26 +16,26 @@ m365 app permission list [options]
 
 ```md definition-list
 `--appId [appId]`
-: Client ID of the Microsoft Entra ID app registered in the .m365rc.json file to retrieve API permissions for.
+: Client ID of the Microsoft Entra app registered in the .m365rc.json file to retrieve API permissions for.
 ```
 
 <Global />
 
 ## Remarks
 
-Use this command to quickly look up API permissions for the Microsoft Entra ID application registration registered in the _.m365rc.json_ file in your current project (folder).
+Use this command to quickly look up API permissions for the Microsoft Entra application registration registered in the _.m365rc.json_ file in your current project (folder).
 
 If you have multiple apps registered in your .m365rc.json file, you can specify the app for which you'd like to retrieve permissions using the `--appId` option. If you don't specify the app using the `--appId` option, you'll be prompted to select one of the applications from your _.m365rc.json_ file.
 
 ## Examples
 
-Retrieve API permissions for your current Microsoft Entra ID app.
+Retrieve API permissions for your current Microsoft Entra app.
 
 ```sh
 m365 app permission list
 ```
 
-Retrieve API permissions for the Microsoft Entra ID app with the client ID specified in the _.m365rc.json_ file.
+Retrieve API permissions for the Microsoft Entra app with the client ID specified in the _.m365rc.json_ file.
 
 ```sh
 m365 app permission list --appId e23d235c-fcdf-45d1-ac5f-24ab2ee0695d

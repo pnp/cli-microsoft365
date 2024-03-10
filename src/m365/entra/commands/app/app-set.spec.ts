@@ -1299,7 +1299,7 @@ describe(commands.APP_SET, () => {
   it('passes validation if certificateFile specified with certificateDisplayName', async () => {
     sinon.stub(fs, 'existsSync').callsFake(_ => true);
 
-    const actual = await command.validate({ options: { name: 'My AAD app', certificateDisplayName: 'Some certificate', certificateFile: 'c:\\temp\\some-certificate.cer' } }, commandInfo);
+    const actual = await command.validate({ options: { name: 'My Microsoft Entra ID', certificateDisplayName: 'Some certificate', certificateFile: 'c:\\temp\\some-certificate.cer' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 

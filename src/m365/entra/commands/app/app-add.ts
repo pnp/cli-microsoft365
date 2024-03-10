@@ -257,9 +257,9 @@ class EntraAppAddCommand extends GraphCommand {
     try {
       const apis = await this.resolveApis(args, logger);
       let appInfo: any = await this.createAppRegistration(args, apis, logger);
-      // based on the assumption that we're adding AAD app to the current
+      // based on the assumption that we're adding Microsoft Entra to the current
       // directory. If we in the future extend the command with allowing
-      // users to create AAD app in a different directory, we'll need to
+      // users to create Microsoft Entra in a different directory, we'll need to
       // adjust this
       appInfo.tenantId = accessToken.getTenantIdFromAccessToken(auth.connection.accessTokens[auth.defaultResource].accessToken);
       appInfo = await this.updateAppFromManifest(args, appInfo);

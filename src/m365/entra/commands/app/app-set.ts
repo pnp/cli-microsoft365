@@ -352,7 +352,7 @@ class EntraAppSetCommand extends GraphCommand {
 
   private async updateKeyCredentials(objectId: string, keyCredentials: KeyCredential[], logger: Logger): Promise<void> {
     if (this.verbose) {
-      await logger.logToStderr(`Updating keyCredentials in AAD app`);
+      await logger.logToStderr(`Updating keyCredentials in Microsoft Entra ID`);
     }
 
     const requestOptions: CliRequestOptions = {
