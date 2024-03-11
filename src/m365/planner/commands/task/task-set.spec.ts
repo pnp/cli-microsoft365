@@ -564,7 +564,7 @@ describe(commands.TASK_SET, () => {
         return groupByDisplayNameResponse;
       }
 
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups/0d0402ee-970f-4951-90b5-2f24519d2e40/planner/plans`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/0d0402ee-970f-4951-90b5-2f24519d2e40/planner/plans?$select=id,title`) {
         return {
           value: [
             {
@@ -604,7 +604,7 @@ describe(commands.TASK_SET, () => {
         };
       }
 
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter('My Planner Group')}'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter('My Planner Group')}'&$select=id`) {
         return groupByDisplayNameResponse;
       }
 
@@ -650,7 +650,7 @@ describe(commands.TASK_SET, () => {
         return { "@odata.etag": "TestEtag" };
       }
 
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups/0d0402ee-970f-4951-90b5-2f24519d2e40/planner/plans`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/0d0402ee-970f-4951-90b5-2f24519d2e40/planner/plans?$select=id,title`) {
         return {
           value: [
             {
@@ -726,11 +726,10 @@ describe(commands.TASK_SET, () => {
     });
 
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/planner/rosters/DjL5xiKO10qut8LQgztpKskABWna/plans`) {
+      if (opts.url === `https://graph.microsoft.com/beta/planner/rosters/DjL5xiKO10qut8LQgztpKskABWna/plans?$select=id`) {
         return {
           "value": [{
-            "id": '8QZEH7b3wkS_bGQobscsM5gADCBb',
-            "title": 'My Planner Plan'
+            "id": '8QZEH7b3wkS_bGQobscsM5gADCBb'
           }]
         };
       }
@@ -739,7 +738,6 @@ describe(commands.TASK_SET, () => {
         return {
           "value": [
             {
-              "@odata.etag": "W/\"JzEtQnVja2V0QEBAQEBAQEBAQEBAQEBARCc=\"",
               "name": "My Planner Bucket",
               "id": "IK8tuFTwQEa5vTonM7ZMRZgAKdno"
             }
@@ -756,7 +754,7 @@ describe(commands.TASK_SET, () => {
         };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     const options: any = {
@@ -939,7 +937,7 @@ describe(commands.TASK_SET, () => {
       planId: '8QZEH7b3wkS_bGQobscsM5gADCBb'
     };
 
-    await assert.rejects(command.action(logger, { options: options } as any), new CommandError('The specified bucket does not exist'));
+    await assert.rejects(command.action(logger, { options: options } as any), new CommandError(`The specified bucket 'My Planner Bucket' does not exist.`));
   });
 
   it('fails when an invalid user is specified', async () => {

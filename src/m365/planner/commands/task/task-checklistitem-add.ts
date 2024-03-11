@@ -42,7 +42,7 @@ class PlannerTaskChecklistItemAddCommand extends GraphCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        isChecked: args.options.isChecked || false
+        isChecked: !!args.options.isChecked
       });
     });
   }

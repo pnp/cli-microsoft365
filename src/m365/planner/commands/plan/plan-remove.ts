@@ -110,6 +110,10 @@ class PlannerPlanRemoveCommand extends GraphCommand {
       try {
         const plan = await this.getPlan(args);
 
+        if (this.verbose) {
+          await logger.logToStderr(`Removing plan '${plan.title}' ...`);
+        }
+
         const requestOptions: CliRequestOptions = {
           url: `${this.resource}/v1.0/planner/plans/${plan.id}`,
           headers: {
@@ -146,7 +150,7 @@ class PlannerPlanRemoveCommand extends GraphCommand {
     }
 
     const groupId = await this.getGroupId(args);
-    return await planner.getPlanByTitle(title!, groupId, 'minimal');
+    return planner.getPlanByTitle(title!, groupId, 'minimal');
   }
 
   private async getGroupId(args: CommandArgs): Promise<string> {
@@ -156,8 +160,7 @@ class PlannerPlanRemoveCommand extends GraphCommand {
       return ownerGroupId;
     }
 
-    const group = await entraGroup.getGroupByDisplayName(ownerGroupName!);
-    return group.id!;
+    return entraGroup.getGroupIdByDisplayName(ownerGroupName!);
   }
 }
 

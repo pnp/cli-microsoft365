@@ -61,8 +61,7 @@ describe(commands.PLAN_SET, () => {
   const singleGroupsResponse = {
     value: [
       {
-        id: ownerGroupId,
-        displayName: ownerGroupName
+        id: ownerGroupId
       }
     ]
   };
@@ -72,8 +71,7 @@ describe(commands.PLAN_SET, () => {
       {
         '@odata.etag': 'abcdef',
         id: id,
-        title: title,
-        owner: ownerGroupId
+        title: title
       }
     ]
   };
@@ -325,11 +323,11 @@ describe(commands.PLAN_SET, () => {
 
   it('correctly updates planner plan shareWithUserNames with given title and ownerGroupName', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(ownerGroupName)}'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(ownerGroupName)}'&$select=id`) {
         return singleGroupsResponse;
       }
 
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${ownerGroupId}/planner/plans`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${ownerGroupId}/planner/plans?$select=id,title`) {
         return singlePlansResponse;
       }
 
@@ -373,11 +371,11 @@ describe(commands.PLAN_SET, () => {
 
   it('correctly updates planner plan shareWithUserIds with given title and ownerGroupId', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(ownerGroupName)}'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(ownerGroupName)}'&$select=id`) {
         return singleGroupsResponse;
       }
 
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${ownerGroupId}/planner/plans`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${ownerGroupId}/planner/plans?$select=id,title`) {
         return singlePlansResponse;
       }
 
@@ -413,7 +411,7 @@ describe(commands.PLAN_SET, () => {
 
   it('correctly updates planner plan shareWithUserIds with given title and rosterId', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/planner/rosters/${rosterId}/plans`) {
+      if (opts.url === `https://graph.microsoft.com/beta/planner/rosters/${rosterId}/plans?$select=id`) {
         return singlePlansResponse;
       }
 
@@ -483,11 +481,11 @@ describe(commands.PLAN_SET, () => {
 
   it('fails when an invalid user is specified', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(ownerGroupName)}'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(ownerGroupName)}'&$select=id`) {
         return singleGroupsResponse;
       }
 
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${ownerGroupId}/planner/plans`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${ownerGroupId}/planner/plans?$select=id,title`) {
         return singlePlansResponse;
       }
 

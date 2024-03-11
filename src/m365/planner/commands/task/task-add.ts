@@ -1,4 +1,4 @@
-import { PlannerBucket, PlannerPlan, PlannerTask, PlannerTaskDetails, User } from '@microsoft/microsoft-graph-types';
+import { PlannerTask, PlannerTaskDetails, User } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
@@ -302,23 +302,7 @@ class PlannerTaskAddCommand extends GraphCommand {
       return args.options.bucketId;
     }
 
-    const requestOptions: CliRequestOptions = {
-      url: `${this.resource}/v1.0/planner/plans/${planId}/buckets`,
-      headers: {
-        accept: 'application/json;odata.metadata=none'
-      },
-      responseType: 'json'
-    };
-
-    const response = await request.get<{ value: PlannerBucket[] }>(requestOptions);
-
-    const bucket: PlannerBucket | undefined = response.value.find(val => val.name === args.options.bucketName);
-
-    if (!bucket) {
-      throw `The specified bucket does not exist`;
-    }
-
-    return bucket.id!;
+    return planner.getBucketIdByTitle(args.options.bucketName!, planId);
   }
 
   private async getPlanId(args: CommandArgs): Promise<string> {
@@ -327,13 +311,11 @@ class PlannerTaskAddCommand extends GraphCommand {
     }
 
     if (args.options.rosterId) {
-      const plan: PlannerPlan = await planner.getPlanByRosterId(args.options.rosterId);
-      return plan.id!;
+      return planner.getPlanIdByRosterId(args.options.rosterId);
     }
     else {
-      const groupId: string = await this.getGroupId(args);
-      const plan: PlannerPlan = await planner.getPlanByTitle(args.options.planTitle!, groupId);
-      return plan.id!;
+      const groupId = await this.getGroupId(args);
+      return planner.getPlanIdByTitle(args.options.planTitle!, groupId);
     }
   }
 
@@ -342,8 +324,7 @@ class PlannerTaskAddCommand extends GraphCommand {
       return args.options.ownerGroupId;
     }
 
-    const group = await entraGroup.getGroupByDisplayName(args.options.ownerGroupName!);
-    return group.id!;
+    return entraGroup.getGroupIdByDisplayName(args.options.ownerGroupName!);
   }
 
   private async getUserIds(options: Options): Promise<string[]> {

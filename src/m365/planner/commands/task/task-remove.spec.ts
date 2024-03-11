@@ -35,8 +35,7 @@ describe(commands.TASK_REMOVE, () => {
   const singleGroupResponse = {
     "value": [
       {
-        "id": validOwnerGroupId,
-        "displayName": validOwnerGroupName
+        "id": validOwnerGroupId
       }
     ]
   };
@@ -44,12 +43,10 @@ describe(commands.TASK_REMOVE, () => {
   const multipleGroupResponse = {
     "value": [
       {
-        "id": validOwnerGroupId,
-        "displayName": validOwnerGroupName
+        "id": validOwnerGroupId
       },
       {
-        "id": validOwnerGroupId,
-        "displayName": validOwnerGroupName
+        "id": validOwnerGroupId
       }
     ]
   };
@@ -356,7 +353,7 @@ describe(commands.TASK_REMOVE, () => {
 
   it('fails validation when no groups found', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(validOwnerGroupName)}'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(validOwnerGroupName)}'&$select=id`) {
         return { "value": [] };
       }
 
@@ -384,7 +381,7 @@ describe(commands.TASK_REMOVE, () => {
     });
 
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(validOwnerGroupName)}'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(validOwnerGroupName)}'&$select=id`) {
         return multipleGroupResponse;
       }
 
@@ -418,7 +415,7 @@ describe(commands.TASK_REMOVE, () => {
         planId: validPlanId,
         force: true
       }
-    }), new CommandError(`The specified bucket ${validBucketName} does not exist`));
+    }), new CommandError(`The specified bucket '${validBucketName}' does not exist.`));
   });
 
   it('fails validation when multiple buckets found', async () => {
@@ -452,10 +449,10 @@ describe(commands.TASK_REMOVE, () => {
     let removeRequestIssued = false;
 
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(validOwnerGroupName)}'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(validOwnerGroupName)}'&$select=id`) {
         return singleGroupResponse;
       }
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${validOwnerGroupId}/planner/plans`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${validOwnerGroupId}/planner/plans?$select=id,title`) {
         return singlePlanResponse;
       }
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${validPlanId}/buckets?$select=id,name`) {
@@ -543,10 +540,10 @@ describe(commands.TASK_REMOVE, () => {
     let removeRequestIssued = false;
 
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(validOwnerGroupName)}'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(validOwnerGroupName)}'&$select=id`) {
         return singleGroupResponse;
       }
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${validOwnerGroupId}/planner/plans`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${validOwnerGroupId}/planner/plans?$select=id,title`) {
         return singlePlanResponse;
       }
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${validPlanId}/buckets?$select=id,name`) {
@@ -636,7 +633,7 @@ describe(commands.TASK_REMOVE, () => {
 
   it('correctly deletes task by title with group id', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${validOwnerGroupId}/planner/plans`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${validOwnerGroupId}/planner/plans?$select=id,title`) {
         return singlePlanResponse;
       }
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${validPlanId}/buckets?$select=id,name`) {
@@ -674,10 +671,10 @@ describe(commands.TASK_REMOVE, () => {
 
   it('correctly deletes task by title', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(validOwnerGroupName)}'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(validOwnerGroupName)}'&$select=id`) {
         return singleGroupResponse;
       }
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${validOwnerGroupId}/planner/plans`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${validOwnerGroupId}/planner/plans?$select=id,title`) {
         return singlePlanResponse;
       }
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${validPlanId}/buckets?$select=id,name`) {
@@ -715,7 +712,7 @@ describe(commands.TASK_REMOVE, () => {
 
   it('correctly deletes task by rosterId', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/planner/rosters/${validRosterId}/plans`) {
+      if (opts.url === `https://graph.microsoft.com/beta/planner/rosters/${validRosterId}/plans?$select=id`) {
         return { "value": [planResponse] };
       }
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${validPlanId}/buckets?$select=id,name`) {
@@ -745,7 +742,8 @@ describe(commands.TASK_REMOVE, () => {
       options: {
         title: validTaskTitle,
         bucketName: validBucketName,
-        rosterId: validRosterId
+        rosterId: validRosterId,
+        verbose: true
       }
     });
   });

@@ -42,7 +42,7 @@ class PlannerTaskReferenceRemoveCommand extends GraphCommand {
       Object.assign(this.telemetryProperties, {
         url: typeof args.options.url !== 'undefined',
         alias: typeof args.options.alias !== 'undefined',
-        force: (!(!args.options.force)).toString()
+        force: !!args.options.force
       });
     });
   }
