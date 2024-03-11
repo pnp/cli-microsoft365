@@ -75,6 +75,7 @@ const dictionary = [
   'org',
   'owner',
   'permission',
+  'pim',
   'place',
   'policy',
   'profile',
