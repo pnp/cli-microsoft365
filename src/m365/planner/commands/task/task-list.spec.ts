@@ -141,37 +141,25 @@ describe(commands.TASK_LIST, () => {
   ];
 
   const taskListResponse: any = {
-    "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#Collection(microsoft.graph.plannerTask)",
-    "@odata.count": 2,
     "value": taskListResponseValue
   };
 
   const taskListBetaResponse: any = {
-    "@odata.context": "https://graph.microsoft.com/beta/$metadata#Collection(microsoft.graph.plannerTask)",
-    "@odata.count": 2,
     "value": taskListResponseBetaValue
   };
 
   const bucketListResponseValue = [
     {
-      "@odata.etag": "W/\"JzEtQnVja2V0QEBAQEBAQEBAQEBAQEBARCc=\"",
       "name": "Planner Bucket A",
-      "planId": "iVPMIgdku0uFlou-KLNg6MkAE1O2",
-      "orderHint": "8585768731950308408",
       "id": "FtzysDykv0-9s9toWiZhdskAD67z"
     },
     {
-      "@odata.etag": "W/\"JzEtQnVja2V0QEBAQEBAQEBAQEBAQEBARCc=\"",
       "name": "Planner Bucket 2",
-      "planId": "iVPMIgdku0uFlou-KLNg6MkAE1O2",
-      "orderHint": "8585784565[8",
       "id": "ZpcnnvS9ZES2pb91RPxQx8kAMLo5"
     }
   ];
 
   const bucketListResponse: any = {
-    "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#Collection(microsoft.graph.plannerBucket)",
-    "@odata.count": 2,
     "value": bucketListResponseValue
   };
 
@@ -179,43 +167,7 @@ describe(commands.TASK_LIST, () => {
     "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#groups",
     "value": [
       {
-        "id": "0d0402ee-970f-4951-90b5-2f24519d2e40",
-        "deletedDateTime": null,
-        "classification": null,
-        "createdDateTime": "2021-06-08T11:04:45Z",
-        "creationOptions": [],
-        "description": "My Planner Group",
-        "displayName": "My Planner Group",
-        "expirationDateTime": null,
-        "groupTypes": [
-          "Unified"
-        ],
-        "isAssignableToRole": null,
-        "mail": "MyPlannerGroup@contoso.onmicrosoft.com",
-        "mailEnabled": true,
-        "mailNickname": "My Planner Group",
-        "membershipRule": null,
-        "membershipRuleProcessingState": null,
-        "onPremisesDomainName": null,
-        "onPremisesLastSyncDateTime": null,
-        "onPremisesNetBiosName": null,
-        "onPremisesSamAccountName": null,
-        "onPremisesSecurityIdentifier": null,
-        "onPremisesSyncEnabled": null,
-        "preferredDataLocation": null,
-        "preferredLanguage": null,
-        "proxyAddresses": [
-          "SPO:SPO_e13f6193-fb01-43e8-8e8d-557796b82ebf@SPO_cc6fafe9-dd93-497c-b521-1d971b1471c7",
-          "SMTP:MyPlannerGroup@contoso.onmicrosoft.com"
-        ],
-        "renewedDateTime": "2021-06-08T11:04:45Z",
-        "resourceBehaviorOptions": [],
-        "resourceProvisioningOptions": [],
-        "securityEnabled": false,
-        "securityIdentifier": "S-1-12-1-218366702-1230083855-573552016-1076796785",
-        "theme": null,
-        "visibility": "Private",
-        "onPremisesProvisioningErrors": []
+        "id": "0d0402ee-970f-4951-90b5-2f24519d2e40"
       }
     ]
   };
@@ -228,42 +180,14 @@ describe(commands.TASK_LIST, () => {
   };
 
   const plansInOwnerGroup: any = {
-    "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#planner/plans",
-    "@odata.count": 2,
     "value": [
       {
-        "@odata.etag": "W/\"JzEtUGxhbiAgQEBAQEBAQEBAQEBAQEBASCc=\"",
-        "createdDateTime": "2021-06-08T12:24:57.3312829Z",
-        "owner": "f3f985d0-a4e0-4891-83f6-08d88bf44e5e",
         "title": "My Planner Plan",
-        "id": "iVPMIgdku0uFlou-KLNg6MkAE1O2",
-        "createdBy": {
-          "user": {
-            "displayName": null,
-            "id": "73829066-5f0a-4745-8f72-12a17bacadea"
-          },
-          "application": {
-            "displayName": null,
-            "id": "09abbdfd-ed25-47ee-a2d9-a627aa1c90f3"
-          }
-        }
+        "id": "iVPMIgdku0uFlou-KLNg6MkAE1O2"
       },
       {
-        "@odata.etag": "W/\"JzEtUGxhbiAgQEBAQEBAQEBAQEBAQEBASCc=\"",
-        "createdDateTime": "2021-06-08T12:25:09.3751058Z",
-        "owner": "f3f985d0-a4e0-4891-83f6-08d88bf44e5e",
         "title": "Sample Plan",
-        "id": "uO1bj3fdekKuMitpeJqaj8kADBxO",
-        "createdBy": {
-          "user": {
-            "displayName": null,
-            "id": "73829066-5f0a-4745-8f72-12a17bacadea"
-          },
-          "application": {
-            "displayName": null,
-            "id": "09abbdfd-ed25-47ee-a2d9-a627aa1c90f3"
-          }
-        }
+        "id": "uO1bj3fdekKuMitpeJqaj8kADBxO"
       }
     ]
   };
@@ -295,16 +219,16 @@ describe(commands.TASK_LIST, () => {
 
   beforeEach(() => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter('My Planner Group')}'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter('My Planner Group')}'&$select=id`) {
         return groupByDisplayNameResponse;
       }
-      if (opts.url === `https://graph.microsoft.com/beta/planner/rosters/DjL5xiKO10qut8LQgztpKskABWna/plans`) {
+      if (opts.url === `https://graph.microsoft.com/beta/planner/rosters/DjL5xiKO10qut8LQgztpKskABWna/plans?$select=id`) {
         return planResponse;
       }
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups/0d0402ee-970f-4951-90b5-2f24519d2e40/planner/plans`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/0d0402ee-970f-4951-90b5-2f24519d2e40/planner/plans?$select=id,title`) {
         return plansInOwnerGroup;
       }
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/iVPMIgdku0uFlou-KLNg6MkAE1O2/buckets`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/iVPMIgdku0uFlou-KLNg6MkAE1O2/buckets?$select=id,name`) {
         return bucketListResponse;
       }
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/iVPMIgdku0uFlou-KLNg6MkAE1O2/tasks`) {
@@ -619,13 +543,13 @@ describe(commands.TASK_LIST, () => {
   it('fails validation when bucketName not found', async () => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter('My Planner Group')}'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter('My Planner Group')}'&$select=id`) {
         return groupByDisplayNameResponse;
       }
-      if (opts.url === `https://graph.microsoft.com/beta/planner/rosters/DjL5xiKO10qut8LQgztpKskABWna/plans`) {
+      if (opts.url === `https://graph.microsoft.com/beta/planner/rosters/DjL5xiKO10qut8LQgztpKskABWna/plans?$select=id`) {
         return planResponse;
       }
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups/0d0402ee-970f-4951-90b5-2f24519d2e40/planner/plans`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/0d0402ee-970f-4951-90b5-2f24519d2e40/planner/plans?$select=id,title`) {
         return plansInOwnerGroup;
       }
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/iVPMIgdku0uFlou-KLNg6MkAE1O2/tasks`) {
@@ -634,7 +558,7 @@ describe(commands.TASK_LIST, () => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/buckets/FtzysDykv0-9s9toWiZhdskAD67z/tasks`) {
         return taskListResponse;
       }
-      if (opts.url === `https://graph.microsoft.com/v1.0/me/planner/tasks`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/me/planner/tasks?$select=id,title`) {
         return taskListResponse;
       }
       if (opts.url === `https://graph.microsoft.com/beta/planner/plans/iVPMIgdku0uFlou-KLNg6MkAE1O2/tasks`) {
@@ -643,10 +567,10 @@ describe(commands.TASK_LIST, () => {
       if (opts.url === `https://graph.microsoft.com/beta/planner/buckets/FtzysDykv0-9s9toWiZhdskAD67z/tasks`) {
         return taskListBetaResponse;
       }
-      if (opts.url === `https://graph.microsoft.com/beta/me/planner/tasks`) {
+      if (opts.url === `https://graph.microsoft.com/beta/me/planner/tasks?$select=id,title`) {
         return taskListBetaResponse;
       }
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/iVPMIgdku0uFlou-KLNg6MkAE1O2/buckets`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/iVPMIgdku0uFlou-KLNg6MkAE1O2/buckets?$select=id,name`) {
         return { value: [] };
       }
       throw 'Invalid Request';
@@ -658,7 +582,7 @@ describe(commands.TASK_LIST, () => {
         planTitle: 'My Planner Plan',
         ownerGroupName: 'My Planner Group'
       }
-    }), new CommandError(`The specified bucket does not exist`));
+    }), new CommandError(`The specified bucket 'foo' does not exist.`));
   });
 
   it('lists planner tasks of the current logged in user', async () => {

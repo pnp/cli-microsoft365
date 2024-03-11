@@ -124,12 +124,14 @@ class PlannerPlanAddCommand extends GraphCommand {
       };
       if (args.options.rosterId) {
         data.container = {
-          "url": `https://graph.microsoft.com/v1.0/planner/rosters/${args.options.rosterId}`
+          url: `https://graph.microsoft.com/v1.0/planner/rosters/${args.options.rosterId}`
         };
       }
       else {
         const groupId = await this.getGroupId(args);
-        data.owner = groupId;
+        data.container = {
+          url: `https://graph.microsoft.com/v1.0/groups/${groupId}`
+        };
       }
 
       const requestOptions: CliRequestOptions = {
@@ -146,7 +148,7 @@ class PlannerPlanAddCommand extends GraphCommand {
       await logger.log(result);
     }
     catch (err: any) {
-      if (err.error && err.error.error.message === "You do not have the required permissions to access this item, or the item may not exist.") {
+      if (args.options.rosterId && err.error?.error.message === "You do not have the required permissions to access this item, or the item may not exist.") {
         throw new CommandError("You can only add 1 plan to a Roster");
       }
       this.handleRejectedODataJsonPromise(err);
@@ -154,7 +156,7 @@ class PlannerPlanAddCommand extends GraphCommand {
   }
 
   private async updatePlanDetails(options: Options, newPlan: PlannerPlan): Promise<PlannerPlan & PlannerPlanDetails> {
-    const planId = newPlan.id as string;
+    const planId = newPlan.id!;
 
     if (!options.shareWithUserIds && !options.shareWithUserNames) {
       return newPlan;
@@ -245,8 +247,7 @@ class PlannerPlanAddCommand extends GraphCommand {
       return args.options.ownerGroupId;
     }
 
-    const group = await entraGroup.getGroupByDisplayName(args.options.ownerGroupName!);
-    return group.id!;
+    return entraGroup.getGroupIdByDisplayName(args.options.ownerGroupName!);
   }
 }
 

@@ -1,4 +1,4 @@
-import { PlannerBucket, PlannerPlan, PlannerTask } from '@microsoft/microsoft-graph-types';
+import { PlannerTask } from '@microsoft/microsoft-graph-types';
 import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
@@ -138,6 +138,10 @@ class PlannerTaskRemoveCommand extends GraphCommand {
       try {
         const task = await this.getTask(args.options);
 
+        if (this.verbose) {
+          await logger.logToStderr(`Removing task '${task.title}' ...`);
+        }
+
         const requestOptions: CliRequestOptions = {
           url: `${this.resource}/v1.0/planner/tasks/${task.id}`,
           headers: {
@@ -185,18 +189,18 @@ class PlannerTaskRemoveCommand extends GraphCommand {
 
     // $filter is not working on the buckets/{bucketId}/tasks endpoint, hence it is not being used.
     const tasks = await odata.getAllItems<PlannerTask>(`${this.resource}/v1.0/planner/buckets/${bucketId}/tasks?$select=title,id`, 'minimal');
-    const filteredtasks = tasks.filter(b => title!.toLocaleLowerCase() === b.title!.toLocaleLowerCase());
+    const filteredTasks = tasks.filter(b => title!.toLocaleLowerCase() === b.title!.toLocaleLowerCase());
 
-    if (filteredtasks.length === 0) {
+    if (filteredTasks.length === 0) {
       throw `The specified task ${title} does not exist`;
     }
 
-    if (filteredtasks.length > 1) {
-      const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', filteredtasks);
+    if (filteredTasks.length > 1) {
+      const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', filteredTasks);
       return await cli.handleMultipleResultsFound<PlannerTask>(`Multiple tasks with title '${title}' found.`, resultAsKeyValuePair);
     }
 
-    return filteredtasks[0];
+    return filteredTasks[0];
   }
 
   private async getBucketId(options: Options): Promise<string> {
@@ -207,28 +211,7 @@ class PlannerTaskRemoveCommand extends GraphCommand {
     }
 
     const planId = await this.getPlanId(options);
-    const requestOptions: CliRequestOptions = {
-      url: `${this.resource}/v1.0/planner/plans/${planId}/buckets?$select=id,name`,
-      headers: {
-        accept: 'application/json;odata.metadata=none'
-      },
-      responseType: 'json'
-    };
-
-    const buckets = await request.get<{ value: PlannerBucket[] }>(requestOptions);
-    const filteredBuckets = buckets.value.filter(b => bucketName!.toLocaleLowerCase() === b.name!.toLocaleLowerCase());
-
-    if (filteredBuckets.length === 0) {
-      throw `The specified bucket ${bucketName} does not exist`;
-    }
-
-    if (filteredBuckets.length > 1) {
-      const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', filteredBuckets);
-      const result = await cli.handleMultipleResultsFound<PlannerBucket>(`Multiple buckets with name '${bucketName}' found.`, resultAsKeyValuePair);
-      return result.id!;
-    }
-
-    return filteredBuckets[0].id!;
+    return planner.getBucketIdByTitle(bucketName!, planId);
   }
 
   private async getPlanId(options: Options): Promise<string> {
@@ -239,13 +222,11 @@ class PlannerTaskRemoveCommand extends GraphCommand {
     }
 
     if (options.rosterId) {
-      const plan: PlannerPlan = await planner.getPlanByRosterId(rosterId as string);
-      return plan.id!;
+      return planner.getPlanIdByRosterId(rosterId as string);
     }
     else {
-      const groupId: string = await this.getGroupId(options);
-      const plan: PlannerPlan = await planner.getPlanByTitle(planTitle!, groupId);
-      return plan.id!;
+      const groupId = await this.getGroupId(options);
+      return planner.getPlanIdByTitle(planTitle!, groupId);
     }
   }
 
@@ -256,8 +237,7 @@ class PlannerTaskRemoveCommand extends GraphCommand {
       return ownerGroupId;
     }
 
-    const group = await entraGroup.getGroupByDisplayName(ownerGroupName!);
-    return group.id!;
+    return entraGroup.getGroupIdByDisplayName(ownerGroupName!);
   }
 }
 

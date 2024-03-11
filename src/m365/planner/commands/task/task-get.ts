@@ -1,4 +1,4 @@
-import { PlannerBucket, PlannerPlan, PlannerTask, PlannerTaskDetails } from '@microsoft/microsoft-graph-types';
+import { PlannerTask, PlannerTaskDetails } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
@@ -192,7 +192,7 @@ class PlannerTaskGetCommand extends GraphCommand {
 
     if (tasks.length > 1) {
       const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', tasks);
-      const result = (await cli.handleMultipleResultsFound<PlannerTask>(`Multiple tasks with title '${options.title}' found.`, resultAsKeyValuePair));
+      const result = await cli.handleMultipleResultsFound<PlannerTask>(`Multiple tasks with title '${options.title}' found.`, resultAsKeyValuePair);
       return result.id!;
     }
 
@@ -205,29 +205,7 @@ class PlannerTaskGetCommand extends GraphCommand {
     }
 
     const planId = await this.getPlanId(options);
-    const requestOptions: CliRequestOptions = {
-      url: `${this.resource}/v1.0/planner/plans/${planId}/buckets?$select=id,name`,
-      headers: {
-        accept: 'application/json;odata.metadata=none'
-      },
-      responseType: 'json'
-    };
-
-    const response = await request.get<{ value: PlannerBucket[] }>(requestOptions);
-    const bucketName = options.bucketName as string;
-    const buckets: PlannerBucket[] | undefined = response.value.filter(val => val.name?.toLocaleLowerCase() === bucketName.toLocaleLowerCase());
-
-    if (!buckets.length) {
-      throw `The specified bucket ${options.bucketName} does not exist`;
-    }
-
-    if (buckets.length > 1) {
-      const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', buckets);
-      const result = await cli.handleMultipleResultsFound<PlannerBucket>(`Multiple buckets with name '${options.bucketName}' found.`, resultAsKeyValuePair);
-      return result.id!;
-    }
-
-    return buckets[0].id as string;
+    return planner.getBucketIdByTitle(options.bucketName!, planId);
   }
 
   private async getPlanId(options: Options): Promise<string> {
@@ -236,13 +214,11 @@ class PlannerTaskGetCommand extends GraphCommand {
     }
 
     if (options.rosterId) {
-      const plan: PlannerPlan = await planner.getPlanByRosterId(options.rosterId);
-      return plan.id!;
+      return planner.getPlanIdByRosterId(options.rosterId);
     }
     else {
       const groupId: string = await this.getGroupId(options);
-      const plan: PlannerPlan = await planner.getPlanByTitle(options.planTitle!, groupId);
-      return plan.id!;
+      return planner.getPlanIdByTitle(options.planTitle!, groupId);
     }
   }
 
@@ -251,8 +227,7 @@ class PlannerTaskGetCommand extends GraphCommand {
       return options.ownerGroupId;
     }
 
-    const group = await entraGroup.getGroupByDisplayName(options.ownerGroupName!);
-    return group.id!;
+    return entraGroup.getGroupIdByDisplayName(options.ownerGroupName!);
   }
 }
 
