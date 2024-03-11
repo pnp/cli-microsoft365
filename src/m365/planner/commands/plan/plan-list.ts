@@ -107,8 +107,7 @@ class PlannerPlanListCommand extends GraphCommand {
       return args.options.ownerGroupId;
     }
 
-    const group = await entraGroup.getGroupByDisplayName(args.options.ownerGroupName!);
-    return group.id!;
+    return entraGroup.getGroupIdByDisplayName(args.options.ownerGroupName!);
   }
 }
 

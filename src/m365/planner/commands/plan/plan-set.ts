@@ -180,8 +180,8 @@ class PlannerPlanSetCommand extends GraphCommand {
       return ownerGroupId;
     }
 
-    const group = await entraGroup.getGroupByDisplayName(ownerGroupName!);
-    return group.id!;
+    const id = await entraGroup.getGroupIdByDisplayName(ownerGroupName!);
+    return id;
   }
 
   private async getPlanId(args: CommandArgs): Promise<string> {
@@ -191,16 +191,14 @@ class PlannerPlanSetCommand extends GraphCommand {
       return id;
     }
 
-    let groupId: string = '';
-
     if (args.options.rosterId) {
-      const plan: PlannerPlan = await planner.getPlanByRosterId(args.options.rosterId);
-      return plan.id!;
+      const id = await planner.getPlanIdByRosterId(args.options.rosterId);
+      return id;
     }
     else {
-      groupId = await this.getGroupId(args);
-      const plan: PlannerPlan = await planner.getPlanByTitle(title!, groupId);
-      return plan.id!;
+      const groupId = await this.getGroupId(args);
+      const id = await planner.getPlanIdByTitle(title!, groupId);
+      return id;
     }
   }
 

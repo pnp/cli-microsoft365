@@ -257,7 +257,7 @@ describe(commands.PLAN_LIST, () => {
 
   it('correctly list planner plans with given ownerGroupName', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${ownerGroupName}'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${ownerGroupName}'&$select=id`) {
         return groupsResponse;
       }
 

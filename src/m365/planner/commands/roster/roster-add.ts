@@ -18,14 +18,12 @@ class PlannerRosterAddCommand extends GraphCommand {
     }
 
     try {
-      const requestBody: any = {};
-
       const requestOptions: CliRequestOptions = {
         url: `${this.resource}/beta/planner/rosters`,
         headers: {
           accept: 'application/json;odata.metadata=none'
         },
-        data: requestBody,
+        data: {},
         responseType: 'json'
       };
 

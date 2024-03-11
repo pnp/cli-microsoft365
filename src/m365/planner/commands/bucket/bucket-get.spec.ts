@@ -37,12 +37,10 @@ describe(commands.BUCKET_GET, () => {
   const multipleGroupResponse = {
     "value": [
       {
-        "id": validOwnerGroupId,
-        "displayName": validOwnerGroupName
+        "id": validOwnerGroupId
       },
       {
-        "id": validOwnerGroupId,
-        "displayName": validOwnerGroupName
+        "id": validOwnerGroupId
       }
     ]
   };
@@ -59,7 +57,6 @@ describe(commands.BUCKET_GET, () => {
   const singleBucketByNameResponse = {
     "value": [
       {
-        "@odata.etag": "W/\"JzEtQnVja2V0QEBAQEBAQEBAQEBAQEBARCc=\"",
         "name": validBucketName,
         "id": validBucketId
       }
@@ -67,7 +64,6 @@ describe(commands.BUCKET_GET, () => {
   };
 
   const singleBucketByIdResponse = {
-    "@odata.etag": "W/\"JzEtQnVja2V0QEBAQEBAQEBAQEBAQEBARCc=\"",
     "name": validBucketName,
     "id": validBucketId
   };
@@ -75,12 +71,10 @@ describe(commands.BUCKET_GET, () => {
   const multipleBucketByNameResponse = {
     "value": [
       {
-        "@odata.etag": "W/\"JzEtQnVja2V0QEBAQEBAQEBAQEBAQEBARCc=\"",
         "name": validBucketName,
         "id": validBucketId
       },
       {
-        "@odata.etag": "W/\"JzEtQnVja2V0QEBAQEBAQEBAQEBAQEBARCc=\"",
         "name": validBucketName,
         "id": validBucketId
       }
@@ -263,7 +257,7 @@ describe(commands.BUCKET_GET, () => {
   it('fails validation when no groups found', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
 
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(validOwnerGroupName)}'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(validOwnerGroupName)}'&$select=id`) {
         return { "value": [] };
       }
 
@@ -290,7 +284,7 @@ describe(commands.BUCKET_GET, () => {
 
     sinon.stub(request, 'get').callsFake(async (opts) => {
 
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(validOwnerGroupName)}'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(validOwnerGroupName)}'&$select=id`) {
         return multipleGroupResponse;
       }
 
@@ -308,7 +302,6 @@ describe(commands.BUCKET_GET, () => {
 
   it('fails validation when no buckets found', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${validPlanId}/buckets`) {
         return { "value": [] };
       }
@@ -321,7 +314,7 @@ describe(commands.BUCKET_GET, () => {
         name: validBucketName,
         planId: validPlanId
       }
-    }), new CommandError(`The specified bucket ${validBucketName} does not exist`));
+    }), new CommandError(`The specified bucket '${validBucketName}' does not exist.`));
   });
 
   it('fails validation when multiple buckets found', async () => {
@@ -352,10 +345,10 @@ describe(commands.BUCKET_GET, () => {
 
   it('handles selecting single result when multiple groups with the specified name found and cli is set to prompt', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(validOwnerGroupName)}'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(validOwnerGroupName)}'&$select=id`) {
         return singleGroupResponse;
       }
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${validOwnerGroupId}/planner/plans`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${validOwnerGroupId}/planner/plans?$select=id,title`) {
         return singlePlanResponse;
       }
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${validPlanId}/buckets`) {
@@ -399,10 +392,10 @@ describe(commands.BUCKET_GET, () => {
   it('correctly gets bucket by name', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
 
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(validOwnerGroupName)}'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(validOwnerGroupName)}'&$select=id`) {
         return singleGroupResponse;
       }
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${validOwnerGroupId}/planner/plans`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${validOwnerGroupId}/planner/plans?$select=id,title`) {
         return singlePlanResponse;
       }
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${validPlanId}/buckets`) {
@@ -427,7 +420,7 @@ describe(commands.BUCKET_GET, () => {
   it('correctly gets bucket by plan title and owner group ID', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
 
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${validOwnerGroupId}/planner/plans`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${validOwnerGroupId}/planner/plans?$select=id,title`) {
         return singlePlanResponse;
       }
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${validPlanId}/buckets`) {
@@ -451,7 +444,7 @@ describe(commands.BUCKET_GET, () => {
 
   it('correctly gets bucket by roster id', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/planner/rosters/${validRosterId}/plans`) {
+      if (opts.url === `https://graph.microsoft.com/beta/planner/rosters/${validRosterId}/plans?$select=id`) {
         return planResponse;
       }
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${validPlanId}/buckets`) {

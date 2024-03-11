@@ -107,6 +107,9 @@ class PlannerPlanRemoveCommand extends GraphCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const removePlan = async (): Promise<void> => {
+      if (this.verbose) {
+        await logger.logToStderr(`Removing plan...`);
+      }
       try {
         const plan = await this.getPlan(args);
 
@@ -156,8 +159,7 @@ class PlannerPlanRemoveCommand extends GraphCommand {
       return ownerGroupId;
     }
 
-    const group = await entraGroup.getGroupByDisplayName(ownerGroupName!);
-    return group.id!;
+    return entraGroup.getGroupIdByDisplayName(ownerGroupName!);
   }
 }
 
