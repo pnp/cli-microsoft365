@@ -16,6 +16,7 @@ import commands from '../../commands.js';
 import command from './m365group-set.js';
 import { entraGroup } from '../../../../utils/entraGroup.js';
 import aadCommands from '../../aadCommands.js';
+import { accessToken } from '../../../../utils/accessToken.js';
 
 describe(commands.M365GROUP_SET, () => {
   let log: string[];
@@ -23,6 +24,7 @@ describe(commands.M365GROUP_SET, () => {
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
   let loggerLogToStderrSpy: sinon.SinonSpy;
+  const groupId = 'f3db5c2b-068f-480d-985b-ec78b9fa0e76';
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -31,6 +33,12 @@ describe(commands.M365GROUP_SET, () => {
     sinon.stub(session, 'getId').returns('');
     sinon.stub(entraGroup, 'isUnifiedGroup').resolves(true);
     auth.connection.active = true;
+    if (!auth.connection.accessTokens[auth.defaultResource]) {
+      auth.connection.accessTokens[auth.defaultResource] = {
+        expiresOn: 'abc',
+        accessToken: 'abc'
+      };
+    }
     commandInfo = cli.getCommandInfo(command);
   });
 
@@ -50,6 +58,7 @@ describe(commands.M365GROUP_SET, () => {
     loggerLogSpy = sinon.spy(logger, 'log');
     loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
     (command as any).pollingInterval = 0;
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
   });
 
   afterEach(() => {
@@ -58,7 +67,10 @@ describe(commands.M365GROUP_SET, () => {
       request.put,
       request.patch,
       request.get,
-      fs.readFileSync
+      fs.readFileSync,
+      fs.existsSync,
+      fs.lstatSync,
+      accessToken.isAppOnlyAccessToken
     ]);
   });
 
@@ -98,7 +110,6 @@ describe(commands.M365GROUP_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', displayName: 'My group' } });
     await command.action(logger, { options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', displayName: 'My group' } });
     assert(loggerLogSpy.notCalled);
   });
@@ -381,6 +392,92 @@ describe(commands.M365GROUP_SET, () => {
     assert(loggerLogToStderrSpy.called);
   });
 
+  it('sets option allowExternalSenders when using delegated permissions', async () => {
+    sinonUtil.restore(accessToken.isAppOnlyAccessToken);
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
+
+    sinon.stub(request, 'patch').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${groupId}` && opts.data['allowExternalSenders']) {
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { id: groupId, allowExternalSenders: true } });
+  });
+
+  it('sets option autoSubscribeNewMembers when using delegated permissions', async () => {
+    sinonUtil.restore(accessToken.isAppOnlyAccessToken);
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
+
+    sinon.stub(request, 'patch').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${groupId}` && opts.data['autoSubscribeNewMembers']) {
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { id: groupId, autoSubscribeNewMembers: true } });
+  });
+
+  it('sets option hideFromAddressLists and autoSubscribeNewMembers when using delegated permissions', async () => {
+    sinonUtil.restore(accessToken.isAppOnlyAccessToken);
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
+
+    sinon.stub(request, 'patch').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${groupId}` && opts.data['autoSubscribeNewMembers'] && !opts.data['hideFromAddressLists']) {
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { id: groupId, autoSubscribeNewMembers: true, hideFromAddressLists: false } });
+  });
+
+  it('sets option hideFromOutlookClients when using application permissions', async () => {
+    sinon.stub(request, 'patch').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${groupId}` && opts.data['hideFromOutlookClients']) {
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { id: groupId, hideFromOutlookClients: true } });
+  });
+
+  it('sets option isSubscribedByMail when using application permissions', async () => {
+    sinon.stub(request, 'patch').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${groupId}` && !opts.data['isSubscribedByMail']) {
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { id: groupId, isSubscribedByMail: false } });
+  });
+
+  it('executes two patch requests when setting option isSubscribedByMail and groupName', async () => {
+    const patchStub = sinon.stub(request, 'patch').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${groupId}` && opts.data['isSubscribedByMail']) {
+        return;
+      }
+
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${groupId}` && opts.data['displayName'] === 'Updated group name') {
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { id: groupId, isSubscribedByMail: true, displayName: 'Updated group name' } });
+    assert(patchStub.calledTwice);
+  });
+
   it('correctly handles API OData error', async () => {
     sinon.stub(request, 'patch').rejects({
       error: {
@@ -395,6 +492,35 @@ describe(commands.M365GROUP_SET, () => {
 
     await assert.rejects(command.action(logger, { options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', displayName: 'My group' } } as any),
       new CommandError('An error has occurred'));
+  });
+
+  it('throws error when the group is not a unified group', async () => {
+    const groupId = '3f04e370-cbc6-4091-80fe-1d038be2ad06';
+
+    sinonUtil.restore(entraGroup.isUnifiedGroup);
+    sinon.stub(entraGroup, 'isUnifiedGroup').resolves(false);
+
+    await assert.rejects(command.action(logger, { options: { id: groupId, displayName: 'Updated title' } } as any),
+      new CommandError(`Specified group with id '${groupId}' is not a Microsoft 365 group.`));
+  });
+
+  it('throws error when we are trying to update allowExternalSenders and we are using application only permissions', async () => {
+    const groupId = '3f04e370-cbc6-4091-80fe-1d038be2ad06';
+    sinonUtil.restore(accessToken.isAppOnlyAccessToken);
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').resolves(true);
+
+    await assert.rejects(command.action(logger, { options: { id: groupId, allowExternalSenders: true } } as any),
+      new CommandError(`Option 'allowExternalSenders' and 'autoSubscribeNewMembers' can only be used with delegated permissions.`));
+  });
+
+
+  it('throws error when we are trying to update autoSubscribeNewMembers and we are using application only permissions', async () => {
+    const groupId = '3f04e370-cbc6-4091-80fe-1d038be2ad06';
+    sinonUtil.restore(accessToken.isAppOnlyAccessToken);
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').resolves(true);
+
+    await assert.rejects(command.action(logger, { options: { id: groupId, autoSubscribeNewMembers: true } } as any),
+      new CommandError(`Option 'allowExternalSenders' and 'autoSubscribeNewMembers' can only be used with delegated permissions.`));
   });
 
   it('fails validation if the id is not a valid GUID', async () => {
@@ -470,7 +596,6 @@ describe(commands.M365GROUP_SET, () => {
   it('fails validation if logoPath points to a non-existent file', async () => {
     sinon.stub(fs, 'existsSync').returns(false);
     const actual = await command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', logoPath: 'invalid' } }, commandInfo);
-    sinonUtil.restore(fs.existsSync);
     assert.notStrictEqual(actual, true);
   });
 
@@ -480,10 +605,6 @@ describe(commands.M365GROUP_SET, () => {
     sinon.stub(fs, 'existsSync').returns(true);
     sinon.stub(fs, 'lstatSync').returns(stats);
     const actual = await command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', logoPath: 'folder' } }, commandInfo);
-    sinonUtil.restore([
-      fs.existsSync,
-      fs.lstatSync
-    ]);
     assert.notStrictEqual(actual, true);
   });
 
@@ -493,97 +614,15 @@ describe(commands.M365GROUP_SET, () => {
     sinon.stub(fs, 'existsSync').returns(true);
     sinon.stub(fs, 'lstatSync').returns(stats);
     const actual = await command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', logoPath: 'folder' } }, commandInfo);
-    sinonUtil.restore([
-      fs.existsSync,
-      fs.lstatSync
-    ]);
     assert.strictEqual(actual, true);
   });
 
-  it('supports specifying id', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--id') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
-
-  it('supports specifying displayName', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--displayName') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
-
-  it('supports specifying description', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--description') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
-
-  it('supports specifying owners', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--owners') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
-
-  it('supports specifying members', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--members') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
-
-  it('supports specifying group type', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--isPrivate') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
-
-  it('supports specifying logo file path', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--logoPath') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
-
-  it('throws error when the group is not a unified group', async () => {
-    const groupId = '3f04e370-cbc6-4091-80fe-1d038be2ad06';
-
-    sinonUtil.restore(entraGroup.isUnifiedGroup);
-    sinon.stub(entraGroup, 'isUnifiedGroup').resolves(false);
-
-    await assert.rejects(command.action(logger, { options: { id: groupId, displayName: 'Updated title' } } as any),
-      new CommandError(`Specified group with id '${groupId}' is not a Microsoft 365 group.`));
+  it('passes validation if all options are being set', async () => {
+    const stats: fs.Stats = new fs.Stats();
+    sinon.stub(stats, 'isDirectory').returns(false);
+    sinon.stub(fs, 'existsSync').returns(true);
+    sinon.stub(fs, 'lstatSync').returns(stats);
+    const actual = await command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', displayName: 'Title', description: 'Description', logoPath: 'logo.png', owners: 'john@contoso.com', members: 'doe@contoso.com', isPrivate: false, allowExternalSenders: false, autoSubscribeNewMembers: false, hideFromAddressLists: false, hideFromOutlookClients: false, isSubscribedByMail: false } }, commandInfo);
+    assert.strictEqual(actual, true);
   });
 });
