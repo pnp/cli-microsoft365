@@ -16,7 +16,28 @@ interface Options extends GlobalOptions {
   MaxCompatibilityLevel: number;
   ExternalServicesEnabled?: boolean;
   NoAccessRedirectUrl: string;
+  ArchiveRedirectUrl: string;
+  ConditionalAccessPolicyErrorHelpLink: string;
+  CustomizedExternalSharingServiceUrl: string;
+  LabelMismatchEmailHelpLink: string;
   SharingCapability: string; // <SharingCapabilities>
+  CoreSharingCapability: string; // <SharingCapabilities>
+  ODBSharingCapability: string; // <SharingCapabilities>
+  OneDriveLoopSharingCapability: string; // <SharingCapabilities>
+  CoreLoopSharingCapability: string; // <SharingCapabilities>
+  ContainerSharingCapability: string; // <SharingCapabilities>
+  CoreDefaultShareLinkRole: string; // <Role>
+  CoreLoopDefaultSharingLinkRole: string; // <Role>
+  ContainerDefaultShareLinkRole: string; // <Role>
+  ContainerLoopDefaultShareLinkRole: string; // <Role>
+  OneDriveDefaultShareLinkRole: string; // <Role>
+  OneDriveLoopDefaultSharingLinkRole: string; // <Role>
+  CoreDefaultShareLinkScope: string; // <SharingScope>
+  CoreLoopDefaultSharingLinkScope: string; // <SharingScope>
+  ContainerDefaultShareLinkScope: string; // <SharingScope>
+  ContainerLoopDefaultShareLinkScope: string; // <SharingScope>
+  OneDriveDefaultShareLinkScope: string; // <SharingScope>
+  OneDriveLoopDefaultSharingLinkScope: string; // <SharingScope>
   DisplayStartASiteOption?: boolean;
   StartASiteFormUrl: string;
   ShowEveryoneClaim?: boolean;
@@ -48,6 +69,7 @@ interface Options extends GlobalOptions {
   DefaultSharingLinkType: string; // <SharingLinkType>
   ODBMembersCanShare: string; // <SharingState>
   ODBAccessRequests: string; // <SharingState>
+  AllowAnonymousMeetingParticipantsToAccessWhiteboards: string; // <SharingState>
   PreventExternalUsersFromResharing?: boolean;
   ShowPeoplePickerSuggestionsForGuestUsers?: boolean;
   FileAnonymousLinkType: string; // <AnonymousLinkType>
@@ -60,6 +82,25 @@ interface Options extends GlobalOptions {
   CommentsOnSitePagesDisabled?: boolean;
   SocialBarOnSitePagesDisabled?: boolean;
   OrphanedPersonalSitesRetentionPeriod?: number;
+  CoreRequestFilesLinkExpirationInDays?: number;
+  OneDriveRequestFilesLinkExpirationInDays?: number;
+  ExternalUserExpireInDays: number;
+  ReduceTempTokenLifetimeEnabled?: boolean;
+  ReduceTempTokenLifetimeValue: number;
+  ShowOpenInDesktopOptionForSyncedFiles?: boolean;
+  ShowPeoplePickerGroupSuggestionsForIB?: boolean;
+  SiteOwnerManageLegacyServicePrincipalEnabled?: boolean;
+  StopNew2010Workflows?: boolean;
+  StopNew2013Workflows?: boolean;
+  ViewersCanCommentOnMediaDisabled?: boolean;
+  AllowEveryoneExceptExternalUsersClaimInPrivateSite?: boolean;
+  AnyoneLinkTrackUsers?: boolean;
+  HasAdminCompletedCUConfiguration?: boolean;
+  HasIntelligentContentServicesCapability?: boolean;
+  HasTopicExperiencesCapability?: boolean;
+  MachineLearningCaptureEnabled?: boolean;
+  MassDeleteNotificationDisabled?: boolean;
+  MobileFriendlyUrlEnabledInTenant?: boolean;
   DisallowInfectedFileDownload?: boolean;
   DefaultLinkPermission: string; // <SharingPermissionType>
   ConditionalAccessPolicy: string; // <SPOConditionalAccessPolicyType>
@@ -84,6 +125,17 @@ interface Options extends GlobalOptions {
   HideSyncButtonOnODB?: boolean;
   IsUnmanagedSyncClientForTenantRestricted?: boolean;
   LimitedAccessFileType: string; // <LimitedAccessFileType>
+  MediaTranscription: string // <MediaTranscriptionPolicyType>
+  MediaTranscriptionAutomaticFeatures: string // <MediaTranscriptionAutomaticFeaturesPolicyType>
+  ImageTaggingOption: string // <ImageTaggingChoice>
+  MarkNewFilesSensitiveByDefault: string; // <SensitiveByDefaultState>
+  OCRAdminSiteListFileName: string;
+  OCRComplianceSiteListFileName: string;
+  OCRModeForAdminSites: string; // <ObjectCharacterRecognitionMode>
+  OCRModeForComplianceODBs: string; // <ObjectCharacterRecognitionMode>
+  OCRModeForComplianceSites: string; // <ObjectCharacterRecognitionMode>
+  OneDriveDefaultLinkToExistingAccess: boolean;
+  ContainerDefaultLinkToExistingAccess: boolean;
   OptOutOfGrooveBlock?: boolean;
   OptOutOfGrooveSoftBlock?: boolean;
   OrgNewsSiteUrl: string;
@@ -94,9 +146,36 @@ interface Options extends GlobalOptions {
   ExcludedFileExtensionsForSyncClient: string[];
   AllowedDomainListForSyncClient: string[];
   DisabledWebPartIds: string[];
+  DisabledModernListTemplateIds: string[];
   DisableCustomAppAuthentication?: boolean;
   CommentsOnListItemsDisabled?: boolean;
   EnableAzureADB2BIntegration?: boolean;
+  EnableAutoNewsDigest?: boolean;
+  AllowCommentsTextOnEmailEnabled?: boolean;
+  CommentsOnFilesDisabled?: boolean;
+  DisableAddToOneDrive?: boolean;
+  DisableBackToClassic?: boolean;
+  DisablePersonalListCreation?: boolean;
+  ViewInFileExplorerEnabled?: boolean;
+  AllowGuestUserShareToUsersNotInSiteCollection?: boolean;
+  BlockSendLabelMismatchEmail?: boolean;
+  CoreDefaultLinkToExistingAccess?: boolean;
+  CoreRequestFilesLinkEnabled?: boolean;
+  OneDriveRequestFilesLinkEnabled?: boolean;
+  DisableDocumentLibraryDefaultLabeling?: boolean;
+  DisableVivaConnectionsAnalytics?: boolean;
+  DisplayNamesOfFileViewersInSpo?: boolean;
+  EnableAIPIntegration?: boolean;
+  EnableRestrictedAccessControl?: boolean;
+  ExternalUserExpirationRequired?: boolean;
+  HideSyncButtonOnDocLib?: boolean;
+  IncludeAtAGlanceInShareEmails?: boolean;
+  InformationBarriersSuspension?: boolean;
+  IsFluidEnabled?: boolean;
+  IsWBFluidEnabled?: boolean;
+  IsCollabMeetingNotesFluidEnabled?: boolean;
+  IsEnableAppAuthPopUpEnabled?: boolean;
+  IsLoopEnabled?: boolean;
   SyncAadB2BManagementPolicy?: boolean;
 }
 
@@ -129,6 +208,21 @@ class SpoTenantSettingsSetCommand extends SpoCommand {
     'OwnerAnonymousNotification',
     'CommentsOnSitePagesDisabled',
     'SocialBarOnSitePagesDisabled',
+    'ReduceTempTokenLifetimeEnabled',
+    'ShowOpenInDesktopOptionForSyncedFiles',
+    'ShowPeoplePickerGroupSuggestionsForIB',
+    'SiteOwnerManageLegacyServicePrincipalEnabled',
+    'StopNew2010Workflows',
+    'StopNew2013Workflows',
+    'ViewersCanCommentOnMediaDisabled',
+    'AllowEveryoneExceptExternalUsersClaimInPrivateSite',
+    'AnyoneLinkTrackUsers',
+    'HasAdminCompletedCUConfiguration',
+    'HasIntelligentContentServicesCapability',
+    'HasTopicExperiencesCapability',
+    'MachineLearningCaptureEnabled',
+    'MassDeleteNotificationDisabled',
+    'MobileFriendlyUrlEnabledInTenant',
     'DisallowInfectedFileDownload',
     'AllowDownloadingNonWebViewableFiles',
     'AllowEditing',
@@ -148,6 +242,8 @@ class SpoTenantSettingsSetCommand extends SpoCommand {
     'EnableMinimumVersionRequirement',
     'HideSyncButtonOnODB',
     'IsUnmanagedSyncClientForTenantRestricted',
+    'OneDriveDefaultLinkToExistingAccess',
+    'ContainerDefaultLinkToExistingAccess',
     'OptOutOfGrooveBlock',
     'OptOutOfGrooveSoftBlock',
     'PermissiveBrowserFileHandlingOverride',
@@ -156,6 +252,32 @@ class SpoTenantSettingsSetCommand extends SpoCommand {
     'DisableCustomAppAuthentication',
     'CommentsOnListItemsDisabled',
     'EnableAzureADB2BIntegration',
+    'EnableAutoNewsDigest',
+    'AllowCommentsTextOnEmailEnabled',
+    'CommentsOnFilesDisabled',
+    'DisableAddToOneDrive',
+    'DisableBackToClassic',
+    'DisablePersonalListCreation',
+    'ViewInFileExplorerEnabled',
+    'AllowGuestUserShareToUsersNotInSiteCollection',
+    'BlockSendLabelMismatchEmail',
+    'CoreDefaultLinkToExistingAccess',
+    'CoreRequestFilesLinkEnabled',
+    'OneDriveRequestFilesLinkEnabled',
+    'DisableDocumentLibraryDefaultLabeling',
+    'DisableVivaConnectionsAnalytics',
+    'DisplayNamesOfFileViewersInSpo',
+    'EnableAIPIntegration',
+    'EnableRestrictedAccessControl',
+    'ExternalUserExpirationRequired',
+    'HideSyncButtonOnDocLib',
+    'IncludeAtAGlanceInShareEmails',
+    'InformationBarriersSuspension',
+    'IsFluidEnabled',
+    'IsWBFluidEnabled',
+    'IsCollabMeetingNotesFluidEnabled',
+    'IsEnableAppAuthPopUpEnabled',
+    'IsLoopEnabled',
     'SyncAadB2BManagementPolicy'
   ];
 
@@ -182,7 +304,30 @@ class SpoTenantSettingsSetCommand extends SpoCommand {
         MinCompatibilityLevel: (!(!args.options.MinCompatibilityLevel)).toString(),
         MaxCompatibilityLevel: (!(!args.options.MaxCompatibilityLevel)).toString(),
         NoAccessRedirectUrl: (!(!args.options.NoAccessRedirectUrl)).toString(),
+        ArchiveRedirectUrl: (!(!args.options.ArchiveRedirectUrl)).toString(),
+        OCRAdminSiteListFileName: (!(!args.options.OCRAdminSiteListFileName)).toString(),
+        OCRComplianceSiteListFileName: (!(!args.options.OCRComplianceSiteListFileName)).toString(),
+        ConditionalAccessPolicyErrorHelpLink: (!(!args.options.ConditionalAccessPolicyErrorHelpLink)).toString(),
+        CustomizedExternalSharingServiceUrl: (!(!args.options.CustomizedExternalSharingServiceUrl)).toString(),
+        LabelMismatchEmailHelpLink: (!(!args.options.LabelMismatchEmailHelpLink)).toString(),
         SharingCapability: (!(!args.options.SharingCapability)).toString(),
+        CoreSharingCapability: (!(!args.options.CoreSharingCapability)).toString(),
+        ODBSharingCapability: (!(!args.options.ODBSharingCapability)).toString(),
+        OneDriveLoopSharingCapability: (!(!args.options.OneDriveLoopSharingCapability)).toString(),
+        CoreLoopSharingCapability: (!(!args.options.CoreLoopSharingCapability)).toString(),
+        ContainerSharingCapability: (!(!args.options.ContainerSharingCapability)).toString(),
+        CoreDefaultShareLinkRole: (!(!args.options.CoreDefaultShareLinkRole)).toString(),
+        CoreLoopDefaultSharingLinkRole: (!(!args.options.CoreLoopDefaultSharingLinkRole)).toString(),
+        ContainerDefaultShareLinkRole: (!(!args.options.ContainerDefaultShareLinkRole)).toString(),
+        ContainerLoopDefaultShareLinkRole: (!(!args.options.ContainerLoopDefaultShareLinkRole)).toString(),
+        OneDriveDefaultShareLinkRole: (!(!args.options.OneDriveDefaultShareLinkRole)).toString(),
+        OneDriveLoopDefaultSharingLinkRole: (!(!args.options.OneDriveLoopDefaultSharingLinkRole)).toString(),
+        CoreDefaultShareLinkScope: (!(!args.options.CoreDefaultShareLinkScope)).toString(),
+        CoreLoopDefaultSharingLinkScope: (!(!args.options.CoreLoopDefaultSharingLinkScope)).toString(),
+        ContainerDefaultShareLinkScope: (!(!args.options.ContainerDefaultShareLinkScope)).toString(),
+        ContainerLoopDefaultShareLinkScope: (!(!args.options.ContainerLoopDefaultShareLinkScope)).toString(),
+        OneDriveDefaultShareLinkScope: (!(!args.options.OneDriveDefaultShareLinkScope)).toString(),
+        OneDriveLoopDefaultSharingLinkScope: (!(!args.options.OneDriveLoopDefaultSharingLinkScope)).toString(),
         StartASiteFormUrl: (!(!args.options.StartASiteFormUrl)).toString(),
         SignInAccelerationDomain: (!(!args.options.SignInAccelerationDomain)).toString(),
         BccExternalSharingInvitationsList: (!(!args.options.BccExternalSharingInvitationsList)).toString(),
@@ -197,17 +342,30 @@ class SpoTenantSettingsSetCommand extends SpoCommand {
         DefaultSharingLinkType: (!(!args.options.DefaultSharingLinkType)).toString(),
         ODBMembersCanShare: (!(!args.options.ODBMembersCanShare)).toString(),
         ODBAccessRequests: (!(!args.options.ODBAccessRequests)).toString(),
+        AllowAnonymousMeetingParticipantsToAccessWhiteboards: (!(!args.options.AllowAnonymousMeetingParticipantsToAccessWhiteboards)).toString(),
         FileAnonymousLinkType: (!(!args.options.FileAnonymousLinkType)).toString(),
         FolderAnonymousLinkType: (!(!args.options.FolderAnonymousLinkType)).toString(),
         OrphanedPersonalSitesRetentionPeriod: (!(!args.options.OrphanedPersonalSitesRetentionPeriod)).toString(),
+        CoreRequestFilesLinkExpirationInDays: (!(!args.options.CoreRequestFilesLinkExpirationInDays)).toString(),
+        OneDriveRequestFilesLinkExpirationInDays: (!(!args.options.OneDriveRequestFilesLinkExpirationInDays)).toString(),
+        ExternalUserExpireInDays: (!(!args.options.ExternalUserExpireInDays)).toString(),
+        ReduceTempTokenLifetimeValue: (!(!args.options.ReduceTempTokenLifetimeValue)).toString(),
         DefaultLinkPermission: (!(!args.options.DefaultLinkPermission)).toString(),
         ConditionalAccessPolicy: (!(!args.options.ConditionalAccessPolicy)).toString(),
         EmailAttestationReAuthDays: (!(!args.options.EmailAttestationReAuthDays)).toString(),
         LimitedAccessFileType: (!(!args.options.LimitedAccessFileType)).toString(),
+        MediaTranscription: (!(!args.options.MediaTranscription)).toString(),
+        MediaTranscriptionAutomaticFeatures: (!(!args.options.MediaTranscriptionAutomaticFeatures)).toString(),
+        ImageTaggingOption: (!(!args.options.ImageTaggingOption)).toString(),
+        MarkNewFilesSensitiveByDefault: (!(!args.options.MarkNewFilesSensitiveByDefault)).toString(),
+        OCRModeForAdminSites: (!(!args.options.OCRModeForAdminSites)).toString(),
+        OCRModeForComplianceODBs: (!(!args.options.OCRModeForComplianceODBs)).toString(),
+        OCRModeForComplianceSites: (!(!args.options.OCRModeForComplianceSites)).toString(),
         OrgNewsSiteUrl: (!(!args.options.OrgNewsSiteUrl)).toString(),
         SpecialCharactersStateInFileFolderNames: (!(!args.options.SpecialCharactersStateInFileFolderNames)).toString(),
         ExcludedFileExtensionsForSyncClient: (!(!args.options.ExcludedFileExtensionsForSyncClient)).toString(),
         DisabledWebPartIds: (!(!args.options.DisabledWebPartIds)).toString(),
+        DisabledModernListTemplateIds: (!(!args.options.DisabledModernListTemplateIds)).toString(),
         AllowedDomainListForSyncClient: (!(!args.options.AllowedDomainListForSyncClient)).toString()
       };
 
@@ -239,8 +397,94 @@ class SpoTenantSettingsSetCommand extends SpoCommand {
         option: '--NoAccessRedirectUrl [NoAccessRedirectUrl]'
       },
       {
+        option: '--ArchiveRedirectUrl [ArchiveRedirectUrl]'
+      },
+      {
+        option: '--OCRAdminSiteListFileName [OCRAdminSiteListFileName]'
+      },
+      {
+        option: '--OCRComplianceSiteListFileName [OCRComplianceSiteListFileName]'
+      },
+      {
+        option: '--ConditionalAccessPolicyErrorHelpLink [ConditionalAccessPolicyErrorHelpLink]'
+      },
+      {
+        option: '--CustomizedExternalSharingServiceUrl [CustomizedExternalSharingServiceUrl]'
+      },
+      {
+        option: '--LabelMismatchEmailHelpLink [LabelMismatchEmailHelpLink]'
+      },
+      {
         option: '--SharingCapability [SharingCapability]',
         autocomplete: this.getSharingCapabilities()
+      },
+      {
+        option: '--CoreSharingCapability [CoreSharingCapability]',
+        autocomplete: this.getSharingCapabilities()
+      },
+      {
+        option: '--ODBSharingCapability [ODBSharingCapability]',
+        autocomplete: this.getSharingCapabilities()
+      },
+      {
+        option: '--OneDriveLoopSharingCapability [OneDriveLoopSharingCapability]',
+        autocomplete: this.getSharingCapabilities()
+      },
+      {
+        option: '--CoreLoopSharingCapability [CoreLoopSharingCapability]',
+        autocomplete: this.getSharingCapabilities()
+      },
+      {
+        option: '--ContainerSharingCapability [ContainerSharingCapability]',
+        autocomplete: this.getSharingCapabilities()
+      },
+      {
+        option: '--CoreDefaultShareLinkRole [CoreDefaultShareLinkRole]',
+        autocomplete: this.getRole()
+      },
+      {
+        option: '--CoreLoopDefaultSharingLinkRole [CoreLoopDefaultSharingLinkRole]',
+        autocomplete: this.getRole()
+      },
+      {
+        option: '--ContainerDefaultShareLinkRole [ContainerDefaultShareLinkRole]',
+        autocomplete: this.getRole()
+      },
+      {
+        option: '--ContainerLoopDefaultShareLinkRole [ContainerLoopDefaultShareLinkRole]',
+        autocomplete: this.getRole()
+      },
+      {
+        option: '--OneDriveDefaultShareLinkRole [OneDriveDefaultShareLinkRole]',
+        autocomplete: this.getRole()
+      },
+      {
+        option: '--OneDriveLoopDefaultSharingLinkRole [OneDriveLoopDefaultSharingLinkRole]',
+        autocomplete: this.getRole()
+      },
+      {
+        option: '--CoreDefaultShareLinkScope [CoreDefaultShareLinkScope]',
+        autocomplete: this.getSharingScope()
+      },
+      {
+        option: '--CoreLoopDefaultSharingLinkScope [CoreLoopDefaultSharingLinkScope]',
+        autocomplete: this.getSharingScope()
+      },
+      {
+        option: '--ContainerDefaultShareLinkScope [ContainerDefaultShareLinkScope]',
+        autocomplete: this.getSharingScope()
+      },
+      {
+        option: '--ContainerLoopDefaultShareLinkScope [ContainerLoopDefaultShareLinkScope]',
+        autocomplete: this.getSharingScope()
+      },
+      {
+        option: '--OneDriveDefaultShareLinkScope [OneDriveDefaultShareLinkScope]',
+        autocomplete: this.getSharingScope()
+      },
+      {
+        option: '--OneDriveLoopDefaultSharingLinkScope [OneDriveLoopDefaultSharingLinkScope]',
+        autocomplete: this.getSharingScope()
       },
       {
         option: '--DisplayStartASiteOption [DisplayStartASiteOption]',
@@ -357,6 +601,10 @@ class SpoTenantSettingsSetCommand extends SpoCommand {
         autocomplete: this.getSharingState()
       },
       {
+        option: '--AllowAnonymousMeetingParticipantsToAccessWhiteboards [AllowAnonymousMeetingParticipantsToAccessWhiteboards]',
+        autocomplete: this.getSharingState()
+      },
+      {
         option: '--PreventExternalUsersFromResharing [PreventExternalUsersFromResharing]',
         autocomplete: ['true', 'false']
       },
@@ -402,6 +650,78 @@ class SpoTenantSettingsSetCommand extends SpoCommand {
       },
       {
         option: '--OrphanedPersonalSitesRetentionPeriod [OrphanedPersonalSitesRetentionPeriod]'
+      },
+      {
+        option: '--CoreRequestFilesLinkExpirationInDays [CoreRequestFilesLinkExpirationInDays]'
+      },
+      {
+        option: '--OneDriveRequestFilesLinkExpirationInDays [OneDriveRequestFilesLinkExpirationInDays]'
+      },
+      {
+        option: '--ExternalUserExpireInDays [ExternalUserExpireInDays]'
+      },
+      {
+        option: '--ReduceTempTokenLifetimeValue [ReduceTempTokenLifetimeValue]'
+      },
+      {
+        option: '--ReduceTempTokenLifetimeEnabled [ReduceTempTokenLifetimeEnabled]',
+        autocomplete: ['true', 'false']
+      },
+      {
+        option: '--ShowOpenInDesktopOptionForSyncedFiles [ShowOpenInDesktopOptionForSyncedFiles]',
+        autocomplete: ['true', 'false']
+      },
+      {
+        option: '--ShowPeoplePickerGroupSuggestionsForIB [ShowPeoplePickerGroupSuggestionsForIB]',
+        autocomplete: ['true', 'false']
+      },
+      {
+        option: '--SiteOwnerManageLegacyServicePrincipalEnabled [SiteOwnerManageLegacyServicePrincipalEnabled]',
+        autocomplete: ['true', 'false']
+      },
+      {
+        option: '--StopNew2010Workflows [StopNew2010Workflows]',
+        autocomplete: ['true', 'false']
+      },
+      {
+        option: '--StopNew2013Workflows [StopNew2013Workflows]',
+        autocomplete: ['true', 'false']
+      },
+      {
+        option: '--ViewersCanCommentOnMediaDisabled [ViewersCanCommentOnMediaDisabled]',
+        autocomplete: ['true', 'false']
+      },
+      {
+        option: '--AllowEveryoneExceptExternalUsersClaimInPrivateSite [AllowEveryoneExceptExternalUsersClaimInPrivateSite]',
+        autocomplete: ['true', 'false']
+      },
+      {
+        option: '--AnyoneLinkTrackUsers [AnyoneLinkTrackUsers]',
+        autocomplete: ['true', 'false']
+      },
+      {
+        option: '--HasAdminCompletedCUConfiguration [HasAdminCompletedCUConfiguration]',
+        autocomplete: ['true', 'false']
+      },
+      {
+        option: '--HasIntelligentContentServicesCapability [HasIntelligentContentServicesCapability]',
+        autocomplete: ['true', 'false']
+      },
+      {
+        option: '--HasTopicExperiencesCapability [HasTopicExperiencesCapability]',
+        autocomplete: ['true', 'false']
+      },
+      {
+        option: '--MachineLearningCaptureEnabled [MachineLearningCaptureEnabled]',
+        autocomplete: ['true', 'false']
+      },
+      {
+        option: '--MassDeleteNotificationDisabled [MassDeleteNotificationDisabled]',
+        autocomplete: ['true', 'false']
+      },
+      {
+        option: '--MobileFriendlyUrlEnabledInTenant [MobileFriendlyUrlEnabledInTenant]',
+        autocomplete: ['true', 'false']
       },
       {
         option: '--DisallowInfectedFileDownload [DisallowInfectedFileDownload]',
@@ -496,6 +816,42 @@ class SpoTenantSettingsSetCommand extends SpoCommand {
         autocomplete: this.getSPOLimitedAccessFileType()
       },
       {
+        option: '--MediaTranscription [MediaTranscription]',
+        autocomplete: this.getMediaTranscriptionPolicyType()
+      },
+      {
+        option: '--MediaTranscriptionAutomaticFeatures [MediaTranscriptionAutomaticFeatures]',
+        autocomplete: this.getMediaTranscriptionAutomaticFeaturesPolicyType()
+      },
+      {
+        option: '--ImageTaggingOption [ImageTaggingOption]',
+        autocomplete: this.getImageTaggingChoice()
+      },
+      {
+        option: '--MarkNewFilesSensitiveByDefault [MarkNewFilesSensitiveByDefault]',
+        autocomplete: this.getSensitiveByDefaultState()
+      },
+      {
+        option: '--OCRModeForAdminSites [OCRModeForAdminSites]',
+        autocomplete: this.getObjectCharacterRecognitionMode()
+      },
+      {
+        option: '--OCRModeForComplianceODBs [OCRModeForComplianceODBs]',
+        autocomplete: this.getObjectCharacterRecognitionMode()
+      },
+      {
+        option: '--OCRModeForComplianceSites [OCRModeForComplianceSites]',
+        autocomplete: this.getObjectCharacterRecognitionMode()
+      },
+      {
+        option: '--OneDriveDefaultLinkToExistingAccess [OneDriveDefaultLinkToExistingAccess]',
+        autocomplete: ['true', 'false']
+      },
+      {
+        option: '--ContainerDefaultLinkToExistingAccess [ContainerDefaultLinkToExistingAccess]',
+        autocomplete: ['true', 'false']
+      },
+      {
         option: '--OptOutOfGrooveBlock [OptOutOfGrooveBlock]',
         autocomplete: ['true', 'false']
       },
@@ -532,6 +888,9 @@ class SpoTenantSettingsSetCommand extends SpoCommand {
         option: '--DisabledWebPartIds [DisabledWebPartIds]'
       },
       {
+        option: '--DisabledModernListTemplateIds [DisabledModernListTemplateIds]'
+      },
+      {
         option: '--DisableCustomAppAuthentication [DisableCustomAppAuthentication]',
         autocomplete: ['true', 'false']
       },
@@ -541,6 +900,110 @@ class SpoTenantSettingsSetCommand extends SpoCommand {
       },
       {
         option: '--EnableAzureADB2BIntegration [EnableAzureADB2BIntegration]',
+        autocomplete: ['true', 'false']
+      },
+      {
+        option: '--EnableAutoNewsDigest [EnableAutoNewsDigest]',
+        autocomplete: ['true', 'false']
+      },
+      {
+        option: '--AllowCommentsTextOnEmailEnabled [AllowCommentsTextOnEmailEnabled]',
+        autocomplete: ['true', 'false']
+      },
+      {
+        option: '--CommentsOnFilesDisabled [CommentsOnFilesDisabled]',
+        autocomplete: ['true', 'false']
+      },
+      {
+        option: '--DisableAddToOneDrive [DisableAddToOneDrive]',
+        autocomplete: ['true', 'false']
+      },
+      {
+        option: '--DisableBackToClassic [DisableBackToClassic]',
+        autocomplete: ['true', 'false']
+      },
+      {
+        option: '--DisablePersonalListCreation [DisablePersonalListCreation]',
+        autocomplete: ['true', 'false']
+      },
+      {
+        option: '--ViewInFileExplorerEnabled [ViewInFileExplorerEnabled]',
+        autocomplete: ['true', 'false']
+      },
+      {
+        option: '--AllowGuestUserShareToUsersNotInSiteCollection [AllowGuestUserShareToUsersNotInSiteCollection]',
+        autocomplete: ['true', 'false']
+      },
+      {
+        option: '--BlockSendLabelMismatchEmail [BlockSendLabelMismatchEmail]',
+        autocomplete: ['true', 'false']
+      },
+      {
+        option: '--CoreDefaultLinkToExistingAccess [CoreDefaultLinkToExistingAccess]',
+        autocomplete: ['true', 'false']
+      },
+      {
+        option: '--CoreRequestFilesLinkEnabled [CoreRequestFilesLinkEnabled]',
+        autocomplete: ['true', 'false']
+      },
+      {
+        option: '--OneDriveRequestFilesLinkEnabled [OneDriveRequestFilesLinkEnabled]',
+        autocomplete: ['true', 'false']
+      },
+      {
+        option: '--DisableDocumentLibraryDefaultLabeling [DisableDocumentLibraryDefaultLabeling]',
+        autocomplete: ['true', 'false']
+      },
+      {
+        option: '--DisableVivaConnectionsAnalytics [DisableVivaConnectionsAnalytics]',
+        autocomplete: ['true', 'false']
+      },
+      {
+        option: '--DisplayNamesOfFileViewersInSpo [DisplayNamesOfFileViewersInSpo]',
+        autocomplete: ['true', 'false']
+      },
+      {
+        option: '--EnableAIPIntegration [EnableAIPIntegration]',
+        autocomplete: ['true', 'false']
+      },
+      {
+        option: '--EnableRestrictedAccessControl [EnableRestrictedAccessControl]',
+        autocomplete: ['true', 'false']
+      },
+      {
+        option: '--ExternalUserExpirationRequired [ExternalUserExpirationRequired]',
+        autocomplete: ['true', 'false']
+      },
+      {
+        option: '--HideSyncButtonOnDocLib [HideSyncButtonOnDocLib]',
+        autocomplete: ['true', 'false']
+      },
+      {
+        option: '--IncludeAtAGlanceInShareEmails [IncludeAtAGlanceInShareEmails]',
+        autocomplete: ['true', 'false']
+      },
+      {
+        option: '--InformationBarriersSuspension [InformationBarriersSuspension]',
+        autocomplete: ['true', 'false']
+      },
+      {
+        option: '--IsFluidEnabled [IsFluidEnabled]',
+        autocomplete: ['true', 'false']
+      },
+      {
+        option: '--IsWBFluidEnabled [IsWBFluidEnabled]',
+        autocomplete: ['true', 'false']
+      },
+      {
+        option: '--IsCollabMeetingNotesFluidEnabled [IsCollabMeetingNotesFluidEnabled]',
+        autocomplete: ['true', 'false']
+      },
+      {
+        option: '--IsEnableAppAuthPopUpEnabled [IsEnableAppAuthPopUpEnabled]',
+        autocomplete: ['true', 'false']
+      },
+      {
+        option: '--IsLoopEnabled [IsLoopEnabled]',
         autocomplete: ['true', 'false']
       },
       {
@@ -587,7 +1050,7 @@ class SpoTenantSettingsSetCommand extends SpoCommand {
   }
 
   public getAllEnumOptions(): string[] {
-    return ['SharingCapability', 'SharingDomainRestrictionMode', 'DefaultSharingLinkType', 'ODBMembersCanShare', 'ODBAccessRequests', 'FileAnonymousLinkType', 'FolderAnonymousLinkType', 'DefaultLinkPermission', 'ConditionalAccessPolicy', 'LimitedAccessFileType', 'SpecialCharactersStateInFileFolderNames'];
+    return ['SharingCapability', 'CoreSharingCapability', 'ODBSharingCapability', 'OneDriveLoopSharingCapability', 'CoreLoopSharingCapability', 'ContainerSharingCapability', 'CoreDefaultShareLinkRole', 'CoreLoopDefaultSharingLinkRole', 'ContainerDefaultShareLinkRole', 'ContainerLoopDefaultShareLinkRole', 'OneDriveDefaultShareLinkRole', 'OneDriveLoopDefaultSharingLinkRole', 'CoreDefaultShareLinkScope', 'CoreLoopDefaultSharingLinkScope', 'ContainerDefaultShareLinkScope', 'ContainerLoopDefaultShareLinkScope', 'OneDriveDefaultShareLinkScope', 'OneDriveLoopDefaultSharingLinkScope', 'SharingDomainRestrictionMode', 'DefaultSharingLinkType', 'ODBMembersCanShare', 'ODBAccessRequests', 'AllowAnonymousMeetingParticipantsToAccessWhiteboards', 'FileAnonymousLinkType', 'FolderAnonymousLinkType', 'DefaultLinkPermission', 'ConditionalAccessPolicy', 'LimitedAccessFileType', 'MediaTranscription', 'MediaTranscriptionAutomaticFeatures', 'ImageTaggingOption', 'MarkNewFilesSensitiveByDefault', 'OCRModeForAdminSites', 'OCRModeForComplianceODBs', 'OCRModeForComplianceSites', 'SpecialCharactersStateInFileFolderNames'];
   }
 
   // all enums as get methods
@@ -600,6 +1063,13 @@ class SpoTenantSettingsSetCommand extends SpoCommand {
   private getSPOConditionalAccessPolicyType(): string[] { return ['AllowFullAccess', 'AllowLimitedAccess', 'BlockAccess']; }
   private getSpecialCharactersState(): string[] { return ['NoPreference', 'Allowed', 'Disallowed']; }
   private getSPOLimitedAccessFileType(): string[] { return ['OfficeOnlineFilesOnly', 'WebPreviewableFiles', 'OtherFiles']; }
+  private getMediaTranscriptionPolicyType(): string[] { return ['Enabled', 'Disabled']; }
+  private getMediaTranscriptionAutomaticFeaturesPolicyType(): string[] { return ['Enabled', 'Disabled']; }
+  private getImageTaggingChoice(): string[] { return ['Disabled', 'Basic', 'Enhanced']; }
+  private getSensitiveByDefaultState(): string[] { return ['AllowExternalSharing', 'BlockExternalSharing']; }
+  private getObjectCharacterRecognitionMode(): string[] { return ['Disabled', 'InclusionList', 'ExclusionList']; }
+  private getSharingScope(): string[] { return ['Uninitialized', 'Anyone', 'Organization', 'SpecificPeople']; }
+  private getRole(): string[] { return ['None', 'View', 'Edit', 'Owner', 'LimitedView', 'LimitedEdit', 'Review', 'RestrictedView', 'Submit', 'ManageList']; }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
@@ -621,7 +1091,7 @@ class SpoTenantSettingsSetCommand extends SpoCommand {
           optionValue = this.mapEnumToInt(optionKey, args.options[optionKey]);
         }
 
-        if (['AllowedDomainListForSyncClient', 'DisabledWebPartIds'].indexOf(optionKey) > -1) {
+        if (['AllowedDomainListForSyncClient', 'DisabledWebPartIds', 'DisabledModernListTemplateIds'].indexOf(optionKey) > -1) {
           // the XML has to be represented as array of guids
           let valuesXml: string = '';
           optionValue.split(',').forEach((value: string) => {
@@ -678,6 +1148,40 @@ class SpoTenantSettingsSetCommand extends SpoCommand {
     switch (key) {
       case 'SharingCapability':
         return this.getSharingCapabilities().indexOf(value);
+      case 'CoreSharingCapability':
+        return this.getSharingCapabilities().indexOf(value);
+      case 'ODBSharingCapability':
+        return this.getSharingCapabilities().indexOf(value);
+      case 'OneDriveLoopSharingCapability':
+        return this.getSharingCapabilities().indexOf(value);
+      case 'CoreLoopSharingCapability':
+        return this.getSharingCapabilities().indexOf(value);
+      case 'ContainerSharingCapability':
+        return this.getSharingCapabilities().indexOf(value);
+      case 'CoreDefaultShareLinkRole':
+        return this.getRole().indexOf(value);
+      case 'CoreLoopDefaultSharingLinkRole':
+        return this.getRole().indexOf(value);
+      case 'ContainerDefaultShareLinkRole':
+        return this.getRole().indexOf(value);
+      case 'ContainerLoopDefaultShareLinkRole':
+        return this.getRole().indexOf(value);
+      case 'OneDriveDefaultShareLinkRole':
+        return this.getRole().indexOf(value);
+      case 'OneDriveLoopDefaultSharingLinkRole':
+        return this.getRole().indexOf(value);
+      case 'CoreDefaultShareLinkScope':
+        return this.getSharingScope().indexOf(value) - 1;
+      case 'CoreLoopDefaultSharingLinkScope':
+        return this.getSharingScope().indexOf(value) - 1;
+      case 'ContainerDefaultShareLinkScope':
+        return this.getSharingScope().indexOf(value) - 1;
+      case 'ContainerLoopDefaultShareLinkScope':
+        return this.getSharingScope().indexOf(value) - 1;
+      case 'OneDriveDefaultShareLinkScope':
+        return this.getSharingScope().indexOf(value) - 1;
+      case 'OneDriveLoopDefaultSharingLinkScope':
+        return this.getSharingScope().indexOf(value) - 1;
       case 'SharingDomainRestrictionMode':
         return this.getSharingDomainRestrictionModes().indexOf(value);
       case 'DefaultSharingLinkType':
@@ -685,6 +1189,8 @@ class SpoTenantSettingsSetCommand extends SpoCommand {
       case 'ODBMembersCanShare':
         return this.getSharingState().indexOf(value);
       case 'ODBAccessRequests':
+        return this.getSharingState().indexOf(value);
+      case 'AllowAnonymousMeetingParticipantsToAccessWhiteboards':
         return this.getSharingState().indexOf(value);
       case 'FileAnonymousLinkType':
         return this.getAnonymousLinkType().indexOf(value);
@@ -696,6 +1202,20 @@ class SpoTenantSettingsSetCommand extends SpoCommand {
         return this.getSPOConditionalAccessPolicyType().indexOf(value);
       case 'LimitedAccessFileType':
         return this.getSPOLimitedAccessFileType().indexOf(value);
+      case 'MediaTranscription':
+        return this.getMediaTranscriptionPolicyType().indexOf(value);
+      case 'MediaTranscriptionAutomaticFeatures':
+        return this.getMediaTranscriptionAutomaticFeaturesPolicyType().indexOf(value);
+      case 'ImageTaggingOption':
+        return this.getImageTaggingChoice().indexOf(value);
+      case 'MarkNewFilesSensitiveByDefault':
+        return this.getSensitiveByDefaultState().indexOf(value);
+      case 'OCRModeForAdminSites':
+        return this.getObjectCharacterRecognitionMode().indexOf(value);
+      case 'OCRModeForComplianceODBs':
+        return this.getObjectCharacterRecognitionMode().indexOf(value);
+      case 'OCRModeForComplianceSites':
+        return this.getObjectCharacterRecognitionMode().indexOf(value);
       case 'SpecialCharactersStateInFileFolderNames':
         return this.getSpecialCharactersState().indexOf(value);
       default:
