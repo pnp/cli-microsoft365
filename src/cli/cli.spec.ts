@@ -439,20 +439,19 @@ describe('cli', () => {
     assert(md2plainSpy.called);
   });
 
-  it('shows full help when specified -h with a number', (done) => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(() => 'full');
-    cli
-      .execute(['cli', 'completion', 'clink', 'update', '-h', '1'])
-      .then(_ => {
-        try {
-          assert(log.some(l => l.indexOf('OPTIONS') > -1), 'Options section not found');
-          assert(log.some(l => l.indexOf('EXAMPLES') > -1), 'Examples section not found');
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }, e => done(e));
+  it('shows full help when specified -h with a number', async () => {
+    const config = cli.getConfig();
+    sinon.stub(config, 'get').callsFake((settingName) => {
+      if (settingName === settingsNames.helpTarget) {
+        return 'console';
+      }
+      return undefined;
+    });
+    sinon.stub(cli, 'getSettingWithDefaultValue').returns('full');
+    await cli.execute(['cli', 'completion', 'clink', 'update', '-h', '1']);
+
+    assert(log.some(l => l.indexOf('OPTIONS') > -1), 'Options section not found');
+    assert(log.some(l => l.indexOf('EXAMPLES') > -1), 'Examples section not found');
   });
 
   it('shows full help when specified -h with full', async () => {
@@ -516,27 +515,6 @@ describe('cli', () => {
       assert(cliErrorStub.getCalls().some(c => c.firstArg.indexOf('Unknown help mode invalid. Allowed values are') > -1));
     }
 
-  });
-
-  it('shows help for command in browser when --help option specified and --helpTarget is set to web', async () => {
-    const config = cli.getConfig();
-    sinon.stub(config, 'get').callsFake((settingName) => {
-      if (settingName === settingsNames.helpTarget) {
-        return 'web';
-      }
-      return undefined;
-    });
-
-    const browserStub = sinon.stub(browserUtil, 'open').callsFake(async (url: string) => {
-      if (url === 'https://pnp.github.io/cli-microsoft365/cmd/cli/completion/completion-clink-update') {
-        return;
-      }
-
-      throw 'Invalid request';
-    });
-
-    await cli.execute(['cli', 'completion', 'clink', 'update', '-h']);
-    assert(browserStub.lastCall.args[0] === 'https://pnp.github.io/cli-microsoft365/cmd/cli/completion/completion-clink-update');
   });
 
   it('shows help for command in browser when --help option specified and --helpTarget is set to web', async () => {
@@ -627,7 +605,7 @@ describe('cli', () => {
     }
   });
 
-  it(`fails options validation if the command doesn't allow unknown options and specified options match command options`, (done) => {
+  it(`fails options validation if the command doesn't allow unknown options and specified options match command options`, async () => {
     cli.commandToExecute = cli.commands.find(c => c.name === 'cli mock');
 
     try {
@@ -639,7 +617,7 @@ describe('cli', () => {
     }
   });
 
-  it(`doesn't execute command action when option validation failed`, (done) => {
+  it(`doesn't execute command action when option validation failed`, async () => {
     cli.commandToExecute = cli.commands.find(c => c.name === 'cli mock');
 
     try {
@@ -651,7 +629,7 @@ describe('cli', () => {
     }
   });
 
-  it(`exits with exit code 1 when option validation failed`, (done) => {
+  it(`exits with exit code 1 when option validation failed`, async () => {
     cli.commandToExecute = cli.commands.find(c => c.name === 'cli mock');
 
     try {
@@ -664,7 +642,15 @@ describe('cli', () => {
 
   });
 
-  it(`does not prompt and fails validation if a required option is missing`, (done) => {
+  it(`does not prompt and fails validation if a required option is missing`, async () => {
+    const config = cli.getConfig();
+    sinon.stub(config, 'get').callsFake((settingName) => {
+      if (settingName === settingsNames.helpTarget) {
+        return 'console';
+      }
+      return undefined;
+    });
+
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
       if (settingName === settingsNames.prompt) {
         return undefined;
@@ -683,7 +669,15 @@ describe('cli', () => {
     }
   });
 
-  it(`shows validation error when no option from a required set is specified`, (done) => {
+  it(`shows validation error when no option from a required set is specified`, async () => {
+    const config = cli.getConfig();
+    sinon.stub(config, 'get').callsFake((settingName) => {
+      if (settingName === settingsNames.helpTarget) {
+        return 'console';
+      }
+      return undefined;
+    });
+
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
       if (settingName === settingsNames.prompt) {
         return false;
@@ -703,7 +697,15 @@ describe('cli', () => {
     }
   });
 
-  it(`shows validation error when multiple options from a required set are specified`, (done) => {
+  it(`shows validation error when multiple options from a required set are specified`, async () => {
+    const config = cli.getConfig();
+    sinon.stub(config, 'get').callsFake((settingName) => {
+      if (settingName === settingsNames.helpTarget) {
+        return 'console';
+      }
+      return undefined;
+    });
+
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
       if (settingName === settingsNames.prompt) {
         return false;
@@ -730,7 +732,15 @@ describe('cli', () => {
     assert(cliErrorStub.notCalled);
   });
 
-  it(`shows validation error when no option from a dependent set is set`, (done) => {
+  it(`shows validation error when no option from a dependent set is set`, async () => {
+    const config = cli.getConfig();
+    sinon.stub(config, 'get').callsFake((settingName) => {
+      if (settingName === settingsNames.helpTarget) {
+        return 'console';
+      }
+      return undefined;
+    });
+
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
       if (settingName === settingsNames.prompt) {
         return false;
@@ -756,7 +766,15 @@ describe('cli', () => {
     assert(cliErrorStub.notCalled);
   });
 
-  it(`shows validation error when multiple options from an optional set are specified`, (done) => {
+  it(`shows validation error when multiple options from an optional set are specified`, async () => {
+    const config = cli.getConfig();
+    sinon.stub(config, 'get').callsFake((settingName) => {
+      if (settingName === settingsNames.helpTarget) {
+        return 'console';
+      }
+      return undefined;
+    });
+
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
       if (settingName === settingsNames.prompt) {
         return false;
