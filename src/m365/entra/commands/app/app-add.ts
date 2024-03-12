@@ -65,6 +65,7 @@ interface Options extends GlobalOptions {
   certificateFile?: string;
   certificateBase64Encoded?: string;
   certificateDisplayName?: string;
+  allowPublicClientFlows?: boolean;
 }
 
 interface AppPermissions {
@@ -118,7 +119,8 @@ class EntraAppAddCommand extends GraphCommand {
         certificateFile: typeof args.options.certificateFile !== 'undefined',
         certificateBase64Encoded: typeof args.options.certificateBase64Encoded !== 'undefined',
         certificateDisplayName: typeof args.options.certificateDisplayName !== 'undefined',
-        grantAdminConsent: typeof args.options.grantAdminConsent !== 'undefined'
+        grantAdminConsent: typeof args.options.grantAdminConsent !== 'undefined',
+        allowPublicClientFlows: typeof args.options.allowPublicClientFlows !== 'undefined'
       });
     });
   }
@@ -183,6 +185,9 @@ class EntraAppAddCommand extends GraphCommand {
       },
       {
         option: '--grantAdminConsent'
+      },
+      {
+        option: '--allowPublicClientFlows'
       }
     );
   }
@@ -328,6 +333,10 @@ class EntraAppAddCommand extends GraphCommand {
       } as any;
 
       applicationInfo.keyCredentials = [newKeyCredential];
+    }
+
+    if (args.options.allowPublicClientFlows) {
+      applicationInfo.isFallbackPublicClient = true;
     }
 
     if (this.verbose) {
