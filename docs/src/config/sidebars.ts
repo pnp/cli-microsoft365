@@ -2437,8 +2437,8 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
-              label: 'folder rename',
-              id: 'cmd/spo/folder/folder-rename'
+              label: 'folder set',
+              id: 'cmd/spo/folder/folder-set'
             },
             {
               type: 'doc',
