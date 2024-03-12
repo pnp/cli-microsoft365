@@ -7793,4 +7793,95 @@ describe(commands.APP_ADD, () => {
       tenantId: ''
     }));
   });
+
+  it('creates Entra app reg with defined name and allowPublicClientFlows option enabled', async () => {
+    sinon.stub(request, 'get').rejects('Issues GET request');
+    sinon.stub(request, 'patch').rejects('Issued PATCH request');
+    sinon.stub(request, 'post').callsFake(async opts => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
+        JSON.stringify(opts.data) === JSON.stringify({
+          "displayName": "My AAD app",
+          "signInAudience": "AzureADMyOrg",
+          "isFallbackPublicClient": true
+        })) {
+        return {
+          "id": "5b31c38c-2584-42f0-aa47-657fb3a84230",
+          "deletedDateTime": null,
+          "appId": "bc724b77-da87-43a9-b385-6ebaaf969db8",
+          "applicationTemplateId": null,
+          "createdDateTime": "2020-12-31T14:44:13.7945807Z",
+          "displayName": "My AAD app",
+          "description": null,
+          "groupMembershipClaims": null,
+          "identifierUris": [],
+          "isDeviceOnlyAuthSupported": null,
+          "isFallbackPublicClient": true,
+          "notes": null,
+          "optionalClaims": null,
+          "publisherDomain": "contoso.onmicrosoft.com",
+          "signInAudience": "AzureADMyOrg",
+          "tags": [],
+          "tokenEncryptionKeyId": null,
+          "verifiedPublisher": {
+            "displayName": null,
+            "verifiedPublisherId": null,
+            "addedDateTime": null
+          },
+          "spa": {
+            "redirectUris": []
+          },
+          "defaultRedirectUri": null,
+          "addIns": [],
+          "api": {
+            "acceptMappedClaims": null,
+            "knownClientApplications": [],
+            "requestedAccessTokenVersion": null,
+            "oauth2PermissionScopes": [],
+            "preAuthorizedApplications": []
+          },
+          "appRoles": [],
+          "info": {
+            "logoUrl": null,
+            "marketingUrl": null,
+            "privacyStatementUrl": null,
+            "supportUrl": null,
+            "termsOfServiceUrl": null
+          },
+          "keyCredentials": [],
+          "parentalControlSettings": {
+            "countriesBlockedForMinors": [],
+            "legalAgeGroupRule": "Allow"
+          },
+          "passwordCredentials": [],
+          "publicClient": {
+            "redirectUris": []
+          },
+          "requiredResourceAccess": [],
+          "web": {
+            "homePageUrl": null,
+            "logoutUrl": null,
+            "redirectUris": [],
+            "implicitGrantSettings": {
+              "enableAccessTokenIssuance": false,
+              "enableIdTokenIssuance": false
+            }
+          }
+        };
+      }
+
+      throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
+    });
+
+    await command.action(logger, {
+      options: {
+        name: 'My AAD app',
+        allowPublicClientFlows: true
+      }
+    });
+    assert(loggerLogSpy.calledWith({
+      appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
+      objectId: '5b31c38c-2584-42f0-aa47-657fb3a84230',
+      tenantId: ''
+    }));
+  });
 });
