@@ -21,6 +21,14 @@ describe(commands.FOLDER_ADD, () => {
   let commandInfo: CommandInfo;
   let stubPostResponses: any;
 
+  const addResponse = { "Exists": true, "IsWOPIEnabled": false, "ItemCount": 0, "Name": "abc", "ProgID": null, "ServerRelativeUrl": "/sites/test1/Shared Documents/abc", "TimeCreated": "2018-05-02T23:21:45Z", "TimeLastModified": "2018-05-02T23:21:45Z", "UniqueId": "0ac3da45-cacf-4c31-9b38-9ef3697d5a66", "WelcomePage": "" };
+
+  const webUrl = 'https://contoso.sharepoint.com';
+  const parentFolder = '/Shared Documents';
+  const folderName = 'My Folder';
+  const colorName = 'darkRed';
+  const colorNumber = '1';
+
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').returns();
@@ -35,7 +43,7 @@ describe(commands.FOLDER_ADD, () => {
             throw addResp;
           }
           else {
-            return { "Exists": true, "IsWOPIEnabled": false, "ItemCount": 0, "Name": "abc", "ProgID": null, "ServerRelativeUrl": "/sites/test1/Shared Documents/abc", "TimeCreated": "2018-05-02T23:21:45Z", "TimeLastModified": "2018-05-02T23:21:45Z", "UniqueId": "0ac3da45-cacf-4c31-9b38-9ef3697d5a66", "WelcomePage": "" };
+            return addResponse;
           }
         }
 
@@ -154,13 +162,60 @@ describe(commands.FOLDER_ADD, () => {
     }));
   });
 
+  it('creates a folder with a specific color by color number', async () => {
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `${webUrl}/_api/foldercoloring/createfolder(DecodedUrl='${formatting.encodeQueryParameter(`${parentFolder}/${folderName}`)}', overwrite=false)`) {
+        return addResponse;
+      }
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { webUrl: webUrl, parentFolderUrl: parentFolder, name: folderName, color: colorNumber } });
+    assert.deepStrictEqual(postStub.lastCall.args[0].data, {
+      coloringInformation: {
+        ColorHex: `${colorNumber}`
+      }
+    });
+  });
+
+  it('creates a folder with a specific color by color name', async () => {
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `${webUrl}/_api/foldercoloring/createfolder(DecodedUrl='${formatting.encodeQueryParameter(`${parentFolder}/${folderName}`)}', overwrite=false)`) {
+        return addResponse;
+      }
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { webUrl: webUrl, parentFolderUrl: parentFolder, name: folderName, color: colorName } });
+    assert.deepStrictEqual(postStub.lastCall.args[0].data, {
+      coloringInformation: {
+        ColorHex: colorNumber
+      }
+    });
+  });
+
   it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'foo', parentFolderUrl: '/Shared Documents', name: 'My Folder' } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'foo', parentFolderUrl: parentFolder, name: folderName } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the webUrl option is a valid SharePoint site URL and parentFolderUrl specified', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', parentFolderUrl: '/Shared Documents', name: 'My Folder' } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: webUrl, parentFolderUrl: parentFolder, name: folderName } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('fails validation if color is passed as string and color is not a valid color', async () => {
+    const actual = await command.validate({ options: { webUrl: webUrl, parentFolderUrl: parentFolder, name: folderName, color: 'invalid' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('passes validation if color is passed as string and color is a valid color', async () => {
+    const actual = await command.validate({ options: { webUrl: webUrl, parentFolderUrl: parentFolder, name: folderName, color: colorName } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('passes validation if color is passed as number and color is a valid color', async () => {
+    const actual = await command.validate({ options: { webUrl: webUrl, parentFolderUrl: parentFolder, name: folderName, color: colorNumber } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 });
