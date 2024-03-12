@@ -23,9 +23,35 @@ m365 spo folder add [options]
 
 `-n, --name <name>`
 : Name of the new folder to be created.
+
+`--color [color]`
+: Visual color of the folder. Valid values are a color name or a number. Check remarks for more info.
 ```
 
 <Global />
+
+## Remarks
+
+When you specify a value for `color`, consider the following:
+
+| Color        | Number value | String value |
+|--------------|--------------|--------------|
+| Yellow       | 0            | yellow       |
+| Dark red     | 1            | darkRed      |
+| Dark orange  | 2            | darkOrange   |
+| Dark green   | 3            | darkGreen    |
+| Dark teal    | 4            | darkTeal     |
+| Dark blue    | 5            | darkBlue     |
+| Dark purple  | 6            | darkPurple   |
+| Dark pink    | 7            | darkPink     |
+| Grey         | 8            | darkGrey     |
+| Light red    | 9            | lightRed     |
+| Light orange | 10           | lightOrange  |
+| Light green  | 11           | lightGreen   |
+| Light teal   | 12           | lightTeal    |
+| Light blue   | 13           | lightBlue    |
+| Light purple | 14           | lightPurple  |
+| Light pink   | 15           | lightPink    |
 
 ## Examples
 
@@ -39,6 +65,18 @@ Creates folder in a specific folder within the site.
 
 ```sh
 m365 spo folder add --webUrl https://contoso.sharepoint.com/sites/project-x --parentFolderUrl '/sites/project-x/Shared Documents/Reports' --name 'Financial reports'
+```
+
+Create a folder with a dark blue look
+
+```sh
+m365 spo folder add --webUrl https://contoso.sharepoint.com --parentFolder '/ProjectFiles' --name 'Project-x' --color 5
+```
+
+Create a folder with a light teal look
+
+```sh
+m365 spo folder add --webUrl https://contoso.sharepoint.com --url '/ProjectFiles/Project-x' --color lightTeal
 ```
 
 ## Response

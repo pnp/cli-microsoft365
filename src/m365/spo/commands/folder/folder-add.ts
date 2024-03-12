@@ -6,6 +6,7 @@ import { urlUtil } from '../../../../utils/urlUtil.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
+import { FolderColorValues } from './FolderColor.js';
 import { FolderProperties } from './FolderProperties.js';
 
 interface CommandArgs {
@@ -16,6 +17,7 @@ interface Options extends GlobalOptions {
   webUrl: string;
   parentFolderUrl: string;
   name: string;
+  color?: number | string;
 }
 
 class SpoFolderAddCommand extends SpoCommand {
@@ -30,9 +32,18 @@ class SpoFolderAddCommand extends SpoCommand {
   constructor() {
     super();
 
+    this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
     this.#initTypes();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        color: typeof args.options.color !== 'undefined'
+      });
+    });
   }
 
   #initOptions(): void {
@@ -45,14 +56,35 @@ class SpoFolderAddCommand extends SpoCommand {
       },
       {
         option: '-n, --name <name>'
+      },
+      {
+        option: '--color [color]'
       }
     );
   }
 
   #initValidators(): void {
     this.validators.push(
-      async (args: CommandArgs) => validation.isValidSharePointUrl(args.options.webUrl)
-    );
+      async (args: CommandArgs) => {
+        const isValidSharePointUrl = validation.isValidSharePointUrl(args.options.webUrl);
+        if (isValidSharePointUrl !== true) {
+          return isValidSharePointUrl;
+        }
+
+        if (args.options.color !== undefined) {
+          if (typeof args.options.color === "number") {
+            if (isNaN(args.options.color) || args.options.color < 0 || args.options.color > 15 || !Number.isInteger(args.options.color)) {
+              return 'color should be an integer between 0 and 15.';
+            }
+          }
+          else if (FolderColorValues[args.options.color] === undefined) {
+            return `${args.options.color} is not a valid color value. Allowed values are ${Object.keys(FolderColorValues).join(', ')}.`;
+          }
+        }
+
+
+        return true;
+      });
   }
 
   #initTypes(): void {
@@ -66,7 +98,10 @@ class SpoFolderAddCommand extends SpoCommand {
 
     const parentFolderServerRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.parentFolderUrl);
     const serverRelativeUrl: string = `${parentFolderServerRelativeUrl}/${args.options.name}`;
-    const requestUrl: string = `${args.options.webUrl}/_api/web/folders/addUsingPath(decodedUrl='${formatting.encodeQueryParameter(serverRelativeUrl)}')`;
+
+    const requestUrl: string = args.options.color !== undefined
+      ? `${args.options.webUrl}/_api/foldercoloring/createfolder(DecodedUrl='${formatting.encodeQueryParameter(serverRelativeUrl)}', overwrite=false)`
+      : `${args.options.webUrl}/_api/web/folders/addUsingPath(decodedUrl='${formatting.encodeQueryParameter(serverRelativeUrl)}')`;
     const requestOptions: CliRequestOptions = {
       url: requestUrl,
       headers: {
@@ -74,6 +109,14 @@ class SpoFolderAddCommand extends SpoCommand {
       },
       responseType: 'json'
     };
+
+    if (args.options.color !== undefined) {
+      requestOptions.data = {
+        'coloringInformation': {
+          'ColorHex': `${typeof args.options.color === 'number' ? args.options.color : FolderColorValues[args.options.color]}`
+        }
+      };
+    }
 
     try {
       const folder = await request.post<FolderProperties>(requestOptions);
