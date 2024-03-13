@@ -38,6 +38,7 @@ export default {
   CONTENTTYPE_LIST: `${prefix} contenttype list`,
   CONTENTTYPE_REMOVE: `${prefix} contenttype remove`,
   CONTENTTYPE_SET: `${prefix} contenttype set`,
+  CONTENTTYPE_SYNC: `${prefix} contenttype sync`,
   CONTENTTYPEHUB_GET: `${prefix} contenttypehub get`,
   CUSTOMACTION_ADD: `${prefix} customaction add`,
   CUSTOMACTION_CLEAR: `${prefix} customaction clear`,
