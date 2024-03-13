@@ -252,9 +252,9 @@ describe('cli', () => {
   let mockCommandWithBooleanRewrite: Command;
 
   before(() => {
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
 
     cliLogStub = sinon.stub(cli, 'log').callsFake(message => {
       log.push(message as string ?? '');
@@ -1124,7 +1124,7 @@ describe('cli', () => {
   });
 
   it('correctly handles error when executing command (execute)', async () => {
-    sinon.stub(cli, 'executeCommand').callsFake(() => Promise.reject('Error'));
+    sinon.stub(cli, 'executeCommand').throws('Error');
     cli.commandToExecute = cli.commands.find(c => c.name === 'cli completion clink update');
     assert.rejects(cli.execute(['cli', 'completion', 'clink', 'update']), new Error('Error'));
   });
@@ -1142,7 +1142,7 @@ describe('cli', () => {
   });
 
   it(`loads all commands, when the matched file doesn't contain command`, async () => {
-    sinon.stub(cli, 'loadCommandFromFile').callsFake(_ => (cli.loadCommandFromFile as any).wrappedMethod.apply(cli, [path.join(rootFolder, 'CommandInfo.js')]));
+    sinon.stub(cli, 'loadCommandFromFile').returns(cli.loadCommandFromFile as any).wrappedMethod.apply(cli, [path.join(rootFolder, 'CommandInfo.js')]);
     await cli.loadCommandFromArgs(['status']);
 
     assert.strictEqual(cli.commandToExecute, undefined);
@@ -1655,7 +1655,7 @@ describe('cli', () => {
 
   it(`prints error as JSON in JSON output mode and printErrorsAsPlainText set to false`, async () => {
     const config = cli.getConfig();
-    sinon.stub(config, 'get').callsFake(() => false);
+    sinon.stub(config, 'get').returns(false);
 
     try {
       await cli.closeWithError(new CommandError('Error'), { options: { output: 'json' } });
@@ -1747,7 +1747,7 @@ describe('cli', () => {
 
   it(`returns stored configuration value when available`, () => {
     const config = cli.getConfig();
-    sinon.stub(config, 'get').callsFake(() => 'value');
+    sinon.stub(config, 'get').returns('value');
     const actualValue = cli.getSettingWithDefaultValue('key', '');
     assert.strictEqual(actualValue, 'value');
   });
@@ -1793,7 +1793,7 @@ describe('cli', () => {
   it('for completion commands loads full command info', async () => {
     sinonUtil.restore(cli.loadAllCommandsInfo);
     const loadAllCommandsInfoStub = sinon.spy(cli, 'loadAllCommandsInfo');
-    sinon.stub(cli, 'executeCommand').callsFake(() => Promise.resolve());
+    sinon.stub(cli, 'executeCommand').resolves();
 
     await cli.execute(['cli', 'completion', 'sh', 'update']);
     assert(loadAllCommandsInfoStub.calledWith(true));

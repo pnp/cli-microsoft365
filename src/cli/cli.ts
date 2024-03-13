@@ -896,13 +896,11 @@ async function closeWithError(error: any, args: CommandArgs, showHelpIfEnabled: 
 
   await cli.error(errorMessage);
 
-  if (showHelpIfEnabled &&
-    cli.getSettingWithDefaultValue<boolean>(settingsNames.showHelpOnFailure, showHelpIfEnabled)) {
-    await printHelp(await getHelpMode(args.options), exitCode);
+  if (showHelpIfEnabled && cli.getSettingWithDefaultValue<boolean>(settingsNames.showHelpOnFailure, showHelpIfEnabled)) {
+    await cli.error(`Run 'm365 ${cli.commandToExecute!.name} -h' for help.`);
   }
-  else {
-    process.exit(exitCode);
-  }
+
+  process.exit(exitCode);
 
   // will never be run. Required for testing where we're stubbing process.exit
   /* c8 ignore next */
