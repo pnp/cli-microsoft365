@@ -68,7 +68,7 @@ class CliConsentCommand extends AnonymousCommand {
         break;
     }
 
-    await logger.log(`To consent permissions for executing ${args.options.service} commands, navigate in your web browser to https://login.microsoftonline.com/${config.tenant}/oauth2/v2.0/authorize?client_id=${config.cliAadAppId}&response_type=code&scope=${encodeURIComponent(scope)}`);
+    await logger.log(`To consent permissions for executing ${args.options.service} commands, navigate in your web browser to https://login.microsoftonline.com/${config.tenant}/oauth2/v2.0/authorize?client_id=${config.cliEntraAppId}&response_type=code&scope=${encodeURIComponent(scope)}`);
   }
 
   public async action(logger: Logger, args: CommandArgs): Promise<void> {

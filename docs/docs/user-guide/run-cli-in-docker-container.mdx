@@ -101,7 +101,7 @@ We have created a non-root user called `cli-microsoft365` inside the container. 
 In scenarios where you need to set environment variables, for example, you want to use a custom Azure AD identity when logging into your Microsoft 365 tenant using the CLI. You can set these variables by passing them in as options arguments `(-e)` into the `docker run` command.
 
 ```sh
-docker run --rm -it -e "CLIMICROSOFT365_AADAPPID=51078274-0353-4f6a-b9f5-8674ab2e524c" -e "CLIMICROSOFT365_TENANT=9455bc83-d5af-4ccf-93f6-0af3f71aaf8e" m365pnp/cli-microsoft365:latest
+docker run --rm -it -e "CLIMICROSOFT365_ENTRAAPPID=51078274-0353-4f6a-b9f5-8674ab2e524c" -e "CLIMICROSOFT365_TENANT=9455bc83-d5af-4ccf-93f6-0af3f71aaf8e" m365pnp/cli-microsoft365:latest
 ```
 
 ## Combining script and environment variables
@@ -109,7 +109,7 @@ docker run --rm -it -e "CLIMICROSOFT365_AADAPPID=51078274-0353-4f6a-b9f5-8674ab2
 Combining scripts and environment variables is a powerful way to run the CLI in Docker, we can set environment variables which we can reference in the script that is executed in the running container and also.
 
 ```sh
-docker run --rm -it -v ${PWD}:/home/cli-microsoft365/scripts -e "CLIMICROSOFT365_AADAPPID=da049853-dd90-49df-aa21-4e0c8b646a36" -e "CLIMICROSOFT365_TENANT=e8954f17-a373-4b61-b54d-45c038fe3188" -e "M365_USER=user@contoso.com" -e "M365_PASSWORD=password" m365pnp/cli-microsoft365:next pwsh scripts/script.ps1
+docker run --rm -it -v ${PWD}:/home/cli-microsoft365/scripts -e "CLIMICROSOFT365_ENTRAAPPID=da049853-dd90-49df-aa21-4e0c8b646a36" -e "CLIMICROSOFT365_TENANT=e8954f17-a373-4b61-b54d-45c038fe3188" -e "M365_USER=user@contoso.com" -e "M365_PASSWORD=password" m365pnp/cli-microsoft365:next pwsh scripts/script.ps1
 ```
 
 We can reference the environment variables passed in to the `docker run` command and use them in the script, in this example, passing the username and password variables into the `m365 login` command to login in to Microsoft 365 using password authentication.

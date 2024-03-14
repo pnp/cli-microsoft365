@@ -23,7 +23,7 @@ describe(commands.CONSENT, () => {
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     sinon.stub(session, 'getId').callsFake(() => '');
     originalTenant = config.tenant;
-    originalAadAppId = config.cliAadAppId;
+    originalAadAppId = config.cliEntraAppId;
     commandInfo = cli.getCommandInfo(command);
   });
 
@@ -45,7 +45,7 @@ describe(commands.CONSENT, () => {
 
   afterEach(() => {
     config.tenant = originalTenant;
-    config.cliAadAppId = originalAadAppId;
+    config.cliEntraAppId = originalAadAppId;
   });
 
   after(() => {
@@ -72,7 +72,7 @@ describe(commands.CONSENT, () => {
 
   it('shows consent URL for VivaEngage permissions for a custom single-tenant app', async () => {
     config.tenant = 'fb5cb38f-ecdb-4c6a-a93b-b8cfd56b4a89';
-    config.cliAadAppId = '2587b55d-a41e-436d-bb1d-6223eb185dd4';
+    config.cliEntraAppId = '2587b55d-a41e-436d-bb1d-6223eb185dd4';
     await command.action(logger, { options: { service: 'VivaEngage' } });
     assert(loggerLogSpy.calledWith(`To consent permissions for executing VivaEngage commands, navigate in your web browser to https://login.microsoftonline.com/fb5cb38f-ecdb-4c6a-a93b-b8cfd56b4a89/oauth2/v2.0/authorize?client_id=2587b55d-a41e-436d-bb1d-6223eb185dd4&response_type=code&scope=https%3A%2F%2Fapi.yammer.com%2Fuser_impersonation`));
   });

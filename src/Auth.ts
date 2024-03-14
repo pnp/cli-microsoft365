@@ -76,7 +76,7 @@ export class Connection {
 
   constructor() {
     this.accessTokens = {};
-    this.appId = config.cliAadAppId;
+    this.appId = config.cliEntraAppId;
     this.tenant = config.tenant;
     this.cloudType = CloudType.Public;
   }
@@ -97,7 +97,7 @@ export class Connection {
     this.thumbprint = undefined;
     this.spoUrl = undefined;
     this.spoTenantId = undefined;
-    this.appId = config.cliAadAppId;
+    this.appId = config.cliEntraAppId;
     this.tenant = config.tenant;
   }
 }

@@ -17,7 +17,7 @@ class CliReconsentCommand extends AnonymousCommand {
   }
 
   public async commandAction(logger: Logger): Promise<void> {
-    const url = `https://login.microsoftonline.com/${config.tenant}/oauth2/authorize?client_id=${config.cliAadAppId}&response_type=code&prompt=admin_consent`;
+    const url = `https://login.microsoftonline.com/${config.tenant}/oauth2/authorize?client_id=${config.cliEntraAppId}&response_type=code&prompt=admin_consent`;
 
     if (cli.getSettingWithDefaultValue<boolean>(settingsNames.autoOpenLinksInBrowser, false) === false) {
       await logger.log(`To re-consent the PnP Microsoft 365 Management Shell Azure AD application navigate in your web browser to ${url}`);
