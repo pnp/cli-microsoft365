@@ -12,7 +12,7 @@ import commands from '../../commands.js';
 import command from './roster-get.js';
 
 describe(commands.ROSTER_GET, () => {
-  const id = 'tYqYlNd6eECmsNhN_fcq85cAGAnd';
+  const id = '8bc07d47-c06f-41e1-8f00-1c113c8f6067';
   const rosterGetResponse = {
     "id": id,
     "assignedSensitivityLabel": null
