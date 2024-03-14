@@ -34,7 +34,7 @@ class EntraAppRoleAssignmentAddCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'Adds service principal permissions also known as scopes and app role assignments for specified Entra application registration';
+    return 'Adds service principal permissions also known as scopes and app role assignments for specified Microsoft Entra application registration';
   }
 
   public alias(): string[] | undefined {

@@ -5,7 +5,7 @@ sidebar_position: 14
 
 # Manage Microsoft 365 apps with the CLI for Microsoft 365
 
-When developing Microsoft 365 apps, you need to register them with the Microsoft cloud. You do this by creating an Microsoft Entra app registration. An Microsoft Entra app registration contains information about your app such as its name, type (for example if it's a client app or a web app) or API permissions. Typically, you manage these settings through the Azure portal. CLI for Microsoft 365 contains a set of commands that simplify managing Microsoft Entra app registrations for your Microsoft 365 apps. What's more, using CLI for Microsoft 365 you can automate create Microsoft Entra apps to allow developers in your team share their configuration without blocking each other.
+When developing Microsoft 365 apps, you need to register them with the Microsoft cloud. You do this by creating a Microsoft Entra app registration. A Microsoft Entra app registration contains information about your app such as its name, type (for example if it's a client app or a web app) or API permissions. Typically, you manage these settings through the Azure portal. CLI for Microsoft 365 contains a set of commands that simplify managing Microsoft Entra app registrations for your Microsoft 365 apps. What's more, using CLI for Microsoft 365 you can automate create Microsoft Entra apps to allow developers in your team share their configuration without blocking each other.
 
 ## Step 1: Create Microsoft Entra app registration
 
@@ -29,7 +29,7 @@ This one-liner is great to share with your dev team so that each developer can c
 
 As you work with Microsoft 365 apps, you'll be creating quite a few application registrations in Microsoft Entra ID. Over time, it might be hard for you to keep track of which one is which and where you need to apply changes.
 
-To help you, CLI for Microsoft 365 offers you two things. First, when creating an Microsoft Entra app registration for your Microsoft 365 app, store a reference to it. You do this, by extending the `m365 entra app add` command with the `--save` flag:
+To help you, CLI for Microsoft 365 offers you two things. First, when creating a Microsoft Entra app registration for your Microsoft 365 app, store a reference to it. You do this, by extending the `m365 entra app add` command with the `--save` flag:
 
 ```sh
 m365 entra app add --name 'My single-page app' --platform spa --redirectUris 'https://myspa.azurewebsites.net,http://localhost' --save

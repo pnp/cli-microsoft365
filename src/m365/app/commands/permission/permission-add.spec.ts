@@ -261,7 +261,7 @@ describe(commands.PERMISSION_ADD, () => {
     });
 
     await assert.rejects(command.action(logger, { options: { applicationPermission: applicationPermissions, verbose: true } }),
-      new CommandError(`App with id ${appId} not found in Microsoft Entra ID`));
+      new CommandError(`App with id ${appId} not found in Microsoft Entra`));
   });
 
   it('throws an error when service principal is not found', async () => {
