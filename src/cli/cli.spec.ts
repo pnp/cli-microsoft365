@@ -7,7 +7,8 @@ import os from 'os';
 import path from 'path';
 import sinon from 'sinon';
 import url from 'url';
-import Command, { CommandError } from '../Command.js';
+import { z } from 'zod';
+import Command, { CommandError, globalOptionsZod } from '../Command.js';
 import AnonymousCommand from '../m365/base/AnonymousCommand.js';
 import cliCompletionUpdateCommand from '../m365/cli/commands/completion/completion-clink-update.js';
 import { settingsNames } from '../settingsNames.js';
@@ -17,8 +18,8 @@ import { pid } from '../utils/pid.js';
 import { Choice, SelectionConfig, prompt } from '../utils/prompt.js';
 import { session } from '../utils/session.js';
 import { sinonUtil } from '../utils/sinonUtil.js';
-import { cli, CommandOutput } from './cli.js';
 import { Logger } from './Logger.js';
+import { CommandOutput, cli } from './cli.js';
 
 const require = createRequire(import.meta.url);
 const packageJSON = require('../../package.json');
@@ -234,6 +235,20 @@ class MockCommandWithRawOutput extends AnonymousCommand {
   }
 }
 
+class MockCommandWithSchema extends AnonymousCommand {
+  public get name(): string {
+    return 'cli mock schema';
+  }
+  public get description(): string {
+    return 'Mock command with schema';
+  }
+  public get schema(): z.ZodTypeAny {
+    return globalOptionsZod.strict();
+  }
+  public async commandAction(): Promise<void> {
+  }
+}
+
 describe('cli', () => {
   let rootFolder: string;
   let cliLogStub: sinon.SinonStub;
@@ -247,6 +262,7 @@ describe('cli', () => {
   let mockCommandWithOptionSets: Command;
   let mockCommandWithAlias: Command;
   let mockCommandWithValidation: Command;
+  let mockCommandWithSchema: Command;
   let log: string[] = [];
   let mockCommandWithBooleanRewrite: Command;
 
@@ -268,6 +284,7 @@ describe('cli', () => {
     mockCommandWithAlias = new MockCommandWithAlias();
     mockCommandWithBooleanRewrite = new MockCommandWithBooleanRewrite();
     mockCommandWithValidation = new MockCommandWithValidation();
+    mockCommandWithSchema = new MockCommandWithSchema();
     mockCommandWithOptionSets = new MockCommandWithOptionSets();
     mockCommandActionSpy = sinon.spy(mockCommand, 'action');
 
@@ -287,6 +304,7 @@ describe('cli', () => {
       cli.getCommandInfo(mockCommandWithOptionSets, 'cli-optionsets-mock.js', 'help.mdx'),
       cli.getCommandInfo(mockCommandWithAlias, 'cli-alias-mock.js', 'help.mdx'),
       cli.getCommandInfo(mockCommandWithValidation, 'cli-validation-mock.js', 'help.mdx'),
+      cli.getCommandInfo(mockCommandWithSchema, 'cli-schema-mock.js', 'help.mdx'),
       cli.getCommandInfo(cliCompletionUpdateCommand, 'cli/commands/completion/completion-clink-update.js', 'cli/completion/completion-clink-update.mdx'),
       cli.getCommandInfo(mockCommandWithBooleanRewrite, 'cli-boolean-rewrite-mock.js', 'help.mdx')
     ];
@@ -313,6 +331,7 @@ describe('cli', () => {
       mockCommandWithAutocomplete.validate,
       mockCommandWithValidation.action,
       mockCommandWithValidation.validate,
+      mockCommandWithSchema.action,
       mockCommand.commandAction,
       mockCommand.processOptions,
       prompt.forInput,
@@ -839,11 +858,53 @@ describe('cli', () => {
     }
   });
 
+  it(`calls command's schema-based validation when schema defined`, (done) => {
+    const mockCommandGetSchemaToParseSpy: sinon.SinonSpy = sinon.spy(mockCommandWithSchema, 'getSchemaToParse');
+    cli.commandToExecute = cli.commands.find(c => c.name === 'cli mock schema');
+    cli
+      .execute(['cli', 'mock', 'schema', '-o', 'text'])
+      .then(_ => {
+        try {
+          assert(mockCommandGetSchemaToParseSpy.called);
+          done();
+        }
+        catch (e) {
+          done(e);
+        }
+      }, e => done(e));
+  });
+
+  it(`throws an error when command's schema-based validation failed`, (done) => {
+    cli.commandToExecute = cli.commands.find(c => c.name === 'cli mock schema');
+    const mockCommandWithSchemaActionSpy: sinon.SinonSpy = sinon.spy(mockCommandWithSchema, 'action');
+
+    cli.commandToExecute = cli.commands.find(c => c.name === 'cli mock schema');
+    cli
+      .execute(['cli', 'mock', 'schema', '-x', '123'])
+      .then(_ => done('Promise fulfilled while error expected'), _ => {
+        try {
+          assert(mockCommandWithSchemaActionSpy.notCalled);
+          done();
+        }
+        catch (e) {
+          done(e);
+        }
+      });
+  });
+
   it(`executes command when validation passed`, async () => {
     cli.commandToExecute = cli.commands.find(c => c.name === 'cli mock');
 
     await cli.execute(['cli', 'mock', '-x', '123']);
     assert(mockCommandActionSpy.called);
+  });
+
+  it(`executes command when schema-based validation passed`, async () => {
+    const mockCommandWithSchemaActionSpy: sinon.SinonSpy = sinon.spy(mockCommandWithSchema, 'action');
+    cli.commandToExecute = cli.commands.find(c => c.name === 'cli mock schema');
+
+    await cli.execute(['cli', 'mock', 'schema', '-o', 'text']);
+    assert(mockCommandWithSchemaActionSpy.called);
   });
 
   it(`writes DONE when executing command in verbose mode succeeded`, async () => {
@@ -1401,7 +1462,7 @@ describe('cli', () => {
     cli.loadCommandFromArgs(['spo', 'site', 'list']);
     cli.printAvailableCommands();
 
-    assert(cliLogStub.calledWith('  cli *  8 commands'));
+    assert(cliLogStub.calledWith('  cli *  9 commands'));
   });
 
   it(`prints commands from the specified group`, async () => {
@@ -1414,7 +1475,7 @@ describe('cli', () => {
     };
     cli.printAvailableCommands();
 
-    assert(cliLogStub.calledWith('  cli mock *        5 commands'));
+    assert(cliLogStub.calledWith('  cli mock *        6 commands'));
   });
 
   it(`prints commands from the root group when the specified string doesn't match any group`, () => {
@@ -1427,7 +1488,7 @@ describe('cli', () => {
     };
     cli.printAvailableCommands();
 
-    assert(cliLogStub.calledWith('  cli *  8 commands'));
+    assert(cliLogStub.calledWith('  cli *  9 commands'));
   });
 
   it(`runs properly when context file not found`, async () => {
