@@ -106,7 +106,7 @@ class EntraM365GroupTeamifyCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    this.showDeprecationWarning(logger, aadCommands.M365GROUP_TEAMIFY, commands.M365GROUP_TEAMIFY);
+    await this.showDeprecationWarning(logger, aadCommands.M365GROUP_TEAMIFY, commands.M365GROUP_TEAMIFY);
 
     try {
       const groupId = await this.getGroupId(args.options);

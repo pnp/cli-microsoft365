@@ -23,7 +23,7 @@ class EntraGroupSettingTemplateListCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger): Promise<void> {
-    this.showDeprecationWarning(logger, aadCommands.GROUPSETTINGTEMPLATE_LIST, commands.GROUPSETTINGTEMPLATE_LIST);
+    await this.showDeprecationWarning(logger, aadCommands.GROUPSETTINGTEMPLATE_LIST, commands.GROUPSETTINGTEMPLATE_LIST);
 
     try {
       const templates = await odata.getAllItems<GroupSettingTemplate>(`${this.resource}/v1.0/groupSettingTemplates`);

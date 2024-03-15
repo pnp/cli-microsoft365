@@ -91,7 +91,7 @@ class EntraAppRoleRemoveCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    this.showDeprecationWarning(logger, aadCommands.APP_ROLE_REMOVE, commands.APP_ROLE_REMOVE);
+    await this.showDeprecationWarning(logger, aadCommands.APP_ROLE_REMOVE, commands.APP_ROLE_REMOVE);
 
     const deleteAppRole = async (): Promise<void> => {
       try {

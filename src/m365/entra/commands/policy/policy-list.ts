@@ -83,7 +83,7 @@ class EntraPolicyListCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    this.showDeprecationWarning(logger, aadCommands.POLICY_LIST, commands.POLICY_LIST);
+    await this.showDeprecationWarning(logger, aadCommands.POLICY_LIST, commands.POLICY_LIST);
 
     const policyType: string = args.options.type ? args.options.type.toLowerCase() : 'all';
 

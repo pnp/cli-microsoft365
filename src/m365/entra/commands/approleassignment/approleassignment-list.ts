@@ -89,7 +89,7 @@ class EntraAppRoleAssignmentListCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    this.showDeprecationWarning(logger, aadCommands.APPROLEASSIGNMENT_LIST, commands.APPROLEASSIGNMENT_LIST);
+    await this.showDeprecationWarning(logger, aadCommands.APPROLEASSIGNMENT_LIST, commands.APPROLEASSIGNMENT_LIST);
 
     try {
       const spAppRoleAssignments = await this.getAppRoleAssignments(args.options);

@@ -53,7 +53,7 @@ class EntraM365GroupRecycleBinItemClearCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    this.showDeprecationWarning(logger, aadCommands.M365GROUP_RECYCLEBINITEM_CLEAR, commands.M365GROUP_RECYCLEBINITEM_CLEAR);
+    await this.showDeprecationWarning(logger, aadCommands.M365GROUP_RECYCLEBINITEM_CLEAR, commands.M365GROUP_RECYCLEBINITEM_CLEAR);
 
     const clearM365GroupRecycleBinItems = async (): Promise<void> => {
       try {

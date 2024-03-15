@@ -73,7 +73,7 @@ class EntraUserHibpCommand extends AnonymousCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    this.showDeprecationWarning(logger, aadCommands.USER_HIBP, commands.USER_HIBP);
+    await this.showDeprecationWarning(logger, aadCommands.USER_HIBP, commands.USER_HIBP);
 
     try {
       const requestOptions: CliRequestOptions = {

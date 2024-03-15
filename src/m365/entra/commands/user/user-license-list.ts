@@ -88,7 +88,7 @@ class EntraUserLicenseListCommand extends GraphCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const isAppOnlyAccessToken = accessToken.isAppOnlyAccessToken(auth.connection.accessTokens[this.resource].accessToken);
-    this.showDeprecationWarning(logger, aadCommands.USER_LICENSE_LIST, commands.USER_LICENSE_LIST);
+    await this.showDeprecationWarning(logger, aadCommands.USER_LICENSE_LIST, commands.USER_LICENSE_LIST);
 
     if (isAppOnlyAccessToken && !args.options.userId && !args.options.userName) {
       this.handleError(`Specify at least 'userId' or 'userName' when using application permissions.`);

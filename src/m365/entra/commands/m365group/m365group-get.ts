@@ -61,7 +61,7 @@ class EntraM365GroupGetCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    this.showDeprecationWarning(logger, aadCommands.M365GROUP_GET, commands.M365GROUP_GET);
+    await this.showDeprecationWarning(logger, aadCommands.M365GROUP_GET, commands.M365GROUP_GET);
 
     let group: GroupExtended;
 

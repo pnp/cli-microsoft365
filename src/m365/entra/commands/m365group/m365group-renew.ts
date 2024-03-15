@@ -56,7 +56,7 @@ class EntraM365GroupRenewCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    this.showDeprecationWarning(logger, aadCommands.M365GROUP_RENEW, commands.M365GROUP_RENEW);
+    await this.showDeprecationWarning(logger, aadCommands.M365GROUP_RENEW, commands.M365GROUP_RENEW);
 
     if (this.verbose) {
       await logger.logToStderr(`Renewing Microsoft 365 group's expiration: ${args.options.id}...`);

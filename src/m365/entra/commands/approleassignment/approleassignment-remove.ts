@@ -101,7 +101,7 @@ class EntraAppRoleAssignmentRemoveCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    this.showDeprecationWarning(logger, aadCommands.APPROLEASSIGNMENT_REMOVE, commands.APPROLEASSIGNMENT_REMOVE);
+    await this.showDeprecationWarning(logger, aadCommands.APPROLEASSIGNMENT_REMOVE, commands.APPROLEASSIGNMENT_REMOVE);
 
     const removeAppRoleAssignment = async (): Promise<void> => {
       let sp: ServicePrincipal;

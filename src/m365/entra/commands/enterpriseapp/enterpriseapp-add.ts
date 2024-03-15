@@ -124,7 +124,7 @@ class EntraEnterpriseAppAddCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    this.showDeprecationWarning(logger, aadCommands.SP_ADD, commands.SP_ADD);
+    await this.showDeprecationWarning(logger, aadCommands.SP_ADD, commands.SP_ADD);
 
     try {
       const appId = await this.getAppId(args);

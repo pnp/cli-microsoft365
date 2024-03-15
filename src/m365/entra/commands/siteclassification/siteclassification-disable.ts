@@ -52,7 +52,7 @@ class EntraSiteClassificationDisableCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    this.showDeprecationWarning(logger, aadCommands.SITECLASSIFICATION_DISABLE, commands.SITECLASSIFICATION_DISABLE);
+    await this.showDeprecationWarning(logger, aadCommands.SITECLASSIFICATION_DISABLE, commands.SITECLASSIFICATION_DISABLE);
 
     const disableSiteClassification = async (): Promise<void> => {
       try {

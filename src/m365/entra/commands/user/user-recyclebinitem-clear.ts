@@ -53,7 +53,7 @@ class EntraUserRecycleBinItemClearCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    this.showDeprecationWarning(logger, aadCommands.USER_RECYCLEBINITEM_CLEAR, commands.USER_RECYCLEBINITEM_CLEAR);
+    await this.showDeprecationWarning(logger, aadCommands.USER_RECYCLEBINITEM_CLEAR, commands.USER_RECYCLEBINITEM_CLEAR);
 
     const clearRecycleBinUsers = async (): Promise<void> => {
       try {

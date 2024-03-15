@@ -23,7 +23,7 @@ class EntraAppListCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger): Promise<void> {
-    this.showDeprecationWarning(logger, aadCommands.APP_LIST, commands.APP_LIST);
+    await this.showDeprecationWarning(logger, aadCommands.APP_LIST, commands.APP_LIST);
 
     try {
       const results = await odata.getAllItems<Application>(`${this.resource}/v1.0/applications`);

@@ -112,7 +112,7 @@ class EntraAppRoleAddCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    this.showDeprecationWarning(logger, aadCommands.APP_ROLE_ADD, commands.APP_ROLE_ADD);
+    await this.showDeprecationWarning(logger, aadCommands.APP_ROLE_ADD, commands.APP_ROLE_ADD);
 
     try {
       const appId = await this.getAppObjectId(args, logger);

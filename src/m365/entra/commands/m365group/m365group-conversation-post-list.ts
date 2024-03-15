@@ -85,7 +85,7 @@ class EntraM365GroupConversationPostListCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    this.showDeprecationWarning(logger, aadCommands.M365GROUP_CONVERSATION_POST_LIST, commands.M365GROUP_CONVERSATION_POST_LIST);
+    await this.showDeprecationWarning(logger, aadCommands.M365GROUP_CONVERSATION_POST_LIST, commands.M365GROUP_CONVERSATION_POST_LIST);
 
     try {
       const retrievedgroupId = await this.getGroupId(args);

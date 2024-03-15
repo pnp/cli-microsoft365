@@ -69,7 +69,7 @@ class EntraGroupSettingRemoveCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    this.showDeprecationWarning(logger, aadCommands.GROUPSETTING_REMOVE, commands.GROUPSETTING_REMOVE);
+    await this.showDeprecationWarning(logger, aadCommands.GROUPSETTING_REMOVE, commands.GROUPSETTING_REMOVE);
 
     const removeGroupSetting = async (): Promise<void> => {
       if (this.verbose) {

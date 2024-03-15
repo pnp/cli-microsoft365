@@ -249,7 +249,7 @@ class EntraUserSetCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    this.showDeprecationWarning(logger, aadCommands.USER_SET, commands.USER_SET);
+    await this.showDeprecationWarning(logger, aadCommands.USER_SET, commands.USER_SET);
 
     try {
       if (args.options.currentPassword) {

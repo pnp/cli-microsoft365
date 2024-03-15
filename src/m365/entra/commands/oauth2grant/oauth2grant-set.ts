@@ -46,7 +46,7 @@ class EntraOAuth2GrantSetCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    this.showDeprecationWarning(logger, aadCommands.OAUTH2GRANT_SET, commands.OAUTH2GRANT_SET);
+    await this.showDeprecationWarning(logger, aadCommands.OAUTH2GRANT_SET, commands.OAUTH2GRANT_SET);
 
     if (this.verbose) {
       await logger.logToStderr(`Updating OAuth2 permissions...`);

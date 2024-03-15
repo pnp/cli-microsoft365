@@ -84,7 +84,7 @@ class EntraUserLicenseAddCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    this.showDeprecationWarning(logger, aadCommands.USER_LICENSE_ADD, commands.USER_LICENSE_ADD);
+    await this.showDeprecationWarning(logger, aadCommands.USER_LICENSE_ADD, commands.USER_LICENSE_ADD);
 
     const addLicenses = args.options.ids.split(',').map(x => { return { "disabledPlans": [], "skuId": x }; });
     const requestBody = { "addLicenses": addLicenses, "removeLicenses": [] };

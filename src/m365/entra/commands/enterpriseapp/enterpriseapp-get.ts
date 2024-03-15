@@ -123,7 +123,7 @@ class EntraEnterpriseAppGetCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    this.showDeprecationWarning(logger, aadCommands.SP_GET, commands.SP_GET);
+    await this.showDeprecationWarning(logger, aadCommands.SP_GET, commands.SP_GET);
 
     if (this.verbose) {
       await logger.logToStderr(`Retrieving enterprise application information...`);

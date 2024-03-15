@@ -97,7 +97,7 @@ class EntraM365GroupUserAddCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    this.showDeprecationWarning(logger, aadCommands.M365GROUP_USER_ADD, commands.USER_ADD);
+    await this.showDeprecationWarning(logger, aadCommands.M365GROUP_USER_ADD, commands.M365GROUP_USER_ADD);
 
     try {
       const providedGroupId: string = (typeof args.options.groupId !== 'undefined') ? args.options.groupId : args.options.teamId as string;

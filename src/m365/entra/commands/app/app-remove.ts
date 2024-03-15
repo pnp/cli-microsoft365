@@ -82,7 +82,7 @@ class EntraAppRemoveCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    this.showDeprecationWarning(logger, aadCommands.APP_REMOVE, commands.APP_REMOVE);
+    await this.showDeprecationWarning(logger, aadCommands.APP_REMOVE, commands.APP_REMOVE);
 
     const deleteApp = async (): Promise<void> => {
       try {

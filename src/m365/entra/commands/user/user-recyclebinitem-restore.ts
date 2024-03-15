@@ -56,7 +56,7 @@ class EntraUserRecycleBinItemRestoreCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    this.showDeprecationWarning(logger, aadCommands.USER_RECYCLEBINITEM_RESTORE, commands.USER_RECYCLEBINITEM_RESTORE);
+    await this.showDeprecationWarning(logger, aadCommands.USER_RECYCLEBINITEM_RESTORE, commands.USER_RECYCLEBINITEM_RESTORE);
 
     if (this.verbose) {
       await logger.logToStderr(`Restoring user with id ${args.options.id} from the recycle bin.`);

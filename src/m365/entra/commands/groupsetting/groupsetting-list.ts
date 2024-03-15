@@ -23,7 +23,7 @@ class EntraGroupSettingListCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger): Promise<void> {
-    this.showDeprecationWarning(logger, aadCommands.GROUPSETTING_LIST, commands.GROUPSETTING_LIST);
+    await this.showDeprecationWarning(logger, aadCommands.GROUPSETTING_LIST, commands.GROUPSETTING_LIST);
 
     try {
       const groupSettings = await odata.getAllItems<GroupSetting>(`${this.resource}/v1.0/groupSettings`);
