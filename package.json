@@ -280,13 +280,16 @@
     "typescript": "^5.5.3",
     "update-notifier": "^7.0.0",
     "uuid": "^9.0.1",
-    "yaml": "^2.4.5"
+    "yaml": "^2.4.5",
+    "yargs-parser": "^21.1.1",
+    "zod": "^3.22.4"
   },
   "devDependencies": {
     "@actions/core": "^1.10.1",
     "@microsoft/microsoft-graph-types": "^2.40.0",
     "@types/adm-zip": "^0.5.5",
     "@types/jmespath": "^0.15.2",
+    "@types/json-schema": "^7.0.15",
     "@types/json-to-ast": "^2.1.4",
     "@types/minimist": "^1.2.5",
     "@types/mocha": "^10.0.7",
@@ -297,6 +300,7 @@
     "@types/sinon": "^17.0.3",
     "@types/update-notifier": "^6.0.8",
     "@types/uuid": "^9.0.8",
+    "@types/yargs-parser": "^21.0.3",
     "@typescript-eslint/eslint-plugin": "^7.8.0",
     "@typescript-eslint/parser": "^7.15.0",
     "c8": "^9.1.0",
