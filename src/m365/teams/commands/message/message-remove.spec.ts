@@ -13,7 +13,7 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './message-remove.js';
 import { accessToken } from '../../../../utils/accessToken.js';
-import { team } from '../../../../utils/team.js';
+import { teams } from '../../../../utils/teams.js';
 import { formatting } from '../../../../utils/formatting.js';
 
 describe(commands.MESSAGE_REMOVE, () => {
@@ -34,8 +34,8 @@ describe(commands.MESSAGE_REMOVE, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
-    sinon.stub(team, 'getTeamId').resolves(teamId);
-    sinon.stub(team, 'getChannelId').resolves(channelId);
+    sinon.stub(teams, 'getTeamId').resolves(teamId);
+    sinon.stub(teams, 'getChannelId').resolves(channelId);
     auth.connection.active = true;
     if (!auth.connection.accessTokens[auth.defaultResource]) {
       auth.connection.accessTokens[auth.defaultResource] = {
