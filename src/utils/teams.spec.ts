@@ -2,7 +2,7 @@ import sinon from 'sinon';
 import request from '../request.js';
 import { sinonUtil } from './sinonUtil.js';
 import { formatting } from './formatting.js';
-import { team } from './team.js';
+import { teams } from './teams.js';
 import assert from 'assert';
 import { cli } from '../cli/cli.js';
 import { settingsNames } from '../settingsNames.js';
@@ -16,30 +16,30 @@ const channelName = 'General';
 const channelId = '19:7a3a82caa8f8436889fbb017acdb11b6@thread.tacv2';
 const channelResponse = { id: channelId };
 
-describe('utils/team', () => {
+describe('utils/teams', () => {
   afterEach(() => {
     sinonUtil.restore([
       request.get,
       cli.getSettingWithDefaultValue,
-      team.getTeamIdByDisplayName,
-      team.verifyChannelExistsById,
-      team.getChannelIdByName,
-      team.getTeamId,
-      team.verifyTeamExistsById
+      teams.getTeamIdByDisplayName,
+      teams.verifyChannelExistsById,
+      teams.getChannelIdByDisplayName,
+      teams.getTeamId,
+      teams.verifyTeamExistsById
     ]);
   });
 
   it('gets team id by displayName', async () => {
-    sinon.stub(team, 'getTeamIdByDisplayName').resolves(teamId);
+    sinon.stub(teams, 'getTeamIdByDisplayName').resolves(teamId);
 
-    const actual = await team.getTeamId(undefined, teamName);
+    const actual = await teams.getTeamId(undefined, teamName);
     assert.strictEqual(actual, teamId);
   });
 
   it('returns team id and verifies that team exists', async () => {
-    sinon.stub(team, 'verifyTeamExistsById').resolves(teamId);
+    sinon.stub(teams, 'verifyTeamExistsById').resolves(teamId);
 
-    const actual = await team.getTeamId(teamId, undefined);
+    const actual = await teams.getTeamId(teamId, undefined);
     assert.strictEqual(actual, teamId);
   });
 
@@ -52,7 +52,7 @@ describe('utils/team', () => {
       throw 'Invalid Request';
     });
 
-    const actual = await team.verifyTeamExistsById(teamId);
+    const actual = await teams.verifyTeamExistsById(teamId);
     assert.strictEqual(actual, teamId);
   });
 
@@ -65,7 +65,7 @@ describe('utils/team', () => {
       throw 'Invalid Request';
     });
 
-    const actual = await team.getTeamIdByDisplayName(teamName);
+    const actual = await teams.getTeamIdByDisplayName(teamName);
     assert.strictEqual(actual, teamId);
   });
 
@@ -78,7 +78,7 @@ describe('utils/team', () => {
       throw 'Invalid Request';
     });
 
-    await assert.rejects(team.getTeamIdByDisplayName(teamName), Error(`The specified team '${teamName}' does not exist.`));
+    await assert.rejects(teams.getTeamIdByDisplayName(teamName), Error(`The specified team '${teamName}' does not exist.`));
   });
 
   it('throws error message when multiple teams were found using getTeamIdByDisplayName', async () => {
@@ -98,7 +98,7 @@ describe('utils/team', () => {
       throw 'Invalid Request';
     });
 
-    await assert.rejects(team.getTeamIdByDisplayName(teamName), Error(`Multiple teams with name '${teamName}' found. Found: ${teamId}.`));
+    await assert.rejects(teams.getTeamIdByDisplayName(teamName), Error(`Multiple teams with name '${teamName}' found. Found: ${teamId}.`));
   });
 
   it('handles selecting single result when multiple teams with the specified name found using getTeamIdByDisplayName and cli is set to prompt', async () => {
@@ -112,21 +112,21 @@ describe('utils/team', () => {
 
     sinon.stub(cli, 'handleMultipleResultsFound').resolves({ id: teamId });
 
-    const actual = await team.getTeamIdByDisplayName(teamName);
+    const actual = await teams.getTeamIdByDisplayName(teamName);
     assert.deepStrictEqual(actual, teamId);
   });
 
   it('gets channel id by name', async () => {
-    sinon.stub(team, 'getChannelIdByName').resolves(channelId);
+    sinon.stub(teams, 'getChannelIdByDisplayName').resolves(channelId);
 
-    const actual = await team.getChannelId(teamId, undefined, channelName);
+    const actual = await teams.getChannelId(teamId, undefined, channelName);
     assert.strictEqual(actual, channelId);
   });
 
   it('returns channel id and verifies that channel exists', async () => {
-    sinon.stub(team, 'verifyChannelExistsById').resolves(channelId);
+    sinon.stub(teams, 'verifyChannelExistsById').resolves(channelId);
 
-    const actual = await team.getChannelId(teamId, channelId, undefined);
+    const actual = await teams.getChannelId(teamId, channelId, undefined);
     assert.strictEqual(actual, channelId);
   });
 
@@ -140,7 +140,7 @@ describe('utils/team', () => {
       throw 'Invalid Request';
     });
 
-    const actual = await team.verifyChannelExistsById(teamId, channelId);
+    const actual = await teams.verifyChannelExistsById(teamId, channelId);
     assert.strictEqual(actual, channelId);
   });
 
@@ -165,7 +165,7 @@ describe('utils/team', () => {
       throw 'Invalid Request';
     });
 
-    await assert.rejects(team.verifyChannelExistsById(teamId, channelId), Error('The specified channel does not exist in the Microsoft Teams team.'));
+    await assert.rejects(teams.verifyChannelExistsById(teamId, channelId), Error('The specified channel does not exist in the Microsoft Teams team.'));
   });
 
   it('correctly get channel id by displayName', async () => {
@@ -177,7 +177,7 @@ describe('utils/team', () => {
       throw 'Invalid Request';
     });
 
-    const actual = await team.getChannelIdByName(teamId, channelName);
+    const actual = await teams.getChannelIdByDisplayName(teamId, channelName);
     assert.strictEqual(actual, channelId);
   });
 
@@ -190,7 +190,7 @@ describe('utils/team', () => {
       throw 'Invalid Request';
     });
 
-    await assert.rejects(team.getChannelIdByName(teamId, channelName), Error('The specified channel does not exist in the Microsoft Teams team'));
+    await assert.rejects(teams.getChannelIdByDisplayName(teamId, channelName), Error('The specified channel does not exist in the Microsoft Teams team'));
   });
 
 }); 

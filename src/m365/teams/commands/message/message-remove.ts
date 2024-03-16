@@ -5,7 +5,7 @@ import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 import { formatting } from '../../../../utils/formatting.js';
-import { team } from '../../../../utils/team.js';
+import { teams } from '../../../../utils/teams.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from "../../../base/GraphCommand.js";
 import commands from '../../commands.js';
@@ -114,8 +114,8 @@ class TeamsMessageRemoveCommand extends GraphCommand {
           await logger.logToStderr(`Removing message ${args.options.id} from team ${args.options.teamId || args.options.teamName} and channel ${args.options.channelId || args.options.channelName}.`);
         }
 
-        const teamId: string = await team.getTeamId(args.options.teamId, args.options.teamName);
-        const channelId: string = await team.getChannelId(teamId, args.options.channelId, args.options.channelName);
+        const teamId: string = await teams.getTeamId(args.options.teamId, args.options.teamName);
+        const channelId: string = await teams.getChannelId(teamId, args.options.channelId, args.options.channelName);
 
         const requestOptions: CliRequestOptions = {
           url: `${this.resource}/v1.0/teams/${formatting.encodeQueryParameter(teamId)}/channels/${formatting.encodeQueryParameter(channelId)}/messages/${args.options.id}/softdelete`,

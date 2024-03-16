@@ -6,7 +6,7 @@ import { cli } from "../cli/cli.js";
 
 const graphResource = 'https://graph.microsoft.com';
 
-export const team = {
+export const teams = {
 
   /**
    * Retrieves the team ID based on the provided ID or display name.
@@ -78,7 +78,7 @@ export const team = {
       return this.verifyChannelExistsById(teamId, channelId);
     }
 
-    return this.getChannelIdByName(teamId, channelName!);
+    return this.getChannelIdByDisplayName(teamId, channelName!);
   },
 
   /**
@@ -115,7 +115,7 @@ export const team = {
    * @returns The ID of the channel.
    * @throws Throws an error if the specified channel does not exist in the team.
    */
-  async getChannelIdByName(teamId: string, name: string): Promise<string> {
+  async getChannelIdByDisplayName(teamId: string, name: string): Promise<string> {
     const channelRequestOptions: CliRequestOptions = {
       url: `${graphResource}/v1.0/teams/${teamId}/channels?$filter=displayName eq '${formatting.encodeQueryParameter(name)}'&$select=id`,
       headers: {
