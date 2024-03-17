@@ -73,7 +73,7 @@ class SpoFolderAddCommand extends SpoCommand {
         }
 
         if (args.options.color && !Object.entries(FolderColorValues).flat().includes(args.options.color)) {
-          return `'${args.options.color}' is not a valid value for option 'color'. Allowed values are ${Object.keys(FolderColorValues).join(', ')} or ${Object.values(FolderColorValues).join(', ')}.`;
+          return `'${args.options.color}' is not a valid value for option 'color'. Allowed values are ${Object.keys(FolderColorValues).join(', ')}, ${Object.values(FolderColorValues).join(', ')}.`;
         }
 
         return true;
