@@ -27,7 +27,7 @@ describe(commands.FOLDER_ADD, () => {
   const parentFolder = '/Shared Documents';
   const folderName = 'My Folder';
   const colorName = 'darkRed';
-  const colorNumber = 1;
+  const colorNumber = '1';
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -162,7 +162,7 @@ describe(commands.FOLDER_ADD, () => {
     }));
   });
 
-  it('creates a folder with a specific color specified by number', async () => {
+  it('creates a folder with a specific color by color number', async () => {
     const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `${webUrl}/_api/foldercoloring/createfolder(DecodedUrl='${formatting.encodeQueryParameter(`${parentFolder}/${folderName}`)}', overwrite=false)`) {
         return addResponse;
@@ -178,7 +178,7 @@ describe(commands.FOLDER_ADD, () => {
     });
   });
 
-  it('creates a folder with a specific color specified by title', async () => {
+  it('creates a folder with a specific color by color name', async () => {
     const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `${webUrl}/_api/foldercoloring/createfolder(DecodedUrl='${formatting.encodeQueryParameter(`${parentFolder}/${folderName}`)}', overwrite=false)`) {
         return addResponse;

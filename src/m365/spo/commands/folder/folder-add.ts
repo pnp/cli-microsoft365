@@ -17,7 +17,7 @@ interface Options extends GlobalOptions {
   webUrl: string;
   parentFolderUrl: string;
   name: string;
-  color?: number | string;
+  color?: string;
 }
 
 class SpoFolderAddCommand extends SpoCommand {
@@ -58,7 +58,8 @@ class SpoFolderAddCommand extends SpoCommand {
         option: '-n, --name <name>'
       },
       {
-        option: '--color [color]'
+        option: '--color [color]',
+        autocomplete: Object.entries(FolderColorValues).flat()
       }
     );
   }
@@ -71,24 +72,16 @@ class SpoFolderAddCommand extends SpoCommand {
           return isValidSharePointUrl;
         }
 
-        if (args.options.color !== undefined) {
-          if (typeof args.options.color === "number") {
-            if (isNaN(args.options.color) || args.options.color < 0 || args.options.color > 15 || !Number.isInteger(args.options.color)) {
-              return 'color should be an integer between 0 and 15.';
-            }
-          }
-          else if (FolderColorValues[args.options.color] === undefined) {
-            return `${args.options.color} is not a valid color value. Allowed values are ${Object.keys(FolderColorValues).join(', ')}.`;
-          }
+        if (args.options.color && !Object.entries(FolderColorValues).flat().includes(args.options.color)) {
+          return `'${args.options.color}' is not a valid value for option 'color'. Allowed values are ${Object.keys(FolderColorValues).join(', ')} or ${Object.values(FolderColorValues).join(', ')}.`;
         }
-
 
         return true;
       });
   }
 
   #initTypes(): void {
-    this.types.string.push('webUrl', 'parentFolderUrl', 'name');
+    this.types.string.push('webUrl', 'parentFolderUrl', 'name', 'color');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -99,21 +92,21 @@ class SpoFolderAddCommand extends SpoCommand {
     const parentFolderServerRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.parentFolderUrl);
     const serverRelativeUrl: string = `${parentFolderServerRelativeUrl}/${args.options.name}`;
 
-    const requestUrl: string = args.options.color !== undefined
-      ? `${args.options.webUrl}/_api/foldercoloring/createfolder(DecodedUrl='${formatting.encodeQueryParameter(serverRelativeUrl)}', overwrite=false)`
-      : `${args.options.webUrl}/_api/web/folders/addUsingPath(decodedUrl='${formatting.encodeQueryParameter(serverRelativeUrl)}')`;
     const requestOptions: CliRequestOptions = {
-      url: requestUrl,
       headers: {
         'accept': 'application/json;odata=nometadata'
       },
       responseType: 'json'
     };
 
-    if (args.options.color !== undefined) {
+    if (args.options.color === undefined) {
+      requestOptions.url = `${args.options.webUrl}/_api/web/folders/addUsingPath(decodedUrl='${formatting.encodeQueryParameter(serverRelativeUrl)}')`;
+    }
+    else {
+      requestOptions.url = `${args.options.webUrl}/_api/foldercoloring/createfolder(DecodedUrl='${formatting.encodeQueryParameter(serverRelativeUrl)}', overwrite=false)`;
       requestOptions.data = {
-        'coloringInformation': {
-          'ColorHex': `${typeof args.options.color === 'number' ? args.options.color : FolderColorValues[args.options.color]}`
+        coloringInformation: {
+          ColorHex: FolderColorValues[args.options.color] || args.options.color
         }
       };
     }
