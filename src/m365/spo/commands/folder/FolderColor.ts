@@ -8,7 +8,7 @@ export const FolderColorValues: { [key: string]: string } =
   darkBlue: '5',
   darkPurple: '6',
   darkPink: '7',
-  darkGrey: '8',
+  grey: '8',
   lightRed: '9',
   lightOrange: '10',
   lightGreen: '11',

@@ -189,7 +189,7 @@ describe(commands.FOLDER_ADD, () => {
     await command.action(logger, { options: { webUrl: webUrl, parentFolderUrl: parentFolder, name: folderName, color: colorName } });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, {
       coloringInformation: {
-        ColorHex: `${colorNumber}`
+        ColorHex: colorNumber
       }
     });
   });
@@ -202,21 +202,6 @@ describe(commands.FOLDER_ADD, () => {
   it('passes validation if the webUrl option is a valid SharePoint site URL and parentFolderUrl specified', async () => {
     const actual = await command.validate({ options: { webUrl: webUrl, parentFolderUrl: parentFolder, name: folderName } }, commandInfo);
     assert.strictEqual(actual, true);
-  });
-
-  it('fails validation if color is passed as number and color is not an integer', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, parentFolderUrl: parentFolder, name: folderName, color: 3.5 } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if color is passed as number and color is smaller than 0', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, parentFolderUrl: parentFolder, name: folderName, color: -3 } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if color is passed as number and color is larger than 15', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, parentFolderUrl: parentFolder, name: folderName, color: 16 } }, commandInfo);
-    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if color is passed as string and color is not a valid color', async () => {

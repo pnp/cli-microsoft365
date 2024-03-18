@@ -59,7 +59,7 @@ class SpoFolderAddCommand extends SpoCommand {
       },
       {
         option: '--color [color]',
-        autocomplete: Object.entries(FolderColorValues).flat()
+        autocomplete: Object.keys(FolderColorValues)
       }
     );
   }
@@ -85,33 +85,33 @@ class SpoFolderAddCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    if (this.verbose) {
-      await logger.logToStderr(`Adding folder to site ${args.options.webUrl}...`);
-    }
-
-    const parentFolderServerRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.parentFolderUrl);
-    const serverRelativeUrl: string = `${parentFolderServerRelativeUrl}/${args.options.name}`;
-
-    const requestOptions: CliRequestOptions = {
-      headers: {
-        'accept': 'application/json;odata=nometadata'
-      },
-      responseType: 'json'
-    };
-
-    if (args.options.color === undefined) {
-      requestOptions.url = `${args.options.webUrl}/_api/web/folders/addUsingPath(decodedUrl='${formatting.encodeQueryParameter(serverRelativeUrl)}')`;
-    }
-    else {
-      requestOptions.url = `${args.options.webUrl}/_api/foldercoloring/createfolder(DecodedUrl='${formatting.encodeQueryParameter(serverRelativeUrl)}', overwrite=false)`;
-      requestOptions.data = {
-        coloringInformation: {
-          ColorHex: FolderColorValues[args.options.color] || args.options.color
-        }
-      };
-    }
-
     try {
+      if (this.verbose) {
+        await logger.logToStderr(`Adding folder to site ${args.options.webUrl}...`);
+      }
+
+      const parentFolderServerRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.parentFolderUrl);
+      const serverRelativeUrl: string = `${parentFolderServerRelativeUrl}/${args.options.name}`;
+
+      const requestOptions: CliRequestOptions = {
+        headers: {
+          'accept': 'application/json;odata=nometadata'
+        },
+        responseType: 'json'
+      };
+
+      if (args.options.color === undefined) {
+        requestOptions.url = `${args.options.webUrl}/_api/web/folders/addUsingPath(decodedUrl='${formatting.encodeQueryParameter(serverRelativeUrl)}')`;
+      }
+      else {
+        requestOptions.url = `${args.options.webUrl}/_api/foldercoloring/createfolder(DecodedUrl='${formatting.encodeQueryParameter(serverRelativeUrl)}', overwrite=false)`;
+        requestOptions.data = {
+          coloringInformation: {
+            ColorHex: FolderColorValues[args.options.color] || args.options.color
+          }
+        };
+      }
+
       const folder = await request.post<FolderProperties>(requestOptions);
       await logger.log(folder);
     }
