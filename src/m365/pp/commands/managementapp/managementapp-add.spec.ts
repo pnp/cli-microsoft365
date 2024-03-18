@@ -80,7 +80,7 @@ describe(commands.MANAGEMENTAPP_ADD, () => {
       options: {
         objectId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f'
       }
-    }), new CommandError(`No Azure AD application registration with ID 9b1b1e42-794b-4c71-93ac-5ed92488b67f found`));
+    }), new CommandError(`No Microsoft Entra application registration with ID 9b1b1e42-794b-4c71-93ac-5ed92488b67f found`));
   });
 
   it('handles error when the app with the specified the name not found', async () => {
@@ -96,7 +96,7 @@ describe(commands.MANAGEMENTAPP_ADD, () => {
       options: {
         name: 'My app'
       }
-    }), new CommandError(`No Azure AD application registration with name My app found`));
+    }), new CommandError(`No Microsoft Entra application registration with name My app found`));
   });
 
   it('handles error when multiple apps with the specified name found', async () => {
@@ -125,7 +125,7 @@ describe(commands.MANAGEMENTAPP_ADD, () => {
       options: {
         name: 'My app'
       }
-    }), new CommandError("Multiple Azure AD application registration with name 'My app' found. Found: 9b1b1e42-794b-4c71-93ac-5ed92488b67f, 9b1b1e42-794b-4c71-93ac-5ed92488b67g."));
+    }), new CommandError("Multiple Microsoft Entra application registration with name 'My app' found. Found: 9b1b1e42-794b-4c71-93ac-5ed92488b67f, 9b1b1e42-794b-4c71-93ac-5ed92488b67g."));
   });
 
   it('handles selecting single result when multiple apps with the specified name found and cli is set to prompt', async () => {

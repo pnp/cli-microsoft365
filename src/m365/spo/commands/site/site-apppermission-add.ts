@@ -122,11 +122,11 @@ class SpoSiteAppPermissionAddCommand extends GraphCommand {
     const appItem: AppInfo | undefined = response.value[0];
 
     if (!appItem) {
-      throw "The specified Azure AD app does not exist";
+      throw "The specified Microsoft Entra app does not exist";
     }
 
     if (response.value.length > 1) {
-      throw `Multiple Azure AD app with displayName ${args.options.appDisplayName} found: ${response.value.map(x => x.appId)}`;
+      throw `Multiple Microsoft Entra app with displayName ${args.options.appDisplayName} found: ${response.value.map(x => x.appId)}`;
     }
 
     return {

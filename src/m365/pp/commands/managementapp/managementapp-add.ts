@@ -118,7 +118,7 @@ class PpManagementAppAddCommand extends PowerPlatformCommand {
 
     if (aadApps.value.length === 0) {
       const applicationIdentifier = objectId ? `ID ${objectId}` : `name ${name}`;
-      throw `No Azure AD application registration with ${applicationIdentifier} found`;
+      throw `No Microsoft Entra application registration with ${applicationIdentifier} found`;
     }
 
     if (aadApps.value.length === 1 && aadApps.value[0].appId) {
@@ -126,7 +126,7 @@ class PpManagementAppAddCommand extends PowerPlatformCommand {
     }
 
     const resultAsKeyValuePair = formatting.convertArrayToHashTable('appId', aadApps.value);
-    const result = await cli.handleMultipleResultsFound<Application>(`Multiple Azure AD application registration with name '${name}' found.`, resultAsKeyValuePair);
+    const result = await cli.handleMultipleResultsFound<Application>(`Multiple Microsoft Entra application registration with name '${name}' found.`, resultAsKeyValuePair);
     return result.appId!;
   }
 }

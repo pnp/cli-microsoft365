@@ -257,9 +257,9 @@ class EntraAppAddCommand extends GraphCommand {
     try {
       const apis = await this.resolveApis(args, logger);
       let appInfo: any = await this.createAppRegistration(args, apis, logger);
-      // based on the assumption that we're adding Microsoft Entra to the current
+      // based on the assumption that we're adding Microsoft Entra app to the current
       // directory. If we in the future extend the command with allowing
-      // users to create Microsoft Entra in a different directory, we'll need to
+      // users to create Microsoft Entra app in a different directory, we'll need to
       // adjust this
       appInfo.tenantId = accessToken.getTenantIdFromAccessToken(auth.connection.accessTokens[auth.defaultResource].accessToken);
       appInfo = await this.updateAppFromManifest(args, appInfo);
@@ -329,7 +329,7 @@ class EntraAppAddCommand extends GraphCommand {
     }
 
     if (this.verbose) {
-      await logger.logToStderr(`Creating Azure AD app registration...`);
+      await logger.logToStderr(`Creating Microsoft Entra app registration...`);
     }
 
     const createApplicationRequestOptions: CliRequestOptions = {
@@ -681,7 +681,7 @@ class EntraAppAddCommand extends GraphCommand {
     }
 
     if (this.verbose) {
-      await logger.logToStderr(`Configuring Azure AD application ID URI...`);
+      await logger.logToStderr(`Configuring Microsoft Entra application ID URI...`);
     }
 
     const applicationInfo: any = {};
@@ -866,7 +866,7 @@ class EntraAppAddCommand extends GraphCommand {
     }
 
     if (this.verbose) {
-      await logger.logToStderr(`Configure Azure AD app secret...`);
+      await logger.logToStderr(`Configure Microsoft Entra app secret...`);
     }
 
     const secret = await this.createSecret({ appObjectId: appInfo.id });
@@ -934,7 +934,7 @@ class EntraAppAddCommand extends GraphCommand {
     const filePath: string = '.m365rc.json';
 
     if (this.verbose) {
-      await logger.logToStderr(`Saving Azure AD app registration information to the ${filePath} file...`);
+      await logger.logToStderr(`Saving Microsoft Entra app registration information to the ${filePath} file...`);
     }
 
     let m365rc: M365RcJson = {};

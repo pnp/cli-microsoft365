@@ -98,7 +98,7 @@ We have created a non-root user called `cli-microsoft365` inside the container. 
 
 ## Set Environment Variables
 
-In scenarios where you need to set environment variables, for example, you want to use a custom Microsoft Entra ID identity when logging into your Microsoft 365 tenant using the CLI. You can set these variables by passing them in as options arguments `(-e)` into the `docker run` command.
+In scenarios where you need to set environment variables, for example, you want to use a custom Microsoft Entra identity identity when logging into your Microsoft 365 tenant using the CLI. You can set these variables by passing them in as options arguments `(-e)` into the `docker run` command.
 
 ```sh
 docker run --rm -it -e "CLIMICROSOFT365_AADAPPID=51078274-0353-4f6a-b9f5-8674ab2e524c" -e "CLIMICROSOFT365_TENANT=9455bc83-d5af-4ccf-93f6-0af3f71aaf8e" m365pnp/cli-microsoft365:latest

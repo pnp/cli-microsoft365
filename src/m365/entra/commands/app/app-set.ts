@@ -138,7 +138,7 @@ class EntraAppSetCommand extends GraphCommand {
     const { appId, name } = args.options;
 
     if (this.verbose) {
-      await logger.logToStderr(`Retrieving information about Azure AD app ${appId ? appId : name}...`);
+      await logger.logToStderr(`Retrieving information about Microsoft Entra app ${appId ? appId : name}...`);
     }
 
     const filter: string = appId ?
@@ -161,11 +161,11 @@ class EntraAppSetCommand extends GraphCommand {
 
     if (res.value.length === 0) {
       const applicationIdentifier = appId ? `ID ${appId}` : `name ${name}`;
-      throw `No Azure AD application registration with ${applicationIdentifier} found`;
+      throw `No Microsoft Entra application registration with ${applicationIdentifier} found`;
     }
 
     const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', res.value);
-    const result = await cli.handleMultipleResultsFound<{ id: string }>(`Multiple Azure AD application registration with name '${name}' found.`, resultAsKeyValuePair);
+    const result = await cli.handleMultipleResultsFound<{ id: string }>(`Multiple Microsoft Entra application registration with name '${name}' found.`, resultAsKeyValuePair);
     return result.id;
   }
 
@@ -175,7 +175,7 @@ class EntraAppSetCommand extends GraphCommand {
     }
 
     if (this.verbose) {
-      await logger.logToStderr(`Configuring Azure AD application ID URI...`);
+      await logger.logToStderr(`Configuring Microsoft Entra application ID URI...`);
     }
 
     const identifierUris: string[] = args.options.uris
@@ -205,7 +205,7 @@ class EntraAppSetCommand extends GraphCommand {
     }
 
     if (this.verbose) {
-      await logger.logToStderr(`Configuring Azure AD application redirect URIs...`);
+      await logger.logToStderr(`Configuring Microsoft Entra application redirect URIs...`);
     }
 
     const getAppRequestOptions: CliRequestOptions = {
@@ -289,7 +289,7 @@ class EntraAppSetCommand extends GraphCommand {
     }
 
     if (this.verbose) {
-      await logger.logToStderr(`Setting certificate for Azure AD app...`);
+      await logger.logToStderr(`Setting certificate for Microsoft Entra app...`);
     }
 
     const certificateBase64Encoded = await this.getCertificateBase64Encoded(args, logger);
@@ -352,7 +352,7 @@ class EntraAppSetCommand extends GraphCommand {
 
   private async updateKeyCredentials(objectId: string, keyCredentials: KeyCredential[], logger: Logger): Promise<void> {
     if (this.verbose) {
-      await logger.logToStderr(`Updating keyCredentials in Microsoft Entra ID`);
+      await logger.logToStderr(`Updating keyCredentials in Microsoft Entra app`);
     }
 
     const requestOptions: CliRequestOptions = {

@@ -122,11 +122,11 @@ class EntraAppGetCommand extends GraphCommand {
 
     if (res.value.length === 0) {
       const applicationIdentifier = appId ? `ID ${appId}` : `name ${name}`;
-      throw `No Azure AD application registration with ${applicationIdentifier} found`;
+      throw `No Microsoft Entra application registration with ${applicationIdentifier} found`;
     }
 
     const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', res.value);
-    const result = await cli.handleMultipleResultsFound<{ id: string }>(`Multiple Azure AD application registration with name '${name}' found.`, resultAsKeyValuePair);
+    const result = await cli.handleMultipleResultsFound<{ id: string }>(`Multiple Microsoft Entra application registration with name '${name}' found.`, resultAsKeyValuePair);
     return result.id;
   }
 
@@ -150,7 +150,7 @@ class EntraAppGetCommand extends GraphCommand {
     const filePath: string = '.m365rc.json';
 
     if (this.verbose) {
-      await logger.logToStderr(`Saving Azure AD app registration information to the ${filePath} file...`);
+      await logger.logToStderr(`Saving Microsoft Entra app registration information to the ${filePath} file...`);
     }
 
     let m365rc: M365RcJson = {};

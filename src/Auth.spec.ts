@@ -353,7 +353,7 @@ describe('Auth', () => {
     });
   });
 
-  it('shows AAD error when invalid Microsoft Entra ID used', (done) => {
+  it('shows error when invalid Microsoft Entra ID used', (done) => {
     sinon.stub(auth as any, 'getPublicClient').callsFake(_ => publicApplication);
     sinon.stub(tokenCache, 'getAllAccounts').resolves([]);
     sinon.stub(publicApplication, 'acquireTokenByDeviceCode').callsFake(_ => Promise.reject({

@@ -13,7 +13,7 @@ class CliReconsentCommand extends AnonymousCommand {
   }
 
   public get description(): string {
-    return 'Returns Microsoft Entra URL to open in the browser to re-consent CLI for Microsoft 365 permissions';
+    return 'Returns Microsoft Entra URL to open in the browser to re-consent CLI for Microsoft 365 Microsoft Entra permissions';
   }
 
   public async commandAction(logger: Logger): Promise<void> {

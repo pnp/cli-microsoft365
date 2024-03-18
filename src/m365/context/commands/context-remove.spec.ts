@@ -154,7 +154,7 @@ describe(commands.REMOVE, () => {
     sinon.stub(fs, 'readFileSync').callsFake(_ => JSON.stringify({
       apps: [{
         appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
-        name: 'My Microsoft Entra ID'
+        name: 'My Microsoft Entra app'
       }]
     }));
     const fsWriteFileSyncSpy = sinon.spy(fs, 'writeFileSync');

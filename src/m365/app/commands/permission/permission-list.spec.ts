@@ -658,7 +658,7 @@ describe(commands.PERMISSION_LIST, () => {
     });
 
     await assert.rejects(command.action(logger, { options: {} }),
-      new CommandError('No Azure AD application registration with ID 9c79078b-815e-4a3e-bb80-2aaf2d9e9b3d found'));
+      new CommandError('No Microsoft Entra application registration with ID 9c79078b-815e-4a3e-bb80-2aaf2d9e9b3d found'));
   });
 
   it('handles error when retrieving service principal for the Microsoft Entra app', async () => {
