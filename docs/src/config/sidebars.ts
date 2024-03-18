@@ -632,6 +632,11 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
+              label: 'user groupmembership list',
+              id: 'cmd/entra/user/user-groupmembership-list'
+            },
+            {
+              type: 'doc',
               label: 'user guest add',
               id: 'cmd/entra/user/user-guest-add'
             },
