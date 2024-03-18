@@ -16,7 +16,7 @@ interface Options extends GlobalOptions {
   webUrl: string;
   url: string;
   name?: string;
-  color?: number | string;
+  color?: string;
 }
 
 class SpoFolderSetCommand extends SpoCommand {
@@ -63,7 +63,8 @@ class SpoFolderSetCommand extends SpoCommand {
         option: '-n, --name [name]'
       },
       {
-        option: '--color [color]'
+        option: '--color [color]',
+        autocomplete: Object.keys(FolderColorValues)
       }
     );
   }
@@ -77,27 +78,19 @@ class SpoFolderSetCommand extends SpoCommand {
         }
 
         if (args.options.color === undefined && args.options.name === undefined) {
-          return `Specify atleast one of the options: name or color.`;
+          return `Specify at least one of the options: name or color.`;
         }
 
-        if (args.options.color !== undefined) {
-          if (typeof args.options.color === 'number') {
-            if (isNaN(args.options.color) || args.options.color < 0 || args.options.color > 15 || !Number.isInteger(args.options.color)) {
-              return 'color should be an integer between 0 and 15.';
-            }
-          }
-          else if (FolderColorValues[args.options.color] === undefined) {
-            return `${args.options.color} is not a valid color value. Allowed values are ${Object.keys(FolderColorValues).join(', ')}.`;
-          }
+        if (args.options.color && !Object.entries(FolderColorValues).flat().includes(args.options.color)) {
+          return `'${args.options.color}' is not a valid value for option 'color'. Allowed values are ${Object.keys(FolderColorValues).join(', ')}, ${Object.values(FolderColorValues).join(', ')}.`;
         }
-
 
         return true;
       });
   }
 
   #initTypes(): void {
-    this.types.string.push('webUrl', 'url', 'name');
+    this.types.string.push('webUrl', 'url', 'name', 'color');
   }
 
   protected getExcludedOptionsWithUrls(): string[] | undefined {
@@ -106,12 +99,14 @@ class SpoFolderSetCommand extends SpoCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
+      await this.showDeprecationWarning(logger, this.alias()![0], this.name);
+
       if (this.verbose) {
-        await logger.logToStderr(`Renaming folder ${args.options.url} to ${args.options.name}`);
+        await logger.logToStderr(`Updating ${args.options.name}...`);
       }
 
       const serverRelativePath = urlUtil.getServerRelativePath(args.options.webUrl, args.options.url);
-      if (args.options.name && !args.options.color) {
+      if (!args.options.color) {
         const requestOptions: CliRequestOptions = {
           url: `${args.options.webUrl}/_api/Web/GetFolderByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(serverRelativePath)}')/ListItemAllFields`,
           headers: {
@@ -132,14 +127,14 @@ class SpoFolderSetCommand extends SpoCommand {
       }
       else {
         const requestOptions: CliRequestOptions = {
-          url: `${args.options.webUrl}/_api/foldercoloring/${args.options.name !== undefined ? 'renamefolder' : 'stampcolor'}(DecodedUrl='${formatting.encodeQueryParameter(serverRelativePath)}')`,
+          url: `${args.options.webUrl}/_api/foldercoloring/${args.options.name ? 'renamefolder' : 'stampcolor'}(DecodedUrl='${formatting.encodeQueryParameter(serverRelativePath)}')`,
           headers: {
-            'accept': 'application/json;odata=nometadata'
+            accept: 'application/json;odata=nometadata'
           },
           responseType: 'json',
           data: {
             coloringInformation: {
-              ColorHex: `${typeof args.options.color === 'number' ? args.options.color : FolderColorValues[args.options.color!]}`
+              ColorHex: FolderColorValues[args.options.color!] || args.options.color
             },
             newName: args.options.name
           }

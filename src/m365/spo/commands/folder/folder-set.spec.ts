@@ -25,7 +25,7 @@ describe(commands.FOLDER_SET, () => {
   const folderRelServerUrl = '/sites/project-x/Shared Documents/Folder1';
   const newFolderName = 'New name';
   const colorName = 'darkRed';
-  const colorNumber = 1;
+  const colorNumber = '1';
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -82,6 +82,18 @@ describe(commands.FOLDER_SET, () => {
     assert.deepStrictEqual(alias, [commands.FOLDER_RENAME]);
   });
 
+  it('correctly logs deprecation warning for yammer command', async () => {
+    const chalk = (await import('chalk')).default;
+    const loggerErrSpy = sinon.spy(logger, 'logToStderr');
+    const commandNameStub = sinon.stub(cli, 'currentCommandName').value(commands.FOLDER_RENAME);
+    sinon.stub(request, 'patch').resolves();
+
+    await command.action(logger, { options: { webUrl: webUrl, url: folderRelServerUrl, name: newFolderName } });
+    assert.deepStrictEqual(loggerErrSpy.firstCall.firstArg, chalk.yellow(`Command '${commands.FOLDER_RENAME}' is deprecated. Please use '${commands.FOLDER_SET}' instead.`));
+
+    sinonUtil.restore([loggerErrSpy, commandNameStub]);
+  });
+
   it('renames folder correctly by using server relative URL', async () => {
     const patchStub = sinon.stub(request, 'patch').callsFake(async (opts) => {
       if (opts.url === `${webUrl}/_api/Web/GetFolderByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(folderRelServerUrl)}')/ListItemAllFields`) {
@@ -100,7 +112,6 @@ describe(commands.FOLDER_SET, () => {
         name: newFolderName
       }
     });
-    assert(patchStub.called);
     assert.deepStrictEqual(patchStub.lastCall.args[0].data, { FileLeafRef: newFolderName, Title: newFolderName });
   });
 
@@ -121,7 +132,6 @@ describe(commands.FOLDER_SET, () => {
         name: newFolderName
       }
     });
-    assert(patchStub.called);
     assert.deepStrictEqual(patchStub.lastCall.args[0].data, { FileLeafRef: newFolderName, Title: newFolderName });
   });
 
