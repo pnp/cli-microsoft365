@@ -88,6 +88,7 @@ export default {
   USER_ADD: `${prefix} user add`,
   USER_GET: `${prefix} user get`,
   USER_GUEST_ADD: `${prefix} user guest add`,
+  USER_GROUPMEMBERSHIP_LIST: `${prefix} user groupmembership list`,
   USER_HIBP: `${prefix} user hibp`,
   USER_LICENSE_ADD: `${prefix} user license add`,
   USER_LICENSE_LIST: `${prefix} user license list`,

@@ -42,6 +42,7 @@ const dictionary = [
   'fun',
   'group',
   'groupify',
+  'groupmembership',
   'guest',
   'health',
   'hide',
