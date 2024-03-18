@@ -110,13 +110,6 @@ describe(commands.BUCKET_SET, () => {
       expiresOn: new Date()
     };
     commandInfo = cli.getCommandInfo(command);
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName: string, defaultValue: any) => {
-      if (settingName === 'prompt') {
-        return false;
-      }
-
-      return defaultValue;
-    });
   });
 
   beforeEach(() => {
@@ -133,6 +126,13 @@ describe(commands.BUCKET_SET, () => {
       }
     };
     (command as any).items = [];
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName: string, defaultValue: any) => {
+      if (settingName === 'prompt') {
+        return false;
+      }
+
+      return defaultValue;
+    });
   });
 
   afterEach(() => {
@@ -256,7 +256,7 @@ describe(commands.BUCKET_SET, () => {
 
   it('fails validation when no groups found', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(validOwnerGroupName)}'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(validOwnerGroupName)}'&$select=id`) {
         return { "value": [] };
       }
 
@@ -273,6 +273,7 @@ describe(commands.BUCKET_SET, () => {
   });
 
   it('fails validation when multiple groups found', async () => {
+    sinonUtil.restore([cli.getSettingWithDefaultValue]);
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
       if (settingName === settingsNames.prompt) {
         return false;
@@ -282,7 +283,7 @@ describe(commands.BUCKET_SET, () => {
     });
 
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(validOwnerGroupName)}'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(validOwnerGroupName)}'&$select=id`) {
         return multipleGroupResponse;
       }
 
@@ -299,6 +300,7 @@ describe(commands.BUCKET_SET, () => {
   });
 
   it('fails validation when no buckets found', async () => {
+    sinonUtil.restore([cli.getSettingWithDefaultValue]);
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${validPlanId}/buckets`) {
         return { "value": [] };
@@ -312,10 +314,11 @@ describe(commands.BUCKET_SET, () => {
         name: validBucketName,
         planId: validPlanId
       }
-    }), new CommandError(`The specified bucket ${validBucketName} does not exist`));
+    }), new CommandError(`The specified bucket '${validBucketName}' does not exist.`));
   });
 
   it('fails validation when multiple buckets found', async () => {
+    sinonUtil.restore([cli.getSettingWithDefaultValue]);
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
       if (settingName === settingsNames.prompt) {
         return false;
@@ -342,10 +345,10 @@ describe(commands.BUCKET_SET, () => {
 
   it('handles selecting single result when multiple buckets with the specified name found and cli is set to prompt', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(validOwnerGroupName)}'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(validOwnerGroupName)}'&$select=id`) {
         return singleGroupResponse;
       }
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${validOwnerGroupId}/planner/plans`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${validOwnerGroupId}/planner/plans?$select=id,title`) {
         return singlePlanResponse;
       }
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${validPlanId}/buckets`) {
@@ -402,10 +405,10 @@ describe(commands.BUCKET_SET, () => {
 
   it('correctly updates bucket by name', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(validOwnerGroupName)}'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(validOwnerGroupName)}'&$select=id`) {
         return singleGroupResponse;
       }
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${validOwnerGroupId}/planner/plans`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${validOwnerGroupId}/planner/plans?$select=id,title`) {
         return singlePlanResponse;
       }
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${validPlanId}/buckets`) {
@@ -435,7 +438,7 @@ describe(commands.BUCKET_SET, () => {
 
   it('correctly updates bucket by name with rosterId', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/planner/rosters/${validRosterId}/plans`) {
+      if (opts.url === `https://graph.microsoft.com/beta/planner/rosters/${validRosterId}/plans?$select=id`) {
         return planResponse;
       }
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${validPlanId}/buckets`) {
@@ -467,7 +470,7 @@ describe(commands.BUCKET_SET, () => {
 
   it('correctly updates bucket by name with group ID', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${validOwnerGroupId}/planner/plans`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${validOwnerGroupId}/planner/plans?$select=id,title`) {
         return singlePlanResponse;
       }
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${validPlanId}/buckets`) {
@@ -490,7 +493,8 @@ describe(commands.BUCKET_SET, () => {
         planTitle: validPlanTitle,
         ownerGroupId: validOwnerGroupId,
         newName: 'New bucket name',
-        orderHint: validOrderHint
+        orderHint: validOrderHint,
+        verbose: true
       }
     }));
   });

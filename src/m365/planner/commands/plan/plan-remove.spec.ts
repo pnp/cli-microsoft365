@@ -214,7 +214,7 @@ describe(commands.PLAN_REMOVE, () => {
 
   it('Correctly deletes plan by title', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(validOwnerGroupName)}'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(validOwnerGroupName)}'&$select=id`) {
         return singleGroupsResponse;
       }
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/${validOwnerGroupId}/planner/plans`) {
@@ -262,7 +262,8 @@ describe(commands.PLAN_REMOVE, () => {
     await command.action(logger, {
       options: {
         title: validPlanTitle,
-        ownerGroupId: validOwnerGroupId
+        ownerGroupId: validOwnerGroupId,
+        verbose: true
       }
     });
   });

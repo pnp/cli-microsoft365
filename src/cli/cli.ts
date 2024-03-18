@@ -981,7 +981,7 @@ async function handleMultipleResultsFound<T>(message: string, values: { [key: st
     throw new Error(`${message} Found: ${Object.keys(values).join(', ')}.`);
   }
 
-  cli.error(`🌶️  ${message} `);
+  cli.error(`🌶️ ${message} `);
   const choices = Object.keys(values).map((choice: any) => { return { name: choice, value: choice }; });
   const response = await cli.promptForSelection<string>({ message: `Please choose one:`, choices });
 

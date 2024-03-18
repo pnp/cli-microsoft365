@@ -1,7 +1,6 @@
-import { PlannerPlan, PlannerTask } from '@microsoft/microsoft-graph-types';
+import { PlannerTask } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
-import request, { CliRequestOptions } from '../../../../request.js';
 import { entraGroup } from '../../../../utils/entraGroup.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { odata } from '../../../../utils/odata.js';
@@ -133,39 +132,30 @@ class PlannerTaskListCommand extends GraphCommand {
     let planId: string | undefined = args.options.planId;
     let taskItems: PlannerTask[] = [];
 
-    if (bucketId || bucketName) {
-      try {
+    try {
+      if (bucketId || bucketName) {
         bucketId = await this.getBucketId(args);
         taskItems = await odata.getAllItems<PlannerTask>(`${this.resource}/v1.0/planner/buckets/${bucketId}/tasks`);
         const betaTasks = await odata.getAllItems<PlannerTask>(`${this.resource}/beta/planner/buckets/${bucketId}/tasks`);
 
         await logger.log(this.mergeTaskPriority(taskItems, betaTasks));
       }
-      catch (err: any) {
-        this.handleRejectedODataJsonPromise(err);
-      }
-    }
-    else if (planId || planTitle) {
-      try {
+      else if (planId || planTitle) {
         planId = await this.getPlanId(args);
         taskItems = await odata.getAllItems<PlannerTask>(`${this.resource}/v1.0/planner/plans/${planId}/tasks`);
         const betaTasks = await odata.getAllItems<PlannerTask>(`${this.resource}/beta/planner/plans/${planId}/tasks`);
 
         await logger.log(this.mergeTaskPriority(taskItems, betaTasks));
       }
-      catch (err: any) {
-        this.handleRejectedODataJsonPromise(err);
-      }
-    }
-    else {
-      try {
+      else {
         taskItems = await odata.getAllItems<PlannerTask>(`${this.resource}/v1.0/me/planner/tasks`);
         const betaTasks = await odata.getAllItems<PlannerTask>(`${this.resource}/beta/me/planner/tasks`);
+
         await logger.log(this.mergeTaskPriority(taskItems, betaTasks));
       }
-      catch (err: any) {
-        this.handleRejectedODataJsonPromise(err);
-      }
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
     }
   }
 
@@ -175,22 +165,7 @@ class PlannerTaskListCommand extends GraphCommand {
     }
 
     const planId = await this.getPlanId(args);
-    const requestOptions: CliRequestOptions = {
-      url: `${this.resource}/v1.0/planner/plans/${planId}/buckets`,
-      headers: {
-        accept: 'application/json;odata.metadata=none'
-      },
-      responseType: 'json'
-    };
-
-    const response = await request.get<{ value: { id: string; name: string; }[] }>(requestOptions);
-    const bucket: { id: string; name: string; } | undefined = response.value.find(val => val.name === args.options.bucketName);
-
-    if (!bucket) {
-      throw `The specified bucket does not exist`;
-    }
-
-    return bucket.id;
+    return planner.getBucketIdByTitle(args.options.bucketName!, planId);
   }
 
   private async getPlanId(args: CommandArgs): Promise<string> {
@@ -199,13 +174,11 @@ class PlannerTaskListCommand extends GraphCommand {
     }
 
     if (args.options.rosterId) {
-      const plan: PlannerPlan = await planner.getPlanByRosterId(args.options.rosterId);
-      return plan.id!;
+      return planner.getPlanIdByRosterId(args.options.rosterId);
     }
     else {
       const groupId: string = await this.getGroupId(args);
-      const plan: PlannerPlan = await planner.getPlanByTitle(args.options.planTitle!, groupId);
-      return plan.id!;
+      return planner.getPlanIdByTitle(args.options.planTitle!, groupId);
     }
   }
 
@@ -214,8 +187,7 @@ class PlannerTaskListCommand extends GraphCommand {
       return formatting.encodeQueryParameter(args.options.ownerGroupId);
     }
 
-    const group = await entraGroup.getGroupByDisplayName(args.options.ownerGroupName!);
-    return group.id!;
+    return entraGroup.getGroupIdByDisplayName(args.options.ownerGroupName!);
   }
 
   private mergeTaskPriority(taskItems: PlannerTask[], betaTaskItems: PlannerTask[]): PlannerTask[] {

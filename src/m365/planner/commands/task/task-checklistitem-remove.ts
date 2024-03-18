@@ -37,7 +37,7 @@ class PlannerTaskChecklistItemRemoveCommand extends GraphCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        force: (!(!args.options.force)).toString()
+        force: !!args.options.force
       });
     });
   }

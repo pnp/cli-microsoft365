@@ -107,30 +107,20 @@ class PlannerPlanGetCommand extends GraphCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
+      let plan: PlannerPlan;
       if (args.options.id) {
-        const plan = await planner.getPlanById(args.options.id);
-        const result = await this.getPlanDetails(plan);
-        await logger.log(result);
+        plan = await planner.getPlanById(args.options.id);
+      }
+      else if (args.options.rosterId) {
+        plan = await planner.getPlanByRosterId(args.options.rosterId);
       }
       else {
-        let plan: PlannerPlan = {};
-        if (args.options.rosterId) {
-          plan = await planner.getPlanByRosterId(args.options.rosterId);
-        }
-        else {
-          let groupId = undefined;
-          if (args.options.ownerGroupId || args.options.ownerGroupName) {
-            groupId = await this.getGroupId(args);
-          }
-          plan = await planner.getPlanByTitle(args.options.title!, groupId);
-        }
-
-        const result = await this.getPlanDetails(plan);
-
-        if (result) {
-          await logger.log(result);
-        }
+        const groupId = await this.getGroupId(args);
+        plan = await planner.getPlanByTitle(args.options.title!, groupId);
       }
+
+      const result = await this.getPlanDetails(plan);
+      await logger.log(result);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
@@ -141,8 +131,8 @@ class PlannerPlanGetCommand extends GraphCommand {
     const requestOptionsTaskDetails: CliRequestOptions = {
       url: `${this.resource}/v1.0/planner/plans/${plan.id}/details`,
       headers: {
-        'accept': 'application/json;odata.metadata=none',
-        'Prefer': 'return=representation'
+        accept: 'application/json;odata.metadata=none',
+        Prefer: 'return=representation'
       },
       responseType: 'json'
     };
@@ -156,8 +146,7 @@ class PlannerPlanGetCommand extends GraphCommand {
       return args.options.ownerGroupId;
     }
 
-    const group = await entraGroup.getGroupByDisplayName(args.options.ownerGroupName!);
-    return group.id!;
+    return entraGroup.getGroupIdByDisplayName(args.options.ownerGroupName!);
   }
 }
 
