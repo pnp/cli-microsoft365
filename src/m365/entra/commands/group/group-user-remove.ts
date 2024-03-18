@@ -1,9 +1,10 @@
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { entraGroup } from '../../../../utils/entraGroup.js';
 import { entraUser } from '../../../../utils/entraUser.js';
-import { GraphBatchRequest, GraphBatchRequestItem } from '../../../../utils/types.js';
+import { GraphBatchRequest, GraphBatchRequestResponse } from '../../../../utils/types.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
@@ -17,18 +18,20 @@ interface Options extends GlobalOptions {
   groupDisplayName?: string;
   ids?: string;
   userNames?: string;
-  role: string;
+  role?: string;
+  suppressNotFound?: boolean;
+  force?: boolean;
 }
 
-class EntraGroupUserAddCommand extends GraphCommand {
+class EntraGroupUserRemoveCommand extends GraphCommand {
   private readonly roleValues = ['Owner', 'Member'];
 
   public get name(): string {
-    return commands.GROUP_USER_ADD;
+    return commands.GROUP_USER_REMOVE;
   }
 
   public get description(): string {
-    return 'Adds users to a Microsoft Entra ID group';
+    return 'Removes users from a Microsoft Entra ID group';
   }
 
   constructor() {
@@ -47,7 +50,10 @@ class EntraGroupUserAddCommand extends GraphCommand {
         groupId: typeof args.options.groupId !== 'undefined',
         groupDisplayName: typeof args.options.groupDisplayName !== 'undefined',
         ids: typeof args.options.ids !== 'undefined',
-        userNames: typeof args.options.userNames !== 'undefined'
+        userNames: typeof args.options.userNames !== 'undefined',
+        role: typeof args.options.role !== 'undefined',
+        suppressNotFound: !!args.options.suppressNotFound,
+        force: !!args.options.force
       });
     });
   }
@@ -67,8 +73,14 @@ class EntraGroupUserAddCommand extends GraphCommand {
         option: '--userNames [userNames]'
       },
       {
-        option: '-r, --role <role>',
+        option: '-r, --role [role]',
         autocomplete: this.roleValues
+      },
+      {
+        option: '--suppressNotFound'
+      },
+      {
+        option: '-f, --force'
       }
     );
   }
@@ -95,7 +107,7 @@ class EntraGroupUserAddCommand extends GraphCommand {
           }
         }
 
-        if (this.roleValues.indexOf(args.options.role) === -1) {
+        if (args.options.role !== undefined && this.roleValues.indexOf(args.options.role) === -1) {
           return `Option 'role' must be one of the following values: ${this.roleValues.join(', ')}.`;
         }
 
@@ -113,50 +125,67 @@ class EntraGroupUserAddCommand extends GraphCommand {
 
   #initTypes(): void {
     this.types.string.push('groupId', 'groupDisplayName', 'ids', 'userNames', 'role');
+    this.types.boolean.push('force', 'suppressNotFound');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
-      if (this.verbose) {
-        await logger.logToStderr(`Adding user(s) ${args.options.ids || args.options.userNames} to group ${args.options.groupId || args.options.groupDisplayName}...`);
-      }
+      const removeUsers = async (): Promise<void> => {
+        if (this.verbose) {
+          await logger.logToStderr(`Removing user(s) ${args.options.ids || args.options.userNames} from group ${args.options.groupId || args.options.groupDisplayName}...`);
+        }
 
-      const groupId = await this.getGroupId(logger, args.options);
-      const userIds = await this.getUserIds(logger, args.options);
+        const groupId = await this.getGroupId(logger, args.options);
+        const userIds = await this.getUserIds(logger, args.options);
 
-      for (let i = 0; i < userIds.length; i += 400) {
-        const userIdsBatch = userIds.slice(i, i + 400);
-        const requestOptions: CliRequestOptions = {
-          url: `${this.resource}/v1.0/$batch`,
-          headers: {
-            'content-type': 'application/json;odata.metadata=none'
-          },
-          responseType: 'json',
-          data: {
-            requests: []
-          } as GraphBatchRequest
-        };
+        const endpoints = [];
+        if (!args.options.role || args.options.role === 'Owner') {
+          endpoints.push(...userIds.map(id => `/groups/${groupId}/owners/${id}/$ref`));
+        }
+        if (!args.options.role || args.options.role === 'Member') {
+          endpoints.push(...userIds.map(id => `/groups/${groupId}/members/${id}/$ref`));
+        }
 
-        for (let j = 0; j < userIdsBatch.length; j += 20) {
-          const userIdsChunk = userIdsBatch.slice(j, j + 20);
-          requestOptions.data.requests.push({
-            id: j + 1,
-            method: 'PATCH',
-            url: `/groups/${groupId}`,
+        for (let i = 0; i < endpoints.length; i += 20) {
+          const endpointsBatch = endpoints.slice(i, i + 20);
+          const requestOptions: CliRequestOptions = {
+            url: `${this.resource}/v1.0/$batch`,
             headers: {
               'content-type': 'application/json;odata.metadata=none'
             },
-            body: {
-              [`${args.options.role === 'Member' ? 'members' : 'owners'}@odata.bind`]: userIdsChunk.map(u => `${this.resource}/v1.0/directoryObjects/${u}`)
-            }
-          } as GraphBatchRequestItem);
-        }
+            responseType: 'json',
+            data: {
+              requests: endpointsBatch.map((ep, index) => ({
+                id: index + 1,
+                method: 'DELETE',
+                url: ep,
+                headers: {
+                  'content-type': 'application/json;odata.metadata=none'
+                }
+              }))
+            } as GraphBatchRequest
+          };
 
-        const res = await request.post<{ responses: { status: number; body: any }[] }>(requestOptions);
-        for (const response of res.responses) {
-          if (response.status !== 204) {
-            throw response.body;
+          const res = await request.post<GraphBatchRequestResponse>(requestOptions);
+          for (const response of res.responses) {
+            // Suppress 404 errors if suppressNotFound is set
+            if (response.status !== 204 && (!args.options.suppressNotFound || response.status !== 404)) {
+              throw response.body;
+            }
           }
+        }
+      };
+
+      if (args.options.force) {
+        await removeUsers();
+      }
+      else {
+        const users = args.options.ids || args.options.userNames;
+        const userList = users!.split(',');
+        const result = await cli.promptForConfirmation({ message: `Are you sure you want to remove ${userList.length} user(s) from group '${args.options.groupId || args.options.groupDisplayName}'?` });
+
+        if (result) {
+          await removeUsers();
         }
       }
     }
@@ -190,4 +219,4 @@ class EntraGroupUserAddCommand extends GraphCommand {
   }
 }
 
-export default new EntraGroupUserAddCommand();
+export default new EntraGroupUserRemoveCommand();
