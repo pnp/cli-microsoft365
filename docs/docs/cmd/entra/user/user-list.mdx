@@ -21,6 +21,9 @@ m365 aad user list [options]
 ## Options
 
 ```md definition-list
+`--type [type]`
+: Filter the results to only users of a given type: `Member` or `Guest`. By default, all users are listed.
+
 `-p, --properties [properties]`
 : Comma-separated list of properties to retrieve
 ```
@@ -29,7 +32,9 @@ m365 aad user list [options]
 
 ## Remarks
 
-Using the `--properties` option, you can specify a comma-separated list of user properties to retrieve from the Microsoft Graph. If you don't specify any properties, the command will retrieve user's display name and account name.
+Using the `--properties` option, you can specify a comma-separated list of user properties to retrieve from the Microsoft Graph. If you don't specify any properties, the command will retrieve user's display name, account name, id, and mail.
+
+When the `properties` option includes values with a `/`, for example: `manager/displayName`, an additional `$expand` query parameter will be included on `manager`.
 
 To filter the list of users, include additional options that match the user property that you want to filter with. For example `--displayName Patt` will return all users whose `displayName` starts with `Patt`. Multiple filters will be combined using the `and` operator.
 
@@ -37,28 +42,40 @@ Certain properties cannot be returned within a user collection. The following pr
 
 ## Examples
 
-List all users in the tenant
+List all users in the tenant.
 
 ```sh
 m365 entra user list
 ```
 
-List all users in the tenant. For each one return the display name and e-mail address
+List all guest users in the tenant.
+
+```sh
+m365 entra user list --type Guest
+```
+
+List all users in the tenant. For each one return the display name and e-mail address.
 
 ```sh
 m365 entra user list --properties "displayName,mail"
 ```
 
-Show users whose display name starts with _Patt_
+Show users whose display name starts with _Patt_.
 
 ```sh
 m365 entra user list --displayName Patt
 ```
 
-Show all account managers whose display name starts with _Patt_
+Show all account managers whose display name starts with _Patt_.
 
 ```sh
 m365 entra user list --displayName Patt --jobTitle 'Account manager'
+```
+
+List users from the tenant. For each one return the display name, e-mail address, and manager information.
+
+```sh
+m365 entra user list --properties "displayName,mail,manager/*"
 ```
 
 ## Response
@@ -69,8 +86,10 @@ m365 entra user list --displayName Patt --jobTitle 'Account manager'
   ```json
   [
     {
-      "userPrincipalName": "John@contoso.onmicrosoft.com",
-      "displayName": "John Doe"
+      "id": "1f5595b2-aa07-445d-9801-a45ea18160b2",
+      "displayName": "John Doe",
+      "mail": "John@contoso.onmicrosoft.com",
+      "userPrincipalName": "John@contoso.onmicrosoft.com"
     }
   ]
   ```
@@ -79,17 +98,17 @@ m365 entra user list --displayName Patt --jobTitle 'Account manager'
   <TabItem value="Text">
 
   ```text
-  userPrincipalName                         displayName
-  ----------------------------------------  -------------------------
-  John@contoso.onmicrosoft.com              John Doe
+  id                                    displayName         mail                                 userPrincipalName
+  ------------------------------------  ------------------  -----------------------------------  ------------------------------------------
+  1f5595b2-aa07-445d-9801-a45ea18160b2  John Doe            John@contoso.onmicrosoft.com         John@contoso.onmicrosoft.com
   ```
 
   </TabItem>
   <TabItem value="CSV">
 
   ```csv
-  userPrincipalName,displayName
-  John@contoso.onmicrosoft.com,John Doe
+  id,displayName,mail,userPrincipalName
+  1f5595b2-aa07-445d-9801-a45ea18160b2,John Doe,John@contoso.onmicrosoft.com,John@contoso.onmicrosoft.com
   ```
 
   </TabItem>
@@ -100,12 +119,14 @@ m365 entra user list --displayName Patt --jobTitle 'Account manager'
 
   Date: 2023-06-02
 
-  ## John Doe
+  ## John Doe (1f5595b2-aa07-445d-9801-a45ea18160b2)
 
   Property | Value
   ---------|-------
-  userPrincipalName | John@contoso.onmicrosoft.com
+  id | 1f5595b2-aa07-445d-9801-a45ea18160b2
   displayName | John Doe
+  mail | John@contoso.onmicrosoft.com
+  userPrincipalName | John@contoso.onmicrosoft.com  
   ```
 
   </TabItem>
@@ -113,4 +134,4 @@ m365 entra user list --displayName Patt --jobTitle 'Account manager'
 
 ## More information
 
-- Microsoft Graph User properties: [https://developer.microsoft.com/en-us/graph/docs/api-reference/v1.0/resources/user#properties](https://developer.microsoft.com/en-us/graph/docs/api-reference/v1.0/resources/user#properties)
+- Microsoft Graph User properties: [https://learn.microsoft.com/graph/api/resources/user?view=graph-rest-1.0#properties](https://learn.microsoft.com/graph/api/resources/user?view=graph-rest-1.0#properties)
