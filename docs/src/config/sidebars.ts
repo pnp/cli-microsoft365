@@ -1840,6 +1840,19 @@ const sidebars: SidebarsConfig = {
       ]
     },
     {
+      'Search': [
+        {
+          search: [
+            {
+              type: 'doc',
+              label: 'search',
+              id: 'cmd/search/search'
+            }
+          ]
+        }
+      ]
+    },
+    {
       'Skype (skype)': [
         {
           report: [
