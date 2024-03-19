@@ -78,6 +78,9 @@ m365 entra appregistration add [options]
 
 `--save`
 : Use to store the information about the created app in a local file.
+
+`--allowPublicClientFlows`
+: Enable the allow public client flows feature on the app registration.
 ```
 
 <Global />
@@ -190,6 +193,12 @@ Create new Entra app registration with a certificate
 
 ```sh
 m365 entra app add --name 'My Entra app' --certificateDisplayName "Some certificate name" --certificateFile "c:\temp\some-certificate.cer"
+```
+
+Create a new Entra app registration with the allow public client flows feature enabled.
+
+```sh
+m365 entra app add --name 'My Entra app' --allowPublicClientFlows
 ```
 
 ## Response

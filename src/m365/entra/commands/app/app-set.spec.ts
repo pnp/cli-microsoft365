@@ -964,6 +964,38 @@ describe(commands.APP_SET, () => {
     });
   });
 
+  it('updates allowPublicClientFlows value for the specified appId', async () => {
+    sinon.stub(request, 'get').callsFake(async opts => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=appId eq 'bc724b77-da87-43a9-b385-6ebaaf969db8'&$select=id`) {
+        return {
+          value: [{
+            id: '5b31c38c-2584-42f0-aa47-657fb3a84230'
+          }]
+        };
+      }
+
+      throw `Invalid request ${JSON.stringify(opts)}`;
+    });
+    sinon.stub(request, 'patch').callsFake(async opts => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230' &&
+        opts.data &&
+        opts.data.isFallbackPublicClient === true) {
+        return;
+      }
+
+      throw `Invalid request ${JSON.stringify(opts)}`;
+    });
+
+    await command.action(logger, {
+      options: {
+        debug: true,
+        appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
+        allowPublicClientFlows: true
+      }
+    });
+  });
+
+
   it('handles error when certificate file cannot be read', async () => {
     sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications/95cfe30d-ed44-4f9d-b73d-c66560f72e83`) {
@@ -1339,4 +1371,20 @@ describe(commands.APP_SET, () => {
     const actual = await command.validate({ options: { appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', redirectUris: 'https://foo.com', platform: 'web' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
+
+  it('passes validation when allowPublicClientFlows is specified as true', async () => {
+    const actual = await command.validate({ options: { appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', allowPublicClientFlows: true } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('passes validation when allowPublicClientFlows is specified as false', async () => {
+    const actual = await command.validate({ options: { appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', allowPublicClientFlows: false } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('passes validation when allowPublicClientFlows is not correct boolean value', async () => {
+    const actual = await command.validate({ options: { appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', allowPublicClientFlows: 'foo' } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
 });
