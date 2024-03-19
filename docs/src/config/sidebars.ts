@@ -3976,6 +3976,11 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
+              label: 'message remove',
+              id: 'cmd/teams/message/message-remove'
+            },
+            {
+              type: 'doc',
               label: 'message send',
               id: 'cmd/teams/message/message-send'
             },
