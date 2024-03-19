@@ -113,9 +113,9 @@ export default abstract class Command {
 
   #initValidators(): void {
     this.validators.push(
+      args => this.validateOutput(args),
       (args, command) => this.validateUnknownOptions(args, command),
       (args, command) => this.validateRequiredOptions(args, command),
-      args => this.validateOutput(args),
       (args, command) => this.validateOptionSets(args, command)
     );
   }
