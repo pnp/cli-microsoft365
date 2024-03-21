@@ -2135,6 +2135,11 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
+              label: 'contenttype sync',
+              id: 'cmd/spo/contenttype/contenttype-sync'
+            },
+            {
+              type: 'doc',
               label: 'contenttype field remove',
               id: 'cmd/spo/contenttype/contenttype-field-remove'
             },
