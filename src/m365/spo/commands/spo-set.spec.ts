@@ -73,6 +73,11 @@ describe(commands.SET, () => {
     assert.strictEqual(auth.connection.spoUrl, 'https://contoso.sharepoint.com');
   });
 
+  it('trims trailing slashes from the URL', async () => {
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/' } });
+    assert.strictEqual(auth.connection.spoUrl, 'https://contoso.sharepoint.com');
+  });
+
   it('throws error when trying to set SPO URL when not logged in to M365', async () => {
     auth.connection.active = false;
 
@@ -86,17 +91,6 @@ describe(commands.SET, () => {
     sinon.stub(auth, 'storeConnectionInfo').rejects(new Error('An error has occurred while setting the password'));
 
     await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com' } } as any), new CommandError('An error has occurred while setting the password'));
-  });
-
-  it('supports specifying url', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--url') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 
   it('fails validation if url is not a valid SharePoint URL', async () => {
