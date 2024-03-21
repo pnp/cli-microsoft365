@@ -1,3 +1,4 @@
+import { setTimeout } from 'timers/promises';
 import { Logger } from '../../../../cli/Logger.js';
 import config from '../../../../config.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
@@ -498,7 +499,7 @@ class SpoSiteAddCommand extends SpoCommand {
       const resourceQuotaWarningLevel: number = typeof args.options.resourceQuotaWarningLevel === 'number' ? args.options.resourceQuotaWarningLevel : 0;
       const webTemplate: string = args.options.webTemplate || 'STS#0';
 
-      const requestOptions: any = {
+      const requestOptions: CliRequestOptions = {
         url: `${this.spoAdminUrl as string}/_vti_bin/client.svc/ProcessQuery`,
         headers: {
           'X-RequestDigest': this.context.FormDigestValue
@@ -521,19 +522,14 @@ class SpoSiteAddCommand extends SpoCommand {
         return args.options.url;
       }
 
-      await new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
-        setTimeout(() => {
-          spo.waitUntilFinished({
-            operationId: JSON.stringify(operation._ObjectIdentity_),
-            siteUrl: this.spoAdminUrl as string,
-            resolve,
-            reject,
-            logger,
-            currentContext: this.context as FormDigestInfo,
-            verbose: this.verbose,
-            debug: this.debug
-          });
-        }, operation.PollingInterval);
+      await setTimeout(operation.PollingInterval);
+      await spo.waitUntilFinished({
+        operationId: JSON.stringify(operation._ObjectIdentity_),
+        siteUrl: this.spoAdminUrl as string,
+        logger,
+        currentContext: this.context as FormDigestInfo,
+        verbose: this.verbose,
+        debug: this.debug
       });
 
       return args.options.url;
@@ -552,7 +548,7 @@ class SpoSiteAddCommand extends SpoCommand {
       await logger.logToStderr(`Checking if the site ${url} exists...`);
     }
 
-    const requestOptions: any = {
+    const requestOptions: CliRequestOptions = {
       url: `${this.spoAdminUrl as string}/_vti_bin/client.svc/ProcessQuery`,
       headers: {
         'X-RequestDigest': this.context.FormDigestValue
@@ -583,7 +579,7 @@ class SpoSiteAddCommand extends SpoCommand {
       await logger.logToStderr(`Site doesn't exist. Checking if the site ${url} exists in the recycle bin...`);
     }
 
-    const requestOptions: any = {
+    const requestOptions: CliRequestOptions = {
       url: `${this.spoAdminUrl as string}/_vti_bin/client.svc/ProcessQuery`,
       headers: {
         'X-RequestDigest': (this.context as FormDigestInfo).FormDigestValue
@@ -615,7 +611,7 @@ class SpoSiteAddCommand extends SpoCommand {
       await logger.logToStderr(`Deleting site ${url} from the recycle bin...`);
     }
 
-    const requestOptions: any = {
+    const requestOptions: CliRequestOptions = {
       url: `${this.spoAdminUrl as string}/_vti_bin/client.svc/ProcessQuery`,
       headers: {
         'X-RequestDigest': this.context.FormDigestValue
@@ -638,19 +634,14 @@ class SpoSiteAddCommand extends SpoCommand {
       return;
     }
 
-    await new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
-      setTimeout(() => {
-        spo.waitUntilFinished({
-          operationId: JSON.stringify(operation._ObjectIdentity_),
-          siteUrl: this.spoAdminUrl as string,
-          resolve,
-          reject,
-          logger,
-          currentContext: this.context as FormDigestInfo,
-          verbose: this.verbose,
-          debug: this.debug
-        });
-      }, operation.PollingInterval);
+    await setTimeout(operation.PollingInterval);
+    await spo.waitUntilFinished({
+      operationId: JSON.stringify(operation._ObjectIdentity_),
+      siteUrl: this.spoAdminUrl as string,
+      logger,
+      currentContext: this.context as FormDigestInfo,
+      verbose: this.verbose,
+      debug: this.debug
     });
   }
 

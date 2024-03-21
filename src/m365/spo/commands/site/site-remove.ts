@@ -3,13 +3,14 @@ import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import config from '../../../../config.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
-import request from '../../../../request.js';
+import request, { CliRequestOptions } from '../../../../request.js';
 import { entraGroup } from '../../../../utils/entraGroup.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { ClientSvcResponse, ClientSvcResponseContents, FormDigestInfo, spo, SpoOperation } from '../../../../utils/spo.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
+import { setTimeout } from 'timers/promises';
 
 interface CommandArgs {
   options: Options;
@@ -151,7 +152,7 @@ class SpoSiteRemoveCommand extends SpoCommand {
   }
 
   private isSiteGroupDeleted(groupId: string): Promise<{ value: { id: string }[] }> {
-    const requestOptions: any = {
+    const requestOptions: CliRequestOptions = {
       url: `https://graph.microsoft.com/v1.0/directory/deletedItems/Microsoft.Graph.Group?$select=id&$filter=groupTypes/any(c:c+eq+'Unified') and startswith(id, '${groupId}')`,
       headers: {
         accept: 'application/json;odata.metadata=none'
@@ -207,7 +208,7 @@ class SpoSiteRemoveCommand extends SpoCommand {
       await logger.logToStderr(`Deleting site ${url}...`);
     }
 
-    const requestOptions: any = {
+    const requestOptions: CliRequestOptions = {
       url: `${this.spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
       headers: {
         'X-RequestDigest': this.context.FormDigestValue
@@ -230,19 +231,14 @@ class SpoSiteRemoveCommand extends SpoCommand {
       return;
     }
 
-    await new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
-      setTimeout(() => {
-        spo.waitUntilFinished({
-          operationId: JSON.stringify(operation._ObjectIdentity_),
-          siteUrl: this.spoAdminUrl as string,
-          resolve,
-          reject,
-          logger,
-          currentContext: this.context as FormDigestInfo,
-          debug: this.debug,
-          verbose: this.verbose
-        });
-      }, operation.PollingInterval);
+    await setTimeout(operation.PollingInterval);
+    await spo.waitUntilFinished({
+      operationId: JSON.stringify(operation._ObjectIdentity_),
+      siteUrl: this.spoAdminUrl as string,
+      logger,
+      currentContext: this.context as FormDigestInfo,
+      debug: this.debug,
+      verbose: this.verbose
     });
   }
 
@@ -272,19 +268,14 @@ class SpoSiteRemoveCommand extends SpoCommand {
       return;
     }
 
-    await new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
-      setTimeout(() => {
-        spo.waitUntilFinished({
-          operationId: JSON.stringify(operation._ObjectIdentity_),
-          siteUrl: this.spoAdminUrl as string,
-          resolve,
-          reject,
-          logger,
-          currentContext: this.context as FormDigestInfo,
-          debug: this.debug,
-          verbose: this.verbose
-        });
-      }, operation.PollingInterval);
+    await setTimeout(operation.PollingInterval);
+    await spo.waitUntilFinished({
+      operationId: JSON.stringify(operation._ObjectIdentity_),
+      siteUrl: this.spoAdminUrl as string,
+      logger,
+      currentContext: this.context as FormDigestInfo,
+      debug: this.debug,
+      verbose: this.verbose
     });
   }
 
