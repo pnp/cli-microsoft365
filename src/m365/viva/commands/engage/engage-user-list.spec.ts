@@ -13,6 +13,7 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './engage-user-list.js';
 import yammerCommands from './yammerCommands.js';
+import { accessToken } from '../../../../utils/accessToken.js';
 
 describe(commands.ENGAGE_USER_LIST, () => {
   let log: string[];
@@ -21,10 +22,15 @@ describe(commands.ENGAGE_USER_LIST, () => {
   let commandInfo: CommandInfo;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
+    auth.connection.accessTokens[auth.defaultResource] = {
+      expiresOn: 'abc',
+      accessToken: 'abc'
+    };
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
   });
@@ -58,7 +64,7 @@ describe(commands.ENGAGE_USER_LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.ENGAGE_USER_LIST), true);
+    assert.strictEqual(command.name, commands.ENGAGE_USER_LIST);
   });
 
   it('has a description', () => {
@@ -87,46 +93,41 @@ describe(commands.ENGAGE_USER_LIST, () => {
   });
 
   it('returns all network users', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/users.json?page=1') {
-        return Promise.resolve(
-          [
-            { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "John Doe" },
-            { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Adam Doe" }
-          ]
-        );
+        return [
+          { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "John Doe" },
+          { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Adam Doe" }];
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
     await command.action(logger, { options: {} } as any);
     assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 1496550646);
   });
 
   it('returns all network users using json', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/users.json?page=1') {
-        return Promise.resolve(
-          [
-            { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "John Doe" },
-            { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Adam Doe" }
-          ]
-        );
+        return [
+          { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "John Doe" },
+          { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Adam Doe" }
+        ];
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
     await command.action(logger, { options: { output: 'json' } } as any);
     assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 1496550646);
   });
 
   it('sorts network users by messages', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/users.json?page=1&sort_by=messages') {
-        return Promise.resolve([
+        return [
           { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Adam Doe" },
           { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "John Doe" }
-        ]);
+        ];
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
     await command.action(logger, { options: { sortBy: "messages" } } as any);
     assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 1496550647);
@@ -135,22 +136,22 @@ describe(commands.ENGAGE_USER_LIST, () => {
   it('fakes the return of more results', async () => {
     let i: number = 0;
 
-    sinon.stub(request, 'get').callsFake(() => {
+    sinon.stub(request, 'get').callsFake(async () => {
       if (i++ === 0) {
-        return Promise.resolve({
+        return {
           users: [
             { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Adam Doe" },
             { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "John Doe" }],
           more_available: true
-        });
+        };
       }
       else {
-        return Promise.resolve({
+        return {
           users: [
             { "type": "user", "id": 14965556, "network_id": 801445, "state": "active", "full_name": "Daniela Kiener" },
             { "type": "user", "id": 12310090123, "network_id": 801445, "state": "active", "full_name": "Carlo Lamber" }],
           more_available: false
-        });
+        };
       }
     });
     await command.action(logger, { options: { output: 'json' } } as any);
@@ -160,66 +161,64 @@ describe(commands.ENGAGE_USER_LIST, () => {
   it('fakes the return of more than 50 entries', async () => {
     let i: number = 0;
 
-    sinon.stub(request, 'get').callsFake(() => {
+    sinon.stub(request, 'get').callsFake(async () => {
       if (i++ === 0) {
-        return Promise.resolve(
-          [
-            { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Adam Doe" },
-            { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "John Doe" },
-            { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Adam Doe" },
-            { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "John Doe" },
-            { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Adam Doe" },
-            { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "John Doe" },
-            { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Adam Doe" },
-            { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "John Doe" },
-            { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Adam Doe" },
-            { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "John Doe" },
-            { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Adam Doe" },
-            { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "John Doe" },
-            { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Adam Doe" },
-            { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "John Doe" },
-            { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Adam Doe" },
-            { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "John Doe" },
-            { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Adam Doe" },
-            { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "John Doe" },
-            { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Adam Doe" },
-            { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "John Doe" },
-            { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Adam Doe" },
-            { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "John Doe" },
-            { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Adam Doe" },
-            { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "John Doe" },
-            { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Adam Doe" },
-            { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "John Doe" },
-            { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Adam Doe" },
-            { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "John Doe" },
-            { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Adam Doe" },
-            { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "John Doe" },
-            { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Adam Doe" },
-            { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "John Doe" },
-            { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Adam Doe" },
-            { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "John Doe" },
-            { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Adam Doe" },
-            { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "John Doe" },
-            { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Adam Doe" },
-            { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "John Doe" },
-            { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Adam Doe" },
-            { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "John Doe" },
-            { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Adam Doe" },
-            { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "John Doe" },
-            { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Adam Doe" },
-            { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "John Doe" },
-            { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Adam Doe" },
-            { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "John Doe" },
-            { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Adam Doe" },
-            { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "John Doe" },
-            { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Adam Doe" },
-            { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "John Doe" }]
-        );
+        return [
+          { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Adam Doe" },
+          { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "John Doe" },
+          { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Adam Doe" },
+          { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "John Doe" },
+          { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Adam Doe" },
+          { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "John Doe" },
+          { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Adam Doe" },
+          { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "John Doe" },
+          { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Adam Doe" },
+          { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "John Doe" },
+          { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Adam Doe" },
+          { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "John Doe" },
+          { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Adam Doe" },
+          { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "John Doe" },
+          { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Adam Doe" },
+          { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "John Doe" },
+          { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Adam Doe" },
+          { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "John Doe" },
+          { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Adam Doe" },
+          { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "John Doe" },
+          { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Adam Doe" },
+          { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "John Doe" },
+          { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Adam Doe" },
+          { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "John Doe" },
+          { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Adam Doe" },
+          { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "John Doe" },
+          { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Adam Doe" },
+          { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "John Doe" },
+          { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Adam Doe" },
+          { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "John Doe" },
+          { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Adam Doe" },
+          { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "John Doe" },
+          { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Adam Doe" },
+          { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "John Doe" },
+          { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Adam Doe" },
+          { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "John Doe" },
+          { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Adam Doe" },
+          { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "John Doe" },
+          { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Adam Doe" },
+          { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "John Doe" },
+          { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Adam Doe" },
+          { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "John Doe" },
+          { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Adam Doe" },
+          { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "John Doe" },
+          { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Adam Doe" },
+          { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "John Doe" },
+          { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Adam Doe" },
+          { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "John Doe" },
+          { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Adam Doe" },
+          { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "John Doe" }];
       }
       else {
-        return Promise.resolve([
+        return [
           { "type": "user", "id": 14965556, "network_id": 801445, "state": "active", "full_name": "Daniela Kiener" },
-          { "type": "user", "id": 12310090123, "network_id": 801445, "state": "active", "full_name": "Carlo Lamber" }]);
+          { "type": "user", "id": 12310090123, "network_id": 801445, "state": "active", "full_name": "Carlo Lamber" }];
       }
     });
     await command.action(logger, { options: { output: 'debug' } } as any);
@@ -229,17 +228,17 @@ describe(commands.ENGAGE_USER_LIST, () => {
   it('fakes the return of more results with exception', async () => {
     let i: number = 0;
 
-    sinon.stub(request, 'get').callsFake(() => {
+    sinon.stub(request, 'get').callsFake(async () => {
       if (i++ === 0) {
-        return Promise.resolve({
+        return {
           users: [
             { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Adam Doe" },
             { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "John Doe" }],
           more_available: true
-        });
+        };
       }
       else {
-        return Promise.reject({
+        throw ({
           "error": {
             "base": "An error has occurred."
           }
@@ -250,33 +249,31 @@ describe(commands.ENGAGE_USER_LIST, () => {
   });
 
   it('sorts users in reverse order', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/users.json?page=1&reverse=true') {
-        return Promise.resolve(
-          [
-            { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Adam Doe" },
-            { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "John Doe" },
-            { "type": "user", "id": 1496550643, "network_id": 801445, "state": "active", "full_name": "Daniela Lamber" }]
-        );
+        return [
+          { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Adam Doe" },
+          { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "John Doe" },
+          { "type": "user", "id": 1496550643, "network_id": 801445, "state": "active", "full_name": "Daniela Lamber" }];
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
     await command.action(logger, { options: { reverse: true } } as any);
     assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 1496550647);
   });
 
   it('sorts users in reverse order in a group and limits the user to 2', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/users/in_group/5785177.json?page=1&reverse=true') {
-        return Promise.resolve({
+        return {
           users: [
             { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Adam Doe" },
             { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "John Doe" },
             { "type": "user", "id": 1496550643, "network_id": 801445, "state": "active", "full_name": "Daniela Lamber" }],
           has_more: true
-        });
+        };
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
     await command.action(logger, { options: { groupId: 5785177, reverse: true, limit: 2 } } as any);
     assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 1496550647);
@@ -284,38 +281,36 @@ describe(commands.ENGAGE_USER_LIST, () => {
   });
 
   it('returns users of a specific group', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/users/in_group/5785177.json?page=1') {
-        return Promise.resolve({
+        return {
           users: [
             { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "John Doe" }, { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Adam Doe" }],
           has_more: false
-        });
+        };
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
     await command.action(logger, { options: { groupId: 5785177 } } as any);
     assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 1496550646);
   });
 
   it('returns users starting with the letter P', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/users.json?page=1&letter=P') {
-        return Promise.resolve(
-          [
-            { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "John Doe" },
-            { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Adam Doe" }]
-        );
+        return [
+          { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "John Doe" },
+          { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Adam Doe" }];
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
     await command.action(logger, { options: { letter: "P" } } as any);
     assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 1496550646);
   });
 
   it('correctly handles error', async () => {
-    sinon.stub(request, 'get').callsFake(() => {
-      return Promise.reject({
+    sinon.stub(request, 'get').callsFake(async () => {
+      throw ({
         "error": {
           "base": "An error has occurred."
         }

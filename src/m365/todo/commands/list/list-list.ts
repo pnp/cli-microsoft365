@@ -1,10 +1,10 @@
 import { Logger } from '../../../../cli/Logger.js';
 import { odata } from '../../../../utils/odata.js';
-import GraphCommand from '../../../base/GraphCommand.js';
+import ToDoCommand from '../../../base/ToDoCommand.js';
 import commands from '../../commands.js';
 import { ToDoList } from '../../ToDoList.js';
 
-class TodoListListCommand extends GraphCommand {
+class TodoListListCommand extends ToDoCommand {
   public get name(): string {
     return commands.LIST_LIST;
   }

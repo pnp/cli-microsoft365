@@ -8,6 +8,7 @@ import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 import { Outlook } from '../../Outlook.js';
 import { cli } from '../../../../cli/cli.js';
+import { accessToken } from '../../../../utils/accessToken.js';
 
 interface CommandArgs {
   options: Options;
@@ -67,6 +68,8 @@ class OutlookMessageListCommand extends GraphCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
+      accessToken.ensureDelegatedAccessToken();
+
       const folderId = await this.getFolderId(args);
 
       const url: string = folderId ? `me/mailFolders/${folderId}/messages` : 'me/messages';

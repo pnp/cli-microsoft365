@@ -13,6 +13,7 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './message-list.js';
 import { settingsNames } from '../../../../settingsNames.js';
+import { accessToken } from '../../../../utils/accessToken.js';
 
 describe(commands.MESSAGE_LIST, () => {
   let log: string[];
@@ -353,6 +354,11 @@ describe(commands.MESSAGE_LIST, () => {
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
+    auth.connection.accessTokens[auth.defaultResource] = {
+      expiresOn: 'abc',
+      accessToken: 'abc'
+    };
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
   });
@@ -564,6 +570,14 @@ describe(commands.MESSAGE_LIST, () => {
 
     await assert.rejects(command.action(logger, { options: {} } as any),
       new CommandError('An error has occurred'));
+  });
+
+  it('throws error when using application permissions', async () => {
+    sinonUtil.restore(accessToken.isAppOnlyAccessToken);
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
+
+    await assert.rejects(command.action(logger, { options: {} } as any),
+      new CommandError('This command does not support application-only permissions.'));
   });
 
   it('fails validation if neither folderId nor folderName are specified', async () => {

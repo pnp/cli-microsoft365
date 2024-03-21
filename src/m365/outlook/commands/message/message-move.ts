@@ -6,6 +6,7 @@ import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 import { Outlook } from '../../Outlook.js';
 import { cli } from '../../../../cli/cli.js';
+import { accessToken } from '../../../../utils/accessToken.js';
 
 interface CommandArgs {
   options: Options;
@@ -83,6 +84,8 @@ class OutlookMessageMoveCommand extends GraphCommand {
     let targetFolder: string;
 
     try {
+      accessToken.ensureDelegatedAccessToken();
+
       sourceFolder = await this.getFolderId(args.options.sourceFolderId, args.options.sourceFolderName);
       targetFolder = await this.getFolderId(args.options.targetFolderId, args.options.targetFolderName);
 
