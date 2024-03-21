@@ -30,6 +30,9 @@ m365 flow run list [options]
 `--triggerEndTime [triggerEndTime]`
 : Time indicating the exclusive end of a time range of flow runs to return. This should be defined as a valid ISO 8601 string (2021-12-16T18:28:48.6964197Z).
 
+`--withTrigger`
+: If specified, include information about the trigger details for each run.
+
 `--asAdmin`
 : Run the command as admin. Use this flag when targeting flows you don't own.
 ```
@@ -48,6 +51,8 @@ If the environment with the name you specified doesn't exist, you will get the `
 
 If the Microsoft Flow with the name you specified doesn't exist, you will get the `The caller with object id 'abc' does not have permission for connection 'xyz' under Api 'shared_logicflows'.` error.
 
+When using `--withTrigger`, extra requests will get fired for each retrieved flow run. This has impact on the time the command takes to run.
+
 ## Examples
 
 List runs of the specified Microsoft Flow.
@@ -56,10 +61,10 @@ List runs of the specified Microsoft Flow.
 m365 flow run list --environmentName Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --flowName 5923cb07-ce1a-4a5c-ab81-257ce820109a
 ```
 
-List runs of the specified Microsoft Flow with a specific status.
+List runs of the specified Microsoft Flow with a specific status including the trigger information.
 
 ```sh
-m365 flow run list --environmentName Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --flowName 5923cb07-ce1a-4a5c-ab81-257ce820109a --status Running
+m365 flow run list --environmentName Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --flowName 5923cb07-ce1a-4a5c-ab81-257ce820109a --status Running --withTrigger
 ```
 
 List runs of the specified Microsoft Flow between a specific time range.
@@ -160,6 +165,68 @@ m365 flow run list --environmentName Default-d87a7535-dd31-4437-bfe1-95340acd55c
   type | Microsoft.ProcessSimple/environments/flows/runs
   startTime | 2022-11-17T14:33:45.2763872Z
   status | Running
+  ```
+
+  </TabItem>
+</Tabs>
+
+### `withTrigger` response
+
+When using the option `withTrigger`, the response for the json-output will differ.
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  [
+    {
+      "name": "08584917134229837167098637545CU67",
+      "id": "/providers/Microsoft.ProcessSimple/environments/Default-e1dd4023-a656-480a-8a0e-c1b1eec51e1d/flows/a18e89d1-4c75-41e4-9517-e90aedc079be/runs/08584917134229837167098637545CU67",
+      "type": "Microsoft.ProcessSimple/environments/flows/runs",
+      "properties": {
+        "startTime": "2024-03-08T10:24:22.4948083Z",
+        "endTime": "2024-03-08T10:24:22.6662784Z",
+        "status": "Succeeded",
+        "correlation": {
+          "clientTrackingId": "08584917134229837167098637545CU67"
+        },
+        "trigger": {
+          "name": "manual",
+          "inputsLink": {
+            "uri": "https://prod-93.westeurope.logic.azure.com:443/workflows/21b6d99931344cc1bc644e57e415d259/runs/08584917134229837167098637545CU67/contents/TriggerInputs?api-version=2016-06-01&se=2024-03-08T16%3A00%3A00.0000000Z&sp=%2Fruns%2F08584917134229837167098637545CU67%2Fcontents%2FTriggerInputs%2Fread&sv=1.0&sig=8_DTJWq2nvHw4eewGrQJ_VJB54_51SEoKmiciqSSUk8",
+            "contentVersion": "qp1b8NIh2ZLUxjxKwnkWng==",
+            "contentSize": 507,
+            "contentHash": {
+              "algorithm": "md5",
+              "value": "qp1b8NIh2ZLUxjxKwnkWng=="
+            }
+          },
+          "outputsLink": {
+            "uri": "https://prod-93.westeurope.logic.azure.com:443/workflows/21b6d99931344cc1bc644e57e415d259/runs/08584917134229837167098637545CU67/contents/TriggerOutputs?api-version=2016-06-01&se=2024-03-08T16%3A00%3A00.0000000Z&sp=%2Fruns%2F08584917134229837167098637545CU67%2Fcontents%2FTriggerOutputs%2Fread&sv=1.0&sig=1_KZU33J_uY672L0WYeFw3YZu5q3bs-4oU-WWF6a-B0",
+            "contentVersion": "1S3nJ0ffDf82K46CzvjNyQ==",
+            "contentSize": 1672,
+            "contentHash": {
+              "algorithm": "md5",
+              "value": "1S3nJ0ffDf82K46CzvjNyQ=="
+            }
+          },
+          "startTime": "2024-03-08T10:24:22.4892073Z",
+          "endTime": "2024-03-08T10:24:22.4892073Z",
+          "originHistoryName": "08584917134229837167098637545CU67",
+          "correlation": {
+            "clientTrackingId": "08584917134229837167098637545CU67"
+          },
+          "status": "Succeeded"
+        },
+        "isAborted": false
+      },
+      "triggerInformation": {
+        "text": "This is text",
+        "boolean": true,
+        "number": 10
+      }
+    }
+  ]
   ```
 
   </TabItem>
