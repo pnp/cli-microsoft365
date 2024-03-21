@@ -804,7 +804,7 @@ const sidebars: SidebarsConfig = {
           ]
         },
         {
-          "people": [
+          'people': [
             {
               type: 'doc',
               label: 'people profilecardproperty add',
@@ -1601,6 +1601,15 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'dataverse table row remove',
               id: 'cmd/pp/dataverse/dataverse-table-row-remove'
+            },
+            {
+              webresource: [
+                {
+                  type: 'doc',
+                  label: 'webresource list',
+                  id: 'cmd/pp/dataverse/webresource/webresource-list'
+                }
+              ]
             }
           ]
         },
