@@ -27,6 +27,7 @@ class SpoSetCommand extends SpoCommand {
 
     this.#initOptions();
     this.#initValidators();
+    this.#initTypes();
   }
 
   #initOptions(): void {
@@ -43,8 +44,12 @@ class SpoSetCommand extends SpoCommand {
     );
   }
 
+  #initTypes(): void {
+    this.types.string.push('url');
+  }
+
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    auth.connection.spoUrl = args.options.url;
+    auth.connection.spoUrl = args.options.url.replace(/\/+$/, '');
 
     try {
       await auth.storeConnectionInfo();
