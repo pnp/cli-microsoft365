@@ -189,6 +189,18 @@ describe(commands.PLAN_SET, () => {
     assert.notStrictEqual(actual, true);
   });
 
+  it('fails validation if shareWithUserNames contains invalid user principal name', async () => {
+    const shareWithUserNames = ['john.doe@contoso.com', 'foo'];
+    const actual = await command.validate({
+      options: {
+        title: title,
+        ownerGroupId: ownerGroupId,
+        shareWithUserNames: shareWithUserNames.join(',')
+      }
+    }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
   it('fails validation if neither the ownerGroupId nor ownerGroupName are provided when using title.', async () => {
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
       if (settingName === settingsNames.prompt) {

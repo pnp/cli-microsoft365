@@ -80,17 +80,16 @@ class EntraGroupUserAddCommand extends GraphCommand {
         }
 
         if (args.options.ids) {
-          const ids = args.options.ids.split(',').map(i => i.trim());
-          if (!validation.isValidGuidArray(ids)) {
-            const invalidGuid = ids.find(id => !validation.isValidGuid(id));
-            return `'${invalidGuid}' is not a valid GUID for option 'ids'.`;
+          const isValidGUIDArrayResult = validation.isValidGuidArray(args.options.ids);
+          if (isValidGUIDArrayResult !== true) {
+            return `The following GUIDs are invalid for the option 'ids': ${isValidGUIDArrayResult}.`;
           }
         }
 
         if (args.options.userNames) {
-          const isValidUserPrincipalNameArray = validation.isValidUserPrincipalNameArray(args.options.userNames.split(',').map(u => u.trim()));
-          if (isValidUserPrincipalNameArray !== true) {
-            return `User principal name '${isValidUserPrincipalNameArray}' is invalid for option 'userNames'.`;
+          const isValidUPNArrayResult = validation.isValidUserPrincipalNameArray(args.options.userNames);
+          if (isValidUPNArrayResult !== true) {
+            return `The following user principal names are invalid for the option 'userNames': ${isValidUPNArrayResult}.`;
           }
         }
 

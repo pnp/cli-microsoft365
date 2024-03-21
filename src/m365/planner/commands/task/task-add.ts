@@ -139,12 +139,22 @@ class PlannerTaskAddCommand extends GraphCommand {
           return `percentComplete should be between 0 and 100`;
         }
 
-        if (args.options.assignedToUserIds && !validation.isValidGuidArray(args.options.assignedToUserIds.split(','))) {
-          return 'assignedToUserIds contains invalid GUID';
+        if (args.options.assignedToUserIds) {
+          const isValidGUIDArrayResult = validation.isValidGuidArray(args.options.assignedToUserIds);
+          if (isValidGUIDArrayResult !== true) {
+            return `The following GUIDs are invalid for the option 'assignedToUserIds': ${isValidGUIDArrayResult}.`;
+          }
         }
 
         if (args.options.assignedToUserIds && args.options.assignedToUserNames) {
           return 'Specify either assignedToUserIds or assignedToUserNames but not both';
+        }
+
+        if (args.options.assignedToUserNames) {
+          const isValidUPNArrayResult = validation.isValidUserPrincipalNameArray(args.options.assignedToUserNames);
+          if (isValidUPNArrayResult !== true) {
+            return `The following user principal names are invalid for the option 'assignedToUserNames': ${isValidUPNArrayResult}.`;
+          }
         }
 
         if (args.options.appliedCategories && args.options.appliedCategories.split(',').filter(category => this.allowedAppliedCategories.indexOf(category.toLocaleLowerCase()) < 0).length !== 0) {

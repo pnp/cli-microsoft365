@@ -453,6 +453,19 @@ describe(commands.TASK_ADD, () => {
     assert.notStrictEqual(actual, true);
   });
 
+  it('fails validation if assignedToUserNames contains invalid user principal name', async () => {
+    const assignedToUserNames = ['john.doe@contoso.com', 'foo'];
+    const actual = await command.validate({
+      options: {
+        title: 'My Planner Task',
+        planId: '8QZEH7b3wkS_bGQobscsM5gADCBb',
+        bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno',
+        assignedToUserNames: assignedToUserNames.join(',')
+      }
+    }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
   it('fails validation when both assignedToUserIds and assignedToUserNames are specified', async () => {
     const actual = await command.validate({
       options: {

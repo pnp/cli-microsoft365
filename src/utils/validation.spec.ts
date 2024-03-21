@@ -106,6 +106,16 @@ describe('validation/validation', () => {
     assert.strictEqual(result, true);
   });
 
+  it('isValidGuidArray returns true if guids are valid', () => {
+    const result = validation.isValidGuidArray('16c578ea-5785-492e-ac22-cad3cd9ca1fa,16cd5c6b-e9e9-4364-b71e-1a1664f81b98,7c9a1059-a725-424c-9dd0-788e66a5338e,02e83c70-f05f-4e63-b9af-73a8e44fdb32,5a53c7d7-2a26-4645-a938-b3e4d08b4a18');
+    assert.strictEqual(result, true);
+  });
+
+  it('isValidGuidArray returns guids that are not valid', () => {
+    const result = validation.isValidGuidArray('000,16c578ea-5785-492e-ac22-cad3cd9ca1fz,16cd5c6b-e9e9-4364-b71e-1a1664f81b98,7c9a1059-a725-424c-9dd0-788e66a5338e,02e83c70-f05f-4e63-b9af-73a8e44fdb32,5a53c7d7-2a26-4645-a938-b3e4d08b4a18');
+    assert.strictEqual(result, "000, 16c578ea-5785-492e-ac22-cad3cd9ca1fz");
+  });
+
   it('isValidGuid returns true if valid guid', () => {
     const result = validation.isValidGuid('b2307a39-e878-458b-bc90-03bc578531d6');
     assert.strictEqual(result, true);
@@ -131,29 +141,28 @@ describe('validation/validation', () => {
     assert.strictEqual(result, true);
   });
 
-
   it('isValidGuid returns true with @meId (case sensitive)', () => {
     const result = validation.isValidGuid('@meId ');
     assert.strictEqual(result, true);
   });
 
   it('isValidUserPrincipalNameArray returns true if valid username array', () => {
-    const result = validation.isValidUserPrincipalNameArray(['john.doe@contoso.com', 'adele@contoso.onmicrosoft.com']);
+    const result = validation.isValidUserPrincipalNameArray('john.doe@contoso.com,adele@contoso.onmicrosoft.com');
     assert.strictEqual(result, true);
   });
 
   it('isValidUserPrincipalNameArray returns falsy value of invalid username array', () => {
-    const result = validation.isValidUserPrincipalNameArray(['john.doe@contoso.com', 'foo']);
+    const result = validation.isValidUserPrincipalNameArray('john.doe@contoso.com,foo');
     assert.strictEqual(result, 'foo');
   });
 
   it('isValidUserPrincipalNameArray returns true with @meusername token', () => {
-    const result = validation.isValidUserPrincipalNameArray(['john.doe@contoso.com', '@meusername']);
+    const result = validation.isValidUserPrincipalNameArray('john.doe@contoso.com,@meusername');
     assert.strictEqual(result, true);
   });
 
   it('isValidUserPrincipalNameArray returns true with @meusername token and spaces', () => {
-    const result = validation.isValidUserPrincipalNameArray(['john.doe@contoso.com', '@meusername ']);
+    const result = validation.isValidUserPrincipalNameArray('john.doe@contoso.com,@meusername ');
     assert.strictEqual(result, true);
   });
 

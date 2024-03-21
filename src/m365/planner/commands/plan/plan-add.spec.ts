@@ -201,6 +201,18 @@ describe(commands.PLAN_ADD, () => {
     assert.notStrictEqual(actual, true);
   });
 
+  it('fails validation if shareWithUserNames contains invalid user principal name', async () => {
+    const shareWithUserNames = ['john.doe@contoso.com', 'foo'];
+    const actual = await command.validate({
+      options: {
+        title: validTitle,
+        ownerGroupId: validOwnerGroupId,
+        shareWithUserNames: shareWithUserNames.join(',')
+      }
+    }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
   it('fails validation when both shareWithUserIds and shareWithUserNames are specified', async () => {
     const actual = await command.validate({
       options: {

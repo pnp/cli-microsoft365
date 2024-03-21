@@ -1,8 +1,11 @@
 import { FormDigestInfo } from "./spo.js";
 
 export const validation = {
-  isValidGuidArray(guids: string[]): boolean {
-    return guids.every(guid => this.isValidGuid(guid));
+  isValidGuidArray(guidsString: string): boolean | string {
+    const guids = guidsString.split(',').map(guid => guid.trim());
+    const invalidGuids = guids.filter(guid => !this.isValidGuid(guid));
+
+    return invalidGuids.length > 0 ? invalidGuids.join(', ') : true;
   },
 
   isValidGuid(guid?: string): boolean {
@@ -31,9 +34,11 @@ export const validation = {
     return guidRegEx.test(guid);
   },
 
-  isValidUserPrincipalNameArray(upns: string[]): boolean | string {
-    const invalidGuid = upns.find(upn => !this.isValidUserPrincipalName(upn));
-    return invalidGuid || true;
+  isValidUserPrincipalNameArray(upnsString: string): boolean | string {
+    const upns = upnsString.split(',').map(upn => upn.trim());
+    const invalidUPNs = upns.filter(upn => !this.isValidUserPrincipalName(upn));
+
+    return invalidUPNs.length > 0 ? invalidUPNs.join(', ') : true;
   },
 
   isValidUserPrincipalName(upn: string): boolean {

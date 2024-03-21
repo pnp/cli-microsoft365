@@ -99,10 +99,9 @@ class TeamsMeetingAddCommand extends GraphCommand {
         }
 
         if (args.options.participantUserNames) {
-          const participants = args.options.participantUserNames.trim().toLowerCase().split(',').filter(e => e && e !== '');
-
-          if (!participants || participants.length === 0 || participants.some(e => !validation.isValidUserPrincipalName(e))) {
-            return `'${args.options.participantUserNames}' contains one or more invalid UPN.`;
+          const isValidUPNArrayResult = validation.isValidUserPrincipalNameArray(args.options.participantUserNames);
+          if (isValidUPNArrayResult !== true) {
+            return `The following user principal names are invalid for the option 'participantUserNames': ${isValidUPNArrayResult}.`;
           }
         }
 

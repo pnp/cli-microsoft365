@@ -101,32 +101,30 @@ class EntraGroupAddCommand extends GraphCommand {
         }
 
         if (args.options.ownerIds) {
-          const ids = args.options.ownerIds.split(',').map(i => i.trim());
-          if (!validation.isValidGuidArray(ids)) {
-            const invalidGuid = ids.find(id => !validation.isValidGuid(id));
-            return `'${invalidGuid}' is not a valid GUID for option 'ownerIds'.`;
+          const isValidGUIDArrayResult = validation.isValidGuidArray(args.options.ownerIds);
+          if (isValidGUIDArrayResult !== true) {
+            return `The following GUIDs are invalid for the option 'ownerIds': ${isValidGUIDArrayResult}.`;
           }
         }
 
         if (args.options.ownerUserNames) {
-          const isValidUserPrincipalNameArray = validation.isValidUserPrincipalNameArray(args.options.ownerUserNames.split(',').map(u => u.trim()));
-          if (isValidUserPrincipalNameArray !== true) {
-            return `User principal name '${isValidUserPrincipalNameArray}' is invalid for option 'ownerUserNames'.`;
+          const isValidUPNArrayResult = validation.isValidUserPrincipalNameArray(args.options.ownerUserNames);
+          if (isValidUPNArrayResult !== true) {
+            return `The following user principal names are invalid for the option 'ownerUserNames': ${isValidUPNArrayResult}.`;
           }
         }
 
         if (args.options.memberIds) {
-          const ids = args.options.memberIds.split(',').map(i => i.trim());
-          if (!validation.isValidGuidArray(ids)) {
-            const invalidGuid = ids.find(id => !validation.isValidGuid(id));
-            return `'${invalidGuid}' is not a valid GUID for option 'memberIds'.`;
+          const isValidGUIDArrayResult = validation.isValidGuidArray(args.options.memberIds);
+          if (isValidGUIDArrayResult !== true) {
+            return `The following GUIDs are invalid for the option 'memberIds': ${isValidGUIDArrayResult}.`;
           }
         }
 
         if (args.options.memberUserNames) {
-          const isValidUserPrincipalNameArray = validation.isValidUserPrincipalNameArray(args.options.memberUserNames.split(',').map(u => u.trim()));
-          if (isValidUserPrincipalNameArray !== true) {
-            return `User principal name '${isValidUserPrincipalNameArray}' is invalid for option 'memberUserNames'.`;
+          const isValidUPNArrayResult = validation.isValidUserPrincipalNameArray(args.options.memberUserNames);
+          if (isValidUPNArrayResult !== true) {
+            return `The following user principal names are invalid for the option 'memberUserNames': ${isValidUPNArrayResult}.`;
           }
         }
 
