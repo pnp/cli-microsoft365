@@ -91,6 +91,11 @@ class CliConfigSetCommand extends AnonymousCommand {
           return `${args.options.value} is not a valid value for the option ${args.options.key}. Allowed values: ${allowedAuthTypes.join(', ')}`;
         }
 
+        if (args.options.key === settingsNames.helpTarget &&
+          !cli.helpTargets.includes(args.options.value)) {
+          return `${args.options.value} is not a valid value for the option ${args.options.key}. Allowed values: ${cli.helpTargets.join(', ')}`;
+        }
+
         return true;
       }
     );

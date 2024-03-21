@@ -22,6 +22,7 @@ import { CommandOptionInfo } from './CommandOptionInfo.js';
 import { Logger } from './Logger.js';
 import { SelectionConfig, ConfirmationConfig, prompt } from '../utils/prompt.js';
 import { timings } from './timings.js';
+import { browserUtil } from '../utils/browserUtil.js';
 const require = createRequire(import.meta.url);
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
@@ -46,7 +47,9 @@ let commandToExecute: CommandInfo | undefined;
 let currentCommandName: string | undefined;
 let optionsFromArgs: { options: minimist.ParsedArgs } | undefined;
 const defaultHelpMode = 'options';
+const defaultHelpTarget = 'console';
 const helpModes: string[] = ['options', 'examples', 'remarks', 'response', 'full'];
+const helpTargets: string[] = ['console', 'web'];
 
 function getConfig(): Configstore {
   if (!_config) {
@@ -652,12 +655,19 @@ function getFirstNonUndefinedArrayItem(arr: any[]): any {
   return undefined;
 }
 
-function printHelp(helpMode: string, exitCode: number = 0): void {
+async function printHelp(helpMode: string, exitCode: number = 0): Promise<void> {
   const properties: any = {};
 
   if (cli.commandToExecute) {
     properties.command = cli.commandToExecute.name;
-    printCommandHelp(helpMode);
+    const helpTarget = getSettingWithDefaultValue<string>(settingsNames.helpTarget, defaultHelpTarget);
+
+    if (helpTarget === 'web') {
+      await openHelpInBrowser();
+    }
+    else {
+      printCommandHelp(helpMode);
+    }
   }
   else {
     cli.log();
@@ -672,6 +682,12 @@ function printHelp(helpMode: string, exitCode: number = 0): void {
   telemetry.trackEvent('help', properties);
 
   process.exit(exitCode);
+}
+
+async function openHelpInBrowser(): Promise<void> {
+  const pathChunks = cli.commandToExecute!.help?.replace(/\\/g, '/').replace(/\.[^/.]+$/, '');
+  const onlineUrl = `https://pnp.github.io/cli-microsoft365/cmd/${pathChunks}`;
+  await browserUtil.open(onlineUrl);
 }
 
 function printCommandHelp(helpMode: string): void {
@@ -877,8 +893,9 @@ async function closeWithError(error: any, args: CommandArgs, showHelpIfEnabled: 
   await cli.error(errorMessage);
 
   if (showHelpIfEnabled &&
-    await cli.getSettingWithDefaultValue<boolean>(settingsNames.showHelpOnFailure, showHelpIfEnabled)) {
-    printHelp(await getHelpMode(args.options), exitCode);
+    cli.getSettingWithDefaultValue<boolean>(settingsNames.showHelpOnFailure, showHelpIfEnabled)) {
+    const helpMode = await getHelpMode(args.options);
+    await printHelp(helpMode, exitCode);
   }
   else {
     process.exit(exitCode);
@@ -1035,6 +1052,7 @@ export const cli = {
   getSettingWithDefaultValue,
   handleMultipleResultsFound,
   helpModes,
+  helpTargets,
   loadAllCommandsInfo,
   loadCommandFromArgs,
   loadCommandFromFile,

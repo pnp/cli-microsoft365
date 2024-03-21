@@ -18,9 +18,9 @@ describe(commands.CONFIG_SET, () => {
 
   before(() => {
     commandInfo = cli.getCommandInfo(command);
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
   });
 
   beforeEach(() => {
@@ -47,7 +47,7 @@ describe(commands.CONFIG_SET, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.CONFIG_SET), true);
+    assert.strictEqual(command.name, commands.CONFIG_SET);
   });
 
   it('has a description', () => {
@@ -191,6 +191,19 @@ describe(commands.CONFIG_SET, () => {
     assert.strictEqual(actualKey, settingsNames.promptListPageSize, 'Invalid key');
     assert.strictEqual(actualValue, 10, 'Invalid value');
   });
+
+  it(`sets ${settingsNames.helpTarget} property`, async () => {
+    const config = cli.getConfig();
+    let actualKey: string = '', actualValue: any;
+    sinon.stub(config, 'set').callsFake(((key: string, value: any) => {
+      actualKey = key;
+      actualValue = value;
+    }) as any);
+    await command.action(logger, { options: { key: settingsNames.helpTarget, value: 'console' } });
+    assert.strictEqual(actualKey, settingsNames.helpTarget, 'Invalid key');
+    assert.strictEqual(actualValue, 'console', 'Invalid value');
+  });
+
 
   it('supports specifying key and value', () => {
     const options = command.options;
@@ -340,6 +353,21 @@ describe(commands.CONFIG_SET, () => {
 
   it('passes validation for number value in promptListPageSize', async () => {
     const actual = await command.validate({ options: { key: settingsNames.promptListPageSize, value: 10 } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('fails validation if specified help target is invalid', async () => {
+    const actual = await command.validate({ options: { key: settingsNames.helpTarget, value: 'invalid' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('passes validation for help target web', async () => {
+    const actual = await command.validate({ options: { key: settingsNames.helpTarget, value: 'web' } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('passes validation for help target console', async () => {
+    const actual = await command.validate({ options: { key: settingsNames.helpTarget, value: 'console' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 });
