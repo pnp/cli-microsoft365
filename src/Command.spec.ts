@@ -126,6 +126,23 @@ class MockCommand4 extends Command {
   }
 }
 
+class MockCommand5 extends Command {
+  public get name(): string {
+    return 'Mock command 5 [opt]';
+  }
+
+  public get description(): string {
+    return 'Mock command 5 description';
+  }
+
+  public async commandAction(): Promise<void> {
+  }
+
+  public handlePromiseError(response: any): void {
+    this.handleRejectedODataPromise(response);
+  }
+}
+
 describe('Command', () => {
   let telemetryCommandName: any;
   let logger: Logger;
@@ -601,5 +618,41 @@ describe('Command', () => {
     sinon.stub(accessToken, 'isAppOnlyAccessToken').callsFake(() => { return true; });
 
     await assert.rejects(command.action(logger, { options: { option1: '@meUsername' } }), new CommandError(`It's not possible to use @meUsername with application permissions`));
+  });
+
+  it('correctly handles stack trace error when using debug for oData json error handling', async () => {
+    const stacktraceError = 'StacktraceError at line 2';
+    try {
+      const mock = new MockCommand2();
+      sinon.stub(cli, 'optionsFromArgs').value({ options: { debug: true } });
+      mock.handlePromiseError({
+        error: { error_description: 'abc' }, stack: 'StacktraceError at line 2'
+      });
+      assert.fail('No exception was thrown.');
+    }
+    catch (err: any) {
+      assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(stacktraceError)));
+    }
+    finally {
+      sinon.stub(cli, 'optionsFromArgs').value({});
+    }
+  });
+
+  it('correctly handles stack trace error when using debug for oData error handling', async () => {
+    const stacktraceError = 'StacktraceError at line 2';
+    try {
+      const mock = new MockCommand5();
+      sinon.stub(cli, 'optionsFromArgs').value({ options: { debug: true } });
+      mock.handlePromiseError({
+        error: { error_description: 'abc' }, stack: 'StacktraceError at line 2'
+      });
+      assert.fail('No exception was thrown.');
+    }
+    catch (err: any) {
+      assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(stacktraceError)));
+    }
+    finally {
+      sinon.stub(cli, 'optionsFromArgs').value({});
+    }
   });
 });
