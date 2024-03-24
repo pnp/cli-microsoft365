@@ -17,6 +17,7 @@ describe(commands.LOGIN, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let deactivateStub: any;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -45,7 +46,7 @@ describe(commands.LOGIN, () => {
         log.push(msg);
       }
     };
-    sinon.stub(auth.connection, 'deactivate').callsFake(() => { });
+    deactivateStub = sinon.stub(auth.connection, 'deactivate').callsFake(() => { });
     sinon.stub(auth, 'ensureAccessToken').callsFake(() => {
       auth.connection.name = '028de82d-7fd9-476e-a9fd-be9714280ff3';
       auth.connection.identityName = 'alexw@contoso.com';
@@ -296,6 +297,36 @@ describe(commands.LOGIN, () => {
   it('logs in to Microsoft 365 using browser authentication', async () => {
     await command.action(logger, { options: { authType: 'browser' } });
     assert.strictEqual(auth.connection.authType, AuthType.Browser, 'Incorrect authType set');
+  });
+
+  it(`Don't start login flow when the CLI is signed in`, async () => {
+    await command.action(logger, { options: { ensure: true } });
+    await command.action(logger, { options: { ensure: true } });
+
+    assert(deactivateStub.callCount <= 1);
+  });
+
+  it(`Don't start login flow if the CLI is signed in as a user`, async () => {
+    await command.action(logger, { options: { ensure: true, authType: 'password', userName: 'john.doe@contoso.com', password: 'password' } });
+    await command.action(logger, { options: { ensure: true, authType: 'password', userName: 'john.doe@contoso.com', password: 'password' } });
+
+    assert(deactivateStub.callCount <= 1);
+  });
+
+  it(`Don't start login flow, if the CLI is signed in using a certificate`, async () => {
+    sinon.stub(fs, 'readFileSync').callsFake(() => 'certificate');
+
+    await command.action(logger, { options: { ensure: true, authType: 'certificate ', certificateFile: 'certificate' } });
+    await command.action(logger, { options: { ensure: true, authType: 'certificate ', certificateFile: 'certificate' } });
+
+    assert(deactivateStub.callCount <= 1);
+  });
+
+  it(`Don't start login flow if the CLI is signed in using the specified app and to the specified tenant`, async () => {
+    await command.action(logger, { options: { ensure: true, appId: '1cf21ca6-c8f0-4a21-839d-68a09d3a0f55', tenant: '973fce64-6409-4843-9328-c2cef0427f4e' } });
+    await command.action(logger, { options: { ensure: true, appId: '1cf21ca6-c8f0-4a21-839d-68a09d3a0f55', tenant: '973fce64-6409-4843-9328-c2cef0427f4e' } });
+
+    assert(deactivateStub.callCount <= 1);
   });
 
   it('correctly handles error when clearing persisted auth information', async () => {

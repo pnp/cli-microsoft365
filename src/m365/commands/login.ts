@@ -27,6 +27,7 @@ interface Options extends GlobalOptions {
   tenant?: string;
   secret?: string;
   connectionName?: string;
+  ensure?: boolean;
 }
 
 class LoginCommand extends Command {
@@ -93,6 +94,9 @@ class LoginCommand extends Command {
       },
       {
         option: '--connectionName [connectionName]'
+      },
+      {
+        option: '--ensure [ensure]'
       }
     );
   }
@@ -223,8 +227,26 @@ class LoginCommand extends Command {
       await logger.log(details);
     };
 
-    deactivate();
-    await login();
+
+    try {
+      await auth.clearConnectionInfo();
+    }
+    catch (error: any) {
+      if (this.debug) {
+        await logger.logToStderr(new CommandError(error));
+      }
+    }
+    finally {
+      if (!args.options.ensure ||
+        (args.options.ensure && !auth.connection.active) ||
+        (args.options.ensure && (args.options.userName && args.options.userName !== auth.connection.userName)) ||
+        (args.options.ensure && (args.options.certificateFile && (auth.connection.certificate !== fs.readFileSync(args.options.certificateFile as string, 'base64')))) ||
+        (args.options.ensure && args.options.appId && args.options.appId !== auth.connection.appId && (!args.options.tenant || args.options.tenant !== auth.connection.tenant))
+      ) {
+        deactivate();
+      }
+      await login();
+    }
   }
 
   public async action(logger: Logger, args: CommandArgs): Promise<void> {
