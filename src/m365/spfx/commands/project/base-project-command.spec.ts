@@ -5,6 +5,7 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { BaseProjectCommand } from "./base-project-command.js";
 import { Project } from "./project-model/index.js";
 import { CommandError } from '../../../../Command.js';
+import * as nodepath from 'path';
 
 class MockCommand extends BaseProjectCommand {
   public get name(): string {
@@ -22,23 +23,23 @@ class MockCommand extends BaseProjectCommand {
 }
 
 describe('BaseProjectCommand', () => {
-  const projectPath: string = 'src/m365/spfx/commands/project/test-projects/spfx-141-webpart-nolib';
+  const projectPath: string = nodepath.join('src', 'm365', 'spfx', 'commands', 'project', 'test-projects', 'spfx-141-webpart-nolib');
 
   const scenarios = [
-    { file: 'config/config.json', invalidJson: '{ "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/config.2.0.schema.json", "version": "2.0", "bundles":' },
-    { file: 'config/copy-assets.json', invalidJson: '' },
-    { file: 'config/deploy-azure-storage.json', invalidJson: '' },
+    { file: nodepath.join('config', 'config.json'), invalidJson: '{ "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/config.2.0.schema.json", "version": "2.0", "bundles":' },
+    { file: nodepath.join('config', 'copy-assets.json'), invalidJson: '' },
+    { file: nodepath.join('config', 'deploy-azure-storage.json'), invalidJson: '' },
     { file: 'package.json', invalidJson: '' },
-    { file: 'config/package-solution.json', invalidJson: '' },
-    { file: 'config/serve.json', invalidJson: '' },
+    { file: nodepath.join('config', 'package-solution.json'), invalidJson: '' },
+    { file: nodepath.join('config', 'serve.json'), invalidJson: '' },
     { file: 'tsconfig.json', invalidJson: '' },
-    { file: 'config/tslint.json', invalidJson: '' },
+    { file: nodepath.join('config', 'tslint.json'), invalidJson: '' },
     { file: 'tslint.json', invalidJson: '' },
-    { file: 'config/write-manifests.json', invalidJson: '' },
+    { file: nodepath.join('config', 'write-manifests.json'), invalidJson: '' },
     { file: '.yo-rc.json', invalidJson: '' },
-    { file: '.vscode/settings.json', invalidJson: '' },
-    { file: '.vscode/extensions.json', invalidJson: '' },
-    { file: '.vscode/launch.json', invalidJson: '' }
+    { file: nodepath.join('.vscode', 'settings.json'), invalidJson: '' },
+    { file: nodepath.join('.vscode', 'extensions.json'), invalidJson: '' },
+    { file: nodepath.join('.vscode', 'launch.json'), invalidJson: '' }
   ];
 
   afterEach(() => {
@@ -103,7 +104,7 @@ describe('BaseProjectCommand', () => {
       const readFileSyncOriginal = fs.readFileSync;
       const existsSyncOriginal = fs.existsSync;
       sinon.stub(fs, 'existsSync').callsFake(path => {
-        if (path.toString() === projectPath + '/' + file) {
+        if (path.toString() === nodepath.join(projectPath, file)) {
           return true;
         }
         else {
@@ -112,7 +113,7 @@ describe('BaseProjectCommand', () => {
       });
 
       sinon.stub(fs, 'readFileSync').callsFake((path, encoding) => {
-        if (path.toString() === projectPath + '/' + file) {
+        if (path.toString() === nodepath.join(projectPath, file)) {
           return invalidJson;
         }
         else {
@@ -124,7 +125,7 @@ describe('BaseProjectCommand', () => {
 
       assert.throws(() => {
         command.getProjectPublic();
-      }, new CommandError('The file ' + projectPath + '/' + file + ' is not a valid JSON file or is not utf-8 encoded.')); // Adjust this to match how CommandError is detected in your assertions
+      }, new CommandError('The file ' + nodepath.join(projectPath, file) + ' is not a valid JSON file or is not utf-8 encoded.'));
     });
   });
 

@@ -35,7 +35,7 @@ export abstract class BaseProjectCommand extends AnonymousCommand {
       catch { }
     }
 
-    const configJsonPath: string = path.join(projectRootPath, 'config/config.json');
+    const configJsonPath: string = path.join(projectRootPath, 'config', 'config.json');
     if (fs.existsSync(configJsonPath)) {
       try {
         const source = formatting.removeSingleLineComments(fs.readFileSync(configJsonPath, 'utf-8'));
@@ -47,7 +47,7 @@ export abstract class BaseProjectCommand extends AnonymousCommand {
       }
     }
 
-    const copyAssetsJsonPath: string = path.join(projectRootPath, 'config/copy-assets.json');
+    const copyAssetsJsonPath: string = path.join(projectRootPath, 'config', 'copy-assets.json');
     if (fs.existsSync(copyAssetsJsonPath)) {
       try {
         const source = formatting.removeSingleLineComments(fs.readFileSync(copyAssetsJsonPath, 'utf-8'));
@@ -59,7 +59,7 @@ export abstract class BaseProjectCommand extends AnonymousCommand {
       }
     }
 
-    const deployAzureStorageJsonPath: string = path.join(projectRootPath, 'config/deploy-azure-storage.json');
+    const deployAzureStorageJsonPath: string = path.join(projectRootPath, 'config', 'deploy-azure-storage.json');
     if (fs.existsSync(deployAzureStorageJsonPath)) {
       try {
         const source = formatting.removeSingleLineComments(fs.readFileSync(deployAzureStorageJsonPath, 'utf-8'));
@@ -83,7 +83,7 @@ export abstract class BaseProjectCommand extends AnonymousCommand {
       }
     }
 
-    const packageSolutionJsonPath: string = path.join(projectRootPath, 'config/package-solution.json');
+    const packageSolutionJsonPath: string = path.join(projectRootPath, 'config', 'package-solution.json');
     if (fs.existsSync(packageSolutionJsonPath)) {
       try {
         const source = formatting.removeSingleLineComments(fs.readFileSync(packageSolutionJsonPath, 'utf-8'));
@@ -95,7 +95,7 @@ export abstract class BaseProjectCommand extends AnonymousCommand {
       }
     }
 
-    const serveJsonPath: string = path.join(projectRootPath, 'config/serve.json');
+    const serveJsonPath: string = path.join(projectRootPath, 'config', 'serve.json');
     if (fs.existsSync(serveJsonPath)) {
       try {
         const source = formatting.removeSingleLineComments(fs.readFileSync(serveJsonPath, 'utf-8'));
@@ -119,7 +119,7 @@ export abstract class BaseProjectCommand extends AnonymousCommand {
       }
     }
 
-    const tsLintJsonPath: string = path.join(projectRootPath, 'config/tslint.json');
+    const tsLintJsonPath: string = path.join(projectRootPath, 'config', 'tslint.json');
     if (fs.existsSync(tsLintJsonPath)) {
       try {
         const source = formatting.removeSingleLineComments(fs.readFileSync(tsLintJsonPath, 'utf-8'));
@@ -143,7 +143,7 @@ export abstract class BaseProjectCommand extends AnonymousCommand {
       }
     }
 
-    const writeManifestJsonPath: string = path.join(projectRootPath, 'config/write-manifests.json');
+    const writeManifestJsonPath: string = path.join(projectRootPath, 'config', 'write-manifests.json');
     if (fs.existsSync(writeManifestJsonPath)) {
       try {
         const source = formatting.removeSingleLineComments(fs.readFileSync(writeManifestJsonPath, 'utf-8'));
