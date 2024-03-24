@@ -193,9 +193,6 @@ describe(commands.PAGE_SET, () => {
       throw 'Invalid request';
     });
 
-    sinon.stub(spo, 'setListItem').resolves();
-    sinon.stub(spo, 'getFileAsListItemByUrl').resolves(fileResponse);
-
     await command.action(logger, { options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', layoutType: 'Home' } });
     assert(loggerLogSpy.notCalled);
   });
