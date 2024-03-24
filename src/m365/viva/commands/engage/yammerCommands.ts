@@ -1,6 +1,7 @@
 const prefix: string = 'yammer';
 
 export default {
+  COMMUNITY_GET: `${prefix} community get`,
   GROUP_LIST: `${prefix} group list`,
   GROUP_USER_ADD: `${prefix} group user add`,
   GROUP_USER_REMOVE: `${prefix} group user remove`,

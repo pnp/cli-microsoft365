@@ -1,0 +1,96 @@
+import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# viva engage community get
+
+Gets information of a Viva Engage community.
+
+## Usage
+
+```sh
+m365 viva engage community get [options]
+```
+
+## Options
+
+```md definition-list
+`--id <id>`
+: The unique identifier of the community.
+```
+
+<Global />
+
+## Remarks
+
+:::warning
+
+This command is based on an API that is currently in preview and is subject to change once the API reached general availability.
+
+In order to use this command, you need to grant the Azure AD application used by the CLI for Microsoft 365 the permission to the Viva Engage API. To do this, execute the `cli consent --service VivaEngage` command.
+
+:::
+
+## Examples
+
+Get a specific community by ID.
+
+```sh
+m365 viva engage community get --id eyJfdHlwZSI6Ikdyb3VwIiwiaWQiOiI0Mjg1NzkwNjE3NyJ9
+```
+
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  {
+    "id": "eyJfdHlwZSI6Ikdyb3VwIiwiaWQiOiIxNTU1MjcwOTQyNzIifQ",
+    "displayName": "New Employee Onboarding",
+    "description": "New Employee Onboarding",
+    "privacy": "public",
+    "groupId": "54dda9b2-2df1-4ce8-ae1e-b400956b5b34"
+  }
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  description: New Employee Onboarding
+  displayName: New Employee Onboarding
+  groupId    : 54dda9b2-2df1-4ce8-ae1e-b400956b5b34
+  id         : eyJfdHlwZSI6Ikdyb3VwIiwiaWQiOiIxNTU1MjcwOTQyNzIifQ
+  privacy    : public
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  id,displayName,description,privacy,groupId
+  eyJfdHlwZSI6Ikdyb3VwIiwiaWQiOiIxNTU1MjcwOTQyNzIifQ,New Employee Onboarding,New Employee Onboarding,public,54dda9b2-2df1-4ce8-ae1e-b400956b5b34
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # viva engage community get --id "eyJfdHlwZSI6Ikdyb3VwIiwiaWQiOiIxNTU1MjcwOTQyNzIifQ"
+
+  Date: 14/03/2024
+
+  ## New Employee Onboarding (eyJfdHlwZSI6Ikdyb3VwIiwiaWQiOiIxNTU1MjcwOTQyNzIifQ)
+
+  Property | Value
+  ---------|-------
+  id | eyJfdHlwZSI6Ikdyb3VwIiwiaWQiOiIxNTU1MjcwOTQyNzIifQ
+  displayName | New Employee Onboarding
+  description | New Employee Onboarding
+  privacy | public
+  groupId | 54dda9b2-2df1-4ce8-ae1e-b400956b5b34
+  ```
+
+  </TabItem>
+</Tabs>
