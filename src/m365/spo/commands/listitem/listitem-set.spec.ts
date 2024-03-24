@@ -8,117 +8,53 @@ import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import request from '../../../../request.js';
 import { telemetry } from '../../../../telemetry.js';
-import { formatting } from '../../../../utils/formatting.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { spo } from '../../../../utils/spo.js';
-import { urlUtil } from '../../../../utils/urlUtil.js';
 import commands from '../../commands.js';
 import command from './listitem-set.js';
 import { settingsNames } from '../../../../settingsNames.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { urlUtil } from '../../../../utils/urlUtil.js';
 
 describe(commands.LISTITEM_SET, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let loggerLogSpy: sinon.SinonSpy;
 
   const webUrl = 'https://contoso.sharepoint.com/sites/project-w';
   const listUrl = '/sites/project-x/lists/TestList';
-  const listServerRelativeUrl: string = urlUtil.getServerRelativePath(webUrl, listUrl);
-
-  const expectedTitle = `List Item 1`;
-
-  const expectedId = 147;
-  let actualId = 0;
-
-  const expectedContentType = 'Item';
-  let actualContentType = '';
-
-  const postFakes = async (opts: any) => {
-    if (opts.url.indexOf('/_api/web/lists') > -1) {
-      if ((opts.url as string).indexOf('ValidateUpdateListItem') > -1) {
-        const bodyString = JSON.stringify(opts.data);
-        const ctMatch = bodyString.match(/\"?FieldName\"?:\s*\"?ContentType\"?,\s*\"?FieldValue\"?:\s*\"?(\w*)\"?/i);
-        actualContentType = ctMatch ? ctMatch[1] : "";
-        if (bodyString.indexOf("fail updating me") > -1) { return { value: [{ ErrorMessage: 'failed updating', 'FieldName': 'Title', 'HasException': true }] }; }
-        return { value: [{ ItemId: expectedId }] };
-      }
-    }
-
-    if ((opts.url as string).indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
-      if (opts.data.indexOf('Name="Current"') > -1) {
-        if ((opts.url as string).indexOf('rejectme.com') > -1) {
-          throw 'Failed request';
-        }
-
-        if ((opts.url as string).indexOf('returnerror.com') > -1) {
-          return JSON.stringify([{ "ErrorInfo": "error occurred" }]);
-        }
-
-        if (opts.url === `https://objectidentityNotFound.sharepoint.com/sites/project-y/_vti_bin/client.svc/ProcessQuery`) {
-          return JSON.stringify([
-            {
-              "SchemaVersion": "15.0.0.0",
-              "LibraryVersion": "16.0.7618.1204",
-              "ErrorInfo": null,
-              "TraceCorrelationId": "3e3e629e-30cc-5000-9f31-cf83b8e70021"
-            },
-            {
-              "_ObjectType_": "SP.Web",
-              "ServerRelativeUrl": "\\u002fsites\\u002fprojecty"
-            }
-          ]);
-        }
-
-        return JSON.stringify([
-          {
-            "SchemaVersion": "15.0.0.0",
-            "LibraryVersion": "16.0.7618.1204",
-            "ErrorInfo": null,
-            "TraceCorrelationId": "3e3e629e-30cc-5000-9f31-cf83b8e70021"
-          },
-          {
-            "_ObjectType_": "SP.Web",
-            "_ObjectIdentity_": "d704ae73-d5ed-459e-80b0-b8103c5fb6e0|8f2be65d-f195-4699-b0de-24aca3384ba9:site:0ead8b78-89e5-427f-b1bc-6e5a77ac191c:web:4c076c07-e3f1-49a8-ad01-dbb70b263cd7",
-            "ServerRelativeUrl": "\\u002fsites\\u002fprojectx"
-          }
-        ]);
-      }
-      if (opts.data.indexOf('SystemUpdate') > -1) {
-        if (opts.data.indexOf('systemUpdate error') > -1) {
-          return 'ErrorMessage": "systemUpdate error"}';
-        }
-        actualId = expectedId;
-        return ']SchemaVersion":"15.0.0.0","LibraryVersion":"16.0.7618.1204","ErrorInfo":null,"TraceCorrelationId":"3e3e629e-f0e9-5000-9f31-c6758b453a4a"';
-      }
-    }
-
-    throw 'Invalid request';
+  const listId = '9befab64-10fa-4a1a-88ad-200629d5306a';
+  const listItemResponse = {
+    "FileSystemObjectType": 0,
+    "Id": 1,
+    "ServerRedirectedEmbedUri": null,
+    "ServerRedirectedEmbedUrl": "",
+    "ContentTypeId": "0x0100A06E900513958643B1CBA90ACB57A4C70088931AAA291F244FA07D46D3B40AD0F1",
+    "Title": "Test",
+    "OData__ColorTag": null,
+    "ComplianceAssetId": null,
+    "ID": 1,
+    "Modified": new Date("2023-10-30T15:36:11Z"),
+    "Created": new Date("2023-10-16T12:40:57Z"),
+    "AuthorId": 11,
+    "EditorId": 11,
+    "OData__UIVersionString": "3.0",
+    "Attachments": false,
+    "GUID": "fe213cee-4c05-4de8-a306-f8a5f0923d5a",
+    "RoleAssignments": []
   };
+
+  const listServerRelativeUrl: string = urlUtil.getServerRelativePath(webUrl, listUrl);
+  const expectedTitle = `List Item 1`;
+  const expectedContentType = 'Item';
 
   const getFakes = async (opts: any) => {
     if (opts.url.indexOf('/_api/web/lists') > -1) {
       if ((opts.url as string).indexOf('contenttypes') > -1) {
         return { value: [{ Id: { StringValue: expectedContentType }, Name: "Item" }] };
-      }
-      if ((opts.url as string).indexOf('/items(') > -1) {
-        actualId = parseInt(opts.url.match(/\/items\((\d+)\)/i)[1]);
-        return {
-          "Attachments": false,
-          "AuthorId": 3,
-          "ContentTypeId": "0x0100B21BD271A810EE488B570BE49963EA34",
-          "Created": "2018-03-15T10:43:10Z",
-          "EditorId": 3,
-          "GUID": "ea093c7b-8ae6-4400-8b75-e2d01154dffc",
-          "Id": actualId,
-          "ID": actualId,
-          "Modified": "2018-03-15T10:52:10Z",
-          "Title": expectedTitle
-        };
-      }
-      if ((opts.url as string).indexOf(')?$select=Id') > -1) {
-        return { Id: "f64041f2-9818-4b67-92ff-3bc5dbbef27e" };
       }
     }
 
@@ -130,20 +66,8 @@ describe(commands.LISTITEM_SET, () => {
       return { value: [{ Id: { StringValue: expectedContentType }, Name: "Item" }] };
     }
 
-    if (opts.url === `https://contoso.sharepoint.com/sites/project-w/_api/web/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')/items(147)`) {
-      actualId = parseInt(opts.url.match(/\/items\((\d+)\)/i)[1]);
-      return {
-        "Attachments": false,
-        "AuthorId": 3,
-        "ContentTypeId": "0x0100B21BD271A810EE488B570BE49963EA34",
-        "Created": "2018-03-15T10:43:10Z",
-        "EditorId": 3,
-        "GUID": "ea093c7b-8ae6-4400-8b75-e2d01154dffc",
-        "Id": actualId,
-        "ID": actualId,
-        "Modified": "2018-03-15T10:52:10Z",
-        "Title": expectedTitle
-      };
+    if (opts.url === `https://contoso.sharepoint.com/sites/project-y/_api/web/lists(guid'${listId}')/contenttypes?$select=Name,Id`) {
+      return { value: [{ Id: { StringValue: expectedContentType }, Name: "Item" }] };
     }
 
     throw 'Invalid request';
@@ -177,12 +101,15 @@ describe(commands.LISTITEM_SET, () => {
         log.push(msg);
       }
     };
+    loggerLogSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
     sinonUtil.restore([
       request.post,
       request.get,
+      spo.updateListItem,
+      spo.systemUpdateListItem,
       cli.getSettingWithDefaultValue
     ]);
   });
@@ -263,11 +190,7 @@ describe(commands.LISTITEM_SET, () => {
   });
 
   it('fails to update a list item when \'fail me\' values are used', async () => {
-    actualId = 0;
-
-    sinon.stub(request, 'get').callsFake(getFakes);
-    sinon.stub(request, 'post').callsFake(postFakes);
-
+    sinon.stub(spo, 'updateListItem').rejects(new Error(`Updating the items has failed with the following errors: ${os.EOL}- Title - failed updating`));
     const options: any = {
       listTitle: 'Demo List',
       id: 47,
@@ -276,13 +199,10 @@ describe(commands.LISTITEM_SET, () => {
     };
 
     await assert.rejects(command.action(logger, { options: options } as any), new CommandError(`Updating the items has failed with the following errors: ${os.EOL}- Title - failed updating`));
-    assert.strictEqual(actualId, 0);
   });
 
   it('returns listItemInstance object when list item is updated with correct values', async () => {
-    sinon.stub(request, 'get').callsFake(getFakes);
-    sinon.stub(request, 'post').callsFake(postFakes);
-
+    sinon.stub(spo, 'updateListItem').resolves(listItemResponse);
     command.allowUnknownOptions();
 
     const options: any = {
@@ -294,13 +214,12 @@ describe(commands.LISTITEM_SET, () => {
     };
 
     await command.action(logger, { options: options } as any);
-    assert.strictEqual(actualId, expectedId);
+    assert(loggerLogSpy.calledWith(listItemResponse));
   });
 
   it('returns listItemInstance object when list item in list retrieved by URL is updated with correct values', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
-    sinon.stub(request, 'post').callsFake(postFakes);
-
+    sinon.stub(spo, 'systemUpdateListItem').resolves(listItemResponse);
     command.allowUnknownOptions();
 
     const options: any = {
@@ -314,12 +233,12 @@ describe(commands.LISTITEM_SET, () => {
     };
 
     await command.action(logger, { options: options } as any);
-    assert.strictEqual(actualId, expectedId);
+    assert(loggerLogSpy.calledWith(listItemResponse));
   });
 
   it('attempts to update the listitem with the contenttype of \'Item\' when content type option \'Item\' is specified', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
-    sinon.stub(request, 'post').callsFake(postFakes);
+    sinon.stub(spo, 'updateListItem').resolves(listItemResponse);
 
     const options: any = {
       listTitle: 'Demo List',
@@ -330,16 +249,16 @@ describe(commands.LISTITEM_SET, () => {
     };
 
     await command.action(logger, { options: options } as any);
-    assert(expectedContentType === actualContentType);
+    assert(loggerLogSpy.calledWith(listItemResponse));
   });
 
   it('attempts to update the listitem with the contenttype of \'Item\' when content type option 0x01 is specified', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
-    sinon.stub(request, 'post').callsFake(postFakes);
+    sinon.stub(spo, 'updateListItem').resolves(listItemResponse);
 
     const options: any = {
       debug: true,
-      listTitle: 'Demo List',
+      listId: listId,
       id: 47,
       webUrl: 'https://contoso.sharepoint.com/sites/project-y',
       contentType: expectedContentType,
@@ -347,12 +266,11 @@ describe(commands.LISTITEM_SET, () => {
     };
 
     await command.action(logger, { options: options } as any);
-    assert(expectedContentType === actualContentType);
+    assert(loggerLogSpy.calledWith(listItemResponse));
   });
 
   it('fails to update the listitem when the specified contentType doesn\'t exist in the target list', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
-    sinon.stub(request, 'post').callsFake(postFakes);
 
     const options: any = {
       listTitle: 'Demo List',
@@ -367,9 +285,7 @@ describe(commands.LISTITEM_SET, () => {
 
   it('successfully updates the listitem when the systemUpdate parameter is specified', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
-    sinon.stub(request, 'post').callsFake(postFakes);
-
-    actualId = 0;
+    sinon.stub(spo, 'systemUpdateListItem').resolves(listItemResponse);
 
     const options: any = {
       debug: true,
@@ -381,68 +297,12 @@ describe(commands.LISTITEM_SET, () => {
     };
 
     await command.action(logger, { options: options } as any);
-    assert.strictEqual(actualId, expectedId);
-  });
-
-  it('fails to get _ObjecttIdentity_ when the systemUpdate parameter is specified', async () => {
-    sinon.stub(request, 'get').callsFake(getFakes);
-    sinon.stub(request, 'post').callsFake(postFakes);
-
-    actualId = 0;
-
-    const options: any = {
-      debug: true,
-      listTitle: 'Demo List',
-      id: 147,
-      webUrl: 'https://rejectme.com/sites/project-y',
-      Title: expectedTitle,
-      systemUpdate: true
-    };
-
-    await assert.rejects(command.action(logger, { options: options } as any), new CommandError("Failed request"));
-  });
-
-  it('fails to get _ObjecttIdentity_ when objectidentity not found', async () => {
-    sinon.stub(request, 'get').callsFake(getFakes);
-    sinon.stub(request, 'post').callsFake(postFakes);
-
-    actualId = 0;
-
-    const options: any = {
-      debug: true,
-      listTitle: 'Test List',
-      id: 147,
-      webUrl: 'https://objectidentityNotFound.sharepoint.com/sites/project-y',
-      Title: expectedTitle,
-      systemUpdate: true
-    };
-
-    await assert.rejects(command.action(logger, { options: options } as any), new CommandError("Cannot proceed. _ObjectIdentity_ not found"));
-  });
-
-  it('fails to get _ObjecttIdentity_ when an error is returned by the _ObjectIdentity_ CSOM request and systemUpdate parameter is specified', async () => {
-    sinon.stub(request, 'get').callsFake(getFakes);
-    sinon.stub(request, 'post').callsFake(postFakes);
-
-    actualId = 0;
-
-    const options: any = {
-      listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF',
-      id: 147,
-      webUrl: 'https://returnerror.com/sites/project-y',
-      Title: expectedTitle,
-      systemUpdate: true
-    };
-
-    await assert.rejects(command.action(logger, { options: options } as any), new CommandError('ClientSvc unknown error'));
-    assert(actualId !== expectedId);
+    assert(loggerLogSpy.calledWith(listItemResponse));
   });
 
   it('fails to update the list item when systemUpdate parameter is specified', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
-    sinon.stub(request, 'post').callsFake(postFakes);
-
-    actualId = 0;
+    sinon.stub(spo, 'systemUpdateListItem').rejects(new Error('Error occurred in systemUpdate operation - ErrorMessage": "systemUpdate error"}'));
 
     const options: any = {
       debug: true,
@@ -455,14 +315,10 @@ describe(commands.LISTITEM_SET, () => {
     };
 
     await assert.rejects(command.action(logger, { options: options } as any), new CommandError('Error occurred in systemUpdate operation - ErrorMessage": "systemUpdate error"}'));
-    assert(actualId !== expectedId);
   });
 
   it('should ignore global options when creating request data', async () => {
-    sinon.stub(request, 'get').callsFake(getFakes);
-    const postStubs = sinon.stub(request, 'post').callsFake(postFakes);
-
-    actualId = 0;
+    sinon.stub(spo, 'updateListItem').resolves(listItemResponse);
 
     const options: any = {
       debug: true,
@@ -476,6 +332,6 @@ describe(commands.LISTITEM_SET, () => {
     };
 
     await command.action(logger, { options: options } as any);
-    assert.deepEqual(postStubs.firstCall.args[0].data, { formValues: [{ FieldName: 'Title', FieldValue: 'List Item 1' }] });
+    assert(loggerLogSpy.calledWith(listItemResponse));
   });
 });
