@@ -41,6 +41,7 @@ export default {
   GROUP_REMOVE: `${prefix} group remove`,
   GROUP_USER_ADD: `${prefix} group user add`,
   GROUP_USER_LIST: `${prefix} group user list`,
+  GROUP_USER_SET: `${prefix} group user set`,
   GROUPSETTING_ADD: `${prefix} groupsetting add`,
   GROUPSETTING_GET: `${prefix} groupsetting get`,
   GROUPSETTING_LIST: `${prefix} groupsetting list`,
