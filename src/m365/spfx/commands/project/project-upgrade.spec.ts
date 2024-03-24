@@ -452,8 +452,7 @@ describe(commands.PROJECT_UPGRADE, () => {
       }
     });
 
-    const getProject = (command as any).getProject;
-    const project: Project = getProject(projectPath);
+    const project: Project = (command as any).getProject(projectPath);
     assert.strictEqual(typeof (project.packageJson), 'undefined');
   });
 
@@ -468,8 +467,7 @@ describe(commands.PROJECT_UPGRADE, () => {
       }
     });
 
-    const getProject = (command as any).getProject;
-    const project: Project = getProject(projectPath);
+    const project: Project = (command as any).getProject(projectPath);
     assert.strictEqual(typeof (project.tsConfigJson), 'undefined');
   });
 
@@ -477,96 +475,90 @@ describe(commands.PROJECT_UPGRADE, () => {
     const originalReadFileSync = fs.readFileSync;
     sinon.stub(fs, 'readFileSync').callsFake((path, encoding) => {
       if (path.toString().endsWith('config.json')) {
-        return '';
+        return '{}';
       }
       else {
         return originalReadFileSync(path, encoding);
       }
     });
 
-    const getProject = (command as any).getProject;
-    const project: Project = getProject(projectPath);
-    assert.strictEqual(typeof (project.configJson), 'undefined');
+    const project: Project = (command as any).getProject(projectPath);
+    assert.strictEqual(typeof (project.configJson), 'object');
   });
 
   it('doesn\'t fail if copy-assets.json is empty', () => {
     const originalReadFileSync = fs.readFileSync;
     sinon.stub(fs, 'readFileSync').callsFake((path, encoding) => {
       if (path.toString().endsWith('copy-assets.json')) {
-        return '';
+        return '{}';
       }
       else {
         return originalReadFileSync(path, encoding);
       }
     });
 
-    const getProject = (command as any).getProject;
-    const project: Project = getProject(projectPath);
-    assert.strictEqual(typeof (project.copyAssetsJson), 'undefined');
+    const project: Project = (command as any).getProject(projectPath);
+    assert.strictEqual(typeof (project.copyAssetsJson), 'object');
   });
 
   it('doesn\'t fail if deploy-azure-storage.json is empty', () => {
     const originalReadFileSync = fs.readFileSync;
     sinon.stub(fs, 'readFileSync').callsFake((path, encoding) => {
       if (path.toString().endsWith('deploy-azure-storage.json')) {
-        return '';
+        return '{}';
       }
       else {
         return originalReadFileSync(path, encoding);
       }
     });
 
-    const getProject = (command as any).getProject;
-    const project: Project = getProject(projectPath);
-    assert.strictEqual(typeof (project.deployAzureStorageJson), 'undefined');
+    const project: Project = (command as any).getProject(projectPath);
+    assert.strictEqual(typeof (project.deployAzureStorageJson), 'object');
   });
 
   it('doesn\'t fail if package.json is empty', () => {
     const originalReadFileSync = fs.readFileSync;
     sinon.stub(fs, 'readFileSync').callsFake((path, encoding) => {
       if (path.toString().endsWith('package.json')) {
-        return '';
+        return '{}';
       }
       else {
         return originalReadFileSync(path, encoding);
       }
     });
 
-    const getProject = (command as any).getProject;
-    const project: Project = getProject(projectPath);
-    assert.strictEqual(typeof (project.packageJson), 'undefined');
+    const project: Project = (command as any).getProject(projectPath);
+    assert.strictEqual(typeof (project.packageJson), 'object');
   });
 
   it('doesn\'t fail if package-solution.json is empty', () => {
     const originalReadFileSync = fs.readFileSync;
     sinon.stub(fs, 'readFileSync').callsFake((path, encoding) => {
       if (path.toString().endsWith('package-solution.json')) {
-        return '';
+        return '{}';
       }
       else {
         return originalReadFileSync(path, encoding);
       }
     });
 
-    const getProject = (command as any).getProject;
-    const project: Project = getProject(projectPath);
-    assert.strictEqual(typeof (project.packageSolutionJson), 'undefined');
+    const project: Project = (command as any).getProject(projectPath);
+    assert.strictEqual(typeof (project.packageSolutionJson), 'object');
   });
 
   it('doesn\'t fail if serve.json is empty', () => {
     const originalReadFileSync = fs.readFileSync;
     sinon.stub(fs, 'readFileSync').callsFake((path, encoding) => {
       if (path.toString().endsWith('serve.json')) {
-        return '';
+        return '{}';
       }
       else {
         return originalReadFileSync(path, encoding);
       }
     });
 
-    const getProject = (command as any).getProject;
-    const project: Project = getProject(projectPath);
-    assert.strictEqual(typeof (project.serveJson), 'undefined');
+    const project: Project = (command as any).getProject(projectPath);
+    assert.strictEqual(typeof (project.serveJson), 'object');
   });
 
   it('doesn\'t fail if tslint.json is empty', () => {
@@ -582,64 +574,60 @@ describe(commands.PROJECT_UPGRADE, () => {
     const originalReadFileSync = fs.readFileSync;
     sinon.stub(fs, 'readFileSync').callsFake((path, encoding) => {
       if (path.toString().endsWith('tslint.json')) {
-        return '';
+        return '{}';
       }
       else {
         return originalReadFileSync(path, encoding);
       }
     });
 
-    const getProject = (command as any).getProject;
-    const project: Project = getProject(projectPath);
-    assert.strictEqual(typeof (project.tsLintJson), 'undefined');
+    const project: Project = (command as any).getProject(projectPath);
+    assert.strictEqual(typeof (project.tsLintJson), 'object');
   });
 
   it('doesn\'t fail if write-manifests.json is empty', () => {
     const originalReadFileSync = fs.readFileSync;
     sinon.stub(fs, 'readFileSync').callsFake((path, encoding) => {
       if (path.toString().endsWith('write-manifests.json')) {
-        return '';
+        return '{}';
       }
       else {
         return originalReadFileSync(path, encoding);
       }
     });
 
-    const getProject = (command as any).getProject;
-    const project: Project = getProject(projectPath);
-    assert.strictEqual(typeof (project.writeManifestsJson), 'undefined');
+    const project: Project = (command as any).getProject(projectPath);
+    assert.strictEqual(typeof (project.writeManifestsJson), 'object');
   });
 
   it('doesn\'t fail if .yo-rc.json is empty', () => {
     const originalReadFileSync = fs.readFileSync;
     sinon.stub(fs, 'readFileSync').callsFake((path, encoding) => {
       if (path.toString().endsWith('.yo-rc.json')) {
-        return '';
+        return '{}';
       }
       else {
         return originalReadFileSync(path, encoding);
       }
     });
 
-    const getProject = (command as any).getProject;
-    const project: Project = getProject(projectPath);
-    assert.strictEqual(typeof (project.yoRcJson), 'undefined');
+    const project: Project = (command as any).getProject(projectPath);
+    assert.strictEqual(typeof (project.yoRcJson), 'object');
   });
 
   it('doesn\'t fail if extensions.json is empty', () => {
     const originalReadFileSync = fs.readFileSync;
     sinon.stub(fs, 'readFileSync').callsFake((path, encoding) => {
       if (path.toString().endsWith('extensions.json')) {
-        return '';
+        return '{}';
       }
       else {
         return originalReadFileSync(path, encoding);
       }
     });
 
-    const getProject = (command as any).getProject;
-    const project: Project = getProject(projectPath);
-    assert.strictEqual(typeof ((project.vsCode as VsCode).extensionsJson), 'undefined');
+    const project: Project = (command as any).getProject(projectPath);
+    assert.strictEqual(typeof ((project.vsCode as VsCode).extensionsJson), 'object');
   });
 
   it('loads manifests when available', () => {
@@ -657,8 +645,7 @@ describe(commands.PROJECT_UPGRADE, () => {
       }
     });
 
-    const getProject = (command as any).getProject;
-    const project: Project = getProject(projectPath);
+    const project: Project = (command as any).getProject(projectPath);
     assert.strictEqual(typeof ((project.vsCode) as VsCode).settingsJson, 'undefined');
   });
 
@@ -666,32 +653,30 @@ describe(commands.PROJECT_UPGRADE, () => {
     const originalReadFileSync = fs.readFileSync;
     sinon.stub(fs, 'readFileSync').callsFake((path, encoding) => {
       if (path.toString().endsWith('settings.json')) {
-        return '';
+        return '{}';
       }
       else {
         return originalReadFileSync(path, encoding);
       }
     });
 
-    const getProject = (command as any).getProject;
-    const project: Project = getProject(projectPath);
-    assert.strictEqual(typeof ((project.vsCode as any).settingsJson), 'undefined');
+    const project: Project = (command as any).getProject(projectPath);
+    assert.strictEqual(typeof ((project.vsCode as any).settingsJson), 'object');
   });
 
   it('doesn\'t fail if vscode launch info is empty', () => {
     const originalReadFileSync = fs.readFileSync;
     sinon.stub(fs, 'readFileSync').callsFake((path, encoding) => {
       if (path.toString().endsWith('launch.json')) {
-        return '';
+        return '{}';
       }
       else {
         return originalReadFileSync(path, encoding);
       }
     });
 
-    const getProject = (command as any).getProject;
-    const project: Project = getProject(projectPath);
-    assert.strictEqual(typeof ((project.vsCode as any).launch), 'undefined');
+    const project: Project = (command as any).getProject(projectPath);
+    assert.strictEqual(typeof ((project.vsCode as any).launchJson), 'object');
   });
 
   //#region npm

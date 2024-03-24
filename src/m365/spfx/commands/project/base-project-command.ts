@@ -4,6 +4,8 @@ import { formatting } from '../../../../utils/formatting.js';
 import { fsUtil } from '../../../../utils/fsUtil.js';
 import AnonymousCommand from "../../../base/AnonymousCommand.js";
 import { Manifest, Project, ScssFile, TsFile } from "./project-model/index.js";
+import { CommandError } from '../../../../Command.js';
+
 
 export abstract class BaseProjectCommand extends AnonymousCommand {
   protected projectRootPath: string | null = null;
@@ -33,115 +35,17 @@ export abstract class BaseProjectCommand extends AnonymousCommand {
       catch { }
     }
 
-    const configJsonPath: string = path.join(projectRootPath, 'config/config.json');
-    if (fs.existsSync(configJsonPath)) {
-      try {
-        const source = formatting.removeSingleLineComments(fs.readFileSync(configJsonPath, 'utf-8'));
-        project.configJson = JSON.parse(source);
-        project.configJson!.source = source;
-      }
-      catch { }
-    }
-
-    const copyAssetsJsonPath: string = path.join(projectRootPath, 'config/copy-assets.json');
-    if (fs.existsSync(copyAssetsJsonPath)) {
-      try {
-        const source = formatting.removeSingleLineComments(fs.readFileSync(copyAssetsJsonPath, 'utf-8'));
-        project.copyAssetsJson = JSON.parse(source);
-        project.copyAssetsJson!.source = source;
-      }
-      catch { }
-    }
-
-    const deployAzureStorageJsonPath: string = path.join(projectRootPath, 'config/deploy-azure-storage.json');
-    if (fs.existsSync(deployAzureStorageJsonPath)) {
-      try {
-        const source = formatting.removeSingleLineComments(fs.readFileSync(deployAzureStorageJsonPath, 'utf-8'));
-        project.deployAzureStorageJson = JSON.parse(source);
-        project.deployAzureStorageJson!.source = source;
-      }
-      catch { }
-    }
-
-    const packageJsonPath: string = path.join(projectRootPath, 'package.json');
-    if (fs.existsSync(packageJsonPath)) {
-      try {
-        const source = formatting.removeSingleLineComments(fs.readFileSync(packageJsonPath, 'utf-8'));
-        project.packageJson = JSON.parse(source);
-        project.packageJson!.source = source;
-      }
-      catch { }
-    }
-
-    const packageSolutionJsonPath: string = path.join(projectRootPath, 'config/package-solution.json');
-    if (fs.existsSync(packageSolutionJsonPath)) {
-      try {
-        const source = formatting.removeSingleLineComments(fs.readFileSync(packageSolutionJsonPath, 'utf-8'));
-        project.packageSolutionJson = JSON.parse(source);
-        project.packageSolutionJson!.source = source;
-      }
-      catch { }
-    }
-
-    const serveJsonPath: string = path.join(projectRootPath, 'config/serve.json');
-    if (fs.existsSync(serveJsonPath)) {
-      try {
-        const source = formatting.removeSingleLineComments(fs.readFileSync(serveJsonPath, 'utf-8'));
-        project.serveJson = JSON.parse(source);
-        project.serveJson!.source = source;
-      }
-      catch { }
-    }
-
-    const tsConfigJsonPath: string = path.join(projectRootPath, 'tsconfig.json');
-    if (fs.existsSync(tsConfigJsonPath)) {
-      try {
-        const source = formatting.removeSingleLineComments(fs.readFileSync(tsConfigJsonPath, 'utf-8'));
-        project.tsConfigJson = JSON.parse(source);
-        project.tsConfigJson!.source = source;
-      }
-      catch { }
-    }
-
-    const tsLintJsonPath: string = path.join(projectRootPath, 'config/tslint.json');
-    if (fs.existsSync(tsLintJsonPath)) {
-      try {
-        const source = formatting.removeSingleLineComments(fs.readFileSync(tsLintJsonPath, 'utf-8'));
-        project.tsLintJson = JSON.parse(source);
-        project.tsLintJson!.source = source;
-      }
-      catch { }
-    }
-
-    const tsLintJsonRootPath: string = path.join(projectRootPath, 'tslint.json');
-    if (fs.existsSync(tsLintJsonRootPath)) {
-      try {
-        const source = formatting.removeSingleLineComments(fs.readFileSync(tsLintJsonRootPath, 'utf-8'));
-        project.tsLintJsonRoot = JSON.parse(source);
-        project.tsLintJsonRoot!.source = source;
-      }
-      catch { }
-    }
-
-    const writeManifestJsonPath: string = path.join(projectRootPath, 'config/write-manifests.json');
-    if (fs.existsSync(writeManifestJsonPath)) {
-      try {
-        const source = formatting.removeSingleLineComments(fs.readFileSync(writeManifestJsonPath, 'utf-8'));
-        project.writeManifestsJson = JSON.parse(source);
-        project.writeManifestsJson!.source = source;
-      }
-      catch { }
-    }
-
-    const yoRcJsonPath: string = path.join(projectRootPath, '.yo-rc.json');
-    if (fs.existsSync(yoRcJsonPath)) {
-      try {
-        const source = formatting.removeSingleLineComments(fs.readFileSync(yoRcJsonPath, 'utf-8'));
-        project.yoRcJson = JSON.parse(source);
-        project.yoRcJson!.source = source;
-      }
-      catch { }
-    }
+    this.readAndParseJsonFile(path.join(projectRootPath, 'config', 'config.json'), project, 'configJson');
+    this.readAndParseJsonFile(path.join(projectRootPath, 'config', 'copy-assets.json'), project, 'copyAssetsJson');
+    this.readAndParseJsonFile(path.join(projectRootPath, 'config', 'deploy-azure-storage.json'), project, 'deployAzureStorageJson');
+    this.readAndParseJsonFile(path.join(projectRootPath, 'package.json'), project, 'packageJson');
+    this.readAndParseJsonFile(path.join(projectRootPath, 'config', 'package-solution.json'), project, 'packageSolutionJson');
+    this.readAndParseJsonFile(path.join(projectRootPath, 'config', 'serve.json'), project, 'serveJson');
+    this.readAndParseJsonFile(path.join(projectRootPath, 'tsconfig.json'), project, 'tsConfigJson');
+    this.readAndParseJsonFile(path.join(projectRootPath, 'config', 'tslint.json'), project, 'tsLintJson');
+    this.readAndParseJsonFile(path.join(projectRootPath, 'tslint.json'), project, 'tsLintJsonRoot');
+    this.readAndParseJsonFile(path.join(projectRootPath, 'config', 'write-manifests.json'), project, 'writeManifestsJson');
+    this.readAndParseJsonFile(path.join(projectRootPath, '.yo-rc.json'), project, 'yoRcJson');
 
     const gulpfileJsPath: string = path.join(projectRootPath, 'gulpfile.js');
     if (fs.existsSync(gulpfileJsPath)) {
@@ -156,35 +60,10 @@ export abstract class BaseProjectCommand extends AnonymousCommand {
     }
 
     project.vsCode = {};
-    const vsCodeSettingsPath: string = path.join(projectRootPath, '.vscode', 'settings.json');
-    if (fs.existsSync(vsCodeSettingsPath)) {
-      try {
-        const source = formatting.removeSingleLineComments(fs.readFileSync(vsCodeSettingsPath, 'utf-8'));
-        project.vsCode.settingsJson = JSON.parse(source);
-        project.vsCode.settingsJson!.source = source;
-      }
-      catch { }
-    }
 
-    const vsCodeExtensionsPath: string = path.join(projectRootPath, '.vscode', 'extensions.json');
-    if (fs.existsSync(vsCodeExtensionsPath)) {
-      try {
-        const source = formatting.removeSingleLineComments(fs.readFileSync(vsCodeExtensionsPath, 'utf-8'));
-        project.vsCode.extensionsJson = JSON.parse(source);
-        project.vsCode.extensionsJson!.source = source;
-      }
-      catch { }
-    }
-
-    const vsCodeLaunchPath: string = path.join(projectRootPath, '.vscode', 'launch.json');
-    if (fs.existsSync(vsCodeLaunchPath)) {
-      try {
-        const source = formatting.removeSingleLineComments(fs.readFileSync(vsCodeLaunchPath, 'utf-8'));
-        project.vsCode.launchJson = JSON.parse(source);
-        project.vsCode.launchJson!.source = source;
-      }
-      catch { }
-    }
+    this.readAndParseJsonFile(path.join(projectRootPath, '.vscode', 'settings.json'), project, 'vsCode.settingsJson');
+    this.readAndParseJsonFile(path.join(projectRootPath, '.vscode', 'extensions.json'), project, 'vsCode.extensionsJson');
+    this.readAndParseJsonFile(path.join(projectRootPath, '.vscode', 'launch.json'), project, 'vsCode.launchJson');
 
     const srcFiles: string[] = fsUtil.readdirR(path.join(projectRootPath, 'src')) as string[];
 
@@ -262,5 +141,29 @@ export abstract class BaseProjectCommand extends AnonymousCommand {
     catch { }
 
     return undefined;
+  }
+
+  private readAndParseJsonFile(filePath: string, project: Project, keyPath: string): Project {
+    if (fs.existsSync(filePath)) {
+      try {
+        const source = formatting.removeSingleLineComments(fs.readFileSync(filePath, 'utf-8'));
+        const keys = keyPath.split('.') as (keyof Project)[];
+        let current: any = project;
+
+        for (let i = 0; i < keys.length - 1; i++) {
+          current = current[keys[i]];
+        }
+
+        const finalKey = keys[keys.length - 1];
+        current[finalKey] = JSON.parse(source);
+        if (typeof current[finalKey] === 'object' && current[finalKey] !== null) {
+          current[finalKey].source = source;
+        }
+      }
+      catch (error) {
+        throw new CommandError(`The file ${filePath} is not a valid JSON file or is not utf-8 encoded. Error: ${error}`);
+      }
+    }
+    return project;
   }
 }
