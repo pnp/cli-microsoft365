@@ -4,6 +4,8 @@ import { formatting } from '../../../../utils/formatting.js';
 import { fsUtil } from '../../../../utils/fsUtil.js';
 import AnonymousCommand from "../../../base/AnonymousCommand.js";
 import { Manifest, Project, ScssFile, TsFile } from "./project-model/index.js";
+import { CommandError } from '../../../../Command.js';
+
 
 export abstract class BaseProjectCommand extends AnonymousCommand {
   protected projectRootPath: string | null = null;
@@ -40,7 +42,9 @@ export abstract class BaseProjectCommand extends AnonymousCommand {
         project.configJson = JSON.parse(source);
         project.configJson!.source = source;
       }
-      catch { }
+      catch {
+        throw new CommandError('The file ' + configJsonPath + ' is not a valid JSON file or is not utf-8 encoded.');
+      }
     }
 
     const copyAssetsJsonPath: string = path.join(projectRootPath, 'config/copy-assets.json');
@@ -50,7 +54,9 @@ export abstract class BaseProjectCommand extends AnonymousCommand {
         project.copyAssetsJson = JSON.parse(source);
         project.copyAssetsJson!.source = source;
       }
-      catch { }
+      catch {
+        throw new CommandError('The file ' + copyAssetsJsonPath + ' is not a valid JSON file or is not utf-8 encoded.');
+      }
     }
 
     const deployAzureStorageJsonPath: string = path.join(projectRootPath, 'config/deploy-azure-storage.json');
@@ -60,7 +66,9 @@ export abstract class BaseProjectCommand extends AnonymousCommand {
         project.deployAzureStorageJson = JSON.parse(source);
         project.deployAzureStorageJson!.source = source;
       }
-      catch { }
+      catch {
+        throw new CommandError('The file ' + deployAzureStorageJsonPath + ' is not a valid JSON file or is not utf-8 encoded.');
+      }
     }
 
     const packageJsonPath: string = path.join(projectRootPath, 'package.json');
@@ -70,7 +78,9 @@ export abstract class BaseProjectCommand extends AnonymousCommand {
         project.packageJson = JSON.parse(source);
         project.packageJson!.source = source;
       }
-      catch { }
+      catch {
+        throw new CommandError('The file ' + packageJsonPath + ' is not a valid JSON file or is not utf-8 encoded.');
+      }
     }
 
     const packageSolutionJsonPath: string = path.join(projectRootPath, 'config/package-solution.json');
@@ -80,7 +90,9 @@ export abstract class BaseProjectCommand extends AnonymousCommand {
         project.packageSolutionJson = JSON.parse(source);
         project.packageSolutionJson!.source = source;
       }
-      catch { }
+      catch {
+        throw new CommandError('The file ' + packageSolutionJsonPath + ' is not a valid JSON file or is not utf-8 encoded.');
+      }
     }
 
     const serveJsonPath: string = path.join(projectRootPath, 'config/serve.json');
@@ -90,7 +102,9 @@ export abstract class BaseProjectCommand extends AnonymousCommand {
         project.serveJson = JSON.parse(source);
         project.serveJson!.source = source;
       }
-      catch { }
+      catch {
+        throw new CommandError('The file ' + serveJsonPath + ' is not a valid JSON file or is not utf-8 encoded.');
+      }
     }
 
     const tsConfigJsonPath: string = path.join(projectRootPath, 'tsconfig.json');
@@ -100,7 +114,9 @@ export abstract class BaseProjectCommand extends AnonymousCommand {
         project.tsConfigJson = JSON.parse(source);
         project.tsConfigJson!.source = source;
       }
-      catch { }
+      catch {
+        throw new CommandError('The file ' + tsConfigJsonPath + ' is not a valid JSON file or is not utf-8 encoded.');
+      }
     }
 
     const tsLintJsonPath: string = path.join(projectRootPath, 'config/tslint.json');
@@ -110,7 +126,9 @@ export abstract class BaseProjectCommand extends AnonymousCommand {
         project.tsLintJson = JSON.parse(source);
         project.tsLintJson!.source = source;
       }
-      catch { }
+      catch {
+        throw new CommandError('The file ' + tsLintJsonPath + ' is not a valid JSON file or is not utf-8 encoded.');
+      }
     }
 
     const tsLintJsonRootPath: string = path.join(projectRootPath, 'tslint.json');
@@ -120,7 +138,9 @@ export abstract class BaseProjectCommand extends AnonymousCommand {
         project.tsLintJsonRoot = JSON.parse(source);
         project.tsLintJsonRoot!.source = source;
       }
-      catch { }
+      catch {
+        throw new CommandError('The file ' + tsLintJsonRootPath + ' is not a valid JSON file or is not utf-8 encoded.');
+      }
     }
 
     const writeManifestJsonPath: string = path.join(projectRootPath, 'config/write-manifests.json');
@@ -130,7 +150,9 @@ export abstract class BaseProjectCommand extends AnonymousCommand {
         project.writeManifestsJson = JSON.parse(source);
         project.writeManifestsJson!.source = source;
       }
-      catch { }
+      catch {
+        throw new CommandError('The file ' + writeManifestJsonPath + ' is not a valid JSON file or is not utf-8 encoded.');
+      }
     }
 
     const yoRcJsonPath: string = path.join(projectRootPath, '.yo-rc.json');
@@ -140,7 +162,9 @@ export abstract class BaseProjectCommand extends AnonymousCommand {
         project.yoRcJson = JSON.parse(source);
         project.yoRcJson!.source = source;
       }
-      catch { }
+      catch {
+        throw new CommandError('The file ' + yoRcJsonPath + ' is not a valid JSON file or is not utf-8 encoded.');
+      }
     }
 
     const gulpfileJsPath: string = path.join(projectRootPath, 'gulpfile.js');
@@ -163,7 +187,9 @@ export abstract class BaseProjectCommand extends AnonymousCommand {
         project.vsCode.settingsJson = JSON.parse(source);
         project.vsCode.settingsJson!.source = source;
       }
-      catch { }
+      catch {
+        throw new CommandError('The file ' + vsCodeSettingsPath + ' is not a valid JSON file or is not utf-8 encoded.');
+      }
     }
 
     const vsCodeExtensionsPath: string = path.join(projectRootPath, '.vscode', 'extensions.json');
@@ -173,7 +199,9 @@ export abstract class BaseProjectCommand extends AnonymousCommand {
         project.vsCode.extensionsJson = JSON.parse(source);
         project.vsCode.extensionsJson!.source = source;
       }
-      catch { }
+      catch {
+        throw new CommandError('The file ' + vsCodeExtensionsPath + ' is not a valid JSON file or is not utf-8 encoded.');
+      }
     }
 
     const vsCodeLaunchPath: string = path.join(projectRootPath, '.vscode', 'launch.json');
@@ -183,7 +211,9 @@ export abstract class BaseProjectCommand extends AnonymousCommand {
         project.vsCode.launchJson = JSON.parse(source);
         project.vsCode.launchJson!.source = source;
       }
-      catch { }
+      catch {
+        throw new CommandError('The file ' + vsCodeLaunchPath + ' is not a valid JSON file or is not utf-8 encoded.');
+      }
     }
 
     const srcFiles: string[] = fsUtil.readdirR(path.join(projectRootPath, 'src')) as string[];
