@@ -26,7 +26,9 @@ For this method, you need to create a certificate and a new Entra App.
 
 To create a new app with the required permissions, use the following command:
 
-  m365 entra app add --name 'RetirementReportApp' --apisApplication 'https://graph.microsoft.com/Application.Read.All,https://graph.microsoft.com/Sites.Read.All,https://microsoft.sharepoint-df.com/Sites.Manage.All' --certificateFile "C:\Path\To\Certificate.cer" --certificateDisplayName 'Certificate' --grantAdminConsent 
+```sh
+m365 entra app add --name 'RetirementReportApp' --apisApplication 'https://graph.microsoft.com/Application.Read.All,https://graph.microsoft.com/Sites.Read.All,https://microsoft.sharepoint-df.com/Sites.Manage.All' --certificateFile "C:\Path\To\Certificate.cer" --certificateDisplayName 'Certificate' --grantAdminConsent 
+```
 
 <Tabs>
   <TabItem value="PowerShell">
@@ -92,7 +94,7 @@ function GetRetirementStatus {
 
   $m365Status = m365 status --output text
 
-  if ($m365Status -eq "Logged Out") {
+  if ($m365Status -eq "Logged out") {
     # Connection to Microsoft 365
     if ($AuthenticationMethod -eq "DeviceCode") {
       Write-Host "Logging in using DeviceCode authentication"
@@ -129,7 +131,7 @@ function GetRetirementStatus {
           AppName              = $EntraApp.displayName
           AppId                = $EntraApp.appId
           ServicePrincipalType = $EntraApp.servicePrincipalType
-          Created              = $EntraApp.createdDateTime.ToLongDateString()
+          Created              = $EntraApp.createdDateTime?.ToLongDateString()
         }
       }
       return $ResultList
