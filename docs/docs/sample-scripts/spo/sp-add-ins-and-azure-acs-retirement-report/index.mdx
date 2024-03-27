@@ -129,7 +129,7 @@ function GetRetirementStatus {
           AppName              = $EntraApp.displayName
           AppId                = $EntraApp.appId
           ServicePrincipalType = $EntraApp.servicePrincipalType
-          Created              = $EntraApp.createdDateTime.ToLongDateString()
+          Created              = $EntraApp.createdDateTime?.ToLongDateString()
         }
       }
       return $ResultList
