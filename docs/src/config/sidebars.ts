@@ -4469,6 +4469,11 @@ const sidebars: SidebarsConfig = {
       type: 'doc',
       label: 'Pull Request review',
       id: 'contribute/expect-during-pr'
+    },
+    {
+      type: 'doc',
+      label: 'PR checklist',
+      id: 'contribute/pr-checklist'
     }
   ],
   about: [
