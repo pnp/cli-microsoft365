@@ -1,8 +1,7 @@
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
-import request from '../../../../request.js';
+import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
-import { spo } from '../../../../utils/spo.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
@@ -62,11 +61,13 @@ class SpoSiteHubSiteConnectCommand extends SpoCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
-      const res = await spo.getRequestDigest(args.options.siteUrl);
-      const requestOptions: any = {
+      if (this.verbose) {
+        await logger.logToStderr(`Connecting site collection ${args.options.siteUrl} to hub site ${args.options.id}...`);
+      }
+
+      const requestOptions: CliRequestOptions = {
         url: `${args.options.siteUrl}/_api/site/JoinHubSite('${formatting.encodeQueryParameter(args.options.id)}')`,
         headers: {
-          'X-RequestDigest': res.FormDigestValue,
           accept: 'application/json;odata=nometadata'
         },
         responseType: 'json'

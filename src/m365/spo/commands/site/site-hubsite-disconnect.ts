@@ -2,7 +2,6 @@ import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
-import { spo } from '../../../../utils/spo.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
@@ -22,7 +21,7 @@ class SpoSiteHubSiteDisconnectCommand extends SpoCommand {
   }
 
   public get description(): string {
-    return 'Disconnects the specifies site collection from its hub site';
+    return 'Disconnects the specified site collection from its hub site';
   }
 
   constructor() {
@@ -73,16 +72,13 @@ class SpoSiteHubSiteDisconnectCommand extends SpoCommand {
 
   private async disconnectHubSite(logger: Logger, args: CommandArgs): Promise<void> {
     try {
-      const res = await spo.getRequestDigest(args.options.siteUrl);
-
       if (this.verbose) {
-        await logger.logToStderr(`Disconnecting site collection ${args.options.siteUrl} from its hubsite...`);
+        await logger.logToStderr(`Disconnecting site collection ${args.options.siteUrl} from its hub site...`);
       }
 
       const requestOptions: CliRequestOptions = {
         url: `${args.options.siteUrl}/_api/site/JoinHubSite('00000000-0000-0000-0000-000000000000')`,
         headers: {
-          'X-RequestDigest': res.FormDigestValue,
           accept: 'application/json;odata=nometadata'
         },
         responseType: 'json'
