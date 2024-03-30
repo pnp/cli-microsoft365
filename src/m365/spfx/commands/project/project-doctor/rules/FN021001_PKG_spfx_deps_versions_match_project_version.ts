@@ -5,7 +5,7 @@ import { Finding } from '../../report-model/index.js';
 import * as spfxDeps from '../spfx-deps.js';
 
 export class FN021001_PKG_spfx_deps_versions_match_project_version extends JsonRule {
-  constructor() {
+  constructor(private includeDevDeps: boolean = true) {
     super();
   }
 
@@ -51,7 +51,7 @@ export class FN021001_PKG_spfx_deps_versions_match_project_version extends JsonR
       });
     }
 
-    if (project.packageJson.devDependencies) {
+    if (this.includeDevDeps && project.packageJson.devDependencies) {
       const projectDevDeps = Object.keys(project.packageJson.devDependencies);
       this.validateDependencies({
         dependencies: projectDevDeps,
