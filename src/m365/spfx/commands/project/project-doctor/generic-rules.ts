@@ -1,4 +1,3 @@
-import { FN021001_PKG_spfx_deps_versions_match_project_version } from "./rules/FN021001_PKG_spfx_deps_versions_match_project_version.js";
 import { FN021002_PKG_spfx_deps_use_exact_version } from "./rules/FN021002_PKG_spfx_deps_use_exact_version.js";
 import { FN021003_PKG_spfx_deps_installed_as_deps } from "./rules/FN021003_PKG_spfx_deps_installed_as_deps.js";
 import { FN021004_PKG_spfx_devdeps_installed_as_devdeps } from "./rules/FN021004_PKG_spfx_devdeps_installed_as_devdeps.js";
@@ -12,7 +11,6 @@ import { FN021011_PKG_ajv_installed_as_devdep } from "./rules/FN021011_PKG_ajv_i
 import { FN021012_PKG_no_duplicate_pnpjs_deps } from "./rules/FN021012_PKG_no_duplicate_pnpjs_deps.js";
 
 export const rules = [
-  new FN021001_PKG_spfx_deps_versions_match_project_version(),
   new FN021002_PKG_spfx_deps_use_exact_version(),
   new FN021003_PKG_spfx_deps_installed_as_deps(),
   new FN021004_PKG_spfx_devdeps_installed_as_devdeps(),

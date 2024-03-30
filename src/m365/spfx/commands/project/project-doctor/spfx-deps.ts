@@ -20,7 +20,9 @@ export const deps = [
 ];
 
 export const devDeps = [
+  '@microsoft/eslint-config-spfx',
+  '@microsoft/eslint-plugin-spfx',
   '@microsoft/sp-build-web',
-  '@microsoft/sp-module-interfaces', 
+  '@microsoft/sp-module-interfaces',
   '@microsoft/sp-tslint-rules'
 ];
