@@ -39,7 +39,7 @@ class EntraPimRoleAssignmentAddCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'Request activation of an Entra ID role assignment for a user or group';
+    return 'Request activation of an Entra role assignment for a user or group';
   }
 
   constructor() {
@@ -168,7 +168,7 @@ class EntraPimRoleAssignmentAddCommand extends GraphCommand {
     this.optionSets.push({
       options: ['noExpiration', 'endDateTime', 'duration'],
       runsWhen: (args) => {
-        return !args.options.noExpiration && args.options.endDateTime !== undefined || args.options.duration !== undefined;
+        return !!args.options.noExpiration || args.options.endDateTime !== undefined || args.options.duration !== undefined;
       }
     });
     this.optionSets.push({
@@ -252,35 +252,35 @@ class EntraPimRoleAssignmentAddCommand extends GraphCommand {
   }
 
   private async getPrincipalId(options: Options, logger: Logger): Promise<string> {
-    let principalId = options.userId;
+    if (options.userId) {
+      return options.userId;
+    }
 
     if (options.userName) {
       if (this.verbose) {
         await logger.logToStderr(`Retrieving user by its name '${options.userName}'`);
       }
 
-      principalId = await entraUser.getUserIdByUpn(options.userName);
+      return await entraUser.getUserIdByUpn(options.userName);
     }
     else if (options.groupId) {
-      principalId = options.groupId;
+      return options.groupId;
     }
     else if (options.groupName) {
       if (this.verbose) {
         await logger.logToStderr(`Retrieving group by its name '${options.groupName}'`);
       }
 
-      principalId = await entraGroup.getGroupIdByDisplayName(options.groupName);
+      return await entraGroup.getGroupIdByDisplayName(options.groupName);
     }
-    else if (!options.userId) {
+    else {
       if (this.verbose) {
         await logger.logToStderr(`Retrieving id of the current user`);
       }
 
       const token = auth.connection.accessTokens[auth.defaultResource].accessToken;
-      principalId = accessToken.getUserIdFromAccessToken(token);
+      return accessToken.getUserIdFromAccessToken(token);
     }
-
-    return principalId!;
   }
 
   private getExpirationType(options: Options): string {
