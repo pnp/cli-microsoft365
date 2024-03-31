@@ -16,16 +16,16 @@ m365 entra pim role assignment list [options]
 
 ```md definition-list
 `--userId [userId]`
-: Id of the user for which to list role assignments for. Specify either `userId`, `userName`, `groupId` or `groupName`. If not specified, all eligible roles will be listed.
+: Id of the user to list role assignments for. Specify either `userId`, `userName`, `groupId` or `groupName`. If not specified, all assigned roles will be listed.
 
 `--userName [userName]`
-: UPN of the user for which to list role assignments for. Specify either `userId`, `userName`, `groupId` or `groupName`. If not specified, all eligible roles will be listed.
+: UPN of the user to list role assignments for. Specify either `userId`, `userName`, `groupId` or `groupName`. If not specified, all assigned roles will be listed.
 
 `--groupId [groupId]`
-: Id of the group for which to list role assignments for. Specify either `userId`, `userName`, `groupId` or `groupName`. If not specified, all eligible roles will be listed.
+: Id of the group to list role assignments for. Specify either `userId`, `userName`, `groupId` or `groupName`. If not specified, all assigned roles will be listed.
 
 `--groupName [groupName]`
-: Display name of the group for which to list role assignments for. Specify either `userId`, `userName`, `groupId` or `groupName`. If not specified, all eligible roles will be listed.
+: Display name of the group to list role assignments for. Specify either `userId`, `userName`, `groupId` or `groupName`. If not specified, all assigned roles will be listed.
 
 `-s, --startDateTime [startDateTime]`
 : An optional ISO 8601 formatted date filter to search from.
@@ -63,6 +63,78 @@ m365 entra pim role assignment list --includePrincipalDetails
 ```
 
 ## Response
+
+### Standard response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  [
+    {
+      "id": "5wuT_mJe20eRr5jDpJo4sS_FsGECqWlHmgnGYoM1sApj5okazO8RSY336VRxQAXe-2",
+      "principalId": "61b0c52f-a902-4769-9a09-c6628335b00a",
+      "roleDefinitionId": "fe930be7-5e62-47db-91af-98c3a49a38b1",
+      "directoryScopeId": "/administrativeUnits/1a89e663-efcc-4911-8df7-e954714005de",
+      "appScopeId": null,
+      "startDateTime": "2023-11-15T12:24:32.773Z",
+      "endDateTime": null,
+      "assignmentType": "Assigned",
+      "memberType": "Direct",
+      "roleAssignmentOriginId": "5wuT_mJe20eRr5jDpJo4sS_FsGECqWlHmgnGYoM1sApj5okazO8RSY336VRxQAXe-2",
+      "roleAssignmentScheduleId": "36bd668f-3a40-455f-a40a-64074fde4a18"
+    }
+  ]
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  id                                                                  principalId                           roleDefinitionId                      directoryScopeId                                           appScopeId  startDateTime             endDateTime  assignmentType  memberType  roleAssignmentOriginId                                              roleAssignmentScheduleId
+  ------------------------------------------------------------------  ------------------------------------  ------------------------------------  ---------------------------------------------------------  ----------  ------------------------  -----------  --------------  ----------  ------------------------------------------------------------------  ------------------------------------------------------------------
+  5wuT_mJe20eRr5jDpJo4sS_FsGECqWlHmgnGYoM1sApj5okazO8RSY336VRxQAXe-2  61b0c52f-a902-4769-9a09-c6628335b00a  fe930be7-5e62-47db-91af-98c3a49a38b1  /administrativeUnits/1a89e663-efcc-4911-8df7-e954714005de  null        2023-11-15T12:24:32.773Z  null         Assigned        Direct      5wuT_mJe20eRr5jDpJo4sS_FsGECqWlHmgnGYoM1sApj5okazO8RSY336VRxQAXe-2  36bd668f-3a40-455f-a40a-64074fde4a18
+  5wuT_mJe20eRr5jDpJo4seCabNh9bS9BgvTNJIBCEKw-1                       d86c9ae0-6d7d-412f-82f4-cd24804210ac  fe930be7-5e62-47db-91af-98c3a49a38b1  /                                                          null        2024-02-12T08:47:02.91Z   null         Assigned        Direct      5wuT_mJe20eRr5jDpJo4seCabNh9bS9BgvTNJIBCEKw-1                       5f2c16a0-4212-4fa2-afae-fc8bfdc527b6
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  id,principalId,roleDefinitionId,directoryScopeId,appScopeId,startDateTime,endDateTime,assignmentType,memberType,roleAssignmentOriginId,roleAssignmentScheduleId
+  5wuT_mJe20eRr5jDpJo4sS_FsGECqWlHmgnGYoM1sApj5okazO8RSY336VRxQAXe-2,61b0c52f-a902-4769-9a09-c6628335b00a,fe930be7-5e62-47db-91af-98c3a49a38b1,/administrativeUnits/1a89e663-efcc-4911-8df7-e954714005de,,2023-11-15T12:24:32.773Z,,Assigned,Direct,5wuT_mJe20eRr5jDpJo4sS_FsGECqWlHmgnGYoM1sApj5okazO8RSY336VRxQAXe-2,36bd668f-3a40-455f-a40a-64074fde4a18
+  5wuT_mJe20eRr5jDpJo4seCabNh9bS9BgvTNJIBCEKw-1,d86c9ae0-6d7d-412f-82f4-cd24804210ac,fe930be7-5e62-47db-91af-98c3a49a38b1,/,,2024-02-12T08:47:02.91Z,,Assigned,Direct,5wuT_mJe20eRr5jDpJo4seCabNh9bS9BgvTNJIBCEKw-1,5f2c16a0-4212-4fa2-afae-fc8bfdc527b6
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # entra pim role assignment list
+
+  Date: 2/23/2024
+
+  ## 5wuT_mJe20eRr5jDpJo4sS_FsGECqWlHmgnGYoM1sApj5okazO8RSY336VRxQAXe-2
+
+  Property | Value
+  ---------|-------
+  id | 5wuT\_mJe20eRr5jDpJo4sS\_FsGECqWlHmgnGYoM1sApj5okazO8RSY336VRxQAXe-2
+  principalId | 61b0c52f-a902-4769-9a09-c6628335b00a
+  roleDefinitionId | fe930be7-5e62-47db-91af-98c3a49a38b1
+  directoryScopeId | /administrativeUnits/1a89e663-efcc-4911-8df7-e954714005de
+  startDateTime | 2023-11-15T12:24:32.773Z
+  assignmentType | Assigned
+  memberType | Direct
+  roleAssignmentOriginId | 5wuT\_mJe20eRr5jDpJo4sS\_FsGECqWlHmgnGYoM1sApj5okazO8RSY336VRxQAXe-2
+  roleAssignmentScheduleId | 36bd668f-3a40-455f-a40a-64074fde4a18
+  ```
+
+  </TabItem>
+</Tabs>
+
+### `includePrincipalDetails` response
+
+When we make use of the option `includePrincipalDetails` the response will differ. 
 
 <Tabs>
   <TabItem value="JSON">

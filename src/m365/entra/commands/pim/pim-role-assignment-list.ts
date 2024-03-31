@@ -36,6 +36,7 @@ class EntraPimRoleAssignmentListCommand extends GraphCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initOptionSets();
   }
 
   #initTelemetry(): void {
@@ -89,42 +90,25 @@ class EntraPimRoleAssignmentListCommand extends GraphCommand {
           return `${args.options.startDateTime} is not a valid ISO 8601 date time string`;
         }
 
-        if (args.options.userId && args.options.userName || args.options.userId && args.options.groupId ||
-          args.options.userId && args.options.groupName || args.options.userName && args.options.groupId ||
-          args.options.userName && args.options.groupName || args.options.groupId && args.options.groupName) {
-          return `Specify either userId, userName, groupId or groupName.`;
-        }
-
         return true;
       }
     );
   }
 
+  #initOptionSets(): void {
+    this.optionSets.push({
+      options: ['userId', 'userName', 'groupId', 'groupName'],
+      runsWhen: (args) => args.options.userId || args.options.userName || args.options.groupId || args.options.groupName
+    });
+  }
+
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    let principalId = args.options.userId;
+    const queryParameters: string[] = [];
+    const filters: string[] = [];
 
-    try {
-      const queryParameters: string[] = [];
-
-      if (args.options.userName) {
-        if (this.verbose) {
-          await logger.logToStderr(`Retrieving user by its name '${args.options.userName}'`);
-        }
-
-        principalId = await entraUser.getUserIdByUpn(args.options.userName);
-      }
-      else if (args.options.groupId) {
-        principalId = args.options.groupId;
-      }
-      else if (args.options.groupName) {
-        if (this.verbose) {
-          await logger.logToStderr(`Retrieving group by its name '${args.options.groupName}'`);
-        }
-
-        principalId = await entraGroup.getGroupIdByDisplayName(args.options.groupName);
-      }
-      
-      const filters: string[] = [];
+    try {     
+      const principalId = await this.getPrincipalId(logger, args.options);
+            
       if (principalId) {
         filters.push(`principalId eq '${principalId}'`);
       }
@@ -154,6 +138,30 @@ class EntraPimRoleAssignmentListCommand extends GraphCommand {
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
+  }
+
+  private async getPrincipalId(logger: Logger, options: Options): Promise<string | undefined> {
+    let principalId = options.userId;
+
+    if (options.userName) {
+      if (this.verbose) {
+        await logger.logToStderr(`Retrieving user by its name '${options.userName}'`);
+      }
+
+      principalId = await entraUser.getUserIdByUpn(options.userName);
+    }
+    else if (options.groupId) {
+      principalId = options.groupId;
+    }
+    else if (options.groupName) {
+      if (this.verbose) {
+        await logger.logToStderr(`Retrieving group by its name '${options.groupName}'`);
+      }
+
+      principalId = await entraGroup.getGroupIdByDisplayName(options.groupName);
+    }
+
+    return principalId;
   }
 }
 

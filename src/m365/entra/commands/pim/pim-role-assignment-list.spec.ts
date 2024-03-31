@@ -147,7 +147,6 @@ describe(commands.PIM_ROLE_ASSIGNMENT_LIST, () => {
     ]);
   });
 
-
   after(() => {
     sinon.restore();
     auth.connection.active = false;
@@ -188,36 +187,6 @@ describe(commands.PIM_ROLE_ASSIGNMENT_LIST, () => {
 
   it('fails validation when startDateTime is not a valid ISO 8601 date', async () => {
     const actual = await command.validate({ options: { startDateTime: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation when both userId and userName are specified', async () => {
-    const actual = await command.validate({ options: { userId: userId, userName: userName } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation when both userId and groupId are specified', async () => {
-    const actual = await command.validate({ options: { userId: userId, groupId: groupId } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation when both userId and groupName are specified', async () => {
-    const actual = await command.validate({ options: { userId: userId, groupName: groupName } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation when both userName and groupId are specified', async () => {
-    const actual = await command.validate({ options: { userName: userName, groupId: groupId } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation when both userName and groupName are specified', async () => {
-    const actual = await command.validate({ options: { userName: userName, groupName: groupName } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation when both groupId and groupName are specified', async () => {
-    const actual = await command.validate({ options: { groupId: groupId, groupName: groupName } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
