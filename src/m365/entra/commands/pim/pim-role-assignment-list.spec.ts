@@ -34,7 +34,10 @@ describe(commands.PIM_ROLE_ASSIGNMENT_LIST, () => {
       "assignmentType": "Assigned",
       "memberType": "Direct",
       "roleAssignmentOriginId": "5wuT_mJe20eRr5jDpJo4sS_FsGECqWlHmgnGYoM1sApj5okazO8RSY336VRxQAXe-2",
-      "roleAssignmentScheduleId": "36bd668f-3a40-455f-a40a-64074fde4a18"
+      "roleAssignmentScheduleId": "36bd668f-3a40-455f-a40a-64074fde4a18",
+      "roleDefinition": {
+        "displayName": "User Administrator"
+      }
     },
     {
       "id": "5wuT_mJe20eRr5jDpJo4seCabNh9bS9BgvTNJIBCEKw-1",
@@ -47,7 +50,10 @@ describe(commands.PIM_ROLE_ASSIGNMENT_LIST, () => {
       "assignmentType": "Assigned",
       "memberType": "Direct",
       "roleAssignmentOriginId": "5wuT_mJe20eRr5jDpJo4seCabNh9bS9BgvTNJIBCEKw-1",
-      "roleAssignmentScheduleId": "5f2c16a0-4212-4fa2-afae-fc8bfdc527b6"
+      "roleAssignmentScheduleId": "5f2c16a0-4212-4fa2-afae-fc8bfdc527b6",
+      "roleDefinition": {
+        "displayName": "SharePoint Administrator"
+      }
     }
   ];
 
@@ -64,6 +70,9 @@ describe(commands.PIM_ROLE_ASSIGNMENT_LIST, () => {
       "memberType": "Direct",
       "roleAssignmentOriginId": "5wuT_mJe20eRr5jDpJo4seCabNh9bS9BgvTNJIBCEKw-1",
       "roleAssignmentScheduleId": "5f2c16a0-4212-4fa2-afae-fc8bfdc527b6",
+      "roleDefinition": {
+        "displayName": "SharePoint Administrator"
+      },
       "principal": {
         "id": "1caf7dcd-7e83-4c3a-94f7-932a1299c844",
         "displayName": "SharePoint Administrators",
@@ -192,7 +201,7 @@ describe(commands.PIM_ROLE_ASSIGNMENT_LIST, () => {
 
   it('should get a list of role assignments', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/roleManagement/directory/roleAssignmentScheduleInstances`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/roleManagement/directory/roleAssignmentScheduleInstances?$expand=roleDefinition($select=displayName)`) {
         return {
           value: unifiedRoleAssignmentScheduleInstanceResponse
         };
@@ -208,7 +217,7 @@ describe(commands.PIM_ROLE_ASSIGNMENT_LIST, () => {
 
   it('should get a list of role assignments for a user specified by id', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/roleManagement/directory/roleAssignmentScheduleInstances?$filter=principalId eq '${userId}'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/roleManagement/directory/roleAssignmentScheduleInstances?$filter=principalId eq '${userId}'&$expand=roleDefinition($select=displayName)`) {
         return {
           value: [
             unifiedRoleAssignmentScheduleInstanceResponse[0]
@@ -227,7 +236,7 @@ describe(commands.PIM_ROLE_ASSIGNMENT_LIST, () => {
   it('should get a list of role assignments for a user specified by name', async () => {
     sinon.stub(entraUser, 'getUserIdByUpn').withArgs(userName).resolves(userId);
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/roleManagement/directory/roleAssignmentScheduleInstances?$filter=principalId eq '${userId}'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/roleManagement/directory/roleAssignmentScheduleInstances?$filter=principalId eq '${userId}'&$expand=roleDefinition($select=displayName)`) {
         return {
           value: [
             unifiedRoleAssignmentScheduleInstanceResponse[0]
@@ -245,7 +254,7 @@ describe(commands.PIM_ROLE_ASSIGNMENT_LIST, () => {
 
   it('should get a list of role assignments for a group specified by id', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/roleManagement/directory/roleAssignmentScheduleInstances?$filter=principalId eq '${groupId}'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/roleManagement/directory/roleAssignmentScheduleInstances?$filter=principalId eq '${groupId}'&$expand=roleDefinition($select=displayName)`) {
         return {
           value: [
             unifiedRoleAssignmentScheduleInstanceResponse[1]
@@ -264,7 +273,7 @@ describe(commands.PIM_ROLE_ASSIGNMENT_LIST, () => {
   it('should get a list of role assignments for a group specified by name', async () => {
     sinon.stub(entraGroup, 'getGroupIdByDisplayName').withArgs(groupName).resolves(groupId);
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/roleManagement/directory/roleAssignmentScheduleInstances?$filter=principalId eq '${groupId}'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/roleManagement/directory/roleAssignmentScheduleInstances?$filter=principalId eq '${groupId}'&$expand=roleDefinition($select=displayName)`) {
         return {
           value: [
             unifiedRoleAssignmentScheduleInstanceResponse[1]
@@ -282,7 +291,7 @@ describe(commands.PIM_ROLE_ASSIGNMENT_LIST, () => {
 
   it('should get a list of role assignments from specified start date', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/roleManagement/directory/roleAssignmentScheduleInstances?$filter=startDateTime ge ${startDateTime}`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/roleManagement/directory/roleAssignmentScheduleInstances?$filter=startDateTime ge ${startDateTime}&$expand=roleDefinition($select=displayName)`) {
         return {
           value: [
             unifiedRoleAssignmentScheduleInstanceResponse[1]
@@ -300,7 +309,7 @@ describe(commands.PIM_ROLE_ASSIGNMENT_LIST, () => {
 
   it('should get a list of role assignments for a user specified by id from specified start date', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/roleManagement/directory/roleAssignmentScheduleInstances?$filter=principalId eq '${userId}' and startDateTime ge ${startDateTime}`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/roleManagement/directory/roleAssignmentScheduleInstances?$filter=principalId eq '${userId}' and startDateTime ge ${startDateTime}&$expand=roleDefinition($select=displayName)`) {
         return {
           value: [
             unifiedRoleAssignmentScheduleInstanceResponse[1]
@@ -318,7 +327,7 @@ describe(commands.PIM_ROLE_ASSIGNMENT_LIST, () => {
 
   it('should get a list of role assignments with details about principal that were assigned', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/roleManagement/directory/roleAssignmentScheduleInstances?$expand=principal`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/roleManagement/directory/roleAssignmentScheduleInstances?$expand=roleDefinition($select=displayName),principal`) {
         return {
           value: unifiedRoleAssignmentScheduleInstanceWithPrincipalResponse
         };
@@ -335,7 +344,7 @@ describe(commands.PIM_ROLE_ASSIGNMENT_LIST, () => {
   it('should get a list of role assignments for a group specified by name from specified start date with details about principal that were assigned', async () => {
     sinon.stub(entraGroup, 'getGroupIdByDisplayName').withArgs(groupName).resolves(groupId);
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/roleManagement/directory/roleAssignmentScheduleInstances?$filter=principalId eq '${groupId}' and startDateTime ge ${startDateTime}&$expand=principal`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/roleManagement/directory/roleAssignmentScheduleInstances?$filter=principalId eq '${groupId}' and startDateTime ge ${startDateTime}&$expand=roleDefinition($select=displayName),principal`) {
         return {
           value: unifiedRoleAssignmentScheduleInstanceWithPrincipalResponse
         };
@@ -351,7 +360,7 @@ describe(commands.PIM_ROLE_ASSIGNMENT_LIST, () => {
 
   it('handles error when retrieving role assignments failed', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/roleManagement/directory/roleAssignmentScheduleInstances`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/roleManagement/directory/roleAssignmentScheduleInstances?$expand=roleDefinition($select=displayName)`) {
         throw { error: { message: 'An error has occurred' } };
       }
       throw `Invalid request`;

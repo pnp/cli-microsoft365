@@ -82,7 +82,10 @@ m365 entra pim role assignment list --includePrincipalDetails
       "assignmentType": "Assigned",
       "memberType": "Direct",
       "roleAssignmentOriginId": "5wuT_mJe20eRr5jDpJo4sS_FsGECqWlHmgnGYoM1sApj5okazO8RSY336VRxQAXe-2",
-      "roleAssignmentScheduleId": "36bd668f-3a40-455f-a40a-64074fde4a18"
+      "roleAssignmentScheduleId": "36bd668f-3a40-455f-a40a-64074fde4a18",
+      "roleDefinition": {
+        "displayName": "User Administrator"
+      }
     }
   ]
   ```
@@ -91,10 +94,10 @@ m365 entra pim role assignment list --includePrincipalDetails
   <TabItem value="Text">
 
   ```text
-  id                                                                  principalId                           roleDefinitionId                      directoryScopeId                                           appScopeId  startDateTime             endDateTime  assignmentType  memberType  roleAssignmentOriginId                                              roleAssignmentScheduleId
-  ------------------------------------------------------------------  ------------------------------------  ------------------------------------  ---------------------------------------------------------  ----------  ------------------------  -----------  --------------  ----------  ------------------------------------------------------------------  ------------------------------------------------------------------
-  5wuT_mJe20eRr5jDpJo4sS_FsGECqWlHmgnGYoM1sApj5okazO8RSY336VRxQAXe-2  61b0c52f-a902-4769-9a09-c6628335b00a  fe930be7-5e62-47db-91af-98c3a49a38b1  /administrativeUnits/1a89e663-efcc-4911-8df7-e954714005de  null        2023-11-15T12:24:32.773Z  null         Assigned        Direct      5wuT_mJe20eRr5jDpJo4sS_FsGECqWlHmgnGYoM1sApj5okazO8RSY336VRxQAXe-2  36bd668f-3a40-455f-a40a-64074fde4a18
-  5wuT_mJe20eRr5jDpJo4seCabNh9bS9BgvTNJIBCEKw-1                       d86c9ae0-6d7d-412f-82f4-cd24804210ac  fe930be7-5e62-47db-91af-98c3a49a38b1  /                                                          null        2024-02-12T08:47:02.91Z   null         Assigned        Direct      5wuT_mJe20eRr5jDpJo4seCabNh9bS9BgvTNJIBCEKw-1                       5f2c16a0-4212-4fa2-afae-fc8bfdc527b6
+  id                                                                  principalId                           roleDefinitionId                      directoryScopeId                                           appScopeId  startDateTime             endDateTime  assignmentType  memberType  roleAssignmentOriginId                                              roleAssignmentScheduleId                                            roleDefinition
+  ------------------------------------------------------------------  ------------------------------------  ------------------------------------  ---------------------------------------------------------  ----------  ------------------------  -----------  --------------  ----------  ------------------------------------------------------------------  ------------------------------------------------------------------  ---------------
+  5wuT_mJe20eRr5jDpJo4sS_FsGECqWlHmgnGYoM1sApj5okazO8RSY336VRxQAXe-2  61b0c52f-a902-4769-9a09-c6628335b00a  fe930be7-5e62-47db-91af-98c3a49a38b1  /administrativeUnits/1a89e663-efcc-4911-8df7-e954714005de  null        2023-11-15T12:24:32.773Z  null         Assigned        Direct      5wuT_mJe20eRr5jDpJo4sS_FsGECqWlHmgnGYoM1sApj5okazO8RSY336VRxQAXe-2  36bd668f-3a40-455f-a40a-64074fde4a18                                [object Object]
+  5wuT_mJe20eRr5jDpJo4seCabNh9bS9BgvTNJIBCEKw-1                       d86c9ae0-6d7d-412f-82f4-cd24804210ac  fe930be7-5e62-47db-91af-98c3a49a38b1  /                                                          null        2024-02-12T08:47:02.91Z   null         Assigned        Direct      5wuT_mJe20eRr5jDpJo4seCabNh9bS9BgvTNJIBCEKw-1                       5f2c16a0-4212-4fa2-afae-fc8bfdc527b6                                [object Object]
   ```
 
   </TabItem>
@@ -153,6 +156,9 @@ When we make use of the option `includePrincipalDetails` the response will diffe
       "memberType": "Direct",
       "roleAssignmentOriginId": "5wuT_mJe20eRr5jDpJo4sS_FsGECqWlHmgnGYoM1sApj5okazO8RSY336VRxQAXe-2",
       "roleAssignmentScheduleId": "36bd668f-3a40-455f-a40a-64074fde4a18",
+      "roleDefinition": {
+        "displayName": "User Administrator"
+      },
       "principal": {
         "id": "61b0c52f-a902-4769-9a09-c6628335b00a",
         "displayName": "Adele Vance",
@@ -176,10 +182,10 @@ When we make use of the option `includePrincipalDetails` the response will diffe
   <TabItem value="Text">
 
   ```text
-  id                                                                  principalId                           roleDefinitionId                      directoryScopeId                                           appScopeId  startDateTime             endDateTime  assignmentType  memberType  roleAssignmentOriginId                                              roleAssignmentScheduleId                                            principal
-  ------------------------------------------------------------------  ------------------------------------  ------------------------------------  ---------------------------------------------------------  ----------  ------------------------  -----------  --------------  ----------  ------------------------------------------------------------------  ------------------------------------------------------------------  ---------------
-  5wuT_mJe20eRr5jDpJo4sS_FsGECqWlHmgnGYoM1sApj5okazO8RSY336VRxQAXe-2  61b0c52f-a902-4769-9a09-c6628335b00a  fe930be7-5e62-47db-91af-98c3a49a38b1  /administrativeUnits/1a89e663-efcc-4911-8df7-e954714005de  null        2023-11-15T12:24:32.773Z  null         Assigned        Direct      5wuT_mJe20eRr5jDpJo4sS_FsGECqWlHmgnGYoM1sApj5okazO8RSY336VRxQAXe-2  36bd668f-3a40-455f-a40a-64074fde4a18                                [object Object]
-  5wuT_mJe20eRr5jDpJo4seCabNh9bS9BgvTNJIBCEKw-1                       d86c9ae0-6d7d-412f-82f4-cd24804210ac  fe930be7-5e62-47db-91af-98c3a49a38b1  /                                                          null        2024-02-12T08:47:02.91Z   null         Assigned        Direct      5wuT_mJe20eRr5jDpJo4seCabNh9bS9BgvTNJIBCEKw-1                       5f2c16a0-4212-4fa2-afae-fc8bfdc527b6                                [object Object]
+  id                                                                  principalId                           roleDefinitionId                      directoryScopeId                                           appScopeId  startDateTime             endDateTime  assignmentType  memberType  roleAssignmentOriginId                                              roleAssignmentScheduleId                                            roleDefinition   principal
+  ------------------------------------------------------------------  ------------------------------------  ------------------------------------  ---------------------------------------------------------  ----------  ------------------------  -----------  --------------  ----------  ------------------------------------------------------------------  ------------------------------------------------------------------  ---------------  ---------------
+  5wuT_mJe20eRr5jDpJo4sS_FsGECqWlHmgnGYoM1sApj5okazO8RSY336VRxQAXe-2  61b0c52f-a902-4769-9a09-c6628335b00a  fe930be7-5e62-47db-91af-98c3a49a38b1  /administrativeUnits/1a89e663-efcc-4911-8df7-e954714005de  null        2023-11-15T12:24:32.773Z  null         Assigned        Direct      5wuT_mJe20eRr5jDpJo4sS_FsGECqWlHmgnGYoM1sApj5okazO8RSY336VRxQAXe-2  36bd668f-3a40-455f-a40a-64074fde4a18                                [object Object]  [object Object]
+  5wuT_mJe20eRr5jDpJo4seCabNh9bS9BgvTNJIBCEKw-1                       d86c9ae0-6d7d-412f-82f4-cd24804210ac  fe930be7-5e62-47db-91af-98c3a49a38b1  /                                                          null        2024-02-12T08:47:02.91Z   null         Assigned        Direct      5wuT_mJe20eRr5jDpJo4seCabNh9bS9BgvTNJIBCEKw-1                       5f2c16a0-4212-4fa2-afae-fc8bfdc527b6                                [object Object]  [object Object]
   ```
 
   </TabItem>

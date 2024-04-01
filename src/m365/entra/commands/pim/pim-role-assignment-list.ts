@@ -105,6 +105,7 @@ class EntraPimRoleAssignmentListCommand extends GraphCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const queryParameters: string[] = [];
     const filters: string[] = [];
+    const expands: string[] = [];
 
     try {     
       const principalId = await this.getPrincipalId(logger, args.options);
@@ -121,13 +122,15 @@ class EntraPimRoleAssignmentListCommand extends GraphCommand {
         queryParameters.push(`$filter=${filters.join(' and ')}`);
       }
 
+      expands.push('roleDefinition($select=displayName)');
+
       if (args.options.includePrincipalDetails) {
-        queryParameters.push('$expand=principal');
+        expands.push('principal');
       }
 
-      const queryString = queryParameters.length > 0
-        ? `?${queryParameters.join('&')}`
-        : '';
+      queryParameters.push(`$expand=${expands.join(',')}`);
+
+      const queryString = `?${queryParameters.join('&')}`;
 
       const url = `${this.resource}/v1.0/roleManagement/directory/roleAssignmentScheduleInstances${queryString}`;
 
