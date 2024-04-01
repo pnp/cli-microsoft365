@@ -136,14 +136,7 @@ class SetupCommand extends AnonymousCommand {
     preferences.experience = await cli.promptForSelection(experienceConfig);
 
     const summaryConfig: ConfirmationConfig = {
-      // invoked by inquirer
-      /* c8 ignore next 6 */
-      message: async (): Promise<string> => {
-        settings = this.getSettings(preferences);
-
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        return this.getSummaryMessage(settings);
-      }
+      message: this.getSummaryMessage(this.getSettings(preferences))
     };
     preferences.summary = await cli.promptForConfirmation(summaryConfig);
 
