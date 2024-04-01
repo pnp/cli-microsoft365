@@ -275,6 +275,11 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
+              label: 'app permission remove',
+              id: 'cmd/entra/app/app-permission-remove'
+            },
+            {
+              type: 'doc',
               label: 'app role add',
               id: 'cmd/entra/app/app-role-add'
             },
