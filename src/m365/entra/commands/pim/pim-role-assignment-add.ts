@@ -186,21 +186,17 @@ class EntraPimRoleAssignmentAddCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    let action = 'adminAssign';
-
+    const { userId, userName, groupId, groupName, startDateTime, endDateTime, ticketNumber, ticketSystem } = args.options;
     try {
       const token = auth.connection.accessTokens[auth.defaultResource].accessToken;
       const isAppOnlyAccessToken = accessToken.isAppOnlyAccessToken(token);
+
       if (isAppOnlyAccessToken) {
         throw 'When running with application permissions either userId, userName, groupId or groupName is required';
       }
 
       const roleDefinitionId = await this.getRoleDefinitionId(args.options, logger);
       const principalId = await this.getPrincipalId(args.options, logger);
-
-      if (!args.options.userId && !args.options.userName && !args.options.groupId && !args.options.groupName) {
-        action = 'selfActivate';
-      }
 
       const requestOptions: CliRequestOptions = {
         url: `${this.resource}/v1.0/roleManagement/directory/roleAssignmentScheduleRequests`,
@@ -212,19 +208,19 @@ class EntraPimRoleAssignmentAddCommand extends GraphCommand {
           principalId: principalId,
           roleDefinitionId: roleDefinitionId,
           directoryScopeId: this.getDirectoryScope(args.options),
-          action: action,
+          action: !userId && !userName && !groupId && !groupName ? 'selfActivate' : 'adminAssign',
           justification: args.options.justification,
           scheduleInfo: {
-            startDateTime: args.options.startDateTime,
+            startDateTime: startDateTime,
             expiration: {
               duration: this.getDuration(args.options),
-              endDateTime: args.options.endDateTime,
+              endDateTime: endDateTime,
               type: this.getExpirationType(args.options)
             }
           },
           ticketInfo: {
-            ticketNumber: args.options.ticketNumber,
-            ticketSystem: args.options.ticketSystem
+            ticketNumber: ticketNumber,
+            ticketSystem: ticketSystem
           }
         }
       };
@@ -252,8 +248,8 @@ class EntraPimRoleAssignmentAddCommand extends GraphCommand {
   }
 
   private async getPrincipalId(options: Options, logger: Logger): Promise<string> {
-    if (options.userId) {
-      return options.userId;
+    if (options.userId || options.groupId) {
+      return options.userId! || options.groupId!;
     }
 
     if (options.userName) {
@@ -263,9 +259,6 @@ class EntraPimRoleAssignmentAddCommand extends GraphCommand {
 
       return await entraUser.getUserIdByUpn(options.userName);
     }
-    else if (options.groupId) {
-      return options.groupId;
-    }
     else if (options.groupName) {
       if (this.verbose) {
         await logger.logToStderr(`Retrieving group by its name '${options.groupName}'`);
@@ -273,14 +266,13 @@ class EntraPimRoleAssignmentAddCommand extends GraphCommand {
 
       return await entraGroup.getGroupIdByDisplayName(options.groupName);
     }
-    else {
-      if (this.verbose) {
-        await logger.logToStderr(`Retrieving id of the current user`);
-      }
 
-      const token = auth.connection.accessTokens[auth.defaultResource].accessToken;
-      return accessToken.getUserIdFromAccessToken(token);
+    if (this.verbose) {
+      await logger.logToStderr(`Retrieving id of the current user`);
     }
+
+    const token = auth.connection.accessTokens[auth.defaultResource].accessToken;
+    return accessToken.getUserIdFromAccessToken(token);
   }
 
   private getExpirationType(options: Options): string {
