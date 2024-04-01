@@ -17,6 +17,7 @@ export default {
   APP_SET: `${prefix} app set`,
   APP_PERMISSION_ADD: `${prefix} app permission add`,
   APP_PERMISSION_LIST: `${prefix} app permission list`,
+  APP_PERMISSION_REMOVE: `${prefix} app permission remove`,
   APP_ROLE_ADD: `${prefix} app role add`,
   APP_ROLE_LIST: `${prefix} app role list`,
   APP_ROLE_REMOVE: `${prefix} app role remove`,
