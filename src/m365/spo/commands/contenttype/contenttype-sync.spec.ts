@@ -110,7 +110,7 @@ describe(commands.CONTENTTYPE_SYNC, () => {
     });
 
     await command.action(logger, { options: { webUrl: webUrl, id: contentTypeId, verbose: true } } as any);
-    assert(loggerLogSpy.calledWith(syncResponse));
+    assert(loggerLogSpy.calledOnceWithExactly(syncResponse));
   });
 
   it('succesfully sync a content type to the site by name', async () => {
@@ -131,7 +131,7 @@ describe(commands.CONTENTTYPE_SYNC, () => {
     });
 
     await command.action(logger, { options: { webUrl: webUrl, name: contentTypeName, verbose: true } } as any);
-    assert(loggerLogSpy.calledWith(syncResponse));
+    assert(loggerLogSpy.calledOnceWithExactly(syncResponse));
   });
 
   it('succesfully sync a content type to a list by listId', async () => {
@@ -153,7 +153,7 @@ describe(commands.CONTENTTYPE_SYNC, () => {
     });
 
     await command.action(logger, { options: { webUrl: url, name: contentTypeName, listId: listId, verbose: true } } as any);
-    assert(loggerLogSpy.calledWith(syncResponse));
+    assert(loggerLogSpy.calledOnceWithExactly(syncResponse));
   });
 
   it('succesfully sync a content type to a list by listTitle', async () => {
@@ -166,7 +166,7 @@ describe(commands.CONTENTTYPE_SYNC, () => {
     });
 
     await command.action(logger, { options: { webUrl: webUrl, id: contentTypeId, listTitle: listTitle, verbose: true } } as any);
-    assert(loggerLogSpy.calledWith(syncResponse));
+    assert(loggerLogSpy.calledOnceWithExactly(syncResponse));
   });
 
   it('succesfully sync a content type to a list by listUrl', async () => {
@@ -187,7 +187,7 @@ describe(commands.CONTENTTYPE_SYNC, () => {
     });
 
     await command.action(logger, { options: { webUrl: webUrl, id: contentTypeId, listUrl: listUrl, verbose: true } } as any);
-    assert(loggerLogSpy.calledWith(syncResponse));
+    assert(loggerLogSpy.calledOnceWithExactly(syncResponse));
   });
 
   it('correctly handles contentType not found in the hub', async () => {

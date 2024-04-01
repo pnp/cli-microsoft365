@@ -125,11 +125,7 @@ class SpoContentTypeSyncCommand extends SpoCommand {
         listUrl = `/lists/${args.options.listId || args.options.listTitle || await this.getListIdByUrl(args.options.webUrl, args.options.listUrl!, logger)}`;
       }
 
-      if (this.verbose) {
-        await logger.logToStderr(`Retrieving content type ID...`);
-      }
-
-      const contentTypeId = args.options.id || await this.getContentTypeId(baseUrl, url, args.options.name!, logger);
+      const contentTypeId = await this.getContentTypeId(baseUrl, url, args.options, logger);
 
       const requestOptions: CliRequestOptions = {
         url: `${baseUrl}${siteUrl}${listUrl}/contenttypes/addCopyFromContentTypeHub`,
@@ -150,23 +146,29 @@ class SpoContentTypeSyncCommand extends SpoCommand {
     }
   }
 
-  private async getContentTypeId(baseUrl: string, url: URL, name: string, logger: Logger): Promise<string> {
+  private async getContentTypeId(baseUrl: string, url: URL, options: Options, logger: Logger): Promise<string> {
+    if (this.verbose) {
+      await logger.logToStderr(`Retrieving content type ID...`);
+    }
+
+    if (options.id) {
+      return options.id;
+    }
+
     if (this.verbose) {
       await logger.logToStderr(`Retrieving site id of content type hub...`);
     }
 
-    // First retrieve the id of the content type hub site
     const siteId = await spo.getSiteId(`${url.origin}/sites/contenttypehub`, logger, this.verbose);
 
     if (this.verbose) {
-      await logger.logToStderr(`Content type hub id obtained. Time to retrieve the content type id based on the name...`);
+      await logger.logToStderr(`Retrieving content type Id by name...`);
     }
 
-    // Retrieve the content type from the hub site
-    const contentTypes: { id: string }[] = await odata.getAllItems(`${baseUrl}${siteId}/contenttypes?$filter=name eq '${name}'&$select=id,name`);
+    const contentTypes: { id: string }[] = await odata.getAllItems(`${baseUrl}${siteId}/contenttypes?$filter=name eq '${options.name}'&$select=id,name`);
 
     if (contentTypes.length === 0) {
-      throw `Content type with name ${name} not found.`;
+      throw `Content type with name ${options.name} not found.`;
     }
 
     return contentTypes[0].id;
