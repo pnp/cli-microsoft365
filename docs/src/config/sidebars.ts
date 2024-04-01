@@ -4216,6 +4216,11 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'user app remove',
               id: 'cmd/teams/user/user-app-remove'
+            },
+            {
+              type: 'doc',
+              label: 'user app upgrade',
+              id: 'cmd/teams/user/user-app-upgrade'
             }
           ]
         }

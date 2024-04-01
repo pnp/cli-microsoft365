@@ -3,6 +3,7 @@ import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
+import { odata } from '../../../../utils/odata.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
@@ -18,13 +19,13 @@ interface Options extends GlobalOptions {
   userName?: string;
 }
 
-class TeamsUserAppAddCommand extends GraphCommand {
+class TeamsUserAppUpgradeCommand extends GraphCommand {
   public get name(): string {
-    return commands.USER_APP_ADD;
+    return commands.USER_APP_UPGRADE;
   }
 
   public get description(): string {
-    return 'Install an app in the personal scope of the specified user';
+    return 'Upgrade an app in the personal scope of the specified user';
   }
 
   constructor() {
@@ -34,6 +35,7 @@ class TeamsUserAppAddCommand extends GraphCommand {
     this.#initOptions();
     this.#initValidators();
     this.#initOptionSets();
+    this.#initTypes();
   }
 
   #initTelemetry(): void {
@@ -67,10 +69,6 @@ class TeamsUserAppAddCommand extends GraphCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (args.options.id && !validation.isValidGuid(args.options.id)) {
-          return `${args.options.id} is not a valid GUID`;
-        }
-
         if (args.options.userId && !validation.isValidGuid(args.options.userId)) {
           return `${args.options.userId} is not a valid GUID`;
         }
@@ -85,29 +83,31 @@ class TeamsUserAppAddCommand extends GraphCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push({ options: ['id', 'name'] });
-    this.optionSets.push({ options: ['userId', 'userName'] });
+    this.optionSets.push(
+      {
+        options: ['id', 'name']
+      },
+      {
+        options: ['userId', 'userName']
+      }
+    );
+  }
+
+  #initTypes(): void {
+    this.types.string.push('id', 'name', 'userId', 'userName');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
-      const appId: string = await this.getAppId(args);
-      const userId: string = (args.options.userId ?? args.options.userName) as string;
-      const endpoint: string = `${this.resource}/v1.0`;
-
       if (this.verbose) {
-        await logger.logToStderr(`Adding app with ID ${appId} for user ${args.options.userId}`);
+        await logger.logToStderr(`Upgrading app ${args.options.id || args.options.name} for user ${args.options.userId || args.options.userName}`);
       }
 
+      const installedAppId: string = await this.getInstalledAppId(args.options, logger);
       const requestOptions: CliRequestOptions = {
-        url: `${endpoint}/users/${formatting.encodeQueryParameter(userId)}/teamwork/installedApps`,
+        url: `${this.resource}/v1.0/users/${formatting.encodeQueryParameter(args.options.userId || args.options.userName!)}/teamwork/installedApps/${installedAppId}/upgrade`,
         headers: {
-          'content-type': 'application/json;odata=nometadata',
           'accept': 'application/json;odata.metadata=none'
-        },
-        responseType: 'json',
-        data: {
-          'teamsApp@odata.bind': `${endpoint}/appCatalogs/teamsApps/${appId}`
         }
       };
 
@@ -118,33 +118,29 @@ class TeamsUserAppAddCommand extends GraphCommand {
     }
   }
 
-  private async getAppId(args: CommandArgs): Promise<string> {
-    if (args.options.id) {
-      return args.options.id;
+  private async getInstalledAppId(options: Options, logger: Logger): Promise<string> {
+    if (this.verbose) {
+      await logger.logToStderr(`Retrieving app ID`);
     }
 
-    const requestOptions: CliRequestOptions = {
-      url: `${this.resource}/v1.0/appCatalogs/teamsApps?$filter=displayName eq '${formatting.encodeQueryParameter(args.options.name as string)}'`,
-      headers: {
-        accept: 'application/json;odata.metadata=none'
-      },
-      responseType: 'json'
-    };
-
-    const response = await request.get<{ value: { id: string; }[] }>(requestOptions);
-
-    if (response.value.length === 1) {
-      return response.value[0].id;
+    if (options.id) {
+      return options.id;
     }
 
-    if (response.value.length === 0) {
-      throw `The specified Teams app does not exist`;
+    const installedApps = await odata.getAllItems<{ id: string }>(`${this.resource}/v1.0/users/${formatting.encodeQueryParameter(options.userId || options.userName!)}/teamwork/installedApps?$expand=teamsAppDefinition&$filter=teamsAppDefinition/displayName eq '${formatting.encodeQueryParameter(options.name!)}'&$select=id`);
+
+    if (installedApps.length === 1) {
+      return installedApps[0].id;
     }
 
-    const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', response.value);
-    const result: { id: string } = (await cli.handleMultipleResultsFound(`Multiple Teams apps with name '${args.options.name}' found.`, resultAsKeyValuePair)) as { id: string };
+    if (installedApps.length === 0) {
+      throw `The specified Teams app ${options.name!} does not exist or is not installed for the user`;
+    }
+
+    const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', installedApps);
+    const result: { id: string } = (await cli.handleMultipleResultsFound(`Multiple installed Teams apps with name '${options.name}' found.`, resultAsKeyValuePair)) as { id: string };
     return result.id;
   }
 }
 
-export default new TeamsUserAppAddCommand();
+export default new TeamsUserAppUpgradeCommand();
