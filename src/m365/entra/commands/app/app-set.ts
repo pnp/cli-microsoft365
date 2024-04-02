@@ -1,4 +1,4 @@
-import { Application, KeyCredential, PublicClientApplication, SpaApplication, WebApplication } from '@microsoft/microsoft-graph-types';
+import { KeyCredential, PublicClientApplication, SpaApplication, WebApplication } from '@microsoft/microsoft-graph-types';
 import fs from 'fs';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import { Logger } from '../../../../cli/Logger.js';
@@ -8,6 +8,7 @@ import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 import { cli } from '../../../../cli/cli.js';
 import aadCommands from '../../aadCommands.js';
+import { AppInfo, entraApp } from '../../../../utils/entraApp.js';
 
 interface CommandArgs {
   options: Options;
@@ -133,11 +134,18 @@ class EntraAppSetCommand extends GraphCommand {
     await this.showDeprecationWarning(logger, aadCommands.APP_SET, commands.APP_SET);
 
     try {
-      let objectId = await this.getAppObjectId(args, logger);
-      objectId = await this.configureUri(args, objectId, logger);
-      objectId = await this.configureRedirectUris(args, objectId, logger);
-      objectId = await this.updateAllowPublicClientFlows(args, objectId, logger);
-      await this.configureCertificate(args, objectId, logger);
+      let applicationInfo: any = {};
+      const objectId = await this.getAppObjectId(args, logger);
+      applicationInfo = await this.configureUri(args, applicationInfo, logger);
+      applicationInfo = await this.configureRedirectUris(args, objectId, applicationInfo, logger);
+      applicationInfo = await this.configureCertificate(args, objectId, applicationInfo, logger);
+      applicationInfo = await this.updateAllowPublicClientFlows(args, applicationInfo, logger);
+
+      if (Object.keys(applicationInfo).length === 0) {
+        return;
+      }
+
+      await entraApp.updateEntraApp(objectId, applicationInfo);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
@@ -183,35 +191,23 @@ class EntraAppSetCommand extends GraphCommand {
     return result.id;
   }
 
-  private async updateAllowPublicClientFlows(args: CommandArgs, objectId: string, logger: Logger): Promise<string> {
+  private async updateAllowPublicClientFlows(args: CommandArgs, applicationInfo: AppInfo, logger: Logger): Promise<AppInfo> {
     if (args.options.allowPublicClientFlows === undefined) {
-      return objectId;
+      return applicationInfo;
     }
 
     if (this.verbose) {
       await logger.logToStderr(`Configuring Entra application AllowPublicClientFlows option...`);
     }
 
-    const applicationInfo: any = {
-      isFallbackPublicClient: args.options.allowPublicClientFlows
-    };
+    applicationInfo.isFallbackPublicClient = args.options.allowPublicClientFlows;
 
-    const requestOptions: CliRequestOptions = {
-      url: `${this.resource}/v1.0/myorganization/applications/${objectId}`,
-      headers: {
-        'content-type': 'application/json;odata.metadata=none'
-      },
-      responseType: 'json',
-      data: applicationInfo
-    };
-
-    await request.patch(requestOptions);
-    return objectId;
+    return applicationInfo;
   }
 
-  private async configureUri(args: CommandArgs, objectId: string, logger: Logger): Promise<string> {
+  private async configureUri(args: CommandArgs, applicationInfo: AppInfo, logger: Logger): Promise<AppInfo> {
     if (!args.options.uris) {
-      return objectId;
+      return applicationInfo;
     }
 
     if (this.verbose) {
@@ -222,26 +218,13 @@ class EntraAppSetCommand extends GraphCommand {
       .split(',')
       .map(u => u.trim());
 
-    const applicationInfo: any = {
-      identifierUris: identifierUris
-    };
-
-    const requestOptions: CliRequestOptions = {
-      url: `${this.resource}/v1.0/myorganization/applications/${objectId}`,
-      headers: {
-        'content-type': 'application/json;odata.metadata=none'
-      },
-      responseType: 'json',
-      data: applicationInfo
-    };
-
-    await request.patch(requestOptions);
-    return objectId;
+    applicationInfo['identifierUris'] = identifierUris;
+    return applicationInfo;
   }
 
-  private async configureRedirectUris(args: CommandArgs, objectId: string, logger: Logger): Promise<string> {
+  private async configureRedirectUris(args: CommandArgs, objectId: string, applicationInfo: AppInfo, logger: Logger): Promise<AppInfo> {
     if (!args.options.redirectUris && !args.options.redirectUrisToRemove) {
-      return objectId;
+      return applicationInfo;
     }
 
     if (this.verbose) {
@@ -256,23 +239,22 @@ class EntraAppSetCommand extends GraphCommand {
       responseType: 'json'
     };
 
-    const application = await request.get<Application>(getAppRequestOptions);
+    const application = await request.get<AppInfo>(getAppRequestOptions);
 
     const publicClientRedirectUris: string[] = (application.publicClient as PublicClientApplication).redirectUris as string[];
     const spaRedirectUris: string[] = (application.spa as SpaApplication).redirectUris as string[];
     const webRedirectUris: string[] = (application.web as WebApplication).redirectUris as string[];
 
     // start with existing redirect URIs
-    const applicationPatch: Application = {
-      publicClient: {
-        redirectUris: publicClientRedirectUris
-      },
-      spa: {
-        redirectUris: spaRedirectUris
-      },
-      web: {
-        redirectUris: webRedirectUris
-      }
+    applicationInfo.publicClient = {
+      redirectUris: publicClientRedirectUris
+    };
+
+    applicationInfo.spa = {
+      redirectUris: spaRedirectUris
+    };
+    applicationInfo.web = {
+      redirectUris: webRedirectUris
     };
 
     if (args.options.redirectUrisToRemove) {
@@ -281,11 +263,11 @@ class EntraAppSetCommand extends GraphCommand {
         .split(',')
         .map(u => u.trim());
 
-      (applicationPatch.publicClient as PublicClientApplication).redirectUris =
+      (applicationInfo.publicClient as PublicClientApplication).redirectUris =
         publicClientRedirectUris.filter(u => !redirectUrisToRemove.includes(u));
-      (applicationPatch.spa as SpaApplication).redirectUris =
+      (applicationInfo.spa as SpaApplication).redirectUris =
         spaRedirectUris.filter(u => !redirectUrisToRemove.includes(u));
-      (applicationPatch.web as WebApplication).redirectUris =
+      (applicationInfo.web as WebApplication).redirectUris =
         webRedirectUris.filter(u => !redirectUrisToRemove.includes(u));
     }
 
@@ -297,35 +279,25 @@ class EntraAppSetCommand extends GraphCommand {
       // add new redirect URIs. If the URI is already present, it will be ignored
       switch (args.options.platform) {
         case 'spa':
-          ((applicationPatch.spa as SpaApplication).redirectUris as string[])
+          ((applicationInfo.spa as SpaApplication).redirectUris as string[])
             .push(...urlsToAdd.filter(u => !spaRedirectUris.includes(u)));
           break;
         case 'publicClient':
-          ((applicationPatch.publicClient as PublicClientApplication).redirectUris as string[])
+          ((applicationInfo.publicClient as PublicClientApplication).redirectUris as string[])
             .push(...urlsToAdd.filter(u => !publicClientRedirectUris.includes(u)));
           break;
         case 'web':
-          ((applicationPatch.web as WebApplication).redirectUris as string[])
+          ((applicationInfo.web as WebApplication).redirectUris as string[])
             .push(...urlsToAdd.filter(u => !webRedirectUris.includes(u)));
       }
     }
 
-    const requestOptions: CliRequestOptions = {
-      url: `${this.resource}/v1.0/myorganization/applications/${objectId}`,
-      headers: {
-        'content-type': 'application/json;odata.metadata=none'
-      },
-      responseType: 'json',
-      data: applicationPatch
-    };
-
-    await request.patch(requestOptions);
-    return objectId;
+    return applicationInfo;
   }
 
-  private async configureCertificate(args: CommandArgs, objectId: string, logger: Logger): Promise<void> {
+  private async configureCertificate(args: CommandArgs, objectId: string, applicationInfo: AppInfo, logger: Logger): Promise<AppInfo> {
     if (!args.options.certificateFile && !args.options.certificateBase64Encoded) {
-      return;
+      return applicationInfo;
     }
 
     if (this.verbose) {
@@ -334,7 +306,7 @@ class EntraAppSetCommand extends GraphCommand {
 
     const certificateBase64Encoded = await this.getCertificateBase64Encoded(args, logger);
 
-    const currentKeyCredentials = await this.getCurrentKeyCredentialsList(args, objectId, certificateBase64Encoded, logger);
+    const currentKeyCredentials = await this.getCurrentKeyCredentialsList(objectId, logger);
     if (this.verbose) {
       await logger.logToStderr(`Adding new keyCredential to list`);
     }
@@ -352,7 +324,8 @@ class EntraAppSetCommand extends GraphCommand {
 
     keyCredentials.push(newKeyCredential);
 
-    return this.updateKeyCredentials(objectId, keyCredentials, logger);
+    applicationInfo.keyCredentials = keyCredentials;
+    return applicationInfo;
   }
 
   private async getCertificateBase64Encoded(args: CommandArgs, logger: Logger): Promise<string> {
@@ -373,7 +346,7 @@ class EntraAppSetCommand extends GraphCommand {
   }
 
   // We first retrieve existing certificates because we need to specify the full list of certificates when updating the app.
-  private async getCurrentKeyCredentialsList(args: CommandArgs, objectId: string, certificateBase64Encoded: string, logger: Logger): Promise<KeyCredential[]> {
+  private async getCurrentKeyCredentialsList(objectId: string, logger: Logger): Promise<KeyCredential[]> {
     if (this.verbose) {
       await logger.logToStderr(`Retrieving current keyCredentials list for app`);
     }
@@ -386,27 +359,8 @@ class EntraAppSetCommand extends GraphCommand {
       responseType: 'json'
     };
 
-    const application = await request.get<Application>(getAppRequestOptions);
+    const application = await request.get<AppInfo>(getAppRequestOptions);
     return application.keyCredentials || [];
-  }
-
-  private async updateKeyCredentials(objectId: string, keyCredentials: KeyCredential[], logger: Logger): Promise<void> {
-    if (this.verbose) {
-      await logger.logToStderr(`Updating keyCredentials in Microsoft Entra app`);
-    }
-
-    const requestOptions: CliRequestOptions = {
-      url: `${this.resource}/v1.0/myorganization/applications/${objectId}`,
-      headers: {
-        'content-type': 'application/json;odata.metadata=none'
-      },
-      responseType: 'json',
-      data: {
-        keyCredentials: keyCredentials
-      }
-    };
-
-    return request.patch(requestOptions);
   }
 }
 
