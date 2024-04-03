@@ -89,10 +89,10 @@ class SetupCommand extends AnonymousCommand {
       }
       else if (args.options.scripting) {
         Object.assign(settings, scriptingPreset);
-      }
 
-      if (pid.isPowerShell()) {
-        Object.assign(settings, powerShellPreset);
+        if (pid.isPowerShell()) {
+          Object.assign(settings, powerShellPreset);
+        }
       }
 
       await this.configureSettings(settings, true, logger);
