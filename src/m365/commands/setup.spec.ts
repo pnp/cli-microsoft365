@@ -286,10 +286,10 @@ describe(commands.SETUP, () => {
 
   it('sets correct settings for interactive, non-PowerShell via option', async () => {
     const configureSettingsStub = sinon.stub(command as any, 'configureSettings').callsFake(() => { });
+    sinon.stub(pid, 'isPowerShell').returns(false);
 
     const expected: SettingNames = {};
     Object.assign(expected, interactivePreset);
-    (command as any).settings = expected;
 
     await command.action(logger, { options: { interactive: true } });
 
@@ -298,10 +298,10 @@ describe(commands.SETUP, () => {
 
   it('sets correct settings for scripting, non-PowerShell via option', async () => {
     const configureSettingsStub = sinon.stub(command as any, 'configureSettings').callsFake(() => { });
+    sinon.stub(pid, 'isPowerShell').returns(false);
 
     const expected: SettingNames = {};
     Object.assign(expected, scriptingPreset);
-    (command as any).settings = expected;
 
     await command.action(logger, { options: { scripting: true } });
 
@@ -310,12 +310,10 @@ describe(commands.SETUP, () => {
 
   it('sets correct settings for interactive, PowerShell via option', async () => {
     const configureSettingsStub = sinon.stub(command as any, 'configureSettings').callsFake(() => { });
-    sinon.stub(pid, 'isPowerShell').callsFake(() => true);
+    sinon.stub(pid, 'isPowerShell').returns(true);
 
     const expected: SettingNames = {};
     Object.assign(expected, interactivePreset);
-    Object.assign(expected, powerShellPreset);
-    (command as any).settings = expected;
 
     await command.action(logger, { options: { interactive: true } });
 
@@ -324,12 +322,11 @@ describe(commands.SETUP, () => {
 
   it('sets correct settings for scripting, PowerShell via option', async () => {
     const configureSettingsStub = sinon.stub(command as any, 'configureSettings').callsFake(() => { });
-    sinon.stub(pid, 'isPowerShell').callsFake(() => true);
+    sinon.stub(pid, 'isPowerShell').returns(true);
 
     const expected: SettingNames = {};
     Object.assign(expected, scriptingPreset);
     Object.assign(expected, powerShellPreset);
-    (command as any).settings = expected;
 
     await command.action(logger, { options: { scripting: true } });
 
