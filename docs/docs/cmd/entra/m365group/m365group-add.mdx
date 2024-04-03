@@ -24,11 +24,11 @@ m365 aad m365group add [options]
 `-n, --displayName <displayName>`
 : Display name for the Microsoft 365 Group
 
-`-d, --description <description>`
-: Description for the Microsoft 365 Group
-
 `-m, --mailNickname <mailNickname>`
 : Name to use in the group e-mail (part before the `@`)
+
+`-d, --description [description]`
+: Description for the Microsoft 365 Group
 
 `--owners [owners]`
 : Comma-separated list of Microsoft 365 Group owners
@@ -74,25 +74,25 @@ HiddenMembership | Owner permission is needed to join the group. Guest users can
 
 ## Examples
 
-Create a public Microsoft 365 Group
+Create a public Microsoft 365 Group.
 
 ```sh
 m365 entra m365group add --displayName Finance --description "This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more." --mailNickname finance
 ```
 
-Create a private Microsoft 365 Group
+Create a private Microsoft 365 Group.
 
 ```sh
 m365 entra m365group add --displayName Finance --description "This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more." --mailNickname finance --visibility Private
 ```
 
-Create a public Microsoft 365 Group and set specified users as its owners
+Create a public Microsoft 365 Group and set specified users as its owners.
 
 ```sh
 m365 entra m365group add --displayName Finance --description "This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more." --mailNickname finance --owners "DebraB@contoso.onmicrosoft.com,DiegoS@contoso.onmicrosoft.com"
 ```
 
-Create a public Microsoft 365 Group and set specified users as its members
+Create a public Microsoft 365 Group and set specified users as its members.
 
 ```sh
 m365 entra m365group add --displayName Finance --description "This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more." --mailNickname finance --members "DebraB@contoso.onmicrosoft.com,DiegoS@contoso.onmicrosoft.com"
@@ -122,7 +122,7 @@ Create a public Microsoft 365 Group and set to not send welcome emails to new gr
 m365 entra m365group add --displayName Finance --description "This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more." --mailNickname finance --welcomeEmailDisabled
 ```
 
-Create a public Microsoft 365 Group and set its logo
+Create a public Microsoft 365 Group and set its logo.
 
 ```sh
 m365 entra m365group add --displayName Finance --description "This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more." --mailNickname finance --logoPath images/logo.png

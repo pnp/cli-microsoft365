@@ -16,8 +16,8 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   displayName: string;
-  description: string;
   mailNickname: string;
+  description?: string;
   owners?: string;
   members?: string;
   visibility?: string;
@@ -57,6 +57,7 @@ class EntraM365GroupAddCommand extends GraphCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
+        description: typeof args.options.description !== 'undefined',
         owners: typeof args.options.owners !== 'undefined',
         members: typeof args.options.members !== 'undefined',
         logoPath: typeof args.options.logoPath !== 'undefined',
@@ -75,10 +76,10 @@ class EntraM365GroupAddCommand extends GraphCommand {
         option: '-n, --displayName <displayName>'
       },
       {
-        option: '-d, --description <description>'
+        option: '-m, --mailNickname <mailNickname>'
       },
       {
-        option: '-m, --mailNickname <mailNickname>'
+        option: '-d, --description [description]'
       },
       {
         option: '--owners [owners]'
