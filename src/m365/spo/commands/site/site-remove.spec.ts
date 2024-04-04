@@ -2,11 +2,7 @@ import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
 import { cli } from '../../../../cli/cli.js';
-import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
-import { CommandError } from '../../../../Command.js';
-import config from '../../../../config.js';
-import request from '../../../../request.js';
 import { telemetry } from '../../../../telemetry.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
@@ -14,32 +10,46 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { spo } from '../../../../utils/spo.js';
 import commands from '../../commands.js';
 import command from './site-remove.js';
+import { odata } from '../../../../utils/odata.js';
+import { settingsNames } from '../../../../settingsNames.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
+import { formatting } from '../../../../utils/formatting.js';
+import request from '../../../../request.js';
+import { CommandError } from '../../../../Command.js';
 
 describe(commands.SITE_REMOVE, () => {
   let log: string[];
   let logger: Logger;
-  let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
-  let loggerLogToStderrSpy: sinon.SinonSpy;
-  let requests: any[];
-  let waitUntilFinishedStub: sinon.SinonStub;
+  let promptIssued: boolean = false;
+
+  const siteUrl = 'https://contoso.sharepoint.com/sites/project-x';
+  const adminUrl = 'https://contoso-admin.sharepoint.com';
+  const odataUrl = `${adminUrl}/_api/web/lists/GetByTitle('DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECOLLECTIONS')/items?$filter=SiteUrl eq '${formatting.encodeQueryParameter(siteUrl)}'&$select=GroupId,TimeDeleted,SiteId`;
+
+  const siteDetailsNonGroup = {
+    GroupId: '00000000-0000-0000-0000-000000000000',
+    SiteId: 'b01dfb5a-ed2d-4f65-8434-f2e51f182dec',
+    TimeDeleted: null
+  };
+  const siteDetailsGroup = {
+    GroupId: '8f5ee9a8-7e71-410b-81fd-c661b00d7169',
+    SiteId: 'b01dfb5a-ed2d-4f65-8434-f2e51f182dec',
+    TimeDeleted: null
+  };
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
+    sinon.stub(spo, 'getSpoAdminUrl').resolves(adminUrl);
     auth.connection.active = true;
-    auth.connection.spoUrl = 'https://contoso.sharepoint.com';
     commandInfo = cli.getCommandInfo(command);
+    (command as any).pollingInterval = 0;
   });
 
   beforeEach(() => {
-    const futureDate = new Date();
-    futureDate.setSeconds(futureDate.getSeconds() + 1800);
-    sinon.stub(spo, 'ensureFormDigest').resolves({ FormDigestValue: 'abc', FormDigestTimeoutSeconds: 1800, FormDigestExpiresAt: futureDate, WebFullUrl: 'https://contoso.sharepoint.com/sites/hr' });
-    waitUntilFinishedStub = sinon.stub(spo, 'waitUntilFinished').resolves();
-
     log = [];
     logger = {
       log: async (msg: string) => {
@@ -52,28 +62,37 @@ describe(commands.SITE_REMOVE, () => {
         log.push(msg);
       }
     };
-    loggerLogSpy = sinon.spy(logger, 'log');
-    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
-    requests = [];
-    sinon.stub(cli, 'promptForConfirmation').resolves(false);
+
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName: string, defaultValue: any) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
+    sinon.stub(cli, 'promptForConfirmation').callsFake(async () => {
+      promptIssued = true;
+      return false;
+    });
+
+    promptIssued = false;
   });
 
   afterEach(() => {
-    (command as any).currentContext = undefined;
     sinonUtil.restore([
-      request.get,
-      request.post,
+      cli.promptForConfirmation,
+      cli.getSettingWithDefaultValue,
+      odata.getAllItems,
       request.delete,
-      spo.ensureFormDigest,
-      spo.waitUntilFinished,
-      cli.promptForConfirmation
+      request.post,
+      request.get
     ]);
   });
 
   after(() => {
     sinon.restore();
     auth.connection.active = false;
-    auth.connection.spoUrl = undefined;
   });
 
   it('has correct name', () => {
@@ -84,1354 +103,312 @@ describe(commands.SITE_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('aborts removing site when prompt not confirmed', async () => {
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demosite', debug: true, verbose: true } });
-    assert(requests.length === 0);
+  it('deletes a classic site and also immediately deletes it from the recycle bin', async () => {
+    sinon.stub(odata, 'getAllItems').callsFake(async (url) => {
+      if (url === odataUrl) {
+        return [siteDetailsNonGroup];
+      }
+      throw 'Invalid request';
+    });
+
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `${adminUrl}/_api/Microsoft.Online.SharePoint.TenantAdministration.Tenant/RemoveSite`) {
+        return;
+      }
+      if (opts.url === `${adminUrl}/_api/Microsoft.Online.SharePoint.TenantAdministration.Tenant/RemoveDeletedSite`) {
+        return;
+      }
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { url: siteUrl, skipRecycleBin: true, force: true, verbose: true } });
+    assert(postStub.calledTwice);
+    assert.strictEqual(postStub.firstCall.args[0].data.siteUrl, siteUrl);
+    assert.strictEqual(postStub.secondCall.args[0].data.siteUrl, siteUrl);
   });
 
-  it('removes the site when prompt confirmed', async () => {
-    sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
-        if (opts.data === `<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}"><Actions><ObjectPath Id="4" ObjectPathId="3"/><Query Id="5" ObjectPathId="3"><Query SelectAllProperties="false"><Properties><Property Name="GroupId" ScalarProperty="true"/></Properties></Query></Query></Actions><ObjectPaths><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/><Method Id="3" ParentId="1" Name="GetSitePropertiesByUrl"><Parameters><Parameter Type="String">https://contoso.sharepoint.com/sites/demosite</Parameter></Parameters></Method></ObjectPaths></Request>`) {
-          return JSON.stringify([
-            {
-              "SchemaVersion": "15.0.0.0",
-              "LibraryVersion": "16.0.20530.12001",
-              "ErrorInfo": null,
-              "TraceCorrelationId": "10f1829f-d000-0000-5962-1110d33e2cf2"
-            },
-            4,
-            {
-              "IsNull": false
-            },
-            5,
-            {
-              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SiteProperties",
-              "_ObjectIdentity_": "10f1829f-d000-0000-5962-1110d33e2cf2|908bed80-a04a-4433-b4a0-883d9847d110:095efa67-57fa-40c7-b7cc-e96dc3e5780c\nSiteProperties\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fdemosite",
-              "GroupId": "/Guid(00000000-0000-0000-0000-000000000000)/"
-            }
-          ]);
-        }
+  it('deletes a group site, deletes the m365 group from entra id', async () => {
+    sinon.stub(odata, 'getAllItems').callsFake(async (url) => {
+      if (url === odataUrl) {
+        return [siteDetailsGroup];
       }
-      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
-        if (opts.headers &&
-          opts.headers['X-RequestDigest'] &&
-          opts.headers['X-RequestDigest'] === 'abc' &&
-          opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="55" ObjectPathId="54"/><ObjectPath Id="57" ObjectPathId="56"/><Query Id="58" ObjectPathId="54"><Query SelectAllProperties="true"><Properties/></Query></Query><Query Id="59" ObjectPathId="56"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true"/><Property Name="PollingInterval" ScalarProperty="true"/></Properties></Query></Query></Actions><ObjectPaths><Constructor Id="54" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/><Method Id="56" ParentId="54" Name="RemoveSite"><Parameters><Parameter Type="String">https://contoso.sharepoint.com/sites/demosite</Parameter></Parameters></Method></ObjectPaths></Request>`) {
-          return JSON.stringify([
-            {
-              "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.8015.1210", "ErrorInfo": null, "TraceCorrelationId": "5eda879e-90d5-6000-d611-e6bfd5acde9f"
-            }, 12, {
-              "IsNull": false
-            }, 14, {
-              "IsNull": false
-            }, 15, {
-              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.Tenant", "_ObjectIdentity_": "5eda879e-90d5-6000-d611-e6bfd5acde9f|908bed80-a04a-4433-b4a0-883d9847d110:2ca3eaa5-140f-4175-9563-1172edf9f339\nTenant", "AllowDownloadingNonWebViewableFiles": true, "AllowedDomainListForSyncClient": [
+      throw 'Invalid request';
+    });
 
-              ], "AllowEditing": true, "AllowLimitedAccessOnUnmanagedDevices": false, "ApplyAppEnforcedRestrictionsToAdHocRecipients": true, "BccExternalSharingInvitations": false, "BccExternalSharingInvitationsList": null, "BlockAccessOnUnmanagedDevices": false, "BlockDownloadOfAllFilesForGuests": false, "BlockDownloadOfAllFilesOnUnmanagedDevices": false, "BlockDownloadOfViewableFilesForGuests": false, "BlockDownloadOfViewableFilesOnUnmanagedDevices": false, "BlockMacSync": false, "CommentsOnSitePagesDisabled": false, "CompatibilityRange": "15,15", "ConditionalAccessPolicy": 0, "DefaultLinkPermission": 2, "DefaultSharingLinkType": 2, "DisabledWebPartIds": null, "DisableReportProblemDialog": false, "DisallowInfectedFileDownload": false, "DisplayNamesOfFileViewers": true, "DisplayStartASiteOption": false, "EmailAttestationReAuthDays": 30, "EmailAttestationRequired": false, "EnableGuestSignInAcceleration": false, "EnableMinimumVersionRequirement": true, "ExcludedFileExtensionsForSyncClient": [
-                ""
-              ], "ExternalServicesEnabled": true, "FileAnonymousLinkType": 1, "FilePickerExternalImageSearchEnabled": true, "FolderAnonymousLinkType": 1, "HideSyncButtonOnODB": false, "IPAddressAllowList": "", "IPAddressEnforcement": false, "IPAddressWACTokenLifetime": 15, "IsHubSitesMultiGeoFlightEnabled": false, "IsMultiGeo": false, "IsUnmanagedSyncClientForTenantRestricted": false, "IsUnmanagedSyncClientRestrictionFlightEnabled": true, "LegacyAuthProtocolsEnabled": true, "LimitedAccessFileType": 1, "NoAccessRedirectUrl": null, "NotificationsInOneDriveForBusinessEnabled": true, "NotificationsInSharePointEnabled": true, "NotifyOwnersWhenInvitationsAccepted": true, "NotifyOwnersWhenItemsReshared": true, "ODBAccessRequests": 0, "ODBMembersCanShare": 0, "OfficeClientADALDisabled": false, "OneDriveForGuestsEnabled": false, "OneDriveStorageQuota": 5242880, "OptOutOfGrooveBlock": false, "OptOutOfGrooveSoftBlock": false, "OrphanedPersonalSitesRetentionPeriod": 30, "OwnerAnonymousNotification": true, "PermissiveBrowserFileHandlingOverride": false, "PreventExternalUsersFromResharing": false, "ProvisionSharedWithEveryoneFolder": false, "PublicCdnAllowedFileTypes": "CSS,EOT,GIF,ICO,JPEG,JPG,JS,MAP,PNG,SVG,TTF,WOFF", "PublicCdnEnabled": false, "PublicCdnOrigins": [
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/directory/deletedItems/Microsoft.Graph.Group/${siteDetailsGroup.GroupId}?$select=id`) {
+        throw {
+          response: {
+            status: 404
+          }
+        };
+      }
+      throw 'Invalid request';
+    });
 
-              ], "RequireAcceptingAccountMatchInvitedAccount": false, "RequireAnonymousLinksExpireInDays": -1, "ResourceQuota": 6300, "ResourceQuotaAllocated": 1200, "RootSiteUrl": "https:\u002f\u002fcontoso.sharepoint.com", "SearchResolveExactEmailOrUPN": false, "SharingAllowedDomainList": null, "SharingBlockedDomainList": null, "SharingCapability": 2, "SharingDomainRestrictionMode": 0, "ShowAllUsersClaim": false, "ShowEveryoneClaim": false, "ShowEveryoneExceptExternalUsersClaim": true, "ShowNGSCDialogForSyncOnODB": true, "ShowPeoplePickerSuggestionsForGuestUsers": false, "SignInAccelerationDomain": "", "SocialBarOnSitePagesDisabled": false, "SpecialCharactersStateInFileFolderNames": 1, "StartASiteFormUrl": null, "StorageQuota": 1355776, "StorageQuotaAllocated": 135266304, "SyncPrivacyProfileProperties": true, "UseFindPeopleInPeoplePicker": false, "UsePersistentCookiesForExplorerView": false, "UserVoiceForFeedbackEnabled": true
-            }, 16, {
-              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SpoOperation", "_ObjectIdentity_": "5eda879e-90d5-6000-d611-e6bfd5acde9f|908bed80-a04a-4433-b4a0-883d9847d110:2ca3eaa5-140f-4175-9563-1172edf9f339\nSpoOperation\nRemoveSite\n636707032254311675\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fdemosite\n00000000-0000-0000-0000-000000000000", "IsComplete": true, "PollingInterval": 0
-            }
-          ]);
-        }
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `${adminUrl}/_api/GroupSiteManager/Delete?siteUrl='${formatting.encodeQueryParameter(siteUrl)}'`) {
+        return;
+      }
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { url: siteUrl, force: true, verbose: true } });
+    assert(postStub.calledOnce);
+  });
+
+  it('deletes a group site, deletes the m365 group from entra id and immediately deletes it from the recycle bin', async () => {
+    sinon.stub(odata, 'getAllItems').callsFake(async (url) => {
+      if (url === odataUrl) {
+        return [siteDetailsGroup];
+      }
+      throw 'Invalid request';
+    });
+
+    const getRequestStub = sinon.stub(request, 'get');
+
+    getRequestStub.onFirstCall().callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/directory/deletedItems/Microsoft.Graph.Group/${siteDetailsGroup.GroupId}?$select=id`) {
+        throw {
+          response: {
+            status: 404
+          }
+        };
+      }
+      throw 'Invalid request';
+    });
+
+    getRequestStub.onSecondCall().callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/directory/deletedItems/Microsoft.Graph.Group/${siteDetailsGroup.GroupId}?$select=id`) {
+        return { id: siteDetailsGroup.GroupId };
+      }
+      throw 'Invalid request';
+    });
+
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `${adminUrl}/_api/GroupSiteManager/Delete?siteUrl='${formatting.encodeQueryParameter(siteUrl)}'`) {
+        return;
+      }
+      if (opts.url === `${adminUrl}/_api/Microsoft.Online.SharePoint.TenantAdministration.Tenant/RemoveDeletedSite`) {
+        return;
+      }
+      throw 'Invalid request';
+    });
+
+    const deleteStub = sinon.stub(request, 'delete').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/directory/deletedItems/Microsoft.Graph.Group/${siteDetailsGroup.GroupId}`) {
+        return;
+      }
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { url: siteUrl, skipRecycleBin: true, force: true, verbose: true } });
+    assert(deleteStub.calledOnce);
+  });
+
+  it('deletes a group site, deletes the m365 group from entra id and immediately deletes the site from the recycle bin, but skips deletion of the m365 group when it does not exist in Entra', async () => {
+    let amountOfCalls = 0;
+
+    sinon.stub(odata, 'getAllItems').callsFake(async (url) => {
+      if (url === odataUrl) {
+        return [siteDetailsGroup];
+      }
+      throw 'Invalid request';
+    });
+
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/directory/deletedItems/Microsoft.Graph.Group/${siteDetailsGroup.GroupId}?$select=id`) {
+        amountOfCalls++;
+        throw {
+          response: {
+            status: 404
+          }
+        };
+      }
+      throw 'Invalid request';
+    });
+
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `${adminUrl}/_api/GroupSiteManager/Delete?siteUrl='${formatting.encodeQueryParameter(siteUrl)}'`) {
+        return;
+      }
+      if (opts.url === `${adminUrl}/_api/Microsoft.Online.SharePoint.TenantAdministration.Tenant/RemoveDeletedSite`) {
+        return;
+      }
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { url: siteUrl, skipRecycleBin: true, force: true, verbose: true } });
+    assert.strictEqual(amountOfCalls, 24);
+  });
+
+  it('deletes a group site from recycle bin and also removes the m365 group from entra id recycle bin', async () => {
+    sinon.stub(odata, 'getAllItems').callsFake(async (url) => {
+      if (url === odataUrl) {
+        return [{ ...siteDetailsGroup, TimeDeleted: new Date().toISOString() }];
+      }
+      throw 'Invalid request';
+    });
+
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `${adminUrl}/_api/Microsoft.Online.SharePoint.TenantAdministration.Tenant/RemoveDeletedSite`) {
+        return;
+      }
+      throw 'Invalid request';
+    });
+
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/directory/deletedItems/Microsoft.Graph.Group/${siteDetailsGroup.GroupId}?$select=id`) {
+        return { id: siteDetailsGroup.GroupId };
+      }
+      throw 'Invalid request';
+    });
+
+    const deleteStub = sinon.stub(request, 'delete').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/directory/deletedItems/Microsoft.Graph.Group/${siteDetailsGroup.GroupId}`) {
+        return;
+      }
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { url: siteUrl, fromRecycleBin: true, force: true, verbose: true } });
+    assert(deleteStub.calledOnce);
+  });
+
+  it('deletes a group site from recycle bin, removes trailing slash, and skips deletion of the m365 group from entra id recycle bin if it does not exist', async () => {
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
+
+    sinon.stub(odata, 'getAllItems').callsFake(async (url) => {
+      if (url === odataUrl) {
+        return [{ ...siteDetailsGroup, TimeDeleted: new Date().toISOString() }];
+      }
+      throw 'Invalid request';
+    });
+
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `${adminUrl}/_api/Microsoft.Online.SharePoint.TenantAdministration.Tenant/RemoveDeletedSite`) {
+        return;
+      }
+      throw 'Invalid request';
+    });
+
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/directory/deletedItems/Microsoft.Graph.Group/${siteDetailsGroup.GroupId}?$select=id`) {
+        throw {
+          response: {
+            status: 404
+          }
+        };
+      }
+      throw 'Invalid request';
+    });
+
+    const deleteStub = sinon.stub(request, 'delete').resolves();
+
+    await command.action(logger, { options: { url: `${siteUrl}/`, fromRecycleBin: true, verbose: true } });
+    assert(postStub.calledOnce);
+    assert(deleteStub.notCalled);
+  });
+
+
+  it('throws error if site is not found', async () => {
+    sinon.stub(odata, 'getAllItems').resolves([]);
+
+    await assert.rejects(command.action(logger, { options: { url: siteUrl, verbose: true, force: true } }),
+      new CommandError('Site not found in the tenant.'));
+  });
+
+  it('throws error if the endpoint fails when retrieving the deleted group', async () => {
+    const errorMessage = 'Error occurred on processing the request.';
+    sinon.stub(odata, 'getAllItems').resolves([{ ...siteDetailsGroup, TimeDeleted: new Date().toISOString() }]);
+
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/directory/deletedItems/Microsoft.Graph.Group/${siteDetailsGroup.GroupId}?$select=id`) {
+        throw {
+          error: {
+            code: '-1, InvalidOperationException',
+            message: errorMessage
+          }
+        };
       }
 
       throw 'Invalid request';
     });
 
-    sinonUtil.restore(cli.promptForConfirmation);
-    sinon.stub(cli, 'promptForConfirmation').resolves(true);
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demosite', debug: true, verbose: true } });
-    assert(loggerLogToStderrSpy.called);
+    await assert.rejects(command.action(logger, { options: { url: siteUrl, fromRecycleBin: true, verbose: true, force: true } }),
+      new CommandError(errorMessage));
   });
 
-  it('fails validation if the url is not a valid url', async () => {
-    const actual = await command.validate({
-      options: {
-        url: 'abc'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('throws error if site has already been deleted when trying to remove it', async () => {
+    sinon.stub(odata, 'getAllItems').resolves([{ ...siteDetailsNonGroup, TimeDeleted: new Date().toISOString() }]);
+
+    await assert.rejects(command.action(logger, { options: { url: siteUrl, verbose: true, force: true } }),
+      new CommandError('Site is already in the recycle bin. Use --fromRecycleBin to permanently delete it.'));
   });
 
-  it('fails validation if the url is not a valid SharePoint url', async () => {
-    const actual = await command.validate({
-      options: {
-        url: 'http://contoso'
+  it('throws an error when attempting to delete a site that is not present in the recycle bin', async () => {
+    sinon.stub(odata, 'getAllItems').callsFake(async (url) => {
+      if (url === odataUrl) {
+        return [siteDetailsNonGroup];
       }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+
+      throw 'Invalid request';
+    });
+
+    await assert.rejects(command.action(logger, { options: { url: siteUrl, fromRecycleBin: true, verbose: true, force: true } }),
+      new CommandError('Site is currently not in the recycle bin. Do not specify --fromRecycleBin if you want to try to remove it from the active sites.'));
   });
 
-  it('passes validation if the required options are correct', async () => {
-    const actual = await command.validate({
-      options: {
-        url: 'https://contoso.sharepoint.com/sites/demosite'
-      }
-    }, commandInfo);
+  it(`correctly shows deprecation warning for option 'wait'`, async () => {
+    const chalk = (await import('chalk')).default;
+    const loggerErrSpy = sinon.spy(logger, 'logToStderr');
+
+    await command.action(logger, { options: { url: siteUrl, wait: true } });
+    assert(loggerErrSpy.calledWith(chalk.yellow(`Option 'wait' is deprecated and will be removed in the next major release.`)));
+
+    sinonUtil.restore(loggerErrSpy);
+  });
+
+  it('prompts before removing the site when force option not passed', async () => {
+    await command.action(logger, { options: { url: siteUrl, verbose: true } });
+    assert(promptIssued);
+  });
+
+  it('aborts removing the site when prompt not confirmed', async () => {
+    const postStub = sinon.stub(request, 'post').resolves();
+
+    await command.action(logger, { options: { url: siteUrl, verbose: true } });
+    assert(postStub.notCalled);
+  });
+
+  it('passes validation if siteUrl is a valid url', async () => {
+    const actual = await command.validate({ options: { url: siteUrl } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('removes site. doesn\'t wait for completion (debug)', async () => {
-    sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
-        if (opts.data === `<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}"><Actions><ObjectPath Id="4" ObjectPathId="3"/><Query Id="5" ObjectPathId="3"><Query SelectAllProperties="false"><Properties><Property Name="GroupId" ScalarProperty="true"/></Properties></Query></Query></Actions><ObjectPaths><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/><Method Id="3" ParentId="1" Name="GetSitePropertiesByUrl"><Parameters><Parameter Type="String">https://contoso.sharepoint.com/sites/demosite</Parameter></Parameters></Method></ObjectPaths></Request>`) {
-          return JSON.stringify([
-            {
-              "SchemaVersion": "15.0.0.0",
-              "LibraryVersion": "16.0.20530.12001",
-              "ErrorInfo": null,
-              "TraceCorrelationId": "10f1829f-d000-0000-5962-1110d33e2cf2"
-            },
-            4,
-            {
-              "IsNull": false
-            },
-            5,
-            {
-              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SiteProperties",
-              "_ObjectIdentity_": "10f1829f-d000-0000-5962-1110d33e2cf2|908bed80-a04a-4433-b4a0-883d9847d110:095efa67-57fa-40c7-b7cc-e96dc3e5780c\nSiteProperties\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fdemosite",
-              "GroupId": "/Guid(00000000-0000-0000-0000-000000000000)/"
-            }
-          ]);
-        }
-      }
-      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
-        if (opts.headers &&
-          opts.headers['X-RequestDigest'] &&
-          opts.headers['X-RequestDigest'] === 'abc' &&
-          opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="55" ObjectPathId="54"/><ObjectPath Id="57" ObjectPathId="56"/><Query Id="58" ObjectPathId="54"><Query SelectAllProperties="true"><Properties/></Query></Query><Query Id="59" ObjectPathId="56"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true"/><Property Name="PollingInterval" ScalarProperty="true"/></Properties></Query></Query></Actions><ObjectPaths><Constructor Id="54" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/><Method Id="56" ParentId="54" Name="RemoveSite"><Parameters><Parameter Type="String">https://contoso.sharepoint.com/sites/demosite</Parameter></Parameters></Method></ObjectPaths></Request>`) {
-          return JSON.stringify([
-            {
-              "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.8015.1210", "ErrorInfo": null, "TraceCorrelationId": "5eda879e-90d5-6000-d611-e6bfd5acde9f"
-            }, 12, {
-              "IsNull": false
-            }, 14, {
-              "IsNull": false
-            }, 15, {
-              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.Tenant", "_ObjectIdentity_": "5eda879e-90d5-6000-d611-e6bfd5acde9f|908bed80-a04a-4433-b4a0-883d9847d110:2ca3eaa5-140f-4175-9563-1172edf9f339\nTenant", "AllowDownloadingNonWebViewableFiles": true, "AllowedDomainListForSyncClient": [
-
-              ], "AllowEditing": true, "AllowLimitedAccessOnUnmanagedDevices": false, "ApplyAppEnforcedRestrictionsToAdHocRecipients": true, "BccExternalSharingInvitations": false, "BccExternalSharingInvitationsList": null, "BlockAccessOnUnmanagedDevices": false, "BlockDownloadOfAllFilesForGuests": false, "BlockDownloadOfAllFilesOnUnmanagedDevices": false, "BlockDownloadOfViewableFilesForGuests": false, "BlockDownloadOfViewableFilesOnUnmanagedDevices": false, "BlockMacSync": false, "CommentsOnSitePagesDisabled": false, "CompatibilityRange": "15,15", "ConditionalAccessPolicy": 0, "DefaultLinkPermission": 2, "DefaultSharingLinkType": 2, "DisabledWebPartIds": null, "DisableReportProblemDialog": false, "DisallowInfectedFileDownload": false, "DisplayNamesOfFileViewers": true, "DisplayStartASiteOption": false, "EmailAttestationReAuthDays": 30, "EmailAttestationRequired": false, "EnableGuestSignInAcceleration": false, "EnableMinimumVersionRequirement": true, "ExcludedFileExtensionsForSyncClient": [
-                ""
-              ], "ExternalServicesEnabled": true, "FileAnonymousLinkType": 1, "FilePickerExternalImageSearchEnabled": true, "FolderAnonymousLinkType": 1, "HideSyncButtonOnODB": false, "IPAddressAllowList": "", "IPAddressEnforcement": false, "IPAddressWACTokenLifetime": 15, "IsHubSitesMultiGeoFlightEnabled": false, "IsMultiGeo": false, "IsUnmanagedSyncClientForTenantRestricted": false, "IsUnmanagedSyncClientRestrictionFlightEnabled": true, "LegacyAuthProtocolsEnabled": true, "LimitedAccessFileType": 1, "NoAccessRedirectUrl": null, "NotificationsInOneDriveForBusinessEnabled": true, "NotificationsInSharePointEnabled": true, "NotifyOwnersWhenInvitationsAccepted": true, "NotifyOwnersWhenItemsReshared": true, "ODBAccessRequests": 0, "ODBMembersCanShare": 0, "OfficeClientADALDisabled": false, "OneDriveForGuestsEnabled": false, "OneDriveStorageQuota": 5242880, "OptOutOfGrooveBlock": false, "OptOutOfGrooveSoftBlock": false, "OrphanedPersonalSitesRetentionPeriod": 30, "OwnerAnonymousNotification": true, "PermissiveBrowserFileHandlingOverride": false, "PreventExternalUsersFromResharing": false, "ProvisionSharedWithEveryoneFolder": false, "PublicCdnAllowedFileTypes": "CSS,EOT,GIF,ICO,JPEG,JPG,JS,MAP,PNG,SVG,TTF,WOFF", "PublicCdnEnabled": false, "PublicCdnOrigins": [
-
-              ], "RequireAcceptingAccountMatchInvitedAccount": false, "RequireAnonymousLinksExpireInDays": -1, "ResourceQuota": 6300, "ResourceQuotaAllocated": 1200, "RootSiteUrl": "https:\u002f\u002fcontoso.sharepoint.com", "SearchResolveExactEmailOrUPN": false, "SharingAllowedDomainList": null, "SharingBlockedDomainList": null, "SharingCapability": 2, "SharingDomainRestrictionMode": 0, "ShowAllUsersClaim": false, "ShowEveryoneClaim": false, "ShowEveryoneExceptExternalUsersClaim": true, "ShowNGSCDialogForSyncOnODB": true, "ShowPeoplePickerSuggestionsForGuestUsers": false, "SignInAccelerationDomain": "", "SocialBarOnSitePagesDisabled": false, "SpecialCharactersStateInFileFolderNames": 1, "StartASiteFormUrl": null, "StorageQuota": 1355776, "StorageQuotaAllocated": 135266304, "SyncPrivacyProfileProperties": true, "UseFindPeopleInPeoplePicker": false, "UsePersistentCookiesForExplorerView": false, "UserVoiceForFeedbackEnabled": true
-            }, 16, {
-              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SpoOperation", "_ObjectIdentity_": "5eda879e-90d5-6000-d611-e6bfd5acde9f|908bed80-a04a-4433-b4a0-883d9847d110:2ca3eaa5-140f-4175-9563-1172edf9f339\nSpoOperation\nRemoveSite\n636707032254311675\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fdemosite\n00000000-0000-0000-0000-000000000000", "IsComplete": true, "PollingInterval": 0
-            }
-          ]);
-        }
-      }
-
-      throw 'Invalid request';
-    });
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demosite', force: true, debug: true } });
-    assert(loggerLogToStderrSpy.called);
+  it('passes validation if only fromRecycleBin is specified', async () => {
+    const actual = await command.validate({ options: { url: siteUrl, fromRecycleBin: true } }, commandInfo);
+    assert.strictEqual(actual, true);
   });
 
-  it('removes site. doesn\'t wait for completion', async () => {
-    sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
-        if (opts.data === `<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}"><Actions><ObjectPath Id="4" ObjectPathId="3"/><Query Id="5" ObjectPathId="3"><Query SelectAllProperties="false"><Properties><Property Name="GroupId" ScalarProperty="true"/></Properties></Query></Query></Actions><ObjectPaths><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/><Method Id="3" ParentId="1" Name="GetSitePropertiesByUrl"><Parameters><Parameter Type="String">https://contoso.sharepoint.com/sites/demosite</Parameter></Parameters></Method></ObjectPaths></Request>`) {
-          return JSON.stringify([
-            {
-              "SchemaVersion": "15.0.0.0",
-              "LibraryVersion": "16.0.20530.12001",
-              "ErrorInfo": null,
-              "TraceCorrelationId": "10f1829f-d000-0000-5962-1110d33e2cf2"
-            },
-            4,
-            {
-              "IsNull": false
-            },
-            5,
-            {
-              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SiteProperties",
-              "_ObjectIdentity_": "10f1829f-d000-0000-5962-1110d33e2cf2|908bed80-a04a-4433-b4a0-883d9847d110:095efa67-57fa-40c7-b7cc-e96dc3e5780c\nSiteProperties\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fdemosite",
-              "GroupId": "/Guid(00000000-0000-0000-0000-000000000000)/"
-            }
-          ]);
-        }
-      }
-      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
-        if (opts.headers &&
-          opts.headers['X-RequestDigest'] &&
-          opts.headers['X-RequestDigest'] === 'abc' &&
-          opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="55" ObjectPathId="54"/><ObjectPath Id="57" ObjectPathId="56"/><Query Id="58" ObjectPathId="54"><Query SelectAllProperties="true"><Properties/></Query></Query><Query Id="59" ObjectPathId="56"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true"/><Property Name="PollingInterval" ScalarProperty="true"/></Properties></Query></Query></Actions><ObjectPaths><Constructor Id="54" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/><Method Id="56" ParentId="54" Name="RemoveSite"><Parameters><Parameter Type="String">https://contoso.sharepoint.com/sites/demosite</Parameter></Parameters></Method></ObjectPaths></Request>`) {
-          return JSON.stringify([
-            {
-              "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.8015.1210", "ErrorInfo": null, "TraceCorrelationId": "5eda879e-90d5-6000-d611-e6bfd5acde9f"
-            }, 12, {
-              "IsNull": false
-            }, 14, {
-              "IsNull": false
-            }, 15, {
-              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.Tenant", "_ObjectIdentity_": "5eda879e-90d5-6000-d611-e6bfd5acde9f|908bed80-a04a-4433-b4a0-883d9847d110:2ca3eaa5-140f-4175-9563-1172edf9f339\nTenant", "AllowDownloadingNonWebViewableFiles": true, "AllowedDomainListForSyncClient": [
-
-              ], "AllowEditing": true, "AllowLimitedAccessOnUnmanagedDevices": false, "ApplyAppEnforcedRestrictionsToAdHocRecipients": true, "BccExternalSharingInvitations": false, "BccExternalSharingInvitationsList": null, "BlockAccessOnUnmanagedDevices": false, "BlockDownloadOfAllFilesForGuests": false, "BlockDownloadOfAllFilesOnUnmanagedDevices": false, "BlockDownloadOfViewableFilesForGuests": false, "BlockDownloadOfViewableFilesOnUnmanagedDevices": false, "BlockMacSync": false, "CommentsOnSitePagesDisabled": false, "CompatibilityRange": "15,15", "ConditionalAccessPolicy": 0, "DefaultLinkPermission": 2, "DefaultSharingLinkType": 2, "DisabledWebPartIds": null, "DisableReportProblemDialog": false, "DisallowInfectedFileDownload": false, "DisplayNamesOfFileViewers": true, "DisplayStartASiteOption": false, "EmailAttestationReAuthDays": 30, "EmailAttestationRequired": false, "EnableGuestSignInAcceleration": false, "EnableMinimumVersionRequirement": true, "ExcludedFileExtensionsForSyncClient": [
-                ""
-              ], "ExternalServicesEnabled": true, "FileAnonymousLinkType": 1, "FilePickerExternalImageSearchEnabled": true, "FolderAnonymousLinkType": 1, "HideSyncButtonOnODB": false, "IPAddressAllowList": "", "IPAddressEnforcement": false, "IPAddressWACTokenLifetime": 15, "IsHubSitesMultiGeoFlightEnabled": false, "IsMultiGeo": false, "IsUnmanagedSyncClientForTenantRestricted": false, "IsUnmanagedSyncClientRestrictionFlightEnabled": true, "LegacyAuthProtocolsEnabled": true, "LimitedAccessFileType": 1, "NoAccessRedirectUrl": null, "NotificationsInOneDriveForBusinessEnabled": true, "NotificationsInSharePointEnabled": true, "NotifyOwnersWhenInvitationsAccepted": true, "NotifyOwnersWhenItemsReshared": true, "ODBAccessRequests": 0, "ODBMembersCanShare": 0, "OfficeClientADALDisabled": false, "OneDriveForGuestsEnabled": false, "OneDriveStorageQuota": 5242880, "OptOutOfGrooveBlock": false, "OptOutOfGrooveSoftBlock": false, "OrphanedPersonalSitesRetentionPeriod": 30, "OwnerAnonymousNotification": true, "PermissiveBrowserFileHandlingOverride": false, "PreventExternalUsersFromResharing": false, "ProvisionSharedWithEveryoneFolder": false, "PublicCdnAllowedFileTypes": "CSS,EOT,GIF,ICO,JPEG,JPG,JS,MAP,PNG,SVG,TTF,WOFF", "PublicCdnEnabled": false, "PublicCdnOrigins": [
-
-              ], "RequireAcceptingAccountMatchInvitedAccount": false, "RequireAnonymousLinksExpireInDays": -1, "ResourceQuota": 6300, "ResourceQuotaAllocated": 1200, "RootSiteUrl": "https:\u002f\u002fcontoso.sharepoint.com", "SearchResolveExactEmailOrUPN": false, "SharingAllowedDomainList": null, "SharingBlockedDomainList": null, "SharingCapability": 2, "SharingDomainRestrictionMode": 0, "ShowAllUsersClaim": false, "ShowEveryoneClaim": false, "ShowEveryoneExceptExternalUsersClaim": true, "ShowNGSCDialogForSyncOnODB": true, "ShowPeoplePickerSuggestionsForGuestUsers": false, "SignInAccelerationDomain": "", "SocialBarOnSitePagesDisabled": false, "SpecialCharactersStateInFileFolderNames": 1, "StartASiteFormUrl": null, "StorageQuota": 1355776, "StorageQuotaAllocated": 135266304, "SyncPrivacyProfileProperties": true, "UseFindPeopleInPeoplePicker": false, "UsePersistentCookiesForExplorerView": false, "UserVoiceForFeedbackEnabled": true
-            }, 16, {
-              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SpoOperation", "_ObjectIdentity_": "5eda879e-90d5-6000-d611-e6bfd5acde9f|908bed80-a04a-4433-b4a0-883d9847d110:2ca3eaa5-140f-4175-9563-1172edf9f339\nSpoOperation\nRemoveSite\n636707032254311675\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fdemosite\n00000000-0000-0000-0000-000000000000", "IsComplete": true, "PollingInterval": 0
-            }
-          ]);
-        }
-      }
-
-      throw 'Invalid request';
-    });
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demosite', force: true } });
-    assert(loggerLogSpy.notCalled);
+  it('passes validation if only skipRecycleBin is specified', async () => {
+    const actual = await command.validate({ options: { url: siteUrl, skipRecycleBin: true } }, commandInfo);
+    assert.strictEqual(actual, true);
   });
 
-  it('removes site, skip recycle bin doesn\'t wait for completion (debug)', async () => {
-    sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
-        if (opts.data === `<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}"><Actions><ObjectPath Id="4" ObjectPathId="3"/><Query Id="5" ObjectPathId="3"><Query SelectAllProperties="false"><Properties><Property Name="GroupId" ScalarProperty="true"/></Properties></Query></Query></Actions><ObjectPaths><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/><Method Id="3" ParentId="1" Name="GetSitePropertiesByUrl"><Parameters><Parameter Type="String">https://contoso.sharepoint.com/sites/demosite</Parameter></Parameters></Method></ObjectPaths></Request>`) {
-          return JSON.stringify([
-            {
-              "SchemaVersion": "15.0.0.0",
-              "LibraryVersion": "16.0.20530.12001",
-              "ErrorInfo": null,
-              "TraceCorrelationId": "10f1829f-d000-0000-5962-1110d33e2cf2"
-            },
-            4,
-            {
-              "IsNull": false
-            },
-            5,
-            {
-              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SiteProperties",
-              "_ObjectIdentity_": "10f1829f-d000-0000-5962-1110d33e2cf2|908bed80-a04a-4433-b4a0-883d9847d110:095efa67-57fa-40c7-b7cc-e96dc3e5780c\nSiteProperties\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fdemosite",
-              "GroupId": "/Guid(00000000-0000-0000-0000-000000000000)/"
-            }
-          ]);
-        }
-      }
-      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
-        if (opts.headers &&
-          opts.headers['X-RequestDigest'] &&
-          opts.headers['X-RequestDigest'] === 'abc' &&
-          opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="55" ObjectPathId="54"/><ObjectPath Id="57" ObjectPathId="56"/><Query Id="58" ObjectPathId="54"><Query SelectAllProperties="true"><Properties/></Query></Query><Query Id="59" ObjectPathId="56"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true"/><Property Name="PollingInterval" ScalarProperty="true"/></Properties></Query></Query></Actions><ObjectPaths><Constructor Id="54" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/><Method Id="56" ParentId="54" Name="RemoveSite"><Parameters><Parameter Type="String">https://contoso.sharepoint.com/sites/demosite</Parameter></Parameters></Method></ObjectPaths></Request>`) {
-          return JSON.stringify([
-            {
-              "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.8015.1210", "ErrorInfo": null, "TraceCorrelationId": "5eda879e-90d5-6000-d611-e6bfd5acde9f"
-            }, 12, {
-              "IsNull": false
-            }, 14, {
-              "IsNull": false
-            }, 15, {
-              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.Tenant", "_ObjectIdentity_": "5eda879e-90d5-6000-d611-e6bfd5acde9f|908bed80-a04a-4433-b4a0-883d9847d110:2ca3eaa5-140f-4175-9563-1172edf9f339\nTenant", "AllowDownloadingNonWebViewableFiles": true, "AllowedDomainListForSyncClient": [
-
-              ], "AllowEditing": true, "AllowLimitedAccessOnUnmanagedDevices": false, "ApplyAppEnforcedRestrictionsToAdHocRecipients": true, "BccExternalSharingInvitations": false, "BccExternalSharingInvitationsList": null, "BlockAccessOnUnmanagedDevices": false, "BlockDownloadOfAllFilesForGuests": false, "BlockDownloadOfAllFilesOnUnmanagedDevices": false, "BlockDownloadOfViewableFilesForGuests": false, "BlockDownloadOfViewableFilesOnUnmanagedDevices": false, "BlockMacSync": false, "CommentsOnSitePagesDisabled": false, "CompatibilityRange": "15,15", "ConditionalAccessPolicy": 0, "DefaultLinkPermission": 2, "DefaultSharingLinkType": 2, "DisabledWebPartIds": null, "DisableReportProblemDialog": false, "DisallowInfectedFileDownload": false, "DisplayNamesOfFileViewers": true, "DisplayStartASiteOption": false, "EmailAttestationReAuthDays": 30, "EmailAttestationRequired": false, "EnableGuestSignInAcceleration": false, "EnableMinimumVersionRequirement": true, "ExcludedFileExtensionsForSyncClient": [
-                ""
-              ], "ExternalServicesEnabled": true, "FileAnonymousLinkType": 1, "FilePickerExternalImageSearchEnabled": true, "FolderAnonymousLinkType": 1, "HideSyncButtonOnODB": false, "IPAddressAllowList": "", "IPAddressEnforcement": false, "IPAddressWACTokenLifetime": 15, "IsHubSitesMultiGeoFlightEnabled": false, "IsMultiGeo": false, "IsUnmanagedSyncClientForTenantRestricted": false, "IsUnmanagedSyncClientRestrictionFlightEnabled": true, "LegacyAuthProtocolsEnabled": true, "LimitedAccessFileType": 1, "NoAccessRedirectUrl": null, "NotificationsInOneDriveForBusinessEnabled": true, "NotificationsInSharePointEnabled": true, "NotifyOwnersWhenInvitationsAccepted": true, "NotifyOwnersWhenItemsReshared": true, "ODBAccessRequests": 0, "ODBMembersCanShare": 0, "OfficeClientADALDisabled": false, "OneDriveForGuestsEnabled": false, "OneDriveStorageQuota": 5242880, "OptOutOfGrooveBlock": false, "OptOutOfGrooveSoftBlock": false, "OrphanedPersonalSitesRetentionPeriod": 30, "OwnerAnonymousNotification": true, "PermissiveBrowserFileHandlingOverride": false, "PreventExternalUsersFromResharing": false, "ProvisionSharedWithEveryoneFolder": false, "PublicCdnAllowedFileTypes": "CSS,EOT,GIF,ICO,JPEG,JPG,JS,MAP,PNG,SVG,TTF,WOFF", "PublicCdnEnabled": false, "PublicCdnOrigins": [
-
-              ], "RequireAcceptingAccountMatchInvitedAccount": false, "RequireAnonymousLinksExpireInDays": -1, "ResourceQuota": 6300, "ResourceQuotaAllocated": 1200, "RootSiteUrl": "https:\u002f\u002fcontoso.sharepoint.com", "SearchResolveExactEmailOrUPN": false, "SharingAllowedDomainList": null, "SharingBlockedDomainList": null, "SharingCapability": 2, "SharingDomainRestrictionMode": 0, "ShowAllUsersClaim": false, "ShowEveryoneClaim": false, "ShowEveryoneExceptExternalUsersClaim": true, "ShowNGSCDialogForSyncOnODB": true, "ShowPeoplePickerSuggestionsForGuestUsers": false, "SignInAccelerationDomain": "", "SocialBarOnSitePagesDisabled": false, "SpecialCharactersStateInFileFolderNames": 1, "StartASiteFormUrl": null, "StorageQuota": 1355776, "StorageQuotaAllocated": 135266304, "SyncPrivacyProfileProperties": true, "UseFindPeopleInPeoplePicker": false, "UsePersistentCookiesForExplorerView": false, "UserVoiceForFeedbackEnabled": true
-            }, 16, {
-              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SpoOperation", "_ObjectIdentity_": "5eda879e-90d5-6000-d611-e6bfd5acde9f|908bed80-a04a-4433-b4a0-883d9847d110:2ca3eaa5-140f-4175-9563-1172edf9f339\nSpoOperation\nRemoveSite\n636707032254311675\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fdemosite\n00000000-0000-0000-0000-000000000000", "IsComplete": true, "PollingInterval": 0
-            }
-          ]);
-        }
-        if (opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="185" ObjectPathId="184" /><Query Id="186" ObjectPathId="184"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true" /><Property Name="PollingInterval" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Method Id="184" ParentId="175" Name="RemoveDeletedSite"><Parameters><Parameter Type="String">https://contoso.sharepoint.com/sites/demosite</Parameter></Parameters></Method><Constructor Id="175" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
-          return JSON.stringify([
-            {
-              "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.8015.1210", "ErrorInfo": null, "TraceCorrelationId": "5eda879e-90d5-6000-d611-e6bfd5acde9f"
-            }, 12, {
-              "IsNull": false
-            }, 14, {
-              "IsNull": false
-            }, 15, {
-              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.Tenant", "_ObjectIdentity_": "5eda879e-90d5-6000-d611-e6bfd5acde9f|908bed80-a04a-4433-b4a0-883d9847d110:2ca3eaa5-140f-4175-9563-1172edf9f339\nTenant", "AllowDownloadingNonWebViewableFiles": true, "AllowedDomainListForSyncClient": [
-
-              ], "AllowEditing": true, "AllowLimitedAccessOnUnmanagedDevices": false, "ApplyAppEnforcedRestrictionsToAdHocRecipients": true, "BccExternalSharingInvitations": false, "BccExternalSharingInvitationsList": null, "BlockAccessOnUnmanagedDevices": false, "BlockDownloadOfAllFilesForGuests": false, "BlockDownloadOfAllFilesOnUnmanagedDevices": false, "BlockDownloadOfViewableFilesForGuests": false, "BlockDownloadOfViewableFilesOnUnmanagedDevices": false, "BlockMacSync": false, "CommentsOnSitePagesDisabled": false, "CompatibilityRange": "15,15", "ConditionalAccessPolicy": 0, "DefaultLinkPermission": 2, "DefaultSharingLinkType": 2, "DisabledWebPartIds": null, "DisableReportProblemDialog": false, "DisallowInfectedFileDownload": false, "DisplayNamesOfFileViewers": true, "DisplayStartASiteOption": false, "EmailAttestationReAuthDays": 30, "EmailAttestationRequired": false, "EnableGuestSignInAcceleration": false, "EnableMinimumVersionRequirement": true, "ExcludedFileExtensionsForSyncClient": [
-                ""
-              ], "ExternalServicesEnabled": true, "FileAnonymousLinkType": 1, "FilePickerExternalImageSearchEnabled": true, "FolderAnonymousLinkType": 1, "HideSyncButtonOnODB": false, "IPAddressAllowList": "", "IPAddressEnforcement": false, "IPAddressWACTokenLifetime": 15, "IsHubSitesMultiGeoFlightEnabled": false, "IsMultiGeo": false, "IsUnmanagedSyncClientForTenantRestricted": false, "IsUnmanagedSyncClientRestrictionFlightEnabled": true, "LegacyAuthProtocolsEnabled": true, "LimitedAccessFileType": 1, "NoAccessRedirectUrl": null, "NotificationsInOneDriveForBusinessEnabled": true, "NotificationsInSharePointEnabled": true, "NotifyOwnersWhenInvitationsAccepted": true, "NotifyOwnersWhenItemsReshared": true, "ODBAccessRequests": 0, "ODBMembersCanShare": 0, "OfficeClientADALDisabled": false, "OneDriveForGuestsEnabled": false, "OneDriveStorageQuota": 5242880, "OptOutOfGrooveBlock": false, "OptOutOfGrooveSoftBlock": false, "OrphanedPersonalSitesRetentionPeriod": 30, "OwnerAnonymousNotification": true, "PermissiveBrowserFileHandlingOverride": false, "PreventExternalUsersFromResharing": false, "ProvisionSharedWithEveryoneFolder": false, "PublicCdnAllowedFileTypes": "CSS,EOT,GIF,ICO,JPEG,JPG,JS,MAP,PNG,SVG,TTF,WOFF", "PublicCdnEnabled": false, "PublicCdnOrigins": [
-
-              ], "RequireAcceptingAccountMatchInvitedAccount": false, "RequireAnonymousLinksExpireInDays": -1, "ResourceQuota": 6300, "ResourceQuotaAllocated": 1200, "RootSiteUrl": "https:\u002f\u002fcontoso.sharepoint.com", "SearchResolveExactEmailOrUPN": false, "SharingAllowedDomainList": null, "SharingBlockedDomainList": null, "SharingCapability": 2, "SharingDomainRestrictionMode": 0, "ShowAllUsersClaim": false, "ShowEveryoneClaim": false, "ShowEveryoneExceptExternalUsersClaim": true, "ShowNGSCDialogForSyncOnODB": true, "ShowPeoplePickerSuggestionsForGuestUsers": false, "SignInAccelerationDomain": "", "SocialBarOnSitePagesDisabled": false, "SpecialCharactersStateInFileFolderNames": 1, "StartASiteFormUrl": null, "StorageQuota": 1355776, "StorageQuotaAllocated": 135266304, "SyncPrivacyProfileProperties": true, "UseFindPeopleInPeoplePicker": false, "UsePersistentCookiesForExplorerView": false, "UserVoiceForFeedbackEnabled": true
-            }, 16, {
-              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SpoOperation", "_ObjectIdentity_": "5eda879e-90d5-6000-d611-e6bfd5acde9f|908bed80-a04a-4433-b4a0-883d9847d110:2ca3eaa5-140f-4175-9563-1172edf9f339\nSpoOperation\nRemoveDeletedSite\n636707032254311675\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fdemosite\n00000000-0000-0000-0000-000000000000", "IsComplete": true, "PollingInterval": 0
-            }
-          ]);
-        }
-      }
-
-      throw 'Invalid request';
-    });
-
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demosite', force: true, debug: true, skipRecycleBin: true } } as any);
-    assert(loggerLogToStderrSpy.called);
+  it('fails validation if siteUrl is a valid url', async () => {
+    const actual = await command.validate({ options: { url: 'invalid' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
   });
 
-  it('removes site, skip recycle bin doesn\'t wait for completion', async () => {
-    sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
-        if (opts.data === `<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}"><Actions><ObjectPath Id="4" ObjectPathId="3"/><Query Id="5" ObjectPathId="3"><Query SelectAllProperties="false"><Properties><Property Name="GroupId" ScalarProperty="true"/></Properties></Query></Query></Actions><ObjectPaths><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/><Method Id="3" ParentId="1" Name="GetSitePropertiesByUrl"><Parameters><Parameter Type="String">https://contoso.sharepoint.com/sites/demosite</Parameter></Parameters></Method></ObjectPaths></Request>`) {
-          return JSON.stringify([
-            {
-              "SchemaVersion": "15.0.0.0",
-              "LibraryVersion": "16.0.20530.12001",
-              "ErrorInfo": null,
-              "TraceCorrelationId": "10f1829f-d000-0000-5962-1110d33e2cf2"
-            },
-            4,
-            {
-              "IsNull": false
-            },
-            5,
-            {
-              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SiteProperties",
-              "_ObjectIdentity_": "10f1829f-d000-0000-5962-1110d33e2cf2|908bed80-a04a-4433-b4a0-883d9847d110:095efa67-57fa-40c7-b7cc-e96dc3e5780c\nSiteProperties\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fdemosite",
-              "GroupId": "/Guid(00000000-0000-0000-0000-000000000000)/"
-            }
-          ]);
-        }
-      }
-      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
-        if (opts.headers &&
-          opts.headers['X-RequestDigest'] &&
-          opts.headers['X-RequestDigest'] === 'abc' &&
-          opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="55" ObjectPathId="54"/><ObjectPath Id="57" ObjectPathId="56"/><Query Id="58" ObjectPathId="54"><Query SelectAllProperties="true"><Properties/></Query></Query><Query Id="59" ObjectPathId="56"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true"/><Property Name="PollingInterval" ScalarProperty="true"/></Properties></Query></Query></Actions><ObjectPaths><Constructor Id="54" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/><Method Id="56" ParentId="54" Name="RemoveSite"><Parameters><Parameter Type="String">https://contoso.sharepoint.com/sites/demosite</Parameter></Parameters></Method></ObjectPaths></Request>`) {
-          return JSON.stringify([
-            {
-              "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.8015.1210", "ErrorInfo": null, "TraceCorrelationId": "5eda879e-90d5-6000-d611-e6bfd5acde9f"
-            }, 12, {
-              "IsNull": false
-            }, 14, {
-              "IsNull": false
-            }, 15, {
-              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.Tenant", "_ObjectIdentity_": "5eda879e-90d5-6000-d611-e6bfd5acde9f|908bed80-a04a-4433-b4a0-883d9847d110:2ca3eaa5-140f-4175-9563-1172edf9f339\nTenant", "AllowDownloadingNonWebViewableFiles": true, "AllowedDomainListForSyncClient": [
-
-              ], "AllowEditing": true, "AllowLimitedAccessOnUnmanagedDevices": false, "ApplyAppEnforcedRestrictionsToAdHocRecipients": true, "BccExternalSharingInvitations": false, "BccExternalSharingInvitationsList": null, "BlockAccessOnUnmanagedDevices": false, "BlockDownloadOfAllFilesForGuests": false, "BlockDownloadOfAllFilesOnUnmanagedDevices": false, "BlockDownloadOfViewableFilesForGuests": false, "BlockDownloadOfViewableFilesOnUnmanagedDevices": false, "BlockMacSync": false, "CommentsOnSitePagesDisabled": false, "CompatibilityRange": "15,15", "ConditionalAccessPolicy": 0, "DefaultLinkPermission": 2, "DefaultSharingLinkType": 2, "DisabledWebPartIds": null, "DisableReportProblemDialog": false, "DisallowInfectedFileDownload": false, "DisplayNamesOfFileViewers": true, "DisplayStartASiteOption": false, "EmailAttestationReAuthDays": 30, "EmailAttestationRequired": false, "EnableGuestSignInAcceleration": false, "EnableMinimumVersionRequirement": true, "ExcludedFileExtensionsForSyncClient": [
-                ""
-              ], "ExternalServicesEnabled": true, "FileAnonymousLinkType": 1, "FilePickerExternalImageSearchEnabled": true, "FolderAnonymousLinkType": 1, "HideSyncButtonOnODB": false, "IPAddressAllowList": "", "IPAddressEnforcement": false, "IPAddressWACTokenLifetime": 15, "IsHubSitesMultiGeoFlightEnabled": false, "IsMultiGeo": false, "IsUnmanagedSyncClientForTenantRestricted": false, "IsUnmanagedSyncClientRestrictionFlightEnabled": true, "LegacyAuthProtocolsEnabled": true, "LimitedAccessFileType": 1, "NoAccessRedirectUrl": null, "NotificationsInOneDriveForBusinessEnabled": true, "NotificationsInSharePointEnabled": true, "NotifyOwnersWhenInvitationsAccepted": true, "NotifyOwnersWhenItemsReshared": true, "ODBAccessRequests": 0, "ODBMembersCanShare": 0, "OfficeClientADALDisabled": false, "OneDriveForGuestsEnabled": false, "OneDriveStorageQuota": 5242880, "OptOutOfGrooveBlock": false, "OptOutOfGrooveSoftBlock": false, "OrphanedPersonalSitesRetentionPeriod": 30, "OwnerAnonymousNotification": true, "PermissiveBrowserFileHandlingOverride": false, "PreventExternalUsersFromResharing": false, "ProvisionSharedWithEveryoneFolder": false, "PublicCdnAllowedFileTypes": "CSS,EOT,GIF,ICO,JPEG,JPG,JS,MAP,PNG,SVG,TTF,WOFF", "PublicCdnEnabled": false, "PublicCdnOrigins": [
-
-              ], "RequireAcceptingAccountMatchInvitedAccount": false, "RequireAnonymousLinksExpireInDays": -1, "ResourceQuota": 6300, "ResourceQuotaAllocated": 1200, "RootSiteUrl": "https:\u002f\u002fcontoso.sharepoint.com", "SearchResolveExactEmailOrUPN": false, "SharingAllowedDomainList": null, "SharingBlockedDomainList": null, "SharingCapability": 2, "SharingDomainRestrictionMode": 0, "ShowAllUsersClaim": false, "ShowEveryoneClaim": false, "ShowEveryoneExceptExternalUsersClaim": true, "ShowNGSCDialogForSyncOnODB": true, "ShowPeoplePickerSuggestionsForGuestUsers": false, "SignInAccelerationDomain": "", "SocialBarOnSitePagesDisabled": false, "SpecialCharactersStateInFileFolderNames": 1, "StartASiteFormUrl": null, "StorageQuota": 1355776, "StorageQuotaAllocated": 135266304, "SyncPrivacyProfileProperties": true, "UseFindPeopleInPeoplePicker": false, "UsePersistentCookiesForExplorerView": false, "UserVoiceForFeedbackEnabled": true
-            }, 16, {
-              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SpoOperation", "_ObjectIdentity_": "5eda879e-90d5-6000-d611-e6bfd5acde9f|908bed80-a04a-4433-b4a0-883d9847d110:2ca3eaa5-140f-4175-9563-1172edf9f339\nSpoOperation\nRemoveSite\n636707032254311675\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fdemosite\n00000000-0000-0000-0000-000000000000", "IsComplete": true, "PollingInterval": 0
-            }
-          ]);
-        }
-        if (opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="185" ObjectPathId="184" /><Query Id="186" ObjectPathId="184"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true" /><Property Name="PollingInterval" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Method Id="184" ParentId="175" Name="RemoveDeletedSite"><Parameters><Parameter Type="String">https://contoso.sharepoint.com/sites/demosite</Parameter></Parameters></Method><Constructor Id="175" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
-          return JSON.stringify([
-            {
-              "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.8015.1210", "ErrorInfo": null, "TraceCorrelationId": "5eda879e-90d5-6000-d611-e6bfd5acde9f"
-            }, 12, {
-              "IsNull": false
-            }, 14, {
-              "IsNull": false
-            }, 15, {
-              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.Tenant", "_ObjectIdentity_": "5eda879e-90d5-6000-d611-e6bfd5acde9f|908bed80-a04a-4433-b4a0-883d9847d110:2ca3eaa5-140f-4175-9563-1172edf9f339\nTenant", "AllowDownloadingNonWebViewableFiles": true, "AllowedDomainListForSyncClient": [
-
-              ], "AllowEditing": true, "AllowLimitedAccessOnUnmanagedDevices": false, "ApplyAppEnforcedRestrictionsToAdHocRecipients": true, "BccExternalSharingInvitations": false, "BccExternalSharingInvitationsList": null, "BlockAccessOnUnmanagedDevices": false, "BlockDownloadOfAllFilesForGuests": false, "BlockDownloadOfAllFilesOnUnmanagedDevices": false, "BlockDownloadOfViewableFilesForGuests": false, "BlockDownloadOfViewableFilesOnUnmanagedDevices": false, "BlockMacSync": false, "CommentsOnSitePagesDisabled": false, "CompatibilityRange": "15,15", "ConditionalAccessPolicy": 0, "DefaultLinkPermission": 2, "DefaultSharingLinkType": 2, "DisabledWebPartIds": null, "DisableReportProblemDialog": false, "DisallowInfectedFileDownload": false, "DisplayNamesOfFileViewers": true, "DisplayStartASiteOption": false, "EmailAttestationReAuthDays": 30, "EmailAttestationRequired": false, "EnableGuestSignInAcceleration": false, "EnableMinimumVersionRequirement": true, "ExcludedFileExtensionsForSyncClient": [
-                ""
-              ], "ExternalServicesEnabled": true, "FileAnonymousLinkType": 1, "FilePickerExternalImageSearchEnabled": true, "FolderAnonymousLinkType": 1, "HideSyncButtonOnODB": false, "IPAddressAllowList": "", "IPAddressEnforcement": false, "IPAddressWACTokenLifetime": 15, "IsHubSitesMultiGeoFlightEnabled": false, "IsMultiGeo": false, "IsUnmanagedSyncClientForTenantRestricted": false, "IsUnmanagedSyncClientRestrictionFlightEnabled": true, "LegacyAuthProtocolsEnabled": true, "LimitedAccessFileType": 1, "NoAccessRedirectUrl": null, "NotificationsInOneDriveForBusinessEnabled": true, "NotificationsInSharePointEnabled": true, "NotifyOwnersWhenInvitationsAccepted": true, "NotifyOwnersWhenItemsReshared": true, "ODBAccessRequests": 0, "ODBMembersCanShare": 0, "OfficeClientADALDisabled": false, "OneDriveForGuestsEnabled": false, "OneDriveStorageQuota": 5242880, "OptOutOfGrooveBlock": false, "OptOutOfGrooveSoftBlock": false, "OrphanedPersonalSitesRetentionPeriod": 30, "OwnerAnonymousNotification": true, "PermissiveBrowserFileHandlingOverride": false, "PreventExternalUsersFromResharing": false, "ProvisionSharedWithEveryoneFolder": false, "PublicCdnAllowedFileTypes": "CSS,EOT,GIF,ICO,JPEG,JPG,JS,MAP,PNG,SVG,TTF,WOFF", "PublicCdnEnabled": false, "PublicCdnOrigins": [
-
-              ], "RequireAcceptingAccountMatchInvitedAccount": false, "RequireAnonymousLinksExpireInDays": -1, "ResourceQuota": 6300, "ResourceQuotaAllocated": 1200, "RootSiteUrl": "https:\u002f\u002fcontoso.sharepoint.com", "SearchResolveExactEmailOrUPN": false, "SharingAllowedDomainList": null, "SharingBlockedDomainList": null, "SharingCapability": 2, "SharingDomainRestrictionMode": 0, "ShowAllUsersClaim": false, "ShowEveryoneClaim": false, "ShowEveryoneExceptExternalUsersClaim": true, "ShowNGSCDialogForSyncOnODB": true, "ShowPeoplePickerSuggestionsForGuestUsers": false, "SignInAccelerationDomain": "", "SocialBarOnSitePagesDisabled": false, "SpecialCharactersStateInFileFolderNames": 1, "StartASiteFormUrl": null, "StorageQuota": 1355776, "StorageQuotaAllocated": 135266304, "SyncPrivacyProfileProperties": true, "UseFindPeopleInPeoplePicker": false, "UsePersistentCookiesForExplorerView": false, "UserVoiceForFeedbackEnabled": true
-            }, 16, {
-              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SpoOperation", "_ObjectIdentity_": "5eda879e-90d5-6000-d611-e6bfd5acde9f|908bed80-a04a-4433-b4a0-883d9847d110:2ca3eaa5-140f-4175-9563-1172edf9f339\nSpoOperation\nRemoveDeletedSite\n636707032254311675\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fdemosite\n00000000-0000-0000-0000-000000000000", "IsComplete": true, "PollingInterval": 0
-            }
-          ]);
-        }
-      }
-
-      throw 'Invalid request';
-    });
-
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demosite', force: true, skipRecycleBin: true } } as any);
-    assert(loggerLogSpy.notCalled);
+  it('fails validation when trying to remove the root site collection', async () => {
+    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
   });
 
-  it('removes site from recycle bin doesn\'t wait for completion (debug)', async () => {
-    sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
-        if (opts.data === `<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}"><Actions><ObjectPath Id="4" ObjectPathId="3"/><Query Id="5" ObjectPathId="3"><Query SelectAllProperties="false"><Properties><Property Name="GroupId" ScalarProperty="true"/></Properties></Query></Query></Actions><ObjectPaths><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/><Method Id="3" ParentId="1" Name="GetSitePropertiesByUrl"><Parameters><Parameter Type="String">https://contoso.sharepoint.com/sites/demosite</Parameter></Parameters></Method></ObjectPaths></Request>`) {
-          return JSON.stringify([
-            {
-              "SchemaVersion": "15.0.0.0",
-              "LibraryVersion": "16.0.20530.12001",
-              "ErrorInfo": null,
-              "TraceCorrelationId": "10f1829f-d000-0000-5962-1110d33e2cf2"
-            },
-            4,
-            {
-              "IsNull": false
-            },
-            5,
-            {
-              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SiteProperties",
-              "_ObjectIdentity_": "10f1829f-d000-0000-5962-1110d33e2cf2|908bed80-a04a-4433-b4a0-883d9847d110:095efa67-57fa-40c7-b7cc-e96dc3e5780c\nSiteProperties\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fdemosite",
-              "GroupId": "/Guid(00000000-0000-0000-0000-000000000000)/"
-            }
-          ]);
-        }
-      }
-      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
-        if (opts.headers &&
-          opts.headers['X-RequestDigest'] &&
-          opts.headers['X-RequestDigest'] === 'abc' &&
-          opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="185" ObjectPathId="184" /><Query Id="186" ObjectPathId="184"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true" /><Property Name="PollingInterval" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Method Id="184" ParentId="175" Name="RemoveDeletedSite"><Parameters><Parameter Type="String">https://contoso.sharepoint.com/sites/demosite</Parameter></Parameters></Method><Constructor Id="175" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
-          return JSON.stringify([
-            {
-              "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.8015.1210", "ErrorInfo": null, "TraceCorrelationId": "5eda879e-90d5-6000-d611-e6bfd5acde9f"
-            }, 12, {
-              "IsNull": false
-            }, 14, {
-              "IsNull": false
-            }, 15, {
-              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.Tenant", "_ObjectIdentity_": "5eda879e-90d5-6000-d611-e6bfd5acde9f|908bed80-a04a-4433-b4a0-883d9847d110:2ca3eaa5-140f-4175-9563-1172edf9f339\nTenant", "AllowDownloadingNonWebViewableFiles": true, "AllowedDomainListForSyncClient": [
-
-              ], "AllowEditing": true, "AllowLimitedAccessOnUnmanagedDevices": false, "ApplyAppEnforcedRestrictionsToAdHocRecipients": true, "BccExternalSharingInvitations": false, "BccExternalSharingInvitationsList": null, "BlockAccessOnUnmanagedDevices": false, "BlockDownloadOfAllFilesForGuests": false, "BlockDownloadOfAllFilesOnUnmanagedDevices": false, "BlockDownloadOfViewableFilesForGuests": false, "BlockDownloadOfViewableFilesOnUnmanagedDevices": false, "BlockMacSync": false, "CommentsOnSitePagesDisabled": false, "CompatibilityRange": "15,15", "ConditionalAccessPolicy": 0, "DefaultLinkPermission": 2, "DefaultSharingLinkType": 2, "DisabledWebPartIds": null, "DisableReportProblemDialog": false, "DisallowInfectedFileDownload": false, "DisplayNamesOfFileViewers": true, "DisplayStartASiteOption": false, "EmailAttestationReAuthDays": 30, "EmailAttestationRequired": false, "EnableGuestSignInAcceleration": false, "EnableMinimumVersionRequirement": true, "ExcludedFileExtensionsForSyncClient": [
-                ""
-              ], "ExternalServicesEnabled": true, "FileAnonymousLinkType": 1, "FilePickerExternalImageSearchEnabled": true, "FolderAnonymousLinkType": 1, "HideSyncButtonOnODB": false, "IPAddressAllowList": "", "IPAddressEnforcement": false, "IPAddressWACTokenLifetime": 15, "IsHubSitesMultiGeoFlightEnabled": false, "IsMultiGeo": false, "IsUnmanagedSyncClientForTenantRestricted": false, "IsUnmanagedSyncClientRestrictionFlightEnabled": true, "LegacyAuthProtocolsEnabled": true, "LimitedAccessFileType": 1, "NoAccessRedirectUrl": null, "NotificationsInOneDriveForBusinessEnabled": true, "NotificationsInSharePointEnabled": true, "NotifyOwnersWhenInvitationsAccepted": true, "NotifyOwnersWhenItemsReshared": true, "ODBAccessRequests": 0, "ODBMembersCanShare": 0, "OfficeClientADALDisabled": false, "OneDriveForGuestsEnabled": false, "OneDriveStorageQuota": 5242880, "OptOutOfGrooveBlock": false, "OptOutOfGrooveSoftBlock": false, "OrphanedPersonalSitesRetentionPeriod": 30, "OwnerAnonymousNotification": true, "PermissiveBrowserFileHandlingOverride": false, "PreventExternalUsersFromResharing": false, "ProvisionSharedWithEveryoneFolder": false, "PublicCdnAllowedFileTypes": "CSS,EOT,GIF,ICO,JPEG,JPG,JS,MAP,PNG,SVG,TTF,WOFF", "PublicCdnEnabled": false, "PublicCdnOrigins": [
-
-              ], "RequireAcceptingAccountMatchInvitedAccount": false, "RequireAnonymousLinksExpireInDays": -1, "ResourceQuota": 6300, "ResourceQuotaAllocated": 1200, "RootSiteUrl": "https:\u002f\u002fcontoso.sharepoint.com", "SearchResolveExactEmailOrUPN": false, "SharingAllowedDomainList": null, "SharingBlockedDomainList": null, "SharingCapability": 2, "SharingDomainRestrictionMode": 0, "ShowAllUsersClaim": false, "ShowEveryoneClaim": false, "ShowEveryoneExceptExternalUsersClaim": true, "ShowNGSCDialogForSyncOnODB": true, "ShowPeoplePickerSuggestionsForGuestUsers": false, "SignInAccelerationDomain": "", "SocialBarOnSitePagesDisabled": false, "SpecialCharactersStateInFileFolderNames": 1, "StartASiteFormUrl": null, "StorageQuota": 1355776, "StorageQuotaAllocated": 135266304, "SyncPrivacyProfileProperties": true, "UseFindPeopleInPeoplePicker": false, "UsePersistentCookiesForExplorerView": false, "UserVoiceForFeedbackEnabled": true
-            }, 16, {
-              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SpoOperation", "_ObjectIdentity_": "5eda879e-90d5-6000-d611-e6bfd5acde9f|908bed80-a04a-4433-b4a0-883d9847d110:2ca3eaa5-140f-4175-9563-1172edf9f339\nSpoOperation\nRemoveDeletedSite\n636707032254311675\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fdemosite\n00000000-0000-0000-0000-000000000000", "IsComplete": true, "PollingInterval": 0
-            }
-          ]);
-        }
-      }
-
-      throw 'Invalid request';
-    });
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demosite', fromRecycleBin: true, force: true, debug: true } });
-    assert(loggerLogToStderrSpy.called);
-  });
-
-  it('removes site from recycle bin doesn\'t wait for completion', async () => {
-    sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
-        if (opts.data === `<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}"><Actions><ObjectPath Id="4" ObjectPathId="3"/><Query Id="5" ObjectPathId="3"><Query SelectAllProperties="false"><Properties><Property Name="GroupId" ScalarProperty="true"/></Properties></Query></Query></Actions><ObjectPaths><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/><Method Id="3" ParentId="1" Name="GetSitePropertiesByUrl"><Parameters><Parameter Type="String">https://contoso.sharepoint.com/sites/demosite</Parameter></Parameters></Method></ObjectPaths></Request>`) {
-          return JSON.stringify([
-            {
-              "SchemaVersion": "15.0.0.0",
-              "LibraryVersion": "16.0.20530.12001",
-              "ErrorInfo": null,
-              "TraceCorrelationId": "10f1829f-d000-0000-5962-1110d33e2cf2"
-            },
-            4,
-            {
-              "IsNull": false
-            },
-            5,
-            {
-              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SiteProperties",
-              "_ObjectIdentity_": "10f1829f-d000-0000-5962-1110d33e2cf2|908bed80-a04a-4433-b4a0-883d9847d110:095efa67-57fa-40c7-b7cc-e96dc3e5780c\nSiteProperties\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fdemosite",
-              "GroupId": "/Guid(00000000-0000-0000-0000-000000000000)/"
-            }
-          ]);
-        }
-      }
-      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
-        if (opts.headers &&
-          opts.headers['X-RequestDigest'] &&
-          opts.headers['X-RequestDigest'] === 'abc' &&
-          opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="185" ObjectPathId="184" /><Query Id="186" ObjectPathId="184"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true" /><Property Name="PollingInterval" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Method Id="184" ParentId="175" Name="RemoveDeletedSite"><Parameters><Parameter Type="String">https://contoso.sharepoint.com/sites/demosite</Parameter></Parameters></Method><Constructor Id="175" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
-          return JSON.stringify([
-            {
-              "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.8015.1210", "ErrorInfo": null, "TraceCorrelationId": "5eda879e-90d5-6000-d611-e6bfd5acde9f"
-            }, 12, {
-              "IsNull": false
-            }, 14, {
-              "IsNull": false
-            }, 15, {
-              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.Tenant", "_ObjectIdentity_": "5eda879e-90d5-6000-d611-e6bfd5acde9f|908bed80-a04a-4433-b4a0-883d9847d110:2ca3eaa5-140f-4175-9563-1172edf9f339\nTenant", "AllowDownloadingNonWebViewableFiles": true, "AllowedDomainListForSyncClient": [
-
-              ], "AllowEditing": true, "AllowLimitedAccessOnUnmanagedDevices": false, "ApplyAppEnforcedRestrictionsToAdHocRecipients": true, "BccExternalSharingInvitations": false, "BccExternalSharingInvitationsList": null, "BlockAccessOnUnmanagedDevices": false, "BlockDownloadOfAllFilesForGuests": false, "BlockDownloadOfAllFilesOnUnmanagedDevices": false, "BlockDownloadOfViewableFilesForGuests": false, "BlockDownloadOfViewableFilesOnUnmanagedDevices": false, "BlockMacSync": false, "CommentsOnSitePagesDisabled": false, "CompatibilityRange": "15,15", "ConditionalAccessPolicy": 0, "DefaultLinkPermission": 2, "DefaultSharingLinkType": 2, "DisabledWebPartIds": null, "DisableReportProblemDialog": false, "DisallowInfectedFileDownload": false, "DisplayNamesOfFileViewers": true, "DisplayStartASiteOption": false, "EmailAttestationReAuthDays": 30, "EmailAttestationRequired": false, "EnableGuestSignInAcceleration": false, "EnableMinimumVersionRequirement": true, "ExcludedFileExtensionsForSyncClient": [
-                ""
-              ], "ExternalServicesEnabled": true, "FileAnonymousLinkType": 1, "FilePickerExternalImageSearchEnabled": true, "FolderAnonymousLinkType": 1, "HideSyncButtonOnODB": false, "IPAddressAllowList": "", "IPAddressEnforcement": false, "IPAddressWACTokenLifetime": 15, "IsHubSitesMultiGeoFlightEnabled": false, "IsMultiGeo": false, "IsUnmanagedSyncClientForTenantRestricted": false, "IsUnmanagedSyncClientRestrictionFlightEnabled": true, "LegacyAuthProtocolsEnabled": true, "LimitedAccessFileType": 1, "NoAccessRedirectUrl": null, "NotificationsInOneDriveForBusinessEnabled": true, "NotificationsInSharePointEnabled": true, "NotifyOwnersWhenInvitationsAccepted": true, "NotifyOwnersWhenItemsReshared": true, "ODBAccessRequests": 0, "ODBMembersCanShare": 0, "OfficeClientADALDisabled": false, "OneDriveForGuestsEnabled": false, "OneDriveStorageQuota": 5242880, "OptOutOfGrooveBlock": false, "OptOutOfGrooveSoftBlock": false, "OrphanedPersonalSitesRetentionPeriod": 30, "OwnerAnonymousNotification": true, "PermissiveBrowserFileHandlingOverride": false, "PreventExternalUsersFromResharing": false, "ProvisionSharedWithEveryoneFolder": false, "PublicCdnAllowedFileTypes": "CSS,EOT,GIF,ICO,JPEG,JPG,JS,MAP,PNG,SVG,TTF,WOFF", "PublicCdnEnabled": false, "PublicCdnOrigins": [
-
-              ], "RequireAcceptingAccountMatchInvitedAccount": false, "RequireAnonymousLinksExpireInDays": -1, "ResourceQuota": 6300, "ResourceQuotaAllocated": 1200, "RootSiteUrl": "https:\u002f\u002fcontoso.sharepoint.com", "SearchResolveExactEmailOrUPN": false, "SharingAllowedDomainList": null, "SharingBlockedDomainList": null, "SharingCapability": 2, "SharingDomainRestrictionMode": 0, "ShowAllUsersClaim": false, "ShowEveryoneClaim": false, "ShowEveryoneExceptExternalUsersClaim": true, "ShowNGSCDialogForSyncOnODB": true, "ShowPeoplePickerSuggestionsForGuestUsers": false, "SignInAccelerationDomain": "", "SocialBarOnSitePagesDisabled": false, "SpecialCharactersStateInFileFolderNames": 1, "StartASiteFormUrl": null, "StorageQuota": 1355776, "StorageQuotaAllocated": 135266304, "SyncPrivacyProfileProperties": true, "UseFindPeopleInPeoplePicker": false, "UsePersistentCookiesForExplorerView": false, "UserVoiceForFeedbackEnabled": true
-            }, 16, {
-              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SpoOperation", "_ObjectIdentity_": "5eda879e-90d5-6000-d611-e6bfd5acde9f|908bed80-a04a-4433-b4a0-883d9847d110:2ca3eaa5-140f-4175-9563-1172edf9f339\nSpoOperation\nRemoveDeletedSite\n636707032254311675\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fdemosite\n00000000-0000-0000-0000-000000000000", "IsComplete": true, "PollingInterval": 0
-            }
-          ]);
-        }
-      }
-
-      throw 'Invalid request';
-    });
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demosite', fromRecycleBin: true, force: true } });
-    assert(loggerLogSpy.notCalled);
-  });
-
-  it('removes site from recycle bin, wait for completion (debug)', async () => {
-    sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
-        if (opts.data === `<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}"><Actions><ObjectPath Id="4" ObjectPathId="3"/><Query Id="5" ObjectPathId="3"><Query SelectAllProperties="false"><Properties><Property Name="GroupId" ScalarProperty="true"/></Properties></Query></Query></Actions><ObjectPaths><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/><Method Id="3" ParentId="1" Name="GetSitePropertiesByUrl"><Parameters><Parameter Type="String">https://contoso.sharepoint.com/sites/demosite</Parameter></Parameters></Method></ObjectPaths></Request>`) {
-          return JSON.stringify([
-            {
-              "SchemaVersion": "15.0.0.0",
-              "LibraryVersion": "16.0.20530.12001",
-              "ErrorInfo": null,
-              "TraceCorrelationId": "10f1829f-d000-0000-5962-1110d33e2cf2"
-            },
-            4,
-            {
-              "IsNull": false
-            },
-            5,
-            {
-              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SiteProperties",
-              "_ObjectIdentity_": "10f1829f-d000-0000-5962-1110d33e2cf2|908bed80-a04a-4433-b4a0-883d9847d110:095efa67-57fa-40c7-b7cc-e96dc3e5780c\nSiteProperties\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fdemosite",
-              "GroupId": "/Guid(00000000-0000-0000-0000-000000000000)/"
-            }
-          ]);
-        }
-      }
-      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
-        if (opts.headers &&
-          opts.headers['X-RequestDigest'] &&
-          opts.headers['X-RequestDigest'] === 'abc' &&
-          opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="185" ObjectPathId="184" /><Query Id="186" ObjectPathId="184"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true" /><Property Name="PollingInterval" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Method Id="184" ParentId="175" Name="RemoveDeletedSite"><Parameters><Parameter Type="String">https://contoso.sharepoint.com/sites/demosite</Parameter></Parameters></Method><Constructor Id="175" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
-          return JSON.stringify([
-            {
-              "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7324.1200", "ErrorInfo": null, "TraceCorrelationId": "e13c489e-304e-5000-8242-705e26a87302"
-            }, 185, {
-              "IsNull": false
-            }, 186, {
-              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SpoOperation", "_ObjectIdentity_": "e13c489e-304e-5000-8242-705e26a87302|908bed80-a04a-4433-b4a0-883d9847d110:67753f63-bc14-4012-869e-f808a43fe023\nSpoOperation\nRemoveDeletedSite\n636536266495764941\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fdemosite\n00000000-0000-0000-0000-000000000000", "IsComplete": false, "PollingInterval": 0
-            }
-          ]);
-        }
-        if (opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Query Id="188" ObjectPathId="184"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true" /><Property Name="PollingInterval" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Identity Id="184" Name="e13c489e-304e-5000-8242-705e26a87302|908bed80-a04a-4433-b4a0-883d9847d110:67753f63-bc14-4012-869e-f808a43fe023&#xA;SpoOperation&#xA;RemoveDeletedSite&#xA;636536266495764941&#xA;https%3a%2f%2fcontoso.sharepoint.com%2fsites%2fdemosite&#xA;00000000-0000-0000-0000-000000000000" /></ObjectPaths></Request>`) {
-          return JSON.stringify([
-            {
-              "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7324.1200", "ErrorInfo": null, "TraceCorrelationId": "803b489e-9066-5000-58fc-dc40eb096913"
-            }, 39, {
-              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SpoOperation", "_ObjectIdentity_": "803b489e-9066-5000-58fc-dc40eb096913|908bed80-a04a-4433-b4a0-883d9847d110:67753f63-bc14-4012-869e-f808a43fe023\nSpoOperation\nRemoveDeletedSite\n636536266495764941\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fdemosite\n00000000-0000-0000-0000-000000000000", "IsComplete": false, "PollingInterval": 0
-            }
-          ]);
-        }
-        if (opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Query Id="188" ObjectPathId="184"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true" /><Property Name="PollingInterval" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Identity Id="184" Name="803b489e-9066-5000-58fc-dc40eb096913|908bed80-a04a-4433-b4a0-883d9847d110:67753f63-bc14-4012-869e-f808a43fe023&#xA;SpoOperation&#xA;RemoveDeletedSite&#xA;636536266495764941&#xA;https%3a%2f%2fcontoso.sharepoint.com%2fsites%2fdemosite&#xA;00000000-0000-0000-0000-000000000000" /></ObjectPaths></Request>`) {
-          return JSON.stringify([
-            {
-              "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7324.1200", "ErrorInfo": null, "TraceCorrelationId": "803b489e-9066-5000-58fc-dc40eb096914"
-            }, 39, {
-              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SpoOperation", "_ObjectIdentity_": "803b489e-9066-5000-58fc-dc40eb096914|908bed80-a04a-4433-b4a0-883d9847d110:67753f63-bc14-4012-869e-f808a43fe023\nSpoOperation\nRemoveDeletedSite\n636536266495764941\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fdemosite\n00000000-0000-0000-0000-000000000000", "IsComplete": true, "PollingInterval": 0
-            }
-          ]);
-
-        }
-      }
-
-      throw 'Invalid request';
-    });
-
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demosite', fromRecycleBin: true, force: true, debug: true, wait: true } });
-    assert(loggerLogToStderrSpy.called);
-  });
-
-  it('removes site from recycle bin, wait for completion, error occurred', async () => {
-    sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
-        if (opts.data === `<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}"><Actions><ObjectPath Id="4" ObjectPathId="3"/><Query Id="5" ObjectPathId="3"><Query SelectAllProperties="false"><Properties><Property Name="GroupId" ScalarProperty="true"/></Properties></Query></Query></Actions><ObjectPaths><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/><Method Id="3" ParentId="1" Name="GetSitePropertiesByUrl"><Parameters><Parameter Type="String">https://contoso.sharepoint.com/sites/demosite</Parameter></Parameters></Method></ObjectPaths></Request>`) {
-          return JSON.stringify([
-            {
-              "SchemaVersion": "15.0.0.0",
-              "LibraryVersion": "16.0.20530.12001",
-              "ErrorInfo": null,
-              "TraceCorrelationId": "10f1829f-d000-0000-5962-1110d33e2cf2"
-            },
-            4,
-            {
-              "IsNull": false
-            },
-            5,
-            {
-              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SiteProperties",
-              "_ObjectIdentity_": "10f1829f-d000-0000-5962-1110d33e2cf2|908bed80-a04a-4433-b4a0-883d9847d110:095efa67-57fa-40c7-b7cc-e96dc3e5780c\nSiteProperties\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fdemosite",
-              "GroupId": "/Guid(00000000-0000-0000-0000-000000000000)/"
-            }
-          ]);
-        }
-      }
-      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
-        if (opts.headers &&
-          opts.headers['X-RequestDigest'] &&
-          opts.headers['X-RequestDigest'] === 'abc' &&
-          opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="185" ObjectPathId="184" /><Query Id="186" ObjectPathId="184"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true" /><Property Name="PollingInterval" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Method Id="184" ParentId="175" Name="RemoveDeletedSite"><Parameters><Parameter Type="String">https://contoso.sharepoint.com/sites/demosite</Parameter></Parameters></Method><Constructor Id="175" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
-          return JSON.stringify([
-            {
-              "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7324.1200", "ErrorInfo": {
-                "ErrorMessage": "An error has occurred.", "ErrorValue": null, "TraceCorrelationId": "e13c489e-2026-5000-8242-7ec96d02ba1d", "ErrorCode": -1, "ErrorTypeName": "SPException"
-              }, "TraceCorrelationId": "e13c489e-2026-5000-8242-7ec96d02ba1d"
-            }
-          ]);
-        }
-      }
-
-      throw 'Invalid request';
-    });
-    await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demosite', fromRecycleBin: true, force: true, debug: true, wait: true } } as any),
-      new CommandError('An error has occurred.'));
-  });
-
-  it('removes site. wait for completion (debug)', async () => {
-    sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
-        if (opts.data === `<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}"><Actions><ObjectPath Id="4" ObjectPathId="3"/><Query Id="5" ObjectPathId="3"><Query SelectAllProperties="false"><Properties><Property Name="GroupId" ScalarProperty="true"/></Properties></Query></Query></Actions><ObjectPaths><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/><Method Id="3" ParentId="1" Name="GetSitePropertiesByUrl"><Parameters><Parameter Type="String">https://contoso.sharepoint.com/sites/demosite</Parameter></Parameters></Method></ObjectPaths></Request>`) {
-          return JSON.stringify([
-            {
-              "SchemaVersion": "15.0.0.0",
-              "LibraryVersion": "16.0.20530.12001",
-              "ErrorInfo": null,
-              "TraceCorrelationId": "10f1829f-d000-0000-5962-1110d33e2cf2"
-            },
-            4,
-            {
-              "IsNull": false
-            },
-            5,
-            {
-              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SiteProperties",
-              "_ObjectIdentity_": "10f1829f-d000-0000-5962-1110d33e2cf2|908bed80-a04a-4433-b4a0-883d9847d110:095efa67-57fa-40c7-b7cc-e96dc3e5780c\nSiteProperties\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fdemosite",
-              "GroupId": "/Guid(00000000-0000-0000-0000-000000000000)/"
-            }
-          ]);
-        }
-      }
-      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
-        if (opts.headers &&
-          opts.headers['X-RequestDigest'] &&
-          opts.headers['X-RequestDigest'] === 'abc' &&
-          opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="55" ObjectPathId="54"/><ObjectPath Id="57" ObjectPathId="56"/><Query Id="58" ObjectPathId="54"><Query SelectAllProperties="true"><Properties/></Query></Query><Query Id="59" ObjectPathId="56"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true"/><Property Name="PollingInterval" ScalarProperty="true"/></Properties></Query></Query></Actions><ObjectPaths><Constructor Id="54" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/><Method Id="56" ParentId="54" Name="RemoveSite"><Parameters><Parameter Type="String">https://contoso.sharepoint.com/sites/demosite</Parameter></Parameters></Method></ObjectPaths></Request>`) {
-          return JSON.stringify([
-            {
-              "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7324.1200", "ErrorInfo": null, "TraceCorrelationId": "e13c489e-304e-5000-8242-705e26a87302"
-            }, 185, {
-              "IsNull": false
-            }, 186, {
-              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SpoOperation", "_ObjectIdentity_": "e13c489e-304e-5000-8242-705e26a87302|908bed80-a04a-4433-b4a0-883d9847d110:67753f63-bc14-4012-869e-f808a43fe023\nSpoOperation\nRemoveSite\n636536266495764941\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fdemosite\n00000000-0000-0000-0000-000000000000", "IsComplete": false, "PollingInterval": 0
-            }
-          ]);
-        }
-        if (opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Query Id="188" ObjectPathId="184"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true" /><Property Name="PollingInterval" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Identity Id="184" Name="e13c489e-304e-5000-8242-705e26a87302|908bed80-a04a-4433-b4a0-883d9847d110:67753f63-bc14-4012-869e-f808a43fe023&#xA;SpoOperation&#xA;RemoveSite&#xA;636536266495764941&#xA;https%3a%2f%2fcontoso.sharepoint.com%2fsites%2fdemosite&#xA;00000000-0000-0000-0000-000000000000" /></ObjectPaths></Request>`) {
-          return JSON.stringify([
-            {
-              "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7324.1200", "ErrorInfo": null, "TraceCorrelationId": "803b489e-9066-5000-58fc-dc40eb096913"
-            }, 39, {
-              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SpoOperation", "_ObjectIdentity_": "803b489e-9066-5000-58fc-dc40eb096913|908bed80-a04a-4433-b4a0-883d9847d110:67753f63-bc14-4012-869e-f808a43fe023\nSpoOperation\nRemoveSite\n636536266495764941\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fdemosite\n00000000-0000-0000-0000-000000000000", "IsComplete": false, "PollingInterval": 0
-            }
-          ]);
-        }
-        if (opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Query Id="188" ObjectPathId="184"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true" /><Property Name="PollingInterval" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Identity Id="184" Name="803b489e-9066-5000-58fc-dc40eb096913|908bed80-a04a-4433-b4a0-883d9847d110:67753f63-bc14-4012-869e-f808a43fe023&#xA;SpoOperation&#xA;RemoveSite&#xA;636536266495764941&#xA;https%3a%2f%2fcontoso.sharepoint.com%2fsites%2fdemosite&#xA;00000000-0000-0000-0000-000000000000" /></ObjectPaths></Request>`) {
-          return JSON.stringify([
-            {
-              "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7324.1200", "ErrorInfo": null, "TraceCorrelationId": "803b489e-9066-5000-58fc-dc40eb096914"
-            }, 39, {
-              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SpoOperation", "_ObjectIdentity_": "803b489e-9066-5000-58fc-dc40eb096914|908bed80-a04a-4433-b4a0-883d9847d110:67753f63-bc14-4012-869e-f808a43fe023\nSpoOperation\nRemoveSite\n636536266495764941\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fdemosite\n00000000-0000-0000-0000-000000000000", "IsComplete": true, "PollingInterval": 0
-            }
-          ]);
-        }
-      }
-
-      throw 'Invalid request';
-    });
-
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demosite', force: true, debug: true, wait: true } });
-    assert(loggerLogToStderrSpy.called);
-  });
-
-  it('removes site. wait for completion (verbose)', async () => {
-    sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
-        if (opts.data === `<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}"><Actions><ObjectPath Id="4" ObjectPathId="3"/><Query Id="5" ObjectPathId="3"><Query SelectAllProperties="false"><Properties><Property Name="GroupId" ScalarProperty="true"/></Properties></Query></Query></Actions><ObjectPaths><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/><Method Id="3" ParentId="1" Name="GetSitePropertiesByUrl"><Parameters><Parameter Type="String">https://contoso.sharepoint.com/sites/demosite</Parameter></Parameters></Method></ObjectPaths></Request>`) {
-          return JSON.stringify([
-            {
-              "SchemaVersion": "15.0.0.0",
-              "LibraryVersion": "16.0.20530.12001",
-              "ErrorInfo": null,
-              "TraceCorrelationId": "10f1829f-d000-0000-5962-1110d33e2cf2"
-            },
-            4,
-            {
-              "IsNull": false
-            },
-            5,
-            {
-              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SiteProperties",
-              "_ObjectIdentity_": "10f1829f-d000-0000-5962-1110d33e2cf2|908bed80-a04a-4433-b4a0-883d9847d110:095efa67-57fa-40c7-b7cc-e96dc3e5780c\nSiteProperties\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fdemosite",
-              "GroupId": "/Guid(00000000-0000-0000-0000-000000000000)/"
-            }
-          ]);
-        }
-      }
-      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
-        if (opts.headers &&
-          opts.headers['X-RequestDigest'] &&
-          opts.headers['X-RequestDigest'] === 'abc' &&
-          opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="55" ObjectPathId="54"/><ObjectPath Id="57" ObjectPathId="56"/><Query Id="58" ObjectPathId="54"><Query SelectAllProperties="true"><Properties/></Query></Query><Query Id="59" ObjectPathId="56"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true"/><Property Name="PollingInterval" ScalarProperty="true"/></Properties></Query></Query></Actions><ObjectPaths><Constructor Id="54" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/><Method Id="56" ParentId="54" Name="RemoveSite"><Parameters><Parameter Type="String">https://contoso.sharepoint.com/sites/demosite</Parameter></Parameters></Method></ObjectPaths></Request>`) {
-          return JSON.stringify([
-            {
-              "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7324.1200", "ErrorInfo": null, "TraceCorrelationId": "e13c489e-304e-5000-8242-705e26a87302"
-            }, 185, {
-              "IsNull": false
-            }, 186, {
-              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SpoOperation", "_ObjectIdentity_": "e13c489e-304e-5000-8242-705e26a87302|908bed80-a04a-4433-b4a0-883d9847d110:67753f63-bc14-4012-869e-f808a43fe023\nSpoOperation\nRemoveSite\n636536266495764941\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fdemosite\n00000000-0000-0000-0000-000000000000", "IsComplete": false, "PollingInterval": 0
-            }
-          ]);
-        }
-        if (opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Query Id="188" ObjectPathId="184"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true" /><Property Name="PollingInterval" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Identity Id="184" Name="e13c489e-304e-5000-8242-705e26a87302|908bed80-a04a-4433-b4a0-883d9847d110:67753f63-bc14-4012-869e-f808a43fe023&#xA;SpoOperation&#xA;RemoveSite&#xA;636536266495764941&#xA;https%3a%2f%2fcontoso.sharepoint.com%2fsites%2fdemosite&#xA;00000000-0000-0000-0000-000000000000" /></ObjectPaths></Request>`) {
-          return JSON.stringify([
-            {
-              "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7324.1200", "ErrorInfo": null, "TraceCorrelationId": "803b489e-9066-5000-58fc-dc40eb096913"
-            }, 39, {
-              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SpoOperation", "_ObjectIdentity_": "803b489e-9066-5000-58fc-dc40eb096913|908bed80-a04a-4433-b4a0-883d9847d110:67753f63-bc14-4012-869e-f808a43fe023\nSpoOperation\nRemoveSite\n636536266495764941\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fdemosite\n00000000-0000-0000-0000-000000000000", "IsComplete": false, "PollingInterval": 0
-            }
-          ]);
-        }
-        if (opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Query Id="188" ObjectPathId="184"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true" /><Property Name="PollingInterval" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Identity Id="184" Name="803b489e-9066-5000-58fc-dc40eb096913|908bed80-a04a-4433-b4a0-883d9847d110:67753f63-bc14-4012-869e-f808a43fe023&#xA;SpoOperation&#xA;RemoveSite&#xA;636536266495764941&#xA;https%3a%2f%2fcontoso.sharepoint.com%2fsites%2fdemosite&#xA;00000000-0000-0000-0000-000000000000" /></ObjectPaths></Request>`) {
-          return JSON.stringify([
-            {
-              "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7324.1200", "ErrorInfo": null, "TraceCorrelationId": "803b489e-9066-5000-58fc-dc40eb096914"
-            }, 39, {
-              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SpoOperation", "_ObjectIdentity_": "803b489e-9066-5000-58fc-dc40eb096914|908bed80-a04a-4433-b4a0-883d9847d110:67753f63-bc14-4012-869e-f808a43fe023\nSpoOperation\nRemoveSite\n636536266495764941\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fdemosite\n00000000-0000-0000-0000-000000000000", "IsComplete": true, "PollingInterval": 0
-            }
-          ]);
-        }
-      }
-
-      throw 'Invalid request';
-    });
-
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demosite', force: true, verbose: true, wait: true } });
-    assert(loggerLogToStderrSpy.called);
-  });
-
-  it('removes site. wait for completion', async () => {
-    sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
-        if (opts.data === `<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}"><Actions><ObjectPath Id="4" ObjectPathId="3"/><Query Id="5" ObjectPathId="3"><Query SelectAllProperties="false"><Properties><Property Name="GroupId" ScalarProperty="true"/></Properties></Query></Query></Actions><ObjectPaths><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/><Method Id="3" ParentId="1" Name="GetSitePropertiesByUrl"><Parameters><Parameter Type="String">https://contoso.sharepoint.com/sites/demosite</Parameter></Parameters></Method></ObjectPaths></Request>`) {
-          return JSON.stringify([
-            {
-              "SchemaVersion": "15.0.0.0",
-              "LibraryVersion": "16.0.20530.12001",
-              "ErrorInfo": null,
-              "TraceCorrelationId": "10f1829f-d000-0000-5962-1110d33e2cf2"
-            },
-            4,
-            {
-              "IsNull": false
-            },
-            5,
-            {
-              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SiteProperties",
-              "_ObjectIdentity_": "10f1829f-d000-0000-5962-1110d33e2cf2|908bed80-a04a-4433-b4a0-883d9847d110:095efa67-57fa-40c7-b7cc-e96dc3e5780c\nSiteProperties\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fdemosite",
-              "GroupId": "/Guid(00000000-0000-0000-0000-000000000000)/"
-            }
-          ]);
-        }
-      }
-      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
-        if (opts.headers &&
-          opts.headers['X-RequestDigest'] &&
-          opts.headers['X-RequestDigest'] === 'abc' &&
-          opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="55" ObjectPathId="54"/><ObjectPath Id="57" ObjectPathId="56"/><Query Id="58" ObjectPathId="54"><Query SelectAllProperties="true"><Properties/></Query></Query><Query Id="59" ObjectPathId="56"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true"/><Property Name="PollingInterval" ScalarProperty="true"/></Properties></Query></Query></Actions><ObjectPaths><Constructor Id="54" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/><Method Id="56" ParentId="54" Name="RemoveSite"><Parameters><Parameter Type="String">https://contoso.sharepoint.com/sites/demosite</Parameter></Parameters></Method></ObjectPaths></Request>`) {
-          return JSON.stringify([
-            {
-              "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7324.1200", "ErrorInfo": null, "TraceCorrelationId": "e13c489e-304e-5000-8242-705e26a87302"
-            }, 185, {
-              "IsNull": false
-            }, 186, {
-              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SpoOperation", "_ObjectIdentity_": "e13c489e-304e-5000-8242-705e26a87302|908bed80-a04a-4433-b4a0-883d9847d110:67753f63-bc14-4012-869e-f808a43fe023\nSpoOperation\nRemoveSite\n636536266495764941\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fdemosite\n00000000-0000-0000-0000-000000000000", "IsComplete": false, "PollingInterval": 0
-            }
-          ]);
-        }
-        if (opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Query Id="188" ObjectPathId="184"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true" /><Property Name="PollingInterval" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Identity Id="184" Name="e13c489e-304e-5000-8242-705e26a87302|908bed80-a04a-4433-b4a0-883d9847d110:67753f63-bc14-4012-869e-f808a43fe023&#xA;SpoOperation&#xA;RemoveSite&#xA;636536266495764941&#xA;https%3a%2f%2fcontoso.sharepoint.com%2fsites%2fdemosite&#xA;00000000-0000-0000-0000-000000000000" /></ObjectPaths></Request>`) {
-          return JSON.stringify([
-            {
-              "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7324.1200", "ErrorInfo": null, "TraceCorrelationId": "803b489e-9066-5000-58fc-dc40eb096913"
-            }, 39, {
-              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SpoOperation", "_ObjectIdentity_": "803b489e-9066-5000-58fc-dc40eb096913|908bed80-a04a-4433-b4a0-883d9847d110:67753f63-bc14-4012-869e-f808a43fe023\nSpoOperation\nRemoveSite\n636536266495764941\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fdemosite\n00000000-0000-0000-0000-000000000000", "IsComplete": false, "PollingInterval": 0
-            }
-          ]);
-        }
-        if (opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Query Id="188" ObjectPathId="184"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true" /><Property Name="PollingInterval" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Identity Id="184" Name="803b489e-9066-5000-58fc-dc40eb096913|908bed80-a04a-4433-b4a0-883d9847d110:67753f63-bc14-4012-869e-f808a43fe023&#xA;SpoOperation&#xA;RemoveSite&#xA;636536266495764941&#xA;https%3a%2f%2fcontoso.sharepoint.com%2fsites%2fdemosite&#xA;00000000-0000-0000-0000-000000000000" /></ObjectPaths></Request>`) {
-          return JSON.stringify([
-            {
-              "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7324.1200", "ErrorInfo": null, "TraceCorrelationId": "803b489e-9066-5000-58fc-dc40eb096914"
-            }, 39, {
-              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SpoOperation", "_ObjectIdentity_": "803b489e-9066-5000-58fc-dc40eb096914|908bed80-a04a-4433-b4a0-883d9847d110:67753f63-bc14-4012-869e-f808a43fe023\nSpoOperation\nRemoveSite\n636536266495764941\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fdemosite\n00000000-0000-0000-0000-000000000000", "IsComplete": true, "PollingInterval": 0
-            }
-          ]);
-
-        }
-      }
-
-      throw 'Invalid request';
-    });
-
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demosite', force: true, wait: true } });
-    assert(loggerLogSpy.notCalled);
-  });
-
-  it('removes the site - Groupified Site - Entered with \'fromRecycleBin\' OR \'skipRecycleBin\' ', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/groups/58587cc9-560c-4adb-a849-e669bd37c5f8') {
-        return {
-          "id": "58587cc9-560c-4adb-a849-e669bd37c5f8",
-          "deletedDateTime": null,
-          "classification": null,
-          "createdDateTime": "2017-11-29T03:27:05Z",
-          "description": "This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more.",
-          "displayName": "Finance",
-          "groupTypes": [
-            "Unified"
-          ],
-          "mail": "finance@contoso.onmicrosoft.com",
-          "mailEnabled": true,
-          "mailNickname": "finance",
-          "onPremisesLastSyncDateTime": null,
-          "onPremisesProvisioningErrors": [],
-          "onPremisesSecurityIdentifier": null,
-          "onPremisesSyncEnabled": null,
-          "preferredDataLocation": null,
-          "proxyAddresses": [
-            "SMTP:finance@contoso.onmicrosoft.com"
-          ],
-          "renewedDateTime": "2017-11-29T03:27:05Z",
-          "securityEnabled": false,
-          "visibility": "Public"
-        };
-      }
-
-      throw 'Invalid request';
-    });
-
-    sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
-        if (opts.data === `<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}"><Actions><ObjectPath Id="4" ObjectPathId="3"/><Query Id="5" ObjectPathId="3"><Query SelectAllProperties="false"><Properties><Property Name="GroupId" ScalarProperty="true"/></Properties></Query></Query></Actions><ObjectPaths><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/><Method Id="3" ParentId="1" Name="GetSitePropertiesByUrl"><Parameters><Parameter Type="String">https://contoso.sharepoint.com/sites/demositeGrouped</Parameter></Parameters></Method></ObjectPaths></Request>`) {
-          return JSON.stringify([
-            {
-              "SchemaVersion": "15.0.0.0",
-              "LibraryVersion": "16.0.20530.12001",
-              "ErrorInfo": null,
-              "TraceCorrelationId": "10f1829f-d000-0000-5962-1110d33e2cf2"
-            },
-            4,
-            {
-              "IsNull": false
-            },
-            5,
-            {
-              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SiteProperties",
-              "_ObjectIdentity_": "10f1829f-d000-0000-5962-1110d33e2cf2|908bed80-a04a-4433-b4a0-883d9847d110:095efa67-57fa-40c7-b7cc-e96dc3e5780c\nSiteProperties\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fdemosite",
-              "GroupId": "/Guid(58587cc9-560c-4adb-a849-e669bd37c5f8)/"
-            }
-          ]);
-        }
-
-        if (opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="55" ObjectPathId="54"/><ObjectPath Id="57" ObjectPathId="56"/><Query Id="58" ObjectPathId="54"><Query SelectAllProperties="true"><Properties/></Query></Query><Query Id="59" ObjectPathId="56"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true"/><Property Name="PollingInterval" ScalarProperty="true"/></Properties></Query></Query></Actions><ObjectPaths><Constructor Id="54" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/><Method Id="56" ParentId="54" Name="RemoveSite"><Parameters><Parameter Type="String">https://contoso.sharepoint.com/sites/demositeGrouped</Parameter></Parameters></Method></ObjectPaths></Request>`) {
-          return JSON.stringify([
-            {
-              "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.8015.1210", "ErrorInfo": null, "TraceCorrelationId": "5eda879e-90d5-6000-d611-e6bfd5acde9f"
-            }, 12, {
-              "IsNull": false
-            }, 14, {
-              "IsNull": false
-            }, 15, {
-              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.Tenant", "_ObjectIdentity_": "5eda879e-90d5-6000-d611-e6bfd5acde9f|908bed80-a04a-4433-b4a0-883d9847d110:2ca3eaa5-140f-4175-9563-1172edf9f339\nTenant", "AllowDownloadingNonWebViewableFiles": true, "AllowedDomainListForSyncClient": [
-
-              ], "AllowEditing": true, "AllowLimitedAccessOnUnmanagedDevices": false, "ApplyAppEnforcedRestrictionsToAdHocRecipients": true, "BccExternalSharingInvitations": false, "BccExternalSharingInvitationsList": null, "BlockAccessOnUnmanagedDevices": false, "BlockDownloadOfAllFilesForGuests": false, "BlockDownloadOfAllFilesOnUnmanagedDevices": false, "BlockDownloadOfViewableFilesForGuests": false, "BlockDownloadOfViewableFilesOnUnmanagedDevices": false, "BlockMacSync": false, "CommentsOnSitePagesDisabled": false, "CompatibilityRange": "15,15", "ConditionalAccessPolicy": 0, "DefaultLinkPermission": 2, "DefaultSharingLinkType": 2, "DisabledWebPartIds": null, "DisableReportProblemDialog": false, "DisallowInfectedFileDownload": false, "DisplayNamesOfFileViewers": true, "DisplayStartASiteOption": false, "EmailAttestationReAuthDays": 30, "EmailAttestationRequired": false, "EnableGuestSignInAcceleration": false, "EnableMinimumVersionRequirement": true, "ExcludedFileExtensionsForSyncClient": [
-                ""
-              ], "ExternalServicesEnabled": true, "FileAnonymousLinkType": 1, "FilePickerExternalImageSearchEnabled": true, "FolderAnonymousLinkType": 1, "HideSyncButtonOnODB": false, "IPAddressAllowList": "", "IPAddressEnforcement": false, "IPAddressWACTokenLifetime": 15, "IsHubSitesMultiGeoFlightEnabled": false, "IsMultiGeo": false, "IsUnmanagedSyncClientForTenantRestricted": false, "IsUnmanagedSyncClientRestrictionFlightEnabled": true, "LegacyAuthProtocolsEnabled": true, "LimitedAccessFileType": 1, "NoAccessRedirectUrl": null, "NotificationsInOneDriveForBusinessEnabled": true, "NotificationsInSharePointEnabled": true, "NotifyOwnersWhenInvitationsAccepted": true, "NotifyOwnersWhenItemsReshared": true, "ODBAccessRequests": 0, "ODBMembersCanShare": 0, "OfficeClientADALDisabled": false, "OneDriveForGuestsEnabled": false, "OneDriveStorageQuota": 5242880, "OptOutOfGrooveBlock": false, "OptOutOfGrooveSoftBlock": false, "OrphanedPersonalSitesRetentionPeriod": 30, "OwnerAnonymousNotification": true, "PermissiveBrowserFileHandlingOverride": false, "PreventExternalUsersFromResharing": false, "ProvisionSharedWithEveryoneFolder": false, "PublicCdnAllowedFileTypes": "CSS,EOT,GIF,ICO,JPEG,JPG,JS,MAP,PNG,SVG,TTF,WOFF", "PublicCdnEnabled": false, "PublicCdnOrigins": [
-
-              ], "RequireAcceptingAccountMatchInvitedAccount": false, "RequireAnonymousLinksExpireInDays": -1, "ResourceQuota": 6300, "ResourceQuotaAllocated": 1200, "RootSiteUrl": "https:\u002f\u002fcontoso.sharepoint.com", "SearchResolveExactEmailOrUPN": false, "SharingAllowedDomainList": null, "SharingBlockedDomainList": null, "SharingCapability": 2, "SharingDomainRestrictionMode": 0, "ShowAllUsersClaim": false, "ShowEveryoneClaim": false, "ShowEveryoneExceptExternalUsersClaim": true, "ShowNGSCDialogForSyncOnODB": true, "ShowPeoplePickerSuggestionsForGuestUsers": false, "SignInAccelerationDomain": "", "SocialBarOnSitePagesDisabled": false, "SpecialCharactersStateInFileFolderNames": 1, "StartASiteFormUrl": null, "StorageQuota": 1355776, "StorageQuotaAllocated": 135266304, "SyncPrivacyProfileProperties": true, "UseFindPeopleInPeoplePicker": false, "UsePersistentCookiesForExplorerView": false, "UserVoiceForFeedbackEnabled": true
-            }, 16, {
-              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SpoOperation", "_ObjectIdentity_": "5eda879e-90d5-6000-d611-e6bfd5acde9f|908bed80-a04a-4433-b4a0-883d9847d110:2ca3eaa5-140f-4175-9563-1172edf9f339\nSpoOperation\nRemoveSite\n636707032254311675\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fdemosite\n00000000-0000-0000-0000-000000000000", "IsComplete": true, "PollingInterval": 0
-            }
-          ]);
-        }
-      }
-
-      throw 'Invalid request';
-    });
-
-    sinon.stub(request, 'delete').callsFake(async (opts) => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/groups/58587cc9-560c-4adb-a849-e669bd37c5f8') {
-        return;
-      }
-
-      throw 'Invalid request';
-    });
-
-    sinonUtil.restore(cli.promptForConfirmation);
-    sinon.stub(cli, 'promptForConfirmation').resolves(true);
-
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demositeGrouped', debug: true, verbose: true, skipRecycleBin: true } });
-  });
-
-  it('removes the site - Groupified Site - Entered with \'wait\'', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/groups/58587cc9-560c-4adb-a849-e669bd37c5f8') {
-        return {
-          "id": "58587cc9-560c-4adb-a849-e669bd37c5f8",
-          "deletedDateTime": null,
-          "classification": null,
-          "createdDateTime": "2017-11-29T03:27:05Z",
-          "description": "This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more.",
-          "displayName": "Finance",
-          "groupTypes": [
-            "Unified"
-          ],
-          "mail": "finance@contoso.onmicrosoft.com",
-          "mailEnabled": true,
-          "mailNickname": "finance",
-          "onPremisesLastSyncDateTime": null,
-          "onPremisesProvisioningErrors": [],
-          "onPremisesSecurityIdentifier": null,
-          "onPremisesSyncEnabled": null,
-          "preferredDataLocation": null,
-          "proxyAddresses": [
-            "SMTP:finance@contoso.onmicrosoft.com"
-          ],
-          "renewedDateTime": "2017-11-29T03:27:05Z",
-          "securityEnabled": false,
-          "visibility": "Public"
-        };
-      }
-
-      throw 'Invalid request';
-    });
-
-    sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
-        if (opts.data === `<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}"><Actions><ObjectPath Id="4" ObjectPathId="3"/><Query Id="5" ObjectPathId="3"><Query SelectAllProperties="false"><Properties><Property Name="GroupId" ScalarProperty="true"/></Properties></Query></Query></Actions><ObjectPaths><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/><Method Id="3" ParentId="1" Name="GetSitePropertiesByUrl"><Parameters><Parameter Type="String">https://contoso.sharepoint.com/sites/demositeGrouped</Parameter></Parameters></Method></ObjectPaths></Request>`) {
-          return JSON.stringify([
-            {
-              "SchemaVersion": "15.0.0.0",
-              "LibraryVersion": "16.0.20530.12001",
-              "ErrorInfo": null,
-              "TraceCorrelationId": "10f1829f-d000-0000-5962-1110d33e2cf2"
-            },
-            4,
-            {
-              "IsNull": false
-            },
-            5,
-            {
-              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SiteProperties",
-              "_ObjectIdentity_": "10f1829f-d000-0000-5962-1110d33e2cf2|908bed80-a04a-4433-b4a0-883d9847d110:095efa67-57fa-40c7-b7cc-e96dc3e5780c\nSiteProperties\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fdemosite",
-              "GroupId": "/Guid(58587cc9-560c-4adb-a849-e669bd37c5f8)/"
-            }
-          ]);
-        }
-
-        if (opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="55" ObjectPathId="54"/><ObjectPath Id="57" ObjectPathId="56"/><Query Id="58" ObjectPathId="54"><Query SelectAllProperties="true"><Properties/></Query></Query><Query Id="59" ObjectPathId="56"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true"/><Property Name="PollingInterval" ScalarProperty="true"/></Properties></Query></Query></Actions><ObjectPaths><Constructor Id="54" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/><Method Id="56" ParentId="54" Name="RemoveSite"><Parameters><Parameter Type="String">https://contoso.sharepoint.com/sites/demositeGrouped</Parameter></Parameters></Method></ObjectPaths></Request>`) {
-          return JSON.stringify([
-            {
-              "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.8015.1210", "ErrorInfo": null, "TraceCorrelationId": "5eda879e-90d5-6000-d611-e6bfd5acde9f"
-            }, 12, {
-              "IsNull": false
-            }, 14, {
-              "IsNull": false
-            }, 15, {
-              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.Tenant", "_ObjectIdentity_": "5eda879e-90d5-6000-d611-e6bfd5acde9f|908bed80-a04a-4433-b4a0-883d9847d110:2ca3eaa5-140f-4175-9563-1172edf9f339\nTenant", "AllowDownloadingNonWebViewableFiles": true, "AllowedDomainListForSyncClient": [
-
-              ], "AllowEditing": true, "AllowLimitedAccessOnUnmanagedDevices": false, "ApplyAppEnforcedRestrictionsToAdHocRecipients": true, "BccExternalSharingInvitations": false, "BccExternalSharingInvitationsList": null, "BlockAccessOnUnmanagedDevices": false, "BlockDownloadOfAllFilesForGuests": false, "BlockDownloadOfAllFilesOnUnmanagedDevices": false, "BlockDownloadOfViewableFilesForGuests": false, "BlockDownloadOfViewableFilesOnUnmanagedDevices": false, "BlockMacSync": false, "CommentsOnSitePagesDisabled": false, "CompatibilityRange": "15,15", "ConditionalAccessPolicy": 0, "DefaultLinkPermission": 2, "DefaultSharingLinkType": 2, "DisabledWebPartIds": null, "DisableReportProblemDialog": false, "DisallowInfectedFileDownload": false, "DisplayNamesOfFileViewers": true, "DisplayStartASiteOption": false, "EmailAttestationReAuthDays": 30, "EmailAttestationRequired": false, "EnableGuestSignInAcceleration": false, "EnableMinimumVersionRequirement": true, "ExcludedFileExtensionsForSyncClient": [
-                ""
-              ], "ExternalServicesEnabled": true, "FileAnonymousLinkType": 1, "FilePickerExternalImageSearchEnabled": true, "FolderAnonymousLinkType": 1, "HideSyncButtonOnODB": false, "IPAddressAllowList": "", "IPAddressEnforcement": false, "IPAddressWACTokenLifetime": 15, "IsHubSitesMultiGeoFlightEnabled": false, "IsMultiGeo": false, "IsUnmanagedSyncClientForTenantRestricted": false, "IsUnmanagedSyncClientRestrictionFlightEnabled": true, "LegacyAuthProtocolsEnabled": true, "LimitedAccessFileType": 1, "NoAccessRedirectUrl": null, "NotificationsInOneDriveForBusinessEnabled": true, "NotificationsInSharePointEnabled": true, "NotifyOwnersWhenInvitationsAccepted": true, "NotifyOwnersWhenItemsReshared": true, "ODBAccessRequests": 0, "ODBMembersCanShare": 0, "OfficeClientADALDisabled": false, "OneDriveForGuestsEnabled": false, "OneDriveStorageQuota": 5242880, "OptOutOfGrooveBlock": false, "OptOutOfGrooveSoftBlock": false, "OrphanedPersonalSitesRetentionPeriod": 30, "OwnerAnonymousNotification": true, "PermissiveBrowserFileHandlingOverride": false, "PreventExternalUsersFromResharing": false, "ProvisionSharedWithEveryoneFolder": false, "PublicCdnAllowedFileTypes": "CSS,EOT,GIF,ICO,JPEG,JPG,JS,MAP,PNG,SVG,TTF,WOFF", "PublicCdnEnabled": false, "PublicCdnOrigins": [
-
-              ], "RequireAcceptingAccountMatchInvitedAccount": false, "RequireAnonymousLinksExpireInDays": -1, "ResourceQuota": 6300, "ResourceQuotaAllocated": 1200, "RootSiteUrl": "https:\u002f\u002fcontoso.sharepoint.com", "SearchResolveExactEmailOrUPN": false, "SharingAllowedDomainList": null, "SharingBlockedDomainList": null, "SharingCapability": 2, "SharingDomainRestrictionMode": 0, "ShowAllUsersClaim": false, "ShowEveryoneClaim": false, "ShowEveryoneExceptExternalUsersClaim": true, "ShowNGSCDialogForSyncOnODB": true, "ShowPeoplePickerSuggestionsForGuestUsers": false, "SignInAccelerationDomain": "", "SocialBarOnSitePagesDisabled": false, "SpecialCharactersStateInFileFolderNames": 1, "StartASiteFormUrl": null, "StorageQuota": 1355776, "StorageQuotaAllocated": 135266304, "SyncPrivacyProfileProperties": true, "UseFindPeopleInPeoplePicker": false, "UsePersistentCookiesForExplorerView": false, "UserVoiceForFeedbackEnabled": true
-            }, 16, {
-              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SpoOperation", "_ObjectIdentity_": "5eda879e-90d5-6000-d611-e6bfd5acde9f|908bed80-a04a-4433-b4a0-883d9847d110:2ca3eaa5-140f-4175-9563-1172edf9f339\nSpoOperation\nRemoveSite\n636707032254311675\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fdemosite\n00000000-0000-0000-0000-000000000000", "IsComplete": true, "PollingInterval": 0
-            }
-          ]);
-        }
-      }
-
-      throw 'Invalid request';
-    });
-
-    sinon.stub(request, 'delete').callsFake(async (opts) => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/groups/58587cc9-560c-4adb-a849-e669bd37c5f8') {
-        return;
-      }
-
-      throw 'Invalid request';
-    });
-
-    sinonUtil.restore(cli.promptForConfirmation);
-    sinon.stub(cli, 'promptForConfirmation').resolves(true);
-
-    sinon.stub(global, 'setTimeout').callsFake((fn) => {
-      fn();
-      return {} as any;
-    });
-
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demositeGrouped', debug: true, verbose: true, wait: true } });
-    assert(loggerLogToStderrSpy.called);
-  });
-
-  it('removes the site - Groupified Site, group is permanently deleted', async () => {
-    sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === 'https://contoso-admin.sharepoint.com/_vti_bin/client.svc/ProcessQuery') {
-        if (opts.data === `<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}"><Actions><ObjectPath Id="4" ObjectPathId="3"/><Query Id="5" ObjectPathId="3"><Query SelectAllProperties="false"><Properties><Property Name="GroupId" ScalarProperty="true"/></Properties></Query></Query></Actions><ObjectPaths><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/><Method Id="3" ParentId="1" Name="GetSitePropertiesByUrl"><Parameters><Parameter Type="String">https://contoso.sharepoint.com/sites/demositeGrouped</Parameter></Parameters></Method></ObjectPaths></Request>`) {
-          return JSON.stringify([
-            {
-              "SchemaVersion": "15.0.0.0",
-              "LibraryVersion": "16.0.20530.12001",
-              "ErrorInfo": null,
-              "TraceCorrelationId": "10f1829f-d000-0000-5962-1110d33e2cf2"
-            },
-            4,
-            {
-              "IsNull": false
-            },
-            5,
-            {
-              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SiteProperties",
-              "_ObjectIdentity_": "10f1829f-d000-0000-5962-1110d33e2cf2|908bed80-a04a-4433-b4a0-883d9847d110:095efa67-57fa-40c7-b7cc-e96dc3e5780c\nSiteProperties\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%demositeGrouped",
-              "GroupId": "/Guid(58587cc9-560c-4adb-a849-e669bd37c5f8)/"
-            }
-          ]);
-        }
-      }
-
-      if (opts.url === "https://contoso-admin.sharepoint.com/_api/GroupSiteManager/Delete?siteUrl='https://contoso.sharepoint.com/sites/demositeGrouped'") {
-        return {
-          "data": {
-            "odata.null": true
-          }
-        };
-      }
-
-      throw 'Invalid request';
-    });
-
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/groups/58587cc9-560c-4adb-a849-e669bd37c5f8') {
-        throw {
-          response: {
-            status: 404,
-            data: {
-              error: { 'odata.error': { message: { value: "Resource '58587cc9-560c-4adb-a849-e669bd37c5f8' does not exist or one of its queried reference-property objects are not present." } } }
-            }
-          }
-        };
-      }
-
-      if (opts.url === `https://graph.microsoft.com/v1.0/directory/deletedItems/Microsoft.Graph.Group?$select=id&$filter=groupTypes/any(c:c+eq+'Unified') and startswith(id, '58587cc9-560c-4adb-a849-e669bd37c5f8')`) {
-        return {
-          value: []
-        };
-      }
-
-      throw 'Invalid request';
-    });
-
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demositeGrouped', debug: true, verbose: true, force: true, wait: true } });
-    assert(loggerLogToStderrSpy.called);
-  });
-
-  it('does not remove the site - Groupified Site, bad request (getting the site group)', async () => {
-    sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
-        if (opts.data === `<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}"><Actions><ObjectPath Id="4" ObjectPathId="3"/><Query Id="5" ObjectPathId="3"><Query SelectAllProperties="false"><Properties><Property Name="GroupId" ScalarProperty="true"/></Properties></Query></Query></Actions><ObjectPaths><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/><Method Id="3" ParentId="1" Name="GetSitePropertiesByUrl"><Parameters><Parameter Type="String">https://contoso.sharepoint.com/sites/demositeGrouped</Parameter></Parameters></Method></ObjectPaths></Request>`) {
-          return JSON.stringify([
-            {
-              "SchemaVersion": "15.0.0.0",
-              "LibraryVersion": "16.0.20530.12001",
-              "ErrorInfo": null,
-              "TraceCorrelationId": "10f1829f-d000-0000-5962-1110d33e2cf2"
-            },
-            4,
-            {
-              "IsNull": false
-            },
-            5,
-            {
-              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SiteProperties",
-              "_ObjectIdentity_": "10f1829f-d000-0000-5962-1110d33e2cf2|908bed80-a04a-4433-b4a0-883d9847d110:095efa67-57fa-40c7-b7cc-e96dc3e5780c\nSiteProperties\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fdemosite",
-              "GroupId": "/Guid(58587cc9-560c-4adb-a849-e669bd37c5f8)/"
-            }
-          ]);
-        }
-      }
-
-      throw 'Invalid request';
-    });
-
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/groups/58587cc9-560c-4adb-a849-e669bd37c5f8') {
-        throw {
-          response: {
-            status: 400,
-            data: {
-              error: { 'odata.error': { message: { value: "Invalid object identifier '0z013f997-c1aa-424d-a530-c4e3a05de704'." } } }
-            }
-          }
-        };
-      }
-
-      throw 'Invalid request';
-    });
-
-    await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demositeGrouped', debug: true, verbose: true, force: true } }));
-    assert(loggerLogToStderrSpy.called);
-  });
-
-  it('does not remove the site - Groupified Site, group is in the deleted groups', async () => {
-    sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
-        if (opts.data === `<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}"><Actions><ObjectPath Id="4" ObjectPathId="3"/><Query Id="5" ObjectPathId="3"><Query SelectAllProperties="false"><Properties><Property Name="GroupId" ScalarProperty="true"/></Properties></Query></Query></Actions><ObjectPaths><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/><Method Id="3" ParentId="1" Name="GetSitePropertiesByUrl"><Parameters><Parameter Type="String">https://contoso.sharepoint.com/sites/demositeGrouped</Parameter></Parameters></Method></ObjectPaths></Request>`) {
-          return JSON.stringify([
-            {
-              "SchemaVersion": "15.0.0.0",
-              "LibraryVersion": "16.0.20530.12001",
-              "ErrorInfo": null,
-              "TraceCorrelationId": "10f1829f-d000-0000-5962-1110d33e2cf2"
-            },
-            4,
-            {
-              "IsNull": false
-            },
-            5,
-            {
-              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SiteProperties",
-              "_ObjectIdentity_": "10f1829f-d000-0000-5962-1110d33e2cf2|908bed80-a04a-4433-b4a0-883d9847d110:095efa67-57fa-40c7-b7cc-e96dc3e5780c\nSiteProperties\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fdemosite",
-              "GroupId": "/Guid(58587cc9-560c-4adb-a849-e669bd37c5f8)/"
-            }
-          ]);
-        }
-      }
-
-      throw 'Invalid request';
-    });
-
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/groups/58587cc9-560c-4adb-a849-e669bd37c5f8') {
-        throw {
-          response: {
-            status: 404,
-            data: {
-              error: { 'odata.error': { message: { value: "Resource '58587cc9-560c-4adb-a849-e669bd37c5f8' does not exist or one of its queried reference-property objects are not present." } } }
-            }
-          }
-        };
-      }
-
-      if (opts.url === `https://graph.microsoft.com/v1.0/directory/deletedItems/Microsoft.Graph.Group?$select=id&$filter=groupTypes/any(c:c+eq+'Unified') and startswith(id, '58587cc9-560c-4adb-a849-e669bd37c5f8')`) {
-        return {
-          value: [{
-            "id": "58587cc9-560c-4adb-a849-e669bd37c5f8"
-          }]
-        };
-      }
-
-      throw "Site group still exists in the deleted groups. The site won't be removed.";
-    });
-
-
-    await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demositeGrouped', debug: true, verbose: true, skipRecycleBin: true, force: true, wait: true } }),
-      new CommandError("Site group still exists in the deleted groups. The site won't be removed."));
-  });
-
-  it('does not remove the site - Groupified Site, bad request (getting the site group in the deleted groups)', async () => {
-    sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
-        if (opts.data === `<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}"><Actions><ObjectPath Id="4" ObjectPathId="3"/><Query Id="5" ObjectPathId="3"><Query SelectAllProperties="false"><Properties><Property Name="GroupId" ScalarProperty="true"/></Properties></Query></Query></Actions><ObjectPaths><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/><Method Id="3" ParentId="1" Name="GetSitePropertiesByUrl"><Parameters><Parameter Type="String">https://contoso.sharepoint.com/sites/demositeGrouped</Parameter></Parameters></Method></ObjectPaths></Request>`) {
-          return JSON.stringify([
-            {
-              "SchemaVersion": "15.0.0.0",
-              "LibraryVersion": "16.0.20530.12001",
-              "ErrorInfo": null,
-              "TraceCorrelationId": "10f1829f-d000-0000-5962-1110d33e2cf2"
-            },
-            4,
-            {
-              "IsNull": false
-            },
-            5,
-            {
-              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SiteProperties",
-              "_ObjectIdentity_": "10f1829f-d000-0000-5962-1110d33e2cf2|908bed80-a04a-4433-b4a0-883d9847d110:095efa67-57fa-40c7-b7cc-e96dc3e5780c\nSiteProperties\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fdemosite",
-              "GroupId": "/Guid(58587cc9-560c-4adb-a849-e669bd37c5f8)/"
-            }
-          ]);
-        }
-      }
-
-      throw 'Invalid request';
-    });
-
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/groups/58587cc9-560c-4adb-a849-e669bd37c5f8') {
-        throw {
-          response: {
-            status: 404,
-            data: {
-              error: { 'odata.error': { message: { value: "Resource '58587cc9-560c-4adb-a849-e669bd37c5f8' does not exist or one of its queried reference-property objects are not present." } } }
-            }
-          }
-        };
-      }
-
-      if (opts.url === `https://graph.microsoft.com/v1.0/directory/deletedItems/Microsoft.Graph.Group?$filter=groupTypes/any(c:c+eq+'Unified') and startswith(id, '58587cc9-560c-4adb-a849-e669bd37c5f8')`) {
-        throw {
-          response: {
-            status: 400,
-            data: {
-              error: { 'odata.error': { message: { value: "Invalid object identifier '0z013f997-c1aa-424d-a530-c4e3a05de704'." } } }
-            }
-          }
-        };
-      }
-
-      throw 'Invalid request';
-    });
-
-    await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demositeGrouped', debug: true, verbose: true, force: true } }));
-    assert(loggerLogToStderrSpy.called);
-  });
-
-  it('removes site. wait for completion, error occurred', async () => {
-    sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
-        if (opts.data === `<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}"><Actions><ObjectPath Id="4" ObjectPathId="3"/><Query Id="5" ObjectPathId="3"><Query SelectAllProperties="false"><Properties><Property Name="GroupId" ScalarProperty="true"/></Properties></Query></Query></Actions><ObjectPaths><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/><Method Id="3" ParentId="1" Name="GetSitePropertiesByUrl"><Parameters><Parameter Type="String">https://contoso.sharepoint.com/sites/demosite</Parameter></Parameters></Method></ObjectPaths></Request>`) {
-          return JSON.stringify([
-            {
-              "SchemaVersion": "15.0.0.0",
-              "LibraryVersion": "16.0.20530.12001",
-              "ErrorInfo": null,
-              "TraceCorrelationId": "10f1829f-d000-0000-5962-1110d33e2cf2"
-            },
-            4,
-            {
-              "IsNull": false
-            },
-            5,
-            {
-              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SiteProperties",
-              "_ObjectIdentity_": "10f1829f-d000-0000-5962-1110d33e2cf2|908bed80-a04a-4433-b4a0-883d9847d110:095efa67-57fa-40c7-b7cc-e96dc3e5780c\nSiteProperties\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fdemosite",
-              "GroupId": "/Guid(00000000-0000-0000-0000-000000000000)/"
-            }
-          ]);
-        }
-      }
-      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
-        if (opts.headers &&
-          opts.headers['X-RequestDigest'] &&
-          opts.headers['X-RequestDigest'] === 'abc' &&
-          opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="55" ObjectPathId="54"/><ObjectPath Id="57" ObjectPathId="56"/><Query Id="58" ObjectPathId="54"><Query SelectAllProperties="true"><Properties/></Query></Query><Query Id="59" ObjectPathId="56"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true"/><Property Name="PollingInterval" ScalarProperty="true"/></Properties></Query></Query></Actions><ObjectPaths><Constructor Id="54" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/><Method Id="56" ParentId="54" Name="RemoveSite"><Parameters><Parameter Type="String">https://contoso.sharepoint.com/sites/demosite</Parameter></Parameters></Method></ObjectPaths></Request>`) {
-          return JSON.stringify([
-            {
-              "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7324.1200", "ErrorInfo": null, "TraceCorrelationId": "e13c489e-304e-5000-8242-705e26a87302"
-            }, 185, {
-              "IsNull": false
-            }, 186, {
-              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SpoOperation", "_ObjectIdentity_": "e13c489e-304e-5000-8242-705e26a87302|908bed80-a04a-4433-b4a0-883d9847d110:67753f63-bc14-4012-869e-f808a43fe023\nSpoOperation\nRemoveSite\n636536266495764941\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fdemosite\n00000000-0000-0000-0000-000000000000", "IsComplete": false, "PollingInterval": 0
-            }
-          ]);
-        }
-        if (opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Query Id="188" ObjectPathId="184"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true" /><Property Name="PollingInterval" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Identity Id="184" Name="e13c489e-304e-5000-8242-705e26a87302|908bed80-a04a-4433-b4a0-883d9847d110:67753f63-bc14-4012-869e-f808a43fe023&#xA;SpoOperation&#xA;RemoveSite&#xA;636536266495764941&#xA;https%3a%2f%2fcontoso.sharepoint.com%2fsites%2fdemosite&#xA;00000000-0000-0000-0000-000000000000" /></ObjectPaths></Request>`) {
-          return JSON.stringify([
-            {
-              "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7324.1200", "ErrorInfo": null, "TraceCorrelationId": "803b489e-9066-5000-58fc-dc40eb096913"
-            }, 39, {
-              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SpoOperation", "_ObjectIdentity_": "803b489e-9066-5000-58fc-dc40eb096913|908bed80-a04a-4433-b4a0-883d9847d110:67753f63-bc14-4012-869e-f808a43fe023\nSpoOperation\nRemoveSite\n636536266495764941\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fdemosite\n00000000-0000-0000-0000-000000000000", "IsComplete": false, "PollingInterval": 0
-            }
-          ]);
-        }
-        if (opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Query Id="188" ObjectPathId="184"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true" /><Property Name="PollingInterval" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Identity Id="184" Name="803b489e-9066-5000-58fc-dc40eb096913|908bed80-a04a-4433-b4a0-883d9847d110:67753f63-bc14-4012-869e-f808a43fe023&#xA;SpoOperation&#xA;RemoveSite&#xA;636536266495764941&#xA;https%3a%2f%2fcontoso.sharepoint.com%2fsites%2fdemosite&#xA;00000000-0000-0000-0000-000000000000" /></ObjectPaths></Request>`) {
-          return JSON.stringify([
-            {
-              "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7324.1200", "ErrorInfo": {
-                "ErrorMessage": "An error has occurred.", "ErrorValue": null, "TraceCorrelationId": "e13c489e-2026-5000-8242-7ec96d02ba1d", "ErrorCode": -1, "ErrorTypeName": "SPException"
-              }, "TraceCorrelationId": "e13c489e-2026-5000-8242-7ec96d02ba1d"
-            }
-          ]);
-
-        }
-      }
-
-      throw 'Invalid request';
-    });
-
-    waitUntilFinishedStub.restore();
-    sinon.stub(spo, 'waitUntilFinished').rejects(new Error("An error has occurred."));
-
-    await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demosite', force: true, wait: true } } as any),
-      new CommandError('An error has occurred.'));
-  });
-
-  it('removes site, error occurred', async () => {
-    sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
-        if (opts.data === `<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}"><Actions><ObjectPath Id="4" ObjectPathId="3"/><Query Id="5" ObjectPathId="3"><Query SelectAllProperties="false"><Properties><Property Name="GroupId" ScalarProperty="true"/></Properties></Query></Query></Actions><ObjectPaths><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/><Method Id="3" ParentId="1" Name="GetSitePropertiesByUrl"><Parameters><Parameter Type="String">https://contoso.sharepoint.com/sites/demosite</Parameter></Parameters></Method></ObjectPaths></Request>`) {
-          return JSON.stringify([
-            {
-              "SchemaVersion": "15.0.0.0",
-              "LibraryVersion": "16.0.20530.12001",
-              "ErrorInfo": null,
-              "TraceCorrelationId": "10f1829f-d000-0000-5962-1110d33e2cf2"
-            },
-            4,
-            {
-              "IsNull": false
-            },
-            5,
-            {
-              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SiteProperties",
-              "_ObjectIdentity_": "10f1829f-d000-0000-5962-1110d33e2cf2|908bed80-a04a-4433-b4a0-883d9847d110:095efa67-57fa-40c7-b7cc-e96dc3e5780c\nSiteProperties\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fdemosite",
-              "GroupId": "/Guid(00000000-0000-0000-0000-000000000000)/"
-            }
-          ]);
-        }
-      }
-      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
-        if (opts.headers &&
-          opts.headers['X-RequestDigest'] &&
-          opts.headers['X-RequestDigest'] === 'abc' &&
-          opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="55" ObjectPathId="54"/><ObjectPath Id="57" ObjectPathId="56"/><Query Id="58" ObjectPathId="54"><Query SelectAllProperties="true"><Properties/></Query></Query><Query Id="59" ObjectPathId="56"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true"/><Property Name="PollingInterval" ScalarProperty="true"/></Properties></Query></Query></Actions><ObjectPaths><Constructor Id="54" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/><Method Id="56" ParentId="54" Name="RemoveSite"><Parameters><Parameter Type="String">https://contoso.sharepoint.com/sites/demosite</Parameter></Parameters></Method></ObjectPaths></Request>`) {
-          return JSON.stringify([
-            {
-              "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7324.1200", "ErrorInfo": {
-                "ErrorMessage": "An error has occurred.", "ErrorValue": null, "TraceCorrelationId": "e13c489e-2026-5000-8242-7ec96d02ba1d", "ErrorCode": -1, "ErrorTypeName": "SPException"
-              }, "TraceCorrelationId": "e13c489e-2026-5000-8242-7ec96d02ba1d"
-            }
-          ]);
-        }
-      }
-
-      throw 'Invalid request';
-    });
-    await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demosite', force: true, debug: true } } as any),
-      new CommandError('An error has occurred.'));
-  });
-
-  it('Get Group ID - Error Occurred', async () => {
-    sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
-        if (opts.data === `<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}"><Actions><ObjectPath Id="4" ObjectPathId="3"/><Query Id="5" ObjectPathId="3"><Query SelectAllProperties="false"><Properties><Property Name="GroupId" ScalarProperty="true"/></Properties></Query></Query></Actions><ObjectPaths><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/><Method Id="3" ParentId="1" Name="GetSitePropertiesByUrl"><Parameters><Parameter Type="String">https://contoso.sharepoint.com/sites/demositeinvalid</Parameter></Parameters></Method></ObjectPaths></Request>`) {
-          return JSON.stringify([
-            {
-              "SchemaVersion": "15.0.0.0",
-              "LibraryVersion": "16.0.20530.12001",
-              "ErrorInfo": {
-                "ErrorMessage": "Cannot get site https://contoso.sharepoint.com/sites/demositeinvalid.",
-                "ErrorValue": null,
-                "TraceCorrelationId": "3929839f-9018-0000-5518-a12b0af612a8",
-                "ErrorCode": -1,
-                "ErrorTypeName": "Microsoft.Online.SharePoint.Common.SpoNoSiteException"
-              },
-              "TraceCorrelationId": "3929839f-9018-0000-5518-a12b0af612a8"
-            }
-          ]);
-        }
-      }
-
-      throw 'Cannot get site https://contoso.sharepoint.com/sites/demositeinvalid.';
-    });
-    await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demositeinvalid', force: true, debug: true } }),
-      new CommandError('Cannot get site https://contoso.sharepoint.com/sites/demositeinvalid.'));
+  it('fails validation if both fromRecycleBin and skipRecycleBin is specified is a valid url', async () => {
+    const actual = await command.validate({ options: { url: siteUrl, fromRecycleBin: true, skipRecycleBin: true } }, commandInfo);
+    assert.notStrictEqual(actual, true);
   });
 });

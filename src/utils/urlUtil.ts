@@ -233,5 +233,14 @@ export const urlUtil = {
       const rootUrl = new URL(fullUrl);
       return rootUrl.origin;
     }
+  },
+
+  /**
+   * Removes trailing slash from the URL.
+   * @param url The URL to process.
+   * @returns The URL without trailing slash.
+   */
+  removeTrailingSlash(url: string): string {
+    return url.replace(/\/+$/, '');
   }
 };
