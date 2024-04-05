@@ -4114,6 +4114,11 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
+              label: 'message restore',
+              id: 'cmd/teams/message/message-restore'
+            },
+            {
+              type: 'doc',
               label: 'message send',
               id: 'cmd/teams/message/message-send'
             },
