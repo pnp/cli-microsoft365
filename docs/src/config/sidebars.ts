@@ -4089,6 +4089,11 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
+              label: 'message restore',
+              id: 'cmd/teams/message/message-restore'
+            },
+            {
+              type: 'doc',
               label: 'message reply list',
               id: 'cmd/teams/message/message-reply-list'
             }
