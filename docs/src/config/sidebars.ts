@@ -1016,6 +1016,11 @@ const sidebars: SidebarsConfig = {
           notebook: [
             {
               type: 'doc',
+              label: 'notebook add',
+              id: 'cmd/onenote/notebook/notebook-add'
+            },
+            {
+              type: 'doc',
               label: 'notebook list',
               id: 'cmd/onenote/notebook/notebook-list'
             }
