@@ -120,6 +120,10 @@ class SpoPageSetCommand extends SpoCommand {
           return isValidSharePointUrl;
         }
 
+        if (!args.options.layoutType && !args.options.promoteAs && !args.options.demoteFrom && args.options.commentsEnabled === undefined && !args.options.publish && !args.options.description && !args.options.title && !args.options.content) {
+          return 'Specify at least one option to update.';
+        }
+
         if (args.options.layoutType &&
           supportedPageLayouts.indexOf(args.options.layoutType) < 0) {
           return `${args.options.layoutType} is not a valid option for layoutType. Allowed values ${supportedPageLayouts.join(', ')}`;
