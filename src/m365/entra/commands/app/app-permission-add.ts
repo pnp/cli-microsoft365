@@ -143,7 +143,7 @@ class EntraAppPermissionAddCommand extends GraphCommand {
     }
   }
 
-  private async getAppObjectId(appName: string): Promise<string> {
+  private async getAppObjectByName(appName: string): Promise<Application[]> {
     const requestOptions: CliRequestOptions = {
       url: `${this.resource}/v1.0/myorganization/applications?$filter=displayName eq '${formatting.encodeQueryParameter(appName)}'&$select=id`,
       headers: {
@@ -155,7 +155,7 @@ class EntraAppPermissionAddCommand extends GraphCommand {
     const res = await request.get<{ value: { id: string }[] }>(requestOptions);
 
     if (res.value.length === 1) {
-      return res.value[0].id;
+      return await odata.getAllItems<Application>(`${this.resource}/v1.0/applications?$filter=id eq '${res.value[0].id}'&$select=id,appId,requiredResourceAccess`);
     }
 
     if (res.value.length === 0) {
@@ -164,21 +164,26 @@ class EntraAppPermissionAddCommand extends GraphCommand {
 
     const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', res.value);
     const result = await cli.handleMultipleResultsFound<{ id: string }>(`Multiple Entra application registration with name '${appName}' found.`, resultAsKeyValuePair);
-    return result.id;
+
+    return await odata.getAllItems<Application>(`${this.resource}/v1.0/applications?$filter=id eq '${result.id}'&$select=id,appId,requiredResourceAccess`);
   }
 
   private async getAppObject(options: Options): Promise<Application> {
-    let appObjectId = options.appObjectId ?? options.appId;
-    let appNotFoundMessage = `${options.appObjectId ? 'object id' : 'client id'} ${options.appObjectId ? options.appObjectId : options.appId}`;
+    let appNotFoundMessage = '';
+    let apps: Application[] = [];
 
-    if (options.appName) {
-      appObjectId = await this.getAppObjectId(options.appName);
+    if (options.appId) {
+      apps = await odata.getAllItems<Application>(`${this.resource}/v1.0/applications?$filter=appId eq '${options.appId}'&$select=id,appId,requiredResourceAccess`);
+      appNotFoundMessage = `client id ${options.appId}`;
+    }
+    else if (options.appName) {
+      apps = await this.getAppObjectByName(options.appName);
       appNotFoundMessage = `name ${options.appName}`;
     }
-
-    const apps = (options.appObjectId || options.appName)
-      ? await odata.getAllItems<Application>(`${this.resource}/v1.0/applications?$filter=id eq '${appObjectId}'&$select=id,appId,requiredResourceAccess`)
-      : await odata.getAllItems<Application>(`${this.resource}/v1.0/applications?$filter=appId eq '${appObjectId}'&$select=id,appId,requiredResourceAccess`);
+    else if (options.appObjectId) {
+      apps = await odata.getAllItems<Application>(`${this.resource}/v1.0/applications?$filter=id eq '${options.appObjectId}'&$select=id,appId,requiredResourceAccess`);
+      appNotFoundMessage = `object id ${options.appObjectId}`;
+    }
 
     if (apps.length === 0) {
       throw `App with ${appNotFoundMessage} not found in Entra ID (Azure AD)`;
