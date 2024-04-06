@@ -4017,6 +4017,11 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
+              label: 'meeting attendancereport get',
+              id: 'cmd/teams/meeting/meeting-attendancereport-get'
+            },
+            {
+              type: 'doc',
               label: 'meeting attendancereport list',
               id: 'cmd/teams/meeting/meeting-attendancereport-list'
             },
