@@ -746,13 +746,13 @@ describe(commands.PAGE_SET, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation when name and webURL specified and webUrl is a valid SharePoint URL', async () => {
+  it('fails validation when name and webURL specified and webUrl is a valid SharePoint URL but no option is set to update', async () => {
     const actual = await command.validate({ options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com' } }, commandInfo);
-    assert.strictEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation when name has no extension', async () => {
-    const actual = await command.validate({ options: { name: 'page', webUrl: 'https://contoso.sharepoint.com' } }, commandInfo);
+    const actual = await command.validate({ options: { name: 'page', webUrl: 'https://contoso.sharepoint.com', commentsEnabled: true } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
