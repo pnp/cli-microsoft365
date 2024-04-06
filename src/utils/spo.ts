@@ -622,7 +622,7 @@ export const spo = {
   },
 
   /**
-   * Retrieves the Azure AD ID from a SP user.
+   * Retrieves the Microsoft Entra ID from a SP user.
    * @param webUrl Web url
    * @param id The Id of the user
    */

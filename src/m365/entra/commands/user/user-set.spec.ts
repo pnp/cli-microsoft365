@@ -424,7 +424,7 @@ describe(commands.USER_SET, () => {
     assert(loggerLogSpy.notCalled);
   });
 
-  it('updates Azure AD user and set its manager by id', async () => {
+  it('updates Microsoft Entra user and set its manager by id', async () => {
     const putStub = sinon.stub(request, 'put').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users/${userName}/manager/$ref`) {
         return;
@@ -439,7 +439,7 @@ describe(commands.USER_SET, () => {
     });
   });
 
-  it('updates Azure AD user and set its manager by user principal name', async () => {
+  it('updates Microsoft Entra user and set its manager by user principal name', async () => {
     const putStub = sinon.stub(request, 'put').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users/${userName}/manager/$ref`) {
         return;
@@ -454,7 +454,7 @@ describe(commands.USER_SET, () => {
     });
   });
 
-  it('updates Azure AD user and removes manager', async () => {
+  it('updates Microsoft Entra user and removes manager', async () => {
     const deleteStub = sinon.stub(request, 'delete').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users/${userName}/manager/$ref`) {
         return;

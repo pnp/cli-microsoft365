@@ -4,7 +4,7 @@ import TabItem from '@theme/TabItem';
 
 # app open
 
-Returns deep link of the current AD app to open the Azure portal on the Azure AD app registration management page.
+Opens Microsoft Entra app in the Microsoft Entra ID portal
 
 ## Usage
 
@@ -16,10 +16,10 @@ m365 app open [options]
 
 ```md definition-list
 `--appId [appId]`
-: Optional Application (client) ID of the Azure AD application registration to open. Uses the app from the `.m365rc.json` file corresponding to the `appId`. If multiple apps are available, this will evade the prompt to choose an app. If the `appId` is not available in the list of apps, an error is thrown.
+: Optional Application (client) ID of the Microsoft Entra application registration to open. Uses the app from the `.m365rc.json` file corresponding to the `appId`. If multiple apps are available, this will evade the prompt to choose an app. If the `appId` is not available in the list of apps, an error is thrown.
 
 `--preview`
-: Use to open the url of the Azure AD preview portal.
+: Use to open the url of the Microsoft Entra ID preview portal.
 ```
 
 <Global />
@@ -32,19 +32,19 @@ Gets the app from the `.m365rc.json` file in the current directory. If the `--ap
 
 ## Examples
 
-Prints the URL to the Azure AD application registration management page on the Azure Portal. 
+Prints the URL to the Microsoft Entra application registration management page on the Azure Portal. 
 
 ```sh
 m365 app open
 ```
 
-Prints the url of the Azure AD application registration management page on the preview Azure Portal.
+Prints the url of the Microsoft Entra application registration management page on the preview Azure Portal.
 
 ```sh
 m365 app open --preview
 ```
 
-Prints the URL to the Azure AD application registration management page on the Azure Portal, evading a possible choice prompt in the case of multiple saved apps in the `.m365rc.json` file. 
+Prints the URL to the Microsoft Entra application registration management page on the Azure Portal, evading a possible choice prompt in the case of multiple saved apps in the `.m365rc.json` file. 
 
 ```sh
 m365 app open --appId d75be2e1-0204-4f95-857d-51a37cf40be8 

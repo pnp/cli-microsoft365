@@ -46,6 +46,8 @@ class EntraOAuth2GrantRemoveCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    await this.showDeprecationWarning(logger, aadCommands.OAUTH2GRANT_REMOVE, commands.OAUTH2GRANT_REMOVE);
+
     const removeOauth2Grant: () => Promise<void> = async (): Promise<void> => {
       if (this.verbose) {
         await logger.logToStderr(`Removing OAuth2 permissions...`);

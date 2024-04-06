@@ -10,6 +10,10 @@ interface CommandArgs {
 }
 
 class TenantReportOffice365ActivationCountsCommand extends GraphCommand {
+  protected get allowedOutputs(): string[] {
+    return ['json', 'csv'];
+  }
+
   public get name(): string {
     return commands.REPORT_OFFICE365ACTIVATIONCOUNTS;
   }

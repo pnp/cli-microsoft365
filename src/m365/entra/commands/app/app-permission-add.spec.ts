@@ -257,7 +257,7 @@ describe(commands.APP_PERMISSION_ADD, () => {
     });
 
     await assert.rejects(command.action(logger, { options: { appId: appId, applicationPermissions: applicationPermissions, verbose: true } }),
-      new CommandError(`App with client id ${appId} not found in Entra ID (Azure AD)`));
+      new CommandError(`App with client id ${appId} not found in Microsoft Entra ID`));
   });
 
   it('throws an error when application specified by appObjectId is not found', async () => {
@@ -273,7 +273,7 @@ describe(commands.APP_PERMISSION_ADD, () => {
     });
 
     await assert.rejects(command.action(logger, { options: { appObjectId: appObjectId, applicationPermissions: applicationPermissions, verbose: true } }),
-      new CommandError(`App with object id ${appObjectId} not found in Entra ID (Azure AD)`));
+      new CommandError(`App with object id ${appObjectId} not found in Microsoft Entra ID`));
   });
 
   it('throws an error when service principal is not found', async () => {

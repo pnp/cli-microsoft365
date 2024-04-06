@@ -61,6 +61,8 @@ class EntraM365GroupConversationListCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    await this.showDeprecationWarning(logger, aadCommands.M365GROUP_CONVERSATION_LIST, commands.M365GROUP_CONVERSATION_LIST);
+
     try {
       const isUnifiedGroup = await entraGroup.isUnifiedGroup(args.options.groupId);
 

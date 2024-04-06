@@ -552,6 +552,20 @@ const sidebars: SidebarsConfig = {
           ]
         },
         {
+          pim: [
+            {
+              type: 'doc',
+              label: 'pim role assignment add',
+              id: 'cmd/entra/pim/pim-role-assignment-add'
+            },
+            {
+              type: 'doc',
+              label: 'pim role assignment list',
+              id: 'cmd/entra/pim/pim-role-assignment-list'
+            }
+          ]
+        },
+        {
           policy: [
             {
               type: 'doc',
@@ -1059,6 +1073,11 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'message move',
               id: 'cmd/outlook/message/message-move'
+            },
+            {
+              type: 'doc',
+              label: 'message remove',
+              id: 'cmd/outlook/message/message-remove'
             }
           ]
         },
@@ -1877,6 +1896,11 @@ const sidebars: SidebarsConfig = {
           project: [
             {
               type: 'doc',
+              label: 'project azuredevops pipeline add',
+              id: 'cmd/spfx/project/project-azuredevops-pipeline-add'
+            },
+            {
+              type: 'doc',
               label: 'project doctor',
               id: 'cmd/spfx/project/project-doctor'
             },
@@ -2122,6 +2146,11 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'contenttype set',
               id: 'cmd/spo/contenttype/contenttype-set'
+            },
+            {
+              type: 'doc',
+              label: 'contenttype sync',
+              id: 'cmd/spo/contenttype/contenttype-sync'
             },
             {
               type: 'doc',
@@ -2432,8 +2461,8 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
-              label: 'folder rename',
-              id: 'cmd/spo/folder/folder-rename'
+              label: 'folder set',
+              id: 'cmd/spo/folder/folder-set'
             },
             {
               type: 'doc',

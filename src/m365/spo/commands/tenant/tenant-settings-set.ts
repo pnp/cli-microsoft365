@@ -658,7 +658,7 @@ class SpoTenantSettingsSetCommand extends SpoCommand {
       }
 
       if (args.options.EnableAzureADB2BIntegration === true) {
-        await this.warn(logger, 'WARNING: Make sure to also enable the Azure AD one-time passcode authentication preview. If it is not enabled then SharePoint will not use Azure AD B2B even if EnableAzureADB2BIntegration is set to true. Learn more at http://aka.ms/spo-b2b-integration.');
+        await this.warn(logger, 'WARNING: Make sure to also enable the Microsoft Entra one-time passcode authentication preview. If it is not enabled then SharePoint will not use Microsoft Entra B2B even if EnableAzureADB2BIntegration is set to true. Learn more at http://aka.ms/spo-b2b-integration.');
       }
     }
     catch (err: any) {

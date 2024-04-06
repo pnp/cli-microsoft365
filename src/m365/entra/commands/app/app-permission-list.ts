@@ -134,7 +134,7 @@ class EntraAppPermissionListCommand extends GraphCommand {
 
     if (res.value.length === 0) {
       const applicationIdentifier = appId ? `ID ${appId}` : `name ${appName}`;
-      throw `No Entra application registration with ${applicationIdentifier} found`;
+      throw `No Microsoft Entra application registration with ${applicationIdentifier} found`;
     }
 
     const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', res.value);

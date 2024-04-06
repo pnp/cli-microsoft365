@@ -21,7 +21,7 @@ class AppOpenCommand extends AppCommand {
   }
 
   public get description(): string {
-    return 'Opens Azure AD app in the Azure AD portal';
+    return 'Opens Microsoft Entra app in the Microsoft Entra ID portal';
   }
 
   constructor() {

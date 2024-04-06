@@ -101,6 +101,8 @@ class EntraUserSigninListCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    await this.showDeprecationWarning(logger, aadCommands.USER_SIGNIN_LIST, commands.USER_SIGNIN_LIST);
+
     try {
       let endpoint: string = `${this.resource}/v1.0/auditLogs/signIns`;
       let filter: string = "";

@@ -439,7 +439,7 @@ describe(commands.APP_PERMISSION_LIST, () => {
     });
 
     await assert.rejects(command.action(logger, { options: { appId: appId } }),
-      new CommandError(`No Entra application registration with ID ${appId} found`));
+      new CommandError(`No Microsoft Entra application registration with ID ${appId} found`));
   });
 
   it('handles a non-existent app by appName', async () => {
@@ -452,7 +452,7 @@ describe(commands.APP_PERMISSION_LIST, () => {
     });
 
     await assert.rejects(command.action(logger, { options: { appName: appName } }),
-      new CommandError(`No Entra application registration with name ${appName} found`));
+      new CommandError(`No Microsoft Entra application registration with name ${appName} found`));
   });
 
   it('lists no permissions for app registration without permissions', async () => {

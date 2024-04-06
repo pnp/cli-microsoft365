@@ -304,7 +304,7 @@ describe('Auth', () => {
       done('Got access token');
     }, () => {
       try {
-        assert(loggerLogToStderrSpy.calledWith('getTokenPromise authentication result is null'));
+        assert(loggerLogToStderrSpy.calledWith('getTokenPromise authentication result is null.'));
         done();
       }
       catch (e) {
@@ -321,7 +321,7 @@ describe('Auth', () => {
       done('Got access token');
     }, () => {
       try {
-        assert(loggerLogToStderrSpy.calledWith('getTokenPromise authentication result is null'));
+        assert(loggerLogToStderrSpy.calledWith('getTokenPromise authentication result is null.'));
         done();
       }
       catch (e) {
@@ -353,7 +353,7 @@ describe('Auth', () => {
     });
   });
 
-  it('shows AAD error when invalid AAD app used', (done) => {
+  it('shows error when invalid Microsoft Entra app used', (done) => {
     sinon.stub(auth as any, 'getPublicClient').callsFake(_ => publicApplication);
     sinon.stub(tokenCache, 'getAllAccounts').resolves([]);
     sinon.stub(publicApplication, 'acquireTokenByDeviceCode').callsFake(_ => Promise.reject({

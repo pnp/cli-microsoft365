@@ -58,7 +58,7 @@ describe('autocomplete', () => {
     "help": {
       "--help": {}
     },
-    "aad": {
+    "entra": {
     },
     "spo": {
       "app": {
@@ -269,7 +269,7 @@ describe('autocomplete', () => {
     });
     autocomplete.commands = commandInfo;
     autocomplete.handleAutocomplete(undefined, evtData);
-    assert(replyStub.calledWith(['help', 'aad', 'spo']));
+    assert(replyStub.calledWith(['help', 'entra', 'spo']));
   });
 
   it('correctly returns list of spo commands when first fragment is spo', () => {

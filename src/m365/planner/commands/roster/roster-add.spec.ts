@@ -14,7 +14,7 @@ import command from './roster-add.js';
 
 describe(commands.ROSTER_ADD, () => {
   const rosterResponse = {
-    id: "e6fmvM_yi0OJgvmepE5uj5cAE6qX",
+    id: "8bc07d47-c06f-41e1-8f00-1c113c8f6067",
     assignedSensitivityLabel: null
   };
 

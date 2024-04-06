@@ -163,6 +163,8 @@ class EntraM365GroupAddCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    await this.showDeprecationWarning(logger, aadCommands.M365GROUP_ADD, commands.M365GROUP_ADD);
+
     let group: Group;
     let ownerIds: string[] = [];
     let memberIds: string[] = [];

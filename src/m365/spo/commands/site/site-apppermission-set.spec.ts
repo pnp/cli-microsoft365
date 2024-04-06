@@ -169,7 +169,7 @@ describe(commands.SITE_APPPERMISSION_SET, () => {
     } as any), new CommandError('Requested site could not be found'));
   });
 
-  it('fails to get Azure AD app when Azure AD app does not exists', async () => {
+  it('fails to get Microsoft Entra app when Microsoft Entra app does not exists', async () => {
     const getRequestStub = sinon.stub(request, 'get');
     getRequestStub.onCall(0)
       .callsFake(async (opts) => {
@@ -204,7 +204,7 @@ describe(commands.SITE_APPPERMISSION_SET, () => {
     } as any), new CommandError('The specified app permission does not exist'));
   });
 
-  it('fails when multiple Azure AD apps with same name exists', async () => {
+  it('fails when multiple Microsoft Entra apps with same name exists', async () => {
     const getRequestStub = sinon.stub(request, 'get');
     getRequestStub.onCall(0)
       .callsFake(async (opts) => {

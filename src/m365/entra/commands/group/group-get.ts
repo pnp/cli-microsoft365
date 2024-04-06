@@ -77,6 +77,8 @@ class EntraGroupGetCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    await this.showDeprecationWarning(logger, aadCommands.GROUP_GET, commands.GROUP_GET);
+
     let group: Group;
 
     try {

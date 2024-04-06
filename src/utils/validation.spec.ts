@@ -546,4 +546,100 @@ describe('validation/validation', () => {
     const result = validation.isValidMailNickname('nick,name');
     assert.strictEqual(result, false);
   });
+
+  it('isValidISODuration returns true if duration in years is valid', () => {
+    const actual = validation.isValidISODuration("P2Y");
+    const expected = true;
+    assert.strictEqual(actual, expected);
+  });
+
+  it('isValidISODuration returns true if duration in months is valid', () => {
+    const actual = validation.isValidISODuration("P2M");
+    const expected = true;
+    assert.strictEqual(actual, expected);
+  });
+
+  it('isValidISODuration returns true if duration in weeks is valid', () => {
+    const actual = validation.isValidISODuration("P2W");
+    const expected = true;
+    assert.strictEqual(actual, expected);
+  });
+
+  it('isValidISODuration returns true if duration in days is valid', () => {
+    const actual = validation.isValidISODuration("P2D");
+    const expected = true;
+    assert.strictEqual(actual, expected);
+  });
+
+  it('isValidISODuration returns true if duration in hours is valid', () => {
+    const actual = validation.isValidISODuration("PT2H");
+    const expected = true;
+    assert.strictEqual(actual, expected);
+  });
+
+  it('isValidISODuration returns true if duration in minutes is valid', () => {
+    const actual = validation.isValidISODuration("PT2M");
+    const expected = true;
+    assert.strictEqual(actual, expected);
+  });
+
+  it('isValidISODuration returns true if duration in seconds is valid', () => {
+    const actual = validation.isValidISODuration("PT2S");
+    const expected = true;
+    assert.strictEqual(actual, expected);
+  });
+
+  it('isValidISODuration returns true if duration is valid', () => {
+    const actual = validation.isValidISODuration("P3Y6M4DT12H30M5S");
+    const expected = true;
+    assert.strictEqual(actual, expected);
+  });
+
+  it('isValidISODuration returns false if duration in years is not valid', () => {
+    const actual = validation.isValidISODuration("PY");
+    const expected = true;
+    assert.notStrictEqual(actual, expected);
+  });
+
+  it('isValidISODuration returns false if duration in months is not valid', () => {
+    const actual = validation.isValidISODuration("PM");
+    const expected = true;
+    assert.notStrictEqual(actual, expected);
+  });
+
+  it('isValidISODuration returns false if duration in weeks is not valid', () => {
+    const actual = validation.isValidISODuration("PW");
+    const expected = true;
+    assert.notStrictEqual(actual, expected);
+  });
+
+  it('isValidISODuration returns false if duration in days is not valid', () => {
+    const actual = validation.isValidISODuration("PD");
+    const expected = true;
+    assert.notStrictEqual(actual, expected);
+  });
+
+  it('isValidISODuration returns false if duration in hours is not valid', () => {
+    const actual = validation.isValidISODuration("PTH");
+    const expected = true;
+    assert.notStrictEqual(actual, expected);
+  });
+
+  it('isValidISODuration returns false if duration in minutes is not valid', () => {
+    const actual = validation.isValidISODuration("PTM");
+    const expected = true;
+    assert.notStrictEqual(actual, expected);
+  });
+
+  it('isValidISODuration returns false if duration in seconds is not valid', () => {
+    const actual = validation.isValidISODuration("PTS");
+    const expected = true;
+    assert.notStrictEqual(actual, expected);
+  });
+
+  it('isValidISODuration returns false if duration is not valid', () => {
+    const actual = validation.isValidISODuration("P3Y6MDT12H30M5S");
+    const expected = true;
+    assert.notStrictEqual(actual, expected);
+  });
 });

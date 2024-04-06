@@ -65,6 +65,7 @@ interface Options extends GlobalOptions {
   certificateFile?: string;
   certificateBase64Encoded?: string;
   certificateDisplayName?: string;
+  allowPublicClientFlows?: boolean;
 }
 
 interface AppPermissions {
@@ -118,7 +119,8 @@ class EntraAppAddCommand extends GraphCommand {
         certificateFile: typeof args.options.certificateFile !== 'undefined',
         certificateBase64Encoded: typeof args.options.certificateBase64Encoded !== 'undefined',
         certificateDisplayName: typeof args.options.certificateDisplayName !== 'undefined',
-        grantAdminConsent: typeof args.options.grantAdminConsent !== 'undefined'
+        grantAdminConsent: typeof args.options.grantAdminConsent !== 'undefined',
+        allowPublicClientFlows: typeof args.options.allowPublicClientFlows !== 'undefined'
       });
     });
   }
@@ -183,6 +185,9 @@ class EntraAppAddCommand extends GraphCommand {
       },
       {
         option: '--grantAdminConsent'
+      },
+      {
+        option: '--allowPublicClientFlows'
       }
     );
   }
@@ -254,12 +259,14 @@ class EntraAppAddCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    await this.showDeprecationWarning(logger, aadCommands.APP_ADD, commands.APP_ADD);
+
     try {
       const apis = await this.resolveApis(args, logger);
       let appInfo: any = await this.createAppRegistration(args, apis, logger);
-      // based on the assumption that we're adding AAD app to the current
+      // based on the assumption that we're adding Microsoft Entra app to the current
       // directory. If we in the future extend the command with allowing
-      // users to create AAD app in a different directory, we'll need to
+      // users to create Microsoft Entra app in a different directory, we'll need to
       // adjust this
       appInfo.tenantId = accessToken.getTenantIdFromAccessToken(auth.connection.accessTokens[auth.defaultResource].accessToken);
       appInfo = await this.updateAppFromManifest(args, appInfo);
@@ -328,8 +335,12 @@ class EntraAppAddCommand extends GraphCommand {
       applicationInfo.keyCredentials = [newKeyCredential];
     }
 
+    if (args.options.allowPublicClientFlows) {
+      applicationInfo.isFallbackPublicClient = true;
+    }
+
     if (this.verbose) {
-      await logger.logToStderr(`Creating Azure AD app registration...`);
+      await logger.logToStderr(`Creating Microsoft Entra app registration...`);
     }
 
     const createApplicationRequestOptions: CliRequestOptions = {
@@ -681,7 +692,7 @@ class EntraAppAddCommand extends GraphCommand {
     }
 
     if (this.verbose) {
-      await logger.logToStderr(`Configuring Azure AD application ID URI...`);
+      await logger.logToStderr(`Configuring Microsoft Entra application ID URI...`);
     }
 
     const applicationInfo: any = {};
@@ -866,7 +877,7 @@ class EntraAppAddCommand extends GraphCommand {
     }
 
     if (this.verbose) {
-      await logger.logToStderr(`Configure Azure AD app secret...`);
+      await logger.logToStderr(`Configure Microsoft Entra app secret...`);
     }
 
     const secret = await this.createSecret({ appObjectId: appInfo.id });
@@ -934,7 +945,7 @@ class EntraAppAddCommand extends GraphCommand {
     const filePath: string = '.m365rc.json';
 
     if (this.verbose) {
-      await logger.logToStderr(`Saving Azure AD app registration information to the ${filePath} file...`);
+      await logger.logToStderr(`Saving Microsoft Entra app registration information to the ${filePath} file...`);
     }
 
     let m365rc: M365RcJson = {};

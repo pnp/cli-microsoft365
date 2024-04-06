@@ -916,7 +916,7 @@ describe('utils/spo', () => {
     assert.deepEqual(customAction, customActionOnSiteResponse1);
   });
 
-  it(`retrieves Azure AD ID by SPO user ID sucessfully`, async () => {
+  it(`retrieves Microsoft Entra ID by SPO user ID successfully`, async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://contoso.sharepoint.com/sites/sales/_api/web/siteusers/GetById('9')?$select=AadObjectId`) {
         return {

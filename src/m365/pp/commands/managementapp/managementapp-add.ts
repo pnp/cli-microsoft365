@@ -114,19 +114,19 @@ class PpManagementAppAddCommand extends PowerPlatformCommand {
       responseType: 'json'
     };
 
-    const aadApps: { value: Application[] } = await request.get<{ value: Application[] }>((requestOptions));
+    const entraApps: { value: Application[] } = await request.get<{ value: Application[] }>((requestOptions));
 
-    if (aadApps.value.length === 0) {
+    if (entraApps.value.length === 0) {
       const applicationIdentifier = objectId ? `ID ${objectId}` : `name ${name}`;
-      throw `No Azure AD application registration with ${applicationIdentifier} found`;
+      throw `No Microsoft Entra application registration with ${applicationIdentifier} found`;
     }
 
-    if (aadApps.value.length === 1 && aadApps.value[0].appId) {
-      return aadApps.value[0].appId;
+    if (entraApps.value.length === 1 && entraApps.value[0].appId) {
+      return entraApps.value[0].appId;
     }
 
-    const resultAsKeyValuePair = formatting.convertArrayToHashTable('appId', aadApps.value);
-    const result = await cli.handleMultipleResultsFound<Application>(`Multiple Azure AD application registration with name '${name}' found.`, resultAsKeyValuePair);
+    const resultAsKeyValuePair = formatting.convertArrayToHashTable('appId', entraApps.value);
+    const result = await cli.handleMultipleResultsFound<Application>(`Multiple Microsoft Entra application registrations with name '${name}' found.`, resultAsKeyValuePair);
     return result.appId!;
   }
 }

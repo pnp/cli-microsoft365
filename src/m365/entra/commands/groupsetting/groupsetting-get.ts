@@ -55,6 +55,8 @@ class EntraGroupSettingGetCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    await this.showDeprecationWarning(logger, aadCommands.GROUPSETTING_GET, commands.GROUPSETTING_GET);
+
     try {
       const requestOptions: CliRequestOptions = {
         url: `${this.resource}/v1.0/groupSettings/${args.options.id}`,

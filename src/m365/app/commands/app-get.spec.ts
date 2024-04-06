@@ -84,7 +84,7 @@ describe(commands.GET, () => {
       options: {
         appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f'
       }
-    }), new CommandError(`No Azure AD application registration with ID 9b1b1e42-794b-4c71-93ac-5ed92488b67f found`));
+    }), new CommandError(`No Microsoft Entra application registration with ID 9b1b1e42-794b-4c71-93ac-5ed92488b67f found`));
   });
 
   it('handles error when retrieving information about app through appId failed', async () => {
@@ -97,7 +97,7 @@ describe(commands.GET, () => {
     }), new CommandError(`An error has occurred`));
   });
 
-  it(`gets an Azure AD app registration by its app (client) ID.`, async () => {
+  it(`gets an Microsoft Entra app registration by its app (client) ID.`, async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=appId eq '9b1b1e42-794b-4c71-93ac-5ed92488b67f'&$select=id`) {
         return {

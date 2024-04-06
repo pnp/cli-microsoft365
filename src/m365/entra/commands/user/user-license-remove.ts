@@ -95,6 +95,8 @@ class EntraUserLicenseRemoveCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: any): Promise<void> {
+    await this.showDeprecationWarning(logger, aadCommands.USER_LICENSE_REMOVE, commands.USER_LICENSE_REMOVE);
+
     if (this.verbose) {
       await logger.logToStderr(`Removing the licenses for the user '${args.options.userId || args.options.userName}'...`);
     }

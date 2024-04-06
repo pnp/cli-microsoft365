@@ -20,7 +20,7 @@
     "@docusaurus/preset-classic": "^3.1.1",
     "@docusaurus/theme-mermaid": "^3.1.1",
     "@docusaurus/types": "^3.1.1",
-    "@mdx-js/react": "^3.0.0",
+    "@mdx-js/react": "^3.0.1",
     "@mendable/search": "^0.0.205",
     "clsx": "^2.1.0",
     "docusaurus-plugin-sass": "^0.2.5",
@@ -28,15 +28,15 @@
     "prism-react-renderer": "^2.3.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "sass": "^1.70.0",
+    "sass": "^1.71.1",
     "unist-util-visit": "^5.0.0"
   },
   "devDependencies": {
     "@docusaurus/module-type-aliases": "^3.1.1",
     "@docusaurus/tsconfig": "^3.1.1",
-    "asciinema-player": "^3.6.3",
+    "asciinema-player": "^3.7.0",
     "docusaurus-node-polyfills": "^1.0.0",
-    "typescript": "^5.3.3"
+    "typescript": "^5.4.2"
   },
   "browserslist": {
     "production": [
