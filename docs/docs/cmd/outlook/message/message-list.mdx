@@ -28,7 +28,7 @@ m365 outlook message list [options]
 : Time indicating the exclusive end of a time range when the message was received. This should be defined as a valid ISO 8601 string (2021-12-16T18:28:48.6964197Z).
 
 `--userId [userId]`
-: User id of the user. Specify either `userId` or `userName`, not both. This option is required when using application permissions.
+: The Microsoft Entra user ID. Specify either `userId` or `userName`, not both. This option is required when using application permissions.
 
 `--userName [userName]`
 : User principal name of the user. Specify either `userId` or `userName`, not both. This option is required when using application permissions.
@@ -38,19 +38,19 @@ m365 outlook message list [options]
 
 ## Examples
 
-List all messages in the folder with the specified name received between a specific startTime and endTime.
+List all messages from a folder with the specified name received between within a specific time frame.
 
 ```sh
 m365 outlook message list --folderName Archive --startTime 2023-12-16T18:28:48.6964197Z --endTime 2024-02-01
 ```
 
-List all messages in the folder with the specified ID for a user specified by id.
+List all messages from a specific folder of a user specified by ID.
 
 ```sh
 m365 outlook message list --folderId AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OAAuAAAAAAAiQ8W967B7TKBjgx9rVEURAQAiIsqMbYjsT5e-T7KzowPTAAAAAAFNAAA= --userId 48d31887-5fad-4d73-a9f5-3c356e68a038
 ```
 
-List all messages in the folder with the specified well-known name from a user specified by userName.
+List all messages from a folder of a user specified by UPN.
 
 ```sh
 m365 outlook message list --folderName inbox --userName john@contoso.com

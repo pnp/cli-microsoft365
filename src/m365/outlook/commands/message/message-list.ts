@@ -40,6 +40,7 @@ class OutlookMessageListCommand extends GraphCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initTypes();
     this.#initOptionSets();
   }
 
@@ -85,7 +86,7 @@ class OutlookMessageListCommand extends GraphCommand {
       async (args: CommandArgs) => {
         if (args.options.startTime) {
           if (!validation.isValidISODateTime(args.options.startTime)) {
-            return `'${args.options.startTime}' is not a valid ISO date string`;
+            return `'${args.options.startTime}' is not a valid ISO date string for option startTime.`;
           }
           if (new Date(args.options.startTime) > new Date()) {
             return 'startTime value cannot be in the future.';
@@ -94,7 +95,7 @@ class OutlookMessageListCommand extends GraphCommand {
 
         if (args.options.endTime) {
           if (!validation.isValidISODateTime(args.options.endTime)) {
-            return `'${args.options.endTime}' is not a valid ISO date string`;
+            return `'${args.options.endTime}' is not a valid ISO date string for option endTime.`;
           }
           if (new Date(args.options.endTime) > new Date()) {
             return 'endTime value cannot be in the future.';
@@ -102,20 +103,24 @@ class OutlookMessageListCommand extends GraphCommand {
         }
 
         if (args.options.startTime && args.options.endTime && new Date(args.options.startTime) >= new Date(args.options.endTime)) {
-          return 'startTime value must be before endTime.';
+          return 'endTime cannot be before startTime.';
         }
 
-        if (args.options.userId && !validation.isValidGuid(args.options.userId as string)) {
-          return `${args.options.userId} is not a valid GUID`;
+        if (args.options.userId && !validation.isValidGuid(args.options.userId)) {
+          return `${args.options.userId} is not a valid GUID for option userId.`;
         }
 
         if (args.options.userName && !validation.isValidUserPrincipalName(args.options.userName)) {
-          return `${args.options.userName} is not a valid userName`;
+          return `${args.options.userName} is not a valid userName.`;
         }
 
         return true;
       }
     );
+  }
+
+  #initTypes(): void {
+    this.types.string.push('folderName', 'folderId', 'startTime', 'endTime', 'userId', 'userName');
   }
 
   #initOptionSets(): void {
@@ -137,28 +142,28 @@ class OutlookMessageListCommand extends GraphCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
-      if (!args.options.userId && !args.options.userName && accessToken.isAppOnlyAccessToken(auth.connection.accessTokens[this.resource].accessToken)) {
-        throw 'You must specify either the userId or userName option when using an app-only access token';
+      if (!args.options.userId && !args.options.userName && accessToken.isAppOnlyAccessToken(auth.connection.accessTokens[auth.defaultResource].accessToken)) {
+        throw 'You must specify either the userId or userName option when using app-only access permissions.';
       }
 
       const userUrl = args.options.userId || args.options.userName ? `users/${args.options.userId || args.options.userName}` : 'me';
 
       const folderId = await this.getFolderId(userUrl, args);
-      const folderUrl: string = folderId ? `/mailFolders/${folderId}/messages` : '/messages';
-      let requestUrl = `${this.resource}/v1.0/${userUrl}${folderUrl}`;
+      const folderUrl: string = folderId ? `/mailFolders/${folderId}` : '';
+      let requestUrl = `${this.resource}/v1.0/${userUrl}${folderUrl}/messages?$top=100`;
 
       if (args.options.startTime || args.options.endTime) {
         const filters = [];
 
         if (args.options.startTime) {
-          filters.push(`receivedDateTime ge ${formatting.encodeQueryParameter(args.options.startTime)}`);
+          filters.push(`receivedDateTime ge ${args.options.startTime}`);
         }
         if (args.options.endTime) {
-          filters.push(`receivedDateTime le ${formatting.encodeQueryParameter(args.options.endTime)}`);
+          filters.push(`receivedDateTime lt ${args.options.endTime}`);
         }
 
         if (filters.length > 0) {
-          requestUrl += `?$filter=${filters.join(' and ')}`;
+          requestUrl += `&$filter=${filters.join(' and ')}`;
         }
       }
 
@@ -184,7 +189,7 @@ class OutlookMessageListCommand extends GraphCommand {
     }
 
     const requestOptions: CliRequestOptions = {
-      url: `${this.resource}/v1.0/${userUrl}/mailFolders?$filter=displayName eq '${formatting.encodeQueryParameter(args.options.folderName as string)}'&$select=id`,
+      url: `${this.resource}/v1.0/${userUrl}/mailFolders?$filter=displayName eq '${formatting.encodeQueryParameter(args.options.folderName!)}'&$select=id`,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },

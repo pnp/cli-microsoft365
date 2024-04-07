@@ -13,7 +13,6 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './message-list.js';
 import { settingsNames } from '../../../../settingsNames.js';
-import { formatting } from '../../../../utils/formatting.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 
 describe(commands.MESSAGE_LIST, () => {
@@ -420,12 +419,12 @@ describe(commands.MESSAGE_LIST, () => {
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
 
     await assert.rejects(command.action(logger, { options: {} } as any),
-      new CommandError('You must specify either the userId or userName option when using an app-only access token'));
+      new CommandError('You must specify either the userId or userName option when using app-only access permissions.'));
   });
 
   it('lists messages from the folder with name specified using well-known-name', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/me/mailFolders/inbox/messages`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/me/mailFolders/inbox/messages?$top=100`) {
         return emailResponse;
       }
 
@@ -433,12 +432,12 @@ describe(commands.MESSAGE_LIST, () => {
     });
 
     await command.action(logger, { options: { folderName: 'inbox' } });
-    assert(loggerLogSpy.calledWith(emailOutput));
+    assert(loggerLogSpy.calledOnceWith(emailOutput));
   });
 
   it('lists messages from the folder with name specified using well-known-name (debug)', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/me/mailFolders/inbox/messages`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/me/mailFolders/inbox/messages?$top=100`) {
         return emailResponse;
       }
 
@@ -446,12 +445,12 @@ describe(commands.MESSAGE_LIST, () => {
     });
 
     await command.action(logger, { options: { debug: true, folderName: 'inbox' } });
-    assert(loggerLogSpy.calledWith(emailOutput));
+    assert(loggerLogSpy.calledOnceWith(emailOutput));
   });
 
   it('lists messages from the folder with id specified using well-known-name', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/me/mailFolders/inbox/messages`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/me/mailFolders/inbox/messages?$top=100`) {
         return emailResponse;
       }
 
@@ -459,12 +458,12 @@ describe(commands.MESSAGE_LIST, () => {
     });
 
     await command.action(logger, { options: { folderId: 'inbox' } });
-    assert(loggerLogSpy.calledWith(emailOutput));
+    assert(loggerLogSpy.calledOnceWith(emailOutput));
   });
 
   it('lists messages from the folder with the specified name', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/me/mailFolders/AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OAAuAAAAAAAiQ8W967B7TKBjgx9rVEURAQAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAA=/messages`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/me/mailFolders/AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OAAuAAAAAAAiQ8W967B7TKBjgx9rVEURAQAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAA=/messages?$top=100`) {
         return emailResponse;
       }
       else if (opts.url === `https://graph.microsoft.com/v1.0/me/mailFolders?$filter=displayName eq 'Inbox'&$select=id`) {
@@ -481,12 +480,12 @@ describe(commands.MESSAGE_LIST, () => {
     });
 
     await command.action(logger, { options: { folderName: 'Inbox' } });
-    assert(loggerLogSpy.calledWith(emailOutput));
+    assert(loggerLogSpy.calledOnceWith(emailOutput));
   });
 
   it('lists messages from the folder with the specified id', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/me/mailFolders/AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OAAuAAAAAAAiQ8W967B7TKBjgx9rVEURAQAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAA=/messages`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/me/mailFolders/AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OAAuAAAAAAAiQ8W967B7TKBjgx9rVEURAQAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAA=/messages?$top=100`) {
         return emailResponse;
       }
 
@@ -494,12 +493,12 @@ describe(commands.MESSAGE_LIST, () => {
     });
 
     await command.action(logger, { options: { folderId: 'AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OAAuAAAAAAAiQ8W967B7TKBjgx9rVEURAQAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAA=' } });
-    assert(loggerLogSpy.calledWith(emailOutput));
+    assert(loggerLogSpy.calledOnceWith(emailOutput));
   });
 
-  it('lists messages from me endpoint', async () => {
+  it('lists messages from the currently logged in user', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/me/messages`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/me/messages?$top=100`) {
         return emailResponse;
       }
 
@@ -507,12 +506,12 @@ describe(commands.MESSAGE_LIST, () => {
     });
 
     await command.action(logger, { options: {} });
-    assert(loggerLogSpy.calledWith(emailOutput));
+    assert(loggerLogSpy.calledOnceWith(emailOutput));
   });
 
-  it('lists messages from me endpoint with a specified startTime', async () => {
+  it('lists messages for the currently logged in user with a specified startTime', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/me/messages?$filter=receivedDateTime ge ${formatting.encodeQueryParameter(startTime)}`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/me/messages?$top=100&$filter=receivedDateTime ge ${startTime}`) {
         return emailResponse;
       }
 
@@ -520,12 +519,12 @@ describe(commands.MESSAGE_LIST, () => {
     });
 
     await command.action(logger, { options: { startTime: startTime } });
-    assert(loggerLogSpy.calledWith(emailOutput));
+    assert(loggerLogSpy.calledOnceWith(emailOutput));
   });
 
-  it('lists messages from me endpoint with a specified endTime and specifying a user by id', async () => {
+  it('lists messages the currently logged in user with a specified endTime and specifying a user by id', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users/${userId}/messages?$filter=receivedDateTime le ${formatting.encodeQueryParameter(endTime)}`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users/${userId}/messages?$top=100&$filter=receivedDateTime lt ${endTime}`) {
         return emailResponse;
       }
 
@@ -533,12 +532,12 @@ describe(commands.MESSAGE_LIST, () => {
     });
 
     await command.action(logger, { options: { userId: userId, endTime: endTime } });
-    assert(loggerLogSpy.calledWith(emailOutput));
+    assert(loggerLogSpy.calledOnceWith(emailOutput));
   });
 
-  it('lists messages from me endpoint with a specified start and endTime and specifying a user by name', async () => {
+  it('lists messages for the currently logged in user with a specified start and endTime and specifying a user by UPN', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users/${userName}/messages?$filter=receivedDateTime ge ${formatting.encodeQueryParameter(startTime)} and receivedDateTime le ${formatting.encodeQueryParameter(endTime)}`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users/${userName}/messages?$top=100&$filter=receivedDateTime ge ${startTime} and receivedDateTime lt ${endTime}`) {
         return emailResponse;
       }
 
@@ -546,7 +545,7 @@ describe(commands.MESSAGE_LIST, () => {
     });
 
     await command.action(logger, { options: { startTime: startTime, endTime: endTime, userName: userName } });
-    assert(loggerLogSpy.calledWith(emailOutput));
+    assert(loggerLogSpy.calledOnceWith(emailOutput));
   });
 
   it('returns error when the folder with the specified name does not exist', async () => {
@@ -607,7 +606,7 @@ describe(commands.MESSAGE_LIST, () => {
         };
       }
 
-      if (opts.url === `https://graph.microsoft.com/v1.0/me/mailFolders/AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OAAuAAAAAAAiQ8W967B7TKBjgx9rVEURAQAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAA=/messages`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/me/mailFolders/AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OAAuAAAAAAAiQ8W967B7TKBjgx9rVEURAQAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAA=/messages?$top=100`) {
         return emailResponse;
       }
 
@@ -619,12 +618,12 @@ describe(commands.MESSAGE_LIST, () => {
     });
 
     await command.action(logger, { options: { folderName: 'Archives' } });
-    assert(loggerLogSpy.calledWith(emailOutput));
+    assert(loggerLogSpy.calledOnceWith(emailOutput));
   });
 
   it('returns all message properties in JSON output mode', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/me/mailFolders/inbox/messages`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/me/mailFolders/inbox/messages?$top=100`) {
         return emailResponse;
       }
 
