@@ -35,7 +35,7 @@ export interface Options extends GlobalOptions {
   region?: string;
 }
 
-class SpeContainerTypeAddCommand extends SpoCommand {
+class SpeContainertypeAddCommand extends SpoCommand {
   public get name(): string {
     return commands.CONTAINERTYPE_ADD;
   }
@@ -167,4 +167,4 @@ class SpeContainerTypeAddCommand extends SpoCommand {
   }
 }
 
-export default new SpeContainerTypeAddCommand();
+export default new SpeContainertypeAddCommand();

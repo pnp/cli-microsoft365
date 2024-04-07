@@ -23,6 +23,7 @@ const dictionary = [
   'client',
   'comm',
   'command',
+  'containertype',
   'content',
   'conversation',
   'custom',
