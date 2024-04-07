@@ -104,7 +104,7 @@ describe(commands.CONTAINERTYPE_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { name: containerName, applicationId: applicationId, trial: true } });
+    await command.action(logger, { options: { name: containerName, applicationId: applicationId, trial: true, verbose: true } });
     const jsonResponseClone = { ...jsonResponse };
     jsonResponseClone.SPContainerTypeBillingClassification = "Trial";
     assert(loggerLogSpy.calledWith(jsonResponseClone));
@@ -118,7 +118,7 @@ describe(commands.CONTAINERTYPE_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { name: containerName, applicationId: applicationId, region: region, azureSubscriptionId: azureSubscriptionId, resourceGroup: resourceGroup } });
+    await command.action(logger, { options: { name: containerName, applicationId: applicationId, region: region, azureSubscriptionId: azureSubscriptionId, resourceGroup: resourceGroup, verbose: true } });
     assert(loggerLogSpy.calledWith(jsonResponse));
   });
 
@@ -130,7 +130,7 @@ describe(commands.CONTAINERTYPE_ADD, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { name: containerName, applicationId: applicationId, trial: true } })
+    await assert.rejects(command.action(logger, { options: { name: containerName, applicationId: applicationId, trial: true, verbose: true } })
       , new CommandError(errorMessageTooManyContainers));
   });
 
@@ -142,7 +142,7 @@ describe(commands.CONTAINERTYPE_ADD, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { name: containerName, applicationId: applicationId, azureSubscriptionId: azureSubscriptionId, resourceGroup: resourceGroup, region: region } })
+    await assert.rejects(command.action(logger, { options: { name: containerName, applicationId: applicationId, azureSubscriptionId: azureSubscriptionId, resourceGroup: resourceGroup, region: region, verbose: true } })
       , new CommandError(errorMessageContainerAlreadyExists));
   });
 
