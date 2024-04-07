@@ -1863,8 +1863,8 @@ const sidebars: SidebarsConfig = {
           container: [
             {
               type: 'doc',
-              label: 'container type add',
-              id: 'cmd/spe/container/container-type-add'
+              label: 'containertype add',
+              id: 'cmd/spe/containertype/containertype-add'
             }
           ]
         }
