@@ -8,13 +8,13 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './container-type-add.js';
+import command from './containertype-add.js';
 import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { spo } from '../../../../utils/spo.js';
 import { CommandError } from '../../../../Command.js';
 
-describe(commands.CONTAINER_TYPE_ADD, () => {
+describe(commands.CONTAINERTYPE_ADD, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -89,7 +89,7 @@ describe(commands.CONTAINER_TYPE_ADD, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name, commands.CONTAINER_TYPE_ADD);
+    assert.strictEqual(command.name, commands.CONTAINERTYPE_ADD);
   });
 
   it('has a description', () => {

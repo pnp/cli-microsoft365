@@ -37,11 +37,11 @@ export interface Options extends GlobalOptions {
 
 class SpeContainerTypeAddCommand extends SpoCommand {
   public get name(): string {
-    return commands.CONTAINER_TYPE_ADD;
+    return commands.CONTAINERTYPE_ADD;
   }
 
   public get description(): string {
-    return 'Creates a new Container Type for your app';
+    return 'Creates a new Containertype for your app';
   }
 
   constructor() {
@@ -116,6 +116,10 @@ class SpeContainerTypeAddCommand extends SpoCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
+      if (this.verbose) {
+        await logger.logToStderr(`Creating a new Containertype for your app with name ${args.options.name}`);
+      }
+
       const adminUrl = await spo.getSpoAdminUrl(logger, this.debug);
       const requestBody = this.getRequestBody(args.options);
 
