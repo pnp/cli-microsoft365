@@ -3962,6 +3962,11 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
+              label: 'meeting transcript get',
+              id: 'cmd/teams/meeting/meeting-transcript-get'
+            },
+            {
+              type: 'doc',
               label: 'meeting transcript list',
               id: 'cmd/teams/meeting/meeting-transcript-list'
             }
