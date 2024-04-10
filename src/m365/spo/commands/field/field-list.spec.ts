@@ -64,7 +64,7 @@ describe(commands.FIELD_LIST, () => {
   });
 
   it('defines correct properties for the default output', () => {
-    assert.deepStrictEqual(command.defaultProperties(), ['Id', 'Title', 'Group', 'Hidden']);
+    assert.deepStrictEqual(command.defaultProperties(), ['Id', 'Title', 'InternalName', 'Hidden']);
   });
 
   it('fails validation if the specified site URL is not a valid SharePoint URL', async () => {
