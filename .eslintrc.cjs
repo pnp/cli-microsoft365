@@ -34,6 +34,7 @@ const dictionary = [
   'default',
   'dev',
   'details',
+  'eligibility',
   'enterprise',
   'entra',
   'event',
