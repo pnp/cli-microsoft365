@@ -660,8 +660,6 @@ class SpfxDoctorCommand extends BaseProjectCommand {
     this.logger = logger;
 
     await this.logMessage(' ');
-
-    await this.logMessage(' ');
     await this.logMessage('CLI for Microsoft 365 SharePoint Framework doctor');
     await this.logMessage('Verifying configuration of your system for working with the SharePoint Framework');
     await this.logMessage(' ');
