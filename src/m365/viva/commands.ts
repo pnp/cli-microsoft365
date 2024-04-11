@@ -2,6 +2,7 @@ const prefix: string = 'viva';
 
 export default {
   CONNECTIONS_APP_CREATE: `${prefix} connections app create`,
+  ENGAGE_COMMUNITY_ADD: `${prefix} engage community add`,
   ENGAGE_COMMUNITY_GET: `${prefix} engage community get`,
   ENGAGE_GROUP_LIST: `${prefix} engage group list`,
   ENGAGE_GROUP_USER_ADD: `${prefix} engage group user add`,
