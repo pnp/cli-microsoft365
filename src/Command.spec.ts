@@ -621,17 +621,17 @@ describe('Command', () => {
   });
 
   it('correctly handles stack trace error when using debug for oData json error handling', async () => {
-    const stacktraceError = 'StacktraceError at line 2';
     try {
+      sinon.stub(cli, 'error');
       const mock = new MockCommand2();
       sinon.stub(cli, 'optionsFromArgs').value({ options: { debug: true } });
       mock.handlePromiseError({
-        error: { error_description: 'abc' }, stack: 'StacktraceError at line 2'
+        error: { error_description: 'abc' }
       });
       assert.fail('No exception was thrown.');
     }
     catch (err: any) {
-      assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(stacktraceError)));
+      assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('abc')));
     }
     finally {
       sinon.stub(cli, 'optionsFromArgs').value({});
@@ -639,17 +639,16 @@ describe('Command', () => {
   });
 
   it('correctly handles stack trace error when using debug for oData error handling', async () => {
-    const stacktraceError = 'StacktraceError at line 2';
     try {
       const mock = new MockCommand5();
       sinon.stub(cli, 'optionsFromArgs').value({ options: { debug: true } });
       mock.handlePromiseError({
-        error: { error_description: 'abc' }, stack: 'StacktraceError at line 2'
+        error: { error_description: 'abc' }
       });
       assert.fail('No exception was thrown.');
     }
     catch (err: any) {
-      assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(stacktraceError)));
+      assert.strictEqual(JSON.stringify(err), JSON.stringify({ 'message': { 'error_description': 'abc' } }));
     }
     finally {
       sinon.stub(cli, 'optionsFromArgs').value({});
