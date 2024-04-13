@@ -1050,6 +1050,7 @@ export const cli = {
 const spinnerOptions: Options = {
   text: 'Running command...',
   /* c8 ignore next 1 */
-  stream: cli.getSettingWithDefaultValue('errorOutput', 'stderr') === 'stderr' ? process.stderr : process.stdout
+  stream: cli.getSettingWithDefaultValue('errorOutput', 'stderr') === 'stderr' ? process.stderr : process.stdout,
+  discardStdin: false
 };
 cli.spinner = ora(spinnerOptions);
