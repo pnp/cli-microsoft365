@@ -299,34 +299,52 @@ describe(commands.LOGIN, () => {
     assert.strictEqual(auth.connection.authType, AuthType.Browser, 'Incorrect authType set');
   });
 
-  it(`Don't start login flow when the CLI is signed in`, async () => {
+  it(`doesn't start the login flow when the CLI is signed in`, async () => {
+    auth.connection.active = false;
+
     await command.action(logger, { options: { ensure: true } });
     await command.action(logger, { options: { ensure: true } });
 
-    assert(deactivateStub.callCount <= 1);
+    assert(deactivateStub.callCount === 1);
   });
 
-  it(`Don't start login flow if the CLI is signed in as a user`, async () => {
+  it(`doesn't start the login flow if the CLI is signed in as a user`, async () => {
+    auth.connection.active = false;
+
     await command.action(logger, { options: { ensure: true, authType: 'password', userName: 'john.doe@contoso.com', password: 'password' } });
     await command.action(logger, { options: { ensure: true, authType: 'password', userName: 'john.doe@contoso.com', password: 'password' } });
 
-    assert(deactivateStub.callCount <= 1);
+    assert(deactivateStub.callCount === 1);
   });
 
-  it(`Don't start login flow, if the CLI is signed in using a certificate`, async () => {
+  it(`doesn't start the login flow if the CLI is signed in using a certificate`, async () => {
+    auth.connection.active = false;
+    auth.connection.certificate = 'certificate';
+
     sinon.stub(fs, 'readFileSync').callsFake(() => 'certificate');
 
     await command.action(logger, { options: { ensure: true, authType: 'certificate ', certificateFile: 'certificate' } });
     await command.action(logger, { options: { ensure: true, authType: 'certificate ', certificateFile: 'certificate' } });
 
-    assert(deactivateStub.callCount <= 1);
+    assert(deactivateStub.callCount === 1);
   });
 
-  it(`Don't start login flow if the CLI is signed in using the specified app and to the specified tenant`, async () => {
+  it(`doesn't start the login flow if the CLI is signed in using the specified app and to the specified tenant`, async () => {
+    auth.connection.active = false;
+
     await command.action(logger, { options: { ensure: true, appId: '1cf21ca6-c8f0-4a21-839d-68a09d3a0f55', tenant: '973fce64-6409-4843-9328-c2cef0427f4e' } });
     await command.action(logger, { options: { ensure: true, appId: '1cf21ca6-c8f0-4a21-839d-68a09d3a0f55', tenant: '973fce64-6409-4843-9328-c2cef0427f4e' } });
 
-    assert(deactivateStub.callCount <= 1);
+    assert(deactivateStub.callCount === 1);
+  });
+
+  it(`starts the login flow again when using a different app id and tenant`, async () => {
+    auth.connection.active = false;
+
+    await command.action(logger, { options: { ensure: true, appId: '1cf21ca6-c8f0-4a21-839d-68a09d3a0f55', tenant: '973fce64-6409-4843-9328-c2cef0427f4e' } });
+    await command.action(logger, { options: { ensure: true, appId: 'b059efda-fc9d-49ec-b585-283f5b26202e', tenant: '7f7993c9-ae48-413a-ae6b-d816a669f602' } });
+
+    assert(deactivateStub.callCount === 2);
   });
 
   it('correctly handles error when clearing persisted auth information', async () => {
