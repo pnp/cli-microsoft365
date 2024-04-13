@@ -358,8 +358,13 @@ export default abstract class Command {
   }
 
   protected handleRejectedODataPromise(res: any): void {
-    if (cli.optionsFromArgs?.options.debug && res.stack) {
-      throw new CommandError(res.stack);
+    if (cli.optionsFromArgs?.options.debug) {
+      try {
+        throw new Error(res);
+      }
+      catch (newErr: any) {
+        cli.error(newErr.stack);
+      }
     }
 
     if (res.error) {
@@ -401,8 +406,13 @@ export default abstract class Command {
   }
 
   protected handleRejectedODataJsonPromise(response: any): void {
-    if (cli.optionsFromArgs?.options.debug && response.stack) {
-      throw new CommandError(response.stack);
+    if (cli.optionsFromArgs?.options.debug) {
+      try {
+        throw new Error(response);
+      }
+      catch (newErr: any) {
+        cli.error(newErr.stack);
+      }
     }
 
     if (response.error &&
