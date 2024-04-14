@@ -41,7 +41,7 @@ class SpeContainertypeAddCommand extends SpoCommand {
   }
 
   public get description(): string {
-    return 'Creates a new Containertype for your app';
+    return 'Creates a new Container Type for your app';
   }
 
   constructor() {
@@ -90,23 +90,23 @@ class SpeContainertypeAddCommand extends SpoCommand {
     this.validators.push(
       async (args: CommandArgs) => {
         if (!validation.isValidGuid(args.options.applicationId)) {
-          return `${args.options.applicationId} is not a valid GUID`;
+          return `${args.options.applicationId} is not a valid GUID for option applicationId.`;
         }
 
         if (args.options.trial === undefined && !args.options.azureSubscriptionId) {
-          return 'You must specify the azureSubscriptionId when creating a non-trial environment';
+          return 'You must specify the azureSubscriptionId when creating a non-trial environment.';
         }
 
         if (args.options.trial === undefined && !args.options.resourceGroup) {
-          return 'You must specify the resourceGroup when creating a non-trial environment';
+          return 'You must specify the resourceGroup when creating a non-trial environment.';
         }
 
         if (args.options.trial === undefined && !args.options.region) {
-          return 'You must specify the region when creating a non-trial environment';
+          return 'You must specify the region when creating a non-trial environment.';
         }
 
         if (args.options.azureSubscriptionId && !validation.isValidGuid(args.options.azureSubscriptionId)) {
-          return `${args.options.azureSubscriptionId} is not a valid GUID`;
+          return `${args.options.azureSubscriptionId} is not a valid GUID for option azureSubscriptionId.`;
         }
 
         return true;
@@ -117,7 +117,7 @@ class SpeContainertypeAddCommand extends SpoCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       if (this.verbose) {
-        await logger.logToStderr(`Creating a new Containertype for your app with name ${args.options.name}`);
+        await logger.logToStderr(`Creating a new Container Type for your app with name ${args.options.name}`);
       }
 
       const adminUrl = await spo.getSpoAdminUrl(logger, this.debug);

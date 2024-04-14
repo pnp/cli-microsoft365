@@ -96,7 +96,7 @@ describe(commands.CONTAINERTYPE_ADD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('creates a new trial container type', async () => {
+  it('creates a new trial Container Type', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `${adminUrl}/_vti_bin/client.svc/ProcessQuery`) {
         return csomOutput;
@@ -110,7 +110,7 @@ describe(commands.CONTAINERTYPE_ADD, () => {
     assert(loggerLogSpy.calledWith(jsonResponseClone));
   });
 
-  it('creates a new standard container type', async () => {
+  it('creates a new standard Container Type', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `${adminUrl}/_vti_bin/client.svc/ProcessQuery`) {
         return csomOutput;
