@@ -568,6 +568,11 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'pim role assignment list',
               id: 'cmd/entra/pim/pim-role-assignment-list'
+            },
+            {
+              type: 'doc',
+              label: 'pim role request list',
+              id: 'cmd/entra/pim/pim-role-request-list'
             }
           ]
         },

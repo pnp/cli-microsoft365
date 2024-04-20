@@ -85,6 +85,7 @@ const dictionary = [
   'property',
   'records',
   'recycle',
+  'request',
   'resolver',
   'registration',
   'retention',
