@@ -78,6 +78,7 @@ export default {
   OAUTH2GRANT_SET: `${prefix} oauth2grant set`,
   PIM_ROLE_ASSIGNMENT_ADD: `${prefix} pim role assignment add`,
   PIM_ROLE_ASSIGNMENT_LIST: `${prefix} pim role assignment list`,
+  PIM_ROLE_REQUEST_LIST: `${prefix} pim role request list`,
   POLICY_LIST: `${prefix} policy list`,
   SITECLASSIFICATION_DISABLE: `${prefix} siteclassification disable`,
   SITECLASSIFICATION_ENABLE: `${prefix} siteclassification enable`,
