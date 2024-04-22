@@ -145,31 +145,6 @@ class EntraAppPermissionAddCommand extends GraphCommand {
     }
   }
 
-  private async getAppObjectByName(appName: string): Promise<Application[]> {
-    const requestOptions: CliRequestOptions = {
-      url: `${this.resource}/v1.0/myorganization/applications?$filter=displayName eq '${formatting.encodeQueryParameter(appName)}'&$select=id`,
-      headers: {
-        accept: 'application/json;odata.metadata=none'
-      },
-      responseType: 'json'
-    };
-
-    const res = await request.get<{ value: { id: string }[] }>(requestOptions);
-
-    if (res.value.length === 1) {
-      return await odata.getAllItems<Application>(`${this.resource}/v1.0/applications?$filter=id eq '${res.value[0].id}'&$select=id,appId,requiredResourceAccess`);
-    }
-
-    if (res.value.length === 0) {
-      throw `No Entra application registration with name ${appName} found`;
-    }
-
-    const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', res.value);
-    const result = await cli.handleMultipleResultsFound<{ id: string }>(`Multiple Entra application registration with name '${appName}' found.`, resultAsKeyValuePair);
-
-    return await odata.getAllItems<Application>(`${this.resource}/v1.0/applications?$filter=id eq '${result.id}'&$select=id,appId,requiredResourceAccess`);
-  }
-
   private async getAppObject(options: Options): Promise<Application> {
     let appNotFoundMessage = '';
     let apps: Application[] = [];
@@ -179,8 +154,14 @@ class EntraAppPermissionAddCommand extends GraphCommand {
       appNotFoundMessage = `client id ${options.appId}`;
     }
     else if (options.appName) {
-      apps = await this.getAppObjectByName(options.appName);
+      apps = await odata.getAllItems<Application>(`${this.resource}/v1.0/applications?$filter=displayName eq '${formatting.encodeQueryParameter(options.appName)}'&$select=id,appId,requiredResourceAccess`);
       appNotFoundMessage = `name ${options.appName}`;
+
+      if (apps.length > 1) {
+        const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', apps);
+        const result = await cli.handleMultipleResultsFound<Application>(`Multiple Entra application registration with name '${options.appName}' found.`, resultAsKeyValuePair);
+        return result;
+      }
     }
     else if (options.appObjectId) {
       apps = await odata.getAllItems<Application>(`${this.resource}/v1.0/applications?$filter=id eq '${options.appObjectId}'&$select=id,appId,requiredResourceAccess`);

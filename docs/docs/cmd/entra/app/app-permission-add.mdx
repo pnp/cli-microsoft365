@@ -61,7 +61,7 @@ Grant multiple delegated API permissions to a Microsoft Entra app specified by o
 m365 entra app permission add --appObjectId 'e0306bb2-bf0b-4cc5-a845-a0b2cf11f690' --delegatedPermissions 'https://management.azure.com/user_impersonation https://service.flow.microsoft.com/Flows.Read.All https://graph.microsoft.com/Agreement.Read.All'
 ```
 
-Grant multiple app-only permissions to a Microsoft Entra app specified by client id and grant admin consent.
+Grant multiple app-only permissions to a Microsoft Entra app specified by app name and grant admin consent.
 
 ```sh
 m365 entra app permission add --appName 'Contoso App' --applicationPermissions 'https://graph.microsoft.com/Sites.FullControl.All https://microsoft.sharepoint-df.com/Sites.FullControl.All' --grantAdminConsent
