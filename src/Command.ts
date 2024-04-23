@@ -335,12 +335,8 @@ export default abstract class Command {
 
   protected handleRejectedODataPromise(res: any): void {
     if (cli.optionsFromArgs?.options.debug) {
-      try {
-        throw new Error(res);
-      }
-      catch (newErr: any) {
-        cli.error(newErr.stack);
-      }
+      const error = new Error();
+      cli.error(error.stack);
     }
 
     if (res.error) {
@@ -383,12 +379,8 @@ export default abstract class Command {
 
   protected handleRejectedODataJsonPromise(response: any): void {
     if (cli.optionsFromArgs?.options.debug) {
-      try {
-        throw new Error(response);
-      }
-      catch (newErr: any) {
-        cli.error(newErr.stack);
-      }
+      const error = new Error();
+      cli.error(error.stack);
     }
 
     if (response.error &&

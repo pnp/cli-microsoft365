@@ -173,7 +173,8 @@ describe('Command', () => {
     sinonUtil.restore([
       process.exit,
       accessToken.isAppOnlyAccessToken,
-      accessToken.getUserIdFromAccessToken
+      accessToken.getUserIdFromAccessToken,
+      cli.optionsFromArgs
     ]);
     auth.service.connected = false;
   });
@@ -633,9 +634,6 @@ describe('Command', () => {
     catch (err: any) {
       assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('abc')));
     }
-    finally {
-      sinon.stub(cli, 'optionsFromArgs').value({});
-    }
   });
 
   it('correctly handles stack trace error when using debug for oData error handling', async () => {
@@ -649,9 +647,6 @@ describe('Command', () => {
     }
     catch (err: any) {
       assert.strictEqual(JSON.stringify(err), JSON.stringify({ 'message': { 'error_description': 'abc' } }));
-    }
-    finally {
-      sinon.stub(cli, 'optionsFromArgs').value({});
     }
   });
 });
