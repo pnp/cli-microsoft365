@@ -96,7 +96,7 @@ class LoginCommand extends Command {
         option: '--connectionName [connectionName]'
       },
       {
-        option: '--ensure [ensure]'
+        option: '--ensure'
       }
     );
   }
@@ -223,10 +223,8 @@ class LoginCommand extends Command {
         (details as any).accessToken = JSON.stringify(auth.connection.accessTokens, null, 2);
       }
 
-
       await logger.log(details);
     };
-
 
     try {
       await auth.clearConnectionInfo();
@@ -237,12 +235,13 @@ class LoginCommand extends Command {
       }
     }
     finally {
-      if (!args.options.ensure ||
-        (args.options.ensure && !auth.connection.active) ||
-        (args.options.ensure && (args.options.userName && args.options.userName !== auth.connection.userName)) ||
-        (args.options.ensure && (args.options.certificateFile && (auth.connection.certificate !== fs.readFileSync(args.options.certificateFile as string, 'base64')))) ||
-        (args.options.ensure && args.options.appId && args.options.appId !== auth.connection.appId && (!args.options.tenant || args.options.tenant !== auth.connection.tenant))
-      ) {
+      const ensure: boolean | undefined = args.options.ensure;;
+      if (!ensure || (ensure && (
+        (!auth.connection.active) ||
+        (args.options.userName && args.options.userName !== auth.connection.userName) ||
+        (args.options.certificateFile && (auth.connection.certificate !== fs.readFileSync(args.options.certificateFile as string, 'base64'))) ||
+        (args.options.appId && args.options.appId !== auth.connection.appId) ||
+        (args.options.tenant && args.options.tenant !== auth.connection.tenant)))) {
         deactivate();
       }
       await login();
