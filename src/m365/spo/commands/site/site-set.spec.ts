@@ -651,7 +651,7 @@ describe(commands.SITE_SET, () => {
 
       throw 'Invalid request';
     });
-    executeCommandSpy = sinon.stub(cli, 'executeCommand').callsFake(() => Promise.resolve());
+    executeCommandSpy = sinon.stub(cli, 'executeCommand').resolves();
     sinon.stub(request, 'patch').callsFake(async (opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups/e10a459e-60c8-4000-8240-a68d6a12d39e') {
         return;
@@ -2202,7 +2202,7 @@ describe(commands.SITE_SET, () => {
 
       throw 'Invalid request';
     });
-    executeCommandSpy = sinon.stub(cli, 'executeCommand').callsFake(() => Promise.resolve());
+    executeCommandSpy = sinon.stub(cli, 'executeCommand').resolves();
 
     await command.action(logger, { options: { siteDesignId: 'eb2f31da-9461-4fbf-9ea1-9959b134b89e', url: 'https://contoso.sharepoint.com/sites/Sales' } });
     const options = {
@@ -2227,7 +2227,7 @@ describe(commands.SITE_SET, () => {
 
       throw 'Invalid request';
     });
-    executeCommandSpy = sinon.stub(cli, 'executeCommand').callsFake(() => Promise.resolve());
+    executeCommandSpy = sinon.stub(cli, 'executeCommand').resolves();
 
     await command.action(logger, { options: { siteDesignId: 'eb2f31da-9461-4fbf-9ea1-9959b134b89e', url: 'https://contoso.sharepoint.com/sites/Sales' } });
     const options = {
@@ -2415,7 +2415,7 @@ describe(commands.SITE_SET, () => {
 
       throw 'Invalid request';
     });
-    executeCommandSpy = sinon.stub(cli, 'executeCommand').callsFake(() => Promise.reject(new CommandError('An error has occurred')));
+    executeCommandSpy = sinon.stub(cli, 'executeCommand').rejects(new CommandError('An error has occurred'));
 
     await assert.rejects(command.action(logger, { options: { siteDesignId: 'eb2f31da-9461-4fbf-9ea1-9959b134b89e', url: 'https://contoso.sharepoint.com/sites/Sales' } } as any),
       new CommandError('An error has occurred'));
@@ -2424,7 +2424,7 @@ describe(commands.SITE_SET, () => {
   it('correctly handles site not found error', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/Sales/_api/site?$select=GroupId,Id') {
-        return Promise.reject(new Error("404 - \"404 FILE NOT FOUND\""));
+        throw new Error("404 - \"404 FILE NOT FOUND\"");
       }
 
       throw 'Invalid request';
@@ -2504,7 +2504,7 @@ describe(commands.SITE_SET, () => {
     });
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
-        return Promise.reject('An error has occurred');
+        throw 'An error has occurred';
       }
 
       throw 'Invalid request';
@@ -2632,7 +2632,7 @@ describe(commands.SITE_SET, () => {
           opts.headers['X-RequestDigest'] &&
           opts.headers['X-RequestDigest'] === 'ABC' &&
           opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="48" ObjectPathId="47" /></Actions><ObjectPaths><Method Id="47" ParentId="34" Name="SetSiteAdmin"><Parameters><Parameter Type="String">https://contoso.sharepoint.com/sites/team</Parameter><Parameter Type="String">admin@contoso.com</Parameter><Parameter Type="Boolean">true</Parameter></Parameters></Method><Constructor Id="34" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
-          return Promise.reject('Unknown Error');
+          throw 'Unknown Error';
         }
       }
 

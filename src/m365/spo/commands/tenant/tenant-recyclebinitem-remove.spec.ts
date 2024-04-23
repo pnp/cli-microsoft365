@@ -19,7 +19,6 @@ describe(commands.TENANT_RECYCLEBINITEM_REMOVE, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
-  //let waitUntilFinishedStub: sinon.SinonStub;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -35,7 +34,7 @@ describe(commands.TENANT_RECYCLEBINITEM_REMOVE, () => {
       FormDigestExpiresAt: new Date(),
       WebFullUrl: 'https://contoso.sharepoint.com'
     });
-    //waitUntilFinishedStub = 
+
     sinon.stub(spo, 'waitUntilFinished').resolves();
   });
 
