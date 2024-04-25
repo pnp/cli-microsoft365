@@ -2617,6 +2617,11 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'folder sharinglink list',
               id: 'cmd/spo/folder/folder-sharinglink-list'
+            },
+            {
+              type: 'doc',
+              label: 'folder sharinglink remove',
+              id: 'cmd/spo/folder/folder-sharinglink-remove'
             }
           ]
         },
