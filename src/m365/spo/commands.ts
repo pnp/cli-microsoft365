@@ -103,6 +103,7 @@ export default {
   FOLDER_ROLEINHERITANCE_RESET: `${prefix} folder roleinheritance reset`,
   FOLDER_SHARINGLINK_GET: `${prefix} folder sharinglink get`,
   FOLDER_SHARINGLINK_LIST: `${prefix} folder sharinglink list`,
+  FOLDER_SHARINGLINK_REMOVE: `${prefix} folder sharinglink remove`,
   GET: `${prefix} get`,
   GROUP_ADD: `${prefix} group add`,
   GROUP_GET: `${prefix} group get`,
