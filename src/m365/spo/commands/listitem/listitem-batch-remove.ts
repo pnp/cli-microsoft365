@@ -80,7 +80,7 @@ class SpoListItemBatchRemoveCommand extends SpoCommand {
         option: '-i, --ids [ids]'
       },
       {
-        option: '--recycle'
+        option: '-r, --recycle'
       },
       {
         option: '-f, --force'
@@ -98,26 +98,34 @@ class SpoListItemBatchRemoveCommand extends SpoCommand {
 
         if (args.options.listId &&
           !validation.isValidGuid(args.options.listId)) {
-          return `${args.options.listId} in option listId is not a valid GUID`;
+          return `${args.options.listId} in option listId is not a valid GUID.`;
         }
 
         if (args.options.filePath) {
+
           if (!fs.existsSync(args.options.filePath)) {
-            return `File with path ${args.options.filePath} does not exist`;
+            return `File with path ${args.options.filePath} does not exist.`;
           }
           // read and validate content
-          const fileContent = fs.readFileSync(args.options.filePath, 'utf-8').split(`\n`).map(y => y.trim());
-          fileContent.shift(); // remove header row
-          const nonNumbers = fileContent.filter(element => isNaN(Number(element.trim())));
+          const fileContent = fs.readFileSync(args.options.filePath, 'utf-8');
+          const jsonContent: any[] = formatting.parseCsvToJson(fileContent);
+
+          if (!jsonContent[0].hasOwnProperty('ID')) {
+            return `The file does not contain the required header row with the column name 'ID'.`;
+          }
+
+          const nonNumbers = jsonContent.filter(element => isNaN(Number(element['ID'].toString().trim()))).map(element => element['ID']);
+
           if (nonNumbers.length > 0) {
-            return `The specified ids '${nonNumbers.join(', ')}' are invalid numbers`;
+            return `The specified ids '${nonNumbers.join(', ')}' are invalid numbers.`;
           }
         }
 
         if (args.options.ids) {
           const nonNumbers = formatting.splitAndTrim(args.options.ids).filter(element => isNaN(Number(element)));
+
           if (nonNumbers.length > 0) {
-            return `The specified ids '${nonNumbers.join(', ')}' are invalid numbers`;
+            return `The specified ids '${nonNumbers.join(', ')}' are invalid numbers.`;
           }
         }
 
@@ -151,19 +159,23 @@ class SpoListItemBatchRemoveCommand extends SpoCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const removeListItems = async (): Promise<void> => {
       try {
+
         if (this.verbose) {
           logger.logToStderr('Removing the listitems from SharePoint...');
         }
 
+        let idsToRemove: string[] = [];
+
         if (args.options.filePath) {
-          const fileContent = fs.readFileSync(args.options.filePath, 'utf-8').split(`\n`).map(y => y.trim());
-          fileContent.shift(); // remove header row
-          await this.removeItemsAsBatch(fileContent, args.options, logger);
+          const csvContent = fs.readFileSync(args.options.filePath, 'utf-8');
+          const jsonContent = formatting.parseCsvToJson(csvContent);
+          idsToRemove = jsonContent.map((item: { ID: string }) => item['ID']);
         }
         else {
-          const content = formatting.splitAndTrim(args.options.ids!);
-          await this.removeItemsAsBatch(content, args.options, logger);
+          idsToRemove = formatting.splitAndTrim(args.options.ids!);
         }
+
+        await this.removeItemsAsBatch(idsToRemove, args.options, logger);
       }
       catch (err: any) {
         this.handleRejectedODataJsonPromise(err);
@@ -183,27 +195,20 @@ class SpoListItemBatchRemoveCommand extends SpoCommand {
   }
 
   private async removeItemsAsBatch(items: string[], options: Options, logger: Logger): Promise<void> {
-    const baseUrl = `${options.webUrl}/_api/web/${this.getListUrl(options)}`;
-
-    // Slice items into chunks of 100
-    const itemsChunks: string[][] = this.chunkArray(items, 100);
-
-    // Loop through the chunks and send the request to remove the items
+    const itemsChunks: string[][] = this.getChunkedArray(items, 10);
     for (const [index, chunk] of itemsChunks.entries()) {
+
       if (this.verbose) {
         await logger.logToStderr(`Processing chunk ${index + 1} of ${itemsChunks.length}...`);
       }
-      await this.postBatchData(chunk, baseUrl, options.webUrl, options.recycle);
+      await this.postBatchData(chunk, options.webUrl, options);
     }
   }
 
-  private async postBatchData(chunk: string[], baseUrl: string, webUrl: string, recycle?: boolean): Promise<void> {
+  private async postBatchData(chunk: string[], webUrl: string, options: Options): Promise<void> {
     const batchId = v4();
 
-    // first, create a request body for the items
-    const requestBody = this.getRequestBody(chunk, baseUrl, batchId, recycle);
-
-    // create the batch request
+    const requestBody = this.getRequestBody(chunk, batchId, options);
     const requestOptions: CliRequestOptions = {
       url: `${webUrl}/_api/$batch`,
       headers: {
@@ -212,8 +217,6 @@ class SpoListItemBatchRemoveCommand extends SpoCommand {
       },
       data: requestBody.join('')
     };
-
-    // send request
     const response: string = await request.post(requestOptions);
     const errors = this.parseBatchResponseBody(response, chunk);
 
@@ -222,22 +225,16 @@ class SpoListItemBatchRemoveCommand extends SpoCommand {
     }
   }
 
-  private getRequestBody(chunk: string[], baseUrl: string, batchId: string, recycle?: boolean): string[] {
+  private getRequestBody(chunk: string[], batchId: string, options: Options): string[] {
     const changeSetId = v4();
     const batchBody: string[] = [];
 
-    // add default batch body headers
     batchBody.push(`--batch_${batchId}\n`);
     batchBody.push(`Content-Type: multipart/mixed; boundary="changeset_${changeSetId}"\n\n`);
     batchBody.push('Content-Transfer-Encoding: binary\n\n');
 
     for (const item of chunk) {
-      if (item === '') {
-        // Added this due to when saving an Excel-table as a CSV-file, it will add an empty record at the end of the array, thus the output will be wrong
-        continue;
-      }
-      const itemUrl = `${baseUrl}(${item})`;
-      const actionUrl = recycle ? `${itemUrl}/recycle()` : itemUrl;
+      const actionUrl = this.getActionUrl(options, item);
       batchBody.push(`--changeset_${changeSetId}\n`);
       batchBody.push('Content-Type: application/http\n');
       batchBody.push('Content-Transfer-Encoding: binary\n\n');
@@ -246,7 +243,6 @@ class SpoListItemBatchRemoveCommand extends SpoCommand {
       batchBody.push(`If-Match: *\n\n`);
     }
 
-    // close batch body
     batchBody.push(`\n\n`);
     batchBody.push(`--changeset_${changeSetId}--\n\n`);
     batchBody.push(`--batch_${batchId}--\n`);
@@ -262,7 +258,6 @@ class SpoListItemBatchRemoveCommand extends SpoCommand {
       .forEach((line: string, index: number) => {
         const parsedResponse: any = JSON.parse(line);
         if (parsedResponse.error) {
-          // if an error object is returned, the request failed
           const error = parsedResponse.error as { message: { value: string } };
           errors.push(`Item ID ${chunk[index]}: ${error.message.value}`);
         }
@@ -271,7 +266,7 @@ class SpoListItemBatchRemoveCommand extends SpoCommand {
     return errors;
   };
 
-  private chunkArray(inputArray: string[], chunkSize: number): string[][] {
+  private getChunkedArray(inputArray: string[], chunkSize: number): string[][] {
     const result: string[][] = [];
     for (let i = 0; i < inputArray.length; i += chunkSize) {
       result.push(inputArray.slice(i, i + chunkSize));
@@ -279,19 +274,26 @@ class SpoListItemBatchRemoveCommand extends SpoCommand {
     return result;
   }
 
-  private getListUrl(options: Options): string {
-    let listUrl = '';
+  private getActionUrl(options: Options, item: string): string {
+    let requestUrl = '';
     if (options.listId) {
-      listUrl += `lists(guid'${formatting.encodeQueryParameter(options.listId)}')`;
+      requestUrl += `lists(guid'${formatting.encodeQueryParameter(options.listId)}')`;
     }
     else if (options.listTitle) {
-      listUrl += `lists/getByTitle('${formatting.encodeQueryParameter(options.listTitle)}')`;
+      requestUrl += `lists/getByTitle('${formatting.encodeQueryParameter(options.listTitle)}')`;
     }
     else if (options.listUrl) {
       const listServerRelativeUrl: string = urlUtil.getServerRelativePath(options.webUrl, options.listUrl);
-      listUrl += `GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')`;
+      requestUrl += `GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')`;
     }
-    return `${listUrl}/items`;
+
+    requestUrl += `/items(${item})`;
+
+    if (options.recycle) {
+      requestUrl += '/recycle()';
+    }
+
+    return requestUrl;
   }
 }
 

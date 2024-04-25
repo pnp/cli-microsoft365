@@ -146,8 +146,8 @@ describe(commands.LISTITEM_BATCH_REMOVE, () => {
     await command.action(logger, { options: { webUrl: webUrl, filePath: filePath, listTitle: listTitle, force: true, verbose: true } });
   });
 
-  it('adds items in batch to a sharepoint list retrieved by title and removes empty items if they exist', async () => {
-    sinon.stub(fs, 'readFileSync').returns(`${csvContent}\n\n3`);
+  it('adds items in batch to a sharepoint list retrieved by title and removes empty items and final empty line if they exist', async () => {
+    sinon.stub(fs, 'readFileSync').returns(`${csvContent}\n\n3\n`);
     sinon.stub(request, 'post').callsFake(async (opts: any) => {
       if (opts.url === `${webUrl}/_api/$batch`) {
         return mockBatchSuccessfulResponse;
@@ -223,9 +223,16 @@ describe(commands.LISTITEM_BATCH_REMOVE, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if filePath exists and listId is a valid guid, but the csvContent contains invalid ids', async () => {
+  it('fails validation if filePath exists and listId is a valid guid, but the csvContent does not contain the ID column', async () => {
     sinon.stub(fs, 'existsSync').returns(true);
     sinon.stub(fs, 'readFileSync').returns(`${csvContent}\n2\ninvalid`);
+    const actual = await command.validate({ options: { webUrl: webUrl, filePath: filePath, listId: listId } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if filePath exists and listId is a valid guid, but the csvContent contains invalid ids', async () => {
+    sinon.stub(fs, 'existsSync').returns(true);
+    sinon.stub(fs, 'readFileSync').returns(`${csvContentHeaders}invalid\n${csvContentLine}`);
     const actual = await command.validate({ options: { webUrl: webUrl, filePath: filePath, listId: listId } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });

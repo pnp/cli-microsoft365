@@ -31,7 +31,7 @@ m365 spo listitem batch remove [options]
 `-i, --ids [ids]`
 : Comma separated list of list item IDs. Specify `filePath` or `ids`, but not both.
 
-`--recycle`
+`-r, --recycle`
 : Recycle the list items. Otherwise, they will be permanently deleted.
 
 `-f, --force`
@@ -42,7 +42,7 @@ m365 spo listitem batch remove [options]
 
 ## Remarks
 
-A sample CSV can be found below. Note that the ID column is required.
+A sample CSV can be found below. The first line of the CSV-file should contain the internal column name of the ID-column.
 
 ```csv
 ID
