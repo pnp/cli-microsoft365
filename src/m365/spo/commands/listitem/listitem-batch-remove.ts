@@ -102,11 +102,10 @@ class SpoListItemBatchRemoveCommand extends SpoCommand {
         }
 
         if (args.options.filePath) {
-
           if (!fs.existsSync(args.options.filePath)) {
             return `File with path ${args.options.filePath} does not exist.`;
           }
-          // read and validate content
+
           const fileContent = fs.readFileSync(args.options.filePath, 'utf-8');
           const jsonContent: any[] = formatting.parseCsvToJson(fileContent);
 
@@ -159,7 +158,6 @@ class SpoListItemBatchRemoveCommand extends SpoCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const removeListItems = async (): Promise<void> => {
       try {
-
         if (this.verbose) {
           logger.logToStderr('Removing the listitems from SharePoint...');
         }
@@ -196,11 +194,12 @@ class SpoListItemBatchRemoveCommand extends SpoCommand {
 
   private async removeItemsAsBatch(items: string[], options: Options, logger: Logger): Promise<void> {
     const itemsChunks: string[][] = this.getChunkedArray(items, 10);
-    for (const [index, chunk] of itemsChunks.entries()) {
 
+    for (const [index, chunk] of itemsChunks.entries()) {
       if (this.verbose) {
         await logger.logToStderr(`Processing chunk ${index + 1} of ${itemsChunks.length}...`);
       }
+
       await this.postBatchData(chunk, options.webUrl, options);
     }
   }
@@ -257,6 +256,7 @@ class SpoListItemBatchRemoveCommand extends SpoCommand {
       .filter((line: string) => line.startsWith('{'))
       .forEach((line: string, index: number) => {
         const parsedResponse: any = JSON.parse(line);
+
         if (parsedResponse.error) {
           const error = parsedResponse.error as { message: { value: string } };
           errors.push(`Item ID ${chunk[index]}: ${error.message.value}`);
@@ -268,14 +268,17 @@ class SpoListItemBatchRemoveCommand extends SpoCommand {
 
   private getChunkedArray(inputArray: string[], chunkSize: number): string[][] {
     const result: string[][] = [];
+
     for (let i = 0; i < inputArray.length; i += chunkSize) {
       result.push(inputArray.slice(i, i + chunkSize));
     }
+
     return result;
   }
 
   private getActionUrl(options: Options, item: string): string {
     let requestUrl = '';
+
     if (options.listId) {
       requestUrl += `lists(guid'${formatting.encodeQueryParameter(options.listId)}')`;
     }
