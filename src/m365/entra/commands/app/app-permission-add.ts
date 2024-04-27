@@ -159,7 +159,7 @@ class EntraAppPermissionAddCommand extends GraphCommand {
 
       if (apps.length > 1) {
         const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', apps);
-        const result = await cli.handleMultipleResultsFound<Application>(`Multiple Entra application registration with name '${options.appName}' found.`, resultAsKeyValuePair);
+        const result = await cli.handleMultipleResultsFound<Application>(`Multiple Entra application registrations with name '${options.appName}' found.`, resultAsKeyValuePair);
         return result;
       }
     }

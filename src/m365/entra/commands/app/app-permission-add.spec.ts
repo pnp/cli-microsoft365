@@ -330,7 +330,7 @@ describe(commands.APP_PERMISSION_ADD, () => {
       options: {
         appName: appName
       }
-    }), new CommandError(`Multiple Entra application registration with name 'My App' found. Found: 9b1b1e42-794b-4c71-93ac-5ed92488b67f, 9b1b1e42-794b-4c71-93ac-5ed92488b67g.`));
+    }), new CommandError(`Multiple Entra application registrations with name 'My App' found. Found: 9b1b1e42-794b-4c71-93ac-5ed92488b67f, 9b1b1e42-794b-4c71-93ac-5ed92488b67g.`));
   });
 
   it('handles a non-existent app by appName', async () => {
