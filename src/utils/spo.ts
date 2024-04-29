@@ -653,10 +653,10 @@ export const spo = {
  * @param webUrl Web url
  * @param email The email of the user
  * @param logger the Logger object
- * @param verbose set if verbose logging should be logged 
+ * @param verbose set for verbose logging
  */
-  async getUserByEmail(webUrl: string, email: string, logger: Logger, verbose?: boolean): Promise<User> {
-    if (verbose) {
+  async getUserByEmail(webUrl: string, email: string, logger?: Logger, verbose?: boolean): Promise<any> {
+    if (verbose && logger) {
       await logger.logToStderr(`Retrieving the spo user by email ${email}`);
     }
     const requestUrl = `${webUrl}/_api/web/siteusers/GetByEmail('${formatting.encodeQueryParameter(email)}')`;
@@ -737,10 +737,10 @@ export const spo = {
   * @param webUrl Web url
   * @param name The name of the group
   * @param logger the Logger object
-  * @param verbose set if verbose logging should be logged 
+  * @param verbose set for verbose logging
   */
-  async getGroupByName(webUrl: string, name: string, logger: Logger, verbose?: boolean): Promise<any> {
-    if (verbose) {
+  async getGroupByName(webUrl: string, name: string, logger?: Logger, verbose?: boolean): Promise<any> {
+    if (verbose && logger) {
       await logger.logToStderr(`Retrieving the group by name ${name}`);
     }
     const requestUrl = `${webUrl}/_api/web/sitegroups/GetByName('${formatting.encodeQueryParameter(name)}')`;
@@ -763,10 +763,10 @@ export const spo = {
   * @param webUrl Web url
   * @param name the name of the role definition
   * @param logger the Logger object
-  * @param debug set if debug logging should be logged 
+  * @param verbose set for verbose logging
   */
-  async getRoleDefinitionByName(webUrl: string, name: string, logger: Logger, debug?: boolean): Promise<RoleDefinition> {
-    if (debug) {
+  async getRoleDefinitionByName(webUrl: string, name: string, logger?: Logger, verbose?: boolean): Promise<RoleDefinition> {
+    if (verbose && logger) {
       await logger.logToStderr(`Retrieving the role definitions for ${name}`);
     }
 
@@ -1860,5 +1860,33 @@ export const spo = {
 
     const itemsResponse = await request.get<ListItemInstance>(requestOptionsItems);
     return (itemsResponse);
+  },
+
+  /**
+  * Retrieves the file by id.
+  * Returns a FileProperties object
+  * @param webUrl Web url
+  * @param id the id of the file
+  * @param logger the Logger object
+  * @param verbose set for verbose logging 
+  */
+  async getFileById(webUrl: string, id: string, logger?: Logger, verbose?: boolean): Promise<FileProperties> {
+    if (verbose && logger) {
+      await logger.logToStderr(`Retrieving the file with id ${id}`);
+    }
+    const requestUrl = `${webUrl}/_api/web/GetFileById('${formatting.encodeQueryParameter(id)}')`;
+
+    const requestOptions: CliRequestOptions = {
+      url: requestUrl,
+      headers: {
+        'accept': 'application/json;odata=nometadata'
+      },
+
+      responseType: 'json'
+    };
+
+    const file: FileProperties = await request.get<FileProperties>(requestOptions);
+
+    return file;
   }
 };
