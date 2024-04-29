@@ -203,19 +203,7 @@ class LoginCommand extends Command {
         auth.connection.cloudType = CloudType.Public;
       }
 
-      try {
-        await auth.ensureAccessToken(auth.defaultResource, logger, this.debug);
-        auth.connection.active = true;
-      }
-      catch (error: any) {
-        if (this.debug) {
-          await logger.logToStderr('Error:');
-          await logger.logToStderr(error);
-          await logger.logToStderr('');
-        }
-
-        throw new CommandError(error.message);
-      }
+      await this.obtainAccessToken(logger);
 
       const details = auth.getConnectionDetails(auth.connection);
 
@@ -227,7 +215,9 @@ class LoginCommand extends Command {
     };
 
     try {
-      await auth.clearConnectionInfo();
+      if (this.shouldRenewConnection(args.options)) {
+        await auth.clearConnectionInfo();
+      }
     }
     catch (error: any) {
       if (this.debug) {
@@ -235,16 +225,13 @@ class LoginCommand extends Command {
       }
     }
     finally {
-      const ensure: boolean | undefined = args.options.ensure;;
-      if (!ensure || (ensure && (
-        (!auth.connection.active) ||
-        (args.options.userName && args.options.userName !== auth.connection.userName) ||
-        (args.options.certificateFile && (auth.connection.certificate !== fs.readFileSync(args.options.certificateFile as string, 'base64'))) ||
-        (args.options.appId && args.options.appId !== auth.connection.appId) ||
-        (args.options.tenant && args.options.tenant !== auth.connection.tenant)))) {
-        deactivate();
+      if (!this.shouldRenewConnection(args.options)) {
+        await this.obtainAccessToken(logger);
       }
-      await login();
+      else {
+        deactivate();
+        await login();
+      }
     }
   }
 
@@ -258,6 +245,38 @@ class LoginCommand extends Command {
 
     this.initAction(args, logger);
     await this.commandAction(logger, args);
+  }
+
+  private shouldRenewConnection(options: Options): boolean {
+    const authType = options.authType || cli.getSettingWithDefaultValue<string>(settingsNames.authType, 'deviceCode');
+    const ensure: boolean | undefined = options.ensure;
+
+    if (!ensure || (ensure && (
+      (!auth.connection.active && AuthType[authType as keyof typeof AuthType] !== auth.connection.authType) ||
+      (options.userName && options.userName !== auth.connection.userName) ||
+      (options.certificateFile && (auth.connection.certificate !== fs.readFileSync(options.certificateFile as string, 'base64'))) ||
+      (options.appId && options.appId !== auth.connection.appId) ||
+      (options.tenant && options.tenant !== auth.connection.tenant)))) {
+      return true;
+    }
+
+    return false;
+  }
+
+  private async obtainAccessToken(logger: Logger): Promise<void> {
+    try {
+      await auth.ensureAccessToken(auth.defaultResource, logger, this.debug);
+      auth.connection.active = true;
+    }
+    catch (error: any) {
+      if (this.debug) {
+        await logger.logToStderr('Error:');
+        await logger.logToStderr(error);
+        await logger.logToStderr('');
+      }
+
+      throw new CommandError(error.message);
+    }
   }
 }
 
