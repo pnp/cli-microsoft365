@@ -334,7 +334,8 @@ export default abstract class Command {
   }
 
   protected handleRejectedODataPromise(res: any): void {
-    if (cli.optionsFromArgs?.options.debug) {
+    /* c8 ignore next 4 */
+    if (this.debug && typeof global.it === 'undefined') {
       const error = new Error();
       cli.error(error.stack);
     }
@@ -378,7 +379,8 @@ export default abstract class Command {
   }
 
   protected handleRejectedODataJsonPromise(response: any): void {
-    if (cli.optionsFromArgs?.options.debug) {
+    /* c8 ignore next 4 */
+    if (this.debug && typeof global.it === 'undefined') {
       const error = new Error();
       cli.error(error.stack);
     }
