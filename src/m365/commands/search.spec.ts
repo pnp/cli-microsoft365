@@ -1,21 +1,19 @@
 ﻿import assert from 'assert';
 import sinon from 'sinon';
-import auth from '../../../Auth.js';
+import auth from '../../Auth.js';
 import command from './search.js';
-import { telemetry } from '../../../telemetry.js';
-import { pid } from '../../../utils/pid.js';
-import { session } from '../../../utils/session.js';
-import { cli } from '../../../cli/cli.js';
-import { sinonUtil } from '../../../utils/sinonUtil.js';
-import request from '../../../request.js';
-import { Logger } from '../../../cli/Logger.js';
-import { CommandInfo } from '../../../cli/CommandInfo.js';
-import { CommandError } from '../../../Command.js';
+import { telemetry } from '../../telemetry.js';
+import { pid } from '../../utils/pid.js';
+import { session } from '../../utils/session.js';
+import { cli } from '../../cli/cli.js';
+import { sinonUtil } from '../../utils/sinonUtil.js';
+import request from '../../request.js';
+import { Logger } from '../../cli/Logger.js';
+import { CommandInfo } from '../../cli/CommandInfo.js';
+import { CommandError } from '../../Command.js';
+import commands from './commands.js';
 
-const commandName = 'search';
-
-
-describe(commandName, () => {
+describe(commands.SEARCH, () => {
   const fullSearchResponse = {
     "searchTerms": [
       "contoso"
@@ -410,7 +408,7 @@ describe(commandName, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name, commandName);
+    assert.strictEqual(command.name, commands.SEARCH);
   });
 
   it('has a description', () => {

@@ -1,11 +1,10 @@
 import { SearchHit, SearchResponse } from '@microsoft/microsoft-graph-types';
-import { Logger } from '../../../cli/Logger.js';
-import request, { CliRequestOptions } from '../../../request.js';
-import GraphCommand from '../../base/GraphCommand.js';
-import GlobalOptions from '../../../GlobalOptions.js';
-import { ODataResponse } from '../../../utils/odata.js';
-
-const commandName = 'search';
+import { Logger } from '../../cli/Logger.js';
+import request, { CliRequestOptions } from '../../request.js';
+import GraphCommand from '../base/GraphCommand.js';
+import GlobalOptions from '../../GlobalOptions.js';
+import { ODataResponse } from '../../utils/odata.js';
+import commands from './commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -25,11 +24,11 @@ interface Options extends GlobalOptions {
   enableSpellingModification?: boolean;
 }
 
-class SearchSearchCommand extends GraphCommand {
+class SearchCommand extends GraphCommand {
   private allowedScopes: string[] = ['chatMessage', 'message', 'event', 'drive', 'driveItem', 'list', 'listItem', 'site', 'bookmark', 'acronym', 'person'];
 
   public get name(): string {
-    return commandName;
+    return commands.SEARCH;
   }
 
   public get description(): string {
@@ -186,8 +185,7 @@ class SearchSearchCommand extends GraphCommand {
         }
       }
       while (allResults);
-      
-      
+
       if (args.options.resultsOnly) {
         await logger.log(searchHits);
       }
@@ -237,4 +235,4 @@ class SearchSearchCommand extends GraphCommand {
   }
 }
 
-export default new SearchSearchCommand();
+export default new SearchCommand();

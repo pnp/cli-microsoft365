@@ -20,6 +20,7 @@ const sidebars: SidebarsConfig = {
     'cmd/login',
     'cmd/logout',
     'cmd/request',
+    'cmd/search',
     'cmd/setup',
     'cmd/status',
     'cmd/version',
@@ -1848,19 +1849,6 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'threatassessment list',
               id: 'cmd/purview/threatassessment/threatassessment-list'
-            }
-          ]
-        }
-      ]
-    },
-    {
-      'Search': [
-        {
-          search: [
-            {
-              type: 'doc',
-              label: 'search',
-              id: 'cmd/search/search'
             }
           ]
         }

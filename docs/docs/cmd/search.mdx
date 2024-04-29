@@ -59,16 +59,28 @@ The `sortBy` option allows to specify the order. By default, the order is ascend
 
 ## Examples
 
-Queries messages in the current user mailbox that contain the string "contoso" in any part of the message (the sender name, subject, message body, or any attachments). The query returns the first 100 results. The search results are ordered by createdDateTime descending and id descending and date ascending
+Queries messages in the current user mailbox that contain the string "contoso" in any part of the message (the sender name, subject, message body, or any attachments). The query returns the first 100 results.
 
 ```sh
-m365 search --scopes 'message' --query 'contoso' --size 100 --sortBy 'createdDateTime:desc,id:desc,date'
+m365 search --scopes 'message' --query 'contoso' --pageSize 100
 ```
 
 Queries list items and sites that contain the string "accountt" and requests a spelling modification for the query.
 
 ```sh
 m365 search --scopes 'listItem, site' --query 'accountt' --enableSpellingSuggestion --enableSpellingModification
+```
+
+Search for file report.xlsl in specific folder of user personal OneDrive
+
+```sh
+m365 search --scopes 'driveItem' --query 'filename:SyncCalendars.xlsx AND path:\"https://contoso-my.sharepoint.com/personal/john.doe_contoso_com/Documents/Reports/2024\"'
+```
+
+Search for all sites
+
+```sh
+m365 search --scopes 'site' --query 'site:\"https://contoso-my.sharepoint.com/personal/*\"'
 ```
 
 ## Response
