@@ -274,7 +274,9 @@
     "typescript": "^5.4.3",
     "update-notifier": "^7.0.0",
     "uuid": "^9.0.1",
-    "yaml": "^2.4.1"
+    "yaml": "^2.4.1",
+    "yargs-parser": "^21.1.1",
+    "zod": "^3.22.4"
   },
   "devDependencies": {
     "@actions/core": "^1.10.1",
@@ -291,6 +293,7 @@
     "@types/sinon": "^17.0.3",
     "@types/update-notifier": "^6.0.8",
     "@types/uuid": "^9.0.8",
+    "@types/yargs-parser": "^21.0.3",
     "@typescript-eslint/eslint-plugin": "^7.5.0",
     "@typescript-eslint/parser": "^7.5.0",
     "c8": "^9.1.0",

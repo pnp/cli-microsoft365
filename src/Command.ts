@@ -1,4 +1,5 @@
 import os from 'os';
+import { ZodTypeAny, z } from 'zod';
 import auth from './Auth.js';
 import GlobalOptions from './GlobalOptions.js';
 import { CommandInfo } from './cli/CommandInfo.js';
@@ -12,6 +13,7 @@ import { accessToken } from './utils/accessToken.js';
 import { md } from './utils/md.js';
 import { GraphResponseError } from './utils/odata.js';
 import { prompt } from './utils/prompt.js';
+import { zod } from './utils/zod.js';
 
 interface CommandOption {
   option: string;
@@ -42,6 +44,14 @@ interface ODataError {
     }
   }
 }
+
+export const globalOptionsZod = z.object({
+  query: z.string().optional(),
+  output: zod.alias('o', z.enum(['csv', 'json', 'md', 'text', 'none']).optional()),
+  debug: z.boolean().default(false),
+  verbose: z.boolean().default(false)
+});
+export type GlobalOptionsZod = z.infer<typeof globalOptionsZod>;
 
 export interface CommandArgs {
   options: GlobalOptions;
@@ -74,6 +84,22 @@ export default abstract class Command {
 
   public abstract get name(): string;
   public abstract get description(): string;
+  public get schema(): ZodTypeAny | undefined {
+    return undefined;
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  public getRefinedSchema(schema: ZodTypeAny): z.ZodEffects<any> | undefined {
+    return undefined;
+  }
+
+  public getSchemaToParse(): z.ZodTypeAny | undefined {
+    return this.getRefinedSchema(this.schema as z.ZodTypeAny) ?? this.schema;
+  }
+
+  // metadata for command's options
+  // used for building telemetry
+  public optionsInfo: CommandOptionInfo[] = [];
 
   constructor() {
     // These functions must be defined with # so that they're truly private
@@ -554,8 +580,36 @@ export default abstract class Command {
   }
 
   private getTelemetryProperties(args: any): any {
-    this.telemetry.forEach(t => t(args));
-    return this.telemetryProperties;
+    if (this.schema) {
+      const telemetryProperties: any = {};
+      this.optionsInfo.forEach(o => {
+        if (o.required) {
+          return;
+        }
+
+        if (typeof args.options[o.name] === 'undefined') {
+          return;
+        }
+
+        switch (o.type) {
+          case 'string':
+            telemetryProperties[o.name] = o.autocomplete ? args.options[o.name] : typeof args.options[o.name] !== 'undefined';
+            break;
+          case 'boolean':
+            telemetryProperties[o.name] = args.options[o.name];
+            break;
+          case 'number':
+            telemetryProperties[o.name] = typeof args.options[o.name] !== 'undefined';
+            break;
+        };
+      });
+
+      return telemetryProperties;
+    }
+    else {
+      this.telemetry.forEach(t => t(args));
+      return this.telemetryProperties;
+    }
   }
 
   public async getTextOutput(logStatement: any[]): Promise<string> {

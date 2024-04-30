@@ -1,5 +1,6 @@
 import { AzureCloudInstance, DeviceCodeResponse } from '@azure/msal-common';
 import type * as Msal from '@azure/msal-node';
+import assert from 'assert';
 import type clipboard from 'clipboardy';
 import type NodeForge from 'node-forge';
 import type { AuthServer } from './AuthServer.js';
@@ -7,15 +8,14 @@ import { CommandError } from './Command.js';
 import { FileTokenStorage } from './auth/FileTokenStorage.js';
 import { TokenStorage } from './auth/TokenStorage.js';
 import { msalCachePlugin } from './auth/msalCachePlugin.js';
-import { cli } from './cli/cli.js';
 import { Logger } from './cli/Logger.js';
+import { cli } from './cli/cli.js';
 import config from './config.js';
+import { ConnectionDetails } from './m365/commands/ConnectionDetails.js';
 import request from './request.js';
 import { settingsNames } from './settingsNames.js';
-import { browserUtil } from './utils/browserUtil.js';
 import * as accessTokenUtil from './utils/accessToken.js';
-import { ConnectionDetails } from './m365/commands/ConnectionDetails.js';
-import assert from 'assert';
+import { browserUtil } from './utils/browserUtil.js';
 
 interface Hash<TValue> {
   [key: string]: TValue;
@@ -37,11 +37,11 @@ export interface InteractiveAuthorizationErrorResponse {
 }
 
 export enum CloudType {
-  Public,
-  USGov,
-  USGovHigh,
-  USGovDoD,
-  China
+  Public = 'Public',
+  USGov = 'USGov',
+  USGovHigh = 'USGovHigh',
+  USGovDoD = 'USGovDoD',
+  China = 'China'
 }
 
 export class Connection {
@@ -123,7 +123,7 @@ export class Auth {
   private deviceCodeRequest?: Msal.DeviceCodeRequest;
   private _connection: Connection;
   private clientApplication: Msal.ClientApplication | undefined;
-  private static cloudEndpoints: any[] = [];
+  private static cloudEndpoints: { [key: string]: any } = {};
 
   // A list of all connections, including the active one
   private _allConnections: Connection[] | undefined;
