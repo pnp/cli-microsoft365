@@ -114,6 +114,7 @@ class EntraM365GroupAddCommand extends GraphCommand {
   }
 
   #initTypes(): void {
+    this.types.string.push('displayName', 'mailNickname', 'description', 'owners', 'members', 'visibility', 'logoPath');
     this.types.boolean.push('allowMembersToPost', 'hideGroupInOutlook', 'subscribeNewGroupMembers', 'welcomeEmailDisabled');
   }
 
