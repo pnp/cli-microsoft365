@@ -171,32 +171,29 @@ class SpoFileAddCommand extends SpoCommand {
     let isCheckedOut: boolean = false;
     let listSettings: ListSettings;
 
-    if (this.debug) {
-      await logger.logToStderr(`folder path: ${folderPath}...`);
-    }
-
-    if (this.debug) {
-      await logger.logToStderr('Check if the specified folder exists.');
-      await logger.logToStderr('');
-    }
-
-    if (this.debug) {
+    if (this.verbose) {
       await logger.logToStderr(`file name: ${fileName}...`);
+      await logger.logToStderr(`folder path: ${folderPath}...`);
     }
 
     try {
       try {
+        if (this.verbose) {
+          await logger.logToStderr('Check if the specified folder exists.');
+        }
+
         const requestOptions: CliRequestOptions = {
           url: `${args.options.webUrl}/_api/web/GetFolderByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(folderPath)}')`,
           headers: {
-            'accept': 'application/json;odata=nometadata'
-          }
+            accept: 'application/json;odata=nometadata'
+          },
+          responseType: 'json'
         };
         await request.get<void>(requestOptions);
       }
       catch (err: any) {
         // folder does not exist so will attempt to create the folder tree
-        await spo.ensureFolder(args.options.webUrl, folderPath, logger, this.debug);
+        await spo.ensureFolder(args.options.webUrl, folderPath, logger, this.verbose);
       }
 
       if (args.options.checkOut) {
@@ -212,7 +209,7 @@ class SpoFileAddCommand extends SpoCommand {
 
       const fileStats: fs.Stats = fs.statSync(fullPath);
       const fileSize: number = fileStats.size;
-      if (this.debug) {
+      if (this.verbose) {
         await logger.logToStderr(`File size is ${fileSize} bytes`);
       }
 
@@ -228,8 +225,9 @@ class SpoFileAddCommand extends SpoCommand {
         const requestOptions: CliRequestOptions = {
           url: `${args.options.webUrl}/_api/web/GetFolderByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(folderPath)}')/Files/GetByPathOrAddStub(DecodedUrl='${formatting.encodeQueryParameter(fileName)}')/StartUpload(uploadId=guid'${uploadId}')`,
           headers: {
-            'accept': 'application/json;odata=nometadata'
-          }
+            accept: 'application/json;odata=nometadata'
+          },
+          responseType: 'json'
         };
 
         await request.post<void>(requestOptions);
@@ -260,8 +258,9 @@ class SpoFileAddCommand extends SpoCommand {
           const requestOptions: CliRequestOptions = {
             url: `${args.options.webUrl}/_api/web/GetFolderByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(folderPath)}')/Files('${formatting.encodeQueryParameter(fileName)}')/cancelupload(uploadId=guid'${uploadId}')`,
             headers: {
-              'accept': 'application/json;odata=nometadata'
-            }
+              accept: 'application/json;odata=nometadata'
+            },
+            responseType: 'json'
           };
 
           try {
@@ -285,7 +284,7 @@ class SpoFileAddCommand extends SpoCommand {
           url: `${args.options.webUrl}/_api/web/GetFolderByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(folderPath)}')/Files/Add(url='${formatting.encodeQueryParameter(fileName)}', overwrite=true)`,
           data: fileBody,
           headers: {
-            'accept': 'application/json;odata=nometadata',
+            accept: 'application/json;odata=nometadata',
             'content-length': bodyLength
           },
           maxBodyLength: this.fileChunkingThreshold
@@ -314,12 +313,12 @@ class SpoFileAddCommand extends SpoCommand {
       }
 
       if (fieldsToUpdate.length > 0) {
-        // perform list item update and checkin
+        // perform list item update and check-in
         await this.validateUpdateListItem(args.options.webUrl, folderPath, fileName, fieldsToUpdate, logger, args.options.checkInComment);
       }
       else if (isCheckedOut) {
-        // perform checkin
-        await this.fileCheckIn(args, fileName);
+        // perform check-in
+        await this.fileCheckIn(args.options.webUrl, folderPath, fileName, args.options.checkInComment);
       }
 
       // approve and publish cannot be used together
@@ -334,7 +333,7 @@ class SpoFileAddCommand extends SpoCommand {
         const requestOptions: CliRequestOptions = {
           url: `${args.options.webUrl}/_api/web/GetFolderByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(folderPath)}')/Files('${formatting.encodeQueryParameter(fileName)}')/approve(comment='${formatting.encodeQueryParameter(args.options.approveComment || '')}')`,
           headers: {
-            'accept': 'application/json;odata=nometadata'
+            accept: 'application/json;odata=nometadata'
           },
           responseType: 'json'
         };
@@ -354,7 +353,7 @@ class SpoFileAddCommand extends SpoCommand {
         const requestOptions: CliRequestOptions = {
           url: `${args.options.webUrl}/_api/web/GetFolderByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(folderPath)}')/Files('${formatting.encodeQueryParameter(fileName)}')/publish(comment='${formatting.encodeQueryParameter(args.options.publishComment || '')}')`,
           headers: {
-            'accept': 'application/json;odata=nometadata'
+            accept: 'application/json;odata=nometadata'
           },
           responseType: 'json'
         };
@@ -367,8 +366,12 @@ class SpoFileAddCommand extends SpoCommand {
         // in a case the command has done checkout
         // then have to rollback the checkout
 
-        const requestOptions: any = {
-          url: `${args.options.webUrl}/_api/web/GetFolderByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(folderPath)}')/Files('${formatting.encodeQueryParameter(fileName)}')/UndoCheckOut()`
+        const requestOptions: CliRequestOptions = {
+          url: `${args.options.webUrl}/_api/web/GetFolderByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(folderPath)}')/Files('${formatting.encodeQueryParameter(fileName)}')/UndoCheckOut()`,
+          headers: {
+            accept: 'application/json;odata=nometadata'
+          },
+          responseType: 'json'
         };
 
         try {
@@ -378,7 +381,6 @@ class SpoFileAddCommand extends SpoCommand {
           if (this.verbose) {
             await logger.logToStderr('Could not rollback file checkout');
             await logger.logToStderr(err);
-            await logger.logToStderr('');
           }
         }
       }
@@ -395,7 +397,7 @@ class SpoFileAddCommand extends SpoCommand {
     const requestOptions: CliRequestOptions = {
       url: `${webUrl}/_api/web/lists('${listSettings.Id}')/contenttypes?$select=Name,Id`,
       headers: {
-        'accept': 'application/json;odata=nometadata'
+        accept: 'application/json;odata=nometadata'
       },
       responseType: 'json'
     };
@@ -415,8 +417,9 @@ class SpoFileAddCommand extends SpoCommand {
     const requestOptionsGetFile: CliRequestOptions = {
       url: `${webUrl}/_api/web/GetFolderByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(folder)}')/Files('${formatting.encodeQueryParameter(fileName)}')`,
       headers: {
-        'accept': 'application/json;odata=nometadata'
-      }
+        accept: 'application/json;odata=nometadata'
+      },
+      responseType: 'json'
     };
 
     await request.get<void>(requestOptionsGetFile);
@@ -424,7 +427,7 @@ class SpoFileAddCommand extends SpoCommand {
     const requestOptionsCheckOut: CliRequestOptions = {
       url: `${webUrl}/_api/web/GetFolderByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(folder)}')/Files('${formatting.encodeQueryParameter(fileName)}')/CheckOut()`,
       headers: {
-        'accept': 'application/json;odata=nometadata'
+        accept: 'application/json;odata=nometadata'
       },
       responseType: 'json'
     };
@@ -453,7 +456,7 @@ class SpoFileAddCommand extends SpoCommand {
         url: `${info.WebUrl}/_api/web/GetFolderByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(info.FolderPath)}')/Files('${formatting.encodeQueryParameter(info.Name)}')/${isLastChunk ? 'Finish' : 'Continue'}Upload(uploadId=guid'${info.Id}',fileOffset=${offset})`,
         data: fileBuffer,
         headers: {
-          'accept': 'application/json;odata=nometadata',
+          accept: 'application/json;odata=nometadata',
           'content-length': readCount
         },
         maxBodyLength: this.fileChunkingThreshold
@@ -514,7 +517,7 @@ class SpoFileAddCommand extends SpoCommand {
     const requestOptions: CliRequestOptions = {
       url: `${webUrl}/_api/web/GetFolderByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(folder)}')/Files('${formatting.encodeQueryParameter(fileName)}')/ListItemAllFields/ParentList?$Select=Id,EnableModeration,EnableVersioning,EnableMinorVersions`,
       headers: {
-        'accept': 'application/json;odata=nometadata'
+        accept: 'application/json;odata=nometadata'
       },
       responseType: 'json'
     };
@@ -529,20 +532,19 @@ class SpoFileAddCommand extends SpoCommand {
 
     const requestBody: any = {
       formValues: fieldsToUpdate,
-      bNewDocumentUpdate: true, // true = will automatically checkin the item, but we will use it to perform system update and also do a checkin
+      bNewDocumentUpdate: true, // true = will automatically check-in the item, but we will use it to perform system update and also do a check-in
       checkInComment: checkInComment || ''
     };
 
-    if (this.debug) {
-      await logger.logToStderr('ValidateUpdateListItem will perform the checkin ...');
-      await logger.logToStderr('');
+    if (this.verbose) {
+      await logger.logToStderr('ValidateUpdateListItem will perform the check-in ...');
     }
 
     // update the existing file list item fields
     const requestOptions: CliRequestOptions = {
       url: `${webUrl}/_api/web/GetFolderByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(folderPath)}')/Files('${formatting.encodeQueryParameter(fileName)}')/ListItemAllFields/ValidateUpdateListItem()`,
       headers: {
-        'accept': 'application/json;odata=nometadata'
+        accept: 'application/json;odata=nometadata'
       },
       data: requestBody,
       responseType: 'json'
@@ -559,11 +561,11 @@ class SpoFileAddCommand extends SpoCommand {
     return;
   }
 
-  private async fileCheckIn(args: any, fileName: string): Promise<void> {
+  private async fileCheckIn(webUrl: string, folderUrl: string, fileName: string, checkInComment?: string): Promise<void> {
     const requestOptions: CliRequestOptions = {
-      url: `${args.options.webUrl}/_api/web/GetFolderByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(args.options.folder)}')/Files('${formatting.encodeQueryParameter(fileName)}')/CheckIn(comment='${formatting.encodeQueryParameter(args.options.checkInComment || '')}',checkintype=0)`,
+      url: `${webUrl}/_api/web/GetFolderByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(folderUrl)}')/Files('${formatting.encodeQueryParameter(fileName)}')/CheckIn(comment='${formatting.encodeQueryParameter(checkInComment || '')}',checkintype=0)`,
       headers: {
-        'accept': 'application/json;odata=nometadata'
+        accept: 'application/json;odata=nometadata'
       },
       responseType: 'json'
     };
