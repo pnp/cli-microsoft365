@@ -40,6 +40,34 @@ describe(commands.M365GROUP_ADD, () => {
     visibility: 'Public'
   };
 
+  const fsStats: fs.Stats = {
+    isDirectory: () => false,
+    isFile: () => false,
+    isBlockDevice: () => false,
+    isCharacterDevice: () => false,
+    isSymbolicLink: () => false,
+    isFIFO: () => false,
+    isSocket: () => false,
+    dev: 0,
+    ino: 0,
+    mode: 0,
+    nlink: 0,
+    uid: 0,
+    gid: 0,
+    rdev: 0,
+    size: 0,
+    blksize: 0,
+    blocks: 0,
+    atimeMs: 0,
+    mtimeMs: 0,
+    ctimeMs: 0,
+    birthtimeMs: 0,
+    atime: new Date(),
+    mtime: new Date(),
+    ctime: new Date(),
+    birthtime: new Date()
+  };
+
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -696,8 +724,7 @@ describe(commands.M365GROUP_ADD, () => {
   });
 
   it('fails validation if logoPath points to a folder', async () => {
-    const stats: fs.Stats = new fs.Stats();
-    sinon.stub(stats, 'isDirectory').callsFake(() => true);
+    const stats = { ...fsStats, isDirectory: () => true };
     sinon.stub(fs, 'existsSync').callsFake(() => true);
     sinon.stub(fs, 'lstatSync').callsFake(() => stats);
     const actual = await command.validate({ options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', logoPath: 'folder' } }, commandInfo);
@@ -721,10 +748,8 @@ describe(commands.M365GROUP_ADD, () => {
   });
 
   it('passes validation if logoPath points to an existing file', async () => {
-    const stats: fs.Stats = new fs.Stats();
-    sinon.stub(stats, 'isDirectory').callsFake(() => false);
     sinon.stub(fs, 'existsSync').callsFake(() => true);
-    sinon.stub(fs, 'lstatSync').callsFake(() => stats);
+    sinon.stub(fs, 'lstatSync').callsFake(() => fsStats);
     const actual = await command.validate({ options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', logoPath: 'folder' } }, commandInfo);
     sinonUtil.restore([
       fs.existsSync,
