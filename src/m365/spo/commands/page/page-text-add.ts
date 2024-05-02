@@ -1,4 +1,3 @@
-import { isNumber } from 'util';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request from '../../../../request.js';
@@ -79,11 +78,11 @@ class SpoPageTextAddCommand extends SpoCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (args.options.section && (!isNumber(args.options.section) || args.options.section < 1)) {
+        if (args.options.section && (!Number.isInteger(args.options.section) || args.options.section < 1)) {
           return 'The value of parameter section must be 1 or higher';
         }
 
-        if (args.options.column && (!isNumber(args.options.column) || args.options.column < 1)) {
+        if (args.options.column && (!Number.isInteger(args.options.column) || args.options.column < 1)) {
           return 'The value of parameter column must be 1 or higher';
         }
 

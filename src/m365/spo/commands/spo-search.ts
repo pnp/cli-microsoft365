@@ -1,4 +1,3 @@
-import { isNumber } from 'util';
 import { cli } from '../../../cli/cli.js';
 import { Logger } from '../../../cli/Logger.js';
 import GlobalOptions from '../../../GlobalOptions.js';
@@ -181,11 +180,11 @@ class SpoSearchCommand extends SpoCommand {
           return `sortlist parameter value '${args.options.sortList}' does not match the required pattern (=comma-separated list of '<property>:(ascending|descending)'-pattern)`;
         }
 
-        if (args.options.rowLimit && !isNumber(args.options.rowLimit)) {
+        if (args.options.rowLimit && !Number.isInteger(args.options.rowLimit)) {
           return `${args.options.rowLimit} is not a valid number`;
         }
 
-        if (args.options.startRow && !isNumber(args.options.startRow)) {
+        if (args.options.startRow && !Number.isInteger(args.options.startRow)) {
           return `${args.options.startRow} is not a valid number`;
         }
 
@@ -193,7 +192,7 @@ class SpoSearchCommand extends SpoCommand {
           return 'You cannot specify startRow when allResults is set';
         }
 
-        if (args.options.culture && !isNumber(args.options.culture)) {
+        if (args.options.culture && !Number.isInteger(args.options.culture)) {
           return `${args.options.culture} is not a valid number`;
         }
 

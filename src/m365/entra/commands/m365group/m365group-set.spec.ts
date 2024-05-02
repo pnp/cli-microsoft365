@@ -18,6 +18,34 @@ import { entraGroup } from '../../../../utils/entraGroup.js';
 import aadCommands from '../../aadCommands.js';
 
 describe(commands.M365GROUP_SET, () => {
+  const fsStats: fs.Stats = {
+    isDirectory: () => false,
+    isFile: () => false,
+    isBlockDevice: () => false,
+    isCharacterDevice: () => false,
+    isSymbolicLink: () => false,
+    isFIFO: () => false,
+    isSocket: () => false,
+    dev: 0,
+    ino: 0,
+    mode: 0,
+    nlink: 0,
+    uid: 0,
+    gid: 0,
+    rdev: 0,
+    size: 0,
+    blksize: 0,
+    blocks: 0,
+    atimeMs: 0,
+    mtimeMs: 0,
+    ctimeMs: 0,
+    birthtimeMs: 0,
+    atime: new Date(),
+    mtime: new Date(),
+    ctime: new Date(),
+    birthtime: new Date()
+  };
+
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -475,8 +503,7 @@ describe(commands.M365GROUP_SET, () => {
   });
 
   it('fails validation if logoPath points to a folder', async () => {
-    const stats: fs.Stats = new fs.Stats();
-    sinon.stub(stats, 'isDirectory').returns(true);
+    const stats = { ...fsStats, isDirectory: () => true };
     sinon.stub(fs, 'existsSync').returns(true);
     sinon.stub(fs, 'lstatSync').returns(stats);
     const actual = await command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', logoPath: 'folder' } }, commandInfo);
@@ -488,10 +515,8 @@ describe(commands.M365GROUP_SET, () => {
   });
 
   it('passes validation if logoPath points to an existing file', async () => {
-    const stats: fs.Stats = new fs.Stats();
-    sinon.stub(stats, 'isDirectory').returns(false);
     sinon.stub(fs, 'existsSync').returns(true);
-    sinon.stub(fs, 'lstatSync').returns(stats);
+    sinon.stub(fs, 'lstatSync').returns(fsStats);
     const actual = await command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', logoPath: 'folder' } }, commandInfo);
     sinonUtil.restore([
       fs.existsSync,
