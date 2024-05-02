@@ -314,6 +314,11 @@ describe(commands.RUN_LIST, () => {
     assert.notStrictEqual(actual, true);
   });
 
+  it('fails validation if the output is not json and withTrigger is specified', async () => {
+    const actual = await command.validate({ options: { environmentName: environmentName, flowName: flowName, output: 'text', withTrigger: true } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
   it('passes validation if all options are passed properly', async () => {
     const actual = await command.validate({ options: { environmentName: environmentName, flowName: flowName, status: status, triggerStartTime: triggerStartTime, triggerEndTime: triggerEndTime } }, commandInfo);
     assert.strictEqual(actual, true);

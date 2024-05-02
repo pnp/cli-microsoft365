@@ -28,7 +28,13 @@ interface PowerAutomateFlowRun {
   properties: {
     startTime: string;
     status: string;
+    trigger: {
+      outputsLink: {
+        uri: string;
+      }
+    }
   }
+  triggerInformation?: any;
 }
 
 class FlowRunListCommand extends PowerAutomateCommand {
@@ -112,6 +118,10 @@ class FlowRunListCommand extends PowerAutomateCommand {
           return `'${args.options.triggerEndTime}' is not a valid datetime.`;
         }
 
+        if (args.options.output !== 'json' && args.options.withTrigger) {
+          return 'The --withTrigger option is only available when output is set to json';
+        }
+
         return true;
       }
     );
@@ -130,7 +140,7 @@ class FlowRunListCommand extends PowerAutomateCommand {
     try {
       const items = await odata.getAllItems<PowerAutomateFlowRun>(url);
 
-      if (args.options.output === 'json' && args.options.withTrigger) {
+      if (args.options.withTrigger) {
         await this.retrieveTriggerInformation(items);
       }
 
@@ -163,7 +173,7 @@ class FlowRunListCommand extends PowerAutomateCommand {
   }
 
   private async retrieveTriggerInformation(items: PowerAutomateFlowRun[]): Promise<void> {
-    const tasks = items.map(async (item: any) => {
+    const tasks = items.map(async (item: PowerAutomateFlowRun) => {
       const requestOptions: CliRequestOptions = {
         url: item.properties.trigger.outputsLink.uri,
         headers: {
