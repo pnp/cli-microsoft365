@@ -111,7 +111,7 @@ class OutlookMessageListCommand extends GraphCommand {
         }
 
         if (args.options.userName && !validation.isValidUserPrincipalName(args.options.userName)) {
-          return `${args.options.userName} is not a valid userName.`;
+          return `${args.options.userName} is not a valid UPN for option userName.`;
         }
 
         return true;
@@ -143,14 +143,14 @@ class OutlookMessageListCommand extends GraphCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       if (!args.options.userId && !args.options.userName && accessToken.isAppOnlyAccessToken(auth.connection.accessTokens[auth.defaultResource].accessToken)) {
-        throw 'You must specify either the userId or userName option when using app-only access permissions.';
+        throw 'You must specify either the userId or userName option when using app-only permissions.';
       }
 
-      const userUrl = args.options.userId || args.options.userName ? `users/${args.options.userId || args.options.userName}` : 'me';
+      const userUrl = args.options.userId || args.options.userName ? `users/${args.options.userId || formatting.encodeQueryParameter(args.options.userName!)}` : 'me';
 
-      const folderId = await this.getFolderId(userUrl, args);
+      const folderId = await this.getFolderId(userUrl, args.options);
       const folderUrl: string = folderId ? `/mailFolders/${folderId}` : '';
-      let requestUrl = `${this.resource}/v1.0/${userUrl}${folderUrl}/messages?$top=100`;
+      let requestUrl = `${this.resource}/v1.0/${userUrl}${folderUrl}/messages`;
 
       if (args.options.startTime || args.options.endTime) {
         const filters = [];
@@ -163,7 +163,7 @@ class OutlookMessageListCommand extends GraphCommand {
         }
 
         if (filters.length > 0) {
-          requestUrl += `&$filter=${filters.join(' and ')}`;
+          requestUrl += `?$filter=${filters.join(' and ')}`;
         }
       }
 
@@ -175,21 +175,21 @@ class OutlookMessageListCommand extends GraphCommand {
     }
   }
 
-  private async getFolderId(userUrl: string, args: CommandArgs): Promise<string> {
-    if (!args.options.folderId && !args.options.folderName) {
+  private async getFolderId(userUrl: string, options: Options): Promise<string> {
+    if (!options.folderId && !options.folderName) {
       return '';
     }
 
-    if (args.options.folderId) {
-      return args.options.folderId;
+    if (options.folderId) {
+      return options.folderId;
     }
 
-    if (Outlook.wellKnownFolderNames.includes(args.options.folderName!)) {
-      return args.options.folderName!;
+    if (Outlook.wellKnownFolderNames.includes(options.folderName!.toLowerCase())) {
+      return options.folderName!;
     }
 
     const requestOptions: CliRequestOptions = {
-      url: `${this.resource}/v1.0/${userUrl}/mailFolders?$filter=displayName eq '${formatting.encodeQueryParameter(args.options.folderName!)}'&$select=id`,
+      url: `${this.resource}/v1.0/${userUrl}/mailFolders?$filter=displayName eq '${formatting.encodeQueryParameter(options.folderName!)}'&$select=id`,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },
@@ -199,12 +199,12 @@ class OutlookMessageListCommand extends GraphCommand {
     const response = await request.get<{ value: { id: string; }[] }>(requestOptions);
 
     if (response.value.length === 0) {
-      throw `Folder with name '${args.options.folderName as string}' not found`;
+      throw `Folder with name '${options.folderName as string}' not found`;
     }
 
     if (response.value.length > 1) {
       const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', response.value);
-      const result = await cli.handleMultipleResultsFound<{ id: string }>(`Multiple folders with name '${args.options.folderName!}' found.`, resultAsKeyValuePair);
+      const result = await cli.handleMultipleResultsFound<{ id: string }>(`Multiple folders with name '${options.folderName!}' found.`, resultAsKeyValuePair);
       return result.id;
     }
 
