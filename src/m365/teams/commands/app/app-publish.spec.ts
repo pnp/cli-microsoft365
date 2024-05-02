@@ -26,6 +26,34 @@ describe(commands.APP_PUBLISH, () => {
     distributionMethod: "organization"
   };
 
+  const fsStats: fs.Stats = {
+    isDirectory: () => false,
+    isFile: () => false,
+    isBlockDevice: () => false,
+    isCharacterDevice: () => false,
+    isSymbolicLink: () => false,
+    isFIFO: () => false,
+    isSocket: () => false,
+    dev: 0,
+    ino: 0,
+    mode: 0,
+    nlink: 0,
+    uid: 0,
+    gid: 0,
+    rdev: 0,
+    size: 0,
+    blksize: 0,
+    blocks: 0,
+    atimeMs: 0,
+    mtimeMs: 0,
+    ctimeMs: 0,
+    birthtimeMs: 0,
+    atime: new Date(),
+    mtime: new Date(),
+    ctime: new Date(),
+    birthtime: new Date()
+  };
+
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').returns();
@@ -82,8 +110,7 @@ describe(commands.APP_PUBLISH, () => {
   });
 
   it('fails validation if the filePath points to a directory', async () => {
-    const stats: fs.Stats = new fs.Stats();
-    sinon.stub(stats, 'isDirectory').returns(true);
+    const stats = { ...fsStats, isDirectory: () => true };
     sinon.stub(fs, 'existsSync').returns(true);
     sinon.stub(fs, 'lstatSync').returns(stats);
 
@@ -97,10 +124,8 @@ describe(commands.APP_PUBLISH, () => {
   });
 
   it('validates for a correct input.', async () => {
-    const stats: fs.Stats = new fs.Stats();
-    sinon.stub(stats, 'isDirectory').returns(false);
     sinon.stub(fs, 'existsSync').returns(true);
-    sinon.stub(fs, 'lstatSync').returns(stats);
+    sinon.stub(fs, 'lstatSync').returns(fsStats);
 
     const actual = await command.validate({
       options: {

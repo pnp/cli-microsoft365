@@ -58,6 +58,9 @@ jobs:
           - os: ubuntu-latest
             nodeRun: 18
             nodeBuild: 20
+          - os: ubuntu-latest
+            nodeRun: 22
+            nodeBuild: 20
 
     steps:
       - name: Configure pagefile
