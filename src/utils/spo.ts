@@ -18,7 +18,7 @@ import { SiteProperties } from '../m365/spo/commands/site/SiteProperties.js';
 import { entraGroup } from './entraGroup.js';
 import { SharingCapabilities } from '../m365/spo/commands/site/SharingCapabilities.js';
 import { WebProperties } from '../m365/spo/commands/web/WebProperties.js';
-import { Site } from '@microsoft/microsoft-graph-types';
+import { Site, Drive, DriveItem } from '@microsoft/microsoft-graph-types';
 import { ListItemInstance } from '../m365/spo/commands/listitem/ListItemInstance.js';
 import { ListItemFieldValueResult } from '../m365/spo/commands/listitem/ListItemFieldValueResult.js';
 import { FileProperties } from '../m365/spo/commands/file/FileProperties.js';
@@ -1741,6 +1741,96 @@ export const spo = {
     const site: Site = await request.get<Site>(requestOptions);
 
     return site.id as string;
+  },
+
+  /**
+   * Retrieves the server-relative URL of a folder.
+   * @param webUrl Web URL
+   * @param folderUrl Folder URL
+   * @param folderId Folder ID
+   * @returns The server-relative URL of the folder
+   */
+  async getFolderServerRelativeUrl(webUrl: string, folderUrl: string | undefined, folderId: string | undefined): Promise<string> {
+    let requestUrl: string = `${webUrl}/_api/web/`;
+
+    if (folderUrl) {
+      const folderServerRelativeUrl: string = urlUtil.getServerRelativePath(webUrl, folderUrl);
+      requestUrl += `GetFolderByServerRelativePath(decodedUrl='${formatting.encodeQueryParameter(folderServerRelativeUrl)}')`;
+    }
+    else {
+      requestUrl += `GetFolderById('${folderId}')`;
+    }
+
+    requestUrl += '?$select=ServerRelativeUrl';
+
+    const requestOptions: CliRequestOptions = {
+      url: requestUrl,
+      headers: {
+        accept: 'application/json;odata=nometadata'
+      },
+      responseType: 'json'
+    };
+
+    const res = await request.get<{ ServerRelativeUrl: string }>(requestOptions);
+    return res.ServerRelativeUrl;
+  },
+
+  /**
+   * Retrieves the Drive associated with the specified site and folder URL.
+   * @param siteId Site ID
+   * @param folderUrl Folder URL
+   * @returns The Drive associated with the folder URL.
+   */
+  async getDrive(siteId: string, folderUrl: URL): Promise<Drive> {
+    const requestOptions: CliRequestOptions = {
+      url: `https://graph.microsoft.com/v1.0/sites/${siteId}/drives?$select=webUrl,id`,
+      headers: {
+        accept: 'application/json;odata.metadata=none'
+      },
+      responseType: 'json'
+    };
+
+    const drives = await request.get<{ value: Drive[] }>(requestOptions);
+
+    const lowerCaseFolderUrl: string = folderUrl.href.toLowerCase();
+
+    const drive: Drive | undefined = drives.value
+      .sort((a, b) => (b.webUrl as string).localeCompare(a.webUrl as string))
+      .find((d: Drive) => {
+        const driveUrl: string = (d.webUrl as string).toLowerCase();
+
+        return lowerCaseFolderUrl.startsWith(driveUrl) &&
+          (driveUrl.length === lowerCaseFolderUrl.length ||
+            lowerCaseFolderUrl[driveUrl.length] === '/');
+      });
+
+    if (!drive) {
+      throw `Drive '${folderUrl.href}' not found`;
+    }
+
+    return drive;
+  },
+
+  /**
+   * Retrieves the ID of a drive item (file, folder, etc.) associated with the given drive and item URL.
+   * @param drive The Drive object containing the item
+   * @param itemUrl Item URL
+   * @returns Drive item ID
+   */
+  async getDriveItemId(drive: Drive, itemUrl: URL): Promise<string> {
+    const relativeItemUrl: string = itemUrl.href.replace(new RegExp(`${drive.webUrl}`, 'i'), '').replace(/\/+$/, '');
+
+    const requestOptions: CliRequestOptions = {
+      url: `https://graph.microsoft.com/v1.0/drives/${drive.id}/root${relativeItemUrl ? `:${relativeItemUrl}` : ''}?$select=id`,
+      headers: {
+        accept: 'application/json;odata.metadata=none'
+      },
+      responseType: 'json'
+    };
+
+    const driveItem = await request.get<DriveItem>(requestOptions);
+
+    return driveItem?.id as string;
   },
 
   /**
