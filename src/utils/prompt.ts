@@ -109,6 +109,6 @@ export const prompt = {
       config.pageSize = Math.min(config.choices.length, promptPageSizeCap);
     }
 
-    return inquirerSelect.default(config, { output: errorOutput === 'stderr' ? process.stderr : process.stdout }) as Promise<T>;
+    return inquirerSelect.default(config, { output: errorOutput === 'stderr' ? process.stderr : process.stdout });
   }
 };
