@@ -101,6 +101,7 @@ export default {
   FOLDER_ROLEASSIGNMENT_ADD: `${prefix} folder roleassignment add`,
   FOLDER_ROLEINHERITANCE_BREAK: `${prefix} folder roleinheritance break`,
   FOLDER_ROLEINHERITANCE_RESET: `${prefix} folder roleinheritance reset`,
+  FOLDER_SHARINGLINK_GET: `${prefix} folder sharinglink get`,
   FOLDER_SHARINGLINK_LIST: `${prefix} folder sharinglink list`,
   GET: `${prefix} get`,
   GROUP_ADD: `${prefix} group add`,

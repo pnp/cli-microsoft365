@@ -2570,6 +2570,11 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
+              label: 'folder sharinglink get',
+              id: 'cmd/spo/folder/folder-sharinglink-get'
+            },
+            {
+              type: 'doc',
               label: 'folder sharinglink list',
               id: 'cmd/spo/folder/folder-sharinglink-list'
             }
