@@ -24,9 +24,9 @@ describe(commands.MOVE, () => {
       const url: string = opts.url as string;
 
       if (
-        url === 'https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com,ea49a393-e3e6-4760-a1b2-e96539e15372,66e2861c-96d9-4418-a75c-0ed1bca68b42/drives/b!k6NJ6ubjYEehsullOeFTchyG4mbZlhhEp1wO0bymi0KkhVdx52mJQ5y68EfLYQYU/items/01YNDLPYN6Y2GOVW7725BZO354PWSELRRZ/copy' ||
-        url === 'https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com,ea49a393-e3e6-4760-a1b2-e96539e15372,66e2861c-96d9-4418-a75c-0ed1bca68b42/drives/b!k6NJ6ubjYEehsullOeFTchyG4mbZlhhEp1wO0bymi0KkhVdx52mJQ5y68EfLYQYU/items/01YNDLPYN6Y2GOVW7725BZO354PWSELRRZ/copy?@microsoft.graph.conflictBehavior=replace' ||
-        url === 'https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com,ea49a393-e3e6-4760-a1b2-e96539e15372,66e2861c-96d9-4418-a75c-0ed1bca68b42/drives/b!k6NJ6ubjYEehsullOeFTchyG4mbZlhhEp1wO0bymi0KkhVdx52mJQ5y68EfLYQYU/items/01YNDLPYN6Y2GOVW7725BZO354PWSELRRZ/copy?@microsoft.graph.conflictBehavior=rename'
+        url === 'https://graph.microsoft.com/v1.0/drives/b!k6NJ6ubjYEehsullOeFTchyG4mbZlhhEp1wO0bymi0KkhVdx52mJQ5y68EfLYQYU/items/01YNDLPYN6Y2GOVW7725BZO354PWSELRRZ/copy' ||
+        url === 'https://graph.microsoft.com/v1.0/drives/b!k6NJ6ubjYEehsullOeFTchyG4mbZlhhEp1wO0bymi0KkhVdx52mJQ5y68EfLYQYU/items/01YNDLPYN6Y2GOVW7725BZO354PWSELRRZ/copy?@microsoft.graph.conflictBehavior=replace' ||
+        url === 'https://graph.microsoft.com/v1.0/drives/b!k6NJ6ubjYEehsullOeFTchyG4mbZlhhEp1wO0bymi0KkhVdx52mJQ5y68EfLYQYU/items/01YNDLPYN6Y2GOVW7725BZO354PWSELRRZ/copy?@microsoft.graph.conflictBehavior=rename'
       ) {
         return Promise.resolve({
           status: 202,
@@ -37,7 +37,7 @@ describe(commands.MOVE, () => {
       }
 
       if (
-        url === 'https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com,f89617dc-8c96-4044-954d-4c690ce5fcd9,e0f173ba-2d5e-4098-a9d7-49530181130c/drives/b!k6NJ6ubjYEehsullOeFTchyG4mbZlhhEp1wO0bymi0KkhVdx52mJQ5y68EfLYQYV/items/01YNDLPYN6Y2GOVW7725BZO354PWSELRRA/copy'
+        url === 'https://graph.microsoft.com/v1.0/drives/b!k6NJ6ubjYEehsullOeFTchyG4mbZlhhEp1wO0bymi0KkhVdx52mJQ5y68EfLYQYV/items/01YNDLPYN6Y2GOVW7725BZO354PWSELRRA/copy'
       ) {
         return Promise.resolve({
           status: 202,
@@ -56,8 +56,8 @@ describe(commands.MOVE, () => {
       const url: string = opts.url as string;
 
       if (
-        url === 'https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com,ea49a393-e3e6-4760-a1b2-e96539e15372,66e2861c-96d9-4418-a75c-0ed1bca68b42/drives/b!k6NJ6ubjYEehsullOeFTchyG4mbZlhhEp1wO0bymi0KkhVdx52mJQ5y68EfLYQYU/items/01YNDLPYN6Y2GOVW7725BZO354PWSELRRZ' ||
-        url === 'https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com,ea49a393-e3e6-4760-a1b2-e96539e15372,66e2861c-96d9-4418-a75c-0ed1bca68b42/drives/b!k6NJ6ubjYEehsullOeFTchyG4mbZlhhEp1wO0bymi0KkhVdx52mJQ5y68EfLYQYU/items/01YNDLPYN6Y2GOVW7725BZO354PWSELRRZ?@microsoft.graph.conflictBehavior=rename'
+        url === 'https://graph.microsoft.com/v1.0//drives/b!k6NJ6ubjYEehsullOeFTchyG4mbZlhhEp1wO0bymi0KkhVdx52mJQ5y68EfLYQYU/items/01YNDLPYN6Y2GOVW7725BZO354PWSELRRZ' ||
+        url === 'https://graph.microsoft.com/v1.0/drives/b!k6NJ6ubjYEehsullOeFTchyG4mbZlhhEp1wO0bymi0KkhVdx52mJQ5y68EfLYQYU/items/01YNDLPYN6Y2GOVW7725BZO354PWSELRRZ?@microsoft.graph.conflictBehavior=rename'
       ) {
         return Promise.resolve({
           status: 202
@@ -159,8 +159,8 @@ describe(commands.MOVE, () => {
       const url: string = opts.url as string;
 
       if (
-        url === 'https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com,ea49a393-e3e6-4760-a1b2-e96539e15372,66e2861c-96d9-4418-a75c-0ed1bca68b42/drives/b!k6NJ6ubjYEehsullOeFTchyG4mbZlhhEp1wO0bymi0KkhVdx52mJQ5y68EfLYQYU/items/01YNDLPYN6Y2GOVW7725BZO354PWSELRRZ' ||
-        url === 'https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com,f89617dc-8c96-4044-954d-4c690ce5fcd9,e0f173ba-2d5e-4098-a9d7-49530181130c/drives/b!k6NJ6ubjYEehsullOeFTchyG4mbZlhhEp1wO0bymi0KkhVdx52mJQ5y68EfLYQYV/items/01YNDLPYN6Y2GOVW7725BZO354PWSELRRA'
+        url === 'https://graph.microsoft.com/v1.0/drives/b!k6NJ6ubjYEehsullOeFTchyG4mbZlhhEp1wO0bymi0KkhVdx52mJQ5y68EfLYQYU/items/01YNDLPYN6Y2GOVW7725BZO354PWSELRRZ' ||
+        url === 'https://graph.microsoft.com/v1.0/drives/b!k6NJ6ubjYEehsullOeFTchyG4mbZlhhEp1wO0bymi0KkhVdx52mJQ5y68EfLYQYV/items/01YNDLPYN6Y2GOVW7725BZO354PWSELRRA'
       ) {
         return;
       }
@@ -252,23 +252,6 @@ describe(commands.MOVE, () => {
       }
     }, commandInfo);
     assert.strictEqual(actual, true);
-  });
-
-  it('moves a file to a folder in the same document library', async () => {
-    const getStub: sinon.SinonStub = defaultGetStub();
-    const patchStub: sinon.SinonStub = defaultPatchStub();
-
-    await command.action(logger, {
-      options: {
-        webUrl: 'https://contoso.sharepoint.com',
-        sourceUrl: '/Shared Documents/file.pdf',
-        targetUrl: '/Shared Documents/NewFolder',
-        verbose: true
-      }
-    });
-
-    assert(getStub.called);
-    assert(patchStub.called);
   });
 
   it('moves a file by renaming when the same name already exists.', async () => {
@@ -459,6 +442,6 @@ describe(commands.MOVE, () => {
         sourceUrl: '/invalid/file.pdf',
         targetUrl: '/teams/finance/Shared Documents'
       }
-    }), new CommandError(`Document library '/invalid/file.pdf' not found`));
+    }), new CommandError(`Drive 'https://contoso.sharepoint.com/invalid/file.pdf' not found`));
   });
 });

@@ -1,4 +1,4 @@
-import { Drive, DriveItem } from '@microsoft/microsoft-graph-types';
+import { Drive } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../cli/Logger.js';
 import GlobalOptions from '../../../GlobalOptions.js';
 import GraphCommand from '../../base/GraphCommand.js';
@@ -7,6 +7,7 @@ import commands from '../commands.js';
 import request, { CliRequestOptions } from '../../../request.js';
 import { spo } from '../../../utils/spo.js';
 import { urlUtil } from '../../../utils/urlUtil.js';
+import { driveUtil } from '../../../utils/driveUtil.js';
 import { validation } from '../../../utils/validation.js';
 
 interface CommandArgs {
@@ -81,29 +82,25 @@ class FileMoveCommand extends GraphCommand {
       const sourcePath: string = this.getAbsoluteUrl(webUrl, sourceUrl);
       const destinationPath: string = this.getAbsoluteUrl(webUrl, targetUrl);
 
+      const { driveId, itemId } = await this.getDriveIdAndItemId(webUrl, sourcePath, sourceUrl, logger, verbose);
+      const targetSiteUrl: string = urlUtil.getTargetSiteAbsoluteUrl(webUrl, targetUrl);
+      const targetFolderUrl: string = this.getAbsoluteUrl(targetSiteUrl, targetUrl);
+      const { driveId: targetDriveId, itemId: targetItemId } = await this.getDriveIdAndItemId(targetSiteUrl, targetFolderUrl, targetUrl, logger, verbose);
+
+      const requestOptions: CliRequestOptions = this.getRequestOptions(driveId, itemId, targetDriveId, targetItemId, newName, sourcePath, nameConflictBehavior);
+
       if (verbose) {
         logger.logToStderr(`Moving file '${sourcePath}' to '${destinationPath}'...`);
       }
 
-      const { siteId, driveId, itemId } = await this.getDriveIdAndItemId(webUrl, sourcePath, sourceUrl, logger, verbose);
-      const { targetDriveId, targetItemId } = await this.getTargetDriveAndItemId(webUrl, targetUrl, logger, verbose);
-      const requestOptions: CliRequestOptions = this.getRequestOptions(targetDriveId, targetItemId, newName, sourcePath);
+      if (driveId === targetDriveId) {
+        await request.patch(requestOptions);
+      }
+      else {
+        const response: any = await request.post(requestOptions);
+        await this.waitUntilCopyOperationCompleted(response.headers.location, logger);
 
-      const isSameDrive: boolean = driveId === targetDriveId;
-      const apiUrl =
-        isSameDrive
-          ? `${this.resource}/v1.0/sites/${siteId}/drives/${driveId}/items/${itemId}`
-          : `${this.resource}/v1.0/sites/${siteId}/drives/${driveId}/items/${itemId}/copy`;
-
-      const queryParameters: string = nameConflictBehavior && nameConflictBehavior !== 'fail'
-        ? `@microsoft.graph.conflictBehavior=${nameConflictBehavior}`
-        : '';
-      const urlWithQuery = `${apiUrl}${queryParameters ? `?${queryParameters}` : ''}`;
-
-      await this.sendRequest(urlWithQuery, requestOptions, isSameDrive, logger);
-
-      if (!isSameDrive) {
-        const itemUrl = `${this.resource}/v1.0/sites/${siteId}/drives/${driveId}/items/${itemId}`;
+        const itemUrl = `${this.resource}/v1.0/drives/${driveId}/items/${itemId}`;
         await request.delete({ url: itemUrl, headers: requestOptions.headers });
       }
     }
@@ -112,89 +109,30 @@ class FileMoveCommand extends GraphCommand {
     }
   }
 
-  private async sendRequest(url: string, requestOptions: CliRequestOptions, isPatch: boolean, logger: Logger): Promise<any> {
-    if (this.verbose) {
-      logger.logToStderr(`Moving file...`);
-    }
-    requestOptions.url = url;
-
-    const response: any = isPatch ? await request.patch(requestOptions) : await request.post(requestOptions);
-
-    if (isPatch) {
-      return response;
-    }
-    else {
-      await this.waitUntilCopyOperationCompleted(response.headers.location, logger);
-      return response;
-    }
-  }
-
   private getAbsoluteUrl(webUrl: string, url: string): string {
     return url.startsWith('https://') ? url : urlUtil.getAbsoluteUrl(webUrl, url);
   }
 
-  private async getDriveIdAndItemId(webUrl: string, folderUrl: string, sourceUrl: string, logger: Logger, verbose?: boolean): Promise<{ siteId: string, driveId: string, drive: Drive, itemId: string }> {
+  private async getDriveIdAndItemId(webUrl: string, folderUrl: string, sourceUrl: string, logger: Logger, verbose?: boolean): Promise<{ driveId: string, drive: Drive, itemId: string }> {
     const siteId: string = await spo.getSiteId(webUrl, logger, verbose);
-    const drive: Drive = await this.getDocumentLibrary(siteId, new URL(folderUrl), sourceUrl);
-    const itemId: string = await this.getStartingFolderId(drive, new URL(folderUrl));
-    return { siteId, driveId: drive.id as string, drive, itemId };
+    const drive: Drive = await driveUtil.getDriveByUrl(siteId, new URL(folderUrl));
+    const itemId: string = await driveUtil.getDriveItemId(drive, new URL(folderUrl));
+    return { driveId: drive.id as string, drive, itemId };
   }
 
-  private async getDocumentLibrary(siteId: string, folderUrl: URL, folderUrlFromUser: string): Promise<Drive> {
-    const requestOptions: CliRequestOptions = {
-      url: `${this.resource}/v1.0/sites/${siteId}/drives?$select=webUrl,id`,
-      headers: {
-        accept: 'application/json;odata.metadata=none'
-      },
-      responseType: 'json'
-    };
+  private getRequestOptions(sourceDriveId: string, sourceItemId: string, targetDriveId: string, targetItemId: string, newName: string | undefined, sourcePath: string, nameConflictBehavior: string | undefined): CliRequestOptions {
+    const apiUrl =
+      sourceDriveId === targetDriveId
+        ? `${this.resource}/v1.0/drives/${sourceDriveId}/items/${sourceItemId}`
+        : `${this.resource}/v1.0/drives/${sourceDriveId}/items/${sourceItemId}/copy`;
 
-    const drives = await request.get<{ value: Drive[] }>(requestOptions);
-    const lowerCaseFolderUrl: string = folderUrl.href.toLowerCase();
-
-    const drive: Drive | undefined = drives.value
-      .sort((a, b) => (b.webUrl as string).localeCompare(a.webUrl as string))
-      .find((d: Drive) => {
-        const driveUrl: string = (d.webUrl as string).toLowerCase();
-        // ensure that the drive url is a prefix of the folder url
-        return lowerCaseFolderUrl.startsWith(driveUrl) &&
-          (driveUrl.length === lowerCaseFolderUrl.length ||
-            lowerCaseFolderUrl[driveUrl.length] === '/');
-      });
-
-    if (!drive) {
-      throw `Document library '${folderUrlFromUser}' not found`;
-    }
-
-    return drive;
-  }
-
-  private async getStartingFolderId(documentLibrary: Drive, folderUrl: URL): Promise<string> {
-    const documentLibraryRelativeFolderUrl: string = folderUrl.href.replace(new RegExp(`${documentLibrary.webUrl}`, 'i'), '').replace(/\/+$/, '');
+    const queryParameters: string = nameConflictBehavior && nameConflictBehavior !== 'fail'
+      ? `@microsoft.graph.conflictBehavior=${nameConflictBehavior}`
+      : '';
+    const urlWithQuery = `${apiUrl}${queryParameters ? `?${queryParameters}` : ''}`;
 
     const requestOptions: CliRequestOptions = {
-      url: `${this.resource}/v1.0/drives/${documentLibrary.id}/root${documentLibraryRelativeFolderUrl ? `:${documentLibraryRelativeFolderUrl}` : ''}?$select=id`,
-      headers: {
-        accept: 'application/json;odata.metadata=none'
-      },
-      responseType: 'json'
-    };
-
-    const folder = await request.get<DriveItem>(requestOptions);
-
-    return folder?.id as string;
-  }
-
-  private async getTargetDriveAndItemId(webUrl: string, targetUrl: string, logger: Logger, verbose?: boolean): Promise<{ targetDriveId: string, targetItemId: string }> {
-    const targetSiteUrl: string = urlUtil.getTargetSiteAbsoluteUrl(webUrl, targetUrl);
-    const targetFolderUrl: string = this.getAbsoluteUrl(targetSiteUrl, targetUrl);
-    const { driveId, itemId } = await this.getDriveIdAndItemId(targetSiteUrl, targetFolderUrl, targetUrl, logger, verbose);
-    return { targetDriveId: driveId, targetItemId: itemId };
-  }
-
-  private getRequestOptions(targetDriveId: string, targetItemId: string, newName: string | undefined, sourcePath: string): CliRequestOptions {
-    const requestOptions: CliRequestOptions = {
-      url: '',
+      url: urlWithQuery,
       headers: { accept: 'application/json;odata.metadata=none' },
       responseType: 'json',
       fullResponse: true,
