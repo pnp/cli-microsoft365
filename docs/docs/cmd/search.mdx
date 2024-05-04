@@ -15,7 +15,7 @@ m365 search [options]
 ## Options
 
 ```md definition-list
-`-q --queryString [queryString]`
+`-q --queryText [queryText]`
 : Query to be executed in Keyword Query Language (KQL) format.
 
 `-s, --scopes <scopes>`
@@ -53,7 +53,7 @@ m365 search [options]
 
 ## Remarks
 
-The `queryString` option supports [Keyword Query Language](https://learn.microsoft.com/graph/api/resources/search-api-overview#keyword-query-language-kql-support) (KQL).
+The `queryText` option supports [Keyword Query Language](https://learn.microsoft.com/graph/api/resources/search-api-overview#keyword-query-language-kql-support) (KQL).
 
 The `sortBy` option allows to specify the order. By default, the order is ascending. If you want to apply descending order, add `:desc` to the property name, like `createdDateTime:desc`.
 
@@ -62,25 +62,25 @@ The `sortBy` option allows to specify the order. By default, the order is ascend
 Queries messages in the current user mailbox that contain the string "contoso" in any part of the message (the sender name, subject, message body, or any attachments). The query returns the first 100 results.
 
 ```sh
-m365 search --scopes 'message' --query 'contoso' --pageSize 100
+m365 search --scopes 'message' --queryText 'contoso' --pageSize 100
 ```
 
 Queries list items and sites that contain the string "accountt" and requests a spelling modification for the query.
 
 ```sh
-m365 search --scopes 'listItem, site' --query 'accountt' --enableSpellingSuggestion --enableSpellingModification
+m365 search --scopes 'listItem, site' --queryText 'accountt' --enableSpellingSuggestion --enableSpellingModification
 ```
 
 Search for file report.xlsl in specific folder of user personal OneDrive
 
 ```sh
-m365 search --scopes 'driveItem' --query 'filename:report.xlsl AND path:\"https://contoso-my.sharepoint.com/personal/john.doe_contoso_com/Documents/Reports/2024\"'
+m365 search --scopes 'driveItem' --queryText 'filename:report.xlsl AND path:\"https://contoso-my.sharepoint.com/personal/john.doe_contoso_com/Documents/Reports/2024\"'
 ```
 
 Search for all sites
 
 ```sh
-m365 search --scopes 'site' --query 'site:\"https://contoso-my.sharepoint.com/personal/*\"'
+m365 search --scopes 'site' --queryText 'site:\"https://contoso-my.sharepoint.com/personal/*\"'
 ```
 
 ## Response

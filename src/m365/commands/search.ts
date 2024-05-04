@@ -11,7 +11,7 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  queryString?: string;
+  queryText?: string;
   scopes: string;
   startIndex?: number;
   pageSize?: number;
@@ -46,7 +46,7 @@ class SearchCommand extends GraphCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        query: typeof args.options.query !== 'undefined',
+        queryText: typeof args.options.queryText !== 'undefined',
         startIndex: typeof args.options.startIndex !== 'undefined',
         pageSize: typeof args.options.pageSize !== 'undefined',
         allResults: !!args.options.allResults,
@@ -63,7 +63,7 @@ class SearchCommand extends GraphCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '-q --queryString [queryString]'
+        option: '-q --queryText [queryText]'
       },
       {
         option: '-s, --scopes <scopes>',
@@ -117,13 +117,13 @@ class SearchCommand extends GraphCommand {
           return `'${args.options.pageSize}' is not a valid value for option 'pageSize'. Page size must be between 1 and 500.`;
         }
 
-        if (args.options.sortBy && scopes.some(scope => scope === 'message' || scope === 'event')){
+        if (args.options.sortBy && scopes.some(scope => scope === 'message' || scope === 'event')) {
           return 'Sorting the results is not supported for messages and events.';
         }
 
         if (args.options.enableTopResults &&
           ((scopes.length === 1 && scopes.indexOf('message') === -1 && scopes.indexOf('chatMessage') === -1) ||
-          (scopes.length === 2) && !(scopes.indexOf('message') > -1 && scopes.indexOf('chatMessage') > -1))) {
+            (scopes.length === 2) && !(scopes.indexOf('message') > -1 && scopes.indexOf('chatMessage') > -1))) {
           return 'Top results are only supported for messages and chat messages.';
         }
 
@@ -153,7 +153,7 @@ class SearchCommand extends GraphCommand {
               {
                 "entityTypes": args.options.scopes.split(',').map(scope => scope.trim()),
                 "query": {
-                  "queryString": args.options.queryString ?? '*'
+                  "queryString": args.options.queryText ?? '*'
                 },
                 "enableTopResults": args.options.enableTopResults,
                 "from": startIndex,
@@ -193,7 +193,7 @@ class SearchCommand extends GraphCommand {
         if (result.hitsContainers && result.hitsContainers[0].hits) {
           result.hitsContainers[0].hits = searchHits;
         }
-        
+
         await logger.log(result);
       }
     }
