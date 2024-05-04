@@ -12,7 +12,7 @@ import TabItem from '@theme/TabItem';
 
 Author: [Pete Skelly](https://peteskelly.com/lightweight-reports-using-the-office-365-cli-and-jq/)
 
-The [Power Automate Admin Center](https://admin.flow.microsoft.com) provides a list of the Flows in your tenant, but there is no way to easily export Flows from the Flow admin center for governance activities. This script retrieves Flows from the Default Environment and maps creator information from Azure AD to list Flows by owner, state and trigger type.
+The [Power Automate Admin Center](https://admin.flow.microsoft.com) provides a list of the Flows in your tenant, but there is no way to easily export Flows from the Flow admin center for governance activities. This script retrieves Flows from the Default Environment and maps creator information from Microsoft Entra ID to list Flows by owner, state and trigger type.
 
 The `bash` version of this script uses an external file to process owner mapping. This is provided in the jq tab and should be saved to the same folder as the bash script and named `merge.jq`.
 

@@ -255,7 +255,7 @@ class SpoGroupMemberRemoveCommand extends SpoCommand {
     }
 
     if (foundGroups.length === 0) {
-      throw `The Azure AD group ${args.options.entraGroupId || args.options.entraGroupName} is not found in SharePoint group ${args.options.groupId || args.options.groupName}`;
+      throw `The Microsoft Entra group ${args.options.entraGroupId || args.options.entraGroupName} is not found in SharePoint group ${args.options.groupId || args.options.groupName}`;
     }
 
     return foundGroups[0].Id;

@@ -60,6 +60,8 @@ class EntraOAuth2GrantListCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    await this.showDeprecationWarning(logger, aadCommands.OAUTH2GRANT_LIST, commands.OAUTH2GRANT_LIST);
+
     if (this.verbose) {
       await logger.logToStderr(`Retrieving list of OAuth grants for the service principal...`);
     }

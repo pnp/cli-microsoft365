@@ -119,7 +119,7 @@ class EntraAppPermissionListCommand extends GraphCommand {
     const res = await request.get<{ value: { id: string }[] }>(requestOptions);
 
     if (res.value.length === 0) {
-      throw `No Azure AD application registration with ID ${options.appId} found`;
+      throw `No Microsoft Entra application registration with ID ${options.appId} found`;
     }
 
     return res.value[0].id;

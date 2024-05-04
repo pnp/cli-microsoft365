@@ -1,6 +1,6 @@
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
-import request from '../../../../request.js';
+import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
@@ -12,7 +12,9 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   siteUrl: string;
-  ids: string;
+  ids?: string;
+  allPrimary?: boolean;
+  allSecondary?: boolean;
 }
 
 class SpoSiteRecycleBinItemRestoreCommand extends SpoCommand {
@@ -29,6 +31,7 @@ class SpoSiteRecycleBinItemRestoreCommand extends SpoCommand {
 
     this.#initOptions();
     this.#initValidators();
+    this.#initTypes();
   }
 
   #initOptions(): void {
@@ -37,7 +40,13 @@ class SpoSiteRecycleBinItemRestoreCommand extends SpoCommand {
         option: '-u, --siteUrl <siteUrl>'
       },
       {
-        option: '-i, --ids <ids>'
+        option: '-i, --ids [ids]'
+      },
+      {
+        option: '--allPrimary'
+      },
+      {
+        option: '--allSecondary'
       }
     );
   }
@@ -50,11 +59,19 @@ class SpoSiteRecycleBinItemRestoreCommand extends SpoCommand {
           return isValidSharePointUrl;
         }
 
-        const invalidIds = formatting
-          .splitAndTrim(args.options.ids)
-          .filter(id => !validation.isValidGuid(id));
-        if (invalidIds.length > 0) {
-          return `The following IDs are invalid: ${invalidIds.join(', ')}`;
+        if (args.options.ids) {
+          const invalidIds = formatting
+            .splitAndTrim(args.options.ids)
+            .filter(id => !validation.isValidGuid(id));
+
+          if (invalidIds.length > 0) {
+            return `The following IDs are invalid: ${invalidIds.join(', ')}`;
+          }
+        }
+
+        if ((!args.options.ids && !args.options.allPrimary && !args.options.allSecondary)
+          || (args.options.ids && (args.options.allPrimary || args.options.allSecondary))) {
+          return `Option 'ids' cannot be used with 'allPrimary' or 'allSecondary'.`;
         }
 
         return true;
@@ -62,42 +79,74 @@ class SpoSiteRecycleBinItemRestoreCommand extends SpoCommand {
     );
   }
 
+  #initTypes(): void {
+    this.types.string.push('siteUrl', 'ids');
+    this.types.boolean.push('allPrimary', 'allSecondary');
+  }
+
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
       await logger.logToStderr(`Restoring items from recycle bin at ${args.options.siteUrl}...`);
     }
 
-    const requestUrl: string = `${args.options.siteUrl}/_api/site/RecycleBin/RestoreByIds`;
-
-    const ids: string[] = formatting.splitAndTrim(args.options.ids);
-    const idsChunks: string[][] = [];
-
-    while (ids.length) {
-      idsChunks.push(ids.splice(0, 20));
-    }
+    const baseUrl: string = `${args.options.siteUrl}/_api`;
 
     try {
-      await Promise.all(
-        idsChunks.map((idsChunk: string[]) => {
-          const requestOptions: any = {
-            url: requestUrl,
-            headers: {
-              'accept': 'application/json;odata=nometadata',
-              'content-type': 'application/json'
-            },
-            responseType: 'json',
-            data: {
-              ids: idsChunk
-            }
-          };
+      if (args.options.ids) {
+        const requestUrl = baseUrl + '/site/RecycleBin/RestoreByIds';
+        const ids: string[] = formatting.splitAndTrim(args.options.ids);
+        const idsChunks: string[][] = [];
 
-          return request.post(requestOptions);
-        })
-      );
+        while (ids.length) {
+          idsChunks.push(ids.splice(0, 20));
+        }
+
+        await Promise.all(
+          idsChunks.map((idsChunk: string[]) => {
+            const requestOptions: CliRequestOptions = {
+              url: requestUrl,
+              headers: {
+                'accept': 'application/json;odata=nometadata',
+                'content-type': 'application/json'
+              },
+              responseType: 'json',
+              data: {
+                ids: idsChunk
+              }
+            };
+
+            return request.post(requestOptions);
+          })
+        );
+      }
+      else {
+        if (args.options.allPrimary && args.options.allSecondary) {
+          await this.restoreRecycleBinStage(baseUrl + '/site/RecycleBin/RestoreAll');
+        }
+        else if (args.options.allPrimary) {
+          await this.restoreRecycleBinStage(baseUrl + '/web/RecycleBin/RestoreAll');
+        }
+        else if (args.options.allSecondary) {
+          await this.restoreRecycleBinStage(baseUrl + '/site/GetRecycleBinItems(rowLimit=2000000000,itemState=2)/RestoreAll');
+        }
+      }
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
+  }
+
+  private async restoreRecycleBinStage(requestUrl: string): Promise<void> {
+    const requestOptions: CliRequestOptions = {
+      url: requestUrl,
+      headers: {
+        accept: 'application/json;odata=nometadata',
+        'content-type': 'application/json'
+      },
+      responseType: 'json'
+    };
+
+    return request.post(requestOptions);
   }
 }
 

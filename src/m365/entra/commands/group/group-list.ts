@@ -77,6 +77,8 @@ class EntraGroupListCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    await this.showDeprecationWarning(logger, aadCommands.GROUP_LIST, commands.GROUP_LIST);
+
     try {
       let requestUrl: string = `${this.resource}/v1.0/groups`;
       let useConsistencyLevelHeader = false;

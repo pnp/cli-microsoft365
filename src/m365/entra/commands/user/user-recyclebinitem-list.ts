@@ -23,6 +23,8 @@ class EntraUserRecycleBinItemListCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger): Promise<void> {
+    await this.showDeprecationWarning(logger, aadCommands.USER_RECYCLEBINITEM_LIST, commands.USER_RECYCLEBINITEM_LIST);
+
     if (this.verbose) {
       await logger.logToStderr('Retrieving users from the recycle bin...');
     }

@@ -27,7 +27,7 @@ m365 spfx doctor [options]
 : JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
 
 `-o, --output [output]`
-: Output type. `text`. Default `text`
+: Output type. `text` or `json`. Default `text`
 
 `--verbose`
 : Runs command with verbose logging
@@ -56,7 +56,7 @@ Checks ran by this command are based on what is officially supported by Microsof
 
 :::info
 
-This command supports only text output.
+This command supports only text or json output.
 
 :::
 
@@ -80,11 +80,67 @@ Verify if your environment meets the requirements to work with SharePoint Framew
 m365 spfx doctor --spfxVersion 1.11.0 --output text
 ```
 
+Verify if your environment meets the requirements to work with SharePoint Framework v1.11.0 and outputs it in a JSON format.
+
+```sh
+m365 spfx doctor --spfxVersion 1.11.0 --output json
+```
+
 ## Response
 
 ### Response with no issues
 
 <Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  [
+    {
+      "check": "SharePoint Framework",
+      "passed": true,
+      "version": "1.18.2",
+      "message": "SharePoint Framework v1.18.2 valid."
+    },
+    {
+      "check": "SharePoint Framework",
+      "passed": true,
+      "version": "1.18.2",
+      "message": "SharePoint Framework v1.18.2"
+    },
+    {
+      "check": "env",
+      "passed": true,
+      "message": "Supported in SPO",
+      "version": "spo"
+    },
+    {
+      "check": "Node",
+      "passed": true,
+      "message": "Node v18.18.2",
+      "version": "18.18.2"
+    },
+    {
+      "check": "yo",
+      "passed": true,
+      "message": "yo v5.0.0",
+      "version": "5.0.0"
+    },
+    {
+      "check": "gulp-cli",
+      "passed": true,
+      "message": "gulp-cli v2.3.0",
+      "version": "2.3.0"
+    },
+    {
+      "check": "typescript",
+      "passed": true,
+      "message": "bundled typescript used"
+    }
+  ]
+  ```
+
+  </TabItem>
+
   <TabItem value="Text">
 
   ```text
@@ -106,6 +162,56 @@ m365 spfx doctor --spfxVersion 1.11.0 --output text
 When the installed version of Yeoman is lower than expected to run SharePoint Framework v1.15.0
 
 <Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  [
+    {
+      "check": "SharePoint Framework",
+      "passed": true,
+      "version": "1.15.0",
+      "message": "SharePoint Framework v1.15.0 valid."
+    },
+    {
+      "check": "SharePoint Framework",
+      "passed": true,
+      "version": "1.15.0",
+      "message": "SharePoint Framework v1.15.0"
+    },
+    {
+      "check": "env",
+      "passed": true,
+      "message": "Supported in SPO",
+      "version": "spo"
+    },
+    {
+      "check": "Node",
+      "passed": true,
+      "message": "Node v16.18.0",
+      "version": "16.18.0"
+    },
+    {
+      "check": "yo",
+      "passed": false,
+      "message": "yo v3.1.1 found, v^4 required",
+      "version": "3.1.1",
+      "fix": "npm i -g yo@4"
+    },
+    {
+      "check": "gulp-cli",
+      "passed": true,
+      "message": "gulp-cli v2.3.0",
+      "version": "2.3.0"
+    },
+    {
+      "check": "typescript",
+      "passed": true,
+      "message": "bundled typescript used"
+    }
+  ]
+  ```
+
+  </TabItem>
   <TabItem value="Text">
 
   ```text

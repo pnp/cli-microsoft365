@@ -44,7 +44,8 @@ describe(commands.SITE_RECYCLEBINITEM_RESTORE, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      request.post
+      request.post,
+      cli.getSettingWithDefaultValue
     ]);
   });
 
@@ -74,6 +75,26 @@ describe(commands.SITE_RECYCLEBINITEM_RESTORE, () => {
   it('fails validation if the second id is not a valid GUID', async () => {
     const actual = await command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com', ids: '5fb84a1f-6ab5-4d07-a6aa-31bba6de9526, 9526' } }, commandInfo);
     assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if no options are specified', async () => {
+    const actual = await command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if ids and allPrimary options are specified together', async () => {
+    const actual = await command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com', ids: '5fb84a1f-6ab5-4d07-a6aa-31bba6de9526', allPrimary: true } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if ids and allSecondary options are specified together', async () => {
+    const actual = await command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com', ids: '5fb84a1f-6ab5-4d07-a6aa-31bba6de9526', allSecondary: true } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('passes validation if allPrimary and allSecondary options are specified together', async () => {
+    const actual = await command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com', allPrimary: true, allSecondary: true } }, commandInfo);
+    assert.strictEqual(actual, true);
   });
 
   it('passes validation if the siteUrl and ids options are valid', async () => {
@@ -117,7 +138,65 @@ describe(commands.SITE_RECYCLEBINITEM_RESTORE, () => {
     assert.equal(result, undefined);
   });
 
-  it('catches error when restores all items from recyclebin', async () => {
+  it('restores all items from the first-stage recycle bin', async () => {
+    const postRequestStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso.sharepoint.com/_api/web/RecycleBin/RestoreAll') {
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options: {
+        siteUrl: 'https://contoso.sharepoint.com',
+        allPrimary: true
+      }
+    });
+
+    assert(postRequestStub.calledOnce);
+  });
+
+  it('restores all items from the second-stage recycle bin', async () => {
+    const postRequestStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso.sharepoint.com/_api/site/GetRecycleBinItems(rowLimit=2000000000,itemState=2)/RestoreAll') {
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options: {
+        siteUrl: 'https://contoso.sharepoint.com',
+        allSecondary: true
+      }
+    });
+
+    assert(postRequestStub.calledOnce);
+  });
+
+  it('restores all items from the first-stage and second-stage recycle bins', async () => {
+    const postRequestStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso.sharepoint.com/_api/site/RecycleBin/RestoreAll') {
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options: {
+        siteUrl: 'https://contoso.sharepoint.com',
+        allPrimary: true,
+        allSecondary: true
+      }
+    });
+
+    assert(postRequestStub.calledOnce);
+  });
+
+  it('catches error when restores all items from recycle bin', async () => {
     sinon.stub(request, 'post').callsFake(() => {
       throw 'Invalid request';
     });

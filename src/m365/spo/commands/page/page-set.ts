@@ -1,7 +1,5 @@
 import { Auth } from '../../../../Auth.js';
-import { cli, CommandOutput } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
-import Command from '../../../../Command.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
@@ -10,8 +8,6 @@ import { urlUtil } from '../../../../utils/urlUtil.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
-import spoFileGetCommand, { Options as spoFileGetOptions } from '../file/file-get.js';
-import spoListItemSetCommand, { Options as spoListItemSetOptions } from '../listitem/listitem-set.js';
 import { Page, supportedPageLayouts, supportedPromoteAs } from './Page.js';
 
 interface CommandArgs {
@@ -120,6 +116,10 @@ class SpoPageSetCommand extends SpoCommand {
           return isValidSharePointUrl;
         }
 
+        if (!args.options.layoutType && !args.options.promoteAs && !args.options.demoteFrom && args.options.commentsEnabled === undefined && !args.options.publish && !args.options.description && !args.options.title && !args.options.content) {
+          return 'Specify at least one option to update.';
+        }
+
         if (args.options.layoutType &&
           supportedPageLayouts.indexOf(args.options.layoutType) < 0) {
           return `${args.options.layoutType} is not a valid option for layoutType. Allowed values ${supportedPageLayouts.join(', ')}`;
@@ -176,6 +176,10 @@ class SpoPageSetCommand extends SpoCommand {
     }
     const listServerRelativeUrl = `${urlUtil.getServerRelativeSiteUrl(args.options.webUrl)}/sitepages`;
     const serverRelativeFileUrl: string = `${listServerRelativeUrl}/${pageName}`;
+
+    const listUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, listServerRelativeUrl);
+    const requestUrl = `${args.options.webUrl}/_api/web/GetList('${formatting.encodeQueryParameter(listUrl)}')`;
+
     const needsToSavePage = !!args.options.title || !!args.options.description;
 
     try {
@@ -196,21 +200,16 @@ class SpoPageSetCommand extends SpoCommand {
       }
 
       if (args.options.layoutType) {
-        const itemId = await this.getFileListItemId(args.options.webUrl, serverRelativeFileUrl);
-        const listItemSetOptions: spoListItemSetOptions = {
-          webUrl: args.options.webUrl,
-          listUrl: listServerRelativeUrl,
-          id: itemId,
-          systemUpdate: true,
-          PageLayoutType: args.options.layoutType,
-          verbose: this.verbose,
-          debug: this.debug
+        const file = await spo.getFileAsListItemByUrl(args.options.webUrl, serverRelativeFileUrl, logger, this.verbose);
+        const itemId = file.Id;
+        const listItemSetOptions: any = {
+          PageLayoutType: args.options.layoutType
         };
         if (args.options.layoutType === 'Article') {
           listItemSetOptions.PromotedState = 0;
           listItemSetOptions.BannerImageUrl = `${resource}/_layouts/15/images/sitepagethumbnail.png, /_layouts/15/images/sitepagethumbnail.png`;
         }
-        await cli.executeCommand(spoListItemSetCommand as Command, { options: { ...listItemSetOptions, _: [] } });
+        await spo.systemUpdateListItem(requestUrl, itemId, logger, this.verbose, listItemSetOptions);
       }
       if (args.options.promoteAs) {
         const requestOptions: CliRequestOptions = {
@@ -233,21 +232,17 @@ class SpoPageSetCommand extends SpoCommand {
             await request.post(requestOptions);
             break;
           case 'NewsPage':
-            const newsPageItemId = await this.getFileListItemId(args.options.webUrl, serverRelativeFileUrl);
-            const listItemSetOptions: spoListItemSetOptions = {
-              webUrl: args.options.webUrl,
-              listUrl: listServerRelativeUrl,
-              id: newsPageItemId,
-              systemUpdate: true,
+            const newsPageItem = await spo.getFileAsListItemByUrl(args.options.webUrl, serverRelativeFileUrl, logger, this.verbose);
+            const newsPageItemId = newsPageItem.Id;
+            const listItemSetOptions: any = {
               PromotedState: 2,
-              FirstPublishedDate: new Date().toISOString(),
-              verbose: this.verbose,
-              debug: this.debug
+              FirstPublishedDate: new Date().toISOString()
             };
-            await cli.executeCommand(spoListItemSetCommand as Command, { options: { ...listItemSetOptions, _: [] } });
+            await spo.systemUpdateListItem(requestUrl, newsPageItemId, logger, this.verbose, listItemSetOptions);
             break;
           case 'Template':
-            const templateItemId = await this.getFileListItemId(args.options.webUrl, serverRelativeFileUrl);
+            const templateItem = await spo.getFileAsListItemByUrl(args.options.webUrl, serverRelativeFileUrl, logger, this.verbose);
+            const templateItemId = templateItem.Id;
             requestOptions.headers = {
               'X-RequestDigest': requestDigest,
               'content-type': 'application/json;odata=nometadata',
@@ -350,17 +345,12 @@ class SpoPageSetCommand extends SpoCommand {
       }
 
       if (args.options.demoteFrom === 'NewsPage') {
-        const fileId = await this.getFileListItemId(args.options.webUrl, serverRelativeFileUrl);
-        const listItemSetOptions: spoListItemSetOptions = {
-          webUrl: args.options.webUrl,
-          listUrl: listServerRelativeUrl,
-          id: fileId,
-          systemUpdate: true,
-          PromotedState: 0,
-          verbose: this.verbose,
-          debug: this.debug
+        const file = await spo.getFileAsListItemByUrl(args.options.webUrl, serverRelativeFileUrl, logger, this.verbose);
+        const fileId = file.Id;
+        const listItemSetOptions: any = {
+          PromotedState: 0
         };
-        await cli.executeCommandWithOutput(spoListItemSetCommand as Command, { options: { ...listItemSetOptions, _: [] } });
+        await spo.systemUpdateListItem(requestUrl, fileId, logger, this.verbose, listItemSetOptions);
       }
 
       let requestOptions: CliRequestOptions;
@@ -397,19 +387,6 @@ class SpoPageSetCommand extends SpoCommand {
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
-  }
-
-  private async getFileListItemId(webUrl: string, serverRelativeFileUrl: string): Promise<string> {
-    const fileGetOptions: spoFileGetOptions = {
-      webUrl: webUrl,
-      url: serverRelativeFileUrl,
-      asListItem: true,
-      verbose: this.verbose,
-      debug: this.debug
-    };
-    const fileGetOutput: CommandOutput = await cli.executeCommandWithOutput(spoFileGetCommand as Command, { options: { ...fileGetOptions, _: [] } });
-    const fileGetOutputJson = JSON.parse(fileGetOutput.stdout);
-    return fileGetOutputJson.Id;
   }
 }
 

@@ -6,6 +6,11 @@ import request, { CliRequestOptions } from '../../../../request.js';
 import { entraGroup } from '../../../../utils/entraGroup.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
+import { validation } from '../../../../utils/validation.js';
+import { accessToken } from '../../../../utils/accessToken.js';
+import auth from '../../../../Auth.js';
+import { entraUser } from '../../../../utils/entraUser.js';
+import { formatting } from '../../../../utils/formatting.js';
 
 interface CommandArgs {
   options: Options;
@@ -16,6 +21,12 @@ interface Options extends GlobalOptions {
   name?: string;
   template?: string;
   wait?: boolean;
+  ownerUserNames?: string;
+  ownerIds?: string;
+  ownerEmails?: string;
+  memberUserNames?: string;
+  memberIds?: string;
+  memberEmails?: string;
 }
 
 class TeamsTeamAddCommand extends GraphCommand {
@@ -34,6 +45,7 @@ class TeamsTeamAddCommand extends GraphCommand {
 
     this.#initTelemetry();
     this.#initOptions();
+    this.#initValidators();
     this.#initOptionSets();
   }
 
@@ -43,7 +55,13 @@ class TeamsTeamAddCommand extends GraphCommand {
         name: typeof args.options.name !== 'undefined',
         description: typeof args.options.description !== 'undefined',
         template: typeof args.options.template !== 'undefined',
-        wait: !!args.options.wait
+        wait: !!args.options.wait,
+        ownerUserNames: typeof args.options.ownerUserNames !== 'undefined',
+        ownerIds: typeof args.options.ownerIds !== 'undefined',
+        ownerEmails: typeof args.options.ownerEmails !== 'undefined',
+        memberUserNames: typeof args.options.memberUserNames !== 'undefined',
+        memberIds: typeof args.options.memberIds !== 'undefined',
+        memberEmails: typeof args.options.memberEmails !== 'undefined'
       });
     });
   }
@@ -61,6 +79,68 @@ class TeamsTeamAddCommand extends GraphCommand {
       },
       {
         option: '--wait'
+      },
+      {
+        option: '--ownerUserNames [ownerUserNames]'
+      },
+      {
+        option: '--ownerIds [ownerIds]'
+      },
+      {
+        option: '--ownerEmails [ownerEmails]'
+      },
+      {
+        option: '--memberUserNames [memberUserNames]'
+      },
+      {
+        option: '--memberIds [memberIds]'
+      },
+      {
+        option: '--memberEmails [memberEmails]'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (args.options.ownerUserNames) {
+          const isValidUserPrincipalNameArray = validation.isValidUserPrincipalNameArray(formatting.splitAndTrim(args.options.ownerUserNames));
+          if (isValidUserPrincipalNameArray !== true) {
+            return `Owner username '${isValidUserPrincipalNameArray}' is invalid for option 'ownerUserNames'.`;
+          }
+        }
+
+        if (args.options.ownerEmails) {
+          const isValidUserPrincipalNameArray = validation.isValidUserPrincipalNameArray(formatting.splitAndTrim(args.options.ownerEmails));
+          if (isValidUserPrincipalNameArray !== true) {
+            return `Owner email '${isValidUserPrincipalNameArray}' is invalid for option 'ownerEmails'.`;
+          }
+        }
+
+        if (args.options.ownerIds && !validation.isValidGuidArray(formatting.splitAndTrim(args.options.ownerIds))) {
+          return `The option 'ownerIds' contains one or more invalid GUIDs.`;
+        }
+
+        if (args.options.memberUserNames) {
+          const isValidUserPrincipalNameArray = validation.isValidUserPrincipalNameArray(formatting.splitAndTrim(args.options.memberUserNames));
+          if (isValidUserPrincipalNameArray !== true) {
+            return `Member username '${isValidUserPrincipalNameArray}' is invalid for option 'memberUserNames'.`;
+          }
+        }
+
+        if (args.options.memberEmails) {
+          const isValidUserPrincipalNameArray = validation.isValidUserPrincipalNameArray(formatting.splitAndTrim(args.options.memberEmails));
+          if (isValidUserPrincipalNameArray !== true) {
+            return `Member email '${isValidUserPrincipalNameArray}' is invalid for option 'memberEmails'.`;
+          }
+        }
+
+        if (args.options.memberIds && !validation.isValidGuidArray(formatting.splitAndTrim(args.options.memberIds))) {
+          return `The option 'memberIds' contains one or more invalid GUIDs`;
+        }
+
+        return true;
       }
     );
   }
@@ -78,11 +158,29 @@ class TeamsTeamAddCommand extends GraphCommand {
         runsWhen: (args) => {
           return !args.options.template;
         }
+      },
+      {
+        options: ['ownerUserNames', 'ownerIds', 'ownerEmails'],
+        runsWhen: (args) => {
+          return args.options.ownerUserNames || args.options.ownerIds || args.options.ownerEmails;
+        }
+      },
+      {
+        options: ['memberUserNames', 'memberIds', 'memberEmails'],
+        runsWhen: (args) => {
+          return args.options.memberUserNames || args.options.memberIds || args.options.memberEmails;
+        }
       }
     );
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    const isAppOnlyAccessToken = accessToken.isAppOnlyAccessToken(auth.connection.accessTokens[this.resource].accessToken)!;
+
+    if (isAppOnlyAccessToken && !args.options.ownerUserNames && !args.options.ownerIds && !args.options.ownerEmails) {
+      this.handleError(`Specify at least 'ownerUserNames', 'ownerIds' or 'ownerEmails' when using application permissions.`);
+    }
+
     let requestBody: any;
     if (args.options.template) {
       if (this.verbose) {
@@ -116,6 +214,23 @@ class TeamsTeamAddCommand extends GraphCommand {
       };
     }
 
+    let members: TeamMember[] = [];
+
+    if (args.options.ownerEmails || args.options.ownerIds || args.options.ownerUserNames) {
+      await this.retrieveMembersToAdd(members, 'owner', args.options.ownerEmails, args.options.ownerIds, args.options.ownerUserNames);
+    }
+
+    if (args.options.memberEmails || args.options.memberIds || args.options.memberUserNames) {
+      await this.retrieveMembersToAdd(members, 'member', args.options.memberEmails, args.options.memberIds, args.options.memberUserNames);
+    }
+
+    // We filter out the first owner here and add it to the request body when we are using application only permissions. This is required or the Graph API will throw an error.
+    if (members.length > 0 && members.filter(y => y.roles.includes('owner')).length > 0 && isAppOnlyAccessToken) {
+      const groupOwner = members.filter(y => y.roles.includes('owner')).slice(0, 1);
+      members = members.filter(y => y !== groupOwner[0]);
+      requestBody.members = groupOwner;
+    }
+
     const requestOptionsPost: CliRequestOptions = {
       url: `${this.resource}/v1.0/teams`,
       headers: {
@@ -137,17 +252,37 @@ class TeamsTeamAddCommand extends GraphCommand {
 
       const teamsAsyncOperation: TeamsAsyncOperation = await request.get<TeamsAsyncOperation>(requestOptions);
 
-      if (!args.options.wait) {
+      if (!args.options.wait && members.length === 0) {
         await logger.log(teamsAsyncOperation);
       }
       else {
         await this.waitUntilTeamFinishedProvisioning(teamsAsyncOperation, requestOptions, logger);
         const entraGroup = await this.getEntraGroup(teamsAsyncOperation.targetResourceId!, logger);
+        if (members.length > 0) {
+          if (this.verbose) {
+            await logger.logToStderr('Adding members to the team...');
+          }
+          await this.addMembers(members, entraGroup.id!);
+        }
         await logger.log(entraGroup);
       }
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
+    }
+  }
+
+  private async addMembers(members: TeamMember[], groupId: string): Promise<void> {
+    for (const member of members) {
+      const requestOptions: CliRequestOptions = {
+        url: `${this.resource}/v1.0/teams/${groupId}/members`,
+        headers: {
+          'content-type': 'application/json;odata.metadata=none'
+        },
+        responseType: 'json',
+        data: member
+      };
+      await request.post(requestOptions);
     }
   }
 
@@ -187,6 +322,41 @@ class TeamsTeamAddCommand extends GraphCommand {
 
     return group!;
   }
+
+  private async retrieveMembersToAdd(members: TeamMember[], role: string, emails?: string, ids?: string, userNames?: string): Promise<void> {
+    let itemsToProcess: string[] = [];
+
+    if (emails) {
+      itemsToProcess = await entraUser.getUserIdsByEmails(formatting.splitAndTrim(emails));
+    }
+    else if (ids) {
+      itemsToProcess = formatting.splitAndTrim(ids);
+    }
+    else if (userNames) {
+      itemsToProcess = await entraUser.getUserIdsByUpns(formatting.splitAndTrim(userNames));
+    }
+
+    itemsToProcess.map((item: string) => {
+      const member = members.find((y: TeamMember) => y['user@odata.bind'] === `https://graph.microsoft.com/v1.0/users('${item}')`);
+
+      if (!member) {
+        members.push({
+          '@odata.type': '#microsoft.graph.aadUserConversationMember',
+          'user@odata.bind': `https://graph.microsoft.com/v1.0/users('${item}')`,
+          roles: [role]
+        });
+      }
+      else {
+        member.roles.push(role);
+      }
+    });
+  }
+}
+
+export interface TeamMember {
+  "@odata.type": string
+  roles: string[]
+  "user@odata.bind": string
 }
 
 export default new TeamsTeamAddCommand();

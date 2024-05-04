@@ -134,7 +134,7 @@ describe(commands.USER_ADD, () => {
     assert.deepStrictEqual(alias, [aadCommands.USER_ADD]);
   });
 
-  it('creates Azure AD user using a preset password but requiring the user to change it the next login', async () => {
+  it('creates Microsoft Entra user using a preset password but requiring the user to change it the next login', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === graphBaseUrl) {
         return userResponseWithoutPassword;
@@ -148,7 +148,7 @@ describe(commands.USER_ADD, () => {
     assert(loggerLogSpy.calledWith(userResponseWithPassword));
   });
 
-  it('creates a disabled Azure AD user and set custom mailNickname', async () => {
+  it('creates a disabled Microsoft Entra user and set custom mailNickname', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === graphBaseUrl) {
         return userResponseWithoutPassword;
@@ -161,7 +161,7 @@ describe(commands.USER_ADD, () => {
     assert(loggerLogSpy.calledWith(userResponseWithPassword));
   });
 
-  it('creates Azure AD user and set its manager by id', async () => {
+  it('creates Microsoft Entra user and set its manager by id', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === graphBaseUrl) {
         return userResponseWithoutPassword;
@@ -182,7 +182,7 @@ describe(commands.USER_ADD, () => {
     assert.strictEqual(putStub.lastCall.args[0].data['@odata.id'], `${graphBaseUrl}/${managerUserId}`);
   });
 
-  it('creates Azure AD user and set its manager by user principal name', async () => {
+  it('creates Microsoft Entra user and set its manager by user principal name', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === graphBaseUrl) {
         return userResponseWithoutPassword;

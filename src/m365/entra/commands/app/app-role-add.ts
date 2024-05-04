@@ -112,12 +112,14 @@ class EntraAppRoleAddCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    await this.showDeprecationWarning(logger, aadCommands.APP_ROLE_ADD, commands.APP_ROLE_ADD);
+
     try {
       const appId = await this.getAppObjectId(args, logger);
       const appInfo = await this.getAppInfo(appId, logger);
 
       if (this.verbose) {
-        await logger.logToStderr(`Adding role ${args.options.name} to Azure AD app ${appInfo.id}...`);
+        await logger.logToStderr(`Adding role ${args.options.name} to Microsoft Entra app ${appInfo.id}...`);
       }
 
       const requestOptions: CliRequestOptions = {
@@ -146,7 +148,7 @@ class EntraAppRoleAddCommand extends GraphCommand {
 
   private async getAppInfo(appId: string, logger: Logger): Promise<AppInfo> {
     if (this.verbose) {
-      await logger.logToStderr(`Retrieving information about roles for Azure AD app ${appId}...`);
+      await logger.logToStderr(`Retrieving information about roles for Microsoft Entra app ${appId}...`);
     }
 
     const requestOptions: CliRequestOptions = {
@@ -181,7 +183,7 @@ class EntraAppRoleAddCommand extends GraphCommand {
     const { appId, appName } = args.options;
 
     if (this.verbose) {
-      await logger.logToStderr(`Retrieving information about Azure AD app ${appId ? appId : appName}...`);
+      await logger.logToStderr(`Retrieving information about Microsoft Entra app ${appId ? appId : appName}...`);
     }
 
     const filter: string = appId ?
@@ -204,11 +206,11 @@ class EntraAppRoleAddCommand extends GraphCommand {
 
     if (res.value.length === 0) {
       const applicationIdentifier = appId ? `ID ${appId}` : `name ${appName}`;
-      throw `No Azure AD application registration with ${applicationIdentifier} found`;
+      throw `No Microsoft Entra application registration with ${applicationIdentifier} found`;
     }
 
     const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', res.value);
-    const result = await cli.handleMultipleResultsFound<{ id: string }>(`Multiple Azure AD application registration with name '${appName}' found.`, resultAsKeyValuePair);
+    const result = await cli.handleMultipleResultsFound<{ id: string }>(`Multiple Microsoft Entra application registrations with name '${appName}' found.`, resultAsKeyValuePair);
     return result.id;
   }
 }

@@ -658,10 +658,10 @@ describe(commands.PERMISSION_LIST, () => {
     });
 
     await assert.rejects(command.action(logger, { options: {} }),
-      new CommandError('No Azure AD application registration with ID 9c79078b-815e-4a3e-bb80-2aaf2d9e9b3d found'));
+      new CommandError('No Microsoft Entra application registration with ID 9c79078b-815e-4a3e-bb80-2aaf2d9e9b3d found'));
   });
 
-  it('handles error when retrieving service principal for the AAD app', async () => {
+  it('handles error when retrieving service principal for the Microsoft Entra app', async () => {
     sinon.stub(request, 'get').callsFake(async opts => {
       switch (opts.url) {
         case `https://graph.microsoft.com/v1.0/servicePrincipals?$filter=appId eq '9c79078b-815e-4a3e-bb80-2aaf2d9e9b3d'&$select=appId,id,displayName`:
@@ -898,7 +898,7 @@ describe(commands.PERMISSION_LIST, () => {
     await assert.rejects(command.action(logger, { options: {} }), new CommandError(`An error has occurred`));
   });
 
-  it('handles error when retrieving AAD app registration', async () => {
+  it('handles error when retrieving Microsoft Entra registration', async () => {
     sinon.stub(request, 'get').callsFake(async opts => {
       switch (opts.url) {
         case `https://graph.microsoft.com/v1.0/servicePrincipals?$filter=appId eq '9c79078b-815e-4a3e-bb80-2aaf2d9e9b3d'&$select=appId,id,displayName`:

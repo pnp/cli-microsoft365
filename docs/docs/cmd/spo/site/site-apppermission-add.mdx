@@ -22,17 +22,17 @@ m365 spo site apppermission add [options]
 : Permission to site (`read`, `write`, `manage` or `fullcontrol`)
 
 `-i, --appId [appId]`
-: Client ID of the Azure AD app for which to grant permissions
+: Client ID of the Microsoft Entra app for which to grant permissions
 
 `-n, --appDisplayName [appDisplayName]`
-: Display name of the Azure AD app for which to grant permissions
+: Display name of the Microsoft Entra app for which to grant permissions
 ```
 
 <Global />
 
 ## Remarks
 
-To set permissions, specify at minimum either `appId` or `addDisplayName`. For best performance specify both values to avoid extra lookup.
+To set permissions, specify at minimum either `appId` or `appDisplayName`. For best performance specify both values to avoid extra lookup.
 
 ## Example
 

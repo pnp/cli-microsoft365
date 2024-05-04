@@ -26,7 +26,7 @@ class SpoSiteAppPermissionRemoveCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'Removes an application permission from the site';
+    return 'Removes a specific application permission from a site';
   }
 
   constructor() {
@@ -44,7 +44,7 @@ class SpoSiteAppPermissionRemoveCommand extends GraphCommand {
         appId: typeof args.options.appId !== 'undefined',
         appDisplayName: typeof args.options.appDisplayName !== 'undefined',
         id: typeof args.options.id !== 'undefined',
-        force: (!!args.options.force).toString()
+        force: !!args.options.force
       });
     });
   }
@@ -114,7 +114,7 @@ class SpoSiteAppPermissionRemoveCommand extends GraphCommand {
 
   private async getPermissionIds(siteId: string, options: Options): Promise<string[]> {
     if (options.id) {
-      return Promise.resolve([options.id!]);
+      return [options.id!];
     }
 
     const permissionsObject = await this.getPermissions(siteId);
@@ -131,7 +131,7 @@ class SpoSiteAppPermissionRemoveCommand extends GraphCommand {
     const spRequestOptions: any = {
       url: `${this.resource}/v1.0/sites/${siteId}/permissions/${permissionId}`,
       headers: {
-        'accept': 'application/json;odata.metadata=none'
+        accept: 'application/json;odata.metadata=none'
       },
       responseType: 'json'
     };
@@ -141,18 +141,18 @@ class SpoSiteAppPermissionRemoveCommand extends GraphCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (args.options.force) {
-      await this.removeSiteAppPermission(logger, args.options);
+      await this.removeSiteAppPermission(args.options);
     }
     else {
       const result = await cli.promptForConfirmation({ message: `Are you sure you want to remove the specified application permission from site ${args.options.siteUrl}?` });
 
       if (result) {
-        await this.removeSiteAppPermission(logger, args.options);
+        await this.removeSiteAppPermission(args.options);
       }
     }
   }
 
-  private async removeSiteAppPermission(logger: Logger, options: Options): Promise<void> {
+  private async removeSiteAppPermission(options: Options): Promise<void> {
     try {
       const siteId = await spo.getSpoGraphSiteId(options.siteUrl);
       const permissionIdsToRemove: string[] = await this.getPermissionIds(siteId, options);
@@ -162,8 +162,7 @@ class SpoSiteAppPermissionRemoveCommand extends GraphCommand {
         tasks.push(this.removePermissions(siteId, permissionId));
       }
 
-      const response = await Promise.all(tasks);
-      await logger.log(response);
+      await Promise.all(tasks);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);

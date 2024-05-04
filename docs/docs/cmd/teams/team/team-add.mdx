@@ -26,6 +26,24 @@ m365 teams team add [options]
 
 `--wait`
 : Wait for the team to be provisioned before completing the command.
+
+`--ownerUserNames [ownerUserNames]`
+: User principal names of the owners to set, separated by a `,`. Specify either `ownerUserNames`, `ownerIds` or `ownerEmails`.
+
+`--ownerIds [ownerIds]`
+: Ids of the owners to set, separated by a `,`. Specify either `ownerUserNames`, `ownerIds` or `ownerEmails`.
+
+`--ownerEmails [ownerEmails]`
+: Email addresses of the owners to set, separated by a `,`. Specify either `ownerUserNames`, `ownerIds` or `ownerEmails`.
+
+`--memberUserNames [memberUserNames]`
+: User principal names of the members to set, separated by a `,`. Specify either `memberUserNames`, `memberIds` or `memberEmails`.
+
+`--memberIds [memberIds]`
+: Ids of the members to set, separated by a `,`. Specify either `memberUserNames`, `memberIds` or `memberEmails`.
+
+`--memberEmails [memberEmails]`
+: Email addresses of the members to set, separated by a `,`. Specify either `memberUserNames`, `memberIds` or `memberEmails`.
 ```
 
 <Global />
@@ -36,12 +54,18 @@ If you want to add a Team to an existing Microsoft 365 Group use the [entra m365
 
 This command will return different responses based on the presence of the `--wait` option. If present, the command will return a `group` resource in the response. If not present, the command will return a `teamsAsyncOperation` resource in the response.
 
+:::info
+
+When using application permissions, you have to specify atleast one owner using the `--ownerUserNames`, `--ownerIds` or `--ownerEmails` options. This will also result in the `--wait` option being enforced if more than one owner is being set.
+
+:::
+
 ## Examples
 
-Add a new Microsoft Teams team.
+Add a new Microsoft Teams team with a specific owner.
 
 ```sh
-m365 teams team add --name "Architecture" --description "Architecture Discussion"
+m365 teams team add --name "Architecture" --description "Architecture Discussion" --ownerIds "d7a3d3e5-3e3d-4f3e-8a3d-3e3d3f3e3d3f"
 ```
 
 Add a new Microsoft Teams team using a template from a file.
@@ -50,10 +74,10 @@ Add a new Microsoft Teams team using a template from a file.
 m365 teams team add --name "Architecture" --description "Architecture Discussion" --template @template.json
 ```
 
-Add a new Microsoft Teams team using a template and wait for the team to be provisioned.
+Add a new Microsoft Teams team using a template and wait for the team to be provisioned with multiple members.
 
 ```sh
-m365 teams team add --name "Architecture" --description "Architecture Discussion" --template @template.json --wait
+m365 teams team add --name "Architecture" --description "Architecture Discussion" --template @template.json --wait --memberUserNames "john@contoso.com,doe@contoso.com"
 ```
 
 ## Response

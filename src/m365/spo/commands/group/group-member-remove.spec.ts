@@ -28,7 +28,7 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
   const email = 'Alex.Wilber@contoso.com';
   const userId = 14;
 
-  const spoGroupMemberListCommandOutput = `[{ "Id": 13, "IsHiddenInUI": false, "LoginName": "c:0t.c|tenant|4b468129-3b44-4414-bd45-aa5bde29df2f", "Title": "Azure AD Security Group 2", "PrincipalType": 1, "Email": "", "Expiration": "", "IsEmailAuthenticationGuestUser": false, "IsShareByEmailGuestUser": false, "IsSiteAdmin": false, "UserId": null, "UserPrincipalName": null },{ "Id": 13, "IsHiddenInUI": false, "LoginName": "c:0t.c|tenant|3f10f4af-8704-4394-80c0-ee8cef5eae27", "Title": "Azure AD Security Group", "PrincipalType": 1, "Email": "", "Expiration": "", "IsEmailAuthenticationGuestUser": false, "IsShareByEmailGuestUser": false, "IsSiteAdmin": false, "UserId": null, "UserPrincipalName": null }, { "Id": 17, "IsHiddenInUI": false, "LoginName": "c:0o.c|federateddirectoryclaimprovider|5786b8e8-c495-4734-b345-756733960730", "Title": "Office 365 Group", "PrincipalType": 4, "Email": "office365group@contoso.onmicrosoft.com", "Expiration": "", "IsEmailAuthenticationGuestUser": false, "IsShareByEmailGuestUser": false, "IsSiteAdmin": false, "UserId": null, "UserPrincipalName": null }]`;
+  const spoGroupMemberListCommandOutput = `[{ "Id": 13, "IsHiddenInUI": false, "LoginName": "c:0t.c|tenant|4b468129-3b44-4414-bd45-aa5bde29df2f", "Title": "Microsoft Entra Security Group 2", "PrincipalType": 1, "Email": "", "Expiration": "", "IsEmailAuthenticationGuestUser": false, "IsShareByEmailGuestUser": false, "IsSiteAdmin": false, "UserId": null, "UserPrincipalName": null },{ "Id": 13, "IsHiddenInUI": false, "LoginName": "c:0t.c|tenant|3f10f4af-8704-4394-80c0-ee8cef5eae27", "Title": "Microsoft Entra Security Group", "PrincipalType": 1, "Email": "", "Expiration": "", "IsEmailAuthenticationGuestUser": false, "IsShareByEmailGuestUser": false, "IsSiteAdmin": false, "UserId": null, "UserPrincipalName": null }, { "Id": 17, "IsHiddenInUI": false, "LoginName": "c:0o.c|federateddirectoryclaimprovider|5786b8e8-c495-4734-b345-756733960730", "Title": "Office 365 Group", "PrincipalType": 4, "Email": "office365group@contoso.onmicrosoft.com", "Expiration": "", "IsEmailAuthenticationGuestUser": false, "IsShareByEmailGuestUser": false, "IsSiteAdmin": false, "UserId": null, "UserPrincipalName": null }]`;
   const UserRemovalJSONResponse =
   {
     "odata.null": true
@@ -123,14 +123,14 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
         debug: true,
         webUrl: "https://contoso.sharepoint.com/sites/SiteA",
         groupName: "Site A Visitors",
-        entraGroupName: "Azure AD Security Group"
+        entraGroupName: "Microsoft Entra Security Group"
       }
     });
 
     assert(postStub.called);
   });
 
-  it('Removes Azure AD group from SharePoint group using Azure AD Group Name', async () => {
+  it('Removes Microsoft Entra group from SharePoint group using Microsoft Entra Group Name', async () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
@@ -157,7 +157,7 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
         debug: true,
         webUrl: "https://contoso.sharepoint.com/sites/SiteA",
         groupName: "Site A Visitors",
-        aadGroupName: "Azure AD Security Group"
+        aadGroupName: "Microsoft Entra Security Group"
       }
     });
 
@@ -194,7 +194,7 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
     assert(postStub.called);
   });
 
-  it('Removes Azure AD group from SharePoint group using Azure AD Group ID - Without Confirmation Prompt', async () => {
+  it('Removes Microsoft Entra group from SharePoint group using Microsoft Entra Group ID - Without Confirmation Prompt', async () => {
     sinon.stub(cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
       if (command === spoGroupMemberListCommand) {
         return ({
@@ -256,7 +256,7 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
     assert(postStub.called);
   });
 
-  it('Throws error when Azure AD group not found', async () => {
+  it('Throws error when Microsoft Entra group not found', async () => {
     sinon.stub(cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
       if (command === spoGroupMemberListCommand) {
         return ({
@@ -275,7 +275,7 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
         entraGroupName: "Not existing group",
         force: true
       }
-    }), new CommandError('The Azure AD group Not existing group is not found in SharePoint group Site A Visitors'));
+    }), new CommandError('The Microsoft Entra group Not existing group is not found in SharePoint group Site A Visitors'));
   });
 
   it('Removes user from SharePoint group using Group ID - Without Confirmation Prompt', async () => {

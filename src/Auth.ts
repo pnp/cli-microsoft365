@@ -68,15 +68,15 @@ export class Connection {
   spoUrl?: string;
   // SharePoint tenantId used to execute CSOM requests
   spoTenantId?: string;
-  // ID of the Azure AD app used to authenticate
+  // ID of the Microsoft Entra ID app used to authenticate
   appId: string;
-  // ID of the tenant where the Azure AD app is registered; common if multitenant
+  // ID of the tenant where the Microsoft Entra app is registered; common if multi-tenant
   tenant: string;
   cloudType: CloudType = CloudType.Public;
 
   constructor() {
     this.accessTokens = {};
-    this.appId = config.cliAadAppId;
+    this.appId = config.cliEntraAppId;
     this.tenant = config.tenant;
     this.cloudType = CloudType.Public;
   }
@@ -97,7 +97,7 @@ export class Connection {
     this.thumbprint = undefined;
     this.spoUrl = undefined;
     this.spoTenantId = undefined;
-    this.appId = config.cliAadAppId;
+    this.appId = config.cliEntraAppId;
     this.tenant = config.tenant;
   }
 }
@@ -216,7 +216,7 @@ export class Auth {
     else {
       if (debug) {
         if (!accessToken) {
-          await logger.logToStderr(`No token found for resource ${resource}`);
+          await logger.logToStderr(`No token found for resource ${resource}.`);
         }
         else {
           await logger.logToStderr(`Access token expired. Token: ${accessToken.accessToken}, ExpiresAt: ${accessToken.expiresOn}`);
@@ -269,9 +269,9 @@ export class Auth {
     const response = await getTokenPromise(resource, logger, debug, fetchNew);
     if (!response) {
       if (debug) {
-        await logger.logToStderr(`getTokenPromise authentication result is null`);
+        await logger.logToStderr('getTokenPromise authentication result is null.');
       }
-      throw `Failed to retrieve an access token. Please try again`;
+      throw 'Failed to retrieve an access token. Please try again.';
     }
     else {
       if (debug) {
@@ -496,7 +496,7 @@ export class Auth {
     });
   }
 
-  private async ensureAccessTokenWithCertificate(resource: string, logger: Logger, debug: boolean): Promise<AccessToken | null> {
+  private async ensureAccessTokenWithCertificate(resource: string, logger: Logger, debug: boolean, fetchNew: boolean): Promise<AccessToken | null> {
     const nodeForge = (await import('node-forge')).default;
     const { pem, pki, asn1, pkcs12 } = nodeForge;
 
@@ -567,7 +567,8 @@ export class Auth {
 
     this.clientApplication = await this.getConfidentialClient(logger, debug, this.connection.thumbprint as string, cert);
     return (this.clientApplication as Msal.ConfidentialClientApplication).acquireTokenByClientCredential({
-      scopes: [`${resource}/.default`]
+      scopes: [`${resource}/.default`],
+      skipCache: fetchNew
     });
   }
 
@@ -706,10 +707,11 @@ export class Auth {
     }
   }
 
-  private async ensureAccessTokenWithSecret(resource: string, logger: Logger, debug: boolean): Promise<AccessToken | null> {
+  private async ensureAccessTokenWithSecret(resource: string, logger: Logger, debug: boolean, fetchNew: boolean): Promise<AccessToken | null> {
     this.clientApplication = await this.getConfidentialClient(logger, debug, undefined, undefined, this.connection.secret);
     return (this.clientApplication as Msal.ConfidentialClientApplication).acquireTokenByClientCredential({
-      scopes: [`${resource}/.default`]
+      scopes: [`${resource}/.default`],
+      skipCache: fetchNew
     });
   }
 
@@ -726,7 +728,7 @@ export class Auth {
     let resource: string = url;
     const pos: number = resource.indexOf('/', 8);
     if (pos > -1) {
-      resource = resource.substr(0, pos);
+      resource = resource.substring(0, pos);
     }
 
     if (resource === 'https://api.bap.microsoft.com' ||

@@ -89,6 +89,8 @@ class EntraAppRoleAssignmentListCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    await this.showDeprecationWarning(logger, aadCommands.APPROLEASSIGNMENT_LIST, commands.APPROLEASSIGNMENT_LIST);
+
     try {
       const spAppRoleAssignments = await this.getAppRoleAssignments(args.options);
       // the role assignment has an appRoleId but no name. To get the name,

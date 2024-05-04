@@ -8,7 +8,7 @@
     "updateDateTime": "2023-02-28",
     "shortDescription": "This script helps you to quickly remove pending SharePoint API permission requests.",
     "longDescription": [
-      "When building SharePoint Framework solutions connected to APIs secured with Azure Active Directory,  you'll easily end up with many pending permission requests. This script helps you to quickly remove pending SharePoint API permission requests."
+      "When building SharePoint Framework solutions connected to APIs secured with Microsoft Entra ID,  you'll easily end up with many pending permission requests. This script helps you to quickly remove pending SharePoint API permission requests."
     ],
     "products": [
       "SharePoint"

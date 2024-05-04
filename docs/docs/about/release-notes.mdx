@@ -4,19 +4,74 @@ sidebar_position: 4
 
 # Release notes
 
-## v7.6.0 (beta)
+## v7.7.0 (beta)
 
 ### New commands
+
+**Entra ID:**
+
+- [entra pim role assignment add](../cmd/entra/pim/pim-role-assignment-add.mdx) - requests activation of an Entra role assignment for a user or group [#5766](https://github.com/pnp/cli-microsoft365/issues/5766)
+- [entra pim role assignment list](../cmd/entra/pim/pim-role-assignment-list.mdx) - retrieves a list of Entra role assignments for a user or group. [#5782](https://github.com/pnp/cli-microsoft365/issues/5782)
+
+**SharePoint:**
+
+- [spo contenttype sync](../cmd/spo/contenttype/contenttype-sync.mdx) - adds a published content type from the content type hub to a site or syncs its latest changes [#5551](https://github.com/pnp/cli-microsoft365/issues/5551)
+
+**SharePoint Embedded:**
+
+- [spe containertype add](../cmd/spe/containertype/containertype-add.mdx) - creates a new Container Type for your app [#5767](https://github.com/pnp/cli-microsoft365/issues/5767)
+
+### Changes
+
+- added allowPublicClientFlow option to 'entra app add/set' commands [#5870](https://github.com/pnp/cli-microsoft365/issues/5870)
+- extended [spfx project upgrade](../cmd/spfx/project/project-upgrade.mdx) with support for v1.19.0-beta.0 [#5942](https://github.com/pnp/cli-microsoft365/issues/5942)
+- extended [spfx doctor](../cmd/spfx/spfx-doctor.mdx) with support for v1.19.0-beta.0 [#5942](https://github.com/pnp/cli-microsoft365/issues/5942)
+- extended [spfx project doctor](../cmd/spfx/project/project-doctor.mdx) with support for v1.19.0-beta.0 [#5942](https://github.com/pnp/cli-microsoft365/issues/5942)
+- fixed [spo page set](../cmd/spo/page/page-set.mdx) to throw an error when no options to update are specified [#5938](https://github.com/pnp/cli-microsoft365/issues/5938)
+- enhanced [spo site hubsite connect](../cmd/spo/site/site-hubsite-connect.mdx) and [spo site hubsite disconnect](../cmd/spo/site/site-hubsite-disconnect.mdx) to drop request digest value [#5940](https://github.com/pnp/cli-microsoft365/issues/5940)
+- enhanced option validation order [#5915](https://github.com/pnp/cli-microsoft365/issues/5915)
+- refactored spo page set and spo page add to use util instead of calling other command [#5300](https://github.com/pnp/cli-microsoft365/issues/5300)
+- fixed 'spo site apppermission remove' output [#5958](https://github.com/pnp/cli-microsoft365/pull/5958)
+- fixed prompt issue on macOS [#5957](https://github.com/pnp/cli-microsoft365/pull/5957)
+- updated 'aad user list' with 'type' option [#5644](https://github.com/pnp/cli-microsoft365/pull/5644)
+- enhanced cli warning when non-existing command is called [#5768](https://github.com/pnp/cli-microsoft365/issues/5768)
+- enhanced 'spfx doctor' command with 'json' output [#4212](https://github.com/pnp/cli-microsoft365/issues/4212)
+
+## [v7.6.0](https://github.com/pnp/cli-microsoft365/releases/tag/v7.6.0)
+
+### New commands
+
+**Outlook:**
+
+- [outlook message remove](../cmd/outlook/message/message-remove.mdx) - permanently removes a specific message from a mailbox [#5784](https://github.com/pnp/cli-microsoft365/issues/5784)
 
 **Purview:**
 
 - [purview threatassessment add](../cmd/purview/threatassessment/threatassessment-add.mdx) - creates a threat assessment [#4428](https://github.com/pnp/cli-microsoft365/issues/4428)
 - [purview threatassessment list](../cmd/purview/threatassessment/threatassessment-list.mdx) - get a list of threat assessments [#4426](https://github.com/pnp/cli-microsoft365/issues/4426)
 
+**SharePoint Framework:**
+
+- [spfx project azuredevops pipeline add](../cmd/spfx/project/project-azuredevops-pipeline-add) - adds a Azure DevOps pipeline for a SharePoint Framework project [#5763](https://github.com/pnp/cli-microsoft365/issues/5763)
+
 ### Changes
 
-- refactored 'auth' and 'chili' files to async/await. [#5145](https://github.com/pnp/cli-microsoft365/issues/5145)
-- refactored 'cli' files to async/await. [#5146](https://github.com/pnp/cli-microsoft365/issues/5146)
+- refactored 'auth' and 'chili' files to async/await [#5145](https://github.com/pnp/cli-microsoft365/issues/5145)
+- refactored 'cli' files to async/await [#5146](https://github.com/pnp/cli-microsoft365/issues/5146)
+- fixed retrieving new app only access token [#5891](https://github.com/pnp/cli-microsoft365/issues/5891)
+- added new script sample to generate the retirement report [#5774](https://github.com/pnp/cli-microsoft365/issues/5774)
+- added more options to 'spo user remove' [#5522](https://github.com/pnp/cli-microsoft365/issues/5522)
+- renamed `Azure Active Directory` to `Microsoft Entra ID` in docs [#5780](https://github.com/pnp/cli-microsoft365/issues/5780)
+- renamed `AAD` environment variables to `ENTRA` [#5917](https://github.com/pnp/cli-microsoft365/issues/5917)
+- enhanced [spo folder add](../cmd/spo/folder/folder-add.mdx) with support for setting folder color [#5894](https://github.com/pnp/cli-microsoft365/issues/5894)
+- enhanced [spo folder set](../cmd/spo/folder/folder-set.mdx) with support for setting folder color [#5895](https://github.com/pnp/cli-microsoft365/issues/5895)
+- updated planner roster IDs in docs [#5910](https://github.com/pnp/cli-microsoft365/issues/5910)
+- enhanced [spo site recyclebinitem restore](../cmd/spo/site/site-recyclebinitem-restore.mdx) with support for restoring recycle bin stages [#4726](https://github.com/pnp/cli-microsoft365/issues/4726)
+- added deprecation warning for deprecated 'aad' commands [#5762](https://github.com/pnp/cli-microsoft365/issues/5762)
+- enhanced [teams tab get](../cmd/teams/tab/tab-get.mdx) command output with teams app information [#5855](https://github.com/pnp/cli-microsoft365/issues/5855)
+- enhanced [teams team add](../cmd/teams/team/team-add.mdx) to be used with application permissions and allowing members or owners to be set after creation [#4916](https://github.com/pnp/cli-microsoft365/issues/4916)
+- updated [spfx project github workflow add](../cmd/spfx/project/project-github-workflow-add.mdx) command [#5776](https://github.com/pnp/cli-microsoft365/issues/5776)
+- fixed output check on report commands [#5040](https://github.com/pnp/cli-microsoft365/issues/5040)
 
 ## [v7.5.0](https://github.com/pnp/cli-microsoft365/releases/tag/v7.5.0)
 
@@ -3295,7 +3350,7 @@ sidebar_position: 4
 
 - [spo file checkin](../cmd/spo/file/file-checkin.mdx) - checks in specified file [#284](https://github.com/pnp/cli-microsoft365/issues/284)
 - [spo file checkout](../cmd/spo/file/file-checkout.mdx) - checks out specified file [#285](https://github.com/pnp/cli-microsoft365/issues/285)
-- [spo folder rename](../cmd/spo/folder/folder-rename.mdx) - renames a folder [#429](https://github.com/pnp/cli-microsoft365/issues/429)
+- [spo folder rename](../cmd/spo/folder/folder-set.mdx) - renames a folder [#429](https://github.com/pnp/cli-microsoft365/issues/429)
 - [spo listitem get](../cmd/spo/listitem/listitem-get.mdx) - gets a list item from the specified list [#269](https://github.com/pnp/cli-microsoft365/issues/269)
 - [spo listitem set](../cmd/spo/listitem/listitem-set.mdx) - updates a list item in the specified list [#271](https://github.com/pnp/cli-microsoft365/issues/271)
 

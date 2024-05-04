@@ -24,6 +24,7 @@ interface Options extends GlobalOptions {
   certificateFile?: string;
   certificateBase64Encoded?: string;
   certificateDisplayName?: string;
+  allowPublicClientFlows?: boolean;
 }
 
 class EntraAppSetCommand extends GraphCommand {
@@ -48,6 +49,7 @@ class EntraAppSetCommand extends GraphCommand {
     this.#initOptions();
     this.#initValidators();
     this.#initOptionSets();
+    this.#initTypes();
   }
 
   #initTelemetry(): void {
@@ -62,7 +64,8 @@ class EntraAppSetCommand extends GraphCommand {
         uris: typeof args.options.uris !== 'undefined',
         certificateFile: typeof args.options.certificateFile !== 'undefined',
         certificateBase64Encoded: typeof args.options.certificateBase64Encoded !== 'undefined',
-        certificateDisplayName: typeof args.options.certificateDisplayName !== 'undefined'
+        certificateDisplayName: typeof args.options.certificateDisplayName !== 'undefined',
+        allowPublicClientFlows: typeof args.options.allowPublicClientFlows !== 'undefined'
       });
     });
   }
@@ -81,7 +84,11 @@ class EntraAppSetCommand extends GraphCommand {
         option: '--platform [platform]',
         autocomplete: EntraAppSetCommand.aadApplicationPlatform
       },
-      { option: '--redirectUrisToRemove [redirectUrisToRemove]' }
+      { option: '--redirectUrisToRemove [redirectUrisToRemove]' },
+      {
+        option: '--allowPublicClientFlows [allowPublicClientFlows]',
+        autocomplete: ['true', 'false']
+      }
     );
   }
 
@@ -118,11 +125,18 @@ class EntraAppSetCommand extends GraphCommand {
     this.optionSets.push({ options: ['appId', 'objectId', 'name'] });
   }
 
+  #initTypes(): void {
+    this.types.boolean.push('allowPublicClientFlows');
+  }
+
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    await this.showDeprecationWarning(logger, aadCommands.APP_SET, commands.APP_SET);
+
     try {
       let objectId = await this.getAppObjectId(args, logger);
       objectId = await this.configureUri(args, objectId, logger);
       objectId = await this.configureRedirectUris(args, objectId, logger);
+      objectId = await this.updateAllowPublicClientFlows(args, objectId, logger);
       await this.configureCertificate(args, objectId, logger);
     }
     catch (err: any) {
@@ -138,7 +152,7 @@ class EntraAppSetCommand extends GraphCommand {
     const { appId, name } = args.options;
 
     if (this.verbose) {
-      await logger.logToStderr(`Retrieving information about Azure AD app ${appId ? appId : name}...`);
+      await logger.logToStderr(`Retrieving information about Microsoft Entra app ${appId ? appId : name}...`);
     }
 
     const filter: string = appId ?
@@ -161,12 +175,38 @@ class EntraAppSetCommand extends GraphCommand {
 
     if (res.value.length === 0) {
       const applicationIdentifier = appId ? `ID ${appId}` : `name ${name}`;
-      throw `No Azure AD application registration with ${applicationIdentifier} found`;
+      throw `No Microsoft Entra application registration with ${applicationIdentifier} found`;
     }
 
     const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', res.value);
-    const result = await cli.handleMultipleResultsFound<{ id: string }>(`Multiple Azure AD application registration with name '${name}' found.`, resultAsKeyValuePair);
+    const result = await cli.handleMultipleResultsFound<{ id: string }>(`Multiple Microsoft Entra application registration with name '${name}' found.`, resultAsKeyValuePair);
     return result.id;
+  }
+
+  private async updateAllowPublicClientFlows(args: CommandArgs, objectId: string, logger: Logger): Promise<string> {
+    if (args.options.allowPublicClientFlows === undefined) {
+      return objectId;
+    }
+
+    if (this.verbose) {
+      await logger.logToStderr(`Configuring Entra application AllowPublicClientFlows option...`);
+    }
+
+    const applicationInfo: any = {
+      isFallbackPublicClient: args.options.allowPublicClientFlows
+    };
+
+    const requestOptions: CliRequestOptions = {
+      url: `${this.resource}/v1.0/myorganization/applications/${objectId}`,
+      headers: {
+        'content-type': 'application/json;odata.metadata=none'
+      },
+      responseType: 'json',
+      data: applicationInfo
+    };
+
+    await request.patch(requestOptions);
+    return objectId;
   }
 
   private async configureUri(args: CommandArgs, objectId: string, logger: Logger): Promise<string> {
@@ -175,7 +215,7 @@ class EntraAppSetCommand extends GraphCommand {
     }
 
     if (this.verbose) {
-      await logger.logToStderr(`Configuring Azure AD application ID URI...`);
+      await logger.logToStderr(`Configuring Microsoft Entra application ID URI...`);
     }
 
     const identifierUris: string[] = args.options.uris
@@ -205,7 +245,7 @@ class EntraAppSetCommand extends GraphCommand {
     }
 
     if (this.verbose) {
-      await logger.logToStderr(`Configuring Azure AD application redirect URIs...`);
+      await logger.logToStderr(`Configuring Microsoft Entra application redirect URIs...`);
     }
 
     const getAppRequestOptions: CliRequestOptions = {
@@ -289,7 +329,7 @@ class EntraAppSetCommand extends GraphCommand {
     }
 
     if (this.verbose) {
-      await logger.logToStderr(`Setting certificate for Azure AD app...`);
+      await logger.logToStderr(`Setting certificate for Microsoft Entra app...`);
     }
 
     const certificateBase64Encoded = await this.getCertificateBase64Encoded(args, logger);
@@ -352,7 +392,7 @@ class EntraAppSetCommand extends GraphCommand {
 
   private async updateKeyCredentials(objectId: string, keyCredentials: KeyCredential[], logger: Logger): Promise<void> {
     if (this.verbose) {
-      await logger.logToStderr(`Updating keyCredentials in AAD app`);
+      await logger.logToStderr(`Updating keyCredentials in Microsoft Entra app`);
     }
 
     const requestOptions: CliRequestOptions = {

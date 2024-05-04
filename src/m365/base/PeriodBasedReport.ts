@@ -15,6 +15,10 @@ interface UsagePeriodOptions extends GlobalOptions {
 export default abstract class PeriodBasedReport extends GraphCommand {
   public abstract get usageEndpoint(): string;
 
+  protected get allowedOutputs(): string[] {
+    return ['json', 'csv'];
+  }
+
   constructor() {
     super();
 

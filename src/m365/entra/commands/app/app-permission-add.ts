@@ -37,7 +37,7 @@ class EntraAppPermissionAddCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'Adds the specified application and/or delegated permissions to a specified Entra ID (Azure AD) app';
+    return 'Adds the specified application and/or delegated permissions to a specified Microsoft Entra app';
   }
 
   public alias(): string[] | undefined {
@@ -100,6 +100,8 @@ class EntraAppPermissionAddCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    await this.showDeprecationWarning(logger, aadCommands.APP_PERMISSION_ADD, commands.APP_PERMISSION_ADD);
+
     try {
       const appObject = await this.getAppObject(args.options);
       const servicePrincipals = await this.getServicePrincipals();
@@ -143,7 +145,7 @@ class EntraAppPermissionAddCommand extends GraphCommand {
       : await odata.getAllItems<Application>(`${this.resource}/v1.0/applications?$filter=appId eq '${options.appId}'&$select=id,appId,requiredResourceAccess`);
 
     if (apps.length === 0) {
-      throw `App with ${options.appObjectId ? 'object id' : 'client id'} ${options.appObjectId ? options.appObjectId : options.appId} not found in Entra ID (Azure AD)`;
+      throw `App with ${options.appObjectId ? 'object id' : 'client id'} ${options.appObjectId ? options.appObjectId : options.appId} not found in Microsoft Entra ID`;
     }
 
     return apps[0];

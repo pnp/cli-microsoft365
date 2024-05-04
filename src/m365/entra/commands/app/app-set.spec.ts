@@ -964,6 +964,38 @@ describe(commands.APP_SET, () => {
     });
   });
 
+  it('updates allowPublicClientFlows value for the specified appId', async () => {
+    sinon.stub(request, 'get').callsFake(async opts => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=appId eq 'bc724b77-da87-43a9-b385-6ebaaf969db8'&$select=id`) {
+        return {
+          value: [{
+            id: '5b31c38c-2584-42f0-aa47-657fb3a84230'
+          }]
+        };
+      }
+
+      throw `Invalid request ${JSON.stringify(opts)}`;
+    });
+    sinon.stub(request, 'patch').callsFake(async opts => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230' &&
+        opts.data &&
+        opts.data.isFallbackPublicClient === true) {
+        return;
+      }
+
+      throw `Invalid request ${JSON.stringify(opts)}`;
+    });
+
+    await command.action(logger, {
+      options: {
+        debug: true,
+        appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
+        allowPublicClientFlows: true
+      }
+    });
+  });
+
+
   it('handles error when certificate file cannot be read', async () => {
     sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications/95cfe30d-ed44-4f9d-b73d-c66560f72e83`) {
@@ -1011,7 +1043,7 @@ describe(commands.APP_SET, () => {
         appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f',
         uris: 'https://contoso.com/bc724b77-da87-43a9-b385-6ebaaf969db8'
       }
-    }), new CommandError(`No Azure AD application registration with ID 9b1b1e42-794b-4c71-93ac-5ed92488b67f found`));
+    }), new CommandError(`No Microsoft Entra application registration with ID 9b1b1e42-794b-4c71-93ac-5ed92488b67f found`));
   });
 
   it('handles error when the app specified with name not found', async () => {
@@ -1029,7 +1061,7 @@ describe(commands.APP_SET, () => {
         name: 'My app',
         uris: 'https://contoso.com/bc724b77-da87-43a9-b385-6ebaaf969db8'
       }
-    }), new CommandError(`No Azure AD application registration with name My app found`));
+    }), new CommandError(`No Microsoft Entra application registration with name My app found`));
   });
 
   it('handles error when multiple apps with the specified name found', async () => {
@@ -1060,7 +1092,7 @@ describe(commands.APP_SET, () => {
         name: 'My app',
         uris: 'https://contoso.com/bc724b77-da87-43a9-b385-6ebaaf969db8'
       }
-    }), new CommandError(`Multiple Azure AD application registration with name 'My app' found. Found: 9b1b1e42-794b-4c71-93ac-5ed92488b67f, 9b1b1e42-794b-4c71-93ac-5ed92488b67g.`));
+    }), new CommandError(`Multiple Microsoft Entra application registration with name 'My app' found. Found: 9b1b1e42-794b-4c71-93ac-5ed92488b67f, 9b1b1e42-794b-4c71-93ac-5ed92488b67g.`));
   });
 
   it('handles selecting single result when multiple apps with the specified name found and cli is set to prompt', async () => {
@@ -1299,7 +1331,7 @@ describe(commands.APP_SET, () => {
   it('passes validation if certificateFile specified with certificateDisplayName', async () => {
     sinon.stub(fs, 'existsSync').callsFake(_ => true);
 
-    const actual = await command.validate({ options: { name: 'My AAD app', certificateDisplayName: 'Some certificate', certificateFile: 'c:\\temp\\some-certificate.cer' } }, commandInfo);
+    const actual = await command.validate({ options: { name: 'My Microsoft Entra app', certificateDisplayName: 'Some certificate', certificateFile: 'c:\\temp\\some-certificate.cer' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
@@ -1339,4 +1371,20 @@ describe(commands.APP_SET, () => {
     const actual = await command.validate({ options: { appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', redirectUris: 'https://foo.com', platform: 'web' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
+
+  it('passes validation when allowPublicClientFlows is specified as true', async () => {
+    const actual = await command.validate({ options: { appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', allowPublicClientFlows: true } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('passes validation when allowPublicClientFlows is specified as false', async () => {
+    const actual = await command.validate({ options: { appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', allowPublicClientFlows: false } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('passes validation when allowPublicClientFlows is not correct boolean value', async () => {
+    const actual = await command.validate({ options: { appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', allowPublicClientFlows: 'foo' } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
 });

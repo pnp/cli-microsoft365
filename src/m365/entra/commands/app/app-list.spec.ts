@@ -74,7 +74,7 @@ describe(commands.APP_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['appId', 'id', 'displayName', 'signInAudience']);
   });
 
-  it(`should get a list of Azure AD app registrations`, async () => {
+  it(`should get a list of Microsoft Entra app registrations`, async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/applications`) {
         return {

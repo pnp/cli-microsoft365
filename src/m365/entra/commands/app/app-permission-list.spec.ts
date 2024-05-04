@@ -296,7 +296,7 @@ describe(commands.APP_PERMISSION_LIST, () => {
     });
 
     await assert.rejects(command.action(logger, { options: { appId: appId } }),
-      new CommandError(`No Azure AD application registration with ID ${appId} found`));
+      new CommandError(`No Microsoft Entra application registration with ID ${appId} found`));
   });
 
   it('lists no permissions for app registration without permissions', async () => {

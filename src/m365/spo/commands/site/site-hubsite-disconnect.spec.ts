@@ -10,7 +10,6 @@ import { telemetry } from '../../../../telemetry.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
-import { spo } from '../../../../utils/spo.js';
 import commands from '../../commands.js';
 import command from './site-hubsite-disconnect.js';
 
@@ -27,12 +26,6 @@ describe(commands.SITE_HUBSITE_DISCONNECT, () => {
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
-    sinon.stub(spo, 'getRequestDigest').resolves({
-      FormDigestValue: 'ABC',
-      FormDigestTimeoutSeconds: 1800,
-      FormDigestExpiresAt: new Date(),
-      WebFullUrl: 'https://contoso.sharepoint.com'
-    });
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
   });
@@ -52,9 +45,9 @@ describe(commands.SITE_HUBSITE_DISCONNECT, () => {
     };
     loggerLogSpy = sinon.spy(logger, 'log');
     loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
-    sinon.stub(cli, 'promptForConfirmation').callsFake(() => {
+    sinon.stub(cli, 'promptForConfirmation').callsFake(async () => {
       promptIssued = true;
-      return Promise.resolve(false);
+      return false;
     });
 
     promptIssued = false;

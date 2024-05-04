@@ -53,6 +53,8 @@ class EntraUserRecycleBinItemClearCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    await this.showDeprecationWarning(logger, aadCommands.USER_RECYCLEBINITEM_CLEAR, commands.USER_RECYCLEBINITEM_CLEAR);
+
     const clearRecycleBinUsers = async (): Promise<void> => {
       try {
         const users = await odata.getAllItems<User>(`${this.resource}/v1.0/directory/deletedItems/microsoft.graph.user?$select=id`);

@@ -104,7 +104,7 @@ describe(commands.GROUP_GET, () => {
     assert.deepStrictEqual(alias, [aadCommands.GROUP_GET]);
   });
 
-  it('retrieves information about the specified Azure AD Group by id', async () => {
+  it('retrieves information about the specified Microsoft Entra Group by id', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/${validId}`) {
         return groupResponse.value[0];
@@ -117,7 +117,7 @@ describe(commands.GROUP_GET, () => {
     assert(loggerLogSpy.calledWith(groupResponse.value[0]));
   });
 
-  it('retrieves information about the specified Azure AD Group by displayName', async () => {
+  it('retrieves information about the specified Microsoft Entra Group by displayName', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${validDisplayName}'`) {
         return groupResponse;

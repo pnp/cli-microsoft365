@@ -243,7 +243,7 @@ describe(commands.GROUP_MEMBER_ADD, () => {
         webUrl: "https://contoso.sharepoint.com/sites/SiteA",
         groupId: 32,
         userIds: 5,
-        entraGroupNames: "Azure AD Group name"
+        entraGroupNames: "Microsoft Entra Group name"
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -263,7 +263,7 @@ describe(commands.GROUP_MEMBER_ADD, () => {
         webUrl: "https://contoso.sharepoint.com/sites/SiteA",
         groupId: 32,
         userIds: 5,
-        aadGroupNames: "Azure AD Group name"
+        aadGroupNames: "Microsoft Entra Group name"
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -545,7 +545,7 @@ describe(commands.GROUP_MEMBER_ADD, () => {
     });
 
     sinon.stub(request, 'get').callsFake(async opts => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq 'Azure%20AD%20Group%20name'&$select=id`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq 'Microsoft%20Entra%20Group%20name'&$select=id`) {
         return {
           value: [{
             id: 'Group name'
@@ -565,7 +565,7 @@ describe(commands.GROUP_MEMBER_ADD, () => {
         debug: true,
         webUrl: "https://contoso.sharepoint.com/sites/SiteA",
         groupId: 32,
-        entraGroupNames: "Azure AD Group name"
+        entraGroupNames: "Microsoft Entra Group name"
       }
     });
 
@@ -583,7 +583,7 @@ describe(commands.GROUP_MEMBER_ADD, () => {
     });
 
     sinon.stub(request, 'get').callsFake(async opts => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq 'Azure%20AD%20Group%20name'&$select=id`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq 'Microsoft%20Entra%20Group%20name'&$select=id`) {
         return {
           value: [{
             id: 'Group name'
@@ -603,7 +603,7 @@ describe(commands.GROUP_MEMBER_ADD, () => {
         debug: true,
         webUrl: "https://contoso.sharepoint.com/sites/SiteA",
         groupId: 32,
-        aadGroupNames: "Azure AD Group name"
+        aadGroupNames: "Microsoft Entra Group name"
       }
     });
 
@@ -690,7 +690,7 @@ describe(commands.GROUP_MEMBER_ADD, () => {
     });
 
     sinon.stub(request, 'get').callsFake(async opts => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq 'Azure%20AD%20Group%20name'&$select=id`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq 'Microsoft%20Entra%20Group%20name'&$select=id`) {
         return {
           value: [
             { id: '9b1b1e42-794b-4c71-93ac-5ed92488b67f' },
@@ -708,14 +708,14 @@ describe(commands.GROUP_MEMBER_ADD, () => {
       options: {
         webUrl: "https://contoso.sharepoint.com/sites/SiteA",
         groupId: 32,
-        entraGroupNames: "Azure AD Group name"
+        entraGroupNames: "Microsoft Entra Group name"
       }
-    }), new CommandError("Resource 'Azure AD Group name' does not exist."));
+    }), new CommandError("Resource 'Microsoft Entra Group name' does not exist."));
   });
 
   it('handles selecting single result when multiple groups with the specified name found and cli is set to prompt', async () => {
     sinon.stub(request, 'get').callsFake(async opts => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq 'Azure%20AD%20Group%20name'&$select=id`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq 'Microsoft%20Entra%20Group%20name'&$select=id`) {
         return {
           value: [
             { id: '9b1b1e42-794b-4c71-93ac-5ed92488b67f' },
@@ -744,7 +744,7 @@ describe(commands.GROUP_MEMBER_ADD, () => {
 
     await command.action(logger, {
       options: {
-        debug: true, webUrl: "https://contoso.sharepoint.com/sites/SiteA", groupId: 32, entraGroupNames: "Azure AD Group name"
+        debug: true, webUrl: "https://contoso.sharepoint.com/sites/SiteA", groupId: 32, entraGroupNames: "Microsoft Entra Group name"
       }
     });
     assert(loggerLogSpy.calledWith(jsonSingleUser.UsersAddedToGroup));

@@ -146,6 +146,8 @@ class EntraM365GroupSetCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    await this.showDeprecationWarning(logger, aadCommands.M365GROUP_SET, commands.M365GROUP_SET);
+
     try {
       const isUnifiedGroup = await entraGroup.isUnifiedGroup(args.options.id);
 

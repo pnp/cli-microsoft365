@@ -16,6 +16,10 @@ interface DateTimeOptions extends GlobalOptions {
 }
 
 class TeamsReportDirectroutingcallsCommand extends GraphCommand {
+  protected get allowedOutputs(): string[] {
+    return ['json', 'csv'];
+  }
+
   public get name(): string {
     return commands.REPORT_DIRECTROUTINGCALLS;
   }

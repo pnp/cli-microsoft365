@@ -1,0 +1,50 @@
+[
+  {
+    "name": "pnp-sharepoint-add-ins-and-azure-acs-retirement-report",
+    "source": "pnp",
+    "title": "SharePoint Add-ins and Azure ACS retirement report",
+    "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/spo/sp-add-ins-and-azure-acs-retirement-report",
+    "creationDateTime": "2024-02-02",
+    "updateDateTime": "2024-02-02",
+    "shortDescription": "This script retrieves the retirement report of SharePoint Add-Ins and Azure ACS.",
+    "longDescription": [
+      "This script retrieves the retirement report of SharePoint Add-Ins and Azure ACS."
+    ],
+    "products": [
+      "SharePoint",
+      "Microsoft 365"
+    ],
+    "categories": [],
+    "tags": [
+      "reports"
+    ],
+    "metadata": [
+      {
+        "key": "CLI-FOR-MICROSOFT365",
+        "value": "7.4.0"
+      }
+    ],
+    "thumbnails": [
+      {
+        "type": "image",
+        "order": 100,
+        "url": "https://raw.githubusercontent.com/pnp/cli-microsoft365/main/docs/docs/sample-scripts/spo/sp-add-ins-and-azure-acs-retirement-report/assets/preview.png",
+        "alt": "preview image for the sample"
+      }
+    ],
+    "authors": [
+      {
+        "gitHubAccount": "mkm17",
+        "pictureUrl": "https://avatars.githubusercontent.com/u/17220108?v=4",
+        "name": "Michał Kornet"
+      }
+    ],
+    "references": [
+      {
+        "name": "Want to learn more about CLI for Microsoft 365 and the commands",
+        "description": "Check out the CLI for Microsoft 365 site to get started and for the reference to the commands.",
+        "url": "https://aka.ms/cli-m365"
+      }
+    ]
+  }
+]

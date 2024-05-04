@@ -618,7 +618,7 @@ describe(commands.SECURITY_ALERTS_LIST, () => {
     assert(loggerLogSpy.calledWith(alertMCAS));
   });
 
-  it('correctly returns list of security alerts for vendor with name Azure Active Directory Identity Protection', async () => {
+  it('correctly returns list of security alerts for vendor with name Microsoft Entra Identity Protection', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/security/alerts?$filter=vendorInformation/provider eq 'IPC'`) {
         return {

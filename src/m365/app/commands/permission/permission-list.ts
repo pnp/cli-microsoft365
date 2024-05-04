@@ -29,7 +29,7 @@ class AppPermissionListCommand extends AppCommand {
   }
 
   public get description(): string {
-    return 'Lists API permissions for the current AAD app';
+    return 'Lists API permissions for the current Microsoft Entra app';
   }
 
   public async commandAction(logger: Logger): Promise<void> {
@@ -221,7 +221,7 @@ class AppPermissionListCommand extends AppCommand {
 
   private async getAppRegistration(appId: string, logger: Logger): Promise<Application> {
     if (this.verbose) {
-      await logger.logToStderr(`Retrieving Azure AD application registration ${appId}`);
+      await logger.logToStderr(`Retrieving Microsoft Entra application registration ${appId}`);
     }
 
     const options: AppGetCommandOptions = {

@@ -165,7 +165,7 @@ describe(commands.SITE_APPPERMISSION_ADD, () => {
     } as any), new CommandError('Requested site could not be found'));
   });
 
-  it('fails to get Azure AD app when Azure AD app does not exists', async () => {
+  it('fails to get Microsoft Entra app when Microsoft Entra app does not exists', async () => {
     const getRequestStub = sinon.stub(request, 'get');
     getRequestStub.onCall(0)
       .callsFake(async (opts) => {
@@ -187,7 +187,7 @@ describe(commands.SITE_APPPERMISSION_ADD, () => {
         if ((opts.url as string).indexOf('/v1.0/myorganization/servicePrincipals?$select=appId,displayName&$filter=') > -1) {
           return { value: [] };
         }
-        throw 'The specified Azure AD app does not exist';
+        throw 'The specified Microsoft Entra app does not exist';
       });
 
     await assert.rejects(command.action(logger, {
@@ -197,10 +197,10 @@ describe(commands.SITE_APPPERMISSION_ADD, () => {
         permission: "write",
         appId: "89ea5c94-7736-4e25-95ad-3fa95f62b66e"
       }
-    } as any), new CommandError('The specified Azure AD app does not exist'));
+    } as any), new CommandError('The specified Microsoft Entra app does not exist'));
   });
 
-  it('fails when multiple Azure AD apps with same name exists', async () => {
+  it('fails when multiple Microsoft Entra apps with same name exists', async () => {
     const getRequestStub = sinon.stub(request, 'get');
     getRequestStub.onCall(0)
       .callsFake(async (opts) => {
@@ -233,7 +233,7 @@ describe(commands.SITE_APPPERMISSION_ADD, () => {
             ]
           };
         }
-        throw 'Multiple Azure AD app with displayName Foo App found: 3166f9d8-f4e9-4b56-b634-dafcc9ecba8e,9bd7b7c0-e4a7-4b85-b0c6-20aaca0e25b7';
+        throw 'Multiple Microsoft Entra apps with displayName Foo App found: 3166f9d8-f4e9-4b56-b634-dafcc9ecba8e,9bd7b7c0-e4a7-4b85-b0c6-20aaca0e25b7';
       });
 
     await assert.rejects(command.action(logger, {
@@ -242,7 +242,7 @@ describe(commands.SITE_APPPERMISSION_ADD, () => {
         permission: "write",
         appDisplayName: "Foo App"
       }
-    } as any), new CommandError('Multiple Azure AD app with displayName Foo App found: 3166f9d8-f4e9-4b56-b634-dafcc9ecba8e,9bd7b7c0-e4a7-4b85-b0c6-20aaca0e25b7'));
+    } as any), new CommandError('Multiple Microsoft Entra apps with displayName Foo App found: 3166f9d8-f4e9-4b56-b634-dafcc9ecba8e,9bd7b7c0-e4a7-4b85-b0c6-20aaca0e25b7'));
   });
 
   it('adds an application permission to the site by appId', async () => {

@@ -19,7 +19,7 @@ m365 planner roster member get [options]
 : ID of the Planner Roster.
 
 `--userId [userId]`
-: User's Azure AD ID. Specify either `userId` or `userName` but not both.
+: User's Microsoft Entra ID. Specify either `userId` or `userName` but not both.
 
 `--userName [userName]`
 : User's UPN (user principal name, e.g. johndoe@example.com). Specify either `userId` or `userName` but not both.
@@ -40,13 +40,13 @@ This command is based on an API that is currently in preview and is subject to c
 Gets a specific user by user name as member of the Planner Roster.
 
 ```sh
-m365 planner roster member get --rosterId tYqYlNd6eECmsNhN_fcq85cAGAnd --userName john.doe@contoso.com
+m365 planner roster member get --rosterId 8bc07d47-c06f-41e1-8f00-1c113c8f6067 --userName john.doe@contoso.com
 ```
 
 Gets a specific user by ID as member of the Planner Roster.
 
 ```sh
-m365 planner roster member get --rosterId tYqYlNd6eECmsNhN_fcq85cAGAnd --userId d049a857-f1c3-4fb3-a629-d8cfb3bd7275
+m365 planner roster member get --rosterId 8bc07d47-c06f-41e1-8f00-1c113c8f6067 --userId d049a857-f1c3-4fb3-a629-d8cfb3bd7275
 ```
 
 ## Response
@@ -85,7 +85,7 @@ m365 planner roster member get --rosterId tYqYlNd6eECmsNhN_fcq85cAGAnd --userId 
   <TabItem value="Markdown">
 
   ```md
-  # planner roster member get --rosterId "tYqYlNd6eECmsNhN_fcq85cAGAnd" --userId "2056d2f6-3257-4253-8cfc-b73393e414e5"
+  # planner roster member get --rosterId "8bc07d47-c06f-41e1-8f00-1c113c8f6067" --userId "2056d2f6-3257-4253-8cfc-b73393e414e5"
 
   Date: 18/2/2023
 
