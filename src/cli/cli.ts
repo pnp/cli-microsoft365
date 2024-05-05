@@ -23,7 +23,6 @@ import { Logger } from './Logger.js';
 import { SelectionConfig, ConfirmationConfig, prompt } from '../utils/prompt.js';
 import { timings } from './timings.js';
 import { browserUtil } from '../utils/browserUtil.js';
-import chalk from 'chalk';
 const require = createRequire(import.meta.url);
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
@@ -672,6 +671,7 @@ async function printHelp(helpMode: string, exitCode: number = 0): Promise<void> 
   }
   else {
     if (cli.currentCommandName && !cli.commands.some(command => command.name.startsWith(cli.currentCommandName!))) {
+      const chalk = (await import('chalk')).default;
       await cli.error(chalk.red(`Command '${cli.currentCommandName}' was not found. Below you can find the commands and command groups you can use. For detailed information on a command group, use 'm365 [command group] --help'.`));
     }
 
@@ -880,14 +880,13 @@ async function closeWithError(error: any, args: CommandArgs, showHelpIfEnabled: 
     return process.exit(exitCode);
   }
 
-  const chalk = (await import('chalk')).default;
-
   let errorMessage: string = error instanceof CommandError ? error.message : error;
   if ((!args.options.output || args.options.output === 'json') &&
     !cli.getSettingWithDefaultValue<boolean>(settingsNames.printErrorsAsPlainText, true)) {
     errorMessage = JSON.stringify({ error: errorMessage });
   }
   else {
+    const chalk = (await import('chalk')).default;
     errorMessage = chalk.red(`Error: ${errorMessage}`);
   }
 
