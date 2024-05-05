@@ -3,7 +3,7 @@
 import { cli } from './cli/cli.js';
 import { app } from './utils/app.js';
 
-async function main(): Promise<void> {
+(async () => {
   // required to make console.log() in combination with piped output synchronous
   // on Windows/in PowerShell so that the output is not trimmed by calling
   // process.exit() after executing the command, while the output is still
@@ -14,10 +14,8 @@ async function main(): Promise<void> {
 
   if (!process.env.CLIMICROSOFT365_NOUPDATE) {
     const updateNotifier = await import('update-notifier');
-    updateNotifier.default({ pkg: app.packageJson() as any, updateCheckInterval: 1 }).notify({ defer: false });
+    updateNotifier.default({ pkg: app.packageJson() as any }).notify({ defer: false });
   }
 
   await cli.execute(process.argv.slice(2));
-}
-
-main();
+})();
