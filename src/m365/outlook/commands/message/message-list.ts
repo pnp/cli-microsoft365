@@ -103,7 +103,7 @@ class OutlookMessageListCommand extends GraphCommand {
         }
 
         if (args.options.startTime && args.options.endTime && new Date(args.options.startTime) >= new Date(args.options.endTime)) {
-          return 'endTime cannot be before startTime.';
+          return 'startTime must be before endTime.';
         }
 
         if (args.options.userId && !validation.isValidGuid(args.options.userId)) {
@@ -150,7 +150,7 @@ class OutlookMessageListCommand extends GraphCommand {
 
       const folderId = await this.getFolderId(userUrl, args.options);
       const folderUrl: string = folderId ? `/mailFolders/${folderId}` : '';
-      let requestUrl = `${this.resource}/v1.0/${userUrl}${folderUrl}/messages`;
+      let requestUrl = `${this.resource}/v1.0/${userUrl}${folderUrl}/messages?$top=100`;
 
       if (args.options.startTime || args.options.endTime) {
         const filters = [];
@@ -163,7 +163,7 @@ class OutlookMessageListCommand extends GraphCommand {
         }
 
         if (filters.length > 0) {
-          requestUrl += `?$filter=${filters.join(' and ')}`;
+          requestUrl += `&$filter=${filters.join(' and ')}`;
         }
       }
 

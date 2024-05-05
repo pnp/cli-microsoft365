@@ -192,7 +192,7 @@ describe(commands.MESSAGE_LIST, () => {
   ];
   // #endregion
 
-  const emailResponse: any = { "value": emailOutput };
+  const emailResponse: { value: any[] } = { value: emailOutput };
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -262,7 +262,7 @@ describe(commands.MESSAGE_LIST, () => {
 
   it('lists messages from the folder with name specified using well-known-name', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/me/mailFolders/inbox/messages`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/me/mailFolders/inbox/messages?$top=100`) {
         return emailResponse;
       }
 
@@ -275,7 +275,7 @@ describe(commands.MESSAGE_LIST, () => {
 
   it('lists messages from the folder with name specified using well-known-name (debug)', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/me/mailFolders/inbox/messages`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/me/mailFolders/inbox/messages?$top=100`) {
         return emailResponse;
       }
 
@@ -288,7 +288,7 @@ describe(commands.MESSAGE_LIST, () => {
 
   it('lists messages from the folder with id specified using well-known-name', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/me/mailFolders/inbox/messages`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/me/mailFolders/inbox/messages?$top=100`) {
         return emailResponse;
       }
 
@@ -301,7 +301,7 @@ describe(commands.MESSAGE_LIST, () => {
 
   it('lists messages from the folder with the specified name', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/me/mailFolders/AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OAAuAAAAAAAiQ8W967B7TKBjgx9rVEURAQAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAA=/messages`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/me/mailFolders/AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OAAuAAAAAAAiQ8W967B7TKBjgx9rVEURAQAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAA=/messages?$top=100`) {
         return emailResponse;
       }
       else if (opts.url === `https://graph.microsoft.com/v1.0/me/mailFolders?$filter=displayName eq 'SecondInbox'&$select=id`) {
@@ -323,7 +323,7 @@ describe(commands.MESSAGE_LIST, () => {
 
   it('lists messages from the folder with the specified id', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/me/mailFolders/AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OAAuAAAAAAAiQ8W967B7TKBjgx9rVEURAQAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAA=/messages`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/me/mailFolders/AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OAAuAAAAAAAiQ8W967B7TKBjgx9rVEURAQAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAA=/messages?$top=100`) {
         return emailResponse;
       }
 
@@ -336,7 +336,7 @@ describe(commands.MESSAGE_LIST, () => {
 
   it('lists messages from the currently logged in user', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/me/messages`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/me/messages?$top=100`) {
         return emailResponse;
       }
 
@@ -349,7 +349,7 @@ describe(commands.MESSAGE_LIST, () => {
 
   it('lists messages for the currently logged in user with a specified startTime', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/me/messages?$filter=receivedDateTime ge ${startTime}`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/me/messages?$top=100&$filter=receivedDateTime ge ${startTime}`) {
         return emailResponse;
       }
 
@@ -362,7 +362,7 @@ describe(commands.MESSAGE_LIST, () => {
 
   it('lists messages for the currently logged in user with a specified endTime and specifying a user by id', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users/${userId}/messages?$filter=receivedDateTime lt ${endTime}`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users/${userId}/messages?$top=100&$filter=receivedDateTime lt ${endTime}`) {
         return emailResponse;
       }
 
@@ -375,7 +375,7 @@ describe(commands.MESSAGE_LIST, () => {
 
   it('lists messages for the currently logged in user with a specified start and endTime and specifying a user by UPN', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users/${formatting.encodeQueryParameter(userName)}/messages?$filter=receivedDateTime ge ${startTime} and receivedDateTime lt ${endTime}`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users/${formatting.encodeQueryParameter(userName)}/messages?$top=100&$filter=receivedDateTime ge ${startTime} and receivedDateTime lt ${endTime}`) {
         return emailResponse;
       }
 
@@ -444,7 +444,7 @@ describe(commands.MESSAGE_LIST, () => {
         };
       }
 
-      if (opts.url === `https://graph.microsoft.com/v1.0/me/mailFolders/AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OAAuAAAAAAAiQ8W967B7TKBjgx9rVEURAQAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAA=/messages`) {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/me/mailFolders/AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OAAuAAAAAAAiQ8W967B7TKBjgx9rVEURAQAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAA=/messages?$top=100') {
         return emailResponse;
       }
 
@@ -461,7 +461,7 @@ describe(commands.MESSAGE_LIST, () => {
 
   it('returns all message properties in JSON output mode', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/me/mailFolders/inbox/messages`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/me/mailFolders/inbox/messages?$top=100`) {
         return emailResponse;
       }
 
