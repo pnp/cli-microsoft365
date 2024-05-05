@@ -1,0 +1,54 @@
+[
+  {
+    "name": "pnp-add-ci-cd-pipeline",
+    "source": "pnp",
+    "title": "CLI - Add CI/CD Pipeline for your SharePoint Framework project",
+    "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/spo/add-ci-cd-pipeline",
+    "creationDateTime": "2024-05-05",
+    "updateDateTime": "2024-05-05",
+    "shortDescription": "Script will create either a GitHub Actions or Azure DevOps CI/CD pipeline for your SharePoint Framework project.",
+    "longDescription": [
+      "Setting up a CI/CD pipeline for your SharePoint Framework project is a great way to automate the build and deployment process. This script will create either a GitHub Actions or Azure DevOps CI/CD pipeline for your SharePoint Framework project. The script will ask you a few questions to configure the pipeline and then create the necessary files for you. When using 'application' login method which is recommended the script will also create a new certificate which is required for the app to authenticate and will create a new Entra app registration in a single go. Start your development with DevOps in place and don't leave it for the very end."
+    ],
+    "products": [
+      "SharePoint",
+      "Azure DevOps",
+      "GitHub"
+    ],
+    "categories": [],
+    "tags": [
+      "DevOps",
+      "pipelines",
+      "CI/CD",
+      "workflows"
+    ],
+    "metadata": [
+      {
+        "key": "CLI-FOR-MICROSOFT365",
+        "value": "7.7.0"
+      }
+    ],
+    "thumbnails": [
+      {
+        "type": "image",
+        "order": 100,
+        "url": "https://raw.githubusercontent.com/pnp/cli-microsoft365/main/docs/docs/sample-scripts/spo/add-ci-cd-pipeline/assets/preview.png",
+        "alt": "preview image for the sample"
+      }
+    ],
+    "authors": [
+      {
+        "gitHubAccount": "Adam-it",
+        "pictureUrl": "https://avatars.githubusercontent.com/u/58668583?v=4",
+        "name": "Adam Wójcik"
+      }
+    ],
+    "references": [
+      {
+        "name": "Want to learn more about CLI for Microsoft 365 and the commands",
+        "description": "Check out the CLI for Microsoft 365 site to get started and for the reference to the commands.",
+        "url": "https://aka.ms/cli-m365"
+      }
+    ]
+  }
+]
