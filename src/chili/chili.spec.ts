@@ -39,12 +39,12 @@ describe('chili', () => {
   it('starts a conversation using a prompt from args when specified', async () => {
     sinon.stub(request, 'post').callsFake(async options => {
       switch (options.url) {
-        case 'https://api.mendable.ai/v0/newConversation':
+        case 'https://api.mendable.ai/v1/newConversation':
           return {
             // eslint-disable-next-line camelcase
             conversation_id: 1
           };
-        case 'https://api.mendable.ai/v0/mendableChat':
+        case 'https://api.mendable.ai/v1/mendableChat':
           if (options.data.question === 'Hello') {
             return {
               answer: {
@@ -54,7 +54,7 @@ describe('chili', () => {
             };
           }
           break;
-        case 'https://api.mendable.ai/v0/endConversation':
+        case 'https://api.mendable.ai/v1/endConversation':
           return {};
       }
       throw `Invalid request: ${options.url}`;
@@ -76,12 +76,12 @@ describe('chili', () => {
   it('starts a conversation when a prompt specified as a single arg', async () => {
     sinon.stub(request, 'post').callsFake(async options => {
       switch (options.url) {
-        case 'https://api.mendable.ai/v0/newConversation':
+        case 'https://api.mendable.ai/v1/newConversation':
           return {
             // eslint-disable-next-line camelcase
             conversation_id: 1
           };
-        case 'https://api.mendable.ai/v0/mendableChat':
+        case 'https://api.mendable.ai/v1/mendableChat':
           if (options.data.question === 'Hello world') {
             return {
               answer: {
@@ -91,7 +91,7 @@ describe('chili', () => {
             };
           }
           break;
-        case 'https://api.mendable.ai/v0/endConversation':
+        case 'https://api.mendable.ai/v1/endConversation':
           return {};
       }
       throw `Invalid request: ${options.url}`;
@@ -113,12 +113,12 @@ describe('chili', () => {
   it('starts a conversation when a prompt specified as multiple args (no quotes)', async () => {
     sinon.stub(request, 'post').callsFake(async options => {
       switch (options.url) {
-        case 'https://api.mendable.ai/v0/newConversation':
+        case 'https://api.mendable.ai/v1/newConversation':
           return {
             // eslint-disable-next-line camelcase
             conversation_id: 1
           };
-        case 'https://api.mendable.ai/v0/mendableChat':
+        case 'https://api.mendable.ai/v1/mendableChat':
           if (options.data.question === 'Hello world') {
             return {
               answer: {
@@ -128,7 +128,7 @@ describe('chili', () => {
             };
           }
           break;
-        case 'https://api.mendable.ai/v0/endConversation':
+        case 'https://api.mendable.ai/v1/endConversation':
           return {};
       }
       throw `Invalid request: ${options.url}`;
@@ -150,12 +150,12 @@ describe('chili', () => {
   it('starts a conversation asking for a prompt when no prompt specified via args', async () => {
     sinon.stub(request, 'post').callsFake(async options => {
       switch (options.url) {
-        case 'https://api.mendable.ai/v0/newConversation':
+        case 'https://api.mendable.ai/v1/newConversation':
           return {
             // eslint-disable-next-line camelcase
             conversation_id: 1
           };
-        case 'https://api.mendable.ai/v0/mendableChat':
+        case 'https://api.mendable.ai/v1/mendableChat':
           if (options.data.question === 'Hello world') {
             return {
               answer: {
@@ -165,7 +165,7 @@ describe('chili', () => {
             };
           }
           break;
-        case 'https://api.mendable.ai/v0/endConversation':
+        case 'https://api.mendable.ai/v1/endConversation':
           return {};
       }
       throw `Invalid request: ${options.url}`;
@@ -187,12 +187,12 @@ describe('chili', () => {
   it('uses the prompt to search in CLI docs using Mendable', async () => {
     sinon.stub(request, 'post').callsFake(async options => {
       switch (options.url) {
-        case 'https://api.mendable.ai/v0/newConversation':
+        case 'https://api.mendable.ai/v1/newConversation':
           return {
             // eslint-disable-next-line camelcase
             conversation_id: 1
           };
-        case 'https://api.mendable.ai/v0/mendableChat':
+        case 'https://api.mendable.ai/v1/mendableChat':
           if (options.data.question === 'Hello') {
             return {
               answer: {
@@ -202,7 +202,7 @@ describe('chili', () => {
             };
           }
           break;
-        case 'https://api.mendable.ai/v0/endConversation':
+        case 'https://api.mendable.ai/v1/endConversation':
           return {};
       }
       throw `Invalid request: ${options.url}`;
@@ -223,12 +223,12 @@ describe('chili', () => {
   it('displays the retrieved response to the user', async () => {
     sinon.stub(request, 'post').callsFake(async options => {
       switch (options.url) {
-        case 'https://api.mendable.ai/v0/newConversation':
+        case 'https://api.mendable.ai/v1/newConversation':
           return {
             // eslint-disable-next-line camelcase
             conversation_id: 1
           };
-        case 'https://api.mendable.ai/v0/mendableChat':
+        case 'https://api.mendable.ai/v1/mendableChat':
           if (options.data.question === 'Hello') {
             return {
               answer: {
@@ -238,7 +238,7 @@ describe('chili', () => {
             };
           }
           break;
-        case 'https://api.mendable.ai/v0/endConversation':
+        case 'https://api.mendable.ai/v1/endConversation':
           return {};
 
       }
@@ -261,12 +261,12 @@ describe('chili', () => {
   it('in response formats MD in terminal-friendly way', async () => {
     sinon.stub(request, 'post').callsFake(async options => {
       switch (options.url) {
-        case 'https://api.mendable.ai/v0/newConversation':
+        case 'https://api.mendable.ai/v1/newConversation':
           return {
             // eslint-disable-next-line camelcase
             conversation_id: 1
           };
-        case 'https://api.mendable.ai/v0/mendableChat':
+        case 'https://api.mendable.ai/v1/mendableChat':
           if (options.data.question === 'Hello') {
             return {
               answer: {
@@ -276,7 +276,7 @@ describe('chili', () => {
             };
           }
           break;
-        case 'https://api.mendable.ai/v0/endConversation':
+        case 'https://api.mendable.ai/v1/endConversation':
           return {};
       }
       throw `Invalid request: ${options.url}`;
@@ -298,12 +298,12 @@ describe('chili', () => {
   it('in response, shows sources', async () => {
     sinon.stub(request, 'post').callsFake(async options => {
       switch (options.url) {
-        case 'https://api.mendable.ai/v0/newConversation':
+        case 'https://api.mendable.ai/v1/newConversation':
           return {
             // eslint-disable-next-line camelcase
             conversation_id: 1
           };
-        case 'https://api.mendable.ai/v0/mendableChat':
+        case 'https://api.mendable.ai/v1/mendableChat':
           if (options.data.question === 'Hello') {
             return {
               answer: {
@@ -317,7 +317,7 @@ describe('chili', () => {
             };
           }
           break;
-        case 'https://api.mendable.ai/v0/endConversation':
+        case 'https://api.mendable.ai/v1/endConversation':
           return {};
       }
       throw `Invalid request: ${options.url}`;
@@ -340,12 +340,12 @@ describe('chili', () => {
     let promptedForRating = false;
     sinon.stub(request, 'post').callsFake(async options => {
       switch (options.url) {
-        case 'https://api.mendable.ai/v0/newConversation':
+        case 'https://api.mendable.ai/v1/newConversation':
           return {
             // eslint-disable-next-line camelcase
             conversation_id: 1
           };
-        case 'https://api.mendable.ai/v0/mendableChat':
+        case 'https://api.mendable.ai/v1/mendableChat':
           if (options.data.question === 'Hello world') {
             return {
               answer: {
@@ -357,9 +357,9 @@ describe('chili', () => {
             };
           }
           break;
-        case 'https://api.mendable.ai/v0/rateMessage':
+        case 'https://api.mendable.ai/v1/rateMessage':
           return {};
-        case 'https://api.mendable.ai/v0/endConversation':
+        case 'https://api.mendable.ai/v1/endConversation':
           return {};
       }
       throw `Invalid request: ${options.url}`;
@@ -384,12 +384,12 @@ describe('chili', () => {
     let promptedForRating = false;
     sinon.stub(request, 'post').callsFake(async options => {
       switch (options.url) {
-        case 'https://api.mendable.ai/v0/newConversation':
+        case 'https://api.mendable.ai/v1/newConversation':
           return {
             // eslint-disable-next-line camelcase
             conversation_id: 1
           };
-        case 'https://api.mendable.ai/v0/mendableChat':
+        case 'https://api.mendable.ai/v1/mendableChat':
           if (options.data.question === 'Hello world') {
             return {
               answer: {
@@ -401,7 +401,7 @@ describe('chili', () => {
             };
           }
           break;
-        case 'https://api.mendable.ai/v0/endConversation':
+        case 'https://api.mendable.ai/v1/endConversation':
           return {};
       }
       throw `Invalid request: ${options.url}`;
@@ -425,12 +425,12 @@ describe('chili', () => {
   it('sends positive rating to Mendable', async () => {
     sinon.stub(request, 'post').callsFake(async options => {
       switch (options.url) {
-        case 'https://api.mendable.ai/v0/newConversation':
+        case 'https://api.mendable.ai/v1/newConversation':
           return {
             // eslint-disable-next-line camelcase
             conversation_id: 1
           };
-        case 'https://api.mendable.ai/v0/mendableChat':
+        case 'https://api.mendable.ai/v1/mendableChat':
           if (options.data.question === 'Hello world') {
             return {
               answer: {
@@ -442,12 +442,12 @@ describe('chili', () => {
             };
           }
           break;
-        case 'https://api.mendable.ai/v0/rateMessage':
+        case 'https://api.mendable.ai/v1/rateMessage':
           if (options.data.rating === 1) {
             return {};
           }
           break;
-        case 'https://api.mendable.ai/v0/endConversation':
+        case 'https://api.mendable.ai/v1/endConversation':
           return {};
       }
       throw `Invalid request: ${options.url}`;
@@ -469,12 +469,12 @@ describe('chili', () => {
   it('sends negative rating to Mendable', async () => {
     sinon.stub(request, 'post').callsFake(async options => {
       switch (options.url) {
-        case 'https://api.mendable.ai/v0/newConversation':
+        case 'https://api.mendable.ai/v1/newConversation':
           return {
             // eslint-disable-next-line camelcase
             conversation_id: 1
           };
-        case 'https://api.mendable.ai/v0/mendableChat':
+        case 'https://api.mendable.ai/v1/mendableChat':
           if (options.data.question === 'Hello world') {
             return {
               answer: {
@@ -486,12 +486,12 @@ describe('chili', () => {
             };
           }
           break;
-        case 'https://api.mendable.ai/v0/rateMessage':
+        case 'https://api.mendable.ai/v1/rateMessage':
           if (options.data.rating === -1) {
             return {};
           }
           break;
-        case 'https://api.mendable.ai/v0/endConversation':
+        case 'https://api.mendable.ai/v1/endConversation':
           return {};
       }
       throw `Invalid request: ${options.url}`;
@@ -513,12 +513,12 @@ describe('chili', () => {
   it(`doesn't send rating to Mendable when user chose to skip`, async () => {
     sinon.stub(request, 'post').callsFake(async options => {
       switch (options.url) {
-        case 'https://api.mendable.ai/v0/newConversation':
+        case 'https://api.mendable.ai/v1/newConversation':
           return {
             // eslint-disable-next-line camelcase
             conversation_id: 1
           };
-        case 'https://api.mendable.ai/v0/mendableChat':
+        case 'https://api.mendable.ai/v1/mendableChat':
           if (options.data.question === 'Hello world') {
             return {
               answer: {
@@ -530,7 +530,7 @@ describe('chili', () => {
             };
           }
           break;
-        case 'https://api.mendable.ai/v0/endConversation':
+        case 'https://api.mendable.ai/v1/endConversation':
           return {};
       }
       throw `Invalid request: ${options.url}`;
@@ -552,12 +552,12 @@ describe('chili', () => {
   it(`doesn't fail when rating the response failed`, async () => {
     sinon.stub(request, 'post').callsFake(async options => {
       switch (options.url) {
-        case 'https://api.mendable.ai/v0/newConversation':
+        case 'https://api.mendable.ai/v1/newConversation':
           return {
             // eslint-disable-next-line camelcase
             conversation_id: 1
           };
-        case 'https://api.mendable.ai/v0/mendableChat':
+        case 'https://api.mendable.ai/v1/mendableChat':
           if (options.data.question === 'Hello world') {
             return {
               answer: {
@@ -569,9 +569,9 @@ describe('chili', () => {
             };
           }
           break;
-        case 'https://api.mendable.ai/v0/rateMessage':
+        case 'https://api.mendable.ai/v1/rateMessage':
           throw 'An error has occurred';
-        case 'https://api.mendable.ai/v0/endConversation':
+        case 'https://api.mendable.ai/v1/endConversation':
           return {};
       }
       throw `Invalid request: ${options.url}`;
@@ -593,12 +593,12 @@ describe('chili', () => {
   it(`when rating the response failed, shows error in debug mode`, async () => {
     sinon.stub(request, 'post').callsFake(async options => {
       switch (options.url) {
-        case 'https://api.mendable.ai/v0/newConversation':
+        case 'https://api.mendable.ai/v1/newConversation':
           return {
             // eslint-disable-next-line camelcase
             conversation_id: 1
           };
-        case 'https://api.mendable.ai/v0/mendableChat':
+        case 'https://api.mendable.ai/v1/mendableChat':
           if (options.data.question === 'Hello world') {
             return {
               answer: {
@@ -610,9 +610,9 @@ describe('chili', () => {
             };
           }
           break;
-        case 'https://api.mendable.ai/v0/rateMessage':
+        case 'https://api.mendable.ai/v1/rateMessage':
           throw 'An error has occurred';
-        case 'https://api.mendable.ai/v0/endConversation':
+        case 'https://api.mendable.ai/v1/endConversation':
           return {};
       }
       throw `Invalid request: ${options.url}`;
@@ -636,12 +636,12 @@ describe('chili', () => {
     let questionsAsked = 0;
     sinon.stub(request, 'post').callsFake(async options => {
       switch (options.url) {
-        case 'https://api.mendable.ai/v0/newConversation':
+        case 'https://api.mendable.ai/v1/newConversation':
           return {
             // eslint-disable-next-line camelcase
             conversation_id: 1
           };
-        case 'https://api.mendable.ai/v0/mendableChat':
+        case 'https://api.mendable.ai/v1/mendableChat':
           questionsAsked++;
           if (options.data.question === 'Hello') {
             return {
@@ -660,7 +660,7 @@ describe('chili', () => {
             };
           }
           break;
-        case 'https://api.mendable.ai/v0/endConversation':
+        case 'https://api.mendable.ai/v1/endConversation':
           return {};
       }
       throw `Invalid request: ${options.url}`;
@@ -685,12 +685,12 @@ describe('chili', () => {
     let questionsAsked = 0;
     sinon.stub(request, 'post').callsFake(async options => {
       switch (options.url) {
-        case 'https://api.mendable.ai/v0/newConversation':
+        case 'https://api.mendable.ai/v1/newConversation':
           return {
             // eslint-disable-next-line camelcase
             conversation_id: 1
           };
-        case 'https://api.mendable.ai/v0/mendableChat':
+        case 'https://api.mendable.ai/v1/mendableChat':
           questionsAsked++;
           if (options.data.question === 'Hello') {
             return {
@@ -711,7 +711,7 @@ describe('chili', () => {
             };
           }
           break;
-        case 'https://api.mendable.ai/v0/endConversation':
+        case 'https://api.mendable.ai/v1/endConversation':
           return {};
       }
       throw `Invalid request: ${options.url}`;
@@ -730,12 +730,12 @@ describe('chili', () => {
   it('allows ending conversation after a response', async () => {
     sinon.stub(request, 'post').callsFake(async options => {
       switch (options.url) {
-        case 'https://api.mendable.ai/v0/newConversation':
+        case 'https://api.mendable.ai/v1/newConversation':
           return {
             // eslint-disable-next-line camelcase
             conversation_id: 1
           };
-        case 'https://api.mendable.ai/v0/mendableChat':
+        case 'https://api.mendable.ai/v1/mendableChat':
           if (options.data.question === 'Hello') {
             return {
               answer: {
@@ -745,7 +745,7 @@ describe('chili', () => {
             };
           }
           break;
-        case 'https://api.mendable.ai/v0/endConversation':
+        case 'https://api.mendable.ai/v1/endConversation':
           return {};
       }
       throw `Invalid request: ${options.url}`;
@@ -765,12 +765,12 @@ describe('chili', () => {
     let conversationsStarted = 0;
     sinon.stub(request, 'post').callsFake(async options => {
       switch (options.url) {
-        case 'https://api.mendable.ai/v0/newConversation':
+        case 'https://api.mendable.ai/v1/newConversation':
           return {
             // eslint-disable-next-line camelcase
             conversation_id: ++conversationsStarted
           };
-        case 'https://api.mendable.ai/v0/mendableChat':
+        case 'https://api.mendable.ai/v1/mendableChat':
           if (options.data.question === 'Hello') {
             return {
               answer: {
@@ -789,7 +789,7 @@ describe('chili', () => {
             };
           }
           break;
-        case 'https://api.mendable.ai/v0/endConversation':
+        case 'https://api.mendable.ai/v1/endConversation':
           return {};
       }
       throw `Invalid request: ${options.url}`;
@@ -811,7 +811,7 @@ describe('chili', () => {
   it('throws exception when getting conversation ID failed', async () => {
     sinon.stub(request, 'post').callsFake(async options => {
       switch (options.url) {
-        case 'https://api.mendable.ai/v0/newConversation':
+        case 'https://api.mendable.ai/v1/newConversation':
           return Promise.reject('An error has occurred');
       }
       throw `Invalid request: ${options.url}`;
@@ -823,12 +823,12 @@ describe('chili', () => {
   it('throw exception when calling Mendable API to search in CLI docs failed', () => {
     sinon.stub(request, 'post').callsFake(async options => {
       switch (options.url) {
-        case 'https://api.mendable.ai/v0/newConversation':
+        case 'https://api.mendable.ai/v1/newConversation':
           return {
             // eslint-disable-next-line camelcase
             conversation_id: 1
           };
-        case 'https://api.mendable.ai/v0/mendableChat':
+        case 'https://api.mendable.ai/v1/mendableChat':
           throw 'An error has occurred';
       }
       throw `Invalid request: ${options.url}`;
