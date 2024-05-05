@@ -381,7 +381,7 @@ describe(commands.GROUP_USER_ADD, () => {
     ]);
   });
 
-  it('handles API error when changing roles', async () => {
+  it('handles API error when a user is already a member of a group', async () => {
     sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/$batch' &&
         opts.data.requests[0].method === 'PATCH') {
@@ -412,7 +412,7 @@ describe(commands.GROUP_USER_ADD, () => {
       new CommandError(`One or more added object references already exist for the following modified properties: 'members'.`));
   });
 
-  it('handles API error when changing roles2', async () => {
+  it('handles API error when service is unavailable', async () => {
     sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/$batch' &&
         opts.data.requests[0].method === 'PATCH') {
@@ -453,7 +453,7 @@ describe(commands.GROUP_USER_ADD, () => {
       new CommandError('Service unavailable.'));
   });
 
-  it('handles API error when changing roles3', async () => {
+  it('handles API error when removing user from the current role fails', async () => {
     sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/$batch' &&
         opts.data.requests[0].method === 'PATCH') {

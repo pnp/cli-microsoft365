@@ -197,7 +197,6 @@ class EntraGroupUserSetCommand extends GraphCommand {
       }
     }
 
-
     for (let i = 0; i < userIdsToRemove.length; i += 20) {
       const userIdsBatch = userIds.slice(i, i + 20);
       const requestOptions = this.getRequestOptions();
