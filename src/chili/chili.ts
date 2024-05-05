@@ -41,7 +41,7 @@ let history: {
   prompt: string;
   response: string;
 }[] = [];
-const showSpinner = cli.getSettingWithDefaultValue<boolean>(settingsNames.showSpinner, true) && typeof global.it === 'undefined' || false;
+const showSpinner = cli.getSettingWithDefaultValue<boolean>(settingsNames.showSpinner, true) && typeof global.it === 'undefined';
 
 request.logger = {
   /* c8 ignore next 3 */
