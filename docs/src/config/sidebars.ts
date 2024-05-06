@@ -3631,6 +3631,11 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'tenant settings set',
               id: 'cmd/spo/tenant/tenant-settings-set'
+            },
+            {
+              type: 'doc',
+              label: 'tenant site archive',
+              id: 'cmd/spo/tenant/tenant-site-archive'
             }
           ]
         },
