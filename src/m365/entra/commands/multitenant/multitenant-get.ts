@@ -17,7 +17,7 @@ class EntraMultitenantGetCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'Gets a detail about the multitenant organization';
+    return 'Gets properties of the multitenant organization';
   }
 
   public async commandAction(logger: Logger): Promise<void> {
