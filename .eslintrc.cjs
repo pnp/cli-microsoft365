@@ -70,6 +70,7 @@ const dictionary = [
   'member',
   'messaging',
   'model',
+  'multitenant',
   'm365',
   'news',
   'oauth2',

@@ -425,6 +425,15 @@ const sidebars: SidebarsConfig = {
           ]
         },
         {
+          multitenant: [
+            {
+              type: 'doc',
+              label: 'multitenant get',
+              id: 'cmd/entra/multitenant/multitenant-get'
+            }
+          ]
+        },
+        {
           m365group: [
             {
               type: 'doc',
