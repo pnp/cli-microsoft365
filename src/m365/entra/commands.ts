@@ -75,6 +75,7 @@ export default {
   M365GROUP_USER_SET: `${prefix} m365group user set`,
   MULTITENANT_ADD: `${prefix} multitenant add`,
   MULTITENANT_GET: `${prefix} multitenant get`,
+  MULTITENANT_REMOVE: `${prefix} multitenant remove`,
   MULTITENANT_SET: `${prefix} multitenant set`,
   OAUTH2GRANT_ADD: `${prefix} oauth2grant add`,
   OAUTH2GRANT_LIST: `${prefix} oauth2grant list`,

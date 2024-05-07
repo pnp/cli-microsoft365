@@ -553,6 +553,11 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
+              label: 'multitenant remove',
+              id: 'cmd/entra/multitenant/multitenant-remove'
+            },
+            {
+              type: 'doc',
               label: 'multitenant set',
               id: 'cmd/entra/multitenant/multitenant-set'
             }
