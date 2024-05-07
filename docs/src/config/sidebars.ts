@@ -414,6 +414,15 @@ const sidebars: SidebarsConfig = {
           ]
         },
         {
+          multitenant: [
+            {
+              type: 'doc',
+              label: 'multitenant remove',
+              id: 'cmd/entra/multitenant/multitenant-remove'
+            }
+          ]
+        },
+        {
           m365group: [
             {
               type: 'doc',
