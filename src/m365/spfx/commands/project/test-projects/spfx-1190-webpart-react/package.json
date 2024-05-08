@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "engines": {
-    "node": ">=16.13.0 <17.0.0 || >=18.17.1 <19.0.0"
+    "node": ">=18.17.1 <19.0.0"
   },
   "main": "lib/index.js",
   "scripts": {
@@ -16,12 +16,12 @@
     "react": "17.0.1",
     "react-dom": "17.0.1",
     "@fluentui/react": "^8.106.4",
-    "@microsoft/sp-core-library": "1.19.0-beta.0",
-    "@microsoft/sp-component-base": "1.19.0-beta.0",
-    "@microsoft/sp-property-pane": "1.19.0-beta.0",
-    "@microsoft/sp-webpart-base": "1.19.0-beta.0",
-    "@microsoft/sp-lodash-subset": "1.19.0-beta.0",
-    "@microsoft/sp-office-ui-fabric-core": "1.19.0-beta.0"
+    "@microsoft/sp-core-library": "1.19.0",
+    "@microsoft/sp-component-base": "1.19.0",
+    "@microsoft/sp-property-pane": "1.19.0",
+    "@microsoft/sp-webpart-base": "1.19.0",
+    "@microsoft/sp-lodash-subset": "1.19.0",
+    "@microsoft/sp-office-ui-fabric-core": "1.19.0"
   },
   "devDependencies": {
     "@microsoft/rush-stack-compiler-4.7": "0.1.0",
