@@ -46,32 +46,26 @@ m365 spo tenant settings set [options]
 `--ODBSharingCapability [ODBSharingCapability]`
 : Configure the sharing level for for OneDrive sites. Allowed values: `ExternalUserAndGuestSharing` (default) - External user sharing (share by email) and guest link sharing are both enabled, `Disabled` - External user sharing (share by email) and guest link sharing are both disabled, `ExternalUserSharingOnly` - External user sharing (share by email) is enabled but guest link sharing is disabled, `ExistingExternalUserSharingOnly` - Only guests already in your organization's directory.
 
-`--OneDriveLoopSharingCapability [OneDriveLoopSharingCapability]`
-: Configure the sharing level for the Loop components hosted on OneDrive, for example: whiteboards in Teams meetings. Allowed values: `ExternalUserAndGuestSharing` (default) - External user sharing (share by email) and guest link sharing are both enabled, `Disabled` - External user sharing (share by email) and guest link sharing are both disabled, `ExternalUserSharingOnly` - External user sharing (share by email) is enabled but guest link sharing is disabled, `ExistingExternalUserSharingOnly` - Only guests already in your organization's directory.
-
-`--CoreLoopSharingCapability [CoreLoopSharingCapability]`
-: Configure the sharing level for the fluid on core partition. Allowed values: `ExternalUserAndGuestSharing` (default) - External user sharing (share by email) and guest link sharing are both enabled, `Disabled` - External user sharing (share by email) and guest link sharing are both disabled, `ExternalUserSharingOnly` - External user sharing (share by email) is enabled but guest link sharing is disabled. `ExistingExternalUserSharingOnly` - Only guests already in your organization's directory.
-
 `--ContainerSharingCapability [ContainerSharingCapability]`
 : Configure the sharing level for SharePoint Embedded applications. The external sharing features let users in your organization share content with people outside the organization (such as partners, vendors, clients, or customers), ensuring sensitive data isn't accidentally shared with unauthorized users. Allowed values: `ExternalUserAndGuestSharing` (default) - External user sharing (share by email) and guest link sharing are both enabled, `Disabled` - External user sharing (share by email) and guest link sharing are both disabled, `ExternalUserSharingOnly` - External user sharing (share by email) is enabled but guest link sharing is disabled, `ExistingExternalUserSharingOnly` - Only guests already in your organization's directory.
 
 `--CoreDefaultShareLinkRole [CoreDefaultShareLinkRole]`
-: Sets the default share link role on core partition. Allowed values `Edit`, `View`, `LimitedEdit`, `LimitedView`, `ManageList`, `None`, `Owner`, `RestrictedView`, `Review`, `Submit`.
+: Sets the default share link role on core partition. Allowed values `None`, `View`, `Edit`, `Review`, `RestrictedView`.
 
 `--CoreLoopDefaultSharingLinkRole [CoreLoopDefaultSharingLinkRole]`
-: Sets the default share link role for fluid on SharePoint sites. Allowed values `Edit`, `View`, `LimitedEdit`, `LimitedView`, `ManageList`, `None`, `Owner`, `RestrictedView`, `Review`, `Submit`.
+: Sets the default share link role for fluid on SharePoint sites. Allowed values `None`, `View`, `Edit`, `Review`, `RestrictedView`.
 
 `--ContainerDefaultShareLinkRole [ContainerDefaultShareLinkRole]`
-: Sets the default share link for SharePoint Embedded. Allowed values `Edit`, `View`, `LimitedEdit`, `LimitedView`, `ManageList`, `None`, `Owner`, `RestrictedView`, `Review`, `Submit`.
+: Sets the default share link for SharePoint Embedded. Allowed values `None`, `View`, `Edit`, `Review`, `RestrictedView`.
 
 `--ContainerLoopDefaultShareLinkRole [ContainerLoopDefaultShareLinkRole]`
-: Sets the default share link for Loop components. Allowed values `Edit`, `View`, `LimitedEdit`, `LimitedView`, `ManageList`, `None`, `Owner`, `RestrictedView`, `Review`, `Submit`.
+: Sets the default share link for SharePoint Embedded Loop components. Allowed values `None`, `View`, `Edit`, `Review`, `RestrictedView`.
 
 `--OneDriveDefaultShareLinkRole [OneDriveDefaultShareLinkRole]`
-: Sets the default share link role on OneDrive partition. Allowed values `Edit`, `View`, `LimitedEdit`, `LimitedView`, `ManageList`, `None`, `Owner`, `RestrictedView`, `Review`, `Submit`.
+: Sets the default share link role on OneDrive partition. Allowed values `None`, `View`, `Edit`, `Review`, `RestrictedView`.
 
 `--OneDriveLoopDefaultSharingLinkRole [OneDriveLoopDefaultSharingLinkRole]`
-: Sets the default share link role for fluid on OneDrive sites. Allowed values `Edit`, `View`, `LimitedEdit`, `LimitedView`, `ManageList`, `None`, `Owner`, `RestrictedView`, `Review`, `Submit`.
+: Sets the default share link role for fluid on OneDrive sites. Allowed values `None`, `View`, `Edit`, `Review`, `RestrictedView`.
 
 `--CoreDefaultShareLinkScope [CoreDefaultShareLinkScope]`
 : Sets the default share link scope on core partition. Allowed values `Anyone`, `Organization`, `SpecificPeople`, `Uninitialized`.
@@ -83,7 +77,7 @@ m365 spo tenant settings set [options]
 : Sets the default share link scope for SharePoint Embedded. Allowed values `Anyone`, `Organization`, `SpecificPeople`, `Uninitialized`.
 
 `--ContainerLoopDefaultShareLinkScope [ContainerLoopDefaultShareLinkScope]`
-: Sets the default share link scope for Loop components. Allowed values `Anyone`, `Organization`, `SpecificPeople`, `Uninitialized`.
+: Sets the default share link scope for SharePoint Embedded Loop components. Allowed values `Anyone`, `Organization`, `SpecificPeople`, `Uninitialized`.
 
 `--OneDriveDefaultShareLinkScope [OneDriveDefaultShareLinkScope]`
 : Sets the default share link scope on OneDrive partition. Allowed values `Anyone`, `Organization`, `SpecificPeople`, `Uninitialized`.
@@ -515,6 +509,8 @@ m365 spo tenant settings set [options]
 To use this command you have to have permission to access the tenant admin site.
 
 :::
+
+This command allows using unknown options.
 
 ## Examples
 
