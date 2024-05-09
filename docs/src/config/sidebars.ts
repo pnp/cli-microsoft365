@@ -3318,7 +3318,7 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
-              label: 'site remove',
+              label: 'site unarchive',
               id: 'cmd/spo/site/site-unarchive'
             },
             {
