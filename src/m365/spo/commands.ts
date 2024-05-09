@@ -266,6 +266,7 @@ export default {
   SITE_RENAME: `${prefix} site rename`,
   SITE_SET: `${prefix} site set`,
   SITE_CHROME_SET: `${prefix} site chrome set`,
+  SITE_UNARCHIVE: `${prefix} site unarchive`,
   SITEDESIGN_ADD: `${prefix} sitedesign add`,
   SITEDESIGN_APPLY: `${prefix} sitedesign apply`,
   SITEDESIGN_GET: `${prefix} sitedesign get`,

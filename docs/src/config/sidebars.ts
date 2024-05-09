@@ -3318,6 +3318,11 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
+              label: 'site remove',
+              id: 'cmd/spo/site/site-unarchive'
+            },
+            {
+              type: 'doc',
               label: 'site appcatalog add',
               id: 'cmd/spo/site/site-appcatalog-add'
             },
