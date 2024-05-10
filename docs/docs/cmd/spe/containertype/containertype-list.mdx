@@ -1,0 +1,90 @@
+import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# Container Types list
+
+Retrieves a list of Container Types sites
+
+## Usage
+
+```sh
+m365 Container Types list [options]
+```
+
+## Options
+
+<Global />
+
+## Examples
+
+Retrieves a list of Container Types sites from the tenant.
+
+```sh
+m365 Container Types list
+```
+
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  [{
+    "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SPContainerTypeProperties",
+    "ApplicationRedirectUrl": null,
+    "AzureSubscriptionId": "/Guid(00000000-0000-0000-0000-000000000000)/",
+    "ContainerTypeId": "/Guid(073269af-f1d2-042d-2ef5-5bdd6ac83115)/",
+    "CreationDate": null,
+    "DisplayName": "test1",
+    "ExpiryDate": null,
+    "IsBillingProfileRequired": true,
+    "OwningAppId": "/Guid(df4085cc-9a38-4255-badc-5c5225610475)/",
+    "OwningTenantId": "/Guid(00000000-0000-0000-0000-000000000000)/",
+    "Region": null,
+    "ResourceGroup": null,
+    "SPContainerTypeBillingClassification": 0
+  },
+  {
+    "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SPContainerTypeProperties",
+    "ApplicationRedirectUrl": null,
+    "AzureSubscriptionId": "/Guid(00000000-0000-0000-0000-000000000000)/",
+    "ContainerTypeId": "/Guid(880ab3bd-5b68-01d4-3744-01a7656cf2ba)/",
+    "CreationDate": null,
+    "DisplayName": "test1",
+    "ExpiryDate": null,
+    "IsBillingProfileRequired": true,
+    "OwningAppId": "/Guid(50785fde-3082-47ac-a36d-06282ac5c7da)/",
+    "OwningTenantId": "/Guid(00000000-0000-0000-0000-000000000000)/",
+    "Region": null,
+    "ResourceGroup": null,
+    "SPContainerTypeBillingClassification": 0
+  }]
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # Container Types list
+
+  Date: 2023-05-22
+
+  
+  </TabItem>
+</Tabs>
+
