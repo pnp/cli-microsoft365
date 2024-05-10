@@ -266,7 +266,7 @@ describe(commands.STORAGEENTITY_SET, () => {
   it('rejects invalid SharePoint Online URL', async () => {
     const url = 'http://contoso';
     const actual = await command.validate({ options: { appCatalogUrl: url, key: 'prop', value: 'val' } }, commandInfo);
-    assert.strictEqual(actual, `${url} is not a valid SharePoint Online site URL`);
+    assert.strictEqual(actual, `'${url}' is not a valid SharePoint Online site URL.`);
   });
 
   it('handles promise rejection', async () => {

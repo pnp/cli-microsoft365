@@ -235,7 +235,7 @@ describe(commands.STORAGEENTITY_LIST, () => {
   it('rejects invalid SharePoint Online URL', async () => {
     const url = 'http://contoso';
     const actual = await command.validate({ options: { appCatalogUrl: url } }, commandInfo);
-    assert.strictEqual(actual, `${url} is not a valid SharePoint Online site URL`);
+    assert.strictEqual(actual, `'${url}' is not a valid SharePoint Online site URL.`);
   });
 
   it('fails validation when no SharePoint Online app catalog URL specified', async () => {

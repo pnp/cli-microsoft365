@@ -352,12 +352,12 @@ export const validation = {
   },
 
   isValidSharePointUrl(url: string): boolean | string {
-    if (!url) {
-      return false;
+    if (typeof url !== 'string') {
+      return 'SharePoint Online site URL must be a string.';
     }
 
     if (url.indexOf('https://') !== 0) {
-      return `${url} is not a valid SharePoint Online site URL`;
+      return `'${url}' is not a valid SharePoint Online site URL.`;
     }
     else {
       return true;
