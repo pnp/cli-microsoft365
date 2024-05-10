@@ -1920,6 +1920,11 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'containertype add',
               id: 'cmd/spe/containertype/containertype-add'
+            },
+            {
+              type: 'doc',
+              label: 'containertype list',
+              id: 'cmd/spe/containertype/containertype-list'
             }
           ]
         }

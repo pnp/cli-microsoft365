@@ -1,0 +1,131 @@
+import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# Container Types list
+
+Retrieves a list of Container Types created for a SharePoint Embedded Application
+
+## Usage
+
+```sh
+m365 containertype list [options]
+```
+
+## Options
+
+<Global />
+
+## Examples
+
+Retrieves a list of Container Types created for a SharePoint Embedded Application from the tenant.
+
+```sh
+m365 containertype list
+```
+
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  [{
+    "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SPContainerTypeProperties",
+    "ApplicationRedirectUrl": null,
+    "AzureSubscriptionId": "/Guid(00000000-0000-0000-0000-000000000000)/",
+    "ContainerTypeId": "/Guid(073269af-f1d2-042d-2ef5-5bdd6ac83115)/",
+    "CreationDate": null,
+    "DisplayName": "test1",
+    "ExpiryDate": null,
+    "IsBillingProfileRequired": true,
+    "OwningAppId": "/Guid(df4085cc-9a38-4255-badc-5c5225610475)/",
+    "OwningTenantId": "/Guid(00000000-0000-0000-0000-000000000000)/",
+    "Region": null,
+    "ResourceGroup": null,
+    "SPContainerTypeBillingClassification": 0
+  },
+   {
+    "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SPContainerTypeProperties",
+    "ApplicationRedirectUrl": null,
+    "AzureSubscriptionId": "/Guid(00000000-0000-0000-0000-000000000000)/",
+    "ContainerTypeId": "/Guid(3ec7c59d-ef31-0752-1ab5-5c343a5e8557)/",
+    "CreationDate": null,
+    "DisplayName": "SharePoint Embedded Free Trial Container Type",
+    "ExpiryDate": null,
+    "IsBillingProfileRequired": true,
+    "OwningAppId": "/Guid(e6b529fe-84db-412a-8e9c-5bbb75f7b037)/",
+    "OwningTenantId": "/Guid(00000000-0000-0000-0000-000000000000)/",
+    "Region": null,
+    "ResourceGroup": null,
+    "SPContainerTypeBillingClassification": 1
+  }]
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+ContainerTypeId                               DisplayName                                    OwningAppId                                 
+--------------------------------------------  ---------------------------------------------  --------------------------------------------
+/Guid(073269af-f1d2-042d-2ef5-5bdd6ac83115)/  test1                                          /Guid(df4085cc-9a38-4255-badc-5c5225610475)/
+/Guid(880ab3bd-5b68-01d4-3744-01a7656cf2ba)/  test1                                          /Guid(50785fde-3082-47ac-a36d-06282ac5c7da)/
+/Guid(3ec7c59d-ef31-0752-1ab5-5c343a5e8557)/  SharePoint Embedded Free Trial Container Type  /Guid(e6b529fe-84db-412a-8e9c-5bbb75f7b037)/
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  _ObjectType_,ApplicationRedirectUrl,AzureSubscriptionId,ContainerTypeId,CreationDate,DisplayName,ExpiryDate,IsBillingProfileRequired,OwningAppId,OwningTenantId,Region,ResourceGroup,SPContainerTypeBillingClassification
+  Microsoft.Online.SharePoint.TenantAdministration.SPContainerTypeProperties,,/Guid(00000000-0000-0000-0000-000000000000)/,/Guid(073269af-f1d2-042d-2ef5-5bdd6ac83115)/,,test1,,1,/Guid(df4085cc-9a38-4255-badc-5c5225610475)/,/Guid(00000000-0000-0000-0000-000000000000)/,,,0
+  Microsoft.Online.SharePoint.TenantAdministration.SPContainerTypeProperties,,/Guid(00000000-0000-0000-0000-000000000000)/,/Guid(3ec7c59d-ef31-0752-1ab5-5c343a5e8557)/,,SharePoint Embedded Free Trial Container Type,,1,/Guid(e6b529fe-84db-412a-8e9c-5bbb75f7b037)/,/Guid(00000000-0000-0000-0000-000000000000)/,,,1
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # spe containertype list 
+
+  Date: 5/11/2024
+
+  ## test1
+
+  Property | Value
+  ---------|-------
+  \_ObjectType\_ | Microsoft.Online.SharePoint.TenantAdministration.SPContainerTypeProperties
+  AzureSubscriptionId | /Guid(00000000-0000-0000-0000-000000000000)/
+  ContainerTypeId | /Guid(073269af-f1d2-042d-2ef5-5bdd6ac83115)/
+  DisplayName | test1
+  IsBillingProfileRequired | true
+  OwningAppId | /Guid(df4085cc-9a38-4255-badc-5c5225610475)/
+  OwningTenantId | /Guid(00000000-0000-0000-0000-000000000000)/
+  SPContainerTypeBillingClassification | 0
+
+  ## SharePoint Embedded Free Trial Container Type
+
+  Property | Value
+  ---------|-------
+  \_ObjectType\_ | Microsoft.Online.SharePoint.TenantAdministration.SPContainerTypeProperties
+  AzureSubscriptionId | /Guid(00000000-0000-0000-0000-000000000000)/
+  ContainerTypeId | /Guid(3ec7c59d-ef31-0752-1ab5-5c343a5e8557)/
+  DisplayName | SharePoint Embedded Free Trial Container Type
+  IsBillingProfileRequired | true
+  OwningAppId | /Guid(e6b529fe-84db-412a-8e9c-5bbb75f7b037)/
+  OwningTenantId | /Guid(00000000-0000-0000-0000-000000000000)/
+  SPContainerTypeBillingClassification | 1
+  ```
+
+  </TabItem>
+</Tabs>
+
+## More information
+
+In SharePoint Embedded, all files and documents are stored in Containers, and each Container is identified by a Container Type.
+
+Container Type is a property stamped on every Container instance. Each Container Type is owned by one Application, and each Application can own only one Container Type.
+
+The primary function of a Container Type is to manage the application workload that can access the Containers. Container Type defines the access permissions an Application has towards all Containers of that type, including create, read, write, delete containers; manage container permissions, etc.
+
+More information about SharePoint Embedded and the limits can be found at the following location: [SharePoint Embedded](https://learn.microsoft.com/en-us/sharepoint/dev/embedded/concepts/app-concepts/containertypes#sharepoint-embedded-trial-container-types)
