@@ -583,8 +583,8 @@ class SpfxDoctorCommand extends BaseProjectCommand {
     },
     '1.19.0': {
       gulpCli: {
-        range: '^1 || ^2',
-        fix: 'npm i -g gulp-cli@2'
+        range: '^1 || ^2 || ^3',
+        fix: 'npm i -g gulp-cli@3'
       },
       node: {
         range: '>=18.17.1 <19.0.0',
