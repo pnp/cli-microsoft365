@@ -73,7 +73,7 @@ class SpfxDoctorCommand extends BaseProjectCommand {
   private readonly versions: { [version: string]: SpfxVersionPrerequisites } = {
     '1.0.0': {
       gulpCli: {
-        range: '^1 || ^2 || ^3',
+        range: '^1 || ^2',
         fix: 'npm i -g gulp-cli@2'
       },
       node: {
@@ -88,7 +88,7 @@ class SpfxDoctorCommand extends BaseProjectCommand {
     },
     '1.1.0': {
       gulpCli: {
-        range: '^1 || ^2 || ^3',
+        range: '^1 || ^2',
         fix: 'npm i -g gulp-cli@2'
       },
       node: {
@@ -103,7 +103,7 @@ class SpfxDoctorCommand extends BaseProjectCommand {
     },
     '1.2.0': {
       gulpCli: {
-        range: '^1 || ^2 || ^3',
+        range: '^1 || ^2',
         fix: 'npm i -g gulp-cli@2'
       },
       node: {
@@ -118,7 +118,7 @@ class SpfxDoctorCommand extends BaseProjectCommand {
     },
     '1.4.0': {
       gulpCli: {
-        range: '^1 || ^2 || ^3',
+        range: '^1 || ^2',
         fix: 'npm i -g gulp-cli@2'
       },
       node: {
@@ -133,7 +133,7 @@ class SpfxDoctorCommand extends BaseProjectCommand {
     },
     '1.4.1': {
       gulpCli: {
-        range: '^1 || ^2 || ^3',
+        range: '^1 || ^2',
         fix: 'npm i -g gulp-cli@2'
       },
       node: {
@@ -148,7 +148,7 @@ class SpfxDoctorCommand extends BaseProjectCommand {
     },
     '1.5.0': {
       gulpCli: {
-        range: '^1 || ^2 || ^3',
+        range: '^1 || ^2',
         fix: 'npm i -g gulp-cli@2'
       },
       node: {
@@ -163,7 +163,7 @@ class SpfxDoctorCommand extends BaseProjectCommand {
     },
     '1.5.1': {
       gulpCli: {
-        range: '^1 || ^2 || ^3',
+        range: '^1 || ^2',
         fix: 'npm i -g gulp-cli@2'
       },
       node: {
@@ -178,7 +178,7 @@ class SpfxDoctorCommand extends BaseProjectCommand {
     },
     '1.6.0': {
       gulpCli: {
-        range: '^1 || ^2 || ^3',
+        range: '^1 || ^2',
         fix: 'npm i -g gulp-cli@2'
       },
       node: {
@@ -193,7 +193,7 @@ class SpfxDoctorCommand extends BaseProjectCommand {
     },
     '1.7.0': {
       gulpCli: {
-        range: '^1 || ^2 || ^3',
+        range: '^1 || ^2',
         fix: 'npm i -g gulp-cli@2'
       },
       node: {
@@ -208,7 +208,7 @@ class SpfxDoctorCommand extends BaseProjectCommand {
     },
     '1.7.1': {
       gulpCli: {
-        range: '^1 || ^2 || ^3',
+        range: '^1 || ^2',
         fix: 'npm i -g gulp-cli@2'
       },
       node: {
@@ -223,7 +223,7 @@ class SpfxDoctorCommand extends BaseProjectCommand {
     },
     '1.8.0': {
       gulpCli: {
-        range: '^1 || ^2 || ^3',
+        range: '^1 || ^2',
         fix: 'npm i -g gulp-cli@2'
       },
       node: {
@@ -238,7 +238,7 @@ class SpfxDoctorCommand extends BaseProjectCommand {
     },
     '1.8.1': {
       gulpCli: {
-        range: '^1 || ^2 || ^3',
+        range: '^1 || ^2',
         fix: 'npm i -g gulp-cli@2'
       },
       node: {
@@ -253,7 +253,7 @@ class SpfxDoctorCommand extends BaseProjectCommand {
     },
     '1.8.2': {
       gulpCli: {
-        range: '^1 || ^2 || ^3',
+        range: '^1 || ^2',
         fix: 'npm i -g gulp-cli@2'
       },
       node: {
@@ -268,7 +268,7 @@ class SpfxDoctorCommand extends BaseProjectCommand {
     },
     '1.9.0': {
       gulpCli: {
-        range: '^1 || ^2 || ^3',
+        range: '^1 || ^2',
         fix: 'npm i -g gulp-cli@2'
       },
       node: {
@@ -283,7 +283,7 @@ class SpfxDoctorCommand extends BaseProjectCommand {
     },
     '1.9.1': {
       gulpCli: {
-        range: '^1 || ^2 || ^3',
+        range: '^1 || ^2',
         fix: 'npm i -g gulp-cli@2'
       },
       node: {
@@ -298,7 +298,7 @@ class SpfxDoctorCommand extends BaseProjectCommand {
     },
     '1.10.0': {
       gulpCli: {
-        range: '^1 || ^2 || ^3',
+        range: '^1 || ^2',
         fix: 'npm i -g gulp-cli@2'
       },
       node: {
@@ -313,7 +313,7 @@ class SpfxDoctorCommand extends BaseProjectCommand {
     },
     '1.11.0': {
       gulpCli: {
-        range: '^1 || ^2 || ^3',
+        range: '^1 || ^2',
         fix: 'npm i -g gulp-cli@2'
       },
       node: {
@@ -328,7 +328,7 @@ class SpfxDoctorCommand extends BaseProjectCommand {
     },
     '1.12.0': {
       gulpCli: {
-        range: '^1 || ^2 || ^3',
+        range: '^1 || ^2',
         fix: 'npm i -g gulp-cli@2'
       },
       node: {
@@ -343,7 +343,7 @@ class SpfxDoctorCommand extends BaseProjectCommand {
     },
     '1.12.1': {
       gulpCli: {
-        range: '^1 || ^2 || ^3',
+        range: '^1 || ^2',
         fix: 'npm i -g gulp-cli@2'
       },
       node: {
@@ -358,7 +358,7 @@ class SpfxDoctorCommand extends BaseProjectCommand {
     },
     '1.13.0': {
       gulpCli: {
-        range: '^1 || ^2 || ^3',
+        range: '^1 || ^2',
         fix: 'npm i -g gulp-cli@2'
       },
       node: {
@@ -373,7 +373,7 @@ class SpfxDoctorCommand extends BaseProjectCommand {
     },
     '1.13.1': {
       gulpCli: {
-        range: '^1 || ^2 || ^3',
+        range: '^1 || ^2',
         fix: 'npm i -g gulp-cli@2'
       },
       node: {
@@ -388,7 +388,7 @@ class SpfxDoctorCommand extends BaseProjectCommand {
     },
     '1.14.0': {
       gulpCli: {
-        range: '^1 || ^2 || ^3',
+        range: '^1 || ^2',
         fix: 'npm i -g gulp-cli@2'
       },
       node: {
@@ -403,7 +403,7 @@ class SpfxDoctorCommand extends BaseProjectCommand {
     },
     '1.15.0': {
       gulpCli: {
-        range: '^1 || ^2 || ^3',
+        range: '^1 || ^2',
         fix: 'npm i -g gulp-cli@2'
       },
       node: {
@@ -418,7 +418,7 @@ class SpfxDoctorCommand extends BaseProjectCommand {
     },
     '1.15.2': {
       gulpCli: {
-        range: '^1 || ^2 || ^3',
+        range: '^1 || ^2',
         fix: 'npm i -g gulp-cli@2'
       },
       node: {
@@ -433,7 +433,7 @@ class SpfxDoctorCommand extends BaseProjectCommand {
     },
     '1.16.0': {
       gulpCli: {
-        range: '^1 || ^2 || ^3',
+        range: '^1 || ^2',
         fix: 'npm i -g gulp-cli@2'
       },
       node: {
@@ -448,7 +448,7 @@ class SpfxDoctorCommand extends BaseProjectCommand {
     },
     '1.16.1': {
       gulpCli: {
-        range: '^1 || ^2 || ^3',
+        range: '^1 || ^2',
         fix: 'npm i -g gulp-cli@2'
       },
       node: {
@@ -463,7 +463,7 @@ class SpfxDoctorCommand extends BaseProjectCommand {
     },
     '1.17.0': {
       gulpCli: {
-        range: '^1 || ^2 || ^3',
+        range: '^1 || ^2',
         fix: 'npm i -g gulp-cli@2'
       },
       node: {
@@ -478,7 +478,7 @@ class SpfxDoctorCommand extends BaseProjectCommand {
     },
     '1.17.1': {
       gulpCli: {
-        range: '^1 || ^2 || ^3',
+        range: '^1 || ^2',
         fix: 'npm i -g gulp-cli@2'
       },
       node: {
@@ -493,7 +493,7 @@ class SpfxDoctorCommand extends BaseProjectCommand {
     },
     '1.17.2': {
       gulpCli: {
-        range: '^1 || ^2 || ^3',
+        range: '^1 || ^2',
         fix: 'npm i -g gulp-cli@2'
       },
       node: {
@@ -508,7 +508,7 @@ class SpfxDoctorCommand extends BaseProjectCommand {
     },
     '1.17.3': {
       gulpCli: {
-        range: '^1 || ^2 || ^3',
+        range: '^1 || ^2',
         fix: 'npm i -g gulp-cli@2'
       },
       node: {
@@ -523,7 +523,7 @@ class SpfxDoctorCommand extends BaseProjectCommand {
     },
     '1.17.4': {
       gulpCli: {
-        range: '^1 || ^2 || ^3',
+        range: '^1 || ^2',
         fix: 'npm i -g gulp-cli@2'
       },
       node: {
