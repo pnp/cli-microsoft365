@@ -46,6 +46,24 @@ export const formatting = {
     return JSON.parse(s.replace(/^\uFEFF/, ''));
   },
 
+  /**
+   * Tries to parse a string as JSON. If it fails, returns the original string.
+   * @param value JSON string to parse.
+   * @returns JSON object or the original string if parsing fails.
+   */
+  tryParseJson(value: string): any {
+    try {
+      if (typeof value !== 'string') {
+        return value;
+      }
+
+      return JSON.parse(value);
+    }
+    catch {
+      return value;
+    }
+  },
+
   filterObject(obj: any, propertiesToInclude: string[]): any {
     const objKeys = Object.keys(obj);
     return propertiesToInclude
