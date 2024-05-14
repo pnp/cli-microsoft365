@@ -18,6 +18,7 @@ interface Options extends GlobalOptions {
   title?: string;
   id?: string;
   clientSideComponentId?: string;
+  tenantWideExtensionComponentProperties?: boolean;
 }
 
 class SpoTenantApplicationCustomizerGetCommand extends SpoCommand {
@@ -36,6 +37,7 @@ class SpoTenantApplicationCustomizerGetCommand extends SpoCommand {
     this.#initOptions();
     this.#initValidators();
     this.#initOptionSets();
+    this.#initTypes();
   }
 
   #initTelemetry(): void {
@@ -43,7 +45,8 @@ class SpoTenantApplicationCustomizerGetCommand extends SpoCommand {
       Object.assign(this.telemetryProperties, {
         title: typeof args.options.title !== 'undefined',
         id: typeof args.options.id !== 'undefined',
-        clientSideComponentId: typeof args.options.clientSideComponentId !== 'undefined'
+        clientSideComponentId: typeof args.options.clientSideComponentId !== 'undefined',
+        tenantWideExtensionComponentProperties: !!args.options.tenantWideExtensionComponentProperties
       });
     });
   }
@@ -58,6 +61,9 @@ class SpoTenantApplicationCustomizerGetCommand extends SpoCommand {
       },
       {
         option: '-c, --clientSideComponentId [clientSideComponentId]'
+      },
+      {
+        option: '-p, --tenantWideExtensionComponentProperties'
       }
     );
   }
@@ -80,6 +86,11 @@ class SpoTenantApplicationCustomizerGetCommand extends SpoCommand {
 
   #initOptionSets(): void {
     this.optionSets.push({ options: ['title', 'id', 'clientSideComponentId'] });
+  }
+
+  #initTypes(): void {
+    this.types.string.push('title', 'id', 'clientSideComponentId');
+    this.types.boolean.push('tenantWideExtensionComponentProperties');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -111,13 +122,21 @@ class SpoTenantApplicationCustomizerGetCommand extends SpoCommand {
 
         listItemInstances.forEach(v => delete (v as any)['ID']);
 
+        let listItemInstance: ListItemInstance;
         if (listItemInstances.length > 1) {
           const resultAsKeyValuePair = formatting.convertArrayToHashTable('Id', listItemInstances);
-          const result = await cli.handleMultipleResultsFound<ListItemInstance>(`Multiple application customizers with ${args.options.title || args.options.clientSideComponentId} were found.`, resultAsKeyValuePair);
-          await logger.log(result);
+          listItemInstance = await cli.handleMultipleResultsFound<ListItemInstance>(`Multiple application customizers with ${args.options.title || args.options.clientSideComponentId} were found.`, resultAsKeyValuePair);
         }
         else {
-          await logger.log(listItemInstances[0]);
+          listItemInstance = listItemInstances[0];
+        }
+
+        if (!args.options.tenantWideExtensionComponentProperties) {
+          await logger.log(listItemInstance);
+        }
+        else {
+          const properties = formatting.tryParseJson((listItemInstance as any).TenantWideExtensionComponentProperties);
+          await logger.log(properties);
         }
       }
       else {

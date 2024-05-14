@@ -18,6 +18,7 @@ interface Options extends GlobalOptions {
   id?: string;
   clientSideComponentId?: string;
   scope?: string;
+  clientSideComponentProperties?: boolean;
 }
 
 class SpoApplicationCustomizerGetCommand extends SpoCommand {
@@ -38,6 +39,7 @@ class SpoApplicationCustomizerGetCommand extends SpoCommand {
     this.#initOptions();
     this.#initValidators();
     this.#initOptionSets();
+    this.#initTypes();
   }
 
   #initTelemetry(): void {
@@ -46,7 +48,8 @@ class SpoApplicationCustomizerGetCommand extends SpoCommand {
         title: typeof args.options.title !== 'undefined',
         id: typeof args.options.id !== 'undefined',
         clientSideComponentId: typeof args.options.clientSideComponentId !== 'undefined',
-        scope: typeof args.options.scope !== 'undefined'
+        scope: typeof args.options.scope !== 'undefined',
+        clientSideComponentProperties: !!args.options.clientSideComponentProperties
       });
     });
   }
@@ -69,6 +72,9 @@ class SpoApplicationCustomizerGetCommand extends SpoCommand {
         option: '-s, --scope [scope]',
         autocomplete: this.allowedScopes
       },
+      {
+        option: '-p, --clientSideComponentProperties'
+      }
     );
   }
 
@@ -96,32 +102,25 @@ class SpoApplicationCustomizerGetCommand extends SpoCommand {
     this.optionSets.push({ options: ['title', 'id', 'clientSideComponentId'] });
   }
 
+  #initTypes(): void {
+    this.types.string.push('webUrl', 'title', 'id', 'clientSideComponentId', 'scope');
+    this.types.boolean.push('clientSideComponentProperties');
+  }
+
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       const customAction = await this.getCustomAction(args.options);
 
-      if (customAction) {
+      if (!args.options.clientSideComponentProperties) {
         await logger.log({
-          ClientSideComponentId: customAction.ClientSideComponentId,
-          ClientSideComponentProperties: customAction.ClientSideComponentProperties,
-          CommandUIExtension: customAction.CommandUIExtension,
-          Description: customAction.Description,
-          Group: customAction.Group,
-          Id: customAction.Id,
-          ImageUrl: customAction.ImageUrl,
-          Location: customAction.Location,
-          Name: customAction.Name,
-          RegistrationId: customAction.RegistrationId,
-          RegistrationType: customAction.RegistrationType,
+          ...customAction,
           Rights: JSON.stringify(customAction.Rights),
-          Scope: this.humanizeScope(customAction.Scope),
-          ScriptBlock: customAction.ScriptBlock,
-          ScriptSrc: customAction.ScriptSrc,
-          Sequence: customAction.Sequence,
-          Title: customAction.Title,
-          Url: customAction.Url,
-          VersionOfUserCustomAction: customAction.VersionOfUserCustomAction
+          Scope: this.humanizeScope(customAction.Scope)
         });
+      }
+      else {
+        const properties = formatting.tryParseJson(customAction.ClientSideComponentProperties);
+        await logger.log(properties);
       }
     }
     catch (err: any) {
@@ -129,7 +128,7 @@ class SpoApplicationCustomizerGetCommand extends SpoCommand {
     }
   }
 
-  private async getCustomAction(options: Options): Promise<CustomAction | undefined> {
+  private async getCustomAction(options: Options): Promise<CustomAction> {
     if (options.id) {
       const customAction = await spo.getCustomActionById(options.webUrl, options.id, options.scope);
 
@@ -140,7 +139,7 @@ class SpoApplicationCustomizerGetCommand extends SpoCommand {
       return customAction;
     }
 
-    const filter = options.title ? `Title eq '${formatting.encodeQueryParameter(options.title as string)}'` : `ClientSideComponentId eq guid'${formatting.encodeQueryParameter(options.clientSideComponentId as string)}'`;
+    const filter = options.title ? `Title eq '${formatting.encodeQueryParameter(options.title as string)}'` : `ClientSideComponentId eq guid'${formatting.encodeQueryParameter(options.clientSideComponentId!)}'`;
     const customActions = await spo.getCustomActions(options.webUrl, options.scope, `${filter} and Location eq 'ClientSideExtension.ApplicationCustomizer'`);
 
     if (customActions.length === 1) {
