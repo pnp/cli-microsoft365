@@ -142,7 +142,7 @@ describe('utils/accessToken', () => {
 
   it('throws error when trying to ensure delegated access token when auth is not yet restored or available', () => {
     auth.connection.accessTokens = {};
-    assert.throws(() => accessToken.assertDelegatedAccessToken(), new CommandError('No accesstoken could be found.'));
+    assert.throws(() => accessToken.assertDelegatedAccessToken(), new CommandError('No access token could be found.'));
   });
 
   it('throws error when trying to asserting delegated access token with application only token', () => {
