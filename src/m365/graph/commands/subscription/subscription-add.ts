@@ -88,8 +88,10 @@ class GraphSubscriptionAddCommand extends GraphCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (args.options.notificationUrl.indexOf('https://') !== 0) {
-          return `The specified notification URL '${args.options.notificationUrl}' does not start with 'https://'`;
+        if (args.options.notificationUrl.indexOf('https://') !== 0
+          && args.options.notificationUrl.indexOf('EventHub:https://') !== 0
+          && args.options.notificationUrl.indexOf('EventGrid:?azuresubscriptionid') !== 0) {
+          return `The specified notification URL '${args.options.notificationUrl}' does not start with either 'https://' or 'EventHub:https://' or 'EventGrid:?azuresubscriptionid'`;
         }
 
         if (!this.isValidChangeTypes(args.options.changeTypes)) {
