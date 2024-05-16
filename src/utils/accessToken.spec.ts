@@ -3,6 +3,7 @@ import { accessToken } from '../utils/accessToken.js';
 import { sinonUtil } from './sinonUtil.js';
 import sinon from 'sinon';
 import auth from '../Auth.js';
+import { CommandError } from '../Command.js';
 
 describe('utils/accessToken', () => {
 
@@ -136,11 +137,21 @@ describe('utils/accessToken', () => {
 
   it('returns when ensuring delegated access token using the proper access token', () => {
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
-    accessToken.ensureDelegatedAccessToken();
+    accessToken.assertDelegatedAccessToken();
   });
 
-  it('throws error when trying to ensure delegated access token with application only token', () => {
+  it('throws error when trying to ensure delegated access token when auth is not yet restored or available', () => {
+    auth.connection.accessTokens = {};
+    assert.throws(() => accessToken.assertDelegatedAccessToken(), new CommandError('No accesstoken could be found.'));
+  });
+
+  it('throws error when trying to asserting delegated access token with application only token', () => {
+    auth.connection.accessTokens[auth.defaultResource] = {
+      expiresOn: 'abc',
+      accessToken: 'abc'
+    };
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
-    assert.throws(() => accessToken.ensureDelegatedAccessToken());
+    assert.throws(() => accessToken.assertDelegatedAccessToken(), new CommandError('This command does not support application-only permissions.'));
+    auth.connection.accessTokens = {};
   });
 });

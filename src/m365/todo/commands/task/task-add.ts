@@ -2,7 +2,7 @@ import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { validation } from '../../../../utils/validation.js';
-import ToDoCommand from '../../../base/ToDoCommand.js';
+import DelegatedGraphCommand from '../../../base/DelegatedGraphCommand.js';
 import commands from '../../commands.js';
 
 interface CommandArgs {
@@ -24,7 +24,7 @@ interface Options extends GlobalOptions {
   status?: string;
 }
 
-class TodoTaskAddCommand extends ToDoCommand {
+class TodoTaskAddCommand extends DelegatedGraphCommand {
   private static readonly allowedStatuses: string[] = ['notStarted', 'inProgress', 'completed', 'waitingOnOthers', 'deferred'];
 
   public get name(): string {

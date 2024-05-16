@@ -16,7 +16,7 @@ export default abstract class PowerBICommand extends Command {
       return;
     }
 
-    accessToken.ensureDelegatedAccessToken();
+    accessToken.assertDelegatedAccessToken();
   }
 
 }

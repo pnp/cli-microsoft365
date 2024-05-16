@@ -1,7 +1,7 @@
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request from '../../../../request.js';
-import ToDoCommand from '../../../base/ToDoCommand.js';
+import DelegatedGraphCommand from '../../../base/DelegatedGraphCommand.js';
 import commands from '../../commands.js';
 
 interface CommandArgs {
@@ -14,7 +14,7 @@ interface Options extends GlobalOptions {
   newName: string;
 }
 
-class TodoListSetCommand extends ToDoCommand {
+class TodoListSetCommand extends DelegatedGraphCommand {
   public get name(): string {
     return commands.LIST_SET;
   }

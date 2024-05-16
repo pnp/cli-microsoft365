@@ -30,16 +30,17 @@ describe('PowerAppsCommand', () => {
   before(() => {
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
+    auth.connection.active = true;
     auth.connection.accessTokens[auth.defaultResource] = {
       expiresOn: 'abc',
       accessToken: 'abc'
     };
-    auth.connection.active = true;
   });
 
   after(() => {
     sinon.restore();
     auth.connection.active = false;
+    auth.connection.accessTokens = {};
   });
 
   it('returns correct resource', () => {
@@ -50,43 +51,38 @@ describe('PowerAppsCommand', () => {
   it(`doesn't throw error when not connected`, () => {
     auth.connection.active = false;
     (cmd as any).initAction({ options: {} }, {});
+    auth.connection.active = true;
   });
 
   it('throws error when connected to USGov cloud', () => {
-    auth.connection.active = true;
     auth.connection.cloudType = CloudType.USGov;
     assert.throws(() => (cmd as any).initAction({ options: {} }, {}), cloudError);
   });
 
   it('throws error when connected to USGovHigh cloud', () => {
-    auth.connection.active = true;
     auth.connection.cloudType = CloudType.USGovHigh;
     assert.throws(() => (cmd as any).initAction({ options: {} }, {}), cloudError);
   });
 
   it('throws error when connected to USGovDoD cloud', () => {
-    auth.connection.active = true;
     auth.connection.cloudType = CloudType.USGovDoD;
     assert.throws(() => (cmd as any).initAction({ options: {} }, {}), cloudError);
   });
 
   it('throws error when connected to China cloud', () => {
-    auth.connection.active = true;
     auth.connection.cloudType = CloudType.China;
     assert.throws(() => (cmd as any).initAction({ options: {} }, {}), cloudError);
   });
 
   it(`doesn't throw error when connected to public cloud`, () => {
-    auth.connection.active = true;
     auth.connection.cloudType = CloudType.Public;
     assert.doesNotThrow(() => (cmd as any).initAction({ options: {} }, {}));
   });
 
-  it('throws error when trying to use the command using application only permissions', () => {
+  it('throws error when using application-only permissions', () => {
     sinonUtil.restore(accessToken.isAppOnlyAccessToken);
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
-    auth.connection.active = true;
     auth.connection.cloudType = CloudType.Public;
-    assert.throws(() => (cmd as any).initAction({ options: {} }, {}));
+    assert.throws(() => (cmd as any).initAction({ options: {} }, {}), new CommandError('This command does not support application-only permissions.'));
   });
 });

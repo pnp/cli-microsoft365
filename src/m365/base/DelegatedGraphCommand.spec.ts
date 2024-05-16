@@ -2,10 +2,11 @@ import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../Auth.js';
 import { telemetry } from '../../telemetry.js';
-import PowerAutomateCommand from './PowerAutomateCommand.js';
+import DelegatedGraphCommand from './DelegatedGraphCommand.js';
 import { accessToken } from '../../utils/accessToken.js';
+import { CommandError } from '../../Command.js';
 
-class MockCommand extends PowerAutomateCommand {
+class MockCommand extends DelegatedGraphCommand {
   public get name(): string {
     return 'mock';
   }
@@ -26,21 +27,27 @@ describe('ToDoCommand', () => {
 
   before(() => {
     sinon.stub(telemetry, 'trackEvent').returns();
+    auth.connection.active = true;
     auth.connection.accessTokens[auth.defaultResource] = {
       expiresOn: 'abc',
       accessToken: 'abc'
     };
-    auth.connection.active = true;
   });
 
   after(() => {
     sinon.restore();
     auth.connection.active = false;
+    auth.connection.accessTokens = {};
   });
 
-  it('throws error when trying to use the command using application only permissions', () => {
-    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
+  it(`doesn't throw error when not connected`, () => {
+    auth.connection.active = false;
+    (cmd as any).initAction({ options: {} }, {});
     auth.connection.active = true;
-    assert.throws(() => (cmd as any).initAction({ options: {} }, {}));
+  });
+
+  it('throws error when using application-only permissions', () => {
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
+    assert.throws(() => (cmd as any).initAction({ options: {} }, {}), new CommandError('This command does not support application-only permissions.'));
   });
 });

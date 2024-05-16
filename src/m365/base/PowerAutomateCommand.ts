@@ -20,6 +20,6 @@ export default abstract class PowerAutomateCommand extends Command {
       throw new CommandError(`Power Automate commands only support the public cloud at the moment. We'll add support for other clouds in the future. Sorry for the inconvenience.`);
     }
 
-    accessToken.ensureDelegatedAccessToken();
+    accessToken.assertDelegatedAccessToken();
   }
 }

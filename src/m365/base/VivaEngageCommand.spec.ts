@@ -138,11 +138,11 @@ describe('VivaEngageCommand', () => {
       new CommandError(error as any));
   });
 
-  it('throws error when trying to use the command using application only permissions', () => {
+  it('throws error when using application-only permissions', () => {
     const cmd = new MockCommand();
     sinonUtil.restore(accessToken.isAppOnlyAccessToken);
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
     auth.connection.active = true;
-    assert.throws(() => (cmd as any).initAction({ options: {} }, {}));
+    assert.throws(() => (cmd as any).initAction({ options: {} }, {}), new CommandError('This command does not support application-only permissions.'));
   });
 });

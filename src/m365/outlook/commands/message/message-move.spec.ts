@@ -25,11 +25,7 @@ describe(commands.MESSAGE_MOVE, () => {
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
-    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
-    auth.connection.accessTokens[auth.defaultResource] = {
-      expiresOn: 'abc',
-      accessToken: 'abc'
-    };
+    sinon.stub(accessToken, 'assertDelegatedAccessToken').returns();
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
   });
@@ -62,6 +58,7 @@ describe(commands.MESSAGE_MOVE, () => {
   after(() => {
     sinon.restore();
     auth.connection.active = false;
+    auth.connection.accessTokens = {};
   });
 
   it('has correct name', () => {
@@ -375,14 +372,6 @@ describe(commands.MESSAGE_MOVE, () => {
 
     await assert.rejects(command.action(logger, { options: { id: 'AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OABGAAAAAAAiQ8W967B7TKBjgx9rVEURBwAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAAiIsqMbYjsT5e-T7KzowPTAALvuv07AAA', sourceFolderId: 'inbox', targetFolderId: 'archive' } } as any),
       new CommandError('An error has occurred'));
-  });
-
-  it('throws error when using application permissions', async () => {
-    sinonUtil.restore(accessToken.isAppOnlyAccessToken);
-    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
-
-    await assert.rejects(command.action(logger, { options: { id: 'AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OABGAAAAAAAiQ8W967B7TKBjgx9rVEURBwAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAAiIsqMbYjsT5e-T7KzowPTAALvuv07AAA', sourceFolderId: 'inbox', targetFolderId: 'archive' } } as any),
-      new CommandError('This command does not support application-only permissions.'));
   });
 
   it('passes validation if all required options specified', async () => {

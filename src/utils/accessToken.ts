@@ -1,4 +1,5 @@
 import auth from "../Auth.js";
+import { CommandError } from "../Command.js";
 
 export const accessToken = {
   isAppOnlyAccessToken(accessToken: string): boolean | undefined {
@@ -96,13 +97,17 @@ export const accessToken = {
   },
 
   /**
-   * Ensures that the provided access token is a delegated access token.
+   * Asserts that the provided access token is a delegated access token.  
    * @throws {string} Will throw an error if the access token is an application-only access token.
    */
-  ensureDelegatedAccessToken(): void {
+  assertDelegatedAccessToken(): void {
+    if (!auth?.connection?.accessTokens?.[auth.defaultResource]) {
+      throw new CommandError('No accesstoken could be found.');
+    }
+
     const accessToken = auth.connection.accessTokens[auth.defaultResource].accessToken;
     if (this.isAppOnlyAccessToken(accessToken)) {
-      throw 'This command does not support application-only permissions.';
+      throw new CommandError('This command does not support application-only permissions.');
     }
   }
 };

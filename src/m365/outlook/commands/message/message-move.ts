@@ -84,7 +84,7 @@ class OutlookMessageMoveCommand extends GraphCommand {
     let targetFolder: string;
 
     try {
-      accessToken.ensureDelegatedAccessToken();
+      accessToken.assertDelegatedAccessToken();
 
       sourceFolder = await this.getFolderId(args.options.sourceFolderId, args.options.sourceFolderName);
       targetFolder = await this.getFolderId(args.options.targetFolderId, args.options.targetFolderName);

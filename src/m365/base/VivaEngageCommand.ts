@@ -16,7 +16,7 @@ export default abstract class VivaEngageCommand extends Command {
       return;
     }
 
-    accessToken.ensureDelegatedAccessToken();
+    accessToken.assertDelegatedAccessToken();
   }
 
   protected handleRejectedODataJsonPromise(response: any): void {
