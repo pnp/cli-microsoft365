@@ -36,7 +36,7 @@ describe('chili', () => {
     ]);
   });
 
-  it('starts a conversation using a prompt from args when specified', async () => {
+  it('starts a conversation using a prompt from args when specified with debug mode', async () => {
     sinon.stub(request, 'post').callsFake(async options => {
       switch (options.url) {
         case 'https://api.mendable.ai/v1/newConversation':
@@ -70,7 +70,7 @@ describe('chili', () => {
 
       throw `Prompt not found for '${config.message}'`;
     });
-    await assert.doesNotReject(chili.startConversation(['Hello']));
+    await assert.doesNotReject(chili.startConversation(['Hello', '--debug']));
   });
 
   it('starts a conversation when a prompt specified as a single arg', async () => {
@@ -254,7 +254,7 @@ describe('chili', () => {
 
       throw `Prompt not found for '${config.message}'`;
     });
-    await chili.startConversation(['Hello', '--no-rating']);
+    await chili.startConversation(['Hello']);
     assert(consoleLogSpy.calledWith('Hello back'));
   });
 
@@ -336,302 +336,6 @@ describe('chili', () => {
     assert(consoleLogSpy.calledWith('⬥ https://example.com/source-1'));
   });
 
-  it('prompts for rating the response when rating is enabled', async () => {
-    let promptedForRating = false;
-    sinon.stub(request, 'post').callsFake(async options => {
-      switch (options.url) {
-        case 'https://api.mendable.ai/v1/newConversation':
-          return {
-            // eslint-disable-next-line camelcase
-            conversation_id: 1
-          };
-        case 'https://api.mendable.ai/v1/mendableChat':
-          if (options.data.question === 'Hello world') {
-            return {
-              answer: {
-                text: 'Hello back'
-              },
-              // eslint-disable-next-line camelcase
-              message_id: 1,
-              sources: []
-            };
-          }
-          break;
-        case 'https://api.mendable.ai/v1/rateMessage':
-          return {};
-        case 'https://api.mendable.ai/v1/endConversation':
-          return {};
-      }
-      throw `Invalid request: ${options.url}`;
-    });
-    sinon.stub(prompt, 'forInput').resolves('Hello world');
-    sinon.stub(prompt, 'forSelection').callsFake(async (config: SelectionConfig<unknown>): Promise<unknown> => {
-      if (config.message === 'Was this helpful?') {
-        promptedForRating = true;
-        return 1;
-      }
-      else if (config.message === 'What would you like to do next?') {
-        return 'end';
-      }
-
-      throw `Prompt not found for '${config.message}'`;
-    });
-    await chili.startConversation(['Hello world']);
-    assert.strictEqual(promptedForRating, true);
-  });
-
-  it(`doesn't prompt for rating the response when rating is disabled`, async () => {
-    let promptedForRating = false;
-    sinon.stub(request, 'post').callsFake(async options => {
-      switch (options.url) {
-        case 'https://api.mendable.ai/v1/newConversation':
-          return {
-            // eslint-disable-next-line camelcase
-            conversation_id: 1
-          };
-        case 'https://api.mendable.ai/v1/mendableChat':
-          if (options.data.question === 'Hello world') {
-            return {
-              answer: {
-                text: 'Hello back'
-              },
-              // eslint-disable-next-line camelcase
-              message_id: 1,
-              sources: []
-            };
-          }
-          break;
-        case 'https://api.mendable.ai/v1/endConversation':
-          return {};
-      }
-      throw `Invalid request: ${options.url}`;
-    });
-    sinon.stub(prompt, 'forInput').resolves('Hello world');
-    sinon.stub(prompt, 'forSelection').callsFake(async (config: SelectionConfig<unknown>): Promise<unknown> => {
-      if (config.message === 'Was this helpful?') {
-        promptedForRating = true;
-        return 1;
-      }
-      else if (config.message === 'What would you like to do next?') {
-        return 'end';
-      }
-
-      throw `Prompt not found for '${config.message}'`;
-    });
-    await chili.startConversation(['Hello world', '--no-rating']);
-    assert.strictEqual(promptedForRating, false);
-  });
-
-  it('sends positive rating to Mendable', async () => {
-    sinon.stub(request, 'post').callsFake(async options => {
-      switch (options.url) {
-        case 'https://api.mendable.ai/v1/newConversation':
-          return {
-            // eslint-disable-next-line camelcase
-            conversation_id: 1
-          };
-        case 'https://api.mendable.ai/v1/mendableChat':
-          if (options.data.question === 'Hello world') {
-            return {
-              answer: {
-                text: 'Hello back'
-              },
-              // eslint-disable-next-line camelcase
-              message_id: 1,
-              sources: []
-            };
-          }
-          break;
-        case 'https://api.mendable.ai/v1/rateMessage':
-          if (options.data.rating === 1) {
-            return {};
-          }
-          break;
-        case 'https://api.mendable.ai/v1/endConversation':
-          return {};
-      }
-      throw `Invalid request: ${options.url}`;
-    });
-    sinon.stub(prompt, 'forInput').resolves('Hello world');
-    sinon.stub(prompt, 'forSelection').callsFake(async (config: SelectionConfig<unknown>): Promise<unknown> => {
-      if (config.message === 'Was this helpful?') {
-        return 1;
-      }
-      if (config.message === 'What would you like to do next?') {
-        return 'end';
-      }
-
-      throw `Prompt not found for '${config.message}'`;
-    });
-    await assert.doesNotReject(chili.startConversation(['Hello world']));
-  });
-
-  it('sends negative rating to Mendable', async () => {
-    sinon.stub(request, 'post').callsFake(async options => {
-      switch (options.url) {
-        case 'https://api.mendable.ai/v1/newConversation':
-          return {
-            // eslint-disable-next-line camelcase
-            conversation_id: 1
-          };
-        case 'https://api.mendable.ai/v1/mendableChat':
-          if (options.data.question === 'Hello world') {
-            return {
-              answer: {
-                text: 'Hello back'
-              },
-              // eslint-disable-next-line camelcase
-              message_id: 1,
-              sources: []
-            };
-          }
-          break;
-        case 'https://api.mendable.ai/v1/rateMessage':
-          if (options.data.rating === -1) {
-            return {};
-          }
-          break;
-        case 'https://api.mendable.ai/v1/endConversation':
-          return {};
-      }
-      throw `Invalid request: ${options.url}`;
-    });
-    sinon.stub(prompt, 'forInput').resolves('Hello world');
-    sinon.stub(prompt, 'forSelection').callsFake(async (config: SelectionConfig<unknown>): Promise<unknown> => {
-      if (config.message === 'Was this helpful?') {
-        return -1;
-      }
-      if (config.message === 'What would you like to do next?') {
-        return 'end';
-      }
-
-      throw `Prompt not found for '${config.message}'`;
-    });
-    await assert.doesNotReject(chili.startConversation(['Hello world']));
-  });
-
-  it(`doesn't send rating to Mendable when user chose to skip`, async () => {
-    sinon.stub(request, 'post').callsFake(async options => {
-      switch (options.url) {
-        case 'https://api.mendable.ai/v1/newConversation':
-          return {
-            // eslint-disable-next-line camelcase
-            conversation_id: 1
-          };
-        case 'https://api.mendable.ai/v1/mendableChat':
-          if (options.data.question === 'Hello world') {
-            return {
-              answer: {
-                text: 'Hello back'
-              },
-              // eslint-disable-next-line camelcase
-              message_id: 1,
-              sources: []
-            };
-          }
-          break;
-        case 'https://api.mendable.ai/v1/endConversation':
-          return {};
-      }
-      throw `Invalid request: ${options.url}`;
-    });
-    sinon.stub(prompt, 'forInput').resolves('Hello world');
-    sinon.stub(prompt, 'forSelection').callsFake(async (config: SelectionConfig<unknown>): Promise<unknown> => {
-      if (config.message === 'Was this helpful?') {
-        return 0;
-      }
-      if (config.message === 'What would you like to do next?') {
-        return 'end';
-      }
-
-      throw `Prompt not found for '${config.message}'`;
-    });
-    await assert.doesNotReject(chili.startConversation(['Hello world']));
-  });
-
-  it(`doesn't fail when rating the response failed`, async () => {
-    sinon.stub(request, 'post').callsFake(async options => {
-      switch (options.url) {
-        case 'https://api.mendable.ai/v1/newConversation':
-          return {
-            // eslint-disable-next-line camelcase
-            conversation_id: 1
-          };
-        case 'https://api.mendable.ai/v1/mendableChat':
-          if (options.data.question === 'Hello world') {
-            return {
-              answer: {
-                text: 'Hello back'
-              },
-              // eslint-disable-next-line camelcase
-              message_id: 1,
-              sources: []
-            };
-          }
-          break;
-        case 'https://api.mendable.ai/v1/rateMessage':
-          throw 'An error has occurred';
-        case 'https://api.mendable.ai/v1/endConversation':
-          return {};
-      }
-      throw `Invalid request: ${options.url}`;
-    });
-    sinon.stub(prompt, 'forInput').resolves('Hello world');
-    sinon.stub(prompt, 'forSelection').callsFake(async (config: SelectionConfig<unknown>): Promise<unknown> => {
-      if (config.message === 'Was this helpful?') {
-        return 1;
-      }
-      if (config.message === 'What would you like to do next?') {
-        return 'end';
-      }
-
-      throw `Prompt not found for '${config.message}'`;
-    });
-    await assert.doesNotReject(chili.startConversation(['Hello world']));
-  });
-
-  it(`when rating the response failed, shows error in debug mode`, async () => {
-    sinon.stub(request, 'post').callsFake(async options => {
-      switch (options.url) {
-        case 'https://api.mendable.ai/v1/newConversation':
-          return {
-            // eslint-disable-next-line camelcase
-            conversation_id: 1
-          };
-        case 'https://api.mendable.ai/v1/mendableChat':
-          if (options.data.question === 'Hello world') {
-            return {
-              answer: {
-                text: 'Hello back'
-              },
-              // eslint-disable-next-line camelcase
-              message_id: 1,
-              sources: []
-            };
-          }
-          break;
-        case 'https://api.mendable.ai/v1/rateMessage':
-          throw 'An error has occurred';
-        case 'https://api.mendable.ai/v1/endConversation':
-          return {};
-      }
-      throw `Invalid request: ${options.url}`;
-    });
-    sinon.stub(prompt, 'forInput').resolves('Hello world');
-    sinon.stub(prompt, 'forSelection').callsFake(async (config: SelectionConfig<unknown>): Promise<unknown> => {
-      if (config.message === 'Was this helpful?') {
-        return 1;
-      }
-      else if (config.message === 'What would you like to do next?') {
-        return 'end';
-      }
-
-      throw `Prompt not found for '${config.message}'`;
-    });
-    await chili.startConversation(['Hello world', '--debug']);
-    assert(consoleErrorSpy.calledWith('An error has occurred while rating the response: An error has occurred'));
-  });
-
   it('allows asking a follow-up question after a response', async () => {
     let questionsAsked = 0;
     sinon.stub(request, 'post').callsFake(async options => {
@@ -678,7 +382,7 @@ describe('chili', () => {
 
       throw `Prompt not found for '${config.message}'`;
     });
-    await assert.doesNotReject(chili.startConversation(['Hello', '--no-rating']));
+    await assert.doesNotReject(chili.startConversation(['Hello']));
   });
 
   it('for a follow-up question, includes the history', async () => {
@@ -724,7 +428,7 @@ describe('chili', () => {
 
       return 'ask';
     });
-    await assert.doesNotReject(chili.startConversation(['Hello', '--no-rating']));
+    await assert.doesNotReject(chili.startConversation(['Hello']));
   });
 
   it('allows ending conversation after a response', async () => {
@@ -758,7 +462,7 @@ describe('chili', () => {
 
       throw `Prompt not found for '${config.message}'`;
     });
-    await assert.doesNotReject(chili.startConversation(['Hello', '--no-rating']));
+    await assert.doesNotReject(chili.startConversation(['Hello']));
   });
 
   it('allows starting a new conversation after a response', async () => {
@@ -805,7 +509,7 @@ describe('chili', () => {
 
       throw `Prompt not found for '${config.message}'`;
     });
-    await assert.doesNotReject(chili.startConversation(['Hello', '--no-rating']));
+    await assert.doesNotReject(chili.startConversation(['Hello']));
   });
 
   it('throws exception when getting conversation ID failed', async () => {

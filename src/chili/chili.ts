@@ -29,12 +29,11 @@ interface MendableChatResponse {
 }
 
 const mendableBaseUrl = 'https://api.mendable.ai/v1';
-const mendableApiKey = 'c532aaa5-9038-440c-85cd-17757d9275db';
+const mendableApiKey = 'd3313d54-6f8e-40e0-90d3-4095019d4be7';
 const spinner = ora({ discardStdin: false });
 
 let showHelp = false;
 let debug = false;
-let promptForRating = true;
 let conversationId: number = 0;
 let initialPrompt: string = '';
 let history: {
@@ -85,17 +84,6 @@ function getPromptFromArgs(args: string[]): string {
   else {
     // reset to default. needed for tests
     debug = false;
-  }
-
-  const noRatingPos = args.indexOf('--no-rating');
-
-  if (noRatingPos > -1) {
-    promptForRating = false;
-    args.splice(noRatingPos, 1);
-  }
-  else {
-    // reset to default. needed for tests
-    promptForRating = true;
   }
 
   return args.join(' ');
@@ -151,19 +139,6 @@ async function runConversationTurn(conversationId: number, question: string): Pr
   sources.forEach(src => console.log(`⬥ ${src.link}`));
   console.log('');
 
-  if (promptForRating) {
-    try {
-      await rateResponse(response.message_id);
-    }
-    catch (err) {
-      if (debug) {
-        console.error(`An error has occurred while rating the response: ${err}`);
-      }
-    }
-
-    console.log('');
-  }
-
   const choices = [
     {
       name: '📝 I want to know more',
@@ -195,63 +170,6 @@ async function runConversationTurn(conversationId: number, question: string): Pr
       initialPrompt = '';
       await startConversation([]);
       break;
-  }
-}
-
-async function rateResponse(messageId: number): Promise<void> {
-  const choices = [
-    {
-      name: '👍 Yes',
-      value: 1
-    },
-    {
-      name: '👎 No',
-      value: -1
-    },
-    {
-      name: '🤔 Not sure/skip',
-      value: 0
-    }
-  ];
-
-  const rating = await prompt.forSelection({ message: 'Was this helpful?', choices });
-
-  if (rating === 0) {
-    return;
-  }
-
-  console.log('Thanks for letting us know! 😊');
-
-  const requestOptions: CliRequestOptions = {
-    url: `${mendableBaseUrl}/rateMessage`,
-    headers: {
-      'content-type': 'application/json',
-      'x-anonymous': true
-    },
-    responseType: 'json',
-    data: {
-      // eslint-disable-next-line camelcase
-      api_key: mendableApiKey,
-      // eslint-disable-next-line camelcase
-      message_id: messageId,
-      // eslint-disable-next-line camelcase
-      rating_value: rating
-    }
-  };
-
-  console.log(requestOptions);
-
-  /* c8 ignore next 4 */
-  if (showSpinner) {
-    spinner.text = 'Sending rating...';
-    spinner.start();
-  }
-
-  await request.post(requestOptions);
-
-  /* c8 ignore next 3 */
-  if (showSpinner) {
-    spinner.stop();
   }
 }
 
