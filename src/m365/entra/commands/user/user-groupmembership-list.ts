@@ -18,6 +18,10 @@ export interface Options extends GlobalOptions {
   securityEnabledOnly?: boolean;
 }
 
+interface UserGroupMembership {
+  groupId: string;
+}
+
 class EntraUserGroupmembershipListCommand extends GraphCommand {
   public get name(): string {
     return commands.USER_GROUPMEMBERSHIP_LIST;
@@ -110,8 +114,13 @@ class EntraUserGroupmembershipListCommand extends GraphCommand {
         }
       };
 
-      const results = await request.post<ODataResponse<string[]>>(requestOptions);
-      await logger.log(results.value);
+      const groups: UserGroupMembership[] = [];
+
+      const results = await request.post<ODataResponse<string>>(requestOptions);
+
+      results.value.forEach(x => groups.push({ groupId: x }));
+
+      await logger.log(groups);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);

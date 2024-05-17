@@ -24,6 +24,17 @@ describe(commands.USER_GROUPMEMBERSHIP_LIST, () => {
       "0a0bf25a-2de0-40de-9908-c96941a2615b"
     ]
   };
+  const groupMembershipResults = [
+    {
+      "groupId": "2f64f70d-386b-489f-805a-670cad739fde"
+    },
+    {
+      "groupId": "ff0554cc-8aa8-40f2-a369-ed604503fb79"
+    },
+    {
+      "groupId": "0a0bf25a-2de0-40de-9908-c96941a2615b"
+    }
+  ];
 
   let log: string[];
   let logger: Logger;
@@ -114,7 +125,7 @@ describe(commands.USER_GROUPMEMBERSHIP_LIST, () => {
     });
 
     await command.action(logger, { options: { userId: userId } });
-    assert(loggerLogSpy.calledOnceWithExactly(groupMembershipResponse.value));
+    assert(loggerLogSpy.calledOnceWithExactly(groupMembershipResults));
   });
 
   it('retrieves groups memberships for a user specified by UPN', async () => {
@@ -131,7 +142,7 @@ describe(commands.USER_GROUPMEMBERSHIP_LIST, () => {
     });
 
     await command.action(logger, { options: { userName: userName } });
-    assert(loggerLogSpy.calledOnceWithExactly(groupMembershipResponse.value));
+    assert(loggerLogSpy.calledOnceWithExactly(groupMembershipResults));
   });
 
   it('retrieves groups memberships for a user specified by email', async () => {
@@ -148,7 +159,7 @@ describe(commands.USER_GROUPMEMBERSHIP_LIST, () => {
     });
 
     await command.action(logger, { options: { userEmail: userName } });
-    assert(loggerLogSpy.calledOnceWithExactly(groupMembershipResponse.value));
+    assert(loggerLogSpy.calledOnceWithExactly(groupMembershipResults));
   });
 
   it('retrieves memberships in security enabled groups only for a user specified by id', async () => {
@@ -164,7 +175,7 @@ describe(commands.USER_GROUPMEMBERSHIP_LIST, () => {
     });
 
     await command.action(logger, { options: { userId: userId, securityEnabledOnly: true } });
-    assert(loggerLogSpy.calledOnceWithExactly(groupMembershipResponse.value));
+    assert(loggerLogSpy.calledOnceWithExactly(groupMembershipResults));
   });
 
   it('fails validation if userEmail is not a valid email', async () => {
