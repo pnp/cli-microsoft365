@@ -32,7 +32,7 @@ m365 aad user list [options]
 
 ## Remarks
 
-Using the `--properties` option, you can specify a comma-separated list of user properties to retrieve from the Microsoft Graph. If you don't specify any properties, the command will retrieve user's display name, account name, id, and mail.
+Using the `--properties` option, you can specify a comma-separated list of user properties to retrieve from the Microsoft Graph. If you don't specify any properties, the command will retrieve all the properties returned by Graph of the users.
 
 When the `properties` option includes values with a `/`, for example: `manager/displayName`, an additional `$expand` query parameter will be included on `manager`.
 
@@ -86,10 +86,19 @@ m365 entra user list --properties "displayName,mail,manager/*"
   ```json
   [
     {
-      "id": "1f5595b2-aa07-445d-9801-a45ea18160b2",
+      "businessPhones": [
+        "+32 456 789 123"
+      ],
       "displayName": "John Doe",
+      "givenName": "John",
+      "jobTitle": "Sales Manager",
       "mail": "John@contoso.onmicrosoft.com",
-      "userPrincipalName": "John@contoso.onmicrosoft.com"
+      "mobilePhone": "+32 456 789 123",
+      "officeLocation": "Antwerp",
+      "preferredLanguage": "nl-BE",
+      "surname": "Doe",
+      "userPrincipalName": "John@contoso.onmicrosoft.com",
+      "id": "ef0d4f29-e359-4443-a15d-bc3dccc8143f"
     }
   ]
   ```
@@ -98,17 +107,17 @@ m365 entra user list --properties "displayName,mail,manager/*"
   <TabItem value="Text">
 
   ```text
-  id                                    displayName         mail                                 userPrincipalName
-  ------------------------------------  ------------------  -----------------------------------  ------------------------------------------
-  1f5595b2-aa07-445d-9801-a45ea18160b2  John Doe            John@contoso.onmicrosoft.com         John@contoso.onmicrosoft.com
+  businessPhones   displayName  givenName  jobTitle       mail                          mobilePhone      officeLocation  preferredLanguage  surname  userPrincipalName             id
+  ---------------  -----------  ---------  -------------  ----------------------------  ---------------  --------------  -----------------  -------  ----------------------------  ------------------------------------
+  +32 456 789 123  John Doe     John       Sales Manager  John@contoso.onmicrosoft.com  +32 456 789 123  Antwerp         nl-BE              Doe      John@contoso.onmicrosoft.com  ef0d4f29-e359-4443-a15d-bc3dccc8143f
   ```
 
   </TabItem>
   <TabItem value="CSV">
 
   ```csv
-  id,displayName,mail,userPrincipalName
-  1f5595b2-aa07-445d-9801-a45ea18160b2,John Doe,John@contoso.onmicrosoft.com,John@contoso.onmicrosoft.com
+  displayName,givenName,jobTitle,mail,mobilePhone,officeLocation,preferredLanguage,surname,userPrincipalName,id
+  John Doe,John,Sales Manager,John@contoso.onmicrosoft.com,+32 456 789 123,Antwerp,nl-BE,Doe,John@contoso.onmicrosoft.com,ef0d4f29-e359-4443-a15d-bc3dccc8143f
   ```
 
   </TabItem>
@@ -123,10 +132,16 @@ m365 entra user list --properties "displayName,mail,manager/*"
 
   Property | Value
   ---------|-------
-  id | 1f5595b2-aa07-445d-9801-a45ea18160b2
   displayName | John Doe
+  givenName | John
+  jobTitle | Sales Manager
   mail | John@contoso.onmicrosoft.com
+  mobilePhone | +32 456 789 123
+  officeLocation | Antwerp
+  preferredLanguage | nl-BE
+  surname | Doe
   userPrincipalName | John@contoso.onmicrosoft.com  
+  id | 1f5595b2-aa07-445d-9801-a45ea18160b2
   ```
 
   </TabItem>
