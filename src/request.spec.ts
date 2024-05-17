@@ -16,6 +16,7 @@ describe('Request', () => {
   };
 
   let _options: CliRequestOptions;
+  const retryAfter = 10;
 
   beforeEach(() => {
     _request.logger = logger;
@@ -30,6 +31,7 @@ describe('Request', () => {
       process.env,
       https.request,
       (_request as any).req,
+      (_request as any).setTimeout,
       logger.log,
       auth.ensureAccessToken
     ]);
@@ -396,14 +398,16 @@ describe('Request', () => {
 
   it('repeats 429-throttled request after the designated retry value', async () => {
     let i: number = 0;
+    let timeout: number = -1;
+    const retryAfter = 60;
 
-    const reqStub = sinon.stub(_request as any, 'req').callsFake(() => {
+    sinon.stub(_request as any, 'req').callsFake(() => {
       if (i++ === 0) {
         throw {
           response: {
             status: 429,
             headers: {
-              'retry-after': 60
+              'retry-after': retryAfter
             }
           }
         };
@@ -413,18 +417,24 @@ describe('Request', () => {
       }
     });
 
+    sinon.stub(_request as any, 'setTimeout').callsFake(async (value: any) => {
+      timeout = value;
+      return;
+    });
+
     await _request
       .get({
         url: 'https://contoso.sharepoint.com/'
       });
 
-    assert(reqStub.calledTwice);
+    assert.strictEqual(timeout, retryAfter);
   });
 
   it('repeats 429-throttled request after 10s if no value specified', async () => {
     let i: number = 0;
+    let timeout: number | undefined = -1;
 
-    const reqStub = sinon.stub(_request as any, 'req').callsFake(() => {
+    sinon.stub(_request as any, 'req').callsFake(() => {
       if (i++ === 0) {
         throw {
           response: {
@@ -438,18 +448,24 @@ describe('Request', () => {
       }
     });
 
+    sinon.stub(_request as any, 'setTimeout').callsFake(async (value: any) => {
+      timeout = value;
+      return;
+    });
+
     await _request
       .get({
         url: 'https://contoso.sharepoint.com/'
       });
 
-    assert(reqStub.calledTwice);
+    assert.strictEqual(timeout, retryAfter);
   });
 
   it('repeats 429-throttled request after 10s if the specified value is not a number', async () => {
     let i: number = 0;
+    let timeout: number | undefined = -1;
 
-    const reqStub = sinon.stub(_request as any, 'req').callsFake(() => {
+    sinon.stub(_request as any, 'req').callsFake(() => {
       if (i++ === 0) {
         throw {
           response: {
@@ -465,12 +481,17 @@ describe('Request', () => {
       }
     });
 
+    sinon.stub(_request as any, 'setTimeout').callsFake(async (value: any) => {
+      timeout = value;
+      return;
+    });
+
     await _request
       .get({
         url: 'https://contoso.sharepoint.com/'
       });
 
-    assert(reqStub.calledTwice);
+    assert.strictEqual(timeout, retryAfter);
   });
 
   it('repeats 429-throttled request until it succeeds', async () => {
@@ -500,8 +521,10 @@ describe('Request', () => {
 
   it('repeats 429-throttled request after the designated retry value for large file (stream)', async () => {
     let i: number = 0;
+    let timeout: number | undefined = -1;
+    const retryAfter = 60;
 
-    const reqStub = sinon.stub(_request as any, 'req').callsFake(options => {
+    sinon.stub(_request as any, 'req').callsFake(options => {
       _options = options as CliRequestOptions;
       (options as CliRequestOptions).responseType = "stream";
 
@@ -520,11 +543,16 @@ describe('Request', () => {
       }
     });
 
+    sinon.stub(_request as any, 'setTimeout').callsFake(async (value: any) => {
+      timeout = value;
+      return;
+    });
+
     await _request
       .get({
         url: 'https://contoso.sharepoint.com/'
       });
-    assert(reqStub.calledTwice);
+    assert.strictEqual(timeout, retryAfter);
   });
 
   it('repeats 503-throttled request until it succeeds', async () => {

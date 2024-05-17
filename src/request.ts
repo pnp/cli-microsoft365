@@ -15,7 +15,7 @@ class Request {
   private req: AxiosInstance;
   private _logger?: Logger;
   private _debug: boolean = false;
-  private retryAfterTimeout = 1000;
+  private retryAfterTimeout: number = 1000;
 
   public set debug(debug: boolean) {
     // if the value to set is the same as current value return early to avoid
@@ -216,8 +216,7 @@ class Request {
           await (this._logger as Logger).log(`Request throttled. Waiting ${retryAfter} sec before retrying...`);
         }
 
-        await setTimeout(retryAfter * this.retryAfterTimeout);
-
+        await this.setTimeout(retryAfter);
         return this.execute(options);
       }
 
@@ -225,6 +224,9 @@ class Request {
     }
   }
 
+  private async setTimeout(value: number): Promise<void> {
+    await setTimeout(value * this.retryAfterTimeout);
+  }
 
   private updateRequestForCloudType(options: AxiosRequestConfig, cloudType: CloudType): void {
     const url = new URL(options.url!);
