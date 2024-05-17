@@ -8,7 +8,6 @@ import _request, { CliRequestOptions } from './request.js';
 import { sinonUtil } from './utils/sinonUtil.js';
 import command from './request.js';
 
-
 describe('Request', () => {
   const logger: Logger = {
     log: async () => { },

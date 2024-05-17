@@ -187,6 +187,7 @@ class Request {
       }
 
       const proxyUrl = process.env.HTTP_PROXY || process.env.HTTPS_PROXY;
+
       if (proxyUrl) {
         options.proxy = this.createProxyConfigFromUrl(proxyUrl);
       }
@@ -196,12 +197,9 @@ class Request {
       const end = process.hrtime.bigint();
       timings.api.push(Number(end - start));
 
-      if (options.responseType === 'stream' || options.fullResponse) {
-        return res as any;
-      }
-      else {
-        return res.data;
-      }
+      return options.responseType === 'stream' || options.fullResponse ?
+        res as any :
+        res.data;
     }
     catch (error: any) {
       const end = process.hrtime.bigint();
@@ -209,9 +207,11 @@ class Request {
 
       if (error && error.response && (error.response.status === 429 || error.response.status === 503)) {
         let retryAfter: number = parseInt(error.response.headers['retry-after'] || '10');
+
         if (isNaN(retryAfter)) {
           retryAfter = 10;
         }
+
         if (this._debug) {
           await (this._logger as Logger).log(`Request throttled. Waiting ${retryAfter} sec before retrying...`);
         }
@@ -220,9 +220,8 @@ class Request {
 
         return this.execute(options);
       }
-      else {
-        throw error;
-      }
+
+      throw error;
     }
   }
 
