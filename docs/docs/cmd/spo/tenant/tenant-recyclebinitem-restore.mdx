@@ -1,6 +1,4 @@
 import Global from '/docs/cmd/_global.mdx';
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
 
 # spo tenant recyclebinitem restore
 
@@ -16,21 +14,19 @@ m365 spo tenant recyclebinitem restore [options]
 
 ```md definition-list
 `-u, --siteUrl <siteUrl>`
-: URL of the site to restore
+: URL of the site.
 
 `--wait`
-: Wait for the site collection to be restored before completing the command
+: (deprecated) Wait for the site collection to be restored before completing the command.
 ```
 
 <Global />
 
 ## Remarks
 
-Restoring deleted site collections is by default asynchronous and depending on the current state of Microsoft 365, might take up to few minutes. If you're building a script with steps that require the site to be fully restored, you should use the `--wait` flag. When using this flag, the `spo tenant recyclebinitem restore` command will keep running until it received confirmation from Microsoft 365 that the site has been fully restored.
-
 :::info
 
-To use this command you have to have permissions to access the tenant admin site.
+To use this command you must be a Global or SharePoint administrator.
 
 :::
     
@@ -42,56 +38,6 @@ Restore a deleted site collection from tenant recycle bin
 m365 spo tenant recyclebinitem restore --siteUrl https://contoso.sharepoint.com/sites/team
 ```
 
-Restore a deleted site collection from tenant recycle bin and wait for completion
-
-```sh
-m365 spo tenant recyclebinitem restore --siteUrl https://contoso.sharepoint.com/sites/team --wait
-```
-
 ## Response
 
-<Tabs>
-  <TabItem value="JSON">
-
-  ```json
-  {
-    "HasTimedout": false,
-    "IsComplete": true,
-    "PollingInterval": 15000
-  }
-  ```
-
-  </TabItem>
-  <TabItem value="Text">
-
-  ```text
-  HasTimedout    : false
-  IsComplete     : true
-  PollingInterval: 15000
-  ```
-
-  </TabItem>
-  <TabItem value="CSV">
-
-  ```csv
-  HasTimedout,IsComplete,PollingInterval
-  ,1,15000
-  ```
-
-  </TabItem>
-  <TabItem value="Markdown">
-
-  ```md
-  # spo tenant recyclebinitem restore --siteUrl "https://contoso.sharepoint.com/teams/team1"
-
-  Date: 2023-06-22
-
-  Property | Value
-  ---------|-------
-  HasTimedout | false
-  IsComplete | true
-  PollingInterval | 15000
-  ```
-
-  </TabItem>
-</Tabs>
+The command won't return a response on success.

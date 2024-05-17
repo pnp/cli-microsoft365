@@ -12,12 +12,17 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './tenant-recyclebinitem-restore.js';
+import { odata } from '../../../../utils/odata.js';
+import { formatting } from '../../../../utils/formatting.js';
 
 describe(commands.TENANT_RECYCLEBINITEM_RESTORE, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
-  let loggerLogSpy: sinon.SinonSpy;
+
+  const siteUrl = 'https://contoso.sharepoint.com/sites/hr';
+  const siteRestoreUrl = 'https://contoso-admin.sharepoint.com/_api/SPO.Tenant/RestoreDeletedSite';
+  const odataUrl = `https://contoso-admin.sharepoint.com/_api/web/lists/GetByTitle('DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECOLLECTIONS')/items?$filter=SiteUrl eq '${formatting.encodeQueryParameter(siteUrl)}'&$select=GroupId`;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -42,13 +47,12 @@ describe(commands.TENANT_RECYCLEBINITEM_RESTORE, () => {
         log.push(msg);
       }
     };
-    loggerLogSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
-    (command as any).currentContext = undefined;
     sinonUtil.restore([
-      request.post
+      request.post,
+      odata.getAllItems
     ]);
   });
 
@@ -66,83 +70,98 @@ describe(commands.TENANT_RECYCLEBINITEM_RESTORE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
+  it(`correctly shows deprecation warning for option 'wait'`, async () => {
+    const chalk = (await import('chalk')).default;
+    const loggerErrSpy = sinon.spy(logger, 'logToStderr');
+
+    sinon.stub(request, 'post').resolves();
+    sinon.stub(odata, 'getAllItems').resolves([{ GroupId: '00000000-0000-0000-0000-000000000000' }]);
+
+    await command.action(logger, { options: { siteUrl: siteUrl, wait: true } });
+    assert(loggerErrSpy.calledWith(chalk.yellow(`Option 'wait' is deprecated and will be removed in the next major release.`)));
+
+    sinonUtil.restore(loggerErrSpy);
+  });
+
   it('fails validation if the url option is not a valid SharePoint site URL', async () => {
     const actual = await command.validate({ options: { siteUrl: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the url option is a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com/sites/hr' } }, commandInfo);
-    assert(actual);
+    const actual = await command.validate({ options: { siteUrl: siteUrl } }, commandInfo);
+    assert.strictEqual(actual, true);
   });
 
-  it(`restores deleted site collection from the tenant recycle bin, without waiting for completion`, async () => {
-    sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/SPOInternalUseOnly.Tenant/RestoreDeletedSite`) > -1) {
-        if (opts.headers &&
-          JSON.stringify(opts.data) === JSON.stringify({
-            siteUrl: 'https://contoso.sharepoint.com/sites/hr'
-          })) {
-          return "{\"HasTimedout\":false,\"IsComplete\":true,\"PollingInterval\":15000}";
-        }
+  it(`restores deleted site collection from the tenant recycle bin and also restores m365 group from entra recycle bin`, async () => {
+    const groupId = '4b3f5e3f-6e1f-4b1e-8b5f-0f5f5f5f5f5f';
+    const groupRestoreUrl = `https://graph.microsoft.com/v1.0/directory/deletedItems/${groupId}/restore`;
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === siteRestoreUrl) {
+        return;
+      }
+
+      if (opts.url === groupRestoreUrl) {
+        return;
       }
 
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/hr' } });
+    sinon.stub(odata, 'getAllItems').callsFake(async (url: string) => {
+      if (url === odataUrl) {
+        return [{ GroupId: groupId }];
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { siteUrl: siteUrl, verbose: true } });
+    assert.strictEqual(postStub.lastCall.args[0].url, groupRestoreUrl);
   });
 
-  it(`restores deleted site collection from the tenant recycle bin and waits for completion`, async () => {
-    const postRequestStub = sinon.stub(request, 'post');
-    postRequestStub.onFirstCall().callsFake(async (opts) => {
-      if (opts.url === 'https://contoso-admin.sharepoint.com/_api/SPOInternalUseOnly.Tenant/RestoreDeletedSite') {
-        if (opts.headers && JSON.stringify(opts.data) === JSON.stringify({ siteUrl: 'https://contoso.sharepoint.com/sites/hr' })) {
-          return "{\"HasTimedout\":false,\"IsComplete\":false,\"PollingInterval\":100}";
-        }
+  it('restores deleted site collection from the tenant recycle bin and does not remove m365 group when deleted site is not group connected', async () => {
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === siteRestoreUrl) {
+        return;
       }
 
       throw 'Invalid request';
     });
 
-    postRequestStub.onSecondCall().callsFake(async (opts) => {
-      if (opts.url === 'https://contoso-admin.sharepoint.com/_api/SPOInternalUseOnly.Tenant/RestoreDeletedSite') {
-        if (opts.headers && JSON.stringify(opts.data) === JSON.stringify({ siteUrl: 'https://contoso.sharepoint.com/sites/hr' })) {
-          return "{\"HasTimedout\":false,\"IsComplete\":false,\"PollingInterval\":100}";
-        }
+    sinon.stub(odata, 'getAllItems').callsFake(async (url: string) => {
+      if (url === odataUrl) {
+        return [{ GroupId: '00000000-0000-0000-0000-000000000000' }];
       }
 
       throw 'Invalid request';
     });
 
-    postRequestStub.onThirdCall().callsFake(async (opts) => {
-      if (opts.url === 'https://contoso-admin.sharepoint.com/_api/SPOInternalUseOnly.Tenant/RestoreDeletedSite') {
-        if (opts.headers && JSON.stringify(opts.data) === JSON.stringify({ siteUrl: 'https://contoso.sharepoint.com/sites/hr' })) {
-          return "{\"HasTimedout\":false,\"IsComplete\":true,\"PollingInterval\":100}";
-        }
-      }
-
-      throw 'Invalid request';
-    });
-
-    await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/hr', wait: true, verbose: true } });
-    assert(loggerLogSpy.calledWith({ HasTimedout: false, IsComplete: true, PollingInterval: 100 }));
+    await command.action(logger, { options: { siteUrl: siteUrl, verbose: true } });
+    assert(postStub.lastCall.args[0].url === siteRestoreUrl);
   });
 
   it('handles error when the site to restore is not found', async () => {
-    sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/SPOInternalUseOnly.Tenant/RestoreDeletedSite`) > -1) {
-        if (opts.headers &&
-          JSON.stringify(opts.data) === JSON.stringify({
-            siteUrl: 'https://contoso.sharepoint.com/sites/hr'
-          })) {
-          throw "{\"odata.error\":{\"code\":\"-2147024809, System.ArgumentException\",\"message\":{\"lang\":\"en-US\",\"value\":\"Unable to find the deleted site: https://contoso.sharepoint.com/sites/hr.\"}}}";
+    const error = {
+      error: {
+        'odata.error': {
+          code: '-2147024809, System.ArgumentException',
+          message: {
+            lang: 'en-US',
+            value: `Unable to find the deleted site: ${siteUrl}`
+          }
         }
+      }
+    };
+
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === siteRestoreUrl) {
+        throw error;
       }
 
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/hr' } } as any), new CommandError("{\"odata.error\":{\"code\":\"-2147024809, System.ArgumentException\",\"message\":{\"lang\":\"en-US\",\"value\":\"Unable to find the deleted site: https://contoso.sharepoint.com/sites/hr.\"}}}"));
+    await assert.rejects(command.action(logger, { options: { siteUrl: siteUrl, verbose: true } } as any), new CommandError(error.error['odata.error'].message.value));
   });
 });
