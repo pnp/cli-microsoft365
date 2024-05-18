@@ -73,11 +73,7 @@ describe(commands.AIBUILDERMODEL_REMOVE, () => {
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
-    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
-    auth.connection.accessTokens[auth.defaultResource] = {
-      expiresOn: 'abc',
-      accessToken: 'abc'
-    };
+    sinon.stub(accessToken, 'assertDelegatedAccessToken').returns();
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
   });
@@ -96,9 +92,9 @@ describe(commands.AIBUILDERMODEL_REMOVE, () => {
       }
     };
     loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
-    sinon.stub(cli, 'promptForConfirmation').callsFake(() => {
+    sinon.stub(cli, 'promptForConfirmation').callsFake(async () => {
       promptIssued = true;
-      return Promise.resolve(false);
+      return false;
     });
 
     promptIssued = false;

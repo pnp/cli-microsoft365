@@ -44,7 +44,7 @@ describe('PowerBICommand', () => {
 
   after(() => {
     sinon.restore();
-    auth.connection.active = true;
+    auth.connection.active = false;
     auth.connection.accessTokens = {};
   });
 

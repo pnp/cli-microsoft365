@@ -83,11 +83,7 @@ describe(commands.SOLUTION_LIST, () => {
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
-    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
-    auth.connection.accessTokens[auth.defaultResource] = {
-      expiresOn: 'abc',
-      accessToken: 'abc'
-    };
+    sinon.stub(accessToken, 'assertDelegatedAccessToken').returns();
     auth.connection.active = true;
   });
 

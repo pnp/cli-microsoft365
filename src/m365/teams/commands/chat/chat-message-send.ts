@@ -5,11 +5,11 @@ import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 import { validation } from '../../../../utils/validation.js';
-import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 import { chatUtil } from './chatUtil.js';
 import { cli } from '../../../../cli/cli.js';
 import { formatting } from '../../../../utils/formatting.js';
+import DelegatedGraphCommand from '../../../base/DelegatedGraphCommand.js';
 
 interface CommandArgs {
   options: Options;
@@ -22,7 +22,7 @@ interface Options extends GlobalOptions {
   message: string;
 }
 
-class TeamsChatMessageSendCommand extends GraphCommand {
+class TeamsChatMessageSendCommand extends DelegatedGraphCommand {
   public get name(): string {
     return commands.CHAT_MESSAGE_SEND;
   }
@@ -91,8 +91,6 @@ class TeamsChatMessageSendCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    accessToken.assertDelegatedAccessToken();
-
     try {
       const chatId = await this.getChatId(logger, args);
       await this.sendChatMessage(chatId as string, args);

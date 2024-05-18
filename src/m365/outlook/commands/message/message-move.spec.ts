@@ -58,7 +58,6 @@ describe(commands.MESSAGE_MOVE, () => {
   after(() => {
     sinon.restore();
     auth.connection.active = false;
-    auth.connection.accessTokens = {};
   });
 
   it('has correct name', () => {

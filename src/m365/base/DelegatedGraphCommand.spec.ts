@@ -22,7 +22,7 @@ class MockCommand extends DelegatedGraphCommand {
   }
 }
 
-describe('ToDoCommand', () => {
+describe('DelegatedGraphCommand', () => {
   const cmd = new MockCommand();
 
   before(() => {

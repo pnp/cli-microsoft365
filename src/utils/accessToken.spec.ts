@@ -23,6 +23,7 @@ describe('utils/accessToken', () => {
   after(() => {
     sinon.restore();
     auth.connection.active = false;
+    auth.connection.accessTokens = {};
   });
 
   it('isAppOnlyAccessToken returns undefined when access token is undefined', () => {
@@ -135,23 +136,20 @@ describe('utils/accessToken', () => {
     assert.strictEqual(actual, '');
   });
 
-  it('returns when ensuring delegated access token using the proper access token', () => {
+  it('asserts delegated access token correctly', () => {
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
     accessToken.assertDelegatedAccessToken();
   });
 
-  it('throws error when trying to ensure delegated access token when auth is not yet restored or available', () => {
+  it('throws error when trying to asserting delegated access token when no token available', () => {
+    const currentAccessTokens = { ...auth.connection.accessTokens };
     auth.connection.accessTokens = {};
     assert.throws(() => accessToken.assertDelegatedAccessToken(), new CommandError('No access token could be found.'));
+    auth.connection.accessTokens = currentAccessTokens;
   });
 
-  it('throws error when trying to asserting delegated access token with application only token', () => {
-    auth.connection.accessTokens[auth.defaultResource] = {
-      expiresOn: 'abc',
-      accessToken: 'abc'
-    };
+  it('throws error when trying to assert delegated access token with application only token', () => {
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
     assert.throws(() => accessToken.assertDelegatedAccessToken(), new CommandError('This command does not support application-only permissions.'));
-    auth.connection.accessTokens = {};
   });
 });

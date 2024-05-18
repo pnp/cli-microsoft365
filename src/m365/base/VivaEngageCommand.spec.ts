@@ -48,6 +48,7 @@ describe('VivaEngageCommand', () => {
 
   after(() => {
     sinon.restore();
+    auth.connection.active = false;
   });
 
   it('correctly reports an error while restoring auth info', async () => {

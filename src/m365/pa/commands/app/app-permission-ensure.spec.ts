@@ -85,7 +85,6 @@ describe(commands.APP_PERMISSION_ENSURE, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
-    commandInfo = cli.getCommandInfo(command);
     auth.connection.accessTokens[auth.defaultResource] = {
       expiresOn: '123',
       accessToken: 'abc'
