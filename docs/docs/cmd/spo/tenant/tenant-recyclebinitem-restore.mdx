@@ -1,4 +1,6 @@
 import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 # spo tenant recyclebinitem restore
 
@@ -40,4 +42,48 @@ m365 spo tenant recyclebinitem restore --siteUrl https://contoso.sharepoint.com/
 
 ## Response
 
-The command won't return a response on success.
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  {
+    "HasTimedout": false,
+    "IsComplete": true,
+    "PollingInterval": 15000
+  }
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  HasTimedout    : false
+  IsComplete     : true
+  PollingInterval: 15000
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  HasTimedout,IsComplete,PollingInterval
+  ,1,15000
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # spo tenant recyclebinitem restore --siteUrl "https://contoso.sharepoint.com/teams/team1"
+
+  Date: 2023-06-22
+
+  Property | Value
+  ---------|-------
+  HasTimedout | false
+  IsComplete | true
+  PollingInterval | 15000
+  ```
+
+  </TabItem>
+</Tabs>

@@ -33,6 +33,7 @@ class SpoTenantRecycleBinItemRestoreCommand extends SpoCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initTypes();
   }
 
   #initTelemetry(): void {
@@ -60,6 +61,11 @@ class SpoTenantRecycleBinItemRestoreCommand extends SpoCommand {
     );
   }
 
+  #initTypes(): void {
+    this.types.string.push('siteUrl');
+    this.types.boolean.push('wait');
+  }
+
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (args.options.wait) {
       await this.warn(logger, `Option 'wait' is deprecated and will be removed in the next major release.`);
@@ -67,7 +73,7 @@ class SpoTenantRecycleBinItemRestoreCommand extends SpoCommand {
 
     try {
       if (this.verbose) {
-        await logger.logToStderr(`Restoring site collection ${args.options.siteUrl} from recycle bin.`);
+        await logger.logToStderr(`Restoring site collection '${args.options.siteUrl}' from recycle bin.`);
       }
 
       const siteUrl = urlUtil.removeTrailingSlashes(args.options.siteUrl);
@@ -88,7 +94,7 @@ class SpoTenantRecycleBinItemRestoreCommand extends SpoCommand {
 
       if (groupId && groupId !== '00000000-0000-0000-0000-000000000000') {
         if (this.verbose) {
-          await logger.logToStderr(`Restoring Microsoft 365 group ${groupId} from recycle bin.`);
+          await logger.logToStderr(`Restoring Microsoft 365 group with ID '${groupId}' from recycle bin.`);
         }
 
         const restoreOptions: CliRequestOptions = {
@@ -102,14 +108,22 @@ class SpoTenantRecycleBinItemRestoreCommand extends SpoCommand {
 
         await request.post(restoreOptions);
       }
+
+      // Here, we return a fixed response due to removing the '--wait' functionality as it is deprecated.
+      // This has to be removed in the next major release.
+      await logger.log({
+        HasTimedout: false,
+        IsComplete: !!args.options.wait,
+        PollingInterval: 15000
+      });
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
   }
 
-  private async getSiteGroupId(adminUrl: string, url: string): Promise<string> {
-    const sites = await odata.getAllItems<{ GroupId: string }>(`${adminUrl}/_api/web/lists/GetByTitle('DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECOLLECTIONS')/items?$filter=SiteUrl eq '${formatting.encodeQueryParameter(url)}'&$select=GroupId`);
+  private async getSiteGroupId(adminUrl: string, url: string): Promise<string | undefined> {
+    const sites = await odata.getAllItems<{ GroupId?: string }>(`${adminUrl}/_api/web/lists/GetByTitle('DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECOLLECTIONS')/items?$filter=SiteUrl eq '${formatting.encodeQueryParameter(url)}'&$select=GroupId`);
     return sites[0].GroupId;
   }
 }

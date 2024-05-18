@@ -93,7 +93,7 @@ describe(commands.TENANT_RECYCLEBINITEM_RESTORE, () => {
     assert.strictEqual(actual, true);
   });
 
-  it(`restores deleted site collection from the tenant recycle bin and also restores m365 group from entra recycle bin`, async () => {
+  it(`restores deleted group site from a deleted team site`, async () => {
     const groupId = '4b3f5e3f-6e1f-4b1e-8b5f-0f5f5f5f5f5f';
     const groupRestoreUrl = `https://graph.microsoft.com/v1.0/directory/deletedItems/${groupId}/restore`;
     const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
@@ -120,7 +120,7 @@ describe(commands.TENANT_RECYCLEBINITEM_RESTORE, () => {
     assert.strictEqual(postStub.lastCall.args[0].url, groupRestoreUrl);
   });
 
-  it('restores deleted site collection from the tenant recycle bin and does not remove m365 group when deleted site is not group connected', async () => {
+  it('restores restores a deleted SharePoint site', async () => {
     const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === siteRestoreUrl) {
         return;
@@ -154,13 +154,7 @@ describe(commands.TENANT_RECYCLEBINITEM_RESTORE, () => {
       }
     };
 
-    sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === siteRestoreUrl) {
-        throw error;
-      }
-
-      throw 'Invalid request';
-    });
+    sinon.stub(request, 'post').rejects(error);
 
     await assert.rejects(command.action(logger, { options: { siteUrl: siteUrl, verbose: true } } as any), new CommandError(error.error['odata.error'].message.value));
   });
