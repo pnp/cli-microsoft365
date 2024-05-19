@@ -97,18 +97,17 @@ export const accessToken = {
   },
 
   /**
-   * Asserts that the provided access token is a delegated access token.  
+   * Asserts the presence of a delegated access token and checks if it is not an app-only token.
    * @throws {CommandError} Will throw an error if the access token is not available.
    * @throws {CommandError} Will throw an error if the access token is an application-only access token.
    */
   assertDelegatedAccessToken(): void {
-    const accessToken = auth?.connection?.accessTokens?.[auth.defaultResource];
+    const accessToken = auth?.connection?.accessTokens?.[auth.defaultResource]?.accessToken;
     if (!accessToken) {
-      throw new CommandError('No access token could be found.');
+      throw new CommandError('No access token found.');
     }
 
-    ;
-    if (this.isAppOnlyAccessToken(accessToken.accessToken)) {
+    if (this.isAppOnlyAccessToken(accessToken)) {
       throw new CommandError('This command does not support application-only permissions.');
     }
   }

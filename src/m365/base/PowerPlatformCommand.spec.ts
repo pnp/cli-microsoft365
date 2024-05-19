@@ -48,9 +48,13 @@ describe('PowerPlatformCommand', () => {
   });
 
   it(`doesn't throw error when not connected`, () => {
-    auth.connection.active = false;
-    (cmd as any).initAction({ options: {} }, {});
-    auth.connection.active = true;
+    try {
+      auth.connection.active = false;
+      (cmd as any).initAction({ options: {} }, {});
+    }
+    finally {
+      auth.connection.active = true;
+    }
   });
 
   it('throws error when connected to USGov cloud', () => {

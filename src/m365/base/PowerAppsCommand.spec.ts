@@ -30,7 +30,7 @@ describe('PowerAppsCommand', () => {
   before(() => {
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
-    auth.connection.active = false;
+    auth.connection.active = true;
     auth.connection.accessTokens[auth.defaultResource] = {
       expiresOn: 'abc',
       accessToken: 'abc'
@@ -49,8 +49,13 @@ describe('PowerAppsCommand', () => {
   });
 
   it(`doesn't throw error when not connected`, () => {
-    (cmd as any).initAction({ options: {} }, {});
-    auth.connection.active = true;
+    try {
+      auth.connection.active = false;
+      (cmd as any).initAction({ options: {} }, {});
+    }
+    finally {
+      auth.connection.active = true;
+    }
   });
 
   it('throws error when connected to USGov cloud', () => {

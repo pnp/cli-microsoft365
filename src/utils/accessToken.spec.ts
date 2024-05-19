@@ -141,10 +141,10 @@ describe('utils/accessToken', () => {
     accessToken.assertDelegatedAccessToken();
   });
 
-  it('throws error when trying to asserting delegated access token when no token available', () => {
-    const currentAccessTokens = { ...auth.connection.accessTokens };
+  it('throws error when trying to assert delegated access token when no token available', () => {
+    const currentAccessTokens = auth.connection.accessTokens;
     auth.connection.accessTokens = {};
-    assert.throws(() => accessToken.assertDelegatedAccessToken(), new CommandError('No access token could be found.'));
+    assert.throws(() => accessToken.assertDelegatedAccessToken(), new CommandError('No access token found.'));
     auth.connection.accessTokens = currentAccessTokens;
   });
 

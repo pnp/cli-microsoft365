@@ -5,7 +5,7 @@ import { accessToken } from '../../utils/accessToken.js';
 import GraphCommand from './GraphCommand.js';
 
 /**
- * This class is only used for delegated Graph commands.
+ * This command class is for delegated-only Graph commands.  
  */
 export default abstract class DelegatedGraphCommand extends GraphCommand {
   protected initAction(args: CommandArgs, logger: Logger): void {
