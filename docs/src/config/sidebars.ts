@@ -3273,6 +3273,11 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
+              label: 'site admin remove',
+              id: 'cmd/spo/site/site-admin-remove'
+            },
+            {
+              type: 'doc',
               label: 'site ensure',
               id: 'cmd/spo/site/site-ensure'
             },
