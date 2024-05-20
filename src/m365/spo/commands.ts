@@ -248,6 +248,7 @@ export default {
   SITE_ADD: `${prefix} site add`,
   SITE_ADMIN_ADD: `${prefix} site admin add`,
   SITE_ADMIN_LIST: `${prefix} site admin list`,
+  SITE_ADMIN_REMOVE: `${prefix} site admin remove`,
   SITE_APPCATALOG_ADD: `${prefix} site appcatalog add`,
   SITE_APPCATALOG_LIST: `${prefix} site appcatalog list`,
   SITE_APPCATALOG_REMOVE: `${prefix} site appcatalog remove`,
