@@ -3428,6 +3428,11 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
+              label: 'site admin remove',
+              id: 'cmd/spo/site/site-admin-remove'
+            },
+            {
+              type: 'doc',
               label: 'site appcatalog add',
               id: 'cmd/spo/site/site-appcatalog-add'
             },
