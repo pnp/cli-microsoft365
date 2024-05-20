@@ -24,22 +24,18 @@ class VivaEngageCommunityGetCommand extends GraphCommand {
   constructor() {
     super();
 
-    this.#initTelemetry();
     this.#initOptions();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        id: args.options.id !== undefined
-      });
-    });
+    this.#initTypes();
   }
 
   #initOptions(): void {
     this.options.unshift(
       { option: '-i, --id <id>' }
     );
+  }
+
+  #initTypes(): void {
+    this.types.string.push('id');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -50,14 +46,13 @@ class VivaEngageCommunityGetCommand extends GraphCommand {
     const requestOptions: CliRequestOptions = {
       url: `${this.resource}/beta/employeeExperience/communities/${args.options.id}`,
       headers: {
-        accept: 'application/json;odata.metadata=none',
-        'content-type': 'application/json;odata=nometadata'
+        accept: 'application/json;odata.metadata=none'
       },
       responseType: 'json'
     };
 
     try {
-      const res: any = await request.get(requestOptions);
+      const res = await request.get<any>(requestOptions);
 
       await logger.log(res);
     }
