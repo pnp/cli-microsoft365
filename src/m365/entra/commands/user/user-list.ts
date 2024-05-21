@@ -35,12 +35,17 @@ class EntraUserListCommand extends GraphCommand {
     return true;
   }
 
+  public defaultProperties(): string[] | undefined {
+    return ['id', 'displayName', 'mail', 'userPrincipalName'];
+  }
+
   constructor() {
     super();
 
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initTypes();
   }
 
   #initTelemetry(): void {
@@ -68,7 +73,7 @@ class EntraUserListCommand extends GraphCommand {
     this.validators.push(
       async (args: CommandArgs) => {
         if (args.options.type && !EntraUserListCommand.allowedTypes.some(t => t.toLowerCase() === args.options.type!.toLowerCase())) {
-          return `'${args.options.type}' is not a valid user type. Allowed values are ${EntraUserListCommand.allowedTypes.join('|')}`;
+          return `'${args.options.type}' is not a valid value for option 'type'. Allowed values are: ${EntraUserListCommand.allowedTypes.join(',')}.`;
         }
 
         return true;
@@ -76,30 +81,42 @@ class EntraUserListCommand extends GraphCommand {
     );
   }
 
+  #initTypes(): void {
+    this.types.string.push('type', 'properties');
+  }
+
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     await this.showDeprecationWarning(logger, aadCommands.USER_LIST, commands.USER_LIST);
 
     try {
-      const selectProperties = args.options.properties || '*';
-      const allSelectProperties = selectProperties.split(',');
-      const propertiesWithSlash = allSelectProperties.filter(item => item.includes('/'));
+      let url = `${this.resource}/v1.0/users`;
 
-      const fieldExpand = propertiesWithSlash
-        .map(p => `${p.split('/')[0]}($select=${p.split('/')[1]})`)
-        .join(',');
+      if (args.options.properties) {
+        const selectProperties = args.options.properties;
+        const allSelectProperties = selectProperties.split(',');
+        const propertiesWithSlash = allSelectProperties.filter(item => item.includes('/'));
 
-      const expandParam = fieldExpand.length > 0 ? `&$expand=${fieldExpand}` : '';
-      const selectParam = allSelectProperties.filter(item => !item.includes('/'));
+        const fieldExpand = propertiesWithSlash
+          .map(p => `${p.split('/')[0]}($select=${p.split('/')[1]})`)
+          .join(',');
+
+        const expandParam = fieldExpand.length > 0 ? `&$expand=${fieldExpand}` : '';
+        const selectParam = allSelectProperties.filter(item => !item.includes('/'));
+
+        url += `?$select=${selectParam}${expandParam}`;
+      }
 
       let filter: string = '';
       try {
         filter = this.getFilter(args.options);
+        if (filter.length > 0) {
+          url += `${args.options.properties ? '&' : '?'}${filter}`;
+        }
       }
       catch (ex: any) {
         throw ex;
       }
 
-      const url = `${this.resource}/v1.0/users?$select=${selectParam}${expandParam}${(filter.length > 0 ? '&' + filter : '')}`;
       const users = await odata.getAllItems<User>(url);
       await logger.log(users);
     }

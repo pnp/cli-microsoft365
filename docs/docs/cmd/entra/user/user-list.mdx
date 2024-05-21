@@ -32,7 +32,7 @@ m365 aad user list [options]
 
 ## Remarks
 
-Using the `--properties` option, you can specify a comma-separated list of user properties to retrieve from the Microsoft Graph. If you don't specify any properties, the command will retrieve all the properties returned by Graph of the users.
+Using the `--properties` option, you can specify a comma-separated list of user properties to retrieve from the Microsoft Graph. If you don't specify any properties, the command will output the default properties returned by Graph.  
 
 When the `properties` option includes values with a `/`, for example: `manager/displayName`, an additional `$expand` query parameter will be included on `manager`.
 
@@ -107,9 +107,9 @@ m365 entra user list --properties "displayName,mail,manager/*"
   <TabItem value="Text">
 
   ```text
-  businessPhones   displayName  givenName  jobTitle       mail                          mobilePhone      officeLocation  preferredLanguage  surname  userPrincipalName             id
-  ---------------  -----------  ---------  -------------  ----------------------------  ---------------  --------------  -----------------  -------  ----------------------------  ------------------------------------
-  +32 456 789 123  John Doe     John       Sales Manager  John@contoso.onmicrosoft.com  +32 456 789 123  Antwerp         nl-BE              Doe      John@contoso.onmicrosoft.com  ef0d4f29-e359-4443-a15d-bc3dccc8143f
+  id                                    displayName  mail                          userPrincipalName
+  ------------------------------------  -----------  ----------------------------  ----------------------------
+  ef0d4f29-e359-4443-a15d-bc3dccc8143f  John Doe     John@contoso.onmicrosoft.com  John@contoso.onmicrosoft.com
   ```
 
   </TabItem>
