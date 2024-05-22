@@ -5,7 +5,7 @@ import { Logger } from './cli/Logger.js';
 import { app } from './utils/app.js';
 import { formatting } from './utils/formatting.js';
 import { timings } from './cli/timings.js';
-import { setTimeout } from 'timers/promises';
+import { timersUtil } from './utils/timersUtil.js';
 
 export interface CliRequestOptions extends AxiosRequestConfig {
   fullResponse?: boolean;
@@ -15,7 +15,6 @@ class Request {
   private req: AxiosInstance;
   private _logger?: Logger;
   private _debug: boolean = false;
-  private retryAfterTimeout: number = 1000;
 
   public set debug(debug: boolean) {
     // if the value to set is the same as current value return early to avoid
@@ -216,16 +215,12 @@ class Request {
           await (this._logger as Logger).log(`Request throttled. Waiting ${retryAfter} sec before retrying...`);
         }
 
-        await this.setTimeout(retryAfter);
+        await timersUtil.setTimeout(retryAfter * 1000);
         return this.execute(options);
       }
 
       throw error;
     }
-  }
-
-  private async setTimeout(value: number): Promise<void> {
-    await setTimeout(value * this.retryAfterTimeout);
   }
 
   private updateRequestForCloudType(options: AxiosRequestConfig, cloudType: CloudType): void {

@@ -6,7 +6,7 @@ import auth, { CloudType } from './Auth.js';
 import { Logger } from './cli/Logger.js';
 import _request, { CliRequestOptions } from './request.js';
 import { sinonUtil } from './utils/sinonUtil.js';
-import command from './request.js';
+import { timersUtil } from './utils/timersUtil.js';
 
 describe('Request', () => {
   const logger: Logger = {
@@ -22,7 +22,6 @@ describe('Request', () => {
     _request.logger = logger;
     _request.debug = false;
     sinon.stub(auth, 'ensureAccessToken').resolves('ABC');
-    (command as any).retryAfterTimeout = 0;
   });
 
   afterEach(() => {
@@ -31,9 +30,9 @@ describe('Request', () => {
       process.env,
       https.request,
       (_request as any).req,
-      (_request as any).setTimeout,
       logger.log,
-      auth.ensureAccessToken
+      auth.ensureAccessToken,
+      timersUtil.setTimeout
     ]);
   });
 
@@ -417,7 +416,7 @@ describe('Request', () => {
       }
     });
 
-    sinon.stub(_request as any, 'setTimeout').callsFake(async (value: any) => {
+    sinon.stub(timersUtil, 'setTimeout').callsFake(async (value: any) => {
       timeout = value;
       return;
     });
@@ -427,7 +426,7 @@ describe('Request', () => {
         url: 'https://contoso.sharepoint.com/'
       });
 
-    assert.strictEqual(timeout, retryAfter);
+    assert.strictEqual(timeout, retryAfter * 1000);
   });
 
   it('repeats 429-throttled request after 10s if no value specified', async () => {
@@ -448,7 +447,7 @@ describe('Request', () => {
       }
     });
 
-    sinon.stub(_request as any, 'setTimeout').callsFake(async (value: any) => {
+    sinon.stub(timersUtil, 'setTimeout').callsFake(async (value: any) => {
       timeout = value;
       return;
     });
@@ -458,7 +457,7 @@ describe('Request', () => {
         url: 'https://contoso.sharepoint.com/'
       });
 
-    assert.strictEqual(timeout, retryAfter);
+    assert.strictEqual(timeout, retryAfter * 1000);
   });
 
   it('repeats 429-throttled request after 10s if the specified value is not a number', async () => {
@@ -481,7 +480,7 @@ describe('Request', () => {
       }
     });
 
-    sinon.stub(_request as any, 'setTimeout').callsFake(async (value: any) => {
+    sinon.stub(timersUtil, 'setTimeout').callsFake(async (value: any) => {
       timeout = value;
       return;
     });
@@ -491,7 +490,7 @@ describe('Request', () => {
         url: 'https://contoso.sharepoint.com/'
       });
 
-    assert.strictEqual(timeout, retryAfter);
+    assert.strictEqual(timeout, retryAfter * 1000);
   });
 
   it('repeats 429-throttled request until it succeeds', async () => {
@@ -510,6 +509,8 @@ describe('Request', () => {
         return { data: {} };
       }
     });
+
+    sinon.stub(timersUtil, 'setTimeout').resolves();
 
     await _request
       .get({
@@ -533,7 +534,7 @@ describe('Request', () => {
           response: {
             status: 429,
             headers: {
-              'retry-after': 60
+              'retry-after': retryAfter
             }
           }
         };
@@ -543,7 +544,7 @@ describe('Request', () => {
       }
     });
 
-    sinon.stub(_request as any, 'setTimeout').callsFake(async (value: any) => {
+    sinon.stub(timersUtil, 'setTimeout').callsFake(async (value: any) => {
       timeout = value;
       return;
     });
@@ -552,7 +553,7 @@ describe('Request', () => {
       .get({
         url: 'https://contoso.sharepoint.com/'
       });
-    assert.strictEqual(timeout, retryAfter);
+    assert.strictEqual(timeout, retryAfter * 1000);
   });
 
   it('repeats 503-throttled request until it succeeds', async () => {
@@ -571,6 +572,8 @@ describe('Request', () => {
         return { data: {} };
       }
     });
+
+    sinon.stub(timersUtil, 'setTimeout').resolves();
 
     await _request
       .get({
@@ -596,6 +599,8 @@ describe('Request', () => {
         throw 'Error';
       }
     });
+
+    sinon.stub(timersUtil, 'setTimeout').resolves();
 
     try {
       await _request
@@ -629,6 +634,8 @@ describe('Request', () => {
         return { data: {} };
       }
     });
+
+    sinon.stub(timersUtil, 'setTimeout').resolves();
 
     await _request
       .get({
