@@ -75,12 +75,12 @@ describe(commands.USER_LIST, () => {
     assert.deepStrictEqual(alias, [aadCommands.USER_LIST]);
   });
 
-  it('fails validation if type is not a valid user type.', async () => {
+  it('fails validation if type is not a valid user type', async () => {
     const actual = await command.validate({ options: { type: 'invalid' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if type is a valid user type.', async () => {
+  it('passes validation if type is a valid user type', async () => {
     const actual = await command.validate({ options: { type: 'Member' } }, commandInfo);
     assert.strictEqual(actual, true);
   });

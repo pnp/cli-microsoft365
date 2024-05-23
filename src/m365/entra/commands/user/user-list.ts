@@ -73,7 +73,7 @@ class EntraUserListCommand extends GraphCommand {
     this.validators.push(
       async (args: CommandArgs) => {
         if (args.options.type && !EntraUserListCommand.allowedTypes.some(t => t.toLowerCase() === args.options.type!.toLowerCase())) {
-          return `'${args.options.type}' is not a valid value for option 'type'. Allowed values are: ${EntraUserListCommand.allowedTypes.join(',')}.`;
+          return `'${args.options.type}' is not a valid value for option 'type'. Allowed values are: ${EntraUserListCommand.allowedTypes.join(', ')}.`;
         }
 
         return true;
@@ -106,15 +106,10 @@ class EntraUserListCommand extends GraphCommand {
         url += `?$select=${selectParam}${expandParam}`;
       }
 
-      let filter: string = '';
-      try {
-        filter = this.getFilter(args.options);
-        if (filter.length > 0) {
-          url += `${args.options.properties ? '&' : '?'}${filter}`;
-        }
-      }
-      catch (ex: any) {
-        throw ex;
+      const unknownOptions: Options = this.getUnknownOptions(args.options);
+      if (Object.keys(unknownOptions).length > 0 || args.options.type) {
+        const filter = this.getFilter(unknownOptions, args.options.type);
+        url += `${args.options.properties ? '&' : '?'}${filter}`;
       }
 
       const users = await odata.getAllItems<User>(url);
@@ -125,29 +120,15 @@ class EntraUserListCommand extends GraphCommand {
     }
   }
 
-  private getFilter(options: Options): string {
+  private getFilter(options: Options, type?: string): string {
+
     const filters: any = {};
-    const excludeOptions: string[] = [
-      'type',
-      'properties',
-      'p',
-      'd',
-      'debug',
-      'verbose',
-      'output',
-      'o',
-      'query',
-      '_'
-    ];
-
     Object.keys(options).forEach(key => {
-      if (excludeOptions.indexOf(key) === -1) {
-        if (typeof options[key] === 'boolean') {
-          throw `Specify value for the ${key} property`;
-        }
-
-        filters[key] = formatting.encodeQueryParameter(options[key].toString());
+      if (typeof options[key] === 'boolean') {
+        throw `Specify value for the ${key} property`;
       }
+
+      filters[key] = formatting.encodeQueryParameter(options[key].toString());
     });
 
     let filter: string = Object.keys(filters).map(key => `startsWith(${key}, '${filters[key]}')`).join(' and ');
@@ -155,8 +136,8 @@ class EntraUserListCommand extends GraphCommand {
       filter = `$filter=${filter}`;
     }
 
-    if (options.type) {
-      filter += filter.length > 0 ? ` and userType eq '${options.type}'` : `$filter=userType eq '${options.type}'`;
+    if (type) {
+      filter += filter.length > 0 ? ` and userType eq '${type}'` : `$filter=userType eq '${type}'`;
     }
 
     return filter;
