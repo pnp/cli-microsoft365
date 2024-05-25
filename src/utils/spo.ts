@@ -1888,5 +1888,56 @@ export const spo = {
     const file: FileProperties = await request.get<FileProperties>(requestOptions);
 
     return file;
+  },
+
+  /**
+   * Gets the site collection URL for a given web URL using SP Admin site.
+   * @param adminUrl The SharePoint admin URL
+   * @param siteId The site ID
+   * @param logger The logger object
+   * @param verbose If in verbose mode
+   * @returns Owner login name
+   */
+  async getPrimaryAdminLoginNameAsAdmin(adminUrl: string, siteId: string, logger: Logger, verbose: boolean): Promise<string> {
+    if (verbose) {
+      await logger.logToStderr('Getting the primary admin login name...');
+    }
+
+    const requestOptions: CliRequestOptions = {
+      url: `${adminUrl}/_api/SPO.Tenant/sites('${siteId}')?$select=OwnerLoginName`,
+      headers: {
+        accept: 'application/json;odata=nometadata',
+        'content-type': 'application/json;charset=utf-8'
+      }
+    };
+
+    const response: string = await request.get<string>(requestOptions);
+    const responseContent = JSON.parse(response);
+    return responseContent.OwnerLoginName;
+  },
+
+  /**
+   * Gets the primary owner login from a site.
+   * @param siteUrl The site URL
+   * @param logger The logger object
+   * @param verbose If in verbose mode
+   * @returns Owner login name
+   */
+  async getPrimaryOwnerLoginFromSite(siteUrl: string, logger: Logger, verbose: boolean): Promise<string> {
+    if (verbose) {
+      await logger.logToStderr('Getting the primary admin login name...');
+    }
+
+    const requestOptions: CliRequestOptions = {
+      url: `${siteUrl}/_api/site/owner`,
+      method: 'GET',
+      headers: {
+        'accept': 'application/json;odata=nometadata'
+      },
+      responseType: 'json'
+    };
+
+    const responseContent = await request.get<{ LoginName: string }>(requestOptions);
+    return responseContent?.LoginName;
   }
 };
