@@ -2580,4 +2580,37 @@ describe('utils/spo', () => {
       assert.deepStrictEqual(ex, `File Not Found`);
     }
   });
+
+  it(`gets primary admin loginName from admin site`, async () => {
+    const adminUrl = 'https://contoso-admin.sharepoint.com';
+    const siteId = '0ead8b78-89e5-427f-b1bc-6e5a77ac191c';
+    const primaryAdminLoginName = 'user1loginName';
+
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `${adminUrl}/_api/SPO.Tenant/sites('${siteId}')?$select=OwnerLoginName`) {
+        return JSON.stringify({ OwnerLoginName: primaryAdminLoginName });
+      }
+
+      throw 'Invalid request';
+    });
+
+    const result = await spo.getPrimaryAdminLoginNameAsAdmin(adminUrl, siteId, logger, true);
+    assert.strictEqual(result, primaryAdminLoginName);
+  });
+
+  it(`gets primary admin loginName from site`, async () => {
+    const siteUrl = 'https://contoso.sharepoint.com';
+    const primaryAdminLoginName = 'user1loginName';
+
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `${siteUrl}/_api/site/owner`) {
+        return { LoginName: primaryAdminLoginName };
+      }
+
+      throw 'Invalid request';
+    });
+
+    const result = await spo.getPrimaryOwnerLoginFromSite(siteUrl, logger, true);
+    assert.strictEqual(result, primaryAdminLoginName);
+  });
 });
