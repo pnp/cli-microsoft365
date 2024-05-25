@@ -203,7 +203,7 @@ class LoginCommand extends Command {
         auth.connection.cloudType = CloudType.Public;
       }
 
-      await this.obtainAccessToken(logger);
+      await this.getAccessToken(logger);
 
       const details = auth.getConnectionDetails(auth.connection);
 
@@ -214,8 +214,10 @@ class LoginCommand extends Command {
       await logger.log(details);
     };
 
+    const renewConnection = this.shouldRenewConnection(args.options);
+
     try {
-      if (this.shouldRenewConnection(args.options)) {
+      if (renewConnection) {
         await auth.clearConnectionInfo();
       }
     }
@@ -225,8 +227,8 @@ class LoginCommand extends Command {
       }
     }
     finally {
-      if (!this.shouldRenewConnection(args.options)) {
-        await this.obtainAccessToken(logger);
+      if (!renewConnection) {
+        await this.getAccessToken(logger);
       }
       else {
         deactivate();
@@ -251,19 +253,19 @@ class LoginCommand extends Command {
     const authType = options.authType || cli.getSettingWithDefaultValue<string>(settingsNames.authType, 'deviceCode');
     const ensure: boolean | undefined = options.ensure;
 
-    if (!ensure || (ensure && (
+    if (!ensure || (
       (!auth.connection.active && AuthType[authType as keyof typeof AuthType] !== auth.connection.authType) ||
       (options.userName && options.userName !== auth.connection.userName) ||
       (options.certificateFile && (auth.connection.certificate !== fs.readFileSync(options.certificateFile as string, 'base64'))) ||
       (options.appId && options.appId !== auth.connection.appId) ||
-      (options.tenant && options.tenant !== auth.connection.tenant)))) {
+      (options.tenant && options.tenant !== auth.connection.tenant))) {
       return true;
     }
 
     return false;
   }
 
-  private async obtainAccessToken(logger: Logger): Promise<void> {
+  private async getAccessToken(logger: Logger): Promise<void> {
     try {
       await auth.ensureAccessToken(auth.defaultResource, logger, this.debug);
       auth.connection.active = true;
