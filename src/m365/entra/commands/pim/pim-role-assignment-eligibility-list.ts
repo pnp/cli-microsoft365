@@ -20,6 +20,10 @@ interface Options extends GlobalOptions {
   includePrincipalDetails?: boolean;
 }
 
+interface UnifiedRoleEligibilityScheduleInstanceEx extends UnifiedRoleEligibilityScheduleInstance {
+  roleDefinitionName?: string
+}
+
 class EntraPimRoleAssignmentEligibilityListCommand extends GraphCommand {
   public get name(): string {
     return commands.PIM_ROLE_ASSIGNMENT_ELIGIBILITY_LIST;
@@ -27,6 +31,10 @@ class EntraPimRoleAssignmentEligibilityListCommand extends GraphCommand {
 
   public get description(): string {
     return 'Retrieves a list of eligible roles a user or group can be assigned to';
+  }
+
+  public defaultProperties(): string[] | undefined {
+    return ['roleDefinitionId', 'roleDefinitionName', 'principalId'];
   }
 
   constructor() {
@@ -53,19 +61,19 @@ class EntraPimRoleAssignmentEligibilityListCommand extends GraphCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: "--userId [userId]"
+        option: '--userId [userId]'
       },
       {
-        option: "--userName [userName]"
+        option: '--userName [userName]'
       },
       {
-        option: "--groupId [groupId]"
+        option: '--groupId [groupId]'
       },
       {
-        option: "--groupName [groupName]"
+        option: '--groupName [groupName]'
       },
       {
-        option: "--includePrincipalDetails [includePrincipalDetails]"
+        option: '--includePrincipalDetails [includePrincipalDetails]'
       }
     );
   }
@@ -74,11 +82,15 @@ class EntraPimRoleAssignmentEligibilityListCommand extends GraphCommand {
     this.validators.push(
       async (args: CommandArgs) => {
         if (args.options.userId && !validation.isValidGuid(args.options.userId)) {
-          return `${args.options.userId} is not a valid GUID`;
+          return `'${args.options.userId} is not a valid GUID for option 'userId'.`;
+        }
+
+        if (args.options.userName && !validation.isValidUserPrincipalName(args.options.userName)) {
+          return `'${args.options.userName} is not a valid user principal name for option 'userName'.`;
         }
 
         if (args.options.groupId && !validation.isValidGuid(args.options.groupId)) {
-          return `${args.options.groupId} is not a valid GUID`;
+          return `'${args.options.groupId}' is not a valid GUID for option 'groupId'.`;
         }
 
         return true;
@@ -94,19 +106,17 @@ class EntraPimRoleAssignmentEligibilityListCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    if (this.verbose) {
+      await logger.logToStderr(`Retrieving list of eligible roles for ${args.options.userId || args.options.userName || args.options.groupId || args.options.groupName || 'all users'}...`);
+    }
     const queryParameters: string[] = [];
-    const filters: string[] = [];
     const expands: string[] = [];
 
     try {
       const principalId = await this.getPrincipalId(logger, args.options);
 
       if (principalId) {
-        filters.push(`principalId eq '${principalId}'`);
-      }
-
-      if (filters.length > 0) {
-        queryParameters.push(`$filter=${filters.join(' and ')}`);
+        queryParameters.push(`$filter=principalId eq '${principalId}'`);
       }
 
       expands.push('roleDefinition($select=displayName)');
@@ -117,11 +127,19 @@ class EntraPimRoleAssignmentEligibilityListCommand extends GraphCommand {
 
       queryParameters.push(`$expand=${expands.join(',')}`);
 
-      const queryString = `?${queryParameters.join('&')}`;
+      const url = `${this.resource}/v1.0/roleManagement/directory/roleEligibilityScheduleInstances?${queryParameters.join('&')}`;
 
-      const url = `${this.resource}/v1.0/roleManagement/directory/roleEligibilityScheduleInstances${queryString}`;
+      const results = await odata.getAllItems<UnifiedRoleEligibilityScheduleInstanceEx>(url);
 
-      const results = await odata.getAllItems<UnifiedRoleEligibilityScheduleInstance>(url);
+      results.forEach(c => {
+        const roleDefinition = c['roleDefinition'];
+
+        if (roleDefinition) {
+          c.roleDefinitionName = roleDefinition.displayName!;
+        }
+
+        delete c['roleDefinition'];
+      });
 
       await logger.log(results);
     }

@@ -52,6 +52,33 @@ describe(commands.PIM_ROLE_ASSIGNMENT_ELIGIBILITY_LIST, () => {
     }
   ];
 
+  const unifiedRoleAssignmentEligibilityScheduleInstanceTransformedResponse = [
+    {
+      "id": "XrtkCdube02sKVjnlIYqQBht8lJR0U9DrhSkqDEisrI-1-e",
+      "principalId": "52f26d18-d151-434f-ae14-a4a83122b2b2",
+      "roleDefinitionId": "0964bb5e-9bdb-4d7b-ac29-58e794862a40",
+      "directoryScopeId": "/",
+      "appScopeId": null,
+      "startDateTime": "2024-04-08T10:14:01.153Z",
+      "endDateTime": null,
+      "memberType": "Direct",
+      "roleEligibilityScheduleId": "7a135e3d-5be5-403c-bdad-47ccbac434e3",
+      "roleDefinitionName": "Search Administrator"
+    },
+    {
+      "id": "YMROdH45rUKkYos_l0egLC_FsGECqWlHmgnGYoM1sAo-1-e",
+      "principalId": "61b0c52f-a902-4769-9a09-c6628335b00a",
+      "roleDefinitionId": "744ec460-397e-42ad-a462-8b3f9747a02c",
+      "directoryScopeId": "/",
+      "appScopeId": null,
+      "startDateTime": "2024-04-08T10:13:04.913Z",
+      "endDateTime": "2025-04-08T10:12:36.9Z",
+      "memberType": "Direct",
+      "roleEligibilityScheduleId": "0606b8a1-ba92-42b7-804c-8e32dfdec2b8",
+      "roleDefinitionName": "Knowledge Manager"
+    }
+  ];
+
   const unifiedRoleAssignmentEligibilityScheduleInstanceWithPrincipalResponse = [
     {
       "id": "XrtkCdube02sKVjnlIYqQBht8lJR0U9DrhSkqDEisrI-1-e",
@@ -113,6 +140,63 @@ describe(commands.PIM_ROLE_ASSIGNMENT_ELIGIBILITY_LIST, () => {
     }
   ];
 
+  const unifiedRoleAssignmentEligibilityScheduleInstanceWithPrincipalTransformedResponse = [
+    {
+      "id": "XrtkCdube02sKVjnlIYqQBht8lJR0U9DrhSkqDEisrI-1-e",
+      "principalId": "52f26d18-d151-434f-ae14-a4a83122b2b2",
+      "roleDefinitionId": "0964bb5e-9bdb-4d7b-ac29-58e794862a40",
+      "directoryScopeId": "/",
+      "appScopeId": null,
+      "startDateTime": "2024-04-08T10:14:01.153Z",
+      "endDateTime": null,
+      "memberType": "Direct",
+      "roleEligibilityScheduleId": "7a135e3d-5be5-403c-bdad-47ccbac434e3",
+      "roleDefinitionName": "Search Administrator",
+      "principal": {
+        "id": "52f26d18-d151-434f-ae14-a4a83122b2b2",
+        "displayName": "Alex Wilber",
+        "userPrincipalName": "AlexW@contoso.onmicrosoft.com",
+        "mail": "AlexW@contoso.onmicrosoft.com",
+        "businessPhones": [
+          "+1 858 555 0110"
+        ],
+        "givenName": "Alex",
+        "jobTitle": "Marketing Assistant",
+        "mobilePhone": null,
+        "officeLocation": "131/1104",
+        "preferredLanguage": "en-US",
+        "surname": "Wilber"
+      }
+    },
+    {
+      "id": "YMROdH45rUKkYos_l0egLC_FsGECqWlHmgnGYoM1sAo-1-e",
+      "principalId": "61b0c52f-a902-4769-9a09-c6628335b00a",
+      "roleDefinitionId": "744ec460-397e-42ad-a462-8b3f9747a02c",
+      "directoryScopeId": "/",
+      "appScopeId": null,
+      "startDateTime": "2024-04-08T10:13:04.913Z",
+      "endDateTime": "2025-04-08T10:12:36.9Z",
+      "memberType": "Direct",
+      "roleEligibilityScheduleId": "0606b8a1-ba92-42b7-804c-8e32dfdec2b8",
+      "roleDefinitionName": "Knowledge Manager",
+      "principal": {
+        "id": "61b0c52f-a902-4769-9a09-c6628335b00a",
+        "displayName": "Adele Vance",
+        "userPrincipalName": "AdeleV@contoso.onmicrosoft.com",
+        "mail": "AdeleV@contoso.onmicrosoft.com",
+        "businessPhones": [
+          "+1 425 555 0109"
+        ],
+        "givenName": "Adele",
+        "jobTitle": "Retail Manager",
+        "mobilePhone": null,
+        "officeLocation": "18/2111",
+        "preferredLanguage": "en-US",
+        "surname": "Vance"
+      }
+    }
+  ];
+
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -146,9 +230,6 @@ describe(commands.PIM_ROLE_ASSIGNMENT_ELIGIBILITY_LIST, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.get,
-      cli.getSettingWithDefaultValue,
-      cli.handleMultipleResultsFound,
-      cli.promptForSelection,
       entraUser.getUserIdByUpn,
       entraGroup.getGroupIdByDisplayName
     ]);
@@ -172,6 +253,11 @@ describe(commands.PIM_ROLE_ASSIGNMENT_ELIGIBILITY_LIST, () => {
     assert.strictEqual(actual, true);
   });
 
+  it('passes validation when userName is a valid user principal name', async () => {
+    const actual = await command.validate({ options: { userName: userName } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
   it('passes validation when groupId is a valid GUID', async () => {
     const actual = await command.validate({ options: { groupId: groupId } }, commandInfo);
     assert.strictEqual(actual, true);
@@ -179,6 +265,11 @@ describe(commands.PIM_ROLE_ASSIGNMENT_ELIGIBILITY_LIST, () => {
 
   it('fails validation when userId is not a valid GUID', async () => {
     const actual = await command.validate({ options: { userId: 'foo' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation when userName is not a valid user principal name', async () => {
+    const actual = await command.validate({ options: { userName: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
@@ -198,9 +289,9 @@ describe(commands.PIM_ROLE_ASSIGNMENT_ELIGIBILITY_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: {} });
+    await command.action(logger, { options: { verbose: true } });
 
-    assert(loggerLogSpy.calledOnceWithExactly(unifiedRoleAssignmentEligibilityScheduleInstanceResponse));
+    assert(loggerLogSpy.calledOnceWithExactly(unifiedRoleAssignmentEligibilityScheduleInstanceTransformedResponse));
   });
 
   it('should get a list of eligible roles for a user specified by id', async () => {
@@ -216,9 +307,9 @@ describe(commands.PIM_ROLE_ASSIGNMENT_ELIGIBILITY_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { userId: userId } });
+    await command.action(logger, { options: { userId: userId, verbose: true } });
 
-    assert(loggerLogSpy.calledOnceWithExactly([unifiedRoleAssignmentEligibilityScheduleInstanceResponse[0]]));
+    assert(loggerLogSpy.calledOnceWithExactly([unifiedRoleAssignmentEligibilityScheduleInstanceTransformedResponse[0]]));
   });
 
   it('should get a list of eligible roles for a user specified by name', async () => {
@@ -237,7 +328,7 @@ describe(commands.PIM_ROLE_ASSIGNMENT_ELIGIBILITY_LIST, () => {
 
     await command.action(logger, { options: { userName: userName, verbose: true } });
 
-    assert(loggerLogSpy.calledOnceWithExactly([unifiedRoleAssignmentEligibilityScheduleInstanceResponse[0]]));
+    assert(loggerLogSpy.calledOnceWithExactly([unifiedRoleAssignmentEligibilityScheduleInstanceTransformedResponse[0]]));
   });
 
   it('should get a list of eligible roles for a group specified by id', async () => {
@@ -253,9 +344,9 @@ describe(commands.PIM_ROLE_ASSIGNMENT_ELIGIBILITY_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { groupId: groupId } });
+    await command.action(logger, { options: { groupId: groupId, verbose: true } });
 
-    assert(loggerLogSpy.calledOnceWithExactly([unifiedRoleAssignmentEligibilityScheduleInstanceResponse[1]]));
+    assert(loggerLogSpy.calledOnceWithExactly([unifiedRoleAssignmentEligibilityScheduleInstanceTransformedResponse[1]]));
   });
 
   it('should get a list of eligible roles for a group specified by name', async () => {
@@ -274,7 +365,7 @@ describe(commands.PIM_ROLE_ASSIGNMENT_ELIGIBILITY_LIST, () => {
 
     await command.action(logger, { options: { groupName: groupName, verbose: true } });
 
-    assert(loggerLogSpy.calledOnceWithExactly([unifiedRoleAssignmentEligibilityScheduleInstanceResponse[1]]));
+    assert(loggerLogSpy.calledOnceWithExactly([unifiedRoleAssignmentEligibilityScheduleInstanceTransformedResponse[1]]));
   });
 
   it('should get a list of eligible roles with details about principals that were assigned', async () => {
@@ -290,7 +381,7 @@ describe(commands.PIM_ROLE_ASSIGNMENT_ELIGIBILITY_LIST, () => {
 
     await command.action(logger, { options: { includePrincipalDetails: true } });
 
-    assert(loggerLogSpy.calledOnceWithExactly(unifiedRoleAssignmentEligibilityScheduleInstanceWithPrincipalResponse));
+    assert(loggerLogSpy.calledOnceWithExactly(unifiedRoleAssignmentEligibilityScheduleInstanceWithPrincipalTransformedResponse));
   });
 
   it('handles error when retrieving a list of eligible roles failed', async () => {

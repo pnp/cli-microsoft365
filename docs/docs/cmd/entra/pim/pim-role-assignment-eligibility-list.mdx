@@ -4,7 +4,7 @@ import TabItem from '@theme/TabItem';
 
 # entra pim role assignment eligibility list
 
-Retrieves a list of eligible roles a user or group can be assigned to.
+Retrieves a list of eligible roles a user or group can be assigned to
 
 ## Usage
 
@@ -28,7 +28,7 @@ m365 entra pim role assignment eligibility list [options]
 : Display name of the group for which to list eligible roles. Specify either `userId`, `userName`, `groupId` or `groupName`. If not specified, all eligible roles will be listed.
 
 `--includePrincipalDetails`
-: An optional flag to include details of the principals that were eligible for a role
+: An optional flag to include details of the principals that were eligible for a role.
 ```
 
 <Global />
@@ -72,9 +72,7 @@ m365 entra pim role assignment eligibility list --includePrincipalDetails
       "endDateTime": null,
       "memberType": "Direct",
       "roleEligibilityScheduleId": "7a135e3d-5be5-403c-bdad-47ccbac434e3",
-      "roleDefinition": {
-        "displayName": "Search Administrator"
-      }
+      "roleDefinitionName": "displayName": "Search Administrator"
     }  
   ]
   ```
@@ -83,19 +81,19 @@ m365 entra pim role assignment eligibility list --includePrincipalDetails
   <TabItem value="Text">
 
   ```text
-  id                                               principalId                           roleDefinitionId                      directoryScopeId  appScopeId  startDateTime             endDateTime             memberType  roleEligibilityScheduleId             roleDefinition
-  -----------------------------------------------  ------------------------------------  ------------------------------------  ----------------  ----------  ------------------------  ----------------------  ----------  ------------------------------------  ---------------
-  XrtkCdube02sKVjnlIYqQBht8lJR0U9DrhSkqDEisrI-1-e  52f26d18-d151-434f-ae14-a4a83122b2b2  0964bb5e-9bdb-4d7b-ac29-58e794862a40  /                 null        2024-04-08T10:14:01.153Z  null                    Direct      7a135e3d-5be5-403c-bdad-47ccbac434e3  [object Object]
-  YMROdH45rUKkYos_l0egLC_FsGECqWlHmgnGYoM1sAo-1-e  61b0c52f-a902-4769-9a09-c6628335b00a  744ec460-397e-42ad-a462-8b3f9747a02c  /                 null        2024-04-08T10:13:04.913Z  2025-04-08T10:12:36.9Z  Direct      0606b8a1-ba92-42b7-804c-8e32dfdec2b8  [object Object]
+  roleDefinitionId                      roleDefinitionName    principalId
+  ------------------------------------  --------------------  ------------------------------------
+  0964bb5e-9bdb-4d7b-ac29-58e794862a40  Search Administrator  52f26d18-d151-434f-ae14-a4a83122b2b2
+  744ec460-397e-42ad-a462-8b3f9747a02c  Knowledge Manager     61b0c52f-a902-4769-9a09-c6628335b00a
   ```
 
   </TabItem>
   <TabItem value="CSV">
 
   ```csv
-  id,principalId,roleDefinitionId,directoryScopeId,appScopeId,startDateTime,endDateTime,memberType,roleEligibilityScheduleId
-  XrtkCdube02sKVjnlIYqQBht8lJR0U9DrhSkqDEisrI-1-e,52f26d18-d151-434f-ae14-a4a83122b2b2,0964bb5e-9bdb-4d7b-ac29-58e794862a40,/,,2024-04-08T10:14:01.153Z,,Direct,7a135e3d-5be5-403c-bdad-47ccbac434e3
-  YMROdH45rUKkYos_l0egLC_FsGECqWlHmgnGYoM1sAo-1-e,61b0c52f-a902-4769-9a09-c6628335b00a,744ec460-397e-42ad-a462-8b3f9747a02c,/,,2024-04-08T10:13:04.913Z,2025-04-08T10:12:36.9Z,Direct,0606b8a1-ba92-42b7-804c-8e32dfdec2b8
+  id,principalId,roleDefinitionId,directoryScopeId,appScopeId,startDateTime,endDateTime,memberType,roleEligibilityScheduleId,roleDefinitionName
+  XrtkCdube02sKVjnlIYqQBht8lJR0U9DrhSkqDEisrI-1-e,52f26d18-d151-434f-ae14-a4a83122b2b2,0964bb5e-9bdb-4d7b-ac29-58e794862a40,/,,2024-04-08T10:14:01.153Z,,Direct,7a135e3d-5be5-403c-bdad-47ccbac434e3,Search Administrator
+  YMROdH45rUKkYos_l0egLC_FsGECqWlHmgnGYoM1sAo-1-e,61b0c52f-a902-4769-9a09-c6628335b00a,744ec460-397e-42ad-a462-8b3f9747a02c,/,,2024-04-08T10:13:04.913Z,2025-04-08T10:12:36.9Z,Direct,0606b8a1-ba92-42b7-804c-8e32dfdec2b8,Knowledge Manager
   ```
 
   </TabItem>
@@ -117,6 +115,7 @@ m365 entra pim role assignment eligibility list --includePrincipalDetails
   startDateTime | 2024-04-08T10:14:01.153Z
   memberType | Direct
   roleEligibilityScheduleId | 7a135e3d-5be5-403c-bdad-47ccbac434e3
+  roleDefinitionName | Search Administrator
   ```
 
   </TabItem>
@@ -141,9 +140,7 @@ When we make use of the option `includePrincipalDetails` the response will diffe
       "endDateTime": null,
       "memberType": "Direct",
       "roleEligibilityScheduleId": "7a135e3d-5be5-403c-bdad-47ccbac434e3",
-      "roleDefinition": {
-        "displayName": "Search Administrator"
-      },
+      "roleDefinitionName": "Search Administrator",
       "principal": {
         "id": "52f26d18-d151-434f-ae14-a4a83122b2b2",
         "displayName": "Alex Wilber",
@@ -167,19 +164,19 @@ When we make use of the option `includePrincipalDetails` the response will diffe
   <TabItem value="Text">
 
   ```text
-  id                                               principalId                           roleDefinitionId                      directoryScopeId  appScopeId  startDateTime             endDateTime             memberType  roleEligibilityScheduleId             roleDefinition   principal
-  -----------------------------------------------  ------------------------------------  ------------------------------------  ----------------  ----------  ------------------------  ----------------------  ----------  ------------------------------------  ---------------  ---------------
-  XrtkCdube02sKVjnlIYqQBht8lJR0U9DrhSkqDEisrI-1-e  52f26d18-d151-434f-ae14-a4a83122b2b2  0964bb5e-9bdb-4d7b-ac29-58e794862a40  /                 null        2024-04-08T10:14:01.153Z  null                    Direct      7a135e3d-5be5-403c-bdad-47ccbac434e3  [object Object]  [object Object]
-  YMROdH45rUKkYos_l0egLC_FsGECqWlHmgnGYoM1sAo-1-e  61b0c52f-a902-4769-9a09-c6628335b00a  744ec460-397e-42ad-a462-8b3f9747a02c  /                 null        2024-04-08T10:13:04.913Z  2025-04-08T10:12:36.9Z  Direct      0606b8a1-ba92-42b7-804c-8e32dfdec2b8  [object Object]  [object Object]
+  roleDefinitionId                      roleDefinitionName    principalId
+  ------------------------------------  --------------------  ------------------------------------
+  0964bb5e-9bdb-4d7b-ac29-58e794862a40  Search Administrator  52f26d18-d151-434f-ae14-a4a83122b2b2
+  744ec460-397e-42ad-a462-8b3f9747a02c  Knowledge Manager     61b0c52f-a902-4769-9a09-c6628335b00a
   ```
 
   </TabItem>
   <TabItem value="CSV">
 
   ```csv
-  id,principalId,roleDefinitionId,directoryScopeId,appScopeId,startDateTime,endDateTime,memberType,roleEligibilityScheduleId
-  XrtkCdube02sKVjnlIYqQBht8lJR0U9DrhSkqDEisrI-1-e,52f26d18-d151-434f-ae14-a4a83122b2b2,0964bb5e-9bdb-4d7b-ac29-58e794862a40,/,,2024-04-08T10:14:01.153Z,,Direct,7a135e3d-5be5-403c-bdad-47ccbac434e3
-  YMROdH45rUKkYos_l0egLC_FsGECqWlHmgnGYoM1sAo-1-e,61b0c52f-a902-4769-9a09-c6628335b00a,744ec460-397e-42ad-a462-8b3f9747a02c,/,,2024-04-08T10:13:04.913Z,2025-04-08T10:12:36.9Z,Direct,0606b8a1-ba92-42b7-804c-8e32dfdec2b8
+  id,principalId,roleDefinitionId,directoryScopeId,appScopeId,startDateTime,endDateTime,memberType,roleEligibilityScheduleId,roleDefinitionName
+  XrtkCdube02sKVjnlIYqQBht8lJR0U9DrhSkqDEisrI-1-e,52f26d18-d151-434f-ae14-a4a83122b2b2,0964bb5e-9bdb-4d7b-ac29-58e794862a40,/,,2024-04-08T10:14:01.153Z,,Direct,7a135e3d-5be5-403c-bdad-47ccbac434e3,Search Administrator
+  YMROdH45rUKkYos_l0egLC_FsGECqWlHmgnGYoM1sAo-1-e,61b0c52f-a902-4769-9a09-c6628335b00a,744ec460-397e-42ad-a462-8b3f9747a02c,/,,2024-04-08T10:13:04.913Z,2025-04-08T10:12:36.9Z,Direct,0606b8a1-ba92-42b7-804c-8e32dfdec2b8,Knowledge Manager
   ```
 
   </TabItem>
@@ -201,6 +198,7 @@ When we make use of the option `includePrincipalDetails` the response will diffe
   startDateTime | 2024-04-08T10:14:01.153Z
   memberType | Direct
   roleEligibilityScheduleId | 7a135e3d-5be5-403c-bdad-47ccbac434e3
+  roleDefinitionName | Search Administrator
   ```
 
   </TabItem>
