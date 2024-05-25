@@ -3303,6 +3303,11 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
+              label: 'site admin add',
+              id: 'cmd/spo/site/site-admin-add'
+            },
+            {
+              type: 'doc',
               label: 'site admin list',
               id: 'cmd/spo/site/site-admin-list'
             },

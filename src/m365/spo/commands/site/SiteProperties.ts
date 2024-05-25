@@ -2,5 +2,5 @@ export interface SiteProperties {
   Status: string;
   Title: string;
   Url: string;
-  SiteId: string;
+  SiteId?: string;
 }
