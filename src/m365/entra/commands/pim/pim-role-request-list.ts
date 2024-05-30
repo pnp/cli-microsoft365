@@ -22,6 +22,10 @@ interface Options extends GlobalOptions {
   includePrincipalDetails?: boolean;
 }
 
+interface UnifiedRoleAssignmentScheduleRequestEx extends UnifiedRoleAssignmentScheduleRequest {
+  roleDefinitionName?: string
+}
+
 class EntraPimRoleRequestListCommand extends GraphCommand {
   private readonly allowedStatuses = ['Canceled', 'Denied', 'Failed', 'Granted', 'PendingAdminDecision', 'PendingApproval', 'PendingProvisioning', 'PendingScheduleCreation', 'Provisioned', 'Revoked', 'ScheduleCreated'];
   public get name(): string {
@@ -30,6 +34,10 @@ class EntraPimRoleRequestListCommand extends GraphCommand {
 
   public get description(): string {
     return 'Retrieves a list of PIM requests for roles';
+  }
+
+  public defaultProperties(): string[] | undefined {
+    return ['id', 'roleDefinitionName', 'principalId'];
   }
 
   constructor() {
@@ -58,26 +66,26 @@ class EntraPimRoleRequestListCommand extends GraphCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: "--userId [userId]"
+        option: '--userId [userId]'
       },
       {
-        option: "--userName [userName]"
+        option: '--userName [userName]'
       },
       {
-        option: "--groupId [groupId]"
+        option: '--groupId [groupId]'
       },
       {
-        option: "--groupName [groupName]"
+        option: '--groupName [groupName]'
       },
       {
-        option: "-c, --createdDateTime [createdDateTime]"
+        option: '-c, --createdDateTime [createdDateTime]'
       },
       {
-        option: "-s, --status [status]",
+        option: '-s, --status [status]',
         autocomplete: this.allowedStatuses
       },
       {
-        option: "--includePrincipalDetails [includePrincipalDetails]"
+        option: '--includePrincipalDetails [includePrincipalDetails]'
       }
     );
   }
@@ -86,18 +94,22 @@ class EntraPimRoleRequestListCommand extends GraphCommand {
     this.validators.push(
       async (args: CommandArgs) => {
         if (args.options.userId && !validation.isValidGuid(args.options.userId)) {
-          return `${args.options.userId} is not a valid GUID`;
+          return `'${args.options.userId}' is not a valid GUID for option 'userId'`;
+        }
+
+        if (args.options.userName && !validation.isValidUserPrincipalName(args.options.userName)) {
+          return `'${args.options.userName}' is not a valid user principal name for option 'userName'.`;
         }
 
         if (args.options.groupId && !validation.isValidGuid(args.options.groupId)) {
-          return `${args.options.groupId} is not a valid GUID`;
+          return `'${args.options.groupId}' is not a valid GUID for option 'groupId'`;
         }
 
         if (args.options.createdDateTime && !validation.isValidISODateTime(args.options.createdDateTime)) {
-          return `${args.options.createdDateTime} is not a valid ISO 8601 date time string`;
+          return `'${args.options.createdDateTime}' is not a valid ISO 8601 date time string`;
         }
 
-        if (args.options.status && this.allowedStatuses.indexOf(args.options.status) === -1) {
+        if (args.options.status && !this.allowedStatuses.some(status => status.toLowerCase() === args.options.status!.toLowerCase())) {
           return `Option 'status' must be one of the following values: ${this.allowedStatuses.join(', ')}.`;
         }
 
@@ -114,6 +126,9 @@ class EntraPimRoleRequestListCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    if (this.verbose) {
+      await logger.logToStderr(`Retrieving list of PIM roles requests for ${args.options.userId || args.options.userName || args.options.groupId || args.options.groupName || 'all users'}...`);
+    }
     const queryParameters: string[] = [];
     const filters: string[] = [];
     const expands: string[] = [];
@@ -149,7 +164,17 @@ class EntraPimRoleRequestListCommand extends GraphCommand {
 
       const url = `${this.resource}/v1.0/roleManagement/directory/roleAssignmentScheduleRequests${queryString}`;
 
-      const results = await odata.getAllItems<UnifiedRoleAssignmentScheduleRequest>(url);
+      const results = await odata.getAllItems<UnifiedRoleAssignmentScheduleRequestEx>(url);
+
+      results.forEach(c => {
+        const roleDefinition = c['roleDefinition'];
+
+        if (roleDefinition) {
+          c.roleDefinitionName = roleDefinition.displayName!;
+        }
+
+        delete c['roleDefinition'];
+      });
 
       await logger.log(results);
     }
