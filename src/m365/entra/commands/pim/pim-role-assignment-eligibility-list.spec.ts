@@ -280,7 +280,7 @@ describe(commands.PIM_ROLE_ASSIGNMENT_ELIGIBILITY_LIST, () => {
 
   it('should get a list of eligible roles for any user', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/roleManagement/directory/roleEligibilityScheduleInstances?$expand=roleDefinition($select=displayName)`) {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/roleManagement/directory/roleEligibilityScheduleInstances?$expand=roleDefinition($select=displayName)') {
         return {
           value: unifiedRoleAssignmentEligibilityScheduleInstanceResponse
         };
@@ -370,7 +370,7 @@ describe(commands.PIM_ROLE_ASSIGNMENT_ELIGIBILITY_LIST, () => {
 
   it('should get a list of eligible roles with details about principals that were assigned', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/roleManagement/directory/roleEligibilityScheduleInstances?$expand=roleDefinition($select=displayName),principal`) {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/roleManagement/directory/roleEligibilityScheduleInstances?$expand=roleDefinition($select=displayName),principal') {
         return {
           value: unifiedRoleAssignmentEligibilityScheduleInstanceWithPrincipalResponse
         };
@@ -386,7 +386,7 @@ describe(commands.PIM_ROLE_ASSIGNMENT_ELIGIBILITY_LIST, () => {
 
   it('handles error when retrieving a list of eligible roles failed', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/roleManagement/directory/roleEligibilityScheduleInstances?$expand=roleDefinition($select=displayName)`) {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/roleManagement/directory/roleEligibilityScheduleInstances?$expand=roleDefinition($select=displayName)') {
         throw { error: { message: 'An error has occurred' } };
       }
       throw `Invalid request`;
