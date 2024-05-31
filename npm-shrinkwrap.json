@@ -1,12 +1,12 @@
 {
   "name": "@pnp/cli-microsoft365",
-  "version": "7.9.0",
+  "version": "7.10.0",
   "lockfileVersion": 3,
   "requires": true,
   "packages": {
     "": {
       "name": "@pnp/cli-microsoft365",
-      "version": "7.9.0",
+      "version": "7.10.0",
       "license": "MIT",
       "dependencies": {
         "@azure/msal-common": "^14.10.0",
