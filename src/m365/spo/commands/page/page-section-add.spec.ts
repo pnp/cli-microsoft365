@@ -535,7 +535,6 @@ describe(commands.PAGE_SECTION_ADD, () => {
     assert.strictEqual(data, JSON.stringify({ "CanvasContent1": "[{\"displayMode\":2,\"position\":{\"zoneIndex\":1,\"sectionIndex\":1,\"sectionFactor\":12,\"layoutIndex\":2,\"isLayoutReflowOnTop\":false,\"controlIndex\":1},\"emphasis\":{}},{\"controlType\":0,\"pageSettingsSlice\":{\"isDefaultDescription\":true,\"isDefaultThumbnail\":true}}]" }));
   });
 
-
   it('adds a Vertical section at the end with correct zoneEmphasisValue to an uncustomized page', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/home.aspx')?$select=CanvasContent1,IsPageCheckedOutToCurrentUser`) > -1) {
@@ -603,6 +602,308 @@ describe(commands.PAGE_SECTION_ADD, () => {
       }
     });
     assert.strictEqual(data, JSON.stringify({ "CanvasContent1": "[{\"displayMode\":2,\"position\":{\"zoneIndex\":1,\"sectionIndex\":1,\"sectionFactor\":12,\"layoutIndex\":2,\"isLayoutReflowOnTop\":true,\"controlIndex\":1},\"emphasis\":{\"zoneEmphasis\":1}},{\"controlType\":0,\"pageSettingsSlice\":{\"isDefaultDescription\":true,\"isDefaultThumbnail\":true}}]" }));
+  });
+
+  it('adds a OneColumn section at the end to an uncustomized page with Image zoneEmphasis', async () => {
+    let newZoneId = '';
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/home.aspx')?$select=CanvasContent1,IsPageCheckedOutToCurrentUser`) > -1) {
+        return Promise.resolve({
+          "IsPageCheckedOutToCurrentUser": true,
+          "CanvasContent1": "[{\"controlType\":0,\"pageSettingsSlice\":{\"isDefaultDescription\":true,\"isDefaultThumbnail\":true}}]"
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    let data: string = '';
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/home.aspx')/savepage`) > -1) {
+        newZoneId = JSON.parse(opts.data.CanvasContent1)[1].position.zoneId;
+        data = JSON.stringify(opts.data);
+        return Promise.resolve({});
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    await command.action(logger, {
+      options:
+      {
+        pageName: 'home.aspx',
+        webUrl: 'https://contoso.sharepoint.com/sites/newsletter',
+        sectionTemplate: 'OneColumn',
+        zoneEmphasis: 'Image',
+        imageUrl: 'https://contoso.com/image.jpg'
+      }
+    });
+    assert.strictEqual(data, JSON.stringify({ "CanvasContent1": `[{\"controlType\":0,\"pageSettingsSlice\":{\"isDefaultDescription\":true,\"isDefaultThumbnail\":true}},{\"displayMode\":2,\"position\":{\"zoneIndex\":1,\"sectionIndex\":1,\"sectionFactor\":12,\"layoutIndex\":1,\"zoneId\":\"${newZoneId}\"},\"emphasis\":{}},{\"controlType\":14,\"webPartData\":{\"properties\":{\"zoneBackground\":{\"${newZoneId}\":{\"type\":\"image\",\"imageData\":{\"source\":2,\"fileName\":\"sectionbackground.jpg\",\"height\":955,\"width\":555},\"fillMode\":0,\"useLightText\":false,\"overlay\":{\"color\":\"#FFFFFF\",\"opacity\":60}}}},\"serverProcessedContent\":{\"htmlStrings\":{},\"searchablePlainTexts\":{},\"imageSources\":{\"zoneBackground.${newZoneId}.imageData.url\":\"https://contoso.com/image.jpg\"},\"links\":{}},\"dataVersion\":\"1.0\"}}]` }));
+  });
+
+  it('adds a OneColumn section at the end to an uncustomized page with Gradient zoneEmphasis', async () => {
+    let newZoneId = '';
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/home.aspx')?$select=CanvasContent1,IsPageCheckedOutToCurrentUser`) > -1) {
+        return Promise.resolve({
+          "IsPageCheckedOutToCurrentUser": true,
+          "CanvasContent1": "[{\"controlType\":0,\"pageSettingsSlice\":{\"isDefaultDescription\":true,\"isDefaultThumbnail\":true}}]"
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    let data: string = '';
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/home.aspx')/savepage`) > -1) {
+        newZoneId = JSON.parse(opts.data.CanvasContent1)[1].position.zoneId;
+        data = JSON.stringify(opts.data);
+        return Promise.resolve({});
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    await command.action(logger, {
+      options:
+      {
+        pageName: 'home.aspx',
+        webUrl: 'https://contoso.sharepoint.com/sites/newsletter',
+        sectionTemplate: 'OneColumn',
+        zoneEmphasis: 'Gradient',
+        gradientText: 'test gradient'
+      }
+    });
+    assert.strictEqual(data, JSON.stringify({ "CanvasContent1": `[{\"controlType\":0,\"pageSettingsSlice\":{\"isDefaultDescription\":true,\"isDefaultThumbnail\":true}},{\"displayMode\":2,\"position\":{\"zoneIndex\":1,\"sectionIndex\":1,\"sectionFactor\":12,\"layoutIndex\":1,\"zoneId\":\"${newZoneId}\"},\"emphasis\":{}},{\"controlType\":14,\"webPartData\":{\"properties\":{\"zoneBackground\":{\"${newZoneId}\":{\"type\":\"gradient\",\"gradient\":\"test gradient\",\"useLightText\":false,\"overlay\":{\"color\":\"#FFFFFF\",\"opacity\":60}}}},\"serverProcessedContent\":{\"htmlStrings\":{},\"searchablePlainTexts\":{},\"imageSources\":{},\"links\":{}},\"dataVersion\":\"1.0\"}}]` }));
+  });
+
+  it('adds a OneColumn section at the end to an uncustomized page with Image zoneEmphasis and all options available', async () => {
+    let newZoneId = '';
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/home.aspx')?$select=CanvasContent1,IsPageCheckedOutToCurrentUser`) > -1) {
+        return Promise.resolve({
+          "IsPageCheckedOutToCurrentUser": true,
+          "CanvasContent1": "[{\"controlType\":0,\"pageSettingsSlice\":{\"isDefaultDescription\":true,\"isDefaultThumbnail\":true}}]"
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    let data: string = '';
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/home.aspx')/savepage`) > -1) {
+        newZoneId = JSON.parse(opts.data.CanvasContent1)[1].position.zoneId;
+        data = JSON.stringify(opts.data);
+        return Promise.resolve({});
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    await command.action(logger, {
+      options:
+      {
+        pageName: 'home.aspx',
+        webUrl: 'https://contoso.sharepoint.com/sites/newsletter',
+        sectionTemplate: 'OneColumn',
+        zoneEmphasis: 'Image',
+        imageUrl: 'https://contoso.com/image.jpg',
+        imageHeight: 100,
+        imageWidth: 200,
+        fillMode: 'ScaleToFill',
+        useLightText: true,
+        overlayColor: '#FF00FF',
+        overlayOpacity: 50
+      }
+    });
+    assert.strictEqual(data, JSON.stringify({ "CanvasContent1": `[{\"controlType\":0,\"pageSettingsSlice\":{\"isDefaultDescription\":true,\"isDefaultThumbnail\":true}},{\"displayMode\":2,\"position\":{\"zoneIndex\":1,\"sectionIndex\":1,\"sectionFactor\":12,\"layoutIndex\":1,\"zoneId\":\"${newZoneId}\"},\"emphasis\":{}},{\"controlType\":14,\"webPartData\":{\"properties\":{\"zoneBackground\":{\"${newZoneId}\":{\"type\":\"image\",\"imageData\":{\"source\":2,\"fileName\":\"sectionbackground.jpg\",\"height\":100,\"width\":200},\"fillMode\":0,\"useLightText\":true,\"overlay\":{\"color\":\"#FF00FF\",\"opacity\":50}}}},\"serverProcessedContent\":{\"htmlStrings\":{},\"searchablePlainTexts\":{},\"imageSources\":{\"zoneBackground.${newZoneId}.imageData.url\":\"https://contoso.com/image.jpg\"},\"links\":{}},\"dataVersion\":\"1.0\"}}]` }));
+  });
+
+  it('adds a OneColumn section at the end to an uncustomized page with Gradient zoneEmphasis and all options available', async () => {
+    let newZoneId = '';
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/home.aspx')?$select=CanvasContent1,IsPageCheckedOutToCurrentUser`) > -1) {
+        return Promise.resolve({
+          "IsPageCheckedOutToCurrentUser": true,
+          "CanvasContent1": "[{\"controlType\":0,\"pageSettingsSlice\":{\"isDefaultDescription\":true,\"isDefaultThumbnail\":true}}]"
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    let data: string = '';
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/home.aspx')/savepage`) > -1) {
+        newZoneId = JSON.parse(opts.data.CanvasContent1)[1].position.zoneId;
+        data = JSON.stringify(opts.data);
+        return Promise.resolve({});
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    await command.action(logger, {
+      options:
+      {
+        pageName: 'home.aspx',
+        webUrl: 'https://contoso.sharepoint.com/sites/newsletter',
+        sectionTemplate: 'OneColumn',
+        zoneEmphasis: 'Gradient',
+        gradientText: 'test gradient',
+        overlayColor: '#FF00FF',
+        overlayOpacity: 50
+      }
+    });
+    assert.strictEqual(data, JSON.stringify({ "CanvasContent1": `[{\"controlType\":0,\"pageSettingsSlice\":{\"isDefaultDescription\":true,\"isDefaultThumbnail\":true}},{\"displayMode\":2,\"position\":{\"zoneIndex\":1,\"sectionIndex\":1,\"sectionFactor\":12,\"layoutIndex\":1,\"zoneId\":\"${newZoneId}\"},\"emphasis\":{}},{\"controlType\":14,\"webPartData\":{\"properties\":{\"zoneBackground\":{\"${newZoneId}\":{\"type\":\"gradient\",\"gradient\":\"test gradient\",\"useLightText\":false,\"overlay\":{\"color\":\"#FF00FF\",\"opacity\":50}}}},\"serverProcessedContent\":{\"htmlStrings\":{},\"searchablePlainTexts\":{},\"imageSources\":{},\"links\":{}},\"dataVersion\":\"1.0\"}}]` }));
+  });
+
+  it('adds a OneColumn section at the end to a page with background section added with Image zoneEmphasis', async () => {
+    let newZoneId = '';
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/home.aspx')?$select=CanvasContent1,IsPageCheckedOutToCurrentUser`) > -1) {
+        return Promise.resolve({
+          "IsPageCheckedOutToCurrentUser": true,
+          "CanvasContent1": "[{\"position\":{\"layoutIndex\":1,\"zoneIndex\":2,\"sectionIndex\":1,\"controlIndex\":1,\"sectionFactor\":6,\"zoneId\":\"0158a0e8-20ad-4d8d-9cdc-6e1fde815a35\"},\"id\":\"emptySection\",\"addedFromPersistedData\":true},{\"position\":{\"layoutIndex\":1,\"zoneIndex\":2,\"sectionIndex\":2,\"controlIndex\":1,\"sectionFactor\":6,\"zoneId\":\"0158a0e8-20ad-4d8d-9cdc-6e1fde815a35\"},\"id\":\"emptySection\",\"addedFromPersistedData\":true},{\"position\":{\"layoutIndex\":1,\"zoneIndex\":3,\"sectionIndex\":1,\"controlIndex\":1,\"sectionFactor\":12,\"zoneId\":\"931e6d64-c667-4e2e-b678-eab508d511c8\"},\"id\":\"emptySection\",\"addedFromPersistedData\":true},{\"controlType\":0,\"pageSettingsSlice\":{\"isDefaultDescription\":true,\"isDefaultThumbnail\":true,\"globalRichTextStylingVersion\":0,\"rtePageSettings\":{\"contentVersion\":4},\"isEmailReady\":false}},{\"controlType\":14,\"webPartData\":{\"properties\":{\"zoneBackground\":{\"0158a0e8-20ad-4d8d-9cdc-6e1fde815a35\":{\"type\":\"gradient\",\"gradient\":\"radial-gradient(53.89% 99.37% at 39.45% -6.02%, rgba(4, 110, 212, 0.8) 0%, rgba(4, 110, 212, 0) 100%),\\n      radial-gradient(47.01% 82.21% at 104.3% 15.51%, rgba(118, 5, 180, 0.5) 0%, rgba(118, 5, 180, 0) 100%),\\n      radial-gradient(56.12% 58.33% at 50% 131.71%, #7605B4 34.7%, rgba(118, 5, 180, 0) 100%),\\n      linear-gradient(0deg, #110739, #110739)\",\"useLightText\":true,\"overlay\":{\"color\":\"#000000\",\"opacity\":35}},\"931e6d64-c667-4e2e-b678-eab508d511c8\":{\"type\":\"image\",\"imageData\":{\"source\":1,\"fileName\":\"sectionbackgroundimagedark3.jpg\",\"height\":955,\"width\":555},\"overlay\":{\"color\":\"#000000\",\"opacity\":60},\"useLightText\":true}}},\"serverProcessedContent\":{\"htmlStrings\":{},\"searchablePlainTexts\":{},\"imageSources\":{\"zoneBackground.931e6d64-c667-4e2e-b678-eab508d511c8.imageData.url\":\"/_layouts/15/images/sectionbackgroundimagedark3.jpg\"},\"links\":{}},\"dataVersion\":\"1.0\"}}]"
+
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    let data: string = '';
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/home.aspx')/savepage`) > -1) {
+        newZoneId = JSON.parse(opts.data.CanvasContent1)[4].position.zoneId;
+        data = JSON.stringify(opts.data);
+        return Promise.resolve({});
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    await command.action(logger, {
+      options:
+      {
+        pageName: 'home.aspx',
+        webUrl: 'https://contoso.sharepoint.com/sites/newsletter',
+        sectionTemplate: 'OneColumn',
+        zoneEmphasis: 'Image',
+        imageUrl: 'https://contoso.com/image.jpg'
+      }
+    });
+    assert.strictEqual(data, JSON.stringify({ "CanvasContent1": `[{\"position\":{\"layoutIndex\":1,\"zoneIndex\":2,\"sectionIndex\":1,\"controlIndex\":1,\"sectionFactor\":6,\"zoneId\":\"0158a0e8-20ad-4d8d-9cdc-6e1fde815a35\"},\"id\":\"emptySection\",\"addedFromPersistedData\":true},{\"position\":{\"layoutIndex\":1,\"zoneIndex\":2,\"sectionIndex\":2,\"controlIndex\":1,\"sectionFactor\":6,\"zoneId\":\"0158a0e8-20ad-4d8d-9cdc-6e1fde815a35\"},\"id\":\"emptySection\",\"addedFromPersistedData\":true},{\"position\":{\"layoutIndex\":1,\"zoneIndex\":3,\"sectionIndex\":1,\"controlIndex\":1,\"sectionFactor\":12,\"zoneId\":\"931e6d64-c667-4e2e-b678-eab508d511c8\"},\"id\":\"emptySection\",\"addedFromPersistedData\":true},{\"controlType\":0,\"pageSettingsSlice\":{\"isDefaultDescription\":true,\"isDefaultThumbnail\":true,\"globalRichTextStylingVersion\":0,\"rtePageSettings\":{\"contentVersion\":4},\"isEmailReady\":false}},{\"displayMode\":2,\"position\":{\"zoneIndex\":6,\"sectionIndex\":1,\"sectionFactor\":12,\"layoutIndex\":1,\"zoneId\":\"${newZoneId}\"},\"emphasis\":{}},{\"controlType\":14,\"webPartData\":{\"properties\":{\"zoneBackground\":{\"0158a0e8-20ad-4d8d-9cdc-6e1fde815a35\":{\"type\":\"gradient\",\"gradient\":\"radial-gradient(53.89% 99.37% at 39.45% -6.02%, rgba(4, 110, 212, 0.8) 0%, rgba(4, 110, 212, 0) 100%),\\n      radial-gradient(47.01% 82.21% at 104.3% 15.51%, rgba(118, 5, 180, 0.5) 0%, rgba(118, 5, 180, 0) 100%),\\n      radial-gradient(56.12% 58.33% at 50% 131.71%, #7605B4 34.7%, rgba(118, 5, 180, 0) 100%),\\n      linear-gradient(0deg, #110739, #110739)\",\"useLightText\":true,\"overlay\":{\"color\":\"#000000\",\"opacity\":35}},\"931e6d64-c667-4e2e-b678-eab508d511c8\":{\"type\":\"image\",\"imageData\":{\"source\":1,\"fileName\":\"sectionbackgroundimagedark3.jpg\",\"height\":955,\"width\":555},\"overlay\":{\"color\":\"#000000\",\"opacity\":60},\"useLightText\":true},\"${newZoneId}\":{\"type\":\"image\",\"imageData\":{\"source\":2,\"fileName\":\"sectionbackground.jpg\",\"height\":955,\"width\":555},\"fillMode\":0,\"useLightText\":false,\"overlay\":{\"color\":\"#FFFFFF\",\"opacity\":60}}}},\"serverProcessedContent\":{\"htmlStrings\":{},\"searchablePlainTexts\":{},\"imageSources\":{\"zoneBackground.931e6d64-c667-4e2e-b678-eab508d511c8.imageData.url\":\"/_layouts/15/images/sectionbackgroundimagedark3.jpg\",\"zoneBackground.${newZoneId}.imageData.url\":\"https://contoso.com/image.jpg\"},\"links\":{}},\"dataVersion\":\"1.0\"}}]` }));
+  });
+
+  it('adds a OneColumn section at the end to a page with background section added with Gradient zoneEmphasis', async () => {
+    let newZoneId = '';
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/home.aspx')?$select=CanvasContent1,IsPageCheckedOutToCurrentUser`) > -1) {
+        return Promise.resolve({
+          "IsPageCheckedOutToCurrentUser": true,
+          "CanvasContent1": "[{\"position\":{\"layoutIndex\":1,\"zoneIndex\":2,\"sectionIndex\":1,\"controlIndex\":1,\"sectionFactor\":6,\"zoneId\":\"0158a0e8-20ad-4d8d-9cdc-6e1fde815a35\"},\"id\":\"emptySection\",\"addedFromPersistedData\":true},{\"position\":{\"layoutIndex\":1,\"zoneIndex\":2,\"sectionIndex\":2,\"controlIndex\":1,\"sectionFactor\":6,\"zoneId\":\"0158a0e8-20ad-4d8d-9cdc-6e1fde815a35\"},\"id\":\"emptySection\",\"addedFromPersistedData\":true},{\"position\":{\"layoutIndex\":1,\"zoneIndex\":3,\"sectionIndex\":1,\"controlIndex\":1,\"sectionFactor\":12,\"zoneId\":\"931e6d64-c667-4e2e-b678-eab508d511c8\"},\"id\":\"emptySection\",\"addedFromPersistedData\":true},{\"controlType\":0,\"pageSettingsSlice\":{\"isDefaultDescription\":true,\"isDefaultThumbnail\":true,\"globalRichTextStylingVersion\":0,\"rtePageSettings\":{\"contentVersion\":4},\"isEmailReady\":false}},{\"controlType\":14,\"webPartData\":{\"properties\":{\"zoneBackground\":{\"0158a0e8-20ad-4d8d-9cdc-6e1fde815a35\":{\"type\":\"gradient\",\"gradient\":\"radial-gradient(53.89% 99.37% at 39.45% -6.02%, rgba(4, 110, 212, 0.8) 0%, rgba(4, 110, 212, 0) 100%),\\n      radial-gradient(47.01% 82.21% at 104.3% 15.51%, rgba(118, 5, 180, 0.5) 0%, rgba(118, 5, 180, 0) 100%),\\n      radial-gradient(56.12% 58.33% at 50% 131.71%, #7605B4 34.7%, rgba(118, 5, 180, 0) 100%),\\n      linear-gradient(0deg, #110739, #110739)\",\"useLightText\":true,\"overlay\":{\"color\":\"#000000\",\"opacity\":35}},\"931e6d64-c667-4e2e-b678-eab508d511c8\":{\"type\":\"image\",\"imageData\":{\"source\":1,\"fileName\":\"sectionbackgroundimagedark3.jpg\",\"height\":955,\"width\":555},\"overlay\":{\"color\":\"#000000\",\"opacity\":60},\"useLightText\":true}}},\"serverProcessedContent\":{\"htmlStrings\":{},\"searchablePlainTexts\":{},\"imageSources\":{\"zoneBackground.931e6d64-c667-4e2e-b678-eab508d511c8.imageData.url\":\"/_layouts/15/images/sectionbackgroundimagedark3.jpg\"},\"links\":{}},\"dataVersion\":\"1.0\"}}]"
+
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    let data: string = '';
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/home.aspx')/savepage`) > -1) {
+        newZoneId = JSON.parse(opts.data.CanvasContent1)[4].position.zoneId;
+        data = JSON.stringify(opts.data);
+        return Promise.resolve({});
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    await command.action(logger, {
+      options:
+      {
+        pageName: 'home.aspx',
+        webUrl: 'https://contoso.sharepoint.com/sites/newsletter',
+        sectionTemplate: 'OneColumn',
+        zoneEmphasis: 'Gradient',
+        gradientText: 'test gradient'
+      }
+    });
+    assert.strictEqual(data, JSON.stringify({ "CanvasContent1": `[{\"position\":{\"layoutIndex\":1,\"zoneIndex\":2,\"sectionIndex\":1,\"controlIndex\":1,\"sectionFactor\":6,\"zoneId\":\"0158a0e8-20ad-4d8d-9cdc-6e1fde815a35\"},\"id\":\"emptySection\",\"addedFromPersistedData\":true},{\"position\":{\"layoutIndex\":1,\"zoneIndex\":2,\"sectionIndex\":2,\"controlIndex\":1,\"sectionFactor\":6,\"zoneId\":\"0158a0e8-20ad-4d8d-9cdc-6e1fde815a35\"},\"id\":\"emptySection\",\"addedFromPersistedData\":true},{\"position\":{\"layoutIndex\":1,\"zoneIndex\":3,\"sectionIndex\":1,\"controlIndex\":1,\"sectionFactor\":12,\"zoneId\":\"931e6d64-c667-4e2e-b678-eab508d511c8\"},\"id\":\"emptySection\",\"addedFromPersistedData\":true},{\"controlType\":0,\"pageSettingsSlice\":{\"isDefaultDescription\":true,\"isDefaultThumbnail\":true,\"globalRichTextStylingVersion\":0,\"rtePageSettings\":{\"contentVersion\":4},\"isEmailReady\":false}},{\"displayMode\":2,\"position\":{\"zoneIndex\":6,\"sectionIndex\":1,\"sectionFactor\":12,\"layoutIndex\":1,\"zoneId\":\"${newZoneId}\"},\"emphasis\":{}},{\"controlType\":14,\"webPartData\":{\"properties\":{\"zoneBackground\":{\"0158a0e8-20ad-4d8d-9cdc-6e1fde815a35\":{\"type\":\"gradient\",\"gradient\":\"radial-gradient(53.89% 99.37% at 39.45% -6.02%, rgba(4, 110, 212, 0.8) 0%, rgba(4, 110, 212, 0) 100%),\\n      radial-gradient(47.01% 82.21% at 104.3% 15.51%, rgba(118, 5, 180, 0.5) 0%, rgba(118, 5, 180, 0) 100%),\\n      radial-gradient(56.12% 58.33% at 50% 131.71%, #7605B4 34.7%, rgba(118, 5, 180, 0) 100%),\\n      linear-gradient(0deg, #110739, #110739)\",\"useLightText\":true,\"overlay\":{\"color\":\"#000000\",\"opacity\":35}},\"931e6d64-c667-4e2e-b678-eab508d511c8\":{\"type\":\"image\",\"imageData\":{\"source\":1,\"fileName\":\"sectionbackgroundimagedark3.jpg\",\"height\":955,\"width\":555},\"overlay\":{\"color\":\"#000000\",\"opacity\":60},\"useLightText\":true},\"${newZoneId}\":{\"type\":\"gradient\",\"gradient\":\"test gradient\",\"useLightText\":false,\"overlay\":{\"color\":\"#FFFFFF\",\"opacity\":60}}}},\"serverProcessedContent\":{\"htmlStrings\":{},\"searchablePlainTexts\":{},\"imageSources\":{\"zoneBackground.931e6d64-c667-4e2e-b678-eab508d511c8.imageData.url\":\"/_layouts/15/images/sectionbackgroundimagedark3.jpg\"},\"links\":{}},\"dataVersion\":\"1.0\"}}]` }));
+  });
+
+  it('adds a OneColumn section at the end to an uncustomized page with collapsible setting', async () => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/home.aspx')?$select=CanvasContent1,IsPageCheckedOutToCurrentUser`) > -1) {
+        return Promise.resolve({
+          "IsPageCheckedOutToCurrentUser": true,
+          "CanvasContent1": "[{\"controlType\":0,\"pageSettingsSlice\":{\"isDefaultDescription\":true,\"isDefaultThumbnail\":true}}]"
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    let data: string = '';
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/home.aspx')/savepage`) > -1) {
+        data = JSON.stringify(opts.data);
+        return Promise.resolve({});
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    await command.action(logger, {
+      options:
+      {
+        pageName: 'home.aspx',
+        webUrl: 'https://contoso.sharepoint.com/sites/newsletter',
+        sectionTemplate: 'OneColumn',
+        isCollapsibleSection: true,
+        iconAlignment: 'Right'
+      }
+    });
+    assert.strictEqual(data, JSON.stringify({ "CanvasContent1": "[{\"displayMode\":2,\"position\":{\"zoneIndex\":1,\"sectionIndex\":1,\"sectionFactor\":12,\"layoutIndex\":1},\"emphasis\":{},\"zoneGroupMetadata\":{\"type\":1,\"isExpanded\":false,\"showDividerLine\":false,\"iconAlignment\":\"right\"}},{\"controlType\":0,\"pageSettingsSlice\":{\"isDefaultDescription\":true,\"isDefaultThumbnail\":true}}]" }));
+  });
+
+  it('adds a OneColumn section at the end to an uncustomized page with collapsible setting and left iconAlignment', async () => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/home.aspx')?$select=CanvasContent1,IsPageCheckedOutToCurrentUser`) > -1) {
+        return Promise.resolve({
+          "IsPageCheckedOutToCurrentUser": true,
+          "CanvasContent1": "[{\"controlType\":0,\"pageSettingsSlice\":{\"isDefaultDescription\":true,\"isDefaultThumbnail\":true}}]"
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    let data: string = '';
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/home.aspx')/savepage`) > -1) {
+        data = JSON.stringify(opts.data);
+        return Promise.resolve({});
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    await command.action(logger, {
+      options:
+      {
+        pageName: 'home.aspx',
+        webUrl: 'https://contoso.sharepoint.com/sites/newsletter',
+        sectionTemplate: 'OneColumn',
+        isCollapsibleSection: true,
+        iconAlignment: 'Left'
+      }
+    });
+    assert.strictEqual(data, JSON.stringify({ "CanvasContent1": "[{\"displayMode\":2,\"position\":{\"zoneIndex\":1,\"sectionIndex\":1,\"sectionFactor\":12,\"layoutIndex\":1},\"emphasis\":{},\"zoneGroupMetadata\":{\"type\":1,\"isExpanded\":false,\"showDividerLine\":false,\"iconAlignment\":\"left\"}},{\"controlType\":0,\"pageSettingsSlice\":{\"isDefaultDescription\":true,\"isDefaultThumbnail\":true}}]" }));
   });
 
   it('correctly handles random API error', async () => {
@@ -681,7 +982,6 @@ describe(commands.PAGE_SECTION_ADD, () => {
     assert.notStrictEqual(actual, true);
   });
 
-
   it('fails validation if isLayoutReflowOnTop is valid but sectionTemplate is not Vertical', async () => {
     const actual = await command.validate({
       options: {
@@ -689,6 +989,95 @@ describe(commands.PAGE_SECTION_ADD, () => {
         webUrl: 'https://contoso.sharepoint.com',
         sectionTemplate: 'OneColumn',
         isLayoutReflowOnTop: true
+      }
+    }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if iconAlignment is not valid', async () => {
+    const actual = await command.validate({
+      options: {
+        pageName: 'page.aspx',
+        webUrl: 'https://contoso.sharepoint.com',
+        sectionTemplate: 'OneColumn',
+        zoneEmphasis: 'Image',
+        iconAlignment: 'Invalid'
+      }
+    }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if fillMode is not valid', async () => {
+    const actual = await command.validate({
+      options: {
+        pageName: 'page.aspx',
+        webUrl: 'https://contoso.sharepoint.com',
+        sectionTemplate: 'OneColumn',
+        zoneEmphasis: 'Image',
+        fillMode: 'Invalid'
+      }
+    }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if imageUrl is specified but zoneEmphasis is not specified', async () => {
+    const actual = await command.validate({
+      options: {
+        pageName: 'page.aspx',
+        webUrl: 'https://contoso.sharepoint.com',
+        sectionTemplate: 'OneColumn',
+        imageUrl: 'test.png'
+      }
+    }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if gradientText is specified but zoneEmphasis is not specified', async () => {
+    const actual = await command.validate({
+      options: {
+        pageName: 'page.aspx',
+        webUrl: 'https://contoso.sharepoint.com',
+        sectionTemplate: 'OneColumn',
+        gradientText: 'test gradient'
+      }
+    }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if overlayOpacity is not valid', async () => {
+    const actual = await command.validate({
+      options: {
+        pageName: 'page.aspx',
+        webUrl: 'https://contoso.sharepoint.com',
+        sectionTemplate: 'OneColumn',
+        zoneEmphasis: 'Image',
+        overlayOpacity: 100001
+      }
+    }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if overlayColor is not valid', async () => {
+    const actual = await command.validate({
+      options: {
+        pageName: 'page.aspx',
+        webUrl: 'https://contoso.sharepoint.com',
+        sectionTemplate: 'OneColumn',
+        zoneEmphasis: 'Image',
+        overlayColor: "InvalidColor"
+      }
+    }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if overlayColor is specified but is not Image or Gradient zoneEmphasis', async () => {
+    const actual = await command.validate({
+      options: {
+        pageName: 'page.aspx',
+        webUrl: 'https://contoso.sharepoint.com',
+        sectionTemplate: 'OneColumn',
+        zoneEmphasis: 'Strong',
+        overlayColor: "#FFFFFF"
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);

@@ -26,10 +26,46 @@ m365 spo page section add [options]
 : Order of the section to add.
 
 `--zoneEmphasis [zoneEmphasis]`
-: Section background shading. Allowed values `None`, `Neutral`, `Soft`, `Strong`
+: Section background shading. Allowed values `None`, `Neutral`, `Soft`, `Strong`, `Image`,`Gradient`
 
 `--isLayoutReflowOnTop`
 : The position of the Vertical section for smaller screens. Applied only for Vertical section.
+
+`--isCollapsibleSection`
+: Set section to be collapsible.
+
+`--showDivider`
+: Show divider line between sections.
+
+`--iconAlignment [iconAlignment]`
+: Expand/collapse icon alignment.
+
+`--isExpanded`
+: Set default display of collapsible section.
+
+`--gradientText [gradientText]`
+: Set gradient setting of a background of a section.
+
+`--imageUrl [imageUrl]`
+: Background image URL.
+
+`--imageHeight [imageHeight]`
+: Background image height.
+
+`--imageWidth [imageWidth]`
+: Background image width.
+
+`--fillMode [fillMode]`
+: Fill mode of an image. Possible values are `ScaleToFill`, `ScaleToFit`, `Tile`, `OriginalSize`.
+
+`--useLightText`
+: Use light text parameter for background.
+
+`--overlayColor [overlayColor]`
+:	Overlay color for background. In #RRGGBB format.
+
+`--overlayOpacity [overlayOpacity]`	
+: Overlay opacity for background.
 ```
 
 <Global />
@@ -63,6 +99,25 @@ Add Vertical section with background shading to the modern page with adjusting t
 ```sh
 m365 spo page section add --pageName home.aspx --webUrl https://contoso.sharepoint.com/sites/newsletter --sectionTemplate Vertical --zoneEmphasis Neutral --isLayoutReflowOnTop
 ```
+
+Add OneColumn section as a collapsible section as expanded with icon alligned to the left
+
+```sh
+m365 spo page section add --pageName home.aspx --webUrl https://contoso.sharepoint.com/sites/newsletter --sectionTemplate OneColumn --isCollapsibleSection --isExpanded --iconAlignment Left
+```
+
+Add TwoColumn section with Image background
+
+```sh
+m365 spo page section add --pageName home.aspx --webUrl https://contoso.sharepoint.com/sites/newsletter --sectionTemplate TwoColumn --imageUrl "https://contoso.com/image.jpg" --zoneEmphasis Image --fillMode Tile
+```
+
+Add OneColumn section with Gradient background
+
+```sh
+m365 spo page section add --pageName home.aspx --webUrl https://contoso.sharepoint.com/sites/newsletter --sectionTemplate TwoColumn --zoneEmphasis Gradient --gradientText "linear-gradient(72.44deg, #E6FBFE 0%, #EDDDFB 100%)"
+```
+
 
 ## Response
 
