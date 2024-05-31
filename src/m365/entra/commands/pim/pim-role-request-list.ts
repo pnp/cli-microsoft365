@@ -106,11 +106,11 @@ class EntraPimRoleRequestListCommand extends GraphCommand {
         }
 
         if (args.options.createdDateTime && !validation.isValidISODateTime(args.options.createdDateTime)) {
-          return `'${args.options.createdDateTime}' is not a valid ISO 8601 date time string`;
+          return `'${args.options.createdDateTime}' is not a valid ISO 8601 date time string for option 'createdDateTime'`;
         }
 
         if (args.options.status && !this.allowedStatuses.some(status => status.toLowerCase() === args.options.status!.toLowerCase())) {
-          return `Option 'status' must be one of the following values: ${this.allowedStatuses.join(', ')}.`;
+          return `'${args.options.status}' for option 'status' must be one of the following values: ${this.allowedStatuses.join(', ')}.`;
         }
 
         return true;
