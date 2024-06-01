@@ -30,7 +30,7 @@ function includeContent(md: string, rootFolder: string): string {
   mdxImports.forEach(mdxImport => {
     md = md.replace(mdxImport.tag, () =>
       fs.readFileSync(path.join(rootFolder, mdxImport.location), 'utf8')
-    ).replace(/(```\r\n)\r\n(```md definition-list\r\n)/g, "$1$2");
+    ).replace(/(```\r?\n)\r?\n(```md definition-list\r?\n)/g, "$1$2");
   });
 
   return md;
@@ -69,7 +69,7 @@ function convertContentTabs(md: string): string {
 }
 
 function convertCodeFences(md: string): string {
-  const regex = new RegExp('^```.*?(?:\r\n|\n)(.*?)```(?:\r\n|\n)', 'gms');
+  const regex = new RegExp('^```.*?(?:\r?\n)(.*?)```(?:\r?\n)', 'gms');
   return md.replace(regex, (match, code: string) => {
     return `${code.replace(/^(.+)$/gm, '  $1')}${EOL}`;
   });
