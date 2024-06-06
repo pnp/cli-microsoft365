@@ -1,0 +1,161 @@
+import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# cli app add
+
+Creates custom Entra app for use by CLI for Microsoft 365
+
+## Usage
+
+```sh
+m365 cli app add [options]
+```
+
+## Options
+
+```md definition-list
+`-n, --name <name>`
+: Name of the app.
+
+`-m, --mode <mode>`
+: Determines if CLI will be used by a user (delegated) or as a daemon process (appOnly). Allowed values delegated, appOnly.
+
+`-p, --permissions [permissions]`
+: List of permissions to assign to the app. If not specified, will assign all permissions currently used by CLI for Microsoft 365. For the actual list see https://pnp.github.io/cli-microsoft365/concepts/authorization-tokens/#azure-ad-application-used-by-the-cli-for-microsoft-365. Use permissions or permissionSet but not both.
+
+`--permissionSet [permissionSet]`
+: Predefined set of permissions to assign to the app. Allowed values ReadAll, SpoFull, SpoRead. Use permissions or permissionSet but not both.
+```
+
+<Global />
+
+## Examples
+
+Create new Entra app registration with the specified name and with specified Microsoft Graph delegated permissions for CLI for Microsoft 365
+
+```sh
+m365 cli app add --name 'My Microsoft Entra app' --mode 'delegated' --permissions 'https://graph.microsoft.com/Group.ReadWrite.All'
+```
+
+Create new Entra app registration with the specified name and SharePoint read application permissions preset for CLI for Microsoft 365 
+
+```sh
+m365 cli app add --name 'My Microsoft Entra app' --mode 'appOnly' --permissionSet 'SpoRead'
+```
+
+## Response
+
+### Standard response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  {
+    "appId": "68e9f0dd-c743-4693-9ba4-d78e91bd13cc",
+    "objectId": "d4d7d33a-d40e-4606-b67d-de6cdbfaa01f",
+    "tenantId": "1e852b49-bf4b-4ba5-bcd4-a8c4706c8ed4",
+    "name": "My Microsoft Entra app"
+  }
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  appId   : 908db832-dac2-4622-98b3-b492fdc74f80
+  objectId: 089066cc-2c81-4188-9b6b-7b86e861a169
+  tenantId: 1e852b49-bf4b-4ba5-bcd4-a8c4706c8ed4
+  name    : My Microsoft Entra app
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  appId,objectId,tenantId,name
+  9db26abb-dd17-48f1-b790-765d14d834b6,5c803709-e0b8-4a4f-a43f-f4ad39fdee45,1e852b49-bf4b-4ba5-bcd4-a8c4706c8ed4,My Microsoft Entra app
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # m365 cli app add --name "My Microsoft Entra app" --mode "delegated" --permissions "https://graph.microsoft.com/Group.ReadWrite.All"
+
+  Date: 2023-06-01
+
+  ## 8e60ecac-34b4-404c-832d-f1c77bc27b78
+
+  Property | Value
+  ---------|-------
+  appId | f86600df-9842-4f25-b7cf-242f3736b137
+  objectId | 8e60ecac-34b4-404c-832d-f1c77bc27b78
+  tenantId | 1e852b49-bf4b-4ba5-bcd4-a8c4706c8ed4
+  name | My Microsoft Entra app
+  ```
+
+  </TabItem>
+</Tabs>
+
+### `appOnly` response
+
+When we make use of the option `appOnly` mode the response will differ. 
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  {
+    "appId": "efb2ec4c-d247-446b-9efd-0f8141652711",
+    "objectId": "c8bdc471-ba5a-45c9-b725-5fc83bfc9c59",
+    "tenantId": "1e852b49-bf4b-4ba5-bcd4-a8c4706c8ed4",
+    "certPassword": "Va8chDNjeDWq27rh6kpjfB1cCUp2kyvR",
+    "certThumbprint": "CC3D2D188CB5497CADC1F68FCD14D5B149F5EFEE",
+    "certExpirationDate": "2024-04-17T14:33:22Z"
+  }
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  appId              : 748e1b24-8fa6-4f54-a3f2-5f84ffcffdbe
+  objectId           : 6aa9fde7-d58a-4211-a84a-b7252ac6087b
+  tenantId           : 1e852b49-bf4b-4ba5-bcd4-a8c4706c8ed4
+  certPassword       : Va8chDNjeDWq27rh6kpjfB1cCUp2kyvR
+  certThumbprint     : CC3D2D188CB5497CADC1F68FCD14D5B149F5EFEE
+  certExpirationDate : 2024-04-17T14:33:22Z
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  appId,objectId,tenantId,certPassword,certThumbprint,certExpirationDate
+  06700d67-0c97-402a-8c09-802049ffd70f,1eb0491f-1c88-490f-b2b3-18dc501938a1,1e852b49-bf4b-4ba5-bcd4-a8c4706c8ed4,Va8chDNjeDWq27rh6kpjfB1cCUp2kyvR,CC3D2D188CB5497CADC1F68FCD14D5B149F5EFEE,2024-04-17T14:33:22Z
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # m365 cli app add --name "My Microsoft Entra app" --mode "appOnly" --permissions "https://graph.microsoft.com/Group.ReadWrite.All"
+
+  Date: 2023-06-01
+
+  ## a5cb917a-ebf3-4c3c-82db-90aa122495b4
+
+  Property | Value
+  ---------|-------
+  appId | 3d1a4664-2634-4b35-9e42-1fa24abfda89
+  objectId | a5cb917a-ebf3-4c3c-82db-90aa122495b4
+  tenantId | 1e852b49-bf4b-4ba5-bcd4-a8c4706c8ed4
+  certPassword | Va8chDNjeDWq27rh6kpjfB1cCUp2kyvR
+  certThumbprint | CC3D2D188CB5497CADC1F68FCD14D5B149F5EFEE
+  certExpirationDate | 2024-04-17T14:33:22Z
+  ```
+
+  </TabItem>
+</Tabs>
