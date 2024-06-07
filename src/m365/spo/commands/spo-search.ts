@@ -218,7 +218,7 @@ class SpoSearchCommand extends SpoCommand {
       }
 
       const results: SearchResult[] = await this.executeSearchQuery(logger, args, webUrl, []);
-      this.printResults(logger, args, results);
+      await this.printResults(logger, args, results);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);

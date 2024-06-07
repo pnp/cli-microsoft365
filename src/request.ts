@@ -26,39 +26,39 @@ class Request {
     this._debug = debug;
 
     if (this._debug) {
-      this.req.interceptors.request.use(config => {
+      this.req.interceptors.request.use(async config => {
         if (this._logger) {
-          this._logger.logToStderr('Request:');
+          await this._logger.logToStderr('Request:');
           const properties: string[] = ['url', 'method', 'headers', 'responseType', 'decompress'];
           if (config.responseType !== 'stream') {
             properties.push('data');
           }
-          this._logger.logToStderr(JSON.stringify(formatting.filterObject(config, properties), null, 2));
+          await this._logger.logToStderr(JSON.stringify(formatting.filterObject(config, properties), null, 2));
         }
         return config;
       });
       // since we're stubbing requests, response interceptor is never called in
       // tests, so let's exclude it from coverage
       /* c8 ignore next 26 */
-      this.req.interceptors.response.use((response: AxiosResponse): AxiosResponse => {
+      this.req.interceptors.response.use(async (response: AxiosResponse): Promise<AxiosResponse> => {
         if (this._logger) {
-          this._logger.logToStderr('Response:');
+          await this._logger.logToStderr('Response:');
           const properties: string[] = ['status', 'statusText', 'headers'];
           if (response.headers['content-type'] &&
             response.headers['content-type'].indexOf('json') > -1) {
             properties.push('data');
           }
-          this._logger.logToStderr(JSON.stringify({
+          await this._logger.logToStderr(JSON.stringify({
             url: response.config.url,
             ...formatting.filterObject(response, properties)
           }, null, 2));
         }
         return response;
-      }, (error: AxiosError): void => {
+      }, async (error: AxiosError): Promise<void> => {
         if (this._logger) {
           const properties: string[] = ['status', 'statusText', 'headers'];
-          this._logger.logToStderr('Request error:');
-          this._logger.logToStderr(JSON.stringify({
+          await this._logger.logToStderr('Request error:');
+          await this._logger.logToStderr(JSON.stringify({
             url: error.config?.url,
             ...formatting.filterObject(error.response, properties),
             error: (error as any).error
@@ -200,7 +200,7 @@ class Request {
 
             _resolve((options.responseType === 'stream' || options.fullResponse) ? res : res.data);
           }
-        }, (error: AxiosError): void => {
+        }, async (error: AxiosError): Promise<void> => {
           if (error && error.response &&
             (error.response.status === 429 ||
               error.response.status === 503)) {
@@ -209,11 +209,10 @@ class Request {
               retryAfter = 10;
             }
             if (this._debug) {
-              (this._logger as Logger).log(`Request throttled. Waiting ${retryAfter}sec before retrying...`);
+              await (this._logger as Logger).log(`Request throttled. Waiting ${retryAfter}sec before retrying...`);
             }
-            setTimeout(() => {
-              this.execute(options, resolve || _resolve, reject || _reject);
-            }, retryAfter * 1000);
+            // eslint-disable-next-line @typescript-eslint/no-floating-promises
+            setTimeout(async () => { this.execute(options, resolve || _resolve, reject || _reject); }, retryAfter * 1000);
           }
           else {
             if (reject) {

@@ -3,7 +3,7 @@ import Command, { CommandArgs } from '../../Command.js';
 
 export default abstract class AnonymousCommand extends Command {
   public async action(logger: Logger, args: CommandArgs): Promise<void> {
-    this.initAction(args, logger);
+    await this.initAction(args, logger);
     await this.commandAction(logger, args);
   }
 }

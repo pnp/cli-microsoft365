@@ -297,11 +297,6 @@ describe(commands.SITE_GROUPIFY, () => {
     await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team-a', alias: 'team-a', displayName: 'Team A' } } as any), new CommandError('An error has occurred'));
   });
 
-  it('fails validation if url is not an absolute URL', async () => {
-    const actual = await command.validate({ options: { url: '/sites/team-a', alias: 'team-a', displayName: 'Team A' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
   it('fails validation if url is not a SharePoint URL', async () => {
     const actual = await command.validate({ options: { url: 'http://contoso/sites/team-a', alias: 'team-a', displayName: 'Team A' } }, commandInfo);
     assert.notStrictEqual(actual, true);

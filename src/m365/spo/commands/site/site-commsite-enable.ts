@@ -89,7 +89,7 @@ class SpoSiteCommSiteEnableCommand extends SpoCommand {
     const designPackageId = this.getDesignPackageId(args.options);
 
     if (this.verbose) {
-      logger.logToStderr(`Enabling communication site with design package '${designPackageId}' at '${args.options.url}'...`);
+      await logger.logToStderr(`Enabling communication site with design package '${designPackageId}' at '${args.options.url}'...`);
     }
 
     try {

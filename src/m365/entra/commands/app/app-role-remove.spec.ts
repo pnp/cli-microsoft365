@@ -2006,7 +2006,7 @@ describe(commands.APP_ROLE_REMOVE, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(false);
 
-    command.action(logger, { options: { debug: true, appName: 'App-Name', claim: 'Product.Read' } });
+    await command.action(logger, { options: { debug: true, appName: 'App-Name', claim: 'Product.Read' } });
     assert(patchStub.notCalled);
   });
 

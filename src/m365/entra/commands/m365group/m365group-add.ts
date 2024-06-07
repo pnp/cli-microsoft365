@@ -289,6 +289,7 @@ class EntraM365GroupAddCommand extends GraphCommand {
     let promises: Promise<{ value: User[] }>[] = [];
     let userIds: string[] = [];
 
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
     promises = userArr.map(user => {
       const requestOptions: CliRequestOptions = {
         url: `${this.resource}/v1.0/users?$filter=userPrincipalName eq '${formatting.encodeQueryParameter(user)}'&$select=id,userPrincipalName`,

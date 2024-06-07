@@ -136,7 +136,7 @@ class SpoListItemRetentionLabelRemoveCommand extends SpoCommand {
     }
 
     if (this.verbose) {
-      logger.logToStderr(`Retrieving list absolute URL...`);
+      await logger.logToStderr(`Retrieving list absolute URL...`);
     }
 
     let requestUrl = `${options.webUrl}/_api/web`;
@@ -161,7 +161,7 @@ class SpoListItemRetentionLabelRemoveCommand extends SpoCommand {
     const listAbsoluteUrl = urlUtil.urlCombine(tenantUrl, serverRelativePath);
 
     if (this.verbose) {
-      logger.logToStderr(`List absolute URL found: '${listAbsoluteUrl}'`);
+      await logger.logToStderr(`List absolute URL found: '${listAbsoluteUrl}'`);
     }
 
     return listAbsoluteUrl;

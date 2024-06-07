@@ -81,7 +81,7 @@ class FileCopyCommand extends GraphCommand {
       const destinationPath: string = this.getAbsoluteUrl(webUrl, targetUrl);
 
       if (this.verbose) {
-        logger.logToStderr(`Copying file '${sourcePath}' to '${destinationPath}'...`);
+        await logger.logToStderr(`Copying file '${sourcePath}' to '${destinationPath}'...`);
       }
 
       const copyUrl: string = await this.getCopyUrl(args.options, sourcePath, logger);
@@ -145,7 +145,7 @@ class FileCopyCommand extends GraphCommand {
 
   private async getDocumentLibrary(siteId: string, folderUrl: URL, folderUrlFromUser: string, logger: Logger): Promise<Drive> {
     if (this.verbose) {
-      logger.logToStderr(`Getting document library...`);
+      await logger.logToStderr(`Getting document library...`);
     }
 
     const requestOptions: CliRequestOptions = {
@@ -178,7 +178,7 @@ class FileCopyCommand extends GraphCommand {
 
   private async getStartingFolderId(documentLibrary: Drive, folderUrl: URL, logger: Logger): Promise<string> {
     if (this.verbose) {
-      logger.logToStderr(`Getting starting folder id...`);
+      await logger.logToStderr(`Getting starting folder id...`);
     }
 
     const documentLibraryRelativeFolderUrl: string = folderUrl.href.replace(new RegExp(`${documentLibrary.webUrl}`, 'i'), '').replace(/\/+$/, '');

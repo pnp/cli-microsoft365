@@ -98,7 +98,7 @@ class PaAppOwnerSetCommand extends PowerAppsCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Setting new owner ${args.options.userId || args.options.userName} for Power Apps app ${args.options.appName}...`);
+      await logger.logToStderr(`Setting new owner ${args.options.userId || args.options.userName} for Power Apps app ${args.options.appName}...`);
     }
     try {
       const userId = await this.getUserId(args.options);

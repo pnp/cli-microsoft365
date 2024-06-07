@@ -9,8 +9,8 @@ export default abstract class PowerPlatformCommand extends Command {
     return 'https://api.bap.microsoft.com';
   }
 
-  protected initAction(args: CommandArgs, logger: Logger): void {
-    super.initAction(args, logger);
+  protected async initAction(args: CommandArgs, logger: Logger): Promise<void> {
+    await super.initAction(args, logger);
 
     if (!auth.connection.active) {
       // we fail no login in the base command command class

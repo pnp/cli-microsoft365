@@ -215,7 +215,7 @@ class PaAppExportCommand extends PowerPlatformCommand {
         link = response.properties.packageLink.value;
       }
       else {
-        setTimeout(this.pollingInterval);
+        await setTimeout(this.pollingInterval);
       }
 
       if (this.verbose) {

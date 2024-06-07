@@ -108,7 +108,7 @@ class SpfxProjectExternalizeCommand extends BaseProjectCommand {
       this.allEditSuggestions.push(...rulesResults.map(x => x.suggestions).reduce((x, y) => [...x, ...y]));
       //removing duplicates
       this.allFindings = this.allFindings.filter((x, i) => this.allFindings.findIndex(y => y.key === x.key) === i);
-      this.writeReport(this.allFindings, this.allEditSuggestions, logger, args.options);
+      await this.writeReport(this.allFindings, this.allEditSuggestions, logger, args.options);
     }
     catch (err: any) {
       throw new CommandError(err);

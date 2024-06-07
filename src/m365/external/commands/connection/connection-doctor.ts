@@ -203,7 +203,7 @@ class ExternalConnectionDoctorCommand extends GraphCommand {
 
     for (const check of checks) {
       if (this.debug) {
-        logger.logToStderr(`Running check ${check.id}...`);
+        await logger.logToStderr(`Running check ${check.id}...`);
       }
 
       // don't show spinner if running tests

@@ -72,7 +72,7 @@ class CliConsentCommand extends AnonymousCommand {
   }
 
   public async action(logger: Logger, args: CommandArgs): Promise<void> {
-    this.initAction(args, logger);
+    await this.initAction(args, logger);
     await this.commandAction(logger, args);
   }
 }

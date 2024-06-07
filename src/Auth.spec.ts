@@ -1908,7 +1908,8 @@ describe('Auth', () => {
         catch (e) {
           done(e);
         }
-      });
+      })
+      .catch(done);
   });
 
   it('handles error when restoring authentication', (done) => {

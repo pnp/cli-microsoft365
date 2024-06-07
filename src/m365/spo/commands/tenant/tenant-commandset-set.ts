@@ -136,7 +136,7 @@ class SpoTenantCommandSetSetCommand extends SpoCommand {
 
   private async getListItemById(logger: Logger, webUrl: string, listServerRelativeUrl: string, id: string): Promise<any> {
     if (this.verbose) {
-      logger.logToStderr(`Getting the list item by id ${id}`);
+      await logger.logToStderr(`Getting the list item by id ${id}`);
     }
     const reqOptions: CliRequestOptions = {
       url: `${webUrl}/_api/web/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')/Items(${id})`,
@@ -151,7 +151,7 @@ class SpoTenantCommandSetSetCommand extends SpoCommand {
 
   private async updateTenantWideExtension(appCatalogUrl: string, options: Options, listServerRelativeUrl: string, logger: Logger): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr('Updating tenant wide extension to the TenantWideExtensions list');
+      await logger.logToStderr('Updating tenant wide extension to the TenantWideExtensions list');
     }
 
     const formValues: any = [];
