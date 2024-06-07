@@ -103,7 +103,10 @@ class SpoSiteSetCommand extends SpoCommand {
         option: '-u, --url <url>'
       },
       {
-        option: '-i, --id [id]'
+        option: '-t, --title [title]'
+      },
+      {
+        option: '-d, --description [description]'
       },
       {
         option: '--classification [classification]'
@@ -131,20 +134,14 @@ class SpoSiteSetCommand extends SpoCommand {
         option: '--siteDesignId [siteDesignId]'
       },
       {
-        option: '--title [title]'
-      },
-      {
-        option: '--description [description]'
+        option: '--sharingCapability [sharingCapability]',
+        autocomplete: this.sharingCapabilities
       },
       {
         option: '--siteLogoUrl [siteLogoUrl]'
       },
       {
         option: '--siteThumbnailUrl [siteThumbnailUrl]'
-      },
-      {
-        option: '--sharingCapability [sharingCapability]',
-        autocomplete: this.sharingCapabilities
       },
       {
         option: '--resourceQuota [resourceQuota]'
