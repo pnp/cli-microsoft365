@@ -150,13 +150,13 @@ class SpoGroupMemberAddCommand extends SpoCommand {
       if (args.options.aadGroupIds) {
         args.options.entraGroupIds = args.options.aadGroupIds;
 
-        this.warn(logger, `Option 'aadGroupIds' is deprecated. Please use 'entraGroupIds' instead`);
+        await this.warn(logger, `Option 'aadGroupIds' is deprecated. Please use 'entraGroupIds' instead`);
       }
 
       if (args.options.aadGroupNames) {
         args.options.entraGroupNames = args.options.aadGroupNames;
 
-        this.warn(logger, `Option 'aadGroupNames' is deprecated. Please use 'entraGroupNames' instead`);
+        await this.warn(logger, `Option 'aadGroupNames' is deprecated. Please use 'entraGroupNames' instead`);
       }
 
       const groupId = await this.getGroupId(args, logger);

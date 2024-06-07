@@ -178,24 +178,24 @@ async function execute(rawArgs: string[]): Promise<void> {
     await cli.executeCommand(cli.commandToExecute.command, cli.optionsFromArgs);
     const endTotal = process.hrtime.bigint();
     timings.total.push(Number(endTotal - start));
-    printTimings(rawArgs);
+    await printTimings(rawArgs);
     process.exit(0);
   }
   catch (err) {
     const endTotal = process.hrtime.bigint();
     timings.total.push(Number(endTotal - start));
-    printTimings(rawArgs);
+    await printTimings(rawArgs);
     await cli.closeWithError(err, cli.optionsFromArgs);
     /* c8 ignore next */
   }
 }
 
-function printTimings(rawArgs: string[]): void {
+async function printTimings(rawArgs: string[]): Promise<void> {
   if (rawArgs.some(arg => arg === '--debug')) {
-    cli.error('');
-    cli.error('Timings:');
-    Object.getOwnPropertyNames(timings).forEach(key => {
-      cli.error(`${key}: ${(timings as any)[key].reduce((a: number, b: number) => a + b, 0) / 1e6}ms`);
+    await cli.error('');
+    await cli.error('Timings:');
+    Object.getOwnPropertyNames(timings).forEach(async key => {
+      await cli.error(`${key}: ${(timings as any)[key].reduce((a: number, b: number) => a + b, 0) / 1e6}ms`);
     });
   }
 }
@@ -215,7 +215,7 @@ async function executeCommand(command: Command, args: { options: minimist.Parsed
     },
     logToStderr: async (message: any): Promise<void> => {
       if (args.options.output !== 'none') {
-        cli.error(message);
+        await cli.error(message);
       }
     }
   };
@@ -962,7 +962,7 @@ async function promptForSelection<T>(config: SelectionConfig<T>): Promise<T> {
   }
 
   const answer = await prompt.forSelection<T>(config);
-  cli.error('');
+  await cli.error('');
 
   // Restart the spinner if it was running before the prompt
   /* c8 ignore next 3 */
@@ -982,7 +982,7 @@ async function promptForConfirmation(config: ConfirmationConfig): Promise<boolea
   }
 
   const answer = await prompt.forConfirmation(config);
-  cli.error('');
+  await cli.error('');
 
   // Restart the spinner if it was running before the prompt
   /* c8 ignore next 3 */
@@ -999,7 +999,7 @@ async function handleMultipleResultsFound<T>(message: string, values: { [key: st
     throw new Error(`${message} Found: ${Object.keys(values).join(', ')}.`);
   }
 
-  cli.error(`🌶️  ${message} `);
+  await cli.error(`🌶️  ${message} `);
   const choices = Object.keys(values).map((choice: any) => { return { name: choice, value: choice }; });
   const response = await cli.promptForSelection<string>({ message: `Please choose one:`, choices });
 

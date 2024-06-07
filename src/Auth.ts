@@ -468,7 +468,7 @@ export class Auth {
     }
 
     if (cli.getSettingWithDefaultValue<boolean>(settingsNames.autoOpenLinksInBrowser, false)) {
-      browserUtil.open(response.verificationUri);
+      await browserUtil.open(response.verificationUri);
     }
 
     if (cli.getSettingWithDefaultValue<boolean>(settingsNames.copyDeviceCodeToClipboard, false)) {

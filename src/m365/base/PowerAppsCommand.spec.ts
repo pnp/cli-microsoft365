@@ -37,6 +37,10 @@ describe('PowerAppsCommand', () => {
     };
   });
 
+  beforeEach(() => {
+    auth.connection.active = true;
+  });
+
   after(() => {
     sinon.restore();
     auth.connection.active = false;
@@ -48,34 +52,33 @@ describe('PowerAppsCommand', () => {
     assert.strictEqual((command as any).resource, 'https://api.powerapps.com');
   });
 
-  it(`doesn't throw error when not connected`, () => {
-    try {
-      auth.connection.active = false;
-      (cmd as any).initAction({ options: {} }, {});
-    }
-    finally {
-      auth.connection.active = true;
-    }
+  it(`doesn't throw error when not connected`, async () => {
+    auth.connection.active = false;
+    await (cmd as any).initAction({ options: {} }, {});
   });
 
-  it('throws error when connected to USGov cloud', () => {
+  it('throws error when connected to USGov cloud', async () => {
+    auth.connection.active = true;
     auth.connection.cloudType = CloudType.USGov;
-    assert.throws(() => (cmd as any).initAction({ options: {} }, {}), cloudError);
+    await assert.rejects(() => (cmd as any).initAction({ options: {} }, {}), cloudError);
   });
 
-  it('throws error when connected to USGovHigh cloud', () => {
+  it('throws error when connected to USGovHigh cloud', async () => {
+    auth.connection.active = true;
     auth.connection.cloudType = CloudType.USGovHigh;
-    assert.throws(() => (cmd as any).initAction({ options: {} }, {}), cloudError);
+    await assert.rejects(() => (cmd as any).initAction({ options: {} }, {}), cloudError);
   });
 
-  it('throws error when connected to USGovDoD cloud', () => {
+  it('throws error when connected to USGovDoD cloud', async () => {
+    auth.connection.active = true;
     auth.connection.cloudType = CloudType.USGovDoD;
-    assert.throws(() => (cmd as any).initAction({ options: {} }, {}), cloudError);
+    await assert.rejects(() => (cmd as any).initAction({ options: {} }, {}), cloudError);
   });
 
-  it('throws error when connected to China cloud', () => {
+  it('throws error when connected to China cloud', async () => {
+    auth.connection.active = true;
     auth.connection.cloudType = CloudType.China;
-    assert.throws(() => (cmd as any).initAction({ options: {} }, {}), cloudError);
+    await assert.rejects(() => (cmd as any).initAction({ options: {} }, {}), cloudError);
   });
 
   it(`doesn't throw error when connected to public cloud`, () => {
@@ -83,10 +86,10 @@ describe('PowerAppsCommand', () => {
     assert.doesNotThrow(() => (cmd as any).initAction({ options: {} }, {}));
   });
 
-  it('throws error when using application-only permissions', () => {
+  it('throws error when using application-only permissions', async () => {
     sinonUtil.restore(accessToken.isAppOnlyAccessToken);
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
     auth.connection.cloudType = CloudType.Public;
-    assert.throws(() => (cmd as any).initAction({ options: {} }, {}), new CommandError('This command does not support application-only permissions.'));
+    await assert.rejects(() => (cmd as any).initAction({ options: {} }, {}), new CommandError('This command does not support application-only permissions.'));
   });
 });

@@ -3,7 +3,7 @@
 import { cli } from './cli/cli.js';
 import { app } from './utils/app.js';
 
-(async () => {
+await (async () => {
   // required to make console.log() in combination with piped output synchronous
   // on Windows/in PowerShell so that the output is not trimmed by calling
   // process.exit() after executing the command, while the output is still

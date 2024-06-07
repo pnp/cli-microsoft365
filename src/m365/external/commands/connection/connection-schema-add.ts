@@ -117,7 +117,7 @@ class ExternalConnectionSchemaAddCommand extends GraphCommand {
       const res = await request.patch<AxiosResponse>(requestOptions);
 
       const location: string = res.headers.location;
-      logger.log(location);
+      await logger.log(location);
 
       if (!args.options.wait) {
         return;
@@ -126,14 +126,14 @@ class ExternalConnectionSchemaAddCommand extends GraphCommand {
       let status: NullableOption<ExternalConnectors.ConnectionOperationStatus> | undefined;
       do {
         if (this.verbose) {
-          logger.logToStderr(`Waiting 60 seconds...`);
+          await logger.logToStderr(`Waiting 60 seconds...`);
         }
 
         // waiting 60s before polling as recommended by Microsoft
         await new Promise(resolve => setTimeout(resolve, 60000));
 
         if (this.debug) {
-          logger.logToStderr(`Checking schema operation status...`);
+          await logger.logToStderr(`Checking schema operation status...`);
         }
 
         const operation = await request.get<ExternalConnectors.ConnectionOperation>({
@@ -146,7 +146,7 @@ class ExternalConnectionSchemaAddCommand extends GraphCommand {
         status = operation.status;
 
         if (this.verbose) {
-          logger.logToStderr(`Schema operation status: ${status}`);
+          await logger.logToStderr(`Schema operation status: ${status}`);
         }
 
         if (status === 'failed') {

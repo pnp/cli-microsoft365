@@ -40,7 +40,7 @@ class VivaEngageCommunityGetCommand extends GraphCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Getting the information of Viva Engage community with id '${args.options.id}'...`);
+      await logger.logToStderr(`Getting the information of Viva Engage community with id '${args.options.id}'...`);
     }
 
     const requestOptions: CliRequestOptions = {

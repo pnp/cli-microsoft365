@@ -165,7 +165,7 @@ export default abstract class Command {
 
       if (!prompted) {
         prompted = true;
-        cli.error('🌶️  Provide values for the following parameters:');
+        await cli.error('🌶️  Provide values for the following parameters:');
       }
 
       const answer = optionInfo.autocomplete !== undefined
@@ -176,10 +176,10 @@ export default abstract class Command {
     }
 
     if (prompted) {
-      cli.error('');
+      await cli.error('');
     }
 
-    this.processOptions(args.options);
+    await this.processOptions(args.options);
 
     return true;
   }
@@ -220,22 +220,22 @@ export default abstract class Command {
   }
 
   private async promptForOptionSetNameAndValue(args: CommandArgs, optionSet: OptionSet): Promise<void> {
-    cli.error(`🌶️  Please specify one of the following options:`);
+    await cli.error(`🌶️  Please specify one of the following options:`);
 
     const selectedOptionName = await prompt.forSelection<string>({ message: `Option to use:`, choices: optionSet.options.map((choice: any) => { return { name: choice, value: choice }; }) });
     const optionValue = await prompt.forInput({ message: `${selectedOptionName}:` });
 
     args.options[selectedOptionName] = optionValue;
-    cli.error('');
+    await cli.error('');
   }
 
   private async promptForSpecificOption(args: CommandArgs, commonOptions: string[]): Promise<void> {
-    cli.error(`🌶️  Multiple options for an option set specified. Please specify the correct option that you wish to use.`);
+    await cli.error(`🌶️  Multiple options for an option set specified. Please specify the correct option that you wish to use.`);
 
     const selectedOptionName = await prompt.forSelection({ message: `Option to use:`, choices: commonOptions.map((choice: any) => { return { name: choice, value: choice }; }) });
 
     commonOptions.filter(y => y !== selectedOptionName).map(optionName => args.options[optionName] = undefined);
-    cli.error('');
+    await cli.error('');
   }
 
   private async validateOutput(args: CommandArgs): Promise<string | boolean> {
@@ -284,7 +284,7 @@ export default abstract class Command {
       throw new CommandError(error);
     }
 
-    this.initAction(args, logger);
+    await this.initAction(args, logger);
 
     if (!auth.connection.active) {
       throw new CommandError('Log in to Microsoft 365 first');
@@ -433,14 +433,14 @@ export default abstract class Command {
     this.handleError(rawResponse);
   }
 
-  protected initAction(args: CommandArgs, logger: Logger): void {
+  protected async initAction(args: CommandArgs, logger: Logger): Promise<void> {
     this.debug = args.options.debug || process.env.CLIMICROSOFT365_DEBUG === '1';
     this.verbose = this.debug || args.options.verbose || process.env.CLIMICROSOFT365_VERBOSE === '1';
     request.debug = this.debug;
     request.logger = logger;
 
     if (this.debug && auth.connection.identityName !== undefined) {
-      logger.logToStderr(`Executing command as '${auth.connection.identityName}', appId: ${auth.connection.appId}, tenantId: ${auth.connection.identityTenantId}`);
+      await logger.logToStderr(`Executing command as '${auth.connection.identityName}', appId: ${auth.connection.appId}, tenantId: ${auth.connection.identityTenantId}`);
     }
 
     telemetry.trackEvent(this.getUsedCommandName(), this.getTelemetryProperties(args));

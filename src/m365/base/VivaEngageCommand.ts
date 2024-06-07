@@ -8,8 +8,8 @@ export default abstract class VivaEngageCommand extends Command {
     return 'https://www.yammer.com/api';
   }
 
-  protected initAction(args: CommandArgs, logger: Logger): void {
-    super.initAction(args, logger);
+  protected async initAction(args: CommandArgs, logger: Logger): Promise<void> {
+    await super.initAction(args, logger);
 
     if (!auth.connection.active) {
       // we fail no login in the base command command class

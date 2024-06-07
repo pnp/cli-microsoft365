@@ -137,7 +137,7 @@ class SpoCommandSetGetCommand extends SpoCommand {
         else {
           const resultAsKeyValuePair = formatting.convertArrayToHashTable('Id', commandSets);
           const commandSet = await cli.handleMultipleResultsFound<CustomAction>(`Multiple command sets with title '${args.options.title}' found.`, resultAsKeyValuePair);
-          logger.log(commandSet);
+          await logger.log(commandSet);
         }
       }
     }

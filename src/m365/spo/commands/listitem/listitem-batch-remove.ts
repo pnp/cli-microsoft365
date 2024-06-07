@@ -159,7 +159,7 @@ class SpoListItemBatchRemoveCommand extends SpoCommand {
     const removeListItems = async (): Promise<void> => {
       try {
         if (this.verbose) {
-          logger.logToStderr('Removing the listitems from SharePoint...');
+          await logger.logToStderr('Removing the listitems from SharePoint...');
         }
 
         let idsToRemove: string[] = [];

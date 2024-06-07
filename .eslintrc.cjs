@@ -143,7 +143,8 @@ module.exports = {
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "ecmaVersion": 2015,
-    "sourceType": "module"
+    "sourceType": "module",
+    "project": "./tsconfig.json"
   },
   "plugins": [
     "@typescript-eslint",
@@ -154,6 +155,7 @@ module.exports = {
     "**/package-generate/assets/**",
     "**/test-projects/**",
     "clientsidepages.ts",
+    "*.d.ts",
     "*.js",
     "*.cjs"
   ],
@@ -235,7 +237,8 @@ module.exports = {
       }
     ],
     "@typescript-eslint/explicit-function-return-type": ["error", { "allowExpressions": true }],
-    "mocha/no-identical-title": "error"
+    "mocha/no-identical-title": "error",
+    "@typescript-eslint/no-floating-promises": "error"
   },
   "overrides": [
     {

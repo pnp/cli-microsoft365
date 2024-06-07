@@ -66,7 +66,7 @@ class PurviewThreatAssessmentListCommand extends GraphCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr('Retrieving a list of threat assessments');
+      await logger.logToStderr('Retrieving a list of threat assessments');
     }
 
     try {

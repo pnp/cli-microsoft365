@@ -27,6 +27,7 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
+    auth.connection.spoUrl = 'https://contoso.sharepoint.com';
     commandInfo = cli.getCommandInfo(command);
   });
 
@@ -940,7 +941,7 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
   });
 
   it('fails validation if the specified url is not a valid SharePoint URL', async () => {
-    const options: any = { url: '/foo', owner: 'user@contoso.com', timeZone: 4 };
+    const options: any = { url: 'abc', owner: 'user@contoso.com', timeZone: 4 };
     const actual = await command.validate({ options: options }, commandInfo);
     assert.strictEqual(typeof actual, 'string');
   });
