@@ -73,26 +73,26 @@ class SpoSiteSetCommand extends SpoCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        classification: typeof args.options.classification === 'string',
-        disableFlows: args.options.disableFlows,
-        socialBarOnSitePagesDisabled: args.options.socialBarOnSitePagesDisabled,
-        isPublic: args.options.isPublic,
+        classification: typeof args.options.classification !== 'undefined',
+        disableFlows: !!args.options.disableFlows,
+        socialBarOnSitePagesDisabled: !!args.options.socialBarOnSitePagesDisabled,
+        isPublic: !!args.options.isPublic,
         owners: typeof args.options.owners !== 'undefined',
-        shareByEmailEnabled: args.options.shareByEmailEnabled,
-        title: typeof args.options.title === 'string',
-        description: typeof args.options.description === 'string',
-        siteDesignId: typeof args.options.siteDesignId !== undefined,
-        sharingCapabilities: args.options.sharingCapability,
+        shareByEmailEnabled: !!args.options.shareByEmailEnabled,
+        title: typeof args.options.title !== 'undefined',
+        description: typeof args.options.description !== 'undefined',
+        siteDesignId: typeof args.options.siteDesignId !== 'undefined',
+        sharingCapabilities: typeof args.options.sharingCapability !== 'undefined',
         siteLogoUrl: typeof args.options.siteLogoUrl !== 'undefined',
         siteThumbnailUrl: typeof args.options.siteThumbnailUrl !== 'undefined',
-        resourceQuota: args.options.resourceQuota,
-        resourceQuotaWarningLevel: args.options.resourceQuotaWarningLevel,
-        storageQuota: args.options.storageQuota,
-        storageQuotaWarningLevel: args.options.storageQuotaWarningLevel,
-        allowSelfServiceUpgrade: args.options.allowSelfServiceUpgrade,
-        lockState: args.options.lockState,
-        noScriptSite: args.options.noScriptSite,
-        wait: args.options.wait === true
+        resourceQuota: typeof args.options.resourceQuota !== 'undefined',
+        resourceQuotaWarningLevel: typeof args.options.resourceQuotaWarningLevel !== 'undefined',
+        storageQuota: typeof args.options.storageQuota !== 'undefined',
+        storageQuotaWarningLevel: typeof args.options.storageQuotaWarningLevel !== 'undefined',
+        allowSelfServiceUpgrade: !!args.options.allowSelfServiceUpgrade,
+        lockState: typeof args.options.lockState !== 'undefined',
+        noScriptSite: !!args.options.noScriptSite,
+        wait: !!args.options.wait
       });
     });
   }
@@ -103,7 +103,10 @@ class SpoSiteSetCommand extends SpoCommand {
         option: '-u, --url <url>'
       },
       {
-        option: '-i, --id [id]'
+        option: '-t, --title [title]'
+      },
+      {
+        option: '-d, --description [description]'
       },
       {
         option: '--classification [classification]'
@@ -131,20 +134,14 @@ class SpoSiteSetCommand extends SpoCommand {
         option: '--siteDesignId [siteDesignId]'
       },
       {
-        option: '--title [title]'
-      },
-      {
-        option: '--description [description]'
+        option: '--sharingCapability [sharingCapability]',
+        autocomplete: this.sharingCapabilities
       },
       {
         option: '--siteLogoUrl [siteLogoUrl]'
       },
       {
         option: '--siteThumbnailUrl [siteThumbnailUrl]'
-      },
-      {
-        option: '--sharingCapability [sharingCapability]',
-        autocomplete: this.sharingCapabilities
       },
       {
         option: '--resourceQuota [resourceQuota]'
