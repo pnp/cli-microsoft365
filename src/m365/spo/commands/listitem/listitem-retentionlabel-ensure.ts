@@ -142,7 +142,7 @@ class SpoListItemRetentionLabelEnsureCommand extends SpoCommand {
     }
 
     if (this.verbose) {
-      logger.logToStderr(`Retrieving the name of the retention label based on the Id '${options.id}'...`);
+      await logger.logToStderr(`Retrieving the name of the retention label based on the Id '${options.id}'...`);
     }
 
     const requestUrl: string = `${options.webUrl}/_api/SP.CompliancePolicy.SPPolicyStoreProxy.GetAvailableTagsForSite(siteUrl=@a1)?@a1='${formatting.encodeQueryParameter(options.webUrl)}'`;
@@ -195,7 +195,7 @@ class SpoListItemRetentionLabelEnsureCommand extends SpoCommand {
     const listAbsoluteUrl = urlUtil.urlCombine(tenantUrl, serverRelativePath);
 
     if (this.verbose) {
-      logger.logToStderr(`List absolute URL found: '${listAbsoluteUrl}'`);
+      await logger.logToStderr(`List absolute URL found: '${listAbsoluteUrl}'`);
     }
 
     return listAbsoluteUrl;

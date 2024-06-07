@@ -1435,7 +1435,7 @@ export const spo = {
   */
   async getFileAsListItemByUrl(absoluteListUrl: string, url: string, logger?: Logger, verbose?: boolean): Promise<any> {
     if (verbose && logger) {
-      logger.logToStderr(`Getting the file properties with url ${url}`);
+      await logger.logToStderr(`Getting the file properties with url ${url}`);
     }
 
     const serverRelativePath = urlUtil.getServerRelativePath(absoluteListUrl, url);
@@ -1475,7 +1475,7 @@ export const spo = {
     const webUrl = `${parsedUrl.protocol}//${parsedUrl.host}${serverRelativeSiteMatch ?? ''}`;
 
     if (verbose && logger) {
-      logger.logToStderr(`Getting list id...`);
+      await logger.logToStderr(`Getting list id...`);
     }
 
     const listRequestOptions: CliRequestOptions = {
@@ -1491,7 +1491,7 @@ export const spo = {
     const listId = list.Id;
 
     if (verbose && logger) {
-      logger.logToStderr(`Getting request digest for systemUpdate request`);
+      await logger.logToStderr(`Getting request digest for systemUpdate request`);
     }
 
     const res = await spo.getRequestDigest(webUrl);
@@ -1657,7 +1657,7 @@ export const spo = {
    */
   async getSiteId(webUrl: string, logger?: Logger, verbose?: boolean): Promise<string> {
     if (verbose && logger) {
-      logger.logToStderr(`Getting site id for URL: ${webUrl}...`);
+      await logger.logToStderr(`Getting site id for URL: ${webUrl}...`);
     }
 
     const url: URL = new URL(webUrl);
@@ -1695,7 +1695,7 @@ export const spo = {
 
     const response = await request.post<string>(requestOptions);
     if (verbose) {
-      logger.logToStderr('Attempt to get _ObjectIdentity_ key values');
+      await logger.logToStderr('Attempt to get _ObjectIdentity_ key values');
     }
 
     const json: ClientSvcResponse = JSON.parse(response);

@@ -95,7 +95,7 @@ class SpoUserEnsureCommand extends SpoCommand {
     if (args.options.aadId) {
       args.options.entraId = args.options.aadId;
 
-      this.warn(logger, `Option 'aadId' is deprecated. Please use 'entraId' instead`);
+      await this.warn(logger, `Option 'aadId' is deprecated. Please use 'entraId' instead`);
     }
 
     if (this.verbose) {

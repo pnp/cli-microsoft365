@@ -1126,7 +1126,7 @@ describe('cli', () => {
   it('correctly handles error when executing command (execute)', async () => {
     sinon.stub(cli, 'executeCommand').throws('Error');
     cli.commandToExecute = cli.commands.find(c => c.name === 'cli completion clink update');
-    assert.rejects(cli.execute(['cli', 'completion', 'clink', 'update']), new Error('Error'));
+    await assert.rejects(cli.execute(['cli', 'completion', 'clink', 'update']), 'Error');
   });
 
   it('correctly handles error when executing command with output', async () => {
@@ -1142,7 +1142,7 @@ describe('cli', () => {
   });
 
   it(`loads all commands, when the matched file doesn't contain command`, async () => {
-    sinon.stub(cli, 'loadCommandFromFile').returns(cli.loadCommandFromFile as any).wrappedMethod.apply(cli, [path.join(rootFolder, 'CommandInfo.js')]);
+    await sinon.stub(cli, 'loadCommandFromFile').returns(cli.loadCommandFromFile as any).wrappedMethod.apply(cli, [path.join(rootFolder, 'CommandInfo.js')]);
     await cli.loadCommandFromArgs(['status']);
 
     assert.strictEqual(cli.commandToExecute, undefined);
@@ -1529,25 +1529,25 @@ describe('cli', () => {
         { "name": "Olympia", "state": "WA" }
       ]
     };
-    assert.rejects(async () => {
+    await assert.rejects(async () => {
       await cli.formatOutput(mockCommand, o, {
         query: `contains(abc)`,
         output: 'json'
       });
-    }, chalk.red('Error: JMESPath query error. ArgumentError: contains() takes 2 arguments but received 1. See https://jmespath.org/specification.html for more information'));
+    }, 'Error: JMESPath query error. Argumenterror: contains() takes 2 arguments but received 1. See https://jmespath.org/specification.html for more information');
   });
 
   it(`prints commands grouped per service when no command specified`, async () => {
-    cli.loadCommandFromArgs(['status']);
-    cli.loadCommandFromArgs(['spo', 'site', 'list']);
+    await cli.loadCommandFromArgs(['status']);
+    await cli.loadCommandFromArgs(['spo', 'site', 'list']);
     cli.printAvailableCommands();
 
     assert(cliLogStub.calledWith('  cli *  8 commands'));
   });
 
   it(`prints commands from the specified group`, async () => {
-    cli.loadCommandFromArgs(['status']);
-    cli.loadCommandFromArgs(['spo', 'site', 'list']);
+    await cli.loadCommandFromArgs(['status']);
+    await cli.loadCommandFromArgs(['spo', 'site', 'list']);
     cli.optionsFromArgs = {
       options: {
         _: ['cli']
@@ -1558,9 +1558,9 @@ describe('cli', () => {
     assert(cliLogStub.calledWith('  cli mock *        5 commands'));
   });
 
-  it(`prints commands from the root group when the specified string doesn't match any group`, () => {
-    cli.loadCommandFromArgs(['status']);
-    cli.loadCommandFromArgs(['spo', 'site', 'list']);
+  it(`prints commands from the root group when the specified string doesn't match any group`, async () => {
+    await cli.loadCommandFromArgs(['status']);
+    await cli.loadCommandFromArgs(['spo', 'site', 'list']);
     cli.optionsFromArgs = {
       options: {
         _: ['foo']

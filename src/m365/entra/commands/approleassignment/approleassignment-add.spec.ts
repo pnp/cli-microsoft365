@@ -153,14 +153,14 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
     getRequestStub();
     postRequestStub();
 
-    command.action(logger, { options: { debug: true, appId: '26e49d05-4227-4ace-ae52-9b8f08f37184', resource: 'exchange', scopes: 'Sites.Read.All' } });
+    await command.action(logger, { options: { debug: true, appId: '26e49d05-4227-4ace-ae52-9b8f08f37184', resource: 'exchange', scopes: 'Sites.Read.All' } });
   });
 
   it('handles appId for the resource option value', async () => {
     getRequestStub();
     postRequestStub();
 
-    command.action(logger, { options: { debug: true, appId: '26e49d05-4227-4ace-ae52-9b8f08f37184', resource: 'fff194f1-7dce-4428-8301-1badb5518201', scopes: 'Sites.Read.All' } });
+    await command.action(logger, { options: { debug: true, appId: '26e49d05-4227-4ace-ae52-9b8f08f37184', resource: 'fff194f1-7dce-4428-8301-1badb5518201', scopes: 'Sites.Read.All' } });
   });
 
   it('rejects if app roles are not found for the specified resource option value', async () => {

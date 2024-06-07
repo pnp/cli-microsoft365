@@ -165,13 +165,13 @@ class SpoGroupMemberRemoveCommand extends SpoCommand {
     if (args.options.aadGroupId) {
       args.options.entraGroupId = args.options.aadGroupId;
 
-      this.warn(logger, `Option 'aadGroupId' is deprecated. Please use 'entraGroupId' instead`);
+      await this.warn(logger, `Option 'aadGroupId' is deprecated. Please use 'entraGroupId' instead`);
     }
 
     if (args.options.aadGroupName) {
       args.options.entraGroupName = args.options.aadGroupName;
 
-      this.warn(logger, `Option 'aadGroupName' is deprecated. Please use 'entraGroupName' instead`);
+      await this.warn(logger, `Option 'aadGroupName' is deprecated. Please use 'entraGroupName' instead`);
     }
 
     if (args.options.force) {

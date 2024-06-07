@@ -34,20 +34,23 @@ describe('DelegatedGraphCommand', () => {
     };
   });
 
+  beforeEach(() => {
+    auth.connection.active = true;
+  });
+
   after(() => {
     sinon.restore();
     auth.connection.active = false;
     auth.connection.accessTokens = {};
   });
 
-  it(`doesn't throw error when not connected`, () => {
+  it(`doesn't throw error when not connected`, async () => {
     auth.connection.active = false;
-    (cmd as any).initAction({ options: {} }, {});
-    auth.connection.active = true;
+    await (cmd as any).initAction({ options: {} }, {});
   });
 
-  it('throws error when using application-only permissions', () => {
+  it('throws error when using application-only permissions', async () => {
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
-    assert.throws(() => (cmd as any).initAction({ options: {} }, {}), new CommandError('This command does not support application-only permissions.'));
+    await assert.rejects(() => (cmd as any).initAction({ options: {} }, {}), new CommandError('This command does not support application-only permissions.'));
   });
 });

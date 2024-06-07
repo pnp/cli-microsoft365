@@ -105,11 +105,11 @@ describe('PowerBICommand', () => {
     assert.strictEqual((command as any).resource, 'https://api.powerbi.com');
   });
 
-  it('throws error when using application-only permissions', () => {
+  it('throws error when using application-only permissions', async () => {
     const cmd = new MockCommand();
     sinonUtil.restore(accessToken.isAppOnlyAccessToken);
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
     auth.connection.active = true;
-    assert.throws(() => (cmd as any).initAction({ options: {} }, {}), new CommandError('This command does not support application-only permissions.'));
+    await assert.rejects(() => (cmd as any).initAction({ options: {} }, {}), new CommandError('This command does not support application-only permissions.'));
   });
 });

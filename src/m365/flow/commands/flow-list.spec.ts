@@ -1519,12 +1519,16 @@ describe(commands.LIST, () => {
 
   it('retrieves flows including flows from solutions', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === 'https://api.flow.microsoft.com/providers/Microsoft.ProcessSimple/environments/${environmentId}/flows?api-version=2016-11-01&include=includeSolutionCloudFlows') {
+      if (opts.url === `https://api.flow.microsoft.com/providers/Microsoft.ProcessSimple/environments/${environmentId}/flows?api-version=2016-11-01&include=includeSolutionCloudFlows`) {
         return {
           value: [
             {
               name: "1c6ee23a-a835-44bc-a4f5-462b658efc13",
-              id: "/providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c5/flows/1c6ee23a-a835-44bc-a4f5-462b658efc13"
+              id: "/providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c5/flows/1c6ee23a-a835-44bc-a4f5-462b658efc13",
+              properties: {
+                "apiId": "/providers/Microsoft.PowerApps/apis/shared_logicflows",
+                "displayName": "Get a daily digest of the top CNN news"
+              }
             }
           ]
         };
@@ -1533,27 +1537,40 @@ describe(commands.LIST, () => {
       throw 'Invalid request';
     });
 
-    command.action(logger, { options: { environmentName: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c5', includeSolutions: true } } as any);
+    await command.action(logger, { options: { environmentName: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c5', includeSolutions: true } } as any);
+
     loggerLogSpy.calledWith([
       {
         name: "1c6ee23a-a835-44bc-a4f5-462b658efc13",
-        id: "/providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c5/flows/1c6ee23a-a835-44bc-a4f5-462b658efc13"
+        id: "/providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c5/flows/1c6ee23a-a835-44bc-a4f5-462b658efc13",
+        properties: {
+          "apiId": "/providers/Microsoft.PowerApps/apis/shared_logicflows",
+          "displayName": "Get a daily digest of the top CNN news"
+        }
       }
     ]);
   });
 
   it('retrieves flows and removes duplicates', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === 'https://api.flow.microsoft.com/providers/Microsoft.ProcessSimple/environments/${environmentId}/flows?api-version=2016-11-01') {
+      if (opts.url === `https://api.flow.microsoft.com/providers/Microsoft.ProcessSimple/environments/${environmentId}/flows?api-version=2016-11-01`) {
         return {
           value: [
             {
               name: "1c6ee23a-a835-44bc-a4f5-462b658efc13",
-              id: "/providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c5/flows/1c6ee23a-a835-44bc-a4f5-462b658efc13"
+              id: "/providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c5/flows/1c6ee23a-a835-44bc-a4f5-462b658efc13",
+              properties: {
+                "apiId": "/providers/Microsoft.PowerApps/apis/shared_logicflows",
+                "displayName": "Get a daily digest of the top CNN news"
+              }
             },
             {
               name: "1c6ee23a-a835-44bc-a4f5-462b658efc13",
-              id: "/providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c5/flows/1c6ee23a-a835-44bc-a4f5-462b658efc13"
+              id: "/providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c5/flows/1c6ee23a-a835-44bc-a4f5-462b658efc13",
+              properties: {
+                "apiId": "/providers/Microsoft.PowerApps/apis/shared_logicflows",
+                "displayName": "Get a daily digest of the top CNN news"
+              }
             }
           ]
         };
@@ -1562,11 +1579,15 @@ describe(commands.LIST, () => {
       throw 'Invalid request';
     });
 
-    command.action(logger, { options: { environmentName: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c5' } } as any);
+    await command.action(logger, { options: { environmentName: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c5' } } as any);
     loggerLogSpy.calledWith([
       {
         name: "1c6ee23a-a835-44bc-a4f5-462b658efc13",
-        id: "/providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c5/flows/1c6ee23a-a835-44bc-a4f5-462b658efc13"
+        id: "/providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c5/flows/1c6ee23a-a835-44bc-a4f5-462b658efc13",
+        properties: {
+          "apiId": "/providers/Microsoft.PowerApps/apis/shared_logicflows",
+          "displayName": "Get a daily digest of the top CNN news"
+        }
       }
     ]);
   });

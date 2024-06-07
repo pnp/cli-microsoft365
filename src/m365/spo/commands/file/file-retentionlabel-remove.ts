@@ -124,7 +124,7 @@ class SpoFileRetentionLabelRemoveCommand extends SpoCommand {
 
   private async getFileProperties(logger: Logger, args: CommandArgs): Promise<{ listItemId: string, listServerRelativeUrl: string }> {
     if (this.verbose) {
-      logger.logToStderr(`Retrieving list and item information for file '${args.options.fileId || args.options.fileUrl}' in site at ${args.options.webUrl}...`);
+      await logger.logToStderr(`Retrieving list and item information for file '${args.options.fileId || args.options.fileUrl}' in site at ${args.options.webUrl}...`);
     }
 
     let requestUrl = `${args.options.webUrl}/_api/web/`;

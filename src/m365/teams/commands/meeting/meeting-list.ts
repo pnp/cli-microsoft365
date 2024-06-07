@@ -183,7 +183,7 @@ class TeamsMeetingListCommand extends GraphCommand {
 
     for (let i = 0; i < meetingUrls.length; i += 20) {
       if (this.verbose) {
-        logger.logToStderr(`Retrieving meetings ${i + 1}-${Math.min(i + 20, meetingUrls.length)}...`);
+        await logger.logToStderr(`Retrieving meetings ${i + 1}-${Math.min(i + 20, meetingUrls.length)}...`);
       }
       const batch = meetingUrls.slice(i, i + 20);
       const requestOptions: CliRequestOptions = {

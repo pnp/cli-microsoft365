@@ -812,15 +812,16 @@ describe('chili', () => {
     sinon.stub(request, 'post').callsFake(async options => {
       switch (options.url) {
         case 'https://api.mendable.ai/v0/newConversation':
-          return Promise.reject('An error has occurred');
+          throw new Error('An error has occurred');
       }
       throw `Invalid request: ${options.url}`;
     });
+
     sinon.stub(prompt, 'forSelection').resolves({});
-    assert.rejects(chili.startConversation(['Hello']), 'An error has occurred');
+    await assert.rejects(chili.startConversation(['Hello']), new Error('An error has occurred'));
   });
 
-  it('throw exception when calling Mendable API to search in CLI docs failed', () => {
+  it('throw exception when calling Mendable API to search in CLI docs failed', async () => {
     sinon.stub(request, 'post').callsFake(async options => {
       switch (options.url) {
         case 'https://api.mendable.ai/v0/newConversation':
@@ -829,12 +830,12 @@ describe('chili', () => {
             conversation_id: 1
           };
         case 'https://api.mendable.ai/v0/mendableChat':
-          throw 'An error has occurred';
+          throw new Error('An error has occurred');
       }
       throw `Invalid request: ${options.url}`;
     });
     sinon.stub(prompt, 'forSelection').resolves({});
-    assert.rejects(chili.startConversation(['Hello']), 'An error has occurred');
+    await assert.rejects(chili.startConversation(['Hello']), new Error('An error has occurred'));
   });
 
   it('shows help when requested using --help', async () => {
