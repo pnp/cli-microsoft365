@@ -68,6 +68,7 @@ const dictionary = [
   'logout',
   'management',
   'member',
+  'membership',
   'messaging',
   'model',
   'multitenant',
