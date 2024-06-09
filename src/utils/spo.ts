@@ -141,6 +141,124 @@ interface CopyJobObjectInfo {
 // Wrapping this into a settings object so we can alter the values in tests
 const pollingInterval = 3_000;
 
+interface TenantSiteProperties {
+  AllowDownloadingNonWebViewableFiles: boolean;
+  AllowEditing: boolean;
+  AllowSelfServiceUpgrade: boolean;
+  AnonymousLinkExpirationInDays: number;
+  ApplyToExistingDocumentLibraries: boolean;
+  ApplyToNewDocumentLibraries: boolean;
+  ArchivedBy: string;
+  ArchivedTime: string;
+  ArchiveStatus: string;
+  AuthContextStrength: any;
+  AuthenticationContextLimitedAccess: boolean;
+  AuthenticationContextName: any;
+  AverageResourceUsage: number;
+  BlockDownloadLinksFileType: number;
+  BlockDownloadMicrosoft365GroupIds: any;
+  BlockDownloadPolicy: boolean;
+  BlockDownloadPolicyFileTypeIds: any;
+  BlockGuestsAsSiteAdmin: number;
+  BonusDiskQuota: string;
+  ClearRestrictedAccessControl: boolean;
+  CommentsOnSitePagesDisabled: boolean;
+  CompatibilityLevel: number;
+  ConditionalAccessPolicy: number;
+  CurrentResourceUsage: number;
+  DefaultLinkPermission: number;
+  DefaultLinkToExistingAccess: boolean;
+  DefaultLinkToExistingAccessReset: boolean;
+  DefaultShareLinkRole: number;
+  DefaultShareLinkScope: number;
+  DefaultSharingLinkType: number;
+  DenyAddAndCustomizePages: number;
+  Description: string;
+  DisableAppViews: number;
+  DisableCompanyWideSharingLinks: number;
+  DisableFlows: number;
+  EnableAutoExpirationVersionTrim: boolean;
+  ExcludeBlockDownloadPolicySiteOwners: boolean;
+  ExcludeBlockDownloadSharePointGroups: any[];
+  ExcludedBlockDownloadGroupIds: any[];
+  ExpireVersionsAfterDays: number;
+  ExternalUserExpirationInDays: number;
+  GroupId: string;
+  GroupOwnerLoginName: string;
+  HasHolds: boolean;
+  HubSiteId: string;
+  IBMode: string;
+  IBSegments: any[];
+  IBSegmentsToAdd: any;
+  IBSegmentsToRemove: any;
+  InheritVersionPolicyFromTenant: boolean;
+  IsGroupOwnerSiteAdmin: boolean;
+  IsHubSite: boolean;
+  IsTeamsChannelConnected: boolean;
+  IsTeamsConnected: boolean;
+  LastContentModifiedDate: string;
+  Lcid: string;
+  LimitedAccessFileType: number;
+  ListsShowHeaderAndNavigation: boolean;
+  LockIssue: any;
+  LockReason: number;
+  LockState: string;
+  LoopDefaultSharingLinkRole: number;
+  LoopDefaultSharingLinkScope: number;
+  MajorVersionLimit: number;
+  MajorWithMinorVersionsLimit: number;
+  MediaTranscription: number;
+  OverrideBlockUserInfoVisibility: number;
+  OverrideSharingCapability: boolean;
+  OverrideTenantAnonymousLinkExpirationPolicy: boolean;
+  OverrideTenantExternalUserExpirationPolicy: boolean;
+  Owner: string;
+  OwnerEmail: string;
+  OwnerLoginName: string;
+  OwnerName: string;
+  PWAEnabled: number;
+  ReadOnlyAccessPolicy: boolean;
+  ReadOnlyForBlockDownloadPolicy: boolean;
+  ReadOnlyForUnmanagedDevices: boolean;
+  RelatedGroupId: string;
+  RequestFilesLinkEnabled: boolean;
+  RequestFilesLinkExpirationInDays: number;
+  RestrictContentOrgWideSearch: boolean;
+  RestrictedAccessControl: boolean;
+  RestrictedAccessControlGroups: any[];
+  RestrictedAccessControlGroupsToAdd: any;
+  RestrictedAccessControlGroupsToRemove: any;
+  RestrictedToRegion: number;
+  SandboxedCodeActivationCapability: number;
+  SensitivityLabel: string;
+  SensitivityLabel2: any;
+  SetOwnerWithoutUpdatingSecondaryAdmin: boolean;
+  SharingAllowedDomainList: string;
+  SharingBlockedDomainList: string;
+  SharingCapability: number;
+  SharingDomainRestrictionMode: number;
+  SharingLockDownCanBeCleared: boolean;
+  SharingLockDownEnabled: boolean;
+  ShowPeoplePickerSuggestionsForGuestUsers: boolean;
+  SiteDefinedSharingCapability: number;
+  SiteId: string;
+  SocialBarOnSitePagesDisabled: boolean;
+  Status: string;
+  StorageMaximumLevel: string;
+  StorageQuotaType: any;
+  StorageUsage: string;
+  StorageWarningLevel: string;
+  TeamsChannelType: number;
+  Template: string;
+  TimeZoneId: number;
+  Title: string;
+  TitleTranslations: Array<{ LCID: number; Value: string }>;
+  Url: string;
+  UserCodeMaximumLevel: number;
+  UserCodeWarningLevel: number;
+  WebsCount: number;
+}
+
 export const spo = {
   async getRequestDigest(siteUrl: string): Promise<FormDigestInfo> {
     const requestOptions: CliRequestOptions = {
@@ -2104,5 +2222,37 @@ export const spo = {
 
     const responseContent = await request.get<{ LoginName: string }>(requestOptions);
     return responseContent?.LoginName;
+  },
+
+  /**
+  * Retrieves the site admin properties for a given site URL.
+  * @param adminUrl The SharePoint admin url.
+  * @param siteUrl URL of the site for which to retrieve properties.
+  * @param includeDetail Set to true to include detailed properties.
+  * @param logger The logger object.
+  * @param verbose Set for verbose logging.
+  * @returns Tenant Site properties.
+  */
+  async getSiteAdminPropertiesByUrl(siteUrl: string, includeDetail: boolean, logger: Logger, verbose?: boolean): Promise<TenantSiteProperties> {
+    if (verbose) {
+      await logger.logToStderr(`Getting site admin properties for URL: ${siteUrl}...`);
+    }
+
+    const adminUrl: string = await spo.getSpoAdminUrl(logger, !!verbose);
+
+    const requestOptions: CliRequestOptions = {
+      url: `${adminUrl}/_api/SPO.Tenant/GetSitePropertiesByUrl`,
+      headers: {
+        accept: 'application/json;odata=nometadata',
+        'content-type': 'application/json;charset=utf-8'
+      },
+      data: {
+        url: siteUrl,
+        includeDetail: includeDetail
+      },
+      responseType: 'json'
+    };
+
+    return request.post<TenantSiteProperties>(requestOptions);
   }
 };
