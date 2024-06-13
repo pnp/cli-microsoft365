@@ -105,7 +105,7 @@ describe(commands.SITE_SET, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if no property is specified', async () => {
+  it('fails validation if no option is specified', async () => {
     const actual = await command.validate({
       options: {
         url: 'https://contoso.sharepoint.com/sites/team'
