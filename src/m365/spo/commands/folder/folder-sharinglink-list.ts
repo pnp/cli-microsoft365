@@ -49,7 +49,6 @@ class SpoFolderSharingLinkListCommand extends SpoCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        webUrl: typeof args.options.webUrl !== 'undefined',
         folderUrl: typeof args.options.folderUrl !== 'undefined',
         folderId: typeof args.options.folderId !== 'undefined',
         scope: typeof args.options.scope !== 'undefined'

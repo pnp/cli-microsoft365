@@ -6,7 +6,6 @@ import { CommandError } from '../../../../Command.js';
 import { telemetry } from '../../../../telemetry.js';
 import { Logger } from '../../../../cli/Logger.js';
 import request from '../../../../request.js';
-import { formatting } from '../../../../utils/formatting.js';
 import { odata } from '../../../../utils/odata.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
@@ -14,6 +13,9 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import commands from '../../commands.js';
 import command from './folder-sharinglink-list.js';
+import { spo } from '../../../../utils/spo.js';
+import { driveUtil } from '../../../../utils/driveUtil.js';
+import { Drive } from '@microsoft/microsoft-graph-types';
 
 describe(commands.FOLDER_SHARINGLINK_LIST, () => {
   let log: any[];
@@ -89,40 +91,16 @@ describe(commands.FOLDER_SHARINGLINK_LIST, () => {
     }
   ];
 
-  const getDriveResponse: any = {
-    value: [
-      {
-        "id": driveId,
-        "webUrl": `${webUrl}/Shared%20Documents`
-      }
-    ]
+  const drive: Drive = {
+    id: driveId,
+    webUrl: `${webUrl}/Shared%20Documents`
   };
 
-  const defaultGetStub = (): sinon.SinonStub => {
-    return sinon.stub(request, 'get').callsFake(async opts => {
-      if (opts.url === `${webUrl}/_api/web/GetFolderById('${folderId}')?$select=ServerRelativeUrl`) {
-        return { ServerRelativeUrl: folderUrl };
-      }
-      else if (opts.url === `${webUrl}/_api/web/GetFolderByServerRelativePath(decodedUrl='${formatting.encodeQueryParameter('/sites/project-x/shared documents')}')?$select=ServerRelativeUrl`) {
-        return { ServerRelativeUrl: '/sites/project-x/shared documents' };
-      }
-      else if (opts.url === `${webUrl}/_api/web/GetFolderById('invalid')?$select=ServerRelativeUrl`) {
-        throw { error: { 'odata.error': { message: { value: 'File Not Found.' } } } };
-      }
-      else if (opts.url === `https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com:/sites/project-x?$select=id`) {
-        return { id: siteId };
-      }
-      else if (opts.url === `https://graph.microsoft.com/v1.0/sites/${siteId}/drives?$select=webUrl,id`) {
-        return getDriveResponse;
-      }
-      else if (opts.url === `https://graph.microsoft.com/v1.0/drives/${driveId}/root:/folder1?$select=id` ||
-        opts.url === `https://graph.microsoft.com/v1.0/drives/${driveId}/root?$select=id`
-      ) {
-        return { id: itemId };
-      }
-
-      throw 'Invalid request';
-    });
+  const getStubs: any = (options: any) => {
+    sinon.stub(spo, 'getFolderServerRelativeUrl').resolves(options.folderUrl);
+    sinon.stub(spo, 'getSiteId').resolves(options.siteId);
+    sinon.stub(driveUtil, 'getDriveByUrl').resolves(options.drive);
+    sinon.stub(driveUtil, 'getDriveItemId').resolves(options.itemId);
   };
 
   const stubOdataResponse: any = (graphResponse: any = null) => {
@@ -171,7 +149,11 @@ describe(commands.FOLDER_SHARINGLINK_LIST, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.get,
-      odata.getAllItems
+      odata.getAllItems,
+      spo.getSiteId,
+      spo.getFolderServerRelativeUrl,
+      driveUtil.getDriveByUrl,
+      driveUtil.getDriveItemId
     ]);
   });
 
@@ -209,55 +191,44 @@ describe(commands.FOLDER_SHARINGLINK_LIST, () => {
   });
 
   it('retrieves sharing links from folder specified by id', async () => {
-    defaultGetStub();
+    getStubs({ folderUrl: folderUrl, siteId: siteId, drive: drive, itemId: itemId });
     stubOdataResponse(graphResponse);
 
-    await command.action(logger, { options: { webUrl: webUrl, folderId: folderId } } as any);
+    await command.action(logger, { options: { webUrl: webUrl, folderId: folderId, verbose: true } } as any);
     assert(loggerLogSpy.calledWith(graphResponse.value));
   });
 
   it('retrieves sharing links from folder specified by url', async () => {
-    defaultGetStub();
+    getStubs({ folderUrl: folderUrl, siteId: siteId, drive: drive, itemId: itemId });
     stubOdataResponse(graphResponse);
 
-    await command.action(logger, { options: { webUrl: webUrl, folderUrl: '/sites/project-x/shared documents/' } } as any);
+    await command.action(logger, { options: { webUrl: webUrl, folderUrl: folderUrl, verbose: true } } as any);
     assert(loggerLogSpy.calledWith(graphResponse.value));
   });
 
   it('retrieves sharing links from folder specified by id and valid scope', async () => {
     const scope = 'organization';
-    defaultGetStub();
+    getStubs({ folderUrl: folderUrl, siteId: siteId, drive: drive, itemId: itemId });
     stubOdataScopeResponse(scope, graphResponse);
 
-    await command.action(logger, { options: { webUrl: webUrl, folderId: folderId, scope: scope, verbose: true } } as any);
+    await command.action(logger, { options: { webUrl: webUrl, folderId: folderId, scope: scope } } as any);
     assert(loggerLogSpy.calledWith(graphResponse.value.filter(x => x.link.scope === scope)));
   });
 
   it('retrieves sharing links from folder specified by id and output as text', async () => {
     const scope = 'anonymous';
-    defaultGetStub();
+    getStubs({ folderUrl: folderUrl, siteId: siteId, drive: drive, itemId: itemId });
     stubOdataScopeResponse(scope, graphResponse);
 
     await command.action(logger, { options: { webUrl: webUrl, folderId: folderId, scope: scope, output: 'text' } } as any);
     assert(loggerLogSpy.calledWith(graphResponseText));
   });
 
-  it('throws error when folder not found by id', async () => {
-    defaultGetStub();
-
-    await assert.rejects(command.action(logger, { options: { webUrl: webUrl, folderId: 'invalid', verbose: true } } as any),
-      new CommandError(`File Not Found.`));
-  });
-
   it('throws error when drive not found by url', async () => {
+    sinon.stub(spo, 'getFolderServerRelativeUrl').resolves(folderUrl);
+    sinon.stub(spo, 'getSiteId').resolves(siteId);
     sinon.stub(request, 'get').callsFake(async opts => {
-      if (opts.url === `${webUrl}/_api/web/GetFolderByServerRelativePath(decodedUrl='${formatting.encodeQueryParameter(folderUrl)}')?$select=ServerRelativeUrl`) {
-        return { ServerRelativeUrl: folderUrl };
-      }
-      else if (opts.url === `https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com:/sites/project-x?$select=id`) {
-        return { id: siteId };
-      }
-      else if (opts.url === `https://graph.microsoft.com/v1.0/sites/${siteId}/drives?$select=webUrl,id`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/sites/${siteId}/drives?$select=webUrl,id`) {
         return {
           value: []
         };
