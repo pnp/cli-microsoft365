@@ -1955,6 +1955,35 @@ describe('utils/spo', () => {
     assert.strictEqual(id, 'contoso.sharepoint.com,ea49a393-e3e6-4760-a1b2-e96539e15372,66e2861c-96d9-4418-a75c-0ed1bca68b42');
   });
 
+  it('returns the folder server relative URL by URL', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `${webUrl}/_api/web/GetFolderByServerRelativePath(decodedUrl='${formatting.encodeQueryParameter('/sites/sales/shared documents/folder1')}')?$select=ServerRelativeUrl`
+      ) {
+        return { ServerRelativeUrl: '/sites/sales/shared documents/folder1' };
+      }
+
+      throw 'Invalid request';
+    });
+
+    const url = await spo.getFolderServerRelativeUrl(webUrl, '/sites/sales/shared documents/folder1', undefined);
+
+    assert.strictEqual(url, '/sites/sales/shared documents/folder1');
+  });
+
+  it('returns the folder server relative URL by id', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `${webUrl}/_api/web/GetFolderById('f09c4efe-b8c0-4e89-a166-03418661b89b')?$select=ServerRelativeUrl`) {
+        return { ServerRelativeUrl: '/sites/sales/shared documents/folder1' };
+      }
+
+      throw 'Invalid request';
+    });
+
+    const url = await spo.getFolderServerRelativeUrl(webUrl, undefined, 'f09c4efe-b8c0-4e89-a166-03418661b89b');
+
+    assert.strictEqual(url, '/sites/sales/shared documents/folder1');
+  });
+
   it(`get the file properties with the server relative url`, async () => {
     const fileResponse = {
       ListItemAllFields: {

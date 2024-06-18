@@ -33,7 +33,7 @@ export const driveUtil = {
       });
 
     if (!drive) {
-      throw `Drive '${url.href}' not found`;
+      throw new Error(`Drive '${url.href}' not found`);
     }
 
     return drive;
