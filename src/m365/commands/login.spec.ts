@@ -300,7 +300,14 @@ describe(commands.LOGIN, () => {
   });
 
   it(`doesn't start the login flow when the CLI is signed in`, async () => {
+    const now = new Date();
+    now.setSeconds(now.getSeconds() + 1);
     auth.connection.active = false;
+    auth.connection.authType = AuthType.DeviceCode;
+    auth.connection.accessTokens[auth.defaultResource] = {
+      expiresOn: now.toISOString(),
+      accessToken: 'abc'
+    };
 
     await command.action(logger, { options: { ensure: true } });
     await command.action(logger, { options: { ensure: true } });
@@ -309,7 +316,13 @@ describe(commands.LOGIN, () => {
   });
 
   it(`doesn't start the login flow if the CLI is signed in as a user`, async () => {
+    const now = new Date();
+    now.setSeconds(now.getSeconds() + 1);
     auth.connection.active = false;
+    auth.connection.accessTokens[auth.defaultResource] = {
+      expiresOn: now.toISOString(),
+      accessToken: 'abc'
+    };
 
     await command.action(logger, { options: { ensure: true, authType: 'password', userName: 'john.doe@contoso.com', password: 'password' } });
     await command.action(logger, { options: { ensure: true, authType: 'password', userName: 'john.doe@contoso.com', password: 'password' } });
@@ -318,19 +331,32 @@ describe(commands.LOGIN, () => {
   });
 
   it(`doesn't start the login flow if the CLI is signed in using a certificate`, async () => {
+    const now = new Date();
+    now.setSeconds(now.getSeconds() + 1);
     auth.connection.active = false;
+    auth.connection.accessTokens[auth.defaultResource] = {
+      expiresOn: now.toISOString(),
+      accessToken: 'abc'
+    };
     auth.connection.certificate = 'certificate';
 
     sinon.stub(fs, 'readFileSync').callsFake(() => 'certificate');
 
-    await command.action(logger, { options: { ensure: true, authType: 'certificate ', certificateFile: 'certificate' } });
-    await command.action(logger, { options: { ensure: true, authType: 'certificate ', certificateFile: 'certificate' } });
+    await command.action(logger, { options: { ensure: true, authType: 'certificate', certificateFile: 'certificate' } });
+    await command.action(logger, { options: { ensure: true, authType: 'certificate', certificateFile: 'certificate' } });
 
     assert(deactivateStub.callCount === 1);
   });
 
   it(`doesn't start the login flow if the CLI is signed in using the specified app and to the specified tenant`, async () => {
+    const now = new Date();
+    now.setSeconds(now.getSeconds() + 1);
     auth.connection.active = false;
+    auth.connection.authType = AuthType.DeviceCode;
+    auth.connection.accessTokens[auth.defaultResource] = {
+      expiresOn: now.toISOString(),
+      accessToken: 'abc'
+    };
 
     await command.action(logger, { options: { ensure: true, appId: '1cf21ca6-c8f0-4a21-839d-68a09d3a0f55', tenant: '973fce64-6409-4843-9328-c2cef0427f4e' } });
     await command.action(logger, { options: { ensure: true, appId: '1cf21ca6-c8f0-4a21-839d-68a09d3a0f55', tenant: '973fce64-6409-4843-9328-c2cef0427f4e' } });
@@ -338,11 +364,115 @@ describe(commands.LOGIN, () => {
     assert(deactivateStub.callCount === 1);
   });
 
-  it(`starts the login flow again when using a different app id and tenant`, async () => {
+  it(`starts the login flow again when using a different auth type`, async () => {
+    auth.connection.active = false;
+
+    await command.action(logger, { options: { ensure: true, authType: 'password', userName: 'user@contoso.com', password: 'pass@word1' } });
+    await command.action(logger, { options: { ensure: true, authType: 'identity', userName: 'ac9fbed5-804c-4362-a369-21a4ec51109e' } });
+
+    assert(deactivateStub.callCount === 2);
+  });
+
+  it(`starts the login flow again when using a different cloud type`, async () => {
+    auth.connection.active = false;
+    auth.connection.authType = AuthType.DeviceCode;
+
+    await command.action(logger, { options: { ensure: true, cloud: 'Public' } });
+    await command.action(logger, { options: { ensure: true, cloud: 'USGov' } });
+
+    assert(deactivateStub.callCount === 2);
+  });
+
+  it(`starts the login flow again when using a different app id`, async () => {
+    auth.connection.active = false;
+
+    await command.action(logger, { options: { ensure: true, appId: '1cf21ca6-c8f0-4a21-839d-68a09d3a0f55' } });
+    await command.action(logger, { options: { ensure: true, appId: 'b059efda-fc9d-49ec-b585-283f5b26202e' } });
+
+    assert(deactivateStub.callCount === 2);
+  });
+
+  it(`starts the login flow again when using a different tenant id`, async () => {
     auth.connection.active = false;
 
     await command.action(logger, { options: { ensure: true, appId: '1cf21ca6-c8f0-4a21-839d-68a09d3a0f55', tenant: '973fce64-6409-4843-9328-c2cef0427f4e' } });
-    await command.action(logger, { options: { ensure: true, appId: 'b059efda-fc9d-49ec-b585-283f5b26202e', tenant: '7f7993c9-ae48-413a-ae6b-d816a669f602' } });
+    await command.action(logger, { options: { ensure: true, appId: '1cf21ca6-c8f0-4a21-839d-68a09d3a0f55', tenant: '7f7993c9-ae48-413a-ae6b-d816a669f602' } });
+
+    assert(deactivateStub.callCount === 2);
+  });
+
+  it(`starts the login flow again when using a different username and authType password`, async () => {
+    auth.connection.active = false;
+
+    await command.action(logger, { options: { ensure: true, authType: 'password', userName: 'user@contoso.com', password: 'pass@word1' } });
+    await command.action(logger, { options: { ensure: true, authType: 'password', userName: 'user1@contoso.com', password: 'pass@word1' } });
+
+    assert(deactivateStub.callCount === 2);
+  });
+
+  it(`starts the login flow again when using a different certificate file`, async () => {
+    auth.connection.active = false;
+    let count = 0;
+    sinon.stub(fs, 'readFileSync').callsFake(() => {
+      count++;
+      if (count === 2) {
+        return 'certificate1';
+      }
+
+      return 'certificate';
+    });
+
+    await command.action(logger, { options: { ensure: true, authType: 'certificate', certificateFile: 'certificate' } });
+    await command.action(logger, { options: { ensure: true, authType: 'certificate', certificateFile: 'certificate1' } });
+
+    assert(deactivateStub.callCount === 2);
+  });
+
+  it(`starts the login flow again when using a different username and authType identity`, async () => {
+    auth.connection.active = false;
+
+    await command.action(logger, { options: { ensure: true, authType: 'identity', userName: 'ac9fbed5-804c-4362-a369-21a4ec51109e' } });
+    await command.action(logger, { options: { ensure: true, authType: 'identity', userName: '1cf21ca6-c8f0-4a21-839d-68a09d3a0f55' } });
+
+    assert(deactivateStub.callCount === 2);
+  });
+
+  it(`starts the login flow again when using a different secret`, async () => {
+    auth.connection.active = false;
+
+    await command.action(logger, { options: { ensure: true, authType: 'secret', secret: 'topSeCr3t@007' } });
+    await command.action(logger, { options: { ensure: true, authType: 'secret', secret: 'topSeCr3t@008' } });
+
+    assert(deactivateStub.callCount === 2);
+  });
+
+  it(`starts the login flow when the access token expiresOn is a Date`, async () => {
+    const now = new Date();
+    now.setSeconds(now.getSeconds() - 1);
+
+    auth.connection.accessTokens[auth.defaultResource] = {
+      expiresOn: now,
+      accessToken: 'abc'
+    };
+    auth.connection.active = false;
+    auth.connection.authType = AuthType.DeviceCode;
+
+    await command.action(logger, { options: { ensure: true } });
+    await command.action(logger, { options: { ensure: true } });
+
+    assert(deactivateStub.callCount === 2);
+  });
+
+  it(`starts the login flow again when the access token is expired`, async () => {
+    auth.connection.accessTokens[auth.defaultResource] = {
+      expiresOn: null,
+      accessToken: 'abc'
+    };
+    auth.connection.active = false;
+    auth.connection.authType = AuthType.DeviceCode;
+
+    await command.action(logger, { options: { ensure: true } });
+    await command.action(logger, { options: { ensure: true } });
 
     assert(deactivateStub.callCount === 2);
   });

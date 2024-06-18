@@ -15,6 +15,11 @@ interface CommandArgs {
   options: Options;
 }
 
+interface AccessToken {
+  expiresOn: Date | string | null;
+  accessToken: string;
+}
+
 interface Options extends GlobalOptions {
   authType?: string;
   cloud?: string;
@@ -203,7 +208,7 @@ class LoginCommand extends Command {
         auth.connection.cloudType = CloudType.Public;
       }
 
-      await this.getAccessToken(logger);
+      await this.ensureAccessToken(logger);
 
       const details = auth.getConnectionDetails(auth.connection);
 
@@ -214,26 +219,14 @@ class LoginCommand extends Command {
       await logger.log(details);
     };
 
-    const renewConnection = this.shouldRenewConnection(args.options);
+    const shouldReconnect = this.shouldReconnect(args.options);
 
-    try {
-      if (renewConnection) {
-        await auth.clearConnectionInfo();
-      }
+    if (shouldReconnect) {
+      deactivate();
+      await login();
     }
-    catch (error: any) {
-      if (this.debug) {
-        await logger.logToStderr(new CommandError(error));
-      }
-    }
-    finally {
-      if (!renewConnection) {
-        await this.getAccessToken(logger);
-      }
-      else {
-        deactivate();
-        await login();
-      }
+    else {
+      await this.ensureAccessToken(logger);
     }
   }
 
@@ -249,23 +242,66 @@ class LoginCommand extends Command {
     await this.commandAction(logger, args);
   }
 
-  private shouldRenewConnection(options: Options): boolean {
+  private shouldReconnect(options: Options): boolean {
     const authType = options.authType || cli.getSettingWithDefaultValue<string>(settingsNames.authType, 'deviceCode');
-    const ensure: boolean | undefined = options.ensure;
 
-    if (!ensure || (
-      (!auth.connection.active && AuthType[authType as keyof typeof AuthType] !== auth.connection.authType) ||
-      (options.userName && options.userName !== auth.connection.userName) ||
-      (options.certificateFile && (auth.connection.certificate !== fs.readFileSync(options.certificateFile as string, 'base64'))) ||
-      (options.appId && options.appId !== auth.connection.appId) ||
-      (options.tenant && options.tenant !== auth.connection.tenant))) {
+    if (!auth.connection.active) {
+      return true;
+    }
+
+    if (!options.ensure) {
+      return true;
+    }
+
+    if (authType.toLocaleLowerCase() !== AuthType[auth.connection.authType].toLocaleLowerCase()) {
+      return true;
+    }
+
+    if (options.cloud && options.cloud.toLocaleLowerCase() !== CloudType[auth.connection.cloudType].toLocaleLowerCase()) {
+      return true;
+    }
+
+    if (options.appId && options.appId !== auth.connection.appId) {
+      return true;
+    }
+
+    if (options.tenant && options.tenant !== auth.connection.tenant) {
+      return true;
+    }
+
+    if (authType === 'password' && (options.password && options.userName !== auth.connection.userName)) {
+      return true;
+    }
+
+    if (authType === 'certificate' && (options.certificateFile && (auth.connection.certificate !== fs.readFileSync(options.certificateFile as string, 'base64')))) {
+      return true;
+    }
+
+    if (authType === 'identity' && (options.userName && options.userName !== auth.connection.userName)) {
+      return true;
+    }
+
+    if (authType === 'secret' && (options.secret && options.secret !== auth.connection.secret)) {
+      return true;
+    }
+
+    const now: Date = new Date();
+    const accessToken: AccessToken | undefined = auth.connection.accessTokens[auth.defaultResource];
+
+    const expiresOn: Date = accessToken && accessToken.expiresOn ?
+      // if expiresOn is serialized from the service file, it's set as a string
+      // if it's coming from MSAL, it's a Date
+      typeof accessToken.expiresOn === 'string' ? new Date(accessToken.expiresOn) : accessToken.expiresOn
+      : new Date(0);
+
+    if (expiresOn < now) {
       return true;
     }
 
     return false;
   }
 
-  private async getAccessToken(logger: Logger): Promise<void> {
+  private async ensureAccessToken(logger: Logger): Promise<void> {
     try {
       await auth.ensureAccessToken(auth.defaultResource, logger, this.debug);
       auth.connection.active = true;
@@ -277,6 +313,7 @@ class LoginCommand extends Command {
         await logger.logToStderr('');
       }
 
+      await auth.clearConnectionInfo();
       throw new CommandError(error.message);
     }
   }
