@@ -10,6 +10,7 @@ import { sinonUtil } from '../utils/sinonUtil.js';
 import { FormDigestInfo, spo } from '../utils/spo.js';
 import { entraGroup } from './entraGroup.js';
 import { formatting } from './formatting.js';
+import { Drive } from '@microsoft/microsoft-graph-types';
 
 const stubPostResponses: any = (
   folderAddResp: any = null
@@ -48,6 +49,16 @@ describe('utils/spo', () => {
   let logger: Logger;
   let log: string[];
   let loggerLogSpy: sinon.SinonSpy;
+
+  const siteId = '0f9b8f4f-0e8e-4630-bb0a-501442db9b64';
+  const driveId = '013TMHP6UOOSLON57HT5GLKEU7R5UGWZVK';
+  const itemId = 'b!T4-bD44OMEa7ClAUQtubZID9tc40pGJKpguycvELod_Gx-lo4ZQiRJ7vylonTufG';
+  const webUrl = 'https://contoso.sharepoint.com/sites/sales';
+  const folderUrl: URL = new URL('https://contoso.sharepoint.com/sites/sales/shared%20documents/');
+  const drive: Drive = {
+    id: driveId,
+    webUrl: `${webUrl}/Shared%20Documents`
+  };
 
   before(() => {
     auth.connection.active = true;
@@ -989,7 +1000,6 @@ describe('utils/spo', () => {
   //#region Navigation menu state responses
   const topNavigationResponse = { 'AudienceIds': [], 'FriendlyUrlPrefix': '', 'IsAudienceTargetEnabledForGlobalNav': false, 'Nodes': [{ 'AudienceIds': [], 'CurrentLCID': 1033, 'CustomProperties': [], 'FriendlyUrlSegment': '', 'IsDeleted': false, 'IsHidden': false, 'IsTitleForExistingLanguage': false, 'Key': '2039', 'Nodes': [{ 'AudienceIds': [], 'CurrentLCID': 1033, 'CustomProperties': [], 'FriendlyUrlSegment': '', 'IsDeleted': false, 'IsHidden': false, 'IsTitleForExistingLanguage': false, 'Key': '2041', 'Nodes': [], 'NodeType': 0, 'OpenInNewWindow': true, 'SimpleUrl': '/sites/PnPCoreSDKTestGroup', 'Title': 'Sub level 1', 'Translations': [] }], 'NodeType': 0, 'OpenInNewWindow': null, 'SimpleUrl': '/sites/PnPCoreSDKTestGroup', 'Title': 'Site A', 'Translations': [] }, { 'AudienceIds': [], 'CurrentLCID': 1033, 'CustomProperties': [], 'FriendlyUrlSegment': '', 'IsDeleted': false, 'IsHidden': false, 'IsTitleForExistingLanguage': false, 'Key': '2040', 'Nodes': [], 'NodeType': 0, 'OpenInNewWindow': true, 'SimpleUrl': '/sites/PnPCoreSDKTestGroup', 'Title': 'Site B', 'Translations': [] }, { 'AudienceIds': [], 'CurrentLCID': 1033, 'CustomProperties': [], 'FriendlyUrlSegment': '', 'IsDeleted': false, 'IsHidden': false, 'IsTitleForExistingLanguage': false, 'Key': '2001', 'Nodes': [], 'NodeType': 0, 'OpenInNewWindow': true, 'SimpleUrl': '/sites/team-a/sitepages/about.aspx', 'Title': 'About', 'Translations': [] }], 'SimpleUrl': '', 'SPSitePrefix': '/sites/SharePointDemoSite', 'SPWebPrefix': '/sites/SharePointDemoSite', 'StartingNodeKey': '1025', 'StartingNodeTitle': 'Quick launch', 'Version': '2023-03-09T18:33:53.5468097Z' };
   const quickLaunchResponse = { 'AudienceIds': [], 'FriendlyUrlPrefix': '', 'IsAudienceTargetEnabledForGlobalNav': false, 'Nodes': [{ 'AudienceIds': [], 'CurrentLCID': 1033, 'CustomProperties': [], 'FriendlyUrlSegment': '', 'IsDeleted': false, 'IsHidden': false, 'IsTitleForExistingLanguage': false, 'Key': '2003', 'Nodes': [{ 'AudienceIds': [], 'CurrentLCID': 1033, 'CustomProperties': [], 'FriendlyUrlSegment': '', 'IsDeleted': false, 'IsHidden': false, 'IsTitleForExistingLanguage': false, 'Key': '2006', 'Nodes': [], 'NodeType': 0, 'OpenInNewWindow': null, 'SimpleUrl': '/sites/SharePointDemoSite#/', 'Title': 'Sub Item', 'Translations': [] }], 'NodeType': 0, 'OpenInNewWindow': true, 'SimpleUrl': 'http://google.be', 'Title': 'Site A', 'Translations': [] }, { 'AudienceIds': [], 'CurrentLCID': 1033, 'CustomProperties': [], 'FriendlyUrlSegment': '', 'IsDeleted': false, 'IsHidden': false, 'IsTitleForExistingLanguage': false, 'Key': '2018', 'Nodes': [], 'NodeType': 0, 'OpenInNewWindow': null, 'SimpleUrl': 'https://google.be', 'Title': 'Site B', 'Translations': [] }], 'SimpleUrl': '', 'SPSitePrefix': '/sites/SharePointDemoSite', 'SPWebPrefix': '/sites/SharePointDemoSite', 'StartingNodeKey': '1002', 'StartingNodeTitle': 'SharePoint Top Navigation Bar', 'Version': '2023-03-09T18:34:53.650545Z' };
-  const webUrl = 'https://contoso.sharepoint.com/sites/sales';
   //#endregion
 
   it(`retrieves the quick launch navigation response`, async () => {
@@ -2083,6 +2093,69 @@ describe('utils/spo', () => {
     const id = await spo.getSiteId('https://contoso.sharepoint.com', logger);
 
     assert.strictEqual(id, 'contoso.sharepoint.com,ea49a393-e3e6-4760-a1b2-e96539e15372,66e2861c-96d9-4418-a75c-0ed1bca68b42');
+  });
+
+  it('returns the folder server relative URL by URL', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `${webUrl}/_api/web/GetFolderByServerRelativePath(decodedUrl='${formatting.encodeQueryParameter('/sites/sales/shared documents/folder1')}')?$select=ServerRelativeUrl`
+      ) {
+        return { ServerRelativeUrl: '/sites/sales/shared documents/folder1' };
+      }
+
+      throw 'Invalid request';
+    });
+
+    const url = await spo.getFolderServerRelativeUrl(webUrl, '/sites/sales/shared documents/folder1', undefined);
+
+    assert.strictEqual(url, '/sites/sales/shared documents/folder1');
+  });
+
+  it('returns the folder server relative URL by id', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `${webUrl}/_api/web/GetFolderById('f09c4efe-b8c0-4e89-a166-03418661b89b')?$select=ServerRelativeUrl`) {
+        return { ServerRelativeUrl: '/sites/sales/shared documents/folder1' };
+      }
+
+      throw 'Invalid request';
+    });
+
+    const url = await spo.getFolderServerRelativeUrl(webUrl, undefined, 'f09c4efe-b8c0-4e89-a166-03418661b89b');
+
+    assert.strictEqual(url, '/sites/sales/shared documents/folder1');
+  });
+
+  it('correctly gets drive using getDrive', async () => {
+    sinon.stub(request, 'get').callsFake(async opts => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/sites/${siteId}/drives?$select=webUrl,id`) {
+        return {
+          value: [
+            {
+              "id": "013TMHP6UOOSLON57HT5GLKEU7R5UGWZVK",
+              "webUrl": `${webUrl}/Shared%20Documents`
+            }
+          ]
+        };
+      }
+
+      return 'Invalid Request';
+    });
+
+    const actual = await spo.getDrive(siteId, folderUrl);
+    assert.deepStrictEqual(actual, drive);
+  });
+
+  it('correctly gets drive item ID using getDriveItemId', async () => {
+    sinon.stub(request, 'get').callsFake(async opts => {
+      const relativeItemUrl = folderUrl.href.replace(new RegExp(`${drive.webUrl}`, 'i'), '').replace(/\/+$/, '');
+      if (opts.url === `https://graph.microsoft.com/v1.0/drives/${driveId}/root${relativeItemUrl ? `:${relativeItemUrl}` : ''}?$select=id`) {
+        return { id: itemId };
+      }
+
+      return 'Invalid Request';
+    });
+
+    const actual = await spo.getDriveItemId(drive, folderUrl);
+    assert.strictEqual(actual, itemId);
   });
 
   it(`get the file properties with the server relative url`, async () => {
