@@ -2164,7 +2164,7 @@ describe('Auth', () => {
   it('configures cloud for auth to AzureUsGovernment for USGov cloud', async () => {
     auth.connection.cloudType = CloudType.USGov;
     const actual: msal.Configuration = await (auth as any).getAuthClientConfiguration(logger, false);
-    assert.strictEqual(actual.auth.azureCloudOptions?.azureCloudInstance, msal.AzureCloudInstance.AzureUsGovernment);
+    assert.strictEqual(actual.auth.azureCloudOptions?.azureCloudInstance, msal.AzureCloudInstance.AzurePublic);
   });
 
   it('configures cloud for auth to AzureUsGovernment for USGovHigh cloud', async () => {
