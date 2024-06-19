@@ -65,6 +65,10 @@ describe(commands.LIST_GET, () => {
 
   it('retrieves and prints all details of list if title option is passed', async () => {
     sinon.stub(request, 'get').resolves({
+      "VersionPolicies": {
+        "DefaultExpireAfterDays": 0,
+        "DefaultTrimMode": 0
+      },
       "AllowContentTypes": true,
       "BaseTemplate": 109,
       "BaseType": 1,
@@ -124,7 +128,13 @@ describe(commands.LIST_GET, () => {
         webUrl: 'https://contoso.sharepoint.com'
       }
     });
+
     assert(loggerLogSpy.calledWith({
+      VersionPolicies: {
+        DefaultExpireAfterDays: 0,
+        DefaultTrimMode: 0,
+        DefaultTrimModeValue: 'NoExpiration'
+      },
       AllowContentTypes: true,
       BaseTemplate: 109,
       BaseType: 1,
@@ -192,6 +202,7 @@ describe(commands.LIST_GET, () => {
         properties: 'Title,Id'
       }
     });
+
     assert(loggerLogSpy.calledWith({
       Id: '14b2b6ed-0885-4814-bfd6-594737cc3ae3',
       Title: 'Documents'
@@ -214,6 +225,7 @@ describe(commands.LIST_GET, () => {
         properties: 'Title,Id'
       }
     });
+
     assert(loggerLogSpy.calledWith({
       Id: '14b2b6ed-0885-4814-bfd6-594737cc3ae3',
       Title: 'Documents'
@@ -236,6 +248,7 @@ describe(commands.LIST_GET, () => {
         properties: 'Title,Id'
       }
     });
+
     assert(loggerLogSpy.calledWith({
       Id: '14b2b6ed-0885-4814-bfd6-594737cc3ae3',
       Title: 'Documents'
@@ -377,6 +390,10 @@ describe(commands.LIST_GET, () => {
           "PrincipalId": 12
         }
       ],
+      "VersionPolicies": {
+        "DefaultExpireAfterDays": 0,
+        "DefaultTrimMode": 0
+      },
       "HasUniqueRoleAssignments": true,
       "AllowContentTypes": true,
       "BaseTemplate": 109,
@@ -437,6 +454,7 @@ describe(commands.LIST_GET, () => {
         withPermissions: true
       }
     });
+
     assert(loggerLogSpy.calledWith({
       AllowContentTypes: true,
       BaseTemplate: 109,
@@ -486,6 +504,11 @@ describe(commands.LIST_GET, () => {
       ParentWebPath: null,
       ParentWebUrl: null,
       ParserDisabled: false,
+      VersionPolicies: {
+        DefaultExpireAfterDays: 0,
+        DefaultTrimMode: 0,
+        DefaultTrimModeValue: "NoExpiration"
+      },
       RoleAssignments: [
         {
           Member: {
@@ -624,7 +647,6 @@ describe(commands.LIST_GET, () => {
       Title: 'Documents'
     }));
   });
-
 
   it('retrieves details of list if list id, properties and withPermissions option is passed', async () => {
     sinon.stub(request, 'get').resolves(
@@ -776,6 +798,7 @@ describe(commands.LIST_GET, () => {
         withPermissions: true
       }
     });
+
     assert(loggerLogSpy.calledWith({
       HasUniqueRoleAssignments: true,
       Id: '14b2b6ed-0885-4814-bfd6-594737cc3ae3',
@@ -1064,6 +1087,7 @@ describe(commands.LIST_GET, () => {
         withPermissions: true
       }
     });
+
     assert(loggerLogSpy.calledWith({
       HasUniqueRoleAssignments: true,
       Id: '14b2b6ed-0885-4814-bfd6-594737cc3ae3',
@@ -1220,6 +1244,7 @@ describe(commands.LIST_GET, () => {
         properties: 'RootFolder/ServerRelativeUrl'
       }
     });
+
     assert(loggerLogSpy.calledWith({
       RootFolder: {
         ServerRelativeUrl: "/Lists/TestBatchList"

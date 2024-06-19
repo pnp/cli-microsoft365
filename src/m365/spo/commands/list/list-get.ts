@@ -6,7 +6,7 @@ import { urlUtil } from '../../../../utils/urlUtil.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
-import { ListInstance } from "./ListInstance.js";
+import { DefaultTrimModeType, ListInstance } from "./ListInstance.js";
 import { ListPrincipalType } from './ListPrincipalType.js';
 
 interface Properties {
@@ -132,10 +132,12 @@ class SpoListGetCommand extends SpoCommand {
       queryParams.push(`$expand=${fieldsProperties.expandProperties.join(',')}`);
     }
 
-    const querystring = queryParams.length > 0 ? `?${queryParams.join('&')}` : ``;
+    if (queryParams.length === 0) {
+      queryParams.push(`$expand=VersionPolicies`);
+    }
 
     const requestOptions: CliRequestOptions = {
-      url: `${requestUrl}${querystring}`,
+      url: `${requestUrl}?${queryParams.join('&')}`,
       headers: {
         'accept': 'application/json;odata=nometadata'
       },
@@ -150,6 +152,10 @@ class SpoListGetCommand extends SpoCommand {
         });
       }
 
+      if (listInstance.VersionPolicies) {
+        listInstance.VersionPolicies.DefaultTrimModeValue = DefaultTrimModeType[listInstance.VersionPolicies.DefaultTrimMode];
+      }
+
       await logger.log(listInstance);
     }
     catch (err: any) {
@@ -162,7 +168,7 @@ class SpoListGetCommand extends SpoCommand {
     let expandProperties: any[] = [];
 
     if (withPermissions) {
-      expandProperties = ['HasUniqueRoleAssignments', 'RoleAssignments/Member', 'RoleAssignments/RoleDefinitionBindings'];
+      expandProperties = ['HasUniqueRoleAssignments', 'RoleAssignments/Member', 'RoleAssignments/RoleDefinitionBindings', 'VersionPolicies'];
     }
 
     if (properties) {
