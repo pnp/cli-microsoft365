@@ -315,12 +315,12 @@ export class Auth {
     let azureCloudInstance: AzureCloudInstance = AzureCloudInstance.None;
     switch (this.connection.cloudType) {
       case CloudType.Public:
+      case CloudType.USGov:
         azureCloudInstance = AzureCloudInstance.AzurePublic;
         break;
       case CloudType.China:
         azureCloudInstance = AzureCloudInstance.AzureChina;
         break;
-      case CloudType.USGov:
       case CloudType.USGovHigh:
       case CloudType.USGovDoD:
         azureCloudInstance = AzureCloudInstance.AzureUsGovernment;
