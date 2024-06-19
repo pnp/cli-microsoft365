@@ -15,6 +15,7 @@ describe('utils/drive', () => {
   const siteId = '0f9b8f4f-0e8e-4630-bb0a-501442db9b64';
   const itemId = 'b!T4-bD44OMEa7ClAUQtubZID9tc40pGJKpguycvELod_Gx-lo4ZQiRJ7vylonTufG';
   const folderUrl: URL = new URL('https://contoso.sharepoint.com/sites/sales/shared%20documents/');
+  const subFolderUrl: URL = new URL('https://contoso.sharepoint.com/sites/sales/shared%20documents/folder1');
   const driveId = '013TMHP6UOOSLON57HT5GLKEU7R5UGWZVK';
   const drive: Drive = {
     id: driveId,
@@ -80,6 +81,20 @@ describe('utils/drive', () => {
 
   it('correctly gets drive item ID using getDriveItemId (debug)', async () => {
     sinon.stub(request, 'get').callsFake(async opts => {
+      const relativeItemUrl = subFolderUrl.href.replace(new RegExp(`${drive.webUrl}`, 'i'), '').replace(/\/+$/, '');
+      if (opts.url === `https://graph.microsoft.com/v1.0/drives/${driveId}/root${relativeItemUrl ? `:${relativeItemUrl}` : ''}?$select=id`) {
+        return { id: itemId };
+      }
+
+      return 'Invalid Request';
+    });
+
+    const actual = await driveItem.getDriveItemId(drive, subFolderUrl, logger, true);
+    assert.deepStrictEqual(actual, itemId);
+  });
+
+  it('correctly gets drive item ID using getDriveItemId when relativeItemUrl matches drive webUrl (debug)', async () => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       const relativeItemUrl = folderUrl.href.replace(new RegExp(`${drive.webUrl}`, 'i'), '').replace(/\/+$/, '');
       if (opts.url === `https://graph.microsoft.com/v1.0/drives/${driveId}/root${relativeItemUrl ? `:${relativeItemUrl}` : ''}?$select=id`) {
         return { id: itemId };
@@ -89,20 +104,7 @@ describe('utils/drive', () => {
     });
 
     const actual = await driveItem.getDriveItemId(drive, folderUrl, logger, true);
-    assert.strictEqual(actual, itemId);
-  });
-
-  it('correctly gets drive item ID using getDriveItemId when relativeItemUrl matches drive webUrl', async () => {
-    sinon.stub(request, 'get').callsFake(async opts => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/drives/${driveId}/root?$select=id`) {
-        return { id: itemId };
-      }
-
-      return 'Invalid Request';
-    });
-
-    const actual = await driveItem.getDriveItemId(drive, folderUrl, logger, true);
-    assert.strictEqual(actual, itemId);
+    assert.deepStrictEqual(actual, itemId);
   });
 
   it('handles when drive not found', async () => {
