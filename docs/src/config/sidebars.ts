@@ -3318,11 +3318,6 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
-              label: 'site unarchive',
-              id: 'cmd/spo/site/site-unarchive'
-            },
-            {
-              type: 'doc',
               label: 'site appcatalog add',
               id: 'cmd/spo/site/site-appcatalog-add'
             },
@@ -3631,6 +3626,11 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'tenant settings set',
               id: 'cmd/spo/tenant/tenant-settings-set'
+            },
+            {
+              type: 'doc',
+              label: 'tenant site unarchive',
+              id: 'cmd/spo/tenant/tenant-site-unarchive'
             }
           ]
         },

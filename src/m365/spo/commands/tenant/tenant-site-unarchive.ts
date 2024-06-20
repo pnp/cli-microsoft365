@@ -17,9 +17,9 @@ interface Options extends GlobalOptions {
   force?: boolean;
 }
 
-class SpoSiteUnarchiveCommand extends SpoCommand {
+class SpoTenantSiteUnarchiveCommand extends SpoCommand {
   public get name(): string {
-    return commands.SITE_UNARCHIVE;
+    return commands.TENANT_SITE_UNARCHIVE;
   }
 
   public get description(): string {
@@ -29,9 +29,18 @@ class SpoSiteUnarchiveCommand extends SpoCommand {
   constructor() {
     super();
 
+    this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
     this.#initTypes();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        force: !!args.options.force
+      });
+    });
   }
 
   #initOptions(): void {
@@ -53,15 +62,15 @@ class SpoSiteUnarchiveCommand extends SpoCommand {
 
   #initTypes(): void {
     this.types.string.push('url');
+    this.types.boolean.push('force');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-
     if (args.options.force) {
       await this.unarchiveSite(logger, args.options.url);
     }
     else {
-      const result = await cli.promptForConfirmation({ message: `Are you sure you want to unarchive the site ${args.options.url}?` });
+      const result = await cli.promptForConfirmation({ message: `Are you sure you want to unarchive site '${args.options.url}'? This may cause additional billing costs.` });
 
       if (result) {
         await this.unarchiveSite(logger, args.options.url);
@@ -75,16 +84,28 @@ class SpoSiteUnarchiveCommand extends SpoCommand {
     }
 
     try {
-      const adminCenterUrl = await spo.getSpoAdminUrl(logger, this.debug);
+      const adminCenterUrl = await spo.getSpoAdminUrl(logger, this.verbose);
       const requestDigest = await spo.getRequestDigest(adminCenterUrl);
-      const requestData = `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="2" ObjectPathId="1" /><ObjectPath Id="4" ObjectPathId="3" /></Actions><ObjectPaths><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /><Method Id="3" ParentId="1" Name="UnarchiveSiteByUrl"><Parameters><Parameter Type="String">${url}</Parameter></Parameters></Method></ObjectPaths></Request>`;
 
       const requestOptions: CliRequestOptions = {
         url: `${adminCenterUrl}/_vti_bin/client.svc/ProcessQuery`,
         headers: {
           'X-RequestDigest': requestDigest.FormDigestValue
         },
-        data: requestData
+        data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009">
+  <Actions>
+    <ObjectPath Id="2" ObjectPathId="1" />
+    <ObjectPath Id="4" ObjectPathId="3" />
+  </Actions>
+  <ObjectPaths>
+    <Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" />
+    <Method Id="3" ParentId="1" Name="UnarchiveSiteByUrl">
+      <Parameters>
+        <Parameter Type="String">${url}</Parameter>
+      </Parameters>
+    </Method>
+  </ObjectPaths>
+</Request>`
       };
 
       const response: string = await request.post(requestOptions);
@@ -101,4 +122,4 @@ class SpoSiteUnarchiveCommand extends SpoCommand {
   }
 }
 
-export default new SpoSiteUnarchiveCommand();
+export default new SpoTenantSiteUnarchiveCommand();

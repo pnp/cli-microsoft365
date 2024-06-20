@@ -2,14 +2,14 @@ import Global from '/docs/cmd/_global.mdx';
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-# spo site unarchive
+# spo tenant site unarchive
 
 Unarchives a site collection
 
 ## Usage
 
 ```sh
-m365 spo site unarchive [options]
+m365 spo tenant site unarchive [options]
 ```
 
 ## Options
@@ -38,18 +38,24 @@ If a site remains archived for more than seven days, the reactivation fee will b
 
 :::
 
+:::note
+
+After running this command, it may take a minute before the site is effectively unarchived.
+
+:::
+
 ## Examples
 
 Unarchive a specific site collection.
 
 ```sh
-m365 spo site unarchive --url "https://contoso.sharepoint.com/sites/Marketing"
+m365 spo tenant site unarchive --url "https://contoso.sharepoint.com/sites/Marketing"
 ```
 
 Unarchive a specific site collection without confirmation prompt.
 
 ```sh
-m365 spo site unarchive --url "https://contoso.sharepoint.com/sites/Marketing" --force
+m365 spo tenant site unarchive --url "https://contoso.sharepoint.com/sites/Marketing" --force
 ```
 
 ## Response
@@ -58,4 +64,4 @@ The command won't return a response on success.
 
 ## More information
 
-Pricing model for Microsoft 365 Archive: [https://learn.microsoft.com/en-us/microsoft-365/archive/archive-pricing?view=o365-worldwide](https://learn.microsoft.com/en-us/microsoft-365/archive/archive-pricing?view=o365-worldwide)
+Pricing model for Microsoft 365 Archive: [https://learn.microsoft.com/microsoft-365/archive/archive-pricing](https://learn.microsoft.com/microsoft-365/archive/archive-pricing)

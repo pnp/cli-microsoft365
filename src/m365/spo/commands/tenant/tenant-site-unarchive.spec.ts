@@ -9,12 +9,12 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './site-unarchive.js';
+import command from './tenant-site-unarchive.js';
 import request from '../../../../request.js';
 import { spo } from '../../../../utils/spo.js';
 import { CommandError } from '../../../../Command.js';
 
-describe(commands.SITE_UNARCHIVE, () => {
+describe(commands.TENANT_SITE_UNARCHIVE, () => {
   const url = 'https://contoso.sharepoint.com/sites/project-x';
   const adminUrl = 'https://contoso-admin.sharepoint.com';
   const response = '[{"SchemaVersion":"15.0.0.0","LibraryVersion":"16.0.24817.12008","ErrorInfo":null,"TraceCorrelationId":"ab1127a1-5044-8000-b17c-4aafdd265386"},2,{"IsNull":false},4,{"IsNull":false}]';
@@ -74,7 +74,7 @@ describe(commands.SITE_UNARCHIVE, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name, commands.SITE_UNARCHIVE);
+    assert.strictEqual(command.name, commands.TENANT_SITE_UNARCHIVE);
   });
 
   it('has a description', () => {
@@ -92,13 +92,13 @@ describe(commands.SITE_UNARCHIVE, () => {
   });
 
   it('aborts unarchiving site when prompt not confirmed', async () => {
-    const postStub = sinon.stub(request, 'post');
+    const postStub = sinon.stub(request, 'post').resolves();
 
     await command.action(logger, { options: { url: url } });
     assert(postStub.notCalled);
   });
 
-  it('prompts before unarchiving the site when --force option is not passed', async () => {
+  it('prompts before unarchiving the site when force option is not passed', async () => {
     await command.action(logger, { options: { url: url } });
     assert(promptIssued);
   });
@@ -119,7 +119,7 @@ describe(commands.SITE_UNARCHIVE, () => {
     assert(postStub.calledOnce);
   });
 
-  it('unarchives the site without prompting for confirmation when --force option specified', async () => {
+  it('unarchives the site without prompting for confirmation when force option specified', async () => {
     const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `${adminUrl}/_vti_bin/client.svc/ProcessQuery`) {
         return response;
@@ -129,20 +129,13 @@ describe(commands.SITE_UNARCHIVE, () => {
     });
 
     await command.action(logger, { options: { url: url, force: true, verbose: true } });
-    assert(postStub.called);
+    assert(postStub.calledOnce);
   });
 
   it('correctly handles error when unarchiving site that does not exist', async () => {
     const errorMessage = 'File Not Found.';
 
-    sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `${adminUrl}/_vti_bin/client.svc/ProcessQuery`) {
-        return `[{"SchemaVersion":"15.0.0.0","LibraryVersion":"16.0.24817.12008","ErrorInfo":{"ErrorMessage":"${errorMessage}","ErrorValue":null,"TraceCorrelationId":"731127a1-9041-8000-99fd-2865e0d78b49","ErrorCode":-2147024894,"ErrorTypeName":"System.IO.FileNotFoundException"},"TraceCorrelationId":"731127a1-9041-8000-99fd-2865e0d78b49"}]`;
-      }
-
-      throw 'Invalid request';
-    });
-
+    sinon.stub(request, 'post').resolves(`[{"SchemaVersion":"15.0.0.0","LibraryVersion":"16.0.24817.12008","ErrorInfo":{"ErrorMessage":"${errorMessage}","ErrorValue":null,"TraceCorrelationId":"731127a1-9041-8000-99fd-2865e0d78b49","ErrorCode":-2147024894,"ErrorTypeName":"System.IO.FileNotFoundException"},"TraceCorrelationId":"731127a1-9041-8000-99fd-2865e0d78b49"}]`);
     await assert.rejects(command.action(logger, { options: { url: url, force: true, verbose: true } }),
       new CommandError(errorMessage));
   });
