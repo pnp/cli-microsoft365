@@ -1,3 +1,4 @@
+import { v4 } from 'uuid';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request from '../../../../request.js';
@@ -5,7 +6,7 @@ import { formatting } from '../../../../utils/formatting.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
-import { Control } from './canvasContent.js';
+import { BackgroundControl, Control } from './canvasContent.js';
 import { CanvasSectionTemplate, ZoneEmphasis } from './clientsidepages.js';
 
 interface CommandArgs {
@@ -19,11 +20,25 @@ interface Options extends GlobalOptions {
   order?: number;
   zoneEmphasis?: string;
   isLayoutReflowOnTop?: boolean;
+  isCollapsibleSection?: boolean;
+  showDivider?: boolean;
+  iconAlignment?: string;
+  isExpanded?: boolean;
+  gradientText?: string;
+  imageUrl?: string;
+  imageHeight?: number;
+  imageWidth?: number;
+  fillMode?: string;
+  useLightText?: boolean;
+  overlayColor?: string;
+  overlayOpacity?: number;
 }
 
 class SpoPageSectionAddCommand extends SpoCommand {
   public static readonly SectionTemplate: string[] = ['OneColumn', 'OneColumnFullWidth', 'TwoColumn', 'ThreeColumn', 'TwoColumnLeft', 'TwoColumnRight', 'Vertical'];
-  public static readonly ZoneEmphasis: string[] = ['None', 'Neutral', 'Soft', 'Strong'];
+  public static readonly ZoneEmphasis: string[] = ['None', 'Neutral', 'Soft', 'Strong', 'Image', 'Gradient'];
+  public static readonly IconAlignment: string[] = ['Left', 'Right'];
+  public static readonly FillMode: string[] = ['ScaleToFill', 'ScaleToFit', 'Tile', 'OriginalSize'];
 
   public get name(): string {
     return commands.PAGE_SECTION_ADD;
@@ -46,7 +61,19 @@ class SpoPageSectionAddCommand extends SpoCommand {
       Object.assign(this.telemetryProperties, {
         order: typeof args.options.order !== 'undefined',
         zoneEmphasis: typeof args.options.zoneEmphasis !== 'undefined',
-        isLayoutReflowOnTop: !!args.options.isLayoutReflowOnTop
+        isLayoutReflowOnTop: !!args.options.isLayoutReflowOnTop,
+        isCollapsibleSection: typeof args.options.isCollapsibleSection !== 'undefined',
+        showDivider: typeof args.options.showDivider !== 'undefined',
+        iconAlignment: typeof args.options.iconAlignment !== 'undefined',
+        isExpanded: typeof args.options.isExpanded !== 'undefined',
+        gradientText: typeof args.options.gradientText !== 'undefined',
+        imageUrl: typeof args.options.imageUrl !== 'undefined',
+        imageHeight: typeof args.options.imageHeight !== 'undefined',
+        imageWidth: typeof args.options.imageWidth !== 'undefined',
+        fillMode: typeof args.options.fillMode !== 'undefined',
+        useLightText: typeof args.options.useLightText !== 'undefined',
+        overlayColor: typeof args.options.overlayColor !== 'undefined',
+        overlayOpacity: typeof args.options.overlayOpacity !== 'undefined'
       });
     });
   }
@@ -72,6 +99,44 @@ class SpoPageSectionAddCommand extends SpoCommand {
       },
       {
         option: '--isLayoutReflowOnTop'
+      },
+      {
+        option: '--isCollapsibleSection'
+      },
+      {
+        option: '--showDivider'
+      },
+      {
+        option: '--iconAlignment [iconAlignment]',
+        autocomplete: SpoPageSectionAddCommand.IconAlignment
+      },
+      {
+        option: '--isExpanded'
+      },
+      {
+        option: '--gradientText [gradientText]'
+      },
+      {
+        option: '--imageUrl [imageUrl]'
+      },
+      {
+        option: '--imageHeight [imageHeight]'
+      },
+      {
+        option: '--imageWidth [imageWidth]'
+      },
+      {
+        option: '--fillMode [fillMode]',
+        autocomplete: SpoPageSectionAddCommand.FillMode
+      },
+      {
+        option: '--useLightText'
+      },
+      {
+        option: '--overlayColor [overlayColor]'
+      },
+      {
+        option: '--overlayOpacity [overlayOpacity]'
       }
     );
   }
@@ -90,8 +155,8 @@ class SpoPageSectionAddCommand extends SpoCommand {
         }
 
         if (typeof args.options.zoneEmphasis !== 'undefined') {
-          if (!(args.options.zoneEmphasis in ZoneEmphasis)) {
-            return 'The value of parameter zoneEmphasis must be None|Neutral|Soft|Strong';
+          if (SpoPageSectionAddCommand.ZoneEmphasis.indexOf(args.options.zoneEmphasis) === -1) {
+            return 'The value of parameter zoneEmphasis must be None|Neutral|Soft|Strong|Image|Gradient';
           }
         }
 
@@ -99,6 +164,40 @@ class SpoPageSectionAddCommand extends SpoCommand {
           if (args.options.sectionTemplate !== 'Vertical') {
             return 'Specify isLayoutReflowOnTop when the sectionTemplate is set to Vertical.';
           }
+        }
+
+        if (typeof args.options.iconAlignment !== 'undefined') {
+          if (SpoPageSectionAddCommand.IconAlignment.indexOf(args.options.iconAlignment) === -1) {
+            return 'The value of parameter iconAlignment must be Left|Right';
+          }
+        }
+
+        if (typeof args.options.fillMode !== 'undefined') {
+          if (SpoPageSectionAddCommand.FillMode.indexOf(args.options.fillMode) === -1) {
+            return 'The value of parameter fillMode must be ScaleToFill|ScaleToFit|Tile|OriginalSize';
+          }
+        }
+
+        if (args.options.zoneEmphasis !== 'Image' && (args.options.imageUrl || args.options.imageWidth ||
+          args.options.imageHeight || args.options.fillMode)) {
+          return 'Specify imageUrl, imageWidth, or imageHeight only when zoneEmphasis is set to Image';
+        }
+
+        if (args.options.zoneEmphasis !== 'Gradient' && (args.options.gradientText)) {
+          return 'Specify gradientText only when zoneEmphasis is set to Gradient';
+        }
+
+        if (args.options.overlayOpacity && (args.options.overlayOpacity < 0 || args.options.overlayOpacity > 100)) {
+          return 'The value of parameter overlayOpacity must be between 0 and 100';
+        }
+
+        if (args.options.overlayColor && !/^#[0-9a-f]{6}$/i.test(args.options.overlayColor)) {
+          return 'The value of parameter overlayColor must be a valid hex color';
+        }
+
+        if ((args.options.zoneEmphasis !== 'Image' && args.options.zoneEmphasis !== 'Gradient')
+          && (args.options.overlayColor || args.options.overlayOpacity || args.options.useLightText)) {
+          return 'Specify overlayColor or overlayOpacity only when zoneEmphasis is set to Image or Gradient';
         }
 
         return validation.isValidSharePointUrl(args.options.webUrl);
@@ -111,7 +210,7 @@ class SpoPageSectionAddCommand extends SpoCommand {
     if (pageFullName.indexOf('.aspx') < 0) {
       pageFullName += '.aspx';
     }
-    let canvasContent: Control[];
+    let canvasContent: (Control | BackgroundControl)[];
 
     if (this.verbose) {
       await logger.logToStderr(`Retrieving page information...`);
@@ -142,7 +241,7 @@ class SpoPageSectionAddCommand extends SpoCommand {
       }
 
       // get columns
-      const columns: Control[] = canvasContent
+      const columns: (Control | BackgroundControl)[] = canvasContent
         .filter(c => typeof c.controlType === 'undefined');
       // get unique zoneIndex values given each section can have 1 or more
       // columns each assigned to the zoneIndex of the corresponding section
@@ -154,11 +253,22 @@ class SpoPageSectionAddCommand extends SpoCommand {
         .sort();
       // zoneIndex for the new section to add
       const zoneIndex: number = this.getSectionIndex(zoneIndices, args.options.order);
+      let zoneId = undefined;
+      let backgroundControlToAdd: BackgroundControl | undefined = undefined;
+      if (args.options.zoneEmphasis === 'Image' || args.options.zoneEmphasis === 'Gradient') {
+        zoneId = v4();
+        // get background control based on control type 14
+        const backgroundControl = canvasContent.find(c => c.controlType === 14) as BackgroundControl;
+        backgroundControlToAdd = this.setBackgroundControl(zoneId, backgroundControl, args);
+        if (!backgroundControl) {
+          canvasContent.push(backgroundControlToAdd);
+        }
+      }
       // get the list of columns to insert based on the selected template
-      const columnsToAdd: Control[] = this.getColumns(zoneIndex, args.options.sectionTemplate, args.options.zoneEmphasis, args.options.isLayoutReflowOnTop);
+      const columnsToAdd: Control[] = this.getColumns(zoneIndex, args, zoneId);
       // insert the column in the right place in the array so that
       // it stays sorted ascending by zoneIndex
-      let pos: number = canvasContent.findIndex(c => typeof c.controlType === 'undefined' && c.position.zoneIndex > zoneIndex);
+      let pos: number = canvasContent.findIndex(c => typeof c.controlType === 'undefined' && c.position && c.position.zoneIndex > zoneIndex);
       if (pos === -1) {
         pos = canvasContent.length - 1;
       }
@@ -201,51 +311,53 @@ class SpoPageSectionAddCommand extends SpoCommand {
     return zoneIndices[order - 2] + ((zoneIndices[order - 1] - zoneIndices[order - 2]) / 2);
   }
 
-  private getColumns(zoneIndex: number, sectionTemplate: string, zoneEmphasis?: string, isLayoutReflowOnTop?: boolean): Control[] {
+  private getColumns(zoneIndex: number, args: CommandArgs, zoneId?: string): Control[] {
     const columns: Control[] = [];
     let sectionIndex: number = 1;
 
-    switch (sectionTemplate) {
+    switch (args.options.sectionTemplate) {
       case 'OneColumnFullWidth':
-        columns.push(this.getColumn(zoneIndex, sectionIndex++, 0, zoneEmphasis));
+        columns.push(this.getColumn(zoneIndex, sectionIndex++, 0, args, zoneId));
         break;
       case 'TwoColumn':
-        columns.push(this.getColumn(zoneIndex, sectionIndex++, 6, zoneEmphasis));
-        columns.push(this.getColumn(zoneIndex, sectionIndex++, 6, zoneEmphasis));
+        columns.push(this.getColumn(zoneIndex, sectionIndex++, 6, args, zoneId));
+        columns.push(this.getColumn(zoneIndex, sectionIndex++, 6, args, zoneId));
         break;
       case 'ThreeColumn':
-        columns.push(this.getColumn(zoneIndex, sectionIndex++, 4, zoneEmphasis));
-        columns.push(this.getColumn(zoneIndex, sectionIndex++, 4, zoneEmphasis));
-        columns.push(this.getColumn(zoneIndex, sectionIndex++, 4, zoneEmphasis));
+        columns.push(this.getColumn(zoneIndex, sectionIndex++, 4, args, zoneId));
+        columns.push(this.getColumn(zoneIndex, sectionIndex++, 4, args, zoneId));
+        columns.push(this.getColumn(zoneIndex, sectionIndex++, 4, args, zoneId));
         break;
       case 'TwoColumnLeft':
-        columns.push(this.getColumn(zoneIndex, sectionIndex++, 8, zoneEmphasis));
-        columns.push(this.getColumn(zoneIndex, sectionIndex++, 4, zoneEmphasis));
+        columns.push(this.getColumn(zoneIndex, sectionIndex++, 8, args, zoneId));
+        columns.push(this.getColumn(zoneIndex, sectionIndex++, 4, args, zoneId));
         break;
       case 'TwoColumnRight':
-        columns.push(this.getColumn(zoneIndex, sectionIndex++, 4, zoneEmphasis));
-        columns.push(this.getColumn(zoneIndex, sectionIndex++, 8, zoneEmphasis));
+        columns.push(this.getColumn(zoneIndex, sectionIndex++, 4, args, zoneId));
+        columns.push(this.getColumn(zoneIndex, sectionIndex++, 8, args, zoneId));
         break;
       case 'Vertical':
-        columns.push(this.getVerticalColumn(zoneEmphasis, isLayoutReflowOnTop));
+        columns.push(this.getVerticalColumn(args, zoneId));
         break;
       case 'OneColumn':
       default:
-        columns.push(this.getColumn(zoneIndex, sectionIndex++, 12, zoneEmphasis));
+        columns.push(this.getColumn(zoneIndex, sectionIndex++, 12, args, zoneId));
         break;
     }
 
     return columns;
   }
 
-  private getColumn(zoneIndex: number, sectionIndex: number, sectionFactor: number, zoneEmphasis?: string): Control {
+  private getColumn(zoneIndex: number, sectionIndex: number, sectionFactor: number, args: CommandArgs, zoneId?: string): Control {
+    const { zoneEmphasis, isCollapsibleSection, isExpanded, showDivider, iconAlignment } = args.options;
     const columnValue: Control = {
       displayMode: 2,
       position: {
         zoneIndex: zoneIndex,
         sectionIndex: sectionIndex,
         sectionFactor: sectionFactor,
-        layoutIndex: 1
+        layoutIndex: 1,
+        zoneId: zoneId
       },
       emphasis: {
       }
@@ -256,16 +368,86 @@ class SpoPageSectionAddCommand extends SpoCommand {
       columnValue.emphasis = { zoneEmphasis: zoneEmphasisValue };
     }
 
+    if (isCollapsibleSection) {
+      columnValue.zoneGroupMetadata = {
+        type: 1,
+        isExpanded: !!isExpanded,
+        showDividerLine: !!showDivider,
+        iconAlignment: iconAlignment && iconAlignment === "Right" ? "right" : "left"
+      };
+    }
+
     return columnValue;
   }
 
-  private getVerticalColumn(zoneEmphasis?: string, isLayoutReflowOnTop?: boolean): Control {
-    const columnValue: Control = this.getColumn(1, 1, 12, zoneEmphasis);
-    columnValue.position.isLayoutReflowOnTop = isLayoutReflowOnTop !== undefined ? true : false;
+  private getVerticalColumn(args: CommandArgs, zoneId?: string): Control {
+    const columnValue: Control = this.getColumn(1, 1, 12, args, zoneId);
+    columnValue.position.isLayoutReflowOnTop = args.options.isLayoutReflowOnTop !== undefined ? true : false;
     columnValue.position.layoutIndex = 2;
     columnValue.position.controlIndex = 1;
 
     return columnValue;
+  }
+
+  private setBackgroundControl(zoneId: string, backgroundControl: BackgroundControl, args: CommandArgs): BackgroundControl {
+    const { overlayColor, overlayOpacity, useLightText, imageUrl } = args.options;
+    const backgroundDetails = this.getBackgroundDetails(args);
+
+    if (!backgroundControl) {
+      backgroundControl = {
+        controlType: 14,
+        webPartData: {
+          properties: {
+            zoneBackground: {
+            }
+          },
+          serverProcessedContent: {
+            htmlStrings: {},
+            searchablePlainTexts: {},
+            imageSources: {},
+            links: {}
+          },
+          dataVersion: "1.0"
+        }
+      };
+    }
+
+    backgroundControl.webPartData.properties.zoneBackground[zoneId] = {
+      ...backgroundDetails,
+      useLightText: !!useLightText,
+      overlay: {
+        color: overlayColor ? overlayColor : "#FFFFFF",
+        opacity: overlayOpacity ? overlayOpacity : 60
+      }
+    };
+
+    if (imageUrl && backgroundControl.webPartData.serverProcessedContent.imageSources) {
+      backgroundControl.webPartData.serverProcessedContent.imageSources[`zoneBackground.${zoneId}.imageData.url`] = imageUrl;
+    }
+    return backgroundControl;
+  }
+
+  private getBackgroundDetails(args: CommandArgs): any {
+    const { gradientText, imageUrl, imageHeight, imageWidth, fillMode } = args.options;
+    const backgroundDetails: any = {};
+
+    if (gradientText) {
+      backgroundDetails.type = "gradient";
+      backgroundDetails.gradient = gradientText;
+    }
+
+    if (imageUrl) {
+      backgroundDetails.type = "image";
+      backgroundDetails.imageData = {
+        source: 2,
+        fileName: "sectionbackground.jpg",
+        height: imageHeight ? imageHeight : 955,
+        width: imageWidth ? imageWidth : 555
+      };
+      backgroundDetails.fillMode = fillMode ? SpoPageSectionAddCommand.FillMode.indexOf(fillMode) : 0;
+    }
+
+    return backgroundDetails;
   }
 }
 
