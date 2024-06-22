@@ -14,19 +14,19 @@ m365 entra app permission remove [options]
 
 ```md definition-list
 `-i, --appId [appId]`
-: Client ID of the Microsoft Entra app to add the API permissions to. Specify either `appId`, `appName` or `appObjectId`.
+: Client ID of the Microsoft Entra app to remove the API permissions from. Specify either `appId`, `appName` or `appObjectId`.
 
 `--appObjectId [appObjectId]`
-: Object ID of the Microsoft Entra app to add the API permissions to. Specify either `appId`, `appName` or `appObjectId`.
+: Object ID of the Microsoft Entra app to remove the API permissions from. Specify either `appId`, `appName` or `appObjectId`.
 
 `-n, --appName [appName]`
 : Display name of the Entra app to remove the API permissions from. Specify either `appId`, `appName` or `appObjectId`.
 
 `-a, --applicationPermissions [applicationPermissions]`
-: Space-separated list of application permissions to add. Specify at least `applicationPermissions` or `delegatedPermissions`.
+: Space-separated list of application permissions to remove. Specify at least `applicationPermissions` or `delegatedPermissions`.
 
 `-d, --delegatedPermissions [delegatedPermissions]`
-: Space-separated list of delegated permissions to add. Specify at least `applicationPermissions` or `delegatedPermissions`.
+: Space-separated list of delegated permissions to remove. Specify at least `applicationPermissions` or `delegatedPermissions`.
 
 `--revokeAdminConsent`
 : When specified, revokes the admin consent for the specified permissions as well.
