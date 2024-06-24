@@ -269,7 +269,7 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_GET, () => {
         title: title
       }
     });
-    assert(loggerLogSpy.calledWith(applicationCustomizerResponse.value[0]));
+    assert(loggerLogSpy.calledOnceWithExactly(applicationCustomizerResponse.value[0]));
   });
 
   it('handles error when multiple application customizers with the specified title found', async () => {
@@ -332,7 +332,7 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_GET, () => {
         title: title
       }
     });
-    assert(loggerLogSpy.calledWith(applicationCustomizerResponse.value[0]));
+    assert(loggerLogSpy.calledOnceWithExactly(applicationCustomizerResponse.value[0]));
   });
 
   it('retrieves an application customizer by id', async () => {
@@ -353,7 +353,7 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_GET, () => {
         id: id
       }
     });
-    assert(loggerLogSpy.calledWith(applicationCustomizerResponse.value[0]));
+    assert(loggerLogSpy.calledOnceWithExactly(applicationCustomizerResponse.value[0]));
   });
 
   it('retrieves an application customizer by clientSideComponentId', async () => {
@@ -374,7 +374,29 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_GET, () => {
         clientSideComponentId: clientSideComponentId
       }
     });
-    assert(loggerLogSpy.calledWith(applicationCustomizerResponse.value[0]));
+    assert(loggerLogSpy.calledOnceWithExactly(applicationCustomizerResponse.value[0]));
+  });
+
+  it('retrieves an application customizer component properties', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `${spoUrl}/_api/SP_TenantSettings_Current`) {
+        return { CorporateCatalogUrl: appCatalogUrl };
+      }
+
+      if (opts.url === `https://contoso.sharepoint.com/sites/apps/_api/web/GetList('%2Fsites%2Fapps%2Flists%2FTenantWideExtensions')/items?$filter=TenantWideExtensionLocation eq 'ClientSideExtension.ApplicationCustomizer' and Id eq '4'`) {
+        return applicationCustomizerResponse;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options: {
+        id: id,
+        tenantWideExtensionComponentProperties: true
+      }
+    });
+    assert(loggerLogSpy.calledOnceWithExactly(JSON.parse(applicationCustomizerResponse.value[0].TenantWideExtensionComponentProperties)));
   });
 
   it('handles error when multiple application customizers with the clientSideComponentId found', async () => {

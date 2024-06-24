@@ -21,7 +21,7 @@ describe(commands.COMMANDSET_GET, () => {
   const commandSetId = '0a8e82b5-651f-400b-b537-9a739f92d6b4';
   const clientSideComponentId = '2397e6ef-4b89-4508-aea2-e375e312c76d';
   const commandSetTitle = 'Alerts';
-  const commandSetObject = { 'ClientSideComponentId': clientSideComponentId, 'ClientSideComponentProperties': '', 'CommandUIExtension': null, 'Description': null, 'Group': null, 'HostProperties': '', 'Id': commandSetId, 'ImageUrl': null, 'Location': 'ClientSideExtension.ListViewCommandSet.CommandBar', 'Name': '{0a8e82b5-651f-400b-b537-9a739f92d6b4}', 'RegistrationId': '119', 'RegistrationType': 1, 'Rights': { 'High': 0, 'Low': 0 }, 'Scope': 3, 'ScriptBlock': null, 'ScriptSrc': null, 'Sequence': 65536, 'Title': commandSetTitle, 'Url': null, 'VersionOfUserCustomAction': '1.0.1.0' };
+  const commandSetObject = { 'ClientSideComponentId': clientSideComponentId, 'ClientSideComponentProperties': '{"sampleTextOne":"One item is selected in the list.", "sampleTextTwo":"This command is always visible."}', 'CommandUIExtension': null, 'Description': null, 'Group': null, 'HostProperties': '', 'Id': commandSetId, 'ImageUrl': null, 'Location': 'ClientSideExtension.ListViewCommandSet.CommandBar', 'Name': '{0a8e82b5-651f-400b-b537-9a739f92d6b4}', 'RegistrationId': '119', 'RegistrationType': 1, 'Rights': { 'High': 0, 'Low': 0 }, 'Scope': 3, 'ScriptBlock': null, 'ScriptSrc': null, 'Sequence': 65536, 'Title': commandSetTitle, 'Url': null, 'VersionOfUserCustomAction': '1.0.1.0' };
   const commandSetResponse: any[] = [commandSetObject];
 
   let log: string[];
@@ -93,7 +93,7 @@ describe(commands.COMMANDSET_GET, () => {
     });
 
     await command.action(logger, { options: { webUrl: webUrl, id: commandSetId, scope: scope, verbose: true } });
-    assert(loggerLogSpy.calledWith(commandSetObject));
+    assert(loggerLogSpy.calledOnceWithExactly(commandSetObject));
   });
 
   it('gets command set from specific site by title with scope "Site"', async () => {
@@ -106,7 +106,7 @@ describe(commands.COMMANDSET_GET, () => {
     });
 
     await command.action(logger, { options: { webUrl: webUrl, title: commandSetTitle, scope: scope, verbose: true } });
-    assert(loggerLogSpy.calledWith(commandSetObject));
+    assert(loggerLogSpy.calledOnceWithExactly(commandSetObject));
   });
 
   it('gets command set from specific site by clientSideComponentId without specifying scope', async () => {
@@ -121,7 +121,7 @@ describe(commands.COMMANDSET_GET, () => {
     });
 
     await command.action(logger, { options: { webUrl: webUrl, clientSideComponentId: clientSideComponentId, verbose: true } });
-    assert(loggerLogSpy.calledWith(commandSetObject));
+    assert(loggerLogSpy.calledOnceWithExactly(commandSetObject));
   });
 
   it('throws error when command set not found by id', async () => {
@@ -233,7 +233,44 @@ describe(commands.COMMANDSET_GET, () => {
     });
 
     await command.action(logger, { options: { webUrl: webUrl, title: commandSetTitle, scope: scope, verbose: true } });
-    assert(loggerLogSpy.calledWith(commandSetObject));
+    assert(loggerLogSpy.calledOnceWithExactly(commandSetObject));
+  });
+
+  it('gets client side component properties from a command set by id', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `${webUrl}/_api/Web/UserCustomActions(guid'${commandSetId}')`) {
+        return commandSetObject;
+      }
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { webUrl: webUrl, id: commandSetId, clientSideComponentProperties: true } });
+    assert(loggerLogSpy.calledOnceWithExactly(JSON.parse(commandSetObject.ClientSideComponentProperties)));
+  });
+
+  it('gets malformed client side component properties from a command set by id', async () => {
+    const requestResult = { ...commandSetObject, ClientSideComponentProperties: '{"sampleTextOne": One item is selected in the list.}' };
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `${webUrl}/_api/Web/UserCustomActions(guid'${commandSetId}')`) {
+        return requestResult;
+      }
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { webUrl: webUrl, id: commandSetId, clientSideComponentProperties: true } });
+    assert(loggerLogSpy.calledOnceWithExactly(requestResult.ClientSideComponentProperties));
+  });
+
+  it('gets undefined client side component properties from a command set by id', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `${webUrl}/_api/Web/UserCustomActions(guid'${commandSetId}')`) {
+        return { ...commandSetObject, ClientSideComponentProperties: undefined };
+      }
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { webUrl: webUrl, id: commandSetId, clientSideComponentProperties: true } });
+    assert(loggerLogSpy.calledOnceWithExactly(undefined));
   });
 
   it('fails validation if the url option is not a valid SharePoint site URL', async () => {

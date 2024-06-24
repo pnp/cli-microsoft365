@@ -20,6 +20,7 @@ interface Options extends GlobalOptions {
   title?: string;
   id?: string;
   clientSideComponentId?: string;
+  tenantWideExtensionComponentProperties?: boolean;
 }
 
 class SpoTenantCommandSetGetCommand extends SpoCommand {
@@ -38,6 +39,7 @@ class SpoTenantCommandSetGetCommand extends SpoCommand {
     this.#initOptions();
     this.#initValidators();
     this.#initOptionSets();
+    this.#initTypes();
   }
 
   #initTelemetry(): void {
@@ -45,7 +47,8 @@ class SpoTenantCommandSetGetCommand extends SpoCommand {
       Object.assign(this.telemetryProperties, {
         title: typeof args.options.title !== 'undefined',
         id: typeof args.options.id !== 'undefined',
-        clientSideComponentId: typeof args.options.clientSideComponentId !== 'undefined'
+        clientSideComponentId: typeof args.options.clientSideComponentId !== 'undefined',
+        tenantWideExtensionComponentProperties: !!args.options.tenantWideExtensionComponentProperties
       });
     });
   }
@@ -60,6 +63,9 @@ class SpoTenantCommandSetGetCommand extends SpoCommand {
       },
       {
         option: '-c, --clientSideComponentId  [clientSideComponentId]'
+      },
+      {
+        option: '-p, --tenantWideExtensionComponentProperties'
       }
     );
   }
@@ -84,6 +90,11 @@ class SpoTenantCommandSetGetCommand extends SpoCommand {
     this.optionSets.push({ options: ['title', 'id', 'clientSideComponentId'] });
   }
 
+  #initTypes(): void {
+    this.types.string.push('title', 'id', 'clientSideComponentId');
+    this.types.boolean.push('clientSideComponentProperties');
+  }
+
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const appCatalogUrl = await spo.getTenantAppCatalogUrl(logger, this.debug);
     if (!appCatalogUrl) {
@@ -106,7 +117,7 @@ class SpoTenantCommandSetGetCommand extends SpoCommand {
     const reqOptions: CliRequestOptions = {
       url: `${appCatalogUrl}/_api/web/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')/items?$filter=${filter}`,
       headers: {
-        'accept': 'application/json;odata=nometadata'
+        accept: 'application/json;odata=nometadata'
       },
       responseType: 'json'
     };
@@ -117,13 +128,21 @@ class SpoTenantCommandSetGetCommand extends SpoCommand {
       if (listItemInstances?.value.length > 0) {
         listItemInstances.value.forEach(v => delete v['ID']);
 
+        let listItemInstance: ListItemInstance;
         if (listItemInstances.value.length > 1) {
           const resultAsKeyValuePair = formatting.convertArrayToHashTable('Id', listItemInstances.value);
-          const result = await cli.handleMultipleResultsFound<ListItemInstance>(`Multiple ListView Command Sets with ${args.options.title || args.options.clientSideComponentId} were found.`, resultAsKeyValuePair);
-          await logger.log(result);
+          listItemInstance = await cli.handleMultipleResultsFound<ListItemInstance>(`Multiple ListView Command Sets with ${args.options.title || args.options.clientSideComponentId} were found.`, resultAsKeyValuePair);
         }
         else {
-          await logger.log(listItemInstances.value[0]);
+          listItemInstance = listItemInstances.value[0];
+        }
+
+        if (!args.options.tenantWideExtensionComponentProperties) {
+          await logger.log(listItemInstance);
+        }
+        else {
+          const properties = formatting.tryParseJson((listItemInstance as any).TenantWideExtensionComponentProperties);
+          await logger.log(properties);
         }
       }
       else {

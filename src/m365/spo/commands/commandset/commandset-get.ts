@@ -18,6 +18,7 @@ interface Options extends GlobalOptions {
   id?: string;
   clientSideComponentId?: string;
   scope?: string;
+  clientSideComponentProperties?: boolean;
 }
 
 class SpoCommandSetGetCommand extends SpoCommand {
@@ -40,6 +41,7 @@ class SpoCommandSetGetCommand extends SpoCommand {
     this.#initOptions();
     this.#initValidators();
     this.#initOptionSets();
+    this.#initTypes();
   }
 
   #initTelemetry(): void {
@@ -48,7 +50,8 @@ class SpoCommandSetGetCommand extends SpoCommand {
         title: typeof args.options.title !== 'undefined',
         id: typeof args.options.id !== 'undefined',
         clientSideComponentId: typeof args.options.clientSideComponentId !== 'undefined',
-        scope: typeof args.options.scope !== 'undefined'
+        scope: typeof args.options.scope !== 'undefined',
+        clientSideComponentProperties: !!args.options.clientSideComponentProperties
       });
     });
   }
@@ -70,6 +73,9 @@ class SpoCommandSetGetCommand extends SpoCommand {
       {
         option: '-s, --scope [scope]',
         autocomplete: SpoCommandSetGetCommand.scopes
+      },
+      {
+        option: '-p, --clientSideComponentProperties'
       }
     );
   }
@@ -98,47 +104,60 @@ class SpoCommandSetGetCommand extends SpoCommand {
     this.optionSets.push({ options: ['title', 'id', 'clientSideComponentId'] });
   }
 
+  #initTypes(): void {
+    this.types.string.push('webUrl', 'title', 'id', 'clientSideComponentId', 'scope');
+    this.types.boolean.push('clientSideComponentProperties');
+  }
+
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       if (this.verbose) {
-        await logger.logToStderr(`Attempt to get a specific commandset by property ${args.options.title || args.options.id || args.options.clientSideComponentId}.`);
+        await logger.logToStderr(`Attempt to get a specific Command Set by property ${args.options.title || args.options.id || args.options.clientSideComponentId}.`);
       }
 
+      let commandSet: CustomAction;
       if (args.options.id) {
-        const commandSet = await spo.getCustomActionById(args.options.webUrl, args.options.id, args.options.scope);
+        const customAction = await spo.getCustomActionById(args.options.webUrl, args.options.id, args.options.scope);
 
-        if (commandSet === undefined) {
+        if (customAction === undefined) {
           throw `Command set with id ${args.options.id} can't be found.`;
         }
-        else if (!SpoCommandSetGetCommand.allowedCommandSetLocations.some(allowedLocation => allowedLocation === commandSet.Location)) {
+        else if (!SpoCommandSetGetCommand.allowedCommandSetLocations.some(allowedLocation => allowedLocation === customAction.Location)) {
           throw `Custom action with id ${args.options.id} is not a command set.`;
         }
-        await logger.log(commandSet);
+        commandSet = customAction!;
       }
       else if (args.options.clientSideComponentId) {
         const filter = `${this.getBaseFilter()} ClientSideComponentId eq guid'${args.options.clientSideComponentId}'`;
-        const commandSets = await spo.getCustomActions(args.options.webUrl, args.options.scope, filter);
+        const customActions = await spo.getCustomActions(args.options.webUrl, args.options.scope, filter);
 
-        if (commandSets.length === 0) {
+        if (customActions.length === 0) {
           throw `No command set with clientSideComponentId '${args.options.clientSideComponentId}' found.`;
         }
-        await logger.log(commandSets[0]);
+        commandSet = customActions[0];
       }
       else if (args.options.title) {
         const filter = `${this.getBaseFilter()} Title eq '${formatting.encodeQueryParameter(args.options.title)}'`;
-        const commandSets = await spo.getCustomActions(args.options.webUrl, args.options.scope, filter);
+        const customActions = await spo.getCustomActions(args.options.webUrl, args.options.scope, filter);
 
-        if (commandSets.length === 1) {
-          await logger.log(commandSets[0]);
+        if (customActions.length === 1) {
+          commandSet = customActions[0];
         }
-        else if (commandSets.length === 0) {
+        else if (customActions.length === 0) {
           throw `No command set with title '${args.options.title}' found.`;
         }
         else {
-          const resultAsKeyValuePair = formatting.convertArrayToHashTable('Id', commandSets);
-          const commandSet = await cli.handleMultipleResultsFound<CustomAction>(`Multiple command sets with title '${args.options.title}' found.`, resultAsKeyValuePair);
-          logger.log(commandSet);
+          const resultAsKeyValuePair = formatting.convertArrayToHashTable('Id', customActions);
+          commandSet = await cli.handleMultipleResultsFound<CustomAction>(`Multiple command sets with title '${args.options.title}' found.`, resultAsKeyValuePair);
         }
+      }
+
+      if (!args.options.clientSideComponentProperties) {
+        await logger.log(commandSet!);
+      }
+      else {
+        const properties = formatting.tryParseJson(commandSet!.ClientSideComponentProperties);
+        await logger.log(properties);
       }
     }
     catch (err: any) {

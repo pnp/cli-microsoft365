@@ -37,21 +37,21 @@ m365 spo tenant commandset list
   [
     {
       "FileSystemObjectType": 0,
-      "Id": 9,
+      "Id": 1,
       "ServerRedirectedEmbedUri": null,
       "ServerRedirectedEmbedUrl": "",
-      "ContentTypeId": "0x00693E2C487575B448BD420C12CEAE7EFE",
+      "ContentTypeId": "0x00DBF24546DE6018449BB43573F3581BF0",
       "Title": "HelloWorld",
-      "Modified": "2023-05-25T12:11:21Z",
-      "Created": "2023-05-25T12:11:21Z",
+      "Modified": "2024-05-16T21:28:51Z",
+      "Created": "2024-05-16T21:28:51Z",
       "AuthorId": 9,
       "EditorId": 9,
       "OData__UIVersionString": "1.0",
       "Attachments": false,
-      "GUID": "6c47dd94-f5d5-4ea8-8b39-920385a56c37",
+      "GUID": "bd123dcd-37b8-4981-aa4e-1aab50a66688",
       "OData__ColorTag": null,
       "ComplianceAssetId": null,
-      "TenantWideExtensionComponentId": "f61d4ae8-3480-4541-930b-d641233c4fea",
+      "TenantWideExtensionComponentId": "53dd6a38-1461-44e0-9bf0-14883316a316",
       "TenantWideExtensionComponentProperties": "{\"sampleTextOne\":\"One item is selected in the list.\", \"sampleTextTwo\":\"This command is always visible.\"}",
       "TenantWideExtensionWebTemplate": null,
       "TenantWideExtensionListTemplate": 100,
@@ -67,17 +67,17 @@ m365 spo tenant commandset list
   <TabItem value="Text">
 
   ```text
-  TenantWideExtensionComponentId : f61d4ae8-3480-4541-930b-d641233c4fea
-  TenantWideExtensionListTemplate: 100
-  Title                          : HelloWorld
+  TenantWideExtensionComponentId        TenantWideExtensionListTemplate  Title
+  ------------------------------------  -------------------------------  ----------
+  53dd6a38-1461-44e0-9bf0-14883316a316  100                              HelloWorld
   ```
 
   </TabItem>
   <TabItem value="CSV">
 
   ```csv
-  FileSystemObjectType,Id,ServerRedirectedEmbedUrl,ContentTypeId,Title,Modified,Created,AuthorId,EditorId,OData__UIVersionString,Attachments,GUID,TenantWideExtensionComponentId,TenantWideExtensionComponentProperties,TenantWideExtensionListTemplate,TenantWideExtensionLocation,TenantWideExtensionSequence,TenantWideExtensionDisabled
-  0,9,,0x00693E2C487575B448BD420C12CEAE7EFE,HelloWorld,2023-05-25T12:11:21Z,2023-05-25T12:11:21Z,9,9,1.0,,6c47dd94-f5d5-4ea8-8b39-920385a56c37,f61d4ae8-3480-4541-930b-d641233c4fea,"{""sampleTextOne"":""One item is selected in the list."", ""sampleTextTwo"":""This command is always visible.""}",100,ClientSideExtension.ListViewCommandSet.CommandBar,0,
+  FileSystemObjectType,Id,ServerRedirectedEmbedUri,ServerRedirectedEmbedUrl,ContentTypeId,Title,Modified,Created,AuthorId,EditorId,OData__UIVersionString,Attachments,GUID,OData__ColorTag,ComplianceAssetId,TenantWideExtensionComponentId,TenantWideExtensionComponentProperties,TenantWideExtensionWebTemplate,TenantWideExtensionListTemplate,TenantWideExtensionLocation,TenantWideExtensionSequence,TenantWideExtensionHostProperties,TenantWideExtensionDisabled
+  0,1,,,0x00DBF24546DE6018449BB43573F3581BF0,HelloWorld,2024-05-16T21:28:51Z,2024-05-16T21:28:51Z,9,9,1.0,,bd123dcd-37b8-4981-aa4e-1aab50a66688,,,53dd6a38-1461-44e0-9bf0-14883316a316,"{""sampleTextOne"":""One item is selected in the list."", ""sampleTextTwo"":""This command is always visible.""}",,100,ClientSideExtension.ListViewCommandSet.CommandBar,0,,
   ```
 
   </TabItem>
@@ -86,25 +86,26 @@ m365 spo tenant commandset list
   ```md
   # spo tenant commandset list
 
-  Date: 5/25/2023
+  Date: 16/05/2024
 
-  ## HelloWorld (9)
+  ## HelloWorld (1)
 
   Property | Value
   ---------|-------
   FileSystemObjectType | 0
-  Id | 9
+  Id | 1
   ServerRedirectedEmbedUrl |
-  ContentTypeId | 0x00693E2C487575B448BD420C12CEAE7EFE
+  ContentTypeId | 0x00DBF24546DE6018449BB43573F3581BF0
   Title | HelloWorld
-  Modified | 2023-05-25T12:11:21Z
-  Created | 2023-05-25T12:11:21Z
+  Modified | 2024-05-16T21:28:51Z
+  Created | 2024-05-16T21:28:51Z
   AuthorId | 9
   EditorId | 9
   OData\_\_UIVersionString | 1.0
   Attachments | false
-  GUID | 6c47dd94-f5d5-4ea8-8b39-920385a56c37
-  TenantWideExtensionComponentId | f61d4ae8-3480-4541-930b-d641233c4fea
+  GUID | bd123dcd-37b8-4981-aa4e-1aab50a66688
+  TenantWideExtensionComponentId | 53dd6a38-1461-44e0-9bf0-14883316a316
+  TenantWideExtensionComponentProperties | {"sampleTextOne":"One item is selected in the list.", "sampleTextTwo":"This command is always visible."}
   TenantWideExtensionListTemplate | 100
   TenantWideExtensionLocation | ClientSideExtension.ListViewCommandSet.CommandBar
   TenantWideExtensionSequence | 0

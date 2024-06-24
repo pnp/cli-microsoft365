@@ -44,29 +44,29 @@ m365 spo commandset list --webUrl https://contoso.sharepoint.com/sites/sales
   ```json
   [
     {
-      "ClientSideComponentId": "b206e130-1a5b-4ae7-86a7-4f91c9924d0a",
-      "ClientSideComponentProperties": "",
+      "ClientSideComponentId": "53dd6a38-1461-44e0-9bf0-14883316a316",
+      "ClientSideComponentProperties": "{\"sampleTextOne\":\"One item is selected in the list.\", \"sampleTextTwo\":\"This command is always visible.\"}",
       "CommandUIExtension": null,
       "Description": null,
       "Group": null,
       "HostProperties": "",
-      "Id": "e7000aef-f756-4997-9420-01cc84f9ac9c",
+      "Id": "bb26547d-c9b7-4ed1-b793-00cbe53388d6",
       "ImageUrl": null,
       "Location": "ClientSideExtension.ListViewCommandSet.CommandBar",
-      "Name": "{e7000aef-f756-4997-9420-01cc84f9ac9c}",
+      "Name": "{bb26547d-c9b7-4ed1-b793-00cbe53388d6}",
       "RegistrationId": "100",
-      "RegistrationType": 0,
+      "RegistrationType": 1,
       "Rights": {
         "High": 0,
         "Low": 0
       },
-      "Scope": 2,
+      "Scope": 3,
       "ScriptBlock": null,
       "ScriptSrc": null,
-      "Sequence": 0,
-      "Title": "test",
+      "Sequence": 65536,
+      "Title": "HelloWorld",
       "Url": null,
-      "VersionOfUserCustomAction": "16.0.1.0"
+      "VersionOfUserCustomAction": "1.0.1.0"
     }
   ]
   ```
@@ -75,49 +75,43 @@ m365 spo commandset list --webUrl https://contoso.sharepoint.com/sites/sales
   <TabItem value="Text">
 
   ```text
-  Name                                    Location                                           Scope  Id
-  --------------------------------------  -------------------------------------------------  -----  ------------------------------------
-  {e7000aef-f756-4997-9420-01cc84f9ac9c}  ClientSideExtension.ListViewCommandSet.CommandBar  2      e7000aef-f756-4997-9420-01cc84f9ac9c
+  Id                                    Location                                           Name                                    Scope
+  ------------------------------------  -------------------------------------------------  --------------------------------------  -----
+  bb26547d-c9b7-4ed1-b793-00cbe53388d6  ClientSideExtension.ListViewCommandSet.CommandBar  {bb26547d-c9b7-4ed1-b793-00cbe53388d6}  3    
   ```
 
   </TabItem>
   <TabItem value="CSV">
 
   ```csv
-  Name,Location,Scope,Id
-  {e7000aef-f756-4997-9420-01cc84f9ac9c},ClientSideExtension.ListViewCommandSet.CommandBar,2,e7000aef-f756-4997-9420-01cc84f9ac9c
+  ClientSideComponentId,ClientSideComponentProperties,CommandUIExtension,Description,Group,HostProperties,Id,ImageUrl,Location,Name,RegistrationId,RegistrationType,Scope,ScriptBlock,ScriptSrc,Sequence,Title,Url,VersionOfUserCustomAction
+  53dd6a38-1461-44e0-9bf0-14883316a316,"{""sampleTextOne"":""One item is selected in the list."", ""sampleTextTwo"":""This command is always visible.""}",,,,,bb26547d-c9b7-4ed1-b793-00cbe53388d6,,ClientSideExtension.ListViewCommandSet.CommandBar,{bb26547d-c9b7-4ed1-b793-00cbe53388d6},100,1,3,,,65536,HelloWorld,,1.0.1.0
   ```
 
   </TabItem>
   <TabItem value="Markdown">
 
   ```md
-  # spo commandset list --webUrl "https://ordidev.sharepoint.com"
+  # spo commandset list --webUrl "https://contoso.sharepoint.com/sites/Marketing"
 
-  Date: 20/2/2023
+  Date: 16/05/2024
 
-  ## test (e7000aef-f756-4997-9420-01cc84f9ac9c)
+  ## HelloWorld (bb26547d-c9b7-4ed1-b793-00cbe53388d6)
 
   Property | Value
   ---------|-------
-  ClientSideComponentId | b206e130-1a5b-4ae7-86a7-4f91c9924d0a
-  ClientSideComponentProperties |
-  CommandUIExtension | null
-  Description | null
-  Group | null
+  ClientSideComponentId | 53dd6a38-1461-44e0-9bf0-14883316a316
+  ClientSideComponentProperties | {"sampleTextOne":"One item is selected in the list.", "sampleTextTwo":"This command is always visible."}
   HostProperties |
-  Id | e7000aef-f756-4997-9420-01cc84f9ac9c
-  ImageUrl | null
+  Id | bb26547d-c9b7-4ed1-b793-00cbe53388d6
   Location | ClientSideExtension.ListViewCommandSet.CommandBar
+  Name | {bb26547d-c9b7-4ed1-b793-00cbe53388d6}
   RegistrationId | 100
-  RegistrationType | 0
-  Scope | 2
-  ScriptBlock | null
-  ScriptSrc | null
-  Sequence | 0
-  Title | test
-  Url | null
-  VersionOfUserCustomAction | 16.0.1.0
+  RegistrationType | 1
+  Scope | 3
+  Sequence | 65536
+  Title | HelloWorld
+  VersionOfUserCustomAction | 1.0.1.0
   ```
 
   </TabItem>
