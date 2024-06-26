@@ -2532,6 +2532,11 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'folder roleinheritance reset',
               id: 'cmd/spo/folder/folder-roleinheritance-reset'
+            },
+            {
+              type: 'doc',
+              label: 'folder sharinglink set',
+              id: 'cmd/spo/folder/folder-sharinglink-set'
             }
           ]
         },
