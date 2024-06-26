@@ -100,7 +100,7 @@ describe('autocomplete', () => {
   };
 
   before(async () => {
-    sinon.stub(fs, 'existsSync').callsFake(() => false);
+    sinon.stub(fs, 'existsSync').returns(false);
     autocomplete = (await import('./autocomplete.js')).autocomplete;
   });
 
@@ -113,7 +113,7 @@ describe('autocomplete', () => {
   });
 
   it('writes sh completion to disk', () => {
-    const writeFileSyncStub = sinon.stub(fs, 'writeFileSync').callsFake(() => { });
+    const writeFileSyncStub = sinon.stub(fs, 'writeFileSync').returns();
     cli.commands.push(cli.getCommandInfo(new SimpleCommand(), 'command.js', 'command.mdx'));
     autocomplete.generateShCompletion();
     assert(writeFileSyncStub.calledWith(path.join(__dirname, `..${path.sep}commands.json`), JSON.stringify({
@@ -218,8 +218,8 @@ describe('autocomplete', () => {
 
   it('loads generated commands info from the file system', () => {
     sinonUtil.restore(fs.existsSync);
-    sinon.stub(fs, 'existsSync').callsFake(() => true);
-    const readFileSyncStub = sinon.stub(fs, 'readFileSync').callsFake(() => JSON.stringify({}));
+    sinon.stub(fs, 'existsSync').returns(true);
+    const readFileSyncStub = sinon.stub(fs, 'readFileSync').returns(JSON.stringify({}));
     (autocomplete as any).init();
     try {
       assert(readFileSyncStub.calledWith(path.join(__dirname, `..${path.sep}commands.json`), 'utf-8'));
@@ -238,8 +238,8 @@ describe('autocomplete', () => {
 
   it('doesnt fail when the commands file is empty', () => {
     sinonUtil.restore(fs.existsSync);
-    sinon.stub(fs, 'existsSync').callsFake(() => true);
-    const readFileSyncStub = sinon.stub(fs, 'readFileSync').callsFake(() => '');
+    sinon.stub(fs, 'existsSync').returns(true);
+    const readFileSyncStub = sinon.stub(fs, 'readFileSync').returns('');
     (autocomplete as any).init();
     try {
       assert.strictEqual(JSON.stringify((autocomplete as any).commands), JSON.stringify({}));
