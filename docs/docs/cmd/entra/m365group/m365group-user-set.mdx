@@ -2,7 +2,7 @@ import Global from '/docs/cmd/_global.mdx';
 
 # entra m365group user set
 
-Updates role of the specified user in the specified Microsoft 365 Group or Microsoft Teams team
+Updates role of the specified users in the specified Microsoft 365 Group or Microsoft Teams team
 
 ## Usage
 
@@ -24,13 +24,25 @@ m365 aad teams user set
 
 ```md definition-list
 `-i, --groupId [groupId]`
-: The ID of the Microsoft 365 group for which to update user
+: The ID of the Microsoft 365 group. Specify only one of the following: `groupId`, `groupName`, `teamId`, or `teamName`.
+
+`--groupName [groupName]`
+: The display name of the Microsoft 365 group. Specify only one of the following: `groupId`, `groupName`, `teamId`, or `teamName`.
 
 `--teamId [teamId]`
-: The ID of the Microsoft Teams team for which to update user
+: The ID of the Teams team. Specify only one of the following: `groupId`, `groupName`, `teamId`, or `teamName`.
 
-`-n, --userName <userName>`
-: UPN of the user for whom to update the role (eg. johndoe@example.com)
+`--teamName [teamName]`
+: The display name of the Microsoft Teams team. Specify only one of the following: `groupId`, `groupName`, `teamId`, or `teamName`.
+
+`-n, --userName [userName]`
+: User's UPN (User Principal Name), e.g. johndoe@example.com. This option is deprecated. Please use `ids` or `userNames` instead.
+
+`--ids [ids]`
+: Microsoft Entra IDs of users. You can also pass a comma-separated list of IDs. Specify either `ids` or `userNames` but not both.
+
+`--userNames [userNames]`
+: The user principal names of users. You can also pass a comma-separated list of UPNs. Specify either `ids` or `userNames` but not both.
 
 `-r, --role <role>`
 : Role to set for the given user in the specified Microsoft 365 Group or Microsoft Teams team. Allowed values: `Owner`, `Member`
@@ -44,28 +56,40 @@ The command will return an error if the user already has the specified role in t
 
 ## Examples
 
-Promote the specified user to owner of the given Microsoft 365 Group
+Promote a single user to Owner of the given Microsoft 365 Group
 
 ```sh
 m365 entra m365group user set --groupId '00000000-0000-0000-0000-000000000000' --userName 'anne.matthews@contoso.onmicrosoft.com' --role Owner
 ```
 
-Demote the specified user from owner to member in the given Microsoft 365 Group
+Promote multiple users specified by the userNames parameter to Owner of the given Microsoft 365 Group
+
+```sh
+m365 entra m365group user set --groupName 'Contoso' --userNames 'anne.matthews@contoso.onmicrosoft.com,john.doe@contoso.onmicrosoft.com' --role Owner
+```
+
+Promote multiple users specified by the ids parameter to Owner of the given Microsoft 365 Group
+
+```sh
+m365 entra m365group user set --groupId '00000000-0000-0000-0000-000000000000' --ids '74a3b772-3122-447b-b9da-10895e238219,dd3d21e4-a142-46b9-8482-bca8fe9596b3' --role Owner
+```
+
+Demote a single user from Owner to Member in the given Microsoft 365 Group
 
 ```sh
 m365 entra m365group user set --groupId '00000000-0000-0000-0000-000000000000' --userName 'anne.matthews@contoso.onmicrosoft.com' --role Member
 ```
 
-Promote the specified user to owner of the given Microsoft Teams team
+Demote multiple users specified by the userNames parameter from Owner to Member of the given Microsoft Teams team
 
 ```sh
-m365 entra teams user set --teamId '00000000-0000-0000-0000-000000000000' --userName 'anne.matthews@contoso.onmicrosoft.com' --role Owner
+m365 entra teams user set --teamId '00000000-0000-0000-0000-000000000000' --userNames 'anne.matthews@contoso.onmicrosoft.com,john.doe@contoso.onmicrosoft.com' --role Member
 ```
 
-Demote the specified user from owner to member in the given Microsoft Teams team
+Demote multiple users specified by the ids parameter from Owner to Member in the given Microsoft Teams team
 
 ```sh
-m365 entra teams user set --teamId '00000000-0000-0000-0000-000000000000' --userName 'anne.matthews@contoso.onmicrosoft.com' --role Member
+m365 entra teams user set --teamName 'Engineering' --ids '74a3b772-3122-447b-b9da-10895e238219,dd3d21e4-a142-46b9-8482-bca8fe9596b3' --role Member
 ```
 
 ## Response
