@@ -41,7 +41,7 @@ class SpeContainertypeListCommand extends SpoCommand {
 
   private async getAllContainerTypes(spoAdminUrl: string, logger: Logger): Promise<ContainerTypeProperties[]> {
     const formDigest: FormDigestInfo | undefined;
-    const formDigestInfo: FormDigestInfo = await spo.ensureFormDigest(spoAdminUrl, logger, formDigest, this.debug);
+    const formDigestInfo: FormDigestInfo = await spo.ensureFormDigest(spoAdminUrl, logger, undefined, this.debug);
 
     const requestOptions: CliRequestOptions = {
       url: `${spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
