@@ -20,6 +20,7 @@ class SpeContainertypeListCommand extends SpoCommand {
   public defaultProperties(): string[] | undefined {
     return ['ContainerTypeId', 'ContainerTypeName', 'OwningApplicationId'];
   }
+  
   public async commandAction(logger: Logger): Promise<void> {
     try {
       const spoAdminUrl = await spo.getSpoAdminUrl(logger, this.debug);
