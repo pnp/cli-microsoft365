@@ -95,7 +95,7 @@ describe(commands.CONTAINERTYPE_LIST, () => {
   });
 
   it('defines correct properties for the default output', () => {
-    assert.deepStrictEqual(command.defaultProperties(), ['ContainerTypeId', 'ContainerTypeName', 'OwningApplicationId']);
+    assert.deepStrictEqual(command.defaultProperties(), ['ContainerTypeId', 'DisplayName', 'OwningAppId']);
   });
 
   it('correctly handles random API error', async () => {
