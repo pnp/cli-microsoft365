@@ -56,12 +56,11 @@ class SpeContainertypeListCommand extends SpoCommand {
     const response: ClientSvcResponseContents = json[0];
 
     if (response.ErrorInfo) {
-      throw (response.ErrorInfo.ErrorMessage);
+      throw response.ErrorInfo.ErrorMessage;
     }
-    else {
-      const containerTypes: ContainerTypeProperties[] = json[json.length - 1];
-      this.allContainerTypes!.push(...containerTypes);
-    }
+
+    const containerTypes: ContainerTypeProperties[] = json[json.length - 1];
+    return containerTypes;
   }
 }
 
