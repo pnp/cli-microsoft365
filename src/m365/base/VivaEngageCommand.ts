@@ -1,8 +1,22 @@
-import Command, { CommandError } from "../../Command.js";
+import Command, { CommandArgs, CommandError } from "../../Command.js";
+import auth from "../../Auth.js";
+import { Logger } from "../../cli/Logger.js";
+import { accessToken } from "../../utils/accessToken.js";
 
 export default abstract class VivaEngageCommand extends Command {
   protected get resource(): string {
     return 'https://www.yammer.com/api';
+  }
+
+  protected initAction(args: CommandArgs, logger: Logger): void {
+    super.initAction(args, logger);
+
+    if (!auth.connection.active) {
+      // we fail no login in the base command command class
+      return;
+    }
+
+    accessToken.assertDelegatedAccessToken();
   }
 
   protected handleRejectedODataJsonPromise(response: any): void {

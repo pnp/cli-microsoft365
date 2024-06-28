@@ -90,27 +90,27 @@ class TeamsUserAppAddCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const appId: string = await this.getAppId(args);
-    const userId: string = (args.options.userId ?? args.options.userName) as string;
-    const endpoint: string = `${this.resource}/v1.0`;
-
-    if (this.verbose) {
-      await logger.logToStderr(`Removing app with ID ${appId} for user ${args.options.userId}`);
-    }
-
-    const requestOptions: CliRequestOptions = {
-      url: `${endpoint}/users/${formatting.encodeQueryParameter(userId)}/teamwork/installedApps`,
-      headers: {
-        'content-type': 'application/json;odata=nometadata',
-        'accept': 'application/json;odata.metadata=none'
-      },
-      responseType: 'json',
-      data: {
-        'teamsApp@odata.bind': `${endpoint}/appCatalogs/teamsApps/${appId}`
-      }
-    };
-
     try {
+      const appId: string = await this.getAppId(args);
+      const userId: string = (args.options.userId ?? args.options.userName) as string;
+      const endpoint: string = `${this.resource}/v1.0`;
+
+      if (this.verbose) {
+        await logger.logToStderr(`Adding app with ID ${appId} for user ${args.options.userId}`);
+      }
+
+      const requestOptions: CliRequestOptions = {
+        url: `${endpoint}/users/${formatting.encodeQueryParameter(userId)}/teamwork/installedApps`,
+        headers: {
+          'content-type': 'application/json;odata=nometadata',
+          'accept': 'application/json;odata.metadata=none'
+        },
+        responseType: 'json',
+        data: {
+          'teamsApp@odata.bind': `${endpoint}/appCatalogs/teamsApps/${appId}`
+        }
+      };
+
       await request.post(requestOptions);
     }
     catch (err: any) {

@@ -11,6 +11,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './solution-publisher-list.js';
+import { accessToken } from '../../../../utils/accessToken.js';
 
 describe(commands.SOLUTION_PUBLISHER_LIST, () => {
   const validEnvironment = '4be50206-9576-4237-8b17-38d8aadfaa36';
@@ -48,6 +49,7 @@ describe(commands.SOLUTION_PUBLISHER_LIST, () => {
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
+    sinon.stub(accessToken, 'assertDelegatedAccessToken').returns();
     auth.connection.active = true;
   });
 

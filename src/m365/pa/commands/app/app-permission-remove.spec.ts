@@ -61,11 +61,12 @@ describe(commands.APP_PERMISSION_REMOVE, () => {
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
-    auth.connection.active = true;
+    sinon.stub(accessToken, 'assertDelegatedAccessToken').returns();
     auth.connection.accessTokens[auth.defaultResource] = {
       expiresOn: '123',
       accessToken: 'abc'
     };
+    auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
   });
 
@@ -83,9 +84,9 @@ describe(commands.APP_PERMISSION_REMOVE, () => {
       }
     };
 
-    sinon.stub(cli, 'promptForConfirmation').callsFake(() => {
+    sinon.stub(cli, 'promptForConfirmation').callsFake(async () => {
       promptIssued = true;
-      return Promise.resolve(false);
+      return false;
     });
 
     promptIssued = false;

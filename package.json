@@ -1,6 +1,6 @@
 {
   "name": "@pnp/cli-microsoft365",
-  "version": "7.9.0",
+  "version": "7.10.0",
   "description": "Manage Microsoft 365 and SharePoint Framework projects on any platform",
   "license": "MIT",
   "main": "./dist/api.js",
@@ -108,6 +108,11 @@
       "name": "Milan Holemans",
       "email": "11723921+milanholemans@users.noreply.github.com",
       "web": "https://github.com/milanholemans"
+    },
+    {
+      "name": "Mathijs Verbeeck",
+      "email": "verbeeckmathijs@gmail.com",
+      "web": "https://github.com/MathijsVerbeeck"
     }
   ],
   "contributors": [
@@ -151,6 +156,7 @@
     "Hunt, Geoffrey <info@runningdeveloper.com>",
     "Hvam, Allan <ahp@delegate.dk>",
     "Jaakke, Robert <robert.jaakke@mavention.nl>",
+    "Jain, Lovy <54174168+lovyjain@users.noreply.github.com>",
     "Junker Aaron <aaron.junker@outlook.com>",
     "Kailasam, Balamurugan <kshsbala@engineer.com>",
     "Karda, Akash <akashkarda@gmail.com>",
@@ -245,22 +251,22 @@
     "Zachariassen Laksafoss, Trygvi <trygvi.laksafoss@gmail.com>"
   ],
   "dependencies": {
-    "@azure/msal-common": "^14.10.0",
-    "@azure/msal-node": "^2.8.0",
-    "@inquirer/confirm": "^3.1.6",
-    "@inquirer/input": "^2.1.6",
-    "@inquirer/select": "^2.3.2",
+    "@azure/msal-common": "^14.11.0",
+    "@azure/msal-node": "^2.9.1",
+    "@inquirer/confirm": "^3.1.9",
+    "@inquirer/input": "^2.1.9",
+    "@inquirer/select": "^2.3.5",
     "@xmldom/xmldom": "^0.8.10",
     "adaptive-expressions": "^4.22.2",
-    "adaptivecards": "^3.0.3",
+    "adaptivecards": "^3.0.4",
     "adaptivecards-templating": "^2.3.1",
-    "adm-zip": "^0.5.12",
+    "adm-zip": "^0.5.14",
     "applicationinsights": "^2.9.5",
-    "axios": "^1.6.8",
+    "axios": "^1.7.2",
     "chalk": "^5.3.0",
     "clipboardy": "^4.0.0",
     "configstore": "^6.0.0",
-    "csv-stringify": "^6.4.6",
+    "csv-stringify": "^6.5.0",
     "easy-table": "^1.2.0",
     "jmespath": "^0.16.0",
     "json-to-ast": "^2.1.0",
@@ -269,12 +275,12 @@
     "omelette": "^0.4.17",
     "open": "^10.1.0",
     "ora": "^8.0.1",
-    "semver": "^7.6.1",
+    "semver": "^7.6.2",
     "strip-json-comments": "^5.0.1",
     "typescript": "^5.4.5",
     "update-notifier": "^7.0.0",
     "uuid": "^9.0.1",
-    "yaml": "^2.4.2"
+    "yaml": "^2.4.3"
   },
   "devDependencies": {
     "@actions/core": "^1.10.1",
@@ -284,7 +290,7 @@
     "@types/json-to-ast": "^2.1.4",
     "@types/minimist": "^1.2.5",
     "@types/mocha": "^10.0.6",
-    "@types/node": "^20.12.10",
+    "@types/node": "^20.14.2",
     "@types/node-forge": "^1.3.11",
     "@types/omelette": "^0.4.4",
     "@types/semver": "^7.5.8",
@@ -292,13 +298,13 @@
     "@types/update-notifier": "^6.0.8",
     "@types/uuid": "^9.0.8",
     "@typescript-eslint/eslint-plugin": "^7.8.0",
-    "@typescript-eslint/parser": "^7.8.0",
+    "@typescript-eslint/parser": "^7.12.0",
     "c8": "^9.1.0",
     "eslint": "^8.57.0",
     "eslint-plugin-cli-microsoft365": "file:eslint-rules",
     "eslint-plugin-mocha": "^10.4.3",
     "mocha": "^10.4.0",
-    "rimraf": "^5.0.5",
+    "rimraf": "^5.0.7",
     "sinon": "^17.0.2",
     "source-map-support": "^0.5.21"
   }

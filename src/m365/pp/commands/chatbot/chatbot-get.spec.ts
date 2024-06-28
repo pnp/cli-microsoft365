@@ -15,6 +15,7 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './chatbot-get.js';
 import { settingsNames } from '../../../../settingsNames.js';
+import { accessToken } from '../../../../utils/accessToken.js';
 
 describe(commands.CHATBOT_GET, () => {
   let commandInfo: CommandInfo;
@@ -86,6 +87,7 @@ describe(commands.CHATBOT_GET, () => {
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
+    sinon.stub(accessToken, 'assertDelegatedAccessToken').returns();
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName: string, defaultValue: any) => {

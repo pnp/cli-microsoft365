@@ -13,6 +13,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './app-permission-list.js';
+import { accessToken } from '../../../../utils/accessToken.js';
 
 describe(commands.APP_PERMISSION_LIST, () => {
   const environmentName = 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6';
@@ -78,6 +79,7 @@ describe(commands.APP_PERMISSION_LIST, () => {
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
+    sinon.stub(accessToken, 'assertDelegatedAccessToken').returns();
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
   });

@@ -105,6 +105,15 @@ describe(commands.SITE_SET, () => {
     assert.notStrictEqual(actual, true);
   });
 
+  it('fails validation if no option is specified', async () => {
+    const actual = await command.validate({
+      options: {
+        url: 'https://contoso.sharepoint.com/sites/team'
+      }
+    }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
   it('fails validation if the resourceQuota is not a number', async () => {
     const actual = await command.validate({
       options: {
@@ -178,16 +187,6 @@ describe(commands.SITE_SET, () => {
         url: 'https://contoso.sharepoint.com/sites/team', lockState: 'Invalid'
       }
     }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if specified id is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com', id: 'ABC' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if no property to update specified (id specified)', async () => {
-    const actual = await command.validate({ options: { id: '255a50b2-527f-4413-8485-57f4c17a24d1', url: 'https://contoso.sharepoint.com' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
@@ -318,11 +317,6 @@ describe(commands.SITE_SET, () => {
 
   it('passes validation if url and socialBarOnSitePagesDisabled false specified', async () => {
     const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com', socialBarOnSitePagesDisabled: false } }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
-
-  it('passes validation if url, id, classification and disableFlows specified', async () => {
-    const actual = await command.validate({ options: { id: '255a50b2-527f-4413-8485-57f4c17a24d1', url: 'https://contoso.sharepoint.com', classification: 'HBI', disableFlows: true } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
@@ -1360,7 +1354,7 @@ describe(commands.SITE_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { classification: 'HBI', id: '255a50b2-527f-4413-8485-57f4c17a24d1', url: 'https://contoso.sharepoint.com/sites/Sales' } });
+    await command.action(logger, { options: { classification: 'HBI', url: 'https://contoso.sharepoint.com/sites/Sales' } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -1387,7 +1381,7 @@ describe(commands.SITE_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, classification: 'HBI', id: '255a50b2-527f-4413-8485-57f4c17a24d1', url: 'https://contoso.sharepoint.com/sites/Sales' } });
+    await command.action(logger, { options: { debug: true, classification: 'HBI', url: 'https://contoso.sharepoint.com/sites/Sales' } });
     assert(loggerLogToStderrSpy.calledWith('Site is not group connected'));
   });
 
@@ -1415,7 +1409,7 @@ describe(commands.SITE_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { classification: 'HBI', id: '255a50b2-527f-4413-8485-57f4c17a24d1', url: 'https://contoso.sharepoint.com/sites/Sales' } });
+    await command.action(logger, { options: { classification: 'HBI', url: 'https://contoso.sharepoint.com/sites/Sales' } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -1443,7 +1437,7 @@ describe(commands.SITE_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, classification: 'HBI', id: '255a50b2-527f-4413-8485-57f4c17a24d1', url: 'https://contoso.sharepoint.com/sites/Sales' } });
+    await command.action(logger, { options: { debug: true, classification: 'HBI', url: 'https://contoso.sharepoint.com/sites/Sales' } });
     assert(loggerLogToStderrSpy.calledWith(`Site attached to group e10a459e-60c8-4000-8240-a68d6a12d39e`));
   });
 
@@ -1676,7 +1670,7 @@ describe(commands.SITE_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { classification: '', id: '255a50b2-527f-4413-8485-57f4c17a24d1', url: 'https://contoso.sharepoint.com/sites/Sales' } });
+    await command.action(logger, { options: { classification: '', url: 'https://contoso.sharepoint.com/sites/Sales' } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -1704,7 +1698,7 @@ describe(commands.SITE_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { classification: '', id: '255a50b2-527f-4413-8485-57f4c17a24d1', url: 'https://contoso.sharepoint.com/sites/Sales' } });
+    await command.action(logger, { options: { classification: '', url: 'https://contoso.sharepoint.com/sites/Sales' } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -1732,7 +1726,7 @@ describe(commands.SITE_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { disableFlows: true, id: '255a50b2-527f-4413-8485-57f4c17a24d1', url: 'https://contoso.sharepoint.com/sites/Sales' } });
+    await command.action(logger, { options: { disableFlows: true, url: 'https://contoso.sharepoint.com/sites/Sales' } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -1760,7 +1754,7 @@ describe(commands.SITE_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { disableFlows: true, id: '255a50b2-527f-4413-8485-57f4c17a24d1', url: 'https://contoso.sharepoint.com/sites/Sales' } });
+    await command.action(logger, { options: { disableFlows: true, url: 'https://contoso.sharepoint.com/sites/Sales' } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -1788,7 +1782,7 @@ describe(commands.SITE_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { disableFlows: false, id: '255a50b2-527f-4413-8485-57f4c17a24d1', url: 'https://contoso.sharepoint.com/sites/Sales' } });
+    await command.action(logger, { options: { disableFlows: false, url: 'https://contoso.sharepoint.com/sites/Sales' } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -1816,7 +1810,7 @@ describe(commands.SITE_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { socialBarOnSitePagesDisabled: true, id: '255a50b2-527f-4413-8485-57f4c17a24d1', url: 'https://contoso.sharepoint.com/sites/Sales' } });
+    await command.action(logger, { options: { socialBarOnSitePagesDisabled: true, url: 'https://contoso.sharepoint.com/sites/Sales' } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -1844,7 +1838,7 @@ describe(commands.SITE_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { socialBarOnSitePagesDisabled: true, id: '255a50b2-527f-4413-8485-57f4c17a24d1', url: 'https://contoso.sharepoint.com/sites/Sales' } });
+    await command.action(logger, { options: { socialBarOnSitePagesDisabled: true, url: 'https://contoso.sharepoint.com/sites/Sales' } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -1872,7 +1866,7 @@ describe(commands.SITE_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { socialBarOnSitePagesDisabled: false, id: '255a50b2-527f-4413-8485-57f4c17a24d1', url: 'https://contoso.sharepoint.com/sites/Sales' } });
+    await command.action(logger, { options: { socialBarOnSitePagesDisabled: false, url: 'https://contoso.sharepoint.com/sites/Sales' } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -1900,7 +1894,7 @@ describe(commands.SITE_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { shareByEmailEnabled: true, id: '255a50b2-527f-4413-8485-57f4c17a24d1', url: 'https://contoso.sharepoint.com/sites/Sales' } });
+    await command.action(logger, { options: { shareByEmailEnabled: true, url: 'https://contoso.sharepoint.com/sites/Sales' } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -1928,7 +1922,7 @@ describe(commands.SITE_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { shareByEmailEnabled: true, id: '255a50b2-527f-4413-8485-57f4c17a24d1', url: 'https://contoso.sharepoint.com/sites/Sales' } });
+    await command.action(logger, { options: { shareByEmailEnabled: true, url: 'https://contoso.sharepoint.com/sites/Sales' } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -1956,7 +1950,7 @@ describe(commands.SITE_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { shareByEmailEnabled: false, id: '255a50b2-527f-4413-8485-57f4c17a24d1', url: 'https://contoso.sharepoint.com/sites/Sales' } });
+    await command.action(logger, { options: { shareByEmailEnabled: false, url: 'https://contoso.sharepoint.com/sites/Sales' } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -1984,7 +1978,7 @@ describe(commands.SITE_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { shareByEmailEnabled: false, id: '255a50b2-527f-4413-8485-57f4c17a24d1', url: 'https://contoso.sharepoint.com/sites/Sales' } });
+    await command.action(logger, { options: { shareByEmailEnabled: false, url: 'https://contoso.sharepoint.com/sites/Sales' } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -2430,7 +2424,7 @@ describe(commands.SITE_SET, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/Sales', id: '255a50b2-527f-4413-8485-57f4c17a24d1', classification: 'HBI' } } as any), new CommandError("404 - \"404 FILE NOT FOUND\""));
+    await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/Sales', classification: 'HBI' } } as any), new CommandError("404 - \"404 FILE NOT FOUND\""));
   });
 
   it('correctly handles API error while updating shared properties', async () => {
@@ -2458,7 +2452,7 @@ describe(commands.SITE_SET, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/Sales', id: '255a50b2-527f-4413-8485-57f4c17a24d1', classification: 'HBI' } } as any),
+    await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/Sales', classification: 'HBI' } } as any),
       new CommandError("An error has occurred."));
   });
 

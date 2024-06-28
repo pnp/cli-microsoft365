@@ -1,8 +1,10 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
-import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
+import { cli } from '../../../../cli/cli.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
+import { Logger } from '../../../../cli/Logger.js';
 import request from '../../../../request.js';
 import { telemetry } from '../../../../telemetry.js';
 import { formatting } from '../../../../utils/formatting.js';
@@ -14,6 +16,7 @@ import command from './user-list.js';
 import aadCommands from '../../aadCommands.js';
 
 describe(commands.USER_LIST, () => {
+  let commandInfo: CommandInfo;
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -24,6 +27,7 @@ describe(commands.USER_LIST, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
+    commandInfo = cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -71,9 +75,19 @@ describe(commands.USER_LIST, () => {
     assert.deepStrictEqual(alias, [aadCommands.USER_LIST]);
   });
 
+  it('fails validation if type is not a valid user type', async () => {
+    const actual = await command.validate({ options: { type: 'invalid' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('passes validation if type is a valid user type', async () => {
+    const actual = await command.validate({ options: { type: 'Member' } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
   it('lists users in the tenant with the default properties (debug)', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users?$select=id,displayName,mail,userPrincipalName&$top=100`) {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/users') {
         return {
           "value": [
             { "id": "1f5595b2-aa07-445d-9801-a45ea18160b2", "displayName": "Aarif Sherzai", "mail": "AarifS@contoso.onmicrosoft.com", "userPrincipalName": "AarifS@contoso.onmicrosoft.com" },
@@ -94,7 +108,7 @@ describe(commands.USER_LIST, () => {
 
   it('retrieves only the specified user properties', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users?$select=displayName,mail&$top=100`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users?$select=displayName,mail`) {
         return {
           "value": [
             { "displayName": "Aarif Sherzai", "mail": "AarifS@contoso.onmicrosoft.com" }, { "displayName": "Achim Maier", "mail": "AchimM@contoso.onmicrosoft.com" }
@@ -113,7 +127,7 @@ describe(commands.USER_LIST, () => {
 
   it('retrieves properties for all users with properties option includes values with a slash', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users?$select=displayName&$expand=manager($select=displayName),manager($select=department)&$top=100`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users?$select=displayName&$expand=manager($select=displayName),manager($select=department)`) {
         return {
           "value": [
             { "displayName": "Aarif Sherzai", "manager": { "displayName": "Jon Doe", "department": "IT" } }, { "displayName": "Achim Maier", "manager": { "displayName": "Jon Doe", "department": "IT" } }
@@ -132,7 +146,7 @@ describe(commands.USER_LIST, () => {
 
   it('filters users by one property', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users?$select=id,displayName,mail,userPrincipalName&$filter=startsWith(surname, 'M')&$top=100`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=startsWith(surname, 'M')`) {
         return {
           "value": [
             { "id": "1f5595b2-aa07-445d-9801-a45ea18160b2", "displayName": "Achim Maier", "mail": "AchimM@contoso.onmicrosoft.com", "userPrincipalName": "AchimM@contoso.onmicrosoft.com" }, { "id": "0fe76bf5-222b-48f8-a5c1-a3a03b96d472", "displayName": "Karl Matteson", "mail": "KarlM@contoso.onmicrosoft.com", "userPrincipalName": "KarlM@contoso.onmicrosoft.com" }
@@ -151,7 +165,7 @@ describe(commands.USER_LIST, () => {
 
   it('filters users by multiple properties', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users?$select=id,displayName,mail,userPrincipalName&$filter=startsWith(surname, 'M') and startsWith(givenName, 'A')&$top=100`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=startsWith(surname, 'M') and startsWith(givenName, 'A')`) {
         return {
           "value": [
             { "id": "1f5595b2-aa07-445d-9801-a45ea18160b2", "displayName": "Achim Maier", "mail": "AchimM@contoso.onmicrosoft.com", "userPrincipalName": "AchimM@contoso.onmicrosoft.com" }, { "id": "7f50c7d9-916b-4da9-949e-09a431de2646", "displayName": "Anne Matthews", "mail": "AnneM@contoso.onmicrosoft.com", "userPrincipalName": "AnneM@contoso.onmicrosoft.com" }
@@ -170,7 +184,7 @@ describe(commands.USER_LIST, () => {
 
   it('lists users in the tenant with the guest type and surname', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users?$select=id,displayName,mail,userPrincipalName&$filter=startsWith(surname, 'S') and userType eq 'Guest'&$top=100`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=startsWith(surname, 'S') and userType eq 'Guest'`) {
         return {
           "value": [
             { "id": "7dc52cef-c513-4a53-bd43-93e9f6727911", "displayName": "Aarif Sherzai", "mail": "AarifS@fabrikam.onmicrosoft.com", "userPrincipalName": "AarifS_fabrikam.onmicrosoft.com#EXT#@contoso.onmicrosoft.com" }
@@ -187,9 +201,9 @@ describe(commands.USER_LIST, () => {
     ]));
   });
 
-  it('lists users in the tenant with only guest type', async () => {
+  it('lists users in the tenant with only guest type and shows only their displayName', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users?$select=id,displayName,mail,userPrincipalName&$filter=userType eq 'Guest'&$top=100`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users?$select=displayName&$filter=userType eq 'Guest'`) {
         return {
           "value": [
             { "id": "7dc52cef-c513-4a53-bd43-93e9f6727911", "displayName": "Aarif Sherzai", "mail": "AarifS@fabrikam.onmicrosoft.com", "userPrincipalName": "AarifS_fabrikam.onmicrosoft.com#EXT#@contoso.onmicrosoft.com" }
@@ -200,16 +214,16 @@ describe(commands.USER_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { type: 'Guest' } });
+    await command.action(logger, { options: { type: 'Guest', properties: 'displayName' } });
     assert(loggerLogSpy.calledWith([
       { "id": "7dc52cef-c513-4a53-bd43-93e9f6727911", "displayName": "Aarif Sherzai", "mail": "AarifS@fabrikam.onmicrosoft.com", "userPrincipalName": "AarifS_fabrikam.onmicrosoft.com#EXT#@contoso.onmicrosoft.com" }
     ]));
   });
-  
+
   it('escapes special characters in filters', async () => {
     const displayName = 'O\'Brien';
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users?$select=id,displayName,mail,userPrincipalName&$filter=startsWith(displayName, '${formatting.encodeQueryParameter(displayName)}')&$top=100`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=startsWith(displayName, '${formatting.encodeQueryParameter(displayName)}')`) {
         return {
           "value": []
         };
@@ -224,7 +238,7 @@ describe(commands.USER_LIST, () => {
 
   it('ignores global options in filters', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users?$select=id,displayName,mail,userPrincipalName&$filter=startsWith(surname, 'M') and startsWith(givenName, 'A')&$top=100`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=startsWith(surname, 'M') and startsWith(givenName, 'A')`) {
         return {
           "value": [
             { "id": "1f5595b2-aa07-445d-9801-a45ea18160b2", "displayName": "Achim Maier", "mail": "AchimM@contoso.onmicrosoft.com", "userPrincipalName": "AchimM@contoso.onmicrosoft.com" }, { "id": "7f50c7d9-916b-4da9-949e-09a431de2646", "displayName": "Anne Matthews", "mail": "AnneM@contoso.onmicrosoft.com", "userPrincipalName": "AnneM@contoso.onmicrosoft.com" }
@@ -250,16 +264,16 @@ describe(commands.USER_LIST, () => {
 
   it('handles error when retrieving second page of users', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users?$select=id,displayName,mail,userPrincipalName&$top=100`) {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/users') {
         return {
-          "@odata.nextLink": "https://graph.microsoft.com/v1.0/users?$select=id,displayName,mail,userPrincipalName&$top=100&$top=100&$skiptoken=X%2744537074090001000000000000000014000000C233BFA08475B84E8BF8C40335F8944D01000000000000000000000000000017312E322E3834302E3131333535362E312E342E32333331020000000000017D06501DC4C194438D57CFE494F81C1E%27",
+          "@odata.nextLink": "https://graph.microsoft.com/v1.0/users?$skiptoken=X%2744537074090001000000000000000014000000C233BFA08475B84E8BF8C40335F8944D01000000000000000000000000000017312E322E3834302E3131333535362E312E342E32333331020000000000017D06501DC4C194438D57CFE494F81C1E%27",
           "value": [
             { "id": "1f5595b2-aa07-445d-9801-a45ea18160b2", "displayName": "Achim Maier", "mail": "AchimM@contoso.onmicrosoft.com", "userPrincipalName": "AchimM@contoso.onmicrosoft.com" }, { "id": "7f50c7d9-916b-4da9-949e-09a431de2646", "displayName": "Anne Matthews", "mail": "AnneM@contoso.onmicrosoft.com", "userPrincipalName": "AnneM@contoso.onmicrosoft.com" }
           ]
         };
       }
 
-      if (opts.url === `https://graph.microsoft.com/v1.0/users?$select=id,displayName,mail,userPrincipalName&$top=100&$top=100&$skiptoken=X%2744537074090001000000000000000014000000C233BFA08475B84E8BF8C40335F8944D01000000000000000000000000000017312E322E3834302E3131333535362E312E342E32333331020000000000017D06501DC4C194438D57CFE494F81C1E%27`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users?$skiptoken=X%2744537074090001000000000000000014000000C233BFA08475B84E8BF8C40335F8944D01000000000000000000000000000017312E322E3834302E3131333535362E312E342E32333331020000000000017D06501DC4C194438D57CFE494F81C1E%27`) {
         throw 'An error has occurred';
       }
 
@@ -273,7 +287,7 @@ describe(commands.USER_LIST, () => {
     await assert.rejects(command.action(logger, { options: { surname: true } } as any), new CommandError('Specify value for the surname property'));
   });
 
-  it('allows unknown properties', () => {
+  it('allows unknown options', () => {
     const allowUnknownOptions = command.allowUnknownOptions();
     assert.strictEqual(allowUnknownOptions, true);
   });

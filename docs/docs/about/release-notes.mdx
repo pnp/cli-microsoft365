@@ -1,8 +1,71 @@
 ---
-sidebar_position: 4
+sidebar_position: 3
 ---
 
 # Release notes
+
+## v7.10.0 (beta)
+
+### New commands
+
+**Entra ID**
+
+- [entra pim role assignment eligibility list](../cmd/entra/pim/pim-role-assignment-eligibility-list.mdx) - retrieves a list of eligible roles a user or group can be assigned to [#5783](https://github.com/pnp/cli-microsoft365/issues/5783)
+- [entra pim role request list](../cmd/entra/pim/pim-role-request-list.mdx) - retrieves a list of PIM requests for roles [#5781](https://github.com/pnp/cli-microsoft365/issues/5781)
+- [entra app permission remove](../cmd/entra/app/app-permission-remove.mdx) - removes the specified application and/or delegated permissions from a specified Entra app [#5691](https://github.com/pnp/cli-microsoft365/issues/5691)
+
+**SharePoint:**
+
+- [spo tenant site archive](../cmd/spo/tenant/tenant-site-archive.mdx) - archives a site collection [#6018](https://github.com/pnp/cli-microsoft365/issues/6018)
+- [spo tenant site unarchive](../cmd/spo/tenant/tenant-site-unarchive.mdx) - unarchives a site collection [#6019](https://github.com/pnp/cli-microsoft365/issues/6019)
+- [spo site admin list](../cmd/spo/site/site-admin-list.mdx) - lists all administrators of a specific SharePoint site [#5882](https://github.com/pnp/cli-microsoft365/issues/5882)
+
+**Teams:**
+
+- [teams user app upgrade](../cmd/teams/user/user-app-upgrade.mdx) - upgrades an app in the personal scope of the specified user [#5705](https://github.com/pnp/cli-microsoft365/issues/5705)
+
+### Changes
+
+- added option 'ensureParentFolders' to [spo folder add](../cmd/spo/folder/folder-add.mdx) command [#5887](https://github.com/pnp/cli-microsoft365/issues/5887)
+- fixed logging in to USGov tenants [#6093](https://github.com/pnp/cli-microsoft365/issues/6093)
+- fixed duplicate white line in help page [#6071](https://github.com/pnp/cli-microsoft365/issues/6071)
+- fixed chili response behavior [#5987](https://github.com/pnp/cli-microsoft365/issues/5987)
+- fixed [spo file add](../cmd/spo/file/file-add.mdx) check-in issue [#6011](https://github.com/pnp/cli-microsoft365/issues/6011)
+- fixed docs for 'entra app permission remove' command [#6098](https://github.com/pnp/cli-microsoft365/issues/6098)
+- removed powershell comparison page
+
+## [v7.9.0](https://github.com/pnp/cli-microsoft365/releases/tag/v7.9.0)
+
+### New commands
+
+**Entra ID:**
+
+- [entra group user set](../cmd/entra/group/group-user-set.mdx) - updates role of users in an Entra group [#5473](https://github.com/pnp/cli-microsoft365/issues/5473)
+- [entra user groupmembership list](../cmd/entra/user/user-groupmembership-list.mdx) - retrieves all groups where the user is a member of [#5904](https://github.com/pnp/cli-microsoft365/issues/5904)
+
+**Global:**
+
+- [search](../cmd/search.mdx) - use Microsoft Search [#5344](https://github.com/pnp/cli-microsoft365/issues/5344)
+
+**Viva:**
+
+- [viva engage community get](../cmd/viva/engage/engage-community-get.mdx) - gets information of a Viva Engage community [#5754](https://github.com/pnp/cli-microsoft365/issues/5754)
+
+### Changes
+
+- added doc page 'pr checklist' [#5533](https://github.com/pnp/cli-microsoft365/issues/5533)
+- added support for gulp-cli v3 in 'spfx doctor' command [#6045](https://github.com/pnp/cli-microsoft365/issues/6045)
+- added more properties to output of [entra user list](../cmd/entra/user/user-list.mdx) command [#4667](https://github.com/pnp/cli-microsoft365/issues/4667)
+- added application permissions check on certain commands [#4054](https://github.com/pnp/cli-microsoft365/issues/4054)
+- fixed error when specifying empty SharePoint URL [#6012](https://github.com/pnp/cli-microsoft365/issues/6012)
+- fixed restoring team site group for command [spo tenant recyclebinitem restore](../cmd/spo/tenant/tenant-recyclebinitem-restore.mdx) [#6021](https://github.com/pnp/cli-microsoft365/issues/6021)
+
+## [v7.8.1](https://github.com/pnp/cli-microsoft365/releases/tag/v7.8.1)
+
+### Changes
+
+- fixed documentation typo for [spe containertype add](../cmd/spe/containertype/containertype-add) command [#6040](https://github.com/pnp/cli-microsoft365/issues/6040)
+- fixed logging in with client certificate [#6038](https://github.com/pnp/cli-microsoft365/issues/6038)
 
 ## [v7.8.0](https://github.com/pnp/cli-microsoft365/releases/tag/v7.8.0)
 
@@ -28,8 +91,8 @@ sidebar_position: 4
 - modified help output in case of errors [#5341](https://github.com/pnp/cli-microsoft365/issues/5341)
 - added appName option to 'entra app permission add/list' commands [#5786](https://github.com/pnp/cli-microsoft365/issues/5786)
 - added interactivity for planner commands [#5902](https://github.com/pnp/cli-microsoft365/issues/5902)
-- removed trailing slashes from [spo get](../cmd/spo/spo-get.mdx)
-- extended [spfx project upgrade](../cmd/spfx/project/project-upgrade.mdx) with support for v1.19.0[#6010](https://github.com/pnp/cli-microsoft365/issues/6010)
+- removed trailing slashes from [spo get](../cmd/spo/spo-get.mdx) [#5929](https://github.com/pnp/cli-microsoft365/pull/5929)
+- extended [spfx project upgrade](../cmd/spfx/project/project-upgrade.mdx) with support for v1.19.0 [#6010](https://github.com/pnp/cli-microsoft365/issues/6010)
 - extended [spfx doctor](../cmd/spfx/spfx-doctor.mdx) with support for v1.19.0 [#6010](https://github.com/pnp/cli-microsoft365/issues/6010)
 - extended [spfx project doctor](../cmd/spfx/project/project-doctor.mdx) with support for v1.19.0 [#6010](https://github.com/pnp/cli-microsoft365/issues/6010)
 

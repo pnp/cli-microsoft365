@@ -247,7 +247,7 @@ describe(commands.FOLDER_SET, () => {
 
   it('fails validation if the webUrl option is not valid', async () => {
     const actual = await command.validate({ options: { webUrl: 'abc', url: folderRelSiteUrl, name: newFolderName } }, commandInfo);
-    assert.strictEqual(actual, "abc is not a valid SharePoint Online site URL");
+    assert.strictEqual(actual, "'abc' is not a valid SharePoint Online site URL.");
   });
 
   it('passes validation when the url option specified', async () => {

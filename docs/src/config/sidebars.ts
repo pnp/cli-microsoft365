@@ -20,6 +20,7 @@ const sidebars: SidebarsConfig = {
     'cmd/login',
     'cmd/logout',
     'cmd/request',
+    'cmd/search',
     'cmd/setup',
     'cmd/status',
     'cmd/version',
@@ -274,6 +275,11 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
+              label: 'app permission remove',
+              id: 'cmd/entra/app/app-permission-remove'
+            },
+            {
+              type: 'doc',
               label: 'app role add',
               id: 'cmd/entra/app/app-role-add'
             },
@@ -358,6 +364,11 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'group user list',
               id: 'cmd/entra/group/group-user-list'
+            },
+            {
+              type: 'doc',
+              label: 'group user set',
+              id: 'cmd/entra/group/group-user-set'
             }
           ]
         },
@@ -562,6 +573,16 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'pim role assignment list',
               id: 'cmd/entra/pim/pim-role-assignment-list'
+            },
+            {
+              type: 'doc',
+              label: 'pim role assignment eligibility list',
+              id: 'cmd/entra/pim/pim-role-assignment-eligibility-list'
+            },
+            {
+              type: 'doc',
+              label: 'pim role request list',
+              id: 'cmd/entra/pim/pim-role-request-list'
             }
           ]
         },
@@ -629,6 +650,11 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'user set',
               id: 'cmd/entra/user/user-set'
+            },
+            {
+              type: 'doc',
+              label: 'user groupmembership list',
+              id: 'cmd/entra/user/user-groupmembership-list'
             },
             {
               type: 'doc',
@@ -3267,6 +3293,11 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
+              label: 'site admin list',
+              id: 'cmd/spo/site/site-admin-list'
+            },
+            {
+              type: 'doc',
               label: 'site ensure',
               id: 'cmd/spo/site/site-ensure'
             },
@@ -3610,6 +3641,16 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'tenant settings set',
               id: 'cmd/spo/tenant/tenant-settings-set'
+            },
+            {
+              type: 'doc',
+              label: 'tenant site archive',
+              id: 'cmd/spo/tenant/tenant-site-archive'
+            },
+            {
+              type: 'doc',
+              label: 'tenant site unarchive',
+              id: 'cmd/spo/tenant/tenant-site-unarchive'
             }
           ]
         },
@@ -4195,6 +4236,11 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'user app remove',
               id: 'cmd/teams/user/user-app-remove'
+            },
+            {
+              type: 'doc',
+              label: 'user app upgrade',
+              id: 'cmd/teams/user/user-app-upgrade'
             }
           ]
         }
@@ -4279,6 +4325,11 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'engage search',
               id: 'cmd/viva/engage/engage-search'
+            },
+            {
+              type: 'doc',
+              label: 'engage community get',
+              id: 'cmd/viva/engage/engage-community-get'
             },
             {
               type: 'doc',
@@ -4469,6 +4520,11 @@ const sidebars: SidebarsConfig = {
       type: 'doc',
       label: 'Pull Request review',
       id: 'contribute/expect-during-pr'
+    },
+    {
+      type: 'doc',
+      label: 'PR checklist',
+      id: 'contribute/pr-checklist'
     }
   ],
   about: [

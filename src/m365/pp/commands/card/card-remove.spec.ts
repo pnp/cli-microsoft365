@@ -14,6 +14,7 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import ppCardGetCommand from './card-get.js';
 import command from './card-remove.js';
+import { accessToken } from '../../../../utils/accessToken.js';
 
 describe(commands.CARD_REMOVE, () => {
   let commandInfo: CommandInfo;
@@ -34,6 +35,7 @@ describe(commands.CARD_REMOVE, () => {
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
+    sinon.stub(accessToken, 'assertDelegatedAccessToken').returns();
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
   });

@@ -1,0 +1,115 @@
+import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# spo site admin list
+
+Lists all administrators of a specific SharePoint site
+
+## Usage
+
+```sh
+m365 spo site admin list [options]
+```
+
+## Options
+
+```md definition-list
+`-u, --siteUrl <siteUrl>`
+: The URL of the SharePoint site
+
+`--asAdmin`
+: List admins as admin for sites you don't have permission to
+```
+
+<Global />
+
+## Remarks
+
+:::info
+
+To use this command with the `--asAdmin` mode, you must have permission to access the tenant admin site.
+
+Without this parameter, you must have site collection admin permissions for the requested site.
+
+In `--asAdmin` mode, the Id, PrincipalType, and PrincipalTypeString properties are not exported.
+
+:::
+
+## Examples
+
+Lists all admins of a SharePoint site
+
+```sh
+m365 spo site admin list --siteUrl https://contoso.sharepoint.com
+```
+
+Lists all admins of a SharePoint site as admin
+
+```sh
+m365 spo site admin list --siteUrl https://contoso.sharepoint.com --asAdmin
+```
+
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  [
+    {
+      "Id": 6,
+      "LoginName": "i:0#.f|membership|user@contoso.com",
+      "Title": "User Example",
+      "PrincipalType": 1,
+      "PrincipalTypeString": "User",
+      "Email": "user@contoso.com",
+      "IsPrimaryAdmin": true
+    }
+  ]
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  Email               : user@contoso.com
+  Id                  : 6
+  LoginName           : i:0#.f|membership|user@contoso.com
+  PrincipalType       : 1
+  PrincipalTypeString : User
+  Title               : User Example
+  IsPrimaryAdmin      : true
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  Id,LoginName,Title,PrincipalType,PrincipalTypeString,Email,IsPrimaryAdmin
+  6,i:0#.f|membership|user@contoso.com,User Example,1,User,user@contoso.com,1
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # spo site admin list --siteUrl "https://contoso.sharepoint.com/sites/Test"
+
+  Date: 20/03/2024
+
+  ## User
+
+  Property | Value
+  ---------|-------
+  Id | 6
+  LoginName | i:0#.f\|membership\|user@contoso.com
+  Title | User Example
+  PrincipalType | 1
+  PrincipalTypeString | User
+  Email | user@contoso.com
+  IsPrimaryAdmin | true
+  ```
+
+  </TabItem>
+</Tabs>

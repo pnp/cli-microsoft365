@@ -68,5 +68,6 @@ export default {
   USER_SET: `${prefix} user set`,
   USER_APP_ADD: `${prefix} user app add`,
   USER_APP_LIST: `${prefix} user app list`,
-  USER_APP_REMOVE: `${prefix} user app remove`
+  USER_APP_REMOVE: `${prefix} user app remove`,
+  USER_APP_UPGRADE: `${prefix} user app upgrade`
 };

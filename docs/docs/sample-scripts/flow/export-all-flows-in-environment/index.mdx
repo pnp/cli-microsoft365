@@ -34,7 +34,7 @@ This script will get all flows in your default environment and export them as bo
       $filename = $_.displayName.Replace(" ","")
       $timestamp = Get-Date -Format "yyyymmddhhmmss"
       $exportPath = "$($filename)_$($timestamp)"
-      $flowId = $_.Name
+      $flowId = $_.name
       
       m365 flow export --name $flowId --environmentName $environment --packageDisplayName $_.displayName --path "$exportPath.zip"
       m365 flow export --name $flowId --environmentName $environment --format json --path "$exportPath.json"

@@ -1,0 +1,21 @@
+import auth from '../../Auth.js';
+import { CommandArgs } from '../../Command.js';
+import { Logger } from '../../cli/Logger.js';
+import { accessToken } from '../../utils/accessToken.js';
+import GraphCommand from './GraphCommand.js';
+
+/**
+ * This command class is for delegated-only Graph commands.  
+ */
+export default abstract class DelegatedGraphCommand extends GraphCommand {
+  protected initAction(args: CommandArgs, logger: Logger): void {
+    super.initAction(args, logger);
+
+    if (!auth.connection.active) {
+      // we fail no login in the base command command class
+      return;
+    }
+
+    accessToken.assertDelegatedAccessToken();
+  }
+}
