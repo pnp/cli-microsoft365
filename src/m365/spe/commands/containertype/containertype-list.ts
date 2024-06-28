@@ -7,7 +7,6 @@ import commands from '../../commands.js';
 import { ContainerTypeProperties } from '../../ContainerTypeProperties.js';
 
 class SpeContainertypeListCommand extends SpoCommand {
-  private allContainerTypes?: ContainerTypeProperties[];
 
   public get name(): string {
     return commands.CONTAINERTYPE_LIST;
