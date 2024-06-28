@@ -18,7 +18,7 @@ class SpeContainertypeListCommand extends SpoCommand {
   }
 
   public defaultProperties(): string[] | undefined {
-    return ['ContainerTypeId', 'ContainerTypeName', 'OwningApplicationId'];
+    return ['ContainerTypeId', 'DisplayName', 'OwningAppId'];
   }
   
   public async commandAction(logger: Logger): Promise<void> {
