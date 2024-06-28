@@ -40,7 +40,7 @@ class SpeContainertypeListCommand extends SpoCommand {
   }
 
   private async getAllContainerTypes(spoAdminUrl: string, logger: Logger): Promise<ContainerTypeProperties[]> {
-    const formDigest: FormDigestInfo | undefined = undefined;
+    const formDigest: FormDigestInfo | undefined;
     const formDigestInfo: FormDigestInfo = await spo.ensureFormDigest(spoAdminUrl, logger, formDigest, this.debug);
 
     const requestOptions: CliRequestOptions = {
