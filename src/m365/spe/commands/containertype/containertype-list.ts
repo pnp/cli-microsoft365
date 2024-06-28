@@ -28,11 +28,8 @@ class SpeContainertypeListCommand extends SpoCommand {
         await logger.logToStderr(`Retrieving list of Container types...`);
       }
 
-      this.allContainerTypes = [];
-
-      await this.getAllContainerTypes(spoAdminUrl, logger);
-
-      await logger.log(this.allContainerTypes);
+      const allContainerTypes = await this.getAllContainerTypes(spoAdminUrl, logger);
+      await logger.log(allContainerTypes);
     }
     catch (err: any) {
       this.handleRejectedPromise(err);
