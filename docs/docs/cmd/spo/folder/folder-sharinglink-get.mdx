@@ -1,0 +1,116 @@
+import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# spo folder sharinglink get
+
+Gets details about a specific sharing link on a folder
+
+## Usage
+
+```sh
+m365 spo folder sharinglink get [options]
+```
+
+## Options
+
+```md definition-list
+`-u, --webUrl <webUrl>`
+: The URL of the site where the folder is located.
+
+`--folderUrl [folderUrl]`
+: The server- or site-relative decoded URL of the folder. Specify either `folderUrl` or `folderId` but not both.
+
+`--folderId [folderId]`
+: The UniqueId (GUID) of the folder. Specify either `folderUrl` or `folderId` but not both.
+
+`-i, --id <id>`
+: The sharing link ID.
+```
+
+<Global />
+
+## Examples
+
+Gets a specific sharing link of a folder by id.
+
+```sh
+m365 spo folder sharinglink get --webUrl https://contoso.sharepoint.com/sites/demo --id 45fa6aed-362f-48b1-b04e-6da85a526506 --folderId daebb04b-a773-4baa-b1d1-3625418e3234
+```
+
+Gets a specific sharing link of a folder by url.
+
+```sh
+m365 spo folder sharinglink get --webUrl https://contoso.sharepoint.com/sites/demo --id 45fa6aed-362f-48b1-b04e-6da85a526506 --folderUrl "/sites/demo/shared documents/folder"
+```
+
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  {
+    "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#drives('b!FeaYl4alXkWEhoSRP0ksSSOaj9osSfFPqj5bQNdluvlwfL79GNVISZZCf6nfB3vY')/items('01A5WCPNVP7VPKWR54VZCKFHBM773D5TE6')/permissions/$entity",
+    "@deprecated.GrantedToIdentities": "GrantedToIdentities has been deprecated. Refer to GrantedToIdentitiesV2",
+    "id": "d6f6a428-9857-471f-9635-edd68d5aa6c1",
+    "roles": [
+      "write"
+    ],
+    "shareId": "u!aHR0cHM6Ly9uYWNoYW4zNjUuc2hhcmVwb2ludC5jb20vOmY6L3MvU1BEZW1vL0VxXzlYcXRIdks1RW9wd3NfX1kteko0QlNybFFNUy1qUTBFOWJsazhVLVNTdVE",
+    "hasPassword": false,
+    "grantedToIdentitiesV2": [],
+    "grantedToIdentities": [],
+    "link": {
+      "scope": "anonymous",
+      "type": "edit",
+      "webUrl": "https://contoso.sharepoint.com/:f:/s/demo/Eq_9XqtHvK5Eopws__Y-zJ4BSrlQMS-jQ0E9blk8U-SSuQ",
+      "preventsDownload": false
+    }
+  }
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  @deprecated.GrantedToIdentities: GrantedToIdentities has been deprecated. Refer to GrantedToIdentitiesV2
+  @odata.context                 : https://graph.microsoft.com/v1.0/$metadata#drives('b!FeaYl4alXkWEhoSRP0ksSSOaj9osSfFPqj5bQNdluvlwfL79GNVISZZCf6nfB3vY')/items('01A5WCPNVP7VPKWR54VZCKFHBM773D5TE6')/permissions/$entity
+  grantedToIdentities            : []
+  grantedToIdentitiesV2          : []
+  hasPassword                    : false
+  id                             : d6f6a428-9857-471f-9635-edd68d5aa6c1
+  link                           : {"scope":"anonymous","type":"edit","webUrl":"https://contoso.sharepoint.com/:f:/s/demo/Eq_9XqtHvK5Eopws__Y-zJ4BSrlQMS-jQ0E9blk8U-SSuQ","preventsDownload":false}
+  roles                          : ["write"]
+  shareId                        : u!aHR0cHM6Ly9uYWNoYW4zNjUuc2hhcmVwb2ludC5jb20vOmY6L3MvU1BEZW1vL0VxXzlYcXRIdks1RW9wd3NfX1kteko0QlNybFFNUy1qUTBFOWJsazhVLVNTdVE
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  @odata.context,@deprecated.GrantedToIdentities,id,shareId,hasPassword
+  https://graph.microsoft.com/v1.0/$metadata#drives('b!FeaYl4alXkWEhoSRP0ksSSOaj9osSfFPqj5bQNdluvlwfL79GNVISZZCf6nfB3vY')/items('01A5WCPNVP7VPKWR54VZCKFHBM773D5TE6')/permissions/$entity,GrantedToIdentities has been deprecated. Refer to GrantedToIdentitiesV2,d6f6a428-9857-471f-9635-edd68d5aa6c1,u!aHR0cHM6Ly9uYWNoYW4zNjUuc2hhcmVwb2ludC5jb20vOmY6L3MvU1BEZW1vL0VxXzlYcXRIdks1RW9wd3NfX1kteko0QlNybFFNUy1qUTBFOWJsazhVLVNTdVE,
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # spo folder sharinglink get --webUrl "https://nachan365.sharepoint.com/sites/demo" --id "d6f6a428-9857-471f-9635-edd68d5aa6c1" --folderUrl "/sites/demo/shared documents/Test"
+
+  Date: 5/2/2024
+
+  ## d6f6a428-9857-471f-9635-edd68d5aa6c1
+
+  Property | Value
+  ---------|-------
+  @odata.context | https://graph.microsoft.com/v1.0/$metadata#drives('b!FeaYl4alXkWEhoSRP0ksSSOaj9osSfFPqj5bQNdluvlwfL79GNVISZZCf6nfB3vY')/items('01A5WCPNVP7VPKWR54VZCKFHBM773D5TE6')/permissions/$entity
+  @deprecated.GrantedToIdentities | GrantedToIdentities has been deprecated. Refer to GrantedToIdentitiesV2
+  id | d6f6a428-9857-471f-9635-edd68d5aa6c1
+  shareId | u!aHR0cHM6Ly9uYWNoYW4zNjUuc2hhcmVwb2ludC5jb20vOmY6L3MvU1BEZW1vL0VxXzlYcXRIdks1RW9wd3NfX1kteko0QlNybFFNUy1qUTBFOWJsazhVLVNTdVE
+  hasPassword | false
+  ```
+
+  </TabItem>
+</Tabs>
