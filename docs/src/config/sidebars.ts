@@ -2193,6 +2193,11 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
+              label: 'contenttype field list',
+              id: 'cmd/spo/contenttype/contenttype-field-list'
+            },
+            {
+              type: 'doc',
               label: 'contenttype field remove',
               id: 'cmd/spo/contenttype/contenttype-field-remove'
             },
