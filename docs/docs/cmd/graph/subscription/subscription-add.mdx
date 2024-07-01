@@ -47,6 +47,10 @@ To subscribe to change notifications of Outlook contacts, events, or messages in
 - Use the corresponding application permission to subscribe to changes of items in a folder or mailbox of any user in the tenant.
 - Do not use the Outlook sharing permissions (Contacts.Read.Shared, Calendars.Read.Shared, Mail.Read.Shared, and their read/write counterparts), as they do not support subscribing to change notifications on items in shared or delegated folders.
 
+If you want receive notifications through Azure Event Hub, the `notificationUrl` must point to your Event Hubs location.
+
+If you want receive notifications through Azure Event Grid, the `notificationUrl` must point to your Event Grid Partner Topic.
+
 ## Examples
 
 Create a subscription
@@ -65,6 +69,24 @@ Create a subscription using the maximum allowed expiration for Group resources
 
 ```sh
 m365 graph subscription add --resource groups --changeTypes "updated" --notificationUrl "https://webhook.azurewebsites.net/api/send/myNotifyClient"
+```
+
+Create a subscription for Event Hub location using by Key Vault
+
+```sh
+m365 graph subscription add --resource user --changeTypes "created,updated,deleted" --notificationUrl "EventHub:https://azureKeyVaultName.vault.azure.net/secrets/secretName?tenantId=contoso.com"
+```
+
+Create a subscription for Event Hub location using by role-based access control
+
+```sh
+m365 graph subscription add --resource user --changeTypes "created,updated,deleted" --notificationUrl "EventHub:https://eventHubNamespace.servicebus.windows.net/eventhubname/eventHubName?tenantId=contoso.com"
+```
+
+Create a subscription for Event Grid Partner Topic.
+
+```sh
+m365 graph subscription add --resource user --changeTypes "created,updated,deleted" --notificationUrl "EventGrid:?azuresubscriptionid=8A8A8A8A-4B4B-4C4C-4D4D-12E12E12E12E&resourcegroup=resourceGroupName&partnertopic=partnerTopicName&location=partnerTopicAzureRegionName"
 ```
 
 ## Response
