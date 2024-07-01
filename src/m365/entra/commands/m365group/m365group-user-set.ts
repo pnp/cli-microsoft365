@@ -1,13 +1,12 @@
-import { User } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
-import { odata } from '../../../../utils/odata.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import teamsCommands from '../../../teams/commands.js';
 import commands from '../../commands.js';
 import { entraGroup } from '../../../../utils/entraGroup.js';
+import { entraUser } from '../../../../utils/entraUser.js';
 import aadCommands from '../../aadCommands.js';
 
 interface CommandArgs {
@@ -15,10 +14,14 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  role: string;
-  teamId?: string;
+  userName?: string;
+  ids?: string;
+  userNames?: string;
   groupId?: string;
-  userName: string;
+  groupName?: string;
+  teamId?: string;
+  teamName?: string;
+  role: string;
 }
 
 class EntraM365GroupUserSetCommand extends GraphCommand {
@@ -42,14 +45,18 @@ class EntraM365GroupUserSetCommand extends GraphCommand {
     this.#initOptions();
     this.#initValidators();
     this.#initOptionSets();
+    this.#initTypes();
   }
 
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
         teamId: typeof args.options.teamId !== 'undefined',
+        teamName: typeof args.options.teamName !== 'undefined',
         groupId: typeof args.options.groupId !== 'undefined',
-        role: args.options.role
+        groupName: typeof args.options.groupName !== 'undefined',
+        ids: typeof args.options.ids !== 'undefined',
+        userNames: typeof args.options.userNames !== 'undefined'
       });
     });
   }
@@ -57,13 +64,25 @@ class EntraM365GroupUserSetCommand extends GraphCommand {
   #initOptions(): void {
     this.options.unshift(
       {
+        option: '-n, --userName [userName]'
+      },
+      {
+        option: '--ids [ids]'
+      },
+      {
+        option: '--userNames [userNames]'
+      },
+      {
         option: "-i, --groupId [groupId]"
+      },
+      {
+        option: '--groupName [groupName]'
       },
       {
         option: "--teamId [teamId]"
       },
       {
-        option: '-n, --userName <userName>'
+        option: '--teamName [teamName]'
       },
       {
         option: '-r, --role <role>',
@@ -83,7 +102,15 @@ class EntraM365GroupUserSetCommand extends GraphCommand {
           return `${args.options.groupId} is not a valid GUID`;
         }
 
-        if (['Owner', 'Member'].indexOf(args.options.role) === -1) {
+        if (args.options.ids && args.options.ids.split(',').some(e => !validation.isValidGuid(e))) {
+          return `${args.options.ids} contains one or more invalid GUIDs`;
+        }
+
+        if (args.options.userNames && args.options.userNames.split(',').some(e => !validation.isValidUserPrincipalName(e))) {
+          return `${args.options.userNames} contains one or more invalid usernames`;
+        }
+
+        if (['owner', 'member'].indexOf(args.options.role.toLowerCase()) === -1) {
           return `${args.options.role} is not a valid role value. Allowed values Owner|Member`;
         }
 
@@ -93,124 +120,176 @@ class EntraM365GroupUserSetCommand extends GraphCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push({ options: ['groupId', 'teamId'] });
+    this.optionSets.push({ options: ['groupId', 'groupName', 'teamId', 'teamName'] });
+    this.optionSets.push({ options: ['userName', 'ids', 'userNames'] });
+  }
+
+  #initTypes(): void {
+    this.types.string.push('userName', 'ids', 'userNames', 'groupId', 'groupName', 'teamId', 'teamName', 'role');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     await this.showDeprecationWarning(logger, aadCommands.M365GROUP_USER_SET, commands.M365GROUP_USER_SET);
 
+    if (args.options.userName) {
+      args.options.userNames = args.options.userName;
+
+      this.warn(logger, `Option 'userName' is deprecated. Please use 'ids' or 'userNames' instead.`);
+    }
+
     try {
-      const groupId: string = (typeof args.options.groupId !== 'undefined') ? args.options.groupId : args.options.teamId as string;
+      const groupId: string = await this.getGroupId(logger, args);
       const isUnifiedGroup = await entraGroup.isUnifiedGroup(groupId);
 
       if (!isUnifiedGroup) {
         throw Error(`Specified group with id '${groupId}' is not a Microsoft 365 group.`);
       }
 
-      let users = await this.getOwners(groupId, logger);
-      const membersAndGuests = await this.getMembersAndGuests(groupId, logger);
-      users = users.concat(membersAndGuests);
+      const userIds: string[] = await this.getUserIds(logger, args.options.ids, args.options.userNames);
 
-      // Filter out duplicate added values for owners (as they are returned as members as well)
-      users = users.filter((groupUser, index, self) =>
-        index === self.findIndex((t) => (
-          t.id === groupUser.id && t.displayName === groupUser.displayName
-        ))
-      );
+      // we can't simply switch the role
+      // first add users to the new role
+      await this.addUsers(groupId, userIds, args.options.role);
 
-      if (this.debug) {
-        await logger.logToStderr((typeof args.options.groupId !== 'undefined') ? 'Group owners and members:' : 'Team owners and members:');
-        await logger.logToStderr(users);
-        await logger.logToStderr('');
-      }
-
-      if (users.filter(i => args.options.userName.toUpperCase() === i.userPrincipalName!.toUpperCase()).length <= 0) {
-        const userNotInGroup = (typeof args.options.groupId !== 'undefined') ?
-          'The specified user does not belong to the given Microsoft 365 Group. Please use the \'m365group user add\' command to add new users.' :
-          'The specified user does not belong to the given Microsoft Teams team. Please use the \'graph teams user add\' command to add new users.';
-
-        throw new Error(userNotInGroup);
-      }
-
-      if (args.options.role === "Owner") {
-        const foundMember: User | undefined = users.find(e => args.options.userName.toUpperCase() === e.userPrincipalName!.toUpperCase() && e.userType === 'Member');
-
-        if (foundMember !== undefined) {
-          const endpoint: string = `${this.resource}/v1.0/groups/${groupId}/owners/$ref`;
-
-          const requestOptions: CliRequestOptions = {
-            url: endpoint,
-            headers: {
-              'accept': 'application/json;odata.metadata=none'
-            },
-            responseType: 'json',
-            data: { "@odata.id": "https://graph.microsoft.com/v1.0/directoryObjects/" + foundMember.id }
-          };
-
-          await request.post(requestOptions);
-        }
-        else {
-          const userAlreadyOwner = (typeof args.options.groupId !== 'undefined') ?
-            'The specified user is already an owner in the specified Microsoft 365 group, and thus cannot be promoted.' :
-            'The specified user is already an owner in the specified Microsoft Teams team, and thus cannot be promoted.';
-
-          throw new Error(userAlreadyOwner);
-        }
-      }
-      else {
-        const foundOwner: User | undefined = users.find(e => args.options.userName.toUpperCase() === e.userPrincipalName!.toUpperCase() && e.userType === 'Owner');
-
-        if (foundOwner !== undefined) {
-          const endpoint: string = `${this.resource}/v1.0/groups/${groupId}/owners/${foundOwner.id}/$ref`;
-
-          const requestOptions: CliRequestOptions = {
-            url: endpoint,
-            headers: {
-              'accept': 'application/json;odata.metadata=none'
-            }
-          };
-
-          await request.delete(requestOptions);
-        }
-        else {
-          const userAlreadyMember = (typeof args.options.groupId !== 'undefined') ?
-            'The specified user is already a member in the specified Microsoft 365 group, and thus cannot be demoted.' :
-            'The specified user is already a member in the specified Microsoft Teams team, and thus cannot be demoted.';
-
-          throw new Error(userAlreadyMember);
-        }
-      }
+      // remove users from the old role
+      await this.removeUsersFromRole(logger, groupId, userIds, args.options.role);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
   }
 
-  private async getOwners(groupId: string, logger: Logger): Promise<User[]> {
-    if (this.verbose) {
-      await logger.logToStderr(`Retrieving owners of the group with id ${groupId}`);
+  private async getGroupId(logger: Logger, args: CommandArgs): Promise<string> {
+    if (args.options.groupId) {
+      return args.options.groupId;
     }
 
-    const endpoint: string = `${this.resource}/v1.0/groups/${groupId}/owners?$select=id,displayName,userPrincipalName,userType`;
+    if (args.options.teamId) {
+      return args.options.teamId;
+    }
 
-    const users = await odata.getAllItems<User>(endpoint);
-    // Currently there is a bug in the Microsoft Graph that returns Owners as
-    // userType 'member'. We therefore update all returned user as owner
-    users.forEach(user => {
-      user.userType = 'Owner';
-    });
+    const name = args.options.groupName || args.options.teamName;
 
-    return users;
+    if (this.verbose) {
+      await logger.logToStderr('Retrieving Group ID by display name...');
+    }
 
+    return entraGroup.getGroupIdByDisplayName(name!);
   }
 
-  private async getMembersAndGuests(groupId: string, logger: Logger): Promise<User[]> {
-    if (this.verbose) {
-      await logger.logToStderr(`Retrieving members of the group with id ${groupId}`);
+  private async getUserIds(logger: Logger, userIds: string | undefined, userNames: string | undefined): Promise<string[]> {
+    if (userIds) {
+      return userIds.split(',').map(o => o.trim());
     }
 
-    const endpoint: string = `${this.resource}/v1.0/groups/${groupId}/members?$select=id,displayName,userPrincipalName,userType`;
-    return await odata.getAllItems<User>(endpoint);
+    if (this.verbose) {
+      await logger.logToStderr('Retrieving user ID(s) by username(s)...');
+    }
+
+    return entraUser.getUserIdsByUpns(userNames!.split(',').map(u => u.trim()));
+  }
+
+  private async removeUsersFromRole(logger: Logger, groupId: string, userIds: string[], role: string): Promise<void> {
+    const userIdsToRemove: string[] = [];
+    const currentRole = (role.toLowerCase() === 'member') ? 'owners' : 'members';
+
+    if (this.verbose) {
+      await logger.logToStderr(`Removing users from the old role '${currentRole}'.`);
+    }
+
+    for (let i = 0; i < userIds.length; i += 20) {
+      const userIdsBatch = userIds.slice(i, i + 20);
+      const requestOptions = this.getRequestOptions();
+
+      userIdsBatch.map(userId => {
+        requestOptions.data.requests.push({
+          id: userId,
+          method: 'GET',
+          url: `/groups/${groupId}/${currentRole}/$count?$filter=id eq '${userId}'`,
+          headers: {
+            'ConsistencyLevel': 'eventual'
+          }
+        });
+      });
+
+      // send batch request
+      const res = await request.post<{ responses: { id: string, status: number; body: any }[] }>(requestOptions);
+      for (const response of res.responses) {
+        if (response.status === 200) {
+          if (response.body === 1) {
+            // user can be removed from current role
+            userIdsToRemove.push(response.id);
+          }
+        }
+        else {
+          throw response.body;
+        }
+      }
+    }
+
+    for (let i = 0; i < userIdsToRemove.length; i += 20) {
+      const userIdsBatch = userIds.slice(i, i + 20);
+      const requestOptions = this.getRequestOptions();
+
+      userIdsBatch.map(userId => {
+        requestOptions.data.requests.push({
+          id: userId,
+          method: 'DELETE',
+          url: `/groups/${groupId}/${currentRole}/${userId}/$ref`
+        });
+      });
+
+      const res = await request.post<{ responses: { id: string, status: number; body: any }[] }>(requestOptions);
+      for (const response of res.responses) {
+        if (response.status !== 204) {
+          throw response.body;
+        }
+      }
+    }
+  }
+
+  private async addUsers(groupId: string, userIds: string[], role: string): Promise<void> {
+    for (let i = 0; i < userIds.length; i += 400) {
+      const userIdsBatch = userIds.slice(i, i + 400);
+      const requestOptions = this.getRequestOptions();
+
+      for (let j = 0; j < userIdsBatch.length; j += 20) {
+        const userIdsChunk = userIdsBatch.slice(j, j + 20);
+        requestOptions.data.requests.push({
+          id: j + 1,
+          method: 'PATCH',
+          url: `/groups/${groupId}`,
+          headers: {
+            'content-type': 'application/json;odata.metadata=none'
+          },
+          body: {
+            [`${role === 'Member' ? 'members' : 'owners'}@odata.bind`]: userIdsChunk.map(u => `${this.resource}/v1.0/directoryObjects/${u}`)
+          }
+        });
+      }
+
+      const res = await request.post<{ responses: { status: number; body: any }[] }>(requestOptions);
+      for (const response of res.responses) {
+        if (response.status !== 204) {
+          throw response.body;
+        }
+      }
+    }
+  }
+
+  private getRequestOptions(): CliRequestOptions {
+    const requestOptions: CliRequestOptions = {
+      url: `${this.resource}/v1.0/$batch`,
+      headers: {
+        'content-type': 'application/json;odata.metadata=none'
+      },
+      responseType: 'json',
+      data: {
+        requests: []
+      }
+    };
+
+    return requestOptions;
   }
 }
 
