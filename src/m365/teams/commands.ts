@@ -31,6 +31,7 @@ export default {
   MEETING_ADD: `${prefix} meeting add`,
   MEETING_GET: `${prefix} meeting get`,
   MEETING_LIST: `${prefix} meeting list`,
+  MEETING_ATTENDANCEREPORT_GET: `${prefix} meeting attendancereport get`,
   MEETING_ATTENDANCEREPORT_LIST: `${prefix} meeting attendancereport list`,
   MEETING_TRANSCRIPT_LIST: `${prefix} meeting transcript list`,
   MEMBERSETTINGS_LIST: `${prefix} membersettings list`,
