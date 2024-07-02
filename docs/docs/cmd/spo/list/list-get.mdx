@@ -91,6 +91,11 @@ m365 spo list get --title Documents --webUrl https://contoso.sharepoint.com/site
 
   ```json
   {
+    "VersionPolicies": {
+      "DefaultExpireAfterDays": 0,
+      "DefaultTrimMode": 0,
+      "DefaultTrimModeValue": "NoExpiration"
+    },
     "AllowContentTypes": true,
     "BaseTemplate": 100,
     "BaseType": 0,
