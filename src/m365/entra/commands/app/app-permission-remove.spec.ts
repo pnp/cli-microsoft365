@@ -335,4 +335,44 @@ describe(commands.APP_PERMISSION_REMOVE, () => {
     const actual = await command.validate({ options: { appObjectId: appObjectId, applicationPermissions: applicationPermissions } }, commandInfo);
     assert.strictEqual(actual, true);
   });
+
+  it('passes validation if the one scope in delegatedPermissions is fully-qualified', async () => {
+    const actual = await command.validate({ options: { appObjectId: appObjectId, delegatedPermissions: delegatedPermissions } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('fails validation if the one scope in delegatedPermissions is not fully-qualified', async () => {
+    const actual = await command.validate({ options: { appObjectId: appObjectId, delegatedPermissions: 'User.Read' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('passes validation if all scopes in delegatedPermissions are fully-qualified', async () => {
+    const actual = await command.validate({ options: { appObjectId: appObjectId, delegatedPermissions: 'https://graph.microsoft.com/User.Read https://graph.microsoft.com/User.ReadWrite' } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('fails validation if one scope in delegatedPermissions is fully-qualified and the other is not', async () => {
+    const actual = await command.validate({ options: { appObjectId: appObjectId, delegatedPermissions: 'https://graph.microsoft.com/User.Read User.ReadWrite' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('passes validation if the one scope in applicationPermissions is fully-qualified', async () => {
+    const actual = await command.validate({ options: { appObjectId: appObjectId, applicationPermissions: applicationPermissions } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('fails validation if the one scope in applicationPermissions is not fully-qualified', async () => {
+    const actual = await command.validate({ options: { appObjectId: appObjectId, applicationPermissions: 'User.Read.All' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('passes validation if all scopes in applicationPermissions are fully-qualified', async () => {
+    const actual = await command.validate({ options: { appObjectId: appObjectId, applicationPermissions: 'https://graph.microsoft.com/User.Read.All https://graph.microsoft.com/User.ReadWrite.All' } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('fails validation if one scope in applicationPermissions is fully-qualified and the other is not', async () => {
+    const actual = await command.validate({ options: { appObjectId: appObjectId, applicationPermissions: 'https://graph.microsoft.com/User.Read.All User.ReadWrite.All' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
 });

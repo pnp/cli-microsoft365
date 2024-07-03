@@ -388,5 +388,12 @@ export const validation = {
       /^P(?!$)((\d+Y)|(\d+\.\d+Y$))?((\d+M)|(\d+\.\d+M$))?((\d+W)|(\d+\.\d+W$))?((\d+D)|(\d+\.\d+D$))?(T(?=\d)((\d+H)|(\d+\.\d+H$))?((\d+M)|(\d+\.\d+M$))?(\d+(\.\d+)?S)?)??$/);
 
     return durationRegEx.test(duration);
+  },
+
+  isValidPermission(permissions: string): boolean | string[] {
+    const invalidPermissions = permissions
+      .split(' ')
+      .filter(permission => permission.indexOf('/') < 0);
+    return invalidPermissions.length > 0 ? invalidPermissions : true;
   }
 };

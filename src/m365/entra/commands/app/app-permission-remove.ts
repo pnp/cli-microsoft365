@@ -104,6 +104,20 @@ class EntraAppPermissionRemoveCommand extends GraphCommand {
           return `${args.options.appObjectId} is not a valid GUID`;
         }
 
+        if (args.options.delegatedPermissions) {
+          const invalidPermissions = validation.isValidPermission(args.options.delegatedPermissions);
+          if (Array.isArray(invalidPermissions)) {
+            return `Delegated permission(s) ${invalidPermissions.join(', ')} are not fully-qualified`;
+          }
+        }
+
+        if (args.options.applicationPermissions) {
+          const invalidPermissions = validation.isValidPermission(args.options.applicationPermissions);
+          if (Array.isArray(invalidPermissions)) {
+            return `Application permission(s) ${invalidPermissions.join(', ')} are not fully-qualified`;
+          }
+        }
+
         return true;
       }
     );
