@@ -1,10 +1,7 @@
 import fs from 'fs';
-import ora from 'ora';
 import path from 'path';
 import url from 'url';
-import { cli } from '../cli/cli.js';
 import request, { CliRequestOptions } from '../request.js';
-import { settingsNames } from '../settingsNames.js';
 import { md } from '../utils/md.js';
 import { prompt } from '../utils/prompt.js';
 
@@ -30,7 +27,6 @@ interface MendableChatResponse {
 
 const mendableBaseUrl = 'https://api.mendable.ai/v1';
 const mendableApiKey = 'd3313d54-6f8e-40e0-90d3-4095019d4be7';
-const spinner = ora({ discardStdin: false });
 
 let showHelp = false;
 let debug = false;
@@ -40,7 +36,6 @@ let history: {
   prompt: string;
   response: string;
 }[] = [];
-const showSpinner = cli.getSettingWithDefaultValue<boolean>(settingsNames.showSpinner, true) && typeof global.it === 'undefined';
 
 request.logger = {
   /* c8 ignore next 3 */
@@ -112,11 +107,6 @@ async function promptForPrompt(): Promise<string> {
 
 async function runConversationTurn(conversationId: number, question: string): Promise<void> {
   console.log('');
-  /* c8 ignore next 4 */
-  if (showSpinner) {
-    spinner.text = 'Searching documentation...';
-    spinner.start();
-  }
 
   const response = await runMendableChat(conversationId, question);
 
@@ -124,11 +114,6 @@ async function runConversationTurn(conversationId: number, question: string): Pr
     prompt: question,
     response: response.answer.text
   });
-
-  /* c8 ignore next 3 */
-  if (showSpinner) {
-    spinner.stop();
-  }
 
   console.log(md.md2plain(response.answer.text, ''));
   console.log('');
@@ -189,18 +174,7 @@ async function endConversation(conversationId: number): Promise<void> {
     }
   };
 
-  /* c8 ignore next 4 */
-  if (showSpinner) {
-    spinner.text = 'Ending conversation...';
-    spinner.start();
-  }
-
   await request.post(requestOptions);
-
-  /* c8 ignore next 3 */
-  if (showSpinner) {
-    spinner.stop();
-  }
 }
 
 async function runMendableChat(conversationId: number, question: string): Promise<MendableChatResponse> {
