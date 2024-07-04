@@ -197,6 +197,43 @@ describe(commands.APP_PERMISSION_ADD, () => {
     assert.strictEqual(amountOfPostCalls, 2);
   });
 
+  it('creates service principal if not exists before granting admin consent', async () => {
+    let numberOfPostCalls = 0;
+    sinon.stub(odata, 'getAllItems').callsFake(async (url: string) => {
+      switch (url) {
+        case 'https://graph.microsoft.com/v1.0/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames':
+          return [servicePrincipals[1]];
+        case `https://graph.microsoft.com/v1.0/applications?$filter=appId eq '${appId}'&$select=id,appId,requiredResourceAccess`:
+          return applications;
+        default:
+          throw 'Invalid request';
+      }
+    });
+
+    sinon.stub(request, 'patch').callsFake(async opts => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/applications/${applications[0].id}`) {
+        return;
+      }
+      throw 'Invalid request';
+    });
+
+    sinon.stub(request, 'post').callsFake(async opts => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/servicePrincipals') {
+        numberOfPostCalls++;
+        return { "appId": appId, 'id': servicePrincipalId, "servicePrincipalNames": [] };
+      }
+
+      if (opts.url === `https://graph.microsoft.com/v1.0/servicePrincipals/${servicePrincipalId}/appRoleAssignments`) {
+        numberOfPostCalls++;
+        return;
+      }
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { appId: appId, applicationPermissions: applicationPermissions, grantAdminConsent: true, verbose: true } });
+    assert.strictEqual(numberOfPostCalls, 3);
+  });
+
   it('adds delegated and application permissions to appId while granting admin consent', async () => {
     let amountOfPostCalls = 0;
 
