@@ -153,7 +153,28 @@ describe(commands.APP_PERMISSION_REMOVE, () => {
     });
 
     sinon.stub(request, 'patch').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/applications/${appObjectId}`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/applications/${appObjectId}` &&
+        JSON.stringify(opts.data) === JSON.stringify({
+          "requiredResourceAccess": [
+            {
+              "resourceAppId": "00000003-0000-0000-c000-000000000000",
+              "resourceAccess": [
+                {
+                  "id": "e4aa47b9-9a69-4109-82ed-36ec70d85ff1",
+                  "type": "Scope"
+                },
+                {
+                  "id": "7427e0e9-2fba-42fe-b0c0-848c9e6a8182",
+                  "type": "Scope"
+                },
+                {
+                  "id": "332a536c-c7ef-4017-ab91-336970924f0d",
+                  "type": "Role"
+                }
+              ]
+            }
+          ]
+        })) {
         return;
       }
       throw 'Invalid request';
@@ -204,6 +225,28 @@ describe(commands.APP_PERMISSION_REMOVE, () => {
     const patchStub = sinon.stub(request, 'patch').callsFake(async (opts) => {
       switch (opts.url) {
         case `https://graph.microsoft.com/v1.0/applications/${appObjectId}`:
+          if (JSON.stringify(opts.data) === JSON.stringify({
+            "requiredResourceAccess": [
+              {
+                "resourceAppId": "00000003-0000-0000-c000-000000000000",
+                "resourceAccess": [
+                  {
+                    "id": "e4aa47b9-9a69-4109-82ed-36ec70d85ff1",
+                    "type": "Scope"
+                  },
+                  {
+                    "id": "332a536c-c7ef-4017-ab91-336970924f0d",
+                    "type": "Role"
+                  }
+                ]
+              }
+            ]
+          })) {
+            return;
+          }
+          else {
+            throw 'Invalid request';
+          }
         case `https://graph.microsoft.com/v1.0/oauth2PermissionGrants/${oAuth2GrantResponse[0].id}`:
           return;
         default:
@@ -241,7 +284,24 @@ describe(commands.APP_PERMISSION_REMOVE, () => {
     });
 
     const patchStub = sinon.stub(request, 'patch').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/applications/${appObjectId}`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/applications/${appObjectId}` &&
+        JSON.stringify(opts.data) === JSON.stringify({
+          "requiredResourceAccess": [
+            {
+              "resourceAppId": "00000003-0000-0000-c000-000000000000",
+              "resourceAccess": [
+                {
+                  "id": "e4aa47b9-9a69-4109-82ed-36ec70d85ff1",
+                  "type": "Scope"
+                },
+                {
+                  "id": "332a536c-c7ef-4017-ab91-336970924f0d",
+                  "type": "Role"
+                }
+              ]
+            }
+          ]
+        })) {
         return;
       }
       throw 'Invalid request';
@@ -250,6 +310,86 @@ describe(commands.APP_PERMISSION_REMOVE, () => {
     sinon.stub(cli, 'handleMultipleResultsFound').resolves({ id: appObjectId });
 
     await command.action(logger, { options: { appId: appId, delegatedPermissions: delegatedPermissions, force: true, verbose: true } });
+    assert(patchStub.calledOnce);
+  });
+
+  it('submits empty array when removing last delegated permission', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/applications/${appObjectId}?${selectProperties}`) {
+        return applications[0];
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinon.stub(odata, 'getAllItems').callsFake(async (url) => {
+      switch (url) {
+        case `https://graph.microsoft.com/v1.0/applications?$filter=appId eq '${appId}'&${selectProperties}`:
+          return [{ id: appObjectId, appId: appId, requiredResourceAccess: [{ resourceAppId: "00000003-0000-0000-c000-000000000000", resourceAccess: [{ id: "cd87405c-5792-4f15-92f7-debc0db6d1d6", type: "Scope" }, { id: "7427e0e9-2fba-42fe-b0c0-848c9e6a8182", type: "Scope" }] }] }];
+        case 'https://graph.microsoft.com/v1.0/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames':
+          return servicePrincipals;
+        case `https://graph.microsoft.com/v1.0/servicePrincipals/${servicePrincipalId}/appRoleAssignments?$select=id,appRoleId,resourceId`:
+          return [];
+        default:
+          throw 'Invalid request';
+      }
+    });
+
+    const patchStub = sinon.stub(request, 'patch').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/applications/${appObjectId}`) {
+        if (opts.data.requiredResourceAccess.length === 0) {
+          return;
+        }
+        else {
+          throw 'Invalid request. Expected empty requiredResourceAccess array';
+        }
+      }
+      throw 'Invalid request';
+    });
+
+    sinon.stub(cli, 'handleMultipleResultsFound').resolves({ id: appObjectId });
+
+    await command.action(logger, { options: { appId: appId, delegatedPermissions: 'https://graph.microsoft.com/TeamTemplates.Read https://graph.microsoft.com/offline_access', force: true, verbose: true } });
+    assert(patchStub.calledOnce);
+  });
+
+  it('submits empty array when removing last application permission', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/applications/${appObjectId}?${selectProperties}`) {
+        return applications[0];
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinon.stub(odata, 'getAllItems').callsFake(async (url) => {
+      switch (url) {
+        case `https://graph.microsoft.com/v1.0/applications?$filter=appId eq '${appId}'&${selectProperties}`:
+          return [{ id: appObjectId, appId: appId, requiredResourceAccess: [{ resourceAppId: "00000003-0000-0000-c000-000000000000", resourceAccess: [{ id: "741f803b-c850-494e-b5df-cde7c675a1ca", type: "Role" }] }] }];
+        case 'https://graph.microsoft.com/v1.0/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames':
+          return servicePrincipals;
+        case `https://graph.microsoft.com/v1.0/servicePrincipals/${servicePrincipalId}/appRoleAssignments?$select=id,appRoleId,resourceId`:
+          return [];
+        default:
+          throw 'Invalid request';
+      }
+    });
+
+    const patchStub = sinon.stub(request, 'patch').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/applications/${appObjectId}`) {
+        if (opts.data.requiredResourceAccess.length === 0) {
+          return;
+        }
+        else {
+          throw 'Invalid request. Expected empty requiredResourceAccess array';
+        }
+      }
+      throw 'Invalid request';
+    });
+
+    sinon.stub(cli, 'handleMultipleResultsFound').resolves({ id: appObjectId });
+
+    await command.action(logger, { options: { appId: appId, applicationPermissions: 'https://graph.microsoft.com/User.ReadWrite.All', force: true, verbose: true } });
     assert(patchStub.calledOnce);
   });
 
