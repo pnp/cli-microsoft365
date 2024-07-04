@@ -2,7 +2,6 @@ import Configstore from 'configstore';
 import fs from 'fs';
 import minimist from 'minimist';
 import { createRequire } from 'module';
-import ora, { Options, Ora } from 'ora';
 import os from 'os';
 import path from 'path';
 import { fileURLToPath, pathToFileURL } from 'url';
@@ -33,9 +32,6 @@ export interface CommandOutput {
 }
 
 let _config: Configstore | undefined;
-// we assign it through exported function to support mocking
-// eslint-disable-next-line prefer-const
-let spinner: Ora = ora();
 const commands: CommandInfo[] = [];
 /**
  * Command to execute
@@ -228,13 +224,6 @@ async function executeCommand(command: Command, args: { options: minimist.Parsed
   // the command to execute
   const parentCommandName: string | undefined = cli.currentCommandName;
   cli.currentCommandName = command.getCommandName(cli.currentCommandName);
-  const showSpinner = cli.getSettingWithDefaultValue<boolean>(settingsNames.showSpinner, true) && args.options.output !== 'none';
-
-  // don't show spinner if running tests
-  /* c8 ignore next 3 */
-  if (showSpinner && typeof global.it === 'undefined') {
-    cli.spinner.start();
-  }
 
   const startCommand = process.hrtime.bigint();
   try {
@@ -248,11 +237,6 @@ async function executeCommand(command: Command, args: { options: minimist.Parsed
   finally {
     // restore the original command name
     cli.currentCommandName = parentCommandName;
-
-    /* c8 ignore next 3 */
-    if (cli.spinner.isSpinning) {
-      cli.spinner.stop();
-    }
 
     const endCommand = process.hrtime.bigint();
     timings.command.push(Number(endCommand - startCommand));
@@ -909,35 +893,15 @@ async function closeWithError(error: any, args: CommandArgs, showHelpIfEnabled: 
 }
 
 function log(message?: any, ...optionalParams: any[]): void {
-  const spinnerSpinning = cli.spinner.isSpinning;
-
-  /* c8 ignore next 3 */
-  if (spinnerSpinning) {
-    cli.spinner.stop();
-  }
-
   if (message) {
     console.log(message, ...optionalParams);
   }
   else {
     console.log();
   }
-
-  // Restart the spinner if it was running before the log
-  /* c8 ignore next 3 */
-  if (spinnerSpinning) {
-    cli.spinner.start();
-  }
 }
 
 async function error(message?: any, ...optionalParams: any[]): Promise<void> {
-  const spinnerSpinning = cli.spinner.isSpinning;
-
-  /* c8 ignore next 3 */
-  if (spinnerSpinning) {
-    cli.spinner.stop();
-  }
-
   const errorOutput: string = cli.getSettingWithDefaultValue(settingsNames.errorOutput, 'stderr');
   if (errorOutput === 'stdout') {
     console.log(message, ...optionalParams);
@@ -945,50 +909,18 @@ async function error(message?: any, ...optionalParams: any[]): Promise<void> {
   else {
     console.error(message, ...optionalParams);
   }
-
-  // Restart the spinner if it was running before the log
-  /* c8 ignore next 3 */
-  if (spinnerSpinning) {
-    cli.spinner.start();
-  }
 }
 
 async function promptForSelection<T>(config: SelectionConfig<T>): Promise<T> {
-  const spinnerSpinning = cli.spinner.isSpinning;
-
-  /* c8 ignore next 3 */
-  if (spinnerSpinning) {
-    cli.spinner.stop();
-  }
-
   const answer = await prompt.forSelection<T>(config);
   await cli.error('');
-
-  // Restart the spinner if it was running before the prompt
-  /* c8 ignore next 3 */
-  if (spinnerSpinning) {
-    cli.spinner.start();
-  }
 
   return answer;
 }
 
 async function promptForConfirmation(config: ConfirmationConfig): Promise<boolean> {
-  const spinnerSpinning = cli.spinner.isSpinning;
-
-  /* c8 ignore next 3 */
-  if (spinnerSpinning) {
-    cli.spinner.stop();
-  }
-
   const answer = await prompt.forConfirmation(config);
   await cli.error('');
-
-  // Restart the spinner if it was running before the prompt
-  /* c8 ignore next 3 */
-  if (spinnerSpinning) {
-    cli.spinner.start();
-  }
 
   return answer;
 }
@@ -1062,14 +994,5 @@ export const cli = {
   printAvailableCommands,
   promptForConfirmation,
   promptForSelection,
-  shouldTrimOutput,
-  spinner
+  shouldTrimOutput
 };
-
-const spinnerOptions: Options = {
-  text: 'Running command...',
-  /* c8 ignore next 1 */
-  stream: cli.getSettingWithDefaultValue('errorOutput', 'stderr') === 'stderr' ? process.stderr : process.stdout,
-  discardStdin: false
-};
-cli.spinner = ora(spinnerOptions);

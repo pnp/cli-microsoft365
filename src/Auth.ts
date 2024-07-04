@@ -456,16 +456,7 @@ export class Auth {
       await logger.logToStderr('');
     }
 
-    cli.spinner.text = response.message;
-    cli.spinner.spinner = {
-      frames: ['🌶️ ']
-    };
-
-    // don't show spinner if running tests
-    /* c8 ignore next 3 */
-    if (!cli.spinner.isSpinning && typeof global.it === 'undefined') {
-      cli.spinner.start();
-    }
+    await logger.logToStderr(`🌶️  ${response.message}`);
 
     if (cli.getSettingWithDefaultValue<boolean>(settingsNames.autoOpenLinksInBrowser, false)) {
       await browserUtil.open(response.verificationUri);
