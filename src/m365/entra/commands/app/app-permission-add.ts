@@ -136,13 +136,37 @@ class EntraAppPermissionAddCommand extends GraphCommand {
       await request.patch(addPermissionsRequestOptions);
 
       if (args.options.grantAdminConsent) {
-        const appServicePrincipal = servicePrincipals.find(sp => sp.appId === appObject.appId);
-        await this.grantAdminConsent(appServicePrincipal!, appPermissions, logger);
+        let appServicePrincipal = servicePrincipals.find(sp => sp.appId === appObject.appId);
+        if (!appServicePrincipal) {
+          appServicePrincipal = await this.createServicePrincipal(appObject.appId!, logger);
+        }
+
+        await this.grantAdminConsent(appServicePrincipal, appPermissions, logger);
       }
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
+  }
+
+  private async createServicePrincipal(appId: string, logger: Logger): Promise<ServicePrincipal> {
+    if (this.verbose) {
+      await logger.logToStderr(`Creating service principal for app ${appId}...`);
+    }
+
+    const requestOptions: CliRequestOptions = {
+      url: `${this.resource}/v1.0/servicePrincipals`,
+      headers: {
+        accept: 'application/json;odata.metadata=none',
+        'content-type': 'application/json;odata=nometadata'
+      },
+      data: {
+        appId
+      },
+      responseType: 'json'
+    };
+
+    return await request.post<ServicePrincipal>(requestOptions);
   }
 
   private async getAppObject(options: Options): Promise<Application> {

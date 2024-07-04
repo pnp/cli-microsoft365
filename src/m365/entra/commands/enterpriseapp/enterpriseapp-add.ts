@@ -120,7 +120,6 @@ class EntraEnterpriseAppAddCommand extends GraphCommand {
     }
 
     return spItem.appId;
-
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
