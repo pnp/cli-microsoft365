@@ -163,8 +163,8 @@ class LoginCommand extends Command {
       }
 
       const authType = args.options.authType || cli.getSettingWithDefaultValue<string>(settingsNames.authType, 'deviceCode');
-      auth.connection.appId = args.options.appId || config.cliEntraAppId;
-      auth.connection.tenant = args.options.tenant || config.tenant;
+      auth.connection.appId = args.options.appId || cli.getSettingWithDefaultValue<string>(settingsNames.cliEntraAppId, config.cliEntraAppId);
+      auth.connection.tenant = args.options.tenant || cli.getSettingWithDefaultValue<string>(settingsNames.cliEntraAppTenant, config.tenant);
       auth.connection.name = args.options.connectionName;
 
       switch (authType) {

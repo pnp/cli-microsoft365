@@ -17,7 +17,10 @@ class CliReconsentCommand extends AnonymousCommand {
   }
 
   public async commandAction(logger: Logger): Promise<void> {
-    const url = `https://login.microsoftonline.com/${config.tenant}/oauth2/authorize?client_id=${config.cliEntraAppId}&response_type=code&prompt=admin_consent`;
+    const cliEntraAppId = cli.getSettingWithDefaultValue<string>(settingsNames.cliEntraAppId, config.cliEntraAppId);
+    const tenant = cli.getSettingWithDefaultValue<string>(settingsNames.cliEntraAppTenant, config.tenant);
+
+    const url = `https://login.microsoftonline.com/${tenant}/oauth2/authorize?client_id=${cliEntraAppId}&response_type=code&prompt=admin_consent`;
 
     if (cli.getSettingWithDefaultValue<boolean>(settingsNames.autoOpenLinksInBrowser, false) === false) {
       await logger.log(`To re-consent the PnP Microsoft 365 Management Shell Microsoft Entra application navigate in your web browser to ${url}`);

@@ -97,8 +97,8 @@ export class Connection {
     this.thumbprint = undefined;
     this.spoUrl = undefined;
     this.spoTenantId = undefined;
-    this.appId = config.cliEntraAppId;
-    this.tenant = config.tenant;
+    this.appId = cli.getSettingWithDefaultValue<string>(settingsNames.cliEntraAppId, config.cliEntraAppId);
+    this.tenant = cli.getSettingWithDefaultValue<string>(settingsNames.cliEntraAppTenant, config.tenant);
   }
 }
 
@@ -328,11 +328,11 @@ export class Auth {
     }
 
     const config = {
-      clientId: this.connection.appId,
-      authority: `${Auth.getEndpointForResource('https://login.microsoftonline.com', this.connection.cloudType)}/${this.connection.tenant}`,
+      clientId: cli.getSettingWithDefaultValue<string>(settingsNames.cliEntraAppId, this.connection.appId),
+      authority: `${Auth.getEndpointForResource('https://login.microsoftonline.com', this.connection.cloudType)}/${cli.getSettingWithDefaultValue<string>(settingsNames.cliEntraAppTenant, this.connection.tenant)}`,
       azureCloudOptions: {
         azureCloudInstance,
-        tenant: this.connection.tenant
+        tenant: cli.getSettingWithDefaultValue<string>(settingsNames.cliEntraAppTenant, this.connection.tenant)
       }
     };
 
@@ -894,8 +894,8 @@ export class Auth {
       connectionName: connection.name,
       connectedAs: connection.identityName,
       authType: AuthType[connection.authType],
-      appId: connection.appId,
-      appTenant: connection.tenant,
+      appId: cli.getSettingWithDefaultValue<string>(settingsNames.cliEntraAppId, this.connection.appId),
+      appTenant: cli.getSettingWithDefaultValue<string>(settingsNames.cliEntraAppTenant, this.connection.tenant),
       cloudType: CloudType[connection.cloudType]
     };
 

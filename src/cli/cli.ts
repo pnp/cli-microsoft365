@@ -60,7 +60,7 @@ function getConfig(): Configstore {
 }
 
 function getSettingWithDefaultValue<TValue>(settingName: string, defaultValue: TValue): TValue {
-  const configuredValue: TValue | undefined = cli.getConfig().get(settingName);
+  const configuredValue: TValue | undefined =  cli.getConfig().get(settingName);
   if (typeof configuredValue === 'undefined') {
     return defaultValue;
   }

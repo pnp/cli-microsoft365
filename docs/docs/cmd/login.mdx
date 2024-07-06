@@ -37,10 +37,10 @@ m365 login [options]
 : Client Secret of the Microsoft Entra application to use for authentication. Required when `authType` is set to `secret`.
 
 `--appId [appId]`
-: App ID of the Microsoft Entra application to use for authentication. If not specified, use the app specified in the `CLIMICROSOFT365_ENTRAAPPID` environment variable. If the environment variable is not defined, use the multitenant PnP Management Shell app
+: App ID of the Microsoft Entra application to use for authentication. If not specified, use the app specified in the `cliEntraAppId` configuration setting. If both not specified, use the app specified in the `CLIMICROSOFT365_ENTRAAPPID` environment variable. If the environment variable is not defined, use the multitenant PnP Management Shell app
 
 `--tenant [tenant]`
-: ID of the tenant from which accounts should be able to authenticate. Use `common` or `organization` if the app is multitenant. If not specified, use the tenant specified in the `CLIMICROSOFT365_TENANT` environment variable. If the environment variable is not defined, use `common` as the tenant identifier
+: ID of the tenant from which accounts should be able to authenticate. Use `common` or `organization` if the app is multitenant. If not specified, use the app specified in the `cliEntraAppTenant` configuration setting. If both not specified, use the tenant specified in the `CLIMICROSOFT365_TENANT` environment variable. If the environment variable is not defined, use `common` as the tenant identifier
 
 `--cloud [cloud]`
 : Cloud to connect to. Allowed values `Public`, `USGov`, `USGovHigh`, `USGovDoD` and `China`. Default `Public`
@@ -61,7 +61,7 @@ When logging in to Microsoft 365 using the user name and password, next to the a
 
 When logging in to Microsoft 365 using a certificate, the CLI for Microsoft 365 will store the contents of the certificate so that it can automatically re-authenticate if necessary. The contents of the certificate are removed by re-authenticating using the device code or by calling the [logout](logout.mdx) command.  
 
-To log in to Microsoft 365 using a certificate or secret, you will typically [create a custom Microsoft Entra application](../user-guide/using-own-identity.mdx). To use this application with the CLI for Microsoft 365, you will set the `CLIMICROSOFT365_ENTRAAPPID` environment variable to the application's ID and the `CLIMICROSOFT365_TENANT` environment variable to the ID of the Microsoft Entra tenant, where you created the Microsoft Entra application. Also, please make sure to read about [the caveats when using the certificate login option](../user-guide/cli-certificate-caveats.mdx).
+To log in to Microsoft 365 using a certificate or secret, you will typically [create a custom Microsoft Entra application](../user-guide/using-own-identity.mdx). To use this application with the CLI for Microsoft 365, you will set the `cliEntraAppId` configuration setting or the `CLIMICROSOFT365_ENTRAAPPID` environment variable to the application's ID and the `cliEntraAppTenant` configuration setting or the `CLIMICROSOFT365_TENANT` environment variable to the ID of the Microsoft Entra tenant, where you created the Microsoft Entra application. Also, please make sure to read about [the caveats when using the certificate login option](../user-guide/cli-certificate-caveats.mdx).
 
 Managed identity in Azure Cloud Shell is the identity of the user. It is neither system- nor user-assigned and it can't be configured. To log in to Microsoft 365 using managed identity in Azure Cloud Shell, set `authType` to `identity` and don't specify the `userName` option.
 
