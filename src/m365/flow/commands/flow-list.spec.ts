@@ -68,7 +68,7 @@ describe(commands.LIST, () => {
   });
 
   it('defines correct properties for the default output', () => {
-    assert.deepStrictEqual(command.defaultProperties(), ['name', 'displayName']);
+    assert.deepStrictEqual(command.defaultProperties(), ['name']);
   });
 
   it('fails validation if asAdmin is specified in combination with a sharingStatus', async () => {
@@ -281,8 +281,7 @@ describe(commands.LIST, () => {
           },
           "provisioningMethod": "FromDefinition",
           "flowFailureAlertSubscribed": true
-        },
-        displayName: "Send myself a reminder in 10 minutes"
+        }
       },
       {
         "name": "3989cb59-ce1a-4a5c-bb78-257c5c39381d",
@@ -348,8 +347,7 @@ describe(commands.LIST, () => {
           },
           "provisioningMethod": "FromDefinition",
           "flowFailureAlertSubscribed": true
-        },
-        displayName: "Get a daily digest of the top CNN news"
+        }
       }
     ]));
   });
@@ -544,8 +542,7 @@ describe(commands.LIST, () => {
           },
           "provisioningMethod": "FromDefinition",
           "flowFailureAlertSubscribed": true
-        },
-        displayName: 'Send myself a reminder in 10 minutes'
+        }
       },
       {
         "name": "3989cb59-ce1a-4a5c-bb78-257c5c39381d",
@@ -611,8 +608,7 @@ describe(commands.LIST, () => {
           },
           "provisioningMethod": "FromDefinition",
           "flowFailureAlertSubscribed": true
-        },
-        displayName: 'Get a daily digest of the top CNN news'
+        }
       }
     ]));
   });
@@ -869,8 +865,7 @@ describe(commands.LIST, () => {
           },
           "provisioningMethod": "FromDefinition",
           "flowFailureAlertSubscribed": true
-        },
-        displayName: 'Send myself a reminder in 10 minutes'
+        }
       },
       {
         "name": "3989cb59-ce1a-4a5c-bb78-257c5c39381d",
@@ -936,8 +931,7 @@ describe(commands.LIST, () => {
           },
           "provisioningMethod": "FromDefinition",
           "flowFailureAlertSubscribed": true
-        },
-        displayName: 'Get a daily digest of the top CNN news'
+        }
       }
     ]));
   });
@@ -1132,8 +1126,7 @@ describe(commands.LIST, () => {
           },
           "provisioningMethod": "FromDefinition",
           "flowFailureAlertSubscribed": true
-        },
-        displayName: 'Send myself a reminder in 10 minutes'
+        }
       },
       {
         "name": "3989cb59-ce1a-4a5c-bb78-257c5c39381d",
@@ -1199,8 +1192,7 @@ describe(commands.LIST, () => {
           },
           "provisioningMethod": "FromDefinition",
           "flowFailureAlertSubscribed": true
-        },
-        displayName: 'Get a daily digest of the top CNN news'
+        }
       }
     ]));
   });
@@ -1402,8 +1394,7 @@ describe(commands.LIST, () => {
           },
           "provisioningMethod": "FromDefinition",
           "flowFailureAlertSubscribed": true
-        },
-        displayName: 'Send myself a reminder in 10 minutes'
+        }
       },
       {
         "name": "3989cb59-ce1a-4a5c-bb78-257c5c39381d",
@@ -1469,8 +1460,7 @@ describe(commands.LIST, () => {
           },
           "provisioningMethod": "FromDefinition",
           "flowFailureAlertSubscribed": true
-        },
-        displayName: 'Get a daily digest of the top CNN news'
+        }
       }
     ]));
   });
