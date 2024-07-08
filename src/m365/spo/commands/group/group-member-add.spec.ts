@@ -209,26 +209,6 @@ describe(commands.GROUP_MEMBER_ADD, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if both emails and aadGroupIds options are passed', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({
-      options: {
-        webUrl: "https://contoso.sharepoint.com/sites/SiteA",
-        groupId: 32,
-        emails: "Alex.Wilber@contoso.com",
-        aadGroupIds: "56ca9023-3449-4e98-a96a-69e81a6f4983"
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
   it('fails validation if both userIds and entraGroupNames options are passed', async () => {
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
       if (settingName === settingsNames.prompt) {
@@ -244,26 +224,6 @@ describe(commands.GROUP_MEMBER_ADD, () => {
         groupId: 32,
         userIds: 5,
         entraGroupNames: "Microsoft Entra Group name"
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if both userIds and aadGroupNames options are passed', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({
-      options: {
-        webUrl: "https://contoso.sharepoint.com/sites/SiteA",
-        groupId: 32,
-        userIds: 5,
-        aadGroupNames: "Microsoft Entra Group name"
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -289,7 +249,7 @@ describe(commands.GROUP_MEMBER_ADD, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if userNames, emails, userIds, entraGroupIds, aadGroupIds, entraGroupNames, or aadGroupNames options are not passed', async () => {
+  it('fails validation if userNames, emails, userIds, entraGroupIds, or entraGroupNames options are not passed', async () => {
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
       if (settingName === settingsNames.prompt) {
         return false;
@@ -334,11 +294,6 @@ describe(commands.GROUP_MEMBER_ADD, () => {
 
   it('fails validation if entraGroupIds is Invalid', async () => {
     const actual = await command.validate({ options: { webUrl: "https://contoso.sharepoint.com/sites/SiteA", groupId: 32, entraGroupIds: "56ca9023-3449-4e98-a96a-69e81a6f4983,9" } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if aadGroupIds is Invalid', async () => {
-    const actual = await command.validate({ options: { webUrl: "https://contoso.sharepoint.com/sites/SiteA", groupId: 32, aadGroupIds: "56ca9023-3449-4e98-a96a-69e81a6f4983,9" } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
@@ -505,35 +460,6 @@ describe(commands.GROUP_MEMBER_ADD, () => {
     assert(loggerLogSpy.calledWith(jsonSingleUser.UsersAddedToGroup));
   });
 
-  it('adds user to a SharePoint Group by groupId and aadGroupIds (Debug)', async () => {
-    sinon.stub(request, 'post').callsFake(async opts => {
-      if (opts.url === 'https://contoso.sharepoint.com/sites/SiteA/_api/SP.Web.ShareObject' &&
-        opts.data) {
-        return jsonSingleUser;
-      }
-
-      throw `Invalid request ${JSON.stringify(opts)}`;
-    });
-
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/sites/SiteA/_api/web/sitegroups/GetById('32')?$select=Id`) {
-        return groupResponse;
-      }
-
-      throw 'Invalid request';
-    });
-
-    await command.action(logger, {
-      options: {
-        debug: true,
-        webUrl: "https://contoso.sharepoint.com/sites/SiteA",
-        groupId: 32,
-        aadGroupIds: "56ca9023-3449-4e98-a96a-69e81a6f4983"
-      }
-    });
-    assert(loggerLogSpy.calledWith(jsonSingleUser.UsersAddedToGroup));
-  });
-
   it('adds user to a SharePoint Group by groupId and entraGroupNames (Debug)', async () => {
     sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/SiteA/_api/SP.Web.ShareObject' &&
@@ -566,44 +492,6 @@ describe(commands.GROUP_MEMBER_ADD, () => {
         webUrl: "https://contoso.sharepoint.com/sites/SiteA",
         groupId: 32,
         entraGroupNames: "Microsoft Entra Group name"
-      }
-    });
-
-    assert(loggerLogSpy.calledWith(jsonSingleUser.UsersAddedToGroup));
-  });
-
-  it('adds user to a SharePoint Group by groupId and aadGroupNames (Debug)', async () => {
-    sinon.stub(request, 'post').callsFake(async opts => {
-      if (opts.url === 'https://contoso.sharepoint.com/sites/SiteA/_api/SP.Web.ShareObject' &&
-        opts.data) {
-        return jsonSingleUser;
-      }
-
-      throw `Invalid request ${JSON.stringify(opts)}`;
-    });
-
-    sinon.stub(request, 'get').callsFake(async opts => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq 'Microsoft%20Entra%20Group%20name'&$select=id`) {
-        return {
-          value: [{
-            id: 'Group name'
-          }]
-        };
-      }
-
-      if (opts.url === `https://contoso.sharepoint.com/sites/SiteA/_api/web/sitegroups/GetById('32')?$select=Id`) {
-        return groupResponse;
-      }
-
-      throw `Invalid request ${JSON.stringify(opts)}`;
-    });
-
-    await command.action(logger, {
-      options: {
-        debug: true,
-        webUrl: "https://contoso.sharepoint.com/sites/SiteA",
-        groupId: 32,
-        aadGroupNames: "Microsoft Entra Group name"
       }
     });
 

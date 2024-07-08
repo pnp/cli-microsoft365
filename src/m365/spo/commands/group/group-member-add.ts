@@ -22,9 +22,7 @@ interface Options extends GlobalOptions {
   emails?: string;
   userIds?: string;
   entraGroupIds?: string;
-  aadGroupIds?: string;
   entraGroupNames?: string;
-  aadGroupNames?: string;
 }
 
 class SpoGroupMemberAddCommand extends SpoCommand {
@@ -58,9 +56,7 @@ class SpoGroupMemberAddCommand extends SpoCommand {
         emails: typeof args.options.emails !== 'undefined',
         userIds: typeof args.options.userIds !== 'undefined',
         entraGroupIds: typeof args.options.entraGroupIds !== 'undefined',
-        aadGroupIds: typeof args.options.aadGroupIds !== 'undefined',
-        entraGroupNames: typeof args.options.entraGroupNames !== 'undefined',
-        aadGroupNames: typeof args.options.aadGroupNames !== 'undefined'
+        entraGroupNames: typeof args.options.entraGroupNames !== 'undefined'
       });
     });
   }
@@ -89,13 +85,7 @@ class SpoGroupMemberAddCommand extends SpoCommand {
         option: '--entraGroupIds [entraGroupIds]'
       },
       {
-        option: '--aadGroupIds [aadGroupIds]'
-      },
-      {
         option: '--entraGroupNames [entraGroupNames]'
-      },
-      {
-        option: '--aadGroupNames [aadGroupNames]'
       }
     );
   }
@@ -129,10 +119,6 @@ class SpoGroupMemberAddCommand extends SpoCommand {
           return `${args.options.entraGroupIds} contains one or more invalid GUIDs`;
         }
 
-        if (args.options.aadGroupIds && args.options.aadGroupIds.split(',').some(e => !validation.isValidGuid(e))) {
-          return `${args.options.aadGroupIds} contains one or more invalid GUIDs`;
-        }
-
         return true;
       }
     );
@@ -141,24 +127,12 @@ class SpoGroupMemberAddCommand extends SpoCommand {
   #initOptionSets(): void {
     this.optionSets.push(
       { options: ['groupId', 'groupName'] },
-      { options: ['userNames', 'emails', 'userIds', 'entraGroupIds', 'aadGroupIds', 'entraGroupNames', 'aadGroupNames'] }
+      { options: ['userNames', 'emails', 'userIds', 'entraGroupIds', 'entraGroupNames'] }
     );
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
-      if (args.options.aadGroupIds) {
-        args.options.entraGroupIds = args.options.aadGroupIds;
-
-        await this.warn(logger, `Option 'aadGroupIds' is deprecated. Please use 'entraGroupIds' instead`);
-      }
-
-      if (args.options.aadGroupNames) {
-        args.options.entraGroupNames = args.options.aadGroupNames;
-
-        await this.warn(logger, `Option 'aadGroupNames' is deprecated. Please use 'entraGroupNames' instead`);
-      }
-
       const groupId = await this.getGroupId(args, logger);
       const resolvedUsernameList = await this.getValidUsers(args, logger);
 

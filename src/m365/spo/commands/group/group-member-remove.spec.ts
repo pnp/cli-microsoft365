@@ -157,7 +157,7 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
         debug: true,
         webUrl: "https://contoso.sharepoint.com/sites/SiteA",
         groupName: "Site A Visitors",
-        aadGroupName: "Microsoft Entra Security Group"
+        entraGroupName: "Microsoft Entra Security Group"
       }
     });
 
@@ -217,7 +217,7 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
         debug: true,
         webUrl: "https://contoso.sharepoint.com/sites/SiteA",
         groupName: "Site A Visitors",
-        aadGroupId: "5786b8e8-c495-4734-b345-756733960730",
+        entraGroupId: "5786b8e8-c495-4734-b345-756733960730",
         force: true
       }
     });
@@ -706,17 +706,6 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
         webUrl: "https://contoso.sharepoint.com/sites/SiteA",
         groupId: 3,
         entraGroupId: 'Invalid GUID'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if aadGroupId is not a valid guid.', async () => {
-    const actual = await command.validate({
-      options: {
-        webUrl: "https://contoso.sharepoint.com/sites/SiteA",
-        groupId: 3,
-        aadGroupId: 'Invalid GUID'
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);

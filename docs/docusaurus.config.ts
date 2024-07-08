@@ -49,9 +49,6 @@ const config: Config = {
       'client-redirects',
       {
         createRedirects(routePath) {
-          if (routePath.includes('/entra')) {
-            return [routePath.replace('/entra', '/aad')];
-          }
           if (routePath.includes('/viva/engage')) {
             return [routePath.replace('/viva/engage', '/yammer')];
           }
