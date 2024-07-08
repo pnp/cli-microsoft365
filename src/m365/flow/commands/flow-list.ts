@@ -19,7 +19,6 @@ interface Options extends GlobalOptions {
 interface PowerAutomateFlow {
   name: string;
   id: string;
-  displayName: string;
   properties: {
     displayName: string;
   }
@@ -37,7 +36,7 @@ class FlowListCommand extends PowerAutomateCommand {
   }
 
   public defaultProperties(): string[] | undefined {
-    return ['name', 'displayName'];
+    return ['name'];
   }
 
   constructor() {
@@ -129,10 +128,6 @@ class FlowListCommand extends PowerAutomateCommand {
       );
 
       if (items.length > 0) {
-        items.forEach(i => {
-          i.displayName = i.properties.displayName;
-        });
-
         await logger.log(items);
       }
       else {
