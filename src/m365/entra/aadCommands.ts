@@ -69,6 +69,7 @@ export default {
   SP_ADD: `${prefix} sp add`,
   SP_GET: `${prefix} sp get`,
   SP_LIST: `${prefix} sp list`,
+  SP_REMOVE: `${prefix} sp remove`,
   USER_ADD: `${prefix} user add`,
   USER_GET: `${prefix} user get`,
   USER_GUEST_ADD: `${prefix} user guest add`,

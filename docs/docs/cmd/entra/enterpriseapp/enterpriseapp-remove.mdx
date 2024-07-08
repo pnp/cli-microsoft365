@@ -1,0 +1,71 @@
+import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# entra enterpriseapp remove
+
+Deletes an enterprise application (or service principal)
+
+## Usage
+
+```sh
+m365 entra enterpriseapp remove [options]
+```
+
+## Alias
+
+```sh
+m365 aad sp remove [options]
+m365 entra sp remove [options]
+```
+
+## Options
+
+```md definition-list
+`-i, --appId [appId]`
+: ID of the application for which the enterprise application should be deleted.
+
+`-n, --appDisplayName [appDisplayName]`
+: Display name of the application for which the enterprise application should be deleted.
+
+`--appObjectId [appObjectId]`
+: ObjectId of the application for which the enterprise application should be deleted.
+
+`-f, --force`
+: Don't prompt for confirmation.
+```
+
+<Global />
+
+## Remarks
+
+Specify either the `appId`, `appObjectId` or `appDisplayName`. If you specify more than one option value, the command will fail with an error.
+
+## Examples
+
+Delete an enterprise application with appId _b2307a39-e878-458b-bc90-03bc578531d6_.
+
+```sh
+m365 entra enterpriseapp remove --appId b2307a39-e878-458b-bc90-03bc578531d6 --force
+```
+
+Delete the _Contoso app_ enterprise application.
+
+```sh
+m365 entra enterpriseapp remove --appDisplayName "Contoso app"
+```
+
+Delete the enterprise application with ObjectId _b2307a39-e878-458b-bc90-03bc578531dd_.
+
+```sh
+m365 entra enterpriseapp remove --appObjectId b2307a39-e878-458b-bc90-03bc578531dd
+```
+
+## Response
+
+The command won't return a response on success.
+
+## More information
+
+- Application and service principal objects in Microsoft Entra ID: [https://learn.microsoft.com/azure/active-directory/develop/active-directory-application-objects](https://learn.microsoft.com/azure/active-directory/develop/active-directory-application-objects)
+- Delete servicePrincipal: [https://learn.microsoft.com/en-us/graph/api/serviceprincipal-delete?view=graph-rest-1.0](https://learn.microsoft.com/en-us/graph/api/serviceprincipal-delete?view=graph-rest-1.0)
