@@ -13,8 +13,8 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   appId?: string;
-  applicationPermission?: string;
-  delegatedPermission?: string;
+  applicationPermissions?: string;
+  delegatedPermissions?: string;
   grantAdminConsent?: boolean;
 }
 
@@ -50,8 +50,8 @@ class AppPermissionAddCommand extends AppCommand {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
         appId: typeof args.options.appId !== 'undefined',
-        applicationPermission: typeof args.options.applicationPermission !== 'undefined',
-        delegatedPermission: typeof args.options.delegatedPermission !== 'undefined',
+        applicationPermissions: typeof args.options.applicationPermissions !== 'undefined',
+        delegatedPermissions: typeof args.options.delegatedPermissions !== 'undefined',
         grantAdminConsent: !!args.options.grantAdminConsent
       });
     });
@@ -60,16 +60,16 @@ class AppPermissionAddCommand extends AppCommand {
   #initOptions(): void {
     this.options.unshift(
       { option: '--appId [appId]' },
-      { option: '--applicationPermission [applicationPermission]' },
-      { option: '--delegatedPermission [delegatedPermission]' },
+      { option: '--applicationPermissions [applicationPermissions]' },
+      { option: '--delegatedPermissions [delegatedPermissions]' },
       { option: '--grantAdminConsent' }
     );
   }
 
   #initOptionSets(): void {
     this.optionSets.push({
-      options: ['applicationPermission', 'delegatedPermission'],
-      runsWhen: (args) => args.options.delegatedPermission === undefined && args.options.applicationPermission === undefined
+      options: ['applicationPermissions', 'delegatedPermissions'],
+      runsWhen: (args) => args.options.delegatedPermissions === undefined && args.options.applicationPermissions === undefined
     });
   }
 
@@ -79,13 +79,13 @@ class AppPermissionAddCommand extends AppCommand {
       const servicePrincipals = await odata.getAllItems<ServicePrincipal>(`${this.resource}/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames`);
       const appPermissions: AppPermission[] = [];
 
-      if (args.options.delegatedPermission) {
-        const delegatedPermissions = await this.getRequiredResourceAccessForApis(servicePrincipals, args.options.delegatedPermission, ScopeType.Scope, appPermissions, logger);
+      if (args.options.delegatedPermissions) {
+        const delegatedPermissions = await this.getRequiredResourceAccessForApis(servicePrincipals, args.options.delegatedPermissions, ScopeType.Scope, appPermissions, logger);
         this.addPermissionsToResourceArray(delegatedPermissions, appObject.requiredResourceAccess!);
       }
 
-      if (args.options.applicationPermission) {
-        const applicationPermissions = await this.getRequiredResourceAccessForApis(servicePrincipals, args.options.applicationPermission, ScopeType.Role, appPermissions, logger);
+      if (args.options.applicationPermissions) {
+        const applicationPermissions = await this.getRequiredResourceAccessForApis(servicePrincipals, args.options.applicationPermissions, ScopeType.Role, appPermissions, logger);
         this.addPermissionsToResourceArray(applicationPermissions, appObject.requiredResourceAccess!);
       }
 
