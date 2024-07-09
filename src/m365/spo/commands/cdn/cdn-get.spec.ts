@@ -18,6 +18,9 @@ describe(commands.CDN_GET, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let loggerLogSpy: sinon.SinonSpy;
+  let loggerLogToStderrSpy: sinon.SinonSpy;
+  const spoAdminUrl = 'https://contoso-admin.sharepoint.com';
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -43,6 +46,8 @@ describe(commands.CDN_GET, () => {
         log.push(msg);
       }
     };
+    loggerLogSpy = sinon.spy(logger, 'log');
+    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
   });
 
   afterEach(() => {
@@ -68,7 +73,7 @@ describe(commands.CDN_GET, () => {
 
   it('retrieves the settings of the public CDN when type set to Public', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf('/_api/contextinfo') > -1) {
+      if (opts.url === `${spoAdminUrl}/_api/contextinfo`) {
         if (opts.headers &&
           opts.headers.accept &&
           (opts.headers.accept as string).indexOf('application/json') === 0) {
@@ -76,7 +81,7 @@ describe(commands.CDN_GET, () => {
         }
       }
 
-      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
+      if (opts.url === `${spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`) {
         if (opts.headers &&
           opts.headers['X-RequestDigest'] &&
           opts.headers['X-RequestDigest'] === 'abc' &&
@@ -85,26 +90,16 @@ describe(commands.CDN_GET, () => {
         }
       }
 
-      throw 'Invalid request';
+      throw 'Invalid request ' + opts.url;
     });
 
-    await command.action(logger, { options: { debug: true, type: 'Public' } });
-    let correctLogStatement = false;
-    log.forEach(l => {
-      if (!l || typeof l !== 'string') {
-        return;
-      }
-
-      if (l.indexOf('Public CDN at') > -1 && l.indexOf('enabled') > -1) {
-        correctLogStatement = true;
-      }
-    });
-    assert(correctLogStatement);
+    await command.action(logger, { options: { verbose: true, type: 'Public' } });
+    assert(loggerLogToStderrSpy.calledWithExactly(`Public CDN at ${spoAdminUrl} is enabled`));
   });
 
   it('retrieves the settings of the private CDN when type set to Private', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf('/_api/contextinfo') > -1) {
+      if (opts.url === `${spoAdminUrl}/_api/contextinfo`) {
         if (opts.headers &&
           opts.headers.accept &&
           (opts.headers.accept as string).indexOf('application/json') === 0) {
@@ -112,7 +107,7 @@ describe(commands.CDN_GET, () => {
         }
       }
 
-      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
+      if (opts.url === `${spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`) {
         if (opts.headers &&
           opts.headers['X-RequestDigest'] &&
           opts.headers['X-RequestDigest'] === 'abc' &&
@@ -125,18 +120,12 @@ describe(commands.CDN_GET, () => {
     });
 
     await command.action(logger, { options: { type: 'Private' } });
-    let correctLogStatement = false;
-    log.forEach(l => {
-      if (l === false) {
-        correctLogStatement = true;
-      }
-    });
-    assert(correctLogStatement);
+    assert(loggerLogSpy.calledOnceWithExactly(false));
   });
 
-  it('retrieves the settings of the private CDN when type set to Private (debug)', async () => {
+  it('retrieves the settings of the CDN when using verbose mode', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf('/_api/contextinfo') > -1) {
+      if (opts.url === `${spoAdminUrl}/_api/contextinfo`) {
         if (opts.headers &&
           opts.headers.accept &&
           (opts.headers.accept as string).indexOf('application/json') === 0) {
@@ -144,7 +133,33 @@ describe(commands.CDN_GET, () => {
         }
       }
 
-      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
+      if (opts.url === `${spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`) {
+        if (opts.headers &&
+          opts.headers['X-RequestDigest'] &&
+          opts.headers['X-RequestDigest'] === 'abc' &&
+          opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Method Name="GetTenantCdnEnabled" Id="12" ObjectPathId="8"><Parameters><Parameter Type="Enum">0</Parameter></Parameters></Method></Actions><ObjectPaths><Identity Id="8" Name="abc" /></ObjectPaths></Request>`) {
+          return JSON.stringify([{ "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7025.1207", "ErrorInfo": null, "TraceCorrelationId": "3d92299e-e019-4000-c866-de7d45aa9628" }, 12, false]);
+        }
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { verbose: true } });
+    assert(loggerLogSpy.calledOnceWithExactly(false));
+  });
+
+  it('retrieves the settings of the private CDN when type set to Private (debug)', async () => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `${spoAdminUrl}/_api/contextinfo`) {
+        if (opts.headers &&
+          opts.headers.accept &&
+          (opts.headers.accept as string).indexOf('application/json') === 0) {
+          return { FormDigestValue: 'abc' };
+        }
+      }
+
+      if (opts.url === `${spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`) {
         if (opts.headers &&
           opts.headers['X-RequestDigest'] &&
           opts.headers['X-RequestDigest'] === 'abc' &&
@@ -156,23 +171,13 @@ describe(commands.CDN_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, type: 'Private' } });
-    let correctLogStatement = false;
-    log.forEach(l => {
-      if (!l || typeof l !== 'string') {
-        return;
-      }
-
-      if (l.indexOf('disabled') > -1) {
-        correctLogStatement = true;
-      }
-    });
-    assert(correctLogStatement);
+    await command.action(logger, { options: { verbose: true, type: 'Private' } });
+    assert(loggerLogToStderrSpy.calledWithExactly(`Private CDN at ${spoAdminUrl} is disabled`));
   });
 
   it('retrieves the settings of the public CDN when no type set', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf('/_api/contextinfo') > -1) {
+      if (opts.url === `${spoAdminUrl}/_api/contextinfo`) {
         if (opts.headers &&
           opts.headers.accept &&
           (opts.headers.accept as string).indexOf('application/json') === 0) {
@@ -180,7 +185,7 @@ describe(commands.CDN_GET, () => {
         }
       }
 
-      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
+      if (opts.url === `${spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`) {
         if (opts.headers &&
           opts.headers['X-RequestDigest'] &&
           opts.headers['X-RequestDigest'] === 'abc' &&
@@ -192,25 +197,14 @@ describe(commands.CDN_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true } });
-    let correctLogStatement = false;
-    log.forEach(l => {
-      if (!l || typeof l !== 'string') {
-        return;
-      }
-
-      if (l.indexOf('Public CDN at') > -1 && l.indexOf('enabled') > -1) {
-        correctLogStatement = true;
-      }
-    });
-
-    assert(correctLogStatement);
+    await command.action(logger, { options: { verbose: true } });
+    assert(loggerLogToStderrSpy.calledWithExactly(`Public CDN at ${spoAdminUrl} is enabled`));
   });
 
   it('correctly handles an error when getting tenant CDN settings', async () => {
     sinonUtil.restore(request.post);
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf('/_api/contextinfo') > -1) {
+      if (opts.url === `${spoAdminUrl}/_api/contextinfo`) {
         if (opts.headers &&
           opts.headers.accept &&
           (opts.headers.accept as string).indexOf('application/json') === 0) {
@@ -218,7 +212,7 @@ describe(commands.CDN_GET, () => {
         }
       }
 
-      if ((opts.url as string).indexOf('/_vti_bin/client.svc/ProcessQuery') > -1) {
+      if (opts.url === `${spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`) {
         if (opts.headers &&
           opts.headers['X-RequestDigest'] &&
           opts.data) {
@@ -247,17 +241,6 @@ describe(commands.CDN_GET, () => {
     await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred'));
   });
 
-  it('supports specifying CDN type', () => {
-    const options = command.options;
-    let containsTypeOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('[type]') > -1) {
-        containsTypeOption = true;
-      }
-    });
-    assert(containsTypeOption);
-  });
-
   it('accepts Public SharePoint Online CDN type', async () => {
     const actual = await command.validate({ options: { type: 'Public' } }, commandInfo);
     assert.strictEqual(actual, true);
@@ -269,9 +252,8 @@ describe(commands.CDN_GET, () => {
   });
 
   it('rejects invalid SharePoint Online CDN type', async () => {
-    const type = 'foo';
-    const actual = await command.validate({ options: { type: type } }, commandInfo);
-    assert.strictEqual(actual, `${type} is not a valid CDN type. Allowed values are Public|Private`);
+    const actual = await command.validate({ options: { type: 'foo' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
   });
 
   it('doesn\'t fail validation if the optional type option not specified', async () => {

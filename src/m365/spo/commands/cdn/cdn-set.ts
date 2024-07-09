@@ -17,6 +17,8 @@ interface Options extends GlobalOptions {
 }
 
 class SpoCdnSetCommand extends SpoCommand {
+  private readonly validTypes: string[] = ['Public', 'Private', 'Both'];
+
   public get name(): string {
     return commands.CDN_SET;
   }
@@ -39,7 +41,7 @@ class SpoCdnSetCommand extends SpoCommand {
       Object.assign(this.telemetryProperties, {
         cdnType: args.options.type || 'Public',
         enabled: args.options.enabled,
-        noDefaultOrigins: (!(!args.options.noDefaultOrigins)).toString()
+        noDefaultOrigins: !!args.options.noDefaultOrigins
       });
     });
   }
@@ -52,7 +54,7 @@ class SpoCdnSetCommand extends SpoCommand {
       },
       {
         option: '-t, --type [type]',
-        autocomplete: ['Public', 'Private', 'Both']
+        autocomplete: this.validTypes
       },
       {
         option: '--noDefaultOrigins'
@@ -61,7 +63,8 @@ class SpoCdnSetCommand extends SpoCommand {
   }
 
   #initTypes(): void {
-    this.types.boolean.push('enabled');
+    this.types.boolean.push('enabled', 'noDefaultOrigins');
+    this.types.string.push('type');
   }
 
   #initValidators(): void {
@@ -70,7 +73,7 @@ class SpoCdnSetCommand extends SpoCommand {
         if (args.options.type) {
           if (args.options.type !== 'Public' && args.options.type !== 'Both' &&
             args.options.type !== 'Private') {
-            return `${args.options.type} is not a valid CDN type. Allowed values are Public|Private|Both`;
+            return `${args.options.type} is not a valid CDN type. Allowed values are ${this.validTypes.join(', ')}.`;
           }
         }
 
