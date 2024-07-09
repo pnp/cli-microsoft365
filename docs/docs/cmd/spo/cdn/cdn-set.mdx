@@ -17,10 +17,10 @@ m365 spo cdn set [options]
 : Set to true to enable CDN or to false to disable it. Allowed values: `true`, `false`.
 
 `-t, --type [type]`
-: Type of CDN to manage. Allowed values: `Public`, `Private`, `Both`. Defaults to `Public`.
+: Type of CDN to update. Allowed values: `Public`, `Private`, `Both`. Defaults to `Public`.
 
 `--noDefaultOrigins`
-: pass to not create the default origins.
+: Specify this flag to not create the default origins.
 ```
 
 <Global />
@@ -35,7 +35,7 @@ Using the `--noDefaultOrigins` option you can specify to skip the creation of th
 
 :::info
 
-To use this command you have to have permissions to access the tenant admin site.
+To use this command you must be a Global or SharePoint administrator.
 
 :::
 
