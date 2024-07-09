@@ -1,0 +1,15 @@
+# v8 Upgrade Guidance
+
+The v8 of CLI for Microsoft 365 introduces several breaking changes. To help you upgrade to the latest version of CLI for Microsoft 365, we've listed those changes along with any actions you may need to take.
+
+## Power Automate
+
+### Adjusted output of `flow list` command
+
+For this new major version, we've adjusted the output of the `flow list` command. The command now returns a list of flows in the given environment. When specifying the `--asAdmin` option, the command will now return a slightly different result. We had to take this action due to the deprecation of the previous API.
+
+Note that we also made some slight changes when you are not running the command as admin. The command will always give an output, even if no flows exist in your specified environment. We also removed a redundant property in the result. Instead of referencing the `displayName` property, you should now use `properties/displayName`.
+
+#### What action do I need to take?
+
+Please, check the documentation of the [flow list](./cmd/flow/flow-list) command to see the updated output and adjust your scripts accordingly.

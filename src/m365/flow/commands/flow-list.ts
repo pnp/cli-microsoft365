@@ -33,7 +33,7 @@ class FlowListCommand extends PowerAutomateCommand {
   }
 
   public get description(): string {
-    return 'Lists Microsoft Flows in the given environment';
+    return 'Lists Power Automate flows in the given environment';
   }
 
   public defaultProperties(): string[] | undefined {
@@ -46,6 +46,7 @@ class FlowListCommand extends PowerAutomateCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initTypes();
   }
 
   #initTelemetry(): void {
@@ -84,7 +85,7 @@ class FlowListCommand extends PowerAutomateCommand {
         }
 
         if (args.options.sharingStatus && !this.allowedSharingStatuses.some(status => status === args.options.sharingStatus)) {
-          return `${args.options.sharingStatus} is not a valid sharing status. Allowed values are: ${this.allowedSharingStatuses.join(',')}`;
+          return `${args.options.sharingStatus} is not a valid sharing status. Allowed values are: ${this.allowedSharingStatuses.join(', ')}`;
         }
 
         return true;
@@ -92,7 +93,16 @@ class FlowListCommand extends PowerAutomateCommand {
     );
   }
 
+  #initTypes(): void {
+    this.types.string.push('environmentName', 'sharingStatus');
+    this.types.boolean.push('includeSolutions', 'asAdmin');
+  }
+
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    if (this.verbose) {
+      await logger.logToStderr(`Getting Power Automate flows${args.options.asAdmin && ' as admin'} in environment '${args.options.environmentName}'...`);
+    }
+
     try {
       const {
         environmentName,
@@ -128,18 +138,12 @@ class FlowListCommand extends PowerAutomateCommand {
         index === self.findIndex(f => f.id === flow.id)
       );
 
-      if (items.length > 0) {
-        items.forEach(i => {
-          i.displayName = i.properties.displayName;
+      if (args.options.output && args.options.output !== 'json') {
+        items.forEach(flow => {
+          flow.displayName = flow.properties.displayName;
         });
-
-        await logger.log(items);
       }
-      else {
-        if (this.verbose) {
-          await logger.logToStderr('No Flows found');
-        }
-      }
+      await logger.log(items);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
@@ -147,7 +151,15 @@ class FlowListCommand extends PowerAutomateCommand {
   }
 
   private getApiUrl(environmentName: string, asAdmin?: boolean, includeSolutionFlows?: boolean, filter?: 'personal' | 'team',): string {
-    let url = `${this.resource}/providers/Microsoft.ProcessSimple${asAdmin ? '/scopes/admin' : ''}/environments/${formatting.encodeQueryParameter(environmentName)}/flows?api-version=2016-11-01`;
+    let url = `${this.resource}/providers/Microsoft.ProcessSimple`;
+
+    if (asAdmin) {
+      url += `/scopes/admin/environments/${formatting.encodeQueryParameter(environmentName)}/v2`;
+    }
+    else {
+      url += `/environments/${formatting.encodeQueryParameter(environmentName)}`;
+    }
+    url += '/flows?api-version=2016-11-01';
 
     if (filter === 'personal') {
       url += `&$filter=search('personal')`;

@@ -4,7 +4,7 @@ import TabItem from '@theme/TabItem';
 
 # flow list
 
-Lists Power Automate flow in the given environment
+Lists Power Automate flows in the given environment
 
 ## Usage
 
@@ -83,85 +83,61 @@ m365 flow list --environmentName Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --
   ```json
   [
     {
-      "name": "00afcb83-df7b-4fe0-ab9c-1542a1dc66a9",
-      "id": "/providers/Microsoft.ProcessSimple/environments/Default-00000000-0000-0000-0000-000000000000/flows/00afcb83-df7b-4fe0-ab9c-1542a1dc66a9",
+      "name": "fc2d4ef5-4151-4e93-9aaa-1f380d7ed95d",
+      "id": "/providers/Microsoft.ProcessSimple/environments/Default-1e852b49-bf4b-4ba5-bcd4-a8c4706c8ed4/flows/fc2d4ef5-4151-4e93-9aaa-1f380d7ed95d",
       "type": "Microsoft.ProcessSimple/environments/flows",
       "properties": {
         "apiId": "/providers/Microsoft.PowerApps/apis/shared_logicflows",
-        "displayName": "Contoso Invoicing Flow",
+        "displayName": "Invoicing flow",
         "userType": "Owner",
         "state": "Started",
         "connectionReferences": {
-          "shared_contoso-20invoicing-5fdd00e4805bfffb8f-5fbaee43593a7efda0": {
-            "connectionName": "bd877f62e4224011aa936d706fc68902",
-            "source": "Invoker",
-            "id": "/providers/Microsoft.PowerApps/apis/shared_contoso-20invoicing-5fdd00e4805bfffb8f-5fbaee43593a7efda0",
-            "displayName": "Contoso Invoicing",
-            "iconUri": "https://az787822.vo.msecnd.net/defaulticons/api-dedicated.png",
-            "brandColor": "#007ee5",
-            "tier": "NotSpecified"
-          },
-          "shared_flowpush": {
-            "connectionName": "shared-flowpush-d2c01136-3f7d-4449-b4f1-cb2d03a35ba8",
-            "source": "Invoker",
-            "id": "/providers/Microsoft.PowerApps/apis/shared_flowpush",
-            "displayName": "Notifications",
-            "iconUri": "https://connectoricons-prod.azureedge.net/releases/v1.0.1599/1.0.1599.3017/flowpush/icon.png",
-            "brandColor": "#FF3B30",
+          "shared_office365": {
+            "connectionName": "shared-office365-19528cc4-23c1-4b39-abea-f010eb9fe3f9",
+            "source": "Embedded",
+            "id": "/providers/Microsoft.PowerApps/apis/shared_office365",
+            "displayName": "Office 365 Outlook",
+            "iconUri": "https://connectoricons-prod.azureedge.net/releases/v1.0.1686/1.0.1686.3706/office365/icon.png",
+            "brandColor": "#0078D4",
             "tier": "Standard"
           }
         },
-        "createdTime": "2022-06-11T10:34:03.7241198Z",
-        "lastModifiedTime": "2022-06-11T10:35:54.1920032Z",
+        "createdTime": "2024-07-09T21:32:14.5918501Z",
+        "lastModifiedTime": "2024-07-09T21:32:15.2349507Z",
         "environment": {
-          "name": "Default-00000000-0000-0000-0000-000000000000",
+          "name": "Default-1e852b49-bf4b-4ba5-bcd4-a8c4706c8ed4",
           "type": "Microsoft.ProcessSimple/environments",
-          "id": "/providers/Microsoft.ProcessSimple/environments/Default-00000000-0000-0000-0000-000000000000"
+          "id": "/providers/Microsoft.ProcessSimple/environments/Default-1e852b49-bf4b-4ba5-bcd4-a8c4706c8ed4"
         },
         "definitionSummary": {
           "triggers": [
             {
-              "type": "Request",
-              "kind": "Button",
+              "type": "Recurrence",
               "metadata": {
-                "operationMetadataId": "0cc0490e-e1b6-4a19-b313-f54862d64f02"
+                "operationMetadataId": "57317efe-4f87-47bc-b69c-179452c75f87"
               }
             }
           ],
           "actions": [
             {
               "type": "OpenApiConnection",
-              "swaggerOperationId": "ListInvoices",
+              "swaggerOperationId": "SendEmailV2",
               "metadata": {
-                "operationMetadataId": "d76a7b54-48bb-49a0-86b8-dd3d21b3d5ce"
-              }
-            },
-            {
-              "type": "Table",
-              "metadata": {
-                "operationMetadataId": "1164ebc4-b501-46bc-bc88-cc99660f92c3"
-              }
-            },
-            {
-              "type": "OpenApiConnection",
-              "swaggerOperationId": "SendEmailNotification",
-              "metadata": {
-                "operationMetadataId": "9febe29f-2e36-4765-81ab-83645d28332d"
+                "operationMetadataId": "474e8016-6a45-466a-a021-3fedf5a766be"
               }
             }
           ]
         },
         "creator": {
-          "tenantId": "00000000-0000-0000-0000-000000000000",
-          "objectId": "00000000-0000-0000-0000-000000000000",
-          "userId": "00000000-0000-0000-0000-000000000000",
+          "tenantId": "1e852b49-bf4b-4ba5-bcd4-a8c4706c8ed4",
+          "objectId": "9723d9b0-b8d6-48af-b381-fb4a9f0403e4",
+          "userId": "9723d9b0-b8d6-48af-b381-fb4a9f0403e4",
           "userType": "ActiveDirectory"
         },
         "provisioningMethod": "FromDefinition",
         "flowFailureAlertSubscribed": true,
         "isManaged": false
-      },
-      "displayName": "Contoso Invoicing Flow"
+      }
     }
   ]
   ```
@@ -171,16 +147,16 @@ m365 flow list --environmentName Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --
 
   ```text
   name                                  displayName
-  ------------------------------------  -----------------------------------------------
-  00afcb83-df7b-4fe0-ab9c-1542a1dc66a9  Contoso Invoicing Flow
+  ------------------------------------  --------------
+  fc2d4ef5-4151-4e93-9aaa-1f380d7ed95d  Invoicing Flow
   ```
 
   </TabItem>
   <TabItem value="CSV">
 
   ```csv
-  name,displayName
-  00afcb83-df7b-4fe0-ab9c-1542a1dc66a9,Contoso Invoicing Flow
+  name,id,type,displayName
+  fc2d4ef5-4151-4e93-9aaa-1f380d7ed95d,/providers/Microsoft.ProcessSimple/environments/Default-1e852b49-bf4b-4ba5-bcd4-a8c4706c8ed4/flows/fc2d4ef5-4151-4e93-9aaa-1f380d7ed95d,Microsoft.ProcessSimple/environments/flows,Invoicing flow
   ```
 
   </TabItem>
@@ -189,18 +165,100 @@ m365 flow list --environmentName Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --
   ```md
   # flow list --environmentName "Default-1e852b49-bf4b-4ba5-bcd4-a8c4706c8ed4"
 
-  Date: 2023-05-18
+  Date: 09/07/2024
 
-  ## Contoso Invoicing Flow (/providers/Microsoft.ProcessSimple/environments/Default-1e852b49-bf4b-4ba5-bcd4-a8c4706c8ed4/flows/00afcb83-df7b-4fe0-ab9c-1542a1dc66a9)
+  ## Invoicing flow (/providers/Microsoft.ProcessSimple/environments/Default-1e852b49-bf4b-4ba5-bcd4-a8c4706c8ed4/flows/fc2d4ef5-4151-4e93-9aaa-1f380d7ed95d)
 
   Property | Value
   ---------|-------
-  name | 00afcb83-df7b-4fe0-ab9c-1542a1dc66a9
-  id | /providers/Microsoft.ProcessSimple/environments/Default-1e852b49-bf4b-4ba5-bcd4-a8c4706c8ed4/flows/00afcb83-df7b-4fe0-ab9c-1542a1dc66a9
+  name | fc2d4ef5-4151-4e93-9aaa-1f380d7ed95d
+  id | /providers/Microsoft.ProcessSimple/environments/Default-1e852b49-bf4b-4ba5-bcd4-a8c4706c8ed4/flows/fc2d4ef5-4151-4e93-9aaa-1f380d7ed95d
   type | Microsoft.ProcessSimple/environments/flows
-  displayName | Contoso Invoicing Flow
+  displayName | Invoicing flow
   ```
 
   </TabItem>
 </Tabs>
 
+### `asAdmin` response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  [
+    {
+      "name": "fc2d4ef5-4151-4e93-9aaa-1f380d7ed95d",
+      "id": "/providers/Microsoft.ProcessSimple/environments/Default-1e852b49-bf4b-4ba5-bcd4-a8c4706c8ed4/flows/fc2d4ef5-4151-4e93-9aaa-1f380d7ed95d",
+      "type": "Microsoft.ProcessSimple/environments/flows",
+      "properties": {
+        "apiId": "/providers/Microsoft.PowerApps/apis/shared_logicflows",
+        "displayName": "Invoicing flow",
+        "state": "Started",
+        "createdTime": "2024-07-09T21:32:15Z",
+        "lastModifiedTime": "2024-07-09T21:32:15Z",
+        "flowSuspensionReason": "None",
+        "environment": {
+          "name": "Default-1e852b49-bf4b-4ba5-bcd4-a8c4706c8ed4",
+          "type": "Microsoft.ProcessSimple/environments",
+          "id": "/providers/Microsoft.ProcessSimple/environments/Default-1e852b49-bf4b-4ba5-bcd4-a8c4706c8ed4"
+        },
+        "definitionSummary": {
+          "triggers": [],
+          "actions": []
+        },
+        "creator": {
+          "tenantId": "1e852b49-bf4b-4ba5-bcd4-a8c4706c8ed4",
+          "objectId": "9723d9b0-b8d6-48af-b381-fb4a9f0403e4",
+          "userId": "9723d9b0-b8d6-48af-b381-fb4a9f0403e4",
+          "userType": "ActiveDirectory"
+        },
+        "flowFailureAlertSubscribed": false,
+        "isManaged": false,
+        "machineDescriptionData": {},
+        "flowOpenAiData": {
+          "isConsequential": false,
+          "isConsequentialFlagOverwritten": false
+        }
+      }
+    }
+  ]
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  name                                  displayName
+  ------------------------------------  --------------
+  fc2d4ef5-4151-4e93-9aaa-1f380d7ed95d  Invoicing Flow
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  name,id,type,displayName
+  fc2d4ef5-4151-4e93-9aaa-1f380d7ed95d,/providers/Microsoft.ProcessSimple/environments/Default-1e852b49-bf4b-4ba5-bcd4-a8c4706c8ed4/flows/fc2d4ef5-4151-4e93-9aaa-1f380d7ed95d,Microsoft.ProcessSimple/environments/flows,Invoicing flow
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # flow list --environmentName "Default-1e852b49-bf4b-4ba5-bcd4-a8c4706c8ed4"
+
+  Date: 09/07/2024
+
+  ## Invoicing flow (/providers/Microsoft.ProcessSimple/environments/Default-1e852b49-bf4b-4ba5-bcd4-a8c4706c8ed4/flows/fc2d4ef5-4151-4e93-9aaa-1f380d7ed95d)
+
+  Property | Value
+  ---------|-------
+  name | fc2d4ef5-4151-4e93-9aaa-1f380d7ed95d
+  id | /providers/Microsoft.ProcessSimple/environments/Default-1e852b49-bf4b-4ba5-bcd4-a8c4706c8ed4/flows/fc2d4ef5-4151-4e93-9aaa-1f380d7ed95d
+  type | Microsoft.ProcessSimple/environments/flows
+  displayName | Invoicing flow
+  ```
+
+  </TabItem>
+</Tabs>
