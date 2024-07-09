@@ -69,7 +69,7 @@ class EntraM365GroupUserListCommand extends GraphCommand {
       },
       {
         option: "-r, --role [type]",
-        autocomplete: ["Owner", "Member", "Guest"]
+        autocomplete: ["Owner", "Member"]
       },
       {
         option: "-p, --properties [properties]"
@@ -96,8 +96,8 @@ class EntraM365GroupUserListCommand extends GraphCommand {
         }
 
         if (args.options.role) {
-          if (['Owner', 'Member', 'Guest'].indexOf(args.options.role) === -1) {
-            return `${args.options.role} is not a valid role value. Allowed values Owner|Member|Guest`;
+          if (['Owner', 'Member'].indexOf(args.options.role) === -1) {
+            return `${args.options.role} is not a valid role value. Allowed values Owner|Member`;
           }
         }
 
@@ -110,10 +110,6 @@ class EntraM365GroupUserListCommand extends GraphCommand {
     await this.showDeprecationWarning(logger, aadCommands.M365GROUP_USER_LIST, commands.M365GROUP_USER_LIST);
 
     try {
-      if (args.options.role === 'Guest') {
-        await this.warn(logger, `Value 'Guest' for the option role is deprecated. Use --filter "userType eq 'Guest'" instead.`);
-      }
-
       const groupId = await this.getGroupId(args.options, logger);
       const isUnifiedGroup = await entraGroup.isUnifiedGroup(groupId);
 
@@ -127,7 +123,7 @@ class EntraM365GroupUserListCommand extends GraphCommand {
         owners.forEach(owner => users.push({ ...owner, roles: ['Owner'], userType: 'Owner' }));
       }
 
-      if (!args.options.role || args.options.role === 'Member' || args.options.role === 'Guest') {
+      if (!args.options.role || args.options.role === 'Member') {
         const members = await this.getUsers(args.options, 'Members', groupId, logger);
 
         members.forEach((member: ExtendedUser) => {
