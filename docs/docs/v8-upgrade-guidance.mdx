@@ -1,0 +1,13 @@
+# v8 Upgrade Guidance
+
+The v8 of CLI for Microsoft 365 introduces several breaking changes. To help you upgrade to the latest version of CLI for Microsoft 365, we've listed those changes along with any actions you may need to take.
+
+## SharePoint
+
+### Updated command output of `spo group member add`
+
+Due to issues with the current endpoint, we have moved the `spo group member add` command to a new endpoint. This change is necessary to ensure the command's functionality and reliability. Because of the new endpoint, the command output has changed.
+
+#### What action do I need to take?
+
+The command is not backward compatible with the previous endpoint. This results in different command output. Users will need to update their scripts and automation tools to the new command output. More info can be found in the docs of the [spo group member add](./cmd/spo/group/group-member-add.mdx) command.

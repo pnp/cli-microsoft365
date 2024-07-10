@@ -110,17 +110,21 @@ m365 spo group member add --webUrl https://contoso.sharepoint.com/sites/SiteA --
   ```json
   [
     {
-      "AllowedRoles": [
-        0
-      ],
-      "CurrentRole": 0,
-      "DisplayName": "John Doe",
-      "Email": "john.doe@contoso.onmicrosoft.com",
-      "InvitationLink": null,
-      "IsUserKnown": true,
-      "Message": null,
-      "Status": true,
-      "User": "i:0#.f|membership|john.doe@contoso.onmicrosoft.com"
+      "Id": 11,
+      "IsHiddenInUI": false,
+      "LoginName": "i:0#.f|membership|adelev@contoso.onmicrosoft.com",
+      "Title": "Adele Vance",
+      "PrincipalType": 1,
+      "Email": "Adele.Vance@contoso.onmicrosoft.com",
+      "Expiration": "",
+      "IsEmailAuthenticationGuestUser": false,
+      "IsShareByEmailGuestUser": false,
+      "IsSiteAdmin": false,
+      "UserId": {
+        "NameId": "10032001f5ac2029",
+        "NameIdIssuer": "urn:federation:microsoftonline"
+      },
+      "UserPrincipalName": "adelev@contoso.onmicrosoft.com"
     }
   ]
   ```
@@ -129,39 +133,42 @@ m365 spo group member add --webUrl https://contoso.sharepoint.com/sites/SiteA --
   <TabItem value="Text">
 
   ```text
-  DisplayName  Email
-  -----------  ---------------------------------
-  John Doe     john.doe@contoso.onmicrosoft.com
+  Title        UserPrincipalName
+  -----------  -------------------------------------
+  Adele Vance  Adele.Vance@contoso.onmicrosoft.com
   ```
 
   </TabItem>
   <TabItem value="CSV">
 
   ```csv
-  DisplayName,Email
-  John Doe,john.doe@contoso.onmicrosoft.com
+  Id,IsHiddenInUI,LoginName,Title,PrincipalType,Email,Expiration,IsEmailAuthenticationGuestUser,IsShareByEmailGuestUser,IsSiteAdmin,UserPrincipalName
+  11,,i:0#.f|membership|adelev@contoso.onmicrosoft.com,Adele Vance,1,Adele.Vance@contoso.onmicrosoft.com,,,,,adelev@contoso.onmicrosoft.com
   ```
 
   </TabItem>
   <TabItem value="Markdown">
 
   ```md
-  # spo group member add --webUrl "https://contoso.sharepoint.com" --groupId "5" --aadGroupIds "f2fb2f10-cfd2-4054-8ffd-64533657a5ab"
+  # spo group member add --webUrl "https://contoso.sharepoint.com/sites/Marketing" --groupId "5" --userNames "AdeleV@contoso.onmicrosoft.com"
 
-  Date: 13/2/2023
+  Date: 10/07/2024
 
-  ## All Company Members
+  ## Adele Vance (11)
 
   Property | Value
   ---------|-------
-  CurrentRole | 0
-  DisplayName | All Company Members
-  Email | allcompany@contoso.onmicrosoft.com
-  InvitationLink | null
-  IsUserKnown | true
-  Message | null
-  Status | true
-  User | c:0o.c\|federateddirectoryclaimprovider\|f2fb2f10-cfd2-4054-8ffd-64533657a5ab
+  Id | 11
+  IsHiddenInUI | false
+  LoginName | i:0#.f\|membership\|adelev@contoso.onmicrosoft.com
+  Title | Adele Vance
+  PrincipalType | 1
+  Email | Adele.Vance@contoso.onmicrosoft.com
+  Expiration |
+  IsEmailAuthenticationGuestUser | false
+  IsShareByEmailGuestUser | false
+  IsSiteAdmin | false
+  UserPrincipalName | adelev@contoso.onmicrosoft.com
   ```
 
   </TabItem>
