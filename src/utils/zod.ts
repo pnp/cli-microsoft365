@@ -41,6 +41,7 @@ function parseString(_def: z.ZodStringDef, _options: CommandOptionInfo[], curren
   if (currentOption) {
     currentOption.type = 'string';
   }
+  
   return;
 }
 
