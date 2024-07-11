@@ -14,7 +14,7 @@ function parseIntersection(def: z.ZodIntersectionDef, _options: CommandOptionInf
     return def.right._def;
   }
 
-  return undefined;
+  return;
 }
 
 function parseObject(def: z.ZodObjectDef, options: CommandOptionInfo[], _currentOption?: CommandOptionInfo): z.ZodTypeDef | undefined {
