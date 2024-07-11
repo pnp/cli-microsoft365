@@ -49,6 +49,7 @@ function parseNumber(_def: z.ZodNumberDef, _options: CommandOptionInfo[], curren
   if (currentOption) {
     currentOption.type = 'number';
   }
+  
   return;
 }
 
