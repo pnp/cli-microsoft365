@@ -167,12 +167,11 @@ async function execute(rawArgs: string[]): Promise<void> {
     const result = cli.commandToExecute.command.getSchemaToParse()!.safeParse(cli.optionsFromArgs.options);
     const endValidation = process.hrtime.bigint();
     timings.validation.push(Number(endValidation - startValidation));
-    if (result.success) {
-      finalArgs = result.data;
-    }
-    else {
+    if (!result.success) {
       return cli.closeWithError(result.error, cli.optionsFromArgs, true);
     }
+    
+    finalArgs = result.data;
   }
   else {
     const startValidation = process.hrtime.bigint();
