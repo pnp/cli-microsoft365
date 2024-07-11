@@ -141,8 +141,6 @@ describe(commands.LOGIN, () => {
     assert.strictEqual(auth.connection.authType, AuthType.Identity, 'Incorrect authType set');
     assert.strictEqual(auth.connection.userName, undefined, 'Incorrect userName set');
   });
-
-
   it('logs in to Microsoft 365 using client secret authType "secret" set', async () => {
     await command.action(logger, { options: commandOptionsSchema.parse({ authType: 'secret', secret: 'unBrEakaBle@123' }) });
     assert.strictEqual(auth.connection.authType, AuthType.Secret, 'Incorrect authType set');
