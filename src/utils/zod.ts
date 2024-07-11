@@ -57,6 +57,7 @@ function parseBoolean(_def: z.ZodBooleanDef, _options: CommandOptionInfo[], curr
   if (currentOption) {
     currentOption.type = 'boolean';
   }
+  
   return;
 }
 
