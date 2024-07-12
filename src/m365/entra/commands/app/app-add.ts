@@ -8,7 +8,6 @@ import { accessToken } from '../../../../utils/accessToken.js';
 import { AppCreationOptions, AppInfo, entraApp } from '../../../../utils/entraApp.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import { M365RcJson } from '../../../base/M365RcJson.js';
-import aadCommands from '../../aadCommands.js';
 import commands from '../../commands.js';
 
 interface CommandArgs {
@@ -39,10 +38,6 @@ class EntraAppAddCommand extends GraphCommand {
 
   public get description(): string {
     return 'Creates new Entra app registration';
-  }
-
-  public alias(): string[] | undefined {
-    return [aadCommands.APP_ADD, commands.APPREGISTRATION_ADD];
   }
 
   constructor() {
@@ -211,8 +206,6 @@ class EntraAppAddCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    await this.showDeprecationWarning(logger, aadCommands.APP_ADD, commands.APP_ADD);
-
     if (!args.options.name && this.manifest) {
       args.options.name = this.manifest.name;
     }

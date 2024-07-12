@@ -14,7 +14,6 @@ import commands from '../../commands.js';
 import command from './m365group-teamify.js';
 import { settingsNames } from '../../../../settingsNames.js';
 import { entraGroup } from '../../../../utils/entraGroup.js';
-import aadCommands from '../../aadCommands.js';
 
 describe(commands.M365GROUP_TEAMIFY, () => {
   let log: string[];
@@ -67,16 +66,6 @@ describe(commands.M365GROUP_TEAMIFY, () => {
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
-  });
-
-  it('defines alias', () => {
-    const alias = command.alias();
-    assert.notStrictEqual(typeof alias, 'undefined');
-  });
-
-  it('defines correct alias', () => {
-    const alias = command.alias();
-    assert.deepStrictEqual(alias, [aadCommands.M365GROUP_TEAMIFY]);
   });
 
   it('fails validation if both id and mailNickname options are not passed', async () => {

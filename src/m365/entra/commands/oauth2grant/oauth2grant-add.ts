@@ -3,7 +3,6 @@ import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
-import aadCommands from '../../aadCommands.js';
 import commands from '../../commands.js';
 
 interface CommandArgs {
@@ -23,10 +22,6 @@ class EntraOAuth2GrantAddCommand extends GraphCommand {
 
   public get description(): string {
     return 'Grant the specified service principal OAuth2 permissions to the specified resource';
-  }
-
-  public alias(): string[] | undefined {
-    return [aadCommands.OAUTH2GRANT_ADD];
   }
 
   constructor() {
@@ -67,8 +62,6 @@ class EntraOAuth2GrantAddCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    await this.showDeprecationWarning(logger, aadCommands.OAUTH2GRANT_ADD, commands.OAUTH2GRANT_ADD);
-
     if (this.verbose) {
       await logger.logToStderr(`Granting the service principal specified permissions...`);
     }

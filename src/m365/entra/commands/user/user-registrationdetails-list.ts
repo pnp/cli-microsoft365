@@ -2,7 +2,6 @@ import GlobalOptions from '../../../../GlobalOptions.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
-import aadCommands from '../../aadCommands.js';
 import { odata } from '../../../../utils/odata.js';
 import { UserRegistrationDetails } from '@microsoft/microsoft-graph-types';
 import { entraUser } from '../../../../utils/entraUser.js';
@@ -40,10 +39,6 @@ class EntraUserRegistrationDetailsListCommand extends GraphCommand {
   }
   public get description(): string {
     return 'Retrieves a list of the authentication methods registered for users';
-  }
-
-  public alias(): string[] | undefined {
-    return [aadCommands.USER_REGISTRATIONDETAILS_LIST];
   }
 
   public defaultProperties(): string[] | undefined {

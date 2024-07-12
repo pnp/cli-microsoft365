@@ -4,7 +4,6 @@ import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import GraphCommand from '../../../base/GraphCommand.js';
-import aadCommands from '../../aadCommands.js';
 import commands from '../../commands.js';
 
 interface CommandArgs {
@@ -22,10 +21,6 @@ class EntraOAuth2GrantRemoveCommand extends GraphCommand {
 
   public get description(): string {
     return 'Remove specified service principal OAuth2 permissions';
-  }
-
-  public alias(): string[] | undefined {
-    return [aadCommands.OAUTH2GRANT_REMOVE];
   }
 
   constructor() {
@@ -46,8 +41,6 @@ class EntraOAuth2GrantRemoveCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    await this.showDeprecationWarning(logger, aadCommands.OAUTH2GRANT_REMOVE, commands.OAUTH2GRANT_REMOVE);
-
     const removeOauth2Grant: () => Promise<void> = async (): Promise<void> => {
       if (this.verbose) {
         await logger.logToStderr(`Removing OAuth2 permissions...`);

@@ -14,7 +14,6 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './m365group-recyclebinitem-restore.js';
 import { settingsNames } from '../../../../settingsNames.js';
-import aadCommands from '../../aadCommands.js';
 
 describe(commands.M365GROUP_RECYCLEBINITEM_RESTORE, () => {
   const validGroupId = '00000000-0000-0000-0000-000000000000';
@@ -114,16 +113,6 @@ describe(commands.M365GROUP_RECYCLEBINITEM_RESTORE, () => {
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
-  });
-
-  it('defines alias', () => {
-    const alias = command.alias();
-    assert.notStrictEqual(typeof alias, 'undefined');
-  });
-
-  it('defines correct alias', () => {
-    const alias = command.alias();
-    assert.deepStrictEqual(alias, [aadCommands.M365GROUP_RECYCLEBINITEM_RESTORE]);
   });
 
   it('fails validation if the id is not a valid GUID', async () => {
