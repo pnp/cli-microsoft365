@@ -22,10 +22,10 @@ m365 aad group user list [options]
 
 ```md definition-list
 `-i, --groupId [groupId]`
-: The ID of the Entra group. Specify `groupId` or `groupDisplayName` but not both.
+: The ID of the Entra group. Specify `groupId` or `groupName` but not both.
 
-`-n, --groupDisplayName [groupDisplayName]`
-: The display name of the Entra group. Specify `groupId` or `groupDisplayName` but not both.
+`-n, --groupName [groupName]`
+: The display name of the Entra group. Specify `groupId` or `groupName` but not both.
 
 `-r, --role [role]`
 : Filter the results to only users with the given role: `Owner`, `Member`.
@@ -54,25 +54,25 @@ m365 entra group user list --groupId 03cba9da-3974-46c1-afaf-79caa2e45bbe
 List all owners from a group specified by display name.
 
 ```sh
-m365 entra group user list --groupDisplayName Developers --role Owner
+m365 entra group user list --groupName Developers --role Owner
 ```
 
 List all group users from a group specified by name. For each one return the display name, e-mail address, and manager display name.
 
 ```sh
-m365 entra group user list --groupDisplayName Developers --properties "displayName,mail,manager/displayName"
+m365 entra group user list --groupName Developers --properties "displayName,mail,manager/displayName"
 ```
 
 List all group users from a group specified by name. For each one return the display name, e-mail address, and manager information.
 
 ```sh
-m365 entra group user list --groupDisplayName Developers --properties "displayName,mail,manager/*"
+m365 entra group user list --groupName Developers --properties "displayName,mail,manager/*"
 ```
 
 List all group members that are guest users.
 
 ```sh
-m365 entra group user list --groupDisplayName Developers --filter "userType eq 'Guest'"
+m365 entra group user list --groupName Developers --filter "userType eq 'Guest'"
 ```
 
 ## Response
