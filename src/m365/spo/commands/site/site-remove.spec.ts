@@ -360,16 +360,6 @@ describe(commands.SITE_REMOVE, () => {
       new CommandError('Site is currently not in the recycle bin. Remove --fromRecycleBin if you want to remove it as active site.'));
   });
 
-  it(`correctly shows deprecation warning for option 'wait'`, async () => {
-    const chalk = (await import('chalk')).default;
-    const loggerErrSpy = sinon.spy(logger, 'logToStderr');
-
-    await command.action(logger, { options: { url: siteUrl, wait: true } });
-    assert(loggerErrSpy.calledWith(chalk.yellow(`Option 'wait' is deprecated and will be removed in the next major release.`)));
-
-    sinonUtil.restore(loggerErrSpy);
-  });
-
   it('prompts before removing the site when force option not passed', async () => {
     await command.action(logger, { options: { url: siteUrl, verbose: true } });
     assert(promptIssued);
