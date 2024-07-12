@@ -6,8 +6,6 @@ import { entraGroup } from '../../../../utils/entraGroup.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
-import teamsCommands from '../../../teams/commands.js';
-import aadCommands from '../../aadCommands.js';
 import commands from '../../commands.js';
 
 interface CommandArgs {
@@ -32,10 +30,6 @@ class EntraM365GroupUserRemoveCommand extends GraphCommand {
 
   public get description(): string {
     return 'Removes the specified user from specified Microsoft 365 Group or Microsoft Teams team';
-  }
-
-  public alias(): string[] | undefined {
-    return [teamsCommands.USER_REMOVE, aadCommands.M365GROUP_USER_REMOVE];
   }
 
   constructor() {
@@ -95,8 +89,6 @@ class EntraM365GroupUserRemoveCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    await this.showDeprecationWarning(logger, aadCommands.M365GROUP_USER_REMOVE, commands.M365GROUP_USER_REMOVE);
-
     const groupId: string = (typeof args.options.groupId !== 'undefined') ? args.options.groupId : args.options.teamId as string;
 
     const removeUser = async (): Promise<void> => {

@@ -4,7 +4,6 @@ import request, { CliRequestOptions } from '../../../../request.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 import { SiteClassificationSettings } from './SiteClassificationSettings.js';
-import aadCommands from '../../aadCommands.js';
 
 class EntraSiteClassificationGetCommand extends GraphCommand {
   public get name(): string {
@@ -15,13 +14,7 @@ class EntraSiteClassificationGetCommand extends GraphCommand {
     return 'Gets site classification configuration';
   }
 
-  public alias(): string[] | undefined {
-    return [aadCommands.SITECLASSIFICATION_GET];
-  }
-
   public async commandAction(logger: Logger): Promise<void> {
-    await this.showDeprecationWarning(logger, aadCommands.SITECLASSIFICATION_GET, commands.SITECLASSIFICATION_GET);
-
     try {
       const requestOptions: CliRequestOptions = {
         url: `${this.resource}/v1.0/groupSettings`,

@@ -4,7 +4,6 @@ import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
-import aadCommands from '../../aadCommands.js';
 import commands from '../../commands.js';
 
 interface CommandArgs {
@@ -23,10 +22,6 @@ class EntraGroupSettingRemoveCommand extends GraphCommand {
 
   public get description(): string {
     return 'Removes the particular group setting';
-  }
-
-  public alias(): string[] | undefined {
-    return [aadCommands.GROUPSETTING_REMOVE];
   }
 
   constructor() {
@@ -69,8 +64,6 @@ class EntraGroupSettingRemoveCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    await this.showDeprecationWarning(logger, aadCommands.GROUPSETTING_REMOVE, commands.GROUPSETTING_REMOVE);
-
     const removeGroupSetting = async (): Promise<void> => {
       if (this.verbose) {
         await logger.logToStderr(`Removing group setting: ${args.options.id}...`);

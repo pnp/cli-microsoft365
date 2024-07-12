@@ -1,7 +1,6 @@
 import { Logger } from '../../../../cli/Logger.js';
 import { odata } from '../../../../utils/odata.js';
 import GraphCommand from '../../../base/GraphCommand.js';
-import aadCommands from '../../aadCommands.js';
 import commands from '../../commands.js';
 
 class EntraLicenseListCommand extends GraphCommand {
@@ -13,17 +12,11 @@ class EntraLicenseListCommand extends GraphCommand {
     return 'Lists commercial subscriptions that an organization has acquired';
   }
 
-  public alias(): string[] | undefined {
-    return [aadCommands.LICENSE_LIST];
-  }
-
   public defaultProperties(): string[] | undefined {
     return ['id', 'skuId', 'skuPartNumber'];
   }
 
   public async commandAction(logger: Logger): Promise<void> {
-    await this.showDeprecationWarning(logger, aadCommands.LICENSE_LIST, commands.LICENSE_LIST);
-
     if (this.verbose) {
       await logger.logToStderr(`Retrieving the commercial subscriptions that an organization has acquired`);
     }

@@ -4,7 +4,6 @@ import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { validation } from '../../../../utils/validation.js';
 import AnonymousCommand from '../../../base/AnonymousCommand.js';
-import aadCommands from '../../aadCommands.js';
 import commands from '../../commands.js';
 
 interface CommandArgs {
@@ -24,10 +23,6 @@ class EntraUserHibpCommand extends AnonymousCommand {
 
   public get description(): string {
     return 'Allows you to retrieve all accounts that have been pwned with the specified username';
-  }
-
-  public alias(): string[] | undefined {
-    return [aadCommands.USER_HIBP];
   }
 
   constructor() {
@@ -73,8 +68,6 @@ class EntraUserHibpCommand extends AnonymousCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    await this.showDeprecationWarning(logger, aadCommands.USER_HIBP, commands.USER_HIBP);
-
     try {
       const requestOptions: CliRequestOptions = {
         url: `https://haveibeenpwned.com/api/v3/breachedaccount/${formatting.encodeQueryParameter(args.options.userName)}${(args.options.domain ? `?domain=${formatting.encodeQueryParameter(args.options.domain)}` : '')}`,

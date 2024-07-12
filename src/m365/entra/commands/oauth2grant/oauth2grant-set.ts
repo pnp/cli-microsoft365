@@ -3,7 +3,6 @@ import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import GraphCommand from '../../../base/GraphCommand.js';
-import aadCommands from '../../aadCommands.js';
 import commands from '../../commands.js';
 
 interface CommandArgs {
@@ -24,10 +23,6 @@ class EntraOAuth2GrantSetCommand extends GraphCommand {
     return 'Update OAuth2 permissions for the service principal';
   }
 
-  public alias(): string[] | undefined {
-    return [aadCommands.OAUTH2GRANT_SET];
-  }
-
   constructor() {
     super();
 
@@ -46,8 +41,6 @@ class EntraOAuth2GrantSetCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    await this.showDeprecationWarning(logger, aadCommands.OAUTH2GRANT_SET, commands.OAUTH2GRANT_SET);
-
     if (this.verbose) {
       await logger.logToStderr(`Updating OAuth2 permissions...`);
     }

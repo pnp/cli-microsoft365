@@ -4,7 +4,6 @@ import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
-import aadCommands from '../../aadCommands.js';
 import commands from '../../commands.js';
 
 interface CommandArgs {
@@ -23,10 +22,6 @@ class EntraUserRecycleBinItemRemoveCommand extends GraphCommand {
 
   public get description(): string {
     return 'Removes a user from the recycle bin in the current tenant';
-  }
-
-  public alias(): string[] | undefined {
-    return [aadCommands.USER_RECYCLEBINITEM_REMOVE];
   }
 
   constructor() {
@@ -69,8 +64,6 @@ class EntraUserRecycleBinItemRemoveCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    await this.showDeprecationWarning(logger, aadCommands.USER_RECYCLEBINITEM_REMOVE, commands.USER_RECYCLEBINITEM_REMOVE);
-
     const clearRecycleBinItem: () => Promise<void> = async (): Promise<void> => {
       if (this.verbose) {
         await logger.logToStderr(`Permanently deleting user with id ${args.options.id} from Microsoft Entra ID`);
