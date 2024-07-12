@@ -12,7 +12,7 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  groupDisplayName?: string;
+  groupName?: string;
   groupMailNickname?: string;
 }
 
@@ -39,7 +39,7 @@ class EntraM365GroupRecycleBinItemListCommand extends GraphCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        groupDisplayName: typeof args.options.groupDisplayName !== 'undefined',
+        groupName: typeof args.options.groupName !== 'undefined',
         groupMailNickname: typeof args.options.groupMailNickname !== 'undefined'
       });
     });
@@ -48,7 +48,7 @@ class EntraM365GroupRecycleBinItemListCommand extends GraphCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '-d, --groupDisplayName [groupDisplayName]'
+        option: '-d, --groupName [groupName]'
       },
       {
         option: '-m, --groupMailNickname [groupMailNickname]'
@@ -65,7 +65,7 @@ class EntraM365GroupRecycleBinItemListCommand extends GraphCommand {
 
     try {
       const filter: string = `?$filter=groupTypes/any(c:c+eq+'Unified')`;
-      const displayNameFilter: string = args.options.groupDisplayName ? ` and startswith(DisplayName,'${formatting.encodeQueryParameter(args.options.groupDisplayName).replace(/'/g, `''`)}')` : '';
+      const displayNameFilter: string = args.options.groupName ? ` and startswith(DisplayName,'${formatting.encodeQueryParameter(args.options.groupName).replace(/'/g, `''`)}')` : '';
       const mailNicknameFilter: string = args.options.groupMailNickname ? ` and startswith(MailNickname,'${formatting.encodeQueryParameter(args.options.groupMailNickname).replace(/'/g, `''`)}')` : '';
       const topCount: string = '&$top=100';
       const endpoint: string = `${this.resource}/v1.0/directory/deletedItems/Microsoft.Graph.Group${filter}${displayNameFilter}${mailNicknameFilter}${topCount}`;
