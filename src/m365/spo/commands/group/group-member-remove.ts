@@ -22,9 +22,7 @@ interface Options extends GlobalOptions {
   email?: string;
   userId?: number;
   entraGroupId?: string;
-  aadGroupId?: string;
   entraGroupName?: string;
-  aadGroupName?: string;
   force?: boolean;
 }
 
@@ -55,9 +53,7 @@ class SpoGroupMemberRemoveCommand extends SpoCommand {
         email: (!(!args.options.email)).toString(),
         userId: (!(!args.options.userId)).toString(),
         entraGroupId: (!(!args.options.entraGroupId)).toString(),
-        aadGroupId: (!(!args.options.groupId)).toString(),
         entraGroupName: (!(!args.options.entraGroupName)).toString(),
-        aadGroupName: (!(!args.options.aadGroupName)).toString(),
         force: (!(!args.options.force)).toString()
       });
     });
@@ -87,13 +83,7 @@ class SpoGroupMemberRemoveCommand extends SpoCommand {
         option: '--entraGroupId [entraGroupId]'
       },
       {
-        option: '--aadGroupId [aadGroupId]'
-      },
-      {
         option: '--entraGroupName [entraGroupName]'
-      },
-      {
-        option: '--aadGroupName [aadGroupName]'
       },
       {
         option: '-f, --force'
@@ -124,10 +114,6 @@ class SpoGroupMemberRemoveCommand extends SpoCommand {
           return `${args.options.entraGroupId} is not a valid GUID`;
         }
 
-        if (args.options.aadGroupId && !validation.isValidGuid(args.options.aadGroupId as string)) {
-          return `${args.options.aadGroupId} is not a valid GUID`;
-        }
-
         return validation.isValidSharePointUrl(args.options.webUrl);
       }
     );
@@ -136,7 +122,7 @@ class SpoGroupMemberRemoveCommand extends SpoCommand {
   #initOptionSets(): void {
     this.optionSets.push(
       { options: ['groupName', 'groupId'] },
-      { options: ['userName', 'email', 'userId', 'entraGroupId', 'aadGroupId', 'entraGroupName', 'aadGroupName'] }
+      { options: ['userName', 'email', 'userId', 'entraGroupId', 'entraGroupName'] }
     );
   }
 
@@ -162,18 +148,6 @@ class SpoGroupMemberRemoveCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    if (args.options.aadGroupId) {
-      args.options.entraGroupId = args.options.aadGroupId;
-
-      await this.warn(logger, `Option 'aadGroupId' is deprecated. Please use 'entraGroupId' instead`);
-    }
-
-    if (args.options.aadGroupName) {
-      args.options.entraGroupName = args.options.aadGroupName;
-
-      await this.warn(logger, `Option 'aadGroupName' is deprecated. Please use 'entraGroupName' instead`);
-    }
-
     if (args.options.force) {
       if (this.debug) {
         await logger.logToStderr('Confirmation bypassed by entering confirm option. Removing the user from SharePoint Group...');
