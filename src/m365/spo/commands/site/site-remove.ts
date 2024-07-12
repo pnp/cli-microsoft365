@@ -19,7 +19,6 @@ interface Options extends GlobalOptions {
   url: string;
   skipRecycleBin?: boolean;
   fromRecycleBin?: boolean;
-  wait?: boolean;
   force?: boolean;
 }
 
@@ -55,7 +54,6 @@ class SpoSiteRemoveCommand extends SpoCommand {
       Object.assign(this.telemetryProperties, {
         skipRecycleBin: !!args.options.skipRecycleBin,
         fromRecycleBin: !!args.options.fromRecycleBin,
-        wait: !!args.options.wait,
         force: !!args.options.force
       });
     });
@@ -71,9 +69,6 @@ class SpoSiteRemoveCommand extends SpoCommand {
       },
       {
         option: '--fromRecycleBin'
-      },
-      {
-        option: '--wait'
       },
       {
         option: '-f, --force'
@@ -105,14 +100,10 @@ class SpoSiteRemoveCommand extends SpoCommand {
 
   #initTypes(): void {
     this.types.string.push('url');
-    this.types.boolean.push('skipRecycleBin', 'fromRecycleBin', 'wait', 'force');
+    this.types.boolean.push('skipRecycleBin', 'fromRecycleBin', 'force');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    if (args.options.wait) {
-      await this.warn(logger, `Option 'wait' is deprecated and will be removed in the next major release.`);
-    }
-
     if (args.options.force) {
       await this.removeSite(logger, args.options);
     }
