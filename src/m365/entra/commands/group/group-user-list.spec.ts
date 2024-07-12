@@ -19,7 +19,7 @@ import aadCommands from '../../aadCommands.js';
 
 describe(commands.GROUP_USER_LIST, () => {
   const groupId = '2c1ba4c4-cd9b-4417-832f-92a34bc34b2a';
-  const groupDisplayName = 'CLI Test Group';
+  const groupName = 'CLI Test Group';
 
   let log: string[];
   let logger: Logger;
@@ -180,7 +180,7 @@ describe(commands.GROUP_USER_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true, groupDisplayName: groupDisplayName } });
+    await command.action(logger, { options: { verbose: true, groupName: groupName } });
 
     assert(loggerLogSpy.calledOnceWithExactly([
       {
@@ -235,7 +235,7 @@ describe(commands.GROUP_USER_LIST, () => {
     });
 
     sinon.stub(request, 'get').callsFake(async opts => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(groupDisplayName)}'&$select=id`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(groupName)}'&$select=id`) {
         return {
           value: [
             { id: '9b1b1e42-794b-4c71-93ac-5ed92488b67f' },
@@ -249,14 +249,14 @@ describe(commands.GROUP_USER_LIST, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        groupDisplayName: groupDisplayName
+        groupName: groupName
       }
     }), new CommandError(`Multiple groups with name 'CLI Test Group' found. Found: 9b1b1e42-794b-4c71-93ac-5ed92488b67f, 9b1b1e42-794b-4c71-93ac-5ed92488b67g.`));
   });
 
   it('handles selecting single result when multiple Microsoft Entra groups with the specified name found and cli is set to prompt', async () => {
     sinon.stub(request, 'get').callsFake(async opts => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(groupDisplayName)}'&$select=id`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(groupName)}'&$select=id`) {
         return {
           value: [
             { id: '9b1b1e42-794b-4c71-93ac-5ed92488b67f' },
@@ -276,7 +276,7 @@ describe(commands.GROUP_USER_LIST, () => {
 
     sinon.stub(cli, 'handleMultipleResultsFound').resolves({ id: '9b1b1e42-794b-4c71-93ac-5ed92488b67f' });
 
-    await command.action(logger, { options: { groupDisplayName: groupDisplayName, role: "Owner" } });
+    await command.action(logger, { options: { groupName: groupName, role: "Owner" } });
     assert(loggerLogSpy.calledOnceWithExactly([
       {
         "id": "00000000-0000-0000-0000-000000000000",

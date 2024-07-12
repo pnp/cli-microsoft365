@@ -135,7 +135,7 @@ describe(commands.M365GROUP_CONVERSATION_POST_LIST, () => {
   it('defines correct properties for the default output', () => {
     assert.deepStrictEqual(command.defaultProperties(), ['receivedDateTime', 'id']);
   });
-  it('fails validation if groupId and groupDisplayName specified', async () => {
+  it('fails validation if groupId and groupName specified', async () => {
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
       if (settingName === settingsNames.prompt) {
         return false;
@@ -144,10 +144,10 @@ describe(commands.M365GROUP_CONVERSATION_POST_LIST, () => {
       return defaultValue;
     });
 
-    const actual = await command.validate({ options: { groupId: '1caf7dcd-7e83-4c3a-94f7-932a1299c844', groupDisplayName: 'MyGroup', threadId: '123' } }, commandInfo);
+    const actual = await command.validate({ options: { groupId: '1caf7dcd-7e83-4c3a-94f7-932a1299c844', groupName: 'MyGroup', threadId: '123' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
-  it('fails validation if neither groupId nor groupDisplayName specified', async () => {
+  it('fails validation if neither groupId nor groupName specified', async () => {
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
       if (settingName === settingsNames.prompt) {
         return false;
@@ -187,7 +187,7 @@ describe(commands.M365GROUP_CONVERSATION_POST_LIST, () => {
       jsonOutput.value
     ));
   });
-  it('Retrieve posts for the specified conversation threadId of m365 group groupDisplayName in the tenant (verbose)', async () => {
+  it('Retrieve posts for the specified conversation threadId of m365 group groupName in the tenant (verbose)', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/groups?$filter=displayName') > -1) {
         return {
@@ -208,7 +208,7 @@ describe(commands.M365GROUP_CONVERSATION_POST_LIST, () => {
     await command.action(logger, {
       options: {
         verbose: true,
-        groupDisplayName: "MyGroup",
+        groupName: "MyGroup",
         threadId: "AAQkADkwN2Q2NDg1LWQ3ZGYtNDViZi1iNGRiLTVhYjJmN2Q5NDkxZQAQAOnRAfDf71lIvrdK85FAn5E="
       }
     });

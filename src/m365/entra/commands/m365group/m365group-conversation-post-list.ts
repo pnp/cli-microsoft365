@@ -15,7 +15,7 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   groupId?: string;
-  groupDisplayName?: string;
+  groupName?: string;
   threadId: string;
 }
 
@@ -45,7 +45,7 @@ class EntraM365GroupConversationPostListCommand extends GraphCommand {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
         groupId: typeof args.options.groupId !== 'undefined',
-        groupDisplayName: typeof args.options.groupDisplayName !== 'undefined'
+        groupName: typeof args.options.groupName !== 'undefined'
       });
     });
   }
@@ -56,7 +56,7 @@ class EntraM365GroupConversationPostListCommand extends GraphCommand {
         option: '-i, --groupId [groupId]'
       },
       {
-        option: '-d, --groupDisplayName [groupDisplayName]'
+        option: '-d, --groupName [groupName]'
       },
       {
         option: '-t, --threadId <threadId>'
@@ -77,7 +77,7 @@ class EntraM365GroupConversationPostListCommand extends GraphCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push({ options: ['groupId', 'groupDisplayName'] });
+    this.optionSets.push({ options: ['groupId', 'groupName'] });
   }
 
   public defaultProperties(): string[] | undefined {
@@ -108,7 +108,7 @@ class EntraM365GroupConversationPostListCommand extends GraphCommand {
       return formatting.encodeQueryParameter(args.options.groupId);
     }
 
-    const group = await entraGroup.getGroupByDisplayName(args.options.groupDisplayName!);
+    const group = await entraGroup.getGroupByDisplayName(args.options.groupName!);
     return group.id!;
   }
 }
