@@ -58,11 +58,6 @@ describe(commands.MULTITENANT_GET, () => {
     auth.connection.active = false;
   });
 
-  after(() => {
-    sinon.restore();
-    auth.connection.active = false;
-  });
-
   it('has correct name', () => {
     assert.strictEqual(command.name, commands.MULTITENANT_GET);
   });
@@ -80,14 +75,24 @@ describe(commands.MULTITENANT_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { } });
+    await command.action(logger, { options: { verbose: true } });
     assert(loggerLogSpy.calledOnceWithExactly(response));
   });
 
-  it('handles random API error', async () => {
-    const errorMessage = 'Something went wrong';
-    sinon.stub(request, 'get').rejects(new Error(errorMessage));
+  it('throws an error when user does not have permission', async () => {
+    const error = {
+      "error": {
+        "code": "Authorization_RequestDenied",
+        "message": "Insufficient privileges to complete the operation.",
+        "innerError": {
+          "date": "2024-07-12T22:15:20",
+          "request-id": "df7cb1e0-8bf1-4a53-84e5-5fe9e28335d6",
+          "client-request-id": "f62e7761-0ff8-78a9-a587-c953b2725122"
+        }
+      }
+    };
+    sinon.stub(request, 'get').throws(error);//.rejects(new Error(errorMessage));
 
-    await assert.rejects(command.action(logger, { options: {} }), new CommandError(errorMessage));
+    await assert.rejects(command.action(logger, { options: {} }), new CommandError(error.error.message));
   });
 });

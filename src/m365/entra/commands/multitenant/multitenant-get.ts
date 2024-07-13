@@ -2,14 +2,7 @@ import { Logger } from '../../../../cli/Logger.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
-
-interface MultitenantOrganization {
-  createdDateTime?: string;
-  displayName?: string;
-  description?: string;
-  id?: string;
-  state?: string;
-}
+import { MultitenantOrganization } from './MultitenantOrganization.js';
 
 class EntraMultitenantGetCommand extends GraphCommand {
   public get name(): string {
@@ -31,6 +24,9 @@ class EntraMultitenantGetCommand extends GraphCommand {
     };
 
     try {
+      if (this.verbose) {
+        await logger.logToStderr('Retrieving multitenant organization...');
+      }
       const multitenantOrg = await request.get<MultitenantOrganization>(requestOptions);
 
       await logger.log(multitenantOrg);
