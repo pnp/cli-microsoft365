@@ -16,13 +16,13 @@ m365 teams meeting transcript get [options]
 
 ```md definition-list
 `-u, --userId [userId]`
-: The id of the user, omit to get meeting transcript for current signed in user. Use either  `id`, `userName` or `email`, but not multiple.
+: The id of the user, omit to get meeting transcript for the currently signed-in user. Use either `id`, `userName` or `email`, but not multiple.
 
 `-n, --userName [userName]`
-: The name of the user, omit to get meeting transcript for current signed in user. Use either `id`, `userName` or `email`, but not multiple.
+: The name of the user, omit to get the meeting transcript for the currently signed-in user. Use either `id`, `userName` or `email`, but not multiple.
 
 `--email [email]`
-: The email of the user, omit to get meeting transcript reports for current signed in user. Use either `id`, `userName` or `email`, but not multiple.
+: The email of the user, omit to get the meeting transcript for the currently signed-in user. Use either `id`, `userName` or `email`, but not multiple.
 
 `-m, --meetingId <meetingId>`
 : The Id of the meeting.
@@ -31,7 +31,7 @@ m365 teams meeting transcript get [options]
 : The Id of the transcript.
 
 `-f, --outputFile [outputFile]`
-: Path to the file where the report should be stored in.
+: Destination path for the report file.
 ```
 
 <Global />
@@ -44,7 +44,7 @@ Gets the specified transcript made for the current signed in user and Microsoft 
 m365 teams meeting transcript get --meetingId MSo1N2Y5ZGFjYy03MWJmLTQ3NDMtYjQxMy01M2EdFGkdRWHJlQ --id MSMjMCMjNzU3ODc2ZDYtOTcwMi00MDhkLWFkNDItOTE2ZDNmZjkwZGY4
 ```
 
-Saves the specified transcript made for the _[garthf@contoso.com](mailto:garthf@contoso.com)_ and Microsoft Teams meeting with given id.
+Saves the specified transcript made for a given user and Microsoft Teams meeting with the given id.
 
 ```sh
 m365 teams meeting transcript get --userName garthf@contoso.com --meetingId MSo1N2Y5ZGFjYy03MWJmLTQ3NDMtYjQxMy01M2EdFGkdRWHJlQ --id MSMjMCMjNzU3ODc2ZDYtOTcwMi00MDhkLWFkNDItOTE2ZDNmZjkwZGY4 --outputFile c:/Transcript.vtt
