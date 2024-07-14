@@ -31,7 +31,7 @@ class SpoListListCommand extends SpoCommand {
   }
 
   public defaultProperties(): string[] | undefined {
-    return ['Title', 'Url', 'Id'];
+    return ['Title', 'Id'];
   }
 
   constructor() {
@@ -85,10 +85,6 @@ class SpoListListCommand extends SpoCommand {
       }
 
       const listInstances = await odata.getAllItems<ListInstance>(`${args.options.webUrl}/_api/web/lists?${queryParams.join('&')}`);
-      listInstances.forEach(l => {
-        l.Url = l.RootFolder.ServerRelativeUrl;
-      });
-
       await logger.log(listInstances);
     }
     catch (err: any) {
