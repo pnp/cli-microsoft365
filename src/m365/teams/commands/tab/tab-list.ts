@@ -26,7 +26,7 @@ class TeamsTabListCommand extends GraphCommand {
   }
 
   public defaultProperties(): string[] | undefined {
-    return ['id', 'displayName', 'teamsAppTabId'];
+    return ['id', 'displayName'];
   }
 
   constructor() {
@@ -68,10 +68,6 @@ class TeamsTabListCommand extends GraphCommand {
 
     try {
       const items = await odata.getAllItems<TeamsTab>(endpoint);
-      items.forEach(i => {
-        (i as any).teamsAppTabId = i.teamsApp!.id;
-      });
-
       await logger.log(items);
     }
     catch (err: any) {
