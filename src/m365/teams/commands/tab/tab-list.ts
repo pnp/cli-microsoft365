@@ -68,9 +68,12 @@ class TeamsTabListCommand extends GraphCommand {
 
     try {
       const items = await odata.getAllItems<TeamsTab>(endpoint);
-      items.forEach(i => {
-        (i as any).teamsAppTabId = i.teamsApp!.id;
-      });
+
+      if (args.options.output !== 'json') {
+        items.forEach(i => {
+          (i as any).teamsAppTabId = i.teamsApp!.id;
+        });
+      }
 
       await logger.log(items);
     }
