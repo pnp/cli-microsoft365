@@ -149,6 +149,14 @@ In the past versions of CLI for Microsoft 365, the command had no output. When u
 
 When using the [spo file copy](./cmd/spo/file/file-copy.mdx) command, please use the new command input. This means that you'll have to remove option `--resetAuthorAndCreated` from your scripts and automation tools.
 
+### Removed 'spo folder rename' alias
+
+The `spo folder rename` command was removed and replaced by the [spo folder set](./cmd/spo/folder/folder-set.mdx) command.
+
+#### What action do I need to take?
+
+Please, update your scripts to use the `spo folder set` command instead of `spo folder rename`.
+
 ## SharePoint Framework
 
 ### Removed overwrite option from `spfx project github workflow add` command
