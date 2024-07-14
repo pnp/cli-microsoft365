@@ -12,7 +12,6 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-
 import command from './folder-set.js';
 
 describe(commands.FOLDER_SET, () => {
@@ -70,23 +69,6 @@ describe(commands.FOLDER_SET, () => {
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
-  });
-
-  it('defines correct alias', () => {
-    const alias = command.alias();
-    assert.deepStrictEqual(alias, [commands.FOLDER_RENAME]);
-  });
-
-  it('correctly logs deprecation warning for yammer command', async () => {
-    const chalk = (await import('chalk')).default;
-    const loggerErrSpy = sinon.spy(logger, 'logToStderr');
-    const commandNameStub = sinon.stub(cli, 'currentCommandName').value(commands.FOLDER_RENAME);
-    sinon.stub(request, 'patch').resolves();
-
-    await command.action(logger, { options: { webUrl: webUrl, url: folderRelServerUrl, name: newFolderName } });
-    assert.deepStrictEqual(loggerErrSpy.firstCall.firstArg, chalk.yellow(`Command '${commands.FOLDER_RENAME}' is deprecated. Please use '${commands.FOLDER_SET}' instead.`));
-
-    sinonUtil.restore([loggerErrSpy, commandNameStub]);
   });
 
   it('renames folder correctly by using server relative URL', async () => {
