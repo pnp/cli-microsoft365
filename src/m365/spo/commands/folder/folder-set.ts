@@ -29,10 +29,6 @@ class SpoFolderSetCommand extends SpoCommand {
     return 'Updates a folder';
   }
 
-  public alias(): string[] | undefined {
-    return [commands.FOLDER_RENAME];
-  }
-
   constructor() {
     super();
 
@@ -99,8 +95,6 @@ class SpoFolderSetCommand extends SpoCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
-      await this.showDeprecationWarning(logger, this.alias()![0], this.name);
-
       if (this.verbose) {
         await logger.logToStderr(`Updating folder '${args.options.name}'...`);
       }
