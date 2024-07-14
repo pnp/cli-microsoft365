@@ -233,6 +233,16 @@ Overwriting the SPFx package should be the default behavior of the continuous de
 
 Please update your scripts not to use the `overwrite` option.
 
+## Teams
+
+### Removes duplicate property from 'teams tab list' command.
+
+In the [teams tab list](./cmd/teams/tab/tab-list.mdx) we removed the `teamsAppTabId` from the command output as it was a duplicate of the `teamsApp/id` property.
+
+#### What action do I need to take?
+
+Please update your scripts not to use the `teamsAppTabId` property from the command output.
+
 ## Yammer (Viva Engage)
 
 ### Removal of deprecated Yammer aliases
