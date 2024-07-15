@@ -35,16 +35,16 @@ m365 aad group set [options]
 : The new mail alias for the group (part before the @). Maximum length is 64 characters.
 
 `--ownerIds [ownerIds]`
-: Comma-separated list of IDs of Microsoft Entra ID users that will be group owners.
+: Comma-separated list of IDs of Microsoft Entra users that will be the group owners.
 
 `--ownerUserNames [ownerUserNames]`
-: Comma-separated list of UPNs of Microsoft Entra ID users that will be group owners.
+: Comma-separated list of UPNs of Microsoft Entra users that will be the group owners.
 
 `--memberIds [memberIds]`
-: Comma-separated list of IDs of Microsoft Entra ID users that will be group members.
+: Comma-separated list of IDs of Microsoft Entra users that will be the group members.
 
 `--memberUserNames [memberUserNames]`
-: Comma-separated list of UPNs of Microsoft Entra ID users that will be group members.
+: Comma-separated list of UPNs of Microsoft Entra users that will be the group members.
 
 `--visibility [visibility]`
 : Specifies the group join policy and group content visibility for Microsoft 365 groups. Possible values are: `Private` or `Public`. Specify only when targeting a Microsoft 365 group.
@@ -53,8 +53,6 @@ m365 aad group set [options]
 <Global />
 
 ## Remarks
-
-:::info
 
 The `visibility` option affects the behavior of the group.
 
@@ -68,8 +66,6 @@ With the `Private` visibilty:
 - Anyone can view the attributes of the group.
 - Anyone can see the members of the group.
 
-:::
-
 This command allows using unknown options. For a comprehensive list of group properties, please refer to the [Graph documentation page](https://learn.microsoft.com/graph/api/resources/group?view=graph-rest-1.0#properties).
 
 If the specified option is not found, you will receive a `Resource 'xyz' does not exist or one of its queried reference-property objects are not present.` error.
@@ -79,7 +75,7 @@ If the specified option is not found, you will receive a `Resource 'xyz' does no
 Update the display name of a group specified by the display name
 
 ```sh
-m365 entra group set --displayName Developers --newDisplayName Developers
+m365 entra group set --displayName Devs --newDisplayName Developers
 ```
 
 Set the owners of a group to the specified people

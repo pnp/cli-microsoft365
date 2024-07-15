@@ -2,7 +2,6 @@ import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
 import commands from '../../commands.js';
-import aadCommands from '../../aadCommands.js';
 import { Logger } from '../../../../cli/Logger.js';
 import request from '../../../../request.js';
 import { telemetry } from '../../../../telemetry.js';
@@ -60,6 +59,12 @@ describe(commands.GROUP_SET, () => {
       }
     }
   ];
+  const updateGroupRequest = {
+    displayName: '365 group',
+    description: 'Microsoft 365 group',
+    mailNickName: 'Microsoft365Group',
+    visibility: 'Public'
+  };
 
   let log: string[];
   let logger: Logger;
@@ -91,6 +96,7 @@ describe(commands.GROUP_SET, () => {
 
   afterEach(() => {
     sinonUtil.restore([
+      request.get,
       request.patch,
       request.post,
       entraUser.getUserIdsByUpns,
@@ -109,16 +115,6 @@ describe(commands.GROUP_SET, () => {
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
-  });
-
-  it('defines alias', () => {
-    const alias = command.alias();
-    assert.notStrictEqual(typeof alias, 'undefined');
-  });
-
-  it('defines correct alias', () => {
-    const alias = command.alias();
-    assert.deepStrictEqual(alias, [aadCommands.GROUP_SET]);
   });
 
   it('fails validation if the length of newDisplayName is more than 256 characters', async () => {
@@ -188,65 +184,53 @@ describe(commands.GROUP_SET, () => {
     assert.strictEqual(actual, true);
   });
 
+  it('fails validation if no options to be updated is specified', async () => {
+    const actual = await command.validate({ options: { id: groupId } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
   it('successfully updates group specified by id', async () => {
-    sinon.stub(request, 'patch').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${groupId}` && 
-        JSON.stringify(opts.data) === JSON.stringify({
-          "displayName": '365 group',
-          "description": 'Microsoft 365 group',
-          "mailNickName": 'Microsoft365Group',          
-          "visibility": 'Public'
-        })) {
-        return;
-      }
+    sinon.stub(request, 'get').resolves({ value: [] });
+    const patchRequestStub = sinon.stub(request, 'patch').resolves();
 
-      throw 'Invalid request';
-    });
-
-    await command.action(logger, { options: { id: groupId, description: 'Microsoft 365 group', mailNickname: 'Microsoft365Group', visibility: 'Public', newDisplayName: '365 group' } });
+    await command.action(logger, { options: { id: groupId, description: 'Microsoft 365 group', mailNickname: 'Microsoft365Group', visibility: 'Public', newDisplayName: '365 group', verbose: true } });
+    assert.deepStrictEqual(patchRequestStub.lastCall.args[0].data, updateGroupRequest);
   });
 
   it('successfully updates group specified by displayName', async () => {
+    sinon.stub(request, 'get').resolves({ value: []});
     sinon.stub(entraGroup, 'getGroupIdByDisplayName').withArgs('Microsoft 365 Group').resolves(groupId);
 
-    sinon.stub(request, 'patch').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${groupId}` &&
-        JSON.stringify(opts.data) === JSON.stringify({
-          "displayName": '365 group',
-          "description": 'Microsoft 365 group',
-          "mailNickName": 'Microsoft365Group',
-          "visibility": 'Public'
-        })) {
-        return;
-      }
-
-      throw 'Invalid request';
-    });
+    const patchRequestStub = sinon.stub(request, 'patch').resolves();
 
     await command.action(logger, { options: { displayName: 'Microsoft 365 Group', description: 'Microsoft 365 group', mailNickname: 'Microsoft365Group', visibility: 'Public', newDisplayName: '365 group' } });
+    assert.deepStrictEqual(patchRequestStub.lastCall.args[0].data, updateGroupRequest);
   });
 
-  it('successfully updates group with owners specified by ids', async () => {
-    sinon.stub(request, 'patch').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${groupId}` &&
-        JSON.stringify(opts.data) === JSON.stringify({
-          "description": 'Microsoft 365 group',
-          "mailNickName": 'Microsoft365Group',
-          "visibility": 'Public'
-        })) {
-        return;
-      }
-
-      throw 'Invalid request';
-    });
+  it('successfully updates group with owners specified by ids and removes current owners', async () => {
+    sinon.stub(request, 'get').resolves({ value: [{ id: '717f1683-00fa-488c-b68d-5d0051f6bcfa' }] });
+    sinon.stub(request, 'patch').resolves();
 
     const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/$batch') {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/$batch' &&
+        opts.data.requests[0].method === 'PATCH') {
         return {
           responses: Array(2).fill({
             status: 204,
             body: {}
           })
+        };
+      }
+
+      if (opts.url === 'https://graph.microsoft.com/v1.0/$batch' &&
+        opts.data.requests[0].method === 'DELETE') {
+        return {
+          responses: [
+            {
+              status: 204,
+              body: {}
+            }
+          ]
         };
       }
 
@@ -254,28 +238,18 @@ describe(commands.GROUP_SET, () => {
     });
 
     await command.action(logger, { options: { id: groupId, description: 'Microsoft 365 group', mailNickname: 'Microsoft365Group', visibility: 'Public', ownerIds: userIds.join(',') } });
-    assert.deepStrictEqual(postStub.lastCall.args[0].data.requests, addOwnersRequest);
+    assert.deepStrictEqual(postStub.firstCall.args[0].data.requests, addOwnersRequest);
   });
 
-  it('successfully updates group with members specified by user names', async () => {
+  it('successfully updates group with members specified by user names and removes current members', async () => {
+    sinon.stub(request, 'get').resolves({ value: [{ id: '717f1683-00fa-488c-b68d-5d0051f6bcfa' }] });
     sinon.stub(entraUser, 'getUserIdsByUpns').withArgs(userUpns).resolves(userIds);
     sinon.stub(entraGroup, 'getGroupIdByDisplayName').withArgs('Microsoft 365 Group').resolves(groupId);
-
-    sinon.stub(request, 'patch').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${groupId}` &&
-        JSON.stringify(opts.data) === JSON.stringify({
-          "description": 'Microsoft 365 group',
-          "mailNickName": 'Microsoft365Group',
-          "visibility": 'Private'
-        })) {
-        return;
-      }
-
-      throw 'Invalid request';
-    });
+    sinon.stub(request, 'patch').resolves();
 
     const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/$batch') {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/$batch' &&
+        opts.data.requests[0].method === 'PATCH') {
         return {
           responses: Array(2).fill({
             status: 204,
@@ -284,30 +258,32 @@ describe(commands.GROUP_SET, () => {
         };
       }
 
-      throw 'Invalid request';
-    });
-
-    await command.action(logger, { options: { displayName: 'Microsoft 365 Group', description: 'Microsoft 365 group', mailNickname: 'Microsoft365Group', visibility: 'Private', memberUserNames: userUpns.join(','), verbose: true } });
-    assert.deepStrictEqual(postStub.lastCall.args[0].data.requests, addMembersRequest);
-  });
-
-  it('handles API error when adding users to a group', async () => {
-    sinon.stub(entraGroup, 'getGroupIdByDisplayName').withArgs('Microsoft 365 Group').resolves(groupId);
-
-    sinon.stub(request, 'patch').callsFake(async opts => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${groupId}` &&
-        JSON.stringify(opts.data) === JSON.stringify({
-          "description": 'Microsoft 365 group',
-          "mailNickName": 'Microsoft365Group',
-          "visibility": 'Public'
-        })) {
-        return;
+      if (opts.url === 'https://graph.microsoft.com/v1.0/$batch' &&
+        opts.data.requests[0].method === 'DELETE') {
+        return {
+          responses: [
+            {
+              status: 204,
+              body: {}
+            }
+          ]
+        };
       }
 
       throw 'Invalid request';
     });
+
+    await command.action(logger, { options: { displayName: 'Microsoft 365 Group', description: 'Microsoft 365 group', mailNickname: 'Microsoft365Group', visibility: 'Private', memberUserNames: userUpns.join(','), verbose: true } });
+    assert.deepStrictEqual(postStub.firstCall.args[0].data.requests, addMembersRequest);
+  });
+
+  it('handles API error when adding users to a group', async () => {
+    sinon.stub(entraGroup, 'getGroupIdByDisplayName').withArgs('Microsoft 365 Group').resolves(groupId);
+    sinon.stub(request, 'get').resolves({ value: [] });
+    sinon.stub(request, 'patch').resolves();
     sinon.stub(request, 'post').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/$batch') {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/$batch' &&
+        opts.data.requests[0].method === 'PATCH') {
         return {
           responses: [
             {
@@ -333,6 +309,44 @@ describe(commands.GROUP_SET, () => {
 
     await assert.rejects(command.action(logger, { options: { displayName: 'Microsoft 365 Group', description: 'Microsoft 365 group', mailNickname: 'Microsoft365Group', visibility: 'Public', ownerIds: userIds.join(',') } }),
       new CommandError(`One or more added object references already exist for the following modified properties: 'members'.`));
+  });
+
+  it('handles API error when removing users from a group', async () => {
+    sinon.stub(entraGroup, 'getGroupIdByDisplayName').withArgs('Microsoft 365 Group').resolves(groupId);
+    sinon.stub(request, 'get').resolves({ value: [{ id: '717f1683-00fa-488c-b68d-5d0051f6bcfa' }] });
+    sinon.stub(request, 'patch').resolves();
+    sinon.stub(request, 'post').callsFake(async opts => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/$batch' &&
+        opts.data.requests[0].method === 'PATCH') {
+        return {
+          responses: Array(2).fill({
+            status: 204,
+            body: {}
+          })
+        };
+      }
+
+      if (opts.url === 'https://graph.microsoft.com/v1.0/$batch' &&
+        opts.data.requests[0].method === 'DELETE') {
+        return {
+          responses: [
+            {
+              status: 500,
+              body: {
+                error: {
+                  message: 'Service unavailable.'
+                }
+              }
+            }
+          ]
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    await assert.rejects(command.action(logger, { options: { displayName: 'Microsoft 365 Group', description: 'Microsoft 365 group', ownerIds: userIds.join(',') } }),
+      new CommandError('Service unavailable.'));
   });
 
   it('correctly handles API OData error', async () => {
