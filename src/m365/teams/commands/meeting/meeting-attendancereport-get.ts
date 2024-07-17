@@ -35,6 +35,7 @@ class TeamsMeetingAttendancereportGetCommand extends GraphCommand {
 
     this.#initTelemetry();
     this.#initOptions();
+    this.#initTypes();
     this.#initValidators();
     this.#initOptionSets();
   }
@@ -67,6 +68,10 @@ class TeamsMeetingAttendancereportGetCommand extends GraphCommand {
         option: '-i, --id <id>'
       }
     );
+  }
+
+  #initTypes(): void {
+    this.types.string.push('userId', 'userName', 'email', 'meetingId', 'id');
   }
 
   #initValidators(): void {
@@ -111,7 +116,7 @@ class TeamsMeetingAttendancereportGetCommand extends GraphCommand {
       }
 
       if (this.verbose) {
-        await logger.logToStderr(`Retrieving attendance report for ${isAppOnlyAccessToken ? `specific user ${args.options.userId || args.options.userName || args.options.email}` : 'currently logged in user'}.`);
+        await logger.logToStderr(`Retrieving attendance report for ${isAppOnlyAccessToken ? `specific user ${args.options.userId || args.options.userName || args.options.email}.` : 'currently logged in user'}.`);
       }
 
       let userUrl = '';
@@ -143,10 +148,12 @@ class TeamsMeetingAttendancereportGetCommand extends GraphCommand {
     if (options.userId) {
       return options.userId;
     }
+
     if (options.userName) {
-      return await entraUser.getUserIdByUpn(options.userName);
+      return entraUser.getUserIdByUpn(options.userName);
     }
-    return await entraUser.getUserIdByEmail(options.email!);
+
+    return entraUser.getUserIdByEmail(options.email!);
   }
 }
 

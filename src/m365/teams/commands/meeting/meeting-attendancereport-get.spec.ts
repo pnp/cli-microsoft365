@@ -60,7 +60,7 @@ describe(commands.MEETING_ATTENDANCEREPORT_GET, () => {
     }
   };
 
-  let log: any[];
+  let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
