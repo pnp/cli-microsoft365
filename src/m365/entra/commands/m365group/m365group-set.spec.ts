@@ -58,7 +58,7 @@ describe(commands.M365GROUP_SET, () => {
     loggerLogSpy = sinon.spy(logger, 'log');
     loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
     (command as any).pollingInterval = 0;
-    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
   });
 
   afterEach(() => {
@@ -393,11 +393,8 @@ describe(commands.M365GROUP_SET, () => {
   });
 
   it('sets option allowExternalSenders when using delegated permissions', async () => {
-    sinonUtil.restore(accessToken.isAppOnlyAccessToken);
-    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
-
-    sinon.stub(request, 'patch').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${groupId}` && opts.data['allowExternalSenders']) {
+    const patchStub = sinon.stub(request, 'patch').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${groupId}`) {
         return;
       }
 
@@ -405,14 +402,12 @@ describe(commands.M365GROUP_SET, () => {
     });
 
     await command.action(logger, { options: { id: groupId, allowExternalSenders: true } });
+    assert(patchStub.firstCall.args[0].data.allowExternalSenders);
   });
 
   it('sets option autoSubscribeNewMembers when using delegated permissions', async () => {
-    sinonUtil.restore(accessToken.isAppOnlyAccessToken);
-    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
-
-    sinon.stub(request, 'patch').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${groupId}` && opts.data['autoSubscribeNewMembers']) {
+    const patchStub = sinon.stub(request, 'patch').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${groupId}`) {
         return;
       }
 
@@ -420,13 +415,11 @@ describe(commands.M365GROUP_SET, () => {
     });
 
     await command.action(logger, { options: { id: groupId, autoSubscribeNewMembers: true } });
+    assert(patchStub.firstCall.args[0].data.autoSubscribeNewMembers);
   });
 
   it('sets option hideFromAddressLists and autoSubscribeNewMembers when using delegated permissions', async () => {
-    sinonUtil.restore(accessToken.isAppOnlyAccessToken);
-    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
-
-    sinon.stub(request, 'patch').callsFake(async (opts) => {
+    const patchStub = sinon.stub(request, 'patch').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/${groupId}` && opts.data['autoSubscribeNewMembers'] && !opts.data['hideFromAddressLists']) {
         return;
       }
@@ -435,10 +428,11 @@ describe(commands.M365GROUP_SET, () => {
     });
 
     await command.action(logger, { options: { id: groupId, autoSubscribeNewMembers: true, hideFromAddressLists: false } });
+    assert(patchStub.firstCall.args[0].data.autoSubscribeNewMembers && !patchStub.firstCall.args[0].data.hideFromAddressLists);
   });
 
   it('sets option hideFromOutlookClients when using application permissions', async () => {
-    sinon.stub(request, 'patch').callsFake(async (opts) => {
+    const patchStub = sinon.stub(request, 'patch').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/${groupId}` && opts.data['hideFromOutlookClients']) {
         return;
       }
@@ -447,35 +441,7 @@ describe(commands.M365GROUP_SET, () => {
     });
 
     await command.action(logger, { options: { id: groupId, hideFromOutlookClients: true } });
-  });
-
-  it('sets option isSubscribedByMail when using application permissions', async () => {
-    sinon.stub(request, 'patch').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${groupId}` && !opts.data['isSubscribedByMail']) {
-        return;
-      }
-
-      throw 'Invalid request';
-    });
-
-    await command.action(logger, { options: { id: groupId, isSubscribedByMail: false } });
-  });
-
-  it('executes two patch requests when setting option isSubscribedByMail and groupName', async () => {
-    const patchStub = sinon.stub(request, 'patch').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${groupId}` && opts.data['isSubscribedByMail']) {
-        return;
-      }
-
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${groupId}` && opts.data['displayName'] === 'Updated group name') {
-        return;
-      }
-
-      throw 'Invalid request';
-    });
-
-    await command.action(logger, { options: { id: groupId, isSubscribedByMail: true, displayName: 'Updated group name' } });
-    assert(patchStub.calledTwice);
+    assert(patchStub.firstCall.args[0].data.hideFromOutlookClients);
   });
 
   it('correctly handles API OData error', async () => {
@@ -510,7 +476,7 @@ describe(commands.M365GROUP_SET, () => {
     sinon.stub(accessToken, 'isAppOnlyAccessToken').resolves(true);
 
     await assert.rejects(command.action(logger, { options: { id: groupId, allowExternalSenders: true } } as any),
-      new CommandError(`Option 'allowExternalSenders' and 'autoSubscribeNewMembers' can only be used with delegated permissions.`));
+      new CommandError(`Option 'allowExternalSenders' and 'autoSubscribeNewMembers' can only be used when using delegated permissions.`));
   });
 
 
@@ -520,7 +486,7 @@ describe(commands.M365GROUP_SET, () => {
     sinon.stub(accessToken, 'isAppOnlyAccessToken').resolves(true);
 
     await assert.rejects(command.action(logger, { options: { id: groupId, autoSubscribeNewMembers: true } } as any),
-      new CommandError(`Option 'allowExternalSenders' and 'autoSubscribeNewMembers' can only be used with delegated permissions.`));
+      new CommandError(`Option 'allowExternalSenders' and 'autoSubscribeNewMembers' can only be used when using delegated permissions.`));
   });
 
   it('fails validation if the id is not a valid GUID', async () => {
@@ -622,7 +588,7 @@ describe(commands.M365GROUP_SET, () => {
     sinon.stub(stats, 'isDirectory').returns(false);
     sinon.stub(fs, 'existsSync').returns(true);
     sinon.stub(fs, 'lstatSync').returns(stats);
-    const actual = await command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', displayName: 'Title', description: 'Description', logoPath: 'logo.png', owners: 'john@contoso.com', members: 'doe@contoso.com', isPrivate: false, allowExternalSenders: false, autoSubscribeNewMembers: false, hideFromAddressLists: false, hideFromOutlookClients: false, isSubscribedByMail: false } }, commandInfo);
+    const actual = await command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', displayName: 'Title', description: 'Description', logoPath: 'logo.png', owners: 'john@contoso.com', members: 'doe@contoso.com', isPrivate: false, allowExternalSenders: false, autoSubscribeNewMembers: false, hideFromAddressLists: false, hideFromOutlookClients: false } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 });

@@ -12,7 +12,6 @@ import { entraGroup } from '../../../../utils/entraGroup.js';
 import aadCommands from '../../aadCommands.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 import auth from '../../../../Auth.js';
-import { formatting } from '../../../../utils/formatting.js';
 
 interface CommandArgs {
   options: Options;
@@ -115,16 +114,13 @@ class EntraM365GroupSetCommand extends GraphCommand {
       {
         option: '--hideFromOutlookClients [hideFromOutlookClients]',
         autocomplete: ['true', 'false']
-      },
-      {
-        option: '--isSubscribedByMail [isSubscribedByMail]',
-        autocomplete: ['true', 'false']
       }
     );
   }
 
   #initTypes(): void {
-    this.types.boolean.push('isPrivate', 'allowExternalSenders', 'autoSubscribeNewMembers', 'hideFromAddressLists', 'hideFromOutlookClients', 'isSubscribedByMail');
+    this.types.boolean.push('isPrivate', 'allowEternalSenders', 'autoSubscribeNewMembers', 'hideFromAddressLists', 'hideFromOutlookClients', 'isSubscribedByMail');
+    this.types.string.push('id', 'displayName', 'description', 'owners', 'members', 'logoPath');
   }
 
   #initValidators(): void {
@@ -141,7 +137,7 @@ class EntraM365GroupSetCommand extends GraphCommand {
           args.options.hideFromAddressLists === undefined &&
           args.options.hideFromOutlookClients === undefined &&
           args.options.isSubscribedByMail === undefined) {
-          return 'Specify at least one property to update';
+          return 'Specify at least one option to update.';
         }
 
         if (!validation.isValidGuid(args.options.id)) {
@@ -149,16 +145,16 @@ class EntraM365GroupSetCommand extends GraphCommand {
         }
 
         if (args.options.owners) {
-          const isValidUserPrincipalNameArray = validation.isValidUserPrincipalNameArray(formatting.splitAndTrim(args.options.owners));
-          if (isValidUserPrincipalNameArray !== true) {
-            return `User principal name '${isValidUserPrincipalNameArray}' is invalid for option 'owners'.`;
+          const isValidArray = validation.isValidUserPrincipalNameArray(args.options.owners);
+          if (isValidArray !== true) {
+            return `Option 'owners' contains one or more invalid UPNs: ${isValidArray}.`;
           }
         }
 
         if (args.options.members) {
-          const isValidUserPrincipalNameArray = validation.isValidUserPrincipalNameArray(formatting.splitAndTrim(args.options.members));
-          if (isValidUserPrincipalNameArray !== true) {
-            return `User principal name '${isValidUserPrincipalNameArray}' is invalid for option 'members'.`;
+          const isValidArray = validation.isValidUserPrincipalNameArray(args.options.members);
+          if (isValidArray !== true) {
+            return `Option 'members' contains one or more invalid UPNs: ${isValidArray}.`;
           }
         }
 
@@ -183,8 +179,8 @@ class EntraM365GroupSetCommand extends GraphCommand {
     await this.showDeprecationWarning(logger, aadCommands.M365GROUP_SET, commands.M365GROUP_SET);
 
     try {
-      if ((args.options.allowExternalSenders !== undefined || args.options.autoSubscribeNewMembers !== undefined) && accessToken.isAppOnlyAccessToken(auth.connection.accessTokens[this.resource].accessToken)) {
-        throw `Option 'allowExternalSenders' and 'autoSubscribeNewMembers' can only be used with delegated permissions.`;
+      if ((args.options.allowExternalSenders !== undefined || args.options.autoSubscribeNewMembers !== undefined) && accessToken.isAppOnlyAccessToken(auth.connection.accessTokens[auth.defaultResource].accessToken)) {
+        throw `Option 'allowExternalSenders' and 'autoSubscribeNewMembers' can only be used when using delegated permissions.`;
       }
 
       const isUnifiedGroup = await entraGroup.isUnifiedGroup(args.options.id);
@@ -221,7 +217,7 @@ class EntraM365GroupSetCommand extends GraphCommand {
 
       // This has to be a separate request due to some Graph API limitations. Otherwise it will throw an error.
       if (args.options.allowExternalSenders !== undefined || args.options.autoSubscribeNewMembers !== undefined || args.options.hideFromAddressLists !== undefined || args.options.hideFromOutlookClients !== undefined || args.options.isSubscribedByMail !== undefined) {
-        const requestBody = {
+        const requestBody: any = {
           allowExternalSenders: args.options.allowExternalSenders,
           autoSubscribeNewMembers: args.options.autoSubscribeNewMembers,
           hideFromAddressLists: args.options.hideFromAddressLists,
@@ -232,7 +228,7 @@ class EntraM365GroupSetCommand extends GraphCommand {
         const requestOptions: CliRequestOptions = {
           url: `${this.resource}/v1.0/groups/${args.options.id}`,
           headers: {
-            'accept': 'application/json;odata.metadata=none'
+            accept: 'application/json;odata.metadata=none'
           },
           responseType: 'json',
           data: requestBody

@@ -35,7 +35,7 @@ m365 aad m365group set [options]
 : Comma-separated list of Microsoft 365 Group members to add
 
 `--isPrivate [isPrivate]`
-: Set to `true` if the Microsoft 365 Group should be private and to `false` if it should be public (default)
+: Set to `true` if the Microsoft 365 Group should be private and `false` if it should be public.  
 
 `-l, --logoPath [logoPath]`
 : Local path to the image file to use as group logo
@@ -51,9 +51,6 @@ m365 aad m365group set [options]
 
 `--hideFromOutlookClients [hideFromOutlookClients]`
 : Indicates if the group is not displayed in Outlook clients, such as Outlook for Windows and Outlook on the web. Valid values: `true`, `false`.
-
-`--isSubscribedByMail [isSubscribedByMail]`
-: Indicates whether the signed-in user is subscribed to receive email conversations. Valid values: `true`, `false`.
 ```
 
 <Global />
@@ -66,7 +63,7 @@ When specifying the path to the logo image you can use both relative and absolut
 
 :::warning
 
-The options `allowExternalSenders` and `autoSubscribeNewMembers` can only be set using delegated permissions.
+Options `allowExternalSenders` and `autoSubscribeNewMembers` can only be set using delegated permissions.  
 
 :::
 
@@ -112,12 +109,6 @@ Auto-subscribe new members to receive email notifications and do not allow exter
 
 ```sh
 m365 entra m365group set --id 28beab62-7540-4db1-a23f-29a6018a3848 --autoSubscribeNewMembers true --allowExternalSenders false
-```
-
-Set-up the Microsoft 365 group so that the signed-in user is subscribed to receive email conversations.
-
-```sh
-m365 entra m365group set --id 28beab62-7540-4db1-a23f-29a6018a3848 --isSubscribedByMail
 ```
 
 ## Response
