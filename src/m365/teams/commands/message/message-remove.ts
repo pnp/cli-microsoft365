@@ -1,13 +1,11 @@
-import auth from '../../../../Auth.js';
 import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
-import { accessToken } from '../../../../utils/accessToken.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { teams } from '../../../../utils/teams.js';
 import { validation } from '../../../../utils/validation.js';
-import GraphCommand from "../../../base/GraphCommand.js";
+import DelegatedGraphCommand from '../../../base/DelegatedGraphCommand.js';
 import commands from '../../commands.js';
 
 interface CommandArgs {
@@ -23,7 +21,7 @@ interface Options extends GlobalOptions {
   force?: boolean;
 }
 
-class TeamsMessageRemoveCommand extends GraphCommand {
+class TeamsMessageRemoveCommand extends DelegatedGraphCommand {
   public get name(): string {
     return commands.MESSAGE_REMOVE;
   }
@@ -39,6 +37,7 @@ class TeamsMessageRemoveCommand extends GraphCommand {
     this.#initOptions();
     this.#initValidators();
     this.#initOptionSets();
+    this.#initTypes();
   }
 
   #initTelemetry(): void {
@@ -80,11 +79,11 @@ class TeamsMessageRemoveCommand extends GraphCommand {
     this.validators.push(
       async (args: CommandArgs) => {
         if (args.options.teamId && !validation.isValidGuid(args.options.teamId)) {
-          return `${args.options.teamId} is not a valid GUID`;
+          return `${args.options.teamId} is not a valid GUID for 'teamId'`;
         }
 
         if (args.options.channelId && !validation.isValidTeamsChannelId(args.options.channelId as string)) {
-          return `${args.options.channelId} is not a valid Teams ChannelId`;
+          return `${args.options.channelId} is not a valid ID for 'channelId'.`;
         }
 
         return true;
@@ -103,22 +102,23 @@ class TeamsMessageRemoveCommand extends GraphCommand {
     );
   }
 
-  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    if (accessToken.isAppOnlyAccessToken(auth.connection.accessTokens[this.resource].accessToken)) {
-      throw 'This command does not support application only premissions.';
-    }
+  #initTypes(): void {
+    this.types.string.push('teamId', 'teamName', 'channelId', 'channelName', 'id');
+    this.types.boolean.push('force');
+  }
 
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const removeTeamMessage = async (): Promise<void> => {
       try {
         if (this.verbose) {
-          await logger.logToStderr(`Removing message ${args.options.id} from team ${args.options.teamId || args.options.teamName} and channel ${args.options.channelId || args.options.channelName}.`);
+          await logger.logToStderr(`Removing message '${args.options.id}' from channel '${args.options.channelId || args.options.channelName}' in team '${args.options.teamId || args.options.teamName}'.`);
         }
 
-        const teamId: string = await teams.getTeamId(args.options.teamId, args.options.teamName);
-        const channelId: string = await teams.getChannelId(teamId, args.options.channelId, args.options.channelName);
+        const teamId: string = args.options.teamId || await teams.getTeamIdByDisplayName(args.options.teamName!);
+        const channelId: string = args.options.channelId || await teams.getChannelIdByDisplayName(teamId, args.options.channelName!);
 
         const requestOptions: CliRequestOptions = {
-          url: `${this.resource}/v1.0/teams/${formatting.encodeQueryParameter(teamId)}/channels/${formatting.encodeQueryParameter(channelId)}/messages/${args.options.id}/softdelete`,
+          url: `${this.resource}/v1.0/teams/${teamId}/channels/${formatting.encodeQueryParameter(channelId)}/messages/${args.options.id}/softDelete`,
           headers: {
             accept: 'application/json;odata.metadata=none'
           },
@@ -128,8 +128,8 @@ class TeamsMessageRemoveCommand extends GraphCommand {
         await request.post(requestOptions);
       }
       catch (err: any) {
-        if (err.error && err.error.error && err.error.error.code === 'NotFound') {
-          this.handleError('The specified message was not found in the specified channel');
+        if (err.error?.error?.code === 'NotFound') {
+          this.handleError('The specified message was not found in the Teams channel.');
         }
         else {
           this.handleRejectedODataJsonPromise(err);
@@ -141,7 +141,7 @@ class TeamsMessageRemoveCommand extends GraphCommand {
       await removeTeamMessage();
     }
     else {
-      const result = await cli.promptForConfirmation({ message: `Are you sure you want to remove the message?` });
+      const result = await cli.promptForConfirmation({ message: `Are you sure you want to remove this message?` });
 
       if (result) {
         await removeTeamMessage();

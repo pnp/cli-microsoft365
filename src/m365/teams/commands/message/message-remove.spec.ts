@@ -13,8 +13,8 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './message-remove.js';
 import { accessToken } from '../../../../utils/accessToken.js';
-import { teams } from '../../../../utils/teams.js';
 import { formatting } from '../../../../utils/formatting.js';
+import { teams } from '../../../../utils/teams.js';
 
 describe(commands.MESSAGE_REMOVE, () => {
   const channelId = '19:f3dcbb1674574677abcae89cb626f1e6@thread.skype';
@@ -34,8 +34,8 @@ describe(commands.MESSAGE_REMOVE, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
-    sinon.stub(teams, 'getTeamId').resolves(teamId);
-    sinon.stub(teams, 'getChannelId').resolves(channelId);
+    sinon.stub(teams, 'getTeamIdByDisplayName').resolves(teamId);
+    sinon.stub(teams, 'getChannelIdByDisplayName').resolves(channelId);
     auth.connection.active = true;
     if (!auth.connection.accessTokens[auth.defaultResource]) {
       auth.connection.accessTokens[auth.defaultResource] = {
@@ -107,20 +107,20 @@ describe(commands.MESSAGE_REMOVE, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('prompts before removing the specified message by id when force option not passed', async () => {
+  it('prompts before removing the specified message when force option not passed', async () => {
     await command.action(logger, { options: { id: messageId, teamId: teamId, channelId: channelId } });
     assert(promptIssued);
   });
 
-  it('aborts removing the specified team when force option not passed and prompt not confirmed', async () => {
-    const postSpy = sinon.spy(request, 'post');
+  it('aborts removing the specified message when force option not passed and prompt not confirmed', async () => {
+    const postStub = sinon.stub(request, 'post').resolves();
     await command.action(logger, { options: { id: messageId, teamId: teamId, channelId: channelId } });
-    assert(postSpy.notCalled);
+    assert(postStub.notCalled);
   });
 
-  it('removes the specified message by id when teamId, channelId and force option passed', async () => {
+  it('removes the specified message when teamId, channelId and force option passed', async () => {
     const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/teams/${teamId}/channels/${formatting.encodeQueryParameter(channelId)}/messages/${messageId}/softdelete`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams/${teamId}/channels/${formatting.encodeQueryParameter(channelId)}/messages/${messageId}/softDelete`) {
         return;
       }
 
@@ -128,12 +128,12 @@ describe(commands.MESSAGE_REMOVE, () => {
     });
 
     await command.action(logger, { options: { id: messageId, teamId: teamId, channelId: channelId, force: true, verbose: true } });
-    assert(postStub.called);
+    assert(postStub.calledOnce);
   });
 
-  it('removes the specified message by id when teamName, channelName and prompt is confirmed', async () => {
+  it('removes the specified message when teamName, channelName and prompt is confirmed', async () => {
     const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/teams/${teamId}/channels/${formatting.encodeQueryParameter(channelId)}/messages/${messageId}/softdelete`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams/${teamId}/channels/${formatting.encodeQueryParameter(channelId)}/messages/${messageId}/softDelete`) {
         return;
       }
 
@@ -144,33 +144,28 @@ describe(commands.MESSAGE_REMOVE, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, { options: { id: messageId, teamName: teamName, channelName: channelName, verbose: true } });
-    assert(postStub.called);
+    assert(postStub.calledOnce);
   });
 
   it('throws error when the message we are trying to delete is not found', async () => {
-    sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/teams/${teamId}/channels/${formatting.encodeQueryParameter(channelId)}/messages/${messageId}/softdelete`) {
-        throw {
-          error: {
-            error: {
-              code: 'NotFound',
-              message: 'NotFound',
-              innerError: {
-                code: '1',
-                message: `MessageNotFound-Message does not exist in the thread: ColdStoreNotSupportedForMessageException:ColdStoreMessageOperations is not supported if cutOffColdStoreEpoch is not provided. (msgVersion:${messageId}, cutoff:1707944123071)`,
-                date: '2024-02-21T20:55:23',
-                'request-id': 'fe227b45-0b96-47c2-bac4-3d5e17dfc70d',
-                'client-request-id': 'fe227b45-0b96-47c2-bac4-3d5e17dfc70d'
-              }
-            }
+    const error = {
+      error: {
+        error: {
+          code: 'NotFound',
+          message: 'NotFound',
+          innerError: {
+            code: '1',
+            message: `MessageNotFound-Message does not exist in the thread: ColdStoreNotSupportedForMessageException:ColdStoreMessageOperations is not supported if cutOffColdStoreEpoch is not provided. (msgVersion:${messageId}, cutoff:1707944123071)`,
+            date: '2024-02-21T20:55:23',
+            'request-id': 'fe227b45-0b96-47c2-bac4-3d5e17dfc70d',
+            'client-request-id': 'fe227b45-0b96-47c2-bac4-3d5e17dfc70d'
           }
-        };
+        }
       }
+    };
+    sinon.stub(request, 'post').rejects(error);
 
-      throw 'Invalid request';
-    });
-
-    await assert.rejects(command.action(logger, { options: { id: messageId, teamName: teamName, channelName: channelName, force: true, verbose: true } }), new CommandError('The specified message was not found in the specified channel'));
+    await assert.rejects(command.action(logger, { options: { id: messageId, teamName: teamName, channelName: channelName, force: true, verbose: true } }), new CommandError('The specified message was not found in the Teams channel.'));
   });
 
   it('correctly handles generic error when removing message', async () => {
@@ -189,12 +184,5 @@ describe(commands.MESSAGE_REMOVE, () => {
     sinon.stub(request, 'post').rejects(error);
 
     await assert.rejects(command.action(logger, { options: { id: messageId, channelId: channelId, teamName: teamName, force: true, verbose: true } } as any), new CommandError('An error has occurred'));
-  });
-
-  it('throws error when trying to create a team using application permissions and not specifying an owner', async () => {
-    sinonUtil.restore(accessToken.isAppOnlyAccessToken);
-    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
-
-    await assert.rejects(command.action(logger, { options: { teamName: teamName, channelId: channelId, id: messageId } }), new CommandError('This command does not support application only premissions.'));
   });
 });

@@ -20,27 +20,27 @@ m365 teams message remove [options]
 : Name of the Microsoft Teams team. Specify either `teamId` or `teamName` but not both.
 
 `--channelId [channelId]`
-: Channel ID of the Microsoft Teams team.. Specify either `channelId` or `channelName` but not both.
+: Channel ID of the Microsoft Teams team. Specify either `channelId` or `channelName` but not both.
 
 `--channelName [channelName]`
-: Channel name of the Microsoft Teams team.. Specify either `channelId` or `channelName` but not both.
+: Channel name of the Microsoft Teams team. Specify either `channelId` or `channelName` but not both.
 
 `-i, --id <id>`
 : The ID of the Teams message.
 
 `-f, --force`
-Don't prompt for confirmation.
+: Don't prompt for confirmation.  
 ```
 
 <Global />
 
 ## Remarks
 
-You can only remove a message from a Microsoft Teams team that you posted yourself. If you try to remove a message that was posted by someone else, the command will fail.
+You can only remove a message from a Microsoft Teams team that you created yourself.  
 
 :::warning
 
-This command does not support application only permissions.
+This command does only support delegated permissions.  
 
 :::
 
