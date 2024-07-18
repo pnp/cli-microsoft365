@@ -6,7 +6,6 @@ import AnonymousCommand from "../../../base/AnonymousCommand.js";
 import { Manifest, Project, ScssFile, TsFile } from "./project-model/index.js";
 import { CommandError } from '../../../../Command.js';
 
-
 export abstract class BaseProjectCommand extends AnonymousCommand {
   protected projectRootPath: string | null = null;
 
