@@ -35,38 +35,17 @@ export abstract class BaseProjectCommand extends AnonymousCommand {
       catch { }
     }
 
-    const configJsonPath: string = path.join(projectRootPath, 'config', 'config.json');
-    this.readAndParseJsonFile(configJsonPath, project, 'configJson');
-
-    const copyAssetsJsonPath: string = path.join(projectRootPath, 'config', 'copy-assets.json');
-    this.readAndParseJsonFile(copyAssetsJsonPath, project, 'copyAssetsJson');
-
-    const deployAzureStorageJsonPath: string = path.join(projectRootPath, 'config', 'deploy-azure-storage.json');
-    this.readAndParseJsonFile(deployAzureStorageJsonPath, project, 'deployAzureStorageJson');
-
-    const packageJsonPath: string = path.join(projectRootPath, 'package.json');
-    this.readAndParseJsonFile(packageJsonPath, project, 'packageJson');
-
-    const packageSolutionJsonPath: string = path.join(projectRootPath, 'config', 'package-solution.json');
-    this.readAndParseJsonFile(packageSolutionJsonPath, project, 'packageSolutionJson');
-
-    const serveJsonPath: string = path.join(projectRootPath, 'config', 'serve.json');
-    this.readAndParseJsonFile(serveJsonPath, project, 'serveJson');
-
-    const tsConfigJsonPath: string = path.join(projectRootPath, 'tsconfig.json');
-    this.readAndParseJsonFile(tsConfigJsonPath, project, 'tsConfigJson');
-
-    const tsLintJsonPath: string = path.join(projectRootPath, 'config', 'tslint.json');
-    this.readAndParseJsonFile(tsLintJsonPath, project, 'tsLintJson');
-
-    const tsLintJsonRootPath: string = path.join(projectRootPath, 'tslint.json');
-    this.readAndParseJsonFile(tsLintJsonRootPath, project, 'tsLintJsonRoot');
-
-    const writeManifestJsonPath: string = path.join(projectRootPath, 'config', 'write-manifests.json');
-    this.readAndParseJsonFile(writeManifestJsonPath, project, 'writeManifestsJson');
-
-    const yoRcJsonPath: string = path.join(projectRootPath, '.yo-rc.json');
-    this.readAndParseJsonFile(yoRcJsonPath, project, 'yoRcJson');
+    this.readAndParseJsonFile(path.join(projectRootPath, 'config', 'config.json'), project, 'configJson');
+    this.readAndParseJsonFile(path.join(projectRootPath, 'config', 'copy-assets.json'), project, 'copyAssetsJson');
+    this.readAndParseJsonFile(path.join(projectRootPath, 'config', 'deploy-azure-storage.json'), project, 'deployAzureStorageJson');
+    this.readAndParseJsonFile(path.join(projectRootPath, 'package.json'), project, 'packageJson');
+    this.readAndParseJsonFile(path.join(projectRootPath, 'config', 'package-solution.json'), project, 'packageSolutionJson');
+    this.readAndParseJsonFile(path.join(projectRootPath, 'config', 'serve.json'), project, 'serveJson');
+    this.readAndParseJsonFile(path.join(projectRootPath, 'tsconfig.json'), project, 'tsConfigJson');
+    this.readAndParseJsonFile(path.join(projectRootPath, 'config', 'tslint.json'), project, 'tsLintJson');
+    this.readAndParseJsonFile(path.join(projectRootPath, 'tslint.json'), project, 'tsLintJsonRoot');
+    this.readAndParseJsonFile(path.join(projectRootPath, 'config', 'write-manifests.json'), project, 'writeManifestsJson');
+    this.readAndParseJsonFile(path.join(projectRootPath, '.yo-rc.json'), project, 'yoRcJson');
 
     const gulpfileJsPath: string = path.join(projectRootPath, 'gulpfile.js');
     if (fs.existsSync(gulpfileJsPath)) {
@@ -81,14 +60,10 @@ export abstract class BaseProjectCommand extends AnonymousCommand {
     }
 
     project.vsCode = {};
-    const vsCodeSettingsPath: string = path.join(projectRootPath, '.vscode', 'settings.json');
-    this.readAndParseJsonFile(vsCodeSettingsPath, project, 'vsCode.settingsJson');
 
-    const vsCodeExtensionsPath: string = path.join(projectRootPath, '.vscode', 'extensions.json');
-    this.readAndParseJsonFile(vsCodeExtensionsPath, project, 'vsCode.extensionsJson');
-
-    const vsCodeLaunchPath: string = path.join(projectRootPath, '.vscode', 'launch.json');
-    this.readAndParseJsonFile(vsCodeLaunchPath, project, 'vsCode.launchJson');
+    this.readAndParseJsonFile(path.join(projectRootPath, '.vscode', 'settings.json'), project, 'vsCode.settingsJson');
+    this.readAndParseJsonFile(path.join(projectRootPath, '.vscode', 'extensions.json'), project, 'vsCode.extensionsJson');
+    this.readAndParseJsonFile(path.join(projectRootPath, '.vscode', 'launch.json'), project, 'vsCode.launchJson');
 
     const srcFiles: string[] = fsUtil.readdirR(path.join(projectRootPath, 'src')) as string[];
 
@@ -168,7 +143,7 @@ export abstract class BaseProjectCommand extends AnonymousCommand {
     return undefined;
   }
 
-  protected readAndParseJsonFile(filePath: string, project: Project, keyPath: string): Project {
+  private readAndParseJsonFile(filePath: string, project: Project, keyPath: string): Project {
     if (fs.existsSync(filePath)) {
       try {
         const source = formatting.removeSingleLineComments(fs.readFileSync(filePath, 'utf-8'));
@@ -176,9 +151,6 @@ export abstract class BaseProjectCommand extends AnonymousCommand {
         let current: any = project;
 
         for (let i = 0; i < keys.length - 1; i++) {
-          if (current[keys[i]] === undefined) {
-            current[keys[i]] = {};
-          }
           current = current[keys[i]];
         }
 

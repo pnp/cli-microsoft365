@@ -452,8 +452,7 @@ describe(commands.PROJECT_UPGRADE, () => {
       }
     });
 
-    const getProject = (command as any).getProject;
-    const project: Project = getProject(projectPath);
+    const project: Project = (command as any).getProject(projectPath);
     assert.strictEqual(typeof (project.packageJson), 'undefined');
   });
 
@@ -468,8 +467,7 @@ describe(commands.PROJECT_UPGRADE, () => {
       }
     });
 
-    const getProject = (command as any).getProject;
-    const project: Project = getProject(projectPath);
+    const project: Project = (command as any).getProject(projectPath);
     assert.strictEqual(typeof (project.tsConfigJson), 'undefined');
   });
 
@@ -484,8 +482,7 @@ describe(commands.PROJECT_UPGRADE, () => {
       }
     });
 
-    const getProject = (command as any).getProject;
-    const project: Project = getProject(projectPath);
+    const project: Project = (command as any).getProject(projectPath);
     assert.strictEqual(typeof (project.configJson), 'object');
   });
 
@@ -500,8 +497,7 @@ describe(commands.PROJECT_UPGRADE, () => {
       }
     });
 
-    const getProject = (command as any).getProject;
-    const project: Project = getProject(projectPath);
+    const project: Project = (command as any).getProject(projectPath);
     assert.strictEqual(typeof (project.copyAssetsJson), 'object');
   });
 
@@ -516,8 +512,7 @@ describe(commands.PROJECT_UPGRADE, () => {
       }
     });
 
-    const getProject = (command as any).getProject;
-    const project: Project = getProject(projectPath);
+    const project: Project = (command as any).getProject(projectPath);
     assert.strictEqual(typeof (project.deployAzureStorageJson), 'object');
   });
 
@@ -532,8 +527,7 @@ describe(commands.PROJECT_UPGRADE, () => {
       }
     });
 
-    const getProject = (command as any).getProject;
-    const project: Project = getProject(projectPath);
+    const project: Project = (command as any).getProject(projectPath);
     assert.strictEqual(typeof (project.packageJson), 'object');
   });
 
@@ -548,8 +542,7 @@ describe(commands.PROJECT_UPGRADE, () => {
       }
     });
 
-    const getProject = (command as any).getProject;
-    const project: Project = getProject(projectPath);
+    const project: Project = (command as any).getProject(projectPath);
     assert.strictEqual(typeof (project.packageSolutionJson), 'object');
   });
 
@@ -564,8 +557,7 @@ describe(commands.PROJECT_UPGRADE, () => {
       }
     });
 
-    const getProject = (command as any).getProject;
-    const project: Project = getProject(projectPath);
+    const project: Project = (command as any).getProject(projectPath);
     assert.strictEqual(typeof (project.serveJson), 'object');
   });
 
@@ -589,8 +581,7 @@ describe(commands.PROJECT_UPGRADE, () => {
       }
     });
 
-    const getProject = (command as any).getProject;
-    const project: Project = getProject(projectPath);
+    const project: Project = (command as any).getProject(projectPath);
     assert.strictEqual(typeof (project.tsLintJson), 'object');
   });
 
@@ -605,8 +596,7 @@ describe(commands.PROJECT_UPGRADE, () => {
       }
     });
 
-    const getProject = (command as any).getProject;
-    const project: Project = getProject(projectPath);
+    const project: Project = (command as any).getProject(projectPath);
     assert.strictEqual(typeof (project.writeManifestsJson), 'object');
   });
 
@@ -621,8 +611,7 @@ describe(commands.PROJECT_UPGRADE, () => {
       }
     });
 
-    const getProject = (command as any).getProject;
-    const project: Project = getProject(projectPath);
+    const project: Project = (command as any).getProject(projectPath);
     assert.strictEqual(typeof (project.yoRcJson), 'object');
   });
 
@@ -637,8 +626,7 @@ describe(commands.PROJECT_UPGRADE, () => {
       }
     });
 
-    const getProject = (command as any).getProject;
-    const project: Project = getProject(projectPath);
+    const project: Project = (command as any).getProject(projectPath);
     assert.strictEqual(typeof ((project.vsCode as VsCode).extensionsJson), 'object');
   });
 
@@ -657,8 +645,7 @@ describe(commands.PROJECT_UPGRADE, () => {
       }
     });
 
-    const getProject = (command as any).getProject;
-    const project: Project = getProject(projectPath);
+    const project: Project = (command as any).getProject(projectPath);
     assert.strictEqual(typeof ((project.vsCode) as VsCode).settingsJson, 'undefined');
   });
 
@@ -673,8 +660,7 @@ describe(commands.PROJECT_UPGRADE, () => {
       }
     });
 
-    const getProject = (command as any).getProject;
-    const project: Project = getProject(projectPath);
+    const project: Project = (command as any).getProject(projectPath);
     assert.strictEqual(typeof ((project.vsCode as any).settingsJson), 'object');
   });
 
@@ -689,8 +675,7 @@ describe(commands.PROJECT_UPGRADE, () => {
       }
     });
 
-    const getProject = (command as any).getProject;
-    const project: Project = getProject(projectPath);
+    const project: Project = (command as any).getProject(projectPath);
     assert.strictEqual(typeof ((project.vsCode as any).launchJson), 'object');
   });
 

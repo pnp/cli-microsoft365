@@ -312,8 +312,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
       }
     });
 
-    const getProject = (command as any).getProject;
-    const project: Project = getProject(projectPath);
+    const project: Project = (command as any).getProject(projectPath);
     assert.notStrictEqual(typeof (project.configJson), 'undefined');
   });
 
@@ -328,8 +327,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
       }
     });
 
-    const getProject = (command as any).getProject;
-    const project: Project = getProject(projectPath);
+    const project: Project = (command as any).getProject(projectPath);
     assert.strictEqual(typeof (project.packageJson), 'undefined');
   });
 
@@ -344,8 +342,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
       }
     });
 
-    const getProject = (command as any).getProject;
-    const project: Project = getProject(projectPath);
+    const project: Project = (command as any).getProject(projectPath);
     assert.strictEqual(typeof (project.tsConfigJson), 'undefined');
   });
 
@@ -360,8 +357,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
       }
     });
 
-    const getProject = (command as any).getProject;
-    const project: Project = getProject(projectPath);
+    const project: Project = (command as any).getProject(projectPath);
     assert.strictEqual(typeof (project.configJson), 'object');
   });
 
@@ -376,8 +372,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
       }
     });
 
-    const getProject = (command as any).getProject;
-    const project: Project = getProject(projectPath);
+    const project: Project = (command as any).getProject(projectPath);
     assert.strictEqual(typeof (project.packageJson), 'object');
   });
 
@@ -392,8 +387,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
       }
     });
 
-    const getProject = (command as any).getProject;
-    const project: Project = getProject(projectPath);
+    const project: Project = (command as any).getProject(projectPath);
     assert.strictEqual(typeof (project.yoRcJson), 'object');
   });
 

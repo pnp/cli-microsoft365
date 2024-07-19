@@ -125,7 +125,7 @@ describe('BaseProjectCommand', () => {
 
       assert.throws(() => {
         command.getProjectPublic();
-      }, new CommandError($`The file ${nodepath.join(projectPath, file)} is not a valid JSON file or is not utf-8 encoded.`));
+      }, new CommandError(`The file ${nodepath.join(projectPath, file)} is not a valid JSON file or is not utf-8 encoded. Error: SyntaxError: Unexpected end of JSON input`));
     });
   });
 
