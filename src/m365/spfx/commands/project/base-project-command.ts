@@ -150,9 +150,7 @@ export abstract class BaseProjectCommand extends AnonymousCommand {
         const keys = keyPath.split('.') as (keyof Project)[];
         let current: any = project;
 
-        for (let i = 0; i < keys.length - 1; i++) {
-          current = current[keys[i]];
-        }
+        current = keys.slice(0, -1).reduce((acc, key) => acc[key], current);
 
         const finalKey = keys[keys.length - 1];
         current[finalKey] = JSON.parse(source);
