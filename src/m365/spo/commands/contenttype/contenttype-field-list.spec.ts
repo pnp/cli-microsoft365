@@ -108,7 +108,7 @@ describe(commands.CONTENTTYPE_FIELD_LIST, () => {
     "MaxLength": 255
   }];
 
-  let log: any[];
+  let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
@@ -167,7 +167,7 @@ describe(commands.CONTENTTYPE_FIELD_LIST, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation when webUrl, id and listId are specified', async () => {
+  it('passes validation when webUrl, contentTypeId and listId are specified', async () => {
     const actual = await command.validate({ options: { webUrl: webUrl, contentTypeId: contentTypeId, listId: listId } }, commandInfo);
     assert.strictEqual(actual, true);
   });

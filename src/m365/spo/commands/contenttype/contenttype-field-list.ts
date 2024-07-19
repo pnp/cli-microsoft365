@@ -30,6 +30,11 @@ class SpoContentTypeFieldListCommand extends SpoCommand {
     return 'Lists fields for a given site or list content type';
   }
 
+  public defaultProperties(): string[] | undefined {
+    return ['Id', 'Title', 'Group', 'Hidden'];
+  }
+
+
   constructor() {
     super();
 
@@ -115,7 +120,7 @@ class SpoContentTypeFieldListCommand extends SpoCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       if (this.verbose) {
-        await logger.logToStderr(`Retrieving fields for content type ${args.options.contentTypeId || args.options.contentTypeName} in site ${args.options.webUrl}...`);
+        await logger.logToStderr(`Retrieving fields for content type '${args.options.contentTypeId || args.options.contentTypeName}' in site ${args.options.webUrl}...`);
       }
 
       let requestUrl: string = `${args.options.webUrl}/_api/web`;
@@ -132,7 +137,7 @@ class SpoContentTypeFieldListCommand extends SpoCommand {
 
       requestUrl += '/contentTypes';
 
-      const contentTypeId = await this.getContentTypeId(args.options.webUrl, requestUrl, logger, args.options.contentTypeId, args.options.contentTypeName);
+      const contentTypeId = await this.getContentTypeId(requestUrl, logger, args.options.contentTypeId, args.options.contentTypeName);
       requestUrl += `('${formatting.encodeQueryParameter(contentTypeId)}')/fields`;
 
       if (args.options.properties) {
@@ -147,13 +152,13 @@ class SpoContentTypeFieldListCommand extends SpoCommand {
     }
   }
 
-  private async getContentTypeId(webUrl: string, requestUrl: string, logger: Logger, contentTypeId?: string, contentTypeName?: string): Promise<string> {
+  private async getContentTypeId(requestUrl: string, logger: Logger, contentTypeId?: string, contentTypeName?: string): Promise<string> {
     if (contentTypeId) {
       return contentTypeId;
     }
 
     if (this.verbose) {
-      await logger.logToStderr(`Retrieving content type id for contentType ${contentTypeName}.`);
+      await logger.logToStderr(`Retrieving content type id for content type '${contentTypeName}'.`);
     }
 
     const res: { StringId: string }[] = await odata.getAllItems(`${requestUrl}?$filter=Name eq '${formatting.encodeQueryParameter(contentTypeName!)}'&$select=StringId`);
