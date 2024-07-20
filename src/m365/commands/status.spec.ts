@@ -120,7 +120,7 @@ describe(commands.STATUS, () => {
     auth.connection.active = false;
     (auth as any)._allConnections = [];
     await command.action(logger, { options: { verbose: true } });
-    assert(loggerLogToStderrSpy.calledWith('Logged out from Microsoft 365'));
+    assert(loggerLogToStderrSpy.calledWith('Logged out'));
   });
 
   it('shows logged out status when not logged in with connections available', async () => {
@@ -132,7 +132,7 @@ describe(commands.STATUS, () => {
   it('shows logged out status when not logged in with connections available (verbose)', async () => {
     auth.connection.active = false;
     await command.action(logger, { options: { verbose: true } });
-    assert(loggerLogToStderrSpy.calledWith('Logged out from Microsoft 365, signed in connections available'));
+    assert(loggerLogToStderrSpy.calledWith('Logged out, signed in connections available'));
   });
 
   it('shows logged out status when the refresh token is expired', async () => {
