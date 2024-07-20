@@ -76,7 +76,7 @@ function getSettingWithDefaultValue<TValue>(settingName: string, defaultValue: T
 }
 
 function getClientId(): string | undefined {
-  return cli.getSettingWithDefaultValue(settingsNames.clientId, process.env.CLIMICROSOFT365_ENTRAAPPID || process.env.CLIMICROSOFT365_AADAPPID);
+  return cli.getSettingWithDefaultValue(settingsNames.clientId, process.env.CLIMICROSOFT365_ENTRAAPPID);
 }
 
 function getTenant(): string {
