@@ -36,7 +36,7 @@ Search all flows as, an administrator, for a specific search string and report r
 
           if ($null -ne $flowData) {
               if ($flowData.Contains($searchString)) {
-                  Write-Output $($flow.displayName + "contains your search string" + $searchString)
+                  Write-Output $($flow.properties.displayName + "contains your search string" + $searchString)
                   Write-Output $flow.id
               }
 
