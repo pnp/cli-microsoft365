@@ -99,3 +99,13 @@ In the past versions of CLI for Microsoft 365, the command had no output. When u
 #### What action do I need to take?
 
 When using the [spo file copy](./cmd/spo/file/file-copy.mdx) command, please use the new command input. This means that you'll have to remove option `--resetAuthorAndCreated` from your scripts and automation tools.
+
+## CLI environment variables
+
+### Removed deprecated CLI environment variables
+
+For this new major version, we've removed the deprecated `AAD` CLI environment variables. We have renamed `CLIMICROSOFT365_AADAPPID` variable to `CLIMICROSOFT365_ENTRAAPPID`.
+
+#### What action do I need to take?
+
+Please, check the user guidance [Log in to Microsoft 365](./user-guide/connecting-microsoft-365.mdx) command to see the updated environment variables to use.
