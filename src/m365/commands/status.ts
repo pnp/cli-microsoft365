@@ -38,8 +38,8 @@ class StatusCommand extends Command {
       const connections = await auth.getAllConnections();
       if (this.verbose) {
         const message = connections.length > 0
-          ? `Logged out from Microsoft 365, signed in connections available`
-          : 'Logged out from Microsoft 365';
+          ? `Logged out, signed in connections available`
+          : 'Logged out';
         await logger.logToStderr(message);
       }
       else {
