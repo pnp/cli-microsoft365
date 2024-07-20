@@ -22,6 +22,18 @@ We removed the `showSpinner` config variable from the CLI configuration. Due to 
 
 Remove all entries in your script where you use the `showSpinner` setting.
 
+## CLI Doctor
+
+### Updated output of `cli doctor` command
+
+For this new major version, we've adjusted the output of the `cli doctor` command to align the renaming of Azure AD to Microsoft Entra ID.
+
+The output is updated with `cliAadAppId` as `cliEntraAppId` and `cliAadAppTenant` as `cliEntraAppTenant`.
+
+#### What action do I need to take?
+
+Please, check the documentation of the [cli doctor](./cmd/cli/cli-doctor.mdx) command to see the updated output and adjust your scripts accordingly.
+
 ## CLI environment variables
 
 ### Removed deprecated CLI environment variables
