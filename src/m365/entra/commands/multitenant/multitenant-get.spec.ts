@@ -91,7 +91,7 @@ describe(commands.MULTITENANT_GET, () => {
         }
       }
     };
-    sinon.stub(request, 'get').throws(error);//.rejects(new Error(errorMessage));
+    sinon.stub(request, 'get').rejects(error);
 
     await assert.rejects(command.action(logger, { options: {} }), new CommandError(error.error.message));
   });
