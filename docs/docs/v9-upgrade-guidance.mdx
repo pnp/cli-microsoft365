@@ -22,6 +22,16 @@ For this new major version, we've removed the deprecated `AAD` CLI environment v
 
 Please, check the user guidance [Log in to Microsoft 365](./user-guide/connecting-microsoft-365.mdx) command to see the updated environment variables to use.
 
+## CLI Status
+
+### Removed deprecated CLI environment variables
+
+We've updated the [m365 status](./cmd/status.mdx) command output. Previously the command would return `Logged out from Microsoft 365` now it will return `Logged out`.
+
+#### What action do I need to take?
+
+Please, update your scripts to reflect the new output of the [m365 status](./cmd/status.mdx) command.
+
 ## Entra ID
 
 ### Removed deprecated Guest value from 'aad m365group user list' command.
