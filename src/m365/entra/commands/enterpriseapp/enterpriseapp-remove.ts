@@ -2,10 +2,10 @@ import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
+import { odata } from '../../../../utils/odata.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
-import aadCommands from '../../aadCommands.js';
 import commands from '../../commands.js';
 
 interface CommandArgs {
@@ -13,9 +13,9 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  appId?: string;
-  appDisplayName?: string;
-  appObjectId?: string;
+  id?: string;
+  displayName?: string;
+  objectId?: string;
   force?: boolean;
 }
 
@@ -29,7 +29,7 @@ class EntraEnterpriseAppRemoveCommand extends GraphCommand {
   }
 
   public alias(): string[] | undefined {
-    return [aadCommands.SP_REMOVE, commands.SP_REMOVE];
+    return [commands.SP_REMOVE];
   }
 
   constructor() {
@@ -45,9 +45,9 @@ class EntraEnterpriseAppRemoveCommand extends GraphCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        appId: (!(!args.options.appId)).toString(),
-        appDisplayName: (!(!args.options.appDisplayName)).toString(),
-        appObjectId: (!(!args.options.appObjectId)).toString(),
+        id: typeof args.options.id !== 'undefined',
+        displayName: typeof args.options.displayName !== 'undefined',
+        objectId: typeof args.options.objectId !== 'undefined',
         force: !!args.options.force
       });
     });
@@ -56,13 +56,13 @@ class EntraEnterpriseAppRemoveCommand extends GraphCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '-i, --appId [appId]'
+        option: '-i, --id [id]'
       },
       {
-        option: '-n, --appDisplayName [appDisplayName]'
+        option: '-n, --displayName [displayName]'
       },
       {
-        option: '--appObjectId [appObjectId]'
+        option: '--objectId [objectId]'
       },
       {
         option: '-f, --force'
@@ -73,12 +73,12 @@ class EntraEnterpriseAppRemoveCommand extends GraphCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (args.options.appId && !validation.isValidGuid(args.options.appId)) {
-          return `${args.options.appId} is not a valid appId GUID`;
+        if (args.options.id && !validation.isValidGuid(args.options.id)) {
+          return `The option 'id' with value '${args.options.id}' is not a valid GUID.`;
         }
 
-        if (args.options.appObjectId && !validation.isValidGuid(args.options.appObjectId)) {
-          return `${args.options.appObjectId} is not a valid objectId GUID`;
+        if (args.options.objectId && !validation.isValidGuid(args.options.objectId)) {
+          return `The option 'objectId' with value '${args.options.objectId}' is not a valid GUID.`;
         }
 
         return true;
@@ -87,64 +87,33 @@ class EntraEnterpriseAppRemoveCommand extends GraphCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push({ options: ['appId', 'appDisplayName', 'appObjectId'] });
+    this.optionSets.push({ options: ['id', 'displayName', 'objectId'] });
   }
 
   #initTypes(): void {
-    this.types.string.push('appId', 'appDisplayName', 'appObjectId');
-  }
-
-  private async getSpId(args: CommandArgs): Promise<string> {
-    if (args.options.appObjectId) {
-      return args.options.appObjectId;
-    }
-
-    let spMatchQuery: string = '';
-    if (args.options.appDisplayName) {
-      spMatchQuery = `displayName eq '${formatting.encodeQueryParameter(args.options.appDisplayName)}'`;
-    }
-    else if (args.options.appId) {
-      spMatchQuery = `appId eq '${formatting.encodeQueryParameter(args.options.appId)}'`;
-    }
-
-    const idRequestOptions: CliRequestOptions = {
-      url: `${this.resource}/v1.0/servicePrincipals?$filter=${spMatchQuery}`,
-      headers: {
-        accept: 'application/json;odata.metadata=none'
-      },
-      responseType: 'json'
-    };
-
-    const response = await request.get<{ value: { id: string; }[] }>(idRequestOptions);
-
-    const spItem: { id: string } | undefined = response.value[0];
-
-    if (!spItem) {
-      throw `The specified Entra app does not exist`;
-    }
-
-    if (response.value.length > 1) {
-      const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', response.value);
-      const result = await cli.handleMultipleResultsFound<{ id: string }>(`Multiple Entra apps with name '${args.options.appDisplayName}' found.`, resultAsKeyValuePair);
-      return result.id;
-    }
-
-    return spItem.id;
+    this.types.string.push('id', 'displayName', 'objectId');
+    this.types.boolean.push('force');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    await this.showDeprecationWarning(logger, aadCommands.SP_REMOVE, commands.SP_REMOVE);
-
     const removeEnterpriseApplication = async (): Promise<void> => {
       if (this.verbose) {
-        await logger.logToStderr(`Removing an enterprise application ${args.options.appId || args.options.appDisplayName || args.options.appObjectId}...`);
+        await logger.logToStderr(`Removing enterprise application ${args.options.id || args.options.displayName || args.options.objectId}...`);
       }
 
       try {
-        const id = await this.getSpId(args);
+        let url = `${this.resource}/v1.0`;
+
+        if (args.options.id) {
+          url += `/servicePrincipals(appId='${args.options.id}')`;
+        }
+        else {
+          const id = await this.getSpId(args.options);
+          url += `/servicePrincipals/${id}`;
+        }
 
         const requestOptions: CliRequestOptions = {
-          url: `${this.resource}/v1.0/servicePrincipals/${id}`,
+          url: url,
           headers: {
             accept: 'application/json;odata.metadata=none'
           },
@@ -162,12 +131,39 @@ class EntraEnterpriseAppRemoveCommand extends GraphCommand {
       await removeEnterpriseApplication();
     }
     else {
-      const result = await cli.promptForConfirmation({ message: `Are you sure you want to remove the enterprise application ${args.options.appId || args.options.appDisplayName || args.options.appObjectId}?` });
+      const result = await cli.promptForConfirmation({ message: `Are you sure you want to remove enterprise application '${args.options.id || args.options.displayName || args.options.objectId}'?` });
 
       if (result) {
         await removeEnterpriseApplication();
       }
     }
+  }
+
+  private async getSpId(options: Options): Promise<string> {
+    if (options.objectId) {
+      return options.objectId;
+    }
+
+    let spMatchQuery: string = '';
+    if (options.displayName) {
+      spMatchQuery = `displayName eq '${formatting.encodeQueryParameter(options.displayName)}'`;
+    }
+
+    const spItemsResponse = await odata.getAllItems<{ id: string }>(`${this.resource}/v1.0/servicePrincipals?$filter=${spMatchQuery}&$select=id`);
+
+    if (spItemsResponse.length === 0) {
+      throw `The specified enterprise application does not exist.`;
+    }
+
+    if (spItemsResponse.length > 1) {
+      const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', spItemsResponse);
+      const result = await cli.handleMultipleResultsFound<{ id: string }>(`Multiple enterprise applications with name '${options.displayName}' found.`, resultAsKeyValuePair);
+      return result.id;
+    }
+
+    const spItem = spItemsResponse[0];
+
+    return spItem.id;
   }
 }
 
