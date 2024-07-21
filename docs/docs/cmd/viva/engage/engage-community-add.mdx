@@ -22,13 +22,13 @@ m365 viva engage community add [options]
 : The description of the community. The maximum length is 1024 characters.
 
 `--privacy <privacy>`
-: Defines the privacy level of the community. The possible values are: public, and private.
+: Defines the privacy level of the community. The possible values are: `public`, `private`.
 
 `--adminEntraIds [adminEntraIds]`
-: Comma-separated list of Microsoft Entra IDs, assigning admin privileges to the designated individuals. Required when using application permissions. Specify either adminEntraIds or adminEntraUserNames, but not both.
+: Comma-separated list of Microsoft Entra IDs, assigning admin privileges to the designated individuals. Required when using application permissions. Specify either `adminEntraIds` or `adminEntraUserNames`, but not both.
 
 `--adminEntraUserNames [adminEntraUserNames]`
-: Comma-separated list of Microsoft Entra UPNs, assigning admin privileges to the designated individuals. Required when using application permissions. Specify either adminEntraIds or adminEntraUserNames, but not both.
+: Comma-separated list of Microsoft Entra UPNs, assigning admin privileges to the designated individuals. Required when using application permissions. Specify either `adminEntraIds` or `adminEntraUserNames`, but not both.
 
 `--wait`
 : Wait for the operation to finish.
@@ -40,15 +40,11 @@ m365 viva engage community add [options]
 
 :::warning
 
-This command is based on an API that is currently in preview and is subject to change once the API reached general availability.
+This command is based on an API that is currently in preview and is subject to change once the API reaches general availability.
 
 :::
 
-It is limited to networks in Native mode only - legacy and external Yammer networks will not be able to use this API for community creation.
-
-Creating a community will create a linked Microsoft 365 unified group as well.
-
-In order to use this command, you need to grant the Microsoft Entra application used by the CLI for Microsoft 365 the permission to the Viva Engage API. To do this, execute the `cli consent --service VivaEngage` command.
+Creating a community is limited to networks in Native mode only - legacy and external Yammer networks will not be able to use this API for community creation.
 
 ## Examples
 
@@ -72,7 +68,42 @@ m365 viva engage community add --displayName "Software engineers" --description 
 
 ## Response
 
-### With --wait:
+### Standard response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  "https://graph.microsoft.com/beta/employeeExperience/engagementAsyncOperations('eyJfdHlwZSI6IkxvbmdSdW5uaW5nT3BlcmF0aW9uIiwiaWQiOiI4ZmM2NzEyZS0wMWY4LTQxN2YtYWNmMS1iZTJiYmMxY2FjNGQiLCJvcGVyYXRpb24iOiJDcmVhdGVDb21tdW5pdHkifQ')"
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  https://graph.microsoft.com/beta/employeeExperience/engagementAsyncOperations('eyJfdHlwZSI6IkxvbmdSdW5uaW5nT3BlcmF0aW9uIiwiaWQiOiI4ZmM2NzEyZS0wMWY4LTQxN2YtYWNmMS1iZTJiYmMxY2FjNGQiLCJvcGVyYXRpb24iOiJDcmVhdGVDb21tdW5pdHkifQ')
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  https://graph.microsoft.com/beta/employeeExperience/engagementAsyncOperations('eyJfdHlwZSI6IkxvbmdSdW5uaW5nT3BlcmF0aW9uIiwiaWQiOiI4ZmM2NzEyZS0wMWY4LTQxN2YtYWNmMS1iZTJiYmMxY2FjNGQiLCJvcGVyYXRpb24iOiJDcmVhdGVDb21tdW5pdHkifQ')
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  https://graph.microsoft.com/beta/employeeExperience/engagementAsyncOperations('eyJfdHlwZSI6IkxvbmdSdW5uaW5nT3BlcmF0aW9uIiwiaWQiOiI4ZmM2NzEyZS0wMWY4LTQxN2YtYWNmMS1iZTJiYmMxY2FjNGQiLCJvcGVyYXRpb24iOiJDcmVhdGVDb21tdW5pdHkifQ')
+  ```
+
+  </TabItem>
+</Tabs>
+
+### `wait` response
+
+When we make use of the option `wait` the response will differ. 
 
 <Tabs>
   <TabItem value="JSON">
@@ -131,39 +162,6 @@ m365 viva engage community add --displayName "Software engineers" --description 
   resourceLocation | https://graph.microsoft.com/beta/employeeExperience/communities('eyJfdHlwZSI6Ikdyb3VwIiwiaWQiOiIxODQ4MTUyMzkxNjgifQ')
   operationType | createCommunity
   resourceId | eyJfdHlwZSI6Ikdyb3VwIiwiaWQiOiIxODQ4MTUyMzkxNjgifQ
-  ```
-
-  </TabItem>
-</Tabs>
-
-### Without --wait:
-
-<Tabs>
-  <TabItem value="JSON">
-
-  ```json
-  https://graph.microsoft.com/beta/employeeExperience/engagementAsyncOperations('eyJfdHlwZSI6IkxvbmdSdW5uaW5nT3BlcmF0aW9uIiwiaWQiOiI4ZmM2NzEyZS0wMWY4LTQxN2YtYWNmMS1iZTJiYmMxY2FjNGQiLCJvcGVyYXRpb24iOiJDcmVhdGVDb21tdW5pdHkifQ')
-  ```
-
-  </TabItem>
-  <TabItem value="Text">
-
-  ```text
-  https://graph.microsoft.com/beta/employeeExperience/engagementAsyncOperations('eyJfdHlwZSI6IkxvbmdSdW5uaW5nT3BlcmF0aW9uIiwiaWQiOiI4ZmM2NzEyZS0wMWY4LTQxN2YtYWNmMS1iZTJiYmMxY2FjNGQiLCJvcGVyYXRpb24iOiJDcmVhdGVDb21tdW5pdHkifQ')
-  ```
-
-  </TabItem>
-  <TabItem value="CSV">
-
-  ```csv
-  https://graph.microsoft.com/beta/employeeExperience/engagementAsyncOperations('eyJfdHlwZSI6IkxvbmdSdW5uaW5nT3BlcmF0aW9uIiwiaWQiOiI4ZmM2NzEyZS0wMWY4LTQxN2YtYWNmMS1iZTJiYmMxY2FjNGQiLCJvcGVyYXRpb24iOiJDcmVhdGVDb21tdW5pdHkifQ')
-  ```
-
-  </TabItem>
-  <TabItem value="Markdown">
-
-  ```md
-  https://graph.microsoft.com/beta/employeeExperience/engagementAsyncOperations('eyJfdHlwZSI6IkxvbmdSdW5uaW5nT3BlcmF0aW9uIiwiaWQiOiI4ZmM2NzEyZS0wMWY4LTQxN2YtYWNmMS1iZTJiYmMxY2FjNGQiLCJvcGVyYXRpb24iOiJDcmVhdGVDb21tdW5pdHkifQ')
   ```
 
   </TabItem>

@@ -4,6 +4,11 @@ import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { validation } from '../../../../utils/validation.js';
+import { accessToken } from '../../../../utils/accessToken.js';
+import auth from '../../../../Auth.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { entraUser } from '../../../../utils/entraUser.js';
+import { setTimeout } from 'timers/promises';
 
 interface CommandArgs {
   options: Options;
@@ -15,9 +20,11 @@ interface Options extends GlobalOptions {
   privacy: string;
   adminEntraIds?: string;
   adminEntraUserNames?: string;
+  wait?: boolean;
 }
 
 class VivaEngageCommunityAddCommand extends GraphCommand {
+  private pollingInterval: number = 5000;
   private readonly privacyOptions = ['public', 'private'];
 
   public get name(): string {
@@ -35,6 +42,7 @@ class VivaEngageCommunityAddCommand extends GraphCommand {
     this.#initOptions();
     this.#initValidators();
     this.#initTypes();
+    this.#initOptionSets();
   }
 
   #initTelemetry(): void {
@@ -44,7 +52,8 @@ class VivaEngageCommunityAddCommand extends GraphCommand {
         description: typeof args.options.description !== 'undefined',
         privacy: typeof args.options.privacy !== 'undefined',
         adminEntraIds: typeof args.options.adminEntraIds !== 'undefined',
-        adminEntraUserNames: typeof args.options.adminEntraUserNames !== 'undefined'
+        adminEntraUserNames: typeof args.options.adminEntraUserNames !== 'undefined',
+        wait: !!args.options.wait
       });
     });
   }
@@ -66,39 +75,29 @@ class VivaEngageCommunityAddCommand extends GraphCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (args.options.displayName && args.options.displayName.length > 255) {
+        if (args.options.displayName.length > 255) {
           return `The maximum amount of characters for 'displayName' is 255.`;
         }
 
-        if (args.options.description && args.options.description.length > 1024) {
+        if (args.options.description.length > 1024) {
           return `The maximum amount of characters for 'description' is 1024.`;
         }
 
-        if (args.options.privacy && this.privacyOptions.indexOf(args.options.privacy) === -1) {
+        if (this.privacyOptions.indexOf(args.options.privacy) === -1) {
           return `'${args.options.privacy}' is not a valid value for privacy. Allowed values are: ${this.privacyOptions.join(', ')}.`;
         }
 
-        if (args.options.adminEntraIds && args.options.adminEntraUserNames) {
-          return `You can only specify either 'adminEntraIds' or 'adminEntraUserNames'`;
-        }
-
         if (args.options.adminEntraIds) {
-          const adminEntraIds = args.options.adminEntraIds.split(',');
-          for (let i: number = 0; i < adminEntraIds.length; i++) {
-            const trimmedId: string = adminEntraIds[i].trim();
-            if (!validation.isValidGuid(trimmedId)) {
-              return `${trimmedId} is not a valid GUID`;
-            }
+          const isValidGUIDArrayResult = validation.isValidGuidArray(args.options.adminEntraIds);
+          if (isValidGUIDArrayResult !== true) {
+            return `The following GUIDs are invalid for the option 'adminEntraIds': ${isValidGUIDArrayResult}.`;
           }
         }
 
         if (args.options.adminEntraUserNames) {
-          const adminEntraUserNames = args.options.adminEntraUserNames.split(',');
-          for (let i: number = 0; i < adminEntraUserNames.length; i++) {
-            const trimmedUPN: string = adminEntraUserNames[i].trim();
-            if (!validation.isValidUserPrincipalName(trimmedUPN)) {
-              return `${trimmedUPN} is not a valid UPN`;
-            }
+          const isValidUPNArrayResult = validation.isValidUserPrincipalNameArray(args.options.adminEntraUserNames);
+          if (isValidUPNArrayResult !== true) {
+            return `The following user principal names are invalid for the option 'adminEntraUserNames': ${isValidUPNArrayResult}.`;
           }
         }
 
@@ -109,13 +108,28 @@ class VivaEngageCommunityAddCommand extends GraphCommand {
 
   #initTypes(): void {
     this.types.string.push('displayName', 'description', 'privacy', 'adminEntraIds', 'adminEntraUserNames');
+    this.types.boolean.push('wait');
+  }
+
+  #initOptionSets(): void {
+    this.optionSets.push(
+      {
+        options: ['adminEntraIds', 'adminEntraUserNames'],
+        runsWhen: (args) => args.options.adminEntraIds || args.options.adminEntraUserNames
+      }
+    );
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const { displayName, description, privacy, adminEntraIds, adminEntraUserNames, wait } = args.options;
 
+    const isAppOnlyAccessToken = accessToken.isAppOnlyAccessToken(auth.connection.accessTokens[this.resource].accessToken);
+    if (isAppOnlyAccessToken && !adminEntraIds && !adminEntraUserNames) {
+      this.handleError(`Specify at least one admin using either --adminEntraIds or --adminEntraUserNames when using application permissions.`);
+    }
+
     if (this.verbose) {
-      logger.logToStderr(`Creating a Viva Engage community with display name '${displayName}'...`);
+      await logger.logToStderr(`Creating a Viva Engage community with display name '${displayName}'...`);
     }
 
     try {
@@ -123,7 +137,7 @@ class VivaEngageCommunityAddCommand extends GraphCommand {
         url: `${this.resource}/beta/employeeExperience/communities`,
         headers: {
           accept: 'application/json;odata.metadata=none',
-          'content-type': 'application/json;odata=nometadata'
+          'content-type': 'application/json'
         },
         responseType: 'json',
         fullResponse: true,
@@ -137,19 +151,18 @@ class VivaEngageCommunityAddCommand extends GraphCommand {
       let entraIds: string[] = [];
 
       if (adminEntraIds) {
-        entraIds = adminEntraIds.split(',').map(id => this.getUserIdUrl(id));
+        entraIds = formatting.splitAndTrim(adminEntraIds);
       }
       else if (adminEntraUserNames) {
-        const userUPNs = adminEntraUserNames.split(',').map(upn => this.getUserId(upn));
-        const userIds = await Promise.all(userUPNs);
-        entraIds = userIds.map(id => this.getUserIdUrl(id));
+        const userIds = await entraUser.getUserIdsByUpns(formatting.splitAndTrim(adminEntraUserNames));
+        entraIds = userIds.map(id => `https://graph.microsoft.com/beta/users/${id}`);
       }
 
       if (entraIds.length > 0) {
         requestOptions.data['owners@odata.bind'] = entraIds;
       }
 
-      const res: any = await request.post(requestOptions);
+      const res = await request.post<{ headers: { location: string } }>(requestOptions);
 
       const location: string = res.headers.location;
 
@@ -162,16 +175,16 @@ class VivaEngageCommunityAddCommand extends GraphCommand {
 
       do {
         if (this.verbose) {
-          logger.logToStderr(`Waiting 30 seconds...`);
+          await logger.logToStderr(`Community still provisioning. Retrying in ${this.pollingInterval / 1000} seconds...`);
         }
 
-        await new Promise(resolve => setTimeout(resolve, 30000));
+        await setTimeout(this.pollingInterval);
 
         if (this.debug) {
-          logger.logToStderr(`Checking create community operation status...`);
+          await logger.logToStderr(`Checking create community operation status...`);
         }
 
-        const operation: any = await request.get({
+        const operation = await request.get<any>({
           url: location,
           headers: {
             accept: 'application/json;odata.metadata=none'
@@ -181,7 +194,7 @@ class VivaEngageCommunityAddCommand extends GraphCommand {
         status = operation.status;
 
         if (this.verbose) {
-          logger.logToStderr(`Community creation operation status: ${status}`);
+          await logger.logToStderr(`Community creation operation status: ${status}`);
         }
 
         if (status === 'failed') {
@@ -197,23 +210,6 @@ class VivaEngageCommunityAddCommand extends GraphCommand {
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
-  }
-
-  private async getUserId(userUPN: string): Promise<string> {
-    const requestOptions: any = {
-      url: `${this.resource}/v1.0/users/${userUPN}?$select=id`,
-      headers: {
-        accept: 'application/json;odata.metadata=none'
-      },
-      responseType: 'json'
-    };
-
-    const res = await request.get<{ id: string }>(requestOptions);
-    return res.id;
-  }
-
-  private getUserIdUrl(id: string): string {
-    return `https://graph.microsoft.com/beta/users/${id}`;
   }
 }
 

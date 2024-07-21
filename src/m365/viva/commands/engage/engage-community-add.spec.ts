@@ -13,6 +13,9 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './engage-community-add.js';
+import { accessToken } from '../../../../utils/accessToken.js';
+import { settingsNames } from '../../../../settingsNames.js';
+import { entraUser } from '../../../../utils/entraUser.js';
 
 describe(commands.ENGAGE_COMMUNITY_ADD, () => {
   let log: string[];
@@ -27,6 +30,12 @@ describe(commands.ENGAGE_COMMUNITY_ADD, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
+    if (!auth.connection.accessTokens[auth.defaultResource]) {
+      auth.connection.accessTokens[auth.defaultResource] = {
+        expiresOn: 'abc',
+        accessToken: 'abc'
+      };
+    }
     commandInfo = cli.getCommandInfo(command);
   });
 
@@ -44,13 +53,16 @@ describe(commands.ENGAGE_COMMUNITY_ADD, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
+    (command as any).pollingInterval = 0;
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
   });
 
   afterEach(() => {
     sinonUtil.restore([
       request.get,
       request.post,
-      global.setTimeout
+      accessToken.isAppOnlyAccessToken,
+      entraUser.getUserIdsByUpns
     ]);
   });
 
@@ -60,7 +72,7 @@ describe(commands.ENGAGE_COMMUNITY_ADD, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.ENGAGE_COMMUNITY_ADD), true);
+    assert.strictEqual(command.name, commands.ENGAGE_COMMUNITY_ADD);
   });
 
   it('has a description', () => {
@@ -71,7 +83,7 @@ describe(commands.ENGAGE_COMMUNITY_ADD, () => {
     const actual = await command.validate({
       options: {
         displayName: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries.",
-        description: "A community for all software engineer",
+        description: "A community for all software engineers",
         privacy: "public"
       }
     }, commandInfo);
@@ -93,7 +105,7 @@ describe(commands.ENGAGE_COMMUNITY_ADD, () => {
     const actual = await command.validate({
       options: {
         displayName: "Software engineers",
-        description: "A community for all software engineer",
+        description: "A community for all software engineers",
         privacy: "invalid"
       }
     }, commandInfo);
@@ -104,7 +116,7 @@ describe(commands.ENGAGE_COMMUNITY_ADD, () => {
     const actual = await command.validate({
       options: {
         displayName: "Software engineers",
-        description: "A community for all software engineer",
+        description: "A community for all software engineers",
         privacy: "private",
         adminEntraIds: "invalid"
       }
@@ -116,7 +128,7 @@ describe(commands.ENGAGE_COMMUNITY_ADD, () => {
     const actual = await command.validate({
       options: {
         displayName: "Software engineers",
-        description: "A community for all software engineer",
+        description: "A community for all software engineers",
         privacy: "private",
         adminEntraUserNames: "invalid"
       }
@@ -125,10 +137,18 @@ describe(commands.ENGAGE_COMMUNITY_ADD, () => {
   });
 
   it('fails validation if both adminEntraIds and adminEntraUserNames are specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         displayName: "Software engineers",
-        description: "A community for all software engineer.",
+        description: "A community for all software engineers.",
         privacy: "public",
         adminEntraIds: "50674d84-6bf1-470b-89b5-d55ce0a5a720",
         adminEntraUserNames: "john.doe@contoso.onmicrosoft.com"
@@ -141,7 +161,7 @@ describe(commands.ENGAGE_COMMUNITY_ADD, () => {
     const actual = await command.validate({
       options: {
         displayName: "Software engineers",
-        description: "A community for all software engineer.",
+        description: "A community for all software engineers.",
         privacy: "public",
         adminEntraIds: "50674d84-6bf1-470b-89b5-d55ce0a5a720"
       }
@@ -153,7 +173,7 @@ describe(commands.ENGAGE_COMMUNITY_ADD, () => {
     const actual = await command.validate({
       options: {
         displayName: "Software engineers",
-        description: "A community for all software engineer.",
+        description: "A community for all software engineers.",
         privacy: "public",
         adminEntraUserNames: "john.doe@contoso.onmicrosoft.com"
       }
@@ -162,7 +182,7 @@ describe(commands.ENGAGE_COMMUNITY_ADD, () => {
   });
 
   it('creates a community without waiting for provisioning to complete', async () => {
-    sinon.stub(request, 'post').callsFake(async (opts: any) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/beta/employeeExperience/communities`) {
         return {
           headers: {
@@ -172,15 +192,14 @@ describe(commands.ENGAGE_COMMUNITY_ADD, () => {
       }
       throw 'Invalid request';
     });
-    await command.action(logger, { options: { displayName: "Software engineers", description: "A community for all software engineer", privacy: "public", verbose: true } } as any);
-    assert(loggerLogSpy.calledWith(operationLocation));
+    await command.action(logger, { options: { displayName: "Software engineers", description: "A community for all software engineers", privacy: "public", verbose: true } });
+    assert(loggerLogSpy.calledOnceWithExactly(operationLocation));
   });
 
   it('creates a community with adminEntraIds and waits for provisioning to complete', async () => {
-    let waitsForCompletion = false;
     let i = 0;
 
-    sinon.stub(request, 'post').callsFake(async (opts: any) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/beta/employeeExperience/communities`) {
         return {
           headers: {
@@ -191,7 +210,7 @@ describe(commands.ENGAGE_COMMUNITY_ADD, () => {
       throw 'Invalid request';
     });
 
-    sinon.stub(request, 'get').callsFake(async (opts: any) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === operationLocation) {
         if (i++ < 2) {
           return {
@@ -199,37 +218,48 @@ describe(commands.ENGAGE_COMMUNITY_ADD, () => {
           };
         }
 
-        waitsForCompletion = true;
         return {
-          status: 'succeeded'
+          id: "eyJfdHlwZSI6IkxvbmdSdW5uaW5nT3BlcmF0aW9uIiwiaWQiOiJmYzg3MzBlZS0wN2Q4LTQ1OGMtYjIzOC1mMmRmNTlmMzhkNmIiLCJvcGVyYXRpb24iOiJDcmVhdGVDb21tdW5pdHkifQ",
+          createdDateTime: "2024-07-20T21:30:32.2441923Z",
+          lastActionDateTime: "2024-07-20T21:30:32.2441938Z",
+          status: "succeeded",
+          statusDetail: null,
+          resourceLocation: "https://graph.microsoft.com/beta/employeeExperience/communities('eyJfdHlwZSI6Ikdyb3VwIiwiaWQiOiIxOTcxODQ5NzA3NTIifQ')",
+          operationType: "createCommunity",
+          resourceId: "eyJfdHlwZSI6Ikdyb3VwIiwiaWQiOiIxOTcxODQ5NzA3NTIifQ"
         };
       }
       throw 'Invalid request';
     });
 
-    sinon.stub(global, 'setTimeout').callsFake((fn) => {
-      fn();
-      return {} as any;
-    });
-
     await command.action(logger, {
       options: {
         displayName: "Software engineers",
-        description: "A community for all software engineer",
+        description: "A community for all software engineers",
         privacy: "public",
         adminEntraIds: "50674d84-6bf1-470b-89b5-d55ce0a5a720",
         wait: true,
         verbose: true
       }
-    } as any);
-    assert.strictEqual(waitsForCompletion, true);
+    });
+
+    assert(loggerLogSpy.calledWith({
+      id: "eyJfdHlwZSI6IkxvbmdSdW5uaW5nT3BlcmF0aW9uIiwiaWQiOiJmYzg3MzBlZS0wN2Q4LTQ1OGMtYjIzOC1mMmRmNTlmMzhkNmIiLCJvcGVyYXRpb24iOiJDcmVhdGVDb21tdW5pdHkifQ",
+      createdDateTime: "2024-07-20T21:30:32.2441923Z",
+      lastActionDateTime: "2024-07-20T21:30:32.2441938Z",
+      status: "succeeded",
+      statusDetail: null,
+      resourceLocation: "https://graph.microsoft.com/beta/employeeExperience/communities('eyJfdHlwZSI6Ikdyb3VwIiwiaWQiOiIxOTcxODQ5NzA3NTIifQ')",
+      operationType: "createCommunity",
+      resourceId: "eyJfdHlwZSI6Ikdyb3VwIiwiaWQiOiIxOTcxODQ5NzA3NTIifQ"
+    }));
   });
 
   it('creates a community with adminEntraUserNames and waits for provisioning to complete', async () => {
-    let waitsForCompletion = false;
+    sinon.stub(entraUser, 'getUserIdsByUpns').withArgs(['john.doe@consoto.onmicrosoft.com']).resolves(['50674d84-6bf1-470b-89b5-d55ce0a5a720']);
     let i = 0;
 
-    sinon.stub(request, 'post').callsFake(async (opts: any) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/beta/employeeExperience/communities`) {
         return {
           headers: {
@@ -240,7 +270,8 @@ describe(commands.ENGAGE_COMMUNITY_ADD, () => {
       throw 'Invalid request';
     });
 
-    sinon.stub(request, 'get').callsFake(async (opts: any) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+
       if (opts.url === operationLocation) {
         if (i++ < 2) {
           return {
@@ -248,41 +279,48 @@ describe(commands.ENGAGE_COMMUNITY_ADD, () => {
           };
         }
 
-        waitsForCompletion = true;
         return {
-          status: 'succeeded'
+          id: "eyJfdHlwZSI6IkxvbmdSdW5uaW5nT3BlcmF0aW9uIiwiaWQiOiJmYzg3MzBlZS0wN2Q4LTQ1OGMtYjIzOC1mMmRmNTlmMzhkNmIiLCJvcGVyYXRpb24iOiJDcmVhdGVDb21tdW5pdHkifQ",
+          createdDateTime: "2024-07-20T21:30:32.2441923Z",
+          lastActionDateTime: "2024-07-20T21:30:32.2441938Z",
+          status: "succeeded",
+          statusDetail: null,
+          resourceLocation: "https://graph.microsoft.com/beta/employeeExperience/communities('eyJfdHlwZSI6Ikdyb3VwIiwiaWQiOiIxOTcxODQ5NzA3NTIifQ')",
+          operationType: "createCommunity",
+          resourceId: "eyJfdHlwZSI6Ikdyb3VwIiwiaWQiOiIxOTcxODQ5NzA3NTIifQ"
         };
-      }
-
-      if (opts.url.startsWith(`https://graph.microsoft.com/v1.0/users/`) && opts.url.endsWith(`?$select=id`)) {
-        return { id: '50674d84-6bf1-470b-89b5-d55ce0a5a720' };
       }
 
       throw 'Invalid request';
     });
 
-    sinon.stub(global, 'setTimeout').callsFake((fn) => {
-      fn();
-      return {} as any;
-    });
-
     await command.action(logger, {
       options: {
         displayName: "Software engineers",
-        description: "A community for all software engineer",
+        description: "A community for all software engineers",
         privacy: "public",
         adminEntraUserNames: "john.doe@consoto.onmicrosoft.com",
         wait: true,
         debug: true
       }
-    } as any);
-    assert.strictEqual(waitsForCompletion, true);
+    });
+
+    assert(loggerLogSpy.calledWith({
+      id: "eyJfdHlwZSI6IkxvbmdSdW5uaW5nT3BlcmF0aW9uIiwiaWQiOiJmYzg3MzBlZS0wN2Q4LTQ1OGMtYjIzOC1mMmRmNTlmMzhkNmIiLCJvcGVyYXRpb24iOiJDcmVhdGVDb21tdW5pdHkifQ",
+      createdDateTime: "2024-07-20T21:30:32.2441923Z",
+      lastActionDateTime: "2024-07-20T21:30:32.2441938Z",
+      status: "succeeded",
+      statusDetail: null,
+      resourceLocation: "https://graph.microsoft.com/beta/employeeExperience/communities('eyJfdHlwZSI6Ikdyb3VwIiwiaWQiOiIxOTcxODQ5NzA3NTIifQ')",
+      operationType: "createCommunity",
+      resourceId: "eyJfdHlwZSI6Ikdyb3VwIiwiaWQiOiIxOTcxODQ5NzA3NTIifQ"
+    }));
   });
 
   it('handles error when waiting for provisioning to complete fails', async () => {
     let i = 0;
 
-    sinon.stub(request, 'post').callsFake(async (opts: any) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/beta/employeeExperience/communities`) {
         return {
           headers: {
@@ -293,7 +331,7 @@ describe(commands.ENGAGE_COMMUNITY_ADD, () => {
       throw 'Invalid request';
     });
 
-    sinon.stub(request, 'get').callsFake(async (opts: any) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === operationLocation) {
         if (i++ < 2) {
           return {
@@ -312,18 +350,49 @@ describe(commands.ENGAGE_COMMUNITY_ADD, () => {
       throw 'Invalid request';
     });
 
-    sinon.stub(global, 'setTimeout').callsFake((fn) => {
-      fn();
-      return {} as any;
+    await assert.rejects(command.action(logger, {
+      options: {
+        displayName: "Software engineers",
+        description: "A community for all software engineers",
+        privacy: "public",
+        wait: true
+      }
+    }), new CommandError('Community creation failed: An error has occurred'));
+  });
+
+  it('handles error when at least admin is not provided while using app-only authentication', async () => {
+    sinonUtil.restore(accessToken.isAppOnlyAccessToken);
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
+
+    await assert.rejects(command.action(logger, {
+      options: {
+        displayName: "Software engineers",
+        description: "A community for all software engineers",
+        privacy: "public",
+        wait: true
+      }
+    }), new CommandError('Specify at least one admin using either --adminEntraIds or --adminEntraUserNames when using application permissions.'));
+  });
+
+  it('handles API error', async () => {
+    sinon.stub(request, 'post').rejects({
+      error: {
+        'odata.error': {
+          code: '-1, InvalidOperationException',
+          message: {
+            value: 'Invalid request'
+          }
+        }
+      }
     });
 
     await assert.rejects(command.action(logger, {
       options: {
         displayName: "Software engineers",
-        description: "A community for all software engineer",
+        description: "A community for all software engineers",
         privacy: "public",
         wait: true
       }
-    } as any), new CommandError('Community creation failed: An error has occurred'));
+    }), new CommandError('Invalid request'));
   });
 });
