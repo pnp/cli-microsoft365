@@ -444,7 +444,7 @@ describe(commands.M365GROUP_SET, () => {
     assert.deepStrictEqual(JSON.parse(JSON.stringify(patchStub.firstCall.args[0].data)), { autoSubscribeNewMembers: true, hideFromAddressLists: false });
   });
 
-  it('sets option hideFromOutlookClients when using application permissions', async () => {
+  it('sets option hideFromOutlookClients correctly', async () => {
     const patchStub = sinon.stub(request, 'patch').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/${groupId}` && opts.data['hideFromOutlookClients']) {
         return;
@@ -479,7 +479,7 @@ describe(commands.M365GROUP_SET, () => {
     sinonUtil.restore(entraGroup.isUnifiedGroup);
     sinon.stub(entraGroup, 'isUnifiedGroup').resolves(false);
 
-    await assert.rejects(command.action(logger, { options: { id: groupId, displayName: 'Updated title' } } as any),
+    await assert.rejects(command.action(logger, { options: { id: groupId, displayName: 'Updated title' } }),
       new CommandError(`Specified group with id '${groupId}' is not a Microsoft 365 group.`));
   });
 
@@ -488,7 +488,7 @@ describe(commands.M365GROUP_SET, () => {
     sinonUtil.restore(accessToken.isAppOnlyAccessToken);
     sinon.stub(accessToken, 'isAppOnlyAccessToken').resolves(true);
 
-    await assert.rejects(command.action(logger, { options: { id: groupId, allowExternalSenders: true } } as any),
+    await assert.rejects(command.action(logger, { options: { id: groupId, allowExternalSenders: true } }),
       new CommandError(`Option 'allowExternalSenders' and 'autoSubscribeNewMembers' can only be used when using delegated permissions.`));
   });
 
@@ -498,7 +498,7 @@ describe(commands.M365GROUP_SET, () => {
     sinonUtil.restore(accessToken.isAppOnlyAccessToken);
     sinon.stub(accessToken, 'isAppOnlyAccessToken').resolves(true);
 
-    await assert.rejects(command.action(logger, { options: { id: groupId, autoSubscribeNewMembers: true } } as any),
+    await assert.rejects(command.action(logger, { options: { id: groupId, autoSubscribeNewMembers: true } }),
       new CommandError(`Option 'allowExternalSenders' and 'autoSubscribeNewMembers' can only be used when using delegated permissions.`));
   });
 
