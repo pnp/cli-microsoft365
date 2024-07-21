@@ -131,6 +131,19 @@ describe(commands.M365GROUP_SET, () => {
     assert(loggerLogToStderrSpy.called);
   });
 
+  it('clears Microsoft 365 Group description when empty string is passed', async () => {
+    const patchStub = sinon.stub(request, 'patch').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${groupId}`) {
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { id: groupId, description: '' } });
+    assert.deepStrictEqual(JSON.parse(JSON.stringify(patchStub.firstCall.args[0].data)), { description: null });
+  });
+
   it('updates Microsoft 365 Group to public', async () => {
     sinon.stub(request, 'patch').callsFake(async (opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups/28beab62-7540-4db1-a23f-29a6018a3848') {
@@ -402,7 +415,7 @@ describe(commands.M365GROUP_SET, () => {
     });
 
     await command.action(logger, { options: { id: groupId, allowExternalSenders: true } });
-    assert(patchStub.firstCall.args[0].data.allowExternalSenders);
+    assert.deepStrictEqual(JSON.parse(JSON.stringify(patchStub.firstCall.args[0].data)), { allowExternalSenders: true });
   });
 
   it('sets option autoSubscribeNewMembers when using delegated permissions', async () => {
@@ -415,12 +428,12 @@ describe(commands.M365GROUP_SET, () => {
     });
 
     await command.action(logger, { options: { id: groupId, autoSubscribeNewMembers: true } });
-    assert(patchStub.firstCall.args[0].data.autoSubscribeNewMembers);
+    assert.deepStrictEqual(JSON.parse(JSON.stringify(patchStub.firstCall.args[0].data)), { autoSubscribeNewMembers: true });
   });
 
   it('sets option hideFromAddressLists and autoSubscribeNewMembers when using delegated permissions', async () => {
     const patchStub = sinon.stub(request, 'patch').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${groupId}` && opts.data['autoSubscribeNewMembers'] && !opts.data['hideFromAddressLists']) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${groupId}`) {
         return;
       }
 
@@ -428,7 +441,7 @@ describe(commands.M365GROUP_SET, () => {
     });
 
     await command.action(logger, { options: { id: groupId, autoSubscribeNewMembers: true, hideFromAddressLists: false } });
-    assert(patchStub.firstCall.args[0].data.autoSubscribeNewMembers && !patchStub.firstCall.args[0].data.hideFromAddressLists);
+    assert.deepStrictEqual(JSON.parse(JSON.stringify(patchStub.firstCall.args[0].data)), { autoSubscribeNewMembers: true, hideFromAddressLists: false });
   });
 
   it('sets option hideFromOutlookClients when using application permissions', async () => {
@@ -441,7 +454,7 @@ describe(commands.M365GROUP_SET, () => {
     });
 
     await command.action(logger, { options: { id: groupId, hideFromOutlookClients: true } });
-    assert(patchStub.firstCall.args[0].data.hideFromOutlookClients);
+    assert.deepStrictEqual(JSON.parse(JSON.stringify(patchStub.firstCall.args[0].data)), { hideFromOutlookClients: true });
   });
 
   it('correctly handles API OData error', async () => {

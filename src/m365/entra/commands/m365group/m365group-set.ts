@@ -29,7 +29,6 @@ export interface Options extends GlobalOptions {
   autoSubscribeNewMembers?: boolean;
   hideFromAddressLists?: boolean;
   hideFromOutlookClients?: boolean;
-  isSubscribedByMail?: boolean
 }
 
 class EntraM365GroupSetCommand extends GraphCommand {
@@ -69,8 +68,7 @@ class EntraM365GroupSetCommand extends GraphCommand {
         allowExternalSenders: !!args.options.allowExternalSenders,
         autoSubscribeNewMembers: !!args.options.autoSubscribeNewMembers,
         hideFromAddressLists: !!args.options.hideFromAddressLists,
-        hideFromOutlookClients: !!args.options.hideFromOutlookClients,
-        isSubscribedByMail: !!args.options.isSubscribedByMail
+        hideFromOutlookClients: !!args.options.hideFromOutlookClients
       });
     });
   }
@@ -119,7 +117,7 @@ class EntraM365GroupSetCommand extends GraphCommand {
   }
 
   #initTypes(): void {
-    this.types.boolean.push('isPrivate', 'allowEternalSenders', 'autoSubscribeNewMembers', 'hideFromAddressLists', 'hideFromOutlookClients', 'isSubscribedByMail');
+    this.types.boolean.push('isPrivate', 'allowEternalSenders', 'autoSubscribeNewMembers', 'hideFromAddressLists', 'hideFromOutlookClients');
     this.types.string.push('id', 'displayName', 'description', 'owners', 'members', 'logoPath');
   }
 
@@ -127,7 +125,7 @@ class EntraM365GroupSetCommand extends GraphCommand {
     this.validators.push(
       async (args: CommandArgs) => {
         if (!args.options.displayName &&
-          !args.options.description &&
+          args.options.description === undefined &&
           !args.options.members &&
           !args.options.owners &&
           args.options.isPrivate === undefined &&
@@ -135,8 +133,7 @@ class EntraM365GroupSetCommand extends GraphCommand {
           args.options.allowExternalSenders === undefined &&
           args.options.autoSubscribeNewMembers === undefined &&
           args.options.hideFromAddressLists === undefined &&
-          args.options.hideFromOutlookClients === undefined &&
-          args.options.isSubscribedByMail === undefined) {
+          args.options.hideFromOutlookClients === undefined) {
           return 'Specify at least one option to update.';
         }
 
@@ -193,11 +190,14 @@ class EntraM365GroupSetCommand extends GraphCommand {
         await logger.logToStderr(`Updating Microsoft 365 Group ${args.options.id}...`);
       }
 
-      if (args.options.displayName || args.options.description || args.options.isPrivate !== undefined) {
-        const update: Group = {};
+      if (args.options.displayName || args.options.description !== undefined || args.options.isPrivate !== undefined) {
+        const update: Group = {
+          displayName: args.options.displayName
+        };
 
-        update.displayName = args.options.displayName;
-        update.description = args.options.description;
+        if (args.options.description !== undefined) {
+          update.description = args.options.description !== '' ? args.options.description : null;
+        }
 
         if (args.options.isPrivate !== undefined) {
           update.visibility = args.options.isPrivate ? 'Private' : 'Public';
@@ -216,13 +216,12 @@ class EntraM365GroupSetCommand extends GraphCommand {
       }
 
       // This has to be a separate request due to some Graph API limitations. Otherwise it will throw an error.
-      if (args.options.allowExternalSenders !== undefined || args.options.autoSubscribeNewMembers !== undefined || args.options.hideFromAddressLists !== undefined || args.options.hideFromOutlookClients !== undefined || args.options.isSubscribedByMail !== undefined) {
+      if (args.options.allowExternalSenders !== undefined || args.options.autoSubscribeNewMembers !== undefined || args.options.hideFromAddressLists !== undefined || args.options.hideFromOutlookClients !== undefined) {
         const requestBody: any = {
           allowExternalSenders: args.options.allowExternalSenders,
           autoSubscribeNewMembers: args.options.autoSubscribeNewMembers,
           hideFromAddressLists: args.options.hideFromAddressLists,
-          hideFromOutlookClients: args.options.hideFromOutlookClients,
-          isSubscribedByMail: args.options.isSubscribedByMail
+          hideFromOutlookClients: args.options.hideFromOutlookClients
         };
 
         const requestOptions: CliRequestOptions = {
