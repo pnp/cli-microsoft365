@@ -113,9 +113,25 @@ class SpoApplicationCustomizerGetCommand extends SpoCommand {
 
       if (!args.options.clientSideComponentProperties) {
         await logger.log({
-          ...customAction,
-          Rights: JSON.stringify(customAction.Rights),
-          Scope: this.humanizeScope(customAction.Scope)
+          ClientSideComponentId: customAction.ClientSideComponentId,
+          ClientSideComponentProperties: customAction.ClientSideComponentProperties,
+          CommandUIExtension: customAction.CommandUIExtension,
+          Description: customAction.Description,
+          Group: customAction.Group,
+          Id: customAction.Id,
+          ImageUrl: customAction.ImageUrl,
+          Location: customAction.Location,
+          Name: customAction.Name,
+          RegistrationId: customAction.RegistrationId,
+          RegistrationType: customAction.RegistrationType,
+          Rights: customAction.Rights,
+          Scope: this.humanizeScope(customAction.Scope),
+          ScriptBlock: customAction.ScriptBlock,
+          ScriptSrc: customAction.ScriptSrc,
+          Sequence: customAction.Sequence,
+          Title: customAction.Title,
+          Url: customAction.Url,
+          VersionOfUserCustomAction: customAction.VersionOfUserCustomAction
         });
       }
       else {

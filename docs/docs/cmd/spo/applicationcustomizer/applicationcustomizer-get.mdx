@@ -93,7 +93,7 @@ m365 spo applicationcustomizer get --id 14125658-a9bc-4ddf-9c75-1b5767c9a337 --w
     "Name": "{4a428b32-08cf-45c7-9986-17585af38806}",
     "RegistrationId": null,
     "RegistrationType": 0,
-    "Rights": "{\"High\":\"0\",\"Low\":\"0\"}",
+    "Rights": { "High": 0, "Low": 0 },
     "Scope": "Web",
     "ScriptBlock": null,
     "ScriptSrc": null,
@@ -134,8 +134,8 @@ m365 spo applicationcustomizer get --id 14125658-a9bc-4ddf-9c75-1b5767c9a337 --w
   <TabItem value="CSV">
 
   ```csv
-  ClientSideComponentId,ClientSideComponentProperties,CommandUIExtension,Description,Group,HostProperties,Id,ImageUrl,Location,Name,RegistrationId,RegistrationType,Rights,Scope,ScriptBlock,ScriptSrc,Sequence,Title,Url,VersionOfUserCustomAction
-  9a8b100c-246b-4592-9454-67826523e159,"{""testMessage"":""Test message""}",,,,,4a428b32-08cf-45c7-9986-17585af38806,,ClientSideExtension.ApplicationCustomizer,{4a428b32-08cf-45c7-9986-17585af38806},,0,"{""High"":""0"",""Low"":""0""}",Web,,,65536,HelloWorld,,1.0.1.0
+  ClientSideComponentId,ClientSideComponentProperties,CommandUIExtension,Description,Group,Id,ImageUrl,Location,Name,RegistrationId,RegistrationType,Scope,ScriptBlock,ScriptSrc,Sequence,Title,Url,VersionOfUserCustomAction
+  7096cded-b83d-4eab-96f0-df477ed7c0bc,,,,,14125658-a9bc-4ddf-9c75-1b5767c9a337,,ClientSideExtension.ApplicationCustomizer,Some customizer,,0,Web,,,0,Some customizer,,16.0.1.0
   ```
 
   </TabItem>
