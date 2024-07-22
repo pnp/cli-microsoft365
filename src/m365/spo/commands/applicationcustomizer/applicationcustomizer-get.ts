@@ -113,7 +113,7 @@ class SpoApplicationCustomizerGetCommand extends SpoCommand {
           Name: customAction.Name,
           RegistrationId: customAction.RegistrationId,
           RegistrationType: customAction.RegistrationType,
-          Rights: JSON.stringify(customAction.Rights),
+          Rights: customAction.Rights,
           Scope: this.humanizeScope(customAction.Scope),
           ScriptBlock: customAction.ScriptBlock,
           ScriptSrc: customAction.ScriptSrc,
