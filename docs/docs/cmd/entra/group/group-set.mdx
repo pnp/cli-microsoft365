@@ -10,29 +10,23 @@ Updates a Microsoft Entra group
 m365 entra group set [options]
 ```
 
-## Alias
-
-```sh
-m365 aad group set [options]
-```
-
 ## Options
 
 ```md definition-list
 `-i, --id [id]`	
-: The ID of the Microsoft Entra ID group to update. Specify either `id` or `displayName` but not both.
+: The ID of the Microsoft Entra group to update. Specify either `id` or `displayName` but not both.
 
 `-n, --displayName [displayName]`	
-: The display name of the Microsoft Entra ID group to update. Specify either `id` or `displayName` but not both.
+: The display name of the Microsoft Entra group to update. Specify either `id` or `displayName` but not both.
 
 `--newDisplayName [newDisplayName]`	
-: The new display name of the Microsoft Entra ID group. The maximum length is 256 characters.
+: The new display name of the Microsoft Entra group. The maximum length is 256 characters.
 
 `--description [description]`
 : The new description for the group.
 
 `--mailNickname [mailNickname]`
-: The new mail alias for the group (part before the @). Maximum length is 64 characters.
+: The new mail alias for the group (part before the @). Use only for mail-enabled groups. Maximum length is 64 characters.
 
 `--ownerIds [ownerIds]`
 : Comma-separated list of IDs of Microsoft Entra users that will be the group owners.
@@ -57,12 +51,12 @@ m365 aad group set [options]
 The `visibility` option affects the behavior of the group.
 
 With the `Public` visibility:
-- Anyone can join the group without needing owner permission. 
+- Anyone can join the group without needing owner approval. 
 - Anyone can view the attributes of the group. 
 - Anyone can see the members of the group.
 
 With the `Private` visibilty:
-- Owner permission is needed to join the group.
+- Owner approval is needed to join the group.
 - Anyone can view the attributes of the group.
 - Anyone can see the members of the group.
 

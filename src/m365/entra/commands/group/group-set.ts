@@ -109,7 +109,7 @@ class EntraGroupSetCommand extends GraphCommand {
     this.validators.push(
       async (args: CommandArgs) => {
         if (args.options.id && !validation.isValidGuid(args.options.id)) {
-          return `Value '${args.options.id}' is not a valid GUID for 'id' option`;
+          return `Value '${args.options.id}' is not a valid GUID for option 'id'.`;
         }
 
         if (args.options.newDisplayName && args.options.newDisplayName.length > 256) {
@@ -129,39 +129,39 @@ class EntraGroupSetCommand extends GraphCommand {
         if (args.options.ownerIds) {
           const isValidGUIDArrayResult = validation.isValidGuidArray(args.options.ownerIds);
           if (isValidGUIDArrayResult !== true) {
-            return `The following GUIDs are invalid for the option 'ownerIds': ${isValidGUIDArrayResult}.`;
+            return `The following GUIDs are invalid for option 'ownerIds': ${isValidGUIDArrayResult}.`;
           }
         }
 
         if (args.options.ownerUserNames) {
           const isValidUPNArrayResult = validation.isValidUserPrincipalNameArray(args.options.ownerUserNames);
           if (isValidUPNArrayResult !== true) {
-            return `The following user principal names are invalid for the option 'ownerUserNames': ${isValidUPNArrayResult}.`;
+            return `The following user principal names are invalid for option 'ownerUserNames': ${isValidUPNArrayResult}.`;
           }
         }
 
         if (args.options.memberIds) {
           const isValidGUIDArrayResult = validation.isValidGuidArray(args.options.memberIds);
           if (isValidGUIDArrayResult !== true) {
-            return `The following GUIDs are invalid for the option 'memberIds': ${isValidGUIDArrayResult}.`;
+            return `The following GUIDs are invalid for option 'memberIds': ${isValidGUIDArrayResult}.`;
           }
         }
 
         if (args.options.memberUserNames) {
           const isValidUPNArrayResult = validation.isValidUserPrincipalNameArray(args.options.memberUserNames);
           if (isValidUPNArrayResult !== true) {
-            return `The following user principal names are invalid for the option 'memberUserNames': ${isValidUPNArrayResult}.`;
+            return `The following user principal names are invalid for option 'memberUserNames': ${isValidUPNArrayResult}.`;
           }
         }
 
-        if (args.options.visibility && this.allowedVisibility.indexOf(args.options.visibility) === -1) {
-          return `Option 'visibility' must be one of the following values: Public, Private.`;
+        if (args.options.visibility && !this.allowedVisibility.includes(args.options.visibility)) {
+          return `Option 'visibility' must be one of the following values: ${this.allowedVisibility.join(', ')}.`;
         }
 
         if (args.options.newDisplayName === undefined && args.options.description === undefined && args.options.visibility === undefined
           && args.options.ownerIds === undefined && args.options.ownerUserNames === undefined && args.options.memberIds === undefined
-          && args.options.memberUserNames === undefined) {
-          return `Specify at least one of the following options: 'newDisplayName', 'description', 'visibility', 'ownerIds', 'ownerUserNames', 'memberIds', 'memberUserNames'`;
+          && args.options.memberUserNames === undefined && args.options.mailNickname === undefined) {
+          return `Specify at least one of the following options: 'newDisplayName', 'description', 'visibility', 'ownerIds', 'ownerUserNames', 'memberIds', 'memberUserNames', 'mailNickname'.`;
         }
 
         return true;
@@ -171,12 +171,16 @@ class EntraGroupSetCommand extends GraphCommand {
 
   #initOptionSets(): void {
     this.optionSets.push(
-      { options: ['id', 'displayName'] }
+      { options: ['id', 'displayName'] },
+      {
+        options: ['ownerIds', 'ownerUserNames', 'memberIds', 'memberUserNames'],
+        runsWhen: (args) => args.options.ownerIds || args.options.ownerUserNames || args.options.memberIds || args.options.memberUserNames
+      }
     );
   }
 
   #initTypes(): void {
-    this.types.string.push('displayName', 'newDisplayName', 'description', 'mailNickname', 'ownerIds', 'ownerUserNames', 'memberIds', 'memberUserNames', 'visibility');
+    this.types.string.push('id', 'displayName', 'newDisplayName', 'description', 'mailNickname', 'ownerIds', 'ownerUserNames', 'memberIds', 'memberUserNames', 'visibility');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -228,7 +232,7 @@ class EntraGroupSetCommand extends GraphCommand {
   private createRequestBody(options: Options): any {
     const requestBody: any = {
       displayName: options.newDisplayName,
-      description: options.description,
+      description: options.description === '' ? null : options.description,
       mailNickName: options.mailNickname,
       visibility: options.visibility
     };
@@ -243,16 +247,19 @@ class EntraGroupSetCommand extends GraphCommand {
     }
 
     if (userNames) {
+      if (this.verbose) {
+        await logger.logToStderr(`Retrieving users ids...`);
+      }
       return entraUser.getUserIdsByUpns(formatting.splitAndTrim(userNames));
     }
 
     return [];
   }
 
-  private async updateUsers(groupId: string, role: string, userIds: string[]): Promise<void> {
+  private async updateUsers(groupId: string, role: 'members' | 'owners', userIds: string[]): Promise<void> {
     const groupUsers = await odata.getAllItems<User>(`${this.resource}/v1.0/groups/${groupId}/${role}/microsoft.graph.user?$select=id`);
-    const userIdsToAdd = userIds.filter(userId => groupUsers.findIndex(groupUser => groupUser.id === userId) === -1);
-    const userIdsToRemove = groupUsers.filter(groupUser => userIds.findIndex(userId => groupUser.id === userId) === -1);
+    const userIdsToAdd = userIds.filter(userId => !groupUsers.some(groupUser => groupUser.id === userId));
+    const userIdsToRemove = groupUsers.filter(groupUser => !userIds.some(userId => groupUser.id === userId));
 
     for (let i = 0; i < userIdsToAdd.length; i += 400) {
       const userIdsBatch = userIdsToAdd.slice(i, i + 400);
@@ -289,9 +296,9 @@ class EntraGroupSetCommand extends GraphCommand {
 
       userIdsBatch.map(userId => {
         requestOptions.data.requests.push({
-          id: userId,
+          id: userId.id,
           method: 'DELETE',
-          url: `/groups/${groupId}/${role}/${userId}/$ref`
+          url: `/groups/${groupId}/${role}/${userId.id}/$ref`
         });
       });
 

@@ -65,6 +65,12 @@ describe(commands.GROUP_SET, () => {
     mailNickName: 'Microsoft365Group',
     visibility: 'Public'
   };
+  const updateGroupWithEmptyDescriptionRequest = {
+    displayName: '365 group',
+    description: null,
+    mailNickName: 'Microsoft365Group',
+    visibility: 'Public'
+  };
 
   let log: string[];
   let logger: Logger;
@@ -92,6 +98,7 @@ describe(commands.GROUP_SET, () => {
         log.push(msg);
       }
     };
+    sinon.stub(entraGroup, 'getGroupIdByDisplayName').withArgs('Microsoft 365 Group').resolves(groupId);
   });
 
   afterEach(() => {
@@ -175,16 +182,16 @@ describe(commands.GROUP_SET, () => {
   });
 
   it('passes validation when all required parameters are valid with ids', async () => {
-    const actual = await command.validate({ options: { displayName: 'Cli group', ownerIds: userIds.join(','), memberIds: userIds.join(',') } }, commandInfo);
+    const actual = await command.validate({ options: { displayName: 'Cli group', ownerIds: userIds.join(',') } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('passes validation when all required parameters are valid with user names', async () => {
-    const actual = await command.validate({ options: { displayName: 'Cli group', ownerUserNames: userUpns.join(','), memberUserNames: userUpns.join(',') } }, commandInfo);
+    const actual = await command.validate({ options: { displayName: 'Cli group', memberUserNames: userUpns.join(',') } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation if no options to be updated is specified', async () => {
+  it('fails validation if no options to be updated are specified', async () => {
     const actual = await command.validate({ options: { id: groupId } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
@@ -199,12 +206,11 @@ describe(commands.GROUP_SET, () => {
 
   it('successfully updates group specified by displayName', async () => {
     sinon.stub(request, 'get').resolves({ value: []});
-    sinon.stub(entraGroup, 'getGroupIdByDisplayName').withArgs('Microsoft 365 Group').resolves(groupId);
 
     const patchRequestStub = sinon.stub(request, 'patch').resolves();
 
-    await command.action(logger, { options: { displayName: 'Microsoft 365 Group', description: 'Microsoft 365 group', mailNickname: 'Microsoft365Group', visibility: 'Public', newDisplayName: '365 group' } });
-    assert.deepStrictEqual(patchRequestStub.lastCall.args[0].data, updateGroupRequest);
+    await command.action(logger, { options: { displayName: 'Microsoft 365 Group', description: '', mailNickname: 'Microsoft365Group', visibility: 'Public', newDisplayName: '365 group' } });
+    assert.deepStrictEqual(patchRequestStub.lastCall.args[0].data, updateGroupWithEmptyDescriptionRequest);
   });
 
   it('successfully updates group with owners specified by ids and removes current owners', async () => {
@@ -244,7 +250,6 @@ describe(commands.GROUP_SET, () => {
   it('successfully updates group with members specified by user names and removes current members', async () => {
     sinon.stub(request, 'get').resolves({ value: [{ id: '717f1683-00fa-488c-b68d-5d0051f6bcfa' }] });
     sinon.stub(entraUser, 'getUserIdsByUpns').withArgs(userUpns).resolves(userIds);
-    sinon.stub(entraGroup, 'getGroupIdByDisplayName').withArgs('Microsoft 365 Group').resolves(groupId);
     sinon.stub(request, 'patch').resolves();
 
     const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
@@ -278,7 +283,6 @@ describe(commands.GROUP_SET, () => {
   });
 
   it('handles API error when adding users to a group', async () => {
-    sinon.stub(entraGroup, 'getGroupIdByDisplayName').withArgs('Microsoft 365 Group').resolves(groupId);
     sinon.stub(request, 'get').resolves({ value: [] });
     sinon.stub(request, 'patch').resolves();
     sinon.stub(request, 'post').callsFake(async opts => {
@@ -312,7 +316,6 @@ describe(commands.GROUP_SET, () => {
   });
 
   it('handles API error when removing users from a group', async () => {
-    sinon.stub(entraGroup, 'getGroupIdByDisplayName').withArgs('Microsoft 365 Group').resolves(groupId);
     sinon.stub(request, 'get').resolves({ value: [{ id: '717f1683-00fa-488c-b68d-5d0051f6bcfa' }] });
     sinon.stub(request, 'patch').resolves();
     sinon.stub(request, 'post').callsFake(async opts => {
