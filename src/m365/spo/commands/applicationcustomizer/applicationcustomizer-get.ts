@@ -114,7 +114,6 @@ class SpoApplicationCustomizerGetCommand extends SpoCommand {
       if (!args.options.clientSideComponentProperties) {
         await logger.log({
           ...customAction,
-          Rights: JSON.stringify(customAction.Rights),
           Scope: this.humanizeScope(customAction.Scope)
         });
       }
