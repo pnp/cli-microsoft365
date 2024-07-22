@@ -3852,6 +3852,19 @@ const sidebars: SidebarsConfig = {
       ]
     },
     {
+      'SharePoint Premium (spp)': [
+        {
+          model: [
+            {
+              type: 'doc',
+              label: 'model list',
+              id: 'cmd/spp/model/model-list'
+            }
+          ]
+        }
+      ]
+    },
+    {
       'Teams (teams)': [
         {
           app: [
