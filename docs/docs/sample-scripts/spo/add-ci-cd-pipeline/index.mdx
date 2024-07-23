@@ -11,11 +11,11 @@ import TabItem from '@theme/TabItem';
 
 # Add CI/CD Pipeline for your SharePoint Framework project
 
-Having a flow that builds and ships your project on push to your repository main branch is a great practice that allows you to share your latest changes with your team, testers or customers. 
+Having a flow that builds and ships your project on push to your repository's main branch is a great practice that allows you to share your latest changes with your team, testers or customers. 
 This may save you a lot of time and effort, as you don't need to manually build and deploy your project every time you make a change.
 This script will help you to create a CI/CD pipeline for your SharePoint Framework project. 
-Depending on what parameters you pass, the script will create either a new GitHub Actions workflow or Azure DevOps pipeline.
-If you choose to create application login method (which is default and recommended), the script will also create an app registration in your tenant and generate a self-signed certificate that will be used to authenticate the app.
+Depending on what parameters you pass, the script will create either a new GitHub Actions workflow or an Azure DevOps pipeline.
+If you choose to create an application login method (which is default and recommended), the script will also create an app registration in your tenant and generate a self-signed certificate that will be used to authenticate the app.
 
 This script will NOT setup the pipeline for you. It will only generate the YAML file that you will need to commit to your repository and create a new pipeline or workflow based on it.
 
@@ -52,7 +52,7 @@ Creates a GitHub Actions workflow using user login method. Allows the flow to be
 .\script.ps1 -PathToSpfxProject "C:\myCoolProjects\spfxDemo" -LoginMethod "user" -ManuallyTrigger $true -Scope "sitecollection" -SiteUrl "https://tenanttocheck.sharepoint.com/sites/CLIDemo1/appcatalog"
 ```
 
-Creates an Azure DevOps pipeline using application login method and creates an app registration in your tenant along with self-signed certificate. 
+Creates an Azure DevOps pipeline using application login method and creates an app registration in your tenant along with a self-signed certificate. 
 
 ``` powershell
 .\script.ps1 -PathToSpfxProject "C:\myCoolProjects\spfxDemo" -DevOpsEnvironment "azuredevops"
@@ -72,7 +72,7 @@ Creates an Azure DevOps pipeline using user login method. The solution will be d
 
 ## Additional guidance
 
-The script does not create the GitHub Actions workflow or Azure DevOps pipeline for you. It only generates the YAML file that you will need to commit to your repository and create a new pipeline or workflow based on it. Please check the below steps with additional guidance how to set it up for first time.
+The script does not create the GitHub Actions workflow or Azure DevOps pipeline for you. It only generates the YAML file that you will need to commit to your repository and create a new pipeline or workflow based on it. Please check the below steps with additional guidance on how to set it up for the first time.
 
 ### GitHub Actions
 
@@ -97,18 +97,18 @@ In order to add a secret to your repository, navigate to 'Settings' -> 'Security
 
 Creating a new pipeline in Azure DevOps is a one-time operation and then every time you update the YAML definition Azure DevOps will automatically pick up the changes. 
 In order to create a new pipeline go pipelines page in your Azure DevOps project.
-Next in the top right corner of the page hit on the New pipline button. 
-After that follow the for by selecting the location of your repo, next the branch on which the YAML file is present and then select the option to create a new pipeline based on Existing Azure Pipelines YAML file.
-After that just confirm the create process and your ready to go!
+Next in the top right corner of the page hit the new pipeline button. 
+After that follow the for by selecting the location of your repo, next the branch on which the YAML file is present and then select the option to create a new pipeline based on the existing Azure Pipelines YAML file.
+After that just confirm the creation process and you're ready to go!
 
-As best practice you should add a new library group to use in your pipeline with the following variables:
+As best practice, you should add a new library group to use in your pipeline with the following variables:
 
-For the user login method you will need to fill the following variables:
+For the user login method you will need to fill in the following variables:
 
 - `UserName` - user email
 - `Password` - password
 
-For the application login method you will need to fill the following variables:
+For the application login method you will need to fill in the following variables:
 
 - `CertificateBase64Encoded` - base 64 encoded certificate. Use either CertificateBase64Encoded or CertificateSecureFileId but not both
 - `CertificateSecureFileId` - id of a certificate file in the secure files section of the DevOps library. .pfx file. Use either CertificateBase64Encoded or CertificateSecureFileId but not both
@@ -147,7 +147,7 @@ For the application login method you will need to fill the following variables:
     [ValidateSet("tenant", "sitecollection")]
     [string]$Scope = "tenant",
 
-    [Parameter(Mandatory = $false, HelpMessage = "siteUrl (applies onlu to 'sitecollection' scope)")]
+    [Parameter(Mandatory = $false, HelpMessage = "siteUrl (applies only to 'sitecollection' scope)")]
     [string]$SiteUrl,
 
     [Parameter(Mandatory = $false, HelpMessage = "Should add the app to all subsites or tenant")]
@@ -164,7 +164,7 @@ For the application login method you will need to fill the following variables:
   $currentLocation = Get-Location
   Set-Location $PathToSpfxProject
   if (-not (Test-Path -Path ".yo-rc.json")) {
-    Write-Error "The script needs to be executed in the context of SPFx project. Please provide correct path to the SPFx project"
+    Write-Error "The script needs to be executed in the context of the SPFx project. Please provide the correct path to the SPFx project"
     Exit
   }
 
@@ -255,7 +255,7 @@ For the application login method you will need to fill the following variables:
     # show azure devops guidance
     Write-Host "Your new '.azuredevops/pipelines/deploy-spfx-solution.yml' is ready. Now you will need to commit it to your repository and create a new pipeline based on it." 
 
-    Write-Host "In order to create a new pipeline, you will need to navigate to your Azure DevOps pipelines -> New piepline -> pick the repository -> Existing Azure Pipelines YAML file -> select the 'deploy-spfx-solution.yml' file -> Run."
+    Write-Host "In order to create a new pipeline, you will need to navigate to your Azure DevOps pipelines -> New pipeline -> pick the repository -> Existing Azure Pipelines YAML file -> select the 'deploy-spfx-solution.yml' file -> Run."
     Write-Host "As best practice you should add a new library group with the following variables"
     Write-Host "Got to Pipelines -> Library -> Add variable group -> Add the following variables:" 
     Write-Host "SharePointBaseUrl: SharePoint host url"
