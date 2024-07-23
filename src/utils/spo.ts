@@ -1834,7 +1834,7 @@ export const spo = {
   */
   async getFileById(webUrl: string, id: string, logger?: Logger, verbose?: boolean): Promise<FileProperties> {
     if (verbose && logger) {
-      logger.logToStderr(`Retrieving the file with id ${id}`);
+      await logger.logToStderr(`Retrieving the file with id ${id}`);
     }
     const requestUrl = `${webUrl}/_api/web/GetFileById('${formatting.encodeQueryParameter(id)}')`;
 
