@@ -157,6 +157,10 @@ describe(commands.CONTENTTYPE_FIELD_LIST, () => {
     assert.notStrictEqual(command.description, null);
   });
 
+  it('defines correct properties for the default output', () => {
+    assert.deepStrictEqual(command.defaultProperties(), ['Id', 'Title', 'InternalName', 'Hidden']);
+  });
+
   it('fails validation if webUrl is not a valid SharePoint URL', async () => {
     const actual = await command.validate({ options: { webUrl: 'invalid', contentTypeId: contentTypeId } }, commandInfo);
     assert.notStrictEqual(actual, true);
