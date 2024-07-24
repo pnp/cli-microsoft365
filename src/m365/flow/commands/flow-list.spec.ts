@@ -312,23 +312,23 @@ describe(commands.LIST, () => {
     });
 
     await command.action(logger, { options: { environmentName: environmentName, sharingStatus: 'ownedByMe' } });
-    assert(loggerLogSpy.calledWith(flowResponse.value));
+    assert(loggerLogSpy.calledOnceWithExactly(flowResponse.value));
   });
 
   it('retrieves available Flows when specifying sharingStatus all', async () => {
-    const getStub = sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://api.flow.microsoft.com/providers/Microsoft.ProcessSimple/environments/${environmentName}/flows?api-version=2016-11-01&$filter=search('team')`) {
-        return flowResponse;
-      }
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://api.flow.microsoft.com/providers/Microsoft.ProcessSimple/environments/${environmentName}/flows?api-version=2016-11-01&$filter=search('personal')`) {
-        return flowResponse;
+        return { value: [flowResponse.value[0]] };
+      }
+      if (opts.url === `https://api.flow.microsoft.com/providers/Microsoft.ProcessSimple/environments/${environmentName}/flows?api-version=2016-11-01&$filter=search('team')`) {
+        return { value: [flowResponse.value[1]] };
       }
 
       throw 'Invalid request';
     });
 
     await command.action(logger, { options: { environmentName: environmentName, sharingStatus: 'all' } });
-    assert(getStub.calledTwice);
+    assert(loggerLogSpy.calledOnceWithExactly(flowResponse.value));
   });
 
   it('retrieves available Flows when specifying sharingStatus personal', async () => {
@@ -341,7 +341,7 @@ describe(commands.LIST, () => {
     });
 
     await command.action(logger, { options: { environmentName: environmentName, sharingStatus: 'personal' } });
-    assert(loggerLogSpy.calledWith(flowResponse.value));
+    assert(loggerLogSpy.calledOnceWithExactly(flowResponse.value));
   });
 
   it('retrieves available Flows when specifying sharingStatus sharedWithMe', async () => {
@@ -354,7 +354,7 @@ describe(commands.LIST, () => {
     });
 
     await command.action(logger, { options: { environmentName: environmentName, sharingStatus: 'sharedWithMe' } });
-    assert(loggerLogSpy.calledWith(flowResponse.value));
+    assert(loggerLogSpy.calledOnceWithExactly(flowResponse.value));
   });
 
   it('retrieves available Flows as admin', async () => {
@@ -420,7 +420,7 @@ describe(commands.LIST, () => {
 
     await command.action(logger, { options: { environmentName: environmentName, includeSolutions: true } } as any);
 
-    loggerLogSpy.calledWith([
+    assert(loggerLogSpy.calledOnceWithExactly([
       {
         name: "1c6ee23a-a835-44bc-a4f5-462b658efc13",
         id: "/providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c5/flows/1c6ee23a-a835-44bc-a4f5-462b658efc13",
@@ -429,7 +429,7 @@ describe(commands.LIST, () => {
           "displayName": "Get a daily digest of the top CNN news"
         }
       }
-    ]);
+    ]));
   });
 
   it('retrieves flows and removes duplicates', async () => {
@@ -461,7 +461,7 @@ describe(commands.LIST, () => {
     });
 
     await command.action(logger, { options: { environmentName: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c5' } } as any);
-    loggerLogSpy.calledWith([
+    assert(loggerLogSpy.calledWith([
       {
         name: "1c6ee23a-a835-44bc-a4f5-462b658efc13",
         id: "/providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c5/flows/1c6ee23a-a835-44bc-a4f5-462b658efc13",
@@ -470,7 +470,7 @@ describe(commands.LIST, () => {
           "displayName": "Get a daily digest of the top CNN news"
         }
       }
-    ]);
+    ]));
   });
 
   it('correctly transforms output for non-JSON output', async () => {
