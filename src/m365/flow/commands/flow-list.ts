@@ -126,7 +126,7 @@ class FlowListCommand extends PowerAutomateCommand {
         items = await odata.getAllItems<PowerAutomateFlow>(url);
 
         url = this.getApiUrl(environmentName, asAdmin, includeSolutions, 'team');
-        items = await odata.getAllItems<PowerAutomateFlow>(url);
+        items = items.concat(await odata.getAllItems<PowerAutomateFlow>(url));
       }
       else {
         const url = this.getApiUrl(environmentName, asAdmin, includeSolutions);
