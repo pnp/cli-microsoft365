@@ -22,40 +22,40 @@ m365 entra sp get [options]
 ## Options
 
 ```md definition-list
-`-i, --appId [appId]`
-: ID of the application for which the enterprise application should be retrieved
+`-i, --id [id]`
+: ID of the application for which the enterprise application should be retrieved.
 
-`-n, --appDisplayName [appDisplayName]`
-: Display name of the application for which the enterprise application should be retrieved
+`-n, --displayName [displayName]`
+: Display name of the application for which the enterprise application should be retrieved.
 
-`--appObjectId [appObjectId]`
-: ObjectId of the application for which the enterprise application should be retrieved
+`--objectId [objectId]`
+: ObjectId of the application for which the enterprise application should be retrieved.
 ```
 
 <Global />
 
 ## Remarks
 
-Specify either the `appId`, `appObjectId` or `appDisplayName`. If you specify more than one option value, the command will fail with an error.
+Specify either the `id`, `objectId` or `displayName`. If you specify more than one option value, the command will fail with an error.
 
 ## Examples
 
-Return details about the enterprise application with appId _b2307a39-e878-458b-bc90-03bc578531d6_.
+Return details about the enterprise application with the specified id.
 
 ```sh
-m365 entra enterpriseapp get --appId b2307a39-e878-458b-bc90-03bc578531d6
+m365 entra enterpriseapp get --id b2307a39-e878-458b-bc90-03bc578531d6
 ```
 
-Return details about the _Microsoft Graph_ enterprise application.
+Return details about the enterprise application with the specified displayName.
 
 ```sh
-m365 entra enterpriseapp get --appDisplayName "Microsoft Graph"
+m365 entra enterpriseapp get --displayName "Microsoft Graph"
 ```
 
-Return details about the enterprise application with ObjectId _b2307a39-e878-458b-bc90-03bc578531dd_.
+Return details about the enterprise application with the specified ObjectId.
 
 ```sh
-m365 entra enterpriseapp get --appObjectId b2307a39-e878-458b-bc90-03bc578531dd
+m365 entra enterpriseapp get --objectId b2307a39-e878-458b-bc90-03bc578531dd
 ```
 
 ## Response
@@ -69,7 +69,7 @@ m365 entra enterpriseapp get --appObjectId b2307a39-e878-458b-bc90-03bc578531dd
     "deletedDateTime": null,
     "accountEnabled": true,
     "alternativeNames": [],
-    "appDisplayName": "LinkedIn",
+    "displayName": "LinkedIn",
     "appDescription": null,
     "appId": "ac7c9b4b-83b0-4a5e-ace2-a3530162c8f8",
     "applicationTemplateId": null,
@@ -152,7 +152,7 @@ m365 entra enterpriseapp get --appObjectId b2307a39-e878-458b-bc90-03bc578531dd
   addIns                                : []
   alternativeNames                      : []
   appDescription                        : null
-  appDisplayName                        : LinkedIn
+  displayName                        : LinkedIn
   appId                                 : ac7c9b4b-83b0-4a5e-ace2-a3530162c8f8
   appOwnerOrganizationId                : c2b2a0f7-fa44-4929-a994-757b7b998f01
   appRoleAssignmentRequired             : true
@@ -190,7 +190,7 @@ m365 entra enterpriseapp get --appObjectId b2307a39-e878-458b-bc90-03bc578531dd
   <TabItem value="CSV">
 
   ```csv
-  id,accountEnabled,appDisplayName,appId,appOwnerOrganizationId,appRoleAssignmentRequired,createdDateTime,displayName,homepage,servicePrincipalType,signInAudience
+  id,accountEnabled,displayName,appId,appOwnerOrganizationId,appRoleAssignmentRequired,createdDateTime,displayName,homepage,servicePrincipalType,signInAudience
   b62fe6f3-5746-49be-af60-eaa24d66754a,1,LinkedIn,ac7c9b4b-83b0-4a5e-ace2-a3530162c8f8,c2b2a0f7-fa44-4929-a994-757b7b998f01,1,2022-12-12T15:41:42Z,LinkedIn,https://account.activedirectory.windowsazure.com:444/applications/default.aspx?metadata=linkedin|ISV9.3|primary|z,Application,AzureADMyOrg
   ```
 
@@ -198,7 +198,7 @@ m365 entra enterpriseapp get --appObjectId b2307a39-e878-458b-bc90-03bc578531dd
   <TabItem value="Markdown">
 
   ```md
-  # entra enterpriseapp get --appId "ac7c9b4b-83b0-4a5e-ace2-a3530162c8f8"
+  # entra enterpriseapp get --id "ac7c9b4b-83b0-4a5e-ace2-a3530162c8f8"
 
   Date: 2023-06-02
 
@@ -208,7 +208,7 @@ m365 entra enterpriseapp get --appObjectId b2307a39-e878-458b-bc90-03bc578531dd
   ---------|-------
   id | b62fe6f3-5746-49be-af60-eaa24d66754a
   accountEnabled | true
-  appDisplayName | LinkedIn
+  displayName | LinkedIn
   appId | ac7c9b4b-83b0-4a5e-ace2-a3530162c8f8
   appOwnerOrganizationId | c2b2a0f7-fa44-4929-a994-757b7b998f01
   appRoleAssignmentRequired | true
