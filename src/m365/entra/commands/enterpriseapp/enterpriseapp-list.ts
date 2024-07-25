@@ -50,7 +50,7 @@ class EntraEnterpriseAppListCommand extends GraphCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '--displayName [displayName]'
+        option: '-n, --displayName [displayName]'
       },
       {
         option: '--tag [tag]'
