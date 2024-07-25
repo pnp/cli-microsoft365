@@ -79,7 +79,7 @@ describe(commands.ENTERPRISEAPP_ADD, () => {
     assert.deepStrictEqual(alias, [aadCommands.SP_ADD, commands.SP_ADD]);
   });
 
-  it('fails validation if neither the appId, appName, nor objectId option specified', async () => {
+  it('fails validation if neither the id, displayName, nor objectId option specified', async () => {
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
       if (settingName === settingsNames.prompt) {
         return false;
@@ -92,8 +92,8 @@ describe(commands.ENTERPRISEAPP_ADD, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if the appId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { appId: '123' } }, commandInfo);
+  it('fails validation if the id is not a valid GUID', async () => {
+    const actual = await command.validate({ options: { id: '123' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
@@ -102,7 +102,7 @@ describe(commands.ENTERPRISEAPP_ADD, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if both appId and appName are specified', async () => {
+  it('fails validation if both id and displayName are specified', async () => {
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
       if (settingName === settingsNames.prompt) {
         return false;
@@ -111,11 +111,11 @@ describe(commands.ENTERPRISEAPP_ADD, () => {
       return defaultValue;
     });
 
-    const actual = await command.validate({ options: { appId: '00000000-0000-0000-0000-000000000000', appName: 'abc' } }, commandInfo);
+    const actual = await command.validate({ options: { id: '00000000-0000-0000-0000-000000000000', displayName: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if both appName and objectId are specified', async () => {
+  it('fails validation if both displayName and objectId are specified', async () => {
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
       if (settingName === settingsNames.prompt) {
         return false;
@@ -124,11 +124,11 @@ describe(commands.ENTERPRISEAPP_ADD, () => {
       return defaultValue;
     });
 
-    const actual = await command.validate({ options: { appName: 'abc', objectId: '123' } }, commandInfo);
+    const actual = await command.validate({ options: { displayName: 'abc', objectId: '123' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if both appId and objectId are specified', async () => {
+  it('fails validation if both id and objectId are specified', async () => {
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
       if (settingName === settingsNames.prompt) {
         return false;
@@ -137,17 +137,17 @@ describe(commands.ENTERPRISEAPP_ADD, () => {
       return defaultValue;
     });
 
-    const actual = await command.validate({ options: { appId: '00000000-0000-0000-0000-000000000000', objectId: '00000000-0000-0000-0000-000000000000' } }, commandInfo);
+    const actual = await command.validate({ options: { id: '00000000-0000-0000-0000-000000000000', objectId: '00000000-0000-0000-0000-000000000000' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation when the appId option specified', async () => {
-    const actual = await command.validate({ options: { appId: '00000000-0000-0000-0000-000000000000' } }, commandInfo);
+  it('passes validation when the id option specified', async () => {
+    const actual = await command.validate({ options: { id: '00000000-0000-0000-0000-000000000000' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when the appName option specified', async () => {
-    const actual = await command.validate({ options: { appName: 'abc' } }, commandInfo);
+  it('passes validation when the displayName option specified', async () => {
+    const actual = await command.validate({ options: { displayName: 'abc' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
@@ -156,22 +156,22 @@ describe(commands.ENTERPRISEAPP_ADD, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('supports specifying appId', () => {
+  it('supports specifying id', () => {
     const options = command.options;
     let containsOption = false;
     options.forEach(o => {
-      if (o.option.indexOf('--appId') > -1) {
+      if (o.option.indexOf('--id') > -1) {
         containsOption = true;
       }
     });
     assert(containsOption);
   });
 
-  it('supports specifying appName', () => {
+  it('supports specifying displayName', () => {
     const options = command.options;
     let containsOption = false;
     options.forEach(o => {
-      if (o.option.indexOf('--appName') > -1) {
+      if (o.option.indexOf('--displayName') > -1) {
         containsOption = true;
       }
     });
@@ -190,7 +190,7 @@ describe(commands.ENTERPRISEAPP_ADD, () => {
   });
 
   it('correctly handles API OData error', async () => {
-    sinon.stub(request, 'get').rejects({
+    sinon.stub(request, 'post').rejects({
       error: {
         'odata.error': {
           code: '-1, InvalidOperationException',
@@ -201,7 +201,7 @@ describe(commands.ENTERPRISEAPP_ADD, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6' } } as any),
+    await assert.rejects(command.action(logger, { options: { id: '65415bb1-9267-4313-bbf5-ae259732ee12' } } as any),
       new CommandError('An error has occurred'));
   });
 
@@ -260,7 +260,7 @@ describe(commands.ENTERPRISEAPP_ADD, () => {
     await assert.rejects(command.action(logger, {
       options: {
         debug: true,
-        appName: 'Test App'
+        displayName: 'Test App'
       }
     }), new CommandError("Multiple Entra apps with name 'Test App' found. Found: ee091f63-9e48-4697-8462-7cfbf7410b8e, e9fd0957-049f-40d0-8d1d-112320fb1cbd."));
   });
@@ -309,7 +309,7 @@ describe(commands.ENTERPRISEAPP_ADD, () => {
     await command.action(logger, {
       options: {
         debug: true,
-        appName: 'Test App'
+        displayName: 'Test App'
       }
     });
     assert(loggerLogSpy.calledWith({
@@ -319,7 +319,7 @@ describe(commands.ENTERPRISEAPP_ADD, () => {
     }));
   });
 
-  it('creates an enterprise application for a registered Entra app by appId', async () => {
+  it('creates an enterprise application for a registered Entra app by id', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/servicePrincipals`) {
         return {
@@ -333,7 +333,7 @@ describe(commands.ENTERPRISEAPP_ADD, () => {
 
     await command.action(logger, {
       options: {
-        appId: '65415bb1-9267-4313-bbf5-ae259732ee12'
+        id: '65415bb1-9267-4313-bbf5-ae259732ee12'
       }
     });
     assert(loggerLogSpy.calledWith({
@@ -343,7 +343,7 @@ describe(commands.ENTERPRISEAPP_ADD, () => {
     }));
   });
 
-  it('creates an enterprise application for a registered Entra app by appName', async () => {
+  it('creates an enterprise application for a registered Entra app by displayName', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/v1.0/applications?$filter=displayName eq `) > -1) {
         return {
@@ -375,7 +375,7 @@ describe(commands.ENTERPRISEAPP_ADD, () => {
     await command.action(logger, {
       options: {
         debug: true,
-        appName: 'foo'
+        displayName: 'foo'
       }
     });
     assert(loggerLogSpy.calledWith({
