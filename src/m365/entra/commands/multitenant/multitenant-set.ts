@@ -3,17 +3,10 @@ import { Logger } from '../../../../cli/Logger.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
+import { MultitenantOrganization } from './MultitenantOrganization.js';
 
 interface CommandArgs {
   options: Options;
-}
-
-interface MultitenantOrganization {
-  createdDateTime?: string;
-  displayName?: string;
-  description?: string;
-  id?: string;
-  state?: string;
 }
 
 interface Options extends GlobalOptions {
@@ -36,6 +29,7 @@ class EntraMultitenantSetCommand extends GraphCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initTypes();
   }
 
   #initTelemetry(): void {
@@ -70,6 +64,10 @@ class EntraMultitenantSetCommand extends GraphCommand {
     );
   }
 
+  #initTypes(): void {
+    this.types.string.push('displayName', 'description');
+  }
+
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
 
     const requestOptions: CliRequestOptions = {
@@ -85,6 +83,9 @@ class EntraMultitenantSetCommand extends GraphCommand {
     };
 
     try {
+      if (this.verbose) {
+        await logger.logToStderr('Updating multitenant organization...');
+      }
       await request.patch<MultitenantOrganization>(requestOptions);
     }
     catch (err: any) {

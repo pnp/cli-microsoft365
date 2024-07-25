@@ -104,7 +104,7 @@ describe(commands.MULTITENANT_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { description: 'Contoso and partners' } });
+    await command.action(logger, { options: { description: 'Contoso and partners', verbose: true } });
     assert(patchRequestStub.called);
   });
 
