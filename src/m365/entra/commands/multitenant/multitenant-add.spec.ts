@@ -89,7 +89,7 @@ describe(commands.MULTITENANT_ADD, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('creates a multitenant organization with a display name only', async () => {
+  it('creates a multitenant organization with a displayName only', async () => {
     sinon.stub(request, 'put').callsFake(async (opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/tenantRelationships/multiTenantOrganization') {
         return multitenantOrganizationShortReponse;
@@ -98,11 +98,11 @@ describe(commands.MULTITENANT_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { displayName: 'Contoso organization' } });
+    await command.action(logger, { options: { displayName: 'Contoso organization', verbose: true } });
     assert(loggerLogSpy.calledOnceWithExactly(multitenantOrganizationShortReponse));
   });
 
-  it('creates a multitenant organization with display name and description', async () => {
+  it('creates a multitenant organization with displayName and description', async () => {
     sinon.stub(request, 'put').callsFake(async (opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/tenantRelationships/multiTenantOrganization') {
         return multitenantOrganizationReponse;
