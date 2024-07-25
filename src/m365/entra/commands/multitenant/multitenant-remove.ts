@@ -71,7 +71,7 @@ class EntraMultitenantRemoveCommand extends GraphCommand {
 
           do {
             if (this.verbose) {
-              logger.logToStderr(`Waiting 30 seconds...`);
+              await logger.logToStderr(`Waiting 30 seconds...`);
             }
 
             await new Promise(resolve => setTimeout(resolve, 30000));
@@ -79,13 +79,13 @@ class EntraMultitenantRemoveCommand extends GraphCommand {
             // from current behavior, removing tenant can take a few seconds
             // current tenant must be removed once all previous one were removed
             if (this.verbose) {
-              logger.logToStderr(`Checking all tenants were removed...`);
+              await logger.logToStderr(`Checking all tenants were removed...`);
             }
 
             tenantsId = await this.getAllTenantsIds();
 
             if (this.verbose) {
-              logger.logToStderr(`Number of removed tenants: ${tenantsCount - tenantsId.length}`);
+              await logger.logToStderr(`Number of removed tenants: ${tenantsCount - tenantsId.length}`);
             }
           }
           while (tenantsId.length !== 1);
@@ -138,7 +138,7 @@ class EntraMultitenantRemoveCommand extends GraphCommand {
 
   private async removeTenant(logger: Logger, tenantId: string): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Removing tenant: ${tenantId}`);
+      await logger.logToStderr(`Removing tenant: ${tenantId}`);
     }
     const requestOptions: CliRequestOptions = {
       url: `${this.resource}/v1.0/tenantRelationships/multiTenantOrganization/tenants/${tenantId}`,
