@@ -56,6 +56,11 @@ const sidebars: SidebarsConfig = {
       'CLI (cli)': [
         {
           type: 'doc',
+          label: 'app add',
+          id: 'cmd/cli/app/app-add'
+        },
+        {
+          type: 'doc',
           label: 'consent',
           id: 'cmd/cli/cli-consent'
         },

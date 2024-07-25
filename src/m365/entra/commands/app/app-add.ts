@@ -10,6 +10,7 @@ import GraphCommand from '../../../base/GraphCommand.js';
 import { M365RcJson } from '../../../base/M365RcJson.js';
 import commands from '../../commands.js';
 import aadCommands from '../../aadCommands.js';
+import { AppInfo, entraApp } from '../../../../utils/entraApp.js';
 
 interface ServicePrincipalInfo {
   appId: string;
@@ -27,18 +28,6 @@ interface RequiredResourceAccess {
 interface ResourceAccess {
   id: string;
   type: string;
-}
-
-interface AppInfo {
-  appId: string;
-  // objectId
-  id: string;
-  tenantId: string;
-  secrets?: {
-    displayName: string;
-    value: string;
-  }[];
-  requiredResourceAccess: RequiredResourceAccess[];
 }
 
 interface CommandArgs {
@@ -263,28 +252,33 @@ class EntraAppAddCommand extends GraphCommand {
 
     try {
       const apis = await this.resolveApis(args, logger);
-      let appInfo: any = await this.createAppRegistration(args, apis, logger);
+      let appInfo = await this.createAppRegistration(args, apis, logger);
       // based on the assumption that we're adding Microsoft Entra app to the current
       // directory. If we in the future extend the command with allowing
       // users to create Microsoft Entra app in a different directory, we'll need to
       // adjust this
-      appInfo.tenantId = accessToken.getTenantIdFromAccessToken(auth.connection.accessTokens[auth.defaultResource].accessToken);
       appInfo = await this.updateAppFromManifest(args, appInfo);
-      appInfo = await this.grantAdminConsent(appInfo, args.options.grantAdminConsent, logger);
-      appInfo = await this.configureUri(args, appInfo, logger);
-      appInfo = await this.configureSecret(args, appInfo, logger);
-      const _appInfo = await this.saveAppInfo(args, appInfo, logger);
+      const appInfoToUpdate = await this.configureUri(args, appInfo, logger);
+      if (Object.keys(appInfoToUpdate).length > 0) {
+        await entraApp.updateEntraApp(appInfo.id, appInfoToUpdate);
+      }
+      await this.grantAdminConsent(appInfo, args.options.grantAdminConsent, logger);
 
-      appInfo = {
-        appId: _appInfo.appId,
-        objectId: _appInfo.id,
-        tenantId: _appInfo.tenantId
+      appInfo.tenantId = accessToken.getTenantIdFromAccessToken(auth.connection.accessTokens[auth.defaultResource].accessToken);
+      appInfo = await this.configureSecret(args, appInfo, logger);
+
+      await this.saveAppInfo(args, appInfo, logger);
+
+      const appInfoResult: any = {
+        appId: appInfo.appId,
+        objectId: appInfo.id,
+        tenantId: appInfo.tenantId
       };
-      if (_appInfo.secrets) {
-        appInfo.secrets = _appInfo.secrets;
+      if (appInfo.secrets) {
+        appInfoResult.secrets = appInfo.secrets;
       }
 
-      await logger.log(appInfo);
+      await logger.log(appInfoResult);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
@@ -343,16 +337,7 @@ class EntraAppAddCommand extends GraphCommand {
       await logger.logToStderr(`Creating Microsoft Entra app registration...`);
     }
 
-    const createApplicationRequestOptions: CliRequestOptions = {
-      url: `${this.resource}/v1.0/myorganization/applications`,
-      headers: {
-        accept: 'application/json;odata.metadata=none'
-      },
-      responseType: 'json',
-      data: applicationInfo
-    };
-
-    return request.post<AppInfo>(createApplicationRequestOptions);
+    return await entraApp.createEntraApp(applicationInfo);
   }
 
   private async grantAdminConsent(appInfo: AppInfo, adminConsent: boolean | undefined, logger: Logger): Promise<AppInfo> {
@@ -360,7 +345,7 @@ class EntraAppAddCommand extends GraphCommand {
       return appInfo;
     }
 
-    const sp = await this.createServicePrincipal(appInfo.appId);
+    const sp = await entraApp.createServicePrincipal(appInfo.appId);
     if (this.debug) {
       await logger.logToStderr("Service principal created, returned object id: " + sp.id);
     }
@@ -369,7 +354,7 @@ class EntraAppAddCommand extends GraphCommand {
 
     this.appPermissions.forEach(async (permission) => {
       if (permission.scope.length > 0) {
-        tasks.push(this.grantOAuth2Permission(sp.id, permission.resourceId, permission.scope.join(' ')));
+        tasks.push(entraApp.grantOAuth2Permission(sp.id, permission.resourceId, permission.scope.join(' ')));
 
         if (this.debug) {
           await logger.logToStderr(`Admin consent granted for following resource ${permission.resourceId}, with delegated permissions: ${permission.scope.join(',')}`);
@@ -377,7 +362,7 @@ class EntraAppAddCommand extends GraphCommand {
       }
 
       permission.resourceAccess.filter(access => access.type === "Role").forEach(async (access: ResourceAccess) => {
-        tasks.push(this.addRoleToServicePrincipal(sp.id, permission.resourceId, access.id));
+        tasks.push(entraApp.addRoleToServicePrincipal(sp.id, permission.resourceId, access.id));
 
         if (this.debug) {
           await logger.logToStderr(`Admin consent granted for following resource ${permission.resourceId}, with application permission: ${access.id}`);
@@ -389,56 +374,6 @@ class EntraAppAddCommand extends GraphCommand {
     return appInfo;
   }
 
-  private async addRoleToServicePrincipal(objectId: string, resourceId: string, appRoleId: string): Promise<void> {
-    const requestOptions: CliRequestOptions = {
-      url: `${this.resource}/v1.0/myorganization/servicePrincipals/${objectId}/appRoleAssignments`,
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      responseType: 'json',
-      data: {
-        appRoleId: appRoleId,
-        principalId: objectId,
-        resourceId: resourceId
-      }
-    };
-
-    return request.post(requestOptions);
-  }
-
-  private async grantOAuth2Permission(appId: string, resourceId: string, scopeName: string): Promise<void> {
-    const grantAdminConsentApplicationRequestOptions: CliRequestOptions = {
-      url: `${this.resource}/v1.0/myorganization/oauth2PermissionGrants`,
-      headers: {
-        accept: 'application/json;odata.metadata=none'
-      },
-      responseType: 'json',
-      data: {
-        clientId: appId,
-        consentType: "AllPrincipals",
-        principalId: null,
-        resourceId: resourceId,
-        scope: scopeName
-      }
-    };
-
-    return request.post(grantAdminConsentApplicationRequestOptions);
-  }
-
-  private async createServicePrincipal(appId: string): Promise<ServicePrincipalInfo> {
-    const requestOptions: CliRequestOptions = {
-      url: `${this.resource}/v1.0/myorganization/servicePrincipals`,
-      headers: {
-        'content-type': 'application/json'
-      },
-      data: {
-        appId: appId
-      },
-      responseType: 'json'
-    };
-
-    return request.post<ServicePrincipalInfo>(requestOptions);
-  }
 
   private async updateAppFromManifest(args: CommandArgs, appInfo: AppInfo): Promise<AppInfo> {
     if (!args.options.manifest) {
@@ -497,15 +432,7 @@ class EntraAppAddCommand extends GraphCommand {
 
     const graphManifest = this.transformManifest(v2Manifest);
 
-    const updateAppRequestOptions: CliRequestOptions = {
-      url: `${this.resource}/v1.0/myorganization/applications/${appInfo.id}`,
-      headers: {
-        'content-type': 'application/json'
-      },
-      responseType: 'json',
-      data: graphManifest
-    };
-    await request.patch(updateAppRequestOptions);
+    await entraApp.updateEntraApp(appInfo.id, graphManifest);
     await this.updatePreAuthorizedAppsFromManifest(v2Manifest, appInfo);
     await this.createSecrets(secrets, appInfo);
     return appInfo;
@@ -553,16 +480,7 @@ class EntraAppAddCommand extends GraphCommand {
       delete p.permissionIds;
     });
 
-    const updateAppRequestOptions: any = {
-      url: `${this.resource}/v1.0/myorganization/applications/${appInfo.id}`,
-      headers: {
-        'content-type': 'application/json'
-      },
-      responseType: 'json',
-      data: graphManifest
-    };
-
-    await request.patch(updateAppRequestOptions);
+    appInfo.api = graphManifest.api;
     return appInfo;
   }
 
@@ -687,15 +605,14 @@ class EntraAppAddCommand extends GraphCommand {
   }
 
   private async configureUri(args: CommandArgs, appInfo: AppInfo, logger: Logger): Promise<AppInfo> {
+    const applicationInfo: any = {};
     if (!args.options.uri) {
-      return appInfo;
+      return applicationInfo;
     }
 
     if (this.verbose) {
       await logger.logToStderr(`Configuring Microsoft Entra application ID URI...`);
     }
-
-    const applicationInfo: any = {};
 
     if (args.options.uri) {
       const appUri: string = args.options.uri.replace(/_appId_/g, appInfo.appId);
@@ -714,17 +631,7 @@ class EntraAppAddCommand extends GraphCommand {
       };
     }
 
-    const requestOptions: CliRequestOptions = {
-      url: `${this.resource}/v1.0/myorganization/applications/${appInfo.id}`,
-      headers: {
-        'content-type': 'application/json;odata.metadata=none'
-      },
-      responseType: 'json',
-      data: applicationInfo
-    };
-
-    await request.patch(requestOptions);
-    return appInfo;
+    return applicationInfo;
   }
 
   private async resolveApis(args: CommandArgs, logger: Logger): Promise<RequiredResourceAccess[]> {
