@@ -3,7 +3,6 @@ import GlobalOptions from '../../../../GlobalOptions.js';
 import request from '../../../../request.js';
 import VivaEngageCommand from '../../../base/VivaEngageCommand.js';
 import commands from '../../commands.js';
-import yammerCommands from './yammerCommands.js';
 
 interface CommandArgs {
   options: Options;
@@ -22,10 +21,6 @@ class VivaEngageGroupUserAddCommand extends VivaEngageCommand {
 
   public get description(): string {
     return 'Adds a user to a Viva Engage Group';
-  }
-
-  public alias(): string[] | undefined {
-    return [yammerCommands.GROUP_USER_ADD];
   }
 
   constructor() {
@@ -76,8 +71,6 @@ class VivaEngageGroupUserAddCommand extends VivaEngageCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    await this.showDeprecationWarning(logger, this.alias()![0], this.name);
-
     const requestOptions: any = {
       url: `${this.resource}/v1/group_memberships.json`,
       headers: {
