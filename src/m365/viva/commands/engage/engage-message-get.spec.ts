@@ -13,7 +13,6 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './engage-message-get.js';
 import { settingsNames } from '../../../../settingsNames.js';
-import yammerCommands from './yammerCommands.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 
 describe(commands.ENGAGE_MESSAGE_GET, () => {
@@ -69,23 +68,6 @@ describe(commands.ENGAGE_MESSAGE_GET, () => {
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
-  });
-
-  it('defines correct alias', () => {
-    const alias = command.alias();
-    assert.deepStrictEqual(alias, [yammerCommands.MESSAGE_GET]);
-  });
-
-  it('correctly logs deprecation warning for yammer command', async () => {
-    const chalk = (await import('chalk')).default;
-    const loggerErrSpy = sinon.spy(logger, 'logToStderr');
-    const commandNameStub = sinon.stub(cli, 'currentCommandName').value(yammerCommands.MESSAGE_GET);
-    sinon.stub(request, 'get').resolves(firstMessage);
-
-    await command.action(logger, { options: { id: 10123190123123 } });
-    assert.deepStrictEqual(loggerErrSpy.firstCall.firstArg, chalk.yellow(`Command '${yammerCommands.MESSAGE_GET}' is deprecated. Please use '${commands.ENGAGE_MESSAGE_GET}' instead.`));
-
-    sinonUtil.restore([loggerErrSpy, commandNameStub]);
   });
 
   it('defines correct properties for the default output', () => {
