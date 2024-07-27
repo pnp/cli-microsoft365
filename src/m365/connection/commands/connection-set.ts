@@ -27,6 +27,7 @@ class ConnectionSetCommand extends Command {
 
     this.#initOptions();
     this.#initValidators();
+    this.#initTypes();
   }
 
   #initOptions(): void {
@@ -50,6 +51,10 @@ class ConnectionSetCommand extends Command {
         return true;
       }
     );
+  }
+
+  #initTypes(): void {
+    this.types.string.push('name', 'newName');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
