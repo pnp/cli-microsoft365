@@ -3,7 +3,6 @@ import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import VivaEngageCommand from '../../../base/VivaEngageCommand.js';
 import commands from '../../commands.js';
-import yammerCommands from './yammerCommands.js';
 
 interface CommandArgs {
   options: Options;
@@ -20,10 +19,6 @@ class VivaEngageNetworkListCommand extends VivaEngageCommand {
 
   public get description(): string {
     return 'Returns a list of networks to which the current user has access';
-  }
-
-  public alias(): string[] | undefined {
-    return [yammerCommands.NETWORK_LIST];
   }
 
   public defaultProperties(): string[] | undefined {
@@ -54,8 +49,6 @@ class VivaEngageNetworkListCommand extends VivaEngageCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    await this.showDeprecationWarning(logger, this.alias()![0], this.name);
-
     const requestOptions: CliRequestOptions = {
       url: `${this.resource}/v1/networks/current.json`,
       headers: {
