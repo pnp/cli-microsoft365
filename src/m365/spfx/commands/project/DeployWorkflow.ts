@@ -49,7 +49,7 @@ export const workflow: GitHubWorkflow = {
           with: {
             "APP_FILE_PATH": "sharepoint/solution/{{ solutionName }}.sppkg",
             "SKIP_FEATURE_DEPLOYMENT": false,
-            "OVERWRITE": false
+            "OVERWRITE": true
           }
         }
       ]
