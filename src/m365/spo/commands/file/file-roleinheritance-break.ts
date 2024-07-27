@@ -61,7 +61,7 @@ class SpoFileRoleInheritanceBreakCommand extends SpoCommand {
         option: '--fileUrl [fileUrl]'
       },
       {
-        option: 'i, --fileId [fileId]'
+        option: '-i, --fileId [fileId]'
       },
       {
         option: '-c, --clearExistingPermissions'

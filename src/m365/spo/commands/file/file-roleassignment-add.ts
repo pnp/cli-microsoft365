@@ -71,7 +71,7 @@ class SpoFileRoleAssignmentAddCommand extends SpoCommand {
         option: '--fileUrl [fileUrl]'
       },
       {
-        option: 'i, --fileId [fileId]'
+        option: '-i, --fileId [fileId]'
       },
       {
         option: '--principalId [principalId]'
