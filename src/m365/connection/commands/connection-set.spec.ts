@@ -126,7 +126,7 @@ describe(commands.SET, () => {
   });
 
   it(`fails with error if the connection cannot be found`, async () => {
-    await assert.rejects(command.action(logger, { options: { name: 'Non-existent connection', newName: 'something new' } }), new CommandError(`The connection 'Non-existent connection' cannot be found`));
+    await assert.rejects(command.action(logger, { options: { name: 'Non-existent connection', newName: 'something new' } }), new CommandError(`The connection 'Non-existent connection' cannot be found.`));
   });
 
   it(`fails with error if the newName is already in use`, async () => {

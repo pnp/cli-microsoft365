@@ -1,15 +1,17 @@
 import { Logger } from '../../../cli/Logger.js';
-import auth from '../../../Auth.js';
+import auth, { Connection } from '../../../Auth.js';
 import commands from '../commands.js';
 import Command, { CommandError } from '../../../Command.js';
 import GlobalOptions from '../../../GlobalOptions.js';
+import { formatting } from '../../../utils/formatting.js';
+import { cli } from '../../../cli/cli.js';
 
 interface CommandArgs {
   options: Options;
 }
 
 interface Options extends GlobalOptions {
-  name: string;
+  name?: string;
 }
 
 class ConnectionUseCommand extends Command {
@@ -25,18 +27,41 @@ class ConnectionUseCommand extends Command {
     super();
 
     this.#initOptions();
+    this.#initTelemetry();
+    this.#initTypes();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        name: typeof args.options.name !== 'undefined'
+      });
+    });
   }
 
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '-n, --name <name>'
+        option: '-n, --name [name]'
       }
     );
   }
 
+  #initTypes(): void {
+    this.types.string.push('name');
+  }
+
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const connection = await auth.getConnection(args.options.name);
+    let connection: Connection;
+    if (args.options.name) {
+      connection = await auth.getConnection(args.options.name);
+    }
+    else {
+      const connections = await auth.getAllConnections();
+      connections.sort((a, b) => a.name!.localeCompare(b.name!));
+      const keyValuePair = formatting.convertArrayToHashTable('name', connections);
+      connection = await cli.handleMultipleResultsFound<Connection>('Please select the connection you want to activate.', keyValuePair);
+    }
 
     if (this.verbose) {
       await logger.logToStderr(`Switching to connection '${connection.identityName}', appId: ${connection.appId}, tenantId: ${connection.identityTenantId}...`);

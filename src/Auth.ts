@@ -870,7 +870,7 @@ export class Auth {
     const connection = allConnections.find(i => i.name === name);
 
     if (!connection) {
-      throw new CommandError(`The connection '${name}' cannot be found`);
+      throw new CommandError(`The connection '${name}' cannot be found.`);
     }
 
     return connection;
