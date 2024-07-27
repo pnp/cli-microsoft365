@@ -49,7 +49,7 @@ class CliConsentCommand extends AnonymousCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (args.options.service !== 'VivaEngage' && args.options.service !== 'yammer') {
+        if (args.options.service !== 'VivaEngage') {
           return `${args.options.service} is not a valid value for the service option. Allowed values: VivaEngage`;
         }
 
@@ -60,12 +60,8 @@ class CliConsentCommand extends AnonymousCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     let scope = '';
-    switch (args.options.service) {
-      case 'yammer':
-        await this.warn(logger, 'The yammer service is deprecated. Please use the VivaEngage service instead.');
-      case 'VivaEngage':
-        scope = 'https://api.yammer.com/user_impersonation';
-        break;
+    if (args.options.service === 'VivaEngage') {
+      scope = 'https://api.yammer.com/user_impersonation';
     }
 
     await logger.log(`To consent permissions for executing ${args.options.service} commands, navigate in your web browser to https://login.microsoftonline.com/${cli.getTenant()}/oauth2/v2.0/authorize?client_id=${cli.getClientId()}&response_type=code&scope=${encodeURIComponent(scope)}`);
