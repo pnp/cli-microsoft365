@@ -61,7 +61,7 @@ class SpoFolderRetentionLabelEnsureCommand extends SpoCommand {
         option: '--folderUrl [folderUrl]'
       },
       {
-        option: 'i, --folderId [folderId]'
+        option: '-i, --folderId [folderId]'
       }
     );
   }

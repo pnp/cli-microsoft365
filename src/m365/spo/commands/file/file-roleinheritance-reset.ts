@@ -59,7 +59,7 @@ class SpoFileRoleInheritanceResetCommand extends SpoCommand {
         option: '--fileUrl [fileUrl]'
       },
       {
-        option: 'i, --fileId [fileId]'
+        option: '-i, --fileId [fileId]'
       },
       {
         option: '-f, --force'
