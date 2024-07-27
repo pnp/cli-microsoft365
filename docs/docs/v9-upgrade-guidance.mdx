@@ -12,6 +12,16 @@ We updated the [app permission add](./cmd/app/permission/permission-add.mdx) com
 
 Please, check the documentation of the [app permission add](./cmd/app/permission/permission-add.mdx) command to see the updated options and adjust your scripts accordingly.
 
+## CLI environment variables
+
+### Removed deprecated CLI environment variables
+
+For this new major version, we've removed the deprecated `AAD` CLI environment variables. We have renamed `CLIMICROSOFT365_AADAPPID` variable to `CLIMICROSOFT365_ENTRAAPPID`.
+
+#### What action do I need to take?
+
+Please, check the user guidance [Log in to Microsoft 365](./user-guide/connecting-microsoft-365.mdx) command to see the updated environment variables to use.
+
 ## Entra ID
 
 ### Removed deprecated Guest value from 'aad m365group user list' command.
@@ -129,12 +139,12 @@ In the past versions of CLI for Microsoft 365, the command had no output. When u
 
 When using the [spo file copy](./cmd/spo/file/file-copy.mdx) command, please use the new command input. This means that you'll have to remove option `--resetAuthorAndCreated` from your scripts and automation tools.
 
-## CLI environment variables
+## SharePoint Framework
 
-### Removed deprecated CLI environment variables
+### Removed overwrite option from `spfx project github workflow add` command
 
-For this new major version, we've removed the deprecated `AAD` CLI environment variables. We have renamed `CLIMICROSOFT365_AADAPPID` variable to `CLIMICROSOFT365_ENTRAAPPID`.
+Overwriting the SPFx package should be the default behavior of the continuous delivery pipeline. The `overwrite` option was removed from the [spfx project github workflow add](./cmd/spfx/project/project-github-workflow-add.mdx) command.
 
 #### What action do I need to take?
 
-Please, check the user guidance [Log in to Microsoft 365](./user-guide/connecting-microsoft-365.mdx) command to see the updated environment variables to use.
+Please update your scripts not to use the `overwrite` option.
