@@ -14,25 +14,26 @@ m365 spfx project github workflow add [options]
 
 ```md definition-list
 `-n, --name [name]`
-: Name of the workflow that will be created. If none is specified a default name will be used 'Deploy Solution ${name of sppkg file}'
+: Name of the workflow that will be created. If none is specified a default name will be used 'Deploy Solution ${name of sppkg file}'.
 
 `-b, --branchName [branchName]`
-: Specify the branch name which should trigger the workflow on push. If none is specified a default will be used which is 'main'
+: Specify the branch name which should trigger the workflow on push. If none is specified a default will be used which is 'main'.
 
 `-m, --manuallyTrigger`
-: When specified a manual trigger option will be added to the workflow: `workflow_dispatch`
+: When specified a manual trigger option will be added to the workflow: `workflow_dispatch`.
 
 `-l, --loginMethod [loginMethod]`
-: Specify the login method used for the login action. Possible options are: `user`, `application`. Default `application`'
+: Specify the login method used for the login action. Possible options are: `user`, `application`. Default `application`.
 
 `-s, --scope [scope]`
-: Scope of the app catalog: `tenant`, `sitecollection`. Default is `tenant`
+: Scope of the app catalog: `tenant`, `sitecollection`. Default is `tenant`.
 
 `-u, --siteUrl [siteUrl]`
-: The URL of the site collection where the solution package will be added. Required if scope is set to `sitecollection`
+: The URL of the site collection where the solution package will be added. Required if scope is set to `sitecollection`.
 
 `--skipFeatureDeployment`
-: When specified and the app supports tenant-wide deployment, deploy it to the whole tenant
+: When specified and the app supports tenant-wide deployment, deploy it to the whole tenant.
+```
 
 <Global />
 
