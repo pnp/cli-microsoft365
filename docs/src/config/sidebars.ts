@@ -3912,6 +3912,19 @@ const sidebars: SidebarsConfig = {
       ]
     },
     {
+      'SharePoint Premium (spp)': [
+        {
+          contentcenter: [
+            {
+              type: 'doc',
+              label: 'contentcenter list',
+              id: 'cmd/spp/contentcenter/contentcenter-list'
+            }
+          ]
+        }
+      ]
+    },
+    {
       'Teams (teams)': [
         {
           app: [
