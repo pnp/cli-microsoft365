@@ -24,7 +24,6 @@ interface Options extends GlobalOptions {
   scope?: string;
   skipFeatureDeployment?: boolean;
   siteUrl?: string;
-  overwrite?: boolean;
 }
 
 class SpfxProjectGithubWorkflowAddCommand extends BaseProjectCommand {
@@ -56,8 +55,7 @@ class SpfxProjectGithubWorkflowAddCommand extends BaseProjectCommand {
         manuallyTrigger: !!args.options.manuallyTrigger,
         loginMethod: typeof args.options.loginMethod !== 'undefined',
         scope: typeof args.options.scope !== 'undefined',
-        skipFeatureDeployment: !!args.options.skipFeatureDeployment,
-        overwrite: !!args.options.overwrite
+        skipFeatureDeployment: !!args.options.skipFeatureDeployment
       });
     });
   }
@@ -86,9 +84,6 @@ class SpfxProjectGithubWorkflowAddCommand extends BaseProjectCommand {
       },
       {
         option: '--skipFeatureDeployment'
-      },
-      {
-        option: '--overwrite'
       }
     );
   }
@@ -124,10 +119,6 @@ class SpfxProjectGithubWorkflowAddCommand extends BaseProjectCommand {
     this.projectRootPath = this.getProjectRoot(process.cwd());
     if (this.projectRootPath === null) {
       throw new CommandError(`Couldn't find project root folder`, SpfxProjectGithubWorkflowAddCommand.ERROR_NO_PROJECT_ROOT_FOLDER);
-    }
-
-    if (!args.options.overwrite) {
-      await this.warn(logger, `We recommend always using the --overwrite option and it will become the default behavior in next major release. Overwriting your sppkg file on every deployment is required to make continuous delivery of the latest version of your app which is the aim of the continuous delivery pipeline.`);
     }
 
     const solutionPackageJsonFile: string = path.join(this.projectRootPath, 'package.json');
@@ -190,9 +181,7 @@ class SpfxProjectGithubWorkflowAddCommand extends BaseProjectCommand {
       this.getDeployAction(workflow).with!.SKIP_FEATURE_DEPLOYMENT = true;
     }
 
-    if (options.overwrite) {
-      this.getDeployAction(workflow).with!.OVERWRITE = true;
-    }
+    this.getDeployAction(workflow).with!.OVERWRITE = true;
 
     if (options.loginMethod === 'user') {
       const loginAction = this.getLoginAction(workflow);

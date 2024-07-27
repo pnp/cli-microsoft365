@@ -34,10 +34,6 @@ m365 spfx project github workflow add [options]
 `--skipFeatureDeployment`
 : When specified and the app supports tenant-wide deployment, deploy it to the whole tenant
 
-`--overwrite`
-: When specified the workflow will overwrite the existing .sppkg if it is already deployed in the app catalog.
-```
-
 <Global />
 
 ## Remarks
@@ -59,6 +55,8 @@ For the `user` login method you will need to create the following secrets in Git
 
 This method is perfect to test your workflow, in a dev context, for personal usage. It will not work for accounts with MFA.
 
+The workflow will overwrite the existing .sppkg if it is already deployed in the app catalog. Overwriting your sppkg file on every deployment is required to make continuous delivery of the latest version of your app which is the aim of the continuous delivery pipeline.
+
 :::info
 
 Run this command in the SPFx solution folder.
@@ -67,7 +65,7 @@ Run this command in the SPFx solution folder.
     
 ## Examples
 
-Adds a GitHub workflow for a SharePoint Framework project with `application` login method triggered on push to main
+Adds a GitHub workflow for a SharePoint Framework project with `application` login method triggered on push to main.
 
 ```sh
 m365 spfx project github workflow add 
@@ -79,7 +77,7 @@ Adds a GitHub workflow for a SharePoint Framework project with `user` login meth
 m365 spfx project github workflow add --manuallyTrigger --loginMethod "user"
 ```
 
-Adds a GitHub workflow for a SharePoint Framework project with deployment to a site collection app catalog
+Adds a GitHub workflow for a SharePoint Framework project with deployment to a site collection app catalog.
 
 ```sh
 m365 spfx project github workflow add --scope "sitecollection" --siteUrl "https://some.sharepoint.com/sites/someSite"
