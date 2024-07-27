@@ -174,3 +174,37 @@ Overwriting the SPFx package should be the default behavior of the continuous de
 #### What action do I need to take?
 
 Please update your scripts not to use the `overwrite` option.
+
+## Yammer (Viva Engage)
+
+### Removal of deprecated Yammer aliases
+
+We have removed all deprecated `Yammer` command aliases. These aliases were introduced in the previous version to prevent the introduction of breaking changes. Since Yammer has been renamed to Viva Engage a while ago, the following aliases were removed:
+
+Alias | Command 
+--|--
+`yammer search` | [viva engage search](./cmd/viva/engage/engage-search.mdx)
+`yammer group list` | [viva engage group list](./cmd/viva/engage/engage-group-list.mdx)
+`yammer group user add` | [viva engage group user add](./cmd/viva/engage/engage-group-user-add.mdx)
+`yammer group user remove` | [viva engage group user remove](./cmd/viva/engage/engage-group-user-remove.mdx)
+`yammer message add` | [viva engage message add](./cmd/viva/engage/engage-message-add.mdx)
+`yammer message get` | [viva engage message get](./cmd/viva/engage/engage-message-get.mdx)
+`yammer message list` | [viva engage message list](./cmd/viva/engage/engage-message-list.mdx)
+`yammer message remove` | [viva engage message remove](./cmd/viva/engage/engage-message-remove.mdx)
+`yammer message like set` | [viva engage message like set](./cmd/viva/engage/engage-message-like-set.mdx)
+`yammer network list` | [viva engage network list](./cmd/viva/engage/engage-network-list.mdx)
+`yammer report activitycounts` | [viva engage report activitycounts](./cmd/viva/engage/engage-report-activitycounts.mdx)
+`yammer report activityusercounts` | [viva engage report activityusercounts](./cmd/viva/engage/engage-report-activityusercounts.mdx)
+`yammer report activityuserdetail` | [viva engage report activityuserdetail](./cmd/viva/engage/engage-report-activityuserdetail.mdx)
+`yammer report deviceusagedistributionusercounts` | [viva engage report deviceusagedistributionusercounts](./cmd/viva/engage/engage-report-deviceusagedistributionusercounts.mdx)
+`yammer report deviceusageusercounts` | [viva engage report deviceusageusercounts](./cmd/viva/engage/engage-report-deviceusageusercounts.mdx)
+`yammer report deviceusageuserdetail` | [viva engage report deviceusageuserdetail](./cmd/viva/engage/engage-report-deviceusageuserdetail.mdx)
+`yammer report groupsactivitycounts` | [viva engage report groupsactivitycounts](./cmd/viva/engage/engage-report-groupsactivitycounts.mdx)
+`yammer report groupsactivitydetail` | [viva engage report groupsactivitydetail](./cmd/viva/engage/engage-report-groupsactivitydetail.mdx)
+`yammer report groupsactivitygroupcounts` | [viva engage report groupsactivitygroupcounts](./cmd/viva/engage/engage-report-groupsactivitygroupcounts.mdx)
+`yammer user get` | [viva engage user get](./cmd/viva/engage/engage-user-get.mdx)
+`yammer user list` | [viva engage user list](./cmd/viva/engage/engage-user-list.mdx)
+
+#### What action do I need to take?
+
+Replace any of the aliases mentioned above with the corresponding command name. The functionality of the command hasn't changed.

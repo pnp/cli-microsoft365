@@ -5,7 +5,6 @@ import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import VivaEngageCommand from '../../../base/VivaEngageCommand.js';
 import commands from '../../commands.js';
-import yammerCommands from './yammerCommands.js';
 
 interface CommandArgs {
   options: Options;
@@ -98,10 +97,6 @@ class VivaEngageSearchCommand extends VivaEngageCommand {
 
   public get description(): string {
     return 'Returns a list of messages, users, topics and groups that match the specified query.';
-  }
-
-  public alias(): string[] | undefined {
-    return [yammerCommands.SEARCH];
   }
 
   constructor() {
@@ -245,8 +240,6 @@ class VivaEngageSearchCommand extends VivaEngageCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    await this.showDeprecationWarning(logger, this.alias()![0], this.name);
-
     this.summary = {
       messages: 0,
       groups: 0,

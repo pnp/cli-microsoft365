@@ -66,23 +66,6 @@ describe(commands.CONSENT, () => {
     assert(loggerLogSpy.calledWith(`To consent permissions for executing VivaEngage commands, navigate in your web browser to https://login.microsoftonline.com/fb5cb38f-ecdb-4c6a-a93b-b8cfd56b4a89/oauth2/v2.0/authorize?client_id=2587b55d-a41e-436d-bb1d-6223eb185dd4&response_type=code&scope=https%3A%2F%2Fapi.yammer.com%2Fuser_impersonation`));
   });
 
-  it('shows warning for Yammer permissions', async () => {
-    const warnSpy = sinon.spy(command as any, 'warn');
-    await command.action(logger, { options: { service: 'yammer' } });
-    assert(warnSpy.called);
-  });
-
-  it('supports specifying service', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--service') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
-
   it('fails validation if specified service is invalid ', async () => {
     const actual = await command.validate({ options: { service: 'invalid' } }, commandInfo);
     assert.notStrictEqual(actual, true);
