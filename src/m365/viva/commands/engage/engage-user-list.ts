@@ -3,7 +3,6 @@ import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import VivaEngageCommand from '../../../base/VivaEngageCommand.js';
 import commands from '../../commands.js';
-import yammerCommands from './yammerCommands.js';
 
 interface CommandArgs {
   options: Options;
@@ -26,10 +25,6 @@ class VivaEngageUserListCommand extends VivaEngageCommand {
 
   public get description(): string {
     return 'Returns users from the current network';
-  }
-
-  public alias(): string[] | undefined {
-    return [yammerCommands.USER_LIST];
   }
 
   public defaultProperties(): string[] | undefined {
@@ -177,8 +172,6 @@ class VivaEngageUserListCommand extends VivaEngageCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    await this.showDeprecationWarning(logger, this.alias()![0], this.name);
-
     this.items = []; // this will reset the items array in interactive mode
 
     try {
