@@ -12,7 +12,6 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './engage-message-like-set.js';
-import yammerCommands from './yammerCommands.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 
 describe(commands.ENGAGE_MESSAGE_LIKE_SET, () => {
@@ -73,23 +72,6 @@ describe(commands.ENGAGE_MESSAGE_LIKE_SET, () => {
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
-  });
-
-  it('defines correct alias', () => {
-    const alias = command.alias();
-    assert.deepStrictEqual(alias, [yammerCommands.MESSAGE_LIKE_SET]);
-  });
-
-  it('correctly logs deprecation warning for yammer command', async () => {
-    const chalk = (await import('chalk')).default;
-    const loggerErrSpy = sinon.spy(logger, 'logToStderr');
-    const commandNameStub = sinon.stub(cli, 'currentCommandName').value(yammerCommands.MESSAGE_LIKE_SET);
-    sinon.stub(request, 'post').resolves();
-
-    await command.action(logger, { options: { id: 10123190123123 } });
-    assert.deepStrictEqual(loggerErrSpy.firstCall.firstArg, chalk.yellow(`Command '${yammerCommands.MESSAGE_LIKE_SET}' is deprecated. Please use '${commands.ENGAGE_MESSAGE_LIKE_SET}' instead.`));
-
-    sinonUtil.restore([loggerErrSpy, commandNameStub]);
   });
 
   it('correctly handles error', async () => {

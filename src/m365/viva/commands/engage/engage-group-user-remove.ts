@@ -4,7 +4,6 @@ import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import VivaEngageCommand from "../../../base/VivaEngageCommand.js";
 import commands from '../../commands.js';
-import yammerCommands from './yammerCommands.js';
 
 interface CommandArgs {
   options: Options;
@@ -23,10 +22,6 @@ class VivaEngageGroupUserRemoveCommand extends VivaEngageCommand {
 
   public get description(): string {
     return 'Removes a user from a Viva Engage group';
-  }
-
-  public alias(): string[] | undefined {
-    return [yammerCommands.GROUP_USER_REMOVE];
   }
 
   constructor() {
@@ -77,8 +72,6 @@ class VivaEngageGroupUserRemoveCommand extends VivaEngageCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    await this.showDeprecationWarning(logger, this.alias()![0], this.name);
-
     if (args.options.force) {
       await this.executeRemoveAction(args.options);
     }

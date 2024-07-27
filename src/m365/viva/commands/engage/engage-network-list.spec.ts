@@ -12,7 +12,6 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './engage-network-list.js';
-import yammerCommands from './yammerCommands.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 
 describe(commands.ENGAGE_NETWORK_LIST, () => {
@@ -65,23 +64,6 @@ describe(commands.ENGAGE_NETWORK_LIST, () => {
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
-  });
-
-  it('defines correct alias', () => {
-    const alias = command.alias();
-    assert.deepStrictEqual(alias, [yammerCommands.NETWORK_LIST]);
-  });
-
-  it('correctly logs deprecation warning for yammer command', async () => {
-    const chalk = (await import('chalk')).default;
-    const loggerErrSpy = sinon.spy(logger, 'logToStderr');
-    const commandNameStub = sinon.stub(cli, 'currentCommandName').value(yammerCommands.NETWORK_LIST);
-    sinon.stub(request, 'get').resolves();
-
-    await command.action(logger, { options: {} });
-    assert.deepStrictEqual(loggerErrSpy.firstCall.firstArg, chalk.yellow(`Command '${yammerCommands.NETWORK_LIST}' is deprecated. Please use '${commands.ENGAGE_NETWORK_LIST}' instead.`));
-
-    sinonUtil.restore([loggerErrSpy, commandNameStub]);
   });
 
   it('defines correct properties for the default output', () => {
