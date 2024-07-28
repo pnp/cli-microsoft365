@@ -26,6 +26,10 @@ class SpoSiteAdminListCommand extends SpoCommand {
     return 'Lists all administrators of a specific SharePoint site';
   }
 
+  public defaultProperties(): string[] | undefined {
+    return ['Id', 'LoginName', 'Title', 'PrincipalTypeString'];
+  }
+
   constructor() {
     super();
 
@@ -62,6 +66,7 @@ class SpoSiteAdminListCommand extends SpoCommand {
 
   #initTypes(): void {
     this.types.string.push('siteUrl');
+    this.types.boolean.push('asAdmin');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -88,22 +93,18 @@ class SpoSiteAdminListCommand extends SpoCommand {
     const requestOptions: CliRequestOptions = {
       url: `${adminUrl}/_api/SPO.Tenant/GetSiteAdministrators?siteId='${siteId}'`,
       headers: {
-        accept: 'application/json;odata=nometadata',
-        'content-type': 'application/json;charset=utf-8'
-      }
+        accept: 'application/json;odata=nometadata'
+      },
+      responseType: 'json'
     };
 
-    const response: string = await request.post<string>(requestOptions);
-    const responseContent: AdminResult = JSON.parse(response);
+    const response = await request.post<AdminResult>(requestOptions);
     const primaryAdminLoginName = await spo.getPrimaryAdminLoginNameAsAdmin(adminUrl, siteId, logger, this.verbose);
 
-    const mappedResult = responseContent.value.map((u: AdminUserResult): AdminCommandResultItem => ({
-      Id: null,
+    const mappedResult = response.value.map((u: AdminUserResult): AdminCommandResultItem => ({
       Email: u.email,
       LoginName: u.loginName,
       Title: u.name,
-      PrincipalType: null,
-      PrincipalTypeString: null,
       IsPrimaryAdmin: u.loginName === primaryAdminLoginName
     }));
     await logger.log(mappedResult);
@@ -126,7 +127,6 @@ class SpoSiteAdminListCommand extends SpoCommand {
 
     const requestOptions: CliRequestOptions = {
       url: `${args.options.siteUrl}/_api/web/siteusers?$filter=IsSiteAdmin eq true`,
-      method: 'GET',
       headers: {
         'accept': 'application/json;odata=nometadata'
       },

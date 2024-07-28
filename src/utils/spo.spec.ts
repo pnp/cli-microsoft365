@@ -2588,7 +2588,7 @@ describe('utils/spo', () => {
 
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `${adminUrl}/_api/SPO.Tenant/sites('${siteId}')?$select=OwnerLoginName`) {
-        return JSON.stringify({ OwnerLoginName: primaryAdminLoginName });
+        return { OwnerLoginName: primaryAdminLoginName };
       }
 
       throw 'Invalid request';

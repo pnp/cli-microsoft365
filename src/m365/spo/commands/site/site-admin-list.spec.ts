@@ -46,20 +46,14 @@ describe(commands.SITE_ADMIN_LIST, () => {
 
   const listOfAdminsResultAsAdmin = [
     {
-      Id: null,
       LoginName: 'user1loginName',
       Title: 'user1DisplayName',
-      PrincipalType: null,
-      PrincipalTypeString: null,
       IsPrimaryAdmin: true,
       Email: 'user1Email@email.com'
     },
     {
-      Id: null,
       LoginName: 'user2loginName',
       Title: 'user2DisplayName',
-      PrincipalType: null,
-      PrincipalTypeString: null,
       IsPrimaryAdmin: false,
       Email: 'user2Email@email.com'
     }
@@ -182,9 +176,9 @@ describe(commands.SITE_ADMIN_LIST, () => {
       }
 
       if (opts.url === `${adminUrl}/_api/SPO.Tenant/GetSiteAdministrators?siteId='${siteId}'`) {
-        return JSON.stringify({
+        return {
           value: listOfAdminsFromAdminSource
-        });
+        };
       }
 
       if (opts.url === `https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com:/sites/site?$select=id`) {
@@ -196,9 +190,9 @@ describe(commands.SITE_ADMIN_LIST, () => {
 
     sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === `${adminUrl}/_api/SPO.Tenant/GetSiteAdministrators?siteId='${siteId}'`) {
-        return JSON.stringify({
+        return {
           value: listOfAdminsFromAdminSource
-        });
+        };
       }
 
       throw 'Invalid request: ' + opts.url;
@@ -236,9 +230,9 @@ describe(commands.SITE_ADMIN_LIST, () => {
       }
 
       if (opts.url === `${adminUrl}/_api/SPO.Tenant/GetSiteAdministrators?siteId='${siteId}'`) {
-        return JSON.stringify({
+        return {
           value: listOfAdminsFromAdminSource
-        });
+        };
       }
 
       if (opts.url === `https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com:/sites/site?$select=id`) {
@@ -250,9 +244,9 @@ describe(commands.SITE_ADMIN_LIST, () => {
 
     sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === `${adminUrl}/_api/SPO.Tenant/GetSiteAdministrators?siteId='${siteId}'`) {
-        return JSON.stringify({
+        return {
           value: []
-        });
+        };
       }
 
       throw 'Invalid request: ' + opts.url;
@@ -283,9 +277,9 @@ describe(commands.SITE_ADMIN_LIST, () => {
       }
 
       if (opts.url === `${adminUrl}/_api/SPO.Tenant/GetSiteAdministrators?siteId='${siteId}'`) {
-        return JSON.stringify({
+        return {
           value: listOfAdminsFromAdminSource
-        });
+        };
       }
 
       if (opts.url === `https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com:/sites/site?$select=id`) {
@@ -297,9 +291,9 @@ describe(commands.SITE_ADMIN_LIST, () => {
 
     sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === `${adminUrl}/_api/SPO.Tenant/GetSiteAdministrators?siteId='${siteId}'`) {
-        return JSON.stringify({
+        return {
           value: listOfAdminsFromAdminSource
-        });
+        };
       }
 
       throw 'Invalid request: ' + opts.url;
@@ -316,9 +310,9 @@ describe(commands.SITE_ADMIN_LIST, () => {
       }
 
       if (opts.url === `${adminUrl}/_api/SPO.Tenant/GetSiteAdministrators?siteId='${siteId}'`) {
-        return JSON.stringify({
+        return {
           value: listOfAdminsFromAdminSource
-        });
+        };
       }
 
       if (opts.url === `https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com:/sites/site?$select=id`) {
@@ -330,9 +324,9 @@ describe(commands.SITE_ADMIN_LIST, () => {
 
     sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === `${adminUrl}/_api/SPO.Tenant/GetSiteAdministrators?siteId='${siteId}'`) {
-        return JSON.stringify({
+        return {
           value: listOfAdminsFromAdminSource
-        });
+        };
       }
 
       throw 'Invalid request: ' + opts.url;
@@ -406,9 +400,9 @@ describe(commands.SITE_ADMIN_LIST, () => {
       }
 
       if (opts.url === `${adminUrl}/_api/SPO.Tenant/GetSiteAdministrators?siteId='${siteId}'`) {
-        return JSON.stringify({
+        return {
           value: listOfAdminsFromAdminSource
-        });
+        };
       }
 
       if (opts.url === `https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com:/sites/site?$select=id`) {
@@ -420,9 +414,9 @@ describe(commands.SITE_ADMIN_LIST, () => {
 
     sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === `${adminUrl}/_api/SPO.Tenant/GetSiteAdministrators?siteId='${siteId}'`) {
-        return JSON.stringify({
+        return {
           value: listOfAdminsFromAdminSource
-        });
+        };
       }
 
       throw 'Invalid request: ' + opts.url;
