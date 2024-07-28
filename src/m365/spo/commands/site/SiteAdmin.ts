@@ -23,13 +23,13 @@ export interface SiteResult {
 }
 
 export interface AdminCommandResultItem {
-  Id: number | null;
+  Id?: number;
   Email: string;
   IsPrimaryAdmin: boolean;
   LoginName: string;
   Title: string;
-  PrincipalType: number | null;
-  PrincipalTypeString: string | null;
+  PrincipalType?: number;
+  PrincipalTypeString?: string;
 }
 
 export interface IGraphUser {
