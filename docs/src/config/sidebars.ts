@@ -608,6 +608,11 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
+              label: 'pim role assignment remove',
+              id: 'cmd/entra/pim/pim-role-assignment-remove'
+            },
+            {
+              type: 'doc',
               label: 'pim role assignment eligibility list',
               id: 'cmd/entra/pim/pim-role-assignment-eligibility-list'
             },
