@@ -17,9 +17,6 @@ m365 spo tenant recyclebinitem restore [options]
 ```md definition-list
 `-u, --siteUrl <siteUrl>`
 : URL of the site.
-
-`--wait`
-: (deprecated) Wait for the site collection to be restored before completing the command.
 ```
 
 <Global />
@@ -34,7 +31,7 @@ To use this command you must be a Global or SharePoint administrator.
     
 ## Examples
 
-Restore a deleted site collection from tenant recycle bin
+Restore a deleted site collection from tenant recycle bin.
 
 ```sh
 m365 spo tenant recyclebinitem restore --siteUrl https://contoso.sharepoint.com/sites/team
@@ -42,48 +39,4 @@ m365 spo tenant recyclebinitem restore --siteUrl https://contoso.sharepoint.com/
 
 ## Response
 
-<Tabs>
-  <TabItem value="JSON">
-
-  ```json
-  {
-    "HasTimedout": false,
-    "IsComplete": true,
-    "PollingInterval": 15000
-  }
-  ```
-
-  </TabItem>
-  <TabItem value="Text">
-
-  ```text
-  HasTimedout    : false
-  IsComplete     : true
-  PollingInterval: 15000
-  ```
-
-  </TabItem>
-  <TabItem value="CSV">
-
-  ```csv
-  HasTimedout,IsComplete,PollingInterval
-  ,1,15000
-  ```
-
-  </TabItem>
-  <TabItem value="Markdown">
-
-  ```md
-  # spo tenant recyclebinitem restore --siteUrl "https://contoso.sharepoint.com/teams/team1"
-
-  Date: 2023-06-22
-
-  Property | Value
-  ---------|-------
-  HasTimedout | false
-  IsComplete | true
-  PollingInterval | 15000
-  ```
-
-  </TabItem>
-</Tabs>
+The command won't return a response on success.
