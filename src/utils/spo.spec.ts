@@ -10,6 +10,7 @@ import { sinonUtil } from '../utils/sinonUtil.js';
 import { FormDigestInfo, SpoOperation, spo } from '../utils/spo.js';
 import { entraGroup } from './entraGroup.js';
 import { formatting } from './formatting.js';
+import { Group } from '@microsoft/microsoft-graph-types';
 
 const stubPostResponses: any = (
   folderAddResp: any = null
@@ -42,6 +43,39 @@ const stubGetResponses: any = (
     }
     throw 'Invalid request';
   });
+};
+
+const userResponse = {
+  Id: 11,
+  IsHiddenInUI: false,
+  LoginName: 'i:0#.f|membership|john.doe@contoso.com',
+  Title: 'John Doe',
+  PrincipalType: 1,
+  Email: 'john.doe@contoso.com',
+  Expiration: '',
+  IsEmailAuthenticationGuestUser: false,
+  IsShareByEmailGuestUser: false,
+  IsSiteAdmin: false,
+  UserId: {
+    NameId: '10032002473c5ae3',
+    NameIdIssuer: 'urn:federation:microsoftonline'
+  },
+  UserPrincipalName: 'john.doe@contoso.com'
+};
+
+const entraGroupResponse = {
+  Id: 11,
+  IsHiddenInUI: false,
+  LoginName: 'i:0#.f|membership|john.doe@contoso.com',
+  Title: 'John Doe',
+  PrincipalType: 1,
+  Email: 'john.doe@contoso.com',
+  Expiration: '',
+  IsEmailAuthenticationGuestUser: false,
+  IsShareByEmailGuestUser: false,
+  IsSiteAdmin: false,
+  UserId: null,
+  UserPrincipalName: null
 };
 
 describe('utils/spo', () => {
@@ -706,25 +740,7 @@ describe('utils/spo', () => {
     assert.deepEqual(customAction, '6cc1797e-5463-45ec-bb1a-b93ec198bab6');
   });
 
-  it(`retrieves spo user by email sucessfully`, async () => {
-    const userResponse = {
-      Id: 11,
-      IsHiddenInUI: false,
-      LoginName: 'i:0#.f|membership|john.doe@contoso.com',
-      Title: 'John Doe',
-      PrincipalType: 1,
-      Email: 'john.doe@contoso.com',
-      Expiration: '',
-      IsEmailAuthenticationGuestUser: false,
-      IsShareByEmailGuestUser: false,
-      IsSiteAdmin: false,
-      UserId: {
-        NameId: '10032002473c5ae3',
-        NameIdIssuer: 'urn:federation:microsoftonline'
-      },
-      UserPrincipalName: 'john.doe@contoso.com'
-    };
-
+  it(`retrieves spo user by email successfully`, async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://contoso.sharepoint.com/sites/sales/_api/web/siteusers/GetByEmail('${formatting.encodeQueryParameter('john.doe@contoso.com')}')`) {
         return userResponse;
@@ -735,6 +751,104 @@ describe('utils/spo', () => {
 
     const user = await spo.getUserByEmail('https://contoso.sharepoint.com/sites/sales', 'john.doe@contoso.com', logger, true);
     assert.deepEqual(user, userResponse);
+  });
+
+  it('successfully returns a SharePoint user when calling ensureUser', async () => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso.sharepoint.com/sites/sales/_api/web/EnsureUser') {
+        return userResponse;
+      }
+
+      throw 'Invalid request: ' + opts.url;
+    });
+
+    const user = await spo.ensureUser('https://contoso.sharepoint.com/sites/sales', 'john.doe@contoso.com');
+    assert.deepStrictEqual(user, userResponse);
+  });
+
+  it('successfully ensures a SharePoint user when calling ensureUser', async () => {
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso.sharepoint.com/sites/sales/_api/web/EnsureUser') {
+        return userResponse;
+      }
+
+      throw 'Invalid request: ' + opts.url;
+    });
+
+    await spo.ensureUser('https://contoso.sharepoint.com/sites/sales', 'john.doe@contoso.com');
+    assert.deepStrictEqual(postStub.firstCall.args[0].data, { logonName: 'john.doe@contoso.com' });
+  });
+
+  it('successfully throws an error when calling ensureEntraGroup with a group that is not security enabled', async () => {
+    const graphGroup: Group = {
+      id: '38243edd-76c7-4d6d-9093-9e90e6e7e28a',
+      displayName: 'Sales',
+      securityEnabled: false,
+      mailEnabled: false
+    };
+
+    await assert.rejects(spo.ensureEntraGroup('https://contoso.sharepoint.com/sites/sales', graphGroup),
+      new Error('Cannot ensure a Microsoft Entra ID group that is not security enabled.'));
+  });
+
+  it('successfully outputs the ensured group when calling ensureEntraGroup', async () => {
+    const graphGroup: Group = {
+      id: '38243edd-76c7-4d6d-9093-9e90e6e7e28a',
+      displayName: 'Sales',
+      securityEnabled: true,
+      mailEnabled: false
+    };
+
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso.sharepoint.com/sites/sales/_api/web/EnsureUser') {
+        return entraGroupResponse;
+      }
+
+      throw 'Invalid request: ' + opts.url;
+    });
+
+    const group = await spo.ensureEntraGroup('https://contoso.sharepoint.com/sites/sales', graphGroup);
+    assert.deepStrictEqual(group, entraGroupResponse);
+  });
+
+  it('successfully ensures security group when calling ensureEntraGroup', async () => {
+    const graphGroup: Group = {
+      id: '38243edd-76c7-4d6d-9093-9e90e6e7e28a',
+      displayName: 'Sales',
+      securityEnabled: true,
+      mailEnabled: false
+    };
+
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso.sharepoint.com/sites/sales/_api/web/EnsureUser') {
+        return entraGroupResponse;
+      }
+
+      throw 'Invalid request: ' + opts.url;
+    });
+
+    await spo.ensureEntraGroup('https://contoso.sharepoint.com/sites/sales', graphGroup);
+    assert.deepStrictEqual(postStub.firstCall.args[0].data, { logonName: `c:0t.c|tenant|${graphGroup.id}` });
+  });
+
+  it('successfully ensures M365 group when calling ensureEntraGroup', async () => {
+    const graphGroup: Group = {
+      id: '38243edd-76c7-4d6d-9093-9e90e6e7e28a',
+      displayName: 'Sales',
+      securityEnabled: true,
+      mailEnabled: true
+    };
+
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso.sharepoint.com/sites/sales/_api/web/EnsureUser') {
+        return entraGroupResponse;
+      }
+
+      throw 'Invalid request: ' + opts.url;
+    });
+
+    await spo.ensureEntraGroup('https://contoso.sharepoint.com/sites/sales', graphGroup);
+    assert.deepStrictEqual(postStub.firstCall.args[0].data, { logonName: `c:0o.c|federateddirectoryclaimprovider|${graphGroup.id}` });
   });
 
   it(`throws error retrieving a custom action by id with a wrong scope value`, async () => {
