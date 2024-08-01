@@ -60,13 +60,10 @@ class EntraMultitenantRemoveCommand extends GraphCommand {
         let tenantsId = await this.getAllTenantsIds();
         const tenantsCount = tenantsId.length;
 
-        const tasks: Promise<void>[] = [];
-
         if (tenantsCount > 0) {
-          tenantsId.filter(x => x !== tenantId).forEach(t => {
-            tasks.push(this.removeTenant(logger, t));
-          });
-
+          const tasks = tenantsId
+            .filter(x => x !== tenantId)
+            .map(t => this.removeTenant(logger, t));
           await Promise.all(tasks);
 
           do {
@@ -77,7 +74,7 @@ class EntraMultitenantRemoveCommand extends GraphCommand {
             await new Promise(resolve => setTimeout(resolve, 30000));
 
             // from current behavior, removing tenant can take a few seconds
-            // current tenant must be removed once all previous one were removed
+            // current tenant must be removed once all previous ones were removed
             if (this.verbose) {
               await logger.logToStderr(`Checking all tenants were removed...`);
             }
