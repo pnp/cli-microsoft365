@@ -133,6 +133,6 @@ describe(commands.MULTITENANT_SET, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('Invalid request'));
+    await assert.rejects(command.action(logger, { options: {} }), new CommandError('Invalid request'));
   });
 });
