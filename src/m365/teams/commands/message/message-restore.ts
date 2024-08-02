@@ -1,18 +1,10 @@
-import { Channel, Group } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
-import { entraGroup } from '../../../../utils/entraGroup.js';
 import { validation } from '../../../../utils/validation.js';
-import GraphCommand from "../../../base/GraphCommand.js";
 import commands from '../../commands.js';
-import { formatting } from '../../../../utils/formatting.js';
-import { accessToken } from '../../../../utils/accessToken.js';
-import auth from '../../../../Auth.js';
-
-interface ExtendedGroup extends Group {
-  resourceProvisioningOptions: string[];
-}
+import DelegatedGraphCommand from '../../../base/DelegatedGraphCommand.js';
+import { teams } from '../../../../utils/teams.js';
 
 interface CommandArgs {
   options: Options;
@@ -26,7 +18,7 @@ interface Options extends GlobalOptions {
   id: string;
 }
 
-class TeamsMessageRestoreCommand extends GraphCommand {
+class TeamsMessageRestoreCommand extends DelegatedGraphCommand {
   public get name(): string {
     return commands.MESSAGE_RESTORE;
   }
@@ -100,51 +92,41 @@ class TeamsMessageRestoreCommand extends GraphCommand {
     this.types.string.push('teamName', 'channelName');
   }
 
-  private async getTeamId(options: Options): Promise<string> {
+  private async getTeamId(options: Options, logger: Logger): Promise<string> {
     if (options.teamId) {
       return options.teamId;
     }
 
-    const group = await entraGroup.getGroupByDisplayName(options.teamName!);
-
-    if ((group as ExtendedGroup).resourceProvisioningOptions.indexOf('Team') === -1) {
-      throw 'The specified team does not exist in the Microsoft Teams';
+    if (this.verbose) {
+      await logger.logToStderr(`Getting the Team ID.`);
     }
 
-    return group.id!;
+    const groupId = await teams.getTeamIdByDisplayName(options.teamName!);
+
+    return groupId;
   }
 
-  private async getChannelId(options: Options, teamId: string): Promise<string> {
+  private async getChannelId(options: Options, teamId: string, logger: Logger): Promise<string> {
     if (options.channelId) {
       return options.channelId;
     }
 
-    const channelRequestOptions: CliRequestOptions = {
-      url: `${this.resource}/v1.0/teams/${formatting.encodeQueryParameter(teamId)}/channels?$filter=displayName eq '${formatting.encodeQueryParameter(options.channelName as string)}'`,
-      headers: {
-        accept: 'application/json;odata.metadata=none'
-      },
-      responseType: 'json'
-    };
-
-    const response = await request.get<{ value: Channel[] }>(channelRequestOptions);
-    const channelItem: Channel | undefined = response.value[0];
-
-    if (!channelItem) {
-      throw `The specified channel does not exist in the Microsoft Teams team`;
+    if (this.verbose) {
+      await logger.logToStderr(`Getting the channel ID.`);
     }
 
-    return channelItem.id!;
+    const channelId = await teams.getChannelIdByDisplayName(teamId, options.channelName!);
+    return channelId;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
-      if (accessToken.isAppOnlyAccessToken(auth.connection.accessTokens[this.resource].accessToken)) {
-        throw 'This command currently does not support app only permissions.';
+      if (this.verbose) {
+        await logger.logToStderr(`Restoring deleted message '${args.options.id}' from channel '${args.options.channelId || args.options.channelName}' in the Microsoft Teams team ${args.options.teamId || args.options.teamName}.`);
       }
 
-      const teamId: string = await this.getTeamId(args.options);
-      const channelId: string = await this.getChannelId(args.options, teamId);
+      const teamId: string = await this.getTeamId(args.options, logger);
+      const channelId: string = await this.getChannelId(args.options, teamId, logger);
       const requestOptions: CliRequestOptions = {
         url: `${this.resource}/v1.0/teams/${teamId}/channels/${channelId}/messages/${args.options.id}/undoSoftDelete`,
         headers: {
@@ -153,8 +135,7 @@ class TeamsMessageRestoreCommand extends GraphCommand {
         responseType: 'json'
       };
 
-      const res: any = await request.post(requestOptions);
-      await logger.log(res);
+      await request.post(requestOptions);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
