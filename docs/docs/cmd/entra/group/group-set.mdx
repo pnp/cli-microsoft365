@@ -29,16 +29,16 @@ m365 entra group set [options]
 : The new mail alias for the group (part before the @). Use only for mail-enabled groups. Maximum length is 64 characters.
 
 `--ownerIds [ownerIds]`
-: Comma-separated list of IDs of Microsoft Entra users that will be the group owners.
+: Comma-separated list of IDs of Microsoft Entra users that will be the group owners. Specify either `ownerIds` or `ownerUserNames`, but not both.
 
 `--ownerUserNames [ownerUserNames]`
-: Comma-separated list of UPNs of Microsoft Entra users that will be the group owners.
+: Comma-separated list of UPNs of Microsoft Entra users that will be the group owners. Specify either `ownerIds` or `ownerUserNames`, but not both.
 
 `--memberIds [memberIds]`
-: Comma-separated list of IDs of Microsoft Entra users that will be the group members.
+: Comma-separated list of IDs of Microsoft Entra users that will be the group members. Specify either `memberIds` or `memberUserNames`, but not both.
 
 `--memberUserNames [memberUserNames]`
-: Comma-separated list of UPNs of Microsoft Entra users that will be the group members.
+: Comma-separated list of UPNs of Microsoft Entra users that will be the group members. Specify either `memberIds` or `memberUserNames`, but not both.
 
 `--visibility [visibility]`
 : Specifies the group join policy and group content visibility for Microsoft 365 groups. Possible values are: `Private` or `Public`. Specify only when targeting a Microsoft 365 group.
@@ -47,6 +47,8 @@ m365 entra group set [options]
 <Global />
 
 ## Remarks
+
+:::info
 
 The `visibility` option affects the behavior of the group.
 
@@ -60,7 +62,13 @@ With the `Private` visibilty:
 - Anyone can view the attributes of the group.
 - Anyone can see the members of the group.
 
+:::
+
+:::note
+
 This command allows using unknown options. For a comprehensive list of group properties, please refer to the [Graph documentation page](https://learn.microsoft.com/graph/api/resources/group?view=graph-rest-1.0#properties).
+
+:::
 
 If the specified option is not found, you will receive a `Resource 'xyz' does not exist or one of its queried reference-property objects are not present.` error.
 
