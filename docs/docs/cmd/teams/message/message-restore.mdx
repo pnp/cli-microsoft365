@@ -9,23 +9,23 @@ Restores a deleted message from a channel in a Microsoft Teams team
 ## Usage
 
 ```sh
-m365 teams restore [options]
+m365 teams message restore [options]
 ```
 
 ## Options
 
 ```md definition-list
-`-teamId [teamId]`
-: ID of the Microsoft Teams team. Specify either teamId or teamName but not both.
+`--teamId [teamId]`
+: ID of the Microsoft Teams team. Specify either `teamId` or `teamName` but not both.
 
 `--teamName [teamName]`
-:	Name of the Microsoft Teams team. Specify either teamId or teamName but not both.
+:	Name of the Microsoft Teams team. Specify either `teamId` or `teamName` but not both.
 
 `--channelId [channelId]`
-:	Channel ID of the Microsoft Teams team. Specify either channelId or channelName but not both.
+:	Channel ID of the Microsoft Teams team. Specify either `channelId` or `channelName` but not both.
 
 `--channelName [channelName]`
-:	Channel name of the Microsoft Teams team. Specify either channelId or channelName but not both.
+:	Channel name of the Microsoft Teams team. Specify either `channelId` or `channelName` but not both.
 
 `-i, --id <id>`
 :	The ID of the Teams message.
@@ -35,7 +35,7 @@ m365 teams restore [options]
 
 ## Remarks
 
-You can only restore a message from a Microsoft Teams team if you are a member of that team.
+You can only restore a message from a Microsoft Teams team that you made yourself.
 
 ## Examples
 

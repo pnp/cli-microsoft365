@@ -19,10 +19,10 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  teamId: string;
-  teamName: string;
-  channelId: string;
-  channelName: string;
+  teamId?: string;
+  teamName?: string;
+  channelId?: string;
+  channelName?: string;
   id: string;
 }
 
@@ -42,6 +42,7 @@ class TeamsMessageRestoreCommand extends GraphCommand {
     this.#initOptions();
     this.#initValidators();
     this.#initOptionSets();
+    this.#initTypes();
   }
 
   #initTelemetry(): void {
@@ -58,13 +59,13 @@ class TeamsMessageRestoreCommand extends GraphCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '-t, --teamId [teamId]'
+        option: '--teamId [teamId]'
       },
       {
         option: '--teamName [teamName]'
       },
       {
-        option: '-c, --channelId [channelId]'
+        option: '--channelId [channelId]'
       },
       {
         option: '--channelName [channelName]'
@@ -79,11 +80,11 @@ class TeamsMessageRestoreCommand extends GraphCommand {
     this.validators.push(
       async (args: CommandArgs) => {
         if (args.options.teamId && !validation.isValidGuid(args.options.teamId)) {
-          return `${args.options.teamId} is not a valid GUID`;
+          return `'${args.options.teamId}' is not a valid GUID for 'teamId'.`;
         }
 
         if (args.options.channelId && !validation.isValidTeamsChannelId(args.options.channelId as string)) {
-          return `${args.options.channelId} is not a valid Teams ChannelId`;
+          return `'${args.options.channelId}' is not a valid ID for 'channelId'.`;
         }
 
         return true;
@@ -93,6 +94,10 @@ class TeamsMessageRestoreCommand extends GraphCommand {
 
   #initOptionSets(): void {
     this.optionSets.push({ options: ['teamId', 'teamName'] }, { options: ['channelId', 'channelName'] });
+  }
+
+  #initTypes(): void {
+    this.types.string.push('teamName', 'channelName');
   }
 
   private async getTeamId(options: Options): Promise<string> {

@@ -4084,13 +4084,13 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
-              label: 'message send',
-              id: 'cmd/teams/message/message-send'
+              label: 'message restore',
+              id: 'cmd/teams/message/message-restore'
             },
             {
               type: 'doc',
-              label: 'message restore',
-              id: 'cmd/teams/message/message-restore'
+              label: 'message send',
+              id: 'cmd/teams/message/message-send'
             },
             {
               type: 'doc',
