@@ -89,6 +89,7 @@ class EntraMultitenantRemoveCommand extends GraphCommand {
 
           // current tenant must be removed as the last one
           await this.removeTenant(logger, tenantId);
+          await logger.logToStderr('Your Multi-Tenant organization is being removed; this can take up to 2 hours.')
         }
       }
       catch (err: any) {
