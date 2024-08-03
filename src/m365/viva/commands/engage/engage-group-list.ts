@@ -3,7 +3,6 @@ import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import VivaEngageCommand from '../../../base/VivaEngageCommand.js';
 import commands from '../../commands.js';
-import yammerCommands from './yammerCommands.js';
 
 interface CommandArgs {
   options: Options;
@@ -23,10 +22,6 @@ class VivaEngageGroupListCommand extends VivaEngageCommand {
 
   public get description(): string {
     return 'Returns the list of groups in a Viva Engage network or the groups for a specific user';
-  }
-
-  public alias(): string[] | undefined {
-    return [yammerCommands.GROUP_LIST];
   }
 
   constructor() {
@@ -114,8 +109,6 @@ class VivaEngageGroupListCommand extends VivaEngageCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    await this.showDeprecationWarning(logger, this.alias()![0], this.name);
-
     this.items = []; // this will reset the items array in interactive mode
 
     try {

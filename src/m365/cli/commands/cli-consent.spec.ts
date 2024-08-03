@@ -65,11 +65,6 @@ describe(commands.CONSENT, () => {
     assert(loggerLogSpy.calledWith(`To consent permissions for executing VivaEngage commands, navigate in your web browser to https://login.microsoftonline.com/common/oauth2/v2.0/authorize?client_id=31359c7f-bd7e-475c-86db-fdb8c937548e&response_type=code&scope=https%3A%2F%2Fapi.yammer.com%2Fuser_impersonation`));
   });
 
-  it('shows consent URL for yammer permissions for the default multi-tenant app', async () => {
-    await command.action(logger, { options: { service: 'yammer' } });
-    assert(loggerLogSpy.calledWith(`To consent permissions for executing yammer commands, navigate in your web browser to https://login.microsoftonline.com/common/oauth2/v2.0/authorize?client_id=31359c7f-bd7e-475c-86db-fdb8c937548e&response_type=code&scope=https%3A%2F%2Fapi.yammer.com%2Fuser_impersonation`));
-  });
-
   it('shows consent URL for VivaEngage permissions for a custom single-tenant app', async () => {
     config.tenant = 'fb5cb38f-ecdb-4c6a-a93b-b8cfd56b4a89';
     config.cliEntraAppId = '2587b55d-a41e-436d-bb1d-6223eb185dd4';

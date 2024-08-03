@@ -13,7 +13,6 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './engage-message-remove.js';
 import { settingsNames } from '../../../../settingsNames.js';
-import yammerCommands from './yammerCommands.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 
 describe(commands.ENGAGE_MESSAGE_REMOVE, () => {
@@ -66,23 +65,6 @@ describe(commands.ENGAGE_MESSAGE_REMOVE, () => {
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
-  });
-
-  it('defines correct alias', () => {
-    const alias = command.alias();
-    assert.deepStrictEqual(alias, [yammerCommands.MESSAGE_REMOVE]);
-  });
-
-  it('correctly logs deprecation warning for yammer command', async () => {
-    const chalk = (await import('chalk')).default;
-    const loggerErrSpy = sinon.spy(logger, 'logToStderr');
-    const commandNameStub = sinon.stub(cli, 'currentCommandName').value(yammerCommands.MESSAGE_REMOVE);
-    sinon.stub(request, 'delete').resolves();
-
-    await command.action(logger, { options: { id: 10123190123123, force: true } });
-    assert.deepStrictEqual(loggerErrSpy.firstCall.firstArg, chalk.yellow(`Command '${yammerCommands.MESSAGE_REMOVE}' is deprecated. Please use '${commands.ENGAGE_MESSAGE_REMOVE}' instead.`));
-
-    sinonUtil.restore([loggerErrSpy, commandNameStub]);
   });
 
   it('id must be a number', async () => {

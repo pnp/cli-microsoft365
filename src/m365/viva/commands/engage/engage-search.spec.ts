@@ -13,7 +13,6 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import { settingsNames } from '../../../../settingsNames.js';
 import command from './engage-search.js';
-import yammerCommands from './yammerCommands.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 
 describe(commands.ENGAGE_SEARCH, () => {
@@ -248,23 +247,6 @@ describe(commands.ENGAGE_SEARCH, () => {
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
-  });
-
-  it('defines correct alias', () => {
-    const alias = command.alias();
-    assert.deepStrictEqual(alias, [yammerCommands.SEARCH]);
-  });
-
-  it('correctly logs deprecation warning for yammer command', async () => {
-    const chalk = (await import('chalk')).default;
-    const loggerErrSpy = sinon.spy(logger, 'logToStderr');
-    const commandNameStub = sinon.stub(cli, 'currentCommandName').value(yammerCommands.SEARCH);
-    sinon.stub(request, 'get').resolves(searchResults);
-
-    await command.action(logger, { options: { queryText: 'contents' } });
-    assert.deepStrictEqual(loggerErrSpy.firstCall.firstArg, chalk.yellow(`Command '${yammerCommands.SEARCH}' is deprecated. Please use '${commands.ENGAGE_SEARCH}' instead.`));
-
-    sinonUtil.restore([loggerErrSpy, commandNameStub]);
   });
 
   it('correctly handles error', async () => {
