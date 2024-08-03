@@ -46,20 +46,14 @@ describe(commands.SITE_ADMIN_LIST, () => {
 
   const listOfAdminsResultAsAdmin = [
     {
-      Id: null,
       LoginName: 'user1loginName',
       Title: 'user1DisplayName',
-      PrincipalType: null,
-      PrincipalTypeString: null,
       IsPrimaryAdmin: true,
       Email: 'user1Email@email.com'
     },
     {
-      Id: null,
       LoginName: 'user2loginName',
       Title: 'user2DisplayName',
-      PrincipalType: null,
-      PrincipalTypeString: null,
       IsPrimaryAdmin: false,
       Email: 'user2Email@email.com'
     }
