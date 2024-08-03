@@ -112,7 +112,7 @@ describe(commands.PERMISSION_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { applicationPermission: applicationPermissions, verbose: true } });
+    await command.action(logger, { options: { applicationPermissions: applicationPermissions, verbose: true } });
     assert(patchStub.called);
   });
 
@@ -144,7 +144,7 @@ describe(commands.PERMISSION_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { applicationPermission: applicationPermissions, grantAdminConsent: true, verbose: true } });
+    await command.action(logger, { options: { applicationPermissions: applicationPermissions, grantAdminConsent: true, verbose: true } });
     assert.strictEqual(amountOfPostCalls, 2);
   });
 
@@ -167,7 +167,7 @@ describe(commands.PERMISSION_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { delegatedPermission: delegatedPermissions, verbose: true } });
+    await command.action(logger, { options: { delegatedPermissions: delegatedPermissions, verbose: true } });
     assert(patchStub.called);
   });
 
@@ -200,7 +200,7 @@ describe(commands.PERMISSION_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { delegatedPermission: delegatedPermissions, grantAdminConsent: true, verbose: true } });
+    await command.action(logger, { options: { delegatedPermissions: delegatedPermissions, grantAdminConsent: true, verbose: true } });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, {
       clientId: servicePrincipalId,
       consentType: 'AllPrincipals',
@@ -244,7 +244,7 @@ describe(commands.PERMISSION_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { delegatedPermission: delegatedPermissions, applicationPermission: applicationPermissions, grantAdminConsent: true, verbose: true } });
+    await command.action(logger, { options: { delegatedPermissions: delegatedPermissions, applicationPermissions: applicationPermissions, grantAdminConsent: true, verbose: true } });
     assert.strictEqual(amountOfPostCalls, 3);
   });
 
@@ -260,7 +260,7 @@ describe(commands.PERMISSION_ADD, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { applicationPermission: applicationPermissions, verbose: true } }),
+    await assert.rejects(command.action(logger, { options: { applicationPermissions: applicationPermissions, verbose: true } }),
       new CommandError(`App with id ${appId} not found in Microsoft Entra ID.`));
   });
 
@@ -279,7 +279,7 @@ describe(commands.PERMISSION_ADD, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { applicationPermission: api, verbose: true } }),
+    await assert.rejects(command.action(logger, { options: { applicationPermissions: api, verbose: true } }),
       new CommandError(`Service principal ${servicePrincipalName} not found`));
   });
 
@@ -299,26 +299,26 @@ describe(commands.PERMISSION_ADD, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { applicationPermission: api, verbose: true } }),
+    await assert.rejects(command.action(logger, { options: { applicationPermissions: api, verbose: true } }),
       new CommandError(`Permission ${permissionName} for service principal ${servicePrincipalName} not found`));
   });
 
-  it('passes validation if applicationPermission is passed', async () => {
-    const actual = await command.validate({ options: { applicationPermission: applicationPermissions } }, commandInfo);
+  it('passes validation if applicationPermissions is passed', async () => {
+    const actual = await command.validate({ options: { applicationPermissions: applicationPermissions } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if delegatedPermission is passed', async () => {
-    const actual = await command.validate({ options: { delegatedPermission: delegatedPermissions } }, commandInfo);
+  it('passes validation if delegatedPermissions is passed', async () => {
+    const actual = await command.validate({ options: { delegatedPermissions: delegatedPermissions } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if both applicationPermission or delegatedPermission are passed', async () => {
-    const actual = await command.validate({ options: { applicationPermission: applicationPermissions, delegatedPermission: delegatedPermissions } }, commandInfo);
+  it('passes validation if both applicationPermissions or delegatedPermissions are passed', async () => {
+    const actual = await command.validate({ options: { applicationPermissions: applicationPermissions, delegatedPermissions: delegatedPermissions } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation if both applicationPermission or delegatedPermission is not passed', async () => {
+  it('fails validation if both applicationPermissions or delegatedPermissions is not passed', async () => {
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
       if (settingName === settingsNames.prompt) {
         return false;

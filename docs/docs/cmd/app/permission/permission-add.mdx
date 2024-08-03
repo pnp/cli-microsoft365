@@ -16,10 +16,10 @@ m365 app permission add [options]
 `--appId [appId]`
 : Client ID of the Microsoft Entra app registered in the .m365rc.json file to retrieve API permissions for.
 
-`--applicationPermission [applicationPermission]`
+`--applicationPermissions [applicationPermissions]`
 : Space-separated list of application permissions to add.
 
-`--delegatedPermission [delegatedPermission]`
+`--delegatedPermissions [delegatedPermissions]`
 : Space-separated list of delegated permissions to add.
 
 `--grantAdminConsent`
@@ -37,19 +37,19 @@ If you have multiple apps registered in your .m365rc.json file, you can specify 
 Adds the specified application permissions to the default app registered in the _.m365rc.json_ file while granting admin consent.
 
 ```sh
-m365 app permission add --applicationPermission 'https://graph.microsoft.com/User.ReadWrite.All https://graph.microsoft.com/User.Read.All' --grantAdminConsent
+m365 app permission add --applicationPermissions 'https://graph.microsoft.com/User.ReadWrite.All https://graph.microsoft.com/User.Read.All' --grantAdminConsent
 ```
 
 Adds the specified delegated permissions to the default app registered in the _.m365rc.json_ file without granting admin consent.
 
 ```sh
-m365 app permission add --delegatedPermission 'https://graph.microsoft.com/offline_access'
+m365 app permission add --delegatedPermissions 'https://graph.microsoft.com/offline_access'
 ```
 
 Adds the specified application and delegated permissions to a specific app registered in the _.m365rc.json_ file while granting admin consent.
 
 ```sh
-m365 app permission add --appId '1663767b-4172-4519-bfd1-28e6ff19055b' --applicationPermission 'https://graph.microsoft.com/User.ReadWrite.All https://graph.microsoft.com/User.Read.All' --delegatedPermission 'https://graph.microsoft.com/offline_access' --grantAdminConsent
+m365 app permission add --appId '1663767b-4172-4519-bfd1-28e6ff19055b' --applicationPermissions 'https://graph.microsoft.com/User.ReadWrite.All https://graph.microsoft.com/User.Read.All' --delegatedPermissions 'https://graph.microsoft.com/offline_access' --grantAdminConsent
 ```
 
 ## Response
