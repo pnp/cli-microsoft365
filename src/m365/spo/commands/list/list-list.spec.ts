@@ -119,7 +119,7 @@ describe(commands.LIST_LIST, () => {
   });
 
   it('defines correct properties for the default output', () => {
-    assert.deepStrictEqual(command.defaultProperties(), ['Title', 'Url', 'Id']);
+    assert.deepStrictEqual(command.defaultProperties(), ['Title', 'Id']);
   });
 
   it('retrieves all lists', async () => {
@@ -149,8 +149,7 @@ describe(commands.LIST_LIST, () => {
             ParentWebUrl: "/",
             RootFolder: {
               ServerRelativeUrl: "/Lists/test"
-            },
-            Url: "/Lists/test"
+            }
           }]
         };
       }
@@ -169,8 +168,7 @@ describe(commands.LIST_LIST, () => {
       ParentWebUrl: "/",
       RootFolder: {
         ServerRelativeUrl: "/Lists/test"
-      },
-      Url: "/Lists/test"
+      }
     }]));
   });
 
