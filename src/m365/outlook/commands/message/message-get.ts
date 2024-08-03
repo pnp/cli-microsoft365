@@ -13,7 +13,7 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   id: string;
   userId?: string;
-  userPrincipalName?: string;
+  userName?: string;
 }
 
 class OutlookMessageGetCommand extends GraphCommand {
@@ -36,7 +36,7 @@ class OutlookMessageGetCommand extends GraphCommand {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
         userId: typeof args.options.userId !== 'undefined',
-        userPrincipalName: typeof args.options.userPrincipalName !== 'undefined'
+        userName: typeof args.options.userName !== 'undefined'
       });
     });
   }
@@ -50,7 +50,7 @@ class OutlookMessageGetCommand extends GraphCommand {
         option: '--userId [userId]'
       },
       {
-        option: '--userPrincipalName [userPrincipalName]'
+        option: '--userName [userName]'
       }
     );
   }
@@ -65,21 +65,21 @@ class OutlookMessageGetCommand extends GraphCommand {
       let requestUrl = '';
 
       if (isAppOnlyAccessToken) {
-        if (!args.options.userId && !args.options.userPrincipalName) {
-          throw `The option 'userId' or 'userPrincipalName' is required when retrieving an email using app only credentials`;
+        if (!args.options.userId && !args.options.userName) {
+          throw `The option 'userId' or 'userName' is required when retrieving an email using app only credentials`;
         }
-        if (args.options.userId && args.options.userPrincipalName) {
-          throw `Both options 'userId' and 'userPrincipalName' cannot be set when retrieving an email using app only credentials`;
+        if (args.options.userId && args.options.userName) {
+          throw `Both options 'userId' and 'userName' cannot be set when retrieving an email using app only credentials`;
         }
-        requestUrl += `users/${args.options.userId ? args.options.userId : args.options.userPrincipalName}`;
+        requestUrl += `users/${args.options.userId ? args.options.userId : args.options.userName}`;
       }
       else {
-        if (args.options.userId && args.options.userPrincipalName) {
-          throw `Both options 'userId' and 'userPrincipalName' cannot be set when retrieving an email using delegated credentials`;
+        if (args.options.userId && args.options.userName) {
+          throw `Both options 'userId' and 'userName' cannot be set when retrieving an email using delegated credentials`;
         }
 
-        if (args.options.userId || args.options.userPrincipalName) {
-          requestUrl += `users/${args.options.userId ? args.options.userId : args.options.userPrincipalName}`;
+        if (args.options.userId || args.options.userName) {
+          requestUrl += `users/${args.options.userId ? args.options.userId : args.options.userName}`;
         }
         else {
           requestUrl += 'me';

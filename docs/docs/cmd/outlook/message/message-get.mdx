@@ -19,10 +19,10 @@ m365 outlook message get [options]
 : ID of the message.
 
 `--userId [userId]`
-: ID of the user from which to retrieve the message. Specify either `userId` or `userPrincipalName`, but not both. This option is required when using application permissions.
+: ID of the user from which to retrieve the message. Specify either `userId` or `userName`, but not both. This option is required when using application permissions.
 
-`--userPrincipalName [userPrincipalName]`
-: UPN of the user from which to retrieve the message Specify either `userId` or `userPrincipalName`, but not both. This option is required when using application permissions.
+`--userName [userName]`
+: UPN of the user from which to retrieve the message Specify either `userId` or `userName`, but not both. This option is required when using application permissions.
 ```
 
 <Global />
@@ -38,7 +38,7 @@ m365 outlook message get --id AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYm
 Get a specific message using delegated permissions from a shared mailbox.
 
 ```sh
-m365 outlook message get --id AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OABGAAAAAAAiQ8W967B7TKBjgx9rVEURBwAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAAiIsqMbYjsT5e-T7KzowPTAALvuv07AAA= --userPrincipalName sharedmailbox@tenant.com
+m365 outlook message get --id AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OABGAAAAAAAiQ8W967B7TKBjgx9rVEURBwAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAAiIsqMbYjsT5e-T7KzowPTAALvuv07AAA= --userName sharedmailbox@tenant.com
 ```
 
 Get a specific message from a specific user retrieved by user ID using application permissions.
@@ -50,7 +50,7 @@ m365 outlook message get --id AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYm
 Get a specific message from a specific user retrieved by user principal name using application permissions.
 
 ```sh
-m365 outlook message get --id AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OABGAAAAAAAiQ8W967B7TKBjgx9rVEURBwAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAAiIsqMbYjsT5e-T7KzowPTAALvuv07AAA= --userPrincipalName user@tenant.com
+m365 outlook message get --id AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OABGAAAAAAAiQ8W967B7TKBjgx9rVEURBwAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAAiIsqMbYjsT5e-T7KzowPTAALvuv07AAA= --userName user@tenant.com
 ```
 
 ## Response
