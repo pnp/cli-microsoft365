@@ -1822,5 +1822,44 @@ export const spo = {
 
     const itemsResponse = await request.get<ListItemInstance>(requestOptionsItems);
     return (itemsResponse);
+  },
+
+  /**
+   * Gets the site collection URL for a given web URL using SP Admin site.
+   * @param adminUrl The SharePoint admin URL
+   * @param siteId The site ID
+   * @returns Owner login name
+   */
+  async getPrimaryAdminLoginNameAsAdmin(adminUrl: string, siteId: string): Promise<string> {
+    const requestOptions: CliRequestOptions = {
+      url: `${adminUrl}/_api/SPO.Tenant/sites('${siteId}')?$select=OwnerLoginName`,
+      headers: {
+        accept: 'application/json;odata=nometadata',
+        'content-type': 'application/json;charset=utf-8'
+      }
+    };
+
+    const response: string = await request.get<string>(requestOptions);
+    const responseContent = JSON.parse(response);
+    return responseContent.OwnerLoginName;
+  },
+
+  /**
+   * Gets the primary owner login from a site
+   * @param siteUrl The site URL
+   * @returns Owner login name
+   */
+  async getPrimaryOwnerLoginFromSite(siteUrl: string): Promise<string> {
+    const requestOptions: CliRequestOptions = {
+      url: `${siteUrl}/_api/site/owner`,
+      method: 'GET',
+      headers: {
+        'accept': 'application/json;odata=nometadata'
+      },
+      responseType: 'json'
+    };
+
+    const responseContent = await request.get<{ LoginName: string }>(requestOptions);
+    return responseContent?.LoginName;
   }
 };

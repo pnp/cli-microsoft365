@@ -129,7 +129,7 @@ class SpoSiteAdminListCommand extends SpoCommand {
 
     const response: string = await request.post<string>(requestOptions);
     const responseContent: AdminResult = JSON.parse(response);
-    const primaryAdminLoginName = await this.getPrimaryAdminLoginNameFromAdmin(adminUrl, siteId);
+    const primaryAdminLoginName = await spo.getPrimaryAdminLoginNameAsAdmin(adminUrl, siteId);
 
     const mappedResult = responseContent.value.map((u: AdminUserResult): CommandResultItem => ({
       Id: null,
@@ -153,20 +153,6 @@ class SpoSiteAdminListCommand extends SpoCommand {
     return match[1];
   }
 
-  private async getPrimaryAdminLoginNameFromAdmin(adminUrl: string, siteId: string): Promise<string> {
-    const requestOptions: CliRequestOptions = {
-      url: `${adminUrl}/_api/SPO.Tenant/sites('${siteId}')?$select=OwnerLoginName`,
-      headers: {
-        accept: 'application/json;odata=nometadata',
-        'content-type': 'application/json;charset=utf-8'
-      }
-    };
-
-    const response: string = await request.get<string>(requestOptions);
-    const responseContent = JSON.parse(response);
-    return responseContent.OwnerLoginName;
-  }
-
   private async callAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
       await logger.logToStderr('Retrieving site administrators...');
@@ -182,7 +168,7 @@ class SpoSiteAdminListCommand extends SpoCommand {
     };
 
     const responseContent: SiteResult = await request.get<SiteResult>(requestOptions);
-    const primaryOwnerLogin = await this.getPrimaryOwnerLoginFromSite(args.options.siteUrl);
+    const primaryOwnerLogin = await spo.getPrimaryOwnerLoginFromSite(args.options.siteUrl);
     const mappedResult = responseContent.value.map((u: SiteUserResult): CommandResultItem => ({
       Id: u.Id,
       LoginName: u.LoginName,
@@ -193,20 +179,6 @@ class SpoSiteAdminListCommand extends SpoCommand {
       IsPrimaryAdmin: u.LoginName === primaryOwnerLogin
     }));
     await logger.log(mappedResult);
-  }
-
-  private async getPrimaryOwnerLoginFromSite(siteUrl: string): Promise<string | null> {
-    const requestOptions: CliRequestOptions = {
-      url: `${siteUrl}/_api/site/owner`,
-      method: 'GET',
-      headers: {
-        'accept': 'application/json;odata=nometadata'
-      },
-      responseType: 'json'
-    };
-
-    const responseContent = await request.get<{ LoginName: string }>(requestOptions);
-    return responseContent?.LoginName ?? null;
   }
 }
 
