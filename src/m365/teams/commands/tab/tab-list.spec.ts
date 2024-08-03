@@ -75,7 +75,7 @@ describe(commands.TAB_LIST, () => {
   });
 
   it('defines correct properties for the default output', () => {
-    assert.deepStrictEqual(command.defaultProperties(), ['id', 'displayName', 'teamsAppTabId']);
+    assert.deepStrictEqual(command.defaultProperties(), ['id', 'displayName']);
   });
 
   it('fails validation for a incorrect channelId missing leading 19:.', async () => {
@@ -193,8 +193,7 @@ describe(commands.TAB_LIST, () => {
         "externalId": null,
         "displayName": "Document Library",
         "distributionMethod": "store"
-      },
-      "teamsAppTabId": "com.microsoft.teamspace.tab.files.sharepoint"
+      }
     },
     {
       "id": "ba38f554-9ce6-4719-bc9b-e38e4ca16860",
@@ -212,8 +211,7 @@ describe(commands.TAB_LIST, () => {
         "externalId": null,
         "displayName": "Website",
         "distributionMethod": "store"
-      },
-      "teamsAppTabId": "com.microsoft.teamspace.tab.web"
+      }
     },
     {
       "id": "b6c511f1-3ad7-4111-8a82-36b13aad4c9e",
@@ -230,8 +228,7 @@ describe(commands.TAB_LIST, () => {
         "externalId": null,
         "displayName": "Word",
         "distributionMethod": "store"
-      },
-      "teamsAppTabId": "com.microsoft.teamspace.tab.file.staticviewer.word"
+      }
     },
     {
       "id": "d9e972d8-e93d-4b87-beb2-3698912398ea",
@@ -251,8 +248,7 @@ describe(commands.TAB_LIST, () => {
         "externalId": null,
         "displayName": "Wiki",
         "distributionMethod": "store"
-      },
-      "teamsAppTabId": "com.microsoft.teamspace.tab.wiki"
+      }
     }]));
   });
 
@@ -282,8 +278,7 @@ describe(commands.TAB_LIST, () => {
         "externalId": null,
         "displayName": "Document Library",
         "distributionMethod": "store"
-      },
-      "teamsAppTabId": "com.microsoft.teamspace.tab.files.sharepoint"
+      }
     },
     {
       "id": "ba38f554-9ce6-4719-bc9b-e38e4ca16860",
@@ -301,8 +296,7 @@ describe(commands.TAB_LIST, () => {
         "externalId": null,
         "displayName": "Website",
         "distributionMethod": "store"
-      },
-      "teamsAppTabId": "com.microsoft.teamspace.tab.web"
+      }
     },
     {
       "id": "b6c511f1-3ad7-4111-8a82-36b13aad4c9e",
@@ -319,8 +313,7 @@ describe(commands.TAB_LIST, () => {
         "externalId": null,
         "displayName": "Word",
         "distributionMethod": "store"
-      },
-      "teamsAppTabId": "com.microsoft.teamspace.tab.file.staticviewer.word"
+      }
     },
     {
       "id": "d9e972d8-e93d-4b87-beb2-3698912398ea",
@@ -340,8 +333,7 @@ describe(commands.TAB_LIST, () => {
         "externalId": null,
         "displayName": "Wiki",
         "distributionMethod": "store"
-      },
-      "teamsAppTabId": "com.microsoft.teamspace.tab.wiki"
+      }
     }]));
   });
 });
