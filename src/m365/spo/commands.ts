@@ -317,6 +317,7 @@ export default {
   TENANT_SETTINGS_SET: `${prefix} tenant settings set`,
   TENANT_SITE_ARCHIVE: `${prefix} tenant site archive`,
   TENANT_SITE_UNARCHIVE: `${prefix} tenant site unarchive`,
+  TENANT_SITE_MEMBERSHIP_LIST: `${prefix} tenant site membership list`,
   TERM_ADD: `${prefix} term add`,
   TERM_GET: `${prefix} term get`,
   TERM_LIST: `${prefix} term list`,
