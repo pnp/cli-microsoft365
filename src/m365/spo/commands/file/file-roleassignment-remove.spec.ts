@@ -50,6 +50,7 @@ describe(commands.FILE_ROLEASSIGNMENT_REMOVE, () => {
     UIVersionLabel: '3.0',
     UniqueId: 'b2307a39-e878-458b-bc90-03bc578531d6'
   };
+
   const userResponse = {
     Id: 2,
     IsHiddenInUI: false,

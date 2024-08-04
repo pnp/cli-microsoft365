@@ -72,6 +72,7 @@ describe(commands.FILE_ROLEASSIGNMENT_ADD, () => {
     ],
     RoleTypeKindValue: 'Administrator'
   };
+
   const fileResponse = {
     CheckInComment: '',
     CheckOutType: 2,
@@ -99,6 +100,7 @@ describe(commands.FILE_ROLEASSIGNMENT_ADD, () => {
       ID: 4
     }
   };
+
   const userResponse = {
     Id: 11,
     IsHiddenInUI: false,
@@ -116,6 +118,7 @@ describe(commands.FILE_ROLEASSIGNMENT_ADD, () => {
     },
     UserPrincipalName: 'someaccount@tenant.onmicrosoft.com'
   };
+
   const groupResponse = {
     Id: 5,
     IsHiddenInUI: false,

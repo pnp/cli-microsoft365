@@ -2560,11 +2560,11 @@ describe('utils/spo', () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://contoso.sharepoint.com/sites/sales/_api/web/GetFileById('${formatting.encodeQueryParameter(id)}')`) {
         return fileResponse;
-
       }
 
       throw 'Invalid request';
     });
+
     const group = await spo.getFileById(webUrl, id, logger, true);
     assert.deepEqual(group, fileResponse);
   });
