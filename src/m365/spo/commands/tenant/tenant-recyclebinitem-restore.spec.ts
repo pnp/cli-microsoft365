@@ -70,19 +70,6 @@ describe(commands.TENANT_RECYCLEBINITEM_RESTORE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it(`correctly shows deprecation warning for option 'wait'`, async () => {
-    const chalk = (await import('chalk')).default;
-    const loggerErrSpy = sinon.spy(logger, 'logToStderr');
-
-    sinon.stub(request, 'post').resolves();
-    sinon.stub(odata, 'getAllItems').resolves([{ GroupId: '00000000-0000-0000-0000-000000000000' }]);
-
-    await command.action(logger, { options: { siteUrl: siteUrl, wait: true } });
-    assert(loggerErrSpy.calledWith(chalk.yellow(`Option 'wait' is deprecated and will be removed in the next major release.`)));
-
-    sinonUtil.restore(loggerErrSpy);
-  });
-
   it('fails validation if the url option is not a valid SharePoint site URL', async () => {
     const actual = await command.validate({ options: { siteUrl: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
