@@ -1,0 +1,14 @@
+# v9 Upgrade Guidance
+
+The v9 of CLI for Microsoft 365 introduces several breaking changes. To help you upgrade to the latest version of CLI for Microsoft 365, we've listed those changes along with any actions you may need to take.
+
+## SharePoint
+
+### Removed the deprecated `wait` option and output from the `spo tenant recyclebinitem restore` command
+
+For this new major version, we've removed the deprecated `wait` option from the `spo tenant recyclebinitem restore` command. The command now won't return a response on success.
+
+#### What action do I need to take?
+
+- Please, check the documentation of the [spo tenant recyclebinitem restore](./cmd/spo/tenant/tenant-recyclebinitem-restore.mdx) command to see the updated output and adjust your scripts accordingly.
+- In the `spo tenant recyclebinitem restore` command, remove deprecated `wait` option from your scripts.

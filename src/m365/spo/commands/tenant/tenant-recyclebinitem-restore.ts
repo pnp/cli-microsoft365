@@ -15,7 +15,6 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   siteUrl: string;
-  wait?: boolean;
 }
 
 class SpoTenantRecycleBinItemRestoreCommand extends SpoCommand {
@@ -30,27 +29,15 @@ class SpoTenantRecycleBinItemRestoreCommand extends SpoCommand {
   constructor() {
     super();
 
-    this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
     this.#initTypes();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        wait: !!args.options.wait
-      });
-    });
   }
 
   #initOptions(): void {
     this.options.unshift(
       {
         option: '-u, --siteUrl <siteUrl>'
-      },
-      {
-        option: '--wait'
       }
     );
   }
@@ -63,14 +50,9 @@ class SpoTenantRecycleBinItemRestoreCommand extends SpoCommand {
 
   #initTypes(): void {
     this.types.string.push('siteUrl');
-    this.types.boolean.push('wait');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    if (args.options.wait) {
-      await this.warn(logger, `Option 'wait' is deprecated and will be removed in the next major release.`);
-    }
-
     try {
       if (this.verbose) {
         await logger.logToStderr(`Restoring site collection '${args.options.siteUrl}' from recycle bin.`);
@@ -113,7 +95,6 @@ class SpoTenantRecycleBinItemRestoreCommand extends SpoCommand {
       // This has to be removed in the next major release.
       await logger.log({
         HasTimedout: false,
-        IsComplete: !!args.options.wait,
         PollingInterval: 15000
       });
     }
