@@ -22,40 +22,40 @@ m365 entra sp get [options]
 ## Options
 
 ```md definition-list
-`-i, --appId [appId]`
-: ID of the application for which the enterprise application should be retrieved
+`-i, --id [id]`
+: ID of the application for which the enterprise application should be retrieved.
 
-`-n, --appDisplayName [appDisplayName]`
-: Display name of the application for which the enterprise application should be retrieved
+`-n, --displayName [displayName]`
+: Display name of the application for which the enterprise application should be retrieved.
 
-`--appObjectId [appObjectId]`
-: ObjectId of the application for which the enterprise application should be retrieved
+`--objectId [objectId]`
+: ObjectId of the application for which the enterprise application should be retrieved.
 ```
 
 <Global />
 
 ## Remarks
 
-Specify either the `appId`, `appObjectId` or `appDisplayName`. If you specify more than one option value, the command will fail with an error.
+Specify either the `id`, `displayName` or `objectId`. If you specify more than one option value, the command will fail with an error.
 
 ## Examples
 
-Return details about the enterprise application with appId _b2307a39-e878-458b-bc90-03bc578531d6_.
+Return details about the enterprise application with the specified id.
 
 ```sh
-m365 entra enterpriseapp get --appId b2307a39-e878-458b-bc90-03bc578531d6
+m365 entra enterpriseapp get --id b2307a39-e878-458b-bc90-03bc578531d6
 ```
 
-Return details about the _Microsoft Graph_ enterprise application.
+Return details about the enterprise application with the specified displayName.
 
 ```sh
-m365 entra enterpriseapp get --appDisplayName "Microsoft Graph"
+m365 entra enterpriseapp get --displayName "Microsoft Graph"
 ```
 
-Return details about the enterprise application with ObjectId _b2307a39-e878-458b-bc90-03bc578531dd_.
+Return details about the enterprise application with the specified ObjectId.
 
 ```sh
-m365 entra enterpriseapp get --appObjectId b2307a39-e878-458b-bc90-03bc578531dd
+m365 entra enterpriseapp get --objectId b2307a39-e878-458b-bc90-03bc578531dd
 ```
 
 ## Response
@@ -198,7 +198,7 @@ m365 entra enterpriseapp get --appObjectId b2307a39-e878-458b-bc90-03bc578531dd
   <TabItem value="Markdown">
 
   ```md
-  # entra enterpriseapp get --appId "ac7c9b4b-83b0-4a5e-ace2-a3530162c8f8"
+  # entra enterpriseapp get --id "ac7c9b4b-83b0-4a5e-ace2-a3530162c8f8"
 
   Date: 2023-06-02
 
