@@ -70,7 +70,7 @@ This script will retrieve all environments as an Administrator and loop through 
       $results += [pscustomobject]@{
         type          = "flow"
         id            = $_.name
-        displayName   = $_.displayName
+        displayName   = $_.properties.displayName
         envId         = $envId
         lifeCycleId   = $_.properties.lifeCycleId
         status        = $_.properties.state

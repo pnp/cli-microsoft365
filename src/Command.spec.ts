@@ -1,12 +1,15 @@
 import assert from 'assert';
 import chalk from 'chalk';
 import sinon from 'sinon';
+import { z } from 'zod';
 import auth from './Auth.js';
-import { cli } from './cli/cli.js';
-import { Logger } from './cli/Logger.js';
 import Command, {
-  CommandError
+  CommandError,
+  globalOptionsZod
 } from './Command.js';
+import { CommandOptionInfo } from './cli/CommandOptionInfo.js';
+import { Logger } from './cli/Logger.js';
+import { cli } from './cli/cli.js';
 import { telemetry } from './telemetry.js';
 import { accessToken } from './utils/accessToken.js';
 import { pid } from './utils/pid.js';
@@ -119,6 +122,54 @@ class MockCommand4 extends Command {
   public get description(): string {
     return 'Mock command description';
   }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  public async commandAction(logger: Logger, args: any): Promise<void> {
+    throw 'Exception';
+  }
+}
+
+class MockCommandWithSchema extends Command {
+  public get name(): string {
+    return 'mock-command';
+  }
+
+  public get description(): string {
+    return 'Mock command description';
+  }
+
+  public get schema(): z.ZodTypeAny | undefined {
+    return globalOptionsZod;
+  }
+
+  public optionsInfo: CommandOptionInfo[] = [
+    {
+      name: 'requiredOption',
+      required: true,
+      type: 'string'
+    },
+    {
+      name: 'optionalString',
+      required: false,
+      type: 'string'
+    },
+    {
+      name: 'optionalEnum',
+      required: false,
+      type: 'string',
+      autocomplete: ['a', 'b', 'c']
+    },
+    {
+      name: 'optionalNumber',
+      required: false,
+      type: 'number'
+    },
+    {
+      name: 'optionalBoolean',
+      required: false,
+      type: 'boolean'
+    }
+  ];
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public async commandAction(logger: Logger, args: any): Promise<void> {
@@ -307,6 +358,26 @@ describe('Command', () => {
     });
     command.trackUnknownOptionsPublic(actual, { Prop2: false });
     assert.strictEqual(JSON.stringify(actual), expected);
+  });
+
+  it('correctly tracks properties based on schema', () => {
+    const command = new MockCommandWithSchema();
+    const args = {
+      options: {
+        requiredOption: 'abc',
+        optionalString: 'def',
+        optionalEnum: 'a',
+        optionalNumber: 1,
+        optionalBoolean: false
+      }
+    };
+    const telemetryProps = (command as any).getTelemetryProperties(args);
+    assert.deepStrictEqual(telemetryProps, {
+      optionalString: true,
+      optionalEnum: 'a',
+      optionalNumber: true,
+      optionalBoolean: false
+    });
   });
 
   it('adds unknown options to payload', () => {

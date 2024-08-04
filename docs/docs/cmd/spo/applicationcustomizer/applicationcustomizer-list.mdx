@@ -24,6 +24,10 @@ m365 spo applicationcustomizer list [options]
 
 <Global />
 
+## Remarks
+
+This command can be used for retrieving a list of application customizers from a specific site. To retrieve a list of application customizers that are installed tenant-wide, view our dedicated [spo tenant applicationcustomizer list](../tenant/tenant-applicationcustomizer-list.mdx) command.
+
 ## Examples
 
 Retrieves a list of application customizers.
@@ -31,10 +35,6 @@ Retrieves a list of application customizers.
 ```sh
 m365 spo applicationcustomizer list --webUrl https://contoso.sharepoint.com/sites/sales
 ```
-
-## Remarks
-
-This command can be used for retrieving a list of application customizers from a specific site. To retrieve a list of application customizers that are installed tenant-wide, view our dedicated [spo tenant applicationcustomizer list](../tenant/tenant-applicationcustomizer-list.mdx) command.
 
 ## Response
 
@@ -44,16 +44,16 @@ This command can be used for retrieving a list of application customizers from a
   ```json
   [
     {
-      "ClientSideComponentId": "4358e70e-ec3c-4713-beb6-39c88f7621d1",
-      "ClientSideComponentProperties": "{\"listTitle\":\"News\",\"listViewTitle\":\"Published News\"}",
+      "ClientSideComponentId": "9a8b100c-246b-4592-9454-67826523e159",
+      "ClientSideComponentProperties": "{\"testMessage\":\"Test message\"}",
       "CommandUIExtension": null,
       "Description": null,
       "Group": null,
       "HostProperties": "",
-      "Id": "f405303c-6048-4636-9660-1b7b2cadaef9",
+      "Id": "4a428b32-08cf-45c7-9986-17585af38806",
       "ImageUrl": null,
       "Location": "ClientSideExtension.ApplicationCustomizer",
-      "Name": "{f405303c-6048-4636-9660-1b7b2cadaef9}",
+      "Name": "{4a428b32-08cf-45c7-9986-17585af38806}",
       "RegistrationId": null,
       "RegistrationType": 0,
       "Rights": {
@@ -64,7 +64,7 @@ This command can be used for retrieving a list of application customizers from a
       "ScriptBlock": null,
       "ScriptSrc": null,
       "Sequence": 65536,
-      "Title": "NewsTicker",
+      "Title": "HelloWorld",
       "Url": null,
       "VersionOfUserCustomAction": "1.0.1.0"
     }
@@ -75,47 +75,41 @@ This command can be used for retrieving a list of application customizers from a
   <TabItem value="Text">
 
   ```text
-  Name                                    Location                                   Scope  Id
-  --------------------------------------  -----------------------------------------  -----  ------------------------------------
-  {f405303c-6048-4636-9660-1b7b2cadaef9}  ClientSideExtension.ApplicationCustomizer  3      f405303c-6048-4636-9660-1b7b2cadaef9
+  Id                                    Location                                   Name                                    Scope
+  ------------------------------------  -----------------------------------------  --------------------------------------  -----
+  4a428b32-08cf-45c7-9986-17585af38806  ClientSideExtension.ApplicationCustomizer  {4a428b32-08cf-45c7-9986-17585af38806}  3
   ```
 
   </TabItem>
   <TabItem value="CSV">
 
   ```csv
-  Name,Location,Scope,Id
-  {f405303c-6048-4636-9660-1b7b2cadaef9},ClientSideExtension.ApplicationCustomizer,3,f405303c-6048-4636-9660-1b7b2cadaef9
+  ClientSideComponentId,ClientSideComponentProperties,CommandUIExtension,Description,Group,HostProperties,Id,ImageUrl,Location,Name,RegistrationId,RegistrationType,Scope,ScriptBlock,ScriptSrc,Sequence,Title,Url,VersionOfUserCustomAction
+  9a8b100c-246b-4592-9454-67826523e159,"{""testMessage"":""Test message""}",,,,,4a428b32-08cf-45c7-9986-17585af38806,,ClientSideExtension.ApplicationCustomizer,{4a428b32-08cf-45c7-9986-17585af38806},,0,3,,,65536,HelloWorld,,1.0.1.0
   ```
 
   </TabItem>
   <TabItem value="Markdown">
 
   ```md
-  # spo applicationcustomizer list --webUrl "https://contoso.sharepoint.com"
+  # spo applicationcustomizer list --webUrl "https://contoso.sharepoint.com/sites/Marketing"
 
-  Date: 28/2/2023
+  Date: 16/05/2024
 
-  ## NewsTicker (f405303c-6048-4636-9660-1b7b2cadaef9)
+  ## HelloWorld (4a428b32-08cf-45c7-9986-17585af38806)
 
   Property | Value
   ---------|-------
-  ClientSideComponentId | 4358e70e-ec3c-4713-beb6-39c88f7621d1
-  CommandUIExtension | null
-  Description | null
-  Group | null
+  ClientSideComponentId | 9a8b100c-246b-4592-9454-67826523e159
+  ClientSideComponentProperties | {"testMessage":"Test message"}
   HostProperties |
-  Id | f405303c-6048-4636-9660-1b7b2cadaef9
-  ImageUrl | null
+  Id | 4a428b32-08cf-45c7-9986-17585af38806
   Location | ClientSideExtension.ApplicationCustomizer
-  RegistrationId | null
+  Name | {4a428b32-08cf-45c7-9986-17585af38806}
   RegistrationType | 0
   Scope | 3
-  ScriptBlock | null
-  ScriptSrc | null
   Sequence | 65536
-  Title | NewsTicker
-  Url | null
+  Title | HelloWorld
   VersionOfUserCustomAction | 1.0.1.0
   ```
 

@@ -1,3 +1,4 @@
+import { formatting } from "./formatting.js";
 import { FormDigestInfo } from "./spo.js";
 
 export const validation = {
@@ -46,6 +47,27 @@ export const validation = {
 
     // verify if the upn is a valid upn. @meusername will be replaced in a later stage with the actual username of the logged in user
     return upnRegEx.test(upn) || upn.toLowerCase().trim() === '@meusername';
+  },
+
+  /**
+   * Validates if the provided number is a valid positive integer (1 or higher).
+   * @param integer Integer value.
+   * @returns True if integer, false otherwise.
+   */
+  isValidPositiveInteger(integer: number | string): boolean {
+    return !isNaN(Number(integer)) && Number.isInteger(+integer) && +integer > 0;
+  },
+
+  /**
+   * Validates an array of integers. The integers must be positive (1 or higher).
+   * @param integerString Comma-separated string of integers.
+   * @returns True if the integers are valid, an error message with the invalid integers otherwise.
+   */
+  isValidPositiveIntegerArray(integerString: string): boolean | string {
+    const integers = formatting.splitAndTrim(integerString);
+    const invalidIntegers = integers.filter(integer => !this.isValidPositiveInteger(integer));
+
+    return invalidIntegers.length > 0 ? invalidIntegers.join(', ') : true;
   },
 
   isDateInRange(date: string, monthOffset: number): boolean {

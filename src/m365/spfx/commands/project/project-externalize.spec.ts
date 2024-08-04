@@ -248,7 +248,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
     const originalReadFileSync = fs.readFileSync;
     sinon.stub(fs, 'readFileSync').callsFake((path, encoding) => {
       if (path.toString().endsWith('.yo-rc.json')) {
-        return '';
+        return '{}';
       }
       else if (path.toString().endsWith('package.json')) {
         return `{
@@ -312,8 +312,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
       }
     });
 
-    const getProject = (command as any).getProject;
-    const project: Project = getProject(projectPath);
+    const project: Project = (command as any).getProject(projectPath);
     assert.notStrictEqual(typeof (project.configJson), 'undefined');
   });
 
@@ -328,8 +327,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
       }
     });
 
-    const getProject = (command as any).getProject;
-    const project: Project = getProject(projectPath);
+    const project: Project = (command as any).getProject(projectPath);
     assert.strictEqual(typeof (project.packageJson), 'undefined');
   });
 
@@ -344,8 +342,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
       }
     });
 
-    const getProject = (command as any).getProject;
-    const project: Project = getProject(projectPath);
+    const project: Project = (command as any).getProject(projectPath);
     assert.strictEqual(typeof (project.tsConfigJson), 'undefined');
   });
 
@@ -353,48 +350,45 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
     const originalReadFileSync = fs.readFileSync;
     sinon.stub(fs, 'readFileSync').callsFake((path, encoding) => {
       if (path.toString().endsWith('config.json')) {
-        return '';
+        return '{}';
       }
       else {
         return originalReadFileSync(path, encoding);
       }
     });
 
-    const getProject = (command as any).getProject;
-    const project: Project = getProject(projectPath);
-    assert.strictEqual(typeof (project.configJson), 'undefined');
+    const project: Project = (command as any).getProject(projectPath);
+    assert.strictEqual(typeof (project.configJson), 'object');
   });
 
   it('doesn\'t fail if package.json is empty', () => {
     const originalReadFileSync = fs.readFileSync;
     sinon.stub(fs, 'readFileSync').callsFake((path, encoding) => {
       if (path.toString().endsWith('package.json')) {
-        return '';
+        return '{}';
       }
       else {
         return originalReadFileSync(path, encoding);
       }
     });
 
-    const getProject = (command as any).getProject;
-    const project: Project = getProject(projectPath);
-    assert.strictEqual(typeof (project.packageJson), 'undefined');
+    const project: Project = (command as any).getProject(projectPath);
+    assert.strictEqual(typeof (project.packageJson), 'object');
   });
 
   it('doesn\'t fail if .yo-rc.json is empty', () => {
     const originalReadFileSync = fs.readFileSync;
     sinon.stub(fs, 'readFileSync').callsFake((path, encoding) => {
       if (path.toString().endsWith('.yo-rc.json')) {
-        return '';
+        return '{}';
       }
       else {
         return originalReadFileSync(path, encoding);
       }
     });
 
-    const getProject = (command as any).getProject;
-    const project: Project = getProject(projectPath);
-    assert.strictEqual(typeof (project.yoRcJson), 'undefined');
+    const project: Project = (command as any).getProject(projectPath);
+    assert.strictEqual(typeof (project.yoRcJson), 'object');
   });
 
   //#region findings

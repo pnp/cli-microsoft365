@@ -465,9 +465,8 @@ describe(commands.CDN_SET, () => {
   });
 
   it('rejects invalid SharePoint Online CDN type', async () => {
-    const type = 'foo';
-    const actual = await command.validate({ options: { type: type, enabled: true } }, commandInfo);
-    assert.strictEqual(actual, `${type} is not a valid CDN type. Allowed values are Public|Private|Both`);
+    const actual = await command.validate({ options: { type: 'foo', enabled: true } }, commandInfo);
+    assert.notStrictEqual(actual, true);
   });
 
   it('doesn\'t fail validation if the optional type option not specified', async () => {

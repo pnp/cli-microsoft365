@@ -16,6 +16,34 @@ import command from './app-add.js';
 import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.APP_ADD, () => {
+  const fsStats: fs.Stats = {
+    isDirectory: () => false,
+    isFile: () => false,
+    isBlockDevice: () => false,
+    isCharacterDevice: () => false,
+    isSymbolicLink: () => false,
+    isFIFO: () => false,
+    isSocket: () => false,
+    dev: 0,
+    ino: 0,
+    mode: 0,
+    nlink: 0,
+    uid: 0,
+    gid: 0,
+    rdev: 0,
+    size: 0,
+    blksize: 0,
+    blocks: 0,
+    atimeMs: 0,
+    mtimeMs: 0,
+    ctimeMs: 0,
+    birthtimeMs: 0,
+    atime: new Date(),
+    mtime: new Date(),
+    ctime: new Date(),
+    birthtime: new Date()
+  };
+
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -441,10 +469,8 @@ describe(commands.APP_ADD, () => {
   });
 
   it('passes validation on valid \'tenant\' scope', async () => {
-    const stats: fs.Stats = new fs.Stats();
-    sinon.stub(stats, 'isDirectory').returns(false);
     sinon.stub(fs, 'existsSync').returns(true);
-    sinon.stub(fs, 'lstatSync').returns(stats);
+    sinon.stub(fs, 'lstatSync').returns(fsStats);
 
     const actual = await command.validate({ options: { appCatalogScope: 'tenant', filePath: 'abc' } }, commandInfo);
     sinonUtil.restore([
@@ -455,10 +481,8 @@ describe(commands.APP_ADD, () => {
   });
 
   it('passes validation on valid \'Tenant\' scope', async () => {
-    const stats: fs.Stats = new fs.Stats();
-    sinon.stub(stats, 'isDirectory').returns(false);
     sinon.stub(fs, 'existsSync').returns(true);
-    sinon.stub(fs, 'lstatSync').returns(stats);
+    sinon.stub(fs, 'lstatSync').returns(fsStats);
 
     const actual = await command.validate({ options: { appCatalogScope: 'Tenant', filePath: 'abc' } }, commandInfo);
     sinonUtil.restore([
@@ -469,10 +493,8 @@ describe(commands.APP_ADD, () => {
   });
 
   it('passes validation on valid \'SiteCollection\' scope', async () => {
-    const stats: fs.Stats = new fs.Stats();
-    sinon.stub(stats, 'isDirectory').returns(false);
     sinon.stub(fs, 'existsSync').returns(true);
-    sinon.stub(fs, 'lstatSync').returns(stats);
+    sinon.stub(fs, 'lstatSync').returns(fsStats);
 
     const actual = await command.validate({ options: { appCatalogScope: 'SiteCollection', appCatalogUrl: 'https://contoso.sharepoint.com', filePath: 'abc' } }, commandInfo);
     sinonUtil.restore([
@@ -602,8 +624,7 @@ describe(commands.APP_ADD, () => {
   });
 
   it('fails validation if file path points to a directory', async () => {
-    const stats: fs.Stats = new fs.Stats();
-    sinon.stub(stats, 'isDirectory').returns(true);
+    const stats = { ...fsStats, isDirectory: () => true };
     sinon.stub(fs, 'existsSync').returns(true);
     sinon.stub(fs, 'lstatSync').returns(stats);
     const actual = await command.validate({ options: { filePath: 'abc' } }, commandInfo);
@@ -615,10 +636,8 @@ describe(commands.APP_ADD, () => {
   });
 
   it('fails validation when invalid scope is specified', async () => {
-    const stats: fs.Stats = new fs.Stats();
-    sinon.stub(stats, 'isDirectory').returns(false);
     sinon.stub(fs, 'existsSync').returns(true);
-    sinon.stub(fs, 'lstatSync').returns(stats);
+    sinon.stub(fs, 'lstatSync').returns(fsStats);
 
     const actual = await command.validate({ options: { filePath: 'abc', appCatalogScope: 'foo' } }, commandInfo);
 
@@ -630,10 +649,8 @@ describe(commands.APP_ADD, () => {
   });
 
   it('passes validation when path points to a valid file', async () => {
-    const stats: fs.Stats = new fs.Stats();
-    sinon.stub(stats, 'isDirectory').returns(false);
     sinon.stub(fs, 'existsSync').returns(true);
-    sinon.stub(fs, 'lstatSync').returns(stats);
+    sinon.stub(fs, 'lstatSync').returns(fsStats);
 
     const actual = await command.validate({ options: { filePath: 'abc' } }, commandInfo);
 
@@ -645,10 +662,8 @@ describe(commands.APP_ADD, () => {
   });
 
   it('passes validation when no scope is specified', async () => {
-    const stats: fs.Stats = new fs.Stats();
-    sinon.stub(stats, 'isDirectory').returns(false);
     sinon.stub(fs, 'existsSync').returns(true);
-    sinon.stub(fs, 'lstatSync').returns(stats);
+    sinon.stub(fs, 'lstatSync').returns(fsStats);
 
     const actual = await command.validate({ options: { filePath: 'abc' } }, commandInfo);
 
@@ -660,10 +675,8 @@ describe(commands.APP_ADD, () => {
   });
 
   it('passes validation when the scope is specified with \'tenant\'', async () => {
-    const stats: fs.Stats = new fs.Stats();
-    sinon.stub(stats, 'isDirectory').returns(false);
     sinon.stub(fs, 'existsSync').returns(true);
-    sinon.stub(fs, 'lstatSync').returns(stats);
+    sinon.stub(fs, 'lstatSync').returns(fsStats);
 
     const actual = await command.validate({ options: { filePath: 'abc', appCatalogScope: 'tenant' } }, commandInfo);
 
@@ -676,10 +689,8 @@ describe(commands.APP_ADD, () => {
 
 
   it('should fail when \'sitecollection\' scope, but no appCatalogUrl specified', async () => {
-    const stats: fs.Stats = new fs.Stats();
-    sinon.stub(stats, 'isDirectory').returns(false);
     sinon.stub(fs, 'existsSync').returns(true);
-    sinon.stub(fs, 'lstatSync').returns(stats);
+    sinon.stub(fs, 'lstatSync').returns(fsStats);
 
     const actual = await command.validate({ options: { filePath: 'abc', appCatalogScope: 'sitecollection' } }, commandInfo);
 
@@ -691,10 +702,8 @@ describe(commands.APP_ADD, () => {
   });
 
   it('should not fail when \'tenant\' scope, but also appCatalogUrl specified', async () => {
-    const stats: fs.Stats = new fs.Stats();
-    sinon.stub(stats, 'isDirectory').returns(false);
     sinon.stub(fs, 'existsSync').returns(true);
-    sinon.stub(fs, 'lstatSync').returns(stats);
+    sinon.stub(fs, 'lstatSync').returns(fsStats);
 
     const actual = await command.validate({ options: { filePath: 'abc', appCatalogScope: 'tenant', appCatalogUrl: 'https://contoso.sharepoint.com' } }, commandInfo);
 
@@ -706,10 +715,8 @@ describe(commands.APP_ADD, () => {
   });
 
   it('should fail when \'sitecollection\' scope, but bad appCatalogUrl format specified', async () => {
-    const stats: fs.Stats = new fs.Stats();
-    sinon.stub(stats, 'isDirectory').returns(false);
     sinon.stub(fs, 'existsSync').returns(true);
-    sinon.stub(fs, 'lstatSync').returns(stats);
+    sinon.stub(fs, 'lstatSync').returns(fsStats);
 
     const actual = await command.validate({ options: { filePath: 'abc', appCatalogScope: 'sitecollection', appCatalogUrl: 'contoso.sharepoint.com' } }, commandInfo);
 

@@ -380,4 +380,43 @@ describe(commands.SUBSCRIPTION_ADD, () => {
     }, commandInfo);
     assert.strictEqual(actual, true);
   });
+
+  it('passes validation if the notificationUrl points to valid https URL', async () => {
+    const actual = await command.validate({
+      options: {
+        resource: "me/mailFolders('Inbox')/messages",
+        changeTypes: 'updated',
+        clientState: 'secretClientValue',
+        notificationUrl: "https://webhook.azurewebsites.net/api/send/myNotifyClient",
+        expirationDateTime: null
+      }
+    }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('passes validation if the notificationUrl points to valid Azure Event Hub location', async () => {
+    const actual = await command.validate({
+      options: {
+        resource: "me/mailFolders('Inbox')/messages",
+        changeTypes: 'updated',
+        clientState: 'secretClientValue',
+        notificationUrl: "EventHub:https://exchangenotifications.servicebus.windows.net/eventhubname/inboxmessages?tenantId=contoso.com",
+        expirationDateTime: null
+      }
+    }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('passes validation if the notificationUrl points to valid Azure Event Grid Partner Topic', async () => {
+    const actual = await command.validate({
+      options: {
+        resource: "me/mailFolders('Inbox')/messages",
+        changeTypes: 'updated',
+        clientState: 'secretClientValue',
+        notificationUrl: "EventGrid:?azuresubscriptionid=b07a45b3-f7b7-489b-9269-da6f3f93dff0&resourcegroup=rg-graph-api&partnertopic=messages&location=germanywestcentral",
+        expirationDateTime: null
+      }
+    }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
 });

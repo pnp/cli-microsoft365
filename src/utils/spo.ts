@@ -18,7 +18,7 @@ import { SiteProperties } from '../m365/spo/commands/site/SiteProperties.js';
 import { entraGroup } from './entraGroup.js';
 import { SharingCapabilities } from '../m365/spo/commands/site/SharingCapabilities.js';
 import { WebProperties } from '../m365/spo/commands/web/WebProperties.js';
-import { Site } from '@microsoft/microsoft-graph-types';
+import { Group, Site } from '@microsoft/microsoft-graph-types';
 import { ListItemInstance } from '../m365/spo/commands/listitem/ListItemInstance.js';
 import { ListItemFieldValueResult } from '../m365/spo/commands/listitem/ListItemFieldValueResult.js';
 import { FileProperties } from '../m365/spo/commands/file/FileProperties.js'; import { setTimeout } from 'timers/promises';
@@ -68,6 +68,24 @@ export interface GraphFileDetails {
 interface FormValues {
   FieldName: string;
   FieldValue: string;
+}
+
+export interface User {
+  Id: number;
+  IsHiddenInUI: boolean;
+  LoginName: string;
+  Title: string;
+  PrincipalType: number;
+  Email: string;
+  Expiration: string;
+  IsEmailAuthenticationGuestUser: boolean;
+  IsShareByEmailGuestUser: boolean;
+  IsSiteAdmin: boolean;
+  UserId: {
+    NameId: string;
+    NameIdIssuer: string;
+  } | null;
+  UserPrincipalName: string | null;
 }
 
 export const spo = {
@@ -596,14 +614,49 @@ export const spo = {
   },
 
   /**
+   * Ensure a user exists on a specific SharePoint site.
+   * @param webUrl URL of the SharePoint site.
+   * @param logonName Logon name of the user to ensure on the SharePoint site.
+   * @returns SharePoint user object.
+   */
+  async ensureUser(webUrl: string, logonName: string): Promise<User> {
+    const requestOptions: CliRequestOptions = {
+      url: `${webUrl}/_api/web/EnsureUser`,
+      headers: {
+        accept: 'application/json;odata=nometadata'
+      },
+      responseType: 'json',
+      data: {
+        logonName: logonName
+      }
+    };
+
+    return request.post<User>(requestOptions);
+  },
+
+  /**
+   * Ensure a Microsoft Entra ID group exists on a specific SharePoint site.
+   * @param webUrl URL of the SharePoint site.
+   * @param group Microsoft Entra ID group.
+   * @returns SharePoint user object.
+   */
+  async ensureEntraGroup(webUrl: string, group: Group): Promise<User> {
+    if (!group.securityEnabled) {
+      throw new Error('Cannot ensure a Microsoft Entra ID group that is not security enabled.');
+    }
+
+    return this.ensureUser(webUrl, group.mailEnabled ? `c:0o.c|federateddirectoryclaimprovider|${group.id}` : `c:0t.c|tenant|${group.id}`);
+  },
+
+  /**
  * Retrieves the spo user by email.
  * @param webUrl Web url
  * @param email The email of the user
  * @param logger the Logger object
- * @param debug set if debug logging should be logged 
+ * @param verbose set if verbose logging should be logged 
  */
-  async getUserByEmail(webUrl: string, email: string, logger: Logger, debug?: boolean): Promise<any> {
-    if (debug) {
+  async getUserByEmail(webUrl: string, email: string, logger: Logger, verbose?: boolean): Promise<User> {
+    if (verbose) {
       await logger.logToStderr(`Retrieving the spo user by email ${email}`);
     }
     const requestUrl = `${webUrl}/_api/web/siteusers/GetByEmail('${formatting.encodeQueryParameter(email)}')`;
@@ -616,7 +669,7 @@ export const spo = {
       responseType: 'json'
     };
 
-    const userInstance: any = await request.get(requestOptions);
+    const userInstance = await request.get<User>(requestOptions);
 
     return userInstance;
   },
@@ -684,10 +737,10 @@ export const spo = {
   * @param webUrl Web url
   * @param name The name of the group
   * @param logger the Logger object
-  * @param debug set if debug logging should be logged 
+  * @param verbose set if verbose logging should be logged 
   */
-  async getGroupByName(webUrl: string, name: string, logger: Logger, debug?: boolean): Promise<any> {
-    if (debug) {
+  async getGroupByName(webUrl: string, name: string, logger: Logger, verbose?: boolean): Promise<any> {
+    if (verbose) {
       await logger.logToStderr(`Retrieving the group by name ${name}`);
     }
     const requestUrl = `${webUrl}/_api/web/sitegroups/GetByName('${formatting.encodeQueryParameter(name)}')`;

@@ -25,16 +25,20 @@ m365 teams meeting list [options]
 : Set to retrieve only meetings the user is organizer for.
 
 `-u, --userId [userId]`
-: The id of the user or shared mailbox, omit to retrieve meetings for current signed in user. Use either `id`, `userName` or `email`, but not multiple. Use only when using application permissions.
+: The id of the user or shared mailbox, omit to retrieve meetings for current signed in user. Use either `userId`, `userName` or `email`, but not multiple. Use only when using application permissions.
 
 `-n, --userName [userName]`
-: The name of the user or shared mailbox, omit to retrieve meetings for current signed in user. Use either `id`, `userName` or `email`, but not multiple. Use only when using application permissions.
+: The name of the user or shared mailbox, omit to retrieve meetings for current signed in user. Use either `userId`, `userName` or `email`, but not multiple. Use only when using application permissions.
 
 `--email [email]`
-: The email of the user or shared mailbox, omit to retrieve meetings for current signed in user. Use either `id`, `userName` or `email`, but not multiple. Use only when using application permissions.
+: The email of the user or shared mailbox, omit to retrieve meetings for current signed in user. Use either `userId`, `userName` or `email`, but not multiple. Use only when using application permissions.
 ```
 
 <Global />
+
+## Remarks
+
+To use application permission for this command, an [application access policy](https://learn.microsoft.com/en-us/graph/cloud-communication-online-meeting-application-access-policy) must be created and assigned to a user. This authorizes the app configured in the policy to retrieve online meetings on behalf of that user.
 
 ## Examples
 

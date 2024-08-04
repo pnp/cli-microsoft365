@@ -28,7 +28,7 @@ class SpoFieldListCommand extends SpoCommand {
   }
 
   public defaultProperties(): string[] | undefined {
-    return ['Id', 'Title', 'Group', 'Hidden'];
+    return ['Id', 'Title', 'InternalName', 'Hidden'];
   }
 
   constructor() {

@@ -192,6 +192,40 @@ describe('validation/validation', () => {
     assert.strictEqual(result, true);
   });
 
+  it('isValidPositiveInteger returns true if valid integer as string', () => {
+    const result = validation.isValidPositiveInteger('1');
+    assert.strictEqual(result, true);
+  });
+
+  it('isValidPositiveInteger returns true if valid integer as number', () => {
+    const result = validation.isValidPositiveInteger(1);
+    assert.strictEqual(result, true);
+  });
+
+  it('isValidPositiveInteger returns error message of invalid integer when input is not a number', () => {
+    const result = validation.isValidPositiveInteger('foo');
+    assert.strictEqual(result, false);
+  });
+
+  it('isValidPositiveInteger returns error message of invalid integer when number not positive', () => {
+    const result = validation.isValidPositiveInteger(-5);
+    assert.strictEqual(result, false);
+  });
+
+  it('isValidPositiveIntegerArray returns true if valid integer array', () => {
+    const result = validation.isValidPositiveIntegerArray('1, 2, 3, 4, 5');
+    assert.strictEqual(result, true);
+  });
+
+  it('isValidPositiveIntegerArray returns error message of invalid integer when input is not a number', () => {
+    const result = validation.isValidPositiveIntegerArray('1, 2, foo, 4, bar');
+    assert.strictEqual(result, 'foo, bar');
+  });
+
+  it('isValidPositiveIntegerArray returns error message of invalid integer when number not positive', () => {
+    const result = validation.isValidPositiveIntegerArray('0, 1, 2, 3, 4, -5');
+    assert.strictEqual(result, '0, -5');
+  });
 
   it('isValidTeamsChannelId returns true if valid channelId (all numbers)', () => {
     const result = validation.isValidTeamsChannelId('19:0000000000000000000000000000000@thread.skype');

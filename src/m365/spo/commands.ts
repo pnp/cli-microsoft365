@@ -32,6 +32,7 @@ export default {
   COMMANDSET_REMOVE: `${prefix} commandset remove`,
   COMMANDSET_SET: `${prefix} commandset set`,
   CONTENTTYPE_ADD: `${prefix} contenttype add`,
+  CONTENTTYPE_FIELD_LIST: `${prefix} contenttype field list`,
   CONTENTTYPE_FIELD_REMOVE: `${prefix} contenttype field remove`,
   CONTENTTYPE_FIELD_SET: `${prefix} contenttype field set`,
   CONTENTTYPE_GET: `${prefix} contenttype get`,

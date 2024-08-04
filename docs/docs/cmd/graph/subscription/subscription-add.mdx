@@ -67,6 +67,24 @@ Create a subscription using the maximum allowed expiration for Group resources
 m365 graph subscription add --resource groups --changeTypes "updated" --notificationUrl "https://webhook.azurewebsites.net/api/send/myNotifyClient"
 ```
 
+Create a subscription for Event Hub location if you are using Key Vault
+
+```sh
+m365 graph subscription add --resource user --changeTypes "created,updated,deleted" --notificationUrl "EventHub:https://azureKeyVaultName.vault.azure.net/secrets/secretName?tenantId=contoso.com"
+```
+
+Create a subscription for Event Hub location if you are using role-based access control
+
+```sh
+m365 graph subscription add --resource user --changeTypes "created,updated,deleted" --notificationUrl "EventHub:https://eventHubNamespace.servicebus.windows.net/eventhubname/eventHubName?tenantId=contoso.com"
+```
+
+Create a subscription for Event Grid Partner Topic.
+
+```sh
+m365 graph subscription add --resource user --changeTypes "created,updated,deleted" --notificationUrl "EventGrid:?azuresubscriptionid=8A8A8A8A-4B4B-4C4C-4D4D-12E12E12E12E&resourcegroup=resourceGroupName&partnertopic=partnerTopicName&location=partnerTopicAzureRegionName"
+```
+
 ## Response
 
 <Tabs>

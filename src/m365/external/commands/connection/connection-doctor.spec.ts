@@ -1870,7 +1870,150 @@ describe(commands.CONNECTION_DOCTOR, () => {
       output: 'text'
     };
     await command.action(logger, { options: options } as any);
-    assert(loggerLogSpy.notCalled);
+    assert(loggerLogSpy.called);
+  });
+
+  it('stops when the specified connection is not found in text output mode', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts: any) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/external/connections/msgraphdocs`) {
+        return Promise.reject({
+          response: {
+            data: {
+              "error": {
+                "code": "ItemNotFound",
+                "message": "The requested resource does not exist.",
+                "innerError": {
+                  "code": "ResourceNotFound",
+                  "source": "Connection",
+                  "message": "'Connection' was not found.",
+                  "date": "2023-11-22T18:05:10",
+                  "request-id": "a844db09-1ab3-4209-aea8-ee5b8b72949a",
+                  "client-request-id": "a844db09-1ab3-4209-aea8-ee5b8b72949a"
+                }
+              }
+            }
+          }
+        });
+      }
+      throw 'Invalid request';
+    });
+    sinon.stub(request, 'post').callsFake(async () => {
+      throw 'Invalid request';
+    });
+    const options: any = {
+      id: 'msgraphdocs',
+      ux: 'copilot',
+      output: 'text'
+    };
+    await command.action(logger, { options: options } as any);
+    assert(loggerLogSpy.called);
+  });
+
+  it(`returns an error when urlToItemResolver is not configured in text output mode`, async () => {
+    sinon.stub(request, 'get').callsFake(async (opts: any) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/external/connections/msgraphdocs`) {
+        return {
+          "id": "msgraphdocs",
+          "name": "Microsoft Graph documentation",
+          "description": "Documentation for Microsoft Graph API which explains what Microsoft Graph is and how to use it.",
+          "state": "ready",
+          "configuration": {
+            "authorizedAppIds": [
+              "4f56e2be-b7ae-4b30-9fd0-c42d6bdf8255"
+            ]
+          },
+          "searchSettings": {
+            "searchResultTemplates": [
+              {
+                "id": "msgraphdocs",
+                "priority": 1,
+                "layout": {
+                  "type": "AdaptiveCard",
+                  "version": "1.3",
+                  "body": [
+                    {
+                      "type": "ColumnSet",
+                      "columns": [
+                        {
+                          "type": "Column",
+                          "width": "auto",
+                          "items": [
+                            {
+                              "type": "Image",
+                              "url": "https://raw.githubusercontent.com/waldekmastykarz/img/main/microsoft-graph.png",
+                              "altText": "Thumbnail image",
+                              "horizontalAlignment": "center",
+                              "size": "small"
+                            }
+                          ],
+                          "horizontalAlignment": "center"
+                        },
+                        {
+                          "type": "Column",
+                          "width": "stretch",
+                          "items": [
+                            {
+                              "type": "TextBlock",
+                              "text": "[${title}](${url})",
+                              "weight": "bolder",
+                              "color": "accent",
+                              "size": "medium",
+                              "maxLines": 3
+                            },
+                            {
+                              "type": "TextBlock",
+                              "text": "[${url}](${url})",
+                              "weight": "bolder",
+                              "spacing": "small",
+                              "maxLines": 3
+                            },
+                            {
+                              "type": "TextBlock",
+                              "text": "${description}",
+                              "maxLines": 3,
+                              "wrap": true
+                            }
+                          ],
+                          "spacing": "medium"
+                        }
+                      ]
+                    }
+                  ],
+                  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+                  "$data": {
+                    "description": "Marketing team at Contoso.., and looking at the Contoso Marketing documents on the team site. This contains the data from FY20 and will taken over to FY21...Marketing Planning is ongoing for FY20..",
+                    "url": "https://contoso.com",
+                    "title": "Contoso Solutions"
+                  }
+                },
+                "rules": []
+              }
+            ]
+          },
+          "activitySettings": null
+        };
+      }
+      if (opts.url === `https://graph.microsoft.com/v1.0/external/connections/msgraphdocs/schema`) {
+        return schema;
+      }
+      if (opts.url === `https://graph.microsoft.com/v1.0/external/connections/msgraphdocs/items/sdks__create-client`) {
+        return externalItem;
+      }
+      throw 'Invalid request';
+    });
+    sinon.stub(request, 'post').callsFake(async (opts: any) => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/search/query') {
+        return searchResponse;
+      }
+      throw 'Invalid request';
+    });
+    const options: any = {
+      id: 'msgraphdocs',
+      ux: 'copilot',
+      output: 'text'
+    };
+    await command.action(logger, { options: options } as any);
+    assert(loggerLogSpy.called);
   });
 
   it('checks connection compatibility for copilot in csv output mode', async () => {

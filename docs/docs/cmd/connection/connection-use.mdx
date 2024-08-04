@@ -15,7 +15,7 @@ m365 connection use [options]
 ## Options
 
 ```md definition-list
-`-n, --name <name>`
+`-n, --name [name]`
 : The name of the connection to switch to.
 ```
 
@@ -23,7 +23,13 @@ m365 connection use [options]
 
 ## Remarks
 
-The value for `--name` can be found by running [m365 connection list](connection-list.mdx). You can update the name of a connection by running [m365 connection set](connection-set.mdx). 
+:::tip
+
+If you haven't disabled the "prompt" setting, running this command without options will show a list of available connections. You can then select the connection to activate it.
+
+:::
+
+You can update the name of a connection by running [m365 connection set](connection-set.mdx).
 
 ## Examples
 
