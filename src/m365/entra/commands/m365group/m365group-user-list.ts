@@ -120,7 +120,7 @@ class EntraM365GroupUserListCommand extends GraphCommand {
       let users: ExtendedUser[] = [];
       if (!args.options.role || args.options.role === 'Owner') {
         const owners = await this.getUsers(args.options, 'Owners', groupId, logger);
-        owners.forEach(owner => users.push({ ...owner, roles: ['Owner'], userType: 'Owner' }));
+        owners.forEach(owner => users.push({ ...owner, roles: ['Owner'] }));
       }
 
       if (!args.options.role || args.options.role === 'Member') {
@@ -139,7 +139,7 @@ class EntraM365GroupUserListCommand extends GraphCommand {
       }
 
       if (args.options.role) {
-        users = users.filter(i => i.userType === args.options.role);
+        users = users.filter(i => i.roles.indexOf(args.options.role!) > -1);
       }
 
       await logger.log(users);

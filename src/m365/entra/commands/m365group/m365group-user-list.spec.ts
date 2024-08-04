@@ -151,7 +151,7 @@ describe(commands.M365GROUP_USER_LIST, () => {
         "id": "00000000-0000-0000-0000-000000000000",
         "displayName": "Anne Matthews",
         "userPrincipalName": "anne.matthews@contoso.onmicrosoft.com",
-        "userType": "Owner",
+        "userType": "Member",
         "givenName": "Anne",
         "surname": "Matthews",
         "roles": ["Owner", "Member"]
@@ -196,7 +196,7 @@ describe(commands.M365GROUP_USER_LIST, () => {
         "id": "00000000-0000-0000-0000-000000000000",
         "displayName": "Anne Matthews",
         "userPrincipalName": "anne.matthews@contoso.onmicrosoft.com",
-        "userType": "Owner",
+        "userType": "Member",
         "givenName": "Anne",
         "surname": "Matthews",
         "roles": ["Owner", "Member"]
@@ -230,7 +230,7 @@ describe(commands.M365GROUP_USER_LIST, () => {
         "id": "00000000-0000-0000-0000-000000000000",
         "displayName": "Anne Matthews",
         "userPrincipalName": "anne.matthews@contoso.onmicrosoft.com",
-        "userType": "Owner",
+        "userType": "Member",
         "givenName": "Anne",
         "surname": "Matthews",
         "roles": ["Owner"]
@@ -307,7 +307,7 @@ describe(commands.M365GROUP_USER_LIST, () => {
         "id": "00000000-0000-0000-0000-000000000000",
         "displayName": "Anne Matthews",
         "userPrincipalName": "anne.matthews@contoso.onmicrosoft.com",
-        "userType": "Owner",
+        "userType": "Member",
         "givenName": "Anne",
         "surname": "Matthews",
         "roles": ["Owner", "Member"]
@@ -348,7 +348,7 @@ describe(commands.M365GROUP_USER_LIST, () => {
     await command.action(logger, { options: { groupId: "2c1ba4c4-cd9b-4417-832f-92a34bc34b2a", properties: "displayName,mail,memberof/id,memberof/displayName" } });
 
     assert(loggerLogSpy.calledOnceWithExactly([
-      { "id": "00000000-0000-0000-0000-000000000000", "displayName": "Karl Matteson", "mail": "karl.matteson@contoso.onmicrosoft.com", "memberOf": [{ "displayName": "Life and Music", "id": "d6c88284-c598-468d-8074-56acaf3c0453" }], "roles": ["Owner"], "userType": "Owner" },
+      { "id": "00000000-0000-0000-0000-000000000000", "displayName": "Karl Matteson", "mail": "karl.matteson@contoso.onmicrosoft.com", "memberOf": [{ "displayName": "Life and Music", "id": "d6c88284-c598-468d-8074-56acaf3c0453" }], "roles": ["Owner"] },
       { "id": "00000000-0000-0000-0000-000000000001", "displayName": "Anne Matthews", "mail": "anne.matthews@contoso.onmicrosoft.com", "memberOf": [{ "displayName": "Life and Music", "id": "d6c88284-c598-468d-8074-56acaf3c0454" }], "roles": ["Member"] }
     ]));
   });
