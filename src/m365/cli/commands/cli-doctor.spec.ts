@@ -91,8 +91,8 @@ describe(commands.DOCTOR, () => {
     await command.action(logger, { options: {} });
     assert(loggerLogSpy.calledWith({
       authMode: 'DeviceCode',
-      cliAadAppId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
-      cliAadAppTenant: 'common',
+      cliEntraAppId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
+      cliEntraAppTenant: 'common',
       cliEnvironment: '',
       cliVersion: '3.11.0',
       cliConfig: {},
@@ -164,8 +164,8 @@ describe(commands.DOCTOR, () => {
     await command.action(logger, { options: {} });
     assert(loggerLogSpy.calledWith({
       authMode: 'DeviceCode',
-      cliAadAppId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
-      cliAadAppTenant: 'common',
+      cliEntraAppId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
+      cliEntraAppTenant: 'common',
       cliEnvironment: '',
       cliVersion: '3.11.0',
       cliConfig: {},
@@ -211,8 +211,8 @@ describe(commands.DOCTOR, () => {
     await command.action(logger, { options: {} });
     assert(loggerLogSpy.calledWith({
       authMode: 'DeviceCode',
-      cliAadAppId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
-      cliAadAppTenant: 'common',
+      cliEntraAppId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
+      cliEntraAppTenant: 'common',
       cliEnvironment: '',
       cliVersion: '3.11.0',
       cliConfig: {},
@@ -255,8 +255,8 @@ describe(commands.DOCTOR, () => {
     await command.action(logger, { options: {} });
     assert(loggerLogSpy.calledWith({
       authMode: 'DeviceCode',
-      cliAadAppId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
-      cliAadAppTenant: 'common',
+      cliEntraAppId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
+      cliEntraAppTenant: 'common',
       cliEnvironment: '',
       cliVersion: '3.11.0',
       cliConfig: {},
@@ -292,8 +292,8 @@ describe(commands.DOCTOR, () => {
     await command.action(logger, { options: {} });
     assert(loggerLogSpy.calledWith({
       authMode: 'DeviceCode',
-      cliAadAppId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
-      cliAadAppTenant: 'common',
+      cliEntraAppId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
+      cliEntraAppTenant: 'common',
       cliEnvironment: '',
       cliVersion: '3.11.0',
       cliConfig: {},
@@ -336,8 +336,8 @@ describe(commands.DOCTOR, () => {
     await command.action(logger, { options: {} });
     assert(loggerLogSpy.calledWith({
       authMode: 'DeviceCode',
-      cliAadAppId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
-      cliAadAppTenant: 'common',
+      cliEntraAppId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
+      cliEntraAppTenant: 'common',
       cliEnvironment: '',
       cliVersion: '3.11.0',
       cliConfig: {},
@@ -372,8 +372,8 @@ describe(commands.DOCTOR, () => {
     await command.action(logger, { options: {} });
     assert(loggerLogSpy.calledWith({
       authMode: 'Certificate',
-      cliAadAppId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
-      cliAadAppTenant: 'common',
+      cliEntraAppId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
+      cliEntraAppTenant: 'common',
       cliEnvironment: '',
       cliVersion: '3.11.0',
       cliConfig: {},
@@ -408,8 +408,8 @@ describe(commands.DOCTOR, () => {
     await command.action(logger, { options: { debug: true } });
     assert(loggerLogSpy.calledWith({
       authMode: 'Certificate',
-      cliAadAppId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
-      cliAadAppTenant: 'single',
+      cliEntraAppId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
+      cliEntraAppTenant: 'single',
       cliEnvironment: '',
       cliVersion: '3.11.0',
       cliConfig: {},
@@ -444,8 +444,8 @@ describe(commands.DOCTOR, () => {
     await command.action(logger, { options: { debug: true } });
     assert(loggerLogSpy.calledWith({
       authMode: 'Certificate',
-      cliAadAppId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
-      cliAadAppTenant: 'common',
+      cliEntraAppId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
+      cliEntraAppTenant: 'common',
       cliEnvironment: '',
       cliVersion: '3.11.0',
       cliConfig: {},
@@ -480,8 +480,8 @@ describe(commands.DOCTOR, () => {
     await command.action(logger, { options: { debug: true } });
     assert(loggerLogSpy.calledWith({
       authMode: 'Certificate',
-      cliAadAppId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
-      cliAadAppTenant: 'common',
+      cliEntraAppId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
+      cliEntraAppTenant: 'common',
       cliEnvironment: 'docker',
       cliVersion: '3.11.0',
       cliConfig: {},
@@ -509,8 +509,8 @@ describe(commands.DOCTOR, () => {
     await command.action(logger, { options: { debug: true } });
     assert(loggerLogSpy.calledWith({
       authMode: 'Certificate',
-      cliAadAppId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
-      cliAadAppTenant: 'common',
+      cliEntraAppId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
+      cliEntraAppTenant: 'common',
       cliEnvironment: '',
       cliVersion: '3.11.0',
       cliConfig: {},
@@ -520,7 +520,6 @@ describe(commands.DOCTOR, () => {
       scopes: {}
     }));
   });
-
 
   it('returns empty roles and scopes in diagnostic information when access token is invalid', async () => {
     sinon.stub(auth.connection, 'accessTokens').value({
@@ -539,8 +538,8 @@ describe(commands.DOCTOR, () => {
     await command.action(logger, { options: { debug: true } });
     assert(loggerLogSpy.calledWith({
       authMode: 'Certificate',
-      cliAadAppId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
-      cliAadAppTenant: 'common',
+      cliEntraAppId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
+      cliEntraAppTenant: 'common',
       cliEnvironment: '',
       cliVersion: '3.11.0',
       cliConfig: {},
@@ -577,8 +576,8 @@ describe(commands.DOCTOR, () => {
     await command.action(logger, { options: {} });
     assert(loggerLogSpy.calledWith({
       authMode: 'DeviceCode',
-      cliAadAppId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
-      cliAadAppTenant: 'common',
+      cliEntraAppId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
+      cliEntraAppTenant: 'common',
       cliEnvironment: '',
       cliVersion: '3.11.0',
       cliConfig: {
