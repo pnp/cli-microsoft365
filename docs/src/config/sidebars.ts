@@ -3,6 +3,7 @@ import type { SidebarsConfig } from '@docusaurus/plugin-content-docs';
 const sidebars: SidebarsConfig = {
   home: [
     'index',
+    'v9-upgrade-guidance',
     'v8-upgrade-guidance',
     'v7-upgrade-guidance',
     'v6-upgrade-guidance',

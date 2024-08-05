@@ -1,0 +1,23 @@
+# v9 Upgrade Guidance
+
+The v9 of CLI for Microsoft 365 introduces several breaking changes. To help you upgrade to the latest version of CLI for Microsoft 365, we've listed those changes along with any actions you may need to take.
+
+## SharePoint
+
+### Updated `spo site appcatalog remove` options
+
+We updated the [spo site appcatalog remove](./cmd/spo/site/site-appcatalog-remove.mdx) command. This command is a destructive operation that removes a site collection app catalog. Previously, it did not prompt for confirmation before executing this action, which could potentially lead to unintended data loss. To address this, we have added a confirmation prompt by default.
+
+Because of this rework, we have added a new option.
+
+**New options:**
+
+Option | Description
+--- | ---
+`-f, --force` | Don't prompt for confirmation.
+
+#### What action do I need to take?
+
+Update your scripts with the following:
+
+- Add the option `--force` if you want to bypass the confirmation prompt and proceed with the removal operation automatically.
