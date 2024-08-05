@@ -38,10 +38,6 @@ class EntraGroupSetCommand extends GraphCommand {
     return 'Updates a Microsoft Entra group';
   }
 
-  public allowUnknownOptions(): boolean | undefined {
-    return true;
-  }
-
   constructor(){
     super();
 
@@ -199,13 +195,17 @@ class EntraGroupSetCommand extends GraphCommand {
         groupId = await entraGroup.getGroupIdByDisplayName(args.options.displayName);
       }
 
-      const requestBody = this.createRequestBody(args.options);
       const requestOptions: CliRequestOptions = {
         url: `${this.resource}/v1.0/groups/${groupId}`,
         headers: {
           accept: 'application/json;odata.metadata=none'
         },
-        data: requestBody
+        data: {
+          displayName: args.options.newDisplayName,
+          description: args.options.description === '' ? null : args.options.description,
+          mailNickName: args.options.mailNickname,
+          visibility: args.options.visibility
+        }
       };
 
       await request.patch(requestOptions);
@@ -230,18 +230,6 @@ class EntraGroupSetCommand extends GraphCommand {
       this.handleRejectedODataJsonPromise(err);
     }
   };
-
-  private createRequestBody(options: Options): any {
-    const requestBody: any = {
-      displayName: options.newDisplayName,
-      description: options.description === '' ? null : options.description,
-      mailNickName: options.mailNickname,
-      visibility: options.visibility
-    };
-
-    this.addUnknownOptionsToPayload(requestBody, options);
-    return requestBody;
-  }
 
   private async getUserIds(logger: Logger, userIds?: string, userNames?: string): Promise<string[]> {
     if (userIds) {

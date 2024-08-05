@@ -48,8 +48,6 @@ m365 entra group set [options]
 
 ## Remarks
 
-:::info
-
 The `visibility` option affects the behavior of the group.
 
 With the `Public` visibility:
@@ -62,17 +60,9 @@ With the `Private` visibilty:
 - Anyone can view the attributes of the group.
 - Anyone can see the members of the group.
 
-:::
-
-:::note
-
-This command allows using unknown options. For a comprehensive list of group properties, please refer to the [Graph documentation page](https://learn.microsoft.com/graph/api/resources/group?view=graph-rest-1.0#properties).
-
-:::
-
 If the specified option is not found, you will receive a `Resource 'xyz' does not exist or one of its queried reference-property objects are not present.` error.
 
-If the existing members or owners are not specified in the `memberIds`, `memberUserNames`, `ownerIds`, or `ownerUserNames` options, they will be removed from the group.
+Specifying `memberIds` or `memberUserNames` will make only those users members, removing all others. Similarly, specifying `ownerIds` or `ownerUserNames` will make only those users owners, removing all others.
 
 ## Examples
 
@@ -85,7 +75,7 @@ m365 entra group set --displayName Devs --newDisplayName Developers
 Set the owners of a group to the specified people
 
 ```sh
-m365 entra group set --id 57fd6b33-54eb-42b0-9ea0-8a9ac04eab7d --owners "john.doe@contoso.com,adele.vance@contoso.com"
+m365 entra group set --id 57fd6b33-54eb-42b0-9ea0-8a9ac04eab7d --ownerUserNames "john.doe@contoso.com,adele.vance@contoso.com"
 ```
 
 Update the description and mail nickname of a group
