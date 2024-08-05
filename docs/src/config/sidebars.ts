@@ -368,6 +368,11 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
+              label: 'group user remove',
+              id: 'cmd/entra/group/group-user-remove'
+            },
+            {
+              type: 'doc',
               label: 'group user set',
               id: 'cmd/entra/group/group-user-set'
             }
