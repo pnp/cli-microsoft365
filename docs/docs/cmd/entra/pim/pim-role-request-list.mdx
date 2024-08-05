@@ -1,0 +1,261 @@
+import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# entra pim role request list
+
+Retrieves a list of PIM requests for roles
+
+## Usage
+
+```sh
+m365 entra pim role request list [options]
+```
+
+## Options
+
+```md definition-list
+`--userId [userId]`
+: Id of the user for which to list requests. Specify either `userId`, `userName`, `groupId` or `groupName`. If not specified, all requests will be listed.
+
+`--userName [userName]`
+: UPN of the user for which to list requests. Specify either `userId`, `userName`, `groupId` or `groupName`. If not specified, all requests will be listed.
+
+`--groupId [groupId]`
+: Id of the group for which to list requests. Specify either `userId`, `userName`, `groupId` or `groupName`. If not specified, all requests will be listed.
+
+`--groupName [groupName]`
+: Display name of the group for which to list requests. Specify either `userId`, `userName`, `groupId` or `groupName`. If not specified, all requests will be listed.
+
+`-c, --createdDateTime [createdDateTime]`
+: An optional ISO 8601 formatted date filter to search from.
+
+`-s, --status [status]`
+: An optional value to filter the list of requests. Allowed values are: `Canceled`, `Denied`, `Failed`, `Granted`, `PendingAdminDecision`, `PendingApproval`, `PendingProvisioning`, `PendingScheduleCreation`, `Provisioned`, `Revoked`, and `ScheduleCreated`.
+
+`--includePrincipalDetails`
+: An optional flag to include details of the principals that were assigned a role.
+```
+
+<Global />
+
+## Examples
+
+Get a list of PIM requests for roles.
+
+```sh
+m365 entra pim role request list
+```
+
+Get a list of PIM requests for the current user.
+
+```sh
+m365 entra pim role request list --userId '@meID'
+```
+
+Get a list of PIM requests for a specified user since the first of January 2024.
+
+```sh
+m365 entra pim role request list --createdDateTime 2024-01-01T00:00:00Z
+```
+
+Get a list of PIM requests with principal details.
+
+```sh
+m365 entra pim role request list --includePrincipalDetails
+```
+
+Get a list of PIM requests with pending approvals.
+
+```sh
+m365 entra pim role request list --status PendingApproval
+```
+
+## Response
+
+### Standard response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  [
+    {
+      "id": "80231d2f-95a1-47a5-8339-acf3d71efec7",
+      "status": "Revoked",
+      "createdDateTime": "2024-02-12T14:08:38.82Z",
+      "completedDateTime": null,
+      "approvalId": null,
+      "customData": null,
+      "action": "adminRemove",
+      "principalId": "61b0c52f-a902-4769-9a09-c6628335b00a",
+      "roleDefinitionId": "f28a1f50-f6e7-4571-818b-6a12f2af6b6c",
+      "directoryScopeId": "/",
+      "appScopeId": null,
+      "isValidationOnly": false,
+      "targetScheduleId": null,
+      "justification": null,
+      "scheduleInfo": null,
+      "createdBy": {
+        "application": null,
+        "device": null,
+        "user": {
+          "displayName": null,
+          "id": "893f9116-e024-4bc6-8e98-54c245129485"
+        }
+      },
+      "ticketInfo": {
+        "ticketNumber": null,
+        "ticketSystem": null
+      },
+      "roleDefinitionName": "SharePoint Administrator"
+    }
+  ]
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  id                                    roleDefinitionName        principalId
+  ------------------------------------  ------------------------  ------------------------------------
+  48eed833-155f-46ce-87f2-e02e94667dd8  SharePoint Administrator  61b0c52f-a902-4769-9a09-c6628335b00a
+  da1cb564-78ba-4198-b94a-613d892ed73e  User Administrator        61b0c52f-a902-4769-9a09-c6628335b00a
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  id,status,createdDateTime,completedDateTime,approvalId,customData,action,principalId,roleDefinitionId,directoryScopeId,appScopeId,isValidationOnly,targetScheduleId,justification,scheduleInfo,roleDefinitionName
+  da1cb564-78ba-4198-b94a-613d892ed73e,Revoked,2023-10-15T12:35:08.167Z,,,,adminRemove,61b0c52f-a902-4769-9a09-c6628335b00a,fe930be7-5e62-47db-91af-98c3a49a38b1,/administrativeUnits/0a22c83d-c4ac-43e2-bb5e-87af3015d49f,,,,,,User Administrator
+  38d6295f-19e9-4945-90f4-75a2284676ea,Revoked,2024-02-12T08:19:25.037Z,,,,adminRemove,61b0c52f-a902-4769-9a09-c6628335b00a,f28a1f50-f6e7-4571-818b-6a12f2af6b6c,/administrativeUnits/81bb36e4-f4c6-4984-8e56-d4f8feae9e09,,,,,,SharePoint Administrator
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # entra pim role request list
+
+  Date: 5/30/2024
+
+  ## da1cb564-78ba-4198-b94a-613d892ed73e
+
+  Property | Value
+  ---------|-------
+  id | da1cb564-78ba-4198-b94a-613d892ed73e
+  status | Revoked
+  createdDateTime | 2023-10-15T12:35:08.167Z
+  action | adminRemove
+  principalId | 61b0c52f-a902-4769-9a09-c6628335b00a
+  roleDefinitionId | fe930be7-5e62-47db-91af-98c3a49a38b1
+  directoryScopeId | /administrativeUnits/0a22c83d-c4ac-43e2-bb5e-87af3015d49f
+  isValidationOnly | false
+  roleDefinitionName | User Administrator
+  ```
+
+  </TabItem>
+</Tabs>
+
+### `includePrincipalDetails` response
+
+When we make use of the option `includePrincipalDetails` the response will differ. 
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  [
+    {
+      "id": "80231d2f-95a1-47a5-8339-acf3d71efec7",
+      "status": "Revoked",
+      "createdDateTime": "2024-02-12T14:08:38.82Z",
+      "completedDateTime": null,
+      "approvalId": null,
+      "customData": null,
+      "action": "adminRemove",
+      "principalId": "61b0c52f-a902-4769-9a09-c6628335b00a",
+      "roleDefinitionId": "f28a1f50-f6e7-4571-818b-6a12f2af6b6c",
+      "directoryScopeId": "/",
+      "appScopeId": null,
+      "isValidationOnly": false,
+      "targetScheduleId": null,
+      "justification": null,
+      "scheduleInfo": null,
+      "createdBy": {
+        "application": null,
+        "device": null,
+        "user": {
+          "displayName": null,
+          "id": "893f9116-e024-4bc6-8e98-54c245129485"
+        }
+      },
+      "ticketInfo": {
+        "ticketNumber": null,
+        "ticketSystem": null
+      },
+      "roleDefinitionName": "SharePoint Administrator",
+      "principal": {
+        "id": "61b0c52f-a902-4769-9a09-c6628335b00a",
+        "displayName": "John Doe",
+        "userPrincipalName": "JohnDoe@contoso.onmicrosoft.com",
+        "mail": "JohnDoe@contoso.onmicrosoft.com",
+        "businessPhones": [
+          "+1 425 555 0109"
+        ],
+        "givenName": "John",
+        "jobTitle": "Retail Manager",
+        "mobilePhone": null,
+        "officeLocation": "18/2111",
+        "preferredLanguage": "en-US",
+        "surname": "Doe"
+      }
+    }
+  ]
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  id                                    roleDefinitionName        principalId
+  ------------------------------------  ------------------------  ------------------------------------
+  48eed833-155f-46ce-87f2-e02e94667dd8  SharePoint Administrator  61b0c52f-a902-4769-9a09-c6628335b00a
+  da1cb564-78ba-4198-b94a-613d892ed73e  User Administrator        61b0c52f-a902-4769-9a09-c6628335b00a
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  id,status,createdDateTime,completedDateTime,approvalId,customData,action,principalId,roleDefinitionId,directoryScopeId,appScopeId,isValidationOnly,targetScheduleId,justification,scheduleInfo,roleDefinitionName
+  da1cb564-78ba-4198-b94a-613d892ed73e,Revoked,2023-10-15T12:35:08.167Z,,,,adminRemove,61b0c52f-a902-4769-9a09-c6628335b00a,fe930be7-5e62-47db-91af-98c3a49a38b1,/administrativeUnits/0a22c83d-c4ac-43e2-bb5e-87af3015d49f,,,,,,User Administrator
+  38d6295f-19e9-4945-90f4-75a2284676ea,Revoked,2024-02-12T08:19:25.037Z,,,,adminRemove,61b0c52f-a902-4769-9a09-c6628335b00a,f28a1f50-f6e7-4571-818b-6a12f2af6b6c,/administrativeUnits/81bb36e4-f4c6-4984-8e56-d4f8feae9e09,,,,,,SharePoint Administrator
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # entra pim role request list --includePrincipalDetails "true"
+
+  Date: 5/30/2024
+
+  ## da1cb564-78ba-4198-b94a-613d892ed73e
+
+  Property | Value
+  ---------|-------
+  id | da1cb564-78ba-4198-b94a-613d892ed73e
+  status | Revoked
+  createdDateTime | 2023-10-15T12:35:08.167Z
+  action | adminRemove
+  principalId | 61b0c52f-a902-4769-9a09-c6628335b00a
+  roleDefinitionId | fe930be7-5e62-47db-91af-98c3a49a38b1
+  directoryScopeId | /administrativeUnits/0a22c83d-c4ac-43e2-bb5e-87af3015d49f
+  isValidationOnly | false
+  roleDefinitionName | User Administrator
+  ```
+
+  </TabItem>
+</Tabs>

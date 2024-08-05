@@ -4,7 +4,6 @@ import auth from '../../../../Auth.js';
 import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
-import { CommandError } from '../../../../Command.js';
 import request from '../../../../request.js';
 import { telemetry } from '../../../../telemetry.js';
 import { pid } from '../../../../utils/pid.js';
@@ -13,56 +12,170 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './group-member-add.js';
 import { settingsNames } from '../../../../settingsNames.js';
+import { entraGroup } from '../../../../utils/entraGroup.js';
+import { Group } from '@microsoft/microsoft-graph-types';
+import { CommandError } from '../../../../Command.js';
 
 describe(commands.GROUP_MEMBER_ADD, () => {
+  //#region API responses
+  const userResponses =
+    [
+      {
+        Id: 11,
+        IsHiddenInUI: false,
+        LoginName: 'i:0#.f|membership|adelev@contoso.onmicrosoft.com',
+        Title: 'Adele Vance',
+        PrincipalType: 1,
+        Email: 'Adele.Vance@contoso.onmicrosoft.com',
+        Expiration: '',
+        IsEmailAuthenticationGuestUser: false,
+        IsShareByEmailGuestUser: false,
+        IsSiteAdmin: false,
+        UserId: {
+          NameId: '10032001f5ac2029',
+          NameIdIssuer: 'urn:federation:microsoftonline'
+        },
+        UserPrincipalName: 'adelev@contoso.onmicrosoft.com'
+      },
+      {
+        Id: 12,
+        IsHiddenInUI: false,
+        LoginName: 'i:0#.f|membership|johnd@contoso.onmicrosoft.com',
+        Title: 'John Doe',
+        PrincipalType: 1,
+        Email: 'John.Doe@contoso.onmicrosoft.com',
+        Expiration: '',
+        IsEmailAuthenticationGuestUser: false,
+        IsShareByEmailGuestUser: false,
+        IsSiteAdmin: false,
+        UserId: {
+          NameId: '10032001f5ac2029',
+          NameIdIssuer: 'urn:federation:microsoftonline'
+        },
+        UserPrincipalName: 'johnd@contoso.onmicrosoft.com'
+      }
+    ];
+
+  const groupResponses =
+    [
+      {
+        Id: 13,
+        IsHiddenInUI: false,
+        LoginName: 'c:0o.c|federateddirectoryclaimprovider|27ae47f1-48f1-46f3-980b-d3c2460e398d',
+        Title: 'Marketing Members',
+        PrincipalType: 4,
+        Email: 'Marketing@contoso.onmicrosoft.com',
+        Expiration: '',
+        IsEmailAuthenticationGuestUser: false,
+        IsShareByEmailGuestUser: false,
+        IsSiteAdmin: false,
+        UserId: null,
+        UserPrincipalName: null
+      },
+      {
+        Id: 14,
+        IsHiddenInUI: false,
+        LoginName: 'c:0o.c|federateddirectoryclaimprovider|27ae47f1-48f1-46f3-980b-d3c2460e398d',
+        Title: 'HR Members',
+        PrincipalType: 4,
+        Email: 'HR@contoso.onmicrosoft.com',
+        Expiration: '',
+        IsEmailAuthenticationGuestUser: false,
+        IsShareByEmailGuestUser: false,
+        IsSiteAdmin: false,
+        UserId: null,
+        UserPrincipalName: null
+      }
+    ];
+
+  const entraGroupResponses: Group[] = [
+    {
+      id: '75c621f8-8a1c-435a-827f-9b4e7917681b',
+      deletedDateTime: null,
+      classification: null,
+      createdDateTime: '2023-07-20T14:43:57Z',
+      description: 'Marketing',
+      displayName: 'Marketing',
+      expirationDateTime: null,
+      groupTypes: [
+        'Unified'
+      ],
+      isAssignableToRole: null,
+      mail: 'Marketing@contoso.onmicrosoft.com',
+      mailEnabled: true,
+      mailNickname: 'Marketing',
+      membershipRule: null,
+      membershipRuleProcessingState: null,
+      onPremisesDomainName: null,
+      onPremisesLastSyncDateTime: null,
+      onPremisesNetBiosName: null,
+      onPremisesSamAccountName: null,
+      onPremisesSecurityIdentifier: null,
+      onPremisesSyncEnabled: null,
+      preferredDataLocation: null,
+      preferredLanguage: null,
+      proxyAddresses: [
+        'SMTP:Marketing@contoso.onmicrosoft.com',
+        'SPO:SPO_53dec431-9d4f-415b-b12b-010259d5b4e1@SPO_18c58817-3bc9-489d-ac63-f7264fb357e5'
+      ],
+      renewedDateTime: '2023-07-20T14:43:57Z',
+      securityEnabled: false,
+      securityIdentifier: 'S-1-12-1-1975919096-1130007068-1318813570-459806585',
+      theme: null,
+      visibility: 'Public',
+      onPremisesProvisioningErrors: [],
+      serviceProvisioningErrors: []
+    },
+    {
+      id: 'e08e899f-ba40-4e91-ab36-44d4fbaa454e',
+      deletedDateTime: null,
+      classification: null,
+      createdDateTime: '2024-01-05T22:29:40Z',
+      description: null,
+      displayName: 'IT Administrators',
+      expirationDateTime: null,
+      groupTypes: [],
+      isAssignableToRole: null,
+      mail: null,
+      mailEnabled: false,
+      mailNickname: 'd274ca34-f',
+      membershipRule: null,
+      membershipRuleProcessingState: null,
+      onPremisesDomainName: null,
+      onPremisesLastSyncDateTime: null,
+      onPremisesNetBiosName: null,
+      onPremisesSamAccountName: null,
+      onPremisesSecurityIdentifier: null,
+      onPremisesSyncEnabled: null,
+      preferredDataLocation: null,
+      preferredLanguage: null,
+      proxyAddresses: [],
+      renewedDateTime: '2024-01-05T22:29:40Z',
+      securityEnabled: true,
+      securityIdentifier: 'S-1-12-1-3767437727-1318173248-3561240235-1313188603',
+      theme: null,
+      visibility: null,
+      onPremisesProvisioningErrors: [],
+      serviceProvisioningErrors: []
+    }
+  ];
+  //#endregion
+
+  //#region Option values
+  const webUrl = 'https://contoso.sharepoint.com/sites/Marketing';
+  const spGroupName = 'Marketing Site Owners';
+  const spGroupId = 3;
+  const spUserIds = userResponses.map(u => u.Id);
+  const userNames = userResponses.map(u => u.UserPrincipalName);
+  const emails = userResponses.map(u => u.Email);
+  const entraGroupIds = entraGroupResponses.map(g => g.id);
+  const entraGroupNames = entraGroupResponses.map(g => g.displayName);
+  //#endregion
+
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
-
-  const jsonSingleUser =
-  {
-    ErrorMessage: null,
-    IconUrl: "https://contoso.sharepoint.com/sites/SiteA/_layouts/15/images/siteicon.png",
-    InvitedUsers: null,
-    Name: "Site A",
-    PermissionsPageRelativeUrl: null,
-    StatusCode: 0,
-    UniquelyPermissionedUsers: [],
-    Url: "https://contoso.sharepoint.com/sites/SiteA",
-    UsersAddedToGroup: [
-      {
-        AllowedRoles: [
-          0
-        ],
-        CurrentRole: 0,
-        DisplayName: "Alex Wilber",
-        Email: "Alex.Wilber@contoso.com",
-        InvitationLink: null,
-        IsUserKnown: true,
-        Message: null,
-        Status: true,
-        User: "i:0#.f|membership|Alex.Wilber@contoso.com"
-      }
-    ]
-  };
-
-  const jsonGenericError =
-  {
-    ErrorMessage: "The selected permission level is not valid.",
-    IconUrl: null,
-    InvitedUsers: null,
-    Name: null,
-    PermissionsPageRelativeUrl: null,
-    StatusCode: -63,
-    UniquelyPermissionedUsers: null,
-    Url: null,
-    UsersAddedToGroup: null
-  };
-
-  const groupResponse = {
-    Id: 32
-  };
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -71,6 +184,10 @@ describe(commands.GROUP_MEMBER_ADD, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => settingName === settingsNames.prompt ? false : defaultValue);
+    sinon.stub(entraGroup, 'getGroupById').callsFake(async (id: string) => entraGroupResponses.find(g => g.id === id)!);
+    sinon.stub(entraGroup, 'getGroupByDisplayName').callsFake(async (name: string) => entraGroupResponses.find(g => g.displayName === name)!);
   });
 
   beforeEach(() => {
@@ -92,9 +209,7 @@ describe(commands.GROUP_MEMBER_ADD, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.get,
-      request.post,
-      cli.getSettingWithDefaultValue,
-      cli.handleMultipleResultsFound
+      request.post
     ]);
   });
 
@@ -112,14 +227,6 @@ describe(commands.GROUP_MEMBER_ADD, () => {
   });
 
   it('fails validation if both groupId and groupName options are passed', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
     const actual = await command.validate({
       options: {
         webUrl: "https://contoso.sharepoint.com/sites/SiteA",
@@ -132,14 +239,6 @@ describe(commands.GROUP_MEMBER_ADD, () => {
   });
 
   it('fails validation if both groupId and groupName options are not passed', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
     const actual = await command.validate({
       options: {
         webUrl: "https://contoso.sharepoint.com/sites/SiteA",
@@ -150,14 +249,6 @@ describe(commands.GROUP_MEMBER_ADD, () => {
   });
 
   it('fails validation if both userNames and emails options are passed', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
     const actual = await command.validate({
       options: {
         webUrl: "https://contoso.sharepoint.com/sites/SiteA",
@@ -170,14 +261,6 @@ describe(commands.GROUP_MEMBER_ADD, () => {
   });
 
   it('fails validation if both userNames and userIds options are passed', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
     const actual = await command.validate({
       options: {
         webUrl: "https://contoso.sharepoint.com/sites/SiteA",
@@ -190,14 +273,6 @@ describe(commands.GROUP_MEMBER_ADD, () => {
   });
 
   it('fails validation if both emails and entraGroupIds options are passed', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
     const actual = await command.validate({
       options: {
         webUrl: "https://contoso.sharepoint.com/sites/SiteA",
@@ -210,14 +285,6 @@ describe(commands.GROUP_MEMBER_ADD, () => {
   });
 
   it('fails validation if both emails and aadGroupIds options are passed', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
     const actual = await command.validate({
       options: {
         webUrl: "https://contoso.sharepoint.com/sites/SiteA",
@@ -230,14 +297,6 @@ describe(commands.GROUP_MEMBER_ADD, () => {
   });
 
   it('fails validation if both userIds and entraGroupNames options are passed', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
     const actual = await command.validate({
       options: {
         webUrl: "https://contoso.sharepoint.com/sites/SiteA",
@@ -250,14 +309,6 @@ describe(commands.GROUP_MEMBER_ADD, () => {
   });
 
   it('fails validation if both userIds and aadGroupNames options are passed', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
     const actual = await command.validate({
       options: {
         webUrl: "https://contoso.sharepoint.com/sites/SiteA",
@@ -270,14 +321,6 @@ describe(commands.GROUP_MEMBER_ADD, () => {
   });
 
   it('fails validation if both userIds and emails options are passed', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
     const actual = await command.validate({
       options: {
         webUrl: "https://contoso.sharepoint.com/sites/SiteA",
@@ -290,14 +333,6 @@ describe(commands.GROUP_MEMBER_ADD, () => {
   });
 
   it('fails validation if userNames, emails, userIds, entraGroupIds, aadGroupIds, entraGroupNames, or aadGroupNames options are not passed', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
     const actual = await command.validate({
       options: {
         webUrl: "https://contoso.sharepoint.com/sites/SiteA",
@@ -348,405 +383,205 @@ describe(commands.GROUP_MEMBER_ADD, () => {
   });
 
   it('defines correct properties for the default output', () => {
-    assert.deepStrictEqual(command.defaultProperties(), ['DisplayName', 'Email']);
+    assert.deepStrictEqual(command.defaultProperties(), ['Title', 'UserPrincipalName']);
   });
 
-  it('adds user to a SharePoint Group by groupId and userNames', async () => {
-    sinon.stub(request, 'post').callsFake(async opts => {
-      if (opts.url === 'https://contoso.sharepoint.com/sites/SiteA/_api/SP.Web.ShareObject' &&
-        opts.data) {
-        return jsonSingleUser;
+  it('correctly logs deprecation warning for aadGroupIds option', async () => {
+    const chalk = (await import('chalk')).default;
+    const loggerErrSpy = sinon.spy(logger, 'logToStderr');
+    sinon.stub(request, 'post').resolves();
+
+    await command.action(logger, { options: { webUrl: webUrl, groupName: spGroupName, aadGroupIds: entraGroupIds[0] } });
+    assert.deepStrictEqual(loggerErrSpy.firstCall.firstArg, chalk.yellow(`Option 'aadGroupIds' is deprecated. Please use 'entraGroupIds' instead.`));
+
+    sinonUtil.restore(loggerErrSpy);
+  });
+
+  it('correctly logs deprecation warning for aadGroupNames option', async () => {
+    const chalk = (await import('chalk')).default;
+    const loggerErrSpy = sinon.spy(logger, 'logToStderr');
+    sinon.stub(request, 'post').resolves();
+
+    await command.action(logger, { options: { webUrl: webUrl, groupName: spGroupName, aadGroupNames: entraGroupNames[0] } });
+    assert.deepStrictEqual(loggerErrSpy.firstCall.firstArg, chalk.yellow(`Option 'aadGroupNames' is deprecated. Please use 'entraGroupNames' instead.`));
+
+    sinonUtil.restore(loggerErrSpy);
+  });
+
+  it('correctly logs result when adding users by userNames', async () => {
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `${webUrl}/_api/web/SiteGroups/GetById(${spGroupId})/users`) {
+        return userResponses[postStub.callCount - 1];
       }
 
-      throw `Invalid request ${JSON.stringify(opts)}`;
-    });
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/sites/SiteA/_api/web/sitegroups/GetById('32')?$select=Id`) {
-        return groupResponse;
-      }
-
-      throw 'Invalid request';
+      throw 'Invalid request: ' + opts.url;
     });
 
     await command.action(logger, {
       options: {
-        webUrl: "https://contoso.sharepoint.com/sites/SiteA",
-        groupId: 32,
-        userNames: "Alex.Wilber@contoso.com"
+        webUrl: webUrl,
+        groupId: spGroupId,
+        userNames: userNames.join(',')
       }
     });
-    assert(loggerLogSpy.calledWith(jsonSingleUser.UsersAddedToGroup));
+
+    assert(loggerLogSpy.calledOnceWithExactly(userResponses));
   });
 
-  it('adds user to a SharePoint Group by groupId and userIds (Debug)', async () => {
-    sinon.stub(request, 'post').callsFake(async opts => {
-      if (opts.url === 'https://contoso.sharepoint.com/sites/SiteA/_api/SP.Web.ShareObject' &&
-        opts.data) {
-        return jsonSingleUser;
+  it('correctly adds users to group by UPNs', async () => {
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `${webUrl}/_api/web/SiteGroups/GetById(${spGroupId})/users`) {
+        return userResponses[postStub.callCount - 1];
       }
 
-      throw `Invalid request ${JSON.stringify(opts)}`;
+      throw 'Invalid request: ' + opts.url;
     });
-    sinon.stub(request, 'get').callsFake(async opts => {
-      if (opts.url === `https://contoso.sharepoint.com/sites/SiteA/_api/web/siteusers/GetById('9')?$select=AadObjectId`) {
-        return {
-          AadObjectId: {
-            NameId: '6cc1797e-5463-45ec-bb1a-b93ec198bab6',
-            NameIdIssuer: 'urn:federation:microsoftonline'
+
+    await command.action(logger, {
+      options: {
+        webUrl: webUrl,
+        groupId: spGroupId,
+        userNames: userNames.join(',')
+      }
+    });
+
+    assert.deepStrictEqual(postStub.firstCall.args[0].data, { LoginName: 'i:0#.f|membership|adelev@contoso.onmicrosoft.com' });
+    assert.deepStrictEqual(postStub.secondCall.args[0].data, { LoginName: 'i:0#.f|membership|johnd@contoso.onmicrosoft.com' });
+  });
+
+  it('correctly adds users to group by emails', async () => {
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `${webUrl}/_api/web/SiteGroups/GetById(${spGroupId})/users`) {
+        return userResponses[postStub.callCount - 1];
+      }
+
+      throw 'Invalid request: ' + opts.url;
+    });
+
+    await command.action(logger, {
+      options: {
+        webUrl: webUrl,
+        groupId: spGroupId,
+        emails: emails.join(',')
+      }
+    });
+
+    assert.deepStrictEqual(postStub.firstCall.args[0].data, { LoginName: 'i:0#.f|membership|Adele.Vance@contoso.onmicrosoft.com' });
+    assert.deepStrictEqual(postStub.secondCall.args[0].data, { LoginName: 'i:0#.f|membership|John.Doe@contoso.onmicrosoft.com' });
+  });
+
+  it('correctly adds users to group by userIds', async () => {
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `${webUrl}/_api/web/SiteGroups/GetById(${spGroupId})/users`) {
+        return userResponses[postStub.callCount - 1];
+      }
+
+      throw 'Invalid request: ' + opts.url;
+    });
+
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      for (const user of userResponses) {
+        if (opts.url === `${webUrl}/_api/web/SiteUsers/GetById(${user.Id})?$select=LoginName`) {
+          return { LoginName: user.LoginName };
+        }
+      }
+
+      throw 'Invalid request: ' + opts.url;
+    });
+
+    await command.action(logger, {
+      options: {
+        webUrl: webUrl,
+        groupId: spGroupId,
+        userIds: spUserIds.join(','),
+        verbose: true
+      }
+    });
+
+    assert.deepStrictEqual(postStub.firstCall.args[0].data, { LoginName: 'i:0#.f|membership|adelev@contoso.onmicrosoft.com' });
+    assert.deepStrictEqual(postStub.secondCall.args[0].data, { LoginName: 'i:0#.f|membership|johnd@contoso.onmicrosoft.com' });
+  });
+
+  it('correctly logs result when adding groups', async () => {
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `${webUrl}/_api/web/SiteGroups/GetById(${spGroupId})/users`) {
+        return groupResponses[postStub.callCount - 1];
+      }
+
+      throw 'Invalid request: ' + opts.url;
+    });
+
+    await command.action(logger, {
+      options: {
+        webUrl: webUrl,
+        groupId: spGroupId,
+        entraGroupIds: entraGroupIds.join(',')
+      }
+    });
+
+    assert(loggerLogSpy.calledOnceWithExactly(groupResponses));
+  });
+
+  it('correctly adds users to group by entraGroupIds', async () => {
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `${webUrl}/_api/web/SiteGroups/GetById(${spGroupId})/users`) {
+        return groupResponses[postStub.callCount - 1];
+      }
+
+      throw 'Invalid request: ' + opts.url;
+    });
+
+    await command.action(logger, {
+      options: {
+        webUrl: webUrl,
+        groupId: spGroupId,
+        entraGroupIds: entraGroupIds.join(','),
+        verbose: true
+      }
+    });
+
+    assert.deepStrictEqual(postStub.firstCall.args[0].data, { LoginName: `c:0o.c|federateddirectoryclaimprovider|${entraGroupResponses[0].id}` });
+    assert.deepStrictEqual(postStub.secondCall.args[0].data, { LoginName: `c:0t.c|tenant|${entraGroupResponses[1].id}` });
+  });
+
+  it('correctly adds users to group by entraGroupNames', async () => {
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `${webUrl}/_api/web/SiteGroups/GetById(${spGroupId})/users`) {
+        return groupResponses[postStub.callCount - 1];
+      }
+
+      throw 'Invalid request: ' + opts.url;
+    });
+
+    await command.action(logger, {
+      options: {
+        webUrl: webUrl,
+        groupId: spGroupId,
+        entraGroupNames: entraGroupNames.join(','),
+        verbose: true
+      }
+    });
+
+    assert.deepStrictEqual(postStub.firstCall.args[0].data, { LoginName: `c:0o.c|federateddirectoryclaimprovider|${entraGroupResponses[0].id}` });
+    assert.deepStrictEqual(postStub.secondCall.args[0].data, { LoginName: `c:0t.c|tenant|${entraGroupResponses[1].id}` });
+  });
+
+  it('correctly handles error when adding users to group', async () => {
+    const error = {
+      error: {
+        'odata.error': {
+          code: '-2130575276, Microsoft.SharePoint.SPException',
+          message: {
+            lang: 'en-US',
+            value: 'The user does not exist or is not unique.'
           }
-        };
+        }
       }
+    };
 
-      if (opts.url === `https://contoso.sharepoint.com/sites/SiteA/_api/web/sitegroups/GetById('32')?$select=Id`) {
-        return groupResponse;
-      }
+    sinon.stub(request, 'post').rejects(error);
 
-      throw `Invalid request ${JSON.stringify(opts)}`;
-    });
-    await command.action(logger, {
-      options: {
-        debug: true,
-        webUrl: "https://contoso.sharepoint.com/sites/SiteA",
-        groupId: 32,
-        userIds: 9
-      }
-    });
-    assert(loggerLogSpy.calledWith(jsonSingleUser.UsersAddedToGroup));
-  });
-
-  it('adds user to a SharePoint Group by groupId and userNames (Debug)', async () => {
-    sinon.stub(request, 'post').callsFake(async opts => {
-      if (opts.url === 'https://contoso.sharepoint.com/sites/SiteA/_api/SP.Web.ShareObject' &&
-        opts.data) {
-        return jsonSingleUser;
-      }
-
-      throw `Invalid request ${JSON.stringify(opts)}`;
-    });
-
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/sites/SiteA/_api/web/sitegroups/GetById('32')?$select=Id`) {
-        return groupResponse;
-      }
-
-      throw 'Invalid request';
-    });
-
-    await command.action(logger, {
-      options: {
-        debug: true,
-        webUrl: "https://contoso.sharepoint.com/sites/SiteA",
-        groupId: 32,
-        userNames: "Alex.Wilber@contoso.com"
-      }
-    });
-    assert(loggerLogSpy.calledWith(jsonSingleUser.UsersAddedToGroup));
-  });
-
-  it('adds user to a SharePoint Group by groupName and emails (DEBUG)', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=mail eq 'Alex.Wilber%40contoso.com'&$select=id`) {
-        return { value: [{ id: "2056d2f6-3257-4253-8cfc-b73393e414e5" }] };
-      }
-
-      if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/SiteA/_api/web/sitegroups/GetByName(`) > -1) {
-        return {
-          Id: 7
-        };
-      }
-      throw 'Invalid request';
-    });
-
-    sinon.stub(request, 'post').callsFake(async opts => {
-      if (opts.url === 'https://contoso.sharepoint.com/sites/SiteA/_api/SP.Web.ShareObject' &&
-        opts.data) {
-        return jsonSingleUser;
-      }
-
-      throw `Invalid request ${JSON.stringify(opts)}`;
-    });
-    await command.action(logger, {
-      options: {
-        debug: true,
-        webUrl: "https://contoso.sharepoint.com/sites/SiteA",
-        groupName: "Contoso Site Owners",
-        emails: "Alex.Wilber@contoso.com"
-      }
-    });
-    assert(loggerLogSpy.calledWith(jsonSingleUser.UsersAddedToGroup));
-  });
-
-  it('adds user to a SharePoint Group by groupId and entraGroupIds (Debug)', async () => {
-    sinon.stub(request, 'post').callsFake(async opts => {
-      if (opts.url === 'https://contoso.sharepoint.com/sites/SiteA/_api/SP.Web.ShareObject' &&
-        opts.data) {
-        return jsonSingleUser;
-      }
-
-      throw `Invalid request ${JSON.stringify(opts)}`;
-    });
-
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/sites/SiteA/_api/web/sitegroups/GetById('32')?$select=Id`) {
-        return groupResponse;
-      }
-
-      throw 'Invalid request';
-    });
-
-    await command.action(logger, {
-      options: {
-        debug: true,
-        webUrl: "https://contoso.sharepoint.com/sites/SiteA",
-        groupId: 32,
-        entraGroupIds: "56ca9023-3449-4e98-a96a-69e81a6f4983"
-      }
-    });
-    assert(loggerLogSpy.calledWith(jsonSingleUser.UsersAddedToGroup));
-  });
-
-  it('adds user to a SharePoint Group by groupId and aadGroupIds (Debug)', async () => {
-    sinon.stub(request, 'post').callsFake(async opts => {
-      if (opts.url === 'https://contoso.sharepoint.com/sites/SiteA/_api/SP.Web.ShareObject' &&
-        opts.data) {
-        return jsonSingleUser;
-      }
-
-      throw `Invalid request ${JSON.stringify(opts)}`;
-    });
-
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/sites/SiteA/_api/web/sitegroups/GetById('32')?$select=Id`) {
-        return groupResponse;
-      }
-
-      throw 'Invalid request';
-    });
-
-    await command.action(logger, {
-      options: {
-        debug: true,
-        webUrl: "https://contoso.sharepoint.com/sites/SiteA",
-        groupId: 32,
-        aadGroupIds: "56ca9023-3449-4e98-a96a-69e81a6f4983"
-      }
-    });
-    assert(loggerLogSpy.calledWith(jsonSingleUser.UsersAddedToGroup));
-  });
-
-  it('adds user to a SharePoint Group by groupId and entraGroupNames (Debug)', async () => {
-    sinon.stub(request, 'post').callsFake(async opts => {
-      if (opts.url === 'https://contoso.sharepoint.com/sites/SiteA/_api/SP.Web.ShareObject' &&
-        opts.data) {
-        return jsonSingleUser;
-      }
-
-      throw `Invalid request ${JSON.stringify(opts)}`;
-    });
-
-    sinon.stub(request, 'get').callsFake(async opts => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq 'Microsoft%20Entra%20Group%20name'&$select=id`) {
-        return {
-          value: [{
-            id: 'Group name'
-          }]
-        };
-      }
-
-      if (opts.url === `https://contoso.sharepoint.com/sites/SiteA/_api/web/sitegroups/GetById('32')?$select=Id`) {
-        return groupResponse;
-      }
-
-      throw `Invalid request ${JSON.stringify(opts)}`;
-    });
-
-    await command.action(logger, {
-      options: {
-        debug: true,
-        webUrl: "https://contoso.sharepoint.com/sites/SiteA",
-        groupId: 32,
-        entraGroupNames: "Microsoft Entra Group name"
-      }
-    });
-
-    assert(loggerLogSpy.calledWith(jsonSingleUser.UsersAddedToGroup));
-  });
-
-  it('adds user to a SharePoint Group by groupId and aadGroupNames (Debug)', async () => {
-    sinon.stub(request, 'post').callsFake(async opts => {
-      if (opts.url === 'https://contoso.sharepoint.com/sites/SiteA/_api/SP.Web.ShareObject' &&
-        opts.data) {
-        return jsonSingleUser;
-      }
-
-      throw `Invalid request ${JSON.stringify(opts)}`;
-    });
-
-    sinon.stub(request, 'get').callsFake(async opts => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq 'Microsoft%20Entra%20Group%20name'&$select=id`) {
-        return {
-          value: [{
-            id: 'Group name'
-          }]
-        };
-      }
-
-      if (opts.url === `https://contoso.sharepoint.com/sites/SiteA/_api/web/sitegroups/GetById('32')?$select=Id`) {
-        return groupResponse;
-      }
-
-      throw `Invalid request ${JSON.stringify(opts)}`;
-    });
-
-    await command.action(logger, {
-      options: {
-        debug: true,
-        webUrl: "https://contoso.sharepoint.com/sites/SiteA",
-        groupId: 32,
-        aadGroupNames: "Microsoft Entra Group name"
-      }
-    });
-
-    assert(loggerLogSpy.calledWith(jsonSingleUser.UsersAddedToGroup));
-  });
-
-  it('fails to get group when does not exists', async () => {
-    const errorMessage = 'The specified group does not exist in the SharePoint site';
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/SiteA/_api/web/sitegroups/GetByName('`) > -1) {
-        throw { error: { 'odata.error': { message: { value: errorMessage } } } };
-      }
-
-      throw 'Invalid request';
-    });
-
-    await assert.rejects(command.action(logger, {
-      options: {
-        debug: true,
-        webUrl: "https://contoso.sharepoint.com/sites/SiteA",
-        groupName: "Contoso Site Owners",
-        emails: "Alex.Wilber@contoso.com"
-      }
-    }), new CommandError(errorMessage));
-  });
-
-  it('handles generic error when adding user to a SharePoint Group by groupId and userIds', async () => {
-    sinon.stub(request, 'get').callsFake(async opts => {
-      if (opts.url === `https://contoso.sharepoint.com/sites/SiteA/_api/web/siteusers/GetById('9')`) {
-        throw 'User not found';
-      }
-
-      if (opts.url === `https://contoso.sharepoint.com/sites/SiteA/_api/web/sitegroups/GetById('32')?$select=Id`) {
-        return groupResponse;
-      }
-
-      throw `Invalid request ${JSON.stringify(opts)}`;
-    });
-
-    await assert.rejects(command.action(logger, {
-      options: {
-        debug: true,
-        webUrl: "https://contoso.sharepoint.com/sites/SiteA",
-        groupId: 32,
-        userIds: 9
-      }
-    }), new CommandError(`Resource '9' does not exist.`));
-  });
-
-  it('handles error when adding user to SharePoint Group group', async () => {
-    sinon.stub(request, 'post').callsFake(async opts => {
-      if (opts.url === 'https://contoso.sharepoint.com/sites/SiteA/_api/SP.Web.ShareObject' &&
-        opts.data) {
-        return jsonGenericError;
-      }
-
-      throw `Invalid request ${JSON.stringify(opts)}`;
-    });
-
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/sites/SiteA/_api/web/sitegroups/GetById('32')?$select=Id`) {
-        return groupResponse;
-      }
-
-      throw 'Invalid request';
-    });
-
-    await assert.rejects(command.action(logger, {
-      options: {
-        webUrl: "https://contoso.sharepoint.com/sites/SiteA",
-        groupId: 32,
-        userNames: 'Alex.Wilber@contoso.com'
-      }
-    }), new CommandError('The selected permission level is not valid.'));
-  });
-
-  it('handles error when multiple groups with the specified displayName found', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    sinon.stub(request, 'get').callsFake(async opts => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq 'Microsoft%20Entra%20Group%20name'&$select=id`) {
-        return {
-          value: [
-            { id: '9b1b1e42-794b-4c71-93ac-5ed92488b67f' },
-            { id: '9b1b1e42-794b-4c71-93ac-5ed92488b67g' }
-          ]
-        };
-      }
-
-      return 'Invalid Request';
-    });
-
-    sinon.stub(request, 'post').rejects('POST request executed');
-
-    await assert.rejects(command.action(logger, {
-      options: {
-        webUrl: "https://contoso.sharepoint.com/sites/SiteA",
-        groupId: 32,
-        entraGroupNames: "Microsoft Entra Group name"
-      }
-    }), new CommandError("Resource 'Microsoft Entra Group name' does not exist."));
-  });
-
-  it('handles selecting single result when multiple groups with the specified name found and cli is set to prompt', async () => {
-    sinon.stub(request, 'get').callsFake(async opts => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq 'Microsoft%20Entra%20Group%20name'&$select=id`) {
-        return {
-          value: [
-            { id: '9b1b1e42-794b-4c71-93ac-5ed92488b67f' },
-            { id: '9b1b1e42-794b-4c71-93ac-5ed92488b67g' }
-          ]
-        };
-      }
-
-      if (opts.url === `https://contoso.sharepoint.com/sites/SiteA/_api/web/sitegroups/GetById('32')?$select=Id`) {
-        return groupResponse;
-      }
-
-      throw 'Invalid request';
-    });
-
-    sinon.stub(cli, 'handleMultipleResultsFound').resolves({ id: '9b1b1e42-794b-4c71-93ac-5ed92488b67f' });
-
-    sinon.stub(request, 'post').callsFake(async opts => {
-      if (opts.url === 'https://contoso.sharepoint.com/sites/SiteA/_api/SP.Web.ShareObject' &&
-        opts.data) {
-        return jsonSingleUser;
-      }
-
-      throw `Invalid request ${JSON.stringify(opts)}`;
-    });
-
-    await command.action(logger, {
-      options: {
-        debug: true, webUrl: "https://contoso.sharepoint.com/sites/SiteA", groupId: 32, entraGroupNames: "Microsoft Entra Group name"
-      }
-    });
-    assert(loggerLogSpy.calledWith(jsonSingleUser.UsersAddedToGroup));
+    await assert.rejects(command.action(logger, { options: { webUrl: webUrl, groupId: spGroupId, userNames: userNames.join(',') } }),
+      new CommandError(error.error['odata.error'].message.value));
   });
 });

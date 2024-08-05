@@ -9,7 +9,9 @@ import { RoleType } from '../m365/spo/commands/roledefinition/RoleType.js';
  */
 export enum CheckStatus {
   Success,
-  Failure
+  Failure,
+  Information,
+  Warning
 }
 
 export const formatting = {
@@ -42,6 +44,24 @@ export const formatting = {
 
   parseJsonWithBom(s: string): any {
     return JSON.parse(s.replace(/^\uFEFF/, ''));
+  },
+
+  /**
+   * Tries to parse a string as JSON. If it fails, returns the original string.
+   * @param value JSON string to parse.
+   * @returns JSON object or the original string if parsing fails.
+   */
+  tryParseJson(value: string): any {
+    try {
+      if (typeof value !== 'string') {
+        return value;
+      }
+
+      return JSON.parse(value);
+    }
+    catch {
+      return value;
+    }
   },
 
   filterObject(obj: any, propertiesToInclude: string[]): any {
@@ -173,7 +193,18 @@ export const formatting = {
       process.env.TERM === 'xterm-256color';
     const success: string = primarySupported ? '✔' : '√';
     const failure: string = primarySupported ? '✖' : '×';
-    return `${result === CheckStatus.Success ? chalk.green(success) : chalk.red(failure)} ${message}`;
+    const information: string = 'i';
+    const warning: string = '!';
+    switch (result) {
+      case CheckStatus.Success:
+        return `${chalk.green(success)} ${message}`;
+      case CheckStatus.Failure:
+        return `${chalk.red(failure)} ${message}`;
+      case CheckStatus.Information:
+        return `${chalk.blue(information)} ${message}`;
+      case CheckStatus.Warning:
+        return `${chalk.yellow(warning)} ${message}`;
+    }
   },
 
   convertArrayToHashTable(key: string, array: any[]): any {

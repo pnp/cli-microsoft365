@@ -1,6 +1,7 @@
 import auth from '../../../Auth.js';
 import { Logger } from '../../../cli/Logger.js';
 import GlobalOptions from '../../../GlobalOptions.js';
+import { urlUtil } from '../../../utils/urlUtil.js';
 import { validation } from '../../../utils/validation.js';
 import SpoCommand from '../../base/SpoCommand.js';
 import commands from '../commands.js';
@@ -27,6 +28,7 @@ class SpoSetCommand extends SpoCommand {
 
     this.#initOptions();
     this.#initValidators();
+    this.#initTypes();
   }
 
   #initOptions(): void {
@@ -43,8 +45,12 @@ class SpoSetCommand extends SpoCommand {
     );
   }
 
+  #initTypes(): void {
+    this.types.string.push('url');
+  }
+
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    auth.connection.spoUrl = args.options.url;
+    auth.connection.spoUrl = urlUtil.removeTrailingSlashes(args.options.url);
 
     try {
       await auth.storeConnectionInfo();

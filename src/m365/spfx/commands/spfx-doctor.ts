@@ -581,10 +581,10 @@ class SpfxDoctorCommand extends BaseProjectCommand {
         fix: 'npm i -g yo@5'
       }
     },
-    '1.19.0-beta.0': {
+    '1.19.0': {
       gulpCli: {
-        range: '^1 || ^2',
-        fix: 'npm i -g gulp-cli@2'
+        range: '^1 || ^2 || ^3',
+        fix: 'npm i -g gulp-cli@3'
       },
       node: {
         range: '>=18.17.1 <19.0.0',
@@ -810,7 +810,7 @@ class SpfxDoctorCommand extends BaseProjectCommand {
 
   private async checkNodeVersion(prerequisites: SpfxVersionPrerequisites): Promise<void> {
     const nodeVersion: string = this.getNodeVersion();
-    this.checkStatus('Node', nodeVersion, prerequisites.node);
+    await this.checkStatus('Node', nodeVersion, prerequisites.node);
   }
 
   private async checkSharePointFrameworkVersion(spfxVersionRequested: string): Promise<void> {
@@ -823,7 +823,7 @@ class SpfxDoctorCommand extends BaseProjectCommand {
       fix: `npm i -g @microsoft/generator-sharepoint@${spfxVersionRequested}`
     };
     if (spfxVersionDetected) {
-      this.checkStatus(`SharePoint Framework`, spfxVersionDetected, versionCheck);
+      await this.checkStatus(`SharePoint Framework`, spfxVersionDetected, versionCheck);
     }
     else {
       const message = `SharePoint Framework v${spfxVersionRequested} not found`;
@@ -841,7 +841,7 @@ class SpfxDoctorCommand extends BaseProjectCommand {
   private async checkYo(prerequisites: SpfxVersionPrerequisites): Promise<void> {
     const yoVersion: string = await this.getPackageVersion('yo', PackageSearchMode.GlobalOnly, HandlePromise.Continue);
     if (yoVersion) {
-      this.checkStatus('yo', yoVersion, prerequisites.yo);
+      await this.checkStatus('yo', yoVersion, prerequisites.yo);
     }
     else {
       const message = 'yo not found';
@@ -858,7 +858,7 @@ class SpfxDoctorCommand extends BaseProjectCommand {
   private async checkGulpCli(prerequisites: SpfxVersionPrerequisites): Promise<void> {
     const gulpCliVersion: string = await this.getPackageVersion('gulp-cli', PackageSearchMode.GlobalOnly, HandlePromise.Continue);
     if (gulpCliVersion) {
-      this.checkStatus('gulp-cli', gulpCliVersion, prerequisites.gulpCli);
+      await this.checkStatus('gulp-cli', gulpCliVersion, prerequisites.gulpCli);
     }
     else {
       const message = 'gulp-cli not found';

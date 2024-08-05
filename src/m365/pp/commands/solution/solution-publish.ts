@@ -121,7 +121,7 @@ class PpSolutionPublishCommand extends PowerPlatformCommand {
         await request.post(requestOptions);
       }
       else {
-        request.post(requestOptions);
+        void request.post(requestOptions);
       }
     }
     catch (err: any) {

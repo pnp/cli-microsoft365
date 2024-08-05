@@ -89,18 +89,15 @@ class SetupCommand extends AnonymousCommand {
       }
       else if (args.options.scripting) {
         Object.assign(settings, scriptingPreset);
-      }
 
-      if (pid.isPowerShell()) {
-        Object.assign(settings, powerShellPreset);
+        if (pid.isPowerShell()) {
+          Object.assign(settings, powerShellPreset);
+        }
       }
 
       await this.configureSettings(settings, true, logger);
       return;
     }
-
-    // stop the spinner. Fixes #5598
-    cli.spinner.stop();
 
     await logger.logToStderr(`Welcome to the CLI for Microsoft 365 setup!`);
     await logger.logToStderr(`This command will guide you through the process of configuring the CLI for your needs.`);
@@ -150,9 +147,6 @@ class SetupCommand extends AnonymousCommand {
       await logger.logToStderr('');
       await logger.logToStderr('Configuring settings...');
       await logger.logToStderr('');
-
-      // start the spinner. Fixes #5598
-      cli.spinner.start();
 
       await this.configureSettings(settings, false, logger);
 

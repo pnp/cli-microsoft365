@@ -1,10 +1,7 @@
 import fs from 'fs';
-import ora from 'ora';
 import path from 'path';
 import url from 'url';
-import { cli } from '../cli/cli.js';
 import request, { CliRequestOptions } from '../request.js';
-import { settingsNames } from '../settingsNames.js';
 import { md } from '../utils/md.js';
 import { prompt } from '../utils/prompt.js';
 
@@ -28,18 +25,17 @@ interface MendableChatResponse {
   }[];
 }
 
+const mendableBaseUrl = 'https://api.mendable.ai/v1';
 const mendableApiKey = 'd3313d54-6f8e-40e0-90d3-4095019d4be7';
 
 let showHelp = false;
 let debug = false;
-let promptForRating = true;
 let conversationId: number = 0;
 let initialPrompt: string = '';
 let history: {
   prompt: string;
   response: string;
 }[] = [];
-const showSpinner = cli.getSettingWithDefaultValue<boolean>(settingsNames.showSpinner, true) && typeof global.it === 'undefined';
 
 request.logger = {
   /* c8 ignore next 3 */
@@ -85,17 +81,6 @@ function getPromptFromArgs(args: string[]): string {
     debug = false;
   }
 
-  const noRatingPos = args.indexOf('--no-rating');
-
-  if (noRatingPos > -1) {
-    promptForRating = false;
-    args.splice(noRatingPos, 1);
-  }
-  else {
-    // reset to default. needed for tests
-    promptForRating = true;
-  }
-
   return args.join(' ');
 }
 
@@ -122,12 +107,6 @@ async function promptForPrompt(): Promise<string> {
 
 async function runConversationTurn(conversationId: number, question: string): Promise<void> {
   console.log('');
-  const spinner = ora('Searching documentation...');
-
-  /* c8 ignore next 3 */
-  if (showSpinner) {
-    spinner.start();
-  }
 
   const response = await runMendableChat(conversationId, question);
 
@@ -135,11 +114,6 @@ async function runConversationTurn(conversationId: number, question: string): Pr
     prompt: question,
     response: response.answer.text
   });
-
-  /* c8 ignore next 3 */
-  if (showSpinner) {
-    spinner.stop();
-  }
 
   console.log(md.md2plain(response.answer.text, ''));
   console.log('');
@@ -149,19 +123,6 @@ async function runConversationTurn(conversationId: number, question: string): Pr
   const sources = response.sources.filter((src, index, self) => index === self.findIndex(s => s.link === src.link));
   sources.forEach(src => console.log(`⬥ ${src.link}`));
   console.log('');
-
-  if (promptForRating) {
-    try {
-      await rateResponse(response.message_id);
-    }
-    catch (err) {
-      if (debug) {
-        console.error(`An error has occurred while rating the response: ${err}`);
-      }
-    }
-
-    console.log('');
-  }
 
   const choices = [
     {
@@ -197,67 +158,9 @@ async function runConversationTurn(conversationId: number, question: string): Pr
   }
 }
 
-async function rateResponse(messageId: number): Promise<void> {
-  const choices = [
-    {
-      name: '👍 Yes',
-      value: 1
-    },
-    {
-      name: '👎 No',
-      value: -1
-    },
-    {
-      name: '🤔 Not sure/skip',
-      value: 0
-    }
-  ];
-
-  const rating = await prompt.forSelection({ message: 'Was this helpful?', choices });
-
-  if (rating === 0) {
-    return;
-  }
-
-  console.log('Thanks for letting us know! 😊');
-
-  const requestOptions: CliRequestOptions = {
-    url: 'https://api.mendable.ai/v0/rateMessage',
-    headers: {
-      'content-type': 'application/json',
-      'x-anonymous': true
-    },
-    responseType: 'json',
-    data: {
-      // eslint-disable-next-line camelcase
-      api_key: mendableApiKey,
-      // eslint-disable-next-line camelcase
-      conversation_id: conversationId,
-      // eslint-disable-next-line camelcase
-      message_id: messageId,
-      // eslint-disable-next-line camelcase
-      rating_value: rating
-    }
-  };
-
-  const spinner = ora('Sending rating...');
-
-  /* c8 ignore next 3 */
-  if (showSpinner) {
-    spinner.start();
-  }
-
-  await request.post(requestOptions);
-
-  /* c8 ignore next 3 */
-  if (showSpinner) {
-    spinner.stop();
-  }
-}
-
 async function endConversation(conversationId: number): Promise<void> {
   const requestOptions: CliRequestOptions = {
-    url: 'https://api.mendable.ai/v0/endConversation',
+    url: `${mendableBaseUrl}/endConversation`,
     headers: {
       'content-type': 'application/json',
       'x-anonymous': true
@@ -271,23 +174,12 @@ async function endConversation(conversationId: number): Promise<void> {
     }
   };
 
-  const spinner = ora('Ending conversation...');
-  /* c8 ignore next 3 */
-  if (showSpinner) {
-    spinner.start();
-  }
-
   await request.post(requestOptions);
-
-  /* c8 ignore next 3 */
-  if (showSpinner) {
-    spinner.stop();
-  }
 }
 
 async function runMendableChat(conversationId: number, question: string): Promise<MendableChatResponse> {
   const requestOptions: CliRequestOptions = {
-    url: 'https://api.mendable.ai/v0/mendableChat',
+    url: `${mendableBaseUrl}/mendableChat`,
     headers: {
       'content-type': 'application/json',
       'x-anonymous': true
@@ -309,7 +201,7 @@ async function runMendableChat(conversationId: number, question: string): Promis
 
 async function getConversationId(): Promise<number> {
   const requestOptions: CliRequestOptions = {
-    url: 'https://api.mendable.ai/v0/newConversation',
+    url: `${mendableBaseUrl}/newConversation`,
     headers: {
       'content-type': 'application/json',
       'x-anonymous': true

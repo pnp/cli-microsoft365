@@ -13,6 +13,7 @@ import { powerPlatform } from '../../../../utils/powerPlatform.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './solution-get.js';
+import { accessToken } from '../../../../utils/accessToken.js';
 
 describe(commands.SOLUTION_GET, () => {
   let commandInfo: CommandInfo;
@@ -52,6 +53,7 @@ describe(commands.SOLUTION_GET, () => {
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
+    sinon.stub(accessToken, 'assertDelegatedAccessToken').returns();
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
   });

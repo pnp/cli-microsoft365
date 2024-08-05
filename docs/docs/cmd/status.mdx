@@ -35,6 +35,7 @@ m365 status
 
   ```json
   {
+    "connectionName": "dd8b99a7-77c6-4238-a609-396d27844921",
     "connectedAs": "john.doe@contoso.onmicrosoft.com",
     "authType": "DeviceCode",
     "appId": "31359c7f-bd7e-475c-86db-fdb8c937548e",
@@ -47,19 +48,20 @@ m365 status
   <TabItem value="Text">
 
   ```text
-  appId      : 31359c7f-bd7e-475c-86db-fdb8c937548e
-  appTenant  : common
-  authType   : DeviceCode
-  connectedAs: john.doe@contoso.onmicrosoft.com
-  cloudType  : Public
+  appId         : 31359c7f-bd7e-475c-86db-fdb8c937548e
+  appTenant     : common
+  authType      : DeviceCode
+  cloudType     : Public
+  connectedAs   : john.doe@contoso.onmicrosoft.com
+  connectionName: dd8b99a7-77c6-4238-a609-396d27844921
   ```
 
   </TabItem>
   <TabItem value="CSV">
 
   ```csv
-  connectedAs,authType,appId,appTenant,cloudType
-  john.doe@contoso.onmicrosoft.com,DeviceCode,31359c7f-bd7e-475c-86db-fdb8c937548e,common,Public
+  connectionName,connectedAs,authType,appId,appTenant,cloudType
+  dd8b99a7-77c6-4238-a609-396d27844921,john.doe@contoso.onmicrosoft.com,DeviceCode,31359c7f-bd7e-475c-86db-fdb8c937548e,common,Public
   ```
 
   </TabItem>
@@ -70,10 +72,9 @@ m365 status
 
   Date: 7/2/2023
 
-
-
   Property | Value
   ---------|-------
+  connectionName | dd8b99a7-77c6-4238-a609-396d27844921
   connectedAs | john.doe@contoso.onmicrosoft.com
   authType | DeviceCode
   appId | 31359c7f-bd7e-475c-86db-fdb8c937548e

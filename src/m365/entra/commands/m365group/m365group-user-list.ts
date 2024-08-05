@@ -111,7 +111,7 @@ class EntraM365GroupUserListCommand extends GraphCommand {
 
     try {
       if (args.options.role === 'Guest') {
-        this.warn(logger, `Value 'Guest' for the option role is deprecated. Use --filter "userType eq 'Guest'" instead.`);
+        await this.warn(logger, `Value 'Guest' for the option role is deprecated. Use --filter "userType eq 'Guest'" instead.`);
       }
 
       const groupId = await this.getGroupId(args.options, logger);

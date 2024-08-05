@@ -118,13 +118,11 @@ class PlannerBucketListCommand extends GraphCommand {
     }
 
     if (args.options.planTitle) {
-      const groupId: string = await this.getGroupId(args);
-      const plan = await planner.getPlanByTitle(args.options.planTitle, groupId);
-      return plan.id!;
+      const groupId = await this.getGroupId(args);
+      return planner.getPlanIdByTitle(args.options.planTitle, groupId);
     }
 
-    const plan = await planner.getPlanByRosterId(args.options.rosterId!);
-    return plan.id!;
+    return planner.getPlanIdByRosterId(args.options.rosterId!);
   }
 
   private async getGroupId(args: CommandArgs): Promise<string> {
@@ -132,8 +130,7 @@ class PlannerBucketListCommand extends GraphCommand {
       return args.options.ownerGroupId;
     }
 
-    const group = await entraGroup.getGroupByDisplayName(args.options.ownerGroupName!);
-    return group.id!;
+    return entraGroup.getGroupIdByDisplayName(args.options.ownerGroupName!);
   }
 }
 

@@ -22,6 +22,7 @@ describe(commands.FOLDER_ADD, () => {
   let stubPostResponses: any;
 
   const addResponse = { "Exists": true, "IsWOPIEnabled": false, "ItemCount": 0, "Name": "abc", "ProgID": null, "ServerRelativeUrl": "/sites/test1/Shared Documents/abc", "TimeCreated": "2018-05-02T23:21:45Z", "TimeLastModified": "2018-05-02T23:21:45Z", "UniqueId": "0ac3da45-cacf-4c31-9b38-9ef3697d5a66", "WelcomePage": "" };
+  const addResponseChild = { "Exists": true, "IsWOPIEnabled": false, "ItemCount": 0, "Name": "folder1", "ProgID": null, "ServerRelativeUrl": "/Shared Documents/abc/folder1", "TimeCreated": "2018-05-02T23:21:45Z", "TimeLastModified": "2018-05-02T23:21:45Z", "UniqueId": "0ac3da45-cacf-4c31-9b38-9ef3697d5a66", "WelcomePage": "" };
 
   const webUrl = 'https://contoso.sharepoint.com';
   const parentFolder = '/Shared Documents';
@@ -71,6 +72,7 @@ describe(commands.FOLDER_ADD, () => {
 
   afterEach(() => {
     sinonUtil.restore([
+      request.get,
       request.post
     ]);
   });
@@ -192,6 +194,44 @@ describe(commands.FOLDER_ADD, () => {
         ColorHex: colorNumber
       }
     });
+  });
+
+  it('creates folder and ensures parent folder path', async () => {
+    const requestGet = sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `${webUrl}/_api/web/GetFolderByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter('Shared Documents/abc')}')?$select=Exists`) {
+        return {
+          Exists: false
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    const requestPost = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/_api/web/folders/addUsingPath(decodedUrl='${formatting.encodeQueryParameter('Shared Documents/abc')}')`) {
+        return addResponse;
+      }
+
+      if (opts.url === `https://contoso.sharepoint.com/_api/web/folders/addUsingPath(decodedUrl='${formatting.encodeQueryParameter('/Shared Documents/abc/folder1')}')`) {
+        return addResponseChild;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options: {
+        debug: true,
+        webUrl: webUrl,
+        parentFolderUrl: '/Shared Documents/abc',
+        name: 'folder1',
+        ensureParentFolders: true
+      }
+    });
+
+    assert.strictEqual(requestGet.lastCall.args[0].url, `https://contoso.sharepoint.com/_api/web/GetFolderByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter('Shared Documents/abc')}')?$select=Exists`);
+
+    assert.strictEqual(requestPost.callCount, 2);
   });
 
   it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {

@@ -8,7 +8,6 @@ import { planner } from '../../../../utils/planner.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
-import { formatting } from '../../../../utils/formatting.js';
 
 interface CommandArgs {
   options: Options;
@@ -139,6 +138,10 @@ class PlannerBucketRemoveCommand extends GraphCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const removeBucket = async (): Promise<void> => {
+      if (this.verbose) {
+        await logger.logToStderr(`Removing bucket...`);
+      }
+
       try {
         const bucket = await this.getBucket(args);
 
@@ -175,7 +178,7 @@ class PlannerBucketRemoveCommand extends GraphCommand {
       const requestOptions: CliRequestOptions = {
         url: `${this.resource}/v1.0/planner/buckets/${args.options.id}`,
         headers: {
-          accept: 'application/json'
+          accept: 'application/json;odata.metadata=minimal'
         },
         responseType: 'json'
       };
@@ -184,27 +187,7 @@ class PlannerBucketRemoveCommand extends GraphCommand {
     }
 
     const planId = await this.getPlanId(args);
-    const requestOptions: CliRequestOptions = {
-      url: `${this.resource}/v1.0/planner/plans/${planId}/buckets`,
-      headers: {
-        accept: 'application/json'
-      },
-      responseType: 'json'
-    };
-
-    const buckets = await request.get<{ value: PlannerBucket[] }>(requestOptions);
-    const filteredBuckets = buckets.value.filter(b => args.options.name!.toLowerCase() === b.name!.toLowerCase());
-
-    if (!filteredBuckets.length) {
-      throw `The specified bucket ${args.options.name} does not exist`;
-    }
-
-    if (filteredBuckets.length > 1) {
-      const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', filteredBuckets);
-      return await cli.handleMultipleResultsFound<PlannerBucket>(`Multiple buckets with name '${args.options.name}' found.`, resultAsKeyValuePair);
-    }
-
-    return filteredBuckets[0];
+    return planner.getBucketByTitle(args.options.name!, planId, 'minimal');
   }
 
   private async getPlanId(args: CommandArgs): Promise<string> {
@@ -215,13 +198,11 @@ class PlannerBucketRemoveCommand extends GraphCommand {
     }
 
     if (planTitle) {
-      const groupId: string = await this.getGroupId(args);
-      const plan = await planner.getPlanByTitle(planTitle, groupId);
-      return plan.id!;
+      const groupId = await this.getGroupId(args);
+      return planner.getPlanIdByTitle(planTitle, groupId);
     }
 
-    const plan = await planner.getPlanByRosterId(rosterId!);
-    return plan.id!;
+    return planner.getPlanIdByRosterId(rosterId!);
   }
 
   private async getGroupId(args: CommandArgs): Promise<string> {
@@ -231,8 +212,7 @@ class PlannerBucketRemoveCommand extends GraphCommand {
       return ownerGroupId;
     }
 
-    const group = await entraGroup.getGroupByDisplayName(ownerGroupName!);
-    return group.id!;
+    return entraGroup.getGroupIdByDisplayName(ownerGroupName!);
   }
 }
 

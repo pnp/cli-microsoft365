@@ -17,6 +17,7 @@ import { CommandError } from '../../../../Command.js';
 
 describe(commands.APP_PERMISSION_LIST, () => {
   const appId = '2bf26ae1-9be3-425f-a393-5fe8390e3a36';
+  const appName = 'My App';
   const appObjectId = '29807f3b-fef6-4985-b987-8c2565d021bc';
 
   let log: string[];
@@ -59,7 +60,8 @@ describe(commands.APP_PERMISSION_LIST, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.get,
-      cli.getSettingWithDefaultValue
+      cli.getSettingWithDefaultValue,
+      cli.handleMultipleResultsFound
     ]);
   });
 
@@ -96,7 +98,7 @@ describe(commands.APP_PERMISSION_LIST, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation if neither the appId nor the appObjectId are provided.', async () => {
+  it('fails validation if neither the appId, appName, nor appObjectId are provided.', async () => {
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
       if (settingName === settingsNames.prompt) {
         return false;
@@ -113,7 +115,7 @@ describe(commands.APP_PERMISSION_LIST, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when both appId and appObjectId are specified', async () => {
+  it('fails validation when appId, appName, and appObjectId are specified', async () => {
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
       if (settingName === settingsNames.prompt) {
         return false;
@@ -125,6 +127,7 @@ describe(commands.APP_PERMISSION_LIST, () => {
     const actual = await command.validate({
       options: {
         appId: appId,
+        appName: appName,
         appObjectId: appObjectId
       }
     }, commandInfo);
@@ -231,7 +234,6 @@ describe(commands.APP_PERMISSION_LIST, () => {
       throw 'Invalid request';
     });
 
-
     await command.action(logger, { options: { appObjectId: appObjectId, type: 'application' } });
     assert(loggerLogSpy.calledWith(applicationPermissionsResponse));
   });
@@ -281,12 +283,153 @@ describe(commands.APP_PERMISSION_LIST, () => {
       throw 'Invalid request';
     });
 
-
     await command.action(logger, { options: { appId: appId, type: 'delegated' } });
     assert(loggerLogSpy.calledWith(delegatedPermissionsResponse));
   });
 
-  it('handles a non-existent app', async () => {
+  it('lists the delegated permissions of an app registration when using appName', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=displayName eq 'My%20App'&$select=id`) {
+        return { value: [{ id: '29807f3b-fef6-4985-b987-8c2565d021bc' }] };
+      }
+
+      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications/${appObjectId}`) {
+        return application;
+      }
+
+      if (opts.url === `https://graph.microsoft.com/v1.0/servicePrincipals?$filter=appId eq '00000003-0000-0ff1-ce00-000000000000'&$select=appId,id,displayName`) {
+        return {
+          "value": [
+            {
+              "appId": "00000003-0000-0ff1-ce00-000000000000",
+              "id": "5d72c3ba-e836-4be3-94fb-fa6057b1611b",
+              "displayName": "Office 365 SharePoint Online"
+            }
+          ]
+        };
+      }
+
+      if (opts.url === `https://graph.microsoft.com/v1.0/servicePrincipals?$filter=appId eq '00000003-0000-0000-c000-000000000000'&$select=appId,id,displayName`) {
+        return {
+          "value": [
+            {
+              "appId": "00000003-0000-0000-c000-000000000000",
+              "id": "6aac2819-1b16-4d85-be7b-4bc1d1a456a7",
+              "displayName": "Microsoft Graph"
+            }
+          ]
+        };
+      }
+
+      if (opts.url === `https://graph.microsoft.com/v1.0/servicePrincipals/6aac2819-1b16-4d85-be7b-4bc1d1a456a7/oauth2PermissionScopes`) {
+        return spOnlineOauth2PermissionScope;
+      }
+
+      if (opts.url === `https://graph.microsoft.com/v1.0/servicePrincipals/5d72c3ba-e836-4be3-94fb-fa6057b1611b/oauth2PermissionScopes`) {
+        return graphOauth2PermissionScope;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { appName: appName, type: 'delegated' } });
+    assert(loggerLogSpy.calledWith(delegatedPermissionsResponse));
+  });
+
+  it('handles error when multiple apps with the specified name found', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
+    sinon.stub(request, 'get').callsFake(async opts => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=displayName eq 'My%20App'&$select=id`) {
+        return {
+          value: [
+            { id: '9b1b1e42-794b-4c71-93ac-5ed92488b67f' },
+            { id: '9b1b1e42-794b-4c71-93ac-5ed92488b67g' }
+          ]
+        };
+      }
+
+      throw `Invalid request ${JSON.stringify(opts)}`;
+    });
+
+    await assert.rejects(command.action(logger, {
+      options: {
+        appName: appName
+      }
+    }), new CommandError(`Multiple Entra application registrations with name 'My App' found. Found: 9b1b1e42-794b-4c71-93ac-5ed92488b67f, 9b1b1e42-794b-4c71-93ac-5ed92488b67g.`));
+  });
+
+  it('handles selecting single result when multiple apps with the specified name found and cli is set to prompt', async () => {
+    sinon.stub(request, 'get').callsFake(async opts => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=displayName eq 'My%20App'&$select=id`) {
+        return {
+          value: [
+            { id: '9b1b1e42-794b-4c71-93ac-5ed92488b67f' },
+            { id: '9b1b1e42-794b-4c71-93ac-5ed92488b67g' }
+          ]
+        };
+      }
+
+      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications/9b1b1e42-794b-4c71-93ac-5ed92488b67f`) {
+        return application;
+      }
+
+      if (opts.url === `https://graph.microsoft.com/v1.0/servicePrincipals?$filter=appId eq '00000003-0000-0ff1-ce00-000000000000'&$select=appId,id,displayName`) {
+        return {
+          "value": [
+            {
+              "appId": "00000003-0000-0ff1-ce00-000000000000",
+              "id": "5d72c3ba-e836-4be3-94fb-fa6057b1611b",
+              "displayName": "Office 365 SharePoint Online"
+            }
+          ]
+        };
+      }
+
+      if (opts.url === `https://graph.microsoft.com/v1.0/servicePrincipals?$filter=appId eq '00000003-0000-0000-c000-000000000000'&$select=appId,id,displayName`) {
+        return {
+          "value": [
+            {
+              "appId": "00000003-0000-0000-c000-000000000000",
+              "id": "6aac2819-1b16-4d85-be7b-4bc1d1a456a7",
+              "displayName": "Microsoft Graph"
+            }
+          ]
+        };
+      }
+
+      if (opts.url === `https://graph.microsoft.com/v1.0/servicePrincipals/6aac2819-1b16-4d85-be7b-4bc1d1a456a7/oauth2PermissionScopes`) {
+        return spOnlineOauth2PermissionScope;
+      }
+
+      if (opts.url === `https://graph.microsoft.com/v1.0/servicePrincipals/6aac2819-1b16-4d85-be7b-4bc1d1a456a7/appRoles`) {
+        return spOnlineApplication;
+      }
+
+      if (opts.url === `https://graph.microsoft.com/v1.0/servicePrincipals/5d72c3ba-e836-4be3-94fb-fa6057b1611b/oauth2PermissionScopes`) {
+        return graphOauth2PermissionScope;
+      }
+
+      if (opts.url === `https://graph.microsoft.com/v1.0/servicePrincipals/5d72c3ba-e836-4be3-94fb-fa6057b1611b/appRoles`) {
+        return graphApplication;
+      }
+
+      throw `Invalid request ${JSON.stringify(opts)}`;
+    });
+
+    sinon.stub(cli, 'handleMultipleResultsFound').resolves({ id: '9b1b1e42-794b-4c71-93ac-5ed92488b67f' });
+
+    await command.action(logger, { options: { appName: appName, verbose: true } });
+    assert(loggerLogSpy.calledWith(allPermissionsResponse));
+  });
+
+  it('handles a non-existent app by appId', async () => {
     sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=appId eq '${appId}'&$select=id`) {
         return { value: [] };
@@ -297,6 +440,19 @@ describe(commands.APP_PERMISSION_LIST, () => {
 
     await assert.rejects(command.action(logger, { options: { appId: appId } }),
       new CommandError(`No Microsoft Entra application registration with ID ${appId} found`));
+  });
+
+  it('handles a non-existent app by appName', async () => {
+    sinon.stub(request, 'get').callsFake(async opts => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=displayName eq 'My%20App'&$select=id`) {
+        return { value: [] };
+      }
+
+      throw 'Invalid request';
+    });
+
+    await assert.rejects(command.action(logger, { options: { appName: appName } }),
+      new CommandError(`No Microsoft Entra application registration with name ${appName} found`));
   });
 
   it('lists no permissions for app registration without permissions', async () => {
@@ -365,7 +521,7 @@ describe(commands.APP_PERMISSION_LIST, () => {
     assert(loggerLogSpy.calledWith(allUnknownPermissionsResponse));
   });
 
-  it('handles unknown service principal from app registration', async () => {
+  it('handles unknown service principal from app registration using object id', async () => {
     sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications/${appObjectId}`) {
         return application;
@@ -408,5 +564,15 @@ describe(commands.APP_PERMISSION_LIST, () => {
     });
 
     await assert.rejects(command.action(logger, { options: { appObjectId: appObjectId } }), new CommandError(`An error has occurred`));
+  });
+
+  it('handles error when retrieving Entra app registration using name', async () => {
+    sinon.stub(request, 'get').rejects(new Error('An error has occurred'));
+
+    await assert.rejects(command.action(logger, {
+      options: {
+        appName: 'My app'
+      }
+    } as any), new CommandError('An error has occurred'));
   });
 });

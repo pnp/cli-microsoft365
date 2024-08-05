@@ -62,7 +62,7 @@ describe(commands.TENANT_COMMANDSET_GET, () => {
     auth.connection.spoUrl = spoUrl;
     commandInfo = cli.getCommandInfo(command);
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName: string, defaultValue: any) => {
-      if (settingName === 'prompt') {
+      if (settingName === settingsNames.prompt) {
         return false;
       }
 
@@ -89,8 +89,7 @@ describe(commands.TENANT_COMMANDSET_GET, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.get,
-      cli.handleMultipleResultsFound,
-      cli.getSettingWithDefaultValue
+      cli.handleMultipleResultsFound
     ]);
   });
 
@@ -119,14 +118,6 @@ describe(commands.TENANT_COMMANDSET_GET, () => {
   });
 
   it('fails validation when all options are specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
     const actual = await command.validate({
       options: {
         title: title,
@@ -138,14 +129,6 @@ describe(commands.TENANT_COMMANDSET_GET, () => {
   });
 
   it('fails validation when no options are specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
     const actual = await command.validate({
       options: {
       }
@@ -154,14 +137,6 @@ describe(commands.TENANT_COMMANDSET_GET, () => {
   });
 
   it('fails validation when title and id options are specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
     const actual = await command.validate({
       options: {
         title: title,
@@ -172,14 +147,6 @@ describe(commands.TENANT_COMMANDSET_GET, () => {
   });
 
   it('fails validation when title and clientSideComponentId options are specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
     const actual = await command.validate({
       options: {
         title: title,
@@ -190,14 +157,6 @@ describe(commands.TENANT_COMMANDSET_GET, () => {
   });
 
   it('fails validation when id and clientSideComponentId options are specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
     const actual = await command.validate({
       options: {
         id: id,
@@ -276,18 +235,10 @@ describe(commands.TENANT_COMMANDSET_GET, () => {
         title: title
       }
     });
-    assert(loggerLogSpy.calledWith(commandSetResponse.value[0]));
+    assert(loggerLogSpy.calledOnceWithExactly(commandSetResponse.value[0]));
   });
 
   it('handles error when multiple command sets with the specified title found', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `${spoUrl}/_api/SP_TenantSettings_Current`) {
         return { CorporateCatalogUrl: appCatalogUrl };
@@ -339,7 +290,7 @@ describe(commands.TENANT_COMMANDSET_GET, () => {
         title: title
       }
     });
-    assert(loggerLogSpy.calledWith(commandSetResponse.value[0]));
+    assert(loggerLogSpy.calledOnceWithExactly(commandSetResponse.value[0]));
   });
 
   it('retrieves a command set by id', async () => {
@@ -360,7 +311,7 @@ describe(commands.TENANT_COMMANDSET_GET, () => {
         id: id
       }
     });
-    assert(loggerLogSpy.calledWith(commandSetResponse.value[0]));
+    assert(loggerLogSpy.calledOnceWithExactly(commandSetResponse.value[0]));
   });
 
   it('retrieves a command set by clientSideComponentId', async () => {
@@ -381,18 +332,32 @@ describe(commands.TENANT_COMMANDSET_GET, () => {
         clientSideComponentId: clientSideComponentId
       }
     });
-    assert(loggerLogSpy.calledWith(commandSetResponse.value[0]));
+    assert(loggerLogSpy.calledOnceWithExactly(commandSetResponse.value[0]));
+  });
+
+  it('retrieves command set properties', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `${spoUrl}/_api/SP_TenantSettings_Current`) {
+        return { CorporateCatalogUrl: appCatalogUrl };
+      }
+
+      if (opts.url === `https://contoso.sharepoint.com/sites/apps/_api/web/GetList('%2Fsites%2Fapps%2Flists%2FTenantWideExtensions')/items?$filter=startswith(TenantWideExtensionLocation,'ClientSideExtension.ListViewCommandSet') and Id eq 4`) {
+        return commandSetResponse;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options: {
+        id: id,
+        tenantWideExtensionComponentProperties: true
+      }
+    });
+    assert(loggerLogSpy.calledOnceWithExactly(JSON.parse(commandSetResponse.value[0].TenantWideExtensionComponentProperties)));
   });
 
   it('handles error when multiple command sets with the clientSideComponentId found', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `${spoUrl}/_api/SP_TenantSettings_Current`) {
         return { CorporateCatalogUrl: appCatalogUrl };

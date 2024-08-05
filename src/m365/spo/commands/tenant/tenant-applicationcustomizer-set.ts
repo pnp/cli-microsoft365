@@ -179,7 +179,7 @@ class SpoTenantApplicationCustomizerSetCommand extends SpoCommand {
 
   private async getComponentManifest(appCatalogUrl: string, clientSideComponentId: string, logger: Logger): Promise<any> {
     if (this.verbose) {
-      logger.logToStderr('Retrieving component manifest item from the ComponentManifests list on the app catalog site so that we get the solution id');
+      await logger.logToStderr('Retrieving component manifest item from the ComponentManifests list on the app catalog site so that we get the solution id');
     }
 
     const camlQuery = `<View><ViewFields><FieldRef Name='ClientComponentId'></FieldRef><FieldRef Name='SolutionId'></FieldRef><FieldRef Name='ClientComponentManifest'></FieldRef></ViewFields><Query><Where><Eq><FieldRef Name='ClientComponentId' /><Value Type='Guid'>${clientSideComponentId}</Value></Eq></Where></Query></View>`;
@@ -195,7 +195,7 @@ class SpoTenantApplicationCustomizerSetCommand extends SpoCommand {
     const output = await cli.executeCommandWithOutput(spoListItemListCommand as Command, { options: { ...commandOptions, _: [] } });
 
     if (this.verbose) {
-      logger.logToStderr(output.stderr);
+      await logger.logToStderr(output.stderr);
     }
 
     const outputParsed = JSON.parse(output.stdout);
@@ -209,7 +209,7 @@ class SpoTenantApplicationCustomizerSetCommand extends SpoCommand {
 
   private async getSolutionFromAppCatalog(appCatalogUrl: string, solutionId: string, logger: Logger): Promise<Solution> {
     if (this.verbose) {
-      logger.logToStderr(`Retrieving solution with id ${solutionId} from the application catalog`);
+      await logger.logToStderr(`Retrieving solution with id ${solutionId} from the application catalog`);
     }
 
     const camlQuery = `<View><ViewFields><FieldRef Name='SkipFeatureDeployment'></FieldRef><FieldRef Name='ContainsTenantWideExtension'></FieldRef></ViewFields><Query><Where><Eq><FieldRef Name='AppProductID' /><Value Type='Guid'>${solutionId}</Value></Eq></Where></Query></View>`;
@@ -225,7 +225,7 @@ class SpoTenantApplicationCustomizerSetCommand extends SpoCommand {
     const output = await cli.executeCommandWithOutput(spoListItemListCommand as Command, { options: { ...commandOptions, _: [] } });
 
     if (this.verbose) {
-      logger.logToStderr(output.stderr);
+      await logger.logToStderr(output.stderr);
     }
 
     const outputParsed = JSON.parse(output.stdout);

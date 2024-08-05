@@ -1,17 +1,169 @@
 ---
-sidebar_position: 4
+sidebar_position: 3
 ---
 
 # Release notes
 
-## v7.7.0 (beta)
+## v8.1.0 (beta)
+
+### New commands 
+
+**Entra ID:**
+
+- [entra multitenant add](../cmd/entra/multitenant/multitenant-add.mdx) - creates a new multitenant organization [#6006](https://github.com/pnp/cli-microsoft365/issues/6006)
+- [entra multitenant remove](../cmd/entra/multitenant/multitenant-remove.mdx) - removes a multitenant organization [#6009](https://github.com/pnp/cli-microsoft365/issues/6009)
+- [entra multitenant set](../cmd/entra/multitenant/multitenant-set.mdx) - updates the properties of a multitenant organization [#6008](https://github.com/pnp/cli-microsoft365/issues/6008)
+
+**SharePoint Embedded:**
+
+- [spe containertype list](../cmd/spe/containertype/containertype-list.mdx) - retrieves a list of Container Types created for a SharePoint Embedded Application [#5989](https://github.com/pnp/cli-microsoft365/issues/5989)
+
+### Changes
+
+- added 'componentProperties' option to 'spo spfx' commands [#5975](https://github.com/pnp/cli-microsoft365/issues/5975)
+- added prompting to [connection use](../cmd/connection/connection-use.mdx) [#6173](https://github.com/pnp/cli-microsoft365/issues/6173)
+- enhanced [spo list roleassignment](../cmd/spo/list//list-roleassignment-add.mdx) commands with support for Entra groups [#6194](https://github.com/pnp/cli-microsoft365/issues/6194)
+- fixed command [teams meeting list](../cmd/teams/meeting/meeting-list.mdx) [#5968](https://github.com/pnp/cli-microsoft365/issues/5968)
+- introduced zod validation [#5639](https://github.com/pnp/cli-microsoft365/issues/5639)
+
+## [v8.0.0](https://github.com/pnp/cli-microsoft365/releases/tag/v8.0.0)
+
+### New commands 
+
+**Entra ID:**
+
+- [entra multitenant get](../cmd/entra/multitenant/multitenant-get.mdx) - gets properties of the multitenant organization [#6007](https://github.com/pnp/cli-microsoft365/issues/6007)
+
+**SharePoint:**
+
+- [spo contenttype field list](../cmd/spo/contenttype/contenttype-field-list.mdx) - lists fields for a given site or list content type [#5677](https://github.com/pnp/cli-microsoft365/issues/5677)
+
+**Teams:**
+
+- [teams meeting attendancereport get](../cmd/teams/meeting/meeting-attendancereport-get.mdx) - gets attendance report for a given meeting [#3909](https://github.com/pnp/cli-microsoft365/issues/3909)
+- [teams message remove](../cmd/teams/message/message-remove.mdx) - removes a message from a channel in a Microsoft Teams team [#5859](https://github.com/pnp/cli-microsoft365/issues/5859)
+
+**Viva:**
+
+- [viva engage community add](../cmd/viva/engage/engage-community-add.mdx) - creates a new community in Viva Engage [#5753](https://github.com/pnp/cli-microsoft365/issues/5753)
+
+### Changes
+
+- added eslint rule to handle promises [#6005](https://github.com/pnp/cli-microsoft365/issues/6005)
+- added validating permissions in [entra app permission remove](../cmd/entra/app/app-permission-remove.mdx) [#6109](https://github.com/pnp/cli-microsoft365/issues/6109)
+- added project parsing errors [#5927](https://github.com/pnp/cli-microsoft365/issues/5927)
+- added support for Node 22 [#6003](https://github.com/pnp/cli-microsoft365/issues/6003)
+- added new sample script [Setup CI/CD workflow](../sample-scripts/spo/add-ci-cd-pipeline/index.mdx) [#5799](https://github.com/pnp/cli-microsoft365/issues/5799)
+- added extra options to [entra m365group set](../cmd/entra/m365group/m365group-set.mdx) command [#5480](https://github.com/pnp/cli-microsoft365/issues/5480)
+- updated [flow list](../cmd/flow/flow-list.mdx) as admin to use v2 endpoint [#6096](https://github.com/pnp/cli-microsoft365/issues/6096)
+- enhanced [graph subscription add](../cmd/graph/subscription/subscription-add.mdx) with support for Event Hubs & Event Grids [#6050](https://github.com/pnp/cli-microsoft365/issues/6050)
+- fixed removing last app permission [#6110](https://github.com/pnp/cli-microsoft365/issues/6110)
+- fixed adding app permission when service principal doesn't exist [#6112](https://github.com/pnp/cli-microsoft365/issues/6112)
+- fixed command output for [spo cdn get](../cmd/spo/cdn/cdn-get.mdx) [#6133](https://github.com/pnp/cli-microsoft365/issues/6133)
+- fixed [spo group member add](../cmd/spo/group/group-member-add.mdx) on teams channel sites [#6104](https://github.com/pnp/cli-microsoft365/issues/6104)
+- fixed CLI running in Azure Cloud Shell [#6117](https://github.com/pnp/cli-microsoft365/issues/6117)
+- fixed listing all flows for command [flow list](../cmd/flow/flow-list.mdx) [#6175](https://github.com/pnp/cli-microsoft365/pull/6175)
+
+## [v7.10.0](https://github.com/pnp/cli-microsoft365/releases/tag/v7.10.0)
+
+### New commands
+
+**Entra ID:**
+
+- [entra pim role assignment eligibility list](../cmd/entra/pim/pim-role-assignment-eligibility-list.mdx) - retrieves a list of eligible roles a user or group can be assigned to [#5783](https://github.com/pnp/cli-microsoft365/issues/5783)
+- [entra pim role request list](../cmd/entra/pim/pim-role-request-list.mdx) - retrieves a list of PIM requests for roles [#5781](https://github.com/pnp/cli-microsoft365/issues/5781)
+- [entra app permission remove](../cmd/entra/app/app-permission-remove.mdx) - removes the specified application and/or delegated permissions from a specified Entra app [#5691](https://github.com/pnp/cli-microsoft365/issues/5691)
+
+**SharePoint:**
+
+- [spo tenant site archive](../cmd/spo/tenant/tenant-site-archive.mdx) - archives a site collection [#6018](https://github.com/pnp/cli-microsoft365/issues/6018)
+- [spo tenant site unarchive](../cmd/spo/tenant/tenant-site-unarchive.mdx) - unarchives a site collection [#6019](https://github.com/pnp/cli-microsoft365/issues/6019)
+- [spo site admin list](../cmd/spo/site/site-admin-list.mdx) - lists all administrators of a specific SharePoint site [#5882](https://github.com/pnp/cli-microsoft365/issues/5882)
+
+**Teams:**
+
+- [teams user app upgrade](../cmd/teams/user/user-app-upgrade.mdx) - upgrades an app in the personal scope of the specified user [#5705](https://github.com/pnp/cli-microsoft365/issues/5705)
+
+### Changes
+
+- added option 'ensureParentFolders' to [spo folder add](../cmd/spo/folder/folder-add.mdx) command [#5887](https://github.com/pnp/cli-microsoft365/issues/5887)
+- fixed logging in to USGov tenants [#6093](https://github.com/pnp/cli-microsoft365/issues/6093)
+- fixed duplicate white line in help page [#6071](https://github.com/pnp/cli-microsoft365/issues/6071)
+- fixed chili response behavior [#5987](https://github.com/pnp/cli-microsoft365/issues/5987)
+- fixed [spo file add](../cmd/spo/file/file-add.mdx) check-in issue [#6011](https://github.com/pnp/cli-microsoft365/issues/6011)
+- fixed docs for 'entra app permission remove' command [#6098](https://github.com/pnp/cli-microsoft365/issues/6098)
+- removed powershell comparison page
+
+## [v7.9.0](https://github.com/pnp/cli-microsoft365/releases/tag/v7.9.0)
+
+### New commands
+
+**Entra ID:**
+
+- [entra group user set](../cmd/entra/group/group-user-set.mdx) - updates role of users in an Entra group [#5473](https://github.com/pnp/cli-microsoft365/issues/5473)
+- [entra user groupmembership list](../cmd/entra/user/user-groupmembership-list.mdx) - retrieves all groups where the user is a member of [#5904](https://github.com/pnp/cli-microsoft365/issues/5904)
+
+**Global:**
+
+- [search](../cmd/search.mdx) - use Microsoft Search [#5344](https://github.com/pnp/cli-microsoft365/issues/5344)
+
+**Viva:**
+
+- [viva engage community get](../cmd/viva/engage/engage-community-get.mdx) - gets information of a Viva Engage community [#5754](https://github.com/pnp/cli-microsoft365/issues/5754)
+
+### Changes
+
+- added doc page 'pr checklist' [#5533](https://github.com/pnp/cli-microsoft365/issues/5533)
+- added support for gulp-cli v3 in 'spfx doctor' command [#6045](https://github.com/pnp/cli-microsoft365/issues/6045)
+- added more properties to output of [entra user list](../cmd/entra/user/user-list.mdx) command [#4667](https://github.com/pnp/cli-microsoft365/issues/4667)
+- added application permissions check on certain commands [#4054](https://github.com/pnp/cli-microsoft365/issues/4054)
+- fixed error when specifying empty SharePoint URL [#6012](https://github.com/pnp/cli-microsoft365/issues/6012)
+- fixed restoring team site group for command [spo tenant recyclebinitem restore](../cmd/spo/tenant/tenant-recyclebinitem-restore.mdx) [#6021](https://github.com/pnp/cli-microsoft365/issues/6021)
+
+## [v7.8.1](https://github.com/pnp/cli-microsoft365/releases/tag/v7.8.1)
+
+### Changes
+
+- fixed documentation typo for [spe containertype add](../cmd/spe/containertype/containertype-add) command [#6040](https://github.com/pnp/cli-microsoft365/issues/6040)
+- fixed logging in with client certificate [#6038](https://github.com/pnp/cli-microsoft365/issues/6038)
+
+## [v7.8.0](https://github.com/pnp/cli-microsoft365/releases/tag/v7.8.0)
+
+### New commands
+
+**SharePoint:**
+
+- [spo listitem batch remove](../cmd/spo/listitem/listitem-batch-remove.mdx) - removes items from a list in batch [#5688](https://github.com/pnp/cli-microsoft365/issues/5688)
+
+### Changes
+
+- refactored spo util codebase to async/await [#5079](https://github.com/pnp/cli-microsoft365/issues/5079)
+- added web as a possible choice for setting 'helpTarget' [#4037](https://github.com/pnp/cli-microsoft365/issues/4037)
+- updated workflow actions [#5978](https://github.com/pnp/cli-microsoft365/issues/5978)
+- enhanced [flow run list](../cmd/flow/run/run-list.mdx) with 'withTrigger' option [#5160](https://github.com/pnp/cli-microsoft365/issues/5160)
+- refactored importing of chalk [#6026](https://github.com/pnp/cli-microsoft365/issues/6026)
+- fixed bug while removing team sites for [spo site remove](../cmd/spo/site/site-remove.mdx) command [#5218](https://github.com/pnp/cli-microsoft365/issues/5218)
+- fixed spinner showing in update notification [#6020](https://github.com/pnp/cli-microsoft365/issues/6020)
+- fixed [setup](../cmd/setup.mdx) command for setting wrong config key in interactive mode [#5951](https://github.com/pnp/cli-microsoft365/issues/5951)
+- enhanced [entra m365group add](../cmd/entra/m365group/m365group-add.mdx) command by making option 'description' optional [#5930](https://github.com/pnp/cli-microsoft365/issues/5930)
+- enhanced [outlook message list](../cmd/outlook/message/message-list.mdx) command with extra options [#5872](https://github.com/pnp/cli-microsoft365/issues/5872)
+- added more validation output with invalid arrays [#5834](https://github.com/pnp/cli-microsoft365/issues/5834)
+- modified help output in case of errors [#5341](https://github.com/pnp/cli-microsoft365/issues/5341)
+- added appName option to 'entra app permission add/list' commands [#5786](https://github.com/pnp/cli-microsoft365/issues/5786)
+- added interactivity for planner commands [#5902](https://github.com/pnp/cli-microsoft365/issues/5902)
+- removed trailing slashes from [spo get](../cmd/spo/spo-get.mdx) [#5929](https://github.com/pnp/cli-microsoft365/pull/5929)
+- extended [spfx project upgrade](../cmd/spfx/project/project-upgrade.mdx) with support for v1.19.0 [#6010](https://github.com/pnp/cli-microsoft365/issues/6010)
+- extended [spfx doctor](../cmd/spfx/spfx-doctor.mdx) with support for v1.19.0 [#6010](https://github.com/pnp/cli-microsoft365/issues/6010)
+- extended [spfx project doctor](../cmd/spfx/project/project-doctor.mdx) with support for v1.19.0 [#6010](https://github.com/pnp/cli-microsoft365/issues/6010)
+
+## [v7.7.0](https://github.com/pnp/cli-microsoft365/releases/tag/v7.7.0)
 
 ### New commands
 
 **Entra ID:**
 
 - [entra pim role assignment add](../cmd/entra/pim/pim-role-assignment-add.mdx) - requests activation of an Entra role assignment for a user or group [#5766](https://github.com/pnp/cli-microsoft365/issues/5766)
-- [entra pim role assignment list](../cmd/entra/pim/pim-role-assignment-list.mdx) - retrieves a list of Entra role assignments for a user or group. [#5782](https://github.com/pnp/cli-microsoft365/issues/5782)
+- [entra pim role assignment list](../cmd/entra/pim/pim-role-assignment-list.mdx) - retrieves a list of Entra role assignments for a user or group [#5782](https://github.com/pnp/cli-microsoft365/issues/5782)
 
 **SharePoint:**
 

@@ -168,17 +168,16 @@ class EntraUserRegistrationDetailsListCommand extends GraphCommand {
         }
 
         if (args.options.userIds) {
-          const ids = args.options.userIds.split(',').map(i => i.trim());
-          if (!validation.isValidGuidArray(ids)) {
-            const invalidGuid = ids.find(id => !validation.isValidGuid(id));
-            return `'${invalidGuid}' is not a valid GUID for option 'userIds'.`;
+          const isValidGUIDArrayResult = validation.isValidGuidArray(args.options.userIds);
+          if (isValidGUIDArrayResult !== true) {
+            return `The following GUIDs are invalid for the option 'userIds': ${isValidGUIDArrayResult}.`;
           }
         }
 
         if (args.options.userPrincipalNames) {
-          const isValidUserPrincipalNameArray = validation.isValidUserPrincipalNameArray(args.options.userPrincipalNames.split(',').map(u => u.trim()));
-          if (isValidUserPrincipalNameArray !== true) {
-            return `User principal name '${isValidUserPrincipalNameArray}' is invalid for option 'userPrincipalNames'.`;
+          const isValidUPNArrayResult = validation.isValidUserPrincipalNameArray(args.options.userPrincipalNames);
+          if (isValidUPNArrayResult !== true) {
+            return `The following user principal names are invalid for the option 'userPrincipalNames': ${isValidUPNArrayResult}.`;
           }
         }
 
@@ -189,7 +188,7 @@ class EntraUserRegistrationDetailsListCommand extends GraphCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
-      let userUpns: string[] = []; 
+      let userUpns: string[] = [];
 
       if (args.options.userIds) {
         const ids = args.options.userIds.split(',').map(m => m.trim());
@@ -212,7 +211,7 @@ class EntraUserRegistrationDetailsListCommand extends GraphCommand {
     if (options.properties) {
       queryParameters.push(`$select=${options.properties}`);
     }
- 
+
     const filters: string[] = [];
     if (options.isAdmin !== undefined) {
       filters.push(`isAdmin eq ${options.isAdmin}`);
@@ -286,7 +285,7 @@ class EntraUserRegistrationDetailsListCommand extends GraphCommand {
 
     if (options.userType) {
       filters.push(`userType eq '${options.userType}'`);
-    }    
+    }
 
     if (filters.length > 0) {
       queryParameters.push(`$filter=${filters.join(' and ')}`);

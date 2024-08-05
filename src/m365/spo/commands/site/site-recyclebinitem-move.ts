@@ -76,8 +76,11 @@ class SpoSiteRecycleBinItemMoveCommand extends SpoCommand {
           return isValidSharePointUrl;
         }
 
-        if (args.options.ids && !validation.isValidGuidArray(args.options.ids.split(','))) {
-          return 'The option ids contains one or more invalid GUIDs';
+        if (args.options.ids) {
+          const isValidGUIDArrayResult = validation.isValidGuidArray(args.options.ids);
+          if (isValidGUIDArrayResult !== true) {
+            return `The following GUIDs are invalid for the option 'ids': ${isValidGUIDArrayResult}.`;
+          }
         }
 
         return true;

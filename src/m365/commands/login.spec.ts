@@ -1,11 +1,12 @@
 import assert from 'assert';
 import fs from 'fs';
 import sinon from 'sinon';
+import { z } from 'zod';
 import auth, { AuthType, CloudType } from '../../Auth.js';
 import { CommandArgs, CommandError } from '../../Command.js';
-import { cli } from '../../cli/cli.js';
 import { CommandInfo } from '../../cli/CommandInfo.js';
 import { Logger } from '../../cli/Logger.js';
+import { cli } from '../../cli/cli.js';
 import { telemetry } from '../../telemetry.js';
 import { pid } from '../../utils/pid.js';
 import { session } from '../../utils/session.js';
@@ -17,6 +18,7 @@ describe(commands.LOGIN, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: z.ZodTypeAny;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -26,6 +28,7 @@ describe(commands.LOGIN, () => {
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     sinon.stub(session, 'getId').callsFake(() => '');
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
     auth.connection.accessTokens[auth.defaultResource] = {
       expiresOn: '123',
       accessToken: 'abc'
@@ -76,30 +79,24 @@ describe(commands.LOGIN, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('in telemetry defaults to Public cloud when no cloud has been specified', () => {
-    const args: CommandArgs = { options: {} };
-    command.telemetry.forEach(fn => fn(args));
-    assert.strictEqual((command as any).telemetryProperties.cloud, CloudType.Public);
-  });
-
   it('in telemetry tracks the specified cloud', () => {
     const args: CommandArgs = { options: { cloud: 'USGov' } };
-    command.telemetry.forEach(fn => fn(args));
-    assert.strictEqual((command as any).telemetryProperties.cloud, 'USGov');
+    const telemetryProperties = (command as any).getTelemetryProperties(args);
+    assert.strictEqual(telemetryProperties.cloud, 'USGov');
   });
 
   it('logs in to Microsoft 365', async () => {
-    await command.action(logger, { options: {} });
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     assert(auth.connection.active);
   });
 
   it('logs in to Microsoft 365 (debug)', async () => {
-    await command.action(logger, { options: { debug: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true }) });
     assert(auth.connection.active);
   });
 
   it('logs in to Microsoft 365 using username and password when authType password set', async () => {
-    await command.action(logger, { options: { authType: 'password', userName: 'user', password: 'password' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ authType: 'password', userName: 'user', password: 'password' }) });
     assert.strictEqual(auth.connection.authType, AuthType.Password, 'Incorrect authType set');
     assert.strictEqual(auth.connection.userName, 'user', 'Incorrect user name set');
     assert.strictEqual(auth.connection.password, 'password', 'Incorrect password set');
@@ -107,16 +104,18 @@ describe(commands.LOGIN, () => {
 
   it('logs in to Microsoft 365 using certificate when authType certificate set and certificateFile is provided', async () => {
     sinon.stub(fs, 'readFileSync').callsFake(() => 'certificate');
+    sinon.stub(fs, 'existsSync').callsFake(() => true);
 
-    await command.action(logger, { options: { authType: 'certificate', certificateFile: 'certificate' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ authType: 'certificate', certificateFile: 'certificate' }) });
     assert.strictEqual(auth.connection.authType, AuthType.Certificate, 'Incorrect authType set');
     assert.strictEqual(auth.connection.certificate, 'certificate', 'Incorrect certificate set');
   });
 
   it('logs in to Microsoft 365 using certificate when authType certificate set with thumbprint', async () => {
     sinon.stub(fs, 'readFileSync').callsFake(() => 'certificate');
+    sinon.stub(fs, 'existsSync').callsFake(() => true);
 
-    await command.action(logger, { options: { authType: 'certificate', certificateFile: 'certificate', thumbprint: 'thumbprint' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ authType: 'certificate', certificateFile: 'certificate', thumbprint: 'thumbprint' }) });
     assert.strictEqual(auth.connection.authType, AuthType.Certificate, 'Incorrect authType set');
     assert.strictEqual(auth.connection.certificate, 'certificate', 'Incorrect certificate set');
     assert.strictEqual(auth.connection.thumbprint, 'thumbprint', 'Incorrect thumbprint set');
@@ -125,176 +124,141 @@ describe(commands.LOGIN, () => {
   it('logs in to Microsoft 365 using certificate when authType certificate set and certificateBase64Encoded is provided', async () => {
     sinon.stub(fs, 'readFileSync').callsFake(() => 'certificate');
 
-    await command.action(logger, { options: { authType: 'certificate', certificateBase64Encoded: 'certificate', thumbprint: 'thumbprint' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ authType: 'certificate', certificateBase64Encoded: 'certificate', thumbprint: 'thumbprint' }) });
     assert.strictEqual(auth.connection.authType, AuthType.Certificate, 'Incorrect authType set');
     assert.strictEqual(auth.connection.certificate, 'certificate', 'Incorrect certificate set');
     assert.strictEqual(auth.connection.thumbprint, 'thumbprint', 'Incorrect thumbprint set');
   });
 
   it('logs in to Microsoft 365 using system managed identity when authType identity set', async () => {
-    await command.action(logger, { options: { authType: 'identity', userName: 'ac9fbed5-804c-4362-a369-21a4ec51109e' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ authType: 'identity', userName: 'ac9fbed5-804c-4362-a369-21a4ec51109e' }) });
     assert.strictEqual(auth.connection.authType, AuthType.Identity, 'Incorrect authType set');
     assert.strictEqual(auth.connection.userName, 'ac9fbed5-804c-4362-a369-21a4ec51109e', 'Incorrect userName set');
   });
 
   it('logs in to Microsoft 365 using user-assigned managed identity when authType identity set', async () => {
-    await command.action(logger, { options: { authType: 'identity' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ authType: 'identity' }) });
     assert.strictEqual(auth.connection.authType, AuthType.Identity, 'Incorrect authType set');
     assert.strictEqual(auth.connection.userName, undefined, 'Incorrect userName set');
   });
-
-
   it('logs in to Microsoft 365 using client secret authType "secret" set', async () => {
-    await command.action(logger, { options: { authType: 'secret', secret: 'unBrEakaBle@123' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ authType: 'secret', secret: 'unBrEakaBle@123' }) });
     assert.strictEqual(auth.connection.authType, AuthType.Secret, 'Incorrect authType set');
     assert.strictEqual(auth.connection.secret, 'unBrEakaBle@123', 'Incorrect secret set');
   });
 
   it('logs in to Microsoft 365 using the specified cloud', async () => {
-    await command.action(logger, { options: { cloud: 'USGov' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ cloud: 'USGov' }) });
     assert.strictEqual(auth.connection.cloudType, CloudType.USGov);
   });
 
-  it('supports specifying authType', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--authType') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
+  it('fails validation if invalid authType specified', () => {
+    const actual = commandOptionsSchema.safeParse({ authType: 'invalid authType' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('supports specifying userName', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--userName') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
+  it('fails validation if authType is set to password and userName and password not specified', () => {
+    const actual = commandOptionsSchema.safeParse({ authType: 'password' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('supports specifying password', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--password') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
+  it('fails validation if authType is set to password and userName not specified', () => {
+    const actual = commandOptionsSchema.safeParse({ authType: 'password', password: 'password' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if invalid authType specified', async () => {
-    const actual = await command.validate({ options: { authType: 'invalid authType' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if authType is set to password and password not specified', () => {
+    const actual = commandOptionsSchema.safeParse({ authType: 'password', userName: 'user' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if authType is set to password and userName and password not specified', async () => {
-    const actual = await command.validate({ options: { authType: 'password' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if authType is set to certificate and both certificateFile and certificateBase64Encoded are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ authType: 'certificate', certificateFile: 'certificate', certificateBase64Encoded: 'certificateB64', thumbprint: 'thumbprint' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if authType is set to password and userName not specified', async () => {
-    const actual = await command.validate({ options: { authType: 'password', password: 'password' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if authType is set to certificate and neither certificateFile nor certificateBase64Encoded are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ authType: 'certificate' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if authType is set to password and password not specified', async () => {
-    const actual = await command.validate({ options: { authType: 'password', userName: 'user' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if authType is set to certificate and both certificateFile and certificateBase64Encoded are specified', async () => {
-    const actual = await command.validate({ options: { authType: 'certificate', certificateFile: 'certificate', certificateBase64Encoded: 'certificateB64', thumbprint: 'thumbprint' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if authType is set to certificate and neither certificateFile nor certificateBase64Encoded are specified', async () => {
-    const actual = await command.validate({ options: { authType: 'certificate' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if authType is set to certificate and certificateFile does not exist', async () => {
+  it('fails validation if authType is set to certificate and certificateFile does not exist', () => {
     sinon.stub(fs, 'existsSync').callsFake(() => false);
-    const actual = await command.validate({ options: { authType: 'certificate', certificateFile: 'certificate' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ authType: 'certificate', certificateFile: 'certificate' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation cloud is set to an invalid value', async () => {
-    const actual = await command.validate({ options: { cloud: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation cloud is set to an invalid value', () => {
+    const actual = commandOptionsSchema.safeParse({ cloud: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if authType is set to certificate and certificateFile and thumbprint are specified', async () => {
+  it('passes validation if authType is set to certificate and certificateFile and thumbprint are specified', () => {
     sinon.stub(fs, 'existsSync').callsFake(() => true);
-    const actual = await command.validate({ options: { authType: 'certificate', certificateFile: 'certificate', thumbprint: 'thumbprint' } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ authType: 'certificate', certificateFile: 'certificate', thumbprint: 'thumbprint' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if authType is set to certificate and certificateFile are specified', async () => {
+  it('passes validation if authType is set to certificate and certificateFile are specified', () => {
     sinon.stub(fs, 'existsSync').callsFake(() => true);
-    const actual = await command.validate({ options: { authType: 'certificate', certificateFile: 'certificate' } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ authType: 'certificate', certificateFile: 'certificate' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if authType is set to password and userName and password specified', async () => {
-    const actual = await command.validate({ options: { authType: 'password', userName: 'user', password: 'password' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if authType is set to password and userName and password specified', () => {
+    const actual = commandOptionsSchema.safeParse({ authType: 'password', userName: 'user', password: 'password' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if authType is set to deviceCode and userName and password not specified', async () => {
-    const actual = await command.validate({ options: { authType: 'deviceCode' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if authType is set to deviceCode and userName and password not specified', () => {
+    const actual = commandOptionsSchema.safeParse({ authType: 'deviceCode' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if authType is not set and userName and password not specified', async () => {
-    const actual = await command.validate({ options: {} }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if authType is not set and userName and password not specified', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when cloud is set to Public', async () => {
-    const actual = await command.validate({ options: { cloud: 'Public' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when cloud is set to Public', () => {
+    const actual = commandOptionsSchema.safeParse({ cloud: 'Public' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when cloud is set to USGov', async () => {
-    const actual = await command.validate({ options: { cloud: 'USGov' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when cloud is set to USGov', () => {
+    const actual = commandOptionsSchema.safeParse({ cloud: 'USGov' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when cloud is set to USGovHigh', async () => {
-    const actual = await command.validate({ options: { cloud: 'USGovHigh' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when cloud is set to USGovHigh', () => {
+    const actual = commandOptionsSchema.safeParse({ cloud: 'USGovHigh' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when cloud is set to USGovDoD', async () => {
-    const actual = await command.validate({ options: { cloud: 'USGovDoD' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when cloud is set to USGovDoD', () => {
+    const actual = commandOptionsSchema.safeParse({ cloud: 'USGovDoD' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when cloud is set to China', async () => {
-    const actual = await command.validate({ options: { cloud: 'China' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when cloud is set to China', () => {
+    const actual = commandOptionsSchema.safeParse({ cloud: 'China' });
+    assert.strictEqual(actual.success, true);
   });
 
   it('correctly handles error in device code auth flow', async () => {
     sinonUtil.restore(auth.ensureAccessToken);
     sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.reject(new Error('Error')); });
-    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('Error'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({}) }), new CommandError('Error'));
   });
 
   it('correctly handles error in device code auth flow (debug)', async () => {
     sinonUtil.restore(auth.ensureAccessToken);
     sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.reject(new Error('Error')); });
-    await assert.rejects(command.action(logger, { options: { debug: true } } as any), new CommandError('Error'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ debug: true }) }), new CommandError('Error'));
   });
 
   it('logs in to Microsoft 365 using browser authentication', async () => {
-    await command.action(logger, { options: { authType: 'browser' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ authType: 'browser' }) });
     assert.strictEqual(auth.connection.authType, AuthType.Browser, 'Incorrect authType set');
   });
 
@@ -303,7 +267,7 @@ describe(commands.LOGIN, () => {
     sinon.stub(auth, 'clearConnectionInfo').callsFake(() => Promise.reject('An error has occurred'));
 
     try {
-      await command.action(logger, { options: {} });
+      await command.action(logger, { options: commandOptionsSchema.parse({}) });
     }
     finally {
       sinonUtil.restore([
@@ -317,7 +281,7 @@ describe(commands.LOGIN, () => {
     sinon.stub(auth, 'clearConnectionInfo').callsFake(() => Promise.reject('An error has occurred'));
 
     try {
-      await command.action(logger, { options: { debug: true } });
+      await command.action(logger, { options: commandOptionsSchema.parse({ debug: true }) });
     }
     finally {
       sinonUtil.restore([
@@ -330,7 +294,7 @@ describe(commands.LOGIN, () => {
     sinonUtil.restore(auth.restoreAuth);
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.reject('An error has occurred'));
     try {
-      await assert.rejects(command.action(logger, { options: { debug: true } } as any), new CommandError('An error has occurred'));
+      await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ debug: true }) } as any), new CommandError('An error has occurred'));
     }
     finally {
       sinonUtil.restore([
@@ -339,8 +303,8 @@ describe(commands.LOGIN, () => {
     }
   });
 
-  it('fails validation if authType is set to secret and secret option is not specified', async () => {
-    const actual = await command.validate({ options: { authType: 'secret' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if authType is set to secret and secret option is not specified', () => {
+    const actual = commandOptionsSchema.safeParse({ authType: 'secret' });
+    assert.strictEqual(actual.success, false);
   });
 });

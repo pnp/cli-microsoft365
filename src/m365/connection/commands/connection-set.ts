@@ -27,6 +27,7 @@ class ConnectionSetCommand extends Command {
 
     this.#initOptions();
     this.#initValidators();
+    this.#initTypes();
   }
 
   #initOptions(): void {
@@ -52,6 +53,10 @@ class ConnectionSetCommand extends Command {
     );
   }
 
+  #initTypes(): void {
+    this.types.string.push('name', 'newName');
+  }
+
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const connection = await auth.getConnection(args.options.name);
 
@@ -70,7 +75,7 @@ class ConnectionSetCommand extends Command {
       throw new CommandError(error);
     }
 
-    this.initAction(args, logger);
+    await this.initAction(args, logger);
     await this.commandAction(logger, args);
   }
 }

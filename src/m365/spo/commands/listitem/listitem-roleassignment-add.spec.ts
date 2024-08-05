@@ -205,7 +205,7 @@ describe(commands.LISTITEM_ROLEASSIGNMENT_ADD, () => {
       throw 'Invalid request';
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
@@ -226,7 +226,7 @@ describe(commands.LISTITEM_ROLEASSIGNMENT_ADD, () => {
       throw 'Invalid request';
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
@@ -257,7 +257,7 @@ describe(commands.LISTITEM_ROLEASSIGNMENT_ADD, () => {
       throw new CommandError('Unknown case');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
@@ -281,13 +281,13 @@ describe(commands.LISTITEM_ROLEASSIGNMENT_ADD, () => {
     const error = 'no user found';
     sinon.stub(cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
       if (command === spoUserGetCommand) {
-        throw error;
+        throw new Error(error);
       }
 
       throw new CommandError('Unknown case');
     });
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
@@ -296,7 +296,7 @@ describe(commands.LISTITEM_ROLEASSIGNMENT_ADD, () => {
         upn: 'someaccount@tenant.onmicrosoft.com',
         roleDefinitionId: 1073741827
       }
-    });
+    }), new CommandError(error));
   });
 
   it('add role assignment to listitem in list get principal id by group name', async () => {
@@ -318,7 +318,7 @@ describe(commands.LISTITEM_ROLEASSIGNMENT_ADD, () => {
       throw new CommandError('Unknown case');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
@@ -342,13 +342,13 @@ describe(commands.LISTITEM_ROLEASSIGNMENT_ADD, () => {
     const error = 'no group found';
     sinon.stub(cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
       if (command === spoGroupGetCommand) {
-        throw error;
+        throw new Error(error);
       }
 
       throw new CommandError('Unknown case');
     });
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
@@ -357,7 +357,7 @@ describe(commands.LISTITEM_ROLEASSIGNMENT_ADD, () => {
         groupName: 'someGroup',
         roleDefinitionId: 1073741827
       }
-    });
+    }), new CommandError(error));
   });
 
   it('add role assignment to listitem in list get role definition id by role definition name', async () => {
@@ -379,7 +379,7 @@ describe(commands.LISTITEM_ROLEASSIGNMENT_ADD, () => {
       throw new CommandError('Unknown case');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
@@ -403,13 +403,13 @@ describe(commands.LISTITEM_ROLEASSIGNMENT_ADD, () => {
     const error = 'no role definition found';
     sinon.stub(cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
       if (command === spoRoleDefinitionListCommand) {
-        throw error;
+        throw new Error(error);
       }
 
       throw new CommandError('Unknown case');
     });
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
@@ -418,7 +418,7 @@ describe(commands.LISTITEM_ROLEASSIGNMENT_ADD, () => {
         principalId: 11,
         roleDefinitionName: 'Full Control'
       }
-    });
+    }), new CommandError(error));
   });
 
   it('correctly handles error when adding role definition fails', async () => {

@@ -104,8 +104,18 @@ class PlannerPlanSetCommand extends GraphCommand {
           return 'Specify either shareWithUserIds or shareWithUserNames but not both';
         }
 
-        if (args.options.shareWithUserIds && !validation.isValidGuidArray(args.options.shareWithUserIds.split(','))) {
-          return 'shareWithUserIds contains invalid GUID';
+        if (args.options.shareWithUserIds) {
+          const isValidGUIDArrayResult = validation.isValidGuidArray(args.options.shareWithUserIds);
+          if (isValidGUIDArrayResult !== true) {
+            return `The following GUIDs are invalid for the option 'shareWithUserIds': ${isValidGUIDArrayResult}.`;
+          }
+        }
+
+        if (args.options.shareWithUserNames) {
+          const isValidUPNArrayResult = validation.isValidUserPrincipalNameArray(args.options.shareWithUserNames);
+          if (isValidUPNArrayResult !== true) {
+            return `The following user principal names are invalid for the option 'shareWithUserNames': ${isValidUPNArrayResult}.`;
+          }
         }
 
         const allowedCategories: string[] = [
@@ -180,8 +190,8 @@ class PlannerPlanSetCommand extends GraphCommand {
       return ownerGroupId;
     }
 
-    const group = await entraGroup.getGroupByDisplayName(ownerGroupName!);
-    return group.id!;
+    const id = await entraGroup.getGroupIdByDisplayName(ownerGroupName!);
+    return id;
   }
 
   private async getPlanId(args: CommandArgs): Promise<string> {
@@ -191,16 +201,14 @@ class PlannerPlanSetCommand extends GraphCommand {
       return id;
     }
 
-    let groupId: string = '';
-
     if (args.options.rosterId) {
-      const plan: PlannerPlan = await planner.getPlanByRosterId(args.options.rosterId);
-      return plan.id!;
+      const id = await planner.getPlanIdByRosterId(args.options.rosterId);
+      return id;
     }
     else {
-      groupId = await this.getGroupId(args);
-      const plan: PlannerPlan = await planner.getPlanByTitle(title!, groupId);
-      return plan.id!;
+      const groupId = await this.getGroupId(args);
+      const id = await planner.getPlanIdByTitle(title!, groupId);
+      return id;
     }
   }
 

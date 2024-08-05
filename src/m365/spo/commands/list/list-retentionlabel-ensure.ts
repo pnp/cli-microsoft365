@@ -104,7 +104,7 @@ class SpoListRetentionLabelEnsureCommand extends SpoCommand {
 
   private async getListServerRelativeUrl(args: CommandArgs, logger: Logger): Promise<string> {
     if (this.verbose) {
-      logger.logToStderr('Getting the list server relative URL');
+      await logger.logToStderr('Getting the list server relative URL');
     }
 
     if (args.options.listUrl) {

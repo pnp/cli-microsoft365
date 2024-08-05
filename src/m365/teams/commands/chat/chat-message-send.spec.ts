@@ -46,12 +46,7 @@ describe(commands.CHAT_MESSAGE_SEND, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
-    if (!auth.connection.accessTokens[auth.defaultResource]) {
-      auth.connection.accessTokens[auth.defaultResource] = {
-        expiresOn: '123',
-        accessToken: 'abc'
-      };
-    }
+    sinon.stub(accessToken, 'assertDelegatedAccessToken').returns();
     commandInfo = cli.getCommandInfo(command);
   });
 

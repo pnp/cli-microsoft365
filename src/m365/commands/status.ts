@@ -59,7 +59,7 @@ class StatusCommand extends Command {
       throw new CommandError(error);
     }
 
-    this.initAction(args, logger);
+    await this.initAction(args, logger);
     await this.commandAction(logger);
   }
 }

@@ -122,7 +122,7 @@ class SpfxProjectAzureDevOpsPipelineAddCommand extends BaseProjectCommand {
     const solutionName = JSON.parse(packageJson).name;
 
     if (this.debug) {
-      logger.logToStderr(`Adding Azure DevOps pipeline in the current SPFx project`);
+      await logger.logToStderr(`Adding Azure DevOps pipeline in the current SPFx project`);
     }
 
     try {

@@ -21,7 +21,7 @@ describe(commands.APPLICATIONCUSTOMIZER_GET, () => {
   const webUrl = 'https://contoso.sharepoint.com/sites/sales';
   const applicationCustomizerGetResponse = {
     "ClientSideComponentId": clientSideComponentId,
-    "ClientSideComponentProperties": "",
+    "ClientSideComponentProperties": "{\"testMessage\":\"Test message\"}",
     "CommandUIExtension": null,
     "Description": null,
     "Group": null,
@@ -49,7 +49,7 @@ describe(commands.APPLICATIONCUSTOMIZER_GET, () => {
 
   const applicationCustomizerGetOutput = {
     ClientSideComponentId: '7096cded-b83d-4eab-96f0-df477ed7c0bc',
-    ClientSideComponentProperties: '',
+    ClientSideComponentProperties: '{"testMessage":"Test message"}',
     CommandUIExtension: null,
     Description: null,
     Group: null,
@@ -288,7 +288,7 @@ describe(commands.APPLICATIONCUSTOMIZER_GET, () => {
       }
     });
 
-    assert(loggerLogSpy.calledWith(applicationCustomizerGetOutput));
+    assert(loggerLogSpy.calledOnceWithExactly(applicationCustomizerGetOutput));
   });
 
   it('retrieves an application customizer by title', async () => {
@@ -314,7 +314,7 @@ describe(commands.APPLICATIONCUSTOMIZER_GET, () => {
       }
     });
 
-    assert(loggerLogSpy.calledWith(applicationCustomizerGetOutput));
+    assert(loggerLogSpy.calledOnceWithExactly(applicationCustomizerGetOutput));
   });
 
   it('retrieves an application customizer by clientSideComponentId', async () => {
@@ -340,7 +340,27 @@ describe(commands.APPLICATIONCUSTOMIZER_GET, () => {
       }
     });
 
-    assert(loggerLogSpy.calledWith(applicationCustomizerGetOutput));
+    assert(loggerLogSpy.calledOnceWithExactly(applicationCustomizerGetOutput));
+  });
+
+  it('retrieves application customizer properties', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `${webUrl}/_api/Web/UserCustomActions(guid'14125658-a9bc-4ddf-9c75-1b5767c9a337')`) {
+        return applicationCustomizerGetResponse;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options: {
+        id: id,
+        webUrl: webUrl,
+        clientSideComponentProperties: true
+      }
+    });
+
+    assert(loggerLogSpy.calledOnceWithExactly(JSON.parse(applicationCustomizerGetOutput.ClientSideComponentProperties)));
   });
 
   it('handles error when no application customizer with the specified id found', async () => {
@@ -612,7 +632,7 @@ describe(commands.APPLICATIONCUSTOMIZER_GET, () => {
 
     sinon.stub(cli, 'handleMultipleResultsFound').resolves({
       ClientSideComponentId: '7096cded-b83d-4eab-96f0-df477ed7c0bc',
-      ClientSideComponentProperties: '',
+      ClientSideComponentProperties: '{"testMessage":"Test message"}',
       CommandUIExtension: null,
       Description: null,
       Group: null,
@@ -640,7 +660,7 @@ describe(commands.APPLICATIONCUSTOMIZER_GET, () => {
       }
     });
 
-    assert(loggerLogSpy.calledWith(applicationCustomizerGetOutput));
+    assert(loggerLogSpy.calledOnceWithExactly(applicationCustomizerGetOutput));
   });
 
   it('handles error when no valid application customizer with the specified id found', async () => {

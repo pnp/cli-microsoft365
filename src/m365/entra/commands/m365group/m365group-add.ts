@@ -16,8 +16,8 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   displayName: string;
-  description: string;
   mailNickname: string;
+  description?: string;
   owners?: string;
   members?: string;
   visibility?: string;
@@ -57,6 +57,7 @@ class EntraM365GroupAddCommand extends GraphCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
+        description: typeof args.options.description !== 'undefined',
         owners: typeof args.options.owners !== 'undefined',
         members: typeof args.options.members !== 'undefined',
         logoPath: typeof args.options.logoPath !== 'undefined',
@@ -75,10 +76,10 @@ class EntraM365GroupAddCommand extends GraphCommand {
         option: '-n, --displayName <displayName>'
       },
       {
-        option: '-d, --description <description>'
+        option: '-m, --mailNickname <mailNickname>'
       },
       {
-        option: '-m, --mailNickname <mailNickname>'
+        option: '-d, --description [description]'
       },
       {
         option: '--owners [owners]'
@@ -113,6 +114,7 @@ class EntraM365GroupAddCommand extends GraphCommand {
   }
 
   #initTypes(): void {
+    this.types.string.push('displayName', 'mailNickname', 'description', 'owners', 'members', 'visibility', 'logoPath');
     this.types.boolean.push('allowMembersToPost', 'hideGroupInOutlook', 'subscribeNewGroupMembers', 'welcomeEmailDisabled');
   }
 
@@ -287,6 +289,7 @@ class EntraM365GroupAddCommand extends GraphCommand {
     let promises: Promise<{ value: User[] }>[] = [];
     let userIds: string[] = [];
 
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
     promises = userArr.map(user => {
       const requestOptions: CliRequestOptions = {
         url: `${this.resource}/v1.0/users?$filter=userPrincipalName eq '${formatting.encodeQueryParameter(user)}'&$select=id,userPrincipalName`,

@@ -26,6 +26,9 @@ m365 spo folder add [options]
 
 `--color [color]`
 : Visual color of the folder. Valid values are a color name or a number. Check remarks for more info.
+
+`--ensureParentFolders [ensureParentFolders]`
+: Ensure that the parent folder path is available. Any missing folders will be created recursively.
 ```
 
 <Global />
@@ -77,6 +80,12 @@ Create a folder with a light teal look
 
 ```sh
 m365 spo folder add --webUrl https://contoso.sharepoint.com --url '/ProjectFiles/Project-x' --color lightTeal
+```
+
+Create a folder and make sure that any missing folders specified as parent folders are created.
+
+```sh
+m365 spo folder add --webUrl https://contoso.sharepoint.com/sites/project-x --parentFolderUrl '/Projects/2024/Q1/Reports' --name Financial --ensureParentFolders
 ```
 
 ## Response

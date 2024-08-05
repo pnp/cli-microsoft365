@@ -14,7 +14,7 @@ import commands from '../../commands.js';
 import command from './engage-message-get.js';
 import { settingsNames } from '../../../../settingsNames.js';
 import yammerCommands from './yammerCommands.js';
-
+import { accessToken } from '../../../../utils/accessToken.js';
 
 describe(commands.ENGAGE_MESSAGE_GET, () => {
   let log: string[];
@@ -29,6 +29,7 @@ describe(commands.ENGAGE_MESSAGE_GET, () => {
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
+    sinon.stub(accessToken, 'assertDelegatedAccessToken').returns();
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
   });

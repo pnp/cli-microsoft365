@@ -31,12 +31,12 @@ This script will get all flows in your default environment and export them as bo
 
   $flows | ForEach-Object {
       Write-Output "Exporting as ZIP & JSON... $($_.displayName)"
-      $filename = $_.displayName.Replace(" ","")
+      $filename = $_.properties.displayName.Replace(" ","")
       $timestamp = Get-Date -Format "yyyymmddhhmmss"
       $exportPath = "$($filename)_$($timestamp)"
-      $flowId = $_.Name
+      $flowId = $_.name
       
-      m365 flow export --name $flowId --environmentName $environment --packageDisplayName $_.displayName --path "$exportPath.zip"
+      m365 flow export --name $flowId --environmentName $environment --packageDisplayName $_.properties.displayName --path "$exportPath.zip"
       m365 flow export --name $flowId --environmentName $environment --format json --path "$exportPath.json"
   }
 

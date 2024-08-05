@@ -135,7 +135,7 @@ class SpfxProjectGithubWorkflowAddCommand extends BaseProjectCommand {
     const solutionName = JSON.parse(packageJson).name;
 
     if (this.debug) {
-      logger.logToStderr(`Adding GitHub workflow in the current SPFx project`);
+      await logger.logToStderr(`Adding GitHub workflow in the current SPFx project`);
     }
 
     try {

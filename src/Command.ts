@@ -1,4 +1,5 @@
 import os from 'os';
+import { ZodTypeAny, z } from 'zod';
 import auth from './Auth.js';
 import GlobalOptions from './GlobalOptions.js';
 import { CommandInfo } from './cli/CommandInfo.js';
@@ -12,6 +13,7 @@ import { accessToken } from './utils/accessToken.js';
 import { md } from './utils/md.js';
 import { GraphResponseError } from './utils/odata.js';
 import { prompt } from './utils/prompt.js';
+import { zod } from './utils/zod.js';
 
 interface CommandOption {
   option: string;
@@ -42,6 +44,14 @@ interface ODataError {
     }
   }
 }
+
+export const globalOptionsZod = z.object({
+  query: z.string().optional(),
+  output: zod.alias('o', z.enum(['csv', 'json', 'md', 'text', 'none']).optional()),
+  debug: z.boolean().default(false),
+  verbose: z.boolean().default(false)
+});
+export type GlobalOptionsZod = z.infer<typeof globalOptionsZod>;
 
 export interface CommandArgs {
   options: GlobalOptions;
@@ -74,6 +84,22 @@ export default abstract class Command {
 
   public abstract get name(): string;
   public abstract get description(): string;
+  public get schema(): ZodTypeAny | undefined {
+    return undefined;
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  public getRefinedSchema(schema: ZodTypeAny): z.ZodEffects<any> | undefined {
+    return undefined;
+  }
+
+  public getSchemaToParse(): z.ZodTypeAny | undefined {
+    return this.getRefinedSchema(this.schema as z.ZodTypeAny) ?? this.schema;
+  }
+
+  // metadata for command's options
+  // used for building telemetry
+  public optionsInfo: CommandOptionInfo[] = [];
 
   constructor() {
     // These functions must be defined with # so that they're truly private
@@ -165,7 +191,7 @@ export default abstract class Command {
 
       if (!prompted) {
         prompted = true;
-        cli.error('🌶️  Provide values for the following parameters:');
+        await cli.error('🌶️  Provide values for the following parameters:');
       }
 
       const answer = optionInfo.autocomplete !== undefined
@@ -176,10 +202,10 @@ export default abstract class Command {
     }
 
     if (prompted) {
-      cli.error('');
+      await cli.error('');
     }
 
-    this.processOptions(args.options);
+    await this.processOptions(args.options);
 
     return true;
   }
@@ -220,22 +246,22 @@ export default abstract class Command {
   }
 
   private async promptForOptionSetNameAndValue(args: CommandArgs, optionSet: OptionSet): Promise<void> {
-    cli.error(`🌶️  Please specify one of the following options:`);
+    await cli.error(`🌶️  Please specify one of the following options:`);
 
     const selectedOptionName = await prompt.forSelection<string>({ message: `Option to use:`, choices: optionSet.options.map((choice: any) => { return { name: choice, value: choice }; }) });
     const optionValue = await prompt.forInput({ message: `${selectedOptionName}:` });
 
     args.options[selectedOptionName] = optionValue;
-    cli.error('');
+    await cli.error('');
   }
 
   private async promptForSpecificOption(args: CommandArgs, commonOptions: string[]): Promise<void> {
-    cli.error(`🌶️  Multiple options for an option set specified. Please specify the correct option that you wish to use.`);
+    await cli.error(`🌶️  Multiple options for an option set specified. Please specify the correct option that you wish to use.`);
 
     const selectedOptionName = await prompt.forSelection({ message: `Option to use:`, choices: commonOptions.map((choice: any) => { return { name: choice, value: choice }; }) });
 
     commonOptions.filter(y => y !== selectedOptionName).map(optionName => args.options[optionName] = undefined);
-    cli.error('');
+    await cli.error('');
   }
 
   private async validateOutput(args: CommandArgs): Promise<string | boolean> {
@@ -284,7 +310,7 @@ export default abstract class Command {
       throw new CommandError(error);
     }
 
-    this.initAction(args, logger);
+    await this.initAction(args, logger);
 
     if (!auth.connection.active) {
       throw new CommandError('Log in to Microsoft 365 first');
@@ -433,14 +459,14 @@ export default abstract class Command {
     this.handleError(rawResponse);
   }
 
-  protected initAction(args: CommandArgs, logger: Logger): void {
+  protected async initAction(args: CommandArgs, logger: Logger): Promise<void> {
     this.debug = args.options.debug || process.env.CLIMICROSOFT365_DEBUG === '1';
     this.verbose = this.debug || args.options.verbose || process.env.CLIMICROSOFT365_VERBOSE === '1';
     request.debug = this.debug;
     request.logger = logger;
 
     if (this.debug && auth.connection.identityName !== undefined) {
-      logger.logToStderr(`Executing command as '${auth.connection.identityName}', appId: ${auth.connection.appId}, tenantId: ${auth.connection.identityTenantId}`);
+      await logger.logToStderr(`Executing command as '${auth.connection.identityName}', appId: ${auth.connection.appId}, tenantId: ${auth.connection.identityTenantId}`);
     }
 
     telemetry.trackEvent(this.getUsedCommandName(), this.getTelemetryProperties(args));
@@ -554,8 +580,36 @@ export default abstract class Command {
   }
 
   private getTelemetryProperties(args: any): any {
-    this.telemetry.forEach(t => t(args));
-    return this.telemetryProperties;
+    if (this.schema) {
+      const telemetryProperties: any = {};
+      this.optionsInfo.forEach(o => {
+        if (o.required) {
+          return;
+        }
+
+        if (typeof args.options[o.name] === 'undefined') {
+          return;
+        }
+
+        switch (o.type) {
+          case 'string':
+            telemetryProperties[o.name] = o.autocomplete ? args.options[o.name] : typeof args.options[o.name] !== 'undefined';
+            break;
+          case 'boolean':
+            telemetryProperties[o.name] = args.options[o.name];
+            break;
+          case 'number':
+            telemetryProperties[o.name] = typeof args.options[o.name] !== 'undefined';
+            break;
+        };
+      });
+
+      return telemetryProperties;
+    }
+    else {
+      this.telemetry.forEach(t => t(args));
+      return this.telemetryProperties;
+    }
   }
 
   public async getTextOutput(logStatement: any[]): Promise<string> {

@@ -29,9 +29,16 @@ m365 spo applicationcustomizer get [options]
 
 `-s, --scope [scope]`
 : Scope of the application customizer. Allowed values: `Site`, `Web`, `All`. Defaults to `All`.
+
+`-p, --clientSideComponentProperties`
+: Only output the client-side component properties.
 ```
 
 <Global />
+
+## Remarks
+
+This command can be used for retrieving an application customizer from a specific site. To retrieve an application customizer that's installed tenant-wide, view our dedicated [spo tenant applicationcustomizer get](../tenant/tenant-applicationcustomizer-get.mdx) command.
 
 ## Examples
 
@@ -59,36 +66,41 @@ Retrieves an application customizer by title available at the site scope.
 m365 spo applicationcustomizer get --title "Some customizer" --webUrl https://contoso.sharepoint.com/sites/sales --scope site
 ```
 
-## Remarks
+Retrieves the client-side component properties of a application customizer.
 
-This command can be used for retrieving an application customizer from a specific site. To retrieve an application customizer that's installed tenant-wide, view our dedicated [spo tenant applicationcustomizer get](../tenant/tenant-applicationcustomizer-get.mdx) command.
+```sh
+m365 spo applicationcustomizer get --id 14125658-a9bc-4ddf-9c75-1b5767c9a337 --webUrl https://contoso.sharepoint.com/sites/sales --clientSideComponentProperties
+```
 
 ## Response
+
+### Standard response
 
 <Tabs>
   <TabItem value="JSON">
 
   ```json
   {
-    "ClientSideComponentId": "7096cded-b83d-4eab-96f0-df477ed7c0bc",
-    "ClientSideComponentProperties": "",
+    "ClientSideComponentId": "9a8b100c-246b-4592-9454-67826523e159",
+    "ClientSideComponentProperties": "{\"testMessage\":\"Test message\"}",
     "CommandUIExtension": null,
     "Description": null,
     "Group": null,
-    "Id": "14125658-a9bc-4ddf-9c75-1b5767c9a337",
+    "HostProperties": "",
+    "Id": "4a428b32-08cf-45c7-9986-17585af38806",
     "ImageUrl": null,
     "Location": "ClientSideExtension.ApplicationCustomizer",
-    "Name": "Some customizer",
+    "Name": "{4a428b32-08cf-45c7-9986-17585af38806}",
     "RegistrationId": null,
     "RegistrationType": 0,
-    "Rights": "{\"High\":0,\"Low\":0}",
+    "Rights": "{\"High\":\"0\",\"Low\":\"0\"}",
     "Scope": "Web",
     "ScriptBlock": null,
     "ScriptSrc": null,
-    "Sequence": 0,
-    "Title": "Some customizer",
+    "Sequence": 65536,
+    "Title": "HelloWorld",
     "Url": null,
-    "VersionOfUserCustomAction": "16.0.1.0"
+    "VersionOfUserCustomAction": "1.0.1.0"
   }
   ```
 
@@ -96,65 +108,102 @@ This command can be used for retrieving an application customizer from a specifi
   <TabItem value="Text">
 
   ```text
-  ClientSideComponentId        : 7096cded-b83d-4eab-96f0-df477ed7c0bc
-  ClientSideComponentProperties:
+  ClientSideComponentId        : 9a8b100c-246b-4592-9454-67826523e159
+  ClientSideComponentProperties: {"testMessage":"Test message"}
   CommandUIExtension           : null
   Description                  : null
   Group                        : null
-  Id                           : 14125658-a9bc-4ddf-9c75-1b5767c9a337
+  HostProperties               :
+  Id                           : 4a428b32-08cf-45c7-9986-17585af38806
   ImageUrl                     : null
   Location                     : ClientSideExtension.ApplicationCustomizer
-  Name                         : Some customizer
+  Name                         : {4a428b32-08cf-45c7-9986-17585af38806}
   RegistrationId               : null
   RegistrationType             : 0
-  Rights                       : {"High":0,"Low":0}
+  Rights                       : {"High":"0","Low":"0"}
   Scope                        : Web
   ScriptBlock                  : null
   ScriptSrc                    : null
-  Sequence                     : 0
-  Title                        : Some customizer
+  Sequence                     : 65536
+  Title                        : HelloWorld
   Url                          : null
-  VersionOfUserCustomAction    : 16.0.1.0
+  VersionOfUserCustomAction    : 1.0.1.0
   ```
 
   </TabItem>
   <TabItem value="CSV">
 
   ```csv
-  ClientSideComponentId,ClientSideComponentProperties,CommandUIExtension,Description,Group,Id,ImageUrl,Location,Name,RegistrationId,RegistrationType,Rights,Scope,ScriptBlock,ScriptSrc,Sequence,Title,Url,VersionOfUserCustomAction
-  7096cded-b83d-4eab-96f0-df477ed7c0bc,,,,,14125658-a9bc-4ddf-9c75-1b5767c9a337,,ClientSideExtension.ApplicationCustomizer,Some customizer,,0,"{""High"":0,""Low"":0}",Web,,,0,Some customizer,,16.0.1.0
+  ClientSideComponentId,ClientSideComponentProperties,CommandUIExtension,Description,Group,HostProperties,Id,ImageUrl,Location,Name,RegistrationId,RegistrationType,Rights,Scope,ScriptBlock,ScriptSrc,Sequence,Title,Url,VersionOfUserCustomAction
+  9a8b100c-246b-4592-9454-67826523e159,"{""testMessage"":""Test message""}",,,,,4a428b32-08cf-45c7-9986-17585af38806,,ClientSideExtension.ApplicationCustomizer,{4a428b32-08cf-45c7-9986-17585af38806},,0,"{""High"":""0"",""Low"":""0""}",Web,,,65536,HelloWorld,,1.0.1.0
   ```
 
   </TabItem>
   <TabItem value="Markdown">
 
   ```md
-  # spo applicationcustomizer get --title "Some customizer" --webUrl "https://contoso.sharepoint.com/sites/sales" --scope "Web"
+  # spo applicationcustomizer get --webUrl "https://contoso.sharepoint.com/sites/Marketing" --id "4a428b32-08cf-45c7-9986-17585af38806"
 
-  Date: 3/6/2023
+  Date: 16/05/2024
 
-  ## Some customizer (14125658-a9bc-4ddf-9c75-1b5767c9a337)
+  ## HelloWorld (4a428b32-08cf-45c7-9986-17585af38806)
 
   Property | Value
   ---------|-------
-  ClientSideComponentId | 7096cded-b83d-4eab-96f0-df477ed7c0bc
-  ClientSideComponentProperties |
-  CommandUIExtension | null
-  Description | null
-  Group | null
-  Id | 14125658-a9bc-4ddf-9c75-1b5767c9a337
-  ImageUrl | null
+  ClientSideComponentId | 9a8b100c-246b-4592-9454-67826523e159
+  ClientSideComponentProperties | {"testMessage":"Test message"}
+  HostProperties |
+  Id | 4a428b32-08cf-45c7-9986-17585af38806
   Location | ClientSideExtension.ApplicationCustomizer
-  Name | Some customizer
-  RegistrationId | null
+  Name | {4a428b32-08cf-45c7-9986-17585af38806}
   RegistrationType | 0
+  Rights | {"High":"0","Low":"0"}
   Scope | Web
-  ScriptBlock | null
-  ScriptSrc | null
-  Sequence | 0
-  Title | Some customizer
-  Url | null
-  VersionOfUserCustomAction | 16.0.1.0
+  Sequence | 65536
+  Title | HelloWorld
+  VersionOfUserCustomAction | 1.0.1.0
+  ```
+
+  </TabItem>
+</Tabs>
+
+### `clientSideComponentProperties` response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  {
+    "testMessage": "Test message"
+  }
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```txt
+  testMessage: Test message
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  testMessage
+  Test message
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # spo applicationcustomizer get --title "Some customizer" --webUrl "https://contoso.sharepoint.com/sites/sales" --scope "Web" --clientSideComponentProperties "true"
+
+  Date: 15/05/2024
+
+  Property | Value
+  ---------|-------
+  testMessage | Test message
   ```
 
   </TabItem>

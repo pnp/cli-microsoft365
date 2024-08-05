@@ -31,12 +31,14 @@ export default {
   MEETING_ADD: `${prefix} meeting add`,
   MEETING_GET: `${prefix} meeting get`,
   MEETING_LIST: `${prefix} meeting list`,
+  MEETING_ATTENDANCEREPORT_GET: `${prefix} meeting attendancereport get`,
   MEETING_ATTENDANCEREPORT_LIST: `${prefix} meeting attendancereport list`,
   MEETING_TRANSCRIPT_LIST: `${prefix} meeting transcript list`,
   MEMBERSETTINGS_LIST: `${prefix} membersettings list`,
   MEMBERSETTINGS_SET: `${prefix} membersettings set`,
   MESSAGE_GET: `${prefix} message get`,
   MESSAGE_LIST: `${prefix} message list`,
+  MESSAGE_REMOVE: `${prefix} message remove`,
   MESSAGE_REPLY_LIST: `${prefix} message reply list`,
   MESSAGE_SEND: `${prefix} message send`,
   MESSAGINGSETTINGS_LIST: `${prefix} messagingsettings list`,
@@ -68,5 +70,6 @@ export default {
   USER_SET: `${prefix} user set`,
   USER_APP_ADD: `${prefix} user app add`,
   USER_APP_LIST: `${prefix} user app list`,
-  USER_APP_REMOVE: `${prefix} user app remove`
+  USER_APP_REMOVE: `${prefix} user app remove`,
+  USER_APP_UPGRADE: `${prefix} user app upgrade`
 };

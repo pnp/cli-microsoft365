@@ -3,6 +3,7 @@ import type { SidebarsConfig } from '@docusaurus/plugin-content-docs';
 const sidebars: SidebarsConfig = {
   home: [
     'index',
+    'v8-upgrade-guidance',
     'v7-upgrade-guidance',
     'v6-upgrade-guidance',
     'v5-upgrade-guidance',
@@ -20,6 +21,7 @@ const sidebars: SidebarsConfig = {
     'cmd/login',
     'cmd/logout',
     'cmd/request',
+    'cmd/search',
     'cmd/setup',
     'cmd/status',
     'cmd/version',
@@ -274,6 +276,11 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
+              label: 'app permission remove',
+              id: 'cmd/entra/app/app-permission-remove'
+            },
+            {
+              type: 'doc',
               label: 'app role add',
               id: 'cmd/entra/app/app-role-add'
             },
@@ -358,6 +365,11 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'group user list',
               id: 'cmd/entra/group/group-user-list'
+            },
+            {
+              type: 'doc',
+              label: 'group user set',
+              id: 'cmd/entra/group/group-user-set'
             }
           ]
         },
@@ -528,6 +540,30 @@ const sidebars: SidebarsConfig = {
           ]
         },
         {
+          multitenant: [
+            {
+              type: 'doc',
+              label: 'multitenant add',
+              id: 'cmd/entra/multitenant/multitenant-add'
+            },
+            {
+              type: 'doc',
+              label: 'multitenant get',
+              id: 'cmd/entra/multitenant/multitenant-get'
+            },
+            {
+              type: 'doc',
+              label: 'multitenant remove',
+              id: 'cmd/entra/multitenant/multitenant-remove'
+            },
+            {
+              type: 'doc',
+              label: 'multitenant set',
+              id: 'cmd/entra/multitenant/multitenant-set'
+            }
+          ]
+        },
+        {
           oauth2grant: [
             {
               type: 'doc',
@@ -562,6 +598,16 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'pim role assignment list',
               id: 'cmd/entra/pim/pim-role-assignment-list'
+            },
+            {
+              type: 'doc',
+              label: 'pim role assignment eligibility list',
+              id: 'cmd/entra/pim/pim-role-assignment-eligibility-list'
+            },
+            {
+              type: 'doc',
+              label: 'pim role request list',
+              id: 'cmd/entra/pim/pim-role-request-list'
             }
           ]
         },
@@ -629,6 +675,11 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'user set',
               id: 'cmd/entra/user/user-set'
+            },
+            {
+              type: 'doc',
+              label: 'user groupmembership list',
+              id: 'cmd/entra/user/user-groupmembership-list'
             },
             {
               type: 'doc',
@@ -1884,6 +1935,11 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'containertype add',
               id: 'cmd/spe/containertype/containertype-add'
+            },
+            {
+              type: 'doc',
+              label: 'containertype list',
+              id: 'cmd/spe/containertype/containertype-list'
             }
           ]
         }
@@ -2164,6 +2220,11 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'contenttype sync',
               id: 'cmd/spo/contenttype/contenttype-sync'
+            },
+            {
+              type: 'doc',
+              label: 'contenttype field list',
+              id: 'cmd/spo/contenttype/contenttype-field-list'
             },
             {
               type: 'doc',
@@ -2887,6 +2948,11 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
+              label: 'listitem batch remove',
+              id: 'cmd/spo/listitem/listitem-batch-remove'
+            },
+            {
+              type: 'doc',
               label: 'listitem batch set',
               id: 'cmd/spo/listitem/listitem-batch-set'
             },
@@ -3262,6 +3328,11 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
+              label: 'site admin list',
+              id: 'cmd/spo/site/site-admin-list'
+            },
+            {
+              type: 'doc',
               label: 'site ensure',
               id: 'cmd/spo/site/site-ensure'
             },
@@ -3605,6 +3676,16 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'tenant settings set',
               id: 'cmd/spo/tenant/tenant-settings-set'
+            },
+            {
+              type: 'doc',
+              label: 'tenant site archive',
+              id: 'cmd/spo/tenant/tenant-site-archive'
+            },
+            {
+              type: 'doc',
+              label: 'tenant site unarchive',
+              id: 'cmd/spo/tenant/tenant-site-unarchive'
             }
           ]
         },
@@ -3975,6 +4056,11 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
+              label: 'meeting attendancereport get',
+              id: 'cmd/teams/meeting/meeting-attendancereport-get'
+            },
+            {
+              type: 'doc',
               label: 'meeting attendancereport list',
               id: 'cmd/teams/meeting/meeting-attendancereport-list'
             },
@@ -4010,6 +4096,11 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'message list',
               id: 'cmd/teams/message/message-list'
+            },
+            {
+              type: 'doc',
+              label: 'message remove',
+              id: 'cmd/teams/message/message-remove'
             },
             {
               type: 'doc',
@@ -4190,6 +4281,11 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'user app remove',
               id: 'cmd/teams/user/user-app-remove'
+            },
+            {
+              type: 'doc',
+              label: 'user app upgrade',
+              id: 'cmd/teams/user/user-app-upgrade'
             }
           ]
         }
@@ -4274,6 +4370,16 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'engage search',
               id: 'cmd/viva/engage/engage-search'
+            },
+            {
+              type: 'doc',
+              label: 'engage community add',
+              id: 'cmd/viva/engage/engage-community-add'
+            },
+            {
+              type: 'doc',
+              label: 'engage community get',
+              id: 'cmd/viva/engage/engage-community-get'
             },
             {
               type: 'doc',
@@ -4464,6 +4570,11 @@ const sidebars: SidebarsConfig = {
       type: 'doc',
       label: 'Pull Request review',
       id: 'contribute/expect-during-pr'
+    },
+    {
+      type: 'doc',
+      label: 'PR checklist',
+      id: 'contribute/pr-checklist'
     }
   ],
   about: [

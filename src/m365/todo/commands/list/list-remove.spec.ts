@@ -13,6 +13,7 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './list-remove.js';
 import { settingsNames } from '../../../../settingsNames.js';
+import { accessToken } from '../../../../utils/accessToken.js';
 
 describe(commands.LIST_REMOVE, () => {
   let log: string[];
@@ -24,6 +25,7 @@ describe(commands.LIST_REMOVE, () => {
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
+    sinon.stub(accessToken, 'assertDelegatedAccessToken').returns();
     auth.connection.active = true;
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
     commandInfo = cli.getCommandInfo(command);

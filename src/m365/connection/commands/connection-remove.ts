@@ -28,13 +28,14 @@ class ConnectionRemoveCommand extends Command {
 
     this.#initTelemetry();
     this.#initOptions();
+    this.#initTypes();
   }
 
 
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        force: (!(!args.options.force)).toString()
+        force: !!args.options.force
       });
     });
   }
@@ -48,6 +49,11 @@ class ConnectionRemoveCommand extends Command {
         option: '-f, --force'
       }
     );
+  }
+
+  #initTypes(): void {
+    this.types.string.push('name');
+    this.types.boolean.push('force');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -81,7 +87,7 @@ class ConnectionRemoveCommand extends Command {
       throw new CommandError(error);
     }
 
-    this.initAction(args, logger);
+    await this.initAction(args, logger);
     await this.commandAction(logger, args);
   }
 }

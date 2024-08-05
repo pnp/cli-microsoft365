@@ -4,6 +4,8 @@ import auth, { CloudType } from '../../Auth.js';
 import { CommandError } from '../../Command.js';
 import { telemetry } from '../../telemetry.js';
 import PowerAppsCommand from './PowerAppsCommand.js';
+import { accessToken } from '../../utils/accessToken.js';
+import { sinonUtil } from '../../utils/sinonUtil.js';
 
 class MockCommand extends PowerAppsCommand {
   public get name(): string {
@@ -27,10 +29,22 @@ describe('PowerAppsCommand', () => {
 
   before(() => {
     sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
+    auth.connection.active = true;
+    auth.connection.accessTokens[auth.defaultResource] = {
+      expiresOn: 'abc',
+      accessToken: 'abc'
+    };
+  });
+
+  beforeEach(() => {
+    auth.connection.active = true;
   });
 
   after(() => {
     sinon.restore();
+    auth.connection.active = false;
+    auth.connection.accessTokens = {};
   });
 
   it('returns correct resource', () => {
@@ -38,38 +52,44 @@ describe('PowerAppsCommand', () => {
     assert.strictEqual((command as any).resource, 'https://api.powerapps.com');
   });
 
-  it(`doesn't throw error when not connected`, () => {
+  it(`doesn't throw error when not connected`, async () => {
     auth.connection.active = false;
-    (cmd as any).initAction({ options: {} }, {});
+    await (cmd as any).initAction({ options: {} }, {});
   });
 
-  it('throws error when connected to USGov cloud', () => {
+  it('throws error when connected to USGov cloud', async () => {
     auth.connection.active = true;
     auth.connection.cloudType = CloudType.USGov;
-    assert.throws(() => (cmd as any).initAction({ options: {} }, {}), cloudError);
+    await assert.rejects(() => (cmd as any).initAction({ options: {} }, {}), cloudError);
   });
 
-  it('throws error when connected to USGovHigh cloud', () => {
+  it('throws error when connected to USGovHigh cloud', async () => {
     auth.connection.active = true;
     auth.connection.cloudType = CloudType.USGovHigh;
-    assert.throws(() => (cmd as any).initAction({ options: {} }, {}), cloudError);
+    await assert.rejects(() => (cmd as any).initAction({ options: {} }, {}), cloudError);
   });
 
-  it('throws error when connected to USGovDoD cloud', () => {
+  it('throws error when connected to USGovDoD cloud', async () => {
     auth.connection.active = true;
     auth.connection.cloudType = CloudType.USGovDoD;
-    assert.throws(() => (cmd as any).initAction({ options: {} }, {}), cloudError);
+    await assert.rejects(() => (cmd as any).initAction({ options: {} }, {}), cloudError);
   });
 
-  it('throws error when connected to China cloud', () => {
+  it('throws error when connected to China cloud', async () => {
     auth.connection.active = true;
     auth.connection.cloudType = CloudType.China;
-    assert.throws(() => (cmd as any).initAction({ options: {} }, {}), cloudError);
+    await assert.rejects(() => (cmd as any).initAction({ options: {} }, {}), cloudError);
   });
 
   it(`doesn't throw error when connected to public cloud`, () => {
-    auth.connection.active = true;
     auth.connection.cloudType = CloudType.Public;
     assert.doesNotThrow(() => (cmd as any).initAction({ options: {} }, {}));
+  });
+
+  it('throws error when using application-only permissions', async () => {
+    sinonUtil.restore(accessToken.isAppOnlyAccessToken);
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
+    auth.connection.cloudType = CloudType.Public;
+    await assert.rejects(() => (cmd as any).initAction({ options: {} }, {}), new CommandError('This command does not support application-only permissions.'));
   });
 });

@@ -19,7 +19,7 @@ m365 spo file roleassignment add [options]
 `--fileUrl [fileUrl]`
 : The server- or site-relative decoded URL of the file to retrieve. Specify either `fileUrl` or `fileId` but not both.
 
-`i, --fileId [fileId]`
+`-i, --fileId [fileId]`
 : The UniqueId (GUID) of the file to retrieve. Specify either `fileUrl` or `fileId` but not both.
 
 `--principalId [principalId]`
@@ -29,7 +29,7 @@ m365 spo file roleassignment add [options]
 : The upn/email of user to assign role to. Specify either `upn`, `groupName`, or `principalId` but not multiple.
 
 `--groupName [groupName]`
-: The group name of Microsoft Entra or SharePoint group. Specify either `upn`, `groupName`, or `principalId` but not multiple.
+: The group name of the SharePoint group Specify either `upn`, `groupName`, or `principalId` but not multiple.
 
 `--roleDefinitionId [roleDefinitionId]`
 : ID of role definition. Specify either `roleDefinitionId` or `roleDefinitionName` but not both.

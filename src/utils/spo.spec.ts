@@ -7,42 +7,75 @@ import config from '../config.js';
 import { RoleDefinition } from '../m365/spo/commands/roledefinition/RoleDefinition.js';
 import request from '../request.js';
 import { sinonUtil } from '../utils/sinonUtil.js';
-import { FormDigestInfo, spo } from '../utils/spo.js';
+import { FormDigestInfo, SpoOperation, spo } from '../utils/spo.js';
 import { entraGroup } from './entraGroup.js';
 import { formatting } from './formatting.js';
-import { Drive } from '@microsoft/microsoft-graph-types';
+import { Drive, Group } from '@microsoft/microsoft-graph-types';
 
 const stubPostResponses: any = (
   folderAddResp: any = null
 ) => {
-  return sinon.stub(request, 'post').callsFake((opts) => {
+  return sinon.stub(request, 'post').callsFake(async (opts) => {
     if ((opts.url as string).indexOf('/_api/web/GetFolderByServerRelativePath') > -1) {
       if (folderAddResp) {
-        return folderAddResp;
+        throw folderAddResp;
       }
       else {
-        return Promise.resolve({ "Exists": true, "IsWOPIEnabled": false, "ItemCount": 0, "Name": "4t4", "ProgID": null, "ServerRelativeUrl": "/sites/JohnDoe/Shared Documents/4t4", "TimeCreated": "2018-10-26T22:50:27Z", "TimeLastModified": "2018-10-26T22:50:27Z", "UniqueId": "3f5428e2-b0a8-4d35-87df-89621ed5b457", "WelcomePage": "" });
+        return { "Exists": true, "IsWOPIEnabled": false, "ItemCount": 0, "Name": "4t4", "ProgID": null, "ServerRelativeUrl": "/sites/JohnDoe/Shared Documents/4t4", "TimeCreated": "2018-10-26T22:50:27Z", "TimeLastModified": "2018-10-26T22:50:27Z", "UniqueId": "3f5428e2-b0a8-4d35-87df-89621ed5b457", "WelcomePage": "" };
       }
 
     }
-    return Promise.reject('Invalid request');
+    throw 'Invalid request';
   });
 };
 
 const stubGetResponses: any = (
   getFolderByServerRelativeUrlResp: any = null
 ) => {
-  return sinon.stub(request, 'get').callsFake((opts) => {
+  return sinon.stub(request, 'get').callsFake(async (opts) => {
     if ((opts.url as string).indexOf('/_api/web/GetFolderByServerRelativePath(DecodedUrl=') > -1) {
       if (getFolderByServerRelativeUrlResp) {
-        return getFolderByServerRelativeUrlResp;
+        throw getFolderByServerRelativeUrlResp;
       }
       else {
-        return Promise.resolve({ "Exists": true, "IsWOPIEnabled": false, "ItemCount": 1, "Name": "f", "ProgID": null, "ServerRelativeUrl": "/sites/JohnDoe/Shared Documents/4t4/f", "TimeCreated": "2018-10-26T22:54:19Z", "TimeLastModified": "2018-10-26T22:54:20Z", "UniqueId": "0d680f20-53da-4516-b3f6-ed98b1d928e8", "WelcomePage": "" });
+        return { "Exists": true, "IsWOPIEnabled": false, "ItemCount": 1, "Name": "f", "ProgID": null, "ServerRelativeUrl": "/sites/JohnDoe/Shared Documents/4t4/f", "TimeCreated": "2018-10-26T22:54:19Z", "TimeLastModified": "2018-10-26T22:54:20Z", "UniqueId": "0d680f20-53da-4516-b3f6-ed98b1d928e8", "WelcomePage": "" };
       }
     }
-    return Promise.reject('Invalid request');
+    throw 'Invalid request';
   });
+};
+
+const userResponse = {
+  Id: 11,
+  IsHiddenInUI: false,
+  LoginName: 'i:0#.f|membership|john.doe@contoso.com',
+  Title: 'John Doe',
+  PrincipalType: 1,
+  Email: 'john.doe@contoso.com',
+  Expiration: '',
+  IsEmailAuthenticationGuestUser: false,
+  IsShareByEmailGuestUser: false,
+  IsSiteAdmin: false,
+  UserId: {
+    NameId: '10032002473c5ae3',
+    NameIdIssuer: 'urn:federation:microsoftonline'
+  },
+  UserPrincipalName: 'john.doe@contoso.com'
+};
+
+const entraGroupResponse = {
+  Id: 11,
+  IsHiddenInUI: false,
+  LoginName: 'i:0#.f|membership|john.doe@contoso.com',
+  Title: 'John Doe',
+  PrincipalType: 1,
+  Email: 'john.doe@contoso.com',
+  Expiration: '',
+  IsEmailAuthenticationGuestUser: false,
+  IsShareByEmailGuestUser: false,
+  IsSiteAdmin: false,
+  UserId: null,
+  UserPrincipalName: null
 };
 
 describe('utils/spo', () => {
@@ -90,8 +123,7 @@ describe('utils/spo', () => {
       spo.ensureFormDigest,
       spo.siteExistsInTheRecycleBin,
       spo.getSpoUrl,
-      spo.getTenantId,
-      global.setTimeout
+      spo.getTenantId
     ]);
     auth.connection.spoUrl = undefined;
     auth.connection.spoTenantId = undefined;
@@ -102,10 +134,8 @@ describe('utils/spo', () => {
     auth.connection.active = false;
   });
 
-  it('reuses current digestcontext when expireat is a future date', (done) => {
-    sinon.stub(request, 'post').callsFake(() => {
-      return Promise.reject('Invalid request');
-    });
+  it('reuses current digestcontext when expireat is a future date', async () => {
+    sinon.stub(request, 'post').rejects('Invalid request');
 
     const futureDate = new Date();
     futureDate.setSeconds(futureDate.getSeconds() + 1800);
@@ -117,23 +147,12 @@ describe('utils/spo', () => {
       WebFullUrl: 'https://contoso.sharepoint.com'
     };
 
-    spo
-      .ensureFormDigest('https://contoso.sharepoint.com', logger, ctx, false)
-      .then((formDigest) => {
-        try {
-          assert.notStrictEqual(typeof formDigest, 'undefined');
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }, err => done(err));
+    const formDigest = await spo.ensureFormDigest('https://contoso.sharepoint.com', logger, ctx, false);
+    assert.notStrictEqual(typeof formDigest, 'undefined');
   });
 
-  it('reuses current digestcontext when expireat is a future date (debug)', (done) => {
-    sinon.stub(request, 'post').callsFake(() => {
-      return Promise.reject('Invalid request');
-    });
+  it('reuses current digestcontext when expireat is a future date (debug)', async () => {
+    sinon.stub(request, 'post').rejects('Invalid request');
 
     const futureDate = new Date();
     futureDate.setSeconds(futureDate.getSeconds() + 1800);
@@ -145,55 +164,33 @@ describe('utils/spo', () => {
       WebFullUrl: 'https://contoso.sharepoint.com'
     };
 
-    spo
-      .ensureFormDigest('https://contoso.sharepoint.com', logger, ctx, true)
-      .then((formDigest) => {
-        try {
-          assert.notStrictEqual(typeof formDigest, 'undefined');
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }, err => done(err));
+    const formDigest = await spo.ensureFormDigest('https://contoso.sharepoint.com', logger, ctx, true);
+    assert.notStrictEqual(typeof formDigest, 'undefined');
   });
 
-  it('retrieves new digestcontext when no context present', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+  it('retrieves new digestcontext when no context present', async () => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/contextinfo') > -1) {
-        return Promise.resolve({
-          FormDigestValue: 'abc'
-        });
+        return { FormDigestValue: 'abc' };
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
-    spo
-      .ensureFormDigest('https://contoso.sharepoint.com', logger, undefined, false)
-      .then(ctx => {
-        try {
-          assert.notStrictEqual(typeof ctx, 'undefined');
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }, e => {
-        done(e);
-      });
+    const ctx = await spo.ensureFormDigest('https://contoso.sharepoint.com', logger, undefined, false);
+    assert.notStrictEqual(typeof ctx, 'undefined');
   });
 
-  it('retrieves updated digestcontext when expireat is past date', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+  it('retrieves updated digestcontext when expireat is past date', async () => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/contextinfo') > -1) {
-        return Promise.resolve({
+        return {
           FormDigestValue: 'abc',
           FormDigestTimeoutSeconds: 1800,
           FormDigestExpiresAt: new Date(),
           WebFullUrl: 'https://contoso.sharepoint.com'
-        });
+        };
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     const pastDate = new Date();
@@ -206,27 +203,16 @@ describe('utils/spo', () => {
       WebFullUrl: 'https://contoso.sharepoint.com'
     };
 
-    spo
-      .ensureFormDigest('https://contoso.sharepoint.com', logger, ctx, false)
-      .then(ctx => {
-        try {
-          assert.notStrictEqual(typeof ctx, 'undefined');
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }, err => done(err));
+    const formCtx = await spo.ensureFormDigest('https://contoso.sharepoint.com', logger, ctx, false);
+    assert.notStrictEqual(typeof formCtx, 'undefined');
   });
 
-  it('retrieves updated digestcontext when expireat is past date (debug)', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+  it('retrieves updated digestcontext when expireat is past date (debug)', async () => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/contextinfo') > -1) {
-        return Promise.resolve({
-          FormDigestValue: 'abc'
-        });
+        return { FormDigestValue: 'abc' };
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     const pastDate = new Date();
@@ -239,25 +225,16 @@ describe('utils/spo', () => {
       WebFullUrl: 'https://contoso.sharepoint.com'
     };
 
-    spo
-      .ensureFormDigest('https://contoso.sharepoint.com', logger, ctx, false)
-      .then(ctx => {
-        try {
-          assert.notStrictEqual(typeof ctx, 'undefined');
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }, err => done(err));
+    const formCtx = await spo.ensureFormDigest('https://contoso.sharepoint.com', logger, ctx, false);
+    assert.notStrictEqual(typeof formCtx, 'undefined');
   });
 
-  it('handles error when contextinfo could not be retrieved (debug)', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+  it('handles error when contextinfo could not be retrieved (debug)', async () => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/contextinfo') > -1) {
-        return Promise.reject('Invalid request');
+        throw 'Different error than Invalid request';
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     const pastDate = new Date();
@@ -270,25 +247,23 @@ describe('utils/spo', () => {
       WebFullUrl: 'https://contoso.sharepoint.com'
     };
 
-    spo.ensureFormDigest('https://contoso.sharepoint.com', logger, ctx, true).catch((err?: any) => {
-      try {
-        assert(err === "Invalid request");
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    try {
+      await spo.ensureFormDigest('https://contoso.sharepoint.com', logger, ctx, true);
+      assert.fail('No error message thrown');
+    }
+    catch (e) {
+      assert.strictEqual(e, 'Different error than Invalid request');
+    }
   });
 
   it('retrieves tenant app catalog url', async () => {
     auth.connection.spoUrl = 'https://contoso.sharepoint.com';
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/_api/SP_TenantSettings_Current') {
-        return Promise.resolve({ CorporateCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' });
+        return { CorporateCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
 
@@ -298,537 +273,366 @@ describe('utils/spo', () => {
 
   it('returns null when tenant app catalog not configured', async () => {
     auth.connection.spoUrl = 'https://contoso.sharepoint.com';
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/_api/SP_TenantSettings_Current') {
-        return Promise.resolve({ CorporateCatalogUrl: null });
+        return { CorporateCatalogUrl: null };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     const tenantAppCatalogUrl = await spo.getTenantAppCatalogUrl(logger, false);
     assert.deepEqual(tenantAppCatalogUrl, null);
   });
 
-  it('handles error when retrieving SPO URL failed while retrieving tenant app catalog url', (done) => {
+  it('handles error when retrieving SPO URL failed while retrieving tenant app catalog url', async () => {
     const errorMessage = 'Couldn\'t retrieve SharePoint URL';
     auth.connection.spoUrl = undefined;
 
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/SP_TenantSettings_Current') > -1) {
-        return Promise.reject('An error has occurred');
+        throw 'An error has occurred';
       }
 
-      return Promise.reject(errorMessage);
+      throw errorMessage;
     });
 
-    spo
-      .getTenantAppCatalogUrl(logger, false)
-      .then(() => {
-        done('Expected error');
-      }, (err: string) => {
-        try {
-          assert.strictEqual(err, errorMessage);
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      });
+    try {
+      await spo.getTenantAppCatalogUrl(logger, false);
+      assert.fail('No error message thrown');
+    }
+    catch (e) {
+      assert.strictEqual(e, errorMessage);
+    }
   });
 
-  it('handles error when retrieving the tenant app catalog URL fails', (done) => {
+  it('handles error when retrieving the tenant app catalog URL fails', async () => {
     const errorMessage = 'Couldn\'t retrieve tenant app catalog URL';
     auth.connection.spoUrl = 'https://contoso.sharepoint.com';
 
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/SP_TenantSettings_Current') > -1) {
-        return Promise.reject(errorMessage);
+        throw errorMessage;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
-
-    spo
-      .getTenantAppCatalogUrl(logger, false)
-      .then(() => {
-        done('Expected error');
-      }, (err: string) => {
-        try {
-          assert.strictEqual(err, errorMessage);
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      });
+    try {
+      await spo.getTenantAppCatalogUrl(logger, false);
+      assert.fail('No error message thrown');
+    }
+    catch (e) {
+      assert.strictEqual(e, errorMessage);
+    }
   });
 
-  it('retrieves SPO URL from MS Graph when not retrieved previously', (done) => {
-    sinon.stub(auth, 'storeConnectionInfo').callsFake(() => Promise.resolve());
-    sinon.stub(request, 'get').callsFake((opts) => {
+  it('retrieves SPO URL from MS Graph when not retrieved previously', async () => {
+    sinon.stub(auth, 'storeConnectionInfo').resolves();
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/sites/root?$select=webUrl') {
-        return Promise.resolve({ webUrl: 'https://contoso.sharepoint.com' });
+        return { webUrl: 'https://contoso.sharepoint.com' };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
-    spo
-      .getSpoUrl(logger, false)
-      .then((spoUrl: string) => {
-        try {
-          assert.strictEqual(spoUrl, 'https://contoso.sharepoint.com');
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      });
+    const spoUrl = await spo.getSpoUrl(logger, false);
+    assert.strictEqual(spoUrl, 'https://contoso.sharepoint.com');
   });
 
-  it('retrieves SPO URL from MS Graph when not retrieved previously (debug)', (done) => {
-    sinon.stub(auth, 'storeConnectionInfo').callsFake(() => Promise.resolve());
-    sinon.stub(request, 'get').callsFake((opts) => {
+  it('retrieves SPO URL from MS Graph when not retrieved previously (debug)', async () => {
+    sinon.stub(auth, 'storeConnectionInfo').resolves();
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/sites/root?$select=webUrl') {
-        return Promise.resolve({ webUrl: 'https://contoso.sharepoint.com' });
+        return { webUrl: 'https://contoso.sharepoint.com' };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
-    spo
-      .getSpoUrl(logger, true)
-      .then((spoUrl: string) => {
-        try {
-          assert.strictEqual(spoUrl, 'https://contoso.sharepoint.com');
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      });
+    const spoUrl = await spo.getSpoUrl(logger, true);
+    assert.strictEqual(spoUrl, 'https://contoso.sharepoint.com');
   });
 
-  it('returns retrieved SPO URL when persisting connection info failed', (done) => {
-    sinon.stub(auth, 'storeConnectionInfo').callsFake(() => Promise.reject());
-    sinon.stub(request, 'get').callsFake((opts) => {
+  it('returns retrieved SPO URL when persisting connection info failed', async () => {
+    sinon.stub(auth, 'storeConnectionInfo').rejects();
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/sites/root?$select=webUrl') {
-        return Promise.resolve({ webUrl: 'https://contoso.sharepoint.com' });
+        return { webUrl: 'https://contoso.sharepoint.com' };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
-    spo
-      .getSpoUrl(logger, false)
-      .then((spoUrl: string) => {
-        try {
-          assert.strictEqual(spoUrl, 'https://contoso.sharepoint.com');
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      });
+    const spoUrl = await spo.getSpoUrl(logger, true);
+    assert.strictEqual(spoUrl, 'https://contoso.sharepoint.com');
   });
 
-  it('returns error when retrieving SPO URL failed', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+  it('throws error when ', async () => {
+    sinon.stub(auth, 'storeConnectionInfo').rejects();
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/sites/root?$select=webUrl') {
-        return Promise.reject('An error has occurred');
+        return { webUrl: 'https://contoso.sharepoint.com' };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
-    spo
-      .getSpoUrl(logger, false)
-      .then(() => {
-        done('Expected error');
-      }, (err: string) => {
-        try {
-          assert.strictEqual(err, 'An error has occurred');
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      });
+    const spoUrl = await spo.getSpoUrl(logger, true);
+    assert.strictEqual(spoUrl, 'https://contoso.sharepoint.com');
   });
 
-  it('returns error when retrieving SPO admin URL failed', (done) => {
-    sinon.stub(spo, 'getSpoUrl').callsFake(() => Promise.reject('An error has occurred'));
+  it('returns error when retrieving SPO URL failed', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/sites/root?$select=webUrl') {
+        throw 'An error has occurred';
+      }
 
-    spo
-      .getSpoAdminUrl(logger, false)
-      .then(() => {
-        done('Expected error');
-      }, (err: string) => {
-        try {
-          assert.strictEqual(err, 'An error has occurred');
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      });
+      throw 'Invalid request';
+    });
+
+    try {
+      await spo.getSpoUrl(logger, false);
+      assert.fail('No error message thrown');
+    }
+    catch (err) {
+      assert.strictEqual(err, 'An error has occurred');
+    }
   });
 
-  it('retrieves tenant ID when not retrieved previously', (done) => {
-    sinon.stub(auth, 'storeConnectionInfo').callsFake(() => Promise.resolve());
-    sinon.stub(request, 'post').callsFake((opts) => {
+  it('returns error when retrieving SPO admin URL failed', async () => {
+    sinon.stub(spo, 'getSpoUrl').rejects(new Error('An error has occurred'));
+
+    try {
+      await spo.getSpoAdminUrl(logger, false);
+      assert.fail('No error message thrown');
+    }
+    catch (err: any) {
+      assert.strictEqual(err.message, 'An error has occurred');
+    }
+  });
+
+  it('retrieves tenant ID when not retrieved previously', async () => {
+    sinon.stub(auth, 'storeConnectionInfo').resolves();
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === 'https://contoso-admin.sharepoint.com/_vti_bin/client.svc/ProcessQuery') {
-        return Promise.resolve(JSON.stringify([{
+        return JSON.stringify([{
           _ObjectIdentity_: 'tenantId'
-        }]));
+        }]);
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
-    sinon.stub(spo, 'getSpoAdminUrl').callsFake(() => Promise.resolve('https://contoso-admin.sharepoint.com'));
-    sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
+    sinon.stub(spo, 'getSpoAdminUrl').resolves('https://contoso-admin.sharepoint.com');
+    sinon.stub(spo, 'getRequestDigest').resolves({
       FormDigestValue: 'abc',
       FormDigestExpiresAt: new Date(),
       FormDigestTimeoutSeconds: 1800,
       WebFullUrl: 'https://contoso-admin.sharepoint.com'
-    }));
+    });
 
-    spo
-      .getTenantId(logger, false)
-      .then((tenantId: string) => {
-        try {
-          assert.strictEqual(tenantId, 'tenantId');
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      });
+    const tenantId = await spo.getTenantId(logger, false);
+    assert.strictEqual(tenantId, 'tenantId');
   });
 
-  it('retrieves tenant ID when not retrieved previously (debug)', (done) => {
-    sinon.stub(auth, 'storeConnectionInfo').callsFake(() => Promise.resolve());
-    sinon.stub(request, 'post').callsFake((opts) => {
+  it('retrieves tenant ID when not retrieved previously (debug)', async () => {
+    sinon.stub(auth, 'storeConnectionInfo').resolves();
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === 'https://contoso-admin.sharepoint.com/_vti_bin/client.svc/ProcessQuery') {
-        return Promise.resolve(JSON.stringify([{
+        return JSON.stringify([{
           _ObjectIdentity_: 'tenantId'
-        }]));
+        }]);
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
-    sinon.stub(spo, 'getSpoAdminUrl').callsFake(() => Promise.resolve('https://contoso-admin.sharepoint.com'));
-    sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
+    sinon.stub(spo, 'getSpoAdminUrl').resolves('https://contoso-admin.sharepoint.com');
+    sinon.stub(spo, 'getRequestDigest').resolves({
       FormDigestValue: 'abc',
       FormDigestExpiresAt: new Date(),
       FormDigestTimeoutSeconds: 1800,
       WebFullUrl: 'https://contoso-admin.sharepoint.com'
-    }));
+    });
 
-    spo
-      .getTenantId(logger, true)
-      .then((tenantId: string) => {
-        try {
-          assert.strictEqual(tenantId, 'tenantId');
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      });
+    const tenantId = await spo.getTenantId(logger, true);
+    assert.strictEqual(tenantId, 'tenantId');
   });
 
-  it('returns retrieved tenant ID when persisting connection info failed', (done) => {
-    sinon.stub(auth, 'storeConnectionInfo').callsFake(() => Promise.reject('An error has occurred'));
-    sinon.stub(request, 'post').callsFake((opts) => {
+  it('returns retrieved tenant ID when persisting connection info failed', async () => {
+    sinon.stub(auth, 'storeConnectionInfo').rejects('An error has occurred');
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === 'https://contoso-admin.sharepoint.com/_vti_bin/client.svc/ProcessQuery') {
-        return Promise.resolve(JSON.stringify([{
+        return JSON.stringify([{
           _ObjectIdentity_: 'tenantId'
-        }]));
+        }]);
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
-    sinon.stub(spo, 'getSpoAdminUrl').callsFake(() => Promise.resolve('https://contoso-admin.sharepoint.com'));
-    sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
+    sinon.stub(spo, 'getSpoAdminUrl').resolves('https://contoso-admin.sharepoint.com');
+    sinon.stub(spo, 'getRequestDigest').resolves({
       FormDigestValue: 'abc',
       FormDigestExpiresAt: new Date(),
       FormDigestTimeoutSeconds: 1800,
       WebFullUrl: 'https://contoso-admin.sharepoint.com'
-    }));
+    });
 
-    spo
-      .getTenantId(logger, false)
-      .then((tenantId: string) => {
-        try {
-          assert.strictEqual(tenantId, 'tenantId');
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      });
+    const tenantId = await spo.getTenantId(logger, true);
+    assert.strictEqual(tenantId, 'tenantId');
   });
 
-  it('returns error when retrieving tenant ID failed', (done) => {
-    sinon.stub(request, 'post').callsFake(() => Promise.reject('An error has occurred'));
-    sinon.stub(spo, 'getSpoAdminUrl').callsFake(() => Promise.resolve('https://contoso-admin.sharepoint.com'));
-    sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
+  it('returns error when retrieving tenant ID failed', async () => {
+    sinon.stub(request, 'post').rejects(new Error('An error has occurred'));
+    sinon.stub(spo, 'getSpoAdminUrl').resolves('https://contoso-admin.sharepoint.com');
+    sinon.stub(spo, 'getRequestDigest').resolves({
       FormDigestValue: 'abc',
       FormDigestExpiresAt: new Date(),
       FormDigestTimeoutSeconds: 1800,
       WebFullUrl: 'https://contoso-admin.sharepoint.com'
-    }));
-
-    spo
-      .getTenantId(logger, false)
-      .then(() => {
-        done('Error expected');
-      }, (err: any) => {
-        try {
-          assert.strictEqual(err, 'An error has occurred');
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      });
-  });
-
-  it('should reject if wrong url param', (done) => {
-    spo
-      .ensureFolder("abc", "abc", logger, true)
-      .then(() => {
-        done('Should reject, not resolve');
-      }, (err: any) => {
-        assert.strictEqual(err, 'webFullUrl is not a valid URL');
-        done();
-      });
-  });
-
-  it('should reject if empty folder param', (done) => {
-    spo
-      .ensureFolder("https://contoso.sharepoint.com", "", logger, true)
-      .then(() => {
-        done('Should reject, not resolve');
-      }, (err: any) => {
-        assert.strictEqual(err, 'folderToEnsure cannot be empty');
-        done();
-      });
-  });
-
-  it('should handle folder creation failure', (done) => {
-    const folderDoesNotExistErrorResp: any = new Promise<any>((resolve, reject) => {
-      return reject(JSON.stringify({ "odata.error": { "code": "-2130575338, Microsoft.SharePoint.SPException", "message": { "lang": "en-US", "value": "Error: Not found." } } }));
     });
 
+    try {
+      await spo.getTenantId(logger, false);
+      assert.fail('No error message thrown');
+    }
+    catch (err: any) {
+      assert.strictEqual(err.message, 'An error has occurred');
+    }
+  });
+
+  it('should reject if wrong url param', async () => {
+    try {
+      await spo.ensureFolder("abc", "abc", logger, true);
+      assert.fail('No error message thrown');
+    }
+    catch (err: any) {
+      assert.strictEqual(err.message, 'webFullUrl is not a valid URL');
+    }
+  });
+
+  it('should reject if empty folder param', async () => {
+    try {
+      await spo.ensureFolder("https://contoso.sharepoint.com", "", logger, true);
+      assert.fail('No error message thrown');
+    }
+    catch (err: any) {
+      assert.strictEqual(err.message, 'folderToEnsure cannot be empty');
+    }
+  });
+
+  it('should handle folder creation failure', async () => {
     const expectedError = JSON.stringify({ "odata.error": { "code": "-2130575338, Microsoft.SharePoint.SPException", "message": { "lang": "en-US", "value": "Error: Cannot create folder." } } });
 
-    const folderCreationErrorResp: any = new Promise<any>((resolve, reject) => {
-      return reject(expectedError);
-    });
+    stubGetResponses(JSON.stringify({ "odata.error": { "code": "-2130575338, Microsoft.SharePoint.SPException", "message": { "lang": "en-US", "value": "Error: Not found." } } }));
+    stubPostResponses(expectedError);
 
-    stubGetResponses(folderDoesNotExistErrorResp);
-    stubPostResponses(folderCreationErrorResp);
-
-    spo
-      .ensureFolder("https://contoso.sharepoint.com", "abc", logger, false)
-      .then(() => {
-        done('Should not resolve, but reject');
-      }, (err: any) => {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(expectedError));
-        done();
-      });
+    try {
+      await spo.ensureFolder("https://contoso.sharepoint.com", "abc", logger, false);
+      assert.fail('No error message thrown');
+    }
+    catch (err: any) {
+      assert.strictEqual(JSON.stringify(err), JSON.stringify(expectedError));
+    }
   });
 
-  it('should handle folder creation failure (debug)', (done) => {
-    const folderDoesNotExistErrorResp: any = new Promise<any>((resolve, reject) => {
-      return reject(JSON.stringify({ "odata.error": { "code": "-2130575338, Microsoft.SharePoint.SPException", "message": { "lang": "en-US", "value": "Error: Not found." } } }));
-    });
-
+  it('should handle folder creation failure (debug)', async () => {
     const expectedError = JSON.stringify({ "odata.error": { "code": "-2130575338, Microsoft.SharePoint.SPException", "message": { "lang": "en-US", "value": "Error: Cannot create folder." } } });
 
-    const folderCreationErrorResp: any = new Promise<any>((resolve, reject) => {
-      return reject(expectedError);
-    });
+    stubGetResponses(JSON.stringify({ "odata.error": { "code": "-2130575338, Microsoft.SharePoint.SPException", "message": { "lang": "en-US", "value": "Error: Not found." } } }));
+    stubPostResponses(expectedError);
 
-    stubGetResponses(folderDoesNotExistErrorResp);
-    stubPostResponses(folderCreationErrorResp);
-
-    spo
-      .ensureFolder("https://contoso.sharepoint.com", "abc", logger, true)
-      .then(() => {
-        done('Should not resolve, but reject');
-      }, (err: any) => {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(expectedError));
-        done();
-      });
+    try {
+      await spo.ensureFolder("https://contoso.sharepoint.com", "abc", logger, true);
+      assert.fail('No error message thrown');
+    }
+    catch (err: any) {
+      assert.strictEqual(JSON.stringify(err), JSON.stringify(expectedError));
+    }
   });
 
-  it('should succeed in adding folder if it does not exist (debug)', (done) => {
-    const folderDoesNotExistErrorResp: any = new Promise<any>((resolve, reject) => {
-      return reject(JSON.stringify({ "odata.error": { "code": "-2130575338, Microsoft.SharePoint.SPException", "message": { "lang": "en-US", "value": "Error: Not found." } } }));
-    });
-    stubGetResponses(folderDoesNotExistErrorResp);
+  it('should succeed in adding folder if it does not exist (debug)', async () => {
+    stubGetResponses(JSON.stringify({ "odata.error": { "code": "-2130575338, Microsoft.SharePoint.SPException", "message": { "lang": "en-US", "value": "Error: Not found." } } }));
     stubPostResponses();
 
-    spo
-      .ensureFolder("https://contoso.sharepoint.com", "abc", logger, true)
-      .then(() => {
-        assert.strictEqual(loggerLogSpy.lastCall.args[0], 'All sub-folders exist');
-        done();
-      }, (err: any) => {
-        done(err);
-      });
+    await spo.ensureFolder("https://contoso.sharepoint.com", "abc", logger, true);
+    assert.strictEqual(loggerLogSpy.lastCall.args[0], 'All sub-folders exist');
   });
 
-  it('should succeed in adding folder if it does not exist', (done) => {
-    const folderDoesNotExistErrorResp: any = new Promise<any>((resolve, reject) => {
-      return reject(JSON.stringify({ "odata.error": { "code": "-2130575338, Microsoft.SharePoint.SPException", "message": { "lang": "en-US", "value": "Error: Not found." } } }));
-    });
-    stubGetResponses(folderDoesNotExistErrorResp);
+  it('should succeed in adding folder if it does not exist', async () => {
+    stubGetResponses(JSON.stringify({ "odata.error": { "code": "-2130575338, Microsoft.SharePoint.SPException", "message": { "lang": "en-US", "value": "Error: Not found." } } }));
     stubPostResponses();
 
-    spo
-      .ensureFolder("https://contoso.sharepoint.com", "abc", logger, false)
-      .then(() => {
-        assert.strictEqual(loggerLogSpy.notCalled, true);
-        done();
-      }, (err: any) => {
-        done(err);
-      });
+    await spo.ensureFolder("https://contoso.sharepoint.com", "abc", logger, false);
+    assert.strictEqual(loggerLogSpy.notCalled, true);
   });
 
-  it('should succeed if all folders exist (debug)', (done) => {
+  it('should succeed if all folders exist (debug)', async () => {
     stubPostResponses();
     stubGetResponses();
 
-    spo
-      .ensureFolder("https://contoso.sharepoint.com", "abc", logger, true)
-      .then(() => {
-        assert.strictEqual(loggerLogSpy.called, true);
-        done();
-      }, (err: any) => {
-        done(err);
-      });
+    await spo.ensureFolder("https://contoso.sharepoint.com", "abc", logger, true);
+    assert.strictEqual(loggerLogSpy.called, true);
   });
 
-  it('should succeed if all folders exist', (done) => {
+  it('should succeed if all folders exist', async () => {
     stubPostResponses();
     stubGetResponses();
 
-    spo
-      .ensureFolder("https://contoso.sharepoint.com", "abc", logger, false)
-      .then(() => {
-        assert.strictEqual(loggerLogSpy.called, false);
-        done();
-      }, (err: any) => {
-        done(err);
-      });
+    await spo.ensureFolder("https://contoso.sharepoint.com", "abc", logger, false);
+    assert.strictEqual(loggerLogSpy.called, false);
   });
 
-  it('should have the correct url when calling AddSubFolderUsingPath (POST)', (done) => {
+  it('should have the correct url when calling AddSubFolderUsingPath (POST)', async () => {
     const postStubs: sinon.SinonStub = stubPostResponses();
-    const folderDoesNotExistErrorResp: any = new Promise<any>((resolve, reject) => {
-      return reject(JSON.stringify({ "odata.error": { "code": "-2130575338, Microsoft.SharePoint.SPException", "message": { "lang": "en-US", "value": "Error: Not found." } } }));
-    });
-    stubGetResponses(folderDoesNotExistErrorResp);
+    stubGetResponses(JSON.stringify({ "odata.error": { "code": "-2130575338, Microsoft.SharePoint.SPException", "message": { "lang": "en-US", "value": "Error: Not found." } } }));
 
-    spo
-      .ensureFolder("https://contoso.sharepoint.com", "/folder2/folder3", logger, true)
-      .then(() => {
-        assert.strictEqual(postStubs.lastCall.args[0].url, 'https://contoso.sharepoint.com/_api/web/GetFolderByServerRelativePath(DecodedUrl=@a1)/AddSubFolderUsingPath(DecodedUrl=@a2)?@a1=%27%2Ffolder2%27&@a2=%27folder3%27');
-        done();
-      }, (err: any) => {
-        done(err);
-      });
+    await spo.ensureFolder("https://contoso.sharepoint.com", "/folder2/folder3", logger, true);
+    assert.strictEqual(postStubs.lastCall.args[0].url, 'https://contoso.sharepoint.com/_api/web/GetFolderByServerRelativePath(DecodedUrl=@a1)/AddSubFolderUsingPath(DecodedUrl=@a2)?@a1=%27%2Ffolder2%27&@a2=%27folder3%27');
   });
 
-  it('should have the correct url including uppercase letters when calling AddSubFolderUsingPath', (done) => {
+  it('should have the correct url including uppercase letters when calling AddSubFolderUsingPath', async () => {
     const postStubs: sinon.SinonStub = stubPostResponses();
-    const folderDoesNotExistErrorResp: any = new Promise<any>((resolve, reject) => {
-      return reject(JSON.stringify({ "odata.error": { "code": "-2130575338, Microsoft.SharePoint.SPException", "message": { "lang": "en-US", "value": "Error: Not found." } } }));
-    });
-    stubGetResponses(folderDoesNotExistErrorResp);
 
-    spo
-      .ensureFolder("https://contoso.sharepoint.com/sites/Site1", "/folder2/folder3", logger, true)
-      .then(() => {
-        assert.strictEqual(postStubs.lastCall.args[0].url, 'https://contoso.sharepoint.com/sites/Site1/_api/web/GetFolderByServerRelativePath(DecodedUrl=@a1)/AddSubFolderUsingPath(DecodedUrl=@a2)?@a1=%27%2Fsites%2FSite1%2Ffolder2%27&@a2=%27folder3%27');
-        done();
-      }, (err: any) => {
-        done(err);
-      });
+    stubGetResponses(JSON.stringify({ "odata.error": { "code": "-2130575338, Microsoft.SharePoint.SPException", "message": { "lang": "en-US", "value": "Error: Not found." } } }));
+
+    await spo.ensureFolder("https://contoso.sharepoint.com/sites/Site1", "/folder2/folder3", logger, true);
+    assert.strictEqual(postStubs.lastCall.args[0].url, 'https://contoso.sharepoint.com/sites/Site1/_api/web/GetFolderByServerRelativePath(DecodedUrl=@a1)/AddSubFolderUsingPath(DecodedUrl=@a2)?@a1=%27%2Fsites%2FSite1%2Ffolder2%27&@a2=%27folder3%27');
   });
 
-  it('should call two times AddSubFolderUsingPath when folderUrl is folder2/folder3', (done) => {
+  it('should call two times AddSubFolderUsingPath when folderUrl is folder2/folder3', async () => {
     const postStubs: sinon.SinonStub = stubPostResponses();
-    const folderDoesNotExistErrorResp: any = new Promise<any>((resolve, reject) => {
-      return reject(JSON.stringify({ "odata.error": { "code": "-2130575338, Microsoft.SharePoint.SPException", "message": { "lang": "en-US", "value": "Error: Not found." } } }));
-    });
-    stubGetResponses(folderDoesNotExistErrorResp);
+    stubGetResponses(JSON.stringify({ "odata.error": { "code": "-2130575338, Microsoft.SharePoint.SPException", "message": { "lang": "en-US", "value": "Error: Not found." } } }));
 
-    spo
-      .ensureFolder("https://contoso.sharepoint.com/sites/Site1", "/folder2/folder3", logger, true)
-      .then(() => {
-        assert.strictEqual(postStubs.getCall(0).args[0].url, 'https://contoso.sharepoint.com/sites/Site1/_api/web/GetFolderByServerRelativePath(DecodedUrl=@a1)/AddSubFolderUsingPath(DecodedUrl=@a2)?@a1=%27%2Fsites%2FSite1%27&@a2=%27folder2%27');
-        assert.strictEqual(postStubs.getCall(1).args[0].url, 'https://contoso.sharepoint.com/sites/Site1/_api/web/GetFolderByServerRelativePath(DecodedUrl=@a1)/AddSubFolderUsingPath(DecodedUrl=@a2)?@a1=%27%2Fsites%2FSite1%2Ffolder2%27&@a2=%27folder3%27');
-        done();
-      }, (err: any) => {
-        done(err);
-      });
+    await spo.ensureFolder("https://contoso.sharepoint.com/sites/Site1", "/folder2/folder3", logger, true);
+    assert.strictEqual(postStubs.getCall(0).args[0].url, 'https://contoso.sharepoint.com/sites/Site1/_api/web/GetFolderByServerRelativePath(DecodedUrl=@a1)/AddSubFolderUsingPath(DecodedUrl=@a2)?@a1=%27%2Fsites%2FSite1%27&@a2=%27folder2%27');
+    assert.strictEqual(postStubs.getCall(1).args[0].url, 'https://contoso.sharepoint.com/sites/Site1/_api/web/GetFolderByServerRelativePath(DecodedUrl=@a1)/AddSubFolderUsingPath(DecodedUrl=@a2)?@a1=%27%2Fsites%2FSite1%2Ffolder2%27&@a2=%27folder3%27');
   });
 
-  it('should handle end slashes in the command options for webUrl and for folder', (done) => {
+  it('should handle end slashes in the command options for webUrl and for folder', async () => {
     const postStubs: sinon.SinonStub = stubPostResponses();
-    const folderDoesNotExistErrorResp: any = new Promise<any>((resolve, reject) => {
-      return reject(JSON.stringify({ "odata.error": { "code": "-2130575338, Microsoft.SharePoint.SPException", "message": { "lang": "en-US", "value": "Error: Not found." } } }));
-    });
-    stubGetResponses(folderDoesNotExistErrorResp);
+    stubGetResponses(JSON.stringify({ "odata.error": { "code": "-2130575338, Microsoft.SharePoint.SPException", "message": { "lang": "en-US", "value": "Error: Not found." } } }));
 
-    spo
-      .ensureFolder("https://contoso.sharepoint.com/sites/Site1/", "/folder2/folder3/", logger, true)
-      .then(() => {
-        assert.strictEqual(postStubs.getCall(0).args[0].url, 'https://contoso.sharepoint.com/sites/Site1/_api/web/GetFolderByServerRelativePath(DecodedUrl=@a1)/AddSubFolderUsingPath(DecodedUrl=@a2)?@a1=%27%2Fsites%2FSite1%27&@a2=%27folder2%27');
-        assert.strictEqual(postStubs.getCall(1).args[0].url, 'https://contoso.sharepoint.com/sites/Site1/_api/web/GetFolderByServerRelativePath(DecodedUrl=@a1)/AddSubFolderUsingPath(DecodedUrl=@a2)?@a1=%27%2Fsites%2FSite1%2Ffolder2%27&@a2=%27folder3%27');
-        done();
-      }, (err: any) => {
-        done(err);
-      });
+    await spo.ensureFolder("https://contoso.sharepoint.com/sites/Site1/", "/folder2/folder3/", logger, true);
+    assert.strictEqual(postStubs.getCall(0).args[0].url, 'https://contoso.sharepoint.com/sites/Site1/_api/web/GetFolderByServerRelativePath(DecodedUrl=@a1)/AddSubFolderUsingPath(DecodedUrl=@a2)?@a1=%27%2Fsites%2FSite1%27&@a2=%27folder2%27');
+    assert.strictEqual(postStubs.getCall(1).args[0].url, 'https://contoso.sharepoint.com/sites/Site1/_api/web/GetFolderByServerRelativePath(DecodedUrl=@a1)/AddSubFolderUsingPath(DecodedUrl=@a2)?@a1=%27%2Fsites%2FSite1%2Ffolder2%27&@a2=%27folder3%27');
   });
 
-  it('should have the correct url when folder option has uppercase letters when calling AddSubFolderUsingPath', (done) => {
+  it('should have the correct url when folder option has uppercase letters when calling AddSubFolderUsingPath', async () => {
     const postStubs: sinon.SinonStub = stubPostResponses();
-    const folderDoesNotExistErrorResp: any = new Promise<any>((resolve, reject) => {
-      return reject(JSON.stringify({ "odata.error": { "code": "-2130575338, Microsoft.SharePoint.SPException", "message": { "lang": "en-US", "value": "Error: Not found." } } }));
-    });
-    stubGetResponses(folderDoesNotExistErrorResp);
+    stubGetResponses(JSON.stringify({ "odata.error": { "code": "-2130575338, Microsoft.SharePoint.SPException", "message": { "lang": "en-US", "value": "Error: Not found." } } }));
 
-    spo
-      .ensureFolder("https://contoso.sharepoint.com/sites/site1/", "PnP1/Folder2/", logger, true)
-      .then(() => {
-        assert.strictEqual(postStubs.getCall(0).args[0].url, 'https://contoso.sharepoint.com/sites/site1/_api/web/GetFolderByServerRelativePath(DecodedUrl=@a1)/AddSubFolderUsingPath(DecodedUrl=@a2)?@a1=%27%2Fsites%2Fsite1%27&@a2=%27PnP1%27');
-        assert.strictEqual(postStubs.getCall(1).args[0].url, 'https://contoso.sharepoint.com/sites/site1/_api/web/GetFolderByServerRelativePath(DecodedUrl=@a1)/AddSubFolderUsingPath(DecodedUrl=@a2)?@a1=%27%2Fsites%2Fsite1%2FPnP1%27&@a2=%27Folder2%27');
-        done();
-      }, (err: any) => {
-        done(err);
-      });
+    await spo.ensureFolder("https://contoso.sharepoint.com/sites/site1/", "PnP1/Folder2/", logger, true);
+    assert.strictEqual(postStubs.getCall(0).args[0].url, 'https://contoso.sharepoint.com/sites/site1/_api/web/GetFolderByServerRelativePath(DecodedUrl=@a1)/AddSubFolderUsingPath(DecodedUrl=@a2)?@a1=%27%2Fsites%2Fsite1%27&@a2=%27PnP1%27');
+    assert.strictEqual(postStubs.getCall(1).args[0].url, 'https://contoso.sharepoint.com/sites/site1/_api/web/GetFolderByServerRelativePath(DecodedUrl=@a1)/AddSubFolderUsingPath(DecodedUrl=@a2)?@a1=%27%2Fsites%2Fsite1%2FPnP1%27&@a2=%27Folder2%27');
   });
 
-  it('should call GetFolderByServerRelativeUrl with the correct url OData values', (done) => {
+  it('should call GetFolderByServerRelativeUrl with the correct url OData values', async () => {
     stubPostResponses();
     const getStubs: sinon.SinonStub = stubGetResponses();
 
-    spo
-      .ensureFolder("https://contoso.sharepoint.com/sites/Site1", "/folder2/folder3", logger, true)
-      .then(() => {
-        assert.strictEqual(getStubs.getCall(0).args[0].url, 'https://contoso.sharepoint.com/sites/Site1/_api/web/GetFolderByServerRelativePath(DecodedUrl=\'%2Fsites%2FSite1%2Ffolder2\')');
-        assert.strictEqual(getStubs.getCall(1).args[0].url, 'https://contoso.sharepoint.com/sites/Site1/_api/web/GetFolderByServerRelativePath(DecodedUrl=\'%2Fsites%2FSite1%2Ffolder2%2Ffolder3\')');
-        done();
-      }, (err: any) => {
-        done(err);
-      });
+    await spo.ensureFolder("https://contoso.sharepoint.com/sites/Site1", "/folder2/folder3", logger, true);
+    assert.strictEqual(getStubs.getCall(0).args[0].url, 'https://contoso.sharepoint.com/sites/Site1/_api/web/GetFolderByServerRelativePath(DecodedUrl=\'%2Fsites%2FSite1%2Ffolder2\')');
+    assert.strictEqual(getStubs.getCall(1).args[0].url, 'https://contoso.sharepoint.com/sites/Site1/_api/web/GetFolderByServerRelativePath(DecodedUrl=\'%2Fsites%2FSite1%2Ffolder2%2Ffolder3\')');
   });
 
   //#region Custom Action Mock Responses
@@ -842,15 +646,15 @@ describe('utils/spo', () => {
   //#endregion
 
   it(`returns a list of custom actions with scope 'All'`, async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/Site/UserCustomActions') > -1) {
-        return Promise.resolve({ value: customActionsOnSiteResponse });
+        return { value: customActionsOnSiteResponse };
       }
       else if ((opts.url as string).indexOf('/_api/Web/UserCustomActions') > -1) {
-        return Promise.resolve({ value: customActionsOnWebResponse });
+        return { value: customActionsOnWebResponse };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     const customActions = await spo.getCustomActions('https://contoso.sharepoint.com/sites/sales', 'All');
@@ -861,12 +665,12 @@ describe('utils/spo', () => {
   });
 
   it(`returns a list of custom actions with scope 'Site'`, async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/Site/UserCustomActions') > -1) {
-        return Promise.resolve({ value: customActionsOnSiteResponse });
+        return { value: customActionsOnSiteResponse };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     const customActions = await spo.getCustomActions('https://contoso.sharepoint.com/sites/sales', 'Site');
@@ -874,12 +678,12 @@ describe('utils/spo', () => {
   });
 
   it(`returns a list of custom actions with scope 'Web'`, async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/Web/UserCustomActions') > -1) {
-        return Promise.resolve({ value: customActionsOnWebResponse });
+        return { value: customActionsOnWebResponse };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     const customActions = await spo.getCustomActions('https://contoso.sharepoint.com/sites/sales', 'Web');
@@ -887,12 +691,12 @@ describe('utils/spo', () => {
   });
 
   it(`returns a list of custom actions with scope 'Web' with a filter`, async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/Web/UserCustomActions?$filter=ClientSideComponentId eq guid'b41916e7-e69d-467f-b37f-ff8ecf8f99f2'`) > -1) {
-        return Promise.resolve({ value: [customActionOnWebResponse1] });
+        return { value: [customActionOnWebResponse1] };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     const customActions = await spo.getCustomActions('https://contoso.sharepoint.com/sites/sales', 'Web', `ClientSideComponentId eq guid'b41916e7-e69d-467f-b37f-ff8ecf8f99f2'`);
@@ -900,15 +704,15 @@ describe('utils/spo', () => {
   });
 
   it(`retrieves a custom action by id with scope 'All'`, async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/Site/UserCustomActions(guid'd1e5e0d6-109d-40c4-a53e-924073fe9bbd')`) > -1) {
-        return Promise.resolve(customActionOnSiteResponse1);
+        return customActionOnSiteResponse1;
       }
       else if ((opts.url as string).indexOf(`/_api/Web/UserCustomActions(guid'd1e5e0d6-109d-40c4-a53e-924073fe9bbd')`) > -1) {
-        return Promise.resolve({ 'odata.null': true });
+        return { 'odata.null': true };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     const customAction = await spo.getCustomActionById('https://contoso.sharepoint.com/sites/sales', 'd1e5e0d6-109d-40c4-a53e-924073fe9bbd');
@@ -916,12 +720,12 @@ describe('utils/spo', () => {
   });
 
   it(`retrieves a custom action by id with scope 'Site'`, async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/Site/UserCustomActions(guid'd1e5e0d6-109d-40c4-a53e-924073fe9bbd')`) > -1) {
-        return Promise.resolve(customActionOnSiteResponse1);
+        return customActionOnSiteResponse1;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     const customAction = await spo.getCustomActionById('https://contoso.sharepoint.com/sites/sales', 'd1e5e0d6-109d-40c4-a53e-924073fe9bbd', 'Site');
@@ -946,25 +750,7 @@ describe('utils/spo', () => {
     assert.deepEqual(customAction, '6cc1797e-5463-45ec-bb1a-b93ec198bab6');
   });
 
-  it(`retrieves spo user by email sucessfully`, async () => {
-    const userResponse = {
-      Id: 11,
-      IsHiddenInUI: false,
-      LoginName: 'i:0#.f|membership|john.doe@contoso.com',
-      Title: 'John Doe',
-      PrincipalType: 1,
-      Email: 'john.doe@contoso.com',
-      Expiration: '',
-      IsEmailAuthenticationGuestUser: false,
-      IsShareByEmailGuestUser: false,
-      IsSiteAdmin: false,
-      UserId: {
-        NameId: '10032002473c5ae3',
-        NameIdIssuer: 'urn:federation:microsoftonline'
-      },
-      UserPrincipalName: 'john.doe@contoso.com'
-    };
-
+  it(`retrieves spo user by email successfully`, async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://contoso.sharepoint.com/sites/sales/_api/web/siteusers/GetByEmail('${formatting.encodeQueryParameter('john.doe@contoso.com')}')`) {
         return userResponse;
@@ -975,6 +761,104 @@ describe('utils/spo', () => {
 
     const user = await spo.getUserByEmail('https://contoso.sharepoint.com/sites/sales', 'john.doe@contoso.com', logger, true);
     assert.deepEqual(user, userResponse);
+  });
+
+  it('successfully returns a SharePoint user when calling ensureUser', async () => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso.sharepoint.com/sites/sales/_api/web/EnsureUser') {
+        return userResponse;
+      }
+
+      throw 'Invalid request: ' + opts.url;
+    });
+
+    const user = await spo.ensureUser('https://contoso.sharepoint.com/sites/sales', 'john.doe@contoso.com');
+    assert.deepStrictEqual(user, userResponse);
+  });
+
+  it('successfully ensures a SharePoint user when calling ensureUser', async () => {
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso.sharepoint.com/sites/sales/_api/web/EnsureUser') {
+        return userResponse;
+      }
+
+      throw 'Invalid request: ' + opts.url;
+    });
+
+    await spo.ensureUser('https://contoso.sharepoint.com/sites/sales', 'john.doe@contoso.com');
+    assert.deepStrictEqual(postStub.firstCall.args[0].data, { logonName: 'john.doe@contoso.com' });
+  });
+
+  it('successfully throws an error when calling ensureEntraGroup with a group that is not security enabled', async () => {
+    const graphGroup: Group = {
+      id: '38243edd-76c7-4d6d-9093-9e90e6e7e28a',
+      displayName: 'Sales',
+      securityEnabled: false,
+      mailEnabled: false
+    };
+
+    await assert.rejects(spo.ensureEntraGroup('https://contoso.sharepoint.com/sites/sales', graphGroup),
+      new Error('Cannot ensure a Microsoft Entra ID group that is not security enabled.'));
+  });
+
+  it('successfully outputs the ensured group when calling ensureEntraGroup', async () => {
+    const graphGroup: Group = {
+      id: '38243edd-76c7-4d6d-9093-9e90e6e7e28a',
+      displayName: 'Sales',
+      securityEnabled: true,
+      mailEnabled: false
+    };
+
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso.sharepoint.com/sites/sales/_api/web/EnsureUser') {
+        return entraGroupResponse;
+      }
+
+      throw 'Invalid request: ' + opts.url;
+    });
+
+    const group = await spo.ensureEntraGroup('https://contoso.sharepoint.com/sites/sales', graphGroup);
+    assert.deepStrictEqual(group, entraGroupResponse);
+  });
+
+  it('successfully ensures security group when calling ensureEntraGroup', async () => {
+    const graphGroup: Group = {
+      id: '38243edd-76c7-4d6d-9093-9e90e6e7e28a',
+      displayName: 'Sales',
+      securityEnabled: true,
+      mailEnabled: false
+    };
+
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso.sharepoint.com/sites/sales/_api/web/EnsureUser') {
+        return entraGroupResponse;
+      }
+
+      throw 'Invalid request: ' + opts.url;
+    });
+
+    await spo.ensureEntraGroup('https://contoso.sharepoint.com/sites/sales', graphGroup);
+    assert.deepStrictEqual(postStub.firstCall.args[0].data, { logonName: `c:0t.c|tenant|${graphGroup.id}` });
+  });
+
+  it('successfully ensures M365 group when calling ensureEntraGroup', async () => {
+    const graphGroup: Group = {
+      id: '38243edd-76c7-4d6d-9093-9e90e6e7e28a',
+      displayName: 'Sales',
+      securityEnabled: true,
+      mailEnabled: true
+    };
+
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso.sharepoint.com/sites/sales/_api/web/EnsureUser') {
+        return entraGroupResponse;
+      }
+
+      throw 'Invalid request: ' + opts.url;
+    });
+
+    await spo.ensureEntraGroup('https://contoso.sharepoint.com/sites/sales', graphGroup);
+    assert.deepStrictEqual(postStub.firstCall.args[0].data, { logonName: `c:0o.c|federateddirectoryclaimprovider|${graphGroup.id}` });
   });
 
   it(`throws error retrieving a custom action by id with a wrong scope value`, async () => {
@@ -1301,7 +1185,7 @@ describe('utils/spo', () => {
             }, 185, {
               "IsNull": false
             }, 186, {
-              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SpoOperation", "_ObjectIdentity_": "e13c489e-304e-5000-8242-705e26a87302|908bed80-a04a-4433-b4a0-883d9847d110:67753f63-bc14-4012-869e-f808a43fe023\nSpoOperation\nRemoveDeletedSite\n636536266495764941\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fteam\ncb09f194-0ee7-4c48-a44f-8c112fff4d4e", "IsComplete": true, "PollingInterval": 15000
+              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SpoOperation", "_ObjectIdentity_": "e13c489e-304e-5000-8242-705e26a87302|908bed80-a04a-4433-b4a0-883d9847d110:67753f63-bc14-4012-869e-f808a43fe023\nSpoOperation\nRemoveDeletedSite\n636536266495764941\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fteam\ncb09f194-0ee7-4c48-a44f-8c112fff4d4e", "IsComplete": true, "PollingInterval": 0
             }
           ]);
         }
@@ -1366,7 +1250,7 @@ describe('utils/spo', () => {
 
               ], "RequireAcceptingAccountMatchInvitedAccount": false, "RequireAnonymousLinksExpireInDays": 0, "ResourceQuota": 5300, "ResourceQuotaAllocated": 1200, "RootSiteUrl": "https:\u002f\u002fcontoso.sharepoint.com", "SearchResolveExactEmailOrUPN": false, "SharingAllowedDomainList": null, "SharingBlockedDomainList": null, "SharingCapability": 2, "SharingDomainRestrictionMode": 0, "ShowAllUsersClaim": true, "ShowEveryoneClaim": true, "ShowEveryoneExceptExternalUsersClaim": true, "ShowNGSCDialogForSyncOnODB": true, "ShowPeoplePickerSuggestionsForGuestUsers": false, "SignInAccelerationDomain": "", "SpecialCharactersStateInFileFolderNames": 1, "StartASiteFormUrl": null, "StorageQuota": 1061376, "StorageQuotaAllocated": 10669260800, "UseFindPeopleInPeoplePicker": false, "UsePersistentCookiesForExplorerView": false, "UserVoiceForFeedbackEnabled": true
             }, 8, {
-              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SpoOperation", "_ObjectIdentity_": "d53a489e-c0c0-5000-58fc-d03b433dca89|908bed80-a04a-4433-b4a0-883d9847d110:67753f63-bc14-4012-869e-f808a43fe023\nSpoOperation\nCreateSite\n636536245073557362\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fteam\n00000000-0000-0000-0000-000000000000", "IsComplete": false, "PollingInterval": 15000
+              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SpoOperation", "_ObjectIdentity_": "d53a489e-c0c0-5000-58fc-d03b433dca89|908bed80-a04a-4433-b4a0-883d9847d110:67753f63-bc14-4012-869e-f808a43fe023\nSpoOperation\nCreateSite\n636536245073557362\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fteam\n00000000-0000-0000-0000-000000000000", "IsComplete": false, "PollingInterval": 0
             }
           ]);
         }
@@ -1377,18 +1261,13 @@ describe('utils/spo', () => {
             {
               "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7324.1200", "ErrorInfo": null, "TraceCorrelationId": "803b489e-9066-5000-58fc-dc40eb096913"
             }, 39, {
-              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SpoOperation", "_ObjectIdentity_": "803b489e-9066-5000-58fc-dc40eb096913|908bed80-a04a-4433-b4a0-883d9847d110:67753f63-bc14-4012-869e-f808a43fe023\nSpoOperation\nCreateSite\n636536251347192220\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fteam\n00000000-0000-0000-0000-000000000000", "IsComplete": true, "PollingInterval": 5000
+              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SpoOperation", "_ObjectIdentity_": "803b489e-9066-5000-58fc-dc40eb096913|908bed80-a04a-4433-b4a0-883d9847d110:67753f63-bc14-4012-869e-f808a43fe023\nSpoOperation\nCreateSite\n636536251347192220\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fteam\n00000000-0000-0000-0000-000000000000", "IsComplete": true, "PollingInterval": 0
             }
           ]);
         }
       }
 
       throw 'invalid request';
-    });
-
-    sinon.stub(global, 'setTimeout').callsFake((fn) => {
-      fn();
-      return {} as any;
     });
 
     await spo.deleteSiteFromTheRecycleBin('https://contoso.sharepoint.com', logger, true, true);
@@ -1418,7 +1297,7 @@ describe('utils/spo', () => {
 
               ], "RequireAcceptingAccountMatchInvitedAccount": false, "RequireAnonymousLinksExpireInDays": 0, "ResourceQuota": 5300, "ResourceQuotaAllocated": 1200, "RootSiteUrl": "https:\u002f\u002fcontoso.sharepoint.com", "SearchResolveExactEmailOrUPN": false, "SharingAllowedDomainList": null, "SharingBlockedDomainList": null, "SharingCapability": 2, "SharingDomainRestrictionMode": 0, "ShowAllUsersClaim": true, "ShowEveryoneClaim": true, "ShowEveryoneExceptExternalUsersClaim": true, "ShowNGSCDialogForSyncOnODB": true, "ShowPeoplePickerSuggestionsForGuestUsers": false, "SignInAccelerationDomain": "", "SpecialCharactersStateInFileFolderNames": 1, "StartASiteFormUrl": null, "StorageQuota": 1061376, "StorageQuotaAllocated": 10669260800, "UseFindPeopleInPeoplePicker": false, "UsePersistentCookiesForExplorerView": false, "UserVoiceForFeedbackEnabled": true
             }, 8, {
-              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SpoOperation", "_ObjectIdentity_": "d53a489e-c0c0-5000-58fc-d03b433dca89|908bed80-a04a-4433-b4a0-883d9847d110:67753f63-bc14-4012-869e-f808a43fe023\nSpoOperation\nCreateSite\n636536245073557362\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fteam\n00000000-0000-0000-0000-000000000000", "IsComplete": true, "PollingInterval": 15000
+              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SpoOperation", "_ObjectIdentity_": "d53a489e-c0c0-5000-58fc-d03b433dca89|908bed80-a04a-4433-b4a0-883d9847d110:67753f63-bc14-4012-869e-f808a43fe023\nSpoOperation\nCreateSite\n636536245073557362\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fteam\n00000000-0000-0000-0000-000000000000", "IsComplete": true, "PollingInterval": 0
             }
           ]);
         }
@@ -1456,7 +1335,7 @@ describe('utils/spo', () => {
 
               ], "RequireAcceptingAccountMatchInvitedAccount": false, "RequireAnonymousLinksExpireInDays": 0, "ResourceQuota": 5300, "ResourceQuotaAllocated": 1200, "RootSiteUrl": "https:\u002f\u002fcontoso.sharepoint.com", "SearchResolveExactEmailOrUPN": false, "SharingAllowedDomainList": null, "SharingBlockedDomainList": null, "SharingCapability": 2, "SharingDomainRestrictionMode": 0, "ShowAllUsersClaim": true, "ShowEveryoneClaim": true, "ShowEveryoneExceptExternalUsersClaim": true, "ShowNGSCDialogForSyncOnODB": true, "ShowPeoplePickerSuggestionsForGuestUsers": false, "SignInAccelerationDomain": "", "SpecialCharactersStateInFileFolderNames": 1, "StartASiteFormUrl": null, "StorageQuota": 1061376, "StorageQuotaAllocated": 10669260800, "UseFindPeopleInPeoplePicker": false, "UsePersistentCookiesForExplorerView": false, "UserVoiceForFeedbackEnabled": true
             }, 8, {
-              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SpoOperation", "_ObjectIdentity_": "d53a489e-c0c0-5000-58fc-d03b433dca89|908bed80-a04a-4433-b4a0-883d9847d110:67753f63-bc14-4012-869e-f808a43fe023\nSpoOperation\nCreateSite\n636536245073557362\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fteam\n00000000-0000-0000-0000-000000000000", "IsComplete": false, "PollingInterval": 15000
+              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SpoOperation", "_ObjectIdentity_": "d53a489e-c0c0-5000-58fc-d03b433dca89|908bed80-a04a-4433-b4a0-883d9847d110:67753f63-bc14-4012-869e-f808a43fe023\nSpoOperation\nCreateSite\n636536245073557362\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fteam\n00000000-0000-0000-0000-000000000000", "IsComplete": false, "PollingInterval": 0
             }
           ]);
         }
@@ -1465,18 +1344,13 @@ describe('utils/spo', () => {
             {
               "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7324.1200", "ErrorInfo": null, "TraceCorrelationId": "803b489e-9066-5000-58fc-dc40eb096913"
             }, 39, {
-              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SpoOperation", "_ObjectIdentity_": "803b489e-9066-5000-58fc-dc40eb096913|908bed80-a04a-4433-b4a0-883d9847d110:67753f63-bc14-4012-869e-f808a43fe023\nSpoOperation\nCreateSite\n636536251347192220\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fteam\n00000000-0000-0000-0000-000000000000", "IsComplete": true, "PollingInterval": 5000
+              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SpoOperation", "_ObjectIdentity_": "803b489e-9066-5000-58fc-dc40eb096913|908bed80-a04a-4433-b4a0-883d9847d110:67753f63-bc14-4012-869e-f808a43fe023\nSpoOperation\nCreateSite\n636536251347192220\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fteam\n00000000-0000-0000-0000-000000000000", "IsComplete": true, "PollingInterval": 0
             }
           ]);
         }
       }
 
       throw 'invalid request';
-    });
-
-    sinon.stub(global, 'setTimeout').callsFake((fn) => {
-      fn();
-      return {} as any;
     });
 
     await spo.addSite('team', logger, true, true, 'ClassicSite', undefined, undefined, 'john.doe@contoso.com', undefined, true, undefined, undefined, 1033, 'https://contoso.sharepoint.com/sites/team', undefined, undefined, 4, 'PUBLISHING#0', 100, 90, 300, 275);
@@ -1788,7 +1662,7 @@ describe('utils/spo', () => {
             }, 15, {
               "_ObjectIdentity_": "54d8499e-b001-5000-cb83-9445b3944fb9|908bed80-a04a-4433-b4a0-883d9847d110:67753f63-bc14-4012-869e-f808a43fe023\nSiteProperties\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fteam"
             }, 16, {
-              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SpoOperation", "_ObjectIdentity_": "54d8499e-b001-5000-cb83-9445b3944fb9|908bed80-a04a-4433-b4a0-883d9847d110:67753f63-bc14-4012-869e-f808a43fe023\nSpoOperation\nSetSite\n636540580851601240\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fteam\n00000000-0000-0000-0000-000000000000", "IsComplete": false, "PollingInterval": 15000
+              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SpoOperation", "_ObjectIdentity_": "54d8499e-b001-5000-cb83-9445b3944fb9|908bed80-a04a-4433-b4a0-883d9847d110:67753f63-bc14-4012-869e-f808a43fe023\nSpoOperation\nSetSite\n636540580851601240\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fteam\n00000000-0000-0000-0000-000000000000", "IsComplete": false, "PollingInterval": 0
             }
           ]);
         }
@@ -1798,18 +1672,13 @@ describe('utils/spo', () => {
             {
               "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7324.1200", "ErrorInfo": null, "TraceCorrelationId": "803b489e-9066-5000-58fc-dc40eb096913"
             }, 39, {
-              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SpoOperation", "_ObjectIdentity_": "803b489e-9066-5000-58fc-dc40eb096913|908bed80-a04a-4433-b4a0-883d9847d110:67753f63-bc14-4012-869e-f808a43fe023\nSpoOperation\nSetSite\n636540580851601240\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fteam\n00000000-0000-0000-0000-000000000000", "IsComplete": true, "PollingInterval": 5000
+              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SpoOperation", "_ObjectIdentity_": "803b489e-9066-5000-58fc-dc40eb096913|908bed80-a04a-4433-b4a0-883d9847d110:67753f63-bc14-4012-869e-f808a43fe023\nSpoOperation\nSetSite\n636540580851601240\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fteam\n00000000-0000-0000-0000-000000000000", "IsComplete": true, "PollingInterval": 0
             }
           ]);
         }
       }
 
       throw 'invalid request';
-    });
-
-    sinon.stub(global, 'setTimeout').callsFake((fn) => {
-      fn();
-      return {} as any;
     });
 
     await spo.updateSite('https://contoso.sharepoint.com', logger, true, 'team', 'HBI', true, true, 'john.doe@contoso.com,sansa.stark@contoso.com', true, 'eb2f31da-9461-4fbf-9ea1-9959b134b89e', 'Disabled');
@@ -1845,7 +1714,7 @@ describe('utils/spo', () => {
             {
               "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7324.1200", "ErrorInfo": null, "TraceCorrelationId": "803b489e-9066-5000-58fc-dc40eb096913"
             }, 39, {
-              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SpoOperation", "_ObjectIdentity_": "803b489e-9066-5000-58fc-dc40eb096913|908bed80-a04a-4433-b4a0-883d9847d110:67753f63-bc14-4012-869e-f808a43fe023\nSpoOperation\nSetSite\n636540580851601240\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fteam\n00000000-0000-0000-0000-000000000000", "IsComplete": true, "PollingInterval": 5000
+              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SpoOperation", "_ObjectIdentity_": "803b489e-9066-5000-58fc-dc40eb096913|908bed80-a04a-4433-b4a0-883d9847d110:67753f63-bc14-4012-869e-f808a43fe023\nSpoOperation\nSetSite\n636540580851601240\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fteam\n00000000-0000-0000-0000-000000000000", "IsComplete": true, "PollingInterval": 0
             }
           ]);
         }
@@ -1888,7 +1757,7 @@ describe('utils/spo', () => {
             {
               "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7324.1200", "ErrorInfo": null, "TraceCorrelationId": "803b489e-9066-5000-58fc-dc40eb096913"
             }, 39, {
-              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SpoOperation", "_ObjectIdentity_": "803b489e-9066-5000-58fc-dc40eb096913|908bed80-a04a-4433-b4a0-883d9847d110:67753f63-bc14-4012-869e-f808a43fe023\nSpoOperation\nSetSite\n636540580851601240\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fteam\n00000000-0000-0000-0000-000000000000", "IsComplete": true, "PollingInterval": 5000
+              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SpoOperation", "_ObjectIdentity_": "803b489e-9066-5000-58fc-dc40eb096913|908bed80-a04a-4433-b4a0-883d9847d110:67753f63-bc14-4012-869e-f808a43fe023\nSpoOperation\nSetSite\n636540580851601240\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fteam\n00000000-0000-0000-0000-000000000000", "IsComplete": true, "PollingInterval": 0
             }
           ]);
         }
@@ -2081,13 +1950,13 @@ describe('utils/spo', () => {
   });
 
   it('returns the correct site ID for a valid site', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       const expectedUrl = 'https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com:/?$select=id';
       if (opts.url === expectedUrl) {
-        return Promise.resolve({ id: 'contoso.sharepoint.com,ea49a393-e3e6-4760-a1b2-e96539e15372,66e2861c-96d9-4418-a75c-0ed1bca68b42' });
+        return { id: 'contoso.sharepoint.com,ea49a393-e3e6-4760-a1b2-e96539e15372,66e2861c-96d9-4418-a75c-0ed1bca68b42' };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     const id = await spo.getSiteId('https://contoso.sharepoint.com', logger);
@@ -2523,12 +2392,12 @@ describe('utils/spo', () => {
       }
     };
 
-    sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
+    sinon.stub(spo, 'getRequestDigest').resolves({
       FormDigestValue: 'abc',
       FormDigestExpiresAt: new Date(),
       FormDigestTimeoutSeconds: 1800,
       WebFullUrl: 'https://contoso-admin.sharepoint.com'
-    }));
+    });
 
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://contoso.sharepoint.com/sites/sales/_vti_bin/client.svc/ProcessQuery`) {
@@ -2550,12 +2419,12 @@ describe('utils/spo', () => {
   });
 
   it(`handles ClientSvc unknown error when requesting the ObjectIdentity fails`, async () => {
-    sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
+    sinon.stub(spo, 'getRequestDigest').resolves({
       FormDigestValue: 'abc',
       FormDigestExpiresAt: new Date(),
       FormDigestTimeoutSeconds: 1800,
       WebFullUrl: 'https://contoso-admin.sharepoint.com'
-    }));
+    });
 
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://contoso.sharepoint.com/sites/sales/_vti_bin/client.svc/ProcessQuery`) {
@@ -2577,12 +2446,12 @@ describe('utils/spo', () => {
   });
 
   it(`handles error when _ObjectIdentity_ not found when requesting the ObjectIdentity fails`, async () => {
-    sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
+    sinon.stub(spo, 'getRequestDigest').resolves({
       FormDigestValue: 'abc',
       FormDigestExpiresAt: new Date(),
       FormDigestTimeoutSeconds: 1800,
       WebFullUrl: 'https://contoso-admin.sharepoint.com'
-    }));
+    });
 
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://contoso.sharepoint.com/sites/sales/_vti_bin/client.svc/ProcessQuery`) {
@@ -2612,5 +2481,107 @@ describe('utils/spo', () => {
     catch (ex) {
       assert.deepStrictEqual(ex, 'Cannot proceed. _ObjectIdentity_ not found');
     }
+  });
+
+  it(`throws an error when waiting until a process is resulting in an error`, async () => {
+    const objectIdentity = {
+      "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SpoOperation",
+      "_ObjectIdentity_": "5492dba0-70ae-7000-66f6-1306e17a5220|908bed80-a04a-4433-b4a0-883d9847d110:1e852b49-bf4b-4ba5-bcd4-a8c4706c8ed4\nSpoOperation\nRemoveDeletedSite\n638306152161051712\nhttps%3a%2f%2fcontoso.sharepoint.com%2fteams%2fsales\nd8476b67-4a80-4261-a94f-431a2d0b5d3e",
+      "IsComplete": true,
+      "PollingInterval": 0
+    };
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso.sharepoint.com/_vti_bin/client.svc/ProcessQuery') {
+        return JSON.stringify([
+          {
+            "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7324.1200", "ErrorInfo": {
+              "ErrorMessage": "An error has occurred.", "ErrorValue": null, "TraceCorrelationId": "b33c489e-009b-5000-8240-a8c28e5fd8b4", "ErrorCode": -1, "ErrorTypeName": "SPException"
+            }, "TraceCorrelationId": "b33c489e-009b-5000-8240-a8c28e5fd8b4"
+          }
+        ]);
+      }
+
+      if (opts.url === 'https://contoso.sharepoint.com/_api/contextinfo') {
+        return { FormDigestValue: 'abc' };
+      }
+
+      throw 'Invalid request';
+    });
+
+    const ctx: FormDigestInfo = {
+      FormDigestValue: 'value',
+      FormDigestTimeoutSeconds: 1800,
+      FormDigestExpiresAt: new Date(),
+      WebFullUrl: 'https://contoso.sharepoint.com'
+    };
+
+    try {
+      await spo.waitUntilFinished({
+        operationId: JSON.stringify(objectIdentity),
+        siteUrl: 'https://contoso.sharepoint.com',
+        logger,
+        currentContext: ctx,
+        verbose: false,
+        debug: false
+      });
+      assert.fail('No error message thrown.');
+    }
+    catch (ex: any) {
+      assert.deepStrictEqual(ex.message, 'An error has occurred.');
+    }
+  });
+
+  it(`will retry when an operation is not finished after the first attempt`, async () => {
+    let amountOfCalls = 0;
+    const objectIdentity: SpoOperation = {
+      _ObjectIdentity_: "5492dba0-70ae-7000-66f6-1306e17a5220|908bed80-a04a-4433-b4a0-883d9847d110:1e852b49-bf4b-4ba5-bcd4-a8c4706c8ed4\nSpoOperation\nRemoveDeletedSite\n638306152161051712\nhttps%3a%2f%2fcontoso.sharepoint.com%2fteams%2fsales\nd8476b67-4a80-4261-a94f-431a2d0b5d3e",
+      IsComplete: false,
+      PollingInterval: 0
+    };
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      amountOfCalls++;
+      if (opts.url === 'https://contoso.sharepoint.com/_vti_bin/client.svc/ProcessQuery') {
+        if (amountOfCalls > 2) {
+          objectIdentity.IsComplete = true;
+        }
+        return JSON.stringify([
+          {
+            "SchemaVersion": "15.0.0.0",
+            "LibraryVersion": "16.0.24030.12011",
+            "ErrorInfo": null,
+            "TraceCorrelationId": "5492dba0-70ae-7000-66f6-1306e17a5220"
+          },
+          185,
+          {
+            "IsNull": false
+          },
+          186,
+          objectIdentity
+        ]);
+      }
+
+      if (opts.url === 'https://contoso.sharepoint.com/_api/contextinfo') {
+        return { FormDigestValue: 'abc' };
+      }
+
+      throw 'Invalid request';
+    });
+
+    const ctx: FormDigestInfo = {
+      FormDigestValue: 'value',
+      FormDigestTimeoutSeconds: 1800,
+      FormDigestExpiresAt: new Date(),
+      WebFullUrl: 'https://contoso.sharepoint.com'
+    };
+
+    await spo.waitUntilFinished({
+      operationId: JSON.stringify(objectIdentity),
+      siteUrl: 'https://contoso.sharepoint.com',
+      logger,
+      currentContext: ctx,
+      verbose: false,
+      debug: false
+    });
+    assert.strictEqual(amountOfCalls, 4);
   });
 });

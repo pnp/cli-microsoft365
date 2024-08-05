@@ -18,10 +18,11 @@ import { SiteProperties } from '../m365/spo/commands/site/SiteProperties.js';
 import { entraGroup } from './entraGroup.js';
 import { SharingCapabilities } from '../m365/spo/commands/site/SharingCapabilities.js';
 import { WebProperties } from '../m365/spo/commands/web/WebProperties.js';
-import { Site, Drive, DriveItem } from '@microsoft/microsoft-graph-types';
+import { Group, Site, Drive, DriveItem } from '@microsoft/microsoft-graph-types';
 import { ListItemInstance } from '../m365/spo/commands/listitem/ListItemInstance.js';
 import { ListItemFieldValueResult } from '../m365/spo/commands/listitem/ListItemFieldValueResult.js';
-import { FileProperties } from '../m365/spo/commands/file/FileProperties.js';
+import { FileProperties } from '../m365/spo/commands/file/FileProperties.js'; import { setTimeout } from 'timers/promises';
+
 export interface ContextInfo {
   FormDigestTimeoutSeconds: number;
   FormDigestValue: string;
@@ -69,9 +70,27 @@ interface FormValues {
   FieldValue: string;
 }
 
+export interface User {
+  Id: number;
+  IsHiddenInUI: boolean;
+  LoginName: string;
+  Title: string;
+  PrincipalType: number;
+  Email: string;
+  Expiration: string;
+  IsEmailAuthenticationGuestUser: boolean;
+  IsShareByEmailGuestUser: boolean;
+  IsSiteAdmin: boolean;
+  UserId: {
+    NameId: string;
+    NameIdIssuer: string;
+  } | null;
+  UserPrincipalName: string | null;
+}
+
 export const spo = {
-  getRequestDigest(siteUrl: string): Promise<FormDigestInfo> {
-    const requestOptions: any = {
+  async getRequestDigest(siteUrl: string): Promise<FormDigestInfo> {
+    const requestOptions: CliRequestOptions = {
       url: `${siteUrl}/_api/contextinfo`,
       headers: {
         accept: 'application/json;odata=nometadata'
@@ -82,88 +101,69 @@ export const spo = {
     return request.post(requestOptions);
   },
 
-  ensureFormDigest(siteUrl: string, logger: Logger, context: FormDigestInfo | undefined, debug: boolean): Promise<FormDigestInfo> {
-    return new Promise<FormDigestInfo>(async (resolve: (context: FormDigestInfo) => void, reject: (error: any) => void): Promise<void> => {
-      if (validation.isValidFormDigest(context)) {
-        if (debug) {
-          await logger.logToStderr('Existing form digest still valid');
+  async ensureFormDigest(siteUrl: string, logger: Logger, context: FormDigestInfo | undefined, debug: boolean): Promise<FormDigestInfo> {
+    if (validation.isValidFormDigest(context)) {
+      if (debug) {
+        await logger.logToStderr('Existing form digest still valid');
+      }
+
+      return context as FormDigestInfo;
+    }
+
+    const res: FormDigestInfo = await spo.getRequestDigest(siteUrl);
+    const now: Date = new Date();
+    now.setSeconds(now.getSeconds() + res.FormDigestTimeoutSeconds - 5);
+    context = {
+      FormDigestValue: res.FormDigestValue,
+      FormDigestTimeoutSeconds: res.FormDigestTimeoutSeconds,
+      FormDigestExpiresAt: now,
+      WebFullUrl: res.WebFullUrl
+    };
+    return context;
+  },
+
+  async waitUntilFinished({ operationId, siteUrl, logger, currentContext, debug, verbose }: { operationId: string, siteUrl: string, logger: Logger, currentContext: FormDigestInfo, debug: boolean, verbose: boolean }): Promise<void> {
+    const resFormDigest = await spo.ensureFormDigest(siteUrl, logger, currentContext, debug);
+    currentContext = resFormDigest;
+    if (debug) {
+      await logger.logToStderr(`Checking if operation ${operationId} completed...`);
+    }
+
+    const requestOptions: CliRequestOptions = {
+      url: `${siteUrl}/_vti_bin/client.svc/ProcessQuery`,
+      headers: {
+        'X-RequestDigest': currentContext.FormDigestValue
+      },
+      data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Query Id="188" ObjectPathId="184"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true" /><Property Name="PollingInterval" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Identity Id="184" Name="${operationId.replace(/\\n/g, '&#xA;').replace(/"/g, '')}" /></ObjectPaths></Request>`
+    };
+
+    const res: string = await request.post(requestOptions);
+    const json: ClientSvcResponse = JSON.parse(res);
+    const response: ClientSvcResponseContents = json[0];
+    if (response.ErrorInfo) {
+      throw new Error(response.ErrorInfo.ErrorMessage);
+    }
+    else {
+      const operation: SpoOperation = json[json.length - 1];
+      const isComplete: boolean = operation.IsComplete;
+      if (isComplete) {
+        if (!debug && verbose) {
+          process.stdout.write('\n');
         }
 
-        resolve(context as FormDigestInfo);
         return;
       }
 
-      spo
-        .getRequestDigest(siteUrl)
-        .then((res: FormDigestInfo): void => {
-          const now: Date = new Date();
-          now.setSeconds(now.getSeconds() + res.FormDigestTimeoutSeconds - 5);
-          context = {
-            FormDigestValue: res.FormDigestValue,
-            FormDigestTimeoutSeconds: res.FormDigestTimeoutSeconds,
-            FormDigestExpiresAt: now,
-            WebFullUrl: res.WebFullUrl
-          };
-
-          resolve(context);
-        }, (error: any): void => {
-          reject(error);
-        });
-    });
-  },
-
-  waitUntilFinished({ operationId, siteUrl, resolve, reject, logger, currentContext, debug, verbose }: { operationId: string, siteUrl: string, resolve: () => void, reject: (error: any) => void, logger: Logger, currentContext: FormDigestInfo, debug: boolean, verbose: boolean }): void {
-    spo
-      .ensureFormDigest(siteUrl, logger, currentContext, debug)
-      .then(async (res: FormDigestInfo): Promise<string> => {
-        currentContext = res;
-
-        if (debug) {
-          await logger.logToStderr(`Checking if operation ${operationId} completed...`);
-        }
-
-        const requestOptions: any = {
-          url: `${siteUrl}/_vti_bin/client.svc/ProcessQuery`,
-          headers: {
-            'X-RequestDigest': currentContext.FormDigestValue
-          },
-          data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Query Id="188" ObjectPathId="184"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true" /><Property Name="PollingInterval" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Identity Id="184" Name="${operationId.replace(/\\n/g, '&#xA;').replace(/"/g, '')}" /></ObjectPaths></Request>`
-        };
-
-        return request.post(requestOptions);
-      })
-      .then((res: string): void => {
-        const json: ClientSvcResponse = JSON.parse(res);
-        const response: ClientSvcResponseContents = json[0];
-        if (response.ErrorInfo) {
-          reject(response.ErrorInfo.ErrorMessage);
-        }
-        else {
-          const operation: SpoOperation = json[json.length - 1];
-          const isComplete: boolean = operation.IsComplete;
-          if (isComplete) {
-            if (!debug && verbose) {
-              process.stdout.write('\n');
-            }
-
-            resolve();
-            return;
-          }
-
-          setTimeout(() => {
-            spo.waitUntilFinished({
-              operationId: JSON.stringify(operation._ObjectIdentity_),
-              siteUrl,
-              resolve,
-              reject,
-              logger,
-              currentContext,
-              debug,
-              verbose
-            });
-          }, operation.PollingInterval);
-        }
+      await setTimeout(operation.PollingInterval);
+      await spo.waitUntilFinished({
+        operationId: JSON.stringify(operation._ObjectIdentity_),
+        siteUrl,
+        logger,
+        currentContext,
+        debug,
+        verbose
       });
+    }
   },
 
   async getSpoUrl(logger: Logger, debug: boolean): Promise<string> {
@@ -172,51 +172,38 @@ export const spo = {
         await logger.logToStderr(`SPO URL previously retrieved ${auth.connection.spoUrl}. Returning...`);
       }
 
-      return Promise.resolve(auth.connection.spoUrl);
+      return auth.connection.spoUrl;
     }
 
-    return new Promise<string>(async (resolve: (spoUrl: string) => void, reject: (error: any) => void): Promise<void> => {
+    if (debug) {
+      await logger.logToStderr(`No SPO URL available. Retrieving from MS Graph...`);
+    }
+
+    const requestOptions: CliRequestOptions = {
+      url: `https://graph.microsoft.com/v1.0/sites/root?$select=webUrl`,
+      headers: {
+        'accept': 'application/json;odata.metadata=none'
+      },
+      responseType: 'json'
+    };
+
+    const res: { webUrl: string } = await request.get<{ webUrl: string }>(requestOptions);
+
+    auth.connection.spoUrl = res.webUrl;
+    try {
+      await auth.storeConnectionInfo();
+    }
+    catch (e: any) {
       if (debug) {
-        await logger.logToStderr(`No SPO URL available. Retrieving from MS Graph...`);
+        await logger.logToStderr('Error while storing connection info');
       }
-
-      const requestOptions: any = {
-        url: `https://graph.microsoft.com/v1.0/sites/root?$select=webUrl`,
-        headers: {
-          'accept': 'application/json;odata.metadata=none'
-        },
-        responseType: 'json'
-      };
-
-      request
-        .get<{ webUrl: string }>(requestOptions)
-        .then((res: { webUrl: string }): Promise<void> => {
-          auth.connection.spoUrl = res.webUrl;
-          return auth.storeConnectionInfo();
-        })
-        .then((): void => {
-          resolve(auth.connection.spoUrl as string);
-        }, (err: any): void => {
-          if (auth.connection.spoUrl) {
-            resolve(auth.connection.spoUrl);
-          }
-          else {
-            reject(err);
-          }
-        });
-    });
+    }
+    return auth.connection.spoUrl;
   },
 
-  getSpoAdminUrl(logger: Logger, debug: boolean): Promise<string> {
-    return new Promise<string>((resolve: (spoAdminUrl: string) => void, reject: (error: any) => void): void => {
-      spo
-        .getSpoUrl(logger, debug)
-        .then((spoUrl: string): void => {
-          resolve(spoUrl.replace(/(https:\/\/)([^\.]+)(.*)/, '$1$2-admin$3'));
-        }, (error: any): void => {
-          reject(error);
-        });
-    });
+  async getSpoAdminUrl(logger: Logger, debug: boolean): Promise<string> {
+    const spoUrl = await spo.getSpoUrl(logger, debug);
+    return (spoUrl.replace(/(https:\/\/)([^\.]+)(.*)/, '$1$2-admin$3'));
   },
 
   async getTenantId(logger: Logger, debug: boolean): Promise<string> {
@@ -225,50 +212,37 @@ export const spo = {
         await logger.logToStderr(`SPO Tenant ID previously retrieved ${auth.connection.spoTenantId}. Returning...`);
       }
 
-      return Promise.resolve(auth.connection.spoTenantId);
+      return auth.connection.spoTenantId;
     }
 
-    return new Promise<string>(async (resolve: (spoUrl: string) => void, reject: (error: any) => void): Promise<void> => {
+    if (debug) {
+      await logger.logToStderr(`No SPO Tenant ID available. Retrieving...`);
+    }
+
+    const spoAdminUrl = await spo.getSpoAdminUrl(logger, debug);
+    const contextInfo: ContextInfo = await spo.getRequestDigest(spoAdminUrl);
+
+    const tenantInfoRequestOptions: CliRequestOptions = {
+      url: `${spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
+      headers: {
+        'X-RequestDigest': contextInfo.FormDigestValue,
+        accept: 'application/json;odata=nometadata'
+      },
+      data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="4" ObjectPathId="3" /><Query Id="5" ObjectPathId="3"><Query SelectAllProperties="true"><Properties /></Query></Query></Actions><ObjectPaths><Constructor Id="3" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`
+    };
+
+    const res: string = await request.post(tenantInfoRequestOptions);
+    const json: string[] = JSON.parse(res);
+    auth.connection.spoTenantId = (json[json.length - 1] as any)._ObjectIdentity_.replace('\n', '&#xA;');
+    try {
+      await auth.storeConnectionInfo();
+    }
+    catch (e: any) {
       if (debug) {
-        await logger.logToStderr(`No SPO Tenant ID available. Retrieving...`);
+        await logger.logToStderr('Error while storing connection info');
       }
-
-      let spoAdminUrl: string = '';
-
-      spo
-        .getSpoAdminUrl(logger, debug)
-        .then((_spoAdminUrl: string): Promise<ContextInfo> => {
-          spoAdminUrl = _spoAdminUrl;
-          return spo.getRequestDigest(spoAdminUrl);
-        })
-        .then((contextInfo: ContextInfo): Promise<string> => {
-          const tenantInfoRequestOptions = {
-            url: `${spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
-            headers: {
-              'X-RequestDigest': contextInfo.FormDigestValue,
-              accept: 'application/json;odata=nometadata'
-            },
-            data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="4" ObjectPathId="3" /><Query Id="5" ObjectPathId="3"><Query SelectAllProperties="true"><Properties /></Query></Query></Actions><ObjectPaths><Constructor Id="3" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`
-          };
-
-          return request.post(tenantInfoRequestOptions);
-        })
-        .then((res: string): Promise<void> => {
-          const json: string[] = JSON.parse(res);
-          auth.connection.spoTenantId = (json[json.length - 1] as any)._ObjectIdentity_.replace('\n', '&#xA;');
-          return auth.storeConnectionInfo();
-        })
-        .then((): void => {
-          resolve(auth.connection.spoTenantId as string);
-        }, (err: any): void => {
-          if (auth.connection.spoTenantId) {
-            resolve(auth.connection.spoTenantId);
-          }
-          else {
-            reject(err);
-          }
-        });
-    });
+    }
+    return auth.connection.spoTenantId as string;
   },
 
   /**
@@ -299,11 +273,11 @@ export const spo = {
   async ensureFolder(webFullUrl: string, folderToEnsure: string, logger: Logger, debug: boolean): Promise<void> {
     const webUrl = url.parse(webFullUrl);
     if (!webUrl.protocol || !webUrl.hostname) {
-      return Promise.reject('webFullUrl is not a valid URL');
+      throw new Error('webFullUrl is not a valid URL');
     }
 
     if (!folderToEnsure) {
-      return Promise.reject('folderToEnsure cannot be empty');
+      throw new Error('folderToEnsure cannot be empty');
     }
 
     // remove last '/' of webFullUrl if exists
@@ -336,13 +310,13 @@ export const spo = {
     }
 
     // recursive function
-    const checkOrAddFolder = async (resolve: () => void, reject: (error: any) => void): Promise<void> => {
+    async function checkOrAddFolder(): Promise<void> {
       if (folderIndex === folders.length) {
         if (debug) {
           await logger.log(`All sub-folders exist`);
         }
 
-        return resolve();
+        return;
       }
 
       // append the next sub-folder to the folder path and check if it exists
@@ -350,44 +324,44 @@ export const spo = {
       nextFolder += `/${folders[folderIndex]}`;
       const folderServerRelativeUrl = urlUtil.getServerRelativePath(webFullUrl, nextFolder);
 
-      const requestOptions: any = {
+      const requestOptions: CliRequestOptions = {
         url: `${webFullUrl}/_api/web/GetFolderByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(folderServerRelativeUrl)}')`,
         headers: {
           'accept': 'application/json;odata=nometadata'
         }
       };
+      try {
+        await request.get(requestOptions);
 
-      request
-        .get(requestOptions)
-        .then(() => {
+        folderIndex++;
+        await checkOrAddFolder();
+      }
+      catch {
+        const prevFolderServerRelativeUrl: string = urlUtil.getServerRelativePath(webFullUrl, prevFolder);
+        const requestOptions: CliRequestOptions = {
+          url: `${webFullUrl}/_api/web/GetFolderByServerRelativePath(DecodedUrl=@a1)/AddSubFolderUsingPath(DecodedUrl=@a2)?@a1=%27${formatting.encodeQueryParameter(prevFolderServerRelativeUrl)}%27&@a2=%27${formatting.encodeQueryParameter(folders[folderIndex])}%27`,
+          headers: {
+            'accept': 'application/json;odata=nometadata'
+          },
+          responseType: 'json'
+        };
+        try {
+          await request.post(requestOptions);
           folderIndex++;
-          checkOrAddFolder(resolve, reject);
-        })
-        .catch(() => {
-          const prevFolderServerRelativeUrl: string = urlUtil.getServerRelativePath(webFullUrl, prevFolder);
-          const requestOptions: any = {
-            url: `${webFullUrl}/_api/web/GetFolderByServerRelativePath(DecodedUrl=@a1)/AddSubFolderUsingPath(DecodedUrl=@a2)?@a1=%27${formatting.encodeQueryParameter(prevFolderServerRelativeUrl)}%27&@a2=%27${formatting.encodeQueryParameter(folders[folderIndex])}%27`,
-            headers: {
-              'accept': 'application/json;odata=nometadata'
-            },
-            responseType: 'json'
-          };
+          await checkOrAddFolder();
+        }
+        catch (err) {
+          if (debug) {
+            await logger.log(`Could not create sub-folder ${folderServerRelativeUrl}`);
+          }
+          throw err;
+        }
 
-          return request.post(requestOptions)
-            .then(() => {
-              folderIndex++;
-              checkOrAddFolder(resolve, reject);
-            })
-            .catch(async (err: any) => {
-              if (debug) {
-                await logger.log(`Could not create sub-folder ${folderServerRelativeUrl}`);
-              }
 
-              reject(err);
-            });
-        });
+      }
     };
-    return new Promise<void>(checkOrAddFolder);
+
+    return checkOrAddFolder();
   },
 
   /**
@@ -400,8 +374,8 @@ export const spo = {
    * @param webUrl web url
    * @param formDigestValue formDigestValue
    */
-  getCurrentWebIdentity(webUrl: string, formDigestValue: string): Promise<IdentityResponse> {
-    const requestOptions: any = {
+  async getCurrentWebIdentity(webUrl: string, formDigestValue: string): Promise<IdentityResponse> {
+    const requestOptions: CliRequestOptions = {
       url: `${webUrl}/_vti_bin/client.svc/ProcessQuery`,
       headers: {
         'X-RequestDigest': formDigestValue
@@ -409,26 +383,22 @@ export const spo = {
       data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Query Id="1" ObjectPathId="5"><Query SelectAllProperties="false"><Properties><Property Name="ServerRelativeUrl" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Property Id="5" ParentId="3" Name="Web" /><StaticProperty Id="3" TypeId="{3747adcd-a3c3-41b9-bfab-4a64dd2f1e0a}" Name="Current" /></ObjectPaths></Request>`
     };
 
-    return new Promise<IdentityResponse>((resolve: (identity: IdentityResponse) => void, reject: (error: any) => void): void => {
-      request.post<string>(requestOptions).then((res: string): void => {
-        const json: ClientSvcResponse = JSON.parse(res);
+    const res: string = await request.post<string>(requestOptions);
+    const json: ClientSvcResponse = JSON.parse(res);
 
-        const contents: ClientSvcResponseContents = json.find(x => { return x.ErrorInfo; });
-        if (contents && contents.ErrorInfo) {
-          return reject(contents.ErrorInfo.ErrorMessage || 'ClientSvc unknown error');
-        }
+    const contents: ClientSvcResponseContents = json.find(x => { return x.ErrorInfo; });
+    if (contents && contents.ErrorInfo) {
+      throw contents.ErrorInfo.ErrorMessage || 'ClientSvc unknown error';
+    }
 
-        const identityObject: { _ObjectIdentity_: string; ServerRelativeUrl: string } = json.find(x => { return x._ObjectIdentity_; });
-        if (identityObject) {
-          return resolve({
-            objectIdentity: identityObject._ObjectIdentity_,
-            serverRelativeUrl: identityObject.ServerRelativeUrl
-          });
-        }
-
-        reject('Cannot proceed. _ObjectIdentity_ not found'); // this is not supposed to happen
-      }, (err: any): void => { reject(err); });
-    });
+    const identityObject: { _ObjectIdentity_: string; ServerRelativeUrl: string } = json.find(x => { return x._ObjectIdentity_; });
+    if (identityObject) {
+      return {
+        objectIdentity: identityObject._ObjectIdentity_,
+        serverRelativeUrl: identityObject.ServerRelativeUrl
+      };
+    }
+    throw 'Cannot proceed. _ObjectIdentity_ not found';
   },
 
   /**
@@ -438,10 +408,10 @@ export const spo = {
    * @param siteAccessToken site access token
    * @param formDigestValue formDigestValue
    */
-  getEffectiveBasePermissions(webObjectIdentity: string, webUrl: string, formDigestValue: string, logger: Logger, debug: boolean): Promise<BasePermissions> {
+  async getEffectiveBasePermissions(webObjectIdentity: string, webUrl: string, formDigestValue: string, logger: Logger, debug: boolean): Promise<BasePermissions> {
     const basePermissionsResult: BasePermissions = new BasePermissions();
 
-    const requestOptions: any = {
+    const requestOptions: CliRequestOptions = {
       url: `${webUrl}/_vti_bin/client.svc/ProcessQuery`,
       headers: {
         'X-RequestDigest': formDigestValue
@@ -449,28 +419,26 @@ export const spo = {
       data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Query Id="11" ObjectPathId="5"><Query SelectAllProperties="false"><Properties><Property Name="EffectiveBasePermissions" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Identity Id="5" Name="${webObjectIdentity}" /></ObjectPaths></Request>`
     };
 
-    return new Promise<BasePermissions>((resolve: (permissions: BasePermissions) => void, reject: (error: any) => void): void => {
-      request.post<string>(requestOptions).then(async (res: string): Promise<void> => {
-        if (debug) {
-          await logger.log('Attempt to get the web EffectiveBasePermissions');
-        }
 
-        const json: ClientSvcResponse = JSON.parse(res);
-        const contents: ClientSvcResponseContents = json.find(x => { return x.ErrorInfo; });
-        if (contents && contents.ErrorInfo) {
-          return reject(contents.ErrorInfo.ErrorMessage || 'ClientSvc unknown error');
-        }
+    const res: string = await request.post<string>(requestOptions);
+    if (debug) {
+      await logger.log('Attempt to get the web EffectiveBasePermissions');
+    }
 
-        const permissionsObj = json.find(x => { return x.EffectiveBasePermissions; });
-        if (permissionsObj) {
-          basePermissionsResult.high = permissionsObj.EffectiveBasePermissions.High;
-          basePermissionsResult.low = permissionsObj.EffectiveBasePermissions.Low;
-          return resolve(basePermissionsResult);
-        }
+    const json: ClientSvcResponse = JSON.parse(res);
+    const contents: ClientSvcResponseContents = json.find(x => { return x.ErrorInfo; });
+    if (contents && contents.ErrorInfo) {
+      throw contents.ErrorInfo.ErrorMessage || 'ClientSvc unknown error';
+    }
 
-        reject('Cannot proceed. EffectiveBasePermissions not found'); // this is not supposed to happen
-      }, (err: any): void => { reject(err); });
-    });
+    const permissionsObj = json.find(x => { return x.EffectiveBasePermissions; });
+    if (permissionsObj) {
+      basePermissionsResult.high = permissionsObj.EffectiveBasePermissions.High;
+      basePermissionsResult.low = permissionsObj.EffectiveBasePermissions.Low;
+      return basePermissionsResult;
+    }
+
+    throw ('Cannot proceed. EffectiveBasePermissions not found'); // this is not supposed to happen
   },
 
   /**
@@ -483,10 +451,10 @@ export const spo = {
     * @param siteRelativeUrl site relative url e.g. /Shared Documents/Folder1
     * @param formDigestValue formDigestValue
     */
-  getFolderIdentity(webObjectIdentity: string, webUrl: string, siteRelativeUrl: string, formDigestValue: string): Promise<IdentityResponse> {
+  async getFolderIdentity(webObjectIdentity: string, webUrl: string, siteRelativeUrl: string, formDigestValue: string): Promise<IdentityResponse> {
     const serverRelativePath: string = urlUtil.getServerRelativePath(webUrl, siteRelativeUrl);
 
-    const requestOptions: any = {
+    const requestOptions: CliRequestOptions = {
       url: `${webUrl}/_vti_bin/client.svc/ProcessQuery`,
       headers: {
         'X-RequestDigest': formDigestValue
@@ -494,25 +462,22 @@ export const spo = {
       data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="10" ObjectPathId="9" /><ObjectIdentityQuery Id="11" ObjectPathId="9" /><Query Id="12" ObjectPathId="9"><Query SelectAllProperties="false"><Properties><Property Name="Properties" SelectAll="true"><Query SelectAllProperties="false"><Properties /></Query></Property></Properties></Query></Query></Actions><ObjectPaths><Method Id="9" ParentId="5" Name="GetFolderByServerRelativeUrl"><Parameters><Parameter Type="String">${serverRelativePath}</Parameter></Parameters></Method><Identity Id="5" Name="${webObjectIdentity}" /></ObjectPaths></Request>`
     };
 
-    return new Promise<IdentityResponse>((resolve: (identity: IdentityResponse) => void, reject: (error: any) => void) => {
-      return request.post<string>(requestOptions).then((res: string): void => {
-        const json: ClientSvcResponse = JSON.parse(res);
+    const res: string = await request.post<string>(requestOptions);
+    const json: ClientSvcResponse = JSON.parse(res);
 
-        const contents: ClientSvcResponseContents = json.find(x => { return x.ErrorInfo; });
-        if (contents && contents.ErrorInfo) {
-          return reject(contents.ErrorInfo.ErrorMessage || 'ClientSvc unknown error');
-        }
-        const objectIdentity: { _ObjectIdentity_: string; } = json.find(x => { return x._ObjectIdentity_; });
-        if (objectIdentity) {
-          return resolve({
-            objectIdentity: objectIdentity._ObjectIdentity_,
-            serverRelativeUrl: serverRelativePath
-          });
-        }
+    const contents: ClientSvcResponseContents = json.find(x => { return x.ErrorInfo; });
+    if (contents && contents.ErrorInfo) {
+      throw contents.ErrorInfo.ErrorMessage || 'ClientSvc unknown error';
+    }
+    const objectIdentity: { _ObjectIdentity_: string; } = json.find(x => { return x._ObjectIdentity_; });
+    if (objectIdentity) {
+      return {
+        objectIdentity: objectIdentity._ObjectIdentity_,
+        serverRelativeUrl: serverRelativePath
+      };
+    }
 
-        reject('Cannot proceed. Folder _ObjectIdentity_ not found'); // this is not suppose to happen
-      }, (err: any): void => { reject(err); });
-    });
+    throw 'Cannot proceed. Folder _ObjectIdentity_ not found';
   },
 
   /**
@@ -584,7 +549,7 @@ export const spo = {
     }
 
     async function getById(webUrl: string, id: string, scope: string): Promise<CustomAction | undefined> {
-      const requestOptions: any = {
+      const requestOptions: CliRequestOptions = {
         url: `${webUrl}/_api/${scope}/UserCustomActions(guid'${id}')`,
         headers: {
           accept: 'application/json;odata=nometadata'
@@ -617,7 +582,7 @@ export const spo = {
   async getTenantAppCatalogUrl(logger: Logger, debug: boolean): Promise<string | null> {
     const spoUrl = await spo.getSpoUrl(logger, debug);
 
-    const requestOptions: any = {
+    const requestOptions: CliRequestOptions = {
       url: `${spoUrl}/_api/SP_TenantSettings_Current`,
       headers: {
         accept: 'application/json;odata=nometadata'
@@ -649,19 +614,54 @@ export const spo = {
   },
 
   /**
+   * Ensure a user exists on a specific SharePoint site.
+   * @param webUrl URL of the SharePoint site.
+   * @param logonName Logon name of the user to ensure on the SharePoint site.
+   * @returns SharePoint user object.
+   */
+  async ensureUser(webUrl: string, logonName: string): Promise<User> {
+    const requestOptions: CliRequestOptions = {
+      url: `${webUrl}/_api/web/EnsureUser`,
+      headers: {
+        accept: 'application/json;odata=nometadata'
+      },
+      responseType: 'json',
+      data: {
+        logonName: logonName
+      }
+    };
+
+    return request.post<User>(requestOptions);
+  },
+
+  /**
+   * Ensure a Microsoft Entra ID group exists on a specific SharePoint site.
+   * @param webUrl URL of the SharePoint site.
+   * @param group Microsoft Entra ID group.
+   * @returns SharePoint user object.
+   */
+  async ensureEntraGroup(webUrl: string, group: Group): Promise<User> {
+    if (!group.securityEnabled) {
+      throw new Error('Cannot ensure a Microsoft Entra ID group that is not security enabled.');
+    }
+
+    return this.ensureUser(webUrl, group.mailEnabled ? `c:0o.c|federateddirectoryclaimprovider|${group.id}` : `c:0t.c|tenant|${group.id}`);
+  },
+
+  /**
  * Retrieves the spo user by email.
  * @param webUrl Web url
  * @param email The email of the user
  * @param logger the Logger object
- * @param debug set if debug logging should be logged 
+ * @param verbose set if verbose logging should be logged 
  */
-  async getUserByEmail(webUrl: string, email: string, logger: Logger, debug?: boolean): Promise<any> {
-    if (debug) {
+  async getUserByEmail(webUrl: string, email: string, logger: Logger, verbose?: boolean): Promise<User> {
+    if (verbose) {
       await logger.logToStderr(`Retrieving the spo user by email ${email}`);
     }
     const requestUrl = `${webUrl}/_api/web/siteusers/GetByEmail('${formatting.encodeQueryParameter(email)}')`;
 
-    const requestOptions: any = {
+    const requestOptions: CliRequestOptions = {
       url: requestUrl,
       headers: {
         'accept': 'application/json;odata=nometadata'
@@ -669,7 +669,7 @@ export const spo = {
       responseType: 'json'
     };
 
-    const userInstance: any = await request.get(requestOptions);
+    const userInstance = await request.get<User>(requestOptions);
 
     return userInstance;
   },
@@ -737,15 +737,15 @@ export const spo = {
   * @param webUrl Web url
   * @param name The name of the group
   * @param logger the Logger object
-  * @param debug set if debug logging should be logged 
+  * @param verbose set if verbose logging should be logged 
   */
-  async getGroupByName(webUrl: string, name: string, logger: Logger, debug?: boolean): Promise<any> {
-    if (debug) {
+  async getGroupByName(webUrl: string, name: string, logger: Logger, verbose?: boolean): Promise<any> {
+    if (verbose) {
       await logger.logToStderr(`Retrieving the group by name ${name}`);
     }
     const requestUrl = `${webUrl}/_api/web/sitegroups/GetByName('${formatting.encodeQueryParameter(name)}')`;
 
-    const requestOptions: any = {
+    const requestOptions: CliRequestOptions = {
       url: requestUrl,
       headers: {
         'accept': 'application/json;odata=nometadata'
@@ -859,7 +859,7 @@ export const spo = {
       const resourceQuotaWarningLevelOption: number = typeof resourceQuotaWarningLevel === 'number' ? resourceQuotaWarningLevel : 0;
       const webTemplateOption: string = webTemplate || 'STS#0';
 
-      const requestOptions: any = {
+      const requestOptions: CliRequestOptions = {
         url: `${spoAdminUrl as string}/_vti_bin/client.svc/ProcessQuery`,
         headers: {
           'X-RequestDigest': context.FormDigestValue
@@ -882,19 +882,14 @@ export const spo = {
           return;
         }
 
-        await new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
-          setTimeout(() => {
-            spo.waitUntilFinished({
-              operationId: JSON.stringify(operation._ObjectIdentity_),
-              siteUrl: spoAdminUrl as string,
-              resolve,
-              reject,
-              logger,
-              currentContext: context as FormDigestInfo,
-              verbose: verbose,
-              debug: verbose
-            });
-          }, operation.PollingInterval);
+        await setTimeout(operation.PollingInterval);
+        await spo.waitUntilFinished({
+          operationId: JSON.stringify(operation._ObjectIdentity_),
+          siteUrl: spoAdminUrl,
+          logger,
+          currentContext: context,
+          verbose: verbose,
+          debug: verbose
         });
       }
     }
@@ -1029,7 +1024,7 @@ export const spo = {
       await logger.logToStderr(`Checking if the site ${url} exists...`);
     }
 
-    const requestOptions: any = {
+    const requestOptions: CliRequestOptions = {
       url: `${spoAdminUrl as string}/_vti_bin/client.svc/ProcessQuery`,
       headers: {
         'X-RequestDigest': context.FormDigestValue
@@ -1071,7 +1066,7 @@ export const spo = {
     const spoAdminUrl = await spo.getSpoAdminUrl(logger, verbose);
     const context = await spo.ensureFormDigest(spoAdminUrl as string, logger, undefined, verbose);
 
-    const requestOptions: any = {
+    const requestOptions: CliRequestOptions = {
       url: `${spoAdminUrl as string}/_vti_bin/client.svc/ProcessQuery`,
       headers: {
         'X-RequestDigest': (context as FormDigestInfo).FormDigestValue
@@ -1111,7 +1106,7 @@ export const spo = {
       await logger.logToStderr(`Deleting site ${url} from the recycle bin...`);
     }
 
-    const requestOptions: any = {
+    const requestOptions: CliRequestOptions = {
       url: `${spoAdminUrl as string}/_vti_bin/client.svc/ProcessQuery`,
       headers: {
         'X-RequestDigest': context.FormDigestValue
@@ -1134,19 +1129,14 @@ export const spo = {
       return;
     }
 
-    await new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
-      setTimeout(() => {
-        spo.waitUntilFinished({
-          operationId: JSON.stringify(operation._ObjectIdentity_),
-          siteUrl: spoAdminUrl as string,
-          resolve,
-          reject,
-          logger,
-          currentContext: context as FormDigestInfo,
-          verbose: verbose,
-          debug: verbose
-        });
-      }, operation.PollingInterval);
+    await setTimeout(operation.PollingInterval);
+    await spo.waitUntilFinished({
+      operationId: JSON.stringify(operation._ObjectIdentity_),
+      siteUrl: spoAdminUrl,
+      logger,
+      currentContext: context,
+      verbose: verbose,
+      debug: verbose
     });
   },
 
@@ -1173,7 +1163,7 @@ export const spo = {
       await logger.logToStderr('Loading site IDs...');
     }
 
-    const requestOptions: any = {
+    const requestOptions: CliRequestOptions = {
       url: `${url}/_api/site?$select=GroupId,Id`,
       headers: {
         accept: 'application/json;odata=nometadata'
@@ -1203,7 +1193,7 @@ export const spo = {
         const promises: Promise<void>[] = [];
 
         if (typeof title !== 'undefined') {
-          const requestOptions: any = {
+          const requestOptions: CliRequestOptions = {
             url: `${spoAdminUrl}/_api/SPOGroup/UpdateGroupPropertiesBySiteId`,
             headers: {
               accept: 'application/json;odata=nometadata',
@@ -1291,7 +1281,7 @@ export const spo = {
 
       const pos: number = (tenantId as string).indexOf('|') + 1;
 
-      const requestOptionsUpdateProperties: any = {
+      const requestOptionsUpdateProperties: CliRequestOptions = {
         url: `${spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
         headers: {
           'X-RequestDigest': context.FormDigestValue
@@ -1311,19 +1301,14 @@ export const spo = {
         const operation: SpoOperation = json[json.length - 1];
         const isComplete: boolean = operation.IsComplete;
         if (!isComplete) {
-          await new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
-            setTimeout(() => {
-              spo.waitUntilFinished({
-                operationId: JSON.stringify(operation._ObjectIdentity_),
-                siteUrl: spoAdminUrl as string,
-                resolve,
-                reject,
-                logger,
-                currentContext: context as FormDigestInfo,
-                verbose: verbose,
-                debug: verbose
-              });
-            }, operation.PollingInterval);
+          await setTimeout(operation.PollingInterval);
+          await spo.waitUntilFinished({
+            operationId: JSON.stringify(operation._ObjectIdentity_),
+            siteUrl: spoAdminUrl,
+            logger,
+            currentContext: context,
+            verbose: verbose,
+            debug: verbose
           });
         }
 
@@ -1349,7 +1334,7 @@ export const spo = {
       await logger.logToStderr('Retrieving user information to set group owners...');
     }
 
-    const requestOptions: any = {
+    const requestOptions: CliRequestOptions = {
       url: `https://graph.microsoft.com/v1.0/users?$filter=${splittedOwners.map(o => `userPrincipalName eq '${o}'`).join(' or ')}&$select=id`,
       headers: {
         'content-type': 'application/json;odata.metadata=none'
@@ -1357,23 +1342,22 @@ export const spo = {
       responseType: 'json'
     };
 
-    return request.get<{ value: { id: string; }[] }>(requestOptions)
-      .then((res: { value: { id: string; }[] }): Promise<any> => {
-        if (res.value.length === 0) {
-          return Promise.resolve();
+    const res = await request.get<{ value: { id: string; }[] }>(requestOptions);
+
+    if (res.value.length === 0) {
+      return;
+    }
+
+    await Promise.all(res.value.map(user => {
+      const requestOptions: CliRequestOptions = {
+        url: `${spoAdminUrl}/_api/SP.Directory.DirectorySession/Group('${groupId}')/Owners/Add(objectId='${user.id}', principalName='')`,
+        headers: {
+          'content-type': 'application/json;odata=verbose'
         }
+      };
 
-        return Promise.all(res.value.map(user => {
-          const requestOptions: any = {
-            url: `${spoAdminUrl}/_api/SP.Directory.DirectorySession/Group('${groupId}')/Owners/Add(objectId='${user.id}', principalName='')`,
-            headers: {
-              'content-type': 'application/json;odata=verbose'
-            }
-          };
-
-          return request.post(requestOptions);
-        }));
-      });
+      return request.post(requestOptions);
+    }));
   },
 
   /**
@@ -1390,7 +1374,7 @@ export const spo = {
       await logger.logToStderr(`Updating site admin ${principal} on ${siteUrl}...`);
     }
 
-    const requestOptions: any = {
+    const requestOptions: CliRequestOptions = {
       url: `${spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
       headers: {
         'X-RequestDigest': context.FormDigestValue
@@ -1424,7 +1408,7 @@ export const spo = {
 
     const spoUrl: string = await spo.getSpoUrl(logger, verbose);
 
-    const requestOptions: any = {
+    const requestOptions: CliRequestOptions = {
       url: `${spoUrl}/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.ApplySiteDesign`,
       headers: {
         'content-type': 'application/json;charset=utf-8',
@@ -1451,7 +1435,7 @@ export const spo = {
       await logger.logToStderr(`Getting the web properties for ${url}`);
     }
 
-    const requestOptions: any = {
+    const requestOptions: CliRequestOptions = {
       url: `${url}/_api/web`,
       headers: {
         'accept': 'application/json;odata=nometadata'
@@ -1475,7 +1459,7 @@ export const spo = {
    */
   async applyRetentionLabelToListItems(webUrl: string, name: string, listAbsoluteUrl: string, itemIds: number[], logger?: Logger, verbose?: boolean): Promise<void> {
     if (verbose && logger) {
-      logger.logToStderr(`Applying retention label '${name}' to item(s) in list '${listAbsoluteUrl}'...`);
+      await logger.logToStderr(`Applying retention label '${name}' to item(s) in list '${listAbsoluteUrl}'...`);
     }
 
     const requestOptions: CliRequestOptions = {
@@ -1504,7 +1488,7 @@ export const spo = {
   */
   async getFileAsListItemByUrl(absoluteListUrl: string, url: string, logger?: Logger, verbose?: boolean): Promise<any> {
     if (verbose && logger) {
-      logger.logToStderr(`Getting the file properties with url ${url}`);
+      await logger.logToStderr(`Getting the file properties with url ${url}`);
     }
 
     const serverRelativePath = urlUtil.getServerRelativePath(absoluteListUrl, url);
@@ -1544,7 +1528,7 @@ export const spo = {
     const webUrl = `${parsedUrl.protocol}//${parsedUrl.host}${serverRelativeSiteMatch ?? ''}`;
 
     if (verbose && logger) {
-      logger.logToStderr(`Getting list id...`);
+      await logger.logToStderr(`Getting list id...`);
     }
 
     const listRequestOptions: CliRequestOptions = {
@@ -1560,7 +1544,7 @@ export const spo = {
     const listId = list.Id;
 
     if (verbose && logger) {
-      logger.logToStderr(`Getting request digest for systemUpdate request`);
+      await logger.logToStderr(`Getting request digest for systemUpdate request`);
     }
 
     const res = await spo.getRequestDigest(webUrl);
@@ -1635,7 +1619,7 @@ export const spo = {
    */
   async removeRetentionLabelFromListItems(webUrl: string, listAbsoluteUrl: string, itemIds: number[], logger?: Logger, verbose?: boolean): Promise<void> {
     if (verbose && logger) {
-      logger.logToStderr(`Removing retention label from item(s) in list '${listAbsoluteUrl}'...`);
+      await logger.logToStderr(`Removing retention label from item(s) in list '${listAbsoluteUrl}'...`);
     }
 
     const requestOptions: CliRequestOptions = {
@@ -1665,7 +1649,7 @@ export const spo = {
    */
   async applyDefaultRetentionLabelToList(webUrl: string, name: string, listAbsoluteUrl: string, syncToItems?: boolean, logger?: Logger, verbose?: boolean): Promise<void> {
     if (verbose && logger) {
-      logger.logToStderr(`Applying default retention label '${name}' to the list '${listAbsoluteUrl}'...`);
+      await logger.logToStderr(`Applying default retention label '${name}' to the list '${listAbsoluteUrl}'...`);
     }
 
     const requestOptions: CliRequestOptions = {
@@ -1695,7 +1679,7 @@ export const spo = {
    */
   async removeDefaultRetentionLabelFromList(webUrl: string, listAbsoluteUrl: string, logger?: Logger, verbose?: boolean): Promise<void> {
     if (verbose && logger) {
-      logger.logToStderr(`Removing the default retention label from the list '${listAbsoluteUrl}'...`);
+      await logger.logToStderr(`Removing the default retention label from the list '${listAbsoluteUrl}'...`);
     }
 
     const requestOptions: CliRequestOptions = {
@@ -1726,7 +1710,7 @@ export const spo = {
    */
   async getSiteId(webUrl: string, logger?: Logger, verbose?: boolean): Promise<string> {
     if (verbose && logger) {
-      logger.logToStderr(`Getting site id for URL: ${webUrl}...`);
+      await logger.logToStderr(`Getting site id for URL: ${webUrl}...`);
     }
 
     const url: URL = new URL(webUrl);
@@ -1854,7 +1838,7 @@ export const spo = {
 
     const response = await request.post<string>(requestOptions);
     if (verbose) {
-      logger.logToStderr('Attempt to get _ObjectIdentity_ key values');
+      await logger.logToStderr('Attempt to get _ObjectIdentity_ key values');
     }
 
     const json: ClientSvcResponse = JSON.parse(response);

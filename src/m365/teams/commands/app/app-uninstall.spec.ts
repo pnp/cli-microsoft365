@@ -116,7 +116,7 @@ describe(commands.APP_UNINSTALL, () => {
 
   it('aborts uninstalling an app from a Microsoft Teams team when prompt not confirmed', async () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(false);
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         teamId: 'c527a470-a882-481c-981c-ee6efaba85c7',
         id: 'YzUyN2E0NzAtYTg4Mi00ODFjLTk4MWMtZWU2ZWZhYmE4NWM3IyM0ZDFlYTA0Ny1mMTk2LTQ1MGQtYjJlOS0wZDI4NTViYTA1YTY='

@@ -12,6 +12,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './app-consent-set.js';
+import { accessToken } from '../../../../utils/accessToken.js';
 
 describe(commands.APP_CONSENT_SET, () => {
   //#region Mocked Responses
@@ -29,6 +30,7 @@ describe(commands.APP_CONSENT_SET, () => {
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
+    sinon.stub(accessToken, 'assertDelegatedAccessToken').resolves();
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
   });
@@ -46,9 +48,9 @@ describe(commands.APP_CONSENT_SET, () => {
         log.push(msg);
       }
     };
-    sinon.stub(cli, 'promptForConfirmation').callsFake(() => {
+    sinon.stub(cli, 'promptForConfirmation').callsFake(async () => {
       promptIssued = true;
-      return Promise.resolve(false);
+      return false;
     });
 
     promptIssued = false;

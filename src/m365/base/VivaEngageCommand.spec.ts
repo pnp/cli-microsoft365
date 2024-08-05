@@ -8,6 +8,7 @@ import { pid } from '../../utils/pid.js';
 import { session } from '../../utils/session.js';
 import { sinonUtil } from '../../utils/sinonUtil.js';
 import VivaEngageCommand from './VivaEngageCommand.js';
+import { accessToken } from '../../utils/accessToken.js';
 
 class MockCommand extends VivaEngageCommand {
   public get name(): string {
@@ -34,6 +35,11 @@ describe('VivaEngageCommand', () => {
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
+    auth.connection.accessTokens[auth.defaultResource] = {
+      expiresOn: 'abc',
+      accessToken: 'abc'
+    };
   });
 
   afterEach(() => {
@@ -42,6 +48,7 @@ describe('VivaEngageCommand', () => {
 
   after(() => {
     sinon.restore();
+    auth.connection.active = false;
   });
 
   it('correctly reports an error while restoring auth info', async () => {
@@ -130,5 +137,13 @@ describe('VivaEngageCommand', () => {
     const mock = new MockCommand();
     assert.throws(() => mock.handlePromiseError(error),
       new CommandError(error as any));
+  });
+
+  it('throws error when using application-only permissions', async () => {
+    const cmd = new MockCommand();
+    sinonUtil.restore(accessToken.isAppOnlyAccessToken);
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
+    auth.connection.active = true;
+    await assert.rejects(() => (cmd as any).initAction({ options: {} }, {}), new CommandError('This command does not support application-only permissions.'));
   });
 });

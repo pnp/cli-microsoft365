@@ -452,8 +452,7 @@ describe(commands.PROJECT_UPGRADE, () => {
       }
     });
 
-    const getProject = (command as any).getProject;
-    const project: Project = getProject(projectPath);
+    const project: Project = (command as any).getProject(projectPath);
     assert.strictEqual(typeof (project.packageJson), 'undefined');
   });
 
@@ -468,8 +467,7 @@ describe(commands.PROJECT_UPGRADE, () => {
       }
     });
 
-    const getProject = (command as any).getProject;
-    const project: Project = getProject(projectPath);
+    const project: Project = (command as any).getProject(projectPath);
     assert.strictEqual(typeof (project.tsConfigJson), 'undefined');
   });
 
@@ -477,96 +475,90 @@ describe(commands.PROJECT_UPGRADE, () => {
     const originalReadFileSync = fs.readFileSync;
     sinon.stub(fs, 'readFileSync').callsFake((path, encoding) => {
       if (path.toString().endsWith('config.json')) {
-        return '';
+        return '{}';
       }
       else {
         return originalReadFileSync(path, encoding);
       }
     });
 
-    const getProject = (command as any).getProject;
-    const project: Project = getProject(projectPath);
-    assert.strictEqual(typeof (project.configJson), 'undefined');
+    const project: Project = (command as any).getProject(projectPath);
+    assert.strictEqual(typeof (project.configJson), 'object');
   });
 
   it('doesn\'t fail if copy-assets.json is empty', () => {
     const originalReadFileSync = fs.readFileSync;
     sinon.stub(fs, 'readFileSync').callsFake((path, encoding) => {
       if (path.toString().endsWith('copy-assets.json')) {
-        return '';
+        return '{}';
       }
       else {
         return originalReadFileSync(path, encoding);
       }
     });
 
-    const getProject = (command as any).getProject;
-    const project: Project = getProject(projectPath);
-    assert.strictEqual(typeof (project.copyAssetsJson), 'undefined');
+    const project: Project = (command as any).getProject(projectPath);
+    assert.strictEqual(typeof (project.copyAssetsJson), 'object');
   });
 
   it('doesn\'t fail if deploy-azure-storage.json is empty', () => {
     const originalReadFileSync = fs.readFileSync;
     sinon.stub(fs, 'readFileSync').callsFake((path, encoding) => {
       if (path.toString().endsWith('deploy-azure-storage.json')) {
-        return '';
+        return '{}';
       }
       else {
         return originalReadFileSync(path, encoding);
       }
     });
 
-    const getProject = (command as any).getProject;
-    const project: Project = getProject(projectPath);
-    assert.strictEqual(typeof (project.deployAzureStorageJson), 'undefined');
+    const project: Project = (command as any).getProject(projectPath);
+    assert.strictEqual(typeof (project.deployAzureStorageJson), 'object');
   });
 
   it('doesn\'t fail if package.json is empty', () => {
     const originalReadFileSync = fs.readFileSync;
     sinon.stub(fs, 'readFileSync').callsFake((path, encoding) => {
       if (path.toString().endsWith('package.json')) {
-        return '';
+        return '{}';
       }
       else {
         return originalReadFileSync(path, encoding);
       }
     });
 
-    const getProject = (command as any).getProject;
-    const project: Project = getProject(projectPath);
-    assert.strictEqual(typeof (project.packageJson), 'undefined');
+    const project: Project = (command as any).getProject(projectPath);
+    assert.strictEqual(typeof (project.packageJson), 'object');
   });
 
   it('doesn\'t fail if package-solution.json is empty', () => {
     const originalReadFileSync = fs.readFileSync;
     sinon.stub(fs, 'readFileSync').callsFake((path, encoding) => {
       if (path.toString().endsWith('package-solution.json')) {
-        return '';
+        return '{}';
       }
       else {
         return originalReadFileSync(path, encoding);
       }
     });
 
-    const getProject = (command as any).getProject;
-    const project: Project = getProject(projectPath);
-    assert.strictEqual(typeof (project.packageSolutionJson), 'undefined');
+    const project: Project = (command as any).getProject(projectPath);
+    assert.strictEqual(typeof (project.packageSolutionJson), 'object');
   });
 
   it('doesn\'t fail if serve.json is empty', () => {
     const originalReadFileSync = fs.readFileSync;
     sinon.stub(fs, 'readFileSync').callsFake((path, encoding) => {
       if (path.toString().endsWith('serve.json')) {
-        return '';
+        return '{}';
       }
       else {
         return originalReadFileSync(path, encoding);
       }
     });
 
-    const getProject = (command as any).getProject;
-    const project: Project = getProject(projectPath);
-    assert.strictEqual(typeof (project.serveJson), 'undefined');
+    const project: Project = (command as any).getProject(projectPath);
+    assert.strictEqual(typeof (project.serveJson), 'object');
   });
 
   it('doesn\'t fail if tslint.json is empty', () => {
@@ -582,64 +574,60 @@ describe(commands.PROJECT_UPGRADE, () => {
     const originalReadFileSync = fs.readFileSync;
     sinon.stub(fs, 'readFileSync').callsFake((path, encoding) => {
       if (path.toString().endsWith('tslint.json')) {
-        return '';
+        return '{}';
       }
       else {
         return originalReadFileSync(path, encoding);
       }
     });
 
-    const getProject = (command as any).getProject;
-    const project: Project = getProject(projectPath);
-    assert.strictEqual(typeof (project.tsLintJson), 'undefined');
+    const project: Project = (command as any).getProject(projectPath);
+    assert.strictEqual(typeof (project.tsLintJson), 'object');
   });
 
   it('doesn\'t fail if write-manifests.json is empty', () => {
     const originalReadFileSync = fs.readFileSync;
     sinon.stub(fs, 'readFileSync').callsFake((path, encoding) => {
       if (path.toString().endsWith('write-manifests.json')) {
-        return '';
+        return '{}';
       }
       else {
         return originalReadFileSync(path, encoding);
       }
     });
 
-    const getProject = (command as any).getProject;
-    const project: Project = getProject(projectPath);
-    assert.strictEqual(typeof (project.writeManifestsJson), 'undefined');
+    const project: Project = (command as any).getProject(projectPath);
+    assert.strictEqual(typeof (project.writeManifestsJson), 'object');
   });
 
   it('doesn\'t fail if .yo-rc.json is empty', () => {
     const originalReadFileSync = fs.readFileSync;
     sinon.stub(fs, 'readFileSync').callsFake((path, encoding) => {
       if (path.toString().endsWith('.yo-rc.json')) {
-        return '';
+        return '{}';
       }
       else {
         return originalReadFileSync(path, encoding);
       }
     });
 
-    const getProject = (command as any).getProject;
-    const project: Project = getProject(projectPath);
-    assert.strictEqual(typeof (project.yoRcJson), 'undefined');
+    const project: Project = (command as any).getProject(projectPath);
+    assert.strictEqual(typeof (project.yoRcJson), 'object');
   });
 
   it('doesn\'t fail if extensions.json is empty', () => {
     const originalReadFileSync = fs.readFileSync;
     sinon.stub(fs, 'readFileSync').callsFake((path, encoding) => {
       if (path.toString().endsWith('extensions.json')) {
-        return '';
+        return '{}';
       }
       else {
         return originalReadFileSync(path, encoding);
       }
     });
 
-    const getProject = (command as any).getProject;
-    const project: Project = getProject(projectPath);
-    assert.strictEqual(typeof ((project.vsCode as VsCode).extensionsJson), 'undefined');
+    const project: Project = (command as any).getProject(projectPath);
+    assert.strictEqual(typeof ((project.vsCode as VsCode).extensionsJson), 'object');
   });
 
   it('loads manifests when available', () => {
@@ -657,8 +645,7 @@ describe(commands.PROJECT_UPGRADE, () => {
       }
     });
 
-    const getProject = (command as any).getProject;
-    const project: Project = getProject(projectPath);
+    const project: Project = (command as any).getProject(projectPath);
     assert.strictEqual(typeof ((project.vsCode) as VsCode).settingsJson, 'undefined');
   });
 
@@ -666,32 +653,30 @@ describe(commands.PROJECT_UPGRADE, () => {
     const originalReadFileSync = fs.readFileSync;
     sinon.stub(fs, 'readFileSync').callsFake((path, encoding) => {
       if (path.toString().endsWith('settings.json')) {
-        return '';
+        return '{}';
       }
       else {
         return originalReadFileSync(path, encoding);
       }
     });
 
-    const getProject = (command as any).getProject;
-    const project: Project = getProject(projectPath);
-    assert.strictEqual(typeof ((project.vsCode as any).settingsJson), 'undefined');
+    const project: Project = (command as any).getProject(projectPath);
+    assert.strictEqual(typeof ((project.vsCode as any).settingsJson), 'object');
   });
 
   it('doesn\'t fail if vscode launch info is empty', () => {
     const originalReadFileSync = fs.readFileSync;
     sinon.stub(fs, 'readFileSync').callsFake((path, encoding) => {
       if (path.toString().endsWith('launch.json')) {
-        return '';
+        return '{}';
       }
       else {
         return originalReadFileSync(path, encoding);
       }
     });
 
-    const getProject = (command as any).getProject;
-    const project: Project = getProject(projectPath);
-    assert.strictEqual(typeof ((project.vsCode as any).launch), 'undefined');
+    const project: Project = (command as any).getProject(projectPath);
+    assert.strictEqual(typeof ((project.vsCode as any).launchJson), 'object');
   });
 
   //#region npm
@@ -3254,66 +3239,66 @@ describe(commands.PROJECT_UPGRADE, () => {
   //#endregion
 
   //#region 1.18.2
-  it('e2e: shows correct number of findings for upgrading ace 1.18.2 project to 1.19.0-beta.0', async () => {
+  it('e2e: shows correct number of findings for upgrading ace 1.18.2 project to 1.19.0', async () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1182-ace'));
 
-    await command.action(logger, { options: { toVersion: '1.19.0-beta.0', preview: true, output: 'json' } } as any);
+    await command.action(logger, { options: { toVersion: '1.19.0', preview: true, output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
     assert.strictEqual(findings.length, 9);
   });
 
-  it('e2e: shows correct number of findings for upgrading application customizer 1.18.2 project to 1.19.0-beta.0', async () => {
+  it('e2e: shows correct number of findings for upgrading application customizer 1.18.2 project to 1.19.0', async () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1182-applicationcustomizer'));
 
-    await command.action(logger, { options: { toVersion: '1.19.0-beta.0', preview: true, output: 'json' } } as any);
+    await command.action(logger, { options: { toVersion: '1.19.0', preview: true, output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
     assert.strictEqual(findings.length, 11);
   });
 
-  it('e2e: shows correct number of findings for upgrading field customizer react 1.18.2 project to 1.19.0-beta.0', async () => {
+  it('e2e: shows correct number of findings for upgrading field customizer react 1.18.2 project to 1.19.0', async () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1182-fieldcustomizer-react'));
 
-    await command.action(logger, { options: { toVersion: '1.19.0-beta.0', preview: true, output: 'json' } } as any);
+    await command.action(logger, { options: { toVersion: '1.19.0', preview: true, output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
     assert.strictEqual(findings.length, 10);
   });
 
-  it('e2e: shows correct number of findings for upgrading form customizer react 1.18.2 project to 1.19.0-beta.0', async () => {
+  it('e2e: shows correct number of findings for upgrading form customizer react 1.18.2 project to 1.19.0', async () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1182-formcustomizer-react'));
 
-    await command.action(logger, { options: { toVersion: '1.19.0-beta.0', preview: true, output: 'json' } } as any);
+    await command.action(logger, { options: { toVersion: '1.19.0', preview: true, output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
     assert.strictEqual(findings.length, 12);
   });
 
-  it('e2e: shows correct number of findings for upgrading list view command set 1.18.2 project to 1.19.0-beta.0', async () => {
+  it('e2e: shows correct number of findings for upgrading list view command set 1.18.2 project to 1.19.0', async () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1182-listviewcommandset'));
 
-    await command.action(logger, { options: { toVersion: '1.19.0-beta.0', preview: true, output: 'json' } } as any);
+    await command.action(logger, { options: { toVersion: '1.19.0', preview: true, output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
     assert.strictEqual(findings.length, 11);
   });
 
-  it('e2e: shows correct number of findings for upgrading no framework web part 1.18.2 project to 1.19.0-beta.0', async () => {
+  it('e2e: shows correct number of findings for upgrading no framework web part 1.18.2 project to 1.19.0', async () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1182-webpart-nolib'));
 
-    await command.action(logger, { options: { toVersion: '1.19.0-beta.0', preview: true, output: 'json' } } as any);
+    await command.action(logger, { options: { toVersion: '1.19.0', preview: true, output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
     assert.strictEqual(findings.length, 13);
   });
 
-  it('e2e: shows correct number of findings for upgrading react web part 1.18.2 project to 1.19.0-beta.0', async () => {
+  it('e2e: shows correct number of findings for upgrading react web part 1.18.2 project to 1.19.0', async () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1182-webpart-react'));
 
-    await command.action(logger, { options: { toVersion: '1.19.0-beta.0', preview: true, output: 'json' } } as any);
+    await command.action(logger, { options: { toVersion: '1.19.0', preview: true, output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
     assert.strictEqual(findings.length, 13);
   });
 
-  it('e2e: shows correct number of findings for upgrading web part with optional dependencies 1.18.2 project to 1.19.0-beta.0', async () => {
+  it('e2e: shows correct number of findings for upgrading web part with optional dependencies 1.18.2 project to 1.19.0', async () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1182-webpart-optionaldeps'));
 
-    await command.action(logger, { options: { toVersion: '1.19.0-beta.0', preview: true, output: 'json' } } as any);
+    await command.action(logger, { options: { toVersion: '1.19.0', preview: true, output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
     assert.strictEqual(findings.length, 22);
   });

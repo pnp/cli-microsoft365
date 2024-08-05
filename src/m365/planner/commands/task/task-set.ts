@@ -1,4 +1,4 @@
-import { PlannerBucket, PlannerPlan, PlannerTask, PlannerTaskDetails, User } from '@microsoft/microsoft-graph-types';
+import { PlannerTask, PlannerTaskDetails, User } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
@@ -133,8 +133,18 @@ class PlannerTaskSetCommand extends GraphCommand {
           return `percentComplete should be between 0 and 100`;
         }
 
-        if (args.options.assignedToUserIds && !validation.isValidGuidArray(args.options.assignedToUserIds.split(','))) {
-          return 'assignedToUserIds contains invalid GUID';
+        if (args.options.assignedToUserIds) {
+          const isValidGUIDArrayResult = validation.isValidGuidArray(args.options.assignedToUserIds);
+          if (isValidGUIDArrayResult !== true) {
+            return `The following GUIDs are invalid for the option 'assignedToUserIds': ${isValidGUIDArrayResult}.`;
+          }
+        }
+
+        if (args.options.assignedToUserNames) {
+          const isValidUPNArrayResult = validation.isValidUserPrincipalNameArray(args.options.assignedToUserNames);
+          if (isValidUPNArrayResult !== true) {
+            return `The following user principal names are invalid for the option 'assignedToUserNames': ${isValidUPNArrayResult}.`;
+          }
         }
 
         if (args.options.appliedCategories && args.options.appliedCategories.split(',').filter(category => this.allowedAppliedCategories.indexOf(category.toLocaleLowerCase()) < 0).length !== 0) {
@@ -344,23 +354,7 @@ class PlannerTaskSetCommand extends GraphCommand {
     }
 
     const planId = await this.getPlanId(options);
-    const requestOptions: CliRequestOptions = {
-      url: `${this.resource}/v1.0/planner/plans/${planId}/buckets?$select=id,name`,
-      headers: {
-        accept: 'application/json;odata.metadata=none'
-      },
-      responseType: 'json'
-    };
-
-    const response = await request.get<{ value: PlannerBucket[] }>(requestOptions);
-
-    const bucket: PlannerBucket | undefined = response.value.find(val => val.name === options.bucketName);
-
-    if (!bucket) {
-      throw 'The specified bucket does not exist';
-    }
-
-    return bucket.id as string;
+    return planner.getBucketIdByTitle(options.bucketName, planId);
 
   }
 
@@ -370,13 +364,11 @@ class PlannerTaskSetCommand extends GraphCommand {
     }
 
     if (options.rosterId) {
-      const plan: PlannerPlan = await planner.getPlanByRosterId(options.rosterId);
-      return plan.id!;
+      return planner.getPlanIdByRosterId(options.rosterId);
     }
     else {
-      const groupId: string = await this.getGroupId(options);
-      const plan: PlannerPlan = await planner.getPlanByTitle(options.planTitle!, groupId);
-      return plan.id!;
+      const groupId = await this.getGroupId(options);
+      return planner.getPlanIdByTitle(options.planTitle!, groupId);
     }
   }
 
@@ -385,8 +377,7 @@ class PlannerTaskSetCommand extends GraphCommand {
       return options.ownerGroupId;
     }
 
-    const group = await entraGroup.getGroupByDisplayName(options.ownerGroupName!);
-    return group.id!;
+    return entraGroup.getGroupIdByDisplayName(options.ownerGroupName!);
   }
 
   private mapRequestBody(options: Options, appliedCategories: AppliedCategories): any {

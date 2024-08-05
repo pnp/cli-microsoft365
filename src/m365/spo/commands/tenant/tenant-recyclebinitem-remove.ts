@@ -1,3 +1,4 @@
+import { setTimeout } from 'timers/promises';
 import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import config from '../../../../config.js';
@@ -112,19 +113,14 @@ class SpoTenantRecycleBinItemRemoveCommand extends SpoCommand {
         return;
       }
 
-      await new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
-        setTimeout(() => {
-          spo.waitUntilFinished({
-            operationId: JSON.stringify(operation._ObjectIdentity_),
-            siteUrl: spoAdminUrl as string,
-            resolve,
-            reject,
-            logger,
-            currentContext: this.context as FormDigestInfo,
-            debug: this.debug,
-            verbose: this.verbose
-          });
-        }, operation.PollingInterval);
+      await setTimeout(operation.PollingInterval);
+      await spo.waitUntilFinished({
+        operationId: JSON.stringify(operation._ObjectIdentity_),
+        siteUrl: spoAdminUrl as string,
+        logger,
+        currentContext: this.context as FormDigestInfo,
+        debug: this.debug,
+        verbose: this.verbose
       });
     }
     catch (err: any) {

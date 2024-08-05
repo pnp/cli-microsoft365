@@ -1,12 +1,12 @@
 import Configstore from 'configstore';
 import fs from 'fs';
-import minimist from 'minimist';
 import { createRequire } from 'module';
-import ora, { Options, Ora } from 'ora';
 import os from 'os';
 import path from 'path';
 import { fileURLToPath, pathToFileURL } from 'url';
-import Command, { CommandArgs, CommandError, CommandTypes } from '../Command.js';
+import yargs from 'yargs-parser';
+import { ZodError } from 'zod';
+import Command, { CommandArgs, CommandError } from '../Command.js';
 import GlobalOptions from '../GlobalOptions.js';
 import config from '../config.js';
 import { M365RcJson } from '../m365/base/M365RcJson.js';
@@ -14,15 +14,16 @@ import request from '../request.js';
 import { settingsNames } from '../settingsNames.js';
 import { telemetry } from '../telemetry.js';
 import { app } from '../utils/app.js';
+import { browserUtil } from '../utils/browserUtil.js';
 import { formatting } from '../utils/formatting.js';
 import { md } from '../utils/md.js';
+import { ConfirmationConfig, SelectionConfig, prompt } from '../utils/prompt.js';
 import { validation } from '../utils/validation.js';
+import { zod } from '../utils/zod.js';
 import { CommandInfo } from './CommandInfo.js';
 import { CommandOptionInfo } from './CommandOptionInfo.js';
 import { Logger } from './Logger.js';
-import { SelectionConfig, ConfirmationConfig, prompt } from '../utils/prompt.js';
 import { timings } from './timings.js';
-import chalk from 'chalk';
 const require = createRequire(import.meta.url);
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
@@ -33,9 +34,6 @@ export interface CommandOutput {
 }
 
 let _config: Configstore | undefined;
-// we assign it through exported function to support mocking
-// eslint-disable-next-line prefer-const
-let spinner: Ora = ora();
 const commands: CommandInfo[] = [];
 /**
  * Command to execute
@@ -45,9 +43,11 @@ let commandToExecute: CommandInfo | undefined;
  * Name of the command specified through args
  */
 let currentCommandName: string | undefined;
-let optionsFromArgs: { options: minimist.ParsedArgs } | undefined;
+let optionsFromArgs: { options: yargs.Arguments } | undefined;
 const defaultHelpMode = 'options';
+const defaultHelpTarget = 'console';
 const helpModes: string[] = ['options', 'examples', 'remarks', 'response', 'full'];
+const helpTargets: string[] = ['console', 'web'];
 
 function getConfig(): Configstore {
   if (!_config) {
@@ -85,7 +85,7 @@ async function execute(rawArgs: string[]): Promise<void> {
   }
 
   // parse args to see if a command has been specified
-  const parsedArgs: minimist.ParsedArgs = minimist(rawArgs);
+  const parsedArgs: yargs.Arguments = yargs(rawArgs);
 
   // load command
   await cli.loadCommandFromArgs(parsedArgs._);
@@ -101,9 +101,7 @@ async function execute(rawArgs: string[]): Promise<void> {
       };
     }
     catch (e: any) {
-      const optionsWithoutShorts = removeShortOptions({ options: parsedArgs });
-
-      return cli.closeWithError(e.message, optionsWithoutShorts, false);
+      return cli.closeWithError(e.message, { options: parsedArgs }, false);
     }
   }
   else {
@@ -159,46 +157,58 @@ async function execute(rawArgs: string[]): Promise<void> {
     cli.optionsFromArgs.options.output = cli.getSettingWithDefaultValue<string | undefined>(settingsNames.output, 'json');
   }
 
-  const startValidation = process.hrtime.bigint();
-  const validationResult = await cli.commandToExecute.command.validate(cli.optionsFromArgs, cli.commandToExecute);
-  const endValidation = process.hrtime.bigint();
-  timings.validation.push(Number(endValidation - startValidation));
-  if (validationResult !== true) {
-    return cli.closeWithError(validationResult, cli.optionsFromArgs, true);
+  let finalArgs: any = cli.optionsFromArgs.options;
+  if (cli.commandToExecute?.command.schema) {
+    const startValidation = process.hrtime.bigint();
+    const result = cli.commandToExecute.command.getSchemaToParse()!.safeParse(cli.optionsFromArgs.options);
+    const endValidation = process.hrtime.bigint();
+    timings.validation.push(Number(endValidation - startValidation));
+    if (!result.success) {
+      return cli.closeWithError(result.error, cli.optionsFromArgs, true);
+    }
+    
+    finalArgs = result.data;
   }
-
-  cli.optionsFromArgs = removeShortOptions(cli.optionsFromArgs);
+  else {
+    const startValidation = process.hrtime.bigint();
+    const validationResult = await cli.commandToExecute.command.validate(cli.optionsFromArgs, cli.commandToExecute);
+    const endValidation = process.hrtime.bigint();
+    timings.validation.push(Number(endValidation - startValidation));
+    if (validationResult !== true) {
+      return cli.closeWithError(validationResult, cli.optionsFromArgs, true);
+    }
+  }
 
   const end = process.hrtime.bigint();
   timings.core.push(Number(end - start));
 
   try {
-    await cli.executeCommand(cli.commandToExecute.command, cli.optionsFromArgs);
+    await cli.executeCommand(cli.commandToExecute.command, { options: finalArgs });
     const endTotal = process.hrtime.bigint();
     timings.total.push(Number(endTotal - start));
-    printTimings(rawArgs);
+    await printTimings(rawArgs);
     process.exit(0);
   }
   catch (err) {
     const endTotal = process.hrtime.bigint();
     timings.total.push(Number(endTotal - start));
-    printTimings(rawArgs);
+    await printTimings(rawArgs);
     await cli.closeWithError(err, cli.optionsFromArgs);
     /* c8 ignore next */
   }
 }
 
-function printTimings(rawArgs: string[]): void {
+async function printTimings(rawArgs: string[]): Promise<void> {
   if (rawArgs.some(arg => arg === '--debug')) {
-    cli.error('');
-    cli.error('Timings:');
-    Object.getOwnPropertyNames(timings).forEach(key => {
-      cli.error(`${key}: ${(timings as any)[key].reduce((a: number, b: number) => a + b, 0) / 1e6}ms`);
+    await cli.error('');
+    await cli.error('Timings:');
+    Object.getOwnPropertyNames(timings).forEach(async key => {
+      await cli.error(`${key}: ${(timings as any)[key].reduce((a: number, b: number) => a + b, 0) / 1e6}ms`);
     });
   }
 }
 
-async function executeCommand(command: Command, args: { options: minimist.ParsedArgs }): Promise<void> {
+async function executeCommand(command: Command, args: { options: yargs.Arguments }): Promise<void> {
   const logger: Logger = {
     log: async (message: any): Promise<void> => {
       if (args.options.output !== 'none') {
@@ -213,7 +223,7 @@ async function executeCommand(command: Command, args: { options: minimist.Parsed
     },
     logToStderr: async (message: any): Promise<void> => {
       if (args.options.output !== 'none') {
-        cli.error(message);
+        await cli.error(message);
       }
     }
   };
@@ -226,13 +236,6 @@ async function executeCommand(command: Command, args: { options: minimist.Parsed
   // the command to execute
   const parentCommandName: string | undefined = cli.currentCommandName;
   cli.currentCommandName = command.getCommandName(cli.currentCommandName);
-  const showSpinner = cli.getSettingWithDefaultValue<boolean>(settingsNames.showSpinner, true) && args.options.output !== 'none';
-
-  // don't show spinner if running tests
-  /* c8 ignore next 3 */
-  if (showSpinner && typeof global.it === 'undefined') {
-    cli.spinner.start();
-  }
 
   const startCommand = process.hrtime.bigint();
   try {
@@ -247,17 +250,12 @@ async function executeCommand(command: Command, args: { options: minimist.Parsed
     // restore the original command name
     cli.currentCommandName = parentCommandName;
 
-    /* c8 ignore next 3 */
-    if (cli.spinner.isSpinning) {
-      cli.spinner.stop();
-    }
-
     const endCommand = process.hrtime.bigint();
     timings.command.push(Number(endCommand - startCommand));
   }
 }
 
-async function executeCommandWithOutput(command: Command, args: { options: minimist.ParsedArgs }, listener?: {
+async function executeCommandWithOutput(command: Command, args: { options: yargs.Arguments }, listener?: {
   stdout?: (message: any) => void,
   stderr?: (message: any) => void
 }): Promise<CommandOutput> {
@@ -340,7 +338,7 @@ function loadAllCommandsInfo(loadFull: boolean = false): void {
  *
  * @param commandNameWords Array of words specified as args
 */
-async function loadCommandFromArgs(commandNameWords: string[]): Promise<void> {
+async function loadCommandFromArgs(commandNameWords: Array<string | number>): Promise<void> {
   if (commandNameWords.length === 0) {
     return;
   }
@@ -429,12 +427,15 @@ async function loadCommandFromFile(commandFileUrl: string): Promise<void> {
 }
 
 function getCommandInfo(command: Command, filePath: string = '', helpFilePath: string = ''): CommandInfo {
+  const options = command.schema ? zod.schemaToOptions(command.schema) : getCommandOptions(command);
+  command.optionsInfo = options;
+
   return {
     aliases: command.alias(),
     name: command.name,
     description: command.description,
     command: command,
-    options: getCommandOptions(command),
+    options,
     defaultProperties: command.defaultProperties(),
     file: filePath,
     help: helpFilePath
@@ -473,35 +474,47 @@ function getCommandOptions(command: Command): CommandOptionInfo[] {
   return options;
 }
 
-function getCommandOptionsFromArgs(args: string[], commandInfo: CommandInfo | undefined): minimist.ParsedArgs {
-  const minimistOptions: minimist.Opts = {
-    alias: {}
+function getCommandOptionsFromArgs(args: string[], commandInfo: CommandInfo | undefined): yargs.Arguments {
+  const yargsOptions: yargs.Options = {
+    alias: {},
+    configuration: {
+      "parse-numbers": false,
+      "strip-aliased": true,
+      "strip-dashed": true
+    }
   };
 
   let argsToParse = args;
 
   if (commandInfo) {
-    const commandTypes = commandInfo.command.types;
-    if (commandTypes) {
-      minimistOptions.string = commandTypes.string;
+    if (commandInfo.command.schema) {
+      yargsOptions.string = commandInfo.options.filter(o => o.type === 'string').map(o => o.name);
+      yargsOptions.boolean = commandInfo.options.filter(o => o.type === 'boolean').map(o => o.name);
+      yargsOptions.number = commandInfo.options.filter(o => o.type === 'number').map(o => o.name);
+      argsToParse = getRewrittenArgs(args, yargsOptions.boolean);
+    }
+    else {
+      const commandTypes = commandInfo.command.types;
+      if (commandTypes) {
+        yargsOptions.string = commandTypes.string;
 
-      // minimist will parse unused boolean options to 'false' (unused options => options that are not included in the args)
-      // But in the CLI booleans are nullable. They can can be true, false or undefined.
-      // For this reason we only pass boolean types that are actually used as arg.
-      minimistOptions.boolean = commandTypes.boolean.filter(optionName => args.some(arg => `--${optionName}` === arg || `-${optionName}` === arg));
+        // minimist will parse unused boolean options to 'false' (unused options => options that are not included in the args)
+        // But in the CLI booleans are nullable. They can can be true, false or undefined.
+        // For this reason we only pass boolean types that are actually used as arg.
+        yargsOptions.boolean = commandTypes.boolean.filter(optionName => args.some(arg => `--${optionName}` === arg || `-${optionName}` === arg));
+      }
+
+      argsToParse = getRewrittenArgs(args, commandTypes.boolean);
     }
 
-    minimistOptions.alias = {};
     commandInfo.options.forEach(option => {
       if (option.short && option.long) {
-        (minimistOptions.alias as any)[option.short] = option.long;
+        yargsOptions.alias![option.long] = option.short;
       }
     });
-
-    argsToParse = getRewrittenArgs(args, commandTypes);
   }
 
-  return minimist(argsToParse, minimistOptions);
+  return yargs(argsToParse, yargsOptions);
 }
 
 /**
@@ -509,9 +522,7 @@ function getCommandOptionsFromArgs(args: string[], commandInfo: CommandInfo | un
  * Currently only boolean values are checked and fixed.
  * Args are only checked and rewritten if the option has been added to the 'types.boolean' array.
  */
-function getRewrittenArgs(args: string[], commandTypes: CommandTypes): string[] {
-  const booleanTypes = commandTypes.boolean;
-
+function getRewrittenArgs(args: string[], booleanTypes: string[]): string[] {
   if (booleanTypes.length === 0) {
     return args;
   }
@@ -658,10 +669,18 @@ async function printHelp(helpMode: string, exitCode: number = 0): Promise<void> 
 
   if (cli.commandToExecute) {
     properties.command = cli.commandToExecute.name;
-    printCommandHelp(helpMode);
+    const helpTarget = getSettingWithDefaultValue<string>(settingsNames.helpTarget, defaultHelpTarget);
+
+    if (helpTarget === 'web') {
+      await openHelpInBrowser();
+    }
+    else {
+      printCommandHelp(helpMode);
+    }
   }
   else {
     if (cli.currentCommandName && !cli.commands.some(command => command.name.startsWith(cli.currentCommandName!))) {
+      const chalk = (await import('chalk')).default;
       await cli.error(chalk.red(`Command '${cli.currentCommandName}' was not found. Below you can find the commands and command groups you can use. For detailed information on a command group, use 'm365 [command group] --help'.`));
     }
 
@@ -677,6 +696,12 @@ async function printHelp(helpMode: string, exitCode: number = 0): Promise<void> 
   telemetry.trackEvent('help', properties);
 
   process.exit(exitCode);
+}
+
+async function openHelpInBrowser(): Promise<void> {
+  const pathChunks = cli.commandToExecute!.help?.replace(/\\/g, '/').replace(/\.[^/.]+$/, '');
+  const onlineUrl = `https://pnp.github.io/cli-microsoft365/cmd/${pathChunks}`;
+  await browserUtil.open(onlineUrl);
 }
 
 function printCommandHelp(helpMode: string): void {
@@ -864,14 +889,18 @@ async function closeWithError(error: any, args: CommandArgs, showHelpIfEnabled: 
     return process.exit(exitCode);
   }
 
-  const chalk = (await import('chalk')).default;
-
   let errorMessage: string = error instanceof CommandError ? error.message : error;
+
+  if (error instanceof ZodError) {
+    errorMessage = error.errors.map(e => `${e.path}: ${e.message}`).join(os.EOL);
+  }
+
   if ((!args.options.output || args.options.output === 'json') &&
     !cli.getSettingWithDefaultValue<boolean>(settingsNames.printErrorsAsPlainText, true)) {
     errorMessage = JSON.stringify({ error: errorMessage });
   }
   else {
+    const chalk = (await import('chalk')).default;
     errorMessage = chalk.red(`Error: ${errorMessage}`);
   }
 
@@ -881,13 +910,11 @@ async function closeWithError(error: any, args: CommandArgs, showHelpIfEnabled: 
 
   await cli.error(errorMessage);
 
-  if (showHelpIfEnabled &&
-    await cli.getSettingWithDefaultValue<boolean>(settingsNames.showHelpOnFailure, showHelpIfEnabled)) {
-    await printHelp(await getHelpMode(args.options), exitCode);
+  if (showHelpIfEnabled && cli.getSettingWithDefaultValue<boolean>(settingsNames.showHelpOnFailure, showHelpIfEnabled)) {
+    await cli.error(`Run 'm365 ${cli.commandToExecute!.name} -h' for help.`);
   }
-  else {
-    process.exit(exitCode);
-  }
+
+  process.exit(exitCode);
 
   // will never be run. Required for testing where we're stubbing process.exit
   /* c8 ignore next */
@@ -896,35 +923,15 @@ async function closeWithError(error: any, args: CommandArgs, showHelpIfEnabled: 
 }
 
 function log(message?: any, ...optionalParams: any[]): void {
-  const spinnerSpinning = cli.spinner.isSpinning;
-
-  /* c8 ignore next 3 */
-  if (spinnerSpinning) {
-    cli.spinner.stop();
-  }
-
   if (message) {
     console.log(message, ...optionalParams);
   }
   else {
     console.log();
   }
-
-  // Restart the spinner if it was running before the log
-  /* c8 ignore next 3 */
-  if (spinnerSpinning) {
-    cli.spinner.start();
-  }
 }
 
 async function error(message?: any, ...optionalParams: any[]): Promise<void> {
-  const spinnerSpinning = cli.spinner.isSpinning;
-
-  /* c8 ignore next 3 */
-  if (spinnerSpinning) {
-    cli.spinner.stop();
-  }
-
   const errorOutput: string = cli.getSettingWithDefaultValue(settingsNames.errorOutput, 'stderr');
   if (errorOutput === 'stdout') {
     console.log(message, ...optionalParams);
@@ -932,50 +939,18 @@ async function error(message?: any, ...optionalParams: any[]): Promise<void> {
   else {
     console.error(message, ...optionalParams);
   }
-
-  // Restart the spinner if it was running before the log
-  /* c8 ignore next 3 */
-  if (spinnerSpinning) {
-    cli.spinner.start();
-  }
 }
 
 async function promptForSelection<T>(config: SelectionConfig<T>): Promise<T> {
-  const spinnerSpinning = cli.spinner.isSpinning;
-
-  /* c8 ignore next 3 */
-  if (spinnerSpinning) {
-    cli.spinner.stop();
-  }
-
   const answer = await prompt.forSelection<T>(config);
-  cli.error('');
-
-  // Restart the spinner if it was running before the prompt
-  /* c8 ignore next 3 */
-  if (spinnerSpinning) {
-    cli.spinner.start();
-  }
+  await cli.error('');
 
   return answer;
 }
 
 async function promptForConfirmation(config: ConfirmationConfig): Promise<boolean> {
-  const spinnerSpinning = cli.spinner.isSpinning;
-
-  /* c8 ignore next 3 */
-  if (spinnerSpinning) {
-    cli.spinner.stop();
-  }
-
   const answer = await prompt.forConfirmation(config);
-  cli.error('');
-
-  // Restart the spinner if it was running before the prompt
-  /* c8 ignore next 3 */
-  if (spinnerSpinning) {
-    cli.spinner.start();
-  }
+  await cli.error('');
 
   return answer;
 }
@@ -986,23 +961,14 @@ async function handleMultipleResultsFound<T>(message: string, values: { [key: st
     throw new Error(`${message} Found: ${Object.keys(values).join(', ')}.`);
   }
 
-  cli.error(`🌶️  ${message} `);
+  await cli.error(`🌶️  ${message} `);
   const choices = Object.keys(values).map((choice: any) => { return { name: choice, value: choice }; });
   const response = await cli.promptForSelection<string>({ message: `Please choose one:`, choices });
 
   return values[response];
 }
 
-function removeShortOptions(args: { options: minimist.ParsedArgs }): { options: minimist.ParsedArgs } {
-  const filteredArgs = JSON.parse(JSON.stringify(args));
-  const optionsToRemove: string[] = Object.getOwnPropertyNames(args.options)
-    .filter(option => option.length === 1 || option === '--');
-  optionsToRemove.forEach(option => delete filteredArgs.options[option]);
-
-  return filteredArgs;
-}
-
-function loadOptionValuesFromFiles(args: { options: minimist.ParsedArgs }): void {
+function loadOptionValuesFromFiles(args: { options: yargs.Arguments }): void {
   const optionNames: string[] = Object.getOwnPropertyNames(args.options);
   optionNames.forEach(option => {
     const value = args.options[option];
@@ -1040,6 +1006,7 @@ export const cli = {
   getSettingWithDefaultValue,
   handleMultipleResultsFound,
   helpModes,
+  helpTargets,
   loadAllCommandsInfo,
   loadCommandFromArgs,
   loadCommandFromFile,
@@ -1048,14 +1015,5 @@ export const cli = {
   printAvailableCommands,
   promptForConfirmation,
   promptForSelection,
-  shouldTrimOutput,
-  spinner
+  shouldTrimOutput
 };
-
-const spinnerOptions: Options = {
-  text: 'Running command...',
-  /* c8 ignore next 1 */
-  stream: cli.getSettingWithDefaultValue('errorOutput', 'stderr') === 'stderr' ? process.stderr : process.stdout,
-  discardStdin: false
-};
-cli.spinner = ora(spinnerOptions);

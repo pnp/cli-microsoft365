@@ -1,8 +1,12 @@
+import { formatting } from "./formatting.js";
 import { FormDigestInfo } from "./spo.js";
 
 export const validation = {
-  isValidGuidArray(guids: string[]): boolean {
-    return guids.every(guid => this.isValidGuid(guid));
+  isValidGuidArray(guidsString: string): boolean | string {
+    const guids = guidsString.split(',').map(guid => guid.trim());
+    const invalidGuids = guids.filter(guid => !this.isValidGuid(guid));
+
+    return invalidGuids.length > 0 ? invalidGuids.join(', ') : true;
   },
 
   isValidGuid(guid?: string): boolean {
@@ -31,9 +35,11 @@ export const validation = {
     return guidRegEx.test(guid);
   },
 
-  isValidUserPrincipalNameArray(upns: string[]): boolean | string {
-    const invalidGuid = upns.find(upn => !this.isValidUserPrincipalName(upn));
-    return invalidGuid || true;
+  isValidUserPrincipalNameArray(upnsString: string): boolean | string {
+    const upns = upnsString.split(',').map(upn => upn.trim());
+    const invalidUPNs = upns.filter(upn => !this.isValidUserPrincipalName(upn));
+
+    return invalidUPNs.length > 0 ? invalidUPNs.join(', ') : true;
   },
 
   isValidUserPrincipalName(upn: string): boolean {
@@ -41,6 +47,27 @@ export const validation = {
 
     // verify if the upn is a valid upn. @meusername will be replaced in a later stage with the actual username of the logged in user
     return upnRegEx.test(upn) || upn.toLowerCase().trim() === '@meusername';
+  },
+
+  /**
+   * Validates if the provided number is a valid positive integer (1 or higher).
+   * @param integer Integer value.
+   * @returns True if integer, false otherwise.
+   */
+  isValidPositiveInteger(integer: number | string): boolean {
+    return !isNaN(Number(integer)) && Number.isInteger(+integer) && +integer > 0;
+  },
+
+  /**
+   * Validates an array of integers. The integers must be positive (1 or higher).
+   * @param integerString Comma-separated string of integers.
+   * @returns True if the integers are valid, an error message with the invalid integers otherwise.
+   */
+  isValidPositiveIntegerArray(integerString: string): boolean | string {
+    const integers = formatting.splitAndTrim(integerString);
+    const invalidIntegers = integers.filter(integer => !this.isValidPositiveInteger(integer));
+
+    return invalidIntegers.length > 0 ? invalidIntegers.join(', ') : true;
   },
 
   isDateInRange(date: string, monthOffset: number): boolean {
@@ -347,12 +374,12 @@ export const validation = {
   },
 
   isValidSharePointUrl(url: string): boolean | string {
-    if (!url) {
-      return false;
+    if (typeof url !== 'string') {
+      return 'SharePoint Online site URL must be a string.';
     }
 
     if (url.indexOf('https://') !== 0) {
-      return `${url} is not a valid SharePoint Online site URL`;
+      return `'${url}' is not a valid SharePoint Online site URL.`;
     }
     else {
       return true;
@@ -383,5 +410,12 @@ export const validation = {
       /^P(?!$)((\d+Y)|(\d+\.\d+Y$))?((\d+M)|(\d+\.\d+M$))?((\d+W)|(\d+\.\d+W$))?((\d+D)|(\d+\.\d+D$))?(T(?=\d)((\d+H)|(\d+\.\d+H$))?((\d+M)|(\d+\.\d+M$))?(\d+(\.\d+)?S)?)??$/);
 
     return durationRegEx.test(duration);
+  },
+
+  isValidPermission(permissions: string): boolean | string[] {
+    const invalidPermissions = permissions
+      .split(' ')
+      .filter(permission => permission.indexOf('/') < 0);
+    return invalidPermissions.length > 0 ? invalidPermissions : true;
   }
 };

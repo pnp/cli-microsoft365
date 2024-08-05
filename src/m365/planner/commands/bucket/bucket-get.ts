@@ -7,8 +7,6 @@ import { planner } from '../../../../utils/planner.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
-import { cli } from '../../../../cli/cli.js';
-import { formatting } from '../../../../utils/formatting.js';
 
 interface CommandArgs {
   options: Options;
@@ -137,8 +135,7 @@ class PlannerBucketGetCommand extends GraphCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
-      const bucketId = await this.getBucketId(args);
-      const bucket = await this.getBucketById(bucketId);
+      const bucket = await this.getBucket(args);
       await logger.log(bucket);
     }
     catch (err: any) {
@@ -146,36 +143,14 @@ class PlannerBucketGetCommand extends GraphCommand {
     }
   }
 
-  private async getBucketId(args: CommandArgs): Promise<string> {
+  private async getBucket(args: CommandArgs): Promise<PlannerBucket> {
     const { id, name } = args.options;
     if (id) {
-      return id;
+      return this.getBucketById(id);
     }
 
     const planId = await this.getPlanId(args);
-    const requestOptions: CliRequestOptions = {
-      url: `${this.resource}/v1.0/planner/plans/${planId}/buckets`,
-      headers: {
-        accept: 'application/json;odata.metadata=none'
-      },
-      responseType: 'json'
-    };
-
-    const buckets = await request.get<{ value: PlannerBucket[] }>(requestOptions);
-
-    const filteredBuckets = buckets.value.filter(b => name!.toLowerCase() === b.name!.toLowerCase());
-
-    if (!filteredBuckets.length) {
-      throw `The specified bucket ${name} does not exist`;
-    }
-
-    if (filteredBuckets.length > 1) {
-      const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', filteredBuckets);
-      const result = await cli.handleMultipleResultsFound<PlannerBucket>(`Multiple buckets with name '${name}' found.`, resultAsKeyValuePair);
-      return result.id!.toString();
-    }
-
-    return filteredBuckets[0].id!.toString();
+    return planner.getBucketByTitle(name!, planId);
   }
 
   private async getPlanId(args: CommandArgs): Promise<string> {
@@ -187,12 +162,10 @@ class PlannerBucketGetCommand extends GraphCommand {
 
     if (planTitle) {
       const groupId: string = await this.getGroupId(args);
-      const plan = await planner.getPlanByTitle(planTitle, groupId);
-      return plan.id!;
+      return planner.getPlanIdByTitle(planTitle, groupId);
     }
 
-    const plan = await planner.getPlanByRosterId(rosterId!);
-    return plan.id!;
+    return planner.getPlanIdByRosterId(rosterId!);
   }
 
   private async getBucketById(id: string): Promise<PlannerBucket> {
@@ -214,8 +187,7 @@ class PlannerBucketGetCommand extends GraphCommand {
       return ownerGroupId;
     }
 
-    const group = await entraGroup.getGroupByDisplayName(ownerGroupName!);
-    return group.id!;
+    return entraGroup.getGroupIdByDisplayName(ownerGroupName!);
   }
 }
 

@@ -11,10 +11,12 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  type: string;
+  type?: string;
 }
 
 class SpoCdnGetCommand extends SpoCommand {
+  private readonly validTypes: string[] = ['Public', 'Private'];
+
   public get name(): string {
     return commands.CDN_GET;
   }
@@ -29,6 +31,7 @@ class SpoCdnGetCommand extends SpoCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initTypes();
   }
 
   #initTelemetry(): void {
@@ -43,7 +46,7 @@ class SpoCdnGetCommand extends SpoCommand {
     this.options.unshift(
       {
         option: '-t, --type [type]',
-        autocomplete: ['Public', 'Private']
+        autocomplete: this.validTypes
       }
     );
   }
@@ -51,16 +54,17 @@ class SpoCdnGetCommand extends SpoCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (args.options.type) {
-          if (args.options.type !== 'Public' &&
-            args.options.type !== 'Private') {
-            return `${args.options.type} is not a valid CDN type. Allowed values are Public|Private`;
-          }
+        if (args.options.type && !this.validTypes.includes(args.options.type)) {
+          return `'${args.options.type}' is not a valid CDN type. Allowed values are: ${this.validTypes.join(', ')}.`;
         }
 
         return true;
       }
     );
+  }
+
+  #initTypes(): void {
+    this.types.string.push('type');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -92,15 +96,13 @@ class SpoCdnGetCommand extends SpoCommand {
       if (response.ErrorInfo) {
         throw response.ErrorInfo.ErrorMessage;
       }
-      else {
-        const result: boolean = json[json.length - 1];
-        if (this.verbose) {
-          await logger.logToStderr(`${(cdnType === 0 ? 'Public' : 'Private')} CDN at ${spoAdminUrl} is ${(result === true ? 'enabled' : 'disabled')}`);
-        }
-        else {
-          await logger.logToStderr(result);
-        }
+
+      const result: boolean = json[json.length - 1];
+      if (this.verbose) {
+        await logger.logToStderr(`${cdnType === 0 ? 'Public' : 'Private'} CDN at ${spoAdminUrl} is ${result === true ? 'enabled' : 'disabled'}`);
       }
+
+      await logger.log(result);
     }
     catch (err: any) {
       this.handleRejectedPromise(err);

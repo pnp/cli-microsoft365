@@ -14,6 +14,7 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import ppSolutionGetCommand from './solution-get.js';
 import command from './solution-publish.js';
+import { accessToken } from '../../../../utils/accessToken.js';
 
 describe(commands.SOLUTION_PUBLISH, () => {
   let commandInfo: CommandInfo;
@@ -48,6 +49,7 @@ describe(commands.SOLUTION_PUBLISH, () => {
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
+    sinon.stub(accessToken, 'assertDelegatedAccessToken').returns();
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
   });

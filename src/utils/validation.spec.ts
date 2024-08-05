@@ -106,6 +106,16 @@ describe('validation/validation', () => {
     assert.strictEqual(result, true);
   });
 
+  it('isValidGuidArray returns true if guids are valid', () => {
+    const result = validation.isValidGuidArray('16c578ea-5785-492e-ac22-cad3cd9ca1fa,16cd5c6b-e9e9-4364-b71e-1a1664f81b98,7c9a1059-a725-424c-9dd0-788e66a5338e,02e83c70-f05f-4e63-b9af-73a8e44fdb32,5a53c7d7-2a26-4645-a938-b3e4d08b4a18');
+    assert.strictEqual(result, true);
+  });
+
+  it('isValidGuidArray returns guids that are not valid', () => {
+    const result = validation.isValidGuidArray('000,16c578ea-5785-492e-ac22-cad3cd9ca1fz,16cd5c6b-e9e9-4364-b71e-1a1664f81b98,7c9a1059-a725-424c-9dd0-788e66a5338e,02e83c70-f05f-4e63-b9af-73a8e44fdb32,5a53c7d7-2a26-4645-a938-b3e4d08b4a18');
+    assert.strictEqual(result, "000, 16c578ea-5785-492e-ac22-cad3cd9ca1fz");
+  });
+
   it('isValidGuid returns true if valid guid', () => {
     const result = validation.isValidGuid('b2307a39-e878-458b-bc90-03bc578531d6');
     assert.strictEqual(result, true);
@@ -131,29 +141,28 @@ describe('validation/validation', () => {
     assert.strictEqual(result, true);
   });
 
-
   it('isValidGuid returns true with @meId (case sensitive)', () => {
     const result = validation.isValidGuid('@meId ');
     assert.strictEqual(result, true);
   });
 
   it('isValidUserPrincipalNameArray returns true if valid username array', () => {
-    const result = validation.isValidUserPrincipalNameArray(['john.doe@contoso.com', 'adele@contoso.onmicrosoft.com']);
+    const result = validation.isValidUserPrincipalNameArray('john.doe@contoso.com,adele@contoso.onmicrosoft.com');
     assert.strictEqual(result, true);
   });
 
   it('isValidUserPrincipalNameArray returns falsy value of invalid username array', () => {
-    const result = validation.isValidUserPrincipalNameArray(['john.doe@contoso.com', 'foo']);
+    const result = validation.isValidUserPrincipalNameArray('john.doe@contoso.com,foo');
     assert.strictEqual(result, 'foo');
   });
 
   it('isValidUserPrincipalNameArray returns true with @meusername token', () => {
-    const result = validation.isValidUserPrincipalNameArray(['john.doe@contoso.com', '@meusername']);
+    const result = validation.isValidUserPrincipalNameArray('john.doe@contoso.com,@meusername');
     assert.strictEqual(result, true);
   });
 
   it('isValidUserPrincipalNameArray returns true with @meusername token and spaces', () => {
-    const result = validation.isValidUserPrincipalNameArray(['john.doe@contoso.com', '@meusername ']);
+    const result = validation.isValidUserPrincipalNameArray('john.doe@contoso.com,@meusername ');
     assert.strictEqual(result, true);
   });
 
@@ -183,6 +192,40 @@ describe('validation/validation', () => {
     assert.strictEqual(result, true);
   });
 
+  it('isValidPositiveInteger returns true if valid integer as string', () => {
+    const result = validation.isValidPositiveInteger('1');
+    assert.strictEqual(result, true);
+  });
+
+  it('isValidPositiveInteger returns true if valid integer as number', () => {
+    const result = validation.isValidPositiveInteger(1);
+    assert.strictEqual(result, true);
+  });
+
+  it('isValidPositiveInteger returns error message of invalid integer when input is not a number', () => {
+    const result = validation.isValidPositiveInteger('foo');
+    assert.strictEqual(result, false);
+  });
+
+  it('isValidPositiveInteger returns error message of invalid integer when number not positive', () => {
+    const result = validation.isValidPositiveInteger(-5);
+    assert.strictEqual(result, false);
+  });
+
+  it('isValidPositiveIntegerArray returns true if valid integer array', () => {
+    const result = validation.isValidPositiveIntegerArray('1, 2, 3, 4, 5');
+    assert.strictEqual(result, true);
+  });
+
+  it('isValidPositiveIntegerArray returns error message of invalid integer when input is not a number', () => {
+    const result = validation.isValidPositiveIntegerArray('1, 2, foo, 4, bar');
+    assert.strictEqual(result, 'foo, bar');
+  });
+
+  it('isValidPositiveIntegerArray returns error message of invalid integer when number not positive', () => {
+    const result = validation.isValidPositiveIntegerArray('0, 1, 2, 3, 4, -5');
+    assert.strictEqual(result, '0, -5');
+  });
 
   it('isValidTeamsChannelId returns true if valid channelId (all numbers)', () => {
     const result = validation.isValidTeamsChannelId('19:0000000000000000000000000000000@thread.skype');

@@ -7,6 +7,8 @@ import request, { CliRequestOptions } from "../../../../request.js";
 import { Logger } from "../../../../cli/Logger.js";
 import { validation } from "../../../../utils/validation.js";
 import aadCommands from "../../aadCommands.js";
+import { formatting } from "../../../../utils/formatting.js";
+import { cli } from "../../../../cli/cli.js";
 
 interface CommandArgs {
   options: Options;
@@ -14,6 +16,7 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   appId?: string;
+  appName?: string;
   appObjectId?: string;
   applicationPermissions?: string;
   delegatedPermissions?: string;
@@ -57,6 +60,7 @@ class EntraAppPermissionAddCommand extends GraphCommand {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
         appId: typeof args.options.appId !== 'undefined',
+        appName: typeof args.options.appName !== 'undefined',
         appObjectId: typeof args.options.appObjectId !== 'undefined',
         applicationPermissions: typeof args.options.applicationPermissions !== 'undefined',
         delegatedPermissions: typeof args.options.delegatedPermissions !== 'undefined',
@@ -68,6 +72,7 @@ class EntraAppPermissionAddCommand extends GraphCommand {
   #initOptions(): void {
     this.options.unshift(
       { option: '-i, --appId [appId]' },
+      { option: '-n, --appName [appName]' },
       { option: '--appObjectId [appObjectId]' },
       { option: '-a, --applicationPermissions [applicationPermissions]' },
       { option: '-d, --delegatedPermissions [delegatedPermissions]' },
@@ -92,7 +97,7 @@ class EntraAppPermissionAddCommand extends GraphCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push({ options: ['appId', 'appObjectId'] });
+    this.optionSets.push({ options: ['appId', 'appName', 'appObjectId'] });
     this.optionSets.push({
       options: ['applicationPermissions', 'delegatedPermissions'],
       runsWhen: (args) => args.options.delegatedPermissions === undefined && args.options.applicationPermissions === undefined
@@ -106,6 +111,7 @@ class EntraAppPermissionAddCommand extends GraphCommand {
       const appObject = await this.getAppObject(args.options);
       const servicePrincipals = await this.getServicePrincipals();
       const appPermissions: AppPermission[] = [];
+
       if (args.options.delegatedPermissions) {
         const delegatedPermissions = await this.getRequiredResourceAccessForApis(servicePrincipals, args.options.delegatedPermissions, ScopeType.Scope, appPermissions, logger);
         this.addPermissionsToResourceArray(delegatedPermissions, appObject.requiredResourceAccess!);
@@ -130,8 +136,12 @@ class EntraAppPermissionAddCommand extends GraphCommand {
       await request.patch(addPermissionsRequestOptions);
 
       if (args.options.grantAdminConsent) {
-        const appServicePrincipal = servicePrincipals.find(sp => sp.appId === appObject.appId);
-        await this.grantAdminConsent(appServicePrincipal!, appPermissions, logger);
+        let appServicePrincipal = servicePrincipals.find(sp => sp.appId === appObject.appId);
+        if (!appServicePrincipal) {
+          appServicePrincipal = await this.createServicePrincipal(appObject.appId!, logger);
+        }
+
+        await this.grantAdminConsent(appServicePrincipal, appPermissions, logger);
       }
     }
     catch (err: any) {
@@ -139,13 +149,51 @@ class EntraAppPermissionAddCommand extends GraphCommand {
     }
   }
 
+  private async createServicePrincipal(appId: string, logger: Logger): Promise<ServicePrincipal> {
+    if (this.verbose) {
+      await logger.logToStderr(`Creating service principal for app ${appId}...`);
+    }
+
+    const requestOptions: CliRequestOptions = {
+      url: `${this.resource}/v1.0/servicePrincipals`,
+      headers: {
+        accept: 'application/json;odata.metadata=none',
+        'content-type': 'application/json;odata=nometadata'
+      },
+      data: {
+        appId
+      },
+      responseType: 'json'
+    };
+
+    return await request.post<ServicePrincipal>(requestOptions);
+  }
+
   private async getAppObject(options: Options): Promise<Application> {
-    const apps = options.appObjectId
-      ? await odata.getAllItems<Application>(`${this.resource}/v1.0/applications?$filter=id eq '${options.appObjectId}'&$select=id,appId,requiredResourceAccess`)
-      : await odata.getAllItems<Application>(`${this.resource}/v1.0/applications?$filter=appId eq '${options.appId}'&$select=id,appId,requiredResourceAccess`);
+    let appNotFoundMessage = '';
+    let apps: Application[] = [];
+
+    if (options.appId) {
+      apps = await odata.getAllItems<Application>(`${this.resource}/v1.0/applications?$filter=appId eq '${options.appId}'&$select=id,appId,requiredResourceAccess`);
+      appNotFoundMessage = `client id ${options.appId}`;
+    }
+    else if (options.appName) {
+      apps = await odata.getAllItems<Application>(`${this.resource}/v1.0/applications?$filter=displayName eq '${formatting.encodeQueryParameter(options.appName)}'&$select=id,appId,requiredResourceAccess`);
+      appNotFoundMessage = `name ${options.appName}`;
+
+      if (apps.length > 1) {
+        const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', apps);
+        const result = await cli.handleMultipleResultsFound<Application>(`Multiple Entra application registrations with name '${options.appName}' found.`, resultAsKeyValuePair);
+        return result;
+      }
+    }
+    else if (options.appObjectId) {
+      apps = await odata.getAllItems<Application>(`${this.resource}/v1.0/applications?$filter=id eq '${options.appObjectId}'&$select=id,appId,requiredResourceAccess`);
+      appNotFoundMessage = `object id ${options.appObjectId}`;
+    }
 
     if (apps.length === 0) {
-      throw `App with ${options.appObjectId ? 'object id' : 'client id'} ${options.appObjectId ? options.appObjectId : options.appId} not found in Microsoft Entra ID`;
+      throw `App with ${appNotFoundMessage} not found in Microsoft Entra ID`;
     }
 
     return apps[0];

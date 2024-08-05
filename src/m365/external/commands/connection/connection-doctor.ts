@@ -2,13 +2,12 @@ import { ExternalConnectors, SearchResponse } from '@microsoft/microsoft-graph-t
 import os from 'os';
 import Command from '../../../../Command.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
-import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import request, { CliRequestOptions } from '../../../../request.js';
-import { settingsNames } from '../../../../settingsNames.js';
 import { ODataResponse } from '../../../../utils/odata.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
+import { CheckStatus, formatting } from '../../../../utils/formatting.js';
 
 interface CommandArgs {
   options: Options;
@@ -98,9 +97,7 @@ class ExternalConnectionDoctorCommand extends GraphCommand {
     const output = args.options.output;
     this.checksStatus = [];
 
-    const showSpinner = cli.getSettingWithDefaultValue<boolean>(settingsNames.showSpinner, true) &&
-      output === 'text' &&
-      typeof global.it === 'undefined';
+    const show = output === 'text';
 
     let checks: Check[] = [
       {
@@ -203,21 +200,13 @@ class ExternalConnectionDoctorCommand extends GraphCommand {
 
     for (const check of checks) {
       if (this.debug) {
-        logger.logToStderr(`Running check ${check.id}...`);
-      }
-
-      // don't show spinner if running tests
-      /* c8 ignore next 3 */
-      if (showSpinner) {
-        cli.spinner.start(check.text);
+        await logger.logToStderr(`Running check ${check.id}...`);
       }
 
       // only automated checks have functions
       if (!check.fn) {
-        // don't show spinner if running tests
-        /* c8 ignore next 3 */
-        if (showSpinner) {
-          cli.spinner.info(`${check.text} (manual)`);
+        if (show) {
+          await logger.log(formatting.getStatus(CheckStatus.Information, `${check.text} (manual)`));
         }
 
         this.checksStatus.push({
@@ -232,25 +221,20 @@ class ExternalConnectionDoctorCommand extends GraphCommand {
       this.checksStatus.push({ ...check, ...result });
 
       if (result.status === 'passed') {
-        // don't show spinner if running tests
-        /* c8 ignore next 3 */
-        if (showSpinner) {
-          cli.spinner.succeed();
+        if (show) {
+          await logger.log(formatting.getStatus(CheckStatus.Success, check.text));
         }
-
         continue;
       }
 
       if (result.status === 'failed') {
-        // don't show spinner if running tests
-        /* c8 ignore next 9 */
-        if (showSpinner) {
+        if (show) {
           const message = `${check.text}: ${result.errorMessage}`;
           if (check.type === 'required') {
-            cli.spinner.fail(message);
+            await logger.log(formatting.getStatus(CheckStatus.Failure, message));
           }
           else {
-            cli.spinner.warn(message);
+            await logger.log(formatting.getStatus(CheckStatus.Warning, check.text));
           }
         }
 
@@ -260,7 +244,7 @@ class ExternalConnectionDoctorCommand extends GraphCommand {
       }
     }
 
-    if (output === 'text' || output === 'none') {
+    if (show || output === 'none') {
       return;
     }
 
