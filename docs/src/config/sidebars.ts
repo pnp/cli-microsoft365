@@ -331,6 +331,11 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'enterpriseapp list',
               id: 'cmd/entra/enterpriseapp/enterpriseapp-list'
+            },
+            {
+              type: 'doc',
+              label: 'enterpriseapp remove',
+              id: 'cmd/entra/enterpriseapp/enterpriseapp-remove'
             }
           ]
         },
