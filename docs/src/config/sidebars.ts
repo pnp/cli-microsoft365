@@ -1551,6 +1551,15 @@ const sidebars: SidebarsConfig = {
           ]
         },
         {
+          recyclebinitem: [
+            {
+              type: 'doc',
+              label: 'recyclebinitem restore',
+              id: 'cmd/flow/recyclebinitem/recyclebinitem-restore'
+            }
+          ]
+        },
+        {
           run: [
             {
               type: 'doc',
