@@ -26,10 +26,46 @@ m365 spo page section add [options]
 : Order of the section to add.
 
 `--zoneEmphasis [zoneEmphasis]`
-: Section background shading. Allowed values `None`, `Neutral`, `Soft`, `Strong`
+: Section background shading. Allowed values `None`, `Neutral`, `Soft`, `Strong`, `Image`,`Gradient`
 
 `--isLayoutReflowOnTop`
-: The position of the Vertical section for smaller screens. Applied only for Vertical section.
+: The position of the Vertical section for smaller screens. Applied only for `Vertical` section.
+
+`--isCollapsibleSection`
+: Set section to be collapsible.
+
+`--showDivider`
+: Shows a divider line between sections.
+
+`--iconAlignment [iconAlignment]`
+: Specifies the alignment of the expand/collapse icon. Sets `Left` alignment if not specified.
+
+`--isExpanded`
+: Sets the default display state of the collapsible section. Sets `false` if not specified.
+
+`--gradientText [gradientText]`
+: Sets the gradient setting of the background of a section. Required when `zoneEmphasis` is `Gradient`.
+
+`--imageUrl [imageUrl]`
+: The background image URL. Required when `zoneEmphasis` is `Image`.
+
+`--imageHeight [imageHeight]`
+: The height of the background image. Applied only when when `zoneEmphasis` is `Image`. Sets `955` value if not specified.
+
+`--imageWidth [imageWidth]`
+: The width of the background image. Applied only when `zoneEmphasis` is `Image`. Sets `555` value if not specified.
+
+`--fillMode [fillMode]`
+: The fill mode of the background image. Applied only when `zoneEmphasis` is `Image`. Possible values are `ScaleToFill`, `ScaleToFit`, `Tile`, `OriginalSize`. Sets `ScaleToFill` value if not specified.
+
+`--useLightText`
+: Specifies whether to use light text for the background. Applied only when `zoneEmphasis` is `Image`.
+
+`--overlayColor [overlayColor]`
+:	The overlay color for the background in #RRGGBB format. Applied only when `zoneEmphasis` is `Image` or `Gradient`. Sets `#ffffff` value if not specified.
+
+`--overlayOpacity [overlayOpacity]`	
+: The overlay opacity for the background. Applied only when `zoneEmphasis` is `Image` or `Gradient`. Sets `60` value if not specified.
 ```
 
 <Global />
@@ -63,6 +99,25 @@ Add Vertical section with background shading to the modern page with adjusting t
 ```sh
 m365 spo page section add --pageName home.aspx --webUrl https://contoso.sharepoint.com/sites/newsletter --sectionTemplate Vertical --zoneEmphasis Neutral --isLayoutReflowOnTop
 ```
+
+Add OneColumn section as a collapsible section as expanded with icon alligned to the left
+
+```sh
+m365 spo page section add --pageName home.aspx --webUrl https://contoso.sharepoint.com/sites/newsletter --sectionTemplate OneColumn --isCollapsibleSection --isExpanded --iconAlignment Left
+```
+
+Add TwoColumn section with Image background
+
+```sh
+m365 spo page section add --pageName home.aspx --webUrl https://contoso.sharepoint.com/sites/newsletter --sectionTemplate TwoColumn --imageUrl "https://contoso.com/image.jpg" --zoneEmphasis Image --fillMode Tile
+```
+
+Add OneColumn section with Gradient background
+
+```sh
+m365 spo page section add --pageName home.aspx --webUrl https://contoso.sharepoint.com/sites/newsletter --sectionTemplate TwoColumn --zoneEmphasis Gradient --gradientText "linear-gradient(72.44deg, #E6FBFE 0%, #EDDDFB 100%)"
+```
+
 
 ## Response
 
