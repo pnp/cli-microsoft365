@@ -90,13 +90,6 @@ class SpoTenantRecycleBinItemRestoreCommand extends SpoCommand {
 
         await request.post(restoreOptions);
       }
-
-      // Here, we return a fixed response because this new API endpoint doesn't return a response while the previous API did.
-      // This has to be removed in the next major release.
-      await logger.log({
-        HasTimedout: false,
-        PollingInterval: 15000
-      });
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
