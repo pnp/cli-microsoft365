@@ -1728,6 +1728,38 @@ export const spo = {
   },
 
   /**
+   * Retrieves the server-relative URL of a folder.
+   * @param webUrl Web URL
+   * @param folderUrl Folder URL
+   * @param folderId Folder ID
+   * @returns The server-relative URL of the folder
+   */
+  async getFolderServerRelativeUrl(webUrl: string, folderUrl: string | undefined, folderId: string | undefined): Promise<string> {
+    let requestUrl: string = `${webUrl}/_api/web/`;
+
+    if (folderUrl) {
+      const folderServerRelativeUrl: string = urlUtil.getServerRelativePath(webUrl, folderUrl);
+      requestUrl += `GetFolderByServerRelativePath(decodedUrl='${formatting.encodeQueryParameter(folderServerRelativeUrl)}')`;
+    }
+    else {
+      requestUrl += `GetFolderById('${folderId}')`;
+    }
+
+    requestUrl += '?$select=ServerRelativeUrl';
+
+    const requestOptions: CliRequestOptions = {
+      url: requestUrl,
+      headers: {
+        accept: 'application/json;odata=nometadata'
+      },
+      responseType: 'json'
+    };
+
+    const res = await request.get<{ ServerRelativeUrl: string }>(requestOptions);
+    return res.ServerRelativeUrl;
+  },
+
+  /**
    * Retrieves the ObjectIdentity from a SharePoint site
    * @param webUrl web url
    * @param logger The logger object
