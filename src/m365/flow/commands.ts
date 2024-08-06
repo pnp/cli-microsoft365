@@ -13,6 +13,7 @@ export default {
   OWNER_ENSURE: `${prefix} owner ensure`,
   OWNER_LIST: `${prefix} owner list`,
   OWNER_REMOVE: `${prefix} owner remove`,
+  RECYCLEBINITEM_RESTORE: `${prefix} recyclebinitem restore`,
   REMOVE: `${prefix} remove`,
   RUN_CANCEL: `${prefix} run cancel`,
   RUN_GET: `${prefix} run get`,
