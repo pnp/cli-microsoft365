@@ -16,7 +16,7 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   name: string;
   environmentName: string;
-  packageDisplayName: string;
+  packageDisplayName?: string;
   packageDescription?: string;
   packageCreatedBy?: string;
   packageSourceEnvironment?: string;
@@ -40,6 +40,7 @@ class PaAppExportCommand extends PowerPlatformCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initTypes();
   }
 
   #initTelemetry(): void {
@@ -95,13 +96,21 @@ class PaAppExportCommand extends PowerPlatformCommand {
     );
   }
 
+  #initTypes(): void {
+    this.types.string.push('name', 'environmentName', 'packageDisplayName', 'packageDescription', 'packageCreatedBy', 'packageSourceEnvironment', 'path');
+  }
+
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       const location = await this.exportPackage(args, logger);
-      const packageLink = await this.getPackageLink(args, logger, location);
-      //Replace all illegal characters from the file name
-      const illegalCharsRegEx = /[\\\/:*?"<>|]/g;
-      const filename = args.options.packageDisplayName.replace(illegalCharsRegEx, '_');
+      const packageLink = await this.getPackageLink(logger, location);
+
+      let filename = args.options.name;
+      if (args.options.packageDisplayName) {
+        //Replace all illegal characters from the file name
+        const illegalCharsRegEx = /[\\\/:*?"<>|]/g;
+        filename = args.options.packageDisplayName.replace(illegalCharsRegEx, '_');
+      }
 
       const requestOptions: CliRequestOptions = {
         url: packageLink,
@@ -113,7 +122,7 @@ class PaAppExportCommand extends PowerPlatformCommand {
         }
       };
 
-      const file = await request.get<string>(requestOptions);
+      const file = await request.get<any>(requestOptions);
 
       let path = args.options.path || './';
 
@@ -179,7 +188,7 @@ class PaAppExportCommand extends PowerPlatformCommand {
         details: {
           creator: args.options.packageCreatedBy,
           description: args.options.packageDescription,
-          displayName: args.options.packageDisplayName,
+          displayName: args.options.packageDisplayName || args.options.name,
           sourceEnvironment: args.options.packageSourceEnvironment
         },
         resources: resources
@@ -187,12 +196,12 @@ class PaAppExportCommand extends PowerPlatformCommand {
       fullResponse: true
     };
 
-    const response: any = await request.post<any>(requestOptions);
+    const response = await request.post<any>(requestOptions);
 
     return response.headers.location;
   }
 
-  private async getPackageLink(args: CommandArgs, logger: Logger, location: string): Promise<string> {
+  private async getPackageLink(logger: Logger, location: string): Promise<string> {
     if (this.verbose) {
       await logger.logToStderr('Retrieving the package link and waiting on the exported package.');
     }

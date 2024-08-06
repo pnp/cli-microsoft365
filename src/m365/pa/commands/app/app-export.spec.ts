@@ -19,9 +19,7 @@ describe(commands.APP_EXPORT, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
-  let loggerLogToStderrSpy: sinon.SinonSpy;
 
-  const actualFilename = 'Power App.zip';
   const packageDisplayName = 'Power App';
   const packageDescription = 'Power App Description';
   const packageCreatedBy = 'John Doe';
@@ -142,7 +140,7 @@ describe(commands.APP_EXPORT, () => {
     }
   };
 
-  const fileBlobResponse = {
+  const fileBlobResponse: any = {
     type: 'Buffer',
     data: [80, 75, 3, 4, 20, 0, 0, 0, 8, 0, 237, 115, 99, 86, 250, 76, 155, 216, 248, 3, 0, 0, 7, 8, 0, 0, 71, 0, 0, 0, 77, 105, 99, 114, 111, 115, 111, 102, 116, 46, 80, 111, 119, 101, 114, 65, 112, 112, 115, 47, 97, 112, 112, 115, 47, 49, 56, 48, 50, 54, 54, 51, 51, 48]
   };
@@ -171,7 +169,6 @@ describe(commands.APP_EXPORT, () => {
         log.push(msg);
       }
     };
-    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
   });
 
   afterEach(() => {
@@ -195,12 +192,10 @@ describe(commands.APP_EXPORT, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('exports the specified App', async () => {
-    let index = 0;
-    sinon.stub(request, 'get').callsFake(async (opts) => {
+  it('exports the specified app correctly', async () => {
+    const getStub = sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === exportPackageResponse.headers.location) {
-        if (index === 0) {
-          index = 1;
+        if (getStub.calledOnce) {
           return locationRunningResponse;
         }
         else {
@@ -226,17 +221,16 @@ describe(commands.APP_EXPORT, () => {
 
       throw 'invalid request';
     });
-    sinon.stub(fs, 'writeFileSync').returns();
+    const writeFileStub = sinon.stub(fs, 'writeFileSync').returns();
 
-    await assert.doesNotReject(command.action(logger, { options: { name: appId, environmentName: environmentName, packageDisplayName: packageDisplayName } }));
+    await command.action(logger, { options: { name: appId, environmentName: environmentName } });
+    assert(writeFileStub.calledOnceWithExactly(`./${appId}.zip`, fileBlobResponse, 'binary'));
   });
 
-  it('exports the specified App (debug)', async () => {
-    let index = 0;
-    sinon.stub(request, 'get').callsFake(async (opts) => {
+  it('exports the specified app correctly with packageDisplayName', async () => {
+    const getStub = sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === exportPackageResponse.headers.location) {
-        if (index === 0) {
-          index = 1;
+        if (getStub.calledOnce) {
           return locationRunningResponse;
         }
         else {
@@ -262,10 +256,45 @@ describe(commands.APP_EXPORT, () => {
 
       throw 'invalid request';
     });
-    sinon.stub(fs, 'writeFileSync').returns();
+    const writeFileStub = sinon.stub(fs, 'writeFileSync').returns();
+
+    await command.action(logger, { options: { name: appId, environmentName: environmentName, packageDisplayName: packageDisplayName } });
+    assert(writeFileStub.calledOnceWithExactly(`./${packageDisplayName}.zip`, fileBlobResponse, 'binary'));
+  });
+
+  it('exports the specified App correctly with all options', async () => {
+    const getStub = sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === exportPackageResponse.headers.location) {
+        if (getStub.calledOnce) {
+          return locationRunningResponse;
+        }
+        else {
+          return locationSuccessResponse;
+        }
+      }
+
+      if (opts.url === locationSuccessResponse.properties.packageLink.value) {
+        return fileBlobResponse;
+      }
+
+      throw 'invalid request';
+    });
+
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://api.bap.microsoft.com/providers/Microsoft.BusinessAppPlatform/environments/${environmentName}/listPackageResources?api-version=2016-11-01`) {
+        return listPackageResourcesResponse;
+      }
+
+      if (opts.url === `https://api.bap.microsoft.com/providers/Microsoft.BusinessAppPlatform/environments/${environmentName}/exportPackage?api-version=2016-11-01`) {
+        return exportPackageResponse;
+      }
+
+      throw 'invalid request';
+    });
+    const writeFileStub = sinon.stub(fs, 'writeFileSync').returns();
 
     await command.action(logger, { options: { verbose: true, name: appId, environmentName: environmentName, packageDisplayName: packageDisplayName, packageDescription: packageDescription, packageCreatedBy: packageCreatedBy, packageSourceEnvironment: packageSourceEnvironment, path: path } });
-    assert(loggerLogToStderrSpy.calledWith(`File saved to path '${path}/${actualFilename}'`));
+    assert(writeFileStub.calledOnceWithExactly(`${path}/${packageDisplayName}.zip`, fileBlobResponse, 'binary'));
   });
 
   it('fails validation if the name is not a GUID', async () => {
@@ -294,7 +323,7 @@ describe(commands.APP_EXPORT, () => {
 
     sinon.stub(request, 'post').rejects(error);
 
-    await assert.rejects(command.action(logger, { options: { name: appId, environmentName: environmentName, packageDisplayName: packageDisplayName } } as any),
+    await assert.rejects(command.action(logger, { options: { name: appId, environmentName: environmentName, packageDisplayName: packageDisplayName } }),
       new CommandError(error.error.message));
   });
 });
