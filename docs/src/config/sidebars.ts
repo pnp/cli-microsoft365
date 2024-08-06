@@ -1570,6 +1570,11 @@ const sidebars: SidebarsConfig = {
           recyclebinitem: [
             {
               type: 'doc',
+              label: 'recyclebinitem list',
+              id: 'cmd/flow/recyclebinitem/recyclebinitem-list'
+            },
+            {
+              type: 'doc',
               label: 'recyclebinitem restore',
               id: 'cmd/flow/recyclebinitem/recyclebinitem-restore'
             }
