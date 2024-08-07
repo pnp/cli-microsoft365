@@ -1732,9 +1732,15 @@ export const spo = {
    * @param webUrl Web URL
    * @param folderUrl Folder URL
    * @param folderId Folder ID
+   * @param logger The logger object
+   * @param verbose Set for verbose logging
    * @returns The server-relative URL of the folder
    */
-  async getFolderServerRelativeUrl(webUrl: string, folderUrl: string | undefined, folderId: string | undefined): Promise<string> {
+  async getFolderServerRelativeUrl(webUrl: string, folderUrl?: string, folderId?: string, logger?: Logger, verbose?: boolean): Promise<string> {
+    if (verbose && logger) {
+      await logger.logToStderr(`Retrieving server-relative URL for folder ${folderUrl ? `URL: ${folderUrl}` : `ID: ${folderId}`}`);
+    }
+
     let requestUrl: string = `${webUrl}/_api/web/`;
 
     if (folderUrl) {

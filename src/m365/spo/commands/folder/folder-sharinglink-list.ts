@@ -4,7 +4,7 @@ import GlobalOptions from '../../../../GlobalOptions.js';
 import { spo } from '../../../../utils/spo.js';
 import { odata } from '../../../../utils/odata.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
-import { driveUtil } from '../../../../utils/driveUtil.js';
+import { drive } from '../../../../utils/drive.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import { Drive } from '@microsoft/microsoft-graph-types';
@@ -86,7 +86,7 @@ class SpoFolderSharingLinkListCommand extends SpoCommand {
           return `${args.options.folderId} is not a valid GUID`;
         }
 
-        if (args.options.scope && this.allowedScopes.indexOf(args.options.scope) === -1) {
+        if (args.options.scope && !this.allowedScopes.some(scope => scope === args.options.scope)) {
           return `'${args.options.scope}' is not a valid scope. Allowed values are: ${this.allowedScopes.join(',')}`;
         }
 
@@ -105,27 +105,34 @@ class SpoFolderSharingLinkListCommand extends SpoCommand {
     }
 
     try {
-      const relFolderUrl: string = await spo.getFolderServerRelativeUrl(args.options.webUrl, args.options.folderUrl, args.options.folderId);
+      const relFolderUrl: string = await spo.getFolderServerRelativeUrl(args.options.webUrl, args.options.folderUrl, args.options.folderId, logger, args.options.verbose);
       const absoluteFolderUrl: string = urlUtil.getAbsoluteUrl(args.options.webUrl, relFolderUrl);
       const folderUrl: URL = new URL(absoluteFolderUrl);
 
       const siteId: string = await spo.getSiteId(args.options.webUrl);
-      const drive: Drive = await driveUtil.getDriveByUrl(siteId, folderUrl);
-      const itemId: string = await driveUtil.getDriveItemId(drive, folderUrl);
+      const driveDetails: Drive = await drive.getDriveByUrl(siteId, folderUrl, logger, args.options.verbose);
+      const itemId: string = await drive.getDriveItemId(driveDetails, folderUrl, logger, args.options.verbose);
 
-      let requestUrl = `https://graph.microsoft.com/v1.0/drives/${drive.id}/items/${itemId}/permissions?$filter=Link ne null`;
+      let requestUrl = `https://graph.microsoft.com/v1.0/drives/${driveDetails.id}/items/${itemId}/permissions?$filter=Link ne null`;
       if (args.options.scope) {
         requestUrl += ` and Link/Scope eq '${args.options.scope}'`;
       }
 
       const sharingLinks = await odata.getAllItems<any>(requestUrl);
 
+      // remove grantedToIdentities from the sharing link object
+      const filteredSharingLinks = sharingLinks.map(link => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { grantedToIdentities, ...filteredLink } = link;
+        return filteredLink;
+      });
+
       if (!args.options.output || !cli.shouldTrimOutput(args.options.output)) {
-        await logger.log(sharingLinks);
+        await logger.log(filteredSharingLinks);
       }
       else {
         //converted to text friendly output
-        await logger.log(sharingLinks.map(i => {
+        await logger.log(filteredSharingLinks.map(i => {
           return {
             id: i.id,
             roles: i.roles.join(','),

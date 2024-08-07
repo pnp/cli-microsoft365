@@ -14,7 +14,7 @@ import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import commands from '../../commands.js';
 import command from './folder-sharinglink-list.js';
 import { spo } from '../../../../utils/spo.js';
-import { driveUtil } from '../../../../utils/driveUtil.js';
+import { drive } from '../../../../utils/drive.js';
 import { Drive } from '@microsoft/microsoft-graph-types';
 
 describe(commands.FOLDER_SHARINGLINK_LIST, () => {
@@ -40,7 +40,6 @@ describe(commands.FOLDER_SHARINGLINK_LIST, () => {
         "shareId": "u!aHR0cHM6Ly83NTY2YXZhLnNoYXJlcG9pbnQuY29tLzpmOi9nL0V2QVFpdnpLV2ZoT3ZJOHJiNm1UVEhjQnZ4SFBWWW10aGRJNUpYdG51cGhOeUE",
         "hasPassword": false,
         "grantedToIdentitiesV2": [],
-        "grantedToIdentities": [],
         "link": {
           "scope": "anonymous",
           "type": "view",
@@ -56,7 +55,6 @@ describe(commands.FOLDER_SHARINGLINK_LIST, () => {
         "shareId": "u!aHR0cHM6Ly83NTY2YXZhLnNoYXJlcG9pbnQuY29tLzpmOi9nL0V2QVFpdnpLV2ZoT3ZJOHJiNm1UVEhjQmQzUUxCOXVsUGIyQTQ1UG81ZmRuYWc",
         "hasPassword": true,
         "grantedToIdentitiesV2": [],
-        "grantedToIdentities": [],
         "link": {
           "scope": "users",
           "type": "view",
@@ -71,7 +69,6 @@ describe(commands.FOLDER_SHARINGLINK_LIST, () => {
         ],
         "hasPassword": true,
         "grantedToIdentitiesV2": [],
-        "grantedToIdentities": [],
         "link": {
           "scope": "organization",
           "type": "edit",
@@ -91,7 +88,7 @@ describe(commands.FOLDER_SHARINGLINK_LIST, () => {
     }
   ];
 
-  const drive: Drive = {
+  const driveDetails: Drive = {
     id: driveId,
     webUrl: `${webUrl}/Shared%20Documents`
   };
@@ -99,8 +96,8 @@ describe(commands.FOLDER_SHARINGLINK_LIST, () => {
   const getStubs: any = (options: any) => {
     sinon.stub(spo, 'getFolderServerRelativeUrl').resolves(options.folderUrl);
     sinon.stub(spo, 'getSiteId').resolves(options.siteId);
-    sinon.stub(driveUtil, 'getDriveByUrl').resolves(options.drive);
-    sinon.stub(driveUtil, 'getDriveItemId').resolves(options.itemId);
+    sinon.stub(drive, 'getDriveByUrl').resolves(options.drive);
+    sinon.stub(drive, 'getDriveItemId').resolves(options.itemId);
   };
 
   const stubOdataResponse: any = (graphResponse: any = null) => {
@@ -152,8 +149,8 @@ describe(commands.FOLDER_SHARINGLINK_LIST, () => {
       odata.getAllItems,
       spo.getSiteId,
       spo.getFolderServerRelativeUrl,
-      driveUtil.getDriveByUrl,
-      driveUtil.getDriveItemId
+      drive.getDriveByUrl,
+      drive.getDriveItemId
     ]);
   });
 
@@ -191,7 +188,7 @@ describe(commands.FOLDER_SHARINGLINK_LIST, () => {
   });
 
   it('retrieves sharing links from folder specified by id', async () => {
-    getStubs({ folderUrl: folderUrl, siteId: siteId, drive: drive, itemId: itemId });
+    getStubs({ folderUrl: folderUrl, siteId: siteId, drive: driveDetails, itemId: itemId });
     stubOdataResponse(graphResponse);
 
     await command.action(logger, { options: { webUrl: webUrl, folderId: folderId, verbose: true } } as any);
@@ -199,7 +196,7 @@ describe(commands.FOLDER_SHARINGLINK_LIST, () => {
   });
 
   it('retrieves sharing links from folder specified by url', async () => {
-    getStubs({ folderUrl: folderUrl, siteId: siteId, drive: drive, itemId: itemId });
+    getStubs({ folderUrl: folderUrl, siteId: siteId, drive: driveDetails, itemId: itemId });
     stubOdataResponse(graphResponse);
 
     await command.action(logger, { options: { webUrl: webUrl, folderUrl: folderUrl, verbose: true } } as any);
@@ -208,7 +205,7 @@ describe(commands.FOLDER_SHARINGLINK_LIST, () => {
 
   it('retrieves sharing links from folder specified by id and valid scope', async () => {
     const scope = 'organization';
-    getStubs({ folderUrl: folderUrl, siteId: siteId, drive: drive, itemId: itemId });
+    getStubs({ folderUrl: folderUrl, siteId: siteId, drive: driveDetails, itemId: itemId });
     stubOdataScopeResponse(scope, graphResponse);
 
     await command.action(logger, { options: { webUrl: webUrl, folderId: folderId, scope: scope } } as any);
@@ -217,7 +214,7 @@ describe(commands.FOLDER_SHARINGLINK_LIST, () => {
 
   it('retrieves sharing links from folder specified by id and output as text', async () => {
     const scope = 'anonymous';
-    getStubs({ folderUrl: folderUrl, siteId: siteId, drive: drive, itemId: itemId });
+    getStubs({ folderUrl: folderUrl, siteId: siteId, drive: driveDetails, itemId: itemId });
     stubOdataScopeResponse(scope, graphResponse);
 
     await command.action(logger, { options: { webUrl: webUrl, folderId: folderId, scope: scope, output: 'text' } } as any);

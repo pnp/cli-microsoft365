@@ -1956,32 +1956,37 @@ describe('utils/spo', () => {
   });
 
   it('returns the folder server relative URL by URL', async () => {
+    const serverRelativeUrl = '/sites/sales/shared documents/folder1';
+
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `${webUrl}/_api/web/GetFolderByServerRelativePath(decodedUrl='${formatting.encodeQueryParameter('/sites/sales/shared documents/folder1')}')?$select=ServerRelativeUrl`
+      if (opts.url === `${webUrl}/_api/web/GetFolderByServerRelativePath(decodedUrl='${formatting.encodeQueryParameter(serverRelativeUrl)}')?$select=ServerRelativeUrl`
       ) {
-        return { ServerRelativeUrl: '/sites/sales/shared documents/folder1' };
+        return { ServerRelativeUrl: serverRelativeUrl };
       }
 
       throw 'Invalid request';
     });
 
-    const url = await spo.getFolderServerRelativeUrl(webUrl, '/sites/sales/shared documents/folder1', undefined);
+    const url = await spo.getFolderServerRelativeUrl(webUrl, serverRelativeUrl, undefined, logger, true);
 
-    assert.strictEqual(url, '/sites/sales/shared documents/folder1');
+    assert.strictEqual(url, serverRelativeUrl);
   });
 
   it('returns the folder server relative URL by id', async () => {
+    const serverRelativeUrl = '/sites/sales/shared documents/folder1';
+    const folderId = 'f09c4efe-b8c0-4e89-a166-03418661b89b';
+
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `${webUrl}/_api/web/GetFolderById('f09c4efe-b8c0-4e89-a166-03418661b89b')?$select=ServerRelativeUrl`) {
-        return { ServerRelativeUrl: '/sites/sales/shared documents/folder1' };
+      if (opts.url === `${webUrl}/_api/web/GetFolderById('${folderId}')?$select=ServerRelativeUrl`) {
+        return { ServerRelativeUrl: serverRelativeUrl };
       }
 
       throw 'Invalid request';
     });
 
-    const url = await spo.getFolderServerRelativeUrl(webUrl, undefined, 'f09c4efe-b8c0-4e89-a166-03418661b89b');
+    const url = await spo.getFolderServerRelativeUrl(webUrl, undefined, folderId, logger, true);
 
-    assert.strictEqual(url, '/sites/sales/shared documents/folder1');
+    assert.strictEqual(url, serverRelativeUrl);
   });
 
   it(`get the file properties with the server relative url`, async () => {
