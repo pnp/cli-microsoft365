@@ -28,7 +28,7 @@
     "prism-react-renderer": "^2.3.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "sass": "^1.77.6",
+    "sass": "^1.77.8",
     "unist-util-visit": "^5.0.0"
   },
   "devDependencies": {
@@ -36,7 +36,7 @@
     "@docusaurus/tsconfig": "^3.4.0",
     "asciinema-player": "^3.8.0",
     "docusaurus-node-polyfills": "^1.0.0",
-    "typescript": "^5.5.3"
+    "typescript": "^5.5.4"
   },
   "browserslist": {
     "production": [
