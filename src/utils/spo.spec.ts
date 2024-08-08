@@ -259,7 +259,6 @@ describe('utils/spo', () => {
       throw 'Invalid request';
     });
 
-
     const tenantAppCatalogUrl = await spo.getTenantAppCatalogUrl(logger, false);
     assert.deepEqual(tenantAppCatalogUrl, 'https://contoso.sharepoint.com/sites/appcatalog');
   });
