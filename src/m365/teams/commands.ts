@@ -40,6 +40,7 @@ export default {
   MESSAGE_LIST: `${prefix} message list`,
   MESSAGE_REMOVE: `${prefix} message remove`,
   MESSAGE_REPLY_LIST: `${prefix} message reply list`,
+  MESSAGE_RESTORE: `${prefix} message restore`,
   MESSAGE_SEND: `${prefix} message send`,
   MESSAGINGSETTINGS_LIST: `${prefix} messagingsettings list`,
   MESSAGINGSETTINGS_SET: `${prefix} messagingsettings set`,
