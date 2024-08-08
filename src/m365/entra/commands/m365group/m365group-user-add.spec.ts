@@ -178,7 +178,7 @@ describe(commands.M365GROUP_USER_ADD, () => {
       options: {
         groupId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
         userName: 'anne.matthews@contoso.onmicrosoft.com',
-        role: 'Owner'
+        role: 'owner'
       }
     }, commandInfo);
     assert.strictEqual(actual, true);
@@ -189,7 +189,7 @@ describe(commands.M365GROUP_USER_ADD, () => {
       options: {
         groupId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
         userName: 'anne.matthews@contoso.onmicrosoft.com',
-        role: 'Member'
+        role: 'member'
       }
     }, commandInfo);
     assert.strictEqual(actual, true);
@@ -235,7 +235,7 @@ describe(commands.M365GROUP_USER_ADD, () => {
     ]);
   });
 
-  it('correctly adds mebers to specified Microsoft Teams team', async () => {
+  it('correctly adds members to specified Microsoft Teams team', async () => {
     const postStub = sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/$batch') {
         return {
@@ -272,7 +272,7 @@ describe(commands.M365GROUP_USER_ADD, () => {
     ]);
   });
 
-  it('correctly adds users to specified Microsoft Teams team wih name', async () => {
+  it('correctly adds users to specified Microsoft Teams team with name', async () => {
     sinon.stub(entraGroup, 'getGroupIdByDisplayName').resolves(groupId);
 
     const postStub = sinon.stub(request, 'post').callsFake(async opts => {
