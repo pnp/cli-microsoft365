@@ -75,7 +75,7 @@ class TeamsMessageRestoreCommand extends DelegatedGraphCommand {
           return `'${args.options.teamId}' is not a valid GUID for 'teamId'.`;
         }
 
-        if (args.options.channelId && !validation.isValidTeamsChannelId(args.options.channelId as string)) {
+        if (args.options.channelId && !validation.isValidTeamsChannelId(args.options.channelId)) {
           return `'${args.options.channelId}' is not a valid ID for 'channelId'.`;
         }
 
@@ -89,7 +89,30 @@ class TeamsMessageRestoreCommand extends DelegatedGraphCommand {
   }
 
   #initTypes(): void {
-    this.types.string.push('teamName', 'channelName');
+    this.types.string.push('teamId', 'teamName', 'channelId', 'channelName', 'id');
+  }
+
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    try {
+      if (this.verbose) {
+        await logger.logToStderr(`Restoring deleted message '${args.options.id}' from channel '${args.options.channelId || args.options.channelName}' in the Microsoft Teams team '${args.options.teamId || args.options.teamName}'.`);
+      }
+
+      const teamId: string = await this.getTeamId(args.options, logger);
+      const channelId: string = await this.getChannelId(args.options, teamId, logger);
+      const requestOptions: CliRequestOptions = {
+        url: `${this.resource}/v1.0/teams/${teamId}/channels/${channelId}/messages/${args.options.id}/undoSoftDelete`,
+        headers: {
+          accept: 'application/json;odata.metadata=none'
+        },
+        responseType: 'json'
+      };
+
+      await request.post(requestOptions);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 
   private async getTeamId(options: Options, logger: Logger): Promise<string> {
@@ -117,29 +140,6 @@ class TeamsMessageRestoreCommand extends DelegatedGraphCommand {
 
     const channelId = await teams.getChannelIdByDisplayName(teamId, options.channelName!);
     return channelId;
-  }
-
-  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    try {
-      if (this.verbose) {
-        await logger.logToStderr(`Restoring deleted message '${args.options.id}' from channel '${args.options.channelId || args.options.channelName}' in the Microsoft Teams team ${args.options.teamId || args.options.teamName}.`);
-      }
-
-      const teamId: string = await this.getTeamId(args.options, logger);
-      const channelId: string = await this.getChannelId(args.options, teamId, logger);
-      const requestOptions: CliRequestOptions = {
-        url: `${this.resource}/v1.0/teams/${teamId}/channels/${channelId}/messages/${args.options.id}/undoSoftDelete`,
-        headers: {
-          accept: 'application/json;odata.metadata=none'
-        },
-        responseType: 'json'
-      };
-
-      await request.post(requestOptions);
-    }
-    catch (err: any) {
-      this.handleRejectedODataJsonPromise(err);
-    }
   }
 }
 

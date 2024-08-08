@@ -32,10 +32,7 @@ describe(commands.MESSAGE_RESTORE, () => {
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
-    auth.connection.accessTokens[auth.defaultResource] = {
-      expiresOn: 'abc',
-      accessToken: 'abc'
-    };
+    sinon.stub(accessToken, 'assertDelegatedAccessToken').returns();
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
   });
@@ -53,10 +50,7 @@ describe(commands.MESSAGE_RESTORE, () => {
         log.push(msg);
       }
     };
-    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      return settingName === settingsNames.prompt ? false : defaultValue;
-    });
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => settingName === settingsNames.prompt ? false : defaultValue);
   });
 
   afterEach(() => {
@@ -187,9 +181,9 @@ describe(commands.MESSAGE_RESTORE, () => {
     });
   });
 
-  it('restores the specified message by team name and channel name (debug)', async () => {
-    sinon.stub(teams, 'getChannelIdByDisplayName').resolves(channelId);
-    sinon.stub(teams, 'getTeamIdByDisplayName').resolves(teamId);
+  it('restores the specified message by team name and channel name', async () => {
+    sinon.stub(teams, 'getChannelIdByDisplayName').withArgs(teamId, channelName).resolves(channelId);
+    sinon.stub(teams, 'getTeamIdByDisplayName').withArgs(teamName).resolves(teamId);
 
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/${teamId}/channels/${channelId}/messages/${messageId}/undoSoftDelete`) {

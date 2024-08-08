@@ -35,17 +35,21 @@ m365 teams message restore [options]
 
 ## Remarks
 
-You can only restore a message from a Microsoft Teams team that you made yourself.
+You can only restore Microsoft Teams messages that you created yourself.
+
+:::info
+
+This command does only support delegated permissions.  
 
 ## Examples
 
-Restores a deleted message by using IDs
+Restore a deleted message by using IDs
 
 ```sh
 m365 teams message restore --teamId 5f5d7b71-1161-44d8-bcc1-3da710eb4171 --channelId 19:4a95f7d8db4c4e7fae857bcebe0623e6@thread.tacv2 --id 1540747442203
 ```
 
-Restores a deleted message by using display names
+Restore a deleted message by using display names
 
 ```sh
 m365 teams message restore --teamName Marketing --channelName Branding --id 1540747442203
