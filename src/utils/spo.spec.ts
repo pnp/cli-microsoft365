@@ -10,7 +10,7 @@ import { sinonUtil } from '../utils/sinonUtil.js';
 import { FormDigestInfo, SpoOperation, spo } from '../utils/spo.js';
 import { entraGroup } from './entraGroup.js';
 import { formatting } from './formatting.js';
-import { Group } from '@microsoft/microsoft-graph-types';
+import { Drive, Group } from '@microsoft/microsoft-graph-types';
 
 const stubPostResponses: any = (
   folderAddResp: any = null

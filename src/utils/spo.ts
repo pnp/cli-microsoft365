@@ -18,7 +18,7 @@ import { SiteProperties } from '../m365/spo/commands/site/SiteProperties.js';
 import { entraGroup } from './entraGroup.js';
 import { SharingCapabilities } from '../m365/spo/commands/site/SharingCapabilities.js';
 import { WebProperties } from '../m365/spo/commands/web/WebProperties.js';
-import { Group, Site } from '@microsoft/microsoft-graph-types';
+import { Group, Site, Drive, DriveItem } from '@microsoft/microsoft-graph-types';
 import { ListItemInstance } from '../m365/spo/commands/listitem/ListItemInstance.js';
 import { ListItemFieldValueResult } from '../m365/spo/commands/listitem/ListItemFieldValueResult.js';
 import { FileProperties } from '../m365/spo/commands/file/FileProperties.js'; import { setTimeout } from 'timers/promises';
