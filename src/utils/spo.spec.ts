@@ -10,7 +10,7 @@ import { sinonUtil } from '../utils/sinonUtil.js';
 import { FormDigestInfo, SpoOperation, spo } from '../utils/spo.js';
 import { entraGroup } from './entraGroup.js';
 import { formatting } from './formatting.js';
-import { Drive, Group } from '@microsoft/microsoft-graph-types';
+import { Group } from '@microsoft/microsoft-graph-types';
 
 const stubPostResponses: any = (
   folderAddResp: any = null
@@ -2537,5 +2537,41 @@ describe('utils/spo', () => {
       debug: false
     });
     assert.strictEqual(amountOfCalls, 4);
+  });
+
+  it('throws error when folder not found by id', async () => {
+    sinon.stub(request, 'get').callsFake(async opts => {
+      if (opts.url === `${webUrl}/_api/web/GetFolderById('invalidFolderId')?$select=ServerRelativeUrl`) {
+        throw `File Not Found`;
+      }
+
+      throw 'Invalid request';
+    });
+
+    try {
+      await spo.getFolderServerRelativeUrl(webUrl, undefined, 'invalidFolderId', logger, true);
+      assert.fail('No error message thrown.');
+    }
+    catch (ex) {
+      assert.deepStrictEqual(ex, `File Not Found`);
+    }
+  });
+
+  it('throws error when folder not found by url', async () => {
+    sinon.stub(request, 'get').callsFake(async opts => {
+      if (opts.url === `${webUrl}/_api/web/GetFolderByServerRelativePath(decodedUrl='%2Fsites%2Fsales%2FinvalidFolderUrl')?$select=ServerRelativeUrl`) {
+        throw `File Not Found`;
+      }
+
+      throw 'Invalid request';
+    });
+
+    try {
+      await spo.getFolderServerRelativeUrl(webUrl, 'invalidFolderUrl', undefined, logger, true);
+      assert.fail('No error message thrown.');
+    }
+    catch (ex) {
+      assert.deepStrictEqual(ex, `File Not Found`);
+    }
   });
 });

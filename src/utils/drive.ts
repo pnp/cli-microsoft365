@@ -13,7 +13,7 @@ export const drive = {
    */
   async getDrive(siteId: string, folderUrl: URL, logger?: Logger, verbose?: boolean): Promise<Drive> {
     if (verbose && logger) {
-      logger.logToStderr(`Retrieving the drive associated with the folder URL: ${folderUrl}...`);
+      await logger.logToStderr(`Retrieving the drive associated with the folder URL: ${folderUrl}...`);
     }
 
     const requestOptions: CliRequestOptions = {
@@ -54,7 +54,7 @@ export const drive = {
    */
   async getDriveItemId(drive: Drive, itemUrl: URL, logger?: Logger, verbose?: boolean): Promise<string> {
     if (verbose && logger) {
-      logger.logToStderr(`Retrieving ID of a drive item associated with item URL: ${itemUrl}...`);
+      await logger.logToStderr(`Retrieving ID of a drive item associated with item URL: ${itemUrl}...`);
     }
 
     const relativeItemUrl: string = itemUrl.href.replace(new RegExp(`${drive.webUrl}`, 'i'), '').replace(/\/+$/, '');
