@@ -1978,6 +1978,11 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
+              label: 'containertype get',
+              id: 'cmd/spe/containertype/containertype-get'
+            },
+            {
+              type: 'doc',
               label: 'containertype list',
               id: 'cmd/spe/containertype/containertype-list'
             }
