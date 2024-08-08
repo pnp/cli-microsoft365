@@ -37,7 +37,18 @@ describe(commands.RECONSENT, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
-    getSettingWithDefaultValueStub = sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((() => false));
+    getSettingWithDefaultValueStub = sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(opts => {
+      if (opts === 'cliEntraAppId') {
+        return '31359c7f-bd7e-475c-86db-fdb8c937548e';
+      }
+
+      if (opts === 'cliEntraAppTenant') {
+        return 'common';
+      }
+
+      return false;
+    });
+
     openStub = sinon.stub(browserUtil, 'open').callsFake(async () => { return; });
   });
 
@@ -66,7 +77,17 @@ describe(commands.RECONSENT, () => {
 
   it('shows message with url (using autoOpenLinksInBrowser)', async () => {
     getSettingWithDefaultValueStub.restore();
-    getSettingWithDefaultValueStub = sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((() => true));
+    getSettingWithDefaultValueStub = sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(opts => {
+      if (opts === 'cliEntraAppId') {
+        return '31359c7f-bd7e-475c-86db-fdb8c937548e';
+      }
+
+      if (opts === 'cliEntraAppTenant') {
+        return 'common';
+      }
+
+      return true;
+    });
 
     openStub.restore();
     openStub = sinon.stub(browserUtil, 'open').callsFake(async (url) => {
@@ -82,7 +103,17 @@ describe(commands.RECONSENT, () => {
 
   it('throws error when open in browser fails', async () => {
     getSettingWithDefaultValueStub.restore();
-    getSettingWithDefaultValueStub = sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((() => true));
+    getSettingWithDefaultValueStub = sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(opts => {
+      if (opts === 'cliEntraAppId') {
+        return '31359c7f-bd7e-475c-86db-fdb8c937548e';
+      }
+
+      if (opts === 'cliEntraAppTenant') {
+        return 'common';
+      }
+
+      return true;
+    });
 
     openStub.restore();
     openStub = sinon.stub(browserUtil, 'open').callsFake(async (url) => {

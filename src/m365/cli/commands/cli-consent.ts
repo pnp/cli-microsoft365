@@ -1,6 +1,8 @@
+import { cli } from '../../../cli/cli.js';
 import { Logger } from '../../../cli/Logger.js';
 import config from '../../../config.js';
 import GlobalOptions from '../../../GlobalOptions.js';
+import { settingsNames } from '../../../settingsNames.js';
 import AnonymousCommand from '../../base/AnonymousCommand.js';
 import commands from '../commands.js';
 
@@ -68,7 +70,10 @@ class CliConsentCommand extends AnonymousCommand {
         break;
     }
 
-    await logger.log(`To consent permissions for executing ${args.options.service} commands, navigate in your web browser to https://login.microsoftonline.com/${config.tenant}/oauth2/v2.0/authorize?client_id=${config.cliEntraAppId}&response_type=code&scope=${encodeURIComponent(scope)}`);
+    const cliEntraAppId = cli.getSettingWithDefaultValue<string>(settingsNames.cliEntraAppId, config.cliEntraAppId);
+    const tenant = cli.getSettingWithDefaultValue<string>(settingsNames.cliEntraAppTenant, config.tenant);
+
+    await logger.log(`To consent permissions for executing ${args.options.service} commands, navigate in your web browser to https://login.microsoftonline.com/${tenant}/oauth2/v2.0/authorize?client_id=${cliEntraAppId}&response_type=code&scope=${encodeURIComponent(scope)}`);
   }
 
   public async action(logger: Logger, args: CommandArgs): Promise<void> {

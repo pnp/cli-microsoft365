@@ -107,7 +107,22 @@ This completes the configuration required in the Azure portal. We can now move o
 
 To configure the CLI for Microsoft 365 to use our newly created custom application, we need to tell it the Client ID of our custom application and the Tenant ID of where the custom application has been created.
 
-To do that, we need to create two environment variables, named `CLIMICROSOFT365_ENTRAAPPID` and `CLIMICROSOFT365_TENANT`, giving them the values that you saved earlier.
+To do that, we can use one of two methods:
+1. we can set two configuration settings, named `cliEntraAppId` and `cliEntraAppTenant`, giving them the values that you saved earlier.
+2. we can create two environment variables, named `CLIMICROSOFT365_ENTRAAPPID` and `CLIMICROSOFT365_TENANT`, giving them the values that you saved earlier.
+
+How you set the configuration settings.
+
+```powershell
+m365 cli config set --key cliEntraAppId  --value 506af689-32aa-46c8-afb5-972ebf9d218a   
+m365 cli config set --key cliEntraAppTenant  --value e8954f17-a373-4b61-b54d-45c038fe3188
+```
+
+:::tip
+
+Execute `m365 cli config list` to verify that the configuration settings have been created correctly
+
+:::
 
 How you set the environment variables depends on the operating system and shell that you are using.
 

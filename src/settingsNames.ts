@@ -1,6 +1,8 @@
 const settingsNames = {
   authType: 'authType',
   autoOpenLinksInBrowser: 'autoOpenLinksInBrowser',
+  cliEntraAppId: 'cliEntraAppId',
+  cliEntraAppTenant: 'cliEntraAppTenant',
   copyDeviceCodeToClipboard: 'copyDeviceCodeToClipboard',
   csvEscape: 'csvEscape',
   csvHeader: 'csvHeader',
