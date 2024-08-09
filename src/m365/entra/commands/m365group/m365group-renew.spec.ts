@@ -21,12 +21,15 @@ describe(commands.M365GROUP_RENEW, () => {
   let commandInfo: CommandInfo;
   let loggerLogToStderrSpy: sinon.SinonSpy;
 
+  const groupId = '28beab62-7540-4db1-a23f-29a6018a3848';
+
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     sinon.stub(entraGroup, 'isUnifiedGroup').resolves(true);
+    sinon.stub(entraGroup, 'getGroupIdByDisplayName').resolves(groupId);
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
   });
@@ -68,7 +71,7 @@ describe(commands.M365GROUP_RENEW, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('renews expiration the specified group', async () => {
+  it('renews expiration of a group specified by id', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups/28beab62-7540-4db1-a23f-29a6018a3848/renew/') {
         return;
@@ -77,7 +80,20 @@ describe(commands.M365GROUP_RENEW, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { id: '28beab62-7540-4db1-a23f-29a6018a3848' } });
+    await command.action(logger, { options: { id: groupId, verbose: true } });
+    assert(loggerLogSpy.notCalled);
+  });
+
+  it('renews expiration of a group specified by displayName', async () => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/groups/28beab62-7540-4db1-a23f-29a6018a3848/renew/') {
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { displayName: 'Finance', verbose: true } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -90,14 +106,14 @@ describe(commands.M365GROUP_RENEW, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, id: '28beab62-7540-4db1-a23f-29a6018a3848' } });
+    await command.action(logger, { options: { debug: true, id: groupId } });
     assert(loggerLogToStderrSpy.called);
   });
 
   it('correctly handles error when group is not found', async () => {
     sinon.stub(request, 'post').rejects({ error: { 'odata.error': { message: { value: 'The remote server returned an error: (404) Not Found.' } } } });
 
-    await assert.rejects(command.action(logger, { options: { id: '28beab62-7540-4db1-a23f-29a6018a3848' } } as any),
+    await assert.rejects(command.action(logger, { options: { id: groupId } }),
       new CommandError('The remote server returned an error: (404) Not Found.'));
   });
 
@@ -128,7 +144,7 @@ describe(commands.M365GROUP_RENEW, () => {
     sinonUtil.restore(entraGroup.isUnifiedGroup);
     sinon.stub(entraGroup, 'isUnifiedGroup').resolves(false);
 
-    await assert.rejects(command.action(logger, { options: { id: groupId } } as any),
+    await assert.rejects(command.action(logger, { options: { id: groupId } }),
       new CommandError(`Specified group with id '${groupId}' is not a Microsoft 365 group.`));
   });
 });
