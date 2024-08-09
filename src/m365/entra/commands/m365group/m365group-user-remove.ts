@@ -21,6 +21,7 @@ interface UserResponse {
 interface Options extends GlobalOptions {
   teamId?: string;
   groupId?: string;
+  groupDisplayName?: string;
   userName: string;
   force?: boolean;
 }
@@ -45,6 +46,7 @@ class EntraM365GroupUserRemoveCommand extends GraphCommand {
     this.#initOptions();
     this.#initValidators();
     this.#initOptionSets();
+    this.#initTypes();
   }
 
   #initTelemetry(): void {
@@ -52,7 +54,8 @@ class EntraM365GroupUserRemoveCommand extends GraphCommand {
       Object.assign(this.telemetryProperties, {
         force: (!(!args.options.force)).toString(),
         teamId: typeof args.options.teamId !== 'undefined',
-        groupId: typeof args.options.groupId !== 'undefined'
+        groupId: typeof args.options.groupId !== 'undefined',
+        groupDisplayName: typeof args.options.groupDisplayName !== 'undefined'
       });
     });
   }
@@ -61,6 +64,9 @@ class EntraM365GroupUserRemoveCommand extends GraphCommand {
     this.options.unshift(
       {
         option: "-i, --groupId [groupId]"
+      },
+      {
+        option: "--groupDisplayName [groupDisplayName]"
       },
       {
         option: "--teamId [teamId]"
@@ -91,17 +97,32 @@ class EntraM365GroupUserRemoveCommand extends GraphCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push({ options: ['groupId', 'teamId'] });
+    this.optionSets.push({ options: ['groupId', 'groupDisplayName', 'teamId'] });
+  }
+
+  #initTypes(): void {
+    this.types.string.push('groupId', 'groupDisplayName', 'teamId');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     await this.showDeprecationWarning(logger, aadCommands.M365GROUP_USER_REMOVE, commands.M365GROUP_USER_REMOVE);
 
-    const groupId: string = (typeof args.options.groupId !== 'undefined') ? args.options.groupId : args.options.teamId as string;
+    if (this.verbose) {
+      await logger.logToStderr(`Removing user ${args.options.userName} for Microsoft 365 Group: ${args.options.groupId || args.options.groupDisplayName || args.options.teamId}...`);
+    }
+
+    let groupId = args.options.groupId;
+
+    if (args.options.groupDisplayName) {
+      groupId = await entraGroup.getGroupIdByDisplayName(args.options.groupDisplayName);
+    }
+    else if (args.options.teamId) {
+      groupId = args.options.teamId;
+    }
 
     const removeUser = async (): Promise<void> => {
       try {
-        const isUnifiedGroup = await entraGroup.isUnifiedGroup(groupId);
+        const isUnifiedGroup = await entraGroup.isUnifiedGroup(groupId!);
 
         if (!isUnifiedGroup) {
           throw Error(`Specified group with id '${groupId}' is not a Microsoft 365 group.`);
@@ -165,7 +186,7 @@ class EntraM365GroupUserRemoveCommand extends GraphCommand {
       await removeUser();
     }
     else {
-      const result = await cli.promptForConfirmation({ message: `Are you sure you want to remove ${args.options.userName} from the ${(typeof args.options.groupId !== 'undefined' ? 'group' : 'team')} ${groupId}?` });
+      const result = await cli.promptForConfirmation({ message: `Are you sure you want to remove ${args.options.userName} from the ${(args.options.teamId ? 'team' : 'group')} ${groupId}?` });
 
       if (result) {
         await removeUser();
