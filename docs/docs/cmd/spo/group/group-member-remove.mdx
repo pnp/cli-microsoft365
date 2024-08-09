@@ -23,25 +23,19 @@ m365 spo group member remove [options]
 : Name of the SharePoint group from which user has to be removed. Specify either `groupName` or `groupId`, but not both.
 
 `--userName [userName]`
-: The UPN (user principal name, eg. megan.bowen@contoso.com) of the user that needs to be removed. Specify either `userName`, `email`, `userId`, `aadGroupId` or `aadGroupName`.
+: The UPN (user principal name, eg. megan.bowen@contoso.com) of the user that needs to be removed. Specify either `userName`, `email`, `userId`, `entraGroupId` or `entraGroupName`.
 
 `--email [email]`
-: The email of the user to remove as a member. Specify either `userName`, `email`, `userId`, `aadGroupId` or `aadGroupName`.
+: The email of the user to remove as a member. Specify either `userName`, `email`, `userId`, `entraGroupId` or `entraGroupName`.
 
 `--userId [userId]`
-: The user Id (Id of the site user, eg. 14) of the user to remove as a member. Specify either `userName`, `email`, `userId`, `aadGroupId` or `aadGroupName`.
+: The user Id (Id of the site user, eg. 14) of the user to remove as a member. Specify either `userName`, `email`, `userId`, `entraGroupId` or `entraGroupName`.
 
 `--entraGroupId [entraGroupId]`
-: The object Id of the Entra group to remove as a member. Specify either `userName`, `email`, `userId`, `aadGroupId`, `entraGroupId`, `aadGroupName`, or `entraGroupName`.
-
-`--aadGroupId [aadGroupId]`
-: (deprecated. Use `entraGroupId` instead) The object ID of the Microsoft Entra group to remove as a member. Specify either `userName`, `email`, `userId`, `aadGroupId`, `entraGroupId`, `aadGroupName`, or `entraGroupName`.
+: The object Id of the Entra group to remove as a member. Specify either `userName`, `email`, `userId`, `entraGroupId`, or `entraGroupName`.
 
 `--entraGroupName [entraGroupName]`
-: The name of the Entra group to remove as a member. Specify either `userName`, `email`, `userId`, `aadGroupId`, `entraGroupId`, `aadGroupName`, or `entraGroupName`.
-
-`--aadGroupName [aadGroupName]`
-: (deprecated. Use `entraGroupName` instead) The name of the Microsoft Entra group to remove as a member. Specify either `userName`, `email`, `userId`, `aadGroupId`, `entraGroupId`, `aadGroupName`, or `entraGroupName`.
+: The name of the Entra group to remove as a member. Specify either `userName`, `email`, `userId`, `entraGroupId`, or `entraGroupName`.
 ```
 
 <Global />

@@ -25,32 +25,26 @@ m365 spo group member add [options]
 : Name of the SharePoint Group to which the user needs to be added. Specify either `groupId` or `groupName`.
 
 `--userNames [userNames]`
-: User's UPN (user principal name, eg. megan.bowen@contoso.com). If multiple users need to be added, they have to be comma-separated (e.g. megan.bowen@contoso.com,alex.wilber@contoso.com). Specify either `userIds`, `userNames`, `emails`, `aadGroupIds` or `aadGroupNames`.
+: User's UPN (user principal name, eg. megan.bowen@contoso.com). If multiple users need to be added, they have to be comma-separated (e.g. megan.bowen@contoso.com,alex.wilber@contoso.com). Specify either `userIds`, `userNames`, `emails`, `entraGroupIds` or `entraGroupNames`.
 
 `--emails [emails]`
-: User's email (eg. megan.bowen@contoso.com). If multiple users need to be added, they have to be comma-separated (e.g. megan.bowen@contoso.com,alex.wilber@contoso.com). Specify either `userIds`, `userNames`, `emails`, `aadGroupIds` or `aadGroupNames`.
+: User's email (eg. megan.bowen@contoso.com). If multiple users need to be added, they have to be comma-separated (e.g. megan.bowen@contoso.com,alex.wilber@contoso.com). Specify either `userIds`, `userNames`, `emails`, `entraGroupIds` or `entraGroupNames`.
 
 `--userIds [userIds]`
-: The user Id of the user to add as a member. (Id of the site user, for example: 14) If multiple users need to be added, the Ids have to be comma-separated. Specify either `userIds`, `userNames`, `emails`, `aadGroupIds` or `aadGroupNames`.
+: The user Id of the user to add as a member. (Id of the site user, for example: 14) If multiple users need to be added, the Ids have to be comma-separated. Specify either `userIds`, `userNames`, `emails`, `entraGroupIds` or `entraGroupNames`.
 
 `--entraGroupIds [entraGroupIds]`
-: The object Id of the Entra group to add as a member. If multiple groups need to be added, the Ids have to be comma-separated. Specify either `userIds`, `userNames`, `emails`, `aadGroupIds`, `entraGroupIds`, `aadGroupNames`, or `entraGroupNames`.
-
-`--aadGroupIds [aadGroupIds]`
-: (deprecated. Use `entraGroupIds` instead) The object ID of the Microsoft Entra group to add as a member. If multiple groups need to be added, the Ids have to be comma-separated. Specify either `userIds`, `userNames`, `emails`, `aadGroupIds`, `entraGroupIds`, `aadGroupNames`, or `entraGroupNames`.
+: The object Id of the Entra group to add as a member. If multiple groups need to be added, the Ids have to be comma-separated. Specify either `userIds`, `userNames`, `emails`, `entraGroupIds`, or `entraGroupNames`.
 
 `--entraGroupNames [entraGroupNames]`
-: The name of the Entra group to add as a member. If multiple groups need to be added, they have to be comma-separated. Specify either `userIds`, `userNames`, `emails`, `aadGroupIds`, `entraGroupIds`, `aadGroupNames`, or `entraGroupNames`.
-
-`--aadGroupNames [aadGroupNames]`
-: (deprecated. Use `entraGroupNames` instead) The name of the Microsoft Entra group to add as a member. If multiple groups need to be added, they have to be comma-separated. Specify either `userIds`, `userNames`, `emails`, `aadGroupIds`, `entraGroupIds`, `aadGroupNames`, or `entraGroupNames`.
+: The name of the Entra group to add as a member. If multiple groups need to be added, they have to be comma-separated. Specify either `userIds`, `userNames`, `emails`, `entraGroupIds`, or `entraGroupNames`.
 ```
 
 <Global />
 
 ## Remarks
 
-For the `userIds`, `userNames`, `emails`, `aadGroupIds`, `entraGroupIds`, `aadGroupNames`, or `entraGroupNames` options you can specify multiple values by separating them with a comma. If one of the specified entries is not valid, the command will fail with an error message showing the list of invalid values.
+For the `userIds`, `userNames`, `emails`, `entraGroupIds`, or `entraGroupNames` options you can specify multiple values by separating them with a comma. If one of the specified entries is not valid, the command will fail with an error message showing the list of invalid values.
 
 ## Examples
 
