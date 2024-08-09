@@ -14,16 +14,16 @@ m365 entra m365group user remove [options]
 
 ```md definition-list
 `-i, --groupId [groupId]`
-: The ID of the Microsoft 365 group. Specify only one of the following: `groupId`, `groupName`, `teamId`, or `teamName`.
+: The ID of the Microsoft 365 group. Specify only one of the following: `groupId`, `groupDisplayName`, `teamId`, or `teamName`.
 
-`--groupName [groupName]`
-: The display name of the Microsoft 365 group. Specify only one of the following: `groupId`, `groupName`, `teamId`, or `teamName`..
+`--groupDisplayName [groupDisplayName]`
+: The display name of the Microsoft 365 group. Specify only one of the following: `groupId`, `groupDisplayName`, `teamId`, or `teamName`.
 
 `--teamId [teamId]`
-: The ID of the Microsoft Teams team. Specify only one of the following: `groupId`, `groupName`, `teamId`, or `teamName`.
+: The ID of the Microsoft Teams team. Specify only one of the following: `groupId`, `groupDisplayName`, `teamId`, or `teamName`.
 
 `--teamName [teamName]`
-: The display name of the Microsoft Teams team. Specify only one of the following: `groupId`, `groupName`, `teamId`, or `teamName`.
+: The display name of the Microsoft Teams team. Specify only one of the following: `groupId`, `groupDisplayName`, `teamId`, or `teamName`.
 
 `-n, --userName [userName]`
 : (deprecated) User's UPN (user principal name), eg. `johndoe@example.com`.. Specify only one of the following: `userName`, `ids` or `userNames`.
@@ -67,7 +67,7 @@ m365 entra m365group user remove --teamName 'Project Team' --userNames 'anne.mat
 Removes users specified by a comma separated list of user ids from the specified Microsoft 365 group specified by name.
 
 ```sh
-m365 entra m365group user remove --groupName 'Project Team' --ids '5b8e4cb1-ea40-484b-a94e-02a4313fefb4,be7a56d8-b045-4938-af35-917ab6e5309f'
+m365 entra m365group user remove --groupDisplayName 'Project Team' --ids '5b8e4cb1-ea40-484b-a94e-02a4313fefb4,be7a56d8-b045-4938-af35-917ab6e5309f'
 ```
 
 ## Response

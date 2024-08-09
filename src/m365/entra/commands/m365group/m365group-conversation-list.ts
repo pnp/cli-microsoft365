@@ -12,7 +12,8 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  groupId: string;
+  groupId?: string;
+  groupDisplayName?: string;
 }
 
 class EntraM365GroupConversationListCommand extends GraphCommand {
@@ -33,12 +34,17 @@ class EntraM365GroupConversationListCommand extends GraphCommand {
 
     this.#initOptions();
     this.#initValidators();
+    this.#initOptionSets();
+    this.#initTypes();
   }
 
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '-i, --groupId <groupId>'
+        option: '-i, --groupId [groupId]'
+      },
+      {
+        option: '-n, --groupDisplayName [groupDisplayName]'
       }
     );
   }
@@ -46,7 +52,7 @@ class EntraM365GroupConversationListCommand extends GraphCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (!validation.isValidGuid(args.options.groupId as string)) {
+        if (args.options.groupId && !validation.isValidGuid(args.options.groupId as string)) {
           return `${args.options.groupId} is not a valid GUID`;
         }
 
@@ -55,15 +61,33 @@ class EntraM365GroupConversationListCommand extends GraphCommand {
     );
   }
 
-  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    try {
-      const isUnifiedGroup = await entraGroup.isUnifiedGroup(args.options.groupId);
+  #initOptionSets(): void {
+    this.optionSets.push({ options: ['groupId', 'groupDisplayName'] });
+  }
 
-      if (!isUnifiedGroup) {
-        throw Error(`Specified group with id '${args.options.groupId}' is not a Microsoft 365 group.`);
+  #initTypes(): void {
+    this.types.string.push('groupId', 'groupDisplayName');
+  }
+
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    if (this.verbose) {
+      await logger.logToStderr(`Retrieving conversations for Microsoft 365 Group: ${args.options.groupId || args.options.groupDisplayName}...`);
+    }
+
+    try {
+      let groupId = args.options.groupId;
+
+      if (args.options.groupDisplayName) {
+        groupId = await entraGroup.getGroupIdByDisplayName(args.options.groupDisplayName);
       }
 
-      const conversations = await odata.getAllItems<Conversation>(`${this.resource}/v1.0/groups/${args.options.groupId}/conversations`);
+      const isUnifiedGroup = await entraGroup.isUnifiedGroup(groupId!);
+
+      if (!isUnifiedGroup) {
+        throw Error(`Specified group with id '${groupId}' is not a Microsoft 365 group.`);
+      }
+
+      const conversations = await odata.getAllItems<Conversation>(`${this.resource}/v1.0/groups/${groupId}/conversations`);
       await logger.log(conversations);
     }
     catch (err: any) {

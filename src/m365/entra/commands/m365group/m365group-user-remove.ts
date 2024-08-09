@@ -142,6 +142,15 @@ class EntraM365GroupUserRemoveCommand extends GraphCommand {
       await this.warn(logger, `Option 'userName' is deprecated. Please use 'ids' or 'userNames' instead.`);
     }
 
+    let groupId = args.options.groupId;
+
+    if (args.options.groupDisplayName) {
+      groupId = await entraGroup.getGroupIdByDisplayName(args.options.groupDisplayName);
+    }
+    else if (args.options.teamId) {
+      groupId = args.options.teamId;
+    }
+
     const removeUser = async (): Promise<void> => {
       try {
         const groupId: string = await this.getGroupId(logger, args.options.groupId, args.options.teamId, args.options.groupName, args.options.teamName);

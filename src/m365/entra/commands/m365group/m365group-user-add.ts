@@ -20,6 +20,7 @@ interface Options extends GlobalOptions {
   teamId?: string;
   teamName?: string;
   role?: string;
+  groupDisplayName?: string;
 }
 
 class EntraM365GroupUserAddCommand extends GraphCommand {
@@ -132,8 +133,18 @@ class EntraM365GroupUserAddCommand extends GraphCommand {
       const providedGroupId: string = await this.getGroupId(logger, args);
       const isUnifiedGroup = await entraGroup.isUnifiedGroup(providedGroupId);
 
+      let groupId = args.options.groupId;
+
+      if (args.options.groupDisplayName) {
+        groupId = await entraGroup.getGroupIdByDisplayName(args.options.groupDisplayName);
+      }
+      else if (args.options.teamId) {
+        groupId = args.options.teamId;
+      }
+      const isUnifiedGroup = await entraGroup.isUnifiedGroup(groupId!);
+
       if (!isUnifiedGroup) {
-        throw Error(`Specified group with id '${providedGroupId}' is not a Microsoft 365 group.`);
+        throw Error(`Specified group with id '${groupId}' is not a Microsoft 365 group.`);
       }
 
       const userIds: string[] = await this.getUserIds(logger, args.options.ids, args.options.userNames);

@@ -13,8 +13,11 @@ m365 entra m365group remove [options]
 ## Options
 
 ```md definition-list
-`-i, --id <id>`
-: The ID of the Microsoft 365 Group to remove
+`-i, --id [id]`
+: The ID of the Microsoft 365 Group to remove. Specify either `id` or `displayName`, but not both.
+
+`-n, --displayName [displayName]`
+: Display name of the Microsoft 365 Group to remove. Specify either `id` or `displayName`, but not both.
 
 `-f, --force`
 : Don't prompt for confirming removing the group
@@ -47,10 +50,10 @@ Remove group with id _28beab62-7540-4db1-a23f-29a6018a3848_. Will prompt for con
 m365 entra m365group remove --id 28beab62-7540-4db1-a23f-29a6018a3848
 ```
 
-Remove group with id _28beab62-7540-4db1-a23f-29a6018a3848_ without prompting for confirmation
+Remove group with displayName _Finance_ without prompting for confirmation
 
 ```sh
-m365 entra m365group remove --id 28beab62-7540-4db1-a23f-29a6018a3848 --force
+m365 entra m365group remove --displayName 28beab62-7540-4db1-a23f-29a6018a3848 --force
 ```
 
 Remove group with id _28beab62-7540-4db1-a23f-29a6018a3848_ without prompting for confirmation and without moving it to the Recycle Bin

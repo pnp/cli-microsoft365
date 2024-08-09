@@ -31,6 +31,7 @@ describe(commands.M365GROUP_USER_ADD, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     sinon.stub(entraGroup, 'isUnifiedGroup').resolves(true);
+    sinon.stub(entraGroup, 'getGroupIdByDisplayName').resolves('00000000-0000-0000-0000-000000000000');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
   });

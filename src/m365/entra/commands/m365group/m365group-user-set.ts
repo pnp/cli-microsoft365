@@ -131,6 +131,16 @@ class EntraM365GroupUserSetCommand extends GraphCommand {
       const groupId: string = await this.getGroupId(logger, args);
       const isUnifiedGroup = await entraGroup.isUnifiedGroup(groupId);
 
+      let groupId = args.options.groupId;
+
+      if (args.options.groupDisplayName) {
+        groupId = await entraGroup.getGroupIdByDisplayName(args.options.groupDisplayName);
+      }
+      else if (args.options.teamId) {
+        groupId = args.options.teamId;
+      }
+      const isUnifiedGroup = await entraGroup.isUnifiedGroup(groupId!);
+
       if (!isUnifiedGroup) {
         throw Error(`Specified group with id '${groupId}' is not a Microsoft 365 group.`);
       }
