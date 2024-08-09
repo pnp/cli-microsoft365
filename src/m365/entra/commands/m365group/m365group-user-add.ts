@@ -18,6 +18,7 @@ interface Options extends GlobalOptions {
   role?: string;
   teamId?: string;
   groupId?: string;
+  groupDisplayName?: string;
 }
 
 class EntraM365GroupUserAddCommand extends GraphCommand {
@@ -40,6 +41,7 @@ class EntraM365GroupUserAddCommand extends GraphCommand {
     this.#initOptions();
     this.#initValidators();
     this.#initOptionSets();
+    this.#initTypes();
   }
 
   #initTelemetry(): void {
@@ -47,7 +49,8 @@ class EntraM365GroupUserAddCommand extends GraphCommand {
       Object.assign(this.telemetryProperties, {
         role: args.options.role,
         teamId: typeof args.options.teamId !== 'undefined',
-        groupId: typeof args.options.groupId !== 'undefined'
+        groupId: typeof args.options.groupId !== 'undefined',
+        groupDisplayName: typeof args.options.groupDisplayName !== 'undefined'
       });
     });
   }
@@ -59,6 +62,9 @@ class EntraM365GroupUserAddCommand extends GraphCommand {
       },
       {
         option: "-i, --groupId [groupId]"
+      },
+      {
+        option: "--groupDisplayName [groupDisplayName]"
       },
       {
         option: "--teamId [teamId]"
@@ -93,18 +99,33 @@ class EntraM365GroupUserAddCommand extends GraphCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push({ options: ['groupId', 'teamId'] });
+    this.optionSets.push({ options: ['groupId', 'groupDisplayName', 'teamId'] });
+  }
+
+  #initTypes(): void {
+    this.types.string.push('groupId', 'groupDisplayName', 'teamId');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     await this.showDeprecationWarning(logger, aadCommands.M365GROUP_USER_ADD, commands.M365GROUP_USER_ADD);
 
     try {
-      const providedGroupId: string = (typeof args.options.groupId !== 'undefined') ? args.options.groupId : args.options.teamId as string;
-      const isUnifiedGroup = await entraGroup.isUnifiedGroup(providedGroupId);
+      if (this.verbose) {
+        await logger.logToStderr(`Adding user ${args.options.userName} to Microsoft 365 Group: ${args.options.groupId || args.options.groupDisplayName || args.options.teamId}...`);
+      }
+
+      let groupId = args.options.groupId;
+
+      if (args.options.groupDisplayName) {
+        groupId = await entraGroup.getGroupIdByDisplayName(args.options.groupDisplayName);
+      }
+      else if (args.options.teamId) {
+        groupId = args.options.teamId;
+      }
+      const isUnifiedGroup = await entraGroup.isUnifiedGroup(groupId!);
 
       if (!isUnifiedGroup) {
-        throw Error(`Specified group with id '${providedGroupId}' is not a Microsoft 365 group.`);
+        throw Error(`Specified group with id '${groupId}' is not a Microsoft 365 group.`);
       }
 
       let requestOptions: CliRequestOptions = {
@@ -116,7 +137,7 @@ class EntraM365GroupUserAddCommand extends GraphCommand {
       };
 
       const res = await request.get<{ value: string; }>(requestOptions);
-      const endpoint: string = `${this.resource}/v1.0/groups/${providedGroupId}/${((typeof args.options.role !== 'undefined') ? args.options.role : '').toLowerCase() === 'owner' ? 'owners' : 'members'}/$ref`;
+      const endpoint: string = `${this.resource}/v1.0/groups/${groupId}/${((typeof args.options.role !== 'undefined') ? args.options.role : '').toLowerCase() === 'owner' ? 'owners' : 'members'}/$ref`;
 
       requestOptions = {
         url: endpoint,

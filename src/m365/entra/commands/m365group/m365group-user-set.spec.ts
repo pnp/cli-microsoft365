@@ -28,6 +28,7 @@ describe(commands.M365GROUP_USER_SET, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     sinon.stub(entraGroup, 'isUnifiedGroup').resolves(true);
+    sinon.stub(entraGroup, 'getGroupIdByDisplayName').resolves('00000000-0000-0000-0000-000000000000');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
   });
@@ -282,7 +283,7 @@ describe(commands.M365GROUP_USER_SET, () => {
       new CommandError('The specified user is already an owner in the specified Microsoft Teams team, and thus cannot be promoted.'));
   });
 
-  it('correctly promotes specified member to owner in specified Microsoft 365 Group', async () => {
+  it('correctly promotes specified member to owner in Microsoft 365 Group specified by groupId', async () => {
     let promoteMemberIssued = false;
 
     sinon.stub(request, 'get').callsFake(async (opts) => {
@@ -314,6 +315,37 @@ describe(commands.M365GROUP_USER_SET, () => {
     assert(promoteMemberIssued);
   });
 
+  it('correctly promotes specified member to owner in Microsoft 365 Group specified by groupDisplayName', async () => {
+    let promoteMemberIssued = false;
+
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/owners?$select=id,displayName,userPrincipalName,userType`) {
+        return {
+          "value": [{ "id": "00000000-0000-0000-0000-000000000000", "displayName": "Anne Matthews", "userPrincipalName": "anne.matthews@contoso.onmicrosoft.com", "userType": "Member" }]
+        };
+      }
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/members?$select=id,displayName,userPrincipalName,userType`) {
+        return {
+          "value": [{ "id": "00000000-0000-0000-0000-000000000001", "displayName": "Karl Matteson", "userPrincipalName": "karl.matteson@contoso.onmicrosoft.com", "userType": "Member" }]
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/owners/$ref` &&
+        JSON.stringify(opts.data) === `{"@odata.id":"https://graph.microsoft.com/v1.0/directoryObjects/00000000-0000-0000-0000-000000000001"}`) {
+        promoteMemberIssued = true;
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { debug: true, groupDisplayName: "Finance", userName: 'karl.matteson@contoso.onmicrosoft.com', role: 'Owner' } } as any);
+    assert(promoteMemberIssued);
+  });
 
   it('correctly promotes specified member to owner in specified Microsoft Teams team (debug)', async () => {
     let promoteMemberIssued = false;

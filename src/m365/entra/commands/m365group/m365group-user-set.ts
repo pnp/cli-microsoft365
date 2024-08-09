@@ -18,6 +18,7 @@ interface Options extends GlobalOptions {
   role: string;
   teamId?: string;
   groupId?: string;
+  groupDisplayName?: string;
   userName: string;
 }
 
@@ -42,6 +43,7 @@ class EntraM365GroupUserSetCommand extends GraphCommand {
     this.#initOptions();
     this.#initValidators();
     this.#initOptionSets();
+    this.#initTypes();
   }
 
   #initTelemetry(): void {
@@ -49,6 +51,7 @@ class EntraM365GroupUserSetCommand extends GraphCommand {
       Object.assign(this.telemetryProperties, {
         teamId: typeof args.options.teamId !== 'undefined',
         groupId: typeof args.options.groupId !== 'undefined',
+        groupDisplayName: typeof args.options.groupDisplayName !== 'undefined',
         role: args.options.role
       });
     });
@@ -58,6 +61,9 @@ class EntraM365GroupUserSetCommand extends GraphCommand {
     this.options.unshift(
       {
         option: "-i, --groupId [groupId]"
+      },
+      {
+        option: "--groupDisplayName [groupDisplayName]"
       },
       {
         option: "--teamId [teamId]"
@@ -93,22 +99,37 @@ class EntraM365GroupUserSetCommand extends GraphCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push({ options: ['groupId', 'teamId'] });
+    this.optionSets.push({ options: ['groupId', 'groupDisplayName', 'teamId'] });
+  }
+
+  #initTypes(): void {
+    this.types.string.push('groupId', 'groupDisplayName', 'teamId');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     await this.showDeprecationWarning(logger, aadCommands.M365GROUP_USER_SET, commands.M365GROUP_USER_SET);
 
     try {
-      const groupId: string = (typeof args.options.groupId !== 'undefined') ? args.options.groupId : args.options.teamId as string;
-      const isUnifiedGroup = await entraGroup.isUnifiedGroup(groupId);
+      if (this.verbose) {
+        await logger.logToStderr(`Updating user ${args.options.userName} of Microsoft 365 Group: ${args.options.groupId || args.options.groupDisplayName || args.options.teamId}...`);
+      }
+
+      let groupId = args.options.groupId;
+
+      if (args.options.groupDisplayName) {
+        groupId = await entraGroup.getGroupIdByDisplayName(args.options.groupDisplayName);
+      }
+      else if (args.options.teamId) {
+        groupId = args.options.teamId;
+      }
+      const isUnifiedGroup = await entraGroup.isUnifiedGroup(groupId!);
 
       if (!isUnifiedGroup) {
         throw Error(`Specified group with id '${groupId}' is not a Microsoft 365 group.`);
       }
 
-      let users = await this.getOwners(groupId, logger);
-      const membersAndGuests = await this.getMembersAndGuests(groupId, logger);
+      let users = await this.getOwners(groupId!, logger);
+      const membersAndGuests = await this.getMembersAndGuests(groupId!, logger);
       users = users.concat(membersAndGuests);
 
       // Filter out duplicate added values for owners (as they are returned as members as well)
@@ -119,15 +140,15 @@ class EntraM365GroupUserSetCommand extends GraphCommand {
       );
 
       if (this.debug) {
-        await logger.logToStderr((typeof args.options.groupId !== 'undefined') ? 'Group owners and members:' : 'Team owners and members:');
+        await logger.logToStderr(args.options.teamId ? 'Team owners and members:' : 'Group owners and members:');
         await logger.logToStderr(users);
         await logger.logToStderr('');
       }
 
       if (users.filter(i => args.options.userName.toUpperCase() === i.userPrincipalName!.toUpperCase()).length <= 0) {
-        const userNotInGroup = (typeof args.options.groupId !== 'undefined') ?
-          'The specified user does not belong to the given Microsoft 365 Group. Please use the \'m365group user add\' command to add new users.' :
-          'The specified user does not belong to the given Microsoft Teams team. Please use the \'graph teams user add\' command to add new users.';
+        const userNotInGroup = args.options.teamId ?
+          'The specified user does not belong to the given Microsoft Teams team. Please use the \'graph teams user add\' command to add new users.' :
+          'The specified user does not belong to the given Microsoft 365 Group. Please use the \'m365group user add\' command to add new users.';
 
         throw new Error(userNotInGroup);
       }
@@ -150,9 +171,9 @@ class EntraM365GroupUserSetCommand extends GraphCommand {
           await request.post(requestOptions);
         }
         else {
-          const userAlreadyOwner = (typeof args.options.groupId !== 'undefined') ?
-            'The specified user is already an owner in the specified Microsoft 365 group, and thus cannot be promoted.' :
-            'The specified user is already an owner in the specified Microsoft Teams team, and thus cannot be promoted.';
+          const userAlreadyOwner = args.options.teamId ?
+            'The specified user is already an owner in the specified Microsoft Teams team, and thus cannot be promoted.' :
+            'The specified user is already an owner in the specified Microsoft 365 group, and thus cannot be promoted.';
 
           throw new Error(userAlreadyOwner);
         }
@@ -173,9 +194,9 @@ class EntraM365GroupUserSetCommand extends GraphCommand {
           await request.delete(requestOptions);
         }
         else {
-          const userAlreadyMember = (typeof args.options.groupId !== 'undefined') ?
-            'The specified user is already a member in the specified Microsoft 365 group, and thus cannot be demoted.' :
-            'The specified user is already a member in the specified Microsoft Teams team, and thus cannot be demoted.';
+          const userAlreadyMember = args.options.teamId ?
+            'The specified user is already a member in the specified Microsoft Teams team, and thus cannot be demoted.' :
+            'The specified user is already a member in the specified Microsoft 365 group, and thus cannot be demoted.';
 
           throw new Error(userAlreadyMember);
         }
