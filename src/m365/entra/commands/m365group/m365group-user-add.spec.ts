@@ -28,6 +28,7 @@ describe(commands.M365GROUP_USER_ADD, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     sinon.stub(entraGroup, 'isUnifiedGroup').resolves(true);
+    sinon.stub(entraGroup, 'getGroupIdByDisplayName').resolves('00000000-0000-0000-0000-000000000000');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
   });
@@ -231,7 +232,7 @@ describe(commands.M365GROUP_USER_ADD, () => {
     assert(addMemberRequestIssued);
   });
 
-  it('correctly retrieves user and add owner to specified Microsoft 365 group', async () => {
+  it('correctly retrieves user and add owner to Microsoft 365 group specified by groupId', async () => {
     let addMemberRequestIssued = false;
 
     sinon.stub(request, 'get').callsFake(async (opts) => {
@@ -254,6 +255,32 @@ describe(commands.M365GROUP_USER_ADD, () => {
     });
 
     await command.action(logger, { options: { groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com", role: "Owner" } });
+    assert(addMemberRequestIssued);
+  });
+
+  it('correctly retrieves user and add owner to Microsoft 365 group specified by groupDisplayName', async () => {
+    let addMemberRequestIssued = false;
+
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users/anne.matthews%40contoso.onmicrosoft.com/id`) {
+        return {
+          "value": "00000000-0000-0000-0000-000000000001"
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/owners/$ref` &&
+        JSON.stringify(opts.data) === `{"@odata.id":"https://graph.microsoft.com/v1.0/directoryObjects/00000000-0000-0000-0000-000000000001"}`) {
+        addMemberRequestIssued = true;
+      }
+
+      return;
+    });
+
+    await command.action(logger, { options: { groupDisplayName: "Finance", userName: "anne.matthews@contoso.onmicrosoft.com", role: "Owner" } });
     assert(addMemberRequestIssued);
   });
 
