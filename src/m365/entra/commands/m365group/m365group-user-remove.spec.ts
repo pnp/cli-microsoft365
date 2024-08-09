@@ -31,6 +31,7 @@ describe(commands.M365GROUP_USER_REMOVE, () => {
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
+    sinon.stub(entraGroup, 'getGroupIdByDisplayName').resolves('00000000-0000-0000-0000-000000000000');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
   });
@@ -173,7 +174,7 @@ describe(commands.M365GROUP_USER_REMOVE, () => {
     assert(postSpy.notCalled);
   });
 
-  it('removes the specified owner from owners and members endpoint of the specified Microsoft 365 Group with accepted prompt', async () => {
+  it('removes the specified owner from owners and members endpoint of the Microsoft 365 Group specified by id with accepted prompt', async () => {
     let memberDeleteCallIssued = false;
 
     sinon.stub(request, 'delete').callsFake(async (opts) => {
