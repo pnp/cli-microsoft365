@@ -1,0 +1,15 @@
+# v9 Upgrade Guidance
+
+The v9 of CLI for Microsoft 365 introduces several breaking changes. To help you upgrade to the latest version of CLI for Microsoft 365, we've listed those changes along with any actions you may need to take.
+
+## CLI Doctor
+
+### Updated output of `cli doctor` command
+
+For this new major version, we've adjusted the output of the `cli doctor` command to align the renaming of Azure AD to Microsoft Entra ID.
+
+The output is updated with `cliAadAppId` as `cliEntraAppId` and `cliAadAppTenant` as `cliEntraAppTenant`.
+
+#### What action do I need to take?
+
+Please, check the documentation of the [cli doctor](./cmd/cli/cli-doctor.mdx) command to see the updated output and adjust your scripts accordingly.
