@@ -24,6 +24,7 @@
         "chalk": "^5.3.0",
         "clipboardy": "^4.0.0",
         "configstore": "^6.0.0",
+        "csv-parse": "^5.5.6",
         "csv-stringify": "^6.5.0",
         "easy-table": "^1.2.0",
         "jmespath": "^0.16.0",
@@ -2146,6 +2147,11 @@
       "funding": {
         "url": "https://github.com/sponsors/sindresorhus"
       }
+    },
+    "node_modules/csv-parse": {
+      "version": "5.5.6",
+      "resolved": "https://registry.npmjs.org/csv-parse/-/csv-parse-5.5.6.tgz",
+      "integrity": "sha512-uNpm30m/AGSkLxxy7d9yRXpJQFrZzVWLFBkS+6ngPcZkw/5k3L/jjFuj7tVnEpRn+QgmiXr21nDlhCiUK4ij2A=="
     },
     "node_modules/csv-stringify": {
       "version": "6.5.0",
