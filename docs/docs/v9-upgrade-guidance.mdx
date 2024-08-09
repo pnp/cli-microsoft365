@@ -1,0 +1,16 @@
+# v9 Upgrade Guidance
+
+The v9 of CLI for Microsoft 365 introduces several breaking changes. To help you upgrade to the latest version of CLI for Microsoft 365, we've listed those changes along with any actions you may need to take.
+
+## SharePoint
+
+### Renamed `aad` options in `spo group member add`, `spo group member remove`, and `spo user ensure` commands
+
+For this new major version, we've Removed `aad` options in below spo commands:
+  - Renamed `--aadGroupIds` and `--aadGroupNames` option to `--entraGroupIds' and `--entraGroupNames` in `spo group member add`.
+  - Renamed `--aadGroupIds` and `--aadGroupNames` option to `--entraGroupIds' and '--entraGroupNames' in 'spo group member remove'.
+  - Renamed `--aadId` option to `--entraId` in `spo user ensure`.
+
+#### What action do I need to take?
+
+Please, check the documentation of the [spo group member add](./cmd/spo/group/group-member-add.mdx), [spo group member remove](./cmd/spo/group/group-member-remove.mdx), and [spo user ensure](./cmd/spo/user/user-ensure.mdx) command to see the updated options and adjust your scripts accordingly.
