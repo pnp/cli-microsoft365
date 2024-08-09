@@ -36,13 +36,13 @@ m365 aad teams user set
 : The display name of the Microsoft Teams team. Specify only one of the following: `groupId`, `groupName`, `teamId`, or `teamName`.
 
 `-n, --userName [userName]`
-: User's UPN (User Principal Name), e.g. johndoe@example.com. This option is deprecated. Please use `ids` or `userNames` instead.
+: (deprecated) User's UPN (User Principal Name), e.g. johndoe@example.com.
 
 `--ids [ids]`
-: Microsoft Entra IDs of users. You can also pass a comma-separated list of IDs. Specify either `ids` or `userNames` but not both.
+: Microsoft Entra IDs of users. You can also pass a comma-separated list of IDs. Specify only one of the following `userName`, `ids` or `userNames`.
 
 `--userNames [userNames]`
-: The user principal names of users. You can also pass a comma-separated list of UPNs. Specify either `ids` or `userNames` but not both.
+: The user principal names of users. You can also pass a comma-separated list of UPNs. Specify only one of the following `userName`, `ids` or `userNames`.
 
 `-r, --role <role>`
 : Role to set for the given user in the specified Microsoft 365 Group or Microsoft Teams team. Allowed values: `Owner`, `Member`

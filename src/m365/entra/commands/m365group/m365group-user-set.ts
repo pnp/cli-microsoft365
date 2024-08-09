@@ -2,6 +2,7 @@ import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { validation } from '../../../../utils/validation.js';
+import { formatting } from '../../../../utils/formatting.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import teamsCommands from '../../../teams/commands.js';
 import commands from '../../commands.js';
@@ -25,6 +26,8 @@ interface Options extends GlobalOptions {
 }
 
 class EntraM365GroupUserSetCommand extends GraphCommand {
+  private readonly allowedRoles: string[] = ['owner', 'member'];
+
   public get name(): string {
     return commands.M365GROUP_USER_SET;
   }
@@ -73,20 +76,20 @@ class EntraM365GroupUserSetCommand extends GraphCommand {
         option: '--userNames [userNames]'
       },
       {
-        option: "-i, --groupId [groupId]"
+        option: '-i, --groupId [groupId]'
       },
       {
         option: '--groupName [groupName]'
       },
       {
-        option: "--teamId [teamId]"
+        option: '--teamId [teamId]'
       },
       {
         option: '--teamName [teamName]'
       },
       {
         option: '-r, --role <role>',
-        autocomplete: ['Owner', 'Member']
+        autocomplete: this.allowedRoles
       }
     );
   }
@@ -102,16 +105,22 @@ class EntraM365GroupUserSetCommand extends GraphCommand {
           return `${args.options.groupId} is not a valid GUID`;
         }
 
-        if (args.options.ids && args.options.ids.split(',').some(e => !validation.isValidGuid(e))) {
-          return `${args.options.ids} contains one or more invalid GUIDs`;
+        if (args.options.ids) {
+          const isValidGUIDArrayResult = validation.isValidGuidArray(args.options.ids);
+          if (isValidGUIDArrayResult !== true) {
+            return `The following GUIDs are invalid for the option 'ids': ${isValidGUIDArrayResult}.`;
+          }
         }
 
-        if (args.options.userNames && args.options.userNames.split(',').some(e => !validation.isValidUserPrincipalName(e))) {
-          return `${args.options.userNames} contains one or more invalid usernames`;
+        if (args.options.userNames) {
+          const isValidUPNArrayResult = validation.isValidUserPrincipalNameArray(args.options.userNames);
+          if (isValidUPNArrayResult !== true) {
+            return `The following user principal names are invalid for the option 'userNames': ${isValidUPNArrayResult}.`;
+          }
         }
 
-        if (['owner', 'member'].indexOf(args.options.role.toLowerCase()) === -1) {
-          return `${args.options.role} is not a valid role value. Allowed values Owner|Member`;
+        if (args.options.role && !this.allowedRoles.some(role => role.toLowerCase() === args.options.role.toLowerCase())) {
+          return `'${args.options.role}' is not a valid role. Allowed values are: ${this.allowedRoles.join(',')}`;
         }
 
         return true;
@@ -132,12 +141,11 @@ class EntraM365GroupUserSetCommand extends GraphCommand {
     await this.showDeprecationWarning(logger, aadCommands.M365GROUP_USER_SET, commands.M365GROUP_USER_SET);
 
     if (args.options.userName) {
-      args.options.userNames = args.options.userName;
-
-      this.warn(logger, `Option 'userName' is deprecated. Please use 'ids' or 'userNames' instead.`);
+      await this.warn(logger, `Option 'userName' is deprecated. Please use 'ids' or 'userNames' instead.`);
     }
 
     try {
+      const userNames = args.options.userNames || args.options.userName;
       const groupId: string = await this.getGroupId(logger, args);
       const isUnifiedGroup = await entraGroup.isUnifiedGroup(groupId);
 
@@ -145,7 +153,7 @@ class EntraM365GroupUserSetCommand extends GraphCommand {
         throw Error(`Specified group with id '${groupId}' is not a Microsoft 365 group.`);
       }
 
-      const userIds: string[] = await this.getUserIds(logger, args.options.ids, args.options.userNames);
+      const userIds: string[] = await this.getUserIds(logger, args.options.ids, userNames);
 
       // we can't simply switch the role
       // first add users to the new role
@@ -179,14 +187,14 @@ class EntraM365GroupUserSetCommand extends GraphCommand {
 
   private async getUserIds(logger: Logger, userIds: string | undefined, userNames: string | undefined): Promise<string[]> {
     if (userIds) {
-      return userIds.split(',').map(o => o.trim());
+      return formatting.splitAndTrim(userIds);
     }
 
     if (this.verbose) {
       await logger.logToStderr('Retrieving user ID(s) by username(s)...');
     }
 
-    return entraUser.getUserIdsByUpns(userNames!.split(',').map(u => u.trim()));
+    return entraUser.getUserIdsByUpns(formatting.splitAndTrim(userNames!));
   }
 
   private async removeUsersFromRole(logger: Logger, groupId: string, userIds: string[], role: string): Promise<void> {
@@ -263,7 +271,7 @@ class EntraM365GroupUserSetCommand extends GraphCommand {
             'content-type': 'application/json;odata.metadata=none'
           },
           body: {
-            [`${role === 'Member' ? 'members' : 'owners'}@odata.bind`]: userIdsChunk.map(u => `${this.resource}/v1.0/directoryObjects/${u}`)
+            [`${role.toLowerCase() === 'member' ? 'members' : 'owners'}@odata.bind`]: userIdsChunk.map(u => `${this.resource}/v1.0/directoryObjects/${u}`)
           }
         });
       }
