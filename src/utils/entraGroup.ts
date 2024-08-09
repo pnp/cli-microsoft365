@@ -75,6 +75,28 @@ export const entraGroup = {
     return groups[0].id!;
   },
 
+  /**
+   * Get id of a group by its mail nickname.
+   * @param mailNickname Group mail nickname.
+   * @throws Error when group was not found.
+   * @throws Error when multiple groups with the same name were found.
+   */
+  async getGroupIdByMailNickname(mailNickname: string): Promise<string> {
+    const groups = await odata.getAllItems<Group>(`${graphResource}/v1.0/groups?$filter=mailNickname eq '${formatting.encodeQueryParameter(mailNickname)}'&$select=id`);
+
+    if (!groups.length) {
+      throw Error(`The specified group '${mailNickname}' does not exist.`);
+    }
+
+    if (groups.length > 1) {
+      const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', groups);
+      const result = await cli.handleMultipleResultsFound<Group>(`Multiple groups with mail nickname '${mailNickname}' found.`, resultAsKeyValuePair);
+      return result.id!;
+    }
+
+    return groups[0].id!;
+  },
+
   async setGroup(id: string, isPrivate: boolean, logger?: Logger, verbose?: boolean): Promise<void> {
     if (verbose && logger) {
       await logger.logToStderr(`Updating Microsoft 365 Group ${id}...`);
