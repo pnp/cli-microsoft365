@@ -1,0 +1,34 @@
+# v9 Upgrade Guidance
+
+The v9 of CLI for Microsoft 365 introduces several breaking changes. To help you upgrade to the latest version of CLI for Microsoft 365, we've listed those changes along with any actions you may need to take.
+
+## Enterprise application (or service principal)
+
+### Aligns options of `entra enterpriseapp` commands
+
+For this new major version, we've aligned the options of the `entra enterpriseapp` commands as follows: 
+
+[entra enterpriseapp add](https://pnp.github.io/cli-microsoft365/cmd/entra/enterpriseapp/enterpriseapp-add)
+
+| Old v8 option | New v9 option |
+|---------------|---------------|
+| --appId [appId] | -i, --id [id] |
+| --appName [appName] | -n, --displayName [displayName] |
+
+[entra enterpriseapp get](https://pnp.github.io/cli-microsoft365/cmd/entra/enterpriseapp/enterpriseapp-get)
+
+| Old v8 option | New v9 option |
+|---------------|---------------|
+| -i, --appId [appId] | -i, --id [id] |
+| -n, --appDisplayName [appDisplayName] | -n, --displayName [displayName] |
+| --appObjectId [appObjectId] | --objectId [objectId] |
+
+[entra enterpriseapp list](https://pnp.github.io/cli-microsoft365/cmd/entra/enterpriseapp/enterpriseapp-list)
+
+| Old v8 option | New v9 option |
+|---------------|---------------|
+| --displayName [displayName] | -n, --displayName [displayName] |
+
+#### What action do I need to take?
+
+Please, check the documentation of the [entra enterpriseapp add](https://pnp.github.io/cli-microsoft365/cmd/entra/enterpriseapp/enterpriseapp-add), [entra enterpriseapp get](https://pnp.github.io/cli-microsoft365/cmd/entra/enterpriseapp/enterpriseapp-get), and [entra enterpriseapp list](https://pnp.github.io/cli-microsoft365/cmd/entra/enterpriseapp/enterpriseapp-list) commands to see the updated options and adjust your scripts accordingly.
