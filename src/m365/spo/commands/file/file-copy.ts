@@ -1,6 +1,7 @@
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
+import { CreateCopyJobsNameConflictBehavior, spo } from '../../../../utils/spo.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
@@ -17,8 +18,9 @@ interface Options extends GlobalOptions {
   targetUrl: string;
   newName?: string;
   nameConflictBehavior?: string;
-  resetAuthorAndCreated?: boolean;
   bypassSharedLock?: boolean;
+  ignoreVersionHistory?: boolean;
+  skipWait?: boolean;
 }
 
 class SpoFileCopyCommand extends SpoCommand {
@@ -46,9 +48,10 @@ class SpoFileCopyCommand extends SpoCommand {
         sourceUrl: typeof args.options.sourceUrl !== 'undefined',
         sourceId: typeof args.options.sourceId !== 'undefined',
         newName: typeof args.options.newName !== 'undefined',
-        nameConflictBehavior: args.options.nameConflictBehavior || false,
-        resetAuthorAndCreated: !!args.options.resetAuthorAndCreated,
-        bypassSharedLock: !!args.options.bypassSharedLock
+        nameConflictBehavior: typeof args.options.nameConflictBehavior !== 'undefined',
+        ignoreVersionHistory: !!args.options.ignoreVersionHistory,
+        bypassSharedLock: !!args.options.bypassSharedLock,
+        skipWait: !!args.options.skipWait
       });
     });
   }
@@ -76,10 +79,13 @@ class SpoFileCopyCommand extends SpoCommand {
         autocomplete: this.nameConflictBehaviorOptions
       },
       {
-        option: '--resetAuthorAndCreated'
+        option: '--bypassSharedLock'
       },
       {
-        option: '--bypassSharedLock'
+        option: '--ignoreVersionHistory'
+      },
+      {
+        option: '--skipWait'
       }
     );
   }
@@ -96,7 +102,7 @@ class SpoFileCopyCommand extends SpoCommand {
           return `${args.options.sourceId} is not a valid GUID for sourceId.`;
         }
 
-        if (args.options.nameConflictBehavior && this.nameConflictBehaviorOptions.indexOf(args.options.nameConflictBehavior) === -1) {
+        if (args.options.nameConflictBehavior && !this.nameConflictBehaviorOptions.includes(args.options.nameConflictBehavior.toLowerCase())) {
           return `${args.options.nameConflictBehavior} is not a valid nameConflictBehavior value. Allowed values: ${this.nameConflictBehaviorOptions.join(', ')}.`;
         }
 
@@ -111,50 +117,66 @@ class SpoFileCopyCommand extends SpoCommand {
 
   #initTypes(): void {
     this.types.string.push('webUrl', 'sourceUrl', 'sourceId', 'targetUrl', 'newName', 'nameConflictBehavior');
-    this.types.boolean.push('resetAuthorAndCreated', 'bypassSharedLock');
+    this.types.boolean.push('bypassSharedLock', 'ignoreVersionHistory', 'skipWait');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       const sourceServerRelativePath = await this.getSourcePath(logger, args.options);
       const sourcePath = this.getAbsoluteUrl(args.options.webUrl, sourceServerRelativePath);
-      let destinationPath = this.getAbsoluteUrl(args.options.webUrl, args.options.targetUrl) + '/';
+      const destinationPath = this.getAbsoluteUrl(args.options.webUrl, args.options.targetUrl);
 
-      if (args.options.newName) {
-        destinationPath += args.options.newName;
+      if (this.verbose) {
+        await logger.logToStderr(`Copying file '${sourceServerRelativePath}' to '${args.options.targetUrl}'...`);
       }
-      else {
-        // Keep the original file name
-        destinationPath += sourcePath.substring(sourcePath.lastIndexOf('/') + 1);
+
+      let newName = args.options.newName;
+      // Add original file extension if not provided
+      if (newName && !newName.includes('.')) {
+        newName += sourceServerRelativePath.substring(sourceServerRelativePath.lastIndexOf('.'));
+      }
+
+      const copyJobResponse = await spo.createCopyJob(
+        args.options.webUrl,
+        sourcePath,
+        destinationPath,
+        {
+          nameConflictBehavior: this.getNameConflictBehaviorValue(args.options.nameConflictBehavior),
+          bypassSharedLock: !!args.options.bypassSharedLock,
+          ignoreVersionHistory: !!args.options.ignoreVersionHistory,
+          newName: newName
+        }
+      );
+
+      if (args.options.skipWait) {
+        return;
       }
 
       if (this.verbose) {
-        await logger.logToStderr(`Copying file '${sourcePath}' to '${destinationPath}'...`);
+        await logger.logToStderr('Waiting for the copy job to complete...');
       }
 
+      const copyJobResult = await spo.getCopyJobResult(args.options.webUrl, copyJobResponse
+      );
+
+      if (this.verbose) {
+        await logger.logToStderr('Getting information about the destination file...');
+      }
+
+      // Get destination file data
+      const siteRelativeDestinationFolder = '/' + copyJobResult.TargetObjectSiteRelativeUrl.substring(0, copyJobResult.TargetObjectSiteRelativeUrl.lastIndexOf('/'));
+      const absoluteWebUrl = destinationPath.substring(0, destinationPath.toLowerCase().lastIndexOf(siteRelativeDestinationFolder.toLowerCase()));
+
       const requestOptions: CliRequestOptions = {
-        url: `${args.options.webUrl}/_api/SP.MoveCopyUtil.CopyFileByPath`,
+        url: `${absoluteWebUrl}/_api/Web/GetFileById('${copyJobResult.TargetObjectUniqueId}')`,
         headers: {
           accept: 'application/json;odata=nometadata'
         },
-        responseType: 'json',
-        data: {
-          srcPath: {
-            DecodedUrl: sourcePath
-          },
-          destPath: {
-            DecodedUrl: destinationPath
-          },
-          overwrite: args.options.nameConflictBehavior === 'replace',
-          options: {
-            KeepBoth: args.options.nameConflictBehavior === 'rename',
-            ResetAuthorAndCreatedOnCopy: !!args.options.resetAuthorAndCreated,
-            ShouldBypassSharedLocks: !!args.options.bypassSharedLock
-          }
-        }
+        responseType: 'json'
       };
 
-      await request.post(requestOptions);
+      const destinationFile = await request.get<any>(requestOptions);
+      await logger.log(destinationFile);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
@@ -171,19 +193,33 @@ class SpoFileCopyCommand extends SpoCommand {
     }
 
     const requestOptions: CliRequestOptions = {
-      url: `${options.webUrl}/_api/Web/GetFileById('${options.sourceId}')?$select=ServerRelativePath`,
+      url: `${options.webUrl}/_api/Web/GetFileById('${options.sourceId}')/ServerRelativePath`,
       headers: {
         accept: 'application/json;odata=nometadata'
       },
       responseType: 'json'
     };
 
-    const file = await request.get<{ ServerRelativePath: { DecodedUrl: string } }>(requestOptions);
-    return file.ServerRelativePath.DecodedUrl;
+    const file = await request.get<{ DecodedUrl: string }>(requestOptions);
+    return file.DecodedUrl;
+  }
+
+  private getNameConflictBehaviorValue(nameConflictBehavior?: string): CreateCopyJobsNameConflictBehavior {
+    switch (nameConflictBehavior?.toLowerCase()) {
+      case 'fail':
+        return CreateCopyJobsNameConflictBehavior.Fail;
+      case 'replace':
+        return CreateCopyJobsNameConflictBehavior.Replace;
+      case 'rename':
+        return CreateCopyJobsNameConflictBehavior.Rename;
+      default:
+        return CreateCopyJobsNameConflictBehavior.Fail;
+    }
   }
 
   private getAbsoluteUrl(webUrl: string, url: string): string {
-    return url.startsWith('https://') ? url : urlUtil.getAbsoluteUrl(webUrl, url);
+    const result = url.startsWith('https://') ? url : urlUtil.getAbsoluteUrl(webUrl, url);
+    return urlUtil.removeTrailingSlashes(result);
   }
 }
 
