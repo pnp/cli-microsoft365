@@ -7,7 +7,7 @@ import config from '../config.js';
 import { RoleDefinition } from '../m365/spo/commands/roledefinition/RoleDefinition.js';
 import request from '../request.js';
 import { sinonUtil } from '../utils/sinonUtil.js';
-import { FormDigestInfo, SpoOperation, spo } from '../utils/spo.js';
+import { CreateCopyJobsNameConflictBehavior, FormDigestInfo, SpoOperation, spo, settings } from '../utils/spo.js';
 import { entraGroup } from './entraGroup.js';
 import { formatting } from './formatting.js';
 import { Group } from '@microsoft/microsoft-graph-types';
@@ -78,6 +78,15 @@ const entraGroupResponse = {
   UserPrincipalName: null
 };
 
+const copyJobInfo = {
+  EncryptionKey: "2by8+2oizihYOFqk02Tlokj8lWUShePAEE+WMuA9lzA=",
+  JobId: "d812e5a0-d95a-4e4f-bcb7-d4415e88c8ee",
+  JobQueueUri: "https://spoam1db1m020p4.queue.core.windows.net/2-1499-20240831-29533e6c72c6464780b756c71ea3fe92?sv=2018-03-28&sig=aX%2BNOkUimZ3f%2B%2BvdXI95%2FKJI1e5UE6TU703Dw3Eb5c8%3D&st=2024-08-09T00%3A00%3A00Z&se=2024-08-31T00%3A00%3A00Z&sp=rap",
+  SourceListItemUniqueIds: [
+    'c194762b-3f54-4f5f-9f5c-eba26084e29d'
+  ]
+};
+
 describe('utils/spo', () => {
   let logger: Logger;
   let log: string[];
@@ -87,6 +96,7 @@ describe('utils/spo', () => {
 
   before(() => {
     auth.connection.active = true;
+    sinon.stub(settings, 'pollingInterval').value(0);
   });
 
   beforeEach(() => {
@@ -2579,5 +2589,278 @@ describe('utils/spo', () => {
     catch (ex) {
       assert.deepStrictEqual(ex, `File Not Found`);
     }
+  });
+
+  it('correctly outputs result when calling createCopyJob', async () => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso.sharepoint.com/sites/sales/_api/Site/CreateCopyJobs') {
+        return {
+          value: [
+            copyJobInfo
+          ]
+        };
+      }
+
+      throw 'Invalid request: ' + opts.url;
+    });
+
+    const result = await spo.createCopyJob('https://contoso.sharepoint.com/sites/sales', 'https://contoso.sharepoint.com/sites/sales/Icons/Company.png', 'https://contoso.sharepoint.com/sites/marketing/Shared Documents');
+    assert.deepStrictEqual(result, copyJobInfo);
+  });
+
+  it('correctly creates a copy job with default options when using createCopyJob', async () => {
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso.sharepoint.com/sites/sales/_api/Site/CreateCopyJobs') {
+        return {
+          value: [
+            copyJobInfo
+          ]
+        };
+      }
+
+      throw 'Invalid request: ' + opts.url;
+    });
+
+    await spo.createCopyJob('https://contoso.sharepoint.com/sites/sales', 'https://contoso.sharepoint.com/sites/sales/Icons/Company.png', 'https://contoso.sharepoint.com/sites/marketing/Shared Documents');
+    assert.deepStrictEqual(postStub.firstCall.args[0].data, {
+      destinationUri: 'https://contoso.sharepoint.com/sites/marketing/Shared Documents',
+      exportObjectUris: ['https://contoso.sharepoint.com/sites/sales/Icons/Company.png'],
+      options: {
+        NameConflictBehavior: CreateCopyJobsNameConflictBehavior.Fail,
+        AllowSchemaMismatch: true,
+        BypassSharedLock: false,
+        IgnoreVersionHistory: false,
+        CustomizedItemName: undefined,
+        SameWebCopyMoveOptimization: true
+      }
+    });
+  });
+
+  it('correctly creates a copy job with custom options when using createCopyJob', async () => {
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso.sharepoint.com/sites/sales/_api/Site/CreateCopyJobs') {
+        return {
+          value: [
+            copyJobInfo
+          ]
+        };
+      }
+
+      throw 'Invalid request: ' + opts.url;
+    });
+
+    await spo.createCopyJob(
+      'https://contoso.sharepoint.com/sites/sales',
+      'https://contoso.sharepoint.com/sites/sales/Icons/Company.png',
+      'https://contoso.sharepoint.com/sites/marketing/Shared Documents',
+      {
+        nameConflictBehavior: CreateCopyJobsNameConflictBehavior.Rename,
+        bypassSharedLock: true,
+        ignoreVersionHistory: true,
+        newName: 'CompanyV2.png'
+      }
+    );
+    assert.deepStrictEqual(postStub.firstCall.args[0].data, {
+      destinationUri: 'https://contoso.sharepoint.com/sites/marketing/Shared Documents',
+      exportObjectUris: ['https://contoso.sharepoint.com/sites/sales/Icons/Company.png'],
+      options: {
+        NameConflictBehavior: CreateCopyJobsNameConflictBehavior.Rename,
+        AllowSchemaMismatch: true,
+        BypassSharedLock: true,
+        IgnoreVersionHistory: true,
+        CustomizedItemName: ['CompanyV2.png'],
+        SameWebCopyMoveOptimization: true
+      }
+    });
+  });
+
+  it('correctly polls for copy job status when using getCopyJobResult', async () => {
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso.sharepoint.com/sites/sales/_api/Site/GetCopyJobProgress') {
+        if (postStub.callCount < 5) {
+          return {
+            JobState: 4,
+            Logs: []
+          };
+        }
+
+        return {
+          JobState: 0,
+          Logs: [
+            JSON.stringify({
+              Event: 'JobStart',
+              JobId: 'fb4cc143-383c-4da0-bd91-02d2acbb01c7',
+              Time: '08/10/2024 16:30:39.004',
+              SiteId: '53dec431-9d4f-415b-b12b-010259d5b4e1',
+              WebId: 'af102f32-b389-49dc-89bf-d116a17e0aa6',
+              DBId: '5a926054-85d7-4cf6-85f0-c38fa01c4d39',
+              FarmId: '823af112-cd95-49a2-adf5-eccb09c8ba5d',
+              ServerId: 'a6145d7e-1b85-4124-895e-b1e618bfe5ae',
+              SubscriptionId: '18c58817-3bc9-489d-ac63-f7264fb357e5',
+              TotalRetryCount: '0',
+              MigrationType: 'Copy',
+              MigrationDirection: 'Import',
+              CorrelationId: 'd8f444a1-10a8-9000-862c-0bad6eff1006'
+            }),
+            JSON.stringify({
+              Event: 'JobFinishedObjectInfo',
+              JobId: '6d1eda82-0d1c-41eb-ab05-1d9cd4afe786',
+              Time: '08/10/2024 18:59:40.145',
+              SourceObjectFullUrl: 'https://contoso.sharepoint.com/sites/marketing/Shared Documents/Icons/Company.png',
+              TargetServerUrl: 'https://contoso.sharepoint.com',
+              TargetSiteId: '794dada8-4389-45ce-9559-0de74bf3554a',
+              TargetWebId: '8de9b4d3-3c30-4fd0-a9d7-2452bd065555',
+              TargetListId: '44b336a5-e397-4e22-a270-c39e9069b123',
+              TargetObjectUniqueId: '15488d89-b82b-40be-958a-922b2ed79383',
+              TargetObjectSiteRelativeUrl: 'Shared Documents/Icons/Company.png',
+              CorrelationId: '5efd44a1-c034-9000-9692-4e1a1b3ca33b'
+            }),
+            JSON.stringify({
+              Event: 'JobEnd',
+              JobId: 'fb4cc143-383c-4da0-bd91-02d2acbb01c7',
+              Time: '08/10/2024 16:30:39.008',
+              TotalRetryCount: '0',
+              MigrationType: 'Copy',
+              MigrationDirection: 'Import',
+              CorrelationId: 'd8f444a1-10a8-9000-862c-0bad6eff1006'
+            })
+          ]
+        };
+      }
+
+      throw 'Invalid request: ' + opts.url;
+    });
+
+    await spo.getCopyJobResult('https://contoso.sharepoint.com/sites/sales', copyJobInfo);
+
+    const postRequests = postStub.getCalls();
+    postRequests.forEach((request) =>
+      assert.deepStrictEqual(request.args[0].data, { copyJobInfo: copyJobInfo })
+    );
+  });
+
+  it('correctly returns result when using getCopyJobResult', async () => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso.sharepoint.com/sites/sales/_api/Site/GetCopyJobProgress') {
+        return {
+          JobState: 0,
+          Logs: [
+            JSON.stringify({
+              Event: 'JobStart',
+              JobId: 'fb4cc143-383c-4da0-bd91-02d2acbb01c7',
+              Time: '08/10/2024 16:30:39.004',
+              SiteId: '53dec431-9d4f-415b-b12b-010259d5b4e1',
+              WebId: 'af102f32-b389-49dc-89bf-d116a17e0aa6',
+              DBId: '5a926054-85d7-4cf6-85f0-c38fa01c4d39',
+              FarmId: '823af112-cd95-49a2-adf5-eccb09c8ba5d',
+              ServerId: 'a6145d7e-1b85-4124-895e-b1e618bfe5ae',
+              SubscriptionId: '18c58817-3bc9-489d-ac63-f7264fb357e5',
+              TotalRetryCount: '0',
+              MigrationType: 'Copy',
+              MigrationDirection: 'Import',
+              CorrelationId: 'd8f444a1-10a8-9000-862c-0bad6eff1006'
+            }),
+            JSON.stringify({
+              Event: 'JobFinishedObjectInfo',
+              JobId: '6d1eda82-0d1c-41eb-ab05-1d9cd4afe786',
+              Time: '08/10/2024 18:59:40.145',
+              SourceObjectFullUrl: 'https://contoso.sharepoint.com/sites/marketing/Shared Documents/Icons/Company.png',
+              TargetServerUrl: 'https://contoso.sharepoint.com',
+              TargetSiteId: '794dada8-4389-45ce-9559-0de74bf3554a',
+              TargetWebId: '8de9b4d3-3c30-4fd0-a9d7-2452bd065555',
+              TargetListId: '44b336a5-e397-4e22-a270-c39e9069b123',
+              TargetObjectUniqueId: '15488d89-b82b-40be-958a-922b2ed79383',
+              TargetObjectSiteRelativeUrl: 'Shared Documents/Icons/Company.png',
+              CorrelationId: '5efd44a1-c034-9000-9692-4e1a1b3ca33b'
+            }),
+            JSON.stringify({
+              Event: 'JobEnd',
+              JobId: 'fb4cc143-383c-4da0-bd91-02d2acbb01c7',
+              Time: '08/10/2024 16:30:39.008',
+              TotalRetryCount: '0',
+              MigrationType: 'Copy',
+              MigrationDirection: 'Import',
+              CorrelationId: 'd8f444a1-10a8-9000-862c-0bad6eff1006'
+            })
+          ]
+        };
+      }
+
+      throw 'Invalid request: ' + opts.url;
+    });
+
+    const result = await spo.getCopyJobResult('https://contoso.sharepoint.com/sites/sales', copyJobInfo);
+    assert.deepStrictEqual(result,
+      {
+        Event: 'JobFinishedObjectInfo',
+        JobId: '6d1eda82-0d1c-41eb-ab05-1d9cd4afe786',
+        Time: '08/10/2024 18:59:40.145',
+        SourceObjectFullUrl: 'https://contoso.sharepoint.com/sites/marketing/Shared Documents/Icons/Company.png',
+        TargetServerUrl: 'https://contoso.sharepoint.com',
+        TargetSiteId: '794dada8-4389-45ce-9559-0de74bf3554a',
+        TargetWebId: '8de9b4d3-3c30-4fd0-a9d7-2452bd065555',
+        TargetListId: '44b336a5-e397-4e22-a270-c39e9069b123',
+        TargetObjectUniqueId: '15488d89-b82b-40be-958a-922b2ed79383',
+        TargetObjectSiteRelativeUrl: 'Shared Documents/Icons/Company.png',
+        CorrelationId: '5efd44a1-c034-9000-9692-4e1a1b3ca33b'
+      }
+    );
+  });
+
+  it('correctly throws error when using getCopyJobResult', async () => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso.sharepoint.com/sites/sales/_api/Site/GetCopyJobProgress') {
+        return {
+          JobState: 0,
+          Logs: [
+            JSON.stringify({
+              Event: 'JobStart',
+              JobId: 'fb4cc143-383c-4da0-bd91-02d2acbb01c7',
+              Time: '08/10/2024 16:30:39.004',
+              SiteId: '53dec431-9d4f-415b-b12b-010259d5b4e1',
+              WebId: 'af102f32-b389-49dc-89bf-d116a17e0aa6',
+              DBId: '5a926054-85d7-4cf6-85f0-c38fa01c4d39',
+              FarmId: '823af112-cd95-49a2-adf5-eccb09c8ba5d',
+              ServerId: 'a6145d7e-1b85-4124-895e-b1e618bfe5ae',
+              SubscriptionId: '18c58817-3bc9-489d-ac63-f7264fb357e5',
+              TotalRetryCount: '0',
+              MigrationType: 'Copy',
+              MigrationDirection: 'Import',
+              CorrelationId: 'd8f444a1-10a8-9000-862c-0bad6eff1006'
+            }),
+            JSON.stringify({
+              Event: 'JobError',
+              JobId: 'fb4cc143-383c-4da0-bd91-02d2acbb01c7',
+              Time: '08/10/2024 16:30:39.007',
+              TotalRetryCount: '0',
+              MigrationType: 'Copy',
+              MigrationDirection: 'Import',
+              ObjectType: 'File',
+              Url: 'Shared Documents/Icons/Company.png',
+              Id: 'c194762b-3f54-4f5f-9f5c-eba26084e29d',
+              SourceListItemIntId: '38',
+              ErrorCode: '-2147024713',
+              Message: 'A file or folder with the name Company.png already exists at the destination.',
+              TargetListItemIntId: 'f9628bfc-1e80-4486-aa3e-25d1f1ac67f9',
+              CorrelationId: 'd8f444a1-10a8-9000-862c-0bad6eff1006'
+            }),
+            JSON.stringify({
+              Event: 'JobEnd',
+              JobId: 'fb4cc143-383c-4da0-bd91-02d2acbb01c7',
+              Time: '08/10/2024 16:30:39.008',
+              TotalRetryCount: '0',
+              MigrationType: 'Copy',
+              MigrationDirection: 'Import',
+              CorrelationId: 'd8f444a1-10a8-9000-862c-0bad6eff1006'
+            })
+          ]
+        };
+      }
+
+      throw 'Invalid request: ' + opts.url;
+    });
+
+    await assert.rejects(spo.getCopyJobResult('https://contoso.sharepoint.com/sites/sales', copyJobInfo),
+      new Error('A file or folder with the name Company.png already exists at the destination.'));
   });
 });
