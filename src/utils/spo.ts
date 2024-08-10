@@ -21,7 +21,8 @@ import { WebProperties } from '../m365/spo/commands/web/WebProperties.js';
 import { Group, Site } from '@microsoft/microsoft-graph-types';
 import { ListItemInstance } from '../m365/spo/commands/listitem/ListItemInstance.js';
 import { ListItemFieldValueResult } from '../m365/spo/commands/listitem/ListItemFieldValueResult.js';
-import { FileProperties } from '../m365/spo/commands/file/FileProperties.js'; import { setTimeout } from 'timers/promises';
+import { FileProperties } from '../m365/spo/commands/file/FileProperties.js';
+import { setTimeout } from 'timers/promises';
 
 export interface ContextInfo {
   FormDigestTimeoutSeconds: number;
@@ -87,6 +88,45 @@ export interface User {
   } | null;
   UserPrincipalName: string | null;
 }
+
+interface CreateCopyJobsOptions {
+  nameConflictBehavior?: CreateCopyJobsNameConflictBehavior;
+  bypassSharedLock?: boolean;
+  ignoreVersionHistory?: boolean;
+  newName?: string;
+}
+
+export enum CreateCopyJobsNameConflictBehavior {
+  Fail = 0,
+  Replace = 1,
+  Rename = 2,
+}
+
+interface CreateCopyJobInfo {
+  EncryptionKey: string;
+  JobId: string;
+  JobQueueUri: string;
+  SourceListItemUniqueIds: string[];
+}
+
+interface CopyJobObjectInfo {
+  Event: string;
+  JobId: string;
+  Time: string;
+  SourceObjectFullUrl: string;
+  TargetServerUrl: string;
+  TargetSiteId: string;
+  TargetWebId: string;
+  TargetListId: string;
+  TargetObjectUniqueId: string;
+  TargetObjectSiteRelativeUrl: string;
+  CorrelationId: string;
+}
+
+// Wrapping this into a settings object so we can alter the values in tests
+export const settings = {
+  pollingInterval: 3_000
+};
 
 export const spo = {
   async getRequestDigest(siteUrl: string): Promise<FormDigestInfo> {
@@ -1888,6 +1928,77 @@ export const spo = {
     const file: FileProperties = await request.get<FileProperties>(requestOptions);
 
     return file;
+  },
+
+  /**
+   * Create a SharePoint copy job to copy a file/folder to another location.
+   * @param webUrl Absolute web URL where the source file/folder is located.
+   * @param sourceUrl Absolute URL of the source file/folder.
+   * @param destinationUrl Absolute URL of the destination folder.
+   * @param options Options for the copy job.
+   * @returns Copy job information. Use {@link spo.getCopyJobResult} to get the result of the copy job.
+   */
+  async createCopyJob(webUrl: string, sourceUrl: string, destinationUrl: string, options?: CreateCopyJobsOptions): Promise<CreateCopyJobInfo> {
+    const requestOptions: CliRequestOptions = {
+      url: `${webUrl}/_api/Site/CreateCopyJobs`,
+      headers: {
+        accept: 'application/json;odata=nometadata'
+      },
+      responseType: 'json',
+      data: {
+        destinationUri: destinationUrl,
+        exportObjectUris: [sourceUrl],
+        options: {
+          NameConflictBehavior: options?.nameConflictBehavior ?? CreateCopyJobsNameConflictBehavior.Fail,
+          AllowSchemaMismatch: true,
+          BypassSharedLock: !!options?.bypassSharedLock,
+          IgnoreVersionHistory: !!options?.ignoreVersionHistory,
+          CustomizedItemName: options?.newName ? [options.newName] : undefined,
+          SameWebCopyMoveOptimization: true
+        }
+      }
+    };
+
+    const response = await request.post<{ value: CreateCopyJobInfo[] }>(requestOptions);
+    return response.value[0];
+  },
+
+  /**
+   * Poll until the copy job is finished and return the result.
+   * @param webUrl Absolute web URL where the copy job was created.
+   * @param copyJobInfo Information about the copy job.
+   * @throws Error if the copy job has failed.
+   * @returns Information about the destination object.
+   */
+  async getCopyJobResult(webUrl: string, copyJobInfo: CreateCopyJobInfo): Promise<CopyJobObjectInfo> {
+    const requestOptions: CliRequestOptions = {
+      url: `${webUrl}/_api/Site/GetCopyJobProgress`,
+      headers: {
+        accept: 'application/json;odata=nometadata'
+      },
+      responseType: 'json',
+      data: {
+        copyJobInfo: copyJobInfo
+      }
+    };
+    let progress = await request.post<{ JobState: number; Logs: string[] }>(requestOptions);
+
+    while (progress.JobState !== 0) {
+      await setTimeout(settings.pollingInterval);
+      progress = await request.post<{ JobState: number; Logs: string[] }>(requestOptions);
+    }
+
+    const logs = progress.Logs.map(l => JSON.parse(l));
+
+    // Check if the job has failed
+    const errorLog = logs.find(l => l.Event === 'JobError');
+    if (errorLog) {
+      throw new Error(errorLog.Message);
+    }
+
+    // Get the destination object information
+    const objectInfo = logs.find(l => l.Event === 'JobFinishedObjectInfo') as CopyJobObjectInfo;
+    return objectInfo;
   },
 
   /**
