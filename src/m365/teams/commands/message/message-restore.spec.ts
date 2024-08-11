@@ -55,7 +55,6 @@ describe(commands.MESSAGE_RESTORE, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      request.get,
       request.post,
       cli.getSettingWithDefaultValue,
       accessToken.isAppOnlyAccessToken
@@ -164,7 +163,7 @@ describe(commands.MESSAGE_RESTORE, () => {
   });
 
   it('restores the specified message', async () => {
-    sinon.stub(request, 'post').callsFake(async (opts) => {
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/${teamId}/channels/${channelId}/messages/${messageId}/undoSoftDelete`) {
         return;
       }
@@ -179,13 +178,15 @@ describe(commands.MESSAGE_RESTORE, () => {
         id: messageId
       }
     });
+
+    assert(postStub.calledOnce);
   });
 
   it('restores the specified message by team name and channel name', async () => {
     sinon.stub(teams, 'getChannelIdByDisplayName').withArgs(teamId, channelName).resolves(channelId);
     sinon.stub(teams, 'getTeamIdByDisplayName').withArgs(teamName).resolves(teamId);
 
-    sinon.stub(request, 'post').callsFake(async (opts) => {
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/${teamId}/channels/${channelId}/messages/${messageId}/undoSoftDelete`) {
         return;
       }
@@ -201,6 +202,8 @@ describe(commands.MESSAGE_RESTORE, () => {
         id: messageId
       }
     });
+
+    assert(postStub.calledOnce);
   });
 
   it('correctly handles error when retrieving a message', async () => {
