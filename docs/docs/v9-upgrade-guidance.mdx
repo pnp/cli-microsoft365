@@ -2,6 +2,16 @@
 
 The v9 of CLI for Microsoft 365 introduces several breaking changes. To help you upgrade to the latest version of CLI for Microsoft 365, we've listed those changes along with any actions you may need to take.
 
+## App
+
+### Updated option names of 'app permission add' to plural
+
+We updated the [app permission add](./cmd/app/permission/permission-add.mdx) command. Option were updated to `applicationPermissions` and `delegatedPermissions`.
+
+#### What action do I need to take?
+
+- Please, check the documentation of the [app permission add](./cmd/app/permission/permission-add.mdx) command to see the updated options and adjust your scripts accordingly.
+
 ## Enterprise application (or service principal)
 
 ### Aligns options of `entra enterpriseapp` commands
@@ -32,3 +42,65 @@ For this new major version, we've aligned the options of the `entra enterpriseap
 #### What action do I need to take?
 
 Please, check the documentation of the [entra enterpriseapp add](https://pnp.github.io/cli-microsoft365/cmd/entra/enterpriseapp/enterpriseapp-add), [entra enterpriseapp get](https://pnp.github.io/cli-microsoft365/cmd/entra/enterpriseapp/enterpriseapp-get), and [entra enterpriseapp list](https://pnp.github.io/cli-microsoft365/cmd/entra/enterpriseapp/enterpriseapp-list) commands to see the updated options and adjust your scripts accordingly.
+
+## Entra ID
+
+### Removed deprecated Guest value from 'aad m365group user list' command.
+
+The deprecated Guest value was removed from the `role` option in the [aad m365group user list](./cmd/entra/m365group/m365group-user-list.mdx) command.
+
+#### What action do I need to take?
+
+- Please, check the documentation of the aad m365group user list](./cmd/entra/m365group/m365group-user-list.mdx) command to see the updated ``role` option and adjust your scripts accordingly.
+
+## SharePoint
+
+### Updated `spo site appcatalog remove` options
+
+We updated the [spo site appcatalog remove](./cmd/spo/site/site-appcatalog-remove.mdx) command. This command is a destructive operation that removes a site collection app catalog. Previously, it did not prompt for confirmation before executing this action, which could potentially lead to unintended data loss. To address this, we have added a confirmation prompt by default.
+
+Because of this rework, we have added a new option.
+
+**New options:**
+
+Option | Description
+--- | ---
+`-f, --force` | Don't prompt for confirmation.
+
+#### What action do I need to take?
+
+Update your scripts with the following:
+
+- Add the option `--force` if you want to bypass the confirmation prompt and proceed with the removal operation automatically.
+
+### Removed the deprecated `wait` option and output from the `spo tenant recyclebinitem restore` command
+
+For this new major version, we've removed the deprecated `wait` option from the `spo tenant recyclebinitem restore` command. The command now won't return a response on success.
+
+#### What action do I need to take?
+
+- Please, check the documentation of the [spo tenant recyclebinitem restore](./cmd/spo/tenant/tenant-recyclebinitem-restore.mdx) command to see the updated output and adjust your scripts accordingly.
+- In the `spo tenant recyclebinitem restore` command, remove deprecated `wait` option from your scripts.
+
+#### Aligned options with naming convention
+
+We updated option naming from `groupDisplayName` to `groupName` and `userPrincipalName` to `userName`.
+
+**Affected commands:**
+
+- [entra group user list](./cmd/entra/group/group-user-list.mdx)
+- [entra m365group conversation post list](./cmd/entra/m365group/m365group-conversation-post-list.mdx)
+- [entra m365group recyclebinitem list](./cmd/entra/m365group/m365group-recyclebinitem-list.mdx)
+- [outlook message get](./cmd/outlook/message/message-get.mdx)  
+
+#### What action do I need to take?
+
+- Please, check the documentation of the affected commands to see the updated option naming and adjust your scripts accordingly.
+
+### Removes duplicate property from 'spo list list' command.
+
+In the [spo list list](./cmd/spo/list/list-list.mdx) we removed the `Url` from the command output as it was a duplicate of the `RootFolder/ServerRelativeUrl` property.
+
+#### What action do I need to take?
+
+- Please update your scripts not to use the `Url` property from the command output.
