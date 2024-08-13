@@ -1,5 +1,3 @@
-import url from 'url';
-
 export const urlUtil = {
   /**
      * Returns server relative path.
@@ -16,13 +14,7 @@ export const urlUtil = {
      * urlUtil.getServerRelativePath("/sites/team1/", "/Shared Documents");
      */
   getServerRelativePath(webUrl: string, folderRelativePath: string): string {
-    const tenantUrl: string = `${url.parse(webUrl).protocol}//${url.parse(webUrl).hostname}`;
-    // if webUrl is a server-relative URL then tenantUrl will resolve to null//null
-    // in which case we should keep webUrl
-    let webRelativePath: string = tenantUrl !== 'null//null' ? webUrl.substr(tenantUrl.length) : webUrl;
-
-    // will be used to remove relative path from the folderRelativePath
-    // in case the web relative url is included
+    let webRelativePath = this.getUrlRelativePath(webUrl);
     let relativePathToRemove: string = webRelativePath;
 
     // add '/' at 0
@@ -105,13 +97,8 @@ export const urlUtil = {
    * Utils.getWebRelativePath("/sites/team1/", "/sites/team1/Shared Documents");
    */
   getWebRelativePath(webUrl: string, folderUrl: string): string {
-
+    let webRelativePath = this.getUrlRelativePath(webUrl);
     let folderWebRelativePath: string = '';
-
-    const tenantUrl: string = `${url.parse(webUrl).protocol}//${url.parse(webUrl).hostname}`;
-    // if webUrl is a server-relative URL then tenantUrl will resolve to null//null
-    // in which case we should keep webUrl
-    let webRelativePath: string = tenantUrl !== 'null//null' ? webUrl.substr(tenantUrl.length) : webUrl;
 
     // will be used to remove relative path from the folderRelativePath
     // in case the web relative url is included
@@ -168,8 +155,8 @@ export const urlUtil = {
    * urlUtil.getAbsoluteUrl("https://contoso.sharepoint.com/sites/team1/", "/sites/team1/Lists/MyList");
    */
   getAbsoluteUrl(webUrl: string, serverRelativeUrl: string): string {
-    const uri: url.UrlWithStringQuery = url.parse(webUrl);
-    const tenantUrl: string = `${uri.protocol}//${uri.hostname}`;
+    const parsedUrl = new URL(webUrl);
+    const tenantUrl: string = `${parsedUrl.protocol}//${parsedUrl.hostname}`;
     if (serverRelativeUrl[0] !== '/') {
       serverRelativeUrl = `/${serverRelativeUrl}`;
     }
@@ -242,5 +229,14 @@ export const urlUtil = {
    */
   removeTrailingSlashes(url: string): string {
     return url.replace(/\/+$/, '');
+  },
+
+  getUrlRelativePath(url: string): string {
+    if (url.indexOf('://') > 0 || url.indexOf('//') === 0) {
+      const parsedUrl = new URL(url);
+      const tenantUrl: string = `${parsedUrl.protocol}//${parsedUrl.hostname}`;
+      return url.substring(tenantUrl.length);
+    }
+    return url;
   }
 };

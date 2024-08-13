@@ -84,7 +84,7 @@ class EntraM365GroupGetCommand extends GraphCommand {
         };
 
         const res = await request.get<{ webUrl: string }>(requestOptions);
-        group.siteUrl = res.webUrl ? res.webUrl.substr(0, res.webUrl.lastIndexOf('/')) : '';
+        group.siteUrl = res.webUrl ? res.webUrl.substring(0, res.webUrl.lastIndexOf('/')) : '';
       }
 
       await logger.log(group);

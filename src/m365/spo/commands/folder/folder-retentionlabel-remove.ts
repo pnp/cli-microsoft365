@@ -1,4 +1,3 @@
-import * as url from 'url';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
@@ -113,7 +112,7 @@ class SpoFolderRetentionLabelRemoveCommand extends SpoCommand {
       const folderProperties = await this.getFolderProperties(logger, args);
 
       if (folderProperties.ListItemAllFields) {
-        const parsedUrl = url.parse(args.options.webUrl);
+        const parsedUrl = new URL(args.options.webUrl);
         const tenantUrl: string = `${parsedUrl.protocol}//${parsedUrl.hostname}`;
         const listAbsoluteUrl = urlUtil.urlCombine(tenantUrl, folderProperties.ListItemAllFields.ParentList.RootFolder.ServerRelativeUrl);
 

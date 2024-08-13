@@ -2,7 +2,6 @@ import { AxiosResponse } from 'axios';
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
-import url from 'url';
 import { v4 } from 'uuid';
 import auth from '../../../../Auth.js';
 import { Logger } from '../../../../cli/Logger.js';
@@ -243,13 +242,13 @@ class FileConvertPdfCommand extends GraphCommand {
       return fileGraphUrl;
     }
 
-    const _url = url.parse(fileWebUrl);
+    const _url = new URL(fileWebUrl);
     let siteId: string = '';
     let driveRelativeFileUrl: string = '';
-    const siteInfo = await this.getGraphSiteInfoFromFullUrl(_url.host as string, _url.path as string);
+    const siteInfo = await this.getGraphSiteInfoFromFullUrl(_url.hostname, _url.pathname);
 
     siteId = siteInfo.id;
-    let siteRelativeFileUrl: string = (_url.path as string).replace(siteInfo.serverRelativeUrl, '');
+    let siteRelativeFileUrl: string = _url.pathname.replace(siteInfo.serverRelativeUrl, '');
     // normalize site-relative URLs for root site collections and root sites
     if (!siteRelativeFileUrl.startsWith('/')) {
       siteRelativeFileUrl = '/' + siteRelativeFileUrl;
