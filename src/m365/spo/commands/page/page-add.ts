@@ -128,7 +128,7 @@ class SpoPageAddCommand extends SpoCommand {
     let bannerImageUrl: string = '';
     let canvasContent1: string = '';
     let layoutWebpartsContent: string = '';
-    const pageTitle: string = args.options.title ? args.options.title : (args.options.name.indexOf('.aspx') > -1 ? args.options.name.substr(0, args.options.name.indexOf('.aspx')) : args.options.name);
+    const pageTitle: string = args.options.title ? args.options.title : (args.options.name.indexOf('.aspx') > -1 ? args.options.name.substring(0, args.options.name.indexOf('.aspx')) : args.options.name);
     let pageId: number | null = null;
     const pageDescription: string = args.options.description || "";
 

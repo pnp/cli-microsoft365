@@ -1,4 +1,3 @@
-import * as url from 'url';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
@@ -161,7 +160,7 @@ class SpoListItemRetentionLabelEnsureCommand extends SpoCommand {
   }
 
   private async getListAbsoluteUrl(options: Options, logger: Logger): Promise<string> {
-    const parsedUrl = url.parse(options.webUrl);
+    const parsedUrl = new URL(options.webUrl);
     const tenantUrl: string = `${parsedUrl.protocol}//${parsedUrl.hostname}`;
 
     if (options.listUrl) {

@@ -254,7 +254,7 @@ class SpfxPackageGenerateCommand extends AnonymousCommand {
   }
 
   private static getWebPartAlias(webPartName: string): string {
-    return 'AutoWP' + webPartName.replace(/[^a-zA-Z0-9]/g, '').substr(0, 40);
+    return 'AutoWP' + webPartName.replace(/[^a-zA-Z0-9]/g, '').substring(0, 40);
   }
 
   private static generateNewId = (): string => {
