@@ -830,7 +830,7 @@ function printAvailableCommands(): void {
       commandsToPrint[commandName] = command;
     }
     else {
-      const subCommandsGroup: string = commandName.substr(0, pos);
+      const subCommandsGroup: string = commandName.substring(0, pos);
       if (!commandGroupsToPrint[subCommandsGroup]) {
         commandGroupsToPrint[subCommandsGroup] = 0;
       }
@@ -1034,7 +1034,7 @@ function loadOptionValuesFromFiles(args: { options: yargs.Arguments }): void {
       return;
     }
 
-    const filePath: string = value.substr(1);
+    const filePath: string = value.substring(1);
     // if the file doesn't exist, leave as-is, if it exists replace with
     // contents from the file
     if (fs.existsSync(filePath)) {

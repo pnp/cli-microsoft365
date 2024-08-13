@@ -1,4 +1,3 @@
-import * as url from 'url';
 import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
@@ -111,7 +110,7 @@ class SpoFileRetentionLabelRemoveCommand extends SpoCommand {
   private async removeFileRetentionLabel(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       const fileProperties = await this.getFileProperties(logger, args);
-      const parsedUrl = url.parse(args.options.webUrl);
+      const parsedUrl = new URL(args.options.webUrl);
       const tenantUrl: string = `${parsedUrl.protocol}//${parsedUrl.hostname}`;
       const listAbsoluteUrl = urlUtil.urlCombine(tenantUrl, fileProperties.listServerRelativeUrl);
 
