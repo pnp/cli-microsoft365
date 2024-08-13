@@ -350,7 +350,7 @@ export default abstract class Command {
         pos = pos1;
       }
 
-      commandName = commandName.substr(0, pos).trim();
+      commandName = commandName.substring(0, pos).trim();
     }
 
     return commandName;
