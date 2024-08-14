@@ -8,7 +8,6 @@ import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 import { AppRole, AppRoleAssignment, ServicePrincipal } from '@microsoft/microsoft-graph-types';
-import aadCommands from '../../aadCommands.js';
 
 interface CommandArgs {
   options: Options;
@@ -30,10 +29,6 @@ class EntraAppRoleAssignmentRemoveCommand extends GraphCommand {
 
   public get description(): string {
     return 'Deletes an app role assignment for the specified Entra Application Registration';
-  }
-
-  public alias(): string[] | undefined {
-    return [aadCommands.APPROLEASSIGNMENT_REMOVE];
   }
 
   constructor() {
@@ -101,8 +96,6 @@ class EntraAppRoleAssignmentRemoveCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    await this.showDeprecationWarning(logger, aadCommands.APPROLEASSIGNMENT_REMOVE, commands.APPROLEASSIGNMENT_REMOVE);
-
     const removeAppRoleAssignment = async (): Promise<void> => {
       let sp: ServicePrincipal;
       // get the service principal associated with the appId

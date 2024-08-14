@@ -6,7 +6,6 @@ import { odata } from '../../../../utils/odata.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
-import aadCommands from '../../aadCommands.js';
 
 interface CommandArgs {
   options: Options;
@@ -26,10 +25,6 @@ class EntraUserSigninListCommand extends GraphCommand {
 
   public get description(): string {
     return 'Retrieves the Entra ID user sign-ins for the tenant';
-  }
-
-  public alias(): string[] | undefined {
-    return [aadCommands.USER_SIGNIN_LIST];
   }
 
   constructor() {
@@ -101,8 +96,6 @@ class EntraUserSigninListCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    await this.showDeprecationWarning(logger, aadCommands.USER_SIGNIN_LIST, commands.USER_SIGNIN_LIST);
-
     try {
       let endpoint: string = `${this.resource}/v1.0/auditLogs/signIns`;
       let filter: string = "";

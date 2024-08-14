@@ -4,7 +4,6 @@ import { formatting } from '../../../../utils/formatting.js';
 import { odata } from '../../../../utils/odata.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
-import aadCommands from '../../aadCommands.js';
 import commands from '../../commands.js';
 
 interface CommandArgs {
@@ -22,10 +21,6 @@ class EntraOAuth2GrantListCommand extends GraphCommand {
 
   public get description(): string {
     return 'Lists OAuth2 permission grants for the specified service principal';
-  }
-
-  public alias(): string[] | undefined {
-    return [aadCommands.OAUTH2GRANT_LIST];
   }
 
   public defaultProperties(): string[] | undefined {
@@ -60,8 +55,6 @@ class EntraOAuth2GrantListCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    await this.showDeprecationWarning(logger, aadCommands.OAUTH2GRANT_LIST, commands.OAUTH2GRANT_LIST);
-
     if (this.verbose) {
       await logger.logToStderr(`Retrieving list of OAuth grants for the service principal...`);
     }

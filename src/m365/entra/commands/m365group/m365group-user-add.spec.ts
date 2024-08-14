@@ -10,7 +10,6 @@ import { telemetry } from '../../../../telemetry.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
-import teamsCommands from '../../../teams/commands.js';
 import commands from '../../commands.js';
 import command from './m365group-user-add.js';
 import { settingsNames } from '../../../../settingsNames.js';
@@ -73,16 +72,6 @@ describe(commands.M365GROUP_USER_ADD, () => {
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
-  });
-
-  it('defines alias', () => {
-    const alias = command.alias();
-    assert.notStrictEqual(typeof alias, 'undefined');
-  });
-
-  it('defines correct alias', () => {
-    const alias = command.alias();
-    assert.deepStrictEqual(alias, [teamsCommands.USER_ADD, aadCommands.M365GROUP_USER_ADD]);
   });
 
   it('fails validation if the groupId is not a valid guid.', async () => {

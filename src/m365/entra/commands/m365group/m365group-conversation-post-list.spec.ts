@@ -14,7 +14,6 @@ import commands from '../../commands.js';
 import command from './m365group-conversation-post-list.js';
 import { settingsNames } from '../../../../settingsNames.js';
 import { entraGroup } from '../../../../utils/entraGroup.js';
-import aadCommands from '../../aadCommands.js';
 
 describe(commands.M365GROUP_CONVERSATION_POST_LIST, () => {
   let log: string[];
@@ -122,19 +121,10 @@ describe(commands.M365GROUP_CONVERSATION_POST_LIST, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('defines alias', () => {
-    const alias = command.alias();
-    assert.notStrictEqual(typeof alias, 'undefined');
-  });
-
-  it('defines correct alias', () => {
-    const alias = command.alias();
-    assert.deepStrictEqual(alias, [aadCommands.M365GROUP_CONVERSATION_POST_LIST]);
-  });
-
   it('defines correct properties for the default output', () => {
     assert.deepStrictEqual(command.defaultProperties(), ['receivedDateTime', 'id']);
   });
+
   it('fails validation if groupId and groupName specified', async () => {
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
       if (settingName === settingsNames.prompt) {
@@ -147,6 +137,7 @@ describe(commands.M365GROUP_CONVERSATION_POST_LIST, () => {
     const actual = await command.validate({ options: { groupId: '1caf7dcd-7e83-4c3a-94f7-932a1299c844', groupName: 'MyGroup', threadId: '123' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
+
   it('fails validation if neither groupId nor groupName specified', async () => {
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
       if (settingName === settingsNames.prompt) {
@@ -159,10 +150,12 @@ describe(commands.M365GROUP_CONVERSATION_POST_LIST, () => {
     const actual = await command.validate({ options: { threadId: '123' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
+
   it('fails validation if the groupId is not a valid GUID', async () => {
     const actual = await command.validate({ options: { groupId: 'not-c49b-4fd4-8223-28f0ac3a6402', threadId: '123' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
+
   it('passes validation if the groupId is a valid GUID', async () => {
     const actual = await command.validate({ options: { groupId: '1caf7dcd-7e83-4c3a-94f7-932a1299c844', threadId: '123' } }, commandInfo);
     assert.strictEqual(actual, true);
@@ -187,6 +180,7 @@ describe(commands.M365GROUP_CONVERSATION_POST_LIST, () => {
       jsonOutput.value
     ));
   });
+
   it('Retrieve posts for the specified conversation threadId of m365 group groupName in the tenant (verbose)', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/groups?$filter=displayName') > -1) {

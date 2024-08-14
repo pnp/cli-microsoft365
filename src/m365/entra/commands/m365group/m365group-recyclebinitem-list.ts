@@ -5,7 +5,6 @@ import { formatting } from '../../../../utils/formatting.js';
 import { odata } from '../../../../utils/odata.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
-import aadCommands from '../../aadCommands.js';
 
 interface CommandArgs {
   options: Options;
@@ -23,10 +22,6 @@ class EntraM365GroupRecycleBinItemListCommand extends GraphCommand {
 
   public get description(): string {
     return 'Lists Microsoft 365 Groups deleted in the current tenant';
-  }
-
-  public alias(): string[] | undefined {
-    return [aadCommands.M365GROUP_RECYCLEBINITEM_LIST];
   }
 
   constructor() {
@@ -61,8 +56,6 @@ class EntraM365GroupRecycleBinItemListCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    await this.showDeprecationWarning(logger, aadCommands.M365GROUP_RECYCLEBINITEM_LIST, commands.M365GROUP_RECYCLEBINITEM_LIST);
-
     try {
       const filter: string = `?$filter=groupTypes/any(c:c+eq+'Unified')`;
       const displayNameFilter: string = args.options.groupName ? ` and startswith(DisplayName,'${formatting.encodeQueryParameter(args.options.groupName).replace(/'/g, `''`)}')` : '';

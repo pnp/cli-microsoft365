@@ -8,7 +8,6 @@ import GraphCommand from "../../../base/GraphCommand.js";
 import commands from "../../commands.js";
 import request, { CliRequestOptions } from "../../../../request.js";
 import { entraDevice } from "../../../../utils/entraDevice.js";
-import aadCommands from "../../aadCommands.js";
 
 interface CommandArgs {
   options: Options;
@@ -32,10 +31,6 @@ class EntraAdministrativeUnitMemberAddCommand extends GraphCommand {
 
   public get description(): string {
     return 'Adds a member (user, group, device) to an administrative unit';
-  }
-
-  public alias(): string[] | undefined {
-    return [aadCommands.ADMINISTRATIVEUNIT_MEMBER_ADD];
   }
 
   constructor() {
@@ -119,8 +114,6 @@ class EntraAdministrativeUnitMemberAddCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    await this.showDeprecationWarning(logger, aadCommands.ADMINISTRATIVEUNIT_MEMBER_ADD, commands.ADMINISTRATIVEUNIT_MEMBER_ADD);
-
     let administrativeUnitId = args.options.administrativeUnitId;
     let memberType;
     let memberId;

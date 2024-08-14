@@ -7,7 +7,6 @@ import { formatting } from '../../../../utils/formatting.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 import { cli } from '../../../../cli/cli.js';
-import aadCommands from '../../aadCommands.js';
 
 interface CommandArgs {
   options: Options;
@@ -36,10 +35,6 @@ class EntraAppSetCommand extends GraphCommand {
 
   public get description(): string {
     return 'Updates Entra app registration';
-  }
-
-  public alias(): string[] | undefined {
-    return [aadCommands.APP_SET, commands.APPREGISTRATION_SET];
   }
 
   constructor() {
@@ -130,8 +125,6 @@ class EntraAppSetCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    await this.showDeprecationWarning(logger, aadCommands.APP_SET, commands.APP_SET);
-
     try {
       let objectId = await this.getAppObjectId(args, logger);
       objectId = await this.configureUri(args, objectId, logger);

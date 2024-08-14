@@ -12,7 +12,6 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './policy-list.js';
-import aadCommands from '../../aadCommands.js';
 
 describe(commands.POLICY_LIST, () => {
   let log: string[];
@@ -63,16 +62,6 @@ describe(commands.POLICY_LIST, () => {
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
-  });
-
-  it('defines alias', () => {
-    const alias = command.alias();
-    assert.notStrictEqual(typeof alias, 'undefined');
-  });
-
-  it('defines correct alias', () => {
-    const alias = command.alias();
-    assert.deepStrictEqual(alias, [aadCommands.POLICY_LIST]);
   });
 
   it('defines correct properties for the default output', () => {

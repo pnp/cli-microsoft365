@@ -5,7 +5,6 @@ import request, { CliRequestOptions } from '../../../../request.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
-import aadCommands from '../../aadCommands.js';
 
 interface CommandArgs {
   options: Options;
@@ -22,10 +21,6 @@ class EntraUserRecycleBinItemRestoreCommand extends GraphCommand {
 
   public get description(): string {
     return 'Restores a user from the tenant recycle bin';
-  }
-
-  public alias(): string[] | undefined {
-    return [aadCommands.USER_RECYCLEBINITEM_RESTORE];
   }
 
   constructor() {
@@ -56,8 +51,6 @@ class EntraUserRecycleBinItemRestoreCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    await this.showDeprecationWarning(logger, aadCommands.USER_RECYCLEBINITEM_RESTORE, commands.USER_RECYCLEBINITEM_RESTORE);
-
     if (this.verbose) {
       await logger.logToStderr(`Restoring user with id ${args.options.id} from the recycle bin.`);
     }

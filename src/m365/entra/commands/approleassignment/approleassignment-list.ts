@@ -6,7 +6,6 @@ import { formatting } from '../../../../utils/formatting.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
-import aadCommands from '../../aadCommands.js';
 
 interface CommandArgs {
   options: Options;
@@ -25,10 +24,6 @@ class EntraAppRoleAssignmentListCommand extends GraphCommand {
 
   public get description(): string {
     return 'Lists app role assignments for the specified application registration';
-  }
-
-  public alias(): string[] | undefined {
-    return [aadCommands.APPROLEASSIGNMENT_LIST];
   }
 
   constructor() {
@@ -89,8 +84,6 @@ class EntraAppRoleAssignmentListCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    await this.showDeprecationWarning(logger, aadCommands.APPROLEASSIGNMENT_LIST, commands.APPROLEASSIGNMENT_LIST);
-
     try {
       const spAppRoleAssignments = await this.getAppRoleAssignments(args.options);
       // the role assignment has an appRoleId but no name. To get the name,

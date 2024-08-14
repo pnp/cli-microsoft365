@@ -5,7 +5,6 @@ import { formatting } from '../../../../utils/formatting.js';
 import { odata } from '../../../../utils/odata.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
-import aadCommands from '../../aadCommands.js';
 
 interface CommandArgs {
   options: Options;
@@ -25,10 +24,6 @@ class EntraUserListCommand extends GraphCommand {
 
   public get description(): string {
     return 'Lists users matching specified criteria';
-  }
-
-  public alias(): string[] | undefined {
-    return [aadCommands.USER_LIST];
   }
 
   public allowUnknownOptions(): boolean | undefined {
@@ -86,8 +81,6 @@ class EntraUserListCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    await this.showDeprecationWarning(logger, aadCommands.USER_LIST, commands.USER_LIST);
-
     try {
       let url = `${this.resource}/v1.0/users`;
 

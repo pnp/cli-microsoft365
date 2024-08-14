@@ -5,7 +5,6 @@ import request, { CliRequestOptions } from '../../../../request.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
-import aadCommands from '../../aadCommands.js';
 import { entraUser } from '../../../../utils/entraUser.js';
 import { formatting } from '../../../../utils/formatting.js';
 
@@ -28,10 +27,6 @@ class EntraUserGetCommand extends GraphCommand {
 
   public get description(): string {
     return 'Gets information about the specified user';
-  }
-
-  public alias(): string[] | undefined {
-    return [aadCommands.USER_GET];
   }
 
   constructor() {
@@ -97,8 +92,6 @@ class EntraUserGetCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    await this.showDeprecationWarning(logger, aadCommands.USER_GET, commands.USER_GET);
-
     try {
       let userIdOrPrincipalName = args.options.id;
 

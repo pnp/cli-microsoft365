@@ -10,7 +10,6 @@ import { telemetry } from '../../../../telemetry.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
-import teamsCommands from '../../../teams/commands.js';
 import commands from '../../commands.js';
 import command from './m365group-user-set.js';
 import { entraGroup } from '../../../../utils/entraGroup.js';

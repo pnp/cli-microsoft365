@@ -13,7 +13,6 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './m365group-add.js';
-import aadCommands from '../../aadCommands.js';
 
 describe(commands.M365GROUP_ADD, () => {
 
@@ -119,16 +118,6 @@ describe(commands.M365GROUP_ADD, () => {
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
-  });
-
-  it('defines alias', () => {
-    const alias = command.alias();
-    assert.notStrictEqual(typeof alias, 'undefined');
-  });
-
-  it('defines correct alias', () => {
-    const alias = command.alias();
-    assert.deepStrictEqual(alias, [aadCommands.M365GROUP_ADD]);
   });
 
   it('creates Microsoft 365 Group using basic info', async () => {

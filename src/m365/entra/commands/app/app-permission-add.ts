@@ -6,7 +6,6 @@ import commands from "../../commands.js";
 import request, { CliRequestOptions } from "../../../../request.js";
 import { Logger } from "../../../../cli/Logger.js";
 import { validation } from "../../../../utils/validation.js";
-import aadCommands from "../../aadCommands.js";
 import { formatting } from "../../../../utils/formatting.js";
 import { cli } from "../../../../cli/cli.js";
 
@@ -41,10 +40,6 @@ class EntraAppPermissionAddCommand extends GraphCommand {
 
   public get description(): string {
     return 'Adds the specified application and/or delegated permissions to a specified Microsoft Entra app';
-  }
-
-  public alias(): string[] | undefined {
-    return [aadCommands.APP_PERMISSION_ADD, commands.APPREGISTRATION_PERMISSION_ADD];
   }
 
   constructor() {
@@ -105,8 +100,6 @@ class EntraAppPermissionAddCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    await this.showDeprecationWarning(logger, aadCommands.APP_PERMISSION_ADD, commands.APP_PERMISSION_ADD);
-
     try {
       const appObject = await this.getAppObject(args.options);
       const servicePrincipals = await this.getServicePrincipals();

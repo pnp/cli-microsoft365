@@ -15,7 +15,6 @@ import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import command from './group-remove.js';
 import { settingsNames } from '../../../../settingsNames.js';
 import { formatting } from '../../../../utils/formatting.js';
-import aadCommands from '../../aadCommands.js';
 
 describe(commands.GROUP_REMOVE, () => {
   const groupId = '2c1ba4c4-cd9b-4417-832f-92a34bc34b2a';
@@ -71,16 +70,6 @@ describe(commands.GROUP_REMOVE, () => {
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
-  });
-
-  it('defines alias', () => {
-    const alias = command.alias();
-    assert.notStrictEqual(typeof alias, 'undefined');
-  });
-
-  it('defines correct alias', () => {
-    const alias = command.alias();
-    assert.deepStrictEqual(alias, [aadCommands.GROUP_REMOVE]);
   });
 
   it('removes the specified group by id without prompting for confirmation', async () => {

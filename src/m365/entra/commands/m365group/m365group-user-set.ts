@@ -4,7 +4,6 @@ import request, { CliRequestOptions } from '../../../../request.js';
 import { validation } from '../../../../utils/validation.js';
 import { formatting } from '../../../../utils/formatting.js';
 import GraphCommand from '../../../base/GraphCommand.js';
-import teamsCommands from '../../../teams/commands.js';
 import commands from '../../commands.js';
 import { entraGroup } from '../../../../utils/entraGroup.js';
 import { entraUser } from '../../../../utils/entraUser.js';
@@ -34,11 +33,6 @@ class EntraM365GroupUserSetCommand extends GraphCommand {
 
   public get description(): string {
     return 'Updates role of the specified user in the specified Microsoft 365 Group or Microsoft Teams team';
-  }
-
-
-  public alias(): string[] | undefined {
-    return [teamsCommands.USER_SET, aadCommands.M365GROUP_USER_SET];
   }
 
   constructor() {
