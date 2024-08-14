@@ -1859,4 +1859,17 @@ describe('cli', () => {
     await cli.execute(['cli', 'completion', 'sh', 'update']);
     assert(loadAllCommandsInfoStub.calledWith(true));
   });
+
+  it('validates if yargs parser has correct configuration', async () => {
+    const yargsConfiguration = cli.yargsConfiguration;
+
+    assert.deepStrictEqual(yargsConfiguration, {
+      'parse-numbers': true,
+      'strip-aliased': true,
+      'strip-dashed': true,
+      'dot-notation': false,
+      'boolean-negation': true,
+      'camel-case-expansion': false
+    });
+  });
 });
