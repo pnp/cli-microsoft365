@@ -1,0 +1,59 @@
+[
+  {
+    "name": "pnp-find-obsolete-m365-groups",
+    "source": "pnp",
+    "title": "Finding Obsolete Microsoft 365 Groups with PowerShell",
+    "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/entra/find-obsolete-m365-groups",
+    "creationDateTime": "2024-08-14",
+    "updateDateTime": "2024-08-14",
+    "shortDescription": "Understand to what extent the Microsoft 365 groups in your tenant are being used or even not.",
+    "longDescription": [
+      "Like any resource within your Microsoft 365 tenant, M365 Groups can become unused over time. This routine uses PowerShell with `m365 cli` commands to create a report of all M365 groups that are possibly obsolete."
+    ],
+    "products": ["SharePoint", "M365 Groups", "Teams", "Exchange Online"],
+    "categories": [],
+    "tags": [
+      "provisioning",
+      "libraries",
+      "group mailbox",
+      "governance",
+      "m365 groups",
+      "teams",
+      "usage",
+      "insights"
+    ],
+    "metadata": [
+      {
+        "key": "CLI-FOR-MICROSOFT365",
+        "value": "v8.0.0"
+      }
+    ],
+    "thumbnails": [
+      {
+        "type": "image",
+        "order": 100,
+        "url": "https://raw.githubusercontent.com/pnp/cli-microsoft365/main/docs/docs/sample-scripts/find-obsolete-m365-groups/assets/preview.png",
+        "alt": "preview image for the sample"
+      }
+    ],
+    "authors": [
+      {
+        "gitHubAccount": "tmaestrini",
+        "pictureUrl": "https://avatars.githubusercontent.com/u/69770609?v=4",
+        "name": "Tobias Maestrini"
+      }
+    ],
+    "references": [
+      {
+        "name": "Want to learn more about CLI for Microsoft 365 and the commands",
+        "description": "Check out the CLI for Microsoft 365 site to get started and for the reference to the commands.",
+        "url": "https://aka.ms/cli-m365"
+      },
+      {
+        "name": "Original article by Tony Redmond",
+        "description": "Check out the original article on which this script is based.",
+        "url": "https://petri.com/identifying-obsolete-office-365-groups-powershell"
+      }
+    ]
+  }
+]
