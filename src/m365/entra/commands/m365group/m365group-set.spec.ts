@@ -15,7 +15,6 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './m365group-set.js';
 import { entraGroup } from '../../../../utils/entraGroup.js';
-import aadCommands from '../../aadCommands.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 
 describe(commands.M365GROUP_SET, () => {
@@ -119,6 +118,7 @@ describe(commands.M365GROUP_SET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
+<<<<<<< HEAD
   it('defines alias', () => {
     const alias = command.alias();
     assert.notStrictEqual(typeof alias, 'undefined');
@@ -135,6 +135,16 @@ describe(commands.M365GROUP_SET, () => {
     const patchStub = sinon.stub(request, 'patch').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/${groupId}`) {
         return;
+=======
+  it('updates Microsoft 365 Group display name', async () => {
+    sinon.stub(request, 'patch').callsFake(async (opts) => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/groups/28beab62-7540-4db1-a23f-29a6018a3848') {
+        if (JSON.stringify(opts.data) === JSON.stringify(<Group>{
+          displayName: 'My group'
+        })) {
+          return;
+        }
+>>>>>>> ef060945e... removed aad aliases
       }
 
       throw 'Invalid request';

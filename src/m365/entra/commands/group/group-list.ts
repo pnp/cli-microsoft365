@@ -6,7 +6,6 @@ import { CliRequestOptions } from '../../../../request.js';
 import { odata } from '../../../../utils/odata.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
-import aadCommands from '../../aadCommands.js';
 
 interface CommandArgs {
   options: Options;
@@ -29,10 +28,6 @@ class EntraGroupListCommand extends GraphCommand {
 
   public get description(): string {
     return 'Lists all groups defined in Entra ID.';
-  }
-
-  public alias(): string[] | undefined {
-    return [aadCommands.GROUP_LIST];
   }
 
   public defaultProperties(): string[] | undefined {
@@ -77,8 +72,6 @@ class EntraGroupListCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    await this.showDeprecationWarning(logger, aadCommands.GROUP_LIST, commands.GROUP_LIST);
-
     try {
       let requestUrl: string = `${this.resource}/v1.0/groups`;
       let useConsistencyLevelHeader = false;

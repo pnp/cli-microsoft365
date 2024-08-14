@@ -35,10 +35,6 @@ class EntraM365GroupUserAddCommand extends GraphCommand {
     return 'Adds user to specified Microsoft 365 Group or Microsoft Teams team';
   }
 
-  public alias(): string[] | undefined {
-    return [teamsCommands.USER_ADD, aadCommands.M365GROUP_USER_ADD];
-  }
-
   constructor() {
     super();
 

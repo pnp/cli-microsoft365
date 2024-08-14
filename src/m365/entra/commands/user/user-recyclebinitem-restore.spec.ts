@@ -12,7 +12,6 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './user-recyclebinitem-restore.js';
-import aadCommands from '../../aadCommands.js';
 
 describe(commands.USER_RECYCLEBINITEM_RESTORE, () => {
   const validUserId = 'd839826a-81bf-4c38-8f80-f150d11ce6c7';
@@ -80,16 +79,6 @@ describe(commands.USER_RECYCLEBINITEM_RESTORE, () => {
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
-  });
-
-  it('defines alias', () => {
-    const alias = command.alias();
-    assert.notStrictEqual(typeof alias, 'undefined');
-  });
-
-  it('defines correct alias', () => {
-    const alias = command.alias();
-    assert.deepStrictEqual(alias, [aadCommands.USER_RECYCLEBINITEM_RESTORE]);
   });
 
   it('restores the user from the recycle bin', async () => {
