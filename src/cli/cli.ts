@@ -166,7 +166,7 @@ async function execute(rawArgs: string[]): Promise<void> {
     if (!result.success) {
       return cli.closeWithError(result.error, cli.optionsFromArgs, true);
     }
-    
+
     finalArgs = result.data;
   }
   else {
@@ -478,9 +478,12 @@ function getCommandOptionsFromArgs(args: string[], commandInfo: CommandInfo | un
   const yargsOptions: yargs.Options = {
     alias: {},
     configuration: {
-      "parse-numbers": false,
+      "parse-numbers": true,
       "strip-aliased": true,
-      "strip-dashed": true
+      "strip-dashed": true,
+      "dot-notation": false,
+      "boolean-negation": true,
+      "camel-case-expansion": false
     }
   };
 
