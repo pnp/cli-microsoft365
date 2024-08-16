@@ -194,10 +194,7 @@ export default abstract class Command {
         await cli.error('🌶️  Provide values for the following parameters:');
       }
 
-      const answer = optionInfo.autocomplete !== undefined
-        ? await prompt.forSelection<string>({ message: `${optionInfo.name}: `, choices: optionInfo.autocomplete.map((choice: any) => { return { name: choice, value: choice }; }) })
-        : await prompt.forInput({ message: `${optionInfo.name}: ` });
-
+      const answer = await cli.promptForValue(optionInfo);
       args.options[optionInfo.name] = answer;
     }
 
