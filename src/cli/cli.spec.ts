@@ -250,6 +250,24 @@ class MockCommandWithSchema extends AnonymousCommand {
   }
 }
 
+class MockCommandWithSchemaAndRequiredOptions extends AnonymousCommand {
+  public get name(): string {
+    return 'cli mock schema required';
+  }
+  public get description(): string {
+    return 'Mock command with schema and required options';
+  }
+  public get schema(): z.ZodTypeAny {
+    return globalOptionsZod
+      .extend({
+        url: z.string()
+      })
+      .strict();
+  }
+  public async commandAction(): Promise<void> {
+  }
+}
+
 describe('cli', () => {
   let rootFolder: string;
   let cliLogStub: sinon.SinonStub;
@@ -264,6 +282,7 @@ describe('cli', () => {
   let mockCommandWithAlias: Command;
   let mockCommandWithValidation: Command;
   let mockCommandWithSchema: Command;
+  let mockCommandWithSchemaAndRequiredOptions: Command;
   let log: string[] = [];
   let mockCommandWithBooleanRewrite: Command;
 
@@ -286,6 +305,7 @@ describe('cli', () => {
     mockCommandWithBooleanRewrite = new MockCommandWithBooleanRewrite();
     mockCommandWithValidation = new MockCommandWithValidation();
     mockCommandWithSchema = new MockCommandWithSchema();
+    mockCommandWithSchemaAndRequiredOptions = new MockCommandWithSchemaAndRequiredOptions();
     mockCommandWithOptionSets = new MockCommandWithOptionSets();
     mockCommandActionSpy = sinon.spy(mockCommand, 'action');
 
@@ -306,6 +326,7 @@ describe('cli', () => {
       cli.getCommandInfo(mockCommandWithAlias, 'cli-alias-mock.js', 'help.mdx'),
       cli.getCommandInfo(mockCommandWithValidation, 'cli-validation-mock.js', 'help.mdx'),
       cli.getCommandInfo(mockCommandWithSchema, 'cli-schema-mock.js', 'help.mdx'),
+      cli.getCommandInfo(mockCommandWithSchemaAndRequiredOptions, 'cli-schema-mock.js', 'help.mdx'),
       cli.getCommandInfo(cliCompletionUpdateCommand, 'cli/commands/completion/completion-clink-update.js', 'cli/completion/completion-clink-update.mdx'),
       cli.getCommandInfo(mockCommandWithBooleanRewrite, 'cli-boolean-rewrite-mock.js', 'help.mdx')
     ];
@@ -1015,6 +1036,51 @@ describe('cli', () => {
       }, e => done(e));
   });
 
+  it(`prompts for missing required options when validating schema and prompting enabled`, (done) => {
+    cli.commandToExecute = cli.commands.find(c => c.name === 'cli mock schema required');
+    sinon.stub(prompt, 'forInput').resolves('test');
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return true;
+      }
+      return defaultValue;
+    });
+    const executeCommandSpy = sinon.spy(cli, 'executeCommand');
+    cli
+      .execute(['cli', 'mock', 'schema', 'required'])
+      .then(_ => {
+        try {
+          assert(executeCommandSpy.called);
+          done();
+        }
+        catch (e) {
+          done(e);
+        }
+      }, e => done(e));
+  });
+
+  it(`shows validation error for missing required options when validating schema and prompting disabled`, (done) => {
+    cli.commandToExecute = cli.commands.find(c => c.name === 'cli mock schema required');
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+      return defaultValue;
+    });
+    const executeCommandSpy = sinon.spy(cli, 'executeCommand');
+    cli
+      .execute(['cli', 'mock', 'schema', 'required'])
+      .then(_ => done('Promise fulfilled while error expected'), _ => {
+        try {
+          assert(executeCommandSpy.notCalled);
+          done();
+        }
+        catch (e) {
+          done(e);
+        }
+      });
+  });
+
   it(`throws an error when command's schema-based validation failed`, (done) => {
     cli.commandToExecute = cli.commands.find(c => c.name === 'cli mock schema');
     const mockCommandWithSchemaActionSpy: sinon.SinonSpy = sinon.spy(mockCommandWithSchema, 'action');
@@ -1603,7 +1669,7 @@ describe('cli', () => {
     await cli.loadCommandFromArgs(['spo', 'site', 'list']);
     cli.printAvailableCommands();
 
-    assert(cliLogStub.calledWith('  cli *  9 commands'));
+    assert(cliLogStub.calledWith('  cli *  10 commands'));
   });
 
   it(`prints commands from the specified group`, async () => {
@@ -1616,7 +1682,7 @@ describe('cli', () => {
     };
     cli.printAvailableCommands();
 
-    assert(cliLogStub.calledWith('  cli mock *        6 commands'));
+    assert(cliLogStub.calledWith('  cli mock *        7 commands'));
   });
 
   it(`prints commands from the root group when the specified string doesn't match any group`, async () => {
@@ -1629,7 +1695,7 @@ describe('cli', () => {
     };
     cli.printAvailableCommands();
 
-    assert(cliLogStub.calledWith('  cli *  9 commands'));
+    assert(cliLogStub.calledWith('  cli *  10 commands'));
   });
 
   it(`runs properly when context file not found`, async () => {

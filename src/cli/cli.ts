@@ -167,15 +167,41 @@ async function execute(rawArgs: string[]): Promise<void> {
 
   let finalArgs: any = cli.optionsFromArgs.options;
   if (cli.commandToExecute?.command.schema) {
-    const startValidation = process.hrtime.bigint();
-    const result = cli.commandToExecute.command.getSchemaToParse()!.safeParse(cli.optionsFromArgs.options);
-    const endValidation = process.hrtime.bigint();
-    timings.validation.push(Number(endValidation - startValidation));
-    if (!result.success) {
-      return cli.closeWithError(result.error, cli.optionsFromArgs, true);
-    }
+    while (true) {
+      const startValidation = process.hrtime.bigint();
+      const result = cli.commandToExecute.command.getSchemaToParse()!.safeParse(cli.optionsFromArgs.options);
+      const endValidation = process.hrtime.bigint();
+      timings.validation.push(Number(endValidation - startValidation));
 
-    finalArgs = result.data;
+      if (result.success) {
+        finalArgs = result.data;
+        break;
+      }
+      else {
+        const hasNonRequiredErrors = result.error.errors.some(e => e.code !== 'invalid_type' || e.received !== 'undefined');
+        const shouldPrompt = cli.getSettingWithDefaultValue<boolean>(settingsNames.prompt, true);
+
+        if (hasNonRequiredErrors === false &&
+          shouldPrompt) {
+          await cli.error('🌶️  Provide values for the following parameters:');
+
+          for (const error of result.error.errors) {
+            const optionInfo = cli.commandToExecute!.options.find(o => o.name === error.path.join('.'));
+            const answer = await cli.promptForValue(optionInfo!);
+            cli.optionsFromArgs!.options[error.path.join('.')] = answer;
+          }
+        }
+        else {
+          result.error.errors.forEach(e => {
+            if (e.code === 'invalid_type' &&
+              e.received === 'undefined') {
+              e.message = `Required option not specified`;
+            }
+          });
+          return cli.closeWithError(result.error, cli.optionsFromArgs, true);
+        }
+      }
+    }
   }
   else {
     const startValidation = process.hrtime.bigint();
@@ -896,7 +922,7 @@ async function closeWithError(error: any, args: CommandArgs, showHelpIfEnabled: 
   let errorMessage: string = error instanceof CommandError ? error.message : error;
 
   if (error instanceof ZodError) {
-    errorMessage = error.errors.map(e => `${e.path}: ${e.message}`).join(os.EOL);
+    errorMessage = error.errors.map(e => `${e.path.join('.')}: ${e.message}`).join(os.EOL);
   }
 
   if ((!args.options.output || args.options.output === 'json') &&
@@ -943,6 +969,17 @@ async function error(message?: any, ...optionalParams: any[]): Promise<void> {
   else {
     console.error(message, ...optionalParams);
   }
+}
+
+async function promptForValue(optionInfo: CommandOptionInfo): Promise<string> {
+  return optionInfo.autocomplete !== undefined
+    ? await prompt.forSelection<string>({
+      message: `${optionInfo.name}: `,
+      choices: optionInfo.autocomplete.map((choice: any) => {
+        return { name: choice, value: choice };
+      })
+    })
+    : await prompt.forInput({ message: `${optionInfo.name}: ` });
 }
 
 async function promptForSelection<T>(config: SelectionConfig<T>): Promise<T> {
@@ -1019,6 +1056,7 @@ export const cli = {
   printAvailableCommands,
   promptForConfirmation,
   promptForSelection,
+  promptForValue,
   shouldTrimOutput,
   yargsConfiguration
 };
