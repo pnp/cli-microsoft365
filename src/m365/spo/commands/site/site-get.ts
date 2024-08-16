@@ -1,16 +1,21 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request from '../../../../request.js';
 import { validation } from '../../../../utils/validation.js';
+import { zod } from '../../../../utils/zod.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 
+const options = globalOptionsZod
+  .extend({
+    url: zod.alias('u', z.string())
+  })
+  .strict();
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  url: string;
 }
 
 class SpoSiteGetCommand extends SpoCommand {
@@ -22,23 +27,15 @@ class SpoSiteGetCommand extends SpoCommand {
     return 'Gets information about the specific site collection';
   }
 
-  constructor() {
-    super();
-
-    this.#initOptions();
-    this.#initValidators();
+  public get schema(): z.ZodTypeAny | undefined {
+    return options;
   }
 
-  #initOptions(): void {
-    this.options.unshift(
-      { option: '-u, --url <url>' }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args) => validation.isValidSharePointUrl(args.options.url)
-    );
+  public getRefinedSchema(schema: typeof options): z.ZodEffects<any> | undefined {
+    return schema
+      .refine(options => validation.isValidSharePointUrl(options.url) === true, {
+        message: 'Specify a valid SharePoint site URL'
+      });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
