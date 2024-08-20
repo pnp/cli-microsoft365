@@ -6,14 +6,13 @@ import Command, {
 } from '../../Command.js';
 import { Logger } from '../../cli/Logger.js';
 import { cli } from '../../cli/cli.js';
-import config from '../../config.js';
 import { settingsNames } from '../../settingsNames.js';
 import { zod } from '../../utils/zod.js';
 import commands from './commands.js';
 
 const options = globalOptionsZod
   .extend({
-    authType: zod.alias('t', z.enum(['certificate', 'deviceCode', 'password', 'identity', 'browser', 'secret']).optional()),
+    authType: zod.alias('t', z.nativeEnum(AuthType).optional()),
     cloud: z.nativeEnum(CloudType).optional().default(CloudType.Public),
     userName: zod.alias('u', z.string().optional()),
     password: zod.alias('p', z.string().optional()),
@@ -50,6 +49,9 @@ class LoginCommand extends Command {
 
   public getRefinedSchema(schema: typeof options): z.ZodEffects<any> | undefined {
     return schema
+      .refine(options => typeof options.appId !== 'undefined' || cli.getConfig().get(settingsNames.clientId), {
+        message: `appId is required. TIP: use the "m365 setup" command to configure the default appId`
+      })
       .refine(options => options.authType !== 'password' || options.userName, {
         message: 'Username is required when using password authentication',
         path: ['userName']
@@ -62,11 +64,17 @@ class LoginCommand extends Command {
         message: 'Specify either certificateFile or certificateBase64Encoded, but not both.',
         path: ['certificateBase64Encoded']
       })
-      .refine(options => options.authType !== 'certificate' || options.certificateFile || options.certificateBase64Encoded, {
+      .refine(options => options.authType !== 'certificate' ||
+        options.certificateFile ||
+        options.certificateBase64Encoded ||
+        cli.getConfig().get(settingsNames.clientCertificateFile) ||
+        cli.getConfig().get(settingsNames.clientCertificateBase64Encoded), {
         message: 'Specify either certificateFile or certificateBase64Encoded',
         path: ['certificateFile']
       })
-      .refine(options => options.authType !== 'secret' || options.secret, {
+      .refine(options => options.authType !== 'secret' ||
+        options.secret ||
+        cli.getConfig().get(settingsNames.clientSecret), {
         message: 'Secret is required when using secret authentication',
         path: ['secret']
       });
@@ -80,14 +88,26 @@ class LoginCommand extends Command {
 
     const deactivate: () => void = (): void => auth.connection.deactivate();
 
+    const getCertificate: (options: Options) => string | undefined = (options): string | undefined => {
+      // command args take precedence over settings
+      if (options.certificateFile) {
+        return fs.readFileSync(options.certificateFile).toString('base64');
+      }
+      if (options.certificateBase64Encoded) {
+        return options.certificateBase64Encoded;
+      }
+      return cli.getConfig().get(settingsNames.clientCertificateFile) ||
+        cli.getConfig().get(settingsNames.clientCertificateBase64Encoded);
+    };
+
     const login: () => Promise<void> = async (): Promise<void> => {
       if (this.verbose) {
         await logger.logToStderr(`Signing in to Microsoft 365...`);
       }
 
       const authType = args.options.authType || cli.getSettingWithDefaultValue<string>(settingsNames.authType, 'deviceCode');
-      auth.connection.appId = args.options.appId || config.cliEntraAppId;
-      auth.connection.tenant = args.options.tenant || config.tenant;
+      auth.connection.appId = args.options.appId || cli.getClientId();
+      auth.connection.tenant = args.options.tenant || cli.getTenant();
       auth.connection.name = args.options.connectionName;
 
       switch (authType) {
@@ -98,9 +118,9 @@ class LoginCommand extends Command {
           break;
         case 'certificate':
           auth.connection.authType = AuthType.Certificate;
-          auth.connection.certificate = args.options.certificateBase64Encoded ? args.options.certificateBase64Encoded : fs.readFileSync(args.options.certificateFile as string, 'base64');
+          auth.connection.certificate = getCertificate(args.options);
           auth.connection.thumbprint = args.options.thumbprint;
-          auth.connection.password = args.options.password;
+          auth.connection.password = args.options.password || cli.getConfig().get(settingsNames.clientCertificatePassword);
           break;
         case 'identity':
           auth.connection.authType = AuthType.Identity;
@@ -111,7 +131,7 @@ class LoginCommand extends Command {
           break;
         case 'secret':
           auth.connection.authType = AuthType.Secret;
-          auth.connection.secret = args.options.secret;
+          auth.connection.secret = args.options.secret || cli.getConfig().get(settingsNames.clientSecret);
           break;
       }
 
@@ -136,7 +156,6 @@ class LoginCommand extends Command {
       if (this.debug) {
         (details as any).accessToken = JSON.stringify(auth.connection.accessTokens, null, 2);
       }
-
 
       await logger.log(details);
     };

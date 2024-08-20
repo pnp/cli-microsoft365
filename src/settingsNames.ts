@@ -1,6 +1,11 @@
 const settingsNames = {
   authType: 'authType',
   autoOpenLinksInBrowser: 'autoOpenLinksInBrowser',
+  clientId: 'clientId',
+  clientSecret: 'clientSecret',
+  clientCertificateFile: 'clientCertificateFile',
+  clientCertificateBase64Encoded: 'clientCertificateBase64Encoded',
+  clientCertificatePassword: 'clientCertificatePassword',
   copyDeviceCodeToClipboard: 'copyDeviceCodeToClipboard',
   csvEscape: 'csvEscape',
   csvHeader: 'csvHeader',
@@ -16,7 +21,8 @@ const settingsNames = {
   prompt: 'prompt',
   promptListPageSize: 'promptListPageSize',
   showHelpOnFailure: 'showHelpOnFailure',
-  showSpinner: 'showSpinner'
+  showSpinner: 'showSpinner',
+  tenantId: 'tenantId'
 };
 
 export { settingsNames };

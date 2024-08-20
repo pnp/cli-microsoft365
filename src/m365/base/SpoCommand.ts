@@ -110,7 +110,7 @@ export default abstract class SpoCommand extends Command {
       throw new CommandError(error);
     }
 
-    if (auth.connection.active && AuthType[auth.connection.authType] === AuthType[AuthType.Secret]) {
+    if (auth.connection.active && auth.connection.authType === AuthType.Secret) {
       throw new CommandError(`SharePoint does not support authentication using client ID and secret. Please use a different login type to use SharePoint commands.`);
     }
 

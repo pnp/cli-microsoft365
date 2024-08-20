@@ -10,7 +10,6 @@ import { TokenStorage } from './auth/TokenStorage.js';
 import { msalCachePlugin } from './auth/msalCachePlugin.js';
 import { Logger } from './cli/Logger.js';
 import { cli } from './cli/cli.js';
-import config from './config.js';
 import { ConnectionDetails } from './m365/commands/ConnectionDetails.js';
 import request from './request.js';
 import { settingsNames } from './settingsNames.js';
@@ -69,15 +68,13 @@ export class Connection {
   // SharePoint tenantId used to execute CSOM requests
   spoTenantId?: string;
   // ID of the Microsoft Entra ID app used to authenticate
-  appId: string;
+  appId?: string;
   // ID of the tenant where the Microsoft Entra app is registered; common if multi-tenant
-  tenant: string;
+  tenant: string = 'common';
   cloudType: CloudType = CloudType.Public;
 
   constructor() {
     this.accessTokens = {};
-    this.appId = config.cliEntraAppId;
-    this.tenant = config.tenant;
     this.cloudType = CloudType.Public;
   }
 
@@ -97,18 +94,18 @@ export class Connection {
     this.thumbprint = undefined;
     this.spoUrl = undefined;
     this.spoTenantId = undefined;
-    this.appId = config.cliEntraAppId;
-    this.tenant = config.tenant;
+    this.appId = cli.getClientId();
+    this.tenant = cli.getTenant();
   }
 }
 
 export enum AuthType {
-  DeviceCode,
-  Password,
-  Certificate,
-  Identity,
-  Browser,
-  Secret
+  DeviceCode = 'deviceCode',
+  Password = 'password',
+  Certificate = 'certificate',
+  Identity = 'identity',
+  Browser = 'browser',
+  Secret = 'secret'
 }
 
 export enum CertificateType {
@@ -328,7 +325,7 @@ export class Auth {
     }
 
     const config = {
-      clientId: this.connection.appId,
+      clientId: this.connection.appId!,
       authority: `${Auth.getEndpointForResource('https://login.microsoftonline.com', this.connection.cloudType)}/${this.connection.tenant}`,
       azureCloudOptions: {
         azureCloudInstance,
@@ -884,7 +881,7 @@ export class Auth {
     const details: ConnectionDetails = {
       connectionName: connection.name,
       connectedAs: connection.identityName,
-      authType: AuthType[connection.authType],
+      authType: connection.authType,
       appId: connection.appId,
       appTenant: connection.tenant,
       cloudType: CloudType[connection.cloudType]
