@@ -14,7 +14,7 @@ interface CliDiagnosticInfo {
     release: string;
   };
   authMode: string;
-  cliAadAppId: string;
+  cliAadAppId?: string;
   cliAadAppTenant: string;
   cliEnvironment: string;
   nodeVersion: string;

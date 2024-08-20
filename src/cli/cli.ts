@@ -17,7 +17,7 @@ import { app } from '../utils/app.js';
 import { browserUtil } from '../utils/browserUtil.js';
 import { formatting } from '../utils/formatting.js';
 import { md } from '../utils/md.js';
-import { ConfirmationConfig, SelectionConfig, prompt } from '../utils/prompt.js';
+import { ConfirmationConfig, InputConfig, SelectionConfig, prompt } from '../utils/prompt.js';
 import { validation } from '../utils/validation.js';
 import { zod } from '../utils/zod.js';
 import { CommandInfo } from './CommandInfo.js';
@@ -65,6 +65,14 @@ function getSettingWithDefaultValue<TValue>(settingName: string, defaultValue: T
   else {
     return configuredValue;
   }
+}
+
+function getClientId(): string | undefined {
+  return cli.getSettingWithDefaultValue(settingsNames.clientId, process.env.CLIMICROSOFT365_ENTRAAPPID || process.env.CLIMICROSOFT365_AADAPPID);
+}
+
+function getTenant(): string {
+  return cli.getSettingWithDefaultValue(settingsNames.tenantId, process.env.CLIMICROSOFT365_TENANT || 'common');
 }
 
 async function execute(rawArgs: string[]): Promise<void> {
@@ -166,7 +174,7 @@ async function execute(rawArgs: string[]): Promise<void> {
     if (!result.success) {
       return cli.closeWithError(result.error, cli.optionsFromArgs, true);
     }
-    
+
     finalArgs = result.data;
   }
   else {
@@ -955,6 +963,13 @@ async function promptForConfirmation(config: ConfirmationConfig): Promise<boolea
   return answer;
 }
 
+async function promptForInput(config: InputConfig): Promise<string> {
+  const answer = await prompt.forInput(config);
+  await cli.error('');
+
+  return answer;
+}
+
 async function handleMultipleResultsFound<T>(message: string, values: { [key: string]: T }): Promise<T> {
   const prompt: boolean = cli.getSettingWithDefaultValue<boolean>(settingsNames.prompt, true);
   if (!prompt) {
@@ -995,7 +1010,9 @@ export const cli = {
   closeWithError,
   commands,
   commandToExecute,
+  getClientId,
   getConfig,
+  getTenant,
   currentCommandName,
   error,
   execute,
@@ -1014,6 +1031,7 @@ export const cli = {
   optionsFromArgs,
   printAvailableCommands,
   promptForConfirmation,
+  promptForInput,
   promptForSelection,
   shouldTrimOutput
 };

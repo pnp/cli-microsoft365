@@ -9,6 +9,7 @@ import { pid } from '../../../utils/pid.js';
 import { session } from '../../../utils/session.js';
 import commands from '../commands.js';
 import command from './cli-reconsent.js';
+import { sinonUtil } from '../../../utils/sinonUtil.js';
 
 describe(commands.RECONSENT, () => {
   let log: string[];
@@ -45,6 +46,10 @@ describe(commands.RECONSENT, () => {
     loggerLogSpy.restore();
     getSettingWithDefaultValueStub.restore();
     openStub.restore();
+    sinonUtil.restore([
+      cli.getTenant,
+      cli.getClientId
+    ]);
   });
 
   after(() => {
@@ -60,11 +65,15 @@ describe(commands.RECONSENT, () => {
   });
 
   it('shows message with url (not using autoOpenLinksInBrowser)', async () => {
+    sinon.stub(cli, 'getClientId').returns('31359c7f-bd7e-475c-86db-fdb8c937548e');
+    sinon.stub(cli, 'getTenant').returns('common');
     await command.action(logger, { options: {} });
-    assert(loggerLogSpy.calledWith(`To re-consent the PnP Microsoft 365 Management Shell Microsoft Entra application navigate in your web browser to https://login.microsoftonline.com/common/oauth2/authorize?client_id=31359c7f-bd7e-475c-86db-fdb8c937548e&response_type=code&prompt=admin_consent`));
+    assert(loggerLogSpy.calledWith(`To re-consent your Microsoft Entra application navigate in your web browser to https://login.microsoftonline.com/common/oauth2/authorize?client_id=31359c7f-bd7e-475c-86db-fdb8c937548e&response_type=code&prompt=admin_consent`));
   });
 
   it('shows message with url (using autoOpenLinksInBrowser)', async () => {
+    sinon.stub(cli, 'getClientId').returns('31359c7f-bd7e-475c-86db-fdb8c937548e');
+    sinon.stub(cli, 'getTenant').returns('common');
     getSettingWithDefaultValueStub.restore();
     getSettingWithDefaultValueStub = sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((() => true));
 
@@ -81,6 +90,8 @@ describe(commands.RECONSENT, () => {
   });
 
   it('throws error when open in browser fails', async () => {
+    sinon.stub(cli, 'getClientId').returns('31359c7f-bd7e-475c-86db-fdb8c937548e');
+    sinon.stub(cli, 'getTenant').returns('common');
     getSettingWithDefaultValueStub.restore();
     getSettingWithDefaultValueStub = sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((() => true));
 

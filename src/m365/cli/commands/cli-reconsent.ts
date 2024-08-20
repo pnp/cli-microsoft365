@@ -1,13 +1,11 @@
 import { cli } from '../../../cli/cli.js';
 import { Logger } from '../../../cli/Logger.js';
-import config from '../../../config.js';
 import { settingsNames } from '../../../settingsNames.js';
 import { browserUtil } from '../../../utils/browserUtil.js';
 import AnonymousCommand from '../../base/AnonymousCommand.js';
 import commands from '../commands.js';
 
 class CliReconsentCommand extends AnonymousCommand {
-
   public get name(): string {
     return commands.RECONSENT;
   }
@@ -17,10 +15,10 @@ class CliReconsentCommand extends AnonymousCommand {
   }
 
   public async commandAction(logger: Logger): Promise<void> {
-    const url = `https://login.microsoftonline.com/${config.tenant}/oauth2/authorize?client_id=${config.cliEntraAppId}&response_type=code&prompt=admin_consent`;
+    const url = `https://login.microsoftonline.com/${cli.getTenant()}/oauth2/authorize?client_id=${cli.getClientId()}&response_type=code&prompt=admin_consent`;
 
     if (cli.getSettingWithDefaultValue<boolean>(settingsNames.autoOpenLinksInBrowser, false) === false) {
-      await logger.log(`To re-consent the PnP Microsoft 365 Management Shell Microsoft Entra application navigate in your web browser to ${url}`);
+      await logger.log(`To re-consent your Microsoft Entra application navigate in your web browser to ${url}`);
       return;
     }
 

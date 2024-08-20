@@ -196,6 +196,18 @@ class MockCommandWithConfirmationPrompt extends AnonymousCommand {
   }
 }
 
+class MockCommandWithInputPrompt extends AnonymousCommand {
+  public get name(): string {
+    return 'cli mock prompt';
+  }
+  public get description(): string {
+    return 'Mock command with prompt';
+  }
+  public async commandAction(): Promise<void> {
+    await cli.promptForInput({ message: `ID` });
+  }
+}
+
 class MockCommandWithHandleMultipleResultsFound extends AnonymousCommand {
   public get name(): string {
     return 'cli mock interactive prompt';
@@ -1077,6 +1089,14 @@ describe('cli', () => {
     const mockCommandWithConfirmationPrompt = new MockCommandWithConfirmationPrompt();
 
     await cli.executeCommand(mockCommandWithConfirmationPrompt, { options: { _: [] } });
+    assert(promptStub.called);
+  });
+
+  it('calls input prompt tool when command shows prompt', async () => {
+    const promptStub: sinon.SinonStub = sinon.stub(prompt, 'forInput').resolves('abc');
+    const mockCommandWithInputPrompt = new MockCommandWithInputPrompt();
+
+    await cli.executeCommand(mockCommandWithInputPrompt, { options: { _: [] } });
     assert(promptStub.called);
   });
 

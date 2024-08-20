@@ -16,7 +16,11 @@
       // 'm365 spo site get --url /', you'd use:
       // "args": ["spo", "site", "get", "--url", "/"]
       // after debugging, revert changes so that they won't end up in your PR
-      "args": []
+      "args": [],
+      "console": "integratedTerminal",
+      "env": {
+        "NODE_OPTIONS": "--enable-source-maps"
+      }
     },
     {
       "type": "node",

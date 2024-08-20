@@ -18,6 +18,9 @@ m365 setup [options]
 
 `--scripting`
 : Configure CLI for Microsoft 365 for use in scripts without prompting for additional information.
+
+`--skipApp`
+: Skip configuring an Entra app for use with CLI for Microsoft 365
 ```
 
 <Global />
@@ -27,6 +30,10 @@ m365 setup [options]
 The `m365 setup` command is a wizard that helps you configure the CLI for Microsoft 365 for your needs. It will ask you a series of questions and based on your answers, it will configure the CLI for Microsoft 365 for you.
 
 The command will ask you the following questions:
+
+- _CLI for Microsoft 365 requires a Microsoft Entra app. Do you want to create a new app registration or use an existing one?_
+
+  You can choose between using an existing Entra app or creating a new one. If you choose to create a new app, the CLI will ask you to choose between a minimal and a full set of permissions. It then signs in as Azure CLI to your tenant, creates a new app registration, and stores its information in the CLI configuration.
 
 - _How do you plan to use the CLI?_
 

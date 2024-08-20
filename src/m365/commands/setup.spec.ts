@@ -1,29 +1,40 @@
 import assert from 'assert';
+import Configstore from 'configstore';
 import sinon from 'sinon';
+import auth from '../../Auth.js';
 import { cli } from '../../cli/cli.js';
 import { CommandInfo } from '../../cli/CommandInfo.js';
 import { Logger } from '../../cli/Logger.js';
+import { settingsNames } from '../../settingsNames.js';
 import { telemetry } from '../../telemetry.js';
+import { accessToken } from '../../utils/accessToken.js';
+import { entraApp } from '../../utils/entraApp.js';
 import { CheckStatus, formatting } from '../../utils/formatting.js';
 import { pid } from '../../utils/pid.js';
+import { ConfirmationConfig, SelectionConfig } from '../../utils/prompt.js';
 import { session } from '../../utils/session.js';
 import { sinonUtil } from '../../utils/sinonUtil.js';
 import commands from './commands.js';
-import command, { SettingNames } from './setup.js';
+import command, { CliExperience, CliUsageMode, EntraAppConfig, HelpMode, NewEntraAppScopes, Preferences, SettingNames } from './setup.js';
 import { interactivePreset, powerShellPreset, scriptingPreset } from './setupPresets.js';
-import { ConfirmationConfig, SelectionConfig } from '../../utils/prompt.js';
 
 describe(commands.SETUP, () => {
   let log: any[];
   let logger: Logger;
   let loggerLogToStderrSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let config: Configstore;
+  let configSetSpy: sinon.SinonSpy;
+  let configDeleteSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     sinon.stub(session, 'getId').callsFake(() => '');
     commandInfo = cli.getCommandInfo(command);
+    config = cli.getConfig();
+    configDeleteSpy = sinon.stub(config, 'delete').callsFake(() => { });
+    configSetSpy = sinon.stub(config, 'set').callsFake(() => { });
   });
 
   beforeEach(() => {
@@ -47,17 +58,28 @@ describe(commands.SETUP, () => {
     sinonUtil.restore([
       (command as any).configureSettings,
       cli.promptForConfirmation,
+      cli.promptForInput,
       cli.promptForSelection,
-      cli.getConfig().set,
-      pid.isPowerShell
+      pid.isPowerShell,
+      auth.clearConnectionInfo,
+      auth.ensureAccessToken,
+      accessToken.getTenantIdFromAccessToken,
+      entraApp.resolveApis,
+      entraApp.createAppRegistration,
+      entraApp.grantAdminConsent
     ]);
+    configSetSpy.resetHistory();
+    configDeleteSpy.resetHistory();
+    auth.connection.accessTokens = {};
   });
 
   after(() => {
     sinonUtil.restore([
       telemetry.trackEvent,
       pid.getProcessName,
-      session.getId
+      session.getId,
+      config.delete,
+      config.set
     ]);
   });
 
@@ -73,9 +95,9 @@ describe(commands.SETUP, () => {
     sinon.stub(cli, 'promptForSelection').callsFake(async (config: SelectionConfig<unknown>): Promise<unknown> => {
       switch (config.message) {
         case 'How do you plan to use the CLI?':
-          return 'Interactively';
+          return CliUsageMode.Interactively;
         case 'How experienced are you in using the CLI?':
-          return 'Beginner';
+          return CliExperience.Beginner;
         default:
           return '';
       }
@@ -89,25 +111,21 @@ describe(commands.SETUP, () => {
       }
     });
 
-    const configureSettingsStub = sinon.stub(command as any, 'configureSettings').callsFake(() => { });
-
-    const expected: SettingNames = {};
-    Object.assign(expected, interactivePreset);
-    expected.helpMode = 'full';
-    (command as any).settings = expected;
-
     await command.action(logger, { options: {} });
 
-    assert(configureSettingsStub.calledWith(expected));
+    assert(configSetSpy.calledWith(settingsNames.helpMode, HelpMode.Full), 'Incorrect help mode');
+    Object.keys(interactivePreset).forEach(setting => {
+      assert(configSetSpy.calledWith(setting, (interactivePreset as any)[setting]), `Incorrect setting for ${setting}`);
+    });
   });
 
   it('sets correct settings for interactive, proficient', async () => {
     sinon.stub(cli, 'promptForSelection').callsFake(async (config: SelectionConfig<unknown>): Promise<unknown> => {
       switch (config.message) {
         case 'How do you plan to use the CLI?':
-          return 'Interactively';
+          return CliUsageMode.Interactively;
         case 'How experienced are you in using the CLI?':
-          return 'Proficient';
+          return CliExperience.Proficient;
         default:
           return '';
       }
@@ -120,25 +138,22 @@ describe(commands.SETUP, () => {
           return true;
       }
     });
-    const configureSettingsStub = sinon.stub(command as any, 'configureSettings').callsFake(() => { });
-
-    const expected: SettingNames = {};
-    Object.assign(expected, interactivePreset);
-    expected.helpMode = 'options';
-    (command as any).settings = expected;
 
     await command.action(logger, { options: {} });
 
-    assert(configureSettingsStub.calledWith(expected));
+    assert(configSetSpy.calledWith(settingsNames.helpMode, HelpMode.Options), 'Incorrect help mode');
+    Object.keys(interactivePreset).forEach(setting => {
+      assert(configSetSpy.calledWith(setting, (interactivePreset as any)[setting]), `Incorrect setting for ${setting}`);
+    });
   });
 
   it('sets correct settings for scripting, non-PowerShell, beginner', async () => {
     sinon.stub(cli, 'promptForSelection').callsFake(async (config: SelectionConfig<unknown>): Promise<unknown> => {
       switch (config.message) {
         case 'How do you plan to use the CLI?':
-          return 'Scripting';
+          return CliUsageMode.Scripting;
         case 'How experienced are you in using the CLI?':
-          return 'Beginner';
+          return CliExperience.Beginner;
         default:
           return '';
       }
@@ -151,25 +166,22 @@ describe(commands.SETUP, () => {
           return true;
       }
     });
-    const configureSettingsStub = sinon.stub(command as any, 'configureSettings').callsFake(() => { });
-
-    const expected: SettingNames = {};
-    Object.assign(expected, scriptingPreset);
-    expected.helpMode = 'full';
-    (command as any).settings = expected;
 
     await command.action(logger, { options: {} });
 
-    assert(configureSettingsStub.calledWith(expected));
+    assert(configSetSpy.calledWith(settingsNames.helpMode, HelpMode.Full), 'Incorrect help mode');
+    Object.keys(scriptingPreset).forEach(setting => {
+      assert(configSetSpy.calledWith(setting, (scriptingPreset as any)[setting]), `Incorrect setting for ${setting}`);
+    });
   });
 
   it('sets correct settings for scripting, PowerShell, beginner', async () => {
     sinon.stub(cli, 'promptForSelection').callsFake(async (config: SelectionConfig<unknown>): Promise<unknown> => {
       switch (config.message) {
         case 'How do you plan to use the CLI?':
-          return 'Scripting';
+          return CliUsageMode.Scripting;
         case 'How experienced are you in using the CLI?':
-          return 'Beginner';
+          return CliExperience.Beginner;
         default:
           return '';
       }
@@ -182,26 +194,25 @@ describe(commands.SETUP, () => {
           return true;
       }
     });
-    const configureSettingsStub = sinon.stub(command as any, 'configureSettings').callsFake(() => { });
-
-    const expected: SettingNames = {};
-    Object.assign(expected, scriptingPreset);
-    Object.assign(expected, powerShellPreset);
-    expected.helpMode = 'full';
-    (command as any).settings = expected;
 
     await command.action(logger, { options: {} });
 
-    assert(configureSettingsStub.calledWith(expected));
+    assert(configSetSpy.calledWith(settingsNames.helpMode, HelpMode.Full), 'Incorrect help mode');
+    Object.keys(scriptingPreset).forEach(setting => {
+      assert(configSetSpy.calledWith(setting, (scriptingPreset as any)[setting]), `Incorrect setting for ${setting}`);
+    });
+    Object.keys(powerShellPreset).forEach(setting => {
+      assert(configSetSpy.calledWith(setting, (powerShellPreset as any)[setting]), `Incorrect setting for ${setting}`);
+    });
   });
 
   it('sets correct settings for scripting, non-PowerShell, proficient', async () => {
     sinon.stub(cli, 'promptForSelection').callsFake(async (config: SelectionConfig<unknown>): Promise<unknown> => {
       switch (config.message) {
         case 'How do you plan to use the CLI?':
-          return 'Scripting';
+          return CliUsageMode.Scripting;
         case 'How experienced are you in using the CLI?':
-          return 'Proficient';
+          return CliExperience.Proficient;
         default:
           return '';
       }
@@ -214,25 +225,22 @@ describe(commands.SETUP, () => {
           return true;
       }
     });
-    const configureSettingsStub = sinon.stub(command as any, 'configureSettings').callsFake(() => { });
-
-    const expected: SettingNames = {};
-    Object.assign(expected, scriptingPreset);
-    expected.helpMode = 'options';
-    (command as any).settings = expected;
 
     await command.action(logger, { options: {} });
 
-    assert(configureSettingsStub.calledWith(expected));
+    assert(configSetSpy.calledWith(settingsNames.helpMode, HelpMode.Options), 'Incorrect help mode');
+    Object.keys(scriptingPreset).forEach(setting => {
+      assert(configSetSpy.calledWith(setting, (scriptingPreset as any)[setting]), `Incorrect setting for ${setting}`);
+    });
   });
 
   it('sets correct settings for scripting, PowerShell, proficient', async () => {
     sinon.stub(cli, 'promptForSelection').callsFake(async (config: SelectionConfig<unknown>): Promise<unknown> => {
       switch (config.message) {
         case 'How do you plan to use the CLI?':
-          return 'Scripting';
+          return CliUsageMode.Scripting;
         case 'How experienced are you in using the CLI?':
-          return 'Proficient';
+          return CliExperience.Proficient;
         default:
           return '';
       }
@@ -245,26 +253,25 @@ describe(commands.SETUP, () => {
           return true;
       }
     });
-    const configureSettingsStub = sinon.stub(command as any, 'configureSettings').callsFake(() => { });
-
-    const expected: SettingNames = {};
-    Object.assign(expected, scriptingPreset);
-    Object.assign(expected, powerShellPreset);
-    expected.helpMode = 'options';
-    (command as any).settings = expected;
 
     await command.action(logger, { options: {} });
 
-    assert(configureSettingsStub.calledWith(expected));
+    assert(configSetSpy.calledWith(settingsNames.helpMode, HelpMode.Options), 'Incorrect help mode');
+    Object.keys(scriptingPreset).forEach(setting => {
+      assert(configSetSpy.calledWith(setting, (scriptingPreset as any)[setting]), `Incorrect setting for ${setting}`);
+    });
+    Object.keys(powerShellPreset).forEach(setting => {
+      assert(configSetSpy.calledWith(setting, (powerShellPreset as any)[setting]), `Incorrect setting for ${setting}`);
+    });
   });
 
   it(`doesn't apply settings when not confirmed`, async () => {
     sinon.stub(cli, 'promptForSelection').callsFake(async (config: SelectionConfig<unknown>): Promise<unknown> => {
       switch (config.message) {
         case 'How do you plan to use the CLI?':
-          return 'Scripting';
+          return CliUsageMode.Scripting;
         case 'How experienced are you in using the CLI?':
-          return 'Beginner';
+          return CliExperience.Beginner;
         default:
           return '';
       }
@@ -285,61 +292,502 @@ describe(commands.SETUP, () => {
   });
 
   it('sets correct settings for interactive, non-PowerShell via option', async () => {
-    const configureSettingsStub = sinon.stub(command as any, 'configureSettings').callsFake(() => { });
     sinon.stub(pid, 'isPowerShell').returns(false);
-
-    const expected: SettingNames = {};
-    Object.assign(expected, interactivePreset);
 
     await command.action(logger, { options: { interactive: true } });
 
-    assert(configureSettingsStub.calledWith(expected));
+    Object.keys(interactivePreset).forEach(setting => {
+      assert(configSetSpy.calledWith(setting, (interactivePreset as any)[setting]), `Incorrect setting for ${setting}`);
+    });
   });
 
   it('sets correct settings for scripting, non-PowerShell via option', async () => {
-    const configureSettingsStub = sinon.stub(command as any, 'configureSettings').callsFake(() => { });
     sinon.stub(pid, 'isPowerShell').returns(false);
-
-    const expected: SettingNames = {};
-    Object.assign(expected, scriptingPreset);
 
     await command.action(logger, { options: { scripting: true } });
 
-    assert(configureSettingsStub.calledWith(expected));
+    Object.keys(scriptingPreset).forEach(setting => {
+      assert(configSetSpy.calledWith(setting, (scriptingPreset as any)[setting]), `Incorrect setting for ${setting}`);
+    });
   });
 
   it('sets correct settings for interactive, PowerShell via option', async () => {
-    const configureSettingsStub = sinon.stub(command as any, 'configureSettings').callsFake(() => { });
     sinon.stub(pid, 'isPowerShell').returns(true);
-
-    const expected: SettingNames = {};
-    Object.assign(expected, interactivePreset);
 
     await command.action(logger, { options: { interactive: true } });
 
-    assert(configureSettingsStub.calledWith(expected));
+    Object.keys(interactivePreset).forEach(setting => {
+      assert(configSetSpy.calledWith(setting, (interactivePreset as any)[setting]), `Incorrect setting for ${setting}`);
+    });
+    Object.keys(powerShellPreset).forEach(setting => {
+      assert(configSetSpy.calledWith(setting, (powerShellPreset as any)[setting]), `Incorrect setting for ${setting}`);
+    });
   });
 
   it('sets correct settings for scripting, PowerShell via option', async () => {
-    const configureSettingsStub = sinon.stub(command as any, 'configureSettings').callsFake(() => { });
     sinon.stub(pid, 'isPowerShell').returns(true);
-
-    const expected: SettingNames = {};
-    Object.assign(expected, scriptingPreset);
-    Object.assign(expected, powerShellPreset);
 
     await command.action(logger, { options: { scripting: true } });
 
-    assert(configureSettingsStub.calledWith(expected));
+    Object.keys(scriptingPreset).forEach(setting => {
+      assert(configSetSpy.calledWith(setting, (scriptingPreset as any)[setting]), `Incorrect setting for ${setting}`);
+    });
+    Object.keys(powerShellPreset).forEach(setting => {
+      assert(configSetSpy.calledWith(setting, (powerShellPreset as any)[setting]), `Incorrect setting for ${setting}`);
+    });
+  });
+
+  it('skips configuring Entra app when specified via args', async () => {
+    sinon.stub(cli, 'promptForSelection').callsFake(async (config: SelectionConfig<unknown>): Promise<unknown> => {
+      switch (config.message) {
+        case 'How do you plan to use the CLI?':
+          return CliUsageMode.Scripting;
+        case 'How experienced are you in using the CLI?':
+          return CliExperience.Proficient;
+        default:
+          return '';
+      }
+    });
+    sinon.stub(cli, 'promptForConfirmation').callsFake(async (config: ConfirmationConfig): Promise<boolean> => {
+      switch (config.message) {
+        case 'Are you going to use the CLI in PowerShell?':
+          return true;
+        default: //summary
+          return true;
+      }
+    });
+
+    await command.action(logger, { options: { skipApp: true } });
+
+    const expected: SettingNames = {
+      clientId: '00000000-0000-0000-0000-000000000000',
+      tenantId: '00000000-0000-0000-0000-000000000000',
+      clientSecret: '',
+      clientCertificateFile: '',
+      clientCertificateBase64Encoded: ''
+    };
+    Object.keys(expected).forEach(setting => {
+      assert(!configSetSpy.calledWith(setting), `Modified ${setting}`);
+    });
+  });
+
+  it('configures existing public Entra app', async () => {
+    sinon.stub(cli, 'promptForSelection').callsFake(async (config: SelectionConfig<unknown>): Promise<unknown> => {
+      switch (config.message) {
+        case 'How do you plan to use the CLI?':
+          return CliUsageMode.Scripting;
+        case 'How experienced are you in using the CLI?':
+          return CliExperience.Proficient;
+        case 'CLI for Microsoft 365 requires a Microsoft Entra app. Do you want to create a new app registration or use an existing one?':
+          return EntraAppConfig.UseExisting;
+        default:
+          return '';
+      }
+    });
+    sinon.stub(cli, 'promptForConfirmation').callsFake(async (config: ConfirmationConfig): Promise<boolean> => {
+      switch (config.message) {
+        case 'Are you going to use the CLI in PowerShell?':
+          return true;
+        default: //summary
+          return true;
+      }
+    });
+    sinon.stub(cli, 'promptForInput').callsFake(async (config: { message: string }): Promise<string> => {
+      switch (config.message) {
+        case 'Client ID:':
+          return '00000000-0000-0000-0000-000000000000';
+        case 'Tenant ID (leave common if the app is multitenant):':
+          return '00000000-0000-0000-0000-000000000000';
+        default:
+          return '';
+      }
+    });
+
+    await command.action(logger, { options: {} });
+
+    const expected: SettingNames = {
+      clientId: '00000000-0000-0000-0000-000000000000',
+      tenantId: '00000000-0000-0000-0000-000000000000',
+      clientSecret: '',
+      clientCertificateFile: '',
+      clientCertificateBase64Encoded: ''
+    };
+    Object.keys(expected).forEach(setting => {
+      assert(configSetSpy.calledWith(setting, (expected as any)[setting]), `Incorrect setting for ${setting}`);
+    });
+  });
+
+  it('configures existing Entra app with secret', async () => {
+    sinon.stub(cli, 'promptForSelection').callsFake(async (config: SelectionConfig<unknown>): Promise<unknown> => {
+      switch (config.message) {
+        case 'How do you plan to use the CLI?':
+          return CliUsageMode.Scripting;
+        case 'How experienced are you in using the CLI?':
+          return CliExperience.Proficient;
+        case 'CLI for Microsoft 365 requires a Microsoft Entra app. Do you want to create a new app registration or use an existing one?':
+          return EntraAppConfig.UseExisting;
+        default:
+          return '';
+      }
+    });
+    sinon.stub(cli, 'promptForConfirmation').callsFake(async (config: ConfirmationConfig): Promise<boolean> => {
+      switch (config.message) {
+        case 'Are you going to use the CLI in PowerShell?':
+          return true;
+        default: //summary
+          return true;
+      }
+    });
+    sinon.stub(cli, 'promptForInput').callsFake(async (config: { message: string }): Promise<string> => {
+      switch (config.message) {
+        case 'Client ID:':
+          return '00000000-0000-0000-0000-000000000000';
+        case 'Tenant ID (leave common if the app is multitenant):':
+          return '00000000-0000-0000-0000-000000000000';
+        case 'Client secret (leave empty if you use a certificate or a public client):':
+          return 'secret';
+        default:
+          return '';
+      }
+    });
+
+    await command.action(logger, { options: {} });
+
+    const expected: SettingNames = {
+      clientId: '00000000-0000-0000-0000-000000000000',
+      tenantId: '00000000-0000-0000-0000-000000000000',
+      clientSecret: 'secret'
+    };
+    Object.keys(expected).forEach(setting => {
+      assert(configSetSpy.calledWith(setting, (expected as any)[setting]), `Incorrect setting for ${setting}`);
+    });
+  });
+
+  it('configures existing Entra app with base64 cert', async () => {
+    sinon.stub(cli, 'promptForSelection').callsFake(async (config: SelectionConfig<unknown>): Promise<unknown> => {
+      switch (config.message) {
+        case 'How do you plan to use the CLI?':
+          return CliUsageMode.Scripting;
+        case 'How experienced are you in using the CLI?':
+          return CliExperience.Proficient;
+        case 'CLI for Microsoft 365 requires a Microsoft Entra app. Do you want to create a new app registration or use an existing one?':
+          return EntraAppConfig.UseExisting;
+        default:
+          return '';
+      }
+    });
+    sinon.stub(cli, 'promptForConfirmation').callsFake(async (config: ConfirmationConfig): Promise<boolean> => {
+      switch (config.message) {
+        case 'Are you going to use the CLI in PowerShell?':
+          return true;
+        default: //summary
+          return true;
+      }
+    });
+    sinon.stub(cli, 'promptForInput').callsFake(async (config: { message: string }): Promise<string> => {
+      switch (config.message) {
+        case 'Client ID:':
+          return '00000000-0000-0000-0000-000000000000';
+        case 'Tenant ID (leave common if the app is multitenant):':
+          return '00000000-0000-0000-0000-000000000000';
+        case 'Base64-encoded certificate string:':
+          return 'base64';
+        default:
+          return '';
+      }
+    });
+
+    await command.action(logger, { options: {} });
+
+    const expected: SettingNames = {
+      clientId: '00000000-0000-0000-0000-000000000000',
+      tenantId: '00000000-0000-0000-0000-000000000000',
+      clientSecret: '',
+      clientCertificateFile: '',
+      clientCertificateBase64Encoded: 'base64'
+    };
+    Object.keys(expected).forEach(setting => {
+      assert(configSetSpy.calledWith(setting, (expected as any)[setting]), `Incorrect setting for ${setting}`);
+    });
+  });
+
+  it('configures existing Entra app with file cert', async () => {
+    sinon.stub(cli, 'promptForSelection').callsFake(async (config: SelectionConfig<unknown>): Promise<unknown> => {
+      switch (config.message) {
+        case 'How do you plan to use the CLI?':
+          return CliUsageMode.Scripting;
+        case 'How experienced are you in using the CLI?':
+          return CliExperience.Proficient;
+        case 'CLI for Microsoft 365 requires a Microsoft Entra app. Do you want to create a new app registration or use an existing one?':
+          return EntraAppConfig.UseExisting;
+        default:
+          return '';
+      }
+    });
+    sinon.stub(cli, 'promptForConfirmation').callsFake(async (config: ConfirmationConfig): Promise<boolean> => {
+      switch (config.message) {
+        case 'Are you going to use the CLI in PowerShell?':
+          return true;
+        default: //summary
+          return true;
+      }
+    });
+    sinon.stub(cli, 'promptForInput').callsFake(async (config: { message: string }): Promise<string> => {
+      switch (config.message) {
+        case 'Client ID:':
+          return '00000000-0000-0000-0000-000000000000';
+        case 'Tenant ID (leave common if the app is multitenant):':
+          return '00000000-0000-0000-0000-000000000000';
+        case 'Path to the client certificate file (leave empty if you want to specify a base64-encoded certificate string):':
+          return 'file';
+        default:
+          return '';
+      }
+    });
+
+    await command.action(logger, { options: {} });
+
+    const expected: SettingNames = {
+      clientId: '00000000-0000-0000-0000-000000000000',
+      tenantId: '00000000-0000-0000-0000-000000000000',
+      clientSecret: '',
+      clientCertificateFile: 'file'
+    };
+    Object.keys(expected).forEach(setting => {
+      assert(configSetSpy.calledWith(setting, (expected as any)[setting]), `Incorrect setting for ${setting}`);
+    });
+  });
+
+  it('configures existing Entra app with file cert secured with password', async () => {
+    sinon.stub(cli, 'promptForSelection').callsFake(async (config: SelectionConfig<unknown>): Promise<unknown> => {
+      switch (config.message) {
+        case 'How do you plan to use the CLI?':
+          return CliUsageMode.Scripting;
+        case 'How experienced are you in using the CLI?':
+          return CliExperience.Proficient;
+        case 'CLI for Microsoft 365 requires a Microsoft Entra app. Do you want to create a new app registration or use an existing one?':
+          return EntraAppConfig.UseExisting;
+        default:
+          return '';
+      }
+    });
+    sinon.stub(cli, 'promptForConfirmation').callsFake(async (config: ConfirmationConfig): Promise<boolean> => {
+      switch (config.message) {
+        case 'Are you going to use the CLI in PowerShell?':
+          return true;
+        default: //summary
+          return true;
+      }
+    });
+    sinon.stub(cli, 'promptForInput').callsFake(async (config: { message: string }): Promise<string> => {
+      switch (config.message) {
+        case 'Client ID:':
+          return '00000000-0000-0000-0000-000000000000';
+        case 'Tenant ID (leave common if the app is multitenant):':
+          return '00000000-0000-0000-0000-000000000000';
+        case 'Path to the client certificate file (leave empty if you want to specify a base64-encoded certificate string):':
+          return 'file';
+        case 'Password for the client certificate (leave empty if the certificate is not password-protected):':
+          return 'password';
+        default:
+          return '';
+      }
+    });
+
+    await command.action(logger, { options: {} });
+
+    const expected: SettingNames = {
+      clientId: '00000000-0000-0000-0000-000000000000',
+      tenantId: '00000000-0000-0000-0000-000000000000',
+      clientSecret: '',
+      clientCertificateFile: 'file',
+      clientCertificatePassword: 'password'
+    };
+    Object.keys(expected).forEach(setting => {
+      assert(configSetSpy.calledWith(setting, (expected as any)[setting]), `Incorrect setting for ${setting}`);
+    });
+  });
+
+  it('creates a new Entra app with minimal scopes', async () => {
+    sinon.stub(cli, 'promptForSelection').callsFake(async (config: SelectionConfig<unknown>): Promise<unknown> => {
+      switch (config.message) {
+        case 'How do you plan to use the CLI?':
+          return CliUsageMode.Scripting;
+        case 'How experienced are you in using the CLI?':
+          return CliExperience.Proficient;
+        case 'CLI for Microsoft 365 requires a Microsoft Entra app. Do you want to create a new app registration or use an existing one?':
+          return EntraAppConfig.Create;
+        case 'What scopes should the new app registration have?':
+          return NewEntraAppScopes.Minimal;
+        default:
+          return '';
+      }
+    });
+    sinon.stub(cli, 'promptForConfirmation').callsFake(async (config: ConfirmationConfig): Promise<boolean> => {
+      switch (config.message) {
+        case 'Are you going to use the CLI in PowerShell?':
+          return true;
+        default: //summary
+          return true;
+      }
+    });
+    sinon.stub(auth, 'clearConnectionInfo').resolves();
+    sinon.stub(auth, 'ensureAccessToken').resolves();
+    sinon.stub(accessToken, 'getTenantIdFromAccessToken').returns('00000000-0000-0000-0000-000000000003');
+    const scopes = [
+      {
+        resourceAppId: '00000000-0000-0000-0000-000000000000',
+        resourceAccess: [
+          {
+            id: '00000000-0000-0000-0000-000000000000',
+            type: 'Minimal'
+          }
+        ]
+      }
+    ];
+    sinon.stub(entraApp, 'resolveApis').resolves(scopes);
+    const createAppRegistrationSpy = sinon.stub(entraApp, 'createAppRegistration').resolves({
+      appId: '00000000-0000-0000-0000-000000000001',
+      id: '00000000-0000-0000-0000-000000000002',
+      tenantId: '00000000-0000-0000-0000-000000000003',
+      requiredResourceAccess: scopes
+    });
+    sinon.stub(entraApp, 'grantAdminConsent').resolves();
+    auth.connection.accessTokens[auth.defaultResource] = {
+      accessToken: 'abc',
+      expiresOn: new Date().toString()
+    };
+
+    await command.action(logger, { options: {} });
+
+    const expected: SettingNames = {
+      clientId: '00000000-0000-0000-0000-000000000001',
+      tenantId: '00000000-0000-0000-0000-000000000003'
+    };
+    const deleted: SettingNames = {
+      clientSecret: '',
+      clientCertificateFile: '',
+      clientCertificateBase64Encoded: '',
+      clientCertificatePassword: ''
+    };
+    assert.deepEqual(createAppRegistrationSpy.getCall(0).args[0].apis, scopes);
+    Object.keys(expected).forEach(setting => {
+      assert(configSetSpy.calledWith(setting, (expected as any)[setting]), `Incorrect setting for ${setting}`);
+    });
+    Object.keys(deleted).forEach(setting => {
+      assert(configDeleteSpy.calledWith(setting), `Not deleted ${setting}`);
+    });
+  });
+
+  it('creates a new Entra app with all scopes (verbose)', async () => {
+    sinon.stub(cli, 'promptForSelection').callsFake(async (config: SelectionConfig<unknown>): Promise<unknown> => {
+      switch (config.message) {
+        case 'How do you plan to use the CLI?':
+          return CliUsageMode.Scripting;
+        case 'How experienced are you in using the CLI?':
+          return CliExperience.Proficient;
+        case 'CLI for Microsoft 365 requires a Microsoft Entra app. Do you want to create a new app registration or use an existing one?':
+          return EntraAppConfig.Create;
+        case 'What scopes should the new app registration have?':
+          return NewEntraAppScopes.All;
+        default:
+          return '';
+      }
+    });
+    sinon.stub(cli, 'promptForConfirmation').callsFake(async (config: ConfirmationConfig): Promise<boolean> => {
+      switch (config.message) {
+        case 'Are you going to use the CLI in PowerShell?':
+          return true;
+        default: //summary
+          return true;
+      }
+    });
+    sinon.stub(auth, 'clearConnectionInfo').resolves();
+    sinon.stub(auth, 'ensureAccessToken').resolves();
+    sinon.stub(accessToken, 'getTenantIdFromAccessToken').returns('00000000-0000-0000-0000-000000000003');
+    const scopes = [
+      {
+        resourceAppId: '00000000-0000-0000-0000-000000000000',
+        resourceAccess: [
+          {
+            id: '00000000-0000-0000-0000-000000000000',
+            type: 'All'
+          }
+        ]
+      }
+    ];
+    sinon.stub(entraApp, 'resolveApis').resolves(scopes);
+    const createAppRegistrationSpy = sinon.stub(entraApp, 'createAppRegistration').resolves({
+      appId: '00000000-0000-0000-0000-000000000001',
+      id: '00000000-0000-0000-0000-000000000002',
+      tenantId: '00000000-0000-0000-0000-000000000003',
+      requiredResourceAccess: scopes
+    });
+    sinon.stub(entraApp, 'grantAdminConsent').resolves();
+    auth.connection.accessTokens[auth.defaultResource] = {
+      accessToken: 'abc',
+      expiresOn: new Date().toString()
+    };
+
+    await command.action(logger, { options: { verbose: true } });
+
+    const expected: SettingNames = {
+      clientId: '00000000-0000-0000-0000-000000000001',
+      tenantId: '00000000-0000-0000-0000-000000000003'
+    };
+    const deleted: SettingNames = {
+      clientSecret: '',
+      clientCertificateFile: '',
+      clientCertificateBase64Encoded: '',
+      clientCertificatePassword: ''
+    };
+    assert.deepEqual(createAppRegistrationSpy.getCall(0).args[0].apis, scopes);
+    Object.keys(expected).forEach(setting => {
+      assert(configSetSpy.calledWith(setting, (expected as any)[setting]), `Incorrect setting for ${setting}`);
+    });
+    Object.keys(deleted).forEach(setting => {
+      assert(configDeleteSpy.calledWith(setting), `Not deleted ${setting}`);
+    });
+  });
+
+  it(`doesn't create a new Entra app when creation not confirmed`, async () => {
+    sinon.stub(cli, 'promptForSelection').callsFake(async (config: SelectionConfig<unknown>): Promise<unknown> => {
+      switch (config.message) {
+        case 'How do you plan to use the CLI?':
+          return CliUsageMode.Scripting;
+        case 'How experienced are you in using the CLI?':
+          return CliExperience.Proficient;
+        case 'CLI for Microsoft 365 requires a Microsoft Entra app. Do you want to create a new app registration or use an existing one?':
+          return EntraAppConfig.Create;
+        case 'What scopes should the new app registration have?':
+          return NewEntraAppScopes.Minimal;
+        default:
+          return '';
+      }
+    });
+    sinon.stub(cli, 'promptForConfirmation').callsFake(async (config: ConfirmationConfig): Promise<boolean> => {
+      switch (config.message) {
+        case 'Are you going to use the CLI in PowerShell?':
+          return true;
+        case 'CLI for Microsoft 365 will now sign in to your Microsoft 365 tenant as Microsoft Azure CLI to create a new app registration. Continue?':
+          return false;
+        default: //summary
+          return true;
+      }
+    });
+    const clearConnectionInfoSpy = sinon.stub(auth, 'clearConnectionInfo').resolves();
+
+    await assert.rejects(async () => await command.action(logger, { options: {} }));
+    assert(clearConnectionInfoSpy.notCalled);
   });
 
   it('outputs settings to configure to console in debug mode', async () => {
     sinon.stub(cli, 'promptForSelection').callsFake(async (config: SelectionConfig<unknown>): Promise<unknown> => {
       switch (config.message) {
         case 'How do you plan to use the CLI?':
-          return 'Interactively';
+          return CliUsageMode.Interactively;
         case 'How experienced are you in using the CLI?':
-          return 'Beginner';
+          return CliExperience.Beginner;
         default:
           return '';
       }
@@ -352,12 +800,10 @@ describe(commands.SETUP, () => {
           return true;
       }
     });
-    sinon.stub(cli.getConfig(), 'set').callsFake(() => { });
 
     const expected: SettingNames = {};
     Object.assign(expected, interactivePreset);
-    expected.helpMode = 'full';
-    (command as any).settings = expected;
+    expected.helpMode = HelpMode.Full;
 
     await command.action(logger, { options: { debug: true } });
 
@@ -368,9 +814,9 @@ describe(commands.SETUP, () => {
     sinon.stub(cli, 'promptForSelection').callsFake(async (config: SelectionConfig<unknown>): Promise<unknown> => {
       switch (config.message) {
         case 'How do you plan to use the CLI?':
-          return 'Interactively';
+          return CliUsageMode.Interactively;
         case 'How experienced are you in using the CLI?':
-          return 'Beginner';
+          return CliExperience.Beginner;
         default:
           return '';
       }
@@ -383,12 +829,10 @@ describe(commands.SETUP, () => {
           return true;
       }
     });
-    sinon.stub(cli.getConfig(), 'set').callsFake(() => { });
 
     const expected: SettingNames = {};
     Object.assign(expected, interactivePreset);
-    expected.helpMode = 'full';
-    (command as any).settings = expected;
+    expected.helpMode = HelpMode.Full;
 
     await command.action(logger, { options: {} });
 
@@ -398,10 +842,13 @@ describe(commands.SETUP, () => {
   });
 
   it('in the confirmation message lists all settings and their values', async () => {
-    const settings: SettingNames = {};
-    Object.assign(settings, interactivePreset);
-    settings.helpMode = 'full';
-    const actual = (command as any).getSummaryMessage(settings);
+    const preferences: Preferences = {
+      experience: CliExperience.Beginner,
+      usageMode: CliUsageMode.Interactively,
+      usedInPowerShell: false
+    };
+    const settings = (command as any).getSettings(preferences);
+    const actual = (command as any).getSummaryMessage(preferences);
 
     for (const [key, value] of Object.entries(settings)) {
       assert(actual.indexOf(`- ${key}: ${value}`) > -1, `Expected ${key} to be set to ${value}`);

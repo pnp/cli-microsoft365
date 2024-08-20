@@ -83,7 +83,7 @@ describe(commands.DOCTOR, () => {
     sinon.stub(os, 'release').returns('10.0.19043');
     sinon.stub(packageJSON, 'version').value('3.11.0');
     sinon.stub(process, 'version').value('v14.17.0');
-    sinon.stub(auth.connection, 'appId').value('31359c7f-bd7e-475c-86db-fdb8c937548e');
+    auth.connection.appId = '31359c7f-bd7e-475c-86db-fdb8c937548e';
     sinon.stub(auth.connection, 'tenant').value('common');
     sinon.stub(auth.connection, 'authType').value(0);
     sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
@@ -156,7 +156,7 @@ describe(commands.DOCTOR, () => {
     sinon.stub(os, 'release').returns('10.0.19043');
     sinon.stub(packageJSON, 'version').value('3.11.0');
     sinon.stub(process, 'version').value('v14.17.0');
-    sinon.stub(auth.connection, 'appId').value('31359c7f-bd7e-475c-86db-fdb8c937548e');
+    auth.connection.appId = '31359c7f-bd7e-475c-86db-fdb8c937548e';
     sinon.stub(auth.connection, 'tenant').value('common');
     sinon.stub(auth.connection, 'authType').value(0);
     sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
