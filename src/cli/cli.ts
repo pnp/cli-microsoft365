@@ -48,6 +48,14 @@ const defaultHelpMode = 'options';
 const defaultHelpTarget = 'console';
 const helpModes: string[] = ['options', 'examples', 'remarks', 'response', 'full'];
 const helpTargets: string[] = ['console', 'web'];
+const yargsConfiguration: Partial<yargs.Configuration> = {
+  'parse-numbers': true,
+  'strip-aliased': true,
+  'strip-dashed': true,
+  'dot-notation': false,
+  'boolean-negation': true,
+  'camel-case-expansion': false
+};
 
 function getConfig(): Configstore {
   if (!_config) {
@@ -477,14 +485,7 @@ function getCommandOptions(command: Command): CommandOptionInfo[] {
 function getCommandOptionsFromArgs(args: string[], commandInfo: CommandInfo | undefined): yargs.Arguments {
   const yargsOptions: yargs.Options = {
     alias: {},
-    configuration: {
-      "parse-numbers": true,
-      "strip-aliased": true,
-      "strip-dashed": true,
-      "dot-notation": false,
-      "boolean-negation": true,
-      "camel-case-expansion": false
-    }
+    configuration: yargsConfiguration
   };
 
   let argsToParse = args;
@@ -1018,5 +1019,6 @@ export const cli = {
   printAvailableCommands,
   promptForConfirmation,
   promptForSelection,
-  shouldTrimOutput
+  shouldTrimOutput,
+  yargsConfiguration
 };
