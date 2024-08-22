@@ -2720,6 +2720,8 @@ describe('utils/spo', () => {
         BypassSharedLock: false,
         IgnoreVersionHistory: false,
         CustomizedItemName: undefined,
+        IsMoveMode: false,
+        IncludeItemPermissions: false,
         SameWebCopyMoveOptimization: true
       }
     });
@@ -2746,7 +2748,8 @@ describe('utils/spo', () => {
         nameConflictBehavior: CreateCopyJobsNameConflictBehavior.Rename,
         bypassSharedLock: true,
         ignoreVersionHistory: true,
-        newName: 'CompanyV2.png'
+        newName: 'CompanyV2.png',
+        operation: 'copy'
       }
     );
     assert.deepStrictEqual(postStub.firstCall.args[0].data, {
@@ -2757,6 +2760,49 @@ describe('utils/spo', () => {
         AllowSchemaMismatch: true,
         BypassSharedLock: true,
         IgnoreVersionHistory: true,
+        IsMoveMode: false,
+        IncludeItemPermissions: false,
+        CustomizedItemName: ['CompanyV2.png'],
+        SameWebCopyMoveOptimization: true
+      }
+    });
+  });
+
+  it('correctly creates a copy job with custom move options when using createCopyJob', async () => {
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso.sharepoint.com/sites/sales/_api/Site/CreateCopyJobs') {
+        return {
+          value: [
+            copyJobInfo
+          ]
+        };
+      }
+
+      throw 'Invalid request: ' + opts.url;
+    });
+
+    await spo.createCopyJob(
+      'https://contoso.sharepoint.com/sites/sales',
+      'https://contoso.sharepoint.com/sites/sales/Icons/Company.png',
+      'https://contoso.sharepoint.com/sites/marketing/Shared Documents',
+      {
+        nameConflictBehavior: CreateCopyJobsNameConflictBehavior.Rename,
+        bypassSharedLock: true,
+        includeItemPermissions: true,
+        newName: 'CompanyV2.png',
+        operation: 'move'
+      }
+    );
+    assert.deepStrictEqual(postStub.firstCall.args[0].data, {
+      destinationUri: 'https://contoso.sharepoint.com/sites/marketing/Shared Documents',
+      exportObjectUris: ['https://contoso.sharepoint.com/sites/sales/Icons/Company.png'],
+      options: {
+        NameConflictBehavior: CreateCopyJobsNameConflictBehavior.Rename,
+        AllowSchemaMismatch: true,
+        BypassSharedLock: true,
+        IgnoreVersionHistory: false,
+        IsMoveMode: true,
+        IncludeItemPermissions: true,
         CustomizedItemName: ['CompanyV2.png'],
         SameWebCopyMoveOptimization: true
       }

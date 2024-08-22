@@ -303,6 +303,7 @@ describe(commands.FILE_COPY, () => {
         nameConflictBehavior: CreateCopyJobsNameConflictBehavior.Fail,
         bypassSharedLock: false,
         ignoreVersionHistory: false,
+        operation: 'copy',
         newName: undefined
       }
     ]);
@@ -334,6 +335,7 @@ describe(commands.FILE_COPY, () => {
         nameConflictBehavior: CreateCopyJobsNameConflictBehavior.Fail,
         bypassSharedLock: false,
         ignoreVersionHistory: false,
+        operation: 'copy',
         newName: undefined
       }
     ]);
@@ -368,6 +370,7 @@ describe(commands.FILE_COPY, () => {
         nameConflictBehavior: CreateCopyJobsNameConflictBehavior.Rename,
         bypassSharedLock: true,
         ignoreVersionHistory: true,
+        operation: 'copy',
         newName: 'Document-renamed.pdf'
       }
     ]);
@@ -400,6 +403,7 @@ describe(commands.FILE_COPY, () => {
         nameConflictBehavior: CreateCopyJobsNameConflictBehavior.Replace,
         bypassSharedLock: false,
         ignoreVersionHistory: false,
+        operation: 'copy',
         newName: 'Document-renamed.pdf'
       }
     ]);

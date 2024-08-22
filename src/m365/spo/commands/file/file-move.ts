@@ -1,6 +1,7 @@
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
+import { CreateCopyJobsNameConflictBehavior, spo } from '../../../../utils/spo.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
@@ -17,8 +18,9 @@ interface Options extends GlobalOptions {
   targetUrl: string;
   newName?: string;
   nameConflictBehavior?: string;
-  retainEditorAndModified?: boolean;
+  includeItemPermissions?: boolean;
   bypassSharedLock?: boolean;
+  skipWait?: boolean;
 }
 
 class SpoFileMoveCommand extends SpoCommand {
@@ -49,8 +51,9 @@ class SpoFileMoveCommand extends SpoCommand {
         sourceId: typeof args.options.sourceId !== 'undefined',
         newName: typeof args.options.newName !== 'undefined',
         nameConflictBehavior: typeof args.options.nameConflictBehavior !== 'undefined',
-        retainEditorAndModified: !!args.options.retainEditorAndModified,
-        bypassSharedLock: !!args.options.bypassSharedLock
+        includeItemPermissions: !!args.options.includeItemPermissions,
+        bypassSharedLock: !!args.options.bypassSharedLock,
+        skipWait: !!args.options.skipWait
       });
     });
   }
@@ -77,10 +80,13 @@ class SpoFileMoveCommand extends SpoCommand {
         autocomplete: this.nameConflictBehaviorOptions
       },
       {
-        option: '--retainEditorAndModified'
+        option: '--includeItemPermissions'
       },
       {
         option: '--bypassSharedLock'
+      },
+      {
+        option: '--skipWait'
       }
     );
   }
@@ -112,7 +118,7 @@ class SpoFileMoveCommand extends SpoCommand {
 
   #initTypes(): void {
     this.types.string.push('webUrl', 'sourceUrl', 'sourceId', 'targetUrl', 'newName', 'nameConflictBehavior');
-    this.types.boolean.push('retainEditorAndModified', 'bypassSharedLock');
+    this.types.boolean.push('includeItemPermissions', 'bypassSharedLock', 'skipWait');
   }
 
   protected getExcludedOptionsWithUrls(): string[] | undefined {
@@ -121,46 +127,61 @@ class SpoFileMoveCommand extends SpoCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
-      const sourcePath = await this.getSourcePath(logger, args.options);
+      const sourceServerRelativePath = await this.getSourcePath(logger, args.options);
+      const sourcePath = this.getAbsoluteUrl(args.options.webUrl, sourceServerRelativePath);
+      const destinationPath = this.getAbsoluteUrl(args.options.webUrl, args.options.targetUrl);
 
       if (this.verbose) {
-        await logger.logToStderr(`Moving file ${sourcePath} to ${args.options.targetUrl}...`);
+        await logger.logToStderr(`Moving file '${sourceServerRelativePath}' to '${args.options.targetUrl}'...`);
       }
 
-      const absoluteSourcePath = this.getAbsoluteUrl(args.options.webUrl, sourcePath);
-      let absoluteTargetPath = this.getAbsoluteUrl(args.options.webUrl, args.options.targetUrl) + '/';
+      let newName = args.options.newName;
+      // Add original file extension if not provided
+      if (newName && !newName.includes('.')) {
+        newName += sourceServerRelativePath.substring(sourceServerRelativePath.lastIndexOf('.'));
+      }
 
-      if (args.options.newName) {
-        absoluteTargetPath += args.options.newName;
+      const copyJobResponse = await spo.createCopyJob(
+        args.options.webUrl,
+        sourcePath,
+        destinationPath,
+        {
+          nameConflictBehavior: this.getNameConflictBehaviorValue(args.options.nameConflictBehavior),
+          bypassSharedLock: !!args.options.bypassSharedLock,
+          includeItemPermissions: !!args.options.includeItemPermissions,
+          newName: newName,
+          operation: 'move'
+        }
+      );
+
+      if (args.options.skipWait) {
+        return;
       }
-      else {
-        // Keep the original file name
-        absoluteTargetPath += sourcePath.substring(sourcePath.lastIndexOf('/') + 1);
+
+      if (this.verbose) {
+        await logger.logToStderr('Waiting for the move job to complete...');
       }
+
+      const copyJobResult = await spo.getCopyJobResult(args.options.webUrl, copyJobResponse);
+
+      if (this.verbose) {
+        await logger.logToStderr('Getting information about the destination file...');
+      }
+
+      // Get destination file data
+      const siteRelativeDestinationFolder = '/' + copyJobResult.TargetObjectSiteRelativeUrl.substring(0, copyJobResult.TargetObjectSiteRelativeUrl.lastIndexOf('/'));
+      const absoluteWebUrl = destinationPath.substring(0, destinationPath.toLowerCase().lastIndexOf(siteRelativeDestinationFolder.toLowerCase()));
 
       const requestOptions: CliRequestOptions = {
-        url: `${args.options.webUrl}/_api/SP.MoveCopyUtil.MoveFileByPath`,
+        url: `${absoluteWebUrl}/_api/Web/GetFileById('${copyJobResult.TargetObjectUniqueId}')`,
         headers: {
           accept: 'application/json;odata=nometadata'
         },
-        responseType: 'json',
-        data: {
-          srcPath: {
-            DecodedUrl: absoluteSourcePath
-          },
-          destPath: {
-            DecodedUrl: absoluteTargetPath
-          },
-          overwrite: args.options.nameConflictBehavior === 'replace',
-          options: {
-            KeepBoth: args.options.nameConflictBehavior === 'rename',
-            ShouldBypassSharedLocks: !!args.options.bypassSharedLock,
-            RetainEditorAndModifiedOnMove: !!args.options.retainEditorAndModified
-          }
-        }
+        responseType: 'json'
       };
 
-      await request.post(requestOptions);
+      const destinationFile = await request.get<any>(requestOptions);
+      await logger.log(destinationFile);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
@@ -177,19 +198,33 @@ class SpoFileMoveCommand extends SpoCommand {
     }
 
     const requestOptions: CliRequestOptions = {
-      url: `${options.webUrl}/_api/Web/GetFileById('${options.sourceId}')?$select=ServerRelativePath`,
+      url: `${options.webUrl}/_api/Web/GetFileById('${options.sourceId}')/ServerRelativePath`,
       headers: {
         accept: 'application/json;odata=nometadata'
       },
       responseType: 'json'
     };
 
-    const file = await request.get<{ ServerRelativePath: { DecodedUrl: string } }>(requestOptions);
-    return file.ServerRelativePath.DecodedUrl;
+    const file = await request.get<{ DecodedUrl: string }>(requestOptions);
+    return file.DecodedUrl;
+  }
+
+  private getNameConflictBehaviorValue(nameConflictBehavior?: string): CreateCopyJobsNameConflictBehavior {
+    switch (nameConflictBehavior?.toLowerCase()) {
+      case 'fail':
+        return CreateCopyJobsNameConflictBehavior.Fail;
+      case 'replace':
+        return CreateCopyJobsNameConflictBehavior.Replace;
+      case 'rename':
+        return CreateCopyJobsNameConflictBehavior.Rename;
+      default:
+        return CreateCopyJobsNameConflictBehavior.Fail;
+    }
   }
 
   private getAbsoluteUrl(webUrl: string, url: string): string {
-    return url.startsWith('https://') ? url : urlUtil.getAbsoluteUrl(webUrl, url);
+    const result = url.startsWith('https://') ? url : urlUtil.getAbsoluteUrl(webUrl, url);
+    return urlUtil.removeTrailingSlashes(result);
   }
 }
 
