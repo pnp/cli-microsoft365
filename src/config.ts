@@ -6,6 +6,7 @@ export default {
   applicationName: `CLI for Microsoft 365 v${app.packageJson().version}`,
   delimiter: 'm365\$',
   cliEntraAppId: process.env.CLIMICROSOFT365_ENTRAAPPID || process.env.CLIMICROSOFT365_AADAPPID || cliEntraAppId,
+  cliEnvEntraAppId: process.env.CLIMICROSOFT365_ENTRAAPPID || process.env.CLIMICROSOFT365_AADAPPID,
   tenant: process.env.CLIMICROSOFT365_TENANT || 'common',
   configstoreName: 'cli-m365-config'
 };

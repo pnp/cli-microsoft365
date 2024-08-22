@@ -10,10 +10,11 @@ import config from '../../config.js';
 import { settingsNames } from '../../settingsNames.js';
 import { zod } from '../../utils/zod.js';
 import commands from './commands.js';
+import * as accessTokenUtil from '../../utils/accessToken.js';
 
 const options = globalOptionsZod
   .extend({
-    authType: zod.alias('t', z.enum(['certificate', 'deviceCode', 'password', 'identity', 'browser', 'secret']).optional()),
+    authType: zod.alias('t', z.enum(['certificate', 'deviceCode', 'password', 'identity', 'browser', 'secret', 'accessToken']).optional()),
     cloud: z.nativeEnum(CloudType).optional().default(CloudType.Public),
     userName: zod.alias('u', z.string().optional()),
     password: zod.alias('p', z.string().optional()),
@@ -26,6 +27,7 @@ const options = globalOptionsZod
     appId: z.string().optional(),
     tenant: z.string().optional(),
     secret: zod.alias('s', z.string().optional()),
+    accessToken: zod.alias('a', z.string().or(z.array(z.string())).optional()),
     connectionName: z.string().optional()
   })
   .strict();
@@ -64,6 +66,21 @@ class LoginCommand extends Command {
       })
       .refine(options => options.authType !== 'secret' || options.secret, {
         message: 'Secret is required when using secret authentication'
+      })
+      .refine(options => options.authType !== 'accessToken' || options.accessToken, {
+        message: 'accessToken is required when using accessToken authentication'
+      })
+      .refine(options => !(options.authType === 'accessToken' && options.accessToken && this.tokensForMultipleTenants(options.accessToken, options.tenant)), {
+        message: 'The provided accessToken is not for the specified tenant or the access tokens are not for the same tenant'
+      })
+      .refine(options => !(options.authType === 'accessToken' && options.accessToken && this.tokensForMultipleApps(options.accessToken, options.appId)), {
+        message: 'The provided access token is not for the specified app or the access tokens are not for the same app'
+      })
+      .refine(options => !(options.authType === 'accessToken' && options.accessToken && this.tokensForTheSameResources(options.accessToken)), {
+        message: 'Specify access tokens that are not for the same resource'
+      })
+      .refine(options => !(options.authType === 'accessToken' && options.accessToken && this.tokenExpired(options.accessToken)), {
+        message: 'The provided access token has expired'
       });
   }
 
@@ -108,12 +125,36 @@ class LoginCommand extends Command {
           auth.connection.authType = AuthType.Secret;
           auth.connection.secret = args.options.secret;
           break;
+        case 'accessToken':
+          const accessTokens = typeof args.options.accessToken === "string" ? [args.options.accessToken] : args.options.accessToken as string[];
+          auth.connection.authType = AuthType.AccessToken;
+          auth.connection.appId = accessTokenUtil.accessToken.getTenantIdFromAccessToken(accessTokens[0]);
+          auth.connection.tenant = accessTokenUtil.accessToken.getAppIdFromAccessToken(accessTokens[0]);
+
+          for (const token of accessTokens) {
+            const resource = accessTokenUtil.accessToken.getAudienceFromAccessToken(token);
+            const expiresOn = accessTokenUtil.accessToken.getExpirationFromAccessToken(token);
+
+            auth.connection.accessTokens[resource] = {
+              expiresOn: expiresOn as Date || null,
+              accessToken: token
+            };
+          };
+
+          break;
       }
 
       auth.connection.cloudType = args.options.cloud;
 
       try {
-        await auth.ensureAccessToken(auth.defaultResource, logger, this.debug);
+        if (auth.connection.authType !== AuthType.AccessToken) {
+          await auth.ensureAccessToken(auth.defaultResource, logger, this.debug);
+        }
+        else {
+          for (const resource of Object.keys(auth.connection.accessTokens)) {
+            await auth.ensureAccessToken(resource, logger, this.debug);
+          }
+        }
         auth.connection.active = true;
       }
       catch (error: any) {
@@ -123,7 +164,12 @@ class LoginCommand extends Command {
           await logger.logToStderr('');
         }
 
-        throw new CommandError(error.message);
+        if (error instanceof Error) {
+          throw new CommandError(error.message);
+        }
+        else {
+          throw new CommandError(error);
+        }
       }
 
       const details = auth.getConnectionDetails(auth.connection);
@@ -150,6 +196,88 @@ class LoginCommand extends Command {
 
     await this.initAction(args, logger);
     await this.commandAction(logger, args);
+  }
+
+  private tokensForMultipleTenants(accessTokenValue: string | string[] | undefined, tenantValue: string | undefined): boolean {
+    const accessTokens = typeof accessTokenValue === "string" ? [accessTokenValue] : accessTokenValue as string[];;
+    let tenant = tenantValue || config.tenant;
+    let forMultipleTenants: boolean = false;
+
+    for (const token of accessTokens) {
+      const tenantIdInAccessToken = accessTokenUtil.accessToken.getTenantIdFromAccessToken(token);
+
+      if (tenant !== 'common' && tenant !== tenantIdInAccessToken) {
+        forMultipleTenants = true;
+        break;
+      }
+
+      tenant = tenantIdInAccessToken;
+    };
+
+    return forMultipleTenants;
+  }
+
+  private tokensForMultipleApps(accessTokenValue: string | string[] | undefined, appIdValue: string | undefined): boolean {
+    const accessTokens = typeof accessTokenValue === "string" ? [accessTokenValue] : accessTokenValue as string[];;
+    let appId = appIdValue || config.cliEnvEntraAppId || '';
+    let forMultipleApps: boolean = false;
+
+    for (const token of accessTokens) {
+      const appIdInAccessToken = accessTokenUtil.accessToken.getAppIdFromAccessToken(token);
+
+      if (appId !== '' && appId !== appIdInAccessToken) {
+        forMultipleApps = true;
+        break;
+      }
+
+      appId = appIdInAccessToken;
+    };
+
+    return forMultipleApps;
+  }
+
+  private tokensForTheSameResources(accessTokenValue: string | string[] | undefined): boolean {
+    const accessTokens = typeof accessTokenValue === "string" ? [accessTokenValue] : accessTokenValue as string[];;
+    let forTheSameResources: boolean = false;
+    const resources: string[] = [];
+
+    if ((accessTokens as string[]).length === 1) {
+      return false;
+    }
+
+    for (const token of accessTokens) {
+      const resource = accessTokenUtil.accessToken.getAudienceFromAccessToken(token);
+
+      if (resources.indexOf(resource) > -1) {
+        forTheSameResources = true;
+        break;
+      }
+
+      resources.push(resource);
+    };
+
+    return forTheSameResources;
+  }
+
+  private tokenExpired(accessTokenValue: string | string[] | undefined): boolean {
+    const accessTokens = typeof accessTokenValue === "string" ? [accessTokenValue] : accessTokenValue as string[];;
+    let tokenExpired: boolean = false;
+
+    for (const token of accessTokens) {
+      const expiresOn = accessTokenUtil.accessToken.getExpirationFromAccessToken(token);
+
+      const accessToken = {
+        expiresOn: expiresOn as Date || null,
+        accessToken: token
+      };
+
+      if (auth.accessTokenExpired(accessToken)) {
+        tokenExpired = true;
+        break;
+      }
+    };
+
+    return tokenExpired;
   }
 }
 

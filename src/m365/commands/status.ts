@@ -1,4 +1,4 @@
-import auth from '../../Auth.js';
+import auth, { AuthType } from '../../Auth.js';
 import { Logger } from '../../cli/Logger.js';
 import Command, { CommandArgs, CommandError } from '../../Command.js';
 import commands from './commands.js';
@@ -15,7 +15,14 @@ class StatusCommand extends Command {
   public async commandAction(logger: Logger): Promise<void> {
     if (auth.connection.active) {
       try {
-        await auth.ensureAccessToken(auth.defaultResource, logger, this.debug);
+        if (auth.connection.authType !== AuthType.AccessToken) {
+          await auth.ensureAccessToken(auth.defaultResource, logger, this.debug);
+        }
+        else {
+          for (const resource of Object.keys(auth.connection.accessTokens)) {
+            await auth.ensureAccessToken(resource, logger, this.debug);
+          }
+        }
       }
       catch (err: any) {
         if (this.debug) {

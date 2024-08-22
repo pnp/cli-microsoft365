@@ -108,7 +108,8 @@ export enum AuthType {
   Certificate,
   Identity,
   Browser,
-  Secret
+  Secret,
+  AccessToken
 }
 
 export enum CertificateType {
@@ -199,46 +200,43 @@ export class Auth {
   }
 
   public async ensureAccessToken(resource: string, logger: Logger, debug: boolean = false, fetchNew: boolean = false): Promise<string> {
-    const now: Date = new Date();
-    const accessToken: AccessToken | undefined = this.connection.accessTokens[resource];
-    const expiresOn: Date = accessToken && accessToken.expiresOn ?
-      // if expiresOn is serialized from the service file, it's set as a string
-      // if it's coming from MSAL, it's a Date
-      typeof accessToken.expiresOn === 'string' ? new Date(accessToken.expiresOn) : accessToken.expiresOn
-      : new Date(0);
-
-    if (!fetchNew && accessToken && expiresOn > now) {
-      if (debug) {
-        await logger.logToStderr(`Existing access token ${accessToken.accessToken} still valid. Returning...`);
-      }
-      return accessToken.accessToken;
-    }
-    else {
-      if (debug) {
-        if (!accessToken) {
-          await logger.logToStderr(`No token found for resource ${resource}.`);
-        }
-        else {
-          await logger.logToStderr(`Access token expired. Token: ${accessToken.accessToken}, ExpiresAt: ${accessToken.expiresOn}`);
-        }
-      }
-    }
-
     let getTokenPromise: ((resource: string, logger: Logger, debug: boolean, fetchNew: boolean) => Promise<AccessToken | null>) | undefined;
 
-    // When using an application identity, you can't retrieve the access token silently, because there is
-    // no account. Also (for cert auth) clientApplication is instantiated later
-    // after inspecting the specified cert and calculating thumbprint if one
-    // wasn't specified
-    if (this.connection.authType !== AuthType.Certificate &&
-      this.connection.authType !== AuthType.Secret &&
-      this.connection.authType !== AuthType.Identity) {
-      this.clientApplication = await this.getPublicClient(logger, debug);
-      if (this.clientApplication) {
-        const accounts = await this.clientApplication.getTokenCache().getAllAccounts();
-        // if there is an account in the cache and it's active, we can try to get the token silently
-        if (accounts.filter(a => a.localAccountId === this.connection.identityId).length > 0 && this.connection.active === true) {
-          getTokenPromise = this.ensureAccessTokenSilent.bind(this);
+    // If the authType is accessToken, we handle returning the token later on.
+    if (this.connection.authType !== AuthType.AccessToken) {
+      const accessToken: AccessToken | undefined = this.connection.accessTokens[resource];
+
+      if (!fetchNew && accessToken && !this.accessTokenExpired(accessToken)) {
+        if (debug) {
+          await logger.logToStderr(`Existing access token ${accessToken.accessToken} still valid. Returning...`);
+        }
+        return accessToken.accessToken;
+      }
+      else {
+        if (debug) {
+          if (!accessToken) {
+            await logger.logToStderr(`No token found for resource ${resource}.`);
+          }
+          else {
+            await logger.logToStderr(`Access token expired. Token: ${accessToken.accessToken}, ExpiresAt: ${accessToken.expiresOn}`);
+          }
+        }
+      }
+
+      // When using an application identity, you can't retrieve the access token silently, because there is
+      // no account. Also (for cert auth) clientApplication is instantiated later
+      // after inspecting the specified cert and calculating thumbprint if one
+      // wasn't specified
+      if (this.connection.authType !== AuthType.Certificate &&
+        this.connection.authType !== AuthType.Secret &&
+        this.connection.authType !== AuthType.Identity) {
+        this.clientApplication = await this.getPublicClient(logger, debug);
+        if (this.clientApplication) {
+          const accounts = await this.clientApplication.getTokenCache().getAllAccounts();
+          // if there is an account in the cache and it's active, we can try to get the token silently
+          if (accounts.filter(a => a.localAccountId === this.connection.identityId).length > 0 && this.connection.active === true) {
+            getTokenPromise = this.ensureAccessTokenSilent.bind(this);
+          }
         }
       }
     }
@@ -262,6 +260,9 @@ export class Auth {
           break;
         case AuthType.Secret:
           getTokenPromise = this.ensureAccessTokenWithSecret.bind(this);
+          break;
+        case AuthType.AccessToken:
+          getTokenPromise = this.ensureAccessTokenWithAccessToken.bind(this);
           break;
       }
     }
@@ -302,6 +303,17 @@ export class Auth {
       }
     }
     return response.accessToken;
+  }
+
+  public accessTokenExpired(accessToken: AccessToken): boolean {
+    const now: Date = new Date();
+    const expiresOn: Date = accessToken && accessToken.expiresOn ?
+      // if expiresOn is serialized from the service file, it's set as a string
+      // if it's coming from MSAL, it's a Date
+      typeof accessToken.expiresOn === 'string' ? new Date(accessToken.expiresOn) : accessToken.expiresOn
+      : new Date(0);
+
+    return expiresOn <= now;
   }
 
   private async getAuthClientConfiguration(logger: Logger, debug: boolean, certificateThumbprint?: string, certificatePrivateKey?: string, clientSecret?: string): Promise<Msal.Configuration> {
@@ -420,13 +432,13 @@ export class Auth {
     }
 
     // Asserting identityId because it is expected to be available at this point.
-    assert(this.connection.identityId !== undefined);
+    assert(this.connection.identityId !== undefined, "identityId is undefined");
 
     const account = await (this.clientApplication as Msal.ClientApplication)
       .getTokenCache().getAccountByLocalId(this.connection.identityId);
 
     // Asserting account because it is expected to be available at this point.
-    assert(account !== null);
+    assert(account !== null, "account is null");
 
     return (this.clientApplication as Msal.ClientApplication).acquireTokenSilent({
       account: account,
@@ -706,6 +718,24 @@ export class Auth {
     });
   }
 
+  private async ensureAccessTokenWithAccessToken(resource: string, logger: Logger, debug: boolean): Promise<AccessToken | null> {
+    const accessToken: AccessToken | undefined = this.connection.accessTokens[resource];
+
+    if (!accessToken) {
+      throw `No token found for resource ${resource}.`;
+    }
+
+    if (this.accessTokenExpired(accessToken)) {
+      throw `Access token expired. Token: ${accessToken.accessToken}, ExpiresAt: ${accessToken.expiresOn}`;
+    }
+
+    if (debug) {
+      await logger.logToStderr(`Existing access token ${accessToken.accessToken} still valid. Returning...`);
+    }
+
+    return accessToken;
+  }
+
   private async calculateThumbprint(certificate: NodeForge.pki.Certificate): Promise<string> {
     const nodeForge = (await import('node-forge')).default;
     const { md, asn1, pki } = nodeForge;
@@ -878,8 +908,8 @@ export class Auth {
 
   public getConnectionDetails(connection: Connection): ConnectionDetails {
     // Asserting name and identityId because they are optional, but required at this point.    
-    assert(connection.identityName !== undefined);
-    assert(connection.name !== undefined);
+    assert(connection.identityName !== undefined, "identity name is undefined");
+    assert(connection.name !== undefined, "connection name is undefined");
 
     const details: ConnectionDetails = {
       connectionName: connection.name,
