@@ -159,6 +159,24 @@ In the past versions of CLI for Microsoft 365, the command had no output. When u
 
 When using the [spo file copy](./cmd/spo/file/file-copy.mdx) command, please use the new command input. This means that you'll have to remove option `--resetAuthorAndCreated` from your scripts and automation tools.
 
+### Updated command `spo file move`
+
+Just like `spo file copy`, we have decided to move the [spo file move](./cmd/spo/file/file-move.mdx) command to a new endpoint. This change is necessary to ensure the command's functionality and reliability. Because of the new endpoint, the command input and output have changed.
+
+**Command options:**
+
+Unfortunately, we had to drop the `--retainEditorAndModified` options as it's no longer supported by the new endpoint. In return, we were able to add two new options:
+- `--includeItemPermissions`: Ensure that item-level permissions are preserved during the move.
+- `--skipWait`: Don't wait for the copy operation to complete.
+
+**Command output:**
+
+In the past versions of CLI for Microsoft 365, the command had no output. When using option `--nameConflictBehavior rename`, it's hard for the user to know what the actual name of the copied file is. With the new endpoint, the command now returns the file information about the destination file, providing you with all the info you need to execute other commands on this file.
+
+#### What action do I need to take?
+
+When using the [spo file move](./cmd/spo/file/file-move.mdx) command, please use the new command input. This means that you'll have to remove option `--retainEditorAndModified` from your scripts and automation tools.
+
 ### Removed `spo folder rename` alias
 
 The `spo folder rename` command was removed and replaced by the [spo folder set](./cmd/spo/folder/folder-set.mdx) command.
