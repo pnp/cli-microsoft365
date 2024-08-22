@@ -120,6 +120,10 @@ class SpoFileCopyCommand extends SpoCommand {
     this.types.boolean.push('bypassSharedLock', 'ignoreVersionHistory', 'skipWait');
   }
 
+  protected getExcludedOptionsWithUrls(): string[] | undefined {
+    return ['targetUrl', 'sourceUrl'];
+  }
+
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       const sourceServerRelativePath = await this.getSourcePath(logger, args.options);
@@ -144,7 +148,8 @@ class SpoFileCopyCommand extends SpoCommand {
           nameConflictBehavior: this.getNameConflictBehaviorValue(args.options.nameConflictBehavior),
           bypassSharedLock: !!args.options.bypassSharedLock,
           ignoreVersionHistory: !!args.options.ignoreVersionHistory,
-          newName: newName
+          newName: newName,
+          operation: 'copy'
         }
       );
 

@@ -91,9 +91,13 @@ export interface User {
 
 interface CreateCopyJobsOptions {
   nameConflictBehavior?: CreateCopyJobsNameConflictBehavior;
-  bypassSharedLock?: boolean;
-  ignoreVersionHistory?: boolean;
   newName?: string;
+  bypassSharedLock?: boolean;
+  /** @remarks Use only when using operation copy. */
+  ignoreVersionHistory?: boolean;
+  /** @remarks Use only when using operation move. */
+  includeItemPermissions?: boolean;
+  operation: 'copy' | 'move';
 }
 
 export enum CreateCopyJobsNameConflictBehavior {
@@ -1953,8 +1957,10 @@ export const spo = {
           AllowSchemaMismatch: true,
           BypassSharedLock: !!options?.bypassSharedLock,
           IgnoreVersionHistory: !!options?.ignoreVersionHistory,
+          IncludeItemPermissions: !!options?.includeItemPermissions,
           CustomizedItemName: options?.newName ? [options.newName] : undefined,
-          SameWebCopyMoveOptimization: true
+          SameWebCopyMoveOptimization: true,
+          IsMoveMode: options?.operation === 'move'
         }
       }
     };
