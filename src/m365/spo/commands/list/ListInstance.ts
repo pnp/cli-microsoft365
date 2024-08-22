@@ -68,7 +68,7 @@ interface Member {
   PrincipalTypeString: string;
 }
 
-interface VersionPolicy {
+export interface VersionPolicy {
   DefaultExpireAfterDays: number;
   DefaultTrimMode: number;
   DefaultTrimModeValue?: string;

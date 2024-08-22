@@ -6,7 +6,7 @@ import { urlUtil } from '../../../../utils/urlUtil.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
-import { DefaultTrimModeType, ListInstance } from "./ListInstance.js";
+import { DefaultTrimModeType, ListInstance, VersionPolicy } from "./ListInstance.js";
 import { ListPrincipalType } from './ListPrincipalType.js';
 
 interface Properties {
@@ -28,6 +28,8 @@ interface Options extends GlobalOptions {
 }
 
 class SpoListGetCommand extends SpoCommand {
+  private supportedBaseTemplates = [101, 109, 110, 111, 113, 114, 115, 116, 117, 119, 121, 122, 123, 126, 130, 175];
+
   public get name(): string {
     return commands.LIST_GET;
   }
@@ -114,7 +116,7 @@ class SpoListGetCommand extends SpoCommand {
       requestUrl += `lists(guid'${formatting.encodeQueryParameter(args.options.id)}')`;
     }
     else if (args.options.title) {
-      requestUrl += `lists/GetByTitle('${formatting.encodeQueryParameter(args.options.title as string)}')`;
+      requestUrl += `lists/GetByTitle('${formatting.encodeQueryParameter(args.options.title)}')`;
     }
     else if (args.options.url) {
       const listServerRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.url);
@@ -132,12 +134,8 @@ class SpoListGetCommand extends SpoCommand {
       queryParams.push(`$expand=${fieldsProperties.expandProperties.join(',')}`);
     }
 
-    if (queryParams.length === 0) {
-      queryParams.push(`$expand=VersionPolicies`);
-    }
-
     const requestOptions: CliRequestOptions = {
-      url: `${requestUrl}?${queryParams.join('&')}`,
+      url: `${requestUrl}${queryParams.length > 0 ? `?${queryParams.join('&')}` : ''}`,
       headers: {
         'accept': 'application/json;odata=nometadata'
       },
@@ -150,6 +148,10 @@ class SpoListGetCommand extends SpoCommand {
         listInstance.RoleAssignments.forEach(r => {
           r.Member.PrincipalTypeString = ListPrincipalType[r.Member.PrincipalType];
         });
+      }
+
+      if (this.supportedBaseTemplates.some(template => template === listInstance.BaseTemplate)) {
+        await this.retrieveVersionPolicies(requestUrl, listInstance);
       }
 
       if (listInstance.VersionPolicies) {
@@ -185,6 +187,19 @@ class SpoListGetCommand extends SpoCommand {
       selectProperties: [...new Set(selectProperties)],
       expandProperties: [...new Set(expandProperties)]
     };
+  }
+
+  private async retrieveVersionPolicies(requestUrl: string, listInstance: ListInstance): Promise<void> {
+    const requestOptions: CliRequestOptions = {
+      url: `${requestUrl}?$select=VersionPolicies&$expand=VersionPolicies`,
+      headers: {
+        'accept': 'application/json;odata=nometadata'
+      },
+      responseType: 'json'
+    };
+    const { VersionPolicies } = await request.get<{ VersionPolicies: VersionPolicy }>(requestOptions);
+    listInstance.VersionPolicies = VersionPolicies;
+    listInstance.VersionPolicies.DefaultTrimModeValue = DefaultTrimModeType[listInstance.VersionPolicies.DefaultTrimMode];
   }
 }
 
