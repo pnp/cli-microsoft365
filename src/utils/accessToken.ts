@@ -1,5 +1,5 @@
-import auth from "../Auth.js";
-import { CommandError } from "../Command.js";
+import auth from '../Auth.js';
+import { CommandError } from '../Command.js';
 
 export const accessToken = {
   isAppOnlyAccessToken(accessToken: string): boolean | undefined {
@@ -25,124 +25,7 @@ export const accessToken = {
     return isAppOnlyAccessToken;
   },
 
-  getTenantIdFromAccessToken(accessToken: string): string {
-    let tenantId: string = '';
-
-    if (!accessToken || accessToken.length === 0) {
-      return tenantId;
-    }
-
-    const chunks = accessToken.split('.');
-    if (chunks.length !== 3) {
-      return tenantId;
-    }
-
-    const tokenString: string = Buffer.from(chunks[1], 'base64').toString();
-    try {
-      const token: any = JSON.parse(tokenString);
-      tenantId = token.tid;
-    }
-    catch {
-    }
-
-    return tenantId;
-  },
-
-  getUserNameFromAccessToken(accessToken: string): string {
-    let userName: string = '';
-
-    if (!accessToken || accessToken.length === 0) {
-      return userName;
-    }
-
-    const chunks = accessToken.split('.');
-    if (chunks.length !== 3) {
-      return userName;
-    }
-
-    const tokenString: string = Buffer.from(chunks[1], 'base64').toString();
-    try {
-      const token: any = JSON.parse(tokenString);
-      // if authenticated using certificate, there is no upn so use
-      // app display name instead
-      userName = token.upn || token.app_displayname;
-    }
-    catch {
-    }
-
-    return userName;
-  },
-
-  getUserIdFromAccessToken(accessToken: string): string {
-    let userId: string = '';
-
-    if (!accessToken || accessToken.length === 0) {
-      return userId;
-    }
-
-    const chunks = accessToken.split('.');
-    if (chunks.length !== 3) {
-      return userId;
-    }
-
-    const tokenString: string = Buffer.from(chunks[1], 'base64').toString();
-    try {
-      const token: any = JSON.parse(tokenString);
-      userId = token.oid;
-    }
-    catch {
-    }
-
-    return userId;
-  },
-
-  getAppIdFromAccessToken(accessToken: string): string {
-    let appId: string = '';
-
-    if (!accessToken || accessToken.length === 0) {
-      return appId;
-    }
-
-    const chunks = accessToken.split('.');
-    if (chunks.length !== 3) {
-      return appId;
-    }
-
-    const tokenString: string = Buffer.from(chunks[1], 'base64').toString();
-    try {
-      const token: any = JSON.parse(tokenString);
-      appId = token.appid;
-    }
-    catch {
-    }
-
-    return appId;
-  },
-
-  getAudienceFromAccessToken(accessToken: string): string {
-    let audience: string = '';
-
-    if (!accessToken || accessToken.length === 0) {
-      return audience;
-    }
-
-    const chunks = accessToken.split('.');
-    if (chunks.length !== 3) {
-      return audience;
-    }
-
-    const tokenString: string = Buffer.from(chunks[1], 'base64').toString();
-    try {
-      const token: any = JSON.parse(tokenString);
-      audience = token.aud;
-    }
-    catch {
-    }
-
-    return audience;
-  },
-
-  getExpirationFromAccessToken(accessToken: string): Date | undefined {
+  getClaimsFromAccessToken(accessToken: string, ...claimNames: string[]): { [claimName: string]: string | number | undefined } | undefined {
     if (!accessToken || accessToken.length === 0) {
       return undefined;
     }
@@ -155,13 +38,58 @@ export const accessToken = {
     const tokenString: string = Buffer.from(chunks[1], 'base64').toString();
     try {
       const token: any = JSON.parse(tokenString);
-      const expiration = token.exp;
-      return new Date(expiration * 1000);
+
+      const claimsObject: { [claimName: string]: string | number | undefined } = claimNames.reduce((claimsObject: any, claimName: string) => {
+        const claimValue = token[claimName];
+
+        if (claimValue) {
+          claimsObject[claimName] = token[claimName];
+        }
+
+        return claimsObject;
+      }, {});
+
+      return claimsObject;
     }
     catch {
     }
 
     return;
+  },
+
+  getTenantIdFromAccessToken(accessToken: string): string {
+    const claims = this.getClaimsFromAccessToken(accessToken, 'tid');
+    return claims?.tid as string || '';
+  },
+
+  getUserNameFromAccessToken(accessToken: string): string {
+    const claims = this.getClaimsFromAccessToken(accessToken, 'upn', 'app_displayname');
+    return claims?.upn as string || claims?.app_displayname as string || '';
+  },
+
+  getUserIdFromAccessToken(accessToken: string): string {
+    const claims = this.getClaimsFromAccessToken(accessToken, 'oid');
+    return claims?.oid as string || '';
+  },
+
+  getAppIdFromAccessToken(accessToken: string): string {
+    const claims = this.getClaimsFromAccessToken(accessToken, 'appid');
+    return claims?.appid as string || '';
+  },
+
+  getAudienceFromAccessToken(accessToken: string): string {
+    const claims = this.getClaimsFromAccessToken(accessToken, 'aud');
+    return claims?.aud as string || '';
+  },
+
+  getExpirationFromAccessToken(accessToken: string): Date | undefined {
+    const claims = this.getClaimsFromAccessToken(accessToken, 'exp');
+
+    if (!claims?.exp) {
+      return undefined;
+    }
+
+    return new Date(claims.exp as number * 1000);
   },
 
   /**
@@ -170,7 +98,7 @@ export const accessToken = {
    * @throws {CommandError} Will throw an error if the access token is an application-only access token.
    */
   assertDelegatedAccessToken(): void {
-    const accessToken = auth?.connection?.accessTokens?.[auth.defaultResource]?.accessToken;
+    const accessToken = auth?.connection?.accessTokens?.[Object.keys(auth.connection.accessTokens)[0]]?.accessToken;
     if (!accessToken) {
       throw new CommandError('No access token found.');
     }

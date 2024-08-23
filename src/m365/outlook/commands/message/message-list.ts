@@ -142,7 +142,7 @@ class OutlookMessageListCommand extends GraphCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
-      if (!args.options.userId && !args.options.userName && accessToken.isAppOnlyAccessToken(auth.connection.accessTokens[auth.defaultResource].accessToken)) {
+      if (!args.options.userId && !args.options.userName && accessToken.isAppOnlyAccessToken(auth.connection.accessTokens[Object.keys(auth.connection.accessTokens)[0]].accessToken)) {
         throw 'You must specify either the userId or userName option when using app-only permissions.';
       }
 

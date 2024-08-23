@@ -513,11 +513,12 @@ export default abstract class Command {
   }
 
   private loadValuesFromAccessToken(args: CommandArgs): void {
-    if (!auth.connection.accessTokens[auth.defaultResource]) {
+    const resource = Object.keys(auth.connection.accessTokens)[0];
+    if (!auth.connection.accessTokens[resource]) {
       return;
     }
 
-    const token = auth.connection.accessTokens[auth.defaultResource].accessToken;
+    const token = auth.connection.accessTokens[resource].accessToken;
     const optionNames: string[] = Object.getOwnPropertyNames(args.options);
     optionNames.forEach(option => {
       const value = args.options[option];
@@ -527,7 +528,7 @@ export default abstract class Command {
 
       const lowerCaseValue = value.toLowerCase().trim();
       if (lowerCaseValue === '@meid' || lowerCaseValue === '@meusername') {
-        const isAppOnlyAccessToken = accessToken.isAppOnlyAccessToken(auth.connection.accessTokens[auth.defaultResource].accessToken);
+        const isAppOnlyAccessToken = accessToken.isAppOnlyAccessToken(auth.connection.accessTokens[resource].accessToken);
         if (isAppOnlyAccessToken) {
           throw `It's not possible to use ${value} with application permissions`;
         }

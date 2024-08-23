@@ -121,7 +121,7 @@ class PurviewAuditLogListCommand extends O365MgmtCommand {
         await logger.logToStderr(`Getting audit logs for content type '${args.options.contentType}' within a time frame from '${startTime.toISOString()}' to '${endTime.toISOString()}'.`);
       }
 
-      const tenantId = accessToken.getTenantIdFromAccessToken(Auth.connection.accessTokens[Auth.defaultResource].accessToken);
+      const tenantId = accessToken.getTenantIdFromAccessToken(Auth.connection.accessTokens[Object.keys(Auth.connection.accessTokens)[0]].accessToken);
       const contentTypeValue = args.options.contentType === 'DLP' ? 'DLP.All' : 'Audit.' + args.options.contentType;
 
       await this.ensureSubscription(tenantId, contentTypeValue);

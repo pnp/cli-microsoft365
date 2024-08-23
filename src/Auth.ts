@@ -200,43 +200,46 @@ export class Auth {
   }
 
   public async ensureAccessToken(resource: string, logger: Logger, debug: boolean = false, fetchNew: boolean = false): Promise<string> {
-    let getTokenPromise: ((resource: string, logger: Logger, debug: boolean, fetchNew: boolean) => Promise<AccessToken | null>) | undefined;
+    const accessToken: AccessToken | undefined = this.connection.accessTokens[resource];
 
-    // If the authType is accessToken, we handle returning the token later on.
-    if (this.connection.authType !== AuthType.AccessToken) {
-      const accessToken: AccessToken | undefined = this.connection.accessTokens[resource];
+    if (!fetchNew && accessToken && !this.accessTokenExpired(accessToken)) {
+      if (debug) {
+        await logger.logToStderr(`Existing access token ${accessToken.accessToken} still valid. Returning...`);
+      }
 
-      if (!fetchNew && accessToken && !this.accessTokenExpired(accessToken)) {
-        if (debug) {
-          await logger.logToStderr(`Existing access token ${accessToken.accessToken} still valid. Returning...`);
-        }
+      // If the authType is accessToken, we handle returning the token later on.
+      if (this.connection.authType !== AuthType.AccessToken) {
         return accessToken.accessToken;
       }
-      else {
-        if (debug) {
-          if (!accessToken) {
-            await logger.logToStderr(`No token found for resource ${resource}.`);
-          }
-          else {
-            await logger.logToStderr(`Access token expired. Token: ${accessToken.accessToken}, ExpiresAt: ${accessToken.expiresOn}`);
-          }
+    }
+    else {
+      if (debug) {
+        if (!accessToken) {
+          await logger.logToStderr(`No token found for resource ${resource}.`);
+        }
+        else {
+          await logger.logToStderr(`Access token expired. Token: ${accessToken.accessToken}, ExpiresAt: ${accessToken.expiresOn}`);
         }
       }
+    }
 
-      // When using an application identity, you can't retrieve the access token silently, because there is
-      // no account. Also (for cert auth) clientApplication is instantiated later
-      // after inspecting the specified cert and calculating thumbprint if one
-      // wasn't specified
-      if (this.connection.authType !== AuthType.Certificate &&
-        this.connection.authType !== AuthType.Secret &&
-        this.connection.authType !== AuthType.Identity) {
-        this.clientApplication = await this.getPublicClient(logger, debug);
-        if (this.clientApplication) {
-          const accounts = await this.clientApplication.getTokenCache().getAllAccounts();
-          // if there is an account in the cache and it's active, we can try to get the token silently
-          if (accounts.filter(a => a.localAccountId === this.connection.identityId).length > 0 && this.connection.active === true) {
-            getTokenPromise = this.ensureAccessTokenSilent.bind(this);
-          }
+    let getTokenPromise: ((resource: string, logger: Logger, debug: boolean, fetchNew: boolean) => Promise<AccessToken | null>) | undefined;
+
+    // When using an application identity, you can't retrieve the access token silently, because there is
+    // no account. Also (for cert auth) clientApplication is instantiated later
+    // after inspecting the specified cert and calculating thumbprint if one
+    // wasn't specified. For accessToken auth, we can't fetch a new token, 
+    // as the tokens are passed in through the login command.
+    if (this.connection.authType !== AuthType.Certificate &&
+      this.connection.authType !== AuthType.Secret &&
+      this.connection.authType !== AuthType.Identity &&
+      this.connection.authType !== AuthType.AccessToken) {
+      this.clientApplication = await this.getPublicClient(logger, debug);
+      if (this.clientApplication) {
+        const accounts = await this.clientApplication.getTokenCache().getAllAccounts();
+        // if there is an account in the cache and it's active, we can try to get the token silently
+        if (accounts.filter(a => a.localAccountId === this.connection.identityId).length > 0 && this.connection.active === true) {
+          getTokenPromise = this.ensureAccessTokenSilent.bind(this);
         }
       }
     }
@@ -262,7 +265,7 @@ export class Auth {
           getTokenPromise = this.ensureAccessTokenWithSecret.bind(this);
           break;
         case AuthType.AccessToken:
-          getTokenPromise = this.ensureAccessTokenWithAccessToken.bind(this);
+          getTokenPromise = this.returnValidAccessTokenForResource.bind(this);
           break;
       }
     }
@@ -432,13 +435,13 @@ export class Auth {
     }
 
     // Asserting identityId because it is expected to be available at this point.
-    assert(this.connection.identityId !== undefined, "identityId is undefined");
+    assert(this.connection.identityId !== undefined, 'identityId is undefined');
 
     const account = await (this.clientApplication as Msal.ClientApplication)
       .getTokenCache().getAccountByLocalId(this.connection.identityId);
 
     // Asserting account because it is expected to be available at this point.
-    assert(account !== null, "account is null");
+    assert(account !== null, 'account is null');
 
     return (this.clientApplication as Msal.ClientApplication).acquireTokenSilent({
       account: account,
@@ -519,7 +522,7 @@ export class Auth {
         const pemObjs = pem.decode(cert);
 
         if (this.connection.thumbprint === undefined) {
-          const pemCertObj = pemObjs.find(pem => pem.type === "CERTIFICATE");
+          const pemCertObj = pemObjs.find(pem => pem.type === 'CERTIFICATE');
           const pemCertStr: string = pem.encode(pemCertObj!);
           const pemCert = pki.certificateFromPem(pemCertStr);
 
@@ -669,11 +672,11 @@ export class Auth {
       let isNotFoundResponse = false;
       if (e.error && e.error.Message) {
         // check if it is Azure Function api 'not found' response
-        isNotFoundResponse = (e.error.Message.indexOf("No Managed Identity found") !== -1);
+        isNotFoundResponse = (e.error.Message.indexOf('No Managed Identity found') !== -1);
       }
       else if (e.error && e.error.error_description) {
         // check if it is Azure VM api 'not found' response
-        isNotFoundResponse = (e.error.error_description === "Identity not found");
+        isNotFoundResponse = (e.error.error_description === 'Identity not found');
       }
 
       if (!isNotFoundResponse) {
@@ -718,7 +721,7 @@ export class Auth {
     });
   }
 
-  private async ensureAccessTokenWithAccessToken(resource: string, logger: Logger, debug: boolean): Promise<AccessToken | null> {
+  private async returnValidAccessTokenForResource(resource: string, logger: Logger, debug: boolean): Promise<AccessToken | null> {
     const accessToken: AccessToken | undefined = this.connection.accessTokens[resource];
 
     if (!accessToken) {
@@ -726,7 +729,7 @@ export class Auth {
     }
 
     if (this.accessTokenExpired(accessToken)) {
-      throw `Access token expired. Token: ${accessToken.accessToken}, ExpiresAt: ${accessToken.expiresOn}`;
+      throw `Access token for resource '${resource}' expired. ExpiresAt: ${accessToken.expiresOn}`;
     }
 
     if (debug) {
@@ -908,8 +911,8 @@ export class Auth {
 
   public getConnectionDetails(connection: Connection): ConnectionDetails {
     // Asserting name and identityId because they are optional, but required at this point.    
-    assert(connection.identityName !== undefined, "identity name is undefined");
-    assert(connection.name !== undefined, "connection name is undefined");
+    assert(connection.identityName !== undefined, 'identity name is undefined');
+    assert(connection.name !== undefined, 'connection name is undefined');
 
     const details: ConnectionDetails = {
       connectionName: connection.name,

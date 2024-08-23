@@ -126,7 +126,7 @@ class VivaEngageCommunityAddCommand extends GraphCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const { displayName, description, privacy, adminEntraIds, adminEntraUserNames, wait } = args.options;
 
-    const isAppOnlyAccessToken = accessToken.isAppOnlyAccessToken(auth.connection.accessTokens[auth.defaultResource].accessToken);
+    const isAppOnlyAccessToken = accessToken.isAppOnlyAccessToken(auth.connection.accessTokens[Object.keys(auth.connection.accessTokens)[0]].accessToken);
     if (isAppOnlyAccessToken && !adminEntraIds && !adminEntraUserNames) {
       this.handleError(`Specify at least one admin using either adminEntraIds or adminEntraUserNames options when using application permissions.`);
     }
