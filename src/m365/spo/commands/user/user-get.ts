@@ -56,6 +56,7 @@ class SpoUserGetCommand extends SpoCommand {
     this.#initOptions();
     this.#initValidators();
     this.#initOptionSets();
+    this.#initTypes();
   }
 
   #initTelemetry(): void {
@@ -97,6 +98,16 @@ class SpoUserGetCommand extends SpoCommand {
     );
   }
 
+  #initTypes(): void {
+    this.types.string.push('webUrl');
+    this.types.string.push('id');
+    this.types.string.push('email');
+    this.types.string.push('loginName');
+    this.types.string.push('userName');
+    this.types.string.push('entraGroupId');
+    this.types.string.push('entraGroupName');
+  }
+
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
@@ -106,7 +117,7 @@ class SpoUserGetCommand extends SpoCommand {
         }
 
         if (args.options.entraGroupId && !validation.isValidGuid(args.options.entraGroupId)) {
-          return `${args.options.entraId} is not a valid GUID.`;
+          return `${args.options.entraGroupId} is not a valid GUID.`;
         }
 
         if (args.options.userName && !validation.isValidUserPrincipalName(args.options.userName)) {
@@ -125,7 +136,7 @@ class SpoUserGetCommand extends SpoCommand {
   #initOptionSets(): void {
     this.optionSets.push({
       options: ['id', 'email', 'loginName', 'userName', 'entraGroupId', 'entraGroupName'],
-      runsWhen: (args) => args.options.id || args.options.loginName || args.options.email
+      runsWhen: (args) => args.options.id || args.options.email || args.options.loginName || args.options.userName || args.options.entraGroupId || args.options.entraGroupName
     });
   }
 
@@ -146,16 +157,11 @@ class SpoUserGetCommand extends SpoCommand {
       requestUrl = `${args.options.webUrl}/_api/web/siteusers/GetByLoginName('${formatting.encodeQueryParameter(args.options.loginName)}')`;
     }
     else if (args.options.userName) {
-      const user = await this.getUser(args.options);
-
-      if (!user) {
-        throw `User not found: ${args.options.userName}`;
-      }
-
+      const user = await this.getUser(args.options.webUrl, args.options.userName);
       requestUrl = `${args.options.webUrl}/_api/web/siteusers/GetById('${formatting.encodeQueryParameter(user.Id.toString())}')`;
     }
     else if (args.options.entraGroupId || args.options.entraGroupName) {
-      const entraGroup = await this.getEntraGroup(args.options);
+      const entraGroup = await this.getEntraGroup(args.options.entraGroupId!, args.options.entraGroupName!);
 
       // For entra groups, M365 groups have an associated email and security groups don't
       if (entraGroup?.mail) {
@@ -187,8 +193,8 @@ class SpoUserGetCommand extends SpoCommand {
     }
   }
 
-  private async getUser(options: GlobalOptions): Promise<any> {
-    const requestUrl: string = `${options.webUrl}/_api/web/siteusers?$filter=UserPrincipalName eq ('${formatting.encodeQueryParameter(options.userName)}')`;
+  private async getUser(webUrl: string, userName: string): Promise<SpoUser> {
+    const requestUrl: string = `${webUrl}/_api/web/siteusers?$filter=UserPrincipalName eq ('${formatting.encodeQueryParameter(userName)}')`;
     const requestOptions: CliRequestOptions = {
       url: requestUrl,
       headers: {
@@ -198,13 +204,23 @@ class SpoUserGetCommand extends SpoCommand {
     };
 
     const userInstance = await request.get(requestOptions);
-    return (userInstance as {
+    const userInstanceValue = (userInstance as {
       value: SpoUser[];
     }).value[0];
+
+    if (!userInstanceValue) {
+      throw `User not found: ${userName}`;
+    }
+
+    return userInstanceValue;
   }
 
-  private async getEntraGroup(options: GlobalOptions): Promise<Group> {
-    return options.entraGroupId ? await entraGroup.getGroupById(options.entraGroupId) : await entraGroup.getGroupByDisplayName(options.entraGroupName);
+  private async getEntraGroup(entraGroupId: string, entraGroupName: string): Promise<Group> {
+    if (entraGroupId) {
+      return await entraGroup.getGroupById(entraGroupId);
+    }
+
+    return await entraGroup.getGroupByDisplayName(entraGroupName);
   }
 }
 
