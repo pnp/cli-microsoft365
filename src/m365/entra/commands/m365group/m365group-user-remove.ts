@@ -144,8 +144,8 @@ class EntraM365GroupUserRemoveCommand extends GraphCommand {
 
     let groupId = args.options.groupId;
 
-    if (args.options.groupDisplayName) {
-      groupId = await entraGroup.getGroupIdByDisplayName(args.options.groupDisplayName);
+    if (args.options.groupName) {
+      groupId = await entraGroup.getGroupIdByDisplayName(args.options.groupName);
     }
     else if (args.options.teamId) {
       groupId = args.options.teamId;

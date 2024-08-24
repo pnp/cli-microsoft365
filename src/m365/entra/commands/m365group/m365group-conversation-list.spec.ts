@@ -121,7 +121,7 @@ describe(commands.M365GROUP_CONVERSATION_LIST, () => {
     ));
   });
 
-  it('Retrieve conversations for the group specified by groupDisplayName in the tenant (verbose)', async () => {
+  it('Retrieve conversations for the group specified by groupName in the tenant (verbose)', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/conversations`) {
         return jsonOutput;
@@ -131,7 +131,7 @@ describe(commands.M365GROUP_CONVERSATION_LIST, () => {
 
     await command.action(logger, {
       options: {
-        verbose: true, groupDisplayName: "Finance"
+        verbose: true, groupName: "Finance"
       }
     });
     assert(loggerLogSpy.calledWith(

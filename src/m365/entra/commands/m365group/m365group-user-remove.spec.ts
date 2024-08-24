@@ -218,7 +218,7 @@ describe(commands.M365GROUP_USER_REMOVE, () => {
     assert(memberDeleteCallIssued);
   });
 
-  it('removes the specified owner from owners and members endpoint of the Microsoft 365 Group specified by groupDisplayName with accepted prompt', async () => {
+  it('removes the specified owner from owners and members endpoint of the Microsoft 365 Group specified by groupName with accepted prompt', async () => {
     let memberDeleteCallIssued = false;
 
     sinon.stub(request, 'get').callsFake(async (opts) => {
@@ -263,7 +263,7 @@ describe(commands.M365GROUP_USER_REMOVE, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
-    await command.action(logger, { options: { groupDisplayName: "Finance", userName: "anne.matthews@contoso.onmicrosoft.com" } });
+    await command.action(logger, { options: { groupName: "Finance", userName: "anne.matthews@contoso.onmicrosoft.com" } });
     assert(memberDeleteCallIssued);
   });
 

@@ -16,10 +16,10 @@ m365 entra m365group conversation list [options]
 
 ```md definition-list
 `-i, --groupId [groupId]`
-: The ID of the Microsoft 365 Group. Specify either `groupId` or `groupDisplayName`, but not both.
+: The ID of the Microsoft 365 Group. Specify either `groupId` or `groupName`, but not both.
 
-`-n, --groupDisplayName [groupDisplayName]`
-: Display name of the Microsoft 365 Group. Specify either `groupId` or `groupDisplayName`, but not both.
+`-n, --groupName [groupName]`
+: Display name of the Microsoft 365 Group. Specify either `groupId` or `groupName`, but not both.
 ```
 
 <Global />
@@ -35,7 +35,7 @@ m365 entra m365group conversation list --groupId '00000000-0000-0000-0000-000000
 Lists conversations for the Microsoft 365 group specified by displayName.
 
 ```sh
-m365 entra m365group conversation list --groupDisplayName Finance
+m365 entra m365group conversation list --groupName Finance
 ```
 
 ## Response
