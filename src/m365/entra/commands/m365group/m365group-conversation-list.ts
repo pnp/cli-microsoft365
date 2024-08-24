@@ -14,7 +14,7 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   groupId?: string;
-  groupDisplayName?: string;
+  groupName?: string;
 }
 
 class EntraM365GroupConversationListCommand extends GraphCommand {
@@ -49,7 +49,7 @@ class EntraM365GroupConversationListCommand extends GraphCommand {
         option: '-i, --groupId [groupId]'
       },
       {
-        option: '-n, --groupDisplayName [groupDisplayName]'
+        option: '-n, --groupName [groupName]'
       }
     );
   }
@@ -67,25 +67,25 @@ class EntraM365GroupConversationListCommand extends GraphCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push({ options: ['groupId', 'groupDisplayName'] });
+    this.optionSets.push({ options: ['groupId', 'groupName'] });
   }
 
   #initTypes(): void {
-    this.types.string.push('groupId', 'groupDisplayName');
+    this.types.string.push('groupId', 'groupName');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     await this.showDeprecationWarning(logger, aadCommands.M365GROUP_CONVERSATION_LIST, commands.M365GROUP_CONVERSATION_LIST);
 
     if (this.verbose) {
-      await logger.logToStderr(`Retrieving conversations for Microsoft 365 Group: ${args.options.groupId || args.options.groupDisplayName}...`);
+      await logger.logToStderr(`Retrieving conversations for Microsoft 365 Group: ${args.options.groupId || args.options.groupName}...`);
     }
 
     try {
       let groupId = args.options.groupId;
 
-      if (args.options.groupDisplayName) {
-        groupId = await entraGroup.getGroupIdByDisplayName(args.options.groupDisplayName);
+      if (args.options.groupName) {
+        groupId = await entraGroup.getGroupIdByDisplayName(args.options.groupName);
       }
 
       const isUnifiedGroup = await entraGroup.isUnifiedGroup(groupId!);

@@ -22,10 +22,10 @@ m365 aad m365group conversation post list [options]
 
 ```md definition-list
 `-i, --groupId [groupId]`
-: The Id of the Microsoft 365 Group. You can specify the groupId or groupDisplayName, but not both.
+: The Id of the Microsoft 365 Group. You can specify the groupId or groupName, but not both.
 
-`-d, --groupDisplayName [groupDisplayName]`
-: The Displayname of the Microsoft 365 Group. You can specify the groupId or groupDisplayName, but not both.
+`-d, --groupName [groupName]`
+: The Displayname of the Microsoft 365 Group. You can specify the groupId or groupName, but not both.
 
 `-t, --threadId <threadId>`
 : The ID of the thread to retrieve details for
@@ -41,10 +41,10 @@ Lists the posts of the specific conversation of Microsoft 365 group by groupId
 m365 entra m365group conversation post list --groupId '00000000-0000-0000-0000-000000000000' --threadId 'AAQkADkwN2Q2NDg1LWQ3ZGYtNDViZi1iNGRiLTVhYjJmN2Q5NDkxZQAQAOnRAfDf71lIvrdK85FAn5E='
 ```
 
-Lists the posts of the specific conversation of Microsoft 365 group by groupDisplayName
+Lists the posts of the specific conversation of Microsoft 365 group by groupName
 
 ```sh
-m365 entra m365group conversation post list --groupDisplayName 'MyGroup' --threadId 'AAQkADkwN2Q2NDg1LWQ3ZGYtNDViZi1iNGRiLTVhYjJmN2Q5NDkxZQAQAOnRAfDf71lIvrdK85FAn5E='
+m365 entra m365group conversation post list --groupName 'MyGroup' --threadId 'AAQkADkwN2Q2NDg1LWQ3ZGYtNDViZi1iNGRiLTVhYjJmN2Q5NDkxZQAQAOnRAfDf71lIvrdK85FAn5E='
 ```
 
 ## Response

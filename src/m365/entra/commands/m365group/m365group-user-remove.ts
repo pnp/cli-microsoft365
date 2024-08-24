@@ -21,7 +21,7 @@ interface UserResponse {
 interface Options extends GlobalOptions {
   teamId?: string;
   groupId?: string;
-  groupDisplayName?: string;
+  groupName?: string;
   userName: string;
   force?: boolean;
 }
@@ -55,7 +55,7 @@ class EntraM365GroupUserRemoveCommand extends GraphCommand {
         force: (!(!args.options.force)).toString(),
         teamId: typeof args.options.teamId !== 'undefined',
         groupId: typeof args.options.groupId !== 'undefined',
-        groupDisplayName: typeof args.options.groupDisplayName !== 'undefined'
+        groupName: typeof args.options.groupName !== 'undefined'
       });
     });
   }
@@ -66,7 +66,7 @@ class EntraM365GroupUserRemoveCommand extends GraphCommand {
         option: "-i, --groupId [groupId]"
       },
       {
-        option: "--groupDisplayName [groupDisplayName]"
+        option: "--groupName [groupName]"
       },
       {
         option: "--teamId [teamId]"
@@ -97,24 +97,24 @@ class EntraM365GroupUserRemoveCommand extends GraphCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push({ options: ['groupId', 'groupDisplayName', 'teamId'] });
+    this.optionSets.push({ options: ['groupId', 'groupName', 'teamId'] });
   }
 
   #initTypes(): void {
-    this.types.string.push('groupId', 'groupDisplayName', 'teamId');
+    this.types.string.push('groupId', 'groupName', 'teamId');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     await this.showDeprecationWarning(logger, aadCommands.M365GROUP_USER_REMOVE, commands.M365GROUP_USER_REMOVE);
 
     if (this.verbose) {
-      await logger.logToStderr(`Removing user ${args.options.userName} for Microsoft 365 Group: ${args.options.groupId || args.options.groupDisplayName || args.options.teamId}...`);
+      await logger.logToStderr(`Removing user ${args.options.userName} for Microsoft 365 Group: ${args.options.groupId || args.options.groupName || args.options.teamId}...`);
     }
 
     let groupId = args.options.groupId;
 
-    if (args.options.groupDisplayName) {
-      groupId = await entraGroup.getGroupIdByDisplayName(args.options.groupDisplayName);
+    if (args.options.groupName) {
+      groupId = await entraGroup.getGroupIdByDisplayName(args.options.groupName);
     }
     else if (args.options.teamId) {
       groupId = args.options.teamId;

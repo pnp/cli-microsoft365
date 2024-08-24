@@ -21,7 +21,7 @@ m365 aad m365group recyclebinitem list [options]
 ## Options
 
 ```md definition-list
-`-d, --groupDisplayName [groupDisplayName]`
+`-d, --groupName [groupName]`
 : Lists groups with DisplayName starting with the specified value
 
 `-m, --groupMailNickname [groupMailNickname]`
@@ -41,7 +41,7 @@ m365 entra m365group recyclebinitem list
 List deleted Microsoft 365 Groups with display name starting with _Project_
 
 ```sh
-m365 entra m365group recyclebinitem list --groupDisplayName Project
+m365 entra m365group recyclebinitem list --groupName Project
 ```
 
 List deleted Microsoft 365 Groups mail nick name starting with _team_
@@ -53,7 +53,7 @@ m365 entra m365group recyclebinitem list --groupMailNickname team
 List deleted Microsoft 365 Groups mail nick name starting with _team_ and with display name starting with _Project_
 
 ```sh
-m365 entra m365group recyclebinitem list --groupMailNickname team --groupDisplayName Project
+m365 entra m365group recyclebinitem list --groupMailNickname team --groupName Project
 ```
 
 ## Response
