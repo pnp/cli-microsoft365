@@ -6,21 +6,23 @@ sidebar_position: 3
 
 ## v10.0.0 (beta)
 
-### Changes
+### ⚠️ Breaking changes
 
-- updated option names of 'app permission add' to plural [#5719](https://github.com/pnp/cli-microsoft365/issues/5975)
-- removed deprecated Guest value from 'aad m365group user list' command [#5558](https://github.com/pnp/cli-microsoft365/issues/5558)
-- added `--force` option to 'spo site appcatalog remove' command [#6091](https://github.com/pnp/cli-microsoft365/issues/6091)
+- updated option names of [app permission add](../cmd/app/permission/permission-add.mdx) to plural [#5719](https://github.com/pnp/cli-microsoft365/issues/5975)
+- removed deprecated guest filtering for [entra m365group user list](../cmd/entra/m365group/m365group-user-list.mdx) command [#5558](https://github.com/pnp/cli-microsoft365/issues/5558)
+- added `--force` option to [spo site appcatalog remove](../cmd/spo/site/site-appcatalog-remove.mdx) command [#6091](https://github.com/pnp/cli-microsoft365/issues/6091)
 - aligned options with naming convention [#5616](https://github.com/pnp/cli-microsoft365/issues/5616)
-- removed duplicate property from 'spo list list' command [#6042](https://github.com/pnp/cli-microsoft365/issues/6042)
-- updated 'spo tenant recyclebinitem restore' command [#6063](https://github.com/pnp/cli-microsoft365/issues/6063)
-- removed deprecated option '--wait' from 'spo site remove' command [#5956](https://github.com/pnp/cli-microsoft365/issues/5956)
-- reworked command 'spo file copy' to new API endpoint [#6152](https://github.com/pnp/cli-microsoft365/issues/6152)
+- removed duplicate property from [spo list list](../cmd/spo/list/list-list.mdx) command [#6042](https://github.com/pnp/cli-microsoft365/issues/6042)
+- updated [spo tenant recyclebinitem restore](../cmd/spo/tenant/tenant-recyclebinitem-restore.mdx) command output [#6063](https://github.com/pnp/cli-microsoft365/issues/6063)
+- removed deprecated option `wait` from [spo site remove](../cmd/spo/site/site-remove.mdx) command [#5956](https://github.com/pnp/cli-microsoft365/issues/5956)
+- reworked command [spo file copy](../cmd/spo/file/file-copy.mdx) to new API endpoint [#6152](https://github.com/pnp/cli-microsoft365/issues/6152)
 - removed deprecated CLI environment variables [#5918](https://github.com/pnp/cli-microsoft365/issues/5918)
-- updated options of 'entra enterpriseapp' commands [#6155](https://github.com/pnp/cli-microsoft365/issues/6155)
-- removed 'overwrite' option from 'spfx project github workflow add' command [#5765](https://github.com/pnp/cli-microsoft365/issues/5765)
-- updated 'm365 status' command output [#5849](https://github.com/pnp/cli-microsoft365/issues/5849)
-- removed 'spo folder rename' alias [#5911](https://github.com/pnp/cli-microsoft365/issues/5911)
+- updated options of `entra enterpriseapp` commands [#6155](https://github.com/pnp/cli-microsoft365/issues/6155)
+- removed `overwrite` option from [spfx project github workflow add](../cmd/spfx/project/project-github-workflow-add.mdx) command [#5765](https://github.com/pnp/cli-microsoft365/issues/5765)
+- updated [status](../cmd/status.mdx) command output [#5849](https://github.com/pnp/cli-microsoft365/issues/5849)
+- removed [spo folder rename](../cmd/spo/folder/folder-set.mdx) alias [#5911](https://github.com/pnp/cli-microsoft365/issues/5911)
+- removed stringified property from [spo applicationcustomizer get](../cmd/spo/applicationcustomizer/applicationcustomizer-get.mdx) command [#6052](https://github.com/pnp/cli-microsoft365/issues/6052)
+- removed all `yammer` command aliases [#5764](https://github.com/pnp/cli-microsoft365/issues/5764)
 
 ## [v9.0.0](https://github.com/pnp/cli-microsoft365/releases/tag/v9.0.0)
 
