@@ -5,8 +5,6 @@ import { entraGroup } from '../../../../utils/entraGroup.js';
 import { validation } from '../../../../utils/validation.js';
 import { formatting } from '../../../../utils/formatting.js';
 import GraphCommand from '../../../base/GraphCommand.js';
-import teamsCommands from '../../../teams/commands.js';
-import aadCommands from '../../aadCommands.js';
 import { entraUser } from '../../../../utils/entraUser.js';
 import commands from '../../commands.js';
 
@@ -130,7 +128,13 @@ class EntraM365GroupUserAddCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+<<<<<<< HEAD
     await this.showDeprecationWarning(logger, aadCommands.M365GROUP_USER_ADD, commands.M365GROUP_USER_ADD);
+=======
+    if (args.options.userName) {
+      await this.warn(logger, `Option 'userName' is deprecated. Please use 'ids' or 'userNames' instead.`);
+    }
+>>>>>>> 8835d6d1c... build fix
 
     try {
       const providedGroupId: string = await this.getGroupId(logger, args);
