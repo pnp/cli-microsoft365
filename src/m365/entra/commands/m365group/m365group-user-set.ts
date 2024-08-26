@@ -13,7 +13,6 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  userName?: string;
   ids?: string;
   userNames?: string;
   groupId?: string;
@@ -59,9 +58,6 @@ class EntraM365GroupUserSetCommand extends GraphCommand {
 
   #initOptions(): void {
     this.options.unshift(
-      {
-        option: '-n, --userName [userName]'
-      },
       {
         option: '--ids [ids]'
       },
@@ -123,20 +119,15 @@ class EntraM365GroupUserSetCommand extends GraphCommand {
 
   #initOptionSets(): void {
     this.optionSets.push({ options: ['groupId', 'groupName', 'teamId', 'teamName'] });
-    this.optionSets.push({ options: ['userName', 'ids', 'userNames'] });
+    this.optionSets.push({ options: ['ids', 'userNames'] });
   }
 
   #initTypes(): void {
-    this.types.string.push('userName', 'ids', 'userNames', 'groupId', 'groupName', 'teamId', 'teamName', 'role');
+    this.types.string.push('ids', 'userNames', 'groupId', 'groupName', 'teamId', 'teamName', 'role');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    if (args.options.userName) {
-      await this.warn(logger, `Option 'userName' is deprecated. Please use 'ids' or 'userNames' instead.`);
-    }
-
     try {
-      const userNames = args.options.userNames || args.options.userName;
       const groupId: string = await this.getGroupId(logger, args);
       const isUnifiedGroup = await entraGroup.isUnifiedGroup(groupId);
 
@@ -144,7 +135,7 @@ class EntraM365GroupUserSetCommand extends GraphCommand {
         throw Error(`Specified group with id '${groupId}' is not a Microsoft 365 group.`);
       }
 
-      const userIds: string[] = await this.getUserIds(logger, args.options.ids, userNames);
+      const userIds: string[] = await this.getUserIds(logger, args.options.ids, args.options.userNames);
 
       // we can't simply switch the role
       // first add users to the new role
