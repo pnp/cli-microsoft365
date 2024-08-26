@@ -15,7 +15,6 @@ import command from './m365group-user-add.js';
 import { settingsNames } from '../../../../settingsNames.js';
 import { entraGroup } from '../../../../utils/entraGroup.js';
 import { entraUser } from '../../../../utils/entraUser.js';
-import aadCommands from '../../aadCommands.js';
 
 describe(commands.M365GROUP_USER_ADD, () => {
   const groupId = '3f04e370-cbc6-4091-80fe-1d038be2ad06';

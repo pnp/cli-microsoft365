@@ -7,7 +7,6 @@ import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 import { entraGroup } from '../../../../utils/entraGroup.js';
 import { entraUser } from '../../../../utils/entraUser.js';
-import aadCommands from '../../aadCommands.js';
 
 interface CommandArgs {
   options: Options;
@@ -132,8 +131,6 @@ class EntraM365GroupUserSetCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    await this.showDeprecationWarning(logger, aadCommands.M365GROUP_USER_SET, commands.M365GROUP_USER_SET);
-
     if (args.options.userName) {
       await this.warn(logger, `Option 'userName' is deprecated. Please use 'ids' or 'userNames' instead.`);
     }
