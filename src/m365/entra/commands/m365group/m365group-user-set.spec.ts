@@ -518,7 +518,7 @@ describe(commands.M365GROUP_USER_SET, () => {
     sinonUtil.restore(entraGroup.isUnifiedGroup);
     sinon.stub(entraGroup, 'isUnifiedGroup').resolves(false);
 
-    await assert.rejects(command.action(logger, { options: { groupId: groupId, userName: 'anne.matthews@contoso.onmicrosoft.com' } } as any),
+    await assert.rejects(command.action(logger, { options: { groupId: groupId, userNames: userUpns.join(',') } } as any),
       new CommandError(`Specified group with id '${groupId}' is not a Microsoft 365 group.`));
   });
 });
