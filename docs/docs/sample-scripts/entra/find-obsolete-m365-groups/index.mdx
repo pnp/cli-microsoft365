@@ -11,7 +11,7 @@ tags:
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-# Finding Obsolete Microsoft 365 Groups with PowerShell
+# Finding obsolete Microsoft 365 groups with PowerShell
 
 Author: [Tobias Maestrini](https://github.com/tmaestrini)
 
@@ -19,10 +19,10 @@ This script is based on the [original article](https://petri.com/identifying-obs
 
 Like any resource within your Microsoft 365 tenant, M365 Groups can become unused over time.
 
-This routine uses PowerShell with `m365 cli` commands 
-- to gather insights about SharePoint file activity within the related SharePoint site,
-- to do a check against conversation items in the group mailbox,
-- to denote the amount of active people (group owners, members and guests) in the group.
+This routine uses PowerShell with CLI for Microsoft 365
+- To gather insights about SharePoint file activity within the related SharePoint site.
+- To do a check against conversation items in the group mailbox.
+- To denote the amount of active people (group owners, members and guests) in the group.
 
 These metrics can help us understand the extent to which the resource is being used from a governance perspective – or even not.
 Use this script to create a report of all M365 groups that are possibly obsolete.
@@ -78,7 +78,7 @@ Use this script to create a report of all M365 groups that are possibly obsolete
     $Global:ObsoleteGroups = [System.Collections.Generic.Dictionary[string, GroupInfo]]::new()
 
     Write-Output "Connecting to M365 tenant: please follow the instructions."
-    Write-output "IMPORTANT: You'll need to have global admin permissions!`n"
+    Write-output "IMPORTANT: You'll need to have at least global reader permissions!`n"
     if ((m365 status --output text) -eq "Logged out") {
       m365 login
     }
@@ -95,7 +95,7 @@ Use this script to create a report of all M365 groups that are possibly obsolete
     }
     
     $TestPath = Test-Path -Path  $Script:Path
-    $tStamp = (Get-Date).ToString("yyyyMMddHHmmss")
+    $tStamp = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss")
     if ($TestPath -ne $true) {
       New-Item -ItemType directory -Path $Script:Path | Out-Null
       Write-Host "Will create file in $($Script:Path): M365GroupsReport-{current date}.csv" -ForegroundColor Yellow
@@ -114,7 +114,7 @@ Use this script to create a report of all M365 groups that are possibly obsolete
   }
 
   function Start-GroupInsightsTests {
-    Write-Host "Checking your $($Script:Groups.Count) groups for activity"
+    Write-Host "Checking $($Script:Groups.Count) groups for activity"
 
     $Script:Groups | ForEach-Object {
       $groupInfo = [GroupInfo]::new()
@@ -148,10 +148,16 @@ Use this script to create a report of all M365 groups that are possibly obsolete
       [Parameter(Mandatory = $true)] [GroupInfo] $Group
     )
 
+    # Original lists
     $users = m365 entra m365group user list --groupId $Group.Reference.id | ConvertFrom-Json
-    $owners = $users | Where-Object { $_.userType -eq "Owner" }
-    $members = $users | Where-Object { $_.userType -eq "Member" }
-    $guests = $users | Where-Object { $_.userType -eq "Guest" }
+    $owners = m365 entra m365group user list --groupId $Group.Reference.id --role Owner | ConvertFrom-Json
+    $members = m365 entra m365group user list --groupId $Group.Reference.id --role Member | ConvertFrom-Json
+    
+    # Consider guests as users that are not in the $members list
+    $guests = Compare-Object -ReferenceObject $users $members -PassThru
+
+    # Modify the $members list to only contain users that are not in the $owners list
+    $members = Compare-Object $members $owners -PassThru
 
     $Group.Membership = [ordered] @{
       Owners  = $owners
@@ -205,7 +211,6 @@ Use this script to create a report of all M365 groups that are possibly obsolete
     $WarningDate = (Get-Date).AddDays(-90)
     
     # Not possible to retrieve property 'LastContentModifiedDate' via command 'm365 spo site get --url $group.siteUrl', so we need to use filtering:
-    # $spoSite = m365 spo site get --url $group.siteUrl | ConvertFrom-Json
     $spoSite = m365 spo site list --filter "Url -eq '$($Group.Reference.siteUrl)'" | ConvertFrom-Json
     $spoSite.LastContentModifiedDate = Get-ParsedDate -JavascriptDateString $spoSite.LastContentModifiedDate
     if ($spoSite.LastContentModifiedDate -lt $WarningDate) {
