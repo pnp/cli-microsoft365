@@ -87,7 +87,7 @@ class OutlookMessageRemoveCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const isAppOnlyAccessToken: boolean | undefined = accessToken.isAppOnlyAccessToken(auth.connection.accessTokens[auth.defaultResource].accessToken);
+    const isAppOnlyAccessToken: boolean | undefined = accessToken.isAppOnlyAccessToken(auth.connection.accessTokens[Object.keys(auth.connection.accessTokens)[0]].accessToken);
     let principalUrl = '';
 
     if (isAppOnlyAccessToken) {

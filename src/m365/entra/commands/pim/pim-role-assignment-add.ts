@@ -188,7 +188,7 @@ class EntraPimRoleAssignmentAddCommand extends GraphCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const { userId, userName, groupId, groupName, startDateTime, endDateTime, ticketNumber, ticketSystem } = args.options;
     try {
-      const token = auth.connection.accessTokens[auth.defaultResource].accessToken;
+      const token = auth.connection.accessTokens[Object.keys(auth.connection.accessTokens)[0]].accessToken;
       const isAppOnlyAccessToken = accessToken.isAppOnlyAccessToken(token);
 
       if (isAppOnlyAccessToken) {
@@ -271,7 +271,7 @@ class EntraPimRoleAssignmentAddCommand extends GraphCommand {
       await logger.logToStderr(`Retrieving id of the current user`);
     }
 
-    const token = auth.connection.accessTokens[auth.defaultResource].accessToken;
+    const token = auth.connection.accessTokens[Object.keys(auth.connection.accessTokens)[0]].accessToken;
     return accessToken.getUserIdFromAccessToken(token);
   }
 

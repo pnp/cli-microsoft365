@@ -190,7 +190,7 @@ class PaAppPermissionRemoveCommand extends PowerAppsCommand {
       return userId;
     }
 
-    return `tenant-${accessToken.getTenantIdFromAccessToken(Auth.connection.accessTokens[Auth.defaultResource].accessToken)}`;
+    return `tenant-${accessToken.getTenantIdFromAccessToken(Auth.connection.accessTokens[Object.keys(Auth.connection.accessTokens)[0]].accessToken)}`;
   }
 }
 
