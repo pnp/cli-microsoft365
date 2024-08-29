@@ -3,6 +3,7 @@ import os from 'os';
 import auth, { AuthType } from '../../Auth.js';
 import { cli } from '../../cli/cli.js';
 import { Logger } from '../../cli/Logger.js';
+import config from '../../config.js';
 import GlobalOptions from '../../GlobalOptions.js';
 import { settingsNames } from '../../settingsNames.js';
 import { accessToken } from '../../utils/accessToken.js';
@@ -10,10 +11,10 @@ import { AppCreationOptions, AppInfo, entraApp } from '../../utils/entraApp.js';
 import { CheckStatus, formatting } from '../../utils/formatting.js';
 import { pid } from '../../utils/pid.js';
 import { ConfirmationConfig, SelectionConfig } from '../../utils/prompt.js';
+import { validation } from '../../utils/validation.js';
 import AnonymousCommand from '../base/AnonymousCommand.js';
 import commands from './commands.js';
 import { interactivePreset, powerShellPreset, scriptingPreset } from './setupPresets.js';
-import { validation } from '../../utils/validation.js';
 
 export interface Preferences {
   clientId?: string;
@@ -65,65 +66,6 @@ export enum HelpMode {
   Full = 'full',
   Options = 'options'
 }
-
-const minimalScopes = [
-  'https://graph.microsoft.com/User.Read'
-];
-const allScopes = [
-  'https://graph.windows.net/Directory.AccessAsUser.All',
-  'https://management.azure.com/user_impersonation',
-  'https://admin.services.crm.dynamics.com/user_impersonation',
-  'https://graph.microsoft.com/AppCatalog.ReadWrite.All',
-  'https://graph.microsoft.com/AuditLog.Read.All',
-  'https://graph.microsoft.com/Bookings.Read.All',
-  'https://graph.microsoft.com/Calendars.Read',
-  'https://graph.microsoft.com/ChannelMember.ReadWrite.All',
-  'https://graph.microsoft.com/ChannelMessage.Read.All',
-  'https://graph.microsoft.com/ChannelMessage.ReadWrite',
-  'https://graph.microsoft.com/ChannelMessage.Send',
-  'https://graph.microsoft.com/ChannelSettings.ReadWrite.All',
-  'https://graph.microsoft.com/Chat.ReadWrite',
-  'https://graph.microsoft.com/Directory.AccessAsUser.All',
-  'https://graph.microsoft.com/Directory.ReadWrite.All',
-  'https://graph.microsoft.com/ExternalConnection.ReadWrite.All',
-  'https://graph.microsoft.com/ExternalItem.ReadWrite.All',
-  'https://graph.microsoft.com/Group.ReadWrite.All',
-  'https://graph.microsoft.com/IdentityProvider.ReadWrite.All',
-  'https://graph.microsoft.com/InformationProtectionPolicy.Read',
-  'https://graph.microsoft.com/Mail.Read.Shared',
-  'https://graph.microsoft.com/Mail.ReadWrite',
-  'https://graph.microsoft.com/Mail.Send',
-  'https://graph.microsoft.com/Notes.ReadWrite.All',
-  'https://graph.microsoft.com/OnlineMeetingArtifact.Read.All',
-  'https://graph.microsoft.com/OnlineMeetings.ReadWrite',
-  'https://graph.microsoft.com/OnlineMeetingTranscript.Read.All',
-  'https://graph.microsoft.com/PeopleSettings.ReadWrite.All',
-  'https://graph.microsoft.com/Place.Read.All',
-  'https://graph.microsoft.com/Policy.Read.All',
-  'https://graph.microsoft.com/RecordsManagement.ReadWrite.All',
-  'https://graph.microsoft.com/Reports.Read.All',
-  'https://graph.microsoft.com/RoleAssignmentSchedule.ReadWrite.Directory',
-  'https://graph.microsoft.com/RoleEligibilitySchedule.Read.Directory',
-  'https://graph.microsoft.com/SecurityEvents.Read.All',
-  'https://graph.microsoft.com/ServiceHealth.Read.All',
-  'https://graph.microsoft.com/ServiceMessage.Read.All',
-  'https://graph.microsoft.com/ServiceMessageViewpoint.Write',
-  'https://graph.microsoft.com/Sites.Read.All',
-  'https://graph.microsoft.com/Tasks.ReadWrite',
-  'https://graph.microsoft.com/Team.Create',
-  'https://graph.microsoft.com/TeamMember.ReadWrite.All',
-  'https://graph.microsoft.com/TeamsAppInstallation.ReadWriteForUser',
-  'https://graph.microsoft.com/TeamSettings.ReadWrite.All',
-  'https://graph.microsoft.com/TeamsTab.ReadWrite.All',
-  'https://graph.microsoft.com/User.Invite.All',
-  'https://manage.office.com/ActivityFeed.Read',
-  'https://manage.office.com/ServiceHealth.Read',
-  'https://analysis.windows.net/powerbi/api/Dataset.Read.All',
-  'https://api.powerapps.com//User',
-  'https://microsoft.sharepoint-df.com/AllSites.FullControl',
-  'https://microsoft.sharepoint-df.com/TermStore.ReadWrite.All',
-  'https://microsoft.sharepoint-df.com/User.ReadWrite.All'
-];
 
 export type SettingNames = {
   [key in keyof typeof settingsNames]?: string | boolean;
@@ -341,7 +283,7 @@ class SetupCommand extends AnonymousCommand {
       message: 'CLI for Microsoft 365 will now sign in to your Microsoft 365 tenant as Microsoft Azure CLI to create a new app registration. Continue?',
       default: false
     })) {
-      throw new Error();
+      throw 'Cancelled';
     }
 
     // setup auth
@@ -354,7 +296,7 @@ class SetupCommand extends AnonymousCommand {
 
     const options: AppCreationOptions = {
       allowPublicClientFlows: true,
-      apisDelegated: (preferences.newEntraAppScopes === NewEntraAppScopes.All ? allScopes : minimalScopes).join(','),
+      apisDelegated: (preferences.newEntraAppScopes === NewEntraAppScopes.All ? config.allScopes : config.minimalScopes).join(','),
       implicitFlow: false,
       multitenant: false,
       name: 'CLI for Microsoft 365',
