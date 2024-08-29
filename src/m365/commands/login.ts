@@ -51,19 +51,24 @@ class LoginCommand extends Command {
   public getRefinedSchema(schema: typeof options): z.ZodEffects<any> | undefined {
     return schema
       .refine(options => options.authType !== 'password' || options.userName, {
-        message: 'Username is required when using password authentication'
+        message: 'Username is required when using password authentication',
+        path: ['userName']
       })
       .refine(options => options.authType !== 'password' || options.password, {
-        message: 'Password is required when using password authentication'
+        message: 'Password is required when using password authentication',
+        path: ['password']
       })
       .refine(options => options.authType !== 'certificate' || !(options.certificateFile && options.certificateBase64Encoded), {
-        message: 'Specify either certificateFile or certificateBase64Encoded, but not both.'
+        message: 'Specify either certificateFile or certificateBase64Encoded, but not both.',
+        path: ['certificateBase64Encoded']
       })
       .refine(options => options.authType !== 'certificate' || options.certificateFile || options.certificateBase64Encoded, {
-        message: 'Specify either certificateFile or certificateBase64Encoded'
+        message: 'Specify either certificateFile or certificateBase64Encoded',
+        path: ['certificateFile']
       })
       .refine(options => options.authType !== 'secret' || options.secret, {
-        message: 'Secret is required when using secret authentication'
+        message: 'Secret is required when using secret authentication',
+        path: ['secret']
       });
   }
 

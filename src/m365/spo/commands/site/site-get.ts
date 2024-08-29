@@ -9,7 +9,9 @@ import commands from '../../commands.js';
 
 const options = globalOptionsZod
   .extend({
-    url: zod.alias('u', z.string())
+    url: zod.alias('u', z.string().refine(url => validation.isValidSharePointUrl(url) === true, {
+      message: 'Specify a valid SharePoint site URL'
+    }))
   })
   .strict();
 declare type Options = z.infer<typeof options>;
@@ -29,13 +31,6 @@ class SpoSiteGetCommand extends SpoCommand {
 
   public get schema(): z.ZodTypeAny | undefined {
     return options;
-  }
-
-  public getRefinedSchema(schema: typeof options): z.ZodEffects<any> | undefined {
-    return schema
-      .refine(options => validation.isValidSharePointUrl(options.url) === true, {
-        message: 'Specify a valid SharePoint site URL'
-      });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
