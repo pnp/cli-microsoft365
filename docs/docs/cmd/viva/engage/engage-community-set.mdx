@@ -1,0 +1,52 @@
+import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# viva engage community set
+
+Updates an existing Viva Engage community
+
+## Usage
+
+```sh
+m365 viva engage community set [options]
+```
+
+## Options
+
+```md definition-list
+`-i, --id [id]`
+: The id of the community. Specify either `id` or `displayName`, but not both.
+
+`-d, --displayName [displayName]`
+: The name of the community. Specify either `id` or `displayName`, but not both.
+
+`--newDisplayName [newDisplayName]`
+: New name for the community. The maximum length is 255 characters.
+
+`--description [description]`
+: The description of the community. The maximum length is 1024 characters.
+
+`--privacy [privacy]`
+: Defines the privacy level of the community. The possible values are: `public`, and `private`.
+```
+
+<Global />
+
+## Examples
+
+Update info about the community specified by id
+
+```sh
+m365 viva engage community set --id eyJfdHlwZSI6Ikdyb3VwIiwiaWQiOiI0NzY5MTM1ODIwOSJ9 --newDisplayName 'Developers' --description 'Community for all devs' --privacy public
+```
+
+Update info about the community specified by name
+
+```sh
+m365 viva engage community set --displayName 'Developrs' --newDisplayName 'Developers'
+```
+
+## Response
+
+The command won't return a response on success.
