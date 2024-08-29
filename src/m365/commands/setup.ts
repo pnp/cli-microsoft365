@@ -13,6 +13,7 @@ import { ConfirmationConfig, SelectionConfig } from '../../utils/prompt.js';
 import AnonymousCommand from '../base/AnonymousCommand.js';
 import commands from './commands.js';
 import { interactivePreset, powerShellPreset, scriptingPreset } from './setupPresets.js';
+import { validation } from '../../utils/validation.js';
 
 export interface Preferences {
   clientId?: string;
@@ -298,11 +299,13 @@ class SetupCommand extends AnonymousCommand {
     const clientId = await cli.promptForInput({
       message: 'Client ID:',
       /* c8 ignore next */
-      validate: value => value.length > 0
+      validate: value => validation.isValidGuid(value) ? true : 'The specified value is not a valid GUID'
     });
     const tenantId = await cli.promptForInput({
       message: 'Tenant ID (leave common if the app is multitenant):',
-      default: 'common'
+      default: 'common',
+      /* c8 ignore next */
+      validate: value => value === 'common' || validation.isValidGuid(value) ? true : `Tenant ID must be a valid GUID or 'common'`
     });
     const clientSecret = await cli.promptForInput({
       message: 'Client secret (leave empty if you use a certificate or a public client):'
@@ -313,7 +316,7 @@ class SetupCommand extends AnonymousCommand {
       });
       if (!clientCertificateFile) {
         clientCertificateBase64Encoded = await cli.promptForInput({
-          message: 'Base64-encoded certificate string:'
+          message: `Base64-encoded certificate string (leave empty if you don't connect using a certificate):`
         });
       }
       if (clientCertificateFile || clientCertificateBase64Encoded) {
@@ -341,8 +344,6 @@ class SetupCommand extends AnonymousCommand {
       throw new Error();
     }
 
-    // logout, just in case
-    await auth.clearConnectionInfo();
     // setup auth
     auth.connection.authType = AuthType.Browser;
     // Microsoft Azure CLI app ID
@@ -381,9 +382,6 @@ class SetupCommand extends AnonymousCommand {
       logger,
       debug: this.debug
     });
-
-    // logout
-    await auth.clearConnectionInfo();
 
     return appInfo;
   }
@@ -447,6 +445,23 @@ class SetupCommand extends AnonymousCommand {
         break;
       case CliExperience.Proficient:
         settings.helpMode = HelpMode.Options;
+        break;
+    }
+
+    switch (answers.entraApp) {
+      case EntraAppConfig.Create:
+        settings.authType = 'browser';
+        break;
+      case EntraAppConfig.UseExisting:
+        if (answers.clientSecret) {
+          settings.authType = 'secret';
+          break;
+        }
+        if (answers.clientCertificateFile || answers.clientCertificateBase64Encoded) {
+          settings.authType = 'certificate';
+          break;
+        }
+        settings.authType = 'browser';
         break;
     }
 

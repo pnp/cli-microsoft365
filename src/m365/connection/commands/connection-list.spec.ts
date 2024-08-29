@@ -18,16 +18,16 @@ describe(commands.LIST, () => {
 
   const mockListResponse = [
     {
-      "name": "028de82d-7fd9-476e-a9fd-be9714280ff3",
+      "active": true,
+      "authType": "deviceCode",
       "connectedAs": "alexw@contoso.com",
-      "authType": "DeviceCode",
-      "active": true
+      "name": "028de82d-7fd9-476e-a9fd-be9714280ff3"
     },
     {
-      "name": "acd6df42-10a9-4315-8928-53334f1c9d01",
+      "active": false,
+      "authType": "secret",
       "connectedAs": "Contoso Application",
-      "authType": "Secret",
-      "active": false
+      "name": "acd6df42-10a9-4315-8928-53334f1c9d01"
     }
   ];
 
@@ -160,10 +160,10 @@ describe(commands.LIST, () => {
 
     const mockConnectionsResponse = [
       {
-        "name": "028de82d-7fd9-476e-a9fd-be9714280ff3",
+        "active": true,
+        "authType": "deviceCode",
         "connectedAs": "alexw@contoso.com",
-        "authType": "DeviceCode",
-        "active": true
+        "name": "028de82d-7fd9-476e-a9fd-be9714280ff3"
       }
     ];
 

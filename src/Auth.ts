@@ -100,12 +100,12 @@ export class Connection {
 }
 
 export enum AuthType {
-  DeviceCode,
-  Password,
-  Certificate,
-  Identity,
-  Browser,
-  Secret
+  DeviceCode = 'deviceCode',
+  Password = 'password',
+  Certificate = 'certificate',
+  Identity = 'identity',
+  Browser = 'browser',
+  Secret = 'secret'
 }
 
 export enum CertificateType {
@@ -881,7 +881,7 @@ export class Auth {
     const details: ConnectionDetails = {
       connectionName: connection.name,
       connectedAs: connection.identityName,
-      authType: AuthType[connection.authType],
+      authType: connection.authType,
       appId: connection.appId,
       appTenant: connection.tenant,
       cloudType: CloudType[connection.cloudType]

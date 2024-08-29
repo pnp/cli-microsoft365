@@ -490,7 +490,7 @@ describe(commands.SETUP, () => {
           return '00000000-0000-0000-0000-000000000000';
         case 'Tenant ID (leave common if the app is multitenant):':
           return '00000000-0000-0000-0000-000000000000';
-        case 'Base64-encoded certificate string:':
+        case `Base64-encoded certificate string (leave empty if you don't connect using a certificate):`:
           return 'base64';
         default:
           return '';
@@ -507,7 +507,7 @@ describe(commands.SETUP, () => {
       clientCertificateBase64Encoded: 'base64'
     };
     Object.keys(expected).forEach(setting => {
-      assert(configSetSpy.calledWith(setting, (expected as any)[setting]), `Incorrect setting for ${setting}`);
+      assert(configSetSpy.calledWith(setting, (expected as any)[setting]), `Incorrect setting for ${setting}.`);
     });
   });
 
