@@ -1,5 +1,4 @@
 import { Logger } from '../../../../cli/Logger.js';
-//import { CliRequestOptions } from '../../../../request.js';
 import { odata } from '../../../../utils/odata.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
