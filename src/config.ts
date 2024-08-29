@@ -15,6 +15,7 @@ export default {
     'https://graph.microsoft.com/ChannelMessage.Send',
     'https://graph.microsoft.com/ChannelSettings.ReadWrite.All',
     'https://graph.microsoft.com/Chat.ReadWrite',
+    'https://graph.microsoft.com/Community.ReadWrite.All',
     'https://graph.microsoft.com/Directory.AccessAsUser.All',
     'https://graph.microsoft.com/Directory.ReadWrite.All',
     'https://graph.microsoft.com/ExternalConnection.ReadWrite.All',
