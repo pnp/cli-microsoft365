@@ -1058,5 +1058,5 @@ export const cli = {
   promptForSelection,
   promptForValue,
   shouldTrimOutput,
-  yargsConfiguration,
+  yargsConfiguration
 };
