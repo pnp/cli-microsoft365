@@ -4520,6 +4520,11 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
+              label: 'engage community set',
+              id: 'cmd/viva/engage/engage-community-set'
+            },
+            {
+              type: 'doc',
               label: 'engage community user list',
               id: 'cmd/viva/engage/engage-community-user-list'
             },
