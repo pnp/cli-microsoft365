@@ -16,6 +16,10 @@ sidebar_position: 3
 - [entra multitenant remove](../cmd/entra/multitenant/multitenant-remove.mdx) - removes a multitenant organization [#6009](https://github.com/pnp/cli-microsoft365/issues/6009)
 - [entra multitenant set](../cmd/entra/multitenant/multitenant-set.mdx) - updates the properties of a multitenant organization [#6008](https://github.com/pnp/cli-microsoft365/issues/6008)
 
+**Onenote:**
+
+- [onenote notebook add ](../cmd/onenote/notebook/notebook-add.mdx) - creates a new OneNote notebook. [#3100](https://github.com/pnp/cli-microsoft365/issues/3100)
+
 **SharePoint Embedded:**
 
 - [spe containertype list](../cmd/spe/containertype/containertype-list.mdx) - retrieves a list of Container Types created for a SharePoint Embedded Application [#5989](https://github.com/pnp/cli-microsoft365/issues/5989)
@@ -31,17 +35,19 @@ sidebar_position: 3
 
 ### Changes
 
-- added 'componentProperties' option to 'spo spfx' commands [#5975](https://github.com/pnp/cli-microsoft365/issues/5975)
+- added `componentProperties` option to `spo spfx` commands [#5975](https://github.com/pnp/cli-microsoft365/issues/5975)
 - added prompting to [connection use](../cmd/connection/connection-use.mdx) [#6173](https://github.com/pnp/cli-microsoft365/issues/6173)
-- enhanced [spo list roleassignment](../cmd/spo/list/list-roleassignment-add.mdx) commands with support for Entra groups [#6194](https://github.com/pnp/cli-microsoft365/issues/6194)
-- fixed command [teams meeting list](../cmd/teams/meeting/meeting-list.mdx) [#5968](https://github.com/pnp/cli-microsoft365/issues/5968)
-- introduced zod validation [#5639](https://github.com/pnp/cli-microsoft365/issues/5639)
-- added 'VersionPolicies' to [spo list get](../cmd/spo/list/list-get.mdx) command [#5983](https://github.com/pnp/cli-microsoft365/issues/5983)
+- added missing --force in example for [spo app uninstall](../cmd/spo/app/app-uninstall.mdx) command [#6245](https://github.com/pnp/cli-microsoft365/issues/6245)
+- added `versionPolicies` to [spo list get](../cmd/spo/list/list-get.mdx) command [#5983](https://github.com/pnp/cli-microsoft365/issues/5983)
 - added capabilities to add multiple users in an m365group [#6060](https://github.com/pnp/cli-microsoft365/issues/6060)
 - added capabilities to set multiple users in an m365group [#6059](https://github.com/pnp/cli-microsoft365/issues/6059)
+- enhanced [spo list roleassignment](../cmd/spo/list/list-roleassignment-add.mdx) commands with support for Entra groups [#6194](https://github.com/pnp/cli-microsoft365/issues/6194)
 - enhanced the [flow get](../cmd/flow/flow-get.mdx) command to return additional properties [#4683](https://github.com/pnp/cli-microsoft365/issues/4683)
+- introduced zod validation [#5639](https://github.com/pnp/cli-microsoft365/issues/5639)
 - fixed [pa app export](../cmd/pa/app/app-export.mdx) without packageDisplayName [#6215](https://github.com/pnp/cli-microsoft365/issues/6215)
-- added missing --force in example for [spo app uninstall](../cmd/spo/app/app-uninstall.mdx) command [#6245](https://github.com/pnp/cli-microsoft365/issues/6245)
+- fixed bug when parsing number arguments [#6211](https://github.com/pnp/cli-microsoft365/issues/6211)
+- fixed command [teams meeting list](../cmd/teams/meeting/meeting-list.mdx) [#5968](https://github.com/pnp/cli-microsoft365/issues/5968)
+- fixed prompting for missing required options in ZOD commands [#6219](https://github.com/pnp/cli-microsoft365/issues/6219)
 
 ## [v8.0.0](https://github.com/pnp/cli-microsoft365/releases/tag/v8.0.0)
 
