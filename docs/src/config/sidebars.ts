@@ -4702,6 +4702,11 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
+              label: 'engage community remove',
+              id: 'cmd/viva/engage/engage-community-remove'
+            },
+            {
+              type: 'doc',
               label: 'engage community set',
               id: 'cmd/viva/engage/engage-community-set'
             },
