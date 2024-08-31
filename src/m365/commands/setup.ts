@@ -91,9 +91,9 @@ class SetupCommand extends AnonymousCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       const properties: any = {
-        interactive: args.options.interactive,
-        scripting: args.options.scripting,
-        skipApp: args.options.skipApp
+        interactive: !!args.options.interactive,
+        scripting: !!args.options.scripting,
+        skipApp: !!args.options.skipApp
       };
 
       Object.assign(this.telemetryProperties, properties);
@@ -241,13 +241,13 @@ class SetupCommand extends AnonymousCommand {
     const clientId = await cli.promptForInput({
       message: 'Client ID:',
       /* c8 ignore next */
-      validate: value => validation.isValidGuid(value) ? true : 'The specified value is not a valid GUID'
+      validate: value => validation.isValidGuid(value) ? true : 'The specified value is not a valid GUID.'
     });
     const tenantId = await cli.promptForInput({
       message: 'Tenant ID (leave common if the app is multitenant):',
       default: 'common',
       /* c8 ignore next */
-      validate: value => value === 'common' || validation.isValidGuid(value) ? true : `Tenant ID must be a valid GUID or 'common'`
+      validate: value => value === 'common' || validation.isValidGuid(value) ? true : `Tenant ID must be a valid GUID or 'common'.`
     });
     const clientSecret = await cli.promptForInput({
       message: 'Client secret (leave empty if you use a certificate or a public client):'

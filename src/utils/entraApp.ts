@@ -139,8 +139,8 @@ async function getRequiredResourceAccessForApis({ servicePrincipals, apis, scope
   const requestedApis: string[] = apis!.split(',').map(a => a.trim());
   for (const api of requestedApis) {
     const pos: number = api.lastIndexOf('/');
-    const permissionName: string = api.substr(pos + 1);
-    const servicePrincipalName: string = api.substr(0, pos);
+    const permissionName: string = api.substring(pos + 1);
+    const servicePrincipalName: string = api.substring(0, pos);
     if (debug) {
       await logger.logToStderr(`Resolving ${api}...`);
       await logger.logToStderr(`Permission name: ${permissionName}`);
@@ -345,75 +345,70 @@ export const entraApp = {
 
     let resolvedApis: RequiredResourceAccess[] = [];
 
-    try {
-      if (options.apisDelegated || options.apisApplication) {
-        resolvedApis = await getRequiredResourceAccessForApis({
-          servicePrincipals,
-          apis: options.apisDelegated,
-          scopeType: 'Scope',
-          logger,
-          debug
-        });
-        if (verbose) {
-          await logger.logToStderr(`Resolved delegated permissions: ${JSON.stringify(resolvedApis, null, 2)}`);
-        }
-        const resolvedApplicationApis = await getRequiredResourceAccessForApis({
-          servicePrincipals,
-          apis: options.apisApplication,
-          scopeType: 'Role',
-          logger,
-          debug
-        });
-        if (verbose) {
-          await logger.logToStderr(`Resolved application permissions: ${JSON.stringify(resolvedApplicationApis, null, 2)}`);
-        }
-        // merge resolved application APIs onto resolved delegated APIs
-        resolvedApplicationApis.forEach(resolvedRequiredResource => {
-          const requiredResource = resolvedApis.find(api => api.resourceAppId === resolvedRequiredResource.resourceAppId);
-          if (requiredResource) {
-            requiredResource.resourceAccess!.push(...resolvedRequiredResource.resourceAccess!);
-          }
-          else {
-            resolvedApis.push(resolvedRequiredResource);
-          }
-        });
-      }
-      else {
-        const manifestApis = (manifest.requiredResourceAccess as RequiredResourceAccess[]);
-
-        manifestApis.forEach(manifestApi => {
-          resolvedApis.push(manifestApi);
-
-          const app = servicePrincipals.find(servicePrincipals => servicePrincipals.appId === manifestApi.resourceAppId);
-
-          if (app) {
-            manifestApi.resourceAccess!.forEach((res => {
-              const resourceAccessPermission = {
-                id: res.id,
-                type: res.type
-              };
-
-              const oAuthValue = app.oauth2PermissionScopes.find(scp => scp.id === res.id)?.value;
-              updateAppPermissions({
-                spId: app.id,
-                resourceAccessPermission,
-                oAuth2PermissionValue: oAuthValue
-              });
-            }));
-          }
-        });
-      }
-
+    if (options.apisDelegated || options.apisApplication) {
+      resolvedApis = await getRequiredResourceAccessForApis({
+        servicePrincipals,
+        apis: options.apisDelegated,
+        scopeType: 'Scope',
+        logger,
+        debug
+      });
       if (verbose) {
-        await logger.logToStderr(`Merged delegated and application permissions: ${JSON.stringify(resolvedApis, null, 2)}`);
-        await logger.logToStderr(`App role assignments: ${JSON.stringify(entraApp.appPermissions.flatMap(permission => permission.resourceAccess.filter(access => access.type === "Role")), null, 2)}`);
-        await logger.logToStderr(`OAuth2 permissions: ${JSON.stringify(entraApp.appPermissions.flatMap(permission => permission.scope), null, 2)}`);
+        await logger.logToStderr(`Resolved delegated permissions: ${JSON.stringify(resolvedApis, null, 2)}`);
       }
+      const resolvedApplicationApis = await getRequiredResourceAccessForApis({
+        servicePrincipals,
+        apis: options.apisApplication,
+        scopeType: 'Role',
+        logger,
+        debug
+      });
+      if (verbose) {
+        await logger.logToStderr(`Resolved application permissions: ${JSON.stringify(resolvedApplicationApis, null, 2)}`);
+      }
+      // merge resolved application APIs onto resolved delegated APIs
+      resolvedApplicationApis.forEach(resolvedRequiredResource => {
+        const requiredResource = resolvedApis.find(api => api.resourceAppId === resolvedRequiredResource.resourceAppId);
+        if (requiredResource) {
+          requiredResource.resourceAccess!.push(...resolvedRequiredResource.resourceAccess!);
+        }
+        else {
+          resolvedApis.push(resolvedRequiredResource);
+        }
+      });
+    }
+    else {
+      const manifestApis = (manifest.requiredResourceAccess as RequiredResourceAccess[]);
 
-      return resolvedApis;
+      manifestApis.forEach(manifestApi => {
+        resolvedApis.push(manifestApi);
+
+        const app = servicePrincipals.find(servicePrincipals => servicePrincipals.appId === manifestApi.resourceAppId);
+
+        if (app) {
+          manifestApi.resourceAccess!.forEach((res => {
+            const resourceAccessPermission = {
+              id: res.id,
+              type: res.type
+            };
+
+            const oAuthValue = app.oauth2PermissionScopes.find(scp => scp.id === res.id)?.value;
+            updateAppPermissions({
+              spId: app.id,
+              resourceAccessPermission,
+              oAuth2PermissionValue: oAuthValue
+            });
+          }));
+        }
+      });
     }
-    catch (e) {
-      throw e;
+
+    if (verbose) {
+      await logger.logToStderr(`Merged delegated and application permissions: ${JSON.stringify(resolvedApis, null, 2)}`);
+      await logger.logToStderr(`App role assignments: ${JSON.stringify(entraApp.appPermissions.flatMap(permission => permission.resourceAccess.filter(access => access.type === "Role")), null, 2)}`);
+      await logger.logToStderr(`OAuth2 permissions: ${JSON.stringify(entraApp.appPermissions.flatMap(permission => permission.scope), null, 2)}`);
     }
+
+    return resolvedApis;
   }
 };

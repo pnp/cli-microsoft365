@@ -83,6 +83,8 @@ describe(commands.DOCTOR, () => {
     sinon.stub(os, 'release').returns('10.0.19043');
     sinon.stub(packageJSON, 'version').value('3.11.0');
     sinon.stub(process, 'version').value('v14.17.0');
+    // must be a direct assignment rather than a stub, because appId is optional
+    // and undefined by default, which means it can't be stubbed
     auth.connection.appId = '31359c7f-bd7e-475c-86db-fdb8c937548e';
     sinon.stub(auth.connection, 'tenant').value('common');
     sinon.stub(auth.connection, 'authType').value(AuthType.DeviceCode);
