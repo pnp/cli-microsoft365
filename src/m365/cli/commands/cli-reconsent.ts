@@ -18,7 +18,7 @@ class CliReconsentCommand extends AnonymousCommand {
     const url = `https://login.microsoftonline.com/${cli.getTenant()}/oauth2/authorize?client_id=${cli.getClientId()}&response_type=code&prompt=admin_consent`;
 
     if (cli.getSettingWithDefaultValue<boolean>(settingsNames.autoOpenLinksInBrowser, false) === false) {
-      await logger.log(`To re-consent your Microsoft Entra application navigate in your web browser to ${url}`);
+      await logger.log(`To re-consent your Microsoft Entra application, navigate in your web browser to ${url}.`);
       return;
     }
 
