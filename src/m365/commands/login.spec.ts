@@ -60,7 +60,7 @@ describe(commands.LOGIN, () => {
       auth.connection.identityTenantId = 'db308122-52f3-4241-af92-1734aa6e2e50';
       return Promise.resolve('');
     });
-    sinon.stub(config, 'get').callsFake(() => undefined);
+    sinon.stub(config, 'get').returns(undefined);
   });
 
   afterEach(() => {
