@@ -33,7 +33,7 @@ describe(commands.SETUP, () => {
     sinon.stub(session, 'getId').callsFake(() => '');
     commandInfo = cli.getCommandInfo(command);
     config = cli.getConfig();
-    configDeleteSpy = sinon.stub(config, 'delete').returns()
+    configDeleteSpy = sinon.stub(config, 'delete').returns();
     configSetSpy = sinon.stub(config, 'set').returns();
   });
 
