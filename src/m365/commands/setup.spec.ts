@@ -33,8 +33,8 @@ describe(commands.SETUP, () => {
     sinon.stub(session, 'getId').callsFake(() => '');
     commandInfo = cli.getCommandInfo(command);
     config = cli.getConfig();
-    configDeleteSpy = sinon.stub(config, 'delete').callsFake(() => { });
-    configSetSpy = sinon.stub(config, 'set').callsFake(() => { });
+    configDeleteSpy = sinon.stub(config, 'delete').returns()
+    configSetSpy = sinon.stub(config, 'set').returns();
   });
 
   beforeEach(() => {
