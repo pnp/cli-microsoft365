@@ -96,7 +96,7 @@ class FlowOwnerListCommand extends PowerAutomateCommand {
         await logger.logToStderr(`Listing owners for flow ${args.options.flowName} in environment ${args.options.environmentName}`);
       }
 
-      const response = await odata.getAllItems<FlowPermissionResponse>(`${this.resource}/providers/Microsoft.ProcessSimple/${args.options.asAdmin ? 'scopes/admin/' : ''}environments/${formatting.encodeQueryParameter(args.options.environmentName)}/flows/${formatting.encodeQueryParameter(args.options.flowName)}/permissions?api-version=2016-11-01`);
+      const response = await odata.getAllItems<FlowPermissionResponse>(`${PowerAutomateCommand.resource}/providers/Microsoft.ProcessSimple/${args.options.asAdmin ? 'scopes/admin/' : ''}environments/${formatting.encodeQueryParameter(args.options.environmentName)}/flows/${formatting.encodeQueryParameter(args.options.flowName)}/permissions?api-version=2016-11-01`);
       if (!cli.shouldTrimOutput(args.options.output)) {
         await logger.log(response);
       }

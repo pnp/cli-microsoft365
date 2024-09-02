@@ -152,7 +152,7 @@ class FlowRunGetCommand extends PowerAutomateCommand {
 
     const actionsParameter = args.options.withActions ? '$expand=properties%2Factions&' : '';
     const requestOptions: CliRequestOptions = {
-      url: `${this.resource}/providers/Microsoft.ProcessSimple/environments/${formatting.encodeQueryParameter(args.options.environmentName)}/flows/${formatting.encodeQueryParameter(args.options.flowName)}/runs/${formatting.encodeQueryParameter(args.options.name)}?${actionsParameter}api-version=2016-11-01`,
+      url: `${PowerAutomateCommand.resource}/providers/Microsoft.ProcessSimple/environments/${formatting.encodeQueryParameter(args.options.environmentName)}/flows/${formatting.encodeQueryParameter(args.options.flowName)}/runs/${formatting.encodeQueryParameter(args.options.name)}?${actionsParameter}api-version=2016-11-01`,
       headers: {
         accept: 'application/json'
       },
