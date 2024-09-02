@@ -87,7 +87,7 @@ class FlowRunResubmitCommand extends PowerAutomateCommand {
         }
 
         const requestOptions: CliRequestOptions = {
-          url: `${this.resource}/providers/Microsoft.ProcessSimple/environments/${formatting.encodeQueryParameter(args.options.environmentName)}/flows/${formatting.encodeQueryParameter(args.options.flowName)}/triggers/${formatting.encodeQueryParameter(triggerName)}/histories/${formatting.encodeQueryParameter(args.options.name)}/resubmit?api-version=2016-11-01`,
+          url: `${PowerAutomateCommand.resource}/providers/Microsoft.ProcessSimple/environments/${formatting.encodeQueryParameter(args.options.environmentName)}/flows/${formatting.encodeQueryParameter(args.options.flowName)}/triggers/${formatting.encodeQueryParameter(triggerName)}/histories/${formatting.encodeQueryParameter(args.options.name)}/resubmit?api-version=2016-11-01`,
           headers: {
             accept: 'application/json'
           },
@@ -115,7 +115,7 @@ class FlowRunResubmitCommand extends PowerAutomateCommand {
 
   private async getTriggerName(environment: string, flow: string): Promise<string> {
     const requestOptions: CliRequestOptions = {
-      url: `${this.resource}/providers/Microsoft.ProcessSimple/environments/${formatting.encodeQueryParameter(environment)}/flows/${formatting.encodeQueryParameter(flow)}/triggers?api-version=2016-11-01`,
+      url: `${PowerAutomateCommand.resource}/providers/Microsoft.ProcessSimple/environments/${formatting.encodeQueryParameter(environment)}/flows/${formatting.encodeQueryParameter(flow)}/triggers?api-version=2016-11-01`,
       headers: {
         accept: 'application/json'
       },

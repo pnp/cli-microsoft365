@@ -79,7 +79,7 @@ class FlowRunCancelCommand extends PowerAutomateCommand {
 
     const cancelFlow = async (): Promise<void> => {
       const requestOptions: CliRequestOptions = {
-        url: `${this.resource}/providers/Microsoft.ProcessSimple/environments/${formatting.encodeQueryParameter(args.options.environmentName)}/flows/${formatting.encodeQueryParameter(args.options.flowName)}/runs/${formatting.encodeQueryParameter(args.options.name)}/cancel?api-version=2016-11-01`,
+        url: `${PowerAutomateCommand.resource}/providers/Microsoft.ProcessSimple/environments/${formatting.encodeQueryParameter(args.options.environmentName)}/flows/${formatting.encodeQueryParameter(args.options.flowName)}/runs/${formatting.encodeQueryParameter(args.options.name)}/cancel?api-version=2016-11-01`,
         headers: {
           accept: 'application/json'
         },

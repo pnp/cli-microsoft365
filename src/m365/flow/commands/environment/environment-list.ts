@@ -23,7 +23,7 @@ class FlowEnvironmentListCommand extends PowerAutomateCommand {
     }
 
     try {
-      const res = await odata.getAllItems<{ name: string, displayName: string; properties: { displayName: string } }>(`${this.resource}/providers/Microsoft.ProcessSimple/environments?api-version=2016-11-01`);
+      const res = await odata.getAllItems<{ name: string, displayName: string; properties: { displayName: string } }>(`${PowerAutomateCommand.resource}/providers/Microsoft.ProcessSimple/environments?api-version=2016-11-01`);
 
       if (res.length > 0) {
         if (args.options.output !== 'json') {
