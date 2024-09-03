@@ -3525,6 +3525,11 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'site recyclebinitem restore',
               id: 'cmd/spo/site/site-recyclebinitem-restore'
+            },
+            {
+              type: 'doc',
+              label: 'site sharingpermission set',
+              id: 'cmd/spo/site/site-sharingpermission-set'
             }
           ]
         },
