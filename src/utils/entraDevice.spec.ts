@@ -11,7 +11,7 @@ import { settingsNames } from '../settingsNames.js';
 describe('utils/entraDevice', () => {
   const deviceId = 'fc33aa61-cf0e-46b6-9506-f633347202ab';
   const secondDeviceId = 'fc33aa61-cf0e-1234-9506-f633347202ab';
-  const displayName = 'AdeleVence-PC';
+  const displayName = 'AdeleVance-PC';
   const secondDisplayName = 'JohnDoe-PC';
   const invalidDisplayName = 'European';
 

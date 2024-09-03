@@ -3,25 +3,39 @@ import sinon from 'sinon';
 import auth from '../../../../Auth.js';
 import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
-import commands from '../../commands.js';
-import command from './administrativeunit-add.js';
+import { Logger } from '../../../../cli/Logger.js';
+import { CommandError } from '../../../../Command.js';
+import request from '../../../../request.js';
 import { telemetry } from '../../../../telemetry.js';
+import { misc } from '../../../../utils/misc.js';
+import { MockRequests } from '../../../../utils/MockRequest.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
-import request from '../../../../request.js';
-import { Logger } from '../../../../cli/Logger.js';
-import { CommandError } from '../../../../Command.js';
 import aadCommands from '../../aadCommands.js';
+import commands from '../../commands.js';
+import command from './administrativeunit-add.js';
+
+const administrativeUnitResponse: any = {
+  id: 'fc33aa61-cf0e-46b6-9506-f633347202ab',
+  displayName: 'European Division',
+  description: null,
+  visibility: null
+};
+
+export const mocks = {
+  administrativeUnits: {
+    request: {
+      url: 'https://graph.microsoft.com/v1.0/directory/administrativeUnits',
+      method: 'POST'
+    },
+    response: {
+      body: administrativeUnitResponse
+    }
+  }
+} satisfies MockRequests;
 
 describe(commands.ADMINISTRATIVEUNIT_ADD, () => {
-  const administrativeUnitReponse: any = {
-    id: 'fc33aa61-cf0e-46b6-9506-f633347202ab',
-    displayName: 'European Division',
-    description: null,
-    visibility: null
-  };
-
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -84,8 +98,8 @@ describe(commands.ADMINISTRATIVEUNIT_ADD, () => {
 
   it('creates an administrative unit with a specific display name', async () => {
     const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/directory/administrativeUnits') {
-        return administrativeUnitReponse;
+      if (opts.url === mocks.administrativeUnits.request.url) {
+        return misc.deepClone(mocks.administrativeUnits.response.body);
       }
 
       throw 'Invalid request';
@@ -97,16 +111,16 @@ describe(commands.ADMINISTRATIVEUNIT_ADD, () => {
       description: undefined,
       visibility: null
     });
-    assert(loggerLogSpy.calledOnceWithExactly(administrativeUnitReponse));
+    assert(loggerLogSpy.calledOnceWithExactly(administrativeUnitResponse));
   });
 
   it('creates an administrative unit with a specific display name and description', async () => {
-    const privateAdministrativeUnitResponse = { ...administrativeUnitReponse };
+    const privateAdministrativeUnitResponse = { ...misc.deepClone(mocks.administrativeUnits.response.body) };
     privateAdministrativeUnitResponse.description = 'European Division Administration';
 
     const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/directory/administrativeUnits') {
-        return administrativeUnitReponse;
+      if (opts.url === mocks.administrativeUnits.request.url) {
+        return privateAdministrativeUnitResponse;
       }
 
       throw 'Invalid request';
@@ -118,17 +132,17 @@ describe(commands.ADMINISTRATIVEUNIT_ADD, () => {
       description: 'European Division Administration',
       visibility: null
     });
-    assert(loggerLogSpy.calledOnceWith(administrativeUnitReponse));
+    assert(loggerLogSpy.calledOnceWith(privateAdministrativeUnitResponse));
   });
 
   it('creates a hidden administrative unit with a specific display name and description', async () => {
-    const privateAdministrativeUnitResponse = { ...administrativeUnitReponse };
+    const privateAdministrativeUnitResponse = { ...misc.deepClone(mocks.administrativeUnits.response.body) };
     privateAdministrativeUnitResponse.description = 'European Division Administration';
     privateAdministrativeUnitResponse.visibility = 'HiddenMembership';
 
     const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/directory/administrativeUnits') {
-        return administrativeUnitReponse;
+      if (opts.url === mocks.administrativeUnits.request.url) {
+        return privateAdministrativeUnitResponse;
       }
 
       throw 'Invalid request';
@@ -140,7 +154,7 @@ describe(commands.ADMINISTRATIVEUNIT_ADD, () => {
       description: 'European Division Administration',
       visibility: 'HiddenMembership'
     });
-    assert(loggerLogSpy.calledOnceWith(administrativeUnitReponse));
+    assert(loggerLogSpy.calledOnceWith(privateAdministrativeUnitResponse));
   });
 
   it('correctly handles API OData error', async () => {

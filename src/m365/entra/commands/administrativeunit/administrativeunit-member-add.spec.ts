@@ -1,33 +1,105 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
-import commands from '../../commands.js';
-import request from '../../../../request.js';
-import { telemetry } from '../../../../telemetry.js';
+import { cli } from '../../../../cli/cli.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
+import request from '../../../../request.js';
+import { settingsNames } from '../../../../settingsNames.js';
+import { telemetry } from '../../../../telemetry.js';
+import { entraAdministrativeUnit } from '../../../../utils/entraAdministrativeUnit.js';
+import { entraDevice } from '../../../../utils/entraDevice.js';
+import { entraGroup } from '../../../../utils/entraGroup.js';
+import { entraUser } from '../../../../utils/entraUser.js';
+import { MockRequests } from '../../../../utils/MockRequest.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
-import { cli } from '../../../../cli/cli.js';
-import { CommandInfo } from '../../../../cli/CommandInfo.js';
-import command from './administrativeunit-member-add.js';
-import { entraAdministrativeUnit } from '../../../../utils/entraAdministrativeUnit.js';
-import { entraGroup } from '../../../../utils/entraGroup.js';
-import { entraUser } from '../../../../utils/entraUser.js';
-import { entraDevice } from '../../../../utils/entraDevice.js';
-import { settingsNames } from '../../../../settingsNames.js';
 import aadCommands from '../../aadCommands.js';
+import commands from '../../commands.js';
+import command from './administrativeunit-member-add.js';
+
+const administrativeUnitId = 'fc33aa61-cf0e-46b6-9506-f633347202ab';
+
+export const mocks = {
+  addMember: {
+    request: {
+      url: `https://graph.microsoft.com/v1.0/directory/administrativeUnits/${administrativeUnitId}/members/$ref`,
+      method: 'POST'
+    },
+    response: {
+      body: {}
+    }
+  },
+  getAdministrativeUnitByDisplayName: {
+    request: {
+      url: `https://graph.microsoft.com/v1.0/directory/administrativeUnits?$filter=displayName eq 'European Division'`
+    },
+    response: {
+      body: {
+        value: [
+          {
+            id: 'fc33aa61-cf0e-46b6-9506-f633347202ab',
+            displayName: 'European Division',
+            visibility: 'HiddenMembership'
+          }
+        ]
+      }
+    }
+  },
+  getUserIdByUpn: {
+    request: {
+      url: `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq 'john.doe@contoso.com'&$select=Id`
+    },
+    response: {
+      body: {
+        value: [
+          {
+            id: '23b415fb-baea-4995-a26e-c74073beadff'
+          }
+        ]
+      }
+    }
+  },
+  getGroupIdByDisplayName: {
+    request: {
+      url: `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq 'Marketing Group'&$select=id`
+    },
+    response: {
+      body: {
+        value: [
+          {
+            id: '593af7e2-d27e-42b8-ad17-abe5e57dab61'
+          }
+        ]
+      }
+    }
+  },
+  getDeviceIdByDisplayName: {
+    request: {
+      url: `https://graph.microsoft.com/v1.0/devices?$filter=displayName eq 'AdeleVance-PC'`
+    },
+    response: {
+      body: {
+        value: [
+          {
+            id: '60c99a96-70af-4d68-a8dc-5c51b345c6ce'
+          }
+        ]
+      }
+    }
+  }
+} satisfies MockRequests;
 
 describe(commands.ADMINISTRATIVEUNIT_MEMBER_ADD, () => {
-  const administrativeUnitId = 'fc33aa61-cf0e-46b6-9506-f633347202ab';
   const administrativeUnitName = 'European Division';
   const userId = '23b415fb-baea-4995-a26e-c74073beadff';
   const userName = 'adele.vence@contoso.com';
   const groupId = '593af7e2-d27e-42b8-ad17-abe5e57dab61';
   const groupName = 'Marketing';
   const deviceId = '60c99a96-70af-4d68-a8dc-5c51b345c6ce';
-  const deviceName = 'AdeleVence-PC';
+  const deviceName = 'AdeleVance-PC';
 
   let log: string[];
   let logger: Logger;
@@ -361,7 +433,7 @@ describe(commands.ADMINISTRATIVEUNIT_MEMBER_ADD, () => {
 
   it('adds a user specified by its id to an administrative unit specified by its id', async () => {
     const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/directory/administrativeUnits/${administrativeUnitId}/members/$ref`) {
+      if (opts.url === mocks.addMember.request.url) {
         return;
       }
 
@@ -378,7 +450,7 @@ describe(commands.ADMINISTRATIVEUNIT_MEMBER_ADD, () => {
     sinon.stub(entraAdministrativeUnit, 'getAdministrativeUnitByDisplayName').withArgs(administrativeUnitName).resolves({ id: administrativeUnitId, displayName: administrativeUnitName });
 
     const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/directory/administrativeUnits/${administrativeUnitId}/members/$ref`) {
+      if (opts.url === mocks.addMember.request.url) {
         return;
       }
 
@@ -392,7 +464,7 @@ describe(commands.ADMINISTRATIVEUNIT_MEMBER_ADD, () => {
 
   it('adds a group specified by its id to an administrative unit specified by its id', async () => {
     const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/directory/administrativeUnits/${administrativeUnitId}/members/$ref`) {
+      if (opts.url === mocks.addMember.request.url) {
         return;
       }
 
@@ -409,7 +481,7 @@ describe(commands.ADMINISTRATIVEUNIT_MEMBER_ADD, () => {
     sinon.stub(entraAdministrativeUnit, 'getAdministrativeUnitByDisplayName').withArgs(administrativeUnitName).resolves({ id: administrativeUnitId, displayName: administrativeUnitName });
 
     const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/directory/administrativeUnits/${administrativeUnitId}/members/$ref`) {
+      if (opts.url === mocks.addMember.request.url) {
         return;
       }
 
@@ -423,7 +495,7 @@ describe(commands.ADMINISTRATIVEUNIT_MEMBER_ADD, () => {
 
   it('adds a device specified by its id to an administrative unit specified by its id', async () => {
     const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/directory/administrativeUnits/${administrativeUnitId}/members/$ref`) {
+      if (opts.url === mocks.addMember.request.url) {
         return;
       }
 
@@ -440,7 +512,7 @@ describe(commands.ADMINISTRATIVEUNIT_MEMBER_ADD, () => {
     sinon.stub(entraAdministrativeUnit, 'getAdministrativeUnitByDisplayName').withArgs(administrativeUnitName).resolves({ id: administrativeUnitId, displayName: administrativeUnitName });
 
     const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/directory/administrativeUnits/${administrativeUnitId}/members/$ref`) {
+      if (opts.url === mocks.addMember.request.url) {
         return;
       }
 
@@ -465,7 +537,7 @@ describe(commands.ADMINISTRATIVEUNIT_MEMBER_ADD, () => {
       }
     };
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/directory/administrativeUnits/${administrativeUnitId}/members/$ref`) {
+      if (opts.url === mocks.addMember.request.url) {
         throw error;
       }
 

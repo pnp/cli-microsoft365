@@ -50,55 +50,55 @@ When the `properties` option includes values with a `/`, for example: `manager/d
 List members of an administrative unit specified by id
 
 ```sh
-m365 entra administrativeunit member list --administrativeUnitId 03c4c9dc-6f0c-4c4f-a4e6-0c9ed80f54c7
+m365 entra administrativeunit member list --administrativeUnitId fc33aa61-cf0e-46b6-9506-f633347202ab
 ```
 
 List members of an administrative unit specified by id. For each one return the `id` and the `displayName`
 
 ```sh
-m365 entra administrativeunit member list --administrativeUnitId 03c4c9dc-6f0c-4c4f-a4e6-0c9ed80f54c7 --properties 'id,displayName'
+m365 entra administrativeunit member list --administrativeUnitId fc33aa61-cf0e-46b6-9506-f633347202ab --properties 'id,displayName'
 ```
 
 List members of an administrative unit specified by name
 
 ```sh
-m365 entra administrativeunit member list --administrativeUnitName 'Marketing Division'
+m365 entra administrativeunit member list --administrativeUnitName 'European Division'
 ```
 
 List users of an administrative unit specified by id
 
 ```sh
-m365 entra administrativeunit member list --administrativeUnitId 03c4c9dc-6f0c-4c4f-a4e6-0c9ed80f54c7 --type user
+m365 entra administrativeunit member list --administrativeUnitId fc33aa61-cf0e-46b6-9506-f633347202ab --type user
 ```
 
 List users of an administrative unit specified by id that are guest users
 
 ```sh
-m365 entra administrativeunit member list --administrativeUnitId 03c4c9dc-6f0c-4c4f-a4e6-0c9ed80f54c7 --type user --filter "userType eq 'Guest'"
+m365 entra administrativeunit member list --administrativeUnitId fc33aa61-cf0e-46b6-9506-f633347202ab --type user --filter "userType eq 'Guest'"
 ```
 
 List groups of an administrative unit specified by id
 
 ```sh
-m365 entra administrativeunit member list --administrativeUnitId 03c4c9dc-6f0c-4c4f-a4e6-0c9ed80f54c7 --type group
+m365 entra administrativeunit member list --administrativeUnitId fc33aa61-cf0e-46b6-9506-f633347202ab --type group
 ```
 
 List groups of an administrative unit specified by id and include owners names, for each member return the `id` and the `displayName`
 
 ```sh
-m365 entra administrativeunit member list --administrativeUnitId 03c4c9dc-6f0c-4c4f-a4e6-0c9ed80f54c7 --type group --properties 'id,displayName,owners/displayName'
+m365 entra administrativeunit member list --administrativeUnitId fc33aa61-cf0e-46b6-9506-f633347202ab --type group --properties 'id,displayName,owners/displayName'
 ```
 
 List devices of an administrative unit specified by id
 
 ```sh
-m365 entra administrativeunit member list --administrativeUnitId 03c4c9dc-6f0c-4c4f-a4e6-0c9ed80f54c7 --type device
+m365 entra administrativeunit member list --administrativeUnitId fc33aa61-cf0e-46b6-9506-f633347202ab --type device
 ```
 
 List devices with linux operating system of an administrative unit specified by id
 
 ```sh
-m365 entra administrativeunit member list --administrativeUnitId 03c4c9dc-6f0c-4c4f-a4e6-0c9ed80f54c7 --type device --filter "operatingSystem eq 'linux'"
+m365 entra administrativeunit member list --administrativeUnitId fc33aa61-cf0e-46b6-9506-f633347202ab --type device --filter "operatingSystem eq 'linux'"
 ```
 
 ## Response
@@ -186,7 +186,7 @@ m365 entra administrativeunit member list --administrativeUnitId 03c4c9dc-6f0c-4
       "deviceMetadata": null,
       "deviceOwnership": null,
       "deviceVersion": null,
-      "displayName": "AdeleVence-PC",
+      "displayName": "AdeleVance-PC",
       "domainName": null,
       "enrollmentProfileName": null,
       "enrollmentType": null,
@@ -245,7 +245,7 @@ m365 entra administrativeunit member list --administrativeUnitId 03c4c9dc-6f0c-4
   ------------------------------------  -------------------
   64131a70-beb9-4ccb-b590-4401e58446ec  Pradeep Gupta
   c121c70b-deb1-43f7-8298-9111bf3036b4  Mark 8 Project Team
-  3f9fd7c3-73ad-4ce3-b053-76bb8252964d  AdeleVence-PC
+  3f9fd7c3-73ad-4ce3-b053-76bb8252964d  AdeleVance-PC
   ```
 
   </TabItem>
@@ -255,7 +255,7 @@ m365 entra administrativeunit member list --administrativeUnitId 03c4c9dc-6f0c-4
   id,displayName,givenName,jobTitle,mail,officeLocation,preferredLanguage,surname,userPrincipalName,type
   64131a70-beb9-4ccb-b590-4401e58446ec,Pradeep Gupta,Pradeep,Accountant,PradeepG@contoso.com,98/2202,en-US,Gupta,PradeepG@contoso.com,user
   c121c70b-deb1-43f7-8298-9111bf3036b4,Mark 8 Project Team,,,Mark8ProjectTeam@contoso.com,,,,,group
-  3f9fd7c3-73ad-4ce3-b053-76bb8252964d,AdeleVence-PC,,,,,,,,device
+  3f9fd7c3-73ad-4ce3-b053-76bb8252964d,AdeleVance-PC,,,,,,,,device
   ```
 
   </TabItem>
@@ -296,7 +296,7 @@ m365 entra administrativeunit member list --administrativeUnitId 03c4c9dc-6f0c-4
   visibility | Public
   type | group
 
-  ## AdeleVence-PC (3f9fd7c3-73ad-4ce3-b053-76bb8252964d)
+  ## AdeleVance-PC (3f9fd7c3-73ad-4ce3-b053-76bb8252964d)
 
   Property | Value
   ---------|-------
@@ -304,7 +304,7 @@ m365 entra administrativeunit member list --administrativeUnitId 03c4c9dc-6f0c-4
   accountEnabled | true
   createdDateTime | 2023-11-09T06:18:26Z
   deviceId | 4c299165-6e8f-4b45-a5ba-c5d250a707ff
-  displayName | AdeleVence-PC
+  displayName | AdeleVance-PC
   operatingSystem | windows
   operatingSystemVersion | 10
   type | device

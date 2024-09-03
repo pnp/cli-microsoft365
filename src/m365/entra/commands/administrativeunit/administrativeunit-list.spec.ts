@@ -5,12 +5,38 @@ import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
 import request from '../../../../request.js';
 import { telemetry } from '../../../../telemetry.js';
+import { misc } from '../../../../utils/misc.js';
+import { MockRequests } from '../../../../utils/MockRequest.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
+import aadCommands from '../../aadCommands.js';
 import commands from '../../commands.js';
 import command from './administrativeunit-list.js';
-import aadCommands from '../../aadCommands.js';
+
+export const mocks = {
+  administrativeUnits: {
+    request: {
+      url: `https://graph.microsoft.com/v1.0/directory/administrativeUnits`
+    },
+    response: {
+      body: {
+        value: [
+          {
+            id: 'fc33aa61-cf0e-46b6-9506-f633347202ab',
+            displayName: 'European Division',
+            visibility: 'HiddenMembership'
+          },
+          {
+            id: 'a25b4c5e-e8b7-4f02-a23d-0965b6415098',
+            displayName: 'Asian Division',
+            visibility: null
+          }
+        ]
+      }
+    }
+  }
+} satisfies MockRequests;
 
 describe(commands.ADMINISTRATIVEUNIT_LIST, () => {
   let log: string[];
@@ -76,21 +102,8 @@ describe(commands.ADMINISTRATIVEUNIT_LIST, () => {
 
   it(`should get a list of administrative units`, async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/directory/administrativeUnits`) {
-        return {
-          value: [
-            {
-              id: 'fc33aa61-cf0e-46b6-9506-f633347202ab',
-              displayName: 'European Division',
-              visibility: 'HiddenMembership'
-            },
-            {
-              id: 'a25b4c5e-e8b7-4f02-a23d-0965b6415098',
-              displayName: 'Asian Division',
-              visibility: null
-            }
-          ]
-        };
+      if (opts.url === mocks.administrativeUnits.request.url) {
+        return misc.deepClone(mocks.administrativeUnits.response.body);
       }
 
       throw 'Invalid request';
@@ -118,7 +131,7 @@ describe(commands.ADMINISTRATIVEUNIT_LIST, () => {
 
   it('handles error when retrieving administrative units list failed', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/directory/administrativeUnits`) {
+      if (opts.url === mocks.administrativeUnits.request.url) {
         throw { error: { message: 'An error has occurred' } };
       }
       throw `Invalid request`;

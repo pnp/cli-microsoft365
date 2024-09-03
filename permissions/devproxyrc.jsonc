@@ -1,0 +1,51 @@
+{
+  "$schema": "https://raw.githubusercontent.com/microsoft/dev-proxy/main/schemas/v0.21.0/rc.schema.json",
+  "plugins": [
+    {
+      "name": "GraphMockResponsePlugin",
+      "enabled": true,
+      "pluginPath": "~appFolder/plugins/dev-proxy-plugins.dll",
+      "configSection": "graphMocks",
+      "urlsToWatch": [
+        "https://graph.microsoft.com/v1.0/*",
+        "https://graph.microsoft.com/beta/*",
+        "https://graph.microsoft.us/v1.0/*",
+        "https://graph.microsoft.us/beta/*",
+        "https://dod-graph.microsoft.us/v1.0/*",
+        "https://dod-graph.microsoft.us/beta/*",
+        "https://microsoftgraph.chinacloudapi.cn/v1.0/*",
+        "https://microsoftgraph.chinacloudapi.cn/beta/*"
+      ]
+    },
+    {
+      "name": "MinimalPermissionsPlugin",
+      "enabled": true,
+      "pluginPath": "~appFolder/plugins/dev-proxy-plugins.dll",
+      "urlsToWatch": [
+        "https://graph.microsoft.com/v1.0/*",
+        "https://graph.microsoft.com/beta/*",
+        "https://graph.microsoft.us/v1.0/*",
+        "https://graph.microsoft.us/beta/*",
+        "https://dod-graph.microsoft.us/v1.0/*",
+        "https://dod-graph.microsoft.us/beta/*",
+        "https://microsoftgraph.chinacloudapi.cn/v1.0/*",
+        "https://microsoftgraph.chinacloudapi.cn/beta/*"
+      ]
+    },
+    {
+      "name": "JsonReporter",
+      "enabled": true,
+      "pluginPath": "~appFolder/plugins/dev-proxy-plugins.dll",
+      "urlsToWatch": [
+        // dummy because we need to provide here something
+        "https://graph.microsoft.com/*"
+      ]
+    }
+  ],
+  "urlsToWatch": [],
+  "graphMocks": {
+    "mocksFile": ".devproxy/mocks-graph.microsoft.com.json",
+    "blockUnmockedRequests": true
+  },
+  "asSystemProxy": false
+}

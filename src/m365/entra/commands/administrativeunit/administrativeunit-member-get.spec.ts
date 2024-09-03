@@ -1,26 +1,86 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
-import commands from '../../commands.js';
+import { CommandError } from '../../../../Command.js';
+import request from '../../../../request.js';
+import { settingsNames } from '../../../../settingsNames.js';
 import { telemetry } from '../../../../telemetry.js';
+import { entraAdministrativeUnit } from '../../../../utils/entraAdministrativeUnit.js';
+import { misc } from '../../../../utils/misc.js';
+import { MockRequests } from '../../../../utils/MockRequest.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
-import { cli } from '../../../../cli/cli.js';
-import command from './administrativeunit-member-get.js';
-import request from '../../../../request.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
-import { CommandError } from '../../../../Command.js';
-import { entraAdministrativeUnit } from '../../../../utils/entraAdministrativeUnit.js';
-import { settingsNames } from '../../../../settingsNames.js';
 import aadCommands from '../../aadCommands.js';
+import commands from '../../commands.js';
+import command from './administrativeunit-member-get.js';
+
+const administrativeUnitId = 'fc33aa61-cf0e-46b6-9506-f633347202ab';
+const administrativeUnitName = 'European Division';
+const userId = '64131a70-beb9-4ccb-b590-4401e58446ec';
+
+export const mocks = {
+  getMemberByIdUnitById: {
+    request: {
+      url: `https://graph.microsoft.com/v1.0/directory/administrativeUnits/${administrativeUnitId}/members/${userId}`
+    },
+    response: {
+      body: {
+        "@odata.type": "#microsoft.graph.user",
+        "id": "64131a70-beb9-4ccb-b590-4401e58446ec",
+        "businessPhones": [
+          "+20 255501070"
+        ],
+        "displayName": "Pradeep Gupta",
+        "givenName": "Pradeep",
+        "jobTitle": "Accountant",
+        "mail": "PradeepG@4wrvkx.onmicrosoft.com",
+        "mobilePhone": null,
+        "officeLocation": "98/2202",
+        "preferredLanguage": "en-US",
+        "surname": "Gupta",
+        "userPrincipalName": "PradeepG@4wrvkx.onmicrosoft.com"
+      }
+    }
+  },
+  getSelectedMemberProperties: {
+    request: {
+      url: `https://graph.microsoft.com/v1.0/directory/administrativeUnits/${administrativeUnitId}/members/${userId}?$select=id,displayName&$expand=manager($select=displayName),drive($select=id)`
+    },
+    response: {
+      body: {
+        "@odata.type": "#microsoft.graph.user",
+        "id": "64131a70-beb9-4ccb-b590-4401e58446ec",
+        "displayName": "Pradeep Gupta",
+        "manager": {
+          "displayName": "Adele Vance"
+        },
+        "drive": {
+          "id": "b!WJdcRuwCnkmNMvypowShlJAOO7sb8BNGi5bd40SvsYXCJjiTCgSgSq19j0OM3YgT"
+        }
+      }
+    }
+  },
+  getAdministrativeUnitIdByDisplayName: {
+    request: {
+      url: `https://graph.microsoft.com/v1.0/directory/administrativeUnits?$filter=displayName eq 'Marketing Division'`
+    },
+    response: {
+      body: {
+        value: [
+          {
+            id: 'fc33aa61-cf0e-46b6-9506-f633347202ab'
+          }
+        ]
+      }
+    }
+  }
+} satisfies MockRequests;
 
 describe(commands.ADMINISTRATIVEUNIT_MEMBER_GET, () => {
-  const administrativeUnitId = 'fc33aa61-cf0e-46b6-9506-f633347202ab';
-  const administrativeUnitName = 'European Division';
-  const userId = '64131a70-beb9-4ccb-b590-4401e58446ec';
-
   const userTransformedResponse = {
     "id": "64131a70-beb9-4ccb-b590-4401e58446ec",
     "businessPhones": [
@@ -142,23 +202,8 @@ describe(commands.ADMINISTRATIVEUNIT_MEMBER_GET, () => {
 
   it('get member info for an administrative unit specified by id and member specified by id', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/directory/administrativeUnits/${administrativeUnitId}/members/${userId}`) {
-        return {
-          "@odata.type": "#microsoft.graph.user",
-          "id": "64131a70-beb9-4ccb-b590-4401e58446ec",
-          "businessPhones": [
-            "+20 255501070"
-          ],
-          "displayName": "Pradeep Gupta",
-          "givenName": "Pradeep",
-          "jobTitle": "Accountant",
-          "mail": "PradeepG@4wrvkx.onmicrosoft.com",
-          "mobilePhone": null,
-          "officeLocation": "98/2202",
-          "preferredLanguage": "en-US",
-          "surname": "Gupta",
-          "userPrincipalName": "PradeepG@4wrvkx.onmicrosoft.com"
-        };
+      if (opts.url === mocks.getMemberByIdUnitById.request.url) {
+        return misc.deepClone(mocks.getMemberByIdUnitById.response.body);
       }
 
       throw 'Invalid request';
@@ -173,23 +218,8 @@ describe(commands.ADMINISTRATIVEUNIT_MEMBER_GET, () => {
     sinon.stub(entraAdministrativeUnit, 'getAdministrativeUnitByDisplayName').withArgs(administrativeUnitName).resolves({ id: administrativeUnitId, displayName: administrativeUnitName });
 
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/directory/administrativeUnits/${administrativeUnitId}/members/${userId}`) {
-        return {
-          "@odata.type": "#microsoft.graph.user",
-          "id": "64131a70-beb9-4ccb-b590-4401e58446ec",
-          "businessPhones": [
-            "+20 255501070"
-          ],
-          "displayName": "Pradeep Gupta",
-          "givenName": "Pradeep",
-          "jobTitle": "Accountant",
-          "mail": "PradeepG@4wrvkx.onmicrosoft.com",
-          "mobilePhone": null,
-          "officeLocation": "98/2202",
-          "preferredLanguage": "en-US",
-          "surname": "Gupta",
-          "userPrincipalName": "PradeepG@4wrvkx.onmicrosoft.com"
-        };
+      if (opts.url === mocks.getMemberByIdUnitById.request.url) {
+        return misc.deepClone(mocks.getMemberByIdUnitById.response.body);
       }
 
       throw 'Invalid request';
@@ -224,18 +254,8 @@ describe(commands.ADMINISTRATIVEUNIT_MEMBER_GET, () => {
 
   it('retrieves selected properties of a member for an administrative unit specified by id and member specified by id', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/directory/administrativeUnits/${administrativeUnitId}/members/${userId}?$select=id,displayName&$expand=manager($select=displayName),drive($select=id)`) {
-        return {
-          "@odata.type": "#microsoft.graph.user",
-          "id": "64131a70-beb9-4ccb-b590-4401e58446ec",
-          "displayName": "Pradeep Gupta",
-          "manager": {
-            "displayName": "Adele Vance"
-          },
-          "drive": {
-            "id": "b!WJdcRuwCnkmNMvypowShlJAOO7sb8BNGi5bd40SvsYXCJjiTCgSgSq19j0OM3YgT"
-          }
-        };
+      if (opts.url === mocks.getSelectedMemberProperties.request.url) {
+        return misc.deepClone(mocks.getSelectedMemberProperties.response.body);
       }
 
       throw 'Invalid request';

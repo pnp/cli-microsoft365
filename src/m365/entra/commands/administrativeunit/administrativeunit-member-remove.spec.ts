@@ -1,32 +1,64 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
-import commands from '../../commands.js';
-import request from '../../../../request.js';
-import { telemetry } from '../../../../telemetry.js';
+import { cli } from '../../../../cli/cli.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
+import request from '../../../../request.js';
+import { settingsNames } from '../../../../settingsNames.js';
+import { telemetry } from '../../../../telemetry.js';
+import { entraAdministrativeUnit } from '../../../../utils/entraAdministrativeUnit.js';
+import { entraDevice } from '../../../../utils/entraDevice.js';
+import { entraGroup } from '../../../../utils/entraGroup.js';
+import { entraUser } from '../../../../utils/entraUser.js';
+import { MockRequests } from '../../../../utils/MockRequest.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
-import { cli } from '../../../../cli/cli.js';
-import { CommandInfo } from '../../../../cli/CommandInfo.js';
+import commands from '../../commands.js';
 import command from './administrativeunit-member-remove.js';
-import { entraAdministrativeUnit } from '../../../../utils/entraAdministrativeUnit.js';
-import { entraGroup } from '../../../../utils/entraGroup.js';
-import { entraUser } from '../../../../utils/entraUser.js';
-import { entraDevice } from '../../../../utils/entraDevice.js';
-import { settingsNames } from '../../../../settingsNames.js';
+
+const administrativeUnitId = 'fc33aa61-cf0e-46b6-9506-f633347202ab';
+const userId = '23b415fb-baea-4995-a26e-c74073beadff';
+const groupId = '593af7e2-d27e-42b8-ad17-abe5e57dab61';
+const deviceId = '60c99a96-70af-4d68-a8dc-5c51b345c6ce';
+
+export const mocks = {
+  deleteUser: {
+    request: {
+      url: `https://graph.microsoft.com/v1.0/directory/administrativeUnits/${administrativeUnitId}/members/${userId}/$ref`,
+      method: 'DELETE'
+    },
+    response: {
+      body: {}
+    }
+  },
+  deleteGroup: {
+    request: {
+      url: `https://graph.microsoft.com/v1.0/directory/administrativeUnits/${administrativeUnitId}/members/${groupId}/$ref`,
+      method: 'DELETE'
+    },
+    response: {
+      body: {}
+    }
+  },
+  deleteDevice: {
+    request: {
+      url: `https://graph.microsoft.com/v1.0/directory/administrativeUnits/${administrativeUnitId}/members/${deviceId}/$ref`,
+      method: 'DELETE'
+    },
+    response: {
+      body: {}
+    }
+  }
+} satisfies MockRequests;
 
 describe(commands.ADMINISTRATIVEUNIT_MEMBER_REMOVE, () => {
-  const administrativeUnitId = 'fc33aa61-cf0e-46b6-9506-f633347202ab';
   const administrativeUnitName = 'European Division';
-  const userId = '23b415fb-baea-4995-a26e-c74073beadff';
   const userName = 'adele.vence@contoso.com';
-  const groupId = '593af7e2-d27e-42b8-ad17-abe5e57dab61';
   const groupName = 'Marketing';
-  const deviceId = '60c99a96-70af-4d68-a8dc-5c51b345c6ce';
-  const deviceName = 'AdeleVence-PC';
+  const deviceName = 'AdeleVance-PC';
 
   let log: string[];
   let logger: Logger;
@@ -453,7 +485,7 @@ describe(commands.ADMINISTRATIVEUNIT_MEMBER_REMOVE, () => {
 
   it('removes the member specified by id from administrative unit specified by id without prompting for confirmation', async () => {
     const deleteRequestStub = sinon.stub(request, 'delete').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/directory/administrativeUnits/${administrativeUnitId}/members/${userId}/$ref`) {
+      if (opts.url === mocks.deleteUser.request.url) {
         return;
       }
 
@@ -469,7 +501,7 @@ describe(commands.ADMINISTRATIVEUNIT_MEMBER_REMOVE, () => {
     sinon.stub(entraUser, 'getUserIdByUpn').withArgs(userName).resolves(userId);
 
     const deleteRequestStub = sinon.stub(request, 'delete').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/directory/administrativeUnits/${administrativeUnitId}/members/${userId}/$ref`) {
+      if (opts.url === mocks.deleteUser.request.url) {
         return;
       }
 
@@ -485,7 +517,7 @@ describe(commands.ADMINISTRATIVEUNIT_MEMBER_REMOVE, () => {
 
   it('removes a member specified by its id from an administrative unit specified by its id', async () => {
     const deleteRequestStub = sinon.stub(request, 'delete').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/directory/administrativeUnits/${administrativeUnitId}/members/${userId}/$ref`) {
+      if (opts.url === mocks.deleteUser.request.url) {
         return;
       }
 
@@ -498,7 +530,7 @@ describe(commands.ADMINISTRATIVEUNIT_MEMBER_REMOVE, () => {
 
   it('removes a user specified by its id from an administrative unit specified by its id', async () => {
     const deleteRequestStub = sinon.stub(request, 'delete').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/directory/administrativeUnits/${administrativeUnitId}/members/${userId}/$ref`) {
+      if (opts.url === mocks.deleteUser.request.url) {
         return;
       }
 
@@ -514,7 +546,7 @@ describe(commands.ADMINISTRATIVEUNIT_MEMBER_REMOVE, () => {
     sinon.stub(entraAdministrativeUnit, 'getAdministrativeUnitByDisplayName').withArgs(administrativeUnitName).resolves({ id: administrativeUnitId, displayName: administrativeUnitName });
 
     const deleteRequestStub = sinon.stub(request, 'delete').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/directory/administrativeUnits/${administrativeUnitId}/members/${userId}/$ref`) {
+      if (opts.url === mocks.deleteUser.request.url) {
         return;
       }
 
@@ -527,7 +559,7 @@ describe(commands.ADMINISTRATIVEUNIT_MEMBER_REMOVE, () => {
 
   it('removes a group specified by its id from an administrative unit specified by its id', async () => {
     const deleteRequestStub = sinon.stub(request, 'delete').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/directory/administrativeUnits/${administrativeUnitId}/members/${groupId}/$ref`) {
+      if (opts.url === mocks.deleteGroup.request.url) {
         return;
       }
 
@@ -543,7 +575,7 @@ describe(commands.ADMINISTRATIVEUNIT_MEMBER_REMOVE, () => {
     sinon.stub(entraAdministrativeUnit, 'getAdministrativeUnitByDisplayName').withArgs(administrativeUnitName).resolves({ id: administrativeUnitId, displayName: administrativeUnitName });
 
     const deleteRequestStub = sinon.stub(request, 'delete').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/directory/administrativeUnits/${administrativeUnitId}/members/${groupId}/$ref`) {
+      if (opts.url === mocks.deleteGroup.request.url) {
         return;
       }
 
@@ -556,7 +588,7 @@ describe(commands.ADMINISTRATIVEUNIT_MEMBER_REMOVE, () => {
 
   it('removes a device specified by its id from an administrative unit specified by its id', async () => {
     const deleteRequestStub = sinon.stub(request, 'delete').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/directory/administrativeUnits/${administrativeUnitId}/members/${deviceId}/$ref`) {
+      if (opts.url === mocks.deleteDevice.request.url) {
         return;
       }
 
@@ -572,7 +604,7 @@ describe(commands.ADMINISTRATIVEUNIT_MEMBER_REMOVE, () => {
     sinon.stub(entraAdministrativeUnit, 'getAdministrativeUnitByDisplayName').withArgs(administrativeUnitName).resolves({ id: administrativeUnitId, displayName: administrativeUnitName });
 
     const deleteRequestStub = sinon.stub(request, 'delete').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/directory/administrativeUnits/${administrativeUnitId}/members/${deviceId}/$ref`) {
+      if (opts.url === mocks.deleteDevice.request.url) {
         return;
       }
 
@@ -596,7 +628,7 @@ describe(commands.ADMINISTRATIVEUNIT_MEMBER_REMOVE, () => {
       }
     };
     sinon.stub(request, 'delete').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/directory/administrativeUnits/${administrativeUnitId}/members/${userId}/$ref`) {
+      if (opts.url === mocks.deleteUser.request.url) {
         throw error;
       }
 

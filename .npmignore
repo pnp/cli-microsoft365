@@ -20,3 +20,4 @@ tsconfig.json
 *.spec.js
 *.mock.js
 test-projects
+permissions/*

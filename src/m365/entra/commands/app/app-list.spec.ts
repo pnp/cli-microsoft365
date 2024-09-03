@@ -11,6 +11,36 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './app-list.js';
 import aadCommands from '../../aadCommands.js';
+import { MockRequests } from '../../../../utils/MockRequest.js';
+import { misc } from '../../../../utils/misc.js';
+
+export const mocks = {
+  getApps: {
+    request: {
+      url: `https://graph.microsoft.com/v1.0/applications`
+    },
+    response: {
+      body: {
+        value: [
+          {
+            id: '340a4aa3-1af6-43ac-87d8-189819003952',
+            appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f',
+            displayName: 'My App 1',
+            description: 'My second app',
+            signInAudience: 'My Audience'
+          },
+          {
+            id: '340a4aa3-1af6-43ac-87d8-189819003953',
+            appId: '9b1b1e42-794b-4c71-93ac-5ed92488b670',
+            displayName: 'My App 2',
+            description: 'My second app',
+            signInAudience: 'My Audience'
+          }
+        ]
+      }
+    }
+  }
+} satisfies MockRequests;
 
 describe(commands.APP_LIST, () => {
   let log: string[];
@@ -76,25 +106,8 @@ describe(commands.APP_LIST, () => {
 
   it(`should get a list of Microsoft Entra app registrations`, async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/applications`) {
-        return {
-          value: [
-            {
-              id: '340a4aa3-1af6-43ac-87d8-189819003952',
-              appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f',
-              displayName: 'My App 1',
-              description: 'My second app',
-              signInAudience: 'My Audience'
-            },
-            {
-              id: '340a4aa3-1af6-43ac-87d8-189819003953',
-              appId: '9b1b1e42-794b-4c71-93ac-5ed92488b670',
-              displayName: 'My App 2',
-              description: 'My second app',
-              signInAudience: 'My Audience'
-            }
-          ]
-        };
+      if (opts.url === mocks.getApps.request.url) {
+        return misc.deepClone(mocks.getApps.response.body);
       }
 
       throw 'Invalid request';

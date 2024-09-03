@@ -8,16 +8,705 @@ import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
 import request from '../../../../request.js';
 import { telemetry } from '../../../../telemetry.js';
+import { misc } from '../../../../utils/misc.js';
+import { MockRequests } from '../../../../utils/MockRequest.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
+import aadCommands from '../../aadCommands.js';
 import commands from '../../commands.js';
 import command from './app-add.js';
-import * as mocks from './app-add.mock.js';
-import aadCommands from '../../aadCommands.js';
+import * as appAddMocks from './app-add.mock.js';
+
+export const mocks = {
+  createAppWithName: {
+    request: {
+      url: 'https://graph.microsoft.com/v1.0/myorganization/applications',
+      method: 'POST',
+      bodyFragment: '"signInAudience": "AzureADMyOrg"'
+    },
+    response: {
+      body: {
+        "id": "5b31c38c-2584-42f0-aa47-657fb3a84230",
+        "deletedDateTime": null,
+        "appId": "bc724b77-da87-43a9-b385-6ebaaf969db8",
+        "applicationTemplateId": null,
+        "createdDateTime": "2020-12-31T14:44:13.7945807Z",
+        "displayName": "My Microsoft Entra app",
+        "description": null,
+        "groupMembershipClaims": null,
+        "identifierUris": [],
+        "isDeviceOnlyAuthSupported": null,
+        "isFallbackPublicClient": null,
+        "notes": null,
+        "optionalClaims": null,
+        "publisherDomain": "contoso.onmicrosoft.com",
+        "signInAudience": "AzureADMyOrg",
+        "tags": [],
+        "tokenEncryptionKeyId": null,
+        "verifiedPublisher": {
+          "displayName": null,
+          "verifiedPublisherId": null,
+          "addedDateTime": null
+        },
+        "spa": {
+          "redirectUris": []
+        },
+        "defaultRedirectUri": null,
+        "addIns": [],
+        "api": {
+          "acceptMappedClaims": null,
+          "knownClientApplications": [],
+          "requestedAccessTokenVersion": null,
+          "oauth2PermissionScopes": [],
+          "preAuthorizedApplications": []
+        },
+        "appRoles": [],
+        "info": {
+          "logoUrl": null,
+          "marketingUrl": null,
+          "privacyStatementUrl": null,
+          "supportUrl": null,
+          "termsOfServiceUrl": null
+        },
+        "keyCredentials": [],
+        "parentalControlSettings": {
+          "countriesBlockedForMinors": [],
+          "legalAgeGroupRule": "Allow"
+        },
+        "passwordCredentials": [],
+        "publicClient": {
+          "redirectUris": []
+        },
+        "requiredResourceAccess": [],
+        "web": {
+          "homePageUrl": null,
+          "logoutUrl": null,
+          "redirectUris": [],
+          "implicitGrantSettings": {
+            "enableAccessTokenIssuance": false,
+            "enableIdTokenIssuance": false
+          }
+        }
+      }
+    }
+  },
+  createMultitenantApp: {
+    request: {
+      url: 'https://graph.microsoft.com/v1.0/myorganization/applications',
+      method: 'POST',
+      bodyFragment: '"signInAudience": "AzureADMultipleOrgs"'
+    },
+    response: {
+      body: {
+        "id": "9b1e2c08-6e35-4134-a0ac-16ab154cd05a",
+        "deletedDateTime": null,
+        "appId": "62f0f128-987f-47f2-827a-be50d0d894c7",
+        "applicationTemplateId": null,
+        "createdDateTime": "2020-12-31T14:50:40.1806422Z",
+        "displayName": "My Microsoft Entra app",
+        "description": null,
+        "groupMembershipClaims": null,
+        "identifierUris": [],
+        "isDeviceOnlyAuthSupported": null,
+        "isFallbackPublicClient": null,
+        "notes": null,
+        "optionalClaims": null,
+        "publisherDomain": "M365x271534.onmicrosoft.com",
+        "signInAudience": "AzureADMultipleOrgs",
+        "tags": [],
+        "tokenEncryptionKeyId": null,
+        "verifiedPublisher": {
+          "displayName": null,
+          "verifiedPublisherId": null,
+          "addedDateTime": null
+        },
+        "spa": {
+          "redirectUris": []
+        },
+        "defaultRedirectUri": null,
+        "addIns": [],
+        "api": {
+          "acceptMappedClaims": null,
+          "knownClientApplications": [],
+          "requestedAccessTokenVersion": null,
+          "oauth2PermissionScopes": [],
+          "preAuthorizedApplications": []
+        },
+        "appRoles": [],
+        "info": {
+          "logoUrl": null,
+          "marketingUrl": null,
+          "privacyStatementUrl": null,
+          "supportUrl": null,
+          "termsOfServiceUrl": null
+        },
+        "keyCredentials": [],
+        "parentalControlSettings": {
+          "countriesBlockedForMinors": [],
+          "legalAgeGroupRule": "Allow"
+        },
+        "passwordCredentials": [],
+        "publicClient": {
+          "redirectUris": []
+        },
+        "requiredResourceAccess": [],
+        "web": {
+          "homePageUrl": null,
+          "logoutUrl": null,
+          "redirectUris": [],
+          "implicitGrantSettings": {
+            "enableAccessTokenIssuance": false,
+            "enableIdTokenIssuance": false
+          }
+        }
+      }
+    }
+  },
+  createAppWithRedirectUris: {
+    request: {
+      url: 'https://graph.microsoft.com/v1.0/myorganization/applications',
+      method: 'POST',
+      bodyFragment: '"https://myapp.azurewebsites.net",'
+    },
+    response: {
+      body: {
+        "id": "ff520671-4810-4d25-a10f-e565fc62a5ec",
+        "deletedDateTime": null,
+        "appId": "d2941a3b-aad4-49e0-8a1d-b82de0b46067",
+        "applicationTemplateId": null,
+        "createdDateTime": "2020-12-31T14:53:40.7071625Z",
+        "displayName": "My Microsoft Entra app",
+        "description": null,
+        "groupMembershipClaims": null,
+        "identifierUris": [],
+        "isDeviceOnlyAuthSupported": null,
+        "isFallbackPublicClient": null,
+        "notes": null,
+        "optionalClaims": null,
+        "publisherDomain": "M365x271534.onmicrosoft.com",
+        "signInAudience": "AzureADMyOrg",
+        "tags": [],
+        "tokenEncryptionKeyId": null,
+        "verifiedPublisher": {
+          "displayName": null,
+          "verifiedPublisherId": null,
+          "addedDateTime": null
+        },
+        "spa": {
+          "redirectUris": []
+        },
+        "defaultRedirectUri": null,
+        "addIns": [],
+        "api": {
+          "acceptMappedClaims": null,
+          "knownClientApplications": [],
+          "requestedAccessTokenVersion": null,
+          "oauth2PermissionScopes": [],
+          "preAuthorizedApplications": []
+        },
+        "appRoles": [],
+        "info": {
+          "logoUrl": null,
+          "marketingUrl": null,
+          "privacyStatementUrl": null,
+          "supportUrl": null,
+          "termsOfServiceUrl": null
+        },
+        "keyCredentials": [],
+        "parentalControlSettings": {
+          "countriesBlockedForMinors": [],
+          "legalAgeGroupRule": "Allow"
+        },
+        "passwordCredentials": [],
+        "publicClient": {
+          "redirectUris": []
+        },
+        "requiredResourceAccess": [],
+        "web": {
+          "homePageUrl": null,
+          "logoutUrl": null,
+          "redirectUris": [
+            "https://myapp.azurewebsites.net",
+            "http://localhost:4000"
+          ],
+          "implicitGrantSettings": {
+            "enableAccessTokenIssuance": false,
+            "enableIdTokenIssuance": false
+          }
+        }
+      }
+    }
+  },
+  createDesktopApp: {
+    request: {
+      url: 'https://graph.microsoft.com/v1.0/myorganization/applications',
+      method: 'POST',
+      bodyFragment: '"https://login.microsoftonline.com/common/oauth2/nativeclient"'
+    },
+    response: {
+      body: {
+        "id": "f1bb2138-bff1-491e-b082-9f447f3742b8",
+        "deletedDateTime": null,
+        "appId": "1ce0287c-9ccc-457e-a0cf-3ec5b734c092",
+        "applicationTemplateId": null,
+        "createdDateTime": "2020-12-31T14:56:17.4207858Z",
+        "displayName": "My Microsoft Entra app",
+        "description": null,
+        "groupMembershipClaims": null,
+        "identifierUris": [],
+        "isDeviceOnlyAuthSupported": null,
+        "isFallbackPublicClient": null,
+        "notes": null,
+        "optionalClaims": null,
+        "publisherDomain": "M365x271534.onmicrosoft.com",
+        "signInAudience": "AzureADMyOrg",
+        "tags": [],
+        "tokenEncryptionKeyId": null,
+        "verifiedPublisher": {
+          "displayName": null,
+          "verifiedPublisherId": null,
+          "addedDateTime": null
+        },
+        "spa": {
+          "redirectUris": []
+        },
+        "defaultRedirectUri": null,
+        "addIns": [],
+        "api": {
+          "acceptMappedClaims": null,
+          "knownClientApplications": [],
+          "requestedAccessTokenVersion": null,
+          "oauth2PermissionScopes": [],
+          "preAuthorizedApplications": []
+        },
+        "appRoles": [],
+        "info": {
+          "logoUrl": null,
+          "marketingUrl": null,
+          "privacyStatementUrl": null,
+          "supportUrl": null,
+          "termsOfServiceUrl": null
+        },
+        "keyCredentials": [],
+        "parentalControlSettings": {
+          "countriesBlockedForMinors": [],
+          "legalAgeGroupRule": "Allow"
+        },
+        "passwordCredentials": [],
+        "publicClient": {
+          "redirectUris": [
+            "https://login.microsoftonline.com/common/oauth2/nativeclient"
+          ]
+        },
+        "requiredResourceAccess": [],
+        "web": {
+          "homePageUrl": null,
+          "logoutUrl": null,
+          "redirectUris": [],
+          "implicitGrantSettings": {
+            "enableAccessTokenIssuance": false,
+            "enableIdTokenIssuance": false
+          }
+        }
+      }
+    }
+  },
+  createSecret: {
+    request: {
+      url: 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230/addPassword',
+      method: 'POST'
+    },
+    response: {
+      body: {
+        "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#microsoft.graph.passwordCredential",
+        "customKeyIdentifier": null,
+        "displayName": "Default",
+        "endDateTime": "2120-12-31T14:58:16.875Z",
+        "hint": "VtJ",
+        "keyId": "17dc40d4-7c81-47dd-a3cb-41df4aed1130",
+        "secretText": "VtJt.yG~V5pzbY2.xekx_0Xy_~9ozP_Ub5",
+        "startDateTime": "2020-12-31T14:58:19.2307535Z"
+      }
+    }
+  },
+  getGraphSp: {
+    request: {
+      url: 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames'
+    },
+    response: {
+      body: {
+        "@odata.nextLink": "https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27",
+        "value": [
+          appAddMocks.microsoftGraphSp
+        ]
+      }
+    }
+  },
+  getAadSp: {
+    request: {
+      url: 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27'
+    },
+    response: {
+      body: {
+        value: appAddMocks.aadSp
+      }
+    }
+  },
+  createAppWithRoles: {
+    request: {
+      url: 'https://graph.microsoft.com/v1.0/myorganization/applications',
+      method: 'POST',
+      bodyFragment: '"id": "62a82d76-70ea-41e2-9197-370581804d09",'
+    },
+    response: {
+      body: {
+        "id": "5b31c38c-2584-42f0-aa47-657fb3a84230",
+        "deletedDateTime": null,
+        "appId": "bc724b77-da87-43a9-b385-6ebaaf969db8",
+        "applicationTemplateId": null,
+        "createdDateTime": "2020-12-31T15:02:42.8048505Z",
+        "displayName": "My Microsoft Entra app",
+        "description": null,
+        "groupMembershipClaims": null,
+        "identifierUris": [],
+        "isDeviceOnlyAuthSupported": null,
+        "isFallbackPublicClient": null,
+        "notes": null,
+        "optionalClaims": null,
+        "publisherDomain": "M365x271534.onmicrosoft.com",
+        "signInAudience": "AzureADMyOrg",
+        "tags": [],
+        "tokenEncryptionKeyId": null,
+        "verifiedPublisher": {
+          "displayName": null,
+          "verifiedPublisherId": null,
+          "addedDateTime": null
+        },
+        "spa": {
+          "redirectUris": []
+        },
+        "defaultRedirectUri": null,
+        "addIns": [],
+        "api": {
+          "acceptMappedClaims": null,
+          "knownClientApplications": [],
+          "requestedAccessTokenVersion": null,
+          "oauth2PermissionScopes": [],
+          "preAuthorizedApplications": []
+        },
+        "appRoles": [],
+        "info": {
+          "logoUrl": null,
+          "marketingUrl": null,
+          "privacyStatementUrl": null,
+          "supportUrl": null,
+          "termsOfServiceUrl": null
+        },
+        "keyCredentials": [],
+        "parentalControlSettings": {
+          "countriesBlockedForMinors": [],
+          "legalAgeGroupRule": "Allow"
+        },
+        "passwordCredentials": [],
+        "publicClient": {
+          "redirectUris": []
+        },
+        "requiredResourceAccess": [
+          {
+            "resourceAppId": "00000003-0000-0000-c000-000000000000",
+            "resourceAccess": [
+              {
+                "id": "62a82d76-70ea-41e2-9197-370581804d09",
+                "type": "Role"
+              },
+              {
+                "id": "7ab1d382-f21e-4acd-a863-ba3e13f7da61",
+                "type": "Role"
+              }
+            ]
+          }
+        ],
+        "web": {
+          "homePageUrl": null,
+          "logoutUrl": null,
+          "redirectUris": [],
+          "implicitGrantSettings": {
+            "enableAccessTokenIssuance": false,
+            "enableIdTokenIssuance": false
+          }
+        }
+      }
+    }
+  },
+  createAppWithScopes: {
+    request: {
+      url: 'https://graph.microsoft.com/v1.0/myorganization/applications',
+      method: 'POST',
+      bodyFragment: '"06da0dbc-49e2-44d2-8312-53f166ab848a"'
+    },
+    response: {
+      body: {
+        "id": "5b31c38c-2584-42f0-aa47-657fb3a84230",
+        "deletedDateTime": null,
+        "appId": "bc724b77-da87-43a9-b385-6ebaaf969db8",
+        "applicationTemplateId": null,
+        "createdDateTime": "2020-12-31T15:02:42.8048505Z",
+        "displayName": "My Microsoft Entra app",
+        "description": null,
+        "groupMembershipClaims": null,
+        "identifierUris": [],
+        "isDeviceOnlyAuthSupported": null,
+        "isFallbackPublicClient": null,
+        "notes": null,
+        "optionalClaims": null,
+        "publisherDomain": "M365x271534.onmicrosoft.com",
+        "signInAudience": "AzureADMyOrg",
+        "tags": [],
+        "tokenEncryptionKeyId": null,
+        "verifiedPublisher": {
+          "displayName": null,
+          "verifiedPublisherId": null,
+          "addedDateTime": null
+        },
+        "spa": {
+          "redirectUris": []
+        },
+        "defaultRedirectUri": null,
+        "addIns": [],
+        "api": {
+          "acceptMappedClaims": null,
+          "knownClientApplications": [],
+          "requestedAccessTokenVersion": null,
+          "oauth2PermissionScopes": [],
+          "preAuthorizedApplications": []
+        },
+        "appRoles": [],
+        "info": {
+          "logoUrl": null,
+          "marketingUrl": null,
+          "privacyStatementUrl": null,
+          "supportUrl": null,
+          "termsOfServiceUrl": null
+        },
+        "keyCredentials": [],
+        "parentalControlSettings": {
+          "countriesBlockedForMinors": [],
+          "legalAgeGroupRule": "Allow"
+        },
+        "passwordCredentials": [],
+        "publicClient": {
+          "redirectUris": []
+        },
+        "requiredResourceAccess": [
+          {
+            "resourceAppId": "00000003-0000-0000-c000-000000000000",
+            "resourceAccess": [
+              {
+                "id": "06da0dbc-49e2-44d2-8312-53f166ab848a",
+                "type": "Scope"
+              },
+              {
+                "id": "62a82d76-70ea-41e2-9197-370581804d09",
+                "type": "Role"
+              },
+              {
+                "id": "7ab1d382-f21e-4acd-a863-ba3e13f7da61",
+                "type": "Role"
+              }
+            ]
+          }
+        ],
+        "web": {
+          "homePageUrl": null,
+          "logoutUrl": null,
+          "redirectUris": [],
+          "implicitGrantSettings": {
+            "enableAccessTokenIssuance": false,
+            "enableIdTokenIssuance": false
+          }
+        }
+      }
+    }
+  },
+  createSpa: {
+    request: {
+      url: 'https://graph.microsoft.com/v1.0/myorganization/applications',
+      method: 'POST',
+      bodyFragment: '"https://myspa.azurewebsites.net",'
+    },
+    response: {
+      body: {
+        "id": "f51ff52f-8f04-4924-91d0-636349eed65c",
+        "deletedDateTime": null,
+        "appId": "c505d465-9e4e-4bb4-b653-7b36d77cc94a",
+        "applicationTemplateId": null,
+        "createdDateTime": "2020-12-31T19:08:27.9188248Z",
+        "displayName": "My Microsoft Entra app",
+        "description": null,
+        "groupMembershipClaims": null,
+        "identifierUris": [],
+        "isDeviceOnlyAuthSupported": null,
+        "isFallbackPublicClient": null,
+        "notes": null,
+        "optionalClaims": null,
+        "publisherDomain": "M365x271534.onmicrosoft.com",
+        "signInAudience": "AzureADMyOrg",
+        "tags": [],
+        "tokenEncryptionKeyId": null,
+        "verifiedPublisher": {
+          "displayName": null,
+          "verifiedPublisherId": null,
+          "addedDateTime": null
+        },
+        "spa": {
+          "redirectUris": [
+            "https://myspa.azurewebsites.net",
+            "http://localhost:8080"
+          ]
+        },
+        "defaultRedirectUri": null,
+        "addIns": [],
+        "api": {
+          "acceptMappedClaims": null,
+          "knownClientApplications": [],
+          "requestedAccessTokenVersion": null,
+          "oauth2PermissionScopes": [],
+          "preAuthorizedApplications": []
+        },
+        "appRoles": [],
+        "info": {
+          "logoUrl": null,
+          "marketingUrl": null,
+          "privacyStatementUrl": null,
+          "supportUrl": null,
+          "termsOfServiceUrl": null
+        },
+        "keyCredentials": [],
+        "parentalControlSettings": {
+          "countriesBlockedForMinors": [],
+          "legalAgeGroupRule": "Allow"
+        },
+        "passwordCredentials": [],
+        "publicClient": {
+          "redirectUris": []
+        },
+        "requiredResourceAccess": [
+          {
+            "resourceAppId": "00000003-0000-0000-c000-000000000000",
+            "resourceAccess": [
+              {
+                "id": "465a38f9-76ea-45b9-9f34-9e8b0d4b0b42",
+                "type": "Scope"
+              },
+              {
+                "id": "06da0dbc-49e2-44d2-8312-53f166ab848a",
+                "type": "Scope"
+              }
+            ]
+          }
+        ],
+        "web": {
+          "homePageUrl": null,
+          "logoutUrl": null,
+          "redirectUris": [],
+          "implicitGrantSettings": {
+            "enableAccessTokenIssuance": true,
+            "enableIdTokenIssuance": true
+          }
+        }
+      }
+    }
+  },
+  createAppWithAppIDUri: {
+    request: {
+      url: 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230',
+      method: 'PATCH',
+      bodyFragment: '"https://contoso.onmicrosoft.com/myapp"'
+    },
+    response: {
+      body: {}
+    }
+  },
+  createAppWithAppIDUriAndScopesAdminConsent: {
+    request: {
+      url: 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230',
+      method: 'PATCH',
+      bodyFragment: '"type": "Admin",'
+    },
+    response: {
+      body: {}
+    }
+  },
+  createAppWithAppIDUriAndScopesUserConsent: {
+    request: {
+      url: 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230',
+      method: 'PATCH',
+      bodyFragment: '"type": "User",'
+    },
+    response: {
+      body: {}
+    }
+  },
+  createServicePrincipal: {
+    request: {
+      url: 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals',
+      method: 'POST'
+    },
+    response: {
+      body: {
+        "id": "59e617e5-e447-4adc-8b88-00af644d7c92",
+        "appId": "bc724b77-da87-43a9-b385-6ebaaf969db8",
+        "displayName": "My Microsoft Entra app",
+        "appRoles": [],
+        "oauth2PermissionScopes": [],
+        "servicePrincipalNames": [
+          "f1bd758f-4a1a-4b71-aa20-a248a22a8928"
+        ]
+      }
+    }
+  },
+  addOAuth2PermissionGrants: {
+    request: {
+      url: 'https://graph.microsoft.com/v1.0/myorganization/oauth2PermissionGrants',
+      method: 'POST'
+    },
+    response: {
+      body: {}
+    }
+  },
+  addAppRoleAssignment: {
+    request: {
+      url: 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals/59e617e5-e447-4adc-8b88-00af644d7c92/appRoleAssignments',
+      method: 'POST'
+    },
+    response: {
+      body: {
+        "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#servicePrincipals('59e617e5-e447-4adc-8b88-00af644d7c92')/appRoleAssignments/$entity",
+        "id": "vAolND43WUinlI9oBu_ynaoJXWsFy9tInKpeHJBShh4",
+        "deletedDateTime": null,
+        "appRoleId": "62a82d76-70ea-41e2-9197-370581804d09",
+        "createdDateTime": "2022-06-08T16:09:29.4885458Z",
+        "principalDisplayName": "myapp",
+        "principalId": "24448e9c-d0fa-43d1-a1dd-e279720969a0",
+        "principalType": "ServicePrincipal",
+        "resourceDisplayName": "Microsoft Graph",
+        "resourceId": "f75121cb-5156-42f0-916e-341ea2ecaa22"
+      }
+    }
+  },
+  updateApp: {
+    request: {
+      url: 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230',
+      method: 'PATCH'
+    },
+    response: {
+      body: {}
+    }
+  }
+} satisfies MockRequests;
 
 describe(commands.APP_ADD, () => {
-
   //#region manifests
   const basicManifest = {
     "id": "95cfe30d-ed44-4f9d-b73d-c66560f72e83",
@@ -218,74 +907,12 @@ describe(commands.APP_ADD, () => {
     sinon.stub(request, 'get').rejects('Issues GET request');
     sinon.stub(request, 'patch').rejects('Issued PATCH request');
     sinon.stub(request, 'post').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
+      if (opts.url === mocks.createAppWithName.request.url &&
         JSON.stringify(opts.data) === JSON.stringify({
           "displayName": "My Microsoft Entra app",
           "signInAudience": "AzureADMyOrg"
         })) {
-        return {
-          "id": "5b31c38c-2584-42f0-aa47-657fb3a84230",
-          "deletedDateTime": null,
-          "appId": "bc724b77-da87-43a9-b385-6ebaaf969db8",
-          "applicationTemplateId": null,
-          "createdDateTime": "2020-12-31T14:44:13.7945807Z",
-          "displayName": "My Microsoft Entra app",
-          "description": null,
-          "groupMembershipClaims": null,
-          "identifierUris": [],
-          "isDeviceOnlyAuthSupported": null,
-          "isFallbackPublicClient": null,
-          "notes": null,
-          "optionalClaims": null,
-          "publisherDomain": "contoso.onmicrosoft.com",
-          "signInAudience": "AzureADMyOrg",
-          "tags": [],
-          "tokenEncryptionKeyId": null,
-          "verifiedPublisher": {
-            "displayName": null,
-            "verifiedPublisherId": null,
-            "addedDateTime": null
-          },
-          "spa": {
-            "redirectUris": []
-          },
-          "defaultRedirectUri": null,
-          "addIns": [],
-          "api": {
-            "acceptMappedClaims": null,
-            "knownClientApplications": [],
-            "requestedAccessTokenVersion": null,
-            "oauth2PermissionScopes": [],
-            "preAuthorizedApplications": []
-          },
-          "appRoles": [],
-          "info": {
-            "logoUrl": null,
-            "marketingUrl": null,
-            "privacyStatementUrl": null,
-            "supportUrl": null,
-            "termsOfServiceUrl": null
-          },
-          "keyCredentials": [],
-          "parentalControlSettings": {
-            "countriesBlockedForMinors": [],
-            "legalAgeGroupRule": "Allow"
-          },
-          "passwordCredentials": [],
-          "publicClient": {
-            "redirectUris": []
-          },
-          "requiredResourceAccess": [],
-          "web": {
-            "homePageUrl": null,
-            "logoutUrl": null,
-            "redirectUris": [],
-            "implicitGrantSettings": {
-              "enableAccessTokenIssuance": false,
-              "enableIdTokenIssuance": false
-            }
-          }
-        };
+        return misc.deepClone(mocks.createAppWithName.response.body);
       }
 
       throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
@@ -307,74 +934,12 @@ describe(commands.APP_ADD, () => {
     sinon.stub(request, 'get').rejects('Issues GET request');
     sinon.stub(request, 'patch').rejects('Issued PATCH request');
     sinon.stub(request, 'post').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
+      if (opts.url === mocks.createMultitenantApp.request.url &&
         JSON.stringify(opts.data) === JSON.stringify({
           "displayName": "My Microsoft Entra app",
           "signInAudience": "AzureADMultipleOrgs"
         })) {
-        return {
-          "id": "9b1e2c08-6e35-4134-a0ac-16ab154cd05a",
-          "deletedDateTime": null,
-          "appId": "62f0f128-987f-47f2-827a-be50d0d894c7",
-          "applicationTemplateId": null,
-          "createdDateTime": "2020-12-31T14:50:40.1806422Z",
-          "displayName": "My Microsoft Entra app",
-          "description": null,
-          "groupMembershipClaims": null,
-          "identifierUris": [],
-          "isDeviceOnlyAuthSupported": null,
-          "isFallbackPublicClient": null,
-          "notes": null,
-          "optionalClaims": null,
-          "publisherDomain": "M365x271534.onmicrosoft.com",
-          "signInAudience": "AzureADMultipleOrgs",
-          "tags": [],
-          "tokenEncryptionKeyId": null,
-          "verifiedPublisher": {
-            "displayName": null,
-            "verifiedPublisherId": null,
-            "addedDateTime": null
-          },
-          "spa": {
-            "redirectUris": []
-          },
-          "defaultRedirectUri": null,
-          "addIns": [],
-          "api": {
-            "acceptMappedClaims": null,
-            "knownClientApplications": [],
-            "requestedAccessTokenVersion": null,
-            "oauth2PermissionScopes": [],
-            "preAuthorizedApplications": []
-          },
-          "appRoles": [],
-          "info": {
-            "logoUrl": null,
-            "marketingUrl": null,
-            "privacyStatementUrl": null,
-            "supportUrl": null,
-            "termsOfServiceUrl": null
-          },
-          "keyCredentials": [],
-          "parentalControlSettings": {
-            "countriesBlockedForMinors": [],
-            "legalAgeGroupRule": "Allow"
-          },
-          "passwordCredentials": [],
-          "publicClient": {
-            "redirectUris": []
-          },
-          "requiredResourceAccess": [],
-          "web": {
-            "homePageUrl": null,
-            "logoutUrl": null,
-            "redirectUris": [],
-            "implicitGrantSettings": {
-              "enableAccessTokenIssuance": false,
-              "enableIdTokenIssuance": false
-            }
-          }
-        };
+        return misc.deepClone(mocks.createMultitenantApp.response.body);
       }
 
       throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
@@ -397,7 +962,7 @@ describe(commands.APP_ADD, () => {
     sinon.stub(request, 'get').rejects('Issues GET request');
     sinon.stub(request, 'patch').rejects('Issued PATCH request');
     sinon.stub(request, 'post').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
+      if (opts.url === mocks.createAppWithRedirectUris.request.url &&
         JSON.stringify(opts.data) === JSON.stringify({
           "displayName": "My Microsoft Entra app",
           "signInAudience": "AzureADMyOrg",
@@ -408,72 +973,7 @@ describe(commands.APP_ADD, () => {
             ]
           }
         })) {
-        return {
-          "id": "ff520671-4810-4d25-a10f-e565fc62a5ec",
-          "deletedDateTime": null,
-          "appId": "d2941a3b-aad4-49e0-8a1d-b82de0b46067",
-          "applicationTemplateId": null,
-          "createdDateTime": "2020-12-31T14:53:40.7071625Z",
-          "displayName": "My Microsoft Entra app",
-          "description": null,
-          "groupMembershipClaims": null,
-          "identifierUris": [],
-          "isDeviceOnlyAuthSupported": null,
-          "isFallbackPublicClient": null,
-          "notes": null,
-          "optionalClaims": null,
-          "publisherDomain": "M365x271534.onmicrosoft.com",
-          "signInAudience": "AzureADMyOrg",
-          "tags": [],
-          "tokenEncryptionKeyId": null,
-          "verifiedPublisher": {
-            "displayName": null,
-            "verifiedPublisherId": null,
-            "addedDateTime": null
-          },
-          "spa": {
-            "redirectUris": []
-          },
-          "defaultRedirectUri": null,
-          "addIns": [],
-          "api": {
-            "acceptMappedClaims": null,
-            "knownClientApplications": [],
-            "requestedAccessTokenVersion": null,
-            "oauth2PermissionScopes": [],
-            "preAuthorizedApplications": []
-          },
-          "appRoles": [],
-          "info": {
-            "logoUrl": null,
-            "marketingUrl": null,
-            "privacyStatementUrl": null,
-            "supportUrl": null,
-            "termsOfServiceUrl": null
-          },
-          "keyCredentials": [],
-          "parentalControlSettings": {
-            "countriesBlockedForMinors": [],
-            "legalAgeGroupRule": "Allow"
-          },
-          "passwordCredentials": [],
-          "publicClient": {
-            "redirectUris": []
-          },
-          "requiredResourceAccess": [],
-          "web": {
-            "homePageUrl": null,
-            "logoutUrl": null,
-            "redirectUris": [
-              "https://myapp.azurewebsites.net",
-              "http://localhost:4000"
-            ],
-            "implicitGrantSettings": {
-              "enableAccessTokenIssuance": false,
-              "enableIdTokenIssuance": false
-            }
-          }
-        };
+        return misc.deepClone(mocks.createAppWithRedirectUris.response.body);
       }
 
       throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
@@ -497,7 +997,7 @@ describe(commands.APP_ADD, () => {
     sinon.stub(request, 'get').rejects('Issues GET request');
     sinon.stub(request, 'patch').rejects('Issued PATCH request');
     sinon.stub(request, 'post').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
+      if (opts.url === mocks.createDesktopApp.request.url &&
         JSON.stringify(opts.data) === JSON.stringify({
           "displayName": "My Microsoft Entra app",
           "signInAudience": "AzureADMyOrg",
@@ -507,71 +1007,7 @@ describe(commands.APP_ADD, () => {
             ]
           }
         })) {
-        return {
-          "id": "f1bb2138-bff1-491e-b082-9f447f3742b8",
-          "deletedDateTime": null,
-          "appId": "1ce0287c-9ccc-457e-a0cf-3ec5b734c092",
-          "applicationTemplateId": null,
-          "createdDateTime": "2020-12-31T14:56:17.4207858Z",
-          "displayName": "My Microsoft Entra app",
-          "description": null,
-          "groupMembershipClaims": null,
-          "identifierUris": [],
-          "isDeviceOnlyAuthSupported": null,
-          "isFallbackPublicClient": null,
-          "notes": null,
-          "optionalClaims": null,
-          "publisherDomain": "M365x271534.onmicrosoft.com",
-          "signInAudience": "AzureADMyOrg",
-          "tags": [],
-          "tokenEncryptionKeyId": null,
-          "verifiedPublisher": {
-            "displayName": null,
-            "verifiedPublisherId": null,
-            "addedDateTime": null
-          },
-          "spa": {
-            "redirectUris": []
-          },
-          "defaultRedirectUri": null,
-          "addIns": [],
-          "api": {
-            "acceptMappedClaims": null,
-            "knownClientApplications": [],
-            "requestedAccessTokenVersion": null,
-            "oauth2PermissionScopes": [],
-            "preAuthorizedApplications": []
-          },
-          "appRoles": [],
-          "info": {
-            "logoUrl": null,
-            "marketingUrl": null,
-            "privacyStatementUrl": null,
-            "supportUrl": null,
-            "termsOfServiceUrl": null
-          },
-          "keyCredentials": [],
-          "parentalControlSettings": {
-            "countriesBlockedForMinors": [],
-            "legalAgeGroupRule": "Allow"
-          },
-          "passwordCredentials": [],
-          "publicClient": {
-            "redirectUris": [
-              "https://login.microsoftonline.com/common/oauth2/nativeclient"
-            ]
-          },
-          "requiredResourceAccess": [],
-          "web": {
-            "homePageUrl": null,
-            "logoutUrl": null,
-            "redirectUris": [],
-            "implicitGrantSettings": {
-              "enableAccessTokenIssuance": false,
-              "enableIdTokenIssuance": false
-            }
-          }
-        };
+        return misc.deepClone(mocks.createDesktopApp.response.body);
       }
 
       throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
@@ -595,87 +1031,16 @@ describe(commands.APP_ADD, () => {
     sinon.stub(request, 'get').rejects('Issues GET request');
     sinon.stub(request, 'patch').rejects('Issued PATCH request');
     sinon.stub(request, 'post').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
+      if (opts.url === mocks.createAppWithName.request.url &&
         JSON.stringify(opts.data) === JSON.stringify({
           "displayName": "My Microsoft Entra app",
           "signInAudience": "AzureADMyOrg"
         })) {
-        return {
-          "id": "4d24b0c6-ad07-47c6-9bd8-9c167f9f758e",
-          "deletedDateTime": null,
-          "appId": "3c5bd51d-f1ac-4344-bd16-43396cadff14",
-          "applicationTemplateId": null,
-          "createdDateTime": "2020-12-31T14:58:18.7120335Z",
-          "displayName": "My Microsoft Entra app",
-          "description": null,
-          "groupMembershipClaims": null,
-          "identifierUris": [],
-          "isDeviceOnlyAuthSupported": null,
-          "isFallbackPublicClient": null,
-          "notes": null,
-          "optionalClaims": null,
-          "publisherDomain": "M365x271534.onmicrosoft.com",
-          "signInAudience": "AzureADMyOrg",
-          "tags": [],
-          "tokenEncryptionKeyId": null,
-          "verifiedPublisher": {
-            "displayName": null,
-            "verifiedPublisherId": null,
-            "addedDateTime": null
-          },
-          "spa": {
-            "redirectUris": []
-          },
-          "defaultRedirectUri": null,
-          "addIns": [],
-          "api": {
-            "acceptMappedClaims": null,
-            "knownClientApplications": [],
-            "requestedAccessTokenVersion": null,
-            "oauth2PermissionScopes": [],
-            "preAuthorizedApplications": []
-          },
-          "appRoles": [],
-          "info": {
-            "logoUrl": null,
-            "marketingUrl": null,
-            "privacyStatementUrl": null,
-            "supportUrl": null,
-            "termsOfServiceUrl": null
-          },
-          "keyCredentials": [],
-          "parentalControlSettings": {
-            "countriesBlockedForMinors": [],
-            "legalAgeGroupRule": "Allow"
-          },
-          "passwordCredentials": [],
-          "publicClient": {
-            "redirectUris": []
-          },
-          "requiredResourceAccess": [],
-          "web": {
-            "homePageUrl": null,
-            "logoutUrl": null,
-            "redirectUris": [],
-            "implicitGrantSettings": {
-              "enableAccessTokenIssuance": false,
-              "enableIdTokenIssuance": false
-            }
-          }
-        };
+        return misc.deepClone(mocks.createAppWithName.response.body);
       }
 
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/4d24b0c6-ad07-47c6-9bd8-9c167f9f758e/addPassword') {
-        return {
-          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#microsoft.graph.passwordCredential",
-          "customKeyIdentifier": null,
-          "displayName": "Default",
-          "endDateTime": "2120-12-31T14:58:16.875Z",
-          "hint": "VtJ",
-          "keyId": "17dc40d4-7c81-47dd-a3cb-41df4aed1130",
-          "secretText": "VtJt.yG~V5pzbY2.xekx_0Xy_~9ozP_Ub5",
-          "startDateTime": "2020-12-31T14:58:19.2307535Z"
-        };
+      if (opts.url === mocks.createSecret.request.url) {
+        return misc.deepClone(mocks.createSecret.response.body);
       }
 
       throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
@@ -688,8 +1053,8 @@ describe(commands.APP_ADD, () => {
       }
     });
     assert(loggerLogSpy.calledWith({
-      appId: '3c5bd51d-f1ac-4344-bd16-43396cadff14',
-      objectId: '4d24b0c6-ad07-47c6-9bd8-9c167f9f758e',
+      appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
+      objectId: '5b31c38c-2584-42f0-aa47-657fb3a84230',
       secrets: [{
         displayName: 'Default',
         value: 'VtJt.yG~V5pzbY2.xekx_0Xy_~9ozP_Ub5'
@@ -702,87 +1067,16 @@ describe(commands.APP_ADD, () => {
     sinon.stub(request, 'get').rejects('Issues GET request');
     sinon.stub(request, 'patch').rejects('Issued PATCH request');
     sinon.stub(request, 'post').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
+      if (opts.url === mocks.createAppWithName.request.url &&
         JSON.stringify(opts.data) === JSON.stringify({
           "displayName": "My Microsoft Entra app",
           "signInAudience": "AzureADMyOrg"
         })) {
-        return {
-          "id": "4d24b0c6-ad07-47c6-9bd8-9c167f9f758e",
-          "deletedDateTime": null,
-          "appId": "3c5bd51d-f1ac-4344-bd16-43396cadff14",
-          "applicationTemplateId": null,
-          "createdDateTime": "2020-12-31T14:58:18.7120335Z",
-          "displayName": "My Microsoft Entra app",
-          "description": null,
-          "groupMembershipClaims": null,
-          "identifierUris": [],
-          "isDeviceOnlyAuthSupported": null,
-          "isFallbackPublicClient": null,
-          "notes": null,
-          "optionalClaims": null,
-          "publisherDomain": "M365x271534.onmicrosoft.com",
-          "signInAudience": "AzureADMyOrg",
-          "tags": [],
-          "tokenEncryptionKeyId": null,
-          "verifiedPublisher": {
-            "displayName": null,
-            "verifiedPublisherId": null,
-            "addedDateTime": null
-          },
-          "spa": {
-            "redirectUris": []
-          },
-          "defaultRedirectUri": null,
-          "addIns": [],
-          "api": {
-            "acceptMappedClaims": null,
-            "knownClientApplications": [],
-            "requestedAccessTokenVersion": null,
-            "oauth2PermissionScopes": [],
-            "preAuthorizedApplications": []
-          },
-          "appRoles": [],
-          "info": {
-            "logoUrl": null,
-            "marketingUrl": null,
-            "privacyStatementUrl": null,
-            "supportUrl": null,
-            "termsOfServiceUrl": null
-          },
-          "keyCredentials": [],
-          "parentalControlSettings": {
-            "countriesBlockedForMinors": [],
-            "legalAgeGroupRule": "Allow"
-          },
-          "passwordCredentials": [],
-          "publicClient": {
-            "redirectUris": []
-          },
-          "requiredResourceAccess": [],
-          "web": {
-            "homePageUrl": null,
-            "logoutUrl": null,
-            "redirectUris": [],
-            "implicitGrantSettings": {
-              "enableAccessTokenIssuance": false,
-              "enableIdTokenIssuance": false
-            }
-          }
-        };
+        return misc.deepClone(mocks.createAppWithName.response.body);
       }
 
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/4d24b0c6-ad07-47c6-9bd8-9c167f9f758e/addPassword') {
-        return {
-          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#microsoft.graph.passwordCredential",
-          "customKeyIdentifier": null,
-          "displayName": "Default",
-          "endDateTime": "2120-12-31T14:58:16.875Z",
-          "hint": "VtJ",
-          "keyId": "17dc40d4-7c81-47dd-a3cb-41df4aed1130",
-          "secretText": "VtJt.yG~V5pzbY2.xekx_0Xy_~9ozP_Ub5",
-          "startDateTime": "2020-12-31T14:58:19.2307535Z"
-        };
+      if (opts.url === mocks.createSecret.request.url) {
+        return misc.deepClone(mocks.createSecret.response.body);
       }
 
       throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
@@ -796,8 +1090,8 @@ describe(commands.APP_ADD, () => {
       }
     });
     assert(loggerLogSpy.calledWith({
-      appId: '3c5bd51d-f1ac-4344-bd16-43396cadff14',
-      objectId: '4d24b0c6-ad07-47c6-9bd8-9c167f9f758e',
+      appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
+      objectId: '5b31c38c-2584-42f0-aa47-657fb3a84230',
       secrets: [{
         displayName: 'Default',
         value: 'VtJt.yG~V5pzbY2.xekx_0Xy_~9ozP_Ub5'
@@ -808,26 +1102,19 @@ describe(commands.APP_ADD, () => {
 
   it('creates Microsoft Entra app reg for a daemon app with specified Microsoft Graph application permissions', async () => {
     sinon.stub(request, 'get').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames') {
-        return {
-          "@odata.nextLink": "https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27",
-          "value": [
-            mocks.microsoftGraphSp
-          ]
-        };
+      if (opts.url === mocks.getGraphSp.request.url) {
+        return misc.deepClone(mocks.getGraphSp.response.body);
       }
 
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27') {
-        return {
-          value: mocks.aadSp
-        };
+      if (opts.url === mocks.getAadSp.request.url) {
+        return misc.deepClone(mocks.getAadSp.response.body);
       }
 
       throw `Invalid GET request: ${opts.url}`;
     });
     sinon.stub(request, 'patch').rejects('Issued PATCH request');
     sinon.stub(request, 'post').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
+      if (opts.url === mocks.createAppWithRoles.request.url &&
         JSON.stringify(opts.data) === JSON.stringify({
           "displayName": "My Microsoft Entra app",
           "signInAudience": "AzureADMyOrg",
@@ -847,96 +1134,11 @@ describe(commands.APP_ADD, () => {
             }
           ]
         })) {
-        return {
-          "id": "b63c4be1-9c78-40b7-8619-de7172eed8de",
-          "deletedDateTime": null,
-          "appId": "dbfdad7a-5105-45fc-8290-eb0b0b24ac58",
-          "applicationTemplateId": null,
-          "createdDateTime": "2020-12-31T15:02:42.8048505Z",
-          "displayName": "My Microsoft Entra app",
-          "description": null,
-          "groupMembershipClaims": null,
-          "identifierUris": [],
-          "isDeviceOnlyAuthSupported": null,
-          "isFallbackPublicClient": null,
-          "notes": null,
-          "optionalClaims": null,
-          "publisherDomain": "M365x271534.onmicrosoft.com",
-          "signInAudience": "AzureADMyOrg",
-          "tags": [],
-          "tokenEncryptionKeyId": null,
-          "verifiedPublisher": {
-            "displayName": null,
-            "verifiedPublisherId": null,
-            "addedDateTime": null
-          },
-          "spa": {
-            "redirectUris": []
-          },
-          "defaultRedirectUri": null,
-          "addIns": [],
-          "api": {
-            "acceptMappedClaims": null,
-            "knownClientApplications": [],
-            "requestedAccessTokenVersion": null,
-            "oauth2PermissionScopes": [],
-            "preAuthorizedApplications": []
-          },
-          "appRoles": [],
-          "info": {
-            "logoUrl": null,
-            "marketingUrl": null,
-            "privacyStatementUrl": null,
-            "supportUrl": null,
-            "termsOfServiceUrl": null
-          },
-          "keyCredentials": [],
-          "parentalControlSettings": {
-            "countriesBlockedForMinors": [],
-            "legalAgeGroupRule": "Allow"
-          },
-          "passwordCredentials": [],
-          "publicClient": {
-            "redirectUris": []
-          },
-          "requiredResourceAccess": [
-            {
-              "resourceAppId": "00000003-0000-0000-c000-000000000000",
-              "resourceAccess": [
-                {
-                  "id": "62a82d76-70ea-41e2-9197-370581804d09",
-                  "type": "Role"
-                },
-                {
-                  "id": "7ab1d382-f21e-4acd-a863-ba3e13f7da61",
-                  "type": "Role"
-                }
-              ]
-            }
-          ],
-          "web": {
-            "homePageUrl": null,
-            "logoutUrl": null,
-            "redirectUris": [],
-            "implicitGrantSettings": {
-              "enableAccessTokenIssuance": false,
-              "enableIdTokenIssuance": false
-            }
-          }
-        };
+        return misc.deepClone(mocks.createAppWithRoles.response.body);
       }
 
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/b63c4be1-9c78-40b7-8619-de7172eed8de/addPassword') {
-        return {
-          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#microsoft.graph.passwordCredential",
-          "customKeyIdentifier": null,
-          "displayName": "Default",
-          "endDateTime": "2120-12-31T15:02:40.978Z",
-          "hint": "vP2",
-          "keyId": "f7394450-52f6-4c04-926c-dc29398eaa1c",
-          "secretText": "VtJt.yG~V5pzbY2.xekx_0Xy_~9ozP_Ub5",
-          "startDateTime": "2020-12-31T15:02:43.2435402Z"
-        };
+      if (opts.url === mocks.createSecret.request.url) {
+        return misc.deepClone(mocks.createSecret.response.body);
       }
 
       throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
@@ -950,8 +1152,8 @@ describe(commands.APP_ADD, () => {
       }
     });
     assert(loggerLogSpy.calledWith({
-      appId: 'dbfdad7a-5105-45fc-8290-eb0b0b24ac58',
-      objectId: 'b63c4be1-9c78-40b7-8619-de7172eed8de',
+      appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
+      objectId: '5b31c38c-2584-42f0-aa47-657fb3a84230',
       secrets: [{
         displayName: 'Default',
         value: 'VtJt.yG~V5pzbY2.xekx_0Xy_~9ozP_Ub5'
@@ -962,26 +1164,19 @@ describe(commands.APP_ADD, () => {
 
   it('creates Microsoft Entra app reg for a daemon app with specified Microsoft Graph application and delegated permissions', async () => {
     sinon.stub(request, 'get').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames') {
-        return {
-          "@odata.nextLink": "https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27",
-          "value": [
-            mocks.microsoftGraphSp
-          ]
-        };
+      if (opts.url === mocks.getGraphSp.request.url) {
+        return misc.deepClone(mocks.getGraphSp.response.body);
       }
 
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27') {
-        return {
-          value: mocks.aadSp
-        };
+      if (opts.url === mocks.getAadSp.request.url) {
+        return misc.deepClone(mocks.getAadSp.response.body);
       }
 
       throw `Invalid GET request: ${opts.url}`;
     });
     sinon.stub(request, 'patch').rejects('Issued PATCH request');
     sinon.stub(request, 'post').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
+      if (opts.url === mocks.createAppWithScopes.request.url &&
         JSON.stringify(opts.data) === JSON.stringify({
           "displayName": "My Microsoft Entra app",
           "signInAudience": "AzureADMyOrg",
@@ -1005,100 +1200,11 @@ describe(commands.APP_ADD, () => {
             }
           ]
         })) {
-        return {
-          "id": "b63c4be1-9c78-40b7-8619-de7172eed8de",
-          "deletedDateTime": null,
-          "appId": "dbfdad7a-5105-45fc-8290-eb0b0b24ac58",
-          "applicationTemplateId": null,
-          "createdDateTime": "2020-12-31T15:02:42.8048505Z",
-          "displayName": "My Microsoft Entra app",
-          "description": null,
-          "groupMembershipClaims": null,
-          "identifierUris": [],
-          "isDeviceOnlyAuthSupported": null,
-          "isFallbackPublicClient": null,
-          "notes": null,
-          "optionalClaims": null,
-          "publisherDomain": "M365x271534.onmicrosoft.com",
-          "signInAudience": "AzureADMyOrg",
-          "tags": [],
-          "tokenEncryptionKeyId": null,
-          "verifiedPublisher": {
-            "displayName": null,
-            "verifiedPublisherId": null,
-            "addedDateTime": null
-          },
-          "spa": {
-            "redirectUris": []
-          },
-          "defaultRedirectUri": null,
-          "addIns": [],
-          "api": {
-            "acceptMappedClaims": null,
-            "knownClientApplications": [],
-            "requestedAccessTokenVersion": null,
-            "oauth2PermissionScopes": [],
-            "preAuthorizedApplications": []
-          },
-          "appRoles": [],
-          "info": {
-            "logoUrl": null,
-            "marketingUrl": null,
-            "privacyStatementUrl": null,
-            "supportUrl": null,
-            "termsOfServiceUrl": null
-          },
-          "keyCredentials": [],
-          "parentalControlSettings": {
-            "countriesBlockedForMinors": [],
-            "legalAgeGroupRule": "Allow"
-          },
-          "passwordCredentials": [],
-          "publicClient": {
-            "redirectUris": []
-          },
-          "requiredResourceAccess": [
-            {
-              "resourceAppId": "00000003-0000-0000-c000-000000000000",
-              "resourceAccess": [
-                {
-                  "id": "06da0dbc-49e2-44d2-8312-53f166ab848a",
-                  "type": "Scope"
-                },
-                {
-                  "id": "62a82d76-70ea-41e2-9197-370581804d09",
-                  "type": "Role"
-                },
-                {
-                  "id": "7ab1d382-f21e-4acd-a863-ba3e13f7da61",
-                  "type": "Role"
-                }
-              ]
-            }
-          ],
-          "web": {
-            "homePageUrl": null,
-            "logoutUrl": null,
-            "redirectUris": [],
-            "implicitGrantSettings": {
-              "enableAccessTokenIssuance": false,
-              "enableIdTokenIssuance": false
-            }
-          }
-        };
+        return misc.deepClone(mocks.createAppWithScopes.response.body);
       }
 
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/b63c4be1-9c78-40b7-8619-de7172eed8de/addPassword') {
-        return {
-          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#microsoft.graph.passwordCredential",
-          "customKeyIdentifier": null,
-          "displayName": "Default",
-          "endDateTime": "2120-12-31T15:02:40.978Z",
-          "hint": "vP2",
-          "keyId": "f7394450-52f6-4c04-926c-dc29398eaa1c",
-          "secretText": "VtJt.yG~V5pzbY2.xekx_0Xy_~9ozP_Ub5",
-          "startDateTime": "2020-12-31T15:02:43.2435402Z"
-        };
+      if (opts.url === mocks.createSecret.request.url) {
+        return misc.deepClone(mocks.createSecret.response.body);
       }
 
       throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
@@ -1113,8 +1219,8 @@ describe(commands.APP_ADD, () => {
       }
     });
     assert(loggerLogSpy.calledWith({
-      appId: 'dbfdad7a-5105-45fc-8290-eb0b0b24ac58',
-      objectId: 'b63c4be1-9c78-40b7-8619-de7172eed8de',
+      appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
+      objectId: '5b31c38c-2584-42f0-aa47-657fb3a84230',
       secrets: [{
         displayName: 'Default',
         value: 'VtJt.yG~V5pzbY2.xekx_0Xy_~9ozP_Ub5'
@@ -1125,26 +1231,19 @@ describe(commands.APP_ADD, () => {
 
   it('creates Microsoft Entra app reg for a single-page app with specified Microsoft Graph delegated permissions', async () => {
     sinon.stub(request, 'get').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames') {
-        return {
-          "@odata.nextLink": "https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27",
-          "value": [
-            mocks.microsoftGraphSp
-          ]
-        };
+      if (opts.url === mocks.getGraphSp.request.url) {
+        return misc.deepClone(mocks.getGraphSp.response.body);
       }
 
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27') {
-        return {
-          value: mocks.aadSp
-        };
+      if (opts.url === mocks.getAadSp.request.url) {
+        return misc.deepClone(mocks.getAadSp.response.body);
       }
 
       throw `Invalid GET request: ${opts.url}`;
     });
     sinon.stub(request, 'patch').rejects('Issued PATCH request');
     sinon.stub(request, 'post').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
+      if (opts.url === mocks.createSpa.request.url &&
         JSON.stringify(opts.data) === JSON.stringify({
           "displayName": "My Microsoft Entra app",
           "signInAudience": "AzureADMyOrg",
@@ -1176,86 +1275,7 @@ describe(commands.APP_ADD, () => {
             }
           }
         })) {
-        return {
-          "id": "f51ff52f-8f04-4924-91d0-636349eed65c",
-          "deletedDateTime": null,
-          "appId": "c505d465-9e4e-4bb4-b653-7b36d77cc94a",
-          "applicationTemplateId": null,
-          "createdDateTime": "2020-12-31T19:08:27.9188248Z",
-          "displayName": "My Microsoft Entra app",
-          "description": null,
-          "groupMembershipClaims": null,
-          "identifierUris": [],
-          "isDeviceOnlyAuthSupported": null,
-          "isFallbackPublicClient": null,
-          "notes": null,
-          "optionalClaims": null,
-          "publisherDomain": "M365x271534.onmicrosoft.com",
-          "signInAudience": "AzureADMyOrg",
-          "tags": [],
-          "tokenEncryptionKeyId": null,
-          "verifiedPublisher": {
-            "displayName": null,
-            "verifiedPublisherId": null,
-            "addedDateTime": null
-          },
-          "spa": {
-            "redirectUris": [
-              "https://myspa.azurewebsites.net",
-              "http://localhost:8080"
-            ]
-          },
-          "defaultRedirectUri": null,
-          "addIns": [],
-          "api": {
-            "acceptMappedClaims": null,
-            "knownClientApplications": [],
-            "requestedAccessTokenVersion": null,
-            "oauth2PermissionScopes": [],
-            "preAuthorizedApplications": []
-          },
-          "appRoles": [],
-          "info": {
-            "logoUrl": null,
-            "marketingUrl": null,
-            "privacyStatementUrl": null,
-            "supportUrl": null,
-            "termsOfServiceUrl": null
-          },
-          "keyCredentials": [],
-          "parentalControlSettings": {
-            "countriesBlockedForMinors": [],
-            "legalAgeGroupRule": "Allow"
-          },
-          "passwordCredentials": [],
-          "publicClient": {
-            "redirectUris": []
-          },
-          "requiredResourceAccess": [
-            {
-              "resourceAppId": "00000003-0000-0000-c000-000000000000",
-              "resourceAccess": [
-                {
-                  "id": "465a38f9-76ea-45b9-9f34-9e8b0d4b0b42",
-                  "type": "Scope"
-                },
-                {
-                  "id": "06da0dbc-49e2-44d2-8312-53f166ab848a",
-                  "type": "Scope"
-                }
-              ]
-            }
-          ],
-          "web": {
-            "homePageUrl": null,
-            "logoutUrl": null,
-            "redirectUris": [],
-            "implicitGrantSettings": {
-              "enableAccessTokenIssuance": true,
-              "enableIdTokenIssuance": true
-            }
-          }
-        };
+        return misc.deepClone(mocks.createSpa.response.body);
       }
 
       throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
@@ -1279,26 +1299,19 @@ describe(commands.APP_ADD, () => {
 
   it('creates Microsoft Entra app reg for a single-page app with specified Microsoft Graph delegated permissions (debug)', async () => {
     sinon.stub(request, 'get').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames') {
-        return {
-          "@odata.nextLink": "https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27",
-          "value": [
-            mocks.microsoftGraphSp
-          ]
-        };
+      if (opts.url === mocks.getGraphSp.request.url) {
+        return misc.deepClone(mocks.getGraphSp.response.body);
       }
 
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27') {
-        return {
-          value: mocks.aadSp
-        };
+      if (opts.url === mocks.getAadSp.request.url) {
+        return misc.deepClone(mocks.getAadSp.response.body);
       }
 
       throw `Invalid GET request: ${opts.url}`;
     });
     sinon.stub(request, 'patch').rejects('Issued PATCH request');
     sinon.stub(request, 'post').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
+      if (opts.url === mocks.createSpa.request.url &&
         JSON.stringify(opts.data) === JSON.stringify({
           "displayName": "My Microsoft Entra app",
           "signInAudience": "AzureADMyOrg",
@@ -1330,86 +1343,7 @@ describe(commands.APP_ADD, () => {
             }
           }
         })) {
-        return {
-          "id": "f51ff52f-8f04-4924-91d0-636349eed65c",
-          "deletedDateTime": null,
-          "appId": "c505d465-9e4e-4bb4-b653-7b36d77cc94a",
-          "applicationTemplateId": null,
-          "createdDateTime": "2020-12-31T19:08:27.9188248Z",
-          "displayName": "My Microsoft Entra app",
-          "description": null,
-          "groupMembershipClaims": null,
-          "identifierUris": [],
-          "isDeviceOnlyAuthSupported": null,
-          "isFallbackPublicClient": null,
-          "notes": null,
-          "optionalClaims": null,
-          "publisherDomain": "M365x271534.onmicrosoft.com",
-          "signInAudience": "AzureADMyOrg",
-          "tags": [],
-          "tokenEncryptionKeyId": null,
-          "verifiedPublisher": {
-            "displayName": null,
-            "verifiedPublisherId": null,
-            "addedDateTime": null
-          },
-          "spa": {
-            "redirectUris": [
-              "https://myspa.azurewebsites.net",
-              "http://localhost:8080"
-            ]
-          },
-          "defaultRedirectUri": null,
-          "addIns": [],
-          "api": {
-            "acceptMappedClaims": null,
-            "knownClientApplications": [],
-            "requestedAccessTokenVersion": null,
-            "oauth2PermissionScopes": [],
-            "preAuthorizedApplications": []
-          },
-          "appRoles": [],
-          "info": {
-            "logoUrl": null,
-            "marketingUrl": null,
-            "privacyStatementUrl": null,
-            "supportUrl": null,
-            "termsOfServiceUrl": null
-          },
-          "keyCredentials": [],
-          "parentalControlSettings": {
-            "countriesBlockedForMinors": [],
-            "legalAgeGroupRule": "Allow"
-          },
-          "passwordCredentials": [],
-          "publicClient": {
-            "redirectUris": []
-          },
-          "requiredResourceAccess": [
-            {
-              "resourceAppId": "00000003-0000-0000-c000-000000000000",
-              "resourceAccess": [
-                {
-                  "id": "465a38f9-76ea-45b9-9f34-9e8b0d4b0b42",
-                  "type": "Scope"
-                },
-                {
-                  "id": "06da0dbc-49e2-44d2-8312-53f166ab848a",
-                  "type": "Scope"
-                }
-              ]
-            }
-          ],
-          "web": {
-            "homePageUrl": null,
-            "logoutUrl": null,
-            "redirectUris": [],
-            "implicitGrantSettings": {
-              "enableAccessTokenIssuance": true,
-              "enableIdTokenIssuance": true
-            }
-          }
-        };
+        return misc.deepClone(mocks.createSpa.response.body);
       }
 
       throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
@@ -1435,7 +1369,7 @@ describe(commands.APP_ADD, () => {
   it('creates Microsoft Entra app reg with Application ID URI set to a fixed value', async () => {
     sinon.stub(request, 'get').rejects('Issued GET request');
     sinon.stub(request, 'patch').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/c0e63919-057c-4e6b-be6c-8662e7aec4eb' &&
+      if (opts.url === mocks.createAppWithAppIDUri.request.url &&
         JSON.stringify(opts.data) === JSON.stringify({
           "identifierUris": [
             "https://contoso.onmicrosoft.com/myapp"
@@ -1447,74 +1381,12 @@ describe(commands.APP_ADD, () => {
       throw `Invalid PATCH request: ${JSON.stringify(opts, null, 2)}`;
     });
     sinon.stub(request, 'post').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
+      if (opts.url === mocks.createAppWithName.request.url &&
         JSON.stringify(opts.data) === JSON.stringify({
           "displayName": "My Microsoft Entra app",
           "signInAudience": "AzureADMyOrg"
         })) {
-        return {
-          "id": "c0e63919-057c-4e6b-be6c-8662e7aec4eb",
-          "deletedDateTime": null,
-          "appId": "b08d9318-5612-4f87-9f94-7414ef6f0c8a",
-          "applicationTemplateId": null,
-          "createdDateTime": "2020-12-31T19:14:23.9641082Z",
-          "displayName": "My Microsoft Entra app",
-          "description": null,
-          "groupMembershipClaims": null,
-          "identifierUris": [],
-          "isDeviceOnlyAuthSupported": null,
-          "isFallbackPublicClient": null,
-          "notes": null,
-          "optionalClaims": null,
-          "publisherDomain": "M365x271534.onmicrosoft.com",
-          "signInAudience": "AzureADMyOrg",
-          "tags": [],
-          "tokenEncryptionKeyId": null,
-          "verifiedPublisher": {
-            "displayName": null,
-            "verifiedPublisherId": null,
-            "addedDateTime": null
-          },
-          "spa": {
-            "redirectUris": []
-          },
-          "defaultRedirectUri": null,
-          "addIns": [],
-          "api": {
-            "acceptMappedClaims": null,
-            "knownClientApplications": [],
-            "requestedAccessTokenVersion": null,
-            "oauth2PermissionScopes": [],
-            "preAuthorizedApplications": []
-          },
-          "appRoles": [],
-          "info": {
-            "logoUrl": null,
-            "marketingUrl": null,
-            "privacyStatementUrl": null,
-            "supportUrl": null,
-            "termsOfServiceUrl": null
-          },
-          "keyCredentials": [],
-          "parentalControlSettings": {
-            "countriesBlockedForMinors": [],
-            "legalAgeGroupRule": "Allow"
-          },
-          "passwordCredentials": [],
-          "publicClient": {
-            "redirectUris": []
-          },
-          "requiredResourceAccess": [],
-          "web": {
-            "homePageUrl": null,
-            "logoutUrl": null,
-            "redirectUris": [],
-            "implicitGrantSettings": {
-              "enableAccessTokenIssuance": false,
-              "enableIdTokenIssuance": false
-            }
-          }
-        };
+        return misc.deepClone(mocks.createAppWithName.response.body);
       }
 
       throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
@@ -1527,8 +1399,8 @@ describe(commands.APP_ADD, () => {
       }
     });
     assert(loggerLogSpy.calledWith({
-      appId: 'b08d9318-5612-4f87-9f94-7414ef6f0c8a',
-      objectId: 'c0e63919-057c-4e6b-be6c-8662e7aec4eb',
+      appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
+      objectId: '5b31c38c-2584-42f0-aa47-657fb3a84230',
       tenantId: ''
     }));
   });
@@ -1536,7 +1408,7 @@ describe(commands.APP_ADD, () => {
   it('creates Microsoft Entra app reg with Application ID URI set to a fixed value (debug)', async () => {
     sinon.stub(request, 'get').rejects('Issued GET request');
     sinon.stub(request, 'patch').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/c0e63919-057c-4e6b-be6c-8662e7aec4eb' &&
+      if (opts.url === mocks.createAppWithAppIDUri.request.url &&
         JSON.stringify(opts.data) === JSON.stringify({
           "identifierUris": [
             "https://contoso.onmicrosoft.com/myapp"
@@ -1548,74 +1420,12 @@ describe(commands.APP_ADD, () => {
       throw `Invalid PATCH request: ${JSON.stringify(opts, null, 2)}`;
     });
     sinon.stub(request, 'post').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
+      if (opts.url === mocks.createAppWithName.request.url &&
         JSON.stringify(opts.data) === JSON.stringify({
           "displayName": "My Microsoft Entra app",
           "signInAudience": "AzureADMyOrg"
         })) {
-        return {
-          "id": "c0e63919-057c-4e6b-be6c-8662e7aec4eb",
-          "deletedDateTime": null,
-          "appId": "b08d9318-5612-4f87-9f94-7414ef6f0c8a",
-          "applicationTemplateId": null,
-          "createdDateTime": "2020-12-31T19:14:23.9641082Z",
-          "displayName": "My Microsoft Entra app",
-          "description": null,
-          "groupMembershipClaims": null,
-          "identifierUris": [],
-          "isDeviceOnlyAuthSupported": null,
-          "isFallbackPublicClient": null,
-          "notes": null,
-          "optionalClaims": null,
-          "publisherDomain": "M365x271534.onmicrosoft.com",
-          "signInAudience": "AzureADMyOrg",
-          "tags": [],
-          "tokenEncryptionKeyId": null,
-          "verifiedPublisher": {
-            "displayName": null,
-            "verifiedPublisherId": null,
-            "addedDateTime": null
-          },
-          "spa": {
-            "redirectUris": []
-          },
-          "defaultRedirectUri": null,
-          "addIns": [],
-          "api": {
-            "acceptMappedClaims": null,
-            "knownClientApplications": [],
-            "requestedAccessTokenVersion": null,
-            "oauth2PermissionScopes": [],
-            "preAuthorizedApplications": []
-          },
-          "appRoles": [],
-          "info": {
-            "logoUrl": null,
-            "marketingUrl": null,
-            "privacyStatementUrl": null,
-            "supportUrl": null,
-            "termsOfServiceUrl": null
-          },
-          "keyCredentials": [],
-          "parentalControlSettings": {
-            "countriesBlockedForMinors": [],
-            "legalAgeGroupRule": "Allow"
-          },
-          "passwordCredentials": [],
-          "publicClient": {
-            "redirectUris": []
-          },
-          "requiredResourceAccess": [],
-          "web": {
-            "homePageUrl": null,
-            "logoutUrl": null,
-            "redirectUris": [],
-            "implicitGrantSettings": {
-              "enableAccessTokenIssuance": false,
-              "enableIdTokenIssuance": false
-            }
-          }
-        };
+        return misc.deepClone(mocks.createAppWithName.response.body);
       }
 
       throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
@@ -1629,8 +1439,8 @@ describe(commands.APP_ADD, () => {
       }
     });
     assert(loggerLogSpy.calledWith({
-      appId: 'b08d9318-5612-4f87-9f94-7414ef6f0c8a',
-      objectId: 'c0e63919-057c-4e6b-be6c-8662e7aec4eb',
+      appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
+      objectId: '5b31c38c-2584-42f0-aa47-657fb3a84230',
       tenantId: ''
     }));
   });
@@ -1638,11 +1448,11 @@ describe(commands.APP_ADD, () => {
   it('creates Microsoft Entra app reg with Application ID URI set to a value with the appId token and a custom scope that can be consented by admins', async () => {
     sinon.stub(request, 'get').rejects('Issued GET request');
     sinon.stub(request, 'patch').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/fe45ba27-a692-4b11-adf8-f4ec184ea3a5') {
+      if (opts.url === mocks.createAppWithAppIDUriAndScopesAdminConsent.request.url) {
         const actualData = JSON.stringify(opts.data);
         const expectedData = JSON.stringify({
           "identifierUris": [
-            "api://caf406b91cd4.ngrok.io/13e11551-2967-4985-8c55-cd2aaa6b80ad"
+            "api://caf406b91cd4.ngrok.io/bc724b77-da87-43a9-b385-6ebaaf969db8"
           ],
           "api": {
             "oauth2PermissionScopes": [
@@ -1664,74 +1474,12 @@ describe(commands.APP_ADD, () => {
       throw `Invalid PATCH request: ${JSON.stringify(opts, null, 2)}`;
     });
     sinon.stub(request, 'post').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
+      if (opts.url === mocks.createAppWithName.request.url &&
         JSON.stringify(opts.data) === JSON.stringify({
           "displayName": "My Microsoft Entra app",
           "signInAudience": "AzureADMyOrg"
         })) {
-        return {
-          "id": "fe45ba27-a692-4b11-adf8-f4ec184ea3a5",
-          "deletedDateTime": null,
-          "appId": "13e11551-2967-4985-8c55-cd2aaa6b80ad",
-          "applicationTemplateId": null,
-          "createdDateTime": "2020-12-31T19:17:55.8423122Z",
-          "displayName": "My Microsoft Entra app",
-          "description": null,
-          "groupMembershipClaims": null,
-          "identifierUris": [],
-          "isDeviceOnlyAuthSupported": null,
-          "isFallbackPublicClient": null,
-          "notes": null,
-          "optionalClaims": null,
-          "publisherDomain": "M365x271534.onmicrosoft.com",
-          "signInAudience": "AzureADMyOrg",
-          "tags": [],
-          "tokenEncryptionKeyId": null,
-          "verifiedPublisher": {
-            "displayName": null,
-            "verifiedPublisherId": null,
-            "addedDateTime": null
-          },
-          "spa": {
-            "redirectUris": []
-          },
-          "defaultRedirectUri": null,
-          "addIns": [],
-          "api": {
-            "acceptMappedClaims": null,
-            "knownClientApplications": [],
-            "requestedAccessTokenVersion": null,
-            "oauth2PermissionScopes": [],
-            "preAuthorizedApplications": []
-          },
-          "appRoles": [],
-          "info": {
-            "logoUrl": null,
-            "marketingUrl": null,
-            "privacyStatementUrl": null,
-            "supportUrl": null,
-            "termsOfServiceUrl": null
-          },
-          "keyCredentials": [],
-          "parentalControlSettings": {
-            "countriesBlockedForMinors": [],
-            "legalAgeGroupRule": "Allow"
-          },
-          "passwordCredentials": [],
-          "publicClient": {
-            "redirectUris": []
-          },
-          "requiredResourceAccess": [],
-          "web": {
-            "homePageUrl": null,
-            "logoutUrl": null,
-            "redirectUris": [],
-            "implicitGrantSettings": {
-              "enableAccessTokenIssuance": false,
-              "enableIdTokenIssuance": false
-            }
-          }
-        };
+        return misc.deepClone(mocks.createAppWithName.response.body);
       }
 
       throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
@@ -1748,8 +1496,8 @@ describe(commands.APP_ADD, () => {
       }
     });
     assert(loggerLogSpy.calledWith({
-      appId: '13e11551-2967-4985-8c55-cd2aaa6b80ad',
-      objectId: 'fe45ba27-a692-4b11-adf8-f4ec184ea3a5',
+      appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
+      objectId: '5b31c38c-2584-42f0-aa47-657fb3a84230',
       tenantId: ''
     }));
   });
@@ -1757,11 +1505,11 @@ describe(commands.APP_ADD, () => {
   it('creates Microsoft Entra app reg with Application ID URI set to a value with the appId token and a custom scope that can be consented by admins and users', async () => {
     sinon.stub(request, 'get').rejects('Issued GET request');
     sinon.stub(request, 'patch').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/fe45ba27-a692-4b11-adf8-f4ec184ea3a5') {
+      if (opts.url === mocks.createAppWithAppIDUriAndScopesUserConsent.request.url) {
         const actualData = JSON.stringify(opts.data);
         const expectedData = JSON.stringify({
           "identifierUris": [
-            "api://caf406b91cd4.ngrok.io/13e11551-2967-4985-8c55-cd2aaa6b80ad"
+            "api://caf406b91cd4.ngrok.io/bc724b77-da87-43a9-b385-6ebaaf969db8"
           ],
           "api": {
             "oauth2PermissionScopes": [
@@ -1783,74 +1531,12 @@ describe(commands.APP_ADD, () => {
       throw `Invalid PATCH request: ${JSON.stringify(opts, null, 2)}`;
     });
     sinon.stub(request, 'post').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
+      if (opts.url === mocks.createAppWithName.request.url &&
         JSON.stringify(opts.data) === JSON.stringify({
           "displayName": "My Microsoft Entra app",
           "signInAudience": "AzureADMyOrg"
         })) {
-        return {
-          "id": "fe45ba27-a692-4b11-adf8-f4ec184ea3a5",
-          "deletedDateTime": null,
-          "appId": "13e11551-2967-4985-8c55-cd2aaa6b80ad",
-          "applicationTemplateId": null,
-          "createdDateTime": "2020-12-31T19:17:55.8423122Z",
-          "displayName": "My Microsoft Entra app",
-          "description": null,
-          "groupMembershipClaims": null,
-          "identifierUris": [],
-          "isDeviceOnlyAuthSupported": null,
-          "isFallbackPublicClient": null,
-          "notes": null,
-          "optionalClaims": null,
-          "publisherDomain": "M365x271534.onmicrosoft.com",
-          "signInAudience": "AzureADMyOrg",
-          "tags": [],
-          "tokenEncryptionKeyId": null,
-          "verifiedPublisher": {
-            "displayName": null,
-            "verifiedPublisherId": null,
-            "addedDateTime": null
-          },
-          "spa": {
-            "redirectUris": []
-          },
-          "defaultRedirectUri": null,
-          "addIns": [],
-          "api": {
-            "acceptMappedClaims": null,
-            "knownClientApplications": [],
-            "requestedAccessTokenVersion": null,
-            "oauth2PermissionScopes": [],
-            "preAuthorizedApplications": []
-          },
-          "appRoles": [],
-          "info": {
-            "logoUrl": null,
-            "marketingUrl": null,
-            "privacyStatementUrl": null,
-            "supportUrl": null,
-            "termsOfServiceUrl": null
-          },
-          "keyCredentials": [],
-          "parentalControlSettings": {
-            "countriesBlockedForMinors": [],
-            "legalAgeGroupRule": "Allow"
-          },
-          "passwordCredentials": [],
-          "publicClient": {
-            "redirectUris": []
-          },
-          "requiredResourceAccess": [],
-          "web": {
-            "homePageUrl": null,
-            "logoutUrl": null,
-            "redirectUris": [],
-            "implicitGrantSettings": {
-              "enableAccessTokenIssuance": false,
-              "enableIdTokenIssuance": false
-            }
-          }
-        };
+        return misc.deepClone(mocks.createAppWithName.response.body);
       }
 
       throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
@@ -1867,8 +1553,8 @@ describe(commands.APP_ADD, () => {
       }
     });
     assert(loggerLogSpy.calledWith({
-      appId: '13e11551-2967-4985-8c55-cd2aaa6b80ad',
-      objectId: 'fe45ba27-a692-4b11-adf8-f4ec184ea3a5',
+      appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
+      objectId: '5b31c38c-2584-42f0-aa47-657fb3a84230',
       tenantId: ''
     }));
   });
@@ -1877,7 +1563,7 @@ describe(commands.APP_ADD, () => {
     sinon.stub(request, 'get').rejects('Issues GET request');
     sinon.stub(request, 'patch').rejects('Issued PATCH request');
     sinon.stub(request, 'post').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
+      if (opts.url === mocks.createAppWithName.request.url &&
         JSON.stringify(opts.data) === JSON.stringify({
           "displayName": "My Microsoft Entra app",
           "signInAudience": "AzureADMyOrg",
@@ -1888,69 +1574,7 @@ describe(commands.APP_ADD, () => {
             "key": "somecertificatebase64string"
           }]
         })) {
-        return {
-          "id": "5b31c38c-2584-42f0-aa47-657fb3a84230",
-          "deletedDateTime": null,
-          "appId": "bc724b77-da87-43a9-b385-6ebaaf969db8",
-          "applicationTemplateId": null,
-          "createdDateTime": "2020-12-31T14:44:13.7945807Z",
-          "displayName": "My Microsoft Entra app",
-          "description": null,
-          "groupMembershipClaims": null,
-          "identifierUris": [],
-          "isDeviceOnlyAuthSupported": null,
-          "isFallbackPublicClient": null,
-          "notes": null,
-          "optionalClaims": null,
-          "publisherDomain": "contoso.onmicrosoft.com",
-          "signInAudience": "AzureADMyOrg",
-          "tags": [],
-          "tokenEncryptionKeyId": null,
-          "verifiedPublisher": {
-            "displayName": null,
-            "verifiedPublisherId": null,
-            "addedDateTime": null
-          },
-          "spa": {
-            "redirectUris": []
-          },
-          "defaultRedirectUri": null,
-          "addIns": [],
-          "api": {
-            "acceptMappedClaims": null,
-            "knownClientApplications": [],
-            "requestedAccessTokenVersion": null,
-            "oauth2PermissionScopes": [],
-            "preAuthorizedApplications": []
-          },
-          "appRoles": [],
-          "info": {
-            "logoUrl": null,
-            "marketingUrl": null,
-            "privacyStatementUrl": null,
-            "supportUrl": null,
-            "termsOfServiceUrl": null
-          },
-          "keyCredentials": [],
-          "parentalControlSettings": {
-            "countriesBlockedForMinors": [],
-            "legalAgeGroupRule": "Allow"
-          },
-          "passwordCredentials": [],
-          "publicClient": {
-            "redirectUris": []
-          },
-          "requiredResourceAccess": [],
-          "web": {
-            "homePageUrl": null,
-            "logoutUrl": null,
-            "redirectUris": [],
-            "implicitGrantSettings": {
-              "enableAccessTokenIssuance": false,
-              "enableIdTokenIssuance": false
-            }
-          }
-        };
+        return misc.deepClone(mocks.createAppWithName.response.body);
       }
 
       throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
@@ -1976,7 +1600,7 @@ describe(commands.APP_ADD, () => {
     sinon.stub(request, 'get').rejects('Issues GET request');
     sinon.stub(request, 'patch').rejects('Issued PATCH request');
     sinon.stub(request, 'post').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
+      if (opts.url === mocks.createAppWithName.request.url &&
         JSON.stringify(opts.data) === JSON.stringify({
           "displayName": "My Microsoft Entra app",
           "signInAudience": "AzureADMyOrg",
@@ -1987,69 +1611,7 @@ describe(commands.APP_ADD, () => {
             "key": "somecertificatebase64string"
           }]
         })) {
-        return {
-          "id": "5b31c38c-2584-42f0-aa47-657fb3a84230",
-          "deletedDateTime": null,
-          "appId": "bc724b77-da87-43a9-b385-6ebaaf969db8",
-          "applicationTemplateId": null,
-          "createdDateTime": "2020-12-31T14:44:13.7945807Z",
-          "displayName": "My Microsoft Entra app",
-          "description": null,
-          "groupMembershipClaims": null,
-          "identifierUris": [],
-          "isDeviceOnlyAuthSupported": null,
-          "isFallbackPublicClient": null,
-          "notes": null,
-          "optionalClaims": null,
-          "publisherDomain": "contoso.onmicrosoft.com",
-          "signInAudience": "AzureADMyOrg",
-          "tags": [],
-          "tokenEncryptionKeyId": null,
-          "verifiedPublisher": {
-            "displayName": null,
-            "verifiedPublisherId": null,
-            "addedDateTime": null
-          },
-          "spa": {
-            "redirectUris": []
-          },
-          "defaultRedirectUri": null,
-          "addIns": [],
-          "api": {
-            "acceptMappedClaims": null,
-            "knownClientApplications": [],
-            "requestedAccessTokenVersion": null,
-            "oauth2PermissionScopes": [],
-            "preAuthorizedApplications": []
-          },
-          "appRoles": [],
-          "info": {
-            "logoUrl": null,
-            "marketingUrl": null,
-            "privacyStatementUrl": null,
-            "supportUrl": null,
-            "termsOfServiceUrl": null
-          },
-          "keyCredentials": [],
-          "parentalControlSettings": {
-            "countriesBlockedForMinors": [],
-            "legalAgeGroupRule": "Allow"
-          },
-          "passwordCredentials": [],
-          "publicClient": {
-            "redirectUris": []
-          },
-          "requiredResourceAccess": [],
-          "web": {
-            "homePageUrl": null,
-            "logoutUrl": null,
-            "redirectUris": [],
-            "implicitGrantSettings": {
-              "enableAccessTokenIssuance": false,
-              "enableIdTokenIssuance": false
-            }
-          }
-        };
+        return misc.deepClone(mocks.createAppWithName.response.body);
       }
 
       throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
@@ -2071,25 +1633,18 @@ describe(commands.APP_ADD, () => {
 
   it('creates Microsoft Entra app reg for a daemon app with specified Microsoft Graph permissions, including admin consent', async () => {
     sinon.stub(request, 'get').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames') {
-        return {
-          "@odata.nextLink": "https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27",
-          "value": [
-            mocks.microsoftGraphSp
-          ]
-        };
+      if (opts.url === mocks.getGraphSp.request.url) {
+        return misc.deepClone(mocks.getGraphSp.response.body);
       }
 
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27') {
-        return {
-          value: mocks.aadSp
-        };
+      if (opts.url === mocks.getAadSp.request.url) {
+        return misc.deepClone(mocks.getAadSp.response.body);
       }
 
       throw `Invalid GET request: ${opts.url}`;
     });
     sinon.stub(request, 'post').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
+      if (opts.url === mocks.createAppWithRoles.request.url &&
         JSON.stringify(opts.data) === JSON.stringify({
           "displayName": "My Microsoft Entra app",
           "signInAudience": "AzureADMyOrg",
@@ -2105,111 +1660,19 @@ describe(commands.APP_ADD, () => {
             }
           ]
         })) {
-        return {
-          "id": "b63c4be1-9c78-40b7-8619-de7172eed8de",
-          "deletedDateTime": null,
-          "appId": "dbfdad7a-5105-45fc-8290-eb0b0b24ac58",
-          "applicationTemplateId": null,
-          "createdDateTime": "2020-12-31T15:02:42.8048505Z",
-          "displayName": "My Microsoft Entra app",
-          "description": null,
-          "groupMembershipClaims": null,
-          "identifierUris": [],
-          "isDeviceOnlyAuthSupported": null,
-          "isFallbackPublicClient": null,
-          "notes": null,
-          "optionalClaims": null,
-          "publisherDomain": "M365x271534.onmicrosoft.com",
-          "signInAudience": "AzureADMyOrg",
-          "tags": [],
-          "tokenEncryptionKeyId": null,
-          "verifiedPublisher": {
-            "displayName": null,
-            "verifiedPublisherId": null,
-            "addedDateTime": null
-          },
-          "spa": {
-            "redirectUris": []
-          },
-          "defaultRedirectUri": null,
-          "addIns": [],
-          "api": {
-            "acceptMappedClaims": null,
-            "knownClientApplications": [],
-            "requestedAccessTokenVersion": null,
-            "oauth2PermissionScopes": [],
-            "preAuthorizedApplications": []
-          },
-          "appRoles": [],
-          "info": {
-            "logoUrl": null,
-            "marketingUrl": null,
-            "privacyStatementUrl": null,
-            "supportUrl": null,
-            "termsOfServiceUrl": null
-          },
-          "keyCredentials": [],
-          "parentalControlSettings": {
-            "countriesBlockedForMinors": [],
-            "legalAgeGroupRule": "Allow"
-          },
-          "passwordCredentials": [],
-          "publicClient": {
-            "redirectUris": []
-          },
-          "requiredResourceAccess": [
-            {
-              "resourceAppId": "00000003-0000-0000-c000-000000000000",
-              "resourceAccess": [
-                {
-                  "id": "62a82d76-70ea-41e2-9197-370581804d09",
-                  "type": "Role"
-                }
-              ]
-            }
-          ],
-          "web": {
-            "homePageUrl": null,
-            "logoutUrl": null,
-            "redirectUris": [],
-            "implicitGrantSettings": {
-              "enableAccessTokenIssuance": false,
-              "enableIdTokenIssuance": false
-            }
-          }
-        };
+        return misc.deepClone(mocks.createAppWithRoles.response.body);
       }
 
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals') {
-        return {
-          "id": "59e617e5-e447-4adc-8b88-00af644d7c92",
-          "appId": "dbfdad7a-5105-45fc-8290-eb0b0b24ac58",
-          "displayName": "My Microsoft Entra app",
-          "appRoles": [],
-          "oauth2PermissionScopes": [],
-          "servicePrincipalNames": [
-            "f1bd758f-4a1a-4b71-aa20-a248a22a8928"
-          ]
-        };
+      if (opts.url === mocks.createServicePrincipal.request.url) {
+        return misc.deepClone(mocks.createServicePrincipal.response.body);
       }
 
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/oauth2PermissionGrants') {
+      if (opts.url === mocks.addOAuth2PermissionGrants.request.url) {
         return;
       }
 
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals/59e617e5-e447-4adc-8b88-00af644d7c92/appRoleAssignments') {
-        return {
-          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#servicePrincipals('59e617e5-e447-4adc-8b88-00af644d7c92')/appRoleAssignments/$entity",
-          "id": "vAolND43WUinlI9oBu_ynaoJXWsFy9tInKpeHJBShh4",
-          "deletedDateTime": null,
-          "appRoleId": "62a82d76-70ea-41e2-9197-370581804d09",
-          "createdDateTime": "2022-06-08T16:09:29.4885458Z",
-          "principalDisplayName": "myapp",
-          "principalId": "24448e9c-d0fa-43d1-a1dd-e279720969a0",
-          "principalType": "ServicePrincipal",
-          "resourceDisplayName": "Microsoft Graph",
-          "resourceId": "f75121cb-5156-42f0-916e-341ea2ecaa22"
-        };
+      if (opts.url === mocks.addAppRoleAssignment.request.url) {
+        return misc.deepClone(mocks.addAppRoleAssignment.response.body);
       }
 
       throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
@@ -2224,8 +1687,8 @@ describe(commands.APP_ADD, () => {
       }
     });
     assert(loggerLogSpy.calledWith({
-      appId: 'dbfdad7a-5105-45fc-8290-eb0b0b24ac58',
-      objectId: 'b63c4be1-9c78-40b7-8619-de7172eed8de',
+      appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
+      objectId: '5b31c38c-2584-42f0-aa47-657fb3a84230',
       tenantId: ''
     }));
   });
@@ -2250,26 +1713,19 @@ describe(commands.APP_ADD, () => {
 
   it('returns error when non-existent service principal specified in the APIs', async () => {
     sinon.stub(request, 'get').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames') {
-        return {
-          "@odata.nextLink": "https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27",
-          "value": [
-            mocks.microsoftGraphSp
-          ]
-        };
+      if (opts.url === mocks.getGraphSp.request.url) {
+        return misc.deepClone(mocks.getGraphSp.response.body);
       }
 
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27') {
-        return {
-          value: mocks.aadSp
-        };
+      if (opts.url === mocks.getAadSp.request.url) {
+        return misc.deepClone(mocks.getAadSp.response.body);
       }
 
       throw `Invalid GET request: ${opts.url}`;
     });
     sinon.stub(request, 'patch').rejects('Issued PATCH request');
     sinon.stub(request, 'post').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
+      if (opts.url === mocks.createAppWithName.request.url &&
         JSON.stringify(opts.data) === JSON.stringify({
           "displayName": "My Microsoft Entra app",
           "signInAudience": "AzureADMyOrg",
@@ -2301,86 +1757,7 @@ describe(commands.APP_ADD, () => {
             }
           }
         })) {
-        return {
-          "id": "f51ff52f-8f04-4924-91d0-636349eed65c",
-          "deletedDateTime": null,
-          "appId": "c505d465-9e4e-4bb4-b653-7b36d77cc94a",
-          "applicationTemplateId": null,
-          "createdDateTime": "2020-12-31T19:08:27.9188248Z",
-          "displayName": "My Microsoft Entra app",
-          "description": null,
-          "groupMembershipClaims": null,
-          "identifierUris": [],
-          "isDeviceOnlyAuthSupported": null,
-          "isFallbackPublicClient": null,
-          "notes": null,
-          "optionalClaims": null,
-          "publisherDomain": "M365x271534.onmicrosoft.com",
-          "signInAudience": "AzureADMyOrg",
-          "tags": [],
-          "tokenEncryptionKeyId": null,
-          "verifiedPublisher": {
-            "displayName": null,
-            "verifiedPublisherId": null,
-            "addedDateTime": null
-          },
-          "spa": {
-            "redirectUris": [
-              "https://myspa.azurewebsites.net",
-              "http://localhost:8080"
-            ]
-          },
-          "defaultRedirectUri": null,
-          "addIns": [],
-          "api": {
-            "acceptMappedClaims": null,
-            "knownClientApplications": [],
-            "requestedAccessTokenVersion": null,
-            "oauth2PermissionScopes": [],
-            "preAuthorizedApplications": []
-          },
-          "appRoles": [],
-          "info": {
-            "logoUrl": null,
-            "marketingUrl": null,
-            "privacyStatementUrl": null,
-            "supportUrl": null,
-            "termsOfServiceUrl": null
-          },
-          "keyCredentials": [],
-          "parentalControlSettings": {
-            "countriesBlockedForMinors": [],
-            "legalAgeGroupRule": "Allow"
-          },
-          "passwordCredentials": [],
-          "publicClient": {
-            "redirectUris": []
-          },
-          "requiredResourceAccess": [
-            {
-              "resourceAppId": "00000003-0000-0000-c000-000000000000",
-              "resourceAccess": [
-                {
-                  "id": "465a38f9-76ea-45b9-9f34-9e8b0d4b0b42",
-                  "type": "Scope"
-                },
-                {
-                  "id": "06da0dbc-49e2-44d2-8312-53f166ab848a",
-                  "type": "Scope"
-                }
-              ]
-            }
-          ],
-          "web": {
-            "homePageUrl": null,
-            "logoutUrl": null,
-            "redirectUris": [],
-            "implicitGrantSettings": {
-              "enableAccessTokenIssuance": true,
-              "enableIdTokenIssuance": true
-            }
-          }
-        };
+        return misc.deepClone(mocks.createAppWithName.response.body);
       }
 
       throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
@@ -2398,26 +1775,19 @@ describe(commands.APP_ADD, () => {
 
   it('returns error when non-existent permission scope specified in the APIs', async () => {
     sinon.stub(request, 'get').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames') {
-        return {
-          "@odata.nextLink": "https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27",
-          "value": [
-            mocks.microsoftGraphSp
-          ]
-        };
+      if (opts.url === mocks.getGraphSp.request.url) {
+        return misc.deepClone(mocks.getGraphSp.response.body);
       }
 
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27') {
-        return {
-          value: mocks.aadSp
-        };
+      if (opts.url === mocks.getAadSp.request.url) {
+        return misc.deepClone(mocks.getAadSp.response.body);
       }
 
       throw `Invalid GET request: ${opts.url}`;
     });
     sinon.stub(request, 'patch').rejects('Issued PATCH request');
     sinon.stub(request, 'post').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
+      if (opts.url === mocks.createAppWithName.request.url &&
         JSON.stringify(opts.data) === JSON.stringify({
           "displayName": "My Microsoft Entra app",
           "signInAudience": "AzureADMyOrg",
@@ -2449,86 +1819,7 @@ describe(commands.APP_ADD, () => {
             }
           }
         })) {
-        return {
-          "id": "f51ff52f-8f04-4924-91d0-636349eed65c",
-          "deletedDateTime": null,
-          "appId": "c505d465-9e4e-4bb4-b653-7b36d77cc94a",
-          "applicationTemplateId": null,
-          "createdDateTime": "2020-12-31T19:08:27.9188248Z",
-          "displayName": "My Microsoft Entra app",
-          "description": null,
-          "groupMembershipClaims": null,
-          "identifierUris": [],
-          "isDeviceOnlyAuthSupported": null,
-          "isFallbackPublicClient": null,
-          "notes": null,
-          "optionalClaims": null,
-          "publisherDomain": "M365x271534.onmicrosoft.com",
-          "signInAudience": "AzureADMyOrg",
-          "tags": [],
-          "tokenEncryptionKeyId": null,
-          "verifiedPublisher": {
-            "displayName": null,
-            "verifiedPublisherId": null,
-            "addedDateTime": null
-          },
-          "spa": {
-            "redirectUris": [
-              "https://myspa.azurewebsites.net",
-              "http://localhost:8080"
-            ]
-          },
-          "defaultRedirectUri": null,
-          "addIns": [],
-          "api": {
-            "acceptMappedClaims": null,
-            "knownClientApplications": [],
-            "requestedAccessTokenVersion": null,
-            "oauth2PermissionScopes": [],
-            "preAuthorizedApplications": []
-          },
-          "appRoles": [],
-          "info": {
-            "logoUrl": null,
-            "marketingUrl": null,
-            "privacyStatementUrl": null,
-            "supportUrl": null,
-            "termsOfServiceUrl": null
-          },
-          "keyCredentials": [],
-          "parentalControlSettings": {
-            "countriesBlockedForMinors": [],
-            "legalAgeGroupRule": "Allow"
-          },
-          "passwordCredentials": [],
-          "publicClient": {
-            "redirectUris": []
-          },
-          "requiredResourceAccess": [
-            {
-              "resourceAppId": "00000003-0000-0000-c000-000000000000",
-              "resourceAccess": [
-                {
-                  "id": "465a38f9-76ea-45b9-9f34-9e8b0d4b0b42",
-                  "type": "Scope"
-                },
-                {
-                  "id": "06da0dbc-49e2-44d2-8312-53f166ab848a",
-                  "type": "Scope"
-                }
-              ]
-            }
-          ],
-          "web": {
-            "homePageUrl": null,
-            "logoutUrl": null,
-            "redirectUris": [],
-            "implicitGrantSettings": {
-              "enableAccessTokenIssuance": true,
-              "enableIdTokenIssuance": true
-            }
-          }
-        };
+        return misc.deepClone(mocks.createAppWithName.response.body);
       }
 
       throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
@@ -2548,77 +1839,15 @@ describe(commands.APP_ADD, () => {
     sinon.stub(request, 'get').rejects('Issues GET request');
     sinon.stub(request, 'patch').rejects('Issued PATCH request');
     sinon.stub(request, 'post').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
+      if (opts.url === mocks.createAppWithName.request.url &&
         JSON.stringify(opts.data) === JSON.stringify({
           "displayName": "My Microsoft Entra app",
           "signInAudience": "AzureADMyOrg"
         })) {
-        return {
-          "id": "4d24b0c6-ad07-47c6-9bd8-9c167f9f758e",
-          "deletedDateTime": null,
-          "appId": "3c5bd51d-f1ac-4344-bd16-43396cadff14",
-          "applicationTemplateId": null,
-          "createdDateTime": "2020-12-31T14:58:18.7120335Z",
-          "displayName": "My Microsoft Entra app",
-          "description": null,
-          "groupMembershipClaims": null,
-          "identifierUris": [],
-          "isDeviceOnlyAuthSupported": null,
-          "isFallbackPublicClient": null,
-          "notes": null,
-          "optionalClaims": null,
-          "publisherDomain": "M365x271534.onmicrosoft.com",
-          "signInAudience": "AzureADMyOrg",
-          "tags": [],
-          "tokenEncryptionKeyId": null,
-          "verifiedPublisher": {
-            "displayName": null,
-            "verifiedPublisherId": null,
-            "addedDateTime": null
-          },
-          "spa": {
-            "redirectUris": []
-          },
-          "defaultRedirectUri": null,
-          "addIns": [],
-          "api": {
-            "acceptMappedClaims": null,
-            "knownClientApplications": [],
-            "requestedAccessTokenVersion": null,
-            "oauth2PermissionScopes": [],
-            "preAuthorizedApplications": []
-          },
-          "appRoles": [],
-          "info": {
-            "logoUrl": null,
-            "marketingUrl": null,
-            "privacyStatementUrl": null,
-            "supportUrl": null,
-            "termsOfServiceUrl": null
-          },
-          "keyCredentials": [],
-          "parentalControlSettings": {
-            "countriesBlockedForMinors": [],
-            "legalAgeGroupRule": "Allow"
-          },
-          "passwordCredentials": [],
-          "publicClient": {
-            "redirectUris": []
-          },
-          "requiredResourceAccess": [],
-          "web": {
-            "homePageUrl": null,
-            "logoutUrl": null,
-            "redirectUris": [],
-            "implicitGrantSettings": {
-              "enableAccessTokenIssuance": false,
-              "enableIdTokenIssuance": false
-            }
-          }
-        };
+        return misc.deepClone(mocks.createAppWithName.response.body);
       }
 
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/4d24b0c6-ad07-47c6-9bd8-9c167f9f758e/addPassword') {
+      if (opts.url === mocks.createSecret.request.url) {
         throw {
           error: {
             message: 'An error has occurred'
@@ -2653,74 +1882,12 @@ describe(commands.APP_ADD, () => {
     sinon.stub(request, 'get').rejects('Issued GET request');
     sinon.stub(request, 'patch').rejects({ error: { message: 'An error has occurred' } });
     sinon.stub(request, 'post').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
+      if (opts.url === mocks.createAppWithName.request.url &&
         JSON.stringify(opts.data) === JSON.stringify({
           "displayName": "My Microsoft Entra app",
           "signInAudience": "AzureADMyOrg"
         })) {
-        return {
-          "id": "c0e63919-057c-4e6b-be6c-8662e7aec4eb",
-          "deletedDateTime": null,
-          "appId": "b08d9318-5612-4f87-9f94-7414ef6f0c8a",
-          "applicationTemplateId": null,
-          "createdDateTime": "2020-12-31T19:14:23.9641082Z",
-          "displayName": "My Microsoft Entra app",
-          "description": null,
-          "groupMembershipClaims": null,
-          "identifierUris": [],
-          "isDeviceOnlyAuthSupported": null,
-          "isFallbackPublicClient": null,
-          "notes": null,
-          "optionalClaims": null,
-          "publisherDomain": "M365x271534.onmicrosoft.com",
-          "signInAudience": "AzureADMyOrg",
-          "tags": [],
-          "tokenEncryptionKeyId": null,
-          "verifiedPublisher": {
-            "displayName": null,
-            "verifiedPublisherId": null,
-            "addedDateTime": null
-          },
-          "spa": {
-            "redirectUris": []
-          },
-          "defaultRedirectUri": null,
-          "addIns": [],
-          "api": {
-            "acceptMappedClaims": null,
-            "knownClientApplications": [],
-            "requestedAccessTokenVersion": null,
-            "oauth2PermissionScopes": [],
-            "preAuthorizedApplications": []
-          },
-          "appRoles": [],
-          "info": {
-            "logoUrl": null,
-            "marketingUrl": null,
-            "privacyStatementUrl": null,
-            "supportUrl": null,
-            "termsOfServiceUrl": null
-          },
-          "keyCredentials": [],
-          "parentalControlSettings": {
-            "countriesBlockedForMinors": [],
-            "legalAgeGroupRule": "Allow"
-          },
-          "passwordCredentials": [],
-          "publicClient": {
-            "redirectUris": []
-          },
-          "requiredResourceAccess": [],
-          "web": {
-            "homePageUrl": null,
-            "logoutUrl": null,
-            "redirectUris": [],
-            "implicitGrantSettings": {
-              "enableAccessTokenIssuance": false,
-              "enableIdTokenIssuance": false
-            }
-          }
-        };
+        return misc.deepClone(mocks.createAppWithName.response.body);
       }
 
       throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
@@ -2754,22 +1921,20 @@ describe(commands.APP_ADD, () => {
         return {
           "@odata.nextLink": "https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27",
           "value": [
-            mocks.mockCrmSp
+            appAddMocks.mockCrmSp
           ]
         };
       }
 
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27') {
-        return {
-          value: mocks.aadSp
-        };
+      if (opts.url === mocks.getAadSp.request.url) {
+        return misc.deepClone(mocks.getAadSp.response.body);
       }
 
       throw `Invalid GET request: ${opts.url}`;
     });
     sinon.stub(request, 'patch').rejects('Issued PATCH request');
     sinon.stub(request, 'post').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
+      if (opts.url === mocks.createAppWithName.request.url &&
         JSON.stringify(opts.data) === JSON.stringify({
           "displayName": "My Microsoft Entra app",
           "signInAudience": "AzureADMyOrg",
@@ -2790,82 +1955,7 @@ describe(commands.APP_ADD, () => {
             ]
           }
         })) {
-        return {
-          "id": "1cd23c5f-2cb4-4bd0-a582-d5b00f578dcd",
-          "deletedDateTime": null,
-          "appId": "702e65ba-cacb-4a2f-aa5c-e6460967bc20",
-          "applicationTemplateId": null,
-          "createdDateTime": "2021-02-21T09:44:05.953701Z",
-          "displayName": "My Microsoft Entra app",
-          "description": null,
-          "groupMembershipClaims": null,
-          "identifierUris": [],
-          "isDeviceOnlyAuthSupported": null,
-          "isFallbackPublicClient": null,
-          "notes": null,
-          "optionalClaims": null,
-          "publisherDomain": "m365404404.onmicrosoft.com",
-          "signInAudience": "AzureADMyOrg",
-          "tags": [],
-          "tokenEncryptionKeyId": null,
-          "verifiedPublisher": {
-            "displayName": null,
-            "verifiedPublisherId": null,
-            "addedDateTime": null
-          },
-          "defaultRedirectUri": null,
-          "addIns": [],
-          "api": {
-            "acceptMappedClaims": null,
-            "knownClientApplications": [],
-            "requestedAccessTokenVersion": null,
-            "oauth2PermissionScopes": [],
-            "preAuthorizedApplications": []
-          },
-          "appRoles": [],
-          "info": {
-            "logoUrl": null,
-            "marketingUrl": null,
-            "privacyStatementUrl": null,
-            "supportUrl": null,
-            "termsOfServiceUrl": null
-          },
-          "keyCredentials": [],
-          "parentalControlSettings": {
-            "countriesBlockedForMinors": [],
-            "legalAgeGroupRule": "Allow"
-          },
-          "passwordCredentials": [],
-          "publicClient": {
-            "redirectUris": []
-          },
-          "requiredResourceAccess": [
-            {
-              "resourceAppId": "00000007-0000-0000-c000-000000000000",
-              "resourceAccess": [
-                {
-                  "id": "78ce3f0f-a1ce-49c2-8cde-64b5c0896db4",
-                  "type": "Scope"
-                }
-              ]
-            }
-          ],
-          "web": {
-            "homePageUrl": null,
-            "logoutUrl": null,
-            "redirectUris": [
-              "https://global.consent.azure-apim.net/redirect"
-            ],
-            "implicitGrantSettings": {
-              "enableAccessTokenIssuance": false,
-              "enableIdTokenIssuance": false
-            }
-          },
-          "spa": {
-            "redirectUris": []
-          }
-
-        };
+        return misc.deepClone(mocks.createAppWithName.response.body);
       }
 
       throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
@@ -2880,8 +1970,8 @@ describe(commands.APP_ADD, () => {
       }
     });
     assert(loggerLogSpy.calledWith({
-      appId: '702e65ba-cacb-4a2f-aa5c-e6460967bc20',
-      objectId: '1cd23c5f-2cb4-4bd0-a582-d5b00f578dcd',
+      appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
+      objectId: '5b31c38c-2584-42f0-aa47-657fb3a84230',
       tenantId: ''
     }));
   });
@@ -2892,21 +1982,19 @@ describe(commands.APP_ADD, () => {
         return {
           "@odata.nextLink": "https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27",
           "value": [
-            mocks.mockCrmSp
+            appAddMocks.mockCrmSp
           ]
         };
       }
 
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27') {
-        return {
-          value: mocks.aadSp
-        };
+      if (opts.url === mocks.getAadSp.request.url) {
+        return misc.deepClone(mocks.getAadSp.response.body);
       }
 
       throw `Invalid GET request: ${opts.url}`;
     });
     sinon.stub(request, 'patch').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/3a0388de-2988-4a97-a068-ff4e2b218752' &&
+      if (opts.url === mocks.updateApp.request.url &&
         JSON.stringify(opts.data) === JSON.stringify({
           "addIns": [],
           "appRoles": [],
@@ -2971,7 +2059,7 @@ describe(commands.APP_ADD, () => {
       throw `Invalid PATCH request: ${JSON.stringify(opts, null, 2)}`;
     });
     sinon.stub(request, 'post').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
+      if (opts.url === mocks.createAppWithName.request.url &&
         JSON.stringify(opts.data) === JSON.stringify({
           "displayName": "My app",
           "signInAudience": "AzureADMyOrg",
@@ -2987,69 +2075,7 @@ describe(commands.APP_ADD, () => {
             }
           ]
         })) {
-        return {
-          "id": "3a0388de-2988-4a97-a068-ff4e2b218752",
-          "deletedDateTime": null,
-          "appId": "689d2d97-7b80-4283-9185-ee24b5648607",
-          "applicationTemplateId": null,
-          "createdDateTime": "2021-04-15T11:10:08.3662336Z",
-          "displayName": "My app",
-          "description": null,
-          "groupMembershipClaims": null,
-          "identifierUris": [],
-          "isDeviceOnlyAuthSupported": null,
-          "isFallbackPublicClient": null,
-          "notes": null,
-          "optionalClaims": null,
-          "publisherDomain": "contoso.onmicrosoft.com",
-          "signInAudience": "AzureADMyOrg",
-          "tags": [],
-          "tokenEncryptionKeyId": null,
-          "verifiedPublisher": {
-            "displayName": null,
-            "verifiedPublisherId": null,
-            "addedDateTime": null
-          },
-          "defaultRedirectUri": null,
-          "addIns": [],
-          "api": {
-            "acceptMappedClaims": null,
-            "knownClientApplications": [],
-            "requestedAccessTokenVersion": null,
-            "oauth2PermissionScopes": [],
-            "preAuthorizedApplications": []
-          },
-          "appRoles": [],
-          "info": {
-            "logoUrl": null,
-            "marketingUrl": null,
-            "privacyStatementUrl": null,
-            "supportUrl": null,
-            "termsOfServiceUrl": null
-          },
-          "keyCredentials": [],
-          "parentalControlSettings": {
-            "countriesBlockedForMinors": [],
-            "legalAgeGroupRule": "Allow"
-          },
-          "passwordCredentials": [],
-          "publicClient": {
-            "redirectUris": []
-          },
-          "requiredResourceAccess": [],
-          "web": {
-            "homePageUrl": null,
-            "logoutUrl": null,
-            "redirectUris": [],
-            "implicitGrantSettings": {
-              "enableAccessTokenIssuance": false,
-              "enableIdTokenIssuance": false
-            }
-          },
-          "spa": {
-            "redirectUris": []
-          }
-        };
+        return misc.deepClone(mocks.createAppWithName.response.body);
       }
 
       throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
@@ -3127,8 +2153,8 @@ describe(commands.APP_ADD, () => {
       }
     });
     assert(loggerLogSpy.calledWith({
-      appId: '689d2d97-7b80-4283-9185-ee24b5648607',
-      objectId: '3a0388de-2988-4a97-a068-ff4e2b218752',
+      appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
+      objectId: '5b31c38c-2584-42f0-aa47-657fb3a84230',
       tenantId: ''
     }));
   });
@@ -3139,21 +2165,19 @@ describe(commands.APP_ADD, () => {
         return {
           "@odata.nextLink": "https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27",
           "value": [
-            mocks.mockCrmSp
+            appAddMocks.mockCrmSp
           ]
         };
       }
 
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27') {
-        return {
-          value: mocks.aadSp
-        };
+      if (opts.url === mocks.getAadSp.request.url) {
+        return misc.deepClone(mocks.getAadSp.response.body);
       }
 
       throw `Invalid GET request: ${opts.url}`;
     });
     sinon.stub(request, 'patch').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/3a0388de-2988-4a97-a068-ff4e2b218752' &&
+      if (opts.url === mocks.updateApp.request.url &&
         JSON.stringify(opts.data) === JSON.stringify({
           "addIns": [],
           "appRoles": [],
@@ -3218,7 +2242,7 @@ describe(commands.APP_ADD, () => {
       throw `Invalid PATCH request: ${JSON.stringify(opts, null, 2)}`;
     });
     sinon.stub(request, 'post').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
+      if (opts.url === mocks.createAppWithName.request.url &&
         JSON.stringify(opts.data) === JSON.stringify({
           "displayName": "My app",
           "signInAudience": "AzureADMyOrg",
@@ -3234,69 +2258,7 @@ describe(commands.APP_ADD, () => {
             }
           ]
         })) {
-        return {
-          "id": "3a0388de-2988-4a97-a068-ff4e2b218752",
-          "deletedDateTime": null,
-          "appId": "689d2d97-7b80-4283-9185-ee24b5648607",
-          "applicationTemplateId": null,
-          "createdDateTime": "2021-04-15T11:10:08.3662336Z",
-          "displayName": "My app",
-          "description": null,
-          "groupMembershipClaims": null,
-          "identifierUris": [],
-          "isDeviceOnlyAuthSupported": null,
-          "isFallbackPublicClient": null,
-          "notes": null,
-          "optionalClaims": null,
-          "publisherDomain": "contoso.onmicrosoft.com",
-          "signInAudience": "AzureADMyOrg",
-          "tags": [],
-          "tokenEncryptionKeyId": null,
-          "verifiedPublisher": {
-            "displayName": null,
-            "verifiedPublisherId": null,
-            "addedDateTime": null
-          },
-          "defaultRedirectUri": null,
-          "addIns": [],
-          "api": {
-            "acceptMappedClaims": null,
-            "knownClientApplications": [],
-            "requestedAccessTokenVersion": null,
-            "oauth2PermissionScopes": [],
-            "preAuthorizedApplications": []
-          },
-          "appRoles": [],
-          "info": {
-            "logoUrl": null,
-            "marketingUrl": null,
-            "privacyStatementUrl": null,
-            "supportUrl": null,
-            "termsOfServiceUrl": null
-          },
-          "keyCredentials": [],
-          "parentalControlSettings": {
-            "countriesBlockedForMinors": [],
-            "legalAgeGroupRule": "Allow"
-          },
-          "passwordCredentials": [],
-          "publicClient": {
-            "redirectUris": []
-          },
-          "requiredResourceAccess": [],
-          "web": {
-            "homePageUrl": null,
-            "logoutUrl": null,
-            "redirectUris": [],
-            "implicitGrantSettings": {
-              "enableAccessTokenIssuance": false,
-              "enableIdTokenIssuance": false
-            }
-          },
-          "spa": {
-            "redirectUris": []
-          }
-        };
+        return misc.deepClone(mocks.createAppWithName.response.body);
       }
 
       throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
@@ -3374,8 +2336,8 @@ describe(commands.APP_ADD, () => {
       }
     });
     assert(loggerLogSpy.calledWith({
-      appId: '689d2d97-7b80-4283-9185-ee24b5648607',
-      objectId: '3a0388de-2988-4a97-a068-ff4e2b218752',
+      appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
+      objectId: '5b31c38c-2584-42f0-aa47-657fb3a84230',
       tenantId: ''
     }));
   });
@@ -3386,21 +2348,19 @@ describe(commands.APP_ADD, () => {
         return {
           "@odata.nextLink": "https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27",
           "value": [
-            mocks.mockCrmSp
+            appAddMocks.mockCrmSp
           ]
         };
       }
 
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27') {
-        return {
-          value: mocks.aadSp
-        };
+      if (opts.url === mocks.getAadSp.request.url) {
+        return misc.deepClone(mocks.getAadSp.response.body);
       }
 
       throw `Invalid GET request: ${opts.url}`;
     });
     sinon.stub(request, 'patch').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/3a0388de-2988-4a97-a068-ff4e2b218752' &&
+      if (opts.url === mocks.updateApp.request.url &&
         JSON.stringify(opts.data) === JSON.stringify({
           "addIns": [],
           "appRoles": [],
@@ -3459,7 +2419,7 @@ describe(commands.APP_ADD, () => {
       throw `Invalid PATCH request: ${JSON.stringify(opts, null, 2)}`;
     });
     sinon.stub(request, 'post').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
+      if (opts.url === mocks.createAppWithName.request.url &&
         JSON.stringify(opts.data) === JSON.stringify({
           "displayName": "My app",
           "signInAudience": "AzureADMyOrg",
@@ -3475,69 +2435,7 @@ describe(commands.APP_ADD, () => {
             }
           ]
         })) {
-        return {
-          "id": "3a0388de-2988-4a97-a068-ff4e2b218752",
-          "deletedDateTime": null,
-          "appId": "689d2d97-7b80-4283-9185-ee24b5648607",
-          "applicationTemplateId": null,
-          "createdDateTime": "2021-04-15T11:10:08.3662336Z",
-          "displayName": "My app",
-          "description": null,
-          "groupMembershipClaims": null,
-          "identifierUris": [],
-          "isDeviceOnlyAuthSupported": null,
-          "isFallbackPublicClient": null,
-          "notes": null,
-          "optionalClaims": null,
-          "publisherDomain": "contoso.onmicrosoft.com",
-          "signInAudience": "AzureADMyOrg",
-          "tags": [],
-          "tokenEncryptionKeyId": null,
-          "verifiedPublisher": {
-            "displayName": null,
-            "verifiedPublisherId": null,
-            "addedDateTime": null
-          },
-          "defaultRedirectUri": null,
-          "addIns": [],
-          "api": {
-            "acceptMappedClaims": null,
-            "knownClientApplications": [],
-            "requestedAccessTokenVersion": null,
-            "oauth2PermissionScopes": [],
-            "preAuthorizedApplications": []
-          },
-          "appRoles": [],
-          "info": {
-            "logoUrl": null,
-            "marketingUrl": null,
-            "privacyStatementUrl": null,
-            "supportUrl": null,
-            "termsOfServiceUrl": null
-          },
-          "keyCredentials": [],
-          "parentalControlSettings": {
-            "countriesBlockedForMinors": [],
-            "legalAgeGroupRule": "Allow"
-          },
-          "passwordCredentials": [],
-          "publicClient": {
-            "redirectUris": []
-          },
-          "requiredResourceAccess": [],
-          "web": {
-            "homePageUrl": null,
-            "logoutUrl": null,
-            "redirectUris": [],
-            "implicitGrantSettings": {
-              "enableAccessTokenIssuance": false,
-              "enableIdTokenIssuance": false
-            }
-          },
-          "spa": {
-            "redirectUris": []
-          }
-        };
+        return misc.deepClone(mocks.createAppWithName.response.body);
       }
 
       throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
@@ -3608,8 +2506,8 @@ describe(commands.APP_ADD, () => {
       }
     });
     assert(loggerLogSpy.calledWith({
-      appId: '689d2d97-7b80-4283-9185-ee24b5648607',
-      objectId: '3a0388de-2988-4a97-a068-ff4e2b218752',
+      appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
+      objectId: '5b31c38c-2584-42f0-aa47-657fb3a84230',
       tenantId: ''
     }));
   });
@@ -3620,21 +2518,19 @@ describe(commands.APP_ADD, () => {
         return {
           "@odata.nextLink": "https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27",
           "value": [
-            mocks.mockCrmSp
+            appAddMocks.mockCrmSp
           ]
         };
       }
 
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27') {
-        return {
-          value: mocks.aadSp
-        };
+      if (opts.url === mocks.getAadSp.request.url) {
+        return misc.deepClone(mocks.getAadSp.response.body);
       }
 
       throw `Invalid GET request: ${opts.url}`;
     });
     sinon.stub(request, 'patch').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/bcac8603-cf65-479b-a4e5-8d45d3d05379') {
+      if (opts.url === mocks.updateApp.request.url) {
         if (JSON.stringify(opts.data) === JSON.stringify({
           "addIns": [],
           "appRoles": [],
@@ -3737,7 +2633,7 @@ describe(commands.APP_ADD, () => {
       throw `Invalid PATCH request: ${JSON.stringify(opts, null, 2)}`;
     });
     sinon.stub(request, 'post').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
+      if (opts.url === mocks.createAppWithName.request.url &&
         JSON.stringify(opts.data) === JSON.stringify({
           "displayName": "My app",
           "signInAudience": "AzureADMyOrg",
@@ -3753,72 +2649,7 @@ describe(commands.APP_ADD, () => {
             }
           ]
         })) {
-        return {
-          "id": "bcac8603-cf65-479b-a4e5-8d45d3d05379",
-          "deletedDateTime": null,
-          "appId": "19180b97-8f30-43ac-8a22-19565de0b064",
-          "applicationTemplateId": null,
-          "disabledByMicrosoftStatus": null,
-          "createdDateTime": "2022-02-10T08:06:59.5299702Z",
-          "displayName": "Angular Teams app",
-          "description": null,
-          "groupMembershipClaims": null,
-          "identifierUris": [],
-          "isDeviceOnlyAuthSupported": null,
-          "isFallbackPublicClient": null,
-          "notes": null,
-          "publisherDomain": "M365x61791022.onmicrosoft.com",
-          "serviceManagementReference": null,
-          "signInAudience": "AzureADMyOrg",
-          "tags": [],
-          "tokenEncryptionKeyId": null,
-          "defaultRedirectUri": null,
-          "certification": null,
-          "optionalClaims": null,
-          "addIns": [],
-          "api": {
-            "acceptMappedClaims": null,
-            "knownClientApplications": [],
-            "requestedAccessTokenVersion": null,
-            "oauth2PermissionScopes": [],
-            "preAuthorizedApplications": []
-          },
-          "appRoles": [],
-          "info": {
-            "logoUrl": null,
-            "marketingUrl": null,
-            "privacyStatementUrl": null,
-            "supportUrl": null,
-            "termsOfServiceUrl": null
-          },
-          "keyCredentials": [],
-          "parentalControlSettings": {
-            "countriesBlockedForMinors": [],
-            "legalAgeGroupRule": "Allow"
-          },
-          "passwordCredentials": [],
-          "publicClient": {
-            "redirectUris": []
-          },
-          "requiredResourceAccess": [],
-          "verifiedPublisher": {
-            "displayName": null,
-            "verifiedPublisherId": null,
-            "addedDateTime": null
-          },
-          "web": {
-            "homePageUrl": null,
-            "logoutUrl": null,
-            "redirectUris": [],
-            "implicitGrantSettings": {
-              "enableAccessTokenIssuance": false,
-              "enableIdTokenIssuance": false
-            }
-          },
-          "spa": {
-            "redirectUris": []
-          }
-        };
+        return misc.deepClone(mocks.createAppWithName.response.body);
       }
 
       throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
@@ -3928,8 +2759,8 @@ describe(commands.APP_ADD, () => {
       }
     });
     assert(loggerLogSpy.calledWith({
-      appId: '19180b97-8f30-43ac-8a22-19565de0b064',
-      objectId: 'bcac8603-cf65-479b-a4e5-8d45d3d05379',
+      appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
+      objectId: '5b31c38c-2584-42f0-aa47-657fb3a84230',
       tenantId: ''
     }));
   });
@@ -3940,21 +2771,19 @@ describe(commands.APP_ADD, () => {
         return {
           "@odata.nextLink": "https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27",
           "value": [
-            mocks.mockCrmSp
+            appAddMocks.mockCrmSp
           ]
         };
       }
 
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27') {
-        return {
-          value: mocks.aadSp
-        };
+      if (opts.url === mocks.getAadSp.request.url) {
+        return misc.deepClone(mocks.getAadSp.response.body);
       }
 
       throw `Invalid GET request: ${opts.url}`;
     });
     sinon.stub(request, 'patch').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/bcac8603-cf65-479b-a4e5-8d45d3d05379') {
+      if (opts.url === mocks.updateApp.request.url) {
         if (JSON.stringify(opts.data) === JSON.stringify({
           "addIns": [],
           "appRoles": [],
@@ -4057,7 +2886,7 @@ describe(commands.APP_ADD, () => {
       throw `Invalid PATCH request: ${JSON.stringify(opts, null, 2)}`;
     });
     sinon.stub(request, 'post').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
+      if (opts.url === mocks.createAppWithName.request.url &&
         JSON.stringify(opts.data) === JSON.stringify({
           "displayName": "My app",
           "signInAudience": "AzureADMyOrg",
@@ -4073,72 +2902,7 @@ describe(commands.APP_ADD, () => {
             }
           ]
         })) {
-        return {
-          "id": "bcac8603-cf65-479b-a4e5-8d45d3d05379",
-          "deletedDateTime": null,
-          "appId": "19180b97-8f30-43ac-8a22-19565de0b064",
-          "applicationTemplateId": null,
-          "disabledByMicrosoftStatus": null,
-          "createdDateTime": "2022-02-10T08:06:59.5299702Z",
-          "displayName": "Angular Teams app",
-          "description": null,
-          "groupMembershipClaims": null,
-          "identifierUris": [],
-          "isDeviceOnlyAuthSupported": null,
-          "isFallbackPublicClient": null,
-          "notes": null,
-          "publisherDomain": "M365x61791022.onmicrosoft.com",
-          "serviceManagementReference": null,
-          "signInAudience": "AzureADMyOrg",
-          "tags": [],
-          "tokenEncryptionKeyId": null,
-          "defaultRedirectUri": null,
-          "certification": null,
-          "optionalClaims": null,
-          "addIns": [],
-          "api": {
-            "acceptMappedClaims": null,
-            "knownClientApplications": [],
-            "requestedAccessTokenVersion": null,
-            "oauth2PermissionScopes": [],
-            "preAuthorizedApplications": []
-          },
-          "appRoles": [],
-          "info": {
-            "logoUrl": null,
-            "marketingUrl": null,
-            "privacyStatementUrl": null,
-            "supportUrl": null,
-            "termsOfServiceUrl": null
-          },
-          "keyCredentials": [],
-          "parentalControlSettings": {
-            "countriesBlockedForMinors": [],
-            "legalAgeGroupRule": "Allow"
-          },
-          "passwordCredentials": [],
-          "publicClient": {
-            "redirectUris": []
-          },
-          "requiredResourceAccess": [],
-          "verifiedPublisher": {
-            "displayName": null,
-            "verifiedPublisherId": null,
-            "addedDateTime": null
-          },
-          "web": {
-            "homePageUrl": null,
-            "logoutUrl": null,
-            "redirectUris": [],
-            "implicitGrantSettings": {
-              "enableAccessTokenIssuance": false,
-              "enableIdTokenIssuance": false
-            }
-          },
-          "spa": {
-            "redirectUris": []
-          }
-        };
+        return misc.deepClone(mocks.createAppWithName.response.body);
       }
 
       throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
@@ -4248,8 +3012,8 @@ describe(commands.APP_ADD, () => {
       }
     });
     assert(loggerLogSpy.calledWith({
-      appId: '19180b97-8f30-43ac-8a22-19565de0b064',
-      objectId: 'bcac8603-cf65-479b-a4e5-8d45d3d05379',
+      appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
+      objectId: '5b31c38c-2584-42f0-aa47-657fb3a84230',
       tenantId: ''
     }));
   });
@@ -4260,21 +3024,19 @@ describe(commands.APP_ADD, () => {
         return {
           "@odata.nextLink": "https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27",
           "value": [
-            mocks.mockCrmSp
+            appAddMocks.mockCrmSp
           ]
         };
       }
 
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27') {
-        return {
-          value: mocks.aadSp
-        };
+      if (opts.url === mocks.getAadSp.request.url) {
+        return misc.deepClone(mocks.getAadSp.response.body);
       }
 
       throw `Invalid GET request: ${opts.url}`;
     });
     sinon.stub(request, 'patch').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/bcac8603-cf65-479b-a4e5-8d45d3d05379') {
+      if (opts.url === mocks.updateApp.request.url) {
         if (JSON.stringify(opts.data) === JSON.stringify({
           "addIns": [],
           "appRoles": [],
@@ -4377,7 +3139,7 @@ describe(commands.APP_ADD, () => {
       throw `Invalid PATCH request: ${JSON.stringify(opts, null, 2)}`;
     });
     sinon.stub(request, 'post').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
+      if (opts.url === mocks.createAppWithName.request.url &&
         JSON.stringify(opts.data) === JSON.stringify({
           "displayName": "My app",
           "signInAudience": "AzureADMyOrg",
@@ -4393,72 +3155,7 @@ describe(commands.APP_ADD, () => {
             }
           ]
         })) {
-        return {
-          "id": "bcac8603-cf65-479b-a4e5-8d45d3d05379",
-          "deletedDateTime": null,
-          "appId": "19180b97-8f30-43ac-8a22-19565de0b064",
-          "applicationTemplateId": null,
-          "disabledByMicrosoftStatus": null,
-          "createdDateTime": "2022-02-10T08:06:59.5299702Z",
-          "displayName": "Angular Teams app",
-          "description": null,
-          "groupMembershipClaims": null,
-          "identifierUris": [],
-          "isDeviceOnlyAuthSupported": null,
-          "isFallbackPublicClient": null,
-          "notes": null,
-          "publisherDomain": "M365x61791022.onmicrosoft.com",
-          "serviceManagementReference": null,
-          "signInAudience": "AzureADMyOrg",
-          "tags": [],
-          "tokenEncryptionKeyId": null,
-          "defaultRedirectUri": null,
-          "certification": null,
-          "optionalClaims": null,
-          "addIns": [],
-          "api": {
-            "acceptMappedClaims": null,
-            "knownClientApplications": [],
-            "requestedAccessTokenVersion": null,
-            "oauth2PermissionScopes": [],
-            "preAuthorizedApplications": []
-          },
-          "appRoles": [],
-          "info": {
-            "logoUrl": null,
-            "marketingUrl": null,
-            "privacyStatementUrl": null,
-            "supportUrl": null,
-            "termsOfServiceUrl": null
-          },
-          "keyCredentials": [],
-          "parentalControlSettings": {
-            "countriesBlockedForMinors": [],
-            "legalAgeGroupRule": "Allow"
-          },
-          "passwordCredentials": [],
-          "publicClient": {
-            "redirectUris": []
-          },
-          "requiredResourceAccess": [],
-          "verifiedPublisher": {
-            "displayName": null,
-            "verifiedPublisherId": null,
-            "addedDateTime": null
-          },
-          "web": {
-            "homePageUrl": null,
-            "logoutUrl": null,
-            "redirectUris": [],
-            "implicitGrantSettings": {
-              "enableAccessTokenIssuance": false,
-              "enableIdTokenIssuance": false
-            }
-          },
-          "spa": {
-            "redirectUris": []
-          }
-        };
+        return misc.deepClone(mocks.createAppWithName.response.body);
       }
 
       throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
@@ -4568,8 +3265,8 @@ describe(commands.APP_ADD, () => {
       }
     });
     assert(loggerLogSpy.calledWith({
-      appId: '19180b97-8f30-43ac-8a22-19565de0b064',
-      objectId: 'bcac8603-cf65-479b-a4e5-8d45d3d05379',
+      appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
+      objectId: '5b31c38c-2584-42f0-aa47-657fb3a84230',
       tenantId: ''
     }));
   });
@@ -4580,21 +3277,19 @@ describe(commands.APP_ADD, () => {
         return {
           "@odata.nextLink": "https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27",
           "value": [
-            mocks.mockCrmSp
+            appAddMocks.mockCrmSp
           ]
         };
       }
 
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27') {
-        return {
-          value: mocks.aadSp
-        };
+      if (opts.url === mocks.getAadSp.request.url) {
+        return misc.deepClone(mocks.getAadSp.response.body);
       }
 
       throw `Invalid GET request: ${opts.url}`;
     });
     sinon.stub(request, 'patch').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/bcac8603-cf65-479b-a4e5-8d45d3d05379') {
+      if (opts.url === mocks.updateApp.request.url) {
         if (JSON.stringify(opts.data) === JSON.stringify({
           "addIns": [],
           "appRoles": [],
@@ -4675,7 +3370,7 @@ describe(commands.APP_ADD, () => {
       throw `Invalid PATCH request: ${JSON.stringify(opts, null, 2)}`;
     });
     sinon.stub(request, 'post').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
+      if (opts.url === mocks.createAppWithName.request.url &&
         JSON.stringify(opts.data) === JSON.stringify({
           "displayName": "My app",
           "signInAudience": "AzureADMyOrg",
@@ -4691,85 +3386,11 @@ describe(commands.APP_ADD, () => {
             }
           ]
         })) {
-        return {
-          "id": "bcac8603-cf65-479b-a4e5-8d45d3d05379",
-          "deletedDateTime": null,
-          "appId": "19180b97-8f30-43ac-8a22-19565de0b064",
-          "applicationTemplateId": null,
-          "disabledByMicrosoftStatus": null,
-          "createdDateTime": "2022-02-10T08:06:59.5299702Z",
-          "displayName": "Angular Teams app",
-          "description": null,
-          "groupMembershipClaims": null,
-          "identifierUris": [],
-          "isDeviceOnlyAuthSupported": null,
-          "isFallbackPublicClient": null,
-          "notes": null,
-          "publisherDomain": "M365x61791022.onmicrosoft.com",
-          "serviceManagementReference": null,
-          "signInAudience": "AzureADMyOrg",
-          "tags": [],
-          "tokenEncryptionKeyId": null,
-          "defaultRedirectUri": null,
-          "certification": null,
-          "optionalClaims": null,
-          "addIns": [],
-          "api": {
-            "acceptMappedClaims": null,
-            "knownClientApplications": [],
-            "requestedAccessTokenVersion": null,
-            "oauth2PermissionScopes": [],
-            "preAuthorizedApplications": []
-          },
-          "appRoles": [],
-          "info": {
-            "logoUrl": null,
-            "marketingUrl": null,
-            "privacyStatementUrl": null,
-            "supportUrl": null,
-            "termsOfServiceUrl": null
-          },
-          "keyCredentials": [],
-          "parentalControlSettings": {
-            "countriesBlockedForMinors": [],
-            "legalAgeGroupRule": "Allow"
-          },
-          "passwordCredentials": [],
-          "publicClient": {
-            "redirectUris": []
-          },
-          "requiredResourceAccess": [],
-          "verifiedPublisher": {
-            "displayName": null,
-            "verifiedPublisherId": null,
-            "addedDateTime": null
-          },
-          "web": {
-            "homePageUrl": null,
-            "logoutUrl": null,
-            "redirectUris": [],
-            "implicitGrantSettings": {
-              "enableAccessTokenIssuance": false,
-              "enableIdTokenIssuance": false
-            }
-          },
-          "spa": {
-            "redirectUris": []
-          }
-        };
+        return misc.deepClone(mocks.createAppWithName.response.body);
       }
 
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/bcac8603-cf65-479b-a4e5-8d45d3d05379/addPassword') {
-        return {
-          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#microsoft.graph.passwordCredential",
-          "customKeyIdentifier": null,
-          "displayName": "mysecret",
-          "endDateTime": "2120-12-31T14:58:16.875Z",
-          "hint": "VtJ",
-          "keyId": "17dc40d4-7c81-47dd-a3cb-41df4aed1130",
-          "secretText": "VtJt.yG~V5pzbY2.xekx_0Xy_~9ozP_Ub5",
-          "startDateTime": "2020-12-31T14:58:19.2307535Z"
-        };
+      if (opts.url === mocks.createSecret.request.url) {
+        return misc.deepClone(mocks.createSecret.response.body);
       }
 
       throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
@@ -4877,8 +3498,8 @@ describe(commands.APP_ADD, () => {
       }
     });
     assert(loggerLogSpy.calledWith({
-      appId: '19180b97-8f30-43ac-8a22-19565de0b064',
-      objectId: 'bcac8603-cf65-479b-a4e5-8d45d3d05379',
+      appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
+      objectId: '5b31c38c-2584-42f0-aa47-657fb3a84230',
       tenantId: '',
       secrets: [{
         "displayName": "mysecret",
@@ -4893,21 +3514,19 @@ describe(commands.APP_ADD, () => {
         return {
           "@odata.nextLink": "https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27",
           "value": [
-            mocks.mockCrmSp
+            appAddMocks.mockCrmSp
           ]
         };
       }
 
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27') {
-        return {
-          value: mocks.aadSp
-        };
+      if (opts.url === mocks.getAadSp.request.url) {
+        return misc.deepClone(mocks.getAadSp.response.body);
       }
 
       throw `Invalid GET request: ${opts.url}`;
     });
     sinon.stub(request, 'patch').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/bcac8603-cf65-479b-a4e5-8d45d3d05379') {
+      if (opts.url === mocks.updateApp.request.url) {
         if (JSON.stringify(opts.data) === JSON.stringify({
           "addIns": [],
           "appRoles": [
@@ -5022,7 +3641,7 @@ describe(commands.APP_ADD, () => {
       throw `Invalid PATCH request: ${JSON.stringify(opts, null, 2)}`;
     });
     sinon.stub(request, 'post').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
+      if (opts.url === mocks.createAppWithName.request.url &&
         JSON.stringify(opts.data) === JSON.stringify({
           "displayName": "My app",
           "signInAudience": "AzureADMyOrg",
@@ -5038,72 +3657,7 @@ describe(commands.APP_ADD, () => {
             }
           ]
         })) {
-        return {
-          "id": "bcac8603-cf65-479b-a4e5-8d45d3d05379",
-          "deletedDateTime": null,
-          "appId": "19180b97-8f30-43ac-8a22-19565de0b064",
-          "applicationTemplateId": null,
-          "disabledByMicrosoftStatus": null,
-          "createdDateTime": "2022-02-10T08:06:59.5299702Z",
-          "displayName": "Angular Teams app",
-          "description": null,
-          "groupMembershipClaims": null,
-          "identifierUris": [],
-          "isDeviceOnlyAuthSupported": null,
-          "isFallbackPublicClient": null,
-          "notes": null,
-          "publisherDomain": "M365x61791022.onmicrosoft.com",
-          "serviceManagementReference": null,
-          "signInAudience": "AzureADMyOrg",
-          "tags": [],
-          "tokenEncryptionKeyId": null,
-          "defaultRedirectUri": null,
-          "certification": null,
-          "optionalClaims": null,
-          "addIns": [],
-          "api": {
-            "acceptMappedClaims": null,
-            "knownClientApplications": [],
-            "requestedAccessTokenVersion": null,
-            "oauth2PermissionScopes": [],
-            "preAuthorizedApplications": []
-          },
-          "appRoles": [],
-          "info": {
-            "logoUrl": null,
-            "marketingUrl": null,
-            "privacyStatementUrl": null,
-            "supportUrl": null,
-            "termsOfServiceUrl": null
-          },
-          "keyCredentials": [],
-          "parentalControlSettings": {
-            "countriesBlockedForMinors": [],
-            "legalAgeGroupRule": "Allow"
-          },
-          "passwordCredentials": [],
-          "publicClient": {
-            "redirectUris": []
-          },
-          "requiredResourceAccess": [],
-          "verifiedPublisher": {
-            "displayName": null,
-            "verifiedPublisherId": null,
-            "addedDateTime": null
-          },
-          "web": {
-            "homePageUrl": null,
-            "logoutUrl": null,
-            "redirectUris": [],
-            "implicitGrantSettings": {
-              "enableAccessTokenIssuance": false,
-              "enableIdTokenIssuance": false
-            }
-          },
-          "spa": {
-            "redirectUris": []
-          }
-        };
+        return misc.deepClone(mocks.createAppWithName.response.body);
       }
 
       throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
@@ -5226,33 +3780,26 @@ describe(commands.APP_ADD, () => {
       }
     });
     assert(loggerLogSpy.calledWith({
-      appId: '19180b97-8f30-43ac-8a22-19565de0b064',
-      objectId: 'bcac8603-cf65-479b-a4e5-8d45d3d05379',
+      appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
+      objectId: '5b31c38c-2584-42f0-aa47-657fb3a84230',
       tenantId: ''
     }));
   });
 
   it('creates Microsoft Entra app reg for a web app from a manifest with app roles and specified Microsoft Graph application permissions', async () => {
     sinon.stub(request, 'get').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames') {
-        return {
-          "@odata.nextLink": "https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27",
-          "value": [
-            mocks.microsoftGraphSp
-          ]
-        };
+      if (opts.url === mocks.getGraphSp.request.url) {
+        return misc.deepClone(mocks.getGraphSp.response.body);
       }
 
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27') {
-        return {
-          value: mocks.aadSp
-        };
+      if (opts.url === mocks.getAadSp.request.url) {
+        return misc.deepClone(mocks.getAadSp.response.body);
       }
 
       throw `Invalid GET request: ${opts.url}`;
     });
     sinon.stub(request, 'patch').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/bcac8603-cf65-479b-a4e5-8d45d3d05379') {
+      if (opts.url === mocks.updateApp.request.url) {
         if (JSON.stringify(opts.data) === JSON.stringify({
           "addIns": [],
           "appRoles": [
@@ -5375,7 +3922,7 @@ describe(commands.APP_ADD, () => {
       throw `Invalid PATCH request: ${JSON.stringify(opts, null, 2)}`;
     });
     sinon.stub(request, 'post').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
+      if (opts.url === mocks.createAppWithName.request.url &&
         JSON.stringify(opts.data) === JSON.stringify({
           "displayName": "My app",
           "signInAudience": "AzureADMyOrg",
@@ -5396,9 +3943,1503 @@ describe(commands.APP_ADD, () => {
           ]
         })) {
         return {
-          "id": "bcac8603-cf65-479b-a4e5-8d45d3d05379",
+          "id": "5b31c38c-2584-42f0-aa47-657fb3a84230",
           "deletedDateTime": null,
-          "appId": "19180b97-8f30-43ac-8a22-19565de0b064",
+          "appId": "bc724b77-da87-43a9-b385-6ebaaf969db8",
+          "applicationTemplateId": null,
+          "disabledByMicrosoftStatus": null,
+          "createdDateTime": "2022-02-10T08:06:59.5299702Z",
+          "displayName": "Angular Teams app",
+          "description": null,
+          "groupMembershipClaims": null,
+          "identifierUris": [],
+          "isDeviceOnlyAuthSupported": null,
+          "isFallbackPublicClient": null,
+          "notes": null,
+          "publisherDomain": "M365x61791022.onmicrosoft.com",
+          "serviceManagementReference": null,
+          "signInAudience": "AzureADMyOrg",
+          "tags": [],
+          "tokenEncryptionKeyId": null,
+          "defaultRedirectUri": null,
+          "certification": null,
+          "optionalClaims": null,
+          "addIns": [],
+          "api": {
+            "acceptMappedClaims": null,
+            "knownClientApplications": [],
+            "requestedAccessTokenVersion": null,
+            "oauth2PermissionScopes": [],
+            "preAuthorizedApplications": []
+          },
+          "appRoles": [],
+          "info": {
+            "logoUrl": null,
+            "marketingUrl": null,
+            "privacyStatementUrl": null,
+            "supportUrl": null,
+            "termsOfServiceUrl": null
+          },
+          "keyCredentials": [],
+          "parentalControlSettings": {
+            "countriesBlockedForMinors": [],
+            "legalAgeGroupRule": "Allow"
+          },
+          "passwordCredentials": [],
+          "publicClient": {
+            "redirectUris": []
+          },
+          "requiredResourceAccess": [
+            {
+              "resourceAppId": "00000003-0000-0000-c000-000000000000",
+              "resourceAccess": [
+                {
+                  "id": "62a82d76-70ea-41e2-9197-370581804d09",
+                  "type": "Role"
+                },
+                {
+                  "id": "7ab1d382-f21e-4acd-a863-ba3e13f7da61",
+                  "type": "Role"
+                },
+                {
+                  "id": "e1fe6dd8-ba31-4d61-89e7-88639da4683d",
+                  "type": "Scope"
+                }
+              ]
+            }
+          ],
+          "verifiedPublisher": {
+            "displayName": null,
+            "verifiedPublisherId": null,
+            "addedDateTime": null
+          },
+          "web": {
+            "homePageUrl": null,
+            "logoutUrl": null,
+            "redirectUris": [],
+            "implicitGrantSettings": {
+              "enableAccessTokenIssuance": false,
+              "enableIdTokenIssuance": false
+            }
+          },
+          "spa": {
+            "redirectUris": []
+          }
+        };
+      }
+
+      throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
+    });
+
+    const manifest = {
+      "id": "5b31c38c-2584-42f0-aa47-657fb3a84230",
+      "acceptMappedClaims": null,
+      "accessTokenAcceptedVersion": null,
+      "addIns": [],
+      "allowPublicClient": null,
+      "appId": "bc724b77-da87-43a9-b385-6ebaaf969db8",
+      "appRoles": [
+        {
+          "allowedMemberTypes": [
+            "User"
+          ],
+          "description": "myAppRole",
+          "displayName": "myAppRole",
+          "id": "d212e66a-8927-469d-be76-f121e287ffb0",
+          "isEnabled": true,
+          "lang": null,
+          "origin": "Application",
+          "value": "123"
+        }
+      ],
+      "oauth2AllowUrlPathMatching": false,
+      "createdDateTime": "2022-02-07T08:51:18Z",
+      "description": null,
+      "certification": null,
+      "disabledByMicrosoftStatus": null,
+      "groupMembershipClaims": null,
+      "identifierUris": [
+        "api://24c4-2001-1c00-80c-d00-e5da-977c-7c52-5197.ngrok.io/ff254847-12c7-44cf-921e-8883dbd622a7"
+      ],
+      "informationalUrls": {
+        "termsOfService": null,
+        "support": null,
+        "privacy": null,
+        "marketing": null
+      },
+      "keyCredentials": [],
+      "knownClientApplications": [],
+      "logoUrl": null,
+      "logoutUrl": null,
+      "name": "My app",
+      "notes": null,
+      "oauth2AllowIdTokenImplicitFlow": false,
+      "oauth2AllowImplicitFlow": false,
+      "oauth2Permissions": [
+        {
+          "adminConsentDescription": "Access as a user",
+          "adminConsentDisplayName": "Access as a user",
+          "id": "cf38eb5b-8fcd-4697-9bd5-d80b7f98dfc5",
+          "isEnabled": true,
+          "lang": null,
+          "origin": "Application",
+          "type": "User",
+          "userConsentDescription": null,
+          "userConsentDisplayName": null,
+          "value": "access_as_user"
+        }
+      ],
+      "oauth2RequirePostResponse": false,
+      "optionalClaims": null,
+      "orgRestrictions": [],
+      "parentalControlSettings": {
+        "countriesBlockedForMinors": [],
+        "legalAgeGroupRule": "Allow"
+      },
+      "passwordCredentials": [],
+      "preAuthorizedApplications": [
+        {
+          "appId": "5e3ce6c0-2b1f-4285-8d4b-75ee78787346",
+          "permissionIds": [
+            "cf38eb5b-8fcd-4697-9bd5-d80b7f98dfc5"
+          ]
+        },
+        {
+          "appId": "1fec8e78-bce4-4aaf-ab1b-5451cc387264",
+          "permissionIds": [
+            "cf38eb5b-8fcd-4697-9bd5-d80b7f98dfc5"
+          ]
+        }
+      ],
+      "publisherDomain": "contoso.onmicrosoft.com",
+      "replyUrlsWithType": [
+        {
+          "url": "http://localhost/auth",
+          "type": "Spa"
+        },
+        {
+          "url": "https://24c4-2001-1c00-80c-d00-e5da-977c-7c52-5197.ngrok.io/auth",
+          "type": "Spa"
+        }
+      ],
+      "requiredResourceAccess": [
+        {
+          "resourceAppId": "00000003-0000-0000-c000-000000000000",
+          "resourceAccess": [
+            {
+              "id": "e1fe6dd8-ba31-4d61-89e7-88639da4683d",
+              "type": "Scope"
+            },
+            {
+              "id": "62a82d76-70ea-41e2-9197-370581804d09",
+              "type": "Role"
+            },
+            {
+              "id": "7ab1d382-f21e-4acd-a863-ba3e13f7da61",
+              "type": "Role"
+            }
+          ]
+        }
+      ],
+      "samlMetadataUrl": null,
+      "serviceManagementReference": null,
+      "signInUrl": null,
+      "signInAudience": "AzureADMyOrg",
+      "tags": [],
+      "tokenEncryptionKeyId": null
+    };
+
+    (command as any).manifest = manifest;
+    await command.action(logger, {
+      options: {
+        manifest: JSON.stringify(manifest),
+        apisApplication: 'https://graph.microsoft.com/Group.ReadWrite.All,https://graph.microsoft.com/Directory.Read.All'
+      }
+    });
+    assert(loggerLogSpy.calledWith({
+      appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
+      objectId: '5b31c38c-2584-42f0-aa47-657fb3a84230',
+      tenantId: ''
+    }));
+  });
+
+  it(`creates Microsoft Entra app reg with just the name. Doesn't save the app info if not requested`, async () => {
+    sinon.stub(request, 'get').rejects('Issues GET request');
+    sinon.stub(request, 'patch').rejects('Issued PATCH request');
+    sinon.stub(request, 'post').callsFake(async opts => {
+      if (opts.url === mocks.createAppWithName.request.url &&
+        JSON.stringify(opts.data) === JSON.stringify({
+          "displayName": "My Microsoft Entra app",
+          "signInAudience": "AzureADMyOrg"
+        })) {
+        return misc.deepClone(mocks.createAppWithName.response.body);
+      }
+
+      throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
+    });
+    const fsWriteFileSyncSpy = sinon.spy(fs, 'writeFileSync');
+
+    await command.action(logger, {
+      options: {
+        name: 'My Microsoft Entra app'
+      }
+    });
+    assert(fsWriteFileSyncSpy.notCalled);
+  });
+
+  it(`saves app info in the .m365rc.json file in the current folder when requested. Creates the file it doesn't exist`, async () => {
+    let fileContents: string | undefined;
+    let filePath: string | undefined;
+    sinon.stub(request, 'get').rejects('Issues GET request');
+    sinon.stub(request, 'patch').rejects('Issued PATCH request');
+    sinon.stub(request, 'post').callsFake(async opts => {
+      if (opts.url === mocks.createAppWithName.request.url &&
+        JSON.stringify(opts.data) === JSON.stringify({
+          "displayName": "My Microsoft Entra app",
+          "signInAudience": "AzureADMyOrg"
+        })) {
+        return misc.deepClone(mocks.createAppWithName.response.body);
+      }
+
+      throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
+    });
+    sinon.stub(fs, 'existsSync').returns(false);
+    sinon.stub(fs, 'writeFileSync').callsFake((_, contents) => {
+      filePath = _.toString();
+      fileContents = contents as string;
+    });
+
+    await command.action(logger, {
+      options: {
+        name: 'My Microsoft Entra app',
+        save: true
+      }
+    });
+    assert.strictEqual(filePath, '.m365rc.json');
+    assert.strictEqual(fileContents, JSON.stringify({
+      apps: [{
+        appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
+        name: 'My Microsoft Entra app'
+      }]
+    }, null, 2));
+  });
+
+  it(`saves app info in the .m365rc.json file in the current folder when requested. Writes to the existing empty file`, async () => {
+    let fileContents: string | undefined;
+    let filePath: string | undefined;
+    sinon.stub(request, 'get').rejects('Issues GET request');
+    sinon.stub(request, 'patch').rejects('Issued PATCH request');
+    sinon.stub(request, 'post').callsFake(async opts => {
+      if (opts.url === mocks.createAppWithName.request.url &&
+        JSON.stringify(opts.data) === JSON.stringify({
+          "displayName": "My Microsoft Entra app",
+          "signInAudience": "AzureADMyOrg"
+        })) {
+        return misc.deepClone(mocks.createAppWithName.response.body);
+      }
+
+      throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
+    });
+    sinon.stub(fs, 'existsSync').returns(true);
+    sinon.stub(fs, 'readFileSync').returns('');
+    sinon.stub(fs, 'writeFileSync').callsFake((_, contents) => {
+      filePath = _.toString();
+      fileContents = contents as string;
+    });
+
+    await command.action(logger, {
+      options: {
+        name: 'My Microsoft Entra app',
+        save: true
+      }
+    });
+    assert.strictEqual(filePath, '.m365rc.json');
+    assert.strictEqual(fileContents, JSON.stringify({
+      apps: [{
+        appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
+        name: 'My Microsoft Entra app'
+      }]
+    }, null, 2));
+  });
+
+  it(`saves app info in the .m365rc.json file in the current folder when requested. Adds to the existing file contents`, async () => {
+    let fileContents: string | undefined;
+    let filePath: string | undefined;
+    sinon.stub(request, 'get').rejects('Issues GET request');
+    sinon.stub(request, 'patch').rejects('Issued PATCH request');
+    sinon.stub(request, 'post').callsFake(async opts => {
+      if (opts.url === mocks.createAppWithName.request.url &&
+        JSON.stringify(opts.data) === JSON.stringify({
+          "displayName": "My Microsoft Entra app",
+          "signInAudience": "AzureADMyOrg"
+        })) {
+        return misc.deepClone(mocks.createAppWithName.response.body);
+      }
+
+      throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
+    });
+    sinon.stub(fs, 'existsSync').returns(true);
+    sinon.stub(fs, 'readFileSync').returns(JSON.stringify({
+      "apps": [
+        {
+          "appId": "74ad36da-3704-4e67-ba08-8c8e833f3c52",
+          "name": "M365 app"
+        }
+      ]
+    }));
+    sinon.stub(fs, 'writeFileSync').callsFake((_, contents) => {
+      filePath = _.toString();
+      fileContents = contents as string;
+    });
+
+    await command.action(logger, {
+      options: {
+        name: 'My Microsoft Entra app',
+        save: true
+      }
+    });
+    assert.strictEqual(filePath, '.m365rc.json');
+    assert.strictEqual(fileContents, JSON.stringify({
+      apps: [
+        {
+          "appId": "74ad36da-3704-4e67-ba08-8c8e833f3c52",
+          "name": "M365 app"
+        },
+        {
+          appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
+          name: 'My Microsoft Entra app'
+        }]
+    }, null, 2));
+  });
+
+  it(`saves app info in the .m365rc.json file in the current folder when requested. Adds to the existing file contents (debug)`, async () => {
+    let fileContents: string | undefined;
+    let filePath: string | undefined;
+    sinon.stub(request, 'get').rejects('Issues GET request');
+    sinon.stub(request, 'patch').rejects('Issued PATCH request');
+    sinon.stub(request, 'post').callsFake(async opts => {
+      if (opts.url === mocks.createAppWithName.request.url &&
+        JSON.stringify(opts.data) === JSON.stringify({
+          "displayName": "My Microsoft Entra app",
+          "signInAudience": "AzureADMyOrg"
+        })) {
+        return misc.deepClone(mocks.createAppWithName.response.body);
+      }
+
+      throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
+    });
+    sinon.stub(fs, 'existsSync').returns(true);
+    sinon.stub(fs, 'readFileSync').returns(JSON.stringify({
+      "apps": [
+        {
+          "appId": "74ad36da-3704-4e67-ba08-8c8e833f3c52",
+          "name": "M365 app"
+        }
+      ]
+    }));
+    sinon.stub(fs, 'writeFileSync').callsFake((_, contents) => {
+      filePath = _.toString();
+      fileContents = contents as string;
+    });
+
+    await command.action(logger, {
+      options: {
+        debug: true,
+        name: 'My Microsoft Entra app',
+        save: true
+      }
+    });
+    assert.strictEqual(filePath, '.m365rc.json');
+    assert.strictEqual(fileContents, JSON.stringify({
+      apps: [
+        {
+          "appId": "74ad36da-3704-4e67-ba08-8c8e833f3c52",
+          "name": "M365 app"
+        },
+        {
+          appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
+          name: 'My Microsoft Entra app'
+        }]
+    }, null, 2));
+  });
+
+  it(`doesn't save app info in the .m365rc.json file when there was error reading file contents`, async () => {
+    sinon.stub(request, 'get').rejects('Issues GET request');
+    sinon.stub(request, 'patch').rejects('Issued PATCH request');
+    sinon.stub(request, 'post').callsFake(async opts => {
+      if (opts.url === mocks.createAppWithName.request.url &&
+        JSON.stringify(opts.data) === JSON.stringify({
+          "displayName": "My Microsoft Entra app",
+          "signInAudience": "AzureADMyOrg"
+        })) {
+        return misc.deepClone(mocks.createAppWithName.response.body);
+      }
+
+      throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
+    });
+    sinon.stub(fs, 'existsSync').returns(true);
+    sinon.stub(fs, 'readFileSync').throws(new Error('An error has occurred'));
+    const fsWriteFileSyncSpy = sinon.spy(fs, 'writeFileSync');
+
+    await command.action(logger, {
+      options: {
+        name: 'My Microsoft Entra app',
+        save: true
+      }
+    });
+    assert(fsWriteFileSyncSpy.notCalled);
+  });
+
+  it(`doesn't save app info in the .m365rc.json file when file has invalid JSON`, async () => {
+    sinon.stub(request, 'get').rejects('Issues GET request');
+    sinon.stub(request, 'patch').rejects('Issued PATCH request');
+    sinon.stub(request, 'post').callsFake(async opts => {
+      if (opts.url === mocks.createAppWithName.request.url &&
+        JSON.stringify(opts.data) === JSON.stringify({
+          "displayName": "My Microsoft Entra app",
+          "signInAudience": "AzureADMyOrg"
+        })) {
+        return misc.deepClone(mocks.createAppWithName.response.body);
+      }
+
+      throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
+    });
+    sinon.stub(fs, 'existsSync').returns(true);
+    sinon.stub(fs, 'readFileSync').returns('{');
+    const fsWriteFileSyncSpy = sinon.spy(fs, 'writeFileSync');
+
+    await command.action(logger, {
+      options: {
+        name: 'My Microsoft Entra app',
+        save: true
+      }
+    });
+    assert(fsWriteFileSyncSpy.notCalled);
+  });
+
+  it(`doesn't fail execution when error occurred while saving app info`, async () => {
+    sinon.stub(request, 'get').rejects('Issues GET request');
+    sinon.stub(request, 'patch').rejects('Issued PATCH request');
+    sinon.stub(request, 'post').callsFake(async opts => {
+      if (opts.url === mocks.createAppWithName.request.url &&
+        JSON.stringify(opts.data) === JSON.stringify({
+          "displayName": "My Microsoft Entra app",
+          "signInAudience": "AzureADMyOrg"
+        })) {
+        return misc.deepClone(mocks.createAppWithName.response.body);
+      }
+
+      throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
+    });
+    sinon.stub(fs, 'existsSync').returns(false);
+    sinon.stub(fs, 'writeFileSync').throws(new Error('Error occurred while saving app info'));
+
+    await command.action(logger, {
+      options: {
+        name: 'My Microsoft Entra app',
+        save: true
+      }
+    });
+  });
+
+  it('fails validation if specified platform value is not valid', async () => {
+    const actual = await command.validate({ options: { name: 'My Microsoft Entra app', platform: 'abc' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('passes validation if platform value is spa', async () => {
+    const actual = await command.validate({ options: { name: 'My Microsoft Entra app', platform: 'spa' } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('passes validation if platform value is web', async () => {
+    const actual = await command.validate({ options: { name: 'My Microsoft Entra app', platform: 'web' } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('passes validation if platform value is publicClient', async () => {
+    const actual = await command.validate({ options: { name: 'My Microsoft Entra app', platform: 'publicClient' } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('fails validation if redirectUris specified without platform', async () => {
+    const actual = await command.validate({ options: { name: 'My Microsoft Entra app', redirectUris: 'http://localhost:8080' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('passes validation if redirectUris specified with platform', async () => {
+    const actual = await command.validate({ options: { name: 'My Microsoft Entra app', redirectUris: 'http://localhost:8080', platform: 'spa' } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('fails validation if scopeName specified without uri', async () => {
+    const actual = await command.validate({ options: { name: 'My Microsoft Entra app', scopeName: 'access_as_user', scopeAdminConsentDescription: 'Access as user', scopeAdminConsentDisplayName: 'Access as user' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if scopeName specified without scopeAdminConsentDescription', async () => {
+    const actual = await command.validate({ options: { name: 'My Microsoft Entra app', scopeName: 'access_as_user', uri: 'https://contoso.onmicrosoft.com/myapp', scopeAdminConsentDisplayName: 'Access as user' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if scopeName specified without scopeAdminConsentDisplayName', async () => {
+    const actual = await command.validate({ options: { name: 'My Microsoft Entra app', scopeName: 'access_as_user', uri: 'https://contoso.onmicrosoft.com/myapp', scopeAdminConsentDescription: 'Access as user' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('passes validation if scopeName specified with uri, scopeAdminConsentDisplayName and scopeAdminConsentDescription', async () => {
+    const actual = await command.validate({ options: { name: 'My Microsoft Entra app', scopeName: 'access_as_user', uri: 'https://contoso.onmicrosoft.com/myapp', scopeAdminConsentDescription: 'Access as user', scopeAdminConsentDisplayName: 'Access as user' } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('fails validation if specified scopeConsentBy value is not valid', async () => {
+    const actual = await command.validate({ options: { name: 'My Microsoft Entra app', scopeConsentBy: 'abc' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('passes validation if scopeConsentBy is admins', async () => {
+    const actual = await command.validate({ options: { name: 'My Microsoft Entra app', scopeConsentBy: 'admins' } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('passes validation if scopeConsentBy is adminsAndUsers', async () => {
+    const actual = await command.validate({ options: { name: 'My Microsoft Entra app', scopeConsentBy: 'adminsAndUsers' } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('fails validation if specified manifest is not a valid JSON string', async () => {
+    const manifest = '{';
+    const actual = await command.validate({ options: { manifest: manifest } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it(`fails validation if manifest is valid JSON but it doesn't contain name and name option not specified`, async () => {
+    const manifest = '{}';
+    const actual = await command.validate({ options: { manifest: manifest } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if certificateDisplayName is specified without certificate', async () => {
+    const actual = await command.validate({ options: { name: 'My Microsoft Entra app', certificateDisplayName: 'Some certificate' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if both certificateBase64Encoded and certificateFile are specified', async () => {
+    const actual = await command.validate({ options: { name: 'My Microsoft Entra app', certificateFile: 'c:\\temp\\some-certificate.cer', certificateBase64Encoded: 'somebase64string' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('passes validation if certificateFile specified with certificateDisplayName', async () => {
+    sinon.stub(fs, 'existsSync').callsFake(_ => true);
+
+    const actual = await command.validate({ options: { name: 'My Microsoft Entra app', certificateDisplayName: 'Some certificate', certificateFile: 'c:\\temp\\some-certificate.cer' } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('fails validation when certificate file is not found', async () => {
+    sinon.stub(fs, 'existsSync').callsFake(_ => false);
+
+    const actual = await command.validate({ options: { debug: true, name: 'My Microsoft Entra app', certificateDisplayName: 'some certificate', certificateFile: 'C:\\temp\\some-certificate.cer' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('passes validation if certificateBase64Encoded specified with certificateDisplayName', async () => {
+    const actual = await command.validate({ options: { name: 'My Microsoft Entra app', certificateDisplayName: 'Some certificate', certificateBase64Encoded: 'somebase64string' } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('passes validation if manifest is valid JSON', async () => {
+    const manifest = '{"name": "My app"}';
+    const actual = await command.validate({ options: { manifest: manifest } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('creates Microsoft Entra app reg for a web app from a manifest with redirectUris and options overriding them', async () => {
+    sinon.stub(request, 'get').callsFake(async opts => {
+      if (opts.url === mocks.getGraphSp.request.url) {
+        return misc.deepClone(mocks.getGraphSp.response.body);
+      }
+
+      if (opts.url === mocks.getAadSp.request.url) {
+        return misc.deepClone(mocks.getAadSp.response.body);
+      }
+
+      throw `Invalid GET request: ${opts.url}`;
+    });
+    sinon.stub(request, 'patch').callsFake(async opts => {
+      if (opts.url === mocks.updateApp.request.url) {
+        if (JSON.stringify(opts.data) === JSON.stringify({
+          "addIns": [],
+          "appRoles": [],
+          "createdDateTime": "2022-02-07T08:51:18Z",
+          "description": null,
+          "certification": null,
+          "groupMembershipClaims": null,
+          "identifierUris": [
+            "api://24c4-2001-1c00-80c-d00-e5da-977c-7c52-5197.ngrok.io/ff254847-12c7-44cf-921e-8883dbd622a7"
+          ],
+          "keyCredentials": [],
+          "notes": null,
+          "optionalClaims": null,
+          "parentalControlSettings": {
+            "countriesBlockedForMinors": [],
+            "legalAgeGroupRule": "Allow"
+          },
+          "passwordCredentials": [],
+          "requiredResourceAccess": [
+            {
+              "resourceAppId": "00000003-0000-0000-c000-000000000000",
+              "resourceAccess": [
+                {
+                  "id": "e1fe6dd8-ba31-4d61-89e7-88639da4683d",
+                  "type": "Scope"
+                }
+              ]
+            }
+          ],
+          "serviceManagementReference": null,
+          "signInAudience": "AzureADMyOrg",
+          "tags": [],
+          "tokenEncryptionKeyId": null,
+          "api": {
+            "acceptMappedClaims": null,
+            "knownClientApplications": [],
+            "oauth2PermissionScopes": [
+              {
+                "adminConsentDescription": "Access as a user",
+                "adminConsentDisplayName": "Access as a user",
+                "id": "cf38eb5b-8fcd-4697-9bd5-d80b7f98dfc5",
+                "isEnabled": true,
+                "type": "User",
+                "userConsentDescription": null,
+                "userConsentDisplayName": null,
+                "value": "access_as_user"
+              }
+            ]
+          },
+          "info": {
+            "termsOfServiceUrl": null,
+            "supportUrl": null,
+            "privacyStatementUrl": null,
+            "marketingUrl": null,
+            "logoUrl": null
+          },
+          "web": {
+            "implicitGrantSettings": {
+              "enableAccessTokenIssuance": false,
+              "enableIdTokenIssuance": false
+            },
+            "redirectUris": [],
+            "logoutUrl": null,
+            "homePageUrl": null
+          },
+          "spa": {
+            "redirectUris": [
+              "http://localhost/auth",
+              "https://24c4-2001-1c00-80c-d00-e5da-977c-7c52-5197.ngrok.io/auth"
+            ]
+          },
+          "isFallbackPublicClient": null,
+          "displayName": "My app"
+        })) {
+          return;
+        }
+
+        if (JSON.stringify(opts.data) === JSON.stringify({
+          "api": {
+            "preAuthorizedApplications": [
+              {
+                "appId": "5e3ce6c0-2b1f-4285-8d4b-75ee78787346",
+                "delegatedPermissionIds": [
+                  "cf38eb5b-8fcd-4697-9bd5-d80b7f98dfc5"
+                ]
+              },
+              {
+                "appId": "1fec8e78-bce4-4aaf-ab1b-5451cc387264",
+                "delegatedPermissionIds": [
+                  "cf38eb5b-8fcd-4697-9bd5-d80b7f98dfc5"
+                ]
+              }
+            ]
+          }
+        })) {
+          return;
+        }
+      }
+
+      throw `Invalid PATCH request: ${JSON.stringify(opts, null, 2)}`;
+    });
+    sinon.stub(request, 'post').callsFake(async opts => {
+      if (opts.url === mocks.createAppWithName.request.url &&
+        JSON.stringify(opts.data) === JSON.stringify({
+          "displayName": "My app",
+          "signInAudience": "AzureADMyOrg",
+          "requiredResourceAccess": [
+            {
+              "resourceAppId": "00000003-0000-0000-c000-000000000000",
+              "resourceAccess": [
+                {
+                  "id": "e1fe6dd8-ba31-4d61-89e7-88639da4683d",
+                  "type": "Scope"
+                }
+              ]
+            }
+          ],
+          "spa": {
+            "redirectUris": [
+              "http://localhost/auth",
+              "https://24c4-2001-1c00-80c-d00-e5da-977c-7c52-5197.ngrok.io/auth"
+            ]
+          }
+        })) {
+        return misc.deepClone(mocks.createAppWithName.response.body);
+      }
+
+      throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
+    });
+
+    (command as any).manifest = manifest;
+    await command.action(logger, {
+      options: {
+        manifest: JSON.stringify(manifest),
+        platform: "spa",
+        redirectUris: "http://localhost/auth,https://24c4-2001-1c00-80c-d00-e5da-977c-7c52-5197.ngrok.io/auth"
+      }
+    });
+
+    assert(loggerLogSpy.calledWith({
+      appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
+      objectId: '5b31c38c-2584-42f0-aa47-657fb3a84230',
+      tenantId: ''
+    }));
+  });
+
+  it('creates Microsoft Entra app reg for a web app from a manifest with app roles and specified Microsoft Graph application permissions overriding them', async () => {
+    sinon.stub(request, 'get').callsFake(async opts => {
+      if (opts.url === mocks.getGraphSp.request.url) {
+        return misc.deepClone(mocks.getGraphSp.response.body);
+      }
+
+      if (opts.url === mocks.getAadSp.request.url) {
+        return misc.deepClone(mocks.getAadSp.response.body);
+      }
+
+      throw `Invalid GET request: ${opts.url}`;
+    });
+    sinon.stub(request, 'patch').callsFake(async opts => {
+      if (opts.url === mocks.updateApp.request.url) {
+        if (JSON.stringify(opts.data) === JSON.stringify({
+          "addIns": [],
+          "appRoles": [],
+          "createdDateTime": "2022-02-07T08:51:18Z",
+          "description": null,
+          "certification": null,
+          "groupMembershipClaims": null,
+          "identifierUris": [
+            "api://24c4-2001-1c00-80c-d00-e5da-977c-7c52-5197.ngrok.io/ff254847-12c7-44cf-921e-8883dbd622a7"
+          ],
+          "keyCredentials": [],
+          "notes": null,
+          "optionalClaims": null,
+          "parentalControlSettings": {
+            "countriesBlockedForMinors": [],
+            "legalAgeGroupRule": "Allow"
+          },
+          "passwordCredentials": [],
+          "requiredResourceAccess": [
+            {
+              "resourceAppId": "00000003-0000-0000-c000-000000000000",
+              "resourceAccess": [
+                {
+                  "id": "62a82d76-70ea-41e2-9197-370581804d09",
+                  "type": "Role"
+                },
+                {
+                  "id": "7ab1d382-f21e-4acd-a863-ba3e13f7da61",
+                  "type": "Role"
+                },
+                {
+                  "id": "e1fe6dd8-ba31-4d61-89e7-88639da4683d",
+                  "type": "Scope"
+                }
+              ]
+            }
+          ],
+          "serviceManagementReference": null,
+          "signInAudience": "AzureADMyOrg",
+          "tags": [],
+          "tokenEncryptionKeyId": null,
+          "api": {
+            "acceptMappedClaims": null,
+            "knownClientApplications": [],
+            "oauth2PermissionScopes": [
+              {
+                "adminConsentDescription": "Access as a user",
+                "adminConsentDisplayName": "Access as a user",
+                "id": "cf38eb5b-8fcd-4697-9bd5-d80b7f98dfc5",
+                "isEnabled": true,
+                "type": "User",
+                "userConsentDescription": null,
+                "userConsentDisplayName": null,
+                "value": "access_as_user"
+              }
+            ]
+          },
+          "info": {
+            "termsOfServiceUrl": null,
+            "supportUrl": null,
+            "privacyStatementUrl": null,
+            "marketingUrl": null,
+            "logoUrl": null
+          },
+          "web": {
+            "implicitGrantSettings": {
+              "enableAccessTokenIssuance": false,
+              "enableIdTokenIssuance": false
+            },
+            "redirectUris": [],
+            "logoutUrl": null,
+            "homePageUrl": null
+          },
+          "spa": {
+            "redirectUris": [
+              "http://localhost/auth",
+              "https://24c4-2001-1c00-80c-d00-e5da-977c-7c52-5197.ngrok.io/auth"
+            ]
+          },
+          "isFallbackPublicClient": null,
+          "displayName": "My app"
+        })) {
+          return;
+        }
+
+        if (JSON.stringify(opts.data) === JSON.stringify({
+          "api": {
+            "preAuthorizedApplications": [
+              {
+                "appId": "5e3ce6c0-2b1f-4285-8d4b-75ee78787346",
+                "delegatedPermissionIds": [
+                  "cf38eb5b-8fcd-4697-9bd5-d80b7f98dfc5"
+                ]
+              },
+              {
+                "appId": "1fec8e78-bce4-4aaf-ab1b-5451cc387264",
+                "delegatedPermissionIds": [
+                  "cf38eb5b-8fcd-4697-9bd5-d80b7f98dfc5"
+                ]
+              }
+            ]
+          }
+        })) {
+          return;
+        }
+      }
+
+      throw `Invalid PATCH request: ${JSON.stringify(opts, null, 2)}`;
+    });
+    sinon.stub(request, 'post').callsFake(async opts => {
+      if (opts.url === mocks.createAppWithName.request.url &&
+        JSON.stringify(opts.data) === JSON.stringify({
+          "displayName": "My app",
+          "signInAudience": "AzureADMyOrg",
+          "requiredResourceAccess": [
+            {
+              "resourceAppId": "00000003-0000-0000-c000-000000000000",
+              "resourceAccess": [
+                {
+                  "id": "62a82d76-70ea-41e2-9197-370581804d09",
+                  "type": "Role"
+                },
+                {
+                  "id": "7ab1d382-f21e-4acd-a863-ba3e13f7da61",
+                  "type": "Role"
+                }
+              ]
+            }
+          ]
+        })) {
+        return {
+          "id": "5b31c38c-2584-42f0-aa47-657fb3a84230",
+          "deletedDateTime": null,
+          "appId": "bc724b77-da87-43a9-b385-6ebaaf969db8",
+          "applicationTemplateId": null,
+          "disabledByMicrosoftStatus": null,
+          "createdDateTime": "2022-02-10T08:06:59.5299702Z",
+          "displayName": "Angular Teams app",
+          "description": null,
+          "groupMembershipClaims": null,
+          "identifierUris": [],
+          "isDeviceOnlyAuthSupported": null,
+          "isFallbackPublicClient": null,
+          "notes": null,
+          "publisherDomain": "M365x61791022.onmicrosoft.com",
+          "serviceManagementReference": null,
+          "signInAudience": "AzureADMyOrg",
+          "tags": [],
+          "tokenEncryptionKeyId": null,
+          "defaultRedirectUri": null,
+          "certification": null,
+          "optionalClaims": null,
+          "addIns": [],
+          "api": {
+            "acceptMappedClaims": null,
+            "knownClientApplications": [],
+            "requestedAccessTokenVersion": null,
+            "oauth2PermissionScopes": [],
+            "preAuthorizedApplications": []
+          },
+          "appRoles": [],
+          "info": {
+            "logoUrl": null,
+            "marketingUrl": null,
+            "privacyStatementUrl": null,
+            "supportUrl": null,
+            "termsOfServiceUrl": null
+          },
+          "keyCredentials": [],
+          "parentalControlSettings": {
+            "countriesBlockedForMinors": [],
+            "legalAgeGroupRule": "Allow"
+          },
+          "passwordCredentials": [],
+          "publicClient": {
+            "redirectUris": []
+          },
+          "requiredResourceAccess": [
+            {
+              "resourceAppId": "00000003-0000-0000-c000-000000000000",
+              "resourceAccess": [
+                {
+                  "id": "62a82d76-70ea-41e2-9197-370581804d09",
+                  "type": "Role"
+                },
+                {
+                  "id": "7ab1d382-f21e-4acd-a863-ba3e13f7da61",
+                  "type": "Role"
+                },
+                {
+                  "id": "e1fe6dd8-ba31-4d61-89e7-88639da4683d",
+                  "type": "Scope"
+                }
+              ]
+            }
+          ],
+          "verifiedPublisher": {
+            "displayName": null,
+            "verifiedPublisherId": null,
+            "addedDateTime": null
+          },
+          "web": {
+            "homePageUrl": null,
+            "logoutUrl": null,
+            "redirectUris": [],
+            "implicitGrantSettings": {
+              "enableAccessTokenIssuance": false,
+              "enableIdTokenIssuance": false
+            }
+          },
+          "spa": {
+            "redirectUris": []
+          }
+        };
+      }
+
+      throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
+    });
+
+    (command as any).manifest = manifest;
+    await command.action(logger, {
+      options: {
+        manifest: JSON.stringify(manifest),
+        apisApplication: 'https://graph.microsoft.com/Group.ReadWrite.All,https://graph.microsoft.com/Directory.Read.All'
+      }
+    });
+
+    assert(loggerLogSpy.calledWith({
+      appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
+      objectId: '5b31c38c-2584-42f0-aa47-657fb3a84230',
+      tenantId: ''
+    }));
+  });
+
+  it('creates Microsoft Entra app reg with a secret, overriding manifest', async () => {
+    sinon.stub(request, 'get').rejects('Issues GET request');
+    sinon.stub(request, 'patch').callsFake(async opts => {
+      if (opts.url === mocks.updateApp.request.url &&
+        JSON.stringify(opts.data) === JSON.stringify({
+          "addIns": [],
+          "appRoles": [],
+          "createdDateTime": "2022-02-07T08:51:18Z",
+          "description": null,
+          "certification": null,
+          "groupMembershipClaims": null,
+          "identifierUris": [],
+          "keyCredentials": [],
+          "notes": null,
+          "optionalClaims": null,
+          "parentalControlSettings": {
+            "countriesBlockedForMinors": [],
+            "legalAgeGroupRule": "Allow"
+          },
+          "requiredResourceAccess": [],
+          "serviceManagementReference": null,
+          "signInAudience": "AzureADMyOrg",
+          "tags": [],
+          "tokenEncryptionKeyId": null,
+          "api": {
+            "acceptMappedClaims": null,
+            "knownClientApplications": [],
+            "oauth2PermissionScopes": []
+          },
+          "info": {
+            "termsOfServiceUrl": null,
+            "supportUrl": null,
+            "privacyStatementUrl": null,
+            "marketingUrl": null,
+            "logoUrl": null
+          },
+          "web": {
+            "implicitGrantSettings": {
+              "enableAccessTokenIssuance": false,
+              "enableIdTokenIssuance": false
+            },
+            "redirectUris": [],
+            "logoutUrl": null,
+            "homePageUrl": null
+          },
+          "spa": {
+            "redirectUris": []
+          },
+          "isFallbackPublicClient": null,
+          "displayName": "My app"
+        })) {
+        return;
+      }
+
+      throw `Issued PATCH request: ${JSON.stringify(opts, null, 2)}`;
+    });
+    sinon.stub(request, 'post').callsFake(async opts => {
+      if (opts.url === mocks.createAppWithName.request.url &&
+        JSON.stringify(opts.data) === JSON.stringify({
+          "displayName": "My Microsoft Entra app",
+          "signInAudience": "AzureADMyOrg"
+        })) {
+        return misc.deepClone(mocks.createAppWithName.response.body);
+      }
+
+      if (opts.url === mocks.createSecret.request.url) {
+        return misc.deepClone(mocks.createSecret.response.body);
+      }
+
+      throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
+    });
+
+    (command as any).manifest = manifestWithSecret;
+    await command.action(logger, {
+      options: {
+        name: 'My Microsoft Entra app',
+        manifest: JSON.stringify(manifestWithSecret),
+        withSecret: true
+      }
+    });
+
+    assert(loggerLogSpy.calledWith({
+      appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
+      objectId: '5b31c38c-2584-42f0-aa47-657fb3a84230',
+      tenantId: '',
+      secrets: [
+        {
+          displayName: 'mysecret',
+          value: 'VtJt.yG~V5pzbY2.xekx_0Xy_~9ozP_Ub5'
+        }
+      ]
+    }));
+  });
+
+  it('creates Microsoft Entra app reg with a certificate using base64 string, overriding manifest', async () => {
+    sinon.stub(request, 'get').rejects('Issues GET request');
+    sinon.stub(request, 'patch').callsFake(async opts => {
+      if (opts.url === mocks.updateApp.request.url &&
+        JSON.stringify(opts.data) === JSON.stringify({
+          "addIns": [],
+          "appRoles": [],
+          "createdDateTime":
+            "2022-02-07T08:51:18Z",
+          "description": null,
+          "certification": null,
+          "groupMembershipClaims": null,
+          "identifierUris": [],
+          "notes": null,
+          "optionalClaims": null,
+          "parentalControlSettings": {
+            "countriesBlockedForMinors": [],
+            "legalAgeGroupRule": "Allow"
+          },
+          "passwordCredentials": [],
+          "requiredResourceAccess": [],
+          "serviceManagementReference": null,
+          "signInAudience": "AzureADMyOrg",
+          "tags": [],
+          "tokenEncryptionKeyId": null,
+          "api": {
+            "acceptMappedClaims": null,
+            "knownClientApplications": [],
+            "oauth2PermissionScopes": []
+          },
+          "info": {
+            "termsOfServiceUrl": null,
+            "supportUrl": null,
+            "privacyStatementUrl": null,
+            "marketingUrl": null,
+            "logoUrl": null
+          },
+          "web": {
+            "implicitGrantSettings": {
+              "enableAccessTokenIssuance": false,
+              "enableIdTokenIssuance": false
+            },
+            "redirectUris": [],
+            "logoutUrl": null,
+            "homePageUrl": null
+          },
+          "spa": {
+            "redirectUris": []
+          },
+          "isFallbackPublicClient": null,
+          "displayName": "My app"
+        })) {
+        return;
+      }
+
+      throw 'Issued PATCH request';
+    });
+    sinon.stub(request, 'post').callsFake(async opts => {
+      if (opts.url === mocks.createAppWithName.request.url &&
+        JSON.stringify(opts.data) === JSON.stringify({
+          "displayName": "My Microsoft Entra app",
+          "signInAudience": "AzureADMyOrg",
+          "keyCredentials": [{
+            "type": "AsymmetricX509Cert",
+            "usage": "Verify",
+            "displayName": "some certificate",
+            "key": "somecertificatebase64string"
+          }]
+        })) {
+        return misc.deepClone(mocks.createAppWithName.response.body);
+      }
+
+      throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
+    });
+
+    (command as any).manifest = basicManifest;
+    await command.action(logger, {
+      options: {
+        name: 'My Microsoft Entra app',
+        manifest: JSON.stringify(basicManifest),
+        certificateDisplayName: 'some certificate',
+        certificateBase64Encoded: 'somecertificatebase64string'
+      }
+    });
+
+    assert(loggerLogSpy.calledWith({
+      appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
+      objectId: '5b31c38c-2584-42f0-aa47-657fb3a84230',
+      tenantId: ''
+    }));
+  });
+
+  it('creates Microsoft Entra app reg with a public client/redirectUris, overriding manifest', async () => {
+    sinon.stub(request, 'get').rejects('Issues GET request');
+    sinon.stub(request, 'patch').callsFake(async opts => {
+      if (opts.url === mocks.updateApp.request.url &&
+        JSON.stringify(opts.data) === JSON.stringify({
+          "addIns": [],
+          "appRoles": [],
+          "createdDateTime": "2022-02-07T08:51:18Z",
+          "description": null,
+          "certification": null,
+          "groupMembershipClaims": null,
+          "identifierUris": [],
+          "keyCredentials": [],
+          "notes": null,
+          "optionalClaims": null,
+          "parentalControlSettings": {
+            "countriesBlockedForMinors": [],
+            "legalAgeGroupRule": "Allow"
+          },
+          "passwordCredentials": [],
+          "requiredResourceAccess": [],
+          "serviceManagementReference": null,
+          "signInAudience": "AzureADMyOrg",
+          "tags": [],
+          "tokenEncryptionKeyId": null,
+          "api": {
+            "acceptMappedClaims": null,
+            "knownClientApplications": [],
+            "oauth2PermissionScopes": []
+          },
+          "info": {
+            "termsOfServiceUrl": null,
+            "supportUrl": null,
+            "privacyStatementUrl": null,
+            "marketingUrl": null,
+            "logoUrl": null
+          },
+          "web": {
+            "implicitGrantSettings": {
+              "enableAccessTokenIssuance": false,
+              "enableIdTokenIssuance": false
+            },
+            "redirectUris": [],
+            "logoutUrl": null,
+            "homePageUrl": null
+          },
+          "spa": {
+            "redirectUris": []
+          },
+          "isFallbackPublicClient": null,
+          "displayName": "My app"
+        })) {
+        return;
+      }
+
+      throw 'Issued PATCH request';
+    });
+    sinon.stub(request, 'post').callsFake(async opts => {
+      if (opts.url === mocks.createAppWithName.request.url &&
+        JSON.stringify(opts.data) === JSON.stringify({
+          "displayName": "My Microsoft Entra app",
+          "signInAudience": "AzureADMyOrg",
+          "publicClient": {
+            "redirectUris": ["https://login.microsoftonline.com/common/oauth2/nativeclient"]
+          }
+        })) {
+        return misc.deepClone(mocks.createAppWithName.response.body);
+      }
+
+      throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
+    });
+
+    (command as any).manifest = basicManifest;
+    await command.action(logger, {
+      options: {
+        name: 'My Microsoft Entra app',
+        manifest: JSON.stringify(basicManifest),
+        platform: 'publicClient',
+        redirectUris: 'https://login.microsoftonline.com/common/oauth2/nativeclient'
+      }
+    });
+
+    assert(loggerLogSpy.calledWith({
+      appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
+      objectId: '5b31c38c-2584-42f0-aa47-657fb3a84230',
+      tenantId: ''
+    }));
+  });
+
+  it('creates Microsoft Entra app reg with implicit flow enabled, overriding manifest', async () => {
+    sinon.stub(request, 'get').rejects('Issues GET request');
+    sinon.stub(request, 'patch').callsFake(async opts => {
+      if (opts.url === mocks.updateApp.request.url &&
+        JSON.stringify(opts.data) === JSON.stringify({
+          "addIns": [],
+          "appRoles": [],
+          "createdDateTime": "2022-02-07T08:51:18Z",
+          "description": null,
+          "certification": null,
+          "groupMembershipClaims": null,
+          "identifierUris": [],
+          "keyCredentials": [],
+          "notes": null,
+          "optionalClaims": null,
+          "parentalControlSettings": {
+            "countriesBlockedForMinors": [],
+            "legalAgeGroupRule": "Allow"
+          },
+          "passwordCredentials": [],
+          "requiredResourceAccess": [],
+          "serviceManagementReference": null,
+          "signInAudience": "AzureADMultipleOrgs",
+          "tags": [],
+          "tokenEncryptionKeyId": null,
+          "api": {
+            "acceptMappedClaims": null,
+            "knownClientApplications": [],
+            "oauth2PermissionScopes": []
+          },
+          "info": {
+            "termsOfServiceUrl": null,
+            "supportUrl": null,
+            "privacyStatementUrl": null,
+            "marketingUrl": null,
+            "logoUrl": null
+          },
+          "web": {
+            "implicitGrantSettings": {},
+            "redirectUris": [],
+            "logoutUrl": null,
+            "homePageUrl": null
+          },
+          "spa": {
+            "redirectUris": []
+          },
+          "isFallbackPublicClient": null,
+          "displayName": "My app"
+        })) {
+        return;
+      }
+
+      throw 'Issued PATCH request';
+    });
+    sinon.stub(request, 'post').callsFake(async opts => {
+      if (opts.url === mocks.createAppWithName.request.url &&
+        JSON.stringify(opts.data) === JSON.stringify({
+          "displayName": "My Microsoft Entra app",
+          "signInAudience": "AzureADMultipleOrgs",
+          "web": {
+            "implicitGrantSettings": {
+              "enableAccessTokenIssuance": true,
+              "enableIdTokenIssuance": true
+            }
+          }
+        })) {
+        return misc.deepClone(mocks.createAppWithName.response.body);
+      }
+
+      throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
+    });
+
+    (command as any).manifest = basicManifest;
+    await command.action(logger, {
+      options: {
+        name: 'My Microsoft Entra app',
+        manifest: JSON.stringify(basicManifest),
+        implicitFlow: true,
+        multitenant: true
+      }
+    });
+
+    assert(loggerLogSpy.calledWith({
+      appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
+      objectId: '5b31c38c-2584-42f0-aa47-657fb3a84230',
+      tenantId: ''
+    }));
+  });
+
+  it('creates Microsoft Entra app reg with a custom scope, overriding manifest', async () => {
+    sinon.stub(request, 'get').callsFake(async opts => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames') {
+        return {
+          "@odata.nextLink": "https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27",
+          "value": [
+            appAddMocks.microsoftGraphSp
+          ]
+        };
+      }
+
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27') {
+        return {
+          value: appAddMocks.aadSp
+        };
+      }
+
+      throw `Invalid GET request: ${opts.url}`;
+    });
+    sinon.stub(request, 'patch').callsFake(async opts => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230') {
+        if (JSON.stringify(opts.data) === JSON.stringify({
+          "addIns": [],
+          "appRoles": [],
+          "createdDateTime": "2022-02-07T08:51:18Z",
+          "description": null,
+          "certification": null,
+          "groupMembershipClaims": null,
+          "identifierUris": [],
+          "keyCredentials": [],
+          "notes": null,
+          "optionalClaims": null,
+          "parentalControlSettings": {
+            "countriesBlockedForMinors": [],
+            "legalAgeGroupRule": "Allow"
+          },
+          "passwordCredentials": [],
+          "requiredResourceAccess": [],
+          "serviceManagementReference": null,
+          "signInAudience": "AzureADMyOrg",
+          "tags": [],
+          "tokenEncryptionKeyId": null,
+          "api": {
+            "acceptMappedClaims": null,
+            "knownClientApplications": []
+          },
+          "info": {
+            "termsOfServiceUrl": null,
+            "supportUrl": null,
+            "privacyStatementUrl": null,
+            "marketingUrl": null,
+            "logoUrl": null
+          },
+          "web": {
+            "implicitGrantSettings": {
+              "enableAccessTokenIssuance": false,
+              "enableIdTokenIssuance": false
+            },
+            "redirectUris": [],
+            "logoutUrl": null,
+            "homePageUrl": null
+          },
+          "spa": {
+            "redirectUris": []
+          },
+          "isFallbackPublicClient": null,
+          "displayName": "My app"
+        })) {
+          return;
+        }
+
+        if (
+          opts.data.identifierUris[0] === "api://caf406b91cd4.ngrok.io/bc724b77-da87-43a9-b385-6ebaaf969db8" &&
+          opts.data.api.oauth2PermissionScopes.length === 1 &&
+          opts.data.api.oauth2PermissionScopes[0].value === "access_as_user" &&
+          opts.data.api.oauth2PermissionScopes[0].adminConsentDescription === "Access as a user" &&
+          opts.data.api.oauth2PermissionScopes[0].adminConsentDisplayName === "Access as a user" &&
+          opts.data.api.oauth2PermissionScopes[0].type === 'User'
+        ) {
+          return;
+        }
+      }
+
+      throw `Invalid PATCH request: ${JSON.stringify(opts, null, 2)}`;
+    });
+    sinon.stub(request, 'post').callsFake(async opts => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
+        JSON.stringify(opts.data) === JSON.stringify({
+          "displayName": "My Microsoft Entra app",
+          "signInAudience": "AzureADMyOrg",
+          "requiredResourceAccess": [
+            {
+              "resourceAppId": "00000003-0000-0000-c000-000000000000",
+              "resourceAccess": [
+                {
+                  "id": "e1fe6dd8-ba31-4d61-89e7-88639da4683d",
+                  "type": "Scope"
+                },
+                {
+                  "id": "62a82d76-70ea-41e2-9197-370581804d09",
+                  "type": "Role"
+                },
+                {
+                  "id": "7ab1d382-f21e-4acd-a863-ba3e13f7da61",
+                  "type": "Role"
+                }
+              ]
+            }
+          ]
+        })) {
+        return {
+          "id": "5b31c38c-2584-42f0-aa47-657fb3a84230",
+          "deletedDateTime": null,
+          "appId": "bc724b77-da87-43a9-b385-6ebaaf969db8",
           "applicationTemplateId": null,
           "disabledByMicrosoftStatus": null,
           "createdDateTime": "2022-02-10T08:06:59.5299702Z",
@@ -5605,2178 +5646,6 @@ describe(commands.APP_ADD, () => {
     (command as any).manifest = manifest;
     await command.action(logger, {
       options: {
-        manifest: JSON.stringify(manifest),
-        apisApplication: 'https://graph.microsoft.com/Group.ReadWrite.All,https://graph.microsoft.com/Directory.Read.All'
-      }
-    });
-    assert(loggerLogSpy.calledWith({
-      appId: '19180b97-8f30-43ac-8a22-19565de0b064',
-      objectId: 'bcac8603-cf65-479b-a4e5-8d45d3d05379',
-      tenantId: ''
-    }));
-  });
-
-  it(`creates Microsoft Entra app reg with just the name. Doesn't save the app info if not requested`, async () => {
-    sinon.stub(request, 'get').rejects('Issues GET request');
-    sinon.stub(request, 'patch').rejects('Issued PATCH request');
-    sinon.stub(request, 'post').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
-        JSON.stringify(opts.data) === JSON.stringify({
-          "displayName": "My Microsoft Entra app",
-          "signInAudience": "AzureADMyOrg"
-        })) {
-        return {
-          "id": "5b31c38c-2584-42f0-aa47-657fb3a84230",
-          "deletedDateTime": null,
-          "appId": "bc724b77-da87-43a9-b385-6ebaaf969db8",
-          "applicationTemplateId": null,
-          "createdDateTime": "2020-12-31T14:44:13.7945807Z",
-          "displayName": "My Microsoft Entra app",
-          "description": null,
-          "groupMembershipClaims": null,
-          "identifierUris": [],
-          "isDeviceOnlyAuthSupported": null,
-          "isFallbackPublicClient": null,
-          "notes": null,
-          "optionalClaims": null,
-          "publisherDomain": "contoso.onmicrosoft.com",
-          "signInAudience": "AzureADMyOrg",
-          "tags": [],
-          "tokenEncryptionKeyId": null,
-          "verifiedPublisher": {
-            "displayName": null,
-            "verifiedPublisherId": null,
-            "addedDateTime": null
-          },
-          "spa": {
-            "redirectUris": []
-          },
-          "defaultRedirectUri": null,
-          "addIns": [],
-          "api": {
-            "acceptMappedClaims": null,
-            "knownClientApplications": [],
-            "requestedAccessTokenVersion": null,
-            "oauth2PermissionScopes": [],
-            "preAuthorizedApplications": []
-          },
-          "appRoles": [],
-          "info": {
-            "logoUrl": null,
-            "marketingUrl": null,
-            "privacyStatementUrl": null,
-            "supportUrl": null,
-            "termsOfServiceUrl": null
-          },
-          "keyCredentials": [],
-          "parentalControlSettings": {
-            "countriesBlockedForMinors": [],
-            "legalAgeGroupRule": "Allow"
-          },
-          "passwordCredentials": [],
-          "publicClient": {
-            "redirectUris": []
-          },
-          "requiredResourceAccess": [],
-          "web": {
-            "homePageUrl": null,
-            "logoutUrl": null,
-            "redirectUris": [],
-            "implicitGrantSettings": {
-              "enableAccessTokenIssuance": false,
-              "enableIdTokenIssuance": false
-            }
-          }
-        };
-      }
-
-      throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
-    });
-    const fsWriteFileSyncSpy = sinon.spy(fs, 'writeFileSync');
-
-    await command.action(logger, {
-      options: {
-        name: 'My Microsoft Entra app'
-      }
-    });
-    assert(fsWriteFileSyncSpy.notCalled);
-  });
-
-  it(`saves app info in the .m365rc.json file in the current folder when requested. Creates the file it doesn't exist`, async () => {
-    let fileContents: string | undefined;
-    let filePath: string | undefined;
-    sinon.stub(request, 'get').rejects('Issues GET request');
-    sinon.stub(request, 'patch').rejects('Issued PATCH request');
-    sinon.stub(request, 'post').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
-        JSON.stringify(opts.data) === JSON.stringify({
-          "displayName": "My Microsoft Entra app",
-          "signInAudience": "AzureADMyOrg"
-        })) {
-        return {
-          "id": "5b31c38c-2584-42f0-aa47-657fb3a84230",
-          "deletedDateTime": null,
-          "appId": "bc724b77-da87-43a9-b385-6ebaaf969db8",
-          "applicationTemplateId": null,
-          "createdDateTime": "2020-12-31T14:44:13.7945807Z",
-          "displayName": "My Microsoft Entra app",
-          "description": null,
-          "groupMembershipClaims": null,
-          "identifierUris": [],
-          "isDeviceOnlyAuthSupported": null,
-          "isFallbackPublicClient": null,
-          "notes": null,
-          "optionalClaims": null,
-          "publisherDomain": "contoso.onmicrosoft.com",
-          "signInAudience": "AzureADMyOrg",
-          "tags": [],
-          "tokenEncryptionKeyId": null,
-          "verifiedPublisher": {
-            "displayName": null,
-            "verifiedPublisherId": null,
-            "addedDateTime": null
-          },
-          "spa": {
-            "redirectUris": []
-          },
-          "defaultRedirectUri": null,
-          "addIns": [],
-          "api": {
-            "acceptMappedClaims": null,
-            "knownClientApplications": [],
-            "requestedAccessTokenVersion": null,
-            "oauth2PermissionScopes": [],
-            "preAuthorizedApplications": []
-          },
-          "appRoles": [],
-          "info": {
-            "logoUrl": null,
-            "marketingUrl": null,
-            "privacyStatementUrl": null,
-            "supportUrl": null,
-            "termsOfServiceUrl": null
-          },
-          "keyCredentials": [],
-          "parentalControlSettings": {
-            "countriesBlockedForMinors": [],
-            "legalAgeGroupRule": "Allow"
-          },
-          "passwordCredentials": [],
-          "publicClient": {
-            "redirectUris": []
-          },
-          "requiredResourceAccess": [],
-          "web": {
-            "homePageUrl": null,
-            "logoutUrl": null,
-            "redirectUris": [],
-            "implicitGrantSettings": {
-              "enableAccessTokenIssuance": false,
-              "enableIdTokenIssuance": false
-            }
-          }
-        };
-      }
-
-      throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
-    });
-    sinon.stub(fs, 'existsSync').returns(false);
-    sinon.stub(fs, 'writeFileSync').callsFake((_, contents) => {
-      filePath = _.toString();
-      fileContents = contents as string;
-    });
-
-    await command.action(logger, {
-      options: {
-        name: 'My Microsoft Entra app',
-        save: true
-      }
-    });
-    assert.strictEqual(filePath, '.m365rc.json');
-    assert.strictEqual(fileContents, JSON.stringify({
-      apps: [{
-        appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
-        name: 'My Microsoft Entra app'
-      }]
-    }, null, 2));
-  });
-
-  it(`saves app info in the .m365rc.json file in the current folder when requested. Writes to the existing empty file`, async () => {
-    let fileContents: string | undefined;
-    let filePath: string | undefined;
-    sinon.stub(request, 'get').rejects('Issues GET request');
-    sinon.stub(request, 'patch').rejects('Issued PATCH request');
-    sinon.stub(request, 'post').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
-        JSON.stringify(opts.data) === JSON.stringify({
-          "displayName": "My Microsoft Entra app",
-          "signInAudience": "AzureADMyOrg"
-        })) {
-        return {
-          "id": "5b31c38c-2584-42f0-aa47-657fb3a84230",
-          "deletedDateTime": null,
-          "appId": "bc724b77-da87-43a9-b385-6ebaaf969db8",
-          "applicationTemplateId": null,
-          "createdDateTime": "2020-12-31T14:44:13.7945807Z",
-          "displayName": "My Microsoft Entra app",
-          "description": null,
-          "groupMembershipClaims": null,
-          "identifierUris": [],
-          "isDeviceOnlyAuthSupported": null,
-          "isFallbackPublicClient": null,
-          "notes": null,
-          "optionalClaims": null,
-          "publisherDomain": "contoso.onmicrosoft.com",
-          "signInAudience": "AzureADMyOrg",
-          "tags": [],
-          "tokenEncryptionKeyId": null,
-          "verifiedPublisher": {
-            "displayName": null,
-            "verifiedPublisherId": null,
-            "addedDateTime": null
-          },
-          "spa": {
-            "redirectUris": []
-          },
-          "defaultRedirectUri": null,
-          "addIns": [],
-          "api": {
-            "acceptMappedClaims": null,
-            "knownClientApplications": [],
-            "requestedAccessTokenVersion": null,
-            "oauth2PermissionScopes": [],
-            "preAuthorizedApplications": []
-          },
-          "appRoles": [],
-          "info": {
-            "logoUrl": null,
-            "marketingUrl": null,
-            "privacyStatementUrl": null,
-            "supportUrl": null,
-            "termsOfServiceUrl": null
-          },
-          "keyCredentials": [],
-          "parentalControlSettings": {
-            "countriesBlockedForMinors": [],
-            "legalAgeGroupRule": "Allow"
-          },
-          "passwordCredentials": [],
-          "publicClient": {
-            "redirectUris": []
-          },
-          "requiredResourceAccess": [],
-          "web": {
-            "homePageUrl": null,
-            "logoutUrl": null,
-            "redirectUris": [],
-            "implicitGrantSettings": {
-              "enableAccessTokenIssuance": false,
-              "enableIdTokenIssuance": false
-            }
-          }
-        };
-      }
-
-      throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
-    });
-    sinon.stub(fs, 'existsSync').returns(true);
-    sinon.stub(fs, 'readFileSync').returns('');
-    sinon.stub(fs, 'writeFileSync').callsFake((_, contents) => {
-      filePath = _.toString();
-      fileContents = contents as string;
-    });
-
-    await command.action(logger, {
-      options: {
-        name: 'My Microsoft Entra app',
-        save: true
-      }
-    });
-    assert.strictEqual(filePath, '.m365rc.json');
-    assert.strictEqual(fileContents, JSON.stringify({
-      apps: [{
-        appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
-        name: 'My Microsoft Entra app'
-      }]
-    }, null, 2));
-  });
-
-  it(`saves app info in the .m365rc.json file in the current folder when requested. Adds to the existing file contents`, async () => {
-    let fileContents: string | undefined;
-    let filePath: string | undefined;
-    sinon.stub(request, 'get').rejects('Issues GET request');
-    sinon.stub(request, 'patch').rejects('Issued PATCH request');
-    sinon.stub(request, 'post').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
-        JSON.stringify(opts.data) === JSON.stringify({
-          "displayName": "My Microsoft Entra app",
-          "signInAudience": "AzureADMyOrg"
-        })) {
-        return {
-          "id": "5b31c38c-2584-42f0-aa47-657fb3a84230",
-          "deletedDateTime": null,
-          "appId": "bc724b77-da87-43a9-b385-6ebaaf969db8",
-          "applicationTemplateId": null,
-          "createdDateTime": "2020-12-31T14:44:13.7945807Z",
-          "displayName": "My Microsoft Entra app",
-          "description": null,
-          "groupMembershipClaims": null,
-          "identifierUris": [],
-          "isDeviceOnlyAuthSupported": null,
-          "isFallbackPublicClient": null,
-          "notes": null,
-          "optionalClaims": null,
-          "publisherDomain": "contoso.onmicrosoft.com",
-          "signInAudience": "AzureADMyOrg",
-          "tags": [],
-          "tokenEncryptionKeyId": null,
-          "verifiedPublisher": {
-            "displayName": null,
-            "verifiedPublisherId": null,
-            "addedDateTime": null
-          },
-          "spa": {
-            "redirectUris": []
-          },
-          "defaultRedirectUri": null,
-          "addIns": [],
-          "api": {
-            "acceptMappedClaims": null,
-            "knownClientApplications": [],
-            "requestedAccessTokenVersion": null,
-            "oauth2PermissionScopes": [],
-            "preAuthorizedApplications": []
-          },
-          "appRoles": [],
-          "info": {
-            "logoUrl": null,
-            "marketingUrl": null,
-            "privacyStatementUrl": null,
-            "supportUrl": null,
-            "termsOfServiceUrl": null
-          },
-          "keyCredentials": [],
-          "parentalControlSettings": {
-            "countriesBlockedForMinors": [],
-            "legalAgeGroupRule": "Allow"
-          },
-          "passwordCredentials": [],
-          "publicClient": {
-            "redirectUris": []
-          },
-          "requiredResourceAccess": [],
-          "web": {
-            "homePageUrl": null,
-            "logoutUrl": null,
-            "redirectUris": [],
-            "implicitGrantSettings": {
-              "enableAccessTokenIssuance": false,
-              "enableIdTokenIssuance": false
-            }
-          }
-        };
-      }
-
-      throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
-    });
-    sinon.stub(fs, 'existsSync').returns(true);
-    sinon.stub(fs, 'readFileSync').returns(JSON.stringify({
-      "apps": [
-        {
-          "appId": "74ad36da-3704-4e67-ba08-8c8e833f3c52",
-          "name": "M365 app"
-        }
-      ]
-    }));
-    sinon.stub(fs, 'writeFileSync').callsFake((_, contents) => {
-      filePath = _.toString();
-      fileContents = contents as string;
-    });
-
-    await command.action(logger, {
-      options: {
-        name: 'My Microsoft Entra app',
-        save: true
-      }
-    });
-    assert.strictEqual(filePath, '.m365rc.json');
-    assert.strictEqual(fileContents, JSON.stringify({
-      apps: [
-        {
-          "appId": "74ad36da-3704-4e67-ba08-8c8e833f3c52",
-          "name": "M365 app"
-        },
-        {
-          appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
-          name: 'My Microsoft Entra app'
-        }]
-    }, null, 2));
-  });
-
-  it(`saves app info in the .m365rc.json file in the current folder when requested. Adds to the existing file contents (debug)`, async () => {
-    let fileContents: string | undefined;
-    let filePath: string | undefined;
-    sinon.stub(request, 'get').rejects('Issues GET request');
-    sinon.stub(request, 'patch').rejects('Issued PATCH request');
-    sinon.stub(request, 'post').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
-        JSON.stringify(opts.data) === JSON.stringify({
-          "displayName": "My Microsoft Entra app",
-          "signInAudience": "AzureADMyOrg"
-        })) {
-        return {
-          "id": "5b31c38c-2584-42f0-aa47-657fb3a84230",
-          "deletedDateTime": null,
-          "appId": "bc724b77-da87-43a9-b385-6ebaaf969db8",
-          "applicationTemplateId": null,
-          "createdDateTime": "2020-12-31T14:44:13.7945807Z",
-          "displayName": "My Microsoft Entra app",
-          "description": null,
-          "groupMembershipClaims": null,
-          "identifierUris": [],
-          "isDeviceOnlyAuthSupported": null,
-          "isFallbackPublicClient": null,
-          "notes": null,
-          "optionalClaims": null,
-          "publisherDomain": "contoso.onmicrosoft.com",
-          "signInAudience": "AzureADMyOrg",
-          "tags": [],
-          "tokenEncryptionKeyId": null,
-          "verifiedPublisher": {
-            "displayName": null,
-            "verifiedPublisherId": null,
-            "addedDateTime": null
-          },
-          "spa": {
-            "redirectUris": []
-          },
-          "defaultRedirectUri": null,
-          "addIns": [],
-          "api": {
-            "acceptMappedClaims": null,
-            "knownClientApplications": [],
-            "requestedAccessTokenVersion": null,
-            "oauth2PermissionScopes": [],
-            "preAuthorizedApplications": []
-          },
-          "appRoles": [],
-          "info": {
-            "logoUrl": null,
-            "marketingUrl": null,
-            "privacyStatementUrl": null,
-            "supportUrl": null,
-            "termsOfServiceUrl": null
-          },
-          "keyCredentials": [],
-          "parentalControlSettings": {
-            "countriesBlockedForMinors": [],
-            "legalAgeGroupRule": "Allow"
-          },
-          "passwordCredentials": [],
-          "publicClient": {
-            "redirectUris": []
-          },
-          "requiredResourceAccess": [],
-          "web": {
-            "homePageUrl": null,
-            "logoutUrl": null,
-            "redirectUris": [],
-            "implicitGrantSettings": {
-              "enableAccessTokenIssuance": false,
-              "enableIdTokenIssuance": false
-            }
-          }
-        };
-      }
-
-      throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
-    });
-    sinon.stub(fs, 'existsSync').returns(true);
-    sinon.stub(fs, 'readFileSync').returns(JSON.stringify({
-      "apps": [
-        {
-          "appId": "74ad36da-3704-4e67-ba08-8c8e833f3c52",
-          "name": "M365 app"
-        }
-      ]
-    }));
-    sinon.stub(fs, 'writeFileSync').callsFake((_, contents) => {
-      filePath = _.toString();
-      fileContents = contents as string;
-    });
-
-    await command.action(logger, {
-      options: {
-        debug: true,
-        name: 'My Microsoft Entra app',
-        save: true
-      }
-    });
-    assert.strictEqual(filePath, '.m365rc.json');
-    assert.strictEqual(fileContents, JSON.stringify({
-      apps: [
-        {
-          "appId": "74ad36da-3704-4e67-ba08-8c8e833f3c52",
-          "name": "M365 app"
-        },
-        {
-          appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
-          name: 'My Microsoft Entra app'
-        }]
-    }, null, 2));
-  });
-
-  it(`doesn't save app info in the .m365rc.json file when there was error reading file contents`, async () => {
-    sinon.stub(request, 'get').rejects('Issues GET request');
-    sinon.stub(request, 'patch').rejects('Issued PATCH request');
-    sinon.stub(request, 'post').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
-        JSON.stringify(opts.data) === JSON.stringify({
-          "displayName": "My Microsoft Entra app",
-          "signInAudience": "AzureADMyOrg"
-        })) {
-        return {
-          "id": "5b31c38c-2584-42f0-aa47-657fb3a84230",
-          "deletedDateTime": null,
-          "appId": "bc724b77-da87-43a9-b385-6ebaaf969db8",
-          "applicationTemplateId": null,
-          "createdDateTime": "2020-12-31T14:44:13.7945807Z",
-          "displayName": "My Microsoft Entra app",
-          "description": null,
-          "groupMembershipClaims": null,
-          "identifierUris": [],
-          "isDeviceOnlyAuthSupported": null,
-          "isFallbackPublicClient": null,
-          "notes": null,
-          "optionalClaims": null,
-          "publisherDomain": "contoso.onmicrosoft.com",
-          "signInAudience": "AzureADMyOrg",
-          "tags": [],
-          "tokenEncryptionKeyId": null,
-          "verifiedPublisher": {
-            "displayName": null,
-            "verifiedPublisherId": null,
-            "addedDateTime": null
-          },
-          "spa": {
-            "redirectUris": []
-          },
-          "defaultRedirectUri": null,
-          "addIns": [],
-          "api": {
-            "acceptMappedClaims": null,
-            "knownClientApplications": [],
-            "requestedAccessTokenVersion": null,
-            "oauth2PermissionScopes": [],
-            "preAuthorizedApplications": []
-          },
-          "appRoles": [],
-          "info": {
-            "logoUrl": null,
-            "marketingUrl": null,
-            "privacyStatementUrl": null,
-            "supportUrl": null,
-            "termsOfServiceUrl": null
-          },
-          "keyCredentials": [],
-          "parentalControlSettings": {
-            "countriesBlockedForMinors": [],
-            "legalAgeGroupRule": "Allow"
-          },
-          "passwordCredentials": [],
-          "publicClient": {
-            "redirectUris": []
-          },
-          "requiredResourceAccess": [],
-          "web": {
-            "homePageUrl": null,
-            "logoutUrl": null,
-            "redirectUris": [],
-            "implicitGrantSettings": {
-              "enableAccessTokenIssuance": false,
-              "enableIdTokenIssuance": false
-            }
-          }
-        };
-      }
-
-      throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
-    });
-    sinon.stub(fs, 'existsSync').returns(true);
-    sinon.stub(fs, 'readFileSync').throws(new Error('An error has occurred'));
-    const fsWriteFileSyncSpy = sinon.spy(fs, 'writeFileSync');
-
-    await command.action(logger, {
-      options: {
-        name: 'My Microsoft Entra app',
-        save: true
-      }
-    });
-    assert(fsWriteFileSyncSpy.notCalled);
-  });
-
-  it(`doesn't save app info in the .m365rc.json file when file has invalid JSON`, async () => {
-    sinon.stub(request, 'get').rejects('Issues GET request');
-    sinon.stub(request, 'patch').rejects('Issued PATCH request');
-    sinon.stub(request, 'post').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
-        JSON.stringify(opts.data) === JSON.stringify({
-          "displayName": "My Microsoft Entra app",
-          "signInAudience": "AzureADMyOrg"
-        })) {
-        return {
-          "id": "5b31c38c-2584-42f0-aa47-657fb3a84230",
-          "deletedDateTime": null,
-          "appId": "bc724b77-da87-43a9-b385-6ebaaf969db8",
-          "applicationTemplateId": null,
-          "createdDateTime": "2020-12-31T14:44:13.7945807Z",
-          "displayName": "My Microsoft Entra app",
-          "description": null,
-          "groupMembershipClaims": null,
-          "identifierUris": [],
-          "isDeviceOnlyAuthSupported": null,
-          "isFallbackPublicClient": null,
-          "notes": null,
-          "optionalClaims": null,
-          "publisherDomain": "contoso.onmicrosoft.com",
-          "signInAudience": "AzureADMyOrg",
-          "tags": [],
-          "tokenEncryptionKeyId": null,
-          "verifiedPublisher": {
-            "displayName": null,
-            "verifiedPublisherId": null,
-            "addedDateTime": null
-          },
-          "spa": {
-            "redirectUris": []
-          },
-          "defaultRedirectUri": null,
-          "addIns": [],
-          "api": {
-            "acceptMappedClaims": null,
-            "knownClientApplications": [],
-            "requestedAccessTokenVersion": null,
-            "oauth2PermissionScopes": [],
-            "preAuthorizedApplications": []
-          },
-          "appRoles": [],
-          "info": {
-            "logoUrl": null,
-            "marketingUrl": null,
-            "privacyStatementUrl": null,
-            "supportUrl": null,
-            "termsOfServiceUrl": null
-          },
-          "keyCredentials": [],
-          "parentalControlSettings": {
-            "countriesBlockedForMinors": [],
-            "legalAgeGroupRule": "Allow"
-          },
-          "passwordCredentials": [],
-          "publicClient": {
-            "redirectUris": []
-          },
-          "requiredResourceAccess": [],
-          "web": {
-            "homePageUrl": null,
-            "logoutUrl": null,
-            "redirectUris": [],
-            "implicitGrantSettings": {
-              "enableAccessTokenIssuance": false,
-              "enableIdTokenIssuance": false
-            }
-          }
-        };
-      }
-
-      throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
-    });
-    sinon.stub(fs, 'existsSync').returns(true);
-    sinon.stub(fs, 'readFileSync').returns('{');
-    const fsWriteFileSyncSpy = sinon.spy(fs, 'writeFileSync');
-
-    await command.action(logger, {
-      options: {
-        name: 'My Microsoft Entra app',
-        save: true
-      }
-    });
-    assert(fsWriteFileSyncSpy.notCalled);
-  });
-
-  it(`doesn't fail execution when error occurred while saving app info`, async () => {
-    sinon.stub(request, 'get').rejects('Issues GET request');
-    sinon.stub(request, 'patch').rejects('Issued PATCH request');
-    sinon.stub(request, 'post').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
-        JSON.stringify(opts.data) === JSON.stringify({
-          "displayName": "My Microsoft Entra app",
-          "signInAudience": "AzureADMyOrg"
-        })) {
-        return {
-          "id": "5b31c38c-2584-42f0-aa47-657fb3a84230",
-          "deletedDateTime": null,
-          "appId": "bc724b77-da87-43a9-b385-6ebaaf969db8",
-          "applicationTemplateId": null,
-          "createdDateTime": "2020-12-31T14:44:13.7945807Z",
-          "displayName": "My Microsoft Entra app",
-          "description": null,
-          "groupMembershipClaims": null,
-          "identifierUris": [],
-          "isDeviceOnlyAuthSupported": null,
-          "isFallbackPublicClient": null,
-          "notes": null,
-          "optionalClaims": null,
-          "publisherDomain": "contoso.onmicrosoft.com",
-          "signInAudience": "AzureADMyOrg",
-          "tags": [],
-          "tokenEncryptionKeyId": null,
-          "verifiedPublisher": {
-            "displayName": null,
-            "verifiedPublisherId": null,
-            "addedDateTime": null
-          },
-          "spa": {
-            "redirectUris": []
-          },
-          "defaultRedirectUri": null,
-          "addIns": [],
-          "api": {
-            "acceptMappedClaims": null,
-            "knownClientApplications": [],
-            "requestedAccessTokenVersion": null,
-            "oauth2PermissionScopes": [],
-            "preAuthorizedApplications": []
-          },
-          "appRoles": [],
-          "info": {
-            "logoUrl": null,
-            "marketingUrl": null,
-            "privacyStatementUrl": null,
-            "supportUrl": null,
-            "termsOfServiceUrl": null
-          },
-          "keyCredentials": [],
-          "parentalControlSettings": {
-            "countriesBlockedForMinors": [],
-            "legalAgeGroupRule": "Allow"
-          },
-          "passwordCredentials": [],
-          "publicClient": {
-            "redirectUris": []
-          },
-          "requiredResourceAccess": [],
-          "web": {
-            "homePageUrl": null,
-            "logoutUrl": null,
-            "redirectUris": [],
-            "implicitGrantSettings": {
-              "enableAccessTokenIssuance": false,
-              "enableIdTokenIssuance": false
-            }
-          }
-        };
-      }
-
-      throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
-    });
-    sinon.stub(fs, 'existsSync').returns(false);
-    sinon.stub(fs, 'writeFileSync').throws(new Error('Error occurred while saving app info'));
-
-    await command.action(logger, {
-      options: {
-        name: 'My Microsoft Entra app',
-        save: true
-      }
-    });
-  });
-
-  it('fails validation if specified platform value is not valid', async () => {
-    const actual = await command.validate({ options: { name: 'My Microsoft Entra app', platform: 'abc' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('passes validation if platform value is spa', async () => {
-    const actual = await command.validate({ options: { name: 'My Microsoft Entra app', platform: 'spa' } }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
-
-  it('passes validation if platform value is web', async () => {
-    const actual = await command.validate({ options: { name: 'My Microsoft Entra app', platform: 'web' } }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
-
-  it('passes validation if platform value is publicClient', async () => {
-    const actual = await command.validate({ options: { name: 'My Microsoft Entra app', platform: 'publicClient' } }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
-
-  it('fails validation if redirectUris specified without platform', async () => {
-    const actual = await command.validate({ options: { name: 'My Microsoft Entra app', redirectUris: 'http://localhost:8080' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('passes validation if redirectUris specified with platform', async () => {
-    const actual = await command.validate({ options: { name: 'My Microsoft Entra app', redirectUris: 'http://localhost:8080', platform: 'spa' } }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
-
-  it('fails validation if scopeName specified without uri', async () => {
-    const actual = await command.validate({ options: { name: 'My Microsoft Entra app', scopeName: 'access_as_user', scopeAdminConsentDescription: 'Access as user', scopeAdminConsentDisplayName: 'Access as user' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if scopeName specified without scopeAdminConsentDescription', async () => {
-    const actual = await command.validate({ options: { name: 'My Microsoft Entra app', scopeName: 'access_as_user', uri: 'https://contoso.onmicrosoft.com/myapp', scopeAdminConsentDisplayName: 'Access as user' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if scopeName specified without scopeAdminConsentDisplayName', async () => {
-    const actual = await command.validate({ options: { name: 'My Microsoft Entra app', scopeName: 'access_as_user', uri: 'https://contoso.onmicrosoft.com/myapp', scopeAdminConsentDescription: 'Access as user' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('passes validation if scopeName specified with uri, scopeAdminConsentDisplayName and scopeAdminConsentDescription', async () => {
-    const actual = await command.validate({ options: { name: 'My Microsoft Entra app', scopeName: 'access_as_user', uri: 'https://contoso.onmicrosoft.com/myapp', scopeAdminConsentDescription: 'Access as user', scopeAdminConsentDisplayName: 'Access as user' } }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
-
-  it('fails validation if specified scopeConsentBy value is not valid', async () => {
-    const actual = await command.validate({ options: { name: 'My Microsoft Entra app', scopeConsentBy: 'abc' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('passes validation if scopeConsentBy is admins', async () => {
-    const actual = await command.validate({ options: { name: 'My Microsoft Entra app', scopeConsentBy: 'admins' } }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
-
-  it('passes validation if scopeConsentBy is adminsAndUsers', async () => {
-    const actual = await command.validate({ options: { name: 'My Microsoft Entra app', scopeConsentBy: 'adminsAndUsers' } }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
-
-  it('fails validation if specified manifest is not a valid JSON string', async () => {
-    const manifest = '{';
-    const actual = await command.validate({ options: { manifest: manifest } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it(`fails validation if manifest is valid JSON but it doesn't contain name and name option not specified`, async () => {
-    const manifest = '{}';
-    const actual = await command.validate({ options: { manifest: manifest } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if certificateDisplayName is specified without certificate', async () => {
-    const actual = await command.validate({ options: { name: 'My Microsoft Entra app', certificateDisplayName: 'Some certificate' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if both certificateBase64Encoded and certificateFile are specified', async () => {
-    const actual = await command.validate({ options: { name: 'My Microsoft Entra app', certificateFile: 'c:\\temp\\some-certificate.cer', certificateBase64Encoded: 'somebase64string' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('passes validation if certificateFile specified with certificateDisplayName', async () => {
-    sinon.stub(fs, 'existsSync').callsFake(_ => true);
-
-    const actual = await command.validate({ options: { name: 'My Microsoft Entra app', certificateDisplayName: 'Some certificate', certificateFile: 'c:\\temp\\some-certificate.cer' } }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
-
-  it('fails validation when certificate file is not found', async () => {
-    sinon.stub(fs, 'existsSync').callsFake(_ => false);
-
-    const actual = await command.validate({ options: { debug: true, name: 'My Microsoft Entra app', certificateDisplayName: 'some certificate', certificateFile: 'C:\\temp\\some-certificate.cer' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('passes validation if certificateBase64Encoded specified with certificateDisplayName', async () => {
-    const actual = await command.validate({ options: { name: 'My Microsoft Entra app', certificateDisplayName: 'Some certificate', certificateBase64Encoded: 'somebase64string' } }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
-
-  it('passes validation if manifest is valid JSON', async () => {
-    const manifest = '{"name": "My app"}';
-    const actual = await command.validate({ options: { manifest: manifest } }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
-
-  it('creates Microsoft Entra app reg for a web app from a manifest with redirectUris and options overriding them', async () => {
-    sinon.stub(request, 'get').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames') {
-        return {
-          "@odata.nextLink": "https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27",
-          "value": [
-            mocks.microsoftGraphSp
-          ]
-        };
-      }
-
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27') {
-        return {
-          value: mocks.aadSp
-        };
-      }
-
-      throw `Invalid GET request: ${opts.url}`;
-    });
-    sinon.stub(request, 'patch').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/bcac8603-cf65-479b-a4e5-8d45d3d05379') {
-        if (JSON.stringify(opts.data) === JSON.stringify({
-          "addIns": [],
-          "appRoles": [],
-          "createdDateTime": "2022-02-07T08:51:18Z",
-          "description": null,
-          "certification": null,
-          "groupMembershipClaims": null,
-          "identifierUris": [
-            "api://24c4-2001-1c00-80c-d00-e5da-977c-7c52-5197.ngrok.io/ff254847-12c7-44cf-921e-8883dbd622a7"
-          ],
-          "keyCredentials": [],
-          "notes": null,
-          "optionalClaims": null,
-          "parentalControlSettings": {
-            "countriesBlockedForMinors": [],
-            "legalAgeGroupRule": "Allow"
-          },
-          "passwordCredentials": [],
-          "requiredResourceAccess": [
-            {
-              "resourceAppId": "00000003-0000-0000-c000-000000000000",
-              "resourceAccess": [
-                {
-                  "id": "e1fe6dd8-ba31-4d61-89e7-88639da4683d",
-                  "type": "Scope"
-                }
-              ]
-            }
-          ],
-          "serviceManagementReference": null,
-          "signInAudience": "AzureADMyOrg",
-          "tags": [],
-          "tokenEncryptionKeyId": null,
-          "api": {
-            "acceptMappedClaims": null,
-            "knownClientApplications": [],
-            "oauth2PermissionScopes": [
-              {
-                "adminConsentDescription": "Access as a user",
-                "adminConsentDisplayName": "Access as a user",
-                "id": "cf38eb5b-8fcd-4697-9bd5-d80b7f98dfc5",
-                "isEnabled": true,
-                "type": "User",
-                "userConsentDescription": null,
-                "userConsentDisplayName": null,
-                "value": "access_as_user"
-              }
-            ]
-          },
-          "info": {
-            "termsOfServiceUrl": null,
-            "supportUrl": null,
-            "privacyStatementUrl": null,
-            "marketingUrl": null,
-            "logoUrl": null
-          },
-          "web": {
-            "implicitGrantSettings": {
-              "enableAccessTokenIssuance": false,
-              "enableIdTokenIssuance": false
-            },
-            "redirectUris": [],
-            "logoutUrl": null,
-            "homePageUrl": null
-          },
-          "spa": {
-            "redirectUris": [
-              "http://localhost/auth",
-              "https://24c4-2001-1c00-80c-d00-e5da-977c-7c52-5197.ngrok.io/auth"
-            ]
-          },
-          "isFallbackPublicClient": null,
-          "displayName": "My app"
-        })) {
-          return;
-        }
-
-        if (JSON.stringify(opts.data) === JSON.stringify({
-          "api": {
-            "preAuthorizedApplications": [
-              {
-                "appId": "5e3ce6c0-2b1f-4285-8d4b-75ee78787346",
-                "delegatedPermissionIds": [
-                  "cf38eb5b-8fcd-4697-9bd5-d80b7f98dfc5"
-                ]
-              },
-              {
-                "appId": "1fec8e78-bce4-4aaf-ab1b-5451cc387264",
-                "delegatedPermissionIds": [
-                  "cf38eb5b-8fcd-4697-9bd5-d80b7f98dfc5"
-                ]
-              }
-            ]
-          }
-        })) {
-          return;
-        }
-      }
-
-      throw `Invalid PATCH request: ${JSON.stringify(opts, null, 2)}`;
-    });
-    sinon.stub(request, 'post').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
-        JSON.stringify(opts.data) === JSON.stringify({
-          "displayName": "My app",
-          "signInAudience": "AzureADMyOrg",
-          "requiredResourceAccess": [
-            {
-              "resourceAppId": "00000003-0000-0000-c000-000000000000",
-              "resourceAccess": [
-                {
-                  "id": "e1fe6dd8-ba31-4d61-89e7-88639da4683d",
-                  "type": "Scope"
-                }
-              ]
-            }
-          ],
-          "spa": {
-            "redirectUris": [
-              "http://localhost/auth",
-              "https://24c4-2001-1c00-80c-d00-e5da-977c-7c52-5197.ngrok.io/auth"
-            ]
-          }
-        })) {
-        return {
-          "id": "bcac8603-cf65-479b-a4e5-8d45d3d05379",
-          "deletedDateTime": null,
-          "appId": "19180b97-8f30-43ac-8a22-19565de0b064",
-          "applicationTemplateId": null,
-          "disabledByMicrosoftStatus": null,
-          "createdDateTime": "2022-02-10T08:06:59.5299702Z",
-          "displayName": "Angular Teams app",
-          "description": null,
-          "groupMembershipClaims": null,
-          "identifierUris": [],
-          "isDeviceOnlyAuthSupported": null,
-          "isFallbackPublicClient": null,
-          "notes": null,
-          "publisherDomain": "M365x61791022.onmicrosoft.com",
-          "serviceManagementReference": null,
-          "signInAudience": "AzureADMyOrg",
-          "tags": [],
-          "tokenEncryptionKeyId": null,
-          "defaultRedirectUri": null,
-          "certification": null,
-          "optionalClaims": null,
-          "addIns": [],
-          "api": {
-            "acceptMappedClaims": null,
-            "knownClientApplications": [],
-            "requestedAccessTokenVersion": null,
-            "oauth2PermissionScopes": [],
-            "preAuthorizedApplications": []
-          },
-          "appRoles": [],
-          "info": {
-            "logoUrl": null,
-            "marketingUrl": null,
-            "privacyStatementUrl": null,
-            "supportUrl": null,
-            "termsOfServiceUrl": null
-          },
-          "keyCredentials": [],
-          "parentalControlSettings": {
-            "countriesBlockedForMinors": [],
-            "legalAgeGroupRule": "Allow"
-          },
-          "passwordCredentials": [],
-          "publicClient": {
-            "redirectUris": []
-          },
-          "requiredResourceAccess": [
-            {
-              "resourceAppId": "00000003-0000-0000-c000-000000000000",
-              "resourceAccess": [
-                {
-                  "id": "62a82d76-70ea-41e2-9197-370581804d09",
-                  "type": "Role"
-                },
-                {
-                  "id": "7ab1d382-f21e-4acd-a863-ba3e13f7da61",
-                  "type": "Role"
-                },
-                {
-                  "id": "e1fe6dd8-ba31-4d61-89e7-88639da4683d",
-                  "type": "Scope"
-                }
-              ]
-            }
-          ],
-          "verifiedPublisher": {
-            "displayName": null,
-            "verifiedPublisherId": null,
-            "addedDateTime": null
-          },
-          "web": {
-            "homePageUrl": null,
-            "logoutUrl": null,
-            "redirectUris": [],
-            "implicitGrantSettings": {
-              "enableAccessTokenIssuance": false,
-              "enableIdTokenIssuance": false
-            }
-          },
-          "spa": {
-            "redirectUris": []
-          }
-        };
-      }
-
-      throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
-    });
-
-    (command as any).manifest = manifest;
-    await command.action(logger, {
-      options: {
-        manifest: JSON.stringify(manifest),
-        platform: "spa",
-        redirectUris: "http://localhost/auth,https://24c4-2001-1c00-80c-d00-e5da-977c-7c52-5197.ngrok.io/auth"
-      }
-    });
-
-    assert(loggerLogSpy.calledWith({
-      appId: '19180b97-8f30-43ac-8a22-19565de0b064',
-      objectId: 'bcac8603-cf65-479b-a4e5-8d45d3d05379',
-      tenantId: ''
-    }));
-  });
-
-  it('creates Microsoft Entra app reg for a web app from a manifest with app roles and specified Microsoft Graph application permissions overriding them', async () => {
-    sinon.stub(request, 'get').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames') {
-        return {
-          "@odata.nextLink": "https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27",
-          "value": [
-            mocks.microsoftGraphSp
-          ]
-        };
-      }
-
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27') {
-        return {
-          value: mocks.aadSp
-        };
-      }
-
-      throw `Invalid GET request: ${opts.url}`;
-    });
-    sinon.stub(request, 'patch').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/bcac8603-cf65-479b-a4e5-8d45d3d05379') {
-        if (JSON.stringify(opts.data) === JSON.stringify({
-          "addIns": [],
-          "appRoles": [],
-          "createdDateTime": "2022-02-07T08:51:18Z",
-          "description": null,
-          "certification": null,
-          "groupMembershipClaims": null,
-          "identifierUris": [
-            "api://24c4-2001-1c00-80c-d00-e5da-977c-7c52-5197.ngrok.io/ff254847-12c7-44cf-921e-8883dbd622a7"
-          ],
-          "keyCredentials": [],
-          "notes": null,
-          "optionalClaims": null,
-          "parentalControlSettings": {
-            "countriesBlockedForMinors": [],
-            "legalAgeGroupRule": "Allow"
-          },
-          "passwordCredentials": [],
-          "requiredResourceAccess": [
-            {
-              "resourceAppId": "00000003-0000-0000-c000-000000000000",
-              "resourceAccess": [
-                {
-                  "id": "62a82d76-70ea-41e2-9197-370581804d09",
-                  "type": "Role"
-                },
-                {
-                  "id": "7ab1d382-f21e-4acd-a863-ba3e13f7da61",
-                  "type": "Role"
-                },
-                {
-                  "id": "e1fe6dd8-ba31-4d61-89e7-88639da4683d",
-                  "type": "Scope"
-                }
-              ]
-            }
-          ],
-          "serviceManagementReference": null,
-          "signInAudience": "AzureADMyOrg",
-          "tags": [],
-          "tokenEncryptionKeyId": null,
-          "api": {
-            "acceptMappedClaims": null,
-            "knownClientApplications": [],
-            "oauth2PermissionScopes": [
-              {
-                "adminConsentDescription": "Access as a user",
-                "adminConsentDisplayName": "Access as a user",
-                "id": "cf38eb5b-8fcd-4697-9bd5-d80b7f98dfc5",
-                "isEnabled": true,
-                "type": "User",
-                "userConsentDescription": null,
-                "userConsentDisplayName": null,
-                "value": "access_as_user"
-              }
-            ]
-          },
-          "info": {
-            "termsOfServiceUrl": null,
-            "supportUrl": null,
-            "privacyStatementUrl": null,
-            "marketingUrl": null,
-            "logoUrl": null
-          },
-          "web": {
-            "implicitGrantSettings": {
-              "enableAccessTokenIssuance": false,
-              "enableIdTokenIssuance": false
-            },
-            "redirectUris": [],
-            "logoutUrl": null,
-            "homePageUrl": null
-          },
-          "spa": {
-            "redirectUris": [
-              "http://localhost/auth",
-              "https://24c4-2001-1c00-80c-d00-e5da-977c-7c52-5197.ngrok.io/auth"
-            ]
-          },
-          "isFallbackPublicClient": null,
-          "displayName": "My app"
-        })) {
-          return;
-        }
-
-        if (JSON.stringify(opts.data) === JSON.stringify({
-          "api": {
-            "preAuthorizedApplications": [
-              {
-                "appId": "5e3ce6c0-2b1f-4285-8d4b-75ee78787346",
-                "delegatedPermissionIds": [
-                  "cf38eb5b-8fcd-4697-9bd5-d80b7f98dfc5"
-                ]
-              },
-              {
-                "appId": "1fec8e78-bce4-4aaf-ab1b-5451cc387264",
-                "delegatedPermissionIds": [
-                  "cf38eb5b-8fcd-4697-9bd5-d80b7f98dfc5"
-                ]
-              }
-            ]
-          }
-        })) {
-          return;
-        }
-      }
-
-      throw `Invalid PATCH request: ${JSON.stringify(opts, null, 2)}`;
-    });
-    sinon.stub(request, 'post').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
-        JSON.stringify(opts.data) === JSON.stringify({
-          "displayName": "My app",
-          "signInAudience": "AzureADMyOrg",
-          "requiredResourceAccess": [
-            {
-              "resourceAppId": "00000003-0000-0000-c000-000000000000",
-              "resourceAccess": [
-                {
-                  "id": "62a82d76-70ea-41e2-9197-370581804d09",
-                  "type": "Role"
-                },
-                {
-                  "id": "7ab1d382-f21e-4acd-a863-ba3e13f7da61",
-                  "type": "Role"
-                }
-              ]
-            }
-          ]
-        })) {
-        return {
-          "id": "bcac8603-cf65-479b-a4e5-8d45d3d05379",
-          "deletedDateTime": null,
-          "appId": "19180b97-8f30-43ac-8a22-19565de0b064",
-          "applicationTemplateId": null,
-          "disabledByMicrosoftStatus": null,
-          "createdDateTime": "2022-02-10T08:06:59.5299702Z",
-          "displayName": "Angular Teams app",
-          "description": null,
-          "groupMembershipClaims": null,
-          "identifierUris": [],
-          "isDeviceOnlyAuthSupported": null,
-          "isFallbackPublicClient": null,
-          "notes": null,
-          "publisherDomain": "M365x61791022.onmicrosoft.com",
-          "serviceManagementReference": null,
-          "signInAudience": "AzureADMyOrg",
-          "tags": [],
-          "tokenEncryptionKeyId": null,
-          "defaultRedirectUri": null,
-          "certification": null,
-          "optionalClaims": null,
-          "addIns": [],
-          "api": {
-            "acceptMappedClaims": null,
-            "knownClientApplications": [],
-            "requestedAccessTokenVersion": null,
-            "oauth2PermissionScopes": [],
-            "preAuthorizedApplications": []
-          },
-          "appRoles": [],
-          "info": {
-            "logoUrl": null,
-            "marketingUrl": null,
-            "privacyStatementUrl": null,
-            "supportUrl": null,
-            "termsOfServiceUrl": null
-          },
-          "keyCredentials": [],
-          "parentalControlSettings": {
-            "countriesBlockedForMinors": [],
-            "legalAgeGroupRule": "Allow"
-          },
-          "passwordCredentials": [],
-          "publicClient": {
-            "redirectUris": []
-          },
-          "requiredResourceAccess": [
-            {
-              "resourceAppId": "00000003-0000-0000-c000-000000000000",
-              "resourceAccess": [
-                {
-                  "id": "62a82d76-70ea-41e2-9197-370581804d09",
-                  "type": "Role"
-                },
-                {
-                  "id": "7ab1d382-f21e-4acd-a863-ba3e13f7da61",
-                  "type": "Role"
-                },
-                {
-                  "id": "e1fe6dd8-ba31-4d61-89e7-88639da4683d",
-                  "type": "Scope"
-                }
-              ]
-            }
-          ],
-          "verifiedPublisher": {
-            "displayName": null,
-            "verifiedPublisherId": null,
-            "addedDateTime": null
-          },
-          "web": {
-            "homePageUrl": null,
-            "logoutUrl": null,
-            "redirectUris": [],
-            "implicitGrantSettings": {
-              "enableAccessTokenIssuance": false,
-              "enableIdTokenIssuance": false
-            }
-          },
-          "spa": {
-            "redirectUris": []
-          }
-        };
-      }
-
-      throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
-    });
-
-    (command as any).manifest = manifest;
-    await command.action(logger, {
-      options: {
-        manifest: JSON.stringify(manifest),
-        apisApplication: 'https://graph.microsoft.com/Group.ReadWrite.All,https://graph.microsoft.com/Directory.Read.All'
-      }
-    });
-
-    assert(loggerLogSpy.calledWith({
-      appId: '19180b97-8f30-43ac-8a22-19565de0b064',
-      objectId: 'bcac8603-cf65-479b-a4e5-8d45d3d05379',
-      tenantId: ''
-    }));
-  });
-
-  it('creates Microsoft Entra app reg with a secret, overriding manifest', async () => {
-    sinon.stub(request, 'get').rejects('Issues GET request');
-    sinon.stub(request, 'patch').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230' &&
-        JSON.stringify(opts.data) === JSON.stringify({
-          "addIns": [],
-          "appRoles": [],
-          "createdDateTime": "2022-02-07T08:51:18Z",
-          "description": null,
-          "certification": null,
-          "groupMembershipClaims": null,
-          "identifierUris": [],
-          "keyCredentials": [],
-          "notes": null,
-          "optionalClaims": null,
-          "parentalControlSettings": {
-            "countriesBlockedForMinors": [],
-            "legalAgeGroupRule": "Allow"
-          },
-          "requiredResourceAccess": [],
-          "serviceManagementReference": null,
-          "signInAudience": "AzureADMyOrg",
-          "tags": [],
-          "tokenEncryptionKeyId": null,
-          "api": {
-            "acceptMappedClaims": null,
-            "knownClientApplications": [],
-            "oauth2PermissionScopes": []
-          },
-          "info": {
-            "termsOfServiceUrl": null,
-            "supportUrl": null,
-            "privacyStatementUrl": null,
-            "marketingUrl": null,
-            "logoUrl": null
-          },
-          "web": {
-            "implicitGrantSettings": {
-              "enableAccessTokenIssuance": false,
-              "enableIdTokenIssuance": false
-            },
-            "redirectUris": [],
-            "logoutUrl": null,
-            "homePageUrl": null
-          },
-          "spa": {
-            "redirectUris": []
-          },
-          "isFallbackPublicClient": null,
-          "displayName": "My app"
-        })) {
-        return;
-      }
-
-      throw `Issued PATCH request: ${JSON.stringify(opts, null, 2)}`;
-    });
-    sinon.stub(request, 'post').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
-        JSON.stringify(opts.data) === JSON.stringify({
-          "displayName": "My Microsoft Entra app",
-          "signInAudience": "AzureADMyOrg"
-        })) {
-        return {
-          "id": "5b31c38c-2584-42f0-aa47-657fb3a84230",
-          "deletedDateTime": null,
-          "appId": "bc724b77-da87-43a9-b385-6ebaaf969db8",
-          "applicationTemplateId": null,
-          "createdDateTime": "2020-12-31T14:44:13.7945807Z",
-          "displayName": "My Microsoft Entra app",
-          "description": null,
-          "groupMembershipClaims": null,
-          "identifierUris": [],
-          "isDeviceOnlyAuthSupported": null,
-          "isFallbackPublicClient": null,
-          "notes": null,
-          "optionalClaims": null,
-          "publisherDomain": "contoso.onmicrosoft.com",
-          "signInAudience": "AzureADMyOrg",
-          "tags": [],
-          "tokenEncryptionKeyId": null,
-          "verifiedPublisher": {
-            "displayName": null,
-            "verifiedPublisherId": null,
-            "addedDateTime": null
-          },
-          "spa": {
-            "redirectUris": []
-          },
-          "defaultRedirectUri": null,
-          "addIns": [],
-          "api": {
-            "acceptMappedClaims": null,
-            "knownClientApplications": [],
-            "requestedAccessTokenVersion": null,
-            "oauth2PermissionScopes": [],
-            "preAuthorizedApplications": []
-          },
-          "appRoles": [],
-          "info": {
-            "logoUrl": null,
-            "marketingUrl": null,
-            "privacyStatementUrl": null,
-            "supportUrl": null,
-            "termsOfServiceUrl": null
-          },
-          "keyCredentials": [],
-          "parentalControlSettings": {
-            "countriesBlockedForMinors": [],
-            "legalAgeGroupRule": "Allow"
-          },
-          "passwordCredentials": [],
-          "publicClient": {
-            "redirectUris": []
-          },
-          "requiredResourceAccess": [],
-          "web": {
-            "homePageUrl": null,
-            "logoutUrl": null,
-            "redirectUris": [],
-            "implicitGrantSettings": {
-              "enableAccessTokenIssuance": false,
-              "enableIdTokenIssuance": false
-            }
-          }
-        };
-      }
-
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230/addPassword') {
-        return {
-          "secretText": "VtJt.yG~V5pzbY2.xekx_0Xy_~9ozP_Ub5"
-        };
-      }
-
-      throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
-    });
-
-    (command as any).manifest = manifestWithSecret;
-    await command.action(logger, {
-      options: {
-        name: 'My Microsoft Entra app',
-        manifest: JSON.stringify(manifestWithSecret),
-        withSecret: true
-      }
-    });
-
-    assert(loggerLogSpy.calledWith({
-      appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
-      objectId: '5b31c38c-2584-42f0-aa47-657fb3a84230',
-      tenantId: '',
-      secrets: [
-        {
-          displayName: 'mysecret',
-          value: 'VtJt.yG~V5pzbY2.xekx_0Xy_~9ozP_Ub5'
-        }
-      ]
-    }));
-  });
-
-  it('creates Microsoft Entra app reg with a certificate using base64 string, overriding manifest', async () => {
-    sinon.stub(request, 'get').rejects('Issues GET request');
-    sinon.stub(request, 'patch').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230' &&
-        JSON.stringify(opts.data) === JSON.stringify({
-          "addIns": [],
-          "appRoles": [],
-          "createdDateTime":
-            "2022-02-07T08:51:18Z",
-          "description": null,
-          "certification": null,
-          "groupMembershipClaims": null,
-          "identifierUris": [],
-          "notes": null,
-          "optionalClaims": null,
-          "parentalControlSettings": {
-            "countriesBlockedForMinors": [],
-            "legalAgeGroupRule": "Allow"
-          },
-          "passwordCredentials": [],
-          "requiredResourceAccess": [],
-          "serviceManagementReference": null,
-          "signInAudience": "AzureADMyOrg",
-          "tags": [],
-          "tokenEncryptionKeyId": null,
-          "api": {
-            "acceptMappedClaims": null,
-            "knownClientApplications": [],
-            "oauth2PermissionScopes": []
-          },
-          "info": {
-            "termsOfServiceUrl": null,
-            "supportUrl": null,
-            "privacyStatementUrl": null,
-            "marketingUrl": null,
-            "logoUrl": null
-          },
-          "web": {
-            "implicitGrantSettings": {
-              "enableAccessTokenIssuance": false,
-              "enableIdTokenIssuance": false
-            },
-            "redirectUris": [],
-            "logoutUrl": null,
-            "homePageUrl": null
-          },
-          "spa": {
-            "redirectUris": []
-          },
-          "isFallbackPublicClient": null,
-          "displayName": "My app"
-        })) {
-        return;
-      }
-
-      throw 'Issued PATCH request';
-    });
-    sinon.stub(request, 'post').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
-        JSON.stringify(opts.data) === JSON.stringify({
-          "displayName": "My Microsoft Entra app",
-          "signInAudience": "AzureADMyOrg",
-          "keyCredentials": [{
-            "type": "AsymmetricX509Cert",
-            "usage": "Verify",
-            "displayName": "some certificate",
-            "key": "somecertificatebase64string"
-          }]
-        })) {
-        return {
-          "id": "5b31c38c-2584-42f0-aa47-657fb3a84230",
-          "deletedDateTime": null,
-          "appId": "bc724b77-da87-43a9-b385-6ebaaf969db8",
-          "applicationTemplateId": null,
-          "createdDateTime": "2020-12-31T14:44:13.7945807Z",
-          "displayName": "My Microsoft Entra app",
-          "description": null,
-          "groupMembershipClaims": null,
-          "identifierUris": [],
-          "isDeviceOnlyAuthSupported": null,
-          "isFallbackPublicClient": null,
-          "notes": null,
-          "optionalClaims": null,
-          "publisherDomain": "contoso.onmicrosoft.com",
-          "signInAudience": "AzureADMyOrg",
-          "tags": [],
-          "tokenEncryptionKeyId": null,
-          "verifiedPublisher": {
-            "displayName": null,
-            "verifiedPublisherId": null,
-            "addedDateTime": null
-          },
-          "spa": {
-            "redirectUris": []
-          },
-          "defaultRedirectUri": null,
-          "addIns": [],
-          "api": {
-            "acceptMappedClaims": null,
-            "knownClientApplications": [],
-            "requestedAccessTokenVersion": null,
-            "oauth2PermissionScopes": [],
-            "preAuthorizedApplications": []
-          },
-          "appRoles": [],
-          "info": {
-            "logoUrl": null,
-            "marketingUrl": null,
-            "privacyStatementUrl": null,
-            "supportUrl": null,
-            "termsOfServiceUrl": null
-          },
-          "keyCredentials": [],
-          "parentalControlSettings": {
-            "countriesBlockedForMinors": [],
-            "legalAgeGroupRule": "Allow"
-          },
-          "passwordCredentials": [],
-          "publicClient": {
-            "redirectUris": []
-          },
-          "requiredResourceAccess": [],
-          "web": {
-            "homePageUrl": null,
-            "logoutUrl": null,
-            "redirectUris": [],
-            "implicitGrantSettings": {
-              "enableAccessTokenIssuance": false,
-              "enableIdTokenIssuance": false
-            }
-          }
-        };
-      }
-
-      throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
-    });
-
-    (command as any).manifest = basicManifest;
-    await command.action(logger, {
-      options: {
-        name: 'My Microsoft Entra app',
-        manifest: JSON.stringify(basicManifest),
-        certificateDisplayName: 'some certificate',
-        certificateBase64Encoded: 'somecertificatebase64string'
-      }
-    });
-
-    assert(loggerLogSpy.calledWith({
-      appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
-      objectId: '5b31c38c-2584-42f0-aa47-657fb3a84230',
-      tenantId: ''
-    }));
-  });
-
-  it('creates Microsoft Entra app reg with a public client/redirectUris, overriding manifest', async () => {
-    sinon.stub(request, 'get').rejects('Issues GET request');
-    sinon.stub(request, 'patch').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230' &&
-        JSON.stringify(opts.data) === JSON.stringify({
-          "addIns": [],
-          "appRoles": [],
-          "createdDateTime": "2022-02-07T08:51:18Z",
-          "description": null,
-          "certification": null,
-          "groupMembershipClaims": null,
-          "identifierUris": [],
-          "keyCredentials": [],
-          "notes": null,
-          "optionalClaims": null,
-          "parentalControlSettings": {
-            "countriesBlockedForMinors": [],
-            "legalAgeGroupRule": "Allow"
-          },
-          "passwordCredentials": [],
-          "requiredResourceAccess": [],
-          "serviceManagementReference": null,
-          "signInAudience": "AzureADMyOrg",
-          "tags": [],
-          "tokenEncryptionKeyId": null,
-          "api": {
-            "acceptMappedClaims": null,
-            "knownClientApplications": [],
-            "oauth2PermissionScopes": []
-          },
-          "info": {
-            "termsOfServiceUrl": null,
-            "supportUrl": null,
-            "privacyStatementUrl": null,
-            "marketingUrl": null,
-            "logoUrl": null
-          },
-          "web": {
-            "implicitGrantSettings": {
-              "enableAccessTokenIssuance": false,
-              "enableIdTokenIssuance": false
-            },
-            "redirectUris": [],
-            "logoutUrl": null,
-            "homePageUrl": null
-          },
-          "spa": {
-            "redirectUris": []
-          },
-          "isFallbackPublicClient": null,
-          "displayName": "My app"
-        })) {
-        return;
-      }
-
-      throw 'Issued PATCH request';
-    });
-    sinon.stub(request, 'post').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
-        JSON.stringify(opts.data) === JSON.stringify({
-          "displayName": "My Microsoft Entra app",
-          "signInAudience": "AzureADMyOrg",
-          "publicClient": {
-            "redirectUris": ["https://login.microsoftonline.com/common/oauth2/nativeclient"]
-          }
-        })) {
-        return {
-          "id": "5b31c38c-2584-42f0-aa47-657fb3a84230",
-          "deletedDateTime": null,
-          "appId": "bc724b77-da87-43a9-b385-6ebaaf969db8",
-          "applicationTemplateId": null,
-          "createdDateTime": "2020-12-31T14:44:13.7945807Z",
-          "displayName": "My Microsoft Entra app",
-          "description": null,
-          "groupMembershipClaims": null,
-          "identifierUris": [],
-          "isDeviceOnlyAuthSupported": null,
-          "isFallbackPublicClient": null,
-          "notes": null,
-          "optionalClaims": null,
-          "publisherDomain": "contoso.onmicrosoft.com",
-          "signInAudience": "AzureADMyOrg",
-          "tags": [],
-          "tokenEncryptionKeyId": null,
-          "verifiedPublisher": {
-            "displayName": null,
-            "verifiedPublisherId": null,
-            "addedDateTime": null
-          },
-          "spa": {
-            "redirectUris": []
-          },
-          "defaultRedirectUri": null,
-          "addIns": [],
-          "api": {
-            "acceptMappedClaims": null,
-            "knownClientApplications": [],
-            "requestedAccessTokenVersion": null,
-            "oauth2PermissionScopes": [],
-            "preAuthorizedApplications": []
-          },
-          "appRoles": [],
-          "info": {
-            "logoUrl": null,
-            "marketingUrl": null,
-            "privacyStatementUrl": null,
-            "supportUrl": null,
-            "termsOfServiceUrl": null
-          },
-          "keyCredentials": [],
-          "parentalControlSettings": {
-            "countriesBlockedForMinors": [],
-            "legalAgeGroupRule": "Allow"
-          },
-          "passwordCredentials": [],
-          "publicClient": {
-            "redirectUris": []
-          },
-          "requiredResourceAccess": [],
-          "web": {
-            "homePageUrl": null,
-            "logoutUrl": null,
-            "redirectUris": [],
-            "implicitGrantSettings": {
-              "enableAccessTokenIssuance": false,
-              "enableIdTokenIssuance": false
-            }
-          }
-        };
-      }
-
-      throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
-    });
-
-    (command as any).manifest = basicManifest;
-    await command.action(logger, {
-      options: {
-        name: 'My Microsoft Entra app',
-        manifest: JSON.stringify(basicManifest),
-        platform: 'publicClient',
-        redirectUris: 'https://login.microsoftonline.com/common/oauth2/nativeclient'
-      }
-    });
-
-    assert(loggerLogSpy.calledWith({
-      appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
-      objectId: '5b31c38c-2584-42f0-aa47-657fb3a84230',
-      tenantId: ''
-    }));
-  });
-
-  it('creates Microsoft Entra app reg with implicit flow enabled, overriding manifest', async () => {
-    sinon.stub(request, 'get').rejects('Issues GET request');
-    sinon.stub(request, 'patch').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230' &&
-        JSON.stringify(opts.data) === JSON.stringify({
-          "addIns": [],
-          "appRoles": [],
-          "createdDateTime": "2022-02-07T08:51:18Z",
-          "description": null,
-          "certification": null,
-          "groupMembershipClaims": null,
-          "identifierUris": [],
-          "keyCredentials": [],
-          "notes": null,
-          "optionalClaims": null,
-          "parentalControlSettings": {
-            "countriesBlockedForMinors": [],
-            "legalAgeGroupRule": "Allow"
-          },
-          "passwordCredentials": [],
-          "requiredResourceAccess": [],
-          "serviceManagementReference": null,
-          "signInAudience": "AzureADMultipleOrgs",
-          "tags": [],
-          "tokenEncryptionKeyId": null,
-          "api": {
-            "acceptMappedClaims": null,
-            "knownClientApplications": [],
-            "oauth2PermissionScopes": []
-          },
-          "info": {
-            "termsOfServiceUrl": null,
-            "supportUrl": null,
-            "privacyStatementUrl": null,
-            "marketingUrl": null,
-            "logoUrl": null
-          },
-          "web": {
-            "implicitGrantSettings": {},
-            "redirectUris": [],
-            "logoutUrl": null,
-            "homePageUrl": null
-          },
-          "spa": {
-            "redirectUris": []
-          },
-          "isFallbackPublicClient": null,
-          "displayName": "My app"
-        })) {
-        return;
-      }
-
-      throw 'Issued PATCH request';
-    });
-    sinon.stub(request, 'post').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
-        JSON.stringify(opts.data) === JSON.stringify({
-          "displayName": "My Microsoft Entra app",
-          "signInAudience": "AzureADMultipleOrgs",
-          "web": {
-            "implicitGrantSettings": {
-              "enableAccessTokenIssuance": true,
-              "enableIdTokenIssuance": true
-            }
-          }
-        })) {
-        return {
-          "id": "5b31c38c-2584-42f0-aa47-657fb3a84230",
-          "deletedDateTime": null,
-          "appId": "bc724b77-da87-43a9-b385-6ebaaf969db8",
-          "applicationTemplateId": null,
-          "createdDateTime": "2020-12-31T14:44:13.7945807Z",
-          "displayName": "My Microsoft Entra app",
-          "description": null,
-          "groupMembershipClaims": null,
-          "identifierUris": [],
-          "isDeviceOnlyAuthSupported": null,
-          "isFallbackPublicClient": null,
-          "notes": null,
-          "optionalClaims": null,
-          "publisherDomain": "contoso.onmicrosoft.com",
-          "signInAudience": "AzureADMultipleOrgs",
-          "tags": [],
-          "tokenEncryptionKeyId": null,
-          "verifiedPublisher": {
-            "displayName": null,
-            "verifiedPublisherId": null,
-            "addedDateTime": null
-          },
-          "spa": {
-            "redirectUris": []
-          },
-          "defaultRedirectUri": null,
-          "addIns": [],
-          "api": {
-            "acceptMappedClaims": null,
-            "knownClientApplications": [],
-            "requestedAccessTokenVersion": null,
-            "oauth2PermissionScopes": [],
-            "preAuthorizedApplications": []
-          },
-          "appRoles": [],
-          "info": {
-            "logoUrl": null,
-            "marketingUrl": null,
-            "privacyStatementUrl": null,
-            "supportUrl": null,
-            "termsOfServiceUrl": null
-          },
-          "keyCredentials": [],
-          "parentalControlSettings": {
-            "countriesBlockedForMinors": [],
-            "legalAgeGroupRule": "Allow"
-          },
-          "passwordCredentials": [],
-          "publicClient": {
-            "redirectUris": []
-          },
-          "requiredResourceAccess": [],
-          "web": {
-            "homePageUrl": null,
-            "logoutUrl": null,
-            "redirectUris": [],
-            "implicitGrantSettings": {
-              "enableAccessTokenIssuance": true,
-              "enableIdTokenIssuance": true
-            }
-          }
-        };
-      }
-
-      throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
-    });
-
-    (command as any).manifest = basicManifest;
-    await command.action(logger, {
-      options: {
-        name: 'My Microsoft Entra app',
-        manifest: JSON.stringify(basicManifest),
-        implicitFlow: true,
-        multitenant: true
-      }
-    });
-
-    assert(loggerLogSpy.calledWith({
-      appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
-      objectId: '5b31c38c-2584-42f0-aa47-657fb3a84230',
-      tenantId: ''
-    }));
-  });
-
-  it('creates Microsoft Entra app reg with a custom scope, overriding manifest', async () => {
-    sinon.stub(request, 'get').rejects('Issues GET request');
-    sinon.stub(request, 'patch').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230' &&
-        JSON.stringify(opts.data) === JSON.stringify({
-          "addIns": [],
-          "appRoles": [],
-          "createdDateTime": "2022-02-07T08:51:18Z",
-          "description": null,
-          "certification": null,
-          "groupMembershipClaims": null,
-          "identifierUris": [],
-          "keyCredentials": [],
-          "notes": null,
-          "optionalClaims": null,
-          "parentalControlSettings": {
-            "countriesBlockedForMinors": [],
-            "legalAgeGroupRule": "Allow"
-          },
-          "passwordCredentials": [],
-          "requiredResourceAccess": [],
-          "serviceManagementReference": null,
-          "signInAudience": "AzureADMyOrg",
-          "tags": [],
-          "tokenEncryptionKeyId": null,
-          "api": {
-            "acceptMappedClaims": null,
-            "knownClientApplications": []
-          },
-          "info": {
-            "termsOfServiceUrl": null,
-            "supportUrl": null,
-            "privacyStatementUrl": null,
-            "marketingUrl": null,
-            "logoUrl": null
-          },
-          "web": {
-            "implicitGrantSettings": {
-              "enableAccessTokenIssuance": false,
-              "enableIdTokenIssuance": false
-            },
-            "redirectUris": [],
-            "logoutUrl": null,
-            "homePageUrl": null
-          },
-          "spa": {
-            "redirectUris": []
-          },
-          "isFallbackPublicClient": null,
-          "displayName": "My app"
-        })) {
-        return;
-      }
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230') {
-        const actualData = JSON.stringify(opts.data);
-        const expectedData = JSON.stringify({
-          "identifierUris": [
-            "api://caf406b91cd4.ngrok.io/13e11551-2967-4985-8c55-cd2aaa6b80ad"
-          ],
-          "api": {
-            "oauth2PermissionScopes": [
-              {
-                "adminConsentDescription": "Access as a user",
-                "adminConsentDisplayName": "Access as a user",
-                "id": "|",
-                "type": "User",
-                "value": "access_as_user"
-              }
-            ]
-          }
-        }).split('|');
-        if (actualData.indexOf(expectedData[0]) > -1 && actualData.indexOf(expectedData[1]) > -1) {
-          return;
-        }
-      }
-
-      throw 'Issued PATCH request';
-    });
-    sinon.stub(request, 'post').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
-        JSON.stringify(opts.data) === JSON.stringify({
-          "displayName": "My Microsoft Entra app",
-          "signInAudience": "AzureADMyOrg"
-        })) {
-        return {
-          "id": "5b31c38c-2584-42f0-aa47-657fb3a84230",
-          "deletedDateTime": null,
-          "appId": "13e11551-2967-4985-8c55-cd2aaa6b80ad",
-          "applicationTemplateId": null,
-          "createdDateTime": "2020-12-31T14:44:13.7945807Z",
-          "displayName": "My Microsoft Entra app",
-          "description": null,
-          "groupMembershipClaims": null,
-          "identifierUris": [],
-          "isDeviceOnlyAuthSupported": null,
-          "isFallbackPublicClient": null,
-          "notes": null,
-          "optionalClaims": null,
-          "publisherDomain": "contoso.onmicrosoft.com",
-          "signInAudience": "AzureADMyOrg",
-          "tags": [],
-          "tokenEncryptionKeyId": null,
-          "verifiedPublisher": {
-            "displayName": null,
-            "verifiedPublisherId": null,
-            "addedDateTime": null
-          },
-          "spa": {
-            "redirectUris": []
-          },
-          "defaultRedirectUri": null,
-          "addIns": [],
-          "api": {
-            "acceptMappedClaims": null,
-            "knownClientApplications": [],
-            "requestedAccessTokenVersion": null,
-            "oauth2PermissionScopes": [],
-            "preAuthorizedApplications": []
-          },
-          "appRoles": [],
-          "info": {
-            "logoUrl": null,
-            "marketingUrl": null,
-            "privacyStatementUrl": null,
-            "supportUrl": null,
-            "termsOfServiceUrl": null
-          },
-          "keyCredentials": [],
-          "parentalControlSettings": {
-            "countriesBlockedForMinors": [],
-            "legalAgeGroupRule": "Allow"
-          },
-          "passwordCredentials": [],
-          "publicClient": {
-            "redirectUris": []
-          },
-          "requiredResourceAccess": [],
-          "web": {
-            "homePageUrl": null,
-            "logoutUrl": null,
-            "redirectUris": [],
-            "implicitGrantSettings": {
-              "enableAccessTokenIssuance": false,
-              "enableIdTokenIssuance": false
-            }
-          }
-        };
-      }
-
-      throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
-    });
-
-    (command as any).manifest = basicManifest;
-    await command.action(logger, {
-      options: {
         name: 'My Microsoft Entra app',
         manifest: JSON.stringify(basicManifest),
         uri: 'api://caf406b91cd4.ngrok.io/_appId_',
@@ -7788,7 +5657,7 @@ describe(commands.APP_ADD, () => {
     });
 
     assert(loggerLogSpy.calledWith({
-      appId: '13e11551-2967-4985-8c55-cd2aaa6b80ad',
+      appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
       objectId: '5b31c38c-2584-42f0-aa47-657fb3a84230',
       tenantId: ''
     }));
@@ -7798,75 +5667,13 @@ describe(commands.APP_ADD, () => {
     sinon.stub(request, 'get').rejects('Issues GET request');
     sinon.stub(request, 'patch').rejects('Issued PATCH request');
     sinon.stub(request, 'post').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
+      if (opts.url === mocks.createAppWithName.request.url &&
         JSON.stringify(opts.data) === JSON.stringify({
           "displayName": "My AAD app",
           "signInAudience": "AzureADMyOrg",
           "isFallbackPublicClient": true
         })) {
-        return {
-          "id": "5b31c38c-2584-42f0-aa47-657fb3a84230",
-          "deletedDateTime": null,
-          "appId": "bc724b77-da87-43a9-b385-6ebaaf969db8",
-          "applicationTemplateId": null,
-          "createdDateTime": "2020-12-31T14:44:13.7945807Z",
-          "displayName": "My AAD app",
-          "description": null,
-          "groupMembershipClaims": null,
-          "identifierUris": [],
-          "isDeviceOnlyAuthSupported": null,
-          "isFallbackPublicClient": true,
-          "notes": null,
-          "optionalClaims": null,
-          "publisherDomain": "contoso.onmicrosoft.com",
-          "signInAudience": "AzureADMyOrg",
-          "tags": [],
-          "tokenEncryptionKeyId": null,
-          "verifiedPublisher": {
-            "displayName": null,
-            "verifiedPublisherId": null,
-            "addedDateTime": null
-          },
-          "spa": {
-            "redirectUris": []
-          },
-          "defaultRedirectUri": null,
-          "addIns": [],
-          "api": {
-            "acceptMappedClaims": null,
-            "knownClientApplications": [],
-            "requestedAccessTokenVersion": null,
-            "oauth2PermissionScopes": [],
-            "preAuthorizedApplications": []
-          },
-          "appRoles": [],
-          "info": {
-            "logoUrl": null,
-            "marketingUrl": null,
-            "privacyStatementUrl": null,
-            "supportUrl": null,
-            "termsOfServiceUrl": null
-          },
-          "keyCredentials": [],
-          "parentalControlSettings": {
-            "countriesBlockedForMinors": [],
-            "legalAgeGroupRule": "Allow"
-          },
-          "passwordCredentials": [],
-          "publicClient": {
-            "redirectUris": []
-          },
-          "requiredResourceAccess": [],
-          "web": {
-            "homePageUrl": null,
-            "logoutUrl": null,
-            "redirectUris": [],
-            "implicitGrantSettings": {
-              "enableAccessTokenIssuance": false,
-              "enableIdTokenIssuance": false
-            }
-          }
-        };
+        return misc.deepClone(mocks.createAppWithName.response.body);
       }
 
       throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
