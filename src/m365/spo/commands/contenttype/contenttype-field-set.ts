@@ -64,10 +64,10 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
         option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-c, --contentTypeId <contentTypeId>'
+        option: '--contentTypeId <contentTypeId>'
       },
       {
-        option: '--id <id>'
+        option: '-i, --id <id>'
       },
       {
         option: '-r, --required [required]',

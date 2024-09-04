@@ -15,7 +15,7 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   contentTypeId: string;
-  fieldLinkId: string;
+  id: string;
   webUrl: string;
   listId?: string;
   listTitle?: string;
@@ -69,10 +69,10 @@ class SpoContentTypeFieldRemoveCommand extends SpoCommand {
         option: '--listUrl [listUrl]'
       },
       {
-        option: '-i, --contentTypeId <contentTypeId>'
+        option: '--contentTypeId <contentTypeId>'
       },
       {
-        option: '--fieldLinkId <fieldLinkId>'
+        option: '-i, --id <id>'
       },
       {
         option: '-c, --updateChildContentTypes'
@@ -86,8 +86,8 @@ class SpoContentTypeFieldRemoveCommand extends SpoCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (!validation.isValidGuid(args.options.fieldLinkId)) {
-          return `${args.options.fieldLinkId} is not a valid GUID`;
+        if (!validation.isValidGuid(args.options.id)) {
+          return `${args.options.id} is not a valid GUID`;
         }
 
         if (args.options.listId && !validation.isValidGuid(args.options.listId)) {
@@ -166,16 +166,16 @@ class SpoContentTypeFieldRemoveCommand extends SpoCommand {
 
         if (this.debug) {
           const additionalLog = args.options.listTitle ? `; ListTitle='${args.options.listTitle}'` : args.options.listId ? `; ListId='${args.options.listId}'` : args.options.listUrl ? `; ListUrl='${args.options.listUrl}'` : ` ; UpdateChildContentTypes='${updateChildContentTypes}`;
-          await logger.logToStderr(`Remove FieldLink from ContentType. FieldLinkId='${args.options.fieldLinkId}' ; ContentTypeId='${args.options.contentTypeId}' ${additionalLog}`);
+          await logger.logToStderr(`Remove FieldLink from ContentType. Id='${args.options.id}' ; ContentTypeId='${args.options.contentTypeId}' ${additionalLog}`);
           await logger.logToStderr(`Execute ProcessQuery.`);
         }
 
         let requestBody: string = '';
         if (listId) {
-          requestBody = `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName=".NET Library" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="18" ObjectPathId="17" /><ObjectPath Id="20" ObjectPathId="19" /><Method Name="DeleteObject" Id="21" ObjectPathId="19" /><Method Name="Update" Id="22" ObjectPathId="15"><Parameters><Parameter Type="Boolean">${updateChildContentTypes}</Parameter></Parameters></Method></Actions><ObjectPaths><Property Id="17" ParentId="15" Name="FieldLinks" /><Method Id="19" ParentId="17" Name="GetById"><Parameters><Parameter Type="Guid">{${formatting.escapeXml(args.options.fieldLinkId)}}</Parameter></Parameters></Method><Identity Id="15" Name="09eec89e-709b-0000-558c-c222dcaf9162|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:${siteId}:web:${webId}:list:${listId}:contenttype:${formatting.escapeXml(args.options.contentTypeId)}" /></ObjectPaths></Request>`;
+          requestBody = `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName=".NET Library" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="18" ObjectPathId="17" /><ObjectPath Id="20" ObjectPathId="19" /><Method Name="DeleteObject" Id="21" ObjectPathId="19" /><Method Name="Update" Id="22" ObjectPathId="15"><Parameters><Parameter Type="Boolean">${updateChildContentTypes}</Parameter></Parameters></Method></Actions><ObjectPaths><Property Id="17" ParentId="15" Name="FieldLinks" /><Method Id="19" ParentId="17" Name="GetById"><Parameters><Parameter Type="Guid">{${formatting.escapeXml(args.options.id)}}</Parameter></Parameters></Method><Identity Id="15" Name="09eec89e-709b-0000-558c-c222dcaf9162|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:${siteId}:web:${webId}:list:${listId}:contenttype:${formatting.escapeXml(args.options.contentTypeId)}" /></ObjectPaths></Request>`;
         }
         else {
-          requestBody = `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName=".NET Library" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="77" ObjectPathId="76" /><ObjectPath Id="79" ObjectPathId="78" /><Method Name="DeleteObject" Id="80" ObjectPathId="78" /><Method Name="Update" Id="81" ObjectPathId="24"><Parameters><Parameter Type="Boolean">${updateChildContentTypes}</Parameter></Parameters></Method></Actions><ObjectPaths><Property Id="76" ParentId="24" Name="FieldLinks" /><Method Id="78" ParentId="76" Name="GetById"><Parameters><Parameter Type="Guid">{${formatting.escapeXml(args.options.fieldLinkId)}}</Parameter></Parameters></Method><Identity Id="24" Name="6b3ec69e-00a7-0000-55a3-61f8d779d2b3|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:${siteId}:web:${webId}:contenttype:${formatting.escapeXml(args.options.contentTypeId)}" /></ObjectPaths></Request>`;
+          requestBody = `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName=".NET Library" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="77" ObjectPathId="76" /><ObjectPath Id="79" ObjectPathId="78" /><Method Name="DeleteObject" Id="80" ObjectPathId="78" /><Method Name="Update" Id="81" ObjectPathId="24"><Parameters><Parameter Type="Boolean">${updateChildContentTypes}</Parameter></Parameters></Method></Actions><ObjectPaths><Property Id="76" ParentId="24" Name="FieldLinks" /><Method Id="78" ParentId="76" Name="GetById"><Parameters><Parameter Type="Guid">{${formatting.escapeXml(args.options.id)}}</Parameter></Parameters></Method><Identity Id="24" Name="6b3ec69e-00a7-0000-55a3-61f8d779d2b3|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:${siteId}:web:${webId}:contenttype:${formatting.escapeXml(args.options.contentTypeId)}" /></ObjectPaths></Request>`;
         }
 
         requestOptions = {
@@ -202,7 +202,7 @@ class SpoContentTypeFieldRemoveCommand extends SpoCommand {
       await removeFieldLink();
     }
     else {
-      const result = await cli.promptForConfirmation({ message: `Are you sure you want to remove the column ${args.options.fieldLinkId} from content type ${args.options.contentTypeId}?` });
+      const result = await cli.promptForConfirmation({ message: `Are you sure you want to remove the column ${args.options.id} from content type ${args.options.contentTypeId}?` });
 
       if (result) {
         await removeFieldLink();

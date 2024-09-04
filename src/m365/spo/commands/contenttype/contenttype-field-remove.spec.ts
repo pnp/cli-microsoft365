@@ -173,7 +173,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     (command as any).webId = '';
     (command as any).siteId = '';
     (command as any).listId = '';
-    (command as any).fieldLinkId = '';
+    (command as any).id = '';
   });
 
   afterEach(() => {
@@ -218,7 +218,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
 
     await command.action(logger, {
       options: {
-        webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
+        webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, id: FIELD_LINK_ID,
         updateChildContentTypes: false,
         force: true
       }
@@ -231,7 +231,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
 
     await command.action(logger, {
       options: {
-        webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
+        webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, id: FIELD_LINK_ID,
         updateChildContentTypes: false,
         force: false
       }
@@ -247,7 +247,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
     await command.action(logger, {
       options: {
-        webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
+        webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, id: FIELD_LINK_ID,
         updateChildContentTypes: false
       }
     } as any);
@@ -262,7 +262,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
 
     await command.action(logger, {
       options: {
-        webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
+        webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, id: FIELD_LINK_ID,
         updateChildContentTypes: true
       }
     } as any);
@@ -275,7 +275,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
 
     await command.action(logger, {
       options: {
-        webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
+        webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, id: FIELD_LINK_ID,
         updateChildContentTypes: false,
         force: false,
         debug: true
@@ -293,7 +293,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
 
     await command.action(logger, {
       options: {
-        webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
+        webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, id: FIELD_LINK_ID,
         updateChildContentTypes: true,
         debug: true
       }
@@ -308,7 +308,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
 
     await command.action(logger, {
       options: {
-        webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
+        webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, id: FIELD_LINK_ID,
         updateChildContentTypes: true,
         force: true
       }
@@ -321,7 +321,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
 
     await command.action(logger, {
       options: {
-        webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
+        webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, id: FIELD_LINK_ID,
         updateChildContentTypes: true
       }
     } as any);
@@ -336,7 +336,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
 
     await command.action(logger, {
       options: {
-        webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
+        webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, id: FIELD_LINK_ID,
         updateChildContentTypes: true,
         force: false
       }
@@ -352,7 +352,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
 
     await command.action(logger, {
       options: {
-        webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
+        webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, id: FIELD_LINK_ID,
         updateChildContentTypes: true,
         force: false
       }
@@ -366,7 +366,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
 
     await command.action(logger, {
       options: {
-        webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
+        webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, id: FIELD_LINK_ID,
         updateChildContentTypes: true,
         force: false,
         debug: true
@@ -384,7 +384,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
 
     await command.action(logger, {
       options: {
-        webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
+        webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, id: FIELD_LINK_ID,
         updateChildContentTypes: true,
         force: false,
         debug: true
@@ -402,7 +402,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
 
     await command.action(logger, {
       options: {
-        webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
+        webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, id: FIELD_LINK_ID,
         updateChildContentTypes: true,
         force: false,
         debug: true
@@ -418,7 +418,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
 
     await command.action(logger, {
       options: {
-        webUrl: WEB_URL, listTitle: LIST_TITLE, contentTypeId: LIST_CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
+        webUrl: WEB_URL, listTitle: LIST_TITLE, contentTypeId: LIST_CONTENT_TYPE_ID, id: FIELD_LINK_ID,
         force: true
       }
     } as any);
@@ -432,7 +432,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
 
     await command.action(logger, {
       options: {
-        webUrl: WEB_URL, listId: LIST_ID, contentTypeId: LIST_CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
+        webUrl: WEB_URL, listId: LIST_ID, contentTypeId: LIST_CONTENT_TYPE_ID, id: FIELD_LINK_ID,
         force: true
       }
     } as any);
@@ -446,7 +446,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
 
     await command.action(logger, {
       options: {
-        webUrl: WEB_URL, listUrl: LIST_URL, contentTypeId: LIST_CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
+        webUrl: WEB_URL, listUrl: LIST_URL, contentTypeId: LIST_CONTENT_TYPE_ID, id: FIELD_LINK_ID,
         force: true
       }
     } as any);
@@ -460,7 +460,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
 
     await command.action(logger, {
       options: {
-        webUrl: WEB_URL, listTitle: LIST_TITLE, contentTypeId: LIST_CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID
+        webUrl: WEB_URL, listTitle: LIST_TITLE, contentTypeId: LIST_CONTENT_TYPE_ID, id: FIELD_LINK_ID
       }
     } as any);
 
@@ -476,7 +476,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
 
     await command.action(logger, {
       options: {
-        webUrl: WEB_URL, listTitle: LIST_TITLE, contentTypeId: LIST_CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
+        webUrl: WEB_URL, listTitle: LIST_TITLE, contentTypeId: LIST_CONTENT_TYPE_ID, id: FIELD_LINK_ID,
         updateChildContentTypes: false,
         force: true
       }
@@ -494,7 +494,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
 
     await command.action(logger, {
       options: {
-        webUrl: WEB_URL, listTitle: LIST_TITLE, contentTypeId: LIST_CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
+        webUrl: WEB_URL, listTitle: LIST_TITLE, contentTypeId: LIST_CONTENT_TYPE_ID, id: FIELD_LINK_ID,
         updateChildContentTypes: false,
         force: false
       }
@@ -510,7 +510,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
 
     await command.action(logger, {
       options: {
-        webUrl: WEB_URL, listTitle: LIST_TITLE, contentTypeId: LIST_CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
+        webUrl: WEB_URL, listTitle: LIST_TITLE, contentTypeId: LIST_CONTENT_TYPE_ID, id: FIELD_LINK_ID,
         updateChildContentTypes: false,
         force: true,
         debug: true
@@ -524,7 +524,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
 
     await command.action(logger, {
       options: {
-        webUrl: WEB_URL, listTitle: LIST_TITLE, contentTypeId: LIST_CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
+        webUrl: WEB_URL, listTitle: LIST_TITLE, contentTypeId: LIST_CONTENT_TYPE_ID, id: FIELD_LINK_ID,
         debug: true
       }
     } as any);
@@ -540,7 +540,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
 
     await command.action(logger, {
       options: {
-        webUrl: WEB_URL, listTitle: LIST_TITLE, contentTypeId: LIST_CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
+        webUrl: WEB_URL, listTitle: LIST_TITLE, contentTypeId: LIST_CONTENT_TYPE_ID, id: FIELD_LINK_ID,
         updateChildContentTypes: false,
         debug: true
       }
@@ -557,7 +557,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
 
     await command.action(logger, {
       options: {
-        webUrl: WEB_URL, listId: LIST_ID, contentTypeId: LIST_CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
+        webUrl: WEB_URL, listId: LIST_ID, contentTypeId: LIST_CONTENT_TYPE_ID, id: FIELD_LINK_ID,
         updateChildContentTypes: false,
         debug: true
       }
@@ -574,7 +574,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
 
     await command.action(logger, {
       options: {
-        webUrl: WEB_URL, listUrl: LIST_URL, contentTypeId: LIST_CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
+        webUrl: WEB_URL, listUrl: LIST_URL, contentTypeId: LIST_CONTENT_TYPE_ID, id: FIELD_LINK_ID,
         updateChildContentTypes: false,
         debug: true
       }
@@ -590,7 +590,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
 
     await command.action(logger, {
       options: {
-        webUrl: WEB_URL, listTitle: LIST_TITLE, contentTypeId: LIST_CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
+        webUrl: WEB_URL, listTitle: LIST_TITLE, contentTypeId: LIST_CONTENT_TYPE_ID, id: FIELD_LINK_ID,
         updateChildContentTypes: false,
         debug: true
       }
@@ -605,7 +605,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
+        webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, id: FIELD_LINK_ID,
         updateChildContentTypes: true,
         force: true
       }
@@ -616,7 +616,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     sinon.stub(request, 'get').callsFake(getStubCalls);
     sinon.stub(request, 'post').callsFake(postStubFailedCalls);
 
-    await assert.rejects(command.action(logger, { options: { debug: true, webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID, updateChildContentTypes: true, force: true } } as any),
+    await assert.rejects(command.action(logger, { options: { debug: true, webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, id: FIELD_LINK_ID, updateChildContentTypes: true, force: true } } as any),
       new CommandError('Unknown Error'));
   });
 
@@ -629,7 +629,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
+        webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, id: FIELD_LINK_ID,
         updateChildContentTypes: true,
         force: false
       }
@@ -642,7 +642,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
+        webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, id: FIELD_LINK_ID,
         updateChildContentTypes: true,
         force: true
       }
@@ -650,7 +650,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
   });
 
   // Fails validation
-  it('fails validation if fieldLinkId is not passed', async () => {
+  it('fails validation if id is not passed', async () => {
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
       if (settingName === settingsNames.prompt) {
         return false;
@@ -672,28 +672,28 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
       return defaultValue;
     });
 
-    const actual = await command.validate({ options: { fieldLinkId: FIELD_LINK_ID, contentTypeId: CONTENT_TYPE_ID } }, commandInfo);
+    const actual = await command.validate({ options: { id: FIELD_LINK_ID, contentTypeId: CONTENT_TYPE_ID } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if webUrl is not correct', async () => {
-    const actual = await command.validate({ options: { fieldLinkId: FIELD_LINK_ID, contentTypeId: CONTENT_TYPE_ID, webUrl: "test" } }, commandInfo);
+    const actual = await command.validate({ options: { id: FIELD_LINK_ID, contentTypeId: CONTENT_TYPE_ID, webUrl: "test" } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if listId is not correct', async () => {
-    const actual = await command.validate({ options: { fieldLinkId: FIELD_LINK_ID, contentTypeId: CONTENT_TYPE_ID, webUrl: WEB_URL, listId: 'foo' } }, commandInfo);
+    const actual = await command.validate({ options: { id: FIELD_LINK_ID, contentTypeId: CONTENT_TYPE_ID, webUrl: WEB_URL, listId: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if fieldLinkId is not valid GUID', async () => {
-    const actual = await command.validate({ options: { fieldLinkId: 'xxx', webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID } }, commandInfo);
+  it('fails validation if id is not valid GUID', async () => {
+    const actual = await command.validate({ options: { id: 'xxx', webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   // Passes validation
   it('passes validation', async () => {
-    const actual = await command.validate({ options: { listTitle: 'List', fieldLinkId: FIELD_LINK_ID, contentTypeId: CONTENT_TYPE_ID, webUrl: WEB_URL, debug: true } }, commandInfo);
+    const actual = await command.validate({ options: { listTitle: 'List', id: FIELD_LINK_ID, contentTypeId: CONTENT_TYPE_ID, webUrl: WEB_URL, debug: true } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 });
