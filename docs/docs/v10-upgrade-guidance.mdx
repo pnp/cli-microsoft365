@@ -165,6 +165,28 @@ In the previous version of CLI, the command output had a `Rights` property that 
 
 Please, check the documentation of the [spo applicationcustomizer get](./cmd/spo/applicationcustomizer/applicationcustomizer-get.mdx) command to see the updated output and adjust your scripts accordingly.
 
+### Updated `spo contenttype field remove` options
+
+We updated the [spo contenttype field remove](./cmd/spo/contenttype/contenttype-field-remove.mdx) command. We made the following changes:
+
+- Removed the short option for `contentTypeId`
+- Renamed the option `fieldLinkId` to `id` and added the short option `i`
+
+#### What actions do I need to take?
+
+Please update your scripts to make sure that you use the correct options.
+
+### Updated `spo contenttype field set` options
+
+We updated the [spo contenttype field set](./cmd/spo/contenttype/contenttype-field-set.mdx) command. We made the following changes:
+
+- Removed the short option for `contentTypeId`
+- Add the short option `i` for `id`
+
+#### What actions do I need to take?
+
+Please update your scripts to make sure that you use the correct options.
+
 ## SharePoint Framework
 
 ### Removed overwrite option from `spfx project github workflow add` command
