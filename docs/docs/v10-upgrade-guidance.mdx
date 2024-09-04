@@ -12,6 +12,16 @@ We updated the [app permission add](./cmd/app/permission/permission-add.mdx) com
 
 Please, check the documentation of the [app permission add](./cmd/app/permission/permission-add.mdx) command to see the updated options and adjust your scripts accordingly.
 
+## CLI configuration
+
+### Removed setting `showSpinner`
+
+We removed the `showSpinner` config variable from the CLI configuration. Due to several issues, the spinner has been permanently removed.
+
+#### What action do I need to take?
+
+Remove all entries in your script where you use the `showSpinner` setting.
+
 ## CLI environment variables
 
 ### Removed deprecated CLI environment variables
