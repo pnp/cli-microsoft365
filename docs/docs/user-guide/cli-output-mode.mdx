@@ -663,8 +663,8 @@ Because PowerShell offers native support for working with JSON strings and objec
 
 When setting the value of the output option to `none`, no output is returned at all. This includes command output, errors, validation errors and help documentation. This can be useful when running the CLI for Microsoft 365 in an environment where console output is problematic. 
 
-An example of this is when running the CLI on an Azure Function. The Azure Functions PowerShell runtime throws exceptions when the CLI for Microsoft 365 tries to render the spinner when running commands. The spinner must in this case be hidden by running the following with output `none`:
+An example of how to run a command with output --none can be found below:
 
 ```sh
-m365 cli config set --key showSpinner --value false --output none
+m365 spo listitem set --webUrl https://contoso.sharepoint.com --listTitle 'Projects' --id 5 --Title 'Updated title' --output none
 ```

@@ -4,8 +4,7 @@ export const interactivePreset = {
   output: 'text',
   printErrorsAsPlainText: true,
   prompt: true,
-  showHelpOnFailure: true,
-  showSpinner: true
+  showHelpOnFailure: true
 };
 export const scriptingPreset = {
   autoOpenLinksInBrowser: false,
@@ -13,8 +12,7 @@ export const scriptingPreset = {
   output: 'json',
   printErrorsAsPlainText: false,
   prompt: false,
-  showHelpOnFailure: false,
-  showSpinner: false
+  showHelpOnFailure: false
 };
 export const powerShellPreset = {
   errorOutput: 'stdout'
