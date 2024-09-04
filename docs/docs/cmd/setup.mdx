@@ -37,7 +37,7 @@ The command will ask you the following questions:
 
 - _How do you plan to use the CLI?_
 
-  You can choose between **interactive** and **scripting** use. In interactive mode, the CLI for Microsoft 365 will prompt you for additional information when needed, automatically open links browser, automatically show help on errors and show spinners. In **scripting** mode, the CLI will not use interactivity to prevent blocking your scripts.
+  You can choose between **interactive** and **scripting** use. In interactive mode, the CLI for Microsoft 365 will prompt you for additional information when needed, automatically open links browser, automatically show help on errors. In **scripting** mode, the CLI will not use interactivity to prevent blocking your scripts.
 
 - _Are you going to use the CLI in PowerShell?_ (asked only when you chose to configure CLI for scripting)
 
@@ -60,7 +60,6 @@ The `m365 setup` command uses the following presets:
   - printErrorsAsPlainText: true,
   - prompt: true,
   - showHelpOnFailure: true,
-  - showSpinner: true
 - scripting use:
   - autoOpenLinksInBrowser: false,
   - copyDeviceCodeToClipboard: false,
@@ -68,7 +67,6 @@ The `m365 setup` command uses the following presets:
   - printErrorsAsPlainText: false,
   - prompt: false,
   - showHelpOnFailure: false,
-  - showSpinner: false
 - use in PowerShell:
   - errorOutput: 'stdout'
 - beginner:

@@ -21,7 +21,6 @@ const settingsNames = {
   prompt: 'prompt',
   promptListPageSize: 'promptListPageSize',
   showHelpOnFailure: 'showHelpOnFailure',
-  showSpinner: 'showSpinner',
   tenantId: 'tenantId'
 };
 
