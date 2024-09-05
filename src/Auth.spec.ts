@@ -2115,7 +2115,8 @@ describe('Auth', () => {
   it('returns confidential client for certificate auth', async () => {
     auth.connection.authType = AuthType.Certificate;
     auth.connection.thumbprint = 'ccf4f2a3c3d209c512b3724bb883a5474c0921dc';
-    const actualClientApp = await (auth as any).getConfidentialClient(logger, false, auth.connection.thumbprint as string, auth.connection.password, undefined);
+    auth.connection.password = 'pass@word1';
+    const actualClientApp = await (auth as any).getConfidentialClient(logger, false, auth.connection.thumbprint, auth.connection.password, undefined);
     assert(actualClientApp instanceof msal.ConfidentialClientApplication);
   });
 

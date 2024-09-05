@@ -324,7 +324,7 @@ export class Auth {
         break;
     }
 
-    const config = {
+    const config: Msal.NodeAuthOptions = {
       clientId: this.connection.appId!,
       authority: `${Auth.getEndpointForResource('https://login.microsoftonline.com', this.connection.cloudType)}/${this.connection.tenant}`,
       azureCloudOptions: {
@@ -333,7 +333,7 @@ export class Auth {
       }
     };
 
-    const authConfig = cert
+    const authConfig: Msal.NodeAuthOptions = cert
       ? { ...config, clientCertificate: cert }
       : { ...config, clientSecret };
 
