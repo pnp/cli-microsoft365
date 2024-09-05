@@ -41,7 +41,7 @@ function parseString(_def: z.ZodStringDef, _options: CommandOptionInfo[], curren
   if (currentOption) {
     currentOption.type = 'string';
   }
-  
+
   return;
 }
 
@@ -49,7 +49,7 @@ function parseNumber(_def: z.ZodNumberDef, _options: CommandOptionInfo[], curren
   if (currentOption) {
     currentOption.type = 'number';
   }
-  
+
   return;
 }
 
@@ -57,7 +57,7 @@ function parseBoolean(_def: z.ZodBooleanDef, _options: CommandOptionInfo[], curr
   if (currentOption) {
     currentOption.type = 'boolean';
   }
-  
+
   return;
 }
 
@@ -80,7 +80,7 @@ function parseDefault(def: z.ZodDefaultDef, _options: CommandOptionInfo[], curre
 function parseEnum(def: z.ZodEnumDef, _options: CommandOptionInfo[], currentOption?: CommandOptionInfo): z.ZodTypeDef | undefined {
   if (currentOption) {
     currentOption.type = 'string';
-    currentOption.autocomplete = def.values;
+    currentOption.autocomplete = [...def.values];
   }
 
   return;
