@@ -10,36 +10,6 @@ import GraphCommand from '../../../base/GraphCommand.js';
 import { M365RcJson } from '../../../base/M365RcJson.js';
 import commands from '../../commands.js';
 
-interface ServicePrincipalInfo {
-  appId: string;
-  appRoles: { id: string; value: string; }[];
-  id: string;
-  oauth2PermissionScopes: { id: string; value: string; }[];
-  servicePrincipalNames: string[];
-}
-
-interface RequiredResourceAccess {
-  resourceAppId: string;
-  resourceAccess: ResourceAccess[];
-}
-
-interface ResourceAccess {
-  id: string;
-  type: string;
-}
-
-interface AppInfo {
-  appId: string;
-  // objectId
-  id: string;
-  tenantId: string;
-  secrets?: {
-    displayName: string;
-    value: string;
-  }[];
-  requiredResourceAccess: RequiredResourceAccess[];
-}
-
 interface CommandArgs {
   options: Options;
 }
