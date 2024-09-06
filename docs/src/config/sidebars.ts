@@ -1297,6 +1297,11 @@ const sidebars: SidebarsConfig = {
           mail: [
             {
               type: 'doc',
+              label: 'mail searchfolder add',
+              id: 'cmd/outlook/mail/mail-searchfolder-add'
+            },
+            {
+              type: 'doc',
               label: 'mail send',
               id: 'cmd/outlook/mail/mail-send'
             }
