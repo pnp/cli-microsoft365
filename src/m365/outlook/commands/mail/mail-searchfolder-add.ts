@@ -15,7 +15,7 @@ const options = globalOptionsZod
     userName: zod.alias('n', z.string().optional()),
     folderName: z.string(),
     messageFilter: z.string(),
-    sourceFoldersIds: z.string(),
+    sourceFoldersIds: z.string().transform((value) => value.split(',')).pipe(z.string().array()),
     includeNestedFolders: z.boolean().optional()
   })
   .strict();
@@ -78,7 +78,7 @@ class OutlookMailSearchFolderAddCommand extends GraphCommand {
           displayName: args.options.folderName,
           includeNestedFolders: args.options.includeNestedFolders,
           filterQuery: args.options.messageFilter,
-          sourceFolderIds: args.options.sourceFoldersIds.split(',')
+          sourceFolderIds: args.options.sourceFoldersIds
         }
       };
 
