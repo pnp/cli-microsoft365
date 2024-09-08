@@ -19,7 +19,7 @@ class VivaEngageCommunityListCommand extends GraphCommand {
 
   public async commandAction(logger: Logger): Promise<void> {
     if (this.verbose) {
-      await logger.logToStderr('Getting the list of Viva Engage communities');
+      await logger.logToStderr('Getting all Viva Engage communities');
     }
 
     try {
