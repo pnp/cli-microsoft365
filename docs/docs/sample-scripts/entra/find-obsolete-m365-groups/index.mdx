@@ -56,6 +56,8 @@ Use this script to create a report of all M365 groups that are possibly obsolete
       if ($KeepOutputPath.IsPresent) { Initialize-ExportPath -KeepOutputPath }
       else { Initialize-ExportPath }
       Get-AllM365Groups
+      Get-AllGuestUsers
+      Get-AllTeamSites
       Start-GroupInsightsTests
       
       Write-Host "`n✔︎ Routine terminated" -ForegroundColor Green
@@ -75,6 +77,8 @@ Use this script to create a report of all M365 groups that are possibly obsolete
     $Global:Path
     $Script:ReportPath = $null
     $Script:Groups = @()
+    $Script:Guests = @()
+    $Script:TeamSites = @()
     $Global:ObsoleteGroups = [System.Collections.Generic.Dictionary[string, GroupInfo]]::new()
 
     Write-Output "Connecting to M365 tenant: please follow the instructions."
@@ -111,6 +115,14 @@ Use this script to create a report of all M365 groups that are possibly obsolete
   function Get-AllM365Groups {
     $groups = m365 entra m365group list --includeSiteUrl | ConvertFrom-Json
     $Script:Groups = $groups | Where-Object { $null -ne $_.siteUrl }
+  }
+
+  function Get-AllGuestUsers {
+    $Script:Guests = m365 entra user list --type Guest | ConvertFrom-Json
+  }
+
+  function Get-AllTeamSites {
+    $Script:TeamSites = m365 spo site list --type TeamSite | ConvertFrom-Json
   }
 
   function Start-GroupInsightsTests {
@@ -153,8 +165,8 @@ Use this script to create a report of all M365 groups that are possibly obsolete
     $owners = m365 entra m365group user list --groupId $Group.Reference.id --role Owner | ConvertFrom-Json
     $members = m365 entra m365group user list --groupId $Group.Reference.id --role Member | ConvertFrom-Json
     
-    # Consider guests as users that are not in the $members list
-    $guests = Compare-Object -ReferenceObject $users $members -PassThru
+    # Consider guests as users that also match the $Script:Guests array
+    $guests = $users | Where-Object { $_.id -in $Script:Guests.id }
 
     # Modify the $members list to only contain users that are not in the $owners list
     $members = Compare-Object $members $owners -PassThru
@@ -176,7 +188,7 @@ Use this script to create a report of all M365 groups that are possibly obsolete
       try {
         $Global:ObsoleteGroups.Add($Group.Reference.id, $Group)
       }
-      catch {}
+      catch { Write-Information "Group was already added to the list of potentially obsolete groups" }
     }
   }
 
@@ -185,37 +197,14 @@ Use this script to create a report of all M365 groups that are possibly obsolete
     param (
       [Parameter(Mandatory = $true)] [GroupInfo] $Group
     )
-
-    function Get-ParsedDate {
-      [CmdletBinding()]
-      param (
-        [Parameter(Mandatory = $true)] [String] $JavascriptDateString
-      )
-
-      $dateParts = [regex]::Matches($JavascriptDateString, '\d+') | ForEach-Object { $_.Value }
-
-      # Convert the parts to integers
-      $year = [int]$dateParts[0]
-      $month = [int]$dateParts[1] + 1
-      $day = [int]$dateParts[2]
-      $hour = [int]$dateParts[3]
-      $minute = [int]$dateParts[4]
-      $second = [int]$dateParts[5]
-      # $millisecond = [int]$dateParts[6]
-
-      # return a DateTime object
-      $dateObject = New-Object -TypeName DateTime -ArgumentList $year, $month, $day, $hour, $minute, $second
-      $dateObject
-    }
     
     $WarningDate = (Get-Date).AddDays(-90)
     
-    # Not possible to retrieve property 'LastContentModifiedDate' via command 'm365 spo site get --url $group.siteUrl', so we need to use filtering:
-    $spoSite = m365 spo site list --filter "Url -eq '$($Group.Reference.siteUrl)'" | ConvertFrom-Json
-    $spoSite.LastContentModifiedDate = Get-ParsedDate -JavascriptDateString $spoSite.LastContentModifiedDate
-    if ($spoSite.LastContentModifiedDate -lt $WarningDate) {
-      Write-Host "  → potentially obsolete (SPO last content modified: $($spoSite.LastContentModifiedDate))" -ForegroundColor Yellow
-      $reason = "Low SharePoint activity ($($spoSite.LastContentModifiedDate))"
+    $spoSite = $Script:TeamSites | Where-Object { $_.GroupId -eq "/Guid($($Group.Reference.id))/" }
+    $spoWeb = m365 spo web get --url $spoSite.Url | ConvertFrom-Json
+    if ($spoWeb.LastItemUserModifiedDate -lt $WarningDate) {
+      Write-Host "  → potentially obsolete (SPO last content modified: $($spoWeb.LastItemUserModifiedDate))" -ForegroundColor Yellow
+      $reason = "Low SharePoint activity ($($spoWeb.LastItemUserModifiedDate))"
 
       $Group.SharePointStatus = @{
         Reason = $reason
@@ -226,7 +215,7 @@ Use this script to create a report of all M365 groups that are possibly obsolete
       try {
         $Global:ObsoleteGroups.Add($Group.Reference.id, $Group)
       }
-      catch {}  
+      catch { Write-Information "Group was already added to the list of potentially obsolete groups" }
     }  
   }
 
@@ -238,16 +227,16 @@ Use this script to create a report of all M365 groups that are possibly obsolete
 
     $WarningDate = (Get-Date).AddDays(-365)
       
-    $a = m365 entra m365group conversation list --groupId $Group.Reference.id | ConvertFrom-Json | Where-Object {
+    $conversations = m365 entra m365group conversation list --groupId $Group.Reference.id | ConvertFrom-Json | Where-Object {
       [datetime]$_.lastDeliveredDateTime -lt $WarningDate
     }
-    if (!$a -or $a.Length -eq 0) { return }
+    if (!$conversations -or $conversations.Length -eq 0) { return }
 
-    Write-Host "  → potentially obsolete ($($a.Length) conversation item$($a.Length -gt 1 ? 's' : '') created more than 1 year ago)" -ForegroundColor Yellow
-    $reason = "$($a.Length) conversation item$($a.Length -gt 1 ? 's' : '') created more than 1 year ago)"
+    Write-Host "  → potentially obsolete ($($conversations.Length) conversation item$($conversations.Length -gt 1 ? 's' : '') created more than 1 year ago)" -ForegroundColor Yellow
+    $reason = "$($conversations.Length) conversation item$($conversations.Length -gt 1 ? 's' : '') created more than 1 year ago"
 
     $Group.MailboxStatus = @{
-      OutdatedConversations = $a | Sort-Object -Property lastDeliveredDateTime
+      OutdatedConversations = $conversations | Sort-Object -Property lastDeliveredDateTime
       Reason                = $reason
     }
     $Group.TestStatus = "🟡 Warning"
@@ -256,7 +245,7 @@ Use this script to create a report of all M365 groups that are possibly obsolete
     try {
       $Global:ObsoleteGroups.Add($Group.Reference.id, $Group)
     }
-    catch { }
+    catch { Write-Information "Group was already added to the list of potentially obsolete groups" }
   }
 
   function New-Report {
@@ -267,15 +256,15 @@ Use this script to create a report of all M365 groups that are possibly obsolete
     
     $exportObject = [ordered] @{
       "Group Name"              = $Group.Reference.displayName
+      Description               = $Group.Reference.description
       "Managed by"              = $Group.Membership.Owners ? $Group.Membership.Owners.displayName -join ", " : "n/a"
       Owners                    = $Group.Membership.Owners.Count
       Members                   = $Group.Membership.Members.Count
       Guests                    = $Group.Membership.Guests.Count
       "Group Status"            = $Group.Membership.Status ?? "Normal"
-      Description               = $Group.Reference.description
-      "Conversation Status"     = $Group.MailboxStatus.Reason ?? "Normal"
       "Number of Conversations" = $Group.MailboxStatus.OutdatedConversations ? $Group.MailboxStatus.OutdatedConversations.Length : "n/a"
       "Last Conversation"       = $Group.MailboxStatus.OutdatedConversations ? $Group.MailboxStatus.OutdatedConversations[0].lastDeliveredDateTime : ""
+      "Conversation Status"     = $Group.MailboxStatus.Reason ?? "Normal"
       "Team enabled"            = $Group.Reference.resourceProvisioningOptions -contains 'Team' ? "True" : "False"
       "SPO Status"              = $Group.SharePointStatus.Reason ?? "Normal"
       "SPO Activity"            = $Group.SharePointStatus ? "Low / No document library usage" : "Document library in use"

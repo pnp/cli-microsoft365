@@ -8,7 +8,7 @@
     "updateDateTime": "2024-08-14",
     "shortDescription": "Understand to what extent the Microsoft 365 groups in your tenant are being used or even not.",
     "longDescription": [
-      "Like any resource within your Microsoft 365 tenant, M365 Groups can become unused over time. This routine uses PowerShell with `m365 cli` commands to create a report of all M365 groups that are possibly obsolete."
+      "Like any resource within your Microsoft 365 tenant, M365 Groups can become unused over time. This routine uses PowerShell with CLI for Microsoft 365 to create a report of all M365 groups that are possibly obsolete."
     ],
     "products": ["SharePoint", "M365 Groups", "Teams", "Exchange Online"],
     "categories": [],
