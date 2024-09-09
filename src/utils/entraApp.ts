@@ -1,8 +1,10 @@
-import { RequiredResourceAccess, ResourceAccess } from '@microsoft/microsoft-graph-types';
+import { Application, RequiredResourceAccess, ResourceAccess } from '@microsoft/microsoft-graph-types';
 import fs from 'fs';
 import { Logger } from '../cli/Logger.js';
 import request, { CliRequestOptions } from '../request.js';
 import { odata } from './odata.js';
+import { formatting } from './formatting.js';
+import { cli } from '../cli/cli.js';
 
 export interface AppInfo {
   appId: string;
@@ -410,5 +412,28 @@ export const entraApp = {
     }
 
     return resolvedApis;
+  },
+  async getAppObjectIdFromAppId(appId: string): Promise<string> {
+    const apps = await odata.getAllItems<Application>(`https://graph.microsoft.com/v1.0/applications?$filter=appId eq '${appId}'&$select=id`);
+
+    if (apps.length === 0) {
+      throw `App with appId '${appId}' not found in Microsoft Entra ID`;
+    }
+
+    return apps[0].id!;
+  },
+  async getAppObjectIdFromAppName(appName: string): Promise<string> {
+    const apps = await odata.getAllItems<Application>(`https://graph.microsoft.com/v1.0/applications?$filter=displayName eq '${formatting.encodeQueryParameter(appName)}'&$select=id`);
+
+    if (apps.length === 0) {
+      throw `App with name '${appName}' not found in Microsoft Entra ID`;
+    }
+
+    if (apps.length > 1) {
+      const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', apps);
+      return (await cli.handleMultipleResultsFound<Application>(`Multiple apps with name '${appName}' found in Microsoft Entra ID.`, resultAsKeyValuePair)).id!;
+    }
+
+    return apps[0].id!;
   }
 };
