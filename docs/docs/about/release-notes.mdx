@@ -6,6 +6,24 @@ sidebar_position: 3
 
 ## v9.1.0 (beta)
 
+### New commands
+
+**Power Automate:**
+
+- [flow recyclebinitem list](../cmd/flow/recyclebinitem/recyclebinitem-list.mdx) - lists all soft-deleted Power Automate flows within an environment [#6139](https://github.com/pnp/cli-microsoft365/issues/6139)
+- [flow recyclebinitem restore ](../cmd/flow/recyclebinitem/recyclebinitem-restore.mdx) - restores a soft-deleted Power Automate flow [#6140](https://github.com/pnp/cli-microsoft365/issues/6140)
+
+**SharePoint:**
+
+- [spo folder sharinglink add](../cmd/spo/folder/folder-sharinglink-add.mdx) - creates a new sharing link to a folder [#5963](https://github.com/pnp/cli-microsoft365/issues/5963)
+- [spo folder sharinglink clear](../cmd/spo/folder/folder-sharinglink-clear.mdx) - removes all sharing links of a folder [#5965](https://github.com/pnp/cli-microsoft365/issues/5965)
+- [spo folder sharinglink remove](../cmd/spo/folder/folder-sharinglink-remove.mdx) - removes a sharing links from a folder [#5966](https://github.com/pnp/cli-microsoft365/issues/5966)
+- [spo site admin add](../cmd/spo/site/site-admin-add.mdx) - adds a user or group as a site collection administrator [#5883](https://github.com/pnp/cli-microsoft365/issues/5883)
+
+**SharePoint Premium:**
+
+- [spp contentcenter list](../cmd/spp/contentcenter/contentcenter-list.mdx) - gets the URLs of the SharePoint Premium content centers [#6101](https://github.com/pnp/cli-microsoft365/issues/6101)
+
 ### Changes
 
 - enhanced 'flow export' endpoints. [#6297](https://github.com/pnp/cli-microsoft365/issues/6297)
@@ -13,6 +31,7 @@ sidebar_position: 3
 - enhanced [spo page section add](../cmd/spo/page/page-section-add.mdx) with extended zoneEmphasis options. [#5268](https://github.com/pnp/cli-microsoft365/issues/5268)
 - fixed 'VersionPolicies' on generic list. [#6264](https://github.com/pnp/cli-microsoft365/issues/6264)
 - fixed user retrieval using the correct property. [#6308](https://github.com/pnp/cli-microsoft365/issues/6308)
+- enhanced [spo user get](../cmd/spo/user/user-get.mdx) with extra options. [#5516](https://github.com/pnp/cli-microsoft365/issues/5516)
 
 ## [v9.0.0](https://github.com/pnp/cli-microsoft365/releases/tag/v9.0.0)
 
@@ -20,7 +39,7 @@ sidebar_position: 3
 
 **Entra ID:**
 
-- [entra enterpriseapp remove](../cmd/entra/enterpriseapp/enterpriseapp-remove.mdx) - Deletes an enterprise application (or service principal) [#6111](https://github.com/pnp/cli-microsoft365/issues/6111)
+- [entra enterpriseapp remove](../cmd/entra/enterpriseapp/enterpriseapp-remove.mdx) - deletes an enterprise application (or service principal) [#6111](https://github.com/pnp/cli-microsoft365/issues/6111)
 - [entra group set](../cmd/entra/group/group-set.mdx) - updates a Microsoft Entra group [#5479](https://github.com/pnp/cli-microsoft365/issues/5479)
 - [entra multitenant add](../cmd/entra/multitenant/multitenant-add.mdx) - creates a new multitenant organization [#6006](https://github.com/pnp/cli-microsoft365/issues/6006)
 - [entra multitenant remove](../cmd/entra/multitenant/multitenant-remove.mdx) - removes a multitenant organization [#6009](https://github.com/pnp/cli-microsoft365/issues/6009)
