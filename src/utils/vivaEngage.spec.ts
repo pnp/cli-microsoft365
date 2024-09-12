@@ -10,17 +10,20 @@ import { settingsNames } from '../settingsNames.js';
 describe('utils/vivaEngage', () => {
   const displayName = 'All Company';
   const invalidDisplayName = 'All Compayn';
+  const entraGroupId = '0bed8b86-5026-4a93-ac7d-56750cc099f1';
   const communityResponse = {
     "id": "eyJfdHlwZSI6Ikdyb3VwIiwiaWQiOiI0NzY5MTM1ODIwOSJ9",
     "description": "This is the default group for everyone in the network",
     "displayName": "All Company",
-    "privacy": "Public"
+    "privacy": "Public",
+    "groupId": "0bed8b86-5026-4a93-ac7d-56750cc099f1"
   };
   const anotherCommunityResponse = {
     "id": "eyJfdHlwZ0NzY5SIwiIiSJ9IwO6IaWQiOIMTM1ODikdyb3Vw",
     "description": "Test only",
     "displayName": "All Company",
-    "privacy": "Private"
+    "privacy": "Private",
+    "groupId": "0bed8b86-5026-4a93-ac7d-56750cc099f1"
   };
 
   afterEach(() => {
@@ -104,5 +107,34 @@ describe('utils/vivaEngage', () => {
 
     await assert.rejects(vivaEngage.getCommunityIdByDisplayName(displayName),
       Error(`Multiple Viva Engage communities with name '${displayName}' found. Found: ${communityResponse.id}, ${anotherCommunityResponse.id}.`));
+  });
+
+  it('correctly get single community id by group id using getCommunityIdByEntraGroupId', async () => {
+    sinon.stub(request, 'get').callsFake(async opts => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/employeeExperience/communities?$select=id,groupId') {
+        return {
+          value: [
+            communityResponse
+          ]
+        };
+      }
+
+      return 'Invalid Request';
+    });
+
+    const actual = await vivaEngage.getCommunityIdByEntraGroupId(entraGroupId);
+    assert.deepStrictEqual(actual, 'eyJfdHlwZSI6Ikdyb3VwIiwiaWQiOiI0NzY5MTM1ODIwOSJ9');
+  });
+
+  it('throws error message when no community was found using getCommunityIdByEntraGroupId', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/employeeExperience/communities?$select=id,groupId') {
+        return { value: [] };
+      }
+
+      throw 'Invalid Request';
+    });
+
+    await assert.rejects(vivaEngage.getCommunityIdByEntraGroupId(entraGroupId)), Error(`The Microsoft Entra group with id '${entraGroupId}' is not associated with any Viva Engage community.`);
   });
 });

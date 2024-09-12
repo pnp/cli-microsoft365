@@ -24,5 +24,24 @@ export const vivaEngage = {
     }
 
     return communities[0].id;
+  },
+
+  /**
+   * Get Viva Engage community ID by Entra group ID.
+   * @param entraGroupId The Microsoft Entra group ID.
+   * @returns The ID of the Viva Engage community.
+   * @throws Error when the community was not found.
+   */
+  async getCommunityIdByEntraGroupId(entraGroupId: string): Promise<string> {
+    // The Graph API doesn't support filtering by groupId
+    const communities = await odata.getAllItems<Community>('https://graph.microsoft.com/v1.0/employeeExperience/communities?$select=id,groupId');
+
+    const filtereCommunities = communities.filter(c => c.groupId === entraGroupId);
+
+    if (filtereCommunities.length === 0) {
+      throw `The Microsoft Entra group with id '${entraGroupId}' is not associated with any Viva Engage community.`;
+    }
+
+    return filtereCommunities[0].id;
   }
 };
