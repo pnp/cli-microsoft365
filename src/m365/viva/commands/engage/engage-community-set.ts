@@ -1,25 +1,34 @@
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { z } from 'zod';
+import { globalOptionsZod } from '../../../../Command.js';
 import { Logger } from '../../../../cli/Logger.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { vivaEngage } from '../../../../utils/vivaEngage.js';
+import { zod } from '../../../../utils/zod.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
+import { validation } from '../../../../utils/validation.js';
+
+const options = globalOptionsZod
+  .extend({
+    id: zod.alias('i', z.string().optional()),
+    displayName: zod.alias('d', z.string().optional()),
+    entraGroupId: z.string().optional(),
+    newDisplayName: z.string().optional().refine(value => !value || value.length <= 255, {
+      message: 'The maximum amount of characters is 255.'
+    }),
+    description: z.string().optional().refine(value => !value || value.length <= 1024, {
+      message: 'The maximum amount of characters is 1024.'
+    }),
+    privacy: z.enum(['public', 'private']).optional()
+  })
+  .strict();
+declare type Options = z.infer<typeof options>;
 
 interface CommandArgs {
   options: Options;
 }
 
-interface Options extends GlobalOptions {
-  id?: string;
-  displayName?: string;
-  newDisplayName?: string;
-  description?: string;
-  privacy?: string;
-}
-
 class VivaEngageCommunitySetCommand extends GraphCommand {
-  private privacyOptions: string[] = ['public', 'private'];
-
   public get name(): string {
     return commands.ENGAGE_COMMUNITY_SET;
   }
@@ -28,79 +37,23 @@ class VivaEngageCommunitySetCommand extends GraphCommand {
     return 'Updates an existing Viva Engage community';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initTypes();
-    this.#initOptionSets();
+  public get schema(): z.ZodTypeAny | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        id: typeof args.options.id !== 'undefined',
-        displayName: typeof args.options.displayName !== 'undefined',
-        newDisplayName: typeof args.options.newDisplayName !== 'undefined',
-        description: typeof args.options.description !== 'undefined',
-        privacy: typeof args.options.privacy !== 'undefined'
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-i, --id [id]'
-      },
-      {
-        option: '-d, --displayName [displayName]'
-      },
-      {
-        option: '--newDisplayName [newDisplayName]'
-      },
-      {
-        option: '--description [description]'
-      },
-      {
-        option: '--privacy [privacy]',
-        autocomplete: this.privacyOptions
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.newDisplayName && args.options.newDisplayName.length > 255) {
-          return `The maximum amount of characters for 'newDisplayName' is 255.`;
-        }
-
-        if (args.options.description && args.options.description.length > 1024) {
-          return `The maximum amount of characters for 'description' is 1024.`;
-        }
-
-        if (args.options.privacy && this.privacyOptions.map(x => x.toLowerCase()).indexOf(args.options.privacy.toLowerCase()) === -1) {
-          return `${args.options.privacy} is not a valid privacy. Allowed values are ${this.privacyOptions.join(', ')}`;
-        }
-
-        if (!args.options.newDisplayName && !args.options.description && !args.options.privacy) {
-          return 'Specify at least newDisplayName, description, or privacy.';
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initTypes(): void {
-    this.types.string.push('id', 'displayName', 'newDisplayName', 'description', 'privacy');
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push({ options: ['id', 'displayName'] });
+  public getRefinedSchema(schema: typeof options): z.ZodEffects<any> | undefined {
+    return schema
+      .refine(options => Object.values([options.id, options.displayName, options.entraGroupId]).filter(x => typeof x !== 'undefined').length === 1, {
+        message: `Specify either id, displayName, or entraGroupId, but not multiple.`
+      })
+      .refine(options => options.newDisplayName || options.description || options.privacy, {
+        message: 'Specify at least newDisplayName, description, or privacy.'
+      })
+      .refine(options => (!options.id && !options.displayName && !options.entraGroupId) || options.id || options.displayName ||
+        (options.entraGroupId && validation.isValidGuid(options.entraGroupId)), options => ({
+        message: `The '${options.entraGroupId}' must be a valid GUID`,
+        path: ['entraGroupId']
+      }));
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -109,6 +62,10 @@ class VivaEngageCommunitySetCommand extends GraphCommand {
 
     if (args.options.displayName) {
       communityId = await vivaEngage.getCommunityIdByDisplayName(args.options.displayName);
+    }
+
+    if (args.options.entraGroupId) {
+      communityId = await vivaEngage.getCommunityIdByEntraGroupId(args.options.entraGroupId);
     }
 
     if (this.verbose) {
