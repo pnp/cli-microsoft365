@@ -120,7 +120,7 @@ class LoginCommand extends Command {
           auth.connection.authType = AuthType.Certificate;
           auth.connection.certificate = getCertificate(args.options);
           auth.connection.thumbprint = args.options.thumbprint;
-          auth.connection.password = args.options.password || cli.getConfig().get(settingsNames.clientCertificatePassword);
+          auth.connection.password = args.options.password ?? cli.getConfig().get(settingsNames.clientCertificatePassword);
           break;
         case 'identity':
           auth.connection.authType = AuthType.Identity;
