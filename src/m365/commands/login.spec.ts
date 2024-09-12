@@ -53,12 +53,12 @@ describe(commands.LOGIN, () => {
       }
     };
     sinon.stub(auth.connection, 'deactivate').callsFake(() => { });
-    sinon.stub(auth, 'ensureAccessToken').callsFake(() => {
+    sinon.stub(auth, 'ensureAccessToken').callsFake(async () => {
       auth.connection.name = '028de82d-7fd9-476e-a9fd-be9714280ff3';
       auth.connection.identityName = 'alexw@contoso.com';
       auth.connection.identityId = '028de82d-7fd9-476e-a9fd-be9714280ff3';
       auth.connection.identityTenantId = 'db308122-52f3-4241-af92-1734aa6e2e50';
-      return Promise.resolve('');
+      return '';
     });
     sinon.stub(config, 'get').returns(undefined);
   });
@@ -162,6 +162,42 @@ describe(commands.LOGIN, () => {
     assert.strictEqual(auth.connection.certificate, 'certificate', 'Incorrect certificate set');
   });
 
+  it('logs in to Microsoft 365 using certificate when authType certificate set and certificate password is provided', async () => {
+    sinon.stub(fs, 'readFileSync').callsFake(() => 'certificate');
+    sinon.stub(fs, 'existsSync').callsFake(() => true);
+
+    await command.action(logger, {
+      options: commandOptionsSchema.parse({
+        appId: '00000000-0000-0000-0000-000000000000',
+        tenant: '00000000-0000-0000-0000-000000000000',
+        authType: 'certificate',
+        certificateFile: 'certificate',
+        password: 'p@$$w0rd'
+      })
+    });
+    assert.strictEqual(auth.connection.authType, AuthType.Certificate, 'Incorrect authType set');
+    assert.strictEqual(auth.connection.certificate, 'certificate', 'Incorrect certificate set');
+    assert.strictEqual(auth.connection.password, 'p@$$w0rd', 'Incorrect password set');
+  });
+
+  it('logs in to Microsoft 365 using certificate when authType certificate set and certificate password is empty', async () => {
+    sinon.stub(fs, 'readFileSync').callsFake(() => 'certificate');
+    sinon.stub(fs, 'existsSync').callsFake(() => true);
+
+    await command.action(logger, {
+      options: commandOptionsSchema.parse({
+        appId: '00000000-0000-0000-0000-000000000000',
+        tenant: '00000000-0000-0000-0000-000000000000',
+        authType: 'certificate',
+        certificateFile: 'certificate',
+        password: ''
+      })
+    });
+    assert.strictEqual(auth.connection.authType, AuthType.Certificate, 'Incorrect authType set');
+    assert.strictEqual(auth.connection.certificate, 'certificate', 'Incorrect certificate set');
+    assert.strictEqual(auth.connection.password, '', 'Incorrect password set');
+  });
+
   it('logs in to Microsoft 365 using certificate when authType certificate set with thumbprint', async () => {
     sinon.stub(fs, 'readFileSync').callsFake(() => 'certificate');
     sinon.stub(fs, 'existsSync').callsFake(() => true);
@@ -216,6 +252,29 @@ describe(commands.LOGIN, () => {
     assert.strictEqual(auth.connection.authType, AuthType.Certificate, 'Incorrect authType set');
     assert.strictEqual(auth.connection.certificate, 'certificate', 'Incorrect certificate set');
     assert.strictEqual(auth.connection.thumbprint, 'thumbprint', 'Incorrect thumbprint set');
+  });
+
+  it('logs in to Microsoft 365 using certificate when authType certificate set and clientCertificatePassword is set in CLI config', async () => {
+    sinonUtil.restore(config.get);
+    sinon.stub(config, 'get').callsFake(setting => {
+      if (setting === settingsNames.clientCertificateBase64Encoded) {
+        return 'certificate';
+      }
+      if (setting === settingsNames.clientCertificatePassword) {
+        return 'p@$$w0rd';
+      }
+      return undefined;
+    });
+    await command.action(logger, {
+      options: commandOptionsSchema.parse({
+        appId: '00000000-0000-0000-0000-000000000000',
+        tenant: '00000000-0000-0000-0000-000000000000',
+        authType: 'certificate'
+      })
+    });
+    assert.strictEqual(auth.connection.authType, AuthType.Certificate, 'Incorrect authType set');
+    assert.strictEqual(auth.connection.certificate, 'certificate', 'Incorrect certificate set');
+    assert.strictEqual(auth.connection.password, 'p@$$w0rd', 'Incorrect password set');
   });
 
   it('logs in to Microsoft 365 using certificate when authType certificate set and certificateFile is set in CLI config', async () => {
