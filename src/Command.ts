@@ -682,7 +682,10 @@ export default abstract class Command {
       quote: cli.getConfig().get(settingsNames.csvQuote),
       quoted: cli.getSettingWithDefaultValue<boolean>(settingsNames.csvQuoted, false),
       // eslint-disable-next-line camelcase
-      quoted_empty: cli.getSettingWithDefaultValue<boolean>(settingsNames.csvQuotedEmpty, false)
+      quoted_empty: cli.getSettingWithDefaultValue<boolean>(settingsNames.csvQuotedEmpty, false),
+      cast: {
+        boolean: (value: boolean) => value ? '1' : '0'
+      }
     });
   }
 
