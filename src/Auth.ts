@@ -453,7 +453,9 @@ export class Auth {
       await logger.logToStderr('');
     }
 
-    await logger.logToStderr(`🌶️  ${response.message}`);
+    if (response.message) {
+      await logger.logToStderr(`🌶️  ${response.message}`);
+    }
 
     if (cli.getSettingWithDefaultValue<boolean>(settingsNames.autoOpenLinksInBrowser, false)) {
       await browserUtil.open(response.verificationUri);

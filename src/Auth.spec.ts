@@ -124,6 +124,7 @@ describe('Auth', () => {
     loggerSpy.restore();
     readFileSyncStub.restore();
     initializeServerStub.restore();
+    loggerLogToStderrSpy.resetHistory();
     sinonUtil.restore([
       cli.getConfig().get,
       request.get,
@@ -315,7 +316,7 @@ describe('Auth', () => {
 
   it('handles empty response when retrieving new access token', (done) => {
     sinon.stub(auth as any, 'getPublicClient').callsFake(_ => publicApplication);
-    sinon.stub(publicApplication, 'acquireTokenSilent').callsFake(_ => Promise.reject('An error has occurred'));
+    sinon.stub(publicApplication, 'acquireTokenSilent').resolves(null as any);
 
     auth.ensureAccessToken(resource, logger, true).then(() => {
       done('Got access token');
@@ -476,8 +477,15 @@ describe('Auth', () => {
   });
 
   it('writes response from the device code request (debug)', async () => {
+    response.message = 'response';
     await (auth as any).processDeviceCodeCallback(response, logger, true);
     assert(loggerLogToStderrSpy.calledWith(response));
+  });
+
+  it(`doesn't write response if it's undefined`, async () => {
+    response.message = undefined as any;
+    await (auth as any).processDeviceCodeCallback(response, logger, false);
+    assert(loggerLogToStderrSpy.notCalled);
   });
 
   it('retrieves token using device code authentication flow when authType deviceCode specified', (done) => {
