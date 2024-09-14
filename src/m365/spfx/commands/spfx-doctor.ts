@@ -595,6 +595,21 @@ class SpfxDoctorCommand extends BaseProjectCommand {
         range: '^4 || ^5',
         fix: 'npm i -g yo@5'
       }
+    },
+    '1.20.0-rc.1': {
+      gulpCli: {
+        range: '^1 || ^2 || ^3',
+        fix: 'npm i -g gulp-cli@3'
+      },
+      node: {
+        range: '>=18.17.1 <19.0.0',
+        fix: 'Install Node.js >=18.17.1 <19.0.0'
+      },
+      sp: SharePointVersion.SPO,
+      yo: {
+        range: '^4 || ^5',
+        fix: 'npm i -g yo@5'
+      }
     }
   };
 
