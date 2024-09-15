@@ -64,6 +64,13 @@ jobs:
       - name: Restore dependencies
         if: steps.cache.outputs.cache-hit != 'true'
         run: npm ci
+      - name: Cache .eslintcache
+        id: eslintcache
+        uses: actions/cache@v4
+        with:
+          path: |
+            .eslintcache
+          key: eslintcache-${{ matrix.os }}-${{ hashFiles('npm-shrinkwrap.json', '.eslintrc.cjs') }}
       - name: Test
         run: npm test
         env:
