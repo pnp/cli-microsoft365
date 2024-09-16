@@ -14,13 +14,25 @@ m365 entra m365group user remove [options]
 
 ```md definition-list
 `-i, --groupId [groupId]`
-: The ID of the Microsoft 365 Group from which to remove the user.
+: The ID of the Microsoft 365 group. Specify only one of the following: `groupId`, `groupName`, `teamId`, or `teamName`.
+
+`--groupName [groupName]`
+: The display name of the Microsoft 365 group. Specify only one of the following: `groupId`, `groupName`, `teamId`, or `teamName`..
 
 `--teamId [teamId]`
-: The ID of the Microsoft Teams team from which to remove the user.
+: The ID of the Microsoft Teams team. Specify only one of the following: `groupId`, `groupName`, `teamId`, or `teamName`.
 
-`-n, --userName <userName>`
-: User's UPN (user principal name), eg. `johndoe@example.com`.
+`--teamName [teamName]`
+: The display name of the Microsoft Teams team. Specify only one of the following: `groupId`, `groupName`, `teamId`, or `teamName`.
+
+`-n, --userName [userName]`
+: (deprecated) User's UPN (user principal name), eg. `johndoe@example.com`.. Specify only one of the following: `userName`, `ids` or `userNames`.
+
+`--ids [ids]`
+: Microsoft Entra IDs of users. You can also pass a comma-separated list of IDs. Specify only one of the following `userName`, `ids` or `userNames`.
+
+`--userNames [userNames]`
+: The user principal names of users. You can also pass a comma-separated list of UPNs. Specify only one of the following `userName`, `ids` or `userNames`.
 
 `-f, --force`
 : Don't prompt for confirming removing the user from the specified Microsoft 365 Group or Microsoft Teams team.
@@ -37,19 +49,25 @@ You can remove users from a Microsoft 365 Group or Microsoft Teams team if you a
 Removes user from the specified Microsoft 365 Group.
 
 ```sh
-m365 entra m365group user remove --groupId '00000000-0000-0000-0000-000000000000' --userName 'anne.matthews@contoso.onmicrosoft.com'
+m365 entra m365group user remove --groupId '5b8e4cb1-ea40-484b-a94e-02a4313fefb4' --userName 'anne.matthews@contoso.onmicrosoft.com'
 ```
 
-Removes user from the specified Microsoft 365 Group without confirmation.
+Removes user from the specified Microsoft 365 Team specified by id without confirmation.
 
 ```sh
-m365 entra m365group user remove --groupId '00000000-0000-0000-0000-000000000000' --userName 'anne.matthews@contoso.onmicrosoft.com' --force
+m365 entra m365group user remove --teamId '5b8e4cb1-ea40-484b-a94e-02a4313fefb4' --userName 'anne.matthews@contoso.onmicrosoft.com' --force
 ```
 
-Removes user from the specified Microsoft Teams team.
+Removes users specified by a comma separated list of user principal names from the specified Microsoft Teams team specified by name
 
 ```sh
-m365 entra teams user remove --teamId '00000000-0000-0000-0000-000000000000' --userName 'anne.matthews@contoso.onmicrosoft.com'
+m365 entra m365group user remove --teamName 'Project Team' --userNames 'anne.matthews@contoso.onmicrosoft.com,john@contoso.com'
+```
+
+Removes users specified by a comma separated list of user ids from the specified Microsoft 365 group specified by name.
+
+```sh
+m365 entra m365group user remove --groupName 'Project Team' --ids '5b8e4cb1-ea40-484b-a94e-02a4313fefb4,be7a56d8-b045-4938-af35-917ab6e5309f'
 ```
 
 ## Response
