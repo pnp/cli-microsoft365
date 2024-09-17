@@ -104,22 +104,18 @@ describe(commands.PAGE_TEMPLATE_LIST, () => {
     });
 
     await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a' } });
-    assert(loggerLogSpy.notCalled);
+    assert(loggerLogSpy.calledOnceWithExactly([]));
   });
 
   it('correctly handles OData error when retrieving page templates', async () => {
-    sinon.stub(request, 'get').callsFake(() => {
-      throw { error: { 'odata.error': { message: { value: 'An error has occurred' } } } };
-    });
+    sinon.stub(request, 'get').rejects({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
 
     await assert.rejects(command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a' } } as any),
       new CommandError('An error has occurred'));
   });
 
   it('correctly handles error when retrieving page templates on a site which does not have any', async () => {
-    sinon.stub(request, 'get').callsFake(() => {
-      throw { response: { status: 404 } };
-    });
+    sinon.stub(request, 'get').rejects({ response: { status: 404 } });
 
     await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a' } } as any);
     assert(loggerLogSpy.calledWith([]));

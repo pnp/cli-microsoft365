@@ -111,18 +111,14 @@ class SpoListWebhookListCommand extends SpoCommand {
 
     try {
       const res = await odata.getAllItems<{ id: string, clientState: string, expirationDateTime: Date, resource: string }>(requestUrl);
+
       if (res && res.length > 0) {
         res.forEach(w => {
           w.clientState = w.clientState || '';
         });
+      }
 
-        await logger.log(res);
-      }
-      else {
-        if (this.verbose) {
-          await logger.logToStderr('No webhooks found');
-        }
-      }
+      await logger.log(res);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);

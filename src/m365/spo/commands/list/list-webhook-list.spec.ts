@@ -39,7 +39,6 @@ describe(commands.LIST_WEBHOOK_LIST, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
-  let loggerLogToStderrSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -64,7 +63,6 @@ describe(commands.LIST_WEBHOOK_LIST, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
-    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
   });
 
   afterEach(() => {
@@ -203,7 +201,7 @@ describe(commands.LIST_WEBHOOK_LIST, () => {
         webUrl: 'https://contoso.sharepoint.com/sites/ninja'
       }
     });
-    assert(loggerLogToStderrSpy.calledWith('No webhooks found'));
+    assert(loggerLogSpy.calledOnceWithExactly([]));
   });
 
   it('outputs all properties when output is JSON', async () => {

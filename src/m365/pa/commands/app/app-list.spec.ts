@@ -19,7 +19,6 @@ describe(commands.APP_LIST, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
-  let loggerLogToStderrSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -45,7 +44,6 @@ describe(commands.APP_LIST, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
-    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
   });
 
   afterEach(() => {
@@ -3435,14 +3433,7 @@ describe(commands.APP_LIST, () => {
     sinon.stub(request, 'get').resolves({ value: [] });
 
     await command.action(logger, { options: {} });
-    assert(loggerLogSpy.notCalled);
-  });
-
-  it('correctly handles no apps found (debug)', async () => {
-    sinon.stub(request, 'get').resolves({ value: [] });
-
-    await command.action(logger, { options: { debug: true } });
-    assert(loggerLogToStderrSpy.calledWith('No apps found'));
+    assert(loggerLogSpy.calledWith([]));
   });
 
   it('correctly handles API OData error', async () => {

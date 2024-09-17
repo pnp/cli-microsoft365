@@ -1,7 +1,7 @@
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
-import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
+import { odata } from '../../../../utils/odata.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import aadCommands from '../../aadCommands.js';
@@ -67,19 +67,8 @@ class EntraOAuth2GrantListCommand extends GraphCommand {
     }
 
     try {
-      const requestOptions: CliRequestOptions = {
-        url: `${this.resource}/v1.0/oauth2PermissionGrants?$filter=clientId eq '${formatting.encodeQueryParameter(args.options.spObjectId)}'`,
-        headers: {
-          accept: 'application/json;odata.metadata=none'
-        },
-        responseType: 'json'
-      };
-
-      const res = await request.get<{ value: any[] }>(requestOptions);
-
-      if (res.value && res.value.length > 0) {
-        await logger.log(res.value);
-      }
+      const res = await odata.getAllItems<any>(`${this.resource}/v1.0/oauth2PermissionGrants?$filter=clientId eq '${formatting.encodeQueryParameter(args.options.spObjectId)}'`);
+      await logger.log(res);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);

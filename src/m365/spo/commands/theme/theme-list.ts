@@ -33,7 +33,8 @@ class SpoThemeListCommand extends SpoCommand {
       };
 
       const rawRes = await request.post<any>(requestOptions);
-      await logger.log(rawRes.themePreviews);
+
+      await logger.log(rawRes.themePreviews || []);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);

@@ -18,7 +18,6 @@ describe(commands.WEB_CLIENTSIDEWEBPART_LIST, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
-  let loggerLogToStderrSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -43,7 +42,6 @@ describe(commands.WEB_CLIENTSIDEWEBPART_LIST, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
-    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
   });
 
   afterEach(() => {
@@ -164,7 +162,7 @@ describe(commands.WEB_CLIENTSIDEWEBPART_LIST, () => {
       if ((opts.url as string).indexOf('/_api/web/GetClientSideWebParts') > -1) {
         return clientsideWebPartRsp;
       }
-      return 'abc';
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -174,7 +172,7 @@ describe(commands.WEB_CLIENTSIDEWEBPART_LIST, () => {
         webUrl: 'https://contoso.sharepoint.com'
       }
     });
-    assert(loggerLogToStderrSpy.calledWith("No client-side web parts available for this site"));
+    assert(loggerLogSpy.calledOnceWithExactly([]));
   });
 
   it('retrieves the list of clientside components of ComponentType : 1', async () => {

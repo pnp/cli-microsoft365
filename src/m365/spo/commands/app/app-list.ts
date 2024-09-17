@@ -96,14 +96,7 @@ class SpoAppListCommand extends SpoAppBaseCommand {
       }
 
       const apps = await odata.getAllItems<any>(`${appCatalogSiteUrl}/_api/web/${scope}appcatalog/AvailableApps`);
-      if (apps && apps.length > 0) {
-        await logger.log(apps);
-      }
-      else {
-        if (this.verbose) {
-          await logger.logToStderr('No apps found');
-        }
-      }
+      await logger.log(apps);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);

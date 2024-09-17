@@ -1,6 +1,6 @@
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
-import request, { CliRequestOptions } from '../../../../request.js';
+import { odata } from '../../../../utils/odata.js';
 import { validation } from '../../../../utils/validation.js';
 import commands from '../../commands.js';
 import { SpoAppBaseCommand } from './SpoAppBaseCommand.js';
@@ -60,25 +60,9 @@ class SpoAppInStanceListCommand extends SpoAppBaseCommand {
       await logger.logToStderr(`Retrieving installed apps in site at ${args.options.siteUrl}...`);
     }
 
-    const requestOptions: CliRequestOptions = {
-      url: `${args.options.siteUrl}/_api/web/AppTiles?$filter=AppType eq 3`,
-      method: 'GET',
-      headers: {
-        'accept': 'application/json;odata=nometadata'
-      },
-      responseType: 'json'
-    };
-
     try {
-      const apps = await request.get<any>(requestOptions);
-      if (apps.value && apps.value.length > 0) {
-        await logger.log(apps.value);
-      }
-      else {
-        if (this.verbose) {
-          await logger.logToStderr('No apps found');
-        }
-      }
+      const apps = await odata.getAllItems<any>(`${args.options.siteUrl}/_api/web/AppTiles?$filter=AppType eq 3`);
+      await logger.log(apps);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);

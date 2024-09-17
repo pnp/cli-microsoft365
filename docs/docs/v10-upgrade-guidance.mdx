@@ -296,3 +296,31 @@ Alias | Command
 #### What action do I need to take?
 
 Replace any of the aliases mentioned above with the corresponding command name. The functionality of the command hasn't changed.
+
+## General
+
+### Ensured output for `list` commands
+
+We noticed that some of the `list` commands were not returning any output when no items were found. We've updated all `list` commands to return an empty array when no items are found.
+
+The commands impacted by this change are:
+- [entra oauth2grant list](./cmd/entra/oauth2grant/oauth2grant-list.mdx)
+- [flow environment list](./cmd/flow/environment/environment-list.mdx)
+- [pa app list](./cmd/pa/app/app-list.mdx)
+- [pa connector list](./cmd/pa/connector/connector-list.mdx)
+- [pa environment list](./cmd/pa/environment/environment-list.mdx)
+- [pp environment list](./cmd/pp/environment/environment-list.mdx)
+- [spo app instance list](./cmd/spo/app/app-instance-list.mdx)
+- [spo app list](./cmd/spo/app/app-list.mdx)
+- [spo feature list](./cmd/spo/feature/feature-list.mdx)
+- [spo list webhook list](./cmd/spo/list/list-webhook-list.mdx)
+- [spo listitem attachment list](./cmd/spo/listitem/listitem-attachment-list.mdx)
+- [spo page list](./cmd/spo/page/page-list.mdx)
+- [spo page template list](./cmd/spo/page/page-template-list.mdx)
+- [spo sitescript list](./cmd/spo/sitescript/sitescript-list.mdx)
+- [spo theme list](./cmd/spo/theme/theme-list.mdx)
+- [spo web clientsidewebpart list](./cmd/spo/web/web-clientsidewebpart-list.mdx)
+
+#### What action do I need to take?
+
+Update your scripts using these commands to handle the empty array output when there are no items found.

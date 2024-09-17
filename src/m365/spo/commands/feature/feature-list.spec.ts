@@ -239,7 +239,7 @@ describe(commands.FEATURE_LIST, () => {
   it('correctly handles no features in site collection', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/Site/Features?$select=DisplayName,DefinitionId') > -1) {
-        return JSON.stringify({ value: [] });
+        return { value: [] };
       }
 
       throw 'Invalid request';
@@ -251,13 +251,13 @@ describe(commands.FEATURE_LIST, () => {
     };
 
     await command.action(logger, { options: options } as any);
-    assert.strictEqual(log.length, 0);
+    assert(loggerLogSpy.calledOnceWithExactly([]));
   });
 
   it('correctly handles no features in site', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/Web/Features?$select=DisplayName,DefinitionId') > -1) {
-        return JSON.stringify({ value: [] });
+        return { value: [] };
       }
 
       throw 'Invalid request';
@@ -269,63 +269,7 @@ describe(commands.FEATURE_LIST, () => {
     };
 
     await command.action(logger, { options: options } as any);
-    assert.strictEqual(log.length, 0);
-  });
-
-  it('correctly handles no features in site collection (verbose)', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf('/_api/Site/Features?$select=DisplayName,DefinitionId') > -1) {
-        return JSON.stringify({ value: [] });
-      }
-
-      throw 'Invalid request';
-    });
-
-    const options: any = {
-      verbose: true,
-      webUrl: 'https://contoso.sharepoint.com',
-      scope: 'Site'
-    };
-    await command.action(logger, { options: options } as any);
-    let correctLogStatement = false;
-    log.forEach(l => {
-      if (!l || typeof l !== 'string') {
-        return;
-      }
-
-      if (l.indexOf('No activated Features found') > -1) {
-        correctLogStatement = true;
-      }
-    });
-    assert(correctLogStatement);
-  });
-
-  it('correctly handles no features in site (verbose)', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf('/_api/Web/Features?$select=DisplayName,DefinitionId') > -1) {
-        return JSON.stringify({ value: [] });
-      }
-
-      throw 'Invalid request';
-    });
-
-    const options: any = {
-      verbose: true,
-      webUrl: 'https://contoso.sharepoint.com',
-      scope: 'Web'
-    };
-    await command.action(logger, { options: options } as any);
-    let correctLogStatement = false;
-    log.forEach(l => {
-      if (!l || typeof l !== 'string') {
-        return;
-      }
-
-      if (l.indexOf('No activated Features found') > -1) {
-        correctLogStatement = true;
-      }
-    });
-    assert(correctLogStatement);
+    assert(loggerLogSpy.calledOnceWithExactly([]));
   });
 
   it('correctly handles web feature reject request', async () => {

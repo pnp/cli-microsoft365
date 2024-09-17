@@ -1,6 +1,6 @@
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
-import request from '../../../../request.js';
+import request, { CliRequestOptions } from '../../../../request.js';
 import PowerPlatformCommand from '../../../base/PowerPlatformCommand.js';
 import commands from '../../commands.js';
 
@@ -60,7 +60,7 @@ class PpEnvironmentListCommand extends PowerPlatformCommand {
       url = `${this.resource}/providers/Microsoft.BusinessAppPlatform/environments`;
     }
 
-    const requestOptions: any = {
+    const requestOptions: CliRequestOptions = {
       url: `${url}?api-version=2020-10-01`,
       headers: {
         accept: 'application/json'
@@ -75,9 +75,9 @@ class PpEnvironmentListCommand extends PowerPlatformCommand {
         res.value.forEach(e => {
           e.displayName = e.properties.displayName;
         });
-
-        await logger.log(res.value);
       }
+
+      await logger.log(res.value);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);

@@ -17,7 +17,6 @@ describe(commands.CONNECTOR_LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
-  let loggerLogToStderrSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -42,7 +41,6 @@ describe(commands.CONNECTOR_LIST, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
-    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
   });
 
   afterEach(() => {
@@ -161,14 +159,7 @@ describe(commands.CONNECTOR_LIST, () => {
     sinon.stub(request, 'get').resolves({ value: [] });
 
     await command.action(logger, { options: { environmentName: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6' } });
-    assert(loggerLogSpy.notCalled);
-  });
-
-  it('correctly handles no custom connectors found (debug)', async () => {
-    sinon.stub(request, 'get').resolves({ value: [] });
-
-    await command.action(logger, { options: { debug: true, environmentName: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6' } });
-    assert(loggerLogToStderrSpy.calledWith('No custom connectors found'));
+    assert(loggerLogSpy.calledWith([]));
   });
 
   it('correctly handles API OData error', async () => {
