@@ -168,6 +168,7 @@ describe(commands.SITESCRIPT_LIST, () => {
     });
 
     await command.action(logger, { options: {} });
+    assert(loggerLogSpy.calledOnceWithExactly([]));
   });
 
   it('correctly handles OData error when creating site script', async () => {

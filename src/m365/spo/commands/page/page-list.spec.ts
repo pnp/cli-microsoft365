@@ -116,7 +116,7 @@ describe(commands.PAGE_LIST, () => {
     });
 
     await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a' } });
-    assert(loggerLogSpy.notCalled);
+    assert(loggerLogSpy.calledOnceWithExactly([]));
   });
 
   it('correctly handles OData error when retrieving pages', async () => {

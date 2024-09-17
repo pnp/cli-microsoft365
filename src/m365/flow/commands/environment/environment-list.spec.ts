@@ -527,7 +527,7 @@ describe(commands.ENVIRONMENT_LIST, () => {
     });
 
     await command.action(logger, { options: { output: 'json' } });
-    assert(loggerLogSpy.calledWith([
+    assert(loggerLogSpy.calledWithExactly([
       {
         "name": "Default-d87a7535-dd31-4437-bfe1-95340acd55c5",
         "location": "europe",
@@ -599,7 +599,7 @@ describe(commands.ENVIRONMENT_LIST, () => {
     });
 
     await command.action(logger, { options: {} });
-    assert(loggerLogSpy.notCalled);
+    assert(loggerLogSpy.calledWithExactly([]));
   });
 
   it('correctly handles API OData error', async () => {
