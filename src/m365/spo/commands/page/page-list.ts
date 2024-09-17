@@ -77,9 +77,8 @@ class SpoPageListCommand extends SpoCommand {
         });
 
         pages.filter(p => p.ListItemAllFields).forEach(page => delete page.ListItemAllFields.ID);
-
-        await logger.log(pages);
       }
+      await logger.log(pages);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
