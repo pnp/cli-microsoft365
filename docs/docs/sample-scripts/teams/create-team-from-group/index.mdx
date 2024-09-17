@@ -48,7 +48,7 @@ A sample script which creates a Microsoft 365 Group, associates a logo to it and
   $membersToAdd = m365 entra user list --displayName $memberDisplayName --properties "id,userprincipalname" --output "json" | convertfrom-json
   $membersToAdd | ForEach-Object {
       Write-Host "Adding member to $($_.userPrincipalName) to Group"
-      $variable = m365 entra m365group user add --groupId $group.id --userName $_.id -o "json" | convertfrom-json
+      $variable = m365 entra m365group user add --groupId $group.id --userNames $_.id -o "json" | convertfrom-json
   }
 
   Write-Host "Teamify the Group"
