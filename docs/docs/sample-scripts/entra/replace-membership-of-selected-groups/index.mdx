@@ -92,7 +92,7 @@ This script can be used to replace the membership of a user for a selected list 
         if ($isMember -or $isTeam) {
           try {
             Write-Host "Granting $newUser member rights"
-            m365 entra m365group user add --groupId $groupId --userName $newUser | Get-CLIValue
+            m365 entra m365group user add --groupId $groupId --userNames $newUser | Get-CLIValue
           }
           catch {
             Write-Host $_.Exception.Message -ForegroundColor White
@@ -102,7 +102,7 @@ This script can be used to replace the membership of a user for a selected list 
         if ($isOwner) {
           try {
             Write-Host "Granting $newUser owner rights"
-            m365 entra m365group user add --groupId $groupId --userName $newUser --role Owner | Get-CLIValue
+            m365 entra m365group user add --groupId $groupId --userNames $newUser --role Owner | Get-CLIValue
           }
           catch {
             Write-Host $_.Exception.Message -ForegroundColor White
