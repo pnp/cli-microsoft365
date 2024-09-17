@@ -89,7 +89,7 @@ describe(commands.M365GROUP_USER_ADD, () => {
     const actual = await command.validate({
       options: {
         groupId: 'not-c49b-4fd4-8223-28f0ac3a6402',
-        userName: 'anne.matthews@contoso.onmicrosoft.com'
+        userNames: 'anne.matthews@contoso.onmicrosoft.com'
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -99,7 +99,7 @@ describe(commands.M365GROUP_USER_ADD, () => {
     const actual = await command.validate({
       options: {
         teamId: 'not-c49b-4fd4-8223-28f0ac3a6402',
-        userName: 'anne.matthews@contoso.onmicrosoft.com'
+        userNames: 'anne.matthews@contoso.onmicrosoft.com'
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -117,7 +117,7 @@ describe(commands.M365GROUP_USER_ADD, () => {
     const actual = await command.validate({
       options: {
         role: 'Member',
-        userName: 'anne.matthews@contoso.onmicrosoft.com'
+        userNames: 'anne.matthews@contoso.onmicrosoft.com'
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -136,7 +136,7 @@ describe(commands.M365GROUP_USER_ADD, () => {
       options: {
         groupId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
         teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
-        userName: 'anne.matthews@contoso.onmicrosoft.com'
+        userNames: 'anne.matthews@contoso.onmicrosoft.com'
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -156,7 +156,7 @@ describe(commands.M365GROUP_USER_ADD, () => {
     const actual = await command.validate({
       options: {
         groupId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
-        userName: 'anne.matthews@contoso.onmicrosoft.com',
+        userNames: 'anne.matthews@contoso.onmicrosoft.com',
         role: 'Invalid'
       }
     }, commandInfo);
@@ -167,7 +167,7 @@ describe(commands.M365GROUP_USER_ADD, () => {
     const actual = await command.validate({
       options: {
         groupId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
-        userName: 'anne.matthews@contoso.onmicrosoft.com'
+        userNames: 'anne.matthews@contoso.onmicrosoft.com'
       }
     }, commandInfo);
     assert.strictEqual(actual, true);
@@ -177,7 +177,7 @@ describe(commands.M365GROUP_USER_ADD, () => {
     const actual = await command.validate({
       options: {
         groupId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
-        userName: 'anne.matthews@contoso.onmicrosoft.com',
+        userNames: 'anne.matthews@contoso.onmicrosoft.com',
         role: 'owner'
       }
     }, commandInfo);
@@ -188,7 +188,7 @@ describe(commands.M365GROUP_USER_ADD, () => {
     const actual = await command.validate({
       options: {
         groupId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
-        userName: 'anne.matthews@contoso.onmicrosoft.com',
+        userNames: 'anne.matthews@contoso.onmicrosoft.com',
         role: 'member'
       }
     }, commandInfo);
@@ -345,7 +345,7 @@ describe(commands.M365GROUP_USER_ADD, () => {
     sinonUtil.restore(entraGroup.isUnifiedGroup);
     sinon.stub(entraGroup, 'isUnifiedGroup').resolves(false);
 
-    await assert.rejects(command.action(logger, { options: { groupId: groupId, userName: 'anne.matthews@contoso.onmicrosoft.com' } } as any),
+    await assert.rejects(command.action(logger, { options: { groupId: groupId, userNames: 'anne.matthews@contoso.onmicrosoft.com' } } as any),
       new CommandError(`Specified group with id '${groupId}' is not a Microsoft 365 group.`));
   });
 });

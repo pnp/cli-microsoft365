@@ -108,6 +108,14 @@ For this new major version, we've aligned the options of the `entra enterpriseap
 
 Please, check the documentation of the [entra enterpriseapp add](./cmd/entra/enterpriseapp/enterpriseapp-add), [entra enterpriseapp get](./cmd/entra/enterpriseapp/enterpriseapp-get), and [entra enterpriseapp list](./cmd/entra/enterpriseapp/enterpriseapp-list) commands to see the updated options and adjust your scripts accordingly.
 
+### Removed deprecated option `userName` from the `entra m365group user add` command.
+
+The deprecated option `userName` was removed from the command [entra m365group user add](./cmd/entra/m365group/m365group-user-add.mdx).
+
+#### What action do I need to take?
+
+In your scripts, replace every occurrence of the deprecated option `userName` with `userNames`.
+
 ## SharePoint
 
 ### Updated `spo site appcatalog remove` options
