@@ -72,11 +72,6 @@ const sidebars: SidebarsConfig = {
           id: 'cmd/cli/cli-issue'
         },
         {
-          type: 'doc',
-          label: 'reconsent',
-          id: 'cmd/cli/cli-reconsent'
-        },
-        {
           completion: [
             {
               type: 'doc',

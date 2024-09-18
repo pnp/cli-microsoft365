@@ -198,18 +198,6 @@ To authorize for communicating with Microsoft 365 API, the CLI for Microsoft 365
 
 If you authenticate using credentials, the authentication and authorization are a part of the same request that CLI for Microsoft 365 issues towards Microsoft Entra ID. If either authentication or authorization fails, you will see a corresponding error message explaining what went wrong.
 
-## Re-consent the PnP Microsoft 365 Management Shell Microsoft Entra application
-
-CLI for Microsoft 365 uses the _PnP Microsoft 365 Management Shell_ Microsoft Entra application to log in to your Microsoft 365 tenant on your behalf. As we add new commands to the CLI, it's possible, that new permissions will be added to the _PnP Microsoft 365 Management Shell_ Microsoft Entra application. To be able to use the newly added commands which depend on these new permissions, you will have to re-approve the _PnP Microsoft 365 Management Shell_ Microsoft Entra application in your Microsoft Entra ID. This process is also known as _re-consenting the Microsoft Entra application_.
-
-To re-consent the _PnP Microsoft 365 Management Shell_ application in your Microsoft Entra ID, in the command line execute:
-
-```sh
-m365 cli reconsent
-```
-
-CLI for Microsoft 365 will provide you with a URL that you should open in the web browser and sign in with your organizational account. After authenticating, Microsoft Entra ID will prompt you to approve the new set of permissions. Once you approved the permissions, you will be redirected to an empty page. You can now use all commands in the CLI for Microsoft 365.
-
 ## Logging in to Microsoft 365 via a proxy
 
 All communication between the CLI for Microsoft 365 and Microsoft 365 APIs happens via web requests. If you're behind a proxy, you should set up an environment variable to allow CLI for Microsoft 365 to log in to Microsoft 365. More information about the necessary configuration steps is available at [https://github.com/request/request#controlling-proxy-behaviour-using-environment-variables](https://github.com/request/request#controlling-proxy-behaviour-using-environment-variables).
