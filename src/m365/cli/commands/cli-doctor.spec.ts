@@ -2,7 +2,7 @@ import assert from 'assert';
 import { createRequire } from 'module';
 import os from 'os';
 import sinon from 'sinon';
-import auth from '../../../Auth.js';
+import auth, { AuthType } from '../../../Auth.js';
 import { cli } from '../../../cli/cli.js';
 import { Logger } from '../../../cli/Logger.js';
 import { telemetry } from '../../../telemetry.js';
@@ -83,14 +83,16 @@ describe(commands.DOCTOR, () => {
     sinon.stub(os, 'release').returns('10.0.19043');
     sinon.stub(packageJSON, 'version').value('3.11.0');
     sinon.stub(process, 'version').value('v14.17.0');
-    sinon.stub(auth.connection, 'appId').value('31359c7f-bd7e-475c-86db-fdb8c937548e');
+    // must be a direct assignment rather than a stub, because appId is optional
+    // and undefined by default, which means it can't be stubbed
+    auth.connection.appId = '31359c7f-bd7e-475c-86db-fdb8c937548e';
     sinon.stub(auth.connection, 'tenant').value('common');
-    sinon.stub(auth.connection, 'authType').value(0);
+    sinon.stub(auth.connection, 'authType').value(AuthType.DeviceCode);
     sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
 
     await command.action(logger, { options: {} });
     assert(loggerLogSpy.calledWith({
-      authMode: 'DeviceCode',
+      authMode: 'deviceCode',
       cliAadAppId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
       cliAadAppTenant: 'common',
       cliEnvironment: '',
@@ -156,14 +158,14 @@ describe(commands.DOCTOR, () => {
     sinon.stub(os, 'release').returns('10.0.19043');
     sinon.stub(packageJSON, 'version').value('3.11.0');
     sinon.stub(process, 'version').value('v14.17.0');
-    sinon.stub(auth.connection, 'appId').value('31359c7f-bd7e-475c-86db-fdb8c937548e');
+    auth.connection.appId = '31359c7f-bd7e-475c-86db-fdb8c937548e';
     sinon.stub(auth.connection, 'tenant').value('common');
-    sinon.stub(auth.connection, 'authType').value(0);
+    sinon.stub(auth.connection, 'authType').value(AuthType.DeviceCode);
     sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
 
     await command.action(logger, { options: {} });
     assert(loggerLogSpy.calledWith({
-      authMode: 'DeviceCode',
+      authMode: 'deviceCode',
       cliAadAppId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
       cliAadAppTenant: 'common',
       cliEnvironment: '',
@@ -205,12 +207,12 @@ describe(commands.DOCTOR, () => {
     sinon.stub(process, 'version').value('v14.17.0');
     sinon.stub(auth.connection, 'appId').value('31359c7f-bd7e-475c-86db-fdb8c937548e');
     sinon.stub(auth.connection, 'tenant').value('common');
-    sinon.stub(auth.connection, 'authType').value(0);
+    sinon.stub(auth.connection, 'authType').value(AuthType.DeviceCode);
     sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
 
     await command.action(logger, { options: {} });
     assert(loggerLogSpy.calledWith({
-      authMode: 'DeviceCode',
+      authMode: 'deviceCode',
       cliAadAppId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
       cliAadAppTenant: 'common',
       cliEnvironment: '',
@@ -249,12 +251,12 @@ describe(commands.DOCTOR, () => {
     sinon.stub(process, 'version').value('v14.17.0');
     sinon.stub(auth.connection, 'appId').value('31359c7f-bd7e-475c-86db-fdb8c937548e');
     sinon.stub(auth.connection, 'tenant').value('common');
-    sinon.stub(auth.connection, 'authType').value(0);
+    sinon.stub(auth.connection, 'authType').value(AuthType.DeviceCode);
     sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
 
     await command.action(logger, { options: {} });
     assert(loggerLogSpy.calledWith({
-      authMode: 'DeviceCode',
+      authMode: 'deviceCode',
       cliAadAppId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
       cliAadAppTenant: 'common',
       cliEnvironment: '',
@@ -286,12 +288,12 @@ describe(commands.DOCTOR, () => {
     sinon.stub(process, 'version').value('v14.17.0');
     sinon.stub(auth.connection, 'appId').value('31359c7f-bd7e-475c-86db-fdb8c937548e');
     sinon.stub(auth.connection, 'tenant').value('common');
-    sinon.stub(auth.connection, 'authType').value(0);
+    sinon.stub(auth.connection, 'authType').value(AuthType.DeviceCode);
     sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
 
     await command.action(logger, { options: {} });
     assert(loggerLogSpy.calledWith({
-      authMode: 'DeviceCode',
+      authMode: 'deviceCode',
       cliAadAppId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
       cliAadAppTenant: 'common',
       cliEnvironment: '',
@@ -330,12 +332,12 @@ describe(commands.DOCTOR, () => {
     sinon.stub(process, 'version').value('v14.17.0');
     sinon.stub(auth.connection, 'appId').value('31359c7f-bd7e-475c-86db-fdb8c937548e');
     sinon.stub(auth.connection, 'tenant').value('common');
-    sinon.stub(auth.connection, 'authType').value(0);
+    sinon.stub(auth.connection, 'authType').value(AuthType.DeviceCode);
     sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
 
     await command.action(logger, { options: {} });
     assert(loggerLogSpy.calledWith({
-      authMode: 'DeviceCode',
+      authMode: 'deviceCode',
       cliAadAppId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
       cliAadAppTenant: 'common',
       cliEnvironment: '',
@@ -366,12 +368,12 @@ describe(commands.DOCTOR, () => {
     sinon.stub(process, 'version').value('v14.17.0');
     sinon.stub(auth.connection, 'appId').value('31359c7f-bd7e-475c-86db-fdb8c937548e');
     sinon.stub(auth.connection, 'tenant').value('common');
-    sinon.stub(auth.connection, 'authType').value(2);
+    sinon.stub(auth.connection, 'authType').value(AuthType.Certificate);
     sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
 
     await command.action(logger, { options: {} });
     assert(loggerLogSpy.calledWith({
-      authMode: 'Certificate',
+      authMode: 'certificate',
       cliAadAppId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
       cliAadAppTenant: 'common',
       cliEnvironment: '',
@@ -402,12 +404,12 @@ describe(commands.DOCTOR, () => {
     sinon.stub(process, 'version').value('v14.17.0');
     sinon.stub(auth.connection, 'appId').value('31359c7f-bd7e-475c-86db-fdb8c937548e');
     sinon.stub(auth.connection, 'tenant').value('923d42f0-6d23-41eb-b68d-c036d242654f');
-    sinon.stub(auth.connection, 'authType').value(2);
+    sinon.stub(auth.connection, 'authType').value(AuthType.Certificate);
     sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
 
     await command.action(logger, { options: { debug: true } });
     assert(loggerLogSpy.calledWith({
-      authMode: 'Certificate',
+      authMode: 'certificate',
       cliAadAppId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
       cliAadAppTenant: 'single',
       cliEnvironment: '',
@@ -438,12 +440,12 @@ describe(commands.DOCTOR, () => {
     sinon.stub(process, 'version').value('v14.17.0');
     sinon.stub(auth.connection, 'appId').value('31359c7f-bd7e-475c-86db-fdb8c937548e');
     sinon.stub(auth.connection, 'tenant').value('common');
-    sinon.stub(auth.connection, 'authType').value(2);
+    sinon.stub(auth.connection, 'authType').value(AuthType.Certificate);
     sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
 
     await command.action(logger, { options: { debug: true } });
     assert(loggerLogSpy.calledWith({
-      authMode: 'Certificate',
+      authMode: 'certificate',
       cliAadAppId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
       cliAadAppTenant: 'common',
       cliEnvironment: '',
@@ -474,12 +476,12 @@ describe(commands.DOCTOR, () => {
     sinon.stub(process, 'version').value('v14.17.0');
     sinon.stub(auth.connection, 'appId').value('31359c7f-bd7e-475c-86db-fdb8c937548e');
     sinon.stub(auth.connection, 'tenant').value('common');
-    sinon.stub(auth.connection, 'authType').value(2);
+    sinon.stub(auth.connection, 'authType').value(AuthType.Certificate);
     sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': 'docker' });
 
     await command.action(logger, { options: { debug: true } });
     assert(loggerLogSpy.calledWith({
-      authMode: 'Certificate',
+      authMode: 'certificate',
       cliAadAppId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
       cliAadAppTenant: 'common',
       cliEnvironment: 'docker',
@@ -503,12 +505,12 @@ describe(commands.DOCTOR, () => {
     sinon.stub(process, 'version').value('v14.17.0');
     sinon.stub(auth.connection, 'appId').value('31359c7f-bd7e-475c-86db-fdb8c937548e');
     sinon.stub(auth.connection, 'tenant').value('common');
-    sinon.stub(auth.connection, 'authType').value(2);
+    sinon.stub(auth.connection, 'authType').value(AuthType.Certificate);
     sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
 
     await command.action(logger, { options: { debug: true } });
     assert(loggerLogSpy.calledWith({
-      authMode: 'Certificate',
+      authMode: 'certificate',
       cliAadAppId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
       cliAadAppTenant: 'common',
       cliEnvironment: '',
@@ -533,12 +535,12 @@ describe(commands.DOCTOR, () => {
     sinon.stub(process, 'version').value('v14.17.0');
     sinon.stub(auth.connection, 'appId').value('31359c7f-bd7e-475c-86db-fdb8c937548e');
     sinon.stub(auth.connection, 'tenant').value('common');
-    sinon.stub(auth.connection, 'authType').value(2);
+    sinon.stub(auth.connection, 'authType').value(AuthType.Certificate);
     sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
 
     await command.action(logger, { options: { debug: true } });
     assert(loggerLogSpy.calledWith({
-      authMode: 'Certificate',
+      authMode: 'certificate',
       cliAadAppId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
       cliAadAppTenant: 'common',
       cliEnvironment: '',
@@ -569,14 +571,14 @@ describe(commands.DOCTOR, () => {
     sinon.stub(process, 'version').value('v14.17.0');
     sinon.stub(auth.connection, 'appId').value('31359c7f-bd7e-475c-86db-fdb8c937548e');
     sinon.stub(auth.connection, 'tenant').value('common');
-    sinon.stub(auth.connection, 'authType').value(0);
+    sinon.stub(auth.connection, 'authType').value(AuthType.DeviceCode);
     sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
     sinonUtil.restore(cli.getConfig().all);
     sinon.stub(cli.getConfig(), 'all').value({ "showHelpOnFailure": false });
 
     await command.action(logger, { options: {} });
     assert(loggerLogSpy.calledWith({
-      authMode: 'DeviceCode',
+      authMode: 'deviceCode',
       cliAadAppId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
       cliAadAppTenant: 'common',
       cliEnvironment: '',

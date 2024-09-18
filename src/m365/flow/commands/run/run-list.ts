@@ -132,7 +132,7 @@ class FlowRunListCommand extends PowerAutomateCommand {
       await logger.logToStderr(`Retrieving list of runs for Microsoft Flow ${args.options.flowName}...`);
     }
 
-    let url: string = `${this.resource}/providers/Microsoft.ProcessSimple/${args.options.asAdmin ? 'scopes/admin/' : ''}environments/${formatting.encodeQueryParameter(args.options.environmentName)}/flows/${formatting.encodeQueryParameter(args.options.flowName)}/runs?api-version=2016-11-01`;
+    let url: string = `${PowerAutomateCommand.resource}/providers/Microsoft.ProcessSimple/${args.options.asAdmin ? 'scopes/admin/' : ''}environments/${formatting.encodeQueryParameter(args.options.environmentName)}/flows/${formatting.encodeQueryParameter(args.options.flowName)}/runs?api-version=2016-11-01`;
     const filters = this.getFilters(args.options);
     if (filters.length > 0) {
       url += `&$filter=${filters.join(' and ')}`;

@@ -64,6 +64,7 @@ describe('Lazy loading commands', () => {
       'entra sp add',
       'entra sp get',
       'entra sp list',
+      'entra sp remove',
       'entra appregistration add',
       'entra appregistration get',
       'entra appregistration list',

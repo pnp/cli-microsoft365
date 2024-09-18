@@ -3,6 +3,7 @@ import type { SidebarsConfig } from '@docusaurus/plugin-content-docs';
 const sidebars: SidebarsConfig = {
   home: [
     'index',
+    'v9-upgrade-guidance',
     'v8-upgrade-guidance',
     'v7-upgrade-guidance',
     'v6-upgrade-guidance',
@@ -331,6 +332,11 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'enterpriseapp list',
               id: 'cmd/entra/enterpriseapp/enterpriseapp-list'
+            },
+            {
+              type: 'doc',
+              label: 'enterpriseapp remove',
+              id: 'cmd/entra/enterpriseapp/enterpriseapp-remove'
             }
           ]
         },
@@ -355,6 +361,11 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'group remove',
               id: 'cmd/entra/group/group-remove'
+            },
+            {
+              type: 'doc',
+              label: 'group set',
+              id: 'cmd/entra/group/group-set'
             },
             {
               type: 'doc',
@@ -1081,6 +1092,11 @@ const sidebars: SidebarsConfig = {
           notebook: [
             {
               type: 'doc',
+              label: 'notebook add',
+              id: 'cmd/onenote/notebook/notebook-add'
+            },
+            {
+              type: 'doc',
               label: 'notebook list',
               id: 'cmd/onenote/notebook/notebook-list'
             }
@@ -1547,6 +1563,20 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'owner remove',
               id: 'cmd/flow/owner/owner-remove'
+            }
+          ]
+        },
+        {
+          recyclebinitem: [
+            {
+              type: 'doc',
+              label: 'recyclebinitem list',
+              id: 'cmd/flow/recyclebinitem/recyclebinitem-list'
+            },
+            {
+              type: 'doc',
+              label: 'recyclebinitem restore',
+              id: 'cmd/flow/recyclebinitem/recyclebinitem-restore'
             }
           ]
         },
@@ -2570,6 +2600,16 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
+              label: 'folder sharinglink add',
+              id: 'cmd/spo/folder/folder-sharinglink-add'
+            },
+            {
+              type: 'doc',
+              label: 'folder sharinglink clear',
+              id: 'cmd/spo/folder/folder-sharinglink-clear'
+            },
+            {
+              type: 'doc',
               label: 'folder sharinglink get',
               id: 'cmd/spo/folder/folder-sharinglink-get'
             },
@@ -2577,6 +2617,11 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'folder sharinglink list',
               id: 'cmd/spo/folder/folder-sharinglink-list'
+            },
+            {
+              type: 'doc',
+              label: 'folder sharinglink remove',
+              id: 'cmd/spo/folder/folder-sharinglink-remove'
             }
           ]
         },
@@ -3333,11 +3378,6 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
-              label: 'site admin list',
-              id: 'cmd/spo/site/site-admin-list'
-            },
-            {
-              type: 'doc',
               label: 'site ensure',
               id: 'cmd/spo/site/site-ensure'
             },
@@ -3370,6 +3410,16 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'site set',
               id: 'cmd/spo/site/site-set'
+            },
+            {
+              type: 'doc',
+              label: 'site admin add',
+              id: 'cmd/spo/site/site-admin-add'
+            },
+            {
+              type: 'doc',
+              label: 'site admin list',
+              id: 'cmd/spo/site/site-admin-list'
             },
             {
               type: 'doc',
@@ -3882,6 +3932,19 @@ const sidebars: SidebarsConfig = {
       ]
     },
     {
+      'SharePoint Premium (spp)': [
+        {
+          contentcenter: [
+            {
+              type: 'doc',
+              label: 'contentcenter list',
+              id: 'cmd/spp/contentcenter/contentcenter-list'
+            }
+          ]
+        }
+      ]
+    },
+    {
       'Teams (teams)': [
         {
           app: [
@@ -4106,6 +4169,11 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'message remove',
               id: 'cmd/teams/message/message-remove'
+            },
+            {
+              type: 'doc',
+              label: 'message restore',
+              id: 'cmd/teams/message/message-restore'
             },
             {
               type: 'doc',

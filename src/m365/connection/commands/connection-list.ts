@@ -1,8 +1,8 @@
-import { Logger } from '../../../cli/Logger.js';
-import auth, { AuthType } from '../../../Auth.js';
-import commands from '../commands.js';
-import Command, { CommandArgs, CommandError } from '../../../Command.js';
 import assert from 'assert';
+import auth from '../../../Auth.js';
+import { Logger } from '../../../cli/Logger.js';
+import Command, { CommandArgs, CommandError } from '../../../Command.js';
+import commands from '../commands.js';
 
 class ConnectionListCommand extends Command {
   public get name(): string {
@@ -26,7 +26,7 @@ class ConnectionListCommand extends Command {
       return {
         name: connection.name,
         connectedAs: connection.identityName,
-        authType: AuthType[connection.authType],
+        authType: connection.authType,
         active: isCurrentConnection
       };
     }).sort((a, b) => {

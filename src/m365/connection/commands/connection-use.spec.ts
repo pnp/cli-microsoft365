@@ -20,7 +20,7 @@ describe(commands.USE, () => {
   const mockContosoApplicationIdentityResponse = {
     "connectedAs": "Contoso Application",
     "connectionName": "acd6df42-10a9-4315-8928-53334f1c9d01",
-    "authType": "Secret",
+    "authType": "secret",
     "appId": "39446e2e-5081-4887-980c-f285919fccca",
     "appTenant": "db308122-52f3-4241-af92-1734aa6e2e50",
     "cloudType": "Public"
@@ -29,7 +29,7 @@ describe(commands.USE, () => {
   const mockUserIdentityResponse = {
     "connectedAs": "alexw@contoso.com",
     "connectionName": "028de82d-7fd9-476e-a9fd-be9714280ff3",
-    "authType": "DeviceCode",
+    "authType": "deviceCode",
     "appId": "31359c7f-bd7e-475c-86db-fdb8c937548e",
     "appTenant": "common",
     "cloudType": "Public"

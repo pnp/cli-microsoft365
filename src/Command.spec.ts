@@ -601,6 +601,18 @@ describe('Command', () => {
     assert(actual.indexOf(JSON.stringify(commandOutput[0].property)) === -1);
   });
 
+  it('correctly serialize bool values to csv output', async () => {
+    const command = new MockCommand1();
+    const commandOutput = [
+      {
+        'property1': true,
+        'property2': false
+      }
+    ];
+    const actual = await command.getCsvOutput(commandOutput, { options: { output: 'csv' } });
+    assert.strictEqual(actual,"property1,property2\n1,0\n");
+  });
+
   it('passes validation when csv output specified', async () => {
     const cmd = new MockCommand2();
     assert.strictEqual(await cmd.validate({ options: { output: 'csv' } }, cli.getCommandInfo(cmd)), true);

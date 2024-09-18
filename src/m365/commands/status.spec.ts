@@ -171,7 +171,7 @@ describe(commands.STATUS, () => {
     assert(loggerLogSpy.calledWith({
       connectedAs: 'alexw@contoso.com',
       connectionName: '028de82d-7fd9-476e-a9fd-be9714280ff3',
-      authType: 'DeviceCode',
+      authType: 'deviceCode',
       appId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
       appTenant: 'common',
       cloudType: 'Public'
@@ -191,7 +191,7 @@ describe(commands.STATUS, () => {
     assert(loggerLogSpy.calledWith({
       connectedAs: 'alexw@contoso.com',
       connectionName: '028de82d-7fd9-476e-a9fd-be9714280ff3',
-      authType: 'DeviceCode',
+      authType: 'deviceCode',
       appId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
       appTenant: 'common',
       accessTokens: '{\n  "https://graph.microsoft.com": {\n    "expiresOn": "123",\n    "accessToken": "abc"\n  }\n}',

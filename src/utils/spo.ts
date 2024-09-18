@@ -653,10 +653,10 @@ export const spo = {
  * @param webUrl Web url
  * @param email The email of the user
  * @param logger the Logger object
- * @param verbose set if verbose logging should be logged 
+ * @param verbose set for verbose logging
  */
-  async getUserByEmail(webUrl: string, email: string, logger: Logger, verbose?: boolean): Promise<User> {
-    if (verbose) {
+  async getUserByEmail(webUrl: string, email: string, logger?: Logger, verbose?: boolean): Promise<any> {
+    if (verbose && logger) {
       await logger.logToStderr(`Retrieving the spo user by email ${email}`);
     }
     const requestUrl = `${webUrl}/_api/web/siteusers/GetByEmail('${formatting.encodeQueryParameter(email)}')`;
@@ -737,10 +737,10 @@ export const spo = {
   * @param webUrl Web url
   * @param name The name of the group
   * @param logger the Logger object
-  * @param verbose set if verbose logging should be logged 
+  * @param verbose set for verbose logging
   */
-  async getGroupByName(webUrl: string, name: string, logger: Logger, verbose?: boolean): Promise<any> {
-    if (verbose) {
+  async getGroupByName(webUrl: string, name: string, logger?: Logger, verbose?: boolean): Promise<any> {
+    if (verbose && logger) {
       await logger.logToStderr(`Retrieving the group by name ${name}`);
     }
     const requestUrl = `${webUrl}/_api/web/sitegroups/GetByName('${formatting.encodeQueryParameter(name)}')`;
@@ -763,10 +763,10 @@ export const spo = {
   * @param webUrl Web url
   * @param name the name of the role definition
   * @param logger the Logger object
-  * @param debug set if debug logging should be logged 
+  * @param verbose set for verbose logging
   */
-  async getRoleDefinitionByName(webUrl: string, name: string, logger: Logger, debug?: boolean): Promise<RoleDefinition> {
-    if (debug) {
+  async getRoleDefinitionByName(webUrl: string, name: string, logger?: Logger, verbose?: boolean): Promise<RoleDefinition> {
+    if (verbose && logger) {
       await logger.logToStderr(`Retrieving the role definitions for ${name}`);
     }
 
@@ -1860,5 +1860,84 @@ export const spo = {
 
     const itemsResponse = await request.get<ListItemInstance>(requestOptionsItems);
     return (itemsResponse);
+  },
+
+  /**
+  * Retrieves the file by id.
+  * Returns a FileProperties object
+  * @param webUrl Web url
+  * @param id the id of the file
+  * @param logger the Logger object
+  * @param verbose set for verbose logging 
+  */
+  async getFileById(webUrl: string, id: string, logger?: Logger, verbose?: boolean): Promise<FileProperties> {
+    if (verbose && logger) {
+      await logger.logToStderr(`Retrieving the file with id ${id}`);
+    }
+    const requestUrl = `${webUrl}/_api/web/GetFileById('${formatting.encodeQueryParameter(id)}')`;
+
+    const requestOptions: CliRequestOptions = {
+      url: requestUrl,
+      headers: {
+        'accept': 'application/json;odata=nometadata'
+      },
+
+      responseType: 'json'
+    };
+
+    const file: FileProperties = await request.get<FileProperties>(requestOptions);
+
+    return file;
+  },
+
+  /**
+   * Gets the site collection URL for a given web URL using SP Admin site.
+   * @param adminUrl The SharePoint admin URL
+   * @param siteId The site ID
+   * @param logger The logger object
+   * @param verbose If in verbose mode
+   * @returns Owner login name
+   */
+  async getPrimaryAdminLoginNameAsAdmin(adminUrl: string, siteId: string, logger: Logger, verbose: boolean): Promise<string> {
+    if (verbose) {
+      await logger.logToStderr('Getting the primary admin login name...');
+    }
+
+    const requestOptions: CliRequestOptions = {
+      url: `${adminUrl}/_api/SPO.Tenant/sites('${siteId}')?$select=OwnerLoginName`,
+      headers: {
+        accept: 'application/json;odata=nometadata',
+        'content-type': 'application/json;charset=utf-8'
+      }
+    };
+
+    const response: string = await request.get<string>(requestOptions);
+    const responseContent = JSON.parse(response);
+    return responseContent.OwnerLoginName;
+  },
+
+  /**
+   * Gets the primary owner login from a site.
+   * @param siteUrl The site URL
+   * @param logger The logger object
+   * @param verbose If in verbose mode
+   * @returns Owner login name
+   */
+  async getPrimaryOwnerLoginFromSite(siteUrl: string, logger: Logger, verbose: boolean): Promise<string> {
+    if (verbose) {
+      await logger.logToStderr('Getting the primary admin login name...');
+    }
+
+    const requestOptions: CliRequestOptions = {
+      url: `${siteUrl}/_api/site/owner`,
+      method: 'GET',
+      headers: {
+        'accept': 'application/json;odata=nometadata'
+      },
+      responseType: 'json'
+    };
+
+    const responseContent = await request.get<{ LoginName: string }>(requestOptions);
+    return responseContent?.LoginName;
   }
 };

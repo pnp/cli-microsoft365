@@ -40,7 +40,7 @@ This script shows how you can use the CLI to:
         }
       }
 
-      $allFiles = m365 spo file list --webUrl "$tenatUrl$sourceSite" --folder $folder.substring(1) --output 'json'
+      $allFiles = m365 spo file list --webUrl "$tenatUrl$sourceSite" --folderUrl $folder.substring(1) --output 'json'
       $allFiles = $allFiles | ConvertFrom-Json
       foreach ($file in $allFiles) {
         $fileUrl = $file.ServerRelativeUrl -replace $sourceSite, ''
@@ -57,17 +57,17 @@ This script shows how you can use the CLI to:
     [Parameter(Mandatory = $True)][bool] $copyKeepingSameFolderStructure) {
     if ($copyKeepingSameFolderStructure) {
       Write-host "Copy the same structure"
-      
+
       $allFolders = m365 spo folder list --webUrl "$tenatUrl$sourceSite" --parentFolderUrl "/$sourceLibrary" --output 'json'
       $allFolders = $allFolders | ConvertFrom-Json
       foreach ($folder in $allFolders) {
         if ($folder.Name -ne 'Forms') {
           $folderName = $folder.Name
-          m365 spo folder copy --webUrl "$tenatUrl$sourceSite" --sourceUrl "/$sourceLibrary/$folderName" --targetUrl "$targetSite/$targetLibrary" --allowSchemaMismatch
+          m365 spo folder copy --webUrl "$tenatUrl$sourceSite" --sourceUrl "/$sourceLibrary/$folderName" --targetUrl "$targetSite/$targetLibrary"
         }
       }
-      
-      $allFiles = m365 spo file list --webUrl "$tenatUrl$sourceSite" --folder $sourceLibrary --output 'json'
+
+      $allFiles = m365 spo file list --webUrl "$tenatUrl$sourceSite" --folderUrl $sourceLibrary --output 'json'
       $allFiles = $allFiles | ConvertFrom-Json
       foreach ($file in $allFiles) {
         $fileUrl = $file.ServerRelativeUrl -replace $sourceSite, ''
@@ -88,9 +88,9 @@ This script shows how you can use the CLI to:
   }
 
   $tenatUrl = 'https://contoso.sharepoint.com'
-  $sourceLibrary = 'Shared%20Documents'
+  $sourceLibrary = 'Shared Documents'
   $sourceSite = '/sites/FromSite'
-  $targetLibrary = 'Shared%20Documents'
+  $targetLibrary = 'Shared Documents'
   $targetSite = '/sites/ToSite'
   $copyKeepingSameFolderStructure = $false
   Copy-LibraryToLibrary -tenatUrl $tenatUrl -sourceLibrary $sourceLibrary -sourceSite $sourceSite -targetLibrary $targetLibrary -targetSite $targetSite -copyKeepingSameFolderStructure $copyKeepingSameFolderStructure
