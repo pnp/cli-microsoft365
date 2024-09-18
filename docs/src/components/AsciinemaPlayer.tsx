@@ -1,13 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
 import BrowserOnly from '@docusaurus/BrowserOnly';
-import styles from '../scss/AsciinemaPlayer.module.scss';
 
 type AsciinemaPlayerProps = {
   src: string;
   // START asciinemaOptions
   cols: string;
   rows: string;
-  autoPlay: boolean
+  autoPlay: boolean;
   preload: boolean;
   loop: boolean | number;
   startAt: number | string;
@@ -27,18 +26,20 @@ const AsciinemaPlayerComponent: React.FC<AsciinemaPlayerProps> = ({
   const ref = useRef<HTMLDivElement>(null);
   const proxiedSrc = `https://corsproxy.io/?${encodeURIComponent(src)}`;
   const [isMounted, setIsMounted] = useState(false);
-  const [isPlayerLoaded, setIsPlayerLoaded] = useState(false);
 
   useEffect(() => {
     setIsMounted(true);
   }, []);
 
   useEffect(() => {
-    if (ref.current && !isPlayerLoaded && isMounted) {
-      const AsciinemaPlayerLibrary = require('asciinema-player');
-      AsciinemaPlayerLibrary.create(proxiedSrc, ref.current, asciinemaOptions);
-      setIsPlayerLoaded(true);
-    }
+    const loadAsciinemaPlayer = async () => {
+      if (ref.current && isMounted) {
+        const AsciinemaPlayerLibrary = await import('asciinema-player');
+        AsciinemaPlayerLibrary.create(proxiedSrc, ref.current, asciinemaOptions);
+      }
+    };
+
+    loadAsciinemaPlayer();
   }, [proxiedSrc, asciinemaOptions, isMounted]);
 
   return (
