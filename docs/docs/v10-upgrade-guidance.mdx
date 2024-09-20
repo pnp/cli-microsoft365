@@ -271,6 +271,18 @@ Please update your scripts not to use the `overwrite` option.
 
 ## Teams
 
+### Enhanced `teams cache remove` command
+
+We enhanced the [teams cache remove](./cmd/teams/cache/cache-remove.mdx) command to support the removal of the cache from the new Teams client. We also made it so that by default, the command will remove the cache for the `new` client. 
+
+To still support the old client, we have added the option `--client`, in which you can specify `classic` as value to remove the cache of the old Teams client.
+
+#### What action do I need to take?
+
+Add the `--client` option to your scripts to specify which client's cache you want to remove. Otherwise, upon the release of v10, it will attempt to remove the cache from the new client.
+
+## Teams
+
 ### Removes duplicate property from 'teams tab list' command.
 
 For the [teams tab list](./cmd/teams/tab/tab-list.mdx) command we removed the `teamsAppTabId` from the command output as it was a duplicate of the `teamsApp/id` property.
