@@ -258,7 +258,7 @@ describe('Auth', () => {
 
   it('handles empty response when retrieving new access token', async () => {
     sinon.stub(auth as any, 'getPublicClient').returns(publicApplication);
-    sinon.stub(publicApplication, 'acquireTokenSilent').rejects('An error has occurred');
+    sinon.stub(publicApplication, 'acquireTokenSilent').resolves(null as any);
 
     try {
       await auth.ensureAccessToken(resource, logger, true);
