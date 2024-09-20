@@ -51,7 +51,20 @@ m365 spo sitescript get --id 2c1ba4c4-cd9b-4417-832f-92a34bc34b2a --content
 
   ```json
   {
-    "Content": "{\"$schema\":\"https://developer.microsoft.com/json-schemas/sp/site-design-script-actions.schema.json\",\"actions\":[{\"verb\":\"activateSPFeature\",\"name\":\"SiteNotebook feature\",\"title\":\"SiteNotebook feature\",\"featureId\":\"f151bb39-7c3b-414f-bb36-6bf18872052f\",\"scope\":\"web\"}],\"bindata\":{},\"version\":1}",
+    "Content": { 
+      "$schema": "https://developer.microsoft.com/json-schemas/sp/site-design-script-actions.schema.json",
+      "actions": [ 
+        {
+          "verb":"activateSPFeature",
+          "name": "SiteNotebook feature", 
+          "title": "SiteNotebook feature",
+          "featureId": "f151bb39-7c3b-414f-bb36-6bf18872052f", 
+          "scope": "web"
+        }
+      ], 
+      "bindata":{},
+      "version":1
+    },
     "ContentByteArray": null,
     "Description": "Contoso site script",
     "Id": "43d4ffa0-c7ee-4a97-91d7-db27e5b62de5",

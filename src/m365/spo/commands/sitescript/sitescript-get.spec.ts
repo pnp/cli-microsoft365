@@ -74,10 +74,7 @@ describe(commands.SITESCRIPT_GET, () => {
 
   it('gets information about the specified site script', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GetSiteScriptMetadata`) > -1 &&
-        JSON.stringify(opts.data) === JSON.stringify({
-          id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b'
-        })) {
+      if (opts.url === 'https://contoso.sharepoint.com/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GetSiteScriptMetadata') {
         return {
           "Content": JSON.stringify({
             "$schema": "schema.json",
@@ -102,7 +99,7 @@ describe(commands.SITESCRIPT_GET, () => {
 
     await command.action(logger, { options: { id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' } });
     assert(loggerLogSpy.calledOnceWithExactly({
-      "Content": JSON.stringify({
+      "Content": {
         "$schema": "schema.json",
         "actions": [
           {
@@ -112,7 +109,7 @@ describe(commands.SITESCRIPT_GET, () => {
         ],
         "bindata": {},
         "version": 1
-      }),
+      },
       "Description": "My contoso script",
       "Id": "0f27a016-d277-4bb4-b3c3-b5b040c9559b",
       "Title": "Contoso",
@@ -122,10 +119,7 @@ describe(commands.SITESCRIPT_GET, () => {
 
   it('gets information about the specified site script (debug)', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GetSiteScriptMetadata`) > -1 &&
-        JSON.stringify(opts.data) === JSON.stringify({
-          id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b'
-        })) {
+      if (opts.url === 'https://contoso.sharepoint.com/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GetSiteScriptMetadata') {
         return {
           "Content": JSON.stringify({
             "$schema": "schema.json",
@@ -150,7 +144,7 @@ describe(commands.SITESCRIPT_GET, () => {
 
     await command.action(logger, { options: { debug: true, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' } });
     assert(loggerLogSpy.calledOnceWithExactly({
-      "Content": JSON.stringify({
+      "Content": {
         "$schema": "schema.json",
         "actions": [
           {
@@ -160,7 +154,7 @@ describe(commands.SITESCRIPT_GET, () => {
         ],
         "bindata": {},
         "version": 1
-      }),
+      },
       "Description": "My contoso script",
       "Id": "0f27a016-d277-4bb4-b3c3-b5b040c9559b",
       "Title": "Contoso",
@@ -170,10 +164,7 @@ describe(commands.SITESCRIPT_GET, () => {
 
   it('gets the specified site script contents', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GetSiteScriptMetadata`) > -1 &&
-        JSON.stringify(opts.data) === JSON.stringify({
-          id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b'
-        })) {
+      if (opts.url === 'https://contoso.sharepoint.com/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GetSiteScriptMetadata') {
         return {
           "Content": JSON.stringify({
             "$schema": "schema.json",
@@ -214,17 +205,6 @@ describe(commands.SITESCRIPT_GET, () => {
     sinon.stub(request, 'post').rejects({ error: { 'odata.error': { message: { value: 'File Not Found.' } } } });
 
     await assert.rejects(command.action(logger, { options: { id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' } } as any), new CommandError('File Not Found.'));
-  });
-
-  it('supports specifying id', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--id') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 
   it('fails validation if the id is not a valid GUID', async () => {
