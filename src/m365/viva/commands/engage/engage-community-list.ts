@@ -10,7 +10,7 @@ class VivaEngageCommunityListCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'Lists Viva Engage communities';
+    return 'Lists all Viva Engage communities';
   }
 
   public defaultProperties(): string[] | undefined {
@@ -19,7 +19,7 @@ class VivaEngageCommunityListCommand extends GraphCommand {
 
   public async commandAction(logger: Logger): Promise<void> {
     if (this.verbose) {
-      await logger.logToStderr('Getting all Viva Engage communities');
+      await logger.logToStderr('Getting all Viva Engage communities...');
     }
 
     try {
