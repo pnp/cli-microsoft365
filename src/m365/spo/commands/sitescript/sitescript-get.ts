@@ -1,6 +1,6 @@
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
-import request from '../../../../request.js';
+import request, { CliRequestOptions } from '../../../../request.js';
 import { ContextInfo, spo } from '../../../../utils/spo.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
@@ -58,7 +58,7 @@ class SpoSiteScriptGetCommand extends SpoCommand {
     try {
       const spoUrl: string = await spo.getSpoUrl(logger, this.debug);
       const formDigest: ContextInfo = await spo.getRequestDigest(spoUrl);
-      const requestOptions: any = {
+      const requestOptions: CliRequestOptions = {
         url: `${spoUrl}/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GetSiteScriptMetadata`,
         headers: {
           'X-RequestDigest': formDigest.FormDigestValue,
@@ -71,8 +71,10 @@ class SpoSiteScriptGetCommand extends SpoCommand {
 
       const response: any = await request.post(requestOptions);
 
-      if (args.options.content === true) {
-        await logger.log(JSON.parse(response.Content));
+      response.Content = JSON.parse(response.Content);
+
+      if (args.options.content) {
+        await logger.log(response.Content);
         return;
       }
 

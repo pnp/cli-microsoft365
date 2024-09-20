@@ -197,6 +197,14 @@ We updated the [spo contenttype field set](./cmd/spo/contenttype/contenttype-fie
 
 Please update your scripts to make sure that you use the correct options.
 
+### Updated `spo sitescript get` output
+
+We updated the output from the [`spo sitescript get`](./cmd/spo/sitescript/sitescript-get.mdx) command. The `Content` property is now a JSON object instead of a stringified JSON object, so it's easier to interact with the sitescript data, even when --content is not specified.
+
+#### What action do I need to take?
+
+Please update your scripts to reflect the new output of the [`spo sitescript get`](./cmd/spo/sitescript/sitescript-get.mdx) command.
+
 ## SharePoint Framework
 
 ### Removed overwrite option from `spfx project github workflow add` command
