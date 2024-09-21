@@ -63,13 +63,13 @@ For more information about using these options, see the Microsoft Graph API docu
 Creates an external item with simple properties that everyone is allowed to access
 
 ```sh
-m365 external item add --id "pnp-ensure-siteassets-library" --connectionId "samplesolutiongallery" --content "Ensure that the Site Assets library is created." --title "Ensure the Site Assets Library is created" --description "Ensure that the Site Assets library is created." --authors "Phil Harding" --acls "grant,everyone,everyone"
+m365 external item add --id "pnp-ensure-siteassets-library" --externalConnectionId "samplesolutiongallery" --content "Ensure that the Site Assets library is created." --title "Ensure the Site Assets Library is created" --description "Ensure that the Site Assets library is created." --authors "Phil Harding" --acls "grant,everyone,everyone"
 ```
 
 Creates an external item with multi-value properties accessible only to users from the specified Entra group
 
 ```sh
-m365 external item add --id "pnp-ensure-siteassets-library" --connectionId "samplesolutiongallery" --content "Ensure that the Site Assets library is created." --title "Ensure the Site Assets Library is created" --description "Ensure that the Site Assets library is created." --authors@odata.type "Collection(String)" --authors "Phil Harding;#Steve Smith" --acls "grant,group,Super users"
+m365 external item add --id "pnp-ensure-siteassets-library" --externalConnectionId "samplesolutiongallery" --content "Ensure that the Site Assets library is created." --title "Ensure the Site Assets Library is created" --description "Ensure that the Site Assets library is created." --authors@odata.type "Collection(String)" --authors "Phil Harding;#Steve Smith" --acls "grant,group,Super users"
 ```
 
 ## Response
@@ -123,7 +123,7 @@ m365 external item add --id "pnp-ensure-siteassets-library" --connectionId "samp
   <TabItem value="Markdown">
 
   ```md
-  # m365 external item add --id "pnp-ensure-siteassets-library" --connectionId "samplesolutiongallery" --content "Ensure that the Site Assets library is created." --title "Ensure the Site Assets Library is created" --description "Ensure that the Site Assets library is created." --authors "Phil Harding" --acls "grant,everyone,everyone"
+  # m365 external item add --id "pnp-ensure-siteassets-library" --externalConnectionId "samplesolutiongallery" --content "Ensure that the Site Assets library is created." --title "Ensure the Site Assets Library is created" --description "Ensure that the Site Assets library is created." --authors "Phil Harding" --acls "grant,everyone,everyone"
 
   Date: 2023-10-28
 
