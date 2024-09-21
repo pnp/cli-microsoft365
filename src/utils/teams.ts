@@ -22,13 +22,13 @@ export const teams = {
       throw Error(`The specified team '${displayName}' does not exist.`);
     }
 
-    if (teams.length > 1) {
-      const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', teams);
-      const result = await cli.handleMultipleResultsFound<Team>(`Multiple teams with name '${displayName}' found.`, resultAsKeyValuePair);
-      return result;
+    if (teams.length === 1) {
+      return teams[0];
     }
 
-    return teams[0];
+    const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', teams);
+    const result = await cli.handleMultipleResultsFound<Team>(`Multiple teams with name '${displayName}' found.`, resultAsKeyValuePair);
+    return result;
   },
 
   /**
@@ -45,13 +45,13 @@ export const teams = {
       throw Error(`The specified team '${displayName}' does not exist.`);
     }
 
-    if (teams.length > 1) {
-      const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', teams);
-      const result = await cli.handleMultipleResultsFound<Team>(`Multiple teams with name '${displayName}' found.`, resultAsKeyValuePair);
-      return result.id!;
+    if (teams.length === 1) {
+      return teams[0].id!;
     }
 
-    return teams[0].id!;
+    const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', teams);
+    const result = await cli.handleMultipleResultsFound<Team>(`Multiple teams with name '${displayName}' found.`, resultAsKeyValuePair);
+    return result.id!;
   },
 
   /**
