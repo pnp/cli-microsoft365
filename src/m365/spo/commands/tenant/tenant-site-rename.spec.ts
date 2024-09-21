@@ -12,10 +12,11 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { spo } from '../../../../utils/spo.js';
 import commands from '../../commands.js';
-import command from './site-rename.js';
+import command from './tenant-site-rename.js';
 import { settingsNames } from '../../../../settingsNames.js';
+import { timersUtil } from '../../../../utils/timersUtil.js';
 
-describe(commands.SITE_RENAME, () => {
+describe(commands.TENANT_SITE_RENAME, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -27,10 +28,7 @@ describe(commands.SITE_RENAME, () => {
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
-    sinon.stub(global, 'setTimeout').callsFake((fn) => {
-      fn();
-      return {} as any;
-    });
+    sinon.stub(timersUtil, 'setTimeout').resolves();
     auth.connection.active = true;
     auth.connection.spoUrl = 'https://contoso.sharepoint.com';
     commandInfo = cli.getCommandInfo(command);
@@ -73,7 +71,7 @@ describe(commands.SITE_RENAME, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name, commands.SITE_RENAME);
+    assert.strictEqual(command.name, commands.TENANT_SITE_RENAME);
   });
 
   it('has a description', () => {

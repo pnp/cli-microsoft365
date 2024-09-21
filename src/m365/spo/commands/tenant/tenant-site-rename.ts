@@ -1,8 +1,9 @@
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
-import request from '../../../../request.js';
+import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { FormDigestInfo, spo } from '../../../../utils/spo.js';
+import { timersUtil } from '../../../../utils/timersUtil.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 
@@ -24,13 +25,13 @@ interface SiteRenameJob {
   JobState: string;
 }
 
-class SpoSiteRenameCommand extends SpoCommand {
+class SpoTenantSiteRenameCommand extends SpoCommand {
   private context?: FormDigestInfo;
   private operationData?: SiteRenameJob;
   private static readonly checkIntervalInMs: number = 5000;
 
   public get name(): string {
-    return commands.SITE_RENAME;
+    return commands.TENANT_SITE_RENAME;
   }
 
   public get description(): string {
@@ -48,10 +49,10 @@ class SpoSiteRenameCommand extends SpoCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        newTitle: args.options.newTitle ? true : false,
-        suppressMarketplaceAppCheck: args.options.suppressMarketplaceAppCheck,
-        suppressWorkflow2013Check: args.options.suppressWorkflow2013Check,
-        wait: args.options.wait
+        newTitle: typeof args.options.newTitle !== 'undefined',
+        suppressMarketplaceAppCheck: !!args.options.suppressMarketplaceAppCheck,
+        suppressWorkflow2013Check: !!args.options.suppressWorkflow2013Check,
+        wait: !!args.options.wait
       });
     });
   }
@@ -111,27 +112,25 @@ class SpoSiteRenameCommand extends SpoCommand {
         optionsBitmask = optionsBitmask | 16;
       }
 
-      const requestOptions = {
-        "SourceSiteUrl": options.url,
-        "TargetSiteUrl": options.newUrl,
-        "TargetSiteTitle": options.newTitle || null,
-        "Option": optionsBitmask,
-        "Reserve": null,
-        "SkipGestures": null,
-        "OperationId": "00000000-0000-0000-0000-000000000000"
-      };
-
-      const postData: any = {
+      const requestOptions: CliRequestOptions = {
         url: `${spoAdminUrl}/_api/SiteRenameJobs?api-version=1.4.7`,
         headers: {
           'X-RequestDigest': this.context.FormDigestValue,
           'Content-Type': 'application/json'
         },
         responseType: 'json',
-        data: requestOptions
+        data: {
+          SourceSiteUrl: options.url,
+          TargetSiteUrl: options.newUrl,
+          TargetSiteTitle: options.newTitle || null,
+          Option: optionsBitmask,
+          Reserve: null,
+          SkipGestures: null,
+          OperationId: '00000000-0000-0000-0000-000000000000'
+        }
       };
 
-      const res = await request.post<SiteRenameJob>(postData);
+      const res = await request.post<SiteRenameJob>(requestOptions);
 
       if (options.verbose) {
         await logger.logToStderr(res);
@@ -160,10 +159,10 @@ class SpoSiteRenameCommand extends SpoCommand {
     }
   }
 
-  protected async waitForRenameCompletion(command: SpoSiteRenameCommand, isVerbose: boolean, spoAdminUrl: string, siteUrl: string, iteration: number): Promise<void> {
+  protected async waitForRenameCompletion(command: SpoTenantSiteRenameCommand, isVerbose: boolean, spoAdminUrl: string, siteUrl: string, iteration: number): Promise<void> {
     iteration++;
 
-    const requestOptions: any = {
+    const requestOptions: CliRequestOptions = {
       url: `${spoAdminUrl}/_api/SiteRenameJobs/GetJobsBySiteUrl(url='${formatting.encodeQueryParameter(siteUrl)}')?api-version=1.4.7`,
       headers: {
         'X-AttemptNumber': iteration.toString()
@@ -182,13 +181,9 @@ class SpoSiteRenameCommand extends SpoCommand {
       return;
     }
 
-    await this.sleep(SpoSiteRenameCommand.checkIntervalInMs);
+    await timersUtil.setTimeout(SpoTenantSiteRenameCommand.checkIntervalInMs);
     await command.waitForRenameCompletion(command, isVerbose, spoAdminUrl, siteUrl, iteration);
-  }
-
-  protected sleep(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
   }
 }
 
-export default new SpoSiteRenameCommand();
+export default new SpoTenantSiteRenameCommand();
