@@ -171,12 +171,12 @@ class SpoSiteAdminRemoveCommand extends SpoCommand {
       headers: {
         accept: 'application/json;odata=nometadata',
         'content-type': 'application/json;charset=utf-8'
-      }
+      },
+      responseType: 'json'
     };
 
-    const response: string = await request.post<string>(requestOptions);
-    const responseContent: AdminResult = JSON.parse(response);
-    return responseContent.value;
+    const response = await request.post<AdminResult>(requestOptions);
+    return response.value;
   }
 
   private async getCorrectLoginName(options: Options): Promise<string> {
@@ -216,7 +216,8 @@ class SpoSiteAdminRemoveCommand extends SpoCommand {
           secondaryAdministratorLoginNames:
             admins.map(u => u.loginName)
         }
-      }
+      },
+      responseType: 'json'
     };
 
     await request.post<string>(requestOptions);

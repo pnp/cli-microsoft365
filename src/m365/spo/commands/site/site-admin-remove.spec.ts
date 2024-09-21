@@ -144,7 +144,7 @@ describe(commands.SITE_ADMIN_REMOVE, () => {
       }
 
       if (opts.url === `${adminUrl}/_api/SPO.Tenant/sites('${siteId}')?$select=OwnerLoginName`) {
-        return JSON.stringify({ OwnerLoginName: primaryAdminLoginName });
+        return { OwnerLoginName: primaryAdminLoginName };
       }
 
       if (opts.url === `https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com:/sites/site?$select=id`) {
@@ -156,9 +156,9 @@ describe(commands.SITE_ADMIN_REMOVE, () => {
 
     const postStub = sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === `${adminUrl}/_api/SPO.Tenant/GetSiteAdministrators?siteId='${siteId}'`) {
-        return JSON.stringify({
+        return {
           value: listOfAdminsFromAdminSource
-        });
+        };
       }
 
       if (opts.url === `${adminUrl}/_api/SPOInternalUseOnly.Tenant/SetSiteSecondaryAdministrators`) {
@@ -195,7 +195,7 @@ describe(commands.SITE_ADMIN_REMOVE, () => {
       }
 
       if (opts.url === `${adminUrl}/_api/SPO.Tenant/sites('${siteId}')?$select=OwnerLoginName`) {
-        return JSON.stringify({ OwnerLoginName: primaryAdminLoginName });
+        return { OwnerLoginName: primaryAdminLoginName };
       }
 
 
@@ -208,7 +208,7 @@ describe(commands.SITE_ADMIN_REMOVE, () => {
 
     const postStub = sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === `${adminUrl}/_api/SPO.Tenant/GetSiteAdministrators?siteId='${siteId}'`) {
-        return JSON.stringify({
+        return {
           value: [
             ...listOfAdminsFromAdminSource,
             {
@@ -218,7 +218,7 @@ describe(commands.SITE_ADMIN_REMOVE, () => {
               userPrincipalName: ''
             }
           ]
-        });
+        };
       }
 
       if (opts.url === `${adminUrl}/_api/SPOInternalUseOnly.Tenant/SetSiteSecondaryAdministrators`) {
@@ -255,7 +255,7 @@ describe(commands.SITE_ADMIN_REMOVE, () => {
       }
 
       if (opts.url === `${adminUrl}/_api/SPO.Tenant/sites('${siteId}')?$select=OwnerLoginName`) {
-        return JSON.stringify({ OwnerLoginName: primaryAdminLoginName });
+        return { OwnerLoginName: primaryAdminLoginName };
       }
 
       if (opts.url === `https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com:/sites/site?$select=id`) {
@@ -267,9 +267,9 @@ describe(commands.SITE_ADMIN_REMOVE, () => {
 
     const postStub = sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === `${adminUrl}/_api/SPO.Tenant/GetSiteAdministrators?siteId='${siteId}'`) {
-        return JSON.stringify({
+        return {
           value: listOfAdminsFromAdminSource
-        });
+        };
       }
 
       if (opts.url === `${adminUrl}/_api/SPOInternalUseOnly.Tenant/SetSiteSecondaryAdministrators`) {
@@ -297,7 +297,7 @@ describe(commands.SITE_ADMIN_REMOVE, () => {
       }
 
       if (opts.url === `${adminUrl}/_api/SPO.Tenant/sites('${siteId}')?$select=OwnerLoginName`) {
-        return JSON.stringify({ OwnerLoginName: primaryAdminLoginName });
+        return { OwnerLoginName: primaryAdminLoginName };
       }
 
       if (opts.url === `https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com:/sites/site?$select=id`) {
@@ -309,9 +309,9 @@ describe(commands.SITE_ADMIN_REMOVE, () => {
 
     sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === `${adminUrl}/_api/SPO.Tenant/GetSiteAdministrators?siteId='${siteId}'`) {
-        return JSON.stringify({
+        return {
           value: listOfAdminsFromAdminSource
-        });
+        };
       }
 
       if (opts.url === `${adminUrl}/_api/SPOInternalUseOnly.Tenant/SetSiteSecondaryAdministrators` && opts.data.secondaryAdministratorsFieldsData) {
@@ -331,7 +331,7 @@ describe(commands.SITE_ADMIN_REMOVE, () => {
       }
 
       if (opts.url === `${adminUrl}/_api/SPO.Tenant/sites('${siteId}')?$select=OwnerLoginName`) {
-        return JSON.stringify({ OwnerLoginName: primaryAdminLoginName });
+        return { OwnerLoginName: primaryAdminLoginName };
       }
 
       if (opts.url === `https://graph.microsoft.com/v1.0/users('user1loginName%40email.com')`) {
@@ -347,9 +347,9 @@ describe(commands.SITE_ADMIN_REMOVE, () => {
 
     const postStub = sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === `${adminUrl}/_api/SPO.Tenant/GetSiteAdministrators?siteId='${siteId}'`) {
-        return JSON.stringify({
+        return {
           value: listOfAdminsFromAdminSource
-        });
+        };
       }
 
       if (opts.url === `${adminUrl}/_api/SPOInternalUseOnly.Tenant/SetSiteSecondaryAdministrators`) {
@@ -377,7 +377,7 @@ describe(commands.SITE_ADMIN_REMOVE, () => {
       }
 
       if (opts.url === `${adminUrl}/_api/SPO.Tenant/sites('${siteId}')?$select=OwnerLoginName`) {
-        return JSON.stringify({ OwnerLoginName: primaryAdminLoginName });
+        return { OwnerLoginName: primaryAdminLoginName };
       }
 
       if (opts.url === `https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com:/sites/site?$select=id`) {
@@ -397,7 +397,7 @@ describe(commands.SITE_ADMIN_REMOVE, () => {
       }
 
       if (opts.url === `${adminUrl}/_api/SPO.Tenant/sites('${siteId}')?$select=OwnerLoginName`) {
-        return JSON.stringify({ OwnerLoginName: primaryAdminLoginName });
+        return { OwnerLoginName: primaryAdminLoginName };
       }
 
       if (opts.url === `https://graph.microsoft.com/v1.0/users('userPrimaryAdminEmail%40email.com')`) {
@@ -422,7 +422,7 @@ describe(commands.SITE_ADMIN_REMOVE, () => {
       }
 
       if (opts.url === `${adminUrl}/_api/SPO.Tenant/sites('${siteId}')?$select=OwnerLoginName`) {
-        return JSON.stringify({ OwnerLoginName: primaryAdminLoginName });
+        return { OwnerLoginName: primaryAdminLoginName };
       }
 
       if (opts.url === `https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com:/sites/site?$select=id`) {
@@ -434,7 +434,7 @@ describe(commands.SITE_ADMIN_REMOVE, () => {
 
     const postStub = sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === `${adminUrl}/_api/SPO.Tenant/GetSiteAdministrators?siteId='${siteId}'`) {
-        return JSON.stringify({
+        return {
           value: [
             ...listOfAdminsFromAdminSource,
             {
@@ -444,7 +444,7 @@ describe(commands.SITE_ADMIN_REMOVE, () => {
               userPrincipalName: ''
             }
           ]
-        });
+        };
       }
 
       if (opts.url === `${adminUrl}/_api/SPOInternalUseOnly.Tenant/SetSiteSecondaryAdministrators`) {
@@ -473,7 +473,7 @@ describe(commands.SITE_ADMIN_REMOVE, () => {
       }
 
       if (opts.url === `${adminUrl}/_api/SPO.Tenant/sites('${siteId}')?$select=OwnerLoginName`) {
-        return JSON.stringify({ OwnerLoginName: primaryAdminLoginName });
+        return { OwnerLoginName: primaryAdminLoginName };
       }
 
       if (opts.url === `https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com:/sites/site?$select=id`) {
@@ -485,7 +485,7 @@ describe(commands.SITE_ADMIN_REMOVE, () => {
 
     const postStub = sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === `${adminUrl}/_api/SPO.Tenant/GetSiteAdministrators?siteId='${siteId}'`) {
-        return JSON.stringify({
+        return {
           value: [
             ...listOfAdminsFromAdminSource,
             {
@@ -495,7 +495,7 @@ describe(commands.SITE_ADMIN_REMOVE, () => {
               userPrincipalName: ''
             }
           ]
-        });
+        };
       }
 
       if (opts.url === `${adminUrl}/_api/SPOInternalUseOnly.Tenant/SetSiteSecondaryAdministrators`) {
@@ -524,7 +524,7 @@ describe(commands.SITE_ADMIN_REMOVE, () => {
       }
 
       if (opts.url === `${adminUrl}/_api/SPO.Tenant/sites('${siteId}')?$select=OwnerLoginName`) {
-        return JSON.stringify({ OwnerLoginName: primaryAdminLoginName });
+        return { OwnerLoginName: primaryAdminLoginName };
       }
 
       if (opts.url === `https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com:/sites/site?$select=id`) {
@@ -536,7 +536,7 @@ describe(commands.SITE_ADMIN_REMOVE, () => {
 
     const postStub = sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === `${adminUrl}/_api/SPO.Tenant/GetSiteAdministrators?siteId='${siteId}'`) {
-        return JSON.stringify({
+        return {
           value: [
             ...listOfAdminsFromAdminSource,
             {
@@ -546,7 +546,7 @@ describe(commands.SITE_ADMIN_REMOVE, () => {
               userPrincipalName: ''
             }
           ]
-        });
+        };
       }
 
       if (opts.url === `${adminUrl}/_api/SPOInternalUseOnly.Tenant/SetSiteSecondaryAdministrators`) {
@@ -712,9 +712,9 @@ describe(commands.SITE_ADMIN_REMOVE, () => {
       }
 
       if (opts.url === `${adminUrl}/_api/SPO.Tenant/GetSiteAdministrators?siteId='${incorrectSiteId}'`) {
-        return JSON.stringify({
+        return {
           value: listOfAdminsFromAdminSource
-        });
+        };
       }
 
       if (opts.url === `https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com:/sites/site?$select=id`) {
