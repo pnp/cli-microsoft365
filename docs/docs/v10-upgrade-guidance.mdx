@@ -122,6 +122,14 @@ The deprecated option `userName` was removed from the command [entra m365group u
 
 In your scripts, replace every occurrence of the deprecated option `userName` with `userNames`.
 
+### Enhanced `entra m365group set` command
+
+We've enhanced the [entra m365group set](./cmd/entra/m365group/m365group-set.mdx) command so that a group that we wish to update can also be retrieved by it's displayName. Before, this was only able by the group ID. We have replaced the original `displayName` option by `newDisplayName`.
+
+#### What action do I need to take?
+
+Make sure that if you are currently updating groups using the `displayName` option, you update your scripts to use the `newDisplayName` option instead.
+
 ## SharePoint
 
 ### Updated `spo site appcatalog remove` options
