@@ -96,6 +96,14 @@ For this new major version, we've aligned the options of the `entra enterpriseap
 
 Please, check the documentation of the [entra enterpriseapp add](./cmd/entra/enterpriseapp/enterpriseapp-add), [entra enterpriseapp get](./cmd/entra/enterpriseapp/enterpriseapp-get), and [entra enterpriseapp list](./cmd/entra/enterpriseapp/enterpriseapp-list) commands to see the updated options and adjust your scripts accordingly.
 
+### Enhanced `entra m365group set` command
+
+We've enhanced the [entra m365group set](./cmd/entra/m365group/m365group-set.mdx) command so that a group that we wish to update can also be retrieved by it's displayName. Before, this was only able by the group ID. We have replaced the original `displayName` option by `newDisplayName`.
+
+#### What action do I need to take?
+
+Make sure that if you are currently updating groups using the `displayName` option, you update your scripts to use the `newDisplayName` option instead.
+
 ## SharePoint
 
 ### Updated `spo site appcatalog remove` options

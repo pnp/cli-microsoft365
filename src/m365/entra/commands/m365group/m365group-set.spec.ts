@@ -125,21 +125,19 @@ describe(commands.M365GROUP_SET, () => {
     assert.deepStrictEqual(alias, [aadCommands.M365GROUP_SET]);
   });
 
-  it('updates Microsoft 365 Group display name', async () => {
-    sinon.stub(request, 'patch').callsFake(async (opts) => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/groups/28beab62-7540-4db1-a23f-29a6018a3848') {
-        if (JSON.stringify(opts.data) === JSON.stringify(<Group>{
-          displayName: 'My group'
-        })) {
-          return;
-        }
+  it('updates Microsoft 365 Group display name while group is being retrieved by display name', async () => {
+    const groupName = 'Project A';
+    sinon.stub(entraGroup, 'getGroupIdByDisplayName').withArgs(groupName).resolves(groupId);
+    const patchStub = sinon.stub(request, 'patch').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${groupId}`) {
+        return;
       }
 
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', displayName: 'My group' } });
-    assert(loggerLogSpy.notCalled);
+    await command.action(logger, { options: { displayName: groupName, newDisplayName: 'My group', verbose: true } });
+    assert(patchStub.calledOnce);
   });
 
   it('updates Microsoft 365 Group description (debug)', async () => {
@@ -497,7 +495,7 @@ describe(commands.M365GROUP_SET, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', displayName: 'My group' } } as any),
+    await assert.rejects(command.action(logger, { options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', newDisplayName: 'My group' } } as any),
       new CommandError('An error has occurred'));
   });
 
@@ -505,7 +503,7 @@ describe(commands.M365GROUP_SET, () => {
     sinonUtil.restore(entraGroup.isUnifiedGroup);
     sinon.stub(entraGroup, 'isUnifiedGroup').resolves(false);
 
-    await assert.rejects(command.action(logger, { options: { id: groupId, displayName: 'Updated title' } }),
+    await assert.rejects(command.action(logger, { options: { id: groupId, newDisplayName: 'Updated title' } }),
       new CommandError(`Specified group with id '${groupId}' is not a Microsoft 365 group.`));
   });
 
@@ -532,7 +530,7 @@ describe(commands.M365GROUP_SET, () => {
   });
 
   it('passes validation when the id is a valid GUID and displayName specified', async () => {
-    const actual = await command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', displayName: 'My group' } }, commandInfo);
+    const actual = await command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', newDisplayName: 'My group' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
@@ -622,7 +620,7 @@ describe(commands.M365GROUP_SET, () => {
     sinon.stub(stats, 'isDirectory').returns(false);
     sinon.stub(fs, 'existsSync').returns(true);
     sinon.stub(fs, 'lstatSync').returns(stats);
-    const actual = await command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', displayName: 'Title', description: 'Description', logoPath: 'logo.png', owners: 'john@contoso.com', members: 'doe@contoso.com', isPrivate: false, allowExternalSenders: false, autoSubscribeNewMembers: false, hideFromAddressLists: false, hideFromOutlookClients: false } }, commandInfo);
+    const actual = await command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', newDisplayName: 'Title', description: 'Description', logoPath: 'logo.png', owners: 'john@contoso.com', members: 'doe@contoso.com', isPrivate: false, allowExternalSenders: false, autoSubscribeNewMembers: false, hideFromAddressLists: false, hideFromOutlookClients: false } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 });

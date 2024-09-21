@@ -18,8 +18,9 @@ interface CommandArgs {
 }
 
 export interface Options extends GlobalOptions {
-  id: string;
+  id?: string;
   displayName?: string;
+  newDisplayName?: string;
   description?: string;
   owners?: string;
   members?: string;
@@ -52,14 +53,17 @@ class EntraM365GroupSetCommand extends GraphCommand {
 
     this.#initTelemetry();
     this.#initOptions();
-    this.#initTypes();
     this.#initValidators();
+    this.#initOptionSets();
+    this.#initTypes();
   }
 
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
+        id: typeof args.options.id !== 'undefined',
         displayName: typeof args.options.displayName !== 'undefined',
+        newDisplayName: typeof args.options.newDisplayName !== 'undefined',
         description: typeof args.options.description !== 'undefined',
         owners: typeof args.options.owners !== 'undefined',
         members: typeof args.options.members !== 'undefined',
@@ -76,10 +80,13 @@ class EntraM365GroupSetCommand extends GraphCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '-i, --id <id>'
+        option: '-i, --id [id]'
       },
       {
         option: '-n, --displayName [displayName]'
+      },
+      {
+        option: '--newDisplayName [newDisplayName]'
       },
       {
         option: '-d, --description [description]'
@@ -116,15 +123,19 @@ class EntraM365GroupSetCommand extends GraphCommand {
     );
   }
 
+  #initOptionSets(): void {
+    this.optionSets.push({ options: ['id', 'displayName'] });
+  }
+
   #initTypes(): void {
     this.types.boolean.push('isPrivate', 'allowEternalSenders', 'autoSubscribeNewMembers', 'hideFromAddressLists', 'hideFromOutlookClients');
-    this.types.string.push('id', 'displayName', 'description', 'owners', 'members', 'logoPath');
+    this.types.string.push('id', 'displayName', 'newDisplayName', 'description', 'owners', 'members', 'logoPath');
   }
 
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (!args.options.displayName &&
+        if (!args.options.newDisplayName &&
           args.options.description === undefined &&
           !args.options.members &&
           !args.options.owners &&
@@ -137,7 +148,7 @@ class EntraM365GroupSetCommand extends GraphCommand {
           return 'Specify at least one option to update.';
         }
 
-        if (!validation.isValidGuid(args.options.id)) {
+        if (args.options.id && !validation.isValidGuid(args.options.id)) {
           return `${args.options.id} is not a valid GUID`;
         }
 
@@ -180,19 +191,20 @@ class EntraM365GroupSetCommand extends GraphCommand {
         throw `Option 'allowExternalSenders' and 'autoSubscribeNewMembers' can only be used when using delegated permissions.`;
       }
 
-      const isUnifiedGroup = await entraGroup.isUnifiedGroup(args.options.id);
+      const groupId = args.options.id || await entraGroup.getGroupIdByDisplayName(args.options.displayName!);
+      const isUnifiedGroup = await entraGroup.isUnifiedGroup(groupId);
 
       if (!isUnifiedGroup) {
-        throw Error(`Specified group with id '${args.options.id}' is not a Microsoft 365 group.`);
+        throw Error(`Specified group with id '${groupId}' is not a Microsoft 365 group.`);
       }
 
       if (this.verbose) {
-        await logger.logToStderr(`Updating Microsoft 365 Group ${args.options.id}...`);
+        await logger.logToStderr(`Updating Microsoft 365 Group ${args.options.id || args.options.displayName}...`);
       }
 
-      if (args.options.displayName || args.options.description !== undefined || args.options.isPrivate !== undefined) {
+      if (args.options.newDisplayName || args.options.description !== undefined || args.options.isPrivate !== undefined) {
         const update: Group = {
-          displayName: args.options.displayName,
+          displayName: args.options.newDisplayName,
           description: args.options.description !== '' ? args.options.description : null
         };
 
@@ -201,7 +213,7 @@ class EntraM365GroupSetCommand extends GraphCommand {
         }
 
         const requestOptions: CliRequestOptions = {
-          url: `${this.resource}/v1.0/groups/${args.options.id}`,
+          url: `${this.resource}/v1.0/groups/${groupId}`,
           headers: {
             'accept': 'application/json;odata.metadata=none'
           },
@@ -222,7 +234,7 @@ class EntraM365GroupSetCommand extends GraphCommand {
         };
 
         const requestOptions: CliRequestOptions = {
-          url: `${this.resource}/v1.0/groups/${args.options.id}`,
+          url: `${this.resource}/v1.0/groups/${groupId}`,
           headers: {
             accept: 'application/json;odata.metadata=none'
           },
@@ -239,7 +251,7 @@ class EntraM365GroupSetCommand extends GraphCommand {
         }
 
         const requestOptions: CliRequestOptions = {
-          url: `${this.resource}/v1.0/groups/${args.options.id}/photo/$value`,
+          url: `${this.resource}/v1.0/groups/${groupId}/photo/$value`,
           headers: {
             'content-type': this.getImageContentType(fullPath)
           },
@@ -270,7 +282,7 @@ class EntraM365GroupSetCommand extends GraphCommand {
         const res = await request.get<{ value: { id: string; }[] }>(requestOptions);
 
         await Promise.all(res.value.map(u => request.post({
-          url: `${this.resource}/v1.0/groups/${args.options.id}/owners/$ref`,
+          url: `${this.resource}/v1.0/groups/${groupId}/owners/$ref`,
           headers: {
             'content-type': 'application/json'
           },
@@ -302,7 +314,7 @@ class EntraM365GroupSetCommand extends GraphCommand {
         const res = await request.get<{ value: { id: string; }[] }>(requestOptions);
 
         await Promise.all(res.value.map(u => request.post({
-          url: `${this.resource}/v1.0/groups/${args.options.id}/members/$ref`,
+          url: `${this.resource}/v1.0/groups/${groupId}/members/$ref`,
           headers: {
             'content-type': 'application/json'
           },
