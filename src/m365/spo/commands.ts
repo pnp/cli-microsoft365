@@ -324,6 +324,7 @@ export default {
   TENANT_SITE_ARCHIVE: `${prefix} tenant site archive`,
   TENANT_SITE_RENAME: `${prefix} tenant site rename`,
   TENANT_SITE_LIST: `${prefix} tenant site list`,
+  TENANT_SITE_RENAME: `${prefix} tenant site rename`,
   TENANT_SITE_UNARCHIVE: `${prefix} tenant site unarchive`,
   TERM_ADD: `${prefix} term add`,
   TERM_GET: `${prefix} term get`,
