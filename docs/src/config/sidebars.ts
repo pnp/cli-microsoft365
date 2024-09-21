@@ -3404,11 +3404,6 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
-              label: 'site rename',
-              id: 'cmd/spo/site/site-rename'
-            },
-            {
-              type: 'doc',
               label: 'site set',
               id: 'cmd/spo/site/site-set'
             },
@@ -3747,6 +3742,11 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'tenant site archive',
               id: 'cmd/spo/tenant/tenant-site-archive'
+            },
+            {
+              type: 'doc',
+              label: 'tenant site rename',
+              id: 'cmd/spo/tenant/tenant-site-rename'
             },
             {
               type: 'doc',
