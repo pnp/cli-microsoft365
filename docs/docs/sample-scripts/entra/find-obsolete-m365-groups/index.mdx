@@ -102,7 +102,7 @@ Use this script to create a report of all M365 groups that are possibly obsolete
     $tStamp = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss")
     if ($TestPath -ne $true) {
       New-Item -ItemType directory -Path $Script:Path | Out-Null
-      Write-Host "Will create file in $($Script:Path): M365GroupsReport-{current date}.csv" -ForegroundColor Yellow
+      Write-Host "Will create file in $($Script:Path): M365GroupsReport-$tStamp.csv" -ForegroundColor Yellow
     }
     else {
       Write-Host "Following report file will be created in $($Script:Path): 'M365GroupsReport-$($tStamp).csv'."
