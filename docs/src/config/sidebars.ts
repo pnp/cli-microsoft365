@@ -3409,7 +3409,7 @@ const sidebars: SidebarsConfig = {
             {
               type: 'doc',
               label: 'site list',
-              id: 'cmd/spo/site/site-list'
+              id: 'cmd/spo/tenant/tenant-site-list'
             },
             {
               type: 'doc',
@@ -3756,6 +3756,11 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'tenant site archive',
               id: 'cmd/spo/tenant/tenant-site-archive'
+            },
+            {
+              type: 'doc',
+              label: 'tenant site list',
+              id: 'cmd/spo/tenant/tenant-site-list'
             },
             {
               type: 'doc',
