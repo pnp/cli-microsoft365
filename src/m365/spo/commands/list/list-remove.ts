@@ -15,6 +15,7 @@ interface Options extends GlobalOptions {
   webUrl: string;
   id?: string;
   title?: string;
+  recycle?: boolean;
   force?: boolean;
 }
 
@@ -41,7 +42,8 @@ class SpoListRemoveCommand extends SpoCommand {
       Object.assign(this.telemetryProperties, {
         id: (!(!args.options.id)).toString(),
         title: (!(!args.options.title)).toString(),
-        force: (!(!args.options.force)).toString()
+        force: (!(!args.options.force)).toString(),
+        recycle: (!(!args.options.recycle)).toString()
       });
     });
   }
@@ -56,6 +58,9 @@ class SpoListRemoveCommand extends SpoCommand {
       },
       {
         option: '-t, --title [title]'
+      },
+      {
+        option: '--recycle'
       },
       {
         option: '-f, --force'
@@ -98,6 +103,10 @@ class SpoListRemoveCommand extends SpoCommand {
       }
       else {
         requestUrl = `${args.options.webUrl}/_api/web/lists/GetByTitle('${formatting.encodeQueryParameter(args.options.title as string)}')`;
+      }
+
+      if (args.options.recycle) {
+        requestUrl += `/recycle()`;
       }
 
       const requestOptions: CliRequestOptions = {
