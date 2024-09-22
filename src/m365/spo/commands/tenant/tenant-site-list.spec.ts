@@ -13,9 +13,9 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { spo } from '../../../../utils/spo.js';
 import commands from '../../commands.js';
-import command from './site-list.js';
+import command from './tenant-site-list.js';
 
-describe(commands.SITE_LIST, () => {
+describe(commands.TENANT_SITE_LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -61,7 +61,7 @@ describe(commands.SITE_LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name, commands.SITE_LIST);
+    assert.strictEqual(command.name, commands.TENANT_SITE_LIST);
   });
 
   it('has a description', () => {
@@ -598,5 +598,10 @@ describe(commands.SITE_LIST, () => {
     sinon.stub(request, 'post').rejects(new Error('An error has occurred'));
 
     await assert.rejects(command.action(logger, { options: { debug: true, filter: "Url like 'ctest'" } } as any), new CommandError('An error has occurred'));
+  });
+
+  it('defines alias', () => {
+    const alias = command.alias();
+    assert.notStrictEqual(typeof alias, 'undefined');
   });
 });

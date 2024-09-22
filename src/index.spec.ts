@@ -83,6 +83,7 @@ describe('Lazy loading commands', () => {
       'search externalconnection remove',
       'search externalconnection schema add',
       'spo folder rename',
+      'spo site list',
       'spo page template remove',
       'spo sp grant add',
       'spo sp grant list',
