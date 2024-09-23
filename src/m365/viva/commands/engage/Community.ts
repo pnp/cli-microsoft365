@@ -3,4 +3,5 @@ export interface Community {
   displayName: string;
   description?: string;
   privacy: string;
+  groupId: string;
 }
