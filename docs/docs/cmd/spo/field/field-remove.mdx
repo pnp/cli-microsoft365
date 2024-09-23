@@ -26,13 +26,16 @@ m365 spo field remove [options]
 : Server- or web-relative URL of the list where the field is located. Specify either `listTitle`, `listId` or `listUrl`.
 
 `-i, --id [id]`
-: The ID of the field to remove. Specify either `id`, `title`, or `group`.
+: The ID of the field to remove. Specify either `id`, `title`, `internalName`, or `group`.
 
 `-t, --title [title]`
-: The display name (case-sensitive) of the field to remove. Specify either `id`, `title`, or `group`.
+: The display name (case-sensitive) of the field to remove. Specify either `id`, `title`, `internalName`, or `group`.
+
+`--internalName [internalName]`
+: The internal name (case-sensitive) of the field to remove. Specify either `id`, `title`, `internalName`, or `group`.
 
 `-g, --group [group]`
-: Delete all fields from this group (case-sensitive). Specify either `id`, `title`, or `group`.
+: Delete all fields from this group (case-sensitive). Specify either `id`, `title`, `internalName`, or `group`.
 
 `-f, --force`
 : Don't prompt for confirming removing the field.
@@ -58,6 +61,12 @@ Remove the list column with the specified display name, located in the specified
 
 ```sh
 m365 spo field remove --webUrl https://contoso.sharepoint.com/sites/contoso-sales --listUrl "Lists/Events" --title "Title"
+```
+
+Remove the list column with the specified display name, located in the specified site. Retrieves the list by its url.
+
+```sh
+m365 spo field remove --webUrl https://contoso.sharepoint.com/sites/contoso-sales --listUrl "Lists/Events" --internalName "Title"
 ```
 
 Remove all site columns from the specified group.
