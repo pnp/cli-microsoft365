@@ -20,28 +20,34 @@ m365 aad m365group set [options]
 
 ```md definition-list
 `-i, --id [id]`
-: The ID of the Microsoft 365 Group to update
+: The ID of the Microsoft 365 Group to update.
 
 `-n, --displayName [displayName]`
-: Display name of the Microsoft 365 Group to update
+: Display name of the Microsoft 365 Group to update.
 
 `--newDisplayName [newDisplayName]`
-: New display name for the Microsoft 365 Group
+: New display name for the Microsoft 365 Group.
 
 `-d, --description [description]`
-: Description for the Microsoft 365 Group
+: Description for the Microsoft 365 Group.
 
-`--owners [owners]`
-: Comma-separated list of Microsoft 365 Group owners to add
+`--ownerIds [ownerIds]`
+: Comma-separated list of IDs of Microsoft Entra ID users that will be group owners. Specify either `ownerIds` or `ownerUserNames`, but not both.
 
-`--members [members]`
-: Comma-separated list of Microsoft 365 Group members to add
+`--ownerUserNames [ownerUserNames]`
+: Comma-separated list of UPNs of Microsoft Entra ID users that will be group owners. Specify either `ownerIds` or `ownerUserNames`, but not both.
+
+`--memberIds [memberIds]`
+: Comma-separated list of IDs of Microsoft Entra ID users that will be group members. Specify either `memberIds` or `memberUserNames`, but not both.
+
+`--memberUserNames [memberUserNames]`
+: Comma-separated list of UPNs of Microsoft Entra ID users that will be group members. Specify either `memberIds` or `memberUserNames`, but not both.
 
 `--isPrivate [isPrivate]`
 : Set to `true` if the Microsoft 365 Group should be private and `false` if it should be public.  
 
 `-l, --logoPath [logoPath]`
-: Local path to the image file to use as group logo
+: Local path to the image file to use as group logo.
 
 `--allowExternalSenders [allowExternalSenders]`
 : Indicates if people external to the organization can send messages to the group. Valid values: `true`, `false`.
@@ -60,7 +66,7 @@ m365 aad m365group set [options]
 
 ## Remarks
 
-When updating group's owners and members, the command will add newly specified users to the previously set owners and members. The previously set users will not be replaced.
+When updating group's owners and members, the command will remove existing owners/members from the group, and the specified users will be added.
 
 When specifying the path to the logo image you can use both relative and absolute paths. Note, that ~ in the path, will not be resolved and will most likely result in an error.
 
@@ -84,16 +90,28 @@ Change Microsoft 365 Group visibility to public.
 m365 entra m365group set --id 28beab62-7540-4db1-a23f-29a6018a3848 --isPrivate `false`
 ```
 
-Add new Microsoft 365 Group owners of group.
+Updates the list of Microsoft 365 Group owners with a list of users by UPN.
 
 ```sh
-m365 entra m365group set --displayName 'Project Team' --owners "DebraB@contoso.onmicrosoft.com,DiegoS@contoso.onmicrosoft.com"
+m365 entra m365group set --id 28beab62-7540-4db1-a23f-29a6018a3848 --ownerUserNames "DebraB@contoso.onmicrosoft.com,DiegoS@contoso.onmicrosoft.com"
 ```
 
-Add new Microsoft 365 Group members.
+Updates the list of Microsoft 365 Group owners with a list of users by ID.
 
 ```sh
-m365 entra m365group set --displayName 'Project Team' --members "DebraB@contoso.onmicrosoft.com,DiegoS@contoso.onmicrosoft.com"
+m365 entra m365group set --id 28beab62-7540-4db1-a23f-29a6018a3848 --ownerIds "3527dada-9368-4cdd-a958-5460f5658e0e,e94b2cb8-7c9a-4651-b1af-207d81a010b6"
+```
+
+Updates the list of Microsoft 365 Group members with a list of users by UPN.
+
+```sh
+m365 entra m365group set --id 28beab62-7540-4db1-a23f-29a6018a3848 --memberUserNames "DebraB@contoso.onmicrosoft.com,DiegoS@contoso.onmicrosoft.com"
+```
+
+Updates the list of Microsoft 365 Group members with a list of users by ID.
+
+```sh
+m365 entra m365group set --id 28beab62-7540-4db1-a23f-29a6018a3848 --memberIds "3527dada-9368-4cdd-a958-5460f5658e0e,e94b2cb8-7c9a-4651-b1af-207d81a010b6"
 ```
 
 Update Microsoft 365 Group logo.
