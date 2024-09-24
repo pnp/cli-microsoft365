@@ -12,6 +12,10 @@ import { entraGroup } from '../../../../utils/entraGroup.js';
 import aadCommands from '../../aadCommands.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 import auth from '../../../../Auth.js';
+import { entraUser } from '../../../../utils/entraUser.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { odata } from '../../../../utils/odata.js';
+import { User } from '@microsoft/microsoft-graph-types';
 
 interface CommandArgs {
   options: Options;
@@ -22,8 +26,10 @@ export interface Options extends GlobalOptions {
   displayName?: string;
   newDisplayName?: string;
   description?: string;
-  owners?: string;
-  members?: string;
+  ownerIds?: string;
+  ownerUserNames?: string;
+  memberIds?: string;
+  memberUserNames?: string;
   isPrivate?: boolean;
   logoPath?: string;
   allowExternalSenders?: boolean;
@@ -65,8 +71,10 @@ class EntraM365GroupSetCommand extends GraphCommand {
         displayName: typeof args.options.displayName !== 'undefined',
         newDisplayName: typeof args.options.newDisplayName !== 'undefined',
         description: typeof args.options.description !== 'undefined',
-        owners: typeof args.options.owners !== 'undefined',
-        members: typeof args.options.members !== 'undefined',
+        ownerIds: typeof args.options.ownerIds !== 'undefined',
+        ownerUserNames: typeof args.options.ownerUserNames !== 'undefined',
+        memberIds: typeof args.options.memberIds !== 'undefined',
+        memberUserNames: typeof args.options.memberUserNames !== 'undefined',
         isPrivate: !!args.options.isPrivate,
         logoPath: typeof args.options.logoPath !== 'undefined',
         allowExternalSenders: !!args.options.allowExternalSenders,
@@ -92,10 +100,16 @@ class EntraM365GroupSetCommand extends GraphCommand {
         option: '-d, --description [description]'
       },
       {
-        option: '--owners [owners]'
+        option: '--ownerIds [ownerIds]'
       },
       {
-        option: '--members [members]'
+        option: '--ownerUserNames [ownerUserNames]'
+      },
+      {
+        option: '--memberIds [memberIds]'
+      },
+      {
+        option: '--memberUserNames [memberUserNames]'
       },
       {
         option: '--isPrivate [isPrivate]',
@@ -129,7 +143,7 @@ class EntraM365GroupSetCommand extends GraphCommand {
 
   #initTypes(): void {
     this.types.boolean.push('isPrivate', 'allowEternalSenders', 'autoSubscribeNewMembers', 'hideFromAddressLists', 'hideFromOutlookClients');
-    this.types.string.push('id', 'displayName', 'newDisplayName', 'description', 'owners', 'members', 'logoPath');
+    this.types.string.push('id', 'displayName', 'newDisplayName', 'description', 'ownerIds', 'ownerUserNames', 'memberIds', 'memberUserNames', 'logoPath');
   }
 
   #initValidators(): void {
@@ -137,8 +151,10 @@ class EntraM365GroupSetCommand extends GraphCommand {
       async (args: CommandArgs) => {
         if (!args.options.newDisplayName &&
           args.options.description === undefined &&
-          !args.options.members &&
-          !args.options.owners &&
+          !args.options.ownerIds &&
+          !args.options.ownerUserNames &&
+          !args.options.memberIds &&
+          !args.options.memberUserNames &&
           args.options.isPrivate === undefined &&
           !args.options.logoPath &&
           args.options.allowExternalSenders === undefined &&
@@ -152,17 +168,31 @@ class EntraM365GroupSetCommand extends GraphCommand {
           return `${args.options.id} is not a valid GUID`;
         }
 
-        if (args.options.owners) {
-          const isValidArray = validation.isValidUserPrincipalNameArray(args.options.owners);
-          if (isValidArray !== true) {
-            return `Option 'owners' contains one or more invalid UPNs: ${isValidArray}.`;
+        if (args.options.ownerIds) {
+          const isValidGUIDArrayResult = validation.isValidGuidArray(args.options.ownerIds);
+          if (isValidGUIDArrayResult !== true) {
+            return `The following GUIDs are invalid for the option 'ownerIds': ${isValidGUIDArrayResult}.`;
           }
         }
 
-        if (args.options.members) {
-          const isValidArray = validation.isValidUserPrincipalNameArray(args.options.members);
-          if (isValidArray !== true) {
-            return `Option 'members' contains one or more invalid UPNs: ${isValidArray}.`;
+        if (args.options.ownerUserNames) {
+          const isValidUPNArrayResult = validation.isValidUserPrincipalNameArray(args.options.ownerUserNames);
+          if (isValidUPNArrayResult !== true) {
+            return `The following user principal names are invalid for the option 'ownerUserNames': ${isValidUPNArrayResult}.`;
+          }
+        }
+
+        if (args.options.memberIds) {
+          const isValidGUIDArrayResult = validation.isValidGuidArray(args.options.memberIds);
+          if (isValidGUIDArrayResult !== true) {
+            return `The following GUIDs are invalid for the option 'memberIds': ${isValidGUIDArrayResult}.`;
+          }
+        }
+
+        if (args.options.memberUserNames) {
+          const isValidUPNArrayResult = validation.isValidUserPrincipalNameArray(args.options.memberUserNames);
+          if (isValidUPNArrayResult !== true) {
+            return `The following user principal names are invalid for the option 'memberUserNames': ${isValidUPNArrayResult}.`;
           }
         }
 
@@ -264,65 +294,18 @@ class EntraM365GroupSetCommand extends GraphCommand {
         await logger.logToStderr('logoPath not set. Skipping');
       }
 
-      if (args.options.owners) {
-        const owners: string[] = args.options.owners.split(',').map(o => o.trim());
+      const ownerIds: string[] = await this.getUserIds(logger, args.options.ownerIds, args.options.ownerUserNames);
+      const memberIds: string[] = await this.getUserIds(logger, args.options.memberIds, args.options.memberUserNames);
 
-        if (this.verbose) {
-          await logger.logToStderr('Retrieving user information to set group owners...');
-        }
-
-        const requestOptions: CliRequestOptions = {
-          url: `${this.resource}/v1.0/users?$filter=${owners.map(o => `userPrincipalName eq '${o}'`).join(' or ')}&$select=id`,
-          headers: {
-            'content-type': 'application/json'
-          },
-          responseType: 'json'
-        };
-
-        const res = await request.get<{ value: { id: string; }[] }>(requestOptions);
-
-        await Promise.all(res.value.map(u => request.post({
-          url: `${this.resource}/v1.0/groups/${groupId}/owners/$ref`,
-          headers: {
-            'content-type': 'application/json'
-          },
-          responseType: 'json',
-          data: {
-            "@odata.id": `https://graph.microsoft.com/v1.0/users/${u.id}`
-          }
-        })));
+      if (ownerIds.length !== 0) {
+        await this.updateUsers(logger, groupId, 'owners', ownerIds);
       }
       else if (this.debug) {
         await logger.logToStderr('Owners not set. Skipping');
       }
 
-      if (args.options.members) {
-        const members: string[] = args.options.members.split(',').map(o => o.trim());
-
-        if (this.verbose) {
-          await logger.logToStderr('Retrieving user information to set group members...');
-        }
-
-        const requestOptions: CliRequestOptions = {
-          url: `${this.resource}/v1.0/users?$filter=${members.map(o => `userPrincipalName eq '${o}'`).join(' or ')}&$select=id`,
-          headers: {
-            'content-type': 'application/json'
-          },
-          responseType: 'json'
-        };
-
-        const res = await request.get<{ value: { id: string; }[] }>(requestOptions);
-
-        await Promise.all(res.value.map(u => request.post({
-          url: `${this.resource}/v1.0/groups/${groupId}/members/$ref`,
-          headers: {
-            'content-type': 'application/json'
-          },
-          responseType: 'json',
-          data: {
-            "@odata.id": `https://graph.microsoft.com/v1.0/users/${u.id}`
-          }
-        })));
+      if (memberIds.length !== 0) {
+        await this.updateUsers(logger, groupId, 'members', ownerIds);
       }
       else if (this.debug) {
         await logger.logToStderr('Members not set. Skipping');
@@ -359,6 +342,101 @@ class EntraM365GroupSetCommand extends GraphCommand {
       default:
         return 'image/jpeg';
     }
+  }
+
+  private async getUserIds(logger: Logger, userIds?: string, userNames?: string): Promise<string[]> {
+    if (userIds) {
+      return formatting.splitAndTrim(userIds);
+    }
+
+    if (userNames) {
+      if (this.verbose) {
+        await logger.logToStderr(`Retrieving user IDs...`);
+      }
+      return entraUser.getUserIdsByUpns(formatting.splitAndTrim(userNames));
+    }
+
+    return [];
+  }
+
+  private async updateUsers(logger: Logger, groupId: string, role: 'members' | 'owners', userIds: string[]): Promise<void> {
+    const groupUsers = await odata.getAllItems<User>(`${this.resource}/v1.0/groups/${groupId}/${role}/microsoft.graph.user?$select=id`);
+    const userIdsToAdd = userIds.filter(userId => !groupUsers.some(groupUser => groupUser.id === userId));
+    const userIdsToRemove = groupUsers.filter(groupUser => !userIds.some(userId => groupUser.id === userId)).map(user => user.id);
+
+    if (this.verbose) {
+      await logger.logToStderr(`Adding ${userIdsToAdd.length} ${role}...`);
+    }
+
+    for (let i = 0; i < userIdsToAdd.length; i += 400) {
+      const userIdsBatch = userIdsToAdd.slice(i, i + 400);
+      const batchRequestOptions = this.getBatchRequestOptions();
+
+      // only 20 requests per one batch are allowed
+      for (let j = 0; j < userIdsBatch.length; j += 20) {
+        // only 20 users can be added in one request
+        const userIdsChunk = userIdsBatch.slice(j, j + 20);
+        batchRequestOptions.data.requests.push({
+          id: j + 1,
+          method: 'PATCH',
+          url: `/groups/${groupId}`,
+          headers: {
+            'content-type': 'application/json;odata.metadata=none',
+            accept: 'application/json;odata.metadata=none'
+          },
+          body: {
+            [`${role}@odata.bind`]: userIdsChunk.map(u => `${this.resource}/v1.0/directoryObjects/${u}`)
+          }
+        });
+      }
+
+      const res = await request.post<{ responses: { status: number; body: any }[] }>(batchRequestOptions);
+      for (const response of res.responses) {
+        if (response.status !== 204) {
+          throw response.body;
+        }
+      }
+    }
+
+    if (this.verbose) {
+      await logger.logToStderr(`Removing ${userIdsToRemove.length} ${role}...`);
+    }
+
+    for (let i = 0; i < userIdsToRemove.length; i += 20) {
+      const userIdsBatch = userIdsToRemove.slice(i, i + 20);
+      const batchRequestOptions = this.getBatchRequestOptions();
+
+      userIdsBatch.map(userId => {
+        batchRequestOptions.data.requests.push({
+          id: userId,
+          method: 'DELETE',
+          url: `/groups/${groupId}/${role}/${userId}/$ref`
+        });
+      });
+
+      const res = await request.post<{ responses: { id: string, status: number; body: any }[] }>(batchRequestOptions);
+      for (const response of res.responses) {
+        if (response.status !== 204) {
+          throw response.body;
+        }
+      }
+    }
+  }
+
+  private getBatchRequestOptions(): CliRequestOptions {
+    const requestOptions: CliRequestOptions = {
+      url: `${this.resource}/v1.0/$batch`,
+      headers: {
+        'content-type': 'application/json;odata.metadata=none',
+        accept: 'application/json;odata.metadata=none'
+      },
+      responseType: 'json',
+      data: {
+        requests: []
+      }
+    };
+
+    return requestOptions;
   }
 }
 
