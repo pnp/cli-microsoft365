@@ -234,35 +234,46 @@ Use this script to create a report of all M365 groups that are possibly obsolete
     }  
   }
 
-  function Test-ConversationActivity {
-    [CmdletBinding()]
-    param (
-      [Parameter(Mandatory = $true)] [GroupInfo] $Group
-    )
+function Test-ConversationActivity {
+  [CmdletBinding()]
+  param (
+    [Parameter(Mandatory = $true)] [GroupInfo] $Group
+  )
 
-    $WarningDate = (Get-Date).AddDays(-365)
+  $WarningDate = (Get-Date).AddDays(-365)
       
-    $conversations = m365 entra m365group conversation list --groupId $Group.Reference.id | ConvertFrom-Json | Where-Object {
-      [datetime]$_.lastDeliveredDateTime -lt $WarningDate
-    }
-    if (!$conversations -or $conversations.Length -eq 0) { return }
-
-    Write-Host "  → potentially obsolete ($($conversations.Length) conversation item$($conversations.Length -gt 1 ? 's' : '') created more than 1 year ago)" -ForegroundColor Yellow
-    $reason = "$($conversations.Length) conversation item$($conversations.Length -gt 1 ? 's' : '') created more than 1 year ago"
-
-    $Group.MailboxStatus = @{
-      OutdatedConversations = $conversations | Sort-Object -Property lastDeliveredDateTime
-      Reason                = $reason
-    }
-    $Group.TestStatus = "🟡 Warning"
-    $Group.Reasons += $reason
-
-    try {
-      $Global:ObsoleteGroups.Add($Group.Reference.id, $Group)
-    }
-    catch { }
+  $conversations = m365 entra m365group conversation list --groupId $Group.Reference.id | ConvertFrom-Json | Sort-Object -Property lastDeliveredDateTime -Descending
+  $latestConversation = $conversations | Where-Object {
+    [datetime]$_.lastDeliveredDateTime -gt $WarningDate.Date
+  } | Select-Object -First 1
+  
+  $Group.MailboxStatus = @{
+    NumberOfConversations = $conversations.Length
+    LastConversation      = $conversations ? $conversations[0].lastDeliveredDateTime : "n/a"
+    OutdatedConversations = 0
+    Reason                = ""
   }
 
+  # Return if there are no conversations or the latest conversation is not outdated
+  if (!$conversations -or $latestConversation.Count -eq 1) { return }
+  
+  $outdatedConversations = $conversations | Where-Object {
+    [datetime]$_.lastDeliveredDateTime -lt $WarningDate
+  }
+
+  Write-Host "  → potentially obsolete ($($outdatedConversations.Length) conversation item$($outdatedConversations.Length -gt 1 ? 's' : '') created more than 1 year ago)" -ForegroundColor Yellow
+  $reason = "$($outdatedConversations.Length) conversation item$($outdatedConversations.Length -gt 1 ? 's' : '') created more than 1 year ago"
+
+  $Group.MailboxStatus.OutdatedConversations = $outdatedConversations | Sort-Object -Property lastDeliveredDateTime
+  $Group.MailboxStatus.Reason = $reason
+  $Group.TestStatus = "🟡 Warning"
+  $Group.Reasons += $reason
+
+  try {
+    $Global:ObsoleteGroups.Add($Group.Reference.id, $Group)
+  }
+  catch { Write-Information "Group was already added to the list of potentially obsolete groups" }
+}
   function New-Report {
     [CmdletBinding()]
     param (
