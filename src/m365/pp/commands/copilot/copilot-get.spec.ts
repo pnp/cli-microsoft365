@@ -13,16 +13,16 @@ import { powerPlatform } from '../../../../utils/powerPlatform.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './chatbot-get.js';
+import command from './copilot-get.js';
 import { settingsNames } from '../../../../settingsNames.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 
-describe(commands.CHATBOT_GET, () => {
+describe(commands.COPILOT_GET, () => {
   let commandInfo: CommandInfo;
   //#region Mocked Responses
   const validEnvironment = '4be50206-9576-4237-8b17-38d8aadfaa36';
   const validId = '3a081d91-5ea8-40a7-8ac9-abbaa3fcb893';
-  const validName = 'CLI 365 Chatbot';
+  const validName = 'CLI 365 Copilot';
   const envUrl = "https://contoso-dev.api.crm4.dynamics.com";
   const botResponse = {
     "value": [
@@ -35,7 +35,7 @@ describe(commands.CHATBOT_GET, () => {
         "schemaname": "new_bot_23f5f58697fd43d595eb451c9797a53d",
         "_ownerid_value": "5fa787c1-1c4d-ed11-bba1-000d3a2caf7f",
         "overwritetime": "1900-01-01T00:00:00Z",
-        "name": "CLI 365 Chatbot",
+        "name": "CLI 365 Copilot",
         "solutionid": "fd140aae-4df4-11dd-bd17-0019b9312238",
         "ismanaged": false,
         "versionnumber": 1421457,
@@ -130,7 +130,7 @@ describe(commands.CHATBOT_GET, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name, commands.CHATBOT_GET);
+    assert.strictEqual(command.name, commands.COPILOT_GET);
   });
 
   it('has a description', () => {
@@ -161,7 +161,7 @@ describe(commands.CHATBOT_GET, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('throws error when multiple chatbots found with the same name', async () => {
+  it('throws error when multiple copilots found with the same name', async () => {
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
       if (settingName === settingsNames.prompt) {
         return false;
@@ -193,10 +193,10 @@ describe(commands.CHATBOT_GET, () => {
         environmentName: validEnvironment,
         name: validName
       }
-    }), new CommandError("Multiple chatbots with name 'CLI 365 Chatbot' found. Found: 69703efe-4149-ed11-bba2-000d3adf7537, 3a081d91-5ea8-40a7-8ac9-abbaa3fcb893."));
+    }), new CommandError("Multiple copilots with name 'CLI 365 Copilot' found. Found: 69703efe-4149-ed11-bba2-000d3adf7537, 3a081d91-5ea8-40a7-8ac9-abbaa3fcb893."));
   });
 
-  it('handles selecting single result when multiple chatbots with the specified name found and cli is set to prompt', async () => {
+  it('handles selecting single result when multiple copilots with the specified name found and cli is set to prompt', async () => {
     sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').callsFake(async () => envUrl);
 
     const multipleBotsResponse = {
@@ -221,7 +221,7 @@ describe(commands.CHATBOT_GET, () => {
     assert(loggerLogSpy.calledWith(botResponse.value[0]));
   });
 
-  it('throws error when no chatbot with name was found', async () => {
+  it('throws error when no copilot with name was found', async () => {
     sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').callsFake(async () => envUrl);
 
     sinon.stub(request, 'get').callsFake(async (opts) => {
@@ -239,10 +239,10 @@ describe(commands.CHATBOT_GET, () => {
         environmentName: validEnvironment,
         name: validName
       }
-    }), new CommandError(`The specified chatbot '${validName}' does not exist.`));
+    }), new CommandError(`The specified copilot '${validName}' does not exist.`));
   });
 
-  it('retrieves a specific chatbot with the name parameter', async () => {
+  it('retrieves a specific copilot with the name parameter', async () => {
     sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').callsFake(async () => envUrl);
 
     sinon.stub(request, 'get').callsFake(async opts => {
@@ -259,7 +259,7 @@ describe(commands.CHATBOT_GET, () => {
     assert(loggerLogSpy.calledWith(botResponse.value[0]));
   });
 
-  it('retrieves a specific chatbot with the id parameter', async () => {
+  it('retrieves a specific copilot with the id parameter', async () => {
     sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').callsFake(async () => envUrl);
 
     sinon.stub(request, 'get').callsFake(async opts => {

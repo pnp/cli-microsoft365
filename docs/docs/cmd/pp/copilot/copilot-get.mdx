@@ -2,11 +2,17 @@ import Global from '/docs/cmd/_global.mdx';
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-# pp chatbot get
+# pp copilot get
 
-Get information about the specified chatbot
+Get information about the specified copilot
 
 ## Usage
+
+```sh
+m365 pp copilot get [options]
+```
+
+## alias
 
 ```sh
 m365 pp chatbot get [options]
@@ -19,10 +25,10 @@ m365 pp chatbot get [options]
 : The name of the environment.
 
 `-i, --id [id]`
-: The id of the chatbot. Specify either `id` or `name` but not both.
+: The id of the copilot. Specify either `id` or `name` but not both.
 
 `-n, --name [name]`
-: The name of the chatbot. Specify either `id` or `name` but not both.
+: The name of the copilot. Specify either `id` or `name` but not both.
 
 `--asAdmin`
 : Run the command as admin for environments you do not have explicitly assigned permissions to.
@@ -32,28 +38,28 @@ m365 pp chatbot get [options]
 
 ## Examples
 
-Get a specific chatbot in a specific environment based on name.
+Get a specific copilot in a specific environment based on name.
 
 ```sh
-m365 pp chatbot get --environmentName "Default-d87a7535-dd31-4437-bfe1-95340acd55c5" --name "CLI 365 Chatbot"
+m365 pp copilot get --environmentName "Default-d87a7535-dd31-4437-bfe1-95340acd55c5" --name "CLI 365 Copilot"
 ```
 
-Get a specific chatbot in a specific environment based on name as admin.
+Get a specific copilot in a specific environment based on name as admin.
 
 ```sh
-m365 pp chatbot get --environmentName "Default-d87a7535-dd31-4437-bfe1-95340acd55c5" --name "CLI 365 Chatbot" --asAdmin
+m365 pp copilot get --environmentName "Default-d87a7535-dd31-4437-bfe1-95340acd55c5" --name "CLI 365 Copilot" --asAdmin
 ```
 
-Get a specific chatbot in a specific environment based on id.
+Get a specific copilot in a specific environment based on id.
 
 ```sh
-m365 pp chatbot get --environmentName "Default-d87a7535-dd31-4437-bfe1-95340acd55c5" --id "3a081d91-5ea8-40a7-8ac9-abbaa3fcb893"
+m365 pp copilot get --environmentName "Default-d87a7535-dd31-4437-bfe1-95340acd55c5" --id "3a081d91-5ea8-40a7-8ac9-abbaa3fcb893"
 ```
 
-Get a specific chatbot in a specific environment based on id as admin.
+Get a specific copilot in a specific environment based on id as admin.
 
 ```sh
-m365 pp chatbot get --environmentName "Default-d87a7535-dd31-4437-bfe1-95340acd55c5" --id "3a081d91-5ea8-40a7-8ac9-abbaa3fcb893" --asAdmin
+m365 pp copilot get --environmentName "Default-d87a7535-dd31-4437-bfe1-95340acd55c5" --id "3a081d91-5ea8-40a7-8ac9-abbaa3fcb893" --asAdmin
 ```
 
 ## Response
@@ -71,7 +77,7 @@ m365 pp chatbot get --environmentName "Default-d87a7535-dd31-4437-bfe1-95340acd5
     "schemaname": "new_bot_23f5f58697fd43d595eb451c9797a53d",
     "_ownerid_value": "5fa787c1-1c4d-ed11-bba1-000d3a2caf7f",
     "overwritetime": "1900-01-01T00:00:00Z",
-    "name": "CLI 365 Chatbot",
+    "name": "CLI 365 Copilot",
     "solutionid": "fd140aae-4df4-11dd-bd17-0019b9312238",
     "ismanaged": false,
     "versionnumber": 1421457,
@@ -119,7 +125,7 @@ m365 pp chatbot get --environmentName "Default-d87a7535-dd31-4437-bfe1-95340acd5
   botid      : 3a081d91-5ea8-40a7-8ac9-abbaa3fcb893
   createdon  : 2022-11-19T10:42:22Z
   modifiedon : 2022-11-19T10:42:24Z
-  name       : CLI 365 Chatbot
+  name       : CLI 365 Copilot
   publishedon: 2022-11-19T10:43:24Z
   ```
 
@@ -128,18 +134,18 @@ m365 pp chatbot get --environmentName "Default-d87a7535-dd31-4437-bfe1-95340acd5
 
   ```csv
   name,botid,publishedon,createdon,modifiedon
-  CLI 365 Chatbot,3a081d91-5ea8-40a7-8ac9-abbaa3fcb893,2022-11-19T10:43:24Z,2022-11-19T10:42:22Z,2022-11-19T10:42:24Z
+  CLI 365 Copilot,3a081d91-5ea8-40a7-8ac9-abbaa3fcb893,2022-11-19T10:43:24Z,2022-11-19T10:42:22Z,2022-11-19T10:42:24Z
   ```
 
   </TabItem>
   <TabItem value="Markdown">
 
   ```md
-  # pp chatbot get --environmentName "Default-d87a7535-dd31-4437-bfe1-95340acd55c5" --id "3a081d91-5ea8-40a7-8ac9-abbaa3fcb893"
+  # pp copilot get --environmentName "Default-d87a7535-dd31-4437-bfe1-95340acd55c5" --id "3a081d91-5ea8-40a7-8ac9-abbaa3fcb893"
 
   Date: 9/1/2023
 
-  ## CLI 365 Chatbot
+  ## CLI 365 Copilot
 
   Property | Value
   ---------|-------
@@ -151,7 +157,7 @@ m365 pp chatbot get --environmentName "Default-d87a7535-dd31-4437-bfe1-95340acd5
   schemaname | new\_bot\_23f5f58697fd43d595eb451c9797a53d
   \_ownerid\_value | 5fa787c1-1c4d-ed11-bba1-000d3a2caf7f
   overwritetime | 1900-01-01T00:00:00Z
-  name | CLI 365 Chatbot
+  name | CLI 365 Copilot
   solutionid | fd140aae-4df4-11dd-bd17-0019b9312238
   ismanaged | false
   versionnumber | 1445843

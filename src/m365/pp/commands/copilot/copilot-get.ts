@@ -19,14 +19,18 @@ export interface Options extends GlobalOptions {
   asAdmin?: boolean;
 }
 
-class PpChatbotGetCommand extends PowerPlatformCommand {
+class PpCopilotGetCommand extends PowerPlatformCommand {
 
   public get name(): string {
-    return commands.CHATBOT_GET;
+    return commands.COPILOT_GET;
   }
 
   public get description(): string {
-    return 'Get information about the specified chatbot';
+    return 'Get information about the specified copilot';
+  }
+
+  public alias(): string[] | undefined {
+    return [commands.CHATBOT_GET];
   }
 
   public defaultProperties(): string[] | undefined {
@@ -89,13 +93,13 @@ class PpChatbotGetCommand extends PowerPlatformCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      await logger.logToStderr(`Retrieving chatbot '${args.options.id || args.options.name}'...`);
+      await logger.logToStderr(`Retrieving copilot '${args.options.id || args.options.name}'...`);
     }
 
     try {
       const dynamicsApiUrl = await powerPlatform.getDynamicsInstanceApiUrl(args.options.environmentName, args.options.asAdmin);
 
-      const res = await this.getChatbot(dynamicsApiUrl, args.options);
+      const res = await this.getCopilot(dynamicsApiUrl, args.options);
       await logger.log(res);
     }
     catch (err: any) {
@@ -103,7 +107,7 @@ class PpChatbotGetCommand extends PowerPlatformCommand {
     }
   }
 
-  private async getChatbot(dynamicsApiUrl: string, options: Options): Promise<any> {
+  private async getCopilot(dynamicsApiUrl: string, options: Options): Promise<any> {
     const requestOptions: CliRequestOptions = {
       headers: {
         accept: 'application/json;odata.metadata=none'
@@ -122,15 +126,15 @@ class PpChatbotGetCommand extends PowerPlatformCommand {
 
     if (result.value.length > 1) {
       const resultAsKeyValuePair = formatting.convertArrayToHashTable('botid', result.value);
-      return await cli.handleMultipleResultsFound(`Multiple chatbots with name '${options.name}' found.`, resultAsKeyValuePair);
+      return await cli.handleMultipleResultsFound(`Multiple copilots with name '${options.name}' found.`, resultAsKeyValuePair);
     }
 
     if (result.value.length === 0) {
-      throw `The specified chatbot '${options.name}' does not exist.`;
+      throw `The specified copilot '${options.name}' does not exist.`;
     }
 
     return result.value[0];
   }
 }
 
-export default new PpChatbotGetCommand();
+export default new PpCopilotGetCommand();
