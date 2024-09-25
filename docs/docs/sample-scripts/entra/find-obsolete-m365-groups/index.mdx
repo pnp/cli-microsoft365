@@ -169,7 +169,9 @@ Use this script to create a report of all M365 groups that are possibly obsolete
     $guests = $users | Where-Object { $_.id -in $Script:Guests.id }
 
     # Modify the $members list to only contain users that are not in the $owners list
-    $members = Compare-Object $members $owners -PassThru
+    if($null -ne $owners -and $null -ne $members) {
+      $members = Compare-Object $members $owners -PassThru
+    }
 
     $Group.Membership = [ordered] @{
       Owners  = $owners
