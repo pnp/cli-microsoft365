@@ -12,12 +12,6 @@ Creates a new user
 m365 entra user add [options]
 ```
 
-## Alias
-
-```sh
-m365 aad user add [options]
-```
-
 ## Options
 
 ```md definition-list
@@ -95,25 +89,25 @@ If the specified option is not found, you will receive a `Resource 'xyz' does no
 
 ## Examples
 
-Create a user and let him/her update the password at first login
+Create a user and let him/her update the password at first login.
 
 ```sh
 m365 entra user add --displayName "John Doe" --userName "john.doe@contoso.com" --password "SomePassw0rd" --forceChangePasswordNextSignIn
 ```
 
-Create a user with job information
+Create a user with job information.
 
 ```sh
 m365 entra user add --displayName "John Doe" --userName "john.doe@contoso.com" --password "SomePassw0rd" --firstName John --lastName Doe --jobTitle "Sales Manager" --companyName Contoso --department Sales --officeLocation Vosselaar --forceChangePasswordNextSignIn
 ```
 
-Create a user with language information
+Create a user with language information.
 
 ```sh
 m365 entra user add --displayName "John Doe" --userName "john.doe@contoso.com" --preferredLanguage "nl-BE" --usageLocation BE --forceChangePasswordNextSignIn
 ```
 
-Create a user with a manager
+Create a user with a manager.
 
 ```sh
 m365 entra user add --displayName "John Doe" --userName "john.doe@contoso.com" --managerUserName "adele@contoso.com"

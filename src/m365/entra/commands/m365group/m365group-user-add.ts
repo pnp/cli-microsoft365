@@ -128,13 +128,9 @@ class EntraM365GroupUserAddCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-<<<<<<< HEAD
-    await this.showDeprecationWarning(logger, aadCommands.M365GROUP_USER_ADD, commands.M365GROUP_USER_ADD);
-=======
     if (args.options.userName) {
       await this.warn(logger, `Option 'userName' is deprecated. Please use 'ids' or 'userNames' instead.`);
     }
->>>>>>> 8835d6d1c... build fix
 
     try {
       const providedGroupId: string = await this.getGroupId(logger, args);
