@@ -14,13 +14,17 @@ interface Options extends GlobalOptions {
   asAdmin?: boolean;
 }
 
-class PpChatbotListCommand extends PowerPlatformCommand {
+class PpCopilotListCommand extends PowerPlatformCommand {
   public get name(): string {
-    return commands.CHATBOT_LIST;
+    return commands.COPILOT_LIST;
   }
 
   public get description(): string {
-    return 'Lists Microsoft Power Platform chatbots in the specified Power Platform environment';
+    return 'Lists Microsoft Power Platform copilots in the specified Power Platform environment';
+  }
+
+  public alias(): string[] | undefined {
+    return [commands.CHATBOT_LIST];
   }
 
   public defaultProperties(): string[] | undefined {
@@ -54,8 +58,9 @@ class PpChatbotListCommand extends PowerPlatformCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    await this.showDeprecationWarning(logger, commands.CHATBOT_LIST, commands.COPILOT_LIST);
     if (this.verbose) {
-      await logger.logToStderr(`Retrieving list of chatbots for environment '${args.options.environmentName}'.`);
+      await logger.logToStderr(`Retrieving list of copilots for environment '${args.options.environmentName}'.`);
     }
 
     const fetchXml: string = `
@@ -111,4 +116,4 @@ class PpChatbotListCommand extends PowerPlatformCommand {
   }
 }
 
-export default new PpChatbotListCommand();
+export default new PpCopilotListCommand();
