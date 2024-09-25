@@ -66,6 +66,7 @@ describe(commands.M365GROUP_GET, () => {
   });
 
   it('retrieves information about the Microsoft 365 Group specified by id', async () => {
+
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/1caf7dcd-7e83-4c3a-94f7-932a1299c844`) {
         return {
@@ -92,6 +93,16 @@ describe(commands.M365GROUP_GET, () => {
           "renewedDateTime": "2017-11-29T03:27:05Z",
           "securityEnabled": false,
           "visibility": "Public"
+        };
+      }
+
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/1caf7dcd-7e83-4c3a-94f7-932a1299c844?$select=allowExternalSenders,autoSubscribeNewMembers,hideFromAddressLists,hideFromOutlookClients,isSubscribedByMail`) {
+        return {
+          "allowExternalSenders": false,
+          "autoSubscribeNewMembers": false,
+          "isSubscribedByMail": false,
+          "hideFromOutlookClients": false,
+          "hideFromAddressLists": false
         };
       }
 
@@ -122,7 +133,12 @@ describe(commands.M365GROUP_GET, () => {
       ],
       "renewedDateTime": "2017-11-29T03:27:05Z",
       "securityEnabled": false,
-      "visibility": "Public"
+      "visibility": "Public",
+      "allowExternalSenders": false,
+      "autoSubscribeNewMembers": false,
+      "isSubscribedByMail": false,
+      "hideFromOutlookClients": false,
+      "hideFromAddressLists": false
     }));
   });
 
@@ -160,6 +176,16 @@ describe(commands.M365GROUP_GET, () => {
         };
       }
 
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/1caf7dcd-7e83-4c3a-94f7-932a1299c844?$select=allowExternalSenders,autoSubscribeNewMembers,hideFromAddressLists,hideFromOutlookClients,isSubscribedByMail`) {
+        return {
+          "allowExternalSenders": false,
+          "autoSubscribeNewMembers": false,
+          "isSubscribedByMail": false,
+          "hideFromOutlookClients": false,
+          "hideFromAddressLists": false
+        };
+      }
+
       throw 'Invalid request';
     });
 
@@ -187,7 +213,12 @@ describe(commands.M365GROUP_GET, () => {
       ],
       "renewedDateTime": "2017-11-29T03:27:05Z",
       "securityEnabled": false,
-      "visibility": "Public"
+      "visibility": "Public",
+      "allowExternalSenders": false,
+      "autoSubscribeNewMembers": false,
+      "isSubscribedByMail": false,
+      "hideFromOutlookClients": false,
+      "hideFromAddressLists": false
     }));
   });
 
@@ -221,6 +252,16 @@ describe(commands.M365GROUP_GET, () => {
         };
       }
 
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/1caf7dcd-7e83-4c3a-94f7-932a1299c844?$select=allowExternalSenders,autoSubscribeNewMembers,hideFromAddressLists,hideFromOutlookClients,isSubscribedByMail`) {
+        return {
+          "allowExternalSenders": false,
+          "autoSubscribeNewMembers": false,
+          "isSubscribedByMail": false,
+          "hideFromOutlookClients": false,
+          "hideFromAddressLists": false
+        };
+      }
+
       throw 'Invalid request';
     });
 
@@ -248,7 +289,12 @@ describe(commands.M365GROUP_GET, () => {
       ],
       "renewedDateTime": "2017-11-29T03:27:05Z",
       "securityEnabled": false,
-      "visibility": "Public"
+      "visibility": "Public",
+      "allowExternalSenders": false,
+      "autoSubscribeNewMembers": false,
+      "isSubscribedByMail": false,
+      "hideFromOutlookClients": false,
+      "hideFromAddressLists": false
     }));
   });
 
@@ -281,11 +327,19 @@ describe(commands.M365GROUP_GET, () => {
           "visibility": "Public"
         };
       }
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/1caf7dcd-7e83-4c3a-94f7-932a1299c844?$select=allowExternalSenders,autoSubscribeNewMembers,hideFromAddressLists,hideFromOutlookClients,isSubscribedByMail`) {
+        return {
+          "allowExternalSenders": false,
+          "autoSubscribeNewMembers": false,
+          "isSubscribedByMail": false,
+          "hideFromOutlookClients": false,
+          "hideFromAddressLists": false
+        };
+      }
 
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/1caf7dcd-7e83-4c3a-94f7-932a1299c844/drive?$select=webUrl`) {
         return { webUrl: "https://contoso.sharepoint.com/sites/finance/Shared%20Documents" };
       }
-
       throw 'Invalid request';
     });
 
@@ -314,7 +368,12 @@ describe(commands.M365GROUP_GET, () => {
       "renewedDateTime": "2017-11-29T03:27:05Z",
       "securityEnabled": false,
       "siteUrl": "https://contoso.sharepoint.com/sites/finance",
-      "visibility": "Public"
+      "visibility": "Public",
+      "allowExternalSenders": false,
+      "autoSubscribeNewMembers": false,
+      "isSubscribedByMail": false,
+      "hideFromOutlookClients": false,
+      "hideFromAddressLists": false
     }));
   });
 
@@ -345,6 +404,16 @@ describe(commands.M365GROUP_GET, () => {
           "renewedDateTime": "2017-11-29T03:27:05Z",
           "securityEnabled": false,
           "visibility": "Public"
+        };
+      }
+
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/1caf7dcd-7e83-4c3a-94f7-932a1299c844?$select=allowExternalSenders,autoSubscribeNewMembers,hideFromAddressLists,hideFromOutlookClients,isSubscribedByMail`) {
+        return {
+          "allowExternalSenders": false,
+          "autoSubscribeNewMembers": false,
+          "isSubscribedByMail": false,
+          "hideFromOutlookClients": false,
+          "hideFromAddressLists": false
         };
       }
 
@@ -380,7 +449,12 @@ describe(commands.M365GROUP_GET, () => {
       "renewedDateTime": "2017-11-29T03:27:05Z",
       "securityEnabled": false,
       "siteUrl": "https://contoso.sharepoint.com/sites/finance",
-      "visibility": "Public"
+      "visibility": "Public",
+      "allowExternalSenders": false,
+      "autoSubscribeNewMembers": false,
+      "isSubscribedByMail": false,
+      "hideFromOutlookClients": false,
+      "hideFromAddressLists": false
     }));
   });
 
@@ -411,6 +485,16 @@ describe(commands.M365GROUP_GET, () => {
           "renewedDateTime": "2017-11-29T03:27:05Z",
           "securityEnabled": false,
           "visibility": "Public"
+        };
+      }
+
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/1caf7dcd-7e83-4c3a-94f7-932a1299c844?$select=allowExternalSenders,autoSubscribeNewMembers,hideFromAddressLists,hideFromOutlookClients,isSubscribedByMail`) {
+        return {
+          "allowExternalSenders": false,
+          "autoSubscribeNewMembers": false,
+          "isSubscribedByMail": false,
+          "hideFromOutlookClients": false,
+          "hideFromAddressLists": false
         };
       }
 
@@ -446,7 +530,12 @@ describe(commands.M365GROUP_GET, () => {
       "renewedDateTime": "2017-11-29T03:27:05Z",
       "securityEnabled": false,
       "visibility": "Public",
-      "siteUrl": ""
+      "siteUrl": "",
+      "allowExternalSenders": false,
+      "autoSubscribeNewMembers": false,
+      "isSubscribedByMail": false,
+      "hideFromOutlookClients": false,
+      "hideFromAddressLists": false
     }));
   });
 
