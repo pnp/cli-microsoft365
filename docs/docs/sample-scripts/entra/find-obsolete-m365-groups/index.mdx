@@ -179,8 +179,23 @@ Use this script to create a report of all M365 groups that are possibly obsolete
       Guests  = $guests
     }
 
-    if ($owners.Count -eq 1 -and ($members.Count + $guests.Count) -eq 0) {
-      Write-Host "  → potentially obsolete (abandoned group: only 1 owner left)" -ForegroundColor Yellow
+    if ($owners.Count -eq 0) {
+      Write-Host "  → potentially obsolete (abandoned group: no owner)" -ForegroundColor Yellow
+      $reason = "Low user count"
+        
+      $Group.Membership.Status = "Abandoned ($reason)"
+      $Group.TestStatus = "🟡 Warning"
+      $Group.Reasons += $reason
+        
+      try {
+        $Global:ObsoleteGroups.Add($Group.Reference.id, $Group)
+      }
+      catch { Write-Information "Group was already added to the list of potentially obsolete groups" }
+      return
+    }
+
+    if ($owners.Count -le 1 -and ($members.Count + $guests.Count) -eq 0) {
+      Write-Host "  → potentially obsolete (abandoned group: only $($owners.Count) owner left)" -ForegroundColor Yellow
       $reason = "Low user count"
       
       $Group.Membership.Status = "Abandoned ($reason)"
