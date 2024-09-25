@@ -3756,6 +3756,11 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'tenant site unarchive',
               id: 'cmd/spo/tenant/tenant-site-unarchive'
+            },
+            {
+              type: 'doc',
+              label: 'tenant site membership list',
+              id: 'cmd/spo/tenant/tenant-site-membership-list'
             }
           ]
         },

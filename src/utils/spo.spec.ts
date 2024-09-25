@@ -2669,4 +2669,38 @@ describe('utils/spo', () => {
     const group = await spo.getFileById(webUrl, id, logger, true);
     assert.deepEqual(group, fileResponse);
   });
+
+  it(`Gets site properties without included details as admin using provided url`, async () => {
+    const siteId = 'b2307a39-e878-458b-bc90-03bc578531d6';
+    const siteProperties = { SiteId: siteId };
+    sinon.stub(spo, 'getSpoAdminUrl').resolves('https://contoso-admin.sharepoint.com');
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso-admin.sharepoint.com/_api/SPO.Tenant/GetSitePropertiesByUrl`) {
+        return siteProperties;
+      };
+
+      throw 'Invalid request';
+    });
+
+    await spo.getSiteAdminPropertiesByUrl('https://contoso.sharepoint.com/sites/sales', false, logger, true);
+
+    assert.deepStrictEqual(postStub.firstCall.args[0].data, { url: 'https://contoso.sharepoint.com/sites/sales', includeDetail: false });
+  });
+
+  it(`Gets site properties with included details as admin using provided url`, async () => {
+    const siteId = 'b2307a39-e878-458b-bc90-03bc578531d6';
+    const siteProperties = { SiteId: siteId };
+    sinon.stub(spo, 'getSpoAdminUrl').resolves('https://contoso-admin.sharepoint.com');
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso-admin.sharepoint.com/_api/SPO.Tenant/GetSitePropertiesByUrl`) {
+        return siteProperties;
+      };
+
+      throw 'Invalid request';
+    });
+
+    await spo.getSiteAdminPropertiesByUrl('https://contoso.sharepoint.com/sites/sales', true, logger, true);
+
+    assert.deepStrictEqual(postStub.firstCall.args[0].data, { url: 'https://contoso.sharepoint.com/sites/sales', includeDetail: true });
+  });
 });
