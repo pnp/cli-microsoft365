@@ -288,8 +288,8 @@ function Test-ConversationActivity {
       Members                   = $Group.Membership.Members.Count
       Guests                    = $Group.Membership.Guests.Count
       "Group Status"            = $Group.Membership.Status ?? "Normal"
-      "Number of Conversations" = $Group.MailboxStatus.OutdatedConversations ? $Group.MailboxStatus.OutdatedConversations.Length : "n/a"
-      "Last Conversation"       = $Group.MailboxStatus.OutdatedConversations ? $Group.MailboxStatus.OutdatedConversations[0].lastDeliveredDateTime : ""
+      "Number of Conversations" = $Group.MailboxStatus.NumberOfConversations ? $Group.MailboxStatus.NumberOfConversations : "n/a"
+      "Last Conversation"       = $Group.MailboxStatus.LastConversation
       "Conversation Status"     = $Group.MailboxStatus.Reason ?? "Normal"
       "Team enabled"            = $Group.Reference.resourceProvisioningOptions -contains 'Team' ? "True" : "False"
       "SPO Status"              = $Group.SharePointStatus.Reason ?? "Normal"
