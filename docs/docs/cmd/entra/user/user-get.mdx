@@ -12,12 +12,6 @@ Gets information about the specified user
 m365 entra user get [options]
 ```
 
-## Alias
-
-```sh
-m365 aad user get [options]
-```
-
 ## Options
 
 ```md definition-list
@@ -47,43 +41,43 @@ If the user with the specified id, user name, or email doesn't exist, you will g
 
 ## Examples
 
-Get information about the user with id _1caf7dcd-7e83-4c3a-94f7-932a1299c844_
+Get information about the user by id.
 
 ```sh
 m365 entra user get --id 1caf7dcd-7e83-4c3a-94f7-932a1299c844
 ```
 
-Get information about the user by user name
+Get information about the user by user name.
 
 ```sh
 m365 entra user get --userName AarifS@contoso.onmicrosoft.com
 ```
 
-Get information about the user by email
+Get information about the user by email.
 
 ```sh
 m365 entra user get --email AarifS@contoso.onmicrosoft.com
 ```
 
-For the user with id _1caf7dcd-7e83-4c3a-94f7-932a1299c844_ retrieve the user name, e-mail address and full name
+For the user with id _1caf7dcd-7e83-4c3a-94f7-932a1299c844_ retrieve the user name, e-mail address and full name.
 
 ```sh
 m365 entra user get --id 1caf7dcd-7e83-4c3a-94f7-932a1299c844 --properties "userPrincipalName,mail,displayName"
 ```
 
-Get information about the currently logged user using the Id token
+Get information about the currently logged user using the Id token.
 
 ```sh
 m365 entra user get --id "@meId"
 ```
 
-Get information about the currently logged in user using the UserName token
+Get information about the currently logged in user using the UserName token.
 
 ```sh
 m365 entra user get --userName "@meUserName"
 ```
 
-Get information about a user with the manager's details
+Get information about a user with the manager's details.
 
 ```sh
 m365 entra user get --userName AarifS@contoso.onmicrosoft.com --withManager

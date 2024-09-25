@@ -118,33 +118,12 @@ describe(commands.M365GROUP_SET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-<<<<<<< HEAD
-  it('defines alias', () => {
-    const alias = command.alias();
-    assert.notStrictEqual(typeof alias, 'undefined');
-  });
-
-  it('defines correct alias', () => {
-    const alias = command.alias();
-    assert.deepStrictEqual(alias, [aadCommands.M365GROUP_SET]);
-  });
-
   it('updates Microsoft 365 Group display name while group is being retrieved by display name', async () => {
     const groupName = 'Project A';
     sinon.stub(entraGroup, 'getGroupIdByDisplayName').withArgs(groupName).resolves(groupId);
     const patchStub = sinon.stub(request, 'patch').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/${groupId}`) {
         return;
-=======
-  it('updates Microsoft 365 Group display name', async () => {
-    sinon.stub(request, 'patch').callsFake(async (opts) => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/groups/28beab62-7540-4db1-a23f-29a6018a3848') {
-        if (JSON.stringify(opts.data) === JSON.stringify(<Group>{
-          displayName: 'My group'
-        })) {
-          return;
-        }
->>>>>>> ef060945e... removed aad aliases
       }
 
       throw 'Invalid request';

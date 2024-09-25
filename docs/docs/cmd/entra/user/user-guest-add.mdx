@@ -12,12 +12,6 @@ Invite an external user to the organization
 m365 entra user guest add [options]
 ```
 
-## Alias
-
-```sh
-m365 aad user guest add [options]
-```
-
 ## Options
 
 ```md definition-list
@@ -47,19 +41,19 @@ m365 aad user guest add [options]
 
 ## Examples
 
-Invite a user via email and set the display name
+Invite a user via email and set the display name.
 
 ```sh
 m365 entra user guest add --emailAddress john.doe@contoso.com --displayName "John Doe" --sendInvitationMessage
 ```
 
-Invite a user with a custom email and custom redirect url
+Invite a user with a custom email and custom redirect url.
 
 ```sh
 m365 entra user guest add --emailAddress john.doe@contoso.com --welcomeMessage "Hi John, welcome to the organization!" --inviteRedirectUrl https://contoso.sharepoint.com --sendInvitationMessage
 ```
 
-Invite a user and send an invitation mail in Dutch
+Invite a user and send an invitation mail in Dutch.
 
 ```sh
 m365 entra user guest add --emailAddress john.doe@contoso.com --messageLanguage nl-BE --sendInvitationMessage
