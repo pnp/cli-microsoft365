@@ -6,6 +6,7 @@ import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import request from '../../../../request.js';
 import { telemetry } from '../../../../telemetry.js';
+import { formatting } from '../../../../utils/formatting.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
@@ -163,7 +164,7 @@ describe(commands.GROUP_MEMBER_ADD, () => {
 
   //#region Option values
   const webUrl = 'https://contoso.sharepoint.com/sites/Marketing';
-  const spGroupName = 'Marketing Site Owners';
+  const spGroupName = "Contoso Site Owners";
   const spGroupId = 3;
   const spUserIds = userResponses.map(u => u.Id);
   const userNames = userResponses.map(u => u.UserPrincipalName);
@@ -231,7 +232,7 @@ describe(commands.GROUP_MEMBER_ADD, () => {
       options: {
         webUrl: "https://contoso.sharepoint.com/sites/SiteA",
         groupId: 32,
-        groupName: "Contoso Site Owners",
+        groupName: spGroupName,
         userNames: "Alex.Wilber@contoso.com"
       }
     }, commandInfo);
@@ -284,18 +285,6 @@ describe(commands.GROUP_MEMBER_ADD, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if both emails and aadGroupIds options are passed', async () => {
-    const actual = await command.validate({
-      options: {
-        webUrl: "https://contoso.sharepoint.com/sites/SiteA",
-        groupId: 32,
-        emails: "Alex.Wilber@contoso.com",
-        aadGroupIds: "56ca9023-3449-4e98-a96a-69e81a6f4983"
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
   it('fails validation if both userIds and entraGroupNames options are passed', async () => {
     const actual = await command.validate({
       options: {
@@ -303,18 +292,6 @@ describe(commands.GROUP_MEMBER_ADD, () => {
         groupId: 32,
         userIds: 5,
         entraGroupNames: "Microsoft Entra Group name"
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if both userIds and aadGroupNames options are passed', async () => {
-    const actual = await command.validate({
-      options: {
-        webUrl: "https://contoso.sharepoint.com/sites/SiteA",
-        groupId: 32,
-        userIds: 5,
-        aadGroupNames: "Microsoft Entra Group name"
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -332,7 +309,7 @@ describe(commands.GROUP_MEMBER_ADD, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if userNames, emails, userIds, entraGroupIds, aadGroupIds, entraGroupNames, or aadGroupNames options are not passed', async () => {
+  it('fails validation if userNames, emails, userIds, entraGroupIds, or entraGroupNames options are not passed', async () => {
     const actual = await command.validate({
       options: {
         webUrl: "https://contoso.sharepoint.com/sites/SiteA",
@@ -372,11 +349,6 @@ describe(commands.GROUP_MEMBER_ADD, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if aadGroupIds is Invalid', async () => {
-    const actual = await command.validate({ options: { webUrl: "https://contoso.sharepoint.com/sites/SiteA", groupId: 32, aadGroupIds: "56ca9023-3449-4e98-a96a-69e81a6f4983,9" } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
   it('passes validation if all the required options are specified', async () => {
     const actual = await command.validate({ options: { webUrl: "https://contoso.sharepoint.com/sites/SiteA", groupId: 32, userNames: "Alex.Wilber@contoso.com" } }, commandInfo);
     assert.strictEqual(actual, true);
@@ -384,28 +356,6 @@ describe(commands.GROUP_MEMBER_ADD, () => {
 
   it('defines correct properties for the default output', () => {
     assert.deepStrictEqual(command.defaultProperties(), ['Title', 'UserPrincipalName']);
-  });
-
-  it('correctly logs deprecation warning for aadGroupIds option', async () => {
-    const chalk = (await import('chalk')).default;
-    const loggerErrSpy = sinon.spy(logger, 'logToStderr');
-    sinon.stub(request, 'post').resolves();
-
-    await command.action(logger, { options: { webUrl: webUrl, groupName: spGroupName, aadGroupIds: entraGroupIds[0] } });
-    assert.deepStrictEqual(loggerErrSpy.firstCall.firstArg, chalk.yellow(`Option 'aadGroupIds' is deprecated. Please use 'entraGroupIds' instead.`));
-
-    sinonUtil.restore(loggerErrSpy);
-  });
-
-  it('correctly logs deprecation warning for aadGroupNames option', async () => {
-    const chalk = (await import('chalk')).default;
-    const loggerErrSpy = sinon.spy(logger, 'logToStderr');
-    sinon.stub(request, 'post').resolves();
-
-    await command.action(logger, { options: { webUrl: webUrl, groupName: spGroupName, aadGroupNames: entraGroupNames[0] } });
-    assert.deepStrictEqual(loggerErrSpy.firstCall.firstArg, chalk.yellow(`Option 'aadGroupNames' is deprecated. Please use 'entraGroupNames' instead.`));
-
-    sinonUtil.restore(loggerErrSpy);
   });
 
   it('correctly logs result when adding users by userNames', async () => {
@@ -426,27 +376,6 @@ describe(commands.GROUP_MEMBER_ADD, () => {
     });
 
     assert(loggerLogSpy.calledOnceWithExactly(userResponses));
-  });
-
-  it('correctly adds users to group by UPNs', async () => {
-    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `${webUrl}/_api/web/SiteGroups/GetById(${spGroupId})/users`) {
-        return userResponses[postStub.callCount - 1];
-      }
-
-      throw 'Invalid request: ' + opts.url;
-    });
-
-    await command.action(logger, {
-      options: {
-        webUrl: webUrl,
-        groupId: spGroupId,
-        userNames: userNames.join(',')
-      }
-    });
-
-    assert.deepStrictEqual(postStub.firstCall.args[0].data, { LoginName: 'i:0#.f|membership|adelev@contoso.onmicrosoft.com' });
-    assert.deepStrictEqual(postStub.secondCall.args[0].data, { LoginName: 'i:0#.f|membership|johnd@contoso.onmicrosoft.com' });
   });
 
   it('correctly adds users to group by emails', async () => {
@@ -542,6 +471,28 @@ describe(commands.GROUP_MEMBER_ADD, () => {
 
     assert.deepStrictEqual(postStub.firstCall.args[0].data, { LoginName: `c:0o.c|federateddirectoryclaimprovider|${entraGroupResponses[0].id}` });
     assert.deepStrictEqual(postStub.secondCall.args[0].data, { LoginName: `c:0t.c|tenant|${entraGroupResponses[1].id}` });
+  });
+
+  it('correctly adds user to a group by groupName and emails (DEBUG)', async () => {
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `${webUrl}/_api/web/SiteGroups/GetByName('${formatting.encodeQueryParameter(spGroupName)}')/users`) {
+        return groupResponses[postStub.callCount - 1];
+      }
+
+      throw 'Invalid request: ' + opts.url;
+    });
+
+    await command.action(logger, {
+      options: {
+        debug: true,
+        webUrl: webUrl,
+        groupName: spGroupName,
+        emails: emails.join(',')
+      }
+    });
+
+    assert.deepStrictEqual(postStub.firstCall.args[0].data, { LoginName: 'i:0#.f|membership|Adele.Vance@contoso.onmicrosoft.com' });
+    assert.deepStrictEqual(postStub.secondCall.args[0].data, { LoginName: 'i:0#.f|membership|John.Doe@contoso.onmicrosoft.com' });
   });
 
   it('correctly adds users to group by entraGroupNames', async () => {

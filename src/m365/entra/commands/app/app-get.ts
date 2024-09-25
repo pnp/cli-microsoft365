@@ -9,7 +9,6 @@ import GraphCommand from '../../../base/GraphCommand.js';
 import { M365RcJson } from '../../../base/M365RcJson.js';
 import commands from '../../commands.js';
 import { cli } from '../../../../cli/cli.js';
-import aadCommands from '../../aadCommands.js';
 
 interface CommandArgs {
   options: Options;
@@ -29,10 +28,6 @@ class EntraAppGetCommand extends GraphCommand {
 
   public get description(): string {
     return 'Gets an Entra app registration';
-  }
-
-  public alias(): string[] | undefined {
-    return [aadCommands.APP_GET, commands.APPREGISTRATION_GET];
   }
 
   constructor() {
@@ -84,8 +79,6 @@ class EntraAppGetCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    await this.showDeprecationWarning(logger, aadCommands.APP_GET, commands.APP_GET);
-
     try {
       const appObjectId = await this.getAppObjectId(args);
       const appInfo = await this.getAppInfo(appObjectId);

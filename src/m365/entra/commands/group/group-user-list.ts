@@ -7,7 +7,6 @@ import { odata } from '../../../../utils/odata.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
-import aadCommands from '../../aadCommands.js';
 
 interface CommandArgs {
   options: Options;
@@ -32,10 +31,6 @@ class EntraGroupUserListCommand extends GraphCommand {
 
   public get description(): string {
     return 'Lists users of a specific Entra group';
-  }
-
-  public alias(): string[] | undefined {
-    return [aadCommands.GROUP_USER_LIST];
   }
 
   public defaultProperties(): string[] | undefined {
@@ -111,8 +106,6 @@ class EntraGroupUserListCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    await this.showDeprecationWarning(logger, aadCommands.GROUP_USER_LIST, commands.GROUP_USER_LIST);
-
     try {
       const groupId = await this.getGroupId(args.options, logger);
 

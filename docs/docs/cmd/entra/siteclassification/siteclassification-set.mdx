@@ -10,26 +10,20 @@ Updates site classification configuration
 m365 entra siteclassification set [options]
 ```
 
-## Alias
-
-```sh
-m365 aad siteclassification set [options]
-```
-
 ## Options
 
 ```md definition-list
 `-c, --classifications [classifications]`
-: Comma-separated list of classifications
+: Comma-separated list of classifications.
 
 `-d, --defaultClassification [defaultClassification]`
-: Classification to use by default
+: Classification to use by default.
 
 `-u, --usageGuidelinesUrl [usageGuidelinesUrl]`
-: URL with usage guidelines for members
+: URL with usage guidelines for members.
 
 `-g, --guestUsageGuidelinesUrl [guestUsageGuidelinesUrl]`
-: URL with usage guidelines for guests
+: URL with usage guidelines for guests.
 ```
 
 <Global />
@@ -37,25 +31,25 @@ m365 aad siteclassification set [options]
 
 ## Examples
 
-Update Microsoft 365 Tenant site classification configuration
+Update Microsoft 365 Tenant site classification configuration.
 
 ```sh
 m365 entra siteclassification set --classifications "High, Medium, Low" --defaultClassification "Medium"
 ```
 
-Update only the default classification
+Update only the default classification.
 
 ```sh
 m365 entra siteclassification set --defaultClassification "Low"
 ```
 
-Update site classification with a usage guidelines URL
+Update site classification with a usage guidelines URL.
 
 ```sh
 m365 entra siteclassification set --usageGuidelinesUrl "http://aka.ms/pnp"
 ```
 
-Update site classification with usage guidelines URLs for guests and members
+Update site classification with usage guidelines URLs for guests and members.
 
 ```sh
 m365 entra siteclassification set --usageGuidelinesUrl "http://aka.ms/pnp" --guestUsageGuidelinesUrl "http://aka.ms/pnp"

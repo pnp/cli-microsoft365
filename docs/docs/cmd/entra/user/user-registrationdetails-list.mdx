@@ -12,12 +12,6 @@ Retrieves a list of the authentication methods registered for users
 m365 entra user registrationdetails list [options]
 ```
 
-## Alias
-
-```sh
-m365 aad user registrationdetails list [options]
-```
-
 ## Options
 
 ```md definition-list
@@ -85,43 +79,43 @@ When multiple values are specified for `--registeredMethods` option, the command
 
 ## Examples
 
-Retrieve registration details for all users
+Retrieve registration details for all users.
 
 ```sh
 m365 entra user registrationdetails list
 ```
 
-Retrieve user registration details and returns only specific properties
+Retrieve user registration details and returns only specific properties.
 
 ```sh
 m365 entra user registrationdetails list --properties 'id,isAdmin'
 ```
 
-Retrieve registration details for admins
+Retrieve registration details for admins.
 
 ```sh
 m365 entra user registrationdetails list --isAdmin true
 ```
 
-Retrieve registration details for guest users
+Retrieve registration details for guest users.
 
 ```sh
 m365 entra user registrationdetails list --userType guest
 ```
 
-Retrieve registration details for users who selected either sms or push authentication method as the default second-factor for performing multifactor authentication
+Retrieve registration details for users who selected either sms or push authentication method as the default second-factor for performing multifactor authentication.
 
 ```sh
 m365 entra user registrationdetails list --userPreferredMethodForSecondaryAuthentication 'sms,push'
 ```
 
-Retrieve registration details for users with push authentication method as the most secure authentication method among the registered methods for second factor authentication determined by the system
+Retrieve registration details for users with push authentication method as the most secure authentication method among the registered methods for second factor authentication determined by the system.
 
 ```sh
 m365 entra user registrationdetails list --systemPreferredAuthenticationMethods push
 ```
 
-Retrieve registration details for users who have used either Microsoft Authenticator app or mobile phone during registration
+Retrieve registration details for users who have used either Microsoft Authenticator app or mobile phone during registration.
 
 ```sh
 m365 entra user registrationdetails list --methodsRegistered 'microsoftAuthenticatorPush,mobilePhone'

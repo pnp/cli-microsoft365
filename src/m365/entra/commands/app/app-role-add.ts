@@ -6,7 +6,6 @@ import { formatting } from '../../../../utils/formatting.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 import { cli } from '../../../../cli/cli.js';
-import aadCommands from '../../aadCommands.js';
 
 interface CommandArgs {
   options: Options;
@@ -42,10 +41,6 @@ class EntraAppRoleAddCommand extends GraphCommand {
 
   public get description(): string {
     return 'Adds role to the specified Entra app registration';
-  }
-
-  public alias(): string[] | undefined {
-    return [aadCommands.APP_ROLE_ADD, commands.APPREGISTRATION_ROLE_ADD];
   }
 
   constructor() {
@@ -112,8 +107,6 @@ class EntraAppRoleAddCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    await this.showDeprecationWarning(logger, aadCommands.APP_ROLE_ADD, commands.APP_ROLE_ADD);
-
     try {
       const appId = await this.getAppObjectId(args, logger);
       const appInfo = await this.getAppInfo(appId, logger);

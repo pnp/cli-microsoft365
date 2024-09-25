@@ -5,8 +5,6 @@ import { entraGroup } from '../../../../utils/entraGroup.js';
 import { validation } from '../../../../utils/validation.js';
 import { formatting } from '../../../../utils/formatting.js';
 import GraphCommand from '../../../base/GraphCommand.js';
-import teamsCommands from '../../../teams/commands.js';
-import aadCommands from '../../aadCommands.js';
 import { entraUser } from '../../../../utils/entraUser.js';
 import commands from '../../commands.js';
 
@@ -33,10 +31,6 @@ class EntraM365GroupUserAddCommand extends GraphCommand {
 
   public get description(): string {
     return 'Adds user to specified Microsoft 365 Group or Microsoft Teams team';
-  }
-
-  public alias(): string[] | undefined {
-    return [teamsCommands.USER_ADD, aadCommands.M365GROUP_USER_ADD];
   }
 
   constructor() {
@@ -134,8 +128,6 @@ class EntraM365GroupUserAddCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    await this.showDeprecationWarning(logger, aadCommands.M365GROUP_USER_ADD, commands.M365GROUP_USER_ADD);
-
     try {
       const providedGroupId: string = await this.getGroupId(logger, args);
       const isUnifiedGroup = await entraGroup.isUnifiedGroup(providedGroupId);

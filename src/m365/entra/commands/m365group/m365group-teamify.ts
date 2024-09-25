@@ -6,7 +6,6 @@ import { entraGroup } from '../../../../utils/entraGroup.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
-import aadCommands from '../../aadCommands.js';
 import commands from '../../commands.js';
 
 interface CommandArgs {
@@ -25,10 +24,6 @@ class EntraM365GroupTeamifyCommand extends GraphCommand {
 
   public get description(): string {
     return 'Creates a new Microsoft Teams team under existing Microsoft 365 group';
-  }
-
-  public alias(): string[] | undefined {
-    return [aadCommands.M365GROUP_TEAMIFY];
   }
 
   constructor() {
@@ -106,8 +101,6 @@ class EntraM365GroupTeamifyCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    await this.showDeprecationWarning(logger, aadCommands.M365GROUP_TEAMIFY, commands.M365GROUP_TEAMIFY);
-
     try {
       const groupId = await this.getGroupId(args.options);
       const isUnifiedGroup = await entraGroup.isUnifiedGroup(groupId);

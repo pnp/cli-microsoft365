@@ -7,7 +7,6 @@ import { odata } from '../../../../utils/odata.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
-import aadCommands from '../../aadCommands.js';
 
 interface CommandArgs {
   options: Options;
@@ -26,10 +25,6 @@ class EntraM365GroupConversationPostListCommand extends GraphCommand {
 
   public get description(): string {
     return 'Lists conversation posts of a Microsoft 365 group';
-  }
-
-  public alias(): string[] | undefined {
-    return [aadCommands.M365GROUP_CONVERSATION_POST_LIST];
   }
 
   constructor() {
@@ -85,8 +80,6 @@ class EntraM365GroupConversationPostListCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    await this.showDeprecationWarning(logger, aadCommands.M365GROUP_CONVERSATION_POST_LIST, commands.M365GROUP_CONVERSATION_POST_LIST);
-
     try {
       const retrievedgroupId = await this.getGroupId(args);
       const isUnifiedGroup = await entraGroup.isUnifiedGroup(retrievedgroupId);

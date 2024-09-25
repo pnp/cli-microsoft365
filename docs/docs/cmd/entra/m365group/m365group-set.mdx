@@ -10,38 +10,32 @@ Updates Microsoft 365 Group properties
 m365 entra m365group set [options]
 ```
 
-## Alias
-
-```sh
-m365 aad m365group set [options]
-```
-
 ## Options
 
 ```md definition-list
 `-i, --id [id]`
-: The ID of the Microsoft 365 Group to update
+: The ID of the Microsoft 365 Group to update.
 
 `-n, --displayName [displayName]`
-: Display name of the Microsoft 365 Group to update
+: Display name of the Microsoft 365 Group to update.
 
 `--newDisplayName [newDisplayName]`
-: New display name for the Microsoft 365 Group
+: New display name for the Microsoft 365 Group.
 
 `-d, --description [description]`
-: Description for the Microsoft 365 Group
+: Description for the Microsoft 365 Group.
 
 `--owners [owners]`
-: Comma-separated list of Microsoft 365 Group owners to add
+: Comma-separated list of Microsoft 365 Group owners to add.
 
 `--members [members]`
-: Comma-separated list of Microsoft 365 Group members to add
+: Comma-separated list of Microsoft 365 Group members to add.
 
 `--isPrivate [isPrivate]`
-: Set to `true` if the Microsoft 365 Group should be private and `false` if it should be public.  
+: Set to `true` if the Microsoft 365 Group should be private and `false` if it should be public.
 
 `-l, --logoPath [logoPath]`
-: Local path to the image file to use as group logo
+: Local path to the image file to use as group logo.
 
 `--allowExternalSenders [allowExternalSenders]`
 : Indicates if people external to the organization can send messages to the group. Valid values: `true`, `false`.

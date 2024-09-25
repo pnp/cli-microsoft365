@@ -10,7 +10,6 @@ import config from '../../../../config.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { ClientSvcResponse, ClientSvcResponseContents, FormDigestInfo, spo } from '../../../../utils/spo.js';
 import { setTimeout } from 'timers/promises';
-import aadCommands from '../../aadCommands.js';
 
 interface CommandArgs {
   options: Options;
@@ -32,10 +31,6 @@ class EntraM365GroupRemoveCommand extends GraphCommand {
 
   public get description(): string {
     return 'Removes a Microsoft 365 Group';
-  }
-
-  public alias(): string[] | undefined {
-    return [aadCommands.M365GROUP_REMOVE];
   }
 
   constructor() {
@@ -82,8 +77,6 @@ class EntraM365GroupRemoveCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    await this.showDeprecationWarning(logger, aadCommands.M365GROUP_REMOVE, commands.M365GROUP_REMOVE);
-
     const removeGroup = async (): Promise<void> => {
       if (this.verbose) {
         await logger.logToStderr(`Removing Microsoft 365 Group: ${args.options.id}...`);
