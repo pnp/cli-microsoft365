@@ -163,9 +163,7 @@ Use this script to create a report of all M365 groups that are possibly obsolete
     # Original lists
     $users = m365 entra m365group user list --groupId $Group.Reference.id | ConvertFrom-Json
     $owners = $users | Where-Object { $_.roles -contains "Owner" }  
-    $members = $users | Where-Object { $_.roles -contains "Member" }  
-    
-    # Consider guests as users that also match the $Script:Guests array
+    $members = $users | Where-Object { $_.roles -contains "Member" -and $_.id -notin $Script:Guests.id }
     $guests = $users | Where-Object { $_.id -in $Script:Guests.id }
 
     # Modify the $members list to only contain users that are not in the $owners list
