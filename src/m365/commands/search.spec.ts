@@ -1,75 +1,244 @@
 ﻿import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../Auth.js';
-import command from './search.js';
+import { cli } from '../../cli/cli.js';
+import { CommandInfo } from '../../cli/CommandInfo.js';
+import { Logger } from '../../cli/Logger.js';
+import { CommandError } from '../../Command.js';
+import request from '../../request.js';
 import { telemetry } from '../../telemetry.js';
+import { misc } from '../../utils/misc.js';
+import { MockRequests } from '../../utils/MockRequest.js';
 import { pid } from '../../utils/pid.js';
 import { session } from '../../utils/session.js';
-import { cli } from '../../cli/cli.js';
 import { sinonUtil } from '../../utils/sinonUtil.js';
-import request from '../../request.js';
-import { Logger } from '../../cli/Logger.js';
-import { CommandInfo } from '../../cli/CommandInfo.js';
-import { CommandError } from '../../Command.js';
 import commands from './commands.js';
+import command from './search.js';
 
-describe(commands.SEARCH, () => {
-  const fullSearchResponse = {
-    "searchTerms": [
-      "contoso"
-    ],
-    "hitsContainers": [
-      {
-        "hits": [
-          {
-            "hitId": "AAMkAGRlM2Y5YTkzLWI2NzAtNDczOS05YWMyLTJhZGY2MGExMGU0MgBGAAAAAABIbfA8TbuRR7JKOZPl5FPxBwB8kpUvTuxuSYh8eqNsOdGBAAAAAAEMAAB8kpUvTuxuSYh8eqNsOdGBAAD30FHPAAA=",
-            "rank": 1,
-            "summary": "...More.  Your weekly PIM <c0>digest</c0> for MSFT Thanks for using Microsoft Entra Privileged Identity Management (PIM). This weekly <c0>digest</c0> shows your PIM activities over the last seven days:...",
-            "resource": {
-              "@odata.type": "#microsoft.graph.message",
-              "createdDateTime": "2024-03-03T02:27:56Z",
-              "lastModifiedDateTime": "2024-03-03T02:27:58Z",
-              "receivedDateTime": "2024-03-03T02:27:56Z",
-              "sentDateTime": "2024-03-03T02:27:51Z",
-              "hasAttachments": false,
-              "internetMessageId": "<Q5UVB9PQFMU4.BU5IUGF1B0I93@contoso>",
-              "subject": "Your weekly PIM digest for MSFT",
-              "bodyPreview": "...More.  Your weekly PIM digest for MSFT Thanks for using Microsoft Entra Privileged Identity Management (PIM). This weekly digest shows your PIM activities over the last seven days:...",
-              "importance": "normal",
-              "parentFolderId": "AQMkAGRlM2Y5YTkzLWI2NzAtNDczOS05YWMyLTJhZGY2MGExMGU0MgAuAAADSG3wPE27kUeySjmT5eRT8QEAfJKVL07sbkmIfHqjbDnRgQAAAgEMAAAA",
-              "conversationId": "AAQkAGRlM2Y5YTkzLWI2NzAtNDczOS05YWMyLTJhZGY2MGExMGU0MgAQAMc0n1gdmdxAgAfGlWKhSm4=",
-              "isRead": false,
-              "isDraft": false,
-              "webLink": "https://outlook.office365.com/owa/?ItemID=AAMkAGRlM2Y5YTkzLWI2NzAtNDczOS05YWMyLTJhZGY2MGExMGU0MgBGAAAAAABIbfA8TbuRR7JKOZPl5FPxBwB8kpUvTuxuSYh8eqNsOdGBAAAAAAEMAAB8kpUvTuxuSYh8eqNsOdGBAAD30FHPAAA%3D&exvsurl=1&viewmodel=ReadMessageItem",
-              "inferenceClassification": "focused",
-              "replyTo": [
-                {
-                  "emailAddress": {
-                    "name": "John Doe"
-                  }
-                }
-              ],
-              "sender": {
+const fullSearchResponse = {
+  "searchTerms": [
+    "contoso"
+  ],
+  "hitsContainers": [
+    {
+      "hits": [
+        {
+          "hitId": "AAMkAGRlM2Y5YTkzLWI2NzAtNDczOS05YWMyLTJhZGY2MGExMGU0MgBGAAAAAABIbfA8TbuRR7JKOZPl5FPxBwB8kpUvTuxuSYh8eqNsOdGBAAAAAAEMAAB8kpUvTuxuSYh8eqNsOdGBAAD30FHPAAA=",
+          "rank": 1,
+          "summary": "...More.  Your weekly PIM <c0>digest</c0> for MSFT Thanks for using Microsoft Entra Privileged Identity Management (PIM). This weekly <c0>digest</c0> shows your PIM activities over the last seven days:...",
+          "resource": {
+            "@odata.type": "#microsoft.graph.message",
+            "createdDateTime": "2024-03-03T02:27:56Z",
+            "lastModifiedDateTime": "2024-03-03T02:27:58Z",
+            "receivedDateTime": "2024-03-03T02:27:56Z",
+            "sentDateTime": "2024-03-03T02:27:51Z",
+            "hasAttachments": false,
+            "internetMessageId": "<Q5UVB9PQFMU4.BU5IUGF1B0I93@contoso>",
+            "subject": "Your weekly PIM digest for MSFT",
+            "bodyPreview": "...More.  Your weekly PIM digest for MSFT Thanks for using Microsoft Entra Privileged Identity Management (PIM). This weekly digest shows your PIM activities over the last seven days:...",
+            "importance": "normal",
+            "parentFolderId": "AQMkAGRlM2Y5YTkzLWI2NzAtNDczOS05YWMyLTJhZGY2MGExMGU0MgAuAAADSG3wPE27kUeySjmT5eRT8QEAfJKVL07sbkmIfHqjbDnRgQAAAgEMAAAA",
+            "conversationId": "AAQkAGRlM2Y5YTkzLWI2NzAtNDczOS05YWMyLTJhZGY2MGExMGU0MgAQAMc0n1gdmdxAgAfGlWKhSm4=",
+            "isRead": false,
+            "isDraft": false,
+            "webLink": "https://outlook.office365.com/owa/?ItemID=AAMkAGRlM2Y5YTkzLWI2NzAtNDczOS05YWMyLTJhZGY2MGExMGU0MgBGAAAAAABIbfA8TbuRR7JKOZPl5FPxBwB8kpUvTuxuSYh8eqNsOdGBAAAAAAEMAAB8kpUvTuxuSYh8eqNsOdGBAAD30FHPAAA%3D&exvsurl=1&viewmodel=ReadMessageItem",
+            "inferenceClassification": "focused",
+            "replyTo": [
+              {
                 "emailAddress": {
-                  "name": "Microsoft Security",
-                  "address": "MSSecurity-noreply@microsoft.com"
+                  "name": "John Doe"
                 }
-              },
-              "from": {
-                "emailAddress": {
-                  "name": "Microsoft Security",
-                  "address": "MSSecurity-noreply@microsoft.com"
-                }
+              }
+            ],
+            "sender": {
+              "emailAddress": {
+                "name": "Microsoft Security",
+                "address": "MSSecurity-noreply@microsoft.com"
+              }
+            },
+            "from": {
+              "emailAddress": {
+                "name": "Microsoft Security",
+                "address": "MSSecurity-noreply@microsoft.com"
               }
             }
           }
-        ],
-        "total": 350,
-        "moreResultsAvailable": true
-      }
-    ]
-  };
+        }
+      ],
+      "total": 350,
+      "moreResultsAvailable": true
+    }
+  ]
+};
+const selectedPropertiesSearchResponse = {
+  "searchTerms": [
+    "contoso"
+  ],
+  "hitsContainers": [
+    {
+      "hits": [
+        {
+          "hitId": "AAMkAGRlM2Y5YTkzLWI2NzAtNDczOS05YWMyLTJhZGY2MGExMGU0MgBGAAAAAABIbfA8TbuRR7JKOZPl5FPxBwB8kpUvTuxuSYh8eqNsOdGBAAAAAAEMAAB8kpUvTuxuSYh8eqNsOdGBAAD30FHPAAA=",
+          "rank": 1,
+          "summary": "...More.  Your weekly PIM <c0>digest</c0> for MSFT Thanks for using Microsoft Entra Privileged Identity Management (PIM). This weekly <c0>digest</c0> shows your PIM activities over the last seven days:...",
+          "resource": {
+            "@odata.type": "#microsoft.graph.message",
+            "subject": "Your weekly PIM digest for MSFT",
+            "importance": "normal"
+          }
+        }
+      ],
+      "total": 350,
+      "moreResultsAvailable": true
+    }
+  ]
+};
+const spellingCorrectionSearchResponse = {
+  "searchTerms": [
+    "principles"
+  ],
+  "hitsContainers": [
+    {
+      "hits": [
+        {
+          "hitId": "01IOTMML4Q6XCI2NYRXBALIRDODNYA6XLK",
+          "rank": 1,
+          "summary": "",
+          "resource": {
+            "@odata.type": "#microsoft.graph.driveItem",
+            "size": 0,
+            "fileSystemInfo": {
+              "createdDateTime": "2023-02-22T06:41:20Z",
+              "lastModifiedDateTime": "2023-02-22T06:41:20Z"
+            },
+            "listItem": {
+              "@odata.type": "#microsoft.graph.listItem",
+              "fields": {},
+              "id": "8dc4f590-1137-40b8-b444-6e1b700f5d6a"
+            },
+            "id": "01IOTMML4Q6XCI2NYRXBALIRDODNYA6XLK",
+            "createdBy": {
+              "user": {
+                "displayName": "SharePoint App"
+              }
+            },
+            "createdDateTime": "2023-02-22T06:41:20Z",
+            "lastModifiedBy": {
+              "user": {
+                "displayName": "SharePoint App"
+              }
+            },
+            "lastModifiedDateTime": "2023-02-22T06:41:20Z",
+            "name": "Contoso Marketing Principles.pptx",
+            "parentReference": {
+              "driveId": "b!F3G46XHCqU6L-OwKUiU8UObjtItbdTVCk4XtFGm7LW99GmedI39YRpyWEhUHE3Sn",
+              "id": "01IOTMML7VRF52SG4UKVBIE6HPXFKUI6U3",
+              "sharepointIds": {
+                "listId": "9d671a7d-7f23-4658-9c96-1215071374a7",
+                "listItemId": "8",
+                "listItemUniqueId": "8dc4f590-1137-40b8-b444-6e1b700f5d6a"
+              },
+              "siteId": "contoso.sharepoint.com,e9b87117-c271-4ea9-8bf8-ec0a52253c50,8bb4e3e6-755b-4235-9385-ed1469bb2d6f"
+            },
+            "webUrl": "https://contoso.sharepoint.com/sites/Mark8ProjectTeam2/Shared Documents/Digital Assets Web/Contoso Marketing Principles.pptx"
+          }
+        }
+      ],
+      "total": 1,
+      "moreResultsAvailable": false
+    }
+  ],
+  "queryAlterationResponse": {
+    "originalQueryString": "principless",
+    "queryAlteration": {
+      "alteredQueryString": "principles",
+      "alteredHighlightedQueryString": "principles",
+      "alteredQueryTokens": [
+        {
+          "offset": 0,
+          "length": 11,
+          "suggestion": "principles"
+        }
+      ]
+    },
+    "queryAlterationType": "modification"
+  }
+};
 
+export const mocks = {
+  queryNotSpecified: {
+    request: {
+      url: 'https://graph.microsoft.com/v1.0/search/query',
+      method: 'POST',
+      bodyFragment: '"queryString": "*"'
+    },
+    response: {
+      body: { "value": [fullSearchResponse] }
+    }
+  },
+  querySpecified: {
+    request: {
+      url: 'https://graph.microsoft.com/v1.0/search/query',
+      method: 'POST',
+      bodyFragment: '"queryString": "contoso"'
+    },
+    response: {
+      body: { "value": [fullSearchResponse] }
+    }
+  },
+  size: {
+    request: {
+      url: 'https://graph.microsoft.com/v1.0/search/query',
+      method: 'POST',
+      bodyFragment: '"size": 1,'
+    },
+    response: {
+      body: { "value": [fullSearchResponse] }
+    }
+  },
+  from: {
+    request: {
+      url: 'https://graph.microsoft.com/v1.0/search/query',
+      method: 'POST',
+      bodyFragment: '"from": 10,'
+    },
+    response: {
+      body: { "value": [fullSearchResponse] }
+    }
+  },
+  fields: {
+    request: {
+      url: 'https://graph.microsoft.com/v1.0/search/query',
+      method: 'POST',
+      bodyFragment: '"fields":'
+    },
+    response: {
+      body: { "value": [selectedPropertiesSearchResponse] }
+    }
+  },
+  sort: {
+    request: {
+      url: 'https://graph.microsoft.com/v1.0/search/query',
+      method: 'POST',
+      bodyFragment: '"sortProperties": ['
+    },
+    response: {
+      body: { "value": [selectedPropertiesSearchResponse] }
+    }
+  },
+  spelling: {
+    request: {
+      url: 'https://graph.microsoft.com/v1.0/search/query',
+      method: 'POST',
+      bodyFragment: '"enableModification": true,'
+    },
+    response: {
+      body: { "value": [spellingCorrectionSearchResponse] }
+    }
+  }
+} satisfies MockRequests;
+
+describe(commands.SEARCH, () => {
   const fullSearchFromIndexResponse = {
     "searchTerms": [
       "contoso"
@@ -224,30 +393,6 @@ describe(commands.SEARCH, () => {
     ]
   };
 
-  const selectedPropertiesSearchResponse = {
-    "searchTerms": [
-      "contoso"
-    ],
-    "hitsContainers": [
-      {
-        "hits": [
-          {
-            "hitId": "AAMkAGRlM2Y5YTkzLWI2NzAtNDczOS05YWMyLTJhZGY2MGExMGU0MgBGAAAAAABIbfA8TbuRR7JKOZPl5FPxBwB8kpUvTuxuSYh8eqNsOdGBAAAAAAEMAAB8kpUvTuxuSYh8eqNsOdGBAAD30FHPAAA=",
-            "rank": 1,
-            "summary": "...More.  Your weekly PIM <c0>digest</c0> for MSFT Thanks for using Microsoft Entra Privileged Identity Management (PIM). This weekly <c0>digest</c0> shows your PIM activities over the last seven days:...",
-            "resource": {
-              "@odata.type": "#microsoft.graph.message",
-              "subject": "Your weekly PIM digest for MSFT",
-              "importance": "normal"
-            }
-          }
-        ],
-        "total": 350,
-        "moreResultsAvailable": true
-      }
-    ]
-  };
-
   const resultsOnlySearchResponse = [
     {
       "hitId": "AAMkAGRlM2Y5YTkzLWI2NzAtNDczOS05YWMyLTJhZGY2MGExMGU0MgBGAAAAAABIbfA8TbuRR7JKOZPl5FPxBwB8kpUvTuxuSYh8eqNsOdGBAAAAAAEMAAB8kpUvTuxuSYh8eqNsOdGBAAD30FHPAAA=",
@@ -292,78 +437,6 @@ describe(commands.SEARCH, () => {
       }
     }
   ];
-
-  const spellingCorrectionSearchResponse = {
-    "searchTerms": [
-      "principles"
-    ],
-    "hitsContainers": [
-      {
-        "hits": [
-          {
-            "hitId": "01IOTMML4Q6XCI2NYRXBALIRDODNYA6XLK",
-            "rank": 1,
-            "summary": "",
-            "resource": {
-              "@odata.type": "#microsoft.graph.driveItem",
-              "size": 0,
-              "fileSystemInfo": {
-                "createdDateTime": "2023-02-22T06:41:20Z",
-                "lastModifiedDateTime": "2023-02-22T06:41:20Z"
-              },
-              "listItem": {
-                "@odata.type": "#microsoft.graph.listItem",
-                "fields": {},
-                "id": "8dc4f590-1137-40b8-b444-6e1b700f5d6a"
-              },
-              "id": "01IOTMML4Q6XCI2NYRXBALIRDODNYA6XLK",
-              "createdBy": {
-                "user": {
-                  "displayName": "SharePoint App"
-                }
-              },
-              "createdDateTime": "2023-02-22T06:41:20Z",
-              "lastModifiedBy": {
-                "user": {
-                  "displayName": "SharePoint App"
-                }
-              },
-              "lastModifiedDateTime": "2023-02-22T06:41:20Z",
-              "name": "Contoso Marketing Principles.pptx",
-              "parentReference": {
-                "driveId": "b!F3G46XHCqU6L-OwKUiU8UObjtItbdTVCk4XtFGm7LW99GmedI39YRpyWEhUHE3Sn",
-                "id": "01IOTMML7VRF52SG4UKVBIE6HPXFKUI6U3",
-                "sharepointIds": {
-                  "listId": "9d671a7d-7f23-4658-9c96-1215071374a7",
-                  "listItemId": "8",
-                  "listItemUniqueId": "8dc4f590-1137-40b8-b444-6e1b700f5d6a"
-                },
-                "siteId": "contoso.sharepoint.com,e9b87117-c271-4ea9-8bf8-ec0a52253c50,8bb4e3e6-755b-4235-9385-ed1469bb2d6f"
-              },
-              "webUrl": "https://contoso.sharepoint.com/sites/Mark8ProjectTeam2/Shared Documents/Digital Assets Web/Contoso Marketing Principles.pptx"
-            }
-          }
-        ],
-        "total": 1,
-        "moreResultsAvailable": false
-      }
-    ],
-    "queryAlterationResponse": {
-      "originalQueryString": "principless",
-      "queryAlteration": {
-        "alteredQueryString": "principles",
-        "alteredHighlightedQueryString": "principles",
-        "alteredQueryTokens": [
-          {
-            "offset": 0,
-            "length": 11,
-            "suggestion": "principles"
-          }
-        ]
-      },
-      "queryAlterationType": "modification"
-    }
-  };
 
   let log: string[];
   let logger: Logger;
@@ -575,7 +648,7 @@ describe(commands.SEARCH, () => {
 
   it('successfully returns search response when queryText is not specified', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/search/query' &&
+      if (opts.url === mocks.queryNotSpecified.request.url &&
         JSON.stringify(opts.data) === JSON.stringify({
           "requests": [
             {
@@ -591,7 +664,7 @@ describe(commands.SEARCH, () => {
             }
           ]
         })) {
-        return { "value": [fullSearchResponse] };
+        return misc.deepClone(mocks.queryNotSpecified.response.body);
       }
 
       throw 'Invalid request';
@@ -603,7 +676,7 @@ describe(commands.SEARCH, () => {
 
   it('successfully returns search response for specified query', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/search/query' &&
+      if (opts.url === mocks.querySpecified.request.url &&
         JSON.stringify(opts.data) === JSON.stringify({
           "requests": [
             {
@@ -619,7 +692,7 @@ describe(commands.SEARCH, () => {
             }
           ]
         })) {
-        return { "value": [fullSearchResponse] };
+        return misc.deepClone(mocks.querySpecified.response.body);
       }
 
       throw 'Invalid request';
@@ -631,7 +704,7 @@ describe(commands.SEARCH, () => {
 
   it('successfully returns only search results', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/search/query' &&
+      if (opts.url === mocks.querySpecified.request.url &&
         JSON.stringify(opts.data) === JSON.stringify({
           "requests": [
             {
@@ -647,7 +720,7 @@ describe(commands.SEARCH, () => {
             }
           ]
         })) {
-        return { "value": [fullSearchResponse] };
+        return misc.deepClone(mocks.querySpecified.response.body);
       }
 
       throw 'Invalid request';
@@ -659,7 +732,7 @@ describe(commands.SEARCH, () => {
 
   it('successfully returns only specified number of results in search response', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/search/query' &&
+      if (opts.url === mocks.size.request.url &&
         JSON.stringify(opts.data) === JSON.stringify({
           "requests": [
             {
@@ -675,7 +748,7 @@ describe(commands.SEARCH, () => {
             }
           ]
         })) {
-        return { "value": [fullSearchResponse] };
+        return misc.deepClone(mocks.size.response.body);
       }
 
       throw 'Invalid request';
@@ -687,7 +760,7 @@ describe(commands.SEARCH, () => {
 
   it('successfully returns search response from specified index', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/search/query' &&
+      if (opts.url === mocks.from.request.url &&
         JSON.stringify(opts.data) === JSON.stringify({
           "requests": [
             {
@@ -703,7 +776,7 @@ describe(commands.SEARCH, () => {
             }
           ]
         })) {
-        return { "value": [fullSearchResponse] };
+        return misc.deepClone(mocks.from.response.body);
       }
 
       throw 'Invalid request';
@@ -715,7 +788,7 @@ describe(commands.SEARCH, () => {
 
   it('successfully returns search response for specified query with selected properties', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/search/query' &&
+      if (opts.url === mocks.fields.request.url &&
         JSON.stringify(opts.data) === JSON.stringify({
           "requests": [
             {
@@ -735,7 +808,7 @@ describe(commands.SEARCH, () => {
             }
           ]
         })) {
-        return { "value": [selectedPropertiesSearchResponse] };
+        return misc.deepClone(mocks.fields.response.body);
       }
 
       throw 'Invalid request';
@@ -747,7 +820,7 @@ describe(commands.SEARCH, () => {
 
   it('successfully returns search results sorted by specified properties', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/search/query' &&
+      if (opts.url === mocks.sort.request.url &&
         JSON.stringify(opts.data) === JSON.stringify({
           "requests": [
             {
@@ -773,7 +846,7 @@ describe(commands.SEARCH, () => {
             }
           ]
         })) {
-        return { "value": [selectedPropertiesSearchResponse] };
+        return misc.deepClone(mocks.sort.response.body);
       }
 
       throw 'Invalid request';
@@ -785,7 +858,7 @@ describe(commands.SEARCH, () => {
 
   it('successfully returns search results with spelling corrections', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/search/query' &&
+      if (opts.url === mocks.spelling.request.url &&
         JSON.stringify(opts.data) === JSON.stringify({
           "requests": [
             {
@@ -804,7 +877,7 @@ describe(commands.SEARCH, () => {
             }
           ]
         })) {
-        return { "value": [spellingCorrectionSearchResponse] };
+        return misc.deepClone(mocks.spelling.response.body);
       }
 
       throw 'Invalid request';

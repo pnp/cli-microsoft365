@@ -3,30 +3,80 @@ import assert from 'assert';
 import fs from 'fs';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
-import { CommandError } from '../../../../Command.js';
 import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
+import { CommandError } from '../../../../Command.js';
 import request from '../../../../request.js';
+import { settingsNames } from '../../../../settingsNames.js';
 import { telemetry } from '../../../../telemetry.js';
+import { MockRequests } from '../../../../utils/MockRequest.js';
 import { odata } from '../../../../utils/odata.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './permission-add.js';
-import { settingsNames } from '../../../../settingsNames.js';
+
+//#region Mocked responses
+const appId = '9b1b1e42-794b-4c71-93ac-5ed92488b67f';
+const servicePrincipalId = '7c330108-8825-4b6c-b280-8d1d68da6bd7';
+const servicePrincipals: ServicePrincipal[] = [{ "appId": appId, 'id': servicePrincipalId, "servicePrincipalNames": [] }, { "appId": "00000003-0000-0000-c000-000000000000", "id": "fb4be1df-eaa6-4bd0-a068-71f9b2cbe2be", "servicePrincipalNames": ["https://canary.graph.microsoft.com/", "https://graph.microsoft.us/", "https://dod-graph.microsoft.us/", "00000003-0000-0000-c000-000000000000/ags.windows.net", "00000003-0000-0000-c000-000000000000", "https://canary.graph.microsoft.com", "https://graph.microsoft.com", "https://ags.windows.net", "https://graph.microsoft.us", "https://graph.microsoft.com/", "https://dod-graph.microsoft.us"], "appRoles": [{ "allowedMemberTypes": ["Application"], "description": "Allows the app to read and update user profiles without a signed in user.", "displayName": "Read and write all users' full profiles", "id": "741f803b-c850-494e-b5df-cde7c675a1ca", "isEnabled": true, "origin": "Application", "value": "User.ReadWrite.All" }, { "allowedMemberTypes": ["Application"], "description": "Allows the app to read user profiles without a signed in user.", "displayName": "Read all users' full profiles", "id": "df021288-bdef-4463-88db-98f22de89214", "isEnabled": true, "origin": "Application", "value": "User.Read.All" }, { "allowedMemberTypes": ["Application"], "description": "Allows the app to read and query your audit log activities, without a signed-in user.", "displayName": "Read all audit log data", "id": "b0afded3-3588-46d8-8b3d-9842eff778da", "isEnabled": true, "origin": "Application", "value": "AuditLog.Read.All" }], "oauth2PermissionScopes": [{ "adminConsentDescription": "Allows the app to see and update the data you gave it access to, even when users are not currently using the app. This does not give the app any additional permissions.", "adminConsentDisplayName": "Maintain access to data you have given it access to", "id": "7427e0e9-2fba-42fe-b0c0-848c9e6a8182", "isEnabled": true, "type": "User", "userConsentDescription": "Allows the app to see and update the data you gave it access to, even when you are not currently using the app. This does not give the app any additional permissions.", "userConsentDisplayName": "Maintain access to data you have given it access to", "value": "offline_access" }, { "adminConsentDescription": "Allows the app to read the available Teams templates, on behalf of the signed-in user.", "adminConsentDisplayName": "Read available Teams templates", "id": "cd87405c-5792-4f15-92f7-debc0db6d1d6", "isEnabled": true, "type": "User", "userConsentDescription": "Read available Teams templates, on your behalf.", "userConsentDisplayName": "Read available Teams templates", "value": "TeamTemplates.Read" }] }];
+const applications: Application[] = [{ 'id': appId, 'requiredResourceAccess': [] }];
+const applicationPermissions = 'https://graph.microsoft.com/User.ReadWrite.All https://graph.microsoft.com/User.Read.All';
+const delegatedPermissions = 'https://graph.microsoft.com/offline_access';
+//#endregion
+
+export const mocks = {
+  servicePrincipals: {
+    request: {
+      url: 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames'
+    },
+    response: {
+      body: {
+        value: servicePrincipals
+      }
+    }
+  },
+  applications: {
+    request: {
+      url: `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=appId eq '${appId}'&$select=id,requiredResourceAccess`
+    },
+    response: {
+      body: {
+        value: applications
+      }
+    }
+  },
+  patchApp: {
+    request: {
+      url: `https://graph.microsoft.com/v1.0/myorganization/applications/${applications[0].id}`,
+      method: 'PATCH'
+    },
+    response: {
+      body: {}
+    }
+  },
+  postAppRoleAssignments: {
+    request: {
+      url: `https://graph.microsoft.com/v1.0/myorganization/servicePrincipals/${servicePrincipalId}/appRoleAssignments`,
+      method: 'POST'
+    },
+    response: {
+      body: {}
+    }
+  },
+  postOAuth2PermissionGrants: {
+    request: {
+      url: 'https://graph.microsoft.com/v1.0/myorganization/oauth2PermissionGrants'
+    },
+    response: {
+      body: {}
+    }
+  }
+} satisfies MockRequests;
 
 describe(commands.PERMISSION_ADD, () => {
-  //#region Mocked responses
-  const appId = '9c79078b-815e-4a3e-bb80-2aaf2d9e9b3d';
-  const servicePrincipalId = '7c330108-8825-4b6c-b280-8d1d68da6bd7';
-  const servicePrincipals: ServicePrincipal[] = [{ "appId": appId, 'id': servicePrincipalId, "servicePrincipalNames": [] }, { "appId": "00000003-0000-0000-c000-000000000000", "id": "fb4be1df-eaa6-4bd0-a068-71f9b2cbe2be", "servicePrincipalNames": ["https://canary.graph.microsoft.com/", "https://graph.microsoft.us/", "https://dod-graph.microsoft.us/", "00000003-0000-0000-c000-000000000000/ags.windows.net", "00000003-0000-0000-c000-000000000000", "https://canary.graph.microsoft.com", "https://graph.microsoft.com", "https://ags.windows.net", "https://graph.microsoft.us", "https://graph.microsoft.com/", "https://dod-graph.microsoft.us"], "appRoles": [{ "allowedMemberTypes": ["Application"], "description": "Allows the app to read and update user profiles without a signed in user.", "displayName": "Read and write all users' full profiles", "id": "741f803b-c850-494e-b5df-cde7c675a1ca", "isEnabled": true, "origin": "Application", "value": "User.ReadWrite.All" }, { "allowedMemberTypes": ["Application"], "description": "Allows the app to read user profiles without a signed in user.", "displayName": "Read all users' full profiles", "id": "df021288-bdef-4463-88db-98f22de89214", "isEnabled": true, "origin": "Application", "value": "User.Read.All" }, { "allowedMemberTypes": ["Application"], "description": "Allows the app to read and query your audit log activities, without a signed-in user.", "displayName": "Read all audit log data", "id": "b0afded3-3588-46d8-8b3d-9842eff778da", "isEnabled": true, "origin": "Application", "value": "AuditLog.Read.All" }], "oauth2PermissionScopes": [{ "adminConsentDescription": "Allows the app to see and update the data you gave it access to, even when users are not currently using the app. This does not give the app any additional permissions.", "adminConsentDisplayName": "Maintain access to data you have given it access to", "id": "7427e0e9-2fba-42fe-b0c0-848c9e6a8182", "isEnabled": true, "type": "User", "userConsentDescription": "Allows the app to see and update the data you gave it access to, even when you are not currently using the app. This does not give the app any additional permissions.", "userConsentDisplayName": "Maintain access to data you have given it access to", "value": "offline_access" }, { "adminConsentDescription": "Allows the app to read the available Teams templates, on behalf of the signed-in user.", "adminConsentDisplayName": "Read available Teams templates", "id": "cd87405c-5792-4f15-92f7-debc0db6d1d6", "isEnabled": true, "type": "User", "userConsentDescription": "Read available Teams templates, on your behalf.", "userConsentDisplayName": "Read available Teams templates", "value": "TeamTemplates.Read" }] }];
-  const applications: Application[] = [{ 'id': appId, 'requiredResourceAccess': [] }];
-  const applicationPermissions = 'https://graph.microsoft.com/User.ReadWrite.All https://graph.microsoft.com/User.Read.All';
-  const delegatedPermissions = 'https://graph.microsoft.com/offline_access';
-  //#endregion
-
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
@@ -96,9 +146,9 @@ describe(commands.PERMISSION_ADD, () => {
   it('adds application permissions to appId without granting admin consent', async () => {
     sinon.stub(odata, 'getAllItems').callsFake(async (url: string) => {
       switch (url) {
-        case 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames':
+        case mocks.servicePrincipals.request.url:
           return servicePrincipals;
-        case `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=appId eq '${appId}'&$select=id,requiredResourceAccess`:
+        case mocks.applications.request.url:
           return applications;
         default:
           throw 'Invalid request';
@@ -106,7 +156,7 @@ describe(commands.PERMISSION_ADD, () => {
     });
 
     const patchStub = sinon.stub(request, 'patch').callsFake(async opts => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications/${applications[0].id}`) {
+      if (opts.url === mocks.patchApp.request.url) {
         return;
       }
       throw 'Invalid request';
@@ -120,9 +170,9 @@ describe(commands.PERMISSION_ADD, () => {
     let amountOfPostCalls = 0;
     sinon.stub(odata, 'getAllItems').callsFake(async (url: string) => {
       switch (url) {
-        case 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames':
+        case mocks.servicePrincipals.request.url:
           return servicePrincipals;
-        case `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=appId eq '${appId}'&$select=id,requiredResourceAccess`:
+        case mocks.applications.request.url:
           return applications;
         default:
           throw 'Invalid request';
@@ -130,14 +180,14 @@ describe(commands.PERMISSION_ADD, () => {
     });
 
     sinon.stub(request, 'patch').callsFake(async opts => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications/${applications[0].id}`) {
+      if (opts.url === mocks.patchApp.request.url) {
         return;
       }
       throw 'Invalid request';
     });
 
     sinon.stub(request, 'post').callsFake(async opts => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/servicePrincipals/${servicePrincipalId}/appRoleAssignments`) {
+      if (opts.url === mocks.postAppRoleAssignments.request.url) {
         amountOfPostCalls += 1;
         return;
       }
@@ -151,9 +201,9 @@ describe(commands.PERMISSION_ADD, () => {
   it('adds delegated permissions to appId without granting admin consent', async () => {
     sinon.stub(odata, 'getAllItems').callsFake(async (url: string) => {
       switch (url) {
-        case 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames':
+        case mocks.servicePrincipals.request.url:
           return servicePrincipals;
-        case `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=appId eq '${appId}'&$select=id,requiredResourceAccess`:
+        case mocks.applications.request.url:
           return applications;
         default:
           throw 'Invalid request';
@@ -161,7 +211,7 @@ describe(commands.PERMISSION_ADD, () => {
     });
 
     const patchStub = sinon.stub(request, 'patch').callsFake(async opts => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications/${applications[0].id}`) {
+      if (opts.url === mocks.patchApp.request.url) {
         return;
       }
       throw 'Invalid request';
@@ -177,9 +227,9 @@ describe(commands.PERMISSION_ADD, () => {
 
     sinon.stub(odata, 'getAllItems').callsFake(async (url: string) => {
       switch (url) {
-        case 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames':
+        case mocks.servicePrincipals.request.url:
           return servicePrincipals;
-        case `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=appId eq '${appId}'&$select=id,requiredResourceAccess`:
+        case mocks.applications.request.url:
           return applications;
         default:
           throw 'Invalid request';
@@ -187,14 +237,14 @@ describe(commands.PERMISSION_ADD, () => {
     });
 
     sinon.stub(request, 'patch').callsFake(async opts => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications/${applications[0].id}`) {
+      if (opts.url === mocks.patchApp.request.url) {
         return;
       }
       throw 'Invalid request';
     });
 
     const postStub = sinon.stub(request, 'post').callsFake(async opts => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/oauth2PermissionGrants`) {
+      if (opts.url === mocks.postOAuth2PermissionGrants.request.url) {
         return;
       }
       throw 'Invalid request';
@@ -215,9 +265,9 @@ describe(commands.PERMISSION_ADD, () => {
 
     sinon.stub(odata, 'getAllItems').callsFake(async (url: string) => {
       switch (url) {
-        case 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames':
+        case mocks.servicePrincipals.request.url:
           return servicePrincipals;
-        case `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=appId eq '${appId}'&$select=id,requiredResourceAccess`:
+        case mocks.applications.request.url:
           return applications;
         default:
           throw 'Invalid request';
@@ -225,7 +275,7 @@ describe(commands.PERMISSION_ADD, () => {
     });
 
     sinon.stub(request, 'patch').callsFake(async opts => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications/${applications[0].id}`) {
+      if (opts.url === mocks.patchApp.request.url) {
         return;
       }
 
@@ -233,11 +283,11 @@ describe(commands.PERMISSION_ADD, () => {
     });
 
     sinon.stub(request, 'post').callsFake(async opts => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/oauth2PermissionGrants`) {
+      if (opts.url === mocks.postOAuth2PermissionGrants.request.url) {
         amountOfPostCalls++;
         return;
       }
-      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/servicePrincipals/${servicePrincipalId}/appRoleAssignments`) {
+      if (opts.url === mocks.postAppRoleAssignments.request.url) {
         amountOfPostCalls++;
         return;
       }
@@ -251,9 +301,9 @@ describe(commands.PERMISSION_ADD, () => {
   it('throws an error when application is not found', async () => {
     sinon.stub(odata, 'getAllItems').callsFake(async (url: string) => {
       switch (url) {
-        case 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames':
+        case mocks.servicePrincipals.request.url:
           return servicePrincipals;
-        case `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=appId eq '${appId}'&$select=id,requiredResourceAccess`:
+        case mocks.applications.request.url:
           return [];
         default:
           throw 'Invalid request';
@@ -270,9 +320,9 @@ describe(commands.PERMISSION_ADD, () => {
     const servicePrincipalName: string = api.substring(0, pos);
     sinon.stub(odata, 'getAllItems').callsFake(async (url: string) => {
       switch (url) {
-        case 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames':
+        case mocks.servicePrincipals.request.url:
           return servicePrincipals;
-        case `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=appId eq '${appId}'&$select=id,requiredResourceAccess`:
+        case mocks.applications.request.url:
           return applications;
         default:
           throw 'Invalid request';
@@ -290,9 +340,9 @@ describe(commands.PERMISSION_ADD, () => {
     const permissionName: string = api.substring(pos + 1);
     sinon.stub(odata, 'getAllItems').callsFake(async (url: string) => {
       switch (url) {
-        case 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames':
+        case mocks.servicePrincipals.request.url:
           return servicePrincipals;
-        case `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=appId eq '${appId}'&$select=id,requiredResourceAccess`:
+        case mocks.applications.request.url:
           return applications;
         default:
           throw 'Invalid request';

@@ -5,29 +5,49 @@ import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
 import request from '../../../../request.js';
+import { settingsNames } from '../../../../settingsNames.js';
 import { telemetry } from '../../../../telemetry.js';
 import { formatting } from '../../../../utils/formatting.js';
+import { misc } from '../../../../utils/misc.js';
+import { MockRequests } from '../../../../utils/MockRequest.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './business-get.js';
-import { settingsNames } from '../../../../settingsNames.js';
+
+const validId = 'business@contoso.onmicrosoft.com';
+const validName = 'business name';
+const businessResponse = {
+  'id': validId,
+  'displayName': validName,
+  'businessType': 'Other',
+  'phone': '',
+  'email': 'user@contoso.onmicrosoft.com',
+  'webSiteUrl': '',
+  'defaultCurrencyIso': 'USD'
+};
+
+export const mocks = {
+  business: {
+    request: {
+      url: `https://graph.microsoft.com/v1.0/solutions/bookingBusinesses/${formatting.encodeQueryParameter(validId)}`
+    },
+    response: {
+      body: businessResponse
+    }
+  },
+  businesses: {
+    request: {
+      url: `https://graph.microsoft.com/v1.0/solutions/bookingBusinesses`
+    },
+    response: {
+      body: { value: [businessResponse] }
+    }
+  }
+} satisfies MockRequests;
 
 describe(commands.BUSINESS_GET, () => {
-  const validId = 'mail@contoso.onmicrosoft.com';
-  const validName = 'Valid Business';
-
-  const businessResponse = {
-    'id': validId,
-    'displayName': validName,
-    'businessType': 'Other',
-    'phone': '',
-    'email': 'user@contoso.onmicrosoft.com',
-    'webSiteUrl': '',
-    'defaultCurrencyIso': 'USD'
-  };
-
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -86,8 +106,8 @@ describe(commands.BUSINESS_GET, () => {
 
   it('gets business by id', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/solutions/bookingBusinesses/${formatting.encodeQueryParameter(validId)}`) {
-        return businessResponse;
+      if (opts.url === mocks.business.request.url) {
+        return misc.deepClone(mocks.business.response.body);
       }
 
       throw 'Invalid request';
@@ -99,12 +119,12 @@ describe(commands.BUSINESS_GET, () => {
 
   it('gets business by title', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/solutions/bookingBusinesses`) {
-        return { value: [businessResponse] };
+      if (opts.url === mocks.businesses.request.url) {
+        return misc.deepClone(mocks.businesses.response.body);
       }
 
-      if (opts.url === `https://graph.microsoft.com/v1.0/solutions/bookingBusinesses/${formatting.encodeQueryParameter(validId)}`) {
-        return businessResponse;
+      if (opts.url === mocks.business.request.url) {
+        return misc.deepClone(mocks.business.response.body);
       }
 
       throw 'Invalid request';
@@ -124,24 +144,24 @@ describe(commands.BUSINESS_GET, () => {
     });
 
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/solutions/bookingBusinesses`) {
+      if (opts.url === mocks.businesses.request.url) {
         return { value: [businessResponse, businessResponse] };
       }
 
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { name: validName } } as any), new CommandError("Multiple businesses with name 'Valid Business' found. Found: mail@contoso.onmicrosoft.com."));
+    await assert.rejects(command.action(logger, { options: { name: validName } } as any), new CommandError("Multiple businesses with name 'business name' found. Found: business@contoso.onmicrosoft.com."));
   });
 
   it('handles selecting single result when multiple businesses with the specified name found and cli is set to prompt', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/solutions/bookingBusinesses`) {
+      if (opts.url === mocks.businesses.request.url) {
         return Promise.resolve({ value: [businessResponse, businessResponse] });
       }
 
-      if (opts.url === `https://graph.microsoft.com/v1.0/solutions/bookingBusinesses/${formatting.encodeQueryParameter(validId)}`) {
-        return Promise.resolve(businessResponse);
+      if (opts.url === mocks.business.request.url) {
+        return Promise.resolve(misc.deepClone(mocks.business.response.body));
       }
 
       return Promise.reject('Invalid request');
@@ -163,7 +183,7 @@ describe(commands.BUSINESS_GET, () => {
 
   it('fails when no business found with name', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/solutions/bookingBusinesses`) {
+      if (opts.url === mocks.businesses.request.url) {
         return { value: [] };
       }
 
@@ -175,7 +195,7 @@ describe(commands.BUSINESS_GET, () => {
 
   it('fails when no business found with name because of an empty displayName', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/solutions/bookingBusinesses`) {
+      if (opts.url === mocks.businesses.request.url) {
         return { value: [{ 'displayName': null }] };
       }
 

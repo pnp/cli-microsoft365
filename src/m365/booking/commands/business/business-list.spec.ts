@@ -5,11 +5,32 @@ import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
 import request from '../../../../request.js';
 import { telemetry } from '../../../../telemetry.js';
+import { misc } from '../../../../utils/misc.js';
+import { MockRequests } from '../../../../utils/MockRequest.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './business-list.js';
+
+export const mocks = {
+  businesses: {
+    request: {
+      url: `https://graph.microsoft.com/v1.0/solutions/bookingBusinesses`
+    },
+    response: {
+      body: {
+        "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#solutions/bookingBusinesses",
+        "value": [
+          {
+            "id": "FourthCoffee@contoso.onmicrosoft.com",
+            "displayName": "Fourth Coffee"
+          }
+        ]
+      }
+    }
+  }
+} satisfies MockRequests;
 
 describe(commands.BUSINESS_LIST, () => {
   let log: string[];
@@ -66,16 +87,8 @@ describe(commands.BUSINESS_LIST, () => {
 
   it('lists Microsoft Bookings businesses in the tenant (debug)', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/solutions/bookingBusinesses`) {
-        return {
-          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#solutions/bookingBusinesses",
-          "value": [
-            {
-              "id": "FourthCoffee@contoso.onmicrosoft.com",
-              "displayName": "Fourth Coffee"
-            }
-          ]
-        };
+      if (opts.url === mocks.businesses.request.url) {
+        return misc.deepClone(mocks.businesses.response.body);
       }
 
       throw 'Invalid request';

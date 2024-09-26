@@ -7,14 +7,83 @@ import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
 import request from '../../../../request.js';
+import { settingsNames } from '../../../../settingsNames.js';
 import { telemetry } from '../../../../telemetry.js';
+import { misc } from '../../../../utils/misc.js';
+import { MockRequests } from '../../../../utils/MockRequest.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
+import aadCommands from '../../aadCommands.js';
 import commands from '../../commands.js';
 import command from './app-get.js';
-import { settingsNames } from '../../../../settingsNames.js';
-import aadCommands from '../../aadCommands.js';
+
+export const mocks = {
+  getById: {
+    request: {
+      url: `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=appId eq '9b1b1e42-794b-4c71-93ac-5ed92488b67f'&$select=id`
+    },
+    response: {
+      body: {
+        value: [
+          {
+            "id": "340a4aa3-1af6-43ac-87d8-189819003952",
+            "appId": "9b1b1e42-794b-4c71-93ac-5ed92488b67f",
+            "createdDateTime": "2019-10-29T17:46:55Z",
+            "displayName": "My App",
+            "description": null
+          }
+        ]
+      }
+    }
+  },
+  getByName: {
+    request: {
+      url: `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=displayName eq 'My%20App'&$select=id`
+    },
+    response: {
+      body: {
+        value: [
+          {
+            "id": "340a4aa3-1af6-43ac-87d8-189819003952",
+            "appId": "9b1b1e42-794b-4c71-93ac-5ed92488b67f",
+            "createdDateTime": "2019-10-29T17:46:55Z",
+            "displayName": "My App",
+            "description": null
+          }
+        ]
+      }
+    }
+  },
+  getAppByAppId: {
+    request: {
+      url: 'https://graph.microsoft.com/v1.0/myorganization/applications/9b1b1e42-794b-4c71-93ac-5ed92488b67f'
+    },
+    response: {
+      body: {
+        "id": "340a4aa3-1af6-43ac-87d8-189819003952",
+        "appId": "9b1b1e42-794b-4c71-93ac-5ed92488b67f",
+        "createdDateTime": "2019-10-29T17:46:55Z",
+        "displayName": "My App",
+        "description": null
+      }
+    }
+  },
+  getAppByObjectId: {
+    request: {
+      url: `https://graph.microsoft.com/v1.0/myorganization/applications/340a4aa3-1af6-43ac-87d8-189819003952`
+    },
+    response: {
+      body: {
+        "id": "340a4aa3-1af6-43ac-87d8-189819003952",
+        "appId": "9b1b1e42-794b-4c71-93ac-5ed92488b67f",
+        "createdDateTime": "2019-10-29T17:46:55Z",
+        "displayName": "My App",
+        "description": null
+      }
+    }
+  }
+} satisfies MockRequests;
 
 describe(commands.APP_GET, () => {
   let log: string[];
@@ -83,7 +152,7 @@ describe(commands.APP_GET, () => {
 
   it('handles error when the app specified with the appId not found', async () => {
     sinon.stub(request, 'get').callsFake(async opts => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=appId eq '9b1b1e42-794b-4c71-93ac-5ed92488b67f'&$select=id`) {
+      if (opts.url === mocks.getById.request.url) {
         return { value: [] };
       }
 
@@ -99,7 +168,7 @@ describe(commands.APP_GET, () => {
 
   it('handles error when the app with the specified the name not found', async () => {
     sinon.stub(request, 'get').callsFake(async opts => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=displayName eq 'My%20app'&$select=id`) {
+      if (opts.url === mocks.getByName.request.url) {
         return { value: [] };
       }
 
@@ -108,9 +177,9 @@ describe(commands.APP_GET, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        name: 'My app'
+        name: 'My App'
       }
-    }), new CommandError(`No Microsoft Entra application registration with name My app found`));
+    }), new CommandError(`No Microsoft Entra application registration with name My App found`));
   });
 
   it('handles error when multiple apps with the specified name found', async () => {
@@ -123,7 +192,7 @@ describe(commands.APP_GET, () => {
     });
 
     sinon.stub(request, 'get').callsFake(async opts => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=displayName eq 'My%20app'&$select=id`) {
+      if (opts.url === mocks.getByName.request.url) {
         return {
           value: [
             { id: '9b1b1e42-794b-4c71-93ac-5ed92488b67f' },
@@ -137,14 +206,14 @@ describe(commands.APP_GET, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        name: 'My app'
+        name: 'My App'
       }
-    }), new CommandError(`Multiple Microsoft Entra application registrations with name 'My app' found. Found: 9b1b1e42-794b-4c71-93ac-5ed92488b67f, 9b1b1e42-794b-4c71-93ac-5ed92488b67g.`));
+    }), new CommandError(`Multiple Microsoft Entra application registrations with name 'My App' found. Found: 9b1b1e42-794b-4c71-93ac-5ed92488b67f, 9b1b1e42-794b-4c71-93ac-5ed92488b67g.`));
   });
 
   it('handles selecting single result when multiple apps with the specified name found and cli is set to prompt', async () => {
     sinon.stub(request, 'get').callsFake(async opts => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=displayName eq 'My%20App'&$select=id`) {
+      if (opts.url === mocks.getByName.request.url) {
         return {
           value: [
             { id: '9b1b1e42-794b-4c71-93ac-5ed92488b67f' },
@@ -153,14 +222,8 @@ describe(commands.APP_GET, () => {
         };
       }
 
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/9b1b1e42-794b-4c71-93ac-5ed92488b67f') {
-        return {
-          "id": "340a4aa3-1af6-43ac-87d8-189819003952",
-          "appId": "9b1b1e42-794b-4c71-93ac-5ed92488b67f",
-          "createdDateTime": "2019-10-29T17:46:55Z",
-          "displayName": "My App",
-          "description": null
-        };
+      if (opts.url === mocks.getAppByAppId.request.url) {
+        return misc.deepClone(mocks.getAppByAppId.response.body);
       }
 
       throw `Invalid request ${JSON.stringify(opts)}`;
@@ -282,28 +345,12 @@ describe(commands.APP_GET, () => {
 
   it(`should get an Microsoft Entra app registration by its app (client) ID. Doesn't save the app info if not requested`, async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=appId eq '9b1b1e42-794b-4c71-93ac-5ed92488b67f'&$select=id`) {
-        return {
-          value: [
-            {
-              "id": "340a4aa3-1af6-43ac-87d8-189819003952",
-              "appId": "9b1b1e42-794b-4c71-93ac-5ed92488b67f",
-              "createdDateTime": "2019-10-29T17:46:55Z",
-              "displayName": "My App",
-              "description": null
-            }
-          ]
-        };
+      if (opts.url === mocks.getById.request.url) {
+        return misc.deepClone(mocks.getById.response.body);
       }
 
-      if ((opts.url as string).indexOf('/v1.0/myorganization/applications/') > -1) {
-        return {
-          "id": "340a4aa3-1af6-43ac-87d8-189819003952",
-          "appId": "9b1b1e42-794b-4c71-93ac-5ed92488b67f",
-          "createdDateTime": "2019-10-29T17:46:55Z",
-          "displayName": "My App",
-          "description": null
-        };
+      if (opts.url === mocks.getAppByObjectId.request.url) {
+        return misc.deepClone(mocks.getAppByObjectId.response.body);
       }
 
       throw 'Invalid request';
@@ -324,28 +371,12 @@ describe(commands.APP_GET, () => {
 
   it(`should get an Microsoft Entra app registration by its name. Doesn't save the app info if not requested`, async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=displayName eq 'My%20App'&$select=id`) {
-        return {
-          value: [
-            {
-              "id": "340a4aa3-1af6-43ac-87d8-189819003952",
-              "appId": "9b1b1e42-794b-4c71-93ac-5ed92488b67f",
-              "createdDateTime": "2019-10-29T17:46:55Z",
-              "displayName": "My App",
-              "description": null
-            }
-          ]
-        };
+      if (opts.url === mocks.getByName.request.url) {
+        return misc.deepClone(mocks.getByName.response.body);
       }
 
-      if ((opts.url as string).indexOf('/v1.0/myorganization/applications/') > -1) {
-        return {
-          "id": "340a4aa3-1af6-43ac-87d8-189819003952",
-          "appId": "9b1b1e42-794b-4c71-93ac-5ed92488b67f",
-          "createdDateTime": "2019-10-29T17:46:55Z",
-          "displayName": "My App",
-          "description": null
-        };
+      if (opts.url === mocks.getAppByObjectId.request.url) {
+        return misc.deepClone(mocks.getAppByObjectId.response.body);
       }
 
       throw 'Invalid request';
@@ -366,14 +397,8 @@ describe(commands.APP_GET, () => {
 
   it(`should get an Microsoft Entra app registration by its object ID. Doesn't save the app info if not requested`, async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications/340a4aa3-1af6-43ac-87d8-189819003952`) {
-        return {
-          "id": "340a4aa3-1af6-43ac-87d8-189819003952",
-          "appId": "9b1b1e42-794b-4c71-93ac-5ed92488b67f",
-          "createdDateTime": "2019-10-29T17:46:55Z",
-          "displayName": "My App",
-          "description": null
-        };
+      if (opts.url === mocks.getAppByObjectId.request.url) {
+        return misc.deepClone(mocks.getAppByObjectId.response.body);
       }
       throw 'Invalid request';
     });
@@ -395,28 +420,12 @@ describe(commands.APP_GET, () => {
     let fileContents: string | undefined;
     let filePath: string | undefined;
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=appId eq '9b1b1e42-794b-4c71-93ac-5ed92488b67f'&$select=id`) {
-        return {
-          value: [
-            {
-              "id": "340a4aa3-1af6-43ac-87d8-189819003952",
-              "appId": "9b1b1e42-794b-4c71-93ac-5ed92488b67f",
-              "createdDateTime": "2019-10-29T17:46:55Z",
-              "displayName": "My App",
-              "description": null
-            }
-          ]
-        };
+      if (opts.url === mocks.getById.request.url) {
+        return misc.deepClone(mocks.getById.response.body);
       }
 
-      if ((opts.url as string).indexOf('/v1.0/myorganization/applications/') > -1) {
-        return {
-          "id": "340a4aa3-1af6-43ac-87d8-189819003952",
-          "appId": "9b1b1e42-794b-4c71-93ac-5ed92488b67f",
-          "createdDateTime": "2019-10-29T17:46:55Z",
-          "displayName": "My App",
-          "description": null
-        };
+      if (opts.url === mocks.getAppByObjectId.request.url) {
+        return misc.deepClone(mocks.getAppByObjectId.response.body);
       }
 
       throw 'Invalid request';
@@ -450,28 +459,12 @@ describe(commands.APP_GET, () => {
     let fileContents: string | undefined;
     let filePath: string | undefined;
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=appId eq '9b1b1e42-794b-4c71-93ac-5ed92488b67f'&$select=id`) {
-        return {
-          value: [
-            {
-              "id": "340a4aa3-1af6-43ac-87d8-189819003952",
-              "appId": "9b1b1e42-794b-4c71-93ac-5ed92488b67f",
-              "createdDateTime": "2019-10-29T17:46:55Z",
-              "displayName": "My App",
-              "description": null
-            }
-          ]
-        };
+      if (opts.url === mocks.getAppByObjectId.request.url) {
+        return misc.deepClone(mocks.getAppByObjectId.response.body);
       }
 
-      if ((opts.url as string).indexOf('/v1.0/myorganization/applications/') > -1) {
-        return {
-          "id": "340a4aa3-1af6-43ac-87d8-189819003952",
-          "appId": "9b1b1e42-794b-4c71-93ac-5ed92488b67f",
-          "createdDateTime": "2019-10-29T17:46:55Z",
-          "displayName": "My App",
-          "description": null
-        };
+      if (opts.url === mocks.getById.request.url) {
+        return misc.deepClone(mocks.getById.response.body);
       }
 
       throw 'Invalid request';
@@ -506,28 +499,12 @@ describe(commands.APP_GET, () => {
     let fileContents: string | undefined;
     let filePath: string | undefined;
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=appId eq '9b1b1e42-794b-4c71-93ac-5ed92488b67f'&$select=id`) {
-        return {
-          value: [
-            {
-              "id": "340a4aa3-1af6-43ac-87d8-189819003952",
-              "appId": "9b1b1e42-794b-4c71-93ac-5ed92488b67f",
-              "createdDateTime": "2019-10-29T17:46:55Z",
-              "displayName": "My App",
-              "description": null
-            }
-          ]
-        };
+      if (opts.url === mocks.getAppByObjectId.request.url) {
+        return misc.deepClone(mocks.getAppByObjectId.response.body);
       }
 
-      if ((opts.url as string).indexOf('/v1.0/myorganization/applications/') > -1) {
-        return {
-          "id": "340a4aa3-1af6-43ac-87d8-189819003952",
-          "appId": "9b1b1e42-794b-4c71-93ac-5ed92488b67f",
-          "createdDateTime": "2019-10-29T17:46:55Z",
-          "displayName": "My App",
-          "description": null
-        };
+      if (opts.url === mocks.getById.request.url) {
+        return misc.deepClone(mocks.getById.response.body);
       }
 
       throw 'Invalid request';
@@ -574,28 +551,12 @@ describe(commands.APP_GET, () => {
     let fileContents: string | undefined;
     let filePath: string | undefined;
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=appId eq '9b1b1e42-794b-4c71-93ac-5ed92488b67f'&$select=id`) {
-        return {
-          value: [
-            {
-              "id": "340a4aa3-1af6-43ac-87d8-189819003952",
-              "appId": "9b1b1e42-794b-4c71-93ac-5ed92488b67f",
-              "createdDateTime": "2019-10-29T17:46:55Z",
-              "displayName": "My App",
-              "description": null
-            }
-          ]
-        };
+      if (opts.url === mocks.getAppByObjectId.request.url) {
+        return misc.deepClone(mocks.getAppByObjectId.response.body);
       }
 
-      if ((opts.url as string).indexOf('/v1.0/myorganization/applications/') > -1) {
-        return {
-          "id": "340a4aa3-1af6-43ac-87d8-189819003952",
-          "appId": "9b1b1e42-794b-4c71-93ac-5ed92488b67f",
-          "createdDateTime": "2019-10-29T17:46:55Z",
-          "displayName": "My App",
-          "description": null
-        };
+      if (opts.url === mocks.getById.request.url) {
+        return misc.deepClone(mocks.getById.response.body);
       }
 
       throw 'Invalid request';
@@ -641,28 +602,12 @@ describe(commands.APP_GET, () => {
 
   it(`doesn't save app info in the .m365rc.json file when there was error reading file contents`, async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=appId eq '9b1b1e42-794b-4c71-93ac-5ed92488b67f'&$select=id`) {
-        return {
-          value: [
-            {
-              "id": "340a4aa3-1af6-43ac-87d8-189819003952",
-              "appId": "9b1b1e42-794b-4c71-93ac-5ed92488b67f",
-              "createdDateTime": "2019-10-29T17:46:55Z",
-              "displayName": "My App",
-              "description": null
-            }
-          ]
-        };
+      if (opts.url === mocks.getAppByObjectId.request.url) {
+        return misc.deepClone(mocks.getAppByObjectId.response.body);
       }
 
-      if ((opts.url as string).indexOf('/v1.0/myorganization/applications/') > -1) {
-        return {
-          "id": "340a4aa3-1af6-43ac-87d8-189819003952",
-          "appId": "9b1b1e42-794b-4c71-93ac-5ed92488b67f",
-          "createdDateTime": "2019-10-29T17:46:55Z",
-          "displayName": "My App",
-          "description": null
-        };
+      if (opts.url === mocks.getById.request.url) {
+        return misc.deepClone(mocks.getById.response.body);
       }
 
       throw 'Invalid request';
@@ -682,28 +627,12 @@ describe(commands.APP_GET, () => {
 
   it(`doesn't save app info in the .m365rc.json file when file has invalid JSON`, async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=appId eq '9b1b1e42-794b-4c71-93ac-5ed92488b67f'&$select=id`) {
-        return {
-          value: [
-            {
-              "id": "340a4aa3-1af6-43ac-87d8-189819003952",
-              "appId": "9b1b1e42-794b-4c71-93ac-5ed92488b67f",
-              "createdDateTime": "2019-10-29T17:46:55Z",
-              "displayName": "My App",
-              "description": null
-            }
-          ]
-        };
+      if (opts.url === mocks.getAppByObjectId.request.url) {
+        return misc.deepClone(mocks.getAppByObjectId.response.body);
       }
 
-      if ((opts.url as string).indexOf('/v1.0/myorganization/applications/') > -1) {
-        return {
-          "id": "340a4aa3-1af6-43ac-87d8-189819003952",
-          "appId": "9b1b1e42-794b-4c71-93ac-5ed92488b67f",
-          "createdDateTime": "2019-10-29T17:46:55Z",
-          "displayName": "My App",
-          "description": null
-        };
+      if (opts.url === mocks.getById.request.url) {
+        return misc.deepClone(mocks.getById.response.body);
       }
 
       throw 'Invalid request';
@@ -723,28 +652,12 @@ describe(commands.APP_GET, () => {
 
   it(`doesn't fail execution when error occurred while saving app info`, async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=appId eq '9b1b1e42-794b-4c71-93ac-5ed92488b67f'&$select=id`) {
-        return {
-          value: [
-            {
-              "id": "340a4aa3-1af6-43ac-87d8-189819003952",
-              "appId": "9b1b1e42-794b-4c71-93ac-5ed92488b67f",
-              "createdDateTime": "2019-10-29T17:46:55Z",
-              "displayName": "My App",
-              "description": null
-            }
-          ]
-        };
+      if (opts.url === mocks.getAppByObjectId.request.url) {
+        return misc.deepClone(mocks.getAppByObjectId.response.body);
       }
 
-      if ((opts.url as string).indexOf('/v1.0/myorganization/applications/') > -1) {
-        return {
-          "id": "340a4aa3-1af6-43ac-87d8-189819003952",
-          "appId": "9b1b1e42-794b-4c71-93ac-5ed92488b67f",
-          "createdDateTime": "2019-10-29T17:46:55Z",
-          "displayName": "My App",
-          "description": null
-        };
+      if (opts.url === mocks.getById.request.url) {
+        return misc.deepClone(mocks.getById.response.body);
       }
 
       throw 'Invalid request';

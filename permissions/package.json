@@ -1,0 +1,21 @@
+{
+  "name": "cli-microsoft365-permissions",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "scripts": {
+    "start:commands": "node get-commands.js",
+    "start:permissions": "node get-permissions.js",
+    "start:mocks": "node get-mocks.js",
+    "start:devproxy": "devproxy",
+    "clean:commands": "node clean-commands.js",
+    "clean:reports": "rm MinimalPermissionsPlugin_*.json"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "chalk": "^5.3.0",
+    "debug": "^4.3.6"
+  }
+}
