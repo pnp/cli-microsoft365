@@ -4477,6 +4477,11 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
+              label: 'engage community user add',
+              id: 'cmd/viva/engage/engage-community-user-add'
+            },
+            {
+              type: 'doc',
               label: 'engage group list',
               id: 'cmd/viva/engage/engage-group-list'
             },
