@@ -42,7 +42,7 @@ class VivaEngageCommunityUserAddCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'Lists all users within a specified Microsoft 365 Viva Engage community';
+    return 'Adds a user to a specific Microsoft 365 Viva Engage community';
   }
 
   public get schema(): z.ZodTypeAny {
