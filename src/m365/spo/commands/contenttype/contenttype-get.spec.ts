@@ -69,7 +69,7 @@ describe(commands.CONTENTTYPE_GET, () => {
 
   it('gets information about a site content type by id', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/web/contenttypes('0x0100558D85B7216F6A489A499DB361E1AE2F')`) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/web/contenttypes('0x0100558D85B7216F6A489A499DB361E1AE2F')?$expand=Parent`) {
         return contentTypeByIdResponse;
       }
 
@@ -82,7 +82,7 @@ describe(commands.CONTENTTYPE_GET, () => {
 
   it('gets information about a site content type by name', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/contenttypes?$filter=Name eq 'PnP%20Alert'`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/contenttypes?$filter=Name eq 'PnP%20Alert'&$expand=Parent`) > -1) {
         return contentTypeByNameResponse;
       }
 
@@ -95,7 +95,7 @@ describe(commands.CONTENTTYPE_GET, () => {
 
   it('gets information about a list content type by id', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/web/lists/getByTitle('Events')/contenttypes('0x010200973548ACFFDA0948BE80AF607C4E28F9')`) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/web/lists/getByTitle('Events')/contenttypes('0x010200973548ACFFDA0948BE80AF607C4E28F9')?$expand=Parent`) {
         return contentTypeByIdResponse;
       }
 
@@ -108,7 +108,7 @@ describe(commands.CONTENTTYPE_GET, () => {
 
   it('gets information about a list retrieved by its title and the content type by id', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/web/lists(guid'9153a1f5-22f7-49e8-a854-06bb4477c2a2')/contenttypes('0x010200973548ACFFDA0948BE80AF607C4E28F9')`) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/web/lists(guid'9153a1f5-22f7-49e8-a854-06bb4477c2a2')/contenttypes('0x010200973548ACFFDA0948BE80AF607C4E28F9')?$expand=Parent`) {
         return contentTypeByIdResponse;
       }
 
@@ -121,7 +121,7 @@ describe(commands.CONTENTTYPE_GET, () => {
 
   it('gets information about a list retrieved by its url and the content type by id', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/web/GetList('%2Fsites%2Fportal%2Fdocuments')/contenttypes('0x010200973548ACFFDA0948BE80AF607C4E28F9')`) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/web/GetList('%2Fsites%2Fportal%2Fdocuments')/contenttypes('0x010200973548ACFFDA0948BE80AF607C4E28F9')?$expand=Parent`) {
         return contentTypeByIdResponse;
       }
 
@@ -134,7 +134,7 @@ describe(commands.CONTENTTYPE_GET, () => {
 
   it('gets information about a list retrieved by its title and the content type by name', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/web/lists/getByTitle('Events')/contenttypes?$filter=Name eq 'Event'`) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/web/lists/getByTitle('Events')/contenttypes?$filter=Name eq 'Event'&$expand=Parent`) {
         return contentTypeByNameResponse;
       }
 
@@ -147,7 +147,7 @@ describe(commands.CONTENTTYPE_GET, () => {
 
   it('gets information about a list retrieved by its id and the content type by name', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/web/lists(guid'9153a1f5-22f7-49e8-a854-06bb4477c2a2')/contenttypes?$filter=Name eq 'Event'`) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/web/lists(guid'9153a1f5-22f7-49e8-a854-06bb4477c2a2')/contenttypes?$filter=Name eq 'Event'&$expand=Parent`) {
         return contentTypeByNameResponse;
       }
 
@@ -160,7 +160,7 @@ describe(commands.CONTENTTYPE_GET, () => {
 
   it('gets information about a list retrieved by its url and the content type by name', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/web/GetList('%2Fsites%2Fportal%2Fdocuments')/contenttypes?$filter=Name eq 'Event'`) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/web/GetList('%2Fsites%2Fportal%2Fdocuments')/contenttypes?$filter=Name eq 'Event'&$expand=Parent`) {
         return contentTypeByNameResponse;
       }
 
@@ -173,7 +173,7 @@ describe(commands.CONTENTTYPE_GET, () => {
 
   it('correctly escapes special characters in the content type id', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/web/contenttypes('0%3D0100558D85B7216F6A489A499DB361E1AE2F')`) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/web/contenttypes('0%3D0100558D85B7216F6A489A499DB361E1AE2F')?$expand=Parent`) {
         return { "odata.null": true };
       }
 
@@ -186,7 +186,7 @@ describe(commands.CONTENTTYPE_GET, () => {
 
   it('correctly handles site content type not found by id', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/web/contenttypes('0x0100558D85B7216F6A489A499DB361E1AE2F')`) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/web/contenttypes('0x0100558D85B7216F6A489A499DB361E1AE2F')?$expand=Parent`) {
         return { "odata.null": true };
       }
 
@@ -199,7 +199,7 @@ describe(commands.CONTENTTYPE_GET, () => {
 
   it('correctly handles site content type not found by content type name', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/web/contenttypes?$filter=Name eq 'PnP%20Alert'`) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/web/contenttypes?$filter=Name eq 'PnP%20Alert'&$expand=Parent`) {
         return { "value": [] };
       }
 
@@ -212,7 +212,7 @@ describe(commands.CONTENTTYPE_GET, () => {
 
   it('correctly handles list content type not found', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/web/lists/getByTitle('Documents')/contenttypes('0x0100558D85B7216F6A489A499DB361E1AE2F')`) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/web/lists/getByTitle('Documents')/contenttypes('0x0100558D85B7216F6A489A499DB361E1AE2F')?$expand=Parent`) {
         return { "odata.null": true };
       }
 
@@ -225,7 +225,7 @@ describe(commands.CONTENTTYPE_GET, () => {
 
   it('correctly handles list not found', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/web/lists/getByTitle('Documents')/contenttypes('0x0100558D85B7216F6A489A499DB361E1AE2F')`) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/web/lists/getByTitle('Documents')/contenttypes('0x0100558D85B7216F6A489A499DB361E1AE2F')?$expand=Parent`) {
         throw {
           error: {
             "odata.error": {
