@@ -12,7 +12,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './file-move.js';
-import { CreateCopyJobsNameConflictBehavior, spo } from '../../../../utils/spo.js';
+import { CreateFileCopyJobsNameConflictBehavior, spo } from '../../../../utils/spo.js';
 import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.FILE_MOVE, () => {
@@ -95,7 +95,7 @@ describe(commands.FILE_MOVE, () => {
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName: string, defaultValue: any) => settingName === settingsNames.prompt ? false : defaultValue);
-    spoUtilCreateCopyJobStub = sinon.stub(spo, 'createCopyJob').resolves(copyJobInfo);
+    spoUtilCreateCopyJobStub = sinon.stub(spo, 'createFileCopyJob').resolves(copyJobInfo);
   });
 
   beforeEach(() => {
@@ -296,7 +296,7 @@ describe(commands.FILE_MOVE, () => {
       sourceAbsoluteUrl,
       destAbsoluteTargetUrl,
       {
-        nameConflictBehavior: CreateCopyJobsNameConflictBehavior.Fail,
+        nameConflictBehavior: CreateFileCopyJobsNameConflictBehavior.Fail,
         bypassSharedLock: false,
         includeItemPermissions: false,
         operation: 'move',
@@ -328,7 +328,7 @@ describe(commands.FILE_MOVE, () => {
       sourceAbsoluteUrl,
       destAbsoluteTargetUrl,
       {
-        nameConflictBehavior: CreateCopyJobsNameConflictBehavior.Fail,
+        nameConflictBehavior: CreateFileCopyJobsNameConflictBehavior.Fail,
         bypassSharedLock: false,
         includeItemPermissions: false,
         operation: 'move',
@@ -360,7 +360,7 @@ describe(commands.FILE_MOVE, () => {
       sourceAbsoluteUrl,
       destAbsoluteTargetUrl,
       {
-        nameConflictBehavior: CreateCopyJobsNameConflictBehavior.Fail,
+        nameConflictBehavior: CreateFileCopyJobsNameConflictBehavior.Fail,
         bypassSharedLock: false,
         includeItemPermissions: false,
         operation: 'move',
@@ -392,7 +392,7 @@ describe(commands.FILE_MOVE, () => {
       sourceAbsoluteUrl,
       destAbsoluteTargetUrl,
       {
-        nameConflictBehavior: CreateCopyJobsNameConflictBehavior.Replace,
+        nameConflictBehavior: CreateFileCopyJobsNameConflictBehavior.Replace,
         bypassSharedLock: false,
         includeItemPermissions: false,
         operation: 'move',
@@ -427,7 +427,7 @@ describe(commands.FILE_MOVE, () => {
       sourceAbsoluteUrl,
       destAbsoluteTargetUrl,
       {
-        nameConflictBehavior: CreateCopyJobsNameConflictBehavior.Rename,
+        nameConflictBehavior: CreateFileCopyJobsNameConflictBehavior.Rename,
         bypassSharedLock: true,
         includeItemPermissions: true,
         operation: 'move',
@@ -460,7 +460,7 @@ describe(commands.FILE_MOVE, () => {
       sourceAbsoluteUrl,
       destAbsoluteTargetUrl,
       {
-        nameConflictBehavior: CreateCopyJobsNameConflictBehavior.Replace,
+        nameConflictBehavior: CreateFileCopyJobsNameConflictBehavior.Replace,
         bypassSharedLock: false,
         includeItemPermissions: false,
         operation: 'move',
