@@ -211,6 +211,23 @@ In the past versions of CLI for Microsoft 365, the command had no output. When u
 
 When using the [spo file move](./cmd/spo/file/file-move.mdx) command, please use the new command input. This means that you'll have to remove option `--retainEditorAndModified` from your scripts and automation tools.
 
+### Updated command `spo folder move`
+
+Because of some limitations of the current [spo folder move](./cmd/spo/folder/folder-move.mdx) command, we have decided to move it to a new endpoint. This change is necessary to ensure the command's functionality and reliability. Because of the new endpoint, the command input and output have changed.
+
+**Command options:**
+
+Unfortunately, we had to drop the `--retainEditorAndModified` and `--bypassSharedLock` options as it's no longer supported by the new endpoint. In return, we were able to add a new option:
+- `--skipWait`: Don't wait for the move operation to complete.
+
+**Command output:**
+
+In the past versions of CLI for Microsoft 365, the command had no output. When using option `--nameConflictBehavior rename`, it's hard for the user to know what the actual name of the moved folder is. With the new endpoint, the command now returns the folder information about the destination folder, providing you with all the info you need to execute other commands on this folder.
+
+#### What action do I need to take?
+
+When using the [spo folder move](./cmd/spo/folder/folder-move.mdx) command, please use the new command input. This means that you'll have to remove options `--retainEditorAndModified` and `--bypassSharedLock` from your scripts and automation tools.
+
 ### Removed `spo folder rename` alias
 
 The `spo folder rename` command was removed and replaced by the [spo folder set](./cmd/spo/folder/folder-set.mdx) command.
