@@ -14,6 +14,7 @@ interface CommandArgs {
 export interface Options extends GlobalOptions {
   id?: string;
   displayName?: string;
+  properties?: string;
 }
 
 class EntraAdministrativeUnitGetCommand extends GraphCommand {
@@ -39,7 +40,8 @@ class EntraAdministrativeUnitGetCommand extends GraphCommand {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
         id: typeof args.options.id !== 'undefined',
-        displayName: typeof args.options.displayName !== 'undefined'
+        displayName: typeof args.options.displayName !== 'undefined',
+        properties: typeof args.options.properties !== 'undefined'
       });
     });
   }
@@ -51,6 +53,9 @@ class EntraAdministrativeUnitGetCommand extends GraphCommand {
       },
       {
         option: '-n, --displayName [displayName]'
+      },
+      {
+        option: '-p, --properties [properties]'
       }
     );
   }
@@ -80,7 +85,7 @@ class EntraAdministrativeUnitGetCommand extends GraphCommand {
 
     try {
       if (args.options.id) {
-        administrativeUnit = await this.getAdministrativeUnitById(args.options.id);
+        administrativeUnit = await this.getAdministrativeUnitById(args.options.id, args.options.properties);
       }
       else {
         administrativeUnit = await entraAdministrativeUnit.getAdministrativeUnitByDisplayName(args.options.displayName!);
@@ -93,9 +98,24 @@ class EntraAdministrativeUnitGetCommand extends GraphCommand {
     }
   }
 
-  async getAdministrativeUnitById(id: string): Promise<AdministrativeUnit> {
+  async getAdministrativeUnitById(id: string, properties?: string): Promise<AdministrativeUnit> {
+    const queryParameters: string[] = [];
+
+    if (properties) {
+      const allProperties = properties.split(',');
+      const selectProperties = allProperties.filter(prop => !prop.includes('/'));
+
+      if (selectProperties.length > 0) {
+        queryParameters.push(`$select=${selectProperties}`);
+      }
+    }
+
+    const queryString = queryParameters.length > 0
+      ? `?${queryParameters.join('&')}`
+      : '';
+
     const requestOptions: CliRequestOptions = {
-      url: `${this.resource}/v1.0/directory/administrativeUnits/${id}`,
+      url: `${this.resource}/v1.0/directory/administrativeUnits/${id}${queryString}`,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },

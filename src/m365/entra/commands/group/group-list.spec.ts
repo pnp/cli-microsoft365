@@ -342,6 +342,30 @@ describe(commands.GROUP_LIST, () => {
     ]));
   });
 
+  it('lists all microsoft365 groups in the tenant with specified properties', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=groupTypes/any(c:c+eq+'Unified')?$select=id,displayName`) {
+        return {
+          "value": [
+            {
+              "id": "00e21c97-7800-4bc1-8024-a400aba6f46d",
+              "description": "Code Challenge"
+            }
+          ]
+        };
+      }
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { type: 'microsoft365', properties: 'id,displayName' } });
+    assert(loggerLogSpy.calledOnceWithExactly([
+      {
+        "id": "00e21c97-7800-4bc1-8024-a400aba6f46d",
+        "description": "Code Challenge"
+      }
+    ]));
+  });
+
   it('lists all distribution groups in the tenant', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=securityEnabled eq false and mailEnabled eq true`) {
