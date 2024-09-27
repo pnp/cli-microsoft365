@@ -14,6 +14,7 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   id?: string;
   displayName?: string;
+  properties?: string;
 }
 
 class EntraGroupGetCommand extends GraphCommand {
@@ -45,6 +46,9 @@ class EntraGroupGetCommand extends GraphCommand {
       },
       {
         option: '-n, --displayName [displayName]'
+      },
+      {
+        option: '-p, --properties [properties]'
       }
     );
   }
@@ -71,7 +75,8 @@ class EntraGroupGetCommand extends GraphCommand {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
         id: typeof args.options.id !== 'undefined',
-        displayName: typeof args.options.displayName !== 'undefined'
+        displayName: typeof args.options.displayName !== 'undefined',
+        properties: typeof args.options.properties !== 'undefined'
       });
     });
   }
@@ -83,10 +88,10 @@ class EntraGroupGetCommand extends GraphCommand {
 
     try {
       if (args.options.id) {
-        group = await entraGroup.getGroupById(args.options.id);
+        group = await entraGroup.getGroupById(args.options.id, args.options.properties);
       }
       else {
-        group = await entraGroup.getGroupByDisplayName(args.options.displayName!);
+        group = await entraGroup.getGroupByDisplayName(args.options.displayName!, args.options.properties);
       }
 
       await logger.log(group);

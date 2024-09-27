@@ -14,6 +14,7 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   type?: string;
+  properties?: string;
 }
 
 interface ExtendedGroup extends Group {
@@ -50,7 +51,8 @@ class EntraGroupListCommand extends GraphCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        type: typeof args.options.type !== 'undefined'
+        type: typeof args.options.type !== 'undefined',
+        properties: typeof args.options.properties !== 'undefined'
       });
     });
   }
@@ -60,6 +62,9 @@ class EntraGroupListCommand extends GraphCommand {
       {
         option: '--type [type]',
         autocomplete: EntraGroupListCommand.groupTypes
+      },
+      {
+        option: '-p, --properties [properties]'
       }
     );
   }
@@ -102,6 +107,23 @@ class EntraGroupListCommand extends GraphCommand {
             break;
         }
       }
+
+      const queryParameters: string[] = [];
+
+      if (args.options.properties) {
+        const allProperties = args.options.properties.split(',');
+        const selectProperties = allProperties.filter(prop => !prop.includes('/'));
+
+        if (selectProperties.length > 0) {
+          queryParameters.push(`$select=${selectProperties}`);
+        }
+      }
+
+      const queryString = queryParameters.length > 0
+        ? `?${queryParameters.join('&')}`
+        : '';
+
+      requestUrl += queryString;
 
       let groups: Group[] = [];
 
