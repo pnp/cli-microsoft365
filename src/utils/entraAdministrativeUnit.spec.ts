@@ -43,6 +43,26 @@ describe('utils/entraAdministrativeUnit', () => {
     assert.deepStrictEqual(actual, { id: administrativeUnitId, displayName: displayName });
   });
 
+  it('correctly get single administrative unit id by name using getAdministrativeUnitByDisplayName with specified properties', async () => {
+    sinon.stub(request, 'get').callsFake(async opts => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/directory/administrativeUnits?$filter=displayName eq '${formatting.encodeQueryParameter(displayName)}'?$select=id,displayName`) {
+        return {
+          value: [
+            {
+              id: administrativeUnitId,
+              displayName: displayName
+            }
+          ]
+        };
+      }
+
+      return 'Invalid Request';
+    });
+
+    const actual = await entraAdministrativeUnit.getAdministrativeUnitByDisplayName(displayName, 'id,displayName');
+    assert.deepStrictEqual(actual, { id: administrativeUnitId, displayName: displayName });
+  });
+
   it('handles selecting single administrative unit when multiple administrative units with the specified name found using getAdministrativeUnitByDisplayName and cli is set to prompt', async () => {
     sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/directory/administrativeUnits?$filter=displayName eq '${formatting.encodeQueryParameter(displayName)}'`) {

@@ -95,6 +95,19 @@ describe(commands.ADMINISTRATIVEUNIT_GET, () => {
     assert(loggerLogSpy.calledOnceWithExactly(administrativeUnitsReponse.value[0]));
   });
 
+  it('retrieves information about the specified administrative unit by id with specified properties', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/directory/administrativeUnits/${validId}?$select=id,displayName,visibility`) {
+        return administrativeUnitsReponse.value[0];
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { id: validId, properties: 'id,displayName,visibility' } });
+    assert(loggerLogSpy.calledOnceWithExactly(administrativeUnitsReponse.value[0]));
+  });
+
   it('retrieves information about the specified administrative unit by displayName', async () => {
     sinon.stub(entraAdministrativeUnit, 'getAdministrativeUnitByDisplayName').resolves(administrativeUnitsReponse.value[0]);
 

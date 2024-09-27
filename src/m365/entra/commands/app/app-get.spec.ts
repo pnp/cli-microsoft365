@@ -285,13 +285,11 @@ describe(commands.APP_GET, () => {
         };
       }
 
-      if ((opts.url as string).indexOf('/v1.0/myorganization/applications/') > -1) {
+      if (opts.url === "https://graph.microsoft.com/v1.0/myorganization/applications/340a4aa3-1af6-43ac-87d8-189819003952?$select=id,appId,displayName") {
         return {
           "id": "340a4aa3-1af6-43ac-87d8-189819003952",
           "appId": "9b1b1e42-794b-4c71-93ac-5ed92488b67f",
-          "createdDateTime": "2019-10-29T17:46:55Z",
-          "displayName": "My App",
-          "description": null
+          "displayName": "My App"
         };
       }
 
@@ -301,7 +299,8 @@ describe(commands.APP_GET, () => {
 
     await command.action(logger, {
       options: {
-        appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f'
+        appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f',
+        properties: 'id,appId,displayName'
       }
     });
     const call: sinon.SinonSpyCall = loggerLogSpy.lastCall;
@@ -355,7 +354,7 @@ describe(commands.APP_GET, () => {
 
   it(`should get an Microsoft Entra app registration by its object ID. Doesn't save the app info if not requested`, async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications/340a4aa3-1af6-43ac-87d8-189819003952`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications/340a4aa3-1af6-43ac-87d8-189819003952?$select=id,appId,displayName`) {
         return {
           "id": "340a4aa3-1af6-43ac-87d8-189819003952",
           "appId": "9b1b1e42-794b-4c71-93ac-5ed92488b67f",
@@ -370,7 +369,8 @@ describe(commands.APP_GET, () => {
 
     await command.action(logger, {
       options: {
-        objectId: '340a4aa3-1af6-43ac-87d8-189819003952'
+        objectId: '340a4aa3-1af6-43ac-87d8-189819003952',
+        properties: 'id,appId,displayName'
       }
     });
     const call: sinon.SinonSpyCall = loggerLogSpy.lastCall;
