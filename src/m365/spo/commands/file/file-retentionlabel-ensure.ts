@@ -1,4 +1,3 @@
-import * as url from 'url';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
@@ -100,7 +99,7 @@ class SpoFileRetentionLabelEnsureCommand extends SpoCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       const fileProperties = await this.getFileProperties(logger, args);
-      const parsedUrl = url.parse(args.options.webUrl);
+      const parsedUrl = new URL(args.options.webUrl);
       const tenantUrl: string = `${parsedUrl.protocol}//${parsedUrl.hostname}`;
       const listAbsoluteUrl = urlUtil.urlCombine(tenantUrl, fileProperties.listServerRelativeUrl);
 

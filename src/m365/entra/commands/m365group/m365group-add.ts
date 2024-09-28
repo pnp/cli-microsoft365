@@ -333,7 +333,7 @@ class EntraM365GroupAddCommand extends GraphCommand {
   }
 
   private getImageContentType(imagePath: string): string {
-    const extension: string = imagePath.substr(imagePath.lastIndexOf('.')).toLowerCase();
+    const extension: string = imagePath.substring(imagePath.lastIndexOf('.')).toLowerCase();
 
     switch (extension) {
       case '.png':

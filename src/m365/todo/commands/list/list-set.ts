@@ -1,6 +1,7 @@
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request from '../../../../request.js';
+import { formatting } from '../../../../utils/formatting.js';
 import DelegatedGraphCommand from '../../../base/DelegatedGraphCommand.js';
 import commands from '../../commands.js';
 
@@ -95,7 +96,7 @@ class TodoListSetCommand extends DelegatedGraphCommand {
     }
 
     const requestOptions: any = {
-      url: `${endpoint}/me/todo/lists?$filter=displayName eq '${escape(args.options.name as string)}'`,
+      url: `${endpoint}/me/todo/lists?$filter=displayName eq '${formatting.encodeQueryParameter(args.options.name!)}'`,
       headers: {
         accept: "application/json;odata.metadata=none"
       },
