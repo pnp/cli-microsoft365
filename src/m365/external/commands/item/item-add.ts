@@ -125,8 +125,7 @@ class ExternalItemAddCommand extends GraphCommand {
     };
 
     // we need to rewrite the @odata properties to the correct format
-    // because . in @odata.type is interpreted by minimist as a child property
-    // we also need to extract multiple values for collections into arrays
+    // to extract multiple values for collections into arrays
     this.rewriteCollectionProperties(args.options);
     this.addUnknownOptionsToPayload(requestBody.properties, args.options);
 
@@ -166,12 +165,9 @@ class ExternalItemAddCommand extends GraphCommand {
 
   private rewriteCollectionProperties(options: any): void {
     Object.getOwnPropertyNames(options).forEach(name => {
-      if (!name.endsWith('@odata')) {
+      if (!name.includes('@odata')) {
         return;
       }
-
-      options[`${name}.type`] = options[name].type;
-      delete options[name];
 
       // convert the value of a collection to an array
       const nameWithoutOData: string = name.substring(0, name.indexOf('@odata'));

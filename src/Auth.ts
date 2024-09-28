@@ -184,7 +184,7 @@ export class Auth {
   public async restoreAuth(): Promise<void> {
     // check if auth has been restored previously
     if (this._connection.active) {
-      return Promise.resolve();
+      return;
     }
 
     try {
@@ -453,7 +453,9 @@ export class Auth {
       await logger.logToStderr('');
     }
 
-    await logger.logToStderr(`🌶️  ${response.message}`);
+    if (response.message) {
+      await logger.logToStderr(`🌶️  ${response.message}`);
+    }
 
     if (cli.getSettingWithDefaultValue<boolean>(settingsNames.autoOpenLinksInBrowser, false)) {
       await browserUtil.open(response.verificationUri);
@@ -599,7 +601,7 @@ export class Auth {
 
       if (userName && process.env.ACC_CLOUD) {
         // reject for now since the Azure Cloud Shell does not support user-managed identity 
-        return Promise.reject('Azure Cloud Shell does not support user-managed identity. You can execute the command without the --userName option to login with user identity');
+        throw 'Azure Cloud Shell does not support user-managed identity. You can execute the command without the --userName option to login with user identity';
       }
 
       requestOptions.url = `${process.env.IDENTITY_ENDPOINT}?resource=${encodeURIComponent(resource)}`;
@@ -611,7 +613,7 @@ export class Auth {
 
       if (userName && process.env.ACC_CLOUD) {
         // reject for now since the Azure Cloud Shell does not support user-managed identity 
-        return Promise.reject('Azure Cloud Shell does not support user-managed identity. You can execute the command without the --userName option to login with user identity');
+        throw 'Azure Cloud Shell does not support user-managed identity. You can execute the command without the --userName option to login with user identity';
       }
 
       requestOptions.url = `${process.env.MSI_ENDPOINT}?resource=${encodeURIComponent(resource)}`;

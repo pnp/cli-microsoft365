@@ -28,11 +28,9 @@ m365 spo site admin list [options]
 
 :::info
 
-To use this command with the `--asAdmin` mode, you must have permission to access the tenant admin site.
+To use this command with the `--asAdmin` mode, you must be at least SharePoint administrator.
 
 Without this parameter, you must have site collection admin permissions for the requested site.
-
-In `--asAdmin` mode, the Id, PrincipalType, and PrincipalTypeString properties are not exported.
 
 :::
 
@@ -51,6 +49,8 @@ m365 spo site admin list --siteUrl https://contoso.sharepoint.com --asAdmin
 ```
 
 ## Response
+
+### Standard response
 
 <Tabs>
   <TabItem value="JSON">
@@ -73,13 +73,9 @@ m365 spo site admin list --siteUrl https://contoso.sharepoint.com --asAdmin
   <TabItem value="Text">
 
   ```text
-  Email               : user@contoso.com
-  Id                  : 6
-  LoginName           : i:0#.f|membership|user@contoso.com
-  PrincipalType       : 1
-  PrincipalTypeString : User
-  Title               : User Example
-  IsPrimaryAdmin      : true
+  Id  LoginName                                                                    Title    PrincipalTypeString
+  --  ---------------------------------------------------------------------------  -------  -------------------
+  15  c:0o.c|federateddirectoryclaimprovider|d8430798-5a00-00ba-83b0-dd7a032d549a  Members  SecurityGroup
   ```
 
   </TabItem>
@@ -98,7 +94,7 @@ m365 spo site admin list --siteUrl https://contoso.sharepoint.com --asAdmin
 
   Date: 20/03/2024
 
-  ## User
+  ## User Example
 
   Property | Value
   ---------|-------
@@ -108,6 +104,62 @@ m365 spo site admin list --siteUrl https://contoso.sharepoint.com --asAdmin
   PrincipalType | 1
   PrincipalTypeString | User
   Email | user@contoso.com
+  IsPrimaryAdmin | true
+  ```
+
+  </TabItem>
+</Tabs>
+
+### `asAdmin` response
+
+When we make use of the option `asAdmin` the response will differ. 
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  [
+    {
+      "Email": "user@contoso.com",
+      "LoginName": "i:0#.f|membership|user@contoso.com",
+      "Title": "User Example",
+      "IsPrimaryAdmin": true
+    }
+  ]
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  LoginName                                                                    Title          
+  ---------------------------------------------------------------------------  ---------------
+  c:0o.c|federateddirectoryclaimprovider|d8430798-5a00-00ba-83b0-dd7a032d549a  Members        
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  Email,LoginName,Title,IsPrimaryAdmin
+  user@contoso.com,i:0#.f|membership|user@contoso.com,User Example,1
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # spo site admin list --siteUrl "https://contoso.sharepoint.com/sites/Test" --asAdmin
+
+  Date: 20/03/2024
+
+  ## User Example
+
+  Property | Value
+  ---------|-------
+  Email | user@contoso.com
+  LoginName | i:0#.f\|membership\|user@contoso.com
+  Title | User Example
   IsPrimaryAdmin | true
   ```
 

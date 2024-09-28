@@ -236,6 +236,15 @@ export const urlUtil = {
   },
 
   /**
+   * Removes leading slashes from the URL.
+   * @param url The URL to process.
+   * @returns The URL without leading slashes.
+   */
+  removeLeadingSlashes(url: string): string {
+    return url.replace(/^\/+/, '');
+  },
+
+  /**
    * Removes trailing slashes from the URL.
    * @param url The URL to process.
    * @returns The URL without trailing slashes.

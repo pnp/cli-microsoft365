@@ -13,19 +13,17 @@ describe('Telemetry', () => {
   let stdin: string = '';
 
   before(() => {
-    spawnStub = sinon.stub(child_process, 'spawn').callsFake(() => {
-      return {
-        stdin: {
-          write: (s: string) => {
-            stdin += s;
-          },
-          end: () => { }
+    spawnStub = sinon.stub(child_process, 'spawn').returns({
+      stdin: {
+        write: (s: string) => {
+          stdin += s;
         },
-        unref: () => { }
-      } as any;
-    });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => 'abc123');
+        end: () => { }
+      },
+      unref: () => { }
+    } as any);
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('abc123');
   });
 
   afterEach(() => {
@@ -74,7 +72,7 @@ describe('Telemetry', () => {
       return defaultValue;
     });
     sinonUtil.restore(pid.getProcessName);
-    sinon.stub(pid, 'getProcessName').callsFake(() => undefined);
+    sinon.stub(pid, 'getProcessName').returns(undefined);
 
     telemetry.trackEvent('foo bar', {});
     assert.strictEqual(JSON.parse(stdin).shell, '');

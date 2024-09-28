@@ -1891,7 +1891,7 @@ export const spo = {
   },
 
   /**
-   * Gets the site collection URL for a given web URL using SP Admin site.
+   * Gets the primary owner login from a site as admin.
    * @param adminUrl The SharePoint admin URL
    * @param siteId The site ID
    * @param logger The logger object
@@ -1906,14 +1906,13 @@ export const spo = {
     const requestOptions: CliRequestOptions = {
       url: `${adminUrl}/_api/SPO.Tenant/sites('${siteId}')?$select=OwnerLoginName`,
       headers: {
-        accept: 'application/json;odata=nometadata',
-        'content-type': 'application/json;charset=utf-8'
-      }
+        accept: 'application/json;odata=nometadata'
+      },
+      responseType: 'json'
     };
 
-    const response: string = await request.get<string>(requestOptions);
-    const responseContent = JSON.parse(response);
-    return responseContent.OwnerLoginName;
+    const response = await request.get<{ OwnerLoginName: string }>(requestOptions);
+    return response.OwnerLoginName;
   },
 
   /**
@@ -1930,7 +1929,6 @@ export const spo = {
 
     const requestOptions: CliRequestOptions = {
       url: `${siteUrl}/_api/site/owner`,
-      method: 'GET',
       headers: {
         'accept': 'application/json;odata=nometadata'
       },

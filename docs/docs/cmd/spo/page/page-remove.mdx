@@ -13,36 +13,54 @@ m365 spo page remove [options]
 ## Options
 
 ```md definition-list
-`-n, --name <name>`
-: Name of the page to remove.
-
 `-u, --webUrl <webUrl>`
-: URL of the site from which the page should be removed.
+: URL of the site where the page is located.
+
+`-n, --name <name>`
+: Name of the page.
+
+`--recycle`
+: Send the page to the recycle bin instead of permanently deleting it.
+
+`--bypassSharedLock`
+: Remove the page even if it is locked for shared use.
 
 `-f, --force`
-: Do not prompt for confirmation before removing the page.
+: Do not prompt for confirmation.
 ```
 
 <Global />
-
-## Remarks
-
-If you try to remove a page with that does not exist, you will get a `The file does not exist` error.
-
-If you set the `-f, --force` flag, you will not be prompted for confirmation before the page is actually removed.
 
 ## Examples
 
 Remove a modern page
 
 ```sh
-m365 spo page remove --name page.aspx --webUrl https://contoso.sharepoint.com/sites/a-team
+m365 spo page remove --name HR.aspx --webUrl https://contoso.sharepoint.com/sites/Marketing
 ```
 
 Remove a modern page without a confirmation prompt
 
 ```sh
-m365 spo page remove --name page.aspx --webUrl https://contoso.sharepoint.com/sites/a-team --force
+m365 spo page remove --name HR.aspx --webUrl https://contoso.sharepoint.com/sites/Marketing --force
+```
+
+Send a page to the recycle bin
+
+```sh
+m365 spo page remove --name HR.aspx --webUrl https://contoso.sharepoint.com/sites/Marketing --recycle
+```
+
+Remove a page that is locked
+
+```sh
+m365 spo page remove --name HR.aspx --webUrl https://contoso.sharepoint.com/sites/Marketing --bypassSharedLock
+```
+
+Remove a page that is located in a subfolder
+
+```sh
+m365 spo page remove --name /Departments/People/HR.aspx --webUrl https://contoso.sharepoint.com/sites/Marketing
 ```
 
 ## Response

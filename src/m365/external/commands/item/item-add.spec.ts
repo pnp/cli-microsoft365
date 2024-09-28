@@ -129,10 +129,7 @@ describe(commands.ITEM_ADD, () => {
       acls: 'grant,group,Admins',
       ticketTitle: 'Something went wrong ticket',
       priority: 'high',
-      // this is how assignee@odata.type is parsed by minimist
-      'assignee@odata': {
-        type: 'Collection(String)'
-      },
+      'assignee@odata.type': 'Collection(String)',
       assignee: 'Steve;#Brian'
     };
     await command.action(logger, { options } as any);

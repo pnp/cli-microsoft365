@@ -828,6 +828,11 @@ const sidebars: SidebarsConfig = {
           type: 'doc',
           label: 'list',
           id: 'cmd/file/file-list'
+        },
+        {
+          type: 'doc',
+          label: 'move',
+          id: 'cmd/file/file-move'
         }
       ]
     },
@@ -3423,6 +3428,11 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
+              label: 'site admin remove',
+              id: 'cmd/spo/site/site-admin-remove'
+            },
+            {
+              type: 'doc',
               label: 'site appcatalog add',
               id: 'cmd/spo/site/site-appcatalog-add'
             },
@@ -3515,6 +3525,11 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'site recyclebinitem restore',
               id: 'cmd/spo/site/site-recyclebinitem-restore'
+            },
+            {
+              type: 'doc',
+              label: 'site sharingpermission set',
+              id: 'cmd/spo/site/site-sharingpermission-set'
             }
           ]
         },
@@ -4134,6 +4149,11 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
+              label: 'meeting transcript get',
+              id: 'cmd/teams/meeting/meeting-transcript-get'
+            },
+            {
+              type: 'doc',
               label: 'meeting transcript list',
               id: 'cmd/teams/meeting/meeting-transcript-list'
             }
@@ -4453,6 +4473,11 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'engage community get',
               id: 'cmd/viva/engage/engage-community-get'
+            },
+            {
+              type: 'doc',
+              label: 'engage community list',
+              id: 'cmd/viva/engage/engage-community-list'
             },
             {
               type: 'doc',
