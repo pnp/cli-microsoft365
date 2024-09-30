@@ -3991,6 +3991,11 @@ const sidebars: SidebarsConfig = {
           model: [
             {
               type: 'doc',
+              label: 'model get',
+              id: 'cmd/spp/model/model-get'
+            },
+            {
+              type: 'doc',
               label: 'model list',
               id: 'cmd/spp/model/model-list'
             },
