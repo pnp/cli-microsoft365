@@ -1,8 +1,12 @@
 import request, { CliRequestOptions } from '../request.js';
 
 export interface SppModel {
+  ConfidenceScore?: string;
+  Explanations?: string;
+  Schemas?: string;
   UniqueId: string;
   Publications?: any[];
+  ModelSettings?: string;
 }
 
 export const spp = {
