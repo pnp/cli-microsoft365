@@ -19,15 +19,15 @@ interface Options extends GlobalOptions {
   role: string;
 }
 
-class EntraGroupUserSetCommand extends GraphCommand {
+class EntraGroupMemberSetCommand extends GraphCommand {
   private readonly roleValues = ['Owner', 'Member'];
 
   public get name(): string {
-    return commands.GROUP_USER_SET;
+    return commands.GROUP_MEMBER_SET;
   }
 
   public get description(): string {
-    return 'Updates role of users in a Microsoft Entra ID group';
+    return 'Updates role of members in a Microsoft Entra ID group';
   }
 
   constructor() {
@@ -116,7 +116,7 @@ class EntraGroupUserSetCommand extends GraphCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       if (this.verbose) {
-        await logger.logToStderr(`Adding user(s) ${args.options.ids || args.options.userNames} to group ${args.options.groupId || args.options.groupDisplayName}...`);
+        await logger.logToStderr(`Adding member(s) ${args.options.ids || args.options.userNames} to group ${args.options.groupId || args.options.groupDisplayName}...`);
       }
 
       const groupId = await this.getGroupId(logger, args.options);
@@ -163,7 +163,7 @@ class EntraGroupUserSetCommand extends GraphCommand {
     const currentRole = options.role === 'Member' ? 'owners' : 'members';
 
     if (this.verbose) {
-      await logger.logToStderr(`Removing users from the old role '${currentRole}'.`);
+      await logger.logToStderr(`Removing members from the old role '${currentRole}'.`);
     }
 
     for (let i = 0; i < userIds.length; i += 20) {
@@ -262,4 +262,4 @@ class EntraGroupUserSetCommand extends GraphCommand {
   }
 }
 
-export default new EntraGroupUserSetCommand();
+export default new EntraGroupMemberSetCommand();

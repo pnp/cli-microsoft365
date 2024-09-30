@@ -19,15 +19,15 @@ interface Options extends GlobalOptions {
   role: string;
 }
 
-class EntraGroupUserAddCommand extends GraphCommand {
+class EntraGroupMemberAddCommand extends GraphCommand {
   private readonly roleValues = ['Owner', 'Member'];
 
   public get name(): string {
-    return commands.GROUP_USER_ADD;
+    return commands.GROUP_MEMBER_ADD;
   }
 
   public get description(): string {
-    return 'Adds a user to a Microsoft Entra ID group';
+    return 'Adds a member to a Microsoft Entra ID group';
   }
 
   constructor() {
@@ -116,7 +116,7 @@ class EntraGroupUserAddCommand extends GraphCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       if (this.verbose) {
-        await logger.logToStderr(`Adding user(s) ${args.options.ids || args.options.userNames} to group ${args.options.groupId || args.options.groupDisplayName}...`);
+        await logger.logToStderr(`Adding member(s) ${args.options.ids || args.options.userNames} to group ${args.options.groupId || args.options.groupDisplayName}...`);
       }
 
       const groupId = await this.getGroupId(logger, args.options);
@@ -188,4 +188,4 @@ class EntraGroupUserAddCommand extends GraphCommand {
   }
 }
 
-export default new EntraGroupUserAddCommand();
+export default new EntraGroupMemberAddCommand();

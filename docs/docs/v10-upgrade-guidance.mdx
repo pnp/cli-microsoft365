@@ -76,7 +76,7 @@ We updated option naming from `groupDisplayName` to `groupName` and `userPrincip
 
 **Affected commands:**
 
-- [entra group user list](./cmd/entra/group/group-user-list.mdx)
+- [entra group member list](./cmd/entra/group/group-member-list.mdx)
 - [entra m365group conversation post list](./cmd/entra/m365group/m365group-conversation-post-list.mdx)
 - [entra m365group recyclebinitem list](./cmd/entra/m365group/m365group-recyclebinitem-list.mdx)
 - [outlook message get](./cmd/outlook/message/message-get.mdx)  
@@ -129,6 +129,17 @@ We've enhanced the [entra m365group set](./cmd/entra/m365group/m365group-set.mdx
 #### What action do I need to take?
 
 Make sure that if you are currently updating groups using the `displayName` option, you update your scripts to use the `newDisplayName` option instead.
+
+### Renamed `entra group user` commands to `entra group member`
+
+We have renamed the `entra group user` commands to `entra group member` to better reflect the command's purpose,. The following commands were renamed:
+- [entra group member add](./cmd/entra/group/group-member-add.mdx)
+- [entra group member list](./cmd/entra/group/group-member-list.mdx)
+- [entra group member set](./cmd/entra/group/group-member-set.mdx)
+
+#### What action do I need to take?
+
+Please update your scripts to use the new command names.
 
 ## SharePoint
 

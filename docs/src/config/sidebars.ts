@@ -365,18 +365,18 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
-              label: 'group user add',
-              id: 'cmd/entra/group/group-user-add'
+              label: 'group member add',
+              id: 'cmd/entra/group/group-member-add'
             },
             {
               type: 'doc',
-              label: 'group user list',
-              id: 'cmd/entra/group/group-user-list'
+              label: 'group member list',
+              id: 'cmd/entra/group/group-member-list'
             },
             {
               type: 'doc',
-              label: 'group user set',
-              id: 'cmd/entra/group/group-user-set'
+              label: 'group member set',
+              id: 'cmd/entra/group/group-member-set'
             }
           ]
         },
