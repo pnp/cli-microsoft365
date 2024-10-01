@@ -2059,6 +2059,11 @@
         "node": ">= 8"
       }
     },
+    "node_modules/csv-parse": {
+      "version": "5.5.6",
+      "resolved": "https://registry.npmjs.org/csv-parse/-/csv-parse-5.5.6.tgz",
+      "integrity": "sha512-uNpm30m/AGSkLxxy7d9yRXpJQFrZzVWLFBkS+6ngPcZkw/5k3L/jjFuj7tVnEpRn+QgmiXr21nDlhCiUK4ij2A=="
+    },
     "node_modules/csv-stringify": {
       "version": "6.5.1",
       "resolved": "https://registry.npmjs.org/csv-stringify/-/csv-stringify-6.5.1.tgz",
