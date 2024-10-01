@@ -147,6 +147,55 @@ describe(commands.LIST_REMOVE, () => {
     assert(correctRequestIssued);
   });
 
+  it('recycles the list when prompt confirmed', async () => {
+    sinon.stub(request, 'post').callsFake((opts) => {
+      requests.push(opts);
+
+      if ((opts.url as string).indexOf(`/recycle()`) > -1) {
+        if (opts.headers &&
+          opts.headers.accept &&
+          (opts.headers.accept as string).indexOf('application/json') === 0) {
+          return Promise.resolve();
+        }
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
+    await command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6', webUrl: 'https://contoso.sharepoint.com', recycle: true } });
+    let correctRequestIssued = false;
+    requests.forEach(r => {
+      if (r.url.indexOf(`/recycle()`) > -1 &&
+        r.headers.accept &&
+        r.headers.accept.indexOf('application/json') === 0) {
+        correctRequestIssued = true;
+      }
+    });
+
+    assert(correctRequestIssued);
+  });
+
+  it('uses correct API url when recycle option is passed', async () => {
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if ((opts.url as string).indexOf('/recycle()') > -1) {
+        return Promise.resolve('Correct Url');
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    await command.action(logger, {
+      options: {
+        title: 'Documents',
+        recycle: true,
+        webUrl: 'https://contoso.sharepoint.com',
+        force: true
+      }
+    });
+  });
+
   it('command correctly handles list get reject request', async () => {
     const error = {
       error: {
