@@ -17,7 +17,7 @@ import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.MESSAGE_GET, () => {
   const messageId = 'AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OABGAAAAAAAiQ8W967B7TKBjgx9rVEURBwAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAAiIsqMbYjsT5e-T7KzowPTAALvuv07AAA=';
-  const userPrincipalName = 'user@tenant.com';
+  const userName = 'user@tenant.com';
   const userId = '6799fd1a-723b-4eb7-8e52-41ae530274ca';
   const emailResponse = {
     "id": "AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OABGAAAAAAAiQ8W967B7TKBjgx9rVEURBwAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAAiIsqMbYjsT5e-T7KzowPTAALvuv07AAA=",
@@ -144,16 +144,16 @@ describe(commands.MESSAGE_GET, () => {
     assert(loggerLogSpy.calledWith(emailResponse));
   });
 
-  it('retrieves specific message using delegated permissions from a shared mailbox using userPrincipalName as option', async () => {
+  it('retrieves specific message using delegated permissions from a shared mailbox using userName as option', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users/${userPrincipalName}/messages/${messageId}`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users/${userName}/messages/${messageId}`) {
         return emailResponse;
       }
 
       throw `Invalid request`;
     });
 
-    await command.action(logger, { options: { verbose: true, id: messageId, userPrincipalName: userPrincipalName } });
+    await command.action(logger, { options: { verbose: true, id: messageId, userName: userName } });
     assert(loggerLogSpy.calledWith(emailResponse));
   });
 
@@ -183,18 +183,18 @@ describe(commands.MESSAGE_GET, () => {
       new CommandError(`Graph error occurred`));
   });
 
-  it('retrieves specific message using application permissions and using userPrincipalName as option', async () => {
+  it('retrieves specific message using application permissions and using userName as option', async () => {
     sinonUtil.restore([accessToken.isAppOnlyAccessToken]);
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users/${userPrincipalName}/messages/${messageId}`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users/${userName}/messages/${messageId}`) {
         return emailResponse;
       }
 
       throw `Invalid request`;
     });
 
-    await command.action(logger, { options: { verbose: true, id: messageId, userPrincipalName: userPrincipalName } });
+    await command.action(logger, { options: { verbose: true, id: messageId, userName: userName } });
     assert(loggerLogSpy.calledWith(emailResponse));
   });
 
@@ -228,18 +228,18 @@ describe(commands.MESSAGE_GET, () => {
       new CommandError(`Graph error occurred`));
   });
 
-  it('throws error if something fails using application permissions and userPrincipalName as option', async () => {
+  it('throws error if something fails using application permissions and userName as option', async () => {
     sinonUtil.restore([accessToken.isAppOnlyAccessToken]);
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users/${userPrincipalName}/messages/${messageId}`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users/${userName}/messages/${messageId}`) {
         throw `Graph error occurred`;
       }
 
       throw `Invalid request`;
     });
 
-    await assert.rejects(command.action(logger, { options: { id: messageId, userPrincipalName: userPrincipalName } } as any),
+    await assert.rejects(command.action(logger, { options: { id: messageId, userName: userName } } as any),
       new CommandError(`Graph error occurred`));
   });
 
@@ -260,27 +260,27 @@ describe(commands.MESSAGE_GET, () => {
     assert.equal(actual, true);
   });
 
-  it('throws an error when the upn or userprincipalname is not defined when signed in using app only authentication', async () => {
+  it('throws an error when the upn or userName is not defined when signed in using app only authentication', async () => {
     sinonUtil.restore([accessToken.isAppOnlyAccessToken]);
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
 
     await assert.rejects(command.action(logger, { options: { id: messageId } } as any),
-      new CommandError(`The option 'userId' or 'userPrincipalName' is required when retrieving an email using app only credentials`));
+      new CommandError(`The option 'userId' or 'userName' is required when retrieving an email using app only credentials`));
   });
 
-  it('throws an error when the upn or userprincipalname are both defined when signed in using app only authentication', async () => {
+  it('throws an error when the upn or userName are both defined when signed in using app only authentication', async () => {
     sinonUtil.restore([accessToken.isAppOnlyAccessToken]);
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
 
-    await assert.rejects(command.action(logger, { options: { id: messageId, userId: userId, userPrincipalName: userPrincipalName } } as any),
-      new CommandError(`Both options 'userId' and 'userPrincipalName' cannot be set when retrieving an email using app only credentials`));
+    await assert.rejects(command.action(logger, { options: { id: messageId, userId: userId, userName: userName } } as any),
+      new CommandError(`Both options 'userId' and 'userName' cannot be set when retrieving an email using app only credentials`));
   });
 
-  it('throws an error when the upn and userprincipalname are both filled in when signed in using delegated authentication', async () => {
+  it('throws an error when the upn and userName are both filled in when signed in using delegated authentication', async () => {
     sinonUtil.restore([accessToken.isAppOnlyAccessToken]);
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
 
-    await assert.rejects(command.action(logger, { options: { id: messageId, userId: userId, userPrincipalName: userPrincipalName } } as any),
-      new CommandError(`Both options 'userId' and 'userPrincipalName' cannot be set when retrieving an email using delegated credentials`));
+    await assert.rejects(command.action(logger, { options: { id: messageId, userId: userId, userName: userName } } as any),
+      new CommandError(`Both options 'userId' and 'userName' cannot be set when retrieving an email using delegated credentials`));
   });
 });

@@ -14,28 +14,25 @@ m365 spfx project github workflow add [options]
 
 ```md definition-list
 `-n, --name [name]`
-: Name of the workflow that will be created. If none is specified a default name will be used 'Deploy Solution ${name of sppkg file}'
+: Name of the workflow that will be created. If none is specified a default name will be used 'Deploy Solution ${name of sppkg file}'.
 
 `-b, --branchName [branchName]`
-: Specify the branch name which should trigger the workflow on push. If none is specified a default will be used which is 'main'
+: Specify the branch name which should trigger the workflow on push. If none is specified a default will be used which is 'main'.
 
 `-m, --manuallyTrigger`
-: When specified a manual trigger option will be added to the workflow: `workflow_dispatch`
+: When specified a manual trigger option will be added to the workflow: `workflow_dispatch`.
 
 `-l, --loginMethod [loginMethod]`
-: Specify the login method used for the login action. Possible options are: `user`, `application`. Default `application`'
+: Specify the login method used for the login action. Possible options are: `user`, `application`. Default `application`.
 
 `-s, --scope [scope]`
-: Scope of the app catalog: `tenant`, `sitecollection`. Default is `tenant`
+: Scope of the app catalog: `tenant`, `sitecollection`. Default is `tenant`.
 
 `-u, --siteUrl [siteUrl]`
-: The URL of the site collection where the solution package will be added. Required if scope is set to `sitecollection`
+: The URL of the site collection where the solution package will be added. Required if scope is set to `sitecollection`.
 
 `--skipFeatureDeployment`
-: When specified and the app supports tenant-wide deployment, deploy it to the whole tenant
-
-`--overwrite`
-: When specified the workflow will overwrite the existing .sppkg if it is already deployed in the app catalog.
+: When specified and the app supports tenant-wide deployment, deploy it to the whole tenant.
 ```
 
 <Global />
@@ -59,6 +56,8 @@ For the `user` login method you will need to create the following secrets in Git
 
 This method is perfect to test your workflow, in a dev context, for personal usage. It will not work for accounts with MFA.
 
+The workflow will overwrite the existing .sppkg if it is already deployed in the app catalog. Overwriting your sppkg file on every deployment is required to make continuous delivery of the latest version of your app which is the aim of the continuous delivery pipeline.
+
 :::info
 
 Run this command in the SPFx solution folder.
@@ -67,7 +66,7 @@ Run this command in the SPFx solution folder.
     
 ## Examples
 
-Adds a GitHub workflow for a SharePoint Framework project with `application` login method triggered on push to main
+Adds a GitHub workflow for a SharePoint Framework project with `application` login method triggered on push to main.
 
 ```sh
 m365 spfx project github workflow add 
@@ -79,7 +78,7 @@ Adds a GitHub workflow for a SharePoint Framework project with `user` login meth
 m365 spfx project github workflow add --manuallyTrigger --loginMethod "user"
 ```
 
-Adds a GitHub workflow for a SharePoint Framework project with deployment to a site collection app catalog
+Adds a GitHub workflow for a SharePoint Framework project with deployment to a site collection app catalog.
 
 ```sh
 m365 spfx project github workflow add --scope "sitecollection" --siteUrl "https://some.sharepoint.com/sites/someSite"

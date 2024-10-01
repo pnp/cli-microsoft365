@@ -121,15 +121,7 @@ class SpoListItemAttachmentListCommand extends SpoCommand {
 
     try {
       const attachmentFiles = await request.get<any>(requestOptions);
-
-      if (attachmentFiles.AttachmentFiles && attachmentFiles.AttachmentFiles.length > 0) {
-        await logger.log(attachmentFiles.AttachmentFiles);
-      }
-      else {
-        if (this.verbose) {
-          await logger.logToStderr('No attachments found');
-        }
-      }
+      await logger.log(attachmentFiles.AttachmentFiles);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);

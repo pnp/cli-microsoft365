@@ -27,7 +27,13 @@ yarn global add @pnp/cli-microsoft365
 
 ## Getting started
 
-Start managing the settings of your Microsoft 365 tenant by logging in to it, using the `login` command, for example:
+Start, by configuring CLI for Microsoft 365 to your preferences. Configuration includes specifying an Entra app registration that the CLI should use. You can choose between using an existing app registration or creating a new one. To configure the CLI, run the [setup](./cmd/setup) command:
+
+```sh
+m365 setup
+```
+
+After configuring the CLI, you can start using it. Start managing the settings of your Microsoft 365 tenant by logging in to it, using the [login](./cmd/login) command, for example:
 
 ```sh
 m365 login

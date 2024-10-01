@@ -48,8 +48,7 @@ describe('PowerAutomateCommand', () => {
   });
 
   it('returns correct resource', () => {
-    const command = new MockCommand();
-    assert.strictEqual((command as any).resource, 'https://api.flow.microsoft.com');
+    assert.strictEqual(MockCommand.resource, 'https://api.flow.microsoft.com');
   });
 
   it(`doesn't throw error when not connected`, async () => {

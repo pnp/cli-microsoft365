@@ -25,7 +25,6 @@ describe(commands.LISTITEM_ATTACHMENT_LIST, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
-  let loggerLogToStderrSpy: sinon.SinonSpy;
 
   const attachmentsResponse = {
     AttachmentFiles: [
@@ -53,10 +52,10 @@ describe(commands.LISTITEM_ATTACHMENT_LIST, () => {
   };
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
   });
@@ -75,7 +74,6 @@ describe(commands.LISTITEM_ATTACHMENT_LIST, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
-    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
   });
 
   afterEach(() => {
@@ -220,8 +218,8 @@ describe(commands.LISTITEM_ATTACHMENT_LIST, () => {
   });
 
   it('correctly handles No attachments found (debug)', async () => {
-    sinon.stub(request, 'get').callsFake(() => {
-      return Promise.resolve({ AttachmentFiles: [] });
+    sinon.stub(request, 'get').callsFake(async () => {
+      return { AttachmentFiles: [] };
     });
 
     const options: any = {
@@ -232,6 +230,6 @@ describe(commands.LISTITEM_ATTACHMENT_LIST, () => {
     };
 
     await command.action(logger, { options: options });
-    assert(loggerLogToStderrSpy.calledWith('No attachments found'));
+    assert(loggerLogSpy.calledOnceWithExactly([]));
   });
 });

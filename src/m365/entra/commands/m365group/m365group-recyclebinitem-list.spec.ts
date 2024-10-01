@@ -371,7 +371,7 @@ describe(commands.M365GROUP_RECYCLEBINITEM_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { groupDisplayName: 'Deleted' } });
+    await command.action(logger, { options: { groupName: 'Deleted' } });
     assert(loggerLogSpy.calledWith([
       {
         "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
@@ -605,7 +605,7 @@ describe(commands.M365GROUP_RECYCLEBINITEM_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { groupDisplayName: 'Deleted', groupMailNickname: 'd_team' } });
+    await command.action(logger, { options: { groupName: 'Deleted', groupMailNickname: 'd_team' } });
     assert(loggerLogSpy.calledWith([
       {
         "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
@@ -667,11 +667,11 @@ describe(commands.M365GROUP_RECYCLEBINITEM_LIST, () => {
     await assert.rejects(command.action(logger, { options: { mailNickname: 'd_team' } }), new CommandError(errorMessage));
   });
 
-  it('supports specifying groupDisplayName', () => {
+  it('supports specifying groupName', () => {
     const options = command.options;
     let containsOption = false;
     options.forEach(o => {
-      if (o.option.indexOf('--groupDisplayName') > -1) {
+      if (o.option.indexOf('--groupName') > -1) {
         containsOption = true;
       }
     });

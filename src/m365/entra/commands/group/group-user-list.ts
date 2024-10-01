@@ -15,7 +15,7 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   groupId?: string;
-  groupDisplayName?: string;
+  groupName?: string;
   role?: string;
   properties?: string;
   filter?: string;
@@ -55,7 +55,7 @@ class EntraGroupUserListCommand extends GraphCommand {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
         groupId: typeof args.options.groupId !== 'undefined',
-        groupDisplayName: typeof args.options.groupDisplayName !== 'undefined',
+        groupName: typeof args.options.groupName !== 'undefined',
         role: typeof args.options.role !== 'undefined',
         properties: typeof args.options.properties !== 'undefined',
         filter: typeof args.options.filter !== 'undefined'
@@ -69,7 +69,7 @@ class EntraGroupUserListCommand extends GraphCommand {
         option: "-i, --groupId [groupId]"
       },
       {
-        option: "-n, --groupDisplayName [groupDisplayName]"
+        option: "-n, --groupName [groupName]"
       },
       {
         option: "-r, --role [role]",
@@ -87,7 +87,7 @@ class EntraGroupUserListCommand extends GraphCommand {
   #initOptionSets(): void {
     this.optionSets.push(
       {
-        options: ['groupId', 'groupDisplayName']
+        options: ['groupId', 'groupName']
       }
     );
   }
@@ -154,7 +154,7 @@ class EntraGroupUserListCommand extends GraphCommand {
       await logger.logToStderr('Retrieving Group Id...');
     }
 
-    return await entraGroup.getGroupIdByDisplayName(options.groupDisplayName!);
+    return await entraGroup.getGroupIdByDisplayName(options.groupName!);
   }
 
   private async getUsers(options: Options, role: string, groupId: string, logger: Logger): Promise<ExtendedUser[]> {

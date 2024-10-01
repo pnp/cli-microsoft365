@@ -12,21 +12,79 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './file-move.js';
+import { CreateCopyJobsNameConflictBehavior, spo } from '../../../../utils/spo.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.FILE_MOVE, () => {
-  const fileName = 'Report.docx';
-  const rootUrl = 'https://contoso.sharepoint.com';
-  const webUrl = rootUrl + '/sites/project-x';
-  const sourceUrl = '/sites/project-x/documents/' + fileName;
-  const targetUrl = '/sites/project-y/My Documents';
-  const absoluteSourceUrl = rootUrl + sourceUrl;
-  const absoluteTargetUrl = rootUrl + targetUrl;
-  const sourceId = 'b8cc341b-9c11-4f2d-aa2b-0ce9c18bcba2';
+  const sourceWebUrl = 'https://contoso.sharepoint.com/sites/Sales';
+  const sourceDocumentName = 'Document.pdf';
+  const sourceServerRelUrl = '/sites/Sales/Shared Documents/' + sourceDocumentName;
+  const sourceSiteRelUrl = '/Shared Documents/' + sourceDocumentName;
+  const sourceAbsoluteUrl = 'https://contoso.sharepoint.com' + sourceServerRelUrl;
+  const sourceDocId = 'f09c4efe-b8c0-4e89-a166-03418661b89b';
+
+  const destWebUrl = 'https://contoso.sharepoint.com/sites/Marketing';
+  const destSiteRelUrl = '/Documents/Logos';
+  const destServerRelUrl = '/sites/Marketing' + destSiteRelUrl;
+  const destAbsoluteTargetUrl = 'https://contoso.sharepoint.com' + destServerRelUrl;
+  const destDocId = '15488d89-b82b-40be-958a-922b2ed79383';
+
+  const copyJobInfo = {
+    EncryptionKey: '2by8+2oizihYOFqk02Tlokj8lWUShePAEE+WMuA9lzA=',
+    JobId: 'd812e5a0-d95a-4e4f-bcb7-d4415e88c8ee',
+    JobQueueUri: 'https://spoam1db1m020p4.queue.core.windows.net/2-1499-20240831-29533e6c72c6464780b756c71ea3fe92?sv=2018-03-28&sig=aX%2BNOkUimZ3f%2B%2BvdXI95%2FKJI1e5UE6TU703Dw3Eb5c8%3D&st=2024-08-09T00%3A00%3A00Z&se=2024-08-31T00%3A00%3A00Z&sp=rap',
+    SourceListItemUniqueIds: [
+      sourceDocId
+    ]
+  };
+
+  const copyJobResult = {
+    Event: 'JobFinishedObjectInfo',
+    JobId: '6d1eda82-0d1c-41eb-ab05-1d9cd4afe786',
+    Time: '08/10/2024 18:59:40.145',
+    SourceObjectFullUrl: sourceAbsoluteUrl,
+    TargetServerUrl: 'https://contoso.sharepoint.com',
+    TargetSiteId: '794dada8-4389-45ce-9559-0de74bf3554a',
+    TargetWebId: '8de9b4d3-3c30-4fd0-a9d7-2452bd065555',
+    TargetListId: '44b336a5-e397-4e22-a270-c39e9069b123',
+    TargetObjectUniqueId: destDocId,
+    TargetObjectSiteRelativeUrl: destSiteRelUrl.substring(1),
+    CorrelationId: '5efd44a1-c034-9000-9692-4e1a1b3ca33b'
+  };
+
+  const destFileResponse = {
+    CheckInComment: '',
+    CheckOutType: 2,
+    ContentTag: '{C194762B-3F54-4F5F-9F5C-EBA26084E29D},53,23',
+    CustomizedPageStatus: 0,
+    ETag: '"{C194762B-3F54-4F5F-9F5C-EBA26084E29D},53"',
+    Exists: true,
+    ExistsAllowThrowForPolicyFailures: true,
+    ExistsWithException: true,
+    IrmEnabled: false,
+    Length: '18911',
+    Level: 1,
+    LinkingUri: `${destAbsoluteTargetUrl + '/' + sourceDocumentName}?d=wc194762b3f544f5f9f5ceba26084e29d`,
+    LinkingUrl: '',
+    MajorVersion: 14,
+    MinorVersion: 0,
+    Name: sourceDocumentName,
+    ServerRelativeUrl: destServerRelUrl + '/' + sourceDocumentName,
+    TimeCreated: '2024-05-01T19:54:50Z',
+    TimeLastModified: '2024-08-10T19:31:34Z',
+    Title: '',
+    UIVersion: 7168,
+    UIVersionLabel: '14.0',
+    UniqueId: destDocId
+  };
 
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
-  let postStub: sinon.SinonStub;
+  let loggerLogSpy: sinon.SinonSpy;
+
+  let spoUtilCreateCopyJobStub: sinon.SinonStub;
+  let spoUtilGetCopyJobResultStub: sinon.SinonStub;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -36,6 +94,8 @@ describe(commands.FILE_MOVE, () => {
 
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName: string, defaultValue: any) => settingName === settingsNames.prompt ? false : defaultValue);
+    spoUtilCreateCopyJobStub = sinon.stub(spo, 'createCopyJob').resolves(copyJobInfo);
   });
 
   beforeEach(() => {
@@ -52,21 +112,15 @@ describe(commands.FILE_MOVE, () => {
       }
     };
 
-    postStub = sinon.stub(request, 'post').callsFake(async opts => {
-      if (opts.url === `${webUrl}/_api/SP.MoveCopyUtil.MoveFileByPath`) {
-        return {
-          'odata.null': true
-        };
-      }
-
-      throw 'Invalid request: ' + opts.url;
-    });
+    loggerLogSpy = sinon.spy(logger, 'log');
+    spoUtilGetCopyJobResultStub = sinon.stub(spo, 'getCopyJobResult').resolves(copyJobResult);
   });
 
   afterEach(() => {
     sinonUtil.restore([
       request.post,
-      request.get
+      request.get,
+      spo.getCopyJobResult
     ]);
   });
 
@@ -83,43 +137,51 @@ describe(commands.FILE_MOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('excludes options from URL processing', () => {
-    assert.deepStrictEqual((command as any).getExcludedOptionsWithUrls(), ['targetUrl', 'sourceUrl']);
-  });
-
   it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'foo', sourceUrl: sourceUrl, targetUrl: targetUrl } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'foo', sourceUrl: sourceServerRelUrl, targetUrl: destServerRelUrl } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if sourceId is not a valid guid', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, sourceId: 'invalid', targetUrl: targetUrl } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: sourceWebUrl, sourceId: 'invalid', targetUrl: destServerRelUrl } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if nameConflictBehavior is not valid', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, sourceUrl: sourceUrl, targetUrl: targetUrl, nameConflictBehavior: 'invalid' } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: sourceWebUrl, sourceUrl: sourceServerRelUrl, targetUrl: destServerRelUrl, nameConflictBehavior: 'invalid' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the sourceId is a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, sourceId: sourceId, targetUrl: targetUrl } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: sourceWebUrl, sourceId: sourceDocId, targetUrl: destServerRelUrl } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('passes validation if the webUrl option is a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, sourceUrl: sourceUrl, targetUrl: targetUrl } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: sourceWebUrl, sourceUrl: sourceServerRelUrl, targetUrl: destServerRelUrl } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('moves a file correctly when specifying sourceId', async () => {
-    sinon.stub(request, 'get').callsFake(async opts => {
-      if (opts.url === `${webUrl}/_api/Web/GetFileById('${sourceId}')?$select=ServerRelativePath`) {
+  it('passes validation if site-relative sourceUrl is provided', async () => {
+    const actual = await command.validate({ options: { webUrl: sourceWebUrl, sourceUrl: sourceSiteRelUrl, targetUrl: destServerRelUrl } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('passes validation if the sourceUrl is an absolute URL', async () => {
+    const actual = await command.validate({ options: { webUrl: sourceWebUrl, sourceUrl: sourceAbsoluteUrl, targetUrl: destAbsoluteTargetUrl } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('correctly outputs exactly one result when file is moved when using sourceId', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `${sourceWebUrl}/_api/Web/GetFileById('${sourceDocId}')/ServerRelativePath`) {
         return {
-          ServerRelativePath: {
-            DecodedUrl: sourceUrl
-          }
+          DecodedUrl: destAbsoluteTargetUrl + `/${sourceDocumentName}`
         };
+      }
+
+      if (opts.url === `${destWebUrl}/_api/Web/GetFileById('${destDocId}')`) {
+        return destFileResponse;
       }
 
       throw 'Invalid request: ' + opts.url;
@@ -127,165 +189,367 @@ describe(commands.FILE_MOVE, () => {
 
     await command.action(logger, {
       options: {
-        webUrl: webUrl,
-        sourceId: sourceId,
-        targetUrl: targetUrl,
-        verbose: true
+        verbose: true,
+        webUrl: sourceWebUrl,
+        sourceId: sourceDocId,
+        targetUrl: destAbsoluteTargetUrl
       }
     });
 
-    assert.deepStrictEqual(postStub.lastCall.args[0].data,
-      {
-        srcPath: {
-          DecodedUrl: absoluteSourceUrl
-        },
-        destPath: {
-          DecodedUrl: absoluteTargetUrl + `/${fileName}`
-        },
-        overwrite: false,
-        options: {
-          KeepBoth: false,
-          ShouldBypassSharedLocks: false,
-          RetainEditorAndModifiedOnMove: false
-        }
-      }
-    );
+    assert(loggerLogSpy.calledOnce);
   });
 
-  it('moves a file correctly when specifying sourceUrl with server relative paths', async () => {
+  it('correctly outputs result when file is moved when using sourceId', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `${sourceWebUrl}/_api/Web/GetFileById('${sourceDocId}')/ServerRelativePath`) {
+        return {
+          DecodedUrl: sourceAbsoluteUrl
+        };
+      }
+
+      if (opts.url === `${destWebUrl}/_api/Web/GetFileById('${destDocId}')`) {
+        return destFileResponse;
+      }
+
+      throw 'Invalid request: ' + opts.url;
+    });
+
     await command.action(logger, {
       options: {
-        webUrl: webUrl,
-        sourceUrl: sourceUrl,
-        targetUrl: targetUrl
+        verbose: true,
+        webUrl: sourceWebUrl,
+        sourceId: sourceDocId,
+        targetUrl: destAbsoluteTargetUrl
       }
     });
 
-    assert.deepStrictEqual(postStub.lastCall.args[0].data,
-      {
-        srcPath: {
-          DecodedUrl: absoluteSourceUrl
-        },
-        destPath: {
-          DecodedUrl: absoluteTargetUrl + `/${fileName}`
-        },
-        overwrite: false,
-        options: {
-          KeepBoth: false,
-          ShouldBypassSharedLocks: false,
-          RetainEditorAndModifiedOnMove: false
-        }
-      }
-    );
+    assert.deepStrictEqual(loggerLogSpy.lastCall.args[0], destFileResponse);
   });
 
-  it('moves a file correctly when specifying sourceUrl with site relative paths', async () => {
+  it('correctly outputs exactly one result when file is moved when using sourceUrl', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `${destWebUrl}/_api/Web/GetFileById('${destDocId}')`) {
+        return destFileResponse;
+      }
+
+      throw 'Invalid request: ' + opts.url;
+    });
+
     await command.action(logger, {
       options: {
-        webUrl: webUrl,
-        sourceUrl: `/Shared Documents/${fileName}`,
-        targetUrl: targetUrl,
+        verbose: true,
+        webUrl: sourceWebUrl,
+        sourceUrl: sourceServerRelUrl,
+        targetUrl: destAbsoluteTargetUrl
+      }
+    });
+
+    assert(loggerLogSpy.calledOnce);
+  });
+
+  it('correctly outputs result when file is moved when using sourceUrl', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `${destWebUrl}/_api/Web/GetFileById('${destDocId}')`) {
+        return destFileResponse;
+      }
+
+      throw 'Invalid request: ' + opts.url;
+    });
+
+    await command.action(logger, {
+      options: {
+        verbose: true,
+        webUrl: sourceWebUrl,
+        sourceUrl: sourceServerRelUrl,
+        targetUrl: destAbsoluteTargetUrl
+      }
+    });
+
+    assert.deepStrictEqual(loggerLogSpy.lastCall.args[0], destFileResponse);
+  });
+
+  it('correctly moves a file when using sourceId', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `${sourceWebUrl}/_api/Web/GetFileById('${sourceDocId}')/ServerRelativePath`) {
+        return {
+          DecodedUrl: sourceAbsoluteUrl
+        };
+      }
+
+      if (opts.url === `${destWebUrl}/_api/Web/GetFileById('${destDocId}')`) {
+        return destFileResponse;
+      }
+
+      throw 'Invalid request: ' + opts.url;
+    });
+
+    await command.action(logger, {
+      options: {
+        webUrl: sourceWebUrl,
+        sourceId: sourceDocId,
+        targetUrl: destAbsoluteTargetUrl
+      }
+    });
+
+    assert.deepStrictEqual(spoUtilCreateCopyJobStub.lastCall.args, [
+      sourceWebUrl,
+      sourceAbsoluteUrl,
+      destAbsoluteTargetUrl,
+      {
+        nameConflictBehavior: CreateCopyJobsNameConflictBehavior.Fail,
+        bypassSharedLock: false,
+        includeItemPermissions: false,
+        operation: 'move',
+        newName: undefined
+      }
+    ]);
+  });
+
+  it('correctly moves a file when using sourceUrl', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `${destWebUrl}/_api/Web/GetFileById('${destDocId}')`) {
+        return destFileResponse;
+      }
+
+      throw 'Invalid request: ' + opts.url;
+    });
+
+    await command.action(logger, {
+      options: {
+        webUrl: sourceWebUrl,
+        sourceUrl: sourceServerRelUrl,
+        targetUrl: destAbsoluteTargetUrl,
         nameConflictBehavior: 'fail'
       }
     });
 
-    assert.deepStrictEqual(postStub.lastCall.args[0].data,
+    assert.deepStrictEqual(spoUtilCreateCopyJobStub.lastCall.args, [
+      sourceWebUrl,
+      sourceAbsoluteUrl,
+      destAbsoluteTargetUrl,
       {
-        srcPath: {
-          DecodedUrl: webUrl + `/Shared Documents/${fileName}`
-        },
-        destPath: {
-          DecodedUrl: absoluteTargetUrl + `/${fileName}`
-        },
-        overwrite: false,
-        options: {
-          KeepBoth: false,
-          ShouldBypassSharedLocks: false,
-          RetainEditorAndModifiedOnMove: false
-        }
+        nameConflictBehavior: CreateCopyJobsNameConflictBehavior.Fail,
+        bypassSharedLock: false,
+        includeItemPermissions: false,
+        operation: 'move',
+        newName: undefined
       }
-    );
+    ]);
   });
 
-  it('moves a file correctly when specifying sourceUrl with absolute paths', async () => {
+  it('correctly moves a file when using site-relative sourceUrl', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `${destWebUrl}/_api/Web/GetFileById('${destDocId}')`) {
+        return destFileResponse;
+      }
+
+      throw 'Invalid request: ' + opts.url;
+    });
+
     await command.action(logger, {
       options: {
-        webUrl: webUrl,
-        sourceUrl: rootUrl + sourceUrl,
-        targetUrl: rootUrl + targetUrl,
+        webUrl: sourceWebUrl,
+        sourceUrl: sourceSiteRelUrl,
+        targetUrl: destAbsoluteTargetUrl,
+        nameConflictBehavior: 'fail'
+      }
+    });
+
+    assert.deepStrictEqual(spoUtilCreateCopyJobStub.lastCall.args, [
+      sourceWebUrl,
+      sourceAbsoluteUrl,
+      destAbsoluteTargetUrl,
+      {
+        nameConflictBehavior: CreateCopyJobsNameConflictBehavior.Fail,
+        bypassSharedLock: false,
+        includeItemPermissions: false,
+        operation: 'move',
+        newName: undefined
+      }
+    ]);
+  });
+
+  it('correctly moves a file when using absolute urls', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `${destWebUrl}/_api/Web/GetFileById('${destDocId}')`) {
+        return destFileResponse;
+      }
+
+      throw 'Invalid request: ' + opts.url;
+    });
+
+    await command.action(logger, {
+      options: {
+        webUrl: sourceWebUrl,
+        sourceUrl: sourceAbsoluteUrl,
+        targetUrl: destAbsoluteTargetUrl,
         nameConflictBehavior: 'replace'
       }
     });
 
-    assert.deepStrictEqual(postStub.lastCall.args[0].data,
+    assert.deepStrictEqual(spoUtilCreateCopyJobStub.lastCall.args, [
+      sourceWebUrl,
+      sourceAbsoluteUrl,
+      destAbsoluteTargetUrl,
       {
-        srcPath: {
-          DecodedUrl: absoluteSourceUrl
-        },
-        destPath: {
-          DecodedUrl: absoluteTargetUrl + `/${fileName}`
-        },
-        overwrite: true,
-        options: {
-          KeepBoth: false,
-          ShouldBypassSharedLocks: false,
-          RetainEditorAndModifiedOnMove: false
-        }
+        nameConflictBehavior: CreateCopyJobsNameConflictBehavior.Replace,
+        bypassSharedLock: false,
+        includeItemPermissions: false,
+        operation: 'move',
+        newName: undefined
       }
-    );
+    ]);
   });
 
-  it('moves a file correctly when specifying various options', async () => {
+  it('correctly moves a file when using sourceUrl with extra options', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `${destWebUrl}/_api/Web/GetFileById('${destDocId}')`) {
+        return destFileResponse;
+      }
+
+      throw 'Invalid request: ' + opts.url;
+    });
+
     await command.action(logger, {
       options: {
-        webUrl: webUrl,
-        sourceUrl: sourceUrl,
-        targetUrl: targetUrl,
-        newName: 'Report-old.docx',
+        webUrl: sourceWebUrl,
+        sourceUrl: sourceServerRelUrl,
+        targetUrl: destAbsoluteTargetUrl,
         nameConflictBehavior: 'rename',
-        retainEditorAndModified: true,
-        bypassSharedLock: true
+        bypassSharedLock: true,
+        includeItemPermissions: true,
+        newName: 'Document-renamed.pdf'
       }
     });
 
-    assert.deepStrictEqual(postStub.lastCall.args[0].data,
+    assert.deepStrictEqual(spoUtilCreateCopyJobStub.lastCall.args, [
+      sourceWebUrl,
+      sourceAbsoluteUrl,
+      destAbsoluteTargetUrl,
       {
-        srcPath: {
-          DecodedUrl: absoluteSourceUrl
-        },
-        destPath: {
-          DecodedUrl: absoluteTargetUrl + '/Report-old.docx'
-        },
-        overwrite: false,
-        options: {
-          KeepBoth: true,
-          ShouldBypassSharedLocks: true,
-          RetainEditorAndModifiedOnMove: true
-        }
+        nameConflictBehavior: CreateCopyJobsNameConflictBehavior.Rename,
+        bypassSharedLock: true,
+        includeItemPermissions: true,
+        operation: 'move',
+        newName: 'Document-renamed.pdf'
       }
-    );
+    ]);
   });
 
-  it('handles error correctly when moving a file', async () => {
-    const error = {
+  it('correctly moves a file when using sourceUrl with new name without extension', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `${destWebUrl}/_api/Web/GetFileById('${destDocId}')`) {
+        return destFileResponse;
+      }
+
+      throw 'Invalid request: ' + opts.url;
+    });
+
+    await command.action(logger, {
+      options: {
+        webUrl: sourceWebUrl,
+        sourceUrl: sourceServerRelUrl,
+        targetUrl: destAbsoluteTargetUrl,
+        nameConflictBehavior: 'replace',
+        newName: 'Document-renamed'
+      }
+    });
+
+    assert.deepStrictEqual(spoUtilCreateCopyJobStub.lastCall.args, [
+      sourceWebUrl,
+      sourceAbsoluteUrl,
+      destAbsoluteTargetUrl,
+      {
+        nameConflictBehavior: CreateCopyJobsNameConflictBehavior.Replace,
+        bypassSharedLock: false,
+        includeItemPermissions: false,
+        operation: 'move',
+        newName: 'Document-renamed.pdf'
+      }
+    ]);
+  });
+
+  it('correctly polls for the copy job to finish', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `${destWebUrl}/_api/Web/GetFileById('${destDocId}')`) {
+        return destFileResponse;
+      }
+
+      throw 'Invalid request: ' + opts.url;
+    });
+
+    await command.action(logger, {
+      options: {
+        webUrl: sourceWebUrl,
+        sourceUrl: sourceServerRelUrl,
+        targetUrl: destAbsoluteTargetUrl
+      }
+    });
+
+    assert.deepStrictEqual(spoUtilGetCopyJobResultStub.lastCall.args, [
+      sourceWebUrl,
+      copyJobInfo
+    ]);
+  });
+
+  it('outputs no result when skipWait is specified', async () => {
+    await command.action(logger, {
+      options: {
+        webUrl: sourceWebUrl,
+        sourceUrl: sourceServerRelUrl,
+        targetUrl: destAbsoluteTargetUrl,
+        skipWait: true
+      }
+    });
+
+    assert(loggerLogSpy.notCalled);
+  });
+
+  it('correctly skips polling when skipWait is specified', async () => {
+    await command.action(logger, {
+      options: {
+        webUrl: sourceWebUrl,
+        sourceUrl: sourceServerRelUrl,
+        targetUrl: destAbsoluteTargetUrl,
+        skipWait: true
+      }
+    });
+
+    assert(spoUtilGetCopyJobResultStub.notCalled);
+  });
+
+  it('correctly handles error when sourceId does not exist', async () => {
+    sinon.stub(request, 'get').rejects({
       error: {
         'odata.error': {
+          code: '-2147024894, System.IO.FileNotFoundException',
           message: {
             lang: 'en-US',
             value: 'File Not Found.'
           }
         }
       }
-    };
-
-    sinon.stub(request, 'get').rejects(error);
+    });
 
     await assert.rejects(command.action(logger, {
       options: {
-        webUrl: webUrl,
-        sourceId: sourceId,
-        targetUrl: targetUrl
+        webUrl: sourceWebUrl,
+        sourceId: sourceDocId,
+        targetUrl: destAbsoluteTargetUrl
       }
-    }), new CommandError(error.error['odata.error'].message.value));
+    }), new CommandError('File Not Found.'));
+  });
+
+  it('correctly handles error when getCopyJobResult fails', async () => {
+    spoUtilGetCopyJobResultStub.restore();
+    spoUtilGetCopyJobResultStub = sinon.stub(spo, 'getCopyJobResult').rejects(new Error('Target file already exists.'));
+
+    await assert.rejects(command.action(logger, {
+      options: {
+        webUrl: sourceWebUrl,
+        sourceUrl: sourceServerRelUrl,
+        targetUrl: destAbsoluteTargetUrl
+      }
+    }), new CommandError('Target file already exists.'));
   });
 });

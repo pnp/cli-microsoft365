@@ -1,7 +1,7 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import { telemetry } from '../../telemetry.js';
-import auth from '../../Auth.js';
+import auth, { AuthType } from '../../Auth.js';
 import { Logger } from '../../cli/Logger.js';
 import { CommandError } from '../../Command.js';
 import request from '../../request.js';
@@ -235,7 +235,7 @@ describe('SpoCommand', () => {
   });
 
   it('Shows an error when CLI is connected with authType "Secret"', async () => {
-    sinon.stub(auth.connection, 'authType').value(5);
+    sinon.stub(auth.connection, 'authType').value(AuthType.Secret);
 
     const mock = new MockCommand();
     await assert.rejects(mock.action(logger, { options: {} }),

@@ -6,43 +6,10 @@ import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 import { ListPrincipalType } from '../list/ListPrincipalType.js';
+import { AdminResult, AdminUserResult, AdminCommandResultItem, SiteResult, SiteUserResult } from './SiteAdmin.js';
 
 interface CommandArgs {
   options: Options;
-}
-
-interface AdminUserResult {
-  email: string;
-  loginName: string;
-  name: string;
-  userPrincipalName: string;
-}
-
-interface AdminResult {
-  value: AdminUserResult[];
-}
-
-interface SiteUserResult {
-  Email: string;
-  Id: number;
-  IsSiteAdmin: boolean;
-  LoginName: string;
-  PrincipalType: number;
-  Title: string;
-}
-
-interface SiteResult {
-  value: SiteUserResult[];
-}
-
-interface CommandResultItem {
-  Id: number | null;
-  Email: string;
-  IsPrimaryAdmin: boolean;
-  LoginName: string;
-  Title: string;
-  PrincipalType: number | null;
-  PrincipalTypeString: string | null;
 }
 
 interface Options extends GlobalOptions {
@@ -59,6 +26,10 @@ class SpoSiteAdminListCommand extends SpoCommand {
     return 'Lists all administrators of a specific SharePoint site';
   }
 
+  public defaultProperties(): string[] | undefined {
+    return ['Id', 'LoginName', 'Title', 'PrincipalTypeString'];
+  }
+
   constructor() {
     super();
 
@@ -71,7 +42,6 @@ class SpoSiteAdminListCommand extends SpoCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        siteUrl: typeof args.options.siteUrl !== 'undefined',
         asAdmin: !!args.options.asAdmin
       });
     });
@@ -96,6 +66,7 @@ class SpoSiteAdminListCommand extends SpoCommand {
 
   #initTypes(): void {
     this.types.string.push('siteUrl');
+    this.types.boolean.push('asAdmin');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -122,22 +93,18 @@ class SpoSiteAdminListCommand extends SpoCommand {
     const requestOptions: CliRequestOptions = {
       url: `${adminUrl}/_api/SPO.Tenant/GetSiteAdministrators?siteId='${siteId}'`,
       headers: {
-        accept: 'application/json;odata=nometadata',
-        'content-type': 'application/json;charset=utf-8'
-      }
+        accept: 'application/json;odata=nometadata'
+      },
+      responseType: 'json'
     };
 
-    const response: string = await request.post<string>(requestOptions);
-    const responseContent: AdminResult = JSON.parse(response);
-    const primaryAdminLoginName = await this.getPrimaryAdminLoginNameFromAdmin(adminUrl, siteId);
+    const response = await request.post<AdminResult>(requestOptions);
+    const primaryAdminLoginName = await spo.getPrimaryAdminLoginNameAsAdmin(adminUrl, siteId, logger, this.verbose);
 
-    const mappedResult = responseContent.value.map((u: AdminUserResult): CommandResultItem => ({
-      Id: null,
+    const mappedResult = response.value.map((u: AdminUserResult): AdminCommandResultItem => ({
       Email: u.email,
       LoginName: u.loginName,
       Title: u.name,
-      PrincipalType: null,
-      PrincipalTypeString: null,
       IsPrimaryAdmin: u.loginName === primaryAdminLoginName
     }));
     await logger.log(mappedResult);
@@ -153,20 +120,6 @@ class SpoSiteAdminListCommand extends SpoCommand {
     return match[1];
   }
 
-  private async getPrimaryAdminLoginNameFromAdmin(adminUrl: string, siteId: string): Promise<string> {
-    const requestOptions: CliRequestOptions = {
-      url: `${adminUrl}/_api/SPO.Tenant/sites('${siteId}')?$select=OwnerLoginName`,
-      headers: {
-        accept: 'application/json;odata=nometadata',
-        'content-type': 'application/json;charset=utf-8'
-      }
-    };
-
-    const response: string = await request.get<string>(requestOptions);
-    const responseContent = JSON.parse(response);
-    return responseContent.OwnerLoginName;
-  }
-
   private async callAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
       await logger.logToStderr('Retrieving site administrators...');
@@ -174,7 +127,6 @@ class SpoSiteAdminListCommand extends SpoCommand {
 
     const requestOptions: CliRequestOptions = {
       url: `${args.options.siteUrl}/_api/web/siteusers?$filter=IsSiteAdmin eq true`,
-      method: 'GET',
       headers: {
         'accept': 'application/json;odata=nometadata'
       },
@@ -182,8 +134,8 @@ class SpoSiteAdminListCommand extends SpoCommand {
     };
 
     const responseContent: SiteResult = await request.get<SiteResult>(requestOptions);
-    const primaryOwnerLogin = await this.getPrimaryOwnerLoginFromSite(args.options.siteUrl);
-    const mappedResult = responseContent.value.map((u: SiteUserResult): CommandResultItem => ({
+    const primaryOwnerLogin = await spo.getPrimaryOwnerLoginFromSite(args.options.siteUrl, logger, this.verbose);
+    const mappedResult = responseContent.value.map((u: SiteUserResult): AdminCommandResultItem => ({
       Id: u.Id,
       LoginName: u.LoginName,
       Title: u.Title,
@@ -193,20 +145,6 @@ class SpoSiteAdminListCommand extends SpoCommand {
       IsPrimaryAdmin: u.LoginName === primaryOwnerLogin
     }));
     await logger.log(mappedResult);
-  }
-
-  private async getPrimaryOwnerLoginFromSite(siteUrl: string): Promise<string | null> {
-    const requestOptions: CliRequestOptions = {
-      url: `${siteUrl}/_api/site/owner`,
-      method: 'GET',
-      headers: {
-        'accept': 'application/json;odata=nometadata'
-      },
-      responseType: 'json'
-    };
-
-    const responseContent = await request.get<{ LoginName: string }>(requestOptions);
-    return responseContent?.LoginName ?? null;
   }
 }
 

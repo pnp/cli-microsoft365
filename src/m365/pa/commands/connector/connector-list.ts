@@ -56,14 +56,9 @@ class PaConnectorListCommand extends PowerAppsCommand {
         connectors.forEach(c => {
           c.displayName = c.properties.displayName;
         });
+      }
 
-        await logger.log(connectors);
-      }
-      else {
-        if (this.verbose) {
-          await logger.logToStderr('No custom connectors found');
-        }
-      }
+      await logger.log(connectors);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);

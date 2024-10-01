@@ -55,7 +55,7 @@ class FlowEnvironmentGetCommand extends PowerAutomateCommand {
       await logger.logToStderr(`Retrieving information about Microsoft Flow environment ${args.options.name ?? ''}...`);
     }
 
-    let requestUrl = `${this.resource}/providers/Microsoft.ProcessSimple/environments/`;
+    let requestUrl = `${PowerAutomateCommand.resource}/providers/Microsoft.ProcessSimple/environments/`;
 
     if (args.options.name) {
       requestUrl += `${formatting.encodeQueryParameter(args.options.name)}`;

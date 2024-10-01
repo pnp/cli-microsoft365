@@ -21,7 +21,8 @@ import { WebProperties } from '../m365/spo/commands/web/WebProperties.js';
 import { Group, Site } from '@microsoft/microsoft-graph-types';
 import { ListItemInstance } from '../m365/spo/commands/listitem/ListItemInstance.js';
 import { ListItemFieldValueResult } from '../m365/spo/commands/listitem/ListItemFieldValueResult.js';
-import { FileProperties } from '../m365/spo/commands/file/FileProperties.js'; import { setTimeout } from 'timers/promises';
+import { FileProperties } from '../m365/spo/commands/file/FileProperties.js';
+import { setTimeout } from 'timers/promises';
 
 export interface ContextInfo {
   FormDigestTimeoutSeconds: number;
@@ -87,6 +88,49 @@ export interface User {
   } | null;
   UserPrincipalName: string | null;
 }
+
+interface CreateCopyJobsOptions {
+  nameConflictBehavior?: CreateCopyJobsNameConflictBehavior;
+  newName?: string;
+  bypassSharedLock?: boolean;
+  /** @remarks Use only when using operation copy. */
+  ignoreVersionHistory?: boolean;
+  /** @remarks Use only when using operation move. */
+  includeItemPermissions?: boolean;
+  operation: 'copy' | 'move';
+}
+
+export enum CreateCopyJobsNameConflictBehavior {
+  Fail = 0,
+  Replace = 1,
+  Rename = 2,
+}
+
+interface CreateCopyJobInfo {
+  EncryptionKey: string;
+  JobId: string;
+  JobQueueUri: string;
+  SourceListItemUniqueIds: string[];
+}
+
+interface CopyJobObjectInfo {
+  Event: string;
+  JobId: string;
+  Time: string;
+  SourceObjectFullUrl: string;
+  TargetServerUrl: string;
+  TargetSiteId: string;
+  TargetWebId: string;
+  TargetListId: string;
+  TargetObjectUniqueId: string;
+  TargetObjectSiteRelativeUrl: string;
+  CorrelationId: string;
+}
+
+// Wrapping this into a settings object so we can alter the values in tests
+export const settings = {
+  pollingInterval: 3_000
+};
 
 export const spo = {
   async getRequestDigest(siteUrl: string): Promise<FormDigestInfo> {
@@ -653,10 +697,10 @@ export const spo = {
  * @param webUrl Web url
  * @param email The email of the user
  * @param logger the Logger object
- * @param verbose set if verbose logging should be logged 
+ * @param verbose set for verbose logging
  */
-  async getUserByEmail(webUrl: string, email: string, logger: Logger, verbose?: boolean): Promise<User> {
-    if (verbose) {
+  async getUserByEmail(webUrl: string, email: string, logger?: Logger, verbose?: boolean): Promise<any> {
+    if (verbose && logger) {
       await logger.logToStderr(`Retrieving the spo user by email ${email}`);
     }
     const requestUrl = `${webUrl}/_api/web/siteusers/GetByEmail('${formatting.encodeQueryParameter(email)}')`;
@@ -737,10 +781,10 @@ export const spo = {
   * @param webUrl Web url
   * @param name The name of the group
   * @param logger the Logger object
-  * @param verbose set if verbose logging should be logged 
+  * @param verbose set for verbose logging
   */
-  async getGroupByName(webUrl: string, name: string, logger: Logger, verbose?: boolean): Promise<any> {
-    if (verbose) {
+  async getGroupByName(webUrl: string, name: string, logger?: Logger, verbose?: boolean): Promise<any> {
+    if (verbose && logger) {
       await logger.logToStderr(`Retrieving the group by name ${name}`);
     }
     const requestUrl = `${webUrl}/_api/web/sitegroups/GetByName('${formatting.encodeQueryParameter(name)}')`;
@@ -763,10 +807,10 @@ export const spo = {
   * @param webUrl Web url
   * @param name the name of the role definition
   * @param logger the Logger object
-  * @param debug set if debug logging should be logged 
+  * @param verbose set for verbose logging
   */
-  async getRoleDefinitionByName(webUrl: string, name: string, logger: Logger, debug?: boolean): Promise<RoleDefinition> {
-    if (debug) {
+  async getRoleDefinitionByName(webUrl: string, name: string, logger?: Logger, verbose?: boolean): Promise<RoleDefinition> {
+    if (verbose && logger) {
       await logger.logToStderr(`Retrieving the role definitions for ${name}`);
     }
 
@@ -1860,5 +1904,155 @@ export const spo = {
 
     const itemsResponse = await request.get<ListItemInstance>(requestOptionsItems);
     return (itemsResponse);
+  },
+
+  /**
+  * Retrieves the file by id.
+  * Returns a FileProperties object
+  * @param webUrl Web url
+  * @param id the id of the file
+  * @param logger the Logger object
+  * @param verbose set for verbose logging 
+  */
+  async getFileById(webUrl: string, id: string, logger?: Logger, verbose?: boolean): Promise<FileProperties> {
+    if (verbose && logger) {
+      await logger.logToStderr(`Retrieving the file with id ${id}`);
+    }
+    const requestUrl = `${webUrl}/_api/web/GetFileById('${formatting.encodeQueryParameter(id)}')`;
+
+    const requestOptions: CliRequestOptions = {
+      url: requestUrl,
+      headers: {
+        'accept': 'application/json;odata=nometadata'
+      },
+
+      responseType: 'json'
+    };
+
+    const file: FileProperties = await request.get<FileProperties>(requestOptions);
+
+    return file;
+  },
+
+  /**
+   * Create a SharePoint copy job to copy a file/folder to another location.
+   * @param webUrl Absolute web URL where the source file/folder is located.
+   * @param sourceUrl Absolute URL of the source file/folder.
+   * @param destinationUrl Absolute URL of the destination folder.
+   * @param options Options for the copy job.
+   * @returns Copy job information. Use {@link spo.getCopyJobResult} to get the result of the copy job.
+   */
+  async createCopyJob(webUrl: string, sourceUrl: string, destinationUrl: string, options?: CreateCopyJobsOptions): Promise<CreateCopyJobInfo> {
+    const requestOptions: CliRequestOptions = {
+      url: `${webUrl}/_api/Site/CreateCopyJobs`,
+      headers: {
+        accept: 'application/json;odata=nometadata'
+      },
+      responseType: 'json',
+      data: {
+        destinationUri: destinationUrl,
+        exportObjectUris: [sourceUrl],
+        options: {
+          NameConflictBehavior: options?.nameConflictBehavior ?? CreateCopyJobsNameConflictBehavior.Fail,
+          AllowSchemaMismatch: true,
+          BypassSharedLock: !!options?.bypassSharedLock,
+          IgnoreVersionHistory: !!options?.ignoreVersionHistory,
+          IncludeItemPermissions: !!options?.includeItemPermissions,
+          CustomizedItemName: options?.newName ? [options.newName] : undefined,
+          SameWebCopyMoveOptimization: true,
+          IsMoveMode: options?.operation === 'move'
+        }
+      }
+    };
+
+    const response = await request.post<{ value: CreateCopyJobInfo[] }>(requestOptions);
+    return response.value[0];
+  },
+
+  /**
+   * Poll until the copy job is finished and return the result.
+   * @param webUrl Absolute web URL where the copy job was created.
+   * @param copyJobInfo Information about the copy job.
+   * @throws Error if the copy job has failed.
+   * @returns Information about the destination object.
+   */
+  async getCopyJobResult(webUrl: string, copyJobInfo: CreateCopyJobInfo): Promise<CopyJobObjectInfo> {
+    const requestOptions: CliRequestOptions = {
+      url: `${webUrl}/_api/Site/GetCopyJobProgress`,
+      headers: {
+        accept: 'application/json;odata=nometadata'
+      },
+      responseType: 'json',
+      data: {
+        copyJobInfo: copyJobInfo
+      }
+    };
+    let progress = await request.post<{ JobState: number; Logs: string[] }>(requestOptions);
+
+    while (progress.JobState !== 0) {
+      await setTimeout(settings.pollingInterval);
+      progress = await request.post<{ JobState: number; Logs: string[] }>(requestOptions);
+    }
+
+    const logs = progress.Logs.map(l => JSON.parse(l));
+
+    // Check if the job has failed
+    const errorLog = logs.find(l => l.Event === 'JobError');
+    if (errorLog) {
+      throw new Error(errorLog.Message);
+    }
+
+    // Get the destination object information
+    const objectInfo = logs.find(l => l.Event === 'JobFinishedObjectInfo') as CopyJobObjectInfo;
+    return objectInfo;
+  },
+
+  /**
+   * Gets the primary owner login from a site as admin.
+   * @param adminUrl The SharePoint admin URL
+   * @param siteId The site ID
+   * @param logger The logger object
+   * @param verbose If in verbose mode
+   * @returns Owner login name
+   */
+  async getPrimaryAdminLoginNameAsAdmin(adminUrl: string, siteId: string, logger: Logger, verbose: boolean): Promise<string> {
+    if (verbose) {
+      await logger.logToStderr('Getting the primary admin login name...');
+    }
+
+    const requestOptions: CliRequestOptions = {
+      url: `${adminUrl}/_api/SPO.Tenant/sites('${siteId}')?$select=OwnerLoginName`,
+      headers: {
+        accept: 'application/json;odata=nometadata'
+      },
+      responseType: 'json'
+    };
+
+    const response = await request.get<{ OwnerLoginName: string }>(requestOptions);
+    return response.OwnerLoginName;
+  },
+
+  /**
+   * Gets the primary owner login from a site.
+   * @param siteUrl The site URL
+   * @param logger The logger object
+   * @param verbose If in verbose mode
+   * @returns Owner login name
+   */
+  async getPrimaryOwnerLoginFromSite(siteUrl: string, logger: Logger, verbose: boolean): Promise<string> {
+    if (verbose) {
+      await logger.logToStderr('Getting the primary admin login name...');
+    }
+
+    const requestOptions: CliRequestOptions = {
+      url: `${siteUrl}/_api/site/owner`,
+      headers: {
+        'accept': 'application/json;odata=nometadata'
+      },
+      responseType: 'json'
+    };
+
+    const responseContent = await request.get<{ LoginName: string }>(requestOptions);
+    return responseContent?.LoginName;
   }
 };

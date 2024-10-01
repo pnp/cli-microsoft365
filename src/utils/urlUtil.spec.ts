@@ -501,4 +501,14 @@ describe('urlUtil/urlUtil', () => {
     const actual = urlUtil.getTargetSiteAbsoluteUrl('https://contoso.sharepoint.com', 'https://example.com/some/path');
     assert.strictEqual(actual, 'https://example.com');
   });
+
+  it('correctly removes leading slashes from the URL', () => {
+    const actual = urlUtil.removeLeadingSlashes('/Shared Documents/MyFolder');
+    assert.strictEqual(actual, 'Shared Documents/MyFolder');
+  });
+
+  it('correctly removes trailing slashes from the URL', () => {
+    const actual = urlUtil.removeTrailingSlashes('/Shared Documents/MyFolder/');
+    assert.strictEqual(actual, '/Shared Documents/MyFolder');
+  });
 });

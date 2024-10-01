@@ -17,7 +17,7 @@ import { app } from '../utils/app.js';
 import { browserUtil } from '../utils/browserUtil.js';
 import { formatting } from '../utils/formatting.js';
 import { md } from '../utils/md.js';
-import { ConfirmationConfig, SelectionConfig, prompt } from '../utils/prompt.js';
+import { ConfirmationConfig, InputConfig, SelectionConfig, prompt } from '../utils/prompt.js';
 import { validation } from '../utils/validation.js';
 import { zod } from '../utils/zod.js';
 import { CommandInfo } from './CommandInfo.js';
@@ -48,6 +48,14 @@ const defaultHelpMode = 'options';
 const defaultHelpTarget = 'console';
 const helpModes: string[] = ['options', 'examples', 'remarks', 'response', 'full'];
 const helpTargets: string[] = ['console', 'web'];
+const yargsConfiguration: Partial<yargs.Configuration> = {
+  'parse-numbers': true,
+  'strip-aliased': true,
+  'strip-dashed': true,
+  'dot-notation': false,
+  'boolean-negation': true,
+  'camel-case-expansion': false
+};
 
 function getConfig(): Configstore {
   if (!_config) {
@@ -65,6 +73,14 @@ function getSettingWithDefaultValue<TValue>(settingName: string, defaultValue: T
   else {
     return configuredValue;
   }
+}
+
+function getClientId(): string | undefined {
+  return cli.getSettingWithDefaultValue(settingsNames.clientId, process.env.CLIMICROSOFT365_ENTRAAPPID);
+}
+
+function getTenant(): string {
+  return cli.getSettingWithDefaultValue(settingsNames.tenantId, process.env.CLIMICROSOFT365_TENANT || 'common');
 }
 
 async function execute(rawArgs: string[]): Promise<void> {
@@ -159,15 +175,41 @@ async function execute(rawArgs: string[]): Promise<void> {
 
   let finalArgs: any = cli.optionsFromArgs.options;
   if (cli.commandToExecute?.command.schema) {
-    const startValidation = process.hrtime.bigint();
-    const result = cli.commandToExecute.command.getSchemaToParse()!.safeParse(cli.optionsFromArgs.options);
-    const endValidation = process.hrtime.bigint();
-    timings.validation.push(Number(endValidation - startValidation));
-    if (!result.success) {
-      return cli.closeWithError(result.error, cli.optionsFromArgs, true);
+    while (true) {
+      const startValidation = process.hrtime.bigint();
+      const result = cli.commandToExecute.command.getSchemaToParse()!.safeParse(cli.optionsFromArgs.options);
+      const endValidation = process.hrtime.bigint();
+      timings.validation.push(Number(endValidation - startValidation));
+
+      if (result.success) {
+        finalArgs = result.data;
+        break;
+      }
+      else {
+        const hasNonRequiredErrors = result.error.errors.some(e => e.code !== 'invalid_type' || e.received !== 'undefined');
+        const shouldPrompt = cli.getSettingWithDefaultValue<boolean>(settingsNames.prompt, true);
+
+        if (hasNonRequiredErrors === false &&
+          shouldPrompt) {
+          await cli.error('🌶️  Provide values for the following parameters:');
+
+          for (const error of result.error.errors) {
+            const optionInfo = cli.commandToExecute!.options.find(o => o.name === error.path.join('.'));
+            const answer = await cli.promptForValue(optionInfo!);
+            cli.optionsFromArgs!.options[error.path.join('.')] = answer;
+          }
+        }
+        else {
+          result.error.errors.forEach(e => {
+            if (e.code === 'invalid_type' &&
+              e.received === 'undefined') {
+              e.message = `Required option not specified`;
+            }
+          });
+          return cli.closeWithError(result.error, cli.optionsFromArgs, true);
+        }
+      }
     }
-    
-    finalArgs = result.data;
   }
   else {
     const startValidation = process.hrtime.bigint();
@@ -477,11 +519,7 @@ function getCommandOptions(command: Command): CommandOptionInfo[] {
 function getCommandOptionsFromArgs(args: string[], commandInfo: CommandInfo | undefined): yargs.Arguments {
   const yargsOptions: yargs.Options = {
     alias: {},
-    configuration: {
-      "parse-numbers": false,
-      "strip-aliased": true,
-      "strip-dashed": true
-    }
+    configuration: yargsConfiguration
   };
 
   let argsToParse = args;
@@ -892,7 +930,7 @@ async function closeWithError(error: any, args: CommandArgs, showHelpIfEnabled: 
   let errorMessage: string = error instanceof CommandError ? error.message : error;
 
   if (error instanceof ZodError) {
-    errorMessage = error.errors.map(e => `${e.path}: ${e.message}`).join(os.EOL);
+    errorMessage = error.errors.map(e => `${e.path.join('.')}: ${e.message}`).join(os.EOL);
   }
 
   if ((!args.options.output || args.options.output === 'json') &&
@@ -941,6 +979,17 @@ async function error(message?: any, ...optionalParams: any[]): Promise<void> {
   }
 }
 
+async function promptForValue(optionInfo: CommandOptionInfo): Promise<string> {
+  return optionInfo.autocomplete !== undefined
+    ? await prompt.forSelection<string>({
+      message: `${optionInfo.name}: `,
+      choices: optionInfo.autocomplete.map((choice: any) => {
+        return { name: choice, value: choice };
+      })
+    })
+    : await prompt.forInput({ message: `${optionInfo.name}: ` });
+}
+
 async function promptForSelection<T>(config: SelectionConfig<T>): Promise<T> {
   const answer = await prompt.forSelection<T>(config);
   await cli.error('');
@@ -950,6 +999,13 @@ async function promptForSelection<T>(config: SelectionConfig<T>): Promise<T> {
 
 async function promptForConfirmation(config: ConfirmationConfig): Promise<boolean> {
   const answer = await prompt.forConfirmation(config);
+  await cli.error('');
+
+  return answer;
+}
+
+async function promptForInput(config: InputConfig): Promise<string> {
+  const answer = await prompt.forInput(config);
   await cli.error('');
 
   return answer;
@@ -995,7 +1051,9 @@ export const cli = {
   closeWithError,
   commands,
   commandToExecute,
+  getClientId,
   getConfig,
+  getTenant,
   currentCommandName,
   error,
   execute,
@@ -1014,6 +1072,9 @@ export const cli = {
   optionsFromArgs,
   printAvailableCommands,
   promptForConfirmation,
+  promptForInput,
   promptForSelection,
-  shouldTrimOutput
+  promptForValue,
+  shouldTrimOutput,
+  yargsConfiguration
 };

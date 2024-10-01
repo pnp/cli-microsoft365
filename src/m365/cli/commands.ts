@@ -12,6 +12,5 @@ export default {
   CONFIG_SET: `${prefix} config set`,
   CONSENT: `${prefix} consent`,
   DOCTOR: `${prefix} doctor`,
-  ISSUE: `${prefix} issue`,
-  RECONSENT: `${prefix} reconsent`
+  ISSUE: `${prefix} issue`
 };
