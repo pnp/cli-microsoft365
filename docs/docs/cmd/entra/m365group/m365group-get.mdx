@@ -86,7 +86,12 @@ m365 entra m365group get --id 1caf7dcd-7e83-4c3a-94f7-932a1299c844 --includeSite
     "securityIdentifier": "S-1-12-1-4288263055-1337657931-1773679776-1830684296",
     "theme": null,
     "visibility": "Public",
-    "onPremisesProvisioningErrors": []
+    "onPremisesProvisioningErrors": [],
+    "allowExternalSenders": false,
+    "autoSubscribeNewMembers": false,
+    "isSubscribedByMail": false,
+    "hideFromOutlookClients": false,
+    "hideFromAddressLists": false
   }
   ```
 
@@ -94,6 +99,8 @@ m365 entra m365group get --id 1caf7dcd-7e83-4c3a-94f7-932a1299c844 --includeSite
   <TabItem value="Text">
 
   ```text
+  allowExternalSenders         : false
+  autoSubscribeNewMembers      : false
   classification               : null
   createdDateTime              : 2023-06-01T20:18:30Z
   creationOptions              : []
@@ -102,8 +109,11 @@ m365 entra m365group get --id 1caf7dcd-7e83-4c3a-94f7-932a1299c844 --includeSite
   displayName                  : Finance
   expirationDateTime           : null
   groupTypes                   : ["Unified"]
+  hideFromAddressLists         : false
+  hideFromOutlookClients       : false
   id                           : ff99b38f-0a4b-4fbb-a034-b86988061e6d
   isAssignableToRole           : null
+  isSubscribedByMail           : false
   mail                         : finance@contoso.onmicrosoft.com
   mailEnabled                  : true
   mailNickname                 : finance
@@ -132,8 +142,8 @@ m365 entra m365group get --id 1caf7dcd-7e83-4c3a-94f7-932a1299c844 --includeSite
   <TabItem value="CSV">
 
   ```csv
-  id,createdDateTime,description,displayName,mail,mailEnabled,mailNickname,renewedDateTime,securityEnabled,securityIdentifier,visibility
-  ff99b38f-0a4b-4fbb-a034-b86988061e6d,2023-06-01T20:18:30Z,"This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more.",Finance,finance@contoso.onmicrosoft.com,1,finance,2023-06-01T20:18:30Z,,S-1-12-1-4288263055-1337657931-1773679776-1830684296,Public
+  id,createdDateTime,description,displayName,mail,mailEnabled,mailNickname,renewedDateTime,securityEnabled,securityIdentifier,visibility,allowExternalSenders,autoSubscribeNewMembers,isSubscribedByMail,hideFromOutlookClients,hideFromAddressLists
+  ff99b38f-0a4b-4fbb-a034-b86988061e6d,2023-06-01T20:18:30Z,"This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more.",Finance,finance@contoso.onmicrosoft.com,1,finance,2023-06-01T20:18:30Z,,S-1-12-1-4288263055-1337657931-1773679776-1830684296,Public,false,false,false,false,false
   ```
 
   </TabItem>
@@ -159,6 +169,11 @@ m365 entra m365group get --id 1caf7dcd-7e83-4c3a-94f7-932a1299c844 --includeSite
   securityEnabled | false
   securityIdentifier | S-1-12-1-4288263055-1337657931-1773679776-1830684296
   visibility | Public
+  allowExternalSenders | false
+  autoSubscribeNewMembers | false
+  isSubscribedByMail | false
+  hideFromOutlookClients | false
+  hideFromAddressLists | false
   ```
 
   </TabItem>

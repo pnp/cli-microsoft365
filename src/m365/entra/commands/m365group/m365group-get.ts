@@ -74,6 +74,16 @@ class EntraM365GroupGetCommand extends GraphCommand {
 
       group = await entraGroup.getGroupById(args.options.id);
 
+      const requestExtendedOptions: CliRequestOptions = {
+        url: `${this.resource}/v1.0/groups/${group.id}?$select=allowExternalSenders,autoSubscribeNewMembers,hideFromAddressLists,hideFromOutlookClients,isSubscribedByMail`,
+        headers: {
+          accept: 'application/json;odata.metadata=none'
+        },
+        responseType: 'json'
+      };
+      const groupExtended = await request.get<{ allowExternalSenders: boolean, autoSubscribeNewMembers: boolean, hideFromAddressLists: boolean, hideFromOutlookClients: boolean, isSubscribedByMail: boolean }>(requestExtendedOptions);
+      group = { ...group, ...groupExtended };
+
       if (args.options.includeSiteUrl) {
         const requestOptions: CliRequestOptions = {
           url: `${this.resource}/v1.0/groups/${group.id}/drive?$select=webUrl`,
