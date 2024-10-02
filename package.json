@@ -28,7 +28,7 @@
     "test:version": "node scripts/check-version.js",
     "test:cov": "c8 npm run test:test",
     "test:test": "mocha",
-    "lint": "eslint --ext .ts src"
+    "lint": "eslint --ext .ts src --cache --cache-strategy content"
   },
   "keywords": [
     "adaptive card",

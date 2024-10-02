@@ -24,7 +24,7 @@ jobs:
         with:
           path: |
             **/node_modules
-          key: node_modules-${{ matrix.os }}-${{ matrix.node }}-${{ hashFiles('**/npm-shrinkwrap.json') }}
+          key: node_modules-${{ matrix.os }}-${{ matrix.node }}-${{ hashFiles('npm-shrinkwrap.json') }}
       - name: Restore dependencies
         if: steps.cache.outputs.cache-hit != 'true'
         run: npm ci
@@ -87,10 +87,18 @@ jobs:
         with:
           path: |
             **/node_modules
-          key: node_modules-${{ matrix.os }}-${{ matrix.nodeBuild }}-${{ hashFiles('**/npm-shrinkwrap.json') }}
+          key: node_modules-${{ matrix.os }}-${{ matrix.nodeBuild }}-${{ hashFiles('npm-shrinkwrap.json') }}
       - name: Restore dependencies
         if: steps.cache.outputs.cache-hit != 'true'
         run: npm ci
+      - name: Cache .eslintcache
+        if: matrix.nodeRun == matrix.nodeBuild
+        id: eslintcache
+        uses: actions/cache@v4
+        with:
+          path: |
+            .eslintcache
+          key: eslintcache-${{ matrix.os }}-${{ hashFiles('npm-shrinkwrap.json', '.eslintrc.cjs') }}
       - name: Test with coverage
         # we run coverage only on Node that was used to build
         if: matrix.nodeRun == matrix.nodeBuild
@@ -126,7 +134,7 @@ jobs:
         with:
           path: |
             **/docs/node_modules
-          key: docs_node_modules-${{ hashFiles('**/docs/package-lock.json') }}
+          key: docs_node_modules-${{ hashFiles('./docs/package-lock.json') }}
 
       - name: Restore dependencies
         if: steps.cache.outputs.cache-hit != 'true'
