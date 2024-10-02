@@ -38,6 +38,7 @@ class SpoListContentTypeListCommand extends SpoCommand {
     this.#initOptions();
     this.#initValidators();
     this.#initOptionSets();
+    this.#initTypes();
   }
 
   #initTelemetry(): void {
@@ -90,6 +91,10 @@ class SpoListContentTypeListCommand extends SpoCommand {
     this.optionSets.push({ options: ['listId', 'listTitle', 'listUrl'] });
   }
 
+  #initTypes(): void {
+    this.types.string.push('webUrl', 'listId', 'listTitle', 'listUrl');
+  }
+
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
       const list: string = (args.options.listId ? args.options.listId : args.options.listTitle ? args.options.listTitle : args.options.listUrl) as string;
@@ -109,7 +114,7 @@ class SpoListContentTypeListCommand extends SpoCommand {
     }
 
     try {
-      const res = await odata.getAllItems<any>(`${requestUrl}/ContentTypes`);
+      const res = await odata.getAllItems<any>(`${requestUrl}/ContentTypes?$expand=Parent`);
       await logger.log(res);
     }
     catch (err: any) {

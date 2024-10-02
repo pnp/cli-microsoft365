@@ -745,7 +745,7 @@ export default abstract class Command {
   }
 
   private getLogItemId(logItem: any): string | undefined {
-    return logItem.id ?? logItem.Id ?? logItem.ID ??
+    return logItem.id ?? logItem.Id?.StringValue ?? logItem.Id ?? logItem.ID ??
       logItem.uniqueId ?? logItem.UniqueId ??
       logItem.objectId ?? logItem.ObjectId ??
       logItem.url ?? logItem.Url ?? logItem.URL;
