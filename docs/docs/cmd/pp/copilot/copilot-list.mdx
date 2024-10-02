@@ -2,11 +2,17 @@ import Global from '/docs/cmd/_global.mdx';
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-# pp chatbot list
+# pp copilot list
 
-Lists Microsoft Power Platform chatbot in the specified Power Platform environment
+Lists Microsoft Power Platform copilots in the specified Power Platform environment
 
 ## Usage
+
+```sh
+m365 pp copilot list [options]
+```
+
+## alias
 
 ```sh
 m365 pp chatbot list [options]
@@ -26,16 +32,16 @@ m365 pp chatbot list [options]
 
 ## Examples
 
-List chatbots in a specific environment.
+List copilots in a specific environment.
 
 ```sh
-m365 pp chatbot list --environmentName "Default-d87a7535-dd31-4437-bfe1-95340acd55c5"
+m365 pp copilot list --environmentName "Default-d87a7535-dd31-4437-bfe1-95340acd55c5"
 ```
 
-List chatbots in a specific environment as admin.
+List copilots in a specific environment as admin.
 
 ```sh
-m365 pp chatbot list --environmentName "Default-d87a7535-dd31-4437-bfe1-95340acd55c5" --asAdmin
+m365 pp copilot list --environmentName "Default-d87a7535-dd31-4437-bfe1-95340acd55c5" --asAdmin
 ```
 
 ## Response
@@ -59,7 +65,7 @@ m365 pp chatbot list --environmentName "Default-d87a7535-dd31-4437-bfe1-95340acd
       "isManaged": false,
       "versionNumber": 1429641,
       "timezoneRuleVersionNumber": 0,
-      "name": "CLI Chatbot",
+      "name": "CLI Copilot",
       "statusCode": 1,
       "owner": "Doe, John",
       "overwriteTime": "1900-01-01T00:00:00Z",
@@ -79,7 +85,7 @@ m365 pp chatbot list --environmentName "Default-d87a7535-dd31-4437-bfe1-95340acd
   ```text
   name   botid                                 publishedOn           createdOn             botModifiedOn
   ------------  ------------------------------------  --------------------  --------------------  --------------------
-  CLI Chatbot   23f5f586-97fd-43d5-95eb-451c9797a53d  2022-11-19T19:19:53Z  2022-11-19T10:42:22Z  2022-11-19T20:19:57Z
+  CLI Copilot   23f5f586-97fd-43d5-95eb-451c9797a53d  2022-11-19T19:19:53Z  2022-11-19T10:42:22Z  2022-11-19T20:19:57Z
   ```
 
   </TabItem>
@@ -87,18 +93,18 @@ m365 pp chatbot list --environmentName "Default-d87a7535-dd31-4437-bfe1-95340acd
 
   ```csv
   name,botid,publishedOn,createdOn,botModifiedOn
-  CLI Chatbot,23f5f586-97fd-43d5-95eb-451c9797a53d,2022-11-19T19:19:53Z,2022-11-19T10:42:22Z,2022-11-19T20:19:57Z
+  CLI Copilot,23f5f586-97fd-43d5-95eb-451c9797a53d,2022-11-19T19:19:53Z,2022-11-19T10:42:22Z,2022-11-19T20:19:57Z
   ```
 
   </TabItem>
   <TabItem value="Markdown">
 
   ```md
-  # pp chatbot list --environmentName "Default-d87a7535-dd31-4437-bfe1-95340acd55c5"
+  # pp copilot list --environmentName "Default-d87a7535-dd31-4437-bfe1-95340acd55c5"
 
   Date: 9/1/2023
 
-  ## CLI Chatbot
+  ## CLI Copilot
 
   Property | Value
   ---------|-------
@@ -115,7 +121,7 @@ m365 pp chatbot list --environmentName "Default-d87a7535-dd31-4437-bfe1-95340acd
   isManaged | false
   versionNumber | 1429641
   timezoneRuleVersionNumber | 0
-  name | CLI Chatbot
+  name | CLI Copilot
   statusCode | 1
   owner | Doe, John
   overwriteTime | 1900-01-01T00:00:00Z
