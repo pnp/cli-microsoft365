@@ -24,13 +24,22 @@ CLI for Microsoft 365 offers you a number of ways to log in to Microsoft 365.
 
 The default way to log in to Microsoft 365 using the CLI for Microsoft 365 is through the device code flow. To log in to Microsoft 365, use the `login` command.
 
-After executing the `login` command, you will be prompted to navigate to _https://aka.ms/devicelogin_ in your web browser and enter the login code presented to you by the CLI for Microsoft 365 in the command line. After entering the code, you will see the prompt that you are about to authenticate the _PnP Microsoft 365 Management Shell_ application to access your tenant on your behalf.
+When logging in, you need to specify the `appId` and `tenant` of your App Registration. This is required to authenticate your own App Registration to access your tenant on your behalf.
 
-If you are using the CLI for Microsoft 365 for the first time, you will be also prompted to verify the permissions you are about to grant the CLI for Microsoft 365. This is referred to as _consent_.
+:::info
 
-[![Granting the CLI for Microsoft 365 the necessary permissions](../images/consent.png)](../images/consent.png)
+If you don't have an App Registration yet, you can create one using the [m365 setup](../cmd/setup.mdx) command. This command will guide you through the process of creating a new App Registration and granting it the necessary permissions in your tenant. It will also set the `appId` and `tenant` environment variables for you, allowing you to log in to Microsoft 365 without specifying these values when using the `login` command.
 
-The device code flow is the recommended approach for command-line tools to authenticate with resources secured with Microsoft Entra ID. Because the authentication process is handled in the browser by Microsoft Entra ID itself, it allows you to benefit of rich security features such as multi-factor authentication or conditional access. The device code flow is interactive and requires user interaction which might be limiting if you want to use the CLI for Microsoft 365 in your continuous deployment setup which is fully automated and doesn't involve user interaction.
+Alternatively, you can manually set the `CLIMICROSOFT365_ENTRAAPPID` and `CLIMICROSOFT365_TENANT` environment variables to avoid specifying the `appId` and `tenant` values during login.
+
+For more details on creating an App Registration or setting the environment variables, refer to the article: [Use your own Microsoft Entra identity](./using-own-identity.mdx).
+
+:::
+
+After executing the `login` command, you will be prompted to navigate to _https://aka.ms/devicelogin_ in your web browser and enter the login code presented to you by the CLI for Microsoft 365 in the command line. After entering the code, you will see the prompt that you are about to authenticate your own App Registration to access your tenant on your behalf. After accepting the prompt, you can go back to the CLI for Microsoft 365 and you will be logged.
+
+The device code flow is the recommended approach for command-line tools to authenticate with resources secured with Microsoft Entra ID. Because the authentication process is handled in the browser by Microsoft Entra ID itself, it allows you to benefit from rich security features such as multi-factor authentication or conditional access. The device code flow is interactive and requires user interaction which might be limiting if you want to use the CLI for Microsoft 365 in your continuous deployment setup which is fully automated and doesn't involve user interaction.
+
 
 #### Log in using user name and password
 
