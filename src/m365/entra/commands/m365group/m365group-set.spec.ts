@@ -771,7 +771,7 @@ describe(commands.M365GROUP_SET, () => {
     sinon.stub(stats, 'isDirectory').returns(false);
     sinon.stub(fs, 'existsSync').returns(true);
     sinon.stub(fs, 'lstatSync').returns(stats);
-    const actual = await command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', newDisplayName: 'Title', description: 'Description', logoPath: 'logo.png', owners: 'john@contoso.com', members: 'doe@contoso.com', isPrivate: false, allowExternalSenders: false, autoSubscribeNewMembers: false, hideFromAddressLists: false, hideFromOutlookClients: false } }, commandInfo);
+    const actual = await command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', newDisplayName: 'Title', description: 'Description', logoPath: 'logo.png', ownerIds: userIds.join(','), memberIds: userIds.join(','), isPrivate: false, allowExternalSenders: false, autoSubscribeNewMembers: false, hideFromAddressLists: false, hideFromOutlookClients: false } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 });
