@@ -772,6 +772,19 @@ const sidebars: SidebarsConfig = {
       ]
     },
     {
+      'Exchange Online (exo)': [
+        {
+          'approleassignment': [
+            {
+              type: 'doc',
+              label: 'approleassignment add',
+              id: 'cmd/exo/approleassignment/approleassignment-add'
+            }
+          ]
+        }
+      ]
+    },
+    {
       'External (external)': [
         {
           connection: [
