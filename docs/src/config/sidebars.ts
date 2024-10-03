@@ -3993,6 +3993,11 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'model list',
               id: 'cmd/spp/model/model-list'
+            },
+            {
+              type: 'doc',
+              label: 'model remove',
+              id: 'cmd/spp/model/model-remove'
             }
           ]
         }
