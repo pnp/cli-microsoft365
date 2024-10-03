@@ -1,4 +1,4 @@
-import { RoleDefinition } from '@microsoft/microsoft-graph-types';
+import { RoleDefinition, UnifiedRoleDefinition } from '@microsoft/microsoft-graph-types';
 import { cli } from '../cli/cli.js';
 import { formatting } from './formatting.js';
 import { odata } from './odata.js';
@@ -20,6 +20,22 @@ export const roleDefinition = {
     if (roleDefinitions.length > 1) {
       const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', roleDefinitions);
       const selectedRoleDefinition = await cli.handleMultipleResultsFound<RoleDefinition>(`Multiple role definitions with name '${displayName}' found.`, resultAsKeyValuePair);
+      return selectedRoleDefinition;
+    }
+
+    return roleDefinitions[0];
+  },
+
+  async getExchangeRoleDefinitionByDisplayName(displayName: string): Promise<UnifiedRoleDefinition> {
+    const roleDefinitions = await odata.getAllItems<UnifiedRoleDefinition>(`https://graph.microsoft.com/beta/roleManagement/exchange/roleDefinitions?$filter=displayName eq '${formatting.encodeQueryParameter(displayName)}'`);
+
+    if (roleDefinitions.length === 0) {
+      throw `The specified role definition '${displayName}' does not exist.`;
+    }
+
+    if (roleDefinitions.length > 1) {
+      const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', roleDefinitions);
+      const selectedRoleDefinition = await cli.handleMultipleResultsFound<UnifiedRoleDefinition>(`Multiple role definitions with name '${displayName}' found.`, resultAsKeyValuePair);
       return selectedRoleDefinition;
     }
 
