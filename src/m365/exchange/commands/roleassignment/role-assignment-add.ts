@@ -33,7 +33,7 @@ interface CommandArgs {
   options: Options;
 }
 
-class ExchangeRoleAssignmentAddCommand extends GraphCommand {
+class ExchangeRoleAssignmentRoleAssignmentAddCommand extends GraphCommand {
   public get name(): string {
     return commands.ROLE_ASSIGNMENT_ADD;
   }
@@ -182,4 +182,4 @@ class ExchangeRoleAssignmentAddCommand extends GraphCommand {
   }
 }
 
-export default new ExchangeRoleAssignmentAddCommand();
+export default new ExchangeRoleAssignmentRoleAssignmentAddCommand();
