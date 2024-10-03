@@ -68,6 +68,44 @@ describe('utils/roleDefinition', () => {
       }
     ]
   };
+  const exchangeRoleDefinitionResponse = {
+    "id": "82fd214e-61ca-4dc7-98f6-090700bdb205",
+    "description": "Allows the app to create, read, update, and delete email in all mailboxes without a signed-in user. Does not include permission to send mail",
+    "displayName": "Application Mail.ReadWrite",
+    "isEnabled": true,
+    "version": "0.12 (14.0.451.0)",
+    "isBuiltIn": true,
+    "templateId": null,
+    "allowedPrincipalTypes": "servicePrincipal",
+    "rolePermissions": [
+      {
+        "allowedResourceActions": [
+          "Mail.ReadWrite"
+        ],
+        "excludedResourceActions": [],
+        "condition": null
+      }
+    ]
+  };
+  const secondExchangeRoleDefinitionResponse = {
+    "id": "71ec103d-72db-5ed8-87e5-181611acc114",
+    "description": "Allows the app to create, read, update, and delete events of all calendars without a signed-in user",
+    "displayName": "Application Calendars.ReadWrite",
+    "isEnabled": true,
+    "version": "0.12 (14.0.451.0)",
+    "isBuiltIn": true,
+    "templateId": null,
+    "allowedPrincipalTypes": "servicePrincipal",
+    "rolePermissions": [
+      {
+        "allowedResourceActions": [
+          "Calendars.ReadWrite"
+        ],
+        "excludedResourceActions": [],
+        "condition": null
+      }
+    ]
+  };
 
   afterEach(() => {
     sinonUtil.restore([
