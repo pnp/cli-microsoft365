@@ -16,7 +16,7 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   filter?: string;
   groupId?: string;
-  groupDisplayName?: string;
+  groupName?: string;
   properties?: string;
   role?: string;
 }
@@ -51,7 +51,7 @@ class EntraM365GroupUserListCommand extends GraphCommand {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
         groupId: typeof args.options.groupId !== 'undefined',
-        groupDisplayName: typeof args.options.groupDisplayName !== 'undefined',
+        groupName: typeof args.options.groupName !== 'undefined',
         role: typeof args.options.role !== 'undefined',
         properties: typeof args.options.properties !== 'undefined',
         filter: typeof args.options.filter !== 'undefined'
@@ -65,7 +65,7 @@ class EntraM365GroupUserListCommand extends GraphCommand {
         option: "-i, --groupId [groupId]"
       },
       {
-        option: "-n, --groupDisplayName [groupDisplayName]"
+        option: "-n, --groupName [groupName]"
       },
       {
         option: "-r, --role [type]",
@@ -83,7 +83,7 @@ class EntraM365GroupUserListCommand extends GraphCommand {
   #initOptionSets(): void {
     this.optionSets.push(
       {
-        options: ['groupId', 'groupDisplayName']
+        options: ['groupId', 'groupName']
       }
     );
   }
@@ -114,7 +114,7 @@ class EntraM365GroupUserListCommand extends GraphCommand {
       const isUnifiedGroup = await entraGroup.isUnifiedGroup(groupId);
 
       if (!isUnifiedGroup) {
-        throw Error(`Specified group '${args.options.groupId || args.options.groupDisplayName}' is not a Microsoft 365 group.`);
+        throw Error(`Specified group '${args.options.groupId || args.options.groupName}' is not a Microsoft 365 group.`);
       }
 
       let users: ExtendedUser[] = [];
@@ -158,7 +158,7 @@ class EntraM365GroupUserListCommand extends GraphCommand {
       await logger.logToStderr('Retrieving Group Id...');
     }
 
-    return await entraGroup.getGroupIdByDisplayName(options.groupDisplayName!);
+    return await entraGroup.getGroupIdByDisplayName(options.groupName!);
   }
 
   private async getUsers(options: Options, role: string, groupId: string, logger: Logger): Promise<ExtendedUser[]> {

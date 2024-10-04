@@ -17,17 +17,20 @@ m365 aad m365group user remove [options]
 ```
 
 ```sh
-m365 aad teams user remove
+m365 teams user remove [options]
 ```
 
 ## Options
 
 ```md definition-list
 `-i, --groupId [groupId]`
-: The ID of the Microsoft 365 Group from which to remove the user
+: The ID of the Microsoft 365 Group from which to remove the user. Specify either `groupId`, `groupName` or `teamId`, but not multiple.
+
+`--groupName [groupName]`
+: Display name of the Microsoft 365 Group for which to remove the user. Specify either `groupId`, `groupName` or `teamId`, but not multiple.
 
 `--teamId [teamId]`
-: The ID of the Microsoft Teams team from which to remove the user
+: The ID of the Microsoft Teams team from which to remove the user. Specify either `groupId`, `groupName` or `teamId`, but not multiple.
 
 `-n, --userName <userName>`
 : User's UPN (user principal name), eg. `johndoe@example.com`
@@ -53,13 +56,13 @@ m365 entra m365group user remove --groupId '00000000-0000-0000-0000-000000000000
 Removes user from the specified Microsoft 365 Group without confirmation
 
 ```sh
-m365 entra m365group user remove --groupId '00000000-0000-0000-0000-000000000000' --userName 'anne.matthews@contoso.onmicrosoft.com' --force
+m365 entra m365group user remove --groupName Finance --userName 'anne.matthews@contoso.onmicrosoft.com' --force
 ```
 
 Removes user from the specified Microsoft Teams team
 
 ```sh
-m365 entra teams user remove --teamId '00000000-0000-0000-0000-000000000000' --userName 'anne.matthews@contoso.onmicrosoft.com'
+m365 teams user remove --teamId '00000000-0000-0000-0000-000000000000' --userName 'anne.matthews@contoso.onmicrosoft.com'
 ```
 
 ## Response

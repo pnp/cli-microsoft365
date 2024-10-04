@@ -13,7 +13,8 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  id: string;
+  id?: string;
+  displayName?: string;
   includeSiteUrl: boolean;
 }
 
@@ -35,12 +36,17 @@ class EntraM365GroupGetCommand extends GraphCommand {
 
     this.#initOptions();
     this.#initValidators();
+    this.#initOptionSets();
+    this.#initTypes();
   }
 
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '-i, --id <id>'
+        option: '-i, --id [id]'
+      },
+      {
+        option: '-n, --displayName [displayName]'
       },
       {
         option: '--includeSiteUrl'
@@ -51,7 +57,7 @@ class EntraM365GroupGetCommand extends GraphCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (!validation.isValidGuid(args.options.id)) {
+        if (args.options.id && !validation.isValidGuid(args.options.id)) {
           return `${args.options.id} is not a valid GUID`;
         }
 
@@ -60,19 +66,32 @@ class EntraM365GroupGetCommand extends GraphCommand {
     );
   }
 
+  #initOptionSets(): void {
+    this.optionSets.push({ options: ['id', 'displayName'] });
+  }
+
+  #initTypes(): void {
+    this.types.string.push('id', 'displayName');
+  }
+
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     await this.showDeprecationWarning(logger, aadCommands.M365GROUP_GET, commands.M365GROUP_GET);
 
     let group: GroupExtended;
 
     try {
-      const isUnifiedGroup = await entraGroup.isUnifiedGroup(args.options.id);
-
-      if (!isUnifiedGroup) {
-        throw Error(`Specified group with id '${args.options.id}' is not a Microsoft 365 group.`);
+      if (args.options.id) {
+        group = await entraGroup.getGroupById(args.options.id);
+      }
+      else {
+        group = await entraGroup.getGroupByDisplayName(args.options.displayName!);
       }
 
-      group = await entraGroup.getGroupById(args.options.id);
+      const isUnifiedGroup = await entraGroup.isUnifiedGroup(group.id!);
+
+      if (!isUnifiedGroup) {
+        throw Error(`Specified group with id '${group.id}' is not a Microsoft 365 group.`);
+      }
 
       if (args.options.includeSiteUrl) {
         const requestOptions: CliRequestOptions = {
@@ -84,7 +103,7 @@ class EntraM365GroupGetCommand extends GraphCommand {
         };
 
         const res = await request.get<{ webUrl: string }>(requestOptions);
-        group.siteUrl = res.webUrl ? res.webUrl.substr(0, res.webUrl.lastIndexOf('/')) : '';
+        group.siteUrl = res.webUrl ? res.webUrl.substring(0, res.webUrl.lastIndexOf('/')) : '';
       }
 
       await logger.log(group);
