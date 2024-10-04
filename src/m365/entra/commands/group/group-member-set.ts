@@ -116,7 +116,7 @@ class EntraGroupMemberSetCommand extends GraphCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       if (this.verbose) {
-        await logger.logToStderr(`Adding member(s) ${args.options.ids || args.options.userNames} to group ${args.options.groupId || args.options.groupDisplayName}...`);
+        await logger.logToStderr(`Adding member(s) ${args.options.ids || args.options.userNames} to role ${args.options.role} of group ${args.options.groupId || args.options.groupDisplayName}...`);
       }
 
       const groupId = await this.getGroupId(logger, args.options);
