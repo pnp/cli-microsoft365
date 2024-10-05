@@ -748,6 +748,19 @@ const sidebars: SidebarsConfig = {
       ]
     },
     {
+      'Exchange Online (exchange)': [
+        {
+          'role assignment': [
+            {
+              type: 'doc',
+              label: 'role assignment add',
+              id: 'cmd/exchange/role-assignment/role-assignment-add'
+            }
+          ]
+        }
+      ]
+    },
+    {
       'External (external)': [
         {
           connection: [
