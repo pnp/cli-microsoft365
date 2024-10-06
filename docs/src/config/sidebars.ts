@@ -3952,6 +3952,15 @@ const sidebars: SidebarsConfig = {
               id: 'cmd/spp/contentcenter/contentcenter-list'
             }
           ]
+        },
+        {
+          model: [
+            {
+              type: 'doc',
+              label: 'model list',
+              id: 'cmd/spp/model/model-list'
+            }
+          ]
         }
       ]
     },
