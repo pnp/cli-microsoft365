@@ -12,8 +12,8 @@ import commands from './commands.js';
 
 const options = globalOptionsZod
   .extend({
-    authType: zod.alias('t', z.nativeEnum(AuthType).optional()),
-    cloud: z.nativeEnum(CloudType).optional().default(CloudType.Public),
+    authType: zod.alias('t', zod.coercedEnum(AuthType).optional()),
+    cloud: zod.coercedEnum(CloudType).optional().default(CloudType.Public),
     userName: zod.alias('u', z.string().optional()),
     password: zod.alias('p', z.string().optional()),
     certificateFile: zod.alias('c', z.string().optional()
