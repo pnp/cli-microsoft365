@@ -102,7 +102,7 @@ class SppModelRemoveCommand extends SpoCommand {
       }
 
       const siteUrl = urlUtil.removeTrailingSlashes(args.options.siteUrl);
-      await spp.assertSiteIsContentCenter(siteUrl);
+      await spp.assertSiteIsContentCenter(siteUrl, logger, this.verbose);
       let requestUrl = `${siteUrl}/_api/machinelearning/models/`;
 
       if (args.options.title) {
