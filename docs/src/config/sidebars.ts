@@ -4250,6 +4250,11 @@ const sidebars: SidebarsConfig = {
           model: [
             {
               type: 'doc',
+              label: 'model apply',
+              id: 'cmd/spp/model/model-apply'
+            },
+            {
+              type: 'doc',
               label: 'model get',
               id: 'cmd/spp/model/model-get'
             },

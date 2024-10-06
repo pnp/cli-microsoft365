@@ -1,9 +1,7 @@
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
-import request, { CliRequestOptions } from '../../../../request.js';
-import { formatting } from '../../../../utils/formatting.js';
 import { odata } from '../../../../utils/odata.js';
-import { spp, SppModel } from '../../../../utils/spp.js';
+import { spp } from '../../../../utils/spp.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
@@ -89,43 +87,21 @@ class SppModelGetCommand extends SpoCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
-      if (this.verbose) {
-        await logger.log(`Retrieving model information from ${args.options.siteUrl}...`);
-      }
-
       const siteUrl = urlUtil.removeTrailingSlashes(args.options.siteUrl);
-      await spp.assertSiteIsContentCenter(siteUrl);
+      await spp.assertSiteIsContentCenter(siteUrl, logger, this.verbose);
 
-      let requestUrl = `${siteUrl}/_api/machinelearning/models/`;
-
+      let result = null;
       if (args.options.title) {
-        let requestTitle = args.options.title.toLowerCase();
-
-        if (!requestTitle.endsWith('.classifier')) {
-          requestTitle += '.classifier';
-        }
-
-        requestUrl += `getbytitle('${formatting.encodeQueryParameter(requestTitle)}')`;
+        result = await spp.getModelByTitle(siteUrl, args.options.title, logger, this.verbose);
       }
       else {
-        requestUrl += `getbyuniqueid('${args.options.id}')`;
-      }
-
-      const requestOptions: CliRequestOptions = {
-        url: requestUrl,
-        headers: {
-          accept: 'application/json;odata=nometadata'
-        },
-        responseType: 'json'
-      };
-
-      const result = await request.get<SppModel>(requestOptions);
-
-      if ((result as any)['odata.null'] === true) {
-        throw 'Model not found.';
+        result = await spp.getModelById(siteUrl, args.options.id!, logger, this.verbose);
       }
 
       if (args.options.withPublications) {
+        if (this.verbose) {
+          await logger.log(`Retrieving publications for model...`);
+        }
         result.Publications = await odata.getAllItems<any>(`${siteUrl}/_api/machinelearning/publications/getbymodeluniqueid('${result.UniqueId}')`);
       }
 
