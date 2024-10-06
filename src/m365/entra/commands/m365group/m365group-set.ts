@@ -139,6 +139,18 @@ class EntraM365GroupSetCommand extends GraphCommand {
 
   #initOptionSets(): void {
     this.optionSets.push({ options: ['id', 'displayName'] });
+    this.optionSets.push({
+      options: ['ownerIds', 'ownerUserNames'],
+      runsWhen: (args) => {
+        return args.options.ownerIds !== undefined || args.options.ownerUserNames !== undefined;
+      }
+    });
+    this.optionSets.push({
+      options: ['memberIds', 'memberUserNames'],
+      runsWhen: (args) => {
+        return args.options.memberIds !== undefined || args.options.memberUserNames !== undefined;
+      }
+    });
   }
 
   #initTypes(): void {
@@ -151,12 +163,12 @@ class EntraM365GroupSetCommand extends GraphCommand {
       async (args: CommandArgs) => {
         if (!args.options.newDisplayName &&
           args.options.description === undefined &&
-          !args.options.ownerIds &&
-          !args.options.ownerUserNames &&
-          !args.options.memberIds &&
-          !args.options.memberUserNames &&
+          args.options.ownerIds === undefined &&
+          args.options.ownerUserNames === undefined &&
+          args.options.memberIds === undefined &&
+          args.options.memberUserNames === undefined &&
           args.options.isPrivate === undefined &&
-          !args.options.logoPath &&
+          args.options.logoPath === undefined &&
           args.options.allowExternalSenders === undefined &&
           args.options.autoSubscribeNewMembers === undefined &&
           args.options.hideFromAddressLists === undefined &&
@@ -297,18 +309,12 @@ class EntraM365GroupSetCommand extends GraphCommand {
       const ownerIds: string[] = await this.getUserIds(logger, args.options.ownerIds, args.options.ownerUserNames);
       const memberIds: string[] = await this.getUserIds(logger, args.options.memberIds, args.options.memberUserNames);
 
-      if (ownerIds.length !== 0) {
+      if (ownerIds.length > 0) {
         await this.updateUsers(logger, groupId, 'owners', ownerIds);
       }
-      else if (this.debug) {
-        await logger.logToStderr('Owners not set. Skipping');
-      }
 
-      if (memberIds.length !== 0) {
-        await this.updateUsers(logger, groupId, 'members', ownerIds);
-      }
-      else if (this.debug) {
-        await logger.logToStderr('Members not set. Skipping');
+      if (memberIds.length > 0) {
+        await this.updateUsers(logger, groupId, 'members', memberIds);
       }
     }
     catch (err: any) {
@@ -353,6 +359,7 @@ class EntraM365GroupSetCommand extends GraphCommand {
       if (this.verbose) {
         await logger.logToStderr(`Retrieving user IDs...`);
       }
+
       return entraUser.getUserIdsByUpns(formatting.splitAndTrim(userNames));
     }
 

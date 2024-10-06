@@ -90,25 +90,25 @@ Change Microsoft 365 Group visibility to public.
 m365 entra m365group set --id 28beab62-7540-4db1-a23f-29a6018a3848 --isPrivate `false`
 ```
 
-Add new Microsoft 365 Group owners by UPNs.
+Updates the list of Microsoft 365 Group owners with a list of users by UPN.
 
 ```sh
 m365 entra m365group set --id 28beab62-7540-4db1-a23f-29a6018a3848 --ownerUserNames "DebraB@contoso.onmicrosoft.com,DiegoS@contoso.onmicrosoft.com"
 ```
 
-Add new Microsoft 365 Group owners by IDs.
+Updates the list of Microsoft 365 Group owners with a list of users by ID.
 
 ```sh
 m365 entra m365group set --id 28beab62-7540-4db1-a23f-29a6018a3848 --ownerIds "3527dada-9368-4cdd-a958-5460f5658e0e,e94b2cb8-7c9a-4651-b1af-207d81a010b6"
 ```
 
-Add new Microsoft 365 Group members by UPNs.
+Updates the list of Microsoft 365 Group members with a list of users by UPN.
 
 ```sh
 m365 entra m365group set --id 28beab62-7540-4db1-a23f-29a6018a3848 --memberUserNames "DebraB@contoso.onmicrosoft.com,DiegoS@contoso.onmicrosoft.com"
 ```
 
-Add new Microsoft 365 Group members by IDs.
+Updates the list of Microsoft 365 Group members with a list of users by ID.
 
 ```sh
 m365 entra m365group set --id 28beab62-7540-4db1-a23f-29a6018a3848 --memberIds "3527dada-9368-4cdd-a958-5460f5658e0e,e94b2cb8-7c9a-4651-b1af-207d81a010b6"
