@@ -1,5 +1,10 @@
 import request, { CliRequestOptions } from '../request.js';
 
+export interface SppModel {
+  UniqueId: string;
+  Publications?: any[];
+}
+
 export const spp = {
   /**
    * Asserts whether the specified site is a content center.

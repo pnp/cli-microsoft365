@@ -3977,6 +3977,11 @@ const sidebars: SidebarsConfig = {
           model: [
             {
               type: 'doc',
+              label: 'model apply',
+              id: 'cmd/spp/model/model-apply'
+            },
+            {
+              type: 'doc',
               label: 'model list',
               id: 'cmd/spp/model/model-list'
             }
