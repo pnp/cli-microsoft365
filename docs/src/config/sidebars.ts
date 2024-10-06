@@ -1970,6 +1970,15 @@ const sidebars: SidebarsConfig = {
           ]
         },
         {
+          container: [
+            {
+              type: 'doc',
+              label: 'container list',
+              id: 'cmd/spe/container/container-list'
+            }
+          ]
+        },
+        {
           containertype: [
             {
               type: 'doc',
