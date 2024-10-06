@@ -4,7 +4,45 @@ sidebar_position: 3
 
 # Release notes
 
-## v9.1.0 (beta)
+## v10.0.0 (beta)
+
+### Changes
+
+- extended `m365 login` with `--ensure` [#5217](https://github.com/pnp/cli-microsoft365/issues/5217)
+- updated docs thumbnail [#6302](https://github.com/pnp/cli-microsoft365/issues/6302)
+
+### ⚠️ Breaking changes
+
+- updated option names of [app permission add](../cmd/app/permission/permission-add.mdx) to plural [#5719](https://github.com/pnp/cli-microsoft365/issues/5975)
+- removed deprecated guest filtering for [entra m365group user list](../cmd/entra/m365group/m365group-user-list.mdx) command [#5558](https://github.com/pnp/cli-microsoft365/issues/5558)
+- added `--force` option to [spo site appcatalog remove](../cmd/spo/site/site-appcatalog-remove.mdx) command [#6091](https://github.com/pnp/cli-microsoft365/issues/6091)
+- aligned options with naming convention [#5616](https://github.com/pnp/cli-microsoft365/issues/5616)
+- removed duplicate property from [spo list list](../cmd/spo/list/list-list.mdx) command [#6042](https://github.com/pnp/cli-microsoft365/issues/6042)
+- updated [spo tenant recyclebinitem restore](../cmd/spo/tenant/tenant-recyclebinitem-restore.mdx) command output [#6063](https://github.com/pnp/cli-microsoft365/issues/6063)
+- removed deprecated option `wait` option from [spo site remove](../cmd/spo/site/site-remove.mdx) command [#5956](https://github.com/pnp/cli-microsoft365/issues/5956)
+- reworked command options of command [spo file copy](../cmd/spo/file/file-copy.mdx) [#6152](https://github.com/pnp/cli-microsoft365/issues/6152)
+- removed deprecated CLI environment variables [#5918](https://github.com/pnp/cli-microsoft365/issues/5918)
+- updated options of `entra enterpriseapp` commands [#6155](https://github.com/pnp/cli-microsoft365/issues/6155)
+- removed `overwrite` option from [spfx project github workflow add](../cmd/spfx/project/project-github-workflow-add.mdx) command [#5765](https://github.com/pnp/cli-microsoft365/issues/5765)
+- updated [status](../cmd/status.mdx) command output [#5849](https://github.com/pnp/cli-microsoft365/issues/5849)
+- removed [spo folder rename](../cmd/spo/folder/folder-set.mdx) alias [#5911](https://github.com/pnp/cli-microsoft365/issues/5911)
+- removed stringified property from [spo applicationcustomizer get](../cmd/spo/applicationcustomizer/applicationcustomizer-get.mdx) command [#6052](https://github.com/pnp/cli-microsoft365/issues/6052)
+- removed all `yammer` command aliases [#5764](https://github.com/pnp/cli-microsoft365/issues/5764)
+- removed `showSpinner` config variable [#6126](https://github.com/pnp/cli-microsoft365/issues/6126)
+- aligned options of `spo contenttype field` commands [#6170](https://github.com/pnp/cli-microsoft365/issues/6170)
+- enhanced the output of [spo sitescript get](../cmd/spo/sitescript/sitescript-get.mdx) command [#5559](https://github.com/pnp/cli-microsoft365/issues/5559)
+- updated [spo file move](../cmd/spo/file/file-move.mdx) options [#6153](https://github.com/pnp/cli-microsoft365/issues/6153)
+- updated purpose of option `displayName` for [entra m365group set](../cmd/entra/m365group/m365group-set.mdx) command [#6146](https://github.com/pnp/cli-microsoft365/issues/6146)
+- renamed command `spo site rename` to [spo tenant site rename](../cmd/spo/tenant/tenant-site-rename.mdx) [#6142](https://github.com/pnp/cli-microsoft365/issues/6142)
+- removed `cli reconsent` command [#6360](https://github.com/pnp/cli-microsoft365/issues/6360)
+- ensured empty result output for various list commands [#6288](https://github.com/pnp/cli-microsoft365/issues/6288)
+- removed deprecated `userName` option from [entra m365group user add](../cmd/entra/m365group/m365group-user-add.mdx) command [#6218](https://github.com/pnp/cli-microsoft365/issues/6218)
+- updated [cli doctor](../cmd/cli/cli-doctor.mdx) command output [#5923](https://github.com/pnp/cli-microsoft365/issues/5923)
+- removed duplicate properties from [teams tab list](../cmd/teams/tab/tab-list.mdx) command [#5900](https://github.com/pnp/cli-microsoft365/issues/5900)
+- renamed `entra group user <verb>` to `entra group member <verb>`. [#6396](https://github.com/pnp/cli-microsoft365/issues/6396)
+- Updates setting users in `entra m365group set` [#6061](https://github.com/pnp/cli-microsoft365/issues/6061)
+
+## [v9.1.0](https://github.com/pnp/cli-microsoft365/releases/tag/v9.1.0)
 
 ### New commands
 
@@ -54,6 +92,7 @@ sidebar_position: 3
 - improved output of [spo site admin list](../cmd/spo/site/site-admin-list.mdx) when running as admin [#6182](https://github.com/pnp/cli-microsoft365/issues/6182)
 - fixed asciinema player mount on docs [#6204](https://github.com/pnp/cli-microsoft365/issues/6204)
 - enhanced [spo page remove](../cmd/spo/page/page-remove.mdx) to support deleting locked pages [#6294](https://github.com/pnp/cli-microsoft365/issues/6294)
+- added support for SPFx v1.20.0 [#6391](https://github.com/pnp/cli-microsoft365/issues/6391)
 
 ## [v9.0.0](https://github.com/pnp/cli-microsoft365/releases/tag/v9.0.0)
 
@@ -175,7 +214,7 @@ sidebar_position: 3
 
 **Entra ID:**
 
-- [entra group user set](../cmd/entra/group/group-user-set.mdx) - updates role of users in an Entra group [#5473](https://github.com/pnp/cli-microsoft365/issues/5473)
+- [entra group user set](../cmd/entra/group/group-member-set.mdx) - updates role of users in an Entra group [#5473](https://github.com/pnp/cli-microsoft365/issues/5473)
 - [entra user groupmembership list](../cmd/entra/user/user-groupmembership-list.mdx) - retrieves all groups where the user is a member of [#5904](https://github.com/pnp/cli-microsoft365/issues/5904)
 
 **Global:**
@@ -308,7 +347,7 @@ sidebar_position: 3
 
 - [entra administrativeunit member remove](../cmd/entra/administrativeunit/administrativeunit-member-remove.mdx) - removes a member (user, group, or device) from an administrative unit [#5734](https://github.com/pnp/cli-microsoft365/issues/5734)
 - [entra app permission list](../cmd/entra/app/app-permission-list.mdx) - lists the application and delegated permissions for a specified Entra Application Registration [#5668](https://github.com/pnp/cli-microsoft365/issues/5668)
-- [entra group user add](../cmd/entra/group/group-user-add.mdx) - adds a user to a Microsoft Entra ID group [#5471](https://github.com/pnp/cli-microsoft365/issues/5471)
+- [entra group user add](../cmd/entra/group/group-member-add.mdx) - adds a user to a Microsoft Entra ID group [#5471](https://github.com/pnp/cli-microsoft365/issues/5471)
 - [entra group add](../cmd/entra/group/group-add.mdx) - creates a Microsoft Entra group [#5476](https://github.com/pnp/cli-microsoft365/issues/5476)
 - [entra user registrationdetails list](../cmd/entra/user/user-registrationdetails-list.mdx) - retrieves a list of the authentication methods registered for users [#5773](https://github.com/pnp/cli-microsoft365/issues/5773)
 
@@ -466,7 +505,7 @@ sidebar_position: 3
 
 **Entra ID**
 
-- [entra group user list](../cmd/entra/group/group-user-list.mdx) - lists users of a specific Entra group [#5469](https://github.com/pnp/cli-microsoft365/issues/5469)
+- [entra group user list](../cmd/entra/group/group-member-list.mdx) - lists users of a specific Entra group [#5469](https://github.com/pnp/cli-microsoft365/issues/5469)
 
 ### Changes
 
@@ -2996,7 +3035,7 @@ sidebar_position: 3
 **SharePoint:**
 
 - [spo feature disable](../cmd/spo/feature/feature-disable.mdx) - disables feature for the specified site or web [#676](https://github.com/pnp/cli-microsoft365/issues/676)
-- [spo site rename](../cmd/spo/site/site-rename.mdx) - renames the URL and title of a site collection [#1197](https://github.com/pnp/cli-microsoft365/issues/1197)
+- [spo site rename](../cmd/spo/tenant/tenant-site-rename.mdx) - renames the URL and title of a site collection [#1197](https://github.com/pnp/cli-microsoft365/issues/1197)
 
 **Yammer:**
 

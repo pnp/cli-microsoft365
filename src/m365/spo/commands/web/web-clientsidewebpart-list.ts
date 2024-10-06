@@ -1,6 +1,6 @@
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
-import request from '../../../../request.js';
+import request, { CliRequestOptions } from '../../../../request.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
@@ -45,7 +45,7 @@ class SpoWebClientSideWebPartListCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const requestOptions: any = {
+    const requestOptions: CliRequestOptions = {
       url: `${args.options.webUrl}/_api/web/GetClientSideWebParts`,
       headers: {
         accept: 'application/json;odata=nometadata'
@@ -67,13 +67,7 @@ class SpoWebClientSideWebPartListCommand extends SpoCommand {
         }
       });
 
-      if (clientSideWebParts.length === 0 && this.verbose) {
-        await logger.logToStderr("No client-side web parts available for this site");
-      }
-
-      if (clientSideWebParts.length > 0) {
-        await logger.log(clientSideWebParts);
-      }
+      await logger.log(clientSideWebParts);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);

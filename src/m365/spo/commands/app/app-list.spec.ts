@@ -237,7 +237,7 @@ describe(commands.APP_LIST, () => {
         if (opts.headers &&
           opts.headers.accept &&
           (opts.headers.accept as string).indexOf('application/json') === 0) {
-          return JSON.stringify({ value: [] });
+          return { value: [] };
         }
       }
 
@@ -245,7 +245,7 @@ describe(commands.APP_LIST, () => {
     });
 
     await command.action(logger, { options: {} });
-    assert.strictEqual(log.length, 0);
+    assert(loggerLogSpy.calledOnceWithExactly([]));
   });
 
   it('handles if tenant appcatalog is null or not exist (debug)', async () => {
@@ -263,7 +263,7 @@ describe(commands.APP_LIST, () => {
         if (opts.headers &&
           opts.headers.accept &&
           (opts.headers.accept as string).indexOf('application/json') === 0) {
-          return JSON.stringify({ value: [] });
+          return { value: [] };
         }
       }
 
@@ -271,37 +271,7 @@ describe(commands.APP_LIST, () => {
     });
 
     await command.action(logger, { options: { appCatalogScope: 'sitecollection', appCatalogUrl: 'https://contoso-admin.sharepoint.com' } });
-    assert.strictEqual(log.length, 0);
-  });
-
-  it('correctly handles no apps in the tenant app catalog (verbose)', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf('SP_TenantSettings_Current') > -1) {
-        return { "CorporateCatalogUrl": "https://contoso.sharepoint.com/sites/apps" };
-      }
-      if ((opts.url as string).indexOf('/_api/web/tenantappcatalog/AvailableApps') > -1) {
-        if (opts.headers &&
-          opts.headers.accept &&
-          (opts.headers.accept as string).indexOf('application/json') === 0) {
-          return JSON.stringify({ value: [] });
-        }
-      }
-
-      throw 'Invalid request';
-    });
-
-    await command.action(logger, { options: { verbose: true } });
-    let correctLogStatement = false;
-    log.forEach(l => {
-      if (!l || typeof l !== 'string') {
-        return;
-      }
-
-      if (l.indexOf('No apps found') > -1) {
-        correctLogStatement = true;
-      }
-    });
-    assert(correctLogStatement);
+    assert(loggerLogSpy.calledOnceWithExactly([]));
   });
 
   it('fails validation when invalid scope is specified', async () => {

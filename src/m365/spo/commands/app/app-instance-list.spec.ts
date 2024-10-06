@@ -18,7 +18,6 @@ describe(commands.APP_INSTANCE_LIST, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
-  let loggerLogToStderrSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -44,7 +43,6 @@ describe(commands.APP_INSTANCE_LIST, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
-    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
   });
 
   afterEach(() => {
@@ -126,24 +124,7 @@ describe(commands.APP_INSTANCE_LIST, () => {
         if (opts.headers &&
           opts.headers.accept &&
           (opts.headers.accept as string).indexOf('application/json') === 0) {
-          return JSON.stringify({ value: [] });
-        }
-      }
-
-      throw 'Invalid request';
-    });
-
-    await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/testsite' } });
-    assert.strictEqual(log.length, 0);
-  });
-
-  it('correctly handles no apps found in the site collection (verbose)', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf('/_api/web/AppTiles') > -1) {
-        if (opts.headers &&
-          opts.headers.accept &&
-          (opts.headers.accept as string).indexOf('application/json') === 0) {
-          return JSON.stringify({ value: [] });
+          return { value: [] };
         }
       }
 
@@ -151,7 +132,7 @@ describe(commands.APP_INSTANCE_LIST, () => {
     });
 
     await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/testsite', verbose: true } });
-    assert(loggerLogToStderrSpy.calledWith('No apps found'));
+    assert(loggerLogSpy.calledOnceWithExactly([]));
   });
 
   it('correctly handles error while listing apps in the site collection', async () => {

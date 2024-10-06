@@ -9,8 +9,6 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './engage-report-deviceusageuserdetail.js';
-import yammerCommands from './yammerCommands.js';
-import { cli } from '../../../../cli/cli.js';
 
 describe(commands.ENGAGE_REPORT_DEVICEUSAGEUSERDETAIL, () => {
   let log: string[];
@@ -57,23 +55,6 @@ describe(commands.ENGAGE_REPORT_DEVICEUSAGEUSERDETAIL, () => {
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
-  });
-
-  it('defines correct alias', () => {
-    const alias = command.alias();
-    assert.deepStrictEqual(alias, [yammerCommands.REPORT_DEVICEUSAGEUSERDETAIL]);
-  });
-
-  it('correctly logs deprecation warning for yammer command', async () => {
-    const chalk = (await import('chalk')).default;
-    const loggerErrSpy = sinon.spy(logger, 'logToStderr');
-    const commandNameStub = sinon.stub(cli, 'currentCommandName').value(yammerCommands.REPORT_DEVICEUSAGEUSERDETAIL);
-    sinon.stub(request, 'get').resolves('Report Refresh Date,User Principal Name,Display Name,User State,State Change Date,Last Activity Date,Used Web,Used Windows Phone,Used Android Phone,Used iPhone,Used iPad,Used Others,Report Period');
-
-    await command.action(logger, { options: { period: 'D7' } });
-    assert.deepStrictEqual(loggerErrSpy.firstCall.firstArg, chalk.yellow(`Command '${yammerCommands.REPORT_DEVICEUSAGEUSERDETAIL}' is deprecated. Please use '${commands.ENGAGE_REPORT_DEVICEUSAGEUSERDETAIL}' instead.`));
-
-    sinonUtil.restore([loggerErrSpy, commandNameStub]);
   });
 
   it('gets the report for the last week', async () => {

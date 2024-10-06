@@ -3,6 +3,7 @@ import type { SidebarsConfig } from '@docusaurus/plugin-content-docs';
 const sidebars: SidebarsConfig = {
   home: [
     'index',
+    'v10-upgrade-guidance',
     'v9-upgrade-guidance',
     'v8-upgrade-guidance',
     'v7-upgrade-guidance',
@@ -69,11 +70,6 @@ const sidebars: SidebarsConfig = {
           type: 'doc',
           label: 'issue',
           id: 'cmd/cli/cli-issue'
-        },
-        {
-          type: 'doc',
-          label: 'reconsent',
-          id: 'cmd/cli/cli-reconsent'
         },
         {
           completion: [
@@ -369,18 +365,18 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
-              label: 'group user add',
-              id: 'cmd/entra/group/group-user-add'
+              label: 'group member add',
+              id: 'cmd/entra/group/group-member-add'
             },
             {
               type: 'doc',
-              label: 'group user list',
-              id: 'cmd/entra/group/group-user-list'
+              label: 'group member list',
+              id: 'cmd/entra/group/group-member-list'
             },
             {
               type: 'doc',
-              label: 'group user set',
-              id: 'cmd/entra/group/group-user-set'
+              label: 'group member set',
+              id: 'cmd/entra/group/group-member-set'
             }
           ]
         },
@@ -3417,11 +3413,6 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
-              label: 'site rename',
-              id: 'cmd/spo/site/site-rename'
-            },
-            {
-              type: 'doc',
               label: 'site set',
               id: 'cmd/spo/site/site-set'
             },
@@ -3760,6 +3751,11 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'tenant site archive',
               id: 'cmd/spo/tenant/tenant-site-archive'
+            },
+            {
+              type: 'doc',
+              label: 'tenant site rename',
+              id: 'cmd/spo/tenant/tenant-site-rename'
             },
             {
               type: 'doc',

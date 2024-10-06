@@ -15,7 +15,6 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  userName?: string;
   ids?: string;
   userNames?: string;
   groupId?: string;
@@ -59,17 +58,13 @@ class EntraM365GroupUserAddCommand extends GraphCommand {
         teamName: typeof args.options.teamName !== 'undefined',
         groupName: typeof args.options.groupName !== 'undefined',
         ids: typeof args.options.ids !== 'undefined',
-        userNames: typeof args.options.userNames !== 'undefined',
-        userName: typeof args.options.userName !== 'undefined'
+        userNames: typeof args.options.userNames !== 'undefined'
       });
     });
   }
 
   #initOptions(): void {
     this.options.unshift(
-      {
-        option: '-n, --userName [userName]'
-      },
       {
         option: '--ids [ids]'
       },
@@ -131,22 +126,17 @@ class EntraM365GroupUserAddCommand extends GraphCommand {
 
   #initOptionSets(): void {
     this.optionSets.push({ options: ['groupId', 'groupName', 'teamId', 'teamName'] });
-    this.optionSets.push({ options: ['userName', 'ids', 'userNames'] });
+    this.optionSets.push({ options: ['ids', 'userNames'] });
   }
 
   #initTypes(): void {
-    this.types.string.push('userName', 'ids', 'userNames', 'groupId', 'groupName', 'teamId', 'teamName', 'role');
+    this.types.string.push('ids', 'userNames', 'groupId', 'groupName', 'teamId', 'teamName', 'role');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     await this.showDeprecationWarning(logger, aadCommands.M365GROUP_USER_ADD, commands.M365GROUP_USER_ADD);
 
-    if (args.options.userName) {
-      await this.warn(logger, `Option 'userName' is deprecated. Please use 'ids' or 'userNames' instead.`);
-    }
-
     try {
-      const userNames = args.options.userNames || args.options.userName;
       const providedGroupId: string = await this.getGroupId(logger, args);
       const isUnifiedGroup = await entraGroup.isUnifiedGroup(providedGroupId);
 
@@ -154,10 +144,10 @@ class EntraM365GroupUserAddCommand extends GraphCommand {
         throw Error(`Specified group with id '${providedGroupId}' is not a Microsoft 365 group.`);
       }
 
-      const userIds: string[] = await this.getUserIds(logger, args.options.ids, userNames);
+      const userIds: string[] = await this.getUserIds(logger, args.options.ids, args.options.userNames);
 
       if (this.verbose) {
-        await logger.logToStderr(`Adding user(s) ${args.options.ids || userNames} to group ${args.options.groupId || args.options.groupName || args.options.teamId || args.options.teamName}...`);
+        await logger.logToStderr(`Adding user(s) ${args.options.ids || args.options.userNames} to group ${args.options.groupId || args.options.groupName || args.options.teamId || args.options.teamName}...`);
       }
 
       await this.addUsers(providedGroupId, userIds, args.options.role);

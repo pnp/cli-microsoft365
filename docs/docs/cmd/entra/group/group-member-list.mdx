@@ -2,14 +2,14 @@ import Global from '/docs/cmd/_global.mdx';
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-# entra group user list
+# entra group member list
 
-Lists users of a specific Entra group
+Lists members of a specific Entra group
 
 ## Usage
 
 ```sh
-m365 entra group user list [options]
+m365 entra group member list [options]
 ```
 
 ## Alias
@@ -22,19 +22,19 @@ m365 aad group user list [options]
 
 ```md definition-list
 `-i, --groupId [groupId]`
-: The ID of the Entra group. Specify `groupId` or `groupDisplayName` but not both.
+: The ID of the Entra group. Specify `groupId` or `groupName` but not both.
 
-`-n, --groupDisplayName [groupDisplayName]`
-: The display name of the Entra group. Specify `groupId` or `groupDisplayName` but not both.
+`-n, --groupName [groupName]`
+: The display name of the Entra group. Specify `groupId` or `groupName` but not both.
 
 `-r, --role [role]`
-: Filter the results to only users with the given role: `Owner`, `Member`.
+: Filter the results to only members with the given role: `Owner`, `Member`.
 
 `-p, --properties [properties]`
 : Comma-separated list of properties to retrieve.
 
 `-f, --filter [filter]`
-: OData filter to use to query the list of users with.
+: OData filter to use to query the list of members with.
 ```
 
 <Global />
@@ -45,34 +45,34 @@ When the `properties` option includes values with a `/`, for example: `manager/d
 
 ## Examples
 
-List all group users from a group specified by ID.
+List all group members from a group specified by ID.
 
 ```sh
-m365 entra group user list --groupId 03cba9da-3974-46c1-afaf-79caa2e45bbe
+m365 entra group member list --groupId 03cba9da-3974-46c1-afaf-79caa2e45bbe
 ```
 
 List all owners from a group specified by display name.
 
 ```sh
-m365 entra group user list --groupDisplayName Developers --role Owner
+m365 entra group member list --groupName Developers --role Owner
 ```
 
-List all group users from a group specified by name. For each one return the display name, e-mail address, and manager display name.
+List all group members from a group specified by name. For each one return the display name, e-mail address, and manager display name.
 
 ```sh
-m365 entra group user list --groupDisplayName Developers --properties "displayName,mail,manager/displayName"
+m365 entra group member list --groupName Developers --properties "displayName,mail,manager/displayName"
 ```
 
-List all group users from a group specified by name. For each one return the display name, e-mail address, and manager information.
+List all group members from a group specified by name. For each one return the display name, e-mail address, and manager information.
 
 ```sh
-m365 entra group user list --groupDisplayName Developers --properties "displayName,mail,manager/*"
+m365 entra group member list --groupName Developers --properties "displayName,mail,manager/*"
 ```
 
-List all group members that are guest users.
+List all group members that are guest members.
 
 ```sh
-m365 entra group user list --groupDisplayName Developers --filter "userType eq 'Guest'"
+m365 entra group member list --groupName Developers --filter "userType eq 'Guest'"
 ```
 
 ## Response
