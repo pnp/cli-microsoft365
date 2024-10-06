@@ -124,11 +124,11 @@ In your scripts, replace every occurrence of the deprecated option `userName` wi
 
 ### Enhanced `entra m365group set` command
 
-We've enhanced the [entra m365group set](./cmd/entra/m365group/m365group-set.mdx) command so that a group that we wish to update can also be retrieved by it's displayName. Before, this was only able by the group ID. We have replaced the original `displayName` option by `newDisplayName`.
+We've enhanced the [entra m365group set](./cmd/entra/m365group/m365group-set.mdx) command so that a group that we wish to update can also be retrieved by it's displayName. Before, this was only able by the group ID. We have replaced the original `displayName` option by `newDisplayName`. Secondly we've updated the way the command handles updating users. Ownes/members that are not specified, will now be removed from the group. To add users without removing old users, the command [entra m365group user add](./cmd/entra/m365group/m365group-user-add) should be used. We've also added extra options to specify owners and members by UserName or Id.
 
 #### What action do I need to take?
 
-Make sure that if you are currently updating groups using the `displayName` option, you update your scripts to use the `newDisplayName` option instead.
+Make sure that if you are currently updating groups using the `displayName` option, you update your scripts to use the `newDisplayName` option instead. Also make sure that your script uses the new option names for updating Owners and Members, and that it does include all users that should be a member or owner of the group.
 
 ### Renamed `entra group user` commands to `entra group member`
 
