@@ -64,58 +64,71 @@ export default {
 
 Next, to enhance our command with options, validators, telemetry, there are a bunch of methods already available for you. When you make use of a method we order them alphabetically.
 
-## Defining the options
+## Defining command options
 
-When the command requires options to be passed along, we will define them in the interface `Options`. This interface extends from our `GlobalOptions`, where the common options `query`, `output`, `debug`, and `verbose` are defined. When an option is optional, let's make sure that it's also optional in the interface.
+Some commands require options. For example, when you want to get a group, you need to specify the site URL and the group ID. In CLI for Microsoft 365 we define options in a [Zod](https://zod.dev/) schema. Using Zod allows us to define the options in a type-safe way so that we can easily convert arguments specified by the user in the command line to objects that can be used in the command logic.
 
-We will also define the options in the method `#initOptions`. Here we pass along the option name, as a possible abbreviation for the option, to the `this.options` object. In some occasions, the option will always require a predefined input (an option with a fixed amount of choices). When this is the case, we can define them under the property `autocomplete`.
-
-:::info
-
-Required options are denoted as `--required <required>`, optional options are denoted as `--optional [optional]`, and flag options are denoted as `--flag`.
-
-:::
+Global CLI options, such as `query`, `output`, `debug` or `verbose` are defined in the `globalOptionsZod` property. To define options specific to your command, extend the global schema with your command-specific options.
 
 ```ts title="src/m365/spo/commands/group/group-get.ts"
-// ...
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../Command.js';
+
+export const options = globalOptionsZod
+  .extend({
+    webUrl: z.string(),
+    id: z.number().optional(),
+    name: z.string().optional(),
+    associatedGroup: z.string().optional()
+  })
+  .strict();
+```
+
+In this example, we're adding 4 command options: `webUrl`, `id`, `name`, and `associatedGroup`. The `webUrl` option is required and must be a string. The `id`, `name`, and `associatedGroup` options are optional. Since our command doesn't support unknown options, we set the schema to strict.
+
+Next, we define a TypeScript type for options and command args, which allows us to benefit from type-safety when working with options in the command logic.
+
+```ts title="src/m365/spo/commands/group/group-get.ts"
+import { globalOptionsZod } from '../../Command.js';
+
+export const options = globalOptionsZod
+  .extend({
+    webUrl: z.string(),
+    id: z.number().optional(),
+    name: z.string().optional(),
+    associatedGroup: z.string().optional()
+  })
+  .strict();
+declare type Options = z.infer<typeof options>;
+
+interface CommandArgs {
+  options: Options;
+}
+```
+
+Finally, we expose the options schema in the command class.
+
+```ts title="src/m365/spo/commands/group/group-get.ts"
+import { globalOptionsZod } from '../../Command.js';
+
+export const options = globalOptionsZod
+  .extend({
+    webUrl: z.string(),
+    id: z.number().optional(),
+    name: z.string().optional(),
+    associatedGroup: z.string().optional()
+  })
+  .strict();
+declare type Options = z.infer<typeof options>;
 
 interface CommandArgs {
   options: Options;
 }
 
-interface Options extends GlobalOptions {
-  webUrl: string;
-  id?: number;
-  name?: string;
-  associatedGroup?: string;
-}
-
 class SpoGroupGetCommand extends SpoCommand {
   // ...
 
-  constructor() {
-    super();
-
-    this.#initOptions();
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '-i, --id [id]'
-      },
-      {
-        option: '--name [name]'
-      },
-      {
-        option: '--associatedGroup [associatedGroup]',
-        autocomplete: ['Owner', 'Member', 'Visitor']
-      }
-    );
+  public get schema(): z.ZodTypeAny | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -128,111 +141,135 @@ class SpoGroupGetCommand extends SpoCommand {
 }
 ```
 
-## Option validation
+## Defining aliases
 
-The options that are passed along won't always be correct from the first attempt. So instead of passing faulty values to the API, we can write option validation that runs before `commandAction` is executed. This can be done in the method `#initValidators`. Conditions can be written here to validate the option values and return an error when they're faulty. Once again, there are already several validation methods you can make use of to check some common options, e.g., `validation.isValidSharePointUrl(...)`.
+To simplify using the CLI, we often use aliases for options. For example, the `--webUrl` option can be shortened to `-u`. To define an alias for an option, we wrap the property in the `alias` function in the schema.
 
 ```ts title="src/m365/spo/commands/group/group-get.ts"
-// ...
-import { validation } from '../../../../utils/validation.js';
+import { globalOptionsZod } from '../../Command.js';
+import { zod } from '../../utils/zod.js';
 
-class SpoExampleListCommand extends Command {
-  constructor() {
-    super();
-
-    // ...
-    this.#initValidators();
-  }
-
-  // ...
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.id && isNaN(args.options.id)) {
-          return `Specified id ${args.options.id} is not a number`;
-        }
-
-        if (args.options.associatedGroup && ['owner', 'member', 'visitor'].indexOf(args.options.associatedGroup.toLowerCase()) === -1) {
-          return `${args.options.associatedGroup} is not a valid associatedGroup value. Allowed values are Owner|Member|Visitor.`;
-        }
-
-        return validation.isValidSharePointUrl(args.options.webUrl);
-      }
-    );
-  }
-}
+export const options = globalOptionsZod
+  .extend({
+    webUrl: zod.alias('u', z.string()),
+    id: zod.alias('i', z.number().optional()),
+    name: z.string().optional(),
+    associatedGroup: z.string().optional()
+  })
+  .strict();
 ```
+
+## Defining option autocomplete
+
+Some options require predefined values. For example, the `associatedGroup` option can only have one of the following values: `Owner`, `Member`, or `Visitor`. To define the allowed values for an option, we use enums with the `coercedEnum` helper function. This function allows users to specify the values in a case-insensitive way. In the code, the value of the `associatedGroup` option will be expressed as an enum which allows us to benefit from type-safety and support refactoring.
+
+```ts title="src/m365/spo/commands/group/group-get.ts"
+import { globalOptionsZod } from '../../Command.js';
+import { zod } from '../../utils/zod.js';
+
+enum AssociatedGroup {
+  Owner = 'owner',
+  Member = 'member',
+  Visitor = 'visitor'
+};
+
+export const options = globalOptionsZod
+  .extend({
+    webUrl: zod.alias('u', z.string()),
+    id: zod.alias('i', z.number().optional()),
+    name: z.string().optional(),
+    associatedGroup: zod.coercedEnum(AssociatedGroup).optional()
+  })
+  .strict();
+```
+
+## Option validation
+
+The options that users specify won't always be correct. So instead of passing faulty values to the CLI, we can add logic to validate the input first. This allows us to fail fast and offer users the ability to correct their input before continuing.
+
+Zod automatically validates primitive values, which means that you only need to add 'business' validation logic. Validation is implemented using Zod refinements on the specific property. For example, to validate that the specified URL is a SharePoint URL, use:
+
+```ts title="src/m365/spo/commands/group/group-get.ts"
+import { globalOptionsZod } from '../../Command.js';
+import { validation } from '../../utils/validation.js';
+import { zod } from '../../utils/zod.js';
+
+enum AssociatedGroup {
+  Owner = 'owner',
+  Member = 'member',
+  Visitor = 'visitor'
+};
+
+export const options = globalOptionsZod
+  .extend({
+    webUrl: zod.alias('u', z.string().refine(url => validation.isValidSharePointUrl(url) === true, url => ({
+      message: `Specified URL ${url} is not a valid SharePoint URL`,
+    }))),
+    id: zod.alias('i', z.number().optional()),
+    name: z.string().optional(),
+    associatedGroup: zod.coercedEnum(AssociatedGroup).optional()
+  })
+  .strict();
+```
+
+A refinement takes two arguments: a predicate function and an error object. The predicate function is used to validate the input, and the error object is used to define the error message that will be displayed when the input is invalid.
 
 ## Option sets
 
-Option sets are used to ensure that only one option has a value from a set of options. When no option is used, the command will return an error, and the same goes when multiple of these options are used. To make use of the option sets, you can use the method `#initOptionSets`.
+Option sets are used to ensure that only one option has a value from a set of options. When no option is used, the command will return an error, and the same goes when multiple of these options are used. To use option sets, add a Zod refinement on the whole schema, which gives you access to all schema properties.
 
 ```ts title="src/m365/spo/commands/group/group-get.ts"
-class SpoExampleListCommand extends Command {
-  constructor() {
-    super();
+import { globalOptionsZod } from '../../Command.js';
+import { validation } from '../../utils/validation.js';
+import { zod } from '../../utils/zod.js';
 
-    // ...
-    this.#initOptionSets();
-  }
+enum AssociatedGroup {
+  Owner = 'owner',
+  Member = 'member',
+  Visitor = 'visitor'
+};
 
-  // ...
+export const options = globalOptionsZod
+  .extend({
+    webUrl: zod.alias('u', z.string().refine(url => validation.isValidSharePointUrl(url) === true, url => ({
+      message: `Specified URL ${url} is not a valid SharePoint URL`,
+    }))),
+    id: zod.alias('i', z.number().optional()),
+    name: z.string().optional(),
+    associatedGroup: zod.coercedEnum(AssociatedGroup).optional()
+  })
+  .strict();
+declare type Options = z.infer<typeof options>;
 
-  #initOptionSets(): void {
-    this.optionSets.push({ options: ['id', 'name', 'associatedGroup'] });
-  }
+interface CommandArgs {
+  options: Options;
 }
-```
 
-Option sets also allow you to define `runsWhen` for a set of options. This allows you to define a condition when the option set should be executed. E.g., when the option `title` is defined, either the option set `ownerGroupId` and `ownerGroupName` should be required.
-
-```ts title="src/m365/planner/commands/plan/plan-set.ts"
-  #initOptionSets(): void {
-    this.optionSets.push(
-      {
-        options: ['id', 'title', 'rosterId']
-      },
-      {
-        options: ['ownerGroupId', 'ownerGroupName'],
-        runsWhen: (args) => args.options.title !== undefined
-      }
-    );
-  }
-```
-
-## Telemetry
-
-The CLI for Microsoft 365 tracks the usage of the different commands using Azure Application Insights. By default, for each command, the CLI tracks its name and whether it's been executed in debug/verbose mode or not. If your command has additional properties that should be included in the telemetry, you can define them by implementing the `#initTelemetry` method and adding your properties to the `this.telemetryProperties` object.
-
-```ts title="src/m365/spo/commands/group/group-get.ts"
-class SpoExampleListCommand extends Command {
-  constructor() {
-    super();
-
-    // ...
-    this.#initTelemetry();
-  }
-
+class SpoGroupGetCommand extends SpoCommand {
   // ...
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        id: typeof args.options.id !== 'undefined',
-        name: typeof args.options.name !== 'undefined',
-        associatedGroup: !!args.options.associatedGroup
+  public get schema(): z.ZodTypeAny | undefined {
+    return options;
+  }
+
+  public getRefinedSchema(schema: typeof options): z.ZodEffects<any> | undefined {
+    return schema
+      .refine(options => options.id !== undefined || options.name !== undefined && !(options.id !== undefined && options.name !== undefined), {
+        message: `Either id or name is required, but not both.`
       });
-    });
+  }
+
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    if (this.verbose) {
+      await logger.logToStderr(`Retrieving information for group in site at ${args.options.webUrl}...`);
+    }
+
+    // Command implementation goes here
   }
 }
 ```
 
-:::note 
-
-We are only listing the option options in `#initTelemetry`. Since the required options are always used, we don't include them in the telemetry.
-
-:::
+In the `refine` function, you define how the option set should be validated. In this case, we check if either `id` or `name` is defined, but not both. If both are defined, the command returns an error. You can use different logic, depending on the requirements of your command.
 
 ## Command action
 
