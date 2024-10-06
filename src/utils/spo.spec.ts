@@ -78,6 +78,14 @@ const entraGroupResponse = {
   UserPrincipalName: null
 };
 
+const copyJobInfo = {
+  EncryptionKey: "2by8+2oizihYOFqk02Tlokj8lWUShePAEE+WMuA9lzA=",
+  JobId: "d812e5a0-d95a-4e4f-bcb7-d4415e88c8ee",
+  JobQueueUri: "https://spoam1db1m020p4.queue.core.windows.net/2-1499-20240831-29533e6c72c6464780b756c71ea3fe92?sv=2018-03-28&sig=aX%2BNOkUimZ3f%2B%2BvdXI95%2FKJI1e5UE6TU703Dw3Eb5c8%3D&st=2024-08-09T00%3A00%3A00Z&se=2024-08-31T00%3A00%3A00Z&sp=rap",
+  SourceListItemUniqueIds: [
+    'c194762b-3f54-4f5f-9f5c-eba26084e29d'
+  ]
+};
 
 const containerTypedata = [{
   "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SPContainerTypeProperties",
@@ -109,15 +117,6 @@ const containerTypedata = [{
   "ResourceGroup": null,
   "SPContainerTypeBillingClassification": 0
 }];
-
-const copyJobInfo = {
-  EncryptionKey: "2by8+2oizihYOFqk02Tlokj8lWUShePAEE+WMuA9lzA=",
-  JobId: "d812e5a0-d95a-4e4f-bcb7-d4415e88c8ee",
-  JobQueueUri: "https://spoam1db1m020p4.queue.core.windows.net/2-1499-20240831-29533e6c72c6464780b756c71ea3fe92?sv=2018-03-28&sig=aX%2BNOkUimZ3f%2B%2BvdXI95%2FKJI1e5UE6TU703Dw3Eb5c8%3D&st=2024-08-09T00%3A00%3A00Z&se=2024-08-31T00%3A00%3A00Z&sp=rap",
-  SourceListItemUniqueIds: [
-    'c194762b-3f54-4f5f-9f5c-eba26084e29d'
-  ]
-};
 
 describe('utils/spo', () => {
   let logger: Logger;
@@ -2712,64 +2711,6 @@ describe('utils/spo', () => {
     assert.deepEqual(group, fileResponse);
   });
 
-  it('retrieves list of Container Type', async () => {
-    sinon.stub(spo, 'getSpoAdminUrl').resolves('https://contoso-admin.sharepoint.com');
-    sinon.stub(spo, 'ensureFormDigest').resolves({ FormDigestValue: 'abc', FormDigestTimeoutSeconds: 1800, FormDigestExpiresAt: new Date(), WebFullUrl: 'https://contoso.sharepoint.com' });
-
-    sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
-        if (opts.headers &&
-          opts.headers['X-RequestDigest'] &&
-          opts.headers['X-RequestDigest'] === 'abc' &&
-          opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="46" ObjectPathId="45" /><Method Name="GetSPOContainerTypes" Id="47" ObjectPathId="45"><Parameters><Parameter Type="Enum">1</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="45" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
-          return JSON.stringify([
-            {
-              "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.24817.12005", "ErrorInfo": null, "TraceCorrelationId": "2d63d39f-3016-0000-a532-30514e76ae73"
-            }, 46, {
-              "IsNull": false
-            }, 47, containerTypedata
-          ]);
-        }
-      }
-
-      throw 'Invalid request';
-    });
-
-    const containerTypeList = await spo.getAllContainerTypes('https://contoso-admin.sharepoint.com', logger, true);
-    assert.deepEqual(containerTypeList, containerTypedata);
-  });
-
-  it('throws error retrieving container types', async () => {
-    try {
-      sinon.stub(spo, 'getSpoAdminUrl').resolves('https://contoso-admin.sharepoint.com');
-      sinon.stub(spo, 'ensureFormDigest').resolves({ FormDigestValue: 'abc', FormDigestTimeoutSeconds: 1800, FormDigestExpiresAt: new Date(), WebFullUrl: 'https://contoso.sharepoint.com' });
-
-      sinon.stub(request, 'post').callsFake(async (opts) => {
-        if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
-          if (opts.headers &&
-            opts.headers['X-RequestDigest'] &&
-            opts.headers['X-RequestDigest'] === 'abc') {
-
-            return JSON.stringify([
-              {
-                "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7324.1200", "ErrorInfo": {
-                  "ErrorMessage": "An error has occurred", "ErrorValue": null, "TraceCorrelationId": "e13c489e-2026-5000-8242-7ec96d02ba1d", "ErrorCode": -1, "ErrorTypeName": "SPException"
-                }, "TraceCorrelationId": "e13c489e-2026-5000-8242-7ec96d02ba1d"
-              }
-            ]);
-          }
-        }
-
-        throw 'Invalid request';
-      });
-
-      await spo.getAllContainerTypes('https://contoso-admin.sharepoint.com', logger, true);
-      assert.fail('An error has occurred');
-    }
-    catch (e) {
-      assert.deepEqual(e, 'An error has occurred');
-    }
-
   it('correctly outputs result when calling createCopyJob', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/sales/_api/Site/CreateCopyJobs') {
@@ -3087,5 +3028,64 @@ describe('utils/spo', () => {
 
     await assert.rejects(spo.getCopyJobResult('https://contoso.sharepoint.com/sites/sales', copyJobInfo),
       new Error('A file or folder with the name Company.png already exists at the destination.'));
+  });
+
+  it('retrieves list of Container Type', async () => {
+    sinon.stub(spo, 'getSpoAdminUrl').resolves('https://contoso-admin.sharepoint.com');
+    sinon.stub(spo, 'ensureFormDigest').resolves({ FormDigestValue: 'abc', FormDigestTimeoutSeconds: 1800, FormDigestExpiresAt: new Date(), WebFullUrl: 'https://contoso.sharepoint.com' });
+
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
+        if (opts.headers &&
+          opts.headers['X-RequestDigest'] &&
+          opts.headers['X-RequestDigest'] === 'abc' &&
+          opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="46" ObjectPathId="45" /><Method Name="GetSPOContainerTypes" Id="47" ObjectPathId="45"><Parameters><Parameter Type="Enum">1</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="45" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
+          return JSON.stringify([
+            {
+              "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.24817.12005", "ErrorInfo": null, "TraceCorrelationId": "2d63d39f-3016-0000-a532-30514e76ae73"
+            }, 46, {
+              "IsNull": false
+            }, 47, containerTypedata
+          ]);
+        }
+      }
+
+      throw 'Invalid request';
+    });
+
+    const containerTypeList = await spo.getAllContainerTypes('https://contoso-admin.sharepoint.com', logger, true);
+    assert.deepEqual(containerTypeList, containerTypedata);
+  });
+
+  it('throws error retrieving container types', async () => {
+    try {
+      sinon.stub(spo, 'getSpoAdminUrl').resolves('https://contoso-admin.sharepoint.com');
+      sinon.stub(spo, 'ensureFormDigest').resolves({ FormDigestValue: 'abc', FormDigestTimeoutSeconds: 1800, FormDigestExpiresAt: new Date(), WebFullUrl: 'https://contoso.sharepoint.com' });
+
+      sinon.stub(request, 'post').callsFake(async (opts) => {
+        if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
+          if (opts.headers &&
+            opts.headers['X-RequestDigest'] &&
+            opts.headers['X-RequestDigest'] === 'abc') {
+
+            return JSON.stringify([
+              {
+                "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7324.1200", "ErrorInfo": {
+                  "ErrorMessage": "An error has occurred", "ErrorValue": null, "TraceCorrelationId": "e13c489e-2026-5000-8242-7ec96d02ba1d", "ErrorCode": -1, "ErrorTypeName": "SPException"
+                }, "TraceCorrelationId": "e13c489e-2026-5000-8242-7ec96d02ba1d"
+              }
+            ]);
+          }
+        }
+
+        throw 'Invalid request';
+      });
+
+      await spo.getAllContainerTypes('https://contoso-admin.sharepoint.com', logger, true);
+      assert.fail('An error has occurred');
+    }
+    catch (e) {
+      assert.deepEqual(e, 'An error has occurred');
+    }
   });
 });
