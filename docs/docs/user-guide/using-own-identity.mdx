@@ -5,13 +5,13 @@ sidebar_position: 10
 
 # Use your own Microsoft Entra identity
 
-When you use the CLI for Microsoft 365 to connect to your tenant for the first time, you need to specify at least the `appId` and `tenant` options during login.
+When you use the CLI for Microsoft 365 to connect to your tenant for the first time, you can either start with the [m365 setup](../cmd/setup.mdx) command or define the `appId` and `tenant` options directly during login.
 
-To simplify the process of creating an App Registration with all the necessary permission scopes, you can use the [m365 setup](../cmd/setup.mdx) command. This command can set up an App Registration with a wide range of permissions, including those that require administrative consent. This makes it easy to get started with the CLI and try out commands across many CLI for Microsoft 365 workloads in your tenant without having to manually manage permissions for different commands in Azure.
+To simplify the process of creating an Microsoft Entra application registration with all the necessary permission scopes, you can use the [m365 setup](../cmd/setup.mdx) command. This command can set up an application registration with a wide range of permissions, including those that require administrative consent. This makes it easy to get started with the CLI and try out commands across many CLI for Microsoft 365 workloads in your tenant without having to manually manage permissions for different commands in Azure.
 
-While this approach is convenient for development and test environments, using these levels of permissions against production environments may be inconvenient. Administrators might be uncomfortable granting such permissions to an application within their environment. Therefore, it's important to carefully consider the permissions you grant when setting up your App Registration for production use.
+While this approach is convenient for development and test environments, using these levels of permissions against production environments may be inconvenient. Administrators might be uncomfortable granting such permissions to an application within their environment. Therefore, it's important to carefully consider the permissions you grant when setting up your application registration for production use.
 
-In this scenario, administrators will want to provide their own Microsoft Entra app registration to use with the CLI to enable greater control over the permissions that are granted.
+In this scenario, administrators will want to provide their own Microsoft Entra application registration to use with the CLI to enable greater control over the permissions that are granted.
 
 This tutorial will walk you through how to create your own Microsoft Entra application with permissions restricted to only read information about SharePoint Online Site Collections and how to use this custom application with the CLI for Microsoft 365.
 
@@ -19,9 +19,9 @@ This tutorial will walk you through how to create your own Microsoft Entra appli
 
 We first need to register a new Microsoft Entra application in your tenant, to do this we will need to navigate to the [Azure Portal](https://portal.azure.com).
 
-Select `Microsoft Entra ID` from the global menu, select `App registrations` in the Microsoft Entra ID blade and then select the `New registration` action button to open the `Register an application` form.
+Select `Microsoft Entra ID` from the global menu, select `app registrations` in the Microsoft Entra ID blade and then select the `New registration` action button to open the `Register an application` form.
 
-[![New app registration](../images/using-own-identity/new-app-registration.png)](../images/using-own-identity/new-app-registration.png)
+[![New application registration](../images/using-own-identity/new-app-registration.png)](../images/using-own-identity/new-app-registration.png)
 
 In the form, enter a name for your new application, for the purpose of this tutorial let's use `Custom PnP CLI for M365`. You can always change this later if you want. Leave the `Supported account types` and `Redirect URI` values as they are and select the `Register` button at the foot of the form to create your custom application.
 

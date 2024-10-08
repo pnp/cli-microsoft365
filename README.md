@@ -147,7 +147,7 @@ npm install -g @pnp/cli-microsoft365
 
 ## Usage
 
->Before logging in, you should create a custom Entra Identity. Use the `m365 setup` command or refer to the [Using your own Microsoft Entra identity](https://pnp.github.io/cli-microsoft365/user-guide/using-own-identity/) guide.
+>Before logging in, you should create a custom Microsoft Entra application registration. Use the `m365 setup` command or refer to the [Using your own Microsoft Entra identity](https://pnp.github.io/cli-microsoft365/user-guide/using-own-identity/) guide.
 
 Use the `login` command to start the Device Code login flow to authenticate with your Microsoft 365 tenant.
 

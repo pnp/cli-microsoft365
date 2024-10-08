@@ -12,11 +12,11 @@ There are a number of ways in which you can authenticate and authorize with Micr
 
 ### Microsoft Entra application used by the CLI for Microsoft 365
 
-CLI for Microsoft 365 gets access to Microsoft 365 through your own Microsoft Entra application. 
+CLI for Microsoft 365 gets access to Microsoft 365 through your own Microsoft Entra application registration. 
 
 :::info
 
-When you create your own Microsoft Entra application, you need to choose the application to be a **public client**. Despite the setting's description, the application will not be publicly accessible. This setting enables the use of the device flow for your own application. Without activating this setting, it is not possible to complete the authentication process. The option is currently only available in the preview blade for managing for Microsoft Entra applications.
+When you create your own Microsoft Entra application, you need to choose the application to be a **public client**. Despite the setting's description, the application will not be publicly accessible. This setting enables the use of the device flow for your own application and is only required for interactive use of the CLI. If you use the CLI with non-interactive scripts and log in using client credentials or Managed Service Identity, you don't need to activate this setting. The option is currently only available in the preview blade for managing Microsoft Entra applications.
 
 <br/>
 
@@ -24,17 +24,17 @@ When you create your own Microsoft Entra application, you need to choose the app
 
 :::
 
-When specifying a Microsoft Entra application to be used by the CLI for Microsoft 365, set the `CLIMICROSOFT365_ENTRAAPPID` environment variable to the ID of your Microsoft Entra application.
+When specifying a application registration to be used by the CLI for Microsoft 365, set the `CLIMICROSOFT365_ENTRAAPPID` environment variable to the ID of your application registration.
 
-For a streamlined setup, you can use the [m365 setup](../cmd/setup.mdx) command to create a new app registration with all the necessary permissions to fully use the CLI for Microsoft 365. This command simplifies the process by automatically configuring the app registration with the required permissions.
+For a streamlined setup, you can use the [m365 setup](../cmd/setup.mdx) command to create a new application registration with all the necessary permissions to fully use the CLI for Microsoft 365.
 
 :::warning
 
-After changing the ID of the Microsoft Entra application used by the CLI for Microsoft 365 refresh the existing connection to Microsoft 365 using the `login` command. If you try to use the existing connection, CLI for Microsoft 365 will fail when trying to refresh the existing access token.
+After changing the ID of the application registration used by the CLI for Microsoft 365 refresh the existing connection to Microsoft 365 using the `login` command. If you try to use the existing connection, CLI for Microsoft 365 will fail when trying to refresh the existing access token.
 
 :::
 
-For instructions on how to create your own Microsoft Entra app see [Using your own Microsoft Entra identity](../user-guide/using-own-identity.mdx).
+For instructions on how to create your own Microsoft Entra application registration see [Using your own Microsoft Entra identity](../user-guide/using-own-identity.mdx).
 
 ### Access and refresh tokens in the CLI for Microsoft 365
 
