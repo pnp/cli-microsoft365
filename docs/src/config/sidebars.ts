@@ -1961,6 +1961,15 @@ const sidebars: SidebarsConfig = {
     {
       'SharePoint Embedded (spe)': [
         {
+          container: [
+            {
+              type: 'doc',
+              label: 'container get',
+              id: 'cmd/spe/container/container-get'
+            }
+          ]
+        },
+        {
           containertype: [
             {
               type: 'doc',
