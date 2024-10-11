@@ -34,8 +34,8 @@ try {
   }
   
   const siteUrl = sites[0].Url;
-  // m365 spo web get --webUrl https://contoso.sharepoint.com/sites/project-x --withGroups
-  const siteInfo = await executeCommand('spo web get', { webUrl: siteUrl, withGroups: true });
+  // m365 spo web get --url https://contoso.sharepoint.com/sites/project-x --withGroups
+  const siteInfo = await executeCommand('spo web get', { url: siteUrl, withGroups: true });
 
   console.log(siteInfo.stdout);
   
@@ -61,3 +61,48 @@ executeCommand('login', { output: 'text' }, {
 You shouldn't use both listeners and output from Promises. All command output is sent to the registered listeners and exposed in the end through the resolved Promise. If you would send output from both the listener and Promise to the console, you'd end up with the same output printed twice. In the code sample above you see that for all commands you work with the output from Promises but for the `login` command you use a listener because you want to get login instructions while the command is still running.
 
 :::
+## Note on Using ESM Modules
+
+When including CLI for Microsoft 365 as a dependency in your project, it's important to use ECMAScript Modules (ESM). Here's how to set up your Node.js app with ESM:
+
+1. Create a `package.json` file with the following configuration:
+
+```json
+{
+  "name": "cli-microsoft365-example",
+  "version": "1.0.0",
+  "type": "module",
+  "dependencies": {
+    "@pnp/cli-microsoft365": "^5.0.0"
+  },
+  "scripts": {
+    "start": "node index.js"
+  }
+}
+```
+
+2. Create an `index.js` file for your main application code:
+
+```javascript
+import { executeCommand } from '@pnp/cli-microsoft365';
+
+async function main() {
+  try {
+    const status = await executeCommand('status', { output: 'text' });
+    console.log('CLI Status:', status.stdout);
+    // Add more CLI commands here
+  } catch (err) {
+    console.error('Error:', err);
+  }
+}
+
+main();
+```
+
+3. Set up and run your project:
+   - Create a new directory for your project and navigate to it.
+   - Create the `package.json` and `index.js` files with the content shown above.
+   - Run `npm install` to install the dependencies.
+   - Execute your script with `npm start`.
+
+By setting `"type": "module"` in your `package.json`, you enable ESM for your project. This allows you to use `import` statements and ensures compatibility with CLI for Microsoft 365.
