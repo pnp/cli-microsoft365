@@ -15,7 +15,6 @@ import { settingsNames } from '../../../../settingsNames.js';
 import { formatting } from '../../../../utils/formatting.js';
 import commands from '../../commands.js';
 import command from './group-member-list.js';
-import aadCommands from '../../aadCommands.js';
 
 describe(commands.GROUP_MEMBER_LIST, () => {
   const groupId = '2c1ba4c4-cd9b-4417-832f-92a34bc34b2a';

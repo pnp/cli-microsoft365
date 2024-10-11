@@ -33,10 +33,6 @@ class EntraGroupMemberListCommand extends GraphCommand {
     return 'Lists members of a specific Entra group';
   }
 
-  public alias(): string[] | undefined {
-    return [aadCommands.GROUP_USER_LIST];
-  }
-
   public defaultProperties(): string[] | undefined {
     return ['id', 'displayName', 'userPrincipalName', 'roles'];
   }
@@ -110,8 +106,6 @@ class EntraGroupMemberListCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    await this.showDeprecationWarning(logger, aadCommands.GROUP_USER_LIST, commands.GROUP_MEMBER_LIST);
-
     try {
       const groupId = await this.getGroupId(args.options, logger);
 
