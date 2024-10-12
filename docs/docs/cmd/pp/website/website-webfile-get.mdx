@@ -1,0 +1,188 @@
+import Global from "/docs/cmd/_global.mdx";
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+# pp website webfile get
+
+Gets information about the specified web file
+
+## Usage
+
+```sh
+m365 pp website webfile get [options]
+```
+
+## Options
+
+```md definition-list
+`-e, --environmentName <environmentName>`
+: The name of the environment.
+
+`-i, --id [id]`
+: The id of the web file to retrieve details for.
+
+`--websiteId [websiteId]`
+: ID of the Power Pages website. Specify either `websiteId` or `websiteName` but not both.
+
+`--websiteName [websiteName]`
+: The unique name (not the display name) of the Power Pages website. Specify either `websiteId` or `websiteName but not both.
+
+`--asAdmin`
+: Run the command as admin for environments you do not have explicitly assigned permissions to.
+```
+
+<Global />
+
+## Examples
+
+Retrieve web file for the site Contoso in a specific environment.
+
+```sh
+m365 pp website webfile get --environmentName "Default-d87a7535-dd31-4437-bfe1-95340acd55c5" --websiteName "CLI 365 Website" --id 3a081d91-5ea8-40a7-8ac9-abbaa3fcb893
+```
+
+Get a specific website webfile in a specific environment based on name as admin.
+
+```sh
+m365 pp website webfile get --environmentName "Default-d87a7535-dd31-4437-bfe1-95340acd55c5" --websiteName "CLI 365 Website" --id 3a081d91-5ea8-40a7-8ac9-abbaa3fcb893 --asAdmin
+```
+
+Get a specific website webfile in a specific environment based on id.
+
+```sh
+m365 pp website webfile get --environmentName "Default-d87a7535-dd31-4437-bfe1-95340acd55c5" --websiteId 3bbc8102-8ee7-4dac-afbb-807cc5b6f9c2 --id 3a081d91-5ea8-40a7-8ac9-abbaa3fcb893
+```
+
+Get a specific website webfile in a specific environment based on id as admin.
+
+```sh
+m365 pp website webfile get --environmentName "Default-d87a7535-dd31-4437-bfe1-95340acd55c5" --websiteId 3bbc8102-8ee7-4dac-afbb-807cc5b6f9c2 --id 3a081d91-5ea8-40a7-8ac9-abbaa3fcb893 --asAdmin
+```
+
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+```json
+{
+  "mspp_webfileid": "3a081d91-5ea8-40a7-8ac9-abbaa3fcb893",
+  "mspp_name": "theme.css",
+  "mspp_contentdisposition@OData.Community.Display.V1.FormattedValue": "inline",
+  "mspp_contentdisposition": 756150000,
+  "mspp_displayorder@OData.Community.Display.V1.FormattedValue": "9",
+  "mspp_displayorder": 9,
+  "mspp_excludefromsearch@OData.Community.Display.V1.FormattedValue": "Yes",
+  "mspp_excludefromsearch": true,
+  "mspp_hiddenfromsitemap@OData.Community.Display.V1.FormattedValue": "No",
+  "mspp_hiddenfromsitemap": false,
+  "_mspp_parentpageid_value@Microsoft.Dynamics.CRM.associatednavigationproperty": "mspp_parentpageid",
+  "_mspp_parentpageid_value@Microsoft.Dynamics.CRM.lookuplogicalname": "mspp_webpage",
+  "_mspp_parentpageid_value@OData.Community.Display.V1.FormattedValue": "Home",
+  "_mspp_parentpageid_value": "a3d84663-6409-4cce-a269-604a78287ecb",
+  "mspp_partialurl": "theme.css",
+  "_mspp_publishingstateid_value@Microsoft.Dynamics.CRM.associatednavigationproperty": "mspp_publishingstateid",
+  "_mspp_publishingstateid_value@Microsoft.Dynamics.CRM.lookuplogicalname": "mspp_publishingstate",
+  "_mspp_publishingstateid_value@OData.Community.Display.V1.FormattedValue": "Published",
+  "_mspp_publishingstateid_value": "ffefd269-446e-46aa-9379-92d1b2d323b8",
+  "_mspp_websiteid_value@Microsoft.Dynamics.CRM.associatednavigationproperty": "mspp_websiteid",
+  "_mspp_websiteid_value@Microsoft.Dynamics.CRM.lookuplogicalname": "mspp_website",
+  "_mspp_websiteid_value@OData.Community.Display.V1.FormattedValue": "CLI 365 Website",
+  "_mspp_websiteid_value": "5a9c900e-8d0e-422d-970f-cd3cf28252ed",
+  "_mspp_createdby_value@Microsoft.Dynamics.CRM.lookuplogicalname": "systemuser",
+  "_mspp_createdby_value@OData.Community.Display.V1.FormattedValue": "Shantha Kumar Thambidurai",
+  "_mspp_createdby_value": "5364ffa6-d185-ee11-8179-6045bd0027e0",
+  "_mspp_modifiedby_value@Microsoft.Dynamics.CRM.lookuplogicalname": "systemuser",
+  "_mspp_modifiedby_value@OData.Community.Display.V1.FormattedValue": "Shantha Kumar Thambidurai",
+  "_mspp_modifiedby_value": "5364ffa6-d185-ee11-8179-6045bd0027e0",
+  "mspp_modifiedon@OData.Community.Display.V1.FormattedValue": "4/12/2024 11:16 AM",
+  "mspp_modifiedon": "2024-04-12T05:46:36Z",
+  "mspp_createdon@OData.Community.Display.V1.FormattedValue": "4/12/2024 11:16 AM",
+  "mspp_createdon": "2024-04-12T05:46:19Z",
+  "statecode: 0,
+  "statuscode@OData.Community.Display.V1.FormattedValue": "Active",
+  "statuscode: 1,
+  "mspp_title: null,
+  "mspp_displaydate: null,
+  "mspp_summary: null,
+  "mspp_cloudblobaddress: null,
+  "mspp_modifiedbyusername: null,
+  "mspp_alloworigin: null,
+  "mspp_expirationdate: null,
+  "mspp_createdbyipaddress: null,
+  "mspp_createdbyusername: null,
+  "mspp_modifiedbyipaddress: null,
+  "mspp_releasedate: null,
+  "_mspp_masterwebfileid_value: null
+}
+```
+
+  </TabItem>
+  <TabItem value="Text">
+
+```text
+_mspp_publishingstateid_value@OData.Community.Display.V1.FormattedValue: Published
+mspp_name                                                              : theme.css
+mspp_summary                                                           : null
+mspp_webfileid                                                         : 3a081d91-5ea8-40a7-8ac9-abbaa3fcb893
+```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+```csv
+mspp_webfileid,mspp_name,mspp_contentdisposition@OData.Community.Display.V1.FormattedValue,mspp_contentdisposition,mspp_displayorder@OData.Community.Display.V1.FormattedValue,mspp_displayorder,mspp_excludefromsearch@OData.Community.Display.V1.FormattedValue,mspp_excludefromsearch,mspp_hiddenfromsitemap@OData.Community.Display.V1.FormattedValue,mspp_hiddenfromsitemap,_mspp_parentpageid_value@Microsoft.Dynamics.CRM.associatednavigationproperty,_mspp_parentpageid_value@Microsoft.Dynamics.CRM.lookuplogicalname,_mspp_parentpageid_value@OData.Community.Display.V1.FormattedValue,_mspp_parentpageid_value,mspp_partialurl,_mspp_publishingstateid_value@Microsoft.Dynamics.CRM.associatednavigationproperty,_mspp_publishingstateid_value@Microsoft.Dynamics.CRM.lookuplogicalname,_mspp_publishingstateid_value@OData.Community.Display.V1.FormattedValue,_mspp_publishingstateid_value,_mspp_websiteid_value@Microsoft.Dynamics.CRM.associatednavigationproperty,_mspp_websiteid_value@Microsoft.Dynamics.CRM.lookuplogicalname,_mspp_websiteid_value@OData.Community.Display.V1.FormattedValue,_mspp_websiteid_value,_mspp_createdby_value@Microsoft.Dynamics.CRM.lookuplogicalname,_mspp_createdby_value@OData.Community.Display.V1.FormattedValue,_mspp_createdby_value,_mspp_modifiedby_value@Microsoft.Dynamics.CRM.lookuplogicalname,_mspp_modifiedby_value@OData.Community.Display.V1.FormattedValue,_mspp_modifiedby_value,mspp_modifiedon@OData.Community.Display.V1.FormattedValue,mspp_modifiedon,mspp_createdon@OData.Community.Display.V1.FormattedValue,mspp_createdon,statecode,statuscode@OData.Community.Display.V1.FormattedValue,statuscode,mspp_title,mspp_displaydate,mspp_summary,mspp_cloudblobaddress,mspp_modifiedbyusername,mspp_alloworigin,mspp_expirationdate,mspp_createdbyipaddress,mspp_createdbyusername,mspp_modifiedbyipaddress,mspp_releasedate,_mspp_masterwebfileid_value
+3a081d91-5ea8-40a7-8ac9-abbaa3fcb893,theme.css,inline,756150000,9,9,Yes,1,No,0,mspp_parentpageid,mspp_webpage,Home,a3d84663-6409-4cce-a269-604a78287ecb,theme.css,mspp_publishingstateid,mspp_publishingstate,Published,ffefd269-446e-46aa-9379-92d1b2d323b8,mspp_websiteid,mspp_website,CLI 365 Website,5a9c900e-8d0e-422d-970f-cd3cf28252ed,systemuser,Shantha Kumar Thambidurai,5364ffa6-d185-ee11-8179-6045bd0027e0,systemuser,Shantha Kumar Thambidurai,5364ffa6-d185-ee11-8179-6045bd0027e0,4/12/2024 11:16 AM,2024-04-12T05:46:36Z,4/12/2024 11:16 AM,2024-04-12T05:46:19Z,0,Active,1,,,,,,,,,,,,
+```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+```md
+# pp website webfile get --environmentName "Default-d87a7535-dd31-4437-bfe1-95340acd55c5" --websiteId 3bbc8102-8ee7-4dac-afbb-807cc5b6f9c2 --id "3a081d91-5ea8-40a7-8ac9-abbaa3fcb893" --output md
+
+
+| Property                                                                             | Value                                |
+| ------------------------------------------------------------------------------------ | ------------------------------------ |
+| mspp\_webfileid                                                                      | 3a081d91-5ea8-40a7-8ac9-abbaa3fcb893 |
+| mspp\_name                                                                           | theme.css                            |
+| mspp\_contentdisposition@OData.Community.Display.V1.FormattedValue                   | inline                               |
+| mspp\_contentdisposition                                                             | 756150000                            |
+| mspp\_displayorder@OData.Community.Display.V1.FormattedValue                         | 9                                    |
+| mspp\_displayorder                                                                   | 9                                    |
+| mspp\_excludefromsearch@OData.Community.Display.V1.FormattedValue                    | Yes                                  |
+| mspp\_excludefromsearch                                                              | true                                 |
+| mspp\_hiddenfromsitemap@OData.Community.Display.V1.FormattedValue                    | No                                   |
+| mspp\_hiddenfromsitemap                                                              | false                                |
+| \_mspp\_parentpageid\_value@Microsoft.Dynamics.CRM.associatednavigationproperty      | mspp\_parentpageid                   |
+| \_mspp\_parentpageid\_value@Microsoft.Dynamics.CRM.lookuplogicalname                 | mspp\_webpage                        |
+| \_mspp\_parentpageid\_value@OData.Community.Display.V1.FormattedValue                | Home                                 |
+| \_mspp\_parentpageid\_value                                                          | a3d84663-6409-4cce-a269-604a78287ecb |
+| mspp\_partialurl                                                                     | theme.css                            |
+| \_mspp\_publishingstateid\_value@Microsoft.Dynamics.CRM.associatednavigationproperty | mspp\_publishingstateid              |
+| \_mspp\_publishingstateid\_value@Microsoft.Dynamics.CRM.lookuplogicalname            | mspp\_publishingstate                |
+| \_mspp\_publishingstateid\_value@OData.Community.Display.V1.FormattedValue           | Published                            |
+| \_mspp\_publishingstateid\_value                                                     | ffefd269-446e-46aa-9379-92d1b2d323b8 |
+| \_mspp\_websiteid\_value@Microsoft.Dynamics.CRM.associatednavigationproperty         | mspp\_websiteid                      |
+| \_mspp\_websiteid\_value@Microsoft.Dynamics.CRM.lookuplogicalname                    | mspp\_website                        |
+| \_mspp\_websiteid\_value@OData.Community.Display.V1.FormattedValue                   | CLI 365 Website  |
+| \_mspp\_websiteid\_value                                                             | 3bbc8102-8ee7-4dac-afbb-807cc5b6f9c2 |
+| \_mspp\_createdby\_value@Microsoft.Dynamics.CRM.lookuplogicalname                    | systemuser                           |
+| \_mspp\_createdby\_value@OData.Community.Display.V1.FormattedValue                   | Shantha Kumar Thambidurai            |
+| \_mspp\_createdby\_value                                                             | 5364ffa6-d185-ee11-8179-6045bd0027e0 |
+| \_mspp\_modifiedby\_value@Microsoft.Dynamics.CRM.lookuplogicalname                   | systemuser                           |
+| \_mspp\_modifiedby\_value@OData.Community.Display.V1.FormattedValue                  | Shantha Kumar Thambidurai            |
+| \_mspp\_modifiedby\_value                                                            | 5364ffa6-d185-ee11-8179-6045bd0027e0 |
+| mspp\_modifiedon@OData.Community.Display.V1.FormattedValue                           | 4/12/2024 11:16 AM                   |
+| mspp\_modifiedon                                                                     | 2024-04-12T05:46:36Z                 |
+| mspp\_createdon@OData.Community.Display.V1.FormattedValue                            | 4/12/2024 11:16 AM                   |
+| mspp\_createdon                                                                      | 2024-04-12T05:46:19Z                 |
+| statecode                                                                            | 0                                    |
+| statuscode@OData.Community.Display.V1.FormattedValue                                 | Active                               |
+| statuscode                                                                           | 1                                    |
+ 
+
+```
+
+  </TabItem>
+</Tabs>
