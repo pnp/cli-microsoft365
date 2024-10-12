@@ -18,6 +18,10 @@ describe(commands.USER_ENSURE, () => {
   const validUserName = 'john@contoso.com';
   const validEntraId = '2056d2f6-3257-4253-8cfc-b73393e414e5';
   const validWebUrl = 'https://contoso.sharepoint.com';
+  const validEntraGroupId = '2056d2f6-3257-4253-8cfc-b73393e414e5';
+  const validEntraGroupName = 'Finance';
+  const validEntraSecurityGroupName = 'EntraGroupTest';
+  const validLoginName = `i:0#.f|membership|${validUserName}`;
   const ensuredUserResponse = {
     Id: 35,
     IsHiddenInUI: false,
@@ -34,6 +38,102 @@ describe(commands.USER_ENSURE, () => {
       NameIdIssuer: 'urn:federation:microsoftonline'
     },
     UserPrincipalName: validUserName
+  };
+
+  const groupM365Response = {
+    value: [{
+      "id": "2056d2f6-3257-4253-8cfc-b73393e414e5",
+      "deletedDateTime": null,
+      "classification": null,
+      "createdDateTime": "2017-11-29T03:27:05Z",
+      "description": "This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more.",
+      "displayName": "Finance",
+      "groupTypes": [
+        "Unified"
+      ],
+      "mail": "finance@contoso.onmicrosoft.com",
+      "mailEnabled": true,
+      "mailNickname": "finance",
+      "onPremisesLastSyncDateTime": null,
+      "onPremisesProvisioningErrors": [],
+      "onPremisesSecurityIdentifier": null,
+      "onPremisesSyncEnabled": null,
+      "preferredDataLocation": null,
+      "proxyAddresses": [
+        "SMTP:finance@contoso.onmicrosoft.com"
+      ],
+      "renewedDateTime": "2017-11-29T03:27:05Z",
+      "securityEnabled": false,
+      "visibility": "Public"
+    }]
+  };
+
+  const ensuredGroupResponse = {
+    Id: 35,
+    IsHiddenInUI: false,
+    LoginName: `c:0o.c|federateddirectoryclaimprovider|${validEntraGroupId}`,
+    Title: validEntraGroupName,
+    PrincipalType: 4,
+    Email: 'finance@contoso.com',
+    Expiration: '',
+    IsEmailAuthenticationGuestUser: false,
+    IsShareByEmailGuestUser: false,
+    IsSiteAdmin: false,
+    UserId: null,
+    UserPrincipalName: null
+  };
+
+  const groupSecurityResponse = {
+    value: [{
+      "id": "2056d2f6-3257-4253-8cfc-b73393e414e5",
+      "deletedDateTime": null,
+      "classification": null,
+      "createdDateTime": "2024-01-27T16:02:56Z",
+      "creationOptions": [],
+      "description": "Entra Group Test",
+      "displayName": "EntraGroupTest",
+      "expirationDateTime": null,
+      "groupTypes": [],
+      "isAssignableToRole": true,
+      "mail": null,
+      "mailEnabled": false,
+      "mailNickname": "f45205a2-d",
+      "membershipRule": null,
+      "membershipRuleProcessingState": null,
+      "onPremisesDomainName": null,
+      "onPremisesLastSyncDateTime": null,
+      "onPremisesNetBiosName": null,
+      "onPremisesSamAccountName": null,
+      "onPremisesSecurityIdentifier": null,
+      "onPremisesSyncEnabled": null,
+      "preferredDataLocation": null,
+      "preferredLanguage": null,
+      "proxyAddresses": [],
+      "renewedDateTime": "2024-01-27T16:02:56Z",
+      "resourceBehaviorOptions": [],
+      "resourceProvisioningOptions": [],
+      "securityEnabled": true,
+      "securityIdentifier": "S-1-12-1-1968173404-1154184881-1694549896-3083850660",
+      "theme": null,
+      "visibility": "Private",
+      "onPremisesProvisioningErrors": [],
+      "serviceProvisioningErrors": []
+    }]
+  };
+
+  const ensuredSecurityGroupResponse = {
+    Id: 35,
+    IsHiddenInUI: false,
+    LoginName: `c:0t.c|tenant||${validEntraGroupId}`,
+    Title: validEntraGroupName,
+    PrincipalType: 4,
+    Email: null,
+    Expiration: '',
+    IsEmailAuthenticationGuestUser: false,
+    IsShareByEmailGuestUser: false,
+    IsSiteAdmin: false,
+    UserId: null,
+    UserPrincipalName: null
   };
 
   let log: any[];
@@ -68,6 +168,7 @@ describe(commands.USER_ENSURE, () => {
 
   afterEach(() => {
     sinonUtil.restore([
+      request.get,
       request.post,
       entraUser.getUpnByUserId
     ]);
@@ -133,6 +234,82 @@ describe(commands.USER_ENSURE, () => {
     assert(loggerLogSpy.calledWith(ensuredUserResponse));
   });
 
+  it('ensures user for a specific web by loginName', async () => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `${validWebUrl}/_api/web/ensureuser`) {
+        return ensuredUserResponse;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { verbose: true, webUrl: validWebUrl, loginName: validLoginName } });
+    assert(loggerLogSpy.calledWith(ensuredUserResponse));
+  });
+
+  it('ensures user for a specific web by entraGroupId', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${validEntraGroupId}`) {
+        return groupM365Response.value[0];
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `${validWebUrl}/_api/web/ensureuser`) {
+        return ensuredGroupResponse;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { verbose: true, webUrl: validWebUrl, entraGroupId: validEntraGroupId } });
+    assert(loggerLogSpy.calledWith(ensuredGroupResponse));
+  });
+
+  it('ensures security group for a specific web by entraGroupName', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${validEntraSecurityGroupName}'`) {
+        return groupSecurityResponse;
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `${validWebUrl}/_api/web/ensureuser`) {
+        return ensuredSecurityGroupResponse;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { verbose: true, webUrl: validWebUrl, entraGroupName: validEntraSecurityGroupName } });
+    assert(loggerLogSpy.calledWith(ensuredSecurityGroupResponse));
+  });
+
+  it('ensures user for a specific web by entraGroupName', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${validEntraGroupName}'`) {
+        return groupM365Response;
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `${validWebUrl}/_api/web/ensureuser`) {
+        return ensuredGroupResponse;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { verbose: true, webUrl: validWebUrl, entraGroupName: validEntraGroupName } });
+    assert(loggerLogSpy.calledWith(ensuredGroupResponse));
+  });
+
   it('throws error message when no user was found with a specific id', async () => {
     sinon.stub(entraUser, 'getUpnByUserId').callsFake(async (id) => {
       throw {
@@ -165,6 +342,7 @@ describe(commands.USER_ENSURE, () => {
         }
       }
     };
+
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `${validWebUrl}/_api/web/ensureuser`) {
         throw error;
@@ -196,6 +374,11 @@ describe(commands.USER_ENSURE, () => {
     assert.notStrictEqual(actual, true);
   });
 
+  it('fails validation if entraGroupId is not a valid id', async () => {
+    const actual = await command.validate({ options: { webUrl: validWebUrl, entraGroupId: 'invalid' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
   it('passes validation if the url is valid and entraId is a valid id', async () => {
     const actual = await command.validate({ options: { webUrl: validWebUrl, entraId: validEntraId } }, commandInfo);
     assert.strictEqual(actual, true);
@@ -208,6 +391,21 @@ describe(commands.USER_ENSURE, () => {
 
   it('passes validation if the url is valid and userName is a valid user principal name', async () => {
     const actual = await command.validate({ options: { webUrl: validWebUrl, userName: validUserName } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('passes validation if the url is valid and loginName is passed', async () => {
+    const actual = await command.validate({ options: { webUrl: validWebUrl, loginName: validLoginName } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('passes validation if the url is valid and entraGroupName is passed', async () => {
+    const actual = await command.validate({ options: { webUrl: validWebUrl, entraGroupName: validEntraGroupName } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('passes validation if the url is valid and entraGroupId is passed', async () => {
+    const actual = await command.validate({ options: { webUrl: validWebUrl, entraGroupId: validEntraGroupId } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 }); 
