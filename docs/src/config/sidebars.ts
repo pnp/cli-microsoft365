@@ -1801,7 +1801,7 @@ const sidebars: SidebarsConfig = {
           ]
         },
         {
-          card: [
+          website: [
             {
               type: 'doc',
               label: 'website webfile list',
