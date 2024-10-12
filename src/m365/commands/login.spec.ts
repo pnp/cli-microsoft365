@@ -22,6 +22,7 @@ describe(commands.LOGIN, () => {
   let commandInfo: CommandInfo;
   let commandOptionsSchema: z.ZodTypeAny;
   let config: Configstore;
+  let deactivateStub: sinon.SinonStub;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -52,7 +53,7 @@ describe(commands.LOGIN, () => {
         log.push(msg);
       }
     };
-    sinon.stub(auth.connection, 'deactivate').callsFake(() => { });
+    deactivateStub = sinon.stub(auth.connection, 'deactivate').callsFake(() => { });
     sinon.stub(auth, 'ensureAccessToken').callsFake(async () => {
       auth.connection.name = '028de82d-7fd9-476e-a9fd-be9714280ff3';
       auth.connection.identityName = 'alexw@contoso.com';
@@ -575,6 +576,413 @@ describe(commands.LOGIN, () => {
       })
     });
     assert.strictEqual(auth.connection.authType, AuthType.Browser, 'Incorrect authType set');
+  });
+
+  it(`doesn't start the login flow when the CLI is signed in`, async () => {
+    const future = new Date();
+    future.setSeconds(future.getSeconds() + 10);
+    Object.assign(auth.connection, {
+      active: true,
+      authType: AuthType.DeviceCode,
+      appId: '00000000-0000-0000-0000-000000000000',
+      tenant: '00000000-0000-0000-0000-000000000000'
+    });
+    auth.connection.accessTokens[auth.defaultResource] = {
+      expiresOn: future.toISOString(),
+      accessToken: 'abc'
+    };
+
+    await command.action(logger, {
+      options: commandOptionsSchema.parse({
+        appId: '00000000-0000-0000-0000-000000000000',
+        tenant: '00000000-0000-0000-0000-000000000000',
+        ensure: true
+      })
+    });
+
+    assert(deactivateStub.notCalled);
+  });
+
+  it(`doesn't start the login flow if the CLI is signed in as a user`, async () => {
+    const future = new Date();
+    future.setSeconds(future.getSeconds() + 10);
+    Object.assign(auth.connection, {
+      active: true,
+      authType: AuthType.Password,
+      userName: 'john.doe@contoso.com',
+      password: 'password',
+      appId: '00000000-0000-0000-0000-000000000000',
+      tenant: '00000000-0000-0000-0000-000000000000'
+    });
+    auth.connection.accessTokens[auth.defaultResource] = {
+      expiresOn: future.toISOString(),
+      accessToken: 'abc'
+    };
+
+    await command.action(logger, {
+      options: commandOptionsSchema.parse({
+        appId: '00000000-0000-0000-0000-000000000000',
+        tenant: '00000000-0000-0000-0000-000000000000',
+        ensure: true,
+        authType: 'password',
+        userName: 'john.doe@contoso.com',
+        password: 'password'
+      })
+    });
+
+    assert(deactivateStub.notCalled);
+  });
+
+  it(`doesn't start the login flow if the CLI is signed in using a certificate`, async () => {
+    const future = new Date();
+    future.setSeconds(future.getSeconds() + 10);
+    Object.assign(auth.connection, {
+      active: true,
+      authType: AuthType.Certificate,
+      certificate: 'certificate',
+      appId: '00000000-0000-0000-0000-000000000000',
+      tenant: '00000000-0000-0000-0000-000000000000'
+    });
+    auth.connection.accessTokens[auth.defaultResource] = {
+      expiresOn: future.toISOString(),
+      accessToken: 'abc'
+    };
+
+    sinon.stub(fs, 'existsSync').returns(true);
+    sinon.stub(fs, 'readFileSync').returns('certificate');
+
+    await command.action(logger, {
+      options: commandOptionsSchema.parse({
+        appId: '00000000-0000-0000-0000-000000000000',
+        tenant: '00000000-0000-0000-0000-000000000000',
+        ensure: true,
+        authType: 'certificate',
+        certificateFile: 'certificate'
+      })
+    });
+
+    assert(deactivateStub.notCalled);
+  });
+
+  it(`doesn't start the login flow if the CLI is signed in using the specified app and to the specified tenant`, async () => {
+    const future = new Date();
+    future.setSeconds(future.getSeconds() + 10);
+    Object.assign(auth.connection, {
+      active: true,
+      authType: AuthType.DeviceCode,
+      appId: '1cf21ca6-c8f0-4a21-839d-68a09d3a0f55',
+      tenant: '973fce64-6409-4843-9328-c2cef0427f4e'
+    });
+    auth.connection.accessTokens[auth.defaultResource] = {
+      expiresOn: future.toISOString(),
+      accessToken: 'abc'
+    };
+
+    await command.action(logger, {
+      options: commandOptionsSchema.parse({
+        appId: '1cf21ca6-c8f0-4a21-839d-68a09d3a0f55',
+        tenant: '973fce64-6409-4843-9328-c2cef0427f4e',
+        ensure: true,
+        authType: 'deviceCode'
+      })
+    });
+
+    assert(deactivateStub.notCalled);
+  });
+
+  it(`starts the login flow again when using a different auth type`, async () => {
+    const future = new Date();
+    future.setSeconds(future.getSeconds() + 10);
+    Object.assign(auth.connection, {
+      active: true,
+      authType: AuthType.Password,
+      appId: '00000000-0000-0000-0000-000000000000',
+      tenant: '00000000-0000-0000-0000-000000000000',
+      userName: 'user@contoso.com',
+      password: 'pass@word1'
+    });
+    auth.connection.accessTokens[auth.defaultResource] = {
+      expiresOn: future.toISOString(),
+      accessToken: 'abc'
+    };
+
+    await command.action(logger, {
+      options: commandOptionsSchema.parse({
+        appId: '00000000-0000-0000-0000-000000000000',
+        tenant: '00000000-0000-0000-0000-000000000000',
+        ensure: true,
+        authType: 'identity',
+        userName: 'ac9fbed5-804c-4362-a369-21a4ec51109e'
+      })
+    });
+
+    assert(deactivateStub.called);
+  });
+
+  it(`starts the login flow again when using a different cloud type`, async () => {
+    const future = new Date();
+    future.setSeconds(future.getSeconds() + 10);
+    Object.assign(auth.connection, {
+      active: true,
+      authType: AuthType.DeviceCode,
+      appId: '00000000-0000-0000-0000-000000000000',
+      tenant: '00000000-0000-0000-0000-000000000000',
+      cloudType: CloudType.Public
+    });
+    auth.connection.accessTokens[auth.defaultResource] = {
+      expiresOn: future.toISOString(),
+      accessToken: 'abc'
+    };
+
+    await command.action(logger, {
+      options: commandOptionsSchema.parse({
+        appId: '00000000-0000-0000-0000-000000000000',
+        tenant: '00000000-0000-0000-0000-000000000000',
+        ensure: true,
+        cloud: 'USGov'
+      })
+    });
+
+    assert(deactivateStub.called);
+  });
+
+  it(`starts the login flow again when using a different app id`, async () => {
+    const future = new Date();
+    future.setSeconds(future.getSeconds() + 10);
+    Object.assign(auth.connection, {
+      active: true,
+      cloudType: CloudType.Public,
+      appId: '1cf21ca6-c8f0-4a21-839d-68a09d3a0f55',
+      tenant: '00000000-0000-0000-0000-000000000000'
+    });
+    auth.connection.accessTokens[auth.defaultResource] = {
+      expiresOn: future.toISOString(),
+      accessToken: 'abc'
+    };
+
+    await command.action(logger, {
+      options: commandOptionsSchema.parse({
+        appId: 'b059efda-fc9d-49ec-b585-283f5b26202e',
+        tenant: '00000000-0000-0000-0000-000000000000',
+        ensure: true
+      })
+    });
+
+    assert(deactivateStub.called);
+  });
+
+  it(`starts the login flow again when using a different tenant id`, async () => {
+    const future = new Date();
+    future.setSeconds(future.getSeconds() + 10);
+    Object.assign(auth.connection, {
+      active: true,
+      appId: '1cf21ca6-c8f0-4a21-839d-68a09d3a0f55',
+      tenant: '973fce64-6409-4843-9328-c2cef0427f4e'
+    });
+    auth.connection.accessTokens[auth.defaultResource] = {
+      expiresOn: future.toISOString(),
+      accessToken: 'abc'
+    };
+
+    await command.action(logger, {
+      options: commandOptionsSchema.parse({
+        appId: '1cf21ca6-c8f0-4a21-839d-68a09d3a0f55',
+        tenant: '7f7993c9-ae48-413a-ae6b-d816a669f602',
+        ensure: true
+      })
+    });
+
+    assert(deactivateStub.called);
+  });
+
+  it(`starts the login flow again when using a different username and authType password`, async () => {
+    const future = new Date();
+    future.setSeconds(future.getSeconds() + 10);
+    Object.assign(auth.connection, {
+      active: true,
+      authType: AuthType.Password,
+      userName: 'user@contoso.com',
+      password: 'password',
+      appId: '00000000-0000-0000-0000-000000000000',
+      tenant: '00000000-0000-0000-0000-000000000000'
+    });
+    auth.connection.accessTokens[auth.defaultResource] = {
+      expiresOn: future.toISOString(),
+      accessToken: 'abc'
+    };
+
+    await command.action(logger, {
+      options: commandOptionsSchema.parse({
+        appId: '00000000-0000-0000-0000-000000000000',
+        tenant: '00000000-0000-0000-0000-000000000000',
+        ensure: true,
+        authType: 'password',
+        userName: 'user1@contoso.com',
+        password: 'password'
+      })
+    });
+
+    assert(deactivateStub.called);
+  });
+
+  it(`starts the login flow again when using a different certificate file`, async () => {
+    const future = new Date();
+    future.setSeconds(future.getSeconds() + 10);
+    Object.assign(auth.connection, {
+      active: true,
+      authType: AuthType.Certificate,
+      certificate: 'certificate',
+      appId: '00000000-0000-0000-0000-000000000000',
+      tenant: '00000000-0000-0000-0000-000000000000'
+    });
+    auth.connection.accessTokens[auth.defaultResource] = {
+      expiresOn: future.toISOString(),
+      accessToken: 'abc'
+    };
+
+    sinon.stub(fs, 'existsSync').returns(true);
+    sinon.stub(fs, 'readFileSync').returns('certificate1');
+
+    await command.action(logger, {
+      options: commandOptionsSchema.parse({
+        appId: '00000000-0000-0000-0000-000000000000',
+        tenant: '00000000-0000-0000-0000-000000000000',
+        ensure: true,
+        authType: 'certificate',
+        certificateFile: 'certificate'
+      })
+    });
+
+    assert(deactivateStub.called);
+  });
+
+  it(`starts the login flow again when using a different username and authType identity`, async () => {
+    const future = new Date();
+    future.setSeconds(future.getSeconds() + 10);
+    Object.assign(auth.connection, {
+      active: true,
+      authType: AuthType.Identity,
+      userName: 'ac9fbed5-804c-4362-a369-21a4ec51109e',
+      appId: '00000000-0000-0000-0000-000000000000',
+      tenant: '00000000-0000-0000-0000-000000000000'
+    });
+    auth.connection.accessTokens[auth.defaultResource] = {
+      expiresOn: future.toISOString(),
+      accessToken: 'abc'
+    };
+
+    await command.action(logger, {
+      options: commandOptionsSchema.parse({
+        appId: '00000000-0000-0000-0000-000000000000',
+        tenant: '00000000-0000-0000-0000-000000000000',
+        ensure: true,
+        authType: 'identity',
+        userName: '1cf21ca6-c8f0-4a21-839d-68a09d3a0f55'
+      })
+    });
+
+    assert(deactivateStub.called);
+  });
+
+  it(`starts the login flow again when using a different secret`, async () => {
+    const future = new Date();
+    future.setSeconds(future.getSeconds() + 10);
+    Object.assign(auth.connection, {
+      active: true,
+      authType: AuthType.Secret,
+      secret: 'topSeCr3t@007',
+      appId: '00000000-0000-0000-0000-000000000000',
+      tenant: '00000000-0000-0000-0000-000000000000'
+    });
+    auth.connection.accessTokens[auth.defaultResource] = {
+      expiresOn: future.toISOString(),
+      accessToken: 'abc'
+    };
+
+    await command.action(logger, {
+      options: commandOptionsSchema.parse({
+        appId: '00000000-0000-0000-0000-000000000000',
+        tenant: '00000000-0000-0000-0000-000000000000',
+        ensure: true,
+        authType: 'secret',
+        secret: 'topSeCr3t@008'
+      })
+    });
+
+    assert(deactivateStub.called);
+  });
+
+  it(`starts the login flow when the access token expired (Date)`, async () => {
+    const past = new Date();
+    past.setSeconds(past.getSeconds() - 1);
+    Object.assign(auth.connection, {
+      active: true,
+      authType: AuthType.DeviceCode,
+      appId: '00000000-0000-0000-0000-000000000000',
+      tenant: '00000000-0000-0000-0000-000000000000'
+    });
+    auth.connection.accessTokens[auth.defaultResource] = {
+      expiresOn: past,
+      accessToken: 'abc'
+    };
+
+    await command.action(logger, {
+      options: commandOptionsSchema.parse({
+        appId: '00000000-0000-0000-0000-000000000000',
+        tenant: '00000000-0000-0000-0000-000000000000',
+        ensure: true
+      })
+    });
+
+    assert(deactivateStub.called);
+  });
+
+  it(`starts the login flow when the access token expired (string)`, async () => {
+    const past = new Date();
+    past.setSeconds(past.getSeconds() - 1);
+    Object.assign(auth.connection, {
+      active: true,
+      authType: AuthType.DeviceCode,
+      appId: '00000000-0000-0000-0000-000000000000',
+      tenant: '00000000-0000-0000-0000-000000000000'
+    });
+    auth.connection.accessTokens[auth.defaultResource] = {
+      expiresOn: past.toISOString(),
+      accessToken: 'abc'
+    };
+
+    await command.action(logger, {
+      options: commandOptionsSchema.parse({
+        appId: '00000000-0000-0000-0000-000000000000',
+        tenant: '00000000-0000-0000-0000-000000000000',
+        ensure: true
+      })
+    });
+
+    assert(deactivateStub.called);
+  });
+
+  it(`starts the login flow when the access token has no expiration date (null)`, async () => {
+    Object.assign(auth.connection, {
+      active: true,
+      authType: AuthType.DeviceCode,
+      appId: '00000000-0000-0000-0000-000000000000',
+      tenant: '00000000-0000-0000-0000-000000000000'
+    });
+    auth.connection.accessTokens[auth.defaultResource] = {
+      expiresOn: null,
+      accessToken: 'abc'
+    };
+
+    await command.action(logger, {
+      options: commandOptionsSchema.parse({
+        appId: '00000000-0000-0000-0000-000000000000',
+        tenant: '00000000-0000-0000-0000-000000000000',
+        ensure: true
+      })
+    });
+
+    assert(deactivateStub.called);
   });
 
   it('correctly handles error when clearing persisted auth information', async () => {

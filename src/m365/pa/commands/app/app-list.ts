@@ -81,14 +81,8 @@ class PaAppListCommand extends PowerAppsCommand {
         apps.forEach(a => {
           a.displayName = a.properties.displayName;
         });
-
-        await logger.log(apps);
       }
-      else {
-        if (this.verbose) {
-          await logger.logToStderr('No apps found');
-        }
-      }
+      await logger.log(apps);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);

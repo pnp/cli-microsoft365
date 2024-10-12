@@ -31,9 +31,8 @@ class FlowEnvironmentListCommand extends PowerAutomateCommand {
             e.displayName = e.properties.displayName;
           });
         }
-
-        await logger.log(res);
       }
+      await logger.log(res);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);

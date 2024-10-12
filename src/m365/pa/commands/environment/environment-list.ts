@@ -36,9 +36,9 @@ class PaEnvironmentListCommand extends PowerAppsCommand {
         res.value.forEach(e => {
           e.displayName = e.properties.displayName;
         });
-
-        await logger.log(res.value);
       }
+
+      await logger.log(res.value);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);

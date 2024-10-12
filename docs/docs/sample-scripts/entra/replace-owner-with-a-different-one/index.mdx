@@ -72,7 +72,7 @@ Find all the Microsoft 365 Groups that a user is an Owner of and replace them wi
               Write-Host "Found $oldUser" -ForegroundColor Green
               try {
                   Write-Host "Granting $newUser owner rights"
-                  m365 entra m365group user add --groupId $group.id --userName $newUser --role Owner | Get-CLIValue
+                  m365 entra m365group user add --groupId $group.id --userNames $newUser --role Owner | Get-CLIValue
               }
               catch  {
                   Write-Host $_.Exception.Message -ForegroundColor White

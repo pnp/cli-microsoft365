@@ -117,7 +117,7 @@ describe(commands.ENVIRONMENT_LIST, () => {
     });
 
     await command.action(logger, { options: {} });
-    assert(loggerLogSpy.notCalled);
+    assert(loggerLogSpy.calledOnceWithExactly([]));
   });
 
   it('correctly handles API OData error', async () => {

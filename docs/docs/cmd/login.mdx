@@ -47,6 +47,9 @@ m365 login [options]
 
 `--connectionName [connectionName]`
 : Specify an optional name to make switching between connections easier.
+
+`--ensure`
+: Ensures that the user is signed in. if the user isn't signed in, it initiates the login flow
 ```
 
 <Global />
@@ -188,6 +191,12 @@ Log in to Microsoft 365 using a client secret.
 
 ```sh
 m365 login --authType secret --secret topSeCr3t@007
+```
+
+Ensures that the user is signed in, initiates the login flow if the user isn't signed in
+
+```sh
+m365 login --ensure
 ```
 
 ## Response

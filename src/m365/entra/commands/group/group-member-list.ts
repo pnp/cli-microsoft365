@@ -15,7 +15,7 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   groupId?: string;
-  groupDisplayName?: string;
+  groupName?: string;
   role?: string;
   properties?: string;
   filter?: string;
@@ -25,13 +25,13 @@ interface ExtendedUser extends User {
   roles: string[];
 }
 
-class EntraGroupUserListCommand extends GraphCommand {
+class EntraGroupMemberListCommand extends GraphCommand {
   public get name(): string {
-    return commands.GROUP_USER_LIST;
+    return commands.GROUP_MEMBER_LIST;
   }
 
   public get description(): string {
-    return 'Lists users of a specific Entra group';
+    return 'Lists members of a specific Entra group';
   }
 
   public alias(): string[] | undefined {
@@ -55,7 +55,7 @@ class EntraGroupUserListCommand extends GraphCommand {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
         groupId: typeof args.options.groupId !== 'undefined',
-        groupDisplayName: typeof args.options.groupDisplayName !== 'undefined',
+        groupName: typeof args.options.groupName !== 'undefined',
         role: typeof args.options.role !== 'undefined',
         properties: typeof args.options.properties !== 'undefined',
         filter: typeof args.options.filter !== 'undefined'
@@ -69,7 +69,7 @@ class EntraGroupUserListCommand extends GraphCommand {
         option: "-i, --groupId [groupId]"
       },
       {
-        option: "-n, --groupDisplayName [groupDisplayName]"
+        option: "-n, --groupName [groupName]"
       },
       {
         option: "-r, --role [role]",
@@ -87,7 +87,7 @@ class EntraGroupUserListCommand extends GraphCommand {
   #initOptionSets(): void {
     this.optionSets.push(
       {
-        options: ['groupId', 'groupDisplayName']
+        options: ['groupId', 'groupName']
       }
     );
   }
@@ -111,7 +111,7 @@ class EntraGroupUserListCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    await this.showDeprecationWarning(logger, aadCommands.GROUP_USER_LIST, commands.GROUP_USER_LIST);
+    await this.showDeprecationWarning(logger, aadCommands.GROUP_USER_LIST, commands.GROUP_MEMBER_LIST);
 
     try {
       const groupId = await this.getGroupId(args.options, logger);
@@ -154,7 +154,7 @@ class EntraGroupUserListCommand extends GraphCommand {
       await logger.logToStderr('Retrieving Group Id...');
     }
 
-    return await entraGroup.getGroupIdByDisplayName(options.groupDisplayName!);
+    return await entraGroup.getGroupIdByDisplayName(options.groupName!);
   }
 
   private async getUsers(options: Options, role: string, groupId: string, logger: Logger): Promise<ExtendedUser[]> {
@@ -181,7 +181,7 @@ class EntraGroupUserListCommand extends GraphCommand {
 
     const expandParam = fieldExpand.length > 0 ? `&$expand=${fieldExpand}` : '';
     const selectParam = allSelectProperties.filter(item => !item.includes('/'));
-    const endpoint: string = `${this.resource}/v1.0/groups/${groupId}/${role}/microsoft.graph.user?$select=${selectParam}${expandParam}`;
+    const endpoint: string = `${this.resource}/v1.0/groups/${groupId}/${role}?$select=${selectParam}${expandParam}`;
 
     let users: ExtendedUser[] = [];
 
@@ -207,4 +207,4 @@ class EntraGroupUserListCommand extends GraphCommand {
   }
 }
 
-export default new EntraGroupUserListCommand();
+export default new EntraGroupMemberListCommand();
