@@ -109,11 +109,13 @@ class SpoListItemBatchRemoveCommand extends SpoCommand {
           const fileContent = fs.readFileSync(args.options.filePath, 'utf-8');
           const jsonContent: any[] = formatting.parseCsvToJson(fileContent);
 
-          if (!jsonContent[0].hasOwnProperty('ID')) {
+          const idRow = Object.keys(jsonContent[0]).find(key => key.toLowerCase() === 'id');
+
+          if (!idRow) {
             return `The file does not contain the required header row with the column name 'ID'.`;
           }
 
-          const nonNumbers = jsonContent.filter(element => isNaN(Number(element['ID'].toString().trim()))).map(element => element['ID']);
+          const nonNumbers = jsonContent.filter(element => isNaN(Number(element[idRow].toString().trim()))).map(element => element[idRow]);
 
           if (nonNumbers.length > 0) {
             return `The specified ids '${nonNumbers.join(', ')}' are invalid numbers.`;
@@ -167,7 +169,10 @@ class SpoListItemBatchRemoveCommand extends SpoCommand {
         if (args.options.filePath) {
           const csvContent = fs.readFileSync(args.options.filePath, 'utf-8');
           const jsonContent = formatting.parseCsvToJson(csvContent);
-          idsToRemove = jsonContent.map((item: { ID: string }) => item['ID']);
+
+          const idRow = Object.keys(jsonContent[0]).find(key => key.toLowerCase() === 'id');
+
+          idsToRemove = idRow && jsonContent.map((item: any) => item[idRow]);
         }
         else {
           idsToRemove = formatting.splitAndTrim(args.options.ids!);
