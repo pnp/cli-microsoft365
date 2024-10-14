@@ -17,6 +17,7 @@ export interface Options extends GlobalOptions {
   id?: string;
   url?: string;
   recycle?: boolean;
+  bypassSharedLock?: boolean;
   force?: boolean;
 }
 
@@ -49,6 +50,7 @@ class SpoFileRemoveCommand extends SpoCommand {
         id: typeof args.options.id !== 'undefined',
         url: typeof args.options.url !== 'undefined',
         recycle: !!args.options.recycle,
+        bypassSharedLock: !!args.options.bypassSharedLock,
         force: !!args.options.force
       });
     });
@@ -67,6 +69,9 @@ class SpoFileRemoveCommand extends SpoCommand {
       },
       {
         option: '--recycle'
+      },
+      {
+        option: '--bypassSharedLock'
       },
       {
         option: '-f, --force'
@@ -98,7 +103,7 @@ class SpoFileRemoveCommand extends SpoCommand {
 
   #initTypes(): void {
     this.types.string.push('webUrl', 'id', 'url');
-    this.types.boolean.push('recycle', 'force');
+    this.types.boolean.push('recycle', 'bypassSharedLock', 'force');
   }
 
   protected getExcludedOptionsWithUrls(): string[] | undefined {
@@ -135,6 +140,10 @@ class SpoFileRemoveCommand extends SpoCommand {
         },
         responseType: 'json'
       };
+
+      if (args.options.bypassSharedLock) {
+        requestOptions.headers!.Prefer = 'bypass-shared-lock';
+      }
 
       try {
         await request.post(requestOptions);
