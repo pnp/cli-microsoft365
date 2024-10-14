@@ -320,6 +320,51 @@ describe(commands.FIELD_GET, () => {
     assert.strictEqual(getStub.lastCall.args[0].url, 'https://contoso.sharepoint.com/sites/portal/_api/web/lists(guid\'03e45e84-1992-4d42-9116-26f756012634\')/fields/getbyinternalnameortitle(\'Title\')');
   });
 
+  it('should call the correct GET url when field internalName and list title specified (verbose)', async () => {
+    const getStub = sinon.stub(request, 'get').callsFake(async (opts) => {
+      if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
+        return {
+          "Id": "03e45e84-1992-4d42-9116-26f756012634"
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { debug: true, verbose: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', internalName: 'Title', listTitle: 'Documents' } });
+    assert.strictEqual(getStub.lastCall.args[0].url, 'https://contoso.sharepoint.com/sites/portal/_api/web/lists/getByTitle(\'Documents\')/fields/getbyinternalnameortitle(\'Title\')');
+  });
+
+  it('should call the correct GET url when field internalName and list title specified', async () => {
+    const getStub = sinon.stub(request, 'get').callsFake(async (opts) => {
+      if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
+        return {
+          "Id": "03e45e84-1992-4d42-9116-26f756012634"
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/portal', internalName: 'Title', listTitle: 'Documents' } });
+    assert.strictEqual(getStub.lastCall.args[0].url, 'https://contoso.sharepoint.com/sites/portal/_api/web/lists/getByTitle(\'Documents\')/fields/getbyinternalnameortitle(\'Title\')');
+  });
+
+  it('should call the correct GET url when field internalName and list url specified', async () => {
+    const getStub = sinon.stub(request, 'get').callsFake(async (opts) => {
+      if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
+        return {
+          "Id": "03e45e84-1992-4d42-9116-26f756012634"
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', internalName: 'Title', listId: '03e45e84-1992-4d42-9116-26f756012634' } });
+    assert.strictEqual(getStub.lastCall.args[0].url, 'https://contoso.sharepoint.com/sites/portal/_api/web/lists(guid\'03e45e84-1992-4d42-9116-26f756012634\')/fields/getbyinternalnameortitle(\'Title\')');
+  });
+
   it('correctly handles site column not found', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/fields/getbyid('03e45e84-1992-4d42-9116-26f756012634')`) > -1) {
