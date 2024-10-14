@@ -552,6 +552,23 @@ describe(commands.FILE_REMOVE, () => {
     assert(correctRequestIssued);
   });
 
+  it('correctly bypasses a shared lock', async () => {
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/_api/web/GetFileByServerRelativePath(DecodedUrl='%2F0cd891ef-afce-4e55-b836-fce03286cccf')`) {
+        if (opts.headers &&
+          opts.headers.accept &&
+          opts.headers.accept === 'application/json;odata=nometadata') {
+          return;
+        }
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com', url: '0cd891ef-afce-4e55-b836-fce03286cccf', force: true, bypassSharedLock: true } });
+    assert.deepStrictEqual(postStub.firstCall.args[0].headers?.Prefer, 'bypass-shared-lock');
+  });
+
   it('command correctly handles file remove reject request', async () => {
     const err = 'An error has occurred';
     const error = {
