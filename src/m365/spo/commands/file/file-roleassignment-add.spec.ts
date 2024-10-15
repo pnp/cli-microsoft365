@@ -14,6 +14,7 @@ import commands from '../../commands.js';
 import command from './file-roleassignment-add.js';
 import { settingsNames } from '../../../../settingsNames.js';
 import { spo } from '../../../../utils/spo.js';
+import { entraGroup } from '../../../../utils/entraGroup.js';
 
 describe(commands.FILE_ROLEASSIGNMENT_ADD, () => {
   const webUrl = 'https://contoso.sharepoint.com/sites/project-x';
@@ -119,6 +120,21 @@ describe(commands.FILE_ROLEASSIGNMENT_ADD, () => {
     UserPrincipalName: 'someaccount@tenant.onmicrosoft.com'
   };
 
+  const entraGroupResponse = {
+    Id: 15,
+    IsHiddenInUI: false,
+    LoginName: 'c:0o.c|federateddirectoryclaimprovider|27ae47f1-48f1-46f3-980b-d3c1470e398d',
+    Title: 'Marketing members',
+    PrincipalType: 1,
+    Email: '',
+    Expiration: '',
+    IsEmailAuthenticationGuestUser: false,
+    IsShareByEmailGuestUser: false,
+    IsSiteAdmin: false,
+    UserId: null,
+    UserPrincipalName: null
+  };
+
   const groupResponse = {
     Id: 5,
     IsHiddenInUI: false,
@@ -134,11 +150,56 @@ describe(commands.FILE_ROLEASSIGNMENT_ADD, () => {
     RequestToJoinLeaveEmailSetting: null
   };
 
+  const graphGroup = {
+    id: '27ae47f1-48f1-46f3-980b-d3c1470e398d',
+    deletedDateTime: null,
+    classification: null,
+    createdDateTime: '2024-03-22T20:18:37Z',
+    creationOptions: [],
+    description: null,
+    displayName: 'Marketing',
+    expirationDateTime: null,
+    groupTypes: [
+      'Unified'
+    ],
+    isAssignableToRole: null,
+    mail: 'Marketing@milanhdev.onmicrosoft.com',
+    mailEnabled: true,
+    mailNickname: 'Marketing',
+    membershipRule: null,
+    membershipRuleProcessingState: null,
+    onPremisesDomainName: null,
+    onPremisesLastSyncDateTime: null,
+    onPremisesNetBiosName: null,
+    onPremisesSamAccountName: null,
+    onPremisesSecurityIdentifier: null,
+    onPremisesSyncEnabled: null,
+    preferredDataLocation: null,
+    preferredLanguage: null,
+    proxyAddresses: [
+      'SPO:SPO_de7704ba-415d-4dd0-9bbd-fa565007a87e@SPO_18c58817-3bc9-489d-ac63-f7264fb357e5',
+      'SMTP:Marketing@milanhdev.onmicrosoft.com'
+    ],
+    renewedDateTime: '2024-03-22T20:18:37Z',
+    resourceBehaviorOptions: [],
+    resourceProvisioningOptions: [],
+    securityEnabled: true,
+    securityIdentifier: 'S-1-12-1-665733105-1190349041-3268610968-2369326662',
+    theme: null,
+    uniqueName: null,
+    visibility: 'Private',
+    onPremisesProvisioningErrors: [],
+    serviceProvisioningErrors: []
+  };
+
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
+    sinon.stub(entraGroup, 'getGroupById').withArgs(graphGroup.id).resolves(graphGroup);
+    sinon.stub(entraGroup, 'getGroupByDisplayName').withArgs(graphGroup.displayName).resolves(graphGroup);
+    sinon.stub(spo, 'ensureEntraGroup').withArgs(webUrl, graphGroup).resolves(entraGroupResponse);
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
   });
@@ -165,6 +226,7 @@ describe(commands.FILE_ROLEASSIGNMENT_ADD, () => {
       spo.getGroupByName,
       spo.getUserByEmail,
       spo.getFileById,
+      spo.ensureUser,
       cli.getSettingWithDefaultValue
     ]);
   });
@@ -189,6 +251,11 @@ describe(commands.FILE_ROLEASSIGNMENT_ADD, () => {
 
   it('fails validation if the fileId option is not a valid GUID', async () => {
     const actual = await command.validate({ options: { webUrl: webUrl, fileId: 'foo', groupName: 'Group name A', roleDefinitionName: 'Read' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if the entraGroupId option is not a valid GUID', async () => {
+    const actual = await command.validate({ options: { webUrl: webUrl, fileId: fileId, entraGroupId: 'Invalid Guid', roleDefinitionName: 'Read' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
@@ -338,6 +405,46 @@ describe(commands.FILE_ROLEASSIGNMENT_ADD, () => {
         webUrl: webUrl,
         fileUrl: fileUrl,
         groupName: 'Group A',
+        roleDefinitionId: 1073741827
+      }
+    });
+  });
+
+  it('correctly adds role assignments for a Microsoft Entra group specified by ID', async () => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url as string === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFileByServerRelativePath(DecodedUrl='%2Fsites%2Fproject-x%2Fdocuments%2FTest1.docx')/ListItemAllFields/roleassignments/addroleassignment(principalid='15',roledefid='1073741827')`) {
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options: {
+        verbose: true,
+        webUrl: 'https://contoso.sharepoint.com/sites/project-x',
+        fileUrl: fileUrl,
+        entraGroupId: graphGroup.id,
+        roleDefinitionId: 1073741827
+      }
+    });
+  });
+
+  it('correctly adds role assignments for a Microsoft Entra group specified by display name', async () => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url as string === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFileByServerRelativePath(DecodedUrl='%2Fsites%2Fproject-x%2Fdocuments%2FTest1.docx')/ListItemAllFields/roleassignments/addroleassignment(principalid='15',roledefid='1073741827')`) {
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options: {
+        verbose: true,
+        webUrl: 'https://contoso.sharepoint.com/sites/project-x',
+        fileUrl: fileUrl,
+        entraGroupName: graphGroup.displayName,
         roleDefinitionId: 1073741827
       }
     });
