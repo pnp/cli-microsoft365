@@ -23,7 +23,7 @@ m365 spo list remove [options]
 : Title of the list to remove. Specify either `id` or `title` but not both.
 
 `--recycle`
-: Recycle the list
+: Instead of permanently deleting, send the list to the recycle bin.
 
 `-f, --force`
 : Don't prompt for confirming removing the list.
@@ -45,7 +45,7 @@ Remove the list with a specific title located in a specific site.
 m365 spo list remove --webUrl https://contoso.sharepoint.com/sites/project-x --title 'List 1'
 ```
 
-Remove the list with a specific ID located in a specific site and send it to recycle bin
+Remove a list specified by id by sending it to the recycle bin instead of permanently removing it
 
 ```sh
 m365 spo list remove --webUrl https://contoso.sharepoint.com/sites/project-x --id 0cd891ef-afce-4e55-b836-fce03286cccf --recycle

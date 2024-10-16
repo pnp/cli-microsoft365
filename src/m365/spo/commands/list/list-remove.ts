@@ -33,6 +33,7 @@ class SpoListRemoveCommand extends SpoCommand {
 
     this.#initTelemetry();
     this.#initOptions();
+    this.#initTypes();
     this.#initValidators();
     this.#initOptionSets();
   }
@@ -40,10 +41,10 @@ class SpoListRemoveCommand extends SpoCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        id: (!(!args.options.id)).toString(),
-        title: (!(!args.options.title)).toString(),
-        force: (!(!args.options.force)).toString(),
-        recycle: (!(!args.options.recycle)).toString()
+        id: typeof args.options.id !== 'undefined',
+        title: typeof args.options.title !== 'undefined',
+        force: !!args.options.force,
+        recycle: !!args.options.recycle
       });
     });
   }
@@ -90,6 +91,11 @@ class SpoListRemoveCommand extends SpoCommand {
     this.optionSets.push({ options: ['id', 'title'] });
   }
 
+  #initTypes(): void {
+    this.types.string.push('id', 'title', 'webUrl');
+    this.types.boolean.push('force', 'recycle');
+  }
+
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const removeList = async (): Promise<void> => {
       if (this.verbose) {
@@ -106,7 +112,7 @@ class SpoListRemoveCommand extends SpoCommand {
       }
 
       if (args.options.recycle) {
-        requestUrl += `/recycle()`;
+        requestUrl += `/recycle`;
       }
 
       const requestOptions: CliRequestOptions = {
