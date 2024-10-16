@@ -138,10 +138,13 @@ class EntraM365GroupUserRemoveCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const groupId: string = (typeof args.options.groupId !== 'undefined') ? args.options.groupId : args.options.teamId as string;
+    if (args.options.userName) {
+      await this.warn(logger, `Option 'userName' is deprecated. Please use 'ids' or 'userNames' instead.`);
+    }
 
     const removeUser = async (): Promise<void> => {
       try {
+        const groupId: string = await this.getGroupId(logger, args.options.groupId, args.options.teamId, args.options.groupName, args.options.teamName);
         const isUnifiedGroup = await entraGroup.isUnifiedGroup(groupId);
 
         if (!isUnifiedGroup) {
@@ -169,6 +172,20 @@ class EntraM365GroupUserRemoveCommand extends GraphCommand {
         await removeUser();
       }
     }
+  }
+
+  private async getGroupId(logger: Logger, groupId?: string, teamId?: string, groupName?: string, teamName?: string): Promise<string> {
+    const id = groupId || teamId;
+    if (id) {
+      return id;
+    }
+
+    const name = groupName ?? teamName;
+    if (this.verbose) {
+      await logger.logToStderr(`Retrieving Group ID by display name ${name}...`);
+    }
+
+    return entraGroup.getGroupIdByDisplayName(name!);
   }
 
   private async getUserIds(logger: Logger, userIds?: string, userNames?: string): Promise<string[]> {
