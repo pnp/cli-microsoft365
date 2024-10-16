@@ -49,13 +49,13 @@ You can remove users from a Microsoft 365 Group or Microsoft Teams team if you a
 Removes user from the specified Microsoft 365 Group.
 
 ```sh
-m365 entra m365group user remove --groupId '5b8e4cb1-ea40-484b-a94e-02a4313fefb4' --userName 'anne.matthews@contoso.onmicrosoft.com'
+m365 entra m365group user remove --groupId '5b8e4cb1-ea40-484b-a94e-02a4313fefb4' --userNames 'anne.matthews@contoso.onmicrosoft.com'
 ```
 
 Removes user from the specified Microsoft 365 Team specified by id without confirmation.
 
 ```sh
-m365 entra m365group user remove --teamId '5b8e4cb1-ea40-484b-a94e-02a4313fefb4' --userName 'anne.matthews@contoso.onmicrosoft.com' --force
+m365 entra m365group user remove --teamId '5b8e4cb1-ea40-484b-a94e-02a4313fefb4' --userNames 'anne.matthews@contoso.onmicrosoft.com' --force
 ```
 
 Removes users specified by a comma separated list of user principal names from the specified Microsoft Teams team specified by name

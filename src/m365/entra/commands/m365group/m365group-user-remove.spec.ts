@@ -320,7 +320,6 @@ describe(commands.M365GROUP_USER_REMOVE, () => {
 
 
   it('removes the specified members of the specified Microsoft 365 Group specified by groupName', async () => {
-
     sinon.stub(entraGroup, 'getGroupIdByDisplayName').withArgs(groupOrTeamName).resolves(groupOrTeamId);
 
     const deleteStub = sinon.stub(request, 'delete').callsFake(async (opts) => {
