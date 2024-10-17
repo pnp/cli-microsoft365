@@ -1,0 +1,60 @@
+import Global from '/docs/cmd/_global.mdx';
+
+# pp website webrole remove
+
+Removes the specified webrole
+
+## Usage
+
+```sh
+m365 pp website webrole remove [options]
+```
+
+## Options
+
+```md definition-list
+`-e, --environmentName <environmentName>`
+: The name of the environment where the webrole is located.
+
+`-i, --id [id]`
+: ID of the webrole to remove.
+
+`--websiteId [websiteId]`
+: ID of the Power Pages website. Specify either websiteId or websiteName but not both.
+
+`--websiteName [websiteName]`
+: The unique name (not the display name) of the Power Pages website. Specify either websiteId or websiteName but not both.
+
+`--asAdmin`
+: Run the command as admin and retrieve Power Pages websites for environments you do not have explicitly assigned permissions to.
+
+`-f, --force`
+: Don't prompt for confirmation.
+```
+
+<Global />
+
+## Examples
+
+Deletes webrole 2ca3eaa5-140f-4175-8261-3272edf9f339 from Power Pages website Contoso-Demo in the given environment.
+
+```sh
+m365 pp website webrole remove --id "2ca3eaa5-140f-4175-8261-3272edf9f339" --websiteName Contoso-Demo --environmentName "Default-2ca3eaa5-140f-4175-8261-3272edf9f339"
+```
+
+Deletes a webrole from the selected Power Pages website in the given environment without confirmation prompt.
+
+```sh
+m365 pp website webrole remove --id "2ca3eaa5-140f-4175-8261-3272edf9f339" --websiteId 2ca3eaa5-140f-4175-8261-3272edf9f339 --environmentName "Default-2ca3eaa5-140f-4175-8261-3272edf9f339" --force
+```
+
+Deletes a webrole owned by another user from the selected Power Pages website in the given environment without confirmation prompt.
+
+```sh
+m365 pp website webrole remove --id "2ca3eaa5-140f-4175-8261-3272edf9f339" --websiteId 2ca3eaa5-140f-4175-8261-3272edf9f339 --environmentName "Default-2ca3eaa5-140f-4175-8261-3272edf9f339" --force --asAdmin
+
+
+
+## Response
+
+The command won't return a response on success.
