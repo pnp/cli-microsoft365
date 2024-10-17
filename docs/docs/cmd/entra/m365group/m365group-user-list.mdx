@@ -16,10 +16,10 @@ m365 entra m365group user list [options]
 
 ```md definition-list
 `-i, --groupId [groupId]`
-: The ID of the Microsoft 365 group. Specify `groupId` or `groupDisplayName` but not both.
+: The ID of the Microsoft 365 group. Specify `groupId` or `groupName` but not both.
 
-`-n, --groupDisplayName [groupDisplayName]`
-: The display name of the Microsoft 365 group. Specify `groupId` or `groupDisplayName` but not both.
+`-n, --groupName [groupName]`
+: The display name of the Microsoft 365 group. Specify `groupId` or `groupName` but not both.
 
 `-r, --role [role]`
 : Filter the results to only users with the given role. Allowed values: `Owner`, `Member`.
@@ -48,13 +48,19 @@ m365 entra m365group user list --groupId '00000000-0000-0000-0000-000000000000'
 List all owners from Microsoft 365 group specified by display name.
 
 ```sh
-m365 entra m365group user list --groupDisplayName Developers --role Owner
+m365 entra m365group user list --groupName Developers --role Owner
 ```
 
 List specific properties for all group users from a group specified by ID.
 
 ```sh
 m365 entra m365group user list --groupId 03cba9da-3974-46c1-afaf-79caa2e45bbe --properties "id,jobTitle,companyName,accountEnabled"
+```
+
+List all group members that are guest users.
+
+```sh
+m365 entra m365group user list --groupName Developers --filter "userType eq 'Guest'"
 ```
 
 ## Response
