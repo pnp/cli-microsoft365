@@ -96,7 +96,6 @@ describe(commands.CONTAINERTYPE_GET, () => {
   });
 
   it('fails validation if the id is not a valid GUID', async () => {
-
     const actual = await command.validate({ options: { id: '123' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
