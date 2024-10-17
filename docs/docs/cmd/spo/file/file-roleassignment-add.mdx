@@ -26,10 +26,16 @@ m365 spo file roleassignment add [options]
 : The SharePoint Id of the principal. It may be either a user id or group id to add a role assignment for. Specify either `upn`, `groupName`, or `principalId` but not multiple.
 
 `--upn [upn]`
-: The upn/email of user to assign role to. Specify either `upn`, `groupName`, or `principalId` but not multiple.
+: The upn/email of user to assign role to. Specify either `upn`, `groupName`, entraGroupId, entraGroupName, or `principalId` but not multiple.
 
 `--groupName [groupName]`
-: The group name of the SharePoint group Specify either `upn`, `groupName`, or `principalId` but not multiple.
+: The group name of the SharePoint group Specify either `upn`, `groupName`, entraGroupId, entraGroupName, or `principalId` but not multiple. This option is only used for SharePoint Online groups.
+
+`--entraGroupId [entraGroupId]`
+: ID of the Microsoft Entra group to add. Specify either `upn`, `groupName`, entraGroupId, entraGroupName, or `principalId` but not multiple.
+
+`--entraGroupName [entraGroupName]`
+: Display name of the Microsoft Entra group to add. Specify either `upn`, `groupName`, entraGroupId, entraGroupName, or `principalId` but not multiple.
 
 `--roleDefinitionId [roleDefinitionId]`
 : ID of role definition. Specify either `roleDefinitionId` or `roleDefinitionName` but not both.
@@ -54,12 +60,23 @@ Adds a role assignment to a file with a specified site-relative URL for a specif
 m365 spo file roleassignment add --webUrl "https://contoso.sharepoint.com/sites/project-x" --fileUrl "Shared Documents/Test1.docx" --upn "testuser@tenant.onmicrosoft.com" --roleDefinitionName "Full Control"
 ```
 
-Adds a role assignment to a file with a specified server-relative URL the for a specific group  and a role definition name.
+Adds a role assignment to a file with a specified server-relative URL the for a specific SharePoint Online group  and a role definition name.
 
 ```sh
-m365 spo file roleassignment add --webUrl "https://contoso.sharepoint.com/sites/project-x" --fileUrl "/sites/project-x/documents/Test1.docx" --upn "testuser@tenant.onmicrosoft.com" --roleDefinitionName "Read"
+m365 spo file roleassignment add --webUrl "https://contoso.sharepoint.com/sites/project-x" --fileUrl "/sites/project-x/documents/Test1.docx" --groupName "Sales Group" --roleDefinitionName "Read"
 ```
 
+Adds a role assignment to a file with a specified site-relative URL for a specific Entra Group Id and a role definition name.
+
+```sh
+m365 spo file roleassignment add --webUrl "https://contoso.sharepoint.com/sites/project-x" --fileUrl "Shared Documents/Test1.docx" --entraGroupId 3c97e01e-978d-417b-a196-b6a3e37fa873 --roleDefinitionName "Full Control"
+```
+
+Adds a role assignment to a file with a specified site-relative URL for a specific Entra Group Name and a role definition name.
+
+```sh
+m365 spo file roleassignment add --webUrl "https://contoso.sharepoint.com/sites/project-x" --fileUrl "Shared Documents/Test1.docx" --entraGroupName "Marketing Memebers" --roleDefinitionName "Full Control"
+```
 ## Response
 
 The command won't return a response on success.
