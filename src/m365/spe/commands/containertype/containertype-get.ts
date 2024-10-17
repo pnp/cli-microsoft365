@@ -133,7 +133,6 @@ class SpeContainertypeGetCommand extends SpoCommand {
   }
 
   private async getContainerTypeIdByName(name: string, spoAdminUrl: string, logger: Logger): Promise<string> {
-
     const formDigestInfo: FormDigestInfo = await spo.ensureFormDigest(spoAdminUrl, logger, undefined, this.debug);
 
     const requestOptions: CliRequestOptions = {
