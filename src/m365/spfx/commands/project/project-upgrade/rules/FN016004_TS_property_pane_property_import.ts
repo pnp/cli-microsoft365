@@ -54,8 +54,8 @@ export class FN016004_TS_property_pane_property_import extends TsRule {
 
       obj.forEach(n => {
         const resource: string = n.getText();
-        const importsText: string = resource.replace(/\s/g, '').substr(resource.indexOf('{'));
-        const imports: string[] = importsText.substr(0, importsText.indexOf('}')).split(',');
+        const importsText: string = resource.replace(/\s/g, '').substring(resource.indexOf('{'));
+        const imports: string[] = importsText.substring(0, importsText.indexOf('}')).split(',');
         const importsToStay: string[] = [];
         const importsToBeMoved: string[] = [];
 
