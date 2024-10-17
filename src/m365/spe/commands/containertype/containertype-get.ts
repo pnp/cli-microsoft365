@@ -91,7 +91,8 @@ class SpeContainertypeGetCommand extends SpoCommand {
       if (this.verbose) {
         await logger.logToStderr(`Getting the Container type...`);
       }
-      const containerTypeId = await this.getContainerTypeId(args, spoAdminUrl, logger);
+      
+      const containerTypeId = await this.getContainerTypeId(args.options, spoAdminUrl, logger);
       const allContainerTypes = await this.getContainerTypeById(containerTypeId, spoAdminUrl, logger);
       await logger.log(allContainerTypes);
     }
