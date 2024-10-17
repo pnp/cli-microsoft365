@@ -85,10 +85,6 @@ describe(commands.CONTAINERTYPE_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('defines correct properties for the default output', () => {
-    assert.deepStrictEqual(command.defaultProperties(), ['ContainerTypeId', 'DisplayName', 'OwningAppId']);
-  });
-
   it('correctly handles random API error', async () => {
     sinon.stub(request, 'post').rejects(new Error('An error has occurred'));
 

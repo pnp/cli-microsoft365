@@ -80,10 +80,6 @@ class SpeContainertypeGetCommand extends SpoCommand {
     this.types.string.push('id', 'name');
   }
 
-  public defaultProperties(): string[] | undefined {
-    return ['ContainerTypeId', 'DisplayName', 'OwningAppId'];
-  }
-
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       const spoAdminUrl = await spo.getSpoAdminUrl(logger, this.debug);
@@ -91,7 +87,7 @@ class SpeContainertypeGetCommand extends SpoCommand {
       if (this.verbose) {
         await logger.logToStderr(`Getting the Container type...`);
       }
-      
+
       const containerTypeId = await this.getContainerTypeId(args.options, spoAdminUrl, logger);
       const allContainerTypes = await this.getContainerTypeById(containerTypeId, spoAdminUrl, logger);
       await logger.log(allContainerTypes);
@@ -124,12 +120,12 @@ class SpeContainertypeGetCommand extends SpoCommand {
     return containerTypes;
   }
 
-  private async getContainerTypeId(args: CommandArgs, spoAdminUrl: string, logger: Logger): Promise<string> {
-    if (args.options.id) {
-      return args.options.id;
+  private async getContainerTypeId(options: Options, spoAdminUrl: string, logger: Logger): Promise<string> {
+    if (options.id) {
+      return options.id;
     }
 
-    return this.getContainerTypeIdByName(args.options.name!, spoAdminUrl, logger);
+    return this.getContainerTypeIdByName(options.name!, spoAdminUrl, logger);
   }
 
   private async getContainerTypeIdByName(name: string, spoAdminUrl: string, logger: Logger): Promise<string> {
