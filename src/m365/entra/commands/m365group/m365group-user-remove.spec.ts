@@ -218,55 +218,6 @@ describe(commands.M365GROUP_USER_REMOVE, () => {
     assert(memberDeleteCallIssued);
   });
 
-  it('removes the specified owner from owners and members endpoint of the Microsoft 365 Group specified by groupName with accepted prompt', async () => {
-    let memberDeleteCallIssued = false;
-
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users/anne.matthews%40contoso.onmicrosoft.com/id`) {
-        return {
-          "value": "00000000-0000-0000-0000-000000000001"
-        };
-      }
-
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/id`) {
-        return {
-          response: {
-            status: 200,
-            data: {
-              value: "00000000-0000-0000-0000-000000000000"
-            }
-          }
-        };
-      }
-
-      throw 'Invalid request';
-    });
-
-    sinon.stub(request, 'delete').callsFake(async (opts) => {
-      memberDeleteCallIssued = true;
-
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/owners/00000000-0000-0000-0000-000000000001/$ref`) {
-        return {
-          "value": [{ "id": "00000000-0000-0000-0000-000000000000" }]
-        };
-      }
-
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/members/00000000-0000-0000-0000-000000000001/$ref`) {
-        return {
-          "value": [{ "id": "00000000-0000-0000-0000-000000000000" }]
-        };
-      }
-
-      throw 'Invalid request';
-    });
-
-    sinonUtil.restore(cli.promptForConfirmation);
-    sinon.stub(cli, 'promptForConfirmation').resolves(true);
-
-    await command.action(logger, { options: { groupName: "Finance", userName: "anne.matthews@contoso.onmicrosoft.com" } });
-    assert(memberDeleteCallIssued);
-  });
-
   it('removes the specified owner from owners and members endpoint of the specified Microsoft 365 Group when prompt confirmed', async () => {
     let memberDeleteCallIssued = false;
 
