@@ -120,7 +120,7 @@ describe(commands.STATUS, () => {
     auth.connection.active = false;
     (auth as any)._allConnections = [];
     await command.action(logger, { options: { verbose: true } });
-    assert(loggerLogToStderrSpy.calledWith('Logged out from Microsoft 365'));
+    assert(loggerLogToStderrSpy.calledWith('Logged out'));
   });
 
   it('shows logged out status when not logged in with connections available', async () => {
@@ -132,7 +132,7 @@ describe(commands.STATUS, () => {
   it('shows logged out status when not logged in with connections available (verbose)', async () => {
     auth.connection.active = false;
     await command.action(logger, { options: { verbose: true } });
-    assert(loggerLogToStderrSpy.calledWith('Logged out from Microsoft 365, signed in connections available'));
+    assert(loggerLogToStderrSpy.calledWith('Logged out, signed in connections available'));
   });
 
   it('shows logged out status when the refresh token is expired', async () => {
@@ -171,7 +171,7 @@ describe(commands.STATUS, () => {
     assert(loggerLogSpy.calledWith({
       connectedAs: 'alexw@contoso.com',
       connectionName: '028de82d-7fd9-476e-a9fd-be9714280ff3',
-      authType: 'DeviceCode',
+      authType: 'deviceCode',
       appId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
       appTenant: 'common',
       cloudType: 'Public'
@@ -191,7 +191,7 @@ describe(commands.STATUS, () => {
     assert(loggerLogSpy.calledWith({
       connectedAs: 'alexw@contoso.com',
       connectionName: '028de82d-7fd9-476e-a9fd-be9714280ff3',
-      authType: 'DeviceCode',
+      authType: 'deviceCode',
       appId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
       appTenant: 'common',
       accessTokens: '{\n  "https://graph.microsoft.com": {\n    "expiresOn": "123",\n    "accessToken": "abc"\n  }\n}',

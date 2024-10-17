@@ -48,7 +48,7 @@ class MockCommand1 extends Command {
         option: '--option2 [option2]'
       }
     );
-    this.validators.push(() => Promise.resolve(true));
+    this.validators.push(async () => { return true; });
   }
 
   public async commandAction(logger: Logger): Promise<void> {
@@ -183,12 +183,12 @@ describe('Command', () => {
   let loggerLogToStderrSpy: sinon.SinonSpy;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
+    sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').callsFake((commandName) => {
       telemetryCommandName = commandName;
     });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     logger = {
       log: async () => { },
       logRaw: async () => { },
@@ -601,6 +601,18 @@ describe('Command', () => {
     assert(actual.indexOf(JSON.stringify(commandOutput[0].property)) === -1);
   });
 
+  it('correctly serialize bool values to csv output', async () => {
+    const command = new MockCommand1();
+    const commandOutput = [
+      {
+        'property1': true,
+        'property2': false
+      }
+    ];
+    const actual = await command.getCsvOutput(commandOutput, { options: { output: 'csv' } });
+    assert.strictEqual(actual,"property1,property2\n1,0\n");
+  });
+
   it('passes validation when csv output specified', async () => {
     const cmd = new MockCommand2();
     assert.strictEqual(await cmd.validate({ options: { output: 'csv' } }, cli.getCommandInfo(cmd)), true);
@@ -658,7 +670,7 @@ describe('Command', () => {
       accessToken: ''
     };
     const command = new MockCommand3();
-    sinon.stub(accessToken, 'isAppOnlyAccessToken').callsFake(() => { return true; });
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
 
     await assert.rejects(command.action(logger, { options: { option1: '@meId' } }), new CommandError(`It's not possible to use @meId with application permissions`));
   });
@@ -669,7 +681,7 @@ describe('Command', () => {
       accessToken: ''
     };
     const command = new MockCommand3();
-    sinon.stub(accessToken, 'isAppOnlyAccessToken').callsFake(() => { return true; });
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
 
     await assert.rejects(command.action(logger, { options: { option1: '@meUsername' } }), new CommandError(`It's not possible to use @meUsername with application permissions`));
   });

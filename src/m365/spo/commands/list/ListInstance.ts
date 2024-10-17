@@ -52,6 +52,7 @@ export interface ListInstance {
   Title: string;
   RootFolder: RootFolder;
   Url: string;
+  VersionPolicies: VersionPolicy;
 }
 
 interface RootFolder {
@@ -65,4 +66,16 @@ interface RoleAssignment {
 interface Member {
   PrincipalType: number;
   PrincipalTypeString: string;
+}
+
+export interface VersionPolicy {
+  DefaultExpireAfterDays: number;
+  DefaultTrimMode: number;
+  DefaultTrimModeValue?: string;
+}
+
+export enum DefaultTrimModeType {
+  NoExpiration = 0,
+  ExpireAfter = 1,
+  AutoExpiration = 2
 }

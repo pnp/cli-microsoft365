@@ -152,7 +152,7 @@ class FlowListCommand extends PowerAutomateCommand {
   }
 
   private getApiUrl(environmentName: string, asAdmin?: boolean, includeSolutionFlows?: boolean, filter?: 'personal' | 'team',): string {
-    const baseEndpoint = `${this.resource}/providers/Microsoft.ProcessSimple`;
+    const baseEndpoint = `${PowerAutomateCommand.resource}/providers/Microsoft.ProcessSimple`;
     const environmentSegment = `/environments/${formatting.encodeQueryParameter(environmentName)}`;
     const adminSegment = `/scopes/admin${environmentSegment}/v2`;
     const flowsEndpoint = '/flows?api-version=2016-11-01';

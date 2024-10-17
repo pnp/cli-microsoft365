@@ -2,7 +2,6 @@ import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import GraphCommand from '../../../base/GraphCommand.js';
-import aadCommands from '../../aadCommands.js';
 import commands from '../../commands.js';
 
 interface CommandArgs {
@@ -26,10 +25,6 @@ class EntraUserGuestAddCommand extends GraphCommand {
 
   public get description(): string {
     return 'Invite an external user to the organization';
-  }
-
-  public alias(): string[] | undefined {
-    return [aadCommands.USER_GUEST_ADD];
   }
 
   constructor() {
@@ -83,8 +78,6 @@ class EntraUserGuestAddCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    await this.showDeprecationWarning(logger, aadCommands.USER_GUEST_ADD, commands.USER_GUEST_ADD);
-
     try {
       const requestOptions: CliRequestOptions = {
         url: `${this.resource}/v1.0/invitations`,

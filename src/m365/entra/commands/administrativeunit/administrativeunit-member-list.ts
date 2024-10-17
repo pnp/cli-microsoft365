@@ -7,7 +7,6 @@ import GlobalOptions from '../../../../GlobalOptions.js';
 import { entraAdministrativeUnit } from '../../../../utils/entraAdministrativeUnit.js';
 import { validation } from '../../../../utils/validation.js';
 import { CliRequestOptions } from '../../../../request.js';
-import aadCommands from '../../aadCommands.js';
 
 interface CommandArgs {
   options: Options;
@@ -33,10 +32,6 @@ class EntraAdministrativeUnitMemberListCommand extends GraphCommand {
 
   public get description(): string {
     return 'Retrieves members (users, groups, or devices) of an administrative unit.';
-  }
-
-  public alias(): string[] | undefined {
-    return [aadCommands.ADMINISTRATIVEUNIT_MEMBER_LIST];
   }
 
   public defaultProperties(): string[] | undefined {
@@ -110,8 +105,6 @@ class EntraAdministrativeUnitMemberListCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    await this.showDeprecationWarning(logger, aadCommands.ADMINISTRATIVEUNIT_MEMBER_LIST, commands.ADMINISTRATIVEUNIT_MEMBER_LIST);
-
     let administrativeUnitId = args.options.administrativeUnitId;
 
     try {

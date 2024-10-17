@@ -4,7 +4,6 @@ import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import VivaEngageCommand from '../../../base/VivaEngageCommand.js';
 import commands from '../../commands.js';
-import yammerCommands from './yammerCommands.js';
 
 interface CommandArgs {
   options: Options;
@@ -23,10 +22,6 @@ class VivaEngageMessageLikeSetCommand extends VivaEngageCommand {
 
   public get description(): string {
     return 'Likes or unlikes a Viva Engage message';
-  }
-
-  public alias(): string[] | undefined {
-    return [yammerCommands.MESSAGE_LIKE_SET];
   }
 
   constructor() {
@@ -79,8 +74,6 @@ class VivaEngageMessageLikeSetCommand extends VivaEngageCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    await this.showDeprecationWarning(logger, this.alias()![0], this.name);
-
     if (args.options.enable === false) {
       if (args.options.force) {
         await this.executeLikeAction(args.options);

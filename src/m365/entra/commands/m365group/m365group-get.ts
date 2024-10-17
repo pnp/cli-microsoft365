@@ -4,7 +4,6 @@ import request, { CliRequestOptions } from '../../../../request.js';
 import { entraGroup } from '../../../../utils/entraGroup.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
-import aadCommands from '../../aadCommands.js';
 import commands from '../../commands.js';
 import { GroupExtended } from './GroupExtended.js';
 
@@ -24,10 +23,6 @@ class EntraM365GroupGetCommand extends GraphCommand {
 
   public get description(): string {
     return 'Gets information about the specified Microsoft 365 Group or Microsoft Teams team';
-  }
-
-  public alias(): string[] | undefined {
-    return [aadCommands.M365GROUP_GET];
   }
 
   constructor() {
@@ -61,8 +56,6 @@ class EntraM365GroupGetCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    await this.showDeprecationWarning(logger, aadCommands.M365GROUP_GET, commands.M365GROUP_GET);
-
     let group: GroupExtended;
 
     try {

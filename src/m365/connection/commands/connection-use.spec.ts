@@ -7,7 +7,6 @@ import { pid } from '../../../utils/pid.js';
 import { session } from '../../../utils/session.js';
 import commands from '../commands.js';
 import command from './connection-use.js';
-import { CommandInfo } from '../../../cli/CommandInfo.js';
 import { settingsNames } from '../../../settingsNames.js';
 import { sinonUtil } from '../../../utils/sinonUtil.js';
 import { CommandError } from '../../../Command.js';
@@ -18,12 +17,10 @@ describe(commands.USE, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
-  let commandInfo: CommandInfo;
-
   const mockContosoApplicationIdentityResponse = {
     "connectedAs": "Contoso Application",
     "connectionName": "acd6df42-10a9-4315-8928-53334f1c9d01",
-    "authType": "Secret",
+    "authType": "secret",
     "appId": "39446e2e-5081-4887-980c-f285919fccca",
     "appTenant": "db308122-52f3-4241-af92-1734aa6e2e50",
     "cloudType": "Public"
@@ -32,11 +29,50 @@ describe(commands.USE, () => {
   const mockUserIdentityResponse = {
     "connectedAs": "alexw@contoso.com",
     "connectionName": "028de82d-7fd9-476e-a9fd-be9714280ff3",
-    "authType": "DeviceCode",
+    "authType": "deviceCode",
     "appId": "31359c7f-bd7e-475c-86db-fdb8c937548e",
     "appTenant": "common",
     "cloudType": "Public"
   };
+
+  const connections = [
+    {
+      authType: AuthType.DeviceCode,
+      active: true,
+      name: '028de82d-7fd9-476e-a9fd-be9714280ff3',
+      identityName: 'alexw@contoso.com',
+      identityId: '028de82d-7fd9-476e-a9fd-be9714280ff3',
+      identityTenantId: 'db308122-52f3-4241-af92-1734aa6e2e50',
+      appId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
+      tenant: 'common',
+      cloudType: CloudType.Public,
+      certificateType: CertificateType.Unknown,
+      accessTokens: {
+        'https://graph.microsoft.com': {
+          expiresOn: (new Date()).toISOString(),
+          accessToken: 'abc'
+        }
+      }
+    },
+    {
+      authType: AuthType.Secret,
+      active: true,
+      name: 'acd6df42-10a9-4315-8928-53334f1c9d01',
+      identityName: 'Contoso Application',
+      identityId: 'acd6df42-10a9-4315-8928-53334f1c9d01',
+      identityTenantId: 'db308122-52f3-4241-af92-1734aa6e2e50',
+      appId: '39446e2e-5081-4887-980c-f285919fccca',
+      tenant: 'db308122-52f3-4241-af92-1734aa6e2e50',
+      cloudType: CloudType.Public,
+      certificateType: CertificateType.Unknown,
+      accessTokens: {
+        'https://graph.microsoft.com': {
+          expiresOn: (new Date()).toISOString(),
+          accessToken: 'abc'
+        }
+      }
+    }
+  ];
 
   before(() => {
     sinon.stub(auth, 'clearConnectionInfo').resolves();
@@ -44,7 +80,7 @@ describe(commands.USE, () => {
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
-    commandInfo = cli.getCommandInfo(command);
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => settingName === settingsNames.prompt ? false : defaultValue);
 
     auth.connection.active = true;
     auth.connection.authType = AuthType.DeviceCode;
@@ -55,44 +91,7 @@ describe(commands.USE, () => {
     auth.connection.appId = '31359c7f-bd7e-475c-86db-fdb8c937548e';
     auth.connection.tenant = 'common';
 
-    (auth as any)._allConnections = [
-      {
-        authType: AuthType.DeviceCode,
-        active: true,
-        name: '028de82d-7fd9-476e-a9fd-be9714280ff3',
-        identityName: 'alexw@contoso.com',
-        identityId: '028de82d-7fd9-476e-a9fd-be9714280ff3',
-        identityTenantId: 'db308122-52f3-4241-af92-1734aa6e2e50',
-        appId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
-        tenant: 'common',
-        cloudType: CloudType.Public,
-        certificateType: CertificateType.Unknown,
-        accessTokens: {
-          'https://graph.microsoft.com': {
-            expiresOn: (new Date()).toISOString(),
-            accessToken: 'abc'
-          }
-        }
-      },
-      {
-        authType: AuthType.Secret,
-        active: true,
-        name: 'acd6df42-10a9-4315-8928-53334f1c9d01',
-        identityName: 'Contoso Application',
-        identityId: 'acd6df42-10a9-4315-8928-53334f1c9d01',
-        identityTenantId: 'db308122-52f3-4241-af92-1734aa6e2e50',
-        appId: '39446e2e-5081-4887-980c-f285919fccca',
-        tenant: 'db308122-52f3-4241-af92-1734aa6e2e50',
-        cloudType: CloudType.Public,
-        certificateType: CertificateType.Unknown,
-        accessTokens: {
-          'https://graph.microsoft.com': {
-            expiresOn: (new Date()).toISOString(),
-            accessToken: 'abc'
-          }
-        }
-      }
-    ];
+    (auth as any)._allConnections = connections;
   });
 
   beforeEach(() => {
@@ -115,7 +114,6 @@ describe(commands.USE, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      cli.getSettingWithDefaultValue,
       auth.ensureAccessToken,
       cli.handleMultipleResultsFound
     ]);
@@ -134,21 +132,9 @@ describe(commands.USE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if name is not specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: {} }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
   it(`fails with error if the connection cannot be found`, async () => {
-    await assert.rejects(command.action(logger, { options: { name: 'Non-existent connection' } }), new CommandError(`The connection 'Non-existent connection' cannot be found`));
+    await assert.rejects(command.action(logger, { options: { name: 'Non-existent connection' } }),
+      new CommandError(`The connection 'Non-existent connection' cannot be found.`));
   });
 
   it('fails with error when restoring auth information leads to error', async () => {
@@ -177,5 +163,19 @@ describe(commands.USE, () => {
     await command.action(logger, { options: { name: '028de82d-7fd9-476e-a9fd-be9714280ff3', debug: true } });
     const logged = loggerLogSpy.args[0][0] as unknown as ConnectionDetails;
     assert.strictEqual(logged.connectedAs, mockUserIdentityResponse.connectedAs);
+  });
+
+  it('switches to the identity connection using prompting', async () => {
+    sinon.stub(cli, 'handleMultipleResultsFound').resolves(connections[1]);
+
+    await command.action(logger, { options: {} });
+    assert(loggerLogSpy.calledOnceWithExactly(mockContosoApplicationIdentityResponse));
+  });
+
+  it(`switches to the user identity using prompting`, async () => {
+    sinon.stub(cli, 'handleMultipleResultsFound').resolves(connections[0]);
+
+    await command.action(logger, { options: {} });
+    assert(loggerLogSpy.calledOnceWithExactly(mockUserIdentityResponse));
   });
 });

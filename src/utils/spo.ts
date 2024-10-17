@@ -18,10 +18,11 @@ import { SiteProperties } from '../m365/spo/commands/site/SiteProperties.js';
 import { entraGroup } from './entraGroup.js';
 import { SharingCapabilities } from '../m365/spo/commands/site/SharingCapabilities.js';
 import { WebProperties } from '../m365/spo/commands/web/WebProperties.js';
-import { Site } from '@microsoft/microsoft-graph-types';
+import { Group, Site } from '@microsoft/microsoft-graph-types';
 import { ListItemInstance } from '../m365/spo/commands/listitem/ListItemInstance.js';
 import { ListItemFieldValueResult } from '../m365/spo/commands/listitem/ListItemFieldValueResult.js';
-import { FileProperties } from '../m365/spo/commands/file/FileProperties.js'; import { setTimeout } from 'timers/promises';
+import { FileProperties } from '../m365/spo/commands/file/FileProperties.js';
+import { timersUtil } from './timersUtil.js';
 
 export interface ContextInfo {
   FormDigestTimeoutSeconds: number;
@@ -69,6 +70,76 @@ interface FormValues {
   FieldName: string;
   FieldValue: string;
 }
+
+export interface User {
+  Id: number;
+  IsHiddenInUI: boolean;
+  LoginName: string;
+  Title: string;
+  PrincipalType: number;
+  Email: string;
+  Expiration: string;
+  IsEmailAuthenticationGuestUser: boolean;
+  IsShareByEmailGuestUser: boolean;
+  IsSiteAdmin: boolean;
+  UserId: {
+    NameId: string;
+    NameIdIssuer: string;
+  } | null;
+  UserPrincipalName: string | null;
+}
+
+interface CreateFileCopyJobsOptions {
+  nameConflictBehavior?: CreateFileCopyJobsNameConflictBehavior;
+  newName?: string;
+  bypassSharedLock?: boolean;
+  /** @remarks Use only when using operation copy. */
+  ignoreVersionHistory?: boolean;
+  /** @remarks Use only when using operation move. */
+  includeItemPermissions?: boolean;
+  operation: 'copy' | 'move';
+}
+
+interface CreateFolderCopyJobsOptions {
+  nameConflictBehavior?: CreateFolderCopyJobsNameConflictBehavior;
+  newName?: string;
+  operation: 'copy' | 'move';
+}
+
+export enum CreateFileCopyJobsNameConflictBehavior {
+  Fail = 0,
+  Replace = 1,
+  Rename = 2,
+}
+
+export enum CreateFolderCopyJobsNameConflictBehavior {
+  Fail = 0,
+  Rename = 2,
+}
+
+interface CreateCopyJobInfo {
+  EncryptionKey: string;
+  JobId: string;
+  JobQueueUri: string;
+  SourceListItemUniqueIds: string[];
+}
+
+interface CopyJobObjectInfo {
+  Event: string;
+  JobId: string;
+  Time: string;
+  SourceObjectFullUrl: string;
+  TargetServerUrl: string;
+  TargetSiteId: string;
+  TargetWebId: string;
+  TargetListId: string;
+  TargetObjectUniqueId: string;
+  TargetObjectSiteRelativeUrl: string;
+  CorrelationId: string;
+}
+
+// Wrapping this into a settings object so we can alter the values in tests
+const pollingInterval = 3_000;
 
 export const spo = {
   async getRequestDigest(siteUrl: string): Promise<FormDigestInfo> {
@@ -136,7 +207,7 @@ export const spo = {
         return;
       }
 
-      await setTimeout(operation.PollingInterval);
+      await timersUtil.setTimeout(pollingInterval);
       await spo.waitUntilFinished({
         operationId: JSON.stringify(operation._ObjectIdentity_),
         siteUrl,
@@ -596,14 +667,49 @@ export const spo = {
   },
 
   /**
+   * Ensure a user exists on a specific SharePoint site.
+   * @param webUrl URL of the SharePoint site.
+   * @param logonName Logon name of the user to ensure on the SharePoint site.
+   * @returns SharePoint user object.
+   */
+  async ensureUser(webUrl: string, logonName: string): Promise<User> {
+    const requestOptions: CliRequestOptions = {
+      url: `${webUrl}/_api/web/EnsureUser`,
+      headers: {
+        accept: 'application/json;odata=nometadata'
+      },
+      responseType: 'json',
+      data: {
+        logonName: logonName
+      }
+    };
+
+    return request.post<User>(requestOptions);
+  },
+
+  /**
+   * Ensure a Microsoft Entra ID group exists on a specific SharePoint site.
+   * @param webUrl URL of the SharePoint site.
+   * @param group Microsoft Entra ID group.
+   * @returns SharePoint user object.
+   */
+  async ensureEntraGroup(webUrl: string, group: Group): Promise<User> {
+    if (!group.securityEnabled) {
+      throw new Error('Cannot ensure a Microsoft Entra ID group that is not security enabled.');
+    }
+
+    return this.ensureUser(webUrl, group.mailEnabled ? `c:0o.c|federateddirectoryclaimprovider|${group.id}` : `c:0t.c|tenant|${group.id}`);
+  },
+
+  /**
  * Retrieves the spo user by email.
  * @param webUrl Web url
  * @param email The email of the user
  * @param logger the Logger object
- * @param debug set if debug logging should be logged 
+ * @param verbose set for verbose logging
  */
-  async getUserByEmail(webUrl: string, email: string, logger: Logger, debug?: boolean): Promise<any> {
-    if (debug) {
+  async getUserByEmail(webUrl: string, email: string, logger?: Logger, verbose?: boolean): Promise<any> {
+    if (verbose && logger) {
       await logger.logToStderr(`Retrieving the spo user by email ${email}`);
     }
     const requestUrl = `${webUrl}/_api/web/siteusers/GetByEmail('${formatting.encodeQueryParameter(email)}')`;
@@ -616,7 +722,7 @@ export const spo = {
       responseType: 'json'
     };
 
-    const userInstance: any = await request.get(requestOptions);
+    const userInstance = await request.get<User>(requestOptions);
 
     return userInstance;
   },
@@ -684,10 +790,10 @@ export const spo = {
   * @param webUrl Web url
   * @param name The name of the group
   * @param logger the Logger object
-  * @param debug set if debug logging should be logged 
+  * @param verbose set for verbose logging
   */
-  async getGroupByName(webUrl: string, name: string, logger: Logger, debug?: boolean): Promise<any> {
-    if (debug) {
+  async getGroupByName(webUrl: string, name: string, logger?: Logger, verbose?: boolean): Promise<any> {
+    if (verbose && logger) {
       await logger.logToStderr(`Retrieving the group by name ${name}`);
     }
     const requestUrl = `${webUrl}/_api/web/sitegroups/GetByName('${formatting.encodeQueryParameter(name)}')`;
@@ -710,10 +816,10 @@ export const spo = {
   * @param webUrl Web url
   * @param name the name of the role definition
   * @param logger the Logger object
-  * @param debug set if debug logging should be logged 
+  * @param verbose set for verbose logging
   */
-  async getRoleDefinitionByName(webUrl: string, name: string, logger: Logger, debug?: boolean): Promise<RoleDefinition> {
-    if (debug) {
+  async getRoleDefinitionByName(webUrl: string, name: string, logger?: Logger, verbose?: boolean): Promise<RoleDefinition> {
+    if (verbose && logger) {
       await logger.logToStderr(`Retrieving the role definitions for ${name}`);
     }
 
@@ -829,7 +935,7 @@ export const spo = {
           return;
         }
 
-        await setTimeout(operation.PollingInterval);
+        await timersUtil.setTimeout(pollingInterval);
         await spo.waitUntilFinished({
           operationId: JSON.stringify(operation._ObjectIdentity_),
           siteUrl: spoAdminUrl,
@@ -1076,7 +1182,7 @@ export const spo = {
       return;
     }
 
-    await setTimeout(operation.PollingInterval);
+    await timersUtil.setTimeout(pollingInterval);
     await spo.waitUntilFinished({
       operationId: JSON.stringify(operation._ObjectIdentity_),
       siteUrl: spoAdminUrl,
@@ -1248,7 +1354,7 @@ export const spo = {
         const operation: SpoOperation = json[json.length - 1];
         const isComplete: boolean = operation.IsComplete;
         if (!isComplete) {
-          await setTimeout(operation.PollingInterval);
+          await timersUtil.setTimeout(pollingInterval);
           await spo.waitUntilFinished({
             operationId: JSON.stringify(operation._ObjectIdentity_),
             siteUrl: spoAdminUrl,
@@ -1675,6 +1781,44 @@ export const spo = {
   },
 
   /**
+   * Retrieves the server-relative URL of a folder.
+   * @param webUrl Web URL
+   * @param folderUrl Folder URL
+   * @param folderId Folder ID
+   * @param logger The logger object
+   * @param verbose Set for verbose logging
+   * @returns The server-relative URL of the folder
+   */
+  async getFolderServerRelativeUrl(webUrl: string, folderUrl?: string, folderId?: string, logger?: Logger, verbose?: boolean): Promise<string> {
+    if (verbose && logger) {
+      await logger.logToStderr(`Retrieving server-relative URL for folder ${folderUrl ? `URL: ${folderUrl}` : `ID: ${folderId}`}`);
+    }
+
+    let requestUrl: string = `${webUrl}/_api/web/`;
+
+    if (folderUrl) {
+      const folderServerRelativeUrl: string = urlUtil.getServerRelativePath(webUrl, folderUrl);
+      requestUrl += `GetFolderByServerRelativePath(decodedUrl='${formatting.encodeQueryParameter(folderServerRelativeUrl)}')`;
+    }
+    else {
+      requestUrl += `GetFolderById('${folderId}')`;
+    }
+
+    requestUrl += '?$select=ServerRelativeUrl';
+
+    const requestOptions: CliRequestOptions = {
+      url: requestUrl,
+      headers: {
+        accept: 'application/json;odata=nometadata'
+      },
+      responseType: 'json'
+    };
+
+    const res = await request.get<{ ServerRelativeUrl: string }>(requestOptions);
+    return res.ServerRelativeUrl;
+  },
+
+  /**
    * Retrieves the ObjectIdentity from a SharePoint site
    * @param webUrl web url
    * @param logger The logger object
@@ -1769,5 +1913,196 @@ export const spo = {
 
     const itemsResponse = await request.get<ListItemInstance>(requestOptionsItems);
     return (itemsResponse);
+  },
+
+  /**
+  * Retrieves the file by id.
+  * Returns a FileProperties object
+  * @param webUrl Web url
+  * @param id the id of the file
+  * @param logger the Logger object
+  * @param verbose set for verbose logging 
+  */
+  async getFileById(webUrl: string, id: string, logger?: Logger, verbose?: boolean): Promise<FileProperties> {
+    if (verbose && logger) {
+      await logger.logToStderr(`Retrieving the file with id ${id}`);
+    }
+    const requestUrl = `${webUrl}/_api/web/GetFileById('${formatting.encodeQueryParameter(id)}')`;
+
+    const requestOptions: CliRequestOptions = {
+      url: requestUrl,
+      headers: {
+        'accept': 'application/json;odata=nometadata'
+      },
+
+      responseType: 'json'
+    };
+
+    const file: FileProperties = await request.get<FileProperties>(requestOptions);
+
+    return file;
+  },
+
+  /**
+   * Create a SharePoint copy job to copy a file to another location.
+   * @param webUrl Absolute web URL where the source file is located.
+   * @param sourceUrl Absolute URL of the source file.
+   * @param destinationUrl Absolute URL of the destination folder.
+   * @param options Options for the copy job.
+   * @returns Copy job information. Use {@link spo.getCopyJobResult} to get the result of the copy job.
+   */
+  async createFileCopyJob(webUrl: string, sourceUrl: string, destinationUrl: string, options?: CreateFileCopyJobsOptions): Promise<CreateCopyJobInfo> {
+    const requestOptions: CliRequestOptions = {
+      url: `${webUrl}/_api/Site/CreateCopyJobs`,
+      headers: {
+        accept: 'application/json;odata=nometadata'
+      },
+      responseType: 'json',
+      data: {
+        destinationUri: destinationUrl,
+        exportObjectUris: [sourceUrl],
+        options: {
+          NameConflictBehavior: options?.nameConflictBehavior ?? CreateFileCopyJobsNameConflictBehavior.Fail,
+          AllowSchemaMismatch: true,
+          BypassSharedLock: !!options?.bypassSharedLock,
+          IgnoreVersionHistory: !!options?.ignoreVersionHistory,
+          IncludeItemPermissions: !!options?.includeItemPermissions,
+          CustomizedItemName: options?.newName ? [options.newName] : undefined,
+          SameWebCopyMoveOptimization: true,
+          IsMoveMode: options?.operation === 'move'
+        }
+      }
+    };
+
+    const response = await request.post<{ value: CreateCopyJobInfo[] }>(requestOptions);
+    return response.value[0];
+  },
+
+  /**
+   * Create a SharePoint copy job to copy a folder to another location.
+   * @param webUrl Absolute web URL where the source folder is located.
+   * @param sourceUrl Absolute URL of the source folder.
+   * @param destinationUrl Absolute URL of the destination folder.
+   * @param options Options for the copy job.
+   * @returns Copy job information. Use {@link spo.getCopyJobResult} to get the result of the copy job.
+   */
+  async createFolderCopyJob(webUrl: string, sourceUrl: string, destinationUrl: string, options?: CreateFolderCopyJobsOptions): Promise<CreateCopyJobInfo> {
+    const requestOptions: CliRequestOptions = {
+      url: `${webUrl}/_api/Site/CreateCopyJobs`,
+      headers: {
+        accept: 'application/json;odata=nometadata'
+      },
+      responseType: 'json',
+      data: {
+        destinationUri: destinationUrl,
+        exportObjectUris: [sourceUrl],
+        options: {
+          NameConflictBehavior: options?.nameConflictBehavior ?? CreateFolderCopyJobsNameConflictBehavior.Fail,
+          AllowSchemaMismatch: true,
+          CustomizedItemName: options?.newName ? [options.newName] : undefined,
+          SameWebCopyMoveOptimization: true,
+          IsMoveMode: options?.operation === 'move'
+        }
+      }
+    };
+
+    const response = await request.post<{ value: CreateCopyJobInfo[] }>(requestOptions);
+    return response.value[0];
+  },
+
+  /**
+   * Poll until the copy job is finished and return the result.
+   * @param webUrl Absolute web URL where the copy job was created.
+   * @param copyJobInfo Information about the copy job.
+   * @throws Error if the copy job has failed.
+   * @returns Information about the destination object.
+   */
+  async getCopyJobResult(webUrl: string, copyJobInfo: CreateCopyJobInfo): Promise<CopyJobObjectInfo> {
+    const requestOptions: CliRequestOptions = {
+      url: `${webUrl}/_api/Site/GetCopyJobProgress`,
+      headers: {
+        accept: 'application/json;odata=nometadata'
+      },
+      responseType: 'json',
+      data: {
+        copyJobInfo: copyJobInfo
+      }
+    };
+
+    const logs = [];
+    let progress = await request.post<{ JobState: number; Logs: string[] }>(requestOptions);
+    const newLogs = progress.Logs?.map(l => JSON.parse(l));
+    if (newLogs?.length > 0) {
+      logs.push(...newLogs);
+    }
+
+    while (progress.JobState !== 0) {
+      await timersUtil.setTimeout(pollingInterval);
+      progress = await request.post<{ JobState: number; Logs: string[] }>(requestOptions);
+
+      const newLogs = progress.Logs?.map(l => JSON.parse(l));
+      if (newLogs?.length > 0) {
+        logs.push(...newLogs);
+      }
+    }
+
+    // Check if the job has failed
+    const errorLog = logs.find(l => l.Event === 'JobError');
+    if (errorLog) {
+      throw new Error(errorLog.Message);
+    }
+
+    // Get the destination object information
+    const objectInfo = logs.find(l => l.Event === 'JobFinishedObjectInfo') as CopyJobObjectInfo;
+    return objectInfo;
+  },
+
+  /**
+   * Gets the primary owner login from a site as admin.
+   * @param adminUrl The SharePoint admin URL
+   * @param siteId The site ID
+   * @param logger The logger object
+   * @param verbose If in verbose mode
+   * @returns Owner login name
+   */
+  async getPrimaryAdminLoginNameAsAdmin(adminUrl: string, siteId: string, logger: Logger, verbose: boolean): Promise<string> {
+    if (verbose) {
+      await logger.logToStderr('Getting the primary admin login name...');
+    }
+
+    const requestOptions: CliRequestOptions = {
+      url: `${adminUrl}/_api/SPO.Tenant/sites('${siteId}')?$select=OwnerLoginName`,
+      headers: {
+        accept: 'application/json;odata=nometadata'
+      },
+      responseType: 'json'
+    };
+
+    const response = await request.get<{ OwnerLoginName: string }>(requestOptions);
+    return response.OwnerLoginName;
+  },
+
+  /**
+   * Gets the primary owner login from a site.
+   * @param siteUrl The site URL
+   * @param logger The logger object
+   * @param verbose If in verbose mode
+   * @returns Owner login name
+   */
+  async getPrimaryOwnerLoginFromSite(siteUrl: string, logger: Logger, verbose: boolean): Promise<string> {
+    if (verbose) {
+      await logger.logToStderr('Getting the primary admin login name...');
+    }
+
+    const requestOptions: CliRequestOptions = {
+      url: `${siteUrl}/_api/site/owner`,
+      headers: {
+        'accept': 'application/json;odata=nometadata'
+      },
+      responseType: 'json'
+    };
+
+    const responseContent = await request.get<{ LoginName: string }>(requestOptions);
+    return responseContent?.LoginName;
   }
 };

@@ -13,12 +13,6 @@ m365 entra m365group user add [options]
 ## Alias
 
 ```sh
-m365 aad m365group user add [options]
-```
-
-## Alias
-
-```sh
 m365 teams user add
 ```
 
@@ -26,38 +20,53 @@ m365 teams user add
 
 ```md definition-list
 `-i, --groupId [groupId]`
-: The ID of the Microsoft 365 Group to which to add the user
+: The ID of the Microsoft 365 group. Specify only one of the following: `groupId`, `groupName`, `teamId`, or `teamName`.
+
+`--groupName [groupName]`
+: The display name of the Microsoft 365 group. Specify only one of the following: `groupId`, `groupName`, `teamId`, or `teamName`.
 
 `--teamId [teamId]`
-: The ID of the Teams team to which to add the user
+: The ID of the Teams team. Specify only one of the following: `groupId`, `groupName`, `teamId`, or `teamName`.
 
-`-n, --userName <userName>`
-: User's UPN (user principal name, eg. johndoe@example.com)
+`--teamName [teamName]`
+: The display name of the Microsoft Teams team. Specify only one of the following: `groupId`, `groupName`, `teamId`, or `teamName`.
+
+`--ids [ids]`
+: Microsoft Entra IDs of users. You can also pass a comma-separated list of IDs. Specify either `ids` or `userNames` but not both.
+
+`--userNames [userNames]`
+: The user principal names of users. You can also pass a comma-separated list of UPNs. Specify either `ids` or `userNames` but not both.
 
 `-r, --role [role]`
-: The role to be assigned to the new user: `Owner,Member`. Default `Member`
+: The role to be assigned to the new user: `Owner,Member`. Default `Member`.
 ```
 
 <Global />
 
 ## Examples
 
-Add a new member to the specified Microsoft 365 Group
+Add a new member with the userNames parameter to the specified Microsoft 365 Group.
 
 ```sh
-m365 entra m365group user add --groupId '00000000-0000-0000-0000-000000000000' --userName 'anne.matthews@contoso.onmicrosoft.com'
+m365 entra m365group user add --groupId '00000000-0000-0000-0000-000000000000' --userNames 'anne.matthews@contoso.onmicrosoft.com'
 ```
 
-Add a new owner to the specified Microsoft 365 Group
+Add multiple new owners with the userNames parameter to the specified Microsoft 365 Group.
 
 ```sh
-m365 entra m365group user add --groupId '00000000-0000-0000-0000-000000000000' --userName 'anne.matthews@contoso.onmicrosoft.com' --role Owner
+m365 entra m365group user add --groupName 'Contoso' --userNames 'anne.matthews@contoso.onmicrosoft.com, john.doe@contoso.onmicrosoft.com' --role Owner
 ```
 
-Add a new member to the specified Microsoft Teams team
+Add a new member with the userNames parameter to the specified Microsoft Teams team.
 
 ```sh
-m365 teams user add --teamId '00000000-0000-0000-0000-000000000000' --userName 'anne.matthews@contoso.onmicrosoft.com'
+m365 entra m365group member add --teamId '00000000-0000-0000-0000-000000000000' --userNames 'anne.matthews@contoso.onmicrosoft.com' --role Member
+```
+
+Add multiple new members with the ids parameter to the specified Microsoft Teams team.
+
+```sh
+m365 entra m365group user add --teamName 'Engineering' --ids '74a3b772-3122-447b-b9da-10895e238219,dd3d21e4-a142-46b9-8482-bca8fe9596b3' --role Member
 ```
 
 ## Response

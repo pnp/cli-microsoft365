@@ -1,5 +1,5 @@
 import os from 'os';
-import auth, { AuthType } from '../../../Auth.js';
+import auth from '../../../Auth.js';
 import { cli } from '../../../cli/cli.js';
 import { Logger } from '../../../cli/Logger.js';
 import Command from '../../../Command.js';
@@ -14,8 +14,8 @@ interface CliDiagnosticInfo {
     release: string;
   };
   authMode: string;
-  cliAadAppId: string;
-  cliAadAppTenant: string;
+  cliEntraAppId?: string;
+  cliEntraAppTenant: string;
   cliEnvironment: string;
   nodeVersion: string;
   cliVersion: string;
@@ -55,9 +55,9 @@ class CliDoctorCommand extends Command {
       },
       cliVersion: app.packageJson().version,
       nodeVersion: process.version,
-      cliAadAppId: auth.connection.appId,
-      cliAadAppTenant: validation.isValidGuid(auth.connection.tenant) ? 'single' : auth.connection.tenant,
-      authMode: AuthType[auth.connection.authType],
+      cliEntraAppId: auth.connection.appId,
+      cliEntraAppTenant: validation.isValidGuid(auth.connection.tenant) ? 'single' : auth.connection.tenant,
+      authMode: auth.connection.authType,
       cliEnvironment: process.env.CLIMICROSOFT365_ENV ? process.env.CLIMICROSOFT365_ENV : '',
       cliConfig: cli.getConfig().all,
       roles: roles,

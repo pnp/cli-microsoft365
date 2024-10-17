@@ -18,6 +18,9 @@ m365 setup [options]
 
 `--scripting`
 : Configure CLI for Microsoft 365 for use in scripts without prompting for additional information.
+
+`--skipApp`
+: Skip configuring an Entra app for use with CLI for Microsoft 365.
 ```
 
 <Global />
@@ -28,9 +31,13 @@ The `m365 setup` command is a wizard that helps you configure the CLI for Micros
 
 The command will ask you the following questions:
 
+- _CLI for Microsoft 365 requires a Microsoft Entra app. Do you want to create a new app registration or use an existing one?_
+
+  You can choose between using an existing Entra app or creating a new one. If you choose to create a new app, the CLI will ask you to choose between a minimal and a full set of permissions. It then signs in as Azure CLI to your tenant, creates a new app registration, and stores its information in the CLI configuration.
+
 - _How do you plan to use the CLI?_
 
-  You can choose between **interactive** and **scripting** use. In interactive mode, the CLI for Microsoft 365 will prompt you for additional information when needed, automatically open links browser, automatically show help on errors and show spinners. In **scripting** mode, the CLI will not use interactivity to prevent blocking your scripts.
+  You can choose between **interactive** and **scripting** use. In interactive mode, the CLI for Microsoft 365 will prompt you for additional information when needed, automatically open links browser, automatically show help on errors. In **scripting** mode, the CLI will not use interactivity to prevent blocking your scripts.
 
 - _Are you going to use the CLI in PowerShell?_ (asked only when you chose to configure CLI for scripting)
 
@@ -53,7 +60,6 @@ The `m365 setup` command uses the following presets:
   - printErrorsAsPlainText: true,
   - prompt: true,
   - showHelpOnFailure: true,
-  - showSpinner: true
 - scripting use:
   - autoOpenLinksInBrowser: false,
   - copyDeviceCodeToClipboard: false,
@@ -61,7 +67,6 @@ The `m365 setup` command uses the following presets:
   - printErrorsAsPlainText: false,
   - prompt: false,
   - showHelpOnFailure: false,
-  - showSpinner: false
 - use in PowerShell:
   - errorOutput: 'stdout'
 - beginner:
@@ -71,22 +76,28 @@ The `m365 setup` command uses the following presets:
 
 ## Examples
 
-Configure CLI for Microsoft based on your preferences interactively
+Configure CLI for Microsoft 365 based on your preferences interactively
 
 ```sh
 m365 setup
 ```
 
-Configure CLI for Microsoft for interactive use without prompting for additional information
+Configure CLI for Microsoft 365 for interactive use without prompting for additional information
 
 ```sh
 m365 setup --interactive
 ```
 
-Configure CLI for Microsoft for use in scripts without prompting for additional information
+Configure CLI for Microsoft 365 for use in scripts without prompting for additional information
 
 ```sh
 m365 setup --scripting
+```
+
+Configure CLI for Microsoft 365 without setting up an Entra app
+
+```sh
+m365 setup --skipApp
 ```
 
 ## Response

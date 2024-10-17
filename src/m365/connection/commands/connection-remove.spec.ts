@@ -131,7 +131,7 @@ describe(commands.REMOVE, () => {
 
   it(`fails with error if the connection cannot be found`, async () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
-    await assert.rejects(command.action(logger, { options: { name: 'Non-existent connection' } }), new CommandError(`The connection 'Non-existent connection' cannot be found`));
+    await assert.rejects(command.action(logger, { options: { name: 'Non-existent connection' } }), new CommandError(`The connection 'Non-existent connection' cannot be found.`));
   });
 
   it('fails with error when restoring auth information leads to error', async () => {

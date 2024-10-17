@@ -139,6 +139,20 @@ describe(commands.THEME_LIST, () => {
     assert(loggerLogSpy.calledWith(expected.themePreviews), 'Invalid request');
   });
 
+
+  it('retrieves themes and logs empty array when no values found', async () => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso-admin.sharepoint.com/_api/thememanager/GetTenantThemingOptions') {
+        return { 'odata.null': true };
+      }
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { verbose: true, output: 'json' } });
+    assert(loggerLogSpy.calledOnceWithExactly([]));
+  });
+
+
   it('retrieves available themes - handle error', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/thememanager/GetTenantThemingOptions') > -1) {

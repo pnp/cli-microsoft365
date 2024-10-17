@@ -6,15 +6,14 @@ import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 import { cli } from '../../../../cli/cli.js';
-import aadCommands from '../../aadCommands.js';
 
 interface CommandArgs {
   options: Options;
 }
 
 interface Options extends GlobalOptions {
-  appId?: string;
-  appName?: string;
+  id?: string;
+  displayName?: string;
   objectId?: string;
 }
 
@@ -25,10 +24,6 @@ class EntraEnterpriseAppAddCommand extends GraphCommand {
 
   public get description(): string {
     return 'Creates an enterprise application (or service principal) for a registered Entra app';
-  }
-
-  public alias(): string[] | undefined {
-    return [aadCommands.SP_ADD, commands.SP_ADD];
   }
 
   constructor() {
@@ -43,8 +38,8 @@ class EntraEnterpriseAppAddCommand extends GraphCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        appId: (!(!args.options.appId)).toString(),
-        appName: (!(!args.options.appName)).toString(),
+        id: (!(!args.options.id)).toString(),
+        displayName: (!(!args.options.displayName)).toString(),
         objectId: (!(!args.options.objectId)).toString()
       });
     });
@@ -53,10 +48,10 @@ class EntraEnterpriseAppAddCommand extends GraphCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '--appId [appId]'
+        option: '-i, --id [id]'
       },
       {
-        option: '--appName [appName]'
+        option: '-n, --displayName [displayName]'
       },
       {
         option: '--objectId [objectId]'
@@ -67,12 +62,12 @@ class EntraEnterpriseAppAddCommand extends GraphCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (args.options.appId && !validation.isValidGuid(args.options.appId)) {
-          return `${args.options.appId} is not a valid appId GUID`;
+        if (args.options.id && !validation.isValidGuid(args.options.id)) {
+          return `${args.options.id} is not a valid GUID`;
         }
 
         if (args.options.objectId && !validation.isValidGuid(args.options.objectId)) {
-          return `${args.options.objectId} is not a valid objectId GUID`;
+          return `${args.options.objectId} is not a valid GUID`;
         }
 
         return true;
@@ -81,17 +76,17 @@ class EntraEnterpriseAppAddCommand extends GraphCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push({ options: ['appId', 'appName', 'objectId'] });
+    this.optionSets.push({ options: ['id', 'displayName', 'objectId'] });
   }
 
   private async getAppId(args: CommandArgs): Promise<string> {
-    if (args.options.appId) {
-      return args.options.appId;
+    if (args.options.id) {
+      return args.options.id;
     }
 
     let spMatchQuery: string = '';
-    if (args.options.appName) {
-      spMatchQuery = `displayName eq '${formatting.encodeQueryParameter(args.options.appName)}'`;
+    if (args.options.displayName) {
+      spMatchQuery = `displayName eq '${formatting.encodeQueryParameter(args.options.displayName)}'`;
     }
     else if (args.options.objectId) {
       spMatchQuery = `id eq '${formatting.encodeQueryParameter(args.options.objectId)}'`;
@@ -115,7 +110,7 @@ class EntraEnterpriseAppAddCommand extends GraphCommand {
 
     if (response.value.length > 1) {
       const resultAsKeyValuePair = formatting.convertArrayToHashTable('appId', response.value);
-      const result = await cli.handleMultipleResultsFound<{ appId: string }>(`Multiple Entra apps with name '${args.options.appName}' found.`, resultAsKeyValuePair);
+      const result = await cli.handleMultipleResultsFound<{ appId: string }>(`Multiple Entra apps with name '${args.options.displayName}' found.`, resultAsKeyValuePair);
       return result.appId;
     }
 
@@ -123,8 +118,6 @@ class EntraEnterpriseAppAddCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    await this.showDeprecationWarning(logger, aadCommands.SP_ADD, commands.SP_ADD);
-
     try {
       const appId = await this.getAppId(args);
 

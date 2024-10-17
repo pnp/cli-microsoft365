@@ -56,9 +56,7 @@ class SpoPageTemplateListCommand extends SpoCommand {
 
     try {
       const res = await odata.getAllItems<PageTemplate>(`${args.options.webUrl}/_api/sitepages/pages/templates`);
-      if (res && res.length > 0) {
-        await logger.log(res);
-      }
+      await logger.log(res);
     }
     catch (err: any) {
       // The API returns a 404 when no templates are created on the site collection

@@ -4,7 +4,7 @@ import Command, { CommandArgs, CommandError } from '../../Command.js';
 import { accessToken } from '../../utils/accessToken.js';
 
 export default abstract class PowerAutomateCommand extends Command {
-  protected get resource(): string {
+  public static get resource(): string {
     return 'https://api.flow.microsoft.com';
   }
 

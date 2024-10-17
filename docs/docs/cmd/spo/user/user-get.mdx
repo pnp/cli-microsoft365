@@ -16,41 +16,68 @@ m365 spo user get [options]
 
 ```md definition-list
 `-u, --webUrl <webUrl>`
-: URL of the web to get the user within
+: URL of the web to get the user within.
 
 `-i, --id [id]`
-: ID of the user to retrieve information for. Use either `email`, `id` or `loginName`, but not all.
+: ID of the user to retrieve information for. Specify either `id`, `loginName`, `email`, `userName`, `entraGroupId`, or `entraGroupName`.
 
 `--email [email]`
-: Email of the user to retrieve information for. Use either `email`, `id` or `loginName`, but not all.
+: Email of the user to retrieve information for. Specify either `id`, `loginName`, `email`, `userName`, `entraGroupId`, or `entraGroupName`.
 
 `--loginName [loginName]`
-: Login name of the user to retrieve information for. Use either `email`, `id` or `loginName`, but not all.
+: Login name of the user to retrieve information for. Specify either `id`, `loginName`, `email`, `userName`, `entraGroupId`, or `entraGroupName`.
+
+`--userName [userName]`
+: User's UPN (user principal name, eg. megan.bowen@contoso.com). Specify either `id`, `loginName`, `email`, `userName`, `entraGroupId`, or `entraGroupName`.
+
+`--entraGroupId [entraGroupId]`
+: The object ID of the Microsoft Entra group. Specify either `id`, `loginName`, `email`, `userName`, `entraGroupId`, or `entraGroupName`.
+
+`--entraGroupName [entraGroupName]`
+: The name of the Microsoft Entra group. Specify either `id`, `loginName`, `email`, `userName`, `entraGroupId`, or `entraGroupName`.
 ```
 
 <Global />
 
 ## Examples
 
-Get user by email for a web
+Get user by email for a web.
 
 ```sh
 m365 spo user get --webUrl https://contoso.sharepoint.com/sites/project-x --email john.doe@mytenant.onmicrosoft.com
 ```
 
-Get user by ID for a web
+Get user by ID for a web.
 
 ```sh
 m365 spo user get --webUrl https://contoso.sharepoint.com/sites/project-x --id 6
 ```
 
-Get user by login name for a web
+Get user by login name for a web.
 
 ```sh
 m365 spo user get --webUrl https://contoso.sharepoint.com/sites/project-x --loginName "i:0#.f|membership|john.doe@mytenant.onmicrosoft.com"
 ```
 
-Get the currently logged-in user
+Get user by user's UPN for a web.
+
+```sh
+m365 spo user get --webUrl https://contoso.sharepoint.com/sites/project-x --userName "john.doe@mytenant.onmicrosoft.com"
+```
+
+Get user by entraGroupId for a web.
+
+```sh
+m365 spo user get --webUrl https://contoso.sharepoint.com/sites/project-x --entraGroupId f832a493-de73-4fef-87ed-8c6fffd91be6
+```
+
+Get user by entraGroupName for a web.
+
+```sh
+m365 spo user get --webUrl https://contoso.sharepoint.com/sites/project-x --entraGroupName "Test Members"
+```
+
+Get the currently logged-in user.
 
 ```sh
 m365 spo user get --webUrl https://contoso.sharepoint.com/sites/project-x
@@ -134,4 +161,3 @@ m365 spo user get --webUrl https://contoso.sharepoint.com/sites/project-x
 
   </TabItem>
 </Tabs>
-

@@ -3,6 +3,8 @@ import type { SidebarsConfig } from '@docusaurus/plugin-content-docs';
 const sidebars: SidebarsConfig = {
   home: [
     'index',
+    'v10-upgrade-guidance',
+    'v9-upgrade-guidance',
     'v8-upgrade-guidance',
     'v7-upgrade-guidance',
     'v6-upgrade-guidance',
@@ -68,11 +70,6 @@ const sidebars: SidebarsConfig = {
           type: 'doc',
           label: 'issue',
           id: 'cmd/cli/cli-issue'
-        },
-        {
-          type: 'doc',
-          label: 'reconsent',
-          id: 'cmd/cli/cli-reconsent'
         },
         {
           completion: [
@@ -331,6 +328,11 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'enterpriseapp list',
               id: 'cmd/entra/enterpriseapp/enterpriseapp-list'
+            },
+            {
+              type: 'doc',
+              label: 'enterpriseapp remove',
+              id: 'cmd/entra/enterpriseapp/enterpriseapp-remove'
             }
           ]
         },
@@ -358,18 +360,23 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
-              label: 'group user add',
-              id: 'cmd/entra/group/group-user-add'
+              label: 'group set',
+              id: 'cmd/entra/group/group-set'
             },
             {
               type: 'doc',
-              label: 'group user list',
-              id: 'cmd/entra/group/group-user-list'
+              label: 'group member add',
+              id: 'cmd/entra/group/group-member-add'
             },
             {
               type: 'doc',
-              label: 'group user set',
-              id: 'cmd/entra/group/group-user-set'
+              label: 'group member list',
+              id: 'cmd/entra/group/group-member-list'
+            },
+            {
+              type: 'doc',
+              label: 'group member set',
+              id: 'cmd/entra/group/group-member-set'
             }
           ]
         },
@@ -543,8 +550,23 @@ const sidebars: SidebarsConfig = {
           multitenant: [
             {
               type: 'doc',
+              label: 'multitenant add',
+              id: 'cmd/entra/multitenant/multitenant-add'
+            },
+            {
+              type: 'doc',
               label: 'multitenant get',
               id: 'cmd/entra/multitenant/multitenant-get'
+            },
+            {
+              type: 'doc',
+              label: 'multitenant remove',
+              id: 'cmd/entra/multitenant/multitenant-remove'
+            },
+            {
+              type: 'doc',
+              label: 'multitenant set',
+              id: 'cmd/entra/multitenant/multitenant-set'
             }
           ]
         },
@@ -802,6 +824,11 @@ const sidebars: SidebarsConfig = {
           type: 'doc',
           label: 'list',
           id: 'cmd/file/file-list'
+        },
+        {
+          type: 'doc',
+          label: 'move',
+          id: 'cmd/file/file-move'
         }
       ]
     },
@@ -1064,6 +1091,11 @@ const sidebars: SidebarsConfig = {
       'OneNote (onenote)': [
         {
           notebook: [
+            {
+              type: 'doc',
+              label: 'notebook add',
+              id: 'cmd/onenote/notebook/notebook-add'
+            },
             {
               type: 'doc',
               label: 'notebook list',
@@ -1532,6 +1564,20 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'owner remove',
               id: 'cmd/flow/owner/owner-remove'
+            }
+          ]
+        },
+        {
+          recyclebinitem: [
+            {
+              type: 'doc',
+              label: 'recyclebinitem list',
+              id: 'cmd/flow/recyclebinitem/recyclebinitem-list'
+            },
+            {
+              type: 'doc',
+              label: 'recyclebinitem restore',
+              id: 'cmd/flow/recyclebinitem/recyclebinitem-restore'
             }
           ]
         },
@@ -2557,6 +2603,31 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'folder roleinheritance reset',
               id: 'cmd/spo/folder/folder-roleinheritance-reset'
+            },
+            {
+              type: 'doc',
+              label: 'folder sharinglink add',
+              id: 'cmd/spo/folder/folder-sharinglink-add'
+            },
+            {
+              type: 'doc',
+              label: 'folder sharinglink clear',
+              id: 'cmd/spo/folder/folder-sharinglink-clear'
+            },
+            {
+              type: 'doc',
+              label: 'folder sharinglink get',
+              id: 'cmd/spo/folder/folder-sharinglink-get'
+            },
+            {
+              type: 'doc',
+              label: 'folder sharinglink list',
+              id: 'cmd/spo/folder/folder-sharinglink-list'
+            },
+            {
+              type: 'doc',
+              label: 'folder sharinglink remove',
+              id: 'cmd/spo/folder/folder-sharinglink-remove'
             }
           ]
         },
@@ -3313,11 +3384,6 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
-              label: 'site admin list',
-              id: 'cmd/spo/site/site-admin-list'
-            },
-            {
-              type: 'doc',
               label: 'site ensure',
               id: 'cmd/spo/site/site-ensure'
             },
@@ -3343,13 +3409,23 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
-              label: 'site rename',
-              id: 'cmd/spo/site/site-rename'
+              label: 'site set',
+              id: 'cmd/spo/site/site-set'
             },
             {
               type: 'doc',
-              label: 'site set',
-              id: 'cmd/spo/site/site-set'
+              label: 'site admin add',
+              id: 'cmd/spo/site/site-admin-add'
+            },
+            {
+              type: 'doc',
+              label: 'site admin list',
+              id: 'cmd/spo/site/site-admin-list'
+            },
+            {
+              type: 'doc',
+              label: 'site admin remove',
+              id: 'cmd/spo/site/site-admin-remove'
             },
             {
               type: 'doc',
@@ -3445,6 +3521,11 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'site recyclebinitem restore',
               id: 'cmd/spo/site/site-recyclebinitem-restore'
+            },
+            {
+              type: 'doc',
+              label: 'site sharingpermission set',
+              id: 'cmd/spo/site/site-sharingpermission-set'
             }
           ]
         },
@@ -3669,6 +3750,11 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
+              label: 'tenant site rename',
+              id: 'cmd/spo/tenant/tenant-site-rename'
+            },
+            {
+              type: 'doc',
               label: 'tenant site unarchive',
               id: 'cmd/spo/tenant/tenant-site-unarchive'
             }
@@ -3856,6 +3942,19 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'web roleinheritance reset',
               id: 'cmd/spo/web/web-roleinheritance-reset'
+            }
+          ]
+        }
+      ]
+    },
+    {
+      'SharePoint Premium (spp)': [
+        {
+          contentcenter: [
+            {
+              type: 'doc',
+              label: 'contentcenter list',
+              id: 'cmd/spp/contentcenter/contentcenter-list'
             }
           ]
         }
@@ -4051,6 +4150,11 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
+              label: 'meeting transcript get',
+              id: 'cmd/teams/meeting/meeting-transcript-get'
+            },
+            {
+              type: 'doc',
               label: 'meeting transcript list',
               id: 'cmd/teams/meeting/meeting-transcript-list'
             }
@@ -4086,6 +4190,11 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'message remove',
               id: 'cmd/teams/message/message-remove'
+            },
+            {
+              type: 'doc',
+              label: 'message restore',
+              id: 'cmd/teams/message/message-restore'
             },
             {
               type: 'doc',
@@ -4365,6 +4474,11 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'engage community get',
               id: 'cmd/viva/engage/engage-community-get'
+            },
+            {
+              type: 'doc',
+              label: 'engage community list',
+              id: 'cmd/viva/engage/engage-community-list'
             },
             {
               type: 'doc',

@@ -5,56 +5,18 @@ import GlobalOptions from '../../../../GlobalOptions.js';
 import { Logger } from '../../../../cli/Logger.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { accessToken } from '../../../../utils/accessToken.js';
-import { odata } from '../../../../utils/odata.js';
+import { AppCreationOptions, AppInfo, entraApp } from '../../../../utils/entraApp.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import { M365RcJson } from '../../../base/M365RcJson.js';
 import commands from '../../commands.js';
-import aadCommands from '../../aadCommands.js';
-
-interface ServicePrincipalInfo {
-  appId: string;
-  appRoles: { id: string; value: string; }[];
-  id: string;
-  oauth2PermissionScopes: { id: string; value: string; }[];
-  servicePrincipalNames: string[];
-}
-
-interface RequiredResourceAccess {
-  resourceAppId: string;
-  resourceAccess: ResourceAccess[];
-}
-
-interface ResourceAccess {
-  id: string;
-  type: string;
-}
-
-interface AppInfo {
-  appId: string;
-  // objectId
-  id: string;
-  tenantId: string;
-  secrets?: {
-    displayName: string;
-    value: string;
-  }[];
-  requiredResourceAccess: RequiredResourceAccess[];
-}
 
 interface CommandArgs {
   options: Options;
 }
 
-interface Options extends GlobalOptions {
-  apisApplication?: string;
-  apisDelegated?: string;
+interface Options extends GlobalOptions, AppCreationOptions {
   grantAdminConsent?: boolean;
-  implicitFlow: boolean;
   manifest?: string;
-  multitenant: boolean;
-  name?: string;
-  platform?: string;
-  redirectUris?: string;
   save?: boolean;
   scopeAdminConsentDescription?: string;
   scopeAdminConsentDisplayName?: string;
@@ -62,16 +24,6 @@ interface Options extends GlobalOptions {
   scopeName?: string;
   uri?: string;
   withSecret: boolean;
-  certificateFile?: string;
-  certificateBase64Encoded?: string;
-  certificateDisplayName?: string;
-  allowPublicClientFlows?: boolean;
-}
-
-interface AppPermissions {
-  resourceId: string;
-  resourceAccess: ResourceAccess[];
-  scope: string[];
 }
 
 class EntraAppAddCommand extends GraphCommand {
@@ -79,7 +31,6 @@ class EntraAppAddCommand extends GraphCommand {
   private static entraAppScopeConsentBy: string[] = ['admins', 'adminsAndUsers'];
   private manifest: any;
   private appName: string = '';
-  private appPermissions: AppPermissions[] = [];
 
   public get name(): string {
     return commands.APP_ADD;
@@ -87,10 +38,6 @@ class EntraAppAddCommand extends GraphCommand {
 
   public get description(): string {
     return 'Creates new Entra app registration';
-  }
-
-  public alias(): string[] | undefined {
-    return [aadCommands.APP_ADD, commands.APPREGISTRATION_ADD];
   }
 
   constructor() {
@@ -259,18 +206,39 @@ class EntraAppAddCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    await this.showDeprecationWarning(logger, aadCommands.APP_ADD, commands.APP_ADD);
+    if (!args.options.name && this.manifest) {
+      args.options.name = this.manifest.name;
+    }
+    this.appName = args.options.name!;
 
     try {
-      const apis = await this.resolveApis(args, logger);
-      let appInfo: any = await this.createAppRegistration(args, apis, logger);
+      const apis = await entraApp.resolveApis({
+        options: args.options,
+        manifest: this.manifest,
+        logger,
+        verbose: this.verbose,
+        debug: this.debug
+      });
+      let appInfo: any = await entraApp.createAppRegistration({
+        options: args.options,
+        apis,
+        logger,
+        verbose: this.verbose,
+        debug: this.debug
+      });
       // based on the assumption that we're adding Microsoft Entra app to the current
       // directory. If we in the future extend the command with allowing
       // users to create Microsoft Entra app in a different directory, we'll need to
       // adjust this
       appInfo.tenantId = accessToken.getTenantIdFromAccessToken(auth.connection.accessTokens[auth.defaultResource].accessToken);
       appInfo = await this.updateAppFromManifest(args, appInfo);
-      appInfo = await this.grantAdminConsent(appInfo, args.options.grantAdminConsent, logger);
+      appInfo = await entraApp.grantAdminConsent({
+        appInfo,
+        appPermissions: entraApp.appPermissions,
+        adminConsent: args.options.grantAdminConsent,
+        logger,
+        debug: this.debug
+      });
       appInfo = await this.configureUri(args, appInfo, logger);
       appInfo = await this.configureSecret(args, appInfo, logger);
       const _appInfo = await this.saveAppInfo(args, appInfo, logger);
@@ -291,153 +259,52 @@ class EntraAppAddCommand extends GraphCommand {
     }
   }
 
-  private async createAppRegistration(args: CommandArgs, apis: RequiredResourceAccess[], logger: Logger): Promise<AppInfo> {
-    const applicationInfo: any = {
-      displayName: args.options.name,
-      signInAudience: args.options.multitenant ? 'AzureADMultipleOrgs' : 'AzureADMyOrg'
-    };
-
-    if (!applicationInfo.displayName && this.manifest) {
-      applicationInfo.displayName = this.manifest.name;
-    }
-    this.appName = applicationInfo.displayName;
-
-    if (apis.length > 0) {
-      applicationInfo.requiredResourceAccess = apis;
-    }
-
-    if (args.options.redirectUris) {
-      applicationInfo[args.options.platform!] = {
-        redirectUris: args.options.redirectUris.split(',').map(u => u.trim())
-      };
-    }
-
-    if (args.options.implicitFlow) {
-      if (!applicationInfo.web) {
-        applicationInfo.web = {};
-      }
-      applicationInfo.web.implicitGrantSettings = {
-        enableAccessTokenIssuance: true,
-        enableIdTokenIssuance: true
-      };
-    }
-
-    if (args.options.certificateFile || args.options.certificateBase64Encoded) {
-      const certificateBase64Encoded = await this.getCertificateBase64Encoded(args, logger);
-
-      const newKeyCredential = {
-        type: "AsymmetricX509Cert",
-        usage: "Verify",
-        displayName: args.options.certificateDisplayName,
-        key: certificateBase64Encoded
-      } as any;
-
-      applicationInfo.keyCredentials = [newKeyCredential];
-    }
-
-    if (args.options.allowPublicClientFlows) {
-      applicationInfo.isFallbackPublicClient = true;
-    }
-
-    if (this.verbose) {
-      await logger.logToStderr(`Creating Microsoft Entra app registration...`);
-    }
-
-    const createApplicationRequestOptions: CliRequestOptions = {
-      url: `${this.resource}/v1.0/myorganization/applications`,
-      headers: {
-        accept: 'application/json;odata.metadata=none'
-      },
-      responseType: 'json',
-      data: applicationInfo
-    };
-
-    return request.post<AppInfo>(createApplicationRequestOptions);
-  }
-
-  private async grantAdminConsent(appInfo: AppInfo, adminConsent: boolean | undefined, logger: Logger): Promise<AppInfo> {
-    if (!adminConsent || this.appPermissions.length === 0) {
+  private async configureSecret(args: CommandArgs, appInfo: AppInfo, logger: Logger): Promise<AppInfo> {
+    if (!args.options.withSecret || (appInfo.secrets && appInfo.secrets.length > 0)) {
       return appInfo;
     }
 
-    const sp = await this.createServicePrincipal(appInfo.appId);
-    if (this.debug) {
-      await logger.logToStderr("Service principal created, returned object id: " + sp.id);
+    if (this.verbose) {
+      await logger.logToStderr(`Configure Microsoft Entra app secret...`);
     }
 
-    const tasks: Promise<void>[] = [];
+    const secret = await this.createSecret({ appObjectId: appInfo.id });
 
-    this.appPermissions.forEach(async (permission) => {
-      if (permission.scope.length > 0) {
-        tasks.push(this.grantOAuth2Permission(sp.id, permission.resourceId, permission.scope.join(' ')));
-
-        if (this.debug) {
-          await logger.logToStderr(`Admin consent granted for following resource ${permission.resourceId}, with delegated permissions: ${permission.scope.join(',')}`);
-        }
-      }
-
-      permission.resourceAccess.filter(access => access.type === "Role").forEach(async (access: ResourceAccess) => {
-        tasks.push(this.addRoleToServicePrincipal(sp.id, permission.resourceId, access.id));
-
-        if (this.debug) {
-          await logger.logToStderr(`Admin consent granted for following resource ${permission.resourceId}, with application permission: ${access.id}`);
-        }
-      });
-    });
-
-    await Promise.all(tasks);
+    if (!appInfo.secrets) {
+      appInfo.secrets = [];
+    }
+    appInfo.secrets.push(secret);
     return appInfo;
   }
 
-  private async addRoleToServicePrincipal(objectId: string, resourceId: string, appRoleId: string): Promise<void> {
+  private async createSecret({ appObjectId, displayName = undefined, expirationDate = undefined }: { appObjectId: string, displayName?: string, expirationDate?: Date }): Promise<{ displayName: string, value: string }> {
+    let secretExpirationDate = expirationDate;
+    if (!secretExpirationDate) {
+      secretExpirationDate = new Date();
+      secretExpirationDate.setFullYear(secretExpirationDate.getFullYear() + 1);
+    }
+
+    const secretName = displayName ?? 'Default';
+
     const requestOptions: CliRequestOptions = {
-      url: `${this.resource}/v1.0/myorganization/servicePrincipals/${objectId}/appRoleAssignments`,
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      responseType: 'json',
-      data: {
-        appRoleId: appRoleId,
-        principalId: objectId,
-        resourceId: resourceId
-      }
-    };
-
-    return request.post(requestOptions);
-  }
-
-  private async grantOAuth2Permission(appId: string, resourceId: string, scopeName: string): Promise<void> {
-    const grantAdminConsentApplicationRequestOptions: CliRequestOptions = {
-      url: `${this.resource}/v1.0/myorganization/oauth2PermissionGrants`,
-      headers: {
-        accept: 'application/json;odata.metadata=none'
-      },
-      responseType: 'json',
-      data: {
-        clientId: appId,
-        consentType: "AllPrincipals",
-        principalId: null,
-        resourceId: resourceId,
-        scope: scopeName
-      }
-    };
-
-    return request.post(grantAdminConsentApplicationRequestOptions);
-  }
-
-  private async createServicePrincipal(appId: string): Promise<ServicePrincipalInfo> {
-    const requestOptions: CliRequestOptions = {
-      url: `${this.resource}/v1.0/myorganization/servicePrincipals`,
+      url: `${this.resource}/v1.0/myorganization/applications/${appObjectId}/addPassword`,
       headers: {
         'content-type': 'application/json'
       },
+      responseType: 'json',
       data: {
-        appId: appId
-      },
-      responseType: 'json'
+        passwordCredential: {
+          displayName: secretName,
+          endDateTime: secretExpirationDate.toISOString()
+        }
+      }
     };
 
-    return request.post<ServicePrincipalInfo>(requestOptions);
+    const response = await request.post<{ secretText: string }>(requestOptions);
+    return {
+      displayName: secretName,
+      value: response.secretText
+    };
   }
 
   private async updateAppFromManifest(args: CommandArgs, appInfo: AppInfo): Promise<AppInfo> {
@@ -725,216 +592,6 @@ class EntraAppAddCommand extends GraphCommand {
 
     await request.patch(requestOptions);
     return appInfo;
-  }
-
-  private async resolveApis(args: CommandArgs, logger: Logger): Promise<RequiredResourceAccess[]> {
-    if (!args.options.apisDelegated && !args.options.apisApplication
-      && (typeof this.manifest?.requiredResourceAccess === 'undefined' || this.manifest.requiredResourceAccess.length === 0)) {
-      return [];
-    }
-
-    if (this.verbose) {
-      await logger.logToStderr('Resolving requested APIs...');
-    }
-
-    const servicePrincipals = await odata.getAllItems<ServicePrincipalInfo>(`${this.resource}/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames`);
-
-    let resolvedApis: RequiredResourceAccess[] = [];
-
-    try {
-      if (args.options.apisDelegated || args.options.apisApplication) {
-        resolvedApis = await this.getRequiredResourceAccessForApis(servicePrincipals, args.options.apisDelegated, 'Scope', logger);
-        if (this.verbose) {
-          await logger.logToStderr(`Resolved delegated permissions: ${JSON.stringify(resolvedApis, null, 2)}`);
-        }
-        const resolvedApplicationApis = await this.getRequiredResourceAccessForApis(servicePrincipals, args.options.apisApplication, 'Role', logger);
-        if (this.verbose) {
-          await logger.logToStderr(`Resolved application permissions: ${JSON.stringify(resolvedApplicationApis, null, 2)}`);
-        }
-        // merge resolved application APIs onto resolved delegated APIs
-        resolvedApplicationApis.forEach(resolvedRequiredResource => {
-          const requiredResource = resolvedApis.find(api => api.resourceAppId === resolvedRequiredResource.resourceAppId);
-          if (requiredResource) {
-            requiredResource.resourceAccess.push(...resolvedRequiredResource.resourceAccess);
-          }
-          else {
-            resolvedApis.push(resolvedRequiredResource);
-          }
-        });
-      }
-      else {
-        const manifestApis = (this.manifest.requiredResourceAccess as RequiredResourceAccess[]);
-
-        manifestApis.forEach(manifestApi => {
-          resolvedApis.push(manifestApi);
-
-          const app = servicePrincipals.find(servicePrincipals => servicePrincipals.appId === manifestApi.resourceAppId);
-
-          if (app) {
-            manifestApi.resourceAccess.forEach((res => {
-              const resourceAccessPermission = {
-                id: res.id,
-                type: res.type
-              };
-
-              const oAuthValue = app.oauth2PermissionScopes.find(scp => scp.id === res.id)?.value;
-              this.updateAppPermissions(app.id, resourceAccessPermission, oAuthValue);
-            }));
-          }
-        });
-      }
-
-      if (this.verbose) {
-        await logger.logToStderr(`Merged delegated and application permissions: ${JSON.stringify(resolvedApis, null, 2)}`);
-        await logger.logToStderr(`App role assignments: ${JSON.stringify(this.appPermissions.flatMap(permission => permission.resourceAccess.filter(access => access.type === "Role")), null, 2)}`);
-        await logger.logToStderr(`OAuth2 permissions: ${JSON.stringify(this.appPermissions.flatMap(permission => permission.scope), null, 2)}`);
-      }
-
-      return resolvedApis;
-    }
-    catch (e) {
-      throw e;
-    }
-  }
-
-  private async getRequiredResourceAccessForApis(servicePrincipals: ServicePrincipalInfo[], apis: string | undefined, scopeType: string, logger: Logger): Promise<RequiredResourceAccess[]> {
-    if (!apis) {
-      return [];
-    }
-
-    const resolvedApis: RequiredResourceAccess[] = [];
-    const requestedApis: string[] = apis!.split(',').map(a => a.trim());
-    for (const api of requestedApis) {
-      const pos: number = api.lastIndexOf('/');
-      const permissionName: string = api.substr(pos + 1);
-      const servicePrincipalName: string = api.substr(0, pos);
-      if (this.debug) {
-        await logger.logToStderr(`Resolving ${api}...`);
-        await logger.logToStderr(`Permission name: ${permissionName}`);
-        await logger.logToStderr(`Service principal name: ${servicePrincipalName}`);
-      }
-      const servicePrincipal = servicePrincipals.find(sp => (
-        sp.servicePrincipalNames.indexOf(servicePrincipalName) > -1 ||
-        sp.servicePrincipalNames.indexOf(`${servicePrincipalName}/`) > -1));
-      if (!servicePrincipal) {
-        throw `Service principal ${servicePrincipalName} not found`;
-      }
-
-      const scopesOfType = scopeType === 'Scope' ? servicePrincipal.oauth2PermissionScopes : servicePrincipal.appRoles;
-      const permission = scopesOfType.find(scope => scope.value === permissionName);
-      if (!permission) {
-        throw `Permission ${permissionName} for service principal ${servicePrincipalName} not found`;
-      }
-
-      let resolvedApi = resolvedApis.find(a => a.resourceAppId === servicePrincipal.appId);
-      if (!resolvedApi) {
-        resolvedApi = {
-          resourceAppId: servicePrincipal.appId,
-          resourceAccess: []
-        };
-        resolvedApis.push(resolvedApi);
-      }
-
-      const resourceAccessPermission = {
-        id: permission.id,
-        type: scopeType
-      };
-
-      resolvedApi.resourceAccess.push(resourceAccessPermission);
-
-      this.updateAppPermissions(servicePrincipal.id, resourceAccessPermission, permission.value);
-    }
-
-    return resolvedApis;
-  }
-
-  private updateAppPermissions(spId: string, resourceAccessPermission: ResourceAccess, oAuth2PermissionValue?: string): void {
-    // During API resolution, we store globally both app role assignments and oauth2permissions
-    // So that we'll be able to parse them during the admin consent process
-    let existingPermission = this.appPermissions.find(oauth => oauth.resourceId === spId);
-    if (!existingPermission) {
-      existingPermission = {
-        resourceId: spId,
-        resourceAccess: [],
-        scope: []
-      };
-
-      this.appPermissions.push(existingPermission);
-    }
-
-    if (resourceAccessPermission.type === 'Scope' && oAuth2PermissionValue && !existingPermission.scope.find(scp => scp === oAuth2PermissionValue)) {
-      existingPermission.scope.push(oAuth2PermissionValue);
-    }
-
-    if (!existingPermission.resourceAccess.find(res => res.id === resourceAccessPermission.id)) {
-      existingPermission.resourceAccess.push(resourceAccessPermission);
-    }
-  }
-
-  private async configureSecret(args: CommandArgs, appInfo: AppInfo, logger: Logger): Promise<AppInfo> {
-    if (!args.options.withSecret || (appInfo.secrets && appInfo.secrets.length > 0)) {
-      return appInfo;
-    }
-
-    if (this.verbose) {
-      await logger.logToStderr(`Configure Microsoft Entra app secret...`);
-    }
-
-    const secret = await this.createSecret({ appObjectId: appInfo.id });
-
-    if (!appInfo.secrets) {
-      appInfo.secrets = [];
-    }
-    appInfo.secrets.push(secret);
-    return appInfo;
-
-  }
-
-  private async createSecret({ appObjectId, displayName = undefined, expirationDate = undefined }: { appObjectId: string, displayName?: string, expirationDate?: Date }): Promise<{ displayName: string, value: string }> {
-    let secretExpirationDate = expirationDate;
-    if (!secretExpirationDate) {
-      secretExpirationDate = new Date();
-      secretExpirationDate.setFullYear(secretExpirationDate.getFullYear() + 1);
-    }
-
-    const secretName = displayName ?? 'Default';
-
-    const requestOptions: CliRequestOptions = {
-      url: `${this.resource}/v1.0/myorganization/applications/${appObjectId}/addPassword`,
-      headers: {
-        'content-type': 'application/json'
-      },
-      responseType: 'json',
-      data: {
-        passwordCredential: {
-          displayName: secretName,
-          endDateTime: secretExpirationDate.toISOString()
-        }
-      }
-    };
-
-    const response = await request.post<{ secretText: string }>(requestOptions);
-    return {
-      displayName: secretName,
-      value: response.secretText
-    };
-  }
-
-  private async getCertificateBase64Encoded(args: CommandArgs, logger: Logger): Promise<string> {
-    if (args.options.certificateBase64Encoded) {
-      return args.options.certificateBase64Encoded;
-    }
-
-    if (this.debug) {
-      await logger.logToStderr(`Reading existing ${args.options.certificateFile}...`);
-    }
-
-    try {
-      return fs.readFileSync(args.options.certificateFile as string, { encoding: 'base64' });
-    }
-    catch (e) {
-      throw new Error(`Error reading certificate file: ${e}. Please add the certificate using base64 option '--certificateBase64Encoded'.`);
-    }
   }
 
   private async saveAppInfo(args: CommandArgs, appInfo: AppInfo, logger: Logger): Promise<AppInfo> {

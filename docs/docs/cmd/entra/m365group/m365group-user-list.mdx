@@ -12,12 +12,6 @@ Lists users for the specified Microsoft 365 group
 m365 entra m365group user list [options]
 ```
 
-## Alias
-
-```sh
-m365 aad m365group user list [options]
-```
-
 ## Options
 
 ```md definition-list
@@ -28,7 +22,7 @@ m365 aad m365group user list [options]
 : The display name of the Microsoft 365 group. Specify `groupId` or `groupDisplayName` but not both.
 
 `-r, --role [role]`
-: Filter the results to only users with the given role. Allowed values: `Owner`, `Member`, or (Deprecated) `Guest`.
+: Filter the results to only users with the given role. Allowed values: `Owner`, `Member`.
 
 `-p, --properties [properties]`
 : Comma-separated list of properties to retrieve.
@@ -61,12 +55,6 @@ List specific properties for all group users from a group specified by ID.
 
 ```sh
 m365 entra m365group user list --groupId 03cba9da-3974-46c1-afaf-79caa2e45bbe --properties "id,jobTitle,companyName,accountEnabled"
-```
-
-List all group members that are guest users.
-
-```sh
-m365 entra m365group user list --groupDisplayName Developers --filter "userType eq 'Guest'"
 ```
 
 ## Response

@@ -36,6 +36,10 @@ m365 spo applicationcustomizer get [options]
 
 <Global />
 
+## Remarks
+
+This command can be used for retrieving an application customizer from a specific site. To retrieve an application customizer that's installed tenant-wide, view our dedicated [spo tenant applicationcustomizer get](../tenant/tenant-applicationcustomizer-get.mdx) command.
+
 ## Examples
 
 Retrieves an application customizer by title.
@@ -68,10 +72,6 @@ Retrieves the client-side component properties of a application customizer.
 m365 spo applicationcustomizer get --id 14125658-a9bc-4ddf-9c75-1b5767c9a337 --webUrl https://contoso.sharepoint.com/sites/sales --clientSideComponentProperties
 ```
 
-## Remarks
-
-This command can be used for retrieving an application customizer from a specific site. To retrieve an application customizer that's installed tenant-wide, view our dedicated [spo tenant applicationcustomizer get](../tenant/tenant-applicationcustomizer-get.mdx) command.
-
 ## Response
 
 ### Standard response
@@ -93,7 +93,10 @@ This command can be used for retrieving an application customizer from a specifi
     "Name": "{4a428b32-08cf-45c7-9986-17585af38806}",
     "RegistrationId": null,
     "RegistrationType": 0,
-    "Rights": "{\"High\":\"0\",\"Low\":\"0\"}",
+    "Rights": {
+      "High": 0,
+      "Low": 0
+    },
     "Scope": "Web",
     "ScriptBlock": null,
     "ScriptSrc": null,
@@ -120,7 +123,6 @@ This command can be used for retrieving an application customizer from a specifi
   Name                         : {4a428b32-08cf-45c7-9986-17585af38806}
   RegistrationId               : null
   RegistrationType             : 0
-  Rights                       : {"High":"0","Low":"0"}
   Scope                        : Web
   ScriptBlock                  : null
   ScriptSrc                    : null
@@ -134,8 +136,8 @@ This command can be used for retrieving an application customizer from a specifi
   <TabItem value="CSV">
 
   ```csv
-  ClientSideComponentId,ClientSideComponentProperties,CommandUIExtension,Description,Group,HostProperties,Id,ImageUrl,Location,Name,RegistrationId,RegistrationType,Rights,Scope,ScriptBlock,ScriptSrc,Sequence,Title,Url,VersionOfUserCustomAction
-  9a8b100c-246b-4592-9454-67826523e159,"{""testMessage"":""Test message""}",,,,,4a428b32-08cf-45c7-9986-17585af38806,,ClientSideExtension.ApplicationCustomizer,{4a428b32-08cf-45c7-9986-17585af38806},,0,"{""High"":""0"",""Low"":""0""}",Web,,,65536,HelloWorld,,1.0.1.0
+  ClientSideComponentId,ClientSideComponentProperties,CommandUIExtension,Description,Group,Id,ImageUrl,Location,Name,RegistrationId,RegistrationType,Scope,ScriptBlock,ScriptSrc,Sequence,Title,Url,VersionOfUserCustomAction
+  9a8b100c-246b-4592-9454-67826523e159,"{""testMessage"":""Test message""}",,,,4a428b32-08cf-45c7-9986-17585af38806,,ClientSideExtension.ApplicationCustomizer,Some customizer,,0,Web,,,0,Some customizer,,16.0.1.0
   ```
 
   </TabItem>
@@ -157,7 +159,6 @@ This command can be used for retrieving an application customizer from a specifi
   Location | ClientSideExtension.ApplicationCustomizer
   Name | {4a428b32-08cf-45c7-9986-17585af38806}
   RegistrationType | 0
-  Rights | {"High":"0","Low":"0"}
   Scope | Web
   Sequence | 65536
   Title | HelloWorld

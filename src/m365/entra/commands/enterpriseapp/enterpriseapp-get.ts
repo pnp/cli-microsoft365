@@ -5,7 +5,6 @@ import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
-import aadCommands from '../../aadCommands.js';
 import commands from '../../commands.js';
 
 interface CommandArgs {
@@ -13,9 +12,9 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  appId?: string;
-  appDisplayName?: string;
-  appObjectId?: string;
+  id?: string;
+  displayName?: string;
+  objectId?: string;
 }
 
 class EntraEnterpriseAppGetCommand extends GraphCommand {
@@ -25,10 +24,6 @@ class EntraEnterpriseAppGetCommand extends GraphCommand {
 
   public get description(): string {
     return 'Gets information about an Enterprise Application';
-  }
-
-  public alias(): string[] | undefined {
-    return [aadCommands.SP_GET, commands.SP_GET];
   }
 
   constructor() {
@@ -43,9 +38,9 @@ class EntraEnterpriseAppGetCommand extends GraphCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        appId: (!(!args.options.appId)).toString(),
-        appDisplayName: (!(!args.options.appDisplayName)).toString(),
-        appObjectId: (!(!args.options.appObjectId)).toString()
+        id: (!(!args.options.id)).toString(),
+        displayName: (!(!args.options.displayName)).toString(),
+        objectId: (!(!args.options.objectId)).toString()
       });
     });
   }
@@ -53,13 +48,13 @@ class EntraEnterpriseAppGetCommand extends GraphCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '-i, --appId [appId]'
+        option: '-i, --id [id]'
       },
       {
-        option: '-n, --appDisplayName [appDisplayName]'
+        option: '-n, --displayName [displayName]'
       },
       {
-        option: '--appObjectId [appObjectId]'
+        option: '--objectId [objectId]'
       }
     );
   }
@@ -67,12 +62,12 @@ class EntraEnterpriseAppGetCommand extends GraphCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (args.options.appId && !validation.isValidGuid(args.options.appId)) {
-          return `${args.options.appId} is not a valid appId GUID`;
+        if (args.options.id && !validation.isValidGuid(args.options.id)) {
+          return `${args.options.id} is not a valid GUID`;
         }
 
-        if (args.options.appObjectId && !validation.isValidGuid(args.options.appObjectId)) {
-          return `${args.options.appObjectId} is not a valid objectId GUID`;
+        if (args.options.objectId && !validation.isValidGuid(args.options.objectId)) {
+          return `${args.options.objectId} is not a valid GUID`;
         }
 
         return true;
@@ -81,20 +76,20 @@ class EntraEnterpriseAppGetCommand extends GraphCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push({ options: ['appId', 'appDisplayName', 'appObjectId'] });
+    this.optionSets.push({ options: ['id', 'displayName', 'objectId'] });
   }
 
   private async getSpId(args: CommandArgs): Promise<string> {
-    if (args.options.appObjectId) {
-      return args.options.appObjectId;
+    if (args.options.objectId) {
+      return args.options.objectId;
     }
 
     let spMatchQuery: string = '';
-    if (args.options.appDisplayName) {
-      spMatchQuery = `displayName eq '${formatting.encodeQueryParameter(args.options.appDisplayName)}'`;
+    if (args.options.displayName) {
+      spMatchQuery = `displayName eq '${formatting.encodeQueryParameter(args.options.displayName)}'`;
     }
-    else if (args.options.appId) {
-      spMatchQuery = `appId eq '${formatting.encodeQueryParameter(args.options.appId)}'`;
+    else if (args.options.id) {
+      spMatchQuery = `appId eq '${formatting.encodeQueryParameter(args.options.id)}'`;
     }
 
     const idRequestOptions: CliRequestOptions = {
@@ -115,7 +110,7 @@ class EntraEnterpriseAppGetCommand extends GraphCommand {
 
     if (response.value.length > 1) {
       const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', response.value);
-      const result = await cli.handleMultipleResultsFound<{ id: string }>(`Multiple Entra apps with name '${args.options.appDisplayName}' found.`, resultAsKeyValuePair);
+      const result = await cli.handleMultipleResultsFound<{ id: string }>(`Multiple Entra apps with name '${args.options.displayName}' found.`, resultAsKeyValuePair);
       return result.id;
     }
 
@@ -123,8 +118,6 @@ class EntraEnterpriseAppGetCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    await this.showDeprecationWarning(logger, aadCommands.SP_GET, commands.SP_GET);
-
     if (this.verbose) {
       await logger.logToStderr(`Retrieving enterprise application information...`);
     }

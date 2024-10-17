@@ -4,7 +4,6 @@ import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import VivaEngageCommand from '../../../base/VivaEngageCommand.js';
 import commands from '../../commands.js';
-import yammerCommands from './yammerCommands.js';
 
 interface CommandArgs {
   options: Options;
@@ -22,10 +21,6 @@ class VivaEngageUserGetCommand extends VivaEngageCommand {
 
   public get description(): string {
     return 'Retrieves the current user or searches for a user by ID or e-mail';
-  }
-
-  public alias(): string[] | undefined {
-    return [yammerCommands.USER_GET];
   }
 
   public defaultProperties(): string[] | undefined {
@@ -73,8 +68,6 @@ class VivaEngageUserGetCommand extends VivaEngageCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    await this.showDeprecationWarning(logger, this.alias()![0], this.name);
-
     let endPoint = `${this.resource}/v1/users/current.json`;
 
     if (args.options.id) {

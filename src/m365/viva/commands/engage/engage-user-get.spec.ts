@@ -12,7 +12,6 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './engage-user-get.js';
-import yammerCommands from './yammerCommands.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 
 describe(commands.ENGAGE_USER_GET, () => {
@@ -69,23 +68,6 @@ describe(commands.ENGAGE_USER_GET, () => {
 
   it('defines correct properties for the default output', () => {
     assert.deepStrictEqual(command.defaultProperties(), ['id', 'full_name', 'email', 'job_title', 'state', 'url']);
-  });
-
-  it('defines correct alias', () => {
-    const alias = command.alias();
-    assert.deepStrictEqual(alias, [yammerCommands.USER_GET]);
-  });
-
-  it('correctly logs deprecation warning for yammer command', async () => {
-    const chalk = (await import('chalk')).default;
-    const loggerErrSpy = sinon.spy(logger, 'logToStderr');
-    const commandNameStub = sinon.stub(cli, 'currentCommandName').value(yammerCommands.USER_GET);
-    sinon.stub(request, 'get').resolves({ 'type': 'user', 'id': 1496550646, 'network_id': 801445, 'state': 'active', 'full_name': 'John Doe' });
-
-    await command.action(logger, { options: { email: 'pl@nubo.eu' } });
-    assert.deepStrictEqual(loggerErrSpy.firstCall.firstArg, chalk.yellow(`Command '${yammerCommands.USER_GET}' is deprecated. Please use '${commands.ENGAGE_USER_GET}' instead.`));
-
-    sinonUtil.restore([loggerErrSpy, commandNameStub]);
   });
 
   it('calls user by e-mail', async () => {

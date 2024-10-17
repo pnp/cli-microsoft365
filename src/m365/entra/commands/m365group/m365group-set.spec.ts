@@ -15,7 +15,6 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './m365group-set.js';
 import { entraGroup } from '../../../../utils/entraGroup.js';
-import aadCommands from '../../aadCommands.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 
 describe(commands.M365GROUP_SET, () => {
@@ -46,6 +45,9 @@ describe(commands.M365GROUP_SET, () => {
     ctime: new Date(),
     birthtime: new Date()
   };
+
+  const userUpns = ['user1@contoso.com', 'user2@contoso.com', 'user3@contoso.com', 'user4@contoso.com', 'user5@contoso.com', 'user6@contoso.com', 'user7@contoso.com', 'user8@contoso.com', 'user9@contoso.com', 'user10@contoso.com', 'user11@contoso.com', 'user12@contoso.com', 'user13@contoso.com', 'user14@contoso.com', 'user15@contoso.com', 'user16@contoso.com', 'user17@contoso.com', 'user18@contoso.com', 'user19@contoso.com', 'user20@contoso.com', 'user21@contoso.com', 'user22@contoso.com', 'user23@contoso.com', 'user24@contoso.com', 'user25@contoso.com'];
+  const userIds = ['3f2504e0-4f89-11d3-9a0c-0305e82c3301', '6dcd4ce0-4f89-11d3-9a0c-0305e82c3302', '9b76f130-4f89-11d3-9a0c-0305e82c3303', 'c835f5e0-4f89-11d3-9a0c-0305e82c3304', 'f4f3fa90-4f89-11d3-9a0c-0305e82c3305', '2230f6a0-4f8a-11d3-9a0c-0305e82c3306', '4f6df5b0-4f8a-11d3-9a0c-0305e82c3307', '7caaf4c0-4f8a-11d3-9a0c-0305e82c3308', 'a9e8f3d0-4f8a-11d3-9a0c-0305e82c3309', 'd726f2e0-4f8a-11d3-9a0c-0305e82c330a', '0484f1f0-4f8b-11d3-9a0c-0305e82c330b', '31e2f100-4f8b-11d3-9a0c-0305e82c330c', '5f40f010-4f8b-11d3-9a0c-0305e82c330d', '8c9eef20-4f8b-11d3-9a0c-0305e82c330e', 'b9fce030-4f8b-11d3-9a0c-0305e82c330f', 'e73cdf40-4f8b-11d3-9a0c-0305e82c3310', '1470ce50-4f8c-11d3-9a0c-0305e82c3311', '41a3cd60-4f8c-11d3-9a0c-0305e82c3312', '6ed6cc70-4f8c-11d3-9a0c-0305e82c3313', '9c09cb80-4f8c-11d3-9a0c-0305e82c3314', 'c93cca90-4f8c-11d3-9a0c-0305e82c3315', 'f66cc9a0-4f8c-11d3-9a0c-0305e82c3316', '2368c8b0-4f8d-11d3-9a0c-0305e82c3317', '5064c7c0-4f8d-11d3-9a0c-0305e82c3318', '7d60c6d0-4f8d-11d3-9a0c-0305e82c3319'];
 
   let log: string[];
   let logger: Logger;
@@ -98,7 +100,8 @@ describe(commands.M365GROUP_SET, () => {
       fs.readFileSync,
       fs.existsSync,
       fs.lstatSync,
-      accessToken.isAppOnlyAccessToken
+      accessToken.isAppOnlyAccessToken,
+      entraGroup.getGroupIdByDisplayName
     ]);
   });
 
@@ -115,31 +118,19 @@ describe(commands.M365GROUP_SET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('defines alias', () => {
-    const alias = command.alias();
-    assert.notStrictEqual(typeof alias, 'undefined');
-  });
-
-  it('defines correct alias', () => {
-    const alias = command.alias();
-    assert.deepStrictEqual(alias, [aadCommands.M365GROUP_SET]);
-  });
-
-  it('updates Microsoft 365 Group display name', async () => {
-    sinon.stub(request, 'patch').callsFake(async (opts) => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/groups/28beab62-7540-4db1-a23f-29a6018a3848') {
-        if (JSON.stringify(opts.data) === JSON.stringify(<Group>{
-          displayName: 'My group'
-        })) {
-          return;
-        }
+  it('updates Microsoft 365 Group display name while group is being retrieved by display name', async () => {
+    const groupName = 'Project A';
+    sinon.stub(entraGroup, 'getGroupIdByDisplayName').withArgs(groupName).resolves(groupId);
+    const patchStub = sinon.stub(request, 'patch').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${groupId}`) {
+        return;
       }
 
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', displayName: 'My group' } });
-    assert(loggerLogSpy.notCalled);
+    await command.action(logger, { options: { displayName: groupName, newDisplayName: 'My group', verbose: true } });
+    assert(patchStub.calledOnce);
   });
 
   it('updates Microsoft 365 Group description (debug)', async () => {
@@ -312,17 +303,9 @@ describe(commands.M365GROUP_SET, () => {
       new CommandError('An error has occurred'));
   });
 
-  it('adds owner to Microsoft 365 Group', async () => {
-    sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/groups/f3db5c2b-068f-480d-985b-ec78b9fa0e76/owners/$ref' &&
-        opts.data['@odata.id'] === 'https://graph.microsoft.com/v1.0/users/949b16c1-a032-453e-a8ae-89a52bfc1d8a') {
-        return;
-      }
-
-      throw 'Invalid request';
-    });
+  it('adds members to Microsoft 365 Group by IDs', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq 'user@contoso.onmicrosoft.com'&$select=id`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/f3db5c2b-068f-480d-985b-ec78b9fa0e76/members/microsoft.graph.user?$select=id`) {
         return {
           value: [
             {
@@ -335,33 +318,84 @@ describe(commands.M365GROUP_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { id: 'f3db5c2b-068f-480d-985b-ec78b9fa0e76', owners: 'user@contoso.onmicrosoft.com' } });
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/$batch' &&
+        opts.data.requests[0].method === 'PATCH') {
+        return {
+          responses: Array(2).fill({
+            status: 204,
+            body: {}
+          })
+        };
+      }
+
+      if (opts.url === 'https://graph.microsoft.com/v1.0/$batch' &&
+        opts.data.requests[0].method === 'DELETE') {
+        return {
+          responses: Array(2).fill({
+            status: 204,
+            body: {}
+          })
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { id: 'f3db5c2b-068f-480d-985b-ec78b9fa0e76', memberIds: '949b16c1-a032-453e-a8ae-89a52bfc1d8a', verbose: true } });
     assert(loggerLogSpy.notCalled);
   });
 
-  it('adds owners to Microsoft 365 Group (debug)', async () => {
-    sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/groups/f3db5c2b-068f-480d-985b-ec78b9fa0e76/owners/$ref' &&
-        opts.data['@odata.id'] === 'https://graph.microsoft.com/v1.0/users/949b16c1-a032-453e-a8ae-89a52bfc1d8a') {
-        return;
+  it('adds members to Microsoft 365 Group by UPNs', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/f3db5c2b-068f-480d-985b-ec78b9fa0e76?$select=groupTypes`) {
+        return {
+          groupTypes: [
+            'Unified'
+          ]
+        };
       }
 
-      if (opts.url === 'https://graph.microsoft.com/v1.0/groups/f3db5c2b-068f-480d-985b-ec78b9fa0e76/owners/$ref' &&
-        opts.data['@odata.id'] === 'https://graph.microsoft.com/v1.0/users/949b16c1-a032-453e-a8ae-89a52bfc1d8b') {
-        return;
+      if (opts.url === 'https://graph.microsoft.com/v1.0/groups/f3db5c2b-068f-480d-985b-ec78b9fa0e76/members/microsoft.graph.user?$select=id') {
+        return {
+          "value": [
+            { "id": "949b16c1-a032-453e-a8ae-89a52bfc1d8a", "displayName": "Anne Matthews", "userPrincipalName": "anne.matthews@contoso.onmicrosoft.com", "givenName": "Anne", "surname": "Matthews", "userType": "Member" }
+          ]
+        };
       }
 
       throw 'Invalid request';
     });
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq 'user1@contoso.onmicrosoft.com' or userPrincipalName eq 'user2@contoso.onmicrosoft.com'&$select=id`) {
+
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/$batch' &&
+        opts.data.requests[0].method === 'PATCH') {
         return {
-          value: [
+          responses: Array(2).fill({
+            status: 204,
+            body: {}
+          })
+        };
+      }
+
+      if (opts.url === 'https://graph.microsoft.com/v1.0/$batch' &&
+        opts.data.requests[0].method === 'DELETE') {
+        return {
+          responses: Array(2).fill({
+            status: 204,
+            body: {}
+          })
+        };
+      }
+
+      if (opts.url === 'https://graph.microsoft.com/v1.0/$batch' &&
+        opts.data.requests[0].method === 'GET') {
+        return {
+          responses: [
             {
-              id: '949b16c1-a032-453e-a8ae-89a52bfc1d8a'
-            },
-            {
-              id: '949b16c1-a032-453e-a8ae-89a52bfc1d8b'
+              id: userIds[0],
+              status: 200,
+              body: 1
             }
           ]
         };
@@ -370,53 +404,13 @@ describe(commands.M365GROUP_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, id: 'f3db5c2b-068f-480d-985b-ec78b9fa0e76', owners: 'user1@contoso.onmicrosoft.com,user2@contoso.onmicrosoft.com' } });
-    assert(loggerLogToStderrSpy.called);
-  });
-
-  it('adds member to Microsoft 365 Group', async () => {
-    sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/groups/f3db5c2b-068f-480d-985b-ec78b9fa0e76/members/$ref' &&
-        opts.data['@odata.id'] === 'https://graph.microsoft.com/v1.0/users/949b16c1-a032-453e-a8ae-89a52bfc1d8a') {
-        return;
-      }
-
-      throw 'Invalid request';
-    });
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq 'user@contoso.onmicrosoft.com'&$select=id`) {
-        return {
-          value: [
-            {
-              id: '949b16c1-a032-453e-a8ae-89a52bfc1d8a'
-            }
-          ]
-        };
-      }
-
-      throw 'Invalid request';
-    });
-
-    await command.action(logger, { options: { id: 'f3db5c2b-068f-480d-985b-ec78b9fa0e76', members: 'user@contoso.onmicrosoft.com' } });
+    await command.action(logger, { options: { id: 'f3db5c2b-068f-480d-985b-ec78b9fa0e76', memberUserNames: 'user@contoso.onmicrosoft.com', verbose: true } });
     assert(loggerLogSpy.notCalled);
   });
 
-  it('adds members to Microsoft 365 Group (debug)', async () => {
-    sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/groups/f3db5c2b-068f-480d-985b-ec78b9fa0e76/members/$ref' &&
-        opts.data['@odata.id'] === 'https://graph.microsoft.com/v1.0/users/949b16c1-a032-453e-a8ae-89a52bfc1d8a') {
-        return;
-      }
-
-      if (opts.url === 'https://graph.microsoft.com/v1.0/groups/f3db5c2b-068f-480d-985b-ec78b9fa0e76/members/$ref' &&
-        opts.data['@odata.id'] === 'https://graph.microsoft.com/v1.0/users/949b16c1-a032-453e-a8ae-89a52bfc1d8b') {
-        return;
-      }
-
-      throw 'Invalid request';
-    });
+  it('adds owners to Microsoft 365 Group by IDs', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq 'user1@contoso.onmicrosoft.com' or userPrincipalName eq 'user2@contoso.onmicrosoft.com'&$select=id`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/f3db5c2b-068f-480d-985b-ec78b9fa0e76/owners/microsoft.graph.user?$select=id`) {
         return {
           value: [
             {
@@ -429,8 +423,94 @@ describe(commands.M365GROUP_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, id: 'f3db5c2b-068f-480d-985b-ec78b9fa0e76', members: 'user1@contoso.onmicrosoft.com,user2@contoso.onmicrosoft.com' } });
-    assert(loggerLogToStderrSpy.called);
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/$batch' &&
+        opts.data.requests[0].method === 'PATCH') {
+        return {
+          responses: Array(2).fill({
+            status: 204,
+            body: {}
+          })
+        };
+      }
+
+      if (opts.url === 'https://graph.microsoft.com/v1.0/$batch' &&
+        opts.data.requests[0].method === 'DELETE') {
+        return {
+          responses: Array(2).fill({
+            status: 204,
+            body: {}
+          })
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { id: 'f3db5c2b-068f-480d-985b-ec78b9fa0e76', ownerIds: '3527dada-9368-4cdd-a958-5460f5658e0e', verbose: true } });
+    assert(loggerLogSpy.notCalled);
+  });
+
+  it('adds owners to Microsoft 365 Group by UPNs', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/f3db5c2b-068f-480d-985b-ec78b9fa0e76?$select=groupTypes`) {
+        return {
+          groupTypes: [
+            'Unified'
+          ]
+        };
+      }
+
+      if (opts.url === 'https://graph.microsoft.com/v1.0/groups/f3db5c2b-068f-480d-985b-ec78b9fa0e76/owners/microsoft.graph.user?$select=id') {
+        return {
+          "value": [
+            { "id": "949b16c1-a032-453e-a8ae-89a52bfc1d8a", "displayName": "Anne Matthews", "userPrincipalName": "anne.matthews@contoso.onmicrosoft.com", "givenName": "Anne", "surname": "Matthews", "userType": "Member" }
+          ]
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/$batch' &&
+        opts.data.requests[0].method === 'PATCH') {
+        return {
+          responses: Array(2).fill({
+            status: 204,
+            body: {}
+          })
+        };
+      }
+
+      if (opts.url === 'https://graph.microsoft.com/v1.0/$batch' &&
+        opts.data.requests[0].method === 'DELETE') {
+        return {
+          responses: Array(2).fill({
+            status: 204,
+            body: {}
+          })
+        };
+      }
+
+      if (opts.url === 'https://graph.microsoft.com/v1.0/$batch' &&
+        opts.data.requests[0].method === 'GET') {
+        return {
+          responses: [
+            {
+              id: userIds[0],
+              status: 200,
+              body: 1
+            }
+          ]
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { id: 'f3db5c2b-068f-480d-985b-ec78b9fa0e76', ownerUserNames: 'user@contoso.onmicrosoft.com', verbose: true } });
+    assert(loggerLogSpy.notCalled);
   });
 
   it('sets option allowExternalSenders when using delegated permissions', async () => {
@@ -485,6 +565,71 @@ describe(commands.M365GROUP_SET, () => {
     assert.deepStrictEqual(JSON.parse(JSON.stringify(patchStub.firstCall.args[0].data)), { hideFromOutlookClients: true });
   });
 
+  it('handles API error when adding users to a group', async () => {
+    sinon.stub(request, 'get').resolves({ value: [] });
+    sinon.stub(request, 'patch').resolves();
+    sinon.stub(request, 'post').callsFake(async () => {
+      return {
+        responses: [
+          {
+            id: 1,
+            status: 204,
+            body: {}
+          },
+          {
+            id: 2,
+            status: 400,
+            body: {
+              error: {
+                message: `One or more added object references already exist for the following modified properties: 'members'.`
+              }
+            }
+          }
+        ]
+      };
+    });
+
+    await assert.rejects(command.action(logger, { options: { id: groupId, ownerIds: userIds.join(',') } }),
+      new CommandError(`One or more added object references already exist for the following modified properties: 'members'.`));
+  });
+
+  it('handles API error when removing users from a group', async () => {
+    sinon.stub(request, 'get').resolves({ value: [{ id: '717f1683-00fa-488c-b68d-5d0051f6bcfa' }] });
+    sinon.stub(request, 'patch').resolves();
+    sinon.stub(request, 'post').callsFake(async opts => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/$batch' &&
+        opts.data.requests[0].method === 'PATCH') {
+        return {
+          responses: Array(2).fill({
+            status: 204,
+            body: {}
+          })
+        };
+      }
+
+      if (opts.url === 'https://graph.microsoft.com/v1.0/$batch' &&
+        opts.data.requests[0].method === 'DELETE') {
+        return {
+          responses: [
+            {
+              status: 500,
+              body: {
+                error: {
+                  message: 'Service unavailable.'
+                }
+              }
+            }
+          ]
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    await assert.rejects(command.action(logger, { options: { id: groupId, ownerIds: userIds.join(',') } }),
+      new CommandError('Service unavailable.'));
+  });
+
   it('correctly handles API OData error', async () => {
     sinon.stub(request, 'patch').rejects({
       error: {
@@ -497,7 +642,7 @@ describe(commands.M365GROUP_SET, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', displayName: 'My group' } } as any),
+    await assert.rejects(command.action(logger, { options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', newDisplayName: 'My group' } } as any),
       new CommandError('An error has occurred'));
   });
 
@@ -505,7 +650,7 @@ describe(commands.M365GROUP_SET, () => {
     sinonUtil.restore(entraGroup.isUnifiedGroup);
     sinon.stub(entraGroup, 'isUnifiedGroup').resolves(false);
 
-    await assert.rejects(command.action(logger, { options: { id: groupId, displayName: 'Updated title' } }),
+    await assert.rejects(command.action(logger, { options: { id: groupId, newDisplayName: 'Updated title' } }),
       new CommandError(`Specified group with id '${groupId}' is not a Microsoft 365 group.`));
   });
 
@@ -516,7 +661,6 @@ describe(commands.M365GROUP_SET, () => {
     await assert.rejects(command.action(logger, { options: { id: groupId, allowExternalSenders: true } }),
       new CommandError(`Option 'allowExternalSenders' and 'autoSubscribeNewMembers' can only be used when using delegated permissions.`));
   });
-
 
   it('throws error when we are trying to update autoSubscribeNewMembers and we are using application only permissions', async () => {
     sinonUtil.restore(accessToken.isAppOnlyAccessToken);
@@ -532,7 +676,7 @@ describe(commands.M365GROUP_SET, () => {
   });
 
   it('passes validation when the id is a valid GUID and displayName specified', async () => {
-    const actual = await command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', displayName: 'My group' } }, commandInfo);
+    const actual = await command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', newDisplayName: 'My group' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
@@ -546,44 +690,28 @@ describe(commands.M365GROUP_SET, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if one of the owners is invalid', async () => {
-    const actual = await command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', owners: 'user' } }, commandInfo);
+  it('fails validation if ownerIds contains invalid GUID', async () => {
+    const ownerIds = ['7167b488-1ffb-43f1-9547-35969469bada', 'foo'];
+    const actual = await command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', ownerIds: ownerIds.join(',') } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the owner is valid', async () => {
-    const actual = await command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', owners: 'user@contoso.onmicrosoft.com' } }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
-
-  it('passes validation with multiple owners, comma-separated', async () => {
-    const actual = await command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', owners: 'user1@contoso.onmicrosoft.com,user2@contoso.onmicrosoft.com' } }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
-
-  it('passes validation with multiple owners, comma-separated with an additional space', async () => {
-    const actual = await command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', owners: 'user1@contoso.onmicrosoft.com, user2@contoso.onmicrosoft.com' } }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
-
-  it('fails validation if one of the members is invalid', async () => {
-    const actual = await command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', members: 'user' } }, commandInfo);
+  it('fails validation if ownerUserNames contains invalid user principal name', async () => {
+    const ownerUserNames = ['john.doe@contoso.com', 'foo'];
+    const actual = await command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', ownerUserNames: ownerUserNames.join(',') } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the member is valid', async () => {
-    const actual = await command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', members: 'user@contoso.onmicrosoft.com' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('fails validation if memberIds contains invalid GUID', async () => {
+    const memberIds = ['7167b488-1ffb-43f1-9547-35969469bada', 'foo'];
+    const actual = await command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', memberIds: memberIds.join(',') } }, commandInfo);
+    assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation with multiple members, comma-separated', async () => {
-    const actual = await command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', members: 'user1@contoso.onmicrosoft.com,user2@contoso.onmicrosoft.com' } }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
-
-  it('passes validation with multiple members, comma-separated with an additional space', async () => {
-    const actual = await command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', members: 'user1@contoso.onmicrosoft.com, user2@contoso.onmicrosoft.com' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('fails validation if memberUserNames contains invalid user principal name', async () => {
+    const memberUserNames = ['john.doe@contoso.com', 'foo'];
+    const actual = await command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', memberUserNames: memberUserNames.join(',') } }, commandInfo);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if isPrivate is true', async () => {
@@ -593,6 +721,16 @@ describe(commands.M365GROUP_SET, () => {
 
   it('passes validation if isPrivate is false', async () => {
     const actual = await command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', isPrivate: false } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('passes validation when all required parameters are valid with ids', async () => {
+    const actual = await command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', ownerIds: userIds.join(',') } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('passes validation when all required parameters are valid with user names', async () => {
+    const actual = await command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', memberUserNames: userUpns.join(',') } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
@@ -622,7 +760,7 @@ describe(commands.M365GROUP_SET, () => {
     sinon.stub(stats, 'isDirectory').returns(false);
     sinon.stub(fs, 'existsSync').returns(true);
     sinon.stub(fs, 'lstatSync').returns(stats);
-    const actual = await command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', displayName: 'Title', description: 'Description', logoPath: 'logo.png', owners: 'john@contoso.com', members: 'doe@contoso.com', isPrivate: false, allowExternalSenders: false, autoSubscribeNewMembers: false, hideFromAddressLists: false, hideFromOutlookClients: false } }, commandInfo);
+    const actual = await command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', newDisplayName: 'Title', description: 'Description', logoPath: 'logo.png', ownerIds: userIds.join(','), memberIds: userIds.join(','), isPrivate: false, allowExternalSenders: false, autoSubscribeNewMembers: false, hideFromAddressLists: false, hideFromOutlookClients: false } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 });

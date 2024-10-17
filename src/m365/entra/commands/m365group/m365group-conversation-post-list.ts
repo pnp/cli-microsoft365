@@ -7,7 +7,6 @@ import { odata } from '../../../../utils/odata.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
-import aadCommands from '../../aadCommands.js';
 
 interface CommandArgs {
   options: Options;
@@ -15,7 +14,7 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   groupId?: string;
-  groupDisplayName?: string;
+  groupName?: string;
   threadId: string;
 }
 
@@ -26,10 +25,6 @@ class EntraM365GroupConversationPostListCommand extends GraphCommand {
 
   public get description(): string {
     return 'Lists conversation posts of a Microsoft 365 group';
-  }
-
-  public alias(): string[] | undefined {
-    return [aadCommands.M365GROUP_CONVERSATION_POST_LIST];
   }
 
   constructor() {
@@ -45,7 +40,7 @@ class EntraM365GroupConversationPostListCommand extends GraphCommand {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
         groupId: typeof args.options.groupId !== 'undefined',
-        groupDisplayName: typeof args.options.groupDisplayName !== 'undefined'
+        groupName: typeof args.options.groupName !== 'undefined'
       });
     });
   }
@@ -56,7 +51,7 @@ class EntraM365GroupConversationPostListCommand extends GraphCommand {
         option: '-i, --groupId [groupId]'
       },
       {
-        option: '-d, --groupDisplayName [groupDisplayName]'
+        option: '-d, --groupName [groupName]'
       },
       {
         option: '-t, --threadId <threadId>'
@@ -77,7 +72,7 @@ class EntraM365GroupConversationPostListCommand extends GraphCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push({ options: ['groupId', 'groupDisplayName'] });
+    this.optionSets.push({ options: ['groupId', 'groupName'] });
   }
 
   public defaultProperties(): string[] | undefined {
@@ -85,8 +80,6 @@ class EntraM365GroupConversationPostListCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    await this.showDeprecationWarning(logger, aadCommands.M365GROUP_CONVERSATION_POST_LIST, commands.M365GROUP_CONVERSATION_POST_LIST);
-
     try {
       const retrievedgroupId = await this.getGroupId(args);
       const isUnifiedGroup = await entraGroup.isUnifiedGroup(retrievedgroupId);
@@ -108,7 +101,7 @@ class EntraM365GroupConversationPostListCommand extends GraphCommand {
       return formatting.encodeQueryParameter(args.options.groupId);
     }
 
-    const group = await entraGroup.getGroupByDisplayName(args.options.groupDisplayName!);
+    const group = await entraGroup.getGroupByDisplayName(args.options.groupName!);
     return group.id!;
   }
 }

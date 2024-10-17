@@ -11,12 +11,9 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import spoGroupGetCommand from '../group/group-get.js';
-import spoRoleDefinitionListCommand from '../roledefinition/roledefinition-list.js';
-import spoUserGetCommand from '../user/user-get.js';
-import spoFileGetCommand from './file-get.js';
 import command from './file-roleassignment-add.js';
 import { settingsNames } from '../../../../settingsNames.js';
+import { spo } from '../../../../utils/spo.js';
 
 describe(commands.FILE_ROLEASSIGNMENT_ADD, () => {
   const webUrl = 'https://contoso.sharepoint.com/sites/project-x';
@@ -25,6 +22,117 @@ describe(commands.FILE_ROLEASSIGNMENT_ADD, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  const roleDefinitionResponse = {
+    BasePermissions: {
+      High: 2147483647,
+      Low: 4294967295
+    },
+    Description: 'Has full control.',
+    Hidden: false,
+    Id: 1073741827,
+    Name: 'Full Control',
+    Order: 1,
+    RoleTypeKind: 5,
+    BasePermissionsValue: [
+      'ViewListItems',
+      'AddListItems',
+      'EditListItems',
+      'DeleteListItems',
+      'ApproveItems',
+      'OpenItems',
+      'ViewVersions',
+      'DeleteVersions',
+      'CancelCheckout',
+      'ManagePersonalViews',
+      'ManageLists',
+      'ViewFormPages',
+      'AnonymousSearchAccessList',
+      'Open',
+      'ViewPages',
+      'AddAndCustomizePages',
+      'ApplyThemeAndBorder',
+      'ApplyStyleSheets',
+      'ViewUsageData',
+      'CreateSSCSite',
+      'ManageSubwebs',
+      'CreateGroups',
+      'ManagePermissions',
+      'BrowseDirectories',
+      'BrowseUserInfo',
+      'AddDelPrivateWebParts',
+      'UpdatePersonalWebParts',
+      'ManageWeb',
+      'AnonymousSearchAccessWebLists',
+      'UseClientIntegration',
+      'UseRemoteAPIs',
+      'ManageAlerts',
+      'CreateAlerts',
+      'EditMyUserInfo',
+      'EnumeratePermissions'
+    ],
+    RoleTypeKindValue: 'Administrator'
+  };
+
+  const fileResponse = {
+    CheckInComment: '',
+    CheckOutType: 2,
+    ContentTag: '{F09C4EFE-B8C0-4E89-A166-03418661B89B},9,12',
+    CustomizedPageStatus: 0,
+    ETag: '\'{F09C4EFE-B8C0-4E89-A166-03418661B89B},9\'',
+    Exists: true,
+    IrmEnabled: false,
+    Length: '331673',
+    Level: 1,
+    LinkingUri: 'https://contoso.sharepoint.com/sites/project-x/documents/Test1.docx?d=wc39926a80d2c4067afa6cff9902eb866',
+    LinkingUrl: 'https://contoso.sharepoint.com/sites/project-x/documents/Test1.docx?d=wc39926a80d2c4067afa6cff9902eb866',
+    MajorVersion: 3,
+    MinorVersion: 0,
+    Name: 'Test1.docx',
+    ServerRelativeUrl: '/sites/project-x/documents/Test1.docx',
+    TimeCreated: '2018-02-05T08:42:36Z',
+    TimeLastModified: '2018-02-05T08:44:03Z',
+    Title: '',
+    UIVersion: 1536,
+    UIVersionLabel: '3.0',
+    UniqueId: 'b2307a39-e878-458b-bc90-03bc578531d6',
+    ListItemAllFields: {
+      Id: 4,
+      ID: 4
+    }
+  };
+
+  const userResponse = {
+    Id: 11,
+    IsHiddenInUI: false,
+    LoginName: 'i:0#.f|membership|someaccount@tenant.onmicrosoft.com',
+    Title: 'Some Account',
+    PrincipalType: 1,
+    Email: 'someaccount@tenant.onmicrosoft.com',
+    Expiration: '',
+    IsEmailAuthenticationGuestUser: false,
+    IsShareByEmailGuestUser: false,
+    IsSiteAdmin: true,
+    UserId: {
+      NameId: '1003200097d06dd6',
+      NameIdIssuer: 'urn:federation:microsoftonline'
+    },
+    UserPrincipalName: 'someaccount@tenant.onmicrosoft.com'
+  };
+
+  const groupResponse = {
+    Id: 5,
+    IsHiddenInUI: false,
+    LoginName: "Group A",
+    Title: "Group A",
+    PrincipalType: 8,
+    AllowMembersEditMembership: false,
+    AllowRequestToJoinLeave: false,
+    AutoAcceptRequestToJoinLeave: false,
+    Description: "",
+    OnlyAllowMembersViewMembership: true,
+    OwnerTitle: "Some Account",
+    RequestToJoinLeaveEmailSetting: null
+  };
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -52,8 +160,11 @@ describe(commands.FILE_ROLEASSIGNMENT_ADD, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      cli.executeCommandWithOutput,
       request.post,
+      spo.getRoleDefinitionByName,
+      spo.getGroupByName,
+      spo.getUserByEmail,
+      spo.getFileById,
       cli.getSettingWithDefaultValue
     ]);
   });
@@ -142,15 +253,7 @@ describe(commands.FILE_ROLEASSIGNMENT_ADD, () => {
       throw 'Invalid request';
     });
 
-    sinon.stub(cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === spoRoleDefinitionListCommand) {
-        return {
-          stdout: '[{"BasePermissions": {"High": "2147483647","Low": "4294967295"},"Description": "Has full control.","Hidden": false,"Id": 1073741827,"Name": "Full Control","Order": 1,"RoleTypeKind": 5}]'
-        };
-      }
-
-      throw new CommandError('Unknown case');
-    });
+    sinon.stub(spo, 'getRoleDefinitionByName').resolves(roleDefinitionResponse);
 
     await command.action(logger, {
       options: {
@@ -171,20 +274,8 @@ describe(commands.FILE_ROLEASSIGNMENT_ADD, () => {
       throw 'Invalid request';
     });
 
-    sinon.stub(cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === spoFileGetCommand) {
-        return ({
-          stdout: '{"LinkingUri": "https://contoso.sharepoint.com/sites/project-x/documents/Test1.docx?d=wc39926a80d2c4067afa6cff9902eb866","Name": "Test1.docx","ServerRelativeUrl": "/sites/project-x/documents/Test1.docx","UniqueId": "b2307a39-e878-458b-bc90-03bc578531d6"}'
-        });
-      }
-      if (command === spoRoleDefinitionListCommand) {
-        return {
-          stdout: '[{"BasePermissions": {"High": "2147483647","Low": "4294967295"},"Description": "Has full control.","Hidden": false,"Id": 1073741827,"Name": "Full Control","Order": 1,"RoleTypeKind": 5}]'
-        };
-      }
-
-      throw 'Unknown case';
-    });
+    sinon.stub(spo, 'getFileById').resolves(fileResponse);
+    sinon.stub(spo, 'getRoleDefinitionByName').resolves(roleDefinitionResponse);
 
     await command.action(logger, {
       options: {
@@ -205,15 +296,7 @@ describe(commands.FILE_ROLEASSIGNMENT_ADD, () => {
       throw 'Invalid request';
     });
 
-    sinon.stub(cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === spoUserGetCommand) {
-        return {
-          stdout: '{"Id": 11,"IsHiddenInUI": false,"LoginName": "i:0#.f|membership|someaccount@tenant.onmicrosoft.com","Title": "Some Account","PrincipalType": 1,"Email": "someaccount@tenant.onmicrosoft.com","Expiration": "","IsEmailAuthenticationGuestUser": false,"IsShareByEmailGuestUser": false,"IsSiteAdmin": true,"UserId": {"NameId": "1003200097d06dd6","NameIdIssuer": "urn:federation:microsoftonline"},"UserPrincipalName": "someaccount@tenant.onmicrosoft.com"}'
-        };
-      }
-
-      throw 'Unknown case';
-    });
+    sinon.stub(spo, 'getUserByEmail').resolves(userResponse);
 
     await command.action(logger, {
       options: {
@@ -227,13 +310,7 @@ describe(commands.FILE_ROLEASSIGNMENT_ADD, () => {
 
   it('correctly handles error when upn does not exist', async () => {
     const error = 'no user found';
-    sinon.stub(cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === spoUserGetCommand) {
-        throw error;
-      }
-
-      throw 'Unknown case';
-    });
+    sinon.stub(spo, 'getUserByEmail').rejects(new Error(error));
 
     await assert.rejects(command.action(logger, {
       options: {
@@ -254,15 +331,7 @@ describe(commands.FILE_ROLEASSIGNMENT_ADD, () => {
       throw 'Invalid request';
     });
 
-    sinon.stub(cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === spoGroupGetCommand) {
-        return {
-          stdout: '{"Id": 5,"IsHiddenInUI": false,"LoginName": "Group A","Title": "Group A","PrincipalType": 8,"AllowMembersEditMembership": false,"AllowRequestToJoinLeave": false,"AutoAcceptRequestToJoinLeave": false,"Description": "","OnlyAllowMembersViewMembership": true,"OwnerTitle": "Some Account","RequestToJoinLeaveEmailSetting": null}'
-        };
-      }
-
-      throw 'Unknown case';
-    });
+    sinon.stub(spo, 'getGroupByName').resolves(groupResponse);
 
     await command.action(logger, {
       options: {
@@ -276,13 +345,7 @@ describe(commands.FILE_ROLEASSIGNMENT_ADD, () => {
 
   it('correctly handles error when role definition does not exist', async () => {
     const error = 'no role definition found';
-    sinon.stub(cli, 'executeCommandWithOutput').callsFake(async (command) => {
-      if (command === spoRoleDefinitionListCommand) {
-        throw error;
-      }
-
-      throw 'Unknown case';
-    });
+    sinon.stub(spo, 'getRoleDefinitionByName').rejects(new Error(error));
 
     await assert.rejects(command.action(logger, {
       options: {
@@ -296,13 +359,7 @@ describe(commands.FILE_ROLEASSIGNMENT_ADD, () => {
 
   it('correctly handles error when group does not exist', async () => {
     const error = 'no group found';
-    sinon.stub(cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === spoGroupGetCommand) {
-        throw error;
-      }
-
-      throw 'Unknown case';
-    });
+    sinon.stub(spo, 'getGroupByName').rejects(new Error(error));
 
     await assert.rejects(command.action(logger, {
       options: {

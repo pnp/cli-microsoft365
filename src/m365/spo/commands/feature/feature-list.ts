@@ -72,14 +72,7 @@ class SpoFeatureListCommand extends SpoCommand {
 
     try {
       const features = await odata.getAllItems<Feature>(`${args.options.webUrl}/_api/${scope}/Features?$select=DisplayName,DefinitionId`);
-      if (features && features.length > 0) {
-        await logger.log(features);
-      }
-      else {
-        if (this.verbose) {
-          await logger.logToStderr('No activated Features found');
-        }
-      }
+      await logger.log(features);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);

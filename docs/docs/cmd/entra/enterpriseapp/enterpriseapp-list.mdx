@@ -15,31 +15,30 @@ m365 entra enterpriseapp list [options]
 ## Alias
 
 ```sh
-m365 aad sp list [options]
 m365 entra sp list [options]
 ```
 
 ## Options
 
 ```md definition-list
-`--displayName [displayName]`
-: Returns only enterprise applications with the specified name
+`-n, --displayName [displayName]`
+: Returns only enterprise applications with the specified name.
 
 `--tag [tag]`
-: Returns only enterprise applications with the specified tag
+: Returns only enterprise applications with the specified tag.
 ```
 
 <Global />
 
 ## Examples
 
-Return a list of all enterprise applications
+Returns a list of all enterprise applications.
 
 ```sh
 m365 entra enterpriseapp list
 ```
 
-Return a list of all enterprise applications that comply with the display name and the tag parameters
+Returns a list of all enterprise applications that comply with the specified display name and the tag parameters.
 
 ```sh
 m365 entra enterpriseapp list --displayName "My custom enterprise application" --tag "WindowsAzureActiveDirectoryIntegratedApp"

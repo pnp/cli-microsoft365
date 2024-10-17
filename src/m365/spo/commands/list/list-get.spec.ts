@@ -19,6 +19,65 @@ describe(commands.LIST_GET, () => {
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
 
+  const versionPolicies = {
+    VersionPolicies: {
+      DefaultExpireAfterDays: 0,
+      DefaultTrimMode: 0
+    }
+  };
+  const listResponse = {
+    AllowContentTypes: true,
+    BaseTemplate: 109,
+    BaseType: 1,
+    ContentTypesEnabled: false,
+    CrawlNonDefaultViews: false,
+    Created: null,
+    CurrentChangeToken: null,
+    CustomActionElements: null,
+    DefaultContentApprovalWorkflowId: "00000000-0000-0000-0000-000000000000",
+    DefaultItemOpenUseListSetting: false,
+    Description: "",
+    Direction: "none",
+    DocumentTemplateUrl: null,
+    DraftVersionVisibility: 0,
+    EnableAttachments: false,
+    EnableFolderCreation: true,
+    EnableMinorVersions: false,
+    EnableModeration: false,
+    EnableVersioning: false,
+    EntityTypeName: "Documents",
+    ExemptFromBlockDownloadOfNonViewableFiles: false,
+    FileSavePostProcessingEnabled: false,
+    ForceCheckout: false,
+    HasExternalDataSource: false,
+    Hidden: false,
+    Id: "14b2b6ed-0885-4814-bfd6-594737cc3ae3",
+    ImagePath: null,
+    ImageUrl: null,
+    IrmEnabled: false,
+    IrmExpire: false,
+    IrmReject: false,
+    IsApplicationList: false,
+    IsCatalog: false,
+    IsPrivate: false,
+    ItemCount: 69,
+    LastItemDeletedDate: null,
+    LastItemModifiedDate: null,
+    LastItemUserModifiedDate: null,
+    ListExperienceOptions: 0,
+    ListItemEntityTypeFullName: null,
+    MajorVersionLimit: 0,
+    MajorWithMinorVersionsLimit: 0,
+    MultipleDataList: false,
+    NoCrawl: false,
+    ParentWebPath: null,
+    ParentWebUrl: null,
+    ParserDisabled: false,
+    ServerTemplateCanCreateFolders: true,
+    TemplateFeatureId: null,
+    Title: "Documents"
+  };
+
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').returns();
@@ -63,119 +122,49 @@ describe(commands.LIST_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('retrieves and prints all details of list if title option is passed', async () => {
-    sinon.stub(request, 'get').resolves({
-      "AllowContentTypes": true,
-      "BaseTemplate": 109,
-      "BaseType": 1,
-      "ContentTypesEnabled": false,
-      "CrawlNonDefaultViews": false,
-      "Created": null,
-      "CurrentChangeToken": null,
-      "CustomActionElements": null,
-      "DefaultContentApprovalWorkflowId": "00000000-0000-0000-0000-000000000000",
-      "DefaultItemOpenUseListSetting": false,
-      "Description": "",
-      "Direction": "none",
-      "DocumentTemplateUrl": null,
-      "DraftVersionVisibility": 0,
-      "EnableAttachments": false,
-      "EnableFolderCreation": true,
-      "EnableMinorVersions": false,
-      "EnableModeration": false,
-      "EnableVersioning": false,
-      "EntityTypeName": "Documents",
-      "ExemptFromBlockDownloadOfNonViewableFiles": false,
-      "FileSavePostProcessingEnabled": false,
-      "ForceCheckout": false,
-      "HasExternalDataSource": false,
-      "Hidden": false,
-      "Id": "14b2b6ed-0885-4814-bfd6-594737cc3ae3",
-      "ImagePath": null,
-      "ImageUrl": null,
-      "IrmEnabled": false,
-      "IrmExpire": false,
-      "IrmReject": false,
-      "IsApplicationList": false,
-      "IsCatalog": false,
-      "IsPrivate": false,
-      "ItemCount": 69,
-      "LastItemDeletedDate": null,
-      "LastItemModifiedDate": null,
-      "LastItemUserModifiedDate": null,
-      "ListExperienceOptions": 0,
-      "ListItemEntityTypeFullName": null,
-      "MajorVersionLimit": 0,
-      "MajorWithMinorVersionsLimit": 0,
-      "MultipleDataList": false,
-      "NoCrawl": false,
-      "ParentWebPath": null,
-      "ParentWebUrl": null,
-      "ParserDisabled": false,
-      "ServerTemplateCanCreateFolders": true,
-      "TemplateFeatureId": null,
-      "Title": "Documents"
+  it('retrieves and prints all details of the list if the title option is passed and retrieves version policies for a document library', async () => {
+    const webUrl = 'https://contoso.sharepoint.com';
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `${webUrl}/_api/web/lists/GetByTitle('${listResponse.Title}')`) {
+        return listResponse;
+      }
+      if (opts.url === `${webUrl}/_api/web/lists/GetByTitle('${listResponse.Title}')?$select=VersionPolicies&$expand=VersionPolicies`) {
+        return versionPolicies;
+      }
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
       options: {
         debug: true,
-        title: 'Documents',
-        webUrl: 'https://contoso.sharepoint.com'
+        title: listResponse.Title,
+        webUrl: webUrl
       }
     });
-    assert(loggerLogSpy.calledWith({
-      AllowContentTypes: true,
-      BaseTemplate: 109,
-      BaseType: 1,
-      ContentTypesEnabled: false,
-      CrawlNonDefaultViews: false,
-      Created: null,
-      CurrentChangeToken: null,
-      CustomActionElements: null,
-      DefaultContentApprovalWorkflowId: '00000000-0000-0000-0000-000000000000',
-      DefaultItemOpenUseListSetting: false,
-      Description: '',
-      Direction: 'none',
-      DocumentTemplateUrl: null,
-      DraftVersionVisibility: 0,
-      EnableAttachments: false,
-      EnableFolderCreation: true,
-      EnableMinorVersions: false,
-      EnableModeration: false,
-      EnableVersioning: false,
-      EntityTypeName: 'Documents',
-      ExemptFromBlockDownloadOfNonViewableFiles: false,
-      FileSavePostProcessingEnabled: false,
-      ForceCheckout: false,
-      HasExternalDataSource: false,
-      Hidden: false,
-      Id: '14b2b6ed-0885-4814-bfd6-594737cc3ae3',
-      ImagePath: null,
-      ImageUrl: null,
-      IrmEnabled: false,
-      IrmExpire: false,
-      IrmReject: false,
-      IsApplicationList: false,
-      IsCatalog: false,
-      IsPrivate: false,
-      ItemCount: 69,
-      LastItemDeletedDate: null,
-      LastItemModifiedDate: null,
-      LastItemUserModifiedDate: null,
-      ListExperienceOptions: 0,
-      ListItemEntityTypeFullName: null,
-      MajorVersionLimit: 0,
-      MajorWithMinorVersionsLimit: 0,
-      MultipleDataList: false,
-      NoCrawl: false,
-      ParentWebPath: null,
-      ParentWebUrl: null,
-      ParserDisabled: false,
-      ServerTemplateCanCreateFolders: true,
-      TemplateFeatureId: null,
-      Title: 'Documents'
-    }));
+
+    assert(loggerLogSpy.calledWith({ ...listResponse, ...versionPolicies }));
+  });
+
+  it('retrieves and prints all details of the list if the title option is passed and does not retrieve version policies for a generic list', async () => {
+    const webUrl = 'https://contoso.sharepoint.com';
+    const listResponseGeneric = { ...listResponse, BaseTemplate: 100 };
+
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `${webUrl}/_api/web/lists/GetByTitle('${listResponse.Title}')`) {
+        return listResponseGeneric;
+      }
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options: {
+        debug: true,
+        title: listResponse.Title,
+        webUrl: webUrl
+      }
+    });
+
+    assert(loggerLogSpy.calledOnceWithExactly(listResponseGeneric));
   });
 
   it('retrieves details of list if title and properties option is passed (debug)', async () => {
@@ -192,6 +181,7 @@ describe(commands.LIST_GET, () => {
         properties: 'Title,Id'
       }
     });
+
     assert(loggerLogSpy.calledWith({
       Id: '14b2b6ed-0885-4814-bfd6-594737cc3ae3',
       Title: 'Documents'
@@ -214,6 +204,7 @@ describe(commands.LIST_GET, () => {
         properties: 'Title,Id'
       }
     });
+
     assert(loggerLogSpy.calledWith({
       Id: '14b2b6ed-0885-4814-bfd6-594737cc3ae3',
       Title: 'Documents'
@@ -236,6 +227,7 @@ describe(commands.LIST_GET, () => {
         properties: 'Title,Id'
       }
     });
+
     assert(loggerLogSpy.calledWith({
       Id: '14b2b6ed-0885-4814-bfd6-594737cc3ae3',
       Title: 'Documents'
@@ -377,6 +369,10 @@ describe(commands.LIST_GET, () => {
           "PrincipalId": 12
         }
       ],
+      "VersionPolicies": {
+        "DefaultExpireAfterDays": 0,
+        "DefaultTrimMode": 0
+      },
       "HasUniqueRoleAssignments": true,
       "AllowContentTypes": true,
       "BaseTemplate": 109,
@@ -437,6 +433,7 @@ describe(commands.LIST_GET, () => {
         withPermissions: true
       }
     });
+
     assert(loggerLogSpy.calledWith({
       AllowContentTypes: true,
       BaseTemplate: 109,
@@ -486,6 +483,11 @@ describe(commands.LIST_GET, () => {
       ParentWebPath: null,
       ParentWebUrl: null,
       ParserDisabled: false,
+      VersionPolicies: {
+        DefaultExpireAfterDays: 0,
+        DefaultTrimMode: 0,
+        DefaultTrimModeValue: "NoExpiration"
+      },
       RoleAssignments: [
         {
           Member: {
@@ -624,7 +626,6 @@ describe(commands.LIST_GET, () => {
       Title: 'Documents'
     }));
   });
-
 
   it('retrieves details of list if list id, properties and withPermissions option is passed', async () => {
     sinon.stub(request, 'get').resolves(
@@ -776,6 +777,7 @@ describe(commands.LIST_GET, () => {
         withPermissions: true
       }
     });
+
     assert(loggerLogSpy.calledWith({
       HasUniqueRoleAssignments: true,
       Id: '14b2b6ed-0885-4814-bfd6-594737cc3ae3',
@@ -1064,6 +1066,7 @@ describe(commands.LIST_GET, () => {
         withPermissions: true
       }
     });
+
     assert(loggerLogSpy.calledWith({
       HasUniqueRoleAssignments: true,
       Id: '14b2b6ed-0885-4814-bfd6-594737cc3ae3',
@@ -1220,6 +1223,7 @@ describe(commands.LIST_GET, () => {
         properties: 'RootFolder/ServerRelativeUrl'
       }
     });
+
     assert(loggerLogSpy.calledWith({
       RootFolder: {
         ServerRelativeUrl: "/Lists/TestBatchList"

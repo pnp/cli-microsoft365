@@ -1,14 +1,14 @@
 import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
-import Command from '../../../../Command.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
+import { spo } from '../../../../utils/spo.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
-import spoFileGetCommand, { Options as SpoFileGetCommandOptions } from './file-get.js';
+import { FileProperties } from './FileProperties.js';
 
 interface CommandArgs {
   options: Options;
@@ -61,7 +61,7 @@ class SpoFileRoleInheritanceBreakCommand extends SpoCommand {
         option: '--fileUrl [fileUrl]'
       },
       {
-        option: 'i, --fileId [fileId]'
+        option: '-i, --fileId [fileId]'
       },
       {
         option: '-c, --clearExistingPermissions'
@@ -104,7 +104,7 @@ class SpoFileRoleInheritanceBreakCommand extends SpoCommand {
         await logger.logToStderr(`Breaking role inheritance for file ${args.options.fileId || args.options.fileUrl}`);
       }
       try {
-        const fileURL: string = await this.getFileURL(args);
+        const fileURL: string = await this.getFileURL(args, logger);
 
         const keepExistingPermissions: boolean = !args.options.clearExistingPermissions;
 
@@ -135,22 +135,13 @@ class SpoFileRoleInheritanceBreakCommand extends SpoCommand {
     }
   }
 
-  private async getFileURL(args: CommandArgs): Promise<string> {
+  private async getFileURL(args: CommandArgs, logger: Logger): Promise<string> {
     if (args.options.fileUrl) {
       return urlUtil.getServerRelativePath(args.options.webUrl, args.options.fileUrl);
     }
 
-    const options: SpoFileGetCommandOptions = {
-      webUrl: args.options.webUrl,
-      id: args.options.fileId,
-      output: 'json',
-      debug: this.debug,
-      verbose: this.verbose
-    };
-
-    const output = await cli.executeCommandWithOutput(spoFileGetCommand as Command, { options: { ...options, _: [] } });
-    const getFileOutput = JSON.parse(output.stdout);
-    return getFileOutput.ServerRelativeUrl;
+    const file: FileProperties = await spo.getFileById(args.options.webUrl, args.options.fileId!, logger, this.verbose);
+    return file.ServerRelativeUrl;
   }
 }
 

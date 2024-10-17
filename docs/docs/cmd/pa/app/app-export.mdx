@@ -14,25 +14,25 @@ m365 pa app export [options]
 
 ```md definition-list
 `-n, --name <name>`
-: The name (GUID) of the Power Apps app to export
+: The name (GUID) of the Power Apps app to export.
 
 `-e, --environmentName <environmentName>`
-: The name of the environment for which to export the app
+: The name of the environment for which to export the app.
 
 `--packageDisplayName [packageDisplayName]`
-: The display name to use in the exported package
+: The display name to use in the exported package.
 
 `-d, --packageDescription [packageDescription]`
-: The description to use in the exported package
+: The description to use in the exported package.
 
 `-c, --packageCreatedBy [packageCreatedBy]`
-: The name of the person to be used as the creator of the exported package
+: The name of the person to be used as the creator of the exported package.
 
 `-s, --packageSourceEnvironment [packageSourceEnvironment]`
-: The name of the source environment from which the exported package was taken
+: The name of the source environment from which the exported package was taken.
 
 `-p, --path [path]`
-: The path to save the exported package to. If not specified the app will be exported in the current working directory
+: The path to save the exported package to. If not specified the app will be exported in the current working directory.
 ```
 
 <Global />
@@ -42,13 +42,19 @@ m365 pa app export [options]
 Export the specified Power App as a ZIP file
 
 ```sh
-m365 pa app export --environmentName Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --name 3989cb59-ce1a-4a5c-bb78-257c5c39381d --packageDisplayName "PowerApp"
+m365 pa app export --environmentName Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --name 3989cb59-ce1a-4a5c-bb78-257c5c39381d
+```
+
+Export the specified Power App as a ZIP file with a custom package name
+
+```sh
+m365 pa app export --environmentName Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --name 3989cb59-ce1a-4a5c-bb78-257c5c39381d --packageDisplayName "Assets app"
 ```
 
 Export the specified Power App as a ZIP file with the package displayname, package description, the one who created it, the package source environment and the path
 
 ```sh
-m365 pa app export --environmentName Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --name 3989cb59-ce1a-4a5c-bb78-257c5c39381d --packageDisplayName "PowerApp" --packageDescription "Power App Description" --packageCreatedBy "John Doe" --packageSourceEnvironment "Contoso" --path "C:/Users/John/Documents"
+m365 pa app export --environmentName Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --name 3989cb59-ce1a-4a5c-bb78-257c5c39381d --packageDisplayName "Assets app" --packageDescription "App to track assets of people" --packageCreatedBy "John Doe" --packageSourceEnvironment "Contoso" --path "C:/Users/John/Documents"
 ```
 
 ## Response

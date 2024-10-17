@@ -10,7 +10,6 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './m365group-recyclebinitem-list.js';
-import aadCommands from '../../aadCommands.js';
 
 describe(commands.M365GROUP_RECYCLEBINITEM_LIST, () => {
   let log: string[];
@@ -59,16 +58,6 @@ describe(commands.M365GROUP_RECYCLEBINITEM_LIST, () => {
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
-  });
-
-  it('defines alias', () => {
-    const alias = command.alias();
-    assert.notStrictEqual(typeof alias, 'undefined');
-  });
-
-  it('defines correct alias', () => {
-    const alias = command.alias();
-    assert.deepStrictEqual(alias, [aadCommands.M365GROUP_RECYCLEBINITEM_LIST]);
   });
 
   it('defines correct properties for the default output', () => {
@@ -371,7 +360,7 @@ describe(commands.M365GROUP_RECYCLEBINITEM_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { groupDisplayName: 'Deleted' } });
+    await command.action(logger, { options: { groupName: 'Deleted' } });
     assert(loggerLogSpy.calledWith([
       {
         "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
@@ -605,7 +594,7 @@ describe(commands.M365GROUP_RECYCLEBINITEM_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { groupDisplayName: 'Deleted', groupMailNickname: 'd_team' } });
+    await command.action(logger, { options: { groupName: 'Deleted', groupMailNickname: 'd_team' } });
     assert(loggerLogSpy.calledWith([
       {
         "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
@@ -667,11 +656,11 @@ describe(commands.M365GROUP_RECYCLEBINITEM_LIST, () => {
     await assert.rejects(command.action(logger, { options: { mailNickname: 'd_team' } }), new CommandError(errorMessage));
   });
 
-  it('supports specifying groupDisplayName', () => {
+  it('supports specifying groupName', () => {
     const options = command.options;
     let containsOption = false;
     options.forEach(o => {
-      if (o.option.indexOf('--groupDisplayName') > -1) {
+      if (o.option.indexOf('--groupName') > -1) {
         containsOption = true;
       }
     });

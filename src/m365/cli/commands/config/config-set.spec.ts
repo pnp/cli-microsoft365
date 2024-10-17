@@ -370,4 +370,29 @@ describe(commands.CONFIG_SET, () => {
     const actual = await command.validate({ options: { key: settingsNames.helpTarget, value: 'console' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
+
+  it('fails validation if specified clientId is not a GUID', async () => {
+    const actual = await command.validate({ options: { key: settingsNames.clientId, value: 'invalid' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('passes validation if specified clientId is a GUID', async () => {
+    const actual = await command.validate({ options: { key: settingsNames.clientId, value: '00000000-0000-0000-c000-000000000001' } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('fails validation if specified tenantId is not a GUID or common', async () => {
+    const actual = await command.validate({ options: { key: settingsNames.tenantId, value: 'invalid' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('passes validation if specified tenantId is a GUID', async () => {
+    const actual = await command.validate({ options: { key: settingsNames.tenantId, value: '00000000-0000-0000-c000-000000000001' } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('passes validation if specified tenantId is common', async () => {
+    const actual = await command.validate({ options: { key: settingsNames.tenantId, value: 'common' } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
 });

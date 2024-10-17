@@ -7,6 +7,7 @@ import { formatting } from '../../../utils/formatting.js';
 import { validation } from '../../../utils/validation.js';
 import PowerPlatformCommand from '../../base/PowerPlatformCommand.js';
 import commands from '../commands.js';
+import PowerAutomateCommand from '../../base/PowerAutomateCommand.js';
 
 interface CommandArgs {
   options: Options;
@@ -124,7 +125,7 @@ class FlowExportCommand extends PowerPlatformCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     let filenameFromApi = '';
-    const formatArgument = args.options.format ? args.options.format.toLowerCase() : '';
+    const formatArgument = args.options.format?.toLowerCase() || '';
 
     if (this.verbose) {
       await logger.logToStderr(`Retrieving package resources for Microsoft Flow ${args.options.name}...`);
@@ -133,8 +134,8 @@ class FlowExportCommand extends PowerPlatformCommand {
     try {
       let res: any;
       if (formatArgument === 'json') {
-        if (this.debug) {
-          await logger.logToStderr('format = json, skipping listing package resources step');
+        if (this.verbose) {
+          await logger.logToStderr('format = json, skipping listing package resources step.');
         }
       }
       else {
@@ -164,7 +165,7 @@ class FlowExportCommand extends PowerPlatformCommand {
 
       let requestOptions: CliRequestOptions = {
         url: formatArgument === 'json' ?
-          `https://management.azure.com/providers/Microsoft.ProcessSimple/environments/${formatting.encodeQueryParameter(args.options.environmentName)}/flows/${formatting.encodeQueryParameter(args.options.name)}?api-version=2016-11-01`
+          `${PowerAutomateCommand.resource}/providers/Microsoft.ProcessSimple/environments/${formatting.encodeQueryParameter(args.options.environmentName)}/flows/${formatting.encodeQueryParameter(args.options.name)}?api-version=2016-11-01`
           : `${this.resource}/providers/Microsoft.BusinessAppPlatform/environments/${formatting.encodeQueryParameter(args.options.environmentName)}/exportPackage?api-version=2016-11-01`,
         headers: {
           accept: 'application/json'
@@ -181,17 +182,17 @@ class FlowExportCommand extends PowerPlatformCommand {
             : res.resources[key].suggestedCreationType = 'Existing';
         });
 
-        requestOptions['data'] = {
-          "includedResourceIds": [
+        requestOptions.data = {
+          includedResourceIds: [
             `/providers/Microsoft.Flow/flows/${args.options.name}`
           ],
-          "details": {
-            "displayName": args.options.packageDisplayName,
-            "description": args.options.packageDescription,
-            "creator": args.options.packageCreatedBy,
-            "sourceEnvironment": args.options.packageSourceEnvironment
+          details: {
+            displayName: args.options.packageDisplayName,
+            description: args.options.packageDescription,
+            creator: args.options.packageCreatedBy,
+            sourceEnvironment: args.options.packageSourceEnvironment
           },
-          "resources": res.resources
+          resources: res.resources
         };
       }
 
@@ -208,14 +209,14 @@ class FlowExportCommand extends PowerPlatformCommand {
       const illegalCharsRegEx = /[\\\/:*?"<>|]/g;
       filenameFromApi = filenameFromApi.replace(illegalCharsRegEx, '_');
 
-      if (this.debug) {
-        await logger.logToStderr(`Filename from PowerApps API: ${filenameFromApi}`);
+      if (this.verbose) {
+        await logger.logToStderr(`Filename from PowerApps API: ${filenameFromApi}.`);
         await logger.logToStderr('');
       }
 
       requestOptions = {
         url: formatArgument === 'json' ?
-          `https://management.azure.com/providers/Microsoft.ProcessSimple/environments/${formatting.encodeQueryParameter(args.options.environmentName)}/flows/${formatting.encodeQueryParameter(args.options.name)}/exportToARMTemplate?api-version=2016-11-01`
+          `${PowerAutomateCommand.resource}/providers/Microsoft.ProcessSimple/environments/${formatting.encodeQueryParameter(args.options.environmentName)}/flows/${formatting.encodeQueryParameter(args.options.name)}/exportToARMTemplate?api-version=2016-11-01`
           : downloadFileUrl,
         // Set responseType to arraybuffer, otherwise binary data will be encoded
         // to utf8 and binary data is corrupt
@@ -237,7 +238,7 @@ class FlowExportCommand extends PowerPlatformCommand {
       fs.writeFileSync(path, file, 'binary');
       if (!args.options.path || this.verbose) {
         if (this.verbose) {
-          await logger.logToStderr(`File saved to path '${path}'`);
+          await logger.logToStderr(`File saved to path '${path}'.`);
         }
         else {
           await logger.log(path);

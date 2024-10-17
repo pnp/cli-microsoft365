@@ -1,0 +1,135 @@
+import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# entra group member list
+
+Lists members of a specific Entra group
+
+## Usage
+
+```sh
+m365 entra group member list [options]
+```
+
+## Options
+
+```md definition-list
+`-i, --groupId [groupId]`
+: The ID of the Entra group. Specify `groupId` or `groupName` but not both.
+
+`-n, --groupName [groupName]`
+: The display name of the Entra group. Specify `groupId` or `groupName` but not both.
+
+`-r, --role [role]`
+: Filter the results to only members with the given role: `Owner`, `Member`.
+
+`-p, --properties [properties]`
+: Comma-separated list of properties to retrieve.
+
+`-f, --filter [filter]`
+: OData filter to use to query the list of members with.
+```
+
+<Global />
+
+## Remarks
+
+When the `properties` option includes values with a `/`, for example: `manager/displayName`, an additional `$expand` query parameter will be included on `manager`.
+
+## Examples
+
+List all group members from a group specified by ID.
+
+```sh
+m365 entra group member list --groupId 03cba9da-3974-46c1-afaf-79caa2e45bbe
+```
+
+List all owners from a group specified by display name.
+
+```sh
+m365 entra group member list --groupName Developers --role Owner
+```
+
+List all group members from a group specified by name. For each one return the display name, e-mail address, and manager display name.
+
+```sh
+m365 entra group member list --groupName Developers --properties "displayName,mail,manager/displayName"
+```
+
+List all group members from a group specified by name. For each one return the display name, e-mail address, and manager information.
+
+```sh
+m365 entra group member list --groupName Developers --properties "displayName,mail,manager/*"
+```
+
+List all group members that are guest members.
+
+```sh
+m365 entra group member list --groupName Developers --filter "userType eq 'Guest'"
+```
+
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  [
+    {
+      "id": "da52218e-4822-4ac6-b41d-255e2059655e",
+      "displayName": "Adele Vance",
+      "userPrincipalName": "AdeleV@contoso.OnMicrosoft.com",
+      "givenName": "Adele",
+      "surname": "Vance",
+      "roles": [
+        "Owner",
+        "Member"
+      ]
+    }
+  ]
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  id                                    displayName           userPrincipalName                     roles
+  ------------------------------------  --------------------  ------------------------------------  --------
+  da52218e-4822-4ac6-b41d-255e2059655e  Adele Vance           AdeleV@contoso.OnMicrosoft.com        Owner,Member
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  id,displayName,userPrincipalName,givenName,surname
+  da52218e-4822-4ac6-b41d-255e2059655e,Adele Vance,AdeleV@contoso.OnMicrosoft.com,Adele,Vance
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # entra group user list --groupId "1deaa428-8dde-4043-b028-5492226d6114"
+
+  Date: 2023-10-02
+
+  ## Adele Vance (da52218e-4822-4ac6-b41d-255e2059655e)
+
+  Property | Value
+  ---------|-------
+  id | da52218e-4822-4ac6-b41d-255e2059655e
+  displayName | Adele Vance
+  userPrincipalName | AdeleV@contoso.OnMicrosoft.com
+  givenName | Adele
+  surname | Vance
+  ```
+
+  </TabItem>
+</Tabs>
+
+
+## More information
+
+- View the documentation to see what userproperties can be included: [https://pnp.github.io/cli-microsoft365/cmd/entra/user/user-get#more-information](https://pnp.github.io/cli-microsoft365/cmd/entra/user/user-get#more-information)

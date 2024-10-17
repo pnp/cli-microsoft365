@@ -12,7 +12,6 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './oauth2grant-list.js';
-import aadCommands from '../../aadCommands.js';
 
 describe(commands.OAUTH2GRANT_LIST, () => {
   let log: string[];
@@ -62,16 +61,6 @@ describe(commands.OAUTH2GRANT_LIST, () => {
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
-  });
-
-  it('defines alias', () => {
-    const alias = command.alias();
-    assert.notStrictEqual(typeof alias, 'undefined');
-  });
-
-  it('defines correct alias', () => {
-    const alias = command.alias();
-    assert.deepStrictEqual(alias, [aadCommands.OAUTH2GRANT_LIST]);
   });
 
   it('defines correct properties for the default output', () => {
@@ -204,7 +193,7 @@ describe(commands.OAUTH2GRANT_LIST, () => {
     });
 
     await command.action(logger, { options: { spObjectId: '141f7648-0c71-4752-9cdb-c7d5305b7e68', output: 'json' } });
-    assert(loggerLogSpy.calledWith([{
+    assert(loggerLogSpy.calledOnceWithExactly([{
       "clientId": "cd4043e7-b749-420b-bd07-aa7c3912ed22",
       "consentType": "AllPrincipals",
       "expiryTime": "9999-12-31T23:59:59.9999999",
@@ -236,7 +225,7 @@ describe(commands.OAUTH2GRANT_LIST, () => {
     });
 
     await command.action(logger, { options: { spObjectId: '141f7648-0c71-4752-9cdb-c7d5305b7e68' } });
-    assert(loggerLogSpy.notCalled);
+    assert(loggerLogSpy.calledOnceWithExactly([]));
   });
 
   it('correctly handles API OData error', async () => {

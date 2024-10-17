@@ -3,7 +3,6 @@ import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
-import aadCommands from '../../aadCommands.js';
 import commands from '../../commands.js';
 
 interface CommandArgs {
@@ -21,10 +20,6 @@ class EntraGroupSettingGetCommand extends GraphCommand {
 
   public get description(): string {
     return 'Gets information about the particular group setting';
-  }
-
-  public alias(): string[] | undefined {
-    return [aadCommands.GROUPSETTING_GET];
   }
 
   constructor() {
@@ -55,8 +50,6 @@ class EntraGroupSettingGetCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    await this.showDeprecationWarning(logger, aadCommands.GROUPSETTING_GET, commands.GROUPSETTING_GET);
-
     try {
       const requestOptions: CliRequestOptions = {
         url: `${this.resource}/v1.0/groupSettings/${args.options.id}`,

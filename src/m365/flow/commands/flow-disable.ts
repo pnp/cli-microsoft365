@@ -59,7 +59,7 @@ class FlowDisableCommand extends PowerAutomateCommand {
     }
 
     const requestOptions: CliRequestOptions = {
-      url: `${this.resource}/providers/Microsoft.ProcessSimple/${args.options.asAdmin ? 'scopes/admin/' : ''}environments/${formatting.encodeQueryParameter(args.options.environmentName)}/flows/${formatting.encodeQueryParameter(args.options.name)}/stop?api-version=2016-11-01`,
+      url: `${PowerAutomateCommand.resource}/providers/Microsoft.ProcessSimple/${args.options.asAdmin ? 'scopes/admin/' : ''}environments/${formatting.encodeQueryParameter(args.options.environmentName)}/flows/${formatting.encodeQueryParameter(args.options.name)}/stop?api-version=2016-11-01`,
       headers: {
         accept: 'application/json'
       },

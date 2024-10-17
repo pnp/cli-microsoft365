@@ -6,7 +6,6 @@ import { accessToken } from '../../../../utils/accessToken.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
-import aadCommands from '../../aadCommands.js';
 import commands from '../../commands.js';
 
 interface CommandArgs {
@@ -43,10 +42,6 @@ class EntraUserSetCommand extends GraphCommand {
 
   public get description(): string {
     return 'Updates information about the specified user';
-  }
-
-  public alias(): string[] | undefined {
-    return [aadCommands.USER_SET];
   }
 
   public allowUnknownOptions(): boolean | undefined {
@@ -249,8 +244,6 @@ class EntraUserSetCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    await this.showDeprecationWarning(logger, aadCommands.USER_SET, commands.USER_SET);
-
     try {
       if (args.options.currentPassword) {
         if (args.options.id && args.options.id !== accessToken.getUserIdFromAccessToken(auth.connection.accessTokens[auth.defaultResource].accessToken)) {

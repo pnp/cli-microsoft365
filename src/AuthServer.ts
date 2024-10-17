@@ -47,23 +47,23 @@ export class AuthServer {
       await this.logger.logToStderr(url);
       await this.logger.logToStderr('');
     }
-    this.openUrl(url);
+    await this.openUrl(url);
   };
 
-  private openUrl(url: string): void {
-    browserUtil.open(url)
-      .then(async _ => {
-        await this.logger.logToStderr("To sign in, use the web browser that just has been opened. Please sign-in there.");
-      })
-      .catch(_ => {
-        const errorResponse: InteractiveAuthorizationErrorResponse = {
-          error: "Can't open the default browser",
-          errorDescription: "Was not able to open a browser instance. Try again later or use a different authentication method."
-        };
+  private async openUrl(url: string): Promise<void> {
+    try {
+      await browserUtil.open(url);
+      await this.logger.logToStderr("To sign in, use the web browser that just has been opened. Please sign-in there.");
+    }
+    catch {
+      const errorResponse: InteractiveAuthorizationErrorResponse = {
+        error: "Can't open the default browser",
+        errorDescription: "Was not able to open a browser instance. Try again later or use a different authentication method."
+      };
 
-        this.reject(errorResponse);
-        this.httpServer.close();
-      });
+      this.reject(errorResponse);
+      this.httpServer.close();
+    }
   }
 
   private httpRequest = async (request: IncomingMessage, response: ServerResponse): Promise<void> => {

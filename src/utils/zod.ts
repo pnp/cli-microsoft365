@@ -41,7 +41,7 @@ function parseString(_def: z.ZodStringDef, _options: CommandOptionInfo[], curren
   if (currentOption) {
     currentOption.type = 'string';
   }
-  
+
   return;
 }
 
@@ -49,7 +49,7 @@ function parseNumber(_def: z.ZodNumberDef, _options: CommandOptionInfo[], curren
   if (currentOption) {
     currentOption.type = 'number';
   }
-  
+
   return;
 }
 
@@ -57,7 +57,7 @@ function parseBoolean(_def: z.ZodBooleanDef, _options: CommandOptionInfo[], curr
   if (currentOption) {
     currentOption.type = 'boolean';
   }
-  
+
   return;
 }
 
@@ -80,7 +80,7 @@ function parseDefault(def: z.ZodDefaultDef, _options: CommandOptionInfo[], curre
 function parseEnum(def: z.ZodEnumDef, _options: CommandOptionInfo[], currentOption?: CommandOptionInfo): z.ZodTypeDef | undefined {
   if (currentOption) {
     currentOption.type = 'string';
-    currentOption.autocomplete = def.values;
+    currentOption.autocomplete = [...def.values];
   }
 
   return;
@@ -89,7 +89,7 @@ function parseEnum(def: z.ZodEnumDef, _options: CommandOptionInfo[], currentOpti
 function parseNativeEnum(def: z.ZodNativeEnumDef, _options: CommandOptionInfo[], currentOption?: CommandOptionInfo): z.ZodTypeDef | undefined {
   if (currentOption) {
     currentOption.type = 'string';
-    currentOption.autocomplete = Object.getOwnPropertyNames(def.values);
+    currentOption.autocomplete = Object.values(def.values).map(v => String(v));
   }
 
   return;
@@ -139,6 +139,11 @@ function parseDef(def: z.ZodTypeDef, options: CommandOptionInfo[], currentOption
   } while (parsedDef);
 }
 
+type EnumLike = {
+  [k: string]: string | number
+  [nu: number]: string
+};
+
 export const zod = {
   alias<T extends ZodTypeAny>(alias: string, type: T): T {
     type._def.alias = alias;
@@ -149,5 +154,17 @@ export const zod = {
     const options: CommandOptionInfo[] = [];
     parseDef(schema._def, options);
     return options;
-  }
+  },
+
+  coercedEnum: <T extends EnumLike>(e: T): z.ZodEffects<z.ZodNativeEnum<T>, T[keyof T], unknown> =>
+    z.preprocess(val => {
+      const target = String(val)?.toLowerCase();
+      for (const k of Object.values(e)) {
+        if (String(k)?.toLowerCase() === target) {
+          return k;
+        }
+      }
+
+      return null;
+    }, z.nativeEnum(e))
 };
