@@ -179,7 +179,7 @@ describe(commands.M365GROUP_USER_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true, groupName: "CLI Test Group" } });
+    await command.action(logger, { options: { verbose: true, groupDisplayName: "CLI Test Group" } });
     assert(loggerLogSpy.calledOnceWithExactly([
       {
         "id": "00000000-0000-0000-0000-000000000000",
@@ -394,12 +394,12 @@ describe(commands.M365GROUP_USER_LIST, () => {
   });
 
   it('throws error when the group by name is not a unified group', async () => {
-    const groupName = 'CLI Test Group';
+    const groupDisplayName = 'CLI Test Group';
 
     sinonUtil.restore(entraGroup.isUnifiedGroup);
     sinon.stub(entraGroup, 'isUnifiedGroup').resolves(false);
 
-    await assert.rejects(command.action(logger, { options: { verbose: true, groupName: groupName } } as any),
-      new CommandError(`Specified group '${groupName}' is not a Microsoft 365 group.`));
+    await assert.rejects(command.action(logger, { options: { verbose: true, groupDisplayName: groupDisplayName } } as any),
+      new CommandError(`Specified group '${groupDisplayName}' is not a Microsoft 365 group.`));
   });
 });
