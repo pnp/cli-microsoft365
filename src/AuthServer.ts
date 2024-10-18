@@ -38,7 +38,7 @@ export class AuthServer {
   };
 
   private httpListener = async (): Promise<void> => {
-    const requestState = Math.random().toString(16).substring(2, 20);
+    const requestState = Math.random().toString(16).substring(2);
     const address = this.httpServer.address() as AddressInfo;
     this.generatedServerUrl = `http://localhost:${address.port}`;
     const url = `${Auth.getEndpointForResource('https://login.microsoftonline.com', this.connection.cloudType)}/${this.connection.tenant}/oauth2/authorize?response_type=code&client_id=${this.connection.appId}&redirect_uri=${this.generatedServerUrl}&state=${requestState}&resource=${this.resource}&prompt=select_account`;
