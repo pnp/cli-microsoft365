@@ -2053,6 +2053,11 @@ const sidebars: SidebarsConfig = {
           container: [
             {
               type: 'doc',
+              label: 'container activate',
+              id: 'cmd/spe/container/container-activate'
+            },
+            {
+              type: 'doc',
               label: 'container get',
               id: 'cmd/spe/container/container-get'
             },
