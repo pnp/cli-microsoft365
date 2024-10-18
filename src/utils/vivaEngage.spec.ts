@@ -35,12 +35,14 @@ describe('utils/vivaEngage', () => {
     ]);
   });
 
-  it('correctly get single community id by name using getCommunityIdByDisplayName', async () => {
+  it('correctly get single community id by name using getCommunityByDisplayName', async () => {
     sinon.stub(request, 'get').callsFake(async opts => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/employeeExperience/communities?$filter=displayName eq '${formatting.encodeQueryParameter(displayName)}'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/employeeExperience/communities?$filter=displayName eq '${formatting.encodeQueryParameter(displayName)}'&$select=id`) {
         return {
           value: [
-            communityResponse
+            {
+              id: communityId
+            }
           ]
         };
       }
@@ -48,17 +50,17 @@ describe('utils/vivaEngage', () => {
       return 'Invalid Request';
     });
 
-    const actual = await vivaEngage.getCommunityIdByDisplayName(displayName);
-    assert.deepStrictEqual(actual, 'eyJfdHlwZSI6Ikdyb3VwIiwiaWQiOiI0NzY5MTM1ODIwOSJ9');
+    const actual = await vivaEngage.getCommunityByDisplayName(displayName, ['id']);
+    assert.deepStrictEqual(actual, { id: communityId });
   });
 
-  it('handles selecting single community when multiple communities with the specified name found using getCommunityIdByDisplayName and cli is set to prompt', async () => {
+  it('handles selecting single community when multiple communities with the specified name found using getCommunityByDisplayName and cli is set to prompt', async () => {
     sinon.stub(request, 'get').callsFake(async opts => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/employeeExperience/communities?$filter=displayName eq '${formatting.encodeQueryParameter(displayName)}'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/employeeExperience/communities?$filter=displayName eq '${formatting.encodeQueryParameter(displayName)}'&$select=id`) {
         return {
           value: [
-            communityResponse,
-            anotherCommunityResponse
+            { id: communityId },
+            { id: "eyJfdHlwZ0NzY5SIwiIiSJ9IwO6IaWQiOIMTM1ODikdyb3Vw" }
           ]
         };
       }
@@ -66,25 +68,25 @@ describe('utils/vivaEngage', () => {
       return 'Invalid Request';
     });
 
-    sinon.stub(cli, 'handleMultipleResultsFound').resolves(communityResponse);
+    sinon.stub(cli, 'handleMultipleResultsFound').resolves({ id: communityId });
 
-    const actual = await vivaEngage.getCommunityIdByDisplayName(displayName);
-    assert.deepStrictEqual(actual, 'eyJfdHlwZSI6Ikdyb3VwIiwiaWQiOiI0NzY5MTM1ODIwOSJ9');
+    const actual = await vivaEngage.getCommunityByDisplayName(displayName, ['id']);
+    assert.deepStrictEqual(actual, { id: 'eyJfdHlwZSI6Ikdyb3VwIiwiaWQiOiI0NzY5MTM1ODIwOSJ9' });
   });
 
-  it('throws error message when no community was found using getCommunityIdByDisplayName', async () => {
+  it('throws error message when no community was found using getCommunityByDisplayName', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/employeeExperience/communities?$filter=displayName eq '${formatting.encodeQueryParameter(invalidDisplayName)}'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/employeeExperience/communities?$filter=displayName eq '${formatting.encodeQueryParameter(invalidDisplayName)}'&$select=id`) {
         return { value: [] };
       }
 
       throw 'Invalid Request';
     });
 
-    await assert.rejects(vivaEngage.getCommunityIdByDisplayName(invalidDisplayName)), Error(`The specified Viva Engage community '${invalidDisplayName}' does not exist.`);
+    await assert.rejects(vivaEngage.getCommunityByDisplayName(invalidDisplayName, ['id'])), Error(`The specified Viva Engage community '${invalidDisplayName}' does not exist.`);
   });
 
-  it('throws error message when multiple communities were found using getCommunityIdByDisplayName', async () => {
+  it('throws error message when multiple communities were found using getCommunityByDisplayName', async () => {
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
       if (settingName === settingsNames.prompt) {
         return false;
@@ -94,11 +96,11 @@ describe('utils/vivaEngage', () => {
     });
 
     sinon.stub(request, 'get').callsFake(async opts => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/employeeExperience/communities?$filter=displayName eq '${formatting.encodeQueryParameter(displayName)}'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/employeeExperience/communities?$filter=displayName eq '${formatting.encodeQueryParameter(displayName)}'&$select=id`) {
         return {
           value: [
-            communityResponse,
-            anotherCommunityResponse
+            { id: communityId },
+            { id: "eyJfdHlwZ0NzY5SIwiIiSJ9IwO6IaWQiOIMTM1ODikdyb3Vw" }
           ]
         };
       }
@@ -106,16 +108,19 @@ describe('utils/vivaEngage', () => {
       return 'Invalid Request';
     });
 
-    await assert.rejects(vivaEngage.getCommunityIdByDisplayName(displayName),
+    await assert.rejects(vivaEngage.getCommunityByDisplayName(displayName, ['id']),
       Error(`Multiple Viva Engage communities with name '${displayName}' found. Found: ${communityResponse.id}, ${anotherCommunityResponse.id}.`));
   });
 
-  it('correctly get single community id by group id using getCommunityIdByEntraGroupId', async () => {
+  it('correctly get single community by group id using getCommunityByEntraGroupId', async () => {
     sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/employeeExperience/communities?$select=id,groupId') {
         return {
           value: [
-            communityResponse
+            {
+              id: communityId,
+              groupId: entraGroupId
+            }
           ]
         };
       }
@@ -123,11 +128,32 @@ describe('utils/vivaEngage', () => {
       return 'Invalid Request';
     });
 
-    const actual = await vivaEngage.getCommunityIdByEntraGroupId(entraGroupId);
-    assert.deepStrictEqual(actual, 'eyJfdHlwZSI6Ikdyb3VwIiwiaWQiOiI0NzY5MTM1ODIwOSJ9');
+    const actual = await vivaEngage.getCommunityByEntraGroupId(entraGroupId, ['id']);
+    assert.deepStrictEqual(actual, { id: communityId, groupId: entraGroupId });
   });
 
-  it('throws error message when no community was found using getCommunityIdByEntraGroupId', async () => {
+  it('correctly get single community by group id using getCommunityByEntraGroupId and multiple properties', async () => {
+    sinon.stub(request, 'get').callsFake(async opts => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/employeeExperience/communities?$select=id,groupId,displayName') {
+        return {
+          value: [
+            {
+              id: communityId,
+              groupId: entraGroupId,
+              displayName: displayName
+            }
+          ]
+        };
+      }
+
+      return 'Invalid Request';
+    });
+
+    const actual = await vivaEngage.getCommunityByEntraGroupId(entraGroupId, ['id', 'groupId', 'displayName']);
+    assert.deepStrictEqual(actual, { id: communityId, groupId: entraGroupId, displayName: displayName });
+  });
+
+  it('throws error message when no community was found using getCommunityByEntraGroupId', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/employeeExperience/communities?$select=id,groupId') {
         return { value: [] };
@@ -136,23 +162,23 @@ describe('utils/vivaEngage', () => {
       throw 'Invalid Request';
     });
 
-    await assert.rejects(vivaEngage.getCommunityIdByEntraGroupId(entraGroupId)), Error(`The Microsoft Entra group with id '${entraGroupId}' is not associated with any Viva Engage community.`);
+    await assert.rejects(vivaEngage.getCommunityByEntraGroupId(entraGroupId, ['id'])), Error(`The Microsoft Entra group with id '${entraGroupId}' is not associated with any Viva Engage community.`);
   });
 
   it('correctly gets Entra group ID by community ID using getEntraGroupIdByCommunityId', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/employeeExperience/communities/${communityId}?$select=groupId`) {
-        return communityResponse;
+        return { groupId: entraGroupId };
       }
 
       throw 'Invalid Request';
     });
 
-    const actual = await vivaEngage.getEntraGroupIdByCommunityId(communityId);
-    assert.deepStrictEqual(actual, '0bed8b86-5026-4a93-ac7d-56750cc099f1');
+    const actual = await vivaEngage.getCommunityById(communityId, ['groupId']);
+    assert.deepStrictEqual(actual, { groupId: '0bed8b86-5026-4a93-ac7d-56750cc099f1' });
   });
 
-  it('throws error message when no Entra group ID was found using getEntraGroupIdByCommunityId', async () => {
+  it('throws error message when no Entra group ID was found using getCommunityById', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/employeeExperience/communities/${communityId}?$select=groupId`) {
         return null;
@@ -161,27 +187,6 @@ describe('utils/vivaEngage', () => {
       throw 'Invalid Request';
     });
 
-    await assert.rejects(vivaEngage.getEntraGroupIdByCommunityId(communityId)), Error(`The specified Viva Engage community with ID '${communityId}' does not exist.`);
-  });
-
-  it('correctly gets Entra group ID by community display name using getEntraGroupIdByCommunityDisplayName', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/employeeExperience/communities/${communityId}?$select=groupId`) {
-        return communityResponse;
-      }
-
-      if (opts.url === `https://graph.microsoft.com/v1.0/employeeExperience/communities?$filter=displayName eq '${formatting.encodeQueryParameter(displayName)}'`) {
-        return {
-          value: [
-            communityResponse
-          ]
-        };
-      }
-
-      throw 'Invalid Request';
-    });
-
-    const actual = await vivaEngage.getEntraGroupIdByCommunityDisplayName(displayName);
-    assert.deepStrictEqual(actual, entraGroupId);
+    await assert.rejects(vivaEngage.getCommunityById(communityId, ['groupId'])), Error(`The specified Viva Engage community with ID '${communityId}' does not exist.`);
   });
 });

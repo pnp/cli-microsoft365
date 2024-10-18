@@ -1,7 +1,7 @@
 export interface Community {
-  id: string;
-  displayName: string;
+  id?: string;
+  displayName?: string;
   description?: string;
-  privacy: string;
-  groupId: string;
+  privacy?: string;
+  groupId?: string;
 }

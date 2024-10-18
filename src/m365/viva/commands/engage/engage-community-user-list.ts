@@ -68,11 +68,13 @@ class VivaEngageCommunityUserListCommand extends GraphCommand {
       let entraGroupId = args.options.entraGroupId;
 
       if (args.options.communityDisplayName) {
-        entraGroupId = await vivaEngage.getEntraGroupIdByCommunityDisplayName(args.options.communityDisplayName);
+        const community = await vivaEngage.getCommunityByDisplayName(args.options.communityDisplayName, ['groupId']);
+        entraGroupId = community.groupId;
       }
 
       if (args.options.communityId) {
-        entraGroupId = await vivaEngage.getEntraGroupIdByCommunityId(args.options.communityId);
+        const community = await vivaEngage.getCommunityById(args.options.communityId, ['groupId']);
+        entraGroupId = community.groupId;
       }
 
       const requestOptions: CliRequestOptions = {

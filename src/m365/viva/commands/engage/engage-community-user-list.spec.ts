@@ -37,26 +37,7 @@ describe(commands.ENGAGE_COMMUNITY_USER_LIST, () => {
       "userPrincipalName": "Samu.Tolonen@contoso.onmicrosoft.com"
     }
   ];
-  const membersResult = [
-    {
-      "id": "1deb8814-8130-451d-8fcb-849dc7ed47e5",
-      "businessPhones": [
-        "123-555-1215"
-      ],
-      "displayName": "Samu Tolonen",
-      "givenName": "Samu",
-      "jobTitle": "IT Manager",
-      "mail": null,
-      "mobilePhone": "123-555-6645",
-      "officeLocation": "123455",
-      "preferredLanguage": null,
-      "surname": "Tolonen",
-      "userPrincipalName": "Samu.Tolonen@contoso.onmicrosoft.com",
-      "roles": [
-        "Member"
-      ]
-    }
-  ];
+  const membersResult = [{ ...membersAPIResult[0], roles: ["Member"] }];
   const adminsAPIResult = [
     {
       "id": "da634de7-d23c-4419-ab83-fcd395b4ebd0",
@@ -74,26 +55,13 @@ describe(commands.ENGAGE_COMMUNITY_USER_LIST, () => {
       "userPrincipalName": "Anton.Johansen@contoso.onmicrosoft.com"
     }
   ];
-  const adminsResult = [
-    {
-      "id": "da634de7-d23c-4419-ab83-fcd395b4ebd0",
-      "businessPhones": [
-        "123-555-1215"
-      ],
-      "displayName": "Anton Johansen",
-      "givenName": "Anton",
-      "jobTitle": "IT Manager",
-      "mail": null,
-      "mobilePhone": "123-555-6645",
-      "officeLocation": "123455",
-      "preferredLanguage": null,
-      "surname": "Johansen",
-      "userPrincipalName": "Anton.Johansen@contoso.onmicrosoft.com",
-      "roles": [
-        "Admin"
-      ]
-    }
-  ];
+  const adminsResult = [{ ...adminsAPIResult[0], roles: ["Admin"] }];
+  const community = {
+    id: communityId,
+    displayName: communityDisplayName,
+    privacy: 'Public',
+    groupId: entraGroupId
+  };
 
   let log: string[];
   let logger: Logger;
@@ -130,7 +98,7 @@ describe(commands.ENGAGE_COMMUNITY_USER_LIST, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.get,
-      vivaEngage.getEntraGroupIdByCommunityId
+      vivaEngage.getCommunityById
     ]);
   });
 
@@ -235,7 +203,7 @@ describe(commands.ENGAGE_COMMUNITY_USER_LIST, () => {
       throw 'Invalid request';
     });
 
-    sinon.stub(vivaEngage, 'getEntraGroupIdByCommunityId').resolves(entraGroupId);
+    sinon.stub(vivaEngage, 'getCommunityById').resolves(community);
 
     await command.action(logger, { options: { communityId: communityId, verbose: true } });
     assert(loggerLogSpy.calledWith([...adminsResult, ...membersResult]));
@@ -254,7 +222,7 @@ describe(commands.ENGAGE_COMMUNITY_USER_LIST, () => {
       throw 'Invalid request';
     });
 
-    sinon.stub(vivaEngage, 'getEntraGroupIdByCommunityDisplayName').resolves(entraGroupId);
+    sinon.stub(vivaEngage, 'getCommunityByDisplayName').resolves(community);
 
     await command.action(logger, { options: { communityDisplayName: communityDisplayName, verbose: true } });
     assert(loggerLogSpy.calledWith([...adminsResult, ...membersResult]));
@@ -290,7 +258,7 @@ describe(commands.ENGAGE_COMMUNITY_USER_LIST, () => {
       throw 'Invalid request';
     });
 
-    sinon.stub(vivaEngage, 'getEntraGroupIdByCommunityId').resolves(entraGroupId);
+    sinon.stub(vivaEngage, 'getCommunityById').resolves(community);
 
     await command.action(logger, { options: { communityId: communityId, role: 'Admin' } });
     assert(loggerLogSpy.calledWith(adminsResult));
