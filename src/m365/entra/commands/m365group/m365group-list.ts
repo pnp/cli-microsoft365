@@ -122,7 +122,7 @@ class EntraM365GroupListCommand extends GraphCommand {
     const res = await request.get<{ webUrl: string }>(requestOptions);
     return {
       id: groupId,
-      url: res.webUrl ? res.webUrl.substr(0, res.webUrl.lastIndexOf('/')) : ''
+      url: res.webUrl ? res.webUrl.substring(0, res.webUrl.lastIndexOf('/')) : ''
     };
   }
 }

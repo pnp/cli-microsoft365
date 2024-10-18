@@ -185,7 +185,7 @@ class TodoTaskSetCommand extends DelegatedGraphCommand {
     }
 
     const requestOptions: any = {
-      url: `${this.resource}/v1.0/me/todo/lists?$filter=displayName eq '${escape(options.listName as string)}'`,
+      url: `${this.resource}/v1.0/me/todo/lists?$filter=displayName eq '${formatting.encodeQueryParameter(options.listName!)}'`,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },

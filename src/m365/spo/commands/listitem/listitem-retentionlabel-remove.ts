@@ -1,4 +1,3 @@
-import * as url from 'url';
 import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
@@ -127,7 +126,7 @@ class SpoListItemRetentionLabelRemoveCommand extends SpoCommand {
   }
 
   private async getListAbsoluteUrl(options: Options, logger: Logger): Promise<string> {
-    const parsedUrl = url.parse(options.webUrl);
+    const parsedUrl = new URL(options.webUrl);
     const tenantUrl: string = `${parsedUrl.protocol}//${parsedUrl.hostname}`;
 
     if (options.listUrl) {

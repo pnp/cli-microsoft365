@@ -84,7 +84,7 @@ class TeamsUserAppListCommand extends GraphCommand {
       const items = await odata.getAllItems<TeamsAppInstallation>(endpoint);
       items.forEach(i => {
         const userAppId: string = Buffer.from(i.id as string, 'base64').toString('ascii');
-        const appId: string = userAppId.substr(userAppId.indexOf("##") + 2, userAppId.length - userId.length - 2);
+        const appId: string = userAppId.substring(userAppId.indexOf("##") + 2, userAppId.length);
         (i as any).appId = appId;
       });
 
