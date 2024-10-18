@@ -1,6 +1,7 @@
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
+import { CreateFolderCopyJobsNameConflictBehavior, spo } from '../../../../utils/spo.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
@@ -17,8 +18,7 @@ interface Options extends GlobalOptions {
   targetUrl: string;
   newName?: string;
   nameConflictBehavior?: string;
-  resetAuthorAndCreated?: boolean;
-  bypassSharedLock?: boolean;
+  skipWait?: boolean;
 }
 
 class SpoFolderCopyCommand extends SpoCommand {
@@ -49,8 +49,7 @@ class SpoFolderCopyCommand extends SpoCommand {
         sourceId: typeof args.options.sourceId !== 'undefined',
         newName: typeof args.options.newName !== 'undefined',
         nameConflictBehavior: typeof args.options.nameConflictBehavior !== 'undefined',
-        resetAuthorAndCreated: !!args.options.resetAuthorAndCreated,
-        bypassSharedLock: !!args.options.bypassSharedLock
+        skipWait: !!args.options.skipWait
       });
     });
   }
@@ -77,10 +76,7 @@ class SpoFolderCopyCommand extends SpoCommand {
         autocomplete: this.nameConflictBehaviorOptions
       },
       {
-        option: '--resetAuthorAndCreated'
-      },
-      {
-        option: '--bypassSharedLock'
+        option: '--skipWait'
       }
     );
   }
@@ -112,7 +108,7 @@ class SpoFolderCopyCommand extends SpoCommand {
 
   #initTypes(): void {
     this.types.string.push('webUrl', 'sourceUrl', 'sourceId', 'targetUrl', 'newName', 'nameConflictBehavior');
-    this.types.boolean.push('resetAuthorAndCreated', 'bypassSharedLock');
+    this.types.boolean.push('skipWait');
   }
 
   protected getExcludedOptionsWithUrls(): string[] | undefined {
@@ -121,48 +117,67 @@ class SpoFolderCopyCommand extends SpoCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
-      const sourcePath = await this.getSourcePath(logger, args.options);
+      const sourceServerRelativePath = await this.getSourcePath(logger, args.options);
+      const sourcePath = this.getAbsoluteUrl(args.options.webUrl, sourceServerRelativePath);
+      const destinationPath = this.getAbsoluteUrl(args.options.webUrl, args.options.targetUrl);
 
       if (this.verbose) {
-        await logger.logToStderr(`Copying folder ${sourcePath} to ${args.options.targetUrl}...`);
+        await logger.logToStderr(`Copying folder '${sourcePath}' to '${destinationPath}'...`);
       }
 
-      const absoluteSourcePath = this.getAbsoluteUrl(args.options.webUrl, sourcePath);
-      let absoluteTargetPath = this.getAbsoluteUrl(args.options.webUrl, args.options.targetUrl) + '/';
+      const copyJobResponse = await spo.createFolderCopyJob(
+        args.options.webUrl,
+        sourcePath,
+        destinationPath,
+        {
+          nameConflictBehavior: this.getNameConflictBehaviorValue(args.options.nameConflictBehavior),
+          newName: args.options.newName,
+          operation: 'copy'
+        }
+      );
 
-      if (args.options.newName) {
-        absoluteTargetPath += args.options.newName;
+      if (args.options.skipWait) {
+        return;
       }
-      else {
-        // Keep the original folder name
-        absoluteTargetPath += sourcePath.substring(sourcePath.lastIndexOf('/') + 1);
+
+      if (this.verbose) {
+        await logger.logToStderr('Waiting for the copy job to complete...');
       }
+
+      const copyJobResult = await spo.getCopyJobResult(args.options.webUrl, copyJobResponse);
+
+      if (this.verbose) {
+        await logger.logToStderr('Getting information about the destination folder...');
+      }
+
+      // Get destination folder data
+      const siteRelativeDestinationFolder = '/' + copyJobResult.TargetObjectSiteRelativeUrl.substring(0, copyJobResult.TargetObjectSiteRelativeUrl.lastIndexOf('/'));
+      const absoluteWebUrl = destinationPath.substring(0, destinationPath.toLowerCase().lastIndexOf(siteRelativeDestinationFolder.toLowerCase()));
 
       const requestOptions: CliRequestOptions = {
-        url: `${args.options.webUrl}/_api/SP.MoveCopyUtil.CopyFolderByPath`,
+        url: `${absoluteWebUrl}/_api/Web/GetFolderById('${copyJobResult.TargetObjectUniqueId}')`,
         headers: {
           accept: 'application/json;odata=nometadata'
         },
-        responseType: 'json',
-        data: {
-          srcPath: {
-            DecodedUrl: absoluteSourcePath
-          },
-          destPath: {
-            DecodedUrl: absoluteTargetPath
-          },
-          options: {
-            KeepBoth: args.options.nameConflictBehavior === 'rename',
-            ShouldBypassSharedLocks: !!args.options.bypassSharedLock,
-            ResetAuthorAndCreatedOnCopy: !!args.options.resetAuthorAndCreated
-          }
-        }
+        responseType: 'json'
       };
 
-      await request.post(requestOptions);
+      const destinationFile = await request.get<any>(requestOptions);
+      await logger.log(destinationFile);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
+    }
+  }
+
+  private getNameConflictBehaviorValue(nameConflictBehavior?: string): CreateFolderCopyJobsNameConflictBehavior {
+    switch (nameConflictBehavior?.toLowerCase()) {
+      case 'fail':
+        return CreateFolderCopyJobsNameConflictBehavior.Fail;
+      case 'rename':
+        return CreateFolderCopyJobsNameConflictBehavior.Rename;
+      default:
+        return CreateFolderCopyJobsNameConflictBehavior.Fail;
     }
   }
 
@@ -176,19 +191,20 @@ class SpoFolderCopyCommand extends SpoCommand {
     }
 
     const requestOptions: CliRequestOptions = {
-      url: `${options.webUrl}/_api/Web/GetFolderById('${options.sourceId}')?$select=ServerRelativePath`,
+      url: `${options.webUrl}/_api/Web/GetFolderById('${options.sourceId}')/ServerRelativePath`,
       headers: {
         accept: 'application/json;odata=nometadata'
       },
       responseType: 'json'
     };
 
-    const file = await request.get<{ ServerRelativePath: { DecodedUrl: string } }>(requestOptions);
-    return file.ServerRelativePath.DecodedUrl;
+    const path = await request.get<{ DecodedUrl: string }>(requestOptions);
+    return path.DecodedUrl;
   }
 
   private getAbsoluteUrl(webUrl: string, url: string): string {
-    return url.startsWith('https://') ? url : urlUtil.getAbsoluteUrl(webUrl, url);
+    const result = url.startsWith('https://') ? url : urlUtil.getAbsoluteUrl(webUrl, url);
+    return urlUtil.removeTrailingSlashes(result);
   }
 }
 
