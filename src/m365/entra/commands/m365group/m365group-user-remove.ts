@@ -18,7 +18,6 @@ interface Options extends GlobalOptions {
   teamName?: string;
   groupId?: string;
   groupName?: string;
-  userName?: string;
   ids?: string;
   userNames?: string;
   force?: boolean;
@@ -51,7 +50,6 @@ class EntraM365GroupUserRemoveCommand extends GraphCommand {
         groupId: typeof args.options.groupId !== 'undefined',
         teamName: typeof args.options.teamName !== 'undefined',
         groupName: typeof args.options.groupName !== 'undefined',
-        userName: typeof args.options.userName !== 'undefined',
         ids: typeof args.options.ids !== 'undefined',
         userNames: typeof args.options.userNames !== 'undefined'
       });
@@ -71,9 +69,6 @@ class EntraM365GroupUserRemoveCommand extends GraphCommand {
       },
       {
         option: '--teamName [teamName]'
-      },
-      {
-        option: '-n, --userName [userName]'
       },
       {
         option: '--ids [ids]'
@@ -112,10 +107,6 @@ class EntraM365GroupUserRemoveCommand extends GraphCommand {
           }
         }
 
-        if (args.options.userName && !validation.isValidUserPrincipalName(args.options.userName)) {
-          return `The specified userName '${args.options.userName}' is not a valid user principal name.`;
-        }
-
         return true;
       }
     );
@@ -127,21 +118,17 @@ class EntraM365GroupUserRemoveCommand extends GraphCommand {
         options: ['groupId', 'teamId', 'groupName', 'teamName']
       },
       {
-        options: ['userName', 'ids', 'userNames']
+        options: ['ids', 'userNames']
       }
     );
   }
 
   #initTypes(): void {
-    this.types.string.push('groupId', 'groupName', 'teamId', 'teamName', 'userName', 'ids', 'userNames');
+    this.types.string.push('groupId', 'groupName', 'teamId', 'teamName', 'ids', 'userNames');
     this.types.boolean.push('force');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    if (args.options.userName) {
-      await this.warn(logger, `Option 'userName' is deprecated. Please use 'ids' or 'userNames' instead.`);
-    }
-
     const removeUser = async (): Promise<void> => {
       try {
         const groupId: string = await this.getGroupId(logger, args.options.groupId, args.options.teamId, args.options.groupName, args.options.teamName);
@@ -151,7 +138,7 @@ class EntraM365GroupUserRemoveCommand extends GraphCommand {
           throw Error(`Specified group with id '${groupId}' is not a Microsoft 365 group.`);
         }
 
-        const userNames = args.options.userNames || args.options.userName;
+        const userNames = args.options.userNames;
         const userIds: string[] = await this.getUserIds(logger, args.options.ids, userNames);
 
         await this.removeUsersFromGroup(groupId, userIds, 'owners');
@@ -166,7 +153,7 @@ class EntraM365GroupUserRemoveCommand extends GraphCommand {
       await removeUser();
     }
     else {
-      const result = await cli.promptForConfirmation({ message: `Are you sure you want to remove ${args.options.userName || args.options.userNames || args.options.ids} from ${args.options.groupId || args.options.groupName || args.options.teamId || args.options.teamName}?` });
+      const result = await cli.promptForConfirmation({ message: `Are you sure you want to remove ${args.options.userNames || args.options.ids} from ${args.options.groupId || args.options.groupName || args.options.teamId || args.options.teamName}?` });
 
       if (result) {
         await removeUser();
