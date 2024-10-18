@@ -105,6 +105,7 @@ export default {
   FOLDER_SHARINGLINK_GET: `${prefix} folder sharinglink get`,
   FOLDER_SHARINGLINK_LIST: `${prefix} folder sharinglink list`,
   FOLDER_SHARINGLINK_REMOVE: `${prefix} folder sharinglink remove`,
+  FOLDER_SHARINGLINK_SET: `${prefix} folder sharinglink set`,
   GET: `${prefix} get`,
   GROUP_ADD: `${prefix} group add`,
   GROUP_GET: `${prefix} group get`,
