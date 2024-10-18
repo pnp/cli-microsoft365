@@ -1799,6 +1799,15 @@ const sidebars: SidebarsConfig = {
               id: 'cmd/pp/tenant/tenant-settings-set'
             }
           ]
+        },
+        {
+          website: [
+            {
+              type: 'doc',
+              label: 'website webfile get',
+              id: 'cmd/pp/website/website-webfile-get'
+            },
+          ]
         }
       ]
     },
