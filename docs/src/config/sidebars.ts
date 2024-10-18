@@ -3168,6 +3168,11 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
+              label: 'page publish',
+              id: 'cmd/spo/page/page-publish'
+            },
+            {
+              type: 'doc',
               label: 'page remove',
               id: 'cmd/spo/page/page-remove'
             },
