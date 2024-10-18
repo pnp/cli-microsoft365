@@ -203,6 +203,7 @@ export default {
   PAGE_COPY: `${prefix} page copy`,
   PAGE_GET: `${prefix} page get`,
   PAGE_LIST: `${prefix} page list`,
+  PAGE_PUBLISH: `${prefix} page publish`,
   PAGE_REMOVE: `${prefix} page remove`,
   PAGE_SET: `${prefix} page set`,
   PAGE_CLIENTSIDEWEBPART_ADD: `${prefix} page clientsidewebpart add`,
