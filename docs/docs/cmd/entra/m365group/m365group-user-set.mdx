@@ -32,7 +32,7 @@ m365 entra m365group user set [options]
 : The user principal names of users. You can also pass a comma-separated list of UPNs. Specify only one of the following `ids` or `userNames`.
 
 `-r, --role <role>`
-: Role to set for the given user in the specified Microsoft 365 Group or Microsoft Teams team. Allowed values: `Owner`, `Member`
+: Role to set for the given user in the specified Microsoft 365 Group or Microsoft Teams team. Allowed values: `Owner`, `Member`.
 ```
 
 <Global />
@@ -70,13 +70,13 @@ m365 entra m365group user set --groupId '00000000-0000-0000-0000-000000000000' -
 Demote multiple users specified by the userNames parameter from Owner to Member of the given Microsoft Teams team
 
 ```sh
-m365 entra teams user set --teamId '00000000-0000-0000-0000-000000000000' --userNames 'anne.matthews@contoso.onmicrosoft.com,john.doe@contoso.onmicrosoft.com' --role Member
+m365 teams user set --teamId '00000000-0000-0000-0000-000000000000' --userNames 'anne.matthews@contoso.onmicrosoft.com,john.doe@contoso.onmicrosoft.com' --role Member
 ```
 
 Demote multiple users specified by the ids parameter from Owner to Member in the given Microsoft Teams team
 
 ```sh
-m365 entra teams user set --teamName 'Engineering' --ids '74a3b772-3122-447b-b9da-10895e238219,dd3d21e4-a142-46b9-8482-bca8fe9596b3' --role Member
+m365 teams user set --teamName 'Engineering' --ids '74a3b772-3122-447b-b9da-10895e238219,dd3d21e4-a142-46b9-8482-bca8fe9596b3' --role Member
 ```
 
 ## Response
