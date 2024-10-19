@@ -91,7 +91,7 @@ describe(commands.COPILOT_REMOVE, () => {
 
   it('defines correct alias', () => {
     const alias = command.alias();
-    assert.deepStrictEqual(alias, [commands.COPILOT_REMOVE]);
+    assert.deepStrictEqual(alias, [commands.CHATBOT_REMOVE]);
   });
 
   it('fails validation if id is not a valid guid.', async () => {

@@ -190,7 +190,7 @@ describe(commands.COPILOT_LIST, () => {
 
   it('defines correct alias', () => {
     const alias = command.alias();
-    assert.deepStrictEqual(alias, [commands.COPILOT_LIST]);
+    assert.deepStrictEqual(alias, [commands.CHATBOT_LIST]);
   });
 
 });
