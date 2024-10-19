@@ -185,6 +185,12 @@ describe(commands.COPILOT_LIST, () => {
 
   it('defines alias', () => {
     const alias = command.alias();
-    assert.notStrictEqual(typeof alias, 'undefined');
+    assert.notStrictEqual(typeof alias, 'copilot');
   });
+
+  it('defines correct alias', () => {
+    const alias = command.alias();
+    assert.deepStrictEqual(alias, [commands.COPILOT_LIST]);
+  });
+
 });

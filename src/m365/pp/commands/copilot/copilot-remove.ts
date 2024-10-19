@@ -94,6 +94,7 @@ class PpCopilotRemoveCommand extends PowerPlatformCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    await this.showDeprecationWarning(logger, "pp chatbot remove", "pp copilot remove");
     if (this.verbose) {
       await logger.logToStderr(`Removing copilot '${args.options.id || args.options.name}'...`);
     }

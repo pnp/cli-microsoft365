@@ -58,6 +58,7 @@ class PpCopilotListCommand extends PowerPlatformCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    await this.showDeprecationWarning(logger, "pp chatbot list", "pp copilot list");
     if (this.verbose) {
       await logger.logToStderr(`Retrieving list of copilots for environment '${args.options.environmentName}'.`);
     }

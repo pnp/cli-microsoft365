@@ -84,6 +84,16 @@ describe(commands.COPILOT_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
+  it('defines alias', () => {
+    const alias = command.alias();
+    assert.notStrictEqual(typeof alias, 'undefined');
+  });
+
+  it('defines correct alias', () => {
+    const alias = command.alias();
+    assert.deepStrictEqual(alias, [commands.COPILOT_REMOVE]);
+  });
+
   it('fails validation if id is not a valid guid.', async () => {
     const actual = await command.validate({
       options: {
