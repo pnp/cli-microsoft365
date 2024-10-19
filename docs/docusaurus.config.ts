@@ -49,6 +49,9 @@ const config: Config = {
       'client-redirects',
       {
         createRedirects(routePath) {
+          if (routePath.includes('/copilot')) {
+            return [routePath.replace('/copilot', '/chatbot')];
+          }
           if (routePath.includes('/entra')) {
             return [routePath.replace('/entra', '/aad')];
           }
