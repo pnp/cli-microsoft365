@@ -35,7 +35,7 @@ class SpoListGetCommand extends SpoCommand {
   }
 
   public get description(): string {
-    return 'Gets information about the specific list';
+    return 'Gets information about the specific list or returns information about the default list in a site';
   }
 
   constructor() {
