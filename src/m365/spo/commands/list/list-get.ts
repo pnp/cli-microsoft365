@@ -44,7 +44,6 @@ class SpoListGetCommand extends SpoCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
-    this.#initOptionSets();
   }
 
   #initTelemetry(): void {
@@ -99,10 +98,6 @@ class SpoListGetCommand extends SpoCommand {
         return true;
       }
     );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push({ options: ['id', 'title', 'url'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
