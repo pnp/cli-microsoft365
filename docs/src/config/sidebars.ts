@@ -2868,6 +2868,11 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
+              label: 'list defaultvalue list',
+              id: 'cmd/spo/list/list-defaultvalue-list'
+            },
+            {
+              type: 'doc',
               label: 'list retentionlabel ensure',
               id: 'cmd/spo/list/list-retentionlabel-ensure'
             },
