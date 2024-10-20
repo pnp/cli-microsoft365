@@ -25,6 +25,7 @@ interface Options extends GlobalOptions {
   url?: string;
   properties?: string;
   withPermissions?: boolean;
+  default?: boolean;
 }
 
 class SpoListGetCommand extends SpoCommand {
@@ -50,11 +51,12 @@ class SpoListGetCommand extends SpoCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        id: (!(!args.options.id)).toString(),
-        title: (!(!args.options.title)).toString(),
-        url: (!(!args.options.url)).toString(),
-        properties: (!(!args.options.properties)).toString(),
-        withPermissions: typeof args.options.withPermissions !== 'undefined'
+        id: typeof args.options.id !== 'undefined',
+        title: typeof args.options.title !== 'undefined',
+        url: typeof args.options.url !== 'undefined',
+        properties: typeof args.options.properties !== 'undefined',
+        withPermissions: !!args.options.withPermissions,
+        default: !!args.options.default
       });
     });
   }
@@ -72,6 +74,9 @@ class SpoListGetCommand extends SpoCommand {
       },
       {
         option: '--url [url]'
+      },
+      {
+        option: '--default'
       },
       {
         option: '-p, --properties [properties]'
@@ -102,7 +107,7 @@ class SpoListGetCommand extends SpoCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push({ options: ['id', 'title', 'url'] });
+    this.optionSets.push({ options: ['id', 'title', 'url', 'default'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -121,6 +126,9 @@ class SpoListGetCommand extends SpoCommand {
     else if (args.options.url) {
       const listServerRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.url);
       requestUrl += `GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')`;
+    }
+    else if (args.options.default) {
+      requestUrl += `DefaultDocumentLibrary`;
     }
 
     const fieldsProperties: Properties = this.formatSelectProperties(args.options.properties, args.options.withPermissions);
