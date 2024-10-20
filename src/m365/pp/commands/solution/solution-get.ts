@@ -28,10 +28,6 @@ class PpSolutionGetCommand extends PowerPlatformCommand {
     return 'Gets a specific solution in a given environment.';
   }
 
-  public defaultProperties(): string[] | undefined {
-    return ['uniquename', 'version', 'publisher'];
-  }
-
   constructor() {
     super();
 

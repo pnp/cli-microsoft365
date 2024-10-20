@@ -25,10 +25,6 @@ class VivaEngageMessageAddCommand extends VivaEngageCommand {
     return 'Posts a Viva Engage network message on behalf of the current user';
   }
 
-  public defaultProperties(): string[] | undefined {
-    return ['id'];
-  }
-
   constructor() {
     super();
 

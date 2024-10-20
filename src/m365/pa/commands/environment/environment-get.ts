@@ -22,10 +22,6 @@ class PaEnvironmentGetCommand extends PowerAppsCommand {
     return 'Gets information about the specified Microsoft Power Apps environment';
   }
 
-  public defaultProperties(): string[] | undefined {
-    return ['name', 'id', 'location', 'displayName', 'provisioningState', 'environmentSku', 'azureRegionHint', 'isDefault'];
-  }
-
   constructor() {
     super();
 
