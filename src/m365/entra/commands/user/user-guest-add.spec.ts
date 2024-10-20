@@ -85,10 +85,6 @@ describe(commands.USER_GUEST_ADD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('defines correct properties for the default output', () => {
-    assert.deepStrictEqual(command.defaultProperties(), ['id', 'inviteRedeemUrl', 'invitedUserDisplayName', 'invitedUserEmailAddress', 'invitedUserType', 'resetRedemption', 'sendInvitationMessage', 'status']);
-  });
-
   it('correctly logs the API response', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/invitations') {

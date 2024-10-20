@@ -136,10 +136,6 @@ describe(commands.BUCKET_ADD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('defines correct properties for the default output', () => {
-    assert.deepStrictEqual(command.defaultProperties(), ['id', 'name', 'planId', 'orderHint']);
-  });
-
   it('passes validation when valid name and planId specified', async () => {
     const actual = await command.validate({
       options: {

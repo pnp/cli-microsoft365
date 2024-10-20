@@ -23,10 +23,6 @@ class PpEnvironmentGetCommand extends PowerPlatformCommand {
     return 'Gets information about the specified Power Platform environment';
   }
 
-  public defaultProperties(): string[] | undefined {
-    return ['name', 'id'];
-  }
-
   constructor() {
     super();
 
