@@ -1281,4 +1281,25 @@ describe(commands.LIST_GET, () => {
     const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF' } }, commandInfo);
     assert(actual);
   });
+
+  it('retrieves the default list in the specified site by providing a webUrl', async () => {
+    const defaultSiteList = { ...listResponse, BaseTemplate: 101, ParentWebUrl: "/", ListItemEntityTypeFullName: "SP.Data.Shared_x0020_DocumentsItem" };
+
+    sinon.stub(request, 'get').resolves({
+      ...defaultSiteList
+    });
+
+    await command.action(logger, {
+      options: {
+        title: 'Documents',
+        webUrl: 'https://contoso.sharepoint.com'
+      }
+    });
+
+    assert(loggerLogSpy.calledWithMatch({
+      BaseTemplate: 101,
+      ParentWebUrl: "/",
+      ListItemEntityTypeFullName: "SP.Data.Shared_x0020_DocumentsItem"
+    }));
+  });
 });
