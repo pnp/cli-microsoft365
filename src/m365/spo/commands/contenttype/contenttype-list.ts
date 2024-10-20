@@ -34,6 +34,7 @@ class SpoContentTypeListCommand extends SpoCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initTypes();
   }
 
   #initTelemetry(): void {
@@ -61,12 +62,16 @@ class SpoContentTypeListCommand extends SpoCommand {
     );
   }
 
+  #initTypes(): void {
+    this.types.string.push('webUrl', 'category');
+  }
+
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
-      let requestUrl: string = `${args.options.webUrl}/_api/web/ContentTypes`;
+      let requestUrl: string = `${args.options.webUrl}/_api/web/ContentTypes?$expand=Parent`;
 
       if (args.options.category) {
-        requestUrl += `?$filter=Group eq '${formatting.encodeQueryParameter(args.options.category as string)}'`;
+        requestUrl += `&$filter=Group eq '${formatting.encodeQueryParameter(args.options.category as string)}'`;
       }
 
       const res = await odata.getAllItems<any>(requestUrl);
