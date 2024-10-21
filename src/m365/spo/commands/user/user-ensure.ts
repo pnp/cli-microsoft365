@@ -1,10 +1,12 @@
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
-import { entraUser } from '../../../../utils/entraUser.js';
+import { entraGroup } from '../../../../utils/entraGroup.js';
+import { Group } from '@microsoft/microsoft-graph-types';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
+import { entraUser } from '../../../../utils/entraUser.js';
 
 interface CommandArgs {
   options: Options;
@@ -14,6 +16,9 @@ interface Options extends GlobalOptions {
   webUrl: string;
   entraId?: string;
   userName?: string;
+  loginName?: string;
+  entraGroupId?: string;
+  entraGroupName?: string;
 }
 
 class SpoUserEnsureCommand extends SpoCommand {
@@ -32,13 +37,17 @@ class SpoUserEnsureCommand extends SpoCommand {
     this.#initOptions();
     this.#initValidators();
     this.#initOptionSets();
+    this.#initTypes();
   }
 
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
         entraId: typeof args.options.entraId !== 'undefined',
-        userName: typeof args.options.userName !== 'undefined'
+        userName: typeof args.options.userName !== 'undefined',
+        loginName: typeof args.options.loginName !== 'undefined',
+        entraGroupId: typeof args.options.entraGroupId !== 'undefined',
+        entraGroupName: typeof args.options.entraGroupName !== 'undefined'
       });
     });
   }
@@ -53,6 +62,15 @@ class SpoUserEnsureCommand extends SpoCommand {
       },
       {
         option: '--userName [userName]'
+      },
+      {
+        option: '--loginName [loginName]'
+      },
+      {
+        option: '--entraGroupId [entraGroupId]'
+      },
+      {
+        option: '--entraGroupName [entraGroupName]'
       }
     );
   }
@@ -73,13 +91,24 @@ class SpoUserEnsureCommand extends SpoCommand {
           return `${args.options.userName} is not a valid userName.`;
         }
 
+        if (args.options.entraGroupId && !validation.isValidGuid(args.options.entraGroupId)) {
+          return `${args.options.entraGroupId} is not a valid GUID.`;
+        }
+
         return true;
       }
     );
   }
 
   #initOptionSets(): void {
-    this.optionSets.push({ options: ['entraId', 'userName'] });
+    this.optionSets.push({
+      options: ['entraId', 'userName', 'loginName', 'entraGroupId', 'entraGroupName'],
+      runsWhen: (args) => args.options.entraId || args.options.aadId || args.options.userName || args.options.loginName || args.options.entraGroupId || args.options.entraGroupName
+    });
+  }
+
+  #initTypes(): void {
+    this.types.string.push('webUrl', 'entraId', 'userName', 'loginName', 'entraGroupId', 'entraGroupName');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -89,7 +118,7 @@ class SpoUserEnsureCommand extends SpoCommand {
 
     try {
       const requestBody = {
-        logonName: args.options.userName || await this.getUpnByUserId(args.options.entraId!, logger)
+        logonName: await this.getUpn(args.options)
       };
 
       const requestOptions: CliRequestOptions = {
@@ -109,12 +138,39 @@ class SpoUserEnsureCommand extends SpoCommand {
     }
   }
 
-  private async getUpnByUserId(entraId: string, logger: Logger): Promise<string> {
-    if (this.verbose) {
-      await logger.logToStderr(`Retrieving user principal name for user with id ${entraId}`);
+  private async getUpn(options: Options): Promise<string> {
+    if (options.userName) {
+      return options.userName;
     }
 
-    return await entraUser.getUpnByUserId(entraId);
+    if (options.entraId) {
+      return await entraUser.getUpnByUserId(options.entraId);
+    }
+
+    if (options.loginName) {
+      return options.loginName;
+    }
+
+    let upn: string = '';
+    if (options.entraGroupId || options.entraGroupName) {
+      const entraGroup = await this.getEntraGroup(options.entraGroupId, options.entraGroupName);
+      if (entraGroup?.mail) {
+        upn = entraGroup.mail;
+      }
+      else {
+        upn = `c:0t.c|tenant|${entraGroup?.id}`;
+      }
+    }
+
+    return upn;
+  }
+
+  private async getEntraGroup(entraGroupId?: string, entraGroupName?: string): Promise<Group> {
+    if (entraGroupId) {
+      return entraGroup.getGroupById(entraGroupId);
+    }
+
+    return entraGroup.getGroupByDisplayName(entraGroupName!);
   }
 }
 
