@@ -1,0 +1,173 @@
+import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# pp website webfile list
+
+Lists all webfiles for the specified Power Pages website.
+
+## Usage
+
+```sh
+m365 pp website webfile list [options]
+```
+
+## Options
+
+```md definition-list
+`-e, --environmentName <environmentName>`
+: The name of the environment where the Power Pages websites are located.
+
+`--websiteId [websiteId]`
+:ID of the Power Pages website. Specify either `websiteId` or `websiteName` but not both.
+
+`--websiteName [websiteName]`
+:The unique name (not the display name) of the Power Pages website. Specify either `websiteId` or `websiteName` but not both.
+
+`--asAdmin`
+: Run the command as admin and retrive Power Pages websites for environments you do not have explicitly assigned permissions to.
+```
+
+<Global />
+
+## Examples
+
+List all webfiles for the site Contoso
+
+```sh
+m365 pp website webfile list --websiteName Contoso --environmentName "Default-d87a7535-dd31-4437-bfe1-95340acd55c5"
+```
+
+List all webfiles for the site id as admin
+
+```sh
+m365 pp website webfile list --websiteId 2ca3eaa5-140f-4175-8261-3272edf9f339 --environmentName "Default-d87a7535-dd31-4437-bfe1-95340acd55c5" --asAdmin
+```
+
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  [
+    {
+        "mspp_webfileid": "a1700435-b21a-48f0-83f4-f34411a26cbf",
+        "mspp_name": "Site-mockup-1.png",
+        "mspp_contentdisposition@OData.Community.Display.V1.FormattedValue": "inline",
+        "mspp_contentdisposition": 756150000,
+        "mspp_excludefromsearch@OData.Community.Display.V1.FormattedValue": "No",
+        "mspp_excludefromsearch": false,
+        "mspp_hiddenfromsitemap@OData.Community.Display.V1.FormattedValue": "No",
+        "mspp_hiddenfromsitemap": false,
+        "_mspp_parentpageid_value@Microsoft.Dynamics.CRM.associatednavigationproperty": "mspp_parentpageid",
+        "_mspp_parentpageid_value@Microsoft.Dynamics.CRM.lookuplogicalname": "mspp_webpage",
+        "_mspp_parentpageid_value@OData.Community.Display.V1.FormattedValue": "Home",
+        "_mspp_parentpageid_value": "a3efb062-0691-4d3e-a9e6-43bfd2daeed6",
+        "mspp_partialurl": "Site-mockup-1.png",
+        "_mspp_publishingstateid_value@Microsoft.Dynamics.CRM.associatednavigationproperty": "mspp_publishingstateid",
+        "_mspp_publishingstateid_value@Microsoft.Dynamics.CRM.lookuplogicalname": "mspp_publishingstate",
+        "_mspp_publishingstateid_value@OData.Community.Display.V1.FormattedValue": "Published",
+        "_mspp_publishingstateid_value": "0d0fa682-7ed7-419b-bc7a-25e8bc64b6e2",
+        "_mspp_websiteid_value@Microsoft.Dynamics.CRM.associatednavigationproperty": "mspp_websiteid",
+        "_mspp_websiteid_value@Microsoft.Dynamics.CRM.lookuplogicalname": "mspp_website",
+        "_mspp_websiteid_value@OData.Community.Display.V1.FormattedValue": "Contoso",
+        "_mspp_websiteid_value": "2ca3eaa5-140f-4175-8261-3272edf9f339",
+        "_mspp_createdby_value@Microsoft.Dynamics.CRM.lookuplogicalname": "systemuser",
+        "_mspp_createdby_value@OData.Community.Display.V1.FormattedValue": "Shanthakumar",
+        "_mspp_createdby_value": "66ece047-0e90-ee11-8179-000d3a37640e",
+        "_mspp_modifiedby_value@Microsoft.Dynamics.CRM.lookuplogicalname": "systemuser",
+        "_mspp_modifiedby_value@OData.Community.Display.V1.FormattedValue": "Shanthakumar",
+        "_mspp_modifiedby_value": "66ece047-0e90-ee11-8179-000d3a37640e",
+        "mspp_modifiedon@OData.Community.Display.V1.FormattedValue": "8/27/2024 2:37 PM",
+        "mspp_modifiedon": "2024-08-27T09:07:22Z",
+        "mspp_createdon@OData.Community.Display.V1.FormattedValue": "8/27/2024 2:37 PM",
+        "mspp_createdon": "2024-08-27T09:07:16Z",
+        "statecode": 0,
+        "statuscode@OData.Community.Display.V1.FormattedValue": "Active",
+        "statuscode": 1,
+        "mspp_title": null,
+        "mspp_displaydate": null,
+        "mspp_displayorder": null,
+        "mspp_summary": null,
+        "mspp_cloudblobaddress": null,
+        "mspp_modifiedbyusername": null,
+        "mspp_alloworigin": null,
+        "mspp_expirationdate": null,
+        "mspp_createdbyipaddress": null,
+        "mspp_createdbyusername": null,
+        "mspp_modifiedbyipaddress": null,
+        "mspp_releasedate": null,
+        "_mspp_masterwebfileid_value": null
+      }
+  ]
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  mspp_name             mspp_webfileid                        mspp_summary  _mspp_publishingstateid_value@OData.Community.Display.V1.FormattedValue
+  --------------------  ------------------------------------  ------------  -----------------------------------------------------------------------
+  Circle-3.png          b20482f2-6e3b-4626-8b94-15b6e2131fe9  circle image          Published                                                              
+  Video 1.mp4           2e341807-e70a-487c-87ac-1affdbe51fe3  sample video          Published 
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  mspp_name,mspp_webfileid,mspp_summary,_mspp_publishingstateid_value@OData.Community.Display.V1.FormattedValue
+  Circle-3.png,b20482f2-6e3b-4626-8b94-15b6e2131fe9,circle image,Published 
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # pp website webfile list --environmentName "Default-d87a7535-dd31-4437-bfe1-95340acd55c5" --websiteId 2ca3eaa5-140f-4175-8261-3272edf9f339
+
+  Date: 9/1/2023
+
+  ## Tasks List
+
+  Property | Value
+---------|-------
+mspp\_webfileid | a1700435-b21a-48f0-83f4-f34411a26cbf
+mspp\_name | Site-mockup-1.png
+mspp\_contentdisposition@OData.Community.Display.V1.FormattedValue | inline
+mspp\_contentdisposition | 756150000
+mspp\_excludefromsearch@OData.Community.Display.V1.FormattedValue | No
+mspp\_excludefromsearch | false
+mspp\_hiddenfromsitemap@OData.Community.Display.V1.FormattedValue | No
+mspp\_hiddenfromsitemap | false
+\_mspp\_parentpageid\_value@Microsoft.Dynamics.CRM.associatednavigationproperty | mspp\_parentpageid
+\_mspp\_parentpageid\_value@Microsoft.Dynamics.CRM.lookuplogicalname | mspp\_webpage
+\_mspp\_parentpageid\_value@OData.Community.Display.V1.FormattedValue | Home
+\_mspp\_parentpageid\_value | a3efb062-0691-4d3e-a9e6-43bfd2daeed6
+mspp\_partialurl | Site-mockup-1.png
+\_mspp\_publishingstateid\_value@Microsoft.Dynamics.CRM.associatednavigationproperty | mspp\_publishingstateid
+\_mspp\_publishingstateid\_value@Microsoft.Dynamics.CRM.lookuplogicalname | mspp\_publishingstate
+\_mspp\_publishingstateid\_value@OData.Community.Display.V1.FormattedValue | Published
+\_mspp\_publishingstateid\_value | 0d0fa682-7ed7-419b-bc7a-25e8bc64b6e2
+\_mspp\_websiteid\_value@Microsoft.Dynamics.CRM.associatednavigationproperty | mspp\_websiteid
+\_mspp\_websiteid\_value@Microsoft.Dynamics.CRM.lookuplogicalname | mspp\_website
+\_mspp\_websiteid\_value@OData.Community.Display.V1.FormattedValue | Contoso
+\_mspp\_websiteid\_value | 2ca3eaa5-140f-4175-8261-3272edf9f339
+\_mspp\_createdby\_value@Microsoft.Dynamics.CRM.lookuplogicalname | systemuser
+\_mspp\_createdby\_value@OData.Community.Display.V1.FormattedValue | Shanthakumar
+\_mspp\_createdby\_value | 66ece047-0e90-ee11-8179-000d3a37640e
+\_mspp\_modifiedby\_value@Microsoft.Dynamics.CRM.lookuplogicalname | systemuser
+\_mspp\_modifiedby\_value@OData.Community.Display.V1.FormattedValue | Shanthakumar
+\_mspp\_modifiedby\_value | 66ece047-0e90-ee11-8179-000d3a37640e
+mspp\_modifiedon@OData.Community.Display.V1.FormattedValue | 8/27/2024 2:37 PM
+mspp\_modifiedon | 2024-08-27T09:07:22Z
+mspp\_createdon@OData.Community.Display.V1.FormattedValue | 8/27/2024 2:37 PM
+mspp\_createdon | 2024-08-27T09:07:16Z
+statecode | 0
+statuscode@OData.Community.Display.V1.FormattedValue | Active
+statuscode | 1
+  ```
+
+  </TabItem>
+</Tabs>
