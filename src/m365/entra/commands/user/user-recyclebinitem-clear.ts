@@ -6,7 +6,6 @@ import request, { CliRequestOptions } from '../../../../request.js';
 import { odata } from '../../../../utils/odata.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
-import aadCommands from '../../aadCommands.js';
 
 interface CommandArgs {
   options: Options;
@@ -23,10 +22,6 @@ class EntraUserRecycleBinItemClearCommand extends GraphCommand {
 
   public get description(): string {
     return 'Removes all users from the tenant recycle bin';
-  }
-
-  public alias(): string[] | undefined {
-    return [aadCommands.USER_RECYCLEBINITEM_CLEAR];
   }
 
   constructor() {
@@ -53,8 +48,6 @@ class EntraUserRecycleBinItemClearCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    await this.showDeprecationWarning(logger, aadCommands.USER_RECYCLEBINITEM_CLEAR, commands.USER_RECYCLEBINITEM_CLEAR);
-
     const clearRecycleBinUsers = async (): Promise<void> => {
       try {
         const users = await odata.getAllItems<User>(`${this.resource}/v1.0/directory/deletedItems/microsoft.graph.user?$select=id`);

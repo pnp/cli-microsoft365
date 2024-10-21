@@ -1,7 +1,7 @@
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
-import { CreateCopyJobsNameConflictBehavior, spo } from '../../../../utils/spo.js';
+import { CreateFileCopyJobsNameConflictBehavior, spo } from '../../../../utils/spo.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
@@ -140,7 +140,7 @@ class SpoFileCopyCommand extends SpoCommand {
         newName += sourceServerRelativePath.substring(sourceServerRelativePath.lastIndexOf('.'));
       }
 
-      const copyJobResponse = await spo.createCopyJob(
+      const copyJobResponse = await spo.createFileCopyJob(
         args.options.webUrl,
         sourcePath,
         destinationPath,
@@ -208,16 +208,16 @@ class SpoFileCopyCommand extends SpoCommand {
     return file.DecodedUrl;
   }
 
-  private getNameConflictBehaviorValue(nameConflictBehavior?: string): CreateCopyJobsNameConflictBehavior {
+  private getNameConflictBehaviorValue(nameConflictBehavior?: string): CreateFileCopyJobsNameConflictBehavior {
     switch (nameConflictBehavior?.toLowerCase()) {
       case 'fail':
-        return CreateCopyJobsNameConflictBehavior.Fail;
+        return CreateFileCopyJobsNameConflictBehavior.Fail;
       case 'replace':
-        return CreateCopyJobsNameConflictBehavior.Replace;
+        return CreateFileCopyJobsNameConflictBehavior.Replace;
       case 'rename':
-        return CreateCopyJobsNameConflictBehavior.Rename;
+        return CreateFileCopyJobsNameConflictBehavior.Rename;
       default:
-        return CreateCopyJobsNameConflictBehavior.Fail;
+        return CreateFileCopyJobsNameConflictBehavior.Fail;
     }
   }
 

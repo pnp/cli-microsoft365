@@ -10,12 +10,6 @@ Removes a user from the recycle bin in the current tenant
 m365 entra user recyclebinitem remove [options]
 ```
 
-## Alias
-
-```sh
-m365 aad user recyclebinitem remove [options]
-```
-
 ## Options
 
 ```md definition-list
@@ -44,13 +38,13 @@ After running this command, it may take a minute before the deleted user is effe
 
 ## Examples
 
-Removes a specific user from the recycle bin
+Removes a specific user from the recycle bin.
 
 ```sh
 m365 entra user recyclebinitem remove --id 59f80e08-24b1-41f8-8586-16765fd830d3
 ```
 
-Removes a specific user from the recycle bin without confirmation prompt
+Removes a specific user from the recycle bin without confirmation prompt.
 
 ```sh
 m365 entra user recyclebinitem remove --id 59f80e08-24b1-41f8-8586-16765fd830d3 --force

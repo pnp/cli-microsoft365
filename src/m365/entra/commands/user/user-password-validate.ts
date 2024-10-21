@@ -2,7 +2,6 @@ import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import GraphCommand from '../../../base/GraphCommand.js';
-import aadCommands from '../../aadCommands.js';
 import commands from '../../commands.js';
 
 interface CommandArgs {
@@ -22,10 +21,6 @@ class EntraUserPasswordValidateCommand extends GraphCommand {
     return "Check a user's password against the organization's password validation policy";
   }
 
-  public alias(): string[] | undefined {
-    return [aadCommands.USER_PASSWORD_VALIDATE];
-  }
-
   constructor() {
     super();
 
@@ -41,8 +36,6 @@ class EntraUserPasswordValidateCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    await this.showDeprecationWarning(logger, aadCommands.USER_PASSWORD_VALIDATE, commands.USER_PASSWORD_VALIDATE);
-
     try {
       const requestOptions: CliRequestOptions = {
         url: `${this.resource}/beta/users/validatePassword`,

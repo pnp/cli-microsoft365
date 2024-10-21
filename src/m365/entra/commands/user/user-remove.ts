@@ -5,7 +5,6 @@ import request, { CliRequestOptions } from '../../../../request.js';
 import { validation } from '../../../../utils/validation.js';
 import { cli } from '../../../../cli/cli.js';
 import GraphCommand from '../../../base/GraphCommand.js';
-import aadCommands from '../../aadCommands.js';
 
 interface CommandArgs {
   options: Options;
@@ -25,10 +24,6 @@ class EntraUserRemoveCommand extends GraphCommand {
 
   public get description(): string {
     return 'Removes a specific user';
-  }
-
-  public alias(): string[] | undefined {
-    return [aadCommands.USER_REMOVE];
   }
 
   constructor() {
@@ -87,8 +82,6 @@ class EntraUserRemoveCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: any): Promise<void> {
-    await this.showDeprecationWarning(logger, aadCommands.USER_REMOVE, commands.USER_REMOVE);
-
     if (this.verbose) {
       await logger.logToStderr(`Removing user '${args.options.id || args.options.userName}'...`);
     }

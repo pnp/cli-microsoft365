@@ -11,7 +11,7 @@ try {
   const { commandName, properties, exception, shell, session } = data;
 
   appInsights.commonProperties.shell = shell;
-  appInsights.context.tags['ai.session.id'] = session;
+  appInsights.context.tags[appInsights.context.keys.sessionId] = session;
 
   if (exception) {
     appInsights.trackException({
@@ -24,6 +24,6 @@ try {
       properties
     });
   }
-  appInsights.flush();
+  await appInsights.flush();
 }
 catch { }

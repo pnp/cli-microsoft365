@@ -4,7 +4,6 @@ import { Logger } from "../../../../cli/Logger.js";
 import request, { CliRequestOptions } from "../../../../request.js";
 import GraphCommand from "../../../base/GraphCommand.js";
 import commands from "../../commands.js";
-import aadCommands from "../../aadCommands.js";
 
 interface CommandArgs {
   options: Options;
@@ -23,10 +22,6 @@ class EntraAdministrativeUnitAddCommand extends GraphCommand {
 
   public get description(): string {
     return 'Creates an administrative unit';
-  }
-
-  public alias(): string[] | undefined {
-    return [aadCommands.ADMINISTRATIVEUNIT_ADD];
   }
 
   constructor() {
@@ -59,8 +54,6 @@ class EntraAdministrativeUnitAddCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    await this.showDeprecationWarning(logger, aadCommands.ADMINISTRATIVEUNIT_ADD, commands.ADMINISTRATIVEUNIT_ADD);
-
     const requestOptions: CliRequestOptions = {
       url: `${this.resource}/v1.0/directory/administrativeUnits`,
       headers: {

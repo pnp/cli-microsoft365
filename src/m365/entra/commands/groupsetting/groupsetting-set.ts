@@ -5,7 +5,6 @@ import request, { CliRequestOptions } from '../../../../request.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
-import aadCommands from '../../aadCommands.js';
 
 interface CommandArgs {
   options: Options;
@@ -22,10 +21,6 @@ class EntraGroupSettingSetCommand extends GraphCommand {
 
   public get description(): string {
     return 'Updates the particular group setting';
-  }
-
-  public alias(): string[] | undefined {
-    return [aadCommands.GROUPSETTING_SET];
   }
 
   public allowUnknownOptions(): boolean | undefined {
@@ -60,8 +55,6 @@ class EntraGroupSettingSetCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    await this.showDeprecationWarning(logger, aadCommands.GROUPSETTING_SET, commands.GROUPSETTING_SET);
-
     if (this.verbose) {
       await logger.logToStderr(`Retrieving group setting with id '${args.options.id}'...`);
     }

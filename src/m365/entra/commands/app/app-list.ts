@@ -3,7 +3,6 @@ import { Logger } from '../../../../cli/Logger.js';
 import { odata } from "../../../../utils/odata.js";
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
-import aadCommands from '../../aadCommands.js';
 
 class EntraAppListCommand extends GraphCommand {
   public get name(): string {
@@ -14,17 +13,11 @@ class EntraAppListCommand extends GraphCommand {
     return 'Retrieves a list of Entra app registrations';
   }
 
-  public alias(): string[] | undefined {
-    return [aadCommands.APP_LIST, commands.APPREGISTRATION_LIST];
-  }
-
   public defaultProperties(): string[] | undefined {
     return ['appId', 'id', 'displayName', "signInAudience"];
   }
 
   public async commandAction(logger: Logger): Promise<void> {
-    await this.showDeprecationWarning(logger, aadCommands.APP_LIST, commands.APP_LIST);
-
     try {
       const results = await odata.getAllItems<Application>(`${this.resource}/v1.0/applications`);
       await logger.log(results);

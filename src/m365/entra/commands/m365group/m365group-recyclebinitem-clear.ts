@@ -6,7 +6,6 @@ import request from '../../../../request.js';
 import { odata } from '../../../../utils/odata.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
-import aadCommands from '../../aadCommands.js';
 
 interface CommandArgs {
   options: Options;
@@ -23,10 +22,6 @@ class EntraM365GroupRecycleBinItemClearCommand extends GraphCommand {
 
   public get description(): string {
     return 'Clears all M365 Groups from recycle bin.';
-  }
-
-  public alias(): string[] | undefined {
-    return [aadCommands.M365GROUP_RECYCLEBINITEM_CLEAR];
   }
 
   constructor() {
@@ -53,8 +48,6 @@ class EntraM365GroupRecycleBinItemClearCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    await this.showDeprecationWarning(logger, aadCommands.M365GROUP_RECYCLEBINITEM_CLEAR, commands.M365GROUP_RECYCLEBINITEM_CLEAR);
-
     const clearM365GroupRecycleBinItems = async (): Promise<void> => {
       try {
         await this.processRecycleBinItemsClear();

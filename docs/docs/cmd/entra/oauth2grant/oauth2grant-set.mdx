@@ -10,20 +10,14 @@ Update OAuth2 permissions for the service principal
 m365 entra oauth2grant set [options]
 ```
 
-## Alias
-
-```sh
-m365 aad oauth2grant set [options]
-```
-
 ## Options
 
 ```md definition-list
 `-i, --grantId <grantId>`
-: `objectId` of OAuth2 permission grant to update
+: `objectId` of OAuth2 permission grant to update.
 
 `-s, --scope <scope>`
-: Permissions to grant
+: Permissions to grant.
 ```
 
 <Global />
@@ -40,7 +34,7 @@ m365 entra oauth2grant set --grantId \\-Zc1JRY8REeLxmXz5KtixAYU3Q6noCBPlhwGiX7px
 
 ## Examples
 
-Update the existing OAuth2 permission grant with ID _YgA60KYa4UOPSdc-lpxYEnQkr8KVLDpCsOXkiV8i-ek_ to the _Calendars.Read Mail.Read_ permissions
+Update the existing OAuth2 permission grant with ID _YgA60KYa4UOPSdc-lpxYEnQkr8KVLDpCsOXkiV8i-ek_ to the _Calendars.Read Mail.Read_ permissions.
 
 ```sh
 m365 entra oauth2grant set --grantId YgA60KYa4UOPSdc-lpxYEnQkr8KVLDpCsOXkiV8i-ek --scope "Calendars.Read Mail.Read"

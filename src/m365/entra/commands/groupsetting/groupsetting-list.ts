@@ -3,7 +3,6 @@ import { Logger } from '../../../../cli/Logger.js';
 import { odata } from '../../../../utils/odata.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
-import aadCommands from '../../aadCommands.js';
 
 class EntraGroupSettingListCommand extends GraphCommand {
   public get name(): string {
@@ -14,17 +13,11 @@ class EntraGroupSettingListCommand extends GraphCommand {
     return 'Lists Entra group settings';
   }
 
-  public alias(): string[] | undefined {
-    return [aadCommands.GROUPSETTING_LIST];
-  }
-
   public defaultProperties(): string[] | undefined {
     return ['id', 'displayName'];
   }
 
   public async commandAction(logger: Logger): Promise<void> {
-    await this.showDeprecationWarning(logger, aadCommands.GROUPSETTING_LIST, commands.GROUPSETTING_LIST);
-
     try {
       const groupSettings = await odata.getAllItems<GroupSetting>(`${this.resource}/v1.0/groupSettings`);
       await logger.log(groupSettings);

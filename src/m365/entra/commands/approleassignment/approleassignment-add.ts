@@ -8,7 +8,6 @@ import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 import { ServicePrincipal } from '@microsoft/microsoft-graph-types';
 import { cli } from '../../../../cli/cli.js';
-import aadCommands from '../../aadCommands.js';
 
 interface AppRole {
   objectId: string;
@@ -35,10 +34,6 @@ class EntraAppRoleAssignmentAddCommand extends GraphCommand {
 
   public get description(): string {
     return 'Adds service principal permissions also known as scopes and app role assignments for specified Microsoft Entra application registration';
-  }
-
-  public alias(): string[] | undefined {
-    return [aadCommands.APPROLEASSIGNMENT_ADD];
   }
 
   constructor() {
@@ -102,8 +97,6 @@ class EntraAppRoleAssignmentAddCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    await this.showDeprecationWarning(logger, aadCommands.APPROLEASSIGNMENT_ADD, commands.APPROLEASSIGNMENT_ADD);
-
     let objectId: string = '';
     let queryFilter: string = '';
     if (args.options.appId) {

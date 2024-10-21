@@ -9,7 +9,6 @@ import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 import { entraGroup } from '../../../../utils/entraGroup.js';
-import aadCommands from '../../aadCommands.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 import auth from '../../../../Auth.js';
 import { entraUser } from '../../../../utils/entraUser.js';
@@ -48,10 +47,6 @@ class EntraM365GroupSetCommand extends GraphCommand {
 
   public get description(): string {
     return 'Updates Microsoft 365 Group properties';
-  }
-
-  public alias(): string[] | undefined {
-    return [aadCommands.M365GROUP_SET];
   }
 
   constructor() {
@@ -226,8 +221,6 @@ class EntraM365GroupSetCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    await this.showDeprecationWarning(logger, aadCommands.M365GROUP_SET, commands.M365GROUP_SET);
-
     try {
       if ((args.options.allowExternalSenders !== undefined || args.options.autoSubscribeNewMembers !== undefined) && accessToken.isAppOnlyAccessToken(auth.connection.accessTokens[auth.defaultResource].accessToken)) {
         throw `Option 'allowExternalSenders' and 'autoSubscribeNewMembers' can only be used when using delegated permissions.`;

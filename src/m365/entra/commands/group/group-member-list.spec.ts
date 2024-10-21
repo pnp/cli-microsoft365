@@ -15,7 +15,6 @@ import { settingsNames } from '../../../../settingsNames.js';
 import { formatting } from '../../../../utils/formatting.js';
 import commands from '../../commands.js';
 import command from './group-member-list.js';
-import aadCommands from '../../aadCommands.js';
 
 describe(commands.GROUP_MEMBER_LIST, () => {
   const groupId = '2c1ba4c4-cd9b-4417-832f-92a34bc34b2a';
@@ -72,16 +71,6 @@ describe(commands.GROUP_MEMBER_LIST, () => {
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
-  });
-
-  it('defines alias', () => {
-    const alias = command.alias();
-    assert.notStrictEqual(typeof alias, 'undefined');
-  });
-
-  it('defines correct alias', () => {
-    const alias = command.alias();
-    assert.deepStrictEqual(alias, [aadCommands.GROUP_USER_LIST]);
   });
 
   it('defines correct properties for the default output', () => {

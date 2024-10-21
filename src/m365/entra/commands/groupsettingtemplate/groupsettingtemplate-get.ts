@@ -5,7 +5,6 @@ import { odata } from '../../../../utils/odata.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
-import aadCommands from '../../aadCommands.js';
 
 interface CommandArgs {
   options: Options;
@@ -23,10 +22,6 @@ class EntraGroupSettingTemplateGetCommand extends GraphCommand {
 
   public get description(): string {
     return 'Gets information about the specified Entra group settings template';
-  }
-
-  public alias(): string[] | undefined {
-    return [aadCommands.GROUPSETTINGTEMPLATE_GET];
   }
 
   constructor() {
@@ -76,8 +71,6 @@ class EntraGroupSettingTemplateGetCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    await this.showDeprecationWarning(logger, aadCommands.GROUPSETTINGTEMPLATE_GET, commands.GROUPSETTINGTEMPLATE_GET);
-
     try {
       const templates = await odata.getAllItems<GroupSettingTemplate>(`${this.resource}/v1.0/groupSettingTemplates`);
 

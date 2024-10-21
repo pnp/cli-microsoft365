@@ -6,10 +6,27 @@ sidebar_position: 3
 
 ## v10.0.0 (beta)
 
+### New commands
+
+**SharePoint:**
+
+- [spo tenant site membership list](../cmd/spo/tenant/tenant-site-membership-list.mdx) - retrieves information about default site groups' membership [#5980](https://github.com/pnp/cli-microsoft365/issues/5980)
+
+**SharePoint Premium:**
+
+- [spp model list](../cmd/spp/model/model-list.mdx) - retrieves the list of unstructured document processing models [#6103](https://github.com/pnp/cli-microsoft365/issues/6103)
+
 ### Changes
 
-- extended `m365 login` with `--ensure` [#5217](https://github.com/pnp/cli-microsoft365/issues/5217)
+- extended [login](../cmd/login.mdx) command with `--ensure` option [#5217](https://github.com/pnp/cli-microsoft365/issues/5217)
 - updated docs thumbnail [#6302](https://github.com/pnp/cli-microsoft365/issues/6302)
+- fixed casing and autocomplete for enums based on zod [#6373](https://github.com/pnp/cli-microsoft365/pull/6373)
+- updated docs contribution guide with Zod [#6322](https://github.com/pnp/cli-microsoft365/issues/6322)
+- removed obsolete docs example [#6272](https://github.com/pnp/cli-microsoft365/issues/6272)
+- fixed [setup](../cmd/setup.mdx) command's app registration name [#6367](https://github.com/pnp/cli-microsoft365/issues/6367)
+- added ability to specify multiple users for command [entra m365group user remove](../cmd/entra/m365group/m365group-user-remove.mdx) command [#6058](https://github.com/pnp/cli-microsoft365/issues/6058)
+- enhanced [spo list remove](../cmd/spo/list/list-remove.mdx) command with `--recylce` flag [#6270](https://github.com/pnp/cli-microsoft365/issues/6270)
+- enhanced [spo file remove](../cmd/spo/file/file-remove.mdx) command with `--bypassSharedLock` flag [#6313](https://github.com/pnp/cli-microsoft365/issues/6313)
 
 ### ⚠️ Breaking changes
 
@@ -40,7 +57,10 @@ sidebar_position: 3
 - updated [cli doctor](../cmd/cli/cli-doctor.mdx) command output [#5923](https://github.com/pnp/cli-microsoft365/issues/5923)
 - removed duplicate properties from [teams tab list](../cmd/teams/tab/tab-list.mdx) command [#5900](https://github.com/pnp/cli-microsoft365/issues/5900)
 - renamed `entra group user <verb>` to `entra group member <verb>`. [#6396](https://github.com/pnp/cli-microsoft365/issues/6396)
-- Updates setting users in `entra m365group set` [#6061](https://github.com/pnp/cli-microsoft365/issues/6061)
+- updated setting users in [entra m365group set](../cmd/entra/m365group/m365group-set.mdx) [#6061](https://github.com/pnp/cli-microsoft365/issues/6061)
+- removed aad options and aliasses [#5823](https://github.com/pnp/cli-microsoft365/issues/5823), [#5676](https://github.com/pnp/cli-microsoft365/issues/5676)
+- removed deprecated option `username` from [entra m365group user set](../cmd/entra/m365group/m365group-user-set.mdx) command [#6224](https://github.com/pnp/cli-microsoft365/issues/6224)
+- updated endpoint for [spo folder move](../cmd/spo/folder/folder-move.mdx) command [#6154](https://github.com/pnp/cli-microsoft365/issues/6154)
 
 ## [v9.1.0](https://github.com/pnp/cli-microsoft365/releases/tag/v9.1.0)
 

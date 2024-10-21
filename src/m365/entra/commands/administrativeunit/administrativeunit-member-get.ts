@@ -6,7 +6,6 @@ import { Logger } from '../../../../cli/Logger.js';
 import { validation } from '../../../../utils/validation.js';
 import { entraAdministrativeUnit } from '../../../../utils/entraAdministrativeUnit.js';
 import request, { CliRequestOptions } from '../../../../request.js';
-import aadCommands from '../../aadCommands.js';
 
 interface CommandArgs {
   options: Options;
@@ -32,10 +31,6 @@ class EntraAdministrativeUnitMemberGetCommand extends GraphCommand {
 
   public get description(): string {
     return 'Retrieve a specific member (user, group, or device) of an administrative unit';
-  }
-
-  public alias(): string[] | undefined {
-    return [aadCommands.ADMINISTRATIVEUNIT_MEMBER_GET];
   }
 
   constructor() {
@@ -95,8 +90,6 @@ class EntraAdministrativeUnitMemberGetCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    await this.showDeprecationWarning(logger, aadCommands.ADMINISTRATIVEUNIT_MEMBER_GET, commands.ADMINISTRATIVEUNIT_MEMBER_GET);
-
     let administrativeUnitId = args.options.administrativeUnitId;
 
     try {

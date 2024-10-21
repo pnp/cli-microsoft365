@@ -14,7 +14,6 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './approleassignment-remove.js';
 import { settingsNames } from '../../../../settingsNames.js';
-import aadCommands from '../../aadCommands.js';
 
 describe(commands.APPROLEASSIGNMENT_REMOVE, () => {
   let log: string[];
@@ -90,16 +89,6 @@ describe(commands.APPROLEASSIGNMENT_REMOVE, () => {
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
-  });
-
-  it('defines alias', () => {
-    const alias = command.alias();
-    assert.notStrictEqual(typeof alias, 'undefined');
-  });
-
-  it('defines correct alias', () => {
-    const alias = command.alias();
-    assert.deepStrictEqual(alias, [aadCommands.APPROLEASSIGNMENT_REMOVE]);
   });
 
   it('prompts before removing the app role assignment when force option not passed', async () => {

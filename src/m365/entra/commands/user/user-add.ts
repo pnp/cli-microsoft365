@@ -5,7 +5,6 @@ import request, { CliRequestOptions } from '../../../../request.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
-import aadCommands from '../../aadCommands.js';
 
 interface ExtendedUser extends User {
   password: string;
@@ -42,10 +41,6 @@ class EntraUserAddCommand extends GraphCommand {
 
   public get description(): string {
     return 'Creates a new user';
-  }
-
-  public alias(): string[] | undefined {
-    return [aadCommands.USER_ADD];
   }
 
   public allowUnknownOptions(): boolean | undefined {
@@ -206,8 +201,6 @@ class EntraUserAddCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    await this.showDeprecationWarning(logger, aadCommands.USER_ADD, commands.USER_ADD);
-
     if (this.verbose) {
       await logger.logToStderr(`Adding user to AAD with displayName ${args.options.displayName} and userPrincipalName ${args.options.userName}`);
     }

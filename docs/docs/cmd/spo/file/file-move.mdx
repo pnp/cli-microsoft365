@@ -40,14 +40,12 @@ m365 spo file move [options]
 : This indicates whether a file with a share lock can still be moved. Use this option to move a file that is locked.
 
 `--skipWait`
-: Don't wait for the copy operation to complete.
+: Don't wait for the move operation to complete.
 ```
 
 <Global />
 
 ## Remarks
-
-All file versions are retained while moving a file.
 
 When you specify a value for `nameConflictBehavior`, consider the following:
 - `fail` will throw an error when the destination file already exists.

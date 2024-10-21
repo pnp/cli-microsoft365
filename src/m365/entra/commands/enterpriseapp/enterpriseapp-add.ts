@@ -6,7 +6,6 @@ import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 import { cli } from '../../../../cli/cli.js';
-import aadCommands from '../../aadCommands.js';
 
 interface CommandArgs {
   options: Options;
@@ -25,10 +24,6 @@ class EntraEnterpriseAppAddCommand extends GraphCommand {
 
   public get description(): string {
     return 'Creates an enterprise application (or service principal) for a registered Entra app';
-  }
-
-  public alias(): string[] | undefined {
-    return [aadCommands.SP_ADD, commands.SP_ADD];
   }
 
   constructor() {
@@ -123,8 +118,6 @@ class EntraEnterpriseAppAddCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    await this.showDeprecationWarning(logger, aadCommands.SP_ADD, commands.SP_ADD);
-
     try {
       const appId = await this.getAppId(args);
 

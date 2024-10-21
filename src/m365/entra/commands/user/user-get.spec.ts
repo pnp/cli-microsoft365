@@ -14,7 +14,6 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './user-get.js';
 import { settingsNames } from '../../../../settingsNames.js';
-import aadCommands from '../../aadCommands.js';
 import { entraUser } from '../../../../utils/entraUser.js';
 import { formatting } from '../../../../utils/formatting.js';
 
@@ -86,16 +85,6 @@ describe(commands.USER_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('defines alias', () => {
-    const alias = command.alias();
-    assert.notStrictEqual(typeof alias, 'undefined');
-  });
-
-  it('defines correct alias', () => {
-    const alias = command.alias();
-    assert.deepStrictEqual(alias, [aadCommands.USER_GET]);
-  });
-
   it('retrieves user using id', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users/${userId}`) {
@@ -139,7 +128,7 @@ describe(commands.USER_GET, () => {
 
   it('retrieves user using user name', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users/${formatting.encodeQueryParameter(userName) }`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users/${formatting.encodeQueryParameter(userName)}`) {
         return resultValue;
       }
 
@@ -185,7 +174,7 @@ describe(commands.USER_GET, () => {
       "mail": "john.doe@contoso.onmicrosoft.com"
     };
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users/${formatting.encodeQueryParameter(userName) }?$expand=manager($select=displayName,userPrincipalName,id,mail)`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users/${formatting.encodeQueryParameter(userName)}?$expand=manager($select=displayName,userPrincipalName,id,mail)`) {
         return resultValueWithManger;
       }
 
@@ -198,7 +187,7 @@ describe(commands.USER_GET, () => {
 
   it('retrieves user using @meusername token', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users/${formatting.encodeQueryParameter(userName) }`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users/${formatting.encodeQueryParameter(userName)}`) {
         return resultValue;
       }
 
@@ -227,7 +216,7 @@ describe(commands.USER_GET, () => {
 
   it('retrieves only the specified properties', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users/${formatting.encodeQueryParameter(userName) }?$select=id,mail`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users/${formatting.encodeQueryParameter(userName)}?$select=id,mail`) {
         return { "id": "userId", "mail": null };
       }
 
@@ -276,7 +265,7 @@ describe(commands.USER_GET, () => {
     await assert.rejects(command.action(logger, { options: { userName: userName } } as any),
       new CommandError(`Resource '${userName}' does not exist or one of its queried reference-property objects are not present.`));
   });
-  
+
   it('fails validation if id or email or userName options are not passed', async () => {
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
       if (settingName === settingsNames.prompt) {

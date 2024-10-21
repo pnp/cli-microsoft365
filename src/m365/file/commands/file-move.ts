@@ -7,7 +7,7 @@ import commands from '../commands.js';
 import request, { CliRequestOptions } from '../../../request.js';
 import { spo } from '../../../utils/spo.js';
 import { urlUtil } from '../../../utils/urlUtil.js';
-import { driveUtil } from '../../../utils/driveUtil.js';
+import { drive } from '../../../utils/drive.js';
 import { validation } from '../../../utils/validation.js';
 
 interface CommandArgs {
@@ -115,9 +115,9 @@ class FileMoveCommand extends GraphCommand {
 
   private async getDriveIdAndItemId(webUrl: string, folderUrl: string, sourceUrl: string, logger: Logger, verbose?: boolean): Promise<{ driveId: string, itemId: string }> {
     const siteId: string = await spo.getSiteId(webUrl, logger, verbose);
-    const drive: Drive = await driveUtil.getDriveByUrl(siteId, new URL(folderUrl));
-    const itemId: string = await driveUtil.getDriveItemId(drive, new URL(folderUrl));
-    return { driveId: drive.id as string, itemId };
+    const driveDetails: Drive = await drive.getDriveByUrl(siteId, new URL(folderUrl), logger, verbose);
+    const itemId: string = await drive.getDriveItemId(driveDetails, new URL(folderUrl), logger, verbose);
+    return { driveId: driveDetails.id!, itemId };
   }
 
   private getRequestOptions(sourceDriveId: string, sourceItemId: string, targetDriveId: string, targetItemId: string, newName: string | undefined, sourcePath: string, nameConflictBehavior: string | undefined): CliRequestOptions {

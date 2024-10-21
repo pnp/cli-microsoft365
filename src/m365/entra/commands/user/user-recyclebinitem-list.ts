@@ -3,7 +3,6 @@ import { Logger } from '../../../../cli/Logger.js';
 import { odata } from '../../../../utils/odata.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
-import aadCommands from '../../aadCommands.js';
 
 class EntraUserRecycleBinItemListCommand extends GraphCommand {
   public get name(): string {
@@ -14,17 +13,11 @@ class EntraUserRecycleBinItemListCommand extends GraphCommand {
     return 'Lists users from the recycle bin in the current tenant';
   }
 
-  public alias(): string[] | undefined {
-    return [aadCommands.USER_RECYCLEBINITEM_LIST];
-  }
-
   public defaultProperties(): string[] | undefined {
     return ['id', 'displayName', 'userPrincipalName'];
   }
 
   public async commandAction(logger: Logger): Promise<void> {
-    await this.showDeprecationWarning(logger, aadCommands.USER_RECYCLEBINITEM_LIST, commands.USER_RECYCLEBINITEM_LIST);
-
     if (this.verbose) {
       await logger.logToStderr('Retrieving users from the recycle bin...');
     }

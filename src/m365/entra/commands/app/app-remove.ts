@@ -5,7 +5,6 @@ import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
-import aadCommands from '../../aadCommands.js';
 import commands from '../../commands.js';
 
 interface CommandArgs {
@@ -26,10 +25,6 @@ class EntraAppRemoveCommand extends GraphCommand {
 
   public get description(): string {
     return 'Removes an Entra app registration';
-  }
-
-  public alias(): string[] | undefined {
-    return [aadCommands.APP_REMOVE, commands.APPREGISTRATION_REMOVE];
   }
 
   constructor() {
@@ -82,8 +77,6 @@ class EntraAppRemoveCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    await this.showDeprecationWarning(logger, aadCommands.APP_REMOVE, commands.APP_REMOVE);
-
     const deleteApp = async (): Promise<void> => {
       try {
         const objectId = await this.getObjectId(args, logger);
