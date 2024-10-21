@@ -5,7 +5,6 @@ import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
-import aadCommands from '../../aadCommands.js';
 
 interface CommandArgs {
   options: Options;
@@ -22,10 +21,6 @@ class EntraSiteClassificationDisableCommand extends GraphCommand {
 
   public get description(): string {
     return 'Disables site classification';
-  }
-
-  public alias(): string[] | undefined {
-    return [aadCommands.SITECLASSIFICATION_DISABLE];
   }
 
   constructor() {
@@ -52,8 +47,6 @@ class EntraSiteClassificationDisableCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    await this.showDeprecationWarning(logger, aadCommands.SITECLASSIFICATION_DISABLE, commands.SITECLASSIFICATION_DISABLE);
-
     const disableSiteClassification = async (): Promise<void> => {
       try {
         let requestOptions: CliRequestOptions = {

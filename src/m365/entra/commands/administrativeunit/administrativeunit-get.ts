@@ -6,7 +6,6 @@ import request, { CliRequestOptions } from "../../../../request.js";
 import GraphCommand from "../../../base/GraphCommand.js";
 import commands from "../../commands.js";
 import { entraAdministrativeUnit } from "../../../../utils/entraAdministrativeUnit.js";
-import aadCommands from "../../aadCommands.js";
 
 interface CommandArgs {
   options: Options;
@@ -24,10 +23,6 @@ class EntraAdministrativeUnitGetCommand extends GraphCommand {
 
   public get description(): string {
     return 'Gets information about a specific administrative unit';
-  }
-
-  public alias(): string[] | undefined {
-    return [aadCommands.ADMINISTRATIVEUNIT_GET];
   }
 
   constructor() {
@@ -81,8 +76,6 @@ class EntraAdministrativeUnitGetCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    await this.showDeprecationWarning(logger, aadCommands.ADMINISTRATIVEUNIT_GET, commands.ADMINISTRATIVEUNIT_GET);
-
     let administrativeUnit: AdministrativeUnit;
 
     try {

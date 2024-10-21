@@ -7,7 +7,6 @@ import { formatting } from '../../../../utils/formatting.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
-import aadCommands from '../../aadCommands.js';
 
 interface CommandArgs {
   options: Options;
@@ -27,10 +26,6 @@ class EntraM365GroupRecycleBinItemRemoveCommand extends GraphCommand {
 
   public get description(): string {
     return 'Permanently deletes a Microsoft 365 Group from the recycle bin in the current tenant';
-  }
-
-  public alias(): string[] | undefined {
-    return [aadCommands.M365GROUP_RECYCLEBINITEM_REMOVE];
   }
 
   constructor() {
@@ -87,8 +82,6 @@ class EntraM365GroupRecycleBinItemRemoveCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    await this.showDeprecationWarning(logger, aadCommands.M365GROUP_RECYCLEBINITEM_REMOVE, commands.M365GROUP_RECYCLEBINITEM_REMOVE);
-
     const removeGroup: () => Promise<void> = async (): Promise<void> => {
       try {
         const groupId = await this.getGroupId(args.options);

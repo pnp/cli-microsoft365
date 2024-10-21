@@ -7,7 +7,6 @@ import { formatting } from "../../../../utils/formatting.js";
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
-import aadCommands from "../../aadCommands.js";
 
 interface CommandArgs {
   options: Options;
@@ -29,10 +28,6 @@ class EntraAppRoleRemoveCommand extends GraphCommand {
 
   public get description(): string {
     return 'Removes role from the specified Entra app registration';
-  }
-
-  public alias(): string[] | undefined {
-    return [aadCommands.APP_ROLE_REMOVE, commands.APPREGISTRATION_ROLE_REMOVE];
   }
 
   constructor() {
@@ -91,8 +86,6 @@ class EntraAppRoleRemoveCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    await this.showDeprecationWarning(logger, aadCommands.APP_ROLE_REMOVE, commands.APP_ROLE_REMOVE);
-
     const deleteAppRole = async (): Promise<void> => {
       try {
         await this.processAppRoleDelete(logger, args);

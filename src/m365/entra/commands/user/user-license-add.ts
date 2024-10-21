@@ -3,7 +3,6 @@ import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
-import aadCommands from '../../aadCommands.js';
 import commands from '../../commands.js';
 
 interface CommandArgs {
@@ -23,10 +22,6 @@ class EntraUserLicenseAddCommand extends GraphCommand {
 
   public get description(): string {
     return 'Assigns a license to a user';
-  }
-
-  public alias(): string[] | undefined {
-    return [aadCommands.USER_LICENSE_ADD];
   }
 
   constructor() {
@@ -84,8 +79,6 @@ class EntraUserLicenseAddCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    await this.showDeprecationWarning(logger, aadCommands.USER_LICENSE_ADD, commands.USER_LICENSE_ADD);
-
     const addLicenses = args.options.ids.split(',').map(x => { return { "disabledPlans": [], "skuId": x }; });
     const requestBody = { "addLicenses": addLicenses, "removeLicenses": [] };
 

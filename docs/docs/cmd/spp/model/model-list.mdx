@@ -1,0 +1,140 @@
+import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# spp model list
+
+Retrieves the list of unstructured document processing models
+
+## Usage
+
+```sh
+m365 spp model list [options]
+```
+
+## Options
+
+```md definition-list
+`-u, --siteUrl <siteUrl>`
+: The URL of the content center site.
+```
+
+<Global />
+
+## Examples
+
+Retrieve a list of SharePoint Premium unstructured document processing models on the content center site.
+
+```sh
+m365 spp model list --siteUrl https://contoso.sharepoint.com/sites/ContentCenter
+```
+
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  [
+    {
+      "AIBuilderHybridModelType": "Freeform document processing",
+      "AzureCognitivePrebuiltModelName": null,
+      "BaseContentTypeName": null,
+      "ConfidenceScore": "{\r\\\n  \"ConfidenceScoresPerLibrary\": {\r\\\n    \"64e2de73-dfbe-4085-a49f-8347ddfc7e3a\": 0.86973333358764682\r\\\n  }\r\\\n}",       
+      "ContentTypeGroup": "Intelligent Document Content Types",
+      "ContentTypeId": "0x01010027D65A01A9F279408035C63ED6682D3A",
+      "ContentTypeName": "UnorderedModel",
+      "Created": "2024-05-22T20:11:59Z",
+      "CreatedBy": "i:0#.f|membership|user@contoso.onmicrosoft.com",
+      "DriveId": "b!xlpC8UN4X0WDi7Xz7yRQP_JZHRltjGlEpsj90HfZPCiSNv6idu5tRoCxMjOJSIyo",
+      "Explanations": "{\r\\\n  \"Classifier\": [],\r\\\n  \"Extractors\": {}\r\\\n}",
+      "ID": 1,
+      "LastTrained": "2024-05-23T17:35:53Z",
+      "ListID": "a2fe3692-ee76-466d-80b1-323389488ca8",
+      "ModelSettings": "{\r\\\n  \"ModelTypeSpecificSettings\": {\r\\\n    \"kind\": \"aiBuilderHybridSettings\",\r\\\n    \"AIBHybridModelType\": \"CustomDocument\",\r\\\n    \"AIBHybridModelHostName\": \"make.powerapps.com\",\r\\\n    \"IsTestEnvironment\": false,\r\\\n    \"AIBHybridModelId\": \"16cff4de-bac7-4849-957e-54bdee08e11e\",\r\\\n    \"AIBHybridModelEnvironment\": \"Default-4d704217-2c7f-4072-8799-820f988299d7\",\r\\\n    \"AIBHybridModelStatus\": \"publisheddraft\",\r\\\n    \"DataverseInstanceUrl\": \"https://org.crm4.dynamics.com/\"\r\\\n  },\r\\\n  \"LastPublishedTime\": \"2024-05-23T10:36:36Z\",\r\\\n  \"ClassifiedItemsCount\": \"3\"\r\\\n}",
+      "ModelType": 8,
+      "Modified": "2024-05-24T11:57:59Z",
+      "ModifiedBy": "i:0#.w|sharepoint\\system",
+      "ObjectId": "01RS33TEFSBQKR7PVA25C2USVWUH2YFFRV",
+      "PublicationType": 0,
+      "Schemas": "{\"Version\":2,\"Extractors\":{\"FirstName\":{\"id\":\"labels/FirstName\",\"concepts\":{},\"table\":null,\"detectionOnly\":false},\"LastName\":{\"id\":\"labels/LastName\",\"concepts\":{},\"table\":null,\"detectionOnly\":false},\"Hobbies\":{\"id\":\"labels/Hobbies\",\"concepts\":{},\"table\":null,\"detectionOnly\":false},\"Email\":{\"id\":\"labels/Email\",\"concepts\":{},\"table\":null,\"detectionOnly\":false},\"PhoneNumber\":{\"id\":\"labels/PhoneNumber\",\"concepts\":{},\"table\":null,\"detectionOnly\":false},\"City\":{\"id\":\"labels/City\",\"concepts\":{},\"table\":null,\"detectionOnly\":false},\"JobTitle\":{\"id\":\"labels/JobTitle\",\"concepts\":{},\"table\":null,\"detectionOnly\":false},\"Education_aibtable\":{\"id\":\"tables/Education\",\"concepts\":{},\"table\":{\"name\":\"Education\",\"columns\":[{\"name\":\"SchoolName\",\"id\":null},{\"name\":\"SpecializationName\",\"id\":null},{\"name\":\"StartDate\",\"id\":null},{\"name\":\"EndDate\",\"id\":null}]},\"detectionOnly\":false},\"WorkExperiance_aibtable\":{\"id\":\"tables/WorkExperiance\",\"concepts\":{},\"table\":{\"name\":\"WorkExperiance\",\"columns\":[{\"name\":\"CompanyName\",\"id\":null},{\"name\":\"StartDate\",\"id\":null},{\"name\":\"EndDate\",\"id\":null},{\"name\":\"Position\",\"id\":null},{\"name\":\"TechnologiesKeywords\",\"id\":null}]},\"detectionOnly\":false}},\"Classifiers\":null,\"accuracy\":null,\"relationships\":null,\"TemplatedModel\":null}", 
+      "SourceSiteUrl": "https://contoso.sharepoint.com/sites/ContentCenter",
+      "SourceUrl": null,
+      "SourceWebServerRelativeUrl": "/sites/ContentCenter",
+      "UniqueId": "1f150cb2-a0be-45d7-aa4a-b6a1f5829635"
+    }
+  ]
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  AIBuilderHybridModelType        ContentTypeName   LastTrained           UniqueId                            
+  ------------------------------  ----------------- --------------------  ------------------------------------
+  Freeform document processing    UnorderedModel    2024-05-23T17:35:53Z  1f150cb2-a0be-45d7-aa4a-b6a1f5829635
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+    AIBuilderHybridModelType,AzureCognitivePrebuiltModelName,BaseContentTypeName,ConfidenceScore,ContentTypeGroup,ContentTypeId,ContentTypeName,Created,CreatedBy,DriveId,Explanations,ID,LastTrained,ListID,ModelSettings,ModelType,Modified,ModifiedBy,ObjectId,PublicationType,Schemas,SourceSiteUrl,SourceUrl,SourceWebServerRelativeUrl,UniqueId
+  Freeform document processing,,,"{
+    ""ConfidenceScoresPerLibrary"": {
+      ""64e2de73-dfbe-4085-a49f-8347ddfc7e3a"": 0.86973333358764682
+    }
+  }",Intelligent Document Content Types,0x01010027D65A01A9F279408035C63ED6682D3A,UnorderedModel,2024-05-22T20:11:59Z,i:0#.f|membership|user@contoso.onmicrosoft.com,b!xlpC8UN4X0WDi7Xz7yRQP_JZHRltjGlEpsj90HfZPCiSNv6idu5tRoCxMjOJSIyo,"{
+    ""Classifier"": [],
+    ""Extractors"": {}
+  }",1,2024-05-23T17:35:53Z,a2fe3692-ee76-466d-80b1-323389488ca8,"{
+    ""ModelTypeSpecificSettings"": {
+      ""kind"": ""aiBuilderHybridSettings"",
+      ""AIBHybridModelType"": ""CustomDocument"",
+      ""AIBHybridModelHostName"": ""make.powerapps.com"",
+      ""IsTestEnvironment"": false,
+      ""AIBHybridModelId"": ""16cff4de-bac7-4849-957e-54bdee08e11e"",
+      ""AIBHybridModelEnvironment"": ""Default-4d704217-2c7f-4072-8799-820f988299d7"",
+      ""AIBHybridModelStatus"": ""publisheddraft"",
+      ""DataverseInstanceUrl"": ""https://org.crm4.dynamics.com/""
+    },
+    ""LastPublishedTime"": ""2024-05-23T10:36:36Z"",
+    ""ClassifiedItemsCount"": ""3""
+  }",8,2024-05-24T11:57:59Z,i:0#.w|sharepoint\system,01RS33TEFSBQKR7PVA25C2USVWUH2YFFRV,0,"Model Schema",https://contoso.sharepoint.com/sites/ContentCenter,,/sites/ContentCenter,1f150cb2-a0be-45d7-aa4a-b6a1f5829635
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # spp model list --siteUrl "https://contoso.sharepoint.com/sites/ContentCenter"
+
+  Date: 7/22/2024
+
+  ## 1
+
+  Property | Value
+  ---------|-------
+  AIBuilderHybridModelType | Freeform document processing
+  ContentTypeGroup | Intelligent Document Content Types
+  ContentTypeId | 0x01010027D65A01A9F279408035C63ED6682D3A
+  ContentTypeName | UnorderedModel
+  Created | 2024-05-22T20:11:59Z
+  CreatedBy | i:0#.f\|membership\|user@contoso.onmicrosoft.com
+  DriveId | b!xlpC8UN4X0WDi7Xz7yRQP\_JZHRltjGlEpsj90HfZPCiSNv6idu5tRoCxMjOJSIyo
+  ID | 1
+  LastTrained | 2024-05-23T17:35:53Z
+  ListID | a2fe3692-ee76-466d-80b1-323389488ca8
+  ModelType | 8
+  Modified | 2024-05-24T11:57:59Z
+  ModifiedBy | i:0#.w\|sharepoint\system
+  ObjectId | 01RS33TEFSBQKR7PVA25C2USVWUH2YFFRV
+  PublicationType | 0
+  Schemas | {"Version":2,"Extractors":{"FirstName":{"id":"labels/FirstName","concepts":{},"table":null,"detectionOnly":false},"LastName":{"id":"labels/LastName","concepts":{},"table":null,"detectionOnly":false},"Hobbies":{"id":"labels/Hobbies","concepts":{},"table":null,"detectionOnly":false},"Email":{"id":"labels/Email","concepts":{},"table":null,"detectionOnly":false},"PhoneNumber":{"id":"labels/PhoneNumber","concepts":{},"table":null,"detectionOnly":false},"City":{"id":"labels/City","concepts":{},"table":null,"detectionOnly":false},"JobTitle":{"id":"labels/JobTitle","concepts":{},"table":null,"detectionOnly":false},"Education\_aibtable":{"id":"tables/Education","concepts":{},"table":{"name":"Education","columns":[{"name":"SchoolName","id":null},{"name":"SpecializationName","id":null},{"name":"StartDate","id":null},{"name":"EndDate","id":null}]},"detectionOnly":false},"WorkExperiance\_aibtable":{"id":"tables/WorkExperiance","concepts":{},"table":{"name":"WorkExperiance","columns":[{"name":"CompanyName","id":null},{"name":"StartDate","id":null},{"name":"EndDate","id":null},{"name":"Position","id":null},{"name":"TechnologiesKeywords","id":null}]},"detectionOnly":false}},"Classifiers":null,"accuracy":null,"relationships":null,"TemplatedModel":null}
+  SourceSiteUrl | https://contoso.sharepoint.com/sites/ContentCenter
+  SourceWebServerRelativeUrl | /sites/ContentCenter
+  UniqueId | 1f150cb2-a0be-45d7-aa4a-b6a1f5829635
+  ```
+
+  </TabItem>
+</Tabs>
