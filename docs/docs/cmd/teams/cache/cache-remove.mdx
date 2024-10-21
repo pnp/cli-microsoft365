@@ -13,6 +13,9 @@ m365 teams cache remove [options]
 ## Options
 
 ```md definition-list
+`-c, --client`
+: Teams client to target. Possible values are: `new` or `classic`. Default value is `new`.
+
 `-f, --force`
 : Don't prompt for confirmation
 ```
@@ -43,10 +46,16 @@ The command works only on Windows and macOS. If you run it on a different operat
 
 ## Examples
 
-Removes the Microsoft Teams client cache
+Removes the Microsoft Teams client cache for the new client.
 
 ```sh
 m365 teams cache remove
+```
+
+Removes the Microsoft Teams client cache for the classic client.
+
+```sh
+m365 teams cache remove --client classic
 ```
 
 ## Response
