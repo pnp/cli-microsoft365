@@ -1291,7 +1291,6 @@ describe(commands.LIST_GET, () => {
 
     await command.action(logger, {
       options: {
-        title: 'Documents',
         webUrl: 'https://contoso.sharepoint.com'
       }
     });
