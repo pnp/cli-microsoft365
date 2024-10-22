@@ -183,7 +183,15 @@ class EntraAppPermissionRemoveCommand extends GraphCommand {
 
         if (args.options.revokeAdminConsent) {
           const appServicePrincipal = servicePrincipals.find(sp => sp.appId === appObject.appId);
-          await this.revokeAdminConsent(appServicePrincipal!, appPermissions, logger);
+
+          if (appServicePrincipal) {
+            await this.revokeAdminConsent(appServicePrincipal, appPermissions, logger);
+          }
+          else {
+            if (this.debug) {
+              await logger.logToStderr(`No service principal found for the appId: ${appObject.appId}. Skipping revoking admin consent.`);
+            }
+          }
         }
       }
       catch (err: any) {
