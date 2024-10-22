@@ -88,7 +88,8 @@ describe(commands.SITE_ADMIN_REMOVE, () => {
       entraGroup.getGroupByDisplayName,
       entraUser.getUpnByUserId,
       cli.getSettingWithDefaultValue,
-      cli.promptForConfirmation
+      cli.promptForConfirmation,
+      spo.getSiteAdminPropertiesByUrl
     ]);
   });
 
@@ -129,6 +130,7 @@ describe(commands.SITE_ADMIN_REMOVE, () => {
   });
 
   it('prompts for confirmation before removing site admin if --force option is not passed for user option', async () => {
+    sinon.stub(spo, 'getSiteAdminPropertiesByUrl').resolves({ SiteId: siteId } as any);
     const promptStub = sinon.stub(cli, 'promptForConfirmation').callsFake(async opts => {
       if (opts.message === `Are you sure you want to remove specified user from the site administrators list ${siteUrl}?`) {
         return true;
@@ -145,10 +147,6 @@ describe(commands.SITE_ADMIN_REMOVE, () => {
 
       if (opts.url === `${adminUrl}/_api/SPO.Tenant/sites('${siteId}')?$select=OwnerLoginName`) {
         return { OwnerLoginName: primaryAdminLoginName };
-      }
-
-      if (opts.url === `https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com:/sites/site?$select=id`) {
-        return { id: `contoso.sharepoint.com,${siteId},fb0a066f-c10f-4734-94d1-f896de4aa484` };
       }
 
       throw 'Invalid request: ' + opts.url;
@@ -180,6 +178,7 @@ describe(commands.SITE_ADMIN_REMOVE, () => {
   });
 
   it('prompts for confirmation before removing site admin if --force option is not passed for group option', async () => {
+    sinon.stub(spo, 'getSiteAdminPropertiesByUrl').resolves({ SiteId: siteId } as any);
     const promptStub = sinon.stub(cli, 'promptForConfirmation').callsFake(async opts => {
       if (opts.message === `Are you sure you want to remove specified group from the site administrators list ${siteUrl}?`) {
         return true;
@@ -196,11 +195,6 @@ describe(commands.SITE_ADMIN_REMOVE, () => {
 
       if (opts.url === `${adminUrl}/_api/SPO.Tenant/sites('${siteId}')?$select=OwnerLoginName`) {
         return { OwnerLoginName: primaryAdminLoginName };
-      }
-
-
-      if (opts.url === `https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com:/sites/site?$select=id`) {
-        return { id: `contoso.sharepoint.com,${siteId},fb0a066f-c10f-4734-94d1-f896de4aa484` };
       }
 
       throw 'Invalid request: ' + opts.url;
@@ -248,6 +242,7 @@ describe(commands.SITE_ADMIN_REMOVE, () => {
   });
 
   it('removes a user from site collection admins by userId as admin', async () => {
+    sinon.stub(spo, 'getSiteAdminPropertiesByUrl').resolves({ SiteId: siteId } as any);
     sinon.stub(entraUser, 'getUpnByUserId').resolves(adminToRemoveUPN);
     sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/sites/root?$select=webUrl`) {
@@ -256,10 +251,6 @@ describe(commands.SITE_ADMIN_REMOVE, () => {
 
       if (opts.url === `${adminUrl}/_api/SPO.Tenant/sites('${siteId}')?$select=OwnerLoginName`) {
         return { OwnerLoginName: primaryAdminLoginName };
-      }
-
-      if (opts.url === `https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com:/sites/site?$select=id`) {
-        return { id: `contoso.sharepoint.com,${siteId},fb0a066f-c10f-4734-94d1-f896de4aa484` };
       }
 
       throw 'Invalid request: ' + opts.url;
@@ -290,6 +281,7 @@ describe(commands.SITE_ADMIN_REMOVE, () => {
   });
 
   it('removes a user from site collection admins by userId as admin with verbose parameter', async () => {
+    sinon.stub(spo, 'getSiteAdminPropertiesByUrl').resolves({ SiteId: siteId } as any);
     sinon.stub(entraUser, 'getUpnByUserId').resolves(adminToRemoveUPN);
     sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/sites/root?$select=webUrl`) {
@@ -298,10 +290,6 @@ describe(commands.SITE_ADMIN_REMOVE, () => {
 
       if (opts.url === `${adminUrl}/_api/SPO.Tenant/sites('${siteId}')?$select=OwnerLoginName`) {
         return { OwnerLoginName: primaryAdminLoginName };
-      }
-
-      if (opts.url === `https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com:/sites/site?$select=id`) {
-        return { id: `contoso.sharepoint.com,${siteId},fb0a066f-c10f-4734-94d1-f896de4aa484` };
       }
 
       throw 'Invalid request: ' + opts.url;
@@ -325,6 +313,7 @@ describe(commands.SITE_ADMIN_REMOVE, () => {
   });
 
   it('removes a user from site collection admins by userName as admin', async () => {
+    sinon.stub(spo, 'getSiteAdminPropertiesByUrl').resolves({ SiteId: siteId } as any);
     sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/sites/root?$select=webUrl`) {
         return { res: { webUrl: rootUrl } };
@@ -336,10 +325,6 @@ describe(commands.SITE_ADMIN_REMOVE, () => {
 
       if (opts.url === `https://graph.microsoft.com/v1.0/users('user1loginName%40email.com')`) {
         return { userPrincipalName: adminToRemoveUPN };
-      }
-
-      if (opts.url === `https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com:/sites/site?$select=id`) {
-        return { id: `contoso.sharepoint.com,${siteId},fb0a066f-c10f-4734-94d1-f896de4aa484` };
       }
 
       throw 'Invalid request: ' + opts.url;
@@ -370,6 +355,7 @@ describe(commands.SITE_ADMIN_REMOVE, () => {
   });
 
   it('correctly handles an error if trying to remove primary site collection administrator as admin by userId', async () => {
+    sinon.stub(spo, 'getSiteAdminPropertiesByUrl').resolves({ SiteId: siteId } as any);
     sinon.stub(entraUser, 'getUpnByUserId').resolves(primaryAdminUPN);
     sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/sites/root?$select=webUrl`) {
@@ -380,10 +366,6 @@ describe(commands.SITE_ADMIN_REMOVE, () => {
         return { OwnerLoginName: primaryAdminLoginName };
       }
 
-      if (opts.url === `https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com:/sites/site?$select=id`) {
-        return { id: `contoso.sharepoint.com,${siteId},fb0a066f-c10f-4734-94d1-f896de4aa484` };
-      }
-
       throw 'Invalid request: ' + opts.url;
     });
 
@@ -391,6 +373,7 @@ describe(commands.SITE_ADMIN_REMOVE, () => {
   });
 
   it('correctly handles an error if trying to remove primary site collection administrator as admin by userName', async () => {
+    sinon.stub(spo, 'getSiteAdminPropertiesByUrl').resolves({ SiteId: siteId } as any);
     sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/sites/root?$select=webUrl`) {
         return { res: { webUrl: rootUrl } };
@@ -404,10 +387,6 @@ describe(commands.SITE_ADMIN_REMOVE, () => {
         return { userPrincipalName: primaryAdminUPN };
       }
 
-      if (opts.url === `https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com:/sites/site?$select=id`) {
-        return { id: `contoso.sharepoint.com,${siteId},fb0a066f-c10f-4734-94d1-f896de4aa484` };
-      }
-
       throw 'Invalid request: ' + opts.url;
     });
 
@@ -415,6 +394,7 @@ describe(commands.SITE_ADMIN_REMOVE, () => {
   });
 
   it('removes a group from site collection admin by groupId as admin - for M365 Group', async () => {
+    sinon.stub(spo, 'getSiteAdminPropertiesByUrl').resolves({ SiteId: siteId } as any);
     sinon.stub(entraGroup, 'getGroupById').resolves({ id: groupId, mail: 'mail' });
     sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/sites/root?$select=webUrl`) {
@@ -423,10 +403,6 @@ describe(commands.SITE_ADMIN_REMOVE, () => {
 
       if (opts.url === `${adminUrl}/_api/SPO.Tenant/sites('${siteId}')?$select=OwnerLoginName`) {
         return { OwnerLoginName: primaryAdminLoginName };
-      }
-
-      if (opts.url === `https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com:/sites/site?$select=id`) {
-        return { id: `contoso.sharepoint.com,${siteId},fb0a066f-c10f-4734-94d1-f896de4aa484` };
       }
 
       throw 'Invalid request: ' + opts.url;
@@ -466,6 +442,7 @@ describe(commands.SITE_ADMIN_REMOVE, () => {
   });
 
   it('removes a group from site collection admin by groupId as admin - for Security Group', async () => {
+    sinon.stub(spo, 'getSiteAdminPropertiesByUrl').resolves({ SiteId: siteId } as any);
     sinon.stub(entraGroup, 'getGroupById').resolves({ id: groupId, mail: undefined });
     sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/sites/root?$select=webUrl`) {
@@ -474,10 +451,6 @@ describe(commands.SITE_ADMIN_REMOVE, () => {
 
       if (opts.url === `${adminUrl}/_api/SPO.Tenant/sites('${siteId}')?$select=OwnerLoginName`) {
         return { OwnerLoginName: primaryAdminLoginName };
-      }
-
-      if (opts.url === `https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com:/sites/site?$select=id`) {
-        return { id: `contoso.sharepoint.com,${siteId},fb0a066f-c10f-4734-94d1-f896de4aa484` };
       }
 
       throw 'Invalid request: ' + opts.url;
@@ -517,6 +490,7 @@ describe(commands.SITE_ADMIN_REMOVE, () => {
   });
 
   it('removes a group from site collection admin by groupName as admin', async () => {
+    sinon.stub(spo, 'getSiteAdminPropertiesByUrl').resolves({ SiteId: siteId } as any);
     sinon.stub(entraGroup, 'getGroupByDisplayName').resolves({ id: groupId, mail: undefined });
     sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/sites/root?$select=webUrl`) {
@@ -525,10 +499,6 @@ describe(commands.SITE_ADMIN_REMOVE, () => {
 
       if (opts.url === `${adminUrl}/_api/SPO.Tenant/sites('${siteId}')?$select=OwnerLoginName`) {
         return { OwnerLoginName: primaryAdminLoginName };
-      }
-
-      if (opts.url === `https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com:/sites/site?$select=id`) {
-        return { id: `contoso.sharepoint.com,${siteId},fb0a066f-c10f-4734-94d1-f896de4aa484` };
       }
 
       throw 'Invalid request: ' + opts.url;
@@ -704,27 +674,10 @@ describe(commands.SITE_ADMIN_REMOVE, () => {
   });
 
   it('correctly handles incorrect site Id guid in admin mode', async () => {
-    const incorrectSiteId = 'foo';
     sinon.stub(entraUser, 'getUpnByUserId').resolves(adminToRemoveUPN);
-    sinon.stub(request, 'get').callsFake(async opts => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/sites/root?$select=webUrl`) {
-        return { res: { webUrl: rootUrl } };
-      }
+    sinon.stub(spo, 'getSiteAdminPropertiesByUrl').rejects(new Error(`Cannot get site ${siteUrl}`));
 
-      if (opts.url === `${adminUrl}/_api/SPO.Tenant/GetSiteAdministrators?siteId='${incorrectSiteId}'`) {
-        return {
-          value: listOfAdminsFromAdminSource
-        };
-      }
-
-      if (opts.url === `https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com:/sites/site?$select=id`) {
-        return { id: 'Incorrect ID' };
-      }
-
-      throw 'Invalid request: ' + opts.url;
-    });
-
-    await assert.rejects(command.action(logger, { options: { siteUrl: siteUrl, userId: adminToRemoveId, asAdmin: true, force: true } }), new CommandError(`Site with URL ${siteUrl} not found`));
+    await assert.rejects(command.action(logger, { options: { siteUrl: siteUrl, userId: adminToRemoveId, asAdmin: true, force: true } }), new CommandError(`Cannot get site ${siteUrl}`));
   });
 
   it('correctly handles error when user is not found userId admin mode', async () => {
@@ -732,10 +685,6 @@ describe(commands.SITE_ADMIN_REMOVE, () => {
     sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/sites/root?$select=webUrl`) {
         return { res: { webUrl: rootUrl } };
-      }
-
-      if (opts.url === `https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com:/sites/site?$select=id`) {
-        return { id: `contoso.sharepoint.com,${siteId},fb0a066f-c10f-4734-94d1-f896de4aa484` };
       }
 
       throw 'Invalid request: ' + opts.url;
