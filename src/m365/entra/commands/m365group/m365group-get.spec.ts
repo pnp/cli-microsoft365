@@ -13,7 +13,6 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './m365group-get.js';
 import { entraGroup } from '../../../../utils/entraGroup.js';
-import aadCommands from '../../aadCommands.js';
 
 describe(commands.M365GROUP_GET, () => {
   let log: string[];
@@ -64,16 +63,6 @@ describe(commands.M365GROUP_GET, () => {
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
-  });
-
-  it('defines alias', () => {
-    const alias = command.alias();
-    assert.notStrictEqual(typeof alias, 'undefined');
-  });
-
-  it('defines correct alias', () => {
-    const alias = command.alias();
-    assert.deepStrictEqual(alias, [aadCommands.M365GROUP_GET]);
   });
 
   it('retrieves information about the specified Microsoft 365 Group', async () => {

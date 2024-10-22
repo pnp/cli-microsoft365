@@ -4,18 +4,15 @@ import request, { CliRequestOptions } from '../../../../request.js';
 import { validation } from '../../../../utils/validation.js';
 import { formatting } from '../../../../utils/formatting.js';
 import GraphCommand from '../../../base/GraphCommand.js';
-import teamsCommands from '../../../teams/commands.js';
 import commands from '../../commands.js';
 import { entraGroup } from '../../../../utils/entraGroup.js';
 import { entraUser } from '../../../../utils/entraUser.js';
-import aadCommands from '../../aadCommands.js';
 
 interface CommandArgs {
   options: Options;
 }
 
 interface Options extends GlobalOptions {
-  userName?: string;
   ids?: string;
   userNames?: string;
   groupId?: string;
@@ -34,11 +31,6 @@ class EntraM365GroupUserSetCommand extends GraphCommand {
 
   public get description(): string {
     return 'Updates role of the specified user in the specified Microsoft 365 Group or Microsoft Teams team';
-  }
-
-
-  public alias(): string[] | undefined {
-    return [teamsCommands.USER_SET, aadCommands.M365GROUP_USER_SET];
   }
 
   constructor() {
@@ -66,9 +58,6 @@ class EntraM365GroupUserSetCommand extends GraphCommand {
 
   #initOptions(): void {
     this.options.unshift(
-      {
-        option: '-n, --userName [userName]'
-      },
       {
         option: '--ids [ids]'
       },
@@ -130,22 +119,15 @@ class EntraM365GroupUserSetCommand extends GraphCommand {
 
   #initOptionSets(): void {
     this.optionSets.push({ options: ['groupId', 'groupName', 'teamId', 'teamName'] });
-    this.optionSets.push({ options: ['userName', 'ids', 'userNames'] });
+    this.optionSets.push({ options: ['ids', 'userNames'] });
   }
 
   #initTypes(): void {
-    this.types.string.push('userName', 'ids', 'userNames', 'groupId', 'groupName', 'teamId', 'teamName', 'role');
+    this.types.string.push('ids', 'userNames', 'groupId', 'groupName', 'teamId', 'teamName', 'role');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    await this.showDeprecationWarning(logger, aadCommands.M365GROUP_USER_SET, commands.M365GROUP_USER_SET);
-
-    if (args.options.userName) {
-      await this.warn(logger, `Option 'userName' is deprecated. Please use 'ids' or 'userNames' instead.`);
-    }
-
     try {
-      const userNames = args.options.userNames || args.options.userName;
       const groupId: string = await this.getGroupId(logger, args);
       const isUnifiedGroup = await entraGroup.isUnifiedGroup(groupId);
 
@@ -153,7 +135,7 @@ class EntraM365GroupUserSetCommand extends GraphCommand {
         throw Error(`Specified group with id '${groupId}' is not a Microsoft 365 group.`);
       }
 
-      const userIds: string[] = await this.getUserIds(logger, args.options.ids, userNames);
+      const userIds: string[] = await this.getUserIds(logger, args.options.ids, args.options.userNames);
 
       // we can't simply switch the role
       // first add users to the new role

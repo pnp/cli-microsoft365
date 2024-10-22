@@ -9,7 +9,6 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './m365group-report-activitystorage.js';
-import aadCommands from '../../aadCommands.js';
 
 describe(commands.M365GROUP_REPORT_ACTIVITYSTORAGE, () => {
   let log: string[];
@@ -56,16 +55,6 @@ describe(commands.M365GROUP_REPORT_ACTIVITYSTORAGE, () => {
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
-  });
-
-  it('defines alias', () => {
-    const alias = command.alias();
-    assert.notStrictEqual(typeof alias, 'undefined');
-  });
-
-  it('defines correct alias', () => {
-    const alias = command.alias();
-    assert.deepStrictEqual(alias, [aadCommands.M365GROUP_REPORT_ACTIVITYSTORAGE]);
   });
 
   it('get the reports', async () => {

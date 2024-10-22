@@ -4,7 +4,6 @@ import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
-import aadCommands from '../../aadCommands.js';
 
 interface CommandArgs {
   options: Options;
@@ -24,10 +23,6 @@ class EntraSiteClassificationEnableCommand extends GraphCommand {
 
   public get description(): string {
     return 'Enables site classification configuration';
-  }
-
-  public alias(): string[] | undefined {
-    return [aadCommands.SITECLASSIFICATION_ENABLE];
   }
 
   constructor() {
@@ -64,8 +59,6 @@ class EntraSiteClassificationEnableCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    await this.showDeprecationWarning(logger, aadCommands.SITECLASSIFICATION_ENABLE, commands.SITECLASSIFICATION_ENABLE);
-
     try {
       let requestOptions: CliRequestOptions = {
         url: `${this.resource}/v1.0/groupSettingTemplates`,

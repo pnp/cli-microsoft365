@@ -15,6 +15,7 @@ interface Options extends GlobalOptions {
   webUrl: string;
   id?: string;
   title?: string;
+  recycle?: boolean;
   force?: boolean;
 }
 
@@ -32,6 +33,7 @@ class SpoListRemoveCommand extends SpoCommand {
 
     this.#initTelemetry();
     this.#initOptions();
+    this.#initTypes();
     this.#initValidators();
     this.#initOptionSets();
   }
@@ -39,9 +41,10 @@ class SpoListRemoveCommand extends SpoCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        id: (!(!args.options.id)).toString(),
-        title: (!(!args.options.title)).toString(),
-        force: (!(!args.options.force)).toString()
+        id: typeof args.options.id !== 'undefined',
+        title: typeof args.options.title !== 'undefined',
+        force: !!args.options.force,
+        recycle: !!args.options.recycle
       });
     });
   }
@@ -56,6 +59,9 @@ class SpoListRemoveCommand extends SpoCommand {
       },
       {
         option: '-t, --title [title]'
+      },
+      {
+        option: '--recycle'
       },
       {
         option: '-f, --force'
@@ -85,6 +91,11 @@ class SpoListRemoveCommand extends SpoCommand {
     this.optionSets.push({ options: ['id', 'title'] });
   }
 
+  #initTypes(): void {
+    this.types.string.push('id', 'title', 'webUrl');
+    this.types.boolean.push('force', 'recycle');
+  }
+
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const removeList = async (): Promise<void> => {
       if (this.verbose) {
@@ -98,6 +109,10 @@ class SpoListRemoveCommand extends SpoCommand {
       }
       else {
         requestUrl = `${args.options.webUrl}/_api/web/lists/GetByTitle('${formatting.encodeQueryParameter(args.options.title as string)}')`;
+      }
+
+      if (args.options.recycle) {
+        requestUrl += `/recycle`;
       }
 
       const requestOptions: CliRequestOptions = {

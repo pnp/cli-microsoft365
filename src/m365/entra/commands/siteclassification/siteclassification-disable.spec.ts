@@ -11,7 +11,6 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './siteclassification-disable.js';
-import aadCommands from '../../aadCommands.js';
 
 describe(commands.SITECLASSIFICATION_DISABLE, () => {
   let log: string[];
@@ -67,16 +66,6 @@ describe(commands.SITECLASSIFICATION_DISABLE, () => {
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
-  });
-
-  it('defines alias', () => {
-    const alias = command.alias();
-    assert.notStrictEqual(typeof alias, 'undefined');
-  });
-
-  it('defines correct alias', () => {
-    const alias = command.alias();
-    assert.deepStrictEqual(alias, [aadCommands.SITECLASSIFICATION_DISABLE]);
   });
 
   it('prompts before disabling siteclassification when force option not passed', async () => {

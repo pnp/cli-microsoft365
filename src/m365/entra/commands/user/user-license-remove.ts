@@ -5,7 +5,6 @@ import request, { CliRequestOptions } from '../../../../request.js';
 import { validation } from '../../../../utils/validation.js';
 import { cli } from '../../../../cli/cli.js';
 import GraphCommand from '../../../base/GraphCommand.js';
-import aadCommands from '../../aadCommands.js';
 
 interface CommandArgs {
   options: Options;
@@ -26,10 +25,6 @@ class EntraUserLicenseRemoveCommand extends GraphCommand {
 
   public get description(): string {
     return 'Removes a license from a user';
-  }
-
-  public alias(): string[] | undefined {
-    return [aadCommands.USER_LICENSE_REMOVE];
   }
 
   constructor() {
@@ -95,8 +90,6 @@ class EntraUserLicenseRemoveCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: any): Promise<void> {
-    await this.showDeprecationWarning(logger, aadCommands.USER_LICENSE_REMOVE, commands.USER_LICENSE_REMOVE);
-
     if (this.verbose) {
       await logger.logToStderr(`Removing the licenses for the user '${args.options.userId || args.options.userName}'...`);
     }

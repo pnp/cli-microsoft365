@@ -4,7 +4,6 @@ import request, { CliRequestOptions } from '../../../../request.js';
 import { entraGroup } from '../../../../utils/entraGroup.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
-import aadCommands from '../../aadCommands.js';
 import commands from '../../commands.js';
 
 interface CommandArgs {
@@ -22,10 +21,6 @@ class EntraM365GroupRenewCommand extends GraphCommand {
 
   public get description(): string {
     return `Renews Microsoft 365 group's expiration`;
-  }
-
-  public alias(): string[] | undefined {
-    return [aadCommands.M365GROUP_RENEW];
   }
 
   constructor() {
@@ -56,8 +51,6 @@ class EntraM365GroupRenewCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    await this.showDeprecationWarning(logger, aadCommands.M365GROUP_RENEW, commands.M365GROUP_RENEW);
-
     if (this.verbose) {
       await logger.logToStderr(`Renewing Microsoft 365 group's expiration: ${args.options.id}...`);
     }

@@ -10,16 +10,6 @@ Updates role of the specified users in the specified Microsoft 365 Group or Micr
 m365 entra m365group user set [options]
 ```
 
-## Alias
-
-```sh
-m365 aad m365group user set [options]
-```
-
-```sh
-m365 aad teams user set
-```
-
 ## Options
 
 ```md definition-list
@@ -35,14 +25,11 @@ m365 aad teams user set
 `--teamName [teamName]`
 : The display name of the Microsoft Teams team. Specify only one of the following: `groupId`, `groupName`, `teamId`, or `teamName`.
 
-`-n, --userName [userName]`
-: (deprecated) User's UPN (User Principal Name), e.g. johndoe@example.com.
-
 `--ids [ids]`
-: Microsoft Entra IDs of users. You can also pass a comma-separated list of IDs. Specify only one of the following `userName`, `ids` or `userNames`.
+: Microsoft Entra IDs of users. You can also pass a comma-separated list of IDs. Specify only one of the following `ids` or `userNames`.
 
 `--userNames [userNames]`
-: The user principal names of users. You can also pass a comma-separated list of UPNs. Specify only one of the following `userName`, `ids` or `userNames`.
+: The user principal names of users. You can also pass a comma-separated list of UPNs. Specify only one of the following `ids` or `userNames`.
 
 `-r, --role <role>`
 : Role to set for the given user in the specified Microsoft 365 Group or Microsoft Teams team. Allowed values: `Owner`, `Member`
@@ -59,7 +46,7 @@ The command will return an error if the user already has the specified role in t
 Promote a single user to Owner of the given Microsoft 365 Group
 
 ```sh
-m365 entra m365group user set --groupId '00000000-0000-0000-0000-000000000000' --userName 'anne.matthews@contoso.onmicrosoft.com' --role Owner
+m365 entra m365group user set --groupId '00000000-0000-0000-0000-000000000000' --userNames 'anne.matthews@contoso.onmicrosoft.com' --role Owner
 ```
 
 Promote multiple users specified by the userNames parameter to Owner of the given Microsoft 365 Group
@@ -77,7 +64,7 @@ m365 entra m365group user set --groupId '00000000-0000-0000-0000-000000000000' -
 Demote a single user from Owner to Member in the given Microsoft 365 Group
 
 ```sh
-m365 entra m365group user set --groupId '00000000-0000-0000-0000-000000000000' --userName 'anne.matthews@contoso.onmicrosoft.com' --role Member
+m365 entra m365group user set --groupId '00000000-0000-0000-0000-000000000000' --userNames 'anne.matthews@contoso.onmicrosoft.com' --role Member
 ```
 
 Demote multiple users specified by the userNames parameter from Owner to Member of the given Microsoft Teams team
