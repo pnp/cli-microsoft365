@@ -84,7 +84,8 @@ describe(commands.SITE_ADMIN_ADD, () => {
       request.patch,
       entraGroup.getGroupById,
       entraGroup.getGroupByDisplayName,
-      entraUser.getUpnByUserId
+      entraUser.getUpnByUserId,
+      spo.getSiteAdminPropertiesByUrl
     ]);
   });
 
@@ -126,13 +127,10 @@ describe(commands.SITE_ADMIN_ADD, () => {
 
   it('adds a user to site collection admins by userId as admin', async () => {
     sinon.stub(entraUser, 'getUpnByUserId').resolves(adminToAddUPN);
+    sinon.stub(spo, 'getSiteAdminPropertiesByUrl').resolves({ SiteId: siteId } as any);
     sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/sites/root?$select=webUrl`) {
         return { res: { webUrl: rootUrl } };
-      }
-
-      if (opts.url === `https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com:/sites/site?$select=id`) {
-        return { id: `contoso.sharepoint.com,${siteId},fb0a066f-c10f-4734-94d1-f896de4aa484` };
       }
 
       throw 'Invalid request: ' + opts.url;
@@ -161,6 +159,7 @@ describe(commands.SITE_ADMIN_ADD, () => {
   });
 
   it('adds a user as primary site collection admins by userName as admin', async () => {
+    sinon.stub(spo, 'getSiteAdminPropertiesByUrl').resolves({ SiteId: siteId } as any);
     sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/sites/root?$select=webUrl`) {
         return { res: { webUrl: rootUrl } };
@@ -168,10 +167,6 @@ describe(commands.SITE_ADMIN_ADD, () => {
 
       if (opts.url === `https://graph.microsoft.com/v1.0/users('user3loginName%40email.com')`) {
         return { userPrincipalName: adminToAddUPN };
-      }
-
-      if (opts.url === `https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com:/sites/site?$select=id`) {
-        return { id: `contoso.sharepoint.com,${siteId},fb0a066f-c10f-4734-94d1-f896de4aa484` };
       }
 
       throw 'Invalid request: ' + opts.url;
@@ -213,6 +208,7 @@ describe(commands.SITE_ADMIN_ADD, () => {
   });
 
   it('adds a group to site collection admin by groupId as admin - for M365 Group', async () => {
+    sinon.stub(spo, 'getSiteAdminPropertiesByUrl').resolves({ SiteId: siteId } as any);
     sinon.stub(entraGroup, 'getGroupById').resolves({
       mail: 'mail',
       id: groupId
@@ -221,10 +217,6 @@ describe(commands.SITE_ADMIN_ADD, () => {
     sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/sites/root?$select=webUrl`) {
         return { res: { webUrl: rootUrl } };
-      }
-
-      if (opts.url === `https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com:/sites/site?$select=id`) {
-        return { id: `contoso.sharepoint.com,${siteId},fb0a066f-c10f-4734-94d1-f896de4aa484` };
       }
 
       throw 'Invalid request: ' + opts.url;
@@ -253,6 +245,7 @@ describe(commands.SITE_ADMIN_ADD, () => {
   });
 
   it('adds a group to site collection admin by groupId as admin - for Security Group', async () => {
+    sinon.stub(spo, 'getSiteAdminPropertiesByUrl').resolves({ SiteId: siteId } as any);
     sinon.stub(entraGroup, 'getGroupById').resolves({
       mail: undefined,
       id: groupId
@@ -261,10 +254,6 @@ describe(commands.SITE_ADMIN_ADD, () => {
     sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/sites/root?$select=webUrl`) {
         return { res: { webUrl: rootUrl } };
-      }
-
-      if (opts.url === `https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com:/sites/site?$select=id`) {
-        return { id: `contoso.sharepoint.com,${siteId},fb0a066f-c10f-4734-94d1-f896de4aa484` };
       }
 
       throw 'Invalid request: ' + opts.url;
@@ -293,6 +282,7 @@ describe(commands.SITE_ADMIN_ADD, () => {
   });
 
   it('adds a group to site collection admin by groupName as admin', async () => {
+    sinon.stub(spo, 'getSiteAdminPropertiesByUrl').resolves({ SiteId: siteId } as any);
     sinon.stub(entraGroup, 'getGroupByDisplayName').resolves(
       {
         mail: undefined,
@@ -303,10 +293,6 @@ describe(commands.SITE_ADMIN_ADD, () => {
     sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/sites/root?$select=webUrl`) {
         return { res: { webUrl: rootUrl } };
-      }
-
-      if (opts.url === `https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com:/sites/site?$select=id`) {
-        return { id: `contoso.sharepoint.com,${siteId},fb0a066f-c10f-4734-94d1-f896de4aa484` };
       }
 
       throw 'Invalid request: ' + opts.url;
@@ -335,6 +321,7 @@ describe(commands.SITE_ADMIN_ADD, () => {
   });
 
   it('adds a group as primary site collection admins by userName as admin', async () => {
+    sinon.stub(spo, 'getSiteAdminPropertiesByUrl').resolves({ SiteId: siteId } as any);
     sinon.stub(entraGroup, 'getGroupByDisplayName').resolves(
       {
         mail: undefined,
@@ -345,10 +332,6 @@ describe(commands.SITE_ADMIN_ADD, () => {
     sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/sites/root?$select=webUrl`) {
         return { res: { webUrl: rootUrl } };
-      }
-
-      if (opts.url === `https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com:/sites/site?$select=id`) {
-        return { id: `contoso.sharepoint.com,${siteId},fb0a066f-c10f-4734-94d1-f896de4aa484` };
       }
 
       throw 'Invalid request: ' + opts.url;
@@ -522,21 +505,11 @@ describe(commands.SITE_ADMIN_ADD, () => {
   });
 
   it('correctly handles error when site id is not found for specified site URL in admin mode', async () => {
+    sinon.stub(spo, 'getSiteAdminPropertiesByUrl').rejects(new Error(`Cannot get site ${siteUrl}`));
     sinon.stub(entraUser, 'getUpnByUserId').resolves(adminToAddUPN);
-    sinon.stub(request, 'get').callsFake(async opts => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/sites/root?$select=webUrl`) {
-        return { res: { webUrl: rootUrl } };
-      }
-
-      if (opts.url === `https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com:/sites/site?$select=id`) {
-        return { id: 'Incorrect ID' };
-      }
-
-      throw 'Invalid request: ' + opts.url;
-    });
 
     await assert.rejects(command.action(logger, { options: { siteUrl: siteUrl, userId: adminToAddId, asAdmin: true } }),
-      new CommandError(`Site with URL ${siteUrl} not found`));
+      new CommandError(`Cannot get site ${siteUrl}`));
   });
 
   it('correctly handles error when user is not found userId admin mode', async () => {
@@ -544,10 +517,6 @@ describe(commands.SITE_ADMIN_ADD, () => {
     sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/sites/root?$select=webUrl`) {
         return { res: { webUrl: rootUrl } };
-      }
-
-      if (opts.url === `https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com:/sites/site?$select=id`) {
-        return { id: 'Incorrect ID' };
       }
 
       throw 'Invalid request: ' + opts.url;
