@@ -261,6 +261,59 @@ describe(commands.APP_PERMISSION_REMOVE, () => {
     assert(patchStub.lastCall.args[0].data.scope === 'AgreementAcceptance.Read');
   });
 
+  it('Deletes delegated permissions from app specified by appObjectId and skips revoking admin consent when service principal is not found', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/applications/${appObjectId}?${selectProperties}`) {
+        return applications[0];
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinon.stub(odata, 'getAllItems').callsFake(async (url) => {
+      switch (url) {
+        case 'https://graph.microsoft.com/v1.0/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames':
+          return [{ "appId": "00000003-0000-0000-c000-000000000000", "id": "fb4be1df-eaa6-4bd0-a068-71f9b2cbe2be", "servicePrincipalNames": ["https://canary.graph.microsoft.com/", "https://graph.microsoft.us/", "https://dod-graph.microsoft.us/", "00000003-0000-0000-c000-000000000000/ags.windows.net", "00000003-0000-0000-c000-000000000000", "https://canary.graph.microsoft.com", "https://graph.microsoft.com", "https://ags.windows.net", "https://graph.microsoft.us", "https://graph.microsoft.com/", "https://dod-graph.microsoft.us"], "appRoles": [{ "allowedMemberTypes": ["Application"], "description": "Allows the app to read and update user profiles without a signed in user.", "displayName": "Read and write all users' full profiles", "id": "741f803b-c850-494e-b5df-cde7c675a1ca", "isEnabled": true, "origin": "Application", "value": "User.ReadWrite.All" }, { "allowedMemberTypes": ["Application"], "description": "Allows the app to read user profiles without a signed in user.", "displayName": "Read all users' full profiles", "id": "df021288-bdef-4463-88db-98f22de89214", "isEnabled": true, "origin": "Application", "value": "User.Read.All" }, { "allowedMemberTypes": ["Application"], "description": "Allows the app to read and query your audit log activities, without a signed-in user.", "displayName": "Read all audit log data", "id": "b0afded3-3588-46d8-8b3d-9842eff778da", "isEnabled": true, "origin": "Application", "value": "AuditLog.Read.All" }], "oauth2PermissionScopes": [{ "adminConsentDescription": "Allows the app to see and update the data you gave it access to, even when users are not currently using the app. This does not give the app any additional permissions.", "adminConsentDisplayName": "Maintain access to data you have given it access to", "id": "7427e0e9-2fba-42fe-b0c0-848c9e6a8182", "isEnabled": true, "type": "User", "userConsentDescription": "Allows the app to see and update the data you gave it access to, even when you are not currently using the app. This does not give the app any additional permissions.", "userConsentDisplayName": "Maintain access to data you have given it access to", "value": "offline_access" }, { "adminConsentDescription": "Allows the app to read the available Teams templates, on behalf of the signed-in user.", "adminConsentDisplayName": "Read available Teams templates", "id": "cd87405c-5792-4f15-92f7-debc0db6d1d6", "isEnabled": true, "type": "User", "userConsentDescription": "Read available Teams templates, on your behalf.", "userConsentDisplayName": "Read available Teams templates", "value": "TeamTemplates.Read" }] }];
+        default:
+          throw 'Invalid request';
+      }
+    });
+
+    const patchStub = sinon.stub(request, 'patch').callsFake(async (opts) => {
+      switch (opts.url) {
+        case `https://graph.microsoft.com/v1.0/applications/${appObjectId}`:
+          if (JSON.stringify(opts.data) === JSON.stringify({
+            "requiredResourceAccess": [
+              {
+                "resourceAppId": "00000003-0000-0000-c000-000000000000",
+                "resourceAccess": [
+                  {
+                    "id": "e4aa47b9-9a69-4109-82ed-36ec70d85ff1",
+                    "type": "Scope"
+                  },
+                  {
+                    "id": "332a536c-c7ef-4017-ab91-336970924f0d",
+                    "type": "Role"
+                  }
+                ]
+              }
+            ]
+          })) {
+            return;
+          }
+          else {
+            throw 'Invalid request';
+          }
+        default:
+          throw 'Invalid request';
+      }
+    });
+
+    await command.action(logger, { options: { appObjectId: appObjectId, delegatedPermissions: delegatedPermissions, revokeAdminConsent: true, debug: true, force: true } });
+    assert(patchStub.calledOnce);
+    assert(!patchStub.lastCall.args[0].url!.includes('oauth2PermissionGrants'));
+  });
+
   it('deletes delegated permissions from app specified by appId', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/applications/${appObjectId}?${selectProperties}`) {
