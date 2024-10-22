@@ -35,7 +35,7 @@ class SpoListGetCommand extends SpoCommand {
   }
 
   public get description(): string {
-    return 'Gets information about the specific list';
+    return 'Gets information about the specific list or returns information about the default list in a site';
   }
 
   constructor() {
@@ -44,7 +44,6 @@ class SpoListGetCommand extends SpoCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
-    this.#initOptionSets();
   }
 
   #initTelemetry(): void {
@@ -101,10 +100,6 @@ class SpoListGetCommand extends SpoCommand {
     );
   }
 
-  #initOptionSets(): void {
-    this.optionSets.push({ options: ['id', 'title', 'url'] });
-  }
-
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
       await logger.logToStderr(`Retrieving information for list in site at ${args.options.webUrl}...`);
@@ -112,6 +107,9 @@ class SpoListGetCommand extends SpoCommand {
 
     let requestUrl: string = `${args.options.webUrl}/_api/web/`;
 
+    if (!args.options.id && !args.options.title && !args.options.url) {
+      requestUrl += `DefaultDocumentLibrary`;
+    }
     if (args.options.id) {
       requestUrl += `lists(guid'${formatting.encodeQueryParameter(args.options.id)}')`;
     }
