@@ -2,7 +2,6 @@ import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
 import commands from '../../commands.js';
-import aadCommands from '../../aadCommands.js';
 import request from '../../../../request.js';
 import command from './user-registrationdetails-list.js';
 import { telemetry } from '../../../../telemetry.js';
@@ -131,16 +130,6 @@ describe(commands.USER_REGISTRATIONDETAILS_LIST, () => {
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
-  });
-
-  it('defines alias', () => {
-    const alias = command.alias();
-    assert.notStrictEqual(typeof alias, 'undefined');
-  });
-
-  it('defines correct alias', () => {
-    const alias = command.alias();
-    assert.deepStrictEqual(alias, [aadCommands.USER_REGISTRATIONDETAILS_LIST]);
   });
 
   it('defines correct properties for the default output', () => {

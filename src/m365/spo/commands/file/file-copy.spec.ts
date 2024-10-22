@@ -13,7 +13,7 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './file-copy.js';
 import { settingsNames } from '../../../../settingsNames.js';
-import { CreateCopyJobsNameConflictBehavior, spo } from '../../../../utils/spo.js';
+import { CreateFileCopyJobsNameConflictBehavior, spo } from '../../../../utils/spo.js';
 
 describe(commands.FILE_COPY, () => {
   const sourceWebUrl = 'https://contoso.sharepoint.com/sites/Sales';
@@ -94,7 +94,7 @@ describe(commands.FILE_COPY, () => {
     commandInfo = cli.getCommandInfo(command);
 
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName: string, defaultValue: any) => settingName === settingsNames.prompt ? false : defaultValue);
-    spoUtilCreateCopyJobStub = sinon.stub(spo, 'createCopyJob').resolves(copyJobInfo);
+    spoUtilCreateCopyJobStub = sinon.stub(spo, 'createFileCopyJob').resolves(copyJobInfo);
   });
 
   beforeEach(() => {
@@ -300,7 +300,7 @@ describe(commands.FILE_COPY, () => {
       sourceAbsoluteUrl,
       destAbsoluteTargetUrl,
       {
-        nameConflictBehavior: CreateCopyJobsNameConflictBehavior.Fail,
+        nameConflictBehavior: CreateFileCopyJobsNameConflictBehavior.Fail,
         bypassSharedLock: false,
         ignoreVersionHistory: false,
         operation: 'copy',
@@ -332,7 +332,7 @@ describe(commands.FILE_COPY, () => {
       sourceAbsoluteUrl,
       destAbsoluteTargetUrl,
       {
-        nameConflictBehavior: CreateCopyJobsNameConflictBehavior.Fail,
+        nameConflictBehavior: CreateFileCopyJobsNameConflictBehavior.Fail,
         bypassSharedLock: false,
         ignoreVersionHistory: false,
         operation: 'copy',
@@ -367,7 +367,7 @@ describe(commands.FILE_COPY, () => {
       sourceAbsoluteUrl,
       destAbsoluteTargetUrl,
       {
-        nameConflictBehavior: CreateCopyJobsNameConflictBehavior.Rename,
+        nameConflictBehavior: CreateFileCopyJobsNameConflictBehavior.Rename,
         bypassSharedLock: true,
         ignoreVersionHistory: true,
         operation: 'copy',
@@ -400,7 +400,7 @@ describe(commands.FILE_COPY, () => {
       sourceAbsoluteUrl,
       destAbsoluteTargetUrl,
       {
-        nameConflictBehavior: CreateCopyJobsNameConflictBehavior.Replace,
+        nameConflictBehavior: CreateFileCopyJobsNameConflictBehavior.Replace,
         bypassSharedLock: false,
         ignoreVersionHistory: false,
         operation: 'copy',

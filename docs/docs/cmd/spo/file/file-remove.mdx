@@ -31,6 +31,9 @@ m365 spo page template remove
 `--recycle`
 : Recycle the file instead of actually deleting it.
 
+`--bypassSharedLock`
+: Remove the file even if it is locked for shared use.
+
 `-f, --force`
 : Don't prompt for confirming removing the file.
 ```
@@ -39,22 +42,28 @@ m365 spo page template remove
 
 ## Examples
 
-Remove file by ID.
+Remove a file by ID.
 
 ```sh
 m365 spo file remove --webUrl https://contoso.sharepoint.com/sites/project-x --id 0cd891ef-afce-4e55-b836-fce03286cccf
 ```
 
-Remove the file by site-relative URL.
+Remove a file by site-relative URL.
 
 ```sh
 m365 spo file remove --webUrl https://contoso.sharepoint.com/sites/project-x --url "/Shared Documents/Test.docx"
 ```
 
-Move the file by server-relative URL to the recycle bin.
+Remove a file by server-relative URL to the recycle bin.
 
 ```sh
-m365 spo file remove --webUrl https://contoso.sharepoint.com/sites/project-x --url "/sites/project-x/SharedDocuments/Test.docx" --recycle
+m365 spo file remove --webUrl https://contoso.sharepoint.com/sites/project-x --url "/sites/project-x/Shared Documents/Test.docx" --recycle
+```
+
+Remove a file that is locked
+
+```sh
+m365 spo file remove --webUrl https://contoso.sharepoint.com/sites/project-x --url "/Shared Documents/Test.docx" --bypassSharedLock
 ```
 
 Remove a page template by site-relative URL.

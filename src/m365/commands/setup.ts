@@ -299,7 +299,7 @@ class SetupCommand extends AnonymousCommand {
       apisDelegated: (preferences.newEntraAppScopes === NewEntraAppScopes.All ? config.allScopes : config.minimalScopes).join(','),
       implicitFlow: false,
       multitenant: false,
-      name: 'CLI for Microsoft 365',
+      name: 'CLI for M365',
       platform: 'publicClient',
       redirectUris: 'http://localhost,https://localhost,https://login.microsoftonline.com/common/oauth2/nativeclient'
     };
