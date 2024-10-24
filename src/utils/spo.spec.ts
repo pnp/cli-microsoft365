@@ -3186,7 +3186,7 @@ describe('utils/spo', () => {
     await spo.getSiteAdminPropertiesByUrl('https://contoso.sharepoint.com/sites/sales', true, logger, true);
     assert.deepStrictEqual(postStub.firstCall.args[0].data, { url: 'https://contoso.sharepoint.com/sites/sales', includeDetail: true });
   });
-  
+
   it('retrieves list of Container Type', async () => {
     sinon.stub(spo, 'getSpoAdminUrl').resolves('https://contoso-admin.sharepoint.com');
     sinon.stub(spo, 'ensureFormDigest').resolves({ FormDigestValue: 'abc', FormDigestTimeoutSeconds: 1800, FormDigestExpiresAt: new Date(), WebFullUrl: 'https://contoso.sharepoint.com' });
@@ -3214,35 +3214,29 @@ describe('utils/spo', () => {
     assert.deepEqual(containerTypeList, containerTypedata);
   });
 
-  it('throws error retrieving container types', async () => {
-    try {
-      sinon.stub(spo, 'getSpoAdminUrl').resolves('https://contoso-admin.sharepoint.com');
-      sinon.stub(spo, 'ensureFormDigest').resolves({ FormDigestValue: 'abc', FormDigestTimeoutSeconds: 1800, FormDigestExpiresAt: new Date(), WebFullUrl: 'https://contoso.sharepoint.com' });
+  it('correctly throws error when retrieving container types', async () => {
+    sinon.stub(spo, 'getSpoAdminUrl').resolves('https://contoso-admin.sharepoint.com');
+    sinon.stub(spo, 'ensureFormDigest').resolves({ FormDigestValue: 'abc', FormDigestTimeoutSeconds: 1800, FormDigestExpiresAt: new Date(), WebFullUrl: 'https://contoso.sharepoint.com' });
 
-      sinon.stub(request, 'post').callsFake(async (opts) => {
-        if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
-          if (opts.headers &&
-            opts.headers['X-RequestDigest'] &&
-            opts.headers['X-RequestDigest'] === 'abc') {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
+        if (opts.headers &&
+          opts.headers['X-RequestDigest'] &&
+          opts.headers['X-RequestDigest'] === 'abc') {
 
-            return JSON.stringify([
-              {
-                "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7324.1200", "ErrorInfo": {
-                  "ErrorMessage": "An error has occurred", "ErrorValue": null, "TraceCorrelationId": "e13c489e-2026-5000-8242-7ec96d02ba1d", "ErrorCode": -1, "ErrorTypeName": "SPException"
-                }, "TraceCorrelationId": "e13c489e-2026-5000-8242-7ec96d02ba1d"
-              }
-            ]);
-          }
+          return JSON.stringify([
+            {
+              "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7324.1200", "ErrorInfo": {
+                "ErrorMessage": "An error has occurred", "ErrorValue": null, "TraceCorrelationId": "e13c489e-2026-5000-8242-7ec96d02ba1d", "ErrorCode": -1, "ErrorTypeName": "SPException"
+              }, "TraceCorrelationId": "e13c489e-2026-5000-8242-7ec96d02ba1d"
+            }
+          ]);
         }
+      }
 
-        throw 'Invalid request';
-      });
+      throw 'Invalid request';
+    });
 
-      await spo.getAllContainerTypes('https://contoso-admin.sharepoint.com', logger, true);
-      assert.fail('An error has occurred');
-    }
-    catch (e) {
-      assert.deepEqual(e, 'An error has occurred');
-    }
+    await assert.rejects(spo.getAllContainerTypes('https://contoso-admin.sharepoint.com', logger, true), 'An error occured');
   });
 });
