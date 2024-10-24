@@ -7,7 +7,6 @@ import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 import { entraGroup } from '../../../../utils/entraGroup.js';
 import { CliRequestOptions } from '../../../../request.js';
-import aadCommands from '../../aadCommands.js';
 
 interface CommandArgs {
   options: Options;
@@ -32,10 +31,6 @@ class EntraM365GroupUserListCommand extends GraphCommand {
 
   public get description(): string {
     return "Lists users for the specified Microsoft 365 group";
-  }
-
-  public alias(): string[] | undefined {
-    return [aadCommands.M365GROUP_USER_LIST];
   }
 
   constructor() {
@@ -107,8 +102,6 @@ class EntraM365GroupUserListCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    await this.showDeprecationWarning(logger, aadCommands.M365GROUP_USER_LIST, commands.M365GROUP_USER_LIST);
-
     try {
       const groupId = await this.getGroupId(args.options, logger);
       const isUnifiedGroup = await entraGroup.isUnifiedGroup(groupId);

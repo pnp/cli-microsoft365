@@ -13,7 +13,6 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './app-role-remove.js';
 import { settingsNames } from '../../../../settingsNames.js';
-import aadCommands from '../../aadCommands.js';
 
 describe(commands.APP_ROLE_REMOVE, () => {
   let log: string[];
@@ -72,16 +71,6 @@ describe(commands.APP_ROLE_REMOVE, () => {
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
-  });
-
-  it('defines alias', () => {
-    const alias = command.alias();
-    assert.notStrictEqual(typeof alias, 'undefined');
-  });
-
-  it('defines correct alias', () => {
-    const alias = command.alias();
-    assert.deepStrictEqual(alias, [aadCommands.APP_ROLE_REMOVE, commands.APPREGISTRATION_ROLE_REMOVE]);
   });
 
   it('deletes an app role when the role is in enabled state and valid appObjectId, role claim and --force option specified', async () => {

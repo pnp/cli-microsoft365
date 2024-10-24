@@ -13,7 +13,6 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './enterpriseapp-add.js';
 import { settingsNames } from '../../../../settingsNames.js';
-import aadCommands from '../../aadCommands.js';
 
 describe(commands.ENTERPRISEAPP_ADD, () => {
   let log: string[];
@@ -67,16 +66,6 @@ describe(commands.ENTERPRISEAPP_ADD, () => {
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
-  });
-
-  it('defines alias', () => {
-    const alias = command.alias();
-    assert.notStrictEqual(typeof alias, 'undefined');
-  });
-
-  it('defines correct alias', () => {
-    const alias = command.alias();
-    assert.deepStrictEqual(alias, [aadCommands.SP_ADD, commands.SP_ADD]);
   });
 
   it('fails validation if neither the id, displayName, nor objectId option specified', async () => {

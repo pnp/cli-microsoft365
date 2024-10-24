@@ -22,7 +22,7 @@ import { Group, Site } from '@microsoft/microsoft-graph-types';
 import { ListItemInstance } from '../m365/spo/commands/listitem/ListItemInstance.js';
 import { ListItemFieldValueResult } from '../m365/spo/commands/listitem/ListItemFieldValueResult.js';
 import { FileProperties } from '../m365/spo/commands/file/FileProperties.js';
-import { setTimeout } from 'timers/promises';
+import { timersUtil } from './timersUtil.js';
 
 export interface ContextInfo {
   FormDigestTimeoutSeconds: number;
@@ -104,8 +104,8 @@ export interface ContainerTypeProperties {
   SPContainerTypeBillingClassification: string;
 }
 
-interface CreateCopyJobsOptions {
-  nameConflictBehavior?: CreateCopyJobsNameConflictBehavior;
+interface CreateFileCopyJobsOptions {
+  nameConflictBehavior?: CreateFileCopyJobsNameConflictBehavior;
   newName?: string;
   bypassSharedLock?: boolean;
   /** @remarks Use only when using operation copy. */
@@ -115,9 +115,20 @@ interface CreateCopyJobsOptions {
   operation: 'copy' | 'move';
 }
 
-export enum CreateCopyJobsNameConflictBehavior {
+interface CreateFolderCopyJobsOptions {
+  nameConflictBehavior?: CreateFolderCopyJobsNameConflictBehavior;
+  newName?: string;
+  operation: 'copy' | 'move';
+}
+
+export enum CreateFileCopyJobsNameConflictBehavior {
   Fail = 0,
   Replace = 1,
+  Rename = 2,
+}
+
+export enum CreateFolderCopyJobsNameConflictBehavior {
+  Fail = 0,
   Rename = 2,
 }
 
@@ -143,9 +154,125 @@ interface CopyJobObjectInfo {
 }
 
 // Wrapping this into a settings object so we can alter the values in tests
-export const settings = {
-  pollingInterval: 3_000
-};
+const pollingInterval = 3_000;
+
+interface TenantSiteProperties {
+  AllowDownloadingNonWebViewableFiles: boolean;
+  AllowEditing: boolean;
+  AllowSelfServiceUpgrade: boolean;
+  AnonymousLinkExpirationInDays: number;
+  ApplyToExistingDocumentLibraries: boolean;
+  ApplyToNewDocumentLibraries: boolean;
+  ArchivedBy: string;
+  ArchivedTime: string;
+  ArchiveStatus: string;
+  AuthContextStrength: any;
+  AuthenticationContextLimitedAccess: boolean;
+  AuthenticationContextName: any;
+  AverageResourceUsage: number;
+  BlockDownloadLinksFileType: number;
+  BlockDownloadMicrosoft365GroupIds: any;
+  BlockDownloadPolicy: boolean;
+  BlockDownloadPolicyFileTypeIds: any;
+  BlockGuestsAsSiteAdmin: number;
+  BonusDiskQuota: string;
+  ClearRestrictedAccessControl: boolean;
+  CommentsOnSitePagesDisabled: boolean;
+  CompatibilityLevel: number;
+  ConditionalAccessPolicy: number;
+  CurrentResourceUsage: number;
+  DefaultLinkPermission: number;
+  DefaultLinkToExistingAccess: boolean;
+  DefaultLinkToExistingAccessReset: boolean;
+  DefaultShareLinkRole: number;
+  DefaultShareLinkScope: number;
+  DefaultSharingLinkType: number;
+  DenyAddAndCustomizePages: number;
+  Description: string;
+  DisableAppViews: number;
+  DisableCompanyWideSharingLinks: number;
+  DisableFlows: number;
+  EnableAutoExpirationVersionTrim: boolean;
+  ExcludeBlockDownloadPolicySiteOwners: boolean;
+  ExcludeBlockDownloadSharePointGroups: any[];
+  ExcludedBlockDownloadGroupIds: any[];
+  ExpireVersionsAfterDays: number;
+  ExternalUserExpirationInDays: number;
+  GroupId: string;
+  GroupOwnerLoginName: string;
+  HasHolds: boolean;
+  HubSiteId: string;
+  IBMode: string;
+  IBSegments: any[];
+  IBSegmentsToAdd: any;
+  IBSegmentsToRemove: any;
+  InheritVersionPolicyFromTenant: boolean;
+  IsGroupOwnerSiteAdmin: boolean;
+  IsHubSite: boolean;
+  IsTeamsChannelConnected: boolean;
+  IsTeamsConnected: boolean;
+  LastContentModifiedDate: string;
+  Lcid: string;
+  LimitedAccessFileType: number;
+  ListsShowHeaderAndNavigation: boolean;
+  LockIssue: any;
+  LockReason: number;
+  LockState: string;
+  LoopDefaultSharingLinkRole: number;
+  LoopDefaultSharingLinkScope: number;
+  MajorVersionLimit: number;
+  MajorWithMinorVersionsLimit: number;
+  MediaTranscription: number;
+  OverrideBlockUserInfoVisibility: number;
+  OverrideSharingCapability: boolean;
+  OverrideTenantAnonymousLinkExpirationPolicy: boolean;
+  OverrideTenantExternalUserExpirationPolicy: boolean;
+  Owner: string;
+  OwnerEmail: string;
+  OwnerLoginName: string;
+  OwnerName: string;
+  PWAEnabled: number;
+  ReadOnlyAccessPolicy: boolean;
+  ReadOnlyForBlockDownloadPolicy: boolean;
+  ReadOnlyForUnmanagedDevices: boolean;
+  RelatedGroupId: string;
+  RequestFilesLinkEnabled: boolean;
+  RequestFilesLinkExpirationInDays: number;
+  RestrictContentOrgWideSearch: boolean;
+  RestrictedAccessControl: boolean;
+  RestrictedAccessControlGroups: any[];
+  RestrictedAccessControlGroupsToAdd: any;
+  RestrictedAccessControlGroupsToRemove: any;
+  RestrictedToRegion: number;
+  SandboxedCodeActivationCapability: number;
+  SensitivityLabel: string;
+  SensitivityLabel2: any;
+  SetOwnerWithoutUpdatingSecondaryAdmin: boolean;
+  SharingAllowedDomainList: string;
+  SharingBlockedDomainList: string;
+  SharingCapability: number;
+  SharingDomainRestrictionMode: number;
+  SharingLockDownCanBeCleared: boolean;
+  SharingLockDownEnabled: boolean;
+  ShowPeoplePickerSuggestionsForGuestUsers: boolean;
+  SiteDefinedSharingCapability: number;
+  SiteId: string;
+  SocialBarOnSitePagesDisabled: boolean;
+  Status: string;
+  StorageMaximumLevel: string;
+  StorageQuotaType: any;
+  StorageUsage: string;
+  StorageWarningLevel: string;
+  TeamsChannelType: number;
+  Template: string;
+  TimeZoneId: number;
+  Title: string;
+  TitleTranslations: Array<{ LCID: number; Value: string }>;
+  Url: string;
+  UserCodeMaximumLevel: number;
+  UserCodeWarningLevel: number;
+  WebsCount: number;
+}
 
 export const spo = {
   async getRequestDigest(siteUrl: string): Promise<FormDigestInfo> {
@@ -236,7 +363,7 @@ export const spo = {
         return;
       }
 
-      await setTimeout(operation.PollingInterval);
+      await timersUtil.setTimeout(pollingInterval);
       await spo.waitUntilFinished({
         operationId: JSON.stringify(operation._ObjectIdentity_),
         siteUrl,
@@ -964,7 +1091,7 @@ export const spo = {
           return;
         }
 
-        await setTimeout(operation.PollingInterval);
+        await timersUtil.setTimeout(pollingInterval);
         await spo.waitUntilFinished({
           operationId: JSON.stringify(operation._ObjectIdentity_),
           siteUrl: spoAdminUrl,
@@ -1211,7 +1338,7 @@ export const spo = {
       return;
     }
 
-    await setTimeout(operation.PollingInterval);
+    await timersUtil.setTimeout(pollingInterval);
     await spo.waitUntilFinished({
       operationId: JSON.stringify(operation._ObjectIdentity_),
       siteUrl: spoAdminUrl,
@@ -1383,7 +1510,7 @@ export const spo = {
         const operation: SpoOperation = json[json.length - 1];
         const isComplete: boolean = operation.IsComplete;
         if (!isComplete) {
-          await setTimeout(operation.PollingInterval);
+          await timersUtil.setTimeout(pollingInterval);
           await spo.waitUntilFinished({
             operationId: JSON.stringify(operation._ObjectIdentity_),
             siteUrl: spoAdminUrl,
@@ -1973,14 +2100,14 @@ export const spo = {
   },
 
   /**
-   * Create a SharePoint copy job to copy a file/folder to another location.
-   * @param webUrl Absolute web URL where the source file/folder is located.
-   * @param sourceUrl Absolute URL of the source file/folder.
+   * Create a SharePoint copy job to copy a file to another location.
+   * @param webUrl Absolute web URL where the source file is located.
+   * @param sourceUrl Absolute URL of the source file.
    * @param destinationUrl Absolute URL of the destination folder.
    * @param options Options for the copy job.
    * @returns Copy job information. Use {@link spo.getCopyJobResult} to get the result of the copy job.
    */
-  async createCopyJob(webUrl: string, sourceUrl: string, destinationUrl: string, options?: CreateCopyJobsOptions): Promise<CreateCopyJobInfo> {
+  async createFileCopyJob(webUrl: string, sourceUrl: string, destinationUrl: string, options?: CreateFileCopyJobsOptions): Promise<CreateCopyJobInfo> {
     const requestOptions: CliRequestOptions = {
       url: `${webUrl}/_api/Site/CreateCopyJobs`,
       headers: {
@@ -1991,11 +2118,43 @@ export const spo = {
         destinationUri: destinationUrl,
         exportObjectUris: [sourceUrl],
         options: {
-          NameConflictBehavior: options?.nameConflictBehavior ?? CreateCopyJobsNameConflictBehavior.Fail,
+          NameConflictBehavior: options?.nameConflictBehavior ?? CreateFileCopyJobsNameConflictBehavior.Fail,
           AllowSchemaMismatch: true,
           BypassSharedLock: !!options?.bypassSharedLock,
           IgnoreVersionHistory: !!options?.ignoreVersionHistory,
           IncludeItemPermissions: !!options?.includeItemPermissions,
+          CustomizedItemName: options?.newName ? [options.newName] : undefined,
+          SameWebCopyMoveOptimization: true,
+          IsMoveMode: options?.operation === 'move'
+        }
+      }
+    };
+
+    const response = await request.post<{ value: CreateCopyJobInfo[] }>(requestOptions);
+    return response.value[0];
+  },
+
+  /**
+   * Create a SharePoint copy job to copy a folder to another location.
+   * @param webUrl Absolute web URL where the source folder is located.
+   * @param sourceUrl Absolute URL of the source folder.
+   * @param destinationUrl Absolute URL of the destination folder.
+   * @param options Options for the copy job.
+   * @returns Copy job information. Use {@link spo.getCopyJobResult} to get the result of the copy job.
+   */
+  async createFolderCopyJob(webUrl: string, sourceUrl: string, destinationUrl: string, options?: CreateFolderCopyJobsOptions): Promise<CreateCopyJobInfo> {
+    const requestOptions: CliRequestOptions = {
+      url: `${webUrl}/_api/Site/CreateCopyJobs`,
+      headers: {
+        accept: 'application/json;odata=nometadata'
+      },
+      responseType: 'json',
+      data: {
+        destinationUri: destinationUrl,
+        exportObjectUris: [sourceUrl],
+        options: {
+          NameConflictBehavior: options?.nameConflictBehavior ?? CreateFolderCopyJobsNameConflictBehavior.Fail,
+          AllowSchemaMismatch: true,
           CustomizedItemName: options?.newName ? [options.newName] : undefined,
           SameWebCopyMoveOptimization: true,
           IsMoveMode: options?.operation === 'move'
@@ -2025,14 +2184,23 @@ export const spo = {
         copyJobInfo: copyJobInfo
       }
     };
-    let progress = await request.post<{ JobState: number; Logs: string[] }>(requestOptions);
 
-    while (progress.JobState !== 0) {
-      await setTimeout(settings.pollingInterval);
-      progress = await request.post<{ JobState: number; Logs: string[] }>(requestOptions);
+    const logs = [];
+    let progress = await request.post<{ JobState: number; Logs: string[] }>(requestOptions);
+    const newLogs = progress.Logs?.map(l => JSON.parse(l));
+    if (newLogs?.length > 0) {
+      logs.push(...newLogs);
     }
 
-    const logs = progress.Logs.map(l => JSON.parse(l));
+    while (progress.JobState !== 0) {
+      await timersUtil.setTimeout(pollingInterval);
+      progress = await request.post<{ JobState: number; Logs: string[] }>(requestOptions);
+
+      const newLogs = progress.Logs?.map(l => JSON.parse(l));
+      if (newLogs?.length > 0) {
+        logs.push(...newLogs);
+      }
+    }
 
     // Check if the job has failed
     const errorLog = logs.find(l => l.Event === 'JobError');
@@ -2092,5 +2260,37 @@ export const spo = {
 
     const responseContent = await request.get<{ LoginName: string }>(requestOptions);
     return responseContent?.LoginName;
+  },
+
+  /**
+  * Retrieves the site admin properties for a given site URL.
+  * @param adminUrl The SharePoint admin url.
+  * @param siteUrl URL of the site for which to retrieve properties.
+  * @param includeDetail Set to true to include detailed properties.
+  * @param logger The logger object.
+  * @param verbose Set for verbose logging.
+  * @returns Tenant Site properties.
+  */
+  async getSiteAdminPropertiesByUrl(siteUrl: string, includeDetail: boolean, logger: Logger, verbose?: boolean): Promise<TenantSiteProperties> {
+    if (verbose) {
+      await logger.logToStderr(`Getting site admin properties for URL: ${siteUrl}...`);
+    }
+
+    const adminUrl: string = await spo.getSpoAdminUrl(logger, !!verbose);
+
+    const requestOptions: CliRequestOptions = {
+      url: `${adminUrl}/_api/SPO.Tenant/GetSitePropertiesByUrl`,
+      headers: {
+        accept: 'application/json;odata=nometadata',
+        'content-type': 'application/json;charset=utf-8'
+      },
+      data: {
+        url: siteUrl,
+        includeDetail: includeDetail
+      },
+      responseType: 'json'
+    };
+
+    return request.post<TenantSiteProperties>(requestOptions);
   }
 };

@@ -3761,6 +3761,11 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'tenant site unarchive',
               id: 'cmd/spo/tenant/tenant-site-unarchive'
+            },
+            {
+              type: 'doc',
+              label: 'tenant site membership list',
+              id: 'cmd/spo/tenant/tenant-site-membership-list'
             }
           ]
         },
@@ -3959,6 +3964,15 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'contentcenter list',
               id: 'cmd/spp/contentcenter/contentcenter-list'
+            }
+          ]
+        },
+        {
+          model: [
+            {
+              type: 'doc',
+              label: 'model list',
+              id: 'cmd/spp/model/model-list'
             }
           ]
         }
