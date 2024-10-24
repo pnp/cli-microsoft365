@@ -324,7 +324,7 @@ export const spo = {
     const response: ClientSvcResponseContents = json[0];
 
     if (response.ErrorInfo) {
-      throw response.ErrorInfo.ErrorMessage;
+      throw new Error(response.ErrorInfo.ErrorMessage);
     }
 
     const containerTypes: ContainerTypeProperties[] = json[json.length - 1];
@@ -1082,7 +1082,7 @@ export const spo = {
       const response: ClientSvcResponseContents = json[0];
 
       if (response.ErrorInfo) {
-        throw new Error(response.ErrorInfo.ErrorMessage);
+        throw response.ErrorInfo.ErrorMessage;
       }
       else {
         const operation: SpoOperation = json[json.length - 1];
