@@ -42,6 +42,7 @@ const containerTypedata = [{
 describe(commands.CONTAINERTYPE_LIST, () => {
   let log: string[];
   let logger: Logger;
+  let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -66,6 +67,7 @@ describe(commands.CONTAINERTYPE_LIST, () => {
         log.push(msg);
       }
     };
+    loggerLogSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -96,6 +98,7 @@ describe(commands.CONTAINERTYPE_LIST, () => {
   it('retrieves list of container type', async () => {
     sinon.stub(spo, 'getAllContainerTypes').resolves(containerTypedata);
     await command.action(logger, { options: { debug: true } });
+    assert(loggerLogSpy.calledWith(containerTypedata));
   });
 
   it('correctly handles error when retrieving container types', async () => {

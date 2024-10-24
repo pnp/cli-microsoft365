@@ -955,7 +955,7 @@ export const spo = {
       const response: ClientSvcResponseContents = json[0];
 
       if (response.ErrorInfo) {
-        throw response.ErrorInfo.ErrorMessage;
+        throw new Error(response.ErrorInfo.ErrorMessage);
       }
       else {
         const operation: SpoOperation = json[json.length - 1];

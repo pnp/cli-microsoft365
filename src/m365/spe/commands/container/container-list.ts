@@ -37,6 +37,7 @@ class SpeContainerListCommand extends GraphCommand {
     this.#initOptions();
     this.#initValidators();
     this.#initOptionSets();
+    this.#initTypes();
   }
 
   #initTelemetry(): void {
@@ -75,13 +76,17 @@ class SpeContainerListCommand extends GraphCommand {
     this.optionSets.push({ options: ['containerTypeId', 'containerTypeName'] });
   }
 
+  #initTypes(): void {
+    this.types.string.push('containerTypeId', 'containerTypeName');
+  }
+
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       if (this.verbose) {
         await logger.logToStderr(`Retrieving list of Containers...`);
       }
 
-      const containerTypeId = await this.getContainerTypeId(logger, args);
+      const containerTypeId = await this.getContainerTypeId(logger, args.options);
       const allContainers = await odata.getAllItems<ContainerProperties>(`${this.resource}/v1.0/storage/fileStorage/containers?$filter=containerTypeId eq ${formatting.encodeQueryParameter(containerTypeId)}`);
       await logger.log(allContainers);
     }
@@ -90,18 +95,18 @@ class SpeContainerListCommand extends GraphCommand {
     }
   }
 
-  private async getContainerTypeId(logger: Logger, args: CommandArgs): Promise<string> {
-    if (args.options.containerTypeId) {
-      return args.options.containerTypeId;
+  private async getContainerTypeId(logger: Logger, options: Options): Promise<string> {
+    if (options.containerTypeId) {
+      return options.containerTypeId;
     }
 
     const spoAdminUrl = await spo.getSpoAdminUrl(logger, this.debug);
     const containerTypes: ContainerTypeProperties[] = await spo.getAllContainerTypes(spoAdminUrl, logger, this.debug);
 
     // Get id of the container type by name
-    const containerType: ContainerTypeProperties | undefined = containerTypes.find(c => c.DisplayName === args.options.containerTypeName);
+    const containerType: ContainerTypeProperties | undefined = containerTypes.find(c => c.DisplayName === options.containerTypeName);
     if (!containerType) {
-      throw new Error(`Container type with name ${args.options.containerTypeName} not found`);
+      throw new Error(`Container type with name ${options.containerTypeName} not found`);
     }
 
     // The value is returned as "/Guid(073269af-f1d2-042d-2ef5-5bdd6ac83115)/". We need to extract the GUID from it.
