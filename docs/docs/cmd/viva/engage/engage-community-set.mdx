@@ -16,10 +16,13 @@ m365 viva engage community set [options]
 
 ```md definition-list
 `-i, --id [id]`
-: The id of the community. Specify either `id` or `displayName`, but not both.
+: The id of the community. Specify either `id`, `displayName` or `entraGroupId`, but not multiple.
 
 `-d, --displayName [displayName]`
-: The name of the community. Specify either `id` or `displayName`, but not both.
+: The name of the community. Specify either `id`, `displayName` or `entraGroupId`, but not multiple.
+
+`--entraGroupId [entraGroupId]`
+: The id of the Microsoft Entra group associated with the community. Specify either `id`, `displayName` or `entraGroupId`, but not multiple.
 
 `--newDisplayName [newDisplayName]`
 : New name for the community. The maximum length is 255 characters.
@@ -45,6 +48,12 @@ Update info about the community specified by name
 
 ```sh
 m365 viva engage community set --displayName 'Developrs' --newDisplayName 'Developers'
+```
+
+Update info about the community specified by Entra group id
+
+```sh
+m365 viva engage community set --entraGroupId '0bed8b86-5026-4a93-ac7d-56750cc099f1' --newDisplayName 'Developers'
 ```
 
 ## Response

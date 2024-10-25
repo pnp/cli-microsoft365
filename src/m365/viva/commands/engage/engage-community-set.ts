@@ -1,6 +1,7 @@
 import GlobalOptions from '../../../../GlobalOptions.js';
 import { Logger } from '../../../../cli/Logger.js';
 import request, { CliRequestOptions } from '../../../../request.js';
+import { validation } from '../../../../utils/validation.js';
 import { vivaEngage } from '../../../../utils/vivaEngage.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
@@ -12,6 +13,7 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   id?: string;
   displayName?: string;
+  entraGroupId?: string;
   newDisplayName?: string;
   description?: string;
   privacy?: string;
@@ -59,6 +61,9 @@ class VivaEngageCommunitySetCommand extends GraphCommand {
         option: '-d, --displayName [displayName]'
       },
       {
+        option: '--entraGroupId [entraGroupId]'
+      },
+      {
         option: '--newDisplayName [newDisplayName]'
       },
       {
@@ -74,6 +79,10 @@ class VivaEngageCommunitySetCommand extends GraphCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
+        if (args.options.entraGroupId && !validation.isValidGuid(args.options.entraGroupId)) {
+          return `${args.options.entraGroupId} is not a valid GUID for the option 'entraGroupId'.`;
+        }
+
         if (args.options.newDisplayName && args.options.newDisplayName.length > 255) {
           return `The maximum amount of characters for 'newDisplayName' is 255.`;
         }
@@ -100,15 +109,17 @@ class VivaEngageCommunitySetCommand extends GraphCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push({ options: ['id', 'displayName'] });
+    this.optionSets.push({ options: ['id', 'displayName', 'entraGroupId'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-
     let communityId = args.options.id;
 
     if (args.options.displayName) {
-      communityId = await vivaEngage.getCommunityIdByDisplayName(args.options.displayName);
+      communityId = (await vivaEngage.getCommunityByDisplayName(args.options.displayName, ['id'])).id!;
+    }
+    else if (args.options.entraGroupId) {
+      communityId = (await vivaEngage.getCommunityByEntraGroupId(args.options.entraGroupId, ['id'])).id!;
     }
 
     if (this.verbose) {

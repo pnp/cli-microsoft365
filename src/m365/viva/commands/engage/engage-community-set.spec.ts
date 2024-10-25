@@ -17,6 +17,7 @@ import { cli } from '../../../../cli/cli.js';
 describe(commands.ENGAGE_COMMUNITY_SET, () => {
   const communityId = 'eyJfdHlwZSI6Ikdyb3VwIiwiaWQiOiI0NzY5MTM1ODIwOSJ9';
   const displayName = 'Software Engineers';
+  const entraGroupId = '0bed8b86-5026-4a93-ac7d-56750cc099f1';
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
@@ -74,6 +75,11 @@ describe(commands.ENGAGE_COMMUNITY_SET, () => {
     assert.strictEqual(actual, true);
   });
 
+  it('passes validation when entraGroupId is specified', async () => {
+    const actual = await command.validate({ options: { entraGroupId: '0bed8b86-5026-4a93-ac7d-56750cc099f1', description: 'Community for all devs' } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
   it('fails validation when newDisplayName, description or privacy is not specified', async () => {
     const actual = await command.validate({ options: { displayName: 'Software Engineers' } }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -109,6 +115,11 @@ describe(commands.ENGAGE_COMMUNITY_SET, () => {
     assert.notStrictEqual(actual, true);
   });
 
+  it('fails validation when entraGroupId is not a valid GUID', async () => {
+    const actual = await command.validate({ options: { entraGroupId: 'foo', description: 'Community for all devs' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
   it('updates info about a community specified by id', async () => {
     const patchRequestStub = sinon.stub(request, 'patch').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/employeeExperience/communities/${communityId}`) {
@@ -123,7 +134,7 @@ describe(commands.ENGAGE_COMMUNITY_SET, () => {
   });
 
   it('updates info about a community specified by displayName', async () => {
-    sinon.stub(vivaEngage, 'getCommunityIdByDisplayName').resolves(communityId);
+    sinon.stub(vivaEngage, 'getCommunityByDisplayName').resolves({ id: communityId });
     const patchRequestStub = sinon.stub(request, 'patch').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/employeeExperience/communities/${communityId}`) {
         return;
@@ -133,6 +144,20 @@ describe(commands.ENGAGE_COMMUNITY_SET, () => {
     });
 
     await command.action(logger, { options: { displayName: displayName, description: 'Community for all devs', privacy: 'Public', verbose: true } });
+    assert(patchRequestStub.called);
+  });
+
+  it('updates info about a community specified by entraGroupId', async () => {
+    sinon.stub(vivaEngage, 'getCommunityByEntraGroupId').resolves({ id: communityId });
+    const patchRequestStub = sinon.stub(request, 'patch').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/employeeExperience/communities/${communityId}`) {
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { entraGroupId: entraGroupId, description: 'Community for all devs', privacy: 'Public', verbose: true } });
     assert(patchRequestStub.called);
   });
 
