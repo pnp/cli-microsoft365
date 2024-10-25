@@ -14,10 +14,13 @@ m365 viva engage community remove [options]
 
 ```md definition-list
 `-i, --id [id]`
-: The id of the community. Specify either `id` or `displayName` but not both.
+: The id of the community. Specify either `id`, `displayName` or `entraGroupId`, but not multiple.
 
 `-n, --displayName [displayName]`
-: The name of the community. Specify either `id` or `displayName` but not both.
+: The name of the community. Specify either `id`, `displayName` or `entraGroupId`, but not multiple.
+
+`--entraGroupId [entraGroupId]`
+: The id of the Microsoft 365 group associated with the community. Specify either `id`, `displayName` or `entraGroupId`, but not multiple.
 
 `-f, --force`
 : Don't prompt for confirmation.
@@ -45,6 +48,12 @@ Remove a community specified by name and prompt for confirmation
 
 ```sh
 m365 viva engage community remove --displayName 'Software Engineers'
+```
+
+Remove a community specified by Entra group id and prompt for confirmation
+
+```sh
+m365 viva engage community remove --entraGroupId '0bed8b86-5026-4a93-ac7d-56750cc099f1'
 ```
 
 ## Response
