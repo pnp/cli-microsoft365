@@ -45,6 +45,7 @@ class VivaEngageCommunitySetCommand extends GraphCommand {
       Object.assign(this.telemetryProperties, {
         id: typeof args.options.id !== 'undefined',
         displayName: typeof args.options.displayName !== 'undefined',
+        entraGroupId: typeof args.options.entraGroupId !== 'undefined',
         newDisplayName: typeof args.options.newDisplayName !== 'undefined',
         description: typeof args.options.description !== 'undefined',
         privacy: typeof args.options.privacy !== 'undefined'
@@ -105,7 +106,7 @@ class VivaEngageCommunitySetCommand extends GraphCommand {
   }
 
   #initTypes(): void {
-    this.types.string.push('id', 'displayName', 'newDisplayName', 'description', 'privacy');
+    this.types.string.push('id', 'displayName', 'entraGroupId', 'newDisplayName', 'description', 'privacy');
   }
 
   #initOptionSets(): void {
