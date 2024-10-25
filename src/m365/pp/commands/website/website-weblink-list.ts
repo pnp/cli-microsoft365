@@ -1,5 +1,7 @@
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
+import { z } from 'zod';
+import { zod } from '../../../../utils/zod.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { odata } from '../../../../utils/odata.js';
 import { powerPlatform } from '../../../../utils/powerPlatform.js';
@@ -8,15 +10,26 @@ import PowerPlatformCommand from '../../../base/PowerPlatformCommand.js';
 import commands from '../../commands.js';
 import { PpWebSiteOptions } from '../Website.js';
 
+
+
+export const options = globalOptionsZod
+  .extend({
+    environmentName: zod.alias('e', z.string()),
+    websiteId: z.string().refine(id => validation.isValidGuid(id) === true, id => ({ message: `${id} is not a valid GUID` })).optional(),
+    websiteName: z.string().optional(),
+    asAdmin: z.boolean().optional()
+  })
+  .refine(options => !(options.websiteId !== undefined && options.websiteName !== undefined), {
+    message: `Either websiteId or websiteName is required, but not both.`
+  })
+  .refine(options => !(options.websiteId === undefined && options.websiteName === undefined), {
+    message: `Either websiteId or websiteName is required.`
+  });
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  environmentName: string;
-  websiteId?: string;
-  websiteName?: string;
-  asAdmin?: boolean;
 }
 
 class PpWebSiteWebLinkListCommand extends PowerPlatformCommand {
@@ -29,60 +42,11 @@ class PpWebSiteWebLinkListCommand extends PowerPlatformCommand {
   }
 
   public defaultProperties(): string[] | undefined {
-    return ['mspp_name', 'mspp_webfileid', 'mspp_summary', '_mspp_publishingstateid_value@OData.Community.Display.V1.FormattedValue'];
+    return ['mspp_name', 'mspp_weblinkid', 'mspp_description', 'statecode'];
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionsSets();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        websiteId: typeof args.options.websiteId !== 'undefined',
-        websiteName: typeof args.options.name !== 'undefined',
-        asAdmin: !!args.options.asAdmin
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-e, --environmentName <environmentName>'
-      },
-      {
-        option: '--websiteId [websiteId]'
-      },
-      {
-        option: '--websiteName [websiteName]'
-      },
-      {
-        option: '--asAdmin'
-      }
-    );
-  }
-
-  #initOptionsSets(): void {
-    this.optionSets.push(
-      { options: ['websiteId', 'websiteName'] }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.websiteId && !validation.isValidGuid(args.options.websiteId)) {
-          return `${args.options.websiteId} is not a valid GUID`;
-        }
-        return true;
-      }
-    );
+  public get schema(): z.ZodTypeAny {
+    return options;
   }
 
   private async getWebSiteId(dynamicsApiUrl: string, args: CommandArgs): Promise<any> {
@@ -98,13 +62,13 @@ class PpWebSiteWebLinkListCommand extends PowerPlatformCommand {
 
     const requestOptions: CliRequestOptions = {
       headers: {
-        accept: 'applciation/json;odata.metadata=none'
+        accept: 'application/json;odata.metadata=none'
       },
       responseType: 'json'
     };
 
     if (options.name) {
-      requestOptions.url = `${dynamicsApiUrl}/api/data/v9.2/weblinks?$filter=name eq '${options.name}'&$select=powerpagesiteid`;
+      requestOptions.url = `${dynamicsApiUrl}/api/data/v9.2/powerpagesites?$filter=name eq '${options.name}'&$select=powerpagesiteid`;
       const result = await request.get<{ value: any[] }>(requestOptions);
 
       if (result.value.length === 0) {
@@ -114,23 +78,39 @@ class PpWebSiteWebLinkListCommand extends PowerPlatformCommand {
     }
   }
 
+  private async getwebsitelinksets(dynamicsApiUrl: string, websiteId: string): Promise<any> {
+
+    const requestOptions: CliRequestOptions = {
+      headers: {
+        accept: 'application/json;odata.metadata=none'
+      },
+      responseType: 'json'
+    };
+
+    if (websiteId) {
+      requestOptions.url = `${dynamicsApiUrl}/api/data/v9.2/mspp_weblinksets?$filter=_mspp_websiteid_value eq '${websiteId}'`;
+      const result = await request.get<{ value: any[] }>(requestOptions);
+      if (result.value.length === 0) {
+        throw `The specified website '${websiteId}' does not have links.`;
+      }
+      const weblinksets = result.value.map(linkset => "'" + linkset.mspp_weblinksetid.toString() + "'");
+      return weblinksets.join(',');
+    }
+  }
+
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      await logger.logToStderr(`Retrieving list of webfiles`);
+      await logger.logToStderr(`Retrieving list of weblinks from website ${args.options.websiteId || args.options.websiteName} in environment ${args.options.environmentName}...`);
     }
 
     try {
       const dynamicsApiUrl = await powerPlatform.getDynamicsInstanceApiUrl(args.options.environmentName, args.options.asAdmin);
       const websiteId = await this.getWebSiteId(dynamicsApiUrl, args);
-      console.log(websiteId);
-
+      const weblinksets = await this.getwebsitelinksets(dynamicsApiUrl, websiteId);
       const requestOptions: CliRequestOptions = {
-        //url: `${dynamicsApiUrl}/api/data/v9.2/mspp_webfiles?$filter=_mspp_websiteid_value eq '${websiteId}'`,
-        url: `${dynamicsApiUrl}/api/data/v9.2/mspp_weblinks`,
+        url: `${dynamicsApiUrl}/api/data/v9.2/mspp_weblinks?$filter=Microsoft.Dynamics.CRM.ContainValues(PropertyName=@p1,PropertyValues=@p2)&@p1='mspp_weblinksetid'&@p2=[${weblinksets}]`,
         headers: {
-          accept: `application/json;`,
-          'odata-version': '4.0',
-          prefer: `odata.include-annotations="*"`
+          accept: `application/json;`
         },
         responseType: 'json'
       };

@@ -1,0 +1,133 @@
+import Global from "/docs/cmd/_global.mdx";
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+# pp webiste weblink list
+
+List all weblinks for the specified Power Pages website
+
+## Usage
+
+```sh
+m365 pp webiste weblink list [options]
+```
+
+## Options
+
+```md definition-list
+`-e, --environmentName <environmentName>`
+: The name of the environment where the Power Pages websites are located.
+
+`--websiteId [websiteId]`
+:ID of the Power Pages website. Specify either `websiteId` or `websiteName` but not both.
+
+`--websiteName [websiteName]`
+:The unique name (not the display name) of the Power Pages website. Specify either `websiteId` or `websiteName` but not both.
+
+`--asAdmin`
+: Run the command as admin and retrieve Power Pages websites for environments you do not have explicitly assigned permissions to.
+```
+
+<Global />
+
+## Examples
+
+List all weblinks for the site Contoso
+
+```sh
+m365 pp webiste weblink list --environmentName "Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c" --websiteName "Contoso"
+```
+
+List all weblinks for the site by id as admin
+
+```sh
+m365 pp webiste weblink list --environmentName "Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c" --websiteId "3bbc8102-8ee7-4dac-afbb-807cc5b6f9c2" --asAdmin
+```
+
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+```json
+[
+  {
+    "mspp_weblinkid": "18a5589e-6472-4ed6-90ba-fd51a15325d8",
+    "mspp_name": "Subpage 1",
+    "mspp_disablepagevalidation": false,
+    "mspp_displayimageonly": false,
+    "mspp_displayorder": 1,
+    "mspp_displaypagechildlinks": false,
+    "mspp_openinnewwindow": false,
+    "_mspp_pageid_value": "1a4cbb29-223b-4be2-ae9e-bc281de64b12",
+    "_mspp_publishingstateid_value": "ffefd269-446e-46aa-9379-92d1b2d323b8",
+    "mspp_robotsfollowlink": true,
+    "_mspp_weblinksetid_value": "28ae3dfa-5939-4f79-9373-1665a839a9b2",
+    "_mspp_createdby_value": "5364ffa6-d185-ee11-8179-6045bd0027e0",
+    "_mspp_modifiedby_value": "5364ffa6-d185-ee11-8179-6045bd0027e0",
+    "mspp_modifiedon": "2024-04-12T05:46:47Z",
+    "mspp_createdon": "2024-04-12T05:46:47Z",
+    "statecode": 0,
+    "statuscode": 1,
+    "mspp_description": null,
+    "mspp_imagealttext": null,
+    "mspp_imageurl": null,
+    "mspp_imageheight": null,
+    "mspp_modifiedbyusername": null,
+    "mspp_createdbyipaddress": null,
+    "mspp_createdbyusername": null,
+    "mspp_modifiedbyipaddress": null,
+    "_mspp_parentweblinkid_value": "4ebe880e-33fe-48a9-80f6-37f585207382",
+    "mspp_imagewidth": null,
+    "mspp_externalurl": null
+  }
+]
+```
+
+  </TabItem>
+  <TabItem value="Text">
+
+```text
+mspp_name                mspp_weblinkid                        mspp_description  statecode
+-----------------------  ------------------------------------  ----------------  ---------
+Add Attendee Profile     3ec6cc71-464a-ef11-a317-000d3a3083fa  null              1
+```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+```csv
+mspp_name,mspp_weblinkid,mspp_description,statecode
+Add Attendee Profile,3ec6cc71-464a-ef11-a317-000d3a3083fa,null,1
+```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+```md
+
+
+| Property                          | Value                                |
+| ----------------------------------|------------------------------------- |
+| mspp\_weblinkid                   | 21d71883-3f13-ef11-9f89-000d3a593739 |
+| mspp\_name                        | [Admin] Topics                       |
+| mspp\_disablepagevalidation       | false                                |
+| mspp\_displayimageonly            | false                                |
+| mspp\_displayorder                | 10                                   |
+| mspp\_displaypagechildlinks       | false                                |
+| mspp\_openinnewwindow             | false                                |
+| \_mspp\_pageid\_value             | 6269458f-3f13-ef11-9f89-000d3a593739 |
+| \_mspp\_publishingstateid\_value  | 11d71883-3f13-ef11-9f89-000d3a593739 |
+| mspp\_robotsfollowlink            | true                                 |
+| \_mspp\_weblinksetid\_value       | 3c881389-3f13-ef11-9f89-000d3a593739 |
+| \_mspp\_createdby\_value          | 5364ffa6-d185-ee11-8179-6045bd0027e0 |
+| \_mspp\_modifiedby\_value         | 5364ffa6-d185-ee11-8179-6045bd0027e0 |
+| mspp\_modifiedon                  | 2024-05-16T04:49:11Z                 |
+| mspp\_createdon                   | 2024-05-16T04:48:20Z                 |
+| statecode                         | 0                                    |
+| statuscode                        | 1                                    |
+
+```
+
+  </TabItem>
+</Tabs>
