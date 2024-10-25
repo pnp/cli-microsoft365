@@ -12,14 +12,17 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { cli } from '../../../../cli/cli.js';
 import command from './engage-community-remove.js';
 import { vivaEngage } from '../../../../utils/vivaEngage.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
 
 describe(commands.ENGAGE_COMMUNITY_REMOVE, () => {
   const communityId = 'eyJfdHlwZSI6Ikdyb3VwIiwiaWQiOiI0NzY5MTM1ODIwOSJ9';
   const displayName = 'Software Engineers';
+  const entraGroupId = '0bed8b86-5026-4a93-ac7d-56750cc099f1';
 
   let log: string[];
   let logger: Logger;
   let promptIssued: boolean;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -27,6 +30,7 @@ describe(commands.ENGAGE_COMMUNITY_REMOVE, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
+    commandInfo = cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -53,7 +57,6 @@ describe(commands.ENGAGE_COMMUNITY_REMOVE, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.delete,
-      vivaEngage.getCommunityIdByDisplayName,
       cli.promptForConfirmation
     ]);
   });
@@ -69,6 +72,16 @@ describe(commands.ENGAGE_COMMUNITY_REMOVE, () => {
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
+  });
+
+  it('passes validation when entraGroupId is specified', async () => {
+    const actual = await command.validate({ options: { entraGroupId: '0bed8b86-5026-4a93-ac7d-56750cc099f1' } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('fails validation when entraGroupId is not a valid GUID', async () => {
+    const actual = await command.validate({ options: { entraGroupId: 'foo' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
   });
 
   it('prompts before removing the community when confirm option not passed', async () => {
@@ -98,7 +111,7 @@ describe(commands.ENGAGE_COMMUNITY_REMOVE, () => {
   });
 
   it('removes the community specified by displayName while prompting for confirmation', async () => {
-    sinon.stub(vivaEngage, 'getCommunityIdByDisplayName').resolves(communityId);
+    sinon.stub(vivaEngage, 'getCommunityByDisplayName').resolves({ id: communityId });
 
     const deleteRequestStub = sinon.stub(request, 'delete').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/employeeExperience/communities/${communityId}`) {
@@ -112,6 +125,24 @@ describe(commands.ENGAGE_COMMUNITY_REMOVE, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, { options: { displayName: displayName } });
+    assert(deleteRequestStub.called);
+  });
+
+  it('removes the community specified by Entra group id while prompting for confirmation', async () => {
+    sinon.stub(vivaEngage, 'getCommunityByEntraGroupId').resolves({ id: communityId });
+
+    const deleteRequestStub = sinon.stub(request, 'delete').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/employeeExperience/communities/${communityId}`) {
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
+
+    await command.action(logger, { options: { entraGroupId: entraGroupId } });
     assert(deleteRequestStub.called);
   });
 

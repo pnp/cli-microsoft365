@@ -2,6 +2,7 @@ import GlobalOptions from '../../../../GlobalOptions.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { cli } from '../../../../cli/cli.js';
 import request, { CliRequestOptions } from '../../../../request.js';
+import { validation } from '../../../../utils/validation.js';
 import { vivaEngage } from '../../../../utils/vivaEngage.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
@@ -13,6 +14,7 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   id?: string;
   displayName?: string;
+  entraGroupId?: string;
   force?: boolean
 }
 
@@ -29,6 +31,7 @@ class VivaEngageCommunityRemoveCommand extends GraphCommand {
 
     this.#initTelemetry();
     this.#initOptions();
+    this.#initValidators();
     this.#initOptionSets();
     this.#initTypes();
   }
@@ -38,6 +41,7 @@ class VivaEngageCommunityRemoveCommand extends GraphCommand {
       Object.assign(this.telemetryProperties, {
         id: args.options.id !== 'undefined',
         displayName: args.options.displayName !== 'undefined',
+        entraGroupId: args.options.entraGroupId !== 'undefined',
         force: !!args.options.force
       });
     });
@@ -52,7 +56,22 @@ class VivaEngageCommunityRemoveCommand extends GraphCommand {
         option: '-n, --displayName [displayName]'
       },
       {
+        option: '--entraGroupId [entraGroupId]'
+      },
+      {
         option: '-f, --force'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (args.options.entraGroupId && !validation.isValidGuid(args.options.entraGroupId)) {
+          return `${args.options.entraGroupId} is not a valid GUID for the option 'entraGroupId'.`;
+        }
+
+        return true;
       }
     );
   }
@@ -60,13 +79,13 @@ class VivaEngageCommunityRemoveCommand extends GraphCommand {
   #initOptionSets(): void {
     this.optionSets.push(
       {
-        options: ['id', 'displayName']
+        options: ['id', 'displayName', 'entraGroupId']
       }
     );
   }
 
   #initTypes(): void {
-    this.types.string.push('id', 'displayName');
+    this.types.string.push('id', 'displayName', 'entraGroupId');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -76,7 +95,10 @@ class VivaEngageCommunityRemoveCommand extends GraphCommand {
         let communityId = args.options.id;
 
         if (args.options.displayName) {
-          communityId = await vivaEngage.getCommunityIdByDisplayName(args.options.displayName);
+          communityId = (await vivaEngage.getCommunityByDisplayName(args.options.displayName, ['id'])).id;
+        }
+        else if (args.options.entraGroupId) {
+          communityId = (await vivaEngage.getCommunityByEntraGroupId(args.options.entraGroupId, ['id'])).id;
         }
 
         if (args.options.verbose) {
@@ -101,7 +123,7 @@ class VivaEngageCommunityRemoveCommand extends GraphCommand {
       await removeCommunity();
     }
     else {
-      const result = await cli.promptForConfirmation({ message: `Are you sure you want to remove Viva Engage community '${args.options.id || args.options.displayName}'?` });
+      const result = await cli.promptForConfirmation({ message: `Are you sure you want to remove Viva Engage community '${args.options.id || args.options.displayName || args.options.entraGroupId }'?` });
 
       if (result) {
         await removeCommunity();
