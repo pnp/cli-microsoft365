@@ -4,9 +4,4 @@ export interface Community {
   description?: string;
   privacy?: string;
   groupId?: string;
-}export interface Community {
-  id: string;
-  displayName: string;
-  description: string;
-  privacy: string;
 }
