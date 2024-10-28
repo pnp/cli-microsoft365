@@ -157,3 +157,19 @@
     z-index: 200;
   }
 }
+
+//* Testimonials
+
+:global {
+  .testimonial{
+    
+    .testimonial-quote {
+      text-align: justify;
+    }
+
+    .testimonial-image {
+      text-align: center;
+    }
+
+  }
+}
