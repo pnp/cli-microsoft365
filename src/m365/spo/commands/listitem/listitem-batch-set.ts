@@ -219,7 +219,7 @@ class SpoListItemBatchSetCommand extends SpoCommand {
             actionString += `<Method Name="SetFieldValue" Id="${index += 1}" ObjectPathId="${objectPathId}"><Parameters><Parameter Type="String">${field.InternalName}</Parameter><Parameter Type="Array">${lookupMultiString.join('')}</Parameter></Parameters></Method>`;
             break;
           default:
-            actionString += `<Method Name="ParseAndSetFieldValue" Id="${index += 1}" ObjectPathId="${objectPathId}"><Parameters><Parameter Type="String">${field.InternalName}</Parameter><Parameter Type="String">${(<any>row)[field.InternalName].toString()}</Parameter></Parameters></Method>`;
+            actionString += `<Method Name="ParseAndSetFieldValue" Id="${index += 1}" ObjectPathId="${objectPathId}"><Parameters><Parameter Type="String">${field.InternalName}</Parameter><Parameter Type="String">${formatting.escapeXml((<any>row)[field.InternalName].toString())}</Parameter></Parameters></Method>`;
             break;
         }
       }
