@@ -44,7 +44,7 @@ class TeamsCacheRemoveCommand extends AnonymousCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        client: typeof args.options.client !== 'undefined',
+        client: args.options.client,
         force: !!args.options.force
       });
     });
@@ -105,7 +105,7 @@ class TeamsCacheRemoveCommand extends AnonymousCommand {
   }
 
   private async clearTeamsCache(client: string, logger: Logger): Promise<void> {
-    const filePaths = await this.getTeamsCacheFolderPath(client, logger);
+    const filePaths = await this.getTeamsCacheFolderPaths(client, logger);
 
     let folderExists = true;
     for (const filePath of filePaths) {
@@ -126,7 +126,7 @@ class TeamsCacheRemoveCommand extends AnonymousCommand {
 
   }
 
-  private async getTeamsCacheFolderPath(client: string, logger: Logger): Promise<string[]> {
+  private async getTeamsCacheFolderPaths(client: string, logger: Logger): Promise<string[]> {
     const platform = process.platform;
 
     if (this.verbose) {
@@ -227,7 +227,17 @@ class TeamsCacheRemoveCommand extends AnonymousCommand {
         await logger.logToStderr(cmd);
       }
 
-      await this.exec(cmd);
+      try {
+        await this.exec(cmd);
+      }
+      catch (err: any) {
+        if (err?.stderr?.includes('Operation not permitted')) {
+          await logger.log('Deleting the folder failed. Please have a look at the following URL to delete the folders manually: https://answers.microsoft.com/en-us/msteams/forum/all/clearing-cache-on-microsoft-teams/35876f6b-eb1a-4b77-bed1-02ce3277091f');
+        }
+        else {
+          throw err;
+        }
+      }
     }
   }
 

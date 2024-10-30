@@ -12,7 +12,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './cache-remove.js';
-import os from 'os';
+import os, { homedir } from 'os';
 
 describe(commands.CACHE_REMOVE, () => {
   const processOutput = `ProcessId
@@ -21,6 +21,7 @@ describe(commands.CACHE_REMOVE, () => {
   11352`;
   let log: string[];
   let logger: Logger;
+  let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
 
   before(() => {
@@ -46,6 +47,7 @@ describe(commands.CACHE_REMOVE, () => {
         log.push(msg);
       }
     };
+    loggerLogSpy = sinon.spy(logger, 'log');
 
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
   });
@@ -155,6 +157,37 @@ describe(commands.CACHE_REMOVE, () => {
       throw 'Invalid request';
     });
     await assert.rejects(command.action(logger, { options: { client: 'classic', force: true } } as any), new CommandError('random error'));
+  });
+
+  it('shows error message when exec fails when removing the teams cache folder on mac os', async () => {
+    const deleteError = {
+      code: 1,
+      killed: false,
+      signal: null,
+      cmd: 'rm -r "/Users/John/Library/Group Containers/UBF8T346G9.com.microsoft.teams"',
+      stdout: '',
+      stderr: 'rm: /Users/John/Library/Group Containers/UBF8T346G9.com.microsoft.teams: Operation not permitted\\n'
+    };
+
+    sinon.stub(process, 'platform').value('darwin');
+    sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
+    sinon.stub(process, 'kill' as any).returns(null);
+    sinon.stub(fs, 'existsSync').returns(true);
+
+    sinon.stub(command, 'exec' as any).callsFake(async (opts) => {
+      if (opts === `ps ax | grep MacOS/MSTeams -m 1 | grep -v grep | awk '{ print $1 }'`) {
+        return {};
+      }
+      if (opts === `rm -r "${homedir}/Library/Group Containers/UBF8T346G9.com.microsoft.teams"`) {
+        return;
+      }
+      if (opts === `rm -r "${homedir}/Library/Containers/com.microsoft.teams2"`) {
+        throw deleteError;
+      }
+      throw 'Invalid request';
+    });
+    await command.action(logger, { options: { force: true } } as any);
+    assert(loggerLogSpy.calledWith('Deleting the folder failed. Please have a look at the following URL to delete the folders manually: https://answers.microsoft.com/en-us/msteams/forum/all/clearing-cache-on-microsoft-teams/35876f6b-eb1a-4b77-bed1-02ce3277091f'));
   });
 
   it('removes Teams cache from macOs platform without prompting using classic client', async () => {
