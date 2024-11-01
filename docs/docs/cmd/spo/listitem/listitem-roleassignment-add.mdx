@@ -29,13 +29,19 @@ m365 spo listitem roleassignment add [options]
 : Id of the list item to assign the role to.
 
 `--principalId [principalId]`
-: The SharePoint Id of the principal. It may be either a user id or group id to add a role assignment for. Specify either `upn`, `groupName` or `principalId`.
+: The SharePoint Id of the principal. It may be either a user id or group id to add a role assignment for. Specify either `principalId`, `upn`, `groupName`, `entraGroupId`, or `entraGroupName`.
 
 `--upn [upn]`
-: The upn/email of user to assign role to. Specify either `upn`, `groupName` or `principalId`.
+: The upn/email of user to assign role to. Specify either `principalId`, `upn`, `groupName`, `entraGroupId`, or `entraGroupName`.
 
 `--groupName [groupName]`
-: The group name of the SharePoint group Specify either `upn`, `groupName` or `principalId`.
+: The group name of the SharePoint group. Use this option exclusively for SharePoint Online groups. Specify either `principalId`, `upn`, `groupName`, `entraGroupId`, or `entraGroupName`.
+
+`--entraGroupId [entraGroupId]`
+: ID of the Microsoft Entra group to add. Specify either `principalId`, `upn`, `groupName`, `entraGroupId`, or `entraGroupName`.
+
+`--entraGroupName [entraGroupName]`
+: Display name of the Microsoft Entra group to add. Specify either `principalId`, `upn`, `groupName`, `entraGroupId`, or `entraGroupName`.
 
 `--roleDefinitionId [roleDefinitionId]`
 : ID of role definition. Specify either `roleDefinitionId` or `roleDefinitionName` but not both.
@@ -82,6 +88,12 @@ Add role assignment to specified list item in specified list located in specifie
 
 ```sh
 m365 spo listitem roleassignment add --webUrl "https://contoso.sharepoint.com/sites/project-x" --listTitle "someList" --listItemId 1 --principalId 11 --roleDefinitionName "Full Control"
+```
+
+Add role assignment to specified list item in specified list located in specified site for specified Entra group id and specified role definition name.
+
+```sh
+m365 spo listitem roleassignment add --webUrl "https://contoso.sharepoint.com/sites/project-x" --listTitle "someList" --listItemId 1 --entraGroupId "27ae47f1-48f1-46f3-980b-d3c1470e398d" --roleDefinitionName "Full Control"
 ```
 
 ## Response
