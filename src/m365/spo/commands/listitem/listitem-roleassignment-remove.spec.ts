@@ -14,6 +14,65 @@ import commands from '../../commands.js';
 import spoGroupGetCommand from '../group/group-get.js';
 import spoUserGetCommand from '../user/user-get.js';
 import command from './listitem-roleassignment-remove.js';
+import { entraGroup } from '../../../../utils/entraGroup.js';
+import { spo } from '../../../../utils/spo.js';
+
+const graphGroup = {
+  id: '27ae47f1-48f1-46f3-980b-d3c1470e398d',
+  deletedDateTime: null,
+  classification: null,
+  createdDateTime: '2024-03-22T20:18:37Z',
+  creationOptions: [],
+  description: null,
+  displayName: 'Marketing',
+  expirationDateTime: null,
+  groupTypes: [
+    'Unified'
+  ],
+  isAssignableToRole: null,
+  mail: 'Marketing@milanhdev.onmicrosoft.com',
+  mailEnabled: true,
+  mailNickname: 'Marketing',
+  membershipRule: null,
+  membershipRuleProcessingState: null,
+  onPremisesDomainName: null,
+  onPremisesLastSyncDateTime: null,
+  onPremisesNetBiosName: null,
+  onPremisesSamAccountName: null,
+  onPremisesSecurityIdentifier: null,
+  onPremisesSyncEnabled: null,
+  preferredDataLocation: null,
+  preferredLanguage: null,
+  proxyAddresses: [
+    'SPO:SPO_de7704ba-415d-4dd0-9bbd-fa565007a87e@SPO_18c58817-3bc9-489d-ac63-f7264fb357e5',
+    'SMTP:Marketing@milanhdev.onmicrosoft.com'
+  ],
+  renewedDateTime: '2024-03-22T20:18:37Z',
+  resourceBehaviorOptions: [],
+  resourceProvisioningOptions: [],
+  securityEnabled: true,
+  securityIdentifier: 'S-1-12-1-665733105-1190349041-3268610968-2369326662',
+  theme: null,
+  uniqueName: null,
+  visibility: 'Private',
+  onPremisesProvisioningErrors: [],
+  serviceProvisioningErrors: []
+};
+
+const entraGroupResponse = {
+  Id: 15,
+  IsHiddenInUI: false,
+  LoginName: 'c:0o.c|federateddirectoryclaimprovider|27ae47f1-48f1-46f3-980b-d3c1470e398d',
+  Title: 'Marketing members',
+  PrincipalType: 1,
+  Email: '',
+  Expiration: '',
+  IsEmailAuthenticationGuestUser: false,
+  IsShareByEmailGuestUser: false,
+  IsSiteAdmin: false,
+  UserId: null,
+  UserPrincipalName: null
+};
 
 describe(commands.LISTITEM_ROLEASSIGNMENT_REMOVE, () => {
   let log: any[];
@@ -57,7 +116,10 @@ describe(commands.LISTITEM_ROLEASSIGNMENT_REMOVE, () => {
     sinonUtil.restore([
       request.post,
       cli.executeCommandWithOutput,
-      cli.promptForConfirmation
+      cli.promptForConfirmation,
+      entraGroup.getGroupById,
+      entraGroup.getGroupByDisplayName,
+      spo.ensureEntraGroup
     ]);
   });
 
@@ -111,6 +173,16 @@ describe(commands.LISTITEM_ROLEASSIGNMENT_REMOVE, () => {
 
   it('passes validation if the principalId option is a number', async () => {
     const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', listItemId: 1, principalId: 11 } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('fails validation if the entraGroupId option is not a valid GUID', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', listItemId: 1, entraGroupId: 'invalid' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('passes validation if the entraGroupId option is a valid GUID', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', listItemId: 1, entraGroupId: '37455d5c-e466-4e49-8eba-808b5acec21b' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
@@ -203,6 +275,56 @@ describe(commands.LISTITEM_ROLEASSIGNMENT_REMOVE, () => {
         listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF',
         listItemId: 1,
         upn: 'someaccount@tenant.onmicrosoft.com',
+        force: true
+      }
+    });
+  });
+
+  it('removes role assignment from list item get list by Entra group ID', async () => {
+    sinon.stub(entraGroup, 'getGroupById').withArgs(graphGroup.id).resolves(graphGroup);
+    sinon.stub(spo, 'ensureEntraGroup').withArgs('https://contoso.sharepoint.com', graphGroup).resolves(entraGroupResponse);
+
+
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if ((opts.url as string).indexOf('/_api/web/lists(guid\'0CD891EF-AFCE-4E55-B836-FCE03286CCCF\')/items(1)/roleassignments/removeroleassignment(principalid=\'15\')') > -1) {
+        return '';
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options: {
+        debug: true,
+        webUrl: 'https://contoso.sharepoint.com',
+        listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF',
+        listItemId: 1,
+        entraGroupId: '27ae47f1-48f1-46f3-980b-d3c1470e398d',
+        force: true
+      }
+    });
+  });
+
+  it('removes role assignment from list item get list by Entra group name', async () => {
+    sinon.stub(entraGroup, 'getGroupByDisplayName').withArgs(graphGroup.displayName).resolves(graphGroup);
+    sinon.stub(spo, 'ensureEntraGroup').withArgs('https://contoso.sharepoint.com', graphGroup).resolves(entraGroupResponse);
+
+
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if ((opts.url as string).indexOf('/_api/web/lists(guid\'0CD891EF-AFCE-4E55-B836-FCE03286CCCF\')/items(1)/roleassignments/removeroleassignment(principalid=\'15\')') > -1) {
+        return '';
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options: {
+        debug: true,
+        webUrl: 'https://contoso.sharepoint.com',
+        listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF',
+        listItemId: 1,
+        entraGroupName: 'Marketing',
         force: true
       }
     });
