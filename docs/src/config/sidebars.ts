@@ -1828,6 +1828,15 @@ const sidebars: SidebarsConfig = {
               id: 'cmd/pp/tenant/tenant-settings-set'
             }
           ]
+        },
+        {
+          website: [
+            {
+              type: 'doc',
+              label: 'website get',
+              id: 'cmd/pp/website/website-get'
+            }
+          ]
         }
       ]
     },
