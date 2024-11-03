@@ -1,3 +1,4 @@
+import { Group } from '@microsoft/microsoft-graph-types';
 import { cli, CommandOutput } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import Command from '../../../../Command.js';
@@ -10,6 +11,8 @@ import spoGroupGetCommand, { Options as SpoGroupGetCommandOptions } from '../gro
 import spoRoleDefinitionListCommand, { Options as SpoRoleDefinitionListCommandOptions } from '../roledefinition/roledefinition-list.js';
 import { RoleDefinition } from '../roledefinition/RoleDefinition.js';
 import spoUserGetCommand, { Options as SpoUserGetCommandOptions } from '../user/user-get.js';
+import { entraGroup } from '../../../../utils/entraGroup.js';
+import { spo } from '../../../../utils/spo.js';
 
 interface CommandArgs {
   options: Options;
@@ -20,6 +23,8 @@ interface Options extends GlobalOptions {
   principalId?: number;
   upn?: string;
   groupName?: string;
+  entraGroupId?: string;
+  entraGroupName?: string;
   roleDefinitionId?: number;
   roleDefinitionName?: string;
 }
@@ -48,6 +53,8 @@ class SpoWebRoleAssignmentAddCommand extends SpoCommand {
         principalId: typeof args.options.principalId !== 'undefined',
         upn: typeof args.options.upn !== 'undefined',
         groupName: typeof args.options.groupName !== 'undefined',
+        entraGroupId: typeof args.options.entraGroupId !== 'undefined',
+        entraGroupName: typeof args.options.entraGroupName !== 'undefined',
         roleDefinitionId: typeof args.options.roleDefinitionId !== 'undefined',
         roleDefinitionName: typeof args.options.roleDefinitionName !== 'undefined'
       });
@@ -67,6 +74,12 @@ class SpoWebRoleAssignmentAddCommand extends SpoCommand {
       },
       {
         option: '--groupName [groupName]'
+      },
+      {
+        option: '--entraGroupId [entraGroupId]'
+      },
+      {
+        option: '--entraGroupName [entraGroupName]'
       },
       {
         option: '--roleDefinitionId [roleDefinitionId]'
@@ -93,6 +106,10 @@ class SpoWebRoleAssignmentAddCommand extends SpoCommand {
           return `Specified roleDefinitionId ${args.options.roleDefinitionId} is not a number`;
         }
 
+        if (args.options.entraGroupId && !validation.isValidGuid(args.options.entraGroupId)) {
+          return `'${args.options.entraGroupId}' is not a valid GUID for option entraGroupId.`;
+        }
+
         return true;
       }
     );
@@ -100,7 +117,7 @@ class SpoWebRoleAssignmentAddCommand extends SpoCommand {
 
   #initOptionSets(): void {
     this.optionSets.push(
-      { options: ['principalId', 'upn', 'groupName'] },
+      { options: ['principalId', 'upn', 'groupName', 'entraGroupId', 'entraGroupName'] },
       { options: ['roleDefinitionId', 'roleDefinitionName'] }
     );
   }
@@ -115,15 +132,29 @@ class SpoWebRoleAssignmentAddCommand extends SpoCommand {
 
       if (args.options.upn) {
         args.options.principalId = await this.getUserPrincipalId(args.options);
-        await this.addRoleAssignment(logger, args.options);
       }
       else if (args.options.groupName) {
         args.options.principalId = await this.getGroupPrincipalId(args.options);
-        await this.addRoleAssignment(logger, args.options);
       }
-      else {
-        await this.addRoleAssignment(logger, args.options);
+      else if (args.options.entraGroupId || args.options.entraGroupName) {
+        if (this.verbose) {
+          await logger.logToStderr('Retrieving group information...');
+        }
+
+        let group: Group;
+        if (args.options.entraGroupId) {
+          group = await entraGroup.getGroupById(args.options.entraGroupId);
+        }
+        else {
+          group = await entraGroup.getGroupByDisplayName(args.options.entraGroupName!);
+        }
+
+        const siteUser = await spo.ensureEntraGroup(args.options.webUrl, group);
+        args.options.principalId = siteUser.Id;
       }
+
+      await this.addRoleAssignment(logger, args.options);
+
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);

@@ -15,6 +15,65 @@ import spoGroupGetCommand from '../group/group-get.js';
 import spoRoleDefinitionListCommand from '../roledefinition/roledefinition-list.js';
 import spoUserGetCommand from '../user/user-get.js';
 import command from './web-roleassignment-add.js';
+import { entraGroup } from '../../../../utils/entraGroup.js';
+import { spo } from '../../../../utils/spo.js';
+
+const graphGroup = {
+  id: '27ae47f1-48f1-46f3-980b-d3c1470e398d',
+  deletedDateTime: null,
+  classification: null,
+  createdDateTime: '2024-03-22T20:18:37Z',
+  creationOptions: [],
+  description: null,
+  displayName: 'Marketing',
+  expirationDateTime: null,
+  groupTypes: [
+    'Unified'
+  ],
+  isAssignableToRole: null,
+  mail: 'Marketing@contoso.onmicrosoft.com',
+  mailEnabled: true,
+  mailNickname: 'Marketing',
+  membershipRule: null,
+  membershipRuleProcessingState: null,
+  onPremisesDomainName: null,
+  onPremisesLastSyncDateTime: null,
+  onPremisesNetBiosName: null,
+  onPremisesSamAccountName: null,
+  onPremisesSecurityIdentifier: null,
+  onPremisesSyncEnabled: null,
+  preferredDataLocation: null,
+  preferredLanguage: null,
+  proxyAddresses: [
+    'SPO:SPO_de7704ba-415d-4dd0-9bbd-fa565007a87e@SPO_18c58817-3bc9-489d-ac63-f7264fb357e5',
+    'SMTP:Marketing@contoso.onmicrosoft.com'
+  ],
+  renewedDateTime: '2024-03-22T20:18:37Z',
+  resourceBehaviorOptions: [],
+  resourceProvisioningOptions: [],
+  securityEnabled: true,
+  securityIdentifier: 'S-1-12-1-665733105-1190349041-3268610968-2369326662',
+  theme: null,
+  uniqueName: null,
+  visibility: 'Private',
+  onPremisesProvisioningErrors: [],
+  serviceProvisioningErrors: []
+};
+
+const entraGroupResponse = {
+  Id: 11,
+  IsHiddenInUI: false,
+  LoginName: 'c:0o.c|federateddirectoryclaimprovider|27ae47f1-48f1-46f3-980b-d3c1470e398d',
+  Title: 'Marketing members',
+  PrincipalType: 1,
+  Email: '',
+  Expiration: '',
+  IsEmailAuthenticationGuestUser: false,
+  IsShareByEmailGuestUser: false,
+  IsSiteAdmin: false,
+  UserId: null,
+  UserPrincipalName: null
+};
 
 describe(commands.WEB_ROLEASSIGNMENT_ADD, () => {
   let log: any[];
@@ -48,7 +107,10 @@ describe(commands.WEB_ROLEASSIGNMENT_ADD, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.post,
-      cli.executeCommandWithOutput
+      cli.executeCommandWithOutput,
+      entraGroup.getGroupById,
+      entraGroup.getGroupByDisplayName,
+      spo.ensureEntraGroup
     ]);
   });
 
@@ -92,6 +154,17 @@ describe(commands.WEB_ROLEASSIGNMENT_ADD, () => {
 
   it('passes validation if the roleDefinitionId option is a number', async () => {
     const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', principalId: 11, roleDefinitionId: 1073741827 } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+
+  it('fails validation if the entaGroupId is not a valid guid', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', entraGroupId: 'invalid', roleDefinitionId: '1073741827' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('passes validation if the entaGroupId is a valid guid', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', entraGroupId: '27ae47f1-48f1-46f3-980b-d3c1470e398d', roleDefinitionId: 1073741827 } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
@@ -253,6 +326,52 @@ describe(commands.WEB_ROLEASSIGNMENT_ADD, () => {
         webUrl: 'https://contoso.sharepoint.com',
         principalId: 11,
         roleDefinitionName: 'Full Control'
+      }
+    });
+  });
+
+  it('adds role assignment on web by role definition id and Entra group ID', async () => {
+    sinon.stub(entraGroup, 'getGroupById').withArgs(graphGroup.id).resolves(graphGroup);
+    sinon.stub(spo, 'ensureEntraGroup').withArgs('https://contoso.sharepoint.com', graphGroup).resolves(entraGroupResponse);
+
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if ((opts.url as string).indexOf('_api/web/roleassignments/addroleassignment(principalid=\'11\',roledefid=\'1073741827\')') > -1) {
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options: {
+        debug: true,
+        webUrl: 'https://contoso.sharepoint.com',
+        entraGroupId: '27ae47f1-48f1-46f3-980b-d3c1470e398d',
+        principalId: 11,
+        roleDefinitionId: 1073741827
+      }
+    });
+  });
+
+  it('adds role assignment on web by role definition id and Entra group name', async () => {
+    sinon.stub(entraGroup, 'getGroupByDisplayName').withArgs(graphGroup.displayName).resolves(graphGroup);
+    sinon.stub(spo, 'ensureEntraGroup').withArgs('https://contoso.sharepoint.com', graphGroup).resolves(entraGroupResponse);
+
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if ((opts.url as string).indexOf('_api/web/roleassignments/addroleassignment(principalid=\'11\',roledefid=\'1073741827\')') > -1) {
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options: {
+        debug: true,
+        webUrl: 'https://contoso.sharepoint.com',
+        entraGroupName: 'Marketing',
+        principalId: 11,
+        roleDefinitionId: 1073741827
       }
     });
   });
