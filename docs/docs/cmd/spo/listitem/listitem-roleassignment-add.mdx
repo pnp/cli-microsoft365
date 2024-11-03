@@ -29,13 +29,13 @@ m365 spo listitem roleassignment add [options]
 : Id of the list item to assign the role to.
 
 `--principalId [principalId]`
-: The SharePoint Id of the principal. It may be either a user id or group id to add a role assignment for. Specify either `upn`, `groupName` or `principalId`.
+: The SharePoint Id of the principal. It may be either a user id or group id to add a role assignment for. Specify either `principalId`, `upn`, `groupName`, `entraGroupId`, or `entraGroupName`.
 
 `--upn [upn]`
-: The upn/email of user to assign role to. Specify either `upn`, `groupName` or `principalId`.
+: The upn/email of user to assign role to. Specify either `principalId`, `upn`, `groupName`, `entraGroupId`, or `entraGroupName`.
 
 `--groupName [groupName]`
-: The group name of the SharePoint group. Use this option exclusively for SharePoint Online groups. Specify either `upn`, `groupName` or `principalId`.
+: The group name of the SharePoint group. Use this option exclusively for SharePoint Online groups. Specify either `principalId`, `upn`, `groupName`, `entraGroupId`, or `entraGroupName`.
 
 `--entraGroupId [entraGroupId]`
 : ID of the Microsoft Entra group to add. Specify either `principalId`, `upn`, `groupName`, `entraGroupId`, or `entraGroupName`.

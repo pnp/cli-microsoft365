@@ -32,7 +32,7 @@ const graphGroup = {
     'Unified'
   ],
   isAssignableToRole: null,
-  mail: 'Marketing@milanhdev.onmicrosoft.com',
+  mail: 'Marketing@contoso.onmicrosoft.com',
   mailEnabled: true,
   mailNickname: 'Marketing',
   membershipRule: null,
@@ -47,7 +47,7 @@ const graphGroup = {
   preferredLanguage: null,
   proxyAddresses: [
     'SPO:SPO_de7704ba-415d-4dd0-9bbd-fa565007a87e@SPO_18c58817-3bc9-489d-ac63-f7264fb357e5',
-    'SMTP:Marketing@milanhdev.onmicrosoft.com'
+    'SMTP:Marketing@contoso.onmicrosoft.com'
   ],
   renewedDateTime: '2024-03-22T20:18:37Z',
   resourceBehaviorOptions: [],

@@ -29,13 +29,13 @@ m365 spo listitem roleassignment remove [options]
 : Id of the list item to remove the role from.
 
 `--principalId [principalId]`
-: SharePoint ID of principal it may be either user id or group id we want to remove permissions. Specify either `principalId`, `upn`, or `groupName` but not multiple.
+: SharePoint ID of principal it may be either user id or group id we want to remove permissions. Specify either `principalId`, `upn`, `groupName`, `entraGroupId`, or `entraGroupName`.
 
 `--upn [upn]`
-: The upn/email of user. Specify either `principalId`, `upn`, or `groupName` but not multiple.
+: The upn/email of user. Specify either `principalId`, `upn`, `groupName`, `entraGroupId`, or `entraGroupName`.
 
 `--groupName [groupName]`
-: The group name of the SharePoint group. Use this option exclusively for SharePoint Online groups. Specify either `principalId`, `upn`, or `groupName` but not multiple.
+: The group name of the SharePoint group. Use this option exclusively for SharePoint Online groups. Specify either `principalId`, `upn`, `groupName`, `entraGroupId`, or `entraGroupName`.
 
 `--entraGroupId [entraGroupId]`
 : ID of the Microsoft Entra group to remove. Specify either `principalId`, `upn`, `groupName`, `entraGroupId`, or `entraGroupName`.
