@@ -32,6 +32,7 @@ interface Options extends GlobalOptions {
   useLightText?: boolean;
   overlayColor?: string;
   overlayOpacity?: number;
+  collapsibleTitle?: string;
 }
 
 class SpoPageSectionAddCommand extends SpoCommand {
@@ -74,7 +75,8 @@ class SpoPageSectionAddCommand extends SpoCommand {
         fillMode: typeof args.options.fillMode !== 'undefined',
         useLightText: !!args.options.useLightText,
         overlayColor: typeof args.options.overlayColor !== 'undefined',
-        overlayOpacity: typeof args.options.overlayOpacity !== 'undefined'
+        overlayOpacity: typeof args.options.overlayOpacity !== 'undefined',
+        collapsibleTitle: typeof args.options.collapsibleTitle !== 'undefined'
       });
     });
   }
@@ -138,6 +140,9 @@ class SpoPageSectionAddCommand extends SpoCommand {
       },
       {
         option: '--overlayOpacity [overlayOpacity]'
+      },
+      {
+        option: '--collapsibleTitle [collapsibleTitle]'
       }
     );
   }
@@ -214,7 +219,7 @@ class SpoPageSectionAddCommand extends SpoCommand {
   }
 
   #initTypes(): void {
-    this.types.string = ['pageName', 'webUrl', 'sectionTemplate', 'zoneEmphasis', 'iconAlignment', 'gradientText', 'imageUrl', 'fillMode', 'overlayColor'];
+    this.types.string = ['pageName', 'webUrl', 'sectionTemplate', 'zoneEmphasis', 'iconAlignment', 'gradientText', 'imageUrl', 'fillMode', 'overlayColor', 'collapsibleTitle'];
     this.types.boolean = ['isLayoutReflowOnTop', 'isCollapsibleSection', 'showDivider', 'isExpanded', 'useLightText'];
   }
 
@@ -368,7 +373,7 @@ class SpoPageSectionAddCommand extends SpoCommand {
   }
 
   private getColumn(zoneIndex: number, sectionIndex: number, sectionFactor: number, args: CommandArgs, zoneId?: string): Control {
-    const { zoneEmphasis, isCollapsibleSection, isExpanded, showDivider, iconAlignment } = args.options;
+    const { zoneEmphasis, isCollapsibleSection, isExpanded, showDivider, iconAlignment, collapsibleTitle } = args.options;
     const columnValue: Control = {
       displayMode: 2,
       position: {
@@ -393,7 +398,8 @@ class SpoPageSectionAddCommand extends SpoCommand {
         type: 1,
         isExpanded: !!isExpanded,
         showDividerLine: !!showDivider,
-        iconAlignment: iconAlignment && iconAlignment.toLocaleLowerCase() === "right" ? "right" : "left"
+        iconAlignment: iconAlignment && iconAlignment.toLocaleLowerCase() === "right" ? "right" : "left",
+        displayName: collapsibleTitle
       };
     }
 
