@@ -66,6 +66,9 @@ m365 spo page section add [options]
 
 `--overlayOpacity [overlayOpacity]`	
 : The overlay opacity for the background. Applied only when `zoneEmphasis` is `Image` or `Gradient`. Sets `60` value if not specified.
+
+`--collapsibleTitle [collapsibleTitle]`	
+: The display name of the collapsible section
 ```
 
 <Global />
@@ -100,7 +103,13 @@ Add Vertical section with background shading to the modern page with adjusting t
 m365 spo page section add --pageName home.aspx --webUrl https://contoso.sharepoint.com/sites/newsletter --sectionTemplate Vertical --zoneEmphasis Neutral --isLayoutReflowOnTop
 ```
 
-Add OneColumn section as a collapsible section as expanded with icon alligned to the left
+Add One Column section as a collapsible section with title
+
+```sh
+m365 spo page section add --pageName home.aspx --webUrl https://contoso.sharepoint.com/sites/newsletter --sectionTemplate OneColumn --isCollapsibleSection --collapsibleTitle "Collapsible Section Title"
+```
+
+Add OneColumn section as a collapsible section as expanded with icon aligned to the left
 
 ```sh
 m365 spo page section add --pageName home.aspx --webUrl https://contoso.sharepoint.com/sites/newsletter --sectionTemplate OneColumn --isCollapsibleSection --isExpanded --iconAlignment Left
