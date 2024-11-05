@@ -50,8 +50,9 @@ class LoginCommand extends Command {
 
   public getRefinedSchema(schema: typeof options): z.ZodEffects<any> | undefined {
     return schema
-      .refine(options => typeof options.appId !== 'undefined' || cli.getConfig().get(settingsNames.clientId), {
-        message: `appId is required. TIP: use the "m365 setup" command to configure the default appId`
+      .refine(options => typeof options.appId !== 'undefined' || cli.getClientId(), {
+        message: `appId is required. TIP: use the "m365 setup" command to configure the default appId`,
+        path: ['appId']
       })
       .refine(options => options.authType !== 'password' || options.userName, {
         message: 'Username is required when using password authentication',
