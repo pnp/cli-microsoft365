@@ -87,7 +87,7 @@ describe(commands.DOCTOR, () => {
   });
 
   it('passes all checks for SPFx v1.11 project when all requirements met', async () => {
-    const sandbox = sinon.createSandbox();
+    sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v10.22.0');
     sinon.stub(child_process, 'exec').callsFake((file, callback: any) => {
       const packageName: string = file.split(' ')[2];
@@ -119,7 +119,7 @@ describe(commands.DOCTOR, () => {
   });
 
   it('passes all checks for SPFx v1.11 project when all requirements met (debug)', async () => {
-    const sandbox = sinon.createSandbox();
+    sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v10.18.0');
     sinon.stub(child_process, 'exec').callsFake((file, callback: any) => {
       const packageName: string = file.split(' ')[2];
@@ -151,7 +151,7 @@ describe(commands.DOCTOR, () => {
   });
 
   it('passes all checks for SPFx v1.11 generator installed locally when all requirements met (debug)', async () => {
-    const sandbox = sinon.createSandbox();
+    sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v10.18.0');
     sinon.stub(child_process, 'exec').callsFake((file, callback: any) => {
       const args = file.split(' ');
@@ -187,7 +187,7 @@ describe(commands.DOCTOR, () => {
   });
 
   it('passes all checks for SPFx v1.11 generator installed globally when all requirements met', async () => {
-    const sandbox = sinon.createSandbox();
+    sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v10.18.0');
     sinon.stub(child_process, 'exec').callsFake((file, callback: any) => {
       const args = file.split(' ');
@@ -223,7 +223,7 @@ describe(commands.DOCTOR, () => {
   });
 
   it('passes all checks for SPFx v1.11 generator installed locally when all requirements met', async () => {
-    const sandbox = sinon.createSandbox();
+    sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v10.18.0');
     sinon.stub(child_process, 'exec').callsFake((file, callback: any) => {
       const args = file.split(' ');
@@ -259,7 +259,7 @@ describe(commands.DOCTOR, () => {
   });
 
   it('passes all checks for SPFx v1.10 project when all requirements met', async () => {
-    const sandbox = sinon.createSandbox();
+    sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v10.18.0');
     sinon.stub(child_process, 'exec').callsFake((file, callback: any) => {
       const packageName: string = file.split(' ')[2];
@@ -291,7 +291,7 @@ describe(commands.DOCTOR, () => {
   });
 
   it('passes all checks for SPFx v1.10 project when all requirements met (debug)', async () => {
-    const sandbox = sinon.createSandbox();
+    sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v10.18.0');
     sinon.stub(child_process, 'exec').callsFake((file, callback: any) => {
       const packageName: string = file.split(' ')[2];
@@ -323,7 +323,7 @@ describe(commands.DOCTOR, () => {
   });
 
   it('passes all checks for SPFx v1.10 generator installed locally when all requirements met', async () => {
-    const sandbox = sinon.createSandbox();
+    sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v10.18.0');
     sinon.stub(child_process, 'exec').callsFake((file, callback: any) => {
       const args = file.split(' ');
@@ -359,7 +359,7 @@ describe(commands.DOCTOR, () => {
   });
 
   it('passes all checks for SPFx v1.10 generator installed locally when all requirements met (debug)', async () => {
-    const sandbox = sinon.createSandbox();
+    sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v10.18.0');
     sinon.stub(child_process, 'exec').callsFake((file, callback: any) => {
       const args = file.split(' ');
@@ -395,7 +395,7 @@ describe(commands.DOCTOR, () => {
   });
 
   it('passes all checks for SPFx v1.10 generator installed globally when all requirements met', async () => {
-    const sandbox = sinon.createSandbox();
+    sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v10.18.0');
     sinon.stub(child_process, 'exec').callsFake((file, callback: any) => {
       const args = file.split(' ');
@@ -431,7 +431,7 @@ describe(commands.DOCTOR, () => {
   });
 
   it('passes all checks for SPFx v1.11 generator installed globally, SPFx version specified through args, when all requirements met', async () => {
-    const sandbox = sinon.createSandbox();
+    sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v10.18.0');
     sinon.stub(child_process, 'exec').callsFake((file, callback: any) => {
       const args = file.split(' ');
@@ -644,7 +644,7 @@ describe(commands.DOCTOR, () => {
   });
 
   it('passes Node check when version meets single range prerequisite', async () => {
-    const sandbox = sinon.createSandbox();
+    sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v10.18.0');
     sinon.stub(child_process, 'exec').callsFake((file, callback: any) => {
       const packageName: string = file.split(' ')[2];
@@ -663,7 +663,7 @@ describe(commands.DOCTOR, () => {
   });
 
   it('passes Node check when version meets double range prerequisite', async () => {
-    const sandbox = sinon.createSandbox();
+    sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v8.0.0');
     sinon.stub(child_process, 'exec').callsFake((file, callback: any) => {
       const packageName: string = file.split(' ')[2];
@@ -682,7 +682,7 @@ describe(commands.DOCTOR, () => {
   });
 
   it('fails Node check when version does not meet single range prerequisite', async () => {
-    const sandbox = sinon.createSandbox();
+    sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v12.0.0');
     sinon.stub(child_process, 'exec').callsFake((file, callback: any) => {
       const packageName: string = file.split(' ')[2];
@@ -702,7 +702,7 @@ describe(commands.DOCTOR, () => {
   });
 
   it('fails Node check when version does not meet double range prerequisite', async () => {
-    const sandbox = sinon.createSandbox();
+    sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v12.0.0');
     sinon.stub(child_process, 'exec').callsFake((file, callback: any) => {
       const packageName: string = file.split(' ')[2];
@@ -722,7 +722,7 @@ describe(commands.DOCTOR, () => {
   });
 
   it('fails with friendly error message when npm not found', async () => {
-    const sandbox = sinon.createSandbox();
+    sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v10.0.0');
     sinon.stub(child_process, 'exec').callsFake((file, callback: any) => {
       callback(new Error(`${file} ENOENT`));
@@ -800,7 +800,7 @@ describe(commands.DOCTOR, () => {
   });
 
   it('passes yo check when yo found', async () => {
-    const sandbox = sinon.createSandbox();
+    sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v10.18.0');
     sinon.stub(child_process, 'exec').callsFake((file, callback: any) => {
       const packageName: string = file.split(' ')[2];
@@ -822,7 +822,7 @@ describe(commands.DOCTOR, () => {
   });
 
   it('fails yo check when yo not found', async () => {
-    const sandbox = sinon.createSandbox();
+    sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v10.18.0');
     sinon.stub(child_process, 'exec').callsFake((file, callback: any) => {
       const packageName: string = file.split(' ')[2];
@@ -842,7 +842,7 @@ describe(commands.DOCTOR, () => {
   });
 
   it('fails yo check when yo not found and logs error object', async () => {
-    const sandbox = sinon.createSandbox();
+    sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v10.18.0');
     sinon.stub(child_process, 'exec').callsFake((file, callback: any) => {
       const packageName: string = file.split(' ')[2];
@@ -864,7 +864,7 @@ describe(commands.DOCTOR, () => {
   });
 
   it('passes gulp-cli check when gulp-cli found', async () => {
-    const sandbox = sinon.createSandbox();
+    sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v10.18.0');
 
     sinon.stub(child_process, 'exec').callsFake((file, callback: any) => {
@@ -887,7 +887,7 @@ describe(commands.DOCTOR, () => {
   });
 
   it('fails gulp-cli check when gulp-cli not found', async () => {
-    const sandbox = sinon.createSandbox();
+    sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v10.18.0');
 
     sinon.stub(child_process, 'exec').callsFake((file, callback: any) => {
@@ -908,7 +908,7 @@ describe(commands.DOCTOR, () => {
   });
 
   it('fails gulp check when gulp is found', async () => {
-    const sandbox = sinon.createSandbox();
+    sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v10.18.0');
     sinon.stub(child_process, 'exec').callsFake((file, callback: any) => {
       const packageName: string = file.split(' ')[2];
@@ -931,7 +931,7 @@ describe(commands.DOCTOR, () => {
   });
 
   it('passes typescript check when typescript not found', async () => {
-    const sandbox = sinon.createSandbox();
+    sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v10.18.0');
     sinon.stub(child_process, 'exec').callsFake((file, callback: any) => {
       const packageName: string = file.split(' ')[2];
@@ -953,7 +953,7 @@ describe(commands.DOCTOR, () => {
   });
 
   it('fails typescript check when typescript found', async () => {
-    const sandbox = sinon.createSandbox();
+    sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v10.18.0');
     sinon.stub(child_process, 'exec').callsFake((file, callback: any) => {
       const packageName: string = file.split(' ')[2];
@@ -976,7 +976,7 @@ describe(commands.DOCTOR, () => {
   });
 
   it('returns error when used with an unsupported version of spfx', async () => {
-    const sandbox = sinon.createSandbox();
+    sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v10.18.0');
     sinon.stub(child_process, 'exec').callsFake((file, callback: any) => {
       const packageName: string = file.split(' ')[2];
@@ -994,7 +994,7 @@ describe(commands.DOCTOR, () => {
   });
 
   it('uses alternative symbols for win32', async () => {
-    const sandbox = sinon.createSandbox();
+    sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v10.18.0');
     sandbox.stub(process, 'platform').value('win32');
     if (process.env.CI) {
