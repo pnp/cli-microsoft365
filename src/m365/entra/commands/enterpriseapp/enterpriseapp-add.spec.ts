@@ -68,6 +68,11 @@ describe(commands.ENTERPRISEAPP_ADD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
+  it('defines correct alias', () => {
+    const alias = command.alias();
+    assert.deepStrictEqual(alias, [commands.SP_ADD]);
+  });
+
   it('fails validation if neither the id, displayName, nor objectId option specified', async () => {
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
       if (settingName === settingsNames.prompt) {

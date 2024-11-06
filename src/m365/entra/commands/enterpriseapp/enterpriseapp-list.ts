@@ -26,6 +26,10 @@ class EntraEnterpriseAppListCommand extends GraphCommand {
     return 'Lists the enterprise applications (or service principals) in Entra ID';
   }
 
+  public alias(): string[] | undefined {
+    return [commands.SP_LIST];
+  }
+
   constructor() {
     super();
 

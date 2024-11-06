@@ -134,6 +134,11 @@ describe(commands.ENTERPRISEAPP_LIST, () => {
     assert.notStrictEqual(command.description, null);
   });
 
+  it('defines correct alias', () => {
+    const alias = command.alias();
+    assert.deepStrictEqual(alias, [commands.SP_LIST]);
+  });
+
   it('defines correct properties for the default output', () => {
     assert.deepStrictEqual(command.defaultProperties(), ['appId', 'displayName', 'tag']);
   });
