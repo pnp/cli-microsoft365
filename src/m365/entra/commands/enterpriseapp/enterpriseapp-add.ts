@@ -26,6 +26,10 @@ class EntraEnterpriseAppAddCommand extends GraphCommand {
     return 'Creates an enterprise application (or service principal) for a registered Entra app';
   }
 
+  public alias(): string[] | undefined {
+    return [commands.SP_ADD];
+  }
+
   constructor() {
     super();
 
