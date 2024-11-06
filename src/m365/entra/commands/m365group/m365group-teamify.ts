@@ -73,7 +73,7 @@ class EntraM365GroupTeamifyCommand extends GraphCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push({ options: ['id', 'dispalyName', 'mailNickname'] });
+    this.optionSets.push({ options: ['id', 'displayName', 'mailNickname'] });
   }
 
   #initTypes(): void {
