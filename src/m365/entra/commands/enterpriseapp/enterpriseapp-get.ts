@@ -26,6 +26,10 @@ class EntraEnterpriseAppGetCommand extends GraphCommand {
     return 'Gets information about an Enterprise Application';
   }
 
+  public alias(): string[] | undefined {
+    return [commands.SP_GET];
+  }
+
   constructor() {
     super();
 
