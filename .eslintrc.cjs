@@ -32,6 +32,7 @@ const dictionary = [
   'customizer',
   'dataverse',
   'default',
+  'definition',
   'dev',
   'details',
   'eligibility',
