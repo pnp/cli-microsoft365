@@ -156,11 +156,10 @@ export const urlUtil = {
    */
   getAbsoluteUrl(webUrl: string, serverRelativeUrl: string): string {
     const parsedUrl = new URL(webUrl);
-    const tenantUrl: string = `${parsedUrl.protocol}//${parsedUrl.hostname}`;
     if (serverRelativeUrl[0] !== '/') {
       serverRelativeUrl = `/${serverRelativeUrl}`;
     }
-    return `${tenantUrl}${serverRelativeUrl}`;
+    return `${parsedUrl.origin}${serverRelativeUrl}`;
   },
 
   /**
@@ -232,10 +231,9 @@ export const urlUtil = {
   },
 
   getUrlRelativePath(url: string): string {
-    if (url.indexOf('://') > 0 || url.indexOf('//') === 0) {
+    if (url.includes('://')) {
       const parsedUrl = new URL(url);
-      const tenantUrl: string = `${parsedUrl.protocol}//${parsedUrl.hostname}`;
-      return url.substring(tenantUrl.length);
+      return url.substring(parsedUrl.origin.length);
     }
     return url;
   }
