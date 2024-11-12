@@ -25,7 +25,7 @@ interface CommandArgs {
   options: Options;
 }
 
-class PpWebsiteListCommand extends PowerPlatformCommand {
+class PpWebsiteGetCommand extends PowerPlatformCommand {
   public get name(): string {
     return commands.WEBSITE_GET;
   }
@@ -74,4 +74,4 @@ class PpWebsiteListCommand extends PowerPlatformCommand {
   }
 }
 
-export default new PpWebsiteListCommand();
+export default new PpWebsiteGetCommand();
