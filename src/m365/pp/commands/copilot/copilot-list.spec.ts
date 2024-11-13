@@ -183,11 +183,6 @@ describe(commands.COPILOT_LIST, () => {
       new CommandError(`Resource '' does not exist or one of its queried reference-property objects are not present`));
   });
 
-  it('defines alias', () => {
-    const alias = command.alias();
-    assert.notStrictEqual(typeof alias, 'copilot');
-  });
-
   it('defines correct alias', () => {
     const alias = command.alias();
     assert.deepStrictEqual(alias, [commands.CHATBOT_LIST]);

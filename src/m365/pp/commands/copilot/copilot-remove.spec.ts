@@ -84,11 +84,6 @@ describe(commands.COPILOT_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('defines alias', () => {
-    const alias = command.alias();
-    assert.notStrictEqual(typeof alias, 'undefined');
-  });
-
   it('defines correct alias', () => {
     const alias = command.alias();
     assert.deepStrictEqual(alias, [commands.CHATBOT_REMOVE]);

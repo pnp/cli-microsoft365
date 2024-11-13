@@ -92,7 +92,7 @@ class PpCopilotGetCommand extends PowerPlatformCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    await this.showDeprecationWarning(logger, "pp chatbot get", "pp copilot get");
+    await this.showDeprecationWarning(logger, commands.CHATBOT_GET, commands.COPILOT_GET);
     if (this.verbose) {
       await logger.logToStderr(`Retrieving copilot '${args.options.id || args.options.name}'...`);
     }
