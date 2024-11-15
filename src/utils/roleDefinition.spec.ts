@@ -8,6 +8,7 @@ import { formatting } from './formatting.js';
 import { settingsNames } from '../settingsNames.js';
 
 describe('utils/roleDefinition', () => {
+  const id = '729827e3-9c14-49f7-bb1b-9608f156bbb8';
   const displayName = 'Helpdesk Administrator';
   const invalidDisplayName = 'Helpdeks Administratr';
   const roleDefinitionResponse = {
@@ -38,6 +39,10 @@ describe('utils/roleDefinition', () => {
         "id": "88d8e3e3-8f55-4a1e-953a-9b9898b8876b"
       }
     ]
+  };
+  const roleDefinitionLimitedResponse = {
+    "id": "729827e3-9c14-49f7-bb1b-9608f156bbb8",
+    "displayName": "Helpdesk Administrator"
   };
   const customRoleDefinitionResponse = {
     "id": "129827e3-9c14-49f7-bb1b-9608f156bbb8",
@@ -82,7 +87,7 @@ describe('utils/roleDefinition', () => {
         };
       }
 
-      return 'Invalid Request';
+      throw 'Invalid Request';
     });
 
     const actual = await roleDefinition.getRoleDefinitionByDisplayName(displayName);
@@ -117,6 +122,26 @@ describe('utils/roleDefinition', () => {
     });
   });
 
+  it('correctly get single role definition by name using getDirectoryRoleDefinitionByDisplayName with specified properties', async () => {
+    sinon.stub(request, 'get').callsFake(async opts => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/roleManagement/directory/roleDefinitions?$filter=displayName eq '${formatting.encodeQueryParameter(displayName)}'&$select=id,displayName`) {
+        return {
+          value: [
+            roleDefinitionLimitedResponse
+          ]
+        };
+      }
+
+      throw 'Invalid Request';
+    });
+
+    const actual = await roleDefinition.getRoleDefinitionByDisplayName(displayName, 'id,displayName');
+    assert.deepStrictEqual(actual, {
+      "id": "729827e3-9c14-49f7-bb1b-9608f156bbb8",
+      "displayName": "Helpdesk Administrator"
+    });
+  });
+
   it('handles selecting single role definition when multiple role definitions with the specified name found using getDirectoryRoleDefinitionByDisplayName and cli is set to prompt', async () => {
     sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/roleManagement/directory/roleDefinitions?$filter=displayName eq '${formatting.encodeQueryParameter(displayName)}'`) {
@@ -128,7 +153,7 @@ describe('utils/roleDefinition', () => {
         };
       }
 
-      return 'Invalid Request';
+      throw 'Invalid Request';
     });
 
     sinon.stub(cli, 'handleMultipleResultsFound').resolves(roleDefinitionResponse);
@@ -201,5 +226,87 @@ describe('utils/roleDefinition', () => {
 
     await assert.rejects(roleDefinition.getRoleDefinitionByDisplayName(displayName),
       Error(`Multiple role definitions with name '${displayName}' found. Found: ${roleDefinitionResponse.id}, ${customRoleDefinitionResponse.id}.`));
+  });
+
+  it('correctly get single role definition by name using getRoleDefinitionById', async () => {
+    sinon.stub(request, 'get').callsFake(async opts => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/roleManagement/directory/roleDefinitions/${id}`) {
+        return roleDefinitionResponse;
+      }
+
+      throw 'Invalid Request';
+    });
+
+    const actual = await roleDefinition.getRoleDefinitionById(id);
+    assert.deepStrictEqual(actual, {
+      "id": "729827e3-9c14-49f7-bb1b-9608f156bbb8",
+      "description": "Can reset passwords for non-administrators and Helpdesk Administrators.",
+      "displayName": "Helpdesk Administrator",
+      "isBuiltIn": true,
+      "isEnabled": true,
+      "templateId": "729827e3-9c14-49f7-bb1b-9608f156bbb8",
+      "version": "1",
+      "rolePermissions": [
+        {
+          "allowedResourceActions": [
+            "microsoft.directory/users/invalidateAllRefreshTokens",
+            "microsoft.directory/users/bitLockerRecoveryKeys/read",
+            "microsoft.directory/users/password/update",
+            "microsoft.azure.serviceHealth/allEntities/allTasks",
+            "microsoft.azure.supportTickets/allEntities/allTasks",
+            "microsoft.office365.webPortal/allEntities/standard/read",
+            "microsoft.office365.serviceHealth/allEntities/allTasks",
+            "microsoft.office365.supportTickets/allEntities/allTasks"
+          ],
+          "condition": null
+        }
+      ],
+      "inheritsPermissionsFrom": [
+        {
+          "id": "88d8e3e3-8f55-4a1e-953a-9b9898b8876b"
+        }
+      ]
+    });
+  });
+
+  it('correctly get single role definition by name using getRoleDefinitionById with specified properties', async () => {
+    sinon.stub(request, 'get').callsFake(async opts => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/roleManagement/directory/roleDefinitions/${id}?$select=id,displayName`) {
+        return roleDefinitionResponse;
+      }
+
+      throw 'Invalid Request';
+    });
+
+    const actual = await roleDefinition.getRoleDefinitionById(id, 'id,displayName');
+    assert.deepStrictEqual(actual, {
+      "id": "729827e3-9c14-49f7-bb1b-9608f156bbb8",
+      "description": "Can reset passwords for non-administrators and Helpdesk Administrators.",
+      "displayName": "Helpdesk Administrator",
+      "isBuiltIn": true,
+      "isEnabled": true,
+      "templateId": "729827e3-9c14-49f7-bb1b-9608f156bbb8",
+      "version": "1",
+      "rolePermissions": [
+        {
+          "allowedResourceActions": [
+            "microsoft.directory/users/invalidateAllRefreshTokens",
+            "microsoft.directory/users/bitLockerRecoveryKeys/read",
+            "microsoft.directory/users/password/update",
+            "microsoft.azure.serviceHealth/allEntities/allTasks",
+            "microsoft.azure.supportTickets/allEntities/allTasks",
+            "microsoft.office365.webPortal/allEntities/standard/read",
+            "microsoft.office365.serviceHealth/allEntities/allTasks",
+            "microsoft.office365.supportTickets/allEntities/allTasks"
+          ],
+          "condition": null
+        }
+      ],
+      "inheritsPermissionsFrom": [
+        {
+          "id": "88d8e3e3-8f55-4a1e-953a-9b9898b8876b"
+        }
+      ]
+    });
   });
 });
