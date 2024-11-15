@@ -628,6 +628,15 @@ const sidebars: SidebarsConfig = {
           ]
         },
         {
+          roledefinition: [
+            {
+              type: 'doc',
+              label: 'roledefinition get',
+              id: 'cmd/entra/roledefinition/roledefinition-get'
+            }
+          ]
+        },
+        {
           siteclassification: [
             {
               type: 'doc',
