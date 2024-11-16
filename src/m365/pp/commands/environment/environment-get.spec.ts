@@ -76,10 +76,6 @@ describe(commands.ENVIRONMENT_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('defines correct properties for the default output', () => {
-    assert.deepStrictEqual(command.defaultProperties(), ['name', 'id']);
-  });
-
   it('correctly handles API OData error', async () => {
     const errorMessage = `Resource '' does not exist or one of its queried reference-property objects are not present`;
     sinon.stub(request, 'get').callsFake(async () => {

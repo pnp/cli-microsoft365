@@ -29,10 +29,6 @@ class PpChatbotGetCommand extends PowerPlatformCommand {
     return 'Get information about the specified chatbot';
   }
 
-  public defaultProperties(): string[] | undefined {
-    return ['name', 'botid', 'publishedon', 'createdon', 'modifiedon'];
-  }
-
   constructor() {
     super();
 

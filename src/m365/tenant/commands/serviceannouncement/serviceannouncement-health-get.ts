@@ -23,10 +23,6 @@ class TenantServiceAnnouncementHealthGetCommand extends GraphCommand {
     return 'This operation provides the health information of a specified service for a tenant';
   }
 
-  public defaultProperties(): string[] | undefined {
-    return ['id', 'status', 'service'];
-  }
-
   constructor() {
     super();
 

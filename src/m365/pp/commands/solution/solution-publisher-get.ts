@@ -27,10 +27,6 @@ class PpSolutionPublisherGetCommand extends PowerPlatformCommand {
     return 'Get information about the specified publisher in a given environment.';
   }
 
-  public defaultProperties(): string[] | undefined {
-    return ['publisherid', 'uniquename', 'friendlyname'];
-  }
-
   constructor() {
     super();
 

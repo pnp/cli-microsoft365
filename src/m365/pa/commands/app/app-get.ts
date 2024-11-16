@@ -29,10 +29,6 @@ class PaAppGetCommand extends PowerAppsCommand {
     return 'Gets information about the specified Microsoft Power App';
   }
 
-  public defaultProperties(): string[] | undefined {
-    return ['name', 'displayName', 'description', 'appVersion', 'owner'];
-  }
-
   constructor() {
     super();
 
