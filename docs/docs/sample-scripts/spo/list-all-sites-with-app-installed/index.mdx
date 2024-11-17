@@ -53,7 +53,7 @@ This script helps you to list all sites in SharePoint Online, where a particular
       Write-Host "Processing site $($site.Url)..."
       $appInstance = m365 spo app instance list --siteUrl $site.Url --query $queryText | ConvertFrom-Json
 
-      if ($appInstance) {
+      if ($appInstance.count -gt 0) {
         $results += [pscustomobject]@{
           SiteURL = $site.Url
           Title   = $site.Title
