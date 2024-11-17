@@ -56,7 +56,7 @@ This script helps you to list and export all site collection and their lists Sha
       $results += [pscustomobject][ordered]@{
         Type     = "list"
         Title    = $list.Title
-        Url      = $list.Url
+        Url      = $list.RootFolder.ServerRelativeUrl
         Template = $list.BaseTemplate
       }
     }

@@ -47,10 +47,10 @@ List all Lists, the folders and sub folders in a given site, and output the item
 
   foreach ($list in $allLists) {
     if ($false -eq $list.Hidden -and $list.BaseTemplate -eq "101") {
-      Write-Output "Processing $($list.Url)"
-      [void]$results.Add([PSCustomObject]@{ Url = $list.Url; ItemCount = $list.ItemCount; Type = "List"; })
+      Write-Output "Processing $($list.RootFolder.ServerRelativeUrl)"
+      [void]$results.Add([PSCustomObject]@{ Url = $list.RootFolder.ServerRelativeUrl; ItemCount = $list.ItemCount; Type = "List"; })
 
-      Get-Folders $siteUrl $list.Url
+      Get-Folders $siteUrl $list.RootFolder.ServerRelativeUrl
     }
   }
 
