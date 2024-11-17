@@ -11,7 +11,7 @@
       "Validate all your users against known breaches with the have I been pwned api. That way you can quickly scan if your users are part of any known breaches."
     ],
     "products": [
-      "AAD"
+      "Entra"
     ],
     "categories": [],
     "tags": [

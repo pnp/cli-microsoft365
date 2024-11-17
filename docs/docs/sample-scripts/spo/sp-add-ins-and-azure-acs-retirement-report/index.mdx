@@ -186,7 +186,7 @@ function GetRetirementStatus {
 
       foreach ($List in $Lists) {
         $EventReveiversOnList = m365 spo eventreceiver list --webUrl $WebUrl --listId $List.Id --query "[?!contains(ReceiverAssembly,'Microsoft.')]" --output json | ConvertFrom-Json
-        $EventReceivers += GetEventReceiversDataToOutputList -EventReceivers $EventReveiversOnList -Location "List" -LocationUrl $List.Url
+        $EventReceivers += GetEventReceiversDataToOutputList -EventReceivers $EventReveiversOnList -Location "List" -LocationUrl $List.RootFolder.ServerRelativeUrl
       }
       return $EventReceivers
     }

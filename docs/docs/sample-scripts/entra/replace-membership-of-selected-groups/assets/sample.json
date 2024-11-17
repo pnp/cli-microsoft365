@@ -11,7 +11,7 @@
       "This script can be used to replace the membership of a user for a selected list of Groups. It might be useful when a person changes role in an organization or is about to leave it."
     ],
     "products": [
-      "AAD"
+      "Entra"
     ],
     "categories": [],
     "tags": [
