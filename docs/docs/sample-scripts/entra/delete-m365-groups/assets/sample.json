@@ -11,7 +11,7 @@
       "There are so many different ways to create Microsoft 365 groups. Teams, Planner, SharePoint team sites, etc. — you can accumulate a lot of them very fast. Use this script below to delete the ones you no longer need."
     ],
     "products": [
-      "AAD"
+      "Entra"
     ],
     "categories": [],
     "tags": [
