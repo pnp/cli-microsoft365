@@ -1,0 +1,116 @@
+import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# spo homesite list
+
+Lists all the Home Sites
+
+## Usage
+
+```sh
+m365 spo homesite list [options]
+```
+
+## Options
+
+<Global />
+
+## Examples
+
+Lists all the Home Sites
+
+```sh
+m365 spo homesite list
+```
+
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  {
+    "value": [
+      {
+        "Audiences": [
+          {
+            "Email": "ColumnSearchable@contoso.onmicrosoft.com",
+            "Id": "978b5280-4f80-47ea-a1db-b0d1d2fb1ba4",
+            "Title": "ColumnSearchable Members"
+          },
+          {
+            "Email": "contosoteam@contoso.onmicrosoft.com",
+            "Id": "21af775d-17b3-4637-94a4-2ba8625277cb",
+            "Title": "Contoso TeamR Members"
+          }
+        ],
+        "IsInDraftMode": false,
+        "IsVivaBackendSite": false,
+        "SiteId": "431d7819-4aaf-49a1-b664-b2fe9e609b63",
+        "TargetedLicenseType": 2,
+        "Title": "The Landing",
+        "Url": "https://contoso.sharepoint.com/sites/TheLanding",
+        "VivaConnectionsDefaultStart": true,
+        "WebId": "626c1724-8ac8-45d5-af87-c07c752fab75"
+      },
+      {
+        "Audiences": [],
+        "IsInDraftMode": false,
+        "IsVivaBackendSite": false,
+        "SiteId": "45d4a135-40e4-4571-8340-61d17fdfd58a",
+        "TargetedLicenseType": 0,
+        "Title": "Contoso Electronics",
+        "Url": "https://contoso.sharepoint.com/sites/contosoportal",
+        "VivaConnectionsDefaultStart": true,
+        "WebId": "9418e2a1-855c-4752-8dd4-48693f43b10a"
+      }
+    ]
+  }
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  LogoUrl: https://contoso.sharepoint.com/sites/intra/siteassets/work.png
+  SiteId : af80c11f-0138-4d72-bb37-514542c3aabb
+  Title  : Intranet
+  Url    : https://contoso.sharepoint.com/sites/intra
+  WebId  : 6f90666d-b0e7-40c3-991f-4ab051d00a70
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  SiteId,WebId,LogoUrl,Title,Url
+  af80c11f-0138-4d72-bb37-514542c3aabb,6f90666d-b0e7-40c3-991f-4ab051d00a70,https://contoso.sharepoint.com/sites/intra/siteassets/work.png,Intranet,https://contoso.sharepoint.com/sites/intra
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # spo homesite list
+
+  Date: 2/20/2023
+
+  ## Intranet (https://contoso.sharepoint.com/sites/intra)
+
+  Property | Value
+  ---------|-------
+  IsInDraftMode | false
+  SiteId | af80c11f-0138-4d72-bb37-514542c3aabb
+  WebId |6f90666d-b0e7-40c3-991f-4ab051d00a70
+  LogoUrl | https://contoso.sharepoint.com/sites/intra/siteassets/work.png
+  Title | Intranet
+  Url | https://contoso.sharepoint.com/sites/intra
+  ```
+
+  </TabItem>
+</Tabs>
+
+## More information
+
+- SharePoint home sites: a landing for your organization on the intelligent intranet: [https://techcommunity.microsoft.com/t5/Microsoft-SharePoint-Blog/SharePoint-home-sites-a-landing-for-your-organization-on-the/ba-p/621933](https://techcommunity.microsoft.com/t5/Microsoft-SharePoint-Blog/SharePoint-home-sites-a-landing-for-your-organization-on-the/ba-p/621933)
