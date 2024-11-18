@@ -90,6 +90,7 @@ export default {
   POLICY_LIST: `${prefix} policy list`,
   ROLEDEFINITION_LIST: `${prefix} roledefinition list`,
   ROLEDEFINITION_GET: `${prefix} roledefinition get`,
+  ROLEDEFINITION_REMOVE: `${prefix} roledefinition remove`,
   SITECLASSIFICATION_DISABLE: `${prefix} siteclassification disable`,
   SITECLASSIFICATION_ENABLE: `${prefix} siteclassification enable`,
   SITECLASSIFICATION_GET: `${prefix} siteclassification get`,

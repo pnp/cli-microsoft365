@@ -14,9 +14,11 @@ export const roleDefinition = {
    */
   async getRoleDefinitionByDisplayName(displayName: string, properties?: string): Promise<UnifiedRoleDefinition> {
     let url = `https://graph.microsoft.com/v1.0/roleManagement/directory/roleDefinitions?$filter=displayName eq '${formatting.encodeQueryParameter(displayName)}'`;
+
     if (properties) {
       url += `&$select=${properties}`;
     }
+
     const roleDefinitions = await odata.getAllItems<UnifiedRoleDefinition>(url);
 
     if (roleDefinitions.length === 0) {
@@ -41,6 +43,7 @@ export const roleDefinition = {
    */
   async getRoleDefinitionById(id: string, properties?: string): Promise<UnifiedRoleDefinition> {
     let url = `https://graph.microsoft.com/v1.0/roleManagement/directory/roleDefinitions/${id}`;
+
     if (properties) {
       url += `?$select=${properties}`;
     }
