@@ -2712,6 +2712,11 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
+              label: 'homesite list',
+              id: 'cmd/spo/homesite/homesite-list'
+            },
+            {
+              type: 'doc',
               label: 'homesite remove',
               id: 'cmd/spo/homesite/homesite-remove'
             },
