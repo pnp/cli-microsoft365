@@ -633,6 +633,11 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'roledefinition list',
               id: 'cmd/entra/roledefinition/roledefinition-list'
+            },
+            {
+              type: 'doc',
+              label: 'roledefinition remove',
+              id: 'cmd/entra/roledefinition/roledefinition-remove'
             }
           ]
         },
