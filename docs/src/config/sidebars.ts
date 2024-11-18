@@ -628,6 +628,15 @@ const sidebars: SidebarsConfig = {
           ]
         },
         {
+          roledefinition: [
+            {
+              type: 'doc',
+              label: 'roledefinition remove',
+              id: 'cmd/entra/roledefinition/roledefinition-remove'
+            }
+          ]
+        },
+        {
           siteclassification: [
             {
               type: 'doc',
