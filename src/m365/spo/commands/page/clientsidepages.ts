@@ -114,7 +114,7 @@ function getGUID(): string {
 /**
  * Column size factor. Max value is 12 (= one column), other options are 8,6,4 or 0
  */
-type CanvasColumnFactorType = 0 | 2 | 4 | 6 | 8 | 12;
+export type CanvasColumnFactorType = 0 | 2 | 4 | 6 | 8 | 12;
 
 /**
  * Gets the next order value 1 based for the provided collection
@@ -265,7 +265,8 @@ function reindex(collection?: { order: number, columns?: { order: number }[], co
  */
 export class ClientSidePage {
   public sections: CanvasSection[] = [];
-
+  public pageSettings?: PageSettings;
+  public backgroundSettings?: BackgroundSettings;
   /**
    * Converts a json object to an escaped string appropriate for use in attributes when storing client-side controls
    * 
@@ -324,8 +325,15 @@ export class ClientSidePage {
       html.push(this.sections[i].toHtml());
     }
 
-    html.push("</div>");
+    if (this.pageSettings) {
+      html.push(this.pageSettings.toHtml());
+    }
 
+    if (this.backgroundSettings) {
+      html.push(this.backgroundSettings.toHtml());
+    }
+
+    html.push("</div>");
     return html.join("");
   }
 
@@ -344,19 +352,25 @@ export class ClientSidePage {
     getBoundedDivMarkup(html, /<div\b[^>]*data-sp-canvascontrol[^>]*?>/i, markup => {
 
       // get the control type
-      const ct = /controlType&quot;&#58;(\d*?),/i.exec(markup);
+      const ct = /controlType&quot;&#58;(\d*?)(,|&)/i.exec(markup);
 
       // if no control type is present this is a column which we give type 0 to let us process it
-      const controlType = ct == null || ct.length < 2 ? 0 : parseInt(ct[1], 10);
+      const controlType = ct == null || ct.length < 0 ? -1 : parseInt(ct[1], 10);
 
       let control: CanvasControl | null = null;
 
       switch (controlType) {
-        case 0:
+        case -1:
           // empty canvas column
           control = new CanvasColumn(null, 0);
           control.fromHtml(markup);
           page.mergeColumnToTree(<CanvasColumn>control);
+          break;
+        case 0:
+          // page settings
+          control = new PageSettings();
+          control.fromHtml(markup);
+          page.pageSettings = <PageSettings>control;
           break;
         case 3:
           // client side webpart
@@ -369,6 +383,12 @@ export class ClientSidePage {
           control = new ClientSideText();
           control.fromHtml(markup);
           page.mergePartToTree(<ClientSidePart>control);
+          break;
+        case 14:
+          // backgroundSection
+          control = new BackgroundSettings();
+          control.fromHtml(markup);
+          page.backgroundSettings = <BackgroundSettings>control;
           break;
       }
     });
@@ -433,7 +453,7 @@ export class ClientSidePage {
 
     const sections = this.sections.filter(s => s.order === zoneIndex);
     if (sections.length < 1) {
-      section = new CanvasSection(this, zoneIndex);
+      section = new CanvasSection(this, zoneIndex, [], control?.controlData?.position.zoneId, control.controlData?.zoneGroupMetadata);
       this.sections.push(section);
     } else {
       section = sections[0];
@@ -464,7 +484,7 @@ export class ClientSidePage {
     const sections = this.sections.filter(s => s.order === order);
 
     if (sections.length < 1) {
-      section = new CanvasSection(this, order);
+      section = new CanvasSection(this, order, [], column.controlData?.position?.zoneId, column.controlData?.zoneGroupMetadata);
       this.sections.push(section);
     } else {
       section = sections[0];
@@ -476,7 +496,7 @@ export class ClientSidePage {
 }
 
 export class CanvasSection {
-  constructor(public page: ClientSidePage, public order: number, public columns: CanvasColumn[] = []) {
+  constructor(public page: ClientSidePage, public order: number, public columns: CanvasColumn[] = [], public zoneId?: string, public zoneGroupMetadata?: ZoneGroupMetadata) {
   }
 
   /**
@@ -542,6 +562,25 @@ abstract class CanvasControl {
   }
 
   protected abstract getControlData(): ClientSideControlData;
+}
+
+export class PageSettings extends CanvasControl {
+  constructor() {
+    super(0, "1.0");
+  }
+
+  protected getControlData(): ClientSideControlData {
+    return this.controlData as any;
+  }
+
+  public toHtml(): string {
+    return `<div data-sp-canvascontrol="" data-sp-canvasdataversion="${this.dataVersion}" data-sp-controldata="${this.jsonData}"></div>`;
+  }
+
+  public fromHtml(html: string): void {
+    super.fromHtml(html);
+
+  }
 }
 
 export class CanvasColumn extends CanvasControl {
@@ -613,8 +652,10 @@ export class CanvasColumn extends CanvasControl {
       position: {
         sectionFactor: this.factor,
         sectionIndex: this.order,
-        zoneIndex: this.section ? this.section.order : 0
+        zoneIndex: this.section ? this.section.order : 0,
+        zoneId: this.section?.zoneId
       },
+      zoneGroupMetadata: this.section?.zoneGroupMetadata,
     };
   }
 
@@ -643,6 +684,78 @@ export abstract class ClientSidePart extends CanvasControl {
     if (this.column) {
       this.column.controls = this.column.controls.filter(control => control.id !== this.id);
       reindex(this.column.controls);
+    }
+  }
+}
+
+export class BackgroundSettings extends ClientSidePart {
+  public propertieJson: TypedHash<any> = {};
+  protected serverProcessedContent: ServerProcessedContent | null = null;
+
+  constructor() {
+    super(0, "1.0");
+  }
+
+  protected getControlData(): ClientSideControlData {
+    return {
+      controlType: this.controlType
+    } as any;
+  }
+
+  public toHtml(): string {
+    // will form the value of the data-sp-webpartdata attribute
+    const data = {
+      dataVersion: this.dataVersion,
+      instanceId: this.id,
+      properties: this.propertieJson,
+      serverProcessedContent: this.serverProcessedContent,
+    };
+
+
+    const html: string[] = [];
+
+    html.push(`<div data-sp-canvascontrol="" data-sp-canvasdataversion="${this.dataVersion}" data-sp-controldata="${this.jsonData}">`);
+
+    html.push(`<div data-sp-webpart="" data-sp-webpartdataversion="${this.dataVersion}" data-sp-webpartdata="${ClientSidePage.jsonToEscapedString(data)}">`);
+
+    html.push(`<div data-sp-componentid="">`);
+    html.push("</div>");
+
+    html.push(`<div data-sp-htmlproperties="">`);
+
+    for (let imageSource in this.serverProcessedContent?.imageSources) {
+      html.push(`<img data-sp-prop-name="${imageSource}" src="${this.serverProcessedContent?.imageSources[imageSource]}" />`);
+    }
+
+    html.push("</div>");
+
+    html.push("</div>");
+    html.push("</div>");
+
+    return html.join("");
+  }
+
+  private setProperties<T = any>(properties: T): this {
+    this.propertieJson = extend(this.propertieJson, properties);
+    return this;
+  }
+
+  public fromHtml(html: string): void {
+    super.fromHtml(html);
+    const webPartData = ClientSidePage.escapedStringToJson<ClientSideWebpartData>(getAttrValueFromString(html, "data-sp-webpartdata"));
+
+    this.setProperties(webPartData.properties);
+
+    if (typeof webPartData.serverProcessedContent !== "undefined") {
+      this.serverProcessedContent = webPartData.serverProcessedContent;
+    }
+
+    if (typeof webPartData.dynamicDataPaths !== "undefined") {
+      this.dynamicDataPaths = webPartData.dynamicDataPaths;
+    }
+
+    if (typeof webPartData.dynamicDataValues !== "undefined") {
+      this.dynamicDataValues = webPartData.dynamicDataValues;
     }
   }
 }
@@ -683,8 +796,10 @@ export class ClientSideText extends ClientSidePart {
         controlIndex: this.order,
         sectionFactor: this.column ? this.column.factor : 0,
         sectionIndex: this.column ? this.column.order : 0,
-        zoneIndex: this.column && this.column.section ? this.column.section.order : 0
+        zoneIndex: this.column && this.column.section ? this.column.section.order : 0,
+        zoneId: this.column?.section?.zoneId
       },
+      zoneGroupMetadata: this.column?.section?.zoneGroupMetadata,
     };
   }
 
@@ -834,9 +949,11 @@ export class ClientSideWebpart extends ClientSidePart {
         controlIndex: this.order,
         sectionFactor: this.column ? this.column.factor : 0,
         sectionIndex: this.column ? this.column.order : 0,
-        zoneIndex: this.column && this.column.section ? this.column.section.order : 0
+        zoneIndex: this.column && this.column.section ? this.column.section.order : 0,
+        zoneId: this.column?.section?.zoneId
       },
       webPartId: this.webPartId,
+      zoneGroupMetadata: this.column?.section?.zoneGroupMetadata,
     };
 
   }
@@ -983,20 +1100,36 @@ interface ServerProcessedContent {
   links: TypedHash<string>;
 }
 
-interface ClientSideControlPosition {
+export interface ClientSideControlPosition {
   controlIndex?: number;
+  layoutIndex?: number;
   sectionFactor: CanvasColumnFactorType;
   sectionIndex: number;
   zoneIndex: number;
+  isLayoutReflowOnTop?: boolean;
+  zoneId?: string;
 }
 
-interface ClientSideControlData {
+export interface ZoneGroupMetadata {
+  type: number;
+  isExpanded: boolean;
+  showDividerLine: boolean;
+  iconAlignment: string;
+  displayName?: string;
+}
+
+export interface ClientSideControlData {
   controlType?: number;
   id?: string;
   editorType?: string;
+  emphasis?: { zoneEmphasis?: number };
   position: ClientSideControlPosition;
+  reservedHeight?: number;
+  reservedWidth?: number;
+  webPartData?: any;
   webPartId?: string;
   displayMode?: number;
+  zoneGroupMetadata?: ZoneGroupMetadata;
 }
 
 interface ClientSideWebpartData {

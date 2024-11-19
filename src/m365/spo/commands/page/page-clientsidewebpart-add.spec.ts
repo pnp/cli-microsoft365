@@ -2605,6 +2605,113 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
     }));
   });
 
+  it('adds web part to a column in collapsible section when order 1 specified', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/team-a/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')`) {
+        return {
+          "IsPageCheckedOutToCurrentUser": true,
+          "CanvasContent1": `[{"controlType":4,"editorType":"CKEditor","id":"24cebf73-d376-48e5-9b76-39b967c8dfd9","position":{"controlIndex":1,"sectionFactor":12,"sectionIndex":1,"zoneIndex":1,"zoneId":"e524fc79-e526-4da5-82e6-361018dedc67"},"addedFromPersistedData":true,"innerHTML":"<p>test</p>","emphasis":{"zoneEmphasis":0},"zoneGroupMetadata":{"type":1,"isExpanded":true,"showDividerLine":false,"iconAlignment":"left","displayName":"Test"}},{"controlType":0,"pageSettingsSlice":{"isDefaultDescription":true,"isDefaultThumbnail":true,"isSpellCheckEnabled":true,"globalRichTextStylingVersion":1,"rtePageSettings":{"contentVersion":5,"indentationVersion":2},"isEmailReady":false,"webPartsPageSettings":{"isTitleHeadingLevelsEnabled":false}}}]`
+        };
+      }
+
+      if (opts.url === `https://contoso.sharepoint.com/sites/team-a/_api/web/getclientsidewebparts()`) {
+        return clientSideWebParts;
+      }
+
+      throw 'Invalid request';
+    });
+
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/team-a/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/SavePageAsDraft`) {
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger,
+      {
+        options: {
+          pageName: 'page.aspx',
+          webUrl: 'https://contoso.sharepoint.com/sites/team-a',
+          webPartId: 'e377ea37-9047-43b9-8cdb-a761be2f8e09',
+          order: 1
+        }
+      });
+    assert.strictEqual(replaceId(JSON.stringify(postStub.lastCall.args[0].data)), '{"CanvasContent1":"[{\\"controlType\\":3,\\"displayMode\\":2,\\"id\\":\\"89c644b3-f69c-4e84-85d7-dfa04c6163b5\\",\\"position\\":{\\"controlIndex\\":1,\\"sectionFactor\\":12,\\"sectionIndex\\":1,\\"zoneIndex\\":1,\\"zoneId\\":\\"e524fc79-e526-4da5-82e6-361018dedc67\\"},\\"webPartId\\":\\"e377ea37-9047-43b9-8cdb-a761be2f8e09\\",\\"emphasis\\":{},\\"zoneGroupMetadata\\":{\\"type\\":1,\\"isExpanded\\":true,\\"showDividerLine\\":false,\\"iconAlignment\\":\\"left\\",\\"displayName\\":\\"Test\\"},\\"webPartData\\":{\\"dataVersion\\":\\"1.0\\",\\"description\\":\\"Display a key location on a map\\",\\"id\\":\\"e377ea37-9047-43b9-8cdb-a761be2f8e09\\",\\"instanceId\\":\\"89c644b3-f69c-4e84-85d7-dfa04c6163b5\\",\\"properties\\":{\\"pushPins\\":[],\\"maxNumberOfPushPins\\":1,\\"shouldShowPushPinTitle\\":true,\\"zoomLevel\\":12,\\"mapType\\":\\"road\\"},\\"title\\":\\"Bing maps\\"}},{\\"controlType\\":4,\\"editorType\\":\\"CKEditor\\",\\"id\\":\\"24cebf73-d376-48e5-9b76-39b967c8dfd9\\",\\"position\\":{\\"controlIndex\\":2,\\"sectionFactor\\":12,\\"sectionIndex\\":1,\\"zoneIndex\\":1,\\"zoneId\\":\\"e524fc79-e526-4da5-82e6-361018dedc67\\"},\\"addedFromPersistedData\\":true,\\"innerHTML\\":\\"<p>test</p>\\",\\"emphasis\\":{\\"zoneEmphasis\\":0},\\"zoneGroupMetadata\\":{\\"type\\":1,\\"isExpanded\\":true,\\"showDividerLine\\":false,\\"iconAlignment\\":\\"left\\",\\"displayName\\":\\"Test\\"}},{\\"controlType\\":0,\\"pageSettingsSlice\\":{\\"isDefaultDescription\\":true,\\"isDefaultThumbnail\\":true,\\"isSpellCheckEnabled\\":true,\\"globalRichTextStylingVersion\\":1,\\"rtePageSettings\\":{\\"contentVersion\\":5,\\"indentationVersion\\":2},\\"isEmailReady\\":false,\\"webPartsPageSettings\\":{\\"isTitleHeadingLevelsEnabled\\":false}}}]"}');
+  });
+
+  it('adds web part to a column with background settings order 1 specified', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/team-a/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')`) {
+        return {
+          "IsPageCheckedOutToCurrentUser": true,
+          "CanvasContent1": `[{"controlType":4,"editorType":"CKEditor","id":"24cebf73-d376-48e5-9b76-39b967c8dfd9","position":{"controlIndex":1,"sectionFactor":12,"sectionIndex":1,"zoneIndex":1,"zoneId":"e524fc79-e526-4da5-82e6-361018dedc67"},"addedFromPersistedData":true,"zoneGroupMetadata":{"type":0,"isExpanded":true,"showDividerLine":false,"iconAlignment":"left","displayName":"Test"},"innerHTML":"<p>test</p>"},{"controlType":0,"pageSettingsSlice":{"isDefaultDescription":true,"isDefaultThumbnail":true,"isSpellCheckEnabled":true,"globalRichTextStylingVersion":1,"rtePageSettings":{"contentVersion":5,"indentationVersion":2},"isEmailReady":false,"webPartsPageSettings":{"isTitleHeadingLevelsEnabled":false}}},{"controlType":14,"webPartData":{"properties":{"zoneBackground":{"e524fc79-e526-4da5-82e6-361018dedc67":{"type":"gradient","gradient":"radial-gradient(55.05% 96.28% at -5.05% -8.89%, #585984 0%, rgba(88, 89, 132, 0) 100%),linear-gradient(72.98deg, #AD8D8E 0.02%, #2A2A56 102.53%)","useLightText":true,"overlay":{"color":"#000000","opacity":60}}}},"serverProcessedContent":{"htmlStrings":{},"searchablePlainTexts":{},"imageSources":{},"links":{}},"dataVersion":"1.0"}}]`
+        };
+      }
+
+      if (opts.url === `https://contoso.sharepoint.com/sites/team-a/_api/web/getclientsidewebparts()`) {
+        return clientSideWebParts;
+      }
+
+      throw 'Invalid request';
+    });
+
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/team-a/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/SavePageAsDraft`) {
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger,
+      {
+        options: {
+          pageName: 'page.aspx',
+          webUrl: 'https://contoso.sharepoint.com/sites/team-a',
+          webPartId: 'e377ea37-9047-43b9-8cdb-a761be2f8e09',
+          order: 1
+        }
+      });
+    assert.strictEqual(replaceId(JSON.stringify(postStub.lastCall.args[0].data)), '{"CanvasContent1":"[{\\"controlType\\":3,\\"displayMode\\":2,\\"id\\":\\"89c644b3-f69c-4e84-85d7-dfa04c6163b5\\",\\"position\\":{\\"controlIndex\\":1,\\"sectionFactor\\":12,\\"sectionIndex\\":1,\\"zoneIndex\\":1,\\"zoneId\\":\\"e524fc79-e526-4da5-82e6-361018dedc67\\"},\\"webPartId\\":\\"e377ea37-9047-43b9-8cdb-a761be2f8e09\\",\\"emphasis\\":{},\\"zoneGroupMetadata\\":{\\"type\\":0,\\"isExpanded\\":true,\\"showDividerLine\\":false,\\"iconAlignment\\":\\"left\\",\\"displayName\\":\\"Test\\"},\\"webPartData\\":{\\"dataVersion\\":\\"1.0\\",\\"description\\":\\"Display a key location on a map\\",\\"id\\":\\"e377ea37-9047-43b9-8cdb-a761be2f8e09\\",\\"instanceId\\":\\"89c644b3-f69c-4e84-85d7-dfa04c6163b5\\",\\"properties\\":{\\"pushPins\\":[],\\"maxNumberOfPushPins\\":1,\\"shouldShowPushPinTitle\\":true,\\"zoomLevel\\":12,\\"mapType\\":\\"road\\"},\\"title\\":\\"Bing maps\\"}},{\\"controlType\\":4,\\"editorType\\":\\"CKEditor\\",\\"id\\":\\"24cebf73-d376-48e5-9b76-39b967c8dfd9\\",\\"position\\":{\\"controlIndex\\":2,\\"sectionFactor\\":12,\\"sectionIndex\\":1,\\"zoneIndex\\":1,\\"zoneId\\":\\"e524fc79-e526-4da5-82e6-361018dedc67\\"},\\"addedFromPersistedData\\":true,\\"zoneGroupMetadata\\":{\\"type\\":0,\\"isExpanded\\":true,\\"showDividerLine\\":false,\\"iconAlignment\\":\\"left\\",\\"displayName\\":\\"Test\\"},\\"innerHTML\\":\\"<p>test</p>\\"},{\\"controlType\\":0,\\"pageSettingsSlice\\":{\\"isDefaultDescription\\":true,\\"isDefaultThumbnail\\":true,\\"isSpellCheckEnabled\\":true,\\"globalRichTextStylingVersion\\":1,\\"rtePageSettings\\":{\\"contentVersion\\":5,\\"indentationVersion\\":2},\\"isEmailReady\\":false,\\"webPartsPageSettings\\":{\\"isTitleHeadingLevelsEnabled\\":false}}},{\\"controlType\\":14,\\"webPartData\\":{\\"properties\\":{\\"zoneBackground\\":{\\"e524fc79-e526-4da5-82e6-361018dedc67\\":{\\"type\\":\\"gradient\\",\\"gradient\\":\\"radial-gradient(55.05% 96.28% at -5.05% -8.89%, #585984 0%, rgba(88, 89, 132, 0) 100%),linear-gradient(72.98deg, #AD8D8E 0.02%, #2A2A56 102.53%)\\",\\"useLightText\\":true,\\"overlay\\":{\\"color\\":\\"#000000\\",\\"opacity\\":60}}}},\\"serverProcessedContent\\":{\\"htmlStrings\\":{},\\"searchablePlainTexts\\":{},\\"imageSources\\":{},\\"links\\":{}},\\"dataVersion\\":\\"1.0\\"}}]"}');
+  });
+
+  it('adds web part to a column with background settings and collapsible section', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/team-a/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')`) {
+        return {
+          "IsPageCheckedOutToCurrentUser": true,
+          "CanvasContent1": `[{"controlType":4,"editorType":"CKEditor","id":"24cebf73-d376-48e5-9b76-39b967c8dfd9","position":{"controlIndex":1,"sectionFactor":12,"sectionIndex":1,"zoneIndex":1,"zoneId":"e524fc79-e526-4da5-82e6-361018dedc67"},"addedFromPersistedData":true,"zoneGroupMetadata":{"type":1,"isExpanded":true,"showDividerLine":false,"iconAlignment":"left","displayName":"Test"},"innerHTML":"<p>test</p>"},{"controlType":0,"pageSettingsSlice":{"isDefaultDescription":true,"isDefaultThumbnail":true,"isSpellCheckEnabled":true,"globalRichTextStylingVersion":1,"rtePageSettings":{"contentVersion":5,"indentationVersion":2},"isEmailReady":false,"webPartsPageSettings":{"isTitleHeadingLevelsEnabled":false}}},{"controlType":14,"webPartData":{"properties":{"zoneBackground":{"e524fc79-e526-4da5-82e6-361018dedc67":{"type":"gradient","gradient":"radial-gradient(55.05% 96.28% at -5.05% -8.89%, #585984 0%, rgba(88, 89, 132, 0) 100%), linear-gradient(72.98deg, #AD8D8E 0.02%, #2A2A56 102.53%)","useLightText":true,"overlay":{"color":"#000000","opacity":60}}}},"serverProcessedContent":{"htmlStrings":{},"searchablePlainTexts":{},"imageSources":{},"links":{}},"dataVersion":"1.0"}}]`
+        };
+      }
+
+      if (opts.url === `https://contoso.sharepoint.com/sites/team-a/_api/web/getclientsidewebparts()`) {
+        return clientSideWebParts;
+      }
+
+      throw 'Invalid request';
+    });
+
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/team-a/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/SavePageAsDraft`) {
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger,
+      {
+        options: {
+          pageName: 'page.aspx',
+          webUrl: 'https://contoso.sharepoint.com/sites/team-a',
+          webPartId: 'e377ea37-9047-43b9-8cdb-a761be2f8e09'
+        }
+      });
+    assert.strictEqual(replaceId(JSON.stringify(postStub.lastCall.args[0].data)), '{"CanvasContent1":"[{\\"controlType\\":4,\\"editorType\\":\\"CKEditor\\",\\"id\\":\\"24cebf73-d376-48e5-9b76-39b967c8dfd9\\",\\"position\\":{\\"controlIndex\\":1,\\"sectionFactor\\":12,\\"sectionIndex\\":1,\\"zoneIndex\\":1,\\"zoneId\\":\\"e524fc79-e526-4da5-82e6-361018dedc67\\"},\\"addedFromPersistedData\\":true,\\"zoneGroupMetadata\\":{\\"type\\":1,\\"isExpanded\\":true,\\"showDividerLine\\":false,\\"iconAlignment\\":\\"left\\",\\"displayName\\":\\"Test\\"},\\"innerHTML\\":\\"<p>test</p>\\"},{\\"controlType\\":3,\\"displayMode\\":2,\\"id\\":\\"89c644b3-f69c-4e84-85d7-dfa04c6163b5\\",\\"position\\":{\\"controlIndex\\":2,\\"sectionFactor\\":12,\\"sectionIndex\\":1,\\"zoneIndex\\":1,\\"zoneId\\":\\"e524fc79-e526-4da5-82e6-361018dedc67\\"},\\"webPartId\\":\\"e377ea37-9047-43b9-8cdb-a761be2f8e09\\",\\"emphasis\\":{},\\"zoneGroupMetadata\\":{\\"type\\":1,\\"isExpanded\\":true,\\"showDividerLine\\":false,\\"iconAlignment\\":\\"left\\",\\"displayName\\":\\"Test\\"},\\"webPartData\\":{\\"dataVersion\\":\\"1.0\\",\\"description\\":\\"Display a key location on a map\\",\\"id\\":\\"e377ea37-9047-43b9-8cdb-a761be2f8e09\\",\\"instanceId\\":\\"89c644b3-f69c-4e84-85d7-dfa04c6163b5\\",\\"properties\\":{\\"pushPins\\":[],\\"maxNumberOfPushPins\\":1,\\"shouldShowPushPinTitle\\":true,\\"zoomLevel\\":12,\\"mapType\\":\\"road\\"},\\"title\\":\\"Bing maps\\"}},{\\"controlType\\":0,\\"pageSettingsSlice\\":{\\"isDefaultDescription\\":true,\\"isDefaultThumbnail\\":true,\\"isSpellCheckEnabled\\":true,\\"globalRichTextStylingVersion\\":1,\\"rtePageSettings\\":{\\"contentVersion\\":5,\\"indentationVersion\\":2},\\"isEmailReady\\":false,\\"webPartsPageSettings\\":{\\"isTitleHeadingLevelsEnabled\\":false}}},{\\"controlType\\":14,\\"webPartData\\":{\\"properties\\":{\\"zoneBackground\\":{\\"e524fc79-e526-4da5-82e6-361018dedc67\\":{\\"type\\":\\"gradient\\",\\"gradient\\":\\"radial-gradient(55.05% 96.28% at -5.05% -8.89%, #585984 0%, rgba(88, 89, 132, 0) 100%), linear-gradient(72.98deg, #AD8D8E 0.02%, #2A2A56 102.53%)\\",\\"useLightText\\":true,\\"overlay\\":{\\"color\\":\\"#000000\\",\\"opacity\\":60}}}},\\"serverProcessedContent\\":{\\"htmlStrings\\":{},\\"searchablePlainTexts\\":{},\\"imageSources\\":{},\\"links\\":{}},\\"dataVersion\\":\\"1.0\\"}}]"}');
+  });
+
   it('correctly handles sections in reverse order', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')`) > -1) {

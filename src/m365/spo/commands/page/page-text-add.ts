@@ -7,6 +7,7 @@ import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 import {
+  CanvasSection,
   ClientSidePage,
   ClientSideText
 } from './clientsidepages.js';
@@ -117,6 +118,13 @@ class SpoPageTextAddCommand extends SpoCommand {
 
       const section: number = (args.options.section || 1) - 1;
       const column: number = (args.options.column || 1) - 1;
+
+      // Add a new section when page does not contain any sections
+      if (page.sections.length < 1) {
+        const newSection = new CanvasSection(page, 1);
+        newSection.defaultColumn;
+        page.sections.push(newSection);
+      }
 
       // Make sure the section is in range
       if (section >= page.sections.length) {
