@@ -270,7 +270,8 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
         id: webPart.id,
         position: Object.assign({}, control.position),
         webPartId: webPart.webPartId,
-        emphasis: {}
+        emphasis: {},
+        zoneGroupMetadata: control.zoneGroupMetadata
       }, webPart);
 
       if (!control.controlType) {
