@@ -277,6 +277,7 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
         // it's an empty column so we need to replace it with the web part
         // ignore the specified order
         webPartControl.position.controlIndex = 1;
+        webPartControl.zoneGroupMetadata = control.zoneGroupMetadata;
         canvasContent.splice(controlIndex, 1, webPartControl);
       }
       else {

@@ -615,6 +615,7 @@ export class CanvasColumn extends CanvasControl {
         sectionIndex: this.order,
         zoneIndex: this.section ? this.section.order : 0
       },
+      zoneGroupMetadata: this.controlData?.zoneGroupMetadata || this.column?.controlData?.zoneGroupMetadata,
     };
   }
 
@@ -685,6 +686,7 @@ export class ClientSideText extends ClientSidePart {
         sectionIndex: this.column ? this.column.order : 0,
         zoneIndex: this.column && this.column.section ? this.column.section.order : 0
       },
+      zoneGroupMetadata: this.controlData?.zoneGroupMetadata || this.column?.controlData?.zoneGroupMetadata,
     };
   }
 
@@ -837,6 +839,7 @@ export class ClientSideWebpart extends ClientSidePart {
         zoneIndex: this.column && this.column.section ? this.column.section.order : 0
       },
       webPartId: this.webPartId,
+      zoneGroupMetadata: this.controlData?.zoneGroupMetadata || this.column?.controlData?.zoneGroupMetadata,
     };
 
   }
@@ -990,6 +993,14 @@ interface ClientSideControlPosition {
   zoneIndex: number;
 }
 
+interface ZoneGroupMetadata {
+  type: number;
+  isExpanded: boolean;
+  showDividerLine: boolean;
+  iconAlignment: string;
+  displayName?: string;
+}
+
 interface ClientSideControlData {
   controlType?: number;
   id?: string;
@@ -997,6 +1008,7 @@ interface ClientSideControlData {
   position: ClientSideControlPosition;
   webPartId?: string;
   displayMode?: number;
+  zoneGroupMetadata?: ZoneGroupMetadata;
 }
 
 interface ClientSideWebpartData {
