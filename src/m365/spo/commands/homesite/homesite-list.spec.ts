@@ -59,7 +59,7 @@ describe(commands.HOMESITE_LIST, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
-    auth.connection.spoUrl = 'https://contoso-admin.sharepoint.com';
+    auth.connection.spoUrl = 'https://contoso.sharepoint.com';
   });
 
   beforeEach(() => {
@@ -102,27 +102,13 @@ describe(commands.HOMESITE_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['Url', 'Title']);
   });
 
-  it('lists available home sites', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/GetTargetedSitesDetails`) > -1) {
-        return homeSites;
-      }
-
-      throw 'Invalid request';
-    });
-
-    await command.action(logger, { options: { output: 'json' } });
-
-    assert(loggerLogSpy.calledWith(homeSites.value));
-  });
-
   it('lists available home sites (debug)', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/GetTargetedSitesDetails`) > -1) {
+      if (opts.url === `https://contoso-admin.sharepoint.com/_api/SPO.Tenant/GetTargetedSitesDetails`) {
         return homeSites;
       }
 
-      throw 'Invalid request';
+      throw opts.url;
     });
 
     await command.action(logger, { options: { debug: true, output: 'json' } });
