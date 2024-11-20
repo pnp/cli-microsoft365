@@ -102,7 +102,7 @@ describe(commands.HOMESITE_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['Url', 'Title']);
   });
 
-  it('lists available home sites (debug)', async () => {
+  it('lists available home sites', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://contoso-admin.sharepoint.com/_api/SPO.Tenant/GetTargetedSitesDetails`) {
         return homeSites;
@@ -111,7 +111,7 @@ describe(commands.HOMESITE_LIST, () => {
       throw opts.url;
     });
 
-    await command.action(logger, { options: { debug: true, output: 'json' } });
+    await command.action(logger, { options: { verbose: true } });
     assert(loggerLogSpy.calledWith(homeSites.value));
   });
 
