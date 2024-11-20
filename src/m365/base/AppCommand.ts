@@ -90,9 +90,12 @@ export default abstract class AppCommand extends Command {
     }
 
     if (this.m365rcJson.apps.length > 1) {
-      const resultAsKeyValuePair = formatting.convertArrayToHashTable('appIdIndex', this.m365rcJson.apps);
-      const result = await cli.handleMultipleResultsFound<{ appIdIndex: number }>(`Multiple Entra apps found in ${m365rcJsonPath}.`, resultAsKeyValuePair);
-      this.appId = ((this.m365rcJson as M365RcJson).apps as M365RcJsonApp[])[result.appIdIndex].appId;
+      this.m365rcJson.apps.forEach((app, index) => {
+        (app as any).appIdIndex = index;
+      });
+      const resultAsKeyValuePair = formatting.convertArrayToHashTable('appId', this.m365rcJson.apps);
+      const result = await cli.handleMultipleResultsFound<M365RcJsonApp>(`Multiple Entra apps found in ${m365rcJsonPath}.`, resultAsKeyValuePair);
+      this.appId = result.appId;
       await super.action(logger, args);
     }
   }
