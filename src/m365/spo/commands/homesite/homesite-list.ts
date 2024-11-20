@@ -4,6 +4,7 @@ import { spo } from '../../../../utils/spo.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 import { CliRequestOptions } from "../../../../request.js";
+
 class SpoHomeSiteListCommand extends SpoCommand {
   public get name(): string {
     return commands.HOMESITE_LIST;
