@@ -53,17 +53,6 @@ m365 spo homesite list
         "Url": "https://contoso.sharepoint.com/sites/TheLanding",
         "VivaConnectionsDefaultStart": true,
         "WebId": "626c1724-8ac8-45d5-af87-c07c752fab75"
-      },
-      {
-        "Audiences": [],
-        "IsInDraftMode": false,
-        "IsVivaBackendSite": false,
-        "SiteId": "45d4a135-40e4-4571-8340-61d17fdfd58a",
-        "TargetedLicenseType": 0,
-        "Title": "Contoso Electronics",
-        "Url": "https://contoso.sharepoint.com/sites/contosoportal",
-        "VivaConnectionsDefaultStart": true,
-        "WebId": "9418e2a1-855c-4752-8dd4-48693f43b10a"
       }
     ]
   }
@@ -75,14 +64,15 @@ m365 spo homesite list
   ```text
 Url                                                              Title              
 ---------------------------------------------------------------  -------------------
-https://reshmeeauckloo.sharepoint.com/sites/TheLanding           The Landing        
-https://reshmeeauckloo.sharepoint.com/sites/contosoportal        Contoso Electronics
+https://contoso.sharepoint.com/sites/TheLanding           The Landing        
   ```
 
   </TabItem>
   <TabItem value="CSV">
 
   ```csv
+  IsInDraftMode,IsVivaBackendSite,SiteId,TargetedLicenseType,Title,Url,VivaConnectionsDefaultStart,WebId
+0,0,431d7819-4aaf-49a1-b664-b2fe9e609b63,2,The Landing,https://contoso.sharepoint.com/sites/TheLanding,1,626c1724-8ac8-45d5-af87-c07c752fab75
   ```
 
   </TabItem>
@@ -96,7 +86,14 @@ Date: 11/18/2024
 
 Property | Value
 ---------|-------
-
+IsInDraftMode | false
+IsVivaBackendSite | false
+SiteId | 431d7819-4aaf-49a1-b664-b2fe9e609b63
+TargetedLicenseType | 2
+Title | The Landing
+Url | https://contoso.sharepoint.com/sites/TheLanding
+VivaConnectionsDefaultStart | true
+WebId | 626c1724-8ac8-45d5-af87-c07c752fab75
 ```
 
   </TabItem>

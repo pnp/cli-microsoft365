@@ -113,7 +113,7 @@ describe(commands.HOMESITE_LIST, () => {
 
     await command.action(logger, { options: { output: 'json' } });
 
-    assert(loggerLogSpy.calledWith(homeSites));
+    assert(loggerLogSpy.calledWith(homeSites.value));
   });
 
   it('lists available home sites (debug)', async () => {
@@ -126,7 +126,7 @@ describe(commands.HOMESITE_LIST, () => {
     });
 
     await command.action(logger, { options: { debug: true, output: 'json' } });
-    assert(loggerLogSpy.calledWith(homeSites));
+    assert(loggerLogSpy.calledWith(homeSites.value));
   });
 
   it('correctly handles OData error when retrieving available home sites', async () => {
