@@ -142,7 +142,10 @@ describe('AppCommand', () => {
         }
       ]
     }));
-    sinon.stub(cli, 'handleMultipleResultsFound').resolves({ appIdIndex: 1 });
+    sinon.stub(cli, 'handleMultipleResultsFound').resolves({
+      "appId": "9c79078b-815e-4a3e-bb80-2aaf2d9e9b3d",
+      "name": "CLI app1"
+    });
     sinon.stub(Command.prototype, 'action').resolves();
 
     try {
