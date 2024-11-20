@@ -3,6 +3,7 @@ import { odata } from '../../../../utils/odata.js';
 import { spo } from '../../../../utils/spo.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
+import { CliRequestOptions } from "../../../../request.js";
 class SpoHomeSiteListCommand extends SpoCommand {
   public get name(): string {
     return commands.HOMESITE_LIST;
@@ -26,6 +27,9 @@ class SpoHomeSiteListCommand extends SpoCommand {
         },
         responseType: 'json'
       };
+      if (this.verbose) {
+        await logger.logToStderr(`List all home sites...`);
+      }
       const res = await odata.getAllItems(requestOptions);
       await logger.log(res);
     }
