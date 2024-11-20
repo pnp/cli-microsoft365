@@ -9,7 +9,7 @@ class SpoHomeSiteListCommand extends SpoCommand {
   }
 
   public get description(): string {
-    return 'Lists available Home Sites';
+    return 'Lists all home sites';
   }
 
   public defaultProperties(): string[] | undefined {
