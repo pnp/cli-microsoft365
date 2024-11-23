@@ -67,7 +67,7 @@ Find all the Microsoft 365 Groups that a user is an Owner of and replace them wi
   
           $hasOwner = $null
           # verify if the old user is in the owners list
-          $hasOwner = m365 entra m365group user list --groupId $group.id --query "[?userType=='Owner' && userPrincipalName=='$oldUser'].[id]" | Get-CLIValue
+          $hasOwner = m365 entra m365group user list --groupId $group.id --role owner --query "[?userPrincipalName=='$oldUser'].[id]" | Get-CLIValue
           if ($hasOwner -ne $null) {
               Write-Host "Found $oldUser" -ForegroundColor Green
               try {
