@@ -20,7 +20,7 @@ class SpoHomeSiteListCommand extends SpoCommand {
 
   public async commandAction(logger: Logger): Promise<void> {
     try {
-      const spoAdminUrl: string = await spo.getSpoAdminUrl(logger, this.debug);
+      const spoAdminUrl: string = await spo.getSpoAdminUrl(logger, this.verbose);
       const requestOptions: CliRequestOptions = {
         url: `${spoAdminUrl}/_api/SPO.Tenant/GetTargetedSitesDetails`,
         headers: {
