@@ -29,7 +29,7 @@ class SpoHomeSiteListCommand extends SpoCommand {
         responseType: 'json'
       };
       if (this.verbose) {
-        await logger.logToStderr(`List all home sites...`);
+        await logger.logToStderr(`Retrieving all home sites...`);
       }
       const res = await odata.getAllItems(requestOptions);
       await logger.log(res);
