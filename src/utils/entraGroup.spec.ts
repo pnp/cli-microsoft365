@@ -229,7 +229,7 @@ describe('utils/entraGroup', () => {
 
   it('handles selecting single result when multiple groups with the specified name found and cli is set to prompt with specified properties', async () => {
     sinon.stub(request, 'get').callsFake(async opts => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(validGroupName)}'?$select=id,displayName`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(validGroupName)}'&$select=id,displayName`) {
         return {
           value: [
             { id: validGroupId, displayName: validGroupName },
