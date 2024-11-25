@@ -3,6 +3,7 @@ import { Logger } from '../../../../cli/Logger.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 import request, { CliRequestOptions } from '../../../../request.js';
+import { ContainerTypeProperties } from '../../ContainerTypeProperties.js';
 
 interface CommandArgs {
   options: Options;
@@ -52,7 +53,7 @@ class SpeContainerGetCommand extends GraphCommand {
     };
 
     try {
-      const res = await request.get<any>(requestOptions);
+      const res = await request.get<ContainerTypeProperties>(requestOptions);
       await logger.log(res);
     }
     catch (err: any) {

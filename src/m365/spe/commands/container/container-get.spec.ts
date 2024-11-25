@@ -16,7 +16,6 @@ describe(commands.CONTAINER_GET, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
 
-
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').returns();
