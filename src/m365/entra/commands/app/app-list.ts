@@ -29,10 +29,6 @@ class EntraAppListCommand extends GraphCommand {
     this.#initOptions();
   }
 
-  public alias(): string[] | undefined {
-    return [aadCommands.APP_LIST, commands.APPREGISTRATION_LIST];
-  }
-
   public defaultProperties(): string[] | undefined {
     return ['appId', 'id', 'displayName', "signInAudience"];
   }
