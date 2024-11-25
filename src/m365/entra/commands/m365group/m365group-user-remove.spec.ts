@@ -31,6 +31,7 @@ describe(commands.M365GROUP_USER_REMOVE, () => {
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
+    sinon.stub(entraGroup, 'getGroupIdByDisplayName').resolves('00000000-0000-0000-0000-000000000000');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
   });
@@ -82,21 +83,11 @@ describe(commands.M365GROUP_USER_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if userName is not a valid upn', async () => {
-    const actual = await command.validate({
-      options: {
-        groupId: groupOrTeamId,
-        userName: 'invalid'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
   it('fails validation if the groupId is not a valid guid', async () => {
     const actual = await command.validate({
       options: {
         groupId: 'invalid',
-        userName: userName
+        userNames: userName
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -106,7 +97,7 @@ describe(commands.M365GROUP_USER_REMOVE, () => {
     const actual = await command.validate({
       options: {
         teamId: 'invalid',
-        userName: userName
+        userNames: userName
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -132,16 +123,6 @@ describe(commands.M365GROUP_USER_REMOVE, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation when a valid teamId and userName are specified', async () => {
-    const actual = await command.validate({
-      options: {
-        teamId: groupOrTeamId,
-        userName: userName
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
-
   it('passes validation when a valid teamId and userNames are specified', async () => {
     const actual = await command.validate({
       options: {
@@ -164,13 +145,13 @@ describe(commands.M365GROUP_USER_REMOVE, () => {
 
 
   it('prompts before removing the specified user from the specified Microsoft 365 Group when force option not passed', async () => {
-    await command.action(logger, { options: { groupId: groupOrTeamId, userName: userName } });
+    await command.action(logger, { options: { groupId: groupOrTeamId, userNames: userName } });
 
     assert(promptIssued);
   });
 
   it('prompts before removing the specified user from the specified Team when force option not passed (debug)', async () => {
-    await command.action(logger, { options: { debug: true, teamId: "00000000-0000-0000-0000-000000000000", userName: userName } });
+    await command.action(logger, { options: { debug: true, teamId: "00000000-0000-0000-0000-000000000000", userNames: userName } });
 
     assert(promptIssued);
   });
@@ -180,7 +161,7 @@ describe(commands.M365GROUP_USER_REMOVE, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(false);
 
-    await command.action(logger, { options: { groupId: groupOrTeamId, userName: userName } });
+    await command.action(logger, { options: { groupId: groupOrTeamId, userNames: userName } });
     assert(postSpy.notCalled);
   });
 
@@ -189,11 +170,11 @@ describe(commands.M365GROUP_USER_REMOVE, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(false);
 
-    await command.action(logger, { options: { debug: true, groupId: groupOrTeamId, userName: userName } });
+    await command.action(logger, { options: { debug: true, groupId: groupOrTeamId, userNames: userName } });
     assert(postSpy.notCalled);
   });
 
-  it('removes the specified owner from owners and members endpoint of the specified Microsoft 365 Group with accepted prompt', async () => {
+  it('removes the specified owner from owners and members endpoint of the Microsoft 365 Group specified by id with accepted prompt', async () => {
     let memberDeleteCallIssued = false;
 
     sinon.stub(request, 'delete').callsFake(async (opts) => {
@@ -213,7 +194,7 @@ describe(commands.M365GROUP_USER_REMOVE, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
-    await command.action(logger, { options: { groupId: groupOrTeamId, userName: userName } });
+    await command.action(logger, { options: { groupId: groupOrTeamId, userNames: userName } });
     assert(memberDeleteCallIssued);
   });
 
@@ -235,7 +216,7 @@ describe(commands.M365GROUP_USER_REMOVE, () => {
 
     });
 
-    await command.action(logger, { options: { groupId: groupOrTeamId, userName: userName, force: true } });
+    await command.action(logger, { options: { groupId: groupOrTeamId, userNames: userName, force: true } });
     assert(memberDeleteCallIssued);
   });
 
@@ -261,7 +242,7 @@ describe(commands.M365GROUP_USER_REMOVE, () => {
 
     });
 
-    await command.action(logger, { options: { groupId: groupOrTeamId, userName: userName, force: true } });
+    await command.action(logger, { options: { groupId: groupOrTeamId, userNames: userName, force: true } });
     assert(memberDeleteCallIssued);
   });
 
@@ -287,7 +268,7 @@ describe(commands.M365GROUP_USER_REMOVE, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
-    await command.action(logger, { options: { teamName: groupOrTeamName, userName: userName, verbose: true } });
+    await command.action(logger, { options: { teamName: groupOrTeamName, userNames: userName, verbose: true } });
     assert(deleteStub.calledTwice);
   });
 
@@ -318,7 +299,6 @@ describe(commands.M365GROUP_USER_REMOVE, () => {
     assert(deleteStub.calledTwice);
   });
 
-
   it('removes the specified members of the specified Microsoft 365 Group specified by groupName', async () => {
     sinon.stub(entraGroup, 'getGroupIdByDisplayName').withArgs(groupOrTeamName).resolves(groupOrTeamId);
 
@@ -343,11 +323,7 @@ describe(commands.M365GROUP_USER_REMOVE, () => {
   });
 
   it('does not fail if the user is not owner or member of the specified Microsoft 365 Group when prompt confirmed', async () => {
-    let memberDeleteCallIssued = false;
-
-    sinon.stub(request, 'delete').callsFake(async (opts) => {
-      memberDeleteCallIssued = true;
-
+    const deleteStub = sinon.stub(request, 'delete').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/${groupOrTeamId}/owners/${userId}/$ref`) {
         return {
           "response": {
@@ -369,8 +345,8 @@ describe(commands.M365GROUP_USER_REMOVE, () => {
     });
 
 
-    await command.action(logger, { options: { groupId: groupOrTeamId, userName: userName, force: true } });
-    assert(memberDeleteCallIssued);
+    await command.action(logger, { options: { groupId: groupOrTeamId, userNames: userName, force: true } });
+    assert(deleteStub.calledTwice);
   });
 
   it('stops removal if an unknown error message is thrown when deleting the owner', async () => {
@@ -400,7 +376,7 @@ describe(commands.M365GROUP_USER_REMOVE, () => {
 
     });
 
-    await command.action(logger, { options: { groupId: groupOrTeamId, userName: userName, force: true } });
+    await command.action(logger, { options: { groupId: groupOrTeamId, userNames: userName, force: true } });
     assert(memberDeleteCallIssued);
   });
 
@@ -425,7 +401,7 @@ describe(commands.M365GROUP_USER_REMOVE, () => {
     );
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
-    await assert.rejects(command.action(logger, { options: { groupId: groupOrTeamId, userName: userName } } as any),
+    await assert.rejects(command.action(logger, { options: { groupId: groupOrTeamId, userNames: userName } }),
       new CommandError(errorMessage));
   });
 
@@ -448,7 +424,7 @@ describe(commands.M365GROUP_USER_REMOVE, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
-    await assert.rejects(command.action(logger, { options: { groupId: groupOrTeamId, userName: userName } } as any),
+    await assert.rejects(command.action(logger, { options: { groupId: groupOrTeamId, userNames: userName } } as any),
       new CommandError('Invalid object identifier'));
   });
 
@@ -481,7 +457,7 @@ describe(commands.M365GROUP_USER_REMOVE, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
-    await assert.rejects(command.action(logger, { options: { groupId: groupOrTeamId, userName: userName } } as any),
+    await assert.rejects(command.action(logger, { options: { groupId: groupOrTeamId, userNames: userName } }),
       new CommandError('Invalid object identifier'));
   });
 
@@ -489,7 +465,7 @@ describe(commands.M365GROUP_USER_REMOVE, () => {
     sinonUtil.restore(entraGroup.isUnifiedGroup);
     sinon.stub(entraGroup, 'isUnifiedGroup').resolves(false);
 
-    await assert.rejects(command.action(logger, { options: { groupId: groupOrTeamId, userName: 'anne.matthews@contoso.onmicrosoft.com', force: true } } as any),
+    await assert.rejects(command.action(logger, { options: { groupId: groupOrTeamId, userNames: 'anne.matthews@contoso.onmicrosoft.com', force: true } }),
       new CommandError(`Specified group with id '${groupOrTeamId}' is not a Microsoft 365 group.`));
   });
 });

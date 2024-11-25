@@ -16,7 +16,8 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  id: string;
+  id?: string;
+  displayName?: string;
   force?: boolean;
   skipRecycleBin: boolean;
 }
@@ -39,6 +40,8 @@ class EntraM365GroupRemoveCommand extends GraphCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initOptionSets();
+    this.#initTypes();
   }
 
   #initTelemetry(): void {
@@ -53,7 +56,10 @@ class EntraM365GroupRemoveCommand extends GraphCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '-i, --id <id>'
+        option: '-i, --id [id]'
+      },
+      {
+        option: '-n, --displayName [displayName]'
       },
       {
         option: '-f, --force'
@@ -67,7 +73,7 @@ class EntraM365GroupRemoveCommand extends GraphCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (!validation.isValidGuid(args.options.id)) {
+        if (args.options.id && !validation.isValidGuid(args.options.id)) {
           return `${args.options.id} is not a valid GUID`;
         }
 
@@ -76,27 +82,40 @@ class EntraM365GroupRemoveCommand extends GraphCommand {
     );
   }
 
+  #initOptionSets(): void {
+    this.optionSets.push({ options: ['id', 'displayName'] });
+  }
+
+  #initTypes(): void {
+    this.types.string.push('id', 'displayName');
+  }
+
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const removeGroup = async (): Promise<void> => {
       if (this.verbose) {
-        await logger.logToStderr(`Removing Microsoft 365 Group: ${args.options.id}...`);
+        await logger.logToStderr(`Removing Microsoft 365 Group: ${args.options.id || args.options.displayName}...`);
       }
 
       try {
-        const isUnifiedGroup = await entraGroup.isUnifiedGroup(args.options.id);
+        let groupId = args.options.id;
+
+        if (args.options.displayName) {
+          groupId = await entraGroup.getGroupIdByDisplayName(args.options.displayName);
+        }
+        const isUnifiedGroup = await entraGroup.isUnifiedGroup(groupId!);
 
         if (!isUnifiedGroup) {
-          throw Error(`Specified group with id '${args.options.id}' is not a Microsoft 365 group.`);
+          throw Error(`Specified group with id '${groupId}' is not a Microsoft 365 group.`);
         }
 
-        const siteUrl = await this.getM365GroupSiteUrl(logger, args.options.id);
+        const siteUrl = await this.getM365GroupSiteUrl(logger, groupId!);
         const spoAdminUrl = await spo.getSpoAdminUrl(logger, this.debug);
 
         // Delete the Microsoft 365 group site. This operation will also delete the group.
         await this.deleteM365GroupSite(logger, siteUrl, spoAdminUrl);
 
         if (args.options.skipRecycleBin) {
-          await this.deleteM365GroupFromRecycleBin(logger, args.options.id);
+          await this.deleteM365GroupFromRecycleBin(logger, groupId!);
           await this.deleteSiteFromRecycleBin(logger, siteUrl, spoAdminUrl);
         }
       }
@@ -109,7 +128,7 @@ class EntraM365GroupRemoveCommand extends GraphCommand {
       await removeGroup();
     }
     else {
-      const result = await cli.promptForConfirmation({ message: `Are you sure you want to remove the group ${args.options.id}?` });
+      const result = await cli.promptForConfirmation({ message: `Are you sure you want to remove the group ${args.options.id || args.options.displayName}?` });
 
       if (result) {
         await removeGroup();

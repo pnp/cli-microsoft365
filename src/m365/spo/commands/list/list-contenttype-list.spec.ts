@@ -18,6 +18,12 @@ describe(commands.LIST_CONTENTTYPE_LIST, () => {
   const contentTypeResponse = {
     "value": [
       {
+        "Parent": {
+          "StringId": "0x01000B1208C5D23DF",
+          "Name": "Item",
+          "Group": "List items",
+          "Id": { "StringId": "0x01000B1208C5D23DF" }
+        },
         "Description": "Create a new document.",
         "DisplayFormTemplateName": "DocumentLibraryForm",
         "DisplayFormUrl": "",
@@ -127,7 +133,7 @@ describe(commands.LIST_CONTENTTYPE_LIST, () => {
 
   it('retrieves all content types of the specific list if listTitle option is passed (debug)', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/sites/ninja/_api/web/lists/getByTitle('Documents')/ContentTypes`) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/ninja/_api/web/lists/getByTitle('Documents')/ContentTypes?$expand=Parent`) {
         if (opts.headers &&
           opts.headers.accept &&
           (opts.headers.accept as string).indexOf('application/json') === 0) {
@@ -150,7 +156,7 @@ describe(commands.LIST_CONTENTTYPE_LIST, () => {
 
   it('retrieves all content types of the specific list if listTitle option is passed', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/sites/ninja/_api/web/lists/getByTitle('Documents')/ContentTypes`) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/ninja/_api/web/lists/getByTitle('Documents')/ContentTypes?$expand=Parent`) {
         if (opts.headers &&
           opts.headers.accept &&
           (opts.headers.accept as string).indexOf('application/json') === 0) {
@@ -172,7 +178,7 @@ describe(commands.LIST_CONTENTTYPE_LIST, () => {
 
   it('retrieves all content types of the specific list if listId option is passed (debug)', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists(guid'dfddade1-4729-428d-881e-7fedf3cae50d')/ContentTypes`) > -1) {
+      if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists(guid'dfddade1-4729-428d-881e-7fedf3cae50d')/ContentTypes?$expand=Parent`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
           (opts.headers.accept as string).indexOf('application/json') === 0) {
@@ -195,7 +201,7 @@ describe(commands.LIST_CONTENTTYPE_LIST, () => {
 
   it('retrieves all content types of the specific list if listUrl option is passed', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/_api/web/GetList(\'%2Fsites%2Fdocuments\')/ContentTypes') {
+      if (opts.url === 'https://contoso.sharepoint.com/_api/web/GetList(\'%2Fsites%2Fdocuments\')/ContentTypes?$expand=Parent') {
         if (opts.headers &&
           opts.headers.accept &&
           (opts.headers.accept as string).indexOf('application/json') === 0) {
@@ -217,7 +223,7 @@ describe(commands.LIST_CONTENTTYPE_LIST, () => {
 
   it('retrieves all content types of the specific list if listUrl option is passed (debug)', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/_api/web/GetList(\'%2Fsites%2Fdocuments\')/ContentTypes') {
+      if (opts.url === 'https://contoso.sharepoint.com/_api/web/GetList(\'%2Fsites%2Fdocuments\')/ContentTypes?$expand=Parent') {
         if (opts.headers &&
           opts.headers.accept &&
           (opts.headers.accept as string).indexOf('application/json') === 0) {
@@ -240,7 +246,7 @@ describe(commands.LIST_CONTENTTYPE_LIST, () => {
 
   it('retrieves all content types of the specific list if listId option is passed', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists(guid'dfddade1-4729-428d-881e-7fedf3cae50d')/ContentTypes`) > -1) {
+      if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists(guid'dfddade1-4729-428d-881e-7fedf3cae50d')/ContentTypes?$expand=Parent`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
           (opts.headers.accept as string).indexOf('application/json') === 0) {
@@ -263,7 +269,7 @@ describe(commands.LIST_CONTENTTYPE_LIST, () => {
 
   it('outputs all properties when output is JSON', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/sites/ninja/_api/web/lists(guid'dfddade1-4729-428d-881e-7fedf3cae50d')/ContentTypes`) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/ninja/_api/web/lists(guid'dfddade1-4729-428d-881e-7fedf3cae50d')/ContentTypes?$expand=Parent`) {
         if (opts.headers &&
           opts.headers.accept &&
           (opts.headers.accept as string).indexOf('application/json') === 0) {
@@ -287,7 +293,7 @@ describe(commands.LIST_CONTENTTYPE_LIST, () => {
   it('command correctly handles list get reject request', async () => {
     const err = 'list retrieve error';
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/_api/web/lists/getByTitle('Documents')/ContentTypes`) {
+      if (opts.url === `https://contoso.sharepoint.com/_api/web/lists/getByTitle('Documents')/ContentTypes?$expand=Parent`) {
         throw err;
       }
 

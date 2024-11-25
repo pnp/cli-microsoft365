@@ -15,6 +15,12 @@ m365 login [options]
 ## Options
 
 ```md definition-list
+`--appId [appId]`
+: App ID of the Microsoft Entra application to use for authentication. This option is crucial and should be specified if it isn't defined elsewhere.
+
+`--tenant [tenant]`
+: ID of the tenant from which accounts should authenticate. Use `common` or `organization` for multitenant apps. Defaults to `common` if not specified and if the config value `tenantId` and the environment variable `CLIMICROSOFT365_TENANT` are also not set.
+
 `-t, --authType [authType]`
 : The type of authentication to use. Allowed values `certificate`, `deviceCode`, `password`, `identity`, `browser`, `secret`. Default `deviceCode`
 
@@ -36,12 +42,6 @@ m365 login [options]
 `-s, --secret [secret]`
 : Client Secret of the Microsoft Entra application to use for authentication. Required when `authType` is set to `secret`.
 
-`--appId [appId]`
-: App ID of the Microsoft Entra application to use for authentication. If not specified, use the app specified in the `CLIMICROSOFT365_ENTRAAPPID` environment variable. If the environment variable is not defined, use the multitenant PnP Management Shell app
-
-`--tenant [tenant]`
-: ID of the tenant from which accounts should be able to authenticate. Use `common` or `organization` if the app is multitenant. If not specified, use the tenant specified in the `CLIMICROSOFT365_TENANT` environment variable. If the environment variable is not defined, use `common` as the tenant identifier
-
 `--cloud [cloud]`
 : Cloud to connect to. Allowed values `Public`, `USGov`, `USGovHigh`, `USGovDoD` and `China`. Default `Public`
 
@@ -55,6 +55,20 @@ m365 login [options]
 <Global />
 
 ## Remarks
+
+:::tip
+
+The CLI determines the `appId` and `tenant` values in the following order of precedence:
+
+1. The `appId` or `tenant` option specified during login.
+2. The `clientId` or `tenantId` value set in the configuration.
+3. The `CLIMICROSOFT365_ENTRAAPPID` or `CLIMICROSOFT365_TENANT` environment variable.
+
+For `appId`, it is **required** that at least one of the options is specified during login.
+
+For `tenant`, if none are specified, the CLI will default to `common`.
+
+:::
 
 Using the `login` command you can log in to Microsoft 365.
 
@@ -78,116 +92,103 @@ When signing in with multiple identities, every signin will be saved as a connec
 
 ## Examples
 
-Log in to Microsoft 365 using the device code
+Log in to Microsoft 365 using the device code.
 
 ```sh
-m365 login
+m365 login --appId 31359c7f-bd7e-475c-86db-fdb8c937548e
 ```
 
-Log in to Microsoft 365 using the device code and set the connection name
+Log in to Microsoft 365 using the device code and set the connection name.
 
 ```sh
-m365 login --connectionName 'myworkaccount'
+m365 login --connectionName 'myworkaccount' --appId 31359c7f-bd7e-475c-86db-fdb8c937548e
 ```
 
-Log in to Microsoft 365 using the device code in debug mode including detailed debug information in the console output
-
-```sh
-m365 login --debug
-```
-
-Log in to Microsoft 365 using a user name and password
-
-```sh
-m365 login --authType password --userName user@contoso.com --password pass@word1
-```
-
-Log in to Microsoft 365 using a PEM certificate
-
-```sh
-m365 login --authType certificate --certificateFile /Users/user/dev/localhost.pem
-```
-
-Log in to Microsoft 365 using a PEM certificate. Use the specified thumbprint
-
-```sh
-m365 login --authType certificate --certificateFile /Users/user/dev/localhost.pem  --thumbprint 47C4885736C624E90491F32B98855AA8A7562AF1
-```
-
-Log in to Microsoft 365 using a personal information exchange (.pfx) file
-
-```sh
-m365 login --authType certificate --certificateFile /Users/user/dev/localhost.pfx --password 'pass@word1'
-```
-
-Log in to Microsoft 365 using a personal information exchange (.pfx) file protected with an empty password
-
-```sh
-m365 login --authType certificate --certificateFile /Users/user/dev/localhost.pfx --password
-```
-
-Log in to Microsoft 365 using a personal information exchange (.pfx) file not protected with a password
-
-```sh
-m365 login --authType certificate --certificateFile /Users/user/dev/localhost.pfx
-```
-
-Log in to Microsoft 365 using a personal information exchange (.pfx) file. Use the specified thumbprint
-
-```sh
-m365 login --authType certificate --certificateFile /Users/user/dev/localhost.pfx --thumbprint 47C4885736C624E90491F32B98855AA8A7562AF1 --password 'pass@word1'
-```
-
-Log in to Microsoft 365 using a certificate from a base64-encoded string
-
-```sh
-m365 login --authType certificate --certificateBase64Encoded MIII2QIBAzCCCJ8GCSqGSIb3DQEHAaCCCJAEg...eX1N5AgIIAA== --thumbprint D0C9B442DE249F55D10CDA1A2418952DC7D407A3
-```
-
-Log in to Microsoft 365 using a system assigned managed identity. Applies to Azure resources with managed identity enabled,
-such as Azure Virtual Machines, Azure App Service or Azure Functions
-
-```sh
-m365 login --authType identity
-```
-
-Log in to Microsoft 365 using managed identity in Azure Cloud Shell. Uses the identity of the current user.
-
-```sh
-m365 login --authType identity
-```
-
-Log in to Microsoft 365 using a user-assigned managed identity. Client id or principal id also known as object id value can be specified in the `userName` option. Applies to Azure resources with managed identity enabled, such as Azure Virtual Machines, Azure App Service or Azure Functions
-
-```sh
-m365 login --authType identity --userName ac9fbed5-804c-4362-a369-21a4ec51109e
-```
-
-Log in to Microsoft 365 using your own multitenant Microsoft Entra application
-
-```sh
-m365 login --appId 31359c7f-bd7e-475c-86db-fdb8c937548c
-```
-
-Log in to Microsoft 365 using your own Microsoft Entra application that's restricted only to allow accounts from the specific tenant
+Log in to Microsoft 365 using your own Microsoft Entra application that's restricted only to allow accounts from the specific tenant.
 
 ```sh
 m365 login --appId 31359c7f-bd7e-475c-86db-fdb8c937548c --tenant 31359c7f-bd7e-475c-86db-fdb8c937548a
 ```
 
-Log in to Microsoft 365 using your own Microsoft Entra application and a personal information exchange (.pfx) file
+Log in to Microsoft 365 using your own Microsoft Entra application and a personal information exchange (.pfx) file.
 
 ```sh
 m365 login --authType certificate --appId 31359c7f-bd7e-475c-86db-fdb8c937548c --tenant 31359c7f-bd7e-475c-86db-fdb8c937548a --certificateFile /Users/user/dev/localhost.pfx --password 'pass@word1'
 ```
 
-Log in to Microsoft 365 using the interactive browser authentication. Uses the identity of the current user.
+Log in to Microsoft 365 using a user name and password with `clientId` set in the configuration.
+
+```sh
+m365 login --authType password --userName user@contoso.com --password pass@word1
+```
+
+Log in to Microsoft 365 using a PEM certificate with `clientId` set in the configuration.
+
+```sh
+m365 login --authType certificate --certificateFile /Users/user/dev/localhost.pem
+```
+
+Log in to Microsoft 365 using a PEM certificate with `clientId` set in the configuration. Use the specified thumbprint.
+
+```sh
+m365 login --authType certificate --certificateFile /Users/user/dev/localhost.pem  --thumbprint 47C4885736C624E90491F32B98855AA8A7562AF1
+```
+
+Log in to Microsoft 365 using a personal information exchange (.pfx) file with `CLIMICROSOFT365_ENTRAAPPID` environment variable set.
+
+```sh
+m365 login --authType certificate --certificateFile /Users/user/dev/localhost.pfx --password 'pass@word1'
+```
+
+Log in to Microsoft 365 using a personal information exchange (.pfx) file protected with an empty password and `CLIMICROSOFT365_ENTRAAPPID` environment variable set.
+
+```sh
+m365 login --authType certificate --certificateFile /Users/user/dev/localhost.pfx --password
+```
+
+Log in to Microsoft 365 using a personal information exchange (.pfx) file not protected with a password and `CLIMICROSOFT365_ENTRAAPPID` environment variable set.
+
+```sh
+m365 login --authType certificate --certificateFile /Users/user/dev/localhost.pfx
+```
+
+Log in to Microsoft 365 using a personal information exchange (.pfx) file. Use the specified thumbprint and `CLIMICROSOFT365_ENTRAAPPID` environment variable set.
+
+```sh
+m365 login --authType certificate --certificateFile /Users/user/dev/localhost.pfx --thumbprint 47C4885736C624E90491F32B98855AA8A7562AF1 --password 'pass@word1'
+```
+
+Log in to Microsoft 365 using a certificate from a base64-encoded string with `CLIMICROSOFT365_ENTRAAPPID` environment variable set.
+
+```sh
+m365 login --authType certificate --certificateBase64Encoded MIII2QIBAzCCCJ8GCSqGSIb3DQEHAaCCCJAEg...eX1N5AgIIAA== --thumbprint D0C9B442DE249F55D10CDA1A2418952DC7D407A3
+```
+
+Log in to Microsoft 365 using a system assigned managed identity with `clientId` set in the configuration. Applies to Azure resources with managed identity enabled, such as Azure Virtual Machines, Azure App Service or Azure Functions.
+
+```sh
+m365 login --authType identity
+```
+
+Log in to Microsoft 365 using managed identity in Azure Cloud Shell with `clientId` set in the configuration. Uses the identity of the current user.
+
+```sh
+m365 login --authType identity
+```
+
+Log in to Microsoft 365 using a user-assigned managed identity with `clientId` set in the configuration. Client id or principal id also known as object id value can be specified in the `userName` option. Applies to Azure resources with managed identity enabled, such as Azure Virtual Machines, Azure App Service or Azure Functions.
+
+```sh
+m365 login --authType identity --userName ac9fbed5-804c-4362-a369-21a4ec51109e
+```
+
+Log in to Microsoft 365 using the interactive browser authentication with `clientId` set in the configuration. Uses the identity of the current user.
 
 ```sh
 m365 login --authType browser
 ```
 
-Log in to Microsoft 365 using a client secret.
+Log in to Microsoft 365 using a client secret with `clientId` set in the configuration.
 
 ```sh
 m365 login --authType secret --secret topSeCr3t@007

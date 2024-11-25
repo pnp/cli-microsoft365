@@ -1,267 +1,129 @@
 # v10 Upgrade Guidance
 
-The v10 of CLI for Microsoft 365 introduces several breaking changes. To help you upgrade to the latest version of CLI for Microsoft 365, we've listed those changes along with any actions you may need to take.
-
-## App
-
-### Updated option names of 'app permission add' to plural
-
-We updated the [app permission add](./cmd/app/permission/permission-add.mdx) command. Option were updated to `applicationPermissions` and `delegatedPermissions`.
-
-#### What action do I need to take?
-
-Please, check the documentation of the [app permission add](./cmd/app/permission/permission-add.mdx) command to see the updated options and adjust your scripts accordingly.
+The v10 release of CLI for Microsoft 365 introduces several breaking changes. To assist you in upgrading to the latest version, we’ve outlined the changes and the actions you may need to take.
 
 ## CLI
 
 ### Removed command `cli reconsent`
 
-The `cli reconsent` command was removed. This command was removed due to the removal of the PnP Management Shell service application.
+Due to the removal of the PnP Management Shell app registration, the cli reconsent command had no use anymore. Therefore, we have removed this command from the CLI.
 
-## CLI configuration
+### Removed `showSpinner` setting
 
-### Removed setting `showSpinner`
-
-We removed the `showSpinner` config variable from the CLI configuration. Due to several issues, the spinner has been permanently removed.
+Persistent issues with the spinner led to its removal from the CLI a few months ago. However, the `showSpinner` setting remained in the CLI configuration. In this major release, we have removed the `showSpinner` setting entirely.
 
 #### What action do I need to take?
 
-Remove all entries in your script where you use the `showSpinner` setting.
-
-## CLI Doctor
+Remove all instances in your scripts where you reference the `showSpinner` setting.
 
 ### Updated output of `cli doctor` command
 
-For this new major version, we've adjusted the output of the `cli doctor` command to align the renaming of Azure AD to Microsoft Entra ID.
+In this major release, we have updated the [cli doctor](./cmd/cli/cli-doctor.mdx) command output to reflect the renaming of Azure AD to Microsoft Entra ID.
 
-The output is updated with `cliAadAppId` as `cliEntraAppId` and `cliAadAppTenant` as `cliEntraAppTenant`.
+The following properties have been renamed in the result:
 
-#### What action do I need to take?
-
-Please, check the documentation of the [cli doctor](./cmd/cli/cli-doctor.mdx) command to see the updated output and adjust your scripts accordingly.
-
-## CLI environment variables
-
-### Removed deprecated CLI environment variables
-
-For this new major version, we've removed the deprecated `AAD` CLI environment variables. We have renamed `CLIMICROSOFT365_AADAPPID` variable to `CLIMICROSOFT365_ENTRAAPPID`.
+- `cliAadAppId` to `cliEntraAppId`
+- `cliAadAppTenant` to `cliEntraAppTenant`
 
 #### What action do I need to take?
 
-Please, check the user guidance [Log in to Microsoft 365](./user-guide/connecting-microsoft-365.mdx) command to see the updated environment variables to use.
+Review the documentation of the `cli doctor` command to see the new output structure and adjust your scripts accordingly.
 
-## CLI Status
+### Removed deprecated environment variables
 
-### Removed deprecated CLI environment variables
-
-We've updated the [m365 status](./cmd/status.mdx) command output. Previously the command would return `Logged out from Microsoft 365` now it will return `Logged out`.
+In the aftermath of renaming all Azure AD-related commands and options to Microsoft Entra ID, we have removed the deprecated environment variable `CLIMICROSOFT365_AADAPPID` that was used to store the Microsoft Entra app ID.
 
 #### What action do I need to take?
 
-Please, update your scripts to reflect the new output of the [m365 status](./cmd/status.mdx) command.
+Instead of using `CLIMICROSOFT365_AADAPPID`, use `CLIMICROSOFT365_ENTRAAPPID` to store the Microsoft Entra app ID.
+
+### Updated output of `status` command
+
+The command output of [status](./cmd/status.mdx) has been updated. Previously, the command returned `Logged out from Microsoft 365`, now it will simply return `Logged out`.
+
+#### What action do I need to take?
+
+Please, update your scripts to reflect the new output of the [status](./cmd/status.mdx) command.
 
 ## Entra ID
 
-### Removed deprecated Guest value from 'aad m365group user list' command.
+### Removed deprecated `guest` value from `entra m365group user list` command.
 
-The deprecated Guest value was removed from the `role` option in the [aad m365group user list](./cmd/entra/m365group/m365group-user-list.mdx) command.
-
-#### What action do I need to take?
-
-Please, check the documentation of the [aad m365group user list](./cmd/entra/m365group/m365group-user-list.mdx) command to see the updated ``role` option and adjust your scripts accordingly.
-
-#### Aligned options with naming convention
-
-We updated option naming from `groupDisplayName` to `groupName` and `userPrincipalName` to `userName`.
-
-**Affected commands:**
-
-- [entra group member list](./cmd/entra/group/group-member-list.mdx)
-- [entra m365group conversation post list](./cmd/entra/m365group/m365group-conversation-post-list.mdx)
-- [entra m365group recyclebinitem list](./cmd/entra/m365group/m365group-recyclebinitem-list.mdx)
-- [outlook message get](./cmd/outlook/message/message-get.mdx)  
+In the In the entra m365group user list command, it was previously possible to use the `role` option with the value `Guest`. Since this did not yield the expected output, we have removed this option.
 
 #### What action do I need to take?
 
-Please, check the documentation of the affected commands to see the updated option naming and adjust your scripts accordingly.
-
-### Aligns options of `entra enterpriseapp` commands
-
-For this new major version, we've aligned the options of the `entra enterpriseapp` commands as follows: 
-
-[entra enterpriseapp add](https://pnp.github.io/cli-microsoft365/cmd/entra/enterpriseapp/enterpriseapp-add)
-
-| Old option | New option |
-|---------------|---------------|
-| --appId [appId] | -i, --id [id] |
-| --appName [appName] | -n, --displayName [displayName] |
-
-[entra enterpriseapp get](https://pnp.github.io/cli-microsoft365/cmd/entra/enterpriseapp/enterpriseapp-get)
-
-| Old option | New option |
-|---------------|---------------|
-| -i, --appId [appId] | -i, --id [id] |
-| -n, --appDisplayName [appDisplayName] | -n, --displayName [displayName] |
-| --appObjectId [appObjectId] | --objectId [objectId] |
-
-[entra enterpriseapp list](https://pnp.github.io/cli-microsoft365/cmd/entra/enterpriseapp/enterpriseapp-list)
-
-| Old option | New option |
-|---------------|---------------|
-| --displayName [displayName] | -n, --displayName [displayName] |
-
-#### What action do I need to take?
-
-Please, check the documentation of the [entra enterpriseapp add](./cmd/entra/enterpriseapp/enterpriseapp-add), [entra enterpriseapp get](./cmd/entra/enterpriseapp/enterpriseapp-get), and [entra enterpriseapp list](./cmd/entra/enterpriseapp/enterpriseapp-list) commands to see the updated options and adjust your scripts accordingly.
-
-### Removed deprecated option `userName` from the `entra m365group user add` command.
-
-The deprecated option `userName` was removed from the command [entra m365group user add](./cmd/entra/m365group/m365group-user-add.mdx).
-
-#### What action do I need to take?
-
-In your scripts, replace every occurrence of the deprecated option `userName` with `userNames`.
+Remove all --role guest instances from your scripts. To list guest users of a group, use [entra m365group user list](./cmd/entra/m365group/m365group-user-list.mdx) in conjunction with [entra user get](./cmd/entra/user/user-get.mdx) to determine if a user is a guest.
 
 ### Enhanced `entra m365group set` command
 
-We've enhanced the [entra m365group set](./cmd/entra/m365group/m365group-set.mdx) command so that a group that we wish to update can also be retrieved by it's displayName. Before, this was only able by the group ID. We have replaced the original `displayName` option by `newDisplayName`. Secondly we've updated the way the command handles updating users. Ownes/members that are not specified, will now be removed from the group. To add users without removing old users, the command [entra m365group user add](./cmd/entra/m365group/m365group-user-add) should be used. We've also added extra options to specify owners and members by UserName or Id.
+We've enhanced the [entra m365group set](./cmd/entra/m365group/m365group-set.mdx) command to allow retrieving a group by its `displayName`. Previously, groups could only be retrieved by their ID. We have replaced the original `displayName` option with `newDisplayName`. Additionally, owners/members not specified in the command will now be **removed** from the group. To add members/owners without affecting existing ones, use [entra m365group user add](./cmd/entra/m365group/m365group-user-add).
 
 #### What action do I need to take?
 
-Make sure that if you are currently updating groups using the `displayName` option, you update your scripts to use the `newDisplayName` option instead. Also make sure that your script uses the new option names for updating Owners and Members, and that it does include all users that should be a member or owner of the group.
+Ensure your scripts use `newDisplayName` when updating groups by `displayName`. Also, ensure that all intended group members and owners are specified, as any unspecified members or owners will be removed.
 
-### Renamed `entra group user` commands to `entra group member`
+### Removed `aad` options and aliasses
 
-We have renamed the `entra group user` commands to `entra group member` to better reflect the command's purpose,. The following commands were renamed:
-- [entra group member add](./cmd/entra/group/group-member-add.mdx)
-- [entra group member list](./cmd/entra/group/group-member-list.mdx)
-- [entra group member set](./cmd/entra/group/group-member-set.mdx)
+As part of renaming Azure AD to Microsoft Entra ID, all references to `aad` in command and option names have been replaced with `entra`. For example, `aadAppId` is now `entraAppId`.
 
 #### What action do I need to take?
 
-Please update your scripts to use the new command names.
-
-### Removed `aad` options and aliasses to `aad` commands.
-
-As part of the renaming of Azure AD to Microsoft Entra ID, we have removed the `aad` options and aliases. From now on only `entra` commands are available.
-
-#### What action do I need to take?
-
-Please, check if your scripts use any of the `aad` commands and if so update it to `entra` commands.
-
-### Removed deprecated option `username` from `entra m365group user set` command.
-
-The deprecated option `username` was removed from the [entra m365group user set](./cmd/entra/m365group/m365group-user-set.mdx) command.
-
-#### What action do I need to take?
-
-Please, check the documentation of the [entra m365group user set](./cmd/entra/m365group/m365group-user-set.mdx) command to see the updated `username` option and adjust your scripts accordingly.
+Update any `aad` references in your scripts to `entra` for compatibility.
 
 ## SharePoint
 
 ### Updated `spo site appcatalog remove` options
 
-We updated the [spo site appcatalog remove](./cmd/spo/site/site-appcatalog-remove.mdx) command. This command is a destructive operation that removes a site collection app catalog. Previously, it did not prompt for confirmation before executing this action, which could potentially lead to unintended data loss. To address this, we have added a confirmation prompt by default.
-
-Because of this rework, we have added a new option.
-
-**New options:**
-
-Option | Description
---- | ---
-`-f, --force` | Don't prompt for confirmation.
+The [spo site appcatalog remove](./cmd/spo/site/site-appcatalog-remove.mdx) command now includes a confirmation prompt to prevent unintentional deletions. To bypass this prompt, use the `--force` flag.
 
 #### What action do I need to take?
 
-Update your scripts with the following:
+Add `--force` to your scripts to bypass the confirmation prompt, if desired.
 
-- Add the option `--force` if you want to bypass the confirmation prompt and proceed with the removal operation automatically.
+### Removed deprecated `wait` option from `spo site remove` and `spo tenant recyclebinitem restore`
 
-### Removed the deprecated `wait` option and output from the `spo tenant recyclebinitem restore` command
+The deprecated `wait` option has been removed from the [spo site remove](./cmd/spo/site/site-remove.mdx) and [spo tenant recyclebinitem restore](./cmd/spo/tenant/tenant-recyclebinitem-restore.mdx) commands. These commands no longer return a response on success.
 
-For this new major version, we've removed the deprecated `wait` option from the `spo tenant recyclebinitem restore` command. The command now won't return a response on success.
+**What action do I need to take?**
 
-#### What action do I need to take?
+Remove the `--wait` option and adjust scripts to not expect a response from these commands.
 
-- Please, check the documentation of the [spo tenant recyclebinitem restore](./cmd/spo/tenant/tenant-recyclebinitem-restore.mdx) command to see the updated output and adjust your scripts accordingly.
-- In the `spo tenant recyclebinitem restore` command, remove deprecated `wait` option from your scripts.
-
-### Removed the deprecated `wait` option and output from the `spo site remove` command
-
-For this new major version, we've removed the deprecated `wait` option from the `spo site remove` command.
-
-#### What action do I need to take?
-
-In the [spo site remove](./cmd/spo/site/site-remove.mdx) command, remove deprecated `wait` option from your scripts.
-
-### Removes duplicate property from 'spo list list' command.
+### Removes duplicate property from `spo list list` command.
 
 In the [spo list list](./cmd/spo/list/list-list.mdx) we removed the `Url` from the command output as it was a duplicate of the `RootFolder/ServerRelativeUrl` property.
 
 #### What action do I need to take?
 
-Please update your scripts not to use the `Url` property from the command output.
+Please update your scripts not to use the `Url` property from the command output, instead use `RootFolder/ServerRelativeUrl`.
 
-### Updated command `spo file copy`
+### Updated commands for file and folder operations
 
-Because of some limitations of the current [spo file copy](./cmd/spo/file/file-copy.mdx) command, we have decided to move it to a new endpoint. This change is necessary to ensure the command's functionality and reliability. Because of the new endpoint, the command input and output have changed.
+Due to limitations with the current endpoints for file and folder operations, the commands [spo file copy](./cmd/spo/file/file-copy.mdx), [spo file move](./cmd/spo/file/file-move.mdx), [spo folder copy](./cmd/spo/folder/folder-copy.mdx), and [spo file move](./cmd/spo/file/file-move.mdx) have been updated to use new endpoints. This change improves the commands' functionality and reliability. Consequently, the command inputs and outputs have been updated.
 
-**Command options:**
+Several options previously available are no longer supported with the new commands:
 
-Unfortunately, we had to drop the `--resetAuthorAndCreated` options as it's no longer supported by the new endpoint. In return, we were able to add two new options:
-- `--ignoreVersionHistory`: Only copy the most recent version of the file and ignore the version history.
-- `--skipWait`: Don't wait for the copy operation to complete.
+* `spo file copy`: Removed `--resetAuthorAndCreated`
+* `spo file move`: Removed `--retainEditorAndModified`
+* `spo folder copy`: Removed `--resetAuthorAndCreated` and `--bypassSharedLock`
+* `spo folder move`: Removed `--retainEditorAndModified` and `--bypassSharedLock`
 
-**Command output:**
+In return, we have added new options to the commands:
 
-In the past versions of CLI for Microsoft 365, the command had no output. When using option `--nameConflictBehavior rename`, it's hard for the user to know what the actual name of the copied file is. With the new endpoint, the command now returns the file information about the destination file, providing you with all the info you need to execute other commands on this file.
+* `spo file copy`:
+  * `--ignoreVersionHistory`: Only copy the most recent version of the file and ignore the version history.
+  * `--skipWait`: Don't wait for the move operation to complete.
+* `spo file move`:
+  * `--includeItemPermissions`: Ensure that item-level permissions are preserved during the move.
+  * `--skipWait`: Don't wait for the move operation to complete.
+* `spo folder copy` and `spo folder move`:
+  * `--skipWait`: Don't wait for the move operation to complete.
 
-#### What action do I need to take?
-
-When using the [spo file copy](./cmd/spo/file/file-copy.mdx) command, please use the new command input. This means that you'll have to remove option `--resetAuthorAndCreated` from your scripts and automation tools.
-
-### Updated command `spo file move`
-
-Just like `spo file copy`, we have decided to move the [spo file move](./cmd/spo/file/file-move.mdx) command to a new endpoint. This change is necessary to ensure the command's functionality and reliability. Because of the new endpoint, the command input and output have changed.
-
-**Command options:**
-
-Unfortunately, we had to drop the `--retainEditorAndModified` options as it's no longer supported by the new endpoint. In return, we were able to add two new options:
-- `--includeItemPermissions`: Ensure that item-level permissions are preserved during the move.
-- `--skipWait`: Don't wait for the copy operation to complete.
-
-**Command output:**
-
-In the past versions of CLI for Microsoft 365, the command had no output. When using option `--nameConflictBehavior rename`, it's hard for the user to know what the actual name of the copied file is. With the new endpoint, the command now returns the file information about the destination file, providing you with all the info you need to execute other commands on this file.
+Previously, these commands provided no output, making it difficult to track the final name of copied or moved items, especially when using the `--nameConflictBehavior rename` option. With the new endpoints, each command now returns information about the destination file or folder, allowing you to seamlessly execute further commands on the moved or copied items.
 
 #### What action do I need to take?
 
-When using the [spo file move](./cmd/spo/file/file-move.mdx) command, please use the new command input. This means that you'll have to remove option `--retainEditorAndModified` from your scripts and automation tools.
-
-### Updated command `spo folder move`
-
-Because of some limitations of the current [spo folder move](./cmd/spo/folder/folder-move.mdx) command, we have decided to move it to a new endpoint. This change is necessary to ensure the command's functionality and reliability. Because of the new endpoint, the command input and output have changed.
-
-**Command options:**
-
-Unfortunately, we had to drop the `--retainEditorAndModified` and `--bypassSharedLock` options as it's no longer supported by the new endpoint. In return, we were able to add a new option:
-- `--skipWait`: Don't wait for the move operation to complete.
-
-**Command output:**
-
-In the past versions of CLI for Microsoft 365, the command had no output. When using option `--nameConflictBehavior rename`, it's hard for the user to know what the actual name of the moved folder is. With the new endpoint, the command now returns the folder information about the destination folder, providing you with all the info you need to execute other commands on this folder.
-
-#### What action do I need to take?
-
-When using the [spo folder move](./cmd/spo/folder/folder-move.mdx) command, please use the new command input. This means that you'll have to remove options `--retainEditorAndModified` and `--bypassSharedLock` from your scripts and automation tools.
-
-### Removed `spo folder rename` alias
-
-The `spo folder rename` command was removed and replaced by the [spo folder set](./cmd/spo/folder/folder-set.mdx) command.
-
-#### What action do I need to take?
-
-Please, update your scripts to use the `spo folder set` command instead of `spo folder rename`.
+To continue using these commands, update your scripts and automation tools to reflect the new command inputs. Remove any unsupported options (`--resetAuthorAndCreated`, `--retainEditorAndModified`, and `--bypassSharedLock` where applicable) to ensure compatibility with the updated commands.
 
 ### Updated output of `spo applicationcustomizer get` command
 
@@ -269,45 +131,15 @@ In the previous version of CLI, the command output had a `Rights` property that 
 
 #### What action do I need to take?
 
-Please, check the documentation of the [spo applicationcustomizer get](./cmd/spo/applicationcustomizer/applicationcustomizer-get.mdx) command to see the updated output and adjust your scripts accordingly.
-
-### Updated `spo contenttype field remove` options
-
-We made some slight changes to the options of command [spo contenttype field remove](./cmd/spo/contenttype/contenttype-field-remove.mdx) command. The following changes were made:
-
-- Removed the short option for `contentTypeId`.
-- Renamed the option `fieldLinkId` to `id` and added the short option `i`.
-
-#### What actions do I need to take?
-
-Please update your scripts to make sure that you use the new name/short options.
-
-### Updated `spo contenttype field set` options
-
-We updated the [spo contenttype field set](./cmd/spo/contenttype/contenttype-field-set.mdx) command. We made the following changes:
-
-- Removed the short option for `contentTypeId`
-- Add the short option `i` for `id`
-
-#### What actions do I need to take?
-
-Please update your scripts to make sure that you use the correct options.
+Please, check the documentation of the [spo applicationcustomizer get](./cmd/spo/applicationcustomizer/applicationcustomizer-get.mdx) command to see the updated output and adjust your scripts accordingly. If you are using the `Rights` property, there is no change you should make.
 
 ### Updated `spo sitescript get` output
 
-We updated the output from the [`spo sitescript get`](./cmd/spo/sitescript/sitescript-get.mdx) command. The `Content` property is now a JSON object instead of a stringified JSON object, so it's easier to interact with the sitescript data, even when --content is not specified.
+We updated the output from the [spo sitescript get](./cmd/spo/sitescript/sitescript-get.mdx) command. The `Content` property is now a JSON object instead of a stringified JSON object, so it's easier to interact with the sitescript data, even when `--content` is not specified.
 
 #### What action do I need to take?
 
-Please update your scripts to reflect the new output of the [`spo sitescript get`](./cmd/spo/sitescript/sitescript-get.mdx) command.
-
-### Renamed `spo site rename` to `spo tenant site rename`
-
-The `spo site rename` command was renamed to [`spo tenant site rename`](./cmd/spo/tenant/tenant-site-rename.mdx) to better reflect the command's purpose as this is an action that only an administrator can do.
-
-#### What action do I need to take?
-
-Please update your scripts to use the new command name.
+Adjust your scripts to expect a valid JSON object instead of a stringified object in the `Content` property of the output.
 
 ## SharePoint Framework
 
@@ -317,9 +149,19 @@ Overwriting the SPFx package should be the default behavior of the continuous de
 
 #### What action do I need to take?
 
-Please update your scripts not to use the `overwrite` option.
+Please update your scripts not to use the `--overwrite` option.
 
 ## Teams
+
+### Enhanced `teams cache remove` command
+
+We enhanced the [teams cache remove](./cmd/teams/cache/cache-remove.mdx) command to support the removal of the cache from the new Teams client. The breaking change we introduced is that it now targets new Teams clients by default. 
+
+To still support the old client, we have added the option `--client`, in which you can specify `classic` as value to remove the cache of the old Teams client.
+
+#### What action do I need to take?
+
+Add the `--client` option to your scripts to specify which client's cache you want to remove. Otherwise, it will attempt to remove the cache from the new client.
 
 ### Removes duplicate property from 'teams tab list' command.
 
@@ -327,16 +169,21 @@ For the [teams tab list](./cmd/teams/tab/tab-list.mdx) command we removed the `t
 
 #### What action do I need to take?
 
-Please update your scripts not to use the `teamsAppTabId` property from the command output.
+Please update your scripts not to use the `teamsAppTabId` property from the command output. Instead, use the `teamsApp/id` property.
 
-## Yammer (Viva Engage)
+## General
 
-### Removal of deprecated Yammer aliases
+### Aligned command names
 
-We have removed all deprecated `Yammer` command aliases. These aliases were introduced in the previous version to prevent the introduction of breaking changes. Since Yammer has been renamed to Viva Engage a while ago, the following aliases were removed:
+Some command names have been updated to reflect the latest Microsoft 365 terminology. Additionally, command improvements sometimes lead to renaming for better functionality alignment.
 
-Alias | Command 
---|--
+v9 command | v10 command
+--- | ---
+`entra group user add` | [entra group member add](./cmd/entra/group/group-member-add.mdx)
+`entra group user list` | [entra group member list](./cmd/entra/group/group-member-list.mdx)
+`entra group user set` | [entra group member set](./cmd/entra/group/group-member-set.mdx)
+`spo folder rename` | [spo folder set](./cmd/spo/folder/folder-set.mdx)
+`spo site rename` | [spo tenant site rename](./cmd/spo/tenant/tenant-site-rename.mdx)
 `yammer search` | [viva engage search](./cmd/viva/engage/engage-search.mdx)
 `yammer group list` | [viva engage group list](./cmd/viva/engage/engage-group-list.mdx)
 `yammer group user add` | [viva engage group user add](./cmd/viva/engage/engage-group-user-add.mdx)
@@ -361,15 +208,41 @@ Alias | Command
 
 #### What action do I need to take?
 
-Replace any of the aliases mentioned above with the corresponding command name. The functionality of the command hasn't changed.
+Update your scripts to use the new command names listed.
 
-## General
+### Aligned naming options
+
+Just like with command names, we also have to rename options to reflect the changes in the product. We also try to make the options more descriptive and clearer to make it easier for you to use the CLI.
+These changes aim to make it easier for you to use the CLI.
+
+We've updated the following options:
+
+Command | Old option | New option
+------- | ---------- | ----------
+[app permission add](./cmd/app/permission/permission-add.mdx) | `applicationPermission` <br /> `delegatedPermission` | `applicationPermissions` <br /> `delegatedPermissions`
+[entra enterpriseapp add](./cmd/entra/enterpriseapp/enterpriseapp-add) | `appId` <br /> `appName` | `id` <br /> `displayName`
+[entra enterpriseapp get](./cmd/entra/enterpriseapp/enterpriseapp-get) | `appId` <br /> `appDisplayName` <br /> `appObjectId` | `id` <br /> `displayName` <br /> `objectId`
+[entra group member list](./cmd/entra/group/group-member-list.mdx) | `groupDisplayName` | `groupName`
+[entra m365group set](./cmd/entra/m365group/m365group-set.mdx) | `displayName` | `newDisplayName`
+[entra m365group conversation post list](./cmd/entra/m365group/m365group-conversation-post-list.mdx) | `groupDisplayName` | `groupName`
+[entra m365group recyclebinitem list](./cmd/entra/m365group/m365group-recyclebinitem-list.mdx) | `groupDisplayName` | `groupName`
+[entra m365group user add](./cmd/entra/m365group/m365group-user-add.mdx) | `userName` | `userNames`
+[entra m365group user remove](./cmd/entra/m365group/m365group-user-remove.mdx) | `userName` | `userNames`
+[entra m365group user set](./cmd/entra/m365group/m365group-user-set.mdx) | `userName` | `userNames`
+[outlook message get](./cmd/outlook/message/message-get.mdx) | `userPrincipalName` | `userName`
+[spo contenttype field remove](./cmd/spo/contenttype/contenttype-field-remove.mdx) | `i` <br /> `fieldLinkId` | `contentTypeId` <br /> `id`
+[spo contenttype field set](./cmd/spo/contenttype/contenttype-field-set.mdx) | `i` | `contentTypeId`
+
+#### What action do I need to take?
+
+If you use any of the commands listed above, ensure that you use the new option names.
 
 ### Ensured output for `list` commands
 
 We noticed that some of the `list` commands were not returning any output when no items were found. We've updated all `list` commands to return an empty array when no items are found.
 
 The commands impacted by this change are:
+
 - [entra oauth2grant list](./cmd/entra/oauth2grant/oauth2grant-list.mdx)
 - [flow environment list](./cmd/flow/environment/environment-list.mdx)
 - [pa app list](./cmd/pa/app/app-list.mdx)
@@ -389,4 +262,4 @@ The commands impacted by this change are:
 
 #### What action do I need to take?
 
-Update your scripts using these commands to handle the empty array output when there are no items found.
+Update your scripts to expect an empty array when no items are found.

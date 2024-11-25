@@ -17,7 +17,7 @@ m365 entra m365group user remove [options]
 : The ID of the Microsoft 365 group. Specify only one of the following: `groupId`, `groupName`, `teamId`, or `teamName`.
 
 `--groupName [groupName]`
-: The display name of the Microsoft 365 group. Specify only one of the following: `groupId`, `groupName`, `teamId`, or `teamName`..
+: The display name of the Microsoft 365 group. Specify only one of the following: `groupId`, `groupName`, `teamId`, or `teamName`.
 
 `--teamId [teamId]`
 : The ID of the Microsoft Teams team. Specify only one of the following: `groupId`, `groupName`, `teamId`, or `teamName`.
@@ -25,14 +25,11 @@ m365 entra m365group user remove [options]
 `--teamName [teamName]`
 : The display name of the Microsoft Teams team. Specify only one of the following: `groupId`, `groupName`, `teamId`, or `teamName`.
 
-`-n, --userName [userName]`
-: (deprecated) User's UPN (user principal name), eg. `johndoe@example.com`.. Specify only one of the following: `userName`, `ids` or `userNames`.
-
 `--ids [ids]`
-: Microsoft Entra IDs of users. You can also pass a comma-separated list of IDs. Specify only one of the following `userName`, `ids` or `userNames`.
+: Microsoft Entra IDs of users. You can also pass a comma-separated list of IDs. Specify either `ids` or `userNames` but not both.
 
 `--userNames [userNames]`
-: The user principal names of users. You can also pass a comma-separated list of UPNs. Specify only one of the following `userName`, `ids` or `userNames`.
+: The user principal names of users. You can also pass a comma-separated list of UPNs. Specify either `ids` or `userNames` but not both.
 
 `-f, --force`
 : Don't prompt for confirming removing the user from the specified Microsoft 365 Group or Microsoft Teams team.

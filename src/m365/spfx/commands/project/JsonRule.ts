@@ -65,9 +65,9 @@ export abstract class JsonRule extends Rule {
       isArray = true;
       const pos = currentProperty.indexOf('[') + 1;
       // get array element from the property name
-      arrayElement = currentProperty.substr(pos, currentProperty.length - pos - 1);
+      arrayElement = currentProperty.substring(pos, currentProperty.length - 1);
       // remove array element from the property name
-      currentProperty = currentProperty.substr(0, pos - 1);
+      currentProperty = currentProperty.substring(0, pos - 1);
     }
 
     for (let i = 0; i < node.children.length; i++) {

@@ -39,13 +39,12 @@ class TenantReportOffice365ActivationCountsCommand extends GraphCommand {
     try {
       const res: any = await request.get(requestOptions);
       let content: string = '';
-      const cleanResponse = this.removeEmptyLines(res);
 
       if (output && output.toLowerCase() === 'json') {
-        content = formatting.parseCsvToJson(cleanResponse);
+        content = formatting.parseCsvToJson(res);
       }
       else {
-        content = cleanResponse;
+        content = res;
       }
 
       await logger.log(content);
@@ -53,12 +52,6 @@ class TenantReportOffice365ActivationCountsCommand extends GraphCommand {
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
-  }
-
-  private removeEmptyLines(input: string): string {
-    const rows: string[] = input.split('\n');
-    const cleanRows = rows.filter(Boolean);
-    return cleanRows.join('\n');
   }
 }
 

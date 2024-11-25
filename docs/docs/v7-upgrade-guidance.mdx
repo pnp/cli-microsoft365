@@ -93,7 +93,7 @@ Besides that, when using JSON output, we had duplicate properties in the result.
 
 ### Updated output of `pp chatbot list`
 
-The output of [pp chatbot list](./cmd/pp/chatbot/chatbot-list.mdx) contained a `displayName` property. However, the actual property coming from the API was called `name`. We changed `displayName` back to `name` so that it now aligns with the other chatbot commands where a `name` option can be used and a `name` property may be returned.
+The output of [pp chatbot list](./cmd/pp/copilot/copilot-list.mdx) contained a `displayName` property. However, the actual property coming from the API was called `name`. We changed `displayName` back to `name` so that it now aligns with the other chatbot commands where a `name` option can be used and a `name` property may be returned.
 
 #### What action do I need to take?
 
@@ -128,7 +128,7 @@ Update your scripts to use the new options. Verify that your scripts work as int
 
 ### Removed `deleted` flag from `spo site list` command
 
-In the previous versions of CLI for Microsoft 365, you could get deleted sites from your SharePoint tenant using the command [spo site list](./cmd/spo/site/site-list.mdx) by providing the flag `--deleted`. In the latest release, we have removed this option from the command. To get all deleted sites in your tenant, you can now use the command [spo tenant recyclebinitem list](./cmd/spo/tenant/tenant-recyclebinitem-list.mdx).
+In the previous versions of CLI for Microsoft 365, you could get deleted sites from your SharePoint tenant using the command [spo site list](./cmd/spo/tenant/tenant-site-list.mdx) by providing the flag `--deleted`. In the latest release, we have removed this option from the command. To get all deleted sites in your tenant, you can now use the command [spo tenant recyclebinitem list](./cmd/spo/tenant/tenant-recyclebinitem-list.mdx).
 
 #### What action do I need to take?
 
@@ -447,9 +447,9 @@ Command|Old option|New option
 [pp card get](./cmd/pp/card/card-get.mdx)|`environment`|`environmentName`
 [pp card list](./cmd/pp/card/card-list.mdx)|`environment`|`environmentName`
 [pp card remove](./cmd/pp/card/card-remove.mdx)|`environment`|`environmentName`
-[pp chatbot get](./cmd/pp/chatbot/chatbot-get.mdx)|`environment`|`environmentName`
-[pp chatbot list](./cmd/pp/chatbot/chatbot-list.mdx)|`environment`|`environmentName`
-[pp chatbot remove](./cmd/pp/chatbot/chatbot-remove.mdx)|`environment`|`environmentName`
+[pp chatbot get](./cmd/pp/copilot/copilot-get.mdx)|`environment`|`environmentName`
+[pp chatbot list](./cmd/pp/copilot/copilot-list.mdx)|`environment`|`environmentName`
+[pp chatbot remove](./cmd/pp/copilot/copilot-remove.mdx)|`environment`|`environmentName`
 [pp dataverse table get](./cmd/pp/dataverse/dataverse-table-get.mdx)|`environment`|`environmentName`
 [pp dataverse table list](./cmd/pp/dataverse/dataverse-table-list.mdx)|`environment`|`environmentName`
 [pp dataverse table remove](./cmd/pp/dataverse/dataverse-table-remove.mdx)|`environment`|`environmentName`

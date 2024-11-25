@@ -89,9 +89,9 @@ class SpoSiteAdminListCommand extends SpoCommand {
     }
 
     const adminUrl: string = await spo.getSpoAdminUrl(logger, this.debug);
-    const siteId = await this.getSiteId(args.options.siteUrl, logger);
+    const tenantSiteProperties = await spo.getSiteAdminPropertiesByUrl(args.options.siteUrl, false, logger, this.verbose);
     const requestOptions: CliRequestOptions = {
-      url: `${adminUrl}/_api/SPO.Tenant/GetSiteAdministrators?siteId='${siteId}'`,
+      url: `${adminUrl}/_api/SPO.Tenant/GetSiteAdministrators?siteId='${tenantSiteProperties.SiteId}'`,
       headers: {
         accept: 'application/json;odata=nometadata'
       },
@@ -99,7 +99,7 @@ class SpoSiteAdminListCommand extends SpoCommand {
     };
 
     const response = await request.post<AdminResult>(requestOptions);
-    const primaryAdminLoginName = await spo.getPrimaryAdminLoginNameAsAdmin(adminUrl, siteId, logger, this.verbose);
+    const primaryAdminLoginName = await spo.getPrimaryAdminLoginNameAsAdmin(adminUrl, tenantSiteProperties.SiteId, logger, this.verbose);
 
     const mappedResult = response.value.map((u: AdminUserResult): AdminCommandResultItem => ({
       Email: u.email,
@@ -108,16 +108,6 @@ class SpoSiteAdminListCommand extends SpoCommand {
       IsPrimaryAdmin: u.loginName === primaryAdminLoginName
     }));
     await logger.log(mappedResult);
-  }
-
-  private async getSiteId(siteUrl: string, logger: Logger): Promise<string> {
-    const siteGraphId = await spo.getSiteId(siteUrl, logger, this.verbose);
-    const match = siteGraphId.match(/,([a-f0-9\-]{36}),/i);
-    if (!match) {
-      throw `Site with URL ${siteUrl} not found`;
-    }
-
-    return match[1];
   }
 
   private async callAction(logger: Logger, args: CommandArgs): Promise<void> {

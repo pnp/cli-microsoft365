@@ -1653,21 +1653,21 @@ const sidebars: SidebarsConfig = {
           ]
         },
         {
-          chatbot: [
+          copilot: [
             {
               type: 'doc',
-              label: 'chatbot get',
-              id: 'cmd/pp/chatbot/chatbot-get'
+              label: 'copilot get',
+              id: 'cmd/pp/copilot/copilot-get'
             },
             {
               type: 'doc',
-              label: 'chatbot list',
-              id: 'cmd/pp/chatbot/chatbot-list'
+              label: 'copliot list',
+              id: 'cmd/pp/copilot/copilot-list'
             },
             {
               type: 'doc',
-              label: 'chatbot remove',
-              id: 'cmd/pp/chatbot/chatbot-remove'
+              label: 'copilot remove',
+              id: 'cmd/pp/copilot/copilot-remove'
             }
           ]
         },
@@ -1966,6 +1966,11 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'container get',
               id: 'cmd/spe/container/container-get'
+            },
+            {
+              type: 'doc',
+              label: 'container list',
+              id: 'cmd/spe/container/container-list'
             }
           ]
         },
@@ -1975,6 +1980,11 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'containertype add',
               id: 'cmd/spe/containertype/containertype-add'
+            },
+            {
+              type: 'doc',
+              label: 'containertype get',
+              id: 'cmd/spe/containertype/containertype-get'
             },
             {
               type: 'doc',
@@ -2632,6 +2642,11 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'folder sharinglink remove',
               id: 'cmd/spo/folder/folder-sharinglink-remove'
+            },
+            {
+              type: 'doc',
+              label: 'folder sharinglink set',
+              id: 'cmd/spo/folder/folder-sharinglink-set'
             }
           ]
         },
@@ -3168,6 +3183,11 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
+              label: 'page publish',
+              id: 'cmd/spo/page/page-publish'
+            },
+            {
+              type: 'doc',
               label: 'page remove',
               id: 'cmd/spo/page/page-remove'
             },
@@ -3404,7 +3424,7 @@ const sidebars: SidebarsConfig = {
             {
               type: 'doc',
               label: 'site list',
-              id: 'cmd/spo/site/site-list'
+              id: 'cmd/spo/tenant/tenant-site-list'
             },
             {
               type: 'doc',
@@ -3754,6 +3774,11 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
+              label: 'tenant site list',
+              id: 'cmd/spo/tenant/tenant-site-list'
+            },
+            {
+              type: 'doc',
               label: 'tenant site rename',
               id: 'cmd/spo/tenant/tenant-site-rename'
             },
@@ -3973,6 +3998,11 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'model list',
               id: 'cmd/spp/model/model-list'
+            },
+            {
+              type: 'doc',
+              label: 'model remove',
+              id: 'cmd/spp/model/model-remove'
             }
           ]
         }
@@ -4497,6 +4527,16 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'engage community list',
               id: 'cmd/viva/engage/engage-community-list'
+            },
+            {
+              type: 'doc',
+              label: 'engage community set',
+              id: 'cmd/viva/engage/engage-community-set'
+            },
+            {
+              type: 'doc',
+              label: 'engage community user list',
+              id: 'cmd/viva/engage/engage-community-user-list'
             },
             {
               type: 'doc',
