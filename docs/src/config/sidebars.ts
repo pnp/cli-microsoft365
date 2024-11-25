@@ -1966,6 +1966,11 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'container get',
               id: 'cmd/spe/container/container-get'
+            },
+            {
+              type: 'doc',
+              label: 'container list',
+              id: 'cmd/spe/container/container-list'
             }
           ]
         },
