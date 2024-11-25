@@ -2,14 +2,20 @@ import Global from '/docs/cmd/_global.mdx';
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-# spo site list
+# spo tenant site list
 
 Lists modern sites of the given type
 
 ## Usage
 
 ```sh
-m365 spo site list [options]
+m365 spo tenant site list [options]
+```
+
+## Alias
+
+```sh
+m365 spo site list
 ```
 
 ## Options
@@ -49,31 +55,31 @@ To use this command you have to have permissions to access the tenant admin site
 List all sites in the currently connected tenant
 
 ```sh
-m365 spo site list
+m365 spo tenant site list
 ```
 
 List all group connected team sites in the currently connected tenant
 
 ```sh
-m365 spo site list --type TeamSite
+m365 spo tenant site list --type TeamSite
 ```
 
 List all communication sites in the currently connected tenant
 
 ```sh
-m365 spo site list --type CommunicationSite
+m365 spo tenant site list --type CommunicationSite
 ```
 
 List all group connected team sites that contain _project_ in the URL
 
 ```sh
-m365 spo site list --type TeamSite --filter "Url -like 'project'"
+m365 spo tenant site list --type TeamSite --filter "Url -like 'project'"
 ```
 
 List all sites in the currently connected tenant including OneDrive sites
 
 ```sh
-m365 spo site list --includeOneDriveSites
+m365 spo tenant site list --includeOneDriveSites
 ```
 
 ## Response

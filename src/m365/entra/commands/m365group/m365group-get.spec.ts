@@ -65,7 +65,8 @@ describe(commands.M365GROUP_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('retrieves information about the specified Microsoft 365 Group', async () => {
+  it('retrieves information about the Microsoft 365 Group specified by id', async () => {
+
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/1caf7dcd-7e83-4c3a-94f7-932a1299c844`) {
         return {
@@ -92,6 +93,16 @@ describe(commands.M365GROUP_GET, () => {
           "renewedDateTime": "2017-11-29T03:27:05Z",
           "securityEnabled": false,
           "visibility": "Public"
+        };
+      }
+
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/1caf7dcd-7e83-4c3a-94f7-932a1299c844?$select=allowExternalSenders,autoSubscribeNewMembers,hideFromAddressLists,hideFromOutlookClients,isSubscribedByMail`) {
+        return {
+          "allowExternalSenders": false,
+          "autoSubscribeNewMembers": false,
+          "isSubscribedByMail": false,
+          "hideFromOutlookClients": false,
+          "hideFromAddressLists": false
         };
       }
 
@@ -122,7 +133,92 @@ describe(commands.M365GROUP_GET, () => {
       ],
       "renewedDateTime": "2017-11-29T03:27:05Z",
       "securityEnabled": false,
-      "visibility": "Public"
+      "visibility": "Public",
+      "allowExternalSenders": false,
+      "autoSubscribeNewMembers": false,
+      "isSubscribedByMail": false,
+      "hideFromOutlookClients": false,
+      "hideFromAddressLists": false
+    }));
+  });
+
+  it('retrieves information about the Microsoft 365 Group specified by displayName', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq 'Finance'`) {
+        return {
+          "value": [
+            {
+              "id": "1caf7dcd-7e83-4c3a-94f7-932a1299c844",
+              "deletedDateTime": null,
+              "classification": null,
+              "createdDateTime": "2017-11-29T03:27:05Z",
+              "description": "This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more.",
+              "displayName": "Finance",
+              "groupTypes": [
+                "Unified"
+              ],
+              "mail": "finance@contoso.onmicrosoft.com",
+              "mailEnabled": true,
+              "mailNickname": "finance",
+              "onPremisesLastSyncDateTime": null,
+              "onPremisesProvisioningErrors": [],
+              "onPremisesSecurityIdentifier": null,
+              "onPremisesSyncEnabled": null,
+              "preferredDataLocation": null,
+              "proxyAddresses": [
+                "SMTP:finance@contoso.onmicrosoft.com"
+              ],
+              "renewedDateTime": "2017-11-29T03:27:05Z",
+              "securityEnabled": false,
+              "visibility": "Public"
+            }
+          ]
+        };
+      }
+
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/1caf7dcd-7e83-4c3a-94f7-932a1299c844?$select=allowExternalSenders,autoSubscribeNewMembers,hideFromAddressLists,hideFromOutlookClients,isSubscribedByMail`) {
+        return {
+          "allowExternalSenders": false,
+          "autoSubscribeNewMembers": false,
+          "isSubscribedByMail": false,
+          "hideFromOutlookClients": false,
+          "hideFromAddressLists": false
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { displayName: 'Finance' } });
+    assert(loggerLogSpy.calledWith({
+      "id": "1caf7dcd-7e83-4c3a-94f7-932a1299c844",
+      "deletedDateTime": null,
+      "classification": null,
+      "createdDateTime": "2017-11-29T03:27:05Z",
+      "description": "This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more.",
+      "displayName": "Finance",
+      "groupTypes": [
+        "Unified"
+      ],
+      "mail": "finance@contoso.onmicrosoft.com",
+      "mailEnabled": true,
+      "mailNickname": "finance",
+      "onPremisesLastSyncDateTime": null,
+      "onPremisesProvisioningErrors": [],
+      "onPremisesSecurityIdentifier": null,
+      "onPremisesSyncEnabled": null,
+      "preferredDataLocation": null,
+      "proxyAddresses": [
+        "SMTP:finance@contoso.onmicrosoft.com"
+      ],
+      "renewedDateTime": "2017-11-29T03:27:05Z",
+      "securityEnabled": false,
+      "visibility": "Public",
+      "allowExternalSenders": false,
+      "autoSubscribeNewMembers": false,
+      "isSubscribedByMail": false,
+      "hideFromOutlookClients": false,
+      "hideFromAddressLists": false
     }));
   });
 
@@ -156,6 +252,16 @@ describe(commands.M365GROUP_GET, () => {
         };
       }
 
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/1caf7dcd-7e83-4c3a-94f7-932a1299c844?$select=allowExternalSenders,autoSubscribeNewMembers,hideFromAddressLists,hideFromOutlookClients,isSubscribedByMail`) {
+        return {
+          "allowExternalSenders": false,
+          "autoSubscribeNewMembers": false,
+          "isSubscribedByMail": false,
+          "hideFromOutlookClients": false,
+          "hideFromAddressLists": false
+        };
+      }
+
       throw 'Invalid request';
     });
 
@@ -183,7 +289,12 @@ describe(commands.M365GROUP_GET, () => {
       ],
       "renewedDateTime": "2017-11-29T03:27:05Z",
       "securityEnabled": false,
-      "visibility": "Public"
+      "visibility": "Public",
+      "allowExternalSenders": false,
+      "autoSubscribeNewMembers": false,
+      "isSubscribedByMail": false,
+      "hideFromOutlookClients": false,
+      "hideFromAddressLists": false
     }));
   });
 
@@ -216,11 +327,19 @@ describe(commands.M365GROUP_GET, () => {
           "visibility": "Public"
         };
       }
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/1caf7dcd-7e83-4c3a-94f7-932a1299c844?$select=allowExternalSenders,autoSubscribeNewMembers,hideFromAddressLists,hideFromOutlookClients,isSubscribedByMail`) {
+        return {
+          "allowExternalSenders": false,
+          "autoSubscribeNewMembers": false,
+          "isSubscribedByMail": false,
+          "hideFromOutlookClients": false,
+          "hideFromAddressLists": false
+        };
+      }
 
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/1caf7dcd-7e83-4c3a-94f7-932a1299c844/drive?$select=webUrl`) {
         return { webUrl: "https://contoso.sharepoint.com/sites/finance/Shared%20Documents" };
       }
-
       throw 'Invalid request';
     });
 
@@ -249,7 +368,12 @@ describe(commands.M365GROUP_GET, () => {
       "renewedDateTime": "2017-11-29T03:27:05Z",
       "securityEnabled": false,
       "siteUrl": "https://contoso.sharepoint.com/sites/finance",
-      "visibility": "Public"
+      "visibility": "Public",
+      "allowExternalSenders": false,
+      "autoSubscribeNewMembers": false,
+      "isSubscribedByMail": false,
+      "hideFromOutlookClients": false,
+      "hideFromAddressLists": false
     }));
   });
 
@@ -280,6 +404,16 @@ describe(commands.M365GROUP_GET, () => {
           "renewedDateTime": "2017-11-29T03:27:05Z",
           "securityEnabled": false,
           "visibility": "Public"
+        };
+      }
+
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/1caf7dcd-7e83-4c3a-94f7-932a1299c844?$select=allowExternalSenders,autoSubscribeNewMembers,hideFromAddressLists,hideFromOutlookClients,isSubscribedByMail`) {
+        return {
+          "allowExternalSenders": false,
+          "autoSubscribeNewMembers": false,
+          "isSubscribedByMail": false,
+          "hideFromOutlookClients": false,
+          "hideFromAddressLists": false
         };
       }
 
@@ -315,7 +449,12 @@ describe(commands.M365GROUP_GET, () => {
       "renewedDateTime": "2017-11-29T03:27:05Z",
       "securityEnabled": false,
       "siteUrl": "https://contoso.sharepoint.com/sites/finance",
-      "visibility": "Public"
+      "visibility": "Public",
+      "allowExternalSenders": false,
+      "autoSubscribeNewMembers": false,
+      "isSubscribedByMail": false,
+      "hideFromOutlookClients": false,
+      "hideFromAddressLists": false
     }));
   });
 
@@ -346,6 +485,16 @@ describe(commands.M365GROUP_GET, () => {
           "renewedDateTime": "2017-11-29T03:27:05Z",
           "securityEnabled": false,
           "visibility": "Public"
+        };
+      }
+
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/1caf7dcd-7e83-4c3a-94f7-932a1299c844?$select=allowExternalSenders,autoSubscribeNewMembers,hideFromAddressLists,hideFromOutlookClients,isSubscribedByMail`) {
+        return {
+          "allowExternalSenders": false,
+          "autoSubscribeNewMembers": false,
+          "isSubscribedByMail": false,
+          "hideFromOutlookClients": false,
+          "hideFromAddressLists": false
         };
       }
 
@@ -381,7 +530,12 @@ describe(commands.M365GROUP_GET, () => {
       "renewedDateTime": "2017-11-29T03:27:05Z",
       "securityEnabled": false,
       "visibility": "Public",
-      "siteUrl": ""
+      "siteUrl": "",
+      "allowExternalSenders": false,
+      "autoSubscribeNewMembers": false,
+      "isSubscribedByMail": false,
+      "hideFromOutlookClients": false,
+      "hideFromAddressLists": false
     }));
   });
 
@@ -414,12 +568,35 @@ describe(commands.M365GROUP_GET, () => {
   });
 
   it('shows error when the group is not a unified group', async () => {
+    sinon.stub(entraGroup, 'getGroupById').resolves({
+      "id": "3f04e370-cbc6-4091-80fe-1d038be2ad06",
+      "deletedDateTime": null,
+      "classification": null,
+      "createdDateTime": "2017-11-29T03:27:05Z",
+      "description": "This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more.",
+      "displayName": "Finance",
+      "groupTypes": [],
+      "mail": "finance@contoso.onmicrosoft.com",
+      "mailEnabled": true,
+      "mailNickname": "finance",
+      "onPremisesLastSyncDateTime": null,
+      "onPremisesProvisioningErrors": [],
+      "onPremisesSecurityIdentifier": null,
+      "onPremisesSyncEnabled": null,
+      "preferredDataLocation": null,
+      "proxyAddresses": [
+        "SMTP:finance@contoso.onmicrosoft.com"
+      ],
+      "renewedDateTime": "2017-11-29T03:27:05Z",
+      "securityEnabled": false,
+      "visibility": "Public"
+    });
     const groupId = '3f04e370-cbc6-4091-80fe-1d038be2ad06';
 
     sinonUtil.restore(entraGroup.isUnifiedGroup);
     sinon.stub(entraGroup, 'isUnifiedGroup').resolves(false);
 
-    await assert.rejects(command.action(logger, { options: { id: groupId } } as any),
+    await assert.rejects(command.action(logger, { options: { id: groupId } }),
       new CommandError(`Specified group with id '${groupId}' is not a Microsoft 365 group.`));
   });
 });

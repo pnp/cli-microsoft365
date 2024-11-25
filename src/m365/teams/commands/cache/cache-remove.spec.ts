@@ -12,6 +12,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './cache-remove.js';
+import os, { homedir } from 'os';
 
 describe(commands.CACHE_REMOVE, () => {
   const processOutput = `ProcessId
@@ -20,6 +21,7 @@ describe(commands.CACHE_REMOVE, () => {
   11352`;
   let log: string[];
   let logger: Logger;
+  let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
 
   before(() => {
@@ -45,6 +47,7 @@ describe(commands.CACHE_REMOVE, () => {
         log.push(msg);
       }
     };
+    loggerLogSpy = sinon.spy(logger, 'log');
 
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
   });
@@ -84,6 +87,16 @@ describe(commands.CACHE_REMOVE, () => {
     assert(confirmationStub.calledOnce);
   });
 
+  it('fails validation if client is not a valid client option', async () => {
+    sinon.stub(process, 'platform').value('win32');
+    const actual = await command.validate({
+      options: {
+        client: 'invalid'
+      }
+    }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
   it('fails validation if called from docker container.', async () => {
     sinon.stub(process, 'platform').value('win32');
     sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': 'docker' });
@@ -114,7 +127,7 @@ describe(commands.CACHE_REMOVE, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('fails to remove teams cache when exec fails randomly when killing teams.exe process', async () => {
+  it('fails to remove teams cache when exec fails randomly when killing teams.exe process using classic client', async () => {
     sinon.stub(process, 'platform').value('win32');
     sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
     sinon.stub(fs, 'existsSync').returns(true);
@@ -125,10 +138,10 @@ describe(commands.CACHE_REMOVE, () => {
       }
       throw 'Invalid request';
     });
-    await assert.rejects(command.action(logger, { options: { force: true } } as any), new CommandError('random error'));
+    await assert.rejects(command.action(logger, { options: { client: 'classic', force: true } } as any), new CommandError('random error'));
   });
 
-  it('fails to remove teams cache when exec fails randomly when removing cache folder', async () => {
+  it('fails to remove teams cache when exec fails randomly when removing cache folder using classic client', async () => {
     sinon.stub(process, 'platform').value('win32');
     sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '', APPDATA: 'C:\\Users\\Administrator\\AppData\\Roaming' });
     sinon.stub(process, 'kill' as any).returns(null);
@@ -143,10 +156,41 @@ describe(commands.CACHE_REMOVE, () => {
       }
       throw 'Invalid request';
     });
-    await assert.rejects(command.action(logger, { options: { force: true } } as any), new CommandError('random error'));
+    await assert.rejects(command.action(logger, { options: { client: 'classic', force: true } } as any), new CommandError('random error'));
   });
 
-  it('removes Teams cache from macOs platform without prompting.', async () => {
+  it('shows error message when exec fails when removing the teams cache folder on mac os', async () => {
+    const deleteError = {
+      code: 1,
+      killed: false,
+      signal: null,
+      cmd: 'rm -r "/Users/John/Library/Group Containers/UBF8T346G9.com.microsoft.teams"',
+      stdout: '',
+      stderr: 'rm: /Users/John/Library/Group Containers/UBF8T346G9.com.microsoft.teams: Operation not permitted\\n'
+    };
+
+    sinon.stub(process, 'platform').value('darwin');
+    sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
+    sinon.stub(process, 'kill' as any).returns(null);
+    sinon.stub(fs, 'existsSync').returns(true);
+
+    sinon.stub(command, 'exec' as any).callsFake(async (opts) => {
+      if (opts === `ps ax | grep MacOS/MSTeams -m 1 | grep -v grep | awk '{ print $1 }'`) {
+        return {};
+      }
+      if (opts === `rm -r "${homedir}/Library/Group Containers/UBF8T346G9.com.microsoft.teams"`) {
+        return;
+      }
+      if (opts === `rm -r "${homedir}/Library/Containers/com.microsoft.teams2"`) {
+        throw deleteError;
+      }
+      throw 'Invalid request';
+    });
+    await command.action(logger, { options: { force: true } } as any);
+    assert(loggerLogSpy.calledWith('Deleting the folder failed. Please have a look at the following URL to delete the folders manually: https://answers.microsoft.com/en-us/msteams/forum/all/clearing-cache-on-microsoft-teams/35876f6b-eb1a-4b77-bed1-02ce3277091f'));
+  });
+
+  it('removes Teams cache from macOs platform without prompting using classic client', async () => {
     sinon.stub(process, 'platform').value('darwin');
     sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
     sinon.stub(command, 'exec' as any).returns({ stdout: '' });
@@ -156,13 +200,14 @@ describe(commands.CACHE_REMOVE, () => {
     await command.action(logger, {
       options: {
         force: true,
-        verbose: true
+        verbose: true,
+        client: 'classic'
       }
     });
     assert(true);
   });
 
-  it('removes teams cache when teams is currently not active', async () => {
+  it('removes teams cache when teams is currently not active using the classic client', async () => {
     sinon.stub(process, 'platform').value('win32');
     sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '', APPDATA: 'C:\\Users\\Administrator\\AppData\\Roaming' });
     sinon.stub(process, 'kill' as any).returns(null);
@@ -180,13 +225,14 @@ describe(commands.CACHE_REMOVE, () => {
     await command.action(logger, {
       options: {
         force: true,
-        verbose: true
+        verbose: true,
+        client: 'classic'
       }
     });
     assert(true);
   });
 
-  it('removes Teams cache from win32 platform without prompting.', async () => {
+  it('removes Teams cache from win32 platform without prompting using the classic client', async () => {
     sinon.stub(process, 'platform').value('win32');
     sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '', APPDATA: 'C:\\Users\\Administrator\\AppData\\Roaming' });
     sinon.stub(process, 'kill' as any).returns(null);
@@ -203,13 +249,37 @@ describe(commands.CACHE_REMOVE, () => {
     await command.action(logger, {
       options: {
         force: true,
+        verbose: true,
+        client: 'classic'
+      }
+    });
+    assert(true);
+  });
+
+  it('removes Teams cache from win32 platform without prompting using the new client', async () => {
+    sinon.stub(process, 'platform').value('win32');
+    sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '', APPDATA: 'C:\\Users\\Administrator\\AppData\\Roaming', LOCALAPPDATA: 'C:\\Users\\Administrator\\AppData\\Local' });
+    sinon.stub(process, 'kill' as any).returns(null);
+    sinon.stub(command, 'exec' as any).callsFake(async (opts) => {
+      if (opts === 'wmic process where caption="ms-teams.exe" get ProcessId') {
+        return { stdout: processOutput };
+      }
+      if (opts === 'rmdir /s /q "C:\\Users\\Administrator\\AppData\\Local\\Packages\\MSTeams_8wekyb3d8bbwe\\LocalCache\\Microsoft\\MSTeams"') {
+        return;
+      }
+      throw 'Invalid request';
+    });
+    sinon.stub(fs, 'existsSync').returns(true);
+    await command.action(logger, {
+      options: {
+        force: true,
         verbose: true
       }
     });
     assert(true);
   });
 
-  it('removes Teams cache from darwin platform with prompting.', async () => {
+  it('removes Teams cache from darwin platform with prompting using the classic client', async () => {
     sinon.stub(process, 'platform').value('darwin');
     sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
     sinon.stub(command, 'exec' as any).returns({ stdout: 'pid' });
@@ -218,10 +288,68 @@ describe(commands.CACHE_REMOVE, () => {
 
     await command.action(logger, {
       options: {
-        debug: true
+        debug: true,
+        client: 'classic'
       }
     });
     assert(true);
+  });
+
+  it('removes Teams cache from darwin platform with prompting', async () => {
+    sinon.stub(process, 'platform').value('darwin');
+    sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
+    sinon.stub(command, 'exec' as any).returns({ stdout: '1111' });
+    sinon.stub(process, 'kill' as any).returns(null);
+    sinon.stub(fs, 'existsSync').returns(true);
+
+    await command.action(logger, {
+      options: {
+        debug: true,
+        client: 'new'
+      }
+    });
+    assert(true);
+  });
+
+  it('removes teams cache when teams is currently not running on macOS', async () => {
+    sinon.stub(process, 'platform').value('darwin');
+    sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
+    sinon.stub(process, 'kill' as any).returns(null);
+    sinon.stub(command, 'exec' as any).callsFake(async (opts) => {
+      if (opts === `ps ax | grep MacOS/MSTeams -m 1 | grep -v grep | awk '{ print $1 }'`) {
+        return {};
+      }
+      if (opts === `rm -r "${os.homedir()}/Library/Group Containers/UBF8T346G9.com.microsoft.teams"`) {
+        return;
+      }
+      if (opts === `rm -r "${os.homedir()}/Library/Containers/com.microsoft.teams2"`) {
+        return;
+      }
+      throw 'Invalid request';
+    });
+    sinon.stub(fs, 'existsSync').returns(true);
+
+    await command.action(logger, {
+      options: {
+        force: true,
+        verbose: true,
+        client: 'new'
+      }
+    });
+    assert(true);
+  });
+
+
+  it('aborts cache clearing when no cache folder is found using the classic client', async () => {
+    sinon.stub(process, 'platform').value('darwin');
+    sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
+    sinon.stub(fs, 'existsSync').returns(false);
+    await command.action(logger, {
+      options: {
+        verbose: true,
+        client: 'classic'
+      }
+    });
   });
 
   it('aborts cache clearing when no cache folder is found', async () => {

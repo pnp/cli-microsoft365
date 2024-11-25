@@ -111,7 +111,7 @@ This script can be used to replace the membership of a user for a selected list 
 
         try {
           Write-Host "Removing $oldUser..."
-          m365 entra m365group user remove --groupId $groupId --userName $oldUser | Get-CLIValue
+          m365 entra m365group user remove --groupId $groupId --userNames $oldUser | Get-CLIValue
         }
         catch {
           Write-Host $_.Exception.Message -ForegroundColor Red

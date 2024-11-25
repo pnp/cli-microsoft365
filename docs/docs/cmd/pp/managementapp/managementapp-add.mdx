@@ -29,7 +29,7 @@ m365 pp managementapp add [options]
 
 ## Remarks
 
-To execute this command the first time you'll need sign in using the Microsoft Azure PowerShell app registration. You can do this by executing `m365 login --appId 1950a258-227b-4e31-a9cf-717495945fc2`. To register the Microsoft Entra app registration that CLI for Microsoft 365 uses by default, execute `m365 pp managementapp add--appId 31359c7f-bd7e-475c-86db-fdb8c937548e`.
+To execute this command the first time you'll need sign in using the Microsoft Azure PowerShell application registration. You can do this by executing `m365 login --appId 1950a258-227b-4e31-a9cf-717495945fc2`. To register the Microsoft Entra application registration that CLI for Microsoft 365 uses by default, execute `m365 pp managementapp add--appId 31359c7f-bd7e-475c-86db-fdb8c937548e`.
 
 For best performance use the `appId` option to reference the Microsoft Entra application registration to update. If you use `objectId` or `name`, this command will first need to find the corresponding `appId` for that application.
 

@@ -42,7 +42,12 @@ describe(commands.GROUP_GET, () => {
       ],
       "renewedDateTime": "2017-11-29T03:27:05Z",
       "securityEnabled": false,
-      "visibility": "Public"
+      "visibility": "Public",
+      "allowExternalSenders": false,
+      "autoSubscribeNewMembers": false,
+      "isSubscribedByMail": false,
+      "hideFromOutlookClients": false,
+      "hideFromAddressLists": false
     }]
   };
   const validId = "1caf7dcd-7e83-4c3a-94f7-932a1299c844";

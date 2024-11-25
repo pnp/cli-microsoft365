@@ -31,7 +31,7 @@ This script will retrieve all the checked out files in a particular site.
   $resultsForSite = @()
 
   foreach($library in $allLibs){
-      $allDocs = m365 spo file list --webUrl $siteURL --folder $library.Url --recursive -o json | ConvertFrom-Json
+      $allDocs = m365 spo file list --webUrl $siteURL --folder $library.RootFolder.ServerRelativeUrl --recursive -o json | ConvertFrom-Json
 
       foreach($document in $allDocs){
           if($document.CheckOutType -eq [int64]0){
@@ -122,7 +122,7 @@ Depending on the number of sites in your .csv file, the number of libraries as w
       foreach($lib in $allLibraries){
 
           #Get all the documents
-          $allDocs = m365 spo file list --webUrl $row.siteURL --folder $lib.Url --recursive -o json | ConvertFrom-Json
+          $allDocs = m365 spo file list --webUrl $row.siteURL --folder $lib.RootFolder.ServerRelativeUrl --recursive -o json | ConvertFrom-Json
 
           foreach($docu in $allDocs){
               if($docu.CheckOutType -eq [int64]0){

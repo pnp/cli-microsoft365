@@ -109,22 +109,24 @@ class SpoListItemBatchRemoveCommand extends SpoCommand {
           const fileContent = fs.readFileSync(args.options.filePath, 'utf-8');
           const jsonContent: any[] = formatting.parseCsvToJson(fileContent);
 
-          if (!jsonContent[0].hasOwnProperty('ID')) {
+          const idKey = Object.keys(jsonContent[0]).find(key => key.toLowerCase() === 'id');
+
+          if (!idKey) {
             return `The file does not contain the required header row with the column name 'ID'.`;
           }
 
-          const nonNumbers = jsonContent.filter(element => isNaN(Number(element['ID'].toString().trim()))).map(element => element['ID']);
+          const invalidIDs = validation.isValidPositiveIntegerArray(jsonContent.map(element => element[idKey].toString().trim()).join(','));
 
-          if (nonNumbers.length > 0) {
-            return `The specified ids '${nonNumbers.join(', ')}' are invalid numbers.`;
+          if (invalidIDs !== true) {
+            return `The file contains one or more invalid IDs: '${invalidIDs}'.`;
           }
         }
 
         if (args.options.ids) {
-          const nonNumbers = formatting.splitAndTrim(args.options.ids).filter(element => isNaN(Number(element)));
+          const isValidIntegerArray = validation.isValidPositiveIntegerArray(args.options.ids);
 
-          if (nonNumbers.length > 0) {
-            return `The specified ids '${nonNumbers.join(', ')}' are invalid numbers.`;
+          if (isValidIntegerArray !== true) {
+            return `Option 'ids' contains one or more invalid IDs: '${isValidIntegerArray}'.`;
           }
         }
 
@@ -167,7 +169,10 @@ class SpoListItemBatchRemoveCommand extends SpoCommand {
         if (args.options.filePath) {
           const csvContent = fs.readFileSync(args.options.filePath, 'utf-8');
           const jsonContent = formatting.parseCsvToJson(csvContent);
-          idsToRemove = jsonContent.map((item: { ID: string }) => item['ID']);
+
+          const idKey = Object.keys(jsonContent[0]).find(key => key.toLowerCase() === 'id');
+
+          idsToRemove = jsonContent.map((item: any) => item[idKey!]);
         }
         else {
           idsToRemove = formatting.splitAndTrim(args.options.ids!);

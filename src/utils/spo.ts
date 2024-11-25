@@ -1,5 +1,4 @@
 import os from 'os';
-import url from 'url';
 import { urlUtil } from "./urlUtil.js";
 import { validation } from "./validation.js";
 import auth from '../Auth.js';
@@ -259,6 +258,21 @@ interface TenantSiteProperties {
   WebsCount: number;
 }
 
+export interface ContainerTypeProperties {
+  _ObjectType_?: string;
+  AzureSubscriptionId: string;
+  ContainerTypeId: string;
+  CreationDate: string;
+  DisplayName: string;
+  ExpiryDate: string;
+  IsBillingProfileRequired: boolean;
+  OwningAppId: string;
+  OwningTenantId: string;
+  Region?: string;
+  ResourceGroup?: string;
+  SPContainerTypeBillingClassification: string;
+}
+
 export const spo = {
   async getRequestDigest(siteUrl: string): Promise<FormDigestInfo> {
     const requestOptions: CliRequestOptions = {
@@ -291,6 +305,29 @@ export const spo = {
       WebFullUrl: res.WebFullUrl
     };
     return context;
+  },
+
+  async getAllContainerTypes(spoAdminUrl: string, logger: Logger, verbose: boolean): Promise<ContainerTypeProperties[]> {
+    const formDigestInfo: FormDigestInfo = await spo.ensureFormDigest(spoAdminUrl, logger, undefined, verbose);
+
+    const requestOptions: CliRequestOptions = {
+      url: `${spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
+      headers: {
+        'X-RequestDigest': formDigestInfo.FormDigestValue
+      },
+      data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="46" ObjectPathId="45" /><Method Name="GetSPOContainerTypes" Id="47" ObjectPathId="45"><Parameters><Parameter Type="Enum">1</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="45" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`
+    };
+
+    const res: string = await request.post(requestOptions);
+    const json: ClientSvcResponse = JSON.parse(res);
+    const response: ClientSvcResponseContents = json[0];
+
+    if (response.ErrorInfo) {
+      throw new Error(response.ErrorInfo.ErrorMessage);
+    }
+
+    const containerTypes: ContainerTypeProperties[] = json[json.length - 1];
+    return containerTypes;
   },
 
   async waitUntilFinished({ operationId, siteUrl, logger, currentContext, debug, verbose }: { operationId: string, siteUrl: string, logger: Logger, currentContext: FormDigestInfo, debug: boolean, verbose: boolean }): Promise<void> {
@@ -442,8 +479,10 @@ export const spo = {
    * @param siteAccessToken a valid access token for the site specified in the webFullUrl param
    */
   async ensureFolder(webFullUrl: string, folderToEnsure: string, logger: Logger, debug: boolean): Promise<void> {
-    const webUrl = url.parse(webFullUrl);
-    if (!webUrl.protocol || !webUrl.hostname) {
+    try {
+      new URL(webFullUrl);
+    }
+    catch {
       throw new Error('webFullUrl is not a valid URL');
     }
 
@@ -1457,7 +1496,7 @@ export const spo = {
         headers: {
           'X-RequestDigest': context.FormDigestValue
         },
-        data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions>${payload.join('')}<ObjectPath Id="14" ObjectPathId="13" /><ObjectIdentityQuery Id="15" ObjectPathId="5" /><Query Id="16" ObjectPathId="13"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true" /><Property Name="PollingInterval" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Identity Id="5" Name="53d8499e-d0d2-5000-cb83-9ade5be42ca4|${(tenantId as string).substr(pos, (tenantId as string).indexOf('&') - pos)}&#xA;SiteProperties&#xA;${formatting.encodeQueryParameter(url)}" /><Method Id="13" ParentId="5" Name="Update" /></ObjectPaths></Request>`
+        data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions>${payload.join('')}<ObjectPath Id="14" ObjectPathId="13" /><ObjectIdentityQuery Id="15" ObjectPathId="5" /><Query Id="16" ObjectPathId="13"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true" /><Property Name="PollingInterval" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Identity Id="5" Name="53d8499e-d0d2-5000-cb83-9ade5be42ca4|${(tenantId as string).substring(pos, (tenantId as string).indexOf('&'))}&#xA;SiteProperties&#xA;${formatting.encodeQueryParameter(url)}" /><Method Id="13" ParentId="5" Name="Update" /></ObjectPaths></Request>`
 
       };
 

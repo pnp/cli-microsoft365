@@ -7,7 +7,7 @@ import { powerPlatform } from '../../../../utils/powerPlatform.js';
 import { validation } from '../../../../utils/validation.js';
 import PowerPlatformCommand from '../../../base/PowerPlatformCommand.js';
 import commands from '../../commands.js';
-import ppChatbotGetCommand, { Options as PpChatbotGetCommandOptions } from './chatbot-get.js';
+import ppCopilotGetCommand, { Options as PpCopilotGetCommandOptions } from './copilot-get.js';
 
 interface CommandArgs {
   options: Options;
@@ -21,14 +21,18 @@ interface Options extends GlobalOptions {
   force?: boolean;
 }
 
-class PpChatbotRemoveCommand extends PowerPlatformCommand {
+class PpCopilotRemoveCommand extends PowerPlatformCommand {
 
   public get name(): string {
-    return commands.CHATBOT_REMOVE;
+    return commands.COPILOT_REMOVE;
   }
 
   public get description(): string {
-    return 'Removes the specified chatbot';
+    return 'Removes the specified copilot';
+  }
+
+  public alias(): string[] | undefined {
+    return [commands.CHATBOT_REMOVE];
   }
 
   constructor() {
@@ -90,28 +94,29 @@ class PpChatbotRemoveCommand extends PowerPlatformCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    await this.showDeprecationWarning(logger, commands.CHATBOT_REMOVE, commands.COPILOT_REMOVE);
     if (this.verbose) {
-      await logger.logToStderr(`Removing chatbot '${args.options.id || args.options.name}'...`);
+      await logger.logToStderr(`Removing copilot '${args.options.id || args.options.name}'...`);
     }
 
     if (args.options.force) {
-      await this.deleteChatbot(args);
+      await this.deleteCopilot(args);
     }
     else {
-      const result = await cli.promptForConfirmation({ message: `Are you sure you want to remove chatbot '${args.options.id || args.options.name}'?` });
+      const result = await cli.promptForConfirmation({ message: `Are you sure you want to remove copilot '${args.options.id || args.options.name}'?` });
 
       if (result) {
-        await this.deleteChatbot(args);
+        await this.deleteCopilot(args);
       }
     }
   }
 
-  private async getChatbotId(args: CommandArgs): Promise<any> {
+  private async getCopilotId(args: CommandArgs): Promise<any> {
     if (args.options.id) {
       return args.options.id;
     }
 
-    const options: PpChatbotGetCommandOptions = {
+    const options: PpCopilotGetCommandOptions = {
       environmentName: args.options.environmentName,
       name: args.options.name,
       output: 'json',
@@ -119,16 +124,16 @@ class PpChatbotRemoveCommand extends PowerPlatformCommand {
       verbose: this.verbose
     };
 
-    const output = await cli.executeCommandWithOutput(ppChatbotGetCommand as Command, { options: { ...options, _: [] } });
+    const output = await cli.executeCommandWithOutput(ppCopilotGetCommand as Command, { options: { ...options, _: [] } });
     const getBotOutput = JSON.parse(output.stdout);
     return getBotOutput.botid;
   }
 
-  private async deleteChatbot(args: CommandArgs): Promise<void> {
+  private async deleteCopilot(args: CommandArgs): Promise<void> {
     try {
       const dynamicsApiUrl = await powerPlatform.getDynamicsInstanceApiUrl(args.options.environmentName, args.options.asAdmin);
 
-      const botId = await this.getChatbotId(args);
+      const botId = await this.getCopilotId(args);
       const requestOptions: CliRequestOptions = {
         url: `${dynamicsApiUrl}/api/data/v9.1/bots(${botId})/Microsoft.Dynamics.CRM.PvaDeleteBot?tag=deprovisionbotondelete`,
         headers: {
@@ -146,4 +151,4 @@ class PpChatbotRemoveCommand extends PowerPlatformCommand {
   }
 }
 
-export default new PpChatbotRemoveCommand();
+export default new PpCopilotRemoveCommand();

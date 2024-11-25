@@ -29,6 +29,24 @@ m365 graph subscription add [options]
 
 `-s, --clientState [clientState]`
 : The value of the clientState property sent by the service in each notification. The maximum length is 128 characters.
+
+`--lifecycleNotificationUrl [lifecycleNotificationUrl]`
+: The URL of the endpoint that will receive the lifecycle notifications. This URL must use the HTTPS protocol.
+
+`--notificationUrlAppId [notificationUrlAppId]`
+: The app ID that the subscription service can use to generate the validation token. The value allows the client to validate the authenticity of the notification received.
+
+`--latestTLSVersion [latestTLSVersion]`
+: The latest version of TLS that the notification endpoint supports. Allowed values are `v1_0`, `v1_1`, `v1_2`, `v1_3`. Default is `v1_2`.
+
+`--includeResourceData`
+: When set, the change notifications will include the changed resource data.
+
+`--encryptionCertificate [encryptionCertificate]`
+: A base64-encoded representation of a certificate with a public key used to encrypt resource data in change notifications. Required when using `includeResourceData`.
+
+`--encryptionCertificateId [encryptionCertificateId]`
+: A custom app-provided identifier to help identify the certificate needed to decrypt resource data. Required when using `includeResourceData`.
 ```
 
 <Global />
@@ -47,6 +65,13 @@ To subscribe to change notifications of Outlook contacts, events, or messages in
 - Use the corresponding application permission to subscribe to changes of items in a folder or mailbox of any user in the tenant.
 - Do not use the Outlook sharing permissions (Contacts.Read.Shared, Calendars.Read.Shared, Mail.Read.Shared, and their read/write counterparts), as they do not support subscribing to change notifications on items in shared or delegated folders.
 
+:::info
+
+For subscribers whose notification endpoint supports a version lower than the currently recommended version (TLS 1.2), specifying this property by a set timeline allows them to temporarily use their deprecated version of TLS before completing their upgrade to TLS 1.2. 
+For these subscribers, not setting this property per the timeline would result in subscription operations failing.
+
+:::
+
 ## Examples
 
 Create a subscription
@@ -55,16 +80,16 @@ Create a subscription
 m365 graph subscription add --resource "me/mailFolders('Inbox')/messages" --changeTypes "updated" --notificationUrl "https://webhook.azurewebsites.net/api/send/myNotifyClient" --expirationDateTime "2016-11-20T18:23:45.935Z" --clientState "secretClientState"
 ```
 
-Create a subscription on multiple change types
+Create a subscription on multiple change types and include resource data
 
 ```sh
-m365 graph subscription add --resource groups --changeTypes "updated,deleted" --notificationUrl "https://webhook.azurewebsites.net/api/send/myNotifyClient" --expirationDateTime "2016-11-20T18:23:45.935Z" --clientState "secretClientState"
+m365 graph subscription add --resource "me/messages" --changeTypes "updated,deleted" --includeResourceData --encryptionCertificate 'Q0xJIGZvciBNaWNyb3NvZnQgMzY1' --encryptionCertificateId 'myCert' --notificationUrl "https://webhook.azurewebsites.net/api/send/myNotifyClient" --expirationDateTime "2016-11-20T18:23:45.935Z" --clientState "secretClientState"
 ```
 
 Create a subscription using the maximum allowed expiration for Group resources
 
 ```sh
-m365 graph subscription add --resource groups --changeTypes "updated" --notificationUrl "https://webhook.azurewebsites.net/api/send/myNotifyClient"
+m365 graph subscription add --resource groups --changeTypes "updated" --notificationUrl "https://webhook.azurewebsites.net/api/send/myNotifyClient" --lifecycleNotificationUrl "https://webhook.azurewebsites.net/api/send/lifecycleNotifications"
 ```
 
 Create a subscription for Event Hub location if you are using Key Vault
@@ -79,10 +104,10 @@ Create a subscription for Event Hub location if you are using role-based access 
 m365 graph subscription add --resource user --changeTypes "created,updated,deleted" --notificationUrl "EventHub:https://eventHubNamespace.servicebus.windows.net/eventhubname/eventHubName?tenantId=contoso.com"
 ```
 
-Create a subscription for Event Grid Partner Topic.
+Create a subscription for Event Grid Partner Topic and use TLS 1.3
 
 ```sh
-m365 graph subscription add --resource user --changeTypes "created,updated,deleted" --notificationUrl "EventGrid:?azuresubscriptionid=8A8A8A8A-4B4B-4C4C-4D4D-12E12E12E12E&resourcegroup=resourceGroupName&partnertopic=partnerTopicName&location=partnerTopicAzureRegionName"
+m365 graph subscription add --resource user --changeTypes "created,updated,deleted" --latestTLSVersion 'v1_3' --notificationUrl "EventGrid:?azuresubscriptionid=8A8A8A8A-4B4B-4C4C-4D4D-12E12E12E12E&resourcegroup=resourceGroupName&partnertopic=partnerTopicName&location=partnerTopicAzureRegionName"
 ```
 
 ## Response

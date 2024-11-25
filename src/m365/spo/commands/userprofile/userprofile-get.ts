@@ -22,7 +22,7 @@ class SpoUserProfileGetCommand extends SpoCommand {
   }
 
   public get description(): string {
-    return 'Sets user profile property for a SharePoint user';
+    return 'Gets user profile property for a SharePoint user';
   }
 
   constructor() {

@@ -116,6 +116,13 @@ export default {
       style: {
         color: '#A0A0A0'
       }
+    },
+    {
+      types: ['boolean'],
+      languages: ['json'],
+      style: {
+        color: '#0000FF'
+      }
     }
   ]
 } satisfies PrismTheme;

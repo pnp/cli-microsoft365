@@ -83,7 +83,7 @@ Depending on what authentication method you chose, you will need to add the foll
 
 For the application login method:
 
-- `APP_ID` - client id of the registered AAD application
+- `APP_ID` - client id of the registered Entra application
 - `CERTIFICATE_ENCODED` - application's encoded certificate
 - `CERTIFICATE_PASSWORD` - certificate password. This applies only if the certificate is encoded which is the recommended approach
 - `TENANT` - Tenant ID
@@ -214,10 +214,10 @@ For the application login method you will need to fill in the following variable
     }
 
     if ($Scope -eq "tenant") {
-      m365 spfx project github workflow add --loginMethod $LoginMethod --name $Name --branchName $BranchName $ManuallyTriggerStr $SkipFeatureDeploymentStr --overwrite
+      m365 spfx project github workflow add --loginMethod $LoginMethod --name $Name --branchName $BranchName $ManuallyTriggerStr $SkipFeatureDeploymentStr
     }
     else {
-      m365 spfx project github workflow add --loginMethod $LoginMethod --name $Name --branchName $BranchName --scope "sitecollection" --siteUrl $SiteUrl $ManuallyTriggerStr $SkipFeatureDeploymentStr --overwrite
+      m365 spfx project github workflow add --loginMethod $LoginMethod --name $Name --branchName $BranchName --scope "sitecollection" --siteUrl $SiteUrl $ManuallyTriggerStr $SkipFeatureDeploymentStr
     }
 
     # show github guidance

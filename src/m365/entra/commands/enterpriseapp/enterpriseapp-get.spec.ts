@@ -82,6 +82,11 @@ describe(commands.ENTERPRISEAPP_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
+  it('defines correct alias', () => {
+    const alias = command.alias();
+    assert.deepStrictEqual(alias, [commands.SP_GET]);
+  });
+
   it('retrieves information about the specified enterprise application using its display name', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/v1.0/servicePrincipals?$filter=displayName eq `) > -1) {

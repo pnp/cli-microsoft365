@@ -39,7 +39,7 @@ The script loops through each document library in a site where the folder size s
 
     foreach($library in $allLibs) {
       Write-Host "Processing document library: $($library.Title)"
-      $allFolders = m365 spo folder list --webUrl $WebUrl --parentFolderUrl $library.Url --fields "Name,ServerRelativeUrl,TimeCreated,CreatedBy,TimeLastModified" --recursive --filter "ItemCount eq 0" -o json | ConvertFrom-Json
+      $allFolders = m365 spo folder list --webUrl $WebUrl --parentFolderUrl $library.RootFolder.ServerRelativeUrl --fields "Name,ServerRelativeUrl,TimeCreated,CreatedBy,TimeLastModified" --recursive --filter "ItemCount eq 0" -o json | ConvertFrom-Json
 
       foreach($folder in $allFolders) {
         $resultsEmptyFolders += [PSCustomObject]@{              

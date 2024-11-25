@@ -136,7 +136,8 @@ describe(commands.SITE_ADMIN_LIST, () => {
       request.post,
       cli.getSettingWithDefaultValue,
       spo.getPrimaryAdminLoginNameAsAdmin,
-      spo.getPrimaryOwnerLoginFromSite
+      spo.getPrimaryOwnerLoginFromSite,
+      spo.getSiteAdminPropertiesByUrl
     ]);
   });
 
@@ -169,6 +170,7 @@ describe(commands.SITE_ADMIN_LIST, () => {
   });
 
   it('gets site collection admins in admin mode', async () => {
+    sinon.stub(spo, 'getSiteAdminPropertiesByUrl').resolves({ SiteId: siteId } as any);
     sinon.stub(spo, 'getPrimaryAdminLoginNameAsAdmin').resolves(primaryAdminLoginName);
     sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/sites/root?$select=webUrl`) {
@@ -179,10 +181,6 @@ describe(commands.SITE_ADMIN_LIST, () => {
         return {
           value: listOfAdminsFromAdminSource
         };
-      }
-
-      if (opts.url === `https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com:/sites/site?$select=id`) {
-        return { id: `contoso.sharepoint.com,${siteId},fb0a066f-c10f-4734-94d1-f896de4aa484` };
       }
 
       throw 'Invalid request: ' + opts.url;
@@ -223,6 +221,7 @@ describe(commands.SITE_ADMIN_LIST, () => {
   });
 
   it('correctly handles empty list of site collection admins from API in admin mode', async () => {
+    sinon.stub(spo, 'getSiteAdminPropertiesByUrl').resolves({ SiteId: siteId } as any);
     sinon.stub(spo, 'getPrimaryAdminLoginNameAsAdmin').resolves('');
     sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/sites/root?$select=webUrl`) {
@@ -233,10 +232,6 @@ describe(commands.SITE_ADMIN_LIST, () => {
         return {
           value: listOfAdminsFromAdminSource
         };
-      }
-
-      if (opts.url === `https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com:/sites/site?$select=id`) {
-        return { id: `contoso.sharepoint.com,${siteId},fb0a066f-c10f-4734-94d1-f896de4aa484` };
       }
 
       throw 'Invalid request: ' + opts.url;
@@ -270,6 +265,7 @@ describe(commands.SITE_ADMIN_LIST, () => {
   });
 
   it('handles error when primary admin API returns error in admin mode', async () => {
+    sinon.stub(spo, 'getSiteAdminPropertiesByUrl').resolves({ SiteId: siteId } as any);
     sinon.stub(spo, 'getPrimaryAdminLoginNameAsAdmin').throws("Invalid request");
     sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/sites/root?$select=webUrl`) {
@@ -280,10 +276,6 @@ describe(commands.SITE_ADMIN_LIST, () => {
         return {
           value: listOfAdminsFromAdminSource
         };
-      }
-
-      if (opts.url === `https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com:/sites/site?$select=id`) {
-        return { id: `contoso.sharepoint.com,${siteId},fb0a066f-c10f-4734-94d1-f896de4aa484` };
       }
 
       throw 'Invalid request: ' + opts.url;
@@ -303,36 +295,9 @@ describe(commands.SITE_ADMIN_LIST, () => {
   });
 
   it('handles error when returned siteId is incorrect in admin mode', async () => {
-    sinon.stub(spo, 'getPrimaryAdminLoginNameAsAdmin').resolves("Invalid request");
-    sinon.stub(request, 'get').callsFake(async opts => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/sites/root?$select=webUrl`) {
-        return { res: { webUrl: rootUrl } };
-      }
+    sinon.stub(spo, 'getSiteAdminPropertiesByUrl').rejects(new Error(`Cannot get site ${siteUrl}`));
 
-      if (opts.url === `${adminUrl}/_api/SPO.Tenant/GetSiteAdministrators?siteId='${siteId}'`) {
-        return {
-          value: listOfAdminsFromAdminSource
-        };
-      }
-
-      if (opts.url === `https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com:/sites/site?$select=id`) {
-        return { id: 'Incorrect ID' };
-      }
-
-      throw 'Invalid request: ' + opts.url;
-    });
-
-    sinon.stub(request, 'post').callsFake(async opts => {
-      if (opts.url === `${adminUrl}/_api/SPO.Tenant/GetSiteAdministrators?siteId='${siteId}'`) {
-        return {
-          value: listOfAdminsFromAdminSource
-        };
-      }
-
-      throw 'Invalid request: ' + opts.url;
-    });
-
-    await assert.rejects(command.action(logger, { options: { siteUrl: siteUrl, asAdmin: true } }), new CommandError(`Site with URL ${siteUrl} not found`));
+    await assert.rejects(command.action(logger, { options: { siteUrl: siteUrl, asAdmin: true } }), new CommandError(`Cannot get site ${siteUrl}`));
   });
 
   it('passes validation when only correct siteUrl option specified', async () => {
@@ -393,6 +358,7 @@ describe(commands.SITE_ADMIN_LIST, () => {
   });
 
   it('get additional log when verbose parameter is set in admin mode', async () => {
+    sinon.stub(spo, 'getSiteAdminPropertiesByUrl').resolves({ SiteId: siteId } as any);
     sinon.stub(spo, 'getPrimaryAdminLoginNameAsAdmin').resolves(primaryAdminLoginName);
     sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/sites/root?$select=webUrl`) {
@@ -403,10 +369,6 @@ describe(commands.SITE_ADMIN_LIST, () => {
         return {
           value: listOfAdminsFromAdminSource
         };
-      }
-
-      if (opts.url === `https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com:/sites/site?$select=id`) {
-        return { id: `contoso.sharepoint.com,${siteId},fb0a066f-c10f-4734-94d1-f896de4aa484` };
       }
 
       throw 'Invalid request: ' + opts.url;

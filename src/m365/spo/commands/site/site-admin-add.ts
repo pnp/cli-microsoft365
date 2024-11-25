@@ -135,23 +135,13 @@ class SpoSiteAdminAddCommand extends SpoCommand {
     }
 
     const adminUrl: string = await spo.getSpoAdminUrl(logger, this.debug);
-    const siteId = await this.getSiteIdBasedOnUrl(args.options.siteUrl, logger);
-    const siteAdmins = (await this.getSiteAdmins(adminUrl, siteId)).map(u => u.loginName);
+    const tenantSiteProperties = await spo.getSiteAdminPropertiesByUrl(args.options.siteUrl, false, logger, this.verbose);
+    const siteAdmins = (await this.getSiteAdmins(adminUrl, tenantSiteProperties.SiteId)).map(u => u.loginName);
     siteAdmins.push(loginNameToAdd);
-    await this.setSiteAdminsAsAdmin(adminUrl, siteId, siteAdmins);
+    await this.setSiteAdminsAsAdmin(adminUrl, tenantSiteProperties.SiteId, siteAdmins);
     if (args.options.primary) {
-      await this.setPrimaryAdminAsAdmin(adminUrl, siteId, loginNameToAdd);
+      await this.setPrimaryAdminAsAdmin(adminUrl, tenantSiteProperties.SiteId, loginNameToAdd);
     }
-  }
-
-  private async getSiteIdBasedOnUrl(siteUrl: string, logger: Logger): Promise<string> {
-    const siteGraphId = await spo.getSiteId(siteUrl, logger, this.verbose);
-    const match = siteGraphId.match(/,([a-f0-9\-]{36}),/i);
-    if (!match) {
-      throw `Site with URL ${siteUrl} not found`;
-    }
-
-    return match[1];
   }
 
   private async getSiteAdmins(adminUrl: string, siteId: string): Promise<AdminUserResult[]> {

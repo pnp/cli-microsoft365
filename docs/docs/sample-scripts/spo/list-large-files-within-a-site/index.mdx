@@ -43,7 +43,7 @@ The following script will help you find every files in a specific SharePoint Onl
       $i++
       if ($ShowProgress) { Write-Host "Processing '$($lib.Title)' - ($i/$($allLibs.length))" }
 
-      $allFiles = m365 spo file list --webUrl $site --folder $lib.Url --recursive -o json | ConvertFrom-Json
+      $allFiles = m365 spo file list --webUrl $site --folder $lib.RootFolder.ServerRelativeUrl --recursive -o json | ConvertFrom-Json
 
       foreach ($file in $allFiles) {
           if ($ShowProgress) { Write-Host "Processing file '$($file.ServerRelativeUrl)'" }

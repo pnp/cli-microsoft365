@@ -101,9 +101,9 @@ describe(commands.LISTITEM_BATCH_SET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('updates single item in batch to a sharepoint list retrieved by listUrl including empty values', async () => {
+  it('updates single item in batch to a sharepoint list retrieved by listUrl including empty values and special characters', async () => {
     const csvContentHeadersEmptyValues = `Id,ContentType,Title,SingleChoiceField`;
-    const csvContentLineEmptyValues = `10,Item,Title A,`;
+    const csvContentLineEmptyValues = `10,Item,"Title A <>&""",`;
     const csvContentEmptyValues = `${csvContentHeadersEmptyValues}\n${csvContentLineEmptyValues}`;
     const listServerRelativeUrl: string = urlUtil.getServerRelativePath(webUrl, listUrl);
     const filterFields = ["InternalName eq 'ContentType'", "InternalName eq 'Title'", "InternalName eq 'SingleChoiceField'"];
@@ -136,6 +136,7 @@ describe(commands.LISTITEM_BATCH_SET, () => {
 
     await command.action(logger, { options: { webUrl: webUrl, filePath: filePath, listUrl: listUrl, idColumn: idColumn, systemUpdate: true, verbose: true } } as any);
     assert(postStub.called);
+    assert(postStub.args[0][0].data.includes('Title A &lt;&gt;&amp;&quot;'));
   });
 
   it('system updates single item in batch to a sharepoint list retrieved by id without user fields', async () => {

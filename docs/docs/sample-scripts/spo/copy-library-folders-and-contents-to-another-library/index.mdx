@@ -52,7 +52,7 @@ The following script shows how you can copy all library folders and contents to 
 
           # Copy everything (folders and files) to this target level 1 folder
           Write-Host "Copying '$($Folder.ServerRelativeUrl)' to '$DestinationFolderUrl'" -ForegroundColor Cyan
-          m365 spo folder copy --webUrl $SiteURL --sourceUrl $Folder.ServerRelativeUrl --targetUrl $DestinationFolderUrl --allowSchemaMismatch
+          m365 spo folder copy --webUrl $SiteURL --sourceUrl $Folder.ServerRelativeUrl --targetUrl $DestinationFolderUrl
       }
 
       # Copy files from root
