@@ -2712,11 +2712,6 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
-              label: 'homesite list',
-              id: 'cmd/spo/homesite/homesite-list'
-            },
-            {
-              type: 'doc',
               label: 'homesite remove',
               id: 'cmd/spo/homesite/homesite-remove'
             },
@@ -3741,6 +3736,11 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'tenant commandset set',
               id: 'cmd/spo/tenant/tenant-commandset-set'
+            },
+            {
+              type: 'doc',
+              label: 'homesite list',
+              id: 'cmd/spo/tenant/tenant-homesite-list'
             },
             {
               type: 'doc',
