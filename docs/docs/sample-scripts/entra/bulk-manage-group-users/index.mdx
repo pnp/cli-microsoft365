@@ -51,7 +51,7 @@ Note: Refactor the code as per your requirement.
           }
       }
       ElseIf ($action -eq "remove") {
-          m365 entra m365group user remove --groupId $group.id --userName $user.mail --force
+          m365 entra m365group user remove --groupId $group.id --userNames $user.mail --force
           Write-Host $user.mail " removed from " $group.mailNickname
       }
       Else {

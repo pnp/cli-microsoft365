@@ -1653,21 +1653,21 @@ const sidebars: SidebarsConfig = {
           ]
         },
         {
-          chatbot: [
+          copilot: [
             {
               type: 'doc',
-              label: 'chatbot get',
-              id: 'cmd/pp/chatbot/chatbot-get'
+              label: 'copilot get',
+              id: 'cmd/pp/copilot/copilot-get'
             },
             {
               type: 'doc',
-              label: 'chatbot list',
-              id: 'cmd/pp/chatbot/chatbot-list'
+              label: 'copliot list',
+              id: 'cmd/pp/copilot/copilot-list'
             },
             {
               type: 'doc',
-              label: 'chatbot remove',
-              id: 'cmd/pp/chatbot/chatbot-remove'
+              label: 'copilot remove',
+              id: 'cmd/pp/copilot/copilot-remove'
             }
           ]
         },
@@ -3998,6 +3998,11 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'model list',
               id: 'cmd/spp/model/model-list'
+            },
+            {
+              type: 'doc',
+              label: 'model remove',
+              id: 'cmd/spp/model/model-remove'
             }
           ]
         }

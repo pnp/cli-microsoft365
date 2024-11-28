@@ -10,10 +10,10 @@ import { powerPlatform } from '../../../../utils/powerPlatform.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './chatbot-list.js';
+import command from './copilot-list.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 
-describe(commands.CHATBOT_LIST, () => {
+describe(commands.COPILOT_LIST, () => {
   const envUrl = "https://contoso-dev.api.crm4.dynamics.com";
   const validEnvironment = '4be50206-9576-4237-8b17-38d8aadfaa36';
   const fetchXml: string = `
@@ -57,7 +57,7 @@ describe(commands.CHATBOT_LIST, () => {
       </fetch>
     `;
 
-  const chatbotResponse: any = {
+  const copilotResponse: any = {
     "value": [
       {
         "language": 1033,
@@ -73,7 +73,7 @@ describe(commands.CHATBOT_LIST, () => {
         "isManaged": false,
         "versionNumber": 1429641,
         "timezoneRuleVersionNumber": 0,
-        "name": "CLI Chatbot",
+        "name": "CLI Copilot",
         "statusCode": 1,
         "owner": "Doe, John",
         "overwriteTime": "1900-01-01T00:00:00Z",
@@ -129,7 +129,7 @@ describe(commands.CHATBOT_LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name, commands.CHATBOT_LIST);
+    assert.strictEqual(command.name, commands.COPILOT_LIST);
   });
 
   it('has a description', () => {
@@ -140,7 +140,7 @@ describe(commands.CHATBOT_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['name', 'botid', 'publishedOn', 'createdOn', 'botModifiedOn']);
   });
 
-  it('retrieves chatbots', async () => {
+  it('retrieves copilot bots', async () => {
     sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').callsFake(async () => envUrl);
 
     sinon.stub(request, 'get').callsFake(async (opts) => {
@@ -148,7 +148,7 @@ describe(commands.CHATBOT_LIST, () => {
         if (opts.headers &&
           opts.headers.accept &&
           (opts.headers.accept as string).indexOf('application/json') === 0) {
-          return chatbotResponse;
+          return copilotResponse;
         }
       }
 
@@ -156,7 +156,7 @@ describe(commands.CHATBOT_LIST, () => {
     });
 
     await command.action(logger, { options: { debug: true, environmentName: validEnvironment } });
-    assert(loggerLogSpy.calledWith(chatbotResponse.value));
+    assert(loggerLogSpy.calledWith(copilotResponse.value));
   });
 
   it('correctly handles API OData error', async () => {
@@ -182,4 +182,10 @@ describe(commands.CHATBOT_LIST, () => {
     await assert.rejects(command.action(logger, { options: { environmentName: validEnvironment } } as any),
       new CommandError(`Resource '' does not exist or one of its queried reference-property objects are not present`));
   });
+
+  it('defines correct alias', () => {
+    const alias = command.alias();
+    assert.deepStrictEqual(alias, [commands.CHATBOT_LIST]);
+  });
+
 });

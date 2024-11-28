@@ -1,5 +1,5 @@
 ---
-sidebar_position: 3
+sidebar_position: 4
 ---
 
 # Release notes
@@ -13,6 +13,10 @@ sidebar_position: 3
 - [spe container list](../cmd/spe/container/container-list.mdx) - lists containers of a specific Container Type [#6082](https://github.com/pnp/cli-microsoft365/issues/6082)
 - [spe containertype get](../cmd/spe/containertype/containertype-get.mdx) - retrieves a specific Container Type [#5991](https://github.com/pnp/cli-microsoft365/issues/5991)
 
+**SharePoint Premium:**
+
+- [spp model remove](../cmd/spp/model/model-remove.mdx) - deletes a document understanding model [#6118](https://github.com/pnp/cli-microsoft365/issues/6118)
+
 **Viva:**
 
 - [viva engage community set](../cmd/viva/engage/engage-community-set.mdx) - updates an existing Viva Engage community [#6279](https://github.com/pnp/cli-microsoft365/issues/6279)
@@ -20,15 +24,22 @@ sidebar_position: 3
 ### Changes
 
 - fixed using env var for login command [#6469](https://github.com/pnp/cli-microsoft365/issues/6469)
-- updated v10 upgrade guidance [#6363](https://github.com/pnp/cli-microsoft365/issues/6363)
-- fixed missing 'sp' aliases in some 'enterpriseapp' commands [#6476](https://github.com/pnp/cli-microsoft365/issues/6476)
+- fixed missing `sp` aliases in some `enterpriseapp` commands [#6476](https://github.com/pnp/cli-microsoft365/issues/6476)
 - updated `entra m365group` commands to accept displayName option [#6147](https://github.com/pnp/cli-microsoft365/issues/6147)
 - updated linting to make it faster in GitHub workflows [#6348](https://github.com/pnp/cli-microsoft365/issues/6348)
-- enhanced `entra m365group get` with additional properties [#6148](https://github.com/pnp/cli-microsoft365/issues/6148)
-- enhanced `spo contenttype` commands with Parent expand [#6329](https://github.com/pnp/cli-microsoft365/issues/6329)
+- enhanced [entra m365group get](../cmd/entra/m365group/m365group-get.mdx) with additional properties [#6148](https://github.com/pnp/cli-microsoft365/issues/6148)
+- enhanced `spo contenttype` commands with Parent property [#6329](https://github.com/pnp/cli-microsoft365/issues/6329)
 - updated docs on how to log in to CLI [#6343](https://github.com/pnp/cli-microsoft365/issues/6343)
-- enhanced `graph subscription add` command with additional options [#6158](https://github.com/pnp/cli-microsoft365/issues/6158)
-- fixed syntax highlighting in docs
+- enhanced [graph subscription add](../cmd/graph/subscription/subscription-add.mdx) command with additional options [#6158](https://github.com/pnp/cli-microsoft365/issues/6158)
+- fixed CSV-parsing issues for commands that accept a CSV-input [#5825](https://github.com/pnp/cli-microsoft365/issues/5825)
+- added `copilot` alias to `pp chatbot` commands. Closes [#6261](https://github.com/pnp/cli-microsoft365/issues/6261)
+- enhanced [spo listitem batch remove](../cmd/spo/listitem/listitem-batch-remove.mdx) command to allow case-insensitive column names [#6419](https://github.com/pnp/cli-microsoft365/issues/6419)
+- enhanced `spo site admin` commands to retrieve the site ID as admin. Closes [#6443](https://github.com/pnp/cli-microsoft365/issues/6443)
+- fixed [spo listitem batch set](../cmd/spo/listitem/listitem-batch-set.mdx) command to escape XML-special characters [#6430](https://github.com/pnp/cli-microsoft365/issues/6430)
+- aligned all sample scripts with the latest v10 release [#6369](https://github.com/pnp/cli-microsoft365/issues/6369)
+- updated entra group/app/administrativeunit get/list commands [#6315](https://github.com/pnp/cli-microsoft365/issues/6315)
+- added customer quotes docs page
+- fixed prompting for entra app [#6498](https://github.com/pnp/cli-microsoft365/issues/6498)
 
 ## [v10.0.0](https://github.com/pnp/cli-microsoft365/releases/tag/v10.0.0)
 
@@ -1286,8 +1297,8 @@ sidebar_position: 3
 
 **Power Platform:**
 
-- [pp chatbot get](../cmd/pp/chatbot/chatbot-get.mdx) - get information about the specified chatbot [#4107](https://github.com/pnp/cli-microsoft365/issues/4107)
-- [pp chatbot remove](../cmd/pp/chatbot/chatbot-remove.mdx) - removes the specified chatbot [#4106](https://github.com/pnp/cli-microsoft365/issues/4106)
+- [pp chatbot get](../cmd/pp/copilot/copilot-get.mdx) - get information about the specified chatbot [#4107](https://github.com/pnp/cli-microsoft365/issues/4107)
+- [pp chatbot remove](../cmd/pp/copilot/copilot-remove.mdx) - removes the specified chatbot [#4106](https://github.com/pnp/cli-microsoft365/issues/4106)
 - [pp dataverse table row list](../cmd/pp/dataverse/dataverse-table-row-list.mdx) - lists table rows for the given Dataverse table [#3791](https://github.com/pnp/cli-microsoft365/issues/3791)
 - [pp solution publisher add](../cmd/pp/solution/solution-publisher-add.mdx) - adds a specified publisher in a given environment [#3977](https://github.com/pnp/cli-microsoft365/issues/3977)
 - [pp dataverse table row remove](../cmd/pp/dataverse/dataverse-table-row-remove.mdx) - removes a row from a dataverse table in a given environment [#4030](https://github.com/pnp/cli-microsoft365/issues/4030)
@@ -1369,7 +1380,7 @@ sidebar_position: 3
 
 - [pp card clone](../cmd/pp/card/card-clone.mdx) - clones a specific Microsoft Power Platform card in the specified Power Platform environment [#3790](https://github.com/pnp/cli-microsoft365/issues/3790)
 - [pp card remove](../cmd/pp/card/card-remove.mdx) - removes the specified Microsoft Power Platform card in the specified Power Platform environment [#3781](https://github.com/pnp/cli-microsoft365/issues/3781)
-- [pp chatbot list](../cmd/pp/chatbot/chatbot-list.mdx) - lists Microsoft Power Platform chatbot in the specified Power Platform environment [#3650](https://github.com/pnp/cli-microsoft365/issues/3650)
+- [pp chatbot list](../cmd/pp/copilot/copilot-list.mdx) - lists Microsoft Power Platform chatbot in the specified Power Platform environment [#3650](https://github.com/pnp/cli-microsoft365/issues/3650)
 - [pp dataverse table get](../cmd/pp/dataverse/dataverse-table-get.mdx) - lists a dataverse table in a given environment [#3726](https://github.com/pnp/cli-microsoft365/issues/3726)
 - [pp dataverse table remove](../cmd/pp/dataverse/dataverse-table-remove.mdx) - removes a dataverse table in a given environment [#4031](https://github.com/pnp/cli-microsoft365/issues/4031)
 - [pp solution remove](../cmd/pp/solution/solution-remove.mdx) - removes the specified solution in the specified Power Platform environment [#3723](https://github.com/pnp/cli-microsoft365/issues/3723)

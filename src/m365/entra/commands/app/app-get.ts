@@ -19,6 +19,7 @@ export interface Options extends GlobalOptions {
   objectId?: string;
   name?: string;
   save?: boolean;
+  properties?: string;
 }
 
 class EntraAppGetCommand extends GraphCommand {
@@ -44,7 +45,8 @@ class EntraAppGetCommand extends GraphCommand {
       Object.assign(this.telemetryProperties, {
         appId: typeof args.options.appId !== 'undefined',
         objectId: typeof args.options.objectId !== 'undefined',
-        name: typeof args.options.name !== 'undefined'
+        name: typeof args.options.name !== 'undefined',
+        properties: typeof args.options.properties !== 'undefined'
       });
     });
   }
@@ -54,7 +56,8 @@ class EntraAppGetCommand extends GraphCommand {
       { option: '--appId [appId]' },
       { option: '--objectId [objectId]' },
       { option: '--name [name]' },
-      { option: '--save' }
+      { option: '--save' },
+      { option: '-p, --properties [properties]' }
     );
   }
 
@@ -81,7 +84,7 @@ class EntraAppGetCommand extends GraphCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       const appObjectId = await this.getAppObjectId(args);
-      const appInfo = await this.getAppInfo(appObjectId);
+      const appInfo = await this.getAppInfo(appObjectId, args.options.properties);
       const res = await this.saveAppInfo(args, appInfo, logger);
       await logger.log(res);
     }
@@ -125,9 +128,24 @@ class EntraAppGetCommand extends GraphCommand {
     return result.id;
   }
 
-  private async getAppInfo(appObjectId: string): Promise<Application> {
+  private async getAppInfo(appObjectId: string, properties?: string): Promise<Application> {
+    const queryParameters: string[] = [];
+
+    if (properties) {
+      const allProperties = properties.split(',');
+      const selectProperties = allProperties.filter(prop => !prop.includes('/'));
+
+      if (selectProperties.length > 0) {
+        queryParameters.push(`$select=${selectProperties}`);
+      }
+    }
+
+    const queryString = queryParameters.length > 0
+      ? `?${queryParameters.join('&')}`
+      : '';
+
     const requestOptions: CliRequestOptions = {
-      url: `${this.resource}/v1.0/myorganization/applications/${appObjectId}`,
+      url: `${this.resource}/v1.0/myorganization/applications/${appObjectId}${queryString}`,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },

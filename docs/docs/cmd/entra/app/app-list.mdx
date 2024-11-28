@@ -20,14 +20,29 @@ m365 entra appregistration list [options]
 
 ## Options
 
+```md definition-list
+`-p, --properties [properties]`
+: Comma-separated list of properties to retrieve.
+```
+
 <Global />
+
+## Remarks
+
+Using the `--properties` option, you can specify a comma-separated list of app properties to retrieve from the Microsoft Graph. If you don't specify any properties, the command will output the default properties returned by Graph.
 
 ## Examples
 
-Retrieve a list of Entra app registrations
+Retrieve a list of Entra app registrations.
 
 ```sh
 m365 entra app list
+```
+
+Retrieve a list of Entra app registrations with specified properties.
+
+```sh
+m365 entra app list --properties "appId,displayName"
 ```
 
 ## Response
