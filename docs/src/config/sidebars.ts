@@ -3739,6 +3739,11 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
+              label: 'homesite list',
+              id: 'cmd/spo/tenant/tenant-homesite-list'
+            },
+            {
+              type: 'doc',
               label: 'tenant recyclebinitem list',
               id: 'cmd/spo/tenant/tenant-recyclebinitem-list'
             },
