@@ -3342,6 +3342,11 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
+              label: 'page default get',
+              id: 'cmd/spo/page/page-default-get'
+            },
+            {
+              type: 'doc',
               label: 'page header set',
               id: 'cmd/spo/page/page-header-set'
             },
