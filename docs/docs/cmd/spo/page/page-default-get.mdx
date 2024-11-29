@@ -1,0 +1,179 @@
+import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# spo page default get
+
+Gets the home page for a specific site
+
+## Usage
+
+```sh
+m365 spo page default get [options]
+```
+
+## Options
+
+```md definition-list
+`-u, --siteUrl <siteUrl>`
+: URL of the SharePoint site.
+```
+
+<Global />
+
+## Examples
+
+Get the home page of a specific site
+
+```sh
+m365 spo page default get --siteUrl https://contoso.sharepoint.com/sites/Marketing
+```
+
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  {
+    "ListItemAllFields": {
+      "CommentsDisabled": true,
+      "FileSystemObjectType": 0,
+      "Id": 1,
+      "ServerRedirectedEmbedUri": null,
+      "ServerRedirectedEmbedUrl": "",
+      "ContentTypeId": "0x0101009D1CB255DA76424F860D91F20E6C411800DE13AFD7BD1A9847A5DEB2C981024CB6",
+      "OData__ColorTag": null,
+      "ComplianceAssetId": null,
+      "WikiField": null,
+      "Title": "Home",
+      "ClientSideApplicationId": "b6917cb1-93a0-4b97-a84d-7cf49975d4ec",
+      "PageLayoutType": "Home",
+      "CanvasContent1": null,
+      "BannerImageUrl": null,
+      "Description": null,
+      "PromotedState": null,
+      "FirstPublishedDate": null,
+      "LayoutWebpartsContent": null,
+      "OData__AuthorBylineId": null,
+      "_AuthorBylineStringId": null,
+      "OData__TopicHeader": null,
+      "OData__SPSitePageFlags": null,
+      "OData__SPCallToAction": null,
+      "OData__OriginalSourceUrl": null,
+      "OData__OriginalSourceSiteId": null,
+      "OData__OriginalSourceWebId": null,
+      "OData__OriginalSourceListId": null,
+      "OData__OriginalSourceItemId": null,
+      "ID": 1,
+      "Created": "2023-05-20T17:37:33",
+      "AuthorId": 1073741823,
+      "Modified": "2023-05-20T17:37:33",
+      "EditorId": 1073741823,
+      "OData__CopySource": null,
+      "CheckoutUserId": null,
+      "OData__UIVersionString": "1.0",
+      "GUID": "25af1202-addb-4f3a-ab69-f14d5630796a"
+    },
+    "CheckInComment": "",
+    "CheckOutType": 2,
+    "ContentTag": "{2F6CF80C-E4CC-4FCC-A424-8D36770AC481},4,1",
+    "CustomizedPageStatus": 1,
+    "ETag": "\"{2F6CF80C-E4CC-4FCC-A424-8D36770AC481},4\"",
+    "Exists": true,
+    "ExistsAllowThrowForPolicyFailures": true,
+    "ExistsWithException": true,
+    "IrmEnabled": false,
+    "Length": "805",
+    "Level": 1,
+    "LinkingUri": null,
+    "LinkingUrl": "",
+    "MajorVersion": 1,
+    "MinorVersion": 0,
+    "Name": "Home.aspx",
+    "ServerRelativeUrl": "/teams/Marketing/SitePages/Home.aspx",
+    "TimeCreated": "2023-05-21T00:37:33Z",
+    "TimeLastModified": "2023-05-21T00:37:33Z",
+    "Title": "Home",
+    "UIVersion": 512,
+    "UIVersionLabel": "1.0",
+    "UniqueId": "2f6cf80c-e4cc-4fcc-a424-8d36770ac481"
+  }
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  CheckInComment                   :
+  CheckOutType                     : 2
+  ContentTag                       : {2F6CF80C-E4CC-4FCC-A424-8D36770AC481},4,1
+  CustomizedPageStatus             : 1
+  ETag                             : "{2F6CF80C-E4CC-4FCC-A424-8D36770AC481},4"
+  Exists                           : true
+  ExistsAllowThrowForPolicyFailures: true
+  ExistsWithException              : true
+  IrmEnabled                       : false
+  Length                           : 805
+  Level                            : 1
+  LinkingUri                       : null
+  LinkingUrl                       :
+  ListItemAllFields                : {"CommentsDisabled":true,"FileSystemObjectType":0,"Id":1,"ServerRedirectedEmbedUri":null,"ServerRedirectedEmbedUrl":"","ContentTypeId":"0x0101009D1CB255DA76424F860D91F20E6C411800DE13AFD7BD1A9847A5DEB2C981024CB6","OData__ColorTag":null,"ComplianceAssetId":null,"WikiField":null,"Title":"Home","ClientSideApplicationId":"b6917cb1-93a0-4b97-a84d-7cf49975d4ec","PageLayoutType":"Home","CanvasContent1":null,"BannerImageUrl":null,"Description":null,"PromotedState":null,"FirstPublishedDate":null,"LayoutWebpartsContent":null,"OData__AuthorBylineId":null,"_AuthorBylineStringId":null,"OData__TopicHeader":null,"OData__SPSitePageFlags":null,"OData__SPCallToAction":null,"OData__OriginalSourceUrl":null,"OData__OriginalSourceSiteId":null,"OData__OriginalSourceWebId":null,"OData__OriginalSourceListId":null,"OData__OriginalSourceItemId":null,"ID":1,"Created":"2023-05-20T17:37:33","AuthorId":1073741823,"Modified":"2023-05-20T17:37:33","EditorId":1073741823,"OData__CopySource":null,"CheckoutUserId":null,"OData__UIVersionString":"1.0","GUID":"25af1202-addb-4f3a-ab69-f14d5630796a"}
+  MajorVersion                     : 1
+  MinorVersion                     : 0
+  Name                             : Home.aspx
+  ServerRelativeUrl                : /teams/Marketing/SitePages/Home.aspx
+  TimeCreated                      : 2023-05-21T00:37:33Z
+  TimeLastModified                 : 2023-05-21T00:37:33Z
+  Title                            : Home
+  UIVersion                        : 512
+  UIVersionLabel                   : 1.0
+  UniqueId                         : 2f6cf80c-e4cc-4fcc-a424-8d36770ac481
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  CheckInComment,CheckOutType,ContentTag,CustomizedPageStatus,ETag,Exists,ExistsAllowThrowForPolicyFailures,ExistsWithException,IrmEnabled,Length,Level,LinkingUri,LinkingUrl,MajorVersion,MinorVersion,Name,ServerRelativeUrl,TimeCreated,TimeLastModified,Title,UIVersion,UIVersionLabel,UniqueId
+  ,2,"{2F6CF80C-E4CC-4FCC-A424-8D36770AC481},4,1",1,"""{2F6CF80C-E4CC-4FCC-A424-8D36770AC481},4""",1,1,1,0,805,1,,,1,0,Home.aspx,/teams/Marketing/SitePages/Home.aspx,2023-05-21T00:37:33Z,2023-05-21T00:37:33Z,Home,512,1.0,2f6cf80c-e4cc-4fcc-a424-8d36770ac481
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # spo page default get --debug "false" --verbose "false" --siteUrl "https://contoso.sharepoint.com/teams/Marketing"
+
+  Date: 28/11/2024
+
+  ## Home (2f6cf80c-e4cc-4fcc-a424-8d36770ac481)
+
+  Property | Value
+  ---------|-------
+  CheckInComment |
+  CheckOutType | 2
+  ContentTag | {2F6CF80C-E4CC-4FCC-A424-8D36770AC481},4,1
+  CustomizedPageStatus | 1
+  ETag | "{2F6CF80C-E4CC-4FCC-A424-8D36770AC481},4"
+  Exists | true
+  ExistsAllowThrowForPolicyFailures | true
+  ExistsWithException | true
+  IrmEnabled | false
+  Length | 805
+  Level | 1
+  LinkingUrl |
+  MajorVersion | 1
+  MinorVersion | 0
+  Name | Home.aspx
+  ServerRelativeUrl | /teams/Marketing/SitePages/Home.aspx
+  TimeCreated | 2023-05-21T00:37:33Z
+  TimeLastModified | 2023-05-21T00:37:33Z
+  Title | Home
+  UIVersion | 512
+  UIVersionLabel | 1.0
+  UniqueId | 2f6cf80c-e4cc-4fcc-a424-8d36770ac481
+  ```
+
+  </TabItem>
+</Tabs>
