@@ -1,3 +1,4 @@
+import { Group } from '@microsoft/microsoft-graph-types';
 import { cli, CommandOutput } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import Command from '../../../../Command.js';
@@ -10,6 +11,8 @@ import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 import spoGroupGetCommand, { Options as SpoGroupGetCommandOptions } from '../group/group-get.js';
 import spoUserGetCommand, { Options as SpoUserGetCommandOptions } from '../user/user-get.js';
+import { entraGroup } from '../../../../utils/entraGroup.js';
+import { spo } from '../../../../utils/spo.js';
 
 interface CommandArgs {
   options: Options;
@@ -24,6 +27,8 @@ interface Options extends GlobalOptions {
   principalId?: number;
   upn?: string;
   groupName?: string;
+  entraGroupId?: string;
+  entraGroupName?: string;
   force?: boolean;
 }
 
@@ -54,6 +59,8 @@ class SpoListItemRoleAssignmentRemoveCommand extends SpoCommand {
         principalId: typeof args.options.principalId !== 'undefined',
         upn: typeof args.options.upn !== 'undefined',
         groupName: typeof args.options.groupName !== 'undefined',
+        entraGroupId: typeof args.options.entraGroupId !== 'undefined',
+        entraGroupName: typeof args.options.entraGroupName !== 'undefined',
         force: (!(!args.options.force)).toString()
       });
     });
@@ -86,6 +93,12 @@ class SpoListItemRoleAssignmentRemoveCommand extends SpoCommand {
         option: '--groupName [groupName]'
       },
       {
+        option: '--entraGroupId [entraGroupId]'
+      },
+      {
+        option: '--entraGroupName [entraGroupName]'
+      },
+      {
         option: '-f, --force'
       }
     );
@@ -111,6 +124,10 @@ class SpoListItemRoleAssignmentRemoveCommand extends SpoCommand {
           return `Specified principalId ${args.options.principalId} is not a number`;
         }
 
+        if (args.options.entraGroupId && !validation.isValidGuid(args.options.entraGroupId)) {
+          return `'${args.options.entraGroupId}' is not a valid GUID for option entraGroupId.`;
+        }
+
         return true;
       }
     );
@@ -119,7 +136,7 @@ class SpoListItemRoleAssignmentRemoveCommand extends SpoCommand {
   #initOptionSets(): void {
     this.optionSets.push(
       { options: ['listId', 'listTitle', 'listUrl'] },
-      { options: ['principalId', 'upn', 'groupName'] }
+      { options: ['principalId', 'upn', 'groupName', 'entraGroupId', 'entraGroupName'] }
     );
   }
 
@@ -158,15 +175,28 @@ class SpoListItemRoleAssignmentRemoveCommand extends SpoCommand {
 
       if (options.upn) {
         options.principalId = await this.getUserPrincipalId(options);
-        await this.removeRoleAssignmentWithRequestUrl(requestUrl, logger, options);
       }
       else if (options.groupName) {
         options.principalId = await this.getGroupPrincipalId(options);
-        await this.removeRoleAssignmentWithRequestUrl(requestUrl, logger, options);
       }
-      else {
-        await this.removeRoleAssignmentWithRequestUrl(requestUrl, logger, options);
+      else if (options.entraGroupId || options.entraGroupName) {
+        if (this.verbose) {
+          await logger.logToStderr('Retrieving group information...');
+        }
+
+        let group: Group;
+        if (options.entraGroupId) {
+          group = await entraGroup.getGroupById(options.entraGroupId);
+        }
+        else {
+          group = await entraGroup.getGroupByDisplayName(options.entraGroupName!);
+        }
+
+        const siteUser = await spo.ensureEntraGroup(options.webUrl, group);
+        options.principalId = siteUser.Id;
       }
+
+      await this.removeRoleAssignmentWithRequestUrl(requestUrl, logger, options);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
