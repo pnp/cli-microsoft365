@@ -417,5 +417,10 @@ export const validation = {
       .split(' ')
       .filter(permission => permission.indexOf('/') < 0);
     return invalidPermissions.length > 0 ? invalidPermissions : true;
+  },
+
+  isValidPowerPagesUrl(url: string): boolean {
+    const powerPagesUrlPattern = /^https:\/\/[a-zA-Z0-9-]+\.powerappsportals\.com$/;
+    return powerPagesUrlPattern.test(url);
   }
 };

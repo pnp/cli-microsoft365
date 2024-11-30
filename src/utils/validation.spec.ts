@@ -685,4 +685,16 @@ describe('validation/validation', () => {
     const expected = true;
     assert.notStrictEqual(actual, expected);
   });
+
+  it('isValidPowerPagesUrl returns false if url is not a valid Power Pages website', () => {
+    const actual = validation.isValidPowerPagesUrl("https://site-0uaq9.contoso.com");
+    const expected = true;
+    assert.notStrictEqual(actual, expected);
+  });
+
+  it('isValidPowerPagesUrl returns true if url is a valid Power Pages website', () => {
+    const actual = validation.isValidPowerPagesUrl("https://site-0uaq9.powerappsportals.com");
+    const expected = true;
+    assert.strictEqual(actual, expected);
+  });
 });
