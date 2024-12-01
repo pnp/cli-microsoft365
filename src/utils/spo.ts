@@ -2210,7 +2210,16 @@ export const spo = {
     }
 
     // Get the destination object information
-    const objectInfo = logs.find(l => l.Event === 'JobFinishedObjectInfo') as CopyJobObjectInfo;
+    let objectInfo = logs.find(l => l.Event === 'JobFinishedObjectInfo') as CopyJobObjectInfo;
+
+    // In rare cases, the object info may not be available yet
+    if (!objectInfo) {
+      // By doing a final poll, we can get the object info
+      progress = await request.post<{ JobState: number; Logs: string[] }>(requestOptions);
+      const newLogs = progress.Logs?.map(l => JSON.parse(l));
+      objectInfo = newLogs.find(l => l.Event === 'JobFinishedObjectInfo') as CopyJobObjectInfo;
+    }
+
     return objectInfo;
   },
 
