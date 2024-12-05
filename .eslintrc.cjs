@@ -86,6 +86,7 @@ const dictionary = [
   'place',
   'policy',
   'profile',
+  'pronouns',
   'property',
   'records',
   'recycle',
