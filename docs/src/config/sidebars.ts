@@ -906,6 +906,11 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'people profilecardproperty set',
               id: 'cmd/tenant/people/people-profilecardproperty-set'
+            },
+            {
+              type: 'doc',
+              label: 'people pronouns get',
+              id: 'cmd/tenant/people/people-pronouns-get'
             }
           ]
         },
