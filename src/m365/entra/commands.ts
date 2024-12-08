@@ -88,6 +88,7 @@ export default {
   PIM_ROLE_ASSIGNMENT_ELIGIBILITY_LIST: `${prefix} pim role assignment eligibility list`,
   PIM_ROLE_REQUEST_LIST: `${prefix} pim role request list`,
   POLICY_LIST: `${prefix} policy list`,
+  ROLEDEFINITION_LIST: `${prefix} roledefinition list`,
   SITECLASSIFICATION_DISABLE: `${prefix} siteclassification disable`,
   SITECLASSIFICATION_ENABLE: `${prefix} siteclassification enable`,
   SITECLASSIFICATION_GET: `${prefix} siteclassification get`,
