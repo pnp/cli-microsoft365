@@ -61,4 +61,5 @@ interface ZoneGroupMetadata {
   isExpanded: boolean;
   showDividerLine: boolean;
   iconAlignment: string;
+  displayName?: string;
 }
