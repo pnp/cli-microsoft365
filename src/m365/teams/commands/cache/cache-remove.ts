@@ -19,7 +19,7 @@ interface Options extends GlobalOptions {
 }
 
 interface Win32Process {
-  ProcessId: number;
+  PID: number;
 }
 
 class TeamsCacheRemoveCommand extends AnonymousCommand {
@@ -175,10 +175,10 @@ class TeamsCacheRemoveCommand extends AnonymousCommand {
     switch (platform) {
       case 'win32':
         if (client === 'classic') {
-          cmd = 'wmic process where caption="Teams.exe" get ProcessId';
+          cmd = 'tasklist /FI "IMAGENAME eq Teams.exe" /FO csv';
         }
         else {
-          cmd = 'wmic process where caption="ms-teams.exe" get ProcessId';
+          cmd = 'tasklist /FI "IMAGENAME eq ms-teams.exe" /FO csv';
         }
         break;
       case 'darwin':
@@ -204,7 +204,7 @@ class TeamsCacheRemoveCommand extends AnonymousCommand {
     else if (platform === 'win32') {
       const processJson: Win32Process[] = formatting.parseCsvToJson(cmdOutput.stdout);
       for (const proc of processJson) {
-        process.kill(proc.ProcessId);
+        process.kill(proc.PID);
       }
     }
     if (this.verbose) {

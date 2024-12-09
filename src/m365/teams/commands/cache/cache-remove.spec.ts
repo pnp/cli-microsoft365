@@ -15,10 +15,9 @@ import command from './cache-remove.js';
 import os, { homedir } from 'os';
 
 describe(commands.CACHE_REMOVE, () => {
-  const processOutput = `ProcessId
-  6456
-  14196
-  11352`;
+  const processOutput = `"Image Name","PID","Session Name","Session#","Mem Usage"
+  "ms-teams.exe","32544","Console","17","99,892 K"
+  "ms-teams.exe","47784","Console","17","127,152 K"`;
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -133,7 +132,7 @@ describe(commands.CACHE_REMOVE, () => {
     sinon.stub(fs, 'existsSync').returns(true);
     const error = new Error('random error');
     sinon.stub(command, 'exec' as any).callsFake(async (opts) => {
-      if (opts === 'wmic process where caption="Teams.exe" get ProcessId') {
+      if (opts === 'tasklist /FI "IMAGENAME eq Teams.exe" /FO csv') {
         throw error;
       }
       throw 'Invalid request';
@@ -148,7 +147,7 @@ describe(commands.CACHE_REMOVE, () => {
     sinon.stub(fs, 'existsSync').returns(true);
     const error = new Error('random error');
     sinon.stub(command, 'exec' as any).callsFake(async (opts) => {
-      if (opts === 'wmic process where caption="Teams.exe" get ProcessId') {
+      if (opts === 'tasklist /FI "IMAGENAME eq Teams.exe" /FO csv') {
         return { stdout: processOutput };
       }
       if (opts === 'rmdir /s /q "C:\\Users\\Administrator\\AppData\\Roaming\\Microsoft\\Teams"') {
@@ -212,7 +211,7 @@ describe(commands.CACHE_REMOVE, () => {
     sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '', APPDATA: 'C:\\Users\\Administrator\\AppData\\Roaming' });
     sinon.stub(process, 'kill' as any).returns(null);
     sinon.stub(command, 'exec' as any).callsFake(async (opts) => {
-      if (opts === 'wmic process where caption="Teams.exe" get ProcessId') {
+      if (opts === 'tasklist /FI "IMAGENAME eq Teams.exe" /FO csv') {
         return { stdout: 'No Instance(s) Available.' };
       }
       if (opts === 'rmdir /s /q "C:\\Users\\Administrator\\AppData\\Roaming\\Microsoft\\Teams"') {
@@ -237,7 +236,7 @@ describe(commands.CACHE_REMOVE, () => {
     sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '', APPDATA: 'C:\\Users\\Administrator\\AppData\\Roaming' });
     sinon.stub(process, 'kill' as any).returns(null);
     sinon.stub(command, 'exec' as any).callsFake(async (opts) => {
-      if (opts === 'wmic process where caption="Teams.exe" get ProcessId') {
+      if (opts === 'tasklist /FI "IMAGENAME eq Teams.exe" /FO csv') {
         return { stdout: processOutput };
       }
       if (opts === 'rmdir /s /q "C:\\Users\\Administrator\\AppData\\Roaming\\Microsoft\\Teams"') {
@@ -261,7 +260,7 @@ describe(commands.CACHE_REMOVE, () => {
     sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '', APPDATA: 'C:\\Users\\Administrator\\AppData\\Roaming', LOCALAPPDATA: 'C:\\Users\\Administrator\\AppData\\Local' });
     sinon.stub(process, 'kill' as any).returns(null);
     sinon.stub(command, 'exec' as any).callsFake(async (opts) => {
-      if (opts === 'wmic process where caption="ms-teams.exe" get ProcessId') {
+      if (opts === 'tasklist /FI "IMAGENAME eq ms-teams.exe" /FO csv') {
         return { stdout: processOutput };
       }
       if (opts === 'rmdir /s /q "C:\\Users\\Administrator\\AppData\\Local\\Packages\\MSTeams_8wekyb3d8bbwe\\LocalCache\\Microsoft\\MSTeams"') {
