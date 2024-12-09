@@ -13,6 +13,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './user-ensure.js';
+import { entraGroup } from '../../../../utils/entraGroup.js';
 
 describe(commands.USER_ENSURE, () => {
   const validUserName = 'john@contoso.com';
@@ -122,6 +123,7 @@ describe(commands.USER_ENSURE, () => {
   };
 
   const ensuredSecurityGroupResponse = {
+    logonName: 'c:0t.c|tenant|2056d2f6-3257-4253-8cfc-b73393e414e5',
     Id: 35,
     IsHiddenInUI: false,
     LoginName: `c:0t.c|tenant||${validEntraGroupId}`,
@@ -170,7 +172,9 @@ describe(commands.USER_ENSURE, () => {
     sinonUtil.restore([
       request.get,
       request.post,
-      entraUser.getUpnByUserId
+      entraUser.getUpnByUserId,
+      entraGroup.getGroupById,
+      entraGroup.getGroupByDisplayName
     ]);
   });
 
@@ -187,7 +191,7 @@ describe(commands.USER_ENSURE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('ensures user for a specific web by userPrincipalName', async () => {
+  it('ensures user in a specific web by userPrincipalName', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `${validWebUrl}/_api/web/ensureuser`) {
         return ensuredUserResponse;
@@ -200,7 +204,7 @@ describe(commands.USER_ENSURE, () => {
     assert(loggerLogSpy.calledWith(ensuredUserResponse));
   });
 
-  it('ensures user for a specific web by entraId', async () => {
+  it('ensures user in a specific web by entraId', async () => {
     sinon.stub(entraUser, 'getUpnByUserId').callsFake(async () => {
       return validUserName;
     });
@@ -217,7 +221,7 @@ describe(commands.USER_ENSURE, () => {
     assert(loggerLogSpy.calledWith(ensuredUserResponse));
   });
 
-  it('ensures user for a specific web by loginName', async () => {
+  it('ensures user in a specific web by loginName', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `${validWebUrl}/_api/web/ensureuser`) {
         return ensuredUserResponse;
@@ -230,16 +234,12 @@ describe(commands.USER_ENSURE, () => {
     assert(loggerLogSpy.calledWith(ensuredUserResponse));
   });
 
-  it('ensures user for a specific web by entraGroupId', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${validEntraGroupId}`) {
-        return groupM365Response.value[0];
-      }
-
-      throw 'Invalid request';
+  it('ensures user in a specific web by entraGroupId', async () => {
+    sinon.stub(entraGroup, 'getGroupById').callsFake(async () => {
+      return groupM365Response.value[0];
     });
 
-    sinon.stub(request, 'post').callsFake(async (opts) => {
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `${validWebUrl}/_api/web/ensureuser`) {
         return ensuredGroupResponse;
       }
@@ -248,19 +248,15 @@ describe(commands.USER_ENSURE, () => {
     });
 
     await command.action(logger, { options: { verbose: true, webUrl: validWebUrl, entraGroupId: validEntraGroupId } });
-    assert(loggerLogSpy.calledWith(ensuredGroupResponse));
+    assert.deepStrictEqual(postStub.firstCall.args[0].data, { logonName: 'c:0o.c|federateddirectoryclaimprovider|2056d2f6-3257-4253-8cfc-b73393e414e5' });
   });
 
-  it('ensures security group for a specific web by entraGroupName', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${validEntraSecurityGroupName}'`) {
-        return groupSecurityResponse;
-      }
-
-      throw 'Invalid request';
+  it('ensures security group in a specific web by entraGroupName', async () => {
+    sinon.stub(entraGroup, 'getGroupByDisplayName').callsFake(async () => {
+      return groupSecurityResponse.value[0];
     });
 
-    sinon.stub(request, 'post').callsFake(async (opts) => {
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `${validWebUrl}/_api/web/ensureuser`) {
         return ensuredSecurityGroupResponse;
       }
@@ -269,19 +265,15 @@ describe(commands.USER_ENSURE, () => {
     });
 
     await command.action(logger, { options: { verbose: true, webUrl: validWebUrl, entraGroupName: validEntraSecurityGroupName } });
-    assert(loggerLogSpy.calledWith(ensuredSecurityGroupResponse));
+    assert.deepStrictEqual(postStub.firstCall.args[0].data, { logonName: 'c:0t.c|tenant|2056d2f6-3257-4253-8cfc-b73393e414e5' });
   });
 
-  it('ensures user for a specific web by entraGroupName', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${validEntraGroupName}'`) {
-        return groupM365Response;
-      }
-
-      throw 'Invalid request';
+  it('ensures group in a specific web by entraGroupName', async () => {
+    sinon.stub(entraGroup, 'getGroupByDisplayName').callsFake(async () => {
+      return groupM365Response.value[0];
     });
 
-    sinon.stub(request, 'post').callsFake(async (opts) => {
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `${validWebUrl}/_api/web/ensureuser`) {
         return ensuredGroupResponse;
       }
@@ -290,7 +282,7 @@ describe(commands.USER_ENSURE, () => {
     });
 
     await command.action(logger, { options: { verbose: true, webUrl: validWebUrl, entraGroupName: validEntraGroupName } });
-    assert(loggerLogSpy.calledWith(ensuredGroupResponse));
+    assert.deepStrictEqual(postStub.firstCall.args[0].data, { logonName: 'c:0o.c|federateddirectoryclaimprovider|2056d2f6-3257-4253-8cfc-b73393e414e5' });
   });
 
   it('throws error message when no user was found with a specific id', async () => {
