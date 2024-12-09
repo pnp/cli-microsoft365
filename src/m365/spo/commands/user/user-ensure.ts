@@ -92,7 +92,7 @@ class SpoUserEnsureCommand extends SpoCommand {
         }
 
         if (args.options.entraGroupId && !validation.isValidGuid(args.options.entraGroupId)) {
-          return `${args.options.entraGroupId} is not a valid GUID.`;
+          return `${args.options.entraGroupId} is not a valid GUID for option 'entraGroupId'.`;
         }
 
         return true;
@@ -101,20 +101,16 @@ class SpoUserEnsureCommand extends SpoCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push({
-      options: ['entraId', 'userName', 'loginName', 'entraGroupId', 'entraGroupName'],
-      runsWhen: (args) => args.options.entraId || args.options.userName || args.options.loginName || args.options.entraGroupId || args.options.entraGroupName
-    });
+    this.optionSets.push({ options: ['entraId', 'userName', 'loginName', 'entraGroupId', 'entraGroupName'] });
   }
 
   #initTypes(): void {
     this.types.string.push('webUrl', 'entraId', 'userName', 'loginName', 'entraGroupId', 'entraGroupName');
-    this.optionSets.push({ options: ['entraId', 'userName'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      await logger.logToStderr(`Ensuring user ${args.options.entraId || args.options.userName} at site ${args.options.webUrl}`);
+      await logger.logToStderr(`Ensuring user ${args.options.entraId || args.options.userName || args.options.loginName || args.options.entraGroupId || args.options.entraGroupName} at site ${args.options.webUrl}`);
     }
 
     try {
@@ -145,7 +141,7 @@ class SpoUserEnsureCommand extends SpoCommand {
     }
 
     if (options.entraId) {
-      return await entraUser.getUpnByUserId(options.entraId);
+      return entraUser.getUpnByUserId(options.entraId);
     }
 
     if (options.loginName) {
@@ -155,12 +151,7 @@ class SpoUserEnsureCommand extends SpoCommand {
     let upn: string = '';
     if (options.entraGroupId || options.entraGroupName) {
       const entraGroup = await this.getEntraGroup(options.entraGroupId, options.entraGroupName);
-      if (entraGroup?.mail) {
-        upn = entraGroup.mail;
-      }
-      else {
-        upn = `c:0t.c|tenant|${entraGroup?.id}`;
-      }
+      upn = entraGroup.mailEnabled ? `c:0o.c|federateddirectoryclaimprovider|${entraGroup.id}` : `c:0t.c|tenant|${entraGroup.id}`;
     }
 
     return upn;
