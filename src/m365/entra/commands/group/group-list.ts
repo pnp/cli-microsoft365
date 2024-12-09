@@ -6,7 +6,6 @@ import { CliRequestOptions } from '../../../../request.js';
 import { odata } from '../../../../utils/odata.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
-import aadCommands from '../../aadCommands.js';
 
 interface CommandArgs {
   options: Options;
@@ -14,6 +13,7 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   type?: string;
+  properties?: string;
 }
 
 interface ExtendedGroup extends Group {
@@ -31,10 +31,6 @@ class EntraGroupListCommand extends GraphCommand {
     return 'Lists all groups defined in Entra ID.';
   }
 
-  public alias(): string[] | undefined {
-    return [aadCommands.GROUP_LIST];
-  }
-
   public defaultProperties(): string[] | undefined {
     return ['id', 'displayName', 'groupType'];
   }
@@ -50,7 +46,8 @@ class EntraGroupListCommand extends GraphCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        type: typeof args.options.type !== 'undefined'
+        type: typeof args.options.type !== 'undefined',
+        properties: typeof args.options.properties !== 'undefined'
       });
     });
   }
@@ -60,6 +57,9 @@ class EntraGroupListCommand extends GraphCommand {
       {
         option: '--type [type]',
         autocomplete: EntraGroupListCommand.groupTypes
+      },
+      {
+        option: '-p, --properties [properties]'
       }
     );
   }
@@ -77,8 +77,6 @@ class EntraGroupListCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    await this.showDeprecationWarning(logger, aadCommands.GROUP_LIST, commands.GROUP_LIST);
-
     try {
       let requestUrl: string = `${this.resource}/v1.0/groups`;
       let useConsistencyLevelHeader = false;
@@ -102,6 +100,23 @@ class EntraGroupListCommand extends GraphCommand {
             break;
         }
       }
+
+      const queryParameters: string[] = [];
+
+      if (args.options.properties) {
+        const allProperties = args.options.properties.split(',');
+        const selectProperties = allProperties.filter(prop => !prop.includes('/'));
+
+        if (selectProperties.length > 0) {
+          queryParameters.push(`$select=${selectProperties}`);
+        }
+      }
+
+      const queryString = queryParameters.length > 0
+        ? `?${queryParameters.join('&')}`
+        : '';
+
+      requestUrl += queryString;
 
       let groups: Group[] = [];
 

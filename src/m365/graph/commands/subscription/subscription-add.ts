@@ -15,6 +15,12 @@ interface Options extends GlobalOptions {
   notificationUrl: string;
   expirationDateTime?: string;
   clientState?: string;
+  lifecycleNotificationUrl?: string;
+  notificationUrlAppId?: string;
+  latestTLSVersion?: string;
+  includeResourceData?: boolean;
+  encryptionCertificate?: string;
+  encryptionCertificateId?: string;
 }
 
 const DEFAULT_EXPIRATION_DELAY_IN_MINUTES_PER_RESOURCE_TYPE = {
@@ -38,6 +44,7 @@ const DEFAULT_EXPIRATION_DELAY_IN_MINUTES = 4230;
 const SAFE_MINUTES_DELTA = 1;
 
 class GraphSubscriptionAddCommand extends GraphCommand {
+  private allowedTlsVersions: string[] = ['v1_0', 'v1_1', 'v1_2', 'v1_3'];
   public get name(): string {
     return commands.SUBSCRIPTION_ADD;
   }
@@ -59,7 +66,13 @@ class GraphSubscriptionAddCommand extends GraphCommand {
       Object.assign(this.telemetryProperties, {
         changeTypes: args.options.changeTypes,
         expirationDateTime: typeof args.options.expirationDateTime !== 'undefined',
-        clientState: typeof args.options.clientState !== 'undefined'
+        clientState: typeof args.options.clientState !== 'undefined',
+        lifecycleNotificationUrl: typeof args.options.lifecycleNotificationUrl !== 'undefined',
+        notificationUrlAppId: typeof args.options.notificationUrlAppId !== 'undefined',
+        latestTLSVersion: typeof args.options.latestTLSVersion !== 'undefined',
+        includeResourceData: !!args.options.includeResourceData,
+        encryptionCertificate: typeof args.options.encryptionCertificate !== 'undefined',
+        encryptionCertificateId: typeof args.options.encryptionCertificateId !== 'undefined'
       });
     });
   }
@@ -81,6 +94,25 @@ class GraphSubscriptionAddCommand extends GraphCommand {
       },
       {
         option: '-s, --clientState [clientState]'
+      },
+      {
+        option: '--lifecycleNotificationUrl [lifecycleNotificationUrl]'
+      },
+      {
+        option: '--notificationUrlAppId [notificationUrlAppId]'
+      },
+      {
+        option: '--latestTLSVersion [latestTLSVersion]',
+        autocomplete: this.allowedTlsVersions
+      },
+      {
+        option: '--includeResourceData [includeResourceData]'
+      },
+      {
+        option: '--encryptionCertificate [encryptionCertificate]'
+      },
+      {
+        option: '--encryptionCertificateId [encryptionCertificateId]'
       }
     );
   }
@@ -106,6 +138,28 @@ class GraphSubscriptionAddCommand extends GraphCommand {
           return 'The clientState value exceeds the maximum length of 128 characters';
         }
 
+        if (args.options.lifecycleNotificationUrl && !args.options.lifecycleNotificationUrl.toLowerCase().startsWith('https://')
+          && !args.options.lifecycleNotificationUrl.toLowerCase().startsWith('eventhub:https://')
+          && !args.options.lifecycleNotificationUrl.toLowerCase().startsWith('eventgrid:?azuresubscriptionid=')) {
+          return `The lifecycle notification URL '${args.options.lifecycleNotificationUrl}' does not start with either 'https://' or 'EventHub:https://' or 'EventGrid:?azuresubscriptionid='`;
+        }
+
+        if (args.options.latestTLSVersion && this.allowedTlsVersions.map(x => x.toLowerCase()).indexOf(args.options.latestTLSVersion.toLowerCase()) === -1) {
+          return `${args.options.latestTLSVersion} is not a valid TLS version. Allowed values are ${this.allowedTlsVersions.join(', ')}`;
+        }
+
+        if (args.options.includeResourceData && !args.options.encryptionCertificate) {
+          return `The 'encryptionCertificate' options is required to include the changed resource data`;
+        }
+
+        if (args.options.includeResourceData && !args.options.encryptionCertificateId) {
+          return `The 'encryptionCertificateId' options is required to include the changed resource data`;
+        }
+
+        if (args.options.notificationUrlAppId && !validation.isValidGuid(args.options.notificationUrlAppId)) {
+          return `${args.options.notificationUrlAppId} is not a valid GUID for the 'notificationUrlAppId'`;
+        }
+
         return true;
       }
     );
@@ -116,12 +170,15 @@ class GraphSubscriptionAddCommand extends GraphCommand {
       changeType: args.options.changeTypes,
       resource: args.options.resource,
       notificationUrl: args.options.notificationUrl,
-      expirationDateTime: await this.getExpirationDateTimeOrDefault(logger, args)
+      expirationDateTime: await this.getExpirationDateTimeOrDefault(logger, args),
+      clientState: args.options.clientState,
+      includeResourceData: args.options.includeResourceData,
+      encryptionCertificate: args.options.encryptionCertificate,
+      encryptionCertificateId: args.options.encryptionCertificateId,
+      lifecycleNotificationUrl: args.options.lifecycleNotificationUrl,
+      notificationUrlAppId: args.options.notificationUrlAppId,
+      latestSupportedTlsVersion: args.options.latestTLSVersion
     };
-
-    if (args.options.clientState) {
-      data["clientState"] = args.options.clientState;
-    }
 
     const requestOptions: CliRequestOptions = {
       url: `${this.resource}/v1.0/subscriptions`,

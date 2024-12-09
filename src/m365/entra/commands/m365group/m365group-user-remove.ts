@@ -3,25 +3,23 @@ import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request from '../../../../request.js';
 import { entraGroup } from '../../../../utils/entraGroup.js';
+import { entraUser } from '../../../../utils/entraUser.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
-import teamsCommands from '../../../teams/commands.js';
-import aadCommands from '../../aadCommands.js';
 import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
 }
 
-interface UserResponse {
-  value: string
-}
-
 interface Options extends GlobalOptions {
   teamId?: string;
+  teamName?: string;
   groupId?: string;
-  userName: string;
+  groupName?: string;
+  ids?: string;
+  userNames?: string;
   force?: boolean;
 }
 
@@ -34,10 +32,6 @@ class EntraM365GroupUserRemoveCommand extends GraphCommand {
     return 'Removes the specified user from specified Microsoft 365 Group or Microsoft Teams team';
   }
 
-  public alias(): string[] | undefined {
-    return [teamsCommands.USER_REMOVE, aadCommands.M365GROUP_USER_REMOVE];
-  }
-
   constructor() {
     super();
 
@@ -45,14 +39,19 @@ class EntraM365GroupUserRemoveCommand extends GraphCommand {
     this.#initOptions();
     this.#initValidators();
     this.#initOptionSets();
+    this.#initTypes();
   }
 
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        force: (!(!args.options.force)).toString(),
+        force: !!args.options.force,
         teamId: typeof args.options.teamId !== 'undefined',
-        groupId: typeof args.options.groupId !== 'undefined'
+        groupId: typeof args.options.groupId !== 'undefined',
+        teamName: typeof args.options.teamName !== 'undefined',
+        groupName: typeof args.options.groupName !== 'undefined',
+        ids: typeof args.options.ids !== 'undefined',
+        userNames: typeof args.options.userNames !== 'undefined'
       });
     });
   }
@@ -60,13 +59,22 @@ class EntraM365GroupUserRemoveCommand extends GraphCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: "-i, --groupId [groupId]"
+        option: '-i, --groupId [groupId]'
       },
       {
-        option: "--teamId [teamId]"
+        option: '--groupName [groupName]'
       },
       {
-        option: '-n, --userName <userName>'
+        option: '--teamId [teamId]'
+      },
+      {
+        option: '--teamName [teamName]'
+      },
+      {
+        option: '--ids [ids]'
+      },
+      {
+        option: '--userNames [userNames]'
       },
       {
         option: '-f, --force'
@@ -78,11 +86,25 @@ class EntraM365GroupUserRemoveCommand extends GraphCommand {
     this.validators.push(
       async (args: CommandArgs) => {
         if (args.options.teamId && !validation.isValidGuid(args.options.teamId as string)) {
-          return `${args.options.teamId} is not a valid GUID`;
+          return `${args.options.teamId} is not a valid GUID for option 'teamId'.`;
         }
 
         if (args.options.groupId && !validation.isValidGuid(args.options.groupId as string)) {
-          return `${args.options.groupId} is not a valid GUID`;
+          return `${args.options.groupId} is not a valid GUID for option 'groupId'.`;
+        }
+
+        if (args.options.ids) {
+          const isValidGUIDArrayResult = validation.isValidGuidArray(args.options.ids);
+          if (isValidGUIDArrayResult !== true) {
+            return `The following GUIDs are invalid for the option 'ids': ${isValidGUIDArrayResult}.`;
+          }
+        }
+
+        if (args.options.userNames) {
+          const isValidUPNArrayResult = validation.isValidUserPrincipalNameArray(args.options.userNames);
+          if (isValidUPNArrayResult !== true) {
+            return `The following user principal names are invalid for the option 'userNames': ${isValidUPNArrayResult}.`;
+          }
         }
 
         return true;
@@ -91,70 +113,36 @@ class EntraM365GroupUserRemoveCommand extends GraphCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push({ options: ['groupId', 'teamId'] });
+    this.optionSets.push(
+      {
+        options: ['groupId', 'teamId', 'groupName', 'teamName']
+      },
+      {
+        options: ['ids', 'userNames']
+      }
+    );
+  }
+
+  #initTypes(): void {
+    this.types.string.push('groupId', 'groupName', 'teamId', 'teamName', 'ids', 'userNames');
+    this.types.boolean.push('force');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    await this.showDeprecationWarning(logger, aadCommands.M365GROUP_USER_REMOVE, commands.M365GROUP_USER_REMOVE);
-
-    const groupId: string = (typeof args.options.groupId !== 'undefined') ? args.options.groupId : args.options.teamId as string;
-
     const removeUser = async (): Promise<void> => {
       try {
+        const groupId: string = await this.getGroupId(logger, args.options.groupId, args.options.teamId, args.options.groupName, args.options.teamName);
         const isUnifiedGroup = await entraGroup.isUnifiedGroup(groupId);
 
         if (!isUnifiedGroup) {
           throw Error(`Specified group with id '${groupId}' is not a Microsoft 365 group.`);
         }
 
-        // retrieve user
-        const user: UserResponse = await request.get({
-          url: `${this.resource}/v1.0/users/${formatting.encodeQueryParameter(args.options.userName)}/id`,
-          headers: {
-            accept: 'application/json;odata.metadata=none'
-          },
-          responseType: 'json'
-        });
+        const userNames = args.options.userNames;
+        const userIds: string[] = await this.getUserIds(logger, args.options.ids, userNames);
 
-        // used to verify if the group exists or not
-        await request.get({
-          url: `${this.resource}/v1.0/groups/${groupId}/id`,
-          headers: {
-            'accept': 'application/json;odata.metadata=none'
-          }
-        });
-
-        try {
-          // try to delete the user from the owners. Accepted error is 404
-          await request.delete({
-            url: `${this.resource}/v1.0/groups/${groupId}/owners/${user.value}/$ref`,
-            headers: {
-              'accept': 'application/json;odata.metadata=none'
-            }
-          });
-        }
-        catch (err: any) {
-          // the 404 error is accepted
-          if (err.response.status !== 404) {
-            throw err.response.data;
-          }
-        }
-
-        // try to delete the user from the members. Accepted error is 404
-        try {
-          await request.delete({
-            url: `${this.resource}/v1.0/groups/${groupId}/members/${user.value}/$ref`,
-            headers: {
-              'accept': 'application/json;odata.metadata=none'
-            }
-          });
-        }
-        catch (err: any) {
-          // the 404 error is accepted
-          if (err.response.status !== 404) {
-            throw err.response.data;
-          }
-        }
+        await this.removeUsersFromGroup(groupId, userIds, 'owners');
+        await this.removeUsersFromGroup(groupId, userIds, 'members');
       }
       catch (err: any) {
         this.handleRejectedODataJsonPromise(err);
@@ -165,10 +153,55 @@ class EntraM365GroupUserRemoveCommand extends GraphCommand {
       await removeUser();
     }
     else {
-      const result = await cli.promptForConfirmation({ message: `Are you sure you want to remove ${args.options.userName} from the ${(typeof args.options.groupId !== 'undefined' ? 'group' : 'team')} ${groupId}?` });
+      const result = await cli.promptForConfirmation({ message: `Are you sure you want to remove ${args.options.userNames || args.options.ids} from ${args.options.groupId || args.options.groupName || args.options.teamId || args.options.teamName}?` });
 
       if (result) {
         await removeUser();
+      }
+    }
+  }
+
+  private async getGroupId(logger: Logger, groupId?: string, teamId?: string, groupName?: string, teamName?: string): Promise<string> {
+    const id = groupId || teamId;
+    if (id) {
+      return id;
+    }
+
+    const name = groupName ?? teamName;
+    if (this.verbose) {
+      await logger.logToStderr(`Retrieving Group ID by display name ${name}...`);
+    }
+
+    return entraGroup.getGroupIdByDisplayName(name!);
+  }
+
+  private async getUserIds(logger: Logger, userIds?: string, userNames?: string): Promise<string[]> {
+    if (userIds) {
+      return formatting.splitAndTrim(userIds);
+    }
+
+    if (this.verbose) {
+      await logger.logToStderr(`Retrieving user IDs for {userNames}...`);
+    }
+
+    return entraUser.getUserIdsByUpns(formatting.splitAndTrim(userNames!));
+  }
+
+  private async removeUsersFromGroup(groupId: string, userIds: string[], role: string): Promise<void> {
+    for (const userId of userIds) {
+      try {
+        await request.delete({
+          url: `${this.resource}/v1.0/groups/${groupId}/${role}/${userId}/$ref`,
+          headers: {
+            'accept': 'application/json;odata.metadata=none'
+          }
+        });
+      }
+      catch (err: any) {
+        // the 404 error is accepted
+        if (err.response.status !== 404) {
+          throw err.response.data;
+        }
       }
     }
   }

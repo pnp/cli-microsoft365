@@ -15,7 +15,6 @@ m365 entra app get [options]
 ## Alias
 
 ```sh
-m365 aad app get [options]
 m365 entra appregistration get [options]
 ```
 
@@ -23,16 +22,19 @@ m365 entra appregistration get [options]
 
 ```md definition-list
 `--appId [appId]`
-: Application (client) ID of the Entra application registration to get. Specify either `appId`, `objectId` or `name`
+: Application (client) ID of the Entra application registration to get. Specify either `appId`, `objectId` or `name`.
 
 `--objectId [objectId]`
-: Object ID of the Entra application registration to get. Specify either `appId`, `objectId` or `name`
+: Object ID of the Entra application registration to get. Specify either `appId`, `objectId` or `name`.
 
 `--name [name]`
-: Name of the Entra application registration to get. Specify either `appId`, `objectId` or `name`
+: Name of the Entra application registration to get. Specify either `appId`, `objectId` or `name`.
 
 `--save`
-: Use to store the information about the created app in a local file
+: Use to store the information about the created app in a local file.
+
+`-p, --properties [properties]`
+: Comma-separated list of properties to retrieve.
 ```
 
 <Global />
@@ -45,24 +47,26 @@ If the command finds multiple Entra application registrations with the specified
 
 If you want to store the information about the Entra app registration, use the `--save` option. This is useful when you build solutions connected to Microsoft 365 and want to easily manage app registrations used with your solution. When you use the `--save` option, after you get the app registration, the command will write its ID and name to the `.m365rc.json` file in the current directory. If the file already exists, it will add the information about the App registration to it if it's not already present, allowing you to track multiple apps. If the file doesn't exist, the command will create it.
 
+Using the `--properties` option, you can specify a comma-separated list of app properties to retrieve from the Microsoft Graph. If you don't specify any properties, the command will output the default properties returned by Graph.
+
 ## Examples
 
-Get the Entra application registration by its app (client) ID
+Get the Entra application registration by its app (client) ID.
 
 ```sh
 m365 entra app get --appId d75be2e1-0204-4f95-857d-51a37cf40be8
 ```
 
-Get the Entra application registration by its object ID
+Get the Entra application registration by its object ID.
 
 ```sh
 m365 entra app get --objectId d75be2e1-0204-4f95-857d-51a37cf40be8
 ```
 
-Get the Entra application registration by its name
+Get the Entra application registration by its name with specified properties.
 
 ```sh
-m365 entra app get --name "My app"
+m365 entra app get --name "My app" --properties "appId,displayName"
 ```
 
 Get the Entra application registration by its name. Store information about the retrieved app registration in the _.m365rc.json_ file in the current directory.

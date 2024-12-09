@@ -1,4 +1,3 @@
-import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
@@ -6,7 +5,6 @@ import { entraGroup } from '../../../../utils/entraGroup.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
-import aadCommands from '../../aadCommands.js';
 import commands from '../../commands.js';
 
 interface CommandArgs {
@@ -15,6 +13,7 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   id?: string;
+  displayName?: string;
   mailNickname?: string;
 }
 
@@ -27,10 +26,6 @@ class EntraM365GroupTeamifyCommand extends GraphCommand {
     return 'Creates a new Microsoft Teams team under existing Microsoft 365 group';
   }
 
-  public alias(): string[] | undefined {
-    return [aadCommands.M365GROUP_TEAMIFY];
-  }
-
   constructor() {
     super();
 
@@ -38,13 +33,15 @@ class EntraM365GroupTeamifyCommand extends GraphCommand {
     this.#initOptions();
     this.#initValidators();
     this.#initOptionSets();
+    this.#initTypes();
   }
 
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
         id: typeof args.options.id !== 'undefined',
-        mailNickname: typeof args.options.mailNickname !== 'undefined'
+        mailNickname: typeof args.options.mailNickname !== 'undefined',
+        displayName: typeof args.options.displayName !== 'undefined'
       });
     });
   }
@@ -53,6 +50,9 @@ class EntraM365GroupTeamifyCommand extends GraphCommand {
     this.options.unshift(
       {
         option: '-i, --id [id]'
+      },
+      {
+        option: '-n, --displayName [displayName]'
       },
       {
         option: '--mailNickname [mailNickname]'
@@ -73,7 +73,11 @@ class EntraM365GroupTeamifyCommand extends GraphCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push({ options: ['id', 'mailNickname'] });
+    this.optionSets.push({ options: ['id', 'displayName', 'mailNickname'] });
+  }
+
+  #initTypes(): void {
+    this.types.string.push('id', 'displayName', 'mailNickname');
   }
 
   private async getGroupId(options: Options): Promise<string> {
@@ -81,33 +85,14 @@ class EntraM365GroupTeamifyCommand extends GraphCommand {
       return options.id;
     }
 
-    const requestOptions: CliRequestOptions = {
-      url: `${this.resource}/v1.0/groups?$filter=mailNickname eq '${formatting.encodeQueryParameter(options.mailNickname as string)}'`,
-      headers: {
-        accept: 'application/json;odata.metadata=none'
-      },
-      responseType: 'json'
-    };
-
-    const response = await request.get<{ value: [{ id: string }] }>(requestOptions);
-    const groupItem: { id: string } | undefined = response.value[0];
-
-    if (!groupItem) {
-      throw `The specified Microsoft 365 Group does not exist`;
+    if (options.displayName) {
+      return await entraGroup.getGroupIdByDisplayName(options.displayName);
     }
 
-    if (response.value.length > 1) {
-      const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', response.value);
-      const result = await cli.handleMultipleResultsFound<{ id: string }>(`Multiple Microsoft 365 Groups with name '${options.mailNickname}' found.`, resultAsKeyValuePair);
-      return result.id;
-    }
-
-    return groupItem.id;
+    return await entraGroup.getGroupIdByMailNickname(options.mailNickname!);
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    await this.showDeprecationWarning(logger, aadCommands.M365GROUP_TEAMIFY, commands.M365GROUP_TEAMIFY);
-
     try {
       const groupId = await this.getGroupId(args.options);
       const isUnifiedGroup = await entraGroup.isUnifiedGroup(groupId);

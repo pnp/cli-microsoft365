@@ -15,7 +15,6 @@ import commands from '../../commands.js';
 import { spo } from '../../../../utils/spo.js';
 import command from './m365group-remove.js';
 import { entraGroup } from '../../../../utils/entraGroup.js';
-import aadCommands from '../../aadCommands.js';
 
 describe(commands.M365GROUP_REMOVE, () => {
   let log: string[];
@@ -103,6 +102,7 @@ describe(commands.M365GROUP_REMOVE, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     sinon.stub(entraGroup, 'isUnifiedGroup').resolves(true);
+    sinon.stub(entraGroup, 'getGroupIdByDisplayName').resolves(groupId);
     auth.connection.active = true;
     auth.connection.spoUrl = 'https://contoso.sharepoint.com';
     commandInfo = cli.getCommandInfo(command);
@@ -160,16 +160,6 @@ describe(commands.M365GROUP_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('defines alias', () => {
-    const alias = command.alias();
-    assert.notStrictEqual(typeof alias, 'undefined');
-  });
-
-  it('defines correct alias', () => {
-    const alias = command.alias();
-    assert.deepStrictEqual(alias, [aadCommands.M365GROUP_REMOVE]);
-  });
-
   it('fails validation if the id is not a valid GUID', async () => {
     const actual = await command.validate({ options: { id: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -193,7 +183,7 @@ describe(commands.M365GROUP_REMOVE, () => {
     assert(getGroupSpy.notCalled);
   });
 
-  it('deletes the group site for the sepcified group id when prompt confirmed', async () => {
+  it('deletes the group site for the group specified by id when prompt confirmed', async () => {
     defaultGetStub();
     const deletedGroupSpy: sinon.SinonStub = defaultPostStub();
 
@@ -201,6 +191,18 @@ describe(commands.M365GROUP_REMOVE, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, { options: { id: groupId, verbose: true } });
+    assert(deletedGroupSpy.calledOnce);
+    assert(loggerLogToStderrSpy.calledWith(`Deleting the group site: 'https://contoso.sharepoint.com/teams/sales'...`));
+  });
+
+  it('deletes the group site for the group specified by displayName when prompt confirmed', async () => {
+    defaultGetStub();
+    const deletedGroupSpy: sinon.SinonStub = defaultPostStub();
+
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
+
+    await command.action(logger, { options: { displayName: 'Finance', verbose: true } });
     assert(deletedGroupSpy.calledOnce);
     assert(loggerLogToStderrSpy.calledWith(`Deleting the group site: 'https://contoso.sharepoint.com/teams/sales'...`));
   });
@@ -314,7 +316,7 @@ describe(commands.M365GROUP_REMOVE, () => {
     sinonUtil.restore(entraGroup.isUnifiedGroup);
     sinon.stub(entraGroup, 'isUnifiedGroup').resolves(false);
 
-    await assert.rejects(command.action(logger, { options: { id: groupId, force: true } } as any),
+    await assert.rejects(command.action(logger, { options: { id: groupId, force: true } }),
       new CommandError(`Specified group with id '${groupId}' is not a Microsoft 365 group.`));
   });
 });

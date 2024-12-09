@@ -6,7 +6,6 @@ import commands from '../../commands.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { entraGroup } from '../../../../utils/entraGroup.js';
 import { validation } from '../../../../utils/validation.js';
-import aadCommands from '../../aadCommands.js';
 
 interface CommandArgs {
   options: Options;
@@ -25,10 +24,6 @@ class EntraGroupRemoveCommand extends GraphCommand {
 
   public get description(): string {
     return 'Removes an Entra group';
-  }
-
-  public alias(): string[] | undefined {
-    return [aadCommands.GROUP_REMOVE];
   }
 
   constructor() {
@@ -90,8 +85,6 @@ class EntraGroupRemoveCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    await this.showDeprecationWarning(logger, aadCommands.GROUP_REMOVE, commands.GROUP_REMOVE);
-
     const removeGroup = async (): Promise<void> => {
       if (this.verbose) {
         await logger.logToStderr(`Removing group ${args.options.id || args.options.displayName}...`);

@@ -10,14 +10,17 @@ import { telemetry } from '../../../../telemetry.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
-import teamsCommands from '../../../teams/commands.js';
 import commands from '../../commands.js';
 import command from './m365group-user-remove.js';
-import { settingsNames } from '../../../../settingsNames.js';
 import { entraGroup } from '../../../../utils/entraGroup.js';
-import aadCommands from '../../aadCommands.js';
+import { entraUser } from '../../../../utils/entraUser.js';
 
 describe(commands.M365GROUP_USER_REMOVE, () => {
+  const userName = 'adelev@contoso.com';
+  const groupOrTeamId = '80ecb711-2501-4262-b29a-838d30bd3387';
+  const userId = '8b38aeff-1642-47e4-b6ef-9d50d29638b7';
+  const groupOrTeamName = 'Project Team';
+
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
@@ -28,7 +31,7 @@ describe(commands.M365GROUP_USER_REMOVE, () => {
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
-    sinon.stub(entraGroup, 'isUnifiedGroup').resolves(true);
+    sinon.stub(entraGroup, 'getGroupIdByDisplayName').resolves('00000000-0000-0000-0000-000000000000');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
   });
@@ -46,20 +49,24 @@ describe(commands.M365GROUP_USER_REMOVE, () => {
         log.push(msg);
       }
     };
-    sinon.stub(cli, 'promptForConfirmation').callsFake(() => {
+    sinon.stub(cli, 'promptForConfirmation').callsFake(async () => {
       promptIssued = true;
-      return Promise.resolve(false);
+      return false;
     });
     promptIssued = false;
+    sinon.stub(entraGroup, 'isUnifiedGroup').resolves(true);
+    sinon.stub(entraUser, 'getUserIdsByUpns').resolves([userId]);
   });
 
   afterEach(() => {
     sinonUtil.restore([
       request.get,
       request.delete,
-      global.setTimeout,
       cli.promptForConfirmation,
-      cli.getSettingWithDefaultValue
+      cli.getSettingWithDefaultValue,
+      entraUser.getUserIdsByUpns,
+      entraGroup.isUnifiedGroup,
+      entraGroup.getGroupIdByDisplayName
     ]);
   });
 
@@ -76,90 +83,75 @@ describe(commands.M365GROUP_USER_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('defines alias', () => {
-    const alias = command.alias();
-    assert.notStrictEqual(typeof alias, 'undefined');
-  });
-
-  it('defines correct alias', () => {
-    const alias = command.alias();
-    assert.deepStrictEqual(alias, [teamsCommands.USER_REMOVE, aadCommands.M365GROUP_USER_REMOVE]);
-  });
-
-  it('fails validation if the groupId is not a valid guid.', async () => {
+  it('fails validation if the groupId is not a valid guid', async () => {
     const actual = await command.validate({
       options: {
-        groupId: 'not-c49b-4fd4-8223-28f0ac3a6402',
-        userName: 'anne.matthews@contoso.onmicrosoft.com'
+        groupId: 'invalid',
+        userNames: userName
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if the teamId is not a valid guid.', async () => {
+  it('fails validation if the teamId is not a valid guid', async () => {
     const actual = await command.validate({
       options: {
-        teamId: 'not-c49b-4fd4-8223-28f0ac3a6402',
-        userName: 'anne.matthews@contoso.onmicrosoft.com'
+        teamId: 'invalid',
+        userNames: userName
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if neither the groupId nor the teamID are provided.', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
+  it('fails validation if ids contain an invalid guid', async () => {
     const actual = await command.validate({
       options: {
-        userName: 'anne.matthews@contoso.onmicrosoft.com'
+        teamId: groupOrTeamId,
+        ids: `invalid,${userId}`
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when both groupId and teamId are specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
+  it('fails validation if userNames contain an invalid upn', async () => {
     const actual = await command.validate({
       options: {
-        groupId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
-        teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
-        userName: 'anne.matthews@contoso.onmicrosoft.com'
+        teamId: groupOrTeamId,
+        userNames: `invalid,${userName}`
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation when valid groupId and userName are specified', async () => {
+  it('passes validation when a valid teamId and userNames are specified', async () => {
     const actual = await command.validate({
       options: {
-        teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
-        userName: 'anne.matthews@contoso.onmicrosoft.com'
+        teamId: groupOrTeamId,
+        userNames: `${userName},john@contoso.com`
       }
     }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
+  it('passes validation when a valid teamId and ids are specified', async () => {
+    const actual = await command.validate({
+      options: {
+        teamId: groupOrTeamId,
+        ids: `${userId},8b38aeff-1642-47e4-b6ef-9d50d29638b7`
+      }
+    }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+
   it('prompts before removing the specified user from the specified Microsoft 365 Group when force option not passed', async () => {
-    await command.action(logger, { options: { groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com" } });
+    await command.action(logger, { options: { groupId: groupOrTeamId, userNames: userName } });
 
     assert(promptIssued);
   });
 
   it('prompts before removing the specified user from the specified Team when force option not passed (debug)', async () => {
-    await command.action(logger, { options: { debug: true, teamId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com" } });
+    await command.action(logger, { options: { debug: true, teamId: "00000000-0000-0000-0000-000000000000", userNames: userName } });
 
     assert(promptIssued);
   });
@@ -169,7 +161,7 @@ describe(commands.M365GROUP_USER_REMOVE, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(false);
 
-    await command.action(logger, { options: { groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com" } });
+    await command.action(logger, { options: { groupId: groupOrTeamId, userNames: userName } });
     assert(postSpy.notCalled);
   });
 
@@ -178,46 +170,95 @@ describe(commands.M365GROUP_USER_REMOVE, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(false);
 
-    await command.action(logger, { options: { debug: true, groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com" } });
+    await command.action(logger, { options: { debug: true, groupId: groupOrTeamId, userNames: userName } });
     assert(postSpy.notCalled);
   });
 
-  it('removes the specified owner from owners and members endpoint of the specified Microsoft 365 Group with accepted prompt', async () => {
+  it('removes the specified owner from owners and members endpoint of the Microsoft 365 Group specified by id with accepted prompt', async () => {
     let memberDeleteCallIssued = false;
 
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users/anne.matthews%40contoso.onmicrosoft.com/id`) {
-        return {
-          "value": "00000000-0000-0000-0000-000000000001"
-        };
+    sinon.stub(request, 'delete').callsFake(async (opts) => {
+      memberDeleteCallIssued = true;
+
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${groupOrTeamId}/owners/${userId}/$ref`) {
+        return;
       }
 
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/id`) {
-        return {
-          response: {
-            status: 200,
-            data: {
-              value: "00000000-0000-0000-0000-000000000000"
-            }
-          }
-        };
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${groupOrTeamId}/members/${userId}/$ref`) {
+        return;
       }
 
       throw 'Invalid request';
     });
 
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
+
+    await command.action(logger, { options: { groupId: groupOrTeamId, userNames: userName } });
+    assert(memberDeleteCallIssued);
+  });
+
+  it('removes the specified owner from owners and members endpoint of the specified Microsoft 365 Group when prompt confirmed', async () => {
+    let memberDeleteCallIssued = false;
+
     sinon.stub(request, 'delete').callsFake(async (opts) => {
       memberDeleteCallIssued = true;
 
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/owners/00000000-0000-0000-0000-000000000001/$ref`) {
-        return {
-          "value": [{ "id": "00000000-0000-0000-0000-000000000000" }]
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${groupOrTeamId}/owners/${userId}/$ref`) {
+        return;
+      }
+
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${groupOrTeamId}/members/${userId}/$ref`) {
+        return;
+      }
+
+      throw 'Invalid request';
+
+    });
+
+    await command.action(logger, { options: { groupId: groupOrTeamId, userNames: userName, force: true } });
+    assert(memberDeleteCallIssued);
+  });
+
+  it('removes the specified member from members endpoint of the specified Microsoft 365 Group when prompt confirmed', async () => {
+    let memberDeleteCallIssued = false;
+
+    sinon.stub(request, 'delete').callsFake(async (opts) => {
+      memberDeleteCallIssued = true;
+
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${groupOrTeamId}/owners/${userId}/$ref`) {
+        throw {
+          "response": {
+            "status": 404
+          }
         };
       }
 
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/members/00000000-0000-0000-0000-000000000001/$ref`) {
-        return {
-          "value": [{ "id": "00000000-0000-0000-0000-000000000000" }]
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${groupOrTeamId}/members/${userId}/$ref`) {
+        return;
+      }
+
+      throw 'Invalid request';
+
+    });
+
+    await command.action(logger, { options: { groupId: groupOrTeamId, userNames: userName, force: true } });
+    assert(memberDeleteCallIssued);
+  });
+
+  it('removes the specified members of the specified Microsoft 365 Group specified by teamName', async () => {
+    sinon.stub(entraGroup, 'getGroupIdByDisplayName').withArgs(groupOrTeamName).resolves(groupOrTeamId);
+
+    const deleteStub = sinon.stub(request, 'delete').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${groupOrTeamId}/owners/${userId}/$ref`) {
+        return;
+      }
+
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${groupOrTeamId}/members/${userId}/$ref`) {
+        throw {
+          "response": {
+            "status": 404
+          }
         };
       }
 
@@ -227,143 +268,19 @@ describe(commands.M365GROUP_USER_REMOVE, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
-    await command.action(logger, { options: { groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com" } });
-    assert(memberDeleteCallIssued);
+    await command.action(logger, { options: { teamName: groupOrTeamName, userNames: userName, verbose: true } });
+    assert(deleteStub.calledTwice);
   });
 
-  it('removes the specified owner from owners and members endpoint of the specified Microsoft 365 Group when prompt confirmed', async () => {
-    let memberDeleteCallIssued = false;
+  it('removes the specified members specified by ids of the specified Microsoft 365 Team specified by teamId', async () => {
+    sinon.stub(entraGroup, 'getGroupIdByDisplayName').withArgs(groupOrTeamName).resolves(groupOrTeamId);
 
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users/anne.matthews%40contoso.onmicrosoft.com/id`) {
-        return {
-          "value": "00000000-0000-0000-0000-000000000001"
-        };
+    const deleteStub = sinon.stub(request, 'delete').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${groupOrTeamId}/owners/${userId}/$ref`) {
+        return;
       }
 
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/id`) {
-        return {
-          response: {
-            status: 200,
-            data: {
-              value: "00000000-0000-0000-0000-000000000000"
-            }
-          }
-        };
-      }
-
-      throw 'Invalid request';
-    });
-
-
-    sinon.stub(request, 'delete').callsFake(async (opts) => {
-      memberDeleteCallIssued = true;
-
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/owners/00000000-0000-0000-0000-000000000001/$ref`) {
-        return {
-          "value": [{ "id": "00000000-0000-0000-0000-000000000000" }]
-        };
-      }
-
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/members/00000000-0000-0000-0000-000000000001/$ref`) {
-        return {
-          "value": [{ "id": "00000000-0000-0000-0000-000000000000" }]
-        };
-      }
-
-      throw 'Invalid request';
-
-    });
-
-    await command.action(logger, { options: { groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com", force: true } });
-    assert(memberDeleteCallIssued);
-  });
-
-  it('removes the specified member from members endpoint of the specified Microsoft 365 Group when prompt confirmed', async () => {
-    let memberDeleteCallIssued = false;
-
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users/anne.matthews%40contoso.onmicrosoft.com/id`) {
-        return {
-          "value": "00000000-0000-0000-0000-000000000001"
-        };
-      }
-
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/id`) {
-        return {
-          response: {
-            status: 200,
-            data: {
-              value: "00000000-0000-0000-0000-000000000000"
-            }
-          }
-        };
-      }
-
-      throw 'Invalid request';
-    });
-
-
-    sinon.stub(request, 'delete').callsFake(async (opts) => {
-      memberDeleteCallIssued = true;
-
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/owners/00000000-0000-0000-0000-000000000001/$ref`) {
-        throw {
-          "response": {
-            "status": 404
-          }
-        };
-      }
-
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/members/00000000-0000-0000-0000-000000000001/$ref`) {
-        return {
-          "value": [{ "id": "00000000-0000-0000-0000-000000000000" }]
-        };
-      }
-
-      throw 'Invalid request';
-
-    });
-
-    await command.action(logger, { options: { groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com", force: true } });
-    assert(memberDeleteCallIssued);
-  });
-
-  it('removes the specified owners from owners endpoint of the specified Microsoft 365 Group when prompt confirmed', async () => {
-    let memberDeleteCallIssued = false;
-
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users/anne.matthews%40contoso.onmicrosoft.com/id`) {
-        return {
-          "value": "00000000-0000-0000-0000-000000000001"
-        };
-      }
-
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/id`) {
-        return {
-          response: {
-            status: 200,
-            data: {
-              value: "00000000-0000-0000-0000-000000000000"
-            }
-          }
-        };
-      }
-
-      throw 'Invalid request';
-    });
-
-
-    sinon.stub(request, 'delete').callsFake(async (opts) => {
-      memberDeleteCallIssued = true;
-
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/owners/00000000-0000-0000-0000-000000000001/$ref`) {
-        return {
-          "value": [{ "id": "00000000-0000-0000-0000-000000000000" }]
-        };
-      }
-
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/members/00000000-0000-0000-0000-000000000001/$ref`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${groupOrTeamId}/members/${userId}/$ref`) {
         throw {
           "response": {
             "status": 404
@@ -375,39 +292,39 @@ describe(commands.M365GROUP_USER_REMOVE, () => {
 
     });
 
-    await command.action(logger, { options: { groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com", force: true } });
-    assert(memberDeleteCallIssued);
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
+
+    await command.action(logger, { options: { teamId: groupOrTeamId, ids: userId, verbose: true } });
+    assert(deleteStub.calledTwice);
+  });
+
+  it('removes the specified members of the specified Microsoft 365 Group specified by groupName', async () => {
+    sinon.stub(entraGroup, 'getGroupIdByDisplayName').withArgs(groupOrTeamName).resolves(groupOrTeamId);
+
+    const deleteStub = sinon.stub(request, 'delete').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${groupOrTeamId}/owners/${userId}/$ref`) {
+        return;
+      }
+
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${groupOrTeamId}/members/${userId}/$ref`) {
+        return;
+      }
+
+      throw 'Invalid request';
+
+    });
+
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
+
+    await command.action(logger, { options: { teamName: groupOrTeamName, userNames: userName } });
+    assert(deleteStub.calledTwice);
   });
 
   it('does not fail if the user is not owner or member of the specified Microsoft 365 Group when prompt confirmed', async () => {
-    let memberDeleteCallIssued = false;
-
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users/anne.matthews%40contoso.onmicrosoft.com/id`) {
-        return {
-          "value": "00000000-0000-0000-0000-000000000001"
-        };
-      }
-
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/id`) {
-        return {
-          response: {
-            status: 200,
-            data: {
-              value: "00000000-0000-0000-0000-000000000000"
-            }
-          }
-        };
-      }
-
-      throw 'Invalid request';
-    });
-
-
-    sinon.stub(request, 'delete').callsFake(async (opts) => {
-      memberDeleteCallIssued = true;
-
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/owners/00000000-0000-0000-0000-000000000001/$ref`) {
+    const deleteStub = sinon.stub(request, 'delete').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${groupOrTeamId}/owners/${userId}/$ref`) {
         return {
           "response": {
             "status": 404
@@ -415,7 +332,7 @@ describe(commands.M365GROUP_USER_REMOVE, () => {
         };
       }
 
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/members/00000000-0000-0000-0000-000000000001/$ref`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${groupOrTeamId}/members/${userId}/$ref`) {
         throw {
           "response": {
             "status": 404
@@ -428,40 +345,18 @@ describe(commands.M365GROUP_USER_REMOVE, () => {
     });
 
 
-    await command.action(logger, { options: { groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com", force: true } });
-    assert(memberDeleteCallIssued);
+    await command.action(logger, { options: { groupId: groupOrTeamId, userNames: userName, force: true } });
+    assert(deleteStub.calledTwice);
   });
 
   it('stops removal if an unknown error message is thrown when deleting the owner', async () => {
     let memberDeleteCallIssued = false;
 
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users/anne.matthews%40contoso.onmicrosoft.com/id`) {
-        return {
-          "value": "00000000-0000-0000-0000-000000000001"
-        };
-      }
-
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/id`) {
-        return {
-          response: {
-            status: 200,
-            data: {
-              value: "00000000-0000-0000-0000-000000000000"
-            }
-          }
-        };
-      }
-
-      throw 'Invalid request';
-    });
-
-
     sinon.stub(request, 'delete').callsFake(async (opts) => {
       memberDeleteCallIssued = true;
 
       // for example... you must have at least one owner
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/owners/00000000-0000-0000-0000-000000000001/$ref`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${groupOrTeamId}/owners/${userId}/$ref`) {
         return {
           "response": {
             "status": 400
@@ -469,7 +364,7 @@ describe(commands.M365GROUP_USER_REMOVE, () => {
         };
       }
 
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/members/00000000-0000-0000-0000-000000000001/$ref`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${groupOrTeamId}/members/${userId}/$ref`) {
         throw {
           "response": {
             "status": 404
@@ -481,55 +376,38 @@ describe(commands.M365GROUP_USER_REMOVE, () => {
 
     });
 
-    await command.action(logger, { options: { groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com", force: true } });
+    await command.action(logger, { options: { groupId: groupOrTeamId, userNames: userName, force: true } });
     assert(memberDeleteCallIssued);
   });
 
   it('correctly retrieves user but does not find the Group Microsoft 365 group', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users/anne.matthews%40contoso.onmicrosoft.com/id`) {
-        return {
-          "value": "00000000-0000-0000-0000-000000000001"
-        };
-      }
-
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/id`) {
-        throw "Invalid object identifier";
-      }
-
-      throw 'Invalid request';
-    });
+    const errorMessage = `Resource '${groupOrTeamId}' does not exist or one of its queried reference-property objects are not present.`;
 
     sinonUtil.restore(cli.promptForConfirmation);
+    sinonUtil.restore(entraGroup.isUnifiedGroup);
+
+    sinon.stub(entraGroup, 'isUnifiedGroup').rejects(
+      {
+        error: {
+          code: 'Request_ResourceNotFound',
+          message: errorMessage,
+          innerError: {
+            date: '2024-09-16T22:06:30',
+            'request-id': 'c43610b0-70c0-4c00-8c40-ff26b5f37f00',
+            'client-request-id': 'c43610b0-70c0-4c00-8c40-ff26b5f37f00'
+          }
+        }
+      }
+    );
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
-    await assert.rejects(command.action(logger, { options: { groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com" } } as any),
-      new CommandError('Invalid object identifier'));
+
+    await assert.rejects(command.action(logger, { options: { groupId: groupOrTeamId, userNames: userName } }),
+      new CommandError(errorMessage));
   });
 
   it('correctly retrieves user and handle error removing owner from specified Microsoft 365 group', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users/anne.matthews%40contoso.onmicrosoft.com/id`) {
-        return {
-          "value": "00000000-0000-0000-0000-000000000001"
-        };
-      }
-
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/id`) {
-        return {
-          response: {
-            status: 200,
-            data: {
-              value: "00000000-0000-0000-0000-000000000000"
-            }
-          }
-        };
-      }
-
-      throw 'Invalid request';
-    });
-
     sinon.stub(request, 'delete').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/owners/00000000-0000-0000-0000-000000000001/$ref`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${groupOrTeamId}/owners/${userId}/$ref`) {
         throw {
           response: {
             status: 400,
@@ -546,44 +424,23 @@ describe(commands.M365GROUP_USER_REMOVE, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
-    await assert.rejects(command.action(logger, { options: { groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com" } } as any),
+    await assert.rejects(command.action(logger, { options: { groupId: groupOrTeamId, userNames: userName } } as any),
       new CommandError('Invalid object identifier'));
   });
 
   it('correctly retrieves user and handle error removing member from specified Microsoft 365 group', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users/anne.matthews%40contoso.onmicrosoft.com/id`) {
-        return {
-          "value": "00000000-0000-0000-0000-000000000001"
-        };
-      }
-
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/id`) {
-        return {
-          response: {
-            status: 200,
-            data: {
-              value: "00000000-0000-0000-0000-000000000000"
-            }
-          }
-        };
-      }
-
-      throw 'Invalid request';
-    });
-
     sinon.stub(request, 'delete').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/owners/00000000-0000-0000-0000-000000000001/$ref`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${groupOrTeamId}/owners/${userId}/$ref`) {
         return {
-          "err": {
-            "response": {
-              "status": 404
+          err: {
+            response: {
+              status: 404
             }
           }
         };
       }
 
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/members/00000000-0000-0000-0000-000000000001/$ref`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${groupOrTeamId}/members/${userId}/$ref`) {
         throw {
           response: {
             status: 400,
@@ -600,34 +457,15 @@ describe(commands.M365GROUP_USER_REMOVE, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
-    await assert.rejects(command.action(logger, { options: { groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com" } } as any),
+    await assert.rejects(command.action(logger, { options: { groupId: groupOrTeamId, userNames: userName } }),
       new CommandError('Invalid object identifier'));
   });
 
-  it('correctly skips execution when specified user is not found', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users/anne.matthews.not.found%40contoso.onmicrosoft.com/id`) {
-        throw "Resource 'anne.matthews.not.found%40contoso.onmicrosoft.com' does not exist or one of its queried reference-property objects are not present.";
-      }
-
-      throw 'Invalid request';
-    });
-
-    sinon.stub(request, 'delete').resolves();
-
-    sinonUtil.restore(cli.promptForConfirmation);
-    sinon.stub(cli, 'promptForConfirmation').resolves(true);
-
-    await assert.rejects(command.action(logger, { options: { debug: true, groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com" } } as any), new CommandError("Invalid request"));
-  });
-
   it('throws error when the group is not a unified group', async () => {
-    const groupId = '3f04e370-cbc6-4091-80fe-1d038be2ad06';
-
     sinonUtil.restore(entraGroup.isUnifiedGroup);
     sinon.stub(entraGroup, 'isUnifiedGroup').resolves(false);
 
-    await assert.rejects(command.action(logger, { options: { groupId: groupId, userName: 'anne.matthews@contoso.onmicrosoft.com', force: true } } as any),
-      new CommandError(`Specified group with id '${groupId}' is not a Microsoft 365 group.`));
+    await assert.rejects(command.action(logger, { options: { groupId: groupOrTeamId, userNames: 'anne.matthews@contoso.onmicrosoft.com', force: true } }),
+      new CommandError(`Specified group with id '${groupOrTeamId}' is not a Microsoft 365 group.`));
   });
 });

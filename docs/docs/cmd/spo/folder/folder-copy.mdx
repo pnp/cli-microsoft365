@@ -1,4 +1,6 @@
 import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 # spo folder copy
 
@@ -31,18 +33,13 @@ m365 spo folder copy [options]
 `--nameConflictBehavior [nameConflictBehavior]`
 : Behavior when a file or folder with the same name is already present at the destination. Allowed values: `fail`, `rename`. Defaults to `fail`.
 
-`--resetAuthorAndCreated`
-: Use this option to clear the author and created date. When not specified, the values from the source folder are used.
-
-`--bypassSharedLock`
-: This indicates whether a folder with a shared lock can still be moved. Use this option to copy a folder that is locked.
+`--skipWait`
+: Don't wait for the copy operation to complete.
 ```
 
 <Global />
 
 ## Remarks
-
-When you copy a folder with documents that have version history, only the latest document version is copied.
 
 When you specify a value for `nameConflictBehavior`, consider the following:
 
@@ -69,16 +66,90 @@ Copy a folder to another location and use new name on conflict
 m365 spo folder copy --webUrl https://contoso.sharepoint.com/sites/project-x --sourceUrl "/sites/project-x/Shared Documents/Reports" --targetUrl "/sites/project-y/Shared Documents/Project files" --nameConflictBehavior rename
 ```
 
-Copy a folder referenced by its ID to another document library and reset author and created date
+Copy a folder referenced by its ID to another document library and don't wait for the copy operation to finish
 
 ```sh
-m365 spo folder copy --webUrl https://contoso.sharepoint.com/sites/project-x --sourceId b8cc341b-9c11-4f2d-aa2b-0ce9c18bcba2 --targetUrl "/sites/project-x/Project files" --retainEditorAndModified
+m365 spo folder copy --webUrl https://contoso.sharepoint.com/sites/project-x --sourceId b8cc341b-9c11-4f2d-aa2b-0ce9c18bcba2 --targetUrl "/sites/project-x/Project files" --skipWait
 ```
 
 ## Response
 
+### Standard Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  {
+    "Exists": true,
+    "ExistsAllowThrowForPolicyFailures": true,
+    "ExistsWithException": true,
+    "IsWOPIEnabled": false,
+    "ItemCount": 6,
+    "Name": "Company",
+    "ProgID": null,
+    "ServerRelativeUrl": "/sites/Sales/Icons/Company",
+    "TimeCreated": "2024-09-26T22:08:53Z",
+    "TimeLastModified": "2024-09-26T22:09:31Z",
+    "UniqueId": "d3a37396-ca16-467b-b968-48f5fc41f2b6",
+    "WelcomePage": ""
+  }
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  Exists                           : true
+  ExistsAllowThrowForPolicyFailures: true
+  ExistsWithException              : true
+  IsWOPIEnabled                    : false
+  ItemCount                        : 6
+  Name                             : Company
+  ProgID                           : null
+  ServerRelativeUrl                : /sites/Sales/Icons/Company
+  TimeCreated                      : 2024-09-26T22:08:53Z
+  TimeLastModified                 : 2024-09-26T22:09:31Z
+  UniqueId                         : d3a37396-ca16-467b-b968-48f5fc41f2b6
+  WelcomePage                      :
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  Exists,ExistsAllowThrowForPolicyFailures,ExistsWithException,IsWOPIEnabled,ItemCount,Name,ProgID,ServerRelativeUrl,TimeCreated,TimeLastModified,UniqueId,WelcomePage
+  1,1,1,0,6,Company,,/sites/Sales/Icons/Company,2024-09-26T22:08:53Z,2024-09-26T22:09:31Z,d3a37396-ca16-467b-b968-48f5fc41f2b6,
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # spo folder copy --webUrl "https://contoso.sharepoint.com/sites/Marketing" --sourceUrl "/Logos/Contoso" --targetUrl "/sites/Sales/Logos"
+
+  Date: 18/10/2024
+
+  ## Company (d3a37396-ca16-467b-b968-48f5fc41f2b6)
+
+  Property | Value
+  ---------|-------
+  Exists | true
+  ExistsAllowThrowForPolicyFailures | true
+  ExistsWithException | true
+  IsWOPIEnabled | false
+  ItemCount | 6
+  Name | Company
+  ServerRelativeUrl | /sites/Sales/Icons/Company
+  TimeCreated | 2024-09-26T22:08:53Z
+  TimeLastModified | 2024-09-26T22:09:31Z
+  UniqueId | d3a37396-ca16-467b-b968-48f5fc41f2b6
+  WelcomePage | 
+  ```
+
+  </TabItem>
+</Tabs>
+
+### `skipWait` response
+
 The command won't return a response on success.
-
-## More information
-
-- Copy items from a SharePoint document library: [https://support.office.com/en-us/article/move-or-copy-items-from-a-sharepoint-document-library-00e2f483-4df3-46be-a861-1f5f0c1a87bc](https://support.office.com/en-us/article/move-or-copy-items-from-a-sharepoint-document-library-00e2f483-4df3-46be-a861-1f5f0c1a87bc)

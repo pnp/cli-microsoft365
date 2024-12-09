@@ -4,7 +4,6 @@ import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { odata } from '../../../../utils/odata.js';
 import GraphCommand from '../../../base/GraphCommand.js';
-import aadCommands from '../../aadCommands.js';
 import commands from '../../commands.js';
 import { GroupExtended } from './GroupExtended.js';
 
@@ -26,10 +25,6 @@ class EntraM365GroupListCommand extends GraphCommand {
 
   public get description(): string {
     return 'Lists Microsoft 365 Groups in the current tenant';
-  }
-
-  public alias(): string[] | undefined {
-    return [aadCommands.M365GROUP_LIST];
   }
 
   constructor() {
@@ -72,8 +67,6 @@ class EntraM365GroupListCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    await this.showDeprecationWarning(logger, aadCommands.M365GROUP_LIST, commands.M365GROUP_LIST);
-
     const groupFilter: string = `?$filter=groupTypes/any(c:c+eq+'Unified')`;
     const displayNameFilter: string = args.options.displayName ? ` and startswith(DisplayName,'${formatting.encodeQueryParameter(args.options.displayName)}')` : '';
     const mailNicknameFilter: string = args.options.mailNickname ? ` and startswith(MailNickname,'${formatting.encodeQueryParameter(args.options.mailNickname)}')` : '';
@@ -129,7 +122,7 @@ class EntraM365GroupListCommand extends GraphCommand {
     const res = await request.get<{ webUrl: string }>(requestOptions);
     return {
       id: groupId,
-      url: res.webUrl ? res.webUrl.substr(0, res.webUrl.lastIndexOf('/')) : ''
+      url: res.webUrl ? res.webUrl.substring(0, res.webUrl.lastIndexOf('/')) : ''
     };
   }
 }

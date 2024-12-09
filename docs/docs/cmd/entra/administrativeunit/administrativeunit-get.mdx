@@ -12,12 +12,6 @@ Gets information about a specific administrative unit
 m365 entra administrativeunit get [options]
 ```
 
-## Alias
-
-```sh
-m365 aad administrativeunit get [options]
-```
-
 ## Options
 
 ```md definition-list
@@ -26,22 +20,29 @@ m365 aad administrativeunit get [options]
 
 `-n, --displayName [displayName]`
 : The display name of the administrative unit. Specify either `id` or `displayName` but not both.
+
+`-p, --properties [properties]`
+: Comma-separated list of properties to retrieve.
 ```
 
 <Global />
 
+## Remarks
+
+Using the `--properties` option, you can specify a comma-separated list of administrative unit properties to retrieve from the Microsoft Graph. If you don't specify any properties, the command will output the default properties returned by Graph.
+
 ## Examples
 
-Get information about the administrative unit by its id
+Get information about the administrative unit by its id.
 
 ```sh
 m365 entra administrativeunit get --id 03c4c9dc-6f0c-4c4f-a4e6-0c9ed80f54c7
 ```
 
-Get information about the administrative unit by its display name
+Get information about the administrative unit by its display name with specified properties.
 
 ```sh
-m365 entra administrativeunit get --displayName 'Marketing Division'
+m365 entra administrativeunit get --displayName "Marketing Division" --properties "id,displayName"
 ```
 
 ## Response

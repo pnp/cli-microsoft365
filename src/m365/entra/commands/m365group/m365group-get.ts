@@ -4,7 +4,6 @@ import request, { CliRequestOptions } from '../../../../request.js';
 import { entraGroup } from '../../../../utils/entraGroup.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
-import aadCommands from '../../aadCommands.js';
 import commands from '../../commands.js';
 import { GroupExtended } from './GroupExtended.js';
 
@@ -13,7 +12,8 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  id: string;
+  id?: string;
+  displayName?: string;
   includeSiteUrl: boolean;
 }
 
@@ -26,21 +26,22 @@ class EntraM365GroupGetCommand extends GraphCommand {
     return 'Gets information about the specified Microsoft 365 Group or Microsoft Teams team';
   }
 
-  public alias(): string[] | undefined {
-    return [aadCommands.M365GROUP_GET];
-  }
-
   constructor() {
     super();
 
     this.#initOptions();
     this.#initValidators();
+    this.#initOptionSets();
+    this.#initTypes();
   }
 
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '-i, --id <id>'
+        option: '-i, --id [id]'
+      },
+      {
+        option: '-n, --displayName [displayName]'
       },
       {
         option: '--includeSiteUrl'
@@ -51,7 +52,7 @@ class EntraM365GroupGetCommand extends GraphCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (!validation.isValidGuid(args.options.id)) {
+        if (args.options.id && !validation.isValidGuid(args.options.id)) {
           return `${args.options.id} is not a valid GUID`;
         }
 
@@ -60,19 +61,40 @@ class EntraM365GroupGetCommand extends GraphCommand {
     );
   }
 
-  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    await this.showDeprecationWarning(logger, aadCommands.M365GROUP_GET, commands.M365GROUP_GET);
+  #initOptionSets(): void {
+    this.optionSets.push({ options: ['id', 'displayName'] });
+  }
 
+  #initTypes(): void {
+    this.types.string.push('id', 'displayName');
+  }
+
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     let group: GroupExtended;
 
     try {
-      const isUnifiedGroup = await entraGroup.isUnifiedGroup(args.options.id);
-
-      if (!isUnifiedGroup) {
-        throw Error(`Specified group with id '${args.options.id}' is not a Microsoft 365 group.`);
+      if (args.options.id) {
+        group = await entraGroup.getGroupById(args.options.id);
+      }
+      else {
+        group = await entraGroup.getGroupByDisplayName(args.options.displayName!);
       }
 
-      group = await entraGroup.getGroupById(args.options.id);
+      const isUnifiedGroup = await entraGroup.isUnifiedGroup(group.id!);
+
+      if (!isUnifiedGroup) {
+        throw Error(`Specified group with id '${group.id}' is not a Microsoft 365 group.`);
+      }
+
+      const requestExtendedOptions: CliRequestOptions = {
+        url: `${this.resource}/v1.0/groups/${group.id}?$select=allowExternalSenders,autoSubscribeNewMembers,hideFromAddressLists,hideFromOutlookClients,isSubscribedByMail`,
+        headers: {
+          accept: 'application/json;odata.metadata=none'
+        },
+        responseType: 'json'
+      };
+      const groupExtended = await request.get<{ allowExternalSenders: boolean, autoSubscribeNewMembers: boolean, hideFromAddressLists: boolean, hideFromOutlookClients: boolean, isSubscribedByMail: boolean }>(requestExtendedOptions);
+      group = { ...group, ...groupExtended };
 
       if (args.options.includeSiteUrl) {
         const requestOptions: CliRequestOptions = {
@@ -84,7 +106,7 @@ class EntraM365GroupGetCommand extends GraphCommand {
         };
 
         const res = await request.get<{ webUrl: string }>(requestOptions);
-        group.siteUrl = res.webUrl ? res.webUrl.substr(0, res.webUrl.lastIndexOf('/')) : '';
+        group.siteUrl = res.webUrl ? res.webUrl.substring(0, res.webUrl.lastIndexOf('/')) : '';
       }
 
       await logger.log(group);

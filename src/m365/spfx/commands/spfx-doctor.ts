@@ -1050,7 +1050,7 @@ class SpfxDoctorCommand extends BaseProjectCommand {
   }
 
   private getNodeVersion(): string {
-    return process.version.substr(1);
+    return process.version.substring(1);
   }
 
   private async checkStatus(what: string, versionFound: string, versionCheck: VersionCheck): Promise<void> {

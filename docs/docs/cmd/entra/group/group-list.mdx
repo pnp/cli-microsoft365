@@ -12,20 +12,21 @@ Lists Entra groups
 m365 entra group list [options]
 ```
 
-## Alias
-
-```sh
-m365 aad group list [options]
-```
-
 ## Options
 
 ```md definition-list
 `--type [type]`
 : Filter the results to only groups of a given type. Allowed values: `microsoft365`, `security`, `distribution`, `mailEnabledSecurity`. By default, all groups are listed.
+
+`-p, --properties [properties]`
+: Comma-separated list of properties to retrieve.
 ```
 
 <Global />
+
+## Remarks
+
+Using the `--properties` option, you can specify a comma-separated list of group properties to retrieve from the Microsoft Graph. If you don't specify any properties, the command will output the default properties returned by Graph.
 
 ## Examples
 
@@ -35,10 +36,10 @@ Lists all groups defined in Entra ID.
 m365 entra group list
 ```
 
-List all security groups defined in Entra ID.
+List all security groups defined in Entra ID with specified properties.
 
 ```sh
-m365 entra group list --type security
+m365 entra group list --type security --properties "mail,displayName"
 ```
 
 ## Response

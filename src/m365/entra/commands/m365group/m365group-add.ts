@@ -8,7 +8,6 @@ import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
-import aadCommands from '../../aadCommands.js';
 
 interface CommandArgs {
   options: Options;
@@ -39,10 +38,6 @@ class EntraM365GroupAddCommand extends GraphCommand {
 
   public get description(): string {
     return 'Creates a Microsoft 365 Group';
-  }
-
-  public alias(): string[] | undefined {
-    return [aadCommands.M365GROUP_ADD];
   }
 
   constructor() {
@@ -165,8 +160,6 @@ class EntraM365GroupAddCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    await this.showDeprecationWarning(logger, aadCommands.M365GROUP_ADD, commands.M365GROUP_ADD);
-
     let group: Group;
     let ownerIds: string[] = [];
     let memberIds: string[] = [];
@@ -333,7 +326,7 @@ class EntraM365GroupAddCommand extends GraphCommand {
   }
 
   private getImageContentType(imagePath: string): string {
-    const extension: string = imagePath.substr(imagePath.lastIndexOf('.')).toLowerCase();
+    const extension: string = imagePath.substring(imagePath.lastIndexOf('.')).toLowerCase();
 
     switch (extension) {
       case '.png':

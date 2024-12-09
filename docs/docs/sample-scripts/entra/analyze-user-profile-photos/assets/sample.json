@@ -11,7 +11,7 @@
       "This script uses Azure Cognitive Service API and Microsoft 365 CLI to analyze user profile pictures and assess whether they meet the standards placed by the organization. It can be customized to ban content within an org channel or collaboration network where employees post pictures, memes, etc."
     ],
     "products": [
-      "AAD"
+      "Entra"
     ],
     "categories": [],
     "tags": [

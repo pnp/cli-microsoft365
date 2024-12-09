@@ -10,7 +10,6 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './app-list.js';
-import aadCommands from '../../aadCommands.js';
 
 describe(commands.APP_LIST, () => {
   let log: string[];
@@ -58,16 +57,6 @@ describe(commands.APP_LIST, () => {
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
-  });
-
-  it('defines alias', () => {
-    const alias = command.alias();
-    assert.notStrictEqual(typeof alias, 'undefined');
-  });
-
-  it('defines correct alias', () => {
-    const alias = command.alias();
-    assert.deepStrictEqual(alias, [aadCommands.APP_LIST, commands.APPREGISTRATION_LIST]);
   });
 
   it('defines correct properties for the default output', () => {
@@ -119,6 +108,44 @@ describe(commands.APP_LIST, () => {
           displayName: 'My App 2',
           description: 'My second app',
           signInAudience: 'My Audience'
+        }
+      ])
+    );
+  });
+
+  it(`should get a list of Microsoft Entra app registrations with specified properties`, async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/applications?$select=id,displayName`) {
+        return {
+          value: [
+            {
+              id: '340a4aa3-1af6-43ac-87d8-189819003952',
+              displayName: 'My App 1'
+            },
+            {
+              id: '340a4aa3-1af6-43ac-87d8-189819003953',
+              displayName: 'My App 2'
+            }
+          ]
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options: { properties: 'id,displayName' }
+    });
+
+    assert(
+      loggerLogSpy.calledWith([
+        {
+          id: '340a4aa3-1af6-43ac-87d8-189819003952',
+          displayName: 'My App 1'
+        },
+        {
+          id: '340a4aa3-1af6-43ac-87d8-189819003953',
+          displayName: 'My App 2'
         }
       ])
     );

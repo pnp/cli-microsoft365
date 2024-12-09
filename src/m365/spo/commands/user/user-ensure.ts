@@ -15,7 +15,6 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   webUrl: string;
   entraId?: string;
-  aadId?: string;
   userName?: string;
   loginName?: string;
   entraGroupId?: string;
@@ -45,7 +44,6 @@ class SpoUserEnsureCommand extends SpoCommand {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
         entraId: typeof args.options.entraId !== 'undefined',
-        aadId: typeof args.options.aadId !== 'undefined',
         userName: typeof args.options.userName !== 'undefined',
         loginName: typeof args.options.loginName !== 'undefined',
         entraGroupId: typeof args.options.entraGroupId !== 'undefined',
@@ -61,9 +59,6 @@ class SpoUserEnsureCommand extends SpoCommand {
       },
       {
         option: '--entraId [entraId]'
-      },
-      {
-        option: '--aadId [aadId]'
       },
       {
         option: '--userName [userName]'
@@ -92,10 +87,6 @@ class SpoUserEnsureCommand extends SpoCommand {
           return `${args.options.entraId} is not a valid GUID.`;
         }
 
-        if (args.options.aadId && !validation.isValidGuid(args.options.aadId)) {
-          return `${args.options.aadId} is not a valid GUID.`;
-        }
-
         if (args.options.userName && !validation.isValidUserPrincipalName(args.options.userName)) {
           return `${args.options.userName} is not a valid userName.`;
         }
@@ -111,22 +102,17 @@ class SpoUserEnsureCommand extends SpoCommand {
 
   #initOptionSets(): void {
     this.optionSets.push({
-      options: ['entraId', 'aadId', 'userName', 'loginName', 'entraGroupId', 'entraGroupName'],
-      runsWhen: (args) => args.options.entraId || args.options.aadId || args.options.userName || args.options.loginName || args.options.entraGroupId || args.options.entraGroupName
+      options: ['entraId', 'userName', 'loginName', 'entraGroupId', 'entraGroupName'],
+      runsWhen: (args) => args.options.entraId || args.options.userName || args.options.loginName || args.options.entraGroupId || args.options.entraGroupName
     });
   }
 
   #initTypes(): void {
-    this.types.string.push('webUrl', 'entraId', 'aadId', 'userName', 'loginName', 'entraGroupId', 'entraGroupName');
+    this.types.string.push('webUrl', 'entraId', 'userName', 'loginName', 'entraGroupId', 'entraGroupName');
+    this.optionSets.push({ options: ['entraId', 'userName'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    if (args.options.aadId) {
-      args.options.entraId = args.options.aadId;
-
-      await this.warn(logger, `Option 'aadId' is deprecated. Please use 'entraId' instead`);
-    }
-
     if (this.verbose) {
       await logger.logToStderr(`Ensuring user ${args.options.entraId || args.options.userName} at site ${args.options.webUrl}`);
     }

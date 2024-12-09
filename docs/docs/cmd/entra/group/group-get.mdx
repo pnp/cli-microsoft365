@@ -12,12 +12,6 @@ Gets information about the specified Entra group
 m365 entra group get [options]
 ```
 
-## Alias
-
-```sh
-m365 aad group get [options]
-```
-
 ## Options
 
 ```md definition-list
@@ -26,22 +20,29 @@ m365 aad group get [options]
 
 `-n, --displayName [displayName]`
 : The display name of the Entra group. Specify either `id` or `displayName` but not both.
+
+`-p, --properties [properties]`
+: Comma-separated list of properties to retrieve.
 ```
 
 <Global />
 
+## Remarks
+
+Using the `--properties` option, you can specify a comma-separated list of group properties to retrieve from the Microsoft Graph. If you don't specify any properties, the command will output the default properties returned by Graph.
+
 ## Examples
 
-Get information about an Entra Group by id
+Get information about an Entra Group by id.
 
 ```sh
 m365 entra group get --id 1caf7dcd-7e83-4c3a-94f7-932a1299c844
 ```
 
-Get information about an Entra Group by its display name
+Get information about an Entra Group by its display name with specified properties.
 
 ```sh
-m365 entra group get --displayName Finance
+m365 entra group get --displayName Finance --properties "mail,displayName"
 ```
 
 ## Response

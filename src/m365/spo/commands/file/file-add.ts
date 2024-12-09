@@ -449,7 +449,7 @@ class SpoFileAddCommand extends SpoCommand {
       const isLastChunk: boolean = info.Position >= info.Size;
       if (isLastChunk) {
         // trim buffer for last chunk
-        fileBuffer = fileBuffer.slice(0, readCount);
+        fileBuffer = fileBuffer.subarray(0, readCount);
       }
 
       const requestOptions: CliRequestOptions = {

@@ -10,6 +10,7 @@ import { settingsNames } from '../settingsNames.js';
 
 const validGroupName = 'Group name';
 const validGroupId = '00000000-0000-0000-0000-000000000000';
+const validGroupMailNickname = 'GroupName';
 
 const singleGroupResponse = {
   id: validGroupId,
@@ -44,7 +45,7 @@ describe('utils/entraGroup', () => {
     ]);
   });
 
-  it('correctly get a single group by id.', async () => {
+  it('correctly get a single group by id', async () => {
     sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/${validGroupId}`) {
         return singleGroupResponse;
@@ -54,6 +55,19 @@ describe('utils/entraGroup', () => {
     });
 
     const actual = await entraGroup.getGroupById(validGroupId);
+    assert.strictEqual(actual, singleGroupResponse);
+  });
+
+  it('correctly get a single group by id with specified properties', async () => {
+    sinon.stub(request, 'get').callsFake(async opts => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${validGroupId}?$select=id,displayName`) {
+        return singleGroupResponse;
+      }
+
+      return 'Invalid Request';
+    });
+
+    const actual = await entraGroup.getGroupById(validGroupId, 'id,displayName');
     assert.strictEqual(actual, singleGroupResponse);
   });
 
@@ -92,23 +106,6 @@ describe('utils/entraGroup', () => {
     });
 
     await assert.rejects(entraGroup.getGroupByDisplayName(validGroupName), Error("Multiple groups with name 'Group name' found. Found: 00000000-0000-0000-0000-000000000000."));
-  });
-
-  it('correctly get single group by name using getGroupByDisplayName', async () => {
-    sinon.stub(request, 'get').callsFake(async opts => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(validGroupName)}'`) {
-        return {
-          value: [
-            singleGroupResponse
-          ]
-        };
-      }
-
-      return 'Invalid Request';
-    });
-
-    const actual = await entraGroup.getGroupByDisplayName(validGroupName);
-    assert.deepStrictEqual(actual, singleGroupResponse);
   });
 
   it('correctly get single group id by name using getGroupIdByDisplayName', async () => {
@@ -185,6 +182,80 @@ describe('utils/entraGroup', () => {
     assert.deepStrictEqual(actual, validGroupId);
   });
 
+  it('correctly get single group id by name using getGroupIdByMailNickname', async () => {
+    sinon.stub(request, 'get').callsFake(async opts => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=mailNickname eq '${formatting.encodeQueryParameter(validGroupMailNickname)}'&$select=id`) {
+        return {
+          value: [
+            { id: singleGroupResponse.id }
+          ]
+        };
+      }
+
+      return 'Invalid Request';
+    });
+
+    const actual = await entraGroup.getGroupIdByMailNickname(validGroupMailNickname);
+    assert.deepStrictEqual(actual, singleGroupResponse.id);
+  });
+
+  it('throws error message when no group was found using getGroupIdByMailNickname', async () => {
+    sinon.stub(request, 'get').callsFake(async opts => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=mailNickname eq '${formatting.encodeQueryParameter(validGroupMailNickname)}'&$select=id`) {
+        return { value: [] };
+      }
+
+      return 'Invalid Request';
+    });
+
+    await assert.rejects(entraGroup.getGroupIdByMailNickname(validGroupMailNickname), Error(`The specified group '${validGroupMailNickname}' does not exist.`));
+  });
+
+  it('throws error message when multiple groups were found using getGroupIdByMailNickname', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
+    sinon.stub(request, 'get').callsFake(async opts => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=mailNickname eq '${formatting.encodeQueryParameter(validGroupMailNickname)}'&$select=id`) {
+        return {
+          value: [
+            { id: validGroupId },
+            { id: validGroupId }
+          ]
+        };
+      }
+
+      return 'Invalid Request';
+    });
+
+    await assert.rejects(entraGroup.getGroupIdByMailNickname(validGroupMailNickname), Error(`Multiple groups with mail nickname 'GroupName' found. Found: 00000000-0000-0000-0000-000000000000.`));
+  });
+
+  it('handles selecting single result when multiple groups with the specified name found using getGroupIdByMailNickname and cli is set to prompt', async () => {
+    sinon.stub(request, 'get').callsFake(async opts => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=mailNickname eq '${formatting.encodeQueryParameter(validGroupMailNickname)}'&$select=id`) {
+        return {
+          value: [
+            { id: validGroupId },
+            { id: validGroupId }
+          ]
+        };
+      }
+
+      return 'Invalid Request';
+    });
+
+    sinon.stub(cli, 'handleMultipleResultsFound').resolves({ id: validGroupId });
+
+    const actual = await entraGroup.getGroupIdByMailNickname(validGroupMailNickname);
+    assert.deepStrictEqual(actual, validGroupId);
+  });
+
   it('updates a group to public successfully', async () => {
     const patchStub = sinon.stub(request, 'patch').callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/${validGroupId}`) {
@@ -228,6 +299,26 @@ describe('utils/entraGroup', () => {
     sinon.stub(cli, 'handleMultipleResultsFound').resolves({ id: validGroupId, displayName: validGroupName });
 
     const actual = await entraGroup.getGroupByDisplayName(validGroupName);
+    assert.deepStrictEqual(actual, singleGroupResponse);
+  });
+
+  it('handles selecting single result when multiple groups with the specified name found and cli is set to prompt with specified properties', async () => {
+    sinon.stub(request, 'get').callsFake(async opts => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(validGroupName)}'&$select=id,displayName`) {
+        return {
+          value: [
+            { id: validGroupId, displayName: validGroupName },
+            { id: validGroupId, displayName: validGroupName }
+          ]
+        };
+      }
+
+      return 'Invalid Request';
+    });
+
+    sinon.stub(cli, 'handleMultipleResultsFound').resolves({ id: validGroupId, displayName: validGroupName });
+
+    const actual = await entraGroup.getGroupByDisplayName(validGroupName, 'id,displayName');
     assert.deepStrictEqual(actual, singleGroupResponse);
   });
 

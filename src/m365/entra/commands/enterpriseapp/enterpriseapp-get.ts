@@ -5,7 +5,6 @@ import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
-import aadCommands from '../../aadCommands.js';
 import commands from '../../commands.js';
 
 interface CommandArgs {
@@ -28,7 +27,7 @@ class EntraEnterpriseAppGetCommand extends GraphCommand {
   }
 
   public alias(): string[] | undefined {
-    return [aadCommands.SP_GET, commands.SP_GET];
+    return [commands.SP_GET];
   }
 
   constructor() {
@@ -123,8 +122,6 @@ class EntraEnterpriseAppGetCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    await this.showDeprecationWarning(logger, aadCommands.SP_GET, commands.SP_GET);
-
     if (this.verbose) {
       await logger.logToStderr(`Retrieving enterprise application information...`);
     }

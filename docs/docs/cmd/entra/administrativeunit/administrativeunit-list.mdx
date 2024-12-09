@@ -12,22 +12,31 @@ Retrieves a list of administrative units
 m365 entra administrativeunit list [options]
 ```
 
-## Alias
-
-```sh
-m365 aad administrativeunit list [options]
-```
-
 ## Options
+
+```md definition-list
+`-p, --properties [properties]`
+: Comma-separated list of properties to retrieve.
+```
 
 <Global />
 
+## Remarks
+
+Using the `--properties` option, you can specify a comma-separated list of administrative unit properties to retrieve from the Microsoft Graph. If you don't specify any properties, the command will output the default properties returned by Graph.
+
 ## Examples
 
-Retrieve a list of administrative units
+Retrieve a list of administrative units.
 
 ```sh
 m365 entra administrativeunit list
+```
+
+Retrieve a list of administrative units with specified properties.
+
+```sh
+m365 entra administrativeunit list --properties "id,displayName"
 ```
 
 ## Response

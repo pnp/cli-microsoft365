@@ -10,7 +10,6 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './administrativeunit-list.js';
-import aadCommands from '../../aadCommands.js';
 
 describe(commands.ADMINISTRATIVEUNIT_LIST, () => {
   let log: string[];
@@ -60,16 +59,6 @@ describe(commands.ADMINISTRATIVEUNIT_LIST, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('defines alias', () => {
-    const alias = command.alias();
-    assert.notStrictEqual(typeof alias, 'undefined');
-  });
-
-  it('defines correct alias', () => {
-    const alias = command.alias();
-    assert.deepStrictEqual(alias, [aadCommands.ADMINISTRATIVEUNIT_LIST]);
-  });
-
   it('defines correct properties for the default output', () => {
     assert.deepStrictEqual(command.defaultProperties(), ['id', 'displayName', 'visibility']);
   });
@@ -111,6 +100,44 @@ describe(commands.ADMINISTRATIVEUNIT_LIST, () => {
           id: 'a25b4c5e-e8b7-4f02-a23d-0965b6415098',
           displayName: 'Asian Division',
           visibility: null
+        }
+      ])
+    );
+  });
+
+  it(`should get a list of administrative units with specified properties`, async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/directory/administrativeUnits?$select=id,displayName`) {
+        return {
+          value: [
+            {
+              id: 'fc33aa61-cf0e-46b6-9506-f633347202ab',
+              displayName: 'European Division'
+            },
+            {
+              id: 'a25b4c5e-e8b7-4f02-a23d-0965b6415098',
+              displayName: 'Asian Division'
+            }
+          ]
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options: { properties: 'id,displayName' }
+    });
+
+    assert(
+      loggerLogSpy.calledWith([
+        {
+          id: 'fc33aa61-cf0e-46b6-9506-f633347202ab',
+          displayName: 'European Division'
+        },
+        {
+          id: 'a25b4c5e-e8b7-4f02-a23d-0965b6415098',
+          displayName: 'Asian Division'
         }
       ])
     );

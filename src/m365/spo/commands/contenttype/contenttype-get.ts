@@ -115,10 +115,10 @@ class SpoContentTypeGetCommand extends SpoCommand {
     requestUrl += "/contenttypes";
 
     if (args.options.id) {
-      requestUrl += `('${formatting.encodeQueryParameter(args.options.id)}')`;
+      requestUrl += `('${formatting.encodeQueryParameter(args.options.id)}')?$expand=Parent`;
     }
     else if (args.options.name) {
-      requestUrl += `?$filter=Name eq '${formatting.encodeQueryParameter(args.options.name)}'`;
+      requestUrl += `?$filter=Name eq '${formatting.encodeQueryParameter(args.options.name)}'&$expand=Parent`;
     }
 
     const requestOptions: CliRequestOptions = {

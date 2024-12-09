@@ -6,8 +6,6 @@ import request, { CliRequestOptions } from "../../../../request.js";
 import GraphCommand from "../../../base/GraphCommand.js";
 import commands from "../../commands.js";
 import { cli } from "../../../../cli/cli.js";
-import aadCommands from '../../aadCommands.js';
-
 
 interface CommandArgs {
   options: Options;
@@ -25,10 +23,6 @@ class EntraAdministrativeUnitRemoveCommand extends GraphCommand {
   }
   public get description(): string {
     return 'Removes an administrative unit';
-  }
-
-  public alias(): string[] | undefined {
-    return [aadCommands.ADMINISTRATIVEUNIT_REMOVE];
   }
 
   constructor() {
@@ -90,8 +84,6 @@ class EntraAdministrativeUnitRemoveCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    await this.showDeprecationWarning(logger, aadCommands.ADMINISTRATIVEUNIT_REMOVE, commands.ADMINISTRATIVEUNIT_REMOVE);
-
     const removeAdministrativeUnit = async (): Promise<void> => {
       try {
         let administrativeUnitId = args.options.id;

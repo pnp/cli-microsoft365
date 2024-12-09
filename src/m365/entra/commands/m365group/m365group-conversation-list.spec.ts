@@ -12,7 +12,6 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './m365group-conversation-list.js';
 import { entraGroup } from '../../../../utils/entraGroup.js';
-import aadCommands from '../../aadCommands.js';
 import { cli } from '../../../../cli/cli.js';
 
 describe(commands.M365GROUP_CONVERSATION_LIST, () => {
@@ -51,6 +50,7 @@ describe(commands.M365GROUP_CONVERSATION_LIST, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     sinon.stub(entraGroup, 'isUnifiedGroup').resolves(true);
+    sinon.stub(entraGroup, 'getGroupIdByDisplayName').resolves('00000000-0000-0000-0000-000000000000');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
   });
@@ -91,16 +91,6 @@ describe(commands.M365GROUP_CONVERSATION_LIST, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('defines alias', () => {
-    const alias = command.alias();
-    assert.notStrictEqual(typeof alias, 'undefined');
-  });
-
-  it('defines correct alias', () => {
-    const alias = command.alias();
-    assert.deepStrictEqual(alias, [aadCommands.M365GROUP_CONVERSATION_LIST]);
-  });
-
   it('defines correct properties for the default output', () => {
     assert.deepStrictEqual(command.defaultProperties(), ['topic', 'lastDeliveredDateTime', 'id']);
   });
@@ -113,7 +103,7 @@ describe(commands.M365GROUP_CONVERSATION_LIST, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('Retrieve conversations for the specified group by groupId in the tenant (verbose)', async () => {
+  it('Retrieve conversations for the group specified by groupId in the tenant (verbose)', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/conversations`) {
         return jsonOutput;
@@ -130,6 +120,25 @@ describe(commands.M365GROUP_CONVERSATION_LIST, () => {
       jsonOutput.value
     ));
   });
+
+  it('Retrieve conversations for the group specified by groupName in the tenant (verbose)', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/conversations`) {
+        return jsonOutput;
+      }
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options: {
+        verbose: true, groupName: "Finance"
+      }
+    });
+    assert(loggerLogSpy.calledWith(
+      jsonOutput.value
+    ));
+  });
+
   it('correctly handles error when listing conversations', async () => {
     sinon.stub(request, 'get').rejects(new Error('An error has occurred'));
 

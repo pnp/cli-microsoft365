@@ -217,23 +217,6 @@ describe(commands.USER_ENSURE, () => {
     assert(loggerLogSpy.calledWith(ensuredUserResponse));
   });
 
-  it('ensures user for a specific web by aadId', async () => {
-    sinon.stub(entraUser, 'getUpnByUserId').callsFake(async () => {
-      return validUserName;
-    });
-
-    sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `${validWebUrl}/_api/web/ensureuser`) {
-        return ensuredUserResponse;
-      }
-
-      throw 'Invalid request';
-    });
-
-    await command.action(logger, { options: { verbose: true, webUrl: validWebUrl, aadId: validEntraId } });
-    assert(loggerLogSpy.calledWith(ensuredUserResponse));
-  });
-
   it('ensures user for a specific web by loginName', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `${validWebUrl}/_api/web/ensureuser`) {
@@ -364,11 +347,6 @@ describe(commands.USER_ENSURE, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if aadId is not a valid id', async () => {
-    const actual = await command.validate({ options: { webUrl: validWebUrl, aadId: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
   it('fails validation if userName is not a valid user principal name', async () => {
     const actual = await command.validate({ options: { webUrl: validWebUrl, userName: 'invalid' } }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -381,11 +359,6 @@ describe(commands.USER_ENSURE, () => {
 
   it('passes validation if the url is valid and entraId is a valid id', async () => {
     const actual = await command.validate({ options: { webUrl: validWebUrl, entraId: validEntraId } }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
-
-  it('passes validation if the url is valid and aadId is a valid id', async () => {
-    const actual = await command.validate({ options: { webUrl: validWebUrl, aadId: validEntraId } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 

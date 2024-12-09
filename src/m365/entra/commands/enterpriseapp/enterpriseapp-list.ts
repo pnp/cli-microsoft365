@@ -2,7 +2,6 @@ import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import { odata } from '../../../../utils/odata.js';
 import GraphCommand from '../../../base/GraphCommand.js';
-import aadCommands from '../../aadCommands.js';
 import commands from '../../commands.js';
 
 interface CommandArgs {
@@ -28,7 +27,7 @@ class EntraEnterpriseAppListCommand extends GraphCommand {
   }
 
   public alias(): string[] | undefined {
-    return [aadCommands.SP_LIST, commands.SP_LIST];
+    return [commands.SP_LIST];
   }
 
   constructor() {
@@ -59,8 +58,6 @@ class EntraEnterpriseAppListCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    await this.showDeprecationWarning(logger, aadCommands.SP_LIST, commands.SP_LIST);
-
     if (this.verbose) {
       await logger.logToStderr(`Retrieving enterprise application information...`);
     }

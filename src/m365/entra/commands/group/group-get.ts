@@ -5,7 +5,6 @@ import { entraGroup } from '../../../../utils/entraGroup.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
-import aadCommands from '../../aadCommands.js';
 
 interface CommandArgs {
   options: Options;
@@ -14,6 +13,7 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   id?: string;
   displayName?: string;
+  properties?: string;
 }
 
 class EntraGroupGetCommand extends GraphCommand {
@@ -23,10 +23,6 @@ class EntraGroupGetCommand extends GraphCommand {
 
   public get description(): string {
     return 'Gets information about the specified Entra group';
-  }
-
-  public alias(): string[] | undefined {
-    return [aadCommands.GROUP_GET];
   }
 
   constructor() {
@@ -45,6 +41,9 @@ class EntraGroupGetCommand extends GraphCommand {
       },
       {
         option: '-n, --displayName [displayName]'
+      },
+      {
+        option: '-p, --properties [properties]'
       }
     );
   }
@@ -71,22 +70,21 @@ class EntraGroupGetCommand extends GraphCommand {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
         id: typeof args.options.id !== 'undefined',
-        displayName: typeof args.options.displayName !== 'undefined'
+        displayName: typeof args.options.displayName !== 'undefined',
+        properties: typeof args.options.properties !== 'undefined'
       });
     });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    await this.showDeprecationWarning(logger, aadCommands.GROUP_GET, commands.GROUP_GET);
-
     let group: Group;
 
     try {
       if (args.options.id) {
-        group = await entraGroup.getGroupById(args.options.id);
+        group = await entraGroup.getGroupById(args.options.id, args.options.properties);
       }
       else {
-        group = await entraGroup.getGroupByDisplayName(args.options.displayName!);
+        group = await entraGroup.getGroupByDisplayName(args.options.displayName!, args.options.properties);
       }
 
       await logger.log(group);

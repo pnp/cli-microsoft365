@@ -1,6 +1,5 @@
 import fs from 'fs';
 import path from 'path';
-import url from 'url';
 import { Logger } from '../../../cli/Logger.js';
 import GlobalOptions from '../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../request.js';
@@ -73,7 +72,7 @@ class FileAddCommand extends GraphCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     let folderUrlWithoutTrailingSlash = args.options.folderUrl;
     if (folderUrlWithoutTrailingSlash.endsWith('/')) {
-      folderUrlWithoutTrailingSlash = folderUrlWithoutTrailingSlash.substr(0, folderUrlWithoutTrailingSlash.length - 1);
+      folderUrlWithoutTrailingSlash = folderUrlWithoutTrailingSlash.substring(0, folderUrlWithoutTrailingSlash.length - 1);
     }
 
     try {
@@ -148,15 +147,15 @@ class FileAddCommand extends GraphCommand {
       await logger.logToStderr(`Resolving Graph drive item URL for ${fileWebUrl}`);
     }
 
-    const _fileWebUrl = url.parse(fileWebUrl);
-    const _siteUrl = url.parse(siteUrl || fileWebUrl);
+    const _fileWebUrl = new URL(fileWebUrl);
+    const _siteUrl = new URL(siteUrl || fileWebUrl);
     const isSiteUrl = typeof siteUrl !== 'undefined';
     let siteId: string = '';
     let driveRelativeFileUrl: string = '';
-    const siteInfo = await this.getGraphSiteInfoFromFullUrl(_siteUrl.host as string, _siteUrl.path as string, isSiteUrl);
+    const siteInfo = await this.getGraphSiteInfoFromFullUrl(_siteUrl.host, _siteUrl.pathname, isSiteUrl);
 
     siteId = siteInfo.id;
-    let siteRelativeFileUrl: string = (_fileWebUrl.path as string).replace(siteInfo.serverRelativeUrl, '');
+    let siteRelativeFileUrl: string = _fileWebUrl.pathname.replace(siteInfo.serverRelativeUrl, '');
     // normalize site-relative URLs for root site collections and root sites
 
     if (!siteRelativeFileUrl.startsWith('/')) {

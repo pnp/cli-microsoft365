@@ -12,8 +12,8 @@ import commands from './commands.js';
 
 const options = globalOptionsZod
   .extend({
-    authType: zod.alias('t', z.nativeEnum(AuthType).optional()),
-    cloud: z.nativeEnum(CloudType).optional().default(CloudType.Public),
+    authType: zod.alias('t', zod.coercedEnum(AuthType).optional()),
+    cloud: zod.coercedEnum(CloudType).optional().default(CloudType.Public),
     userName: zod.alias('u', z.string().optional()),
     password: zod.alias('p', z.string().optional()),
     certificateFile: zod.alias('c', z.string().optional()
@@ -50,8 +50,9 @@ class LoginCommand extends Command {
 
   public getRefinedSchema(schema: typeof options): z.ZodEffects<any> | undefined {
     return schema
-      .refine(options => typeof options.appId !== 'undefined' || cli.getConfig().get(settingsNames.clientId), {
-        message: `appId is required. TIP: use the "m365 setup" command to configure the default appId`
+      .refine(options => typeof options.appId !== 'undefined' || cli.getClientId(), {
+        message: `appId is required. TIP: use the "m365 setup" command to configure the default appId`,
+        path: ['appId']
       })
       .refine(options => options.authType !== 'password' || options.userName, {
         message: 'Username is required when using password authentication',

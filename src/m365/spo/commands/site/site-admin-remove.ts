@@ -143,26 +143,16 @@ class SpoSiteAdminRemoveCommand extends SpoCommand {
     }
 
     const adminUrl: string = await spo.getSpoAdminUrl(logger, this.debug);
-    const siteId = await this.getSiteId(args.options.siteUrl, logger);
-    const primaryAdminLoginName = await spo.getPrimaryAdminLoginNameAsAdmin(adminUrl, siteId, logger, this.verbose);
+    const tenantSiteProperties = await spo.getSiteAdminPropertiesByUrl(args.options.siteUrl, false, logger, this.verbose);
+    const primaryAdminLoginName = await spo.getPrimaryAdminLoginNameAsAdmin(adminUrl, tenantSiteProperties.SiteId, logger, this.verbose);
 
     if (loginNameToRemove === primaryAdminLoginName) {
       throw 'You cannot remove the primary site collection administrator.';
     }
 
-    const existingAdmins = await this.getSiteAdmins(adminUrl, siteId);
+    const existingAdmins = await this.getSiteAdmins(adminUrl, tenantSiteProperties.SiteId);
     const adminsToSet = existingAdmins.filter(u => u.loginName.toLowerCase() !== loginNameToRemove.toLowerCase());
-    await this.setSiteAdminsAsAdmin(adminUrl, siteId, adminsToSet);
-  }
-
-  private async getSiteId(siteUrl: string, logger: Logger): Promise<string> {
-    const siteGraphId = await spo.getSiteId(siteUrl, logger, this.verbose);
-    const match = siteGraphId.match(/,([a-f0-9\-]{36}),/i);
-    if (!match) {
-      throw `Site with URL ${siteUrl} not found`;
-    }
-
-    return match[1];
+    await this.setSiteAdminsAsAdmin(adminUrl, tenantSiteProperties.SiteId, adminsToSet);
   }
 
   private async getSiteAdmins(adminUrl: string, siteId: string): Promise<AdminUserResult[]> {

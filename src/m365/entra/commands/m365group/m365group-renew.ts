@@ -4,7 +4,6 @@ import request, { CliRequestOptions } from '../../../../request.js';
 import { entraGroup } from '../../../../utils/entraGroup.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
-import aadCommands from '../../aadCommands.js';
 import commands from '../../commands.js';
 
 interface CommandArgs {
@@ -12,7 +11,8 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  id: string;
+  id?: string;
+  displayName?: string;
 }
 
 class EntraM365GroupRenewCommand extends GraphCommand {
@@ -24,21 +24,22 @@ class EntraM365GroupRenewCommand extends GraphCommand {
     return `Renews Microsoft 365 group's expiration`;
   }
 
-  public alias(): string[] | undefined {
-    return [aadCommands.M365GROUP_RENEW];
-  }
-
   constructor() {
     super();
 
     this.#initOptions();
     this.#initValidators();
+    this.#initOptionSets();
+    this.#initTypes();
   }
 
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '-i, --id <id>'
+        option: '-i, --id [id]'
+      },
+      {
+        option: '-n, --displayName [displayName]'
       }
     );
   }
@@ -46,7 +47,7 @@ class EntraM365GroupRenewCommand extends GraphCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (!validation.isValidGuid(args.options.id)) {
+        if (args.options.id && !validation.isValidGuid(args.options.id)) {
           return `${args.options.id} is not a valid GUID`;
         }
 
@@ -55,22 +56,33 @@ class EntraM365GroupRenewCommand extends GraphCommand {
     );
   }
 
-  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    await this.showDeprecationWarning(logger, aadCommands.M365GROUP_RENEW, commands.M365GROUP_RENEW);
+  #initOptionSets(): void {
+    this.optionSets.push({ options: ['id', 'displayName'] });
+  }
 
+  #initTypes(): void {
+    this.types.string.push('id', 'displayName');
+  }
+
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      await logger.logToStderr(`Renewing Microsoft 365 group's expiration: ${args.options.id}...`);
+      await logger.logToStderr(`Renewing Microsoft 365 group's expiration: ${args.options.id || args.options.displayName}...`);
     }
 
     try {
-      const isUnifiedGroup = await entraGroup.isUnifiedGroup(args.options.id);
+      let groupId = args.options.id;
+
+      if (args.options.displayName) {
+        groupId = await entraGroup.getGroupIdByDisplayName(args.options.displayName);
+      }
+      const isUnifiedGroup = await entraGroup.isUnifiedGroup(groupId!);
 
       if (!isUnifiedGroup) {
-        throw Error(`Specified group with id '${args.options.id}' is not a Microsoft 365 group.`);
+        throw Error(`Specified group with id '${groupId}' is not a Microsoft 365 group.`);
       }
 
       const requestOptions: CliRequestOptions = {
-        url: `${this.resource}/v1.0/groups/${args.options.id}/renew/`,
+        url: `${this.resource}/v1.0/groups/${groupId}/renew/`,
         headers: {
           'accept': 'application/json;odata.metadata=none'
         }
