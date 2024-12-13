@@ -22,6 +22,7 @@ const dictionary = [
   'catalog',
   'checklist',
   'client',
+  'column',
   'comm',
   'command',
   'community',
@@ -118,6 +119,7 @@ const dictionary = [
   'unit',
   'url',
   'user',
+  'value',
   'web',
   'webhook'
 ];
