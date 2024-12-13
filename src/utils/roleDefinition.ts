@@ -6,15 +6,15 @@ import request, { CliRequestOptions } from '../request.js';
 
 export const roleDefinition = {
   /**
-   * Get an Entra ID (directory) role by it's name
+   * Get an Entra ID (directory) role by its name
    * @param displayName Role definition display name.
    * @param properties Comma-separated list of properties to include in the response.
    * @returns The role definition.
    * @throws Error when role definition was not found.
    */
-  async getRoleDefinitionByDisplayName(displayName: string, properties: string = ''): Promise<UnifiedRoleDefinition> {
+  async getRoleDefinitionByDisplayName(displayName: string, properties?: string): Promise<UnifiedRoleDefinition> {
     let url = `https://graph.microsoft.com/v1.0/roleManagement/directory/roleDefinitions?$filter=displayName eq '${formatting.encodeQueryParameter(displayName)}'`;
-    if (properties !== '') {
+    if (properties) {
       url += `&$select=${properties}`;
     }
     const roleDefinitions = await odata.getAllItems<UnifiedRoleDefinition>(url);
@@ -33,15 +33,15 @@ export const roleDefinition = {
   },
 
   /**
-   * Get an Entra ID (directory) role by it's id
+   * Get an Entra ID (directory) role by its id
    * @param id Role definition id.
    * @param properties Comma-separated list of properties to include in the response.
    * @returns The role definition.
    * @throws Error when role definition was not found.
    */
-  async getRoleDefinitionById(id: string, properties: string = ''): Promise<UnifiedRoleDefinition> {
+  async getRoleDefinitionById(id: string, properties?: string): Promise<UnifiedRoleDefinition> {
     let url = `https://graph.microsoft.com/v1.0/roleManagement/directory/roleDefinitions/${id}`;
-    if (properties !== '') {
+    if (properties) {
       url += `?$select=${properties}`;
     }
 
