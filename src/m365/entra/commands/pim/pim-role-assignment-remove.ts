@@ -158,7 +158,7 @@ class EntraPimRoleAssignmentRemoveCommand extends GraphCommand {
       const token = auth.connection.accessTokens[auth.defaultResource].accessToken;
       const isAppOnlyAccessToken = accessToken.isAppOnlyAccessToken(token);
 
-      if (isAppOnlyAccessToken) {
+      if (isAppOnlyAccessToken && !(userId || userName || groupId || groupName)) {
         throw 'When running with application permissions either userId, userName, groupId or groupName is required';
       }
 
