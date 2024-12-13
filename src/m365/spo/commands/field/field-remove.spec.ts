@@ -94,6 +94,18 @@ describe(commands.FIELD_REMOVE, () => {
     assert(promptIssued);
   });
 
+  it('prompts before removing field when confirmation argument not passed (internalName)', async () => {
+    await command.action(logger, { options: { internalName: 'myfield1', webUrl: 'https://contoso.sharepoint.com' } });
+
+    assert(promptIssued);
+  });
+
+  it('prompts before removing list column when confirmation argument not passed (internalName)', async () => {
+    await command.action(logger, { options: { internalName: 'myfield1', webUrl: 'https://contoso.sharepoint.com', listTitle: 'My List' } });
+
+    assert(promptIssued);
+  });
+
   it('aborts removing field when prompt not confirmed', async () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(false);
@@ -454,6 +466,51 @@ describe(commands.FIELD_REMOVE, () => {
     assert.strictEqual(getStub.lastCall.args[0].url, 'https://contoso.sharepoint.com/sites/portal/_api/web/lists(guid\'03e45e84-1992-4d42-9116-26f756012634\')/fields/getbyinternalnameortitle(\'Title\')');
   });
 
+  it('calls the correct get url when field internalName and list title specified (verbose)', async () => {
+    const getStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
+        return {
+          "Id": "03e45e84-1992-4d42-9116-26f756012634"
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { debug: true, verbose: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', internalName: 'Title', listTitle: 'Documents', force: true } });
+    assert.strictEqual(getStub.lastCall.args[0].url, 'https://contoso.sharepoint.com/sites/portal/_api/web/lists/getByTitle(\'Documents\')/fields/getbyinternalnameortitle(\'Title\')');
+  });
+
+  it('calls the correct get url when field internalName and list title specified', async () => {
+    const getStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
+        return {
+          "Id": "03e45e84-1992-4d42-9116-26f756012634"
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/portal', internalName: 'Title', listTitle: 'Documents', force: true } });
+    assert.strictEqual(getStub.lastCall.args[0].url, 'https://contoso.sharepoint.com/sites/portal/_api/web/lists/getByTitle(\'Documents\')/fields/getbyinternalnameortitle(\'Title\')');
+  });
+
+  it('calls the correct get url when field internalName and list url specified', async () => {
+    const getStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
+        return {
+          "Id": "03e45e84-1992-4d42-9116-26f756012634"
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', internalName: 'Title', listId: '03e45e84-1992-4d42-9116-26f756012634', force: true } });
+    assert.strictEqual(getStub.lastCall.args[0].url, 'https://contoso.sharepoint.com/sites/portal/_api/web/lists(guid\'03e45e84-1992-4d42-9116-26f756012634\')/fields/getbyinternalnameortitle(\'Title\')');
+  });
+
   it('correctly handles site column not found', async () => {
     const error = {
       error: {
@@ -534,7 +591,7 @@ describe(commands.FIELD_REMOVE, () => {
     assert(containsTypeOption);
   });
 
-  it('fails validation if both id and title options are not passed', async () => {
+  it('fails validation if either of id, title and internalName options are not passed', async () => {
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
       if (settingName === settingsNames.prompt) {
         return false;
