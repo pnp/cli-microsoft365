@@ -1,0 +1,82 @@
+import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# tenant people pronouns set
+
+Manage pronouns settings for an organization
+
+## Usage
+
+```sh
+m365 tenant people pronouns set [options]
+```
+
+## Options
+
+```md definition-list
+`-e, --enabled <enabled>`
+: Specifies whether the pronouns are enabled in the organization or not.
+```
+
+<Global />
+
+## Examples
+
+Enable pronouns in the organization
+
+```sh
+m365 tenant people pronouns set --enabled true
+```
+
+Disable pronouns in the organization
+
+```sh
+m365 tenant people pronouns set --enabled false
+```
+
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  {
+    "isEnabledInOrganization": true
+  }
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  isEnabledInOrganization: true
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  isEnabledInOrganization
+  1
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # tenant people pronouns get
+
+  Date: 12/14/2024
+
+  Property | Value
+  ---------|-------
+  isEnabledInOrganization | true
+  ```
+
+  </TabItem>
+</Tabs>
+
+## More information
+
+- https://learn.microsoft.com/graph/api/pronounssettings-update
