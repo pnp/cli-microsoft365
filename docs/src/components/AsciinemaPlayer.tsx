@@ -24,7 +24,7 @@ const AsciinemaPlayerComponent: React.FC<AsciinemaPlayerProps> = ({
   ...asciinemaOptions
 }) => {
   const ref = useRef<HTMLDivElement>(null);
-  const proxiedSrc = `https://corsproxy.io/?${encodeURIComponent(src)}`;
+  const proxiedSrc = `https://corsproxy.io/?url=${encodeURIComponent(src)}`;
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
