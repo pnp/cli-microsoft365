@@ -194,9 +194,12 @@ async function execute(rawArgs: string[]): Promise<void> {
           await cli.error('🌶️  Provide values for the following parameters:');
 
           for (const error of result.error.errors) {
-            const optionInfo = cli.commandToExecute!.options.find(o => o.name === error.path.join('.'));
+            const optionName = error.path.join('.');
+            const optionInfo = cli.commandToExecute.options.find(o => o.name === optionName);
             const answer = await cli.promptForValue(optionInfo!);
-            cli.optionsFromArgs!.options[error.path.join('.')] = answer;
+            // coerce the answer to the correct type
+            const parsed = getCommandOptionsFromArgs([`--${optionName}`, answer], cli.commandToExecute);
+            cli.optionsFromArgs.options[optionName] = parsed[optionName];
           }
         }
         else {
