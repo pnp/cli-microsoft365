@@ -631,6 +631,11 @@ const sidebars: SidebarsConfig = {
           roledefinition: [
             {
               type: 'doc',
+              label: 'roledefinition add',
+              id: 'cmd/entra/roledefinition/roledefinition-add'
+            },
+            {
+              type: 'doc',
               label: 'roledefinition get',
               id: 'cmd/entra/roledefinition/roledefinition-get'
             },
