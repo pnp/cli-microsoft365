@@ -17,13 +17,19 @@ m365 spo web roleassignment remove [options]
 : URL of the site.
 
 `--principalId [principalId]`
-: SharePoint ID of principal it may be either user id or group id we want to add permissions to. Specify either `principalId`, `upn`, or `groupName` but not multiple.
+: SharePoint ID of principal it may be either user id or group id we want to add permissions to. Specify either `principalId`, `upn`, `groupName`, `entraGroupId` or `entraGroupName` but not multiple.
 
 `--upn [upn]`
-: The upn/email of user to assign role to. Specify either `principalId`, `upn`, or `groupName` but not multiple.
+: The upn/email of user to assign role to. Specify either `principalId`, `upn`, `groupName`, `entraGroupId` or `entraGroupName` but not multiple.
 
 `--groupName [groupName]`
-: The group name of the SharePoint group Specify either `principalId`, `upn`, or `groupName` but not multiple.
+: The group name of the SharePoint group. Use this option exclusively for SharePoint Online groups. Specify either `principalId`, `upn`, `groupName`, `entraGroupId` or `entraGroupName` but not multiple.
+
+`--entraGroupId [entraGroupId]`
+: ID of the Microsoft Entra group to remove. Specify either `principalId`, `upn`, `groupName`, `entraGroupId` or `entraGroupName` but not multiple.
+
+`--entraGroupName [entraGroupName]`
+: Display name of the Microsoft Entra group to remove. Specify either `principalId`, `upn`, `groupName`, `entraGroupId` or `entraGroupName` but not multiple.
 
 `-f, --force`
 : Don't prompt for confirming removing the roleassignment.
@@ -55,6 +61,12 @@ Remove roleassignment from web based on principal Id without prompting for confi
 
 ```sh
 m365 spo web roleassignment remove --webUrl "https://contoso.sharepoint.com/sites/contoso-sales"  --principalId 2 --force
+```
+
+Remove roleassignment from web based on Entra Group Id
+
+```sh
+m365 spo web roleassignment remove --webUrl "https://contoso.sharepoint.com/sites/contoso-sales"  --entraGroupId '27ae47f1-48f1-46f3-980b-d3c1470e398d' --force
 ```
 
 ## Response
