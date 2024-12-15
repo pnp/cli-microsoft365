@@ -3739,7 +3739,7 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
-              label: 'homesite list',
+              label: 'tenant homesite list',
               id: 'cmd/spo/tenant/tenant-homesite-list'
             },
             {
