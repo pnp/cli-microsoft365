@@ -4003,6 +4003,15 @@ const sidebars: SidebarsConfig = {
     {
       'SharePoint Premium (spp)': [
         {
+          autofillcolumn: [
+            {
+              type: 'doc',
+              label: 'autofillcolumn apply',
+              id: 'cmd/spp/autofillcolumn/autofillcolumn-apply'
+            }
+          ]
+        },
+        {
           contentcenter: [
             {
               type: 'doc',
