@@ -57,7 +57,7 @@
   <a href="#microsoft-365--power-platform-community">Microsoft 365 & Power Platform Community</a>
 </p>
 <p align="center">
-  <img alt="CLI for Microsoft 365" src="./docs/docs/images/cli-microsoft365.gif" height="500" />
+  <img alt="CLI for Microsoft 365" src="./docs/docs/images/cli-microsoft365.gif" style="max-height: 500px;max-width: 100%;height: auto;width: auto;object-fit: contain;" />
 </p>
 
 ## Features
@@ -216,9 +216,9 @@ When you execute any `m365` command from the terminal, it will now use your loca
 
 We love to accept contributions.
 
-If you want to get involved with helping us grow the CLI, whether that is suggesting or adding a new command, extending an existing command or updating our documentation, we would love to hear from you.
+If you want to get involved with helping us grow the CLI, whether that is suggesting or adding a new command, extending an existing command, or updating our documentation, we would love to hear from you.
 
-Checkout our [Wiki](https://github.com/pnp/cli-microsoft365/wiki) for guides on how to contribute to this project.
+Check out our [Contributing Guide](https://pnp.github.io/cli-microsoft365/contribute/contributing-guide) for detailed information on how to contribute to this project.
 
 ## Need Help?
 
