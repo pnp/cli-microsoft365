@@ -1428,6 +1428,15 @@ const sidebars: SidebarsConfig = {
               id: 'cmd/planner/tenant/tenant-settings-set'
             }
           ]
+        },
+        {
+          website: [
+            {
+              type: 'doc',
+              label: 'website weblink list',
+              id: 'cmd/pp/website/website-weblink-list'
+            }
+          ]
         }
       ]
     },
