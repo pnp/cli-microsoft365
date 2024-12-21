@@ -222,7 +222,7 @@ describe(commands.USER_ENSURE, () => {
   });
 
   it('ensures user in a specific web by loginName', async () => {
-    sinon.stub(request, 'post').callsFake(async (opts) => {
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `${validWebUrl}/_api/web/ensureuser`) {
         return ensuredUserResponse;
       }
@@ -231,13 +231,11 @@ describe(commands.USER_ENSURE, () => {
     });
 
     await command.action(logger, { options: { verbose: true, webUrl: validWebUrl, loginName: validLoginName } });
-    assert(loggerLogSpy.calledWith(ensuredUserResponse));
+    assert.deepStrictEqual(postStub.firstCall.args[0].data, { logonName: 'c:0t.c|tenant|2056d2f6-3257-4253-8cfc-b73393e414e5' });
   });
 
   it('ensures user in a specific web by entraGroupId', async () => {
-    sinon.stub(entraGroup, 'getGroupById').callsFake(async () => {
-      return groupM365Response.value[0];
-    });
+    sinon.stub(entraGroup, 'getGroupById').resolves(groupM365Response.value[0]);
 
     const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `${validWebUrl}/_api/web/ensureuser`) {
@@ -252,9 +250,7 @@ describe(commands.USER_ENSURE, () => {
   });
 
   it('ensures security group in a specific web by entraGroupName', async () => {
-    sinon.stub(entraGroup, 'getGroupByDisplayName').callsFake(async () => {
-      return groupSecurityResponse.value[0];
-    });
+    sinon.stub(entraGroup, 'getGroupByDisplayName').resolves(groupSecurityResponse.value[0]);
 
     const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `${validWebUrl}/_api/web/ensureuser`) {
@@ -269,9 +265,7 @@ describe(commands.USER_ENSURE, () => {
   });
 
   it('ensures group in a specific web by entraGroupName', async () => {
-    sinon.stub(entraGroup, 'getGroupByDisplayName').callsFake(async () => {
-      return groupM365Response.value[0];
-    });
+    sinon.stub(entraGroup, 'getGroupByDisplayName').resolves(groupM365Response.value[0]);
 
     const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `${validWebUrl}/_api/web/ensureuser`) {
