@@ -904,6 +904,42 @@ describe(commands.PAGE_SECTION_ADD, () => {
     assert.strictEqual(data, JSON.stringify({ "CanvasContent1": "[{\"displayMode\":2,\"position\":{\"zoneIndex\":1,\"sectionIndex\":1,\"sectionFactor\":12,\"layoutIndex\":1},\"emphasis\":{},\"zoneGroupMetadata\":{\"type\":1,\"isExpanded\":false,\"showDividerLine\":false,\"iconAlignment\":\"left\"}},{\"controlType\":0,\"pageSettingsSlice\":{\"isDefaultDescription\":true,\"isDefaultThumbnail\":true}}]" }));
   });
 
+  it('adds a OneColumn section at the end to an uncustomized page with collapsible setting and section title', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if ((opts.url as string).includes(`/_api/sitepages/pages/GetByUrl('sitepages/home.aspx')?$select=CanvasContent1,IsPageCheckedOutToCurrentUser`)) {
+        return {
+          "IsPageCheckedOutToCurrentUser": true,
+          "CanvasContent1": "[{\"controlType\":0,\"pageSettingsSlice\":{\"isDefaultDescription\":true,\"isDefaultThumbnail\":true}}]"
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    let data: string = '';
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if ((opts.url as string).includes(`/_api/sitepages/pages/GetByUrl('sitepages/home.aspx')/savepage`)) {
+        data = JSON.stringify(opts.data);
+        return {};
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options:
+      {
+        pageName: 'home.aspx',
+        webUrl: 'https://contoso.sharepoint.com/sites/newsletter',
+        sectionTemplate: 'OneColumn',
+        isCollapsibleSection: true,
+        iconAlignment: 'Right',
+        collapsibleTitle: 'Collapsible section title'
+      }
+    });
+    assert.strictEqual(data, JSON.stringify({ "CanvasContent1": "[{\"displayMode\":2,\"position\":{\"zoneIndex\":1,\"sectionIndex\":1,\"sectionFactor\":12,\"layoutIndex\":1},\"emphasis\":{},\"zoneGroupMetadata\":{\"type\":1,\"isExpanded\":false,\"showDividerLine\":false,\"iconAlignment\":\"right\",\"displayName\":\"Collapsible section title\"}},{\"controlType\":0,\"pageSettingsSlice\":{\"isDefaultDescription\":true,\"isDefaultThumbnail\":true}}]" }));
+  });
+
   it('correctly handles random API error', async () => {
     sinon.stub(request, 'get').callsFake(() => {
       throw 'An error has occurred';
