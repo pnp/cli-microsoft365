@@ -92,7 +92,8 @@ class EntraGroupListCommand extends GraphCommand {
             requestUrl += '?$filter=securityEnabled eq true and mailEnabled eq false';
             break;
           case 'distribution':
-            requestUrl += '?$filter=securityEnabled eq false and mailEnabled eq true';
+            useConsistencyLevelHeader = true;
+            requestUrl += `?$filter=securityEnabled eq false and mailEnabled eq true and not(groupTypes/any(t:t eq 'Unified'))&$count=true`;
             break;
           case 'mailEnabledSecurity':
             useConsistencyLevelHeader = true;
@@ -139,7 +140,7 @@ class EntraGroupListCommand extends GraphCommand {
 
       if (cli.shouldTrimOutput(args.options.output)) {
         groups.forEach((group: ExtendedGroup) => {
-          if (group.groupTypes && group.groupTypes.length > 0 && group.groupTypes[0] === 'Unified') {
+          if (group.groupTypes && group.groupTypes.length > 0 && group.groupTypes.includes('Unified')) {
             group.groupType = 'Microsoft 365';
           }
           else if (group.mailEnabled && group.securityEnabled) {
