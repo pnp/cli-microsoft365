@@ -231,7 +231,7 @@ describe(commands.USER_ENSURE, () => {
     });
 
     await command.action(logger, { options: { verbose: true, webUrl: validWebUrl, loginName: validLoginName } });
-    assert.deepStrictEqual(postStub.firstCall.args[0].data, { logonName: 'c:0t.c|tenant|2056d2f6-3257-4253-8cfc-b73393e414e5' });
+    assert.deepStrictEqual(postStub.firstCall.args[0].data, { logonName: 'i:0#.f|membership|john@contoso.com' });
   });
 
   it('ensures user in a specific web by entraGroupId', async () => {
