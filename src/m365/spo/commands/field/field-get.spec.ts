@@ -86,7 +86,7 @@ describe(commands.FIELD_GET, () => {
 
   it('gets information about a site column', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/fields/getbyid('5ee2dd25-d941-455a-9bdb-7f2c54aed11b')`) > -1) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/web/fields/getbyid('5ee2dd25-d941-455a-9bdb-7f2c54aed11b')`) {
         return {
           "AutoIndexed": false,
           "CanBeDeleted": true,
@@ -177,7 +177,7 @@ describe(commands.FIELD_GET, () => {
 
   it('gets information about a list column', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/lists/getByTitle('Documents')/fields/getbyid('03e45e84-1992-4d42-9116-26f756012634')`) > -1) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/web/lists/getByTitle('Documents')/fields/getbyid('03e45e84-1992-4d42-9116-26f756012634')`) {
         return {
           "AutoIndexed": false,
           "CanBeDeleted": false,
@@ -262,7 +262,7 @@ describe(commands.FIELD_GET, () => {
 
   it('should call the correct GET url when id and list url specified', async () => {
     const getStub = sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/web/GetList('%2Fsites%2Fportal%2FLists%2FEvents')/fields/getbyid('03e45e84-1992-4d42-9116-26f756012634')`) {
         return {
           "Id": "03e45e84-1992-4d42-9116-26f756012634"
         };
@@ -270,14 +270,13 @@ describe(commands.FIELD_GET, () => {
 
       throw 'Invalid request';
     });
-
-    await assert.rejects(command.action(logger, { options: { verbose: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', id: '03e45e84-1992-4d42-9116-26f756012634', listUrl: 'Lists/Events' } }));
+    await command.action(logger, { options: { debug: true, verbose: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', id: '03e45e84-1992-4d42-9116-26f756012634', listUrl: 'Lists/Events' } });
     assert.strictEqual(getStub.lastCall.args[0].url, 'https://contoso.sharepoint.com/sites/portal/_api/web/GetList(\'%2Fsites%2Fportal%2FLists%2FEvents\')/fields/getbyid(\'03e45e84-1992-4d42-9116-26f756012634\')');
   });
 
   it('should call the correct GET url when field title and list title specified (verbose)', async () => {
     const getStub = sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/web/lists/getByTitle('Documents')/fields/getbyinternalnameortitle('Title')`) {
         return {
           "Id": "03e45e84-1992-4d42-9116-26f756012634"
         };
@@ -292,7 +291,7 @@ describe(commands.FIELD_GET, () => {
 
   it('should call the correct GET url when field title and list title specified', async () => {
     const getStub = sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/web/lists/getByTitle('Documents')/fields/getbyinternalnameortitle('Title')`) {
         return {
           "Id": "03e45e84-1992-4d42-9116-26f756012634"
         };
@@ -306,8 +305,9 @@ describe(commands.FIELD_GET, () => {
   });
 
   it('should call the correct GET url when field title and list url specified', async () => {
+    const webUrl = 'https://contoso.sharepoint.com/sites/portal';
     const getStub = sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
+      if (opts.url === `${webUrl}/_api/web/lists(guid'03e45e84-1992-4d42-9116-26f756012634')/fields/getbyinternalnameortitle('Title')`) {
         return {
           "Id": "03e45e84-1992-4d42-9116-26f756012634"
         };
@@ -321,8 +321,9 @@ describe(commands.FIELD_GET, () => {
   });
 
   it('should call the correct GET url when field internalName and list title specified (verbose)', async () => {
+    const webUrl = 'https://contoso.sharepoint.com/sites/portal';
     const getStub = sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
+      if (opts.url === `${webUrl}/_api/web/lists/getByTitle('Documents')/fields/getbyinternalnameortitle('Title')`) {
         return {
           "Id": "03e45e84-1992-4d42-9116-26f756012634"
         };
@@ -337,7 +338,7 @@ describe(commands.FIELD_GET, () => {
 
   it('should call the correct GET url when field internalName and list title specified', async () => {
     const getStub = sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/web/lists/getByTitle('Documents')/fields/getbyinternalnameortitle('Title')`) {
         return {
           "Id": "03e45e84-1992-4d42-9116-26f756012634"
         };
@@ -351,10 +352,11 @@ describe(commands.FIELD_GET, () => {
   });
 
   it('should call the correct GET url when field internalName and list url specified', async () => {
+    const webUrl = 'https://contoso.sharepoint.com/sites/portal';
     const getStub = sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
+      if (opts.url === `${webUrl}/_api/web/lists(guid'03e45e84-1992-4d42-9116-26f756012634')/fields/getbyinternalnameortitle('Title')`) {
         return {
-          "Id": "03e45e84-1992-4d42-9116-26f756012634"
+          'Id': '03e45e84-1992-4d42-9116-26f756012634'
         };
       }
 
@@ -367,14 +369,14 @@ describe(commands.FIELD_GET, () => {
 
   it('correctly handles site column not found', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/fields/getbyid('03e45e84-1992-4d42-9116-26f756012634')`) > -1) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/web/fields/getbyid('03e45e84-1992-4d42-9116-26f756012634')`) {
         throw {
           error: {
             "odata.error": {
               "code": "-2147024809, System.ArgumentException",
               "message": {
                 "lang": "en-US",
-                "value": "Invalid field name. {03e45e84-1992-4d42-9116-26f756012634} https://m365x526922.sharepoint.com/sites/portal "
+                "value": "Invalid field name. {03e45e84-1992-4d42-9116-26f756012634} https://contoso.sharepoint.com/sites/portal "
               }
             }
           }
@@ -385,12 +387,12 @@ describe(commands.FIELD_GET, () => {
     });
 
     await assert.rejects(command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', id: '03e45e84-1992-4d42-9116-26f756012634' } } as any),
-      new CommandError('Invalid field name. {03e45e84-1992-4d42-9116-26f756012634} https://m365x526922.sharepoint.com/sites/portal '));
+      new CommandError('Invalid field name. {03e45e84-1992-4d42-9116-26f756012634} https://contoso.sharepoint.com/sites/portal '));
   });
 
   it('correctly handles list column not found', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/lists/getByTitle('Documents')/fields/getbyid('03e45e84-1992-4d42-9116-26f756012634')`) > -1) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/web/lists/getByTitle('Documents')/fields/getbyid('03e45e84-1992-4d42-9116-26f756012634')`) {
         throw {
           error: {
             "odata.error": {
@@ -413,7 +415,7 @@ describe(commands.FIELD_GET, () => {
 
   it('correctly handles list not found', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/lists/getByTitle('Documents')/fields/getbyid('03e45e84-1992-4d42-9116-26f756012634')`) > -1) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/web/lists/getByTitle('Documents')/fields/getbyid('03e45e84-1992-4d42-9116-26f756012634')`) {
         throw {
           error: {
             "odata.error": {

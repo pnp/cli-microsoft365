@@ -125,8 +125,7 @@ describe(commands.FIELD_REMOVE, () => {
   it('removes the field when prompt confirmed', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
       requests.push(opts);
-
-      if ((opts.url as string).indexOf(`/_api/web/fields(guid'`) > -1) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/web/fields(guid'b2307a39-e878-458b-bc90-03bc578531d6')`) {
         if (opts.headers &&
           opts.headers.accept &&
           (opts.headers.accept as string).indexOf('application/json') === 0) {
@@ -154,7 +153,7 @@ describe(commands.FIELD_REMOVE, () => {
   it('command correctly handles field get reject request', async () => {
     const err = 'Invalid request';
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf('/_api/web/fields/getbyinternalnameortitle(') > -1) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/web/fields/getbyinternalnameortitle('field1')`) {
         throw err;
       }
 
@@ -173,38 +172,18 @@ describe(commands.FIELD_REMOVE, () => {
     }), new CommandError(err));
   });
 
-  it('uses correct API url when id option is passed', async () => {
-    sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf('/_api/web/fields/getbyid(\'') > -1) {
-        return 'Correct Url';
-      }
-
-      throw 'Invalid request';
-    });
-
-    const actionId: string = '0CD891EF-AFCE-4E55-B836-FCE03286CCCF';
-
-    await command.action(logger, {
-      options: {
-        id: actionId,
-        webUrl: 'https://contoso.sharepoint.com',
-        force: true
-      }
-    });
-  });
-
   it('calls the correct remove url when id and list url specified', async () => {
     const getStub = sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/web/GetList('%2Fsites%2Fportal%2FLists%2FEvents')/fields/getbyid('03e45e84-1992-4d42-9116-26f756012634')`) {
         return {
-          "Id": "03e45e84-1992-4d42-9116-26f756012634"
+          'Id': '03e45e84-1992-4d42-9116-26f756012634'
         };
       }
 
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { verbose: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', id: '03e45e84-1992-4d42-9116-26f756012634', listUrl: 'Lists/Events', force: true } }));
+    await command.action(logger, { options: { debug: true, verbose: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', id: '03e45e84-1992-4d42-9116-26f756012634', listUrl: 'Lists/Events', force: true } });
     assert.strictEqual(getStub.lastCall.args[0].url, 'https://contoso.sharepoint.com/sites/portal/_api/web/GetList(\'%2Fsites%2Fportal%2FLists%2FEvents\')/fields/getbyid(\'03e45e84-1992-4d42-9116-26f756012634\')');
   });
 
@@ -215,17 +194,17 @@ describe(commands.FIELD_REMOVE, () => {
     const getStub = sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/web/GetList(\'%2Fsites%2Fportal%2FLists%2FEvents\')/fields`) {
         return {
-          "value": [{
-            "Id": "03e45e84-1992-4d42-9116-26f756012634",
-            "Group": "MyGroup"
+          'value': [{
+            'Id': '03e45e84-1992-4d42-9116-26f756012634',
+            'Group': 'MyGroup'
           },
           {
-            "Id": "03e45e84-1992-4d42-9116-26f756012635",
-            "Group": "MyGroup"
+            'Id': '03e45e84-1992-4d42-9116-26f756012635',
+            'Group': 'MyGroup'
           },
           {
-            "Id": "03e45e84-1992-4d42-9116-26f756012636",
-            "Group": "DifferentGroup"
+            'Id': '03e45e84-1992-4d42-9116-26f756012636',
+            'Group': 'DifferentGroup'
           }]
         };
       }
@@ -233,15 +212,14 @@ describe(commands.FIELD_REMOVE, () => {
     });
 
     const deletion = sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/GetList(\'%2Fsites%2Fportal%2FLists%2FEvents\')/fields/getbyid(\'03e45e84-1992-4d42-9116-26f756012634\')`) > -1) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/web/GetList('%2Fsites%2Fportal%2FLists%2FEvents')/fields/getbyid('03e45e84-1992-4d42-9116-26f756012634')`) {
         return {
-          "Id": "03e45e84-1992-4d42-9116-26f756012634"
+          'Id': '03e45e84-1992-4d42-9116-26f756012634'
         };
       }
-
-      if ((opts.url as string).indexOf(`/_api/web/GetList(\'%2Fsites%2Fportal%2FLists%2FEvents\')/fields/getbyid(\'03e45e84-1992-4d42-9116-26f756012635\')`) > -1) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/web/GetList('%2Fsites%2Fportal%2FLists%2FEvents')/fields/getbyid('03e45e84-1992-4d42-9116-26f756012635')`) {
         return {
-          "Id": "03e45e84-1992-4d42-9116-26f756012635"
+          'Id': '03e45e84-1992-4d42-9116-26f756012635'
         };
       }
 
@@ -259,17 +237,17 @@ describe(commands.FIELD_REMOVE, () => {
     const getStub = sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/web/fields`) {
         return {
-          "value": [{
-            "Id": "03e45e84-1992-4d42-9116-26f756012634",
-            "Group": "MyGroup"
+          'value': [{
+            'Id': '03e45e84-1992-4d42-9116-26f756012634',
+            'Group': 'MyGroup'
           },
           {
-            "Id": "03e45e84-1992-4d42-9116-26f756012635",
-            "Group": "MyGroup"
+            'Id': '03e45e84-1992-4d42-9116-26f756012635',
+            'Group': 'MyGroup'
           },
           {
-            "Id": "03e45e84-1992-4d42-9116-26f756012636",
-            "Group": "DifferentGroup"
+            'Id': '03e45e84-1992-4d42-9116-26f756012636',
+            'Group': 'DifferentGroup'
           }]
         };
       }
@@ -277,15 +255,14 @@ describe(commands.FIELD_REMOVE, () => {
     });
 
     const deletion = sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/fields/getbyid(\'03e45e84-1992-4d42-9116-26f756012634\')`) > -1) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/web/fields/getbyid('03e45e84-1992-4d42-9116-26f756012634')`) {
         return {
-          "Id": "03e45e84-1992-4d42-9116-26f756012634"
+          'Id': '03e45e84-1992-4d42-9116-26f756012634'
         };
       }
-
-      if ((opts.url as string).indexOf(`/_api/web/fields/getbyid(\'03e45e84-1992-4d42-9116-26f756012635\')`) > -1) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/web/fields/getbyid('03e45e84-1992-4d42-9116-26f756012635')`) {
         return {
-          "Id": "03e45e84-1992-4d42-9116-26f756012635"
+          'Id': '03e45e84-1992-4d42-9116-26f756012635'
         };
       }
 
@@ -303,17 +280,17 @@ describe(commands.FIELD_REMOVE, () => {
     const getStub = sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/web/fields`) {
         return {
-          "value": [{
-            "Id": "03e45e84-1992-4d42-9116-26f756012634",
-            "Group": "MyGroup"
+          'value': [{
+            'Id': '03e45e84-1992-4d42-9116-26f756012634',
+            'Group': 'MyGroup'
           },
           {
-            "Id": "03e45e84-1992-4d42-9116-26f756012635",
-            "Group": "MyGroup"
+            'Id': '03e45e84-1992-4d42-9116-26f756012635',
+            'Group': 'MyGroup'
           },
           {
-            "Id": "03e45e84-1992-4d42-9116-26f756012636",
-            "Group": "DifferentGroup"
+            'Id': '03e45e84-1992-4d42-9116-26f756012636',
+            'Group': 'DifferentGroup'
           }]
         };
       }
@@ -323,7 +300,7 @@ describe(commands.FIELD_REMOVE, () => {
     const deletion = sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/fields`) > -1) {
         return {
-          "Id": "03e45e84-1992-4d42-9116-26f756012634"
+          'Id': '03e45e84-1992-4d42-9116-26f756012634'
         };
       }
 
@@ -350,13 +327,12 @@ describe(commands.FIELD_REMOVE, () => {
     const getStub = sinon.stub(request, 'get').rejects(error);
 
     const deletion = sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/fields/getbyid(\'03e45e84-1992-4d42-9116-26f756012635\')`) > -1) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/web/fields/getbyid('03e45e84-1992-4d42-9116-26f756012635')`) {
         return {
-          "Id": "03e45e84-1992-4d42-9116-26f756012635"
+          'Id': '03e45e84-1992-4d42-9116-26f756012635'
         };
       }
-
-      if ((opts.url as string).indexOf(`/_api/web/fields/getbyid(\'03e45e84-1992-4d42-9116-26f756012634\')`) > -1) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/web/fields/getbyid('03e45e84-1992-4d42-9116-26f756012634')`) {
         throw error;
       }
 
@@ -383,17 +359,17 @@ describe(commands.FIELD_REMOVE, () => {
     const getStub = sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/web/fields`) {
         return {
-          "value": [{
-            "Id": "03e45e84-1992-4d42-9116-26f756012634",
-            "Group": "MyGroup"
+          'value': [{
+            'Id': '03e45e84-1992-4d42-9116-26f756012634',
+            'Group': 'MyGroup'
           },
           {
-            "Id": "03e45e84-1992-4d42-9116-26f756012635",
-            "Group": "MyGroup"
+            'Id': '03e45e84-1992-4d42-9116-26f756012635',
+            'Group': 'MyGroup'
           },
           {
-            "Id": "03e45e84-1992-4d42-9116-26f756012636",
-            "Group": "DifferentGroup"
+            'Id': '03e45e84-1992-4d42-9116-26f756012636',
+            'Group': 'DifferentGroup'
           }]
         };
       }
@@ -401,13 +377,12 @@ describe(commands.FIELD_REMOVE, () => {
     });
 
     const deletion = sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/fields/getbyid(\'03e45e84-1992-4d42-9116-26f756012635\')`) > -1) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/web/fields/getbyid('03e45e84-1992-4d42-9116-26f756012635')`) {
         return {
-          "Id": "03e45e84-1992-4d42-9116-26f756012635"
+          'Id': '03e45e84-1992-4d42-9116-26f756012635'
         };
       }
-
-      if ((opts.url as string).indexOf(`/_api/web/fields/getbyid(\'03e45e84-1992-4d42-9116-26f756012634\')`) > -1) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/web/fields/getbyid('03e45e84-1992-4d42-9116-26f756012634')`) {
         throw error;
       }
 
@@ -423,9 +398,9 @@ describe(commands.FIELD_REMOVE, () => {
 
   it('calls the correct get url when field title and list title specified (verbose)', async () => {
     const getStub = sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/web/lists/getByTitle('Documents')/fields/getbyinternalnameortitle('Title')`) {
         return {
-          "Id": "03e45e84-1992-4d42-9116-26f756012634"
+          'Id': '03e45e84-1992-4d42-9116-26f756012634'
         };
       }
 
@@ -438,9 +413,9 @@ describe(commands.FIELD_REMOVE, () => {
 
   it('calls the correct get url when field title and list title specified', async () => {
     const getStub = sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/web/lists/getByTitle('Documents')/fields/getbyinternalnameortitle('Title')`) {
         return {
-          "Id": "03e45e84-1992-4d42-9116-26f756012634"
+          'Id': '03e45e84-1992-4d42-9116-26f756012634'
         };
       }
 
@@ -453,9 +428,9 @@ describe(commands.FIELD_REMOVE, () => {
 
   it('calls the correct get url when field title and list url specified', async () => {
     const getStub = sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/web/lists(guid'03e45e84-1992-4d42-9116-26f756012634')/fields/getbyinternalnameortitle('Title')`) {
         return {
-          "Id": "03e45e84-1992-4d42-9116-26f756012634"
+          'Id': '03e45e84-1992-4d42-9116-26f756012634'
         };
       }
 
@@ -468,9 +443,9 @@ describe(commands.FIELD_REMOVE, () => {
 
   it('calls the correct get url when field internalName and list title specified (verbose)', async () => {
     const getStub = sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/web/lists/getByTitle('Documents')/fields/getbyinternalnameortitle('Title')`) {
         return {
-          "Id": "03e45e84-1992-4d42-9116-26f756012634"
+          'Id': '03e45e84-1992-4d42-9116-26f756012634'
         };
       }
 
@@ -483,9 +458,9 @@ describe(commands.FIELD_REMOVE, () => {
 
   it('calls the correct get url when field internalName and list title specified', async () => {
     const getStub = sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/web/lists/getByTitle('Documents')/fields/getbyinternalnameortitle('Title')`) {
         return {
-          "Id": "03e45e84-1992-4d42-9116-26f756012634"
+          'Id': '03e45e84-1992-4d42-9116-26f756012634'
         };
       }
 
@@ -498,9 +473,9 @@ describe(commands.FIELD_REMOVE, () => {
 
   it('calls the correct get url when field internalName and list url specified', async () => {
     const getStub = sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/web/lists(guid'03e45e84-1992-4d42-9116-26f756012634')/fields/getbyinternalnameortitle('Title')`) {
         return {
-          "Id": "03e45e84-1992-4d42-9116-26f756012634"
+          'Id': '03e45e84-1992-4d42-9116-26f756012634'
         };
       }
 
@@ -523,7 +498,7 @@ describe(commands.FIELD_REMOVE, () => {
       }
     };
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf('/_api/web/fields/getbyinternalnameortitle(') > -1) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/web/fields/getbyinternalnameortitle('actionTitle')`) {
         throw error;
       }
       throw 'Invalid request';
@@ -536,14 +511,14 @@ describe(commands.FIELD_REMOVE, () => {
 
   it('correctly handles list column not found', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/lists/getByTitle('Documents')/fields/getbyid(`) > -1) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/web/lists/getByTitle('Documents')/fields/getbyid('03e45e84-1992-4d42-9116-26f756012634')`) {
         throw {
           error: {
-            "odata.error": {
-              "code": "-2147024809, System.ArgumentException",
-              "message": {
-                "lang": "en-US",
-                "value": "Invalid field name. {03e45e84-1992-4d42-9116-26f756012634}  /sites/portal/Shared Documents"
+            'odata.error': {
+              'code': '-2147024809, System.ArgumentException',
+              'message': {
+                'lang': 'en-US',
+                'value': 'Invalid field name. {03e45e84-1992-4d42-9116-26f756012634}  /sites/portal/Shared Documents'
               }
             }
           }
@@ -559,14 +534,14 @@ describe(commands.FIELD_REMOVE, () => {
 
   it('correctly handles list not found', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/lists/getByTitle('Documents')/fields/getbyid(`) > -1) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/web/lists/getByTitle('Documents')/fields/getbyid('03e45e84-1992-4d42-9116-26f756012634')`) {
         throw {
           error: {
-            "odata.error": {
-              "code": "-1, System.ArgumentException",
-              "message": {
-                "lang": "en-US",
-                "value": "List 'Documents' does not exist at site with URL 'https://contoso.sharepoint.com/sites/portal'."
+            'odata.error': {
+              'code': '-1, System.ArgumentException',
+              'message': {
+                'lang': 'en-US',
+                'value': 'List \'Documents\' does not exist at site with URL \'https://contoso.sharepoint.com/sites/portal\'.'
               }
             }
           }
@@ -577,7 +552,7 @@ describe(commands.FIELD_REMOVE, () => {
     });
 
     await assert.rejects(command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', id: '03e45e84-1992-4d42-9116-26f756012634', listTitle: 'Documents', force: true } } as any),
-      new CommandError("List 'Documents' does not exist at site with URL 'https://contoso.sharepoint.com/sites/portal'."));
+      new CommandError('List \'Documents\' does not exist at site with URL \'https://contoso.sharepoint.com/sites/portal\'.'));
   });
 
   it('supports specifying URL', () => {

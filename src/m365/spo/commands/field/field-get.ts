@@ -122,11 +122,8 @@ class SpoFieldGetCommand extends SpoCommand {
     if (args.options.id) {
       fieldRestUrl = `/getbyid('${formatting.encodeQueryParameter(args.options.id)}')`;
     }
-    else if (args.options.internalName) {
-      fieldRestUrl = `/getbyinternalnameortitle('${formatting.encodeQueryParameter(args.options.internalName as string)}')`;
-    }
     else {
-      fieldRestUrl = `/getbyinternalnameortitle('${formatting.encodeQueryParameter(args.options.title as string)}')`;
+      fieldRestUrl = `/getbyinternalnameortitle('${formatting.encodeQueryParameter((args.options.title || args.options.internalName) as string)}')`;
     }
 
     const requestOptions: CliRequestOptions = {

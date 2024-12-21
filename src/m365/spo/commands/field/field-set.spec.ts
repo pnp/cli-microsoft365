@@ -76,7 +76,7 @@ describe(commands.FIELD_SET, () => {
 
   it('updates site column specified by title', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
+      if (opts.url === 'https://contoso.sharepoint.com/_vti_bin/client.svc/ProcessQuery') {
         if (opts.headers &&
           opts.headers['X-RequestDigest'] !== 'ABC') {
           throw 'Invalid request';
@@ -114,7 +114,7 @@ describe(commands.FIELD_SET, () => {
 
   it('updates site column specified by internalName', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
+      if (opts.url === 'https://contoso.sharepoint.com/_vti_bin/client.svc/ProcessQuery') {
         if (opts.headers &&
           opts.headers['X-RequestDigest'] !== 'ABC') {
           throw 'Invalid request';
@@ -152,7 +152,7 @@ describe(commands.FIELD_SET, () => {
 
   it('updates site column specified by id, pushing the changes to existing lists', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
+      if (opts.url === 'https://contoso.sharepoint.com/_vti_bin/client.svc/ProcessQuery') {
         if (opts.headers &&
           opts.headers['X-RequestDigest'] !== 'ABC') {
           throw 'Invalid request';
@@ -189,7 +189,7 @@ describe(commands.FIELD_SET, () => {
 
   it('updates list column specified by id, list specified by id', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
+      if (opts.url === 'https://contoso.sharepoint.com/_vti_bin/client.svc/ProcessQuery') {
         if (opts.headers &&
           opts.headers['X-RequestDigest'] !== 'ABC') {
           throw 'Invalid request';
@@ -242,7 +242,7 @@ describe(commands.FIELD_SET, () => {
 
   it('updates list column specified by title, list specified by title', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
+      if (opts.url === 'https://contoso.sharepoint.com/_vti_bin/client.svc/ProcessQuery') {
         if (opts.headers &&
           opts.headers['X-RequestDigest'] !== 'ABC') {
           throw 'Invalid request';
@@ -294,7 +294,7 @@ describe(commands.FIELD_SET, () => {
 
   it('updates list column specified by internalName, list specified by title', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
+      if (opts.url === 'https://contoso.sharepoint.com/_vti_bin/client.svc/ProcessQuery') {
         if (opts.headers &&
           opts.headers['X-RequestDigest'] !== 'ABC') {
           throw 'Invalid request';
@@ -456,7 +456,7 @@ describe(commands.FIELD_SET, () => {
 
   it('correctly escapes XML in list title', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
+      if (opts.url === 'https://contoso.sharepoint.com/_vti_bin/client.svc/ProcessQuery') {
         if (opts.headers &&
           opts.headers['X-RequestDigest'] !== 'ABC') {
           throw 'Invalid request';
@@ -508,7 +508,7 @@ describe(commands.FIELD_SET, () => {
 
   it('ignores global options when creating request data', async () => {
     const postStub: Sinon.SinonStub = sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
+      if (opts.url === 'https://contoso.sharepoint.com/_vti_bin/client.svc/ProcessQuery') {
         if (opts.headers &&
           opts.headers['X-RequestDigest'] !== 'ABC') {
           throw 'Invalid request';
@@ -561,7 +561,7 @@ describe(commands.FIELD_SET, () => {
 
   it('correctly escapes XML in field title', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
+      if (opts.url === 'https://contoso.sharepoint.com/_vti_bin/client.svc/ProcessQuery') {
         if (opts.headers &&
           opts.headers['X-RequestDigest'] !== 'abc') {
           throw 'Invalid request';
@@ -599,7 +599,7 @@ describe(commands.FIELD_SET, () => {
 
   it('correctly escapes XML in field internalName', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
+      if (opts.url === 'https://contoso.sharepoint.com/_vti_bin/client.svc/ProcessQuery') {
         if (opts.headers &&
           opts.headers['X-RequestDigest'] !== 'abc') {
           throw 'Invalid request';
@@ -637,7 +637,7 @@ describe(commands.FIELD_SET, () => {
 
   it('correctly escapes XML in field properties', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
+      if (opts.url === 'https://contoso.sharepoint.com/_vti_bin/client.svc/ProcessQuery') {
         if (opts.headers &&
           opts.headers['X-RequestDigest'] !== 'abc') {
           throw 'Invalid request';
@@ -675,7 +675,7 @@ describe(commands.FIELD_SET, () => {
 
   it('correctly handles an error when the field specified by id doesn\'t exist', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
+      if (opts.url === 'https://contoso.sharepoint.com/_vti_bin/client.svc/ProcessQuery') {
         if (opts.headers &&
           opts.headers['X-RequestDigest'] !== 'ABC') {
           throw 'Invalid request';
@@ -706,7 +706,7 @@ describe(commands.FIELD_SET, () => {
 
   it('correctly handles an error when the field specified by title doesn\'t exist', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
+      if (opts.url === 'https://contoso.sharepoint.com/_vti_bin/client.svc/ProcessQuery') {
         if (opts.headers &&
           opts.headers['X-RequestDigest'] !== 'ABC') {
           throw 'Invalid request';
@@ -737,7 +737,7 @@ describe(commands.FIELD_SET, () => {
 
   it('correctly handles an error when the field specified by internalName doesn\'t exist', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
+      if (opts.url === 'https://contoso.sharepoint.com/_vti_bin/client.svc/ProcessQuery') {
         if (opts.headers &&
           opts.headers['X-RequestDigest'] !== 'ABC') {
           throw 'Invalid request';
@@ -768,7 +768,7 @@ describe(commands.FIELD_SET, () => {
 
   it('correctly handles an error when the list specified by id doesn\'t exist', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
+      if (opts.url === 'https://contoso.sharepoint.com/_vti_bin/client.svc/ProcessQuery') {
         if (opts.headers &&
           opts.headers['X-RequestDigest'] !== 'ABC') {
           throw 'Invalid request';
@@ -799,7 +799,7 @@ describe(commands.FIELD_SET, () => {
 
   it('correctly handles an error when the list specified by title doesn\'t exist', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
+      if (opts.url === 'https://contoso.sharepoint.com/_vti_bin/client.svc/ProcessQuery') {
         if (opts.headers &&
           opts.headers['X-RequestDigest'] !== 'ABC') {
           throw 'Invalid request';
@@ -830,7 +830,7 @@ describe(commands.FIELD_SET, () => {
 
   it('correctly handles an error when updating the field failed', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
+      if (opts.url === 'https://contoso.sharepoint.com/_vti_bin/client.svc/ProcessQuery') {
         if (opts.headers &&
           opts.headers['X-RequestDigest'] !== 'ABC') {
           throw 'Invalid request';
