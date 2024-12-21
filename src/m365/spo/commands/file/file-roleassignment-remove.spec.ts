@@ -329,7 +329,6 @@ describe(commands.FILE_ROLEASSIGNMENT_REMOVE, () => {
     sinon.stub(entraGroup, 'getGroupById').withArgs(graphGroup.id).resolves(graphGroup);
     sinon.stub(spo, 'ensureEntraGroup').withArgs(webUrl, graphGroup).resolves(entraGroupResponse);
 
-
     sinon.stub(request, 'post').callsFake(async (opts) => {
       const serverRelativeUrl: string = urlUtil.getServerRelativePath(webUrl, fileUrl);
       if (opts.url === `${webUrl}/_api/web/GetFileByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(serverRelativeUrl)}')/ListItemAllFields/roleassignments/removeroleassignment(principalid='${principalId}')`) {

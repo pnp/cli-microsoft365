@@ -163,7 +163,6 @@ class SpoFileRoleAssignmentRemoveCommand extends SpoCommand {
           const entraSiteUser = await spo.ensureEntraGroup(args.options.webUrl, group);
 
           principalId = entraSiteUser.Id;
-
         }
         else {
           principalId = args.options.principalId!;
