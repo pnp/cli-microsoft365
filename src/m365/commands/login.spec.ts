@@ -326,6 +326,15 @@ describe(commands.LOGIN, () => {
     assert.strictEqual(auth.connection.userName, undefined, 'Incorrect userName set');
   });
 
+  it('logs in to Microsoft 365 using system-assigned managed identity when authType identity set', async () => {
+    await command.action(logger, {
+      options: commandOptionsSchema.parse({
+        authType: 'identity'
+      })
+    });
+    assert.strictEqual(auth.connection.authType, AuthType.Identity, 'Incorrect authType set');
+  });
+
   it('logs in to Microsoft 365 using client secret authType "secret" set', async () => {
     await command.action(logger, {
       options: commandOptionsSchema.parse({
