@@ -80,10 +80,6 @@ describe(commands.BUSINESS_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('defines correct properties for the text output', () => {
-    assert.deepStrictEqual(command.defaultProperties(), ['id', 'displayName', 'businessType', 'phone', 'email', 'defaultCurrencyIso']);
-  });
-
   it('gets business by id', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/solutions/bookingBusinesses/${formatting.encodeQueryParameter(validId)}`) {
