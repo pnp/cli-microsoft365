@@ -12,9 +12,9 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { spo } from '../../../../utils/spo.js';
 import commands from '../../commands.js';
-import command from './homesite-remove.js';
+import command from './tenant-homesite-remove.js';
 
-describe(commands.HOMESITE_REMOVE, () => {
+describe(commands.TENANT_HOMESITE_REMOVE, () => {
   let log: any[];
   let logger: Logger;
   let promptIssued: boolean = false;
@@ -69,11 +69,15 @@ describe(commands.HOMESITE_REMOVE, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name, commands.HOMESITE_REMOVE);
+    assert.strictEqual(command.name, commands.TENANT_HOMESITE_REMOVE);
   });
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
+  });
+
+  it('defines correct alias', () => {
+    assert.deepStrictEqual(command.alias(), ['spo homesite remove']);
   });
 
   it('prompts before removing the Home Site when force option is not passed', async () => {

@@ -53,6 +53,9 @@ const config: Config = {
           if (routePath.includes('/entra')) {
             return [routePath.replace('/entra', '/aad')];
           }
+          if (routePath.includes('/spo/tenant/tenant-homesite-')) {
+            return [routePath.replace('/spo/tenant/tenant-homesite-', '/spo/homesite/homesite-')];
+          }
 
           return [];
         }

@@ -15,13 +15,17 @@ interface Options extends GlobalOptions {
   force?: boolean;
 }
 
-class SpoHomeSiteRemoveCommand extends SpoCommand {
+class SpoTenantHomeSiteRemoveCommand extends SpoCommand {
   public get name(): string {
-    return commands.HOMESITE_REMOVE;
+    return commands.TENANT_HOMESITE_REMOVE;
   }
 
   public get description(): string {
     return 'Removes the current Home Site';
+  }
+
+  public alias(): string[] {
+    return ['spo homesite remove'];
   }
 
   constructor() {
@@ -34,7 +38,7 @@ class SpoHomeSiteRemoveCommand extends SpoCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        force: args.options.force || false
+        force: !!args.options.force
       });
     });
   }
@@ -48,6 +52,7 @@ class SpoHomeSiteRemoveCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    await this.showDeprecationWarning(logger, this.alias()[0], this.getCommandName());
 
     const removeHomeSite: () => Promise<void> = async (): Promise<void> => {
       try {
@@ -92,4 +97,4 @@ class SpoHomeSiteRemoveCommand extends SpoCommand {
   }
 }
 
-export default new SpoHomeSiteRemoveCommand();
+export default new SpoTenantHomeSiteRemoveCommand();

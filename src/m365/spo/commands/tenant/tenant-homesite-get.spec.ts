@@ -9,9 +9,9 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './homesite-get.js';
+import command from './tenant-homesite-get.js';
 
-describe(commands.HOMESITE_GET, () => {
+describe(commands.TENANT_HOMESITE_GET, () => {
   let log: any[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -54,11 +54,15 @@ describe(commands.HOMESITE_GET, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name, commands.HOMESITE_GET);
+    assert.strictEqual(command.name, commands.TENANT_HOMESITE_GET);
   });
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
+  });
+
+  it('defines correct alias', () => {
+    assert.deepStrictEqual(command.alias(), ['spo homesite get']);
   });
 
   it('gets information about the Home Site', async () => {

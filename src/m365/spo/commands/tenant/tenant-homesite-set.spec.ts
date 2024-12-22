@@ -11,9 +11,9 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './homesite-set.js';
+import command from './tenant-homesite-set.js';
 
-describe(commands.HOMESITE_SET, () => {
+describe(commands.TENANT_HOMESITE_SET, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
@@ -79,11 +79,15 @@ describe(commands.HOMESITE_SET, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name, commands.HOMESITE_SET);
+    assert.strictEqual(command.name, commands.TENANT_HOMESITE_SET);
   });
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
+  });
+
+  it('defines correct alias', () => {
+    assert.deepStrictEqual(command.alias(), ['spo homesite set']);
   });
 
   it('sets the specified site as the Home Site', async () => {
