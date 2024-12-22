@@ -14,6 +14,18 @@ sidebar_position: 4
 - [entra roledefinition list](../cmd/entra/roledefinition/roledefinition-list.mdx) - returns a list of all Microsoft Entra ID role definitions [#6464](https://github.com/pnp/cli-microsoft365/issues/6464)
 - [entra roledefinition remove](../cmd/entra/roledefinition/roledefinition-remove.mdx) - removes a custom Microsoft Entra ID role definition [#6468](https://github.com/pnp/cli-microsoft365/issues/6468)
 
+**SharePoint:**
+
+- [spo tenant homesite list](../cmd/spo/tenant/tenant-homesite-list.mdx) - lists all home sites [#6492](https://github.com/pnp/cli-microsoft365/issues/6492)
+
+**SharePoint Embedded:**
+
+- [spo container get](../cmd/spe/container/container-get.mdx) - gets a container of a specific container type [#6083](https://github.com/pnp/cli-microsoft365/issues/6083)
+
+**SharePoint Premium:**
+
+- [spp model get](../cmd/spp/model/model-get.mdx) - retrieves information about a document understanding model [#6105](https://github.com/pnp/cli-microsoft365/issues/6105)
+
 **Tenant:**
 
 - [tenant people pronouns get](../cmd/tenant/people/people-pronouns-get.mdx) - retrieves information about pronouns settings for an organization [#6206](https://github.com/pnp/cli-microsoft365/issues/6206)
@@ -21,10 +33,11 @@ sidebar_position: 4
 ### Changes
 
 - fixed an issue where removing entra app permissions fails when a service principal doesn't exist [#6291](https://github.com/pnp/cli-microsoft365/issues/6291)
-- updated project & docs dependencies.
-- fixed killing teams process for 'teams cache remove' [#6515](https://github.com/pnp/cli-microsoft365/issues/6515)
+- fixed killing teams process for [teams cache remove](../cmd/teams/cache/cache-remove.mdx) [#6515](https://github.com/pnp/cli-microsoft365/issues/6515)
 - fixed copy job polling [#6422](https://github.com/pnp/cli-microsoft365/issues/6422)
-- fixed asciinema player on render
+- updated project readme file [#5564](https://github.com/pnp/cli-microsoft365/issues/5564)
+- enhanced [spo user ensure](../cmd/spo/user/user-ensure.mdx) command with additional options [#6181](https://github.com/pnp/cli-microsoft365/issues/6181)
+- enhanced [spo page section add](../cmd/spo/page/page-section-add.mdx) with `collapsibleTitle` option [#6461](https://github.com/pnp/cli-microsoft365/issues/6461)
 
 ## [v10.1.0](https://github.com/pnp/cli-microsoft365/releases/tag/v10.1.0)
 
@@ -60,7 +73,6 @@ sidebar_position: 4
 - updated entra group/app/administrativeunit get/list commands [#6315](https://github.com/pnp/cli-microsoft365/issues/6315)
 - added customer quotes docs page
 - fixed prompting for entra app [#6498](https://github.com/pnp/cli-microsoft365/issues/6498)
-- fixed an issue where removing entra app permissions fails when a service principal doesn't exist [#6291](https://github.com/pnp/cli-microsoft365/issues/6291)
 
 ## [v10.0.0](https://github.com/pnp/cli-microsoft365/releases/tag/v10.0.0)
 
