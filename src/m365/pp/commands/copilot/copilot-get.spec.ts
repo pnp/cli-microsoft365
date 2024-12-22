@@ -137,6 +137,11 @@ describe(commands.COPILOT_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
+  it('defines correct alias', () => {
+    const alias = command.alias();
+    assert.deepStrictEqual(alias, [commands.CHATBOT_GET]);
+  });
+  
   it('defines correct properties for the default output', () => {
     assert.deepStrictEqual(command.defaultProperties(), ['name', 'botid', 'publishedon', 'createdon', 'modifiedon']);
   });
