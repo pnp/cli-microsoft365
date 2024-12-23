@@ -3768,6 +3768,11 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
+              label: 'tenant homesite add',
+              id: 'cmd/spo/tenant/tenant-homesite-add'
+            },
+            {
+              type: 'doc',
               label: 'tenant homesite list',
               id: 'cmd/spo/tenant/tenant-homesite-list'
             },
