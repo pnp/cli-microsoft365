@@ -2924,6 +2924,11 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
+              label: 'list defaultvalue clear',
+              id: 'cmd/spo/list/list-defaultvalue-clear'
+            },
+            {
+              type: 'doc',
               label: 'list defaultvalue list',
               id: 'cmd/spo/list/list-defaultvalue-list'
             },
