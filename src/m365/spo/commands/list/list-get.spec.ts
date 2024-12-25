@@ -5,7 +5,7 @@ import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
-import request from '../../../../request.js';
+import request, { CliRequestOptions } from '../../../../request.js';
 import { telemetry } from '../../../../telemetry.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
@@ -1285,8 +1285,13 @@ describe(commands.LIST_GET, () => {
   it('retrieves the default list in the specified site by providing a webUrl', async () => {
     const defaultSiteList = { ...listResponse, BaseTemplate: 101, ParentWebUrl: "/", ListItemEntityTypeFullName: "SP.Data.Shared_x0020_DocumentsItem" };
 
-    sinon.stub(request, 'get').resolves({
-      ...defaultSiteList
+    sinon.stub(request, 'get').callsFake(async (opts: CliRequestOptions) => {
+      if (opts.url?.includes('https://contoso.sharepoint.com/_api/web/DefaultDocumentLibrary')) {
+        return defaultSiteList;
+      }
+      else {
+        throw new Error(`Invalid request ${opts.url}`);
+      }
     });
 
     await command.action(logger, {

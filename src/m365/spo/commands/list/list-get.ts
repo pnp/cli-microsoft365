@@ -107,9 +107,6 @@ class SpoListGetCommand extends SpoCommand {
 
     let requestUrl: string = `${args.options.webUrl}/_api/web/`;
 
-    if (!args.options.id && !args.options.title && !args.options.url) {
-      requestUrl += `DefaultDocumentLibrary`;
-    }
     if (args.options.id) {
       requestUrl += `lists(guid'${formatting.encodeQueryParameter(args.options.id)}')`;
     }
@@ -119,6 +116,9 @@ class SpoListGetCommand extends SpoCommand {
     else if (args.options.url) {
       const listServerRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.url);
       requestUrl += `GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')`;
+    }
+    else {
+      requestUrl += `DefaultDocumentLibrary`;
     }
 
     const fieldsProperties: Properties = this.formatSelectProperties(args.options.properties, args.options.withPermissions);
