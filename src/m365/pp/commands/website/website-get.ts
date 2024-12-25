@@ -16,8 +16,7 @@ const options = globalOptionsZod
     ),
     id: zod.alias('i', z.string().uuid().optional()),
     name: zod.alias('n', z.string().optional()),
-    environmentName: zod.alias('e', z.string()),
-    asAdmin: z.boolean().default(false)
+    environmentName: zod.alias('e', z.string())
   }).strict();
 declare type Options = z.infer<typeof options>;
 
@@ -44,7 +43,7 @@ class PpWebSiteGetCommand extends PowerPlatformCommand {
 
   public getRefinedSchema(schema: typeof options): z.ZodEffects<any> | undefined {
     return schema
-      .refine(options => (options.url !== undefined || options.id !== undefined || options.name !== undefined) && !(options.url !== undefined && options.id !== undefined) && !(options.url !== undefined && options.name !== undefined) && !(options.id !== undefined && options.name !== undefined), {
+      .refine(options => [options.url, options.id, options.name].filter(x => x !== undefined).length === 1, {
         message: `Either url, id or name is required, but not multiple.`
       });
   }
