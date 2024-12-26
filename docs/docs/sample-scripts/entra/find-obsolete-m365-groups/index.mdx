@@ -20,9 +20,9 @@ This script is based on the [original article](https://petri.com/identifying-obs
 Like any resource within your Microsoft 365 tenant, M365 Groups can become unused over time.
 
 This routine uses PowerShell with CLI for Microsoft 365
-- To gather insights about SharePoint file activity within the related SharePoint site.
-- To do a check against conversation items in the group mailbox.
-- To denote the amount of active people (group owners, members and guests) in the group.
+- to gather insights about SharePoint file activity within the related SharePoint site,
+- to do a check against conversation items in the group mailbox,
+- to denote the amount of active people (group owners, members and guests) in the group.
 
 These metrics can help us understand the extent to which the resource is being used from a governance perspective – or even not.
 Use this script to create a report of all M365 groups that are possibly obsolete.
@@ -99,7 +99,7 @@ Use this script to create a report of all M365 groups that are possibly obsolete
     }
     
     $TestPath = Test-Path -Path  $Script:Path
-    $tStamp = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss")
+    $tStamp = (Get-Date).ToString("yyyyMMdd-HHmmss")
     if ($TestPath -ne $true) {
       New-Item -ItemType directory -Path $Script:Path | Out-Null
       Write-Host "Will create file in $($Script:Path): M365GroupsReport-$tStamp.csv" -ForegroundColor Yellow
