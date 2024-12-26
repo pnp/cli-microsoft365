@@ -5,7 +5,7 @@ import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
-import request, { CliRequestOptions } from '../../../../request.js';
+import request from '../../../../request.js';
 import { telemetry } from '../../../../telemetry.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
@@ -1283,27 +1283,43 @@ describe(commands.LIST_GET, () => {
   });
 
   it('retrieves the default list in the specified site by providing a webUrl', async () => {
-    const defaultSiteList = { ...listResponse, BaseTemplate: 101, ParentWebUrl: "/", ListItemEntityTypeFullName: "SP.Data.Shared_x0020_DocumentsItem" };
+    const webUrl = 'https://contoso.sharepoint.com';
+    const mockListResponse = {
+      AllowContentTypes: true,
+      BaseTemplate: 100,
+      BaseType: 1,
+      ContentTypesEnabled: false,
+      Created: "2023-07-02T00:03:51Z",
+      DefaultItemOpenUseListSetting: false,
+      Description: "",
+      EnableVersioning: true,
+      EntityTypeName: "Shared_x0020_Documents",
+      Id: "cf07fe11-8b85-424c-972f-5f84fba5157c",
+      ItemCount: 20,
+      ListItemEntityTypeFullName: "SP.Data.Shared_x0020_DocumentsItem",
+      MajorVersionLimit: 500,
+      ParentWebUrl: "/",
+      Title: "Documents",
+      VersionPolicies: {
+        DefaultTrimMode: 1,
+        MinorVersionLimit: 0,
+        MajorVersionLimit: 500
+      }
+    };
 
-    sinon.stub(request, 'get').callsFake(async (opts: CliRequestOptions) => {
-      if (opts.url === 'https://contoso.sharepoint.com/_api/web/DefaultDocumentLibrary') {
-        return defaultSiteList;
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `${webUrl}/_api/web/DefaultDocumentLibrary`) {
+        return mockListResponse;
       }
-      else {
-        throw new Error(`Invalid request ${opts.url}`);
-      }
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
       options: {
-        webUrl: 'https://contoso.sharepoint.com'
+        webUrl: webUrl
       }
     });
 
-    assert(loggerLogSpy.calledWithMatch({
-      BaseTemplate: 101,
-      ParentWebUrl: "/",
-      ListItemEntityTypeFullName: "SP.Data.Shared_x0020_DocumentsItem"
-    }));
+    assert(loggerLogSpy.calledWith(mockListResponse));
   });
 });
