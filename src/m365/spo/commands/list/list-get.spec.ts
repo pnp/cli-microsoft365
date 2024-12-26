@@ -1286,7 +1286,7 @@ describe(commands.LIST_GET, () => {
     const defaultSiteList = { ...listResponse, BaseTemplate: 101, ParentWebUrl: "/", ListItemEntityTypeFullName: "SP.Data.Shared_x0020_DocumentsItem" };
 
     sinon.stub(request, 'get').callsFake(async (opts: CliRequestOptions) => {
-      if (opts.url?.includes('https://contoso.sharepoint.com/_api/web/DefaultDocumentLibrary')) {
+      if (opts.url === 'https://contoso.sharepoint.com/_api/web/DefaultDocumentLibrary') {
         return defaultSiteList;
       }
       else {
