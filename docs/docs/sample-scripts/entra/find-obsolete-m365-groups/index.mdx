@@ -294,7 +294,7 @@ Use this script to create a report of all M365 groups that are possibly obsolete
     try {
       $Global:ObsoleteGroups.Add($Group.Reference.id, $Group)
     }
-    catch { Write-Information "Group was already added to the list of potentially obsolete groups" }
+    catch { }
   }
   
   function New-Report {
