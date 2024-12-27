@@ -213,13 +213,35 @@ Use this script to create a report of all M365 groups that are possibly obsolete
       [Parameter(Mandatory = $true)] [GroupInfo] $Group
     )
     
+    function Get-ParsedDate {
+      [CmdletBinding()]
+      param (
+        [Parameter(Mandatory = $true)] [String] $JavascriptDateString
+      )
+
+      $dateParts = [regex]::Matches($JavascriptDateString, '\d+') | ForEach-Object { $_.Value }
+
+      # Convert the parts to integers
+      $year = [int]$dateParts[0]
+      $month = [int]$dateParts[1] + 1
+      $day = [int]$dateParts[2]
+      $hour = [int]$dateParts[3]
+      $minute = [int]$dateParts[4]
+      $second = [int]$dateParts[5]
+
+      # return a DateTime object
+      $dateObject = New-Object -TypeName DateTime -ArgumentList $year, $month, $day, $hour, $minute, $second
+      $dateObject
+    }
+
     $WarningDate = (Get-Date).AddDays(-90)
     
     $spoSite = $Script:TeamSites | Where-Object { $_.GroupId -eq "/Guid($($Group.Reference.id))/" }
-    $spoWeb = m365 spo web get --url $spoSite.Url | ConvertFrom-Json
-    if ($spoWeb.LastItemUserModifiedDate -lt $WarningDate) {
-      Write-Host "  → potentially obsolete (SPO last content modified: $($spoWeb.LastItemUserModifiedDate))" -ForegroundColor Yellow
-      $reason = "Low SharePoint activity ($($spoWeb.LastItemUserModifiedDate))"
+    $spoSite = m365 spo site list --filter "Url eq '$($spoSite.Url)'" | ConvertFrom-Json
+    $spoSite.LastContentModifiedDate = Get-ParsedDate -JavascriptDateString $spoSite.LastContentModifiedDate
+    if ($spoSite.LastContentModifiedDate -lt $WarningDate) {
+      Write-Host "  → potentially obsolete (SPO last content modified: $($spoSite.LastContentModifiedDate))" -ForegroundColor Yellow
+      $reason = "Low SharePoint activity ($($spoSite.LastContentModifiedDate))"
 
       $Group.SharePointStatus = @{
         Reason = $reason
