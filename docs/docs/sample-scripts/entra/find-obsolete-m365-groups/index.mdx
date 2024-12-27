@@ -237,7 +237,6 @@ Use this script to create a report of all M365 groups that are possibly obsolete
     $WarningDate = (Get-Date).AddDays(-90)
     
     $spoSite = $Script:TeamSites | Where-Object { $_.GroupId -eq "/Guid($($Group.Reference.id))/" }
-    $spoSite = m365 spo site list --filter "Url eq '$($spoSite.Url)'" | ConvertFrom-Json
     $spoSite.LastContentModifiedDate = Get-ParsedDate -JavascriptDateString $spoSite.LastContentModifiedDate
     if ($spoSite.LastContentModifiedDate -lt $WarningDate) {
       Write-Host "  → potentially obsolete (SPO last content modified: $($spoSite.LastContentModifiedDate))" -ForegroundColor Yellow
