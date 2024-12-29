@@ -767,13 +767,13 @@ const sidebars: SidebarsConfig = {
       ]
     },
     {
-      'Exchange Online (exchange)': [
+      'Exchange Online (exo)': [
         {
-          'role assignment': [
+          'approleassignment': [
             {
               type: 'doc',
-              label: 'role assignment add',
-              id: 'cmd/exchange/role-assignment/role-assignment-add'
+              label: 'approleassignment add',
+              id: 'cmd/exo/approleassignment/approleassignment-add'
             }
           ]
         }
