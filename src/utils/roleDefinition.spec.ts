@@ -347,4 +347,96 @@ describe('utils/roleDefinition', () => {
       ]
     });
   });
+
+  it('correctly get single role definition by name using getExchangeRoleDefinitionByDisplayName', async () => {
+    sinon.stub(request, 'get').callsFake(async opts => {
+      if (opts.url === `https://graph.microsoft.com/beta/roleManagement/exchange/roleDefinitions?$filter=displayName eq '${formatting.encodeQueryParameter(displayName)}'`) {
+        return {
+          value: [
+            exchangeRoleDefinitionResponse
+          ]
+        };
+      }
+
+      return 'Invalid Request';
+    });
+
+    const actual = await roleDefinition.getExchangeRoleDefinitionByDisplayName(displayName);
+    assert.deepStrictEqual(actual, exchangeRoleDefinitionResponse);
+  });
+
+  it('correctly get single role definition by name using getExchangeRoleDefinitionByDisplayName with specified properties', async () => {
+    sinon.stub(request, 'get').callsFake(async opts => {
+      if (opts.url === `https://graph.microsoft.com/beta/roleManagement/exchange/roleDefinitions?$filter=displayName eq '${formatting.encodeQueryParameter(displayName)}'&$select=id,displayName`) {
+        return {
+          value: [
+            exchangeRoleDefinitionResponse
+          ]
+        };
+      }
+
+      return 'Invalid Request';
+    });
+
+    const actual = await roleDefinition.getExchangeRoleDefinitionByDisplayName(displayName, 'id,displayName');
+    assert.deepStrictEqual(actual, exchangeRoleDefinitionResponse);
+  });
+
+  it('handles selecting single role definition when multiple role definitions with the specified name found using getExchangeRoleDefinitionByDisplayName and cli is set to prompt', async () => {
+    sinon.stub(request, 'get').callsFake(async opts => {
+      if (opts.url === `https://graph.microsoft.com/beta/roleManagement/exchange/roleDefinitions?$filter=displayName eq '${formatting.encodeQueryParameter(displayName)}'`) {
+        return {
+          value: [
+            exchangeRoleDefinitionResponse,
+            secondExchangeRoleDefinitionResponse
+          ]
+        };
+      }
+
+      return 'Invalid Request';
+    });
+
+    sinon.stub(cli, 'handleMultipleResultsFound').resolves(exchangeRoleDefinitionResponse);
+
+    const actual = await roleDefinition.getExchangeRoleDefinitionByDisplayName(displayName);
+    assert.deepStrictEqual(actual, exchangeRoleDefinitionResponse);
+  });
+
+  it('throws error message when no role definition was found using getExchangeRoleDefinitionByDisplayName', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/beta/roleManagement/exchange/roleDefinitions?$filter=displayName eq '${formatting.encodeQueryParameter(invalidDisplayName)}'`) {
+        return { value: [] };
+      }
+
+      throw 'Invalid Request';
+    });
+
+    await assert.rejects(roleDefinition.getExchangeRoleDefinitionByDisplayName(invalidDisplayName)), Error(`The specified role definition '${invalidDisplayName}' does not exist.`);
+  });
+
+  it('throws error message when multiple role definition were found using getExchangeRoleDefinitionByDisplayName', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
+    sinon.stub(request, 'get').callsFake(async opts => {
+      if (opts.url === `https://graph.microsoft.com/beta/roleManagement/exchange/roleDefinitions?$filter=displayName eq '${formatting.encodeQueryParameter(displayName)}'`) {
+        return {
+          value: [
+            exchangeRoleDefinitionResponse,
+            secondExchangeRoleDefinitionResponse
+          ]
+        };
+      }
+
+      return 'Invalid Request';
+    });
+
+    await assert.rejects(roleDefinition.getExchangeRoleDefinitionByDisplayName(displayName),
+      Error(`Multiple role definitions with name '${displayName}' found. Found: ${exchangeRoleDefinitionResponse.id}, ${secondExchangeRoleDefinitionResponse.id}.`));
+  });
 });

@@ -4,7 +4,7 @@ import { formatting } from './formatting.js';
 import { cli } from '../cli/cli.js';
 
 export const entraServicePrincipal = {
-  async getServicePrincipalIdFromFromAppId(appId: string): Promise<string> {
+  async getServicePrincipalIdFromAppId(appId: string): Promise<string> {
     const apps = await odata.getAllItems<ServicePrincipal>(`https://graph.microsoft.com/v1.0/servicePrincipals?$filter=appId eq '${appId}'&$select=id`);
 
     if (apps.length === 0) {

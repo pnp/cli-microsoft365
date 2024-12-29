@@ -35,7 +35,7 @@ describe('utils/entraServicePrincipal', () => {
       return 'Invalid Request';
     });
 
-    const actual = await entraServicePrincipal.getServicePrincipalIdFromFromAppId(appId);
+    const actual = await entraServicePrincipal.getServicePrincipalIdFromAppId(appId);
     assert.deepStrictEqual(actual, servicePrincipalId);
   });
 
@@ -87,7 +87,7 @@ describe('utils/entraServicePrincipal', () => {
       throw 'Invalid Request';
     });
 
-    await assert.rejects(entraServicePrincipal.getServicePrincipalIdFromFromAppId(appId)), Error(`App with appId '${appId}' not found in Microsoft Entra ID`);
+    await assert.rejects(entraServicePrincipal.getServicePrincipalIdFromAppId(appId)), Error(`App with appId '${appId}' not found in Microsoft Entra ID`);
   });
 
   it('throws error message when no service principal was found using getServicePrincipalIdFromAppName', async () => {

@@ -1,0 +1,151 @@
+import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# exo role assignment add
+
+Grants permissions to an application that's accessing data in Exchange Online and specify which mailboxes an app can access.
+
+## Usage
+
+```sh
+m365 exo role assignment add [options]
+```
+
+## Options
+
+```md definition-list
+`--roleDefinitionId [roleDefinitionId]`
+: Id of a role to be assigned. Specify either `roleDefinitionId` or `roleDefinitionName`, but not both.
+
+`--roleDefinitionName [roleDefinitionName]`
+: Name of a role to be assigned. Specify either `roleDefinitionId` or `roleDefinitionName`, but not both.
+
+`--principalId [principalId]`
+: Id of a service principal to which the assignment is granted. Specify either `principalId` or `principalName`, but not both.
+
+`--principalName [principalName]`
+: Name of a service principal to which the assignment is granted. Specify either `principalId` or `principalName`, but not both.
+
+`-s, --scope <scope>`	
+: Scope of the roleassignment. Allowed values are: `tenant`, `administrativeUnit`, `group`, `user`, `custom`.
+
+`--userId [userId]`	
+: Id of a user to which the assignment is scoped. Specify either `userId` or `userName` when scope is set to `user`.
+
+`--userName [userName]`
+: UPN of a user to which the assignment is scoped. Specify either `userId` or `userName` when scope is set to `user`.
+
+`--groupId [groupId]`
+: Id of a group to which the assignment is scoped. Specify either `groupId` or `groupName` when scope is set to `group`.
+
+`--groupName [groupName]`
+: Name of a group to which the assignment is scoped. Specify either `groupId` or `groupName` when scope is set to `group`.
+
+`--administrativeUnitId [administrativeUnitId]`
+: Id of an administrative unit to which the assignment is scoped. Specify either `administrativeUnitId` or `administrativeUnitName` when scope is set to `administrativeUnit`.
+
+`--administrativeUnitName [administrativeUnitName]`
+: Name of an administrative unit to which the assignment is scoped. Specify either `administrativeUnitId` or `administrativeUnitName` when scope is set to `administrativeUnit`.
+
+`--customAppScopeId [customAppScopeId]`
+: Id of a custom application scope to which the assignment is scoped. Specify either `customAppScopeId` or `customAppScopeName` when scope is set to `custom`.
+
+`--customAppScopeName [customAppScopeName]`
+: Name of a custom application scope to which the assignment is scoped. Specify either `customAppScopeId` or `customAppScopeName` when scope is set to `custom`.
+```
+
+<Global />
+
+## Remarks
+
+:::info
+
+To use this command you must be at least **Privileged Role Administrator**.
+
+:::
+
+## Examples
+
+Assign a role specified by id to a service principal specified by id and scope the assignment to the whole tenant
+
+```sh
+m365 exo approleassignment add --roleDefinitionId 777b752-f9b7-4205-a2b1-5db0d6a0ccfc --principalId 7a2ca997-9461-402e-9882-58088a370889 --scope tenant
+```
+
+Assign a role specified by id to a service principal specified by id and scope the assignment to a user specified by id
+
+```sh
+m365 exo approleassignment add --roleDefinitionId 777b752-f9b7-4205-a2b1-5db0d6a0ccfc --principalId 7a2ca997-9461-402e-9882-58088a370889 --scope user --userId a4738dd8-fc0f-4646-87fb-47539f5c651b
+```
+
+Assign a role specified by name to a service principal specified by name and scope the assignment to a group specified by name
+
+```sh
+m365 exo approleassignment add --roleDefinitionName 'Application Contacts.ReadWrite' --principalName 'ContactsSyncApp' --scope group --groupName 'Marketing'
+```
+
+Assign a role specified by name to a service principal specified by id and scope the assignment to an administrative unit specified by name
+
+```sh
+m365 exo approleassignment add --roleDefinitionName 'Application Calendars.Read' --principalId fa631c4d-ac9f-4884-a7f5-13c659d177e3 --scope administrativeUnit --administrativeUnitName 'Equipment - EMEA'
+```
+
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  {
+    "id": "6615d221-3834-4f8f-bbc9-7d0d23620a8e",
+    "principalId": "/ServicePrincipals/e483a0d9-8440-455e-8f9a-b9cac6b8b0ef",
+    "roleDefinitionId": "1f704712-7d46-481f-b2cd-dbcc978c4f2a",
+    "directoryScopeId": "/",
+    "appScopeId": null
+  }
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  appScopeId      : null
+  directoryScopeId: /
+  id              : 6615d221-3834-4f8f-bbc9-7d0d23620a8e
+  principalId     : /ServicePrincipals/e483a0d9-8440-455e-8f9a-b9cac6b8b0ef
+  roleDefinitionId: 1f704712-7d46-481f-b2cd-dbcc978c4f2a
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  id,principalId,roleDefinitionId,directoryScopeId,appScopeId
+  6615d221-3834-4f8f-bbc9-7d0d23620a8e,/ServicePrincipals/e483a0d9-8440-455e-8f9a-b9cac6b8b0ef,1f704712-7d46-481f-b2cd-dbcc978c4f2a,/,
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # exo approleassignment add --debug "false" --verbose "false" --roleDefinitionId "1f704712-7d46-481f-b2cd-dbcc978c4f2a" --principalId "e483a0d9-8440-455e-8f9a-b9cac6b8b0ef" --scope tenant
+
+  Date: 10/3/2024
+
+  ## 6615d221-3834-4f8f-bbc9-7d0d23620a8e
+
+  Property | Value
+  ---------|-------
+  id | 6615d221-3834-4f8f-bbc9-7d0d23620a8e
+  principalId | /ServicePrincipals/e483a0d9-8440-455e-8f9a-b9cac6b8b0ef
+  roleDefinitionId | 1f704712-7d46-481f-b2cd-dbcc978c4f2a
+  directoryScopeId | /
+  ```
+
+  </TabItem>
+</Tabs>
+
+## More information
+
+- Role assignment: https://learn.microsoft.com/graph/api/rbacapplication-post-roleassignments?view=graph-rest-beta
