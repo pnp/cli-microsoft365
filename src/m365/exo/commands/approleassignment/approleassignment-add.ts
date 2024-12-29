@@ -152,9 +152,9 @@ class ExoAppRoleAssignmentAddCommand extends GraphCommand {
 
       const data = {
         roleDefinitionId: roleDefinitionId,
-        principalId: await this.getPrincipalId(args.options),
+        principalId: await this.getPrincipalId(args.options, logger),
         directoryScopeId: await this.getDirectoryScopeId(args.options),
-        appScopeId: await this.getAppScopeId(args.options)
+        appScopeId: await this.getAppScopeId(args.options, logger)
       };
 
       const requestOptions: any = {
@@ -187,15 +187,16 @@ class ExoAppRoleAssignmentAddCommand extends GraphCommand {
     return role.id!;
   }
 
-  private async getPrincipalId(options: Options): Promise<string> {
-    let principalId = '';
+  private async getPrincipalId(options: Options, logger: Logger): Promise<string> {
     if (options.principalId) {
-      principalId = options.principalId;
-    }
-    else {
-      principalId = await entraServicePrincipal.getServicePrincipalIdFromAppName(options.principalName!);
+      return `/ServicePrincipals/${options.principalId}`;
     }
 
+    if (this.verbose) {
+      await logger.logToStderr(`Retrieving service principal by its name '${options.principalName}'`);
+    }
+
+    const principalId = await entraServicePrincipal.getServicePrincipalIdFromAppName(options.principalName!);
     return `/ServicePrincipals/${principalId}`;
   }
 
@@ -242,17 +243,20 @@ class ExoAppRoleAssignmentAddCommand extends GraphCommand {
     return `${prefix}${resourceId}`;
   }
 
-  private async getAppScopeId(options: Options): Promise<string | null> {
+  private async getAppScopeId(options: Options, logger: Logger): Promise<string | null> {
     if (options.scope !== 'custom') {
       return null;
     }
 
-    let applicationScopeId = options.customAppScopeId;
-
-    if (options.customAppScopeName) {
-      applicationScopeId = (await customAppScope.getCustomAppScopeByDisplayName(options.customAppScopeName, 'id')).id;
+    if (options.customAppScopeId) {
+      return options.customAppScopeId;
     }
 
+    if (this.verbose) {
+      await logger.logToStderr(`Retrieving custom application scope by its name '${options.customAppScopeName}'`);
+    }
+
+    const applicationScopeId = (await customAppScope.getCustomAppScopeByDisplayName(options.customAppScopeName!, 'id')).id;
     return applicationScopeId!;
   }
 }
