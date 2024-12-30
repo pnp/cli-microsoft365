@@ -198,8 +198,13 @@ async function execute(rawArgs: string[]): Promise<void> {
             const optionInfo = cli.commandToExecute.options.find(o => o.name === optionName);
             const answer = await cli.promptForValue(optionInfo!);
             // coerce the answer to the correct type
-            const parsed = getCommandOptionsFromArgs([`--${optionName}`, answer], cli.commandToExecute);
-            cli.optionsFromArgs.options[optionName] = parsed[optionName];
+            try {
+              const parsed = getCommandOptionsFromArgs([`--${optionName}`, answer], cli.commandToExecute);
+              cli.optionsFromArgs.options[optionName] = parsed[optionName];
+            }
+            catch (e: any) {
+              return cli.closeWithError(e.message, cli.optionsFromArgs, true);
+            }
           }
         }
         else {
