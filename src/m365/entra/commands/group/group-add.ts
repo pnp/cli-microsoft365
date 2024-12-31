@@ -153,6 +153,7 @@ class EntraGroupAddCommand extends GraphCommand {
         memberUserNames: typeof args.options.memberUserNames !== 'undefined',
         visibility: typeof args.options.visibility !== 'undefined'
       });
+      this.trackUnknownOptions(this.telemetryProperties, args.options);
     });
   }
 
@@ -204,6 +205,7 @@ class EntraGroupAddCommand extends GraphCommand {
     };
 
     this.addUnknownOptionsToPayload(requestBody, options);
+
     return requestBody;
   }
 

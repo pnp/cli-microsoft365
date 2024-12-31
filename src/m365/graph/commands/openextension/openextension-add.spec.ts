@@ -307,13 +307,16 @@ describe(commands.OPENEXTENSION_ADD, () => {
 
   it('correctly creates an open extension with JSON object', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users/${resourceId}/extensions` && 
+      if (opts.url === `https://graph.microsoft.com/v1.0/users/${resourceId}/extensions` &&
         JSON.stringify(opts.data) === JSON.stringify({
           'extensionName': 'com.contoso.roamingSettings',
+          'name': 'com.contoso.roamingSettings',
+          'resourceId': 'f4099688-dd3f-4a55-a9f5-ddd7417c227a',
+          'resourceType': 'user',
           'settings': {
-            "theme": "dark",
-            "color": "red",
-            "language": "English"
+            'theme': 'dark',
+            'color': 'red',
+            'language': 'English'
           },
           'supportedSystem': 'Linux'
         })) {

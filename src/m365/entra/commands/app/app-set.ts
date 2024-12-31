@@ -7,6 +7,7 @@ import { formatting } from '../../../../utils/formatting.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 import { cli } from '../../../../cli/cli.js';
+import { optionsUtils } from '../../../../utils/optionsUtils.js';
 
 interface CommandArgs {
   options: Options;
@@ -37,6 +38,10 @@ class EntraAppSetCommand extends GraphCommand {
     return 'Updates Entra app registration';
   }
 
+  public allowUnknownOptions(): boolean | undefined {
+    return true;
+  }
+
   constructor() {
     super();
 
@@ -62,6 +67,7 @@ class EntraAppSetCommand extends GraphCommand {
         certificateDisplayName: typeof args.options.certificateDisplayName !== 'undefined',
         allowPublicClientFlows: typeof args.options.allowPublicClientFlows !== 'undefined'
       });
+      this.trackUnknownOptions(this.telemetryProperties, args.options);
     });
   }
 
@@ -127,6 +133,7 @@ class EntraAppSetCommand extends GraphCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       let objectId = await this.getAppObjectId(args, logger);
+      objectId = await this.updateUnknownOptions(args, objectId);
       objectId = await this.configureUri(args, objectId, logger);
       objectId = await this.configureRedirectUris(args, objectId, logger);
       objectId = await this.updateAllowPublicClientFlows(args, objectId, logger);
@@ -174,6 +181,26 @@ class EntraAppSetCommand extends GraphCommand {
     const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', res.value);
     const result = await cli.handleMultipleResultsFound<{ id: string }>(`Multiple Microsoft Entra application registration with name '${name}' found.`, resultAsKeyValuePair);
     return result.id;
+  }
+
+  private async updateUnknownOptions(args: CommandArgs, objectId: string): Promise<string> {
+    const unknownOptions = optionsUtils.getUnknownOptions(args.options, this.options);
+
+    if (Object.keys(unknownOptions).length > 0) {
+      const requestBody = {};
+      optionsUtils.addUnknownOptionsToPayload(requestBody, unknownOptions);
+
+      const requestOptions: CliRequestOptions = {
+        url: `${this.resource}/v1.0/myorganization/applications/${objectId}`,
+        headers: {
+          'content-type': 'application/json;odata.metadata=none'
+        },
+        responseType: 'json',
+        data: requestBody
+      };
+      await request.patch(requestOptions);
+    }
+    return objectId;
   }
 
   private async updateAllowPublicClientFlows(args: CommandArgs, objectId: string, logger: Logger): Promise<string> {

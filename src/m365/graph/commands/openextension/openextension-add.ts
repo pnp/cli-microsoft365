@@ -7,6 +7,7 @@ import { Logger } from '../../../../cli/Logger.js';
 import commands from '../../commands.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { Extension } from '@microsoft/microsoft-graph-types';
+import { optionsUtils } from '../../../../utils/optionsUtils.js';
 
 const options = globalOptionsZod
   .extend({
@@ -36,13 +37,11 @@ class GraphOpenExtensionAddCommand extends GraphCommand {
 
   public getRefinedSchema(schema: typeof options): z.ZodEffects<any> | undefined {
     return schema
-      .refine(options => options.resourceType !== 'group' && options.resourceType !== 'device' && options.resourceType !== 'organization' ||
-        (options.resourceId && validation.isValidGuid(options.resourceId)), options => ({
+      .refine(options => options.resourceType !== 'group' && options.resourceType !== 'device' && options.resourceType !== 'organization' || (options.resourceId && validation.isValidGuid(options.resourceId)), options => ({
         message: `The '${options.resourceId}' must be a valid GUID`,
         path: ['resourceId']
       }))
-      .refine(options => options.resourceType !== 'user' ||
-        (options.resourceId && (validation.isValidGuid(options.resourceId) || validation.isValidUserPrincipalName(options.resourceId))), options => ({
+      .refine(options => options.resourceType !== 'user' || (options.resourceId && (validation.isValidGuid(options.resourceId) || validation.isValidUserPrincipalName(options.resourceId))), options => ({
         message: `The '${options.resourceId}' must be a valid GUID or user principal name`,
         path: ['resourceId']
       }));
@@ -54,7 +53,7 @@ class GraphOpenExtensionAddCommand extends GraphCommand {
 
       requestBody["extensionName"] = args.options.name;
 
-      const unknownOptions: any = this.getUnknownZodOptions(args.options);
+      const unknownOptions: any = optionsUtils.getUnknownOptions(args.options, this.options);
       const unknownOptionsNames: string[] = Object.getOwnPropertyNames(unknownOptions);
 
       unknownOptionsNames.forEach(async o => {

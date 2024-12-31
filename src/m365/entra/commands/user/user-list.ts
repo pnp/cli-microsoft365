@@ -5,6 +5,7 @@ import { formatting } from '../../../../utils/formatting.js';
 import { odata } from '../../../../utils/odata.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
+import { optionsUtils } from '../../../../utils/optionsUtils.js';
 
 interface CommandArgs {
   options: Options;
@@ -115,7 +116,7 @@ class EntraUserListCommand extends GraphCommand {
   private getFilter(options: Options): string | null {
     const filters: string[] = [];
 
-    const unknownOptions = this.getUnknownOptions(options);
+    const unknownOptions = optionsUtils.getUnknownOptions(options, this.options);
     Object.keys(unknownOptions).forEach(key => {
       if (typeof options[key] === 'boolean') {
         throw `Specify value for the ${key} property`;

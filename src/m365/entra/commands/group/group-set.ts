@@ -38,7 +38,11 @@ class EntraGroupSetCommand extends GraphCommand {
     return 'Updates a Microsoft Entra group';
   }
 
-  constructor(){
+  public allowUnknownOptions(): boolean | undefined {
+    return true;
+  }
+
+  constructor() {
     super();
 
     this.#initTelemetry();
@@ -62,6 +66,7 @@ class EntraGroupSetCommand extends GraphCommand {
         memberUserNames: typeof args.options.memberUserNames !== 'undefined',
         visibility: typeof args.options.visibility !== 'undefined'
       });
+      this.trackUnknownOptions(this.telemetryProperties, args.options);
     });
   }
 
@@ -81,7 +86,7 @@ class EntraGroupSetCommand extends GraphCommand {
       },
       {
         option: '--description [description]'
-      },     
+      },
       {
         option: '--ownerIds [ownerIds]'
       },
@@ -195,17 +200,21 @@ class EntraGroupSetCommand extends GraphCommand {
         groupId = await entraGroup.getGroupIdByDisplayName(args.options.displayName);
       }
 
+      const requestBody = {
+        displayName: args.options.newDisplayName,
+        description: args.options.description === '' ? null : args.options.description,
+        mailNickName: args.options.mailNickname,
+        visibility: args.options.visibility
+      };
+
+      this.addUnknownOptionsToPayload(requestBody, args.options);
+
       const requestOptions: CliRequestOptions = {
         url: `${this.resource}/v1.0/groups/${groupId}`,
         headers: {
           accept: 'application/json;odata.metadata=none'
         },
-        data: {
-          displayName: args.options.newDisplayName,
-          description: args.options.description === '' ? null : args.options.description,
-          mailNickName: args.options.mailNickname,
-          visibility: args.options.visibility
-        }
+        data: requestBody
       };
 
       await request.patch(requestOptions);

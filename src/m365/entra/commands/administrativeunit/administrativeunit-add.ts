@@ -24,6 +24,10 @@ class EntraAdministrativeUnitAddCommand extends GraphCommand {
     return 'Creates an administrative unit';
   }
 
+  public allowUnknownOptions(): boolean | undefined {
+    return true;
+  }
+
   constructor() {
     super();
 
@@ -54,17 +58,21 @@ class EntraAdministrativeUnitAddCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    const requestBody = {
+      description: args.options.description,
+      displayName: args.options.displayName,
+      visibility: args.options.hiddenMembership ? 'HiddenMembership' : null
+    };
+
+    this.addUnknownOptionsToPayload(requestBody, args.options);
+
     const requestOptions: CliRequestOptions = {
       url: `${this.resource}/v1.0/directory/administrativeUnits`,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },
       responseType: 'json',
-      data: {
-        description: args.options.description,
-        displayName: args.options.displayName,
-        visibility: args.options.hiddenMembership ? 'HiddenMembership' : null
-      }
+      data: requestBody
     };
 
     try {

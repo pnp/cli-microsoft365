@@ -4,6 +4,7 @@ import GraphCommand from '../../../base/GraphCommand.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { Localization, ProfileCardProperty, profileCardPropertyNames as allProfileCardPropertyNames } from './profileCardProperties.js';
 import commands from '../../commands.js';
+import { optionsUtils } from '../../../../utils/optionsUtils.js';
 
 interface CommandArgs {
   options: Options;
@@ -37,7 +38,7 @@ class TenantPeopleProfileCardPropertySetCommand extends GraphCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       // Add unknown options to telemetry
-      const unknownOptions = Object.keys(this.getUnknownOptions(args.options));
+      const unknownOptions = Object.keys(optionsUtils.getUnknownOptions(args.options, this.options));
       const unknownOptionsObj = unknownOptions.reduce((obj, key) => ({ ...obj, [key]: true }), {});
 
       Object.assign(this.telemetryProperties, {
@@ -67,7 +68,7 @@ class TenantPeopleProfileCardPropertySetCommand extends GraphCommand {
         }
 
         // Unknown options are allowed only if they start with 'displayName-'
-        const unknownOptionKeys = Object.keys(this.getUnknownOptions(args.options));
+        const unknownOptionKeys = Object.keys(optionsUtils.getUnknownOptions(args.options, this.options));
         const invalidOptionKey = unknownOptionKeys.find(o => !o.startsWith('displayName-'));
         if (invalidOptionKey) {
           return `Invalid option: '${invalidOptionKey}'`;
@@ -139,7 +140,7 @@ class TenantPeopleProfileCardPropertySetCommand extends GraphCommand {
    * @example Transform "--displayName-en-US 'Cost center'" to { languageTag: 'en-US', displayName: 'Cost center' }
    */
   private getLocalizations(options: Options): Localization[] {
-    const unknownOptions = this.getUnknownOptions(options);
+    const unknownOptions = optionsUtils.getUnknownOptions(options, this.options);
 
     const result = Object.keys(unknownOptions).map(o => ({
       languageTag: o.substring(o.indexOf('-') + 1),

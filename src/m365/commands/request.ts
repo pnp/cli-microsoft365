@@ -45,21 +45,14 @@ class RequestCommand extends Command {
 
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
-      const properties: any = {
+      Object.assign(this.telemetryProperties, {
         method: args.options.method || 'get',
         resource: typeof args.options.resource !== 'undefined',
         accept: args.options.accept || 'application/json',
         body: typeof args.options.body !== 'undefined',
         filePath: typeof args.options.filePath !== 'undefined'
-      };
-
-      const unknownOptions: any = this.getUnknownOptions(args.options);
-      const unknownOptionsNames: string[] = Object.getOwnPropertyNames(unknownOptions);
-      unknownOptionsNames.forEach(o => {
-        properties[o] = typeof unknownOptions[o] !== 'undefined';
       });
-
-      Object.assign(this.telemetryProperties, properties);
+      this.trackUnknownOptions(this.telemetryProperties, args.options);
     });
   }
 
@@ -119,11 +112,7 @@ class RequestCommand extends Command {
       const method = (args.options.method || 'get').toUpperCase();
       const headers: RawAxiosRequestHeaders = {};
 
-      const unknownOptions: any = this.getUnknownOptions(args.options);
-      const unknownOptionsNames: string[] = Object.getOwnPropertyNames(unknownOptions);
-      unknownOptionsNames.forEach(o => {
-        headers[o] = unknownOptions[o];
-      });
+      this.addUnknownOptionsToPayload(headers, args.options);
 
       if (!headers.accept) {
         headers.accept = 'application/json';
