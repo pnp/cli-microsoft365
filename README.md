@@ -10,14 +10,14 @@
 </h4>
 
 <p align="center">
-  <a href="https://github.com/pnp/cli-microsoft365/actions?query=workflow%3A%22Release+next%22">
-    <img src="https://github.com/pnp/cli-microsoft365/workflows/Release%20next/badge.svg"
-      alt="GitHub" />
-  </a>
-
   <a href="https://aka.ms/cli-m365/discord">
     <img src="https://img.shields.io/badge/Discord-aka.ms/cli--m365/discord-7289da?style=flat-square"
       alt="Discord" />
+  </a>
+
+  <a href="https://bsky.app/profile/climicrosoft365.bsky.social">
+    <img src="https://img.shields.io/badge/Bsky-%40climicrosoft365.bsky.social-208bfe?style=flat-square"
+      alt="Bluesky" />
   </a>
 
   <a href="https://x.com/climicrosoft365">
@@ -27,6 +27,11 @@
 </p>
 
 <p align="center">
+  <a href="https://github.com/pnp/cli-microsoft365/actions?query=workflow%3A%22Release+next%22">
+    <img src="https://github.com/pnp/cli-microsoft365/workflows/Release%20next/badge.svg"
+      alt="GitHub" />
+  </a>
+  
   <a href="https://www.npmjs.com/package/@pnp/cli-microsoft365">
     <img src="https://img.shields.io/npm/v/@pnp/cli-microsoft365/latest?style=flat-square"
       alt="npm @pnp/cli-microsoft365@latest" />
@@ -101,7 +106,7 @@
   - Upgrade your projects
   - Check your environment compatibility
 
-> Follow our [X](https://x.com/climicrosoft365) account to keep yourself updated about new features, improvements, and bug fixes.
+> Follow our [Bluesky](https://bsky.app/profile/climicrosoft365.bsky.social), or [X](https://x.com/climicrosoft365) account to keep yourself updated about new features, improvements, and bug fixes.
 
 ## Install
 
