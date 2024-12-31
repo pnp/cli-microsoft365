@@ -73,6 +73,10 @@ describe(commands.APP_SET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
+  it('allows unknown options', () => {
+    assert.strictEqual(command.allowUnknownOptions(), true);
+  });
+
   it('updates uris for the specified appId', async () => {
     sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=appId eq 'bc724b77-da87-43a9-b385-6ebaaf969db8'&$select=id`) {
@@ -100,6 +104,46 @@ describe(commands.APP_SET, () => {
         debug: true,
         appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
         uris: 'https://contoso.com/bc724b77-da87-43a9-b385-6ebaaf969db8'
+      }
+    });
+  });
+
+  it('updates unknown options for the specified appId', async () => {
+    sinon.stub(request, 'get').callsFake(async opts => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=appId eq 'bc724b77-da87-43a9-b385-6ebaaf969db8'&$select=id`) {
+        return {
+          value: [{
+            id: '5b31c38c-2584-42f0-aa47-657fb3a84230'
+          }]
+        };
+      }
+
+      throw `Invalid request ${JSON.stringify(opts)}`;
+    });
+    sinon.stub(request, 'patch').callsFake(async opts => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230' &&
+        opts.data &&
+        Object.keys(opts.data).indexOf('extension_b7d8e648520f41d3b9c0fdeb91768a0a_jobGroupTracker') > -1 &&
+        opts.data.extension_b7d8e648520f41d3b9c0fdeb91768a0a_jobGroupTracker === 'JobGroupN') {
+        return;
+      }
+
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230' &&
+        opts.data &&
+        Object.keys(opts.data).indexOf('identifierUris') > -1 &&
+        opts.data.identifierUris[0] === 'https://contoso.com/bc724b77-da87-43a9-b385-6ebaaf969db8') {
+        return;
+      }
+
+      throw `Invalid request ${JSON.stringify(opts)}`;
+    });
+
+    await command.action(logger, {
+      options: {
+        debug: true,
+        appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
+        uris: 'https://contoso.com/bc724b77-da87-43a9-b385-6ebaaf969db8',
+        extension_b7d8e648520f41d3b9c0fdeb91768a0a_jobGroupTracker: 'JobGroupN'
       }
     });
   });
@@ -1280,7 +1324,15 @@ describe(commands.APP_SET, () => {
   });
 
   it('fails validation if objectId and name specified', async () => {
-    const actual = await command.validate({ options: { appObjectId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', appName: 'My app' } }, commandInfo);
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
+    const actual = await command.validate({ options: { objectId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', name: 'My app' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 

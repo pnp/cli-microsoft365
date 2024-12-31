@@ -203,6 +203,10 @@ describe(commands.APP_ADD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
+  it('allows unknown options', () => {
+    assert.strictEqual(command.allowUnknownOptions(), true);
+  });
+
   it('creates Microsoft Entra app reg with just the name', async () => {
     sinon.stub(request, 'get').rejects('Issues GET request');
     sinon.stub(request, 'patch').rejects('Issued PATCH request');
@@ -283,6 +287,97 @@ describe(commands.APP_ADD, () => {
     await command.action(logger, {
       options: {
         name: 'My Microsoft Entra app'
+      }
+    });
+    assert(loggerLogSpy.calledWith({
+      appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
+      objectId: '5b31c38c-2584-42f0-aa47-657fb3a84230',
+      tenantId: ''
+    }));
+  });
+
+  it('creates Microsoft Entra app reg with the name and directory extension', async () => {
+    sinon.stub(request, 'get').rejects('Issues GET request');
+    sinon.stub(request, 'patch').rejects('Issued PATCH request');
+    sinon.stub(request, 'post').callsFake(async opts => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
+        JSON.stringify(opts.data) === JSON.stringify({
+          "displayName": "My Microsoft Entra app",
+          "signInAudience": "AzureADMyOrg",
+          "extension_b7d8e648520f41d3b9c0fdeb91768a0a_jobGroupTracker": 'JobGroupN'
+        })) {
+        return {
+          "id": "5b31c38c-2584-42f0-aa47-657fb3a84230",
+          "deletedDateTime": null,
+          "appId": "bc724b77-da87-43a9-b385-6ebaaf969db8",
+          "applicationTemplateId": null,
+          "createdDateTime": "2020-12-31T14:44:13.7945807Z",
+          "displayName": "My Microsoft Entra app",
+          "description": null,
+          "groupMembershipClaims": null,
+          "identifierUris": [],
+          "isDeviceOnlyAuthSupported": null,
+          "isFallbackPublicClient": null,
+          "notes": null,
+          "optionalClaims": null,
+          "publisherDomain": "contoso.onmicrosoft.com",
+          "signInAudience": "AzureADMyOrg",
+          "tags": [],
+          "tokenEncryptionKeyId": null,
+          "verifiedPublisher": {
+            "displayName": null,
+            "verifiedPublisherId": null,
+            "addedDateTime": null
+          },
+          "spa": {
+            "redirectUris": []
+          },
+          "defaultRedirectUri": null,
+          "addIns": [],
+          "api": {
+            "acceptMappedClaims": null,
+            "knownClientApplications": [],
+            "requestedAccessTokenVersion": null,
+            "oauth2PermissionScopes": [],
+            "preAuthorizedApplications": []
+          },
+          "appRoles": [],
+          "info": {
+            "logoUrl": null,
+            "marketingUrl": null,
+            "privacyStatementUrl": null,
+            "supportUrl": null,
+            "termsOfServiceUrl": null
+          },
+          "keyCredentials": [],
+          "parentalControlSettings": {
+            "countriesBlockedForMinors": [],
+            "legalAgeGroupRule": "Allow"
+          },
+          "passwordCredentials": [],
+          "publicClient": {
+            "redirectUris": []
+          },
+          "requiredResourceAccess": [],
+          "web": {
+            "homePageUrl": null,
+            "logoutUrl": null,
+            "redirectUris": [],
+            "implicitGrantSettings": {
+              "enableAccessTokenIssuance": false,
+              "enableIdTokenIssuance": false
+            }
+          }
+        };
+      }
+
+      throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
+    });
+
+    await command.action(logger, {
+      options: {
+        name: 'My Microsoft Entra app',
+        extension_b7d8e648520f41d3b9c0fdeb91768a0a_jobGroupTracker: 'JobGroupN'
       }
     });
     assert(loggerLogSpy.calledWith({

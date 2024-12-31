@@ -57,6 +57,10 @@ describe(commands.GROUP_ADD, () => {
     "onPremisesProvisioningErrors": [],
     "serviceProvisioningErrors": []
   };
+  const microsoft365GroupWithDirectoryExtension = {
+    ...microsoft365Group,
+    extension_b7d8e648520f41d3b9c0fdeb91768a0a_jobGroupTracker: 'JobGroupN'
+  };
   const securityGroup = {
     "id": "bc91082e-73ad-4a97-9852-e66004c7b0b6",
     "deletedDateTime": null,
@@ -222,6 +226,10 @@ describe(commands.GROUP_ADD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
+  it('allows unknown options', () => {
+    assert.strictEqual(command.allowUnknownOptions(), true);
+  });
+
   it('fails validation if the length of displayName is more than 256 characters', async () => {
     const displayName = 'lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum';
     const actual = await command.validate({ options: { displayName: displayName, type: 'security' } }, commandInfo);
@@ -300,6 +308,28 @@ describe(commands.GROUP_ADD, () => {
 
     await command.action(logger, { options: { displayName: 'Microsoft 365 Group', description: 'Microsoft 365 group', mailNickname: 'Microsoft365Group', visibility: 'Public', type: 'microsoft365' } });
     assert(loggerLogSpy.calledWith(microsoft365Group));
+  });
+
+  it('successfully creates Microsoft 365 group with uknown options', async () => {
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/groups') {
+        return microsoft365GroupWithDirectoryExtension;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { displayName: 'Microsoft 365 Group', description: 'Microsoft 365 group', mailNickname: 'Microsoft365Group', visibility: 'Public', type: 'microsoft365', extension_b7d8e648520f41d3b9c0fdeb91768a0a_jobGroupTracker: 'JobGroupN' } });
+    assert.deepStrictEqual(postStub.lastCall.args[0].data, {
+      displayName: 'Microsoft 365 Group',
+      description: 'Microsoft 365 group',
+      mailNickName: 'Microsoft365Group',
+      visibility: 'Public',
+      groupTypes: ['Unified'],
+      mailEnabled: true,
+      securityEnabled: true,
+      extension_b7d8e648520f41d3b9c0fdeb91768a0a_jobGroupTracker: 'JobGroupN'
+    });
   });
 
   it('successfully creates security group without owners and members', async () => {

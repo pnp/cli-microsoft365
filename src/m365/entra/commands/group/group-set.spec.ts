@@ -71,6 +71,10 @@ describe(commands.GROUP_SET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
+  it('allows unknown options', () => {
+    assert.strictEqual(command.allowUnknownOptions(), true);
+  });
+
   it('fails validation if the length of newDisplayName is more than 256 characters', async () => {
     const displayName = 'lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum';
     const actual = await command.validate({ options: { id: groupId, newDisplayName: displayName } }, commandInfo);
@@ -158,6 +162,25 @@ describe(commands.GROUP_SET, () => {
       description: 'Microsoft 365 group',
       mailNickName: 'Microsoft365Group',
       visibility: 'Public'
+    });
+  });
+
+  it('successfully updates group specified by id with unknown options', async () => {
+    const patchRequestStub = sinon.stub(request, 'patch').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${groupId}`) {
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { id: groupId, description: 'Microsoft 365 group', mailNickname: 'Microsoft365Group', visibility: 'Public', newDisplayName: '365 group', extension_b7d8e648520f41d3b9c0fdeb91768a0a_jobGroupTracker: 'JobGroupN', verbose: true } });
+    assert.deepStrictEqual(patchRequestStub.lastCall.args[0].data, {
+      displayName: '365 group',
+      description: 'Microsoft 365 group',
+      mailNickName: 'Microsoft365Group',
+      visibility: 'Public',
+      extension_b7d8e648520f41d3b9c0fdeb91768a0a_jobGroupTracker: 'JobGroupN'
     });
   });
 

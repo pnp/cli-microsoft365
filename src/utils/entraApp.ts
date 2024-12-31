@@ -3,6 +3,7 @@ import fs from 'fs';
 import { Logger } from '../cli/Logger.js';
 import request, { CliRequestOptions } from '../request.js';
 import { odata } from './odata.js';
+import Command from '../Command.js';
 
 export interface AppInfo {
   appId: string;
@@ -214,12 +215,13 @@ function updateAppPermissions({ spId, resourceAccessPermission, oAuth2Permission
 
 export const entraApp = {
   appPermissions: [] as AppPermissions[],
-  createAppRegistration: async ({ options, apis, logger, verbose, debug }: {
+  createAppRegistration: async ({ options, apis, logger, verbose, debug, command }: {
     options: AppCreationOptions,
     apis: RequiredResourceAccess[],
     logger: Logger,
     verbose: boolean,
-    debug: boolean
+    debug: boolean,
+    command: Command
   }): Promise<AppInfo> => {
     const applicationInfo: any = {
       displayName: options.name,
@@ -262,6 +264,8 @@ export const entraApp = {
     if (options.allowPublicClientFlows) {
       applicationInfo.isFallbackPublicClient = true;
     }
+
+    command.addUnknownOptionsToPayload(applicationInfo, options);
 
     if (verbose) {
       await logger.logToStderr(`Creating Microsoft Entra app registration...`);
