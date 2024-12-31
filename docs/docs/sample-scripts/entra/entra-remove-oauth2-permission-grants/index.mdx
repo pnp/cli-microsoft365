@@ -1,0 +1,121 @@
+---
+tags:  
+  - entra
+  - oauth2
+  - permissions
+  - grants
+  - admin
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# Remove OAuth2 permission grants (granted for users) for a specified Entra ID application registration.
+
+Author: [Tobias Maestrini](https://github.com/tmaestrini)
+
+From an administrators perspective, managing OAuth2 permission grants that have been assigned to an application registration can be a challenging task.
+Sometimes it is necessary to remove permissions that are granted to users – for example when only administrators should define which permissions are granted to an app registration.
+When a user has been granted permissions to an application registration, it can be important to remove these permissions as soon as possible to prevent unauthorized access through the app registration.
+
+This script will remove all OAuth2 permission grants that have been assigned to a specified application registration and are granted to user(s).
+It also provides the option to remove all permissions or permission consents that have been granted by an administrator.
+
+The script first defines a function `Remove-UserPermissionsGrants` that does the necessary work described above and then calls this function with a predefined app registration name.
+
+<Tabs>
+  <TabItem value="PowerShell">
+
+  ```powershell
+  .SYNOPSIS
+    Removes OAuth2 permission grants for a specified Entra ID application registration.
+
+  .DESCRIPTION
+    This function removes OAuth2 permission grants (delegated permissions) from an Entra ID application registration.
+    It can filter and remove permissions based on how they were granted - either by admin consent, user consent, or both.
+
+  .PARAMETER appRegistrationName
+    The display name of the application registration in Entra ID from which to remove permission grants.
+    This parameter is mandatory.
+
+  .PARAMETER GrantType
+    Specifies which type of permission grants to remove. Valid values are:
+    - 'By Admin': Removes only permissions granted through admin consent (consentType = AllPrincipals)
+    - 'By User': Removes only permissions granted through user consent (consentType != AllPrincipals)
+    - 'All': Removes both admin and user consented permissions
+    Default value is: 'Granted By User'
+
+  .EXAMPLE
+    Remove-UserPermissionsGrants -appRegistrationName "My App"
+    Removes all user-consented permission grants for the application "My App"
+
+  .EXAMPLE
+    Remove-UserPermissionsGrants -appRegistrationName "My App" -GrantType "All"
+    Removes all permission grants (both admin and user consented) for the application "My App"
+
+  .EXAMPLE
+    Remove-UserPermissionsGrants -appRegistrationName "My App" -GrantType "By Admin"
+    Removes only admin-consented permission grants for the application "My App"
+
+  .NOTES
+    Prerequisites:
+    - Microsoft 365 CLI (m365) must be installed and configured
+    - User must have appropriate permissions in Entra ID to manage OAuth2 permission grants (e.g. Global Admin)
+
+  .LINK
+    https://learn.microsoft.com/en-us/azure/active-directory/manage-apps/manage-application-permissions
+  #>
+
+  function Remove-PermissionsGrants {
+    param(
+      [Parameter(Mandatory = $true)]
+      [string]$appRegistrationName,
+
+      [Parameter(Mandatory = $false)]
+      [ValidateSet('By Admin', 'By User', 'All')] $GrantType = 'By User'
+    )
+    
+    Clear-Host
+    Write-Host "Removing permission grants for the app registration '$appRegistrationName'"
+    Write-Host "Selected grant type: '$GrantType'`n"
+
+    # Get Service Principal that represents the app registration
+    $app = m365 entra enterpriseapp list --query "[?appDisplayName == '$($appRegistrationName)']" | ConvertFrom-Json
+
+    # Filter (delegated) permissions granted with according consent for the given service principal
+    $selectedPermissionsGrants = @()
+    if ($GrantType -eq 'All') {
+      $selectedPermissionsGrants = m365 entra oauth2grant list --spObjectId $app.id | ConvertFrom-Json
+    }
+    elseif ($GrantType -eq 'Granted By Admin') {
+      $selectedPermissionsGrants = m365 entra oauth2grant list --spObjectId $app.id --query "[?consentType == 'AllPrincipals']" | ConvertFrom-Json
+    }
+    else {
+      # granted by user
+      $selectedPermissionsGrants = m365 entra oauth2grant list --spObjectId $app.id --query "[?consentType != 'AllPrincipals']" | ConvertFrom-Json
+    }
+
+    Write-Host "👉 $($selectedPermissionsGrants.Length) definitions found"
+    
+    # Remove the filtered permissions
+    $selectedPermissionsGrants | ForEach-Object {
+      Write-Host "permission grant (ID) '$($_.id)': " -NoNewline
+      m365 entra oauth2grant remove --grantId $_.id --force
+      Write-Host "✔ Done" -ForegroundColor Green
+      Write-Host "⎿ " $_.scope.trim()
+    }
+
+    # Display success message
+    if($selectedPermissionsGrants.Length -gt 0) {
+      Write-Host "`n✔️ Successfully removed selected permissions" -ForegroundColor Green
+    }
+  }
+
+  # Set the app registration name for which to remove user consents
+  $appRegistrationName = 'My App'
+  Remove-UserPermissionsGrants -appRegistrationName $appRegistrationName
+  ```
+
+  </TabItem>
+</Tabs>
+
