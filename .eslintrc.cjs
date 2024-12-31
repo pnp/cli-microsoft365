@@ -118,6 +118,7 @@ const dictionary = [
   'unit',
   'url',
   'user',
+  'value',
   'web',
   'webhook'
 ];
