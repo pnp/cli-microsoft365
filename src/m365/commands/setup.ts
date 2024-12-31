@@ -314,7 +314,8 @@ class SetupCommand extends AnonymousCommand {
       apis,
       logger,
       verbose: this.verbose,
-      debug: this.debug
+      debug: this.debug,
+      command: this
     });
     appInfo.tenantId = accessToken.getTenantIdFromAccessToken(auth.connection.accessTokens[auth.defaultResource].accessToken);
     await entraApp.grantAdminConsent({

@@ -501,7 +501,7 @@ export default abstract class Command {
     });
   }
 
-  protected addUnknownOptionsToPayload(payload: any, options: any): void {
+  public addUnknownOptionsToPayload(payload: any, options: any): void {
     const unknownOptions: any = this.getUnknownOptions(options);
     const unknownOptionsNames: string[] = Object.getOwnPropertyNames(unknownOptions);
     unknownOptionsNames.forEach(o => {
