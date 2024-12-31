@@ -40,6 +40,10 @@ class EntraAppAddCommand extends GraphCommand {
     return 'Creates new Entra app registration';
   }
 
+  public allowUnknownOptions(): boolean | undefined {
+    return true;
+  }
+
   constructor() {
     super();
 
@@ -228,7 +232,8 @@ class EntraAppAddCommand extends GraphCommand {
         apis,
         logger,
         verbose: this.verbose,
-        debug: this.debug
+        debug: this.debug,
+        command: this
       });
       // based on the assumption that we're adding Microsoft Entra app to the current
       // directory. If we in the future extend the command with allowing

@@ -215,7 +215,8 @@ module.exports = {
           "Query.*",
           "app_displayname",
           "access_token",
-          "expires_on"
+          "expires_on",
+          "extension_*"
         ]
       }
     ],

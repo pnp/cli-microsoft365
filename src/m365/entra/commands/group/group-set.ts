@@ -38,6 +38,10 @@ class EntraGroupSetCommand extends GraphCommand {
     return 'Updates a Microsoft Entra group';
   }
 
+  public allowUnknownOptions(): boolean | undefined {
+    return true;
+  }
+
   constructor(){
     super();
 
@@ -195,17 +199,21 @@ class EntraGroupSetCommand extends GraphCommand {
         groupId = await entraGroup.getGroupIdByDisplayName(args.options.displayName);
       }
 
+      const requestBody = {
+        displayName: args.options.newDisplayName,
+        description: args.options.description === '' ? null : args.options.description,
+        mailNickName: args.options.mailNickname,
+        visibility: args.options.visibility
+      };
+
+      this.addUnknownOptionsToPayload(requestBody, args.options);
+
       const requestOptions: CliRequestOptions = {
         url: `${this.resource}/v1.0/groups/${groupId}`,
         headers: {
           accept: 'application/json;odata.metadata=none'
         },
-        data: {
-          displayName: args.options.newDisplayName,
-          description: args.options.description === '' ? null : args.options.description,
-          mailNickName: args.options.mailNickname,
-          visibility: args.options.visibility
-        }
+        data: requestBody
       };
 
       await request.patch(requestOptions);
