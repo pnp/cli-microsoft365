@@ -15,13 +15,17 @@ interface Options extends GlobalOptions {
   vivaConnectionsDefaultStart?: boolean;
 }
 
-class SpoHomeSiteSetCommand extends SpoCommand {
+class SpoTenantHomeSiteSetCommand extends SpoCommand {
   public get name(): string {
-    return commands.HOMESITE_SET;
+    return commands.TENANT_HOMESITE_SET;
   }
 
   public get description(): string {
     return 'Sets the specified site as the Home Site';
+  }
+
+  public alias(): string[] {
+    return ['spo homesite set'];
   }
 
   constructor() {
@@ -63,6 +67,7 @@ class SpoHomeSiteSetCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    await this.showDeprecationWarning(logger, this.alias()[0], this.getCommandName());
     try {
       if (this.verbose) {
         await logger.logToStderr(`Setting the SharePoint home site to: ${args.options.siteUrl}...`);
@@ -99,4 +104,4 @@ class SpoHomeSiteSetCommand extends SpoCommand {
   }
 }
 
-export default new SpoHomeSiteSetCommand();
+export default new SpoTenantHomeSiteSetCommand();

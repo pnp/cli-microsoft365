@@ -4,16 +4,21 @@ import { spo } from '../../../../utils/spo.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 
-class SpoHomeSiteGetCommand extends SpoCommand {
+class SpoTenantHomeSiteGetCommand extends SpoCommand {
   public get name(): string {
-    return commands.HOMESITE_GET;
+    return commands.TENANT_HOMESITE_GET;
   }
 
   public get description(): string {
     return 'Gets information about the Home Site';
   }
 
+  public alias(): string[] {
+    return ['spo homesite get'];
+  }
+
   public async commandAction(logger: Logger): Promise<void> {
+    await this.showDeprecationWarning(logger, this.alias()[0], this.getCommandName());
     try {
       const spoUrl = await spo.getSpoUrl(logger, this.debug);
       const requestOptions: CliRequestOptions = {
@@ -35,4 +40,4 @@ class SpoHomeSiteGetCommand extends SpoCommand {
   }
 }
 
-export default new SpoHomeSiteGetCommand();
+export default new SpoTenantHomeSiteGetCommand();

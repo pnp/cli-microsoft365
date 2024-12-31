@@ -2733,25 +2733,6 @@ const sidebars: SidebarsConfig = {
           ]
         },
         {
-          homesite: [
-            {
-              type: 'doc',
-              label: 'homesite get',
-              id: 'cmd/spo/homesite/homesite-get'
-            },
-            {
-              type: 'doc',
-              label: 'homesite remove',
-              id: 'cmd/spo/homesite/homesite-remove'
-            },
-            {
-              type: 'doc',
-              label: 'homesite set',
-              id: 'cmd/spo/homesite/homesite-set'
-            }
-          ]
-        },
-        {
           hubsite: [
             {
               type: 'doc',
@@ -3768,8 +3749,23 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
+              label: 'tenant homesite get',
+              id: 'cmd/spo/tenant/tenant-homesite-get'
+            },
+            {
+              type: 'doc',
               label: 'tenant homesite list',
               id: 'cmd/spo/tenant/tenant-homesite-list'
+            },
+            {
+              type: 'doc',
+              label: 'tenant homesite remove',
+              id: 'cmd/spo/tenant/tenant-homesite-remove'
+            },
+            {
+              type: 'doc',
+              label: 'tenant homesite set',
+              id: 'cmd/spo/tenant/tenant-homesite-set'
             },
             {
               type: 'doc',
