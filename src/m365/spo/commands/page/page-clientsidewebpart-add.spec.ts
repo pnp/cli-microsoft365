@@ -2605,6 +2605,42 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
     }));
   });
 
+  it('adds web part to an empty column in collapsible section when order 1 specified', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/team-a/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')`) {
+        return {
+          "IsPageCheckedOutToCurrentUser": true,
+          "CanvasContent1": `[{"id":"emptySection","position":{"controlIndex":1,"sectionFactor":12,"sectionIndex":1,"zoneIndex":1},"zoneGroupMetadata":{"type":1,"isExpanded":true,"showDividerLine":true,"iconAlignment":"left","displayName":"Test1"},"addedFromPersistedData":true},{"controlType":0,"pageSettingsSlice":{"isDefaultDescription":true,"isDefaultThumbnail":true,"isSpellCheckEnabled":true,"globalRichTextStylingVersion":0,"rtePageSettings":{"contentVersion":4,"indentationVersion":1},"isEmailReady":false,"webPartsPageSettings":{"isTitleHeadingLevelsEnabled":false}}}]`
+        };
+      }
+
+      if (opts.url === `https://contoso.sharepoint.com/sites/team-a/_api/web/getclientsidewebparts()`) {
+        return clientSideWebParts;
+      }
+
+      throw 'Invalid request';
+    });
+
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/team-a/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/SavePageAsDraft`) {
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger,
+      {
+        options: {
+          pageName: 'page.aspx',
+          webUrl: 'https://contoso.sharepoint.com/sites/team-a',
+          webPartId: 'e377ea37-9047-43b9-8cdb-a761be2f8e09',
+          order: 1
+        }
+      });
+    assert.strictEqual(replaceId(JSON.stringify(postStub.lastCall.args[0].data)), '{"CanvasContent1":"[{\\"controlType\\":3,\\"displayMode\\":2,\\"id\\":\\"89c644b3-f69c-4e84-85d7-dfa04c6163b5\\",\\"position\\":{\\"controlIndex\\":1,\\"sectionFactor\\":12,\\"sectionIndex\\":1,\\"zoneIndex\\":1},\\"webPartId\\":\\"e377ea37-9047-43b9-8cdb-a761be2f8e09\\",\\"emphasis\\":{},\\"webPartData\\":{\\"dataVersion\\":\\"1.0\\",\\"description\\":\\"Display a key location on a map\\",\\"id\\":\\"e377ea37-9047-43b9-8cdb-a761be2f8e09\\",\\"instanceId\\":\\"89c644b3-f69c-4e84-85d7-dfa04c6163b5\\",\\"properties\\":{\\"pushPins\\":[],\\"maxNumberOfPushPins\\":1,\\"shouldShowPushPinTitle\\":true,\\"zoomLevel\\":12,\\"mapType\\":\\"road\\"},\\"title\\":\\"Bing maps\\"},\\"zoneGroupMetadata\\":{\\"type\\":1,\\"isExpanded\\":true,\\"showDividerLine\\":true,\\"iconAlignment\\":\\"left\\",\\"displayName\\":\\"Test1\\"}},{\\"controlType\\":0,\\"pageSettingsSlice\\":{\\"isDefaultDescription\\":true,\\"isDefaultThumbnail\\":true,\\"isSpellCheckEnabled\\":true,\\"globalRichTextStylingVersion\\":0,\\"rtePageSettings\\":{\\"contentVersion\\":4,\\"indentationVersion\\":1},\\"isEmailReady\\":false,\\"webPartsPageSettings\\":{\\"isTitleHeadingLevelsEnabled\\":false}}}]"}');
+  });
+
   it('correctly handles sections in reverse order', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')`) > -1) {
