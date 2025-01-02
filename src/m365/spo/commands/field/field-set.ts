@@ -16,6 +16,7 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   id?: string;
   title?: string;
+  internalName?: string;
   listId?: string;
   listTitle?: string;
   listUrl?: string;
@@ -46,6 +47,7 @@ class SpoFieldSetCommand extends SpoCommand {
       Object.assign(this.telemetryProperties, {
         id: typeof args.options.id !== 'undefined',
         title: typeof args.options.title !== 'undefined',
+        internalName: typeof args.options.internalName !== 'undefined',
         listId: typeof args.options.listId !== 'undefined',
         listTitle: typeof args.options.listTitle !== 'undefined',
         listUrl: typeof args.options.listUrl !== 'undefined',
@@ -73,6 +75,9 @@ class SpoFieldSetCommand extends SpoCommand {
       },
       {
         option: '-t, --title [title]'
+      },
+      {
+        option: '--internalName [internalName]'
       },
       {
         option: '--updateExistingLists'
@@ -109,7 +114,7 @@ class SpoFieldSetCommand extends SpoCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push({ options: ['id', 'title'] });
+    this.optionSets.push({ options: ['id', 'title', 'internalName'] });
   }
 
   public allowUnknownOptions(): boolean | undefined {
@@ -158,7 +163,7 @@ class SpoFieldSetCommand extends SpoCommand {
       // retrieve column CSOM object id
       const fieldQuery: string = args.options.id ?
         `<Method Id="663" ParentId="7" Name="GetById"><Parameters><Parameter Type="Guid">${formatting.escapeXml(args.options.id)}</Parameter></Parameters></Method>` :
-        `<Method Id="663" ParentId="7" Name="GetByInternalNameOrTitle"><Parameters><Parameter Type="String">${formatting.escapeXml(args.options.name || args.options.title)}</Parameter></Parameters></Method>`;
+        `<Method Id="663" ParentId="7" Name="GetByInternalNameOrTitle"><Parameters><Parameter Type="String">${formatting.escapeXml(args.options.name || args.options.title || args.options.internalName)}</Parameter></Parameters></Method>`;
 
       let requestOptions: CliRequestOptions = {
         url: `${args.options.webUrl}/_vti_bin/client.svc/ProcessQuery`,
@@ -206,6 +211,7 @@ class SpoFieldSetCommand extends SpoCommand {
       'listUrl',
       'id',
       'title',
+      'internalName',
       'updateExistingLists',
       'debug',
       'verbose',
