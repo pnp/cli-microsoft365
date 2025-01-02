@@ -1,3 +1,4 @@
+import { Group } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
@@ -9,6 +10,7 @@ import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 import { RoleDefinition } from '../roledefinition/RoleDefinition.js';
 import { FileProperties } from './FileProperties.js';
+import { entraGroup } from '../../../../utils/entraGroup.js';
 
 interface CommandArgs {
   options: Options;
@@ -21,6 +23,8 @@ interface Options extends GlobalOptions {
   principalId?: number;
   upn?: string;
   groupName?: string;
+  entraGroupId?: string;
+  entraGroupName?: string;
   roleDefinitionId?: number;
   roleDefinitionName?: string;
 }
@@ -52,6 +56,8 @@ class SpoFileRoleAssignmentAddCommand extends SpoCommand {
         principalId: typeof args.options.principalId !== 'undefined',
         upn: typeof args.options.upn !== 'undefined',
         groupName: typeof args.options.groupName !== 'undefined',
+        entraGroupId: typeof args.options.entraGroupId !== 'undefined',
+        entraGroupName: typeof args.options.entraGroupName !== 'undefined',
         roleDefinitionId: typeof args.options.roleDefinitionId !== 'undefined',
         roleDefinitionName: typeof args.options.roleDefinitionName !== 'undefined'
       });
@@ -79,6 +85,12 @@ class SpoFileRoleAssignmentAddCommand extends SpoCommand {
         option: '--groupName [groupName]'
       },
       {
+        option: '--entraGroupId [entraGroupId]'
+      },
+      {
+        option: '--entraGroupName [entraGroupName]'
+      },
+      {
         option: '--roleDefinitionId [roleDefinitionId]'
       },
       {
@@ -103,6 +115,10 @@ class SpoFileRoleAssignmentAddCommand extends SpoCommand {
           return `Specified principalId ${args.options.principalId} is not a number`;
         }
 
+        if (args.options.entraGroupId && !validation.isValidGuid(args.options.entraGroupId)) {
+          return `'${args.options.entraGroupId}' is not a valid GUID for option entraGroupId`;
+        }
+
         if (args.options.roleDefinitionId && isNaN(args.options.roleDefinitionId)) {
           return `Specified roleDefinitionId ${args.options.roleDefinitionId} is not a number`;
         }
@@ -115,13 +131,13 @@ class SpoFileRoleAssignmentAddCommand extends SpoCommand {
   #initOptionSets(): void {
     this.optionSets.push(
       { options: ['fileId', 'fileUrl'] },
-      { options: ['principalId', 'upn', 'groupName'] },
+      { options: ['principalId', 'upn', 'groupName', 'entraGroupId', 'entraGroupName'] },
       { options: ['roleDefinitionId', 'roleDefinitionName'] }
     );
   }
 
   #initTypes(): void {
-    this.types.string.push('webUrl', 'fileUrl', 'fileId', 'upn', 'groupName', 'roleDefinitionName');
+    this.types.string.push('webUrl', 'fileUrl', 'fileId', 'upn', 'groupName', 'entraGroupId', 'entraGroupName', 'roleDefinitionName');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -139,6 +155,22 @@ class SpoFileRoleAssignmentAddCommand extends SpoCommand {
       else if (args.options.groupName) {
         const groupPrincipalId = await this.getGroupPrincipalId(args.options, logger);
         await this.addRoleAssignment(fileUrl, args.options.webUrl, groupPrincipalId, roleDefinitionId);
+      }
+      else if (args.options.entraGroupId || args.options.entraGroupName) {
+        if (this.verbose) {
+          await logger.logToStderr('Retrieving group information...');
+        }
+
+        let group: Group;
+        if (args.options.entraGroupId) {
+          group = await entraGroup.getGroupById(args.options.entraGroupId);
+        }
+        else {
+          group = await entraGroup.getGroupByDisplayName(args.options.entraGroupName!);
+        }
+
+        const entraSiteUser = await spo.ensureEntraGroup(args.options.webUrl, group);
+        await this.addRoleAssignment(fileUrl, args.options.webUrl, entraSiteUser.Id, roleDefinitionId);
       }
       else {
         await this.addRoleAssignment(fileUrl, args.options.webUrl, args.options.principalId!, roleDefinitionId);
