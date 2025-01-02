@@ -27,10 +27,6 @@ class SpoPageCopyCommand extends SpoCommand {
     return 'Creates a copy of a modern page or template';
   }
 
-  public defaultProperties(): string[] | undefined {
-    return ['Id', 'PageLayoutType', 'Title', 'Url'];
-  }
-
   constructor() {
     super();
 

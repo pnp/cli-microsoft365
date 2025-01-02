@@ -134,10 +134,6 @@ describe(commands.CARD_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('defines correct properties for the default output', () => {
-    assert.deepStrictEqual(command.defaultProperties(), ['name', 'cardid', 'publishdate', 'createdon', 'modifiedon']);
-  });
-
   it('fails validation if id is not a valid guid.', async () => {
     const actual = await command.validate({
       options: {

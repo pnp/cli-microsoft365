@@ -33,10 +33,6 @@ class PpCopilotGetCommand extends PowerPlatformCommand {
     return [commands.CHATBOT_GET];
   }
 
-  public defaultProperties(): string[] | undefined {
-    return ['name', 'botid', 'publishedon', 'createdon', 'modifiedon'];
-  }
-
   constructor() {
     super();
 

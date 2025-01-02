@@ -142,10 +142,6 @@ describe(commands.COPILOT_GET, () => {
     assert.deepStrictEqual(alias, [commands.CHATBOT_GET]);
   });
 
-  it('defines correct properties for the default output', () => {
-    assert.deepStrictEqual(command.defaultProperties(), ['name', 'botid', 'publishedon', 'createdon', 'modifiedon']);
-  });
-
   it('fails validation if id is not a valid guid.', async () => {
     const actual = await command.validate({
       options: {
