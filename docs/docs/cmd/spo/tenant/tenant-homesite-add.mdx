@@ -1,0 +1,97 @@
+import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# spo tenant homesite add
+
+Add a Home Site.
+
+## Usage
+
+```sh
+m365 spo tenant homesite add [options]
+```
+
+## Options
+
+<Global />
+
+## Examples
+
+Add a Home Site
+
+```sh
+m365 spo tenant homesite add --url "https://contoso.sharepoint.com/sites/testcomms"
+
+```
+
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  {
+    "Audiences": [],
+    "IsInDraftMode": true,
+    "IsVivaBackendSite": false,
+    "SiteId": "ca49054c-85f3-41eb-a290-46ffda8f219c",
+    "TargetedLicenseType": 0,
+    "Title": "testcommsite",
+    "Url": "https://contoso.sharepoint.com/sites/testcomms",
+    "VivaConnectionsDefaultStart": false,
+    "WebId": "256c4f0f-e372-47b4-a891-b4888e829e20"
+  }
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  Audiences                  : []
+  IsInDraftMode              : true
+  IsVivaBackendSite          : false
+  SiteId                     : ca49054c-85f3-41eb-a290-46ffda8f219c
+  TargetedLicenseType        : 0
+  Title                      : testcommsite
+  Url                        : https://contoso.sharepoint.com/sites/testcomms
+  VivaConnectionsDefaultStart: false
+  WebId                      : 256c4f0f-e372-47b4-a891-b4888e829e20
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  IsInDraftMode,IsVivaBackendSite,SiteId,TargetedLicenseType,Title,Url,VivaConnectionsDefaultStart,WebId
+  1,0,ca49054c-85f3-41eb-a290-46ffda8f219c,0,testcommsite,https://contoso.sharepoint.com/sites/testcomms,0,256c4f0f-e372-47b4-a891-b4888e829e20
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # spo tenant homesite add --url "https://contoso.sharepoint.com/sites/testcomms"
+
+  Date: 12/23/2024
+
+  ## testcommsite (https://contoso.sharepoint.com/sites/testcomms)
+
+  Property | Value
+  ---------|-------
+  IsInDraftMode | true
+  IsVivaBackendSite | false
+  SiteId | ca49054c-85f3-41eb-a290-46ffda8f219c
+  TargetedLicenseType | 0
+  Title | testcommsite
+  Url | https://contoso.sharepoint.com/sites/testcomms
+  VivaConnectionsDefaultStart | false
+  WebId | 256c4f0f-e372-47b4-a891-b4888e829e20
+  ```
+  </TabItem>
+</Tabs>
+
+## More information
+
+- SharePoint home sites [Viva Connections set up](https://learn.microsoft.com/en-us/viva/connections/set-up-admin-center)
+
