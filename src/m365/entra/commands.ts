@@ -115,6 +115,7 @@ export default {
   USER_REGISTRATIONDETAILS_LIST: `${prefix} user registrationdetails list`,
   USER_REMOVE: `${prefix} user remove`,
   USER_RECYCLEBINITEM_RESTORE: `${prefix} user recyclebinitem restore`,
+  USER_SESSION_REVOKE: `${prefix} user session revoke`,
   USER_SET: `${prefix} user set`,
   USER_SIGNIN_LIST: `${prefix} user signin list`
 };
