@@ -20,9 +20,9 @@ describe('utils/entraServicePrincipal', () => {
     ]);
   });
 
-  it('correctly get single service principal id by appId using getServicePrincipalIdFromFromAppId', async () => {
+  it('correctly get single service principal id by appId using getServicePrincipalFromAppId', async () => {
     sinon.stub(request, 'get').callsFake(async opts => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/servicePrincipals?$filter=appId eq '${appId}'&$select=id`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/servicePrincipals?$filter=appId eq '${appId}'`) {
         return {
           value: [
             {
@@ -35,13 +35,13 @@ describe('utils/entraServicePrincipal', () => {
       return 'Invalid Request';
     });
 
-    const actual = await entraServicePrincipal.getServicePrincipalIdFromAppId(appId);
-    assert.deepStrictEqual(actual, servicePrincipalId);
+    const actual = await entraServicePrincipal.getServicePrincipalFromAppId(appId);
+    assert.deepStrictEqual(actual.id, servicePrincipalId);
   });
 
-  it('correctly get single service principal id by appId using getServicePrincipalIdFromAppName', async () => {
+  it('correctly get single service principal id by appId using getServicePrincipalFromAppName', async () => {
     sinon.stub(request, 'get').callsFake(async opts => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/servicePrincipals?$filter=displayName eq '${formatting.encodeQueryParameter(appName)}'&$select=id`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/servicePrincipals?$filter=displayName eq '${formatting.encodeQueryParameter(appName)}'`) {
         return {
           value: [
             {
@@ -54,11 +54,11 @@ describe('utils/entraServicePrincipal', () => {
       return 'Invalid Request';
     });
 
-    const actual = await entraServicePrincipal.getServicePrincipalIdFromAppName(appName);
-    assert.deepStrictEqual(actual, servicePrincipalId);
+    const actual = await entraServicePrincipal.getServicePrincipalFromAppName(appName);
+    assert.deepStrictEqual(actual.id, servicePrincipalId);
   });
 
-  it('handles selecting single service principal when multiple servicePrincipals with the specified name found using getServicePrincipalIdFromAppName and cli is set to prompt', async () => {
+  it('handles selecting single service principal when multiple servicePrincipals with the specified name found using getServicePrincipalFromAppName and cli is set to prompt', async () => {
     sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/servicePrincipals?$filter=displayName eq '${formatting.encodeQueryParameter(appName)}'&$select=id`) {
         return {
@@ -74,11 +74,11 @@ describe('utils/entraServicePrincipal', () => {
 
     sinon.stub(cli, 'handleMultipleResultsFound').resolves({ id: secondServicePrincipalId });
 
-    const actual = await entraServicePrincipal.getServicePrincipalIdFromAppName(appName);
-    assert.deepStrictEqual(actual, secondServicePrincipalId);
+    const actual = await entraServicePrincipal.getServicePrincipalFromAppName(appName, 'id');
+    assert.deepStrictEqual(actual.id, secondServicePrincipalId);
   });
 
-  it('throws error message when no service principal was found using getServicePrincipalIdFromFromAppId', async () => {
+  it('throws error message when no service principal was found using getServicePrincipalFromAppId', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/servicePrincipals?$filter=appId eq '${appId}'&$select=id`) {
         return { value: [] };
@@ -87,22 +87,22 @@ describe('utils/entraServicePrincipal', () => {
       throw 'Invalid Request';
     });
 
-    await assert.rejects(entraServicePrincipal.getServicePrincipalIdFromAppId(appId)), Error(`App with appId '${appId}' not found in Microsoft Entra ID`);
+    await assert.rejects(entraServicePrincipal.getServicePrincipalFromAppId(appId, 'id')), Error(`App with appId '${appId}' not found in Microsoft Entra ID`);
   });
 
-  it('throws error message when no service principal was found using getServicePrincipalIdFromAppName', async () => {
+  it('throws error message when no service principal was found using getServicePrincipalFromAppName', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/servicePrincipals?$filter=displayName eq '${formatting.encodeQueryParameter(appName)}'&$select=id`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/servicePrincipals?$filter=displayName eq '${formatting.encodeQueryParameter(appName)}'`) {
         return { value: [] };
       }
 
       throw 'Invalid Request';
     });
 
-    await assert.rejects(entraServicePrincipal.getServicePrincipalIdFromAppName(appName)), Error(`Service principal with name '${appName}' not found in Microsoft Entra ID`);
+    await assert.rejects(entraServicePrincipal.getServicePrincipalFromAppName(appName)), Error(`Service principal with name '${appName}' not found in Microsoft Entra ID`);
   });
 
-  it('throws error message when multiple service principals were found using getServicePrincipalIdFromAppName', async () => {
+  it('throws error message when multiple service principals were found using getServicePrincipalFromAppName', async () => {
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
       if (settingName === settingsNames.prompt) {
         return false;
@@ -112,7 +112,7 @@ describe('utils/entraServicePrincipal', () => {
     });
 
     sinon.stub(request, 'get').callsFake(async opts => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/servicePrincipals?$filter=displayName eq '${formatting.encodeQueryParameter(appName)}'&$select=id`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/servicePrincipals?$filter=displayName eq '${formatting.encodeQueryParameter(appName)}'`) {
         return {
           value: [
             { id: servicePrincipalId },
@@ -124,6 +124,6 @@ describe('utils/entraServicePrincipal', () => {
       return 'Invalid Request';
     });
 
-    await assert.rejects(entraServicePrincipal.getServicePrincipalIdFromAppName(appName), Error(`Multiple service principals with name '${appName}' found in Microsoft Entra ID. Found: ${servicePrincipalId}, ${secondServicePrincipalId}.`));
+    await assert.rejects(entraServicePrincipal.getServicePrincipalFromAppName(appName), Error(`Multiple service principals with name '${appName}' found in Microsoft Entra ID. Found: ${servicePrincipalId}, ${secondServicePrincipalId}.`));
   });
 });
