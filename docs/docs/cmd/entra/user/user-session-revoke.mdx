@@ -1,0 +1,57 @@
+import Global from '/docs/cmd/_global.mdx';
+
+# entra user session revoke
+
+Revokes all sign-in sessions for a given user
+
+## Usage
+
+```sh
+m365 entra user session revoke [options]
+```
+
+## Options
+```md definition-list
+`-i, --id [id]`
+: The id of the user. Specify either `id` or `userName`, but not both.
+
+`-n, --userName [userName]`
+: The user principal name of the user. Specify either `id` or `userName`, but not both.
+
+`-f, --force`
+: Don't prompt for confirmation.
+```
+
+<Global />
+
+## Remarks
+
+:::info
+
+Only the user with Global Administrator role can revoke sign-in sessions of other users.
+
+:::
+
+## Examples
+
+Revoke sign-in sessions of a user specified by id
+
+```sh
+m365 entra user session revoke --id 4fb72b9b-d0b0-4a35-8bc1-83f9a6488c48
+```
+
+Revoke sign-in sessions of a user specified by its UPN
+
+```sh
+m365 entra user session revoke --userName john.doe@contoso.onmicrosoft.com
+```
+
+Revoke sign-in sessions of a user specified by its UPN without prompting for confirmation.
+
+```sh
+m365 entra user session revoke --userName john.doe@contoso.onmicrosoft.com --force
+```
+
+## Response
+
+The command won't return a response on success

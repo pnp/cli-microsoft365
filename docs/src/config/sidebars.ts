@@ -759,6 +759,11 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
+              label: 'user session revoke',
+              id: 'cmd/entra/user/user-session-revoke'
+            },
+            {
+              type: 'doc',
               label: 'user signin list',
               id: 'cmd/entra/user/user-signin-list'
             }
