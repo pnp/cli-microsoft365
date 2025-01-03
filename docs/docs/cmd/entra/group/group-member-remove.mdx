@@ -14,16 +14,22 @@ m365 entra group member remove [options]
 
 ```md definition-list
 `-i, --groupId [groupId]`
-: The ID of the Entra ID group. Specify `groupId` or `groupDisplayName` but not both.
+: The ID of the Entra ID group. Specify `groupId` or `groupName` but not both.
 
-`-n, --groupDisplayName [groupDisplayName]`
-: The display name of the Entra ID group. Specify `groupId` or `groupDisplayName` but not both.
+`-n, --groupName [groupName]`
+: The display name of the Entra ID group. Specify `groupId` or `groupName` but not both.
 
-`--ids [ids]`
-: Entra ID IDs of users. You can also pass a comma-separated list of IDs. Specify either `ids` or `userNames` but not both.
+`--userIds [userIds]`
+: Microsoft Entra user IDs. You can also pass a comma-separated list of IDs. Specify either `userIds`, `userNames`, `subgroupIds` or `subgroupNames` but not multiple.
 
 `--userNames [userNames]`
-: The user principal names of users. You can also pass a comma-separated list of UPNs. Specify either `ids` or `userNames` but not both.
+: The user principal names of users. You can also pass a comma-separated list of UPNs. Specify either `userIds`, `userNames`, `subgroupIds` or `subgroupNames` but not multiple.
+
+`--subgroupIds [subgroupIds]`
+: Microsoft Entra group IDs. You can also pass a comma-separated list of IDs. Specify either `userIds`, `userNames`, `subgroupIds` or `subgroupNames` but not multiple.
+
+`--subgroupNames [subgroupNames]`
+: The display names of Microsoft Entra groups. You can also pass a comma-separated list of group display names. Specify either `userIds`, `userNames`, `subgroupIds` or `subgroupNames` but not multiple.
 
 `-r, --role [role]`
 : The role to be removed from the users. Valid values: `Owner`, `Member`. Defaults to both.
@@ -52,19 +58,19 @@ Without using this option, you would need to manually verify the user's role in 
 Remove a single user specified by ID as member from a group specified by display name
 
 ```sh
-m365 entra group member remove --groupDisplayName Developers --ids 098b9f52-f48c-4401-819f-29c33794c3f5 --role Member
+m365 entra group member remove --groupName Developers --userIds 098b9f52-f48c-4401-819f-29c33794c3f5 --role Member
 ```
 
 Remove multiple users specified by ID from a group specified by ID
 
 ```sh
-m365 entra group member remove --groupId a03c0c35-ef9a-419b-8cab-f89e0a8d2d2a --ids "098b9f52-f48c-4401-819f-29c33794c3f5,f1e06e31-3abf-4746-83c2-1513d71f38b8"
+m365 entra group member remove --groupId a03c0c35-ef9a-419b-8cab-f89e0a8d2d2a --userIds "098b9f52-f48c-4401-819f-29c33794c3f5,f1e06e31-3abf-4746-83c2-1513d71f38b8"
 ```
 
 Remove a single user specified by UPN as an owner from a group specified by display name
 
 ```sh
-m365 entra group member remove --groupDisplayName Developers --userNames john.doe@contoso.com --role Owner
+m365 entra group member remove --groupName Developers --userNames john.doe@contoso.com --role Owner
 ```
 
 Remove multiple users specified by UPN from a group specified by ID
@@ -76,7 +82,13 @@ m365 entra group member remove --groupId a03c0c35-ef9a-419b-8cab-f89e0a8d2d2a --
 Remove a single user specified by ID as owner and member of the group and suppress errors when the user was not found as owner or member
 
 ```sh
-m365 entra group member remove --groupDisplayName Developers --ids 098b9f52-f48c-4401-819f-29c33794c3f5 --suppressNotFound
+m365 entra group member remove --groupName Developers --userIds 098b9f52-f48c-4401-819f-29c33794c3f5 --suppressNotFound
+```
+
+Remove 2 nested groups referenced by id from a security group
+
+```sh
+m365 entra group member remove --groupName Developers --subgroupIds "b51b6157-839f-4d92-8dab-ac61b53c6c40,1e793f86-8dc6-4df6-8037-649ef9a22330" --role Member
 ```
 
 ## Response

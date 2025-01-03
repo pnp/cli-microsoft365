@@ -15,9 +15,11 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   groupId?: string;
-  groupDisplayName?: string;
-  ids?: string;
+  groupName?: string;
+  userIds?: string;
   userNames?: string;
+  subgroupIds?: string;
+  subgroupNames?: string;
   role?: string;
   suppressNotFound?: boolean;
   force?: boolean;
@@ -48,9 +50,11 @@ class EntraGroupMemberRemoveCommand extends GraphCommand {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
         groupId: typeof args.options.groupId !== 'undefined',
-        groupDisplayName: typeof args.options.groupDisplayName !== 'undefined',
-        ids: typeof args.options.ids !== 'undefined',
+        groupName: typeof args.options.groupName !== 'undefined',
+        userIds: typeof args.options.userIds !== 'undefined',
         userNames: typeof args.options.userNames !== 'undefined',
+        subgroupIds: typeof args.options.subgroupIds !== 'undefined',
+        subgroupNames: typeof args.options.subgroupNames !== 'undefined',
         role: typeof args.options.role !== 'undefined',
         suppressNotFound: !!args.options.suppressNotFound,
         force: !!args.options.force
@@ -64,13 +68,19 @@ class EntraGroupMemberRemoveCommand extends GraphCommand {
         option: '-i, --groupId [groupId]'
       },
       {
-        option: '-n, --groupDisplayName [groupDisplayName]'
+        option: '-n, --groupName [groupName]'
       },
       {
-        option: '--ids [ids]'
+        option: '--userIds [userIds]'
       },
       {
         option: '--userNames [userNames]'
+      },
+      {
+        option: '--subgroupIds [subgroupIds]'
+      },
+      {
+        option: '--subgroupNames [subgroupNames]'
       },
       {
         option: '-r, --role [role]',
@@ -92,8 +102,8 @@ class EntraGroupMemberRemoveCommand extends GraphCommand {
           return `'${args.options.groupId}' is not a valid GUID for option 'groupId'.`;
         }
 
-        if (args.options.ids !== undefined) {
-          const invalidGuids = validation.isValidGuidArray(args.options.ids);
+        if (args.options.userIds !== undefined) {
+          const invalidGuids = validation.isValidGuidArray(args.options.userIds);
           if (invalidGuids !== true) {
             return `Invalid GUIDs found for option 'ids': ${invalidGuids}.`;
           }
@@ -106,8 +116,19 @@ class EntraGroupMemberRemoveCommand extends GraphCommand {
           }
         }
 
+        if (args.options.subgroupIds !== undefined) {
+          const invalidGuids = validation.isValidGuidArray(args.options.subgroupIds);
+          if (invalidGuids !== true) {
+            return `Invalid GUIDs found for option 'subgroupIds': ${invalidGuids}.`;
+          }
+        }
+
         if (args.options.role !== undefined && this.roleValues.indexOf(args.options.role) === -1) {
           return `Option 'role' must be one of the following values: ${this.roleValues.join(', ')}.`;
+        }
+
+        if ((args.options.subgroupIds !== undefined || args.options.subgroupNames !== undefined) && args.options.role?.toLowerCase() !== 'member') {
+          return `When removing subgroups, the 'role' option must be set to 'Member'.`;
         }
 
         return true;
@@ -117,13 +138,13 @@ class EntraGroupMemberRemoveCommand extends GraphCommand {
 
   #initOptionSets(): void {
     this.optionSets.push(
-      { options: ['groupId', 'groupDisplayName'] },
-      { options: ['ids', 'userNames'] }
+      { options: ['groupId', 'groupName'] },
+      { options: ['userIds', 'userNames', 'subgroupIds', 'subgroupNames'] }
     );
   }
 
   #initTypes(): void {
-    this.types.string.push('groupId', 'groupDisplayName', 'ids', 'userNames', 'role');
+    this.types.string.push('groupId', 'groupName', 'ids', 'userNames', 'subgroupIds', 'subgroupNames', 'role');
     this.types.boolean.push('force', 'suppressNotFound');
   }
 
@@ -131,11 +152,11 @@ class EntraGroupMemberRemoveCommand extends GraphCommand {
     try {
       const removeUsers = async (): Promise<void> => {
         if (this.verbose) {
-          await logger.logToStderr(`Removing user(s) ${args.options.ids || args.options.userNames} from group ${args.options.groupId || args.options.groupDisplayName}...`);
+          await logger.logToStderr(`Removing user(s) ${args.options.userIds || args.options.userNames || args.options.subgroupIds || args.options.subgroupNames} from group ${args.options.groupId || args.options.groupName}...`);
         }
 
         const groupId = await this.getGroupId(logger, args.options);
-        const userIds = await this.getUserIds(logger, args.options);
+        const userIds = await this.getPrincipalIds(logger, args.options);
 
         const endpoints = [];
         if (!args.options.role || args.options.role === 'Owner') {
@@ -179,9 +200,9 @@ class EntraGroupMemberRemoveCommand extends GraphCommand {
         await removeUsers();
       }
       else {
-        const users = args.options.ids || args.options.userNames;
-        const userList = users!.split(',');
-        const result = await cli.promptForConfirmation({ message: `Are you sure you want to remove ${userList.length} user(s) from group '${args.options.groupId || args.options.groupDisplayName}'?` });
+        const principals = args.options.userIds || args.options.userNames || args.options.subgroupIds || args.options.subgroupNames;
+        const principalsList = principals!.split(',');
+        const result = await cli.promptForConfirmation({ message: `Are you sure you want to remove ${principalsList.length} principal(s) from group '${args.options.groupId || args.options.groupName}'?` });
 
         if (result) {
           await removeUsers();
@@ -199,22 +220,40 @@ class EntraGroupMemberRemoveCommand extends GraphCommand {
     }
 
     if (this.verbose) {
-      await logger.logToStderr(`Retrieving ID of group '${options.groupDisplayName}'...`);
+      await logger.logToStderr(`Retrieving ID of group '${options.groupName}'...`);
     }
 
-    return entraGroup.getGroupIdByDisplayName(options.groupDisplayName!);
+    return entraGroup.getGroupIdByDisplayName(options.groupName!);
   }
 
-  private async getUserIds(logger: Logger, options: Options): Promise<string[]> {
-    if (options.ids) {
-      return options.ids.split(',').map(i => i.trim());
+  private async getPrincipalIds(logger: Logger, options: Options): Promise<string[]> {
+    if (options.userIds) {
+      return options.userIds.split(',').map(i => i.trim());
     }
 
+    if (options.subgroupIds) {
+      return options.subgroupIds.split(',').map(i => i.trim());
+    }
+
+    if (options.userNames) {
+      if (this.verbose) {
+        await logger.logToStderr('Retrieving ID(s) of user(s)...');
+      }
+
+      return entraUser.getUserIdsByUpns(options.userNames!.split(',').map(u => u.trim()));
+    }
+
+    // Subgroup names were specified
     if (this.verbose) {
-      await logger.logToStderr('Retrieving ID(s) of user(s)...');
+      await logger.logToStderr('Retrieving ID(s) of subgroup(s)...');
     }
 
-    return entraUser.getUserIdsByUpns(options.userNames!.split(',').map(u => u.trim()));
+    const subGroupIds: string[] = [];
+    for (const subgroupName of options.subgroupNames!.split(',')) {
+      const groupId = await entraGroup.getGroupIdByDisplayName(subgroupName.trim());
+      subGroupIds.push(groupId);
+    }
+    return subGroupIds;
   }
 }
 
