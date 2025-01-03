@@ -9,6 +9,7 @@ export default {
   PEOPLE_PROFILECARDPROPERTY_REMOVE: `${prefix} people profilecardproperty remove`,
   PEOPLE_PROFILECARDPROPERTY_SET: `${prefix} people profilecardproperty set`,
   PEOPLE_PRONOUNS_GET: `${prefix} people pronouns get`,
+  PEOPLE_PRONOUNS_SET: `${prefix} people pronouns set`,
   REPORT_ACTIVEUSERCOUNTS: `${prefix} report activeusercounts`,
   REPORT_ACTIVEUSERDETAIL: `${prefix} report activeuserdetail`,
   REPORT_OFFICE365ACTIVATIONCOUNTS: `${prefix} report office365activationcounts`,

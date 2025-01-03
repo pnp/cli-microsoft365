@@ -930,6 +930,11 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'people pronouns get',
               id: 'cmd/tenant/people/people-pronouns-get'
+            },
+            {
+              type: 'doc',
+              label: 'people pronouns set',
+              id: 'cmd/tenant/people/people-pronouns-set'
             }
           ]
         },
