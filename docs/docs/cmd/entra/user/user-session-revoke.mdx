@@ -12,11 +12,11 @@ m365 entra user session revoke [options]
 
 ## Options
 ```md definition-list
-`-i, --id [id]`
-: The id of the user. Specify either `id` or `userName`, but not both.
+`-i, --userId [userId]`
+: The id of the user. Specify either `userId` or `userName`, but not both.
 
 `-n, --userName [userName]`
-: The user principal name of the user. Specify either `id` or `userName`, but not both.
+: The user principal name of the user. Specify either `userId` or `userName`, but not both.
 
 `-f, --force`
 : Don't prompt for confirmation.
@@ -37,7 +37,7 @@ Only the user with Global Administrator role can revoke sign-in sessions of othe
 Revoke sign-in sessions of a user specified by id
 
 ```sh
-m365 entra user session revoke --id 4fb72b9b-d0b0-4a35-8bc1-83f9a6488c48
+m365 entra user session revoke --userId 4fb72b9b-d0b0-4a35-8bc1-83f9a6488c48
 ```
 
 Revoke sign-in sessions of a user specified by its UPN

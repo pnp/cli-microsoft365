@@ -77,9 +77,9 @@ describe(commands.USER_SESSION_REVOKE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if id is not a valid GUID', () => {
+  it('fails validation if userId is not a valid GUID', () => {
     const actual = commandOptionsSchema.safeParse({
-      id: 'foo'
+      userId: 'foo'
     });
     assert.notStrictEqual(actual.success, true);
   });
@@ -91,21 +91,21 @@ describe(commands.USER_SESSION_REVOKE, () => {
     assert.notStrictEqual(actual.success, true);
   });
 
-  it('fails validation if both id and userName are provided', () => {
+  it('fails validation if both userId and userName are provided', () => {
     const actual = commandOptionsSchema.safeParse({
-      id: userId,
+      userId: userId,
       userName: userName
     });
     assert.notStrictEqual(actual.success, true);
   });
 
-  it('fails validation if neither id nor userName is provided', () => {
+  it('fails validation if neither userId nor userName is provided', () => {
     const actual = commandOptionsSchema.safeParse({});
     assert.notStrictEqual(actual.success, true);
   });
 
   it('prompts before revoking all sign-in sessions when confirm option not passed', async () => {
-    await command.action(logger, { options: { id: userId } });
+    await command.action(logger, { options: { userId: userId } });
 
     assert(promptIssued);
   });
@@ -113,11 +113,11 @@ describe(commands.USER_SESSION_REVOKE, () => {
   it('aborts revoking all sign-in sessions when prompt not confirmed', async () => {
     const deleteSpy = sinon.stub(request, 'delete').resolves();
 
-    await command.action(logger, { options: { id: userId } });
+    await command.action(logger, { options: { userId: userId } });
     assert(deleteSpy.notCalled);
   });
 
-  it('revokes all sign-in sessions for a user specified by id without prompting for confirmation', async () => {
+  it('revokes all sign-in sessions for a user specified by userId without prompting for confirmation', async () => {
     const postRequestStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users/${userId}/revokeSignInSessions`) {
         return;
@@ -126,7 +126,7 @@ describe(commands.USER_SESSION_REVOKE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { id: userId, force: true, verbose: true } });
+    await command.action(logger, { options: { userId: userId, force: true, verbose: true } });
     assert(postRequestStub.called);
   });
 
@@ -159,7 +159,7 @@ describe(commands.USER_SESSION_REVOKE, () => {
     assert(postRequestStub.called);
   });
 
-  it('handles error when user specified by id was not found', async () => {
+  it('handles error when user specified by userId was not found', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users/${userId}/revokeSignInSessions`) {
         throw {
@@ -177,7 +177,7 @@ describe(commands.USER_SESSION_REVOKE, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await assert.rejects(
-      command.action(logger, { options: { id: userId } }),
+      command.action(logger, { options: { userId: userId } }),
       new CommandError(`Resource '${userId}' does not exist or one of its queried reference-property objects are not present.`)
     );
   });

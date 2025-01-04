@@ -11,7 +11,7 @@ import { cli } from '../../../../cli/cli.js';
 
 const options = globalOptionsZod
   .extend({
-    id: zod.alias('i', z.string().optional()),
+    userId: zod.alias('i', z.string().optional()),
     userName: zod.alias('n', z.string().optional()),
     force: zod.alias('f', z.boolean().optional())
   })
@@ -35,25 +35,25 @@ class EntraUserSessionRevokeCommand extends GraphCommand {
   }
   public getRefinedSchema(schema: typeof options): z.ZodEffects<any> | undefined {
     return schema
-      .refine(options => !options.id !== !options.userName, {
-        message: 'Specify either id or userName, but not both'
+      .refine(options => !options.userId !== !options.userName, {
+        message: 'Specify either userId or userName, but not both'
       })
-      .refine(options => options.id || options.userName, {
-        message: 'Specify either id or userName'
+      .refine(options => options.userId || options.userName, {
+        message: 'Specify either userId or userName'
       })
-      .refine(options => (!options.id && !options.userName) || options.userName || (options.id && validation.isValidGuid(options.id)), options => ({
-        message: `The '${options.id}' must be a valid GUID`,
-        path: ['id']
+      .refine(options => (!options.userId && !options.userName) || options.userName || (options.userId && validation.isValidGuid(options.userId)), options => ({
+        message: `The '${options.userId}' must be a valid GUID`,
+        path: ['userId']
       }))
-      .refine(options => (!options.id && !options.userName) || options.id || (options.userName && validation.isValidUserPrincipalName(options.userName)), options => ({
+      .refine(options => (!options.userId && !options.userName) || options.userId || (options.userName && validation.isValidUserPrincipalName(options.userName)), options => ({
         message: `The '${options.userName}' must be a valid UPN`,
-        path: ['id']
+        path: ['userId']
       }));
   }
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const revokeUserSessions = async (): Promise<void> => {
       try {
-        let userIdOrPrincipalName = args.options.id;
+        let userIdOrPrincipalName = args.options.userId;
 
         if (args.options.userName) {
           // single user can be retrieved also by user principal name
@@ -87,7 +87,7 @@ class EntraUserSessionRevokeCommand extends GraphCommand {
       await revokeUserSessions();
     }
     else {
-      const result = await cli.promptForConfirmation({ message: `Are you sure you want to invalidate all the refresh tokens issued to applications for a user '${args.options.id || args.options.userName}'?` });
+      const result = await cli.promptForConfirmation({ message: `Are you sure you want to invalidate all the refresh tokens issued to applications for a user '${args.options.userId || args.options.userName}'?` });
 
       if (result) {
         await revokeUserSessions();
