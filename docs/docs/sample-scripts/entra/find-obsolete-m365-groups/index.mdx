@@ -301,7 +301,7 @@ Use this script to create a report of all M365 groups that are possibly obsolete
       [Parameter(Mandatory = $true)] [GroupInfo] $Group
     )
     
-    $exportObject = [ordered] @{
+    $exportObject = [PSCustomObject][ordered] @{
       "Group Name"              = $Group.Reference.displayName
       Description               = $Group.Reference.description
       "Managed by"              = $Group.Membership.Owners ? $Group.Membership.Owners.displayName -join ", " : "n/a"
