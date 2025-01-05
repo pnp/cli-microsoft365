@@ -17,7 +17,6 @@ import { cli } from '../../../../cli/cli.js';
 describe(commands.USER_SESSION_REVOKE, () => {
   const userId = 'abcd1234-de71-4623-b4af-96380a352509';
   const userName = 'john.doe@contoso.com';
-  const userNameWithDollar = "$john.doe@contoso.com";
 
   let log: string[];
   let logger: Logger;
@@ -119,7 +118,7 @@ describe(commands.USER_SESSION_REVOKE, () => {
 
   it('revokes all sign-in sessions for a user specified by userId without prompting for confirmation', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users/${userId}/revokeSignInSessions`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users('${userId}')/revokeSignInSessions`) {
         return {
           value: true
         };
@@ -134,7 +133,7 @@ describe(commands.USER_SESSION_REVOKE, () => {
 
   it('revokes all sign-in sessions for a user specified by UPN while prompting for confirmation', async () => {
     const postRequestStub = sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users/${userName}/revokeSignInSessions`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users('${userName}')/revokeSignInSessions`) {
         return {
           value: true
         };
@@ -147,21 +146,6 @@ describe(commands.USER_SESSION_REVOKE, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, { options: { userName: userName } });
-    assert(postRequestStub.calledOnce);
-  });
-
-  it('revokes all sign-in sessions for a user specified by UPN which starts with $ without prompting for confirmation', async () => {
-    const postRequestStub = sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users('${userNameWithDollar}')/revokeSignInSessions`) {
-        return {
-          value: true
-        };
-      }
-
-      throw 'Invalid request';
-    });
-
-    await command.action(logger, { options: { userName: userNameWithDollar, force: true, verbose: true } });
     assert(postRequestStub.calledOnce);
   });
 

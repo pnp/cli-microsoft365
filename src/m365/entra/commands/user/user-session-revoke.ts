@@ -51,13 +51,8 @@ class EntraUserSessionRevokeCommand extends GraphCommand {
           await logger.logToStderr(`Invalidating all the refresh tokens for user ${userIdentifier}...`);
         }
 
-        // user principal name can start with $ but it violates the OData URL convention, so it must be enclosed in parenthesis and single quotes
-        const requestUrl = userIdentifier!.startsWith('$')
-          ? `${this.resource}/v1.0/users('${userIdentifier}')/revokeSignInSessions`
-          : `${this.resource}/v1.0/users/${userIdentifier}/revokeSignInSessions`;
-
         const requestOptions: CliRequestOptions = {
-          url: requestUrl,
+          url: `${this.resource}/v1.0/users('${userIdentifier}')/revokeSignInSessions`,
           headers: {
             accept: 'application/json;odata.metadata=none'
           },
