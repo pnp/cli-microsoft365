@@ -74,7 +74,7 @@ Use this script to create a report of all M365 groups that are possibly obsolete
     Write-Host "🚀 Generating report of obsolete M365 groups within your organization"
 
     # define globals
-    $Global:Path
+    if ($null -eq $Global:Path) { $Global:Path = $null }
     $Script:ReportPath = $null
     $Script:Groups = @()
     $Script:Guests = @()
