@@ -43,6 +43,20 @@ class SpoTenantHomeSiteAddCommand extends SpoCommand {
     this.options.unshift(
       {
         option: '-u, --url <url>'
+      },
+      {
+        option: '--isInDraftMode [isInDraftMode]',
+        autocomplete: ['true', 'false']
+      },
+      {
+        option: '--vivaConnectionsDefaultStart [vivaConnectionsDefaultStart]',
+        autocomplete: ['true', 'false']
+      },
+      {
+        option: '--audiences [audiences]'
+      },
+      {
+        option: '--order [order]'
       }
     );
   }
@@ -54,6 +68,18 @@ class SpoTenantHomeSiteAddCommand extends SpoCommand {
         if (isValidSharePointUrl !== true) {
           return isValidSharePointUrl;
         }
+
+        if (args.options.audiences) {
+          const invalidGuid = args.options.audiences.split(',').find((guid: string | undefined) => !validation.isValidGuid(guid));
+          if (invalidGuid) {
+            return `${invalidGuid} is not a valid GUID`;
+          }
+        }
+
+        if (args.options.order !== undefined && isNaN(parseInt(args.options.order))) {
+          return 'Order must be an integer';
+        }
+
         return true;
       }
     );
@@ -62,19 +88,39 @@ class SpoTenantHomeSiteAddCommand extends SpoCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       const spoAdminUrl: string = await spo.getSpoAdminUrl(logger, this.verbose);
+      const requestBody: any = {
+        siteUrl: args.options.url
+      };
+
+      if (args.options.isInDraftMode !== undefined) {
+        requestBody.isInDraftMode = args.options.isInDraftMode === 'true';
+      }
+
+      if (args.options.vivaConnectionsDefaultStart !== undefined) {
+        requestBody.vivaConnectionsDefaultStart = args.options.vivaConnectionsDefaultStart === 'true';
+      }
+
+      if (args.options.audiences) {
+        requestBody.audiences = args.options.audiences.split(',');
+      }
+
+      if (args.options.order !== undefined) {
+        requestBody.order = parseInt(args.options.order);
+      }
+
       const requestOptions: CliRequestOptions = {
-        url: `${spoAdminUrl}/_api/SPO.Tenant/AddHomeSite`,
+        url: `${spoAdminUrl}/_api/SPHSite/AddHomeSite`,
         headers: {
           accept: 'application/json;odata=nometadata'
         },
         responseType: 'json',
-        data: {
-          homeSiteUrl: args.options.url
-        }
+        data: requestBody
       };
+
       if (this.verbose) {
-        await logger.logToStderr(`Adding the home site...`);
+        await logger.logToStderr(`Adding home site with URL: ${args.options.url}...`);
       }
+
       const res = await request.post(requestOptions);
       await logger.log(res);
     }
