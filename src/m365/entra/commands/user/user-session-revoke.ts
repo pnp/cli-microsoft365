@@ -5,14 +5,17 @@ import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 import { validation } from '../../../../utils/validation.js';
 import { Logger } from '../../../../cli/Logger.js';
-import { formatting } from '../../../../utils/formatting.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { cli } from '../../../../cli/cli.js';
 
 const options = globalOptionsZod
   .extend({
-    userId: zod.alias('i', z.string().optional()),
-    userName: zod.alias('n', z.string().optional()),
+    userId: zod.alias('i', z.string().refine(id => validation.isValidGuid(id), id => ({
+      message: `'${id}' is not a valid GUID.`
+    })).optional()),
+    userName: zod.alias('n', z.string().refine(name => validation.isValidUserPrincipalName(name), name => ({
+      message: `'${name}' is not a valid UPN.`
+    })).optional()),
     force: zod.alias('f', z.boolean().optional())
   })
   .strict();
@@ -28,55 +31,43 @@ class EntraUserSessionRevokeCommand extends GraphCommand {
     return commands.USER_SESSION_REVOKE;
   }
   public get description(): string {
-    return 'Revokes Microsoft Entra user sessions';
+    return 'Revokes all sign-in sessions for a given user';
   }
   public get schema(): z.ZodTypeAny | undefined {
     return options;
   }
   public getRefinedSchema(schema: typeof options): z.ZodEffects<any> | undefined {
     return schema
-      .refine(options => !options.userId !== !options.userName, {
-        message: 'Specify either userId or userName, but not both'
-      })
-      .refine(options => options.userId || options.userName, {
+      .refine(options => [options.userId, options.userName].filter(o => o !== undefined).length === 1, {
         message: 'Specify either userId or userName'
-      })
-      .refine(options => (!options.userId && !options.userName) || options.userName || (options.userId && validation.isValidGuid(options.userId)), options => ({
-        message: `The '${options.userId}' must be a valid GUID`,
-        path: ['userId']
-      }))
-      .refine(options => (!options.userId && !options.userName) || options.userId || (options.userName && validation.isValidUserPrincipalName(options.userName)), options => ({
-        message: `The '${options.userName}' must be a valid UPN`,
-        path: ['userId']
-      }));
+      });
   }
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const revokeUserSessions = async (): Promise<void> => {
       try {
-        let userIdOrPrincipalName = args.options.userId;
+        const userIdentifier = args.options.userId ?? args.options.userName;
 
-        if (args.options.userName) {
-          // single user can be retrieved also by user principal name
-          userIdOrPrincipalName = formatting.encodeQueryParameter(args.options.userName);
-        }
-
-        if (args.options.verbose) {
-          await logger.logToStderr(`Invalidating all the refresh tokens for user ${userIdOrPrincipalName}...`);
+        if (this.verbose) {
+          await logger.logToStderr(`Invalidating all the refresh tokens for user ${userIdentifier}...`);
         }
 
         // user principal name can start with $ but it violates the OData URL convention, so it must be enclosed in parenthesis and single quotes
-        const requestUrl = userIdOrPrincipalName!.startsWith('%24')
-          ? `${this.resource}/v1.0/users('${userIdOrPrincipalName}')/revokeSignInSessions`
-          : `${this.resource}/v1.0/users/${userIdOrPrincipalName}/revokeSignInSessions`;
+        const requestUrl = userIdentifier!.startsWith('$')
+          ? `${this.resource}/v1.0/users('${userIdentifier}')/revokeSignInSessions`
+          : `${this.resource}/v1.0/users/${userIdentifier}/revokeSignInSessions`;
 
         const requestOptions: CliRequestOptions = {
           url: requestUrl,
           headers: {
             accept: 'application/json;odata.metadata=none'
-          }
+          },
+          responseType: 'json',
+          data: {}
         };
 
-        await request.post(requestOptions);
+        const result = await request.post(requestOptions);
+
+        await logger.log(result);
       }
       catch (err: any) {
         this.handleRejectedODataJsonPromise(err);
@@ -87,7 +78,7 @@ class EntraUserSessionRevokeCommand extends GraphCommand {
       await revokeUserSessions();
     }
     else {
-      const result = await cli.promptForConfirmation({ message: `Are you sure you want to invalidate all the refresh tokens issued to applications for a user '${args.options.userId || args.options.userName}'?` });
+      const result = await cli.promptForConfirmation({ message: `This will revoke all sessions for the user '${args.options.userId || args.options.userName}', requiring the user to re-sign in from all devices. Are you sure?` });
 
       if (result) {
         await revokeUserSessions();

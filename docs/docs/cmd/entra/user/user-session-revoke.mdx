@@ -1,4 +1,6 @@
 import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 # entra user session revoke
 
@@ -28,7 +30,15 @@ m365 entra user session revoke [options]
 
 :::info
 
-Only the user with Global Administrator role can revoke sign-in sessions of other users.
+The user with at least User Administrator role can revoke sign-in sessions of other users.
+
+:::
+
+:::note
+
+There might be a small delay of a few minutes before tokens are revoked.
+
+This API doesn't revoke sign-in sessions for external users, because external users sign in through their home tenant.
 
 :::
 
@@ -46,7 +56,7 @@ Revoke sign-in sessions of a user specified by its UPN
 m365 entra user session revoke --userName john.doe@contoso.onmicrosoft.com
 ```
 
-Revoke sign-in sessions of a user specified by its UPN without prompting for confirmation.
+Revoke sign-in sessions of a user specified by its UPN without prompting for confirmation
 
 ```sh
 m365 entra user session revoke --userName john.doe@contoso.onmicrosoft.com --force
@@ -54,4 +64,42 @@ m365 entra user session revoke --userName john.doe@contoso.onmicrosoft.com --for
 
 ## Response
 
-The command won't return a response on success
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  {
+    "value": true
+  }
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  value: true
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  value
+  1
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # entra user session revoke --userName "john.doe@contoso.com" --force "true"
+
+  Date: 1/5/2025
+
+  Property | Value
+  ---------|-------
+  value | true
+  ```
+
+  </TabItem>
+</Tabs>

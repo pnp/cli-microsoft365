@@ -13,7 +13,6 @@ import { CommandError } from '../../../../Command.js';
 import { z } from 'zod';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { cli } from '../../../../cli/cli.js';
-import { formatting } from '../../../../utils/formatting.js';
 
 describe(commands.USER_SESSION_REVOKE, () => {
   const userId = 'abcd1234-de71-4623-b4af-96380a352509';
@@ -22,6 +21,7 @@ describe(commands.USER_SESSION_REVOKE, () => {
 
   let log: string[];
   let logger: Logger;
+  let loggerLogSpy: sinon.SinonSpy;
   let promptIssued: boolean;
   let commandInfo: CommandInfo;
   let commandOptionsSchema: z.ZodTypeAny;
@@ -49,12 +49,12 @@ describe(commands.USER_SESSION_REVOKE, () => {
         log.push(msg);
       }
     };
-    sinon.stub(cli, 'promptForConfirmation').callsFake(() => {
+    sinon.stub(cli, 'promptForConfirmation').callsFake(async () => {
       promptIssued = true;
-      return Promise.resolve(false);
+      return false;
     });
-
     promptIssued = false;
+    loggerLogSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -111,29 +111,33 @@ describe(commands.USER_SESSION_REVOKE, () => {
   });
 
   it('aborts revoking all sign-in sessions when prompt not confirmed', async () => {
-    const deleteSpy = sinon.stub(request, 'delete').resolves();
+    const postStub = sinon.stub(request, 'post').resolves();
 
     await command.action(logger, { options: { userId: userId } });
-    assert(deleteSpy.notCalled);
+    assert(postStub.notCalled);
   });
 
   it('revokes all sign-in sessions for a user specified by userId without prompting for confirmation', async () => {
-    const postRequestStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users/${userId}/revokeSignInSessions`) {
-        return;
+        return {
+          value: true
+        };
       }
 
       throw 'Invalid request';
     });
 
     await command.action(logger, { options: { userId: userId, force: true, verbose: true } });
-    assert(postRequestStub.called);
+    assert(loggerLogSpy.calledOnceWith({ value: true }));
   });
 
   it('revokes all sign-in sessions for a user specified by UPN while prompting for confirmation', async () => {
     const postRequestStub = sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users/${formatting.encodeQueryParameter(userName)}/revokeSignInSessions`) {
-        return;
+      if (opts.url === `https://graph.microsoft.com/v1.0/users/${userName}/revokeSignInSessions`) {
+        return {
+          value: true
+        };
       }
 
       throw 'Invalid request';
@@ -143,34 +147,31 @@ describe(commands.USER_SESSION_REVOKE, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, { options: { userName: userName } });
-    assert(postRequestStub.called);
+    assert(postRequestStub.calledOnce);
   });
 
   it('revokes all sign-in sessions for a user specified by UPN which starts with $ without prompting for confirmation', async () => {
     const postRequestStub = sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users('${formatting.encodeQueryParameter(userNameWithDollar)}')/revokeSignInSessions`) {
-        return;
+      if (opts.url === `https://graph.microsoft.com/v1.0/users('${userNameWithDollar}')/revokeSignInSessions`) {
+        return {
+          value: true
+        };
       }
 
       throw 'Invalid request';
     });
 
     await command.action(logger, { options: { userName: userNameWithDollar, force: true, verbose: true } });
-    assert(postRequestStub.called);
+    assert(postRequestStub.calledOnce);
   });
 
   it('handles error when user specified by userId was not found', async () => {
-    sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users/${userId}/revokeSignInSessions`) {
-        throw {
-          error:
-          {
-            code: 'Request_ResourceNotFound',
-            message: `Resource '${userId}' does not exist or one of its queried reference-property objects are not present.`
-          }
-        };
+    sinon.stub(request, 'post').rejects({
+      error:
+      {
+        code: 'Request_ResourceNotFound',
+        message: `Resource '${userId}' does not exist or one of its queried reference-property objects are not present.`
       }
-      throw `Invalid request`;
     });
 
     sinonUtil.restore(cli.promptForConfirmation);
