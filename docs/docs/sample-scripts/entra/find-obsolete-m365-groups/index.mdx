@@ -131,7 +131,7 @@ Use this script to create a report of all M365 groups that are possibly obsolete
     $Script:Groups | ForEach-Object {
       $groupInfo = [GroupInfo]::new()
       $groupInfo.Reference = $_
-      $groupInfo.Membership = @{Owners = 0; Members = 0; Guests = 0 }
+      $groupInfo.Membership = @{Owners = 0; Members = 0; Guests = 0}
       $groupInfo.TestStatus = "🟢 OK"
 
       Write-Host "☀︎ $($groupInfo.Reference.displayName)"
@@ -171,10 +171,10 @@ Use this script to create a report of all M365 groups that are possibly obsolete
       $members = Compare-Object $members $owners -PassThru
     }
 
-    $Group.Membership = [ordered] @{
-      Owners  = $owners
-      Members = $members
-      Guests  = $guests
+    $Group.Membership = [PSCustomObject][ordered] @{
+      Owners  = $owners ?? @()
+      Members = $members ?? @()
+      Guests  = $guests ?? @()
     }
 
     if ($owners.Count -eq 0) {
@@ -192,8 +192,8 @@ Use this script to create a report of all M365 groups that are possibly obsolete
       return
     }
 
-    if ($owners.Count -le 1 -and ($members.Count + $guests.Count) -eq 0) {
-      Write-Host "  → potentially obsolete (abandoned group: only $($owners.Count) owner left)" -ForegroundColor Yellow
+    if ($Group.Membership.Owners.Count -le 1 -and ($Group.Membership.Members.Count + $Group.Membership.Guests.Count) -eq 0) {
+      Write-Host "  → potentially obsolete (abandoned group: only $($Group.Membership.Owners.Count) owner left)" -ForegroundColor Yellow
       $reason = "Low owner count"
       
       $Group.Membership.Status = "Abandoned ($reason)"
