@@ -1,0 +1,67 @@
+import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# report settings set
+
+Update (adminReportSettings) tenant-level settings for Microsoft 365 reports
+
+## Usage
+
+```sh
+m365 tenant report settings set [options]
+```
+
+## Options
+
+```md definition-list
+`-h, --hideUserInformation  <hideUserInformation>`
+: Determines whether all reports conceal user information such as usernames, groups, and sites.  
+
+`--verbose`
+: Runs command with verbose logging
+
+`--debug`
+: Runs command with debug logging
+
+```
+
+<Global />
+
+## Remarks
+
+Please refer to the [Graph documentation page](https://learn.microsoft.com/en-in/graph/api/adminreportsettings-update?view=graph-rest-1.0&tabs=http).
+
+:::note
+
+This command returns a `204 No content` response code. To see the default logs, we recommed you to run the command with `---verbose or --debug` options
+
+## Examples
+
+Set `displayConcealedNames` to true. 
+
+```sh
+m365 tenant report settings set --hideUserInformation true
+```
+
+Set `displayConcealedNames` to false. 
+
+```sh
+m365 tenant report settings set --hideUserInformation false
+```
+
+
+## Response
+
+:::note
+
+This command returns a `204 No content` response code.
+
+<Tabs>
+  <TabItem value="JSON">
+
+    ```json
+      {
+        
+      }
+    ```
