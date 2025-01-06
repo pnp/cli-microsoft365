@@ -95,7 +95,6 @@ describe(commands.MAILBOX_SETTINGS_SET, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
-    //(command as any).pollingInterval = 0;
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
   });
 
@@ -263,7 +262,7 @@ describe(commands.MAILBOX_SETTINGS_SET, () => {
     await command.action(logger, {
       options: {
         userId: userId,
-        workingDays: "monday,tuesday,wednesday,thursday,friday",
+        workingDays: 'monday,tuesday,wednesday,thursday,friday',
         workingHoursStartTime: '09:00:00.000000',
         workingHoursEndTime: '17:00:00.000000',
         workingHoursTimeZone: 'UTC',
@@ -292,7 +291,7 @@ describe(commands.MAILBOX_SETTINGS_SET, () => {
   it('updates working days of signed-in user', async () => {
     const patchStub = sinon.stub(request, 'patch').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/me/mailboxSettings`) {
-        throw opts.data;
+        return mailboxSettingsResponse;
       }
 
       throw 'Invalid request';
