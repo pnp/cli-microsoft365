@@ -26,6 +26,7 @@ export default {
     'https://graph.microsoft.com/Mail.Read.Shared',
     'https://graph.microsoft.com/Mail.ReadWrite',
     'https://graph.microsoft.com/Mail.Send',
+    'https://graph.microsoft.com/MailboxSettings.ReadWrite',
     'https://graph.microsoft.com/Notes.ReadWrite.All',
     'https://graph.microsoft.com/OnlineMeetingArtifact.Read.All',
     'https://graph.microsoft.com/OnlineMeetings.ReadWrite',
