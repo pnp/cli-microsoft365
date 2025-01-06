@@ -197,7 +197,7 @@ class EntraAppRoleAssignmentRemoveCommand extends GraphCommand {
       await removeAppRoleAssignment();
     }
     else {
-      const result = await cli.promptForConfirmation({ message: `Are you sure you want to remove the appRoleAssignment with scope ${args.options.scope} for resource ${args.options.resource}?` });
+      const result = await cli.promptForConfirmation({ message: `Are you sure you want to remove the appRoleAssignment with scope(s) ${args.options.scopes} for resource ${args.options.resource}?` });
 
       if (result) {
         await removeAppRoleAssignment();
