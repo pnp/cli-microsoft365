@@ -67,6 +67,7 @@ const dictionary = [
   'log',
   'login',
   'logout',
+  'mailbox',
   'management',
   'member',
   'membership',

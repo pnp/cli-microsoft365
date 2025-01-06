@@ -1150,6 +1150,15 @@ const sidebars: SidebarsConfig = {
           ]
         },
         {
+          mailbox: [
+            {
+              type: 'doc',
+              label: 'mailbox settings set',
+              id: 'cmd/outlook/mailbox/mailbox-settings-set'
+            }
+          ]
+        },
+        {
           message: [
             {
               type: 'doc',
