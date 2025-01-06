@@ -63,7 +63,7 @@ class OutlookMailboxSettingsSetCommand extends GraphCommand {
         options.autoReplyStatus, options.autoReplyExternalAudience, options.autoReplyExternalMessage, options.autoReplyInternalMessage,
         options.autoReplyStartDateTime, options.autoReplyStartTimeZone, options.autoReplyEndDateTime, options.autoReplyEndTimeZone,
         options.timeFormat, options.timeZone, options.dateFormat, options.delegateMeetingMessageDeliveryOptions, options.language].filter(o => o !== undefined).length > 0, {
-        message: 'Specify at least one of the following options: workingDays, workingHoursStartTime, workingHoursEndTime, workingHoursTimeZone'
+        message: 'Specify at least one of the following options: workingDays, workingHoursStartTime, workingHoursEndTime, workingHoursTimeZone, autoReplyStatus, autoReplyExternalAudience, autoReplyExternalMessage, autoReplyInternalMessage, autoReplyStartDateTime, autoReplyStartTimeZone, autoReplyEndDateTime, autoReplyEndTimeZone, timeFormat, timeZone, dateFormat, delegateMeetingMessageDeliveryOptions, or language'
       });
   }
 
