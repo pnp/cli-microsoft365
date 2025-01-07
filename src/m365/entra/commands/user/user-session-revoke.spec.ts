@@ -104,7 +104,8 @@ describe(commands.USER_SESSION_REVOKE, () => {
   });
 
   it('prompts before revoking all sign-in sessions when confirm option not passed', async () => {
-    await command.action(logger, { options: { userId: userId } });
+    const parsedSchema = commandOptionsSchema.safeParse({ userId: userId });
+    await command.action(logger, { options: parsedSchema.data });
 
     assert(promptIssued);
   });
@@ -112,7 +113,8 @@ describe(commands.USER_SESSION_REVOKE, () => {
   it('aborts revoking all sign-in sessions when prompt not confirmed', async () => {
     const postStub = sinon.stub(request, 'post').resolves();
 
-    await command.action(logger, { options: { userId: userId } });
+    const parsedSchema = commandOptionsSchema.safeParse({ userId: userId });
+    await command.action(logger, { options: parsedSchema.data });
     assert(postStub.notCalled);
   });
 
@@ -127,7 +129,8 @@ describe(commands.USER_SESSION_REVOKE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { userId: userId, force: true, verbose: true } });
+    const parsedSchema = commandOptionsSchema.safeParse({ userId: userId, force: true, verbose: true });
+    await command.action(logger, { options: parsedSchema.data });
     assert(loggerLogSpy.calledOnceWith({ value: true }));
   });
 
@@ -145,7 +148,8 @@ describe(commands.USER_SESSION_REVOKE, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
-    await command.action(logger, { options: { userName: userName } });
+    const parsedSchema = commandOptionsSchema.safeParse({ userName: userName });
+    await command.action(logger, { options: parsedSchema.data });
     assert(postRequestStub.calledOnce);
   });
 
@@ -161,8 +165,9 @@ describe(commands.USER_SESSION_REVOKE, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
+    const parsedSchema = commandOptionsSchema.safeParse({ userId: userId });
     await assert.rejects(
-      command.action(logger, { options: { userId: userId } }),
+      command.action(logger, { options: parsedSchema.data }),
       new CommandError(`Resource '${userId}' does not exist or one of its queried reference-property objects are not present.`)
     );
   });
