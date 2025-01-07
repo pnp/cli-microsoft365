@@ -235,7 +235,15 @@ describe(commands.DIRECTORYEXTENSION_ADD, () => {
 
       throw 'Invalid request';
     });
-    await command.action(logger, { options: { appObjectId: appObjectId, name: 'GitHubWorkAccount', dataType: 'String', targetObjects: 'User', verbose: true } });
+
+    const parsedSchema = commandOptionsSchema.safeParse({
+      appObjectId: appObjectId,
+      name: 'GitHubWorkAccount',
+      dataType: 'String',
+      targetObjects: 'User',
+      verbose: true
+    });
+    await command.action(logger, { options: parsedSchema.data });
     assert(loggerLogSpy.calledOnceWithExactly(response));
   });
 
@@ -248,7 +256,15 @@ describe(commands.DIRECTORYEXTENSION_ADD, () => {
 
       throw 'Invalid request';
     });
-    await command.action(logger, { options: { appId: appId, name: 'GitHubAccounts', dataType: 'String', targetObjects: 'User', isMultiValued: true } });
+
+    const parsedSchema = commandOptionsSchema.safeParse({
+      appId: appId,
+      name: 'GitHubAccounts',
+      dataType: 'String',
+      targetObjects: 'User',
+      isMultiValued: true
+    });
+    await command.action(logger, { options: parsedSchema.data });
     assert(loggerLogSpy.calledOnceWithExactly(responseForMultiValued));
   });
 
@@ -261,7 +277,14 @@ describe(commands.DIRECTORYEXTENSION_ADD, () => {
 
       throw 'Invalid request';
     });
-    await command.action(logger, { options: { appName: appName, name: 'ForServiceUseOnly', dataType: 'Boolean', targetObjects: 'User,Application,Device' } });
+
+    const parsedSchema = commandOptionsSchema.safeParse({
+      appName: appName,
+      name: 'ForServiceUseOnly',
+      dataType: 'Boolean',
+      targetObjects: 'User,Application,Device'
+    });
+    await command.action(logger, { options: parsedSchema.data });
     assert(loggerLogSpy.calledOnceWithExactly(responseWithMultipleTargets));
   });
 
@@ -277,6 +300,12 @@ describe(commands.DIRECTORYEXTENSION_ADD, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { appId: appId, name: 'ForServiceUseOnly', dataType: 'Boolean', targetObjects: 'User,Application,Device' } }), new CommandError('An extension property exists with the name extension_7f5df2f49ed64df786d7eefbfc4ab091_ForServiceUseOnly.'));
+    const parsedSchema = commandOptionsSchema.safeParse({
+      appId: appId,
+      name: 'ForServiceUseOnly',
+      dataType: 'Boolean',
+      targetObjects: 'User,Application,Device'
+    });
+    await assert.rejects(command.action(logger, { options: parsedSchema.data }), new CommandError('An extension property exists with the name extension_7f5df2f49ed64df786d7eefbfc4ab091_ForServiceUseOnly.'));
   });
 });
