@@ -82,8 +82,9 @@ describe(commands.PEOPLE_PRONOUNS_SET, () => {
       throw 'Invalid request';
     });
 
+    const parsedSchema = commandOptionsSchema.safeParse({ verbose: true, enabled: true });
     await command.action(logger, {
-      options: { verbose: true, enabled: true }
+      options: parsedSchema.data
     });
 
     assert(
