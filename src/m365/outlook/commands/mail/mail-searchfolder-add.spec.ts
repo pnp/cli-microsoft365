@@ -169,7 +169,14 @@ describe(commands.MAIL_SEARCHFOLDER_ADD, () => {
 
       throw 'Invalid request';
     });
-    await command.action(logger, { options: { userId: userId, folderName: 'Contoso', messageFilter: `subject eq 'Contoso'`, sourceFoldersIds: 'AAMkAGRkZTFiMDQxLWYzNDgtNGQ3ZS05Y2U3LWU1NWJhMTM5YTgwMAAuAAAAAABxI4iNfZK7SYRiWw9sza20AQA7DGC6yx9ARZqQFWs3P3q1AAAASBOHAAA=' } });
+
+    const parsedSchema = commandOptionsSchema.safeParse({
+      userId: userId,
+      folderName: 'Contoso',
+      messageFilter: `subject eq 'Contoso'`,
+      sourceFoldersIds: 'AAMkAGRkZTFiMDQxLWYzNDgtNGQ3ZS05Y2U3LWU1NWJhMTM5YTgwMAAuAAAAAABxI4iNfZK7SYRiWw9sza20AQA7DGC6yx9ARZqQFWs3P3q1AAAASBOHAAA='
+    });
+    await command.action(logger, { options: parsedSchema.data });
     assert(loggerLogSpy.calledOnceWithExactly(response));
   });
 
@@ -182,7 +189,16 @@ describe(commands.MAIL_SEARCHFOLDER_ADD, () => {
 
       throw 'Invalid request';
     });
-    await command.action(logger, { options: { userName: userName, folderName: 'Contoso', messageFilter: `subject eq 'Contoso'`, sourceFoldersIds: 'AAMkAGRkZTFiMDQxLWYzNDgtNGQ3ZS05Y2U3LWU1NWJhMTM5YTgwMAAuAAAAAABxI4iNfZK7SYRiWw9sza20AQA7DGC6yx9ARZqQFWs3P3q1AAAASBOHAAA=,AAMkAGRkZTFiMDQxLWYzNDgtNGQ3ZS05Y2U3LWU1NWJhMTM5YTgwMAAuAAAAAABxI4iNfZK7SYRiWw9sza20AQA7DGC6yx9ARZqQFWs3P3q1AAAASBOHAAB=', includeNestedFodlers: true, verbose: true } });
+
+    const parsedSchema = commandOptionsSchema.safeParse({
+      userName: userName,
+      folderName: 'Contoso',
+      messageFilter: `subject eq 'Contoso'`,
+      sourceFoldersIds: 'AAMkAGRkZTFiMDQxLWYzNDgtNGQ3ZS05Y2U3LWU1NWJhMTM5YTgwMAAuAAAAAABxI4iNfZK7SYRiWw9sza20AQA7DGC6yx9ARZqQFWs3P3q1AAAASBOHAAA=,AAMkAGRkZTFiMDQxLWYzNDgtNGQ3ZS05Y2U3LWU1NWJhMTM5YTgwMAAuAAAAAABxI4iNfZK7SYRiWw9sza20AQA7DGC6yx9ARZqQFWs3P3q1AAAASBOHAAB=',
+      includeNestedFolders: true,
+      verbose: true
+    });
+    await command.action(logger, { options: parsedSchema.data });
     assert(loggerLogSpy.calledOnceWithExactly(responseWithNestedFolders));
   });
 
@@ -196,6 +212,12 @@ describe(commands.MAIL_SEARCHFOLDER_ADD, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { userId: userId, folderName: 'Contoso', messageFilter: `subject eq 'Contoso'`, sourceFoldersIds: 'foo' } } as any), new CommandError('Id is malformed.'));
+    const parsedSchema = commandOptionsSchema.safeParse({
+      userId: userId,
+      folderName: 'Contoso',
+      messageFilter: `subject eq 'Contoso'`,
+      sourceFoldersIds: 'foo'
+    });
+    await assert.rejects(command.action(logger, { options: parsedSchema.data }), new CommandError('Id is malformed.'));
   });
 });

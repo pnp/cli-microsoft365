@@ -11,8 +11,14 @@ import { validation } from '../../../../utils/validation.js';
 
 const options = globalOptionsZod
   .extend({
-    userId: zod.alias('i', z.string().optional()),
-    userName: zod.alias('n', z.string().optional()),
+    userId: zod.alias('i', z.string()
+      .refine(userId => validation.isValidGuid(userId), userId => ({
+        message: `'${userId}' is not a valid GUID.`
+      })).optional()),
+    userName: zod.alias('n', z.string()
+      .refine(userName => validation.isValidUserPrincipalName(userName), userName => ({
+        message: `'${userName}' is not a valid UPN.`
+      })).optional()),
     folderName: z.string(),
     messageFilter: z.string(),
     sourceFoldersIds: z.string().transform((value) => value.split(',')).pipe(z.string().array()),
@@ -43,15 +49,7 @@ class OutlookMailSearchFolderAddCommand extends GraphCommand {
     return schema
       .refine(options => !options.userId !== !options.userName, {
         message: 'Specify either userId or userName, but not both'
-      })
-      .refine(options => (!options.userId && !options.userName) || options.userName || (options.userId && validation.isValidGuid(options.userId)), options => ({
-        message: `The '${options.userId}' must be a valid GUID`,
-        path: ['userId']
-      }))
-      .refine(options => (!options.userId && !options.userName) || options.userId || (options.userName && validation.isValidUserPrincipalName(options.userName)), options => ({
-        message: `The '${options.userName}' must be a valid user principal name`,
-        path: ['userName']
-      }));
+      });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
