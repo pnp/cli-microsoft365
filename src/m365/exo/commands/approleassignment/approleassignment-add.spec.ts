@@ -999,7 +999,7 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
   });
 
   it('correctly creates the role assignment for the role specified by id and the service principal specified by name', async () => {
-    sinon.stub(entraServicePrincipal, 'getServicePrincipalFromAppName').withArgs(principalName, 'id').resolves({ id: principalId });
+    sinon.stub(entraServicePrincipal, 'getServicePrincipalByAppName').withArgs(principalName, 'id').resolves({ id: principalId });
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/beta/roleManagement/exchange/roleAssignments` &&
         JSON.stringify(opts.data) === JSON.stringify({

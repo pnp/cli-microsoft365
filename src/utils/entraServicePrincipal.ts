@@ -11,7 +11,7 @@ export const entraServicePrincipal = {
    * @returns The service principal.
    * @throws Error when service principal was not found.
    */
-  async getServicePrincipalFromAppId(appId: string, properties?: string): Promise<ServicePrincipal> {
+  async getServicePrincipalByAppId(appId: string, properties?: string): Promise<ServicePrincipal> {
     let url = `https://graph.microsoft.com/v1.0/servicePrincipals?$filter=appId eq '${appId}'`;
 
     if (properties) {
@@ -33,7 +33,7 @@ export const entraServicePrincipal = {
    * @returns The service principal.
    * @throws Error when service principal was not found.
    */
-  async getServicePrincipalFromAppName(appName: string, properties?: string): Promise<ServicePrincipal> {
+  async getServicePrincipalByAppName(appName: string, properties?: string): Promise<ServicePrincipal> {
     let url = `https://graph.microsoft.com/v1.0/servicePrincipals?$filter=displayName eq '${formatting.encodeQueryParameter(appName)}'`;
 
     if (properties) {

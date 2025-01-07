@@ -196,7 +196,7 @@ class ExoAppRoleAssignmentAddCommand extends GraphCommand {
       await logger.logToStderr(`Retrieving service principal by its name '${options.principalName}'`);
     }
 
-    const principal = await entraServicePrincipal.getServicePrincipalFromAppName(options.principalName!, 'id');
+    const principal = await entraServicePrincipal.getServicePrincipalByAppName(options.principalName!, 'id');
     return `/ServicePrincipals/${principal.id}`;
   }
 

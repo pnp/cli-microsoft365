@@ -35,7 +35,7 @@ describe('utils/entraServicePrincipal', () => {
       return 'Invalid Request';
     });
 
-    const actual = await entraServicePrincipal.getServicePrincipalFromAppId(appId);
+    const actual = await entraServicePrincipal.getServicePrincipalByAppId(appId);
     assert.deepStrictEqual(actual.id, servicePrincipalId);
   });
 
@@ -54,7 +54,7 @@ describe('utils/entraServicePrincipal', () => {
       return 'Invalid Request';
     });
 
-    const actual = await entraServicePrincipal.getServicePrincipalFromAppName(appName);
+    const actual = await entraServicePrincipal.getServicePrincipalByAppName(appName);
     assert.deepStrictEqual(actual.id, servicePrincipalId);
   });
 
@@ -74,7 +74,7 @@ describe('utils/entraServicePrincipal', () => {
 
     sinon.stub(cli, 'handleMultipleResultsFound').resolves({ id: secondServicePrincipalId });
 
-    const actual = await entraServicePrincipal.getServicePrincipalFromAppName(appName, 'id');
+    const actual = await entraServicePrincipal.getServicePrincipalByAppName(appName, 'id');
     assert.deepStrictEqual(actual.id, secondServicePrincipalId);
   });
 
@@ -87,7 +87,7 @@ describe('utils/entraServicePrincipal', () => {
       throw 'Invalid Request';
     });
 
-    await assert.rejects(entraServicePrincipal.getServicePrincipalFromAppId(appId, 'id')), Error(`App with appId '${appId}' not found in Microsoft Entra ID`);
+    await assert.rejects(entraServicePrincipal.getServicePrincipalByAppId(appId, 'id')), Error(`App with appId '${appId}' not found in Microsoft Entra ID`);
   });
 
   it('throws error message when no service principal was found using getServicePrincipalFromAppName', async () => {
@@ -99,7 +99,7 @@ describe('utils/entraServicePrincipal', () => {
       throw 'Invalid Request';
     });
 
-    await assert.rejects(entraServicePrincipal.getServicePrincipalFromAppName(appName)), Error(`Service principal with name '${appName}' not found in Microsoft Entra ID`);
+    await assert.rejects(entraServicePrincipal.getServicePrincipalByAppName(appName)), Error(`Service principal with name '${appName}' not found in Microsoft Entra ID`);
   });
 
   it('throws error message when multiple service principals were found using getServicePrincipalFromAppName', async () => {
@@ -124,6 +124,6 @@ describe('utils/entraServicePrincipal', () => {
       return 'Invalid Request';
     });
 
-    await assert.rejects(entraServicePrincipal.getServicePrincipalFromAppName(appName), Error(`Multiple service principals with name '${appName}' found in Microsoft Entra ID. Found: ${servicePrincipalId}, ${secondServicePrincipalId}.`));
+    await assert.rejects(entraServicePrincipal.getServicePrincipalByAppName(appName), Error(`Multiple service principals with name '${appName}' found in Microsoft Entra ID. Found: ${servicePrincipalId}, ${secondServicePrincipalId}.`));
   });
 });
