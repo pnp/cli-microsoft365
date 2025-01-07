@@ -130,7 +130,12 @@ describe(commands.ROLEDEFINITION_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { displayName: 'Custom Role', allowedResourceActions: "microsoft.directory/groups.unified/create,microsoft.directory/groups.unified/delete" } });
+    const parsedSchema = commandOptionsSchema.safeParse(
+      {
+        displayName: 'Custom Role',
+        allowedResourceActions: "microsoft.directory/groups.unified/create,microsoft.directory/groups.unified/delete"
+      });
+    await command.action(logger, { options: parsedSchema.data });
     assert(loggerLogSpy.calledOnceWithExactly(roleDefinitionResponse));
   });
 
@@ -143,15 +148,16 @@ describe(commands.ROLEDEFINITION_ADD, () => {
       throw 'Invalid request';
     });
 
+    const parsedSchema = commandOptionsSchema.safeParse({
+      displayName: 'Custom Role',
+      description: 'Allows creating and deleting unified groups',
+      allowedResourceActions: "microsoft.directory/groups.unified/create,microsoft.directory/groups.unified/delete",
+      enabled: false,
+      version: "1",
+      verbose: true
+    });
     await command.action(logger, {
-      options: {
-        displayName: 'Custom Role',
-        description: 'Allows creating and deleting unified groups',
-        allowedResourceActions: "microsoft.directory/groups.unified/create,microsoft.directory/groups.unified/delete",
-        enabled: false,
-        version: "1",
-        verbose: true
-      }
+      options: parsedSchema.data
     });
     assert(loggerLogSpy.calledOnceWithExactly(roleDefinitionWithDeatilsResponse));
   });
@@ -168,11 +174,12 @@ describe(commands.ROLEDEFINITION_ADD, () => {
       }
     });
 
+    const parsedSchema = commandOptionsSchema.safeParse({
+      displayName: 'Custom Role',
+      allowedResourceActions: "microsoft.directory/groups.unified/create"
+    });
     await assert.rejects(command.action(logger, {
-      options: {
-        displayName: 'Custom Role',
-        allowedResourceActions: "microsoft.directory/groups.unified/create"
-      }
+      options: parsedSchema.data
     }), new CommandError('Invalid request'));
   });
 });
