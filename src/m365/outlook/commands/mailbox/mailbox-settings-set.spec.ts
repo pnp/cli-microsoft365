@@ -222,27 +222,29 @@ describe(commands.MAILBOX_SETTINGS_SET, () => {
       throw 'Invalid request';
     });
 
+    const result = commandOptionsSchema.safeParse({
+      dateFormat: 'dd.MM.yyy',
+      timeFormat: 'HH:mm',
+      timeZone: 'Central Europe Standard Time',
+      language: 'en-US',
+      delegateMeetingMessageDeliveryOptions: 'sendToDelegateAndInformationToPrincipal',
+      workingDays: 'monday,tuesday,wednesday,thursday,friday',
+      workingHoursStartTime: '09:00:00.000000',
+      workingHoursEndTime: '17:00:00.000000',
+      workingHoursTimeZone: 'UTC',
+      autoReplyExternalAudience: 'contactsOnly',
+      autoReplyExternalMessage: "I'm out of office",
+      autoReplyInternalMessage: "I'm out of office. Contact my manager in case of any troubles.",
+      autoReplyStartDateTime: '2025-01-06T00:00:00.0000000',
+      autoReplyStartTimeZone: 'UTC',
+      autoReplyEndDateTime: '2025-01-10T00:00:00.0000000',
+      autoReplyEndTimeZone: 'UTC',
+      autoReplyStatus: 'scheduled',
+      verbose: true
+    });
+
     await command.action(logger, {
-      options: { 
-        dateFormat: 'dd.MM.yyy',
-        timeFormat: 'HH:mm',
-        timeZone: 'Central Europe Standard Time',
-        language: 'en-US',
-        delegateMeetingMessageDeliveryOptions: 'sendToDelegateAndInformationToPrincipal',
-        workingDays: 'monday,tuesday,wednesday,thursday,friday',
-        workingHoursStartTime: '09:00:00.000000',
-        workingHoursEndTime: '17:00:00.000000',
-        workingHoursTimeZone: 'UTC',
-        autoReplyExternalAudience: 'contactsOnly',
-        autoReplyExternalMessage: "I'm out of office",
-        autoReplyInternalMessage: "I'm out of office. Contact my manager in case of any troubles.",
-        autoReplyStartDateTime: '2025-01-06T00:00:00.0000000',
-        autoReplyStartTimeZone: 'UTC',
-        autoReplyEndDateTime: '2025-01-10T00:00:00.0000000',
-        autoReplyEndTimeZone: 'UTC',
-        autoReplyStatus: 'scheduled',
-        verbose: true
-      }
+      options: result.data
     });
     assert(loggerLogSpy.calledOnceWith(mailboxSettingsResponse));
   });
@@ -259,15 +261,17 @@ describe(commands.MAILBOX_SETTINGS_SET, () => {
       throw 'Invalid request';
     });
 
+    const result = commandOptionsSchema.safeParse({
+      userId: userId,
+      workingDays: 'monday,tuesday,wednesday,thursday,friday',
+      workingHoursStartTime: '09:00:00.000000',
+      workingHoursEndTime: '17:00:00.000000',
+      workingHoursTimeZone: 'UTC',
+      verbose: true
+    });
+
     await command.action(logger, {
-      options: {
-        userId: userId,
-        workingDays: 'monday,tuesday,wednesday,thursday,friday',
-        workingHoursStartTime: '09:00:00.000000',
-        workingHoursEndTime: '17:00:00.000000',
-        workingHoursTimeZone: 'UTC',
-        verbose: true
-      }
+      options: result.data
     });
 
     assert.deepStrictEqual(patchStub.lastCall.args[0].data, {
@@ -297,10 +301,12 @@ describe(commands.MAILBOX_SETTINGS_SET, () => {
       throw 'Invalid request';
     });
 
+    const result = commandOptionsSchema.safeParse({
+      workingDays: 'monday,tuesday,wednesday,thursday,friday'
+    });
+
     await command.action(logger, {
-      options: {
-        workingDays: 'monday,tuesday,wednesday,thursday,friday'
-      }
+      options: result.data
     });
 
     assert.deepStrictEqual(patchStub.lastCall.args[0].data, {
@@ -328,13 +334,13 @@ describe(commands.MAILBOX_SETTINGS_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, {
-      options: {
-        userName: userName,
-        workingHoursTimeZone: 'UTC',
-        verbose: true
-      }
+    const result = commandOptionsSchema.safeParse({
+      userName: userName,
+      workingHoursTimeZone: 'UTC',
+      verbose: true
     });
+
+    await command.action(logger, { options: result.data });
 
     assert.deepStrictEqual(patchStub.lastCall.args[0].data, {
       workingHours: {
@@ -354,10 +360,12 @@ describe(commands.MAILBOX_SETTINGS_SET, () => {
       throw 'Invalid request';
     });
 
+    const result = commandOptionsSchema.safeParse({
+      workingHoursStartTime: '07:00:00.0000000'
+    });
+
     await command.action(logger, {
-      options: {
-        workingHoursStartTime: '07:00:00.0000000'
-      }
+      options: result.data
     });
 
     assert.deepStrictEqual(patchStub.lastCall.args[0].data, {
@@ -376,10 +384,12 @@ describe(commands.MAILBOX_SETTINGS_SET, () => {
       throw 'Invalid request';
     });
 
+    const result = commandOptionsSchema.safeParse({
+      workingHoursEndTime: '16:00:00.0000000'
+    });
+
     await command.action(logger, {
-      options: {
-        workingHoursEndTime: '16:00:00.0000000'
-      }
+      options: result.data
     });
 
     assert.deepStrictEqual(patchStub.lastCall.args[0].data, {
@@ -398,10 +408,12 @@ describe(commands.MAILBOX_SETTINGS_SET, () => {
       throw 'Invalid request';
     });
 
+    const result = commandOptionsSchema.safeParse({
+      autoReplyExternalAudience: 'all'
+    });
+
     await command.action(logger, {
-      options: {
-        autoReplyExternalAudience: 'all'
-      }
+      options: result.data
     });
 
     assert.deepStrictEqual(patchStub.lastCall.args[0].data, {
@@ -420,10 +432,12 @@ describe(commands.MAILBOX_SETTINGS_SET, () => {
       throw 'Invalid request';
     });
 
+    const result = commandOptionsSchema.safeParse({
+      autoReplyExternalMessage: `I'm out of office`
+    });
+
     await command.action(logger, {
-      options: {
-        autoReplyExternalMessage: `I'm out of office`
-      }
+      options: result.data
     });
 
     assert.deepStrictEqual(patchStub.lastCall.args[0].data, {
@@ -442,10 +456,12 @@ describe(commands.MAILBOX_SETTINGS_SET, () => {
       throw 'Invalid request';
     });
 
+    const result = commandOptionsSchema.safeParse({
+      autoReplyInternalMessage: `I'm out of office. Contact my manager in case of any troubles.`
+    });
+
     await command.action(logger, {
-      options: {
-        autoReplyInternalMessage: `I'm out of office. Contact my manager in case of any troubles.`
-      }
+      options: result.data
     });
 
     assert.deepStrictEqual(patchStub.lastCall.args[0].data, {
@@ -464,10 +480,12 @@ describe(commands.MAILBOX_SETTINGS_SET, () => {
       throw 'Invalid request';
     });
 
+    const result = commandOptionsSchema.safeParse({
+      autoReplyStartDateTime: '2025-01-03T19:00:00.0000000'
+    });
+
     await command.action(logger, {
-      options: {
-        autoReplyStartDateTime: '2025-01-03T19:00:00.0000000'
-      }
+      options: result.data
     });
 
     assert.deepStrictEqual(patchStub.lastCall.args[0].data, {
@@ -488,10 +506,12 @@ describe(commands.MAILBOX_SETTINGS_SET, () => {
       throw 'Invalid request';
     });
 
+    const result = commandOptionsSchema.safeParse({
+      autoReplyStartTimeZone: 'UTC'
+    });
+
     await command.action(logger, {
-      options: {
-        autoReplyStartTimeZone: 'UTC'
-      }
+      options: result.data
     });
 
     assert.deepStrictEqual(patchStub.lastCall.args[0].data, {
@@ -512,10 +532,12 @@ describe(commands.MAILBOX_SETTINGS_SET, () => {
       throw 'Invalid request';
     });
 
+    const result = commandOptionsSchema.safeParse({
+      autoReplyEndDateTime: '2025-01-04T19:00:00.0000000'
+    });
+
     await command.action(logger, {
-      options: {
-        autoReplyEndDateTime: '2025-01-04T19:00:00.0000000'
-      }
+      options: result.data
     });
 
     assert.deepStrictEqual(patchStub.lastCall.args[0].data, {
@@ -536,10 +558,12 @@ describe(commands.MAILBOX_SETTINGS_SET, () => {
       throw 'Invalid request';
     });
 
+    const result = commandOptionsSchema.safeParse({
+      autoReplyEndTimeZone: 'UTC'
+    });
+
     await command.action(logger, {
-      options: {
-        autoReplyEndTimeZone: 'UTC'
-      }
+      options: result.data
     });
 
     assert.deepStrictEqual(patchStub.lastCall.args[0].data, {
@@ -560,10 +584,12 @@ describe(commands.MAILBOX_SETTINGS_SET, () => {
       throw 'Invalid request';
     });
 
+    const result = commandOptionsSchema.safeParse({
+      autoReplyStatus: 'scheduled'
+    });
+
     await command.action(logger, {
-      options: {
-        autoReplyStatus: 'scheduled'
-      }
+      options: result.data
     });
 
     assert.deepStrictEqual(patchStub.lastCall.args[0].data, {
@@ -577,15 +603,19 @@ describe(commands.MAILBOX_SETTINGS_SET, () => {
     sinonUtil.restore(accessToken.isAppOnlyAccessToken);
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
 
-    await assert.rejects(command.action(logger, { options: { userId: userId, userName: userName, verbose: true } }), new CommandError('When running with application permissions either userId or userName is required, but not both'));
+    const result = commandOptionsSchema.safeParse({ userId: userId, userName: userName, timeFormat: 'HH:mm', verbose: true });
+
+    await assert.rejects(command.action(logger, { options: result.data }), new CommandError('When running with application permissions either userId or userName is required, but not both'));
   });
 
   it('fails updating mailbox settings of the signed-in user if userId is specified', async () => {
-    await assert.rejects(command.action(logger, { options: { userId: userId, verbose: true } }), new CommandError('You can update mailbox settings of other users only if CLI is authenticated in app-only mode'));
+    const result = commandOptionsSchema.safeParse({ userId: userId, timeFormat: 'HH:mm', verbose: true });
+    await assert.rejects(command.action(logger, { options: result.data }), new CommandError('You can update mailbox settings of other users only if CLI is authenticated in app-only mode'));
   });
 
   it('fails updating mailbox settings of the signed-in user if userName is specified', async () => {
-    await assert.rejects(command.action(logger, { options: { userName: userName, verbose: true } }), new CommandError('You can update mailbox settings of other users only if CLI is authenticated in app-only mode'));
+    const result = commandOptionsSchema.safeParse({ userName: userName, timeFormat: 'HH:mm', verbose: true });
+    await assert.rejects(command.action(logger, { options: result.data }), new CommandError('You can update mailbox settings of other users only if CLI is authenticated in app-only mode'));
   });
 
   it('correctly handles API OData error', async () => {
@@ -599,7 +629,7 @@ describe(commands.MAILBOX_SETTINGS_SET, () => {
         }
       }
     });
-
-    await assert.rejects(command.action(logger, { options: { dateFormat: 'dd.MM.yyy' } }), new CommandError('Invalid request'));
+    const result = commandOptionsSchema.safeParse({ dateFormat: 'dd.MM.yyy' });
+    await assert.rejects(command.action(logger, { options: result.data }), new CommandError('Invalid request'));
   });
 });
