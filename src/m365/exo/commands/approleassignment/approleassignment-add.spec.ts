@@ -959,14 +959,14 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
 
       throw 'Invalid request';
     });
+    const result = commandOptionsSchema.safeParse({
+      roleDefinitionId: roleDefinitionId,
+      principalId: principalId,
+      scope: 'tenant',
+      verbose: true
+    });
     await command.action(logger, {
-      options:
-      {
-        roleDefinitionId: roleDefinitionId,
-        principalId: principalId,
-        scope: 'tenant',
-        verbose: true
-      }
+      options: result.data
     });
     assert(loggerLogSpy.calledOnceWithExactly(unifiedRoleAssignmentScopeTenant));
   });
@@ -986,14 +986,14 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
 
       throw 'Invalid request';
     });
+    const result = commandOptionsSchema.safeParse({
+      roleDefinitionName: roleDefinitionName,
+      principalId: principalId,
+      scope: 'tenant',
+      verbose: true
+    });
     await command.action(logger, {
-      options:
-      {
-        roleDefinitionName: roleDefinitionName,
-        principalId: principalId,
-        scope: 'tenant',
-        verbose: true
-      }
+      options: result.data
     });
     assert(loggerLogSpy.calledOnceWithExactly(unifiedRoleAssignmentScopeTenant));
   });
@@ -1013,14 +1013,14 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
 
       throw 'Invalid request';
     });
+    const result = commandOptionsSchema.safeParse({
+      roleDefinitionId: roleDefinitionId,
+      principalName: principalName,
+      scope: 'tenant',
+      verbose: true
+    });
     await command.action(logger, {
-      options:
-      {
-        roleDefinitionId: roleDefinitionId,
-        principalName: principalName,
-        scope: 'tenant',
-        verbose: true
-      }
+      options: result.data
     });
     assert(loggerLogSpy.calledOnceWithExactly(unifiedRoleAssignmentScopeTenant));
   });
@@ -1039,15 +1039,15 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
 
       throw 'Invalid request';
     });
+    const result = commandOptionsSchema.safeParse({
+      roleDefinitionId: roleDefinitionId,
+      principalId: principalId,
+      userId: userId,
+      scope: 'user',
+      verbose: true
+    });
     await command.action(logger, {
-      options:
-      {
-        roleDefinitionId: roleDefinitionId,
-        principalId: principalId,
-        userId: userId,
-        scope: 'user',
-        verbose: true
-      }
+      options: result.data
     });
     assert(loggerLogSpy.calledOnceWithExactly(unifiedRoleAssignmentScopeUser));
   });
@@ -1067,15 +1067,15 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
 
       throw 'Invalid request';
     });
+    const result = commandOptionsSchema.safeParse({
+      roleDefinitionId: roleDefinitionId,
+      principalId: principalId,
+      userName: userName,
+      scope: 'user',
+      verbose: true
+    });
     await command.action(logger, {
-      options:
-      {
-        roleDefinitionId: roleDefinitionId,
-        principalId: principalId,
-        userName: userName,
-        scope: 'user',
-        verbose: true
-      }
+      options: result.data
     });
     assert(loggerLogSpy.calledOnceWithExactly(unifiedRoleAssignmentScopeUser));
   });
@@ -1094,15 +1094,15 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
 
       throw 'Invalid request';
     });
+    const result = commandOptionsSchema.safeParse({
+      roleDefinitionId: roleDefinitionId,
+      principalId: principalId,
+      groupId: groupId,
+      scope: 'group',
+      verbose: true
+    });
     await command.action(logger, {
-      options:
-      {
-        roleDefinitionId: roleDefinitionId,
-        principalId: principalId,
-        groupId: groupId,
-        scope: 'group',
-        verbose: true
-      }
+      options: result.data
     });
     assert(loggerLogSpy.calledOnceWithExactly(unifiedRoleAssignmentScopeGroup));
   });
@@ -1122,15 +1122,15 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
 
       throw 'Invalid request';
     });
+    const result = commandOptionsSchema.safeParse({
+      roleDefinitionId: roleDefinitionId,
+      principalId: principalId,
+      groupName: groupName,
+      scope: 'group',
+      verbose: true
+    });
     await command.action(logger, {
-      options:
-      {
-        roleDefinitionId: roleDefinitionId,
-        principalId: principalId,
-        groupName: groupName,
-        scope: 'group',
-        verbose: true
-      }
+      options: result.data
     });
     assert(loggerLogSpy.calledOnceWithExactly(unifiedRoleAssignmentScopeGroup));
   });
@@ -1149,15 +1149,15 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
 
       throw 'Invalid request';
     });
+    const result = commandOptionsSchema.safeParse({
+      roleDefinitionId: roleDefinitionId,
+      principalId: principalId,
+      administrativeUnitId: administrativeUnitId,
+      scope: 'administrativeUnit',
+      verbose: true
+    });
     await command.action(logger, {
-      options:
-      {
-        roleDefinitionId: roleDefinitionId,
-        principalId: principalId,
-        administrativeUnitId: administrativeUnitId,
-        scope: 'administrativeUnit',
-        verbose: true
-      }
+      options: result.data
     });
     assert(loggerLogSpy.calledOnceWithExactly(unifiedRoleAssignmentScopeAdministrativeUnit));
   });
@@ -1177,15 +1177,15 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
 
       throw 'Invalid request';
     });
+    const result = commandOptionsSchema.safeParse({
+      roleDefinitionId: roleDefinitionId,
+      principalId: principalId,
+      administrativeUnitName: administrativeUnitName,
+      scope: 'administrativeUnit',
+      verbose: true
+    });
     await command.action(logger, {
-      options:
-      {
-        roleDefinitionId: roleDefinitionId,
-        principalId: principalId,
-        administrativeUnitName: administrativeUnitName,
-        scope: 'administrativeUnit',
-        verbose: true
-      }
+      options: result.data
     });
     assert(loggerLogSpy.calledOnceWithExactly(unifiedRoleAssignmentScopeAdministrativeUnit));
   });
@@ -1204,15 +1204,15 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
 
       throw 'Invalid request';
     });
+    const result = commandOptionsSchema.safeParse({
+      roleDefinitionId: roleDefinitionId,
+      principalId: principalId,
+      customAppScopeId: customAppScopeId,
+      scope: 'custom',
+      verbose: true
+    });
     await command.action(logger, {
-      options:
-      {
-        roleDefinitionId: roleDefinitionId,
-        principalId: principalId,
-        customAppScopeId: customAppScopeId,
-        scope: 'custom',
-        verbose: true
-      }
+      options: result.data
     });
     assert(loggerLogSpy.calledOnceWithExactly(unifiedRoleAssignmentScopeCustom));
   });
@@ -1232,15 +1232,15 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
 
       throw 'Invalid request';
     });
+    const result = commandOptionsSchema.safeParse({
+      roleDefinitionId: roleDefinitionId,
+      principalId: principalId,
+      customAppScopeName: customAppScopeName,
+      scope: 'custom',
+      verbose: true
+    });
     await command.action(logger, {
-      options:
-      {
-        roleDefinitionId: roleDefinitionId,
-        principalId: principalId,
-        customAppScopeName: customAppScopeName,
-        scope: 'custom',
-        verbose: true
-      }
+      options: result.data
     });
     assert(loggerLogSpy.calledOnceWithExactly(unifiedRoleAssignmentScopeCustom));
   });
@@ -1256,12 +1256,13 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
         }
       }
     });
-
+    const result = commandOptionsSchema.safeParse({
+      roleDefinitionId: roleDefinitionId,
+      principalId: principalId,
+      scope: 'tenant'
+    });
     await assert.rejects(command.action(logger, {
-      options: {
-        roleDefinitionId: roleDefinitionId,
-        principalId: principalId,
-        scope: 'tenant'
-      } }), new CommandError('Invalid request'));
+      options: result.data
+    }), new CommandError('Invalid request'));
   });
 });
