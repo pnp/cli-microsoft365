@@ -79,7 +79,16 @@ It first defines the function `Remove-PermissionsGrants` that does the necessary
     Write-Host "Selected grant type: '$GrantType'`n"
 
     # Get Service Principal that represents the enterprise app / service principal
-    $app = m365 entra enterpriseapp list --query "[?appDisplayName == '$($enterpriseAppName)']" | ConvertFrom-Json
+    try {
+      $app = m365 entra enterpriseapp get --displayName $enterpriseAppName | ConvertFrom-Json
+      if($app.error) {
+        throw "Enterprise app '$enterpriseAppName' not found"
+      }
+    }
+    catch {
+      Write-Host "❌ Terminating: $($_.Exception.Message)" -ForegroundColor Red
+      return
+    }
 
     # Filter (delegated) permissions granted with according consent for the given enterprise app or service principal
     $selectedPermissionsGrants = @()
