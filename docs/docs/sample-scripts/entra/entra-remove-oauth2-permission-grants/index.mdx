@@ -33,27 +33,27 @@ It first defines the function `Remove-PermissionsGrants` that does the necessary
     This function finds and removes OAuth2 permission grants (delegated permissions) assigned to a specific enterprise application.
     It can filter and remove permissions based on how they were granted: either by admin consent, user consent, or both.
 
-  .PARAMETER appRegistrationName
-    The display name of the application registration in Entra ID from which to remove permission grants.
+  .PARAMETER enterpriseAppName
+    The display name of the enterprise application or service princial name in Entra ID from which to remove permission grants.
     This parameter is mandatory.
 
   .PARAMETER GrantType
     Specifies which type of permission grants to remove. Valid values are:
-    - 'By Admin': Removes only permissions granted through admin consent (consentType = AllPrincipals)
-    - 'By User': Removes only permissions granted through user consent (consentType != AllPrincipals)
+    - 'ByAdmin': Removes only permissions granted through admin consent (consentType = AllPrincipals)
+    - 'ByUser': Removes only permissions granted through user consent (consentType != AllPrincipals)
     - 'All': Removes both admin and user consented permissions
-    Default value is: 'Granted By User'
+    Default value is: 'ByUser'
 
   .EXAMPLE
-    Remove-PermissionsGrants -appRegistrationName "My App"
+    Remove-PermissionsGrants -enterpriseAppName "My App"
     Removes all user-consented permission grants for the enterprise application "My App"
 
   .EXAMPLE
-    Remove-PermissionsGrants -appRegistrationName "My App" -GrantType "All"
+    Remove-PermissionsGrants -enterpriseAppName "My App" -GrantType "All"
     Removes all permission grants (both admin and user consented) for the enterprise application "My App"
 
   .EXAMPLE
-    Remove-PermissionsGrants -appRegistrationName "My App" -GrantType "By Admin"
+    Remove-PermissionsGrants -enterpriseAppName "My App" -GrantType "ByAdmin"
     Removes only admin-consented permission grants for the enterprise application "My App"
 
   .NOTES
@@ -68,25 +68,25 @@ It first defines the function `Remove-PermissionsGrants` that does the necessary
   function Remove-PermissionsGrants {
     param(
       [Parameter(Mandatory = $true)]
-      [string]$appRegistrationName,
+      [string]$enterpriseAppName,
 
       [Parameter(Mandatory = $false)]
-      [ValidateSet('By Admin', 'By User', 'All')] $GrantType = 'By User'
+      [ValidateSet('ByAdmin', 'ByUser', 'All')] $GrantType = 'ByUser'
     )
     
     Clear-Host
-    Write-Host "Removing permission grants for the app registration '$appRegistrationName'"
+    Write-Host "Removing permission grants for the enterprise app / service principal '$enterpriseAppName'"
     Write-Host "Selected grant type: '$GrantType'`n"
 
-    # Get Service Principal that represents the app registration
-    $app = m365 entra enterpriseapp list --query "[?appDisplayName == '$($appRegistrationName)']" | ConvertFrom-Json
+    # Get Service Principal that represents the enterprise app / service principal
+    $app = m365 entra enterpriseapp list --query "[?appDisplayName == '$($enterpriseAppName)']" | ConvertFrom-Json
 
-    # Filter (delegated) permissions granted with according consent for the given service principal
+    # Filter (delegated) permissions granted with according consent for the given enterprise app or service principal
     $selectedPermissionsGrants = @()
     if ($GrantType -eq 'All') {
       $selectedPermissionsGrants = m365 entra oauth2grant list --spObjectId $app.id | ConvertFrom-Json
     }
-    elseif ($GrantType -eq 'Granted By Admin') {
+    elseif ($GrantType -eq 'ByAdmin') {
       $selectedPermissionsGrants = m365 entra oauth2grant list --spObjectId $app.id --query "[?consentType == 'AllPrincipals']" | ConvertFrom-Json
     }
     else {
@@ -110,9 +110,9 @@ It first defines the function `Remove-PermissionsGrants` that does the necessary
     }
   }
 
-  # Set the app registration name for which to remove user consents
-  $appRegistrationName = 'My App'
-  Remove-PermissionsGrants -appRegistrationName $appRegistrationName
+  # Set the enterprise app / service principal name for which to remove user consents
+  $enterpriseAppName = 'My App'
+  Remove-PermissionsGrants -enterpriseAppName $enterpriseAppName
   ```
 
   </TabItem>
