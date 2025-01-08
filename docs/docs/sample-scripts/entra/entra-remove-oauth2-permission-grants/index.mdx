@@ -10,29 +10,28 @@ tags:
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-# Remove OAuth2 permission grants (granted for users) for a specified Entra ID application registration.
+# Remove OAuth2 permission grants in a specific enterprise application (or service principal) in Entra ID.
 
 Author: [Tobias Maestrini](https://github.com/tmaestrini)
 
-From an administrators perspective, managing OAuth2 permission grants that have been assigned to an application registration can be a challenging task.
-Sometimes it is necessary to remove permissions that are granted to users – for example when only administrators should define which permissions are granted to an app registration.
-When a user has been granted permissions to an application registration, it can be important to remove these permissions as soon as possible to prevent unauthorized access through the app registration.
+From an administrator's perspective, managing OAuth2 permission grants that have been assigned to an enterprise application (used in a multi-tenant app or your own app registration) can be a challenging task.
+Sometimes it is necessary to remove **permissions that are granted to users** – for example when only administrators should define which permissions are granted to an enterprise app.
+When a user has been granted permissions to an enterprise application, it can be important to remove these permissions as soon as possible to prevent unauthorized access in API requests.
 
-This script will remove all OAuth2 permission grants that have been assigned to a specified application registration and are granted to user(s).
-It also provides the option to remove all permissions or permission consents that have been granted by an administrator.
-
-The script first defines a function `Remove-PermissionsGrants` that does the necessary work described above and then calls this function with a predefined app registration name.
+This script will find and remove all OAuth2 permission grants that have been assigned to a specific enterprise application; either by admin consent, user consent, or both.
+It first defines the function `Remove-PermissionsGrants` that does the necessary work described above and then calls this function with a parameter to select a specific enterprise app.
 
 <Tabs>
   <TabItem value="PowerShell">
 
   ```powershell
   .SYNOPSIS
-    Removes OAuth2 permission grants for a specified Entra ID application registration.
+    Removes OAuth2 permission grants in a specific enterprise application (or service principal) in Entra ID.
 
   .DESCRIPTION
-    This function removes OAuth2 permission grants (delegated permissions) from an Entra ID application registration.
-    It can filter and remove permissions based on how they were granted - either by admin consent, user consent, or both.
+    Find and remove all OAuth2 permissions assigned to a specific enterprise application by selecting one of the following removal options: **All permissions** / Permissions granted **by an administrator** / Permissions granted **to users**.
+    This function finds and removes OAuth2 permission grants (delegated permissions) assigned to a specific enterprise application.
+    It can filter and remove permissions based on how they were granted: either by admin consent, user consent, or both.
 
   .PARAMETER appRegistrationName
     The display name of the application registration in Entra ID from which to remove permission grants.
