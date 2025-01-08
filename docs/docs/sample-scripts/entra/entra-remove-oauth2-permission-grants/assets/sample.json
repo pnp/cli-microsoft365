@@ -2,13 +2,13 @@
   {
     "name": "entra-remove-oauth2-permission-grants",
     "source": "pnp",
-    "title": "CLI - Remove OAuth2 permission grants (granted for users) for a specified Entra ID application registration",
+    "title": "CLI - Remove OAuth2 permission grants in a specific enterprise application (or service principal) in Entra ID",
     "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/entra/entra-remove-oauth2-permission-grants",
     "creationDateTime": "2024-12-25",
     "updateDateTime": "2024-12-25",
-    "shortDescription": "Find all OAuth2 permission grants that have been assigned to a specified application registration and are granted to user(s).",
+    "shortDescription": "Find and remove all OAuth2 permission grants that have been assigned to a specific enterprise application (or service principal).",
     "longDescription": [
-      "Find all OAuth2 permission grants that have been assigned to a specified application registration and are granted to user(s). It also provides the option to remove all permissions or permission consents that have been granted by an administrator."
+      "Find and remove all OAuth2 permissions assigned to a specific enterprise application by selecting one of the following removal options: **All permissions** / Permissions granted **by an administrator** / Permissions granted **to users**."
     ],
     "products": [
       "Entra"
