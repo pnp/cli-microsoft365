@@ -103,11 +103,11 @@ It first defines the function `Remove-PermissionsGrants` that does the necessary
       $selectedPermissionsGrants = m365 entra oauth2grant list --spObjectId $app.id --query "[?consentType != 'AllPrincipals']" --output json | ConvertFrom-Json
     }
 
-    Write-Host "👉 $($selectedPermissionsGrants.Length) definitions found"
+    Write-Host "👉 $($selectedPermissionsGrants.Length) definitions found`n"
     
     # Remove the filtered permissions
     $selectedPermissionsGrants | ForEach-Object {
-      Write-Host "permission grant (ID) '$($_.id)': " -NoNewline
+      Write-Host "Removing permission grant (ID) '$($_.id)': " -NoNewline
       m365 entra oauth2grant remove --grantId $_.id --force
       Write-Host "✔ Done" -ForegroundColor Green
       Write-Host "⎿ " $_.scope.trim()
