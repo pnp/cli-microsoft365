@@ -80,7 +80,7 @@ It first defines the function `Remove-PermissionsGrants` that does the necessary
 
     # Get Service Principal that represents the enterprise app / service principal
     try {
-      $app = m365 entra enterpriseapp get --displayName $enterpriseAppName | ConvertFrom-Json
+      $app = m365 entra enterpriseapp get --displayName $enterpriseAppName --output json | ConvertFrom-Json
       if($app.error) {
         throw "Enterprise app '$enterpriseAppName' not found"
       }
@@ -93,14 +93,14 @@ It first defines the function `Remove-PermissionsGrants` that does the necessary
     # Filter (delegated) permissions granted with according consent for the given enterprise app or service principal
     $selectedPermissionsGrants = @()
     if ($GrantType -eq 'All') {
-      $selectedPermissionsGrants = m365 entra oauth2grant list --spObjectId $app.id | ConvertFrom-Json
+      $selectedPermissionsGrants = m365 entra oauth2grant list --spObjectId $app.id --output json | ConvertFrom-Json
     }
     elseif ($GrantType -eq 'ByAdmin') {
-      $selectedPermissionsGrants = m365 entra oauth2grant list --spObjectId $app.id --query "[?consentType == 'AllPrincipals']" | ConvertFrom-Json
+      $selectedPermissionsGrants = m365 entra oauth2grant list --spObjectId $app.id --query "[?consentType == 'AllPrincipals']" --output json | ConvertFrom-Json
     }
     else {
       # granted by user
-      $selectedPermissionsGrants = m365 entra oauth2grant list --spObjectId $app.id --query "[?consentType != 'AllPrincipals']" | ConvertFrom-Json
+      $selectedPermissionsGrants = m365 entra oauth2grant list --spObjectId $app.id --query "[?consentType != 'AllPrincipals']" --output json | ConvertFrom-Json
     }
 
     Write-Host "👉 $($selectedPermissionsGrants.Length) definitions found"
