@@ -8,7 +8,7 @@
     "updateDateTime": "2024-12-25",
     "shortDescription": "Find and remove all OAuth2 permission grants that have been assigned to a specific enterprise application (or service principal).",
     "longDescription": [
-      "Find and remove all OAuth2 permissions assigned to a specific enterprise application by selecting one of the following removal options: **All permissions** / Permissions granted **by an administrator** / Permissions granted **to users**."
+      "Find and remove all OAuth2 permissions assigned to a specific enterprise application by selecting one of the following removal options: **All permissions** / Permissions granted **by an administrator** / Permissions consented to **by users**."
     ],
     "products": [
       "Entra"
