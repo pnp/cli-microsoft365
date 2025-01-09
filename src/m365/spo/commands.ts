@@ -140,6 +140,7 @@ export default {
   LIST_CONTENTTYPE_DEFAULT_SET: `${prefix} list contenttype default set`,
   LIST_DEFAULTVALUE_LIST: `${prefix} list defaultvalue list`,
   LIST_DEFAULTVALUE_REMOVE: `${prefix} list defaultvalue remove`,
+  LIST_DEFAULTVALUE_SET: `${prefix} list defaultvalue set`,
   LIST_GET: `${prefix} list get`,
   LIST_LIST: `${prefix} list list`,
   LIST_REMOVE: `${prefix} list remove`,
