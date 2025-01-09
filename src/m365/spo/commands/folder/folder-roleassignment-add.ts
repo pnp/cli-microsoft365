@@ -180,27 +180,12 @@ class SpoFolderRoleAssignmentAddCommand extends SpoCommand {
         const siteUser = await spo.ensureEntraGroup(args.options.webUrl, group);
         principalId = siteUser.Id;
       }
-
-      await this.breakRoleAssignment(requestUrl);
+      
       await this.addRoleAssignment(requestUrl, principalId!, roleDefinitionId);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
-  }
-
-  private async breakRoleAssignment(requestUrl: string): Promise<void> {
-    const requestOptions: CliRequestOptions = {
-      url: `${requestUrl}/breakroleinheritance(true)`,
-      method: 'POST',
-      headers: {
-        'accept': 'application/json;odata=nometadata',
-        'content-type': 'application/json'
-      },
-      responseType: 'json'
-    };
-
-    return request.post(requestOptions);
   }
 
   private async addRoleAssignment(requestUrl: string, principalId: number, roleDefinitionId: number): Promise<void> {

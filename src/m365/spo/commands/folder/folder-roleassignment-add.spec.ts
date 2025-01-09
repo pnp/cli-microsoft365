@@ -199,11 +199,7 @@ describe(commands.FOLDER_ROLEASSIGNMENT_ADD, () => {
   });
 
   it('add the role assignment to the specified folder based on the upn and role definition id', async () => {
-    sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/_api/web/GetFolderByServerRelativePath(DecodedUrl=\'%2FShared%20Documents%2FFolderPermission\')/ListItemAllFields/breakroleinheritance(true)') {
-        return;
-      }
-
+    sinon.stub(request, 'post').callsFake(async (opts) => {  
       if (opts.url === 'https://contoso.sharepoint.com/_api/web/GetFolderByServerRelativePath(DecodedUrl=\'%2FShared%20Documents%2FFolderPermission\')/ListItemAllFields/roleassignments/addroleassignment(principalid=\'11\',roledefid=\'1073741827\')') {
         return;
       }
@@ -238,10 +234,6 @@ describe(commands.FOLDER_ROLEASSIGNMENT_ADD, () => {
 
   it('add the role assignment to the specified root folder based on the principal id and role definition id', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/_api/web/GetList(\'%2FShared%20Documents\')/breakroleinheritance(true)') {
-        return;
-      }
-
       if (opts.url === 'https://contoso.sharepoint.com/_api/web/GetList(\'%2FShared%20Documents\')/roleassignments/addroleassignment(principalid=\'11\',roledefid=\'1073741827\')') {
         return;
       }
@@ -269,10 +261,6 @@ describe(commands.FOLDER_ROLEASSIGNMENT_ADD, () => {
 
   it('correctly handles error when upn does not exist', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/_api/web/GetFolderByServerRelativePath(DecodedUrl=\'%2FShared%20Documents\')/ListItemAllFields/breakroleinheritance(true)') {
-        return;
-      }
-
       if (opts.url === 'https://contoso.sharepoint.com/_api/web/GetFolderByServerRelativePath(DecodedUrl=\'%2FShared%20Documents%2FFolderPermission\')/ListItemAllFields/roleassignments/addroleassignment(principalid=\'11\',roledefid=\'1073741827\')') {
         return;
       }
@@ -306,10 +294,6 @@ describe(commands.FOLDER_ROLEASSIGNMENT_ADD, () => {
 
   it('add the role assignment to the specified folder based on the group name and role definition id', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/_api/web/GetFolderByServerRelativePath(DecodedUrl=\'%2FShared%20Documents%2FFolderPermission\')/ListItemAllFields/breakroleinheritance(true)') {
-        return;
-      }
-
       if (opts.url === 'https://contoso.sharepoint.com/_api/web/GetFolderByServerRelativePath(DecodedUrl=\'%2FShared%20Documents%2FFolderPermission\')/ListItemAllFields/roleassignments/addroleassignment(principalid=\'11\',roledefid=\'1073741827\')') {
         return;
       }
@@ -345,10 +329,6 @@ describe(commands.FOLDER_ROLEASSIGNMENT_ADD, () => {
 
   it('correctly handles error when group does not exist', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/_api/web/GetFolderByServerRelativePath(DecodedUrl=\'%2FShared%20Documents%2FFolderPermission\')/ListItemAllFields/breakroleinheritance(true)') {
-        return;
-      }
-
       if (opts.url === 'https://contoso.sharepoint.com/_api/web/GetFolderByServerRelativePath(DecodedUrl=\'%2FShared%20Documents%2FFolderPermission\')/ListItemAllFields/roleassignments/addroleassignment(principalid=\'11\',roledefid=\'1073741827\')') {
         return;
       }
@@ -382,10 +362,6 @@ describe(commands.FOLDER_ROLEASSIGNMENT_ADD, () => {
 
   it('add the role assignment to the specified folder based on the principal id and role definition name', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/_api/web/GetFolderByServerRelativePath(DecodedUrl=\'%2FShared%20Documents%2FFolderPermission\')/ListItemAllFields/breakroleinheritance(true)') {
-        return;
-      }
-
       if (opts.url === 'https://contoso.sharepoint.com/_api/web/GetFolderByServerRelativePath(DecodedUrl=\'%2FShared%20Documents%2FFolderPermission\')/ListItemAllFields/roleassignments/addroleassignment(principalid=\'11\',roledefid=\'1073741827\')') {
         return;
       }
@@ -421,10 +397,6 @@ describe(commands.FOLDER_ROLEASSIGNMENT_ADD, () => {
 
   it('correctly handles error when role definition does not exist', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/_api/web/GetFolderByServerRelativePath(DecodedUrl=\'%2FShared%20Documents%2FFolderPermission\')/ListItemAllFields/breakroleinheritance(true)') {
-        return;
-      }
-
       if (opts.url === 'https://contoso.sharepoint.com/_api/web/GetFolderByServerRelativePath(DecodedUrl=\'%2FShared%20Documents%2FFolderPermission\')/ListItemAllFields/roleassignments/addroleassignment(principalid=\'11\',roledefid=\'1073741827\')') {
         return;
       }
@@ -462,10 +434,6 @@ describe(commands.FOLDER_ROLEASSIGNMENT_ADD, () => {
     sinon.stub(spo, 'ensureEntraGroup').withArgs('https://contoso.sharepoint.com', graphGroup).resolves(entraGroupResponse);
 
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/_api/web/GetList(\'%2FShared%20Documents\')/breakroleinheritance(true)') {
-        return;
-      }
-
       if (opts.url === 'https://contoso.sharepoint.com/_api/web/GetList(\'%2FShared%20Documents\')/roleassignments/addroleassignment(principalid=\'11\',roledefid=\'1073741827\')') {
         return;
       }
@@ -496,10 +464,6 @@ describe(commands.FOLDER_ROLEASSIGNMENT_ADD, () => {
     sinon.stub(spo, 'ensureEntraGroup').withArgs('https://contoso.sharepoint.com', graphGroup).resolves(entraGroupResponse);
 
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/_api/web/GetList(\'%2FShared%20Documents\')/breakroleinheritance(true)') {
-        return;
-      }
-
       if (opts.url === 'https://contoso.sharepoint.com/_api/web/GetList(\'%2FShared%20Documents\')/roleassignments/addroleassignment(principalid=\'11\',roledefid=\'1073741827\')') {
         return;
       }
