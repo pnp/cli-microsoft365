@@ -1,0 +1,112 @@
+import Global from '/docs/cmd/_global.mdx';
+
+# spo list defaultvalue set
+
+Sets default column values for a specific document library
+
+## Usage
+
+```sh
+m365 spo list defaultvalue set [options]
+```
+
+## Options
+
+```md definition-list
+`-u, --webUrl <webUrl>`
+: URL of the site where the list is located.
+
+`-i, --listId [listId]`
+: ID of the list. Specify either `listTitle`, `listId`, or `listUrl`.
+
+`-t, --listTitle [listTitle]`
+: Title of the list. Specify either `listTitle`, `listId`, or `listUrl`.
+
+`--listUrl [listUrl]`
+: Server- or site-relative URL of the list. Specify either `listTitle`, `listId`, or `listUrl`.
+
+`--fieldName <fieldName>`
+: Internal name of the field.
+
+`--fieldValue <fieldValue>`
+: Default value of the field.
+
+`--folderUrl [folderUrl]`
+: Set the value to a specific folder. By default, the root folder of the list is used.
+```
+
+<Global />
+
+# Remarks
+
+:::note
+
+Due to limitations in SharePoint Online, setting default column values for folders with a `#` or `%` character in their path is not supported.
+
+:::
+
+## Examples
+
+Set a default folder value on the root folder of a list for a text field
+
+```sh
+m365 spo list defaultvalue set --webUrl https://contoso.sharepoint.com/sites/Marketing --listTitle Logos --fieldName Company --fieldValue Contoso
+```
+
+Set a default folder value for a taxonomy field on a specific folder
+
+```sh
+m365 spo list defaultvalue set --webUrl https://contoso.sharepoint.com/sites/Marketing --listTitle Logos --folderUrl "/sites/Marketing/Logos/Contoso" --fieldName Country --fieldValue "-1;#Belgium|442affc2-7fab-4f33-9590-330403a579c2"
+```
+
+Set a default folder value for a multi-taxonomy field on a specific folder
+
+```sh
+m365 spo list defaultvalue set --webUrl https://contoso.sharepoint.com/sites/Marketing --listUrl /sites/marketing/Logos --folderUrl "/sites/Marketing/Logos/Contoso" --fieldName Countries --fieldValue "-1;#Belgium|442affc2-7fab-4f33-9590-330403a579c2;#-1;#France|14888324-5c48-46db-b748-215cbe24eb4c"
+```
+
+Set a default folder value for a date field to today
+
+```sh
+m365 spo list defaultvalue set --webUrl https://contoso.sharepoint.com/sites/Marketing --listId 3540460d-cb6e-4bc5-8380-bc1844401ee3 --fieldName Published --fieldValue "[today]"
+```
+
+Set a default folder value for a date field
+
+```sh
+m365 spo list defaultvalue set --webUrl https://contoso.sharepoint.com/sites/Marketing --listTitle Logos --fieldName Published --fieldValue "2020-05-03T11:00:00Z"
+```
+
+Set a default folder value for a choice field
+
+```sh
+m365 spo list defaultvalue set --webUrl https://contoso.sharepoint.com/sites/Marketing --listUrl /sites/marketing/Logos --fieldName FileType --fieldValue Logo
+```
+
+Set a default folder value for a multi-choice field
+
+```sh
+m365 spo list defaultvalue set --webUrl https://contoso.sharepoint.com/sites/Marketing --listTitle Logos --fieldName FileTypes --fieldValue "Logo;#Brand"
+```
+
+Set a default folder value for a yes/no field using site-relative list URL
+
+```sh
+m365 spo list defaultvalue set --webUrl https://contoso.sharepoint.com/sites/Marketing --listUrl /Logos --fieldName Active --fieldValue 1
+```
+
+Set a default folder value for a user field
+
+```sh
+m365 spo list defaultvalue set --webUrl https://contoso.sharepoint.com/sites/Marketing --listId 3540460d-cb6e-4bc5-8380-bc1844401ee3 --fieldName Responsible --fieldValue "1;#john.doe@contoso.com"
+```
+
+Set a default folder value for a multi-user field
+
+```sh
+m365 spo list defaultvalue set --webUrl https://contoso.sharepoint.com/sites/Marketing --listId 3540460d-cb6e-4bc5-8380-bc1844401ee3 --fieldName Responsible --fieldValue "1;#john.doe@contoso.com;#2;#adele.vance@contoso.com"
+```
+
+## Response
+
+The command won't return a response on success.

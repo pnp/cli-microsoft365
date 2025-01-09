@@ -2929,6 +2929,11 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
+              label: 'list defaultvalue set',
+              id: 'cmd/spo/list/list-defaultvalue-set'
+            },
+            {
+              type: 'doc',
               label: 'list retentionlabel ensure',
               id: 'cmd/spo/list/list-retentionlabel-ensure'
             },
