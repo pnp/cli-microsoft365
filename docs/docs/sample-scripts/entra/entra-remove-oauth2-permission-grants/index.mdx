@@ -61,7 +61,7 @@ It first defines the function `Remove-PermissionsGrants` that does the necessary
     Prerequisites:
     - CLI for Microsoft 365 (m365) must be installed and configured
     - The User must be assigned an appropriate Microsoft Entra role to manage OAuth2 permission grants (at least Application Developer, Cloud Application Administrator, User Administrator)
-      (see Microsoft Graph references: [list](https://learn.microsoft.com/en-us/graph/api/oauth2permissiongrant-list?view=graph-rest-1.0&tabs=http) and [delete](https://learn.microsoft.com/en-us/graph/api/oauth2permissiongrant-delete?view=graph-rest-1.0&tabs=http) permission grants)
+      (see Microsoft Graph references: https://learn.microsoft.com/en-us/graph/api/oauth2permissiongrant-list?view=graph-rest-1.0&tabs=http and https://learn.microsoft.com/en-us/graph/api/oauth2permissiongrant-delete?view=graph-rest-1.0&tabs=http)
     - The Entra app registration used to sign into the CLI for Microsoft 365 must have an appropriate permission scope to manage permissions of other apps (at least `DelegatedPermissionGrant.ReadWrite.All`)
 
   .LINK
