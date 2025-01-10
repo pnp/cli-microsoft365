@@ -37,7 +37,7 @@ describe(commands.ROLEDEFINITION_ADD, () => {
     ]
   };
 
-  const roleDefinitionWithDeatilsResponse = {
+  const roleDefinitionWithDetailsResponse = {
     "id": "abcde50a-487c-49b3-a43e-cda270d3341f",
     "description": "Allows creating and deleting unified groups",
     "displayName": "Custom Role",
@@ -93,8 +93,7 @@ describe(commands.ROLEDEFINITION_ADD, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      request.post,
-      cli.promptForConfirmation
+      request.post
     ]);
   });
 
@@ -142,7 +141,7 @@ describe(commands.ROLEDEFINITION_ADD, () => {
   it('creates a custom role definition with a specific display name, description, version and resource actions', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/roleManagement/directory/roleDefinitions') {
-        return roleDefinitionWithDeatilsResponse;
+        return roleDefinitionWithDetailsResponse;
       }
 
       throw 'Invalid request';
@@ -159,7 +158,7 @@ describe(commands.ROLEDEFINITION_ADD, () => {
     await command.action(logger, {
       options: parsedSchema.data
     });
-    assert(loggerLogSpy.calledOnceWithExactly(roleDefinitionWithDeatilsResponse));
+    assert(loggerLogSpy.calledOnceWithExactly(roleDefinitionWithDetailsResponse));
   });
 
   it('correctly handles API OData error', async () => {

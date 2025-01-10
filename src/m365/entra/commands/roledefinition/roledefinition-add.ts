@@ -10,10 +10,10 @@ import { UnifiedRoleDefinition } from '@microsoft/microsoft-graph-types';
 const options = globalOptionsZod
   .extend({
     displayName: zod.alias('n', z.string()),
-    allowedResourceActions: z.string().transform((value) => value.split(',').map(String)),
-    description: z.string().optional(),
-    enabled: z.boolean().optional(),
-    version: z.string().optional()
+    allowedResourceActions: zod.alias('a', z.string().transform((value) => value.split(',').map(String))),
+    description: zod.alias('d', z.string().optional()),
+    enabled: zod.alias('e', z.boolean().optional()),
+    version: zod.alias('v', z.string().optional())
   })
   .strict();
 
