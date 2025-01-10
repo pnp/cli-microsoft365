@@ -60,10 +60,11 @@ describe(commands.REPORT_TENANTSETTINGS_SET, () => {
   });
 
   it('logs a message when updating settings in verbose mode', async () => {
-    command.action(logger, { options: { verbose: true, hideUserInformation: true } });
+    await command.action(logger, { options: { verbose: true, hideUserInformation: true } });
     await command.action(logger, { options: { hideUserInformation: true } });
     assert(loggerLogSpy.calledWith('Updating report settings...'));
   });
+
 
 
   it('patches the tenant settings report with the specified settings', async () => {
