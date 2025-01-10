@@ -14,10 +14,10 @@ const options = globalOptionsZod
     id: zod.alias('i', z.string().optional()),
     displayName: zod.alias('n', z.string().optional()),
     newDisplayName: z.string().optional(),
-    allowedResourceActions: z.string().optional(),
-    description: z.string().optional(),
-    enabled: z.boolean().optional(),
-    version: z.string().optional()
+    allowedResourceActions: zod.alias('a', z.string().optional()),
+    description: zod.alias('d', z.string().optional()),
+    enabled: zod.alias('e', z.boolean().optional()),
+    version: zod.alias('v', z.string().optional())
   })
   .strict();
 
