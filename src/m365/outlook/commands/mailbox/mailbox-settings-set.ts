@@ -68,6 +68,48 @@ class OutlookMailboxSettingsSetCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    const isAppOnlyAccessToken = accessToken.isAppOnlyAccessToken(auth.connection.accessTokens[auth.defaultResource].accessToken);
+
+    let requestUrl = `${this.resource}/v1.0/me/mailboxSettings`;
+
+    if (isAppOnlyAccessToken) {
+      if (args.options.userId && args.options.userName) {
+        throw 'When running with application permissions either userId or userName is required, but not both';
+      }
+
+      const userIdentifier = args.options.userId ?? args.options.userName;
+
+      if (this.verbose) {
+        await logger.logToStderr(`Updating mailbox settings for user ${userIdentifier}...`);
+      }
+
+      requestUrl = `${this.resource}/v1.0/users('${userIdentifier}')/mailboxSettings`;
+    }
+    else {
+      if (args.options.userId || args.options.userName) {
+        throw 'You can update mailbox settings of other users only if CLI is authenticated in app-only mode';
+      }
+    }
+
+    const requestOptions: CliRequestOptions = {
+      url: requestUrl,
+      headers: {
+        accept: 'application/json;odata.metadata=none'
+      },
+      responseType: 'json',
+      data: this.createRequestBody(args)
+    };
+
+    try {
+      const result = await request.patch<MailboxSettings>(requestOptions);
+      await logger.log(result);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
+  }
+
+  private createRequestBody(args: CommandArgs): any {
     const data: any = {
     };
 
@@ -159,45 +201,7 @@ class OutlookMailboxSettingsSetCommand extends GraphCommand {
       data.automaticRepliesSetting['scheduledEndDateTime']['timeZone'] = args.options.autoReplyEndTimeZone;
     }
 
-    const isAppOnlyAccessToken = accessToken.isAppOnlyAccessToken(auth.connection.accessTokens[auth.defaultResource].accessToken);
-
-    let requestUrl = `${this.resource}/v1.0/me/mailboxSettings`;
-
-    if (isAppOnlyAccessToken) {
-      if (args.options.userId && args.options.userName) {
-        throw 'When running with application permissions either userId or userName is required, but not both';
-      }
-
-      const userIdentifier = args.options.userId ?? args.options.userName;
-
-      if (this.verbose) {
-        await logger.logToStderr(`Updating mailbox settings for user ${userIdentifier}...`);
-      }
-
-      requestUrl = `${this.resource}/v1.0/users('${userIdentifier}')/mailboxSettings`;
-    }
-    else {
-      if (args.options.userId || args.options.userName) {
-        throw 'You can update mailbox settings of other users only if CLI is authenticated in app-only mode';
-      }
-    }
-
-    const requestOptions: CliRequestOptions = {
-      url: requestUrl,
-      headers: {
-        accept: 'application/json;odata.metadata=none'
-      },
-      responseType: 'json',
-      data: data
-    };
-
-    try {
-      const result = await request.patch<MailboxSettings>(requestOptions);
-      await logger.log(result);
-    }
-    catch (err: any) {
-      this.handleRejectedODataJsonPromise(err);
-    }
+    return data;
   }
 }
 

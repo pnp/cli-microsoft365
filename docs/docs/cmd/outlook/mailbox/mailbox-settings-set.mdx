@@ -16,10 +16,10 @@ m365 outlook mailbox settings set [options]
 
 ```md definition-list
 `-i, --userId [userId]`
-: The ID of the Microsoft Entra user to update mailbox settings for. Specify either `userId` or `userName`, but not both. This option is required when using application permissions.
+: The ID of the Microsoft Entra user to update mailbox settings for. Either `userId` or `userName` is required when using application permissions.
 
 `-n, --userName [userName]`
-: The UPN of the Microsoft Entra user to update mailbox settings for. Specify either `userId` or `userName`, but not both. This option is required when using application permissions.
+: The UPN of the Microsoft Entra user to update mailbox settings for. Either `userId` or `userName` is required when using application permissions.
 
 `--dateFormat [dateFormat]`
 : The date format for the user's mailbox. Example: `dd.MM.yyyy`.
@@ -28,7 +28,7 @@ m365 outlook mailbox settings set [options]
 : The time format for the user's mailbox. Example: `H:mm`.
 
 `--timeZone [timeZone]`
-: The default time zone for the user's mailbox. Should follow [Windows time zone name](https://learn.microsoft.com/en-us/windows-hardware/manufacture/desktop/default-time-zones?view=windows-11#time-zones) or [IANA time zone identifier](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#List). Example: `Central Europe Standard Time`.
+: The default time zone for the user's mailbox. Should follow [Windows time zone name](https://learn.microsoft.com/windows-hardware/manufacture/desktop/default-time-zones?view=windows-11#time-zones) or [IANA time zone identifier](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#List). Example: `Central Europe Standard Time`.
 
 `--language [language]`
 : The preferred language for the user. Should follow [ISO 639-1 Code](https://learn.microsoft.com/openspecs/office_standards/ms-oe376/6c085406-a698-4e12-9d4d-c3b0ee3dbc4a). Example: `en-US`.
@@ -40,13 +40,13 @@ m365 outlook mailbox settings set [options]
 : The days of the week on which the user works, separated by a comma. Allowed values are `monday`, `tuesday`, `wednesday`, `thursday`, `friday`, `saturday`, or `sunday`.
 
 `--workingHoursStartTime [workingHoursStartTime]`
-: The time of the day that the user starts working. Example: `09:00:00.000000`.
+: The time of the day that the user starts working. Example: `09:00`.
 
 `--workingHoursEndTime [workingHoursEndTime]`
-: The time of the day that the user stops working. Example: `17:00:00.000000`.
+: The time of the day that the user stops working. Example: `17:00`.
 
 `--workingHoursTimeZone [workingHoursTimeZone]`
-: The name of a time zone to which the working hours apply. Should follow [Windows time zone name](https://learn.microsoft.com/en-us/windows-hardware/manufacture/desktop/default-time-zones?view=windows-11#time-zones) or [IANA time zone identifier](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#List). Example: `Central Europe Standard Time`.
+: The name of a time zone to which the working hours apply. Should follow [Windows time zone name](https://learn.microsoft.com/windows-hardware/manufacture/desktop/default-time-zones?view=windows-11#time-zones) or [IANA time zone identifier](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#List). Example: `Central Europe Standard Time`.
 
 `--autoReplyExternalAudience [autoReplyExternalAudience]`
 : Specifies external audience who will receive reply message. Allowed values are `none`, `contactsOnly`, or `all`.
@@ -86,7 +86,7 @@ m365 outlook mailbox settings set --dateFormat 'dd.MM.yyyy' --timeFormat 'H:mm' 
 Update working hours of a user specified by id
 
 ```sh
-m365 outlook mailbox settings set --userId 1caf7dcd-7e83-4c3a-94f7-932a1299c844 --workingDays 'monday,tuesday,thursday,friday' --workingHoursStartTime '08:00:00.0000000' --workingHoursEndTime '16:30:00.0000000' --workingHoursTimeZone 'Central Europe Standard Time'
+m365 outlook mailbox settings set --userId 1caf7dcd-7e83-4c3a-94f7-932a1299c844 --workingDays 'monday,tuesday,thursday,friday' --workingHoursStartTime '08:00' --workingHoursEndTime '16:30' --workingHoursTimeZone 'Central Europe Standard Time'
 ```
 
 Set scheduled automatic replies for the internal audience of a user specified by UPN
