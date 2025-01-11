@@ -2905,6 +2905,11 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
+              label: 'list defaultvalue remove',
+              id: 'cmd/spo/list/list-defaultvalue-remove'
+            },
+            {
+              type: 'doc',
               label: 'list retentionlabel ensure',
               id: 'cmd/spo/list/list-retentionlabel-ensure'
             },
