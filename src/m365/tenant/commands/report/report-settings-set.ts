@@ -60,7 +60,7 @@ class TenantReportSettingsSetCommand extends GraphCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       if (this.verbose) {
-        await logger.logToStderr(`Updating report settings displayConcealedNames to '${args.options.hideUserInformation}'...`);
+        await logger.logToStderr(`Updating report settings '${args.options.hideUserInformation}'...`);
       }
       const requestOptions: CliRequestOptions = {
         url: `${this.resource}/v1.0/admin/reportSettings`,
@@ -75,9 +75,6 @@ class TenantReportSettingsSetCommand extends GraphCommand {
         }
       };
       await request.patch(requestOptions);
-      if (this.verbose) {
-        await logger.logToStderr(`Report settings displayConcealedNames updated to '${args.options.hideUserInformation}'`);
-      }
     }
     catch (err) {
       this.handleRejectedODataJsonPromise(err);
