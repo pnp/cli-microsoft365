@@ -22,6 +22,7 @@ export default {
   GATEWAY_LIST: `${prefix} gateway list`,
   MANAGEMENTAPP_ADD: `${prefix} managementapp add`,
   MANAGEMENTAPP_LIST: `${prefix} managementapp list`,
+  PIPELINE_LIST: `${prefix} pipeline list`,
   SOLUTION_GET: `${prefix} solution get`,
   SOLUTION_LIST: `${prefix} solution list`,
   SOLUTION_PUBLISH: `${prefix} solution publish`,
@@ -31,6 +32,5 @@ export default {
   SOLUTION_PUBLISHER_LIST: `${prefix} solution publisher list`,
   SOLUTION_PUBLISHER_REMOVE: `${prefix} solution publisher remove`,
   TENANT_SETTINGS_LIST: `${prefix} tenant settings list`,
-  TENANT_SETTINGS_SET: `${prefix} tenant settings set`,
-  PIPELINE_LIST: `${prefix} pipeline list`
+  TENANT_SETTINGS_SET: `${prefix} tenant settings set`
 };

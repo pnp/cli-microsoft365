@@ -1,6 +1,5 @@
 import type { SidebarsConfig } from '@docusaurus/plugin-content-docs';
 
-
 const sidebars: SidebarsConfig = {
   home: [
     'index',
@@ -1744,6 +1743,15 @@ const sidebars: SidebarsConfig = {
           ]
         },
         {
+          pipeline: [
+            {
+              type: 'doc',
+              label: 'pipeline list',
+              id: 'cmd/pp/pipeline/pipeline-list'
+            }
+          ]
+        },
+        {
           solution: [
             {
               type: 'doc',
@@ -1784,15 +1792,6 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'solution publisher remove',
               id: 'cmd/pp/solution/solution-publisher-remove'
-            }
-          ]
-        },
-        {
-          pipeline: [
-            {
-              type: 'doc',
-              label: 'pipeline list',
-              id: 'cmd/pp/pipeline/pipeline-list'
             }
           ]
         },

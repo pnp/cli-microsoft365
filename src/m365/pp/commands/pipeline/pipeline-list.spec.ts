@@ -11,17 +11,15 @@ import { session } from "../../../../utils/session.js";
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 import { CommandError } from "../../../../Command.js";
-
-
-
+import { powerPlatform } from "../../../../utils/powerPlatform.js";
 
 describe(commands.PIPELINE_LIST, () => {
   const environmentName = 'environmentName';
   const mockPipelineListResponse: any = [
     {
-      name: 'pipeline1',
+      '_ownerid_value': 'owner1',
       deploymentpipelineid: 'deploymentpipelineid1',
-      ownerid: 'owner1',
+      name: 'pipeline1',
       statuscode: 'statuscode1'
     }
   ];
@@ -89,61 +87,19 @@ describe(commands.PIPELINE_LIST, () => {
   });
 
   it('defines correct properties for the default output', () => {
-    assert.deepStrictEqual(command.defaultProperties(), ['name', 'deploymentpipelineid', 'ownerid', 'statuscode']);
-  });
-
-  it('should send a request to get environment details', async () => {
-    const getEnvironmentStub = sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/providers/Microsoft.BusinessAppPlatform/environments/${environmentName}`) > -1) {
-        return mockEnvironmentResponse;
-      }
-      throw 'Invalid request';
-    });
-    await command['getEnvironmentDetails'](environmentName, false);
-
-    assert(getEnvironmentStub.calledWith(sinon.match({
-      url: sinon.match(`https://api.bap.microsoft.com/providers/Microsoft.BusinessAppPlatform/environments/${environmentName}`),
-      headers: sinon.match({
-        accept: 'application/json;odata.metadata=none'
-      }),
-      responseType: 'json'
-    })));
-  });
-
-  it('should send a request to get environment details (as admin)', async () => {
-    const getEnvironmentStub = sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/providers/Microsoft.BusinessAppPlatform/scopes/admin/environments/${environmentName}`) > -1) {
-        return mockEnvironmentResponse;
-      }
-      throw 'Invalid request';
-    });
-    await command['getEnvironmentDetails'](environmentName, true);
-
-    assert(getEnvironmentStub.calledWith(sinon.match({
-      url: sinon.match(`https://api.bap.microsoft.com/providers/Microsoft.BusinessAppPlatform/scopes/admin/environments/${environmentName}`),
-      headers: sinon.match({
-        accept: 'application/json;odata.metadata=none'
-      }),
-      responseType: 'json'
-    })));
-  });
-
-  it('returns correct environment details', async () => {
-    sinon.stub(request, 'get').resolves(mockEnvironmentResponse);
-    const result = await command['getEnvironmentDetails'](environmentName, false);
-    assert.strictEqual(result.properties.linkedEnvironmentMetadata.instanceApiUrl, 'https://contoso.crm.dynamics.com');
+    assert.deepStrictEqual(command.defaultProperties(), ['name', 'deploymentpipelineid', '_ownerid_value', 'statuscode']);
   });
 
   it('retrieves pipelines in the specified Power Platform environment', async () => {
-    const getEnvironmentStub = await sinon.stub(command as any, 'getEnvironmentDetails').callsFake(() => Promise.resolve(mockEnvironmentResponse));
+    const getEnvironmentStub = await sinon.stub(powerPlatform as any, 'getDynamicsInstanceApiUrl').callsFake(() => Promise.resolve(mockEnvironmentResponse));
     const getPipelineStub = sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/api/data/v9.0/deploymentpipelines') > -1) {
         return {
           value: [
             {
-              name: 'pipeline1',
-              deploymentpipelineid: 'deploymentpipelineid1',
               '_ownerid_value': 'owner1',
+              deploymentpipelineid: 'deploymentpipelineid1',
+              name: 'pipeline1',
               statuscode: 'statuscode1'
             }
           ]
@@ -180,6 +136,3 @@ describe(commands.PIPELINE_LIST, () => {
   });
 
 });
-
-
-
