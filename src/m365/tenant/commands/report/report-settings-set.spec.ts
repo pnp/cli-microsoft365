@@ -1,9 +1,9 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
+import request from '../../../../request.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
-import request from '../../../../request.js';
 import { telemetry } from '../../../../telemetry.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
@@ -14,7 +14,8 @@ import command from './report-settings-set.js';
 describe(commands.REPORT_TENANTSETTINGS_SET, () => {
   let log: string[];
   let logger: Logger;
-  let loggerLogSpy: sinon.SinonSpy;
+
+
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -37,7 +38,6 @@ describe(commands.REPORT_TENANTSETTINGS_SET, () => {
         log.push(msg);
       }
     };
-    loggerLogSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -59,12 +59,20 @@ describe(commands.REPORT_TENANTSETTINGS_SET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('logs a message when updating settings in verbose mode', async () => {
-    await command.action(logger, { options: { verbose: true, hideUserInformation: true } });
-    await command.action(logger, { options: { hideUserInformation: true } });
-    assert(loggerLogSpy.calledWith('Updating report settings...'));
-  });
+  it('logs verbose message when verbose option is enabled', async () => {
+    const logToStderrSpy = sinon.spy(logger, 'logToStderr');
 
+    sinon.stub(request, 'patch').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/admin/reportSettings`) {
+        return Promise.resolve();
+      }
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { hideUserInformation: true, verbose: true } });
+
+    assert(logToStderrSpy.calledWith('Updating report settings displayConcealedNames to true'));
+  });
 
 
   it('patches the tenant settings report with the specified settings', async () => {
@@ -74,7 +82,6 @@ describe(commands.REPORT_TENANTSETTINGS_SET, () => {
       }
       return Promise.reject('Invalid request');
     });
-
     await command.action(logger, {
       options: { hideUserInformation: true }
     });

@@ -1,4 +1,3 @@
-//import { boolean } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
@@ -57,11 +56,15 @@ class TenantReportSettingsSetCommand extends GraphCommand {
     this.types.boolean.push('hideUserInformation');
   }
 
+
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
+
+      const { hideUserInformation } = args.options;
       if (this.verbose) {
-        await logger.logToStderr(`Updating report settings '${args.options.hideUserInformation}'...`);
+        await logger.logToStderr(`Updating report settings displayConcealedNames to ${hideUserInformation}`);
       }
+
       const requestOptions: CliRequestOptions = {
         url: `${this.resource}/v1.0/admin/reportSettings`,
         headers: {
@@ -69,11 +72,11 @@ class TenantReportSettingsSetCommand extends GraphCommand {
           'content-type': 'application/json'
         },
         responseType: 'json',
-        // displayConcealedNames If set to true, all reports conceal user information such as usernames, groups, and sites. If false, all reports show identifiable information
         data: {
           'displayConcealedNames': args.options.hideUserInformation
         }
       };
+
       await request.patch(requestOptions);
     }
     catch (err) {

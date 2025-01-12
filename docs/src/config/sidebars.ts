@@ -964,6 +964,11 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'report servicesusercounts',
               id: 'cmd/tenant/report/report-servicesusercounts'
+            },
+            {
+              type: 'doc',
+              label: 'tenant report settings set',
+              id: 'cmd/tenant/report/report-tenantsettings-set'
             }
           ]
         },
