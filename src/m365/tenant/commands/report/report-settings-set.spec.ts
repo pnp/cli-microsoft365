@@ -1,6 +1,8 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
+import { cli } from '../../../../cli/cli.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import request from '../../../../request.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
@@ -14,8 +16,7 @@ import command from './report-settings-set.js';
 describe(commands.REPORT_TENANTSETTINGS_SET, () => {
   let log: string[];
   let logger: Logger;
-
-
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -23,6 +24,7 @@ describe(commands.REPORT_TENANTSETTINGS_SET, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
+    commandInfo = cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -57,6 +59,33 @@ describe(commands.REPORT_TENANTSETTINGS_SET, () => {
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
+  });
+
+  it('fails validation if --hideUserInformation is not a boolean', async () => {
+    const result = await command.validate({
+      options: {
+        hideUserInformation: 'not-boolean'
+      }
+    }, commandInfo);
+    assert.strictEqual(result, `'hideUserInformation' must be a boolean.`);
+  });
+
+  it('passes validation if --hideUserInformation is true', async () => {
+    const result = await command.validate({
+      options: {
+        hideUserInformation: true
+      }
+    }, commandInfo);
+    assert.strictEqual(result, true);
+  });
+
+  it('passes validation if --hideUserInformation is false', async () => {
+    const result = await command.validate({
+      options: {
+        hideUserInformation: false
+      }
+    }, commandInfo);
+    assert.strictEqual(result, true);
   });
 
   it('logs verbose message when verbose option is enabled', async () => {

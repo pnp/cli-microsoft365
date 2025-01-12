@@ -27,6 +27,7 @@ class TenantReportSettingsSetCommand extends GraphCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initTypes();
+    this.#initValidators();
   }
 
   #initTelemetry(): void {
@@ -51,6 +52,19 @@ class TenantReportSettingsSetCommand extends GraphCommand {
     );
   }
 
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        const { hideUserInformation } = args.options;
+
+        if (typeof hideUserInformation !== 'boolean') {
+          return `'hideUserInformation' must be a boolean.`;
+        }
+
+        return true;
+      }
+    );
+  }
 
   #initTypes(): void {
     this.types.boolean.push('hideUserInformation');
