@@ -1,6 +1,4 @@
 import Global from '/docs/cmd/_global.mdx';
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
 
 # entra user session revoke
 
@@ -30,7 +28,7 @@ m365 entra user session revoke [options]
 
 :::info
 
-The user with at least User Administrator role can revoke sign-in sessions of other users.
+To use this command you must be either **User Administrator** or **Global Administrator**.
 
 :::
 
@@ -64,42 +62,4 @@ m365 entra user session revoke --userName john.doe@contoso.onmicrosoft.com --for
 
 ## Response
 
-<Tabs>
-  <TabItem value="JSON">
-
-  ```json
-  {
-    "value": true
-  }
-  ```
-
-  </TabItem>
-  <TabItem value="Text">
-
-  ```text
-  value: true
-  ```
-
-  </TabItem>
-  <TabItem value="CSV">
-
-  ```csv
-  value
-  1
-  ```
-
-  </TabItem>
-  <TabItem value="Markdown">
-
-  ```md
-  # entra user session revoke --userName "john.doe@contoso.com" --force "true"
-
-  Date: 1/5/2025
-
-  Property | Value
-  ---------|-------
-  value | true
-  ```
-
-  </TabItem>
-</Tabs>
+The command won't return a response on success.

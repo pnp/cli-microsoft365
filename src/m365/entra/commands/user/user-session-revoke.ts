@@ -7,6 +7,7 @@ import { validation } from '../../../../utils/validation.js';
 import { Logger } from '../../../../cli/Logger.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { cli } from '../../../../cli/cli.js';
+import { formatting } from '../../../../utils/formatting.js';
 
 const options = globalOptionsZod
   .extend({
@@ -39,7 +40,7 @@ class EntraUserSessionRevokeCommand extends GraphCommand {
   public getRefinedSchema(schema: typeof options): z.ZodEffects<any> | undefined {
     return schema
       .refine(options => [options.userId, options.userName].filter(o => o !== undefined).length === 1, {
-        message: 'Specify either userId or userName'
+        message: `Specify either 'userId' or 'userName'.`
       });
   }
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -52,7 +53,7 @@ class EntraUserSessionRevokeCommand extends GraphCommand {
         }
 
         const requestOptions: CliRequestOptions = {
-          url: `${this.resource}/v1.0/users('${userIdentifier}')/revokeSignInSessions`,
+          url: `${this.resource}/v1.0/users('${formatting.encodeQueryParameter(userIdentifier!)}')/revokeSignInSessions`,
           headers: {
             accept: 'application/json;odata.metadata=none'
           },
@@ -60,9 +61,7 @@ class EntraUserSessionRevokeCommand extends GraphCommand {
           data: {}
         };
 
-        const result = await request.post(requestOptions);
-
-        await logger.log(result);
+        await request.post(requestOptions);
       }
       catch (err: any) {
         this.handleRejectedODataJsonPromise(err);

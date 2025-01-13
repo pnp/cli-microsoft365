@@ -13,6 +13,7 @@ import { CommandError } from '../../../../Command.js';
 import { z } from 'zod';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { cli } from '../../../../cli/cli.js';
+import { formatting } from '../../../../utils/formatting.js';
 
 describe(commands.USER_SESSION_REVOKE, () => {
   const userId = 'abcd1234-de71-4623-b4af-96380a352509';
@@ -20,7 +21,6 @@ describe(commands.USER_SESSION_REVOKE, () => {
 
   let log: string[];
   let logger: Logger;
-  let loggerLogSpy: sinon.SinonSpy;
   let promptIssued: boolean;
   let commandInfo: CommandInfo;
   let commandOptionsSchema: z.ZodTypeAny;
@@ -53,7 +53,6 @@ describe(commands.USER_SESSION_REVOKE, () => {
       return false;
     });
     promptIssued = false;
-    loggerLogSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -119,8 +118,8 @@ describe(commands.USER_SESSION_REVOKE, () => {
   });
 
   it('revokes all sign-in sessions for a user specified by userId without prompting for confirmation', async () => {
-    sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users('${userId}')/revokeSignInSessions`) {
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users('${formatting.encodeQueryParameter(userId)}')/revokeSignInSessions`) {
         return {
           value: true
         };
@@ -131,12 +130,12 @@ describe(commands.USER_SESSION_REVOKE, () => {
 
     const parsedSchema = commandOptionsSchema.safeParse({ userId: userId, force: true, verbose: true });
     await command.action(logger, { options: parsedSchema.data });
-    assert(loggerLogSpy.calledOnceWith({ value: true }));
+    assert(postStub.calledOnce);
   });
 
   it('revokes all sign-in sessions for a user specified by UPN while prompting for confirmation', async () => {
     const postRequestStub = sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users('${userName}')/revokeSignInSessions`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users('${formatting.encodeQueryParameter(userName)}')/revokeSignInSessions`) {
         return {
           value: true
         };
