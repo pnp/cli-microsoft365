@@ -33,10 +33,6 @@ class PpWebSiteGetCommand extends PowerPlatformCommand {
     return 'Gets information about the specified Power Pages website.';
   }
 
-  public defaultProperties(): string[] | undefined {
-    return ['id', 'name', 'websiteUrl', 'tenantId', 'subdomain', 'type', 'status', 'siteVisibility'];
-  }
-
   public get schema(): z.ZodTypeAny | undefined {
     return options;
   }

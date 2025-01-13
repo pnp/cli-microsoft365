@@ -63,10 +63,6 @@ describe(commands.SITEDESIGN_RUN_STATUS_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('defines correct properties for the default output', () => {
-    assert.deepStrictEqual(command.defaultProperties(), ['ActionTitle', 'SiteScriptTitle', 'OutcomeText']);
-  });
-
   it('gets information about site designs applied to the specified site', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GetSiteDesignRunStatus`) > -1) {

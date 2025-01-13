@@ -85,10 +85,6 @@ describe(commands.TASK_CHECKLISTITEM_ADD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('defines correct properties for the default output', () => {
-    assert.deepStrictEqual(command.defaultProperties(), ['id', 'title', 'isChecked']);
-  });
-
   it('correctly adds checklist item', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter(validTaskId)}/details`) {

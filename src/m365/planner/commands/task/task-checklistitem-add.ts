@@ -27,10 +27,6 @@ class PlannerTaskChecklistItemAddCommand extends GraphCommand {
     return 'Adds a new checklist item to a Planner task.';
   }
 
-  public defaultProperties(): string[] | undefined {
-    return ['id', 'title', 'isChecked'];
-  }
-
   constructor() {
     super();
 

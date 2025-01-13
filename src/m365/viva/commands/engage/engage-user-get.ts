@@ -23,10 +23,6 @@ class VivaEngageUserGetCommand extends VivaEngageCommand {
     return 'Retrieves the current user or searches for a user by ID or e-mail';
   }
 
-  public defaultProperties(): string[] | undefined {
-    return ['id', 'full_name', 'email', 'job_title', 'state', 'url'];
-  }
-
   constructor() {
     super();
 

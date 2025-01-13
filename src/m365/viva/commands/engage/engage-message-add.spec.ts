@@ -66,10 +66,6 @@ describe(commands.ENGAGE_MESSAGE_ADD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('defines correct properties for the default output', () => {
-    assert.deepStrictEqual(command.defaultProperties(), ['id']);
-  });
-
   it('repliedToId must be a number', async () => {
     const actual = await command.validate({ options: { body: "test", repliedToId: 'nonumber' } }, commandInfo);
     assert.notStrictEqual(actual, true);

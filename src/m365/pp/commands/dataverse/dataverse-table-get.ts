@@ -25,10 +25,6 @@ class PpDataverseTableGetCommand extends PowerPlatformCommand {
     return 'Gets a dataverse table in a given environment';
   }
 
-  public defaultProperties(): string[] | undefined {
-    return ['SchemaName', 'EntitySetName', 'LogicalName', 'IsManaged'];
-  }
-
   constructor() {
     super();
 

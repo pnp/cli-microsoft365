@@ -80,10 +80,6 @@ describe(commands.LIST_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('defines correct properties for the default output', () => {
-    assert.deepStrictEqual(command.defaultProperties(), ['displayName', 'id']);
-  });
-
   it('passes validation if required options specified (id)', async () => {
     const actual = await command.validate({ options: { id: validId } }, commandInfo);
     assert.strictEqual(actual, true);

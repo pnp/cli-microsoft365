@@ -23,10 +23,6 @@ class SpoSiteDesignRunStatusGetCommand extends SpoCommand {
     return 'Gets information about the site scripts executed for the specified site design';
   }
 
-  public defaultProperties(): string[] | undefined {
-    return ['ActionTitle', 'SiteScriptTitle', 'OutcomeText'];
-  }
-
   constructor() {
     super();
 

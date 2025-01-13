@@ -24,10 +24,6 @@ class TodoListGetCommand extends DelegatedGraphCommand {
     return 'Gets a specific list of Microsoft To Do task lists';
   }
 
-  public defaultProperties(): string[] | undefined {
-    return ['displayName', 'id'];
-  }
-
   constructor() {
     super();
 

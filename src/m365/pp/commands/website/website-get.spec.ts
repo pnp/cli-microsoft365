@@ -101,10 +101,6 @@ describe(commands.WEBSITE_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('defines correct properties for the default output', () => {
-    assert.deepStrictEqual(command.defaultProperties(), ['id', 'name', 'websiteUrl', 'tenantId', 'subdomain', 'type', 'status', 'siteVisibility']);
-  });
-
   it('retrieves the information for the Power Page website by url', async () => {
     sinon.stub(powerPlatform, 'getWebsiteByUrl').resolves(powerPageResponse);
 
