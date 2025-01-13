@@ -15,7 +15,7 @@ export default {
   REPORT_OFFICE365ACTIVATIONSUSERDETAIL: `${prefix} report office365activationsuserdetail`,
   REPORT_OFFICE365ACTIVATIONSUSERCOUNTS: `${prefix} report office365activationsusercounts`,
   REPORT_SERVICESUSERCOUNTS: `${prefix} report servicesusercounts`,
-  REPORT_TENANTSETTINGS_SET: `${prefix} report settings set`,
+  REPORT_SETTINGS_SET: `${prefix} report settings set`,
   SECURITY_ALERTS_LIST: `${prefix} security alerts list`,
   SERVICEANNOUNCEMENT_HEALTHISSUE_GET: `${prefix} serviceannouncement healthissue get`,
   SERVICEANNOUNCEMENT_HEALTH_GET: `${prefix} serviceannouncement health get`,

@@ -14,7 +14,7 @@ interface Options extends GlobalOptions {
 
 class TenantReportSettingsSetCommand extends GraphCommand {
   public get name(): string {
-    return commands.REPORT_TENANTSETTINGS_SET;
+    return commands.REPORT_SETTINGS_SET;
   }
 
   public get description(): string {

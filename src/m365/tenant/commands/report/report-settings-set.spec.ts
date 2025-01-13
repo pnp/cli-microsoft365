@@ -13,7 +13,7 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './report-settings-set.js';
 
-describe(commands.REPORT_TENANTSETTINGS_SET, () => {
+describe(commands.REPORT_SETTINGS_SET, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
@@ -54,7 +54,7 @@ describe(commands.REPORT_TENANTSETTINGS_SET, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name, commands.REPORT_TENANTSETTINGS_SET);
+    assert.strictEqual(command.name, commands.REPORT_SETTINGS_SET);
   });
 
   it('has a description', () => {

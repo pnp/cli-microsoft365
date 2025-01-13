@@ -967,8 +967,8 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
-              label: 'tenant report settings set',
-              id: 'cmd/tenant/report/report-tenantsettings-set'
+              label: 'report settings set',
+              id: 'cmd/tenant/report/report-settings-set'
             }
           ]
         },
