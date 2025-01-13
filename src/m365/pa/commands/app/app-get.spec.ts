@@ -542,10 +542,6 @@ describe(commands.APP_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('defines correct properties for the default output', () => {
-    assert.deepStrictEqual(command.defaultProperties(), ['name', 'displayName', 'description', 'appVersion', 'owner']);
-  });
-
   it('fails validation if name or displayName not specified', async () => {
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
       if (settingName === settingsNames.prompt) {

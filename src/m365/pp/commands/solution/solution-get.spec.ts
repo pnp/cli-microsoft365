@@ -94,10 +94,6 @@ describe(commands.SOLUTION_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('defines correct properties for the default output', () => {
-    assert.deepStrictEqual(command.defaultProperties(), ['uniquename', 'version', 'publisher']);
-  });
-
   it('fails validation when no solution found', async () => {
     sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').callsFake(async () => envUrl);
 

@@ -29,10 +29,6 @@ class PlannerPlanGetCommand extends GraphCommand {
     return 'Get a Microsoft Planner plan';
   }
 
-  public defaultProperties(): string[] | undefined {
-    return ['id', 'title', 'createdDateTime', 'owner', '@odata.etag'];
-  }
-
   constructor() {
     super();
 

@@ -354,10 +354,6 @@ describe(commands.GROUP_MEMBER_ADD, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('defines correct properties for the default output', () => {
-    assert.deepStrictEqual(command.defaultProperties(), ['Title', 'UserPrincipalName']);
-  });
-
   it('correctly logs result when adding users by userNames', async () => {
     const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `${webUrl}/_api/web/SiteGroups/GetById(${spGroupId})/users`) {

@@ -99,10 +99,6 @@ describe(commands.PLAN_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('defines correct properties for the default output', () => {
-    assert.deepStrictEqual(command.defaultProperties(), ['id', 'title', 'createdDateTime', 'owner', '@odata.etag']);
-  });
-
   it('fails validation if the ownerGroupId is not a valid guid.', async () => {
     const actual = await command.validate({
       options: {

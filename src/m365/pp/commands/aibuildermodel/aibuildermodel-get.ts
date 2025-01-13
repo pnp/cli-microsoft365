@@ -28,10 +28,6 @@ class PpAiBuilderModelGetCommand extends PowerPlatformCommand {
     return 'Get an AI builder model in the specified Power Platform environment.';
   }
 
-  public defaultProperties(): string[] | undefined {
-    return ['msdyn_name', 'msdyn_aimodelid', 'createdon', 'modifiedon'];
-  }
-
   constructor() {
     super();
 

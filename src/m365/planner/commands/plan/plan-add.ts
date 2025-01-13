@@ -31,10 +31,6 @@ class PlannerPlanAddCommand extends GraphCommand {
     return 'Adds a new Microsoft Planner plan';
   }
 
-  public defaultProperties(): string[] | undefined {
-    return ['id', 'title', 'createdDateTime', 'owner'];
-  }
-
   constructor() {
     super();
 
