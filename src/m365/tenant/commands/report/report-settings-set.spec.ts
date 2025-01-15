@@ -12,11 +12,13 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './report-settings-set.js';
+import { z } from 'zod';
 
 describe(commands.REPORT_SETTINGS_SET, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: z.ZodTypeAny;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -25,6 +27,7 @@ describe(commands.REPORT_SETTINGS_SET, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
   });
 
   beforeEach(() => {
@@ -62,30 +65,27 @@ describe(commands.REPORT_SETTINGS_SET, () => {
   });
 
   it('fails validation if --hideUserInformation is not a boolean', async () => {
-    const result = await command.validate({
-      options: {
-        hideUserInformation: 'not-boolean'
-      }
-    }, commandInfo);
-    assert.strictEqual(result, `'hideUserInformation' must be a boolean.`);
+    const result = commandOptionsSchema.safeParse({
+      hideUserInformation: 'not-boolean'
+    });
+    assert.strictEqual(result.success, false);
+    if (!result.success) {
+      assert.strictEqual(result.error.issues[0].message, "'hideUserInformation' must be a boolean");
+    }
   });
 
   it('passes validation if --hideUserInformation is true', async () => {
-    const result = await command.validate({
-      options: {
-        hideUserInformation: true
-      }
-    }, commandInfo);
-    assert.strictEqual(result, true);
+    const result = commandOptionsSchema.safeParse({
+      hideUserInformation: true
+    });
+    assert.strictEqual(result.success, true);
   });
 
   it('passes validation if --hideUserInformation is false', async () => {
-    const result = await command.validate({
-      options: {
-        hideUserInformation: false
-      }
-    }, commandInfo);
-    assert.strictEqual(result, true);
+    const result = commandOptionsSchema.safeParse({
+      hideUserInformation: false
+    });
+    assert.strictEqual(result.success, true);
   });
 
   it('logs verbose message when verbose option is enabled', async () => {

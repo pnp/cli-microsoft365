@@ -1,15 +1,23 @@
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
+import { z } from 'zod';
+import { globalOptionsZod } from '../../../../Command.js';
+
+const options = globalOptionsZod
+  .extend({
+    hideUserInformation: z
+      // eslint-disable-next-line camelcase
+      .boolean({ invalid_type_error: "'hideUserInformation' must be a boolean" })
+      .refine(value => typeof value === 'boolean', { message: "'hideUserInformation' must be a boolean" })
+  })
+  .strict();
+
+declare type Options = z.infer<typeof options>;
 
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  hideUserInformation: boolean;
 }
 
 class TenantReportSettingsSetCommand extends GraphCommand {
@@ -18,62 +26,15 @@ class TenantReportSettingsSetCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'Sets the tenant settings report';
+    return 'Update tenant-level settings for Microsoft 365 reports';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initTypes();
-    this.#initValidators();
+  public get schema(): z.ZodTypeAny | undefined {
+    return options;
   }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      // Add unknown options to telemetry
-      const unknownOptions = Object.keys(this.getUnknownOptions(args.options));
-      const unknownOptionsObj = unknownOptions.reduce((obj, key) => ({ ...obj, [key]: true }), {});
-
-      Object.assign(this.telemetryProperties, {
-        hideUserInformation: typeof args.options.hideUserInformation !== 'undefined',
-        ...unknownOptionsObj
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-h, --hideUserInformation  <hideUserInformation>',
-        autocomplete: ['true', 'false']
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        const { hideUserInformation } = args.options;
-
-        if (typeof hideUserInformation !== 'boolean') {
-          return `'hideUserInformation' must be a boolean.`;
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initTypes(): void {
-    this.types.boolean.push('hideUserInformation');
-  }
-
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
-
       const { hideUserInformation } = args.options;
       if (this.verbose) {
         await logger.logToStderr(`Updating report settings displayConcealedNames to ${hideUserInformation}`);
@@ -87,7 +48,7 @@ class TenantReportSettingsSetCommand extends GraphCommand {
         },
         responseType: 'json',
         data: {
-          'displayConcealedNames': args.options.hideUserInformation
+          displayConcealedNames: hideUserInformation
         }
       };
 
