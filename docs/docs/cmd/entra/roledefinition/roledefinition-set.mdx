@@ -42,13 +42,13 @@ m365 entra roledefinition set [options]
 Update a custom Microsoft Entra ID role specified by the id
 
 ```sh
-m365 entra roledefinition add --id fadbc488-151d-4431-9143-6abbffae759f --newDisplayName 'Application Remover' --description 'Allows to remove any Entra ID application' --allowedResourceActions 'microsoft.directory/applications/delete'
+m365 entra roledefinition set --id fadbc488-151d-4431-9143-6abbffae759f --newDisplayName 'Application Remover' --description 'Allows to remove any Entra ID application' --allowedResourceActions 'microsoft.directory/applications/delete'
 ```
 
 Update a custom Microsoft Entra ID role specified by the display name
 
 ```sh
-m365 entra roledefinition add --displayName 'Application Remover' --version '1.0' --enabled true --allowedResourceActions 'microsoft.directory/applications/delete,microsoft.directory/applications/owners/update'
+m365 entra roledefinition set --displayName 'Application Remover' --version '1.0' --enabled true --allowedResourceActions 'microsoft.directory/applications/delete,microsoft.directory/applications/owners/update'
 ```
 
 ## Response
