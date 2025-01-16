@@ -94,6 +94,7 @@ export default {
   ROLEDEFINITION_GET: `${prefix} roledefinition get`,
   ROLEDEFINITION_REMOVE: `${prefix} roledefinition remove`,
   ROLEDEFINITION_SET: `${prefix} roledefinition set`,
+  ROLEPERMISSION_LIST: `${prefix} rolepermission list`,
   SITECLASSIFICATION_DISABLE: `${prefix} siteclassification disable`,
   SITECLASSIFICATION_ENABLE: `${prefix} siteclassification enable`,
   SITECLASSIFICATION_GET: `${prefix} siteclassification get`,

@@ -662,6 +662,15 @@ const sidebars: SidebarsConfig = {
           ]
         },
         {
+          rolepermission: [
+            {
+              type: 'doc',
+              label: 'rolepermission list',
+              id: 'cmd/entra/rolepermission/rolepermission-list'
+            }
+          ]
+        },
+        {
           siteclassification: [
             {
               type: 'doc',

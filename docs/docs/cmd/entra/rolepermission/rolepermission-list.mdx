@@ -1,0 +1,158 @@
+import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# entra rolepermission list
+
+Lists all Microsoft Entra ID role permissions.
+
+## Usage
+
+```sh
+m365 entra rolepermission list [options]
+```
+
+## Options
+```md definition-list
+`-n, resourceNamespace [resourceNamespace]`
+: The namespace of the resource for which to retrieve role permissions.
+
+`-p, --privileged`
+: Retrieve only sensitive role permissions.
+
+`--properties [properties]`
+: Comma-separated list of properties to retrieve.
+```
+
+<Global />
+
+## Examples
+
+### Examples
+
+Get a list of role permissions
+
+```sh
+m365 entra rolepermission list --resourceNamespace 'microsoft.directory'
+```
+
+Get a list of sensitive role permissions
+
+```sh
+m365 entra rolepermission list --resourceNamespace 'microsoft.directory' --privileged
+```
+
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  [
+    {
+      "actionVerb": null,
+      "description": "Create and delete access reviews, and read and update all properties of access reviews in Microsoft Entra ID",
+      "id": "microsoft.directory-accessReviews-allProperties-allTasks",
+      "isPrivileged": false,
+      "name": "microsoft.directory/accessReviews/allProperties/allTasks",
+      "resourceScopeId": null
+    },
+    {
+      "actionVerb": "GET",
+      "description": "Read all properties of access reviews",
+      "id": "microsoft.directory-accessReviews-allProperties-read-get",
+      "isPrivileged": false,
+      "name": "microsoft.directory/accessReviews/allProperties/read",
+      "resourceScopeId": null
+    },
+    {
+      "actionVerb": null,
+      "description": "Manage access reviews of application role assignments in Microsoft Entra ID",
+      "id": "microsoft.directory-accessReviews-definitions.applications-allProperties-allTasks",
+      "isPrivileged": false,
+      "name": "microsoft.directory/accessReviews/definitions.applications/allProperties/allTasks",
+      "resourceScopeId": null
+    },
+    {
+      "actionVerb": "GET",
+      "description": "Read all properties of access reviews of application role assignments in Microsoft Entra ID",
+      "id": "microsoft.directory-accessReviews-definitions.applications-allProperties-read-get",
+      "isPrivileged": false,
+      "name": "microsoft.directory/accessReviews/definitions.applications/allProperties/read",
+      "resourceScopeId": null
+    }
+  ]
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  id                                                                                      name                                                                                     actionVerb  isPrivileged
+  --------------------------------------------------------------------------------------  ---------------------------------------------------------------------------------------  ----------  ------------
+  microsoft.directory-accessReviews-allProperties-allTasks                                microsoft.directory/accessReviews/allProperties/allTasks                                 null        false
+  microsoft.directory-accessReviews-allProperties-read-get                                microsoft.directory/accessReviews/allProperties/read                                     GET         false
+  microsoft.directory-accessReviews-definitions.applications-allProperties-allTasks       microsoft.directory/accessReviews/definitions.applications/allProperties/allTasks        null        false
+  microsoft.directory-accessReviews-definitions.applications-allProperties-read-get       microsoft.directory/accessReviews/definitions.applications/allProperties/read            GET         false
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  actionVerb,description,id,isPrivileged,name,resourceScopeId
+  ,"Create and delete access reviews, and read and update all properties of access reviews in Microsoft Entra ID",microsoft.directory-accessReviews-allProperties-allTasks,0,microsoft.directory/accessReviews/allProperties/allTasks,
+  GET,Read all properties of access reviews,microsoft.directory-accessReviews-allProperties-read-get,0,microsoft.directory/accessReviews/allProperties/read,
+  ,Manage access reviews of application role assignments in Microsoft Entra ID,microsoft.directory-accessReviews-definitions.applications-allProperties-allTasks,0,microsoft.directory/accessReviews/definitions.applications/allProperties/allTasks,
+  GET,Read all properties of access reviews of application role assignments in Microsoft Entra ID,microsoft.directory-accessReviews-definitions.applications-allProperties-read-get,0,microsoft.directory/accessReviews/definitions.applications/allProperties/read,
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # entra rolepermission list --resourceNamespace "microsoft.directory"
+
+  Date: 1/16/2025
+
+  ## microsoft.directory/accessReviews/allProperties/allTasks (microsoft.directory-accessReviews-allProperties-allTasks)
+
+  Property | Value
+  ---------|-------
+  description | Create and delete access reviews, and read and update all properties of access reviews in Microsoft Entra ID
+  id | microsoft.directory-accessReviews-allProperties-allTasks
+  isPrivileged | false
+  name | microsoft.directory/accessReviews/allProperties/allTasks
+
+  ## microsoft.directory/accessReviews/allProperties/read (microsoft.directory-accessReviews-allProperties-read-get)
+
+  Property | Value
+  ---------|-------
+  actionVerb | GET
+  description | Read all properties of access reviews
+  id | microsoft.directory-accessReviews-allProperties-read-get
+  isPrivileged | false
+  name | microsoft.directory/accessReviews/allProperties/read
+
+  ## microsoft.directory/accessReviews/definitions.applications/allProperties/allTasks (microsoft.directory-accessReviews-definitions.applications-allProperties-allTasks)
+
+  Property | Value
+  ---------|-------
+  description | Manage access reviews of application role assignments in Microsoft Entra ID
+  id | microsoft.directory-accessReviews-definitions.applications-allProperties-allTasks
+  isPrivileged | false
+  name | microsoft.directory/accessReviews/definitions.applications/allProperties/allTasks
+
+  ## microsoft.directory/accessReviews/definitions.applications/allProperties/read (microsoft.directory-accessReviews-definitions.applications-allProperties-read-get)
+
+  Property | Value
+  ---------|-------
+  actionVerb | GET
+  description | Read all properties of access reviews of application role assignments in Microsoft Entra ID
+  id | microsoft.directory-accessReviews-definitions.applications-allProperties-read-get
+  isPrivileged | false
+  name | microsoft.directory/accessReviews/definitions.applications/allProperties/read
+  ```
+
+  </TabItem>
+</Tabs>
