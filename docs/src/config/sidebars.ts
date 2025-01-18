@@ -1214,6 +1214,11 @@ const sidebars: SidebarsConfig = {
           mailbox: [
             {
               type: 'doc',
+              label: 'mailbox settings get',
+              id: 'cmd/outlook/mailbox/mailbox-settings-get'
+            },
+            {
+              type: 'doc',
               label: 'mailbox settings set',
               id: 'cmd/outlook/mailbox/mailbox-settings-set'
             }
