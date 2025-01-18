@@ -2,6 +2,7 @@ const prefix: string = 'outlook';
 
 export default {
   MAIL_SEND: `${prefix} mail send`,
+  MAILBOX_SETTINGS_GET: `${prefix} mailbox settings get`,
   MAILBOX_SETTINGS_SET: `${prefix} mailbox settings set`,
   MESSAGE_GET: `${prefix} message get`,
   MESSAGE_LIST: `${prefix} message list`,

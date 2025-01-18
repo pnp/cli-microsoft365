@@ -608,6 +608,15 @@ describe(commands.MAILBOX_SETTINGS_SET, () => {
     await assert.rejects(command.action(logger, { options: result.data }), new CommandError('When running with application permissions either userId or userName is required, but not both'));
   });
 
+  it('fails updating mailbox settings if neither userId nor userName is specified in app-only mode', async () => {
+    sinonUtil.restore(accessToken.isAppOnlyAccessToken);
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
+
+    const result = commandOptionsSchema.safeParse({ timeFormat: 'HH:mm', verbose: true });
+
+    await assert.rejects(command.action(logger, { options: result.data }), new CommandError('When running with application permissions either userId or userName is required'));
+  });
+
   it('fails updating mailbox settings of the signed-in user if userId is specified', async () => {
     const result = commandOptionsSchema.safeParse({ userId: userId, timeFormat: 'HH:mm', verbose: true });
     await assert.rejects(command.action(logger, { options: result.data }), new CommandError('You can update mailbox settings of other users only if CLI is authenticated in app-only mode'));

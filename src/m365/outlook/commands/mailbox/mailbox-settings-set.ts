@@ -77,6 +77,10 @@ class OutlookMailboxSettingsSetCommand extends GraphCommand {
         throw 'When running with application permissions either userId or userName is required, but not both';
       }
 
+      if (!(args.options.userId || args.options.userName)) {
+        throw 'When running with application permissions either userId or userName is required';
+      }
+
       const userIdentifier = args.options.userId ?? args.options.userName;
 
       if (this.verbose) {
