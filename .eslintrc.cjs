@@ -67,6 +67,7 @@ const dictionary = [
   'log',
   'login',
   'logout',
+  'mailbox',
   'management',
   'member',
   'membership',
@@ -118,6 +119,7 @@ const dictionary = [
   'unit',
   'url',
   'user',
+  'value',
   'web',
   'webhook'
 ];

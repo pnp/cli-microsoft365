@@ -368,7 +368,7 @@ describe(commands.GROUP_LIST, () => {
 
   it('lists all distribution groups in the tenant', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=securityEnabled eq false and mailEnabled eq true`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=securityEnabled eq false and mailEnabled eq true and not(groupTypes/any(t:t eq 'Unified'))&$count=true`) {
         return {
           "value": [
             {

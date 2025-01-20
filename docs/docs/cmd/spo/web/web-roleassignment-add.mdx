@@ -17,13 +17,19 @@ m365 spo web roleassignment add [options]
 : URL of the site.
 
 `--principalId [principalId]`
-: SharePoint ID of principal it may be either user id or group id we want to add permissions to. Specify either `principalId`, `upn`, or `groupName` but not multiple.
+: SharePoint ID of principal it may be either user id or group id we want to add permissions to. Specify either `principalId`, `upn`, `groupName`, `entraGroupId` or `entraGroupName` but not multiple.
 
 `--upn [upn]`
-: The upn/email of user to assign role to. Specify either `principalId`, `upn`, or `groupName` but not multiple.
+: The upn/email of user to assign role to. Specify either `principalId`, `upn`, `groupName`, `entraGroupId` or `entraGroupName` but not multiple.
 
 `--groupName [groupName]`
-: The group name of the SharePoint group Specify either `principalId`, `upn`, or `groupName` but not multiple.
+: The group name of the SharePoint group. Use this option exclusively for SharePoint Online groups. Specify either `principalId`, `upn`, `groupName`, `entraGroupId` or `entraGroupName` but not multiple.
+
+`--entraGroupId [entraGroupId]`
+: ID of the Microsoft Entra group to add. Specify either `principalId`, `upn`, `groupName`, `entraGroupId` or `entraGroupName` but not multiple.
+
+`--entraGroupName [entraGroupName]`
+: Display name of the Microsoft Entra group to add. Specify either `principalId`, `upn`, `groupName`, `entraGroupId` or `entraGroupName` but not multiple.
 
 `--roleDefinitionId [roleDefinitionId]`
 : ID of role definition. Specify either `roleDefinitionId` or `roleDefinitionName` but not both.
@@ -58,6 +64,12 @@ add role assignment to a site for principal id _11_ and role definition name _Fu
 
 ```sh
 m365 spo web roleassignment add --webUrl "https://contoso.sharepoint.com/sites/project-x" --principalId 11 --roleDefinitionName "Full Control"
+```
+
+add role assignment using a Entra Group ID and a role definition 
+
+```sh
+m365 spo web roleassignment add --webUrl "https://contoso.sharepoint.com/sites/project-x" --entraGroupId "27ae47f1-48f1-46f3-980b-d3c1470e398d" --roleDefinitionId 1073741829
 ```
 
 ## Response

@@ -10,6 +10,8 @@ import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 import spoGroupGetCommand, { Options as SpoGroupGetCommandOptions } from '../group/group-get.js';
 import spoUserGetCommand, { Options as SpoUserGetCommandOptions } from '../user/user-get.js';
+import { entraGroup } from '../../../../utils/entraGroup.js';
+import { spo } from '../../../../utils/spo.js';
 
 interface CommandArgs {
   options: Options;
@@ -21,6 +23,8 @@ interface Options extends GlobalOptions {
   principalId?: number;
   upn?: string;
   groupName?: string;
+  entraGroupId?: string;
+  entraGroupName?: string;
   force?: boolean;
 }
 
@@ -48,6 +52,8 @@ class SpoFolderRoleAssignmentRemoveCommand extends SpoCommand {
         principalId: typeof args.options.principalId !== 'undefined',
         upn: typeof args.options.upn !== 'undefined',
         groupName: typeof args.options.groupName !== 'undefined',
+        entraGroupId: typeof args.options.entraGroupId !== 'undefined',
+        entraGroupName: typeof args.options.entraGroupName !== 'undefined',
         force: !!args.options.force
       });
     });
@@ -71,6 +77,12 @@ class SpoFolderRoleAssignmentRemoveCommand extends SpoCommand {
         option: '--groupName [groupName]'
       },
       {
+        option: '--entraGroupId [entraGroupId]'
+      },
+      {
+        option: '--entraGroupName [entraGroupName]'
+      },
+      {
         option: '-f, --force'
       }
     );
@@ -88,13 +100,17 @@ class SpoFolderRoleAssignmentRemoveCommand extends SpoCommand {
           return `Specified principalId ${args.options.principalId} is not a number`;
         }
 
-        const principalOptions: any[] = [args.options.principalId, args.options.upn, args.options.groupName];
+        if (args.options.entraGroupId && !validation.isValidGuid(args.options.entraGroupId)) {
+          return `'${args.options.entraGroupId}' is not a valid GUID for option entraGroupId.`;
+        }
+
+        const principalOptions: any[] = [args.options.principalId, args.options.upn, args.options.groupName, args.options.entraGroupId, args.options.entraGroupName];
         if (principalOptions.some(item => item !== undefined) && principalOptions.filter(item => item !== undefined).length > 1) {
-          return `Specify either principalId id, upn or groupName`;
+          return `Specify either principalId id, upn, groupName, entraGroupId or entraGroupName`;
         }
 
         if (principalOptions.filter(item => item !== undefined).length === 0) {
-          return `Specify at least principalId id, upn or groupName`;
+          return `Specify at least principalId id, upn, groupName, entraGroupId or entraGroupName`;
         }
 
         return true;
@@ -118,15 +134,24 @@ class SpoFolderRoleAssignmentRemoveCommand extends SpoCommand {
       try {
         if (args.options.upn) {
           args.options.principalId = await this.getUserPrincipalId(args.options);
-          await this.removeRoleAssignment(requestUrl, logger, args.options);
         }
         else if (args.options.groupName) {
           args.options.principalId = await this.getGroupPrincipalId(args.options);
-          await this.removeRoleAssignment(requestUrl, logger, args.options);
         }
-        else {
-          await this.removeRoleAssignment(requestUrl, logger, args.options);
+        else if (args.options.entraGroupId || args.options.entraGroupName) {
+          if (this.verbose) {
+            await logger.logToStderr('Retrieving group information...');
+          }
+
+          const group = args.options.entraGroupId
+            ? await entraGroup.getGroupById(args.options.entraGroupId)
+            : await entraGroup.getGroupByDisplayName(args.options.entraGroupName!);
+
+          const siteUser = await spo.ensureEntraGroup(args.options.webUrl, group);
+          args.options.principalId = siteUser.Id;
         }
+        await this.removeRoleAssignment(requestUrl, logger, args.options);
+
       }
       catch (err: any) {
         this.handleRejectedODataJsonPromise(err);
