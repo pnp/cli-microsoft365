@@ -151,6 +151,10 @@ class EntraAppAddCommand extends GraphCommand {
           return `When you specify redirectUris you also need to specify platform`;
         }
 
+        if (args.options.platform && ['spa', 'web', 'publicClient'].indexOf(args.options.platform) > -1 && !args.options.redirectUris) {
+          return `When you use platform spa, web or publicClient, you'll need to specify redirectUris`;
+        }
+
         if (args.options.certificateFile && args.options.certificateBase64Encoded) {
           return 'Specify either certificateFile or certificateBase64Encoded but not both';
         }
