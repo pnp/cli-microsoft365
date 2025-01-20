@@ -12,6 +12,10 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   url: string;
+  audiences: string,
+  vivaConnectionsDefaultStart: boolean,
+  isInDraftMode: boolean,
+  order: number
 }
 
 class SpoTenantHomeSiteAddCommand extends SpoCommand {
@@ -70,14 +74,10 @@ class SpoTenantHomeSiteAddCommand extends SpoCommand {
         }
 
         if (args.options.audiences) {
-          const invalidGuid = args.options.audiences.split(',').find((guid: string | undefined) => !validation.isValidGuid(guid));
-          if (invalidGuid) {
-            return `${invalidGuid} is not a valid GUID`;
+          const validGuid = validation.isValidGuidArray(args.options.audiences);
+          if (!validGuid) {
+            return `${args.options.audiences} has an invalid GUID`;
           }
-        }
-
-        if (args.options.order !== undefined && isNaN(parseInt(args.options.order))) {
-          return 'Order must be an integer';
         }
 
         return true;
@@ -96,10 +96,10 @@ class SpoTenantHomeSiteAddCommand extends SpoCommand {
         responseType: 'json',
         data: {
           siteUrl: args.options.url,
-          audiences = args.options.audiences?split(','),
-          vivaConnectionsDefaultStart = args.options.vivaConnectionsDefaultStart ?? true,
-          isInDraftMode = args.options.isInDraftMode ?? true,
-          order = args.options.order
+          audiences: args.options.audiences?.split(','),
+          vivaConnectionsDefaultStart: args.options.vivaConnectionsDefaultStart ?? true,
+          isInDraftMode: args.options.isInDraftMode ?? true,
+          order: args.options.order
         }
       };
 
