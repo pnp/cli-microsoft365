@@ -6386,17 +6386,17 @@ describe(commands.APP_ADD, () => {
   });
 
   it('passes validation if platform value is spa', async () => {
-    const actual = await command.validate({ options: { name: 'My Microsoft Entra app', platform: 'spa' } }, commandInfo);
+    const actual = await command.validate({ options: { name: 'My Microsoft Entra app', platform: 'spa', redirectUris: 'http://localhost:8080' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('passes validation if platform value is web', async () => {
-    const actual = await command.validate({ options: { name: 'My Microsoft Entra app', platform: 'web' } }, commandInfo);
+    const actual = await command.validate({ options: { name: 'My Microsoft Entra app', platform: 'web', redirectUris: 'http://localhost:8080' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('passes validation if platform value is publicClient', async () => {
-    const actual = await command.validate({ options: { name: 'My Microsoft Entra app', platform: 'publicClient' } }, commandInfo);
+    const actual = await command.validate({ options: { name: 'My Microsoft Entra app', platform: 'publicClient', redirectUris: 'http://localhost:8080' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
@@ -6408,6 +6408,21 @@ describe(commands.APP_ADD, () => {
   it('passes validation if redirectUris specified with platform', async () => {
     const actual = await command.validate({ options: { name: 'My Microsoft Entra app', redirectUris: 'http://localhost:8080', platform: 'spa' } }, commandInfo);
     assert.strictEqual(actual, true);
+  });
+
+  it('fails validation if platform is spa and redirectUris is not specified', async () => {
+    const actual = await command.validate({ options: { name: 'My Microsoft Entra app', platform: 'spa' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if platform is web and redirectUris is not specified', async () => {
+    const actual = await command.validate({ options: { name: 'My Microsoft Entra app', platform: 'web' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if platform is publicClient and redirectUris is not specified', async () => {
+    const actual = await command.validate({ options: { name: 'My Microsoft Entra app', platform: 'publicClient' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if scopeName specified without uri', async () => {
