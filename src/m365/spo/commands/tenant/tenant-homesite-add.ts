@@ -88,33 +88,19 @@ class SpoTenantHomeSiteAddCommand extends SpoCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       const spoAdminUrl: string = await spo.getSpoAdminUrl(logger, this.verbose);
-      const requestBody: any = {
-        siteUrl: args.options.url
-      };
-
-      if (args.options.isInDraftMode !== undefined) {
-        requestBody.isInDraftMode = args.options.isInDraftMode === 'true';
-      }
-
-      if (args.options.vivaConnectionsDefaultStart !== undefined) {
-        requestBody.vivaConnectionsDefaultStart = args.options.vivaConnectionsDefaultStart === 'true';
-      }
-
-      if (args.options.audiences) {
-        requestBody.audiences = args.options.audiences.split(',');
-      }
-
-      if (args.options.order !== undefined) {
-        requestBody.order = parseInt(args.options.order);
-      }
-
       const requestOptions: CliRequestOptions = {
         url: `${spoAdminUrl}/_api/SPHSite/AddHomeSite`,
         headers: {
           accept: 'application/json;odata=nometadata'
         },
         responseType: 'json',
-        data: requestBody
+        data: {
+          siteUrl: args.options.url,
+          audiences = args.options.audiences?split(','),
+          vivaConnectionsDefaultStart = args.options.vivaConnectionsDefaultStart ?? true,
+          isInDraftMode = args.options.isInDraftMode ?? true,
+          order = args.options.order
+        }
       };
 
       if (this.verbose) {
