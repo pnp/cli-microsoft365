@@ -170,6 +170,6 @@ describe(commands.TENANT_HOMESITE_ADD, () => {
   it('correctly handles OData error when adding a home site', async () => {
     sinon.stub(request, 'post').rejects({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
 
-    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: { url: 'https://....' } } as any), new CommandError('An error has occurred'));
   });
 });
