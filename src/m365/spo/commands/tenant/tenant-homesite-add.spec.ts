@@ -95,7 +95,7 @@ describe(commands.TENANT_HOMESITE_ADD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('adds available home sites', async () => {
+  it('correctly logs command response', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://contoso-admin.sharepoint.com/_api/SPHSite/AddHomeSite`) {
         return homeSites;
