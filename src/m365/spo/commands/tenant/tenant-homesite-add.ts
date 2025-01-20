@@ -78,6 +78,14 @@ class SpoTenantHomeSiteAddCommand extends SpoCommand {
           return isValidSharePointUrl;
         }
 
+        if (args.options.order !== undefined && !validation.isValidPositiveInteger(args.options.order)) {
+          return `${args.options.order} is not a positive integer`;
+        }
+
+        const isValidGUIDArrayResult = args.options.audiences ? validation.isValidGuidArray(args.options.audiences) : true;
+        if (isValidGUIDArrayResult !== true) {
+          return `The following GUIDs are invalid for the option 'ids': ${isValidGUIDArrayResult}.`;
+        }
         return true;
       }
     );

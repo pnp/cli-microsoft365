@@ -147,6 +147,26 @@ describe(commands.TENANT_HOMESITE_ADD, () => {
     assert.notStrictEqual(actual, true);
   });
 
+  it('correctly handles non-integer order', async () => {
+    const result = await command.validate({
+      options: {
+        url: homeSite,
+        order: 'invalid-order'
+      }
+    }, commandInfo);
+    assert.strictEqual(result, 'invalid-order is not a positive integer');
+  });
+
+  it('correctly handles invalid GUIDs in audiences', async () => {
+    const result = await command.validate({
+      options: {
+        url: homeSite,
+        audiences: 'invalid-guid'
+      }
+    }, commandInfo);
+    assert.strictEqual(result, `The following GUIDs are invalid for the option 'ids': invalid-guid.`);
+  });
+
   it('passes validation with URL', async () => {
     const actual = await command.validate({
       options: {
