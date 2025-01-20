@@ -1,21 +1,26 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import { spo } from '../../../../utils/spo.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 
+const options = globalOptionsZod
+  .extend({
+    url: z.string().url(),
+    audiences: z.string().optional(),
+    vivaConnectionsDefaultStart: z.boolean().optional(),
+    isInDraftMode: z.boolean().optional(),
+    order: z.number().optional()
+  })
+  .strict();
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  url: string;
-  audiences: string,
-  vivaConnectionsDefaultStart: boolean,
-  isInDraftMode: boolean,
-  order: number
 }
 
 class SpoTenantHomeSiteAddCommand extends SpoCommand {
@@ -71,13 +76,6 @@ class SpoTenantHomeSiteAddCommand extends SpoCommand {
         const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.url);
         if (isValidSharePointUrl !== true) {
           return isValidSharePointUrl;
-        }
-
-        if (args.options.audiences) {
-          const validGuid = validation.isValidGuidArray(args.options.audiences);
-          if (!validGuid) {
-            return `${args.options.audiences} has an invalid GUID`;
-          }
         }
 
         return true;

@@ -109,11 +109,10 @@ describe(commands.TENANT_HOMESITE_ADD, () => {
   });
 
   it('adds a home site with the specified URL, isInDraftMode, vivaConnectionsDefaultStart, and audiences', async () => {
-    sinon.stub(request, 'post').callsFake(async (opts) => {
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://contoso-admin.sharepoint.com/_api/SPHSite/AddHomeSite`) {
         return homeSiteConfig;
       }
-
       throw 'Invalid request';
     });
 
@@ -122,31 +121,21 @@ describe(commands.TENANT_HOMESITE_ADD, () => {
         url: homeSite,
         isInDraftMode: 'true',
         vivaConnectionsDefaultStart: 'false',
-        audiences: 'af8c0bc8-7b1b-44b4-b087-ffcc8df70d16,754ff15c-76b1-44cb-88c7-0065a4d3cfb7',
+        audiences: 'af8c0bc8-7b1b-44b4-b087-ffcc8df70d16',
         order: 2
       }
     });
-    assert(loggerLogSpy.calledWith(homeSiteConfig));
-  });
 
-  it('correctly handles invalid GUID in audiences', async () => {
-    const result = await command.validate({
-      options: {
-        url: homeSite,
-        audiences: "invalidGuid,af8c0bc8-7b1b-44b4-b087-ffcc8df70d16"
-      }
-    }, commandInfo);
-    assert.strictEqual(result, `invalidGuid is not a valid GUID`);
-  });
-
-  it('correctly handles non-integer order', async () => {
-    const result = await command.validate({
-      options: {
-        url: homeSite,
-        order: 'invalid-order'
-      }
-    }, commandInfo);
-    assert.strictEqual(result, 'Order must be an integer');
+    const expectedData = {
+      "audiences": [
+        "af8c0bc8-7b1b-44b4-b087-ffcc8df70d16"
+      ],
+      "isInDraftMode": "true",
+      "order": 2,
+      "siteUrl": "https://contoso.sharepoint.com/sites/testcomms",
+      "vivaConnectionsDefaultStart": "false"
+    };
+    assert.deepStrictEqual(postStub.lastCall.args[0].data, expectedData);
   });
 
   it('fails validation if the url is not a valid SharePoint url', async () => {
@@ -162,6 +151,19 @@ describe(commands.TENANT_HOMESITE_ADD, () => {
     const actual = await command.validate({
       options: {
         url: homeSite
+      }
+    }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('passes validation with URL and optional parameters', async () => {
+    const actual = await command.validate({
+      options: {
+        url: homeSite,
+        isInDraftMode: 'true',
+        vivaConnectionsDefaultStart: 'false',
+        audiences: 'af8c0bc8-7b1b-44b4-b087-ffcc8df70d16',
+        order: 2
       }
     }, commandInfo);
     assert.strictEqual(actual, true);

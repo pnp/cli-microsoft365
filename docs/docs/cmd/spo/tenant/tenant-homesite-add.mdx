@@ -19,10 +19,10 @@ m365 spo tenant homesite add [options]
 : URL of the site to use as a home site.
 
 `--isInDraftMode [isInDraftMode]`
-: Specifies whether the home site is in draft mode. Accepts `true` or `false`.
+: Specifies whether the home site is in draft mode. Accepts `true` or `false`. Default is true. 
 
 `--vivaConnectionsDefaultStart [vivaConnectionsDefaultStart]`
-: Specifies whether the home site is the default start for Viva Connections. Accepts `true` or `false`.
+: Specifies whether the home site is the default start for Viva Connections. Accepts `true` or `false`. Default is true
 
 `--audiences [audiences]`
 : Comma-separated list of audience GUIDs which are GUIDs of Microsoft Entra groups.
@@ -30,6 +30,12 @@ m365 spo tenant homesite add [options]
 `--order [order]`
 : Order of the home site. Must be an integer.
 ```
+
+<Global />
+
+## Remarks
+
+The corresponding site must already be present within the tenant.
 
 ## Examples
 
@@ -44,6 +50,7 @@ Add a Home Site with optional parameters
 ```sh
 m365 spo tenant homesite add --url "https://contoso.sharepoint.com/sites/testcomms" --isInDraftMode true --vivaConnectionsDefaultStart false --audiences "af8c0bc8-7b1b-44b4-b087-ffcc8df70d16,754ff15c-76b1-44cb-88c7-0065a4d3cfb7" --order 2 
 ```
+
 ## Response
 
 <Tabs>
@@ -51,7 +58,13 @@ m365 spo tenant homesite add --url "https://contoso.sharepoint.com/sites/testcom
 
   ```json
   {
-    "Audiences": [],
+    "Audiences": [
+      {
+      "Email": "active@contoso.onmicrosoft.com",
+      "Id": "7a1eea7f-9ab0-40ff-8f2e-0083d9d63451",
+      "Title": "active Members"
+      }
+    ],
     "IsInDraftMode": true,
     "IsVivaBackendSite": false,
     "SiteId": "ca49054c-85f3-41eb-a290-46ffda8f219c",
@@ -67,7 +80,7 @@ m365 spo tenant homesite add --url "https://contoso.sharepoint.com/sites/testcom
   <TabItem value="Text">
 
   ```text
-  Audiences                  : []
+  Audiences                  : [{"Email":"active@contoso.onmicrosoft.com","Id":"7a1eea7f-9ab0-40ff-8f2e-0083d9d63451","Title":"active Members"}]
   IsInDraftMode              : true
   IsVivaBackendSite          : false
   SiteId                     : ca49054c-85f3-41eb-a290-46ffda8f219c
