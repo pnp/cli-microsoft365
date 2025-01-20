@@ -158,7 +158,7 @@ describe(commands.TENANT_HOMESITE_ADD, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation', async () => {
+  it('passes validation with URL', async () => {
     const actual = await command.validate({
       options: {
         url: homeSite
