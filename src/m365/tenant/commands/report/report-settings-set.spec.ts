@@ -129,5 +129,4 @@ describe(commands.REPORT_SETTINGS_SET, () => {
       new CommandError('An error has occurred')
     );
   });
-
 });
