@@ -4,13 +4,11 @@ import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 import { z } from 'zod';
 import { globalOptionsZod } from '../../../../Command.js';
+import { zod } from '../../../../utils/zod.js';
 
 const options = globalOptionsZod
   .extend({
-    hideUserInformation: z
-      // eslint-disable-next-line camelcase
-      .boolean({ invalid_type_error: "'hideUserInformation' must be a boolean" })
-      .refine(value => typeof value === 'boolean', { message: "'hideUserInformation' must be a boolean" })
+    displayConcealedNames: zod.alias('d', z.boolean())
   })
   .strict();
 
@@ -35,9 +33,9 @@ class TenantReportSettingsSetCommand extends GraphCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
-      const { hideUserInformation } = args.options;
+      const { displayConcealedNames } = args.options;
       if (this.verbose) {
-        await logger.logToStderr(`Updating report settings displayConcealedNames to ${hideUserInformation}`);
+        await logger.logToStderr(`Updating report settings displayConcealedNames to ${displayConcealedNames}`);
       }
 
       const requestOptions: CliRequestOptions = {
@@ -48,7 +46,7 @@ class TenantReportSettingsSetCommand extends GraphCommand {
         },
         responseType: 'json',
         data: {
-          displayConcealedNames: hideUserInformation
+          displayConcealedNames: displayConcealedNames
         }
       };
 

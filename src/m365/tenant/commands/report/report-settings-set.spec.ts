@@ -64,26 +64,26 @@ describe(commands.REPORT_SETTINGS_SET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if --hideUserInformation is not a boolean', async () => {
+  it('fails validation if --displayConcealedNames is not a boolean', async () => {
     const result = commandOptionsSchema.safeParse({
-      hideUserInformation: 'not-boolean'
+      displayConcealedNames: 'not-boolean'
     });
     assert.strictEqual(result.success, false);
     if (!result.success) {
-      assert.strictEqual(result.error.issues[0].message, "'hideUserInformation' must be a boolean");
+      assert.strictEqual(result.error.issues[0].message, "Expected boolean, received string");
     }
   });
 
-  it('passes validation if --hideUserInformation is true', async () => {
+  it('passes validation if --displayConcealedNames is true', async () => {
     const result = commandOptionsSchema.safeParse({
-      hideUserInformation: true
+      displayConcealedNames: true
     });
     assert.strictEqual(result.success, true);
   });
 
-  it('passes validation if --hideUserInformation is false', async () => {
+  it('passes validation if --displayConcealedNames is false', async () => {
     const result = commandOptionsSchema.safeParse({
-      hideUserInformation: false
+      displayConcealedNames: false
     });
     assert.strictEqual(result.success, true);
   });
@@ -98,7 +98,7 @@ describe(commands.REPORT_SETTINGS_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { hideUserInformation: true, verbose: true } });
+    await command.action(logger, { options: { displayConcealedNames: true, verbose: true } });
 
     assert(logToStderrSpy.calledWith('Updating report settings displayConcealedNames to true'));
   });
@@ -112,7 +112,7 @@ describe(commands.REPORT_SETTINGS_SET, () => {
       return Promise.reject('Invalid request');
     });
     await command.action(logger, {
-      options: { hideUserInformation: true }
+      options: { displayConcealedNames: true }
     });
   });
 
