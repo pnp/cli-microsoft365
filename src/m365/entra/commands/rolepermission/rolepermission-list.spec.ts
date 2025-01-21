@@ -52,25 +52,6 @@ describe(commands.ROLEDEFINITION_LIST, () => {
     }
   ];
 
-  const resourceActionsLimited = [
-    {
-      "id": "microsoft.directory-accessReviews-allProperties-allTasks",
-      "name": "microsoft.directory/accessReviews/allProperties/allTasks"
-    },
-    {
-      "id": "microsoft.directory-accessReviews-allProperties-read-get",
-      "name": "microsoft.directory/accessReviews/allProperties/read"
-    },
-    {
-      "id": "microsoft.directory-groups-allProperties-allTasks",
-      "name": "microsoft.directory/groups/allProperties/allTasks"
-    },
-    {
-      "id": "microsoft.directory-oAuth2PermissionGrants-allProperties-allTasks",
-      "name": "microsoft.directory/oAuth2PermissionGrants/allProperties/allTasks"
-    }
-  ];
-
   const filteredResourceActions = [
     {
       "actionVerb": null,
@@ -165,29 +146,6 @@ describe(commands.ROLEDEFINITION_LIST, () => {
     });
 
     assert(loggerLogSpy.calledWith(resourceActions));
-  });
-
-  it(`should get a list of Entra ID role permissions with specified properties`, async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/roleManagement/directory/resourceNamespaces/${resourceNamespace}/resourceActions?$select=id,name`) {
-        return {
-          value: resourceActionsLimited
-        };
-      }
-
-      throw 'Invalid request';
-    });
-
-    const parsedSchema = commandOptionsSchema.safeParse({
-      resourceNamespace: resourceNamespace,
-      properties: 'id,name',
-      verbose: true
-    });
-    await command.action(logger, {
-      options: parsedSchema.data
-    });
-
-    assert(loggerLogSpy.calledWith(resourceActionsLimited));
   });
 
   it(`should get a list of privileged Entra ID role permissions`, async () => {

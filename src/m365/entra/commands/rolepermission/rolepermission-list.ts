@@ -10,8 +10,7 @@ import { UnifiedRbacResourceAction } from '@microsoft/microsoft-graph-types';
 const options = globalOptionsZod
   .extend({
     resourceNamespace: zod.alias('n', z.string()),
-    privileged: zod.alias('p', z.boolean().optional()),
-    properties: z.string().optional()
+    privileged: zod.alias('p', z.boolean().optional())
   })
   .strict();
 
@@ -48,19 +47,7 @@ class EntraRolePermissionListCommand extends GraphCommand {
     }
 
     try {
-      const queryParameters: string[] = [];
-
-      if (args.options.properties) {
-        queryParameters.push(`$select=${args.options.properties}`);
-      }
-
-      if (args.options.privileged) {
-        queryParameters.push(`$filter=isPrivileged eq true`);
-      }
-
-      const queryString = queryParameters.length > 0
-        ? `?${queryParameters.join('&')}`
-        : '';
+      const queryString = args.options.privileged ? '?$filter=isPrivileged eq true' : '';
       const url = `${this.resource}/beta/roleManagement/directory/resourceNamespaces/${args.options.resourceNamespace}/resourceActions${queryString}`;
       const results = await odata.getAllItems<UnifiedRbacResourceActionExt>(url);
       await logger.log(results);
