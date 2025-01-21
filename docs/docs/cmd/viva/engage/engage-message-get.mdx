@@ -31,13 +31,13 @@ In order to use this command, you need to grant the Microsoft Entra application 
 
 ## Examples
 
-Returns the Viva Engage message with the id 1239871123
+Returns the Viva Engage message with the id 1239871123.
 
 ```sh
 m365 viva engage message get --id 1239871123
 ```
 
-Returns the Viva Engage message with the id 1239871123 in JSON format
+Returns the Viva Engage message with the id 1239871123 in JSON format.
 
 ```sh
 m365 viva engage message get --id 1239871123 --output json
@@ -89,17 +89,31 @@ m365 viva engage message get --id 1239871123 --output json
   <TabItem value="Text">
 
   ```text
-  content_excerpt: Hello everyone!
-  created_at     : 2022/11/11 21:00:20 +0000
-  direct_message : false
-  group_id       : 31158067201
-  id             : 2000337749565441
-  message_type   : update
-  privacy        : public
-  replied_to_id  : null
-  sender_id      : 36425097217
-  system_message : false
-  thread_id      : 2000337749565441
+  attachments         : []
+  body                : {"parsed":"Hello everyone!","plain":"Hello everyone!","rich":"Hello everyone!"}
+  chat_client_sequence: null
+  client_type         : O365 Api Auth
+  client_url          : https://api.yammer.com
+  content_excerpt     : Hello everyone!
+  created_at          : 2022/11/11 21:00:20 +0000
+  delegate_id         : null
+  direct_message      : false
+  group_id            : 31158067201
+  id                  : 2000337749565441
+  language            : no
+  liked_by            : {"count":0,"names":[]}
+  message_type        : update
+  network_id          : 5897756673
+  notified_user_ids   : []
+  privacy             : public
+  replied_to_id       : null
+  sender_id           : 36425097217
+  sender_type         : user
+  supplemental_reply  : false
+  system_message      : false
+  thread_id           : 2000337749565441
+  url                 : https://www.yammer.com/api/v1/messages/2000337749565441
+  web_url             : https://www.yammer.com/contoso.onmicrosoft.com/messages/2000337749565441
   ```
 
   </TabItem>

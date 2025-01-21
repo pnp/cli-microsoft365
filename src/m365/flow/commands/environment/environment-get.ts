@@ -23,10 +23,6 @@ class FlowEnvironmentGetCommand extends PowerAutomateCommand {
     return 'Gets information about the specified Microsoft Flow environment';
   }
 
-  public defaultProperties(): string[] | undefined {
-    return ['name', 'id', 'location', 'displayName', 'provisioningState', 'environmentSku', 'azureRegionHint', 'isDefault'];
-  }
-
   constructor() {
     super();
 

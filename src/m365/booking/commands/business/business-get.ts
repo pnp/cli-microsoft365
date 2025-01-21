@@ -25,10 +25,6 @@ class BookingBusinessGetCommand extends GraphCommand {
     return 'Retrieve the specified Microsoft Bookings business.';
   }
 
-  public defaultProperties(): string[] | undefined {
-    return ['id', 'displayName', 'businessType', 'phone', 'email', 'defaultCurrencyIso'];
-  }
-
   constructor() {
     super();
 

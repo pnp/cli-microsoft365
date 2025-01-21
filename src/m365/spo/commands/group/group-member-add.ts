@@ -32,10 +32,6 @@ class SpoGroupMemberAddCommand extends SpoCommand {
     return 'Add members to a SharePoint Group';
   }
 
-  public defaultProperties(): string[] | undefined {
-    return ['Title', 'UserPrincipalName'];
-  }
-
   constructor() {
     super();
 

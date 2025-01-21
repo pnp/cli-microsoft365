@@ -21,10 +21,6 @@ class VivaEngageMessageGetCommand extends VivaEngageCommand {
     return 'Returns a Viva Engage message';
   }
 
-  public defaultProperties(): string[] | undefined {
-    return ['id', 'sender_id', 'replied_to_id', 'thread_id', 'group_id', 'created_at', 'direct_message', 'system_message', 'privacy', 'message_type', 'content_excerpt'];
-  }
-
   constructor() {
     super();
 
