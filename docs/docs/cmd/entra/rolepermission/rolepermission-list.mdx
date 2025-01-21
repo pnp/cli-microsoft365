@@ -4,7 +4,7 @@ import TabItem from '@theme/TabItem';
 
 # entra rolepermission list
 
-Lists all Microsoft Entra ID role permissions.
+Lists all Microsoft Entra ID role permissions
 
 ## Usage
 
@@ -13,8 +13,9 @@ m365 entra rolepermission list [options]
 ```
 
 ## Options
+
 ```md definition-list
-`-n, resourceNamespace [resourceNamespace]`
+`-n, --resourceNamespace [resourceNamespace]`
 : The namespace of the resource for which to retrieve role permissions.
 
 `-p, --privileged`
@@ -26,9 +27,15 @@ m365 entra rolepermission list [options]
 
 <Global />
 
-## Examples
+## Remarks
 
-### Examples
+:::warning
+
+The command is based on an API that is currently in preview and is subject to change once the API reached general availability.
+
+:::
+
+## Examples
 
 Get a list of role permissions
 

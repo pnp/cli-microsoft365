@@ -31,7 +31,7 @@ class EntraRolePermissionListCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'Lists all Microsoft Entra ID role permissions from a specifi resource namespace';
+    return 'Lists all Microsoft Entra ID role permissions';
   }
 
   public defaultProperties(): string[] | undefined {
@@ -46,6 +46,7 @@ class EntraRolePermissionListCommand extends GraphCommand {
     if (this.verbose) {
       await logger.logToStderr('Getting Microsoft Entra ID role permissions...');
     }
+
     try {
       const queryParameters: string[] = [];
 
