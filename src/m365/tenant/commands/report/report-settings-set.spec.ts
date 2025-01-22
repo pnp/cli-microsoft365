@@ -105,7 +105,7 @@ describe(commands.REPORT_SETTINGS_SET, () => {
 
     await command.action(logger, { options: { displayConcealedNames: true, verbose: true } });
 
-    assert(logToStderrSpy.calledWith('Updating report settings displayConcealedNames to true'));
+    assert(logToStderrSpy.calledWith('Updating report setting displayConcealedNames to true'));
   });
 
 
