@@ -3410,6 +3410,11 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
+              label: 'page section remove',
+              id: 'cmd/spo/page/page-section-remove'
+            },
+            {
+              type: 'doc',
               label: 'page template list',
               id: 'cmd/spo/page/page-template-list'
             },
