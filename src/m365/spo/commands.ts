@@ -217,7 +217,6 @@ export default {
   PAGE_CONTROL_GET: `${prefix} page control get`,
   PAGE_CONTROL_LIST: `${prefix} page control list`,
   PAGE_CONTROL_SET: `${prefix} page control set`,
-  PAGE_DEFAULT_GET: `${prefix} page default get`,
   PAGE_HEADER_SET: `${prefix} page header set`,
   PAGE_SECTION_ADD: `${prefix} page section add`,
   PAGE_SECTION_GET: `${prefix} page section get`,
