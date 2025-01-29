@@ -1018,6 +1018,11 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
+              label: 'report settings get',
+              id: 'cmd/tenant/report/report-settings-get'
+            },
+            {
+              type: 'doc',
               label: 'report settings set',
               id: 'cmd/tenant/report/report-settings-set'
             }
