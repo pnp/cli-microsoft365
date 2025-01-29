@@ -4,6 +4,7 @@ import request from '../../../../request.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
+import outlookCommands from '../../../outlook/commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -84,6 +85,8 @@ class SpoMailSendCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    await this.showDeprecationWarning(logger, commands.MAIL_SEND, outlookCommands.MAIL_SEND);
+
     const params: any = {
       properties: {
         __metadata: { "type": "SP.Utilities.EmailProperties" },
