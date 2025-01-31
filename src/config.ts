@@ -38,6 +38,7 @@ export default {
     'https://graph.microsoft.com/Reports.ReadWrite.All',
     'https://graph.microsoft.com/RoleAssignmentSchedule.ReadWrite.Directory',
     'https://graph.microsoft.com/RoleEligibilitySchedule.Read.Directory',
+    'https://graph.microsoft.com/RoleManagement.Read.Directory',
     'https://graph.microsoft.com/SecurityEvents.Read.All',
     'https://graph.microsoft.com/ServiceHealth.Read.All',
     'https://graph.microsoft.com/ServiceMessage.Read.All',

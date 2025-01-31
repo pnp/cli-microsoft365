@@ -633,6 +633,15 @@ const sidebars: SidebarsConfig = {
           ]
         },
         {
+          resourcenamespace: [
+            {
+              type: 'doc',
+              label: 'resourcenamespace list',
+              id: 'cmd/entra/resourcenamespace/resourcenamespace-list'
+            }
+          ]
+        },
+        {
           roledefinition: [
             {
               type: 'doc',
