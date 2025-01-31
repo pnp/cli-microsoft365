@@ -3,7 +3,7 @@ import { odata } from '../../../../utils/odata.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 
-class ResourceNamespaceListCommand extends GraphCommand {
+class EntraResourcenamespaceListCommand extends GraphCommand {
   public get name(): string {
     return commands.RESOURCENAMESPACE_LIST;
   }
@@ -31,4 +31,4 @@ class ResourceNamespaceListCommand extends GraphCommand {
   }
 }
 
-export default new ResourceNamespaceListCommand();
+export default new EntraResourcenamespaceListCommand();
