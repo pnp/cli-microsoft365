@@ -118,6 +118,17 @@ describe(commands.MAILBOX_SETTINGS_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
+  it('fails validation if both userId and userName are specified', () => {
+    sinonUtil.restore(accessToken.isAppOnlyAccessToken);
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
+
+    const actual = commandOptionsSchema.safeParse({
+      userId: userId,
+      userName: userName
+    });
+    assert.notStrictEqual(actual.success, true);
+  });
+
   it('fails validation if userId is not a valid GUID', () => {
     sinonUtil.restore(accessToken.isAppOnlyAccessToken);
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
@@ -204,15 +215,6 @@ describe(commands.MAILBOX_SETTINGS_GET, () => {
       options: result.data
     });
     assert(loggerLogSpy.calledOnceWith(mailboxSettingsResponse));
-  });
-
-  it('fails retrieve mailbox settings if both userId and userName is specified in app-only mode', async () => {
-    sinonUtil.restore(accessToken.isAppOnlyAccessToken);
-    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
-
-    const result = commandOptionsSchema.safeParse({ userId: userId, userName: userName, verbose: true });
-
-    await assert.rejects(command.action(logger, { options: result.data }), new CommandError('When running with application permissions either userId or userName is required, but not both'));
   });
 
   it('fails retrieve mailbox settings if neither userId nor userName is specified in app-only mode', async () => {

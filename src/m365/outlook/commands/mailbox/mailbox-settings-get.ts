@@ -40,16 +40,19 @@ class OutlookMailboxSettingsGetCommand extends GraphCommand {
     return options;
   }
 
+  public getRefinedSchema(schema: typeof options): z.ZodEffects<any> | undefined {
+    return schema
+      .refine(options => !(options.userId && options.userName), {
+        message: 'Specify either userId or userName, but not both'
+      });
+  }
+
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const isAppOnlyAccessToken = accessToken.isAppOnlyAccessToken(auth.connection.accessTokens[auth.defaultResource].accessToken);
 
     let requestUrl = `${this.resource}/v1.0/me/mailboxSettings`;
 
     if (isAppOnlyAccessToken) {
-      if (args.options.userId && args.options.userName) {
-        throw 'When running with application permissions either userId or userName is required, but not both';
-      }
-
       if (!(args.options.userId || args.options.userName)) {
         throw 'When running with application permissions either userId or userName is required';
       }

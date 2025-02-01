@@ -59,6 +59,9 @@ class OutlookMailboxSettingsSetCommand extends GraphCommand {
 
   public getRefinedSchema(schema: typeof options): z.ZodEffects<any> | undefined {
     return schema
+      .refine(options => !(options.userId && options.userName), {
+        message: 'Specify either userId or userName, but not both'
+      })
       .refine(options => [options.workingDays, options.workingHoursStartTime, options.workingHoursEndTime, options.workingHoursTimeZone,
         options.autoReplyStatus, options.autoReplyExternalAudience, options.autoReplyExternalMessage, options.autoReplyInternalMessage,
         options.autoReplyStartDateTime, options.autoReplyStartTimeZone, options.autoReplyEndDateTime, options.autoReplyEndTimeZone,
@@ -73,10 +76,6 @@ class OutlookMailboxSettingsSetCommand extends GraphCommand {
     let requestUrl = `${this.resource}/v1.0/me/mailboxSettings`;
 
     if (isAppOnlyAccessToken) {
-      if (args.options.userId && args.options.userName) {
-        throw 'When running with application permissions either userId or userName is required, but not both';
-      }
-
       if (!(args.options.userId || args.options.userName)) {
         throw 'When running with application permissions either userId or userName is required';
       }
