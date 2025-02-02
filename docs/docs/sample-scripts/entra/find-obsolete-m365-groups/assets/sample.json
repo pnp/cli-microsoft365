@@ -13,7 +13,6 @@
     "products": ["SharePoint", "M365 Groups", "Teams", "Exchange Online"],
     "categories": [],
     "tags": [
-      "provisioning",
       "libraries",
       "group mailbox",
       "governance",
