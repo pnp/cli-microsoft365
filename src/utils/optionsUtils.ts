@@ -1,14 +1,14 @@
 import { CommandOption } from "../Command";
 
+const longOptionRegex: RegExp = /--([^\s]+)/;
+const shortOptionRegex: RegExp = /-([a-z])\b/;
+
 export const optionsUtils = {
-  getUnknownOptions(options: any, defaultOptions: any): any {
+  getUnknownOptions(options: any, knownOptions: CommandOption[]): any {
     const unknownOptions: any = JSON.parse(JSON.stringify(options));
     // remove minimist catch-all option
     delete unknownOptions._;
 
-    const knownOptions: CommandOption[] = defaultOptions;
-    const longOptionRegex: RegExp = /--([^\s]+)/;
-    const shortOptionRegex: RegExp = /-([a-z])\b/;
     knownOptions.forEach(o => {
       const longOptionName: string = (longOptionRegex.exec(o.option) as RegExpExecArray)[1];
       delete unknownOptions[longOptionName];
@@ -25,8 +25,8 @@ export const optionsUtils = {
     return unknownOptions;
   },
 
-  addUnknownOptionsToPayload(payload: any, options: any, defaultOptions: any): void {
-    const unknownOptions: any = this.getUnknownOptions(options, defaultOptions);
+  addUnknownOptionsToPayload(payload: any, options: any, knownOptions: CommandOption[]): void {
+    const unknownOptions: any = this.getUnknownOptions(options, knownOptions);
     const unknownOptionsNames: string[] = Object.getOwnPropertyNames(unknownOptions);
     unknownOptionsNames.forEach(o => {
       payload[o] = unknownOptions[o];
