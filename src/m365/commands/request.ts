@@ -7,6 +7,7 @@ import GlobalOptions from '../../GlobalOptions.js';
 import { Logger } from '../../cli/Logger.js';
 import request from '../../request.js';
 import commands from './commands.js';
+import { optionsUtils } from '../../utils/optionsUtils.js';
 
 interface CommandArgs {
   options: Options;
@@ -53,7 +54,7 @@ class RequestCommand extends Command {
         filePath: typeof args.options.filePath !== 'undefined'
       };
 
-      const unknownOptions: any = this.getUnknownOptions(args.options);
+      const unknownOptions: any = optionsUtils.getUnknownOptions(args.options, this.options);
       const unknownOptionsNames: string[] = Object.getOwnPropertyNames(unknownOptions);
       unknownOptionsNames.forEach(o => {
         properties[o] = typeof unknownOptions[o] !== 'undefined';
@@ -119,7 +120,7 @@ class RequestCommand extends Command {
       const method = (args.options.method || 'get').toUpperCase();
       const headers: RawAxiosRequestHeaders = {};
 
-      const unknownOptions: any = this.getUnknownOptions(args.options);
+      const unknownOptions: any = optionsUtils.getUnknownOptions(args.options, this.options);
       const unknownOptionsNames: string[] = Object.getOwnPropertyNames(unknownOptions);
       unknownOptionsNames.forEach(o => {
         headers[o] = unknownOptions[o];

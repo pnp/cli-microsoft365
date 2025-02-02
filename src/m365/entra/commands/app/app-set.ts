@@ -7,6 +7,7 @@ import { formatting } from '../../../../utils/formatting.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 import { cli } from '../../../../cli/cli.js';
+import { optionsUtils } from '../../../../utils/optionsUtils.js';
 
 interface CommandArgs {
   options: Options;
@@ -182,9 +183,9 @@ class EntraAppSetCommand extends GraphCommand {
   }
 
   private async updateUnknownOptions(args: CommandArgs, objectId: string): Promise<string> {
-    if (Object.keys(this.getUnknownOptions(args.options)).length > 0) {
+    if (Object.keys(optionsUtils.getUnknownOptions(args.options, this.options)).length > 0) {
       const requestBody = {};
-      this.addUnknownOptionsToPayload(requestBody, args.options);
+      optionsUtils.addUnknownOptionsToPayload(requestBody, args.options, this.options);
 
       const requestOptions: CliRequestOptions = {
         url: `${this.resource}/v1.0/myorganization/applications/${objectId}`,

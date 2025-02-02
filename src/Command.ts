@@ -14,8 +14,9 @@ import { md } from './utils/md.js';
 import { GraphResponseError } from './utils/odata.js';
 import { prompt } from './utils/prompt.js';
 import { zod } from './utils/zod.js';
+import { optionsUtils } from './utils/optionsUtils.js';
 
-interface CommandOption {
+export interface CommandOption {
   option: string;
   autocomplete?: string[]
 }
@@ -469,32 +470,8 @@ export default abstract class Command {
     await telemetry.trackEvent(this.getUsedCommandName(), this.getTelemetryProperties(args));
   }
 
-  protected getUnknownOptions(options: any): any {
-    const unknownOptions: any = JSON.parse(JSON.stringify(options));
-    // remove minimist catch-all option
-    delete unknownOptions._;
-
-    const knownOptions: CommandOption[] = this.options;
-    const longOptionRegex: RegExp = /--([^\s]+)/;
-    const shortOptionRegex: RegExp = /-([a-z])\b/;
-    knownOptions.forEach(o => {
-      const longOptionName: string = (longOptionRegex.exec(o.option) as RegExpExecArray)[1];
-      delete unknownOptions[longOptionName];
-
-      // short names are optional so we need to check if the current command has
-      // one before continuing
-      const shortOptionMatch: RegExpExecArray | null = shortOptionRegex.exec(o.option);
-      if (shortOptionMatch) {
-        const shortOptionName: string = shortOptionMatch[1];
-        delete unknownOptions[shortOptionName];
-      }
-    });
-
-    return unknownOptions;
-  }
-
   protected trackUnknownOptions(telemetryProps: any, options: any): void {
-    const unknownOptions: any = this.getUnknownOptions(options);
+    const unknownOptions: any = optionsUtils.getUnknownOptions(options, this.options);
     const unknownOptionsNames: string[] = Object.getOwnPropertyNames(unknownOptions);
     unknownOptionsNames.forEach(o => {
       telemetryProps[o] = true;
@@ -502,11 +479,7 @@ export default abstract class Command {
   }
 
   protected addUnknownOptionsToPayload(payload: any, options: any): void {
-    const unknownOptions: any = this.getUnknownOptions(options);
-    const unknownOptionsNames: string[] = Object.getOwnPropertyNames(unknownOptions);
-    unknownOptionsNames.forEach(o => {
-      payload[o] = unknownOptions[o];
-    });
+    optionsUtils.addUnknownOptionsToPayload(payload, options, this.options);
   }
 
   private loadValuesFromAccessToken(args: CommandArgs): void {

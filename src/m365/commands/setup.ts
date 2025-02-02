@@ -311,11 +311,11 @@ class SetupCommand extends AnonymousCommand {
     });
     const appInfo: AppInfo = await entraApp.createAppRegistration({
       options,
+      defaultOptions: this.options,
       apis,
       logger,
       verbose: this.verbose,
-      debug: this.debug,
-      addUnknownOptions: this.addUnknownOptionsToPayload.bind(this)
+      debug: this.debug
     });
     appInfo.tenantId = accessToken.getTenantIdFromAccessToken(auth.connection.accessTokens[auth.defaultResource].accessToken);
     await entraApp.grantAdminConsent({

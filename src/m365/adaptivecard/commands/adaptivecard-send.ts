@@ -4,6 +4,7 @@ import GlobalOptions from '../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../request.js';
 import AnonymousCommand from '../../base/AnonymousCommand.js';
 import commands from '../commands.js';
+import { optionsUtils } from '../../../utils/optionsUtils.js';
 
 interface CommandArgs {
   options: Options;
@@ -113,7 +114,7 @@ class AdaptiveCardSendCommand extends AnonymousCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const unknownOptions = this.getUnknownOptions(args.options);
+    const unknownOptions = optionsUtils.getUnknownOptions(args.options, this.options);
     const unknownOptionNames: string[] = Object.getOwnPropertyNames(unknownOptions);
     const card: any = await this.getCard(args, unknownOptionNames, unknownOptions);
 
