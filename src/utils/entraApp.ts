@@ -3,7 +3,6 @@ import fs from 'fs';
 import { Logger } from '../cli/Logger.js';
 import request, { CliRequestOptions } from '../request.js';
 import { odata } from './odata.js';
-import Command from '../Command.js';
 
 export interface AppInfo {
   appId: string;
@@ -44,6 +43,8 @@ export interface AppPermissions {
   resourceAccess: ResourceAccess[];
   scope: string[];
 }
+
+type addUnknownOptions = (payload: any, options: any) => void;
 
 async function getCertificateBase64Encoded({ options, logger, debug }: {
   options: AppCreationOptions,
@@ -215,13 +216,13 @@ function updateAppPermissions({ spId, resourceAccessPermission, oAuth2Permission
 
 export const entraApp = {
   appPermissions: [] as AppPermissions[],
-  createAppRegistration: async ({ options, apis, logger, verbose, debug, command }: {
+  createAppRegistration: async ({ options, apis, logger, verbose, debug, addUnknownOptions }: {
     options: AppCreationOptions,
     apis: RequiredResourceAccess[],
     logger: Logger,
     verbose: boolean,
     debug: boolean,
-    command: Command
+    addUnknownOptions: addUnknownOptions
   }): Promise<AppInfo> => {
     const applicationInfo: any = {
       displayName: options.name,
@@ -265,7 +266,7 @@ export const entraApp = {
       applicationInfo.isFallbackPublicClient = true;
     }
 
-    command.addUnknownOptionsToPayload(applicationInfo, options);
+    addUnknownOptions(applicationInfo, options);
 
     if (verbose) {
       await logger.logToStderr(`Creating Microsoft Entra app registration...`);

@@ -131,7 +131,7 @@ class EntraAppSetCommand extends GraphCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       let objectId = await this.getAppObjectId(args, logger);
-      objectId = await this.updateUknownOptions(args, objectId);
+      objectId = await this.updateUnknownOptions(args, objectId);
       objectId = await this.configureUri(args, objectId, logger);
       objectId = await this.configureRedirectUris(args, objectId, logger);
       objectId = await this.updateAllowPublicClientFlows(args, objectId, logger);
@@ -181,7 +181,7 @@ class EntraAppSetCommand extends GraphCommand {
     return result.id;
   }
 
-  private async updateUknownOptions(args: CommandArgs, objectId: string): Promise<string> {
+  private async updateUnknownOptions(args: CommandArgs, objectId: string): Promise<string> {
     if (Object.keys(this.getUnknownOptions(args.options)).length > 0) {
       const requestBody = {};
       this.addUnknownOptionsToPayload(requestBody, args.options);
