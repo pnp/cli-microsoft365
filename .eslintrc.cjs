@@ -163,8 +163,8 @@ module.exports = {
     "**/package-generate/assets/**",
     "**/test-projects/**",
     "clientsidepages.ts",
-    "**/*.d.ts",
-    "**/*.js",
+    "*.d.ts",
+    "*.js",
     "*.cjs"
   ],
   "rules": {
