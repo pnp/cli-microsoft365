@@ -1316,7 +1316,8 @@ describe(commands.LIST_GET, () => {
 
     await command.action(logger, {
       options: {
-        webUrl: webUrl
+        webUrl: webUrl,
+        defaut: true
       }
     });
 
