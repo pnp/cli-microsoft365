@@ -25,6 +25,7 @@ interface Options extends GlobalOptions {
   url?: string;
   properties?: string;
   withPermissions?: boolean;
+  default?: boolean;
 }
 
 class SpoListGetCommand extends SpoCommand {
@@ -44,6 +45,7 @@ class SpoListGetCommand extends SpoCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initOptionSets();
   }
 
   #initTelemetry(): void {
@@ -53,7 +55,8 @@ class SpoListGetCommand extends SpoCommand {
         title: (!(!args.options.title)).toString(),
         url: (!(!args.options.url)).toString(),
         properties: (!(!args.options.properties)).toString(),
-        withPermissions: typeof args.options.withPermissions !== 'undefined'
+        withPermissions: typeof args.options.withPermissions !== 'undefined',
+        default: typeof args.options.default !== 'undefined'
       });
     });
   }
@@ -71,6 +74,9 @@ class SpoListGetCommand extends SpoCommand {
       },
       {
         option: '--url [url]'
+      },
+      {
+        option: '--default'
       },
       {
         option: '-p, --properties [properties]'
@@ -100,6 +106,10 @@ class SpoListGetCommand extends SpoCommand {
     );
   }
 
+  #initOptionSets(): void {
+    this.optionSets.push({ options: ['id', 'title', 'url', 'default'] });
+  }
+
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
       await logger.logToStderr(`Retrieving information for list in site at ${args.options.webUrl}...`);
@@ -117,7 +127,7 @@ class SpoListGetCommand extends SpoCommand {
       const listServerRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.url);
       requestUrl += `GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')`;
     }
-    else {
+    else if (args.options.default) {
       requestUrl += `DefaultDocumentLibrary`;
     }
 
