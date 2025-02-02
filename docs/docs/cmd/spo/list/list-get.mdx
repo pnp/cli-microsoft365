@@ -19,13 +19,16 @@ m365 spo list get [options]
 : URL of the site where the list to retrieve is located.
 
 `-i, --id [id]`
-: ID of the list to retrieve information for. Specify either `id`, `title`, or `url` but not multiple.
+: ID of the list to retrieve information for. Specify either `id`, `title`,`url` or `default` but not multiple.
 
 `-t, --title [title]`
-: Title of the list to retrieve information for. Specify either `id`, `title`, or `url` but not multiple.
+: Title of the list to retrieve information for. Specify either `id`, `title`,`url` or `default` but not multiple.
 
 `--url [url]`
-: Server- or site-relative URL of the list. Specify either `id`, `title`, or `url` but not multiple.
+: Server- or site-relative URL of the list. Specify either `id`, `title`,`url` or `default` but not multiple.
+
+`--default`
+: Set if you want to return the default list from the site. Specify either `id`, `title`, `url` or `default` but not multiple.
 
 `-p, --properties [properties]`
 : Comma-separated list of properties to retrieve from the list. Will retrieve all properties possible from default response, if not specified.
@@ -70,6 +73,12 @@ Get information about a list with specified site-relative URL located in the spe
 
 ```sh
 m365 spo list get --url 'Shared Documents' --webUrl https://contoso.sharepoint.com/sites/project-x
+```
+
+Get information about the default (document) located in the specified site.
+
+```sh
+m365 spo list get --webUrl https://contoso.sharepoint.com/sites/project-x --default
 ```
 
 Get information about a list returning the specified list properties.
