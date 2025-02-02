@@ -1,4 +1,4 @@
-import { CommandOption } from "../Command";
+import { CommandOption } from '../Command.js';
 
 const longOptionRegex: RegExp = /--([^\s]+)/;
 const shortOptionRegex: RegExp = /-([a-z])\b/;
