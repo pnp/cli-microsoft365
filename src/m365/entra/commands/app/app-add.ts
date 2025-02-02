@@ -233,7 +233,7 @@ class EntraAppAddCommand extends GraphCommand {
         logger,
         verbose: this.verbose,
         debug: this.debug,
-        command: this
+        addUnknownOptions: this.addUnknownOptionsToPayload.bind(this)
       });
       // based on the assumption that we're adding Microsoft Entra app to the current
       // directory. If we in the future extend the command with allowing
