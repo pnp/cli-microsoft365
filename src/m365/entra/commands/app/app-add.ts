@@ -229,11 +229,11 @@ class EntraAppAddCommand extends GraphCommand {
       });
       let appInfo: any = await entraApp.createAppRegistration({
         options: args.options,
+        defaultOptions: this.options,
         apis,
         logger,
         verbose: this.verbose,
-        debug: this.debug,
-        addUnknownOptions: this.addUnknownOptionsToPayload.bind(this)
+        debug: this.debug
       });
       // based on the assumption that we're adding Microsoft Entra app to the current
       // directory. If we in the future extend the command with allowing
