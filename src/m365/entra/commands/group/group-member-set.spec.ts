@@ -109,6 +109,61 @@ describe(commands.GROUP_MEMBER_SET, () => {
     assert.strictEqual(actual, true);
   });
 
+  it(`correctly shows deprecation warning for option 'groupDisplayName'`, async () => {
+    const chalk = (await import('chalk')).default;
+    const loggerErrSpy = sinon.spy(logger, 'logToStderr');
+
+    sinon.stub(entraGroup, 'getGroupIdByDisplayName').resolves(groupId);
+    sinon.stub(entraUser, 'getUserIdsByUpns').resolves(userIds);
+
+    sinon.stub(request, 'post').callsFake(async opts => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/$batch' &&
+        opts.data.requests[0].method === 'PATCH') {
+        return {
+          responses: Array(2).fill({
+            status: 204,
+            body: {}
+          })
+        };
+      }
+
+      if (opts.url === 'https://graph.microsoft.com/v1.0/$batch' &&
+        opts.data.requests[0].method === 'GET') {
+        return {
+          responses: [
+            {
+              id: userIds[0],
+              status: 200,
+              body: 1
+            },
+            {
+              id: userIds[2],
+              status: 200,
+              body: 1
+            }
+          ]
+        };
+      }
+
+      if (opts.url === 'https://graph.microsoft.com/v1.0/$batch' &&
+        opts.data.requests[0].method === 'DELETE') {
+        return {
+          responses: Array(2).fill({
+            status: 204,
+            body: {}
+          })
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { groupDisplayName: 'Contoso', ids: userIds.join(','), role: 'Member', verbose: true } });
+    assert(loggerErrSpy.calledWith(chalk.yellow(`Option 'groupDisplayName' is deprecated and will be removed in the next major release.`)));
+
+    sinonUtil.restore(loggerErrSpy);
+  });
+
   it('successfully updates roles for users with ids in the group', async () => {
     const postStub = sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/$batch' &&
@@ -289,6 +344,75 @@ describe(commands.GROUP_MEMBER_SET, () => {
     });
 
     await command.action(logger, { options: { groupDisplayName: 'Contoso', userNames: userUpns.join(','), role: 'Owner', verbose: true } });
+    assert.deepStrictEqual(postStub.firstCall.args[0].data.requests, [
+      {
+        id: 1,
+        method: 'PATCH',
+        url: `/groups/${groupId}`,
+        headers: { 'content-type': 'application/json;odata.metadata=none' },
+        body: {
+          'owners@odata.bind': userIds.slice(0, 20).map(u => `https://graph.microsoft.com/v1.0/directoryObjects/${u}`)
+        }
+      },
+      {
+        id: 21,
+        method: 'PATCH',
+        url: `/groups/${groupId}`,
+        headers: { 'content-type': 'application/json;odata.metadata=none' },
+        body: {
+          'owners@odata.bind': userIds.slice(20, 40).map(u => `https://graph.microsoft.com/v1.0/directoryObjects/${u}`)
+        }
+      }
+    ]);
+  });
+
+  it('successfully updates roles for users using groupName and userNames', async () => {
+    sinon.stub(entraGroup, 'getGroupIdByDisplayName').resolves(groupId);
+    sinon.stub(entraUser, 'getUserIdsByUpns').resolves(userIds);
+
+    const postStub = sinon.stub(request, 'post').callsFake(async opts => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/$batch' &&
+        opts.data.requests[0].method === 'PATCH') {
+        return {
+          responses: Array(2).fill({
+            status: 204,
+            body: {}
+          })
+        };
+      }
+
+      if (opts.url === 'https://graph.microsoft.com/v1.0/$batch' &&
+        opts.data.requests[0].method === 'GET') {
+        return {
+          responses: [
+            {
+              id: userIds[0],
+              status: 200,
+              body: 1
+            },
+            {
+              id: userIds[2],
+              status: 200,
+              body: 1
+            }
+          ]
+        };
+      }
+
+      if (opts.url === 'https://graph.microsoft.com/v1.0/$batch' &&
+        opts.data.requests[0].method === 'DELETE') {
+        return {
+          responses: Array(2).fill({
+            status: 204,
+            body: {}
+          })
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { groupName: 'Contoso', userNames: userUpns.join(','), role: 'Owner', verbose: true } });
     assert.deepStrictEqual(postStub.firstCall.args[0].data.requests, [
       {
         id: 1,
