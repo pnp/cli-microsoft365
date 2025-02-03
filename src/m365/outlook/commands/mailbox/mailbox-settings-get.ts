@@ -53,7 +53,7 @@ class OutlookMailboxSettingsGetCommand extends GraphCommand {
     let requestUrl = `${this.resource}/v1.0/me/mailboxSettings`;
 
     if (isAppOnlyAccessToken) {
-      if (!(args.options.userId || args.options.userName)) {
+      if (!args.options.userId && !args.options.userName) {
         throw 'When running with application permissions either userId or userName is required';
       }
 
