@@ -103,6 +103,8 @@ jobs:
         # we run coverage only on Node that was used to build
         if: matrix.nodeRun == matrix.nodeBuild
         run: npm test
+        env:
+          NODE_OPTIONS: '--max_old_space_size=4096'
       - name: Test without coverage
         # we want to run tests on older Node versions to ensure that code works
         if: matrix.nodeRun != matrix.nodeBuild
