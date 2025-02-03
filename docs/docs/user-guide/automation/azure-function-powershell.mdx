@@ -20,7 +20,7 @@ Apart from this IDE, you will need the following extensions for Visual Studio Co
 
 1. Create a new resource group.
 
-    Create a new resource group by searching for "resource group" in the search bar and clicking on the `Create` button.
+    Create a new resource group by searching for "resource group" in the search bar and clicking the `Create` button.
     Pick a suitable name and location for your resource group.
 
     ![Create a resource group](../../images/azure-function-powershell-guide/create-resource-group.png)
@@ -32,23 +32,23 @@ Apart from this IDE, you will need the following extensions for Visual Studio Co
     ![Create a Function App](../../images/azure-function-powershell-guide/create-function-app.png)
 
     In this guide, we are creating an Azure Function with a consumption plan.
-    Fill out the required fields of the form and click on the `Review + create` button.
+    Fill out the required fields of the form and click the `Review + create` button.
     While CLI for Microsoft 365 works on multiple platforms, this guide only explains the setup on a PowerShell Azure Function running on **Windows**.
 
     ![Function App form](../../images/azure-function-powershell-guide/function-app-form.png)
 
 1. Wait for the creation to complete and open the Azure Function app.
 
-1. Setup the environment variables.
+1. Set up the environment variables.
 
     Navigate to the `Environment variables` tab.
-    Over there, add a new environment variable with name `WEBSITE_NODE_DEFAULT_VERSION` and value `~20` to set the right Node version.
-    Finally press `Apply`.
+    Over there, add a new environment variable with the name `WEBSITE_NODE_DEFAULT_VERSION` and value `~20` to set the right Node version.
+    Finally, press `Apply`.
 
     :::note
 
     At the time of writing, the LTS version of Node.js is v20.
-    We recommend to run CLI for Microsoft 365 on the LTS version of Node.js.
+    We recommend running CLI for Microsoft 365 on the LTS version of Node.js.
     Visit the [website of Node.js](https://nodejs.org) to discover the current LTS version of Node.js and update the `WEBSITE_NODE_DEFAULT_VERSION` environment variable accordingly.
 
     :::
@@ -57,7 +57,7 @@ Apart from this IDE, you will need the following extensions for Visual Studio Co
 
     :::tip
 
-    To prevent automatic update checks in your Azure Function, add an additional environment variable with name `CLIMICROSOFT365_NOUPDATE` and value `1`.
+    To prevent automatic update checks in your Azure Function, add an additional environment variable with the name `CLIMICROSOFT365_NOUPDATE` and value `1`.
     This will prevent CLI from checking if new versions are available, not giving you unwanted update notifications in your logs.
 
     :::
@@ -77,7 +77,7 @@ Apart from this IDE, you will need the following extensions for Visual Studio Co
 1. Create a new Azure Function project.
 
     Using the Azure plugin from Visual Studio Code, let's create a new Azure Function project.
-    Select `PowerShell` as the language and `HTTP trigger` as the template. For this demo, let's use authorization level `anonymous`.
+    Select `PowerShell` as the language and `HTTP trigger` as the template. For this demo, let's use the authorization level `anonymous`.
 
     ![Create new project](../../images/azure-function-powershell-guide/create-new-project.png)
 
@@ -85,7 +85,7 @@ Apart from this IDE, you will need the following extensions for Visual Studio Co
 
     To use CLI for Microsoft 365 in this Azure Function, we have to install it locally in the project. When everything is ready to go, we will publish CLI for Microsoft 365 with out code to the Azure Function.
     This will prevent the need to install the CLI for Microsoft 365 on the Azure Function itself at every execution.
-    The easiest way to do achieve this is by creating a `package.json` file in the root of your project project (or run `npm init`).
+    The easiest way to achieve this is to create a `package.json` file in the root of your project (or run `npm init`).
     Make sure your file looks like this (choose your own project name and version):
 
     ```json title="package.json"
@@ -109,9 +109,9 @@ Apart from this IDE, you will need the following extensions for Visual Studio Co
     This behavior is similar to how PowerShell profiles work on your local machine but tailored for the Azure Functions environment.
     The primary purpose of `profile.ps1` is to allow you to run initialization code for your function app.
     This could include setting up environment variables, loading custom modules, or executing any startup tasks required before your functions can run.
-    In the case of CLI for Microsoft 365, we need to make sure that the CLI is available in the context of the Azure Function.
+    In the case of the CLI for Microsoft 365, we need to ensure that it is available in the context of the Azure Function.
 
-    Overwrite the content of the `profile.ps1` file with the following content:
+    Replace the content of the `profile.ps1` file with the following code:
 
     ```powershell title="profile.ps1"
     # Ensure CLI for Microsoft 365 environment path is available in the Azure Function
@@ -133,7 +133,7 @@ Apart from this IDE, you will need the following extensions for Visual Studio Co
 
 ## Creating a new function
 
-Open the `Azure` tab in Visual Studio Code and click on the `Create Function` button to create a new Function.
+Open the `Azure` tab in Visual Studio Code and click the `Create Function` button to create a new Function.
 
 ![Create new function](../../images/azure-function-powershell-guide/create-new-function.png)
 
@@ -142,7 +142,7 @@ Open the `Azure` tab in Visual Studio Code and click on the `Create Function` bu
 1. Create a new HTTP trigger function.
 
     Choose `HTTP trigger` as the template and give it a proper name. For this demo, let's use `GetSitesFromHub`.
-    For the sake of this demo, let's use authorization level `anonymous`.
+    For the sake of this demo, let's use the authorization level `anonymous`.
 
 1. Configure the Azure Function.
 
@@ -287,7 +287,7 @@ If you want to use a different authentication method, please refer to the [log i
 1. Grant permissions to the managed identity.
 
     In order to use CLI for Microsoft 365, you need to grant the necessary permissions to the managed identity.
-    In this guide, out demo code needs the following permissions: `Sites.FullControl.All`, `Group.Read.All` and `Mail.Send`.
+    In this guide, our demo code needs the following permissions: `Sites.FullControl.All`, `Group.Read.All` and `Mail.Send`.
     Let's grant them to the managed identity.
 
     ```powershell
@@ -311,7 +311,7 @@ This section will guide you through deploying your Azure Function to Azure.
 1. Using the Azure extension, deploy your Azure Function.
 
     Open the Azure tab in Visual Studio Code and select the subscription, resource group, and Function App you created earlier.
-    Right click your Function App and choose the `Deploy to Function App...` option.
+    Right-click your Function App and choose the `Deploy to Function App...` option.
 
     ![Deploy to Azure](../../images/azure-function-powershell-guide/azure-deploy.png)
 
@@ -329,7 +329,7 @@ Open the `GetSitesFromHub` function and click on the `Get Function URL` button.
 
 ![Get function URL](../../images/azure-function-powershell-guide/function-url.png)
 
-Copy the URL and paste it in your browser or an API request tool.
+Copy the URL and paste it into your browser or an API request tool.
 Add the query parameter `?Url=` to the URL and append a hub site URL of your tenant.
 You should see a list of sites that are linked to the hub site.
 
