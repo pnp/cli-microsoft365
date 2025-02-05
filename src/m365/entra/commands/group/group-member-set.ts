@@ -62,7 +62,7 @@ class EntraGroupMemberSetCommand extends GraphCommand {
         option: '--groupDisplayName [groupDisplayName]'
       },
       {
-        option: "--groupName [groupName]"
+        option: '-n, --groupName [groupName]'
       },
       {
         option: '--ids [ids]'
