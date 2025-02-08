@@ -118,6 +118,7 @@ export default {
   HIDEDEFAULTTHEMES_GET: `${prefix} hidedefaultthemes get`,
   HIDEDEFAULTTHEMES_SET: `${prefix} hidedefaultthemes set`,
   HOMESITE_GET: `${prefix} homesite get`,
+  HOMESITE_LIST: `${prefix} homesite list`,
   HOMESITE_REMOVE: `${prefix} homesite remove`,
   HOMESITE_SET: `${prefix} homesite set`,
   HUBSITE_CONNECT: `${prefix} hubsite connect`,

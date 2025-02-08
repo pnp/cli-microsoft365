@@ -9,9 +9,9 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './tenant-homesite-list.js';
+import command from './homesite-list.js';
 
-describe(commands.TENANT_HOMESITE_LIST, () => {
+describe(commands.HOMESITE_LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -91,11 +91,15 @@ describe(commands.TENANT_HOMESITE_LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name, commands.TENANT_HOMESITE_LIST);
+    assert.strictEqual(command.name, commands.HOMESITE_LIST);
   });
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
+  });
+
+  it('has an alias', () => {
+    assert.notStrictEqual(command.alias(), commands.TENANT_HOMESITE_LIST);
   });
 
   it('defines correct properties for the default output', () => {
