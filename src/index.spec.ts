@@ -88,6 +88,7 @@ describe('Lazy loading commands', () => {
       'spo folder rename',
       'spo site list',
       'spo page template remove',
+      'spo tenant homesite list',
       'spo sp grant add',
       'spo sp grant list',
       'spo sp grant revoke',
