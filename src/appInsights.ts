@@ -13,7 +13,7 @@ import { app } from './utils/app.js';
 
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 appInsights
-  .setup('6b908c80-d09f-4cf6-8274-e54349a0149a')
+  .setup('InstrumentationKey=6b908c80-d09f-4cf6-8274-e54349a0149a;IngestionEndpoint=https://westeurope-3.in.applicationinsights.azure.com/;LiveEndpoint=https://westeurope.livediagnostics.monitor.azure.com/;ApplicationId=d42020c6-da32-44f7-bbb7-666f0b3a664d')
   .setInternalLogging(false, false);
 // append -dev to the version number when ran locally
 // to distinguish production and dev version of the CLI
