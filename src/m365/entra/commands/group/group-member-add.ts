@@ -28,7 +28,7 @@ class EntraGroupMemberAddCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'Adds a member to a Microsoft Entra ID group';
+    return 'Adds members to a Microsoft Entra group';
   }
 
   constructor() {
