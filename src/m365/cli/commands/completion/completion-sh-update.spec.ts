@@ -15,7 +15,7 @@ describe(commands.COMPLETION_SH_UPDATE, () => {
   let generateShCompletionStub: sinon.SinonStub;
 
   before(() => {
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').resolves();
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     sinon.stub(session, 'getId').callsFake(() => '');
     generateShCompletionStub = sinon.stub(autocomplete, 'generateShCompletion').callsFake(() => { });

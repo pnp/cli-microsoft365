@@ -739,7 +739,7 @@ async function printHelp(helpMode: string, exitCode: number = 0): Promise<void> 
     cli.printAvailableCommands();
   }
 
-  telemetry.trackEvent('help', properties);
+  await telemetry.trackEvent('help', properties);
 
   process.exit(exitCode);
 }

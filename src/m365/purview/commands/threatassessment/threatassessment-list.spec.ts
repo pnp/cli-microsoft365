@@ -100,7 +100,7 @@ describe(commands.THREATASSESSMENT_LIST, () => {
   before(() => {
     commandInfo = cli.getCommandInfo(command);
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').resolves();
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.connection.active = true;
   });

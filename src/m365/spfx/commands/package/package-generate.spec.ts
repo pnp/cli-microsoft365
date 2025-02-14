@@ -27,7 +27,7 @@ describe(commands.PACKAGE_GENERATE, () => {
   let commandInfo: CommandInfo;
 
   before(() => {
-    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(telemetry, 'trackEvent').resolves();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     (command as any).archive = admZipMock;

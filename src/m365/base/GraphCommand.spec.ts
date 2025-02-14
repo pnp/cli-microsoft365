@@ -27,7 +27,7 @@ class MockCommand extends GraphCommand {
 
 describe('GraphCommand', () => {
   before(() => {
-    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(telemetry, 'trackEvent').resolves();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
   });

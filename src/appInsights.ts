@@ -3,6 +3,8 @@
 process.env.APPLICATION_INSIGHTS_NO_DIAGNOSTIC_CHANNEL = 'none';
 // prevents tests from hanging
 process.env.APPLICATION_INSIGHTS_NO_STATSBEAT = 'true';
+// suppress all logging
+process.env.APPLICATIONINSIGHTS_INSTRUMENTATION_LOGGING_LEVEL = 'NONE';
 import * as appInsights from 'applicationinsights';
 import crypto from 'crypto';
 import fs from 'fs';
