@@ -33,7 +33,7 @@ describe('AppCommand', () => {
 
   before(() => {
     commandInfo = cli.getCommandInfo(new MockCommand());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').resolves();
   });
 
   beforeEach(() => {

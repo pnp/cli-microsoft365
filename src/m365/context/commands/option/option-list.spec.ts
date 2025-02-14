@@ -14,7 +14,7 @@ describe(commands.OPTION_LIST, () => {
   let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').resolves();
   });
 
   beforeEach(() => {

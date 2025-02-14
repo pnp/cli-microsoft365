@@ -28,7 +28,7 @@ describe(commands.SETUP, () => {
   let configDeleteSpy: sinon.SinonSpy;
 
   before(() => {
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').resolves();
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     sinon.stub(session, 'getId').callsFake(() => '');
     commandInfo = cli.getCommandInfo(command);

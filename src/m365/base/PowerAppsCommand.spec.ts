@@ -28,7 +28,7 @@ describe('PowerAppsCommand', () => {
   const cloudError = new CommandError(`Power Apps commands only support the public cloud at the moment. We'll add support for other clouds in the future. Sorry for the inconvenience.`);
 
   before(() => {
-    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(telemetry, 'trackEvent').resolves();
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
     auth.connection.active = true;
     auth.connection.accessTokens[auth.defaultResource] = {

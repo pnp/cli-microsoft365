@@ -18,7 +18,7 @@ import { CommandInfo } from '../../../../cli/CommandInfo.js';
 describe(commands.MESSAGE_REMOVE, () => {
   const messageId = 'AAMkAGRlM2Y5YTkzLWI2NzAtNDczOS05YWMyLTJhZGY2MGExMGU0MgBGAAAAAABIbfA8TbuRR7JKOZPl5FPxBwB8kpUvTuxuSYh8eqNsOdGBAAAAAAEMAAB8kpUvTuxuSYh8eqNsOdGBAADb58MCAAA=';
   const userId = '6799fd1a-723b-4eb7-8e52-41ae530274ca';
-  const userPrincipalName = 'john.doe@contoso.com';  
+  const userPrincipalName = 'john.doe@contoso.com';
 
   let log: string[];
   let logger: Logger;
@@ -27,7 +27,7 @@ describe(commands.MESSAGE_REMOVE, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
-    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(telemetry, 'trackEvent').resolves();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
@@ -145,7 +145,7 @@ describe(commands.MESSAGE_REMOVE, () => {
 
   it('removes specific message using delegated permissions from a shared mailbox specified by userPrincipalName without prompting for confirmation', async () => {
     const deleteRequestStub = sinon.stub(request, 'delete').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users/${formatting.encodeQueryParameter(userPrincipalName)}/messages/${ messageId }`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users/${formatting.encodeQueryParameter(userPrincipalName)}/messages/${messageId}`) {
         return;
       }
 

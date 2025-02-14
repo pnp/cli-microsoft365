@@ -67,7 +67,7 @@ describe(commands.MAILBOX_SETTINGS_GET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
-    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(telemetry, 'trackEvent').resolves();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
@@ -176,7 +176,7 @@ describe(commands.MAILBOX_SETTINGS_GET, () => {
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
 
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users('${ userId }')/mailboxSettings`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users('${userId}')/mailboxSettings`) {
         return mailboxSettingsResponse;
       }
 

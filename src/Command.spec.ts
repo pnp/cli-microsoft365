@@ -186,6 +186,7 @@ describe('Command', () => {
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').callsFake((commandName) => {
       telemetryCommandName = commandName;
+      return Promise.resolve();
     });
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
@@ -610,7 +611,7 @@ describe('Command', () => {
       }
     ];
     const actual = await command.getCsvOutput(commandOutput, { options: { output: 'csv' } });
-    assert.strictEqual(actual,"property1,property2\n1,0\n");
+    assert.strictEqual(actual, "property1,property2\n1,0\n");
   });
 
   it('passes validation when csv output specified', async () => {

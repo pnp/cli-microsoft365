@@ -20,7 +20,7 @@ describe(commands.PROJECT_GITHUB_WORKFLOW_ADD, () => {
   const projectPath: string = 'test-project';
 
   before(() => {
-    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(telemetry, 'trackEvent').resolves();
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     sinon.stub(session, 'getId').callsFake(() => '');
     commandInfo = cli.getCommandInfo(command);

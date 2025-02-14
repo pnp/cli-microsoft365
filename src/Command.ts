@@ -466,7 +466,7 @@ export default abstract class Command {
       await logger.logToStderr(`Executing command as '${auth.connection.identityName}', appId: ${auth.connection.appId}, tenantId: ${auth.connection.identityTenantId}`);
     }
 
-    telemetry.trackEvent(this.getUsedCommandName(), this.getTelemetryProperties(args));
+    await telemetry.trackEvent(this.getUsedCommandName(), this.getTelemetryProperties(args));
   }
 
   protected getUnknownOptions(options: any): any {

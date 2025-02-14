@@ -90,7 +90,7 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
-    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(telemetry, 'trackEvent').resolves();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
@@ -947,7 +947,7 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
 
   it('correctly creates the role assignment for the role specified by id and the service principal specified by id', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/roleManagement/exchange/roleAssignments` && 
+      if (opts.url === `https://graph.microsoft.com/beta/roleManagement/exchange/roleAssignments` &&
         JSON.stringify(opts.data) === JSON.stringify({
           "roleDefinitionId": roleDefinitionId,
           "principalId": `/ServicePrincipals/${principalId}`,

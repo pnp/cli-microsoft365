@@ -23,7 +23,7 @@ describe(commands.COMPLETION_PWSH_SETUP, () => {
   let loggerLogToStderrSpy: sinon.SinonSpy;
 
   before(() => {
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').resolves();
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     sinon.stub(session, 'getId').callsFake(() => '');
     sinon.stub(autocomplete, 'generateShCompletion').callsFake(() => { });

@@ -1,39 +1,42 @@
-import child_process from 'child_process';
-import path from 'path';
-import url from 'url';
+import appInsights from './appInsights.js';
 import { cli } from './cli/cli.js';
 import { settingsNames } from './settingsNames.js';
 import { pid } from './utils/pid.js';
 import { session } from './utils/session.js';
 
-const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
-
-function trackTelemetry(object: any): void {
+async function trackTelemetry(object: any): Promise<void> {
   try {
-    const child = child_process.spawn('node', [path.join(__dirname, 'telemetryRunner.js')], {
-      stdio: ['pipe', 'ignore', 'ignore'],
-      detached: true
-    });
-    child.unref();
+    const { commandName, properties, exception } = object;
 
-    object.shell = pid.getProcessName(process.ppid) || '';
-    object.session = session.getId(process.ppid);
+    appInsights.commonProperties.shell = pid.getProcessName(process.ppid) || '';
+    appInsights.context.tags[appInsights.context.keys.sessionId] = session.getId(process.ppid);
 
-    child.stdin.write(JSON.stringify(object));
-    child.stdin.end();
+    if (exception) {
+      appInsights.trackException({
+        exception
+      });
+    }
+    else {
+      appInsights.trackEvent({
+        name: commandName,
+        properties
+      });
+    }
+    await appInsights.flush();
   }
   catch { }
 }
 
 export const telemetry = {
-  trackEvent: (commandName: string, properties: any): void => {
+  trackEvent: async (commandName: string, properties: any, exception?: any): Promise<void> => {
     if (cli.getSettingWithDefaultValue<boolean>(settingsNames.disableTelemetry, false)) {
       return;
     }
 
-    trackTelemetry({
+    await trackTelemetry({
       commandName,
-      properties
+      properties,
+      exception
     });
   }
 };

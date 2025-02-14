@@ -77,7 +77,7 @@ describe(commands.USE, () => {
   before(() => {
     sinon.stub(auth, 'clearConnectionInfo').resolves();
     sinon.stub(auth, 'storeConnectionInfo').resolves();
-    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(telemetry, 'trackEvent').resolves();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => settingName === settingsNames.prompt ? false : defaultValue);

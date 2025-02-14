@@ -67,7 +67,7 @@ describe(commands.ROLEDEFINITION_ADD, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
-    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(telemetry, 'trackEvent').resolves();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
@@ -111,7 +111,7 @@ describe(commands.ROLEDEFINITION_ADD, () => {
   });
 
   it('fails validation if displayName is not provided', () => {
-    const actual = commandOptionsSchema.safeParse({ allowedResourceActions: "microsoft.directory/groups.unified/create"});
+    const actual = commandOptionsSchema.safeParse({ allowedResourceActions: "microsoft.directory/groups.unified/create" });
     assert.notStrictEqual(actual.success, true);
   });
 

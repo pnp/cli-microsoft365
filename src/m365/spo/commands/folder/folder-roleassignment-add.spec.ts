@@ -83,7 +83,7 @@ describe(commands.FOLDER_ROLEASSIGNMENT_ADD, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
-    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(telemetry, 'trackEvent').resolves();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
@@ -199,7 +199,7 @@ describe(commands.FOLDER_ROLEASSIGNMENT_ADD, () => {
   });
 
   it('add the role assignment to the specified folder based on the upn and role definition id', async () => {
-    sinon.stub(request, 'post').callsFake(async (opts) => {  
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/_api/web/GetFolderByServerRelativePath(DecodedUrl=\'%2FShared%20Documents%2FFolderPermission\')/ListItemAllFields/roleassignments/addroleassignment(principalid=\'11\',roledefid=\'1073741827\')') {
         return;
       }
