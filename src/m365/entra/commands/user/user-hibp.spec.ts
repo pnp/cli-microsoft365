@@ -22,7 +22,7 @@ describe(commands.USER_HIBP, () => {
 
   before(() => {
     commandInfo = cli.getCommandInfo(command);
-    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(telemetry, 'trackEvent').resolves();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
   });

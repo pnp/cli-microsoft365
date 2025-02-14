@@ -56,7 +56,7 @@ describe(commands.ROLEDEFINITION_GET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
-    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(telemetry, 'trackEvent').resolves();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
@@ -171,7 +171,7 @@ describe(commands.ROLEDEFINITION_GET, () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/roleManagement/directory/roleDefinitions?$filter=displayName eq '${formatting.encodeQueryParameter(roleDisplayName)}'&$select=id,displayName,isBuiltIn,isEnabled`) {
         return {
-          value: [ roleDefinitionLimitedResponse ]
+          value: [roleDefinitionLimitedResponse]
         };
       }
 
