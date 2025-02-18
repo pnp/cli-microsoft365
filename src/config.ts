@@ -2,7 +2,6 @@ import { app } from './utils/app.js';
 
 export default {
   allScopes: [
-    'https://graph.windows.net/Directory.AccessAsUser.All',
     'https://management.azure.com/user_impersonation',
     'https://admin.services.crm.dynamics.com/user_impersonation',
     'https://graph.microsoft.com/AppCatalog.ReadWrite.All',
