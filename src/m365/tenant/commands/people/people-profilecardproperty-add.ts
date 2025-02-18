@@ -1,6 +1,7 @@
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
+import { optionsUtils } from '../../../../utils/optionsUtils.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 import { profileCardPropertyNames } from './profileCardProperties.js';
@@ -34,7 +35,7 @@ class TenantPeopleProfileCardPropertyAddCommand extends GraphCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       // Add unknown options to telemetry
-      const unknownOptions = Object.keys(this.getUnknownOptions(args.options));
+      const unknownOptions = Object.keys(optionsUtils.getUnknownOptions(args.options, this.options));
       const unknownOptionsObj = unknownOptions.reduce((obj, key) => ({ ...obj, [key]: true }), {});
 
       Object.assign(this.telemetryProperties, {
@@ -73,7 +74,7 @@ class TenantPeopleProfileCardPropertyAddCommand extends GraphCommand {
           return `The option 'displayName' can only be used when adding customAttributes as profile card properties`;
         }
 
-        const unknownOptions = Object.keys(this.getUnknownOptions(args.options));
+        const unknownOptions = Object.keys(optionsUtils.getUnknownOptions(args.options, this.options));
 
         if (!propertyName.startsWith('customattribute') && unknownOptions.length > 0) {
           return `Unknown options like ${unknownOptions.join(', ')} are only supported with customAttributes`;
@@ -151,7 +152,7 @@ class TenantPeopleProfileCardPropertyAddCommand extends GraphCommand {
   }
 
   private getLocalizations(options: Options): { languageTag: string, displayName: string }[] {
-    const unknownOptions = Object.keys(this.getUnknownOptions(options));
+    const unknownOptions = Object.keys(optionsUtils.getUnknownOptions(options, this.options));
 
     if (unknownOptions.length === 0) {
       return [];
