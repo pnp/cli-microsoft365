@@ -157,25 +157,21 @@ export class Auth {
   public static initialize(): void {
     this.cloudEndpoints[CloudType.USGov] = {
       'https://graph.microsoft.com': 'https://graph.microsoft.com',
-      'https://graph.windows.net': 'https://graph.windows.net',
       'https://management.azure.com/': 'https://management.usgovcloudapi.net/',
       'https://login.microsoftonline.com': 'https://login.microsoftonline.com'
     };
     this.cloudEndpoints[CloudType.USGovHigh] = {
       'https://graph.microsoft.com': 'https://graph.microsoft.us',
-      'https://graph.windows.net': 'https://graph.windows.net',
       'https://management.azure.com/': 'https://management.usgovcloudapi.net/',
       'https://login.microsoftonline.com': 'https://login.microsoftonline.us'
     };
     this.cloudEndpoints[CloudType.USGovDoD] = {
       'https://graph.microsoft.com': 'https://dod-graph.microsoft.us',
-      'https://graph.windows.net': 'https://graph.windows.net',
       'https://management.azure.com/': 'https://management.usgovcloudapi.net/',
       'https://login.microsoftonline.com': 'https://login.microsoftonline.us'
     };
     this.cloudEndpoints[CloudType.China] = {
       'https://graph.microsoft.com': 'https://microsoftgraph.chinacloudapi.cn',
-      'https://graph.windows.net': 'https://graph.chinacloudapi.cn',
       'https://management.azure.com/': 'https://management.chinacloudapi.cn',
       'https://login.microsoftonline.com': 'https://login.chinacloudapi.cn'
     };
