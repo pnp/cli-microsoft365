@@ -14,10 +14,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - name: Use Node.js 20
+      - name: Use Node.js 22
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           registry-url: 'https://registry.npmjs.org'
       - name: Cache node modules
         id: cache
@@ -25,7 +25,7 @@ jobs:
         with:
           path: |
             **/node_modules
-          key: node_modules-ubuntu-latest-20-${{ hashFiles('**/npm-shrinkwrap.json') }}
+          key: node_modules-ubuntu-latest-22-${{ hashFiles('**/npm-shrinkwrap.json') }}
       - name: Restore dependencies
         if: steps.cache.outputs.cache-hit != 'true'
         run: npm ci
@@ -49,10 +49,10 @@ jobs:
           name: build
       - name: Unpack build artifact
         run: tar -xvf build.tar && rm build.tar
-      - name: Use Node.js 20
+      - name: Use Node.js 22
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           registry-url: 'https://registry.npmjs.org'
       - name: Cache node modules
         id: cache
@@ -60,7 +60,7 @@ jobs:
         with:
           path: |
             **/node_modules
-          key: node_modules-ubuntu-latest-20-${{ hashFiles('**/npm-shrinkwrap.json') }}
+          key: node_modules-ubuntu-latest-22-${{ hashFiles('**/npm-shrinkwrap.json') }}
       - name: Restore dependencies
         if: steps.cache.outputs.cache-hit != 'true'
         run: npm ci
@@ -91,7 +91,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
 
       - name: Cache node modules
         id: cache
@@ -123,10 +123,10 @@ jobs:
           name: build
       - name: Unpack build artifact
         run: tar -xvf build.tar && rm build.tar
-      - name: Use Node.js 20
+      - name: Use Node.js 22
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           registry-url: 'https://registry.npmjs.org'
       - name: Cache node modules
         id: cache
@@ -134,7 +134,7 @@ jobs:
         with:
           path: |
             **/node_modules
-          key: node_modules-ubuntu-latest-20-${{ hashFiles('**/npm-shrinkwrap.json') }}
+          key: node_modules-ubuntu-latest-22-${{ hashFiles('**/npm-shrinkwrap.json') }}
       - name: Restore dependencies
         if: steps.cache.outputs.cache-hit != 'true'
         run: npm ci
@@ -153,10 +153,10 @@ jobs:
           name: build
       - name: Unpack build artifact
         run: tar -xvf build.tar && rm build.tar
-      - name: Use Node.js 20
+      - name: Use Node.js 22
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           registry-url: 'https://registry.npmjs.org'
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
