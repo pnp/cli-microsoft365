@@ -192,7 +192,7 @@ Execute a command and output response as text using the global `--output` option
 m365 spo site get --url https://contoso.sharepoint.com --output text
 ```
 
-> For more examples and usage, refer to the [command](https://pnp.github.io/cli-microsoft365/cmd/login/) and  [sample scripts](https://pnp.github.io/cli-microsoft365/sample-scripts/) documentation.
+> For more examples and usage, refer to the [command](https://pnp.github.io/cli-microsoft365/cmd/login/) and  [sample scripts](https://pnp.github.io/cli-microsoft365/sample-scripts/introduction/) documentation.
 
 ## Build
 
