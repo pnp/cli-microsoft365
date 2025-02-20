@@ -1,0 +1,138 @@
+---
+tags:  
+  - roles
+  - role permissions
+  - RBAC
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# Check what users assigned to a specific role are allowed to do in a tenant
+
+Before the administrator assign an Entra ID role to a user, it's always a good practice to review what the assignee can do with a specific role in the tenant. The review is performed by checking the role permissions of the role.
+
+This script can be used to review what users can do with a specific role by checking the role's permissions. If the role is inherited, the script includes the role's permissions from the base role.
+
+<Tabs>
+  <TabItem value="PowerShell">
+
+  ```powershell
+  function Invoke-CLICommand {
+    [cmdletbinding()]
+    param(
+      [parameter(Mandatory = $true, ValueFromPipeline = $true)] $input
+    )
+
+    $output = $input
+
+    if ($null -eq $output) {
+      return $null
+    }
+
+    $parsedOutput = $output | ConvertFrom-Json
+
+    if ($parsedOutput -isnot [Array] -and $null -ne $parsedOutput.error) {
+      throw $parsedOutput.error
+    }
+
+    return $parsedOutput
+  }
+
+  <#
+    .SYNOPSIS
+      Gets role permissions for a specific role
+    .PARAMETER roleDefinitionId
+      Id of the role definition
+    .PARAMETER roleDefinitionName
+      Name of the role definition
+    .PARAMETER rolePermissionsDict
+      All role permissions with their descriptions. If empty then descriptions are loaded ad-hoc
+    .EXAMPLE
+      Get-RolePermissions -roleDefinitionId '2af84b1e-32c8-42b7-82bc-daa82404023b'
+    .EXAMPLE
+      Get-RolePermissions -roleDefinitionName 'User'
+  #>
+  function Get-RolePermissions {
+    [CmdletBinding(DefaultParameterSetName = 'Id')]
+    param(
+      [parameter(Mandatory = $true, ParameterSetName = 'Id', HelpMessage = 'Id of the role definition')]
+      [String]$roleDefinitionId,
+      [parameter(Mandatory = $true, ParameterSetName = 'Name', HelpMessage = 'Name of the role definition')]
+      [String]$roleDefinitionName,
+      [parameter(Mandatory = $false, HelpMessage = 'Role permissions with their descriptions')]
+      [hashtable]$rolePermissionsDict
+    )
+
+    $roleDefinition = @{}
+    if ($roleDefinitionId) {
+      # get role definition by id
+      $roleDefinition = m365 entra roledefinition get --id $roleDefinitionId | Invoke-CLICommand
+    }
+    else {
+      # get role definition by name
+      $roleDefinition = m365 entra roledefinition get --displayName $roleDefinitionName | Invoke-CLICommand
+    }
+
+    if (!$rolePermissionsDict) {
+      # init dictionary
+      $rolePermissionsDict = @{}
+    }
+
+    Write-Host "$($roleDefinition.displayName) ($($roleDefinition.id))"
+    Write-Host $roleDefinition.description
+    Write-Host
+
+    $roleDefinition.rolePermissions | ForEach-Object {
+      if ($_.condition -eq '$SubjectIsOwner') {
+        Write-Host "As owner:"   
+      }
+      elseif ($_.condition -eq '$ResourceIsSelf') {
+        Write-Host "To yourself:"   
+      }
+      else {
+        Write-Host "General:"
+      }
+
+      $_.allowedResourceActions | ForEach-Object {
+        if (!$rolePermissionsDict.ContainsKey($_)) {
+            $resourceActionParts = $_.Split("/")
+            # load role permissions ad-hoc
+            $rolePermissions = m365 entra rolepermission list --resourceNamespace $resourceActionParts[0] | Invoke-CLICommand
+
+            $rolePermissions | ForEach-Object {
+                $rolePermissionsDict[$_.name] = $_.description
+            }
+        }
+        Write-Host " - $($rolePermissionsDict[$_])"
+      }
+    }
+
+    if ($roleDefinition.inheritsPermissionsFrom.id) {
+      Write-Host
+      Write-Host "Inherits permissions from"
+      Write-Host
+
+      Get-RolePermissions -roleDefinitionId $roleDefinition.inheritsPermissionsFrom.id -rolePermissionsDict $rolePermissionsDict
+    }
+  }
+
+  # configure the CLI to output JSON on each execution
+  m365 cli config set --key errorOutput --value stdout
+  m365 cli config set --key showHelpOnFailure --value false
+  m365 cli config set --key printErrorsAsPlainText --value false
+
+  $tenantId = '<tenant_id>'
+  $appId = '<app_id>'
+  m365 login --tenant $tenantId --appId $appId --output none | Invoke-CLICommand
+
+  Get-RolePermissions -roleDefinitionName 'SharePoint Administrator'
+
+  m365 logout
+
+  m365 cli config reset
+  ```
+
+  </TabItem>
+</Tabs>
+
