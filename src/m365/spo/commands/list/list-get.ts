@@ -25,6 +25,7 @@ interface Options extends GlobalOptions {
   url?: string;
   properties?: string;
   withPermissions?: boolean;
+  default?: boolean;
 }
 
 class SpoListGetCommand extends SpoCommand {
@@ -35,7 +36,7 @@ class SpoListGetCommand extends SpoCommand {
   }
 
   public get description(): string {
-    return 'Gets information about the specific list';
+    return 'Gets information about the specific list or returns information about the default list in a site';
   }
 
   constructor() {
@@ -54,7 +55,8 @@ class SpoListGetCommand extends SpoCommand {
         title: (!(!args.options.title)).toString(),
         url: (!(!args.options.url)).toString(),
         properties: (!(!args.options.properties)).toString(),
-        withPermissions: typeof args.options.withPermissions !== 'undefined'
+        withPermissions: typeof args.options.withPermissions !== 'undefined',
+        default: typeof args.options.default !== 'undefined'
       });
     });
   }
@@ -72,6 +74,9 @@ class SpoListGetCommand extends SpoCommand {
       },
       {
         option: '--url [url]'
+      },
+      {
+        option: '--default'
       },
       {
         option: '-p, --properties [properties]'
@@ -102,7 +107,7 @@ class SpoListGetCommand extends SpoCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push({ options: ['id', 'title', 'url'] });
+    this.optionSets.push({ options: ['id', 'title', 'url', 'default'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -121,6 +126,9 @@ class SpoListGetCommand extends SpoCommand {
     else if (args.options.url) {
       const listServerRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.url);
       requestUrl += `GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')`;
+    }
+    else if (args.options.default) {
+      requestUrl += `DefaultDocumentLibrary`;
     }
 
     const fieldsProperties: Properties = this.formatSelectProperties(args.options.properties, args.options.withPermissions);
