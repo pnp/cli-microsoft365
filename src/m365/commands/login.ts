@@ -220,6 +220,9 @@ class LoginCommand extends Command {
         auth.connection.authType = AuthType.Identity;
         auth.connection.userName = args.options.userName;
         break;
+      case 'federatedIdentity':
+        auth.connection.authType = AuthType.FederatedIdentity;
+        break;
       case 'browser':
         auth.connection.authType = AuthType.Browser;
         break;

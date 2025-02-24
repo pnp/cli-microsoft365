@@ -11,7 +11,7 @@ import { msalCachePlugin } from './auth/msalCachePlugin.js';
 import { Logger } from './cli/Logger.js';
 import { cli } from './cli/cli.js';
 import { ConnectionDetails } from './m365/commands/ConnectionDetails.js';
-import request from './request.js';
+import request, { CliRequestOptions } from './request.js';
 import { settingsNames } from './settingsNames.js';
 import * as accessTokenUtil from './utils/accessToken.js';
 import { browserUtil } from './utils/browserUtil.js';
@@ -104,6 +104,7 @@ export enum AuthType {
   Password = 'password',
   Certificate = 'certificate',
   Identity = 'identity',
+  FederatedIdentity = 'federatedIdentity',
   Browser = 'browser',
   Secret = 'secret'
 }
@@ -225,7 +226,8 @@ export class Auth {
     // wasn't specified
     if (this.connection.authType !== AuthType.Certificate &&
       this.connection.authType !== AuthType.Secret &&
-      this.connection.authType !== AuthType.Identity) {
+      this.connection.authType !== AuthType.Identity &&
+      this.connection.authType !== AuthType.FederatedIdentity) {
       this.clientApplication = await this.getPublicClient(logger, debug);
       if (this.clientApplication) {
         const accounts = await this.clientApplication.getTokenCache().getAllAccounts();
@@ -249,6 +251,9 @@ export class Auth {
           break;
         case AuthType.Identity:
           getTokenPromise = this.ensureAccessTokenWithIdentity.bind(this);
+          break;
+        case AuthType.FederatedIdentity:
+          getTokenPromise = this.ensureAccessTokenWithFederatedIdentity.bind(this);
           break;
         case AuthType.Browser:
           getTokenPromise = this.ensureAccessTokenWithBrowser.bind(this);
@@ -693,6 +698,68 @@ export class Auth {
     }
   }
 
+  private async ensureAccessTokenWithFederatedIdentity(resource: string, logger: Logger, debug: boolean): Promise<AccessToken | null> {
+    if (debug) {
+      await logger.logToStderr('Trying to retrieve access token using federated identity...');
+    }
+
+    if (!process.env.ACTIONS_ID_TOKEN_REQUEST_URL || !process.env.ACTIONS_ID_TOKEN_REQUEST_TOKEN) {
+      throw new CommandError('Federated identity is currently only supported in GitHub Actions.');
+    }
+
+    if (debug) {
+      await logger.logToStderr('ACTIONS_ID_TOKEN_REQUEST_URL and ACTIONS_ID_TOKEN_REQUEST_TOKEN env variables found. The context is GitHub Actions...');
+    }
+
+    const federationToken = await this.getFederationTokenFromGithub(logger, debug);
+
+    const queryParams = [
+      'grant_type=client_credentials',
+      `scope=${encodeURIComponent(`${resource}/.default`)}`,
+      `client_id=${this.connection.appId}`,
+      `client_assertion_type=${encodeURIComponent('urn:ietf:params:oauth:client-assertion-type:jwt-bearer')}`,
+      `client_assertion=${federationToken}`
+    ];
+
+    const requestOptions: CliRequestOptions = {
+      url: `https://login.microsoftonline.com/${this.connection.tenant}/oauth2/v2.0/token`,
+      headers: {
+        accept: 'application/json',
+        'x-anonymous': true,
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      data: queryParams.join('&'),
+      responseType: 'json'
+    };
+
+    const accessTokenResponse = await request.post<{ access_token: string; expires_on: string }>(requestOptions);
+
+    return {
+      accessToken: accessTokenResponse.access_token,
+      expiresOn: new Date(parseInt(accessTokenResponse.expires_on) * 1000)
+    };
+  }
+
+  private async getFederationTokenFromGithub(logger: Logger, debug: boolean): Promise<string> {
+    if (debug) {
+      await logger.logToStderr('Retrieving GitHub federation token...');
+    }
+
+    const requestOptions: CliRequestOptions = {
+      url: `${process.env.ACTIONS_ID_TOKEN_REQUEST_URL}&audience=${encodeURIComponent('api://AzureADTokenExchange')}`,
+      headers: {
+        Authorization: `Bearer ${process.env.ACTIONS_ID_TOKEN_REQUEST_TOKEN}`,
+        accept: 'application/json',
+        'x-anonymous': true
+      },
+      responseType: 'json'
+    };
+
+    const accessTokenResponse = await request.get<{ value: string }>(requestOptions);
+
+    return accessTokenResponse.value;
+  }
+
   private async ensureAccessTokenWithSecret(resource: string, logger: Logger, debug: boolean, fetchNew: boolean): Promise<AccessToken | null> {
     this.clientApplication = await this.getConfidentialClient(logger, debug, undefined, undefined, this.connection.secret);
     return (this.clientApplication as Msal.ConfidentialClientApplication).acquireTokenByClientCredential({
@@ -787,7 +854,8 @@ export class Auth {
     // When using an application identity, there is no account in the MSAL TokenCache
     if (this.connection.authType !== AuthType.Certificate &&
       this.connection.authType !== AuthType.Secret &&
-      this.connection.authType !== AuthType.Identity) {
+      this.connection.authType !== AuthType.Identity &&
+      this.connection.authType !== AuthType.FederatedIdentity) {
       this.clientApplication = await this.getPublicClient(logger, debug);
 
       if (this.clientApplication) {
