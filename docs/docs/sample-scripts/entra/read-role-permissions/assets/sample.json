@@ -1,0 +1,51 @@
+[
+  {
+    "name": "pnp-read-role-permissions",
+    "source": "pnp",
+    "title": "CLI - Check what users assigned to a specific role are allowed to do in a tenant",
+    "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/entra/read-role-permissions",
+    "creationDateTime": "2025-02-20",
+    "updateDateTime": "2025-02-20",
+    "shortDescription": "This script can be used to review what users assigned to a specific role are allowed to do in a Microsoft 365 tenant",
+    "longDescription": [
+      "This script can be used to review what users can do with a specific role by checking the role's' permissions. If the role is inherited, the script includes the role's' permissions from the base role."
+    ],
+    "products": [
+      "Entra"
+    ],
+    "categories": [],
+    "tags": [
+      "roles",
+      "role permissions",
+      "RBAC"
+    ],
+    "metadata": [
+      {
+        "key": "CLI-FOR-MICROSOFT365",
+        "value": "10.3.0"
+      }
+    ],
+    "thumbnails": [
+      {
+        "type": "image",
+        "order": 100,
+        "url": "https://raw.githubusercontent.com/pnp/cli-microsoft365/main/docs/docs/sample-scripts/entra/read-role-permissions/assets/preview.png",
+        "alt": "preview image for the sample"
+      }
+    ],
+    "authors": [
+      {
+        "gitHubAccount": "MartinM85",
+        "pictureUrl": "https://avatars.githubusercontent.com/u/7744844?v=4",
+        "name": "Martin Macháček"
+      }
+    ],
+    "references": [
+      {
+        "name": "Want to learn more about CLI for Microsoft 365 and the commands",
+        "description": "Check out the CLI for Microsoft 365 site to get started and for the reference to the commands.",
+        "url": "https://aka.ms/cli-m365"
+      }
+    ]
+  }
+]
