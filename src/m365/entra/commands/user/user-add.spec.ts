@@ -52,6 +52,16 @@ describe(commands.USER_ADD, () => {
     password: password
   };
 
+  const userResponseWithoutPasswordAndWithDirectoryExtension = {
+    ...userResponseWithoutPassword,
+    extension_b7d8e648520f41d3b9c0fdeb91768a0a_jobGroupTracker: 'JobGroupN'
+  };
+
+  const userResponseWithPasswordAndDirectoryExtension = {
+    ...userResponseWithPassword,
+    extension_b7d8e648520f41d3b9c0fdeb91768a0a_jobGroupTracker: 'JobGroupN'
+  };
+
   const graphError = {
     error: {
       code: "Request_BadRequest",
@@ -123,6 +133,10 @@ describe(commands.USER_ADD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
+  it('allows unknown options', () => {
+    assert.strictEqual(command.allowUnknownOptions(), true);
+  });
+
   it('creates Microsoft Entra user using a preset password but requiring the user to change it the next login', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === graphBaseUrl) {
@@ -148,6 +162,19 @@ describe(commands.USER_ADD, () => {
 
     await command.action(logger, { options: { userName: userName, displayName: displayName, password: password, mailNickname: mailNickname, accountEnabled: false } });
     assert(loggerLogSpy.calledWith(userResponseWithPassword));
+  });
+
+  it('creates Microsoft Entra user with uknown options', async () => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === graphBaseUrl) {
+        return userResponseWithoutPasswordAndWithDirectoryExtension;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { userName: userName, displayName: displayName, password: password, extension_b7d8e648520f41d3b9c0fdeb91768a0a_jobGroupTracker: 'JobGroupN' } });
+    assert(loggerLogSpy.calledWith(userResponseWithPasswordAndDirectoryExtension));
   });
 
   it('creates Microsoft Entra user and set its manager by id', async () => {

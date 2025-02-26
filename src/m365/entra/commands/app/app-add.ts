@@ -40,6 +40,10 @@ class EntraAppAddCommand extends GraphCommand {
     return 'Creates new Entra app registration';
   }
 
+  public allowUnknownOptions(): boolean | undefined {
+    return true;
+  }
+
   constructor() {
     super();
 
@@ -225,6 +229,7 @@ class EntraAppAddCommand extends GraphCommand {
       });
       let appInfo: any = await entraApp.createAppRegistration({
         options: args.options,
+        defaultOptions: this.options,
         apis,
         logger,
         verbose: this.verbose,
