@@ -13,7 +13,7 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import { ClientSidePage } from './clientsidepages.js';
 import command from './page-control-set.js';
-import { CanvasContent, mockPageData, mockPageDataFail } from './page-control-set.mock.js';
+import { mockCanvasContentStringified, mockPageData, mockPageDataFail } from './page-control-set.mock.js';
 
 describe(commands.PAGE_CONTROL_SET, () => {
   let log: string[];
@@ -72,7 +72,7 @@ describe(commands.PAGE_CONTROL_SET, () => {
   it('correctly handles control not found', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/SitePages/Pages/GetByUrl('sitepages/home.aspx')`) > -1) {
-        return { CanvasContent1: JSON.stringify([CanvasContent]) };
+        return { CanvasContent1: mockCanvasContentStringified };
       }
 
       throw 'Invalid request';
@@ -96,7 +96,7 @@ describe(commands.PAGE_CONTROL_SET, () => {
   it('correctly handles control found and handles error on page checkout error', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/SitePages/Pages/GetByUrl('sitepages/home.aspx')`) > -1) {
-        return { CanvasContent1: JSON.stringify([CanvasContent]) };
+        return { CanvasContent1: mockCanvasContentStringified };
       }
 
       throw 'Invalid request';
@@ -112,7 +112,7 @@ describe(commands.PAGE_CONTROL_SET, () => {
   it('correctly handles control found and handles page checkout correctly when no data is provided', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/SitePages/Pages/GetByUrl('sitepages/home.aspx')`) > -1) {
-        return { CanvasContent1: JSON.stringify([CanvasContent]) };
+        return { CanvasContent1: mockCanvasContentStringified };
       }
 
       throw 'Invalid request';
@@ -134,7 +134,7 @@ describe(commands.PAGE_CONTROL_SET, () => {
   it('correctly handles control not found after the page has been checked out', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/SitePages/Pages/GetByUrl('sitepages/home.aspx')`) > -1) {
-        return { CanvasContent1: JSON.stringify([CanvasContent]) };
+        return { CanvasContent1: mockCanvasContentStringified };
       }
 
       throw 'Invalid request';
@@ -156,7 +156,7 @@ describe(commands.PAGE_CONTROL_SET, () => {
   it('correctly handles control found and handles page checkout', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/SitePages/Pages/GetByUrl('sitepages/home.aspx')`) > -1) {
-        return { CanvasContent1: JSON.stringify([CanvasContent]) };
+        return { CanvasContent1: mockCanvasContentStringified };
       }
 
       throw 'Invalid request';
@@ -182,7 +182,7 @@ describe(commands.PAGE_CONTROL_SET, () => {
   it('correctly page save with webPartData', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/SitePages/Pages/GetByUrl('sitepages/home.aspx')`) > -1) {
-        return { CanvasContent1: JSON.stringify([CanvasContent]) };
+        return { CanvasContent1: mockCanvasContentStringified };
       }
 
       throw 'Invalid request';
@@ -213,7 +213,7 @@ describe(commands.PAGE_CONTROL_SET, () => {
   it('correctly page save with webPartProperties', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/SitePages/Pages/GetByUrl('sitepages/home.aspx')`) > -1) {
-        return { CanvasContent1: JSON.stringify([CanvasContent]) };
+        return { CanvasContent1: mockCanvasContentStringified };
       }
 
       throw 'Invalid request';
@@ -244,7 +244,7 @@ describe(commands.PAGE_CONTROL_SET, () => {
   it('correctly page save when page extension is not provided', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/SitePages/Pages/GetByUrl('sitepages/home.aspx')`) > -1) {
-        return { CanvasContent1: JSON.stringify([CanvasContent]) };
+        return { CanvasContent1: mockCanvasContentStringified };
       }
 
       throw 'Invalid request';
