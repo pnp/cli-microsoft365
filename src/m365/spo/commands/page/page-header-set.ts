@@ -6,6 +6,7 @@ import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 import { ClientSidePageProperties } from './ClientSidePageProperties.js';
+import { PageControl } from './PageControl.js';
 import { CustomPageHeader, CustomPageHeaderProperties, CustomPageHeaderServerProcessedContent, PageHeader } from './PageHeader.js';
 
 interface CommandArgs {
@@ -27,6 +28,8 @@ interface Options extends GlobalOptions {
   type?: string;
   webUrl: string;
 }
+
+const BannerWebPartId: string = 'cbe7b0a9-3504-44dd-a3a3-0e5cacd07788';
 
 class SpoPageHeaderSetCommand extends SpoCommand {
   public get name(): string {
@@ -153,8 +156,8 @@ class SpoPageHeaderSetCommand extends SpoCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const noPageHeader: PageHeader = {
-      "id": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
-      "instanceId": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
+      "id": BannerWebPartId,
+      "instanceId": BannerWebPartId,
       "title": "Title Region",
       "description": "Title Region Description",
       "serverProcessedContent": {
@@ -175,8 +178,8 @@ class SpoPageHeaderSetCommand extends SpoCommand {
       }
     };
     const defaultPageHeader: PageHeader = {
-      "id": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
-      "instanceId": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
+      "id": BannerWebPartId,
+      "instanceId": BannerWebPartId,
       "title": "Title Region",
       "description": "Title Region Description",
       "serverProcessedContent": {
@@ -197,8 +200,8 @@ class SpoPageHeaderSetCommand extends SpoCommand {
       }
     };
     const customPageHeader: CustomPageHeader = {
-      "id": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
-      "instanceId": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
+      "id": BannerWebPartId,
+      "instanceId": BannerWebPartId,
       "title": "Title Region",
       "description": "Title Region Description",
       "serverProcessedContent": {
@@ -312,6 +315,16 @@ class SpoPageHeaderSetCommand extends SpoCommand {
         topicHeader = topicHeader || pageData.TopicHeader || "";
       }
 
+      const pageControls: PageControl[] = JSON.parse(pageData.CanvasContent1);
+      //In the new design page header is is a configurable Banner webpart in the first full-width section
+      const headerControl: PageControl | undefined = pageControls.find(control => control?.position?.zoneIndex === 1 && control?.position?.sectionFactor === 0 && control?.webPartId === BannerWebPartId);
+      const isStandardPageHeader: boolean = pageData.LayoutWebpartsContent !== '[]';
+
+      //LayoutWebpartsContent represents standard page header
+      if (!isStandardPageHeader) {
+        header = headerControl?.webPartData as any || header;
+      }
+
       header.properties.title = title;
       header.properties.textAlignment = args.options.textAlignment as any || 'Left';
       header.properties.showTopicHeader = args.options.showTopicHeader || false;
@@ -372,8 +385,41 @@ class SpoPageHeaderSetCommand extends SpoCommand {
       }
 
       const requestBody: any = {
-        LayoutWebpartsContent: JSON.stringify([header])
+        LayoutWebpartsContent: JSON.stringify([header]),
+        CanvasContent1: canvasContent
       };
+
+      if (!isStandardPageHeader) {
+        requestBody.LayoutWebpartsContent = '[]';
+        header.properties.title = topicHeader;
+        if (headerControl) {
+          headerControl.webPartData = header as any;
+        }
+        else {
+          for (const pageControl of pageControls) {
+            if (pageControl?.position?.sectionIndex) {
+              pageControl.position.sectionIndex += pageControl.position.sectionIndex;
+            }
+          }
+
+          pageControls.push({
+            id: BannerWebPartId,
+            controlType: 3,
+            displayMode: 2,
+            emphasis: {},
+            position: {
+              zoneIndex: 1,
+              sectionFactor: 0,
+              layoutIndex: 1,
+              controlIndex: 1,
+              sectionIndex: 1
+            },
+            webPartId: BannerWebPartId,
+            webPartData: header as any
+          });
+        }
+        requestBody.CanvasContent1 = JSON.stringify(pageControls);
+      }
 
       if (title) {
         requestBody.Title = title;
@@ -389,9 +435,6 @@ class SpoPageHeaderSetCommand extends SpoCommand {
       }
       if (bannerImageUrl) {
         requestBody.BannerImageUrl = bannerImageUrl;
-      }
-      if (canvasContent) {
-        requestBody.CanvasContent1 = canvasContent;
       }
 
       requestOptions = {
