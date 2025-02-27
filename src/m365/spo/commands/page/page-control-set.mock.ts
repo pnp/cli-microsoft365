@@ -122,6 +122,87 @@ export const CanvasContent = {
   }
 };
 
+export const mockCanvasContentStringified = JSON.stringify([CanvasContent]);
+
+export const mockPageJsonCanvasContent = {
+  ListItemAllFields: {
+    "CommentsDisabled": false,
+    "FileSystemObjectType": 0,
+    "Id": 1,
+    "ServerRedirectedEmbedUri": null,
+    "ServerRedirectedEmbedUrl": "",
+    "ContentTypeId": "0x0101009D1CB255DA76424F860D91F20E6C41180062FDF2882AB3F745ACB63105A3C623C9",
+    "FileLeafRef": "Home.aspx",
+    "ComplianceAssetId": null,
+    "WikiField": null,
+    "Title": "Home",
+    "ClientSideApplicationId": "b6917cb1-93a0-4b97-a84d-7cf49975d4ec",
+    "PageLayoutType": "Home",
+    "CanvasContent1": mockCanvasContentStringified,
+    "BannerImageUrl": {
+      "Description": "/_layouts/15/images/sitepagethumbnail.png",
+      "Url": "https://contoso.sharepoint.com/_layouts/15/images/sitepagethumbnail.png"
+    },
+    "Description": "Lorem ipsum Dolor samet Lorem ipsum",
+    "PromotedState": null,
+    "FirstPublishedDate": null,
+    "LayoutWebpartsContent": [{
+      "id": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
+      "instanceId": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
+      "title": "Title Region",
+      "description": "Title Region Description",
+      "serverProcessedContent": {
+        "htmlStrings": {},
+        "searchablePlainTexts": {},
+        "imageSources": {},
+        "links": {}
+      },
+      "dataVersion": "1.4",
+      "properties": {
+        "title": "Page",
+        "imageSourceType": 4,
+        "layoutType": "FullWidthImage",
+        "textAlignment": "Left",
+        "showTopicHeader": false,
+        "showPublishDate": false,
+        "topicHeader": ""
+      }
+    }],
+    "AuthorsId": null,
+    "AuthorsStringId": null,
+    "OriginalSourceUrl": null,
+    "ID": 1,
+    "Created": "2018-01-20T09:54:41",
+    "AuthorId": 1073741823,
+    "Modified": "2018-04-12T12:42:47",
+    "EditorId": 12,
+    "OData__CopySource": null,
+    "CheckoutUserId": null,
+    "OData__UIVersionString": "7.0",
+    "GUID": "edaab907-e729-48dd-9e73-26487c0cf592"
+  },
+  "CheckInComment": "",
+  "CheckOutType": 2,
+  "ContentTag": "{E82A21D1-CA2C-4854-98F2-012AC0E7FA09},25,1",
+  "CustomizedPageStatus": 1,
+  "ETag": "\"{E82A21D1-CA2C-4854-98F2-012AC0E7FA09},25\"",
+  "Exists": true,
+  "IrmEnabled": false,
+  "Length": "805",
+  "Level": 1,
+  "LinkingUri": null,
+  "LinkingUrl": "",
+  "MajorVersion": 7,
+  "MinorVersion": 0,
+  "Name": "home.aspx",
+  "ServerRelativeUrl": "/sites/team-a/SitePages/home.aspx",
+  "TimeCreated": "2018-01-20T08:54:41Z",
+  "TimeLastModified": "2018-04-12T10:42:46Z",
+  "Title": "Home",
+  "UIVersion": 3584,
+  "UIVersionLabel": "7.0",
+  "UniqueId": "e82a21d1-ca2c-4854-98f2-012ac0e7fa09"
+};
 
 export const mockPageData = {
   "AuthorByline": "value",
@@ -130,7 +211,7 @@ export const mockPageData = {
   "Title": "value",
   "TopicHeader": "value",
   "LayoutWebpartsContent": "value",
-  "CanvasContent1": JSON.stringify([{ ...CanvasContent }])
+  "CanvasContent1": mockCanvasContentStringified
 };
 
 export const mockPageDataFail = {
