@@ -413,17 +413,28 @@ export const entraApp = {
 
     return resolvedApis;
   },
-  async getAppObjectIdFromAppId(appId: string): Promise<string> {
-    const apps = await odata.getAllItems<Application>(`https://graph.microsoft.com/v1.0/applications?$filter=appId eq '${appId}'&$select=id`);
+  async getAppRegistrationByAppId(appId: string, properties?: string[]): Promise<Application> {
+    let url = `https://graph.microsoft.com/v1.0/applications?$filter=appId eq '${appId}'`;
+
+    if (properties) {
+      url += `&$select=${properties.join(',')}`;
+    }
+    const apps = await odata.getAllItems<Application>(url);
 
     if (apps.length === 0) {
       throw `App with appId '${appId}' not found in Microsoft Entra ID`;
     }
 
-    return apps[0].id!;
+    return apps[0];
   },
-  async getAppObjectIdFromAppName(appName: string): Promise<string> {
-    const apps = await odata.getAllItems<Application>(`https://graph.microsoft.com/v1.0/applications?$filter=displayName eq '${formatting.encodeQueryParameter(appName)}'&$select=id`);
+  async getAppRegistrationByAppName(appName: string, properties?: string[]): Promise<Application> {
+    let url = `https://graph.microsoft.com/v1.0/applications?$filter=displayName eq '${formatting.encodeQueryParameter(appName)}'`;
+
+    if (properties) {
+      url += `&$select=${properties.join(',')}`;
+    }
+
+    const apps = await odata.getAllItems<Application>(url);
 
     if (apps.length === 0) {
       throw `App with name '${appName}' not found in Microsoft Entra ID`;
@@ -431,9 +442,9 @@ export const entraApp = {
 
     if (apps.length > 1) {
       const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', apps);
-      return (await cli.handleMultipleResultsFound<Application>(`Multiple apps with name '${appName}' found in Microsoft Entra ID.`, resultAsKeyValuePair)).id!;
+      return await cli.handleMultipleResultsFound<Application>(`Multiple apps with name '${appName}' found in Microsoft Entra ID.`, resultAsKeyValuePair);
     }
 
-    return apps[0].id!;
+    return apps[0];
   }
 };

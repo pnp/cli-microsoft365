@@ -65,7 +65,7 @@ describe(commands.DIRECTORYEXTENSION_ADD, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
-    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(telemetry, 'trackEvent').resolves();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
@@ -248,7 +248,7 @@ describe(commands.DIRECTORYEXTENSION_ADD, () => {
   });
 
   it('correctly creates a directory extension defined on the application specified by appId', async () => {
-    sinon.stub(entraApp, 'getAppObjectIdFromAppId').resolves(appObjectId);
+    sinon.stub(entraApp, 'getAppRegistrationByAppId').resolves({ id: appObjectId });
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/applications/${appObjectId}/extensionProperties`) {
         return responseForMultiValued;
@@ -269,7 +269,7 @@ describe(commands.DIRECTORYEXTENSION_ADD, () => {
   });
 
   it('correctly creates a directory extension defined on the application specified by appName', async () => {
-    sinon.stub(entraApp, 'getAppObjectIdFromAppName').resolves(appObjectId);
+    sinon.stub(entraApp, 'getAppRegistrationByAppName').resolves({ id: appObjectId });
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/applications/${appObjectId}/extensionProperties`) {
         return responseWithMultipleTargets;

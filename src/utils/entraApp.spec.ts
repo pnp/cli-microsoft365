@@ -12,6 +12,7 @@ describe('utils/entraApp', () => {
   const appId = '7f5df2f4-9ed6-4df7-86d7-eefbfc4ab091';
   const appName = 'ContosoApp';
   const secondAppObjectId = 'fc33aa61-cf0e-1234-9506-f633347202ac';
+
   afterEach(() => {
     sinonUtil.restore([
       request.get,
@@ -20,9 +21,9 @@ describe('utils/entraApp', () => {
     ]);
   });
 
-  it('correctly get single app object id by appId using getAppObjectIdFromAppId', async () => {
+  it('correctly get single app object id by appId using getAppRegistrationByAppId', async () => {
     sinon.stub(request, 'get').callsFake(async opts => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/applications?$filter=appId eq '${appId}'&$select=id`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/applications?$filter=appId eq '${appId}'`) {
         return {
           value: [
             {
@@ -35,13 +36,13 @@ describe('utils/entraApp', () => {
       return 'Invalid Request';
     });
 
-    const actual = await entraApp.getAppObjectIdFromAppId(appId);
-    assert.deepStrictEqual(actual, appObjectId);
+    const actual = await entraApp.getAppRegistrationByAppId(appId);
+    assert.deepStrictEqual(actual.id, appObjectId);
   });
 
-  it('correctly get single app object id by appId using getAppObjectIdFromAppName', async () => {
+  it('correctly get single app object id by appId using getAppRegistrationByAppName', async () => {
     sinon.stub(request, 'get').callsFake(async opts => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/applications?$filter=displayName eq '${formatting.encodeQueryParameter(appName)}'&$select=id`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/applications?$filter=displayName eq '${formatting.encodeQueryParameter(appName)}'`) {
         return {
           value: [
             {
@@ -54,11 +55,11 @@ describe('utils/entraApp', () => {
       return 'Invalid Request';
     });
 
-    const actual = await entraApp.getAppObjectIdFromAppName(appName);
-    assert.deepStrictEqual(actual, appObjectId);
+    const actual = await entraApp.getAppRegistrationByAppName(appName);
+    assert.deepStrictEqual(actual.id, appObjectId);
   });
 
-  it('handles selecting single application when multiple applications with the specified name found using getAppObjectIdFromAppName and cli is set to prompt', async () => {
+  it('handles selecting single application when multiple applications with the specified name found using getAppRegistrationByAppName and cli is set to prompt', async () => {
     sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/applications?$filter=displayName eq '${formatting.encodeQueryParameter(appName)}'&$select=id`) {
         return {
@@ -74,23 +75,23 @@ describe('utils/entraApp', () => {
 
     sinon.stub(cli, 'handleMultipleResultsFound').resolves({ id: secondAppObjectId });
 
-    const actual = await entraApp.getAppObjectIdFromAppName(appName);
-    assert.deepStrictEqual(actual, secondAppObjectId);
+    const actual = await entraApp.getAppRegistrationByAppName(appName, ['id']);
+    assert.deepStrictEqual(actual.id, secondAppObjectId);
   });
 
-  it('throws error message when no application was found using getAppObjectIdFromAppId', async () => {
+  it('throws error message when no application was found using getAppRegistrationByAppId', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/applications?$filter=appId eq '${appId}'&$select=id`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/applications?$filter=appId eq '${appId}'&$select=id,displayName`) {
         return { value: [] };
       }
 
       throw 'Invalid Request';
     });
 
-    await assert.rejects(entraApp.getAppObjectIdFromAppId(appId)), Error(`App with appId '${appId}' not found in Microsoft Entra ID`);
+    await assert.rejects(entraApp.getAppRegistrationByAppId(appId, ['id', 'displayName'])), Error(`App with appId '${appId}' not found in Microsoft Entra ID`);
   });
 
-  it('throws error message when no application was found using getAppObjectIdFromAppName', async () => {
+  it('throws error message when no application was found using getAppRegistrationByAppName', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/applications?$filter=displayName eq '${formatting.encodeQueryParameter(appName)}'&$select=id`) {
         return { value: [] };
@@ -99,10 +100,10 @@ describe('utils/entraApp', () => {
       throw 'Invalid Request';
     });
 
-    await assert.rejects(entraApp.getAppObjectIdFromAppName(appName)), Error(`App with name '${appName}' not found in Microsoft Entra ID`);
+    await assert.rejects(entraApp.getAppRegistrationByAppName(appName,['id'])), Error(`App with name '${appName}' not found in Microsoft Entra ID`);
   });
 
-  it('throws error message when multiple applications were found using getAppObjectIdFromAppName', async () => {
+  it('throws error message when multiple applications were found using getAppRegistrationByAppName', async () => {
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
       if (settingName === settingsNames.prompt) {
         return false;
@@ -112,11 +113,17 @@ describe('utils/entraApp', () => {
     });
 
     sinon.stub(request, 'get').callsFake(async opts => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/applications?$filter=displayName eq '${formatting.encodeQueryParameter(appName)}'&$select=id`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/applications?$filter=displayName eq '${formatting.encodeQueryParameter(appName)}'&$select=id,displayName`) {
         return {
           value: [
-            { id: appObjectId },
-            { id: secondAppObjectId }
+            {
+              id: appObjectId,
+              displayName: appName
+            },
+            {
+              id: secondAppObjectId,
+              displayName: appName
+            }
           ]
         };
       }
@@ -124,6 +131,6 @@ describe('utils/entraApp', () => {
       return 'Invalid Request';
     });
 
-    await assert.rejects(entraApp.getAppObjectIdFromAppName(appName), Error(`Multiple apps with name '${appName}' found in Microsoft Entra ID. Found: ${appObjectId}, ${secondAppObjectId}.`));
+    await assert.rejects(entraApp.getAppRegistrationByAppName(appName, ['id', 'displayName']), Error(`Multiple apps with name '${appName}' found in Microsoft Entra ID. Found: ${appObjectId}, ${secondAppObjectId}.`));
   });
 });

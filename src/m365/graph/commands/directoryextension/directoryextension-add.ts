@@ -62,7 +62,7 @@ class GraphDirectoryExtensionAddCommand extends GraphCommand {
       const appObjectId = await this.getAppObjectId(args.options);
 
       if (args.options.verbose) {
-        await logger.logToStderr(`Adding directoroy extension to the app with id '${appObjectId}'...`);
+        await logger.logToStderr(`Adding directory extension to the app with id '${appObjectId}'...`);
       }
 
       const requestOptions: CliRequestOptions = {
@@ -94,10 +94,10 @@ class GraphDirectoryExtensionAddCommand extends GraphCommand {
     }
 
     if (options.appId) {
-      return await entraApp.getAppObjectIdFromAppId(options.appId);
+      return (await entraApp.getAppRegistrationByAppId(options.appId, ["id"])).id!;
     }
 
-    return await entraApp.getAppObjectIdFromAppName(options.appName!);
+    return (await entraApp.getAppRegistrationByAppName(options.appName!, ["id"])).id!;
   }
 }
 
