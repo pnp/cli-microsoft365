@@ -180,8 +180,8 @@ describe(commands.TENANT_HOMESITE_ADD, () => {
     const actual = await command.validate({
       options: {
         url: homeSite,
-        isInDraftMode: 'true',
-        vivaConnectionsDefaultStart: 'false',
+        isInDraftMode: true,
+        vivaConnectionsDefaultStart: false,
         audiences: 'af8c0bc8-7b1b-44b4-b087-ffcc8df70d16',
         order: 2
       }
