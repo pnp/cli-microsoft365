@@ -7,6 +7,7 @@ import GlobalOptions from '../../GlobalOptions.js';
 import { Logger } from '../../cli/Logger.js';
 import request from '../../request.js';
 import commands from './commands.js';
+import { optionsUtils } from '../../utils/optionsUtils.js';
 
 interface CommandArgs {
   options: Options;
@@ -53,11 +54,7 @@ class RequestCommand extends Command {
         filePath: typeof args.options.filePath !== 'undefined'
       };
 
-      const unknownOptions: any = this.getUnknownOptions(args.options);
-      const unknownOptionsNames: string[] = Object.getOwnPropertyNames(unknownOptions);
-      unknownOptionsNames.forEach(o => {
-        properties[o] = typeof unknownOptions[o] !== 'undefined';
-      });
+      optionsUtils.addUnknownOptionsFromOptionsToPayload(properties, args.options, this.options);
 
       Object.assign(this.telemetryProperties, properties);
     });
@@ -119,11 +116,7 @@ class RequestCommand extends Command {
       const method = (args.options.method || 'get').toUpperCase();
       const headers: RawAxiosRequestHeaders = {};
 
-      const unknownOptions: any = this.getUnknownOptions(args.options);
-      const unknownOptionsNames: string[] = Object.getOwnPropertyNames(unknownOptions);
-      unknownOptionsNames.forEach(o => {
-        headers[o] = unknownOptions[o];
-      });
+      optionsUtils.addUnknownOptionsFromOptionsToPayload(headers, args.options, this.options);
 
       if (!headers.accept) {
         headers.accept = 'application/json';

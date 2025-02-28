@@ -9,6 +9,7 @@ import { AppCreationOptions, AppInfo, entraApp } from '../../../../utils/entraAp
 import GraphCommand from '../../../base/GraphCommand.js';
 import { M365RcJson } from '../../../base/M365RcJson.js';
 import commands from '../../commands.js';
+import { optionsUtils } from '../../../../utils/optionsUtils.js';
 
 interface CommandArgs {
   options: Options;
@@ -38,6 +39,10 @@ class EntraAppAddCommand extends GraphCommand {
 
   public get description(): string {
     return 'Creates new Entra app registration';
+  }
+
+  public allowUnknownOptions(): boolean | undefined {
+    return true;
   }
 
   constructor() {
@@ -225,6 +230,7 @@ class EntraAppAddCommand extends GraphCommand {
       });
       let appInfo: any = await entraApp.createAppRegistration({
         options: args.options,
+        unknownOptions: optionsUtils.getUnknownOptions(args.options, this.options),
         apis,
         logger,
         verbose: this.verbose,

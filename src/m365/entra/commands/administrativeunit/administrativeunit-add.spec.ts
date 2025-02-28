@@ -21,6 +21,14 @@ describe(commands.ADMINISTRATIVEUNIT_ADD, () => {
     visibility: null
   };
 
+  const administrativeUnitWithDirectoryExtensionReponse: any = {
+    id: 'fc33aa61-cf0e-46b6-9506-f633347202ab',
+    displayName: 'European Division',
+    description: null,
+    visibility: null,
+    extension_b7d8e648520f41d3b9c0fdeb91768a0a_jobGroupTracker: 'JobGroupN'
+  };
+
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -71,6 +79,10 @@ describe(commands.ADMINISTRATIVEUNIT_ADD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
+  it('allows unknown options', () => {
+    assert.strictEqual(command.allowUnknownOptions(), true);
+  });
+
   it('creates an administrative unit with a specific display name', async () => {
     const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/directory/administrativeUnits') {
@@ -108,6 +120,32 @@ describe(commands.ADMINISTRATIVEUNIT_ADD, () => {
       visibility: null
     });
     assert(loggerLogSpy.calledOnceWith(administrativeUnitReponse));
+  });
+
+  it('creates an administrative unit with unknown options', async () => {
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/directory/administrativeUnits') {
+        return administrativeUnitWithDirectoryExtensionReponse;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options:
+      {
+        displayName: 'European Division',
+        description: 'European Division Administration',
+        extension_b7d8e648520f41d3b9c0fdeb91768a0a_jobGroupTracker: 'JobGroupN'
+      }
+    });
+    assert.deepStrictEqual(postStub.lastCall.args[0].data, {
+      displayName: 'European Division',
+      description: 'European Division Administration',
+      visibility: null,
+      extension_b7d8e648520f41d3b9c0fdeb91768a0a_jobGroupTracker: 'JobGroupN'
+    });
+    assert(loggerLogSpy.calledOnceWith(administrativeUnitWithDirectoryExtensionReponse));
   });
 
   it('creates a hidden administrative unit with a specific display name and description', async () => {
