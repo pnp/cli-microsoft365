@@ -185,7 +185,7 @@ class EntraAppSetCommand extends GraphCommand {
   private async updateUnknownOptions(args: CommandArgs, objectId: string): Promise<string> {
     if (Object.keys(optionsUtils.getUnknownOptions(args.options, this.options)).length > 0) {
       const requestBody = {};
-      optionsUtils.addUnknownOptionsToPayload(requestBody, args.options, this.options);
+      optionsUtils.addUnknownOptionsFromOptionsToPayload(requestBody, args.options, this.options);
 
       const requestOptions: CliRequestOptions = {
         url: `${this.resource}/v1.0/myorganization/applications/${objectId}`,

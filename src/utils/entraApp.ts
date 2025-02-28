@@ -4,7 +4,6 @@ import { Logger } from '../cli/Logger.js';
 import request, { CliRequestOptions } from '../request.js';
 import { odata } from './odata.js';
 import { optionsUtils } from './optionsUtils.js';
-import { CommandOption } from '../Command.js';
 
 export interface AppInfo {
   appId: string;
@@ -216,9 +215,9 @@ function updateAppPermissions({ spId, resourceAccessPermission, oAuth2Permission
 
 export const entraApp = {
   appPermissions: [] as AppPermissions[],
-  createAppRegistration: async ({ options, apis, logger, verbose, debug, defaultOptions }: {
+  createAppRegistration: async ({ options, apis, logger, verbose, debug, unknownOptions }: {
     options: AppCreationOptions,
-    defaultOptions: CommandOption[],
+    unknownOptions: any,
     apis: RequiredResourceAccess[],
     logger: Logger,
     verbose: boolean,
@@ -266,7 +265,7 @@ export const entraApp = {
       applicationInfo.isFallbackPublicClient = true;
     }
 
-    optionsUtils.addUnknownOptionsToPayload(applicationInfo, options, defaultOptions);
+    optionsUtils.addUnknownOptionsToPayload(applicationInfo, unknownOptions);
 
     if (verbose) {
       await logger.logToStderr(`Creating Microsoft Entra app registration...`);

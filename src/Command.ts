@@ -479,7 +479,7 @@ export default abstract class Command {
   }
 
   protected addUnknownOptionsToPayload(payload: any, options: any): void {
-    optionsUtils.addUnknownOptionsToPayload(payload, options, this.options);
+    optionsUtils.addUnknownOptionsFromOptionsToPayload(payload, options, this.options);
   }
 
   private loadValuesFromAccessToken(args: CommandArgs): void {

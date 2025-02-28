@@ -15,6 +15,7 @@ import { validation } from '../../utils/validation.js';
 import AnonymousCommand from '../base/AnonymousCommand.js';
 import commands from './commands.js';
 import { interactivePreset, powerShellPreset, scriptingPreset } from './setupPresets.js';
+import { optionsUtils } from '../../utils/optionsUtils.js';
 
 export interface Preferences {
   clientId?: string;
@@ -311,7 +312,7 @@ class SetupCommand extends AnonymousCommand {
     });
     const appInfo: AppInfo = await entraApp.createAppRegistration({
       options,
-      defaultOptions: this.options,
+      unknownOptions: optionsUtils.getUnknownOptions(options, this.options),
       apis,
       logger,
       verbose: this.verbose,

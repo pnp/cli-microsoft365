@@ -54,11 +54,7 @@ class RequestCommand extends Command {
         filePath: typeof args.options.filePath !== 'undefined'
       };
 
-      const unknownOptions: any = optionsUtils.getUnknownOptions(args.options, this.options);
-      const unknownOptionsNames: string[] = Object.getOwnPropertyNames(unknownOptions);
-      unknownOptionsNames.forEach(o => {
-        properties[o] = typeof unknownOptions[o] !== 'undefined';
-      });
+      optionsUtils.addUnknownOptionsFromOptionsToPayload(properties, args.options, this.options);
 
       Object.assign(this.telemetryProperties, properties);
     });
@@ -120,11 +116,7 @@ class RequestCommand extends Command {
       const method = (args.options.method || 'get').toUpperCase();
       const headers: RawAxiosRequestHeaders = {};
 
-      const unknownOptions: any = optionsUtils.getUnknownOptions(args.options, this.options);
-      const unknownOptionsNames: string[] = Object.getOwnPropertyNames(unknownOptions);
-      unknownOptionsNames.forEach(o => {
-        headers[o] = unknownOptions[o];
-      });
+      optionsUtils.addUnknownOptionsFromOptionsToPayload(headers, args.options, this.options);
 
       if (!headers.accept) {
         headers.accept = 'application/json';
