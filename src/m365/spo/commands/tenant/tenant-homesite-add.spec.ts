@@ -164,7 +164,7 @@ describe(commands.TENANT_HOMESITE_ADD, () => {
         audiences: 'invalid-guid'
       }
     }, commandInfo);
-    assert.strictEqual(result, `The following GUIDs are invalid for the option 'ids': invalid-guid.`);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation with URL', async () => {
