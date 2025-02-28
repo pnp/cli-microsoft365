@@ -29,7 +29,7 @@ class SpoTenantHomeSiteAddCommand extends SpoCommand {
   }
 
   public get description(): string {
-    return 'Adds a Home Site';
+    return 'Adds a home site';
   }
 
   constructor() {
