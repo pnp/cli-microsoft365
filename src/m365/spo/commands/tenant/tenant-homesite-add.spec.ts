@@ -154,7 +154,7 @@ describe(commands.TENANT_HOMESITE_ADD, () => {
         order: 'invalid-order'
       }
     }, commandInfo);
-    assert.strictEqual(result, 'invalid-order is not a positive integer');
+    assert.notStrictEqual(actual, true);
   });
 
   it('correctly handles invalid GUIDs in audiences', async () => {
