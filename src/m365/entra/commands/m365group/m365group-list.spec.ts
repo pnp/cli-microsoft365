@@ -1377,7 +1377,10 @@ describe(commands.M365GROUP_LIST, () => {
     ]));
   });
 
-  it('include site URLs of Microsoft 365 Groups', async () => {
+  it(`correctly shows deprecation warning for option 'includeSiteUrl'`, async () => {
+    const chalk = (await import('chalk')).default;
+    const loggerErrSpy = sinon.spy(logger, 'logToStderr');
+
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=groupTypes/any(c:c+eq+'Unified')&$top=100`) {
         return {
@@ -1448,6 +1451,82 @@ describe(commands.M365GROUP_LIST, () => {
     });
 
     await command.action(logger, { options: { includeSiteUrl: true } });
+    assert(loggerErrSpy.calledWith(chalk.yellow(`Parameter 'includeSiteUrl' is deprecated. Please use 'withSiteUrl' instead`)));
+
+    sinonUtil.restore(loggerErrSpy);
+  });
+
+  it('include site URLs of Microsoft 365 Groups', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=groupTypes/any(c:c+eq+'Unified')&$top=100`) {
+        return {
+          "value": [
+            {
+              "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
+              "deletedDateTime": null,
+              "classification": null,
+              "createdDateTime": "2017-12-07T13:58:01Z",
+              "description": "Team 1",
+              "displayName": "Team 1",
+              "groupTypes": [
+                "Unified"
+              ],
+              "mail": "team_1@contoso.onmicrosoft.com",
+              "mailEnabled": true,
+              "mailNickname": "team_1",
+              "onPremisesLastSyncDateTime": null,
+              "onPremisesProvisioningErrors": [],
+              "onPremisesSecurityIdentifier": null,
+              "onPremisesSyncEnabled": null,
+              "preferredDataLocation": null,
+              "proxyAddresses": [
+                "SMTP:team_1@contoso.onmicrosoft.com"
+              ],
+              "renewedDateTime": "2017-12-07T13:58:01Z",
+              "securityEnabled": false,
+              "visibility": "Private"
+            },
+            {
+              "id": "0157132c-bf82-48ff-99e4-b19a74950fe0",
+              "deletedDateTime": null,
+              "classification": null,
+              "createdDateTime": "2017-12-17T13:30:42Z",
+              "description": "Team 2",
+              "displayName": "Team 2",
+              "groupTypes": [
+                "Unified"
+              ],
+              "mail": "team_2@contoso.onmicrosoft.com",
+              "mailEnabled": true,
+              "mailNickname": "team_2",
+              "onPremisesLastSyncDateTime": null,
+              "onPremisesProvisioningErrors": [],
+              "onPremisesSecurityIdentifier": null,
+              "onPremisesSyncEnabled": null,
+              "preferredDataLocation": null,
+              "proxyAddresses": [
+                "SMTP:team_2@contoso.onmicrosoft.com"
+              ],
+              "renewedDateTime": "2017-12-17T13:30:42Z",
+              "securityEnabled": false,
+              "visibility": "Private"
+            }
+          ]
+        };
+      }
+
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/010d2f0a-0c17-4ec8-b694-e85bbe607013/drive?$select=webUrl`) {
+        return { webUrl: "https://contoso.sharepoint.com/sites/team_1/Shared%20Documents" };
+      }
+
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/0157132c-bf82-48ff-99e4-b19a74950fe0/drive?$select=webUrl`) {
+        return { webUrl: "https://contoso.sharepoint.com/sites/team_2/Shared%20Documents" };
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { withSiteUrl: true } });
     assert(loggerLogSpy.calledWith([
       {
         "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
@@ -1576,7 +1655,7 @@ describe(commands.M365GROUP_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, includeSiteUrl: true } });
+    await command.action(logger, { options: { debug: true, withSiteUrl: true } });
     assert(loggerLogSpy.calledWith([
       <Group>{
         "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
@@ -1703,7 +1782,7 @@ describe(commands.M365GROUP_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { includeSiteUrl: true } });
+    await command.action(logger, { options: { withSiteUrl: true } });
     assert(loggerLogSpy.calledWith([
       <Group>{
         "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
@@ -1830,11 +1909,16 @@ describe(commands.M365GROUP_LIST, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { includeSiteUrl: true } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: { withSiteUrl: true } } as any), new CommandError('An error has occurred'));
   });
 
   it('passes validation if only includeSiteUrl option set', async () => {
     const actual = await command.validate({ options: { includeSiteUrl: true } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('passes validation if only withSiteUrl option set', async () => {
+    const actual = await command.validate({ options: { withSiteUrl: true } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 

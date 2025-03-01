@@ -28,6 +28,9 @@ m365 entra pim role assignment eligibility list [options]
 : Display name of the group for which to list eligible roles. Specify either `userId`, `userName`, `groupId` or `groupName`. If not specified, all eligible roles will be listed.
 
 `--includePrincipalDetails`
+: (deprecated. Use option `withPrincipalDetails` instead) An optional flag to include details of the principals that were eligible for a role.
+
+`--withPrincipalDetails`
 : An optional flag to include details of the principals that were eligible for a role.
 ```
 
@@ -50,7 +53,7 @@ m365 entra pim role assignment eligibility list --userId '@meID'
 Get a list of eligible roles for any user with principal details.
 
 ```sh
-m365 entra pim role assignment eligibility list --includePrincipalDetails
+m365 entra pim role assignment eligibility list --withPrincipalDetails
 ```
 
 ## Response
@@ -121,9 +124,9 @@ m365 entra pim role assignment eligibility list --includePrincipalDetails
   </TabItem>
 </Tabs>
 
-### `includePrincipalDetails` response
+### `withPrincipalDetails` response
 
-When we make use of the option `includePrincipalDetails` the response will differ. 
+When we make use of the option `withPrincipalDetails` the response will differ. 
 
 <Tabs>
   <TabItem value="JSON">
@@ -183,7 +186,7 @@ When we make use of the option `includePrincipalDetails` the response will diffe
   <TabItem value="Markdown">
 
   ```md
-  # entra pim role assignment eligibility list --includePrincipalDetails "true"
+  # entra pim role assignment eligibility list --withPrincipalDetails "true"
 
   Date: 4/8/2024
 
