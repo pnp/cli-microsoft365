@@ -18,6 +18,7 @@ interface Options extends GlobalOptions {
   listUrl?: string;
   id?: string;
   title?: string;
+  internalName?: string;
 }
 
 class SpoFieldGetCommand extends SpoCommand {
@@ -45,7 +46,8 @@ class SpoFieldGetCommand extends SpoCommand {
         listTitle: typeof args.options.listTitle !== 'undefined',
         listUrl: typeof args.options.listUrl !== 'undefined',
         id: typeof args.options.id !== 'undefined',
-        title: typeof args.options.title !== 'undefined'
+        title: typeof args.options.title !== 'undefined',
+        internalName: typeof args.options.internalName !== 'undefined'
       });
     });
   }
@@ -69,6 +71,9 @@ class SpoFieldGetCommand extends SpoCommand {
       },
       {
         option: '-t, --title [title]'
+      },
+      {
+        option: '--internalName [internalName]'
       }
     );
   }
@@ -95,7 +100,7 @@ class SpoFieldGetCommand extends SpoCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push({ options: ['id', 'title'] });
+    this.optionSets.push({ options: ['id', 'title', 'internalName'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -118,7 +123,7 @@ class SpoFieldGetCommand extends SpoCommand {
       fieldRestUrl = `/getbyid('${formatting.encodeQueryParameter(args.options.id)}')`;
     }
     else {
-      fieldRestUrl = `/getbyinternalnameortitle('${formatting.encodeQueryParameter(args.options.title as string)}')`;
+      fieldRestUrl = `/getbyinternalnameortitle('${formatting.encodeQueryParameter((args.options.title || args.options.internalName) as string)}')`;
     }
 
     const requestOptions: CliRequestOptions = {

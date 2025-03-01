@@ -67,7 +67,7 @@ describe(commands.MAILBOX_SETTINGS_SET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
-    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(telemetry, 'trackEvent').resolves();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
@@ -118,7 +118,7 @@ describe(commands.MAILBOX_SETTINGS_SET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if both userId and userName are provided in app-only mode', () => {
+  it('fails validation if both userId and userName are specified', () => {
     sinonUtil.restore(accessToken.isAppOnlyAccessToken);
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
 
@@ -599,13 +599,13 @@ describe(commands.MAILBOX_SETTINGS_SET, () => {
     });
   });
 
-  it('fails updating mailbox settings if both userId and userName is specified in app-only mode', async () => {
+  it('fails updating mailbox settings if neither userId nor userName is specified in app-only mode', async () => {
     sinonUtil.restore(accessToken.isAppOnlyAccessToken);
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
 
-    const result = commandOptionsSchema.safeParse({ userId: userId, userName: userName, timeFormat: 'HH:mm', verbose: true });
+    const result = commandOptionsSchema.safeParse({ timeFormat: 'HH:mm', verbose: true });
 
-    await assert.rejects(command.action(logger, { options: result.data }), new CommandError('When running with application permissions either userId or userName is required, but not both'));
+    await assert.rejects(command.action(logger, { options: result.data }), new CommandError('When running with application permissions either userId or userName is required'));
   });
 
   it('fails updating mailbox settings of the signed-in user if userId is specified', async () => {

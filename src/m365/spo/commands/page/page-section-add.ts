@@ -7,7 +7,7 @@ import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 import { BackgroundControl, Control } from './canvasContent.js';
-import { CanvasSectionTemplate } from './clientsidepages.js';
+import { CanvasColumnFactorType, CanvasSectionTemplate } from './clientsidepages.js';
 
 interface CommandArgs {
   options: Options;
@@ -372,7 +372,7 @@ class SpoPageSectionAddCommand extends SpoCommand {
     return columns;
   }
 
-  private getColumn(zoneIndex: number, sectionIndex: number, sectionFactor: number, args: CommandArgs, zoneId?: string): Control {
+  private getColumn(zoneIndex: number, sectionIndex: number, sectionFactor: CanvasColumnFactorType, args: CommandArgs, zoneId?: string): Control {
     const { zoneEmphasis, isCollapsibleSection, isExpanded, showDivider, iconAlignment, collapsibleTitle } = args.options;
     const columnValue: Control = {
       displayMode: 2,

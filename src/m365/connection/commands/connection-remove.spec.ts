@@ -21,7 +21,7 @@ describe(commands.REMOVE, () => {
   before(() => {
     sinon.stub(auth, 'clearConnectionInfo').resolves();
     sinon.stub(auth, 'storeConnectionInfo').resolves();
-    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(telemetry, 'trackEvent').resolves();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     commandInfo = cli.getCommandInfo(command);

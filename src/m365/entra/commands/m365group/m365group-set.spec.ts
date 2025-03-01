@@ -58,7 +58,7 @@ describe(commands.M365GROUP_SET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
-    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(telemetry, 'trackEvent').resolves();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     sinon.stub(entraGroup, 'isUnifiedGroup').resolves(true);
@@ -756,10 +756,8 @@ describe(commands.M365GROUP_SET, () => {
   });
 
   it('passes validation if all options are being set', async () => {
-    const stats: fs.Stats = new fs.Stats();
-    sinon.stub(stats, 'isDirectory').returns(false);
     sinon.stub(fs, 'existsSync').returns(true);
-    sinon.stub(fs, 'lstatSync').returns(stats);
+    sinon.stub(fs, 'lstatSync').returns(fsStats);
     const actual = await command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', newDisplayName: 'Title', description: 'Description', logoPath: 'logo.png', ownerIds: userIds.join(','), memberIds: userIds.join(','), isPrivate: false, allowExternalSenders: false, autoSubscribeNewMembers: false, hideFromAddressLists: false, hideFromOutlookClients: false } }, commandInfo);
     assert.strictEqual(actual, true);
   });

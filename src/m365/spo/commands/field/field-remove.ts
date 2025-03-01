@@ -19,6 +19,7 @@ interface Options extends GlobalOptions {
   group?: string;
   listTitle?: string;
   title?: string;
+  internalName?: string;
   listUrl?: string;
   webUrl: string;
 }
@@ -50,6 +51,7 @@ class SpoFieldRemoveCommand extends SpoCommand {
         id: typeof args.options.id !== 'undefined',
         group: typeof args.options.group !== 'undefined',
         title: typeof args.options.title !== 'undefined',
+        internalName: typeof args.options.internalName !== 'undefined',
         force: (!(!args.options.force)).toString()
       });
     });
@@ -74,6 +76,9 @@ class SpoFieldRemoveCommand extends SpoCommand {
       },
       {
         option: '-t, --title [title]'
+      },
+      {
+        option: '--internalName [internalName]'
       },
       {
         option: '-g, --group [group]'
@@ -106,7 +111,7 @@ class SpoFieldRemoveCommand extends SpoCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push({ options: ['id', 'title', 'group'] });
+    this.optionSets.push({ options: ['id', 'title', 'internalName', 'group'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -118,9 +123,9 @@ class SpoFieldRemoveCommand extends SpoCommand {
       messageEnd = `in site ${args.options.webUrl}`;
     }
 
-    const removeField = async (listRestUrl: string, fieldId: string | undefined, title: string | undefined): Promise<void> => {
+    const removeField = async (listRestUrl: string, fieldId?: string | undefined, title?: string | undefined, internalName?: string | undefined): Promise<void> => {
       if (this.verbose) {
-        await logger.logToStderr(`Removing field ${fieldId || title} ${messageEnd}...`);
+        await logger.logToStderr(`Removing field ${fieldId || title || internalName} ${messageEnd}...`);
       }
 
       let fieldRestUrl: string = '';
@@ -128,7 +133,7 @@ class SpoFieldRemoveCommand extends SpoCommand {
         fieldRestUrl = `/getbyid('${formatting.encodeQueryParameter(fieldId)}')`;
       }
       else {
-        fieldRestUrl = `/getbyinternalnameortitle('${formatting.encodeQueryParameter(title as string)}')`;
+        fieldRestUrl = `/getbyinternalnameortitle('${formatting.encodeQueryParameter(title as string || internalName as string)}')`;
       }
 
       const requestOptions: CliRequestOptions = {
@@ -180,7 +185,7 @@ class SpoFieldRemoveCommand extends SpoCommand {
 
           const promises = [];
           for (let index = 0; index < filteredResults.length; index++) {
-            promises.push(removeField(listRestUrl, filteredResults[index].Id, undefined));
+            promises.push(removeField(listRestUrl, filteredResults[index].Id));
           }
 
           await Promise.all(promises);
@@ -191,8 +196,7 @@ class SpoFieldRemoveCommand extends SpoCommand {
       }
       else {
         try {
-          await removeField(listRestUrl, args.options.id, args.options.title);
-          // REST post call doesn't return anything
+          await removeField(listRestUrl, args.options.id, args.options.title, args.options.internalName);
         }
         catch (err: any) {
           this.handleRejectedODataJsonPromise(err);
@@ -204,7 +208,7 @@ class SpoFieldRemoveCommand extends SpoCommand {
       await prepareRemoval();
     }
     else {
-      const confirmMessage: string = `Are you sure you want to remove the ${args.options.group ? 'fields' : 'field'} ${args.options.id || args.options.title || 'from group ' + args.options.group} ${messageEnd}?`;
+      const confirmMessage: string = `Are you sure you want to remove the ${args.options.group ? 'fields' : 'field'} ${args.options.id || args.options.title || args.options.internalName || 'from group ' + args.options.group} ${messageEnd}?`;
 
       const result = await cli.promptForConfirmation({ message: confirmMessage });
 

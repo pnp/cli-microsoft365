@@ -31,7 +31,7 @@ describe(commands.MULTITENANT_REMOVE, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
-    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(telemetry, 'trackEvent').resolves();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
@@ -167,12 +167,12 @@ describe(commands.MULTITENANT_REMOVE, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
-    await command.action(logger, { options: { } });
+    await command.action(logger, { options: {} });
     assert(deleteRequestStub.calledTwice);
   });
 
   it('prompts before removing the multitenant organization when prompt option not passed', async () => {
-    await command.action(logger, { options: { } });
+    await command.action(logger, { options: {} });
 
     assert(promptIssued);
   });
@@ -180,7 +180,7 @@ describe(commands.MULTITENANT_REMOVE, () => {
   it('aborts removing the multitenant organization when prompt not confirmed', async () => {
     const deleteSpy = sinon.stub(request, 'delete').resolves();
 
-    await command.action(logger, { options: { } });
+    await command.action(logger, { options: {} });
     assert(deleteSpy.notCalled);
   });
 

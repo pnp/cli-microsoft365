@@ -25,6 +25,7 @@ interface Options extends GlobalOptions {
   section?: number;
   column?: number;
   order?: number;
+  verticalSection?: boolean;
 }
 
 class SpoPageClientSideWebPartAddCommand extends SpoCommand {
@@ -54,7 +55,8 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
         webPartProperties: typeof args.options.webPartProperties !== 'undefined',
         section: typeof args.options.section !== 'undefined',
         column: typeof args.options.column !== 'undefined',
-        order: typeof args.options.order !== 'undefined'
+        order: typeof args.options.order !== 'undefined',
+        verticalSection: !!args.options.verticalSection
       });
     });
   }
@@ -87,6 +89,9 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
       },
       {
         option: '--order [order]'
+      },
+      {
+        option: '--verticalSection'
       }
     );
   }
@@ -132,6 +137,14 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
 
         if (args.options.column && (!Number.isInteger(args.options.column) || args.options.column < 1)) {
           return 'The value of parameter column must be 1 or higher';
+        }
+
+        if (args.options.section && args.options.verticalSection) {
+          return 'Specify section or verticalSection but not both';
+        }
+
+        if (args.options.column && args.options.verticalSection) {
+          return 'Use column in combination with section, not with verticalSection';
         }
 
         return validation.isValidSharePointUrl(args.options.webUrl);
@@ -213,64 +226,19 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
 
       await this.setWebPartProperties(webPart, logger, args);
 
-      // if no section exists (canvasContent array only has 1 default object), add a default section (1 col)
-      if (canvasContent.length === 1) {
-        const defaultSection: Control = {
-          position: {
-            controlIndex: 1,
-            sectionIndex: 1,
-            zoneIndex: 1,
-            sectionFactor: 12,
-            layoutIndex: 1
-          },
-          emphasis: {},
-          displayMode: 2
-        };
-        canvasContent.unshift(defaultSection);
-      }
+      const control: Control = this.getCorrectControl(canvasContent, args);
+      const controlIndex: number = canvasContent.indexOf(control);
+      const zoneIndex: number = control.position.zoneIndex;
+      const column: number = control.position.sectionIndex;
 
-      // get unique zoneIndex values given each section can have 1 or more
-      // columns each assigned to the zoneIndex of the corresponding section
-      const zoneIndices: number[] = canvasContent
-        .filter(c => c.position)
-        .map(c => c.position.zoneIndex)
-        .filter((value: number, index: number, array: number[]): boolean => {
-          return array.indexOf(value) === index;
-        })
-        .sort((a, b) => a - b);
-
-      // get section number. if not specified, get the last section
-      const section: number = args.options.section || zoneIndices.length;
-      if (section > zoneIndices.length) {
-        throw `Invalid section '${section}'`;
-      }
-
-      // zoneIndex that represents the section where the web part should be added
-      const zoneIndex: number = zoneIndices[section - 1];
-
-      const column: number = args.options.column || 1;
-      // we need the index of the control in the array so that we know which
-      // item to replace or where to add the web part
-      const controlIndex: number = canvasContent
-        .findIndex(c => c.position &&
-          c.position.zoneIndex === zoneIndex &&
-          c.position.sectionIndex === column);
-      if (controlIndex === -1) {
-        throw `Invalid column '${args.options.column}'`;
-      }
-
-      // get the first control that matches section and column
-      // if it's a empty column, it should be replaced with the web part
-      // if it's a web part, then we need to determine if there are other
-      // web parts and where in the array the new web part should be put
-      const control: Control = canvasContent[controlIndex];
       const webPartControl: Control = this.extend({
         controlType: 3,
         displayMode: 2,
         id: webPart.id,
         position: Object.assign({}, control.position),
         webPartId: webPart.webPartId,
-        emphasis: {}
+        emphasis: {},
+        zoneGroupMetadata: control.zoneGroupMetadata
       }, webPart);
 
       if (!control.controlType) {
@@ -450,6 +418,84 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
       (webPart as any).webPartData = this.extend((webPart as any).webPartData, webPartData);
       webPart.id = (webPart as any).webPartData.instanceId;
     }
+  }
+
+  private getCorrectControl(canvasContent: Control[], args: CommandArgs): Control {
+    // get Vertical section 
+    if (args.options.verticalSection) {
+      let verticalSection = canvasContent
+        .find(c => c.position?.layoutIndex === 2);
+
+      //if vertical section does not exist, create it
+      if (!verticalSection) {
+        verticalSection = {
+          position: {
+            controlIndex: 1,
+            sectionIndex: 1,
+            zoneIndex: 1,
+            sectionFactor: 12,
+            layoutIndex: 2
+          },
+          emphasis: {},
+          displayMode: 2
+        };
+        canvasContent.unshift(verticalSection);
+      }
+      return verticalSection;
+    }
+
+    // if no section exists (canvasContent array only has 1 default object), add a default section (1 col)
+    if (canvasContent.length === 1) {
+      const defaultSection: Control = {
+        position: {
+          controlIndex: 1,
+          sectionIndex: 1,
+          zoneIndex: 1,
+          sectionFactor: 12,
+          layoutIndex: 1
+        },
+        emphasis: {},
+        displayMode: 2
+      };
+      canvasContent.unshift(defaultSection);
+    }
+
+    // get unique zoneIndex values given each section can have 1 or more
+    // columns each assigned to the zoneIndex of the corresponding section
+    const zoneIndices: number[] = canvasContent
+      // Exclude the vertical section
+      .filter(c => c.position)
+      .map(c => c.position.zoneIndex)
+      .filter((value: number, index: number, array: number[]): boolean => {
+        return array.indexOf(value) === index;
+      })
+      .sort((a, b) => a - b);
+
+    // get section number. if not specified, get the last section
+    const section: number = args.options.section || zoneIndices.length;
+    if (section > zoneIndices.length) {
+      throw `Invalid section '${section}'`;
+    }
+
+    // zoneIndex that represents the section where the web part should be added
+    const zoneIndex: number = zoneIndices[section - 1];
+
+    const column: number = args.options.column || 1;
+    // we need the index of the control in the array so that we know which
+    // item to replace or where to add the web part
+    const controlIndex: number = canvasContent
+      .findIndex(c => c.position &&
+        c.position.zoneIndex === zoneIndex &&
+        c.position.sectionIndex === column);
+    if (controlIndex === -1) {
+      throw `Invalid column '${args.options.column}'`;
+    }
+
+    // get the first control that matches section and column
+    // if it's a empty column, it should be replaced with the web part
+    // if it's a web part, then we need to determine if there are other
+    // web parts and where in the array the new web part should be put
+    return canvasContent[controlIndex];
   }
 
   /**

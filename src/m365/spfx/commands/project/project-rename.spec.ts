@@ -23,6 +23,7 @@ describe(commands.PROJECT_RENAME, () => {
   before(() => {
     trackEvent = sinon.stub(telemetry, 'trackEvent').callsFake((commandName) => {
       telemetryCommandName = commandName;
+      return Promise.resolve();
     });
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');

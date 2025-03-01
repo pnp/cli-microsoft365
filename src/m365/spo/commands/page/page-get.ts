@@ -1,20 +1,30 @@
+import { z } from 'zod';
+import { zod } from '../../../../utils/zod.js';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
-import request from '../../../../request.js';
+import { globalOptionsZod } from '../../../../Command.js';
+import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 
+const options = globalOptionsZod
+  .extend({
+    webUrl: zod.alias('u', z.string()
+      .refine(url => validation.isValidSharePointUrl(url) === true, url => ({
+        message: `'${url}' is not a valid SharePoint Online site URL.`
+      }))
+    ),
+    name: zod.alias('n', z.string()).optional(),
+    default: z.boolean().optional(),
+    metadataOnly: z.boolean().optional()
+  })
+  .strict();
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  name: string;
-  webUrl: string;
-  metadataOnly?: boolean;
 }
 
 class SpoPageGetCommand extends SpoCommand {
@@ -30,31 +40,15 @@ class SpoPageGetCommand extends SpoCommand {
     return ['commentsDisabled', 'numSections', 'numControls', 'title', 'layoutType'];
   }
 
-  constructor() {
-    super();
-
-    this.#initOptions();
-    this.#initValidators();
+  public get schema(): z.ZodTypeAny {
+    return options;
   }
 
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-n, --name <name>'
-      },
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '--metadataOnly'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => validation.isValidSharePointUrl(args.options.webUrl)
-    );
+  public getRefinedSchema(schema: typeof options): z.ZodEffects<any> | undefined {
+    return schema
+      .refine(options => [options.name, options.default].filter(x => x !== undefined).length === 1, {
+        message: `Specify either name or default, but not both.`
+      });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -62,13 +56,27 @@ class SpoPageGetCommand extends SpoCommand {
       await logger.logToStderr(`Retrieving information about the page...`);
     }
 
-    let pageName: string = args.options.name;
-    if (args.options.name.indexOf('.aspx') < 0) {
-      pageName += '.aspx';
-    }
-
+    let pageName: string = '';
     try {
-      let requestOptions: any = {
+      if (args.options.name) {
+        pageName = args.options.name.endsWith('.aspx')
+          ? args.options.name
+          : `${args.options.name}.aspx`;
+      }
+      else if (args.options.default) {
+        const requestOptions: CliRequestOptions = {
+          url: `${args.options.webUrl}/_api/Web/RootFolder?$select=WelcomePage`,
+          headers: {
+            accept: 'application/json;odata=nometadata'
+          },
+          responseType: 'json'
+        };
+
+        const { WelcomePage } = await request.get<{ WelcomePage: string }>(requestOptions);
+        pageName = WelcomePage.split('/').pop()!;
+      }
+
+      let requestOptions: CliRequestOptions = {
         url: `${args.options.webUrl}/_api/web/GetFileByServerRelativePath(DecodedUrl='${urlUtil.getServerRelativeSiteUrl(args.options.webUrl)}/SitePages/${formatting.encodeQueryParameter(pageName)}')?$expand=ListItemAllFields/ClientSideApplicationId,ListItemAllFields/PageLayoutType,ListItemAllFields/CommentsDisabled`,
         headers: {
           'content-type': 'application/json;charset=utf-8',
@@ -80,7 +88,7 @@ class SpoPageGetCommand extends SpoCommand {
       const page = await request.get<any>(requestOptions);
 
       if (page.ListItemAllFields.ClientSideApplicationId !== 'b6917cb1-93a0-4b97-a84d-7cf49975d4ec') {
-        throw `Page ${args.options.name} is not a modern page.`;
+        throw `Page ${pageName} is not a modern page.`;
       }
 
       let pageItemData: any = {};

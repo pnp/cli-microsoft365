@@ -633,6 +633,15 @@ const sidebars: SidebarsConfig = {
           ]
         },
         {
+          resourcenamespace: [
+            {
+              type: 'doc',
+              label: 'resourcenamespace list',
+              id: 'cmd/entra/resourcenamespace/resourcenamespace-list'
+            }
+          ]
+        },
+        {
           roledefinition: [
             {
               type: 'doc',
@@ -658,6 +667,15 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'roledefinition set',
               id: 'cmd/entra/roledefinition/roledefinition-set'
+            }
+          ]
+        },
+        {
+          rolepermission: [
+            {
+              type: 'doc',
+              label: 'rolepermission list',
+              id: 'cmd/entra/rolepermission/rolepermission-list'
             }
           ]
         },
@@ -771,6 +789,11 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'user registrationdetails list',
               id: 'cmd/entra/user/user-registrationdetails-list'
+            },
+            {
+              type: 'doc',
+              label: 'user session revoke',
+              id: 'cmd/entra/user/user-session-revoke'
             },
             {
               type: 'doc',
@@ -997,6 +1020,16 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'report servicesusercounts',
               id: 'cmd/tenant/report/report-servicesusercounts'
+            },
+            {
+              type: 'doc',
+              label: 'report settings get',
+              id: 'cmd/tenant/report/report-settings-get'
+            },
+            {
+              type: 'doc',
+              label: 'report settings set',
+              id: 'cmd/tenant/report/report-settings-set'
             }
           ]
         },
@@ -1184,6 +1217,11 @@ const sidebars: SidebarsConfig = {
         },
         {
           mailbox: [
+            {
+              type: 'doc',
+              label: 'mailbox settings get',
+              id: 'cmd/outlook/mailbox/mailbox-settings-get'
+            },
             {
               type: 'doc',
               label: 'mailbox settings set',
@@ -2039,6 +2077,11 @@ const sidebars: SidebarsConfig = {
           container: [
             {
               type: 'doc',
+              label: 'container activate',
+              id: 'cmd/spe/container/container-activate'
+            },
+            {
+              type: 'doc',
               label: 'container get',
               id: 'cmd/spe/container/container-get'
             },
@@ -2792,6 +2835,11 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
+              label: 'homesite list',
+              id: 'cmd/spo/homesite/homesite-list'
+            },
+            {
+              type: 'doc',
               label: 'homesite remove',
               id: 'cmd/spo/homesite/homesite-remove'
             },
@@ -2924,8 +2972,23 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
+              label: 'list defaultvalue clear',
+              id: 'cmd/spo/list/list-defaultvalue-clear'
+            },
+            {
+              type: 'doc',
               label: 'list defaultvalue list',
               id: 'cmd/spo/list/list-defaultvalue-list'
+            },
+            {
+              type: 'doc',
+              label: 'list defaultvalue remove',
+              id: 'cmd/spo/list/list-defaultvalue-remove'
+            },
+            {
+              type: 'doc',
+              label: 'list defaultvalue set',
+              id: 'cmd/spo/list/list-defaultvalue-set'
             },
             {
               type: 'doc',
@@ -3821,16 +3884,6 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'tenant commandset set',
               id: 'cmd/spo/tenant/tenant-commandset-set'
-            },
-            {
-              type: 'doc',
-              label: 'tenant homesite add',
-              id: 'cmd/spo/tenant/tenant-homesite-add'
-            },
-            {
-              type: 'doc',
-              label: 'tenant homesite list',
-              id: 'cmd/spo/tenant/tenant-homesite-list'
             },
             {
               type: 'doc',

@@ -4,7 +4,54 @@ sidebar_position: 4
 
 # Release notes
 
-## v10.3.0 (Beta)
+## [v10.4.0](https://github.com/pnp/cli-microsoft365/releases/tag/v10.4.0)
+
+### New commands
+
+**Entra ID:**
+
+- [entra resourcenamespace list](../cmd/entra/resourcenamespace/resourcenamespace-list.mdx) - retrieves a list of Microsoft Entra ID RBAC resource namespaces [#6561](https://github.com/pnp/cli-microsoft365/issues/6561)
+- [entra user session revoke](../cmd/entra/user/user-session-revoke.mdx) - revokes all sign-in sessions for a given user [#6514](https://github.com/pnp/cli-microsoft365/issues/6514)
+
+**Outlook:**
+
+- [outlook mailbox settings get](../cmd/outlook/mailbox/mailbox-settings-get.mdx) - retrieves user mailbox settings [#6567](https://github.com/pnp/cli-microsoft365/issues/6567)
+
+**Tenant:**
+
+- [tenant report settings get](../cmd/tenant/report/report-settings-get.mdx) - retrieves tenant-level settings for Microsoft 365 reports [#6246](https://github.com/pnp/cli-microsoft365/issues/6246)
+
+### Changes
+
+- updated [spo page get](../cmd/spo/page/page-get.mdx) command with `--default` option to retrieve the default page [#6493](https://github.com/pnp/cli-microsoft365/issues/6493)
+- added a deprecation warning for [spo mail send](../cmd/spo/mail/mail-send.mdx) command [#6576](https://github.com/pnp/cli-microsoft365/issues/6576)
+- added new [sample script](../sample-scripts/entra/find-obsolete-m365-groups/index.mdx) to get a list of all obsolete M365 groups [#2475](https://github.com/pnp/cli-microsoft365/issues/2475)
+- fixed prompting for a value when an option is missing [#6518](https://github.com/pnp/cli-microsoft365/issues/6518)
+- updated project & docs dependencies
+- added internalName option for spo field commands [#6249](https://github.com/pnp/cli-microsoft365/issues/6249)
+- added 'groupName' option and deprecated 'groupDisplayName' on 'entra group member' commands [#6546](https://github.com/pnp/cli-microsoft365/issues/6546)
+- fixed spo pages commands [#6462](https://github.com/pnp/cli-microsoft365/issues/6462)
+- fixed 'page clientsidewebpart add' for vertical sections [#6265](https://github.com/pnp/cli-microsoft365/issues/6265)
+- fixed 'project upgrade guidance' order for v1.20 [#6602](https://github.com/pnp/cli-microsoft365/issues/6602)
+- renamed 'spo tenant homesite list' command [#6597](https://github.com/pnp/cli-microsoft365/issues/6597)
+- removed scope for deprecated Azure AD Graph API [#6594](https://github.com/pnp/cli-microsoft365/issues/6594)
+- fixed collecting telemetry
+- switched to Node@22 [#6604](https://github.com/pnp/cli-microsoft365/issues/6604)
+
+## [v10.3.2](https://github.com/pnp/cli-microsoft365/releases/tag/v10.3.2)
+
+### Changes
+
+- reverted logging telemetry fix due to unexpected behavior on Windows machines
+
+## [v10.3.1](https://github.com/pnp/cli-microsoft365/releases/tag/v10.3.1)
+
+### Changes
+
+- fixed m365 setup permissions error [#6592](https://github.com/pnp/cli-microsoft365/issues/6592)
+- fixed logging telemetry
+
+## [v10.3.0](https://github.com/pnp/cli-microsoft365/releases/tag/v10.3.0)
 
 ### New commands
 
@@ -13,6 +60,7 @@ sidebar_position: 4
 - [entra pim role assignment remove](../cmd/entra/pim/pim-role-assignment-remove.mdx) - requests deactivation of an Entra role assignment for a user or group [#5841](https://github.com/pnp/cli-microsoft365/issues/5841)
 - [entra roledefinition add](../cmd/entra/roledefinition/roledefinition-add.mdx) - creates a custom Microsoft Entra ID role definition [#6466](https://github.com/pnp/cli-microsoft365/issues/6466)
 - [entra roledefinition set](../cmd/entra/roledefinition/roledefinition-set.mdx) - updates a custom Microsoft Entra ID role definition [#6467](https://github.com/pnp/cli-microsoft365/issues/6467)
+- [entra rolepermission list](../cmd/entra/rolepermission/rolepermission-list.mdx) - retrieves a list of Microsoft Entra ID role permissions [#6562](https://github.com/pnp/cli-microsoft365/issues/6562)
 
 **Exchange Online:**
 
@@ -28,11 +76,19 @@ sidebar_position: 4
 
 **SharePoint:**
 
+- [spo list defaultvalue clear](../cmd/spo/list/list-defaultvalue-clear.mdx) - clears default column values for a specific document library [#6505](https://github.com/pnp/cli-microsoft365/issues/6505)
 - [spo list defaultvalue list](../cmd/spo/list/list-defaultvalue-list.mdx) - retrieves default column values for a specific document library [#6404](https://github.com/pnp/cli-microsoft365/issues/6404)
+- [spo list defaultvalue remove](../cmd/spo/list/list-defaultvalue-remove.mdx) - removes default column values for a specific document library [#6504](https://github.com/pnp/cli-microsoft365/issues/6504)
+- [spo list defaultvalue set](../cmd/spo/list/list-defaultvalue-set.mdx) - updates default column values for a specific document library [#6503](https://github.com/pnp/cli-microsoft365/issues/6503)
+
+**SharePoint Embedded:**
+
+- [spe container activate](../cmd/spe/container/container-activate.mdx) - activates a container [#6086](https://github.com/pnp/cli-microsoft365/issues/6086)
 
 **Tenant:**
 
 - [tenant people pronouns set](../cmd/tenant/people/people-pronouns-set.mdx) - manage pronouns settings for an organization [#6205](https://github.com/pnp/cli-microsoft365/issues/6205)
+- [tenant report settings set](../cmd/tenant/report/report-settings-set.mdx) - manage tenant-level settings for Microsoft 365 reports [#6247](https://github.com/pnp/cli-microsoft365/issues/6247)
 
 ### Changes
 
@@ -44,8 +100,9 @@ sidebar_position: 4
 - added Bluesky to docs
 - fixed retrieving distribution groups [#6529](https://github.com/pnp/cli-microsoft365/issues/6529)
 - fixed login validation for system-assigned managed identity [#6527](https://github.com/pnp/cli-microsoft365/issues/6527)
-- fixed 'spo folder roleassignment add' command by removing incorrect breakroleinheritance functionality. Closes [#6555](https://github.com/pnp/cli-microsoft365/issues/6555)
+- fixed 'spo folder roleassignment add' command by removing incorrect breakroleinheritance functionality [#6555](https://github.com/pnp/cli-microsoft365/issues/6555)
 - added new sample script [Remove OAuth2 permission grants in a specific enterprise application (or service principal) in Entra ID](../sample-scripts/entra/entra-remove-oauth2-permission-grants/index.mdx) [#6537](https://github.com/pnp/cli-microsoft365/issues/6537)
+- fixed 'entra app add' command [#6565](https://github.com/pnp/cli-microsoft365/issues/6565)
 
 ## [v10.2.0](https://github.com/pnp/cli-microsoft365/releases/tag/v10.2.0)
 
@@ -59,7 +116,7 @@ sidebar_position: 4
 
 **SharePoint:**
 
-- [spo tenant homesite list](../cmd/spo/tenant/tenant-homesite-list.mdx) - lists all home sites [#6492](https://github.com/pnp/cli-microsoft365/issues/6492)
+- [spo tenant homesite list](../cmd/spo/homesite/homesite-list.mdx) - lists all home sites [#6492](https://github.com/pnp/cli-microsoft365/issues/6492)
 
 **SharePoint Embedded:**
 
