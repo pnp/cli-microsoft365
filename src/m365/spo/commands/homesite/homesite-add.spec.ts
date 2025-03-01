@@ -57,6 +57,7 @@ describe(commands.HOMESITE_ADD, () => {
     sinon.stub(telemetry, 'trackEvent').resolves();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
+    commandInfo = cli.getCommandInfo(command);
     commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
     auth.connection.active = true;
     auth.connection.spoUrl = 'https://contoso.sharepoint.com';
@@ -156,7 +157,6 @@ describe(commands.HOMESITE_ADD, () => {
     const actual = commandOptionsSchema.safeParse({ url: 'homeSite', audiences: 'invalid-guid' });
     assert.strictEqual(actual.success, false);
   });
-
 
   it('correctly handles OData error when adding a home site', async () => {
     sinon.stub(request, 'post').rejects({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
