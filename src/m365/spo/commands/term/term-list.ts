@@ -23,6 +23,7 @@ interface Options extends GlobalOptions {
   termSetId?: string;
   termSetName?: string;
   includeChildTerms?: boolean;
+  withChildTerms?: boolean;
 }
 
 class SpoTermListCommand extends SpoCommand {
@@ -55,7 +56,8 @@ class SpoTermListCommand extends SpoCommand {
         termGroupName: typeof args.options.termGroupName !== 'undefined',
         termSetId: typeof args.options.termSetId !== 'undefined',
         termSetName: typeof args.options.termSetName !== 'undefined',
-        includeChildTerms: !!args.options.includeChildTerms
+        includeChildTerms: !!args.options.includeChildTerms,
+        withChildTerms: !!args.options.withChildTerms
       });
     });
   }
@@ -79,6 +81,9 @@ class SpoTermListCommand extends SpoCommand {
       },
       {
         option: '--includeChildTerms'
+      },
+      {
+        option: '--withChildTerms'
       }
     );
   }
@@ -114,6 +119,10 @@ class SpoTermListCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    if (args.options.includeChildTerms) {
+      await this.warn(logger, `Parameter 'includeChildTerms' is deprecated. Please use 'withChildTerms' instead`);
+    }
+
     try {
       const spoWebUrl: string = args.options.webUrl ? args.options.webUrl : await spo.getSpoAdminUrl(logger, this.debug);
       const res: ContextInfo = await spo.getRequestDigest(spoWebUrl);
@@ -126,13 +135,14 @@ class SpoTermListCommand extends SpoCommand {
       const termSetQuery: string = args.options.termSetId ? `<Method Id="82" ParentId="80" Name="GetById"><Parameters><Parameter Type="Guid">{${args.options.termSetId}}</Parameter></Parameters></Method>` : `<Method Id="82" ParentId="80" Name="GetByName"><Parameters><Parameter Type="String">${formatting.escapeXml(args.options.termSetName)}</Parameter></Parameters></Method>`;
       const data = `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="70" ObjectPathId="69" /><ObjectIdentityQuery Id="71" ObjectPathId="69" /><ObjectPath Id="73" ObjectPathId="72" /><ObjectIdentityQuery Id="74" ObjectPathId="72" /><ObjectPath Id="76" ObjectPathId="75" /><ObjectPath Id="78" ObjectPathId="77" /><ObjectIdentityQuery Id="79" ObjectPathId="77" /><ObjectPath Id="81" ObjectPathId="80" /><ObjectPath Id="83" ObjectPathId="82" /><ObjectIdentityQuery Id="84" ObjectPathId="82" /><ObjectPath Id="86" ObjectPathId="85" /><Query Id="87" ObjectPathId="85"><Query SelectAllProperties="false"><Properties /></Query><ChildItemQuery SelectAllProperties="true"><Properties><Property Name="Name" ScalarProperty="true" /><Property Name="Id" ScalarProperty="true" /></Properties></ChildItemQuery></Query></Actions><ObjectPaths><StaticMethod Id="69" Name="GetTaxonomySession" TypeId="{981cbc68-9edc-4f8d-872f-71146fcbb84f}" /><Method Id="72" ParentId="69" Name="GetDefaultSiteCollectionTermStore" /><Property Id="75" ParentId="72" Name="Groups" />${termGroupQuery}<Property Id="80" ParentId="77" Name="TermSets" />${termSetQuery}<Property Id="85" ParentId="82" Name="Terms" /></ObjectPaths></Request>`;
 
+      const shouldIncludeChildTerms: boolean | undefined = args.options.includeChildTerms || args.options.withChildTerms;
       const result = await this.executeCsomCall(data, spoWebUrl, res);
       const terms: Term[] = [];
       if (result._Child_Items_ && result._Child_Items_.length > 0) {
         for (const term of result._Child_Items_) {
           this.setTermDetails(term);
           terms.push(term);
-          if (args.options.includeChildTerms && term.TermsCount > 0) {
+          if (shouldIncludeChildTerms && term.TermsCount > 0) {
             await this.getChildTerms(spoWebUrl, res, term);
           }
         }
@@ -141,7 +151,7 @@ class SpoTermListCommand extends SpoCommand {
       if (!args.options.output || !cli.shouldTrimOutput(args.options.output)) {
         await logger.log(terms);
       }
-      else if (!args.options.includeChildTerms) {
+      else if (!shouldIncludeChildTerms) {
         // Converted to text friendly output
         await logger.log(terms.map(i => {
           return {
