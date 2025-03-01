@@ -16,9 +16,15 @@ const options = globalOptionsZod
       }))
     ),
     audiences: zod.alias('audiences', z.string().optional()
-      .refine(audiences => audiences === undefined || validation.isValidGuidArray(audiences), audiences => ({
-        message: `'${audiences}' is not a valid GUID.`
-      })).optional(),
+      .refine(audiences => {
+        if (audiences === undefined) {
+          return true;
+        }
+        const audienceArray = audiences.split(',');
+        return audienceArray.every(audience => validation.isValidGuid(audience));
+      }, audiences => ({
+        message: `'${audiences}' contains one or more invalid GUIDs.`
+      })),
     ),
     vivaConnectionsDefaultStart: z.boolean().optional(),
     isInDraftMode: z.boolean().optional(),
