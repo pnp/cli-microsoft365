@@ -368,7 +368,7 @@ describe(commands.PIM_ROLE_ASSIGNMENT_ELIGIBILITY_LIST, () => {
     assert(loggerLogSpy.calledOnceWithExactly([unifiedRoleAssignmentEligibilityScheduleInstanceTransformedResponse[1]]));
   });
 
-  it('should get a list of eligible roles with details about principals that were assigned', async () => {
+  it('should get a list of eligible roles with details about principals that were assigned using includePrincipalDetails parameter', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/roleManagement/directory/roleEligibilityScheduleInstances?$expand=roleDefinition($select=displayName),principal') {
         return {
@@ -380,6 +380,22 @@ describe(commands.PIM_ROLE_ASSIGNMENT_ELIGIBILITY_LIST, () => {
     });
 
     await command.action(logger, { options: { includePrincipalDetails: true } });
+
+    assert(loggerLogSpy.calledOnceWithExactly(unifiedRoleAssignmentEligibilityScheduleInstanceWithPrincipalTransformedResponse));
+  });
+
+  it('should get a list of eligible roles with details about principals that were assigned', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/roleManagement/directory/roleEligibilityScheduleInstances?$expand=roleDefinition($select=displayName),principal') {
+        return {
+          value: unifiedRoleAssignmentEligibilityScheduleInstanceWithPrincipalResponse
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { withPrincipalDetails: true } });
 
     assert(loggerLogSpy.calledOnceWithExactly(unifiedRoleAssignmentEligibilityScheduleInstanceWithPrincipalTransformedResponse));
   });

@@ -670,6 +670,22 @@ describe(commands.LIST_ADD, () => {
     assert.strictEqual(actual, expected);
   });
 
+  it('sets specified withInMyFilesScope for list', async () => {
+    const expected = true;
+    let actual = '';
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
+        actual = opts.data.IncludedInMyFilesScope;
+        return { ErrorMessage: null };
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', withInMyFilesScope: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
+  });
+
   it('sets specified irmEnabled for list', async () => {
     const expected = true;
     let actual = '';

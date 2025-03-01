@@ -9,7 +9,8 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  includeSuspended: boolean;
+  includeSuspended?: boolean;
+  withSuspended?: boolean;
 }
 
 class VivaEngageNetworkListCommand extends VivaEngageCommand {
@@ -35,7 +36,8 @@ class VivaEngageNetworkListCommand extends VivaEngageCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        includeSuspended: args.options.includeSuspended
+        includeSuspended: args.options.includeSuspended,
+        withSuspended: args.options.withSuspended
       });
     });
   }
@@ -44,11 +46,18 @@ class VivaEngageNetworkListCommand extends VivaEngageCommand {
     this.options.unshift(
       {
         option: '--includeSuspended'
+      },
+      {
+        option: '--withSuspended'
       }
     );
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    if (args.options.includeSuspended) {
+      await this.warn(logger, `Parameter 'includeSuspended' is deprecated. Please use 'withSuspended' instead`);
+    }
+
     const requestOptions: CliRequestOptions = {
       url: `${this.resource}/v1/networks/current.json`,
       headers: {
@@ -57,7 +66,7 @@ class VivaEngageNetworkListCommand extends VivaEngageCommand {
       },
       responseType: 'json',
       data: {
-        includeSuspended: args.options.includeSuspended !== undefined && args.options.includeSuspended !== false
+        includeSuspended: (args.options.includeSuspended !== undefined && args.options.includeSuspended !== false) || (args.options.withSuspended !== undefined && args.options.withSuspended !== false)
       }
     };
 

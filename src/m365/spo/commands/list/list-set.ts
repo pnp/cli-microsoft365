@@ -53,6 +53,7 @@ interface Options extends GlobalOptions {
   forceDefaultContentType?: boolean;
   hidden?: boolean;
   includedInMyFilesScope?: boolean;
+  withInMyFilesScope?: boolean;
   irmEnabled?: boolean;
   irmExpire?: boolean;
   irmReject?: boolean;
@@ -110,6 +111,7 @@ class SpoListSetCommand extends SpoCommand {
     'forceDefaultContentType',
     'hidden',
     'includedInMyFilesScope',
+    'withInMyFilesScope',
     'irmEnabled',
     'irmExpire',
     'irmReject',
@@ -380,6 +382,10 @@ class SpoListSetCommand extends SpoCommand {
         autocomplete: ['true', 'false']
       },
       {
+        option: '--withInMyFilesScope [withInMyFilesScope]',
+        autocomplete: ['true', 'false']
+      },
+      {
         option: '--irmEnabled [irmEnabled]',
         autocomplete: ['true', 'false']
       },
@@ -573,6 +579,10 @@ class SpoListSetCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    if (args.options.includedInMyFilesScope) {
+      await this.warn(logger, `Parameter 'includedInMyFilesScope' is deprecated. Please use 'withInMyFilesScope' instead`);
+    }
+
     if (this.verbose) {
       await logger.logToStderr(`Updating list in site at ${args.options.webUrl}...`);
     }
@@ -755,8 +765,9 @@ class SpoListSetCommand extends SpoCommand {
       requestBody.Hidden = options.hidden;
     }
 
-    if (options.includedInMyFilesScope !== undefined) {
-      requestBody.IncludedInMyFilesScope = options.includedInMyFilesScope;
+    const shouldIncludeMyFilesScope: boolean | undefined = options.includedInMyFilesScope || options.withInMyFilesScope;
+    if (shouldIncludeMyFilesScope !== undefined) {
+      requestBody.IncludedInMyFilesScope = shouldIncludeMyFilesScope;
     }
 
     if (options.irmEnabled !== undefined) {

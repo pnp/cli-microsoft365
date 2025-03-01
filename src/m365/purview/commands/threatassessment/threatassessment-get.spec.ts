@@ -107,6 +107,11 @@ describe(commands.THREATASSESSMENT_GET, () => {
     assert.strictEqual(actual, true);
   });
 
+  it('passes validation if a correct id is entered and withResults is specified', async () => {
+    const actual = await command.validate({ options: { id: threatAssessmentId, withResults: true } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
   it('retrieves threat assessment by specified id', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/informationProtection/threatAssessmentRequests/${threatAssessmentId}`) {
@@ -120,7 +125,7 @@ describe(commands.THREATASSESSMENT_GET, () => {
     assert(loggerLogSpy.calledWith(threatAssessmentGetResponse));
   });
 
-  it('retrieves threat assessment by specified id including results', async () => {
+  it('retrieves threat assessment by specified id including results using includeResults parameter', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/informationProtection/threatAssessmentRequests/${threatAssessmentId}?$expand=results`) {
         return threatAssessmentGetResponseIncludingResults;
@@ -130,6 +135,19 @@ describe(commands.THREATASSESSMENT_GET, () => {
     });
 
     await command.action(logger, { options: { id: threatAssessmentId, includeResults: true, verbose: true } });
+    assert(loggerLogSpy.calledWith(threatAssessmentGetResponseIncludingResults));
+  });
+
+  it('retrieves threat assessment by specified id including results', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/informationProtection/threatAssessmentRequests/${threatAssessmentId}?$expand=results`) {
+        return threatAssessmentGetResponseIncludingResults;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { id: threatAssessmentId, withResults: true, verbose: true } });
     assert(loggerLogSpy.calledWith(threatAssessmentGetResponseIncludingResults));
   });
 

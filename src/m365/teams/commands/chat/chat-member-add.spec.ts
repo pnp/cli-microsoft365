@@ -106,7 +106,7 @@ describe(commands.CHAT_MEMBER_ADD, () => {
     assert.deepStrictEqual(postStub.lastCall.args[0].data, requestBody);
   });
 
-  it('adds a member by specifying its userId and share all chat history', async () => {
+  it('adds a member by specifying its userId and share all chat history using includeAllHistory parameter', async () => {
     const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/chats/${chatId}/members`) {
         return;
@@ -123,6 +123,26 @@ describe(commands.CHAT_MEMBER_ADD, () => {
     };
 
     await command.action(logger, { options: { chatId: chatId, userId: userId, includeAllHistory: true } });
+    assert.deepStrictEqual(postStub.lastCall.args[0].data, requestBody);
+  });
+
+  it('adds a member by specifying its userId and share all chat history', async () => {
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/chats/${chatId}/members`) {
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+    const requestBody = {
+      '@odata.type': '#microsoft.graph.aadUserConversationMember',
+      roles: ['owner'],
+      'user@odata.bind': `https://graph.microsoft.com/v1.0/users/${userId}`,
+      visibleHistoryStartDateTime: '0001-01-01T00:00:00Z'
+    };
+
+    await command.action(logger, { options: { chatId: chatId, userId: userId, withAllHistory: true } });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, requestBody);
   });
 

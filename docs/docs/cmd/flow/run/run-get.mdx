@@ -16,22 +16,22 @@ m365 flow run get [options]
 
 ```md definition-list
 `-n, --name <name>`
-: The name of the run to get information about
+: The name of the run to get information about.
 
 `--flowName <flowName>`
-: The name of the Power Automate flow for which to retrieve information
+: The name of the Power Automate flow for which to retrieve information.
 
 `-e, --environmentName <environmentName>`
-: The name of the environment where the flow is located
+: The name of the environment where the flow is located.
 
 `--includeTriggerInformation`
-: (deprecated. Use option `withTrigger` instead) If specified, include information about the trigger details
+: (deprecated. Use option `withTrigger` instead) If specified, include information about the trigger details.
 
 `--withTrigger`
-: If specified, include information about the trigger details
+: If specified, include information about the trigger details.
 
 `--withActions [withActions]`
-: If specified, include information about all actions when no action names are specified, or provide a specified list of actions separated by commas to include only the relevant action details
+: If specified, include information about all actions when no action names are specified, or provide a specified list of actions separated by commas to include only the relevant action details.
 
 ```
 
@@ -55,13 +55,13 @@ If the option `withTrigger` is specified, but the trigger does not contain an ou
 
 ## Examples
 
-Get information about the given run of the specified Power Automate flow
+Get information about the given run of the specified Power Automate flow.
 
 ```sh
 m365 flow run get --environmentName Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --flowName 5923cb07-ce1a-4a5c-ab81-257ce820109a --name 08586653536760200319026785874CU62
 ```
 
-Get information about the given run of the specified Power Automate flow including trigger information
+Get information about the given run of the specified Power Automate flow including trigger information.
 
 ```sh
 m365 flow run get --environmentName Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --flowName 5923cb07-ce1a-4a5c-ab81-257ce820109a --name 08586653536760200319026785874CU62 --withTrigger
@@ -73,7 +73,7 @@ Get information about the given run of the specified Power Automate flow includi
 m365 flow run get --environmentName Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --flowName 5923cb07-ce1a-4a5c-ab81-257ce820109a --name 08586653536760200319026785874CU62 --withActions
 ```
 
-Get information about the given run of the specified Power Automate flow including exclusively the details of 'Action_Internal_Name1' and 'Action_Internal_Name2' actions
+Get information about the given run of the specified Power Automate flow including exclusively the details of 'Action_Internal_Name1' and 'Action_Internal_Name2' actions.
 
 ```sh
 m365 flow run get --environmentName Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --flowName 5923cb07-ce1a-4a5c-ab81-257ce820109a --name 08586653536760200319026785874CU62 --withActions "Action_Internal_Name1,Action_Internal_Name2"

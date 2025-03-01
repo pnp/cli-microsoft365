@@ -528,7 +528,7 @@ describe(commands.PIM_ROLE_REQUEST_LIST, () => {
     assert(loggerLogSpy.calledOnceWithExactly([unifiedRoleAssignmentScheduleRequestTransformedResponse[1]]));
   });
 
-  it('should get a list of PIM requests with details about principal that were assigned', async () => {
+  it('should get a list of PIM requests with details about principal that were assigned using includePrincipalDetails parameter', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/roleManagement/directory/roleAssignmentScheduleRequests?$expand=roleDefinition($select=displayName),principal') {
         return {
@@ -540,6 +540,39 @@ describe(commands.PIM_ROLE_REQUEST_LIST, () => {
     });
 
     await command.action(logger, { options: { includePrincipalDetails: true } });
+
+    assert(loggerLogSpy.calledOnceWithExactly(unifiedRoleAssignmentScheduleRequestWithPrincipalTransformedResponse));
+  });
+
+  it('should get a list of PIM requests for a group specified by name from specified start date with details about principal that were assigned using includePrincipalDetails parameter', async () => {
+    sinon.stub(entraGroup, 'getGroupIdByDisplayName').withArgs(groupName).resolves(groupId);
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/roleManagement/directory/roleAssignmentScheduleRequests?$filter=principalId eq '${groupId}' and createdDateTime ge ${createdDateTime}&$expand=roleDefinition($select=displayName),principal`) {
+        return {
+          value: unifiedRoleAssignmentScheduleRequestWithPrincipalResponse
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { groupName: groupName, createdDateTime: createdDateTime, includePrincipalDetails: true } });
+
+    assert(loggerLogSpy.calledOnceWithExactly(unifiedRoleAssignmentScheduleRequestWithPrincipalTransformedResponse));
+  });
+
+  it('should get a list of PIM requests with details about principal that were assigned', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/roleManagement/directory/roleAssignmentScheduleRequests?$expand=roleDefinition($select=displayName),principal') {
+        return {
+          value: unifiedRoleAssignmentScheduleRequestWithPrincipalResponse
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { withPrincipalDetails: true } });
 
     assert(loggerLogSpy.calledOnceWithExactly(unifiedRoleAssignmentScheduleRequestWithPrincipalTransformedResponse));
   });
@@ -556,7 +589,7 @@ describe(commands.PIM_ROLE_REQUEST_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { groupName: groupName, createdDateTime: createdDateTime, includePrincipalDetails: true } });
+    await command.action(logger, { options: { groupName: groupName, createdDateTime: createdDateTime, withPrincipalDetails: true } });
 
     assert(loggerLogSpy.calledOnceWithExactly(unifiedRoleAssignmentScheduleRequestWithPrincipalTransformedResponse));
   });
