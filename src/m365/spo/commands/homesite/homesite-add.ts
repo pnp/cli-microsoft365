@@ -18,16 +18,17 @@ const options = globalOptionsZod
     audiences: zod.alias('audiences', z.string().optional()
       .refine(audiences => audiences === undefined || validation.isValidGuidArray(audiences), audiences => ({
         message: `'${audiences}' is not a valid GUID.`
-      }))
+      })).optional(),
     ),
     vivaConnectionsDefaultStart: z.boolean().optional(),
     isInDraftMode: z.boolean().optional(),
     order: z.string()
       .refine(order => validation.isValidPositiveInteger(order) === true, order => ({
         message: `'${order}' is not a positive integer`
-      }))
+      })).optional()
   })
   .strict();
+
 declare type Options = z.infer<typeof options>;
 interface CommandArgs {
   options: Options;
@@ -42,6 +43,9 @@ class SpoHomeSiteAddCommand extends SpoCommand {
     return 'Adds a home site';
   }
 
+  public get schema(): z.ZodTypeAny {
+    return options;
+  }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {

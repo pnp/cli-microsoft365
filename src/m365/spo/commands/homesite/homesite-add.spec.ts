@@ -57,10 +57,10 @@ describe(commands.HOMESITE_ADD, () => {
     sinon.stub(telemetry, 'trackEvent').resolves();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
-    commandInfo = cli.getCommandInfo(command);
-    commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
     auth.connection.active = true;
     auth.connection.spoUrl = 'https://contoso.sharepoint.com';
+    commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
   });
 
   beforeEach(() => {
@@ -77,7 +77,6 @@ describe(commands.HOMESITE_ADD, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
-    commandInfo = cli.getCommandInfo(command);
   });
 
   afterEach(() => {
