@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { zod } from '../../../../utils/zod.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { globalOptionsZod } from '../../../../Command.js';
 import { spo } from '../../../../utils/spo.js';
@@ -9,16 +10,25 @@ import request, { CliRequestOptions } from '../../../../request.js';
 
 const options = globalOptionsZod
   .extend({
-    url: z.string().url(),
-    audiences: z.string().optional(),
+    url: zod.alias('u', z.string()
+      .refine(url => validation.isValidSharePointUrl(url) === true, url => ({
+        message: `'${url}' is not a valid SharePoint Online site URL.`
+      }))
+    ),
+    audiences: zod.alias('audiences', z.string().optional()
+      .refine(audiences => audiences === undefined || validation.isValidGuidArray(audiences), audiences => ({
+        message: `'${audiences}' is not a valid GUID.`
+      }))
+    ),
     vivaConnectionsDefaultStart: z.boolean().optional(),
     isInDraftMode: z.boolean().optional(),
-    order: z.number().optional()
+    order: z.string()
+      .refine(order => validation.isValidPositiveInteger(order) === true, order => ({
+        message: `'${order}' is not a positive integer`
+      }))
   })
   .strict();
-
 declare type Options = z.infer<typeof options>;
-
 interface CommandArgs {
   options: Options;
 }
@@ -32,64 +42,6 @@ class SpoHomeSiteAddCommand extends SpoCommand {
     return 'Adds a home site';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        url: args.options.url
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-u, --url <url>'
-      },
-      {
-        option: '--isInDraftMode [isInDraftMode]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--vivaConnectionsDefaultStart [vivaConnectionsDefaultStart]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--audiences [audiences]'
-      },
-      {
-        option: '--order [order]'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.url);
-        if (isValidSharePointUrl !== true) {
-          return isValidSharePointUrl;
-        }
-
-        if (args.options.order !== undefined && !validation.isValidPositiveInteger(args.options.order)) {
-          return `${args.options.order} is not a positive integer`;
-        }
-
-        const isValidGUIDArrayResult = args.options.audiences ? validation.isValidGuidArray(args.options.audiences) : true;
-        if (isValidGUIDArrayResult !== true) {
-          return `The following GUIDs are invalid for the option 'ids': ${isValidGUIDArrayResult}.`;
-        }
-        return true;
-      }
-    );
-  }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
