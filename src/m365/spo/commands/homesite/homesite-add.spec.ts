@@ -12,12 +12,15 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from '../homesite/homesite-add.js';
+import { z } from 'zod';
 
 describe(commands.HOMESITE_ADD, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: z.ZodTypeAny;
+
   const homeSite = "https://contoso.sharepoint.com/sites/testcomms";
   const homeSites = {
     "Audiences": [],
@@ -54,6 +57,7 @@ describe(commands.HOMESITE_ADD, () => {
     sinon.stub(telemetry, 'trackEvent').resolves();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
+    commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
     auth.connection.active = true;
     auth.connection.spoUrl = 'https://contoso.sharepoint.com';
   });
@@ -139,33 +143,20 @@ describe(commands.HOMESITE_ADD, () => {
   });
 
   it('fails validation if the url is not a valid SharePoint url', async () => {
-    const actual = await command.validate({
-      options: {
-        url: "test"
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, "'test' is not a valid SharePoint Online site URL.");
+    const actual = commandOptionsSchema.safeParse({ url: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('correctly handles non-integer order', async () => {
-    const actual = await command.validate({
-      options: {
-        url: homeSite,
-        order: 'invalid-order'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, "'invalid-order' is not a positive integer");
+    const actual = commandOptionsSchema.safeParse({ url: 'homeSite', order: 'invalid-order' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('correctly handles invalid GUIDs in audiences', async () => {
-    const actual = await command.validate({
-      options: {
-        url: homeSite,
-        audiences: 'invalid-guid'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, "'invalid-guid' is not a valid GUID.");
+    const actual = commandOptionsSchema.safeParse({ url: 'homeSite', audiences: 'invalid-guid' });
+    assert.strictEqual(actual.success, false);
   });
+
 
   it('correctly handles OData error when adding a home site', async () => {
     sinon.stub(request, 'post').rejects({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
