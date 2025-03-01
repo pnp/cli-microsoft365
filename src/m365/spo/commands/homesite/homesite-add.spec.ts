@@ -144,7 +144,7 @@ describe(commands.HOMESITE_ADD, () => {
         url: "test"
       }
     }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    assert.notStrictEqual(actual, "'test' is not a valid SharePoint Online site URL.");
   });
 
   it('correctly handles non-integer order', async () => {
@@ -154,7 +154,7 @@ describe(commands.HOMESITE_ADD, () => {
         order: 'invalid-order'
       }
     }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    assert.notStrictEqual(actual, "'invalid-order' is not a positive integer");
   });
 
   it('correctly handles invalid GUIDs in audiences', async () => {
@@ -164,9 +164,8 @@ describe(commands.HOMESITE_ADD, () => {
         audiences: 'invalid-guid'
       }
     }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    assert.notStrictEqual(actual, "'invalid-guid' is not a valid GUID.");
   });
-
 
   it('correctly handles OData error when adding a home site', async () => {
     sinon.stub(request, 'post').rejects({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
