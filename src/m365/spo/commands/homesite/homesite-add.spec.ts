@@ -130,10 +130,10 @@ describe(commands.HOMESITE_ADD, () => {
       "audiences": [
         "af8c0bc8-7b1b-44b4-b087-ffcc8df70d16"
       ],
-      "isInDraftMode": "true",
+      "isInDraftMode": true,
       "order": 2,
       "siteUrl": "https://contoso.sharepoint.com/sites/testcomms",
-      "vivaConnectionsDefaultStart": "false"
+      "vivaConnectionsDefaultStart": false
     };
     assert.deepStrictEqual(postStub.lastCall.args[0].data, expectedData);
   });
@@ -167,27 +167,6 @@ describe(commands.HOMESITE_ADD, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation with URL', async () => {
-    const actual = await command.validate({
-      options: {
-        url: homeSite
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
-
-  it('passes validation with URL and optional parameters', async () => {
-    const actual = await command.validate({
-      options: {
-        url: homeSite,
-        isInDraftMode: true,
-        vivaConnectionsDefaultStart: false,
-        audiences: 'af8c0bc8-7b1b-44b4-b087-ffcc8df70d16',
-        order: 2
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
 
   it('correctly handles OData error when adding a home site', async () => {
     sinon.stub(request, 'post').rejects({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });

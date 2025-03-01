@@ -11,7 +11,7 @@ import request, { CliRequestOptions } from '../../../../request.js';
 const options = globalOptionsZod
   .extend({
     url: zod.alias('u', z.string()
-      .refine(url => validation.isValidSharePointUrl(url) === true, url => ({
+      .refine((url: string) => validation.isValidSharePointUrl(url) === true, url => ({
         message: `'${url}' is not a valid SharePoint Online site URL.`
       }))
     ),
