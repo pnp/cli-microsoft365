@@ -11,9 +11,9 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './tenant-homesite-add.js';
+import command from '../homesite/homesite-add.js';
 
-describe(commands.TENANT_HOMESITE_ADD, () => {
+describe(commands.HOMESITE_ADD, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -88,7 +88,7 @@ describe(commands.TENANT_HOMESITE_ADD, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name, commands.TENANT_HOMESITE_ADD);
+    assert.strictEqual(command.name, commands.HOMESITE_ADD);
   });
 
   it('has a description', () => {
@@ -148,7 +148,7 @@ describe(commands.TENANT_HOMESITE_ADD, () => {
   });
 
   it('correctly handles non-integer order', async () => {
-    const result = await command.validate({
+    const actual = await command.validate({
       options: {
         url: homeSite,
         order: 'invalid-order'
@@ -158,7 +158,7 @@ describe(commands.TENANT_HOMESITE_ADD, () => {
   });
 
   it('correctly handles invalid GUIDs in audiences', async () => {
-    const result = await command.validate({
+    const actual = await command.validate({
       options: {
         url: homeSite,
         audiences: 'invalid-guid'

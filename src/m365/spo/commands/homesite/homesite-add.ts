@@ -23,9 +23,9 @@ interface CommandArgs {
   options: Options;
 }
 
-class SpoTenantHomeSiteAddCommand extends SpoCommand {
+class SpoHomeSiteAddCommand extends SpoCommand {
   public get name(): string {
-    return commands.TENANT_HOMESITE_ADD;
+    return commands.HOMESITE_ADD;
   }
 
   public get description(): string {
@@ -104,7 +104,7 @@ class SpoTenantHomeSiteAddCommand extends SpoCommand {
           siteUrl: args.options.url,
           audiences: args.options.audiences?.split(','),
           vivaConnectionsDefaultStart: args.options.vivaConnectionsDefaultStart ?? true,
-          isInDraftMode: args.options.isInDraftMode ?? true,
+          isInDraftMode: args.options.isInDraftMode ?? false,
           order: args.options.order
         }
       };
@@ -122,4 +122,4 @@ class SpoTenantHomeSiteAddCommand extends SpoCommand {
   }
 }
 
-export default new SpoTenantHomeSiteAddCommand();
+export default new SpoHomeSiteAddCommand();
