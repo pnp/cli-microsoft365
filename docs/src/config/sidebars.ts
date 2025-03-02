@@ -2849,6 +2849,11 @@ const sidebars: SidebarsConfig = {
           homesite: [
             {
               type: 'doc',
+              label: 'homesite add',
+              id: 'cmd/spo/homesite/homesite-add'
+            },
+            {
+              type: 'doc',
               label: 'homesite get',
               id: 'cmd/spo/homesite/homesite-get'
             },
