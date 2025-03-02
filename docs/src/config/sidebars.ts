@@ -1090,6 +1090,15 @@ const sidebars: SidebarsConfig = {
           ]
         },
         {
+          directoryextension: [
+            {
+              type: 'doc',
+              label: 'directoryextension get',
+              id: 'cmd/graph/directoryextension/directoryextension-get'
+            }
+          ]
+        },
+        {
           schemaextension: [
             {
               type: 'doc',

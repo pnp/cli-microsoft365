@@ -35,6 +35,7 @@ const dictionary = [
   'definition',
   'dev',
   'details',
+  'directory',
   'eligibility',
   'enterprise',
   'entra',
