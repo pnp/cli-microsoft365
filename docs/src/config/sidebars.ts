@@ -1090,6 +1090,15 @@ const sidebars: SidebarsConfig = {
           ]
         },
         {
+          directoryextension: [
+            {
+              type: 'doc',
+              label: 'directoryextension remove',
+              id: 'cmd/graph/directoryextension/directoryextension-remove'
+            }
+          ]
+        },
+        {
           schemaextension: [
             {
               type: 'doc',
