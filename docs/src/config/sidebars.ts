@@ -1100,6 +1100,11 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'directoryextension get',
               id: 'cmd/graph/directoryextension/directoryextension-get'
+            },
+            {
+              type: 'doc',
+              label: 'directoryextension remove',
+              id: 'cmd/graph/directoryextension/directoryextension-remove'
             }
           ]
         },
