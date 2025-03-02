@@ -36,7 +36,7 @@ class SpoPageSectionRemoveCommand extends SpoCommand {
   }
 
   public get description(): string {
-    return 'Remove the specified section from the modern page';
+    return 'Removes the specified section from the modern page';
   }
 
   public get schema(): z.ZodTypeAny {
