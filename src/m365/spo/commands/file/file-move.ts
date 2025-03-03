@@ -19,6 +19,7 @@ interface Options extends GlobalOptions {
   newName?: string;
   nameConflictBehavior?: string;
   includeItemPermissions?: boolean;
+  withItemPermissions?: boolean;
   bypassSharedLock?: boolean;
   skipWait?: boolean;
 }
@@ -52,6 +53,7 @@ class SpoFileMoveCommand extends SpoCommand {
         newName: typeof args.options.newName !== 'undefined',
         nameConflictBehavior: typeof args.options.nameConflictBehavior !== 'undefined',
         includeItemPermissions: !!args.options.includeItemPermissions,
+        withItemPermissions: !!args.options.withItemPermissions,
         bypassSharedLock: !!args.options.bypassSharedLock,
         skipWait: !!args.options.skipWait
       });
@@ -81,6 +83,9 @@ class SpoFileMoveCommand extends SpoCommand {
       },
       {
         option: '--includeItemPermissions'
+      },
+      {
+        option: '--withItemPermissions'
       },
       {
         option: '--bypassSharedLock'
@@ -118,7 +123,7 @@ class SpoFileMoveCommand extends SpoCommand {
 
   #initTypes(): void {
     this.types.string.push('webUrl', 'sourceUrl', 'sourceId', 'targetUrl', 'newName', 'nameConflictBehavior');
-    this.types.boolean.push('includeItemPermissions', 'bypassSharedLock', 'skipWait');
+    this.types.boolean.push('includeItemPermissions', 'withItemPermissions', 'bypassSharedLock', 'skipWait');
   }
 
   protected getExcludedOptionsWithUrls(): string[] | undefined {
@@ -148,7 +153,7 @@ class SpoFileMoveCommand extends SpoCommand {
         {
           nameConflictBehavior: this.getNameConflictBehaviorValue(args.options.nameConflictBehavior),
           bypassSharedLock: !!args.options.bypassSharedLock,
-          includeItemPermissions: !!args.options.includeItemPermissions,
+          includeItemPermissions: !!args.options.includeItemPermissions || !!args.options.withItemPermissions,
           newName: newName,
           operation: 'move'
         }

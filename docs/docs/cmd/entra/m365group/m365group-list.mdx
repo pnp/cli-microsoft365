@@ -16,54 +16,56 @@ m365 entra m365group list [options]
 
 ```md definition-list
 `-d, --displayName [displayName]`
-: Retrieve only groups with displayName starting with the specified value
+: Retrieve only groups with displayName starting with the specified value.
 
 `-m, --mailNickname [displayName]`
-: Retrieve only groups with mailNickname starting with the specified value
+: Retrieve only groups with mailNickname starting with the specified value.
 
 `--includeSiteUrl`
-: Set to retrieve the site URL for each group
+: (deprecated. Use option `withSiteUrl` instead) Set to retrieve the site URL for each group.
+
+`--withSiteUrl`
+: Set to retrieve the site URL for each group.
 
 `--orphaned`
-: Set to only retrieve groups without owners
+: Set to only retrieve groups without owners.
 ```
 
 <Global />
 
 ## Remarks
 
-Using the `--includeSiteUrl` option, you can retrieve the URL of the site associated with the particular Microsoft 365 Group. If you however retrieve too many groups and will try to get their site URLs, you will most likely get an error as the command will get throttled, issuing too many requests, too frequently. If you get an error, consider narrowing down the result set using the `--displayName` and `--mailNickname` filters.
+Using the `--withSiteUrl` option, you can retrieve the URL of the site associated with the particular Microsoft 365 Group. If you however retrieve too many groups and will try to get their site URLs, you will most likely get an error as the command will get throttled, issuing too many requests, too frequently. If you get an error, consider narrowing down the result set using the `--displayName` and `--mailNickname` filters.
 
 Using the `--orphaned` option, you can retrieve Microsoft 365 Groups without owners.
 
 ## Examples
 
-List all Microsoft 365 Groups in the tenant
+List all Microsoft 365 Groups in the tenant.
 
 ```sh
 m365 entra m365group list
 ```
 
-List Microsoft 365 Groups with display name starting with _Project_
+List Microsoft 365 Groups with display name starting with _Project_.
 
 ```sh
 m365 entra m365group list --displayName Project
 ```
 
-List Microsoft 365 Groups mail nick name starting with _team_
+List Microsoft 365 Groups mail nick name starting with _team_.
 
 ```sh
 m365 entra m365group list --mailNickname team
 ```
 
-List Microsoft 365 Groups with display name starting with _Project_ including
-the URL of the corresponding SharePoint site
+List Microsoft 365 Groups with display name starting with _Project_ including the URL of the corresponding SharePoint site.
 
 ```sh
-m365 entra m365group list --displayName Project --includeSiteUrl
+m365 entra m365group list --displayName Project --withSiteUrl
 ```
 
-List Microsoft 365 Groups without owners
+List Microsoft 365 Groups without owners.
 
 ```sh
 m365 entra m365group list --orphaned

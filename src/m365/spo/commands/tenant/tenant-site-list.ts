@@ -18,6 +18,7 @@ interface Options extends GlobalOptions {
   webTemplate?: string;
   filter?: string;
   includeOneDriveSites?: boolean;
+  withOneDriveSites?: boolean;
 }
 
 class SpoTenantSiteListCommand extends SpoCommand {
@@ -49,7 +50,8 @@ class SpoTenantSiteListCommand extends SpoCommand {
         webTemplate: args.options.webTemplate,
         type: args.options.type,
         filter: (!(!args.options.filter)).toString(),
-        includeOneDriveSites: typeof args.options.includeOneDriveSites !== 'undefined'
+        includeOneDriveSites: typeof args.options.includeOneDriveSites !== 'undefined',
+        withOneDriveSites: typeof args.options.withOneDriveSites !== 'undefined'
       });
     });
   }
@@ -68,6 +70,9 @@ class SpoTenantSiteListCommand extends SpoCommand {
       },
       {
         option: '--includeOneDriveSites'
+      },
+      {
+        option: '--withOneDriveSites'
       }
     );
   }
@@ -90,6 +95,11 @@ class SpoTenantSiteListCommand extends SpoCommand {
           return 'When using includeOneDriveSites, don\'t specify the type or webTemplate options';
         }
 
+        if (args.options.withOneDriveSites
+          && (args.options.type || args.options.webTemplate)) {
+          return 'When using withOneDriveSites, don\'t specify the type or webTemplate options';
+        }
+
         return true;
       }
     );
@@ -100,8 +110,12 @@ class SpoTenantSiteListCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    if (args.options.includeOneDriveSites) {
+      await this.warn(logger, `Parameter 'includeOneDriveSites' is deprecated. Please use 'withOneDriveSites' instead`);
+    }
+
     const webTemplate: string = this.getWebTemplateId(args.options);
-    const includeOneDriveSites: boolean = args.options.includeOneDriveSites || false;
+    const includeOneDriveSites: boolean = (args.options.includeOneDriveSites || args.options.withOneDriveSites) || false;
     const personalSite: string = includeOneDriveSites === false ? '0' : '1';
 
     try {
@@ -150,7 +164,6 @@ class SpoTenantSiteListCommand extends SpoCommand {
 
       return;
     }
-
   }
 
   private getWebTemplateId(options: Options): string {
@@ -159,6 +172,10 @@ class SpoTenantSiteListCommand extends SpoCommand {
     }
 
     if (options.includeOneDriveSites) {
+      return '';
+    }
+
+    if (options.withOneDriveSites) {
       return '';
     }
 
