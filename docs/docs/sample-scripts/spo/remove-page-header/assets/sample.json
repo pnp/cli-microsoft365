@@ -1,0 +1,50 @@
+[
+  {
+    "name": "pnp-remove-page-header",
+    "source": "pnp",
+    "title": "Remove SharePoint page header",
+    "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/spo/remove-page-header",
+    "creationDateTime": "2025-03-04",
+    "updateDateTime": "2025-03-04",
+    "shortDescription": "The script removes a page header from a SharePoint page.",
+    "longDescription": [
+      "The script removes a page header from a SharePoint page."
+    ],
+    "products": [
+      "SharePoint"
+    ],
+    "categories": [],
+    "tags": [
+      "spo",
+      "page"
+    ],
+    "metadata": [
+      {
+        "key": "CLI-FOR-MICROSOFT365",
+        "value": "10.5.0"
+      }
+    ],
+    "thumbnails": [
+      {
+        "type": "image",
+        "order": 100,
+        "url": "https://raw.githubusercontent.com/pnp/cli-microsoft365/main/docs/docs/sample-scripts/spo/remove-page-header/assets/preview.png",
+        "alt": "preview image for the sample"
+      }
+    ],
+    "authors": [
+      {
+        "gitHubAccount": "mkm17",
+        "pictureUrl": "https://avatars.githubusercontent.com/u/17220108?v=4",
+        "name": "Michał Kornet"
+      }
+    ],
+    "references": [
+      {
+        "name": "Want to learn more about CLI for Microsoft 365 and the commands",
+        "description": "Check out the CLI for Microsoft 365 site to get started and for the reference to the commands.",
+        "url": "https://aka.ms/cli-m365"
+      }
+    ]
+  }
+]
