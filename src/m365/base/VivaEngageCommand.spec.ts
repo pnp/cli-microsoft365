@@ -32,7 +32,7 @@ class MockCommand extends VivaEngageCommand {
 
 describe('VivaEngageCommand', () => {
   before(() => {
-    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(telemetry, 'trackEvent').resolves();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);

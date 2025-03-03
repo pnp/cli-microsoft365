@@ -26,7 +26,7 @@ describe('DelegatedGraphCommand', () => {
   const cmd = new MockCommand();
 
   before(() => {
-    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(telemetry, 'trackEvent').resolves();
     auth.connection.active = true;
     auth.connection.accessTokens[auth.defaultResource] = {
       expiresOn: 'abc',

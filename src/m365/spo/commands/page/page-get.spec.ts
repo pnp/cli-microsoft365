@@ -1,5 +1,6 @@
 import assert from 'assert';
 import sinon from 'sinon';
+import { z } from 'zod';
 import auth from '../../../../Auth.js';
 import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
@@ -19,14 +20,16 @@ describe(commands.PAGE_GET, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: z.ZodTypeAny;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
-    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(telemetry, 'trackEvent').resolves();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
   });
 
   beforeEach(() => {
@@ -145,6 +148,25 @@ describe(commands.PAGE_GET, () => {
     }));
   });
 
+  it('gets information about home page when default option is specified', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/_api/Web/RootFolder?$select=WelcomePage`) {
+        return {
+          WelcomePage: '/SitePages/home.aspx'
+        };
+      }
+
+      if (opts.url === `https://contoso.sharepoint.com/_api/web/GetFileByServerRelativePath(DecodedUrl='/SitePages/home.aspx')?$expand=ListItemAllFields/ClientSideApplicationId,ListItemAllFields/PageLayoutType,ListItemAllFields/CommentsDisabled`) {
+        return pageListItemMock;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com', default: true, metadataOnly: true, output: 'json' } });
+    assert(loggerLogSpy.calledWith(pageListItemMock));
+  });
+
   it('check if section and control HTML parsing gets skipped for metadata only mode', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/GetFileByServerRelativePath(DecodedUrl='/sites/team-a/SitePages/home.aspx')`) > -1) {
@@ -200,23 +222,17 @@ describe(commands.PAGE_GET, () => {
   });
 
   it('supports specifying metadataOnly flag', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--metadataOnly') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', metadataOnly: true, default: true });
+    assert.strictEqual(actual.success, true);
   });
 
   it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'foo', name: 'home.aspx' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'foo' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('passes validation when the webUrl is a valid SharePoint URL and name is specified', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', name: 'home.aspx' } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', name: 'home.aspx' });
+    assert.strictEqual(actual.success, true);
   });
 });

@@ -160,6 +160,7 @@ class Request {
     }
 
     this.updateRequestForCloudType(options, auth.connection.cloudType);
+    this.removeDoubleSlashes(options);
 
     try {
       let accessToken = '';
@@ -228,6 +229,11 @@ class Request {
     const hostname = `${url.protocol}//${url.hostname}`;
     const cloudUrl: string = Auth.getEndpointForResource(hostname, cloudType);
     options.url = options.url!.replace(hostname, cloudUrl);
+  }
+
+  private removeDoubleSlashes(options: AxiosRequestConfig): void {
+    options.url = options.url!.substring(0, 8) +
+      options.url!.substring(8).replace('//', '/');
   }
 
   private createProxyConfigFromUrl(url: string): AxiosProxyConfig {

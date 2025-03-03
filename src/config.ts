@@ -2,7 +2,6 @@ import { app } from './utils/app.js';
 
 export default {
   allScopes: [
-    'https://graph.windows.net/Directory.AccessAsUser.All',
     'https://management.azure.com/user_impersonation',
     'https://admin.services.crm.dynamics.com/user_impersonation',
     'https://graph.microsoft.com/AppCatalog.ReadWrite.All',
@@ -26,6 +25,7 @@ export default {
     'https://graph.microsoft.com/Mail.Read.Shared',
     'https://graph.microsoft.com/Mail.ReadWrite',
     'https://graph.microsoft.com/Mail.Send',
+    'https://graph.microsoft.com/MailboxSettings.ReadWrite',
     'https://graph.microsoft.com/Notes.ReadWrite.All',
     'https://graph.microsoft.com/OnlineMeetingArtifact.Read.All',
     'https://graph.microsoft.com/OnlineMeetings.ReadWrite',
@@ -35,8 +35,10 @@ export default {
     'https://graph.microsoft.com/Policy.Read.All',
     'https://graph.microsoft.com/RecordsManagement.ReadWrite.All',
     'https://graph.microsoft.com/Reports.Read.All',
+    'https://graph.microsoft.com/ReportSettings.ReadWrite.All',
     'https://graph.microsoft.com/RoleAssignmentSchedule.ReadWrite.Directory',
     'https://graph.microsoft.com/RoleEligibilitySchedule.Read.Directory',
+    'https://graph.microsoft.com/RoleManagement.Read.Directory',
     'https://graph.microsoft.com/SecurityEvents.Read.All',
     'https://graph.microsoft.com/ServiceHealth.Read.All',
     'https://graph.microsoft.com/ServiceMessage.Read.All',

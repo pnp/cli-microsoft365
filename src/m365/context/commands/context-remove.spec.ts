@@ -15,7 +15,7 @@ describe(commands.REMOVE, () => {
   let promptIssued: boolean = false;
 
   before(() => {
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').resolves();
   });
 
   beforeEach(() => {

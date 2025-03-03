@@ -5,13 +5,17 @@ import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 import { CliRequestOptions } from "../../../../request.js";
 
-class SpoTenantHomeSiteListCommand extends SpoCommand {
+class SpoHomeSiteListCommand extends SpoCommand {
   public get name(): string {
-    return commands.TENANT_HOMESITE_LIST;
+    return commands.HOMESITE_LIST;
   }
 
   public get description(): string {
     return 'Lists all home sites';
+  }
+
+  public alias(): string[] | undefined {
+    return [commands.TENANT_HOMESITE_LIST];
   }
 
   public defaultProperties(): string[] | undefined {
@@ -19,6 +23,8 @@ class SpoTenantHomeSiteListCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger): Promise<void> {
+    await this.showDeprecationWarning(logger, commands.TENANT_HOMESITE_LIST, commands.HOMESITE_LIST);
+
     try {
       const spoAdminUrl: string = await spo.getSpoAdminUrl(logger, this.verbose);
       const requestOptions: CliRequestOptions = {
@@ -40,4 +46,4 @@ class SpoTenantHomeSiteListCommand extends SpoCommand {
   }
 }
 
-export default new SpoTenantHomeSiteListCommand();
+export default new SpoHomeSiteListCommand();

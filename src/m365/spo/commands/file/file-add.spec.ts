@@ -197,7 +197,7 @@ describe(commands.FILE_ADD, () => {
   before(() => {
     ensureFolderStub = sinon.stub(spo, 'ensureFolder').resolves();
     sinon.stub(auth, 'restoreAuth').resolves();
-    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(telemetry, 'trackEvent').resolves();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     sinon.stub(Buffer, 'alloc').returns(Buffer.from('abc'));

@@ -14,6 +14,7 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   groupId?: string;
   groupDisplayName?: string;
+  groupName?: string;
   ids?: string;
   userNames?: string;
   role: string;
@@ -45,6 +46,7 @@ class EntraGroupMemberSetCommand extends GraphCommand {
       Object.assign(this.telemetryProperties, {
         groupId: typeof args.options.groupId !== 'undefined',
         groupDisplayName: typeof args.options.groupDisplayName !== 'undefined',
+        groupName: typeof args.options.groupName !== 'undefined',
         ids: typeof args.options.ids !== 'undefined',
         userNames: typeof args.options.userNames !== 'undefined'
       });
@@ -57,7 +59,10 @@ class EntraGroupMemberSetCommand extends GraphCommand {
         option: '-i, --groupId [groupId]'
       },
       {
-        option: '-n, --groupDisplayName [groupDisplayName]'
+        option: '--groupDisplayName [groupDisplayName]'
+      },
+      {
+        option: '-n, --groupName [groupName]'
       },
       {
         option: '--ids [ids]'
@@ -104,19 +109,23 @@ class EntraGroupMemberSetCommand extends GraphCommand {
 
   #initOptionSets(): void {
     this.optionSets.push(
-      { options: ['groupId', 'groupDisplayName'] },
+      { options: ['groupId', 'groupDisplayName', 'groupName'] },
       { options: ['ids', 'userNames'] }
     );
   }
 
   #initTypes(): void {
-    this.types.string.push('groupId', 'groupDisplayName', 'ids', 'userNames', 'role');
+    this.types.string.push('groupId', 'groupDisplayName', 'groupName', 'ids', 'userNames', 'role');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
+      if (args.options.groupDisplayName) {
+        await this.warn(logger, `Option 'groupDisplayName' is deprecated and will be removed in the next major release.`);
+      }
+
       if (this.verbose) {
-        await logger.logToStderr(`Adding member(s) ${args.options.ids || args.options.userNames} to role ${args.options.role} of group ${args.options.groupId || args.options.groupDisplayName}...`);
+        await logger.logToStderr(`Adding member(s) ${args.options.ids || args.options.userNames} to role ${args.options.role} of group ${args.options.groupId || args.options.groupDisplayName || args.options.groupName}...`);
       }
 
       const groupId = await this.getGroupId(logger, args.options);
@@ -140,10 +149,10 @@ class EntraGroupMemberSetCommand extends GraphCommand {
     }
 
     if (this.verbose) {
-      await logger.logToStderr(`Retrieving ID of group ${options.groupDisplayName}...`);
+      await logger.logToStderr(`Retrieving ID of group ${options.groupDisplayName || options.groupName}...`);
     }
 
-    return entraGroup.getGroupIdByDisplayName(options.groupDisplayName!);
+    return entraGroup.getGroupIdByDisplayName(options.groupDisplayName! || options.groupName!);
   }
 
   private async getUserIds(logger: Logger, options: Options): Promise<string[]> {

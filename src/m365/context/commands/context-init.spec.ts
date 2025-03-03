@@ -13,7 +13,7 @@ describe(commands.INIT, () => {
   let logger: Logger;
 
   before(() => {
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').resolves();
   });
 
   beforeEach(() => {

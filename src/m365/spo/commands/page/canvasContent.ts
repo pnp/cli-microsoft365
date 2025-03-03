@@ -1,9 +1,11 @@
+import { ClientSideControlPosition, ZoneGroupMetadata } from "./clientsidepages";
+
 export interface Control {
   controlType?: number;
   displayMode: number;
   emphasis?: { zoneEmphasis?: number };
   id?: string;
-  position: ControlPosition;
+  position: ClientSideControlPosition;
   reservedHeight?: number;
   reservedWidth?: number;
   webPartData?: any;
@@ -44,22 +46,4 @@ export interface BackgroundControl {
     },
     dataVersion: string;
   }
-}
-
-interface ControlPosition {
-  controlIndex?: number;
-  layoutIndex: number;
-  sectionFactor: number;
-  sectionIndex: number;
-  zoneIndex: number;
-  isLayoutReflowOnTop?: boolean;
-  zoneId?: string;
-}
-
-interface ZoneGroupMetadata {
-  type: number;
-  isExpanded: boolean;
-  showDividerLine: boolean;
-  iconAlignment: string;
-  displayName?: string;
 }

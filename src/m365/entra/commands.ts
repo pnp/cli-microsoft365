@@ -89,9 +89,13 @@ export default {
   PIM_ROLE_ASSIGNMENT_ELIGIBILITY_LIST: `${prefix} pim role assignment eligibility list`,
   PIM_ROLE_REQUEST_LIST: `${prefix} pim role request list`,
   POLICY_LIST: `${prefix} policy list`,
+  RESOURCENAMESPACE_LIST: `${prefix} resourcenamespace list`,
+  ROLEDEFINITION_ADD: `${prefix} roledefinition add`,
   ROLEDEFINITION_LIST: `${prefix} roledefinition list`,
   ROLEDEFINITION_GET: `${prefix} roledefinition get`,
   ROLEDEFINITION_REMOVE: `${prefix} roledefinition remove`,
+  ROLEDEFINITION_SET: `${prefix} roledefinition set`,
+  ROLEPERMISSION_LIST: `${prefix} rolepermission list`,
   SITECLASSIFICATION_DISABLE: `${prefix} siteclassification disable`,
   SITECLASSIFICATION_ENABLE: `${prefix} siteclassification enable`,
   SITECLASSIFICATION_GET: `${prefix} siteclassification get`,
@@ -116,6 +120,7 @@ export default {
   USER_REGISTRATIONDETAILS_LIST: `${prefix} user registrationdetails list`,
   USER_REMOVE: `${prefix} user remove`,
   USER_RECYCLEBINITEM_RESTORE: `${prefix} user recyclebinitem restore`,
+  USER_SESSION_REVOKE: `${prefix} user session revoke`,
   USER_SET: `${prefix} user set`,
   USER_SIGNIN_LIST: `${prefix} user signin list`
 };

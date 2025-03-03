@@ -15,8 +15,11 @@ m365 spo page get [options]
 ## Options
 
 ```md definition-list
-`-n, --name <name>`
-: Name of the page to retrieve.
+`-n, --name [name]`
+: Name of the page to retrieve. Specify either `name` or `default`, but not both. 
+
+`--default`
+: Get the homepage of a specific web. Specify either `name` or `default`, but not both.
 
 `-u, --webUrl <webUrl>`
 : URL of the site where the page to retrieve is located.
@@ -37,6 +40,12 @@ Get information about the modern page.
 
 ```sh
 m365 spo page get --webUrl https://contoso.sharepoint.com/sites/team-a --name home.aspx
+```
+
+Get information about the home page.
+
+```sh
+m365 spo page get --webUrl https://contoso.sharepoint.com/sites/team-a --default
 ```
 
 Get all the metadata from the modern page, without the section and control count information.

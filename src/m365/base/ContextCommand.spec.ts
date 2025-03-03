@@ -32,7 +32,7 @@ describe('ContextCommand', () => {
   const contextInfo: Hash = {};
 
   before(() => {
-    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(telemetry, 'trackEvent').resolves();
   });
 
   beforeEach(() => {
