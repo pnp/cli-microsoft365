@@ -23,7 +23,7 @@ class VivaEngageCommunityRemoveCommand extends GraphCommand {
     return commands.ENGAGE_COMMUNITY_REMOVE;
   }
   public get description(): string {
-    return 'Removes a community';
+    return 'Removes a Viva Engage community';
   }
 
   constructor() {

@@ -26,7 +26,7 @@ describe(commands.ENGAGE_COMMUNITY_REMOVE, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
-    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(telemetry, 'trackEvent').resolves();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
@@ -46,9 +46,9 @@ describe(commands.ENGAGE_COMMUNITY_REMOVE, () => {
         log.push(msg);
       }
     };
-    sinon.stub(cli, 'promptForConfirmation').callsFake(() => {
+    sinon.stub(cli, 'promptForConfirmation').callsFake(async () => {
       promptIssued = true;
-      return Promise.resolve(false);
+      return false;
     });
 
     promptIssued = false;
@@ -75,7 +75,7 @@ describe(commands.ENGAGE_COMMUNITY_REMOVE, () => {
   });
 
   it('passes validation when entraGroupId is specified', async () => {
-    const actual = await command.validate({ options: { entraGroupId: '0bed8b86-5026-4a93-ac7d-56750cc099f1' } }, commandInfo);
+    const actual = await command.validate({ options: { entraGroupId: entraGroupId } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
