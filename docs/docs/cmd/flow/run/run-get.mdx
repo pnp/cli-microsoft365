@@ -16,22 +16,22 @@ m365 flow run get [options]
 
 ```md definition-list
 `-n, --name <name>`
-: The name of the run to get information about
+: The name of the run to get information about.
 
 `--flowName <flowName>`
-: The name of the Power Automate flow for which to retrieve information
+: The name of the Power Automate flow for which to retrieve information.
 
 `-e, --environmentName <environmentName>`
 : The name of the environment where the flow is located
 
 `--includeTriggerInformation`
-: (deprecated. Use option `withTrigger` instead) If specified, include information about the trigger details
+: (deprecated. Use option `withTrigger` instead) If specified, include information about the trigger details.
 
 `--withTrigger`
-: If specified, include information about the trigger details
+: If specified, include information about the trigger details.
 
 `--withActions [withActions]`
-: If specified, include information about all actions when no action names are specified, or provide a specified list of actions separated by commas to include only the relevant action details
+: If specified, include information about all actions when no action names are specified, or provide a specified list of actions separated by commas to include only the relevant action details.
 
 ```
 
@@ -55,13 +55,13 @@ If the option `withTrigger` is specified, but the trigger does not contain an ou
 
 ## Examples
 
-Get information about the given run of the specified Power Automate flow
+Get information about the given run of the specified Power Automate flow.
 
 ```sh
 m365 flow run get --environmentName Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --flowName 5923cb07-ce1a-4a5c-ab81-257ce820109a --name 08586653536760200319026785874CU62
 ```
 
-Get information about the given run of the specified Power Automate flow including trigger information
+Get information about the given run of the specified Power Automate flow including trigger information.
 
 ```sh
 m365 flow run get --environmentName Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --flowName 5923cb07-ce1a-4a5c-ab81-257ce820109a --name 08586653536760200319026785874CU62 --withTrigger
@@ -73,7 +73,7 @@ Get information about the given run of the specified Power Automate flow includi
 m365 flow run get --environmentName Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --flowName 5923cb07-ce1a-4a5c-ab81-257ce820109a --name 08586653536760200319026785874CU62 --withActions
 ```
 
-Get information about the given run of the specified Power Automate flow including exclusively the details of 'Action_Internal_Name1' and 'Action_Internal_Name2' actions
+Get information about the given run of the specified Power Automate flow including exclusively the details of 'Action_Internal_Name1' and 'Action_Internal_Name2' actions.
 
 ```sh
 m365 flow run get --environmentName Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --flowName 5923cb07-ce1a-4a5c-ab81-257ce820109a --name 08586653536760200319026785874CU62 --withActions "Action_Internal_Name1,Action_Internal_Name2"
@@ -137,11 +137,15 @@ m365 flow run get --environmentName Default-d87a7535-dd31-4437-bfe1-95340acd55c5
   <TabItem value="Text">
 
   ```text
-  endTime    : 2023-03-04T09:05:22.5880202Z
-  name       : 08585236861638480597867166179CU104
-  startTime  : 2023-03-04T09:05:21.8066368Z
-  status     : Succeeded
-  triggerName: When_an_email_is_flagged_(V4)
+  correlation: {"clientTrackingId":"08585329112602833829909892130CU00"}
+  endTime    : 
+  id         : /providers/Microsoft.ProcessSimple/environments/Default-de348bc7-1aeb-4406-8cb3-97db021cadb4/flows/170fb67e-a514-4d84-8727-582022bd13a9/runs/08585329112602833828909892130CU17
+  name       : 08585329112602833828909892130CU17
+  properties : {"correlation":{"clientTrackingId":"08585329112602833829909892130CU00"},"startTime":"2022-11-17T14:33:45.2763872Z","status":"Running","trigger":{"correlation":{"clientTrackingId":"08585329112602833829909892130CU00"},"endTime":"2022-11-17T14:33:45.1914506Z","inputsLink":{"contentHash":{"algorithm":"md5","value":"6ZrBBE+MJg7IvhMgyJLMmA=="},"contentSize":349,"contentVersion":"6ZrBBE+MJg7IvhMgyJLMmA==","uri":"https://prod-08.centralindia.logic.azure.com:443/workflows/f7bf8f6b5c494e63bfc21b54087a596e/runs/08585329112602833828909892130CU17/contents/TriggerInputs?api-version=2016-06-01&se=2022-11-17T18%3A00%3A00.0000000Z&sp=%2Fruns%2F08585329112602833828909892130CU17%2Fcontents%2FTriggerInputs%2Fread&sv=1.0&sig="},"name":"When_a_new_response_is_submitted","originHistoryName":"08585329112602833829909892130CU00","outputsLink":{"contentHash":{"algorithm":"md5","value":"Z/4a8tfYygNAR1xpc44iww=="},"contentSize":493,"contentVersion":"Z/4a8tfYygNAR1xpc44iww==","uri":"https://prod-08.centralindia.logic.azure.com:443/workflows/f7bf8f6b5c494e63bfc21b54087a596e/runs/08585329112602833828909892130CU17/contents/TriggerOutputs?api-version=2016-06-01&se=2022-11-17T18%3A00%3A00.0000000Z&sp=%2Fruns%2F08585329112602833828909892130CU17%2Fcontents%2FTriggerOutputs%2Fread&sv=1.0&sig="},"startTime":"2022-11-17T14:33:45.1914506Z","status":"Succeeded"}}
+  startTime  : 2022-11-17T14:33:45.2763872Z
+  status     : Running
+  triggerName: When_a_new_response_is_submitted
+  type       : Microsoft.ProcessSimple/environments/flows/runs
   ```
 
   </TabItem>

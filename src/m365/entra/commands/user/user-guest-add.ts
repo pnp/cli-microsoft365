@@ -73,10 +73,6 @@ class EntraUserGuestAddCommand extends GraphCommand {
     );
   }
 
-  public defaultProperties(): string[] | undefined {
-    return ['id', 'inviteRedeemUrl', 'invitedUserDisplayName', 'invitedUserEmailAddress', 'invitedUserType', 'resetRedemption', 'sendInvitationMessage', 'status'];
-  }
-
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       const requestOptions: CliRequestOptions = {

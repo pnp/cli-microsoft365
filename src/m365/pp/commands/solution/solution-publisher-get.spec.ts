@@ -85,10 +85,6 @@ describe(commands.SOLUTION_PUBLISHER_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('defines correct properties for the default output', () => {
-    assert.deepStrictEqual(command.defaultProperties(), ['publisherid', 'uniquename', 'friendlyname']);
-  });
-
   it('fails validation when no publisher found', async () => {
     sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').callsFake(async () => envUrl);
 

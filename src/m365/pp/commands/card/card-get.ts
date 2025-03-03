@@ -29,10 +29,6 @@ class PpCardGetCommand extends PowerPlatformCommand {
     return 'Get specific Microsoft Power Platform card in the specified Power Platform environment.';
   }
 
-  public defaultProperties(): string[] | undefined {
-    return ['name', 'cardid', 'publishdate', 'createdon', 'modifiedon'];
-  }
-
   constructor() {
     super();
 

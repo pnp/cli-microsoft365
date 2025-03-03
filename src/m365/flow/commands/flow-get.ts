@@ -49,10 +49,6 @@ class FlowGetCommand extends PowerAutomateCommand {
     return 'Gets information about the specified Microsoft Flow';
   }
 
-  public defaultProperties(): string[] | undefined {
-    return ['name', 'displayName', 'description', 'triggers', 'actions'];
-  }
-
   constructor() {
     super();
 

@@ -30,10 +30,6 @@ class PlannerBucketAddCommand extends GraphCommand {
     return 'Adds a new Microsoft Planner bucket';
   }
 
-  public defaultProperties(): string[] | undefined {
-    return ['id', 'name', 'planId', 'orderHint'];
-  }
-
   constructor() {
     super();
 

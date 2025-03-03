@@ -70,10 +70,6 @@ describe(commands.ENGAGE_MESSAGE_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('defines correct properties for the default output', () => {
-    assert.deepStrictEqual(command.defaultProperties(), ['id', 'sender_id', 'replied_to_id', 'thread_id', 'group_id', 'created_at', 'direct_message', 'system_message', 'privacy', 'message_type', 'content_excerpt']);
-  });
-
   it('id must be a number', async () => {
     const actual = await command.validate({ options: { id: 'nonumber' } }, commandInfo);
     assert.notStrictEqual(actual, true);

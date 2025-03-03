@@ -35,7 +35,7 @@ class SpoPageGetCommand extends SpoCommand {
   public get description(): string {
     return 'Gets information about the specific modern page';
   }
-
+  
   public defaultProperties(): string[] | undefined {
     return ['commentsDisabled', 'numSections', 'numControls', 'title', 'layoutType'];
   }

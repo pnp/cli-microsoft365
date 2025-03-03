@@ -68,10 +68,6 @@ describe(commands.PAGE_COPY, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('defines correct properties for the default output', () => {
-    assert.deepStrictEqual(command.defaultProperties(), ['Id', 'PageLayoutType', 'Title', 'Url']);
-  });
-
   it('create a page copy', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/SP.MoveCopyUtil.CopyFileByPath()`) > -1) {
