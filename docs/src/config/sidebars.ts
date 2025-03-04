@@ -2137,6 +2137,11 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'container list',
               id: 'cmd/spe/container/container-list'
+            },
+            {
+              type: 'doc',
+              label: 'container permission list',
+              id: 'cmd/spe/container/container-permission-list'
             }
           ]
         },

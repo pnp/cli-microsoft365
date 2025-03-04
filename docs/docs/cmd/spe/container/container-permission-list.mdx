@@ -1,0 +1,90 @@
+import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# spe container permission list
+
+Lists permissions of a SharePoint Embedded Container
+
+## Usage
+
+```sh
+m365 spe container permission list [options]
+```
+
+## Options
+
+```md definition-list
+`-i, --containerId <id>`
+: The ID of the SharePoint Embedded Container.
+```
+
+<Global />
+
+## Examples
+
+Lists Container permissions.
+
+```sh
+m365 spe container permission list --containerId "b!ISJs1WRro0y0EWgkUYcktDa0mE8zSlFEqFzqRn70Zwp1CEtDEBZgQICPkRbil_5Z"
+```
+
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  [
+    {
+      "id": "X2k6MCMuZnxtZW1iZXJzaGlwfGRlYnJhYkBuYWNoYW4zNjUub25taWNyb3NvZnQuY29t",
+      "roles": [
+        "owner"
+      ],
+      "grantedToV2": {
+        "user": {
+          "displayName": "John Doe",
+          "email": "john.doe@contoso.onmicrosoft.com",
+          "userPrincipalName": "john.doe@contoso.onmicrosoft.com"
+        }
+      }
+    }
+  ]
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  id                                                                    userPrincipalName                 roles
+  --------------------------------------------------------------------  --------------------------------  ------
+  X2k6MCMuZnxtZW1iZXJzaGlwfGRlYnJhYkBuYWNoYW4zNjUub25taWNyb3NvZnQuY29t  john.doe@contoso.onmicrosoft.com  owner
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  id,roles,userPrincipalName
+  X2k6MCMuZnxtZW1iZXJzaGlwfGRlYnJhYkBuYWNoYW4zNjUub25taWNyb3NvZnQuY29t,owner,john.doe@contoso.onmicrosoft.com
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # spe container permission list --containerId "b!ISJs1WRro0y0EWgkUYcktDa0mE8zSlFEqFzqRn70Zwp1CEtDEBZgQICPkRbil_5Z"
+
+  Date: 3/3/2025
+
+  ## X2k6MCMuZnxtZW1iZXJzaGlwfGRlYnJhYkBuYWNoYW4zNjUub25taWNyb3NvZnQuY29t
+
+  Property | Value
+  ---------|-------
+  id | X2k6MCMuZnxtZW1iZXJzaGlwfGRlYnJhYkBuYWNoYW4zNjUub25taWNyb3NvZnQuY29t
+  roles | owner
+  userPrincipalName | john.doe@contoso.onmicrosoft.com
+  ```
+
+  </TabItem>
+</Tabs>
