@@ -2112,7 +2112,7 @@ const sidebars: SidebarsConfig = {
             {
               type: 'doc',
               label: 'container permission list',
-              id: 'cmd/entra/app/container-permission-list'
+              id: 'cmd/spe/container/container-permission-list'
             }
           ]
         },
