@@ -91,10 +91,12 @@ class VivaEngageCommunityUserRemoveCommand extends GraphCommand {
     let entraGroupId = options.entraGroupId;
 
     if (options.communityDisplayName) {
-      entraGroupId = await vivaEngage.getEntraGroupIdByCommunityDisplayName(options.communityDisplayName);
+      const community = await vivaEngage.getCommunityByDisplayName(options.communityDisplayName, ['groupId']);
+      entraGroupId = community.groupId;
     }
     else if (options.communityId) {
-      entraGroupId = await vivaEngage.getEntraGroupIdByCommunityId(options.communityId);
+      const community = await vivaEngage.getCommunityById(options.communityId, ['groupId']);
+      entraGroupId = community.groupId;
     }
 
     const userId = options.id || await entraUser.getUserIdByUpn(options.userName!);
