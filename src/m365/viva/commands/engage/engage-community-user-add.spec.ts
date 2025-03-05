@@ -32,15 +32,15 @@ describe(commands.ENGAGE_COMMUNITY_USER_ADD, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
-    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(telemetry, 'trackEvent').resolves();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
     commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
     sinon.stub(entraUser, 'getUserIdsByUpns').resolves(userIds);
-    sinon.stub(vivaEngage, 'getEntraGroupIdByCommunityDisplayName').resolves(entraGroupId);
-    sinon.stub(vivaEngage, 'getEntraGroupIdByCommunityId').resolves(entraGroupId);
+    sinon.stub(vivaEngage, 'getCommunityByDisplayName').resolves({ groupId: entraGroupId });
+    sinon.stub(vivaEngage, 'getCommunityById').resolves({ groupId: entraGroupId });
   });
 
   beforeEach(() => {
