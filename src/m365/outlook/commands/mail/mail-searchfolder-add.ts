@@ -1,13 +1,14 @@
 import { MailSearchFolder } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli/Logger.js';
 import request, { CliRequestOptions } from '../../../../request.js';
-import { entraUser } from '../../../../utils/entraUser.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 import { z } from 'zod';
 import { globalOptionsZod } from '../../../../Command.js';
 import { zod } from '../../../../utils/zod.js';
 import { validation } from '../../../../utils/validation.js';
+import { accessToken } from '../../../../utils/accessToken.js';
+import auth from '../../../../Auth.js';
 
 const options = globalOptionsZod
   .extend({
@@ -47,25 +48,38 @@ class OutlookMailSearchFolderAddCommand extends GraphCommand {
 
   public getRefinedSchema(schema: typeof options): z.ZodEffects<any> | undefined {
     return schema
-      .refine(options => !options.userId !== !options.userName, {
+      .refine(options => !(options.userId && options.userName), {
         message: 'Specify either userId or userName, but not both'
       });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
-      let userId = args.options.userId;
+      const isAppOnlyAccessToken = accessToken.isAppOnlyAccessToken(auth.connection.accessTokens[auth.defaultResource].accessToken);
 
-      if (args.options.userName) {
-        userId = await entraUser.getUserIdByUpn(args.options.userName);
+      let requestUrl = `${this.resource}/v1.0/me/mailFolders/searchFolders/childFolders`;
+
+      if (isAppOnlyAccessToken) {
+        if (!args.options.userId && !args.options.userName) {
+          throw 'When running with application permissions either userId or userName is required';
+        }
+
+        const userIdentifier = args.options.userId ?? args.options.userName;
+
+        requestUrl = `${this.resource}/v1.0/users('${userIdentifier}')/mailFolders/searchFolders/childFolders`;
+
+        if (args.options.verbose) {
+          await logger.logToStderr(`Creating a mail search folder in the mailbox of the user ${userIdentifier}...`);
+        }
       }
-
-      if (args.options.verbose) {
-        await logger.logToStderr(`Creating a mail search folder in the mailbox of the user ${userId}...`);
+      else {
+        if (args.options.userId || args.options.userName) {
+          throw 'You can create mail search folder for other users only if CLI is authenticated in app-only mode';
+        }
       }
 
       const requestOptions: CliRequestOptions = {
-        url: `${this.resource}/v1.0/users/${userId}/mailFolders/searchFolders/childFolders`,
+        url: requestUrl,
         headers: {
           accept: 'application/json;odata.metadata=none',
           'content-type': 'application/json'
