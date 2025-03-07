@@ -14,16 +14,48 @@ interface Options extends GlobalOptions {
 
 const policyEndPoints: any = {
   activitybasedtimeout: "activityBasedTimeoutPolicies",
+  adminconsentrequest: "adminConsentRequestPolicy",
+  appManagement: "appManagementPolicies",
+  authenticationflows: "authenticationFlowsPolicy",
+  authenticationmethods: "authenticationMethodsPolicy",
+  authenticationstrength: "authenticationStrengthPolicies",
   authorization: "authorizationPolicy",
   claimsmapping: "claimsMappingPolicies",
+  conditionalaccess: "conditionalAccessPolicies",
+  crosstenantaccess: "crossTenantAccessPolicy",
+  defaultappmanagement: "defaultAppManagementPolicy",
+  deviceregistration: "deviceRegistrationPolicy",
+  featurerolloutpolicy: "featureRolloutPolicies",
   homerealmdiscovery: "homeRealmDiscoveryPolicies",
   identitysecuritydefaultsenforcement: "identitySecurityDefaultsEnforcementPolicy",
+  permissiongrant: "permissionGrantPolicies",
+  rolemanagement: "roleManagementPolicies",
   tokenissuance: "tokenIssuancePolicies",
   tokenlifetime: "tokenLifetimePolicies"
 };
 
 class EntraPolicyListCommand extends GraphCommand {
-  private static readonly supportedPolicyTypes: string[] = ['activityBasedTimeout', 'authorization', 'claimsMapping', 'homeRealmDiscovery', 'identitySecurityDefaultsEnforcement', 'tokenIssuance', 'tokenLifetime'];
+  private static readonly supportedPolicyTypes: string[] = [
+    'activityBasedTimeout',
+    'adminConsentRequest',
+    'appManagement',
+    'authenticationFlows',
+    'authenticationMethods',
+    'authenticationStrength',
+    'authorization',
+    'claimsMapping',
+    'conditionalAccess',
+    'crossTenantAccess',
+    'defaultAppManagement',
+    'deviceRegistration',
+    'featureRolloutPolicy',
+    'homeRealmDiscovery',
+    'identitySecurityDefaultsEnforcement',
+    'permissionGrant',
+    'roleManagement',
+    'tokenIssuance',
+    'tokenLifetime'
+  ];
 
   public get name(): string {
     return commands.POLICY_LIST;
@@ -103,8 +135,16 @@ class EntraPolicyListCommand extends GraphCommand {
 
   private async getPolicies(policyType: string): Promise<any> {
     const endpoint = policyEndPoints[policyType];
+
+    let requestUrl = `${this.resource}/v1.0/policies/${endpoint}`;
+
+    if (endpoint === policyEndPoints.rolemanagement) {
+      // roleManagementPolicies endpoint requires $filter query parameter
+      requestUrl += `?$filter=scopeId eq '/' and scopeType eq 'DirectoryRole'`;
+    }
+
     const requestOptions: CliRequestOptions = {
-      url: `${this.resource}/v1.0/policies/${endpoint}`,
+      url: requestUrl,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },
@@ -113,7 +153,13 @@ class EntraPolicyListCommand extends GraphCommand {
 
     const response = await request.get<any>(requestOptions);
 
-    if (endpoint === policyEndPoints.authorization ||
+    if (endpoint === policyEndPoints.adminconsentrequest ||
+      endpoint === policyEndPoints.authenticationflows ||
+      endpoint === policyEndPoints.authenticationmethods ||
+      endpoint === policyEndPoints.authorization ||
+      endpoint === policyEndPoints.crosstenantaccess ||
+      endpoint === policyEndPoints.defaultappmanagement ||
+      endpoint === policyEndPoints.deviceregistration ||
       endpoint === policyEndPoints.identitysecuritydefaultsenforcement) {
       return response;
     }

@@ -34,6 +34,7 @@ export default {
     'https://graph.microsoft.com/PeopleSettings.ReadWrite.All',
     'https://graph.microsoft.com/Place.Read.All',
     'https://graph.microsoft.com/Policy.Read.All',
+    'https://graph.microsoft.com/Policy.Read.PermissionGrant',
     'https://graph.microsoft.com/RecordsManagement.ReadWrite.All',
     'https://graph.microsoft.com/Reports.Read.All',
     'https://graph.microsoft.com/ReportSettings.ReadWrite.All',
