@@ -1,0 +1,230 @@
+openapi: 3.0.4
+info:
+  title: SharePoint REST API
+  description: SharePoint REST API
+  version: v1.0
+servers:
+  - url: https://{tenant}.sharepoint.com/{site}
+    variables:
+      tenant:
+        default: contoso
+      site:
+        default: ""
+components:
+  securitySchemes:
+    delegated:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: https://login.microsoftonline.com/common/v2.0/oauth2/authorize
+          tokenUrl: https://login.microsoftonline.com/common/v2.0/oauth2/token
+          scopes:
+            AllSites.FullControl: AllSites.FullControl
+            AllSites.Manage: AllSites.Manage
+            AllSites.Read: AllSites.Read
+            AllSites.Write: AllSites.Write
+            EnterpriseResource.Read: EnterpriseResource.Read
+            EnterpriseResource.Write: EnterpriseResource.Write
+            MyFiles.Read: MyFiles.Read
+            MyFiles.Write: MyFiles.Write
+            Project.Read: Project.Read
+            Project.Write: Project.Write
+            ProjectWebApp.FullControl: ProjectWebApp.FullControl
+            ProjectWebAppReporting.Read: ProjectWebAppReporting.Read
+            Sites.Search.All: Sites.Search.All
+            TaskStatus.Submit: TaskStatus.Submit
+            TermStore.Read.All: TermStore.Read.All
+            TermStore.ReadWrite.All: TermStore.ReadWrite.All
+            User.Read.All: User.Read.All
+            User.ReadWrite.All: User.ReadWrite.All
+    application:
+      type: oauth2
+      flows:
+        clientCredentials:
+          tokenUrl: https://login.microsoftonline.com/common/v2.0/oauth2/token
+          scopes:
+            Sites.FullControl.All: Sites.FullControl.All
+            Sites.Manage.All: Sites.Manage.All
+            Sites.Read.All: Sites.Read.All
+            Sites.ReadWrite.All: Sites.ReadWrite.All
+            Sites.Selected: Sites.Selected
+            TermStore.Read.All: TermStore.Read.All
+            TermStore.ReadWrite.All: TermStore.ReadWrite.All
+            User.Read.All: User.Read.All
+            User.ReadWrite.All: User.ReadWrite.All
+paths:
+  /_api/contextinfo:
+    post:
+      security:
+        - delegated:
+          - AllSites.Read
+          - AllSites.Write
+          - AllSites.Manage
+          - AllSites.FullControl
+      responses:
+        200:
+          description: OK
+  /_api/SP_TenantSettings_Current:
+    get:
+      security:
+        - delegated:
+          - AllSites.Read
+          - AllSites.Write
+          - AllSites.Manage
+          - AllSites.FullControl
+      responses:
+        200:
+          description: OK
+  /_api/web:
+    get:
+      security:
+        - delegated:
+          - AllSites.Read
+          - AllSites.Write
+          - AllSites.Manage
+          - AllSites.FullControl
+      responses:
+        200:
+          description: OK
+  /_api/web/folders/addUsingPath(decodedUrl={folderPath}):
+    post:
+      parameters:
+        - name: folderPath
+          in: path
+          required: true
+          description: URL-encoded server-relative path to the folder
+          schema:
+            type: string
+          example: "'%2FShared%20Documents%2FMy%20Folder%20Name'"
+      security:
+        - delegated:
+          - AllSites.Write
+          - AllSites.Manage
+          - AllSites.FullControl
+      responses:
+        200:
+          description: OK
+  /_api/web/GetFolderByServerRelativePath(DecodedUrl={folderPath}):
+    get:
+      parameters:
+        - name: folderPath
+          in: path
+          required: true
+          description: URL-encoded server-relative path to the folder
+          schema:
+            type: string
+          example: "'%2FShared%20Documents'"
+      security:
+        - delegated:
+          - AllSites.Read
+          - AllSites.Write
+          - AllSites.Manage
+          - AllSites.FullControl
+      responses:
+        200:
+          description: OK
+  /_api/web/GetFolderByServerRelativePath(DecodedUrl={folderPath})/Files/Add({filesAddOptions}):
+    post:
+      parameters:
+        - name: folderPath
+          in: path
+          required: true
+          description: URL-encoded server-relative path to the folder
+          schema:
+            type: string
+          example: "'%2FShared%20Documents'"
+        - name: filesAddOptions
+          in: path
+          required: true
+          description: Options for adding files
+          schema:
+            type: string
+          example: "url='README.md',%20overwrite=true"
+      security:
+        - delegated:
+          - AllSites.Write
+          - AllSites.Manage
+          - AllSites.FullControl
+      responses:
+        200:
+          description: OK
+  /_api/web/lists:
+    get:
+      security:
+        - delegated:
+          - AllSites.Read
+          - AllSites.Write
+          - AllSites.Manage
+          - AllSites.FullControl
+        - application:
+          - Sites.Read.All
+          - Sites.Manage.All
+          - Sites.ReadWrite.All
+          - Sites.FullControl.All
+      responses:
+        200:
+          description: OK
+  /_api/web/webs:
+    get:
+      security:
+        - delegated:
+          - AllSites.Write
+          - AllSites.Manage
+          - AllSites.FullControl
+        - application:
+          - Sites.Read.All
+          - Sites.Manage.All
+          - Sites.ReadWrite.All
+          - Sites.FullControl.All
+      responses:
+        200:
+          description: OK
+  /sites/{appCatalog}/_api/web/tenantappcatalog/Add({addOptions}):
+    post:
+      parameters:
+        - name: appCatalog
+          in: path
+          required: true
+          description: App catalog site URL
+          schema:
+            type: string
+          example: "appcatalog"
+        - name: addOptions
+          in: path
+          required: true
+          description: Options for adding the app package
+          schema:
+            type: string
+          example: "overwrite=false,%20url='spfx.sppkg'"
+      security:
+        - delegated:
+          - AllSites.FullControl
+      responses:
+        200:
+          description: OK
+  /sites/{appCatalog}/_api/web/tenantappcatalog/AvailableApps/GetById({appId})/deploy:
+    post:
+      parameters:
+        - name: appCatalog
+          in: path
+          required: true
+          description: App catalog site URL
+          schema:
+            type: string
+          example: "appcatalog"
+        - name: appId
+          in: path
+          required: true
+          description: App ID to deploy
+          schema:
+            type: string
+          example: "'f55e3c17-63ea-456a-8451-48d2839760f7'"
+      security:
+        - delegated:
+          - AllSites.FullControl
+      responses:
+        200:
+          description: OK
+x-ms-generated-by:
+  toolName: Dev Proxy
+  toolVersion: 0.25.0

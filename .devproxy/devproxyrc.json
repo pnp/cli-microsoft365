@@ -1,0 +1,48 @@
+{
+  "$schema": "https://raw.githubusercontent.com/dotnet/dev-proxy/main/schemas/v1.0.0/rc.schema.json",
+  "plugins": [
+    {
+      "name": "GraphMinimalPermissionsPlugin",
+      "enabled": true,
+      "pluginPath": "~appFolder/plugins/DevProxy.Plugins.dll",
+      "urlsToWatch": [
+        "https://graph.microsoft.com/*"
+      ]
+    },
+    {
+      "name": "MinimalPermissionsPlugin",
+      "enabled": true,
+      "pluginPath": "~appFolder/plugins/DevProxy.Plugins.dll",
+      "configSection": "minimalPermissionsPlugin",
+      "urlsToWatch": [
+        "https://*.sharepoint.com/*_api/*"
+      ]
+    },
+    {
+      "name": "MinimalCsomPermissionsPlugin",
+      "enabled": true,
+      "pluginPath": "~appFolder/plugins/DevProxy.Plugins.dll",
+      "configSection": "minimalCsomPermissionsPlugin",
+      "urlsToWatch": [
+        "https://*.sharepoint.com/*_vti_bin/client.svc/ProcessQuery"
+      ]
+    }
+  ],
+  "urlsToWatch": [
+    "https://*.sharepoint.com/*",
+    "https://graph.microsoft.com/*"
+  ],
+  "minimalPermissionsPlugin": {
+    "$schema": "https://raw.githubusercontent.com/dotnet/dev-proxy/main/schemas/v1.0.0/minimalpermissionsplugin.schema.json",
+    "apiSpecsFolderPath": "./api-specs"
+  },
+  "minimalCsomPermissionsPlugin": {
+    "$schema": "https://raw.githubusercontent.com/dotnet/dev-proxy/main/schemas/v1.0.0/minimalcsompermissionsplugin.schema.json",
+    "typesFilePath": "./spo-csom-types.json"
+  },
+  "asSystemProxy": false,
+  "logLevel": "information",
+  "newVersionNotification": "stable",
+  "showSkipMessages": true,
+  "record": true
+}
