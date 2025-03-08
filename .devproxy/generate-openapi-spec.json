@@ -1,0 +1,24 @@
+{
+  "$schema": "https://raw.githubusercontent.com/dotnet/dev-proxy/main/schemas/v0.27.0/rc.schema.json",
+  "plugins": [
+    {
+      "name": "OpenApiSpecGeneratorPlugin",
+      "enabled": true,
+      "pluginPath": "~appFolder/plugins/dev-proxy-plugins.dll",
+      "configSection": "openApiSpecGeneratorPlugin"
+    }
+  ],
+  "urlsToWatch": [
+    "!https://login.microsoftonline.com/*",
+    "!https://*.applicationinsights.azure.com/*",
+    "*"
+  ],
+  "openApiSpecGeneratorPlugin": {
+    "$schema": "https://raw.githubusercontent.com/dotnet/dev-proxy/main/schemas/v0.26.0/openapispecgeneratorplugin.schema.json",
+    "includeOptionsRequests": false,
+    "specVersion": "v3_0",
+    "specFormat": "Yaml"
+  },
+  "asSystemProxy": false,
+  "record": true
+}

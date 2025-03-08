@@ -1,0 +1,223 @@
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# Documenting minimal permissions
+
+To help you improve your security posture, we're working on documenting minimal permissions required for a command to run. Using this information, you can then create a new Entra app registration with only the permissions required for your script to run. Documenting the minimal permissions is a work in progress and we'd appreciate your help. This page describes how to detect the minimal permissions for a CLI for Microsoft 365 command, and update the permissions reference in case some APIs are missing.
+
+## Detect minimal permissions
+
+To detect the minimal permissions for a command, we use [Dev Proxy](https://aka.ms/devproxy). Dev Proxy records the API requests that a command makes. Then, it analyzes the requests to determine the minimal permissions required for the command to run. For the analysis, it uses information about Microsoft Graph permissions from its documentation. For other APIs, such as SharePoint REST and CSOM, it uses information that we [curate together with the community](https://adoption.microsoft.com/sample-solution-gallery/sample/pnp-devproxy-sharepoint-api-minimal-permissions).
+
+To detect the minimal permissions for a command:
+
+### Start Dev Proxy
+
+<Tabs groupId="shell">
+  <TabItem label="PowerShell" value="powershell">
+    - Open a terminal.
+    - Change the working directory to the CLI for Microsoft 365 repo root.
+    - Start Dev Proxy with the permission detection preset:
+
+      ```PowerShell
+      npm run devproxy:permissions -- -- -e "tenant=<your_tenant>"
+      ```
+      
+      For example, if your tenant is `contoso.onmicrosoft.com` run:
+      ```PowerShell
+      npm run devproxy:permissions -- -- -e "tenant=contoso"
+      ```
+
+  </TabItem>
+  <TabItem label="zsh/bash" value="sh">
+    - Open a terminal.
+    - Change the working directory to the CLI for Microsoft 365 repo root.
+    - Start Dev Proxy with the permission detection preset:
+      ```bash
+      npm run devproxy:permissions -- -e="tenant=<your_tenant>"
+      ```
+      
+      For example, if your tenant is `contoso.onmicrosoft.com` run:
+      
+      ```bash
+      npm run devproxy:permissions -- -e="tenant=contoso"
+      ```
+
+  </TabItem>
+</Tabs>
+
+### Run the CLI command through proxy
+
+<Tabs groupId="shell">
+  <TabItem label="PowerShell" value="powershell">
+    - Open a new terminal.
+    - Set environment variables:
+
+      ```PowerShell
+      $env:HTTPS_PROXY="http://127.0.0.1:8000"
+      $env:NODE_TLS_REJECT_UNAUTHORIZED=0
+      ```
+
+    - Run the command:
+
+      ```PowerShell
+      m365 spo web list -u /
+      ```
+
+  </TabItem>
+  <TabItem label="zsh/bash" value="sh">
+    - Open a new terminal.
+    - Run the command:
+
+      ```bash
+      HTTPS_PROXY=http://127.0.0.1:8000 NODE_TLS_REJECT_UNAUTHORIZED=0 m365 spo web list -u /
+      ```
+
+  </TabItem>
+</Tabs>
+
+### Stop Dev Proxy recording
+
+- Press `s` in the Dev Proxy console.
+- Dev Proxy stops the recording and shows the results in the console.
+
+If there are no warnings, note the minimal permissions reported for the command. Note, that SharePoint REST and CSOM API permissions are reported separately. You need to combine them by taking the maximum of both. For example, if the REST API requires `AllSites.Read` and CSOM API requires `AllSites.Write`, the command needs the `AllSites.Write` SharePoint permission.
+
+## Update minimal permissions information
+
+If Dev Proxy shows warnings, it means that the OpenAPI spec for the REST API, or the CSOM type definition is missing the necessary information to determine the minimal permissions. You can see which one it is by the name of the plugin that reported the issue in the log. In that case, you need to first update the relevant reference files before you can automatically discover minimal permissions.
+
+Unfortunately, APIs other than Microsoft Graph that we use in CLI for Microsoft 365 don't have documented permissions and you need to find them out manually. To do this, start with creating Entra app registrations, each with a separate set of permissions (eg. `AllSites.FullControl`, `AllSites.Manage`, etc., and then create equivalents for application permissions). Then, run the command in debug mode with the `--debug` option, and note all API requests that the commands make. Finally, issue each API request with each of the app registrations and see which one works.
+
+:::tip
+
+You can simplify finding out which permissions the particular API request supports, by signing in to CLI for Microsoft 365 using all Entra apps, each time using the `--connectionName [connectionName]` option, and then switching between the apps using the `m365 connection use` command. After switching, you can get an access token for the resource required by your API.
+
+:::
+
+:::tip
+
+The easiest way to issue web requests is by using an .http file in VSCode with the [REST Client extension](https://marketplace.visualstudio.com/items?itemName=humao.rest-client). You can store the access token in a variable and use it in the requests. For example, you can create a file `test.http` with the following content:
+
+```http
+@token=eyJ0eXAiOiJ...
+
+###
+
+GET https://contoso.sharepoint.com/_api/web
+accept: application/json;odata=nometadata
+authorization: Bearer {{token}}
+
+###
+```
+
+:::
+
+### Update REST API spec with minimal permissions
+
+We store the information about the minimal permissions for REST APIs in OpenAPI specs, in the `.devproxy/api-specs` folder. We have a separate API spec for each API. If there's no API spec for the API that you're documenting yet, you need to create one. If there's one already, add the missing API operations that the command you're documenting uses. The easiest way to get the API spec for your API:
+
+Start Dev Proxy:
+
+- Open a terminal.
+- Change the working directory to the CLI for Microsoft 365 repo root.
+- Start Dev Proxy with the OpenAPI spec generation detection preset: `npm run devproxy:apispec`.
+
+:::info
+
+Notice, that Dev Proxy runs in recording mode.
+
+:::
+
+Execute the command through Dev Proxy, for example:
+
+<Tabs groupId="shell">
+  <TabItem label="PowerShell" value="powershell">
+    - Open a new terminal.
+    - Set environment variables:
+
+      ```PowerShell
+      $env:HTTPS_PROXY="http://127.0.0.1:8000"
+      $env:NODE_TLS_REJECT_UNAUTHORIZED=0
+      ```
+
+    - Run the command:
+    
+      ```PowerShell
+      m365 spo web list -u /
+      ```
+  </TabItem>
+  <TabItem label="zsh/bash" value="sh">
+    - Open a new terminal.
+    - Run the command:
+
+      ```bash
+      HTTPS_PROXY=http://127.0.0.1:8000 NODE_TLS_REJECT_UNAUTHORIZED=0 m365 spo web list -u /
+      ```
+  </TabItem>
+</Tabs>
+
+Stop Dev Proxy recording:
+
+- Press `s` in the Dev Proxy console.
+- Dev Proxy generates the OpenAPI spec for the API requests used by the command and shows the name of the file in the console.
+
+Merge the generated OpenAPI spec with the existing one:
+
+- Open the generated OpenAPI spec in a text editor.
+- Copy the operation from the generated OpenAPI spec.
+
+   :::tip
+
+    From the generated operation, you only need the operation, method, parameters, and default response, for example:
+
+    ```yaml
+    /_api/web/folders/addUsingPath(decodedUrl={folderPath}):
+      post:
+        parameters:
+          - name: folderPath
+            in: path
+            required: true
+            description: URL-encoded server-relative path to the folder
+            schema:
+              type: string
+            example: "'%2FShared%20Documents%2FMy%20Folder%20Name'"
+        responses:
+          200:
+            description: OK
+    ```
+
+    You can ignore the request and response shape, because we're not using them in detecting minimal permissions.
+
+   :::
+
+- Paste the operation into the existing OpenAPI spec in the `.devproxy/api-specs` folder.
+
+  :::tip
+
+  To simplify lookup, be sure to paste the operation in the correct place so that operations are sorted alphabetically by the path.
+
+  :::
+
+- Find out which minimal permission each operation supports using the approach described above (switch connection in CLI for Microsoft 365, get an access token, and issue the request using the access token).
+- To your operation, add the security section, with the information about the minimal permissions. Say, you've added the `GET /_api/web` operation, which you can run using the `AllSites.Read` permission. The operation should look like this:
+
+  ```yaml
+  /_api/web:
+    get:
+      security:
+        - delegated:
+          - AllSites.Read
+          - AllSites.Write
+          - AllSites.Manage
+          - AllSites.FullControl
+      responses:
+        200:
+          description: OK
+  ```
+
+  Often, scopes are additive, so for example, if you can use `AllSites.Read` to run the command, you can also use `AllSites.Write`, `AllSites.Manage`, and `AllSites.FullControl`. When documenting minimal permissions, be sure to include all supported permissions in the order from the least to most privileged. This allows us to detect the minimal permissions for the whole command which is likely using multiple API operations.
+
+### Update CSOM type definition with minimal permissions
+
+Documenting permissions for CSOM APIs follows roughly the same process. The main difference is, that CSOM is not a REST API and we can't document it using an OpenAPI spec. Instead, we document it in a custom format, in the `.devproxy/spo-csom-types.json` file. The file lists CSOM operations and the permissions that they support. CSOM uses GUIDs for referencing types. To improve the readability and maintenance, the CSOM file includes a list of mappings between the GUIDs and the type names. Unfortunately, the CSOM GUIDs aren't documented. You might be able to find them on the internet or use a tool like ILSpy to decompile the CSOM DLLs and find the GUIDs in the code.
