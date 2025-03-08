@@ -6,6 +6,7 @@ export default {
   ENGAGE_COMMUNITY_GET: `${prefix} engage community get`,
   ENGAGE_COMMUNITY_LIST: `${prefix} engage community list`,
   ENGAGE_COMMUNITY_SET: `${prefix} engage community set`,
+  ENGAGE_COMMUNITY_USER_ADD: `${prefix} engage community user add`,
   ENGAGE_COMMUNITY_USER_LIST: `${prefix} engage community user list`,
   ENGAGE_GROUP_LIST: `${prefix} engage group list`,
   ENGAGE_GROUP_USER_ADD: `${prefix} engage group user add`,
