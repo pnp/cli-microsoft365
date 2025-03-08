@@ -749,7 +749,10 @@ export class Auth {
     let allConnections = await this.getAllConnections();
 
     if (this.connection.active) {
-      allConnections = allConnections.filter(c => c.identityId !== this.connection.identityId);
+      allConnections = allConnections.filter(c =>
+        c.identityId !== this.connection.identityId ||
+        c.appId !== this.connection.appId ||
+        c.tenant !== this.connection.tenant);
       allConnections.forEach(c => c.active = false);
       allConnections = [{ ...this.connection as any }, ...allConnections];
     }
