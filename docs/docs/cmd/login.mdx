@@ -22,7 +22,7 @@ m365 login [options]
 : ID of the tenant from which accounts should authenticate. Use `common` or `organization` for multitenant apps. Defaults to `common` if not specified and if the config value `tenantId` and the environment variable `CLIMICROSOFT365_TENANT` are also not set.
 
 `-t, --authType [authType]`
-: The type of authentication to use. Allowed values `certificate`, `deviceCode`, `password`, `identity`, `browser`, `secret`. Default `deviceCode`
+: The type of authentication to use. Allowed values `certificate`, `deviceCode`, `password`, `identity`, `federatedIdentity`, `browser`, `secret`. Default `deviceCode`
 
 `-u, --userName [userName]`
 : Name of the user to authenticate. Required when `authType` is set to `password`
@@ -77,6 +77,8 @@ By default, the `login` command uses device code OAuth flow to log in to Microso
 When logging in to Microsoft 365 using the user name and password, next to the access and refresh token, the CLI for Microsoft 365 will store the user credentials so that it can automatically re-authenticate if necessary. Similarly to the tokens, the credentials are removed by re-authenticating using the device code or by calling the [logout](logout.mdx) command.
 
 When logging in to Microsoft 365 using a certificate, the CLI for Microsoft 365 will store the contents of the certificate so that it can automatically re-authenticate if necessary. The contents of the certificate are removed by re-authenticating using the device code or by calling the [logout](logout.mdx) command.  
+
+Federated Identity is currently supported in GitHub Actions. To use this you need to set `authType` to `federatedIdentity` and specify `appId` and `tenant` to the values of the app registration you've configured a federated credential on. 
 
 To log in to Microsoft 365 using a certificate or secret, you will typically [create a custom Microsoft Entra application](../user-guide/using-own-identity.mdx). To use this application with the CLI for Microsoft 365, you will set the `CLIMICROSOFT365_ENTRAAPPID` environment variable to the application's ID and the `CLIMICROSOFT365_TENANT` environment variable to the ID of the Microsoft Entra tenant, where you created the Microsoft Entra application. Also, please make sure to read about [the caveats when using the certificate login option](../user-guide/cli-certificate-caveats.mdx).
 
@@ -180,6 +182,12 @@ Log in to Microsoft 365 using a user-assigned managed identity with `clientId` s
 
 ```sh
 m365 login --authType identity --userName ac9fbed5-804c-4362-a369-21a4ec51109e
+```
+
+Log in to Microsoft 365 using a federated identity. Can currently only be used in GitHub Actions.
+
+```sh
+m365 login --authType federatedIdentity --appId eb96cfd0-abfa-4477-8d1d-c6dfde3efb19 --tenant 9a1a1bbd-e158-4cf5-967d-a53b8e85c628
 ```
 
 Log in to Microsoft 365 using the interactive browser authentication with `clientId` set in the configuration. Uses the identity of the current user.
