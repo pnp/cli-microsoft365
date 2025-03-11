@@ -139,7 +139,7 @@ describe(commands.ENGAGE_NETWORK_LIST, () => {
     assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 123);
   });
 
-  it('calls the networking endpoint with parameter', async () => {
+  it('calls the networking endpoint with parameter using includeSuspended parameter', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/networks/current.json') {
         return [
@@ -168,13 +168,47 @@ describe(commands.ENGAGE_NETWORK_LIST, () => {
     assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 123);
   });
 
+  it('calls the networking endpoint with parameter', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === 'https://www.yammer.com/api/v1/networks/current.json') {
+        return [
+          {
+            "id": 123,
+            "name": "Network1",
+            "email": "email@mail.com",
+            "community": true,
+            "permalink": "network1-link",
+            "web_url": "https://www.yammer.com/network1-link"
+          },
+          {
+            "id": 456,
+            "name": "Network2",
+            "email": "email2@mail.com",
+            "community": false,
+            "permalink": "network2-link",
+            "web_url": "https://www.yammer.com/network2-link"
+          }
+        ];
+      }
+
+      throw 'Invalid request';
+    });
+    await command.action(logger, { options: { debug: true, withSuspended: true } } as any);
+    assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 123);
+  });
+
   it('passes validation without parameters', async () => {
     const actual = await command.validate({ options: {} }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation with parameters', async () => {
+  it('passes validation with parameters using includeSuspended parameter', async () => {
     const actual = await command.validate({ options: { includeSuspended: true } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('passes validation with parameters', async () => {
+    const actual = await command.validate({ options: { withSuspended: true } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 });

@@ -401,7 +401,7 @@ describe(commands.FILE_MOVE, () => {
     ]);
   });
 
-  it('correctly moves a file when using sourceUrl with extra options', async () => {
+  it('correctly moves a file when using sourceUrl with extra options using includeItemPermissions parameter', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `${destWebUrl}/_api/Web/GetFileById('${destDocId}')`) {
         return destFileResponse;
@@ -418,6 +418,41 @@ describe(commands.FILE_MOVE, () => {
         nameConflictBehavior: 'rename',
         bypassSharedLock: true,
         includeItemPermissions: true,
+        newName: 'Document-renamed.pdf'
+      }
+    });
+
+    assert.deepStrictEqual(spoUtilCreateCopyJobStub.lastCall.args, [
+      sourceWebUrl,
+      sourceAbsoluteUrl,
+      destAbsoluteTargetUrl,
+      {
+        nameConflictBehavior: CreateFileCopyJobsNameConflictBehavior.Rename,
+        bypassSharedLock: true,
+        includeItemPermissions: true,
+        operation: 'move',
+        newName: 'Document-renamed.pdf'
+      }
+    ]);
+  });
+
+  it('correctly moves a file when using sourceUrl with extra options', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `${destWebUrl}/_api/Web/GetFileById('${destDocId}')`) {
+        return destFileResponse;
+      }
+
+      throw 'Invalid request: ' + opts.url;
+    });
+
+    await command.action(logger, {
+      options: {
+        webUrl: sourceWebUrl,
+        sourceUrl: sourceServerRelUrl,
+        targetUrl: destAbsoluteTargetUrl,
+        nameConflictBehavior: 'rename',
+        bypassSharedLock: true,
+        withItemPermissions: true,
         newName: 'Document-renamed.pdf'
       }
     });
