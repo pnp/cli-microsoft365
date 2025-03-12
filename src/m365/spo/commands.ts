@@ -117,6 +117,7 @@ export default {
   GROUP_MEMBER_REMOVE: `${prefix} group member remove`,
   HIDEDEFAULTTHEMES_GET: `${prefix} hidedefaultthemes get`,
   HIDEDEFAULTTHEMES_SET: `${prefix} hidedefaultthemes set`,
+  HOMESITE_ADD: `${prefix} homesite add`,
   HOMESITE_GET: `${prefix} homesite get`,
   HOMESITE_LIST: `${prefix} homesite list`,
   HOMESITE_REMOVE: `${prefix} homesite remove`,
