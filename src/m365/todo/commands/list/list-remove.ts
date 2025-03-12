@@ -74,7 +74,7 @@ class TodoListRemoveCommand extends DelegatedGraphCommand {
     }
   }
 
-  private async getListId(args: CommandArgs): Promise<string> {
+  private async getListId(args: CommandArgs): Promise<string | null> {
     if (args.options.id) {
       return args.options.id as string;
     }
@@ -94,7 +94,7 @@ class TodoListRemoveCommand extends DelegatedGraphCommand {
 
   private async removeList(args: CommandArgs): Promise<void> {
     try {
-      const listId: string = await this.getListId(args);
+      const listId = await this.getListId(args);
 
       if (!listId) {
         throw `The list ${args.options.name} cannot be found`;
