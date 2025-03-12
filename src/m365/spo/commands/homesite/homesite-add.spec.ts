@@ -148,7 +148,7 @@ describe(commands.HOMESITE_ADD, () => {
   });
 
   it('correctly handles non-integer order', async () => {
-    const actual = commandOptionsSchema.safeParse({ url: homeSite, order: 'invalid-order' });
+    const actual = commandOptionsSchema.safeParse({ url: homeSite, order: -1 });
     assert.strictEqual(actual.success, false);
   });
 
