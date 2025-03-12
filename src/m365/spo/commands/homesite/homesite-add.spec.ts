@@ -148,12 +148,12 @@ describe(commands.HOMESITE_ADD, () => {
   });
 
   it('correctly handles non-integer order', async () => {
-    const actual = commandOptionsSchema.safeParse({ url: 'homeSite', order: 'invalid-order' });
+    const actual = commandOptionsSchema.safeParse({ url: homeSite, order: 'invalid-order' });
     assert.strictEqual(actual.success, false);
   });
 
   it('correctly handles invalid GUIDs in audiences', async () => {
-    const actual = commandOptionsSchema.safeParse({ url: 'homeSite', audiences: 'invalid-guid' });
+    const actual = commandOptionsSchema.safeParse({ url: homeSite, audiences: 'invalid-guid' });
     assert.strictEqual(actual.success, false);
   });
 
