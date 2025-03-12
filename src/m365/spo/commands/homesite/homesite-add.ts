@@ -28,7 +28,7 @@ const options = globalOptionsZod
     ),
     vivaConnectionsDefaultStart: z.boolean().optional(),
     isInDraftMode: z.boolean().optional(),
-    order: z.string()
+    order: z.number()
       .refine(order => validation.isValidPositiveInteger(order) === true, order => ({
         message: `'${order}' is not a positive integer`
       })).optional()
