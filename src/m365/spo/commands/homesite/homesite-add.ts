@@ -30,7 +30,7 @@ const options = globalOptionsZod
     isInDraftMode: z.boolean().optional(),
     order: z.number()
       .refine(order => validation.isValidPositiveInteger(order) === true, order => ({
-        message: `'${order}' is not a positive integer`
+        message: `'${order}' is not a positive integer.`
       })).optional()
   })
   .strict();
