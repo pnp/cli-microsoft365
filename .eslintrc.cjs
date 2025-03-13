@@ -80,6 +80,7 @@ const dictionary = [
   'oauth2',
   'office365',
   'one',
+  'open',
   'ops',
   'org',
   'owner',
