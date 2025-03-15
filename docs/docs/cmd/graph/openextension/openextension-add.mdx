@@ -4,7 +4,7 @@ import TabItem from '@theme/TabItem';
 
 # graph openextension add
 
-Creates a new open extension
+Adds an open extension to a resource
 
 ## Usage
 
@@ -23,19 +23,22 @@ m365 graph openextension add [options]
 
 `-t, --resourceType <resourceType>`
 : The resource type for which the extension is created. Allowed values are `user`, `group`, `device`, `organization`.
-
-`--property1 [property1]`
-: Custom property 1.
-
-`--property2 [property2]`
-: Custom property 2.
 ```
 
 <Global />
 
+## Remarks
+
+This command allows using unknown options to add custom data to the open extension.
+
+:::warning[Escaping JSON in PowerShell]
+
+When creating open extension it's possible to enter a JSON string. In PowerShell 5 to 7.2 [specific escaping rules](./../../../user-guide/using-cli.mdx#escaping-double-quotes-in-powershell) apply due to an issue. Remember that you can also use [file tokens](./../../../user-guide/using-cli.mdx#passing-complex-content-into-cli-options) instead.
+
+
 ## Examples
 
-Create a new open extension for a user specified by id
+Create a new open extension for a user specified by id. Extension properties are specified by unknown options.
 
 ```
 m365 graph openextension add --resourceId eb77fbcf-6fe8-458b-985d-1747284793bc --resourceType user --name 'com.contoso.roamingSettings' --theme dark --color red --language English
@@ -46,12 +49,6 @@ Create a new open extension for a group, one of the property represents a JSON o
 ```
 m365 graph openextension add --resourceId eb77fbcf-6fe8-458b-985d-1747284793bc --resourceType group --name 'com.contoso.roamingSettings' --settings '{"theme": "dark", "color": "red", "language": "English"}' --supportedSystem 'Linux'
 ```
-
-## Remarks
-
-:::warning[Escaping JSON in PowerShell]
-
-When creating open extension it's possible to enter a JSON string. In PowerShell 5 to 7.2 [specific escaping rules](./../../../user-guide/using-cli.mdx#escaping-double-quotes-in-powershell) apply due to an issue. Remember that you can also use [file tokens](./../../../user-guide/using-cli.mdx#passing-complex-content-into-cli-options) instead.
 
 :::
 

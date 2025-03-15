@@ -40,7 +40,7 @@ class GraphOpenExtensionAddCommand extends GraphCommand {
     try {
       const requestBody: any = {};
 
-      requestBody["extensionName"]= args.options.name;
+      requestBody["extensionName"] = args.options.name;
 
       const unknownOptions: any = this.getUnknownZodOptions(args.options);
       const unknownOptionsNames: string[] = Object.getOwnPropertyNames(unknownOptions);
