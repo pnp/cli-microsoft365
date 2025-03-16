@@ -16,6 +16,7 @@ import { CommandError } from '../../../../Command.js';
 
 describe(commands.OPENEXTENSION_ADD, () => {
   const resourceId = 'f4099688-dd3f-4a55-a9f5-ddd7417c227a';
+  const userPrincipalName = 'john.doe@contoso.com';
   const response = {
     "@odata.type": "#microsoft.graph.openTypeExtension",
     "extensionName": "com.contoso.roamingSettings",
@@ -123,6 +124,18 @@ describe(commands.OPENEXTENSION_ADD, () => {
   it('fails validation if resourceId is not a valid GUID', () => {
     const actual = commandOptionsSchema.safeParse({
       resourceId: 'foo',
+      resourceType: 'group',
+      name: 'com.contoso.roamingSettings',
+      theme: 'dark',
+      color: 'red',
+      language: 'English'
+    });
+    assert.notStrictEqual(actual.success, true);
+  });
+
+  it('fails validation if resoruceType is user and resourceId is neiter a valid GUID nor a valid UPN', () => {
+    const actual = commandOptionsSchema.safeParse({
+      resourceId: 'foo',
       resourceType: 'user',
       name: 'com.contoso.roamingSettings',
       theme: 'dark',
@@ -144,9 +157,21 @@ describe(commands.OPENEXTENSION_ADD, () => {
     assert.notStrictEqual(actual.success, true);
   });
 
-  it('passes validation if resourceType is user', () => {
+  it('passes validation if resourceType is user and resourceId is a valid GUID', () => {
     const actual = commandOptionsSchema.safeParse({
       resourceId: resourceId,
+      resourceType: 'user',
+      name: 'com.contoso.roamingSettings',
+      theme: 'dark',
+      color: 'red',
+      language: 'English'
+    });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('passes validation if resourceType is user and resourceId is a valid UPN', () => {
+    const actual = commandOptionsSchema.safeParse({
+      resourceId: userPrincipalName,
       resourceType: 'user',
       name: 'com.contoso.roamingSettings',
       theme: 'dark',

@@ -11,9 +11,7 @@ import { Extension } from '@microsoft/microsoft-graph-types';
 const options = globalOptionsZod
   .extend({
     name: zod.alias('n', z.string()),
-    resourceId: zod.alias('i', z.string().refine(id => validation.isValidGuid(id), id => ({
-      message: `'${id}' is not a valid GUID.`
-    }))),
+    resourceId: zod.alias('i', z.string()),
     resourceType: zod.alias('t', z.enum(['user', 'group', 'device', 'organization']))
   })
   .and(z.any());
@@ -34,6 +32,20 @@ class GraphOpenExtensionAddCommand extends GraphCommand {
 
   public get schema(): z.ZodTypeAny | undefined {
     return options;
+  }
+
+  public getRefinedSchema(schema: typeof options): z.ZodEffects<any> | undefined {
+    return schema
+      .refine(options => options.resourceType !== 'group' && options.resourceType !== 'device' && options.resourceType !== 'organization' ||
+        (options.resourceId && validation.isValidGuid(options.resourceId)), options => ({
+        message: `The '${options.resourceId}' must be a valid GUID`,
+        path: ['resourceId']
+      }))
+      .refine(options => options.resourceType !== 'user' ||
+        (options.resourceId && (validation.isValidGuid(options.resourceId) || validation.isValidUserPrincipalName(options.resourceId))), options => ({
+        message: `The '${options.resourceId}' must be a valid GUID or user principal name`,
+        path: ['resourceId']
+      }));
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
