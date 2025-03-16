@@ -1,0 +1,50 @@
+[
+  {
+    "name": "pnp-search-parent-flows",
+    "source": "pnp",
+    "title": "CLI - Parent flows report",
+    "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/flow/search-parent-flows",
+    "creationDateTime": "2025-03-16",
+    "updateDateTime": "2025-03-16",
+    "shortDescription": "This script creates a report of all parent flows that invoke a defined child flow.",
+    "longDescription": [
+      "This script creates a report of all parent flows accessible by the current user that invoke a defined child flow using the 'Run a Child Flow' action."
+    ],
+    "products": [
+      "Power Automate"
+    ],
+    "categories": [],
+    "tags": [
+      "flows",
+      "reports"
+    ],
+    "metadata": [
+      {
+        "key": "CLI-FOR-MICROSOFT365",
+        "value": "10.4.0"
+      }
+    ],
+    "thumbnails": [
+      {
+        "type": "image",
+        "order": 100,
+        "url": "https://raw.githubusercontent.com/pnp/cli-microsoft365/main/docs/docs/sample-scripts/flow/search-parent-flows/assets/preview.png",
+        "alt": "preview image for the sample"
+      }
+    ],
+    "authors": [
+      {
+        "gitHubAccount": "mkm17",
+        "pictureUrl": "https://avatars.githubusercontent.com/u/17220108?v=4",
+        "name": "Michał Kornet"
+      }
+    ],
+    "references": [
+      {
+        "name": "Want to learn more about CLI for Microsoft 365 and the commands",
+        "description": "Check out the CLI for Microsoft 365 site to get started and for the reference to the commands.",
+        "url": "https://aka.ms/cli-m365"
+      }
+    ]
+  }
+]
