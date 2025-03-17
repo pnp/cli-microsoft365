@@ -96,6 +96,16 @@ export const accessToken = {
     return userId;
   },
 
+  getDecodedAccessToken(accessToken: string): { header: any; payload: any } {
+    const chunks = accessToken.split('.');
+    const headerString = Buffer.from(chunks[0], 'base64').toString();
+    const payloadString = Buffer.from(chunks[1], 'base64').toString();
+
+    const header = JSON.parse(headerString);
+    const payload = JSON.parse(payloadString);
+    return { header, payload };
+  },
+
   /**
    * Asserts the presence of a delegated access token.
    * @throws {CommandError} Will throw an error if the access token is not available.

@@ -3,6 +3,7 @@ import { Logger } from '../../../../cli/Logger.js';
 import Command from '../../../../Command.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import commands from '../../commands.js';
+import { accessToken } from '../../../../utils/accessToken.js';
 
 interface CommandArgs {
   options: Options;
@@ -11,6 +12,7 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   new?: boolean;
   resource: string;
+  decoded?: boolean;
 }
 
 class UtilAccessTokenGetCommand extends Command {
@@ -32,7 +34,8 @@ class UtilAccessTokenGetCommand extends Command {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        new: args.options.new
+        new: args.options.new,
+        decoded: args.options.decoded
       });
     });
   }
@@ -44,6 +47,9 @@ class UtilAccessTokenGetCommand extends Command {
       },
       {
         option: '--new'
+      },
+      {
+        option: '--decoded'
       }
     );
   }
@@ -64,8 +70,16 @@ class UtilAccessTokenGetCommand extends Command {
     }
 
     try {
-      const accessToken: string = await auth.ensureAccessToken(resource, logger, this.debug, args.options.new);
-      await logger.log(accessToken);
+      const token: string = await auth.ensureAccessToken(resource, logger, this.debug, args.options.new);
+
+      if (args.options.decoded) {
+        const { header, payload } = accessToken.getDecodedAccessToken(token);
+
+        await logger.logRaw(`${JSON.stringify(header, null, 2)}.${JSON.stringify(payload, null, 2)}.[signature]`);
+      }
+      else {
+        await logger.log(token);
+      }
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
