@@ -11,6 +11,7 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   new?: boolean;
   resource: string;
+  decoded?: boolean;
 }
 
 class UtilAccessTokenGetCommand extends Command {
@@ -32,7 +33,8 @@ class UtilAccessTokenGetCommand extends Command {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        new: args.options.new
+        new: args.options.new,
+        decoded: args.options.decoded
       });
     });
   }
@@ -44,6 +46,9 @@ class UtilAccessTokenGetCommand extends Command {
       },
       {
         option: '--new'
+      },
+      {
+        option: '--decoded'
       }
     );
   }
@@ -65,7 +70,20 @@ class UtilAccessTokenGetCommand extends Command {
 
     try {
       const accessToken: string = await auth.ensureAccessToken(resource, logger, this.debug, args.options.new);
-      await logger.log(accessToken);
+
+      if (args.options.decoded) {
+        const chunks = accessToken.split('.');
+        const headerString = Buffer.from(chunks[0], 'base64').toString();
+        const payloadString = Buffer.from(chunks[1], 'base64').toString();
+
+        const header = JSON.parse(headerString);
+        const payload = JSON.parse(payloadString);
+
+        await logger.logRaw(`${JSON.stringify(header, null, 2)}.${JSON.stringify(payload, null, 2)}.[signature]`);
+      }
+      else {
+        await logger.log(accessToken);
+      }
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
