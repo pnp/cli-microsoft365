@@ -704,22 +704,111 @@ export class Auth {
       await logger.logToStderr('Trying to retrieve access token using federated identity...');
     }
 
-    if (!process.env.ACTIONS_ID_TOKEN_REQUEST_URL || !process.env.ACTIONS_ID_TOKEN_REQUEST_TOKEN) {
-      throw new CommandError('Federated identity is currently only supported in GitHub Actions.');
-    }
+    if (process.env.ACTIONS_ID_TOKEN_REQUEST_URL && process.env.ACTIONS_ID_TOKEN_REQUEST_TOKEN) {
+      if (debug) {
+        await logger.logToStderr('ACTIONS_ID_TOKEN_REQUEST_URL and ACTIONS_ID_TOKEN_REQUEST_TOKEN env variables found. The context is GitHub Actions...');
+      }
 
+      const federationToken = await this.getFederationTokenFromGithub(logger, debug);
+      return this.getAccessTokenWithFederatedToken(resource, federationToken, logger, debug);
+    }
+    else if (process.env.SYSTEM_OIDCREQUESTURI) {
+      if (debug) {
+        await logger.logToStderr('SYSTEM_OIDCREQUESTURI env variable found. The context is Azure DevOps...');
+      }
+
+      if (!process.env.SYSTEM_ACCESSTOKEN) {
+        throw new CommandError(`The SYSTEM_ACCESSTOKEN environment variable is not available. Please check the Azure DevOps pipeline task configuration. It should contain 'SYSTEM_ACCESSTOKEN: $(System.AccessToken)' in the env section.`);
+      }
+
+      const serviceConnectionId = process.env.AZURESUBSCRIPTION_SERVICE_CONNECTION_ID;
+      const serviceConnectionAppId = process.env.AZURESUBSCRIPTION_CLIENT_ID;
+      const serviceConnectionTenantId = process.env.AZURESUBSCRIPTION_TENANT_ID;
+      const useServiceConnection = serviceConnectionId && serviceConnectionAppId && serviceConnectionTenantId;
+
+      if (debug) {
+        if (!useServiceConnection) {
+          await logger.logToStderr('Not using a service connection. Run this command in an AzurePowerShell task to be able to use a service connection.');
+
+          if (!this.connection.appId || this.connection.tenant === 'common') {
+            throw new CommandError('The appId and tenant parameters are required when not using a service connection.');
+          }
+        }
+        else {
+          if (this.connection.appId || this.connection.tenant !== 'common') {
+            await logger.logToStderr('When using a service connection, the appId and tenant values are updated to the values of the service connection.');
+          }
+
+          this.connection.appId = serviceConnectionAppId;
+          this.connection.tenant = serviceConnectionTenantId;
+
+          await logger.logToStderr(`Using service connection '${serviceConnectionId}' with app Id '${serviceConnectionAppId}' and tenant Id '${serviceConnectionTenantId}'...`);
+        }
+      }
+
+      const federationToken = await this.getFederationTokenFromAzureDevOps(logger, debug, serviceConnectionId);
+
+      return this.getAccessTokenWithFederatedToken(resource, federationToken, logger, debug);
+    }
+    else {
+      throw new CommandError('Federated identity is currently only supported in GitHub Actions and Azure DevOps.');
+    }
+  }
+
+  private async getFederationTokenFromGithub(logger: Logger, debug: boolean): Promise<string> {
     if (debug) {
-      await logger.logToStderr('ACTIONS_ID_TOKEN_REQUEST_URL and ACTIONS_ID_TOKEN_REQUEST_TOKEN env variables found. The context is GitHub Actions...');
+      await logger.logToStderr('Retrieving GitHub federation token...');
     }
 
-    const federationToken = await this.getFederationTokenFromGithub(logger, debug);
+    const requestOptions: CliRequestOptions = {
+      url: `${process.env.ACTIONS_ID_TOKEN_REQUEST_URL}&audience=${encodeURIComponent('api://AzureADTokenExchange')}`,
+      headers: {
+        Authorization: `Bearer ${process.env.ACTIONS_ID_TOKEN_REQUEST_TOKEN}`,
+        Accept: 'application/json',
+        'x-anonymous': true
+      },
+      responseType: 'json'
+    };
+
+    const accessTokenResponse = await request.get<{ value: string }>(requestOptions);
+
+    return accessTokenResponse.value;
+  }
+
+  private async getFederationTokenFromAzureDevOps(logger: Logger, debug: boolean, serviceConnectionId?: string | undefined): Promise<string> {
+    if (debug) {
+      await logger.logToStderr('Retrieving Azure DevOps federation token...');
+    }
+
+    const urlSuffix = serviceConnectionId ? `&serviceConnectionId=${serviceConnectionId}` : '';
+
+    const requestOptions: CliRequestOptions = {
+      url: `${process.env.SYSTEM_OIDCREQUESTURI}?api-version=7.1${urlSuffix}`,
+      headers: {
+        Authorization: `Bearer ${process.env.SYSTEM_ACCESSTOKEN}`,
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        'x-anonymous': true
+      },
+      responseType: 'json'
+    };
+
+    const accessTokenResponse = await request.post<{ oidcToken: string }>(requestOptions);
+
+    return accessTokenResponse.oidcToken;
+  }
+
+  private async getAccessTokenWithFederatedToken(resource: string, federatedToken: string, logger: Logger, debug: boolean): Promise<AccessToken | null> {
+    if (debug) {
+      await logger.logToStderr('Retrieving Entra ID Access Token with federated token...');
+    }
 
     const queryParams = [
       'grant_type=client_credentials',
       `scope=${encodeURIComponent(`${resource}/.default`)}`,
       `client_id=${this.connection.appId}`,
       `client_assertion_type=${encodeURIComponent('urn:ietf:params:oauth:client-assertion-type:jwt-bearer')}`,
-      `client_assertion=${federationToken}`
+      `client_assertion=${federatedToken}`
     ];
 
     const requestOptions: CliRequestOptions = {
@@ -733,32 +822,15 @@ export class Auth {
       responseType: 'json'
     };
 
-    const accessTokenResponse = await request.post<{ access_token: string; expires_on: string }>(requestOptions);
+    const accessTokenResponse = await request.post<{ access_token: string; expires_in: string }>(requestOptions);
+
+    const expiresIn = parseInt(accessTokenResponse.expires_in) * 1000;
+    const now = new Date();
 
     return {
       accessToken: accessTokenResponse.access_token,
-      expiresOn: new Date(parseInt(accessTokenResponse.expires_on) * 1000)
+      expiresOn: new Date(now.getTime() + expiresIn)
     };
-  }
-
-  private async getFederationTokenFromGithub(logger: Logger, debug: boolean): Promise<string> {
-    if (debug) {
-      await logger.logToStderr('Retrieving GitHub federation token...');
-    }
-
-    const requestOptions: CliRequestOptions = {
-      url: `${process.env.ACTIONS_ID_TOKEN_REQUEST_URL}&audience=${encodeURIComponent('api://AzureADTokenExchange')}`,
-      headers: {
-        Authorization: `Bearer ${process.env.ACTIONS_ID_TOKEN_REQUEST_TOKEN}`,
-        accept: 'application/json',
-        'x-anonymous': true
-      },
-      responseType: 'json'
-    };
-
-    const accessTokenResponse = await request.get<{ value: string }>(requestOptions);
-
-    return accessTokenResponse.value;
   }
 
   private async ensureAccessTokenWithSecret(resource: string, logger: Logger, debug: boolean, fetchNew: boolean): Promise<AccessToken | null> {

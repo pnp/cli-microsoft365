@@ -71,6 +71,9 @@ describe('Auth', () => {
   const identityTenantId = '9bc3ab49-b65d-410a-85ad-de819febfddd';
   const appId = '9bc3ab49-b65d-410a-85ad-de819febfddc';
   const tenant = '9bc3ab49-b65d-410a-85ad-de819febfddd';
+  const serviceConnectionId = 'cf54610a-5868-477c-b766-1ac6bd2ef63c';
+  const serviceConnectionAppId = 'b5882c53-5488-4a65-9bdd-4c1754e7e8dd';
+  const serviceConnectionTenantId = 'b11abebe-6eab-4e99-9571-b6f5433f9d5d';
   const federatedIdentityAudience = 'api://AzureADTokenExchange';
   const activeConnection: Connection = { name: identityId, identityId, identityName, active: true, appId, tenant, authType: AuthType.DeviceCode, certificateType: CertificateType.Unknown, accessTokens: {}, cloudType: CloudType.Public, identityTenantId: identityTenantId, deactivate: () => { } };
   const base64EncodedPemCert = 'QmFnIEF0dHJpYnV0ZXMNCiAgICBsb2NhbEtleUlEOiBDQyBGNCBGMiBBMyBDMyBEMiAwOSBDNSAxMiBCMyA3MiA0QiBCOCA4MyBBNSA0NyA0QyAwOSAyMSBEQyANCnN1YmplY3Q9QyA9IEFVLCBTVCA9IFNvbWUtU3RhdGUsIE8gPSBJbnRlcm5ldCBXaWRnaXRzIFB0eSBMdGQNCg0KaXNzdWVyPUMgPSBBVSwgU1QgPSBTb21lLVN0YXRlLCBPID0gSW50ZXJuZXQgV2lkZ2l0cyBQdHkgTHRkDQoNCi0tLS0tQkVHSU4gQ0VSVElGSUNBVEUtLS0tLQ0KTUlJRGF6Q0NBbE9nQXdJQkFnSVVXb25VNFM0RTcxRjVZMU5zU0xYbUlhZ1dkNVl3RFFZSktvWklodmNOQVFFTA0KQlFBd1JURUxNQWtHQTFVRUJoTUNRVlV4RXpBUkJnTlZCQWdNQ2xOdmJXVXRVM1JoZEdVeElUQWZCZ05WQkFvTQ0KR0VsdWRHVnlibVYwSUZkcFpHZHBkSE1nVUhSNUlFeDBaREFlRncweE9UQTNNVEl5TVRVek1qbGFGdzB5TURBMw0KTVRFeU1UVXpNamxhTUVVeEN6QUpCZ05WQkFZVEFrRlZNUk13RVFZRFZRUUlEQXBUYjIxbExWTjBZWFJsTVNFdw0KSHdZRFZRUUtEQmhKYm5SbGNtNWxkQ0JYYVdSbmFYUnpJRkIwZVNCTWRHUXdnZ0VpTUEwR0NTcUdTSWIzRFFFQg0KQVFVQUE0SUJEd0F3Z2dFS0FvSUJBUUNsa01lQXlKbTJkMy95aEV0NHZGYjYrYjEyUGxRSDB4VGx1a1BoK2xScg0KOXJDNk5DM3dObnoySm5vbE1HclhuZVp2TlN5czFONVpSTm0yTjhQdy9QOExxeHJSenFFOFBNVC96NnN1UFhSUg0KWm5hZ2xaUklXb0NNR25pRVlDZVJHZnI4R2JpUXcwYlZEeXFuSnJaZjByS0pHbnZUNlY3QmpUdFloRWIzeXhoNA0KSmNUSnIrVDl0OEFYaldmemt6alBZdklxYmhha3FxcHd1SEVPYkh4T201cHVERTFBNVJOZm8wamcrTmZtVko5VQ0KMWR1RjVzdmE2NVQ5Q1RtdEdlbVNlUGlzWmgxZmhoOS94QmJwTCs0RUJWUXZqdEZXWk5zMVJHMW9QUllscmpzaQ0KTXFsaHNUdjhDZXI5cWUxcVNTdHFjMmJsc3hGek1zNmxZOHAvUHIrYm5uR3pBZ01CQUFHalV6QlJNQjBHQTFVZA0KRGdRV0JCU203cWFreXQwY2xxN0lnRFRWdkUrWEpaNFU5akFmQmdOVkhTTUVHREFXZ0JTbTdxYWt5dDBjbHE3SQ0KZ0RUVnZFK1hKWjRVOWpBUEJnTlZIUk1CQWY4RUJUQURBUUgvTUEwR0NTcUdTSWIzRFFFQkN3VUFBNElCQVFBYQ0KQnVqTytveU0yL0Q0SzNpS3lqVDVzbHF2UFVlVzFrZVVXYVdSVDZXRTY0VkFPbTlPZzU1bkIyOE5TSVVXampXMA0KdTJEUHF3SzJiOEFXalEveWp3S3NUMXVTdzcyQ0VEY2o3SkE1VXA5UWpBa0hIZmFoQWtOd0o5M0llcmFBdTEyVQ0KN25FRDdIN20yeGZscDVwM0dadzNHUE0rZmpBaDZLOUZIRDI0bWdGUTh4b2JPQSttVEVvV2ZIVVQrZ1pUMGxYdQ0KazFrVTJVelVOd2dwc3c4V04wNFFzWU5XcFF5d3ppUWtuZTQzNW5tdmxZOGZRc2hPSnErK0JCS0thd0xEcjk3bA0KRTBYQUxEZDZlVVhQenZ5OU1xZlozeUswRmUzMy8zbnZnUnE4QWZ3azRsbzhac2ZYWUlSTXA3b3BER0VmaUZmNQ0KM3JTTGxSZG9TNDQ4OVFZRnAyYUQNCi0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0NCkJhZyBBdHRyaWJ1dGVzDQogICAgbG9jYWxLZXlJRDogQ0MgRjQgRjIgQTMgQzMgRDIgMDkgQzUgMTIgQjMgNzIgNEIgQjggODMgQTUgNDcgNEMgMDkgMjEgREMgDQpLZXkgQXR0cmlidXRlczogPE5vIEF0dHJpYnV0ZXM+DQotLS0tLUJFR0lOIFBSSVZBVEUgS0VZLS0tLS0NCk1JSUV2Z0lCQURBTkJna3Foa2lHOXcwQkFRRUZBQVNDQktnd2dnU2tBZ0VBQW9JQkFRQ2xrTWVBeUptMmQzL3kNCmhFdDR2RmI2K2IxMlBsUUgweFRsdWtQaCtsUnI5ckM2TkMzd05uejJKbm9sTUdyWG5lWnZOU3lzMU41WlJObTINCk44UHcvUDhMcXhyUnpxRThQTVQvejZzdVBYUlJabmFnbFpSSVdvQ01HbmlFWUNlUkdmcjhHYmlRdzBiVkR5cW4NCkpyWmYwcktKR252VDZWN0JqVHRZaEViM3l4aDRKY1RKcitUOXQ4QVhqV2Z6a3pqUFl2SXFiaGFrcXFwd3VIRU8NCmJIeE9tNXB1REUxQTVSTmZvMGpnK05mbVZKOVUxZHVGNXN2YTY1VDlDVG10R2VtU2VQaXNaaDFmaGg5L3hCYnANCkwrNEVCVlF2anRGV1pOczFSRzFvUFJZbHJqc2lNcWxoc1R2OENlcjlxZTFxU1N0cWMyYmxzeEZ6TXM2bFk4cC8NClByK2Jubkd6QWdNQkFBRUNnZ0VBUjRsMytqZ3kybmxseWtiSlNXQ3ZnSCs2RWtZNkRxdHd3eFlwVUpIV09sUDcNCjVtaTNWS3htY0FFT0U5V0l4S05RTnNyV0E5TnlRMFlSZjc4MnBZRGJQcEp1NHlxUjFqSTN1SVJsWlhSZU52RzcNCjNnVGpiaVBVbVRTeTBCZXY0TzFGMmZuUEdwV1ZuR2VTT1dqcnNobWExTXlocGwyV2VMRHFiSU96R2t3aHhYOXkNClRhRFd5MjErbDFpNVNGWUZTdHdXOWlhOXRORTFTTTU4WnpQWk0yK0NDdHhQVEFBQXRJRmZXUVdTbnhodUxMenMNCjNyVDRVOGNLZzJITVBXb29rOS9peWxsa0xEVXBPanhJR2tHWXdheDVnR2xvR0xZYWVoelc5Q3hobzgvc3A4WjUNCkVNNVFvczVJSTF2K21pNHhHa0RTdW4rbDYzcDN5Nm54T3pqM1h1MzRlUUtCZ1FEUDNtRWttN2lVaTlhRUxweXYNCkIxeDFlRFR2UmEwcllZMHZUaXFrYzhyUGc0NU1uOUNWRWZqdnV3YkN4M21tTExabThqZVY3ZTFHWjZJeXYreEUNCmcxeFkrUTd0RUlCb1FwWThlemg0UVYvMXRkZkhiUzNPcGdIbHVqMGd5MWxqT2QrbkxzS2RNQWRlYVF3Uy9WK2MNCk51Sks0Y3oyQWl6UXU1dHQ4WHdoOGdvU0Z3S0JnUURMNXRjZnF0VmdMQWJmMnJQbEhBLzdNcU1sWGpqNUQ0ejkNCjZmTWlCVDdOWHlYUGx6a2pJQkxOdG9OWlBCVTFzeERFb2tiNUtyTlhLTUtIaU9nTkQ0cWtDYkdnRFk2WUdaS3cNCkg4bDlLWDBaM2pwcEp0TURvQ21yQW9hSmZTUXNreGJXSDd4VlFGVzdPVWQ0dHMxZ3FDbTBUTFVxeW9lcW1EK3INCmg3WFlaa2RxeFFLQmdBK2NpZnN2M3NyNVBhRXJ4d1MyTHRGN3Q2NElzNXJBZHRRSXNOY3RBeHhXcXdkQ01XNGcNCnJXdUR4bHcya3dKUjlWa0I4LzdFb2I5WjVTcWVrMllKMzVPbkVPSHBEVnZITkhWU1k4bFVUNXFxajR3Z3ZRSDYNCkljWlpHR0l3STRSNlFqdlNIVGVrOWNpM1p2cStJTUlndFJvZW4wQVNwYjcvZUFybnlnVGFvcnI5QW9HQkFJT3QNCllOSEhqaUtjYkJnV2NjU01tZGw4T3hXL3dvVTlRSzBkYjNGUjk5dkREWFVCVU5uWk5hdDVxVnR3VExZd0hLMFANCnEwdndBbjlRQ0VoazVvN0FzYVQ3eWFUMS9GZEhkSTZmQ0l6MnhSNTJnRHcxNFdIZkJlbTFLTk1UYU5BTWNWdjQNCmhMUjlacUFRL3BIN1k2aC9FT2VwL2ZsVGI4ZUFxT1dLTDZvL2F2R05Bb0dCQUlHc0c1VExuSmlPU044SUtGU04NCmJmK3IrNkhWL2R6MkluNjhSR255MTB0OGpwbUpPbGgrdXRncGtvOXI2Y09uWGY4VHM2SFAveTBtbDl5YXhvMlANCm52c2wwcFlseFQxQy9taXJaZWxYKzFaQTltdFpHT2RxbzZhdVZUM1drcXBpb3c2WUtzbzl2Z2RHWmRWRUxiMEINCnUvdyt4UjBvN21aSEpwVEdmS09KdE53MQ0KLS0tLS1FTkQgUFJJVkFURSBLRVktLS0tLQ0K';
@@ -129,6 +132,7 @@ describe('Auth', () => {
     sinonUtil.restore([
       cli.getConfig().get,
       request.get,
+      request.post,
       (auth as any).getClientApplication,
       (auth as any).getDeviceCodeResponse,
       (auth as any).storeConnectionInfo,
@@ -1404,12 +1408,8 @@ describe('Auth', () => {
       if (opts.url === `https://login.microsoftonline.com/${tenant}/oauth2/v2.0/token`) {
         return {
           "access_token": accessToken,
-          "client_id": "a04566df-9a65-4e90-ae3d-574572a16423",
-          "expires_in": "86399",
-          "expires_on": "1587847593",
-          "ext_expires_in": "86399",
-          "not_before": "1587760893",
-          "resource": "https://contoso.sharepoint.com/",
+          "expires_in": "3599",
+          "ext_expires_in": "3599",
           "token_type": "Bearer"
         };
       }
@@ -1430,17 +1430,228 @@ describe('Auth', () => {
     assert.strictEqual(requestPostStub.firstCall.args[0].data.indexOf(`client_assertion=${federatedIdentityClientAssertion}`) > -1, true);
   });
 
-  it('fails when not using federated identity from GitHub Action', async () => {
+  it('calls api with correct params using federated identity flow from Azure DevOps Pipeline without Service Connection', async () => {
+    process.env = {
+      SYSTEM_OIDCREQUESTURI: 'https://contoso.visualstudio.com/0d0a69da-77db-472d-9e84-8beb80d4de42/_apis/distributedtask/hubs/build/plans/dec90b47-fb8f-4dad-8ef3-4e06ae1ca4ab/jobs/037420a7-9ab4-4003-8520-087b4b4a80b7/oidctoken',
+      SYSTEM_ACCESSTOKEN: 'eyJ0eXAiOiJKV1QiLCJ-DevOpsFederationToken-...'
+    };
+    const federatedIdentityClientAssertion = 'eyJ0eXAiOiJKV1QiLCJ-DevOpsFederationClientAssertion-...';
+    const accessToken = 'eyJ0eXAiOiJKV1QiLCJ-EntraIDAccessToken...';
+
+    const requestPostStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `${process.env.SYSTEM_OIDCREQUESTURI}?api-version=7.1`) {
+        return {
+          "oidcToken": federatedIdentityClientAssertion
+        };
+      }
+      else if (opts.url === `https://login.microsoftonline.com/${tenant}/oauth2/v2.0/token`) {
+        return {
+          "access_token": accessToken,
+          "expires_in": "3599",
+          "ext_expires_in": "3599",
+          "token_type": "Bearer"
+        };
+      }
+
+      throw { error: { "error": "Invalid POST Request" } };
+    });
+
+    auth.connection.authType = AuthType.FederatedIdentity;
+    auth.connection.appId = appId;
+    auth.connection.tenant = tenant;
+
+    const ensuredAccessToken = await auth.ensureAccessToken(resource, logger, true);
+    assert.strictEqual(ensuredAccessToken, accessToken);
+    assert.strictEqual(requestPostStub.firstCall.args[0].headers?.Authorization, `Bearer ${process.env.SYSTEM_ACCESSTOKEN}`);
+    assert(requestPostStub.calledTwice);
+    assert.strictEqual(requestPostStub.secondCall.args[0].data.indexOf(`client_id=${appId}`) > -1, true);
+    assert.strictEqual(requestPostStub.secondCall.args[0].data.indexOf(`client_assertion=${federatedIdentityClientAssertion}`) > -1, true);
+  });
+
+  it('calls api with correct params using federated identity flow from Azure DevOps Pipeline with Service Connection', async () => {
+    process.env = {
+      SYSTEM_OIDCREQUESTURI: 'https://contoso.visualstudio.com/0d0a69da-77db-472d-9e84-8beb80d4de42/_apis/distributedtask/hubs/build/plans/dec90b47-fb8f-4dad-8ef3-4e06ae1ca4ab/jobs/037420a7-9ab4-4003-8520-087b4b4a80b7/oidctoken',
+      SYSTEM_ACCESSTOKEN: 'eyJ0eXAiOiJKV1QiLCJ-DevOpsFederationToken-...',
+      AZURESUBSCRIPTION_SERVICE_CONNECTION_ID: serviceConnectionId,
+      AZURESUBSCRIPTION_CLIENT_ID: serviceConnectionAppId,
+      AZURESUBSCRIPTION_TENANT_ID: serviceConnectionTenantId
+    };
+    const federatedIdentityClientAssertion = 'eyJ0eXAiOiJKV1QiLCJ-DevOpsFederationClientAssertion-...';
+    const accessToken = 'eyJ0eXAiOiJKV1QiLCJ-EntraIDAccessToken...';
+
+    const requestPostStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `${process.env.SYSTEM_OIDCREQUESTURI}?api-version=7.1&serviceConnectionId=${serviceConnectionId}`) {
+        return {
+          "oidcToken": federatedIdentityClientAssertion
+        };
+      }
+      else if (opts.url === `https://login.microsoftonline.com/${serviceConnectionTenantId}/oauth2/v2.0/token`) {
+        return {
+          "access_token": accessToken,
+          "expires_in": "3599",
+          "ext_expires_in": "3599",
+          "token_type": "Bearer"
+        };
+      }
+
+      throw { error: { "error": "Invalid POST Request" } };
+    });
+
+    auth.connection.authType = AuthType.FederatedIdentity;
+
+    const ensuredAccessToken = await auth.ensureAccessToken(resource, logger, true);
+    assert.strictEqual(ensuredAccessToken, accessToken);
+    assert.strictEqual(requestPostStub.firstCall.args[0].headers?.Authorization, `Bearer ${process.env.SYSTEM_ACCESSTOKEN}`);
+    assert(requestPostStub.calledTwice);
+    assert.strictEqual(requestPostStub.secondCall.args[0].data.indexOf(`client_id=${serviceConnectionAppId}`) > -1, true);
+    assert.strictEqual(requestPostStub.secondCall.args[0].data.indexOf(`client_assertion=${federatedIdentityClientAssertion}`) > -1, true);
+  });
+
+  it('calls api with correct params using federated identity flow from Azure DevOps Pipeline with Service Connection, overriding appId option', async () => {
+    process.env = {
+      SYSTEM_OIDCREQUESTURI: 'https://contoso.visualstudio.com/0d0a69da-77db-472d-9e84-8beb80d4de42/_apis/distributedtask/hubs/build/plans/dec90b47-fb8f-4dad-8ef3-4e06ae1ca4ab/jobs/037420a7-9ab4-4003-8520-087b4b4a80b7/oidctoken',
+      SYSTEM_ACCESSTOKEN: 'eyJ0eXAiOiJKV1QiLCJ-DevOpsFederationToken-...',
+      AZURESUBSCRIPTION_SERVICE_CONNECTION_ID: serviceConnectionId,
+      AZURESUBSCRIPTION_CLIENT_ID: serviceConnectionAppId,
+      AZURESUBSCRIPTION_TENANT_ID: serviceConnectionTenantId
+    };
+    const federatedIdentityClientAssertion = 'eyJ0eXAiOiJKV1QiLCJ-DevOpsFederationClientAssertion-...';
+    const accessToken = 'eyJ0eXAiOiJKV1QiLCJ-EntraIDAccessToken...';
+
+    const requestPostStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `${process.env.SYSTEM_OIDCREQUESTURI}?api-version=7.1&serviceConnectionId=${serviceConnectionId}`) {
+        return {
+          "oidcToken": federatedIdentityClientAssertion
+        };
+      }
+      else if (opts.url === `https://login.microsoftonline.com/${serviceConnectionTenantId}/oauth2/v2.0/token`) {
+        return {
+          "access_token": accessToken,
+          "expires_in": "3599",
+          "ext_expires_in": "3599",
+          "token_type": "Bearer"
+        };
+      }
+
+      throw { error: { "error": "Invalid POST Request" } };
+    });
+
+    auth.connection.authType = AuthType.FederatedIdentity;
+    auth.connection.appId = appId;
+
+    const ensuredAccessToken = await auth.ensureAccessToken(resource, logger, true);
+    assert.strictEqual(ensuredAccessToken, accessToken);
+    assert.strictEqual(requestPostStub.firstCall.args[0].headers?.Authorization, `Bearer ${process.env.SYSTEM_ACCESSTOKEN}`);
+    assert(requestPostStub.calledTwice);
+    assert.strictEqual(requestPostStub.secondCall.args[0].data.indexOf(`client_id=${serviceConnectionAppId}`) > -1, true);
+    assert.strictEqual(requestPostStub.secondCall.args[0].data.indexOf(`client_assertion=${federatedIdentityClientAssertion}`) > -1, true);
+  });
+
+  it('calls api with correct params using federated identity flow from Azure DevOps Pipeline with Service Connection, overriding tenant option', async () => {
+    process.env = {
+      SYSTEM_OIDCREQUESTURI: 'https://contoso.visualstudio.com/0d0a69da-77db-472d-9e84-8beb80d4de42/_apis/distributedtask/hubs/build/plans/dec90b47-fb8f-4dad-8ef3-4e06ae1ca4ab/jobs/037420a7-9ab4-4003-8520-087b4b4a80b7/oidctoken',
+      SYSTEM_ACCESSTOKEN: 'eyJ0eXAiOiJKV1QiLCJ-DevOpsFederationToken-...',
+      AZURESUBSCRIPTION_SERVICE_CONNECTION_ID: serviceConnectionId,
+      AZURESUBSCRIPTION_CLIENT_ID: serviceConnectionAppId,
+      AZURESUBSCRIPTION_TENANT_ID: serviceConnectionTenantId
+    };
+    const federatedIdentityClientAssertion = 'eyJ0eXAiOiJKV1QiLCJ-DevOpsFederationClientAssertion-...';
+    const accessToken = 'eyJ0eXAiOiJKV1QiLCJ-EntraIDAccessToken...';
+
+    const requestPostStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `${process.env.SYSTEM_OIDCREQUESTURI}?api-version=7.1&serviceConnectionId=${serviceConnectionId}`) {
+        return {
+          "oidcToken": federatedIdentityClientAssertion
+        };
+      }
+      else if (opts.url === `https://login.microsoftonline.com/${serviceConnectionTenantId}/oauth2/v2.0/token`) {
+        return {
+          "access_token": accessToken,
+          "expires_in": "3599",
+          "ext_expires_in": "3599",
+          "token_type": "Bearer"
+        };
+      }
+
+      throw { error: { "error": "Invalid POST Request" } };
+    });
+
+    auth.connection.authType = AuthType.FederatedIdentity;
+    auth.connection.appId = '';
+    auth.connection.tenant = tenant;
+
+    const ensuredAccessToken = await auth.ensureAccessToken(resource, logger, true);
+    assert.strictEqual(ensuredAccessToken, accessToken);
+    assert.strictEqual(requestPostStub.firstCall.args[0].headers?.Authorization, `Bearer ${process.env.SYSTEM_ACCESSTOKEN}`);
+    assert(requestPostStub.calledTwice);
+    assert.strictEqual(requestPostStub.secondCall.args[0].data.indexOf(`client_id=${serviceConnectionAppId}`) > -1, true);
+    assert.strictEqual(requestPostStub.secondCall.args[0].data.indexOf(`client_assertion=${federatedIdentityClientAssertion}`) > -1, true);
+  });
+
+  it('fails when not using federated identity from GitHub Action or Azure DevOps Pipeline', async () => {
     process.env = {
       ACTIONS_ID_TOKEN_REQUEST_URL: '',
-      ACTIONS_ID_TOKEN_REQUEST_TOKEN: ''
+      ACTIONS_ID_TOKEN_REQUEST_TOKEN: '',
+      SYSTEM_OIDCREQUESTURI: '',
+      SYSTEM_ACCESSTOKEN: ''
     };
 
     auth.connection.authType = AuthType.FederatedIdentity;
     auth.connection.appId = appId;
     auth.connection.tenant = tenant;
 
-    await assert.rejects(auth.ensureAccessToken(resource, logger, true), new CommandError('Federated identity is currently only supported in GitHub Actions.'));
+    await assert.rejects(auth.ensureAccessToken(resource, logger, true), new CommandError('Federated identity is currently only supported in GitHub Actions and Azure DevOps.'));
+  });
+
+  it('fails when using federated identity from Azure DevOps Pipeline, but SYSTEM_ACCESSTOKEN not available', async () => {
+    process.env = {
+      SYSTEM_OIDCREQUESTURI: 'https://contoso.visualstudio.com/0d0a69da-77db-472d-9e84-8beb80d4de42/_apis/distributedtask/hubs/build/plans/dec90b47-fb8f-4dad-8ef3-4e06ae1ca4ab/jobs/037420a7-9ab4-4003-8520-087b4b4a80b7/oidctoken',
+      SYSTEM_ACCESSTOKEN: ''
+    };
+
+    auth.connection.authType = AuthType.FederatedIdentity;
+    auth.connection.appId = appId;
+    auth.connection.tenant = tenant;
+
+    await assert.rejects(auth.ensureAccessToken(resource, logger, true), new CommandError(`The SYSTEM_ACCESSTOKEN environment variable is not available. Please check the Azure DevOps pipeline task configuration. It should contain 'SYSTEM_ACCESSTOKEN: $(System.AccessToken)' in the env section.`));
+  });
+
+  it('fails when using federated identity from Azure DevOps Pipeline without using service connection, with empty appId and tenant option', async () => {
+    process.env = {
+      SYSTEM_OIDCREQUESTURI: 'https://contoso.visualstudio.com/0d0a69da-77db-472d-9e84-8beb80d4de42/_apis/distributedtask/hubs/build/plans/dec90b47-fb8f-4dad-8ef3-4e06ae1ca4ab/jobs/037420a7-9ab4-4003-8520-087b4b4a80b7/oidctoken',
+      SYSTEM_ACCESSTOKEN: 'eyJ0eXAiOiJKV1QiLCJ-DevOpsFederationToken-...'
+    };
+
+    auth.connection.authType = AuthType.FederatedIdentity;
+    auth.connection.appId = undefined;
+    auth.connection.tenant = 'common';
+
+    await assert.rejects(auth.ensureAccessToken(resource, logger, true), new CommandError(`The appId and tenant parameters are required when not using a service connection.`));
+  });
+
+  it('fails when using federated identity from Azure DevOps Pipeline without using service connection, with empty appId option', async () => {
+    process.env = {
+      SYSTEM_OIDCREQUESTURI: 'https://contoso.visualstudio.com/0d0a69da-77db-472d-9e84-8beb80d4de42/_apis/distributedtask/hubs/build/plans/dec90b47-fb8f-4dad-8ef3-4e06ae1ca4ab/jobs/037420a7-9ab4-4003-8520-087b4b4a80b7/oidctoken',
+      SYSTEM_ACCESSTOKEN: 'eyJ0eXAiOiJKV1QiLCJ-DevOpsFederationToken-...'
+    };
+
+    auth.connection.authType = AuthType.FederatedIdentity;
+    auth.connection.tenant = 'common';
+
+    await assert.rejects(auth.ensureAccessToken(resource, logger, true), new CommandError(`The appId and tenant parameters are required when not using a service connection.`));
+  });
+
+  it('fails when using federated identity from Azure DevOps Pipeline without using service connection, with empty tenant option', async () => {
+    process.env = {
+      SYSTEM_OIDCREQUESTURI: 'https://contoso.visualstudio.com/0d0a69da-77db-472d-9e84-8beb80d4de42/_apis/distributedtask/hubs/build/plans/dec90b47-fb8f-4dad-8ef3-4e06ae1ca4ab/jobs/037420a7-9ab4-4003-8520-087b4b4a80b7/oidctoken',
+      SYSTEM_ACCESSTOKEN: 'eyJ0eXAiOiJKV1QiLCJ-DevOpsFederationToken-...'
+    };
+
+    auth.connection.authType = AuthType.FederatedIdentity;
+    auth.connection.appId = appId;
+    auth.connection.tenant = 'common';
+
+    await assert.rejects(auth.ensureAccessToken(resource, logger, true), new CommandError(`The appId and tenant parameters are required when not using a service connection.`));
   });
 
   it('returns access token if persisting connection fails', async () => {
