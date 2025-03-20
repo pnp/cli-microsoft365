@@ -170,6 +170,7 @@ While correctly escaped, it would result in the following being saved to sharepo
 The following two methods resolve this:
 
 ### Method 1: Escaping twice
+
 Escape the double quotes twice. Once for powershell using the backtick (`) and once for the executable, using a backslash.
 
 ```PowerShell
@@ -177,6 +178,7 @@ m365 spo listitem set --webUrl "<some-url>" --id 1 --listTitle somelist --SomeFi
 ```
 
 ### Method 2: Using verbatim strings with single quotes
+
 Use single quotes to start a verbatim string. The double quotes need not be escaped for powershell using the backtick. However, they do need to be escaped for the executable, using a backslash.
 
 ```PowerShell
@@ -188,6 +190,54 @@ m365 spo listitem set --webUrl "<some-url>" --id 1 --listTitle somelist --SomeFi
 Remember, instead of escaping, it's also possible to [feed complex content from a file](./using-cli.mdx#passing-complex-content-into-cli-options). 
 
 :::
+
+## Using CLI for Microsoft 365 in PowerShell
+
+CLI for Microsoft 365 by default outputs errors to stderr. Unlike other shells, PowerShell works differently as it has six distinct output streams. This behavior can lead to unexpected results, such as PowerShell continuing execution even after setting $ErrorActionPreference = "Stop". For more information on PowerShell's output streams, see [handling output and errors](https://learn.microsoft.com/en-us/powershell/scripting/learn/shell/running-commands?view=powershell-7.5#handling-output-and-errors). To address these differences, you can use the following settings and helper function to ensure that CLI errors are treated as errors.
+
+```PowerShell
+# setting output to json
+m365 cli config set --key output --value json
+# changing error output to stdout
+m365 cli config set --key errorOutput --value stdout 
+# don't show help on command failure
+m365 cli config set --key showHelpOnFailure --value false 
+# don't print errors as plain text but as objects
+m365 cli config set --key printErrorsAsPlainText --value false 
+
+function Invoke-CLICommand {
+  [cmdletbinding()]
+  param(
+    [parameter(Mandatory = $true, ValueFromPipeline = $true)] $input
+  )
+
+  $output = $input
+
+  if ($null -eq $output) {
+    return $null
+  }
+
+  $parsedOutput = $output | ConvertFrom-Json
+
+  if ($parsedOutput -isnot [Array] -and $null -ne $parsedOutput.error) {
+    throw $parsedOutput.error
+  }
+
+  return $parsedOutput
+}
+```
+
+With the above settings and helper function, you can now use a `try/catch` block to gracefully handle errors that may occur when running CLI for Microsoft 365 commands in PowerShell.
+
+```PowerShell
+try {
+  m365 spo list get --webUrl "https://contoso.sharepoint.com/sites/Marketing" --title "Non Existent" | Invoke-CLICommand
+}
+catch {
+  Write-Host "Failed retrieving list." -ForegroundColor Red
+  Write-Host "Error: $($_.Exception.Message)" -ForegroundColor Red
+}
+```
 
 ## `@meId` and `@meUserName` tokens
 
