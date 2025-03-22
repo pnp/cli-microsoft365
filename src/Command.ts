@@ -493,6 +493,19 @@ export default abstract class Command {
     return unknownOptions;
   }
 
+  protected getUnknownZodOptions(options: any): any {
+    const unknownOptions: any = JSON.parse(JSON.stringify(options));
+    // remove minimist catch-all option
+    delete unknownOptions._;
+
+    const knownOptions: CommandOptionInfo[] = this.optionsInfo;
+    knownOptions.forEach(o => {
+      delete unknownOptions[o.name];
+    });
+
+    return unknownOptions;
+  }
+
   protected trackUnknownOptions(telemetryProps: any, options: any): void {
     const unknownOptions: any = this.getUnknownOptions(options);
     const unknownOptionsNames: string[] = Object.getOwnPropertyNames(unknownOptions);

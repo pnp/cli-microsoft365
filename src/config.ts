@@ -30,6 +30,7 @@ export default {
     'https://graph.microsoft.com/OnlineMeetingArtifact.Read.All',
     'https://graph.microsoft.com/OnlineMeetings.ReadWrite',
     'https://graph.microsoft.com/OnlineMeetingTranscript.Read.All',
+    'https://graph.microsoft.com/Organization.ReadWrite.All',
     'https://graph.microsoft.com/PeopleSettings.ReadWrite.All',
     'https://graph.microsoft.com/Place.Read.All',
     'https://graph.microsoft.com/Policy.Read.All',
