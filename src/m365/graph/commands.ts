@@ -6,6 +6,7 @@ export default {
   DIRECTORYEXTENSION_GET: `${prefix} directoryextension get`,
   DIRECTORYEXTENSION_REMOVE: `${prefix} directoryextension remove`,
   OPENEXTENSION_ADD: `${prefix} openextension add`,
+  OPENEXTENSION_LIST: `${prefix} openextension list`,
   SCHEMAEXTENSION_ADD: `${prefix} schemaextension add`,
   SCHEMAEXTENSION_GET: `${prefix} schemaextension get`,
   SCHEMAEXTENSION_LIST: `${prefix} schemaextension list`,
