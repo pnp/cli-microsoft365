@@ -1,0 +1,129 @@
+import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# graph openextension list
+
+Retrieves all open extensions for a resource
+
+## Usage
+
+```sh
+m365 graph openextension list [options]
+```
+
+## Options
+
+```md definition-list
+`-i, --resourceId <resourceId>`
+: The Id of the resource for which to retrieve open extensions.
+
+`-t, --resourceType <resourceType>`
+: The type of resource. Allowed values are `user`, `group`, `device`, `organization`.
+```
+
+<Global />
+
+## Examples
+
+Retrieve open extensions for a user specified by id
+
+```sh
+m365 graph openextension list --resourceId eb77fbcf-6fe8-458b-985d-1747284793bc --resourceType user
+```
+
+Retrieve open extensions for a user specified by UPN
+
+```sh
+m365 graph openextension list --resourceId john.doe@contoso.com --resourceType user
+```
+
+Retrieve open extensions for a group specified by id
+
+```sh
+m365 graph openextension list --resourceId 19588303-70bf-44a4-beb1-e2f0f1ed06b3 --resourceType group
+```
+
+Retrieve open extensions for an organization specified by id
+
+```sh
+m365 graph openextension list --resourceId c956e711-f074-40c3-8431-fbd69bb67d9c --resourceType organization
+```
+
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  [
+    {
+      "extensionName": "com.contoso.roamingSettings",
+      "theme": "dark",
+      "color": "purple",
+      "lang": "Japanese",
+      "id": "com.contoso.roamingSettings"
+    },
+    {
+      "extensionName": "com.test.m365",
+      "settings": {
+        "theme": "dark"
+      },
+      "supportedSystem": "Linux",
+      "id": "com.test.m365"
+    }
+  ]
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  extensionName                id
+  ---------------------------  ---------------------------
+  com.contoso.roamingSettings  com.contoso.roamingSettings
+  com.test.m365                com.test.m365
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  extensionName,theme,color,lang,id
+  com.contoso.roamingSettings,dark,purple,Japanese,com.contoso.roamingSettings
+  com.test.m365,,,,com.test.m365
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # graph openextension list --resourceId "eb77fbcf-6fe8-458b-985d-1747284793bc" --resourceType "user"
+
+  Date: 3/29/2025
+
+  ## com.contoso.roamingSettings
+
+  Property | Value
+  ---------|-------
+  extensionName | com.contoso.roamingSettings
+  theme | dark
+  color | purple
+  lang | Japanese
+  id | com.contoso.roamingSettings
+
+  ## com.test.m365
+
+  Property | Value
+  ---------|-------
+  extensionName | com.test.m365
+  supportedSystem | Linux
+  id | com.test.m365
+  ```
+
+  </TabItem>
+</Tabs>
+
+## More information
+
+- Open extensions: https://learn.microsoft.com/graph/extensibility-overview?tabs=http#open-extensions
