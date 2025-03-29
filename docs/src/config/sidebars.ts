@@ -1109,6 +1109,15 @@ const sidebars: SidebarsConfig = {
           ]
         },
         {
+          openextension: [
+            {
+              type: 'doc',
+              label: 'openextension list',
+              id: 'cmd/graph/openextension/openextension-list'
+            }
+          ]
+        },
+        {
           schemaextension: [
             {
               type: 'doc',
