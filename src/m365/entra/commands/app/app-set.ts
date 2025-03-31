@@ -67,6 +67,7 @@ class EntraAppSetCommand extends GraphCommand {
         certificateDisplayName: typeof args.options.certificateDisplayName !== 'undefined',
         allowPublicClientFlows: typeof args.options.allowPublicClientFlows !== 'undefined'
       });
+      this.trackUnknownOptions(this.telemetryProperties, args.options);
     });
   }
 
@@ -183,9 +184,11 @@ class EntraAppSetCommand extends GraphCommand {
   }
 
   private async updateUnknownOptions(args: CommandArgs, objectId: string): Promise<string> {
-    if (Object.keys(optionsUtils.getUnknownOptions(args.options, this.options)).length > 0) {
+    const unknownOptions = optionsUtils.getUnknownOptions(args.options, this.options);
+
+    if (Object.keys(unknownOptions).length > 0) {
       const requestBody = {};
-      optionsUtils.addUnknownOptionsFromOptionsToPayload(requestBody, args.options, this.options);
+      optionsUtils.addUnknownOptionsToPayload(requestBody, unknownOptions);
 
       const requestOptions: CliRequestOptions = {
         url: `${this.resource}/v1.0/myorganization/applications/${objectId}`,

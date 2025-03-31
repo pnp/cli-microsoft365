@@ -25,14 +25,6 @@ export const optionsUtils = {
     return unknownOptions;
   },
 
-  addUnknownOptionsFromOptionsToPayload(payload: any, options: any, knownOptions: CommandOption[]): void {
-    const unknownOptions: any = this.getUnknownOptions(options, knownOptions);
-    const unknownOptionsNames: string[] = Object.getOwnPropertyNames(unknownOptions);
-    unknownOptionsNames.forEach(o => {
-      payload[o] = unknownOptions[o];
-    });
-  },
-
   addUnknownOptionsToPayload(payload: any, unknownOptions: any): void {
     const unknownOptionsNames: string[] = Object.getOwnPropertyNames(unknownOptions);
     unknownOptionsNames.forEach(o => {

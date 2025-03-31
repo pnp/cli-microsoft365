@@ -42,7 +42,7 @@ class EntraGroupSetCommand extends GraphCommand {
     return true;
   }
 
-  constructor(){
+  constructor() {
     super();
 
     this.#initTelemetry();
@@ -66,6 +66,7 @@ class EntraGroupSetCommand extends GraphCommand {
         memberUserNames: typeof args.options.memberUserNames !== 'undefined',
         visibility: typeof args.options.visibility !== 'undefined'
       });
+      this.trackUnknownOptions(this.telemetryProperties, args.options);
     });
   }
 
@@ -85,7 +86,7 @@ class EntraGroupSetCommand extends GraphCommand {
       },
       {
         option: '--description [description]'
-      },     
+      },
       {
         option: '--ownerIds [ownerIds]'
       },

@@ -76,6 +76,7 @@ class EntraUserAddCommand extends GraphCommand {
         managerUserId: typeof args.options.managerUserId !== 'undefined',
         managerUserName: typeof args.options.managerUserName !== 'undefined'
       });
+      this.trackUnknownOptions(this.telemetryProperties, args.options);
     });
   }
 
@@ -261,6 +262,7 @@ class EntraUserAddCommand extends GraphCommand {
     };
 
     this.addUnknownOptionsToPayload(requestBody, options);
+
     return requestBody;
   }
 

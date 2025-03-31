@@ -479,7 +479,8 @@ export default abstract class Command {
   }
 
   protected addUnknownOptionsToPayload(payload: any, options: any): void {
-    optionsUtils.addUnknownOptionsFromOptionsToPayload(payload, options, this.options);
+    const unknownOptions: any = optionsUtils.getUnknownOptions(options, this.options);
+    optionsUtils.addUnknownOptionsToPayload(payload, unknownOptions);
   }
 
   private loadValuesFromAccessToken(args: CommandArgs): void {

@@ -7,7 +7,6 @@ import GlobalOptions from '../../GlobalOptions.js';
 import { Logger } from '../../cli/Logger.js';
 import request from '../../request.js';
 import commands from './commands.js';
-import { optionsUtils } from '../../utils/optionsUtils.js';
 
 interface CommandArgs {
   options: Options;
@@ -46,17 +45,14 @@ class RequestCommand extends Command {
 
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
-      const properties: any = {
+      Object.assign(this.telemetryProperties, {
         method: args.options.method || 'get',
         resource: typeof args.options.resource !== 'undefined',
         accept: args.options.accept || 'application/json',
         body: typeof args.options.body !== 'undefined',
         filePath: typeof args.options.filePath !== 'undefined'
-      };
-
-      optionsUtils.addUnknownOptionsFromOptionsToPayload(properties, args.options, this.options);
-
-      Object.assign(this.telemetryProperties, properties);
+      });
+      this.trackUnknownOptions(this.telemetryProperties, args.options);
     });
   }
 
@@ -116,7 +112,7 @@ class RequestCommand extends Command {
       const method = (args.options.method || 'get').toUpperCase();
       const headers: RawAxiosRequestHeaders = {};
 
-      optionsUtils.addUnknownOptionsFromOptionsToPayload(headers, args.options, this.options);
+      this.addUnknownOptionsToPayload(headers, args.options);
 
       if (!headers.accept) {
         headers.accept = 'application/json';
