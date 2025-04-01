@@ -100,7 +100,7 @@ class FlowListCommand extends PowerAutomateCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      await logger.logToStderr(`Getting Power Automate flows${args.options.asAdmin && ' as admin'} in environment '${args.options.environmentName}'...`);
+      await logger.logToStderr(`Getting Power Automate flows${args.options.asAdmin ? ' as admin' : ''} in environment '${args.options.environmentName}'...`);
     }
 
     try {
