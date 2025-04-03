@@ -22,7 +22,7 @@ describe(commands.CARD_REMOVE, () => {
   const validId = '3a081d91-5ea8-40a7-8ac9-abbaa3fcb893';
   const validName = 'CLI 365 Card';
   const envUrl = "https://contoso-dev.api.crm4.dynamics.com";
-  const appResponse = {
+  const cardResponse = {
     solutionid: 'fd140aae-4df4-11dd-bd17-0019b9312238',
     modifiedon: '2022-10-11T08:52:12Z',
     '_owninguser_value': '7d48edd3-69fd-ec11-82e5-000d3ab87733',
@@ -179,7 +179,7 @@ describe(commands.CARD_REMOVE, () => {
 
   it('removes the specified card owned by the currently signed-in user when prompt confirmed', async () => {
     sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').callsFake(async () => envUrl);
-    sinon.stub(powerPlatform, 'getCardByName').resolves(appResponse);
+    sinon.stub(powerPlatform, 'getCardByName').resolves(cardResponse);
 
     sinon.stub(request, 'delete').callsFake(async (opts) => {
       if (opts.url === `https://contoso-dev.api.crm4.dynamics.com/api/data/v9.1/cards(${validId})`) {

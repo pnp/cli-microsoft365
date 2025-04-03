@@ -1,4 +1,3 @@
-import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
@@ -6,7 +5,6 @@ import { powerPlatform } from '../../../../utils/powerPlatform.js';
 import { validation } from '../../../../utils/validation.js';
 import PowerPlatformCommand from '../../../base/PowerPlatformCommand.js';
 import commands from '../../commands.js';
-import { formatting } from '../../../../utils/formatting.js';
 
 interface CommandArgs {
   options: Options;
@@ -91,7 +89,7 @@ class PpCardGetCommand extends PowerPlatformCommand {
     try {
       const dynamicsApiUrl = await powerPlatform.getDynamicsInstanceApiUrl(args.options.environmentName, args.options.asAdmin);
 
-      const res = await this.getCard(dynamicsApiUrl, args.options);
+      const res = await this.getCard(dynamicsApiUrl, args.options, logger);
       await logger.log(res);
     }
     catch (err: any) {
@@ -99,33 +97,24 @@ class PpCardGetCommand extends PowerPlatformCommand {
     }
   }
 
-  private async getCard(dynamicsApiUrl: string, options: Options): Promise<any> {
+  private async getCard(dynamicsApiUrl: string, options: Options, logger: Logger): Promise<any> {
+    if (options.name) {
+      return await powerPlatform.getCardByName(dynamicsApiUrl, options.name!, logger, this.verbose);
+    }
+
+    if (this.verbose) {
+      await logger.logToStderr(`Retrieving the card with id ${options.id}`);
+    }
+
     const requestOptions: CliRequestOptions = {
+      url: `${dynamicsApiUrl}/api/data/v9.1/cards(${options.id})`,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },
       responseType: 'json'
     };
 
-    if (options.id) {
-      requestOptions.url = `${dynamicsApiUrl}/api/data/v9.1/cards(${options.id})`;
-      const result = await request.get<any>(requestOptions);
-      return result;
-    }
-
-    requestOptions.url = `${dynamicsApiUrl}/api/data/v9.1/cards?$filter=name eq '${options.name}'`;
-    const result = await request.get<{ value: any[] }>(requestOptions);
-
-    if (result.value.length === 0) {
-      throw `The specified card '${options.name}' does not exist.`;
-    }
-
-    if (result.value.length > 1) {
-      const resultAsKeyValuePair = formatting.convertArrayToHashTable('cardid', result.value);
-      return cli.handleMultipleResultsFound(`Multiple cards with name '${options.name}' found.`, resultAsKeyValuePair);
-    }
-
-    return result.value[0];
+    return await request.get<any>(requestOptions);
   }
 }
 
