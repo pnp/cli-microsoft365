@@ -14,6 +14,7 @@ describe(commands.ACCESSTOKEN_GET, () => {
   let log: any[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let loggerLogRawSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -37,6 +38,7 @@ describe(commands.ACCESSTOKEN_GET, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
+    loggerLogRawSpy = sinon.spy(logger, 'logRaw');
   });
 
   afterEach(() => {
@@ -111,5 +113,24 @@ describe(commands.ACCESSTOKEN_GET, () => {
 
     await command.action(logger, { options: { resource: 'graph' } });
     assert(loggerLogSpy.calledWith('ABC'));
+  });
+
+  it('decodes access token', async () => {
+    const d: Date = new Date();
+    d.setMinutes(d.getMinutes() + 1);
+    auth.connection.accessTokens['https://graph.microsoft.com'] = {
+      expiresOn: d.toString(),
+      accessToken: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c'
+    };
+
+    await command.action(logger, { options: { resource: 'graph', decoded: true } });
+    assert(loggerLogRawSpy.calledWith(`{
+  "alg": "HS256",
+  "typ": "JWT"
+}.{
+  "sub": "1234567890",
+  "name": "John Doe",
+  "iat": 1516239022
+}.[signature]`));
   });
 });
