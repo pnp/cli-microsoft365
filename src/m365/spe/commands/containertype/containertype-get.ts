@@ -17,7 +17,7 @@ interface Options extends GlobalOptions {
   name?: string;
 }
 
-class SpeContainertypeGetCommand extends SpoCommand {
+class SpeContainerTypeGetCommand extends SpoCommand {
   public get name(): string {
     return commands.CONTAINERTYPE_GET;
   }
@@ -92,7 +92,7 @@ class SpeContainertypeGetCommand extends SpoCommand {
       await logger.log(containerType);
     }
     catch (err: any) {
-      this.handleRejectedPromise(err);
+      this.handleRejectedODataJsonPromise(err);
     }
   }
 
@@ -126,4 +126,4 @@ class SpeContainertypeGetCommand extends SpoCommand {
   }
 }
 
-export default new SpeContainertypeGetCommand();
+export default new SpeContainerTypeGetCommand();

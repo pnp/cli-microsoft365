@@ -4,7 +4,7 @@ import commands from '../../commands.js';
 import { spe } from '../../../../utils/spe.js';
 import { spo } from '../../../../utils/spo.js';
 
-class SpeContainertypeListCommand extends SpoCommand {
+class SpeContainerTypeListCommand extends SpoCommand {
 
   public get name(): string {
     return commands.CONTAINERTYPE_LIST;
@@ -46,4 +46,4 @@ class SpeContainertypeListCommand extends SpoCommand {
   }
 }
 
-export default new SpeContainertypeListCommand();
+export default new SpeContainerTypeListCommand();
