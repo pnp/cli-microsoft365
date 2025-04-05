@@ -245,7 +245,29 @@ describe(commands.HUBSITE_GET, () => {
       new CommandError(`includeAssociatedSites option is only allowed with json output mode`));
   });
 
-  it('retrieves the associated sites of the specified hub site', async () => {
+  it('display error message when withAssociatedSites option is used with other than json output.', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if ((opts.url as string).indexOf(`/_api/hubsites/getbyid('ee8b42c3-3e6f-4822-87c1-c21ad666046b')`) > -1) {
+        return {
+          "Description": null,
+          "ID": "ee8b42c3-3e6f-4822-87c1-c21ad666046b",
+          "LogoUrl": "http://contoso.com/__siteIcon__.jpg",
+          "SiteId": "ee8b42c3-3e6f-4822-87c1-c21ad666046b",
+          "SiteUrl": "https://contoso.sharepoint.com/sites/Sales",
+          "Targets": null,
+          "TenantInstanceId": "00000000-0000-0000-0000-000000000000",
+          "Title": "Sales"
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    await assert.rejects(command.action(logger, { options: { id: 'ee8b42c3-3e6f-4822-87c1-c21ad666046b', withAssociatedSites: true, output: 'text' } }),
+      new CommandError(`withAssociatedSites option is only allowed with json output mode`));
+  });
+
+  it('retrieves the associated sites of the specified hub site using includeAssociatedSites parameter', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/hubsites/getbyid('ee8b42c3-3e6f-4822-87c1-c21ad666046b')`) > -1) {
         return {
@@ -295,6 +317,85 @@ describe(commands.HUBSITE_GET, () => {
     });
 
     await command.action(logger, { options: { id: 'ee8b42c3-3e6f-4822-87c1-c21ad666046b', includeAssociatedSites: true, output: 'json' } });
+    assert(loggerLogSpy.calledWith({
+      "Description": null,
+      "ID": "ee8b42c3-3e6f-4822-87c1-c21ad666046b",
+      "LogoUrl": "http://contoso.com/__siteIcon__.jpg",
+      "SiteId": "ee8b42c3-3e6f-4822-87c1-c21ad666046b",
+      "SiteUrl": "https://contoso.sharepoint.com/sites/Sales",
+      "Targets": null,
+      "TenantInstanceId": "00000000-0000-0000-0000-000000000000",
+      "Title": "Sales",
+      "AssociatedSites": [
+        {
+          "Title": "Lucky Charms",
+          "SiteId": "c08c7be1-4b97-4caa-b88f-ec91100d7774",
+          "SiteUrl": "https://contoso.sharepoint.com/sites/LuckyCharms"
+        },
+        {
+          "Title": "Great Mates",
+          "SiteId": "7c371590-d9dd-4eb1-beb3-20f3613fdd9a",
+          "SiteUrl": "https://contoso.sharepoint.com/sites/GreatMates"
+        },
+        {
+          "Title": "Life and Music",
+          "SiteId": "dd007944-c7f9-4742-8c21-de8a7718696f",
+          "SiteUrl": "https://contoso.sharepoint.com/sites/LifeAndMusic"
+        }
+      ]
+    }));
+  });
+
+  it('retrieves the associated sites of the specified hub site', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if ((opts.url as string).indexOf(`/_api/hubsites/getbyid('ee8b42c3-3e6f-4822-87c1-c21ad666046b')`) > -1) {
+        return {
+          "Description": null,
+          "ID": "ee8b42c3-3e6f-4822-87c1-c21ad666046b",
+          "LogoUrl": "http://contoso.com/__siteIcon__.jpg",
+          "SiteId": "ee8b42c3-3e6f-4822-87c1-c21ad666046b",
+          "SiteUrl": "https://contoso.sharepoint.com/sites/Sales",
+          "Targets": null,
+          "TenantInstanceId": "00000000-0000-0000-0000-000000000000",
+          "Title": "Sales"
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinon.stub(cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
+      if (command === spoListItemListCommand) {
+        return {
+          stdout: JSON.stringify([
+            {
+              Title: "Lucky Charms",
+              SiteId: "c08c7be1-4b97-4caa-b88f-ec91100d7774",
+              SiteUrl: "https://contoso.sharepoint.com/sites/LuckyCharms"
+            },
+            {
+              Title: "Great Mates",
+              SiteId: "7c371590-d9dd-4eb1-beb3-20f3613fdd9a",
+              SiteUrl: "https://contoso.sharepoint.com/sites/GreatMates"
+            },
+            {
+              Title: "Life and Music",
+              SiteId: "dd007944-c7f9-4742-8c21-de8a7718696f",
+              SiteUrl: "https://contoso.sharepoint.com/sites/LifeAndMusic"
+            },
+            {
+              Title: "Leadership Connection",
+              SiteId: "ee8b42c3-3e6f-4822-87c1-c21ad666046b",
+              SiteUrl: "https://contoso.sharepoint.com/sites/leadership-connection"
+            }
+          ]
+          )
+        };
+      }
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { id: 'ee8b42c3-3e6f-4822-87c1-c21ad666046b', withAssociatedSites: true, output: 'json' } });
     assert(loggerLogSpy.calledWith({
       "Description": null,
       "ID": "ee8b42c3-3e6f-4822-87c1-c21ad666046b",

@@ -22,29 +22,32 @@ m365 entra m365group get [options]
 : Display name of the Microsoft 365 Group or Microsoft Teams team to retrieve information for. Specify either `id` or `displayName`, but not both.
 
 `--includeSiteUrl`
-: Set to retrieve the site URL for the group
+: (deprecated. Use option `withSiteUrl` instead) Set to retrieve the site URL for the group.
+
+`--withSiteUrl`
+: Set to retrieve the site URL for the group.
 ```
 
 <Global />
 
 ## Examples
 
-Get information about the Microsoft 365 Group with id _1caf7dcd-7e83-4c3a-94f7-932a1299c844_
+Get information about the Microsoft 365 Group with id _1caf7dcd-7e83-4c3a-94f7-932a1299c844_.
 
 ```sh
 m365 entra m365group get --id 1caf7dcd-7e83-4c3a-94f7-932a1299c844
 ```
 
-Get information about the Microsoft 365 Group with displayName _Finance_
+Get information about the Microsoft 365 Group with displayName _Finance_.
 
 ```sh
 m365 entra m365group get --displayName Finance
 ```
 
-Get information about the Microsoft 365 Group with id _1caf7dcd-7e83-4c3a-94f7-932a1299c844_ and also retrieve the URL of the corresponding SharePoint site
+Get information about the Microsoft 365 Group with id _1caf7dcd-7e83-4c3a-94f7-932a1299c844_ and also retrieve the URL of the corresponding SharePoint site.
 
 ```sh
-m365 entra m365group get --id 1caf7dcd-7e83-4c3a-94f7-932a1299c844 --includeSiteUrl
+m365 entra m365group get --id 1caf7dcd-7e83-4c3a-94f7-932a1299c844 --withSiteUrl
 ```
 
 ## Response
