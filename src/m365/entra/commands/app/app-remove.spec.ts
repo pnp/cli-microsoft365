@@ -13,6 +13,7 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './app-remove.js';
 import { settingsNames } from '../../../../settingsNames.js';
+import { entraApp } from '../../../../utils/entraApp.js';
 
 describe(commands.APP_REMOVE, () => {
   let log: string[];
@@ -20,6 +21,16 @@ describe(commands.APP_REMOVE, () => {
   let commandInfo: CommandInfo;
   let promptIssued: boolean = false;
   let deleteRequestStub: sinon.SinonStub;
+
+  //#region Mocked Responses 
+  const appResponse = {
+    value: [
+      {
+        "id": "d75be2e1-0204-4f95-857d-51a37cf40be8"
+      }
+    ]
+  };
+  //#endregion
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -50,6 +61,8 @@ describe(commands.APP_REMOVE, () => {
     });
 
     promptIssued = false;
+
+    sinon.stub(entraApp, 'getAppRegistrationByAppId').resolves(appResponse.value[0]);
 
     sinon.stub(request, 'get').callsFake(async (opts: any) => {
       if ((opts.url as string).indexOf(`/v1.0/myorganization/applications?$filter=`) > -1) {
@@ -82,7 +95,8 @@ describe(commands.APP_REMOVE, () => {
       request.delete,
       cli.promptForConfirmation,
       cli.getSettingWithDefaultValue,
-      cli.handleMultipleResultsFound
+      cli.handleMultipleResultsFound,
+      entraApp.getAppRegistrationByAppId
     ]);
   });
 
@@ -229,15 +243,11 @@ describe(commands.APP_REMOVE, () => {
   });
 
   it('fails to get app by id when app does not exists', async () => {
-    sinonUtil.restore(request.get);
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/v1.0/myorganization/applications?$filter=`) > -1) {
-        return { value: [] };
-      }
-      throw "No Microsoft Entra application registration with ID myapp found";
-    });
+    sinonUtil.restore(entraApp.getAppRegistrationByAppId);
+    const error = `App with appId 'd75be2e1-0204-4f95-857d-51a37cf40be8' not found in Microsoft Entra ID`;
+    sinon.stub(entraApp, 'getAppRegistrationByAppId').rejects(new Error(error));
 
-    await assert.rejects(command.action(logger, { options: { debug: true, appId: 'd75be2e1-0204-4f95-857d-51a37cf40be8', force: true } } as any), new CommandError("No Microsoft Entra application registration with ID d75be2e1-0204-4f95-857d-51a37cf40be8 found"));
+    await assert.rejects(command.action(logger, { options: { debug: true, appId: 'd75be2e1-0204-4f95-857d-51a37cf40be8', force: true } } as any), new CommandError(error));
   });
 
   it('fails to get app by name when app does not exists', async () => {

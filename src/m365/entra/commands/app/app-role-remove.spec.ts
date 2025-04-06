@@ -13,12 +13,23 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './app-role-remove.js';
 import { settingsNames } from '../../../../settingsNames.js';
+import { entraApp } from '../../../../utils/entraApp.js';
 
 describe(commands.APP_ROLE_REMOVE, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
   let promptIssued: boolean = false;
+
+  //#region Mocked Responses 
+  const appResponse = {
+    value: [
+      {
+        "id": "5b31c38c-2584-42f0-aa47-657fb3a84230"
+      }
+    ]
+  };
+  //#endregion
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -56,7 +67,8 @@ describe(commands.APP_ROLE_REMOVE, () => {
       request.patch,
       cli.promptForConfirmation,
       cli.getSettingWithDefaultValue,
-      cli.handleMultipleResultsFound
+      cli.handleMultipleResultsFound,
+      entraApp.getAppRegistrationByAppId
     ]);
   });
 
@@ -299,24 +311,9 @@ describe(commands.APP_ROLE_REMOVE, () => {
   });
 
   it('deletes an app role when the role is in enabled state and valid appId, role claim and --force option specified', async () => {
+    sinon.stub(entraApp, 'getAppRegistrationByAppId').resolves(appResponse.value[0]);
 
-    const getRequestStub = sinon.stub(request, 'get');
-
-    getRequestStub.onFirstCall().callsFake(async opts => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=appId eq '53788d97-dc06-460c-8bd6-5cfbc7e3b0f7'&$select=id`) {
-        return {
-          "value": [
-            {
-              id: '5b31c38c-2584-42f0-aa47-657fb3a84230'
-            }
-          ]
-        };
-      }
-
-      throw `Invalid request ${JSON.stringify(opts)}`;
-    });
-
-    getRequestStub.onSecondCall().callsFake(async opts => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230?$select=id,appRoles') {
         return {
           id: '5b31c38c-2584-42f0-aa47-657fb3a84230',
@@ -390,24 +387,9 @@ describe(commands.APP_ROLE_REMOVE, () => {
   });
 
   it('deletes an app role when the role is in enabled state and valid appId, role name and --force option specified', async () => {
+    sinon.stub(entraApp, 'getAppRegistrationByAppId').resolves(appResponse.value[0]);
 
-    const getRequestStub = sinon.stub(request, 'get');
-
-    getRequestStub.onFirstCall().callsFake(async opts => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=appId eq '53788d97-dc06-460c-8bd6-5cfbc7e3b0f7'&$select=id`) {
-        return {
-          "value": [
-            {
-              id: '5b31c38c-2584-42f0-aa47-657fb3a84230'
-            }
-          ]
-        };
-      }
-
-      throw `Invalid request ${JSON.stringify(opts)}`;
-    });
-
-    getRequestStub.onSecondCall().callsFake(async opts => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230?$select=id,appRoles') {
         return {
           id: '5b31c38c-2584-42f0-aa47-657fb3a84230',
@@ -482,23 +464,9 @@ describe(commands.APP_ROLE_REMOVE, () => {
   });
 
   it('deletes an app role when the role is in enabled state and valid appId, role id and --force option specified', async () => {
+    sinon.stub(entraApp, 'getAppRegistrationByAppId').resolves(appResponse.value[0]);
 
-    const getRequestStub = sinon.stub(request, 'get');
-
-    getRequestStub.onFirstCall().callsFake(async opts => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=appId eq '53788d97-dc06-460c-8bd6-5cfbc7e3b0f7'&$select=id`) {
-        return {
-          "value": [
-            {
-              id: '5b31c38c-2584-42f0-aa47-657fb3a84230'
-            }
-          ]
-        };
-      }
-      throw `Invalid request ${JSON.stringify(opts)}`;
-    });
-
-    getRequestStub.onSecondCall().callsFake(async opts => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230?$select=id,appRoles') {
         return {
           id: '5b31c38c-2584-42f0-aa47-657fb3a84230',
@@ -648,24 +616,9 @@ describe(commands.APP_ROLE_REMOVE, () => {
   });
 
   it('deletes an app role when the role is in enabled state and valid appId, role name and --force option specified (debug)', async () => {
+    sinon.stub(entraApp, 'getAppRegistrationByAppId').resolves(appResponse.value[0]);
 
-    const getRequestStub = sinon.stub(request, 'get');
-
-    getRequestStub.onFirstCall().callsFake(async opts => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=appId eq '53788d97-dc06-460c-8bd6-5cfbc7e3b0f7'&$select=id`) {
-        return {
-          "value": [
-            {
-              id: '5b31c38c-2584-42f0-aa47-657fb3a84230'
-            }
-          ]
-        };
-      }
-
-      throw `Invalid request ${JSON.stringify(opts)}`;
-    });
-
-    getRequestStub.onSecondCall().callsFake(async opts => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230?$select=id,appRoles') {
         return {
           id: '5b31c38c-2584-42f0-aa47-657fb3a84230',
@@ -741,23 +694,9 @@ describe(commands.APP_ROLE_REMOVE, () => {
   });
 
   it('deletes an app role when the role is in enabled state and valid appId, role id and --force option specified (debug)', async () => {
+    sinon.stub(entraApp, 'getAppRegistrationByAppId').resolves(appResponse.value[0]);
 
-    const getRequestStub = sinon.stub(request, 'get');
-
-    getRequestStub.onFirstCall().callsFake(async opts => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=appId eq '53788d97-dc06-460c-8bd6-5cfbc7e3b0f7'&$select=id`) {
-        return {
-          "value": [
-            {
-              id: '5b31c38c-2584-42f0-aa47-657fb3a84230'
-            }
-          ]
-        };
-      }
-      throw `Invalid request ${JSON.stringify(opts)}`;
-    });
-
-    getRequestStub.onSecondCall().callsFake(async opts => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230?$select=id,appRoles') {
         return {
           id: '5b31c38c-2584-42f0-aa47-657fb3a84230',
@@ -1792,27 +1731,12 @@ describe(commands.APP_ROLE_REMOVE, () => {
   });
 
   it('deletes an app role when the role is in enabled state and valid appId, role name and prompt is confirmed', async () => {
-
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
-    const getRequestStub = sinon.stub(request, 'get');
+    sinon.stub(entraApp, 'getAppRegistrationByAppId').resolves(appResponse.value[0]);
 
-    getRequestStub.onFirstCall().callsFake(async opts => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=appId eq '53788d97-dc06-460c-8bd6-5cfbc7e3b0f7'&$select=id`) {
-        return {
-          "value": [
-            {
-              id: '5b31c38c-2584-42f0-aa47-657fb3a84230'
-            }
-          ]
-        };
-      }
-
-      throw `Invalid request ${JSON.stringify(opts)}`;
-    });
-
-    getRequestStub.onSecondCall().callsFake(async opts => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230?$select=id,appRoles') {
         return {
           id: '5b31c38c-2584-42f0-aa47-657fb3a84230',
@@ -1886,26 +1810,12 @@ describe(commands.APP_ROLE_REMOVE, () => {
   });
 
   it('deletes an app role when the role is in enabled state and valid appId, role id and prompt is confirmed (debug)', async () => {
-
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
-    const getRequestStub = sinon.stub(request, 'get');
+    sinon.stub(entraApp, 'getAppRegistrationByAppId').resolves(appResponse.value[0]);
 
-    getRequestStub.onFirstCall().callsFake(async opts => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=appId eq '53788d97-dc06-460c-8bd6-5cfbc7e3b0f7'&$select=id`) {
-        return {
-          "value": [
-            {
-              id: '5b31c38c-2584-42f0-aa47-657fb3a84230'
-            }
-          ]
-        };
-      }
-      throw `Invalid request ${JSON.stringify(opts)}`;
-    });
-
-    getRequestStub.onSecondCall().callsFake(async opts => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230?$select=id,appRoles') {
         return {
           id: '5b31c38c-2584-42f0-aa47-657fb3a84230',
@@ -2028,13 +1938,8 @@ describe(commands.APP_ROLE_REMOVE, () => {
   });
 
   it('handles error when the app specified with the appId not found', async () => {
-    sinon.stub(request, 'get').callsFake(async opts => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=appId eq '9b1b1e42-794b-4c71-93ac-5ed92488b67f'&$select=id`) {
-        return { value: [] };
-      }
-
-      throw `Invalid request ${JSON.stringify(opts)}`;
-    });
+    const error = `App with appId '9b1b1e42-794b-4c71-93ac-5ed92488b67f' not found in Microsoft Entra ID`;
+    sinon.stub(entraApp, 'getAppRegistrationByAppId').rejects(new Error(error));
 
     await assert.rejects(command.action(logger, {
       options: {
@@ -2042,7 +1947,7 @@ describe(commands.APP_ROLE_REMOVE, () => {
         name: 'App-Role',
         force: true
       }
-    }), new CommandError(`No Microsoft Entra application registration with ID 9b1b1e42-794b-4c71-93ac-5ed92488b67f found`));
+    }), new CommandError(`App with appId '9b1b1e42-794b-4c71-93ac-5ed92488b67f' not found in Microsoft Entra ID`));
   });
 
   it('handles error when the app specified with appName not found', async () => {

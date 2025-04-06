@@ -9,6 +9,7 @@ import GraphCommand from '../../../base/GraphCommand.js';
 import { M365RcJson } from '../../../base/M365RcJson.js';
 import commands from '../../commands.js';
 import { cli } from '../../../../cli/cli.js';
+import { entraApp } from '../../../../utils/entraApp.js';
 
 interface CommandArgs {
   options: Options;
@@ -83,7 +84,7 @@ class EntraAppGetCommand extends GraphCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
-      const appObjectId = await this.getAppObjectId(args);
+      const appObjectId = await this.getAppObjectId(args, logger);
       const appInfo = await this.getAppInfo(appObjectId, args.options.properties);
       const res = await this.saveAppInfo(args, appInfo, logger);
       await logger.log(res);
@@ -93,39 +94,44 @@ class EntraAppGetCommand extends GraphCommand {
     }
   }
 
-  private async getAppObjectId(args: CommandArgs): Promise<string> {
+  private async getAppObjectId(args: CommandArgs, logger: Logger): Promise<string> {
     if (args.options.objectId) {
       return args.options.objectId;
     }
 
     const { appId, name } = args.options;
 
-    const filter: string = appId ?
-      `appId eq '${formatting.encodeQueryParameter(appId)}'` :
-      `displayName eq '${formatting.encodeQueryParameter(name as string)}'`;
-
-    const requestOptions: CliRequestOptions = {
-      url: `${this.resource}/v1.0/myorganization/applications?$filter=${filter}&$select=id`,
-      headers: {
-        accept: 'application/json;odata.metadata=none'
-      },
-      responseType: 'json'
-    };
-
-    const res = await request.get<{ value: { id: string }[] }>(requestOptions);
-
-    if (res.value.length === 1) {
-      return res.value[0].id;
+    if (this.verbose) {
+      await logger.logToStderr(`Retrieving information about Microsoft Entra app ${appId ? appId : name}...`);
     }
 
-    if (res.value.length === 0) {
-      const applicationIdentifier = appId ? `ID ${appId}` : `name ${name}`;
-      throw `No Microsoft Entra application registration with ${applicationIdentifier} found`;
+    if (appId) {
+      const app = await entraApp.getAppRegistrationByAppId(appId, ["id"]);
+      return app.id!;
     }
+    else {
+      const requestOptions: CliRequestOptions = {
+        url: `${this.resource}/v1.0/myorganization/applications?$filter=displayName eq '${formatting.encodeQueryParameter(name as string)}'&$select=id`,
+        headers: {
+          accept: 'application/json;odata.metadata=none'
+        },
+        responseType: 'json'
+      };
 
-    const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', res.value);
-    const result = await cli.handleMultipleResultsFound<{ id: string }>(`Multiple Microsoft Entra application registrations with name '${name}' found.`, resultAsKeyValuePair);
-    return result.id;
+      const res = await request.get<{ value: { id: string }[] }>(requestOptions);
+
+      if (res.value.length === 1) {
+        return res.value[0].id;
+      }
+
+      if (res.value.length === 0) {
+        throw `No Microsoft Entra application registration with name ${name} found`;
+      }
+
+      const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', res.value);
+      const result = await cli.handleMultipleResultsFound<{ id: string }>(`Multiple Microsoft Entra application registrations with name '${name}' found.`, resultAsKeyValuePair);
+      return result.id;
+    }
   }
 
   private async getAppInfo(appObjectId: string, properties?: string): Promise<Application> {
