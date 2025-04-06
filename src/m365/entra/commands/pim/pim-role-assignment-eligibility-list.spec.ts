@@ -368,7 +368,10 @@ describe(commands.PIM_ROLE_ASSIGNMENT_ELIGIBILITY_LIST, () => {
     assert(loggerLogSpy.calledOnceWithExactly([unifiedRoleAssignmentEligibilityScheduleInstanceTransformedResponse[1]]));
   });
 
-  it('should get a list of eligible roles with details about principals that were assigned using includePrincipalDetails parameter', async () => {
+  it(`correctly shows deprecation warning for option 'includePrincipalDetails'`, async () => {
+    const chalk = (await import('chalk')).default;
+    const loggerErrSpy = sinon.spy(logger, 'logToStderr');
+
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/roleManagement/directory/roleEligibilityScheduleInstances?$expand=roleDefinition($select=displayName),principal') {
         return {
@@ -380,8 +383,9 @@ describe(commands.PIM_ROLE_ASSIGNMENT_ELIGIBILITY_LIST, () => {
     });
 
     await command.action(logger, { options: { includePrincipalDetails: true } });
+    assert(loggerErrSpy.calledWith(chalk.yellow(`Parameter 'includePrincipalDetails' is deprecated. Please use 'withPrincipalDetails' instead`)));
 
-    assert(loggerLogSpy.calledOnceWithExactly(unifiedRoleAssignmentEligibilityScheduleInstanceWithPrincipalTransformedResponse));
+    sinonUtil.restore(loggerErrSpy);
   });
 
   it('should get a list of eligible roles with details about principals that were assigned', async () => {

@@ -19,6 +19,7 @@ interface Options extends GlobalOptions {
   groupName?: string;
   startDateTime?: string;
   includePrincipalDetails?: boolean;
+  withPrincipalDetails?: boolean;
 }
 
 class EntraPimRoleAssignmentListCommand extends GraphCommand {
@@ -47,7 +48,8 @@ class EntraPimRoleAssignmentListCommand extends GraphCommand {
         groupId: typeof args.options.groupId !== 'undefined',
         groupName: typeof args.options.groupName !== 'undefined',
         startDateTime: typeof args.options.startDateTime !== 'undefined',
-        includePrincipalDetails: !!args.options.includePrincipalDetails
+        includePrincipalDetails: !!args.options.includePrincipalDetails,
+        withPrincipalDetails: !!args.options.withPrincipalDetails
       });
     });
   }
@@ -71,6 +73,9 @@ class EntraPimRoleAssignmentListCommand extends GraphCommand {
       },
       {
         option: "--includePrincipalDetails [includePrincipalDetails]"
+      },
+      {
+        option: '--withPrincipalDetails [withPrincipalDetails]'
       }
     );
   }
@@ -107,9 +112,13 @@ class EntraPimRoleAssignmentListCommand extends GraphCommand {
     const filters: string[] = [];
     const expands: string[] = [];
 
-    try {     
+    try {
+      if (args.options.includePrincipalDetails) {
+        await this.warn(logger, `Parameter 'includePrincipalDetails' is deprecated. Please use 'withPrincipalDetails' instead`);
+      }
+
       const principalId = await this.getPrincipalId(logger, args.options);
-            
+
       if (principalId) {
         filters.push(`principalId eq '${principalId}'`);
       }
@@ -124,7 +133,7 @@ class EntraPimRoleAssignmentListCommand extends GraphCommand {
 
       expands.push('roleDefinition($select=displayName)');
 
-      if (args.options.includePrincipalDetails) {
+      if (args.options.includePrincipalDetails || args.options.withPrincipalDetails) {
         expands.push('principal');
       }
 

@@ -136,6 +136,10 @@ class SpoFileMoveCommand extends SpoCommand {
       const sourcePath = this.getAbsoluteUrl(args.options.webUrl, sourceServerRelativePath);
       const destinationPath = this.getAbsoluteUrl(args.options.webUrl, args.options.targetUrl);
 
+      if (args.options.includeItemPermissions) {
+        await this.warn(logger, `Parameter 'includeItemPermissions' is deprecated. Please use 'withItemPermissions' instead`);
+      }
+
       if (this.verbose) {
         await logger.logToStderr(`Moving file '${sourceServerRelativePath}' to '${args.options.targetUrl}'...`);
       }

@@ -63,6 +63,10 @@ class SpoHubSiteListCommand extends SpoCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
+      if (args.options.includeAssociatedSites) {
+        await this.warn(logger, `Parameter 'includeAssociatedSites' is deprecated. Please use 'withAssociatedSites' instead`);
+      }
+
       const spoAdminUrl = await spo.getSpoAdminUrl(logger, this.debug);
 
       const hubSitesResult = await odata.getAllItems<HubSite>(`${spoAdminUrl}/_api/hubsites`);

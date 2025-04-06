@@ -139,7 +139,10 @@ describe(commands.ENGAGE_NETWORK_LIST, () => {
     assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 123);
   });
 
-  it('calls the networking endpoint with parameter using includeSuspended parameter', async () => {
+  it(`correctly shows deprecation warning for option 'includeSuspended'`, async () => {
+    const chalk = (await import('chalk')).default;
+    const loggerErrSpy = sinon.spy(logger, 'logToStderr');
+
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/networks/current.json') {
         return [
@@ -164,8 +167,11 @@ describe(commands.ENGAGE_NETWORK_LIST, () => {
 
       throw 'Invalid request';
     });
+
     await command.action(logger, { options: { debug: true, includeSuspended: true } } as any);
-    assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 123);
+    assert(loggerErrSpy.calledWith(chalk.yellow(`Parameter 'includeSuspended' is deprecated. Please use 'withSuspended' instead`)));
+
+    sinonUtil.restore(loggerErrSpy);
   });
 
   it('calls the networking endpoint with parameter', async () => {
@@ -199,11 +205,6 @@ describe(commands.ENGAGE_NETWORK_LIST, () => {
 
   it('passes validation without parameters', async () => {
     const actual = await command.validate({ options: {} }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
-
-  it('passes validation with parameters using includeSuspended parameter', async () => {
-    const actual = await command.validate({ options: { includeSuspended: true } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 

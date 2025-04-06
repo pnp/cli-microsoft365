@@ -179,7 +179,6 @@ class GraphSubscriptionAddCommand extends GraphCommand {
       expirationDateTime: await this.getExpirationDateTimeOrDefault(logger, args),
       clientState: args.options.clientState,
       includeResourceData: args.options.withResourceData || args.options.includeResourceData,
-      withResourceData: args.options.withResourceData || args.options.includeResourceData,
       encryptionCertificate: args.options.encryptionCertificate,
       encryptionCertificateId: args.options.encryptionCertificateId,
       lifecycleNotificationUrl: args.options.lifecycleNotificationUrl,

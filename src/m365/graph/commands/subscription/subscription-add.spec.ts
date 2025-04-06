@@ -346,7 +346,9 @@ describe(commands.SUBSCRIPTION_ADD, () => {
     }));
   });
 
-  it('adds subscription and includes resource data using includeResourceData parameter', async () => {
+  it(`correctly shows deprecation warning for option 'includeResourceData'`, async () => {
+    const chalk = (await import('chalk')).default;
+
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/subscriptions`) {
         return {
@@ -360,7 +362,6 @@ describe(commands.SUBSCRIPTION_ADD, () => {
           "expirationDateTime": "2016-11-20T18:23:45.935Z",
           "creatorId": "8ee44408-0679-472c-bc2a-692812af3437",
           "includeResourceData": true,
-          "withResourceData": true,
           "encryptionCertificateId": "MyCert",
           "encryptionCertificate": "Q0xJIGZvciBNaWNyb3NvZnQgMzY1"
         };
@@ -382,21 +383,9 @@ describe(commands.SUBSCRIPTION_ADD, () => {
       }
     });
 
-    assert.strictEqual(JSON.stringify(log[1]), JSON.stringify({
-      "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#subscriptions/$entity",
-      "id": "7f105c7d-2dc5-4530-97cd-4e7ae6534c07",
-      "resource": "me/mailFolders('Inbox')/messages",
-      "applicationId": "24d3b144-21ae-4080-943f-7067b395b913",
-      "changeType": "updated",
-      "clientState": "secretClientValue",
-      "notificationUrl": "https://webhook.azurewebsites.net/api/send/myNotifyClient",
-      "expirationDateTime": "2016-11-20T18:23:45.935Z",
-      "creatorId": "8ee44408-0679-472c-bc2a-692812af3437",
-      "includeResourceData": true,
-      "withResourceData": true,
-      "encryptionCertificateId": "MyCert",
-      "encryptionCertificate": "Q0xJIGZvciBNaWNyb3NvZnQgMzY1"
-    }));
+    assert(loggerLogToStderrSpy.calledWith(chalk.yellow(`Parameter 'includeResourceData' is deprecated. Please use 'withResourceData' instead`)));
+
+    sinonUtil.restore(loggerLogToStderrSpy);
   });
 
   it('adds subscription and includes resource data', async () => {
@@ -413,7 +402,6 @@ describe(commands.SUBSCRIPTION_ADD, () => {
           "expirationDateTime": "2016-11-20T18:23:45.935Z",
           "creatorId": "8ee44408-0679-472c-bc2a-692812af3437",
           "includeResourceData": true,
-          "withResourceData": true,
           "encryptionCertificateId": "MyCert",
           "encryptionCertificate": "Q0xJIGZvciBNaWNyb3NvZnQgMzY1"
         };
@@ -446,7 +434,6 @@ describe(commands.SUBSCRIPTION_ADD, () => {
       "expirationDateTime": "2016-11-20T18:23:45.935Z",
       "creatorId": "8ee44408-0679-472c-bc2a-692812af3437",
       "includeResourceData": true,
-      "withResourceData": true,
       "encryptionCertificateId": "MyCert",
       "encryptionCertificate": "Q0xJIGZvciBNaWNyb3NvZnQgMzY1"
     }));
@@ -555,36 +542,6 @@ describe(commands.SUBSCRIPTION_ADD, () => {
         notificationUrl: 'https://webhook.azurewebsites.net/api/send/myNotifyClient',
         expirationDateTime: '2016-11-20T18:23:45.935Z',
         lifecycleNotificationUrl: 'foo'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if resource data should be included, but encryptionCertificate is not set using includeResourceData parameter', async () => {
-    const actual = await command.validate({
-      options: {
-        resource: "me/mailFolders('Inbox')/messages",
-        changeTypes: 'updated',
-        clientState: 'secretClientValue',
-        notificationUrl: 'https://webhook.azurewebsites.net/api/send/myNotifyClient',
-        expirationDateTime: '2016-11-20T18:23:45.935Z',
-        includeResourceData: true,
-        encryptionCertificateId: 'MyCert'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if resource data should be included, but encryptionCertificateId is not set using includeResourceData parameter', async () => {
-    const actual = await command.validate({
-      options: {
-        resource: "me/mailFolders('Inbox')/messages",
-        changeTypes: 'updated',
-        clientState: 'secretClientValue',
-        notificationUrl: 'https://webhook.azurewebsites.net/api/send/myNotifyClient',
-        expirationDateTime: '2016-11-20T18:23:45.935Z',
-        includeResourceData: true,
-        encryptionCertificate: 'Q0xJIGZvciBNaWNyb3NvZnQgMzY1'
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);

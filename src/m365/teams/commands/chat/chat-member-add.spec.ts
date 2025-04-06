@@ -106,8 +106,11 @@ describe(commands.CHAT_MEMBER_ADD, () => {
     assert.deepStrictEqual(postStub.lastCall.args[0].data, requestBody);
   });
 
-  it('adds a member by specifying its userId and share all chat history using includeAllHistory parameter', async () => {
-    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+  it(`correctly shows deprecation warning for option 'includeAllHistory'`, async () => {
+    const chalk = (await import('chalk')).default;
+    const loggerErrSpy = sinon.spy(logger, 'logToStderr');
+
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/chats/${chatId}/members`) {
         return;
       }
@@ -115,15 +118,10 @@ describe(commands.CHAT_MEMBER_ADD, () => {
       throw 'Invalid request';
     });
 
-    const requestBody = {
-      '@odata.type': '#microsoft.graph.aadUserConversationMember',
-      roles: ['owner'],
-      'user@odata.bind': `https://graph.microsoft.com/v1.0/users/${userId}`,
-      visibleHistoryStartDateTime: '0001-01-01T00:00:00Z'
-    };
-
     await command.action(logger, { options: { chatId: chatId, userId: userId, includeAllHistory: true } });
-    assert.deepStrictEqual(postStub.lastCall.args[0].data, requestBody);
+    assert(loggerErrSpy.calledWith(chalk.yellow(`Parameter 'includeAllHistory' is deprecated. Please use 'withAllHistory' instead`)));
+
+    sinonUtil.restore(loggerErrSpy);
   });
 
   it('adds a member by specifying its userId and share all chat history', async () => {

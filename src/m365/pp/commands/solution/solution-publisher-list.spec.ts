@@ -110,7 +110,10 @@ describe(commands.SOLUTION_PUBLISHER_LIST, () => {
     assert(loggerLogSpy.calledWith(publisherResponse.value));
   });
 
-  it('retrieves publishers from power platform environment including the Microsoft Publishers using includeMicrosoftPublishers parameter', async () => {
+  it(`correctly shows deprecation warning for option 'includeMicrosoftPublishers'`, async () => {
+    const chalk = (await import('chalk')).default;
+    const loggerErrSpy = sinon.spy(logger, 'logToStderr');
+
     sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').callsFake(async () => envUrl);
 
     sinon.stub(request, 'get').callsFake(async (opts) => {
@@ -124,7 +127,9 @@ describe(commands.SOLUTION_PUBLISHER_LIST, () => {
     });
 
     await command.action(logger, { options: { debug: true, environmentName: validEnvironment, includeMicrosoftPublishers: true } });
-    assert(loggerLogSpy.calledWith(publisherResponse.value));
+    assert(loggerErrSpy.calledWith(chalk.yellow(`Parameter 'includeMicrosoftPublishers' is deprecated. Please use 'withMicrosoftPublishers' instead`)));
+
+    sinonUtil.restore(loggerErrSpy);
   });
 
   it('retrieves publishers from power platform environment including the Microsoft Publishers', async () => {

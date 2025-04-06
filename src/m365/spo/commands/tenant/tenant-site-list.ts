@@ -90,14 +90,14 @@ class SpoTenantSiteListCommand extends SpoCommand {
           return `${args.options.type} is not a valid value for the type option. Allowed values are ${typeValues.join('|')}`;
         }
 
-        if (args.options.includeOneDriveSites
+        if (args.options.includeOneDriveSites || args.options.withOneDriveSites
           && (args.options.type || args.options.webTemplate)) {
-          return 'When using includeOneDriveSites, don\'t specify the type or webTemplate options';
-        }
-
-        if (args.options.withOneDriveSites
-          && (args.options.type || args.options.webTemplate)) {
-          return 'When using withOneDriveSites, don\'t specify the type or webTemplate options';
+          if (args.options.includeOneDriveSites) {
+            return 'When using includeOneDriveSites, don\'t specify the type or webTemplate options';
+          }
+          else {
+            return 'When using withOneDriveSites, don\'t specify the type or webTemplate options';
+          }
         }
 
         return true;
@@ -171,11 +171,7 @@ class SpoTenantSiteListCommand extends SpoCommand {
       return options.webTemplate;
     }
 
-    if (options.includeOneDriveSites) {
-      return '';
-    }
-
-    if (options.withOneDriveSites) {
+    if (options.includeOneDriveSites || options.withOneDriveSites) {
       return '';
     }
 
