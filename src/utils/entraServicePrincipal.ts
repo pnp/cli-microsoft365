@@ -52,5 +52,19 @@ export const entraServicePrincipal = {
     }
 
     return apps[0];
+  },
+
+  /**
+   * Get all available service principals.
+   * @param properties Comma-separated list of properties to include in the response.
+   */
+  async getServicePrincipals(properties?: string): Promise<ServicePrincipal[]> {
+    let url = `https://graph.microsoft.com/v1.0/servicePrincipals`;
+
+    if (properties) {
+      url += `?$select=${properties}`;
+    }
+
+    return odata.getAllItems<ServicePrincipal>(url);
   }
 };

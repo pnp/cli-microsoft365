@@ -126,4 +126,44 @@ describe('utils/entraServicePrincipal', () => {
 
     await assert.rejects(entraServicePrincipal.getServicePrincipalByAppName(appName), Error(`Multiple service principals with name '${appName}' found in Microsoft Entra ID. Found: ${servicePrincipalId}, ${secondServicePrincipalId}.`));
   });
+
+  it('correctly get all service principals using getServicePrincipals', async () => {
+    const allServicePrincipals = [
+      { id: servicePrincipalId, displayName: 'Principal 1' },
+      { id: secondServicePrincipalId, displayName: 'Principal 2' }
+    ];
+
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/servicePrincipals`) {
+        return {
+          value: allServicePrincipals
+        };
+      }
+
+      throw 'Invalid Request';
+    });
+
+    const actual = await entraServicePrincipal.getServicePrincipals();
+    assert.deepStrictEqual(actual, allServicePrincipals);
+  });
+
+  it('correctly get all service principals with options using getServicePrincipals', async () => {
+    const allServicePrincipals = [
+      { id: servicePrincipalId },
+      { id: secondServicePrincipalId }
+    ];
+
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/servicePrincipals?$select=id`) {
+        return {
+          value: allServicePrincipals
+        };
+      }
+
+      throw 'Invalid Request';
+    });
+
+    const actual = await entraServicePrincipal.getServicePrincipals('id');
+    assert.deepStrictEqual(actual, allServicePrincipals);
+  });
 });
