@@ -7,6 +7,7 @@ import { formatting } from "../../../../utils/formatting.js";
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
+import { entraApp } from "../../../../utils/entraApp.js";
 
 interface CommandArgs {
   options: Options;
@@ -109,18 +110,18 @@ class EntraAppRoleRemoveCommand extends GraphCommand {
 
   private async processAppRoleDelete(logger: Logger, args: CommandArgs): Promise<void> {
     const appObjectId = await this.getAppObjectId(args, logger);
-    const aadApp = await this.getAadApp(appObjectId, logger);
+    const app = await this.getEntraApp(appObjectId, logger);
 
     const appRoleDeleteIdentifierNameValue = args.options.name ? `name '${args.options.name}'` : (args.options.claim ? `claim '${args.options.claim}'` : `id '${args.options.id}'`);
     if (this.verbose) {
-      await logger.logToStderr(`Deleting role with ${appRoleDeleteIdentifierNameValue} from Microsoft Entra app ${aadApp.id}...`);
+      await logger.logToStderr(`Deleting role with ${appRoleDeleteIdentifierNameValue} from Microsoft Entra app ${app.id}...`);
     }
 
     // Find the role search criteria provided by the user.
     const appRoleDeleteIdentifierProperty = args.options.name ? `displayName` : (args.options.claim ? `value` : `id`);
     const appRoleDeleteIdentifierValue = args.options.name ? args.options.name : (args.options.claim ? args.options.claim : args.options.id);
 
-    const appRoleToDelete: AppRole[] = aadApp.appRoles!.filter((role: AppRole) => role[appRoleDeleteIdentifierProperty] === appRoleDeleteIdentifierValue);
+    const appRoleToDelete: AppRole[] = app.appRoles!.filter((role: AppRole) => role[appRoleDeleteIdentifierProperty] === appRoleDeleteIdentifierValue);
 
     if (args.options.name &&
       appRoleToDelete !== undefined &&
@@ -136,46 +137,46 @@ class EntraAppRoleRemoveCommand extends GraphCommand {
     const roleToDelete: AppRole = appRoleToDelete[0];
 
     if (roleToDelete.isEnabled) {
-      await this.disableAppRole(logger, aadApp, roleToDelete.id!);
-      await this.deleteAppRole(logger, aadApp, roleToDelete.id!);
+      await this.disableAppRole(logger, app, roleToDelete.id!);
+      await this.deleteAppRole(logger, app, roleToDelete.id!);
     }
     else {
-      await this.deleteAppRole(logger, aadApp, roleToDelete.id!);
+      await this.deleteAppRole(logger, app, roleToDelete.id!);
     }
   }
 
 
-  private async disableAppRole(logger: Logger, aadApp: Application, roleId: string): Promise<void> {
-    const roleIndex = aadApp.appRoles!.findIndex((role: AppRole) => role.id === roleId);
+  private async disableAppRole(logger: Logger, app: Application, roleId: string): Promise<void> {
+    const roleIndex = app.appRoles!.findIndex((role: AppRole) => role.id === roleId);
 
     if (this.verbose) {
       await logger.logToStderr(`Disabling the app role`);
     }
 
-    aadApp.appRoles![roleIndex].isEnabled = false;
+    app.appRoles![roleIndex].isEnabled = false;
 
     const requestOptions: CliRequestOptions = {
-      url: `${this.resource}/v1.0/myorganization/applications/${aadApp.id}`,
+      url: `${this.resource}/v1.0/myorganization/applications/${app.id}`,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },
       responseType: 'json',
       data: {
-        appRoles: aadApp.appRoles
+        appRoles: app.appRoles
       }
     };
 
     return request.patch(requestOptions);
   }
 
-  private async deleteAppRole(logger: Logger, aadApp: Application, roleId: string): Promise<void> {
+  private async deleteAppRole(logger: Logger, app: Application, roleId: string): Promise<void> {
     if (this.verbose) {
       await logger.logToStderr(`Deleting the app role.`);
     }
 
-    const updatedAppRoles = aadApp.appRoles!.filter((role: AppRole) => role.id !== roleId);
+    const updatedAppRoles = app.appRoles!.filter((role: AppRole) => role.id !== roleId);
     const requestOptions: CliRequestOptions = {
-      url: `${this.resource}/v1.0/myorganization/applications/${aadApp.id}`,
+      url: `${this.resource}/v1.0/myorganization/applications/${app.id}`,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },
@@ -188,13 +189,13 @@ class EntraAppRoleRemoveCommand extends GraphCommand {
     return request.patch(requestOptions);
   }
 
-  private async getAadApp(appId: string, logger: Logger): Promise<Application> {
+  private async getEntraApp(appObjectId: string, logger: Logger): Promise<Application> {
     if (this.verbose) {
-      await logger.logToStderr(`Retrieving app roles information for the Microsoft Entra app ${appId}...`);
+      await logger.logToStderr(`Retrieving app roles information for the Microsoft Entra app ${appObjectId}...`);
     }
 
     const requestOptions: CliRequestOptions = {
-      url: `${this.resource}/v1.0/myorganization/applications/${appId}?$select=id,appRoles`,
+      url: `${this.resource}/v1.0/myorganization/applications/${appObjectId}?$select=id,appRoles`,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },
@@ -214,32 +215,33 @@ class EntraAppRoleRemoveCommand extends GraphCommand {
       await logger.logToStderr(`Retrieving information about Microsoft Entra app ${appId ? appId : appName}...`);
     }
 
-    const filter: string = appId ?
-      `appId eq '${formatting.encodeQueryParameter(appId)}'` :
-      `displayName eq '${formatting.encodeQueryParameter(appName as string)}'`;
-
-    const requestOptions: CliRequestOptions = {
-      url: `${this.resource}/v1.0/myorganization/applications?$filter=${filter}&$select=id`,
-      headers: {
-        accept: 'application/json;odata.metadata=none'
-      },
-      responseType: 'json'
-    };
-
-    const res = await request.get<{ value: { id: string }[] }>(requestOptions);
-
-    if (res.value.length === 1) {
-      return res.value[0].id;
+    if (appId) {
+      const app = await entraApp.getAppRegistrationByAppId(appId, ['id']);
+      return app.id!;
     }
+    else {
+      const requestOptions: CliRequestOptions = {
+        url: `${this.resource}/v1.0/myorganization/applications?$filter=displayName eq '${formatting.encodeQueryParameter(appName as string)}'&$select=id`,
+        headers: {
+          accept: 'application/json;odata.metadata=none'
+        },
+        responseType: 'json'
+      };
 
-    if (res.value.length === 0) {
-      const applicationIdentifier = appId ? `ID ${appId}` : `name ${appName}`;
-      throw `No Microsoft Entra application registration with ${applicationIdentifier} found`;
+      const res = await request.get<{ value: { id: string }[] }>(requestOptions);
+
+      if (res.value.length === 1) {
+        return res.value[0].id;
+      }
+
+      if (res.value.length === 0) {
+        throw `No Microsoft Entra application registration with name ${appName} found`;
+      }
+
+      const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', res.value);
+      const result: { id: string } = (await cli.handleMultipleResultsFound(`Multiple Microsoft Entra application registrations with name '${appName}' found.`, resultAsKeyValuePair)) as { id: string };
+      return result.id;
     }
-
-    const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', res.value);
-    const result: { id: string } = (await cli.handleMultipleResultsFound(`Multiple Microsoft Entra application registrations with name '${appName}' found.`, resultAsKeyValuePair)) as { id: string };
-    return result.id;
   }
 }
 

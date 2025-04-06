@@ -14,11 +14,22 @@ import command from './app-permission-list.js';
 import { settingsNames } from '../../../../settingsNames.js';
 import { application, graphApplication, graphOauth2PermissionScope, spOnlineApplication, spOnlineOauth2PermissionScope, allPermissionsResponse, applicationPermissionsResponse, delegatedPermissionsResponse, applicationWithoutPermissions, applicationWithUnknownPermissions, allUnknownPermissionsResponse, allUnkownServicePrincipalPermissionsResponse } from './app-permission-list.mock.js';
 import { CommandError } from '../../../../Command.js';
+import { entraApp } from '../../../../utils/entraApp.js';
 
 describe(commands.APP_PERMISSION_LIST, () => {
   const appId = '2bf26ae1-9be3-425f-a393-5fe8390e3a36';
   const appName = 'My App';
   const appObjectId = '29807f3b-fef6-4985-b987-8c2565d021bc';
+
+  //#region Mocked Responses 
+  const appResponse = {
+    value: [
+      {
+        "id": appObjectId
+      }
+    ]
+  };
+  //#endregion
 
   let log: string[];
   let logger: Logger;
@@ -61,7 +72,8 @@ describe(commands.APP_PERMISSION_LIST, () => {
     sinonUtil.restore([
       request.get,
       cli.getSettingWithDefaultValue,
-      cli.handleMultipleResultsFound
+      cli.handleMultipleResultsFound,
+      entraApp.getAppRegistrationByAppId
     ]);
   });
 
@@ -185,7 +197,7 @@ describe(commands.APP_PERMISSION_LIST, () => {
         return graphApplication;
       }
 
-      throw 'Invalid request';
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
 
@@ -231,7 +243,7 @@ describe(commands.APP_PERMISSION_LIST, () => {
         return graphApplication;
       }
 
-      throw 'Invalid request';
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
     await command.action(logger, { options: { appObjectId: appObjectId, type: 'application' } });
@@ -239,6 +251,8 @@ describe(commands.APP_PERMISSION_LIST, () => {
   });
 
   it('lists the delegated permissions of an app registration when using appId', async () => {
+    sinon.stub(entraApp, 'getAppRegistrationByAppId').resolves(appResponse.value[0]);
+
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=appId eq '2bf26ae1-9be3-425f-a393-5fe8390e3a36'&$select=id`) {
         return { value: [{ id: '29807f3b-fef6-4985-b987-8c2565d021bc' }] };
@@ -280,10 +294,10 @@ describe(commands.APP_PERMISSION_LIST, () => {
         return graphOauth2PermissionScope;
       }
 
-      throw 'Invalid request';
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
-    await command.action(logger, { options: { appId: appId, type: 'delegated' } });
+    await command.action(logger, { options: { appId: appId, type: 'delegated', debug: true } });
     assert(loggerLogSpy.calledWith(delegatedPermissionsResponse));
   });
 
@@ -329,7 +343,7 @@ describe(commands.APP_PERMISSION_LIST, () => {
         return graphOauth2PermissionScope;
       }
 
-      throw 'Invalid request';
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
     await command.action(logger, { options: { appName: appName, type: 'delegated' } });
@@ -430,16 +444,11 @@ describe(commands.APP_PERMISSION_LIST, () => {
   });
 
   it('handles a non-existent app by appId', async () => {
-    sinon.stub(request, 'get').callsFake(async opts => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=appId eq '${appId}'&$select=id`) {
-        return { value: [] };
-      }
-
-      throw 'Invalid request';
-    });
+    const error = `App with appId '${appId}' not found in Microsoft Entra ID`;
+    sinon.stub(entraApp, 'getAppRegistrationByAppId').rejects(new Error(error));
 
     await assert.rejects(command.action(logger, { options: { appId: appId } }),
-      new CommandError(`No Microsoft Entra application registration with ID ${appId} found`));
+      new CommandError(error));
   });
 
   it('handles a non-existent app by appName', async () => {
@@ -448,7 +457,7 @@ describe(commands.APP_PERMISSION_LIST, () => {
         return { value: [] };
       }
 
-      throw 'Invalid request';
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
     await assert.rejects(command.action(logger, { options: { appName: appName } }),
@@ -461,7 +470,7 @@ describe(commands.APP_PERMISSION_LIST, () => {
         return applicationWithoutPermissions;
       }
 
-      throw 'Invalid request';
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
     await command.action(logger, { options: { appObjectId: appObjectId } });
@@ -514,7 +523,7 @@ describe(commands.APP_PERMISSION_LIST, () => {
         return graphApplication;
       }
 
-      throw 'Invalid request';
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
     await command.action(logger, { options: { appObjectId: appObjectId } });
@@ -539,7 +548,7 @@ describe(commands.APP_PERMISSION_LIST, () => {
         };
       }
 
-      throw 'Invalid request';
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
     await command.action(logger, { options: { appObjectId: appObjectId } });
@@ -560,7 +569,7 @@ describe(commands.APP_PERMISSION_LIST, () => {
         };
       }
 
-      throw 'Invalid request';
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
     await assert.rejects(command.action(logger, { options: { appObjectId: appObjectId } }), new CommandError(`An error has occurred`));

@@ -1,9 +1,7 @@
-import { cli } from '../../../cli/cli.js';
 import { Logger } from '../../../cli/Logger.js';
-import Command from '../../../Command.js';
-import entraAppGetCommand, { Options as EntraAppGetCommandOptions } from '../../entra/commands/app/app-get.js';
 import AppCommand, { AppCommandArgs } from '../../base/AppCommand.js';
 import commands from '../commands.js';
+import { entraApp } from '../../../utils/entraApp.js';
 
 class AppGetCommand extends AppCommand {
   public get name(): string {
@@ -15,20 +13,9 @@ class AppGetCommand extends AppCommand {
   }
 
   public async commandAction(logger: Logger, args: AppCommandArgs): Promise<void> {
-    const options: EntraAppGetCommandOptions = {
-      appId: this.appId,
-      output: 'json',
-      debug: args.options.debug,
-      verbose: args.options.verbose
-    };
-
     try {
-      const appGetOutput = await cli.executeCommandWithOutput(entraAppGetCommand as Command, { options: { ...options, _: [] } });
-      if (this.verbose) {
-        await logger.logToStderr(appGetOutput.stderr);
-      }
-
-      await logger.log(JSON.parse(appGetOutput.stdout));
+      const app = await entraApp.getAppRegistrationByAppId(args.options.appId!);
+      await logger.log(app);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
