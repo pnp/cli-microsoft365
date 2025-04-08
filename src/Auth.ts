@@ -1,11 +1,12 @@
 import { AzureCloudInstance, DeviceCodeResponse } from '@azure/msal-common';
-import type * as Msal from '@azure/msal-node';
+import * as Msal from '@azure/msal-node';
 import assert from 'assert';
 import type clipboard from 'clipboardy';
 import type NodeForge from 'node-forge';
 import type { AuthServer } from './AuthServer.js';
 import { CommandError } from './Command.js';
 import { FileTokenStorage } from './auth/FileTokenStorage.js';
+import { MsalNetworkClient } from './auth/MsalNetworkClient.js';
 import { TokenStorage } from './auth/TokenStorage.js';
 import { msalCachePlugin } from './auth/msalCachePlugin.js';
 import { Logger } from './cli/Logger.js';
@@ -355,7 +356,7 @@ export class Auth {
           piiLoggingEnabled: false,
           logLevel: debug ? LogLevel.Verbose : LogLevel.Error
         },
-        proxyUrl: process.env.HTTP_PROXY || process.env.HTTPS_PROXY
+        networkClient: new MsalNetworkClient()
       }
     };
   }
