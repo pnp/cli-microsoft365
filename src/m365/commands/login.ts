@@ -50,7 +50,7 @@ class LoginCommand extends Command {
 
   public getRefinedSchema(schema: typeof options): z.ZodEffects<any> | undefined {
     return schema
-      .refine(options => typeof options.appId !== 'undefined' || cli.getClientId() || options.authType === 'identity', {
+      .refine(options => typeof options.appId !== 'undefined' || cli.getClientId() || options.authType === 'identity' || options.authType === 'federatedIdentity', {
         message: `appId is required. TIP: use the "m365 setup" command to configure the default appId.`,
         path: ['appId']
       })
