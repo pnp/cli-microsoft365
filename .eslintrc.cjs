@@ -15,6 +15,7 @@ const dictionary = [
   'assets',
   'assignment',
   'audit',
+  'autofill',
   'azure',
   'bin',
   'builder',
