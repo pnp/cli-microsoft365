@@ -1,9 +1,7 @@
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
-import request, { CliRequestOptions } from '../../../../request.js';
-import { formatting } from '../../../../utils/formatting.js';
 import { odata } from '../../../../utils/odata.js';
-import { spp, SppModel } from '../../../../utils/spp.js';
+import { spp } from '../../../../utils/spp.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
@@ -96,34 +94,7 @@ class SppModelGetCommand extends SpoCommand {
       const siteUrl = urlUtil.removeTrailingSlashes(args.options.siteUrl);
       await spp.assertSiteIsContentCenter(siteUrl);
 
-      let requestUrl = `${siteUrl}/_api/machinelearning/models/`;
-
-      if (args.options.title) {
-        let requestTitle = args.options.title.toLowerCase();
-
-        if (!requestTitle.endsWith('.classifier')) {
-          requestTitle += '.classifier';
-        }
-
-        requestUrl += `getbytitle('${formatting.encodeQueryParameter(requestTitle)}')`;
-      }
-      else {
-        requestUrl += `getbyuniqueid('${args.options.id}')`;
-      }
-
-      const requestOptions: CliRequestOptions = {
-        url: requestUrl,
-        headers: {
-          accept: 'application/json;odata=nometadata'
-        },
-        responseType: 'json'
-      };
-
-      const result = await request.get<SppModel>(requestOptions);
-
-      if ((result as any)['odata.null'] === true) {
-        throw 'Model not found.';
-      }
+      const result = await spp.getModel(siteUrl, args.options.title, args.options.id);
 
       if (args.options.withPublications) {
         result.Publications = await odata.getAllItems<any>(`${siteUrl}/_api/machinelearning/publications/getbymodeluniqueid('${result.UniqueId}')`);
