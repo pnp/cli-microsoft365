@@ -77,7 +77,8 @@ describe(commands.SOLUTION_GET, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.get,
-      powerPlatform.getDynamicsInstanceApiUrl
+      powerPlatform.getDynamicsInstanceApiUrl,
+      powerPlatform.getSolutionByName
     ]);
   });
 
@@ -96,16 +97,7 @@ describe(commands.SOLUTION_GET, () => {
 
   it('fails validation when no solution found', async () => {
     sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').callsFake(async () => envUrl);
-
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url === `https://contoso-dev.api.crm4.dynamics.com/api/data/v9.0/solutions?$filter=isvisible eq true and uniquename eq 'Default'&$expand=publisherid($select=friendlyname)&$select=solutionid,uniquename,version,publisherid,installedon,solutionpackageversion,friendlyname,versionnumber&api-version=9.1`)) {
-        if ((opts.headers?.accept as string).indexOf('application/json') === 0) {
-          return ({ "value": [] });
-        }
-      }
-
-      throw 'Invalid request';
-    });
+    sinon.stub(powerPlatform, 'getSolutionByName').rejects(new Error(`The specified solution '${validName}' does not exist.`));
 
     await assert.rejects(command.action(logger, {
       options: {
@@ -137,16 +129,7 @@ describe(commands.SOLUTION_GET, () => {
 
   it('retrieves a specific solution from power platform environment with the name parameter', async () => {
     sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').callsFake(async () => envUrl);
-
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url === `https://contoso-dev.api.crm4.dynamics.com/api/data/v9.0/solutions?$filter=isvisible eq true and uniquename eq 'Default'&$expand=publisherid($select=friendlyname)&$select=solutionid,uniquename,version,publisherid,installedon,solutionpackageversion,friendlyname,versionnumber&api-version=9.1`)) {
-        if ((opts.headers?.accept as string).indexOf('application/json') === 0) {
-          return solutionResponse;
-        }
-      }
-
-      throw 'Invalid request';
-    });
+    sinon.stub(powerPlatform, 'getSolutionByName').callsFake(async () => solutionResponse.value[0]);
 
     await command.action(logger, { options: { verbose: true, environmentName: '4be50206-9576-4237-8b17-38d8aadfaa36', name: 'Default' } });
     assert(loggerLogSpy.calledWith(solutionResponse.value[0]));
@@ -154,16 +137,7 @@ describe(commands.SOLUTION_GET, () => {
 
   it('retrieves a specific solution from power platform environment with name parameter in format text', async () => {
     sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').callsFake(async () => envUrl);
-
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url === `https://contoso-dev.api.crm4.dynamics.com/api/data/v9.0/solutions?$filter=isvisible eq true and uniquename eq 'Default'&$expand=publisherid($select=friendlyname)&$select=solutionid,uniquename,version,publisherid,installedon,solutionpackageversion,friendlyname,versionnumber&api-version=9.1`)) {
-        if ((opts.headers?.accept as string).indexOf('application/json') === 0) {
-          return solutionResponse;
-        }
-      }
-
-      throw 'Invalid request';
-    });
+    sinon.stub(powerPlatform, 'getSolutionByName').callsFake(async () => solutionResponse.value[0]);
 
     await command.action(logger, { options: { debug: true, environmentName: '4be50206-9576-4237-8b17-38d8aadfaa36', name: 'Default', output: 'text' } });
     assert(loggerLogSpy.calledWith(solutionResponseText));
@@ -205,23 +179,15 @@ describe(commands.SOLUTION_GET, () => {
 
   it('correctly handles API OData error', async () => {
     sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').callsFake(async () => envUrl);
-
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url === `https://contoso-dev.api.crm4.dynamics.com/api/data/v9.0/solutions?$filter=isvisible eq true and uniquename eq 'Default'&$expand=publisherid($select=friendlyname)&$select=solutionid,uniquename,version,publisherid,installedon,solutionpackageversion,friendlyname,versionnumber&api-version=9.1`)) {
-        if ((opts.headers?.accept as string).indexOf('application/json') === 0) {
-          throw {
-            error: {
-              'odata.error': {
-                code: '-1, InvalidOperationException',
-                message: {
-                  value: `Resource '' does not exist or one of its queried reference-property objects are not present`
-                }
-              }
-            }
-          };
+    sinon.stub(powerPlatform, 'getSolutionByName').rejects({
+      error: {
+        'odata.error': {
+          code: '-1, InvalidOperationException',
+          message: {
+            value: `Resource '' does not exist or one of its queried reference-property objects are not present`
+          }
         }
       }
-
     });
 
     await assert.rejects(command.action(logger, { options: { environmentName: '4be50206-9576-4237-8b17-38d8aadfaa36', name: 'Default' } } as any),

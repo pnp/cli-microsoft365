@@ -89,6 +89,7 @@ class PpSolutionGetCommand extends PowerPlatformCommand {
 
     try {
       const dynamicsApiUrl = await powerPlatform.getDynamicsInstanceApiUrl(args.options.environmentName, args.options.asAdmin);
+
       const res = await this.getSolution(dynamicsApiUrl, args.options);
 
       if (!args.options.output || !cli.shouldTrimOutput(args.options.output)) {
@@ -109,6 +110,10 @@ class PpSolutionGetCommand extends PowerPlatformCommand {
   }
 
   private async getSolution(dynamicsApiUrl: string, options: Options): Promise<Solution> {
+    if (options.name) {
+      return powerPlatform.getSolutionByName(dynamicsApiUrl, options.name);
+    }
+
     const requestOptions: CliRequestOptions = {
       headers: {
         accept: 'application/json;odata.metadata=none'
@@ -116,21 +121,9 @@ class PpSolutionGetCommand extends PowerPlatformCommand {
       responseType: 'json'
     };
 
-    if (options.id) {
-      requestOptions.url = `${dynamicsApiUrl}/api/data/v9.0/solutions(${options.id})?$expand=publisherid($select=friendlyname)&$select=solutionid,uniquename,version,publisherid,installedon,solutionpackageversion,friendlyname,versionnumber&api-version=9.1`;
+    requestOptions.url = `${dynamicsApiUrl}/api/data/v9.0/solutions(${options.id})?$expand=publisherid($select=friendlyname)&$select=solutionid,uniquename,version,publisherid,installedon,solutionpackageversion,friendlyname,versionnumber&api-version=9.1`;
 
-      const result = await request.get<Solution>(requestOptions);
-      return result;
-    }
-
-    requestOptions.url = `${dynamicsApiUrl}/api/data/v9.0/solutions?$filter=isvisible eq true and uniquename eq \'${options.name}\'&$expand=publisherid($select=friendlyname)&$select=solutionid,uniquename,version,publisherid,installedon,solutionpackageversion,friendlyname,versionnumber&api-version=9.1`;
-    const result = await request.get<{ value: Solution[] }>(requestOptions);
-
-    if (result.value.length === 0) {
-      throw `The specified solution '${options.name}' does not exist.`;
-    }
-
-    return result.value[0];
+    return request.get<Solution>(requestOptions);
   }
 }
 

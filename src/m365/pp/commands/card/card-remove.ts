@@ -109,7 +109,11 @@ class PpCardRemoveCommand extends PowerPlatformCommand {
       return args.options.id;
     }
 
-    const card = await powerPlatform.getCardByName(dynamicsApiUrl, args.options.name!, logger, this.verbose);
+    if (this.verbose) {
+      await logger.logToStderr(`Retrieving the card with name '${args.options.name}'`);
+    }
+
+    const card = await powerPlatform.getCardByName(dynamicsApiUrl, args.options.name!);
 
     return card.cardid;
   }
@@ -119,6 +123,11 @@ class PpCardRemoveCommand extends PowerPlatformCommand {
       const dynamicsApiUrl = await powerPlatform.getDynamicsInstanceApiUrl(args.options.environmentName, args.options.asAdmin);
 
       const cardId = await this.getCardId(args, dynamicsApiUrl, logger);
+
+      if (this.verbose) {
+        await logger.logToStderr(`Deleting card with Id '${cardId}'`);
+      }
+
       const requestOptions: CliRequestOptions = {
         url: `${dynamicsApiUrl}/api/data/v9.1/cards(${cardId})`,
         headers: {

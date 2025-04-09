@@ -6,12 +6,8 @@ import { powerPlatform } from './powerPlatform.js';
 import { sinonUtil } from "./sinonUtil.js";
 import { cli } from '../cli/cli.js';
 import { settingsNames } from '../settingsNames.js';
-import { Logger } from '../cli/Logger.js';
 
 describe('utils/powerPlatform', () => {
-  let logger: Logger;
-  let log: string[];
-
   //#region Mocked responses  
   const environment = 'Default-727dc1e9-3cd1-4d1f-8102-ab5c936e52f0';
   const powerPageResponse = {
@@ -185,51 +181,6 @@ describe('utils/powerPlatform', () => {
     sinon.stub(auth, 'restoreAuth').resolves();
     auth.connection.active = true;
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => settingName === settingsNames.prompt ? false : defaultValue);
-  });
-
-  beforeEach(() => {
-    log = [];
-    logger = {
-      log: async (msg: string) => {
-        log.push(msg);
-      },
-      logRaw: async (msg: string) => {
-        log.push(msg);
-      },
-      logToStderr: async (msg: string) => {
-        log.push(msg);
-      }
-    };
-  });
-
-  beforeEach(() => {
-    log = [];
-    logger = {
-      log: async (msg: string) => {
-        log.push(msg);
-      },
-      logRaw: async (msg: string) => {
-        log.push(msg);
-      },
-      logToStderr: async (msg: string) => {
-        log.push(msg);
-      }
-    };
-  });
-
-  beforeEach(() => {
-    log = [];
-    logger = {
-      log: async (msg: string) => {
-        log.push(msg);
-      },
-      logRaw: async (msg: string) => {
-        log.push(msg);
-      },
-      logToStderr: async (msg: string) => {
-        log.push(msg);
-      }
-    };
   });
 
   afterEach(() => {
@@ -458,7 +409,7 @@ describe('utils/powerPlatform', () => {
       throw `Invalid request ${opts.url}`;
     });
 
-    const actual = await powerPlatform.getCardByName(envUrl, validCardName, logger, true);
+    const actual = await powerPlatform.getCardByName(envUrl, validCardName);
     assert.strictEqual(actual, cardResponse.value[0]);
   });
 

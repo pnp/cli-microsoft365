@@ -99,11 +99,15 @@ class PpCardGetCommand extends PowerPlatformCommand {
 
   private async getCard(dynamicsApiUrl: string, options: Options, logger: Logger): Promise<any> {
     if (options.name) {
-      return await powerPlatform.getCardByName(dynamicsApiUrl, options.name!, logger, this.verbose);
+      if (this.verbose) {
+        await logger.logToStderr(`Retrieving the card with name '${options.name}'`);
+      }
+
+      return await powerPlatform.getCardByName(dynamicsApiUrl, options.name!);
     }
 
     if (this.verbose) {
-      await logger.logToStderr(`Retrieving the card with id ${options.id}`);
+      await logger.logToStderr(`Retrieving the card with id '${options.id}'`);
     }
 
     const requestOptions: CliRequestOptions = {
