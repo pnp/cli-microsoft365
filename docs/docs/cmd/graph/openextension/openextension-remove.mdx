@@ -1,0 +1,59 @@
+import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# graph openextension remove
+
+Removes a specific open extension for a resource
+
+## Usage
+
+```sh
+m365 graph openextension remove [options]
+```
+
+## Options
+
+```md definition-list
+`-n, --name <name>`
+: The name of the open extension to remove.
+
+`-i, --resourceId <resourceId>`
+: The Id of the resource for which to remove the open extension.
+
+`-t, --resourceType <resourceType>`
+: The type of resource. Allowed values are `user`, `group`, `device`, `organization`.
+
+`-f, --force`
+: Don't prompt for confirmation.
+```
+
+<Global />
+
+## Examples
+
+Remove a specified open extension for a user specified by id.
+
+```sh
+m365 graph openextension remove --resourceId eb77fbcf-6fe8-458b-985d-1747284793bc --name 'com.contoso.roamingSettings' --resourceType user
+```
+
+Remove a specified open extension for a user specified by UPN without confirmation prompt.
+
+```sh
+m365 graph openextension remove --resourceId john.doe@contoso.com --name 'com.contoso.roamingSettings' --resourceType user --force
+```
+
+Remove a specified open extension for a group specified by id.
+
+```sh
+m365 graph openextension remove --resourceId c956e711-f074-40c3-8431-fbd69bb67d9c --name 'com.contoso.groupSettings' --resourceType group
+```
+
+## Response
+
+The command won't return a response on success.
+
+## More information
+
+- Open extensions: https://learn.microsoft.com/en-us/graph/extensibility-overview?tabs=http#open-extensions
