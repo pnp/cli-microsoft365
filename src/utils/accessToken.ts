@@ -110,5 +110,15 @@ export const accessToken = {
     if (this.isAppOnlyAccessToken(accessToken)) {
       throw new CommandError('This command does not support application-only permissions.');
     }
+  },
+
+  decodeAccessToken(accessToken: string): { header: any; payload: any } {
+    const chunks = accessToken.split('.');
+    const headerString = Buffer.from(chunks[0], 'base64').toString();
+    const payloadString = Buffer.from(chunks[1], 'base64').toString();
+
+    const header = JSON.parse(headerString);
+    const payload = JSON.parse(payloadString);
+    return { header, payload };
   }
 };

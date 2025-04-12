@@ -3,6 +3,7 @@ import { Logger } from '../../../../cli/Logger.js';
 import Command from '../../../../Command.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import commands from '../../commands.js';
+import { accessToken } from '../../../../utils/accessToken.js';
 
 interface CommandArgs {
   options: Options;
@@ -69,20 +70,15 @@ class UtilAccessTokenGetCommand extends Command {
     }
 
     try {
-      const accessToken: string = await auth.ensureAccessToken(resource, logger, this.debug, args.options.new);
+      const token: string = await auth.ensureAccessToken(resource, logger, this.debug, args.options.new);
 
       if (args.options.decoded) {
-        const chunks = accessToken.split('.');
-        const headerString = Buffer.from(chunks[0], 'base64').toString();
-        const payloadString = Buffer.from(chunks[1], 'base64').toString();
-
-        const header = JSON.parse(headerString);
-        const payload = JSON.parse(payloadString);
+        const { header, payload } = accessToken.decodeAccessToken(token);
 
         await logger.logRaw(`${JSON.stringify(header, null, 2)}.${JSON.stringify(payload, null, 2)}.[signature]`);
       }
       else {
-        await logger.log(accessToken);
+        await logger.log(token);
       }
     }
     catch (err: any) {
