@@ -73,7 +73,7 @@ class UtilAccessTokenGetCommand extends Command {
       const token: string = await auth.ensureAccessToken(resource, logger, this.debug, args.options.new);
 
       if (args.options.decoded) {
-        const { header, payload } = accessToken.decodeAccessToken(token);
+        const { header, payload } = accessToken.getDecodedAccessToken(token);
 
         await logger.logRaw(`${JSON.stringify(header, null, 2)}.${JSON.stringify(payload, null, 2)}.[signature]`);
       }

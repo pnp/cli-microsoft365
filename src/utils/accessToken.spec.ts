@@ -136,6 +136,21 @@ describe('utils/accessToken', () => {
     assert.strictEqual(actual, '');
   });
 
+  it('decodes access token', async () => {
+    const decodedAccessToken = accessToken.getDecodedAccessToken('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c');
+    assert.deepStrictEqual(decodedAccessToken, {
+      header: {
+        alg: "HS256",
+        typ: "JWT"
+      },
+      payload: {
+        sub: "1234567890",
+        name: "John Doe",
+        iat: 1516239022
+      }
+    });
+  });
+
   it('asserts delegated access token correctly', () => {
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
     accessToken.assertDelegatedAccessToken();
@@ -151,20 +166,5 @@ describe('utils/accessToken', () => {
   it('throws error when trying to assert delegated access token with application only token', () => {
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
     assert.throws(() => accessToken.assertDelegatedAccessToken(), new CommandError('This command does not support application-only permissions.'));
-  });
-
-  it('decodes access token', async () => {
-    const decodedAccessToken = accessToken.decodeAccessToken('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c');
-    assert.deepStrictEqual(decodedAccessToken, {
-      header: {
-        alg: "HS256",
-        typ: "JWT"
-      },
-      payload: {
-        sub: "1234567890",
-        name: "John Doe",
-        iat: 1516239022
-      }
-    });
   });
 });
