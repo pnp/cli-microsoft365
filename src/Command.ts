@@ -358,6 +358,12 @@ export default abstract class Command {
   }
 
   protected handleRejectedODataPromise(res: any): void {
+    /* c8 ignore next 4 */
+    if (this.debug && typeof global.it === 'undefined') {
+      const error = new Error();
+      cli.error(error.stack).then(() => { }).catch(() => { });
+    }
+
     if (res.error) {
       try {
         const err: ODataError = JSON.parse(res.error);
@@ -397,6 +403,12 @@ export default abstract class Command {
   }
 
   protected handleRejectedODataJsonPromise(response: any): void {
+    /* c8 ignore next 4 */
+    if (this.debug && typeof global.it === 'undefined') {
+      const error = new Error();
+      cli.error(error.stack).then(() => { }).catch(() => { });
+    }
+
     if (response.error &&
       response.error['odata.error'] &&
       response.error['odata.error'].message) {

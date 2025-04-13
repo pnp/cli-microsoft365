@@ -129,6 +129,23 @@ class MockCommand4 extends Command {
   }
 }
 
+class MockCommand5 extends Command {
+  public get name(): string {
+    return 'Mock command 5 [opt]';
+  }
+
+  public get description(): string {
+    return 'Mock command 5 description';
+  }
+
+  public async commandAction(): Promise<void> {
+  }
+
+  public handlePromiseError(response: any): void {
+    this.handleRejectedODataPromise(response);
+  }
+}
+
 class MockCommandWithSchema extends Command {
   public get name(): string {
     return 'mock-command';
@@ -208,7 +225,8 @@ describe('Command', () => {
     sinonUtil.restore([
       process.exit,
       accessToken.isAppOnlyAccessToken,
-      accessToken.getUserIdFromAccessToken
+      accessToken.getUserIdFromAccessToken,
+      cli.optionsFromArgs
     ]);
     auth.connection.active = false;
   });
@@ -685,5 +703,34 @@ describe('Command', () => {
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
 
     await assert.rejects(command.action(logger, { options: { option1: '@meUsername' } }), new CommandError(`It's not possible to use @meUsername with application permissions`));
+  });
+
+  it('correctly handles stack trace error when using debug for oData json error handling', async () => {
+    try {
+      sinon.stub(cli, 'error');
+      const mock = new MockCommand2();
+      sinon.stub(cli, 'optionsFromArgs').value({ options: { debug: true } });
+      mock.handlePromiseError({
+        error: { error_description: 'abc' }
+      });
+      assert.fail('No exception was thrown.');
+    }
+    catch (err: any) {
+      assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('abc')));
+    }
+  });
+
+  it('correctly handles stack trace error when using debug for oData error handling', async () => {
+    try {
+      const mock = new MockCommand5();
+      sinon.stub(cli, 'optionsFromArgs').value({ options: { debug: true } });
+      mock.handlePromiseError({
+        error: { error_description: 'abc' }
+      });
+      assert.fail('No exception was thrown.');
+    }
+    catch (err: any) {
+      assert.strictEqual(JSON.stringify(err), JSON.stringify({ 'message': { 'error_description': 'abc' } }));
+    }
   });
 });
