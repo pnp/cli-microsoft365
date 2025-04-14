@@ -74,7 +74,7 @@ type PartialDeep<T> = T extends object
   : T;
 
 export const prompt = {
-  /* c8 ignore next 9 */
+  /* c8 ignore next 16 */
   async forInput(config: InputConfig): Promise<string> {
     if (!inquirerInput) {
       inquirerInput = await import('@inquirer/input');
@@ -82,7 +82,15 @@ export const prompt = {
 
     const errorOutput: string = cli.getSettingWithDefaultValue(settingsNames.errorOutput, 'stderr');
 
-    return inquirerInput.default(config, { output: errorOutput === 'stderr' ? process.stderr : process.stdout });
+    return inquirerInput
+      .default(config, { output: errorOutput === 'stderr' ? process.stderr : process.stdout })
+      .catch(error => {
+        if (error instanceof Error && error.name === 'ExitPromptError') {
+          return ''; // noop; handle Ctrl + C
+        }
+
+        throw error;
+      });
   },
 
   /* c8 ignore next 9 */
