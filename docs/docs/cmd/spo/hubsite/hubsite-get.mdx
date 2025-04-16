@@ -25,6 +25,9 @@ m365 spo hubsite get [options]
 : URL of the hub site. Specify either `id`, `title`, or `url` but not multiple.
 
 `--includeAssociatedSites`
+: (deprecated. Use option `withAssociatedSites` instead) Include the associated sites in the result (only in JSON output).
+
+`--withAssociatedSites`
 : Include the associated sites in the result (only in JSON output)
 ```
 
@@ -53,7 +56,7 @@ m365 spo hubsite get --url 'https://contoso.sharepoint.com/sites/HubSite'
 Get information about the hub site with specific ID, including its associated sites. Associated site info is only shown in JSON output.
 
 ```sh
-m365 spo hubsite get --id 2c1ba4c4-cd9b-4417-832f-92a34bc34b2a --includeAssociatedSites --output json
+m365 spo hubsite get --id 2c1ba4c4-cd9b-4417-832f-92a34bc34b2a --withAssociatedSites --output json
 ```
 
 ## Response
@@ -147,9 +150,9 @@ m365 spo hubsite get --id 2c1ba4c4-cd9b-4417-832f-92a34bc34b2a --includeAssociat
   </TabItem>
 </Tabs>
 
-### `includeAssociatedSites` response
+### `withAssociatedSites` response
 
-When we make use of the option `includeAssociatedSites` the response will differ. This command can only be executed using --output json or an error will be thrown.
+When we make use of the option `withAssociatedSites` the response will differ. This command can only be executed using --output json or an error will be thrown.
 
 <Tabs>
   <TabItem value="JSON">
