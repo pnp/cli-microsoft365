@@ -7,6 +7,7 @@ export default {
   CONTAINER_LIST: `${prefix} container list`,
   CONTAINER_REMOVE: `${prefix} container remove`,
   CONTAINER_PERMISSION_LIST: `${prefix} container permission list`,
+  CONTAINER_RECYCLEBINITEM_LIST: `${prefix} container recyclebinitem list`,
   CONTAINERTYPE_ADD: `${prefix} containertype add`,
   CONTAINERTYPE_GET: `${prefix} containertype get`,
   CONTAINERTYPE_LIST: `${prefix} containertype list`
