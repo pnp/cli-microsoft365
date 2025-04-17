@@ -31,6 +31,7 @@ export default abstract class SpoCommand extends Command {
       'parentWebUrl',
       'previewImageUrl',
       'siteLogoUrl',
+      'siteThumbnailUrl',
       'siteUrl',
       'StartASiteFormUrl',
       'targetUrl',
