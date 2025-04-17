@@ -9,34 +9,34 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './containertype-list.js';
-import { spo } from '../../../../utils/spo.js';
+import { spe } from '../../../../utils/spe.js';
 import { CommandError } from '../../../../Command.js';
 
-const containerTypedata = [{
-  "AzureSubscriptionId": "/Guid(f08575e2-36c4-407f-a891-eabae23f66bc)",
-  "ContainerTypeId": "/Guid(c33cfee5-c9b6-0a2a-02ee-060693a57f37)",
-  "CreationDate": "3/11/2024 2:38:56 PM",
-  "DisplayName": "standard container",
-  "ExpiryDate": "3/11/2028 2:38:56 PM",
-  "IsBillingProfileRequired": true,
-  "OwningAppId": "/Guid(1b3b8660-9a44-4a7c-9c02-657f3ff5d5ac)",
-  "OwningTenantId": "/Guid(e1dd4023-a656-480a-8a0e-c1b1eec51e1d)",
-  "Region": "West Europe",
-  "ResourceGroup": "Standard group",
-  "SPContainerTypeBillingClassification": "Standard"
+const containerTypeData = [{
+  AzureSubscriptionId: 'f08575e2-36c4-407f-a891-eabae23f66bc',
+  ContainerTypeId: 'c33cfee5-c9b6-0a2a-02ee-060693a57f37',
+  CreationDate: '3/11/2024 2:38:56 PM',
+  DisplayName: 'standard container',
+  ExpiryDate: '3/11/2028 2:38:56 PM',
+  IsBillingProfileRequired: true,
+  OwningAppId: '1b3b8660-9a44-4a7c-9c02-657f3ff5d5ac',
+  OwningTenantId: 'e1dd4023-a656-480a-8a0e-c1b1eec51e1d',
+  Region: 'West Europe',
+  ResourceGroup: 'Standard group',
+  SPContainerTypeBillingClassification: 'Standard'
 },
 {
-  "AzureSubscriptionId": "/Guid(f08575e2-36c4-407f-a891-eabae23f66bc)",
-  "ContainerTypeId": "/Guid(c33cfee5-c9b6-0a2a-02ee-060693a57f37)",
-  "CreationDate": "3/11/2024 2:38:56 PM",
-  "DisplayName": "trial container",
-  "ExpiryDate": "3/11/2028 2:38:56 PM",
-  "IsBillingProfileRequired": true,
-  "OwningAppId": "/Guid(1b3b8660-9a44-4a7c-9c02-657f3ff5d5ac)",
-  "OwningTenantId": "/Guid(e1dd4023-a656-480a-8a0e-c1b1eec51e1d)",
-  "Region": "West Europe",
-  "ResourceGroup": "Standard group",
-  "SPContainerTypeBillingClassification": "Standard"
+  AzureSubscriptionId: 'f08575e2-36c4-407f-a891-eabae23f66bc',
+  ContainerTypeId: 'a33cfee5-c9b6-0a2a-02ee-060693a57f37',
+  CreationDate: '3/11/2024 2:38:56 PM',
+  DisplayName: 'trial container',
+  ExpiryDate: '3/11/2028 2:38:56 PM',
+  IsBillingProfileRequired: true,
+  OwningAppId: '1b3b8660-9a44-4a7c-9c02-657f3ff5d5ac',
+  OwningTenantId: 'e1dd4023-a656-480a-8a0e-c1b1eec51e1d',
+  Region: 'West Europe',
+  ResourceGroup: 'Standard group',
+  SPContainerTypeBillingClassification: 'Standard'
 }];
 
 describe(commands.CONTAINERTYPE_LIST, () => {
@@ -49,7 +49,6 @@ describe(commands.CONTAINERTYPE_LIST, () => {
     sinon.stub(telemetry, 'trackEvent').resolves();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
-    sinon.stub(spo, 'ensureFormDigest').resolves({ FormDigestValue: 'abc', FormDigestTimeoutSeconds: 1800, FormDigestExpiresAt: new Date(), WebFullUrl: 'https://contoso.sharepoint.com' });
     auth.connection.active = true;
     auth.connection.spoUrl = 'https://contoso.sharepoint.com';
   });
@@ -73,7 +72,7 @@ describe(commands.CONTAINERTYPE_LIST, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.post,
-      spo.getAllContainerTypes
+      spe.getAllContainerTypes
     ]);
   });
 
@@ -96,18 +95,48 @@ describe(commands.CONTAINERTYPE_LIST, () => {
   });
 
   it('retrieves list of container type', async () => {
-    sinon.stub(spo, 'getAllContainerTypes').resolves(containerTypedata);
-    await command.action(logger, { options: { debug: true } });
-    assert(loggerLogSpy.calledWith(containerTypedata));
+    sinon.stub(spe, 'getAllContainerTypes').resolves(containerTypeData);
+
+    await command.action(logger, { options: { verbose: true } });
+    assert(loggerLogSpy.calledOnceWith([
+      {
+        _ObjectType_: 'Microsoft.Online.SharePoint.TenantAdministration.SPContainerTypeProperties',
+        AzureSubscriptionId: '/Guid(f08575e2-36c4-407f-a891-eabae23f66bc)/',
+        ContainerTypeId: '/Guid(c33cfee5-c9b6-0a2a-02ee-060693a57f37)/',
+        CreationDate: '3/11/2024 2:38:56 PM',
+        DisplayName: 'standard container',
+        ExpiryDate: '3/11/2028 2:38:56 PM',
+        IsBillingProfileRequired: true,
+        OwningAppId: '/Guid(1b3b8660-9a44-4a7c-9c02-657f3ff5d5ac)/',
+        OwningTenantId: '/Guid(e1dd4023-a656-480a-8a0e-c1b1eec51e1d)/',
+        Region: 'West Europe',
+        ResourceGroup: 'Standard group',
+        SPContainerTypeBillingClassification: 'Standard'
+      },
+      {
+        _ObjectType_: 'Microsoft.Online.SharePoint.TenantAdministration.SPContainerTypeProperties',
+        AzureSubscriptionId: '/Guid(f08575e2-36c4-407f-a891-eabae23f66bc)/',
+        ContainerTypeId: '/Guid(a33cfee5-c9b6-0a2a-02ee-060693a57f37)/',
+        CreationDate: '3/11/2024 2:38:56 PM',
+        DisplayName: 'trial container',
+        ExpiryDate: '3/11/2028 2:38:56 PM',
+        IsBillingProfileRequired: true,
+        OwningAppId: '/Guid(1b3b8660-9a44-4a7c-9c02-657f3ff5d5ac)/',
+        OwningTenantId: '/Guid(e1dd4023-a656-480a-8a0e-c1b1eec51e1d)/',
+        Region: 'West Europe',
+        ResourceGroup: 'Standard group',
+        SPContainerTypeBillingClassification: 'Standard'
+      }
+    ]));
   });
 
   it('correctly handles error when retrieving container types', async () => {
     const error = 'An error has occurred';
-    sinon.stub(spo, 'getAllContainerTypes').rejects(new Error(error));
+    sinon.stub(spe, 'getAllContainerTypes').rejects(new Error(error));
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: true
+        verbose: true
       }
     }), new CommandError('An error has occurred'));
   });
