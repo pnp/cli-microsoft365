@@ -245,41 +245,41 @@ Each time you run CLI for Microsoft 365, it will automatically check if there is
 CLI for Microsoft 365 by default outputs errors to stderr. Unfrortunately, PowerShell doesn't handle stderr as well as other shells. Also in case of command errors PowerShell does not break execution and may still continue even after setting `$ErrorActionPreference = "Stop"`. In order to overcome those problems you may use the following settings and helper method.
 
 ```PowerShell
-  m365 cli config set --key output --value json # setting output to json
-  m365 cli config set --key errorOutput --value stdout # changing error output to stdout
-  m365 cli config set --key showHelpOnFailure --value false # don't show help on command failure
-  m365 cli config set --key printErrorsAsPlainText --value false # don't print errors as plain text but as objects
+m365 cli config set --key output --value json # setting output to json
+m365 cli config set --key errorOutput --value stdout # changing error output to stdout
+m365 cli config set --key showHelpOnFailure --value false # don't show help on command failure
+m365 cli config set --key printErrorsAsPlainText --value false # don't print errors as plain text but as objects
 
-  function Invoke-CLICommand {
-    [cmdletbinding()]
-    param(
-      [parameter(Mandatory = $true, ValueFromPipeline = $true)] $input
-    )
+function Invoke-CLICommand {
+  [cmdletbinding()]
+  param(
+    [parameter(Mandatory = $true, ValueFromPipeline = $true)] $input
+  )
 
-    $output = $input
+  $output = $input
 
-    if ($null -eq $output) {
-      return $null
-    }
-
-    $parsedOutput = $output | ConvertFrom-Json
-
-    if ($parsedOutput -isnot [Array] -and $null -ne $parsedOutput.error) {
-      throw $parsedOutput.error
-    }
-
-    return $parsedOutput
+  if ($null -eq $output) {
+    return $null
   }
+
+  $parsedOutput = $output | ConvertFrom-Json
+
+  if ($parsedOutput -isnot [Array] -and $null -ne $parsedOutput.error) {
+    throw $parsedOutput.error
+  }
+
+  return $parsedOutput
+}
 ```
 
 With the above settings and helper method, you can now use the CLI for Microsoft 365 in PowerShell and have it behave as expected. Example usage:
 
 ```PowerShell
-  try {
-    # some script here like 
-    m365 spo list list --webUrl "random" | Invoke-CLICommand
-  }
-  catch {
-    Write-Host "Errors: $($_.Exception.Message) "
-  }
+try {
+  # some script here like 
+  m365 spo list list --webUrl "random" | Invoke-CLICommand
+}
+catch {
+  Write-Host "Errors: $($_.Exception.Message) "
+}
 ```
