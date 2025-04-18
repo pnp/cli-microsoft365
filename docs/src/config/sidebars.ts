@@ -2151,6 +2151,11 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'containertype list',
               id: 'cmd/spe/containertype/containertype-list'
+            },
+            {
+              type: 'doc',
+              label: 'containertype remove',
+              id: 'cmd/spe/containertype/containertype-remove'
             }
           ]
         }
