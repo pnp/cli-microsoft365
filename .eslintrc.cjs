@@ -83,6 +83,7 @@ const dictionary = [
   'open',
   'ops',
   'org',
+  'organization',
   'owner',
   'permission',
   'pim',

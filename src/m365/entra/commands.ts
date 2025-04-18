@@ -83,6 +83,7 @@ export default {
   OAUTH2GRANT_LIST: `${prefix} oauth2grant list`,
   OAUTH2GRANT_REMOVE: `${prefix} oauth2grant remove`,
   OAUTH2GRANT_SET: `${prefix} oauth2grant set`,
+  ORGANIZATION_LIST: `${prefix} organization list`,
   PIM_ROLE_ASSIGNMENT_ADD: `${prefix} pim role assignment add`,
   PIM_ROLE_ASSIGNMENT_LIST: `${prefix} pim role assignment list`,
   PIM_ROLE_ASSIGNMENT_REMOVE: `${prefix} pim role assignment remove`,
