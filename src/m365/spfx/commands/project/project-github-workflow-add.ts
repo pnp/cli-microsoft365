@@ -10,7 +10,6 @@ import commands from '../../commands.js';
 import { workflow } from './DeployWorkflow.js';
 import { BaseProjectCommand } from './base-project-command.js';
 import { GitHubWorkflow, GitHubWorkflowStep } from './project-github-workflow-model.js';
-import { parse } from 'semver';
 
 interface CommandArgs {
   options: Options;
@@ -161,22 +160,6 @@ class SpfxProjectGithubWorkflowAddCommand extends BaseProjectCommand {
       workflow.on.workflow_dispatch = null;
     }
 
-    const version = this.getProjectVersion();
-
-    if (!version) {
-      throw `Unable to determine the version of the current SharePoint Framework project`;
-    }
-
-    const minorVersion = parse(version)?.minor;
-
-    if (minorVersion === undefined) {
-      throw `Unable to determine the minor version of the current SharePoint Framework project`;
-    }
-
-    if (minorVersion < 18) {
-      this.getNodeAction(workflow).with!['node-version'] = '16.x';
-    }
-
     if (options.skipFeatureDeployment) {
       this.getDeployAction(workflow).with!.SKIP_FEATURE_DEPLOYMENT = true;
     }
@@ -209,11 +192,6 @@ class SpfxProjectGithubWorkflowAddCommand extends BaseProjectCommand {
   private getDeployAction(workflow: GitHubWorkflow): GitHubWorkflowStep {
     const steps = this.getWorkFlowSteps(workflow);
     return steps.find(step => step.uses && step.uses.indexOf('action-cli-deploy') >= 0)!;
-  }
-
-  private getNodeAction(workflow: GitHubWorkflow): GitHubWorkflowStep {
-    const steps = this.getWorkFlowSteps(workflow);
-    return steps.find(step => step.uses && step.uses.indexOf('actions/setup-node@') >= 0)!;
   }
 
   private getWorkFlowSteps(workflow: GitHubWorkflow): GitHubWorkflowStep[] {

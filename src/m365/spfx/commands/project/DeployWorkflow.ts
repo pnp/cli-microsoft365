@@ -13,6 +13,9 @@ export const workflow: GitHubWorkflow = {
   jobs: {
     "build-and-deploy": {
       "runs-on": "ubuntu-latest",
+      env: {
+        NodeVersion: "22.x"
+      },
       steps: [
         {
           name: "Checkout",
@@ -22,7 +25,7 @@ export const workflow: GitHubWorkflow = {
           name: "Use Node.js",
           uses: "actions/setup-node@v4",
           with: {
-            "node-version": "18.x"
+            "node-version": "${{ env.NodeVersion }}"
           }
         },
         {
@@ -109,6 +112,10 @@ export const pipeline: AzureDevOpsPipeline = {
     {
       name: "SiteAppCatalogUrl",
       value: ""
+    },
+    {
+      name: "NodeVersion",
+      value: "22.x"
     }
   ],
   stages: [
@@ -122,7 +129,7 @@ export const pipeline: AzureDevOpsPipeline = {
               task: "NodeTool@0",
               displayName: "Use Node.js",
               inputs: {
-                versionSpec: "18.x"
+                versionSpec: "$(NodeVersion)"
               }
             },
             {

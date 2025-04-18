@@ -9,6 +9,9 @@ export interface GitHubWorkflow {
   jobs: {
     "build-and-deploy": {
       "runs-on": string;
+      env: {
+        NodeVersion: string;
+      };
       steps: GitHubWorkflowStep[];
     };
   };
