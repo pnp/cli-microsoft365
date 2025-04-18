@@ -2125,6 +2125,11 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
+              label: 'container add',
+              id: 'cmd/spe/container/container-add'
+            },
+            {
+              type: 'doc',
               label: 'container get',
               id: 'cmd/spe/container/container-get'
             },
