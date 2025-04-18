@@ -5,6 +5,7 @@ export default {
   CONTAINER_ADD: `${prefix} container add`,
   CONTAINER_GET: `${prefix} container get`,
   CONTAINER_LIST: `${prefix} container list`,
+  CONTAINER_REMOVE: `${prefix} container remove`,
   CONTAINER_PERMISSION_LIST: `${prefix} container permission list`,
   CONTAINERTYPE_ADD: `${prefix} containertype add`,
   CONTAINERTYPE_GET: `${prefix} containertype get`,

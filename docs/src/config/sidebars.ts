@@ -2168,6 +2168,11 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
+              label: 'container remove',
+              id: 'cmd/spe/container/container-remove'
+            },
+            {
+              type: 'doc',
               label: 'container permission list',
               id: 'cmd/spe/container/container-permission-list'
             }

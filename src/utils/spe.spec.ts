@@ -52,7 +52,9 @@ describe('utils/spe', () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      request.post
+      request.post,
+      request.get,
+      cli.handleMultipleResultsFound
     ]);
   });
 
@@ -223,5 +225,89 @@ describe('utils/spe', () => {
     const actual = await spe.getContainerTypeIdByName(adminUrl, 'test1');
     assert(stubMultiResults.calledOnce);
     assert.strictEqual(actual, '4c8bc473-2d5a-474d-b2f3-fc60b7d39726');
+  });
+
+  it('correctly gets a container by its name using getContainerIdByName', async () => {
+    const containerTypeId = '0e95d161-d90d-4e3f-8b94-788a6b40aa48';
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/storage/fileStorage/containers?$filter=containerTypeId eq ${containerTypeId}&$select=id,displayName`) {
+        return {
+          value: [
+            {
+              id: 'b!ISJs1WRro0y0EWgkUYcktDa0mE8zSlFEqFzqRn70Zwp1CEtDEBZgQICPkRbil_5Z',
+              displayName: 'My File Storage Container'
+            },
+            {
+              id: 'b!t18F8ybsHUq1z3LTz8xvZqP8zaSWjkFNhsME-Fepo75dTf9vQKfeRblBZjoSQrd7',
+              displayName: 'My File Storage Container 2'
+            }
+          ]
+        };
+      }
+
+      throw 'Invalid GET request:' + opts.url;
+    });
+
+    const actual = await spe.getContainerIdByName(containerTypeId, 'my FILE storage Container 2');
+    assert.strictEqual(actual, 'b!t18F8ybsHUq1z3LTz8xvZqP8zaSWjkFNhsME-Fepo75dTf9vQKfeRblBZjoSQrd7');
+  });
+
+  it('correctly throws error when container was not found using getContainerIdByName', async () => {
+    const containerTypeId = '0e95d161-d90d-4e3f-8b94-788a6b40aa48';
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/storage/fileStorage/containers?$filter=containerTypeId eq ${containerTypeId}&$select=id,displayName`) {
+        return {
+          value: [
+            {
+              id: 'b!ISJs1WRro0y0EWgkUYcktDa0mE8zSlFEqFzqRn70Zwp1CEtDEBZgQICPkRbil_5Z',
+              displayName: 'My File Storage Container'
+            },
+            {
+              id: 'b!t18F8ybsHUq1z3LTz8xvZqP8zaSWjkFNhsME-Fepo75dTf9vQKfeRblBZjoSQrd7',
+              displayName: 'My File Storage Container 2'
+            }
+          ]
+        };
+      }
+
+      throw 'Invalid GET request:' + opts.url;
+    });
+
+    await assert.rejects(spe.getContainerIdByName(containerTypeId, 'nonexistent container'),
+      new Error(`The specified container 'nonexistent container' does not exist.`));
+  });
+
+  it('correctly handles multiple results when using getContainerIdByName', async () => {
+    const containerTypeId = '0e95d161-d90d-4e3f-8b94-788a6b40aa48';
+    const containers = [
+      {
+        id: 'b!ISJs1WRro0y0EWgkUYcktDa0mE8zSlFEqFzqRn70Zwp1CEtDEBZgQICPkRbil_5Z',
+        displayName: 'My File Storage Container'
+      },
+      {
+        id: 'b!t18F8ybsHUq1z3LTz8xvZqP8zaSWjkFNhsME-Fepo75dTf9vQKfeRblBZjoSQrd7',
+        displayName: 'My File Storage Container 2'
+      },
+      {
+        id: 'b!McTeU0-dW0GxKwECWdW04TIvEK-Js9xJib_RFqF-CqZxNe3OHVAIT4SqBxGm4fND',
+        displayName: 'My File Storage Container'
+      }
+    ];
+
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/storage/fileStorage/containers?$filter=containerTypeId eq ${containerTypeId}&$select=id,displayName`) {
+        return {
+          value: containers
+        };
+      }
+
+      throw 'Invalid GET request:' + opts.url;
+    });
+
+    const stubMultiResults = sinon.stub(cli, 'handleMultipleResultsFound').resolves(containers.find(c => c.id === 'b!McTeU0-dW0GxKwECWdW04TIvEK-Js9xJib_RFqF-CqZxNe3OHVAIT4SqBxGm4fND')!);
+
+    const actual = await spe.getContainerIdByName(containerTypeId, 'My File Storage Container');
+    assert(stubMultiResults.calledOnce);
+    assert.strictEqual(actual, 'b!McTeU0-dW0GxKwECWdW04TIvEK-Js9xJib_RFqF-CqZxNe3OHVAIT4SqBxGm4fND');
   });
 });

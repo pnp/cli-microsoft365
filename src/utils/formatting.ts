@@ -201,12 +201,12 @@ export const formatting = {
   },
 
   /**
- * Extracts the GUID from a string in CSOM format.
- * @param str The string to extract the GUID from
- * @description The string should be in the format /Guid(XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX)/
- * @returns The extracted GUID or the original string if no match is found
- * @example /Guid(eae15efb-ac09-49b9-8906-e579efd622e4)/ => eae15efb-ac09-49b9-8906-e579efd622e4
- */
+   * Extracts the GUID from a string in CSOM format.
+   * @param str The string to extract the GUID from
+   * @description The string should be in the format /Guid(XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX)/
+   * @returns The extracted GUID or the original string if no match is found
+   * @example /Guid(eae15efb-ac09-49b9-8906-e579efd622e4)/ => eae15efb-ac09-49b9-8906-e579efd622e4
+   */
   extractCsomGuid(str: string): string {
     const guidPattern = /\/Guid\(([0-9a-f-]+)\)\//i;
     const match = str.match(guidPattern);

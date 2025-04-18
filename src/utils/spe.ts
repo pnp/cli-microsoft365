@@ -3,6 +3,7 @@ import { ClientSvcResponse, ClientSvcResponseContents } from './spo.js';
 import { formatting } from './formatting.js';
 import { cli } from '../cli/cli.js';
 import config from '../config.js';
+import { odata } from './odata.js';
 
 export interface ContainerTypeProperties {
   AzureSubscriptionId: string;
@@ -17,6 +18,15 @@ export interface ContainerTypeProperties {
   ResourceGroup?: string;
   SPContainerTypeBillingClassification: string;
 }
+
+export interface ContainerProperties {
+  id: string;
+  displayName: string;
+  containerTypeId: string;
+  createdDateTime: string;
+}
+
+const graphResource = 'https://graph.microsoft.com';
 
 export const spe = {
   /**
@@ -75,5 +85,28 @@ export const spe = {
     }
 
     return containerTypes[0].ContainerTypeId;
+  },
+
+  /**
+   * Get the ID of a container by its name.
+   * @param containerTypeId ID of the container type.
+   * @param name Name of the container to search for.
+   * @returns ID of the container.
+   */
+  async getContainerIdByName(containerTypeId: string, name: string): Promise<string> {
+    const containers = await odata.getAllItems<ContainerProperties>(`${graphResource}/v1.0/storage/fileStorage/containers?$filter=containerTypeId eq ${containerTypeId}&$select=id,displayName`);
+    const matchingContainers = containers.filter(c => c.displayName.toLowerCase() === name.toLowerCase());
+
+    if (matchingContainers.length === 0) {
+      throw new Error(`The specified container '${name}' does not exist.`);
+    }
+
+    if (matchingContainers.length > 1) {
+      const containerKeyValuePair = formatting.convertArrayToHashTable('id', matchingContainers);
+      const container = await cli.handleMultipleResultsFound<ContainerProperties>(`Multiple containers with name '${name}' found.`, containerKeyValuePair);
+      return container.id;
+    }
+
+    return matchingContainers[0].id;
   }
 };
