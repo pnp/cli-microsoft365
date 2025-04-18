@@ -4,6 +4,7 @@ export default {
   CONTAINER_ACTIVATE: `${prefix} container activate`,
   CONTAINER_GET: `${prefix} container get`,
   CONTAINER_LIST: `${prefix} container list`,
+  CONTAINER_REMOVE: `${prefix} container remove`,
   CONTAINERTYPE_ADD: `${prefix} containertype add`,
   CONTAINERTYPE_GET: `${prefix} containertype get`,
   CONTAINERTYPE_LIST: `${prefix} containertype list`
