@@ -1,7 +1,8 @@
 import { Logger } from '../../../../cli/Logger.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
-import { ContainerTypeProperties, spo } from '../../../../utils/spo.js';
+import { spe } from '../../../../utils/spe.js';
+import { spo } from '../../../../utils/spo.js';
 
 class SpeContainertypeListCommand extends SpoCommand {
 
@@ -25,8 +26,19 @@ class SpeContainertypeListCommand extends SpoCommand {
         await logger.logToStderr(`Retrieving list of Container types...`);
       }
 
-      const allContainerTypes: ContainerTypeProperties[] = await spo.getAllContainerTypes(spoAdminUrl, logger, this.debug);
-      await logger.log(allContainerTypes);
+      const allContainerTypes = await spe.getAllContainerTypes(spoAdminUrl);
+
+      // The following conversion is done in order not to make breaking changes
+      const result = allContainerTypes.map(ct => ({
+        _ObjectType_: 'Microsoft.Online.SharePoint.TenantAdministration.SPContainerTypeProperties',
+        ...ct,
+        AzureSubscriptionId: `/Guid(${ct.AzureSubscriptionId})/`,
+        ContainerTypeId: `/Guid(${ct.ContainerTypeId})/`,
+        OwningAppId: `/Guid(${ct.OwningAppId})/`,
+        OwningTenantId: `/Guid(${ct.OwningTenantId})/`
+      }));
+
+      await logger.log(result);
     }
     catch (err: any) {
       this.handleRejectedPromise(err);
