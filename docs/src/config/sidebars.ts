@@ -595,6 +595,15 @@ const sidebars: SidebarsConfig = {
           ]
         },
         {
+          organization: [
+            {
+              type: 'doc',
+              label: 'organization list',
+              id: 'cmd/entra/organization/organization-list'
+            }
+          ]
+        },
+        {
           pim: [
             {
               type: 'doc',
