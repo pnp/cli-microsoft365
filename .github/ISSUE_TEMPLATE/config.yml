@@ -3,5 +3,8 @@ contact_links:
   - name: Need help?
     url: https://aka.ms/cli-m365/discord
     about: Ask a question in our community Discord server.
+  - name: Request office hours
+    url: https://forms.office.com/r/F7nUDGFNBB
+    about: Request a call with CLI for Microsoft 365 maintainer to recheck your case or provide support with CLI for Microsoft 365.
 
 
