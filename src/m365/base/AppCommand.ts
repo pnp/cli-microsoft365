@@ -1,18 +1,19 @@
 import fs from 'fs';
+import { z } from 'zod';
 import { cli } from '../../cli/cli.js';
 import { Logger } from '../../cli/Logger.js';
-import Command, { CommandArgs, CommandError } from '../../Command.js';
-import GlobalOptions from '../../GlobalOptions.js';
-import { validation } from '../../utils/validation.js';
-import { M365RcJson, M365RcJsonApp } from './M365RcJson.js';
+import Command, { CommandError, globalOptionsZod } from '../../Command.js';
 import { formatting } from '../../utils/formatting.js';
+import { M365RcJson, M365RcJsonApp } from './M365RcJson.js';
+
+export const appCommandOptions = globalOptionsZod
+  .extend({
+    appId: z.string().uuid().optional()
+  });
+type Options = z.infer<typeof appCommandOptions>;
 
 export interface AppCommandArgs {
-  options: AppCommandOptions;
-}
-
-interface AppCommandOptions extends GlobalOptions {
-  appId?: string;
+  options: Options;
 }
 
 export default abstract class AppCommand extends Command {
@@ -23,29 +24,8 @@ export default abstract class AppCommand extends Command {
     return 'https://graph.microsoft.com';
   }
 
-  constructor() {
-    super();
-
-    this.#initOptions();
-    this.#initValidators();
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      { option: '--appId [appId]' }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.appId && !validation.isValidGuid(args.options.appId)) {
-          return `${args.options.appId} is not a valid GUID`;
-        }
-
-        return true;
-      },
-    );
+  public get schema(): z.ZodTypeAny | undefined {
+    return appCommandOptions;
   }
 
   public async action(logger: Logger, args: AppCommandArgs): Promise<void> {
