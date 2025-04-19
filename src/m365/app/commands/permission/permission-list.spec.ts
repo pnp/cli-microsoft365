@@ -1,24 +1,29 @@
 import assert from 'assert';
 import fs from 'fs';
 import sinon from 'sinon';
+import { z } from 'zod';
 import auth from '../../../../Auth.js';
+import { cli } from '../../../../cli/cli.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
 import request from '../../../../request.js';
 import { telemetry } from '../../../../telemetry.js';
+import { entraApp } from '../../../../utils/entraApp.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './permission-list.js';
 import { appRegApplicationPermissions, appRegDelegatedPermissionsMultipleResources, appRegNoApiPermissions, flowServiceOAuth2PermissionScopes, msGraphPrincipalAppRoles, msGraphPrincipalOAuth2PermissionScopes } from './permission-list.mock.js';
-import { entraApp } from '../../../../utils/entraApp.js';
 
 describe(commands.PERMISSION_LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let loggerLogToStderrSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
+  let commandOptionsSchema: z.ZodTypeAny;
 
   //#region Mocked Responses 
   const appId = '9c79078b-815e-4a3e-bb80-2aaf2d9e9b3d';
@@ -40,6 +45,8 @@ describe(commands.PERMISSION_LIST, () => {
     sinon.stub(fs, 'existsSync').returns(true);
     sinon.stub(fs, 'readFileSync').returns(JSON.stringify(appResponse));
     auth.connection.active = true;
+    commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
   });
 
   beforeEach(() => {
@@ -146,7 +153,7 @@ describe(commands.PERMISSION_LIST, () => {
       }
     });
 
-    await command.action(logger, { options: {} });
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     assert.strictEqual(JSON.stringify(loggerLogSpy.lastCall.args[0]), JSON.stringify([
       {
         "resource": "Microsoft Flow Service",
@@ -243,7 +250,7 @@ describe(commands.PERMISSION_LIST, () => {
       }
     });
 
-    await command.action(logger, { options: { debug: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true }) });
     assert(loggerLogToStderrSpy.called);
   });
 
@@ -314,7 +321,7 @@ describe(commands.PERMISSION_LIST, () => {
       }
     });
 
-    await command.action(logger, { options: {} });
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     assert.strictEqual(JSON.stringify(loggerLogSpy.lastCall.args[0]), JSON.stringify([
       {
         "resource": "Microsoft Flow Service",
@@ -370,7 +377,7 @@ describe(commands.PERMISSION_LIST, () => {
       }
     });
 
-    await command.action(logger, { options: {} });
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     assert.strictEqual(JSON.stringify(loggerLogSpy.lastCall.args[0]), JSON.stringify([
       {
         "resource": "Microsoft Graph",
@@ -392,7 +399,7 @@ describe(commands.PERMISSION_LIST, () => {
       }
     });
 
-    await command.action(logger, { options: {} });
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     assert.strictEqual(JSON.stringify(loggerLogSpy.lastCall.args[0]), JSON.stringify([]));
   });
 
@@ -464,7 +471,7 @@ describe(commands.PERMISSION_LIST, () => {
       }
     });
 
-    await command.action(logger, { options: {} });
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     assert.strictEqual(JSON.stringify(loggerLogSpy.lastCall.args[0]), JSON.stringify([
       {
         "resource": "Microsoft Graph",
@@ -557,7 +564,7 @@ describe(commands.PERMISSION_LIST, () => {
       }
     });
 
-    await command.action(logger, { options: { debug: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true }) });
     assert(loggerLogToStderrSpy.called);
   });
 
@@ -604,7 +611,7 @@ describe(commands.PERMISSION_LIST, () => {
       }
     });
 
-    await command.action(logger, { options: {} });
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     assert.strictEqual(JSON.stringify(loggerLogSpy.lastCall.args[0]), JSON.stringify([
       {
         "resource": "Microsoft Graph",
@@ -632,7 +639,7 @@ describe(commands.PERMISSION_LIST, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: {} }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({}) }),
       new CommandError(error));
   });
 
@@ -650,7 +657,7 @@ describe(commands.PERMISSION_LIST, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: {} }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({}) }),
       new CommandError(`An error has occurred`));
   });
 
@@ -680,7 +687,7 @@ describe(commands.PERMISSION_LIST, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: {} }), new CommandError(`An error has occurred`));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({}) }), new CommandError(`An error has occurred`));
   });
 
   it('handles error when retrieving OAuth2 permission scopes for service principal', async () => {
@@ -755,7 +762,7 @@ describe(commands.PERMISSION_LIST, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: {} }), new CommandError(`An error has occurred`));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({}) }), new CommandError(`An error has occurred`));
   });
 
   it('handles error when retrieving app role assignments for service principal', async () => {
@@ -795,7 +802,7 @@ describe(commands.PERMISSION_LIST, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: {} }), new CommandError(`An error has occurred`));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({}) }), new CommandError(`An error has occurred`));
   });
 
   it('handles error when retrieving app roles for service principal', async () => {
@@ -870,7 +877,7 @@ describe(commands.PERMISSION_LIST, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: {} }), new CommandError(`An error has occurred`));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({}) }), new CommandError(`An error has occurred`));
   });
 
   it('handles error when retrieving Microsoft Entra registration', async () => {
@@ -887,7 +894,7 @@ describe(commands.PERMISSION_LIST, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: {} }), new CommandError(`An error has occurred`));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({}) }), new CommandError(`An error has occurred`));
   });
 
   it('handles non-existent service principal from app registration permissions', async () => {
@@ -903,7 +910,7 @@ describe(commands.PERMISSION_LIST, () => {
       }
     });
 
-    await command.action(logger, { options: {} });
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     assert.strictEqual(JSON.stringify(loggerLogSpy.lastCall.args[0]), JSON.stringify([
       {
         "resource": "00000003-0000-0000-c000-000000000000",
@@ -981,7 +988,7 @@ describe(commands.PERMISSION_LIST, () => {
       }
     });
 
-    await command.action(logger, { options: {} });
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     assert.strictEqual(JSON.stringify(loggerLogSpy.lastCall.args[0]), JSON.stringify([
       {
         "resource": "Microsoft Graph",
@@ -1073,7 +1080,7 @@ describe(commands.PERMISSION_LIST, () => {
       }
     });
 
-    await command.action(logger, { options: {} });
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     assert.strictEqual(JSON.stringify(loggerLogSpy.lastCall.args[0]), JSON.stringify([
       {
         "resource": "Microsoft Flow Service",
@@ -1131,7 +1138,7 @@ describe(commands.PERMISSION_LIST, () => {
       }
     });
 
-    await command.action(logger, { options: {} });
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     assert.strictEqual(JSON.stringify(loggerLogSpy.lastCall.args[0]), JSON.stringify([
       {
         "resource": "Microsoft Graph",

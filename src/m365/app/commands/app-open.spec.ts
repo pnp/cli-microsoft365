@@ -1,11 +1,12 @@
 import assert from 'assert';
 import fs from 'fs';
 import sinon from 'sinon';
+import { z } from 'zod';
 import auth from '../../../Auth.js';
-import { CommandError } from '../../../Command.js';
 import { cli } from '../../../cli/cli.js';
 import { CommandInfo } from '../../../cli/CommandInfo.js';
 import { Logger } from '../../../cli/Logger.js';
+import { CommandError } from '../../../Command.js';
 import { telemetry } from '../../../telemetry.js';
 import { browserUtil } from '../../../utils/browserUtil.js';
 import { pid } from '../../../utils/pid.js';
@@ -20,6 +21,7 @@ describe(commands.OPEN, () => {
   let getSettingWithDefaultValueStub: sinon.SinonStub;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: z.ZodTypeAny;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -37,6 +39,7 @@ describe(commands.OPEN, () => {
       ]
     }));
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
   });
 
   beforeEach(() => {
@@ -75,22 +78,22 @@ describe(commands.OPEN, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if the appId is not a valid guid', async () => {
-    const actual = await command.validate({ options: { appId: 'abc' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the appId is not a valid guid', () => {
+    const actual = commandOptionsSchema.safeParse({ appId: 'abc' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if valid appId-guid is specified', async () => {
-    const actual = await command.validate({ options: { appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if valid appId-guid is specified', () => {
+    const actual = commandOptionsSchema.safeParse({ appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f' });
+    assert.strictEqual(actual.success, true);
   });
 
   it('shows message with url when the app specified with the appId is found', async () => {
     const appId = "9b1b1e42-794b-4c71-93ac-5ed92488b67f";
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         appId: appId
-      }
+      })
     });
     assert(loggerLogSpy.calledWith(`Use a web browser to open the page https://portal.azure.com/#blade/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/Overview/appId/${appId}/isMSAApp/`));
   });
@@ -98,10 +101,10 @@ describe(commands.OPEN, () => {
   it('shows message with url when the app specified with the appId is found (verbose)', async () => {
     const appId = "9b1b1e42-794b-4c71-93ac-5ed92488b67f";
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         appId: appId
-      }
+      })
     });
     assert(loggerLogSpy.calledWith(`Use a web browser to open the page https://portal.azure.com/#blade/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/Overview/appId/${appId}/isMSAApp/`));
   });
@@ -109,10 +112,10 @@ describe(commands.OPEN, () => {
   it('shows message with preview-url when the app specified with the appId is found', async () => {
     const appId = "9b1b1e42-794b-4c71-93ac-5ed92488b67f";
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         appId: appId,
         preview: true
-      }
+      })
     });
     assert(loggerLogSpy.calledWith(`Use a web browser to open the page https://preview.portal.azure.com/#blade/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/Overview/appId/${appId}/isMSAApp/`));
   });
@@ -131,9 +134,9 @@ describe(commands.OPEN, () => {
 
     const appId = "9b1b1e42-794b-4c71-93ac-5ed92488b67f";
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         appId: appId
-      }
+      })
     });
     assert(loggerLogSpy.calledWith(`Opening the following page in your browser: https://portal.azure.com/#blade/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/Overview/appId/${appId}/isMSAApp/`));
   });
@@ -152,10 +155,10 @@ describe(commands.OPEN, () => {
 
     const appId = "9b1b1e42-794b-4c71-93ac-5ed92488b67f";
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         appId: appId,
         preview: true
-      }
+      })
     });
     assert(loggerLogSpy.calledWith(`Opening the following page in your browser: https://preview.portal.azure.com/#blade/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/Overview/appId/${appId}/isMSAApp/`));
   });
@@ -174,10 +177,10 @@ describe(commands.OPEN, () => {
 
     const appId = "9b1b1e42-794b-4c71-93ac-5ed92488b67f";
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         appId: appId,
         preview: true
-      }
+      })
     }), new CommandError('An error occurred'));
     assert(loggerLogSpy.calledWith(`Opening the following page in your browser: https://preview.portal.azure.com/#blade/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/Overview/appId/${appId}/isMSAApp/`));
   });

@@ -1,13 +1,14 @@
 import assert from 'assert';
 import fs from 'fs';
 import sinon from 'sinon';
+import { z } from 'zod';
 import { cli } from '../../cli/cli.js';
 import { CommandInfo } from '../../cli/CommandInfo.js';
 import { Logger } from '../../cli/Logger.js';
 import Command, { CommandError } from '../../Command.js';
+import { telemetry } from '../../telemetry.js';
 import { sinonUtil } from '../../utils/sinonUtil.js';
 import AppCommand from './AppCommand.js';
-import { telemetry } from '../../telemetry.js';
 
 class MockCommand extends AppCommand {
   public get name(): string {
@@ -30,9 +31,11 @@ describe('AppCommand', () => {
   let logger: Logger;
   let log: string[];
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: z.ZodTypeAny;
 
   before(() => {
     commandInfo = cli.getCommandInfo(new MockCommand());
+    commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
     sinon.stub(telemetry, 'trackEvent').resolves();
   });
 
@@ -70,19 +73,19 @@ describe('AppCommand', () => {
 
   it('returns error if .m365rc.json file not found in the current directory', async () => {
     sinon.stub(fs, 'existsSync').returns(false);
-    await assert.rejects(cmd.action(logger, { options: {} }), new CommandError('Could not find file: .m365rc.json'));
+    await assert.rejects(cmd.action(logger, { options: commandOptionsSchema.parse({}) }), new CommandError('Could not find file: .m365rc.json'));
   });
 
   it('returns error if the .m365rc.json file is empty', async () => {
     sinon.stub(fs, 'existsSync').returns(true);
     sinon.stub(fs, 'readFileSync').returns('');
-    await assert.rejects(cmd.action(logger, { options: {} }), new CommandError('File .m365rc.json is empty'));
+    await assert.rejects(cmd.action(logger, { options: commandOptionsSchema.parse({}) }), new CommandError('File .m365rc.json is empty'));
   });
 
   it(`returns error if the .m365rc.json file contents couldn't be parsed`, async () => {
     sinon.stub(fs, 'existsSync').returns(true);
     sinon.stub(fs, 'readFileSync').returns('{');
-    await assert.rejects(cmd.action(logger, { options: {} }), new CommandError('Could not parse file: .m365rc.json'));
+    await assert.rejects(cmd.action(logger, { options: commandOptionsSchema.parse({}) }), new CommandError('Could not parse file: .m365rc.json'));
   });
 
   it(`returns error if the .m365rc.json file is empty doesn't contain any apps`, async () => {
@@ -90,7 +93,7 @@ describe('AppCommand', () => {
     sinon.stub(fs, 'readFileSync').returns(JSON.stringify({
       apps: []
     }));
-    await assert.rejects(cmd.action(logger, { options: {} }), new CommandError('No Entra apps found in .m365rc.json'));
+    await assert.rejects(cmd.action(logger, { options: commandOptionsSchema.parse({}) }), new CommandError('No Entra apps found in .m365rc.json'));
   });
 
   it(`returns error if the specified appId not found in the .m365rc.json file`, async () => {
@@ -103,7 +106,7 @@ describe('AppCommand', () => {
         }
       ]
     }));
-    await assert.rejects(cmd.action(logger, { options: { appId: 'e23d235c-fcdf-45d1-ac5f-24ab2ee06951' } }),
+    await assert.rejects(cmd.action(logger, { options: commandOptionsSchema.parse({ appId: 'e23d235c-fcdf-45d1-ac5f-24ab2ee06951' }) }),
       new CommandError('App e23d235c-fcdf-45d1-ac5f-24ab2ee06951 not found in .m365rc.json'));
   });
 
@@ -124,7 +127,7 @@ describe('AppCommand', () => {
     const cliPromptStub = sinon.stub(cli, 'handleMultipleResultsFound').callsFake(async () => (
       { appIdIndex: 0 }
     ));
-    await assert.rejects(cmd.action(logger, { options: {} }));
+    await assert.rejects(cmd.action(logger, { options: commandOptionsSchema.parse({}) }));
     assert(cliPromptStub.called);
   });
 
@@ -149,7 +152,7 @@ describe('AppCommand', () => {
     sinon.stub(Command.prototype, 'action').resolves();
 
     try {
-      await cmd.action(logger, { options: {} });
+      await cmd.action(logger, { options: commandOptionsSchema.parse({}) });
       assert.strictEqual((cmd as any).appId, '9c79078b-815e-4a3e-bb80-2aaf2d9e9b3d');
     }
     finally {
@@ -171,7 +174,7 @@ describe('AppCommand', () => {
         }
       ]
     }));
-    await assert.rejects(cmd.action(logger, { options: { appId: '9c79078b-815e-4a3e-bb80-2aaf2d9e9b3d' } }));
+    await assert.rejects(cmd.action(logger, { options: commandOptionsSchema.parse({ appId: '9c79078b-815e-4a3e-bb80-2aaf2d9e9b3d' }) }));
     assert.strictEqual((cmd as any).appId, '9c79078b-815e-4a3e-bb80-2aaf2d9e9b3d');
   });
 
@@ -185,17 +188,17 @@ describe('AppCommand', () => {
         }
       ]
     }));
-    await assert.rejects(cmd.action(logger, { options: {} }));
+    await assert.rejects(cmd.action(logger, { options: commandOptionsSchema.parse({}) }));
     assert.strictEqual((cmd as any).appId, 'e23d235c-fcdf-45d1-ac5f-24ab2ee0695d');
   });
 
-  it('fails validation if the specified appId is not a valid GUID', async () => {
-    const actual = await cmd.validate({ options: { appId: 'e23d235c-fcdf-45d1-ac5f-24ab2ee0695' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the specified appId is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ appId: 'e23d235c-fcdf-45d1-ac5f-24ab2ee0695' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if the specified appId is a valid GUID', async () => {
-    const actual = await cmd.validate({ options: { appId: 'e23d235c-fcdf-45d1-ac5f-24ab2ee0695d' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the specified appId is a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ appId: 'e23d235c-fcdf-45d1-ac5f-24ab2ee0695d' });
+    assert.strictEqual(actual.success, true);
   });
 });

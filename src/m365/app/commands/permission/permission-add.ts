@@ -1,21 +1,24 @@
 import { Application, AppRole, PermissionScope, RequiredResourceAccess, ResourceAccess, ServicePrincipal } from '@microsoft/microsoft-graph-types';
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { odata } from '../../../../utils/odata.js';
-import AppCommand from '../../../base/AppCommand.js';
+import AppCommand, { appCommandOptions } from '../../../base/AppCommand.js';
 import commands from '../../commands.js';
+
+const options = appCommandOptions
+  .extend({
+    applicationPermissions: z.string().optional(),
+    delegatedPermissions: z.string().optional(),
+    grantAdminConsent: z.boolean().optional()
+  })
+  .strict();
+
+type Options = z.infer<typeof options>;
 
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  appId?: string;
-  applicationPermissions?: string;
-  delegatedPermissions?: string;
-  grantAdminConsent?: boolean;
 }
 
 interface AppPermission {
@@ -38,39 +41,16 @@ class AppPermissionAddCommand extends AppCommand {
     return 'Adds the specified application and/or delegated permissions to the current Microsoft Entra app API permissions';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initOptionSets();
+  public get schema(): z.ZodTypeAny | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        appId: typeof args.options.appId !== 'undefined',
-        applicationPermissions: typeof args.options.applicationPermissions !== 'undefined',
-        delegatedPermissions: typeof args.options.delegatedPermissions !== 'undefined',
-        grantAdminConsent: !!args.options.grantAdminConsent
+  public getRefinedSchema(schema: typeof options): z.ZodEffects<any> | undefined {
+    return schema
+      .refine(options => options.applicationPermissions || options.delegatedPermissions, {
+        message: 'Specify at least one of applicationPermissions or delegatedPermissions, or both.',
+        path: ['delegatedPermissions']
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      { option: '--appId [appId]' },
-      { option: '--applicationPermissions [applicationPermissions]' },
-      { option: '--delegatedPermissions [delegatedPermissions]' },
-      { option: '--grantAdminConsent' }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push({
-      options: ['applicationPermissions', 'delegatedPermissions'],
-      runsWhen: (args) => args.options.delegatedPermissions === undefined && args.options.applicationPermissions === undefined
-    });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
