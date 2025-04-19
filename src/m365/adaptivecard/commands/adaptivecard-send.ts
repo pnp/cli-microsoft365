@@ -1,23 +1,29 @@
 import type * as ACData from 'adaptivecards-templating';
+import { z } from 'zod';
 import { Logger } from '../../../cli/Logger.js';
-import GlobalOptions from '../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../Command.js';
 import request, { CliRequestOptions } from '../../../request.js';
+import { optionsUtils } from '../../../utils/optionsUtils.js';
+import { zod } from '../../../utils/zod.js';
 import AnonymousCommand from '../../base/AnonymousCommand.js';
 import commands from '../commands.js';
-import { optionsUtils } from '../../../utils/optionsUtils.js';
+
+export const options = globalOptionsZod
+  .extend({
+    url: z.string(),
+    title: zod.alias('t', z.string().optional()),
+    description: zod.alias('d', z.string().optional()),
+    imageUrl: zod.alias('i', z.string().optional()),
+    actionUrl: zod.alias('a', z.string().optional()),
+    card: z.string().optional(),
+    cardData: z.string().optional()
+  })
+  .and(z.any());
+
+declare type Options = z.infer<typeof options>;
 
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  actionUrl?: string;
-  card?: string;
-  cardData?: string;
-  description?: string;
-  imageUrl?: string;
-  title?: string;
-  url: string;
 }
 
 class AdaptiveCardSendCommand extends AnonymousCommand {
@@ -29,92 +35,50 @@ class AdaptiveCardSendCommand extends AnonymousCommand {
     return 'Sends adaptive card to the specified URL';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
+  public get schema(): z.ZodTypeAny | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        actionUrl: typeof args.options.actionUrl !== 'undefined',
-        card: typeof args.options.card !== 'undefined',
-        cardData: typeof args.options.cardData !== 'undefined',
-        description: typeof args.options.description !== 'undefined',
-        imageUrl: typeof args.options.imageUrl !== 'undefined',
-        title: typeof args.options.title !== 'undefined'
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-u, --url <url>'
-      },
-      {
-        option: '-t, --title [title]'
-      },
-      {
-        option: '-d, --description [description]'
-      },
-      {
-        option: '-i, --imageUrl [imageUrl]'
-      },
-      {
-        option: '-a, --actionUrl [actionUrl]'
-      },
-      {
-        option: '--card [card]'
-      },
-      {
-        option: '--cardData [cardData]'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.card) {
+  public getRefinedSchema(schema: typeof options): z.ZodEffects<any> | undefined {
+    return schema
+      .refine(options => !options.cardData || options.card, {
+        message: 'When you specify cardData, you must also specify card.',
+        path: ['cardData']
+      })
+      .refine(options => {
+        if (options.card) {
           try {
-            JSON.parse(args.options.card);
+            JSON.parse(options.card);
+            return true;
           }
           catch (e) {
-            return `Error while parsing the card: ${e}`;
+            return false;
           }
         }
-
-        if (args.options.cardData) {
-          try {
-            JSON.parse(args.options.cardData);
-          }
-          catch (e) {
-            return `Error while parsing card data: ${e}`;
-          }
-        }
-
         return true;
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push(
-      { options: ['title', 'card'] }
-    );
-  }
-
-  public allowUnknownOptions(): boolean {
-    return true;
+      }, {
+        message: 'Specified card is not a valid JSON string.',
+        path: ['card']
+      })
+      .refine(options => {
+        if (options.cardData) {
+          try {
+            JSON.parse(options.cardData);
+            return true;
+          }
+          catch (e) {
+            return false;
+          }
+        }
+        return true;
+      }, {
+        message: 'Specified cardData is not a valid JSON string.',
+        path: ['cardData']
+      });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const unknownOptions = optionsUtils.getUnknownOptions(args.options, this.options);
+    const unknownOptions = optionsUtils.getUnknownOptions(args.options, zod.schemaToOptions(this.schema!));
     const unknownOptionNames: string[] = Object.getOwnPropertyNames(unknownOptions);
     const card: any = await this.getCard(args, unknownOptionNames, unknownOptions);
 
