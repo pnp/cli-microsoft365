@@ -1,19 +1,25 @@
 import { BookingBusiness } from '@microsoft/microsoft-graph-types';
+import { z } from 'zod';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
+import { zod } from '../../../../utils/zod.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
-import { cli } from '../../../../cli/cli.js';
+
+const options = globalOptionsZod
+  .extend({
+    id: zod.alias('i', z.string().optional()),
+    name: zod.alias('n', z.string().optional())
+  })
+  .strict();
+
+declare type Options = z.infer<typeof options>;
 
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  id?: string;
-  name?: string;
 }
 
 class BookingBusinessGetCommand extends GraphCommand {
@@ -25,32 +31,15 @@ class BookingBusinessGetCommand extends GraphCommand {
     return 'Retrieve the specified Microsoft Bookings business.';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initOptionSets();
+  public get schema(): z.ZodTypeAny | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        id: typeof args.options.id !== 'undefined',
-        name: typeof args.options.name !== 'undefined'
+  public getRefinedSchema(schema: typeof options): z.ZodEffects<any> | undefined {
+    return schema
+      .refine(options => options.id || options.name, {
+        message: 'Specify either id or name'
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      { option: '-i, --id [id]' },
-      { option: '-n, --name [name]' }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push({ options: ['id', 'name'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
