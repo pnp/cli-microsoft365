@@ -36,6 +36,19 @@ export class Page {
   }
 
   public static async checkout(name: string, webUrl: string, logger: Logger, debug: boolean, verbose: boolean): Promise<ClientSidePageProperties> {
+    const pageData: ClientSidePageProperties = await Page.checkoutPage(name, webUrl, logger, verbose);
+    if (!pageData) {
+      throw `Page ${name} information not retrieved with the checkout`;
+    }
+
+    if (verbose) {
+      await logger.log(`Page ${name} is now checked out`);
+    }
+
+    return pageData;
+  }
+
+  public static async checkoutPage(name: string, webUrl: string, logger: Logger, verbose: boolean): Promise<ClientSidePageProperties> {
     if (verbose) {
       await logger.log(`Checking out ${name} page...`);
     }
@@ -49,16 +62,7 @@ export class Page {
       responseType: 'json'
     };
 
-    const pageData: ClientSidePageProperties = await request.post<ClientSidePageProperties>(requestOptions);
-    if (!pageData) {
-      throw `Page ${name} information not retrieved with the checkout`;
-    }
-
-    if (verbose) {
-      await logger.log(`Page ${name} is now checked out`);
-    }
-
-    return pageData;
+    return await request.post<ClientSidePageProperties>(requestOptions);
   }
 
   public static getControlsInformation(control: ClientSidePart, isJSONOutput: boolean): ClientSidePart {
