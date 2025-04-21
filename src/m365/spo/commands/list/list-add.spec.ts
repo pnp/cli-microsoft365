@@ -654,26 +654,7 @@ describe(commands.LIST_ADD, () => {
     assert.strictEqual(actual, expected);
   });
 
-  it(`correctly shows deprecation warning for option 'includedInMyFilesScope'`, async () => {
-    const chalk = (await import('chalk')).default;
-    const loggerErrSpy = sinon.spy(logger, 'logToStderr');
-
-    const expected = true;
-    sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
-        return { ErrorMessage: null };
-      }
-
-      throw 'Invalid request';
-    });
-
-    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', includedInMyFilesScope: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
-    assert(loggerErrSpy.calledWith(chalk.yellow(`Parameter 'includedInMyFilesScope' is deprecated. Please use 'withInMyFilesScope' instead`)));
-
-    sinonUtil.restore(loggerErrSpy);
-  });
-
-  it('sets specified withInMyFilesScope for list', async () => {
+  it('sets specified includedInMyFilesScope for list', async () => {
     const expected = true;
     let actual = '';
     sinon.stub(request, 'post').callsFake(async (opts) => {
@@ -685,7 +666,7 @@ describe(commands.LIST_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', withInMyFilesScope: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', includedInMyFilesScope: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 

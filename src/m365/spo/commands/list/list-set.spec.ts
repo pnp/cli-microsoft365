@@ -656,26 +656,7 @@ describe(commands.LIST_SET, () => {
     assert.strictEqual(actual, expected);
   });
 
-  it(`correctly shows deprecation warning for option 'includedInMyFilesScope'`, async () => {
-    const chalk = (await import('chalk')).default;
-    const loggerErrSpy = sinon.spy(logger, 'logToStderr');
-
-    const expected = true;
-    sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
-        return { ErrorMessage: null };
-      }
-
-      throw 'Invalid request';
-    });
-
-    await command.action(logger, { options: { id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', includedInMyFilesScope: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
-    assert(loggerErrSpy.calledWith(chalk.yellow(`Parameter 'includedInMyFilesScope' is deprecated. Please use 'withInMyFilesScope' instead`)));
-
-    sinonUtil.restore(loggerErrSpy);
-  });
-
-  it('sets specified withInMyFilesScope for list', async () => {
+  it('sets specified includedInMyFilesScope for list', async () => {
     const expected = true;
     let actual = '';
     sinon.stub(request, 'post').callsFake(async (opts) => {
@@ -687,7 +668,7 @@ describe(commands.LIST_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', withInMyFilesScope: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', includedInMyFilesScope: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
