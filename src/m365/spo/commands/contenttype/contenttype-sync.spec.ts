@@ -60,7 +60,7 @@ describe(commands.CONTENTTYPE_SYNC, () => {
     sinon.stub(telemetry, 'trackEvent').resolves();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
-    sinon.stub(spo, 'getSiteId').resolves(siteId);
+    sinon.stub(spo, 'getSiteIdByMSGraph').resolves(siteId);
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
   });

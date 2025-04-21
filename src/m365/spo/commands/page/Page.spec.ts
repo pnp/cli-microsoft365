@@ -216,7 +216,7 @@ describe('Page', () => {
     });
 
     Page
-      .checkout('page.aspx', 'https://contoso.sharepoint.com', logger, false, false)
+      .checkout('page.aspx', 'https://contoso.sharepoint.com', logger, false)
       .then((): void => {
         done();
       }, (): void => {
@@ -230,7 +230,7 @@ describe('Page', () => {
     });
 
     Page
-      .checkout('page.aspx', 'https://contoso.sharepoint.com', logger, false, false)
+      .checkout('page.aspx', 'https://contoso.sharepoint.com', logger, false)
       .then((): void => {
         done(new Error('Parsing page didn\'t fail while expected'));
       }, (): void => {
@@ -248,7 +248,7 @@ describe('Page', () => {
     });
 
     Page
-      .checkout('page.aspx', 'https://contoso.sharepoint.com', logger, false, false)
+      .checkout('page.aspx', 'https://contoso.sharepoint.com', logger, false)
       .then((): void => {
         done(new Error('Parsing page didn\'t fail while expected'));
       }, (): void => {

@@ -8,6 +8,7 @@ import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 import { BackgroundControl, Control } from './canvasContent.js';
 import { CanvasColumnFactorType, CanvasSectionTemplate } from './clientsidepages.js';
+import { Page } from './Page.js';
 
 interface CommandArgs {
   options: Options;
@@ -248,15 +249,7 @@ class SpoPageSectionAddCommand extends SpoCommand {
       canvasContent = JSON.parse(res.CanvasContent1 || "[{\"controlType\":0,\"pageSettingsSlice\":{\"isDefaultDescription\":true,\"isDefaultThumbnail\":true}}]");
 
       if (!res.IsPageCheckedOutToCurrentUser) {
-        requestOptions = {
-          url: `${args.options.webUrl}/_api/sitepages/pages/GetByUrl('sitepages/${formatting.encodeQueryParameter(pageFullName)}')/checkoutpage`,
-          headers: {
-            'accept': 'application/json;odata=nometadata'
-          },
-          responseType: 'json'
-        };
-
-        await request.post(requestOptions);
+        await Page.checkout(pageFullName, args.options.webUrl, logger, this.verbose);
       }
 
       // get unique zoneIndex values given each section can have 1 or more

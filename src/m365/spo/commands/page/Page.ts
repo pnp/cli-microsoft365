@@ -35,7 +35,7 @@ export class Page {
     return ClientSidePage.fromHtml(res.ListItemAllFields.CanvasContent1);
   }
 
-  public static async checkout(name: string, webUrl: string, logger: Logger, debug: boolean, verbose: boolean): Promise<ClientSidePageProperties> {
+  public static async checkout(name: string, webUrl: string, logger: Logger, verbose: boolean): Promise<ClientSidePageProperties> {
     if (verbose) {
       await logger.log(`Checking out ${name} page...`);
     }

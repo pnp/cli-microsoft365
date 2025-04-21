@@ -3,7 +3,7 @@ import config from '../../../../config.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
-import { ClientSvcResponse, ClientSvcResponseContents } from '../../../../utils/spo.js';
+import { ClientSvcResponse, ClientSvcResponseContents, spo } from '../../../../utils/spo.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
@@ -123,8 +123,8 @@ class SpoContentTypeSetCommand extends SpoCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       const contentTypeId = await this.getContentTypeId(logger, args.options);
-      const siteId = await this.getSiteId(logger, args.options.webUrl);
-      const webId = await this.getWebId(logger, args.options.webUrl);
+      const siteId = await spo.getSiteIdBySPApi(args.options.webUrl, logger, this.verbose);
+      const webId = await spo.getWebId(args.options.webUrl, logger, this.verbose);
       await this.updateContentType(logger, siteId, webId, contentTypeId, args.options);
     }
     catch (err: any) {
@@ -179,7 +179,7 @@ class SpoContentTypeSetCommand extends SpoCommand {
       headers: {
         'Content-Type': 'text/xml'
       },
-      data: await this.getCsomCallXmlBody(options, siteId, webId, contentTypeId)
+      data: await this.getCsomCallXmlBody(options, siteId, webId, contentTypeId, logger)
     };
 
     const res = await request.post<string>(requestOptions);
@@ -190,9 +190,9 @@ class SpoContentTypeSetCommand extends SpoCommand {
     }
   }
 
-  private async getCsomCallXmlBody(options: Options, siteId: string, webId: string, contentTypeId: string): Promise<string> {
+  private async getCsomCallXmlBody(options: Options, siteId: string, webId: string, contentTypeId: string, logger: Logger): Promise<string> {
     const payload = this.getRequestPayload(options);
-    const list = await this.getListId(options);
+    const list = await this.getListId(options, logger);
     return `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions>${payload}</Actions><ObjectPaths><Identity Id="9" Name="fc4179a0-e0d7-5000-c38b-bc3506fbab6f|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:${siteId}:web:${webId}${list}:contenttype:${formatting.escapeXml(contentTypeId)}" /></ObjectPaths></Request>`;
   }
 
@@ -228,41 +228,7 @@ class SpoContentTypeSetCommand extends SpoCommand {
     return payload.join('');
   }
 
-  private async getSiteId(logger: Logger, webUrl: string): Promise<string> {
-    if (this.verbose) {
-      await logger.logToStderr(`Retrieving site collection id...`);
-    }
-
-    const requestOptions: CliRequestOptions = {
-      url: `${webUrl}/_api/site?$select=Id`,
-      headers: {
-        accept: 'application/json;odata=nometadata'
-      },
-      responseType: 'json'
-    };
-
-    const site = await request.get<{ Id: string }>(requestOptions);
-    return site.Id;
-  }
-
-  private async getWebId(logger: Logger, webUrl: string): Promise<string> {
-    if (this.verbose) {
-      await logger.logToStderr(`Retrieving web id...`);
-    }
-
-    const requestOptions: CliRequestOptions = {
-      url: `${webUrl}/_api/web?$select=Id`,
-      headers: {
-        accept: 'application/json;odata=nometadata'
-      },
-      responseType: 'json'
-    };
-
-    const web = await request.get<{ Id: string }>(requestOptions);
-    return web.Id;
-  }
-
-  private async getListId(options: Options): Promise<string> {
+  private async getListId(options: Options, logger: Logger): Promise<string> {
     if (!options.listId && !options.listTitle && !options.listUrl) {
       return '';
     }
@@ -270,31 +236,7 @@ class SpoContentTypeSetCommand extends SpoCommand {
     if (options.listId) {
       return baseString += options.listId;
     }
-    else if (options.listTitle) {
-      const requestOptions: CliRequestOptions = {
-        url: `${options.webUrl}/_api/web/lists/getByTitle('${formatting.encodeQueryParameter(options.listTitle)}')?$select=Id`,
-        headers: {
-          accept: 'application/json;odata=nometadata'
-        },
-        responseType: 'json'
-      };
-      const listResponse = await request.get<{ Id: string }>(requestOptions);
-      baseString += listResponse.Id;
-    }
-    else if (options.listUrl) {
-      const listServerRelativeUrl: string = urlUtil.getServerRelativePath(options.webUrl, options.listUrl);
-      const requestOptions: CliRequestOptions = {
-        url: `${options.webUrl}/_api/web/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')?$select=Id`,
-        headers: {
-          accept: 'application/json;odata=nometadata'
-        },
-        responseType: 'json'
-      };
-      const listResponse = await request.get<{ Id: string }>(requestOptions);
-      baseString += listResponse.Id;
-    }
-
-    return baseString;
+    return baseString += await spo.getListId(options.webUrl, options.listTitle, options.listUrl, logger, this.verbose);
   }
 }
 
