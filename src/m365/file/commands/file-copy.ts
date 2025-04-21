@@ -119,7 +119,7 @@ class FileCopyCommand extends GraphCommand {
   private async getCopyUrl(options: Options, sourcePath: string, logger: Logger): Promise<string> {
     const { webUrl, sourceUrl, verbose, nameConflictBehavior } = options;
     const folderUrl: URL = new URL(sourcePath);
-    const siteId: string = await spo.getSiteId(webUrl, logger, verbose);
+    const siteId: string = await spo.getSiteIdByMSGraph(webUrl, logger, verbose);
     const drive: Drive = await this.getDocumentLibrary(siteId, folderUrl, sourceUrl, logger);
     const itemId: string = await this.getStartingFolderId(drive, folderUrl, logger);
 
@@ -134,7 +134,7 @@ class FileCopyCommand extends GraphCommand {
 
   private async getTargetDriveAndItemId(webUrl: string, targetUrl: string, logger: Logger, verbose?: boolean): Promise<{ targetDriveId: string, targetItemId: string }> {
     const targetSiteUrl: string = urlUtil.getTargetSiteAbsoluteUrl(webUrl, targetUrl);
-    const targetSiteId: string = await spo.getSiteId(targetSiteUrl, logger, verbose);
+    const targetSiteId: string = await spo.getSiteIdByMSGraph(targetSiteUrl, logger, verbose);
     const targetFolderUrl: URL = new URL(this.getAbsoluteUrl(targetSiteUrl, targetUrl));
     const targetDrive: Drive = await this.getDocumentLibrary(targetSiteId, targetFolderUrl, targetUrl, logger);
     const targetDriveId: string = targetDrive.id as string;
