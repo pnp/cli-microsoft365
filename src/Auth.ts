@@ -726,24 +726,26 @@ export class Auth {
       const serviceConnectionTenantId = process.env.AZURESUBSCRIPTION_TENANT_ID;
       const useServiceConnection = serviceConnectionId && serviceConnectionAppId && serviceConnectionTenantId;
 
-      if (debug) {
-        if (!useServiceConnection) {
+      if (!useServiceConnection) {
+        if (debug) {
           await logger.logToStderr('Not using a service connection. Run this command in an AzurePowerShell task to be able to use a service connection.');
-
-          if (!this.connection.appId || this.connection.tenant === 'common') {
-            throw new CommandError('The appId and tenant parameters are required when not using a service connection.');
-          }
         }
-        else {
+
+        if (!this.connection.appId || this.connection.tenant === 'common') {
+          throw new CommandError('The appId and tenant parameters are required when not using a service connection.');
+        }
+      }
+      else {
+        if (debug) {
           if (this.connection.appId || this.connection.tenant !== 'common') {
             await logger.logToStderr('When using a service connection, the appId and tenant values are updated to the values of the service connection.');
           }
 
-          this.connection.appId = serviceConnectionAppId;
-          this.connection.tenant = serviceConnectionTenantId;
-
           await logger.logToStderr(`Using service connection '${serviceConnectionId}' with app Id '${serviceConnectionAppId}' and tenant Id '${serviceConnectionTenantId}'...`);
         }
+
+        this.connection.appId = serviceConnectionAppId;
+        this.connection.tenant = serviceConnectionTenantId;
       }
 
       const federationToken = await this.getFederationTokenFromAzureDevOps(logger, debug, serviceConnectionId);
