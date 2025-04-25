@@ -11,7 +11,6 @@ import { fsUtil } from '../../../../utils/fsUtil.js';
 import { AzureDevOpsPipeline, AzureDevOpsPipelineStep } from './project-azuredevops-pipeline-model.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 
-
 interface CommandArgs {
   options: Options;
 }
