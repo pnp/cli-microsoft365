@@ -242,7 +242,7 @@ Each time you run CLI for Microsoft 365, it will automatically check if there is
 
 ## Using CLI for Microsoft 365 in PowerShell
 
-CLI for Microsoft 365 by default outputs errors to stderr. Unfrortunately, PowerShell doesn't handle stderr as well as other shells. Also in case of command errors PowerShell does not break execution and may still continue even after setting `$ErrorActionPreference = "Stop"`. In order to overcome those problems you may use the following settings and helper method.
+CLI for Microsoft 365 by default outputs errors to stderr. PowerShell, unlike other shells, works differently as it has six distinct output streams. This behavior can lead to unexpected results, such as PowerShell continuing execution even after setting $ErrorActionPreference = "Stop". For more information on PowerShell's output streams, see [Handling output and errors](https://learn.microsoft.com/en-us/powershell/scripting/learn/shell/running-commands?view=powershell-7.5#handling-output-and-errors). To address these differences, you can use the following settings and helper method.
 
 ```PowerShell
 m365 cli config set --key output --value json # setting output to json
