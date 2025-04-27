@@ -4,6 +4,7 @@ export default {
   CHANGELOG_LIST: `${prefix} changelog list`,
   DIRECTORYEXTENSION_ADD: `${prefix} directoryextension add`,
   DIRECTORYEXTENSION_GET: `${prefix} directoryextension get`,
+  DIRECTORYEXTENSION_LIST: `${prefix} directoryextension list`,
   DIRECTORYEXTENSION_REMOVE: `${prefix} directoryextension remove`,
   OPENEXTENSION_ADD: `${prefix} openextension add`,
   OPENEXTENSION_GET: `${prefix} openextension get`,

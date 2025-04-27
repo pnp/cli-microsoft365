@@ -1126,6 +1126,11 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
+              label: 'directoryextension list',
+              id: 'cmd/graph/directoryextension/directoryextension-list'
+            },
+            {
+              type: 'doc',
               label: 'directoryextension remove',
               id: 'cmd/graph/directoryextension/directoryextension-remove'
             }
