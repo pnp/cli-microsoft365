@@ -259,19 +259,28 @@ class SpoPageSectionAddCommand extends SpoCommand {
         await request.post(requestOptions);
       }
 
-      // get columns
-      const columns: (Control | BackgroundControl)[] = canvasContent
-        .filter(c => typeof c.controlType === 'undefined');
       // get unique zoneIndex values given each section can have 1 or more
       // columns each assigned to the zoneIndex of the corresponding section
-      const zoneIndices: number[] = columns
+      const zoneIndices: number[] = canvasContent
+        // Exclude the vertical section
+        .filter(c => c.position)
         .map(c => c.position.zoneIndex)
         .filter((value: number, index: number, array: number[]): boolean => {
           return array.indexOf(value) === index;
         })
-        .sort();
-      // zoneIndex for the new section to add
-      const zoneIndex: number = this.getSectionIndex(zoneIndices, args.options.order);
+        .sort((a, b) => a - b);
+
+      // Add a new zoneIndex  at the end of the array
+      zoneIndices.push(zoneIndices.length > 0 ? zoneIndices[zoneIndices.length - 1] + 1 : 1);
+
+      // get section number. if not specified, get the last section
+      let section: number = args.options.order || zoneIndices.length;
+      if (section > zoneIndices.length) {
+        section = zoneIndices.length;
+      }
+
+      // zoneIndex that represents the section where the web part should be added
+      const zoneIndex: number = zoneIndices[section - 1];
       let zoneId: string | undefined;
 
       let backgroundControlToAdd: BackgroundControl | undefined = undefined;
@@ -288,11 +297,18 @@ class SpoPageSectionAddCommand extends SpoCommand {
         }
       }
 
+      // Increment the zoneIndex of all columns that are greater than or equal to the new zoneIndex
+      canvasContent.forEach((c: Control | BackgroundControl) => {
+        if (c.position && c.position.zoneIndex >= zoneIndex) {
+          c.position.zoneIndex += 1;
+        }
+      });
+
       // get the list of columns to insert based on the selected template
       const columnsToAdd: Control[] = this.getColumns(zoneIndex, args, zoneId);
       // insert the column in the right place in the array so that
       // it stays sorted ascending by zoneIndex
-      let pos: number = canvasContent.findIndex(c => typeof c.controlType === 'undefined' && c.position && c.position.zoneIndex > zoneIndex);
+      let pos: number = canvasContent.findIndex(c => c.position && c.position.zoneIndex >= zoneIndex);
       if (pos === -1) {
         pos = canvasContent.length - 1;
       }
@@ -315,24 +331,6 @@ class SpoPageSectionAddCommand extends SpoCommand {
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
-  }
-
-  private getSectionIndex(zoneIndices: number[], order?: number): number {
-    // zoneIndex of the first column on the page
-    const minIndex: number = zoneIndices.length === 0 ? 0 : zoneIndices[0];
-    // zoneIndex of the last column on the page
-    const maxIndex: number = zoneIndices.length === 0 ? 0 : zoneIndices[zoneIndices.length - 1];
-    if (!order || order > zoneIndices.length) {
-      // no order specified, add section to the end
-      return maxIndex === 0 ? 1 : maxIndex * 2;
-    }
-
-    // add to the beginning
-    if (order === 1) {
-      return minIndex / 2;
-    }
-
-    return zoneIndices[order - 2] + ((zoneIndices[order - 1] - zoneIndices[order - 2]) / 2);
   }
 
   private getColumns(zoneIndex: number, args: CommandArgs, zoneId?: string): Control[] {
