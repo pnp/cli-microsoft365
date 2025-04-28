@@ -2,7 +2,7 @@ import { ClientSideControlPosition, ZoneGroupMetadata } from "./clientsidepages"
 
 export interface Control {
   controlType?: number;
-  displayMode: number;
+  displayMode?: number;
   emphasis?: { zoneEmphasis?: number };
   id?: string;
   position: ClientSideControlPosition;
