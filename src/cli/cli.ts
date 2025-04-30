@@ -46,7 +46,7 @@ let currentCommandName: string | undefined;
 let optionsFromArgs: { options: yargs.Arguments } | undefined;
 const defaultHelpMode = 'options';
 const defaultHelpTarget = 'console';
-const helpModes: string[] = ['options', 'examples', 'remarks', 'response', 'full'];
+const helpModes: string[] = ['options', 'examples', 'remarks', 'permissions', 'response', 'full'];
 const helpTargets: string[] = ['console', 'web'];
 const yargsConfiguration: Partial<yargs.Configuration> = {
   'parse-numbers': true,

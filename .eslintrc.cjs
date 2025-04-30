@@ -272,6 +272,14 @@ module.exports = {
       "rules": {
         "camelcase": "off"
       }
+    },
+    {
+      "files": [
+        "*.mjs"
+      ],
+      "rules": {
+        "@typescript-eslint/explicit-function-return-type": "off"
+      }
     }
   ]
 };
