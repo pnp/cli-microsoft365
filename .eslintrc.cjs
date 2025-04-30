@@ -247,7 +247,7 @@ module.exports = {
         ]
       }
     ],
-    "@typescript-eslint/explicit-function-return-type": ["error", { "allowExpressions": true }],
+    "@typescript-eslint/explicit-function-return-type": ["error", { "allowExpressions": true }, ],
     "mocha/no-identical-title": "error",
     "@typescript-eslint/no-floating-promises": "error"
   },
@@ -270,6 +270,14 @@ module.exports = {
       ],
       "rules": {
         "camelcase": "off"
+      }
+    },
+    {
+      "files": [
+        "*.mjs"
+      ],
+      "rules": {
+        "@typescript-eslint/explicit-function-return-type": "off"
       }
     }
   ]

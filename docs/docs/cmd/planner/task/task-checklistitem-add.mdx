@@ -27,6 +27,25 @@ m365 planner task checklistitem add [options]
 
 <Global />
 
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource        | Permissions     |
+  |-----------------|-----------------|
+  | Microsoft Graph | Tasks.ReadWrite |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource        | Permissions         |
+  |-----------------|---------------------|
+  | Microsoft Graph | Tasks.ReadWrite.All |
+
+  </TabItem>
+</Tabs>
+
 ## Examples
 
 Adds an unchecked checklist item with the specified title to a Microsoft Planner task with the specified ID.

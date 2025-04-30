@@ -35,6 +35,25 @@ When using rosterId, the command is based on an API that is currently in preview
 
 :::
 
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource        | Permissions                      |
+  |-----------------|----------------------------------|
+  | Microsoft Graph | Tasks.Read, GroupMember.Read.All |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource        | Permissions                          |
+  |-----------------|--------------------------------------|
+  | Microsoft Graph | Tasks.Read.All, GroupMember.Read.All |
+
+  </TabItem>
+</Tabs>
+
 ## Examples
 
 Returns a list of Microsoft Planner plans for the specified Group by id.

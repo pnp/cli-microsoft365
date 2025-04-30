@@ -47,6 +47,25 @@ When using `rosterId`, the command is based on an API that is currently in previ
 
 :::
 
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource        | Permissions                           |
+  |-----------------|---------------------------------------|
+  | Microsoft Graph | Tasks.ReadWrite, GroupMember.Read.All |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource        | Permissions                               |
+  |-----------------|-------------------------------------------|
+  | Microsoft Graph | Tasks.ReadWrite.All, GroupMember.Read.All |
+
+  </TabItem>
+</Tabs>
+
 ## Examples
 
 Adds a Microsoft Planner bucket for a plan based on its ID with an order hint
