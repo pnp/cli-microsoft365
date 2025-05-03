@@ -1,3 +1,4 @@
+import { cli } from '../../../../cli/cli.js';
 import { z } from 'zod';
 import { zod } from '../../../../utils/zod.js';
 import { Logger } from '../../../../cli/Logger.js';
@@ -42,13 +43,19 @@ class SpeContainerPermissionListCommand extends GraphCommand {
       }
 
       const containerPermission = await odata.getAllItems<any>(`${this.resource}/v1.0/storage/fileStorage/containers/${formatting.encodeQueryParameter(args.options.containerId)}/permissions`);
-      await logger.log(containerPermission.map(i => {
-        return {
-          id: i.id,
-          roles: i.roles.join(','),
-          userPrincipalName: i.grantedToV2.user.userPrincipalName
-        };
-      }));
+
+      if (!cli.shouldTrimOutput(args.options.output)) {
+        await logger.log(containerPermission);
+      }
+      else {
+        await logger.log(containerPermission.map(i => {
+          return {
+            id: i.id,
+            roles: i.roles.join(','),
+            userPrincipalName: i.grantedToV2.user.userPrincipalName
+          };
+        }));
+      }
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);

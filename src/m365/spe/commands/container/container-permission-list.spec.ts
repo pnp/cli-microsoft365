@@ -48,6 +48,19 @@ describe(commands.CONTAINER_PERMISSION_LIST, () => {
     ]
   };
 
+  const textOutput = [
+    {
+      "id": "X2k6MCMuZnxtZW1iZXJzaGlwfGRlYnJhYkBuYWNoYW4zNjUub25taWNyb3NvZnQuY29t",
+      "roles": "owner",
+      "userPrincipalName": "debra@contoso.onmicrosoft.com"
+    },
+    {
+      "id": "X2k6MCMuZnxtZW1iZXJzaGlwfGFkbWluQG5hY2hhbjM2NS5vbm1pY3Jvc29mdC5jb20",
+      "roles": "reader",
+      "userPrincipalName": "john@contoso.onmicrosoft.com"
+    }
+  ];
+
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').resolves();
@@ -110,20 +123,27 @@ describe(commands.CONTAINER_PERMISSION_LIST, () => {
       }
     });
 
-    assert(loggerLogSpy.calledWith(
-      [
-        {
-          "id": "X2k6MCMuZnxtZW1iZXJzaGlwfGRlYnJhYkBuYWNoYW4zNjUub25taWNyb3NvZnQuY29t",
-          "roles": "owner",
-          "userPrincipalName": "debra@contoso.onmicrosoft.com"
-        },
-        {
-          "id": "X2k6MCMuZnxtZW1iZXJzaGlwfGFkbWluQG5hY2hhbjM2NS5vbm1pY3Jvc29mdC5jb20",
-          "roles": "reader",
-          "userPrincipalName": "john@contoso.onmicrosoft.com"
-        }
-      ]
-    ));
+    assert(loggerLogSpy.calledWith(containerPermissionResponse.value));
+  });
+
+  it('correctly lists permissions of a SharePoint Embedded Container (TEXT)', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/storage/fileStorage/containers/${formatting.encodeQueryParameter(containerId)}/permissions`) {
+        return containerPermissionResponse;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options: {
+        containerId: containerId,
+        debug: true,
+        output: 'text'
+      }
+    });
+
+    assert(loggerLogSpy.calledWith(textOutput));
   });
 
   it('correctly handles error when SharePoint Embedded Container is not found', async () => {

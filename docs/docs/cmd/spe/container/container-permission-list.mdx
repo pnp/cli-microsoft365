@@ -38,8 +38,16 @@ m365 spe container permission list --containerId "b!ISJs1WRro0y0EWgkUYcktDa0mE8z
   [
     {
       "id": "X2k6MCMuZnxtZW1iZXJzaGlwfGRlYnJhYkBuYWNoYW4zNjUub25taWNyb3NvZnQuY29t",
-      "roles": "owner",
-      "userPrincipalName": "john.doe@contoso.onmicrosoft.com"
+      "roles": [
+        "owner"
+      ],
+      "grantedToV2": {
+        "user": {
+          "displayName": "John Doe",
+          "email": "john.doe@contoso.onmicrosoft.com",
+          "userPrincipalName": "john.doe@contoso.onmicrosoft.com"
+        }
+      }
     }
   ]
   ```
@@ -65,7 +73,7 @@ m365 spe container permission list --containerId "b!ISJs1WRro0y0EWgkUYcktDa0mE8z
   <TabItem value="Markdown">
 
   ```md
-  # spe container permission list --debug "false" --verbose "false" --containerId "b!ISJs1WRro0y0EWgkUYcktDa0mE8zSlFEqFzqRn70Zwp1CEtDEBZgQICPkRbil_5Z"
+  # spe container permission list --containerId "b!ISJs1WRro0y0EWgkUYcktDa0mE8zSlFEqFzqRn70Zwp1CEtDEBZgQICPkRbil_5Z"
 
   Date: 3/3/2025
 
