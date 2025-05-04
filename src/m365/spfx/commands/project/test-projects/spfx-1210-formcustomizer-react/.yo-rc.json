@@ -1,0 +1,23 @@
+{
+  "@microsoft/generator-sharepoint": {
+    "whichFolder": "subdir",
+    "solutionName": "spfx",
+    "environment": "spo",
+    "skipFeatureDeployment": false,
+    "isDomainIsolated": false,
+    "componentType": "extension",
+    "extensionType": "FormCustomizer",
+    "template": "react",
+    "componentName": "HelloWorld",
+    "componentDescription": "HelloWorld",
+    "plusBeta": false,
+    "isCreatingSolution": true,
+    "nodeVersion": "22.14.0",
+    "sdksVersions": {},
+    "version": "1.21.0",
+    "libraryName": "spfx",
+    "libraryId": "1a7a1a7c-eccf-42b9-9e8d-2bbf7c3a37e0",
+    "packageManager": "npm",
+    "solutionShortDescription": "spfx description"
+  }
+}

@@ -33,7 +33,7 @@
     "ajv": "^6.12.5",
     "eslint": "8.57.1",
     "gulp": "4.0.2",
-    "typescript": "5.3.3",
+    "typescript": "~5.3.3",
     "@types/react": "17.0.45",
     "@types/react-dom": "17.0.17",
     "eslint-plugin-react-hooks": "4.3.0",
