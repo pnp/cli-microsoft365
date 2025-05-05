@@ -1,9 +1,10 @@
 import { Application, AppRole, AppRoleAssignment, OAuth2PermissionGrant, PermissionScope, RequiredResourceAccess, ResourceAccess, ServicePrincipal } from '@microsoft/microsoft-graph-types';
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
 import request, { CliRequestOptions } from '../../../../request.js';
-import AppCommand from '../../../base/AppCommand.js';
-import commands from '../../commands.js';
 import { entraApp } from '../../../../utils/entraApp.js';
+import AppCommand, { appCommandOptions } from '../../../base/AppCommand.js';
+import commands from '../../commands.js';
 
 interface ApiPermission {
   resource: string;
@@ -28,6 +29,10 @@ class AppPermissionListCommand extends AppCommand {
 
   public get description(): string {
     return 'Lists API permissions for the current Microsoft Entra app';
+  }
+
+  public get schema(): z.ZodTypeAny | undefined {
+    return appCommandOptions;
   }
 
   public async commandAction(logger: Logger): Promise<void> {

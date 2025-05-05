@@ -1,22 +1,27 @@
 import assert from 'assert';
 import fs from 'fs';
 import sinon from 'sinon';
+import { z } from 'zod';
 import auth from '../../../Auth.js';
+import { cli } from '../../../cli/cli.js';
+import { CommandInfo } from '../../../cli/CommandInfo.js';
 import { Logger } from '../../../cli/Logger.js';
 import { CommandError } from '../../../Command.js';
 import request from '../../../request.js';
 import { telemetry } from '../../../telemetry.js';
+import { entraApp } from '../../../utils/entraApp.js';
 import { pid } from '../../../utils/pid.js';
 import { session } from '../../../utils/session.js';
 import { sinonUtil } from '../../../utils/sinonUtil.js';
 import commands from '../commands.js';
 import command from './app-get.js';
-import { entraApp } from '../../../utils/entraApp.js';
 
 describe(commands.GET, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
+  let commandOptionsSchema: z.ZodTypeAny;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -33,6 +38,8 @@ describe(commands.GET, () => {
       ]
     }));
     auth.connection.active = true;
+    commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
   });
 
   beforeEach(() => {
@@ -76,9 +83,9 @@ describe(commands.GET, () => {
     sinon.stub(entraApp, 'getAppRegistrationByAppId').rejects(new Error(error));
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f'
-      }
+      })
     }), new CommandError(`App with appId '9b1b1e42-794b-4c71-93ac-5ed92488b67f' not found in Microsoft Entra ID`));
   });
 
@@ -98,9 +105,9 @@ describe(commands.GET, () => {
     sinon.stub(entraApp, 'getAppRegistrationByAppId').resolves(appResponse.value[0]);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f'
-      }
+      })
     });
     const call: sinon.SinonSpyCall = loggerLogSpy.lastCall;
     assert.strictEqual(call.args[0].id, '340a4aa3-1af6-43ac-87d8-189819003952');

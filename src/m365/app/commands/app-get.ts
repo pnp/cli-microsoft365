@@ -1,7 +1,8 @@
+import { z } from 'zod';
 import { Logger } from '../../../cli/Logger.js';
-import AppCommand, { AppCommandArgs } from '../../base/AppCommand.js';
-import commands from '../commands.js';
 import { entraApp } from '../../../utils/entraApp.js';
+import AppCommand, { AppCommandArgs, appCommandOptions } from '../../base/AppCommand.js';
+import commands from '../commands.js';
 
 class AppGetCommand extends AppCommand {
   public get name(): string {
@@ -10,6 +11,10 @@ class AppGetCommand extends AppCommand {
 
   public get description(): string {
     return 'Retrieves information about the current Microsoft Entra app';
+  }
+
+  public get schema(): z.ZodTypeAny | undefined {
+    return appCommandOptions;
   }
 
   public async commandAction(logger: Logger, args: AppCommandArgs): Promise<void> {
