@@ -19,13 +19,16 @@ m365 spo list get [options]
 : URL of the site where the list to retrieve is located.
 
 `-i, --id [id]`
-: ID of the list to retrieve information for. Specify either `id`, `title`, or `url` but not multiple.
+: ID of the list to retrieve information for. Specify either `id`, `title`,`url` or `default` but not multiple.
 
 `-t, --title [title]`
-: Title of the list to retrieve information for. Specify either `id`, `title`, or `url` but not multiple.
+: Title of the list to retrieve information for. Specify either `id`, `title`,`url` or `default` but not multiple.
 
 `--url [url]`
-: Server- or site-relative URL of the list. Specify either `id`, `title`, or `url` but not multiple.
+: Server- or site-relative URL of the list. Specify either `id`, `title`,`url` or `default` but not multiple.
+
+`--default`
+: Set to retrieve the default list from the site. Specify either `id`, `title`, `url`, or `default` but not multiple.  
 
 `-p, --properties [properties]`
 : Comma-separated list of properties to retrieve from the list. Will retrieve all properties possible from default response, if not specified.
@@ -41,6 +44,12 @@ m365 spo list get [options]
 When the `properties` option includes values with a `/`, for example: `ListItemAllFields/Id`, an additional `$expand` query parameter will be included on `ListItemAllFields`.
 
 ## Examples
+
+Get the default document library located in the specified site.
+
+```sh
+m365 spo list get --webUrl https://contoso.sharepoint.com/sites/project-x --default  
+```
 
 Get information about a list with specified ID located in the specified site.
 
