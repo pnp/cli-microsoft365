@@ -36,7 +36,7 @@ class SpoListGetCommand extends SpoCommand {
   }
 
   public get description(): string {
-    return 'Gets information about the specific list or returns information about the default list in a site';
+    return 'Gets information about the specific list';
   }
 
   constructor() {
@@ -56,7 +56,7 @@ class SpoListGetCommand extends SpoCommand {
         url: (!(!args.options.url)).toString(),
         properties: (!(!args.options.properties)).toString(),
         withPermissions: typeof args.options.withPermissions !== 'undefined',
-        default: typeof args.options.default !== 'undefined'
+        default: !!args.options.default
       });
     });
   }
