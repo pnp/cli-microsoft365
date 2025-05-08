@@ -2,10 +2,8 @@ import AdmZip from 'adm-zip';
 import fs from 'fs';
 import path from 'path';
 import { v4 } from 'uuid';
-import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import { Logger } from '../../../../cli/Logger.js';
-import { CommandOutput, cli } from '../../../../cli/cli.js';
 import AnonymousCommand from '../../../base/AnonymousCommand.js';
 import commands from '../../commands.js';
 import { WebProperties } from '../../../spo/commands/web/WebProperties.js';
@@ -106,7 +104,7 @@ class VivaConnectionsAppCreateCommand extends AnonymousCommand {
     try {
       const web: WebProperties = await this.getWeb(args, logger);
       if (this.debug) {
-        logger.logToStderr(web);
+        await logger.logToStderr(web);
       }
 
       if (this.verbose) {
