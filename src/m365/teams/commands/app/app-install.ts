@@ -2,7 +2,7 @@ import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
-import { aadUser } from '../../../../utils/aadUser.js';
+import { entraUser } from '../../../../utils/entraUser.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
@@ -131,9 +131,9 @@ class TeamsAppInstallCommand extends GraphCommand {
     }
 
     try {
-      const res = await aadUser.getUpnByUserId(args.options.userId);
+      const res = await entraUser.getUpnByUserId(args.options.userId, logger, this.verbose);
       if (this.verbose) {
-        logger.logToStderr(res);
+        await logger.logToStderr(res);
       }
 
       return true;

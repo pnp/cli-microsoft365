@@ -13,7 +13,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './app-install.js';
-import { aadUser } from '../../../../utils/aadUser.js';
+import { entraUser } from '../../../../utils/entraUser.js';
 
 describe(commands.APP_INSTALL, () => {
   let log: string[];
@@ -49,7 +49,7 @@ describe(commands.APP_INSTALL, () => {
     sinonUtil.restore([
       request.get,
       request.post,
-      aadUser.getUpnByUserId,
+      entraUser.getUpnByUserId,
       cli.getSettingWithDefaultValue
     ]);
   });
@@ -383,7 +383,7 @@ describe(commands.APP_INSTALL, () => {
   });
 
   it('installs app from the catalog the user specified with userId', async () => {
-    sinon.stub(aadUser, 'getUpnByUserId').resolves('admin@contoso.onmicrosoft.com');
+    sinon.stub(entraUser, 'getUpnByUserId').resolves('admin@contoso.onmicrosoft.com');
 
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users/c527a470-a882-481c-981c-ee6efaba85c7/teamwork/installedApps` &&
@@ -404,7 +404,7 @@ describe(commands.APP_INSTALL, () => {
   });
 
   it('installs app from the catalog the user specified with userId (debug)', async () => {
-    sinon.stub(aadUser, 'getUpnByUserId').resolves('admin@contoso.onmicrosoft.com');
+    sinon.stub(entraUser, 'getUpnByUserId').resolves('admin@contoso.onmicrosoft.com');
 
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users/c527a470-a882-481c-981c-ee6efaba85c7/teamwork/installedApps` &&
@@ -496,7 +496,7 @@ describe(commands.APP_INSTALL, () => {
       }
     };
 
-    sinon.stub(aadUser, 'getUpnByUserId').rejects(error);
+    sinon.stub(entraUser, 'getUpnByUserId').rejects(error);
 
     sinon.stub(request, 'post').rejects('Invalid request');
 
@@ -521,7 +521,7 @@ describe(commands.APP_INSTALL, () => {
       }
     };
 
-    sinon.stub(aadUser, 'getUpnByUserId').rejects(error);
+    sinon.stub(entraUser, 'getUpnByUserId').rejects(error);
 
     sinon.stub(request, 'post').rejects('Invalid request');
 
