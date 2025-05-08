@@ -2,7 +2,7 @@ import { Logger } from '../../../../cli/Logger.js';
 import config from '../../../../config.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
-import { aadGroup } from '../../../../utils/aadGroup.js';
+import { entraGroup } from '../../../../utils/entraGroup.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { ClientSvcResponse, ClientSvcResponseContents, FormDigestInfo, spo, SpoOperation } from '../../../../utils/spo.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
@@ -503,7 +503,7 @@ class SpoSiteSetCommand extends SpoCommand {
     }
 
     if (typeof args.options.isPublic !== 'undefined') {
-      promises.push(aadGroup.setGroup(this.groupId as string, (args.options.isPublic === false), undefined, undefined, logger, this.verbose));
+      promises.push(entraGroup.setGroup(this.groupId as string, (args.options.isPublic === false), undefined, undefined, logger, this.verbose));
     }
 
     if (args.options.description) {

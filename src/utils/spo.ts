@@ -1430,7 +1430,7 @@ export const spo = {
         }
 
         if (typeof isPublic !== 'undefined') {
-          promises.push(aadGroup.setGroup(groupId as string, (isPublic === false), undefined, undefined, logger, verbose));
+          promises.push(entraGroup.setGroup(groupId as string, (isPublic === false), undefined, undefined, logger, verbose));
         }
         if (typeof owners !== 'undefined') {
           promises.push(spo.setGroupifiedSiteOwners(spoAdminUrl, groupId, owners, logger, verbose));

@@ -14,7 +14,7 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { spo } from '../../../../utils/spo.js';
 import commands from '../../commands.js';
 import command from './site-set.js';
-import { aadGroup } from '../../../../utils/aadGroup.js';
+import { entraGroup } from '../../../../utils/entraGroup.js';
 
 describe(commands.SITE_SET, () => {
   let log: string[];
@@ -22,7 +22,6 @@ describe(commands.SITE_SET, () => {
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
   let loggerLogToStderrSpy: sinon.SinonSpy;
-  let executeCommandSpy: sinon.SinonSpy;
   let waitUntilFinishedStub: sinon.SinonStub;
 
   before(() => {
@@ -68,7 +67,7 @@ describe(commands.SITE_SET, () => {
       spo.getSpoAdminUrl,
       spo.waitUntilFinished,
       spo.applySiteDesign,
-      aadGroup.setGroup
+      entraGroup.setGroup
     ]);
   });
 
@@ -645,7 +644,7 @@ describe(commands.SITE_SET, () => {
 
       throw 'Invalid request';
     });
-    const executeSetGroupSpy = await sinon.stub(aadGroup, 'setGroup').resolves();
+    const executeSetGroupSpy = await sinon.stub(entraGroup, 'setGroup').resolves();
     sinon.stub(request, 'patch').callsFake(async (opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups/e10a459e-60c8-4000-8240-a68d6a12d39e') {
         return;
@@ -2120,7 +2119,7 @@ describe(commands.SITE_SET, () => {
 
       throw 'Invalid request';
     });
-    sinon.stub(aadGroup, 'setGroup').rejects(new Error('An error has occurred'));
+    sinon.stub(entraGroup, 'setGroup').rejects(new Error('An error has occurred'));
 
     await assert.rejects(command.action(logger, { options: { isPublic: true, url: 'https://contoso.sharepoint.com/sites/Sales' } } as any),
       new CommandError('An error has occurred'));

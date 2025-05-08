@@ -256,19 +256,6 @@ describe('utils/entraGroup', () => {
     assert.deepStrictEqual(actual, validGroupId);
   });
 
-  it('updates a group to public successfully', async () => {
-    const patchStub = sinon.stub(request, 'patch').callsFake(async opts => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${validGroupId}`) {
-        return;
-      }
-
-      return 'Invalid Request';
-    });
-
-    await entraGroup.setGroup(validGroupId, true, logger, true);
-    assert(patchStub.called);
-  });
-
   it('updates a group to private successfully', async () => {
     const patchStub = sinon.stub(request, 'patch').callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/${validGroupId}`) {
@@ -278,7 +265,20 @@ describe('utils/entraGroup', () => {
       return 'Invalid Request';
     });
 
-    await entraGroup.setGroup(validGroupId, false, logger, true);
+    await entraGroup.setGroup(validGroupId, true, 'display name', 'description', logger, true);
+    assert(patchStub.called);
+  });
+
+  it('updates a group to public successfully', async () => {
+    const patchStub = sinon.stub(request, 'patch').callsFake(async opts => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${validGroupId}`) {
+        return;
+      }
+
+      return 'Invalid Request';
+    });
+
+    await entraGroup.setGroup(validGroupId, false, 'display name', 'description', logger, true);
     assert(patchStub.called);
   });
 

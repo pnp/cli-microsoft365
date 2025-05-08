@@ -130,12 +130,20 @@ export const entraGroup = {
     return groups[0].id!;
   },
 
-  async setGroup(id: string, isPrivate: boolean, logger?: Logger, verbose?: boolean): Promise<void> {
+  async setGroup(id: string, isPrivate?: boolean, displayName?: string, description?: string, logger?: Logger, verbose?: boolean): Promise<void> {
     if (verbose && logger) {
       await logger.logToStderr(`Updating Microsoft 365 Group ${id}...`);
     }
 
     const update: Group = {};
+    if (displayName) {
+      update.displayName = displayName;
+    }
+
+    if (description) {
+      update.description = description;
+    }
+
     if (typeof isPrivate !== 'undefined') {
       update.visibility = isPrivate ? 'Private' : 'Public';
     }
