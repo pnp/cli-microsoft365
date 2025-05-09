@@ -170,6 +170,7 @@ While correctly escaped, it would result in the following being saved to sharepo
 The following two methods resolve this:
 
 ### Method 1: Escaping twice
+
 Escape the double quotes twice. Once for powershell using the backtick (`) and once for the executable, using a backslash.
 
 ```PowerShell
@@ -177,6 +178,7 @@ m365 spo listitem set --webUrl "<some-url>" --id 1 --listTitle somelist --SomeFi
 ```
 
 ### Method 2: Using verbatim strings with single quotes
+
 Use single quotes to start a verbatim string. The double quotes need not be escaped for powershell using the backtick. However, they do need to be escaped for the executable, using a backslash.
 
 ```PowerShell
@@ -237,3 +239,47 @@ To help you use its commands, CLI for Microsoft 365 offers you the ability to au
 ## Disable automatic checking for updates
 
 Each time you run CLI for Microsoft 365, it will automatically check if there is a new version available and prompt you with update instructions if that's the case. If you use CLI for Microsoft 365 in CI/CD or in scripts and want to make it run faster, you can disable the check by setting the `CLIMICROSOFT365_NOUPDATE` environment variable to `1`.
+
+## Using CLI for Microsoft 365 in PowerShell
+
+CLI for Microsoft 365 by default outputs errors to stderr. PowerShell, unlike other shells, works differently as it has six distinct output streams. This behavior can lead to unexpected results, such as PowerShell continuing execution even after setting $ErrorActionPreference = "Stop". For more information on PowerShell's output streams, see [Handling output and errors](https://learn.microsoft.com/en-us/powershell/scripting/learn/shell/running-commands?view=powershell-7.5#handling-output-and-errors). To address these differences, you can use the following settings and helper method.
+
+```PowerShell
+m365 cli config set --key output --value json # setting output to json
+m365 cli config set --key errorOutput --value stdout # changing error output to stdout
+m365 cli config set --key showHelpOnFailure --value false # don't show help on command failure
+m365 cli config set --key printErrorsAsPlainText --value false # don't print errors as plain text but as objects
+
+function Invoke-CLICommand {
+  [cmdletbinding()]
+  param(
+    [parameter(Mandatory = $true, ValueFromPipeline = $true)] $input
+  )
+
+  $output = $input
+
+  if ($null -eq $output) {
+    return $null
+  }
+
+  $parsedOutput = $output | ConvertFrom-Json
+
+  if ($parsedOutput -isnot [Array] -and $null -ne $parsedOutput.error) {
+    throw $parsedOutput.error
+  }
+
+  return $parsedOutput
+}
+```
+
+With the above settings and helper method, you can now use the CLI for Microsoft 365 in PowerShell and have it behave as expected. Example usage:
+
+```PowerShell
+try {
+  # some script here like 
+  m365 spo list list --webUrl "random" | Invoke-CLICommand
+}
+catch {
+  Write-Host "Errors: $($_.Exception.Message) "
+}
+```
