@@ -2,6 +2,7 @@ import assert from 'assert';
 import Configstore from 'configstore';
 import sinon from 'sinon';
 import auth from '../../Auth.js';
+import cliConfig from '../../config.js';
 import { cli } from '../../cli/cli.js';
 import { CommandInfo } from '../../cli/CommandInfo.js';
 import { Logger } from '../../cli/Logger.js';
@@ -670,7 +671,22 @@ describe(commands.SETUP, () => {
       clientCertificateBase64Encoded: '',
       clientCertificatePassword: ''
     };
-    assert.deepEqual(createAppRegistrationSpy.getCall(0).args[0].apis, scopes);
+    assert.deepEqual(createAppRegistrationSpy.getCall(0).args[0], {
+      options: {
+        allowPublicClientFlows: true,
+        apisDelegated: cliConfig.minimalScopes.join(','),
+        implicitFlow: false,
+        multitenant: false,
+        name: 'CLI for M365',
+        platform: 'publicClient',
+        redirectUris: 'http://localhost,https://localhost,https://login.microsoftonline.com/common/oauth2/nativeclient'
+      },
+      unknownOptions: {},
+      apis: scopes,
+      logger: logger,
+      verbose: false,
+      debug: false
+    });
     Object.keys(expected).forEach(setting => {
       assert(configSetSpy.calledWith(setting, (expected as any)[setting]), `Incorrect setting for ${setting}`);
     });
@@ -741,7 +757,22 @@ describe(commands.SETUP, () => {
       clientCertificateBase64Encoded: '',
       clientCertificatePassword: ''
     };
-    assert.deepEqual(createAppRegistrationSpy.getCall(0).args[0].apis, scopes);
+    assert.deepEqual(createAppRegistrationSpy.getCall(0).args[0], {
+      options: {
+        allowPublicClientFlows: true,
+        apisDelegated: cliConfig.allScopes.join(','),
+        implicitFlow: false,
+        multitenant: false,
+        name: 'CLI for M365',
+        platform: 'publicClient',
+        redirectUris: 'http://localhost,https://localhost,https://login.microsoftonline.com/common/oauth2/nativeclient'
+      },
+      unknownOptions: {},
+      apis: scopes,
+      logger: logger,
+      verbose: true,
+      debug: false
+    });
     Object.keys(expected).forEach(setting => {
       assert(configSetSpy.calledWith(setting, (expected as any)[setting]), `Incorrect setting for ${setting}`);
     });
