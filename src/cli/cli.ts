@@ -477,7 +477,7 @@ async function loadCommandFromFile(commandFileUrl: string): Promise<void> {
 }
 
 function getCommandInfo(command: Command, filePath: string = '', helpFilePath: string = ''): CommandInfo {
-  const options = command.schema ? zod.schemaToOptions(command.schema) : getCommandOptions(command);
+  const options = command.schema ? zod.schemaToOptionInfo(command.schema) : getCommandOptions(command);
   command.optionsInfo = options;
 
   return {

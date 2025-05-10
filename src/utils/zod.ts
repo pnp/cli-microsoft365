@@ -1,5 +1,6 @@
 import { ZodTypeAny, z } from 'zod';
 import { CommandOptionInfo } from '../cli/CommandOptionInfo';
+import { CommandOption } from '../Command';
 
 function parseEffect(def: z.ZodEffectsDef, _options: CommandOptionInfo[], _currentOption?: CommandOptionInfo): z.ZodTypeDef | undefined {
   return def.schema._def;
@@ -139,6 +140,25 @@ function parseDef(def: z.ZodTypeDef, options: CommandOptionInfo[], currentOption
   } while (parsedDef);
 }
 
+function optionToString(optionInfo: CommandOptionInfo): string {
+  let s = '';
+
+  if (optionInfo.short) {
+    s += `-${optionInfo.short}, `;
+  }
+
+  s += `--${optionInfo.long}`;
+
+  if (optionInfo.type !== 'boolean') {
+    s += ' ';
+    s += optionInfo.required ? '<' : '[';
+    s += optionInfo.long;
+    s += optionInfo.required ? '>' : ']';
+  }
+
+  return s;
+};
+
 type EnumLike = {
   [k: string]: string | number
   [nu: number]: string
@@ -150,9 +170,20 @@ export const zod = {
     return type;
   },
 
-  schemaToOptions(schema: z.ZodSchema<any>): CommandOptionInfo[] {
+  schemaToOptionInfo(schema: z.ZodSchema<any>): CommandOptionInfo[] {
     const options: CommandOptionInfo[] = [];
     parseDef(schema._def, options);
+    return options;
+  },
+
+  schemaToOptions(schema: z.ZodSchema<any>): CommandOption[] {
+    const optionsInfo: CommandOptionInfo[] = this.schemaToOptionInfo(schema);
+    const options: CommandOption[] = optionsInfo.map(option => {
+      return {
+        option: optionToString(option),
+        autocomplete: option.autocomplete
+      };
+    });
     return options;
   },
 
