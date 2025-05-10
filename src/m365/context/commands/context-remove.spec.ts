@@ -1,7 +1,9 @@
 import assert from 'assert';
 import fs from 'fs';
 import sinon from 'sinon';
+import { z } from 'zod';
 import { cli } from '../../../cli/cli.js';
+import { CommandInfo } from '../../../cli/CommandInfo.js';
 import { Logger } from '../../../cli/Logger.js';
 import { CommandError } from '../../../Command.js';
 import { telemetry } from '../../../telemetry.js';
@@ -13,9 +15,13 @@ describe(commands.REMOVE, () => {
   let log: any[];
   let logger: Logger;
   let promptIssued: boolean = false;
+  let commandInfo: CommandInfo;
+  let commandOptionsSchema: z.ZodTypeAny;
 
   before(() => {
     sinon.stub(telemetry, 'trackEvent').resolves();
+    commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
   });
 
   beforeEach(() => {
@@ -63,9 +69,9 @@ describe(commands.REMOVE, () => {
 
   it('prompts before removing the context from the .m365rc.json file when force option not passed', async () => {
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: false
-      }
+      })
     });
 
     assert(promptIssued);
@@ -77,7 +83,7 @@ describe(commands.REMOVE, () => {
       context: {}
     }));
     const unlinkSyncStub = sinon.stub(fs, 'unlinkSync').callsFake(_ => { });
-    await command.action(logger, { options: { debug: true, force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, force: true }) });
 
     assert(unlinkSyncStub.called);
   });
@@ -104,7 +110,7 @@ describe(commands.REMOVE, () => {
       fileContents = contents as string;
     });
 
-    await command.action(logger, { options: { debug: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true }) });
 
     assert.strictEqual(filePath, '.m365rc.json');
     assert.strictEqual(fileContents, JSON.stringify({
@@ -121,7 +127,7 @@ describe(commands.REMOVE, () => {
     sinon.stub(fs, 'existsSync').callsFake(_ => true);
     sinon.stub(fs, 'readFileSync').callsFake(_ => { throw new Error('An error has occurred'); });
 
-    await assert.rejects(command.action(logger, { options: { debug: true, force: true } }), new CommandError(`Error reading .m365rc.json: Error: An error has occurred. Please remove context info from .m365rc.json manually.`));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ debug: true, force: true }) }), new CommandError(`Error reading .m365rc.json: Error: An error has occurred. Please remove context info from .m365rc.json manually.`));
   });
 
   it(`handles an error when writing file contents fails`, async () => {
@@ -137,7 +143,7 @@ describe(commands.REMOVE, () => {
     }));
     sinon.stub(fs, 'writeFileSync').callsFake(_ => { throw new Error('An error has occurred'); });
 
-    await assert.rejects(command.action(logger, { options: { debug: true, force: true } }), new CommandError(`Error writing .m365rc.json: Error: An error has occurred. Please remove context info from .m365rc.json manually.`));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ debug: true, force: true }) }), new CommandError(`Error writing .m365rc.json: Error: An error has occurred. Please remove context info from .m365rc.json manually.`));
   });
 
   it(`handles an error when removing the file fails`, async () => {
@@ -146,7 +152,7 @@ describe(commands.REMOVE, () => {
       "context": {}
     }));
     sinon.stub(fs, 'unlinkSync').callsFake(_ => { throw new Error('An error has occurred'); });
-    await assert.rejects(command.action(logger, { options: { debug: true, force: true } }), new CommandError(`Error removing .m365rc.json: Error: An error has occurred. Please remove .m365rc.json manually.`));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ debug: true, force: true }) }), new CommandError(`Error removing .m365rc.json: Error: An error has occurred. Please remove .m365rc.json manually.`));
   });
 
   it(`doesn't update the context file, if it doesn't contain context information`, async () => {
@@ -159,7 +165,7 @@ describe(commands.REMOVE, () => {
     }));
     const fsWriteFileSyncSpy = sinon.spy(fs, 'writeFileSync');
 
-    await command.action(logger, { options: { debug: true, force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, force: true }) });
     assert(fsWriteFileSyncSpy.notCalled);
   });
 });

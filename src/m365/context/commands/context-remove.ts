@@ -1,18 +1,23 @@
 import fs from 'fs';
+import { z } from 'zod';
 import { cli } from '../../../cli/cli.js';
 import { Logger } from '../../../cli/Logger.js';
-import { CommandError } from '../../../Command.js';
-import GlobalOptions from '../../../GlobalOptions.js';
+import { CommandError, globalOptionsZod } from '../../../Command.js';
+import { zod } from '../../../utils/zod.js';
 import AnonymousCommand from '../../base/AnonymousCommand.js';
 import { M365RcJson } from '../../base/M365RcJson.js';
 import commands from '../commands.js';
 
+const options = globalOptionsZod
+  .extend({
+    force: zod.alias('f', z.boolean().optional())
+  })
+  .strict();
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  force?: boolean;
 }
 
 class ContextRemoveCommand extends AnonymousCommand {
@@ -24,38 +29,19 @@ class ContextRemoveCommand extends AnonymousCommand {
     return 'Removes the CLI for Microsoft 365 context in the current working folder';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        force: !!args.options.force
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-f, --force'
-      }
-    );
+  public get schema(): z.ZodTypeAny | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (args.options.force) {
-      await this.removeContext();
+      this.removeContext();
     }
     else {
       const result = await cli.promptForConfirmation({ message: `Are you sure you want to remove the context?` });
 
       if (result) {
-        await this.removeContext();
+        this.removeContext();
       }
     }
   }
