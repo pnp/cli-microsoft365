@@ -1,19 +1,24 @@
 import fs from 'fs';
+import { z } from 'zod';
 import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
-import { CommandError } from '../../../../Command.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { CommandError, globalOptionsZod } from '../../../../Command.js';
+import { zod } from '../../../../utils/zod.js';
 import ContextCommand from '../../../base/ContextCommand.js';
 import { M365RcJson } from '../../../base/M365RcJson.js';
 import commands from '../../commands.js';
 
+const options = globalOptionsZod
+  .extend({
+    name: zod.alias('n', z.string()),
+    force: zod.alias('f', z.boolean().optional())
+  })
+  .strict();
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  name: string;
-  force?: boolean;
 }
 
 class ContextOptionRemoveCommand extends ContextCommand {
@@ -25,30 +30,8 @@ class ContextOptionRemoveCommand extends ContextCommand {
     return 'Removes an already available name from local context file.';
   }
 
-  constructor() {
-    super();
-
-    this.#initOptions();
-    this.#initTelemetry();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        force: !!args.options.force
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-n, --name <name>'
-      },
-      {
-        option: '-f, --force'
-      }
-    );
+  public get schema(): z.ZodTypeAny | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
