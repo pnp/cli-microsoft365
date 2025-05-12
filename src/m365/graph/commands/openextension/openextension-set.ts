@@ -14,7 +14,7 @@ const options = globalOptionsZod
     name: zod.alias('n', z.string()),
     resourceId: zod.alias('i', z.string()),
     resourceType: zod.alias('t', z.enum(['user', 'group', 'device', 'organization'])),
-    removePropertyIfEmpty: zod.alias('r', z.boolean().optional())
+    keepUnchangedProperties: zod.alias('r', z.boolean().optional())
   })
   .and(z.any());
 declare type Options = z.infer<typeof options>;
@@ -24,7 +24,8 @@ interface CommandArgs {
 }
 
 class GraphOpenExtensionSetCommand extends GraphCommand {
-  private readonly commandOptions = ['removePropertyIfEmpty', 'resourceType', 'resourceId', 'name'];
+  private readonly commandOptions = ['keepUnchangedProperties', 'resourceType', 'resourceId', 'name'];
+  private readonly defaultOpenExtensionProperties = ['id', 'extensionName'];
   public get name(): string {
     return commands.OPENEXTENSION_SET;
   }
@@ -68,9 +69,7 @@ class GraphOpenExtensionSetCommand extends GraphCommand {
 
         const value = unknownOptions[option];
         if (value === "") {
-          if (!args.options.removePropertyIfEmpty) {
-            requestBody[option] = null;
-          }
+          requestBody[option] = null;
         }
         else {
           try {
@@ -84,7 +83,7 @@ class GraphOpenExtensionSetCommand extends GraphCommand {
       });
 
       currentExtensionNames.forEach(async name => {
-        if (!unknownOptionsNames.includes(name)) {
+        if (!unknownOptionsNames.includes(name) && (args.options.keepUnchangedProperties || this.defaultOpenExtensionProperties.includes(name))) {
           requestBody[name] = currentExtension[name];
         }
       });

@@ -24,8 +24,8 @@ m365 graph openextension set [options]
 `-t, --resourceType <resourceType>`
 : The type of resource. Allowed values are `user`, `group`, `device`, `organization`.
 
-`-r, --removePropertyIfEmpty`
-: Whether the property should be removed from the open extension.
+`-k, --keepUnchangedProperties`
+: Keeps not specified properties.
 ```
 
 <Global />
@@ -44,9 +44,9 @@ When updating open extensions it's possible to enter a JSON string. In PowerShel
 
 :::info
 
-If a property of the open extesion is not specified, it remains unchanged.
+If a property of the open extesion is not specified, the property is removed from the open extension.
 
-If the value of the property is set to an empty string and `removePropertyIfEmpty` is specified, the property will be removed from the open extension. If `removePropertyIfEmpty` is not specified, the value of the property will be cleared.
+If a property of the open extesion is not specified and `keepUnchangedProperties` is specified, the property will be kept in the open extension.
 
 :::
 
@@ -70,10 +70,16 @@ Updates an open extension for a group specified by id, one of the property repre
 m365 graph openextension set --resourceId c956e711-f074-40c3-8431-fbd69bb67d9c --name 'com.contoso.roamingSettings' --resourceType group --settings '{"theme": "dark", "color": "red" }'
 ```
 
-Removes the property from an open extension
+Updates an open extension, but keeps the properties that are not specified
 
 ```sh
-m365 graph openextension set --userId eb77fbcf-6fe8-458b-985d-1747284793bc --name 'com.contoso.roamingSettings' --resourceType user --theme "" --removePropertyIfEmpty
+m365 graph openextension set --userId eb77fbcf-6fe8-458b-985d-1747284793bc --name 'com.contoso.roamingSettings' --resourceType user --color red --keepUnchangedProperties
+```
+
+Updates an open extension, but removes the properties that are not specified
+
+```sh
+m365 graph openextension set --userId eb77fbcf-6fe8-458b-985d-1747284793bc --name 'com.contoso.roamingSettings' --resourceType user --color red
 ```
 
 Clears the value of the property

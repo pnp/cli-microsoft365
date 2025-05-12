@@ -273,6 +273,7 @@ describe(commands.OPENEXTENSION_SET, () => {
       name: 'com.contoso.roamingSettings',
       color: 'red',
       language: 'Czech',
+      keepUnchangedProperties: true,
       verbose: true
     });
 
@@ -360,10 +361,8 @@ describe(commands.OPENEXTENSION_SET, () => {
       resourceId: resourceId,
       resourceType: 'organization',
       name: 'com.contoso.roamingSettings',
-      theme: '',
       color: 'blue',
       language: 'Dutch',
-      removePropertyIfEmpty: true,
       verbose: true
     });
     const requestBody = {
