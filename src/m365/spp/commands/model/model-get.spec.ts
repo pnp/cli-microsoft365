@@ -195,7 +195,9 @@ describe(commands.MODEL_GET, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      request.get
+      request.get,
+      spp.getModelById,
+      spp.getModelByTitle
     ]);
   });
 
@@ -243,19 +245,15 @@ describe(commands.MODEL_GET, () => {
   });
 
   it('correctly handles a model is not found error by id', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/machinelearning/models/getbyuniqueid('9b1b1e42-794b-4c71-93ac-5ed92488b67f')`) {
-        throw {
-          error: {
-            "odata.error": {
-              code: "-1, Microsoft.Office.Server.ContentCenter.ModelNotFoundException",
-              message: {
-                lang: "en-US",
-                value: "File Not Found."
-              }
-            }
+    sinon.stub(spp, 'getModelById').rejects({
+      error: {
+        "odata.error": {
+          code: "-1, Microsoft.Office.Server.ContentCenter.ModelNotFoundException",
+          message: {
+            lang: "en-US",
+            value: "File Not Found."
           }
-        };
+        }
       }
     });
 
@@ -263,92 +261,44 @@ describe(commands.MODEL_GET, () => {
       new CommandError('File Not Found.'));
   });
 
-  it('correctly handles a model is not found error by title', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/machinelearning/models/getbytitle('invalidtitle.classifier')`) {
-        return {
-          "odata.null": true
-        };
-      }
-
-      throw 'Invalid request';
-    });
-
-    await assert.rejects(command.action(logger, { options: { verbose: true, siteUrl: 'https://contoso.sharepoint.com/sites/portal', title: 'invalidTitle' } }),
-      new CommandError('Model not found.'));
-  });
-
   it('retrieves model by id', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/machinelearning/models/getbyuniqueid('9b1b1e42-794b-4c71-93ac-5ed92488b67f')`) {
-        return model;
-      }
-
-      throw 'Invalid request';
-    });
+    sinon.stub(spp, 'getModelById').resolves(model);
 
     await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/portal', id: '9b1b1e42-794b-4c71-93ac-5ed92488b67f' } });
     assert.deepStrictEqual(loggerLogSpy.lastCall.args[0], modelResult);
   });
 
   it('retrieves model by title', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/machinelearning/models/getbytitle('modelname.classifier')`) {
-        return model;
-      }
-
-      throw 'Invalid request';
-    });
+    sinon.stub(spp, 'getModelByTitle').resolves(model);
 
     await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/portal', title: 'ModelName' } });
     assert.deepStrictEqual(loggerLogSpy.lastCall.args[0], modelResult);
   });
 
   it('retrieves model without additional information by title', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/machinelearning/models/getbytitle('modelname.classifier')`) {
-        return modelWithoutAdditionalData;
-      }
-
-      throw 'Invalid request';
-    });
+    sinon.stub(spp, 'getModelByTitle').resolves(modelWithoutAdditionalData as any);
 
     await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/portal', title: 'ModelName' } });
     assert.deepStrictEqual(loggerLogSpy.lastCall.args[0], modelResultWithoutAdditionalData);
   });
 
   it('retrieves model by title with classifier suffix', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/machinelearning/models/getbytitle('modelname.classifier')`) {
-        return model;
-      }
-
-      throw 'Invalid request';
-    });
+    sinon.stub(spp, 'getModelByTitle').resolves(model);
 
     await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/portal', title: 'ModelName.classifier' } });
     assert.deepStrictEqual(loggerLogSpy.lastCall.args[0], modelResult);
   });
 
   it('gets correct model when the site URL has a trailing slash', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/machinelearning/models/getbyuniqueid('9b1b1e42-794b-4c71-93ac-5ed92488b67f')`) {
-        return model;
-      }
-
-      throw 'Invalid request';
-    });
+    sinon.stub(spp, 'getModelById').resolves(model);
 
     await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/portal/', id: '9b1b1e42-794b-4c71-93ac-5ed92488b67f' } });
     assert.deepStrictEqual(loggerLogSpy.lastCall.args[0], modelResult);
   });
 
   it('retrieves model by id with withPublications', async () => {
+    sinon.stub(spp, 'getModelById').resolves(model);
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/machinelearning/models/getbyuniqueid('164720c8-35ee-4157-ba26-db6726264f9d')`) {
-        return model;
-      }
-
       if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/machinelearning/publications/getbymodeluniqueid('164720c8-35ee-4157-ba26-db6726264f9d')`) {
         return { value: publications };
       }
@@ -356,16 +306,13 @@ describe(commands.MODEL_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/portal', id: '164720c8-35ee-4157-ba26-db6726264f9d', withPublications: true } });
+    await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/portal', id: '164720c8-35ee-4157-ba26-db6726264f9d', withPublications: true, verbose: true } });
     assert.deepStrictEqual(loggerLogSpy.lastCall.args[0], { ...modelResult, Publications: publications });
   });
 
   it('retrieves model by title with withPublications', async () => {
+    sinon.stub(spp, 'getModelByTitle').resolves(model);
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/machinelearning/models/getbytitle('modelname.classifier')`) {
-        return model;
-      }
-
       if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/machinelearning/publications/getbymodeluniqueid('164720c8-35ee-4157-ba26-db6726264f9d')`) {
         return { value: publications };
       }

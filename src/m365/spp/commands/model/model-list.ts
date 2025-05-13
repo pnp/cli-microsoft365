@@ -63,7 +63,7 @@ class SppModelListCommand extends SpoCommand {
       }
 
       const siteUrl = urlUtil.removeTrailingSlashes(args.options.siteUrl);
-      await spp.assertSiteIsContentCenter(siteUrl);
+      await spp.assertSiteIsContentCenter(siteUrl, logger, this.verbose);
 
       const result = await odata.getAllItems<any>(`${siteUrl}/_api/machinelearning/models`);
       await logger.log(result);
