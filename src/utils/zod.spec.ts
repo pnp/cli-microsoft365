@@ -7,7 +7,7 @@ describe('utils/zod', () => {
     const schema = z.object({
       stringOption: z.string()
     }).strict();
-    const options = zod.schemaToOptions(schema);
+    const options = zod.schemaToOptionInfo(schema);
     assert.strictEqual(options[0].type, 'string');
   });
 
@@ -15,7 +15,7 @@ describe('utils/zod', () => {
     const schema = z.object({
       enumOption: z.enum(['a', 'b', 'c'])
     }).strict();
-    const options = zod.schemaToOptions(schema);
+    const options = zod.schemaToOptionInfo(schema);
     assert.deepStrictEqual(options[0].autocomplete, ['a', 'b', 'c']);
   });
 
@@ -28,7 +28,7 @@ describe('utils/zod', () => {
     const schema = z.object({
       enumOption: z.nativeEnum(TestEnum)
     }).strict();
-    const options = zod.schemaToOptions(schema);
+    const options = zod.schemaToOptionInfo(schema);
     assert.deepStrictEqual(options[0].autocomplete, ['A', 'B', 'C']);
   });
 
@@ -36,7 +36,7 @@ describe('utils/zod', () => {
     const schema = z.object({
       booleanOption: z.boolean()
     }).strict();
-    const options = zod.schemaToOptions(schema);
+    const options = zod.schemaToOptionInfo(schema);
     assert.strictEqual(options[0].type, 'boolean');
   });
 
@@ -44,7 +44,7 @@ describe('utils/zod', () => {
     const schema = z.object({
       numberOption: z.number()
     }).strict();
-    const options = zod.schemaToOptions(schema);
+    const options = zod.schemaToOptionInfo(schema);
     assert.strictEqual(options[0].type, 'number');
   });
 
@@ -52,7 +52,7 @@ describe('utils/zod', () => {
     const schema = z.object({
       stringOption: z.string()
     }).strict();
-    const options = zod.schemaToOptions(schema);
+    const options = zod.schemaToOptionInfo(schema);
     assert.strictEqual(options[0].required, true);
   });
 
@@ -60,7 +60,7 @@ describe('utils/zod', () => {
     const schema = z.object({
       stringOption: z.string().optional()
     }).strict();
-    const options = zod.schemaToOptions(schema);
+    const options = zod.schemaToOptionInfo(schema);
     assert.strictEqual(options[0].required, false);
   });
 
@@ -68,7 +68,7 @@ describe('utils/zod', () => {
     const schema = z.object({
       boolOption: z.boolean().default(false)
     }).strict();
-    const options = zod.schemaToOptions(schema);
+    const options = zod.schemaToOptionInfo(schema);
     assert.strictEqual(options[0].required, false);
   });
 
@@ -80,7 +80,7 @@ describe('utils/zod', () => {
       .refine(data => data.boolOption === true, {
         message: 'boolOption must be true'
       });
-    const options = zod.schemaToOptions(schema);
+    const options = zod.schemaToOptionInfo(schema);
     assert.strictEqual(options[0].name, 'boolOption');
   });
 
@@ -89,7 +89,7 @@ describe('utils/zod', () => {
       boolOption: z.boolean().default(false)
     })
       .and(z.any());
-    const options = zod.schemaToOptions(schema);
+    const options = zod.schemaToOptionInfo(schema);
     assert.strictEqual(options[0].name, 'boolOption');
   });
 
@@ -97,7 +97,7 @@ describe('utils/zod', () => {
     const schema = z.object({
       boolOption: z.boolean().nullable()
     });
-    const options = zod.schemaToOptions(schema);
+    const options = zod.schemaToOptionInfo(schema);
     assert.strictEqual(options[0].name, 'boolOption');
   });
 
@@ -108,7 +108,7 @@ describe('utils/zod', () => {
       .extend({
         stringOption: z.string()
       });
-    const options = zod.schemaToOptions(schema);
+    const options = zod.schemaToOptionInfo(schema);
     assert.strictEqual(options[1].name, 'stringOption');
   });
 
@@ -116,13 +116,13 @@ describe('utils/zod', () => {
     const schema = z.any().and(z.object({
       boolOption: z.boolean().default(false)
     }));
-    const options = zod.schemaToOptions(schema);
+    const options = zod.schemaToOptionInfo(schema);
     assert.strictEqual(options[0].name, 'boolOption');
   });
 
   it('parses noop', () => {
     const schema = z.any().and(z.any());
-    zod.schemaToOptions(schema);
+    zod.schemaToOptionInfo(schema);
     assert(true);
   });
 });
