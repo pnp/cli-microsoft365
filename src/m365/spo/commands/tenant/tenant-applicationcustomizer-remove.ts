@@ -3,8 +3,8 @@ import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
-import { odata } from '../../../../utils/odata.js';
 import { spo } from '../../../../utils/spo.js';
+import { ListItemListOptions, spoListItem } from '../../../../utils/spoListItem.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
@@ -109,34 +109,41 @@ class SpoTenantApplicationCustomizerRemoveCommand extends SpoCommand {
     }
   }
 
-  public async getTenantApplicationCustomizerId(logger: Logger, args: CommandArgs, requestUrl: string): Promise<number> {
+  public async getTenantApplicationCustomizerId(logger: Logger, args: CommandArgs, appCatalogUrl: string): Promise<number> {
     if (this.verbose) {
       await logger.logToStderr(`Getting the tenant application customizer ${args.options.id || args.options.title || args.options.clientSideComponentId}`);
     }
 
-    const filter: string[] = [`TenantWideExtensionLocation eq 'ClientSideExtension.ApplicationCustomizer'`];
+    let filter: string;
     if (args.options.title) {
-      filter.push(`Title eq '${args.options.title}'`);
+      filter = `Title eq '${args.options.title}'`;
     }
     else if (args.options.id) {
-      filter.push(`Id eq '${args.options.id}'`);
+      filter = `Id eq ${args.options.id}`;
     }
-    else if (args.options.clientSideComponentId) {
-      filter.push(`TenantWideExtensionComponentId eq '${args.options.clientSideComponentId}'`);
+    else {
+      filter = `TenantWideExtensionComponentId eq '${args.options.clientSideComponentId}'`;
     }
 
-    const listItemInstances: ListItemInstance[] = await odata.getAllItems(`${requestUrl}/items?$filter=${filter.join(' and ')}&$select=Id`);
+    const options: ListItemListOptions = {
+      webUrl: appCatalogUrl,
+      listUrl: '/Lists/TenantWideExtensions',
+      filter: `TenantWideExtensionLocation eq 'ClientSideExtension.ApplicationCustomizer' and ${filter}`,
+      fields: ['Id']
+    };
 
-    if (listItemInstances.length === 0) {
+    const listItems = await spoListItem.getListItems(options, logger, this.verbose);
+
+    if (listItems.length === 0) {
       throw 'The specified application customizer was not found';
     }
 
-    if (listItemInstances.length > 1) {
-      const resultAsKeyValuePair = formatting.convertArrayToHashTable('Id', listItemInstances);
-      listItemInstances[0] = await cli.handleMultipleResultsFound<ListItemInstance>(`Multiple application customizers with ${args.options.title || args.options.clientSideComponentId} were found.`, resultAsKeyValuePair);
+    if (listItems.length > 1) {
+      const resultAsKeyValuePair = formatting.convertArrayToHashTable('Id', listItems);
+      listItems[0] = await cli.handleMultipleResultsFound<ListItemInstance>(`Multiple application customizers with ${args.options.title || args.options.clientSideComponentId} were found.`, resultAsKeyValuePair);
     }
 
-    return listItemInstances[0].Id;
+    return listItems[0].Id;
   }
 
   private async removeTenantApplicationCustomizer(logger: Logger, args: CommandArgs): Promise<void> {
@@ -146,16 +153,15 @@ class SpoTenantApplicationCustomizerRemoveCommand extends SpoCommand {
       throw 'No app catalog URL found';
     }
 
-    const listServerRelativeUrl: string = urlUtil.getServerRelativePath(appCatalogUrl, '/lists/TenantWideExtensions');
-    const requestUrl = `${appCatalogUrl}/_api/web/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')`;
-    const id = await this.getTenantApplicationCustomizerId(logger, args, requestUrl);
+    const id = await this.getTenantApplicationCustomizerId(logger, args, appCatalogUrl);
 
     if (this.verbose) {
       await logger.logToStderr(`Removing tenant application customizer ${args.options.id || args.options.title || args.options.clientSideComponentId}`);
     }
 
+    const listServerRelativeUrl: string = urlUtil.getServerRelativePath(appCatalogUrl, '/lists/TenantWideExtensions');
     const requestOptions: CliRequestOptions = {
-      url: `${requestUrl}/items(${id})`,
+      url: `${appCatalogUrl}/_api/web/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')/items(${id})`,
       method: 'POST',
       headers: {
         'X-HTTP-Method': 'DELETE',
