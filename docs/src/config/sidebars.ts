@@ -1895,6 +1895,15 @@ const sidebars: SidebarsConfig = {
           ]
         },
         {
+          pipeline: [
+            {
+              type: 'doc',
+              label: 'pipeline list',
+              id: 'cmd/pp/pipeline/pipeline-list'
+            }
+          ]
+        },
+        {
           solution: [
             {
               type: 'doc',
