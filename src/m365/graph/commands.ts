@@ -9,6 +9,7 @@ export default {
   OPENEXTENSION_GET: `${prefix} openextension get`,
   OPENEXTENSION_LIST: `${prefix} openextension list`,
   OPENEXTENSION_REMOVE: `${prefix} openextension remove`,
+  OPENEXTENSION_SET: `${prefix} openextension set`,
   SCHEMAEXTENSION_ADD: `${prefix} schemaextension add`,
   SCHEMAEXTENSION_GET: `${prefix} schemaextension get`,
   SCHEMAEXTENSION_LIST: `${prefix} schemaextension list`,
