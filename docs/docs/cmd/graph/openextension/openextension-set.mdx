@@ -25,7 +25,7 @@ m365 graph openextension set [options]
 : The type of resource. Allowed values are `user`, `group`, `device`, `organization`.
 
 `-k, --keepUnchangedProperties`
-: Keeps not specified properties.
+: Keeps unspecified properties. Without this flag, any property that is not updated will be removed from the extension.
 ```
 
 <Global />
@@ -44,9 +44,9 @@ When updating open extensions it's possible to enter a JSON string. In PowerShel
 
 :::info
 
-If a property of the open extesion is not specified, the property is removed from the open extension.
+If a property of the open extension is not specified, the property is removed from the open extension.
 
-If a property of the open extesion is not specified and `keepUnchangedProperties` is specified, the property will be kept in the open extension.
+If a property of the open extension is not specified and `keepUnchangedProperties` is specified, the property will be kept in the open extension.
 
 :::
 

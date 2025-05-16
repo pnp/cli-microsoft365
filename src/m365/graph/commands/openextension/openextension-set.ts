@@ -14,7 +14,7 @@ const options = globalOptionsZod
     name: zod.alias('n', z.string()),
     resourceId: zod.alias('i', z.string()),
     resourceType: zod.alias('t', z.enum(['user', 'group', 'device', 'organization'])),
-    keepUnchangedProperties: zod.alias('r', z.boolean().optional())
+    keepUnchangedProperties: zod.alias('k', z.boolean().optional())
   })
   .and(z.any());
 declare type Options = z.infer<typeof options>;
@@ -26,6 +26,7 @@ interface CommandArgs {
 class GraphOpenExtensionSetCommand extends GraphCommand {
   private readonly commandOptions = ['keepUnchangedProperties', 'resourceType', 'resourceId', 'name'];
   private readonly defaultOpenExtensionProperties = ['id', 'extensionName'];
+
   public get name(): string {
     return commands.OPENEXTENSION_SET;
   }
