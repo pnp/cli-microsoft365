@@ -17,6 +17,9 @@ m365 spo homesite remove [options]
 ```md definition-list
 `-f, --force`
 : Do not prompt for confirmation before removing the Home Site.
+
+`-u, --url [url]`
+: URL of the home site to remove.
 ```
 
 <Global />
@@ -31,10 +34,16 @@ To use this command you must be either **SharePoint Administrator** or **Global 
 
 ## Examples
 
-Removes the current Home Site without confirmation.
+Removes the first Home Site without confirmation.
 
 ```sh
 m365 spo homesite remove --force
+```
+
+Removes a Home site specified by URL without confirmation.
+
+```sh
+m365 spo homesite remove -url "https://contoso.sharepoint.com/sites/testcomms" --force
 ```
 
 ## Response
