@@ -187,5 +187,4 @@ describe(commands.ORGANIZATION_LIST, () => {
     });
     await assert.rejects(command.action(logger, { options: parsedSchema.data }), new CommandError('Request Authorization failed'));
   });
-
 });
