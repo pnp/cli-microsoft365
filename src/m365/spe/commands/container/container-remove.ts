@@ -99,11 +99,12 @@ class SpeContainerRemoveCommand extends GraphCommand {
       return options.id;
     }
 
+    const containerTypeId = await this.getContainerTypeId(options, logger);
+
     if (this.verbose) {
       await logger.logToStderr(`Getting container ID for container with name '${options.name}'...`);
     }
 
-    const containerTypeId = await this.getContainerTypeId(options, logger);
     return spe.getContainerIdByName(containerTypeId, options.name!);
   }
 

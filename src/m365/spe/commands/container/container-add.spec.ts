@@ -11,7 +11,6 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { cli } from '../../../../cli/cli.js';
 import commands from '../../commands.js';
 import command from './container-add.js';
-import { spo } from '../../../../utils/spo.js';
 import { z } from 'zod';
 import { CommandError } from '../../../../Command.js';
 import { spe } from '../../../../utils/spe.js';
@@ -162,7 +161,7 @@ describe(commands.CONTAINER_ADD, () => {
       throw 'Invalid POST request: ' + opts.url;
     });
 
-    sinon.stub(spo, 'getAllContainerTypes').resolves([
+    sinon.stub(spe, 'getAllContainerTypes').resolves([
       {
         AzureSubscriptionId: '/Guid(f08575e2-36c4-407f-a891-eabae23f66bc)/',
         ContainerTypeId: `/Guid(${containerTypeId})/`,

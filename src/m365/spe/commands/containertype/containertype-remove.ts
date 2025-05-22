@@ -62,7 +62,7 @@ class SpeContainerTypeRemoveCommand extends SpoCommand {
 
     try {
       const spoAdminUrl = await spo.getSpoAdminUrl(logger, this.verbose);
-      const containerTypeId = await this.getContainerTypeId(args.options, spoAdminUrl);
+      const containerTypeId = await this.getContainerTypeId(args.options, spoAdminUrl, logger);
       const formDigestInfo = await spo.ensureFormDigest(spoAdminUrl, logger, undefined, this.debug);
 
       if (this.verbose) {
@@ -88,9 +88,13 @@ class SpeContainerTypeRemoveCommand extends SpoCommand {
     }
   }
 
-  private async getContainerTypeId(options: Options, spoAdminUrl: string): Promise<string> {
+  private async getContainerTypeId(options: Options, spoAdminUrl: string, logger: Logger): Promise<string> {
     if (options.id) {
       return options.id;
+    }
+
+    if (this.verbose) {
+      await logger.logToStderr(`Retrieving container type id for container type '${options.name}'...`);
     }
 
     return spe.getContainerTypeIdByName(spoAdminUrl, options.name!);

@@ -82,13 +82,8 @@ class SpeContainerTypeGetCommand extends SpoCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       const spoAdminUrl = await spo.getSpoAdminUrl(logger, this.debug);
-
-      if (this.verbose) {
-        await logger.logToStderr(`Getting the Container type...`);
-      }
-
-      const containerTypeId = await this.getContainerTypeId(args.options, spoAdminUrl);
-      const containerType = await this.getContainerTypeById(containerTypeId, spoAdminUrl);
+      const containerTypeId = await this.getContainerTypeId(args.options, spoAdminUrl, logger);
+      const containerType = await this.getContainerTypeById(containerTypeId, spoAdminUrl, logger);
       await logger.log(containerType);
     }
     catch (err: any) {
@@ -96,7 +91,11 @@ class SpeContainerTypeGetCommand extends SpoCommand {
     }
   }
 
-  private async getContainerTypeById(containerTypeId: string, spoAdminUrl: string): Promise<ContainerTypeProperties[]> {
+  private async getContainerTypeById(containerTypeId: string, spoAdminUrl: string, logger: Logger): Promise<ContainerTypeProperties[]> {
+    if (this.verbose) {
+      await logger.logToStderr(`Getting the Container type...`);
+    }
+
     const requestOptions: CliRequestOptions = {
       url: `${spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
       headers: {
@@ -117,9 +116,13 @@ class SpeContainerTypeGetCommand extends SpoCommand {
     return containerTypes;
   }
 
-  private async getContainerTypeId(options: Options, spoAdminUrl: string): Promise<string> {
+  private async getContainerTypeId(options: Options, spoAdminUrl: string, logger: Logger): Promise<string> {
     if (options.id) {
       return options.id;
+    }
+
+    if (this.verbose) {
+      await logger.logToStderr(`Retrieving container type id for container type '${options.containerTypeName}'...`);
     }
 
     return spe.getContainerTypeIdByName(spoAdminUrl, options.name!);
