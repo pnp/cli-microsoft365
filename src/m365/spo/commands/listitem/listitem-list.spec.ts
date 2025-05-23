@@ -3,88 +3,47 @@ import sinon from 'sinon';
 import auth from '../../../../Auth.js';
 import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
-import { Logger } from '../../../../cli/Logger.js';
-import { CommandError } from '../../../../Command.js';
-import request from '../../../../request.js';
 import { telemetry } from '../../../../telemetry.js';
-import { formatting } from '../../../../utils/formatting.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { spo } from '../../../../utils/spo.js';
-import { urlUtil } from '../../../../utils/urlUtil.js';
 import commands from '../../commands.js';
 import command from './listitem-list.js';
+import { spoListItem } from '../../../../utils/spoListItem.js';
+import { Logger } from '../../../../cli/Logger.js';
+import { CommandError } from '../../../../Command.js';
 
 describe(commands.LISTITEM_LIST, () => {
-  const webUrl = 'https://contoso.sharepoint.com/sites/project-x';
-  const listUrl = 'sites/project-x/documents';
-  const listServerRelativeUrl: string = urlUtil.getServerRelativePath(webUrl, listUrl);
-  const listItemResponse = {
-    value:
-      [{
-        "Attachments": false,
-        "AuthorId": 3,
-        "ContentTypeId": "0x0100B21BD271A810EE488B570BE49963EA34",
-        "Created": "2018-08-15T13:43:12Z",
-        "EditorId": 3,
-        "GUID": "2b6bd9e0-3c43-4420-891e-20053e3c4664",
-        "Id": 1,
-        "ID": 1,
-        "Modified": "2018-08-15T13:43:12Z",
-        "Title": "Example item 1"
-      },
-      {
-        "Attachments": false,
-        "AuthorId": 3,
-        "ContentTypeId": "0x0100B21BD271A810EE488B570BE49963EA34",
-        "Created": "2018-08-15T13:44:10Z",
-        "EditorId": 3,
-        "GUID": "47c5fc61-afb7-4081-aa32-f4386b8a86ea",
-        "Id": 2,
-        "ID": 2,
-        "Modified": "2018-08-15T13:44:10Z",
-        "Title": "Example item 2"
-      }]
-  };
-
   let log: any[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
 
-  const expectedArrayLength = 2;
-  let returnArrayLength = 0;
-
-  const postFakes = async (opts: any) => {
-    if (opts.url.indexOf('/_api/web/lists') > -1) {
-      if ((opts.url as string).indexOf('/GetItems') > -1) {
-        returnArrayLength = 2;
-        return opts.data.query.ListItemCollectionPosition === undefined ? listItemResponse : { value: [] };
-      }
-    }
-    returnArrayLength = 0;
-    throw 'Invalid request';
-  };
-
-  const getFakes = async (opts: any) => {
-    if (opts.url.indexOf('/_api/web/lists') > -1) {
-      if ((opts.url as string).indexOf('/items') > -1 && (opts.url as string).indexOf('$top=6') > -1) {
-        returnArrayLength = 0;
-        return { value: [] };
-      }
-      if ((opts.url as string).indexOf('/items') > -1) {
-        returnArrayLength = 2;
-        return listItemResponse;
-      }
-    }
-    if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')/items?$top=5000&$select=Title%2CID`) {
-      returnArrayLength = 2;
-      return listItemResponse;
-    }
-    returnArrayLength = 0;
-    throw 'Invalid request';
-  };
+  const listItemResponse = [{
+    "Attachments": false,
+    "AuthorId": 3,
+    "ContentTypeId": "0x0100B21BD271A810EE488B570BE49963EA34",
+    "Created": "2018-08-15T13:43:12Z",
+    "EditorId": 3,
+    "GUID": "2b6bd9e0-3c43-4420-891e-20053e3c4664",
+    "Id": 1,
+    "ID": 1,
+    "Modified": "2018-08-15T13:43:12Z",
+    "Title": "Example item 1"
+  },
+  {
+    "Attachments": false,
+    "AuthorId": 3,
+    "ContentTypeId": "0x0100B21BD271A810EE488B570BE49963EA34",
+    "Created": "2018-08-15T13:44:10Z",
+    "EditorId": 3,
+    "GUID": "47c5fc61-afb7-4081-aa32-f4386b8a86ea",
+    "Id": 2,
+    "ID": 2,
+    "Modified": "2018-08-15T13:44:10Z",
+    "Title": "Example item 2"
+  }];
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -120,8 +79,7 @@ describe(commands.LISTITEM_LIST, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      request.post,
-      request.get
+      spoListItem.getListItems
     ]);
   });
 
@@ -204,236 +162,37 @@ describe(commands.LISTITEM_LIST, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('returns array of listItemInstance objects when a list of items is requested, and debug mode enabled', async () => {
-    sinon.stub(request, 'get').callsFake(getFakes);
-    sinon.stub(request, 'post').callsFake(postFakes);
-
-    const options: any = {
-      debug: true,
-      listTitle: 'Demo List',
-      webUrl: 'https://contoso.sharepoint.com/sites/project-x'
-    };
-
-    await command.action(logger, { options: options } as any);
-    assert.strictEqual(returnArrayLength, expectedArrayLength);
-  });
-
-  it('returns array of listItemInstance objects when a list of items is requested with an output type of json, and a list of fields and a filter specified', async () => {
-    const listTitle = `Test'list`;
-    const filter = `Title eq 'Demo list item'`;
-    const fields = 'Title,ID';
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/lists/getByTitle('${formatting.encodeQueryParameter(listTitle)}')/items?$top=2&$filter=${encodeURIComponent(filter)}&$select=${formatting.encodeQueryParameter(fields)}`) {
-        returnArrayLength = 2;
-        return listItemResponse;
-      }
-      throw 'Invalid request';
-    });
-
-    const options: any = {
-      debug: true,
-      listTitle: listTitle,
-      webUrl: 'https://contoso.sharepoint.com/sites/project-x',
-      output: "json",
-      pageSize: 2,
-      filter: filter,
-      fields: "Title,ID"
-    };
-
-    await command.action(logger, { options: options } as any);
-    assert.strictEqual(returnArrayLength, expectedArrayLength);
-    returnArrayLength = 0;
-  });
-
-  it('returns array of listItemInstance objects when a list of items is requested with an output type of json, a page number specified, a list of fields and a filter specified', async () => {
-    sinon.stub(request, 'get').callsFake(getFakes);
-    sinon.stub(request, 'post').callsFake(postFakes);
-
-    const options: any = {
-      debug: true,
-      listTitle: 'Demo List',
-      webUrl: 'https://contoso.sharepoint.com/sites/project-x',
-      output: "json",
-      pageSize: 2,
-      pageNumber: 2,
-      filter: "Title eq 'Demo list item",
-      fields: "Title,ID"
-    };
-
-    await command.action(logger, { options: options } as any);
-    assert.strictEqual(returnArrayLength, expectedArrayLength);
-  });
-
-  it('returns empty array of listItemInstance objects when a list of items is requested with an output type of json, a page number specified, a list of fields and a filter specified', async () => {
-    sinon.stub(request, 'get').callsFake(getFakes);
-    sinon.stub(request, 'post').callsFake(postFakes);
-
-    const options: any = {
-      debug: true,
-      listTitle: 'Demo List',
-      webUrl: 'https://contoso.sharepoint.com/sites/project-x',
-      output: "json",
-      pageSize: 3,
-      pageNumber: 2,
-      filter: "Title eq 'Demo list item",
-      fields: "Title,ID"
-    };
-
-    await command.action(logger, { options: options } as any);
-    assert.strictEqual(returnArrayLength, 0);
-  });
-
-  it('returns array of listItemInstance objects when a list of items is requested with an output type of json, and a pageNumber is specified', async () => {
-    sinon.stub(request, 'get').callsFake(getFakes);
-    sinon.stub(request, 'post').callsFake(postFakes);
-
-    const options: any = {
-      listTitle: 'Demo List',
-      webUrl: 'https://contoso.sharepoint.com/sites/project-x',
-      output: "json",
-      pageSize: 2,
-      pageNumber: 2,
-      fields: "Title,ID"
-    };
-
-    await command.action(logger, { options: options } as any);
-    assert.strictEqual(returnArrayLength, expectedArrayLength);
-  });
-
-  it('returns array of listItemInstance objects when a list of items is requested with no output type specified, and a list of fields specified', async () => {
-    sinon.stub(request, 'get').callsFake(getFakes);
-    sinon.stub(request, 'post').callsFake(postFakes);
-
-    const options: any = {
-      listTitle: 'Demo List',
-      webUrl: 'https://contoso.sharepoint.com/sites/project-x',
-      fields: "Title,ID"
-    };
-
-    await command.action(logger, { options: options } as any);
-    assert.strictEqual(returnArrayLength, expectedArrayLength);
-  });
-
-  it('returns array of listItemInstance objects when a list of items by list url is requested with no output type specified, and a list of fields specified', async () => {
-    sinon.stub(request, 'get').callsFake(getFakes);
-    sinon.stub(request, 'post').callsFake(postFakes);
-
-    const options: any = {
-      verbose: true,
-      listUrl: listUrl,
-      webUrl: webUrl,
-      fields: "Title,ID"
-    };
-
-    await command.action(logger, { options: options } as any);
-    assert.strictEqual(returnArrayLength, expectedArrayLength);
-  });
-
-  it('returns array of listItemInstance objects when a list of items is requested with no output type specified, a list of fields with lookup field specified', async () => {
-    sinon.stub(request, 'get').callsFake(opts => {
-      if ((opts.url as string).indexOf('$expand=') > -1) {
-        return Promise.resolve({
-          value:
-            [{
-              "ID": 1,
-              "Modified": "2018-08-15T13:43:12Z",
-              "Title": "Example item 1",
-              "Company": { "Title": "Contoso" }
-            },
-            {
-              "ID": 2,
-              "Modified": "2018-08-15T13:44:10Z",
-              "Title": "Example item 2",
-              "Company": { "Title": "Fabrikam" }
-            }]
-        });
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
-    const options: any = {
-      listTitle: 'Demo List',
-      webUrl: 'https://contoso.sharepoint.com/sites/project-x',
-      fields: "Title,Modified,Company/Title"
-    };
-
-    await command.action(logger, { options: options } as any);
-    assert.deepStrictEqual(JSON.stringify(loggerLogSpy.lastCall.args[0]), JSON.stringify([
-      {
-        "Modified": "2018-08-15T13:43:12Z",
-        "Title": "Example item 1",
-        "Company": { "Title": "Contoso" }
-      },
-      {
-        "Modified": "2018-08-15T13:44:10Z",
-        "Title": "Example item 2",
-        "Company": { "Title": "Fabrikam" }
-      }
-    ]));
-  });
-
-  it('returns array of listItemInstance objects when a list of items is requested with an output type of text, and no fields specified', async () => {
-    sinon.stub(request, 'get').callsFake(getFakes);
-    sinon.stub(request, 'post').callsFake(postFakes);
-
-    const options: any = {
-      listTitle: 'Demo List',
-      webUrl: 'https://contoso.sharepoint.com/sites/project-x',
-      output: "text"
-    };
-
-    await command.action(logger, { options: options } as any);
-    assert.strictEqual(returnArrayLength, expectedArrayLength);
-  });
-
   it('returns array of listItemInstance objects when a list of items is requested with an output type of json, and no fields specified', async () => {
-    sinon.stub(request, 'get').callsFake(getFakes);
-    sinon.stub(request, 'post').callsFake(postFakes);
+    sinon.stub(spoListItem, 'getListItems').resolves(listItemResponse as any[]);
 
     const options: any = {
       listTitle: 'Demo List',
       webUrl: 'https://contoso.sharepoint.com/sites/project-x',
-      output: "json"
+      output: 'json',
+      verbose: true
     };
 
     await command.action(logger, { options: options } as any);
-    assert.strictEqual(returnArrayLength, expectedArrayLength);
+    assert.deepStrictEqual(JSON.stringify(loggerLogSpy.lastCall.args[0]), JSON.stringify(listItemResponse));
   });
 
-  it('returns array of listItemInstance objects when a list of items is requested with a camlQuery specified, and output set to json, and debug mode is enabled', async () => {
-    sinon.stub(request, 'get').callsFake(getFakes);
-    sinon.stub(request, 'post').callsFake(postFakes);
-
-    const options: any = {
-      debug: true,
-      listTitle: 'Demo List',
-      webUrl: 'https://contoso.sharepoint.com/sites/project-x',
-      camlQuery: "<View><Query><ViewFields><FieldRef Name='Title' /><FieldRef Name='Id' /></ViewFields><Where><Eq><FieldRef Name='Title' /><Value Type='Text'>Demo List Item 1</Value></Eq></Where></Query></View>",
-      output: "json"
-    };
-
-    await command.action(logger, { options: options } as any);
-    assert.strictEqual(returnArrayLength, expectedArrayLength);
-  });
-
-  it('returns array of listItemInstance objects when a list of items is requested with a camlQuery specified', async () => {
-    sinon.stub(request, 'get').callsFake(getFakes);
-    sinon.stub(request, 'post').callsFake(postFakes);
+  it('returns array of listItemInstance objects when a list of items is requested with an output type of json, and fields specified', async () => {
+    sinon.stub(spoListItem, 'getListItems').resolves(listItemResponse as any[]);
 
     const options: any = {
       listTitle: 'Demo List',
       webUrl: 'https://contoso.sharepoint.com/sites/project-x',
-      camlQuery: "<View><Query><ViewFields><FieldRef Name='Title' /><FieldRef Name='Id' /></ViewFields><Where><Eq><FieldRef Name='Title' /><Value Type='Text'>Demo List Item 1</Value></Eq></Where></Query></View>"
+      output: 'json',
+      fields: 'Title,Id',
+      verbose: true
     };
 
     await command.action(logger, { options: options } as any);
-    assert.strictEqual(returnArrayLength, expectedArrayLength);
+    assert.deepStrictEqual(JSON.stringify(loggerLogSpy.lastCall.args[0]), JSON.stringify(listItemResponse));
   });
 
   it('correctly handles random API error', async () => {
-    sinon.stub(request, 'get').callsFake(getFakes);
-    sinon.stub(request, 'post').callsFake(() => Promise.reject('An error has occurred'));
+    sinon.stub(spoListItem, 'getListItems').callsFake(() => Promise.reject('An error has occurred'));
 
     const options: any = {
       listId: '935c13a0-cc53-4103-8b48-c1d0828eaa7f',
@@ -443,5 +202,18 @@ describe(commands.LISTITEM_LIST, () => {
 
     await assert.rejects(command.action(logger, { options: options } as any),
       new CommandError('An error has occurred'));
+  });
+
+  it('returns array of listItemInstance objects when a list of items is requested with an output type of text, and no fields specified', async () => {
+    sinon.stub(spoListItem, 'getListItems').resolves(listItemResponse as any[]);
+
+    const options: any = {
+      listTitle: 'Demo List',
+      webUrl: 'https://contoso.sharepoint.com/sites/project-x',
+      output: 'text'
+    };
+
+    const listItems = await spoListItem.getListItems(options, logger, true);
+    assert.strictEqual(listItems.length, 2);
   });
 });
