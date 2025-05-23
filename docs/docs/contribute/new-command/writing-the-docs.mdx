@@ -1,4 +1,4 @@
-# Write the command specs
+# Writing docs page
 
 Each command has a corresponding documentation page. The contents of this page are almost identical to the help implemented in the command itself. This way, users working with the CLI can get help directly inside the CLI, while users interested in the capabilities of the CLI, can browse through the help pages published in our documentation. In the CLI for Microsoft 365, we extend this basic information with additional remarks and examples to help users work with the CLI. This will also be published in the terminal when users execute your command with the `--help` flag. 
 
@@ -73,6 +73,44 @@ import Global from '/docs/cmd/_global.mdx';
 When listing available options for the particular command, CLI for Microsoft 365 follows the naming convention where required options are wrapped in angle brackets (`< >`) while optional options are wrapped in square brackets (`[ ]`).
 
 :::
+
+### Permissions
+
+Each command should list the minimum required permissions. If the user grants all the permissions specified in the documentation, they should be able to run the command successfully with any combination of options.
+To make your life easier, we encourage you to use a tool to help discover the minimal permissions needed to run a command. Check out the [documenting minimal permissions guide](https://link-to-guide-of-waldek.com) to learn how.
+After you've discovered the permissions required to run your command, you can generate the permissions section by using the script that can be found at `scripts/generate-docs-permissions.mjs`. This script will generate the markdown section for you, ensuring that the permissions are formatted correctly. You can run the script by executing the following command in your terminal:
+
+```sh
+node ./scripts/generate-docs-permissions.mjs
+```
+
+The script above will output the permissions section, you can find an example below.
+
+```md title="docs\docs\cmd\spo\group\group-get.mdx"
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+<!-- ... -->
+
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource    | Permissions   |
+  |-------------|---------------|
+  | SharePoint  | AllSites.Read |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource    | Permissions    |
+  |-------------|----------------|
+  | SharePoint  | Sites.Read.All |
+
+  </TabItem>
+</Tabs>
+```
 
 ### Examples
 
