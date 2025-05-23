@@ -28,7 +28,10 @@
     "test:version": "node scripts/check-version.js",
     "test:cov": "c8 npm run test:test",
     "test:test": "mocha",
-    "lint": "eslint --ext .ts src --cache --cache-strategy content"
+    "lint": "eslint --ext .ts src --cache --cache-strategy content",
+    "devproxy:apispec": "devproxy -c ./.devproxy/generate-openapi-spec.json",
+    "devproxy:discover": "devproxy --discover --as-system-proxy false",
+    "devproxy:permissions": "devproxy -c ./.devproxy/devproxyrc.json"
   },
   "keywords": [
     "adaptive card",
