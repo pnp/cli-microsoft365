@@ -29,20 +29,25 @@ sidebar_position: 4
 - [spe container recyclebinitem list](../cmd/spe/container/container-recyclebinitem-list.mdx) - lists deleted containers of a specific SharePoint embedded Container Type [#6156](https://github.com/pnp/cli-microsoft365/issues/6156)
 - [spe containertype remove](../cmd/spe/containertype/containertype-remove.mdx) - removes a SharePoint Embedded Container Type [#5992](https://github.com/pnp/cli-microsoft365/issues/5992)
 
+**SharePoint Premium:**
+
+- [spp model apply](../cmd/spp/model/model-apply.mdx) - applies (or syncs) a trained document understanding model to a document library [#6119](https://github.com/pnp/cli-microsoft365/issues/6119)
+
 ### Changes
 
-- refactored 'teams app install' to use util [#5314](https://github.com/pnp/cli-microsoft365/issues/5314)
-- refactored 'spo site set' to use util [#5306](https://github.com/pnp/cli-microsoft365/issues/5306)
-- refactored 'viva connections app create' to use util [#5324](https://github.com/pnp/cli-microsoft365/issues/5324)
+- refactored [teams app install](../cmd/teams/app/app-install.mdx) to use util [#5314](https://github.com/pnp/cli-microsoft365/issues/5314)
+- refactored [spo site set](../cmd/spo/site/site-set.mdx) to use util [#5306](https://github.com/pnp/cli-microsoft365/issues/5306)
+- refactored [viva connections app create](../cmd/viva/connections/connections-app-create.mdx) to use util [#5324](https://github.com/pnp/cli-microsoft365/issues/5324)
 - added login through federated identity for Azure Devops [#6649](https://github.com/pnp/cli-microsoft365/issues/6649)
 - fixed setup command app creation [#6720](https://github.com/pnp/cli-microsoft365/issues/6720)
-- fixed wrong syntax in 'spo field get'
-- fixed problem with 'spo page section add' command [#6701](https://github.com/pnp/cli-microsoft365/issues/6701)
+- fixed problem with [spo page section add](../cmd/spo/page/page-section-add.mdx) command [#6701](https://github.com/pnp/cli-microsoft365/issues/6701)
 - Migrated 'adaptivecard send' to Zod
-- Migrated 'm365 app' commands to Zod
+- Migrated 'app' commands to Zod
 - Migrated 'booking business get' to Zod
 - Migrated 'context remove' to Zod
 - Migrated 'context option remove' to Zod
+- Enhanced [spo list get](../cmd/spo/list/list-get.mdx) command with ability to get the default list of a site [#5856](https://github.com/pnp/cli-microsoft365/issues/5856)
+- Added documentation about [handling errors in PowerShell](../user-guide/using-cli.mdx#handling-errors-in-powershell) [#6664](https://github.com/pnp/cli-microsoft365/pull/6664)
 
 ## [v10.7.0](https://github.com/pnp/cli-microsoft365/releases/tag/v10.7.0)
 
