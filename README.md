@@ -93,14 +93,16 @@
   - Power Apps
   - Power Platform
   - Purview
-  - Skype for Business
+  - SharePoint Embedded
   - SharePoint Online
+  - SharePoint Premium
   - To Do
 - Supported authentication methods
   - Azure Managed Identity
   - Certificate
   - Client Secret
   - Device Code
+  - Federated identity
   - Username and Password
 - Manage your SharePoint Framework projects
   - Upgrade your projects
