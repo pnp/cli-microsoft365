@@ -15,6 +15,7 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   includeAssociatedSites?: boolean;
+  withAssociatedSites?: boolean;
 }
 
 class SpoHubSiteListCommand extends SpoCommand {
@@ -43,7 +44,8 @@ class SpoHubSiteListCommand extends SpoCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        includeAssociatedSites: args.options.includeAssociatedSites === true
+        includeAssociatedSites: args.options.includeAssociatedSites === true,
+        withAssociatedSites: args.options.withAssociatedSites === true
       });
     });
   }
@@ -52,18 +54,27 @@ class SpoHubSiteListCommand extends SpoCommand {
     this.options.unshift(
       {
         option: '-i, --includeAssociatedSites'
+      },
+      {
+        option: '--withAssociatedSites'
       }
     );
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
+      if (args.options.includeAssociatedSites) {
+        await this.warn(logger, `Parameter 'includeAssociatedSites' is deprecated. Please use 'withAssociatedSites' instead`);
+      }
+
       const spoAdminUrl = await spo.getSpoAdminUrl(logger, this.debug);
 
       const hubSitesResult = await odata.getAllItems<HubSite>(`${spoAdminUrl}/_api/hubsites`);
       const hubSites = hubSitesResult;
 
-      if (!(args.options.includeAssociatedSites !== true || args.options.output && args.options.output !== 'json')) {
+      const shouldIncludeAssociatedSites: boolean | undefined = args.options.includeAssociatedSites || args.options.withAssociatedSites;
+
+      if (!(shouldIncludeAssociatedSites !== true || args.options.output && args.options.output !== 'json')) {
         if (this.debug) {
           await logger.logToStderr('Retrieving associated sites...');
           await logger.logToStderr('');
