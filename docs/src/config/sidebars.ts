@@ -614,6 +614,11 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'organization list',
               id: 'cmd/entra/organization/organization-list'
+            },
+            {
+              type: 'doc',
+              label: 'organization set',
+              id: 'cmd/entra/organization/organization-set'
             }
           ]
         },

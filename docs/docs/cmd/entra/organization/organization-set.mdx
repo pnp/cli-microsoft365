@@ -1,0 +1,82 @@
+import Global from '/docs/cmd/_global.mdx';
+
+# entra organization set
+
+Updates info about the organization
+
+## Usage
+
+```sh
+m365 entra organization set [options]
+```
+
+## Options
+
+```md definition-list
+`-i, --id [id]`
+: The id of the organization. Specify either `id` or `displayName`, but not both.
+
+`-d, --displayName [displayName]`
+: The name of the organization. Specify either `id` or `displayName`, but not both.
+
+`--marketingNotificationEmails [marketingNotificationEmails]`
+: The comma separated list of marketing notification emails.
+
+`--securityComplianceNotificationMails [securityComplianceNotificationMails]`
+: The comma separated list of security compliance notification emails.
+
+`--securityComplianceNotificationPhones [securityComplianceNotificationPhones]`
+: The comma separated list of security compliance notification phones.
+
+`--technicalNotificationMails [technicalNotificationMails]`
+: The comma separated list of technical notification emails.
+
+`--contactEmail [contactEmail]`
+: A valid smtp email address for the privacy statement contact
+
+`--statementUrl [statementUrl]`
+: The URL that directs to the company's privacy statement
+```
+
+<Global />
+
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource        | Permissions                                      |
+  |-----------------|--------------------------------------------------|
+  | Microsoft Graph | Organization.ReadWrite.All                       |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource        | Permissions                                              |
+  |-----------------|----------------------------------------------------------|
+  | Microsoft Graph | Organization.ReadWrite.All                              |
+
+  </TabItem>
+</Tabs>
+
+## Examples
+
+Updates properties of an organization specified by id
+
+```sh
+m365 entra organization set --id 84841066-274d-4ec0-a5c1-276be684bdd3 --marketingNotificationEmails 'marketing@contoso.com'
+```
+
+Updates properties of an organization specified by displayName
+
+```sh
+m365 entra organization set --displayName Contoso --marketingNotificationEmails 'marketing@contoso.com'
+```
+
+## Response
+
+The command won't return a response on success
+
+## More information
+
+- Organization: https://learn.microsoft.com/graph/api/organization-update
