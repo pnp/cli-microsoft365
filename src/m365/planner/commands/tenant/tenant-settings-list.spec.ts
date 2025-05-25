@@ -69,10 +69,6 @@ describe(commands.TENANT_SETTINGS_LIST, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('defines correct properties for the default output', () => {
-    assert.deepStrictEqual(command.defaultProperties(), ['isPlannerAllowed', 'allowCalendarSharing', 'allowTenantMoveWithDataLoss', 'allowTenantMoveWithDataMigration', 'allowRosterCreation', 'allowPlannerMobilePushNotifications']);
-  });
-
   it('successfully lists tenant planner settings', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === 'https://tasks.office.com/taskAPI/tenantAdminSettings/Settings') {

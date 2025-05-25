@@ -16,9 +16,9 @@ function convertHeadings(md: string): string {
 }
 
 function convertAdmonitions(md: string): string {
-  const regex = new RegExp(/^:::(\w+)(?:\[([^\]]+)\])?([\s\S]*?):::$/, 'gm');
-  return md.replace(regex, (_, label: string, title: string | undefined, content: string) =>
-    label.toLocaleUpperCase() + (title ? EOL + EOL + title : '') + EOL + EOL + content.trim());
+  const regex = new RegExp(/^([ \t]*):::(\w+)(?:\[([^\]]+)\])?([\s\S]*?)^\1:::$/, 'gm');
+  return md.replace(regex, (_, indent: string | undefined, label: string, title: string | undefined, content: string) =>
+    indent + label.toLocaleUpperCase() + (title ? EOL + EOL + indent + title : '') + EOL + EOL + indent + content.trim());
 }
 
 function includeContent(md: string, rootFolder: string): string {
@@ -63,7 +63,7 @@ function convertHyperlinks(md: string): string {
 function convertContentTabs(md: string): string {
   return md
     .replace(/<TabItem value="([^"]+)">/gm, '$1')
-    .replace(/.*<\/?(Tabs|TabItem)>.*\n?/g, '')
+    .replace(/.*\n?<\/?(Tabs|TabItem)>.*\n?/g, '')
     .replace(/```(?:\w+)?\s*([\s\S]*?)\s*```/g, '$1')
     .trim();
 }

@@ -1,4 +1,6 @@
 import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 # planner roster member remove
 
@@ -41,6 +43,25 @@ This command is based on an API that is currently in preview and is subject to c
 The Planner Roster will be deleted when it doesn't have any users remaining in the membership list because the last user removed themselves. Roster, its plan and all contained tasks will be deleted within 30 days of this operation. We will show an extra prompt when this happens. This prompt is also suppressed when specifying `-f, --force`.
 
 :::
+
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource        | Permissions     |
+  |-----------------|-----------------|
+  | Microsoft Graph | Tasks.ReadWrite |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource        | Permissions         |
+  |-----------------|---------------------|
+  | Microsoft Graph | Tasks.ReadWrite.All |
+
+  </TabItem>
+</Tabs>
 
 ## Examples
 

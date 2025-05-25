@@ -4977,7 +4977,7 @@ const sidebars: SidebarsConfig = {
         },
         {
           type: 'doc',
-          label: 'Help page',
+          label: 'Docs page',
           id: 'contribute/new-command/writing-the-docs'
         }
       ]
