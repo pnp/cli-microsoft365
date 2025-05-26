@@ -23,43 +23,6 @@ describe(commands.HOMESITE_REMOVE, () => {
   let commandInfo: CommandInfo;
   let commandOptionsSchema: z.ZodTypeAny;
   const siteId = '00000000-0000-0000-0000-000000000010';
-  const homeSites = {
-    "value": [
-      {
-        "Audiences": [
-          {
-            "Email": "ColumnSearchable@contoso.onmicrosoft.com",
-            "Id": "978b5280-4f80-47ea-a1db-b0d1d2fb1ba4",
-            "Title": "ColumnSearchable Members"
-          },
-          {
-            "Email": "contosoteam@contoso.onmicrosoft.com",
-            "Id": "21af775d-17b3-4637-94a4-2ba8625277cb",
-            "Title": "Contoso TeamR Members"
-          }
-        ],
-        "IsInDraftMode": false,
-        "IsVivaBackendSite": false,
-        "SiteId": "431d7819-4aaf-49a1-b664-b2fe9e609b63",
-        "TargetedLicenseType": 2,
-        "Title": "The Landing",
-        "Url": "https://contoso.sharepoint.com/sites/TheLanding",
-        "VivaConnectionsDefaultStart": true,
-        "WebId": "626c1724-8ac8-45d5-af87-c07c752fab75"
-      },
-      {
-        "Audiences": [],
-        "IsInDraftMode": false,
-        "IsVivaBackendSite": false,
-        "SiteId": "45d4a135-40e4-4571-8340-61d17fdfd58a",
-        "TargetedLicenseType": 0,
-        "Title": "Contoso Electronics",
-        "Url": "https://contoso.sharepoint.com/sites/contosoportal",
-        "VivaConnectionsDefaultStart": true,
-        "WebId": "9418e2a1-855c-4752-8dd4-48693f43b10a"
-      }
-    ]
-  };
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -101,7 +64,6 @@ describe(commands.HOMESITE_REMOVE, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      request.get,
       request.post,
       cli.promptForConfirmation,
       spo.getSiteAdminPropertiesByUrl
@@ -138,22 +100,17 @@ describe(commands.HOMESITE_REMOVE, () => {
     assert(postSpy.notCalled);
   });
 
-  it('fails validation if the url is not a valid SharePoint url', async () => {
+  it('fails validation if the url option is not a valid SharePoint site url', async () => {
     const actual = commandOptionsSchema.safeParse({ url: 'invalid' });
     assert.strictEqual(actual.success, false);
   });
 
-  it('removes the Home Site using legacy method when only one Home Site exists and prompt is confirmed', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso-admin.sharepoint.com/_api/SPO.Tenant/GetTargetedSitesDetails`) {
-        return { value: [homeSites.value[0]] };
-      }
+  it('passes validation if the url option is a valid SharePoint site URL', async () => {
+    const actual = commandOptionsSchema.safeParse({ url: 'https://contoso.sharepoint.com' });
+    assert.strictEqual(actual.success, true);
+  });
 
-      throw 'Invalid request';
-    });
-
-    sinon.stub(spo, 'getSiteAdminPropertiesByUrl').resolves({ SiteId: siteId } as any);
-
+  it('removes the Home Site when prompt confirmed', async () => {
     let homeSiteRemoveCallIssued = false;
 
     sinon.stub(request, 'post').callsFake(async (opts) => {
@@ -182,24 +139,14 @@ describe(commands.HOMESITE_REMOVE, () => {
     assert(homeSiteRemoveCallIssued);
   });
 
-  it('removes the first Home Site when multiple Home Sites exist and url is not specified', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso-admin.sharepoint.com/_api/SPO.Tenant/GetTargetedSitesDetails`) {
-        return homeSites;
-      }
+  it('removes the Home Site whithout confirm prompt', async () => {
+    let homeSiteRemoveCallIssued = false;
 
-      throw 'Invalid request';
-    });
-
-    sinon.stub(spo, 'getSiteAdminPropertiesByUrl').resolves({ SiteId: siteId } as any);
-
-    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `https://contoso-admin.sharepoint.com/_api/SPO.Tenant/RemoveTargetedSite` &&
-        opts.data.siteId === siteId) {
-        return {};
-      }
-
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="28" ObjectPathId="27" /><Method Name="RemoveSPHSite" Id="29" ObjectPathId="27" /></Actions><ObjectPaths><Constructor Id="27" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
+
+        homeSiteRemoveCallIssued = true;
+
         return JSON.stringify(
           [
             {
@@ -215,36 +162,15 @@ describe(commands.HOMESITE_REMOVE, () => {
     });
 
     await command.action(logger, { options: { force: true } });
-    assert(postStub.calledOnce);
-    assert.deepStrictEqual(postStub.lastCall.args[0].url, "https://contoso-admin.sharepoint.com/_api/SPO.Tenant/RemoveTargetedSite");
+    assert(homeSiteRemoveCallIssued);
   });
 
   it('removes the Home Site specified by URL', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso-admin.sharepoint.com/_api/SPO.Tenant/GetTargetedSitesDetails`) {
-        return homeSites;
-      }
-
-      throw 'Invalid request';
-    });
-
     sinon.stub(spo, 'getSiteAdminPropertiesByUrl').resolves({ SiteId: siteId } as any);
-    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `https://contoso-admin.sharepoint.com/_api/SPO.Tenant/RemoveTargetedSite` &&
-        opts.data?.siteId === siteId) {
-        return {};
-      }
 
-      if (opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="28" ObjectPathId="27" /><Method Name="RemoveSPHSite" Id="29" ObjectPathId="27" /></Actions><ObjectPaths><Constructor Id="27" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
-        return JSON.stringify(
-          [
-            {
-              "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.8929.1227", "ErrorInfo": null, "TraceCorrelationId": "e4f2e59e-c0a9-0000-3dd0-1d8ef12cc742"
-            }, 57, {
-              "IsNull": false
-            }, 58, "The Home site has been removed."
-          ]
-        );
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso-admin.sharepoint.com/_api/SPO.Tenant/RemoveTargetedSite`) {
+        return;
       }
 
       throw 'Invalid request';
@@ -253,21 +179,12 @@ describe(commands.HOMESITE_REMOVE, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com' } });
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com', verbose: true } });
     assert(postStub.calledOnce);
+    assert.deepStrictEqual(postStub.lastCall.args[0].data, { siteId });
   });
 
   it('correctly handles error when removing the Home Site (debug)', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso-admin.sharepoint.com/_api/SPO.Tenant/GetTargetedSitesDetails`) {
-        return { value: [homeSites.value[0]] };
-      }
-
-      throw 'Invalid request';
-    });
-
-    sinon.stub(spo, 'getSiteAdminPropertiesByUrl').resolves({ SiteId: siteId } as any);
-
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="28" ObjectPathId="27" /><Method Name="RemoveSPHSite" Id="29" ObjectPathId="27" /></Actions><ObjectPaths><Constructor Id="27" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
         return JSON.stringify(
@@ -286,5 +203,24 @@ describe(commands.HOMESITE_REMOVE, () => {
 
     await assert.rejects(command.action(logger, { options: { debug: true, force: true } } as any),
       new CommandError(`The requested operation is part of an experimental feature that is not supported in the current environment.`));
+  });
+
+  it('correctly handles error when attempting to remove a site that is not a home site or Viva Connections', async () => {
+    sinon.stub(request, 'post').rejects({
+      error: {
+        "odata.error": {
+          "code": "-2146232832, Microsoft.SharePoint.SPException",
+          "message": {
+            "lang": "en-US",
+            "value": "[Error ID: 03fc404e-0f70-4607-82e8-8fdb014e8658] The site with ID \"8e4686ed-b00c-4c5f-a0e2-4197081df5d5\" has not been added as a home site or Viva Connections. Check aka.ms/homesites for details."
+          }
+        }
+      }
+    });
+
+    await assert.rejects(
+      command.action(logger, { options: { debug: true, force: true } } as any),
+      new CommandError('[Error ID: 03fc404e-0f70-4607-82e8-8fdb014e8658] The site with ID \"8e4686ed-b00c-4c5f-a0e2-4197081df5d5\" has not been added as a home site or Viva Connections. Check aka.ms/homesites for details.')
+    );
   });
 });
