@@ -12,6 +12,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
+import { z } from 'zod';
 import commands from '../../commands.js';
 import command from './list-view-add.js';
 
@@ -47,6 +48,7 @@ describe(commands.LIST_VIEW_ADD, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: z.ZodTypeAny;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -55,6 +57,7 @@ describe(commands.LIST_VIEW_ADD, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
   });
 
   beforeEach(() => {
@@ -93,84 +96,249 @@ describe(commands.LIST_VIEW_ADD, () => {
   });
 
   it('fails validation if webUrl is not a valid SharePoint URL', async () => {
-    const actual = await command.validate({
-      options: {
-        webUrl: 'invalid',
-        listTitle: validListTitle,
-        title: validTitle,
-        fields: validFieldsInput
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: 'invalid',
+      listTitle: validListTitle,
+      title: validTitle,
+      fields: validFieldsInput
+    });
+    assert.notStrictEqual(actual.success, true);
   });
 
   it('fails validation if listId is not a valid GUID', async () => {
-    const actual = await command.validate({
-      options: {
-        webUrl: validWebUrl,
-        listId: 'invalid',
-        title: validTitle,
-        fields: validFieldsInput
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: validWebUrl,
+      listId: 'invalid',
+      title: validTitle,
+      fields: validFieldsInput
+    });
+    assert.notStrictEqual(actual.success, true);
   });
 
   it('fails validation if rowLimit is not a number', async () => {
-    const actual = await command.validate({
-      options: {
-        webUrl: validWebUrl,
-        listId: validListId,
-        title: validTitle,
-        fields: validFieldsInput,
-        rowLimit: 'invalid'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: validWebUrl,
+      listId: validListId,
+      title: validTitle,
+      fields: validFieldsInput,
+      rowLimit: 'invalid'
+    });
+    assert.notStrictEqual(actual.success, true);
   });
 
   it('fails validation if rowLimit is lower than 1', async () => {
-    const actual = await command.validate({
-      options: {
-        webUrl: validWebUrl,
-        listId: validListId,
-        title: validTitle,
-        fields: validFieldsInput,
-        rowLimit: 0
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: validWebUrl,
+      listId: validListId,
+      title: validTitle,
+      fields: validFieldsInput,
+      rowLimit: 0
+    });
+    assert.notStrictEqual(actual.success, true);
   });
 
   it('fails validation when setting default and personal option', async () => {
-    const actual = await command.validate({
-      options: {
-        webUrl: validWebUrl,
-        listId: validListId,
-        title: validTitle,
-        fields: validFieldsInput,
-        personal: true,
-        default: true
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: validWebUrl,
+      listId: validListId,
+      title: validTitle,
+      fields: validFieldsInput,
+      personal: true,
+      default: true
+    });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('correctly validates options', async () => {
-    const actual = await command.validate({
-      options: {
-        webUrl: validWebUrl,
-        listId: validListId,
-        title: validTitle,
-        fields: validFieldsInput
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('fails validation when formatting is not a valid JSON string', async () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: validWebUrl,
+      listId: validListId,
+      title: validTitle,
+      fields: validFieldsInput,
+      customFormatter: 'invalid json'
+    });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('Correctly add view by list title', async () => {
+  it('fails when listId and listTitle are specified', async () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: validWebUrl,
+      listId: validListId,
+      listTitle: validListTitle,
+      title: validTitle,
+      fields: validFieldsInput
+    });
+    assert.notStrictEqual(actual.success, true);
+  });
+
+  it('fails when listUrl and listTitle are specified', async () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: validWebUrl,
+      listTitle: validListTitle,
+      listUrl: validListUrl,
+      title: validTitle,
+      fields: validFieldsInput
+    });
+    assert.notStrictEqual(actual.success, true);
+  });
+
+  it('fails when not listId, listTitle, nor listUrl are specified', async () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: validWebUrl,
+      title: validTitle,
+      fields: validFieldsInput
+    });
+    assert.notStrictEqual(actual.success, true);
+  });
+
+  it('fails validation when calendarStartDateField is not specified for a calendar type', async () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: validWebUrl,
+      type: 'calendar',
+      calendarEndDateField: 'EndDate',
+      calendarTitleField: 'Title',
+      title: validTitle,
+      fields: validFieldsInput
+    });
+    assert.notStrictEqual(actual.success, true);
+  });
+
+  it('fails validation when calendarEndDateField is not specified for a calendar type', async () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: validWebUrl,
+      type: 'calendar',
+      calendarStartDateField: 'StartDate',
+      calendarTitleField: 'Title',
+      title: validTitle,
+      fields: validFieldsInput
+    });
+    assert.notStrictEqual(actual.success, true);
+  });
+
+  it('fails validation when calendarTitleField is not specified for a calendar type', async () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: validWebUrl,
+      type: 'calendar',
+      calendarStartDateField: 'StartDate',
+      calendarEndDateField: 'EndDate',
+      title: validTitle,
+      fields: validFieldsInput
+    });
+    assert.notStrictEqual(actual.success, true);
+  });
+
+  it('fails validation when calendar fields are specified for a regular view', async () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: validWebUrl,
+      calendarStartDateField: 'StartDate',
+      calendarEndDateField: 'EndDate',
+      calendarTitleField: 'Title',
+      title: validTitle,
+      fields: validFieldsInput
+    });
+    assert.notStrictEqual(actual.success, true);
+  });
+
+  it('fails validation when creating a kanban view without the kanban field', async () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: validWebUrl,
+      type: 'kanban',
+      title: validTitle,
+      fields: validFieldsInput
+    });
+    assert.notStrictEqual(actual.success, true);
+  });
+
+  it('fails validation when kanban fields are specified for a regular view', async () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: validWebUrl,
+      kanbanBucketField: 'Bucket',
+      title: validTitle,
+      fields: validFieldsInput
+    });
+    assert.notStrictEqual(actual.success, true);
+  });
+
+  it('fails validation when fields field is not specified and type is not calendar', async () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: validWebUrl,
+      title: validTitle
+    });
+    assert.notStrictEqual(actual.success, true);
+  });
+
+  it('fails validation when specifying an incorrect type', async () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: validWebUrl,
+      title: validTitle,
+      type: 'invalid',
+      fields: validFieldsInput
+    });
+    assert.notStrictEqual(actual.success, true);
+  });
+
+  it('fails validation when specifying an incorrect calendarDefaultLayout', async () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: validWebUrl,
+      title: validTitle,
+      calendarDefaultLayout: 'invalid',
+      fields: validFieldsInput
+    });
+    assert.notStrictEqual(actual.success, true);
+  });
+
+  it('correctly validates regular view options', async () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: validWebUrl,
+      listId: validListId,
+      title: validTitle,
+      fields: validFieldsInput
+    });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('correctly validates gallery view options', async () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: validWebUrl,
+      type: 'gallery',
+      listId: validListId,
+      title: validTitle,
+      fields: validFieldsInput
+    });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('correctly validates calendar view options', async () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: validWebUrl,
+      type: 'calendar',
+      calendarStartDateField: 'StartDate',
+      calendarEndDateField: 'EndDate',
+      calendarTitleField: 'Title',
+      listId: validListId,
+      title: validTitle,
+      fields: validFieldsInput,
+      customFormatter: JSON.stringify({ someProperty: 'someValue' })
+    });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('correctly validates kanban view options', async () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: validWebUrl,
+      type: 'kanban',
+      kanbanBucketField: 'Bucket',
+      listId: validListId,
+      title: validTitle,
+      fields: validFieldsInput,
+      customFormatter: JSON.stringify({ someProperty: 'someValue' })
+    });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('correctly logs an output', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `${validWebUrl}/_api/web/lists/getByTitle(\'${formatting.encodeQueryParameter(validListTitle)}\')/views/add`) {
+      if (opts.url === `${validWebUrl}/_api/web/lists/getByTitle('${formatting.encodeQueryParameter(validListTitle)}')/views/add`) {
         return viewCreationResponse;
       }
 
@@ -188,9 +356,41 @@ describe(commands.LIST_VIEW_ADD, () => {
     assert(loggerLogSpy.calledWith(viewCreationResponse));
   });
 
-  it('Correctly add view by list id', async () => {
-    sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `${validWebUrl}/_api/web/lists(guid\'${formatting.encodeQueryParameter(validListId)}\')/views/add`) {
+  it('correctly creates a regular view by list title', async () => {
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `${validWebUrl}/_api/web/lists/getByTitle('${formatting.encodeQueryParameter(validListTitle)}')/views/add`) {
+        return viewCreationResponse;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options: {
+        webUrl: validWebUrl,
+        listTitle: validListTitle,
+        title: validTitle,
+        fields: validFieldsInput
+      }
+    });
+
+    assert.deepStrictEqual(postStub.lastCall.args[0].data.parameters, {
+      Title: validTitle,
+      ViewFields: {
+        results: validFieldsInput.split(',')
+      },
+      CustomFormatter: undefined,
+      Query: undefined,
+      PersonalView: false,
+      SetAsDefaultView: false,
+      Paged: false,
+      RowLimit: 30
+    });
+  });
+
+  it('correctly adds a kanban view by list id', async () => {
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `${validWebUrl}/_api/web/lists(guid'${formatting.encodeQueryParameter(validListId)}')/views/add`) {
         return viewCreationResponse;
       }
 
@@ -201,16 +401,32 @@ describe(commands.LIST_VIEW_ADD, () => {
       options: {
         webUrl: validWebUrl,
         listId: validListId,
+        type: 'kanban',
         title: validTitle,
-        fields: validFieldsInput
+        fields: validFieldsInput,
+        kanbanBucketField: 'Status'
       }
     });
-    assert(loggerLogSpy.calledWith(viewCreationResponse));
+
+    assert.deepStrictEqual(postStub.lastCall.args[0].data.parameters, {
+      Title: validTitle,
+      ViewFields: {
+        results: [...validFieldsInput.split(','), 'Status']
+      },
+      CustomFormatter: '{}',
+      Query: undefined,
+      ViewData: '<FieldRef Name="Status" Type="KanbanPivotColumn" />',
+      PersonalView: false,
+      SetAsDefaultView: false,
+      Paged: false,
+      RowLimit: 30,
+      ViewType2: 'KANBAN'
+    });
   });
 
-  it('Correctly add view by list URL', async () => {
-    sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `${validWebUrl}/_api/web/GetList(\'${formatting.encodeQueryParameter(urlUtil.getServerRelativePath(validWebUrl, validListUrl))}\')/views/add`) {
+  it('correctly adds gallery view by list URL', async () => {
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `${validWebUrl}/_api/web/GetList('${formatting.encodeQueryParameter(urlUtil.getServerRelativePath(validWebUrl, validListUrl))}')/views/add`) {
         return viewCreationResponse;
       }
 
@@ -220,13 +436,108 @@ describe(commands.LIST_VIEW_ADD, () => {
     await command.action(logger, {
       options: {
         webUrl: validWebUrl,
+        type: 'gallery',
         listUrl: validListUrl,
         title: validTitle,
         fields: validFieldsInput,
-        rowLimit: 100
+        rowLimit: 100,
+        verbose: true
       }
     });
-    assert(loggerLogSpy.calledWith(viewCreationResponse));
+
+    assert.deepStrictEqual(postStub.lastCall.args[0].data.parameters, {
+      Title: validTitle,
+      ViewFields: {
+        results: validFieldsInput.split(',')
+      },
+      CustomFormatter: undefined,
+      Query: undefined,
+      PersonalView: false,
+      SetAsDefaultView: false,
+      Paged: false,
+      RowLimit: 100,
+      ViewType2: 'TILES'
+    });
+  });
+
+  it('correctly adds a calendar view by list id', async () => {
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `${validWebUrl}/_api/web/lists(guid'${formatting.encodeQueryParameter(validListId)}')/views/add`) {
+        return viewCreationResponse;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options: {
+        webUrl: validWebUrl,
+        listId: validListId,
+        type: 'calendar',
+        title: validTitle,
+        calendarStartDateField: 'StartDate',
+        calendarEndDateField: 'EndDate',
+        calendarTitleField: 'Title'
+      }
+    });
+
+    assert.deepStrictEqual(postStub.lastCall.args[0].data.parameters, {
+      Title: validTitle,
+      ViewFields: {
+        results: ['StartDate', 'EndDate', 'Title']
+      },
+      CalendarViewStyles: '<CalendarViewStyle Title="Day" Type="day" Template="CalendarViewdayChrome" Sequence="1" Default="FALSE" /><CalendarViewStyle Title="Week" Type="week" Template="CalendarViewweekChrome" Sequence="2" Default="FALSE" /><CalendarViewStyle Title="Month" Type="month" Template="CalendarViewmonthChrome" Sequence="3" Default="TRUE" /><CalendarViewStyle Title="Work week" Type="workweek" Template="CalendarViewweekChrome" Sequence="4" Default="FALSE" />',
+      Query: `<Where><DateRangesOverlap><FieldRef Name='StartDate' /><FieldRef Name='EndDate' /><Value Type='DateTime'><Month /></Value></DateRangesOverlap></Where>`,
+      ViewData: '<FieldRef Name="Title" Type="CalendarMonthTitle" /><FieldRef Name="Title" Type="CalendarWeekTitle" /><FieldRef Name="" Type="CalendarWeekLocation" /><FieldRef Name="Title" Type="CalendarDayTitle" /><FieldRef Name="" Type="CalendarDayLocation" />',
+      CustomFormatter: undefined,
+      PersonalView: false,
+      SetAsDefaultView: false,
+      Paged: false,
+      RowLimit: 30,
+      ViewType2: 'MODERNCALENDAR'
+    });
+  });
+
+  it('correctly adds a calendar view with additional options', async () => {
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `${validWebUrl}/_api/web/lists(guid'${formatting.encodeQueryParameter(validListId)}')/views/add`) {
+        return viewCreationResponse;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options: {
+        webUrl: validWebUrl,
+        listId: validListId,
+        type: 'calendar',
+        title: validTitle,
+        fields: validFieldsInput,
+        calendarStartDateField: 'StartDate',
+        calendarEndDateField: 'EndDate',
+        calendarTitleField: 'Title',
+        calendarSubTitleField: 'Subtitle',
+        calendarDefaultLayout: 'workWeek',
+        customFormatter: JSON.stringify({ someProperty: 'someValue' })
+      }
+    });
+
+    assert.deepStrictEqual(postStub.lastCall.args[0].data.parameters, {
+      Title: validTitle,
+      ViewFields: {
+        results: ['StartDate', 'EndDate', 'Title', 'Subtitle', ...validFieldsInput.split(',')]
+      },
+      CalendarViewStyles: '<CalendarViewStyle Title="Day" Type="day" Template="CalendarViewdayChrome" Sequence="1" Default="FALSE" /><CalendarViewStyle Title="Week" Type="week" Template="CalendarViewweekChrome" Sequence="2" Default="FALSE" /><CalendarViewStyle Title="Month" Type="month" Template="CalendarViewmonthChrome" Sequence="3" Default="FALSE" /><CalendarViewStyle Title="Work week" Type="workweek" Template="CalendarViewweekChrome" Sequence="4" Default="TRUE" />',
+      Query: `<Where><DateRangesOverlap><FieldRef Name='StartDate' /><FieldRef Name='EndDate' /><Value Type='DateTime'><Month /></Value></DateRangesOverlap></Where>`,
+      ViewData: '<FieldRef Name="Title" Type="CalendarMonthTitle" /><FieldRef Name="Title" Type="CalendarWeekTitle" /><FieldRef Name="Subtitle" Type="CalendarWeekLocation" /><FieldRef Name="Title" Type="CalendarDayTitle" /><FieldRef Name="Subtitle" Type="CalendarDayLocation" />',
+      CustomFormatter: JSON.stringify({ someProperty: 'someValue' }),
+      PersonalView: false,
+      SetAsDefaultView: false,
+      Paged: false,
+      RowLimit: 30,
+      ViewType2: 'MODERNCALENDAR'
+    });
   });
 
   it('handles error correctly', async () => {
@@ -250,6 +561,6 @@ describe(commands.LIST_VIEW_ADD, () => {
         fields: validFieldsInput,
         rowLimit: 100
       }
-    } as any), new CommandError(error.error['odata.error'].message.value));
+    }), new CommandError(error.error['odata.error'].message.value));
   });
 });

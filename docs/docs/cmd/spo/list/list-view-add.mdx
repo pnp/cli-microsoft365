@@ -30,11 +30,32 @@ m365 spo list view add [options]
 `--title <title>`
 : Title of the view to be created for the list.
 
-`--fields <fields>`
-: Comma-separated list of **case-sensitive** internal names of the fields to add to the view.
+`--type [type]`
+: Type of the view. Possible values are: `list`, `calendar`, `gallery`, `kanban`. Defaults to `list`.
+
+`--fields [fields]`
+: Comma-separated list of **case-sensitive** internal names of the fields to add to the view. Optional when `type` is set to `calendar`.
 
 `--viewQuery [viewQuery]`
 : XML representation of the list query for the underlying view.
+
+`--calendarStartDateField [calendarStartDateField]`
+: Internal name of the field that contains the start date of the calendar event. Required when `type` is set to `calendar`.
+
+`--calendarEndDateField [calendarEndDateField]`
+: Internal name of the field that contains the end date of the calendar event. Required when `type` is set to `calendar`.
+
+`--calendarTitleField [calendarTitleField]`
+: Internal name of the field that contains the title of the calendar event. Required when `type` is set to `calendar`.
+
+`--calendarSubTitleField [calendarSubTitleField]`
+: Internal name of the field that contains the subtitle of the calendar event.
+
+`--calendarDefaultLayout [calendarDefaultLayout]`
+: Default layout of the calendar view. Possible values are: `month`, `week`, `workWeek`, `day`. Defaults to `month`.
+
+`--kanbanBucketField [kanbanBucketField]`
+: Internal name of the field that contains the bucket for the Kanban board view. Required when `type` is set to `kanban`.
 
 `--personal`
 : View will be created as personal view, if specified.
@@ -53,32 +74,54 @@ m365 spo list view add [options]
 
 ## Remarks
 
+:::tip
+
 We recommend using the `paged` option. When specified, the view supports displaying more items page by page (default behavior). When not specified, the `rowLimit` is absolute, and there is no link to see more items.
+
+:::
 
 ## Examples
 
-Add a view called _All events_ to a list with specific title.
+Add a list view called to a list with specific title.
 
 ```sh
-m365 spo list view add --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle "Test" --title "All events" --fields "FieldName1,FieldName2,Created,Author,Modified,Editor" --paged
+m365 spo list view add --webUrl https://contoso.sharepoint.com/sites/Sales --listTitle "Customers" --title "All customers" --fields "LinkTitle,Country,Sector,Country,Address,Contact" --paged
 ```
 
-Add a view as default view with title _All events_ to a list with a specific URL.
+Add a gallery view as default view to a list with a specific URL.
 
 ```sh
-m365 spo list view add --webUrl https://contoso.sharepoint.com/sites/project-x --listUrl "/Lists/MyList" --title "All events" --fields "FieldName1,Created" --paged --default
+m365 spo list view add --webUrl https://contoso.sharepoint.com/sites/Sales --listUrl "/Lists/Customers" --title "All customers" --type gallery --fields "LinkTitle,Country,Sector,Country,Address,Contact" --paged --default
 ```
 
-Add a personal view called _All events_ to a list with a specific ID.
+Add a view with defined filter and sorting.
 
 ```sh
-m365 spo list view add --webUrl https://contoso.sharepoint.com/sites/project-x --listId 00000000-0000-0000-0000-000000000000 --title "All events" --fields "FieldName1,Created" --paged --personal
+m365 spo list view add --webUrl https://contoso.sharepoint.com/sites/Sales --listTitle "Customers" --title "Transport customers" --fields "LinkTitle,Country,Country,Address,Contact" --viewQuery "<OrderBy><FieldRef Name='LinkTitle' Ascending='TRUE' /></OrderBy><Where><Eq><FieldRef Name='Sector' /><Value Type='Text'>Transportation</Value></Eq></Where>" --paged
 ```
 
-Add a view called _All events_ with defined filter and sorting.
+Add a gallery view as personal view.
 
 ```sh
-m365 spo list view add --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle "Test" --title "All events" --fields "FieldName1" --viewQuery "<OrderBy><FieldRef Name='Created' Ascending='FALSE' /></OrderBy><Where><Eq><FieldRef Name='TextFieldName' /><Value Type='Text'>Field value</Value></Eq></Where>" --paged
+m365 spo list view add --webUrl https://contoso.sharepoint.com/sites/Sales --listTitle "Customers" --title "All customers" --type gallery --fields "LinkTitle,Country,Sector,Country,Address,Contact" --paged --personal
+```
+
+Add a calendar view with month layout.
+
+```sh
+m365 spo list view add --webUrl https://contoso.sharepoint.com/sites/Sales --listTitle "Events" --title "All events" --type calendar --fields "EventType,InternalExternal" --calendarStartDateField EventStartDate --calendarEndDateField EventEndDate --calendarTitleField LinkTitle --paged
+```
+
+Add a calendar view with week layout and subtitle.
+
+```sh
+m365 spo list view add --webUrl https://contoso.sharepoint.com/sites/Sales --listTitle "Events" --title "All events" --type calendar --fields "EventType,InternalExternal" --calendarStartDateField EventStartDate --calendarEndDateField EventEndDate --calendarTitleField LinkTitle --calendarSubTitleField Location --calendarDefaultLayout week --paged
+```
+
+Add a Kanban board view.
+
+```sh
+m365 spo list view add --webUrl https://contoso.sharepoint.com/sites/Sales --listTitle "Tasks" --title "All tasks" --type kanban --fields "Title,AssignedTo" --kanbanBucketField Status --paged
 ```
 
 ## Response
