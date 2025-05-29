@@ -14,6 +14,7 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './page-section-remove.js';
 import { spo } from '../../../../utils/spo.js';
+import { mockBackgroundControlHTML, mockEmptyPage, mockOneColumnSectionHTML, mockPageSettingsHTML, mockThreeColumnSectionHTML, mockTwoColumnLeftSectionHTML, mockTwoColumnRightSectionHTML, mockTwoColumnsSectionHTML, mockVerticalSectionHTML } from './page.mock.js';
 
 describe(commands.PAGE_SECTION_REMOVE, () => {
   let log: string[];
@@ -168,7 +169,65 @@ describe(commands.PAGE_SECTION_REMOVE, () => {
   it('removes section from the modern page', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/GetFileByServerRelativePath(DecodedUrl='/sites/team-a/SitePages/home.aspx')`) > -1) {
-        return apiResponse;
+        return {
+          "ListItemAllFields": {
+            "FileSystemObjectType": 0,
+            "Id": 9,
+            "ServerRedirectedEmbedUri": null,
+            "ServerRedirectedEmbedUrl": "",
+            "ContentTypeId": "0x0101009D1CB255DA76424F860D91F20E6C41180070E97A63FCC58F47B8FE04D0654FD44E",
+            "WikiField": null,
+            "Title": "Nova",
+            "ClientSideApplicationId": "b6917cb1-93a0-4b97-a84d-7cf49975d4ec",
+            "CanvasContent1": `<div>${mockOneColumnSectionHTML()}${mockPageSettingsHTML}</div>`,
+            "BannerImageUrl": {
+              "Description": "/_layouts/15/images/sitepagethumbnail.png",
+              "Url": "/_layouts/15/images/sitepagethumbnail.png"
+            },
+            "Description": "asd",
+            "PromotedState": 0,
+            "FirstPublishedDate": null,
+            "LayoutWebpartsContent": "",
+            "ComplianceAssetId": null,
+            "OData__AuthorBylineId": null,
+            "_AuthorBylineStringId": null,
+            "OData__OriginalSourceUrl": null,
+            "OData__OriginalSourceSiteId": null,
+            "OData__OriginalSourceWebId": null,
+            "OData__OriginalSourceListId": null,
+            "OData__OriginalSourceItemId": null,
+            "ID": 9,
+            "Created": "2018-07-11T16:24:12",
+            "AuthorId": 9,
+            "Modified": "2018-07-11T16:33:57",
+            "EditorId": 9,
+            "OData__CopySource": null,
+            "CheckoutUserId": 9,
+            "OData__UIVersionString": "1.0",
+            "GUID": "903cdabe-7a28-4e96-a55e-c768185d7d9a"
+          },
+          "CheckInComment": "",
+          "CheckOutType": 0,
+          "ContentTag": "{16035D61-EDB9-4758-A490-3D13FCD9FDAA},10,8",
+          "CustomizedPageStatus": 0,
+          "ETag": "\"{16035D61-EDB9-4758-A490-3D13FCD9FDAA},10\"",
+          "Exists": true,
+          "IrmEnabled": false,
+          "Length": "4708",
+          "Level": 255,
+          "LinkingUri": null,
+          "LinkingUrl": "",
+          "MajorVersion": 1,
+          "MinorVersion": 0,
+          "Name": "Nova.aspx",
+          "ServerRelativeUrl": "/SitePages/Nova.aspx",
+          "TimeCreated": "2018-07-11T19:24:12Z",
+          "TimeLastModified": "2018-07-11T19:33:57Z",
+          "Title": "Nova",
+          "UIVersion": 512,
+          "UIVersionLabel": "1.0",
+          "UniqueId": "16035d61-edb9-4758-a490-3d13fcd9fdaa"
+        };
       }
 
       throw 'Invalid request';
@@ -184,7 +243,7 @@ describe(commands.PAGE_SECTION_REMOVE, () => {
 
     await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', section: 1, force: true } });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, {
-      CanvasContent1: "<div><div data-sp-canvascontrol=\"\" data-sp-canvasdataversion=\"1.0\" data-sp-controldata=\"&#123;&quot;displayMode&quot;&#58;2,&quot;position&quot;&#58;&#123;&quot;sectionFactor&quot;&#58;6,&quot;sectionIndex&quot;&#58;1,&quot;zoneIndex&quot;&#58;1&#125;&#125;\"></div><div data-sp-canvascontrol=\"\" data-sp-canvasdataversion=\"1.0\" data-sp-controldata=\"&#123;&quot;displayMode&quot;&#58;2,&quot;position&quot;&#58;&#123;&quot;sectionFactor&quot;&#58;6,&quot;sectionIndex&quot;&#58;2,&quot;zoneIndex&quot;&#58;1&#125;&#125;\"></div></div>"
+      CanvasContent1: mockEmptyPage
     });
   });
 
@@ -201,7 +260,7 @@ describe(commands.PAGE_SECTION_REMOVE, () => {
             "WikiField": null,
             "Title": "Nova",
             "ClientSideApplicationId": "b6917cb1-93a0-4b97-a84d-7cf49975d4ec",
-            "CanvasContent1": "<div><div data-sp-canvascontrol=\"\" data-sp-canvasdataversion=\"1.0\" data-sp-controldata=\"&#123;&quot;position&quot;&#58;&#123;&quot;layoutIndex&quot;&#58;1,&quot;zoneIndex&quot;&#58;1,&quot;zoneId&quot;&#58;&quot;f4e1f0eb-3b93-4cd0-8cbd-a69d61bcbf7c&quot;,&quot;sectionIndex&quot;&#58;1,&quot;sectionFactor&quot;&#58;12,&quot;controlIndex&quot;&#58;1&#125;,&quot;id&quot;&#58;&quot;d3f007be-0aa7-496f-aa32-3dcc4f95f8a2&quot;,&quot;controlType&quot;&#58;4,&quot;addedFromPersistedData&quot;&#58;true,&quot;isFromSectionTemplate&quot;&#58;false&#125;\"><div data-sp-rte=\"\"><p>test</p></div></div><div data-sp-canvascontrol=\"\" data-sp-canvasdataversion=\"1.0\" data-sp-controldata=\"&#123;&quot;position&quot;&#58;&#123;&quot;layoutIndex&quot;&#58;1,&quot;zoneIndex&quot;&#58;2,&quot;zoneId&quot;&#58;&quot;e3784bbf-0da5-4d78-8f68-230de94a65ac&quot;,&quot;sectionIndex&quot;&#58;1,&quot;sectionFactor&quot;&#58;6,&quot;controlIndex&quot;&#58;1&#125;,&quot;zoneGroupMetadata&quot;&#58;&#123;&quot;type&quot;&#58;1,&quot;isExpanded&quot;&#58;true,&quot;showDividerLine&quot;&#58;true,&quot;iconAlignment&quot;&#58;&quot;right&quot;,&quot;displayName&quot;&#58;&quot;Test&quot;&#125;,&quot;id&quot;&#58;&quot;98c29949-d546-4ee8-a771-8092b267014c&quot;,&quot;controlType&quot;&#58;4,&quot;addedFromPersistedData&quot;&#58;true,&quot;isFromSectionTemplate&quot;&#58;false&#125;\"><div data-sp-rte=\"\"><p>Test</p></div></div><div data-sp-canvascontrol=\"\" data-sp-canvasdataversion=\"1.0\" data-sp-controldata=\"&#123;&quot;position&quot;&#58;&#123;&quot;layoutIndex&quot;&#58;1,&quot;zoneIndex&quot;&#58;2,&quot;zoneId&quot;&#58;&quot;e3784bbf-0da5-4d78-8f68-230de94a65ac&quot;,&quot;sectionIndex&quot;&#58;2,&quot;sectionFactor&quot;&#58;6,&quot;controlIndex&quot;&#58;1&#125;,&quot;zoneGroupMetadata&quot;&#58;&#123;&quot;type&quot;&#58;1,&quot;isExpanded&quot;&#58;true,&quot;showDividerLine&quot;&#58;true,&quot;iconAlignment&quot;&#58;&quot;right&quot;,&quot;displayName&quot;&#58;&quot;Test&quot;&#125;,&quot;id&quot;&#58;&quot;emptySection&quot;,&quot;addedFromPersistedData&quot;&#58;true&#125;\"></div><div data-sp-canvascontrol=\"\" data-sp-canvasdataversion=\"1.0\" data-sp-controldata=\"&#123;&quot;controlType&quot;&#58;0,&quot;pageSettingsSlice&quot;&#58;&#123;&quot;isDefaultDescription&quot;&#58;true,&quot;isDefaultThumbnail&quot;&#58;true,&quot;isSpellCheckEnabled&quot;&#58;true,&quot;globalRichTextStylingVersion&quot;&#58;1,&quot;rtePageSettings&quot;&#58;&#123;&quot;contentVersion&quot;&#58;5&#125;,&quot;isEmailReady&quot;&#58;false,&quot;webPartsPageSettings&quot;&#58;&#123;&quot;isTitleHeadingLevelsEnabled&quot;&#58;false&#125;&#125;&#125;\"></div></div>",
+            "CanvasContent1": `<div>${mockOneColumnSectionHTML()}${mockOneColumnSectionHTML(2, false, true)}${mockPageSettingsHTML}</div>`,
             "BannerImageUrl": {
               "Description": "/_layouts/15/images/sitepagethumbnail.png",
               "Url": "/_layouts/15/images/sitepagethumbnail.png"
@@ -265,7 +324,7 @@ describe(commands.PAGE_SECTION_REMOVE, () => {
 
     await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', section: 1, force: true } });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, {
-      CanvasContent1: '<div><div data-sp-canvascontrol="" data-sp-canvasdataversion="1.0" data-sp-controldata="&#123;&quot;controlType&quot;&#58;4,&quot;editorType&quot;&#58;&quot;CKEditor&quot;,&quot;id&quot;&#58;&quot;98c29949-d546-4ee8-a771-8092b267014c&quot;,&quot;position&quot;&#58;&#123;&quot;controlIndex&quot;&#58;1,&quot;sectionFactor&quot;&#58;6,&quot;sectionIndex&quot;&#58;1,&quot;zoneIndex&quot;&#58;1,&quot;zoneId&quot;&#58;&quot;e3784bbf-0da5-4d78-8f68-230de94a65ac&quot;&#125;,&quot;zoneGroupMetadata&quot;&#58;&#123;&quot;type&quot;&#58;1,&quot;isExpanded&quot;&#58;true,&quot;showDividerLine&quot;&#58;true,&quot;iconAlignment&quot;&#58;&quot;right&quot;,&quot;displayName&quot;&#58;&quot;Test&quot;&#125;&#125;"><div data-sp-rte=""><p>Test</p></div></div><div data-sp-canvascontrol="" data-sp-canvasdataversion="1.0" data-sp-controldata="&#123;&quot;displayMode&quot;&#58;2,&quot;position&quot;&#58;&#123;&quot;sectionFactor&quot;&#58;6,&quot;sectionIndex&quot;&#58;2,&quot;zoneIndex&quot;&#58;1,&quot;zoneId&quot;&#58;&quot;e3784bbf-0da5-4d78-8f68-230de94a65ac&quot;&#125;,&quot;zoneGroupMetadata&quot;&#58;&#123;&quot;type&quot;&#58;1,&quot;isExpanded&quot;&#58;true,&quot;showDividerLine&quot;&#58;true,&quot;iconAlignment&quot;&#58;&quot;right&quot;,&quot;displayName&quot;&#58;&quot;Test&quot;&#125;&#125;"></div><div data-sp-canvascontrol="" data-sp-canvasdataversion="1.0" data-sp-controldata="&#123;&quot;controlType&quot;&#58;0,&quot;pageSettingsSlice&quot;&#58;&#123;&quot;isDefaultDescription&quot;&#58;true,&quot;isDefaultThumbnail&quot;&#58;true,&quot;isSpellCheckEnabled&quot;&#58;true,&quot;globalRichTextStylingVersion&quot;&#58;1,&quot;rtePageSettings&quot;&#58;&#123;&quot;contentVersion&quot;&#58;5&#125;,&quot;isEmailReady&quot;&#58;false,&quot;webPartsPageSettings&quot;&#58;&#123;&quot;isTitleHeadingLevelsEnabled&quot;&#58;false&#125;&#125;&#125;"></div></div>'
+      CanvasContent1: `<div>${mockOneColumnSectionHTML(1, false, true)}${mockPageSettingsHTML}</div>`
     });
   });
 
@@ -282,7 +341,7 @@ describe(commands.PAGE_SECTION_REMOVE, () => {
             "WikiField": null,
             "Title": "Nova",
             "ClientSideApplicationId": "b6917cb1-93a0-4b97-a84d-7cf49975d4ec",
-            "CanvasContent1": "<div><div data-sp-canvascontrol=\"\" data-sp-canvasdataversion=\"1.0\" data-sp-controldata=\"&#123;&quot;position&quot;&#58;&#123;&quot;layoutIndex&quot;&#58;1,&quot;zoneIndex&quot;&#58;1,&quot;zoneId&quot;&#58;&quot;f4e1f0eb-3b93-4cd0-8cbd-a69d61bcbf7c&quot;,&quot;sectionIndex&quot;&#58;1,&quot;sectionFactor&quot;&#58;12,&quot;controlIndex&quot;&#58;1&#125;,&quot;id&quot;&#58;&quot;d3f007be-0aa7-496f-aa32-3dcc4f95f8a2&quot;,&quot;controlType&quot;&#58;4,&quot;addedFromPersistedData&quot;&#58;true,&quot;isFromSectionTemplate&quot;&#58;false,&quot;contentVersion&quot;&#58;5&#125;\"><div data-sp-rte=\"\"><p>test</p></div></div><div data-sp-canvascontrol=\"\" data-sp-canvasdataversion=\"1.0\" data-sp-controldata=\"&#123;&quot;position&quot;&#58;&#123;&quot;layoutIndex&quot;&#58;1,&quot;zoneIndex&quot;&#58;2,&quot;zoneId&quot;&#58;&quot;e3784bbf-0da5-4d78-8f68-230de94a65ac&quot;,&quot;sectionIndex&quot;&#58;1,&quot;sectionFactor&quot;&#58;6,&quot;controlIndex&quot;&#58;1&#125;,&quot;zoneGroupMetadata&quot;&#58;&#123;&quot;type&quot;&#58;0,&quot;isExpanded&quot;&#58;true,&quot;showDividerLine&quot;&#58;true,&quot;iconAlignment&quot;&#58;&quot;right&quot;,&quot;displayName&quot;&#58;&quot;Test&quot;&#125;,&quot;id&quot;&#58;&quot;98c29949-d546-4ee8-a771-8092b267014c&quot;,&quot;controlType&quot;&#58;4,&quot;addedFromPersistedData&quot;&#58;true,&quot;isFromSectionTemplate&quot;&#58;false,&quot;contentVersion&quot;&#58;5&#125;\"><div data-sp-rte=\"\"><p>Test</p></div></div><div data-sp-canvascontrol=\"\" data-sp-canvasdataversion=\"1.0\" data-sp-controldata=\"&#123;&quot;position&quot;&#58;&#123;&quot;layoutIndex&quot;&#58;1,&quot;zoneIndex&quot;&#58;2,&quot;zoneId&quot;&#58;&quot;e3784bbf-0da5-4d78-8f68-230de94a65ac&quot;,&quot;sectionIndex&quot;&#58;2,&quot;sectionFactor&quot;&#58;6,&quot;controlIndex&quot;&#58;1&#125;,&quot;zoneGroupMetadata&quot;&#58;&#123;&quot;type&quot;&#58;0,&quot;isExpanded&quot;&#58;true,&quot;showDividerLine&quot;&#58;true,&quot;iconAlignment&quot;&#58;&quot;right&quot;,&quot;displayName&quot;&#58;&quot;Test&quot;&#125;,&quot;id&quot;&#58;&quot;emptySection&quot;,&quot;addedFromPersistedData&quot;&#58;true&#125;\"></div><div data-sp-canvascontrol=\"\" data-sp-canvasdataversion=\"1.0\" data-sp-controldata=\"&#123;&quot;controlType&quot;&#58;0,&quot;pageSettingsSlice&quot;&#58;&#123;&quot;isDefaultDescription&quot;&#58;true,&quot;isDefaultThumbnail&quot;&#58;true,&quot;isSpellCheckEnabled&quot;&#58;true,&quot;globalRichTextStylingVersion&quot;&#58;1,&quot;rtePageSettings&quot;&#58;&#123;&quot;contentVersion&quot;&#58;5&#125;,&quot;isEmailReady&quot;&#58;false,&quot;webPartsPageSettings&quot;&#58;&#123;&quot;isTitleHeadingLevelsEnabled&quot;&#58;false&#125;&#125;&#125;\"></div><div data-sp-canvascontrol=\"\" data-sp-canvasdataversion=\"1.0\" data-sp-controldata=\"&#123;&quot;controlType&quot;&#58;14&#125;\"><div data-sp-webpart=\"\" data-sp-webpartdataversion=\"1.0\" data-sp-webpartdata=\"&#123;&quot;properties&quot;&#58;&#123;&quot;zoneBackground&quot;&#58;&#123;&quot;e3784bbf-0da5-4d78-8f68-230de94a65ac&quot;&#58;&#123;&quot;type&quot;&#58;&quot;gradient&quot;,&quot;gradient&quot;&#58;&quot;linear-gradient(72.44deg, #9CF6FA 0%, #E3EDB9 100%)&quot;,&quot;useLightText&quot;&#58;false,&quot;overlay&quot;&#58;&#123;&quot;color&quot;&#58;&quot;#FFFFFF&quot;,&quot;opacity&quot;&#58;0&#125;&#125;&#125;&#125;,&quot;serverProcessedContent&quot;&#58;&#123;&quot;htmlStrings&quot;&#58;&#123;&#125;,&quot;searchablePlainTexts&quot;&#58;&#123;&#125;,&quot;imageSources&quot;&#58;&#123;&#125;,&quot;links&quot;&#58;&#123;&#125;&#125;,&quot;dataVersion&quot;&#58;&quot;1.0&quot;&#125;\"><div data-sp-componentid=\"\"></div><div data-sp-htmlproperties=\"\"></div></div></div></div>",
+            "CanvasContent1": `<div>${mockOneColumnSectionHTML()}${mockOneColumnSectionHTML(2, false, true)}${mockOneColumnSectionHTML(3, true)}${mockPageSettingsHTML}${mockBackgroundControlHTML}</div>`,
             "BannerImageUrl": {
               "Description": "/_layouts/15/images/sitepagethumbnail.png",
               "Url": "/_layouts/15/images/sitepagethumbnail.png"
@@ -346,14 +405,72 @@ describe(commands.PAGE_SECTION_REMOVE, () => {
 
     await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', section: 1, force: true } });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, {
-      CanvasContent1: '<div><div data-sp-canvascontrol="" data-sp-canvasdataversion="1.0" data-sp-controldata="&#123;&quot;controlType&quot;&#58;4,&quot;editorType&quot;&#58;&quot;CKEditor&quot;,&quot;id&quot;&#58;&quot;98c29949-d546-4ee8-a771-8092b267014c&quot;,&quot;position&quot;&#58;&#123;&quot;controlIndex&quot;&#58;1,&quot;sectionFactor&quot;&#58;6,&quot;sectionIndex&quot;&#58;1,&quot;zoneIndex&quot;&#58;1,&quot;zoneId&quot;&#58;&quot;e3784bbf-0da5-4d78-8f68-230de94a65ac&quot;&#125;,&quot;zoneGroupMetadata&quot;&#58;&#123;&quot;type&quot;&#58;0,&quot;isExpanded&quot;&#58;true,&quot;showDividerLine&quot;&#58;true,&quot;iconAlignment&quot;&#58;&quot;right&quot;,&quot;displayName&quot;&#58;&quot;Test&quot;&#125;&#125;"><div data-sp-rte=""><p>Test</p></div></div><div data-sp-canvascontrol="" data-sp-canvasdataversion="1.0" data-sp-controldata="&#123;&quot;displayMode&quot;&#58;2,&quot;position&quot;&#58;&#123;&quot;sectionFactor&quot;&#58;6,&quot;sectionIndex&quot;&#58;2,&quot;zoneIndex&quot;&#58;1,&quot;zoneId&quot;&#58;&quot;e3784bbf-0da5-4d78-8f68-230de94a65ac&quot;&#125;,&quot;zoneGroupMetadata&quot;&#58;&#123;&quot;type&quot;&#58;0,&quot;isExpanded&quot;&#58;true,&quot;showDividerLine&quot;&#58;true,&quot;iconAlignment&quot;&#58;&quot;right&quot;,&quot;displayName&quot;&#58;&quot;Test&quot;&#125;&#125;"></div><div data-sp-canvascontrol="" data-sp-canvasdataversion="1.0" data-sp-controldata="&#123;&quot;controlType&quot;&#58;0,&quot;pageSettingsSlice&quot;&#58;&#123;&quot;isDefaultDescription&quot;&#58;true,&quot;isDefaultThumbnail&quot;&#58;true,&quot;isSpellCheckEnabled&quot;&#58;true,&quot;globalRichTextStylingVersion&quot;&#58;1,&quot;rtePageSettings&quot;&#58;&#123;&quot;contentVersion&quot;&#58;5&#125;,&quot;isEmailReady&quot;&#58;false,&quot;webPartsPageSettings&quot;&#58;&#123;&quot;isTitleHeadingLevelsEnabled&quot;&#58;false&#125;&#125;&#125;"></div><div data-sp-canvascontrol="" data-sp-canvasdataversion="1.0" data-sp-controldata="&#123;&quot;controlType&quot;&#58;14&#125;"><div data-sp-webpart="" data-sp-webpartdataversion="1.0" data-sp-webpartdata="&#123;&quot;dataVersion&quot;&#58;&quot;1.0&quot;,&quot;properties&quot;&#58;&#123;&quot;zoneBackground&quot;&#58;&#123;&quot;e3784bbf-0da5-4d78-8f68-230de94a65ac&quot;&#58;&#123;&quot;type&quot;&#58;&quot;gradient&quot;,&quot;gradient&quot;&#58;&quot;linear-gradient(72.44deg, #9CF6FA 0%, #E3EDB9 100%)&quot;,&quot;useLightText&quot;&#58;false,&quot;overlay&quot;&#58;&#123;&quot;color&quot;&#58;&quot;#FFFFFF&quot;,&quot;opacity&quot;&#58;0&#125;&#125;&#125;&#125;,&quot;serverProcessedContent&quot;&#58;&#123;&quot;htmlStrings&quot;&#58;&#123;&#125;,&quot;searchablePlainTexts&quot;&#58;&#123;&#125;,&quot;imageSources&quot;&#58;&#123;&#125;,&quot;links&quot;&#58;&#123;&#125;&#125;&#125;"><div data-sp-componentid=""></div><div data-sp-htmlproperties=""></div></div></div></div>'
+      CanvasContent1: `<div>${mockOneColumnSectionHTML(1, false, true)}${mockOneColumnSectionHTML(2, true)}${mockPageSettingsHTML}${mockBackgroundControlHTML}</div>`
     });
   });
 
-  it('removes sections on the modern page (debug)', async () => {
+  it('removes a section from the modern page while preserving the vertical section', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/GetFileByServerRelativePath(DecodedUrl='/sites/team-a/SitePages/home.aspx')`) > -1) {
-        return apiResponse;
+        return {
+          "ListItemAllFields": {
+            "FileSystemObjectType": 0,
+            "Id": 9,
+            "ServerRedirectedEmbedUri": null,
+            "ServerRedirectedEmbedUrl": "",
+            "ContentTypeId": "0x0101009D1CB255DA76424F860D91F20E6C41180070E97A63FCC58F47B8FE04D0654FD44E",
+            "WikiField": null,
+            "Title": "Nova",
+            "ClientSideApplicationId": "b6917cb1-93a0-4b97-a84d-7cf49975d4ec",
+            "CanvasContent1": `<div>${mockVerticalSectionHTML()}${mockOneColumnSectionHTML(2)}${mockOneColumnSectionHTML(3, false, true)}${mockOneColumnSectionHTML(4, true)}${mockPageSettingsHTML}</div>`,
+            "BannerImageUrl": {
+              "Description": "/_layouts/15/images/sitepagethumbnail.png",
+              "Url": "/_layouts/15/images/sitepagethumbnail.png"
+            },
+            "Description": "asd",
+            "PromotedState": 0,
+            "FirstPublishedDate": null,
+            "LayoutWebpartsContent": "",
+            "ComplianceAssetId": null,
+            "OData__AuthorBylineId": null,
+            "_AuthorBylineStringId": null,
+            "OData__OriginalSourceUrl": null,
+            "OData__OriginalSourceSiteId": null,
+            "OData__OriginalSourceWebId": null,
+            "OData__OriginalSourceListId": null,
+            "OData__OriginalSourceItemId": null,
+            "ID": 9,
+            "Created": "2018-07-11T16:24:12",
+            "AuthorId": 9,
+            "Modified": "2018-07-11T16:33:57",
+            "EditorId": 9,
+            "OData__CopySource": null,
+            "CheckoutUserId": 9,
+            "OData__UIVersionString": "1.0",
+            "GUID": "903cdabe-7a28-4e96-a55e-c768185d7d9a"
+          },
+          "CheckInComment": "",
+          "CheckOutType": 0,
+          "ContentTag": "{16035D61-EDB9-4758-A490-3D13FCD9FDAA},10,8",
+          "CustomizedPageStatus": 0,
+          "ETag": "\"{16035D61-EDB9-4758-A490-3D13FCD9FDAA},10\"",
+          "Exists": true,
+          "IrmEnabled": false,
+          "Length": "4708",
+          "Level": 255,
+          "LinkingUri": null,
+          "LinkingUrl": "",
+          "MajorVersion": 1,
+          "MinorVersion": 0,
+          "Name": "Nova.aspx",
+          "ServerRelativeUrl": "/SitePages/Nova.aspx",
+          "TimeCreated": "2018-07-11T19:24:12Z",
+          "TimeLastModified": "2018-07-11T19:33:57Z",
+          "Title": "Nova",
+          "UIVersion": 512,
+          "UIVersionLabel": "1.0",
+          "UniqueId": "16035d61-edb9-4758-a490-3d13fcd9fdaa"
+        };
       }
 
       throw 'Invalid request';
@@ -367,9 +484,414 @@ describe(commands.PAGE_SECTION_REMOVE, () => {
       throw `Invalid request ${opts.url}`;
     });
 
-    await command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', section: 1, force: true } });
+    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', section: 4, force: true } });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, {
-      CanvasContent1: '<div><div data-sp-canvascontrol="" data-sp-canvasdataversion="1.0" data-sp-controldata="&#123;&quot;displayMode&quot;&#58;2,&quot;position&quot;&#58;&#123;&quot;sectionFactor&quot;&#58;6,&quot;sectionIndex&quot;&#58;1,&quot;zoneIndex&quot;&#58;1&#125;&#125;"></div><div data-sp-canvascontrol="" data-sp-canvasdataversion="1.0" data-sp-controldata="&#123;&quot;displayMode&quot;&#58;2,&quot;position&quot;&#58;&#123;&quot;sectionFactor&quot;&#58;6,&quot;sectionIndex&quot;&#58;2,&quot;zoneIndex&quot;&#58;1&#125;&#125;"></div></div>'
+      CanvasContent1: `<div>${mockVerticalSectionHTML()}${mockOneColumnSectionHTML(2)}${mockOneColumnSectionHTML(3, false, true)}${mockPageSettingsHTML}</div>`
+    });
+  });
+
+  it('removes a section from the modern page while preserving other sections with standard emphasis settings', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if ((opts.url as string).indexOf(`/_api/web/GetFileByServerRelativePath(DecodedUrl='/sites/team-a/SitePages/home.aspx')`) > -1) {
+        return {
+          "ListItemAllFields": {
+            "FileSystemObjectType": 0,
+            "Id": 9,
+            "ServerRedirectedEmbedUri": null,
+            "ServerRedirectedEmbedUrl": "",
+            "ContentTypeId": "0x0101009D1CB255DA76424F860D91F20E6C41180070E97A63FCC58F47B8FE04D0654FD44E",
+            "WikiField": null,
+            "Title": "Nova",
+            "ClientSideApplicationId": "b6917cb1-93a0-4b97-a84d-7cf49975d4ec",
+            "CanvasContent1": `<div>${mockOneColumnSectionHTML()}${mockOneColumnSectionHTML(2, true)}${mockTwoColumnsSectionHTML(3)}${mockPageSettingsHTML}</div>`,
+            "BannerImageUrl": {
+              "Description": "/_layouts/15/images/sitepagethumbnail.png",
+              "Url": "/_layouts/15/images/sitepagethumbnail.png"
+            },
+            "Description": "asd",
+            "PromotedState": 0,
+            "FirstPublishedDate": null,
+            "LayoutWebpartsContent": "",
+            "ComplianceAssetId": null,
+            "OData__AuthorBylineId": null,
+            "_AuthorBylineStringId": null,
+            "OData__OriginalSourceUrl": null,
+            "OData__OriginalSourceSiteId": null,
+            "OData__OriginalSourceWebId": null,
+            "OData__OriginalSourceListId": null,
+            "OData__OriginalSourceItemId": null,
+            "ID": 9,
+            "Created": "2018-07-11T16:24:12",
+            "AuthorId": 9,
+            "Modified": "2018-07-11T16:33:57",
+            "EditorId": 9,
+            "OData__CopySource": null,
+            "CheckoutUserId": 9,
+            "OData__UIVersionString": "1.0",
+            "GUID": "903cdabe-7a28-4e96-a55e-c768185d7d9a"
+          },
+          "CheckInComment": "",
+          "CheckOutType": 0,
+          "ContentTag": "{16035D61-EDB9-4758-A490-3D13FCD9FDAA},10,8",
+          "CustomizedPageStatus": 0,
+          "ETag": "\"{16035D61-EDB9-4758-A490-3D13FCD9FDAA},10\"",
+          "Exists": true,
+          "IrmEnabled": false,
+          "Length": "4708",
+          "Level": 255,
+          "LinkingUri": null,
+          "LinkingUrl": "",
+          "MajorVersion": 1,
+          "MinorVersion": 0,
+          "Name": "Nova.aspx",
+          "ServerRelativeUrl": "/SitePages/Nova.aspx",
+          "TimeCreated": "2018-07-11T19:24:12Z",
+          "TimeLastModified": "2018-07-11T19:33:57Z",
+          "Title": "Nova",
+          "UIVersion": 512,
+          "UIVersionLabel": "1.0",
+          "UniqueId": "16035d61-edb9-4758-a490-3d13fcd9fdaa"
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/team-a/_api/web/GetFileByServerRelativePath(DecodedUrl='/sites/team-a/sitepages/home.aspx')/ListItemAllFields`) {
+        return;
+      }
+
+      throw `Invalid request ${opts.url}`;
+    });
+
+    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', section: 1, force: true } });
+    assert.deepStrictEqual(postStub.lastCall.args[0].data, {
+      CanvasContent1: `<div>${mockOneColumnSectionHTML(1, true)}${mockTwoColumnsSectionHTML(2)}${mockPageSettingsHTML}</div>`
+    });
+  });
+
+  it('removes a section from the modern page while preserving all other section types', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if ((opts.url as string).indexOf(`/_api/web/GetFileByServerRelativePath(DecodedUrl='/sites/team-a/SitePages/home.aspx')`) > -1) {
+        return {
+          "ListItemAllFields": {
+            "FileSystemObjectType": 0,
+            "Id": 9,
+            "ServerRedirectedEmbedUri": null,
+            "ServerRedirectedEmbedUrl": "",
+            "ContentTypeId": "0x0101009D1CB255DA76424F860D91F20E6C41180070E97A63FCC58F47B8FE04D0654FD44E",
+            "WikiField": null,
+            "Title": "Nova",
+            "ClientSideApplicationId": "b6917cb1-93a0-4b97-a84d-7cf49975d4ec",
+            "CanvasContent1": `<div>${mockOneColumnSectionHTML()}${mockTwoColumnsSectionHTML(2)}${mockThreeColumnSectionHTML(3)}${mockTwoColumnLeftSectionHTML(4)}${mockTwoColumnRightSectionHTML(5)}${mockOneColumnSectionHTML(6)}${mockPageSettingsHTML}</div>`,
+            "BannerImageUrl": {
+              "Description": "/_layouts/15/images/sitepagethumbnail.png",
+              "Url": "/_layouts/15/images/sitepagethumbnail.png"
+            },
+            "Description": "asd",
+            "PromotedState": 0,
+            "FirstPublishedDate": null,
+            "LayoutWebpartsContent": "",
+            "ComplianceAssetId": null,
+            "OData__AuthorBylineId": null,
+            "_AuthorBylineStringId": null,
+            "OData__OriginalSourceUrl": null,
+            "OData__OriginalSourceSiteId": null,
+            "OData__OriginalSourceWebId": null,
+            "OData__OriginalSourceListId": null,
+            "OData__OriginalSourceItemId": null,
+            "ID": 9,
+            "Created": "2018-07-11T16:24:12",
+            "AuthorId": 9,
+            "Modified": "2018-07-11T16:33:57",
+            "EditorId": 9,
+            "OData__CopySource": null,
+            "CheckoutUserId": 9,
+            "OData__UIVersionString": "1.0",
+            "GUID": "903cdabe-7a28-4e96-a55e-c768185d7d9a"
+          },
+          "CheckInComment": "",
+          "CheckOutType": 0,
+          "ContentTag": "{16035D61-EDB9-4758-A490-3D13FCD9FDAA},10,8",
+          "CustomizedPageStatus": 0,
+          "ETag": "\"{16035D61-EDB9-4758-A490-3D13FCD9FDAA},10\"",
+          "Exists": true,
+          "IrmEnabled": false,
+          "Length": "4708",
+          "Level": 255,
+          "LinkingUri": null,
+          "LinkingUrl": "",
+          "MajorVersion": 1,
+          "MinorVersion": 0,
+          "Name": "Nova.aspx",
+          "ServerRelativeUrl": "/SitePages/Nova.aspx",
+          "TimeCreated": "2018-07-11T19:24:12Z",
+          "TimeLastModified": "2018-07-11T19:33:57Z",
+          "Title": "Nova",
+          "UIVersion": 512,
+          "UIVersionLabel": "1.0",
+          "UniqueId": "16035d61-edb9-4758-a490-3d13fcd9fdaa"
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/team-a/_api/web/GetFileByServerRelativePath(DecodedUrl='/sites/team-a/sitepages/home.aspx')/ListItemAllFields`) {
+        return;
+      }
+
+      throw `Invalid request ${opts.url}`;
+    });
+
+    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', section: 6, force: true } });
+    assert.deepStrictEqual(postStub.lastCall.args[0].data, {
+      CanvasContent1: `<div>${mockOneColumnSectionHTML()}${mockTwoColumnsSectionHTML(2)}${mockThreeColumnSectionHTML(3)}${mockTwoColumnLeftSectionHTML(4)}${mockTwoColumnRightSectionHTML(5)}${mockPageSettingsHTML}</div>`
+    });
+  });
+
+  it('removes a section from the modern page while preserving section with text webpart', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if ((opts.url as string).indexOf(`/_api/web/GetFileByServerRelativePath(DecodedUrl='/sites/team-a/SitePages/home.aspx')`) > -1) {
+        return {
+          "ListItemAllFields": {
+            "FileSystemObjectType": 0,
+            "Id": 9,
+            "ServerRedirectedEmbedUri": null,
+            "ServerRedirectedEmbedUrl": "",
+            "ContentTypeId": "0x0101009D1CB255DA76424F860D91F20E6C41180070E97A63FCC58F47B8FE04D0654FD44E",
+            "WikiField": null,
+            "Title": "Nova",
+            "ClientSideApplicationId": "b6917cb1-93a0-4b97-a84d-7cf49975d4ec",
+            "CanvasContent1": `<div>${mockOneColumnSectionHTML()}${mockTwoColumnsSectionHTML(2, false, false, true)}${mockPageSettingsHTML}</div>`,
+            "BannerImageUrl": {
+              "Description": "/_layouts/15/images/sitepagethumbnail.png",
+              "Url": "/_layouts/15/images/sitepagethumbnail.png"
+            },
+            "Description": "asd",
+            "PromotedState": 0,
+            "FirstPublishedDate": null,
+            "LayoutWebpartsContent": "",
+            "ComplianceAssetId": null,
+            "OData__AuthorBylineId": null,
+            "_AuthorBylineStringId": null,
+            "OData__OriginalSourceUrl": null,
+            "OData__OriginalSourceSiteId": null,
+            "OData__OriginalSourceWebId": null,
+            "OData__OriginalSourceListId": null,
+            "OData__OriginalSourceItemId": null,
+            "ID": 9,
+            "Created": "2018-07-11T16:24:12",
+            "AuthorId": 9,
+            "Modified": "2018-07-11T16:33:57",
+            "EditorId": 9,
+            "OData__CopySource": null,
+            "CheckoutUserId": 9,
+            "OData__UIVersionString": "1.0",
+            "GUID": "903cdabe-7a28-4e96-a55e-c768185d7d9a"
+          },
+          "CheckInComment": "",
+          "CheckOutType": 0,
+          "ContentTag": "{16035D61-EDB9-4758-A490-3D13FCD9FDAA},10,8",
+          "CustomizedPageStatus": 0,
+          "ETag": "\"{16035D61-EDB9-4758-A490-3D13FCD9FDAA},10\"",
+          "Exists": true,
+          "IrmEnabled": false,
+          "Length": "4708",
+          "Level": 255,
+          "LinkingUri": null,
+          "LinkingUrl": "",
+          "MajorVersion": 1,
+          "MinorVersion": 0,
+          "Name": "Nova.aspx",
+          "ServerRelativeUrl": "/SitePages/Nova.aspx",
+          "TimeCreated": "2018-07-11T19:24:12Z",
+          "TimeLastModified": "2018-07-11T19:33:57Z",
+          "Title": "Nova",
+          "UIVersion": 512,
+          "UIVersionLabel": "1.0",
+          "UniqueId": "16035d61-edb9-4758-a490-3d13fcd9fdaa"
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/team-a/_api/web/GetFileByServerRelativePath(DecodedUrl='/sites/team-a/sitepages/home.aspx')/ListItemAllFields`) {
+        return;
+      }
+
+      throw `Invalid request ${opts.url}`;
+    });
+
+    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', section: 1, force: true } });
+    assert.deepStrictEqual(postStub.lastCall.args[0].data, {
+      CanvasContent1: `<div>${mockTwoColumnsSectionHTML(1, false, false, true)}${mockPageSettingsHTML}</div>`
+    });
+  });
+
+  it('removes a section from the modern page while preserving section with Bing webpart', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if ((opts.url as string).indexOf(`/_api/web/GetFileByServerRelativePath(DecodedUrl='/sites/team-a/SitePages/home.aspx')`) > -1) {
+        return {
+          "ListItemAllFields": {
+            "FileSystemObjectType": 0,
+            "Id": 9,
+            "ServerRedirectedEmbedUri": null,
+            "ServerRedirectedEmbedUrl": "",
+            "ContentTypeId": "0x0101009D1CB255DA76424F860D91F20E6C41180070E97A63FCC58F47B8FE04D0654FD44E",
+            "WikiField": null,
+            "Title": "Nova",
+            "ClientSideApplicationId": "b6917cb1-93a0-4b97-a84d-7cf49975d4ec",
+            "CanvasContent1": `<div>${mockOneColumnSectionHTML()}${mockTwoColumnsSectionHTML(2, false, false, false, true)}${mockPageSettingsHTML}</div>`,
+            "BannerImageUrl": {
+              "Description": "/_layouts/15/images/sitepagethumbnail.png",
+              "Url": "/_layouts/15/images/sitepagethumbnail.png"
+            },
+            "Description": "asd",
+            "PromotedState": 0,
+            "FirstPublishedDate": null,
+            "LayoutWebpartsContent": "",
+            "ComplianceAssetId": null,
+            "OData__AuthorBylineId": null,
+            "_AuthorBylineStringId": null,
+            "OData__OriginalSourceUrl": null,
+            "OData__OriginalSourceSiteId": null,
+            "OData__OriginalSourceWebId": null,
+            "OData__OriginalSourceListId": null,
+            "OData__OriginalSourceItemId": null,
+            "ID": 9,
+            "Created": "2018-07-11T16:24:12",
+            "AuthorId": 9,
+            "Modified": "2018-07-11T16:33:57",
+            "EditorId": 9,
+            "OData__CopySource": null,
+            "CheckoutUserId": 9,
+            "OData__UIVersionString": "1.0",
+            "GUID": "903cdabe-7a28-4e96-a55e-c768185d7d9a"
+          },
+          "CheckInComment": "",
+          "CheckOutType": 0,
+          "ContentTag": "{16035D61-EDB9-4758-A490-3D13FCD9FDAA},10,8",
+          "CustomizedPageStatus": 0,
+          "ETag": "\"{16035D61-EDB9-4758-A490-3D13FCD9FDAA},10\"",
+          "Exists": true,
+          "IrmEnabled": false,
+          "Length": "4708",
+          "Level": 255,
+          "LinkingUri": null,
+          "LinkingUrl": "",
+          "MajorVersion": 1,
+          "MinorVersion": 0,
+          "Name": "Nova.aspx",
+          "ServerRelativeUrl": "/SitePages/Nova.aspx",
+          "TimeCreated": "2018-07-11T19:24:12Z",
+          "TimeLastModified": "2018-07-11T19:33:57Z",
+          "Title": "Nova",
+          "UIVersion": 512,
+          "UIVersionLabel": "1.0",
+          "UniqueId": "16035d61-edb9-4758-a490-3d13fcd9fdaa"
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/team-a/_api/web/GetFileByServerRelativePath(DecodedUrl='/sites/team-a/sitepages/home.aspx')/ListItemAllFields`) {
+        return;
+      }
+
+      throw `Invalid request ${opts.url}`;
+    });
+
+    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', section: 1, force: true } });
+    assert.deepStrictEqual(postStub.lastCall.args[0].data, {
+      CanvasContent1: `<div>${mockTwoColumnsSectionHTML(1, false, false, false, true)}${mockPageSettingsHTML}</div>`
+    });
+  });
+
+  it('removes second section on the modern page (debug)', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if ((opts.url as string).indexOf(`/_api/web/GetFileByServerRelativePath(DecodedUrl='/sites/team-a/SitePages/home.aspx')`) > -1) {
+        return {
+          "ListItemAllFields": {
+            "FileSystemObjectType": 0,
+            "Id": 9,
+            "ServerRedirectedEmbedUri": null,
+            "ServerRedirectedEmbedUrl": "",
+            "ContentTypeId": "0x0101009D1CB255DA76424F860D91F20E6C41180070E97A63FCC58F47B8FE04D0654FD44E",
+            "WikiField": null,
+            "Title": "Nova",
+            "ClientSideApplicationId": "b6917cb1-93a0-4b97-a84d-7cf49975d4ec",
+            "CanvasContent1": `<div>${mockOneColumnSectionHTML()}${mockOneColumnSectionHTML(2, false, true)}${mockTwoColumnsSectionHTML(3, true)}${mockPageSettingsHTML}</div>`,
+            "BannerImageUrl": {
+              "Description": "/_layouts/15/images/sitepagethumbnail.png",
+              "Url": "/_layouts/15/images/sitepagethumbnail.png"
+            },
+            "Description": "asd",
+            "PromotedState": 0,
+            "FirstPublishedDate": null,
+            "LayoutWebpartsContent": "",
+            "ComplianceAssetId": null,
+            "OData__AuthorBylineId": null,
+            "_AuthorBylineStringId": null,
+            "OData__OriginalSourceUrl": null,
+            "OData__OriginalSourceSiteId": null,
+            "OData__OriginalSourceWebId": null,
+            "OData__OriginalSourceListId": null,
+            "OData__OriginalSourceItemId": null,
+            "ID": 9,
+            "Created": "2018-07-11T16:24:12",
+            "AuthorId": 9,
+            "Modified": "2018-07-11T16:33:57",
+            "EditorId": 9,
+            "OData__CopySource": null,
+            "CheckoutUserId": 9,
+            "OData__UIVersionString": "1.0",
+            "GUID": "903cdabe-7a28-4e96-a55e-c768185d7d9a"
+          },
+          "CheckInComment": "",
+          "CheckOutType": 0,
+          "ContentTag": "{16035D61-EDB9-4758-A490-3D13FCD9FDAA},10,8",
+          "CustomizedPageStatus": 0,
+          "ETag": "\"{16035D61-EDB9-4758-A490-3D13FCD9FDAA},10\"",
+          "Exists": true,
+          "IrmEnabled": false,
+          "Length": "4708",
+          "Level": 255,
+          "LinkingUri": null,
+          "LinkingUrl": "",
+          "MajorVersion": 1,
+          "MinorVersion": 0,
+          "Name": "Nova.aspx",
+          "ServerRelativeUrl": "/SitePages/Nova.aspx",
+          "TimeCreated": "2018-07-11T19:24:12Z",
+          "TimeLastModified": "2018-07-11T19:33:57Z",
+          "Title": "Nova",
+          "UIVersion": 512,
+          "UIVersionLabel": "1.0",
+          "UniqueId": "16035d61-edb9-4758-a490-3d13fcd9fdaa"
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/team-a/_api/web/GetFileByServerRelativePath(DecodedUrl='/sites/team-a/sitepages/home.aspx')/ListItemAllFields`) {
+        return;
+      }
+
+      throw `Invalid request ${opts.url}`;
+    });
+
+    await command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', section: 2, force: true } });
+    assert.deepStrictEqual(postStub.lastCall.args[0].data, {
+      CanvasContent1: `<div>${mockOneColumnSectionHTML()}${mockTwoColumnsSectionHTML(2, true)}${mockPageSettingsHTML}</div>`
     });
   });
 

@@ -117,6 +117,11 @@ function getGUID(): string {
 export type CanvasColumnFactorType = 0 | 2 | 4 | 6 | 8 | 12;
 
 /**
+ * Column Layout index where 1 is the default layout and 2 is the Vertical layout
+ */
+export type CanvasColumnLayoutIndex = 1 | 2;
+
+/**
  * Gets the next order value 1 based for the provided collection
  * 
  * @param collection Collection of orderable things
@@ -372,6 +377,12 @@ export class ClientSidePage {
           control.fromHtml(markup);
           page.pageSettings = <PageSettings>control;
           break;
+        case 1:
+          // empty canvas column
+          control = new CanvasColumn(null, 0);
+          control.fromHtml(markup);
+          page.mergeColumnToTree(<CanvasColumn>control);
+          break;
         case 3:
           // client side webpart
           control = new ClientSideWebpart("");
@@ -451,9 +462,9 @@ export class ClientSidePage {
       }
     }
 
-    const sections = this.sections.filter(s => s.order === zoneIndex);
+    const sections = this.sections.filter(s => s.order === zoneIndex && s.layoutIndex === (control.controlData?.position.layoutIndex ?? 1));
     if (sections.length < 1) {
-      section = new CanvasSection(this, zoneIndex, [], control?.controlData?.position.zoneId, control.controlData?.zoneGroupMetadata);
+      section = new CanvasSection(this, zoneIndex, [], control?.controlData);
       this.sections.push(section);
     } else {
       section = sections[0];
@@ -479,12 +490,12 @@ export class ClientSidePage {
    */
   private mergeColumnToTree(column: CanvasColumn): void {
 
-    const order = column.controlData && hOP(column.controlData, "position") && hOP(column.controlData.position, "zoneIndex") ? column.controlData.position.zoneIndex : 0;
+    const order = column?.controlData?.position.zoneIndex || 0;
     let section: CanvasSection | null = null;
-    const sections = this.sections.filter(s => s.order === order);
+    const sections = this.sections.filter(s => s.order === order && s.layoutIndex === (column?.controlData?.position.layoutIndex ?? 1));
 
     if (sections.length < 1) {
-      section = new CanvasSection(this, order, [], column.controlData?.position?.zoneId, column.controlData?.zoneGroupMetadata);
+      section = new CanvasSection(this, order, [], column.controlData);
       this.sections.push(section);
     } else {
       section = sections[0];
@@ -496,7 +507,21 @@ export class ClientSidePage {
 }
 
 export class CanvasSection {
-  constructor(public page: ClientSidePage, public order: number, public columns: CanvasColumn[] = [], public zoneId?: string, public zoneGroupMetadata?: ZoneGroupMetadata) {
+  public zoneId?: string;
+  public zoneGroupMetadata?: ZoneGroupMetadata;
+  public emphasis?: Emphasis;
+  public layoutIndex?: CanvasColumnLayoutIndex;
+  public isLayoutReflowOnTop?: boolean;
+
+  constructor(public page: ClientSidePage,
+    public order: number,
+    public columns: CanvasColumn[] = [],
+    public controlData?: ClientSideControlData) {
+    this.zoneId = this.controlData?.position.zoneId || getGUID();
+    this.zoneGroupMetadata = this.controlData?.zoneGroupMetadata;
+    this.emphasis = this.controlData?.emphasis;
+    this.layoutIndex = this.controlData?.position.layoutIndex ?? 1;
+    this.isLayoutReflowOnTop = this.controlData?.position.isLayoutReflowOnTop;
   }
 
   /**
@@ -536,12 +561,12 @@ export class CanvasSection {
 abstract class CanvasControl {
 
   constructor(
-    protected controlType: number | undefined,
-    public dataVersion: string | null,
-    public column: CanvasColumn | undefined = undefined,
+    protected controlType?: number,
+    public dataVersion?: string | null,
+    public column?: CanvasColumn,
     public order = 1,
     public id: string | undefined = getGUID(),
-    public controlData: ClientSideControlData | null = null,
+    public controlData?: ClientSideControlData,
     public dynamicDataPaths: any = null,
     public dynamicDataValues: any = null) { }
 
@@ -584,7 +609,6 @@ export class PageSettings extends CanvasControl {
 }
 
 export class CanvasColumn extends CanvasControl {
-
   constructor(
     public section: CanvasSection | null,
     public order: number,
@@ -647,16 +671,29 @@ export class CanvasColumn extends CanvasControl {
   }
 
   public getControlData(): ClientSideControlData {
-    return {
-      displayMode: 2,
+    const controlData: ClientSideControlData = {
       position: {
         sectionFactor: this.factor,
         sectionIndex: this.order,
-        zoneIndex: this.section ? this.section.order : 0,
-        zoneId: this.section?.zoneId
+        zoneIndex: this.section?.order || 0,
+        zoneId: this.section?.zoneId,
+        layoutIndex: this.section?.layoutIndex,
       },
       zoneGroupMetadata: this.section?.zoneGroupMetadata,
+      emphasis: this.section?.emphasis
     };
+
+    if (this.column?.section?.isLayoutReflowOnTop !== undefined) {
+      controlData.position.isLayoutReflowOnTop = this.column.section.isLayoutReflowOnTop;
+    }
+
+    const isEmptyColumn = this.controls.length === 0;
+    if (isEmptyColumn) {
+      controlData.id = "emptySection";
+      controlData.controlType = 1;
+    }
+
+    return controlData;
   }
 
   /**
@@ -787,7 +824,7 @@ export class ClientSideText extends ClientSidePart {
 
   public getControlData(): ClientSideControlData {
 
-    return {
+    const controlData: ClientSideControlData = {
       controlType: this.controlType,
       editorType: "CKEditor",
       id: this.id,
@@ -796,10 +833,18 @@ export class ClientSideText extends ClientSidePart {
         sectionFactor: this.column ? this.column.factor : 0,
         sectionIndex: this.column ? this.column.order : 0,
         zoneIndex: this.column && this.column.section ? this.column.section.order : 0,
-        zoneId: this.column?.section?.zoneId
+        zoneId: this.column?.section?.zoneId,
+        layoutIndex: this.column?.section?.layoutIndex
       },
       zoneGroupMetadata: this.column?.section?.zoneGroupMetadata,
+      emphasis: this.column?.section?.emphasis,
     };
+
+    if (this.column?.section?.isLayoutReflowOnTop !== undefined) {
+      controlData.position.isLayoutReflowOnTop = this.column.section.isLayoutReflowOnTop;
+    }
+
+    return controlData;
   }
 
   public toHtml(index: number): string {
@@ -941,7 +986,7 @@ export class ClientSideWebpart extends ClientSidePart {
 
   public getControlData(): ClientSideControlData {
 
-    return {
+    const controlData: ClientSideControlData = {
       controlType: this.controlType,
       id: this.id,
       position: {
@@ -949,11 +994,19 @@ export class ClientSideWebpart extends ClientSidePart {
         sectionFactor: this.column ? this.column.factor : 0,
         sectionIndex: this.column ? this.column.order : 0,
         zoneIndex: this.column && this.column.section ? this.column.section.order : 0,
-        zoneId: this.column?.section?.zoneId
+        zoneId: this.column?.section?.zoneId,
+        layoutIndex: this.column?.section?.layoutIndex,
       },
       webPartId: this.webPartId,
       zoneGroupMetadata: this.column?.section?.zoneGroupMetadata,
+      emphasis: this.column?.section?.emphasis,
     };
+
+    if (this.column?.section?.isLayoutReflowOnTop !== undefined) {
+      controlData.position.isLayoutReflowOnTop = this.column.section.isLayoutReflowOnTop;
+    }
+
+    return controlData;
 
   }
 
@@ -1099,9 +1152,13 @@ interface ServerProcessedContent {
   links: TypedHash<string>;
 }
 
+export interface Emphasis {
+  zoneEmphasis: ZoneEmphasis;
+}
+
 export interface ClientSideControlPosition {
   controlIndex?: number;
-  layoutIndex?: number;
+  layoutIndex?: CanvasColumnLayoutIndex;
   sectionFactor: CanvasColumnFactorType;
   sectionIndex: number;
   zoneIndex: number;
@@ -1121,13 +1178,12 @@ export interface ClientSideControlData {
   controlType?: number;
   id?: string;
   editorType?: string;
-  emphasis?: { zoneEmphasis?: number };
+  emphasis?: Emphasis;
   position: ClientSideControlPosition;
   reservedHeight?: number;
   reservedWidth?: number;
   webPartData?: any;
   webPartId?: string;
-  displayMode?: number;
   zoneGroupMetadata?: ZoneGroupMetadata;
 }
 

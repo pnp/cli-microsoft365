@@ -280,18 +280,19 @@ describe(commands.PAGE_COLUMN_LIST, () => {
     });
 
     await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', output: 'json', section: 1 } });
-    assert.strictEqual(JSON.stringify(log[0]), JSON.stringify([{
+    const result = JSON.stringify(log[0]).replace(/zoneId&quot;&#58;&quot;[a-f0-9-]+&quot;/g, 'zoneId&quot;&#58;&quot;6330b0ad-6f03-47f9-b1b9-b2f74cc09a79&quot;');
+    assert.strictEqual(result, JSON.stringify([{
       "factor": 6,
       "order": 1,
       "dataVersion": "1.0",
-      "jsonData": "&#123;&quot;displayMode&quot;&#58;2,&quot;position&quot;&#58;&#123;&quot;sectionFactor&quot;&#58;6,&quot;sectionIndex&quot;&#58;1,&quot;zoneIndex&quot;&#58;1&#125;&#125;",
+      "jsonData": "&#123;&quot;position&quot;&#58;&#123;&quot;sectionFactor&quot;&#58;6,&quot;sectionIndex&quot;&#58;1,&quot;zoneIndex&quot;&#58;1,&quot;zoneId&quot;&#58;&quot;6330b0ad-6f03-47f9-b1b9-b2f74cc09a79&quot;,&quot;layoutIndex&quot;&#58;1&#125;&#125;",
       "controls": 1
     },
     {
       "factor": 6,
       "order": 2,
       "dataVersion": "1.0",
-      "jsonData": "&#123;&quot;displayMode&quot;&#58;2,&quot;position&quot;&#58;&#123;&quot;sectionFactor&quot;&#58;6,&quot;sectionIndex&quot;&#58;2,&quot;zoneIndex&quot;&#58;1&#125;&#125;",
+      "jsonData": "&#123;&quot;position&quot;&#58;&#123;&quot;sectionFactor&quot;&#58;6,&quot;sectionIndex&quot;&#58;2,&quot;zoneIndex&quot;&#58;1,&quot;zoneId&quot;&#58;&quot;6330b0ad-6f03-47f9-b1b9-b2f74cc09a79&quot;,&quot;layoutIndex&quot;&#58;1&#125;,&quot;id&quot;&#58;&quot;emptySection&quot;,&quot;controlType&quot;&#58;1&#125;",
       "controls": 0
     }]));
   });
