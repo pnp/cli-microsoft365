@@ -25,7 +25,7 @@ describe(commands.APP_LIST, () => {
     sinon.stub(telemetry, 'trackEvent').resolves();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
-    sinon.stub(accessToken, 'assertDelegatedAccessToken').resolves();
+    sinon.stub(accessToken, 'assertAccessTokenType').resolves();
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
   });

@@ -5,7 +5,7 @@ import { formatting } from '../../../../utils/formatting.js';
 import commands from '../../commands.js';
 import { Outlook } from '../../Outlook.js';
 import { cli } from '../../../../cli/cli.js';
-import DelegatedGraphCommand from '../../../base/DelegatedGraphCommand.js';
+import DelegatedGraphCommand from '../../../base/GraphDelegatedCommand.js';
 
 interface CommandArgs {
   options: Options;
