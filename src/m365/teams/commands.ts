@@ -8,6 +8,7 @@ export default {
   APP_UNINSTALL: `${prefix} app uninstall`,
   APP_UPDATE: `${prefix} app update`,
   CACHE_REMOVE: `${prefix} cache remove`,
+  CALLRECORD_LIST: `${prefix} callrecord list`,
   CHANNEL_ADD: `${prefix} channel add`,
   CHANNEL_GET: `${prefix} channel get`,
   CHANNEL_LIST: `${prefix} channel list`,

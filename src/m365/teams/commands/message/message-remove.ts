@@ -5,7 +5,7 @@ import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { teams } from '../../../../utils/teams.js';
 import { validation } from '../../../../utils/validation.js';
-import DelegatedGraphCommand from '../../../base/DelegatedGraphCommand.js';
+import GraphDelegatedCommand from '../../../base/GraphDelegatedCommand.js';
 import commands from '../../commands.js';
 
 interface CommandArgs {
@@ -21,7 +21,7 @@ interface Options extends GlobalOptions {
   force?: boolean;
 }
 
-class TeamsMessageRemoveCommand extends DelegatedGraphCommand {
+class TeamsMessageRemoveCommand extends GraphDelegatedCommand {
   public get name(): string {
     return commands.MESSAGE_REMOVE;
   }

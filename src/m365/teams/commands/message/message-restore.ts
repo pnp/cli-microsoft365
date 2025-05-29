@@ -3,7 +3,7 @@ import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { validation } from '../../../../utils/validation.js';
 import commands from '../../commands.js';
-import DelegatedGraphCommand from '../../../base/DelegatedGraphCommand.js';
+import GraphDelegatedCommand from '../../../base/GraphDelegatedCommand.js';
 import { teams } from '../../../../utils/teams.js';
 
 interface CommandArgs {
@@ -18,7 +18,7 @@ interface Options extends GlobalOptions {
   id: string;
 }
 
-class TeamsMessageRestoreCommand extends DelegatedGraphCommand {
+class TeamsMessageRestoreCommand extends GraphDelegatedCommand {
   public get name(): string {
     return commands.MESSAGE_RESTORE;
   }

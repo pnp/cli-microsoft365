@@ -9,7 +9,7 @@ import commands from '../../commands.js';
 import { chatUtil } from './chatUtil.js';
 import { cli } from '../../../../cli/cli.js';
 import { formatting } from '../../../../utils/formatting.js';
-import DelegatedGraphCommand from '../../../base/DelegatedGraphCommand.js';
+import GraphDelegatedCommand from '../../../base/GraphDelegatedCommand.js';
 
 interface CommandArgs {
   options: Options;
@@ -22,7 +22,7 @@ interface Options extends GlobalOptions {
   message: string;
 }
 
-class TeamsChatMessageSendCommand extends DelegatedGraphCommand {
+class TeamsChatMessageSendCommand extends GraphDelegatedCommand {
   public get name(): string {
     return commands.CHAT_MESSAGE_SEND;
   }

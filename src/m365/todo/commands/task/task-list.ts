@@ -4,7 +4,7 @@ import GlobalOptions from '../../../../GlobalOptions.js';
 import request from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { odata } from '../../../../utils/odata.js';
-import DelegatedGraphCommand from '../../../base/DelegatedGraphCommand.js';
+import GraphDelegatedCommand from '../../../base/GraphDelegatedCommand.js';
 import commands from '../../commands.js';
 import { ToDoTask } from '../../ToDoTask.js';
 
@@ -17,7 +17,7 @@ interface Options extends GlobalOptions {
   listId?: string;
 }
 
-class TodoTaskListCommand extends DelegatedGraphCommand {
+class TodoTaskListCommand extends GraphDelegatedCommand {
   public get name(): string {
     return commands.TASK_LIST;
   }
