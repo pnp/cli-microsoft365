@@ -266,19 +266,20 @@ describe(commands.PAGE_SECTION_LIST, () => {
     });
 
     await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', output: 'json' } });
-    assert.strictEqual(JSON.stringify(log[0]), JSON.stringify([{
+    const result = JSON.stringify(log[0]).replace(/zoneId&quot;&#58;&quot;[a-f0-9-]+&quot;/g, 'zoneId&quot;&#58;&quot;f14c54a6-6d2b-4fc3-aa90-902d38d18bdb&quot;');
+    assert.strictEqual(result, JSON.stringify([{
       "order": 1,
       "columns": [{
         "factor": 6,
         "order": 1,
         "dataVersion": "1.0",
-        "jsonData": "&#123;&quot;displayMode&quot;&#58;2,&quot;position&quot;&#58;&#123;&quot;sectionFactor&quot;&#58;6,&quot;sectionIndex&quot;&#58;1,&quot;zoneIndex&quot;&#58;1&#125;&#125;"
+        "jsonData": "&#123;&quot;position&quot;&#58;&#123;&quot;sectionFactor&quot;&#58;6,&quot;sectionIndex&quot;&#58;1,&quot;zoneIndex&quot;&#58;1,&quot;zoneId&quot;&#58;&quot;f14c54a6-6d2b-4fc3-aa90-902d38d18bdb&quot;,&quot;layoutIndex&quot;&#58;1&#125;&#125;"
       },
       {
         "factor": 6,
         "order": 2,
         "dataVersion": "1.0",
-        "jsonData": "&#123;&quot;displayMode&quot;&#58;2,&quot;position&quot;&#58;&#123;&quot;sectionFactor&quot;&#58;6,&quot;sectionIndex&quot;&#58;2,&quot;zoneIndex&quot;&#58;1&#125;&#125;"
+        "jsonData": "&#123;&quot;position&quot;&#58;&#123;&quot;sectionFactor&quot;&#58;6,&quot;sectionIndex&quot;&#58;2,&quot;zoneIndex&quot;&#58;1,&quot;zoneId&quot;&#58;&quot;f14c54a6-6d2b-4fc3-aa90-902d38d18bdb&quot;,&quot;layoutIndex&quot;&#58;1&#125;,&quot;id&quot;&#58;&quot;emptySection&quot;,&quot;controlType&quot;&#58;1&#125;"
       }]
     },
     {
@@ -287,13 +288,13 @@ describe(commands.PAGE_SECTION_LIST, () => {
         "factor": 6,
         "order": 1,
         "dataVersion": "1.0",
-        "jsonData": "&#123;&quot;displayMode&quot;&#58;2,&quot;position&quot;&#58;&#123;&quot;sectionFactor&quot;&#58;6,&quot;sectionIndex&quot;&#58;1,&quot;zoneIndex&quot;&#58;2&#125;&#125;"
+        "jsonData": "&#123;&quot;position&quot;&#58;&#123;&quot;sectionFactor&quot;&#58;6,&quot;sectionIndex&quot;&#58;1,&quot;zoneIndex&quot;&#58;2,&quot;zoneId&quot;&#58;&quot;f14c54a6-6d2b-4fc3-aa90-902d38d18bdb&quot;,&quot;layoutIndex&quot;&#58;1&#125;,&quot;id&quot;&#58;&quot;emptySection&quot;,&quot;controlType&quot;&#58;1&#125;"
       },
       {
         "factor": 6,
         "order": 2,
         "dataVersion": "1.0",
-        "jsonData": "&#123;&quot;displayMode&quot;&#58;2,&quot;position&quot;&#58;&#123;&quot;sectionFactor&quot;&#58;6,&quot;sectionIndex&quot;&#58;2,&quot;zoneIndex&quot;&#58;2&#125;&#125;"
+        "jsonData": "&#123;&quot;position&quot;&#58;&#123;&quot;sectionFactor&quot;&#58;6,&quot;sectionIndex&quot;&#58;2,&quot;zoneIndex&quot;&#58;2,&quot;zoneId&quot;&#58;&quot;f14c54a6-6d2b-4fc3-aa90-902d38d18bdb&quot;,&quot;layoutIndex&quot;&#58;1&#125;,&quot;id&quot;&#58;&quot;emptySection&quot;,&quot;controlType&quot;&#58;1&#125;"
       }]
     }]));
   });
