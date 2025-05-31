@@ -64,6 +64,7 @@ describe(commands.APP_ADD, () => {
   });
 
   after(() => {
+    sinon.restore();
     sinonUtil.restore([
       config.set
     ]);
