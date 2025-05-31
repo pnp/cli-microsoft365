@@ -75,6 +75,11 @@ const sidebars: SidebarsConfig = {
           app: [
             {
               type: 'doc',
+              label: 'app add',
+              id: 'cmd/cli/app/app-add'
+            },
+            {
+              type: 'doc',
               label: 'app reconsent',
               id: 'cmd/cli/app/app-reconsent'
             }
