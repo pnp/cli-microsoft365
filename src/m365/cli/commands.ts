@@ -1,6 +1,7 @@
 const prefix: string = 'cli';
 
 export default {
+  APP_ADD: `${prefix} app add`,
   APP_RECONSENT: `${prefix} app reconsent`,
   COMPLETION_CLINK_UPDATE: `${prefix} completion clink update`,
   COMPLETION_PWSH_SETUP: `${prefix} completion pwsh setup`,
