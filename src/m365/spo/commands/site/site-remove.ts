@@ -6,10 +6,10 @@ import { formatting } from '../../../../utils/formatting.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
-import { odata } from '../../../../utils/odata.js';
 import { spo } from '../../../../utils/spo.js';
 import { setTimeout } from 'timers/promises';
 import { urlUtil } from '../../../../utils/urlUtil.js';
+import { ListItemListOptions, spoListItem } from '../../../../utils/spoListItem.js';
 
 interface CommandArgs {
   options: Options;
@@ -264,12 +264,20 @@ class SpoSiteRemoveCommand extends SpoCommand {
       await logger.logToStderr(`Retrieving site info.`);
     }
 
-    const sites = await odata.getAllItems<SiteDetails>(`${this.spoAdminUrl}/_api/web/lists/GetByTitle('DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECOLLECTIONS')/items?$filter=SiteUrl eq '${formatting.encodeQueryParameter(url)}'&$select=GroupId,TimeDeleted,SiteId`);
+    const options: ListItemListOptions = {
+      webUrl: this.spoAdminUrl!,
+      listTitle: 'DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECOLLECTIONS',
+      filter: `SiteUrl eq '${formatting.encodeQueryParameter(url)}'`,
+      fields: ['GroupId', 'TimeDeleted', 'SiteId']
+    };
 
-    if (sites.length === 0) {
+    const listItems = await spoListItem.getListItems(options, logger, this.verbose);
+
+    if (listItems.length === 0) {
       throw `Site not found in the tenant.`;
     }
-    return sites[0];
+
+    return listItems[0] as any;
   }
 
   private async deleteGroupifiedSite(logger: Logger, siteUrl: string): Promise<void> {

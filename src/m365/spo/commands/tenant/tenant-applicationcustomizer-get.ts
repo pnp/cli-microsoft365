@@ -1,14 +1,13 @@
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import { formatting } from '../../../../utils/formatting.js';
-import { odata } from '../../../../utils/odata.js';
 import { spo } from '../../../../utils/spo.js';
-import { urlUtil } from '../../../../utils/urlUtil.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 import { cli } from '../../../../cli/cli.js';
 import { ListItemInstance } from '../listitem/ListItemInstance.js';
+import { ListItemListOptions, spoListItem } from '../../../../utils/spoListItem.js';
 
 interface CommandArgs {
   options: Options;
@@ -106,29 +105,32 @@ class SpoTenantApplicationCustomizerGetCommand extends SpoCommand {
         filter = `Title eq '${args.options.title}'`;
       }
       else if (args.options.id) {
-        filter = `Id eq '${args.options.id}'`;
+        filter = `Id eq ${args.options.id}`;
       }
       else {
         filter = `TenantWideExtensionComponentId eq '${args.options.clientSideComponentId}'`;
       }
 
-      const listServerRelativeUrl: string = urlUtil.getServerRelativePath(appCatalogUrl, '/lists/TenantWideExtensions');
-      const listItemInstances = await odata.getAllItems<ListItemInstance>(`${appCatalogUrl}/_api/web/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')/items?$filter=TenantWideExtensionLocation eq 'ClientSideExtension.ApplicationCustomizer' and ${filter}`);
+      const options: ListItemListOptions = {
+        webUrl: appCatalogUrl,
+        listUrl: '/Lists/TenantWideExtensions',
+        filter: `TenantWideExtensionLocation eq 'ClientSideExtension.ApplicationCustomizer' and ${filter}`
+      };
 
-      if (listItemInstances) {
-        if (listItemInstances.length === 0) {
+      const listItems = await spoListItem.getListItems(options, logger, this.verbose);
+
+      if (listItems) {
+        if (listItems.length === 0) {
           throw 'The specified application customizer was not found';
         }
 
-        listItemInstances.forEach(v => delete (v as any)['ID']);
-
         let listItemInstance: ListItemInstance;
-        if (listItemInstances.length > 1) {
-          const resultAsKeyValuePair = formatting.convertArrayToHashTable('Id', listItemInstances);
+        if (listItems.length > 1) {
+          const resultAsKeyValuePair = formatting.convertArrayToHashTable('Id', listItems);
           listItemInstance = await cli.handleMultipleResultsFound<ListItemInstance>(`Multiple application customizers with ${args.options.title || args.options.clientSideComponentId} were found.`, resultAsKeyValuePair);
         }
         else {
-          listItemInstance = listItemInstances[0];
+          listItemInstance = listItems[0];
         }
 
         if (!args.options.tenantWideExtensionComponentProperties) {

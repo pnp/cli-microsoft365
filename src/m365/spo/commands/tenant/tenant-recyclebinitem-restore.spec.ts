@@ -12,8 +12,8 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './tenant-recyclebinitem-restore.js';
-import { odata } from '../../../../utils/odata.js';
 import { formatting } from '../../../../utils/formatting.js';
+import { ListItemListOptions, spoListItem } from '../../../../utils/spoListItem.js';
 
 describe(commands.TENANT_RECYCLEBINITEM_RESTORE, () => {
   let log: any[];
@@ -21,8 +21,9 @@ describe(commands.TENANT_RECYCLEBINITEM_RESTORE, () => {
   let commandInfo: CommandInfo;
 
   const siteUrl = 'https://contoso.sharepoint.com/sites/hr';
+  const spoAdminUrl = 'https://contoso-admin.sharepoint.com';
   const siteRestoreUrl = 'https://contoso-admin.sharepoint.com/_api/SPO.Tenant/RestoreDeletedSite';
-  const odataUrl = `https://contoso-admin.sharepoint.com/_api/web/lists/GetByTitle('DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECOLLECTIONS')/items?$filter=SiteUrl eq '${formatting.encodeQueryParameter(siteUrl)}'&$select=GroupId`;
+  const adminSitesListTitle = 'DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECOLLECTIONS';
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -52,7 +53,7 @@ describe(commands.TENANT_RECYCLEBINITEM_RESTORE, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.post,
-      odata.getAllItems
+      spoListItem.getListItems
     ]);
   });
 
@@ -95,12 +96,16 @@ describe(commands.TENANT_RECYCLEBINITEM_RESTORE, () => {
       throw 'Invalid request';
     });
 
-    sinon.stub(odata, 'getAllItems').callsFake(async (url: string) => {
-      if (url === odataUrl) {
-        return [{ GroupId: groupId }];
+    sinon.stub(spoListItem, 'getListItems').callsFake(async (options: ListItemListOptions) => {
+      if (options.webUrl === spoAdminUrl) {
+        if (options.listTitle === adminSitesListTitle &&
+          options.filter === `SiteUrl eq '${formatting.encodeQueryParameter(siteUrl)}'`
+        ) {
+          return [{ GroupId: groupId }] as any;
+        }
       }
 
-      throw 'Invalid request';
+      throw 'Invalid request: ' + JSON.stringify(options);
     });
 
     await command.action(logger, { options: { siteUrl: siteUrl, verbose: true } });
@@ -116,12 +121,16 @@ describe(commands.TENANT_RECYCLEBINITEM_RESTORE, () => {
       throw 'Invalid request';
     });
 
-    sinon.stub(odata, 'getAllItems').callsFake(async (url: string) => {
-      if (url === odataUrl) {
-        return [{ GroupId: '00000000-0000-0000-0000-000000000000' }];
+    sinon.stub(spoListItem, 'getListItems').callsFake(async (options: ListItemListOptions) => {
+      if (options.webUrl === spoAdminUrl) {
+        if (options.listTitle === adminSitesListTitle &&
+          options.filter === `SiteUrl eq '${formatting.encodeQueryParameter(siteUrl)}'`
+        ) {
+          return [{ GroupId: '00000000-0000-0000-0000-000000000000' }] as any;
+        }
       }
 
-      throw 'Invalid request';
+      throw 'Invalid request: ' + JSON.stringify(options);
     });
 
     await command.action(logger, { options: { siteUrl: siteUrl, verbose: true } });
