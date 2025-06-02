@@ -1,28 +1,15 @@
+import { Application } from "@microsoft/microsoft-graph-types";
 import { v4 } from 'uuid';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
-import { formatting } from '../../../../utils/formatting.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
-import { cli } from '../../../../cli/cli.js';
 import { entraApp } from '../../../../utils/entraApp.js';
 
 interface CommandArgs {
   options: Options;
 }
-
-interface AppInfo {
-  appRoles: {
-    allowedMemberTypes: ('User' | 'Application')[];
-    description: string;
-    displayName: string;
-    id: string;
-    value: string;
-  }[];
-  id: string;
-}
-
 interface Options extends GlobalOptions {
   allowedMembers: string;
   appId?: string;
@@ -109,8 +96,7 @@ class EntraAppRoleAddCommand extends GraphCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
-      const appId = await this.getAppObjectId(args, logger);
-      const appInfo = await this.getAppInfo(appId, logger);
+      const appInfo = await this.getAppInfo(args, logger);
 
       if (this.verbose) {
         await logger.logToStderr(`Adding role ${args.options.name} to Microsoft Entra app ${appInfo.id}...`);
@@ -123,7 +109,7 @@ class EntraAppRoleAddCommand extends GraphCommand {
         },
         responseType: 'json',
         data: {
-          appRoles: appInfo.appRoles.concat({
+          appRoles: appInfo.appRoles!.concat({
             displayName: args.options.name,
             description: args.options.description,
             id: v4(),
@@ -140,22 +126,6 @@ class EntraAppRoleAddCommand extends GraphCommand {
     }
   }
 
-  private async getAppInfo(appId: string, logger: Logger): Promise<AppInfo> {
-    if (this.verbose) {
-      await logger.logToStderr(`Retrieving information about roles for Microsoft Entra app ${appId}...`);
-    }
-
-    const requestOptions: CliRequestOptions = {
-      url: `${this.resource}/v1.0/myorganization/applications/${appId}?$select=id,appRoles`,
-      headers: {
-        accept: 'application/json;odata.metadata=none'
-      },
-      responseType: 'json'
-    };
-
-    return request.get(requestOptions);
-  }
-
   private getAllowedMemberTypes(args: CommandArgs): ('User' | 'Application')[] {
     switch (args.options.allowedMembers) {
       case 'usersGroups':
@@ -169,43 +139,21 @@ class EntraAppRoleAddCommand extends GraphCommand {
     }
   }
 
-  private async getAppObjectId(args: CommandArgs, logger: Logger): Promise<string> {
-    if (args.options.appObjectId) {
-      return args.options.appObjectId;
-    }
-
-    const { appId, appName } = args.options;
+  private async getAppInfo(args: CommandArgs, logger: Logger): Promise<Application> {
+    const { appObjectId, appId, appName } = args.options;
 
     if (this.verbose) {
-      await logger.logToStderr(`Retrieving information about Microsoft Entra app ${appId ? appId : appName}...`);
+      await logger.logToStderr(`Retrieving information about Microsoft Entra app ${appObjectId ? appObjectId : (appId ? appId : appName) }...`);
     }
 
-    if (appId) {
-      const app = await entraApp.getAppRegistrationByAppId(appId, ['id']);
-      return app.id!;
+    if (appObjectId) {
+      return await entraApp.getAppRegistrationByObjectId(appObjectId, ['id', 'appRoles']);
+    }
+    else if (appId) {
+      return await entraApp.getAppRegistrationByAppId(appId, ['id', 'appRoles']);
     }
     else {
-      const requestOptions: CliRequestOptions = {
-        url: `${this.resource}/v1.0/myorganization/applications?$filter=displayName eq '${formatting.encodeQueryParameter(appName as string)}'&$select=id`,
-        headers: {
-          accept: 'application/json;odata.metadata=none'
-        },
-        responseType: 'json'
-      };
-
-      const res = await request.get<{ value: { id: string }[] }>(requestOptions);
-
-      if (res.value.length === 1) {
-        return res.value[0].id;
-      }
-
-      if (res.value.length === 0) {
-        throw `No Microsoft Entra application registration with name ${appName} found`;
-      }
-
-      const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', res.value);
-      const result = await cli.handleMultipleResultsFound<{ id: string }>(`Multiple Microsoft Entra application registrations with name '${appName}' found.`, resultAsKeyValuePair);
-      return result.id;
+      return await entraApp.getAppRegistrationByAppName(appName!, ['id', 'appRoles']);
     }
   }
 }

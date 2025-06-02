@@ -5,8 +5,6 @@ import commands from "../../commands.js";
 import request, { CliRequestOptions } from "../../../../request.js";
 import { Logger } from "../../../../cli/Logger.js";
 import { validation } from "../../../../utils/validation.js";
-import { formatting } from "../../../../utils/formatting.js";
-import { cli } from "../../../../cli/cli.js";
 import { entraApp } from "../../../../utils/entraApp.js";
 
 interface CommandArgs {
@@ -124,27 +122,8 @@ class EntraAppPermissionListCommand extends GraphCommand {
       return app.id!;
     }
     else {
-      const requestOptions: CliRequestOptions = {
-        url: `${this.resource}/v1.0/myorganization/applications?$filter=displayName eq '${formatting.encodeQueryParameter(appName as string)}'&$select=id`,
-        headers: {
-          accept: 'application/json;odata.metadata=none'
-        },
-        responseType: 'json'
-      };
-
-      const res = await request.get<{ value: { id: string }[] }>(requestOptions);
-
-      if (res.value.length === 1) {
-        return res.value[0].id;
-      }
-
-      if (res.value.length === 0) {
-        throw `No Microsoft Entra application registration with name ${appName} found`;
-      }
-
-      const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', res.value);
-      const result = await cli.handleMultipleResultsFound<{ id: string }>(`Multiple Entra application registrations with name '${appName}' found.`, resultAsKeyValuePair);
-      return result.id;
+      const app = await entraApp.getAppRegistrationByAppName(appName!, ["id"]);
+      return app.id!;
     }
   }
 

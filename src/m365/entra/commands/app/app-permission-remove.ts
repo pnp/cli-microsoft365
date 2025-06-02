@@ -7,7 +7,7 @@ import request, { CliRequestOptions } from "../../../../request.js";
 import { Logger } from "../../../../cli/Logger.js";
 import { validation } from "../../../../utils/validation.js";
 import { cli } from "../../../../cli/cli.js";
-import { formatting } from "../../../../utils/formatting.js";
+import { entraApp } from "../../../../utils/entraApp.js";
 
 interface CommandArgs {
   options: Options;
@@ -147,49 +147,49 @@ class EntraAppPermissionRemoveCommand extends GraphCommand {
           await logger.logToStderr(`Removing permissions from application ${args.options.appId || args.options.appObjectId || args.options.appName}...`);
         }
 
-        const appObject = await this.getAppObject(args.options);
+        const entraApp = await this.getEntraApp(args.options, logger);
         const servicePrincipals = await odata.getAllItems<ServicePrincipal>(`${this.resource}/v1.0/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames`);
 
         const appPermissions: AppPermission[] = [];
 
         if (args.options.delegatedPermissions) {
           const delegatedPermissions = await this.getRequiredResourceAccessForApis(servicePrincipals, args.options.delegatedPermissions, ScopeType.Scope, appPermissions, logger);
-          this.removePermissionsFromResourceArray(delegatedPermissions, appObject.requiredResourceAccess!);
+          this.removePermissionsFromResourceArray(delegatedPermissions, entraApp.requiredResourceAccess!);
         }
 
         if (args.options.applicationPermissions) {
           const applicationPermissions = await this.getRequiredResourceAccessForApis(servicePrincipals, args.options.applicationPermissions, ScopeType.Role, appPermissions, logger);
-          this.removePermissionsFromResourceArray(applicationPermissions, appObject.requiredResourceAccess!);
+          this.removePermissionsFromResourceArray(applicationPermissions, entraApp.requiredResourceAccess!);
         }
 
-        for (let i = 0; i < appObject.requiredResourceAccess!.length; i++) {
-          if (appObject.requiredResourceAccess![i].resourceAccess?.length === 0) {
-            appObject.requiredResourceAccess!.splice(i, 1);
+        for (let i = 0; i < entraApp.requiredResourceAccess!.length; i++) {
+          if (entraApp.requiredResourceAccess![i].resourceAccess?.length === 0) {
+            entraApp.requiredResourceAccess!.splice(i, 1);
           }
         }
 
         const removePermissionRequestOptions: CliRequestOptions = {
-          url: `${this.resource}/v1.0/applications/${appObject.id}`,
+          url: `${this.resource}/v1.0/applications/${entraApp.id}`,
           headers: {
             accept: 'application/json;odata.metadata=none'
           },
           responseType: 'json',
           data: {
-            requiredResourceAccess: appObject.requiredResourceAccess
+            requiredResourceAccess: entraApp.requiredResourceAccess
           }
         };
 
         await request.patch(removePermissionRequestOptions);
 
         if (args.options.revokeAdminConsent) {
-          const appServicePrincipal = servicePrincipals.find(sp => sp.appId === appObject.appId);
+          const appServicePrincipal = servicePrincipals.find(sp => sp.appId === entraApp.appId);
 
           if (appServicePrincipal) {
             await this.revokeAdminConsent(appServicePrincipal, appPermissions, logger);
           }
           else {
             if (this.debug) {
-              await logger.logToStderr(`No service principal found for the appId: ${appObject.appId}. Skipping revoking admin consent.`);
+              await logger.logToStderr(`No service principal found for the appId: ${entraApp.appId}. Skipping revoking admin consent.`);
             }
           }
         }
@@ -211,34 +211,22 @@ class EntraAppPermissionRemoveCommand extends GraphCommand {
     }
   }
 
-  private async getAppObject(options: Options): Promise<Application> {
-    const selectProperties = '$select=id,appId,requiredResourceAccess';
-    if (options.appObjectId) {
-      const requestOptions: CliRequestOptions = {
-        url: `${this.resource}/v1.0/applications/${options.appObjectId}?${selectProperties}`,
-        headers: {
-          'content-type': 'application/json;odata.metadata=none'
-        },
-        responseType: 'json'
-      };
+  private async getEntraApp(options: Options, logger: Logger): Promise<Application> {
+    const { appObjectId, appId, appName } = options;
 
-      return request.get<Application>(requestOptions);
+    if (this.verbose) {
+      await logger.logToStderr(`Retrieving information about Microsoft Entra app ${appObjectId ? appObjectId : (appId ? appId : appName)}...`);
     }
 
-    const apps = options.appId
-      ? await odata.getAllItems<Application>(`${this.resource}/v1.0/applications?$filter=appId eq '${options.appId}'&${selectProperties}`)
-      : await odata.getAllItems<Application>(`${this.resource}/v1.0/applications?$filter=displayName eq '${options.appName}'&${selectProperties}`);
-
-    if (apps.length === 0) {
-      throw `App with ${options.appId ? 'id' : 'name'} ${options.appId || options.appName} not found in Microsoft Entra ID`;
+    if (appObjectId) {
+      return await entraApp.getAppRegistrationByObjectId(appObjectId, ['id', 'appId', 'requiredResourceAccess']);
     }
-
-    if (apps.length > 1) {
-      const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', apps);
-      return cli.handleMultipleResultsFound<Application>(`Multiple apps with name '${options.appName}' found.`, resultAsKeyValuePair);
+    else if (appId) {
+      return await entraApp.getAppRegistrationByAppId(appId, ['id', 'appId', 'requiredResourceAccess']);
     }
-
-    return apps[0];
+    else {
+      return await entraApp.getAppRegistrationByAppName(appName!, ['id', 'appId', 'requiredResourceAccess']);
+    }
   }
 
   private async revokeAdminConsent(servicePrincipal: ServicePrincipal, appPermissions: AppPermission[], logger: Logger): Promise<void> {

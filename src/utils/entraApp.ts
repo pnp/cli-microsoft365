@@ -450,5 +450,24 @@ export const entraApp = {
     }
 
     return apps[0];
+  },
+  async getAppRegistrationByObjectId(objectId: string, properties?: string[]): Promise<Application> {
+    let url = `https://graph.microsoft.com/v1.0/applications/${objectId}`;
+
+    if (properties) {
+      url += `?$select=${properties.join(',')}`;
+    }
+
+    const requestOptions: CliRequestOptions = {
+      url: url,
+      headers: {
+        accept: 'application/json;odata.metadata=none'
+      },
+      responseType: 'json'
+    };
+
+    const app = await request.get<Application>(requestOptions);
+
+    return app;
   }
 };
