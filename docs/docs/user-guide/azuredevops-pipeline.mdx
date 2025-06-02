@@ -44,7 +44,7 @@ stages:
           - task: NodeTool@0
             displayName: Use Node.js
             inputs:
-              versionSpec: 18.x
+              versionSpec: 22.x
           - task: Npm@1
             displayName: Run npm install
             inputs:
@@ -101,7 +101,7 @@ Next, let's go over the stages and steps of the pipeline:
 - task: NodeTool@0
   displayName: Use Node.js
   inputs:
-    versionSpec: 18.x
+    versionSpec: 22.x
 - task: Npm@1
   displayName: Run npm install
   inputs:
