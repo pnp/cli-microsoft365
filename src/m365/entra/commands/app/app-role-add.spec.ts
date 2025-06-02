@@ -20,16 +20,6 @@ describe(commands.APP_ROLE_ADD, () => {
   let logger: Logger;
   let commandInfo: CommandInfo;
 
-  //#region Mocked Responses 
-  const appResponse = {
-    value: [
-      {
-        "id": "5b31c38c-2584-42f0-aa47-657fb3a84230"
-      }
-    ]
-  };
-  //#endregion
-
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').resolves();
@@ -60,7 +50,9 @@ describe(commands.APP_ROLE_ADD, () => {
       request.patch,
       cli.getSettingWithDefaultValue,
       cli.handleMultipleResultsFound,
-      entraApp.getAppRegistrationByAppId
+      entraApp.getAppRegistrationByAppId,
+      entraApp.getAppRegistrationByAppName,
+      entraApp.getAppRegistrationByObjectId
     ]);
   });
 
@@ -78,18 +70,11 @@ describe(commands.APP_ROLE_ADD, () => {
   });
 
   it('creates app role for the specified appId, app has no roles', async () => {
-    sinon.stub(entraApp, 'getAppRegistrationByAppId').resolves(appResponse.value[0]);
-
-    sinon.stub(request, 'get').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230?$select=id,appRoles') {
-        return {
-          id: '5b31c38c-2584-42f0-aa47-657fb3a84230',
-          appRoles: []
-        };
-      }
-
-      throw `Invalid request ${JSON.stringify(opts)}`;
+    sinon.stub(entraApp, 'getAppRegistrationByAppId').resolves({
+      id: '5b31c38c-2584-42f0-aa47-657fb3a84230',
+      appRoles: []
     });
+
     sinon.stub(request, 'patch').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230' &&
         opts.data &&
@@ -119,27 +104,21 @@ describe(commands.APP_ROLE_ADD, () => {
   });
 
   it('creates app role for the specified appObjectId, app has one role', async () => {
-    sinon.stub(request, 'get').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230?$select=id,appRoles') {
-        return {
-          id: '5b31c38c-2584-42f0-aa47-657fb3a84230',
-          appRoles: [{
-            "allowedMemberTypes": [
-              "User"
-            ],
-            "description": "Managers",
-            "displayName": "Managers",
-            "id": "c4352a0a-494f-46f9-b843-479855c173a7",
-            "isEnabled": true,
-            "lang": null,
-            "origin": "Application",
-            "value": "managers"
-          }]
-        };
-      }
-
-      throw `Invalid request ${JSON.stringify(opts)}`;
+    sinon.stub(entraApp, 'getAppRegistrationByObjectId').resolves({
+      id: '5b31c38c-2584-42f0-aa47-657fb3a84230',
+      appRoles: [{
+        "allowedMemberTypes": [
+          "User"
+        ],
+        "description": "Managers",
+        "displayName": "Managers",
+        "id": "c4352a0a-494f-46f9-b843-479855c173a7",
+        "isEnabled": true,
+        "origin": "Application",
+        "value": "managers"
+      }]
     });
+
     sinon.stub(request, 'patch').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230' &&
         opts.data &&
@@ -153,7 +132,6 @@ describe(commands.APP_ROLE_ADD, () => {
           "displayName": "Managers",
           "id": "c4352a0a-494f-46f9-b843-479855c173a7",
           "isEnabled": true,
-          "lang": null,
           "origin": "Application",
           "value": "managers"
         }) === JSON.stringify(opts.data.appRoles[0]) &&
@@ -174,54 +152,39 @@ describe(commands.APP_ROLE_ADD, () => {
         name: 'Role',
         description: 'Custom role',
         allowedMembers: 'applications',
-        claim: 'Custom.Role'
+        claim: 'Custom.Role',
+        verbose: true
       }
     });
   });
 
   it('creates app role for the specified appName, app has multiple roles', async () => {
-    sinon.stub(request, 'get').callsFake(async opts => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=displayName eq 'My%20app'&$select=id`) {
-        return {
-          value: [{
-            id: '5b31c38c-2584-42f0-aa47-657fb3a84230'
-          }]
-        };
-      }
-
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230?$select=id,appRoles') {
-        return {
-          id: '5b31c38c-2584-42f0-aa47-657fb3a84230',
-          appRoles: [
-            {
-              "allowedMemberTypes": [
-                "User"
-              ],
-              "description": "Managers",
-              "displayName": "Managers",
-              "id": "c4352a0a-494f-46f9-b843-479855c173a7",
-              "isEnabled": true,
-              "lang": null,
-              "origin": "Application",
-              "value": "managers"
-            },
-            {
-              "allowedMemberTypes": [
-                "User"
-              ],
-              "description": "Team leads",
-              "displayName": "Team leads",
-              "id": "c4352a0a-494f-46f9-b843-479855c173a8",
-              "isEnabled": true,
-              "lang": null,
-              "origin": "Application",
-              "value": "teamLeads"
-            }
-          ]
-        };
-      }
-
-      throw `Invalid request ${JSON.stringify(opts)}`;
+    sinon.stub(entraApp, 'getAppRegistrationByAppName').resolves({
+      id: '5b31c38c-2584-42f0-aa47-657fb3a84230',
+      appRoles: [
+        {
+          "allowedMemberTypes": [
+            "User"
+          ],
+          "description": "Managers",
+          "displayName": "Managers",
+          "id": "c4352a0a-494f-46f9-b843-479855c173a7",
+          "isEnabled": true,
+          "origin": "Application",
+          "value": "managers"
+        },
+        {
+          "allowedMemberTypes": [
+            "User"
+          ],
+          "description": "Team leads",
+          "displayName": "Team leads",
+          "id": "c4352a0a-494f-46f9-b843-479855c173a8",
+          "isEnabled": true,
+          "origin": "Application",
+          "value": "teamLeads"
+        }
+      ]
     });
     sinon.stub(request, 'patch').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230' &&
@@ -246,28 +209,23 @@ describe(commands.APP_ROLE_ADD, () => {
         name: 'Role',
         description: 'Custom role',
         allowedMembers: 'both',
-        claim: 'Custom.Role'
+        claim: 'Custom.Role',
+        verbose: true
       }
     });
   });
 
   it('handles error when the app specified with appObjectId not found', async () => {
-    sinon.stub(request, 'get').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230?$select=id,appRoles') {
-        throw {
-          "error": {
-            "code": "Request_ResourceNotFound",
-            "message": "Resource '5b31c38c-2584-42f0-aa47-657fb3a84230' does not exist or one of its queried reference-property objects are not present.",
-            "innerError": {
-              "date": "2021-04-20T17:22:30",
-              "request-id": "f58cc4de-b427-41de-b37c-46ee4925a26d",
-              "client-request-id": "f58cc4de-b427-41de-b37c-46ee4925a26d"
-            }
-          }
-        };
+    sinon.stub(entraApp, 'getAppRegistrationByObjectId').throws({
+      "error": {
+        "code": "Request_ResourceNotFound",
+        "message": "Resource '5b31c38c-2584-42f0-aa47-657fb3a84230' does not exist or one of its queried reference-property objects are not present.",
+        "innerError": {
+          "date": "2021-04-20T17:22:30",
+          "request-id": "f58cc4de-b427-41de-b37c-46ee4925a26d",
+          "client-request-id": "f58cc4de-b427-41de-b37c-46ee4925a26d"
+        }
       }
-
-      throw `Invalid request ${JSON.stringify(opts)}`;
     });
     sinon.stub(request, 'patch').rejects('PATCH request executed');
 
@@ -300,13 +258,8 @@ describe(commands.APP_ROLE_ADD, () => {
   });
 
   it('handles error when the app specified with appName not found', async () => {
-    sinon.stub(request, 'get').callsFake(async opts => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=displayName eq 'My%20app'&$select=id`) {
-        return { value: [] };
-      }
-
-      throw `Invalid request ${JSON.stringify(opts)}`;
-    });
+    const error = `App with name 'My app' not found in Microsoft Entra ID`;
+    sinon.stub(entraApp, 'getAppRegistrationByAppName').rejects(new Error(error));
     sinon.stub(request, 'patch').rejects('PATCH request executed');
 
     await assert.rejects(command.action(logger, {
@@ -317,30 +270,13 @@ describe(commands.APP_ROLE_ADD, () => {
         allowedMembers: 'usersGroups',
         claim: 'Custom.Role'
       }
-    }), new CommandError(`No Microsoft Entra application registration with name My app found`));
+    }), new CommandError(error));
   });
 
   it('handles error when multiple apps with the specified appName found', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
+    const error = `Multiple apps with name 'My app' found in Microsoft Entra ID. Found: 9b1b1e42-794b-4c71-93ac-5ed92488b67f, 9b1b1e42-794b-4c71-93ac-5ed92488b67g.`;
+    sinon.stub(entraApp, 'getAppRegistrationByAppName').rejects(new Error(error));
 
-      return defaultValue;
-    });
-
-    sinon.stub(request, 'get').callsFake(async opts => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=displayName eq 'My%20app'&$select=id`) {
-        return {
-          value: [
-            { id: '9b1b1e42-794b-4c71-93ac-5ed92488b67f' },
-            { id: '9b1b1e42-794b-4c71-93ac-5ed92488b67g' }
-          ]
-        };
-      }
-
-      throw `Invalid request ${JSON.stringify(opts)}`;
-    });
     sinon.stub(request, 'patch').rejects('PATCH request executed');
 
     await assert.rejects(command.action(logger, {
@@ -351,86 +287,7 @@ describe(commands.APP_ROLE_ADD, () => {
         allowedMembers: 'usersGroups',
         claim: 'Custom.Role'
       }
-    }), new CommandError(`Multiple Microsoft Entra application registrations with name 'My app' found. Found: 9b1b1e42-794b-4c71-93ac-5ed92488b67f, 9b1b1e42-794b-4c71-93ac-5ed92488b67g.`));
-  });
-
-  it('handles selecting single result when multiple apps with the specified name found and cli is set to prompt', async () => {
-    let updateRequestIssued = false;
-
-    sinon.stub(request, 'get').callsFake(async opts => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=displayName eq 'My%20app'&$select=id`) {
-        return {
-          value: [
-            { id: '9b1b1e42-794b-4c71-93ac-5ed92488b67f' },
-            { id: '9b1b1e42-794b-4c71-93ac-5ed92488b67g' }
-          ]
-        };
-      }
-
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230?$select=id,appRoles') {
-        return {
-          id: '5b31c38c-2584-42f0-aa47-657fb3a84230',
-          appRoles: [{
-            "allowedMemberTypes": [
-              "User"
-            ],
-            "description": "Managers",
-            "displayName": "Managers",
-            "id": "c4352a0a-494f-46f9-b843-479855c173a7",
-            "isEnabled": true,
-            "lang": null,
-            "origin": "Application",
-            "value": "managers"
-          }]
-        };
-      }
-
-      throw `Invalid request ${JSON.stringify(opts)}`;
-    });
-
-    sinon.stub(cli, 'handleMultipleResultsFound').resolves({ id: '5b31c38c-2584-42f0-aa47-657fb3a84230' });
-
-    sinon.stub(request, 'patch').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230' &&
-        opts.data &&
-        opts.data.appRoles.length === 2) {
-        const appRole = opts.data.appRoles[1];
-        if (JSON.stringify({
-          "allowedMemberTypes": [
-            "User"
-          ],
-          "description": "Managers",
-          "displayName": "Managers",
-          "id": "c4352a0a-494f-46f9-b843-479855c173a7",
-          "isEnabled": true,
-          "lang": null,
-          "origin": "Application",
-          "value": "managers"
-        }) === JSON.stringify(opts.data.appRoles[0]) &&
-          appRole.displayName === 'Role' &&
-          appRole.description === 'Custom role' &&
-          appRole.value === 'Custom.Role' &&
-          JSON.stringify(appRole.allowedMemberTypes) === JSON.stringify(['Application'])) {
-
-          updateRequestIssued = true;
-          return;
-        }
-      }
-
-      throw `Invalid request ${JSON.stringify(opts)}`;
-    });
-
-    await command.action(logger, {
-      options: {
-        appName: 'My app',
-        name: 'Role',
-        description: 'Custom role',
-        allowedMembers: 'applications',
-        claim: 'Custom.Role'
-      }
-    });
-
-    assert(updateRequestIssued);
+    }), new CommandError(error));
   });
 
   it('handles error when retrieving information about app through appName failed', async () => {
@@ -449,12 +306,16 @@ describe(commands.APP_ROLE_ADD, () => {
   });
 
   it('handles error when retrieving app roles failed', async () => {
-    sinon.stub(request, 'get').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230?$select=id,appRoles') {
-        throw 'An error has occurred';
+    sinon.stub(entraApp, 'getAppRegistrationByObjectId').throws({
+      "error": {
+        "code": "Request_ResourceNotFound",
+        "message": "Resource '5b31c38c-2584-42f0-aa47-657fb3a84230' does not exist or one of its queried reference-property objects are not present.",
+        "innerError": {
+          "date": "2021-04-20T17:22:30",
+          "request-id": "f58cc4de-b427-41de-b37c-46ee4925a26d",
+          "client-request-id": "f58cc4de-b427-41de-b37c-46ee4925a26d"
+        }
       }
-
-      throw `Invalid request ${JSON.stringify(opts)}`;
     });
     sinon.stub(request, 'patch').rejects('PATCH request executed');
 
@@ -466,30 +327,23 @@ describe(commands.APP_ROLE_ADD, () => {
         allowedMembers: 'usersGroups',
         claim: 'Custom.Role'
       }
-    } as any), new CommandError('An error has occurred'));
+    } as any), new CommandError(`Resource '5b31c38c-2584-42f0-aa47-657fb3a84230' does not exist or one of its queried reference-property objects are not present.`));
   });
 
   it('handles error when updating app roles failed', async () => {
-    sinon.stub(request, 'get').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230?$select=id,appRoles') {
-        return {
-          id: '5b31c38c-2584-42f0-aa47-657fb3a84230',
-          appRoles: [{
-            "allowedMemberTypes": [
-              "User"
-            ],
-            "description": "Managers",
-            "displayName": "Managers",
-            "id": "c4352a0a-494f-46f9-b843-479855c173a7",
-            "isEnabled": true,
-            "lang": null,
-            "origin": "Application",
-            "value": "managers"
-          }]
-        };
-      }
-
-      throw `Invalid request ${JSON.stringify(opts)}`;
+    sinon.stub(entraApp, 'getAppRegistrationByObjectId').resolves({
+      id: '5b31c38c-2584-42f0-aa47-657fb3a84230',
+      appRoles: [{
+        "allowedMemberTypes": [
+          "User"
+        ],
+        "description": "Managers",
+        "displayName": "Managers",
+        "id": "c4352a0a-494f-46f9-b843-479855c173a7",
+        "isEnabled": true,
+        "origin": "Application",
+        "value": "managers"
+      }]
     });
     sinon.stub(request, 'patch').rejects(new Error('An error has occurred'));
 
