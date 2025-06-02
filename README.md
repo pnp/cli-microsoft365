@@ -112,7 +112,7 @@
 
 ## Install
 
-To use the CLI for Microsoft 365 you need [`Node.js`](https://nodejs.org). The CLI has been tested with Node.js versions 18 and higher, but we recommend you to use the Node.js LTS version available at the moment.
+To use the CLI for Microsoft 365 you need [`Node.js`](https://nodejs.org). The CLI has been tested with Node.js versions 20 and higher, but we recommend you to use the Node.js LTS version available at the moment.
 
 ```
 npm install -g @pnp/cli-microsoft365
