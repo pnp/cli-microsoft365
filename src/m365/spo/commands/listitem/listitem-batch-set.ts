@@ -6,7 +6,6 @@ import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { odata } from '../../../../utils/odata.js';
 import { ClientSvcResponse, ClientSvcResponseContents, spo } from '../../../../utils/spo.js';
-import { urlUtil } from '../../../../utils/urlUtil.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
@@ -132,7 +131,9 @@ class SpoListItemBatchSetCommand extends SpoCommand {
         throw `The specified value for idColumn does not exist in the array. Specified idColumn is '${args.options.idColumn || 'ID'}'. Please specify the correct value.`;
       }
 
-      const listId = await this.getListId(args.options, logger);
+      const listId = args.options.listId ?
+        args.options.listId :
+        await spo.getListId(args.options.webUrl, args.options.listTitle, args.options.listUrl, logger, this.verbose);
       const fields = await this.getListFields(args.options, listId, jsonContent, idColumn, logger);
       const userFields = fields.filter(field => field.TypeAsString === 'UserMulti' || field.TypeAsString === 'User');
       const resolvedUsers = await this.getUsersFromCsv(args.options.webUrl, jsonContent, userFields);
@@ -263,37 +264,6 @@ class SpoListItemBatchSetCommand extends SpoCommand {
     }
 
     return fields;
-  }
-
-  private async getListId(options: Options, logger: Logger): Promise<string> {
-    if (options.listId) {
-      return options.listId;
-    }
-
-    if (this.verbose) {
-      await logger.logToStderr('Retrieving list id');
-    }
-
-    let listUrl = `${options.webUrl}/_api/web`;
-
-    if (options.listTitle) {
-      listUrl += `/lists/getByTitle('${formatting.encodeQueryParameter(options.listTitle)}')`;
-    }
-    else {
-      const listServerRelativeUrl: string = urlUtil.getServerRelativePath(options.webUrl, options.listUrl!);
-      listUrl += `/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')`;
-    }
-
-    const requestOptions: CliRequestOptions = {
-      url: `${listUrl}?$select=Id`,
-      headers: {
-        'accept': 'application/json;odata=nometadata'
-      },
-      responseType: 'json'
-    };
-
-    const listResult = await request.get<{ Id: string }>(requestOptions);
-    return listResult.Id;
   }
 
   private async getUsersFromCsv(webUrl: string, jsonContent: any[], userFields: FieldDetails[]): Promise<UserDetail[]> {
