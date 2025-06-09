@@ -18,13 +18,30 @@ m365 planner tenant settings list [options]
 
 ## Remarks
 
-:::info
-
-To use this command you must be a global administrator.
-
-:::
-
 After executing the command `planner tenant settings set`, it can take some time for all changes to propagate across the tenant. Because of this, executing this command right away can return some unexpected results.
+
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource        | Permissions |
+  |-----------------|-------------|
+  | Microsoft Graph | email       |
+
+  :::info
+
+  To use this command you must be a **global administrator**.
+
+  :::
+
+  </TabItem>
+  <TabItem value="Application">
+
+  This command does not support application permissions.
+
+  </TabItem>
+</Tabs>
 
 ## Examples
 
@@ -47,7 +64,17 @@ m365 planner tenant settings list
     "allowTenantMoveWithDataLoss": false,
     "allowTenantMoveWithDataMigration": false,
     "allowRosterCreation": true,
-    "allowPlannerMobilePushNotifications": true
+    "allowPlannerMobilePushNotifications": true,
+    "allowFileRecommendations": true,
+    "enforceClientLicenseCheck": false,
+    "allowDataFlowToDataverse": true,
+    "allowPlannerCopilot": true,
+    "disallowedSharedWithContainerTypes": [
+      {
+        "hostContainerType": "group",
+        "sharedWithContainerType": "roster"
+      }
+    ]
   }
   ```
 
@@ -56,10 +83,16 @@ m365 planner tenant settings list
 
   ```txt
   allowCalendarSharing               : true
+  allowDataFlowToDataverse           : true
+  allowFileRecommendations           : true
+  allowPlannerCopilot                : true
   allowPlannerMobilePushNotifications: true
   allowRosterCreation                : true
   allowTenantMoveWithDataLoss        : false
   allowTenantMoveWithDataMigration   : false
+  disallowedSharedWithContainerTypes : [{"hostContainerType":"group","sharedWithContainerType":"roster"}]
+  enforceClientLicenseCheck          : false
+  id                                 : 1
   isPlannerAllowed                   : true
   ```
 
@@ -67,8 +100,8 @@ m365 planner tenant settings list
   <TabItem value="CSV">
 
   ```csv
-  isPlannerAllowed,allowCalendarSharing,allowTenantMoveWithDataLoss,allowTenantMoveWithDataMigration,allowRosterCreation,allowPlannerMobilePushNotifications
-  1,1,,,1,1
+  id,isPlannerAllowed,allowCalendarSharing,allowTenantMoveWithDataLoss,allowTenantMoveWithDataMigration,allowRosterCreation,allowPlannerMobilePushNotifications,allowFileRecommendations,enforceClientLicenseCheck,allowDataFlowToDataverse,allowPlannerCopilot
+  1,1,1,0,0,1,1,1,0,1,1
   ```
 
   </TabItem>
@@ -90,6 +123,10 @@ m365 planner tenant settings list
   allowTenantMoveWithDataMigration | false
   allowRosterCreation | true
   allowPlannerMobilePushNotifications | true
+  allowFileRecommendations | true
+  enforceClientLicenseCheck | false
+  allowDataFlowToDataverse | true
+  allowPlannerCopilot | true
   ```
 
   </TabItem>
