@@ -16,7 +16,10 @@ m365 viva engage network list [options]
 
 ```md definition-list
 `--includeSuspended`
-: Include the networks in which the user is suspended
+: Include the networks in which the user is suspended.
+
+`--withSuspended`
+: Include the networks in which the user is suspended.
 ```
 
 <Global />
@@ -31,16 +34,16 @@ In order to use this command, you need to grant the Microsoft Entra application 
 
 ## Examples
 
-Returns the current user's networks
+Returns the current user's networks.
 
 ```sh
 m365 viva engage network list
 ```
 
-Returns the current user's networks including the networks in which the user is suspended
+Returns the current user's networks including the networks in which the user is suspended.
 
 ```sh
-m365 viva engage network list --includeSuspended
+m365 viva engage network list --withSuspended
 ```
 
 ## Response
