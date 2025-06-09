@@ -1,0 +1,44 @@
+import Global from '/docs/cmd/_global.mdx';
+
+# cli app add
+
+Create a new app registration to use for the CLI for Microsoft 365
+
+## Usage
+
+```sh
+m365 cli app add [options]
+```
+
+## Options
+
+```md definition-list
+`-n, --name [name]`
+: Name of the app registration. Defaults to CLI for M365
+
+`-s, --scopes [scopes]`
+: Which scopes should be added? Valid values are: `minimal`, `all`. Defaults to `minimal`.
+
+`--saveToConfig`
+: Save the app registration info to the CLI config. This way the new app registration will be used as the default app registration to sign in.
+```
+
+<Global />
+
+## Examples
+
+Create a new app registration to use for CLI for Microsoft 365
+
+```sh
+m365 cli app add
+```
+
+Create a new app registration with all permission scopes and a custom name
+
+```sh
+m365 cli app add --name "Contoso CLI app" --scopes all
+```
+
+## Response
+
+The command won't return a response on success
