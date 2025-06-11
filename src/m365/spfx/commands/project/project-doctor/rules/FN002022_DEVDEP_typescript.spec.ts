@@ -2,7 +2,7 @@ import assert from 'assert';
 import { FN002022_DEVDEP_typescript } from './FN002022_DEVDEP_typescript.js';
 import { Finding } from '../../report-model/Finding.js';
 
-describe.only('FN002022_DEVDEP_typescript', () => {
+describe('FN002022_DEVDEP_typescript', () => {
   let findings: Finding[];
   let rule: FN002022_DEVDEP_typescript;
 
