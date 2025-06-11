@@ -1,4 +1,4 @@
-FROFROM mcr.microsoft.com/powershell:alpine-3.20
+FROM mcr.microsoft.com/powershell:alpine-3.20
 
 LABEL name="CLI for Microsoft 365 Development" \
   description="Development container for contributing to CLI for Microsoft 365" \
