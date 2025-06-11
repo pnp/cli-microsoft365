@@ -8,6 +8,7 @@ import { FN002013_DEVDEP_types_webpack_env } from './rules/FN002013_DEVDEP_types
 import { FN002015_DEVDEP_types_react } from './rules/FN002015_DEVDEP_types_react.js';
 import { FN002016_DEVDEP_types_react_dom } from './rules/FN002016_DEVDEP_types_react_dom.js';
 import { FN002019_DEVDEP_microsoft_rush_stack_compiler } from './rules/FN002019_DEVDEP_microsoft_rush_stack_compiler.js';
+import { FN002022_DEVDEP_typescript } from './rules/FN002022_DEVDEP_typescript.js';
 import { FN021001_PKG_spfx_deps_versions_match_project_version } from './rules/FN021001_PKG_spfx_deps_versions_match_project_version.js';
 
 export default [
@@ -21,5 +22,6 @@ export default [
   new FN002016_DEVDEP_types_react_dom('17'),
   new FN002019_DEVDEP_microsoft_rush_stack_compiler(['5.3']),
   new FN002021_DEVDEP_rushstack_eslint_config('4.0.1'),
+  new FN002022_DEVDEP_typescript('~5.3.3'),
   new FN021001_PKG_spfx_deps_versions_match_project_version(true)
 ];
