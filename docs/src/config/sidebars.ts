@@ -4028,6 +4028,11 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
+              label: 'tenant site get',
+              id: 'cmd/spo/tenant/tenant-site-get'
+            },
+            {
+              type: 'doc',
               label: 'tenant site list',
               id: 'cmd/spo/tenant/tenant-site-list'
             },

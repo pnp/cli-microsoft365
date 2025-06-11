@@ -1,0 +1,449 @@
+import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# spo tenant site get
+
+Retrieves the tenant site information
+
+## Usage
+
+```sh
+m365 spo tenant site get [options]
+```
+
+## Options
+
+```md definition-list
+`-i, --id [id]`
+: The ID of the site collection. Specify either `id`, `title`, or `url`, but not multiple.
+
+`-t, --title [title]`
+: Title of the site collection. Specify either `id`, `title`, or `url`, but not multiple.
+
+`-u, --url [url]`
+: The site URL of the site collection. Specify either `id`, `title`, or `url`, but not multiple.
+```
+
+<Global />
+
+## Remarks
+
+:::info
+
+To use this command you must be either SharePoint Administrator or Global Administrator.
+
+:::
+
+## Examples
+
+Retrieve info about a site using its ID.
+
+```sh
+m365 spo tenant site get --id 3ae83bc5-1f27-45c1-9eee-1bd1e2ddce69
+```
+
+Retrieve info about a site using its Title.
+
+```sh
+m365 spo tenant site get --title Marketing
+```
+
+Retrieve info about a site using its URL.
+
+```sh
+m365 spo tenant site get --url "https://contoso.sharepoint.com/sites/Marketing"
+```
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  {
+    "AllowDownloadingNonWebViewableFiles": false,
+    "AllowEditing": true,
+    "AllowFileArchive": false,
+    "AllowSelfServiceUpgrade": true,
+    "AllowWebPropertyBagUpdateWhenDenyAddAndCustomizePagesIsEnabled": false,
+    "AnonymousLinkExpirationInDays": 0,
+    "ApplyToExistingDocumentLibraries": false,
+    "ApplyToNewDocumentLibraries": false,
+    "ArchivedBy": "",
+    "ArchivedTime": "0001-01-01T00:00:00",
+    "ArchiveStatus": "NotArchived",
+    "AuthContextStrength": null,
+    "AuthenticationContextLimitedAccess": false,
+    "AuthenticationContextName": null,
+    "AverageResourceUsage": 0,
+    "BlockDownloadLinksFileType": 1,
+    "BlockDownloadMicrosoft365GroupIds": null,
+    "BlockDownloadPolicy": false,
+    "BlockDownloadPolicyFileTypeIds": null,
+    "BlockGuestsAsSiteAdmin": 0,
+    "BonusDiskQuota": "233320",
+    "ClearGroupId": false,
+    "ClearRestrictedAccessControl": false,
+    "CommentsOnSitePagesDisabled": false,
+    "CompatibilityLevel": 15,
+    "ConditionalAccessPolicy": 0,
+    "CreatedTime": "2022-06-14T09:25:17.817",
+    "CurrentResourceUsage": 0,
+    "DefaultLinkPermission": 0,
+    "DefaultLinkToExistingAccess": false,
+    "DefaultLinkToExistingAccessReset": false,
+    "DefaultShareLinkRole": 0,
+    "DefaultShareLinkScope": -1,
+    "DefaultSharingLinkType": 0,
+    "DenyAddAndCustomizePages": 2,
+    "Description": "",
+    "DisableAppViews": 2,
+    "DisableCompanyWideSharingLinks": 2,
+    "DisableFlows": 2,
+    "EnableAutoExpirationVersionTrim": false,
+    "ExcludeBlockDownloadPolicySiteOwners": false,
+    "ExcludeBlockDownloadSharePointGroups": [],
+    "ExcludedBlockDownloadGroupIds": [],
+    "ExpireVersionsAfterDays": 0,
+    "ExternalUserExpirationInDays": 0,
+    "GroupId": "bed1885e-4958-41e2-a091-b3a0dd418b1e",
+    "GroupOwnerLoginName": "c:0o.c|federateddirectoryclaimprovider|bed1885e-4958-41e2-a091-b3a0dd418b1e_o",
+    "HasHolds": false,
+    "HidePeoplePreviewingFiles": false,
+    "HidePeopleWhoHaveListsOpen": false,
+    "HubSiteId": "00000000-0000-0000-0000-000000000000",
+    "IBMode": "Open",
+    "IBSegments": [],
+    "IBSegmentsToAdd": null,
+    "IBSegmentsToRemove": null,
+    "InheritVersionPolicyFromTenant": true,
+    "IsGroupOwnerSiteAdmin": true,
+    "IsHubSite": false,
+    "IsTeamsChannelConnected": false,
+    "IsTeamsConnected": false,
+    "LastContentModifiedDate": "2025-01-25T16:54:51.843",
+    "Lcid": "1033",
+    "LimitedAccessFileType": 1,
+    "ListsShowHeaderAndNavigation": false,
+    "LockIssue": null,
+    "LockReason": 0,
+    "LockState": "Unlock",
+    "LoopDefaultSharingLinkRole": 0,
+    "LoopDefaultSharingLinkScope": -1,
+    "MajorVersionLimit": 0,
+    "MajorWithMinorVersionsLimit": 0,
+    "MediaTranscription": 0,
+    "OverrideBlockUserInfoVisibility": 0,
+    "OverrideSharingCapability": false,
+    "OverrideTenantAnonymousLinkExpirationPolicy": false,
+    "OverrideTenantExternalUserExpirationPolicy": false,
+    "Owner": "bed1885e-4958-41e2-a091-b3a0dd418b1e_o",
+    "OwnerEmail": "Marketing@contoso.onmicrosoft.com",
+    "OwnerLoginName": "c:0o.c|federateddirectoryclaimprovider|bed1885e-4958-41e2-a091-b3a0dd418b1e_o",
+    "OwnerName": "Marketing Owners",
+    "PWAEnabled": 0,
+    "ReadOnlyAccessPolicy": false,
+    "ReadOnlyForBlockDownloadPolicy": false,
+    "ReadOnlyForUnmanagedDevices": false,
+    "RelatedGroupId": "bed1885e-4958-41e2-a091-b3a0dd418b1e",
+    "RequestFilesLinkEnabled": false,
+    "RequestFilesLinkExpirationInDays": -1,
+    "RestrictContentOrgWideSearch": false,
+    "RestrictedAccessControl": false,
+    "RestrictedAccessControlGroups": [],
+    "RestrictedAccessControlGroupsToAdd": null,
+    "RestrictedAccessControlGroupsToRemove": null,
+    "RestrictedToRegion": 3,
+    "SandboxedCodeActivationCapability": 2,
+    "SensitivityLabel": "00000000-0000-0000-0000-000000000000",
+    "SensitivityLabel2": "",
+    "SetOwnerWithoutUpdatingSecondaryAdmin": false,
+    "SharingAllowedDomainList": "",
+    "SharingBlockedDomainList": "",
+    "SharingCapability": 1,
+    "SharingDomainRestrictionMode": 0,
+    "SharingLockDownCanBeCleared": true,
+    "SharingLockDownEnabled": false,
+    "ShowPeoplePickerSuggestionsForGuestUsers": false,
+    "SiteDefinedSharingCapability": 1,
+    "SiteId": "00000000-0000-0000-0000-000000000000",
+    "SocialBarOnSitePagesDisabled": false,
+    "Status": null,
+    "StorageMaximumLevel": "26214400",
+    "StorageQuotaType": null,
+    "StorageUsage": "1",
+    "StorageWarningLevel": "25574400",
+    "TeamsChannelType": 0,
+    "Template": "GROUP#0",
+    "TimeZoneId": 23,
+    "Title": "Marketing",
+    "TitleTranslations": null,
+    "Url": "https://contoso.sharepoint.com/sites/Marketing",
+    "UserCodeMaximumLevel": 300,
+    "UserCodeWarningLevel": 200,
+    "VersionCount": "0",
+    "VersionSize": "0",
+    "WebsCount": 1
+  }
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  AllowDownloadingNonWebViewableFiles                           : false
+  AllowEditing                                                  : true
+  AllowFileArchive                                              : false
+  AllowSelfServiceUpgrade                                       : true
+  AllowWebPropertyBagUpdateWhenDenyAddAndCustomizePagesIsEnabled: false
+  AnonymousLinkExpirationInDays                                 : 0
+  ApplyToExistingDocumentLibraries                              : false
+  ApplyToNewDocumentLibraries                                   : false
+  ArchiveStatus                                                 : NotArchived
+  ArchivedBy                                                    :
+  ArchivedTime                                                  : 0001-01-01T00:00:00
+  AuthContextStrength                                           : null
+  AuthenticationContextLimitedAccess                            : false
+  AuthenticationContextName                                     : null
+  AverageResourceUsage                                          : 0
+  BlockDownloadLinksFileType                                    : 1
+  BlockDownloadMicrosoft365GroupIds                             : null
+  BlockDownloadPolicy                                           : false
+  BlockDownloadPolicyFileTypeIds                                : null
+  BlockGuestsAsSiteAdmin                                        : 0
+  BonusDiskQuota                                                : 233320
+  ClearGroupId                                                  : false
+  ClearRestrictedAccessControl                                  : false
+  CommentsOnSitePagesDisabled                                   : false
+  CompatibilityLevel                                            : 15
+  ConditionalAccessPolicy                                       : 0
+  CreatedTime                                                   : 2022-06-14T09:25:17.817
+  CurrentResourceUsage                                          : 0
+  DefaultLinkPermission                                         : 0
+  DefaultLinkToExistingAccess                                   : false
+  DefaultLinkToExistingAccessReset                              : false
+  DefaultShareLinkRole                                          : 0
+  DefaultShareLinkScope                                         : -1
+  DefaultSharingLinkType                                        : 0
+  DenyAddAndCustomizePages                                      : 2
+  Description                                                   :
+  DisableAppViews                                               : 2
+  DisableCompanyWideSharingLinks                                : 2
+  DisableFlows                                                  : 2
+  EnableAutoExpirationVersionTrim                               : false
+  ExcludeBlockDownloadPolicySiteOwners                          : false
+  ExcludeBlockDownloadSharePointGroups                          : []
+  ExcludedBlockDownloadGroupIds                                 : []
+  ExpireVersionsAfterDays                                       : 0
+  ExternalUserExpirationInDays                                  : 0
+  GroupId                                                       : bed1885e-4958-41e2-a091-b3a0dd418b1e
+  GroupOwnerLoginName                                           : c:0o.c|federateddirectoryclaimprovider|bed1885e-4958-41e2-a091-b3a0dd418b1e_o
+  HasHolds                                                      : false
+  HidePeoplePreviewingFiles                                     : false
+  HidePeopleWhoHaveListsOpen                                    : false
+  HubSiteId                                                     : 00000000-0000-0000-0000-000000000000
+  IBMode                                                        : Open
+  IBSegments                                                    : []
+  IBSegmentsToAdd                                               : null
+  IBSegmentsToRemove                                            : null
+  InheritVersionPolicyFromTenant                                : true
+  IsGroupOwnerSiteAdmin                                         : true
+  IsHubSite                                                     : false
+  IsTeamsChannelConnected                                       : false
+  IsTeamsConnected                                              : false
+  LastContentModifiedDate                                       : 2025-01-25T16:54:51.843
+  Lcid                                                          : 1033
+  LimitedAccessFileType                                         : 1
+  ListsShowHeaderAndNavigation                                  : false
+  LockIssue                                                     : null
+  LockReason                                                    : 0
+  LockState                                                     : Unlock
+  LoopDefaultSharingLinkRole                                    : 0
+  LoopDefaultSharingLinkScope                                   : -1
+  MajorVersionLimit                                             : 0
+  MajorWithMinorVersionsLimit                                   : 0
+  MediaTranscription                                            : 0
+  OverrideBlockUserInfoVisibility                               : 0
+  OverrideSharingCapability                                     : false
+  OverrideTenantAnonymousLinkExpirationPolicy                   : false
+  OverrideTenantExternalUserExpirationPolicy                    : false
+  Owner                                                         : bed1885e-4958-41e2-a091-b3a0dd418b1e_o
+  OwnerEmail                                                    : Marketing@contoso.onmicrosoft.com
+  OwnerLoginName                                                : c:0o.c|federateddirectoryclaimprovider|bed1885e-4958-41e2-a091-b3a0dd418b1e_o
+  OwnerName                                                     : Marketing Owners
+  PWAEnabled                                                    : 0
+  ReadOnlyAccessPolicy                                          : false
+  ReadOnlyForBlockDownloadPolicy                                : false
+  ReadOnlyForUnmanagedDevices                                   : false
+  RelatedGroupId                                                : bed1885e-4958-41e2-a091-b3a0dd418b1e
+  RequestFilesLinkEnabled                                       : false
+  RequestFilesLinkExpirationInDays                              : -1
+  RestrictContentOrgWideSearch                                  : false
+  RestrictedAccessControl                                       : false
+  RestrictedAccessControlGroups                                 : []
+  RestrictedAccessControlGroupsToAdd                            : null
+  RestrictedAccessControlGroupsToRemove                         : null
+  RestrictedToRegion                                            : 3
+  SandboxedCodeActivationCapability                             : 2
+  SensitivityLabel                                              : 00000000-0000-0000-0000-000000000000
+  SensitivityLabel2                                             :
+  SetOwnerWithoutUpdatingSecondaryAdmin                         : false
+  SharingAllowedDomainList                                      :
+  SharingBlockedDomainList                                      :
+  SharingCapability                                             : 1
+  SharingDomainRestrictionMode                                  : 0
+  SharingLockDownCanBeCleared                                   : true
+  SharingLockDownEnabled                                        : false
+  ShowPeoplePickerSuggestionsForGuestUsers                      : false
+  SiteDefinedSharingCapability                                  : 1
+  SiteId                                                        : 00000000-0000-0000-0000-000000000000
+  SocialBarOnSitePagesDisabled                                  : false
+  Status                                                        : null
+  StorageMaximumLevel                                           : 26214400
+  StorageQuotaType                                              : null
+  StorageUsage                                                  : 1
+  StorageWarningLevel                                           : 25574400
+  TeamsChannelType                                              : 0
+  Template                                                      : GROUP#0
+  TimeZoneId                                                    : 23
+  Title                                                         : Marketing
+  TitleTranslations                                             : null
+  Url                                                           : https://contoso.sharepoint.com/sites/Marketing
+  UserCodeMaximumLevel                                          : 300
+  UserCodeWarningLevel                                          : 200
+  VersionCount                                                  : 0
+  VersionSize                                                   : 0
+  WebsCount                                                     : 1
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  AllowDownloadingNonWebViewableFiles,AllowEditing,AllowFileArchive,AllowSelfServiceUpgrade,AllowWebPropertyBagUpdateWhenDenyAddAndCustomizePagesIsEnabled,AnonymousLinkExpirationInDays,ApplyToExistingDocumentLibraries,ApplyToNewDocumentLibraries,ArchivedBy,ArchivedTime,ArchiveStatus,AuthContextStrength,AuthenticationContextLimitedAccess,AuthenticationContextName,AverageResourceUsage,BlockDownloadLinksFileType,BlockDownloadMicrosoft365GroupIds,BlockDownloadPolicy,BlockDownloadPolicyFileTypeIds,BlockGuestsAsSiteAdmin,BonusDiskQuota,ClearGroupId,ClearRestrictedAccessControl,CommentsOnSitePagesDisabled,CompatibilityLevel,ConditionalAccessPolicy,CreatedTime,CurrentResourceUsage,DefaultLinkPermission,DefaultLinkToExistingAccess,DefaultLinkToExistingAccessReset,DefaultShareLinkRole,DefaultShareLinkScope,DefaultSharingLinkType,DenyAddAndCustomizePages,Description,DisableAppViews,DisableCompanyWideSharingLinks,DisableFlows,EnableAutoExpirationVersionTrim,ExcludeBlockDownloadPolicySiteOwners,ExpireVersionsAfterDays,ExternalUserExpirationInDays,GroupId,GroupOwnerLoginName,HasHolds,HidePeoplePreviewingFiles,HidePeopleWhoHaveListsOpen,HubSiteId,IBMode,IBSegmentsToAdd,IBSegmentsToRemove,InheritVersionPolicyFromTenant,IsGroupOwnerSiteAdmin,IsHubSite,IsTeamsChannelConnected,IsTeamsConnected,LastContentModifiedDate,Lcid,LimitedAccessFileType,ListsShowHeaderAndNavigation,LockIssue,LockReason,LockState,LoopDefaultSharingLinkRole,LoopDefaultSharingLinkScope,MajorVersionLimit,MajorWithMinorVersionsLimit,MediaTranscription,OverrideBlockUserInfoVisibility,OverrideSharingCapability,OverrideTenantAnonymousLinkExpirationPolicy,OverrideTenantExternalUserExpirationPolicy,Owner,OwnerEmail,OwnerLoginName,OwnerName,PWAEnabled,ReadOnlyAccessPolicy,ReadOnlyForBlockDownloadPolicy,ReadOnlyForUnmanagedDevices,RelatedGroupId,RequestFilesLinkEnabled,RequestFilesLinkExpirationInDays,RestrictContentOrgWideSearch,RestrictedAccessControl,RestrictedAccessControlGroupsToAdd,RestrictedAccessControlGroupsToRemove,RestrictedToRegion,SandboxedCodeActivationCapability,SensitivityLabel,SensitivityLabel2,SetOwnerWithoutUpdatingSecondaryAdmin,SharingAllowedDomainList,SharingBlockedDomainList,SharingCapability,SharingDomainRestrictionMode,SharingLockDownCanBeCleared,SharingLockDownEnabled,ShowPeoplePickerSuggestionsForGuestUsers,SiteDefinedSharingCapability,SiteId,SocialBarOnSitePagesDisabled,Status,StorageMaximumLevel,StorageQuotaType,StorageUsage,StorageWarningLevel,TeamsChannelType,Template,TimeZoneId,Title,TitleTranslations,Url,UserCodeMaximumLevel,UserCodeWarningLevel,VersionCount,VersionSize,WebsCount
+  0,1,0,1,0,0,0,0,,0001-01-01T00:00:00,NotArchived,,0,,0,1,,0,,0,233320,0,0,0,15,0,2022-06-14T09:25:17.817,0,0,0,0,0,-1,0,2,,2,2,2,0,0,0,0,bed1885e-4958-41e2-a091-b3a0dd418b1e,c:0o.c|federateddirectoryclaimprovider|bed1885e-4958-41e2-a091-b3a0dd418b1e_o,0,0,0,00000000-0000-0000-0000-000000000000,Open,,,1,1,0,0,0,2025-01-25T16:54:51.843,1033,1,0,,0,Unlock,0,-1,0,0,0,0,0,0,0,bed1885e-4958-41e2-a091-b3a0dd418b1e_o,Marketing@contoso.onmicrosoft.com,c:0o.c|federateddirectoryclaimprovider|bed1885e-4958-41e2-a091-b3a0dd418b1e_o,Marketing Owners,0,0,0,0,bed1885e-4958-41e2-a091-b3a0dd418b1e,0,-1,0,0,,,3,2,00000000-0000-0000-0000-000000000000,,0,,,1,0,1,0,0,1,00000000-0000-0000-0000-000000000000,0,,26214400,,1,25574400,0,GROUP#0,23,Marketing,,https://contoso.sharepoint.com/sites/Marketing,300,200,0,0,1
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # spo tenant site get --debug "false" --verbose "false" --id "fa05c425-7a0b-4624-ba34-f9dc22ef7663"
+
+  Date: 6/8/2025
+
+  ## Marketing (https://contoso.sharepoint.com/sites/Marketing)
+
+  Property | Value
+  ---------|-------
+  AllowDownloadingNonWebViewableFiles | false
+  AllowEditing | true
+  AllowFileArchive | false
+  AllowSelfServiceUpgrade | true
+  AllowWebPropertyBagUpdateWhenDenyAddAndCustomizePagesIsEnabled | false
+  AnonymousLinkExpirationInDays | 0
+  ApplyToExistingDocumentLibraries | false
+  ApplyToNewDocumentLibraries | false
+  ArchivedBy |
+  ArchivedTime | 0001-01-01T00:00:00
+  ArchiveStatus | NotArchived
+  AuthenticationContextLimitedAccess | false
+  AverageResourceUsage | 0
+  BlockDownloadLinksFileType | 1
+  BlockDownloadPolicy | false
+  BlockGuestsAsSiteAdmin | 0
+  BonusDiskQuota | 233320
+  ClearGroupId | false
+  ClearRestrictedAccessControl | false
+  CommentsOnSitePagesDisabled | false
+  CompatibilityLevel | 15
+  ConditionalAccessPolicy | 0
+  CreatedTime | 2022-06-14T09:25:17.817
+  CurrentResourceUsage | 0
+  DefaultLinkPermission | 0
+  DefaultLinkToExistingAccess | false
+  DefaultLinkToExistingAccessReset | false
+  DefaultShareLinkRole | 0
+  DefaultShareLinkScope | -1
+  DefaultSharingLinkType | 0
+  DenyAddAndCustomizePages | 2
+  Description |
+  DisableAppViews | 2
+  DisableCompanyWideSharingLinks | 2
+  DisableFlows | 2
+  EnableAutoExpirationVersionTrim | false
+  ExcludeBlockDownloadPolicySiteOwners | false
+  ExpireVersionsAfterDays | 0
+  ExternalUserExpirationInDays | 0
+  GroupId | bed1885e-4958-41e2-a091-b3a0dd418b1e
+  GroupOwnerLoginName | c:0o.c\|federateddirectoryclaimprovider\|bed1885e-4958-41e2-a091-b3a0dd418b1e\_o
+  HasHolds | false
+  HidePeoplePreviewingFiles | false
+  HidePeopleWhoHaveListsOpen | false
+  HubSiteId | 00000000-0000-0000-0000-000000000000
+  IBMode | Open
+  InheritVersionPolicyFromTenant | true
+  IsGroupOwnerSiteAdmin | true
+  IsHubSite | false
+  IsTeamsChannelConnected | false
+  IsTeamsConnected | false
+  LastContentModifiedDate | 2025-01-25T16:54:51.843
+  Lcid | 1033
+  LimitedAccessFileType | 1
+  ListsShowHeaderAndNavigation | false
+  LockReason | 0
+  LockState | Unlock
+  LoopDefaultSharingLinkRole | 0
+  LoopDefaultSharingLinkScope | -1
+  MajorVersionLimit | 0
+  MajorWithMinorVersionsLimit | 0
+  MediaTranscription | 0
+  OverrideBlockUserInfoVisibility | 0
+  OverrideSharingCapability | false
+  OverrideTenantAnonymousLinkExpirationPolicy | false
+  OverrideTenantExternalUserExpirationPolicy | false
+  Owner | bed1885e-4958-41e2-a091-b3a0dd418b1e\_o
+  OwnerEmail | Marketing@contoso.onmicrosoft.com
+  OwnerLoginName | c:0o.c\|federateddirectoryclaimprovider\|bed1885e-4958-41e2-a091-b3a0dd418b1e\_o
+  OwnerName | Marketing Owners
+  PWAEnabled | 0
+  ReadOnlyAccessPolicy | false
+  ReadOnlyForBlockDownloadPolicy | false
+  ReadOnlyForUnmanagedDevices | false
+  RelatedGroupId | bed1885e-4958-41e2-a091-b3a0dd418b1e
+  RequestFilesLinkEnabled | false
+  RequestFilesLinkExpirationInDays | -1
+  RestrictContentOrgWideSearch | false
+  RestrictedAccessControl | false
+  RestrictedToRegion | 3
+  SandboxedCodeActivationCapability | 2
+  SensitivityLabel | 00000000-0000-0000-0000-000000000000
+  SensitivityLabel2 |
+  SetOwnerWithoutUpdatingSecondaryAdmin | false
+  SharingAllowedDomainList |
+  SharingBlockedDomainList |
+  SharingCapability | 1
+  SharingDomainRestrictionMode | 0
+  SharingLockDownCanBeCleared | true
+  SharingLockDownEnabled | false
+  ShowPeoplePickerSuggestionsForGuestUsers | false
+  SiteDefinedSharingCapability | 1
+  SiteId | 00000000-0000-0000-0000-000000000000
+  SocialBarOnSitePagesDisabled | false
+  StorageMaximumLevel | 26214400
+  StorageUsage | 1
+  StorageWarningLevel | 25574400
+  TeamsChannelType | 0
+  Template | GROUP#0
+  TimeZoneId | 23
+  Title | Marketing
+  Url | https://contoso.sharepoint.com/sites/Marketing
+  UserCodeMaximumLevel | 300
+  UserCodeWarningLevel | 200
+  VersionCount | 0
+  VersionSize | 0
+  WebsCount | 1
+  ```
+
+  </TabItem>
+</Tabs>
