@@ -40,7 +40,8 @@ const config: Config = {
   future: {
     v4: {
       removeLegacyPostBuildHeadAttribute: true,
-      useCssCascadeLayers: true,
+      // This flag is disabled because it causes issues with the styling of admonitions, tabs, tables, collapsible sections, and other components
+      useCssCascadeLayers: false
     },
     experimental_faster: true
   },
