@@ -301,7 +301,7 @@ class SpoSiteSetCommand extends SpoCommand {
       await logger.logToStderr(`Setting the site its logo...`);
     }
 
-    const logoUrl = args.options.siteLogoUrl ? urlUtil.getServerRelativePath(args.options.url, args.options.siteLogoUrl) : "";
+    const logoUrl = args.options.siteLogoUrl ? urlUtil.getUrlRelativePath(args.options.siteLogoUrl) : "";
 
     const requestOptions: any = {
       url: `${args.options.url}/_api/siteiconmanager/setsitelogo`,
@@ -328,7 +328,7 @@ class SpoSiteSetCommand extends SpoCommand {
       await logger.logToStderr(`Setting the site thumbnail...`);
     }
 
-    const thumbnailUrl = args.options.siteThumbnailUrl ? urlUtil.getServerRelativePath(args.options.url, args.options.siteThumbnailUrl) : "";
+    const thumbnailUrl = args.options.siteThumbnailUrl ? urlUtil.getUrlRelativePath(args.options.siteThumbnailUrl) : "";
 
     const requestOptions: any = {
       url: `${args.options.url}/_api/siteiconmanager/setsitelogo`,
