@@ -70,7 +70,7 @@ class SpoTenantSiteUnarchiveCommand extends SpoCommand {
       await this.unarchiveSite(logger, args.options.url);
     }
     else {
-      const result = await cli.promptForConfirmation({ message: `Are you sure you want to unarchive site '${args.options.url}'? This may cause additional billing costs.` });
+      const result = await cli.promptForConfirmation({ message: `Are you sure you want to unarchive site '${args.options.url}'? You won't be able to rearchive this site for 120 days.` });
 
       if (result) {
         await this.unarchiveSite(logger, args.options.url);
