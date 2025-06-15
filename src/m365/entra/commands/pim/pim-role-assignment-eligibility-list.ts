@@ -75,10 +75,10 @@ class EntraPimRoleAssignmentEligibilityListCommand extends GraphCommand {
         option: '--groupName [groupName]'
       },
       {
-        option: '--includePrincipalDetails [includePrincipalDetails]'
+        option: '--includePrincipalDetails'
       },
       {
-        option: '--withPrincipalDetails [withPrincipalDetails]'
+        option: '--withPrincipalDetails'
       }
     );
   }

@@ -72,10 +72,10 @@ class EntraPimRoleAssignmentListCommand extends GraphCommand {
         option: "-s, --startDateTime [startDateTime]"
       },
       {
-        option: "--includePrincipalDetails [includePrincipalDetails]"
+        option: "--includePrincipalDetails"
       },
       {
-        option: '--withPrincipalDetails [withPrincipalDetails]'
+        option: "--withPrincipalDetails"
       }
     );
   }

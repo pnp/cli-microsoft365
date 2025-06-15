@@ -87,10 +87,10 @@ class EntraPimRoleRequestListCommand extends GraphCommand {
         autocomplete: this.allowedStatuses
       },
       {
-        option: '--includePrincipalDetails [includePrincipalDetails]'
+        option: '--includePrincipalDetails'
       },
       {
-        option: '--withPrincipalDetails [withPrincipalDetails]'
+        option: '--withPrincipalDetails'
       }
     );
   }
