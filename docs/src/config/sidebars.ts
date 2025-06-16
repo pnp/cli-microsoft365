@@ -4989,6 +4989,11 @@ const sidebars: SidebarsConfig = {
     },
     {
       type: 'doc',
+      label: 'Documenting minimal permissions',
+      id: 'contribute/document-minimal-permissions'
+    },
+    {
+      type: 'doc',
       label: 'Adding a script sample',
       id: 'contribute/script-sample/new-script-sample'
     },

@@ -1,0 +1,67 @@
+openapi: 3.0.4
+info:
+  title: SharePoint Tenant Admin site API
+  description: SharePoint Tenant Admin site API
+  version: v1.0
+servers:
+  - url: https://{tenant}-admin.sharepoint.com
+    variables:
+      tenant:
+        default: contoso
+components:
+  securitySchemes:
+    delegated:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: https://login.microsoftonline.com/common/v2.0/oauth2/authorize
+          tokenUrl: https://login.microsoftonline.com/common/v2.0/oauth2/token
+          scopes:
+            AllSites.FullControl: AllSites.FullControl
+            AllSites.Manage: AllSites.Manage
+            AllSites.Read: AllSites.Read
+            AllSites.Write: AllSites.Write
+            EnterpriseResource.Read: EnterpriseResource.Read
+            EnterpriseResource.Write: EnterpriseResource.Write
+            MyFiles.Read: MyFiles.Read
+            MyFiles.Write: MyFiles.Write
+            Project.Read: Project.Read
+            Project.Write: Project.Write
+            ProjectWebApp.FullControl: ProjectWebApp.FullControl
+            ProjectWebAppReporting.Read: ProjectWebAppReporting.Read
+            Sites.Search.All: Sites.Search.All
+            TaskStatus.Submit: TaskStatus.Submit
+            TermStore.Read.All: TermStore.Read.All
+            TermStore.ReadWrite.All: TermStore.ReadWrite.All
+            User.Read.All: User.Read.All
+            User.ReadWrite.All: User.ReadWrite.All
+    application:
+      type: oauth2
+      flows:
+        clientCredentials:
+          tokenUrl: https://login.microsoftonline.com/common/v2.0/oauth2/token
+          scopes:
+            Sites.FullControl.All: Sites.FullControl.All
+            Sites.Manage.All: Sites.Manage.All
+            Sites.Read.All: Sites.Read.All
+            Sites.ReadWrite.All: Sites.ReadWrite.All
+            Sites.Selected: Sites.Selected
+            TermStore.Read.All: TermStore.Read.All
+            TermStore.ReadWrite.All: TermStore.ReadWrite.All
+            User.Read.All: User.Read.All
+            User.ReadWrite.All: User.ReadWrite.All
+paths:
+  /_api/contextinfo:
+    post:
+      security:
+        - delegated:
+          - AllSites.Read
+          - AllSites.Write
+          - AllSites.Manage
+          - AllSites.FullControl
+      responses:
+        200:
+          description: OK
+x-ms-generated-by:
+  toolName: Dev Proxy
+  toolVersion: 0.25.0
