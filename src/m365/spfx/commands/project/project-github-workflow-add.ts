@@ -10,6 +10,8 @@ import commands from '../../commands.js';
 import { workflow } from './DeployWorkflow.js';
 import { BaseProjectCommand } from './base-project-command.js';
 import { GitHubWorkflow, GitHubWorkflowStep } from './project-github-workflow-model.js';
+import { versions } from '../SpfxCompatibilityMatrix.js';
+import { spfx } from '../../../../utils/spfx.js';
 
 interface CommandArgs {
   options: Options;
@@ -133,7 +135,12 @@ class SpfxProjectGithubWorkflowAddCommand extends BaseProjectCommand {
       this.saveWorkflow(workflow);
     }
     catch (error: any) {
-      throw new CommandError(error);
+      if (error instanceof CommandError) {
+        throw error;
+      }
+
+      const message = error instanceof Error ? error.message : String(error);
+      throw new CommandError(message);
     }
   }
 
@@ -154,6 +161,22 @@ class SpfxProjectGithubWorkflowAddCommand extends BaseProjectCommand {
     if (options.branchName) {
       workflow.on.push.branches[0] = options.branchName;
     }
+
+    const version = this.getProjectVersion();
+
+    if (!version) {
+      throw new CommandError('Unable to determine the version of the current SharePoint Framework project. Could not find the correct version based on @microsoft/generator-sharepoint property in the .yo-rc.json file.');
+    }
+
+    const versionRequirements = versions[version];
+
+    if (!versionRequirements) {
+      throw new CommandError(`Could not find Node version for ${version} of SharePoint Framework`);
+    }
+
+    const nodeVersion: string = spfx.getHighestNodeVersion(versionRequirements.node.range);
+
+    this.assignNodeVersion(workflow, nodeVersion);
 
     if (options.manuallyTrigger) {
       // eslint-disable-next-line camelcase
@@ -182,6 +205,10 @@ class SpfxProjectGithubWorkflowAddCommand extends BaseProjectCommand {
       const deployAction = this.getDeployAction(workflow);
       deployAction.with!.APP_FILE_PATH = deployAction.with!.APP_FILE_PATH!.replace('{{ solutionName }}', solutionName);
     }
+  }
+
+  private assignNodeVersion(workflow: GitHubWorkflow, nodeVersion: string): void {
+    workflow.jobs['build-and-deploy'].env.NodeVersion = nodeVersion;
   }
 
   private getLoginAction(workflow: GitHubWorkflow): GitHubWorkflowStep {
