@@ -5,6 +5,7 @@ import { Logger } from '../../../cli/Logger.js';
 import { CheckStatus, formatting } from '../../../utils/formatting.js';
 import commands from '../commands.js';
 import { BaseProjectCommand } from './project/base-project-command.js';
+import { SharePointVersion, SpfxVersionPrerequisites, VersionCheck, versions } from './SpfxCompatibilityMatrix.js';
 
 interface CommandArgs {
   options: Options;
@@ -31,35 +32,6 @@ enum PackageSearchMode {
 enum HandlePromise {
   Fail,
   Continue
-}
-
-interface VersionCheck {
-  /**
-   * Required version range in semver
-   */
-  range: string;
-  /**
-   * What to do to fix it if the required range isn't met
-   */
-  fix: string;
-}
-
-/**
- * Versions of SharePoint that support SharePoint Framework
- */
-enum SharePointVersion {
-  SP2016 = 1 << 0,
-  SP2019 = 1 << 1,
-  SPO = 1 << 2,
-  All = ~(~0 << 3)
-}
-
-interface SpfxVersionPrerequisites {
-  gulpCli?: VersionCheck;
-  heft?: VersionCheck;
-  node: VersionCheck;
-  sp: SharePointVersion;
-  yo: VersionCheck;
 }
 
 export interface SpfxDoctorCheck {
@@ -730,7 +702,7 @@ class SpfxDoctorCommand extends BaseProjectCommand {
       },
       {
         option: '-v, --spfxVersion [spfxVersion]',
-        autocomplete: Object.keys(this.versions)
+        autocomplete: Object.keys(versions)
       }
     );
   }
@@ -746,8 +718,8 @@ class SpfxDoctorCommand extends BaseProjectCommand {
         }
 
         if (args.options.spfxVersion) {
-          if (!this.versions[args.options.spfxVersion]) {
-            return `${args.options.spfxVersion} is not a supported SharePoint Framework version. Supported versions are ${Object.keys(this.versions).join(', ')}`;
+          if (!versions[args.options.spfxVersion]) {
+            return `${args.options.spfxVersion} is not a supported SharePoint Framework version. Supported versions are ${Object.keys(versions).join(', ')}`;
           }
         }
 
@@ -785,7 +757,7 @@ class SpfxDoctorCommand extends BaseProjectCommand {
         throw `SharePoint Framework not found`;
       }
 
-      prerequisites = this.versions[spfxVersion];
+      prerequisites = versions[spfxVersion];
 
       if (!prerequisites) {
         const message = `spfx doctor doesn't support SPFx v${spfxVersion} at this moment`;

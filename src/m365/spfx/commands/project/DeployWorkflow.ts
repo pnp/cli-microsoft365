@@ -14,7 +14,7 @@ export const workflow: GitHubWorkflow = {
     "build-and-deploy": {
       "runs-on": "ubuntu-latest",
       env: {
-        NodeVersion: "22.x"
+        NodeVersion: ""
       },
       steps: [
         {
@@ -115,7 +115,7 @@ export const pipeline: AzureDevOpsPipeline = {
     },
     {
       name: "NodeVersion",
-      value: "22.x"
+      value: ""
     }
   ],
   stages: [
