@@ -27,4 +27,24 @@ describe('utils/spfx', () => {
       packageJson: {}
     }), false);
   });
+
+  it('returns correct Node version for a given range', () => {
+    const version = spfx.getHighestNodeVersion('>=14.0.0 <15.0.0 || >=16.0.0 <17.0.0');
+    assert.strictEqual(version, '17.0.x');
+  });
+
+  it('returns correct Node version for a single version', () => {
+    const version = spfx.getHighestNodeVersion('^10');
+    assert.strictEqual(version, '10.0.x');
+  });
+
+  it('returns correct Node version for a range with multiple versions', () => {
+    const version = spfx.getHighestNodeVersion('^12.13 || ^14.15 || ^16.13');
+    assert.strictEqual(version, '16.13.x');
+  });
+
+  it('returns correct Node version when only minor version differ', () => {
+    const version = spfx.getHighestNodeVersion('8.1 || 8.2');
+    assert.strictEqual(version, '8.2.x');
+  });
 });
