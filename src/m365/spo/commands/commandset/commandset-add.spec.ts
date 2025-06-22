@@ -19,6 +19,7 @@ describe(commands.COMMANDSET_ADD, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   const validTitle = 'CLI Custom Action';
+  const validDescription = 'CLI Custom Action Description';
   const validClientSideComponentId = 'b206e130-1a5b-4ae7-86a7-4f91c9924d0a';
   const validWebUrl = 'https://contoso.sharepoint.com';
   const validClientSideComponentProperties = '{"testMessage":"Test message"}';
@@ -27,7 +28,7 @@ describe(commands.COMMANDSET_ADD, () => {
     ClientSideComponentId: "b206e130-1a5b-4ae7-86a7-4f91c9924d0a",
     ClientSideComponentProperties: "",
     CommandUIExtension: null,
-    Description: null,
+    Description: validDescription,
     Group: null,
     HostProperties: "",
     Id: "680ccc51-7ddf-4dda-8696-fc606480cc3f",
@@ -156,7 +157,7 @@ describe(commands.COMMANDSET_ADD, () => {
   });
 
   it('passes validation if all required options specified', async () => {
-    const actual = await command.validate({ options: { title: validTitle, webUrl: validWebUrl, listType: validListType, clientSideComponentId: validClientSideComponentId, scope: 'Web', location: 'Both', clientSideComponentProperties: validClientSideComponentProperties } }, commandInfo);
+    const actual = await command.validate({ options: { title: validTitle, webUrl: validWebUrl, listType: validListType, clientSideComponentId: validClientSideComponentId, description: validDescription, scope: 'Web', location: 'Both', clientSideComponentProperties: validClientSideComponentProperties } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
@@ -171,7 +172,7 @@ describe(commands.COMMANDSET_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, webUrl: validWebUrl, title: validTitle, clientSideComponentId: validClientSideComponentId, clientSideComponentProperties: validClientSideComponentProperties, listType: validListType, scope: 'Web', location: 'Both' } });
+    await command.action(logger, { options: { debug: true, webUrl: validWebUrl, title: validTitle, description: validDescription, clientSideComponentId: validClientSideComponentId, clientSideComponentProperties: validClientSideComponentProperties, listType: validListType, scope: 'Web', location: 'Both' } });
     assert(loggerLogSpy.calledWith(commandactionResponse));
   });
 
@@ -186,7 +187,7 @@ describe(commands.COMMANDSET_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: validWebUrl, title: validTitle, clientSideComponentId: validClientSideComponentId, clientSideComponentProperties: validClientSideComponentProperties, listType: 'Library' } });
+    await command.action(logger, { options: { webUrl: validWebUrl, title: validTitle, description: validDescription, clientSideComponentId: validClientSideComponentId, clientSideComponentProperties: validClientSideComponentProperties, listType: 'Library' } });
     assert(loggerLogSpy.calledWith(commandactionResponse));
   });
 
@@ -204,7 +205,7 @@ describe(commands.COMMANDSET_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: validWebUrl, title: validTitle, clientSideComponentId: validClientSideComponentId, clientSideComponentProperties: validClientSideComponentProperties, scope: 'Site', listType: 'SitePages', location: 'ContextMenu' } });
+    await command.action(logger, { options: { webUrl: validWebUrl, title: validTitle, description: validDescription, clientSideComponentId: validClientSideComponentId, clientSideComponentProperties: validClientSideComponentProperties, scope: 'Site', listType: 'SitePages', location: 'ContextMenu' } });
     assert(loggerLogSpy.calledWith(response));
   });
 
@@ -222,7 +223,7 @@ describe(commands.COMMANDSET_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: validWebUrl, title: validTitle, clientSideComponentId: validClientSideComponentId, clientSideComponentProperties: validClientSideComponentProperties, scope: 'Site', listType: validListType, location: 'CommandBar' } });
+    await command.action(logger, { options: { webUrl: validWebUrl, title: validTitle, description: validDescription, clientSideComponentId: validClientSideComponentId, clientSideComponentProperties: validClientSideComponentProperties, scope: 'Site', listType: validListType, location: 'CommandBar' } });
     assert(loggerLogSpy.calledWith(response));
   });
 
@@ -239,7 +240,7 @@ describe(commands.COMMANDSET_ADD, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: validWebUrl, title: validTitle, clientSideComponentId: validClientSideComponentId, clientSideComponentProperties: validClientSideComponentProperties, scope: 'Site' } } as any),
+    await assert.rejects(command.action(logger, { options: { webUrl: validWebUrl, title: validTitle, description: validDescription, clientSideComponentId: validClientSideComponentId, clientSideComponentProperties: validClientSideComponentProperties, scope: 'Site' } } as any),
       new CommandError(`Something went wrong adding the commandset`));
   });
 
