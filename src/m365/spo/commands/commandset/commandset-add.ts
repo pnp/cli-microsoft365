@@ -15,6 +15,7 @@ interface Options extends GlobalOptions {
   webUrl: string;
   listType: string;
   clientSideComponentId: string;
+  description?: string;
   clientSideComponentProperties?: string;
   scope?: string;
   location?: string;
@@ -44,6 +45,7 @@ class SpoCommandSetAddCommand extends SpoCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
+        description: typeof args.options.description !== 'undefined',
         clientSideComponentProperties: typeof args.options.clientSideComponentProperties !== 'undefined',
         scope: typeof args.options.scope !== 'undefined',
         location: typeof args.options.location !== 'undefined'
@@ -64,6 +66,9 @@ class SpoCommandSetAddCommand extends SpoCommand {
       },
       {
         option: '-i, --clientSideComponentId  <clientSideComponentId>'
+      },
+      {
+        option: '--description [description]'
       },
       {
         option: '--clientSideComponentProperties  [clientSideComponentProperties]'
@@ -121,6 +126,10 @@ class SpoCommandSetAddCommand extends SpoCommand {
         RegistrationId: listType,
         RegistrationType: 1
       };
+
+      if (args.options.description) {
+        requestBody.Description = args.options.description;
+      }
 
       if (args.options.clientSideComponentProperties) {
         requestBody.ClientSideComponentProperties = args.options.clientSideComponentProperties;
