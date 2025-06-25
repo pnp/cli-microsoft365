@@ -462,7 +462,10 @@ describe(commands.TERM_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['Id', 'Name', 'ParentTermId']);
   });
 
-  it('gets taxonomy terms including child terms from term set by id, term group by id', async () => {
+  it(`correctly shows deprecation warning for option 'includeChildTerms'`, async () => {
+    const chalk = (await import('chalk')).default;
+    const loggerErrSpy = sinon.spy(logger, 'logToStderr');
+
     const termGroupId = '0e8f395e-ff58-4d45-9ff7-e331ab728beb';
     const termSetId = '7a167c47-2b37-41d0-94d0-e962c1a4f2ed';
     sinon.stub(request, 'post').callsFake(async (opts) => {
@@ -484,6 +487,33 @@ describe(commands.TERM_LIST, () => {
     });
 
     await command.action(logger, { options: { termSetId: termSetId, termGroupId: termGroupId, includeChildTerms: true } });
+    assert(loggerErrSpy.calledWith(chalk.yellow(`Parameter 'includeChildTerms' is deprecated. Please use 'withChildTerms' instead`)));
+
+    sinonUtil.restore(loggerErrSpy);
+  });
+
+  it('gets taxonomy terms including child terms from term set by id, term group by id', async () => {
+    const termGroupId = '0e8f395e-ff58-4d45-9ff7-e331ab728beb';
+    const termSetId = '7a167c47-2b37-41d0-94d0-e962c1a4f2ed';
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso-admin.sharepoint.com/_vti_bin/client.svc/ProcessQuery' && opts.headers && opts.headers['X-RequestDigest']) {
+        if (opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="70" ObjectPathId="69" /><ObjectIdentityQuery Id="71" ObjectPathId="69" /><ObjectPath Id="73" ObjectPathId="72" /><ObjectIdentityQuery Id="74" ObjectPathId="72" /><ObjectPath Id="76" ObjectPathId="75" /><ObjectPath Id="78" ObjectPathId="77" /><ObjectIdentityQuery Id="79" ObjectPathId="77" /><ObjectPath Id="81" ObjectPathId="80" /><ObjectPath Id="83" ObjectPathId="82" /><ObjectIdentityQuery Id="84" ObjectPathId="82" /><ObjectPath Id="86" ObjectPathId="85" /><Query Id="87" ObjectPathId="85"><Query SelectAllProperties="false"><Properties /></Query><ChildItemQuery SelectAllProperties="true"><Properties><Property Name="Name" ScalarProperty="true" /><Property Name="Id" ScalarProperty="true" /></Properties></ChildItemQuery></Query></Actions><ObjectPaths><StaticMethod Id="69" Name="GetTaxonomySession" TypeId="{981cbc68-9edc-4f8d-872f-71146fcbb84f}" /><Method Id="72" ParentId="69" Name="GetDefaultSiteCollectionTermStore" /><Property Id="75" ParentId="72" Name="Groups" /><Method Id="77" ParentId="75" Name="GetById"><Parameters><Parameter Type="Guid">{${termGroupId}}</Parameter></Parameters></Method><Property Id="80" ParentId="77" Name="TermSets" /><Method Id="82" ParentId="80" Name="GetById"><Parameters><Parameter Type="Guid">{${termSetId}}</Parameter></Parameters></Method><Property Id="85" ParentId="82" Name="Terms" /></ObjectPaths></Request>`) {
+          return csomDefaultResponseJson;
+        }
+
+        if (opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="20" ObjectPathId="19" /><Query Id="21" ObjectPathId="19"><Query SelectAllProperties="false"><Properties /></Query><ChildItemQuery SelectAllProperties="true"><Properties><Property Name="CustomSortOrder" ScalarProperty="true" /><Property Name="CustomProperties" ScalarProperty="true" /><Property Name="LocalCustomProperties" ScalarProperty="true" /></Properties></ChildItemQuery></Query></Actions><ObjectPaths><Property Id="19" ParentId="16" Name="Terms" /><Identity Id="16" Name="${csomDefaultResponseFormatted.filter(y => y.TermsCount > 0)[0]._ObjectIdentity_}" /></ObjectPaths></Request>`) {
+          return csomFirstChildTermResponseJson;
+        }
+
+        if (opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="20" ObjectPathId="19" /><Query Id="21" ObjectPathId="19"><Query SelectAllProperties="false"><Properties /></Query><ChildItemQuery SelectAllProperties="true"><Properties><Property Name="CustomSortOrder" ScalarProperty="true" /><Property Name="CustomProperties" ScalarProperty="true" /><Property Name="LocalCustomProperties" ScalarProperty="true" /></Properties></ChildItemQuery></Query></Actions><ObjectPaths><Property Id="19" ParentId="16" Name="Terms" /><Identity Id="16" Name="6ede85a0-70c8-6000-02cc-23cfae5cac8f|fec14c62-7c3b-481b-851b-c80d7802b224:te:kTm3XibpGUiE5nxBtVMTf14Jch8b6X1EtvEo9yq4/mCesjVWlBPHRaBqFOZeTRSNHOmHw1O1kkuIa5r3F81zsA==" /></ObjectPaths></Request>`) {
+          return csomSecondChildTermResponseJson;
+        }
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { termSetId: termSetId, termGroupId: termGroupId, withChildTerms: true } });
     assert(loggerLogSpy.calledWith(csomChildResponseFormatted));
   });
 
@@ -508,7 +538,7 @@ describe(commands.TERM_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { termSetId: termSetId, termGroupId: termGroupId, includeChildTerms: true, output: 'text' } });
+    await command.action(logger, { options: { termSetId: termSetId, termGroupId: termGroupId, withChildTerms: true, output: 'text' } });
     assert(loggerLogSpy.calledWith(csomChildResponseFormattedText));
   });
 

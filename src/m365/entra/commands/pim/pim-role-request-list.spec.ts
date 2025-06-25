@@ -528,7 +528,10 @@ describe(commands.PIM_ROLE_REQUEST_LIST, () => {
     assert(loggerLogSpy.calledOnceWithExactly([unifiedRoleAssignmentScheduleRequestTransformedResponse[1]]));
   });
 
-  it('should get a list of PIM requests with details about principal that were assigned', async () => {
+  it(`correctly shows deprecation warning for option 'includePrincipalDetails'`, async () => {
+    const chalk = (await import('chalk')).default;
+    const loggerErrSpy = sinon.spy(logger, 'logToStderr');
+
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/roleManagement/directory/roleAssignmentScheduleRequests?$expand=roleDefinition($select=displayName),principal') {
         return {
@@ -540,6 +543,23 @@ describe(commands.PIM_ROLE_REQUEST_LIST, () => {
     });
 
     await command.action(logger, { options: { includePrincipalDetails: true } });
+
+    assert(loggerErrSpy.calledWith(chalk.yellow(`Parameter 'includePrincipalDetails' is deprecated. Please use 'withPrincipalDetails' instead`)));
+    sinonUtil.restore(loggerErrSpy);
+  });
+
+  it('should get a list of PIM requests with details about principal that were assigned', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/roleManagement/directory/roleAssignmentScheduleRequests?$expand=roleDefinition($select=displayName),principal') {
+        return {
+          value: unifiedRoleAssignmentScheduleRequestWithPrincipalResponse
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { withPrincipalDetails: true } });
 
     assert(loggerLogSpy.calledOnceWithExactly(unifiedRoleAssignmentScheduleRequestWithPrincipalTransformedResponse));
   });
@@ -556,7 +576,7 @@ describe(commands.PIM_ROLE_REQUEST_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { groupName: groupName, createdDateTime: createdDateTime, includePrincipalDetails: true } });
+    await command.action(logger, { options: { groupName: groupName, createdDateTime: createdDateTime, withPrincipalDetails: true } });
 
     assert(loggerLogSpy.calledOnceWithExactly(unifiedRoleAssignmentScheduleRequestWithPrincipalTransformedResponse));
   });

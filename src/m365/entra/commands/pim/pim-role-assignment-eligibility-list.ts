@@ -18,6 +18,7 @@ interface Options extends GlobalOptions {
   groupId?: string;
   groupName?: string;
   includePrincipalDetails?: boolean;
+  withPrincipalDetails?: boolean;
 }
 
 interface UnifiedRoleEligibilityScheduleInstanceEx extends UnifiedRoleEligibilityScheduleInstance {
@@ -53,7 +54,8 @@ class EntraPimRoleAssignmentEligibilityListCommand extends GraphCommand {
         userName: typeof args.options.userName !== 'undefined',
         groupId: typeof args.options.groupId !== 'undefined',
         groupName: typeof args.options.groupName !== 'undefined',
-        includePrincipalDetails: !!args.options.includePrincipalDetails
+        includePrincipalDetails: !!args.options.includePrincipalDetails,
+        withPrincipalDetails: !!args.options.withPrincipalDetails
       });
     });
   }
@@ -73,7 +75,10 @@ class EntraPimRoleAssignmentEligibilityListCommand extends GraphCommand {
         option: '--groupName [groupName]'
       },
       {
-        option: '--includePrincipalDetails [includePrincipalDetails]'
+        option: '--includePrincipalDetails'
+      },
+      {
+        option: '--withPrincipalDetails'
       }
     );
   }
@@ -106,6 +111,10 @@ class EntraPimRoleAssignmentEligibilityListCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    if (args.options.includePrincipalDetails) {
+      await this.warn(logger, `Parameter 'includePrincipalDetails' is deprecated. Please use 'withPrincipalDetails' instead`);
+    }
+
     if (this.verbose) {
       await logger.logToStderr(`Retrieving list of eligible roles for ${args.options.userId || args.options.userName || args.options.groupId || args.options.groupName || 'all users'}...`);
     }
@@ -121,7 +130,7 @@ class EntraPimRoleAssignmentEligibilityListCommand extends GraphCommand {
 
       expands.push('roleDefinition($select=displayName)');
 
-      if (args.options.includePrincipalDetails) {
+      if (args.options.includePrincipalDetails || args.options.withPrincipalDetails) {
         expands.push('principal');
       }
 

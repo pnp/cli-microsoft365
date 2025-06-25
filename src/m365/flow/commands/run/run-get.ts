@@ -143,7 +143,7 @@ class FlowRunGetCommand extends PowerAutomateCommand {
     }
 
     if (args.options.includeTriggerInformation) {
-      await this.warn(logger, `Parameter 'includeTriggerInformation' is deprecated. Please use 'withTrigger instead`);
+      await this.warn(logger, `Parameter 'includeTriggerInformation' is deprecated. Please use 'withTrigger' instead`);
     }
 
     const actionsParameter = args.options.withActions ? '$expand=properties%2Factions&' : '';

@@ -12,6 +12,7 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   id: string;
   includeResults?: boolean;
+  withResults?: boolean;
 }
 
 class PurviewThreatAssessmentGetCommand extends GraphCommand {
@@ -34,7 +35,8 @@ class PurviewThreatAssessmentGetCommand extends GraphCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        includeResults: !!args.options.includeResults
+        includeResults: !!args.options.includeResults,
+        withResults: !!args.options.withResults
       });
     });
   }
@@ -46,6 +48,9 @@ class PurviewThreatAssessmentGetCommand extends GraphCommand {
       },
       {
         option: '--includeResults'
+      },
+      {
+        option: '--withResults'
       }
     );
   }
@@ -63,12 +68,18 @@ class PurviewThreatAssessmentGetCommand extends GraphCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
+      if (args.options.includeResults) {
+        await this.warn(logger, `Parameter 'includeResults' is deprecated. Please use 'withResults' instead`);
+      }
+
       if (this.verbose) {
         await logger.logToStderr(`Retrieving threat assessment with id ${args.options.id}`);
       }
 
+      const shouldIncludeResults: boolean | undefined = args.options.includeResults || args.options.withResults;
+
       const requestOptions: CliRequestOptions = {
-        url: `${this.resource}/v1.0/informationProtection/threatAssessmentRequests/${args.options.id}${args.options.includeResults ? '?$expand=results' : ''}`,
+        url: `${this.resource}/v1.0/informationProtection/threatAssessmentRequests/${args.options.id}${shouldIncludeResults ? '?$expand=results' : ''}`,
         headers: {
           accept: 'application/json;odata.metadata=none'
         },
