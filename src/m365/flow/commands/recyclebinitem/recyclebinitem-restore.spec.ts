@@ -31,7 +31,7 @@ describe(commands.OWNER_LIST, () => {
     sinon.stub(telemetry, 'trackEvent').resolves();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
-    sinon.stub(accessToken, 'assertDelegatedAccessToken').returns();
+    sinon.stub(accessToken, 'assertAccessTokenType').returns();
 
     commandInfo = cli.getCommandInfo(command);
     commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
