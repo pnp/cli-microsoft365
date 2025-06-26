@@ -2,12 +2,11 @@ import { z } from 'zod';
 import { zod } from '../../../../utils/zod.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { globalOptionsZod } from '../../../../Command.js';
-import request, { CliRequestOptions } from '../../../../request.js';
-import { formatting } from '../../../../utils/formatting.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
+import { Page } from './Page.js';
 
 const options = globalOptionsZod
   .extend({
@@ -50,15 +49,7 @@ class SpoPagePublishCommand extends SpoCommand {
         await logger.logToStderr(`Publishing page ${pageName}...`);
       }
 
-      const filePath = `${urlUtil.getServerRelativeSiteUrl(args.options.webUrl)}/SitePages/${pageName}`;
-      const requestOptions: CliRequestOptions = {
-        url: `${args.options.webUrl}/_api/web/GetFileByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(filePath)}')/Publish()`,
-        headers: {
-          accept: 'application/json;odata=nometadata'
-        }
-      };
-
-      await request.post(requestOptions);
+      await Page.publishPage(args.options.webUrl, pageName);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);

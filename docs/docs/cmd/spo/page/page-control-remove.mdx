@@ -1,0 +1,56 @@
+import Global from '/docs/cmd/_global.mdx';
+
+# spo page control remove
+
+Removes a control from a modern page
+
+## Usage
+
+```sh
+m365 spo page control remove [options]
+```
+
+## Options
+
+```md definition-list
+`-u, --webUrl <webUrl>`
+: URL of the site where the page is located.
+
+`-n, --pageName <pageName>`
+: Name of the page where the control is located.
+
+`-i, --id <id>`
+: The ID of the control to be removed.
+
+`--draft`
+: Save the page as draft instead of republishing it.
+
+`-f, --force`
+: Don't prompt for confirmation.
+```
+
+<Global />
+
+## Examples
+
+Remove a control from a SharePoint page, with confirmation
+
+```sh
+m365 spo page control remove --webUrl https://contoso.sharepoint.com/sites/Marketing --pageName home.aspx --id b3d6ebc9-6c7b-4e1e-99c1-4c08b682e8c1
+```
+
+Remove a control from a SharePoint page and don't republish the page
+
+```sh
+m365 spo page control remove --webUrl https://contoso.sharepoint.com/sites/Marketing --pageName "home.aspx" --id b3d6ebc9-6c7b-4e1e-99c1-4c08b682e8c1 --draft
+```
+
+Remove a control from a SharePoint page, that is located in a folder
+
+```sh
+m365 spo page control remove --webUrl https://contoso.sharepoint.com/sites/Marketing --pageName "Archive/home.aspx" --id b3d6ebc9-6c7b-4e1e-99c1-4c08b682e8c1
+```
+
+## Response
+
+The command won't return a response on success.
