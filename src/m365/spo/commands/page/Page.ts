@@ -101,6 +101,23 @@ export class Page {
     };
   }
 
+  /**
+   * Publish a modern page in SharePoint Online
+   * @param webUrl Absolute URL of the SharePoint site where the page is located
+   * @param pageName List relative url of the page to publish
+   */
+  public static async publishPage(webUrl: string, pageName: string): Promise<void> {
+    const filePath = `${urlUtil.getServerRelativeSiteUrl(webUrl)}/SitePages/${pageName}`;
+    const requestOptions: CliRequestOptions = {
+      url: `${webUrl}/_api/web/GetFileByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(filePath)}')/Publish()`,
+      headers: {
+        accept: 'application/json;odata=nometadata'
+      }
+    };
+
+    await request.post(requestOptions);
+  }
+
   private static getPageNameWithExtension(name: string): string {
     let pageName: string = name;
     if (pageName.indexOf('.aspx') < 0) {
