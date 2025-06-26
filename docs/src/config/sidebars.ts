@@ -3472,6 +3472,11 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
+              label: 'page control remove',
+              id: 'cmd/spo/page/page-control-remove'
+            },
+            {
+              type: 'doc',
               label: 'page control set',
               id: 'cmd/spo/page/page-control-set'
             },
