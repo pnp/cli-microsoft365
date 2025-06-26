@@ -21,16 +21,6 @@ describe(commands.APP_ROLE_REMOVE, () => {
   let commandInfo: CommandInfo;
   let promptIssued: boolean = false;
 
-  //#region Mocked Responses 
-  const appResponse = {
-    value: [
-      {
-        "id": "5b31c38c-2584-42f0-aa47-657fb3a84230"
-      }
-    ]
-  };
-  //#endregion
-
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').resolves();
@@ -68,7 +58,9 @@ describe(commands.APP_ROLE_REMOVE, () => {
       cli.promptForConfirmation,
       cli.getSettingWithDefaultValue,
       cli.handleMultipleResultsFound,
-      entraApp.getAppRegistrationByAppId
+      entraApp.getAppRegistrationByAppId,
+      entraApp.getAppRegistrationByAppName,
+      entraApp.getAppRegistrationByObjectId
     ]);
   });
 
@@ -86,40 +78,32 @@ describe(commands.APP_ROLE_REMOVE, () => {
   });
 
   it('deletes an app role when the role is in enabled state and valid appObjectId, role claim and --force option specified', async () => {
-    sinon.stub(request, 'get').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230?$select=id,appRoles') {
-        return {
-          id: '5b31c38c-2584-42f0-aa47-657fb3a84230',
-          appRoles: [
-            {
-              "allowedMemberTypes": [
-                "User"
-              ],
-              "description": "Product read",
-              "displayName": "ProductRead",
-              "id": "c4352a0a-494f-46f9-b843-479855c173a7",
-              "isEnabled": true,
-              "lang": null,
-              "origin": "Application",
-              "value": "Product.Read"
-            },
-            {
-              "allowedMemberTypes": [
-                "User"
-              ],
-              "description": "Product write",
-              "displayName": "ProductWrite",
-              "id": "54e8e043-86db-49bb-bfa8-c9c27ebdf3b6",
-              "isEnabled": true,
-              "lang": null,
-              "origin": "Application",
-              "value": "Product.Write"
-            }
-          ]
-        };
-      }
-
-      throw `Invalid request ${JSON.stringify(opts)}`;
+    sinon.stub(entraApp, 'getAppRegistrationByObjectId').resolves({
+      id: '5b31c38c-2584-42f0-aa47-657fb3a84230',
+      appRoles: [
+        {
+          "allowedMemberTypes": [
+            "User"
+          ],
+          "description": "Product read",
+          "displayName": "ProductRead",
+          "id": "c4352a0a-494f-46f9-b843-479855c173a7",
+          "isEnabled": true,
+          "origin": "Application",
+          "value": "Product.Read"
+        },
+        {
+          "allowedMemberTypes": [
+            "User"
+          ],
+          "description": "Product write",
+          "displayName": "ProductWrite",
+          "id": "54e8e043-86db-49bb-bfa8-c9c27ebdf3b6",
+          "isEnabled": true,
+          "origin": "Application",
+          "value": "Product.Write"
+        }
+      ]
     });
 
     const patchStub = sinon.stub(request, 'patch');
@@ -161,40 +145,32 @@ describe(commands.APP_ROLE_REMOVE, () => {
   });
 
   it('deletes an app role when the role is in enabled state and valid appObjectId, role name and --force option specified', async () => {
-    sinon.stub(request, 'get').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230?$select=id,appRoles') {
-        return {
-          id: '5b31c38c-2584-42f0-aa47-657fb3a84230',
-          appRoles: [
-            {
-              "allowedMemberTypes": [
-                "User"
-              ],
-              "description": "Product read",
-              "displayName": "ProductRead",
-              "id": "c4352a0a-494f-46f9-b843-479855c173a7",
-              "isEnabled": true,
-              "lang": null,
-              "origin": "Application",
-              "value": "Product.Read"
-            },
-            {
-              "allowedMemberTypes": [
-                "User"
-              ],
-              "description": "Product write",
-              "displayName": "ProductWrite",
-              "id": "54e8e043-86db-49bb-bfa8-c9c27ebdf3b6",
-              "isEnabled": true,
-              "lang": null,
-              "origin": "Application",
-              "value": "Product.Write"
-            }
-          ]
-        };
-      }
-
-      throw `Invalid request ${JSON.stringify(opts)}`;
+    sinon.stub(entraApp, 'getAppRegistrationByObjectId').resolves({
+      id: '5b31c38c-2584-42f0-aa47-657fb3a84230',
+      appRoles: [
+        {
+          "allowedMemberTypes": [
+            "User"
+          ],
+          "description": "Product read",
+          "displayName": "ProductRead",
+          "id": "c4352a0a-494f-46f9-b843-479855c173a7",
+          "isEnabled": true,
+          "origin": "Application",
+          "value": "Product.Read"
+        },
+        {
+          "allowedMemberTypes": [
+            "User"
+          ],
+          "description": "Product write",
+          "displayName": "ProductWrite",
+          "id": "54e8e043-86db-49bb-bfa8-c9c27ebdf3b6",
+          "isEnabled": true,
+          "origin": "Application",
+          "value": "Product.Write"
+        }
+      ]
     });
 
     const patchStub = sinon.stub(request, 'patch');
@@ -236,40 +212,32 @@ describe(commands.APP_ROLE_REMOVE, () => {
   });
 
   it('deletes an app role when the role is in enabled state and valid appObjectId, role id and --force option specified', async () => {
-    sinon.stub(request, 'get').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230?$select=id,appRoles') {
-        return {
-          id: '5b31c38c-2584-42f0-aa47-657fb3a84230',
-          appRoles: [
-            {
-              "allowedMemberTypes": [
-                "User"
-              ],
-              "description": "Product read",
-              "displayName": "ProductRead",
-              "id": "c4352a0a-494f-46f9-b843-479855c173a7",
-              "isEnabled": true,
-              "lang": null,
-              "origin": "Application",
-              "value": "Product.Read"
-            },
-            {
-              "allowedMemberTypes": [
-                "User"
-              ],
-              "description": "Product write",
-              "displayName": "ProductWrite",
-              "id": "54e8e043-86db-49bb-bfa8-c9c27ebdf3b6",
-              "isEnabled": true,
-              "lang": null,
-              "origin": "Application",
-              "value": "Product.Write"
-            }
-          ]
-        };
-      }
-
-      throw `Invalid request ${JSON.stringify(opts)}`;
+    sinon.stub(entraApp, 'getAppRegistrationByObjectId').resolves({
+      id: '5b31c38c-2584-42f0-aa47-657fb3a84230',
+      appRoles: [
+        {
+          "allowedMemberTypes": [
+            "User"
+          ],
+          "description": "Product read",
+          "displayName": "ProductRead",
+          "id": "c4352a0a-494f-46f9-b843-479855c173a7",
+          "isEnabled": true,
+          "origin": "Application",
+          "value": "Product.Read"
+        },
+        {
+          "allowedMemberTypes": [
+            "User"
+          ],
+          "description": "Product write",
+          "displayName": "ProductWrite",
+          "id": "54e8e043-86db-49bb-bfa8-c9c27ebdf3b6",
+          "isEnabled": true,
+          "origin": "Application",
+          "value": "Product.Write"
+        }
+      ]
     });
 
     const patchStub = sinon.stub(request, 'patch');
@@ -311,42 +279,32 @@ describe(commands.APP_ROLE_REMOVE, () => {
   });
 
   it('deletes an app role when the role is in enabled state and valid appId, role claim and --force option specified', async () => {
-    sinon.stub(entraApp, 'getAppRegistrationByAppId').resolves(appResponse.value[0]);
-
-    sinon.stub(request, 'get').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230?$select=id,appRoles') {
-        return {
-          id: '5b31c38c-2584-42f0-aa47-657fb3a84230',
-          appRoles: [
-            {
-              "allowedMemberTypes": [
-                "User"
-              ],
-              "description": "Product read",
-              "displayName": "ProductRead",
-              "id": "c4352a0a-494f-46f9-b843-479855c173a7",
-              "isEnabled": true,
-              "lang": null,
-              "origin": "Application",
-              "value": "Product.Read"
-            },
-            {
-              "allowedMemberTypes": [
-                "User"
-              ],
-              "description": "Product write",
-              "displayName": "ProductWrite",
-              "id": "54e8e043-86db-49bb-bfa8-c9c27ebdf3b6",
-              "isEnabled": true,
-              "lang": null,
-              "origin": "Application",
-              "value": "Product.Write"
-            }
-          ]
-        };
-      }
-
-      throw `Invalid request ${JSON.stringify(opts)}`;
+    sinon.stub(entraApp, 'getAppRegistrationByAppId').resolves({
+      id: '5b31c38c-2584-42f0-aa47-657fb3a84230',
+      appRoles: [
+        {
+          "allowedMemberTypes": [
+            "User"
+          ],
+          "description": "Product read",
+          "displayName": "ProductRead",
+          "id": "c4352a0a-494f-46f9-b843-479855c173a7",
+          "isEnabled": true,
+          "origin": "Application",
+          "value": "Product.Read"
+        },
+        {
+          "allowedMemberTypes": [
+            "User"
+          ],
+          "description": "Product write",
+          "displayName": "ProductWrite",
+          "id": "54e8e043-86db-49bb-bfa8-c9c27ebdf3b6",
+          "isEnabled": true,
+          "origin": "Application",
+          "value": "Product.Write"
+        }
+      ]
     });
 
     const patchStub = sinon.stub(request, 'patch');
@@ -387,42 +345,32 @@ describe(commands.APP_ROLE_REMOVE, () => {
   });
 
   it('deletes an app role when the role is in enabled state and valid appId, role name and --force option specified', async () => {
-    sinon.stub(entraApp, 'getAppRegistrationByAppId').resolves(appResponse.value[0]);
-
-    sinon.stub(request, 'get').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230?$select=id,appRoles') {
-        return {
-          id: '5b31c38c-2584-42f0-aa47-657fb3a84230',
-          appRoles: [
-            {
-              "allowedMemberTypes": [
-                "User"
-              ],
-              "description": "Product read",
-              "displayName": "ProductRead",
-              "id": "c4352a0a-494f-46f9-b843-479855c173a7",
-              "isEnabled": true,
-              "lang": null,
-              "origin": "Application",
-              "value": "Product.Read"
-            },
-            {
-              "allowedMemberTypes": [
-                "User"
-              ],
-              "description": "Product write",
-              "displayName": "ProductWrite",
-              "id": "54e8e043-86db-49bb-bfa8-c9c27ebdf3b6",
-              "isEnabled": true,
-              "lang": null,
-              "origin": "Application",
-              "value": "Product.Write"
-            }
-          ]
-        };
-      }
-
-      throw `Invalid request ${JSON.stringify(opts)}`;
+    sinon.stub(entraApp, 'getAppRegistrationByAppId').resolves({
+      id: '5b31c38c-2584-42f0-aa47-657fb3a84230',
+      appRoles: [
+        {
+          "allowedMemberTypes": [
+            "User"
+          ],
+          "description": "Product read",
+          "displayName": "ProductRead",
+          "id": "c4352a0a-494f-46f9-b843-479855c173a7",
+          "isEnabled": true,
+          "origin": "Application",
+          "value": "Product.Read"
+        },
+        {
+          "allowedMemberTypes": [
+            "User"
+          ],
+          "description": "Product write",
+          "displayName": "ProductWrite",
+          "id": "54e8e043-86db-49bb-bfa8-c9c27ebdf3b6",
+          "isEnabled": true,
+          "origin": "Application",
+          "value": "Product.Write"
+        }
+      ]
     });
 
     const patchStub = sinon.stub(request, 'patch');
@@ -464,41 +412,32 @@ describe(commands.APP_ROLE_REMOVE, () => {
   });
 
   it('deletes an app role when the role is in enabled state and valid appId, role id and --force option specified', async () => {
-    sinon.stub(entraApp, 'getAppRegistrationByAppId').resolves(appResponse.value[0]);
-
-    sinon.stub(request, 'get').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230?$select=id,appRoles') {
-        return {
-          id: '5b31c38c-2584-42f0-aa47-657fb3a84230',
-          appRoles: [
-            {
-              "allowedMemberTypes": [
-                "User"
-              ],
-              "description": "Product read",
-              "displayName": "ProductRead",
-              "id": "c4352a0a-494f-46f9-b843-479855c173a7",
-              "isEnabled": true,
-              "lang": null,
-              "origin": "Application",
-              "value": "Product.Read"
-            },
-            {
-              "allowedMemberTypes": [
-                "User"
-              ],
-              "description": "Product write",
-              "displayName": "ProductWrite",
-              "id": "54e8e043-86db-49bb-bfa8-c9c27ebdf3b6",
-              "isEnabled": true,
-              "lang": null,
-              "origin": "Application",
-              "value": "Product.Write"
-            }
-          ]
-        };
-      }
-      throw `Invalid request ${JSON.stringify(opts)}`;
+    sinon.stub(entraApp, 'getAppRegistrationByAppId').resolves({
+      id: '5b31c38c-2584-42f0-aa47-657fb3a84230',
+      appRoles: [
+        {
+          "allowedMemberTypes": [
+            "User"
+          ],
+          "description": "Product read",
+          "displayName": "ProductRead",
+          "id": "c4352a0a-494f-46f9-b843-479855c173a7",
+          "isEnabled": true,
+          "origin": "Application",
+          "value": "Product.Read"
+        },
+        {
+          "allowedMemberTypes": [
+            "User"
+          ],
+          "description": "Product write",
+          "displayName": "ProductWrite",
+          "id": "54e8e043-86db-49bb-bfa8-c9c27ebdf3b6",
+          "isEnabled": true,
+          "origin": "Application",
+          "value": "Product.Write"
+        }
+      ]
     });
 
     const patchStub = sinon.stub(request, 'patch');
@@ -540,40 +479,32 @@ describe(commands.APP_ROLE_REMOVE, () => {
   });
 
   it('deletes an app role when the role is in enabled state and valid appObjectId, role claim and --force option specified (debug)', async () => {
-    sinon.stub(request, 'get').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230?$select=id,appRoles') {
-        return {
-          id: '5b31c38c-2584-42f0-aa47-657fb3a84230',
-          appRoles: [
-            {
-              "allowedMemberTypes": [
-                "User"
-              ],
-              "description": "Product read",
-              "displayName": "ProductRead",
-              "id": "c4352a0a-494f-46f9-b843-479855c173a7",
-              "isEnabled": true,
-              "lang": null,
-              "origin": "Application",
-              "value": "Product.Read"
-            },
-            {
-              "allowedMemberTypes": [
-                "User"
-              ],
-              "description": "Product write",
-              "displayName": "ProductWrite",
-              "id": "54e8e043-86db-49bb-bfa8-c9c27ebdf3b6",
-              "isEnabled": true,
-              "lang": null,
-              "origin": "Application",
-              "value": "Product.Write"
-            }
-          ]
-        };
-      }
-
-      throw `Invalid request ${JSON.stringify(opts)}`;
+    sinon.stub(entraApp, 'getAppRegistrationByObjectId').resolves({
+      id: '5b31c38c-2584-42f0-aa47-657fb3a84230',
+      appRoles: [
+        {
+          "allowedMemberTypes": [
+            "User"
+          ],
+          "description": "Product read",
+          "displayName": "ProductRead",
+          "id": "c4352a0a-494f-46f9-b843-479855c173a7",
+          "isEnabled": true,
+          "origin": "Application",
+          "value": "Product.Read"
+        },
+        {
+          "allowedMemberTypes": [
+            "User"
+          ],
+          "description": "Product write",
+          "displayName": "ProductWrite",
+          "id": "54e8e043-86db-49bb-bfa8-c9c27ebdf3b6",
+          "isEnabled": true,
+          "origin": "Application",
+          "value": "Product.Write"
+        }
+      ]
     });
 
     const patchStub = sinon.stub(request, 'patch');
@@ -616,42 +547,32 @@ describe(commands.APP_ROLE_REMOVE, () => {
   });
 
   it('deletes an app role when the role is in enabled state and valid appId, role name and --force option specified (debug)', async () => {
-    sinon.stub(entraApp, 'getAppRegistrationByAppId').resolves(appResponse.value[0]);
-
-    sinon.stub(request, 'get').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230?$select=id,appRoles') {
-        return {
-          id: '5b31c38c-2584-42f0-aa47-657fb3a84230',
-          appRoles: [
-            {
-              "allowedMemberTypes": [
-                "User"
-              ],
-              "description": "Product read",
-              "displayName": "ProductRead",
-              "id": "c4352a0a-494f-46f9-b843-479855c173a7",
-              "isEnabled": true,
-              "lang": null,
-              "origin": "Application",
-              "value": "Product.Read"
-            },
-            {
-              "allowedMemberTypes": [
-                "User"
-              ],
-              "description": "Product write",
-              "displayName": "ProductWrite",
-              "id": "54e8e043-86db-49bb-bfa8-c9c27ebdf3b6",
-              "isEnabled": true,
-              "lang": null,
-              "origin": "Application",
-              "value": "Product.Write"
-            }
-          ]
-        };
-      }
-
-      throw `Invalid request ${JSON.stringify(opts)}`;
+    sinon.stub(entraApp, 'getAppRegistrationByAppId').resolves({
+      id: '5b31c38c-2584-42f0-aa47-657fb3a84230',
+      appRoles: [
+        {
+          "allowedMemberTypes": [
+            "User"
+          ],
+          "description": "Product read",
+          "displayName": "ProductRead",
+          "id": "c4352a0a-494f-46f9-b843-479855c173a7",
+          "isEnabled": true,
+          "origin": "Application",
+          "value": "Product.Read"
+        },
+        {
+          "allowedMemberTypes": [
+            "User"
+          ],
+          "description": "Product write",
+          "displayName": "ProductWrite",
+          "id": "54e8e043-86db-49bb-bfa8-c9c27ebdf3b6",
+          "isEnabled": true,
+          "origin": "Application",
+          "value": "Product.Write"
+        }
+      ]
     });
 
     const patchStub = sinon.stub(request, 'patch');
@@ -694,41 +615,32 @@ describe(commands.APP_ROLE_REMOVE, () => {
   });
 
   it('deletes an app role when the role is in enabled state and valid appId, role id and --force option specified (debug)', async () => {
-    sinon.stub(entraApp, 'getAppRegistrationByAppId').resolves(appResponse.value[0]);
-
-    sinon.stub(request, 'get').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230?$select=id,appRoles') {
-        return {
-          id: '5b31c38c-2584-42f0-aa47-657fb3a84230',
-          appRoles: [
-            {
-              "allowedMemberTypes": [
-                "User"
-              ],
-              "description": "Product read",
-              "displayName": "ProductRead",
-              "id": "c4352a0a-494f-46f9-b843-479855c173a7",
-              "isEnabled": true,
-              "lang": null,
-              "origin": "Application",
-              "value": "Product.Read"
-            },
-            {
-              "allowedMemberTypes": [
-                "User"
-              ],
-              "description": "Product write",
-              "displayName": "ProductWrite",
-              "id": "54e8e043-86db-49bb-bfa8-c9c27ebdf3b6",
-              "isEnabled": true,
-              "lang": null,
-              "origin": "Application",
-              "value": "Product.Write"
-            }
-          ]
-        };
-      }
-      throw `Invalid request ${JSON.stringify(opts)}`;
+    sinon.stub(entraApp, 'getAppRegistrationByAppId').resolves({
+      id: '5b31c38c-2584-42f0-aa47-657fb3a84230',
+      appRoles: [
+        {
+          "allowedMemberTypes": [
+            "User"
+          ],
+          "description": "Product read",
+          "displayName": "ProductRead",
+          "id": "c4352a0a-494f-46f9-b843-479855c173a7",
+          "isEnabled": true,
+          "origin": "Application",
+          "value": "Product.Read"
+        },
+        {
+          "allowedMemberTypes": [
+            "User"
+          ],
+          "description": "Product write",
+          "displayName": "ProductWrite",
+          "id": "54e8e043-86db-49bb-bfa8-c9c27ebdf3b6",
+          "isEnabled": true,
+          "origin": "Application",
+          "value": "Product.Write"
+        }
+      ]
     });
 
     const patchStub = sinon.stub(request, 'patch');
@@ -771,55 +683,32 @@ describe(commands.APP_ROLE_REMOVE, () => {
   });
 
   it('deletes an app role when the role is in "disabled" state and valid appId, role id and --force option specified', async () => {
-
-    const getRequestStub = sinon.stub(request, 'get');
-
-    getRequestStub.onFirstCall().callsFake(async opts => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=displayName eq 'App-Name'&$select=id`) {
-        return {
-          "value": [
-            {
-              id: '5b31c38c-2584-42f0-aa47-657fb3a84230'
-            }
-          ]
-        };
-      }
-      throw `Invalid request ${JSON.stringify(opts)}`;
-    });
-
-    getRequestStub.onSecondCall().callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230?$select=id,appRoles') {
-        return {
-          id: '5b31c38c-2584-42f0-aa47-657fb3a84230',
-          appRoles: [
-            {
-              "allowedMemberTypes": [
-                "User"
-              ],
-              "description": "Product read",
-              "displayName": "ProductRead",
-              "id": "c4352a0a-494f-46f9-b843-479855c173a7",
-              "isEnabled": false,
-              "lang": null,
-              "origin": "Application",
-              "value": "Product.Read"
-            },
-            {
-              "allowedMemberTypes": [
-                "User"
-              ],
-              "description": "Product write",
-              "displayName": "ProductWrite",
-              "id": "54e8e043-86db-49bb-bfa8-c9c27ebdf3b6",
-              "isEnabled": true,
-              "lang": null,
-              "origin": "Application",
-              "value": "Product.Write"
-            }
-          ]
-        };
-      }
-      throw `Invalid request ${JSON.stringify(opts)}`;
+    sinon.stub(entraApp, 'getAppRegistrationByAppName').resolves({
+      id: '5b31c38c-2584-42f0-aa47-657fb3a84230',
+      appRoles: [
+        {
+          "allowedMemberTypes": [
+            "User"
+          ],
+          "description": "Product read",
+          "displayName": "ProductRead",
+          "id": "c4352a0a-494f-46f9-b843-479855c173a7",
+          "isEnabled": false,
+          "origin": "Application",
+          "value": "Product.Read"
+        },
+        {
+          "allowedMemberTypes": [
+            "User"
+          ],
+          "description": "Product write",
+          "displayName": "ProductWrite",
+          "id": "54e8e043-86db-49bb-bfa8-c9c27ebdf3b6",
+          "isEnabled": true,
+          "origin": "Application",
+          "value": "Product.Write"
+        }
+      ]
     });
 
     const patchStub = sinon.stub(request, 'patch');
@@ -849,55 +738,32 @@ describe(commands.APP_ROLE_REMOVE, () => {
   });
 
   it('deletes an app role when the role is in "disabled" state and valid appId, role claim and --force option specified', async () => {
-
-    const getRequestStub = sinon.stub(request, 'get');
-
-    getRequestStub.onFirstCall().callsFake(async opts => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=displayName eq 'App-Name'&$select=id`) {
-        return {
-          "value": [
-            {
-              id: '5b31c38c-2584-42f0-aa47-657fb3a84230'
-            }
-          ]
-        };
-      }
-      throw `Invalid request ${JSON.stringify(opts)}`;
-    });
-
-    getRequestStub.onSecondCall().callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230?$select=id,appRoles') {
-        return {
-          id: '5b31c38c-2584-42f0-aa47-657fb3a84230',
-          appRoles: [
-            {
-              "allowedMemberTypes": [
-                "User"
-              ],
-              "description": "Product read",
-              "displayName": "ProductRead",
-              "id": "c4352a0a-494f-46f9-b843-479855c173a7",
-              "isEnabled": false,
-              "lang": null,
-              "origin": "Application",
-              "value": "Product.Read"
-            },
-            {
-              "allowedMemberTypes": [
-                "User"
-              ],
-              "description": "Product write",
-              "displayName": "ProductWrite",
-              "id": "54e8e043-86db-49bb-bfa8-c9c27ebdf3b6",
-              "isEnabled": true,
-              "lang": null,
-              "origin": "Application",
-              "value": "Product.Write"
-            }
-          ]
-        };
-      }
-      throw `Invalid request ${JSON.stringify(opts)}`;
+    sinon.stub(entraApp, 'getAppRegistrationByAppName').resolves({
+      id: '5b31c38c-2584-42f0-aa47-657fb3a84230',
+      appRoles: [
+        {
+          "allowedMemberTypes": [
+            "User"
+          ],
+          "description": "Product read",
+          "displayName": "ProductRead",
+          "id": "c4352a0a-494f-46f9-b843-479855c173a7",
+          "isEnabled": false,
+          "origin": "Application",
+          "value": "Product.Read"
+        },
+        {
+          "allowedMemberTypes": [
+            "User"
+          ],
+          "description": "Product write",
+          "displayName": "ProductWrite",
+          "id": "54e8e043-86db-49bb-bfa8-c9c27ebdf3b6",
+          "isEnabled": true,
+          "origin": "Application",
+          "value": "Product.Write"
+        }
+      ]
     });
 
     const patchStub = sinon.stub(request, 'patch');
@@ -927,55 +793,32 @@ describe(commands.APP_ROLE_REMOVE, () => {
   });
 
   it('deletes an app role when the role is in "disabled" state and valid appId, role name and --force option specified', async () => {
-
-    const getRequestStub = sinon.stub(request, 'get');
-
-    getRequestStub.onFirstCall().callsFake(async opts => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=displayName eq 'App-Name'&$select=id`) {
-        return {
-          "value": [
-            {
-              id: '5b31c38c-2584-42f0-aa47-657fb3a84230'
-            }
-          ]
-        };
-      }
-      throw `Invalid request ${JSON.stringify(opts)}`;
-    });
-
-    getRequestStub.onSecondCall().callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230?$select=id,appRoles') {
-        return {
-          id: '5b31c38c-2584-42f0-aa47-657fb3a84230',
-          appRoles: [
-            {
-              "allowedMemberTypes": [
-                "User"
-              ],
-              "description": "Product read",
-              "displayName": "ProductRead",
-              "id": "c4352a0a-494f-46f9-b843-479855c173a7",
-              "isEnabled": false,
-              "lang": null,
-              "origin": "Application",
-              "value": "Product.Read"
-            },
-            {
-              "allowedMemberTypes": [
-                "User"
-              ],
-              "description": "Product write",
-              "displayName": "ProductWrite",
-              "id": "54e8e043-86db-49bb-bfa8-c9c27ebdf3b6",
-              "isEnabled": true,
-              "lang": null,
-              "origin": "Application",
-              "value": "Product.Write"
-            }
-          ]
-        };
-      }
-      throw `Invalid request ${JSON.stringify(opts)}`;
+    sinon.stub(entraApp, 'getAppRegistrationByAppName').resolves({
+      id: '5b31c38c-2584-42f0-aa47-657fb3a84230',
+      appRoles: [
+        {
+          "allowedMemberTypes": [
+            "User"
+          ],
+          "description": "Product read",
+          "displayName": "ProductRead",
+          "id": "c4352a0a-494f-46f9-b843-479855c173a7",
+          "isEnabled": false,
+          "origin": "Application",
+          "value": "Product.Read"
+        },
+        {
+          "allowedMemberTypes": [
+            "User"
+          ],
+          "description": "Product write",
+          "displayName": "ProductWrite",
+          "id": "54e8e043-86db-49bb-bfa8-c9c27ebdf3b6",
+          "isEnabled": true,
+          "origin": "Application",
+          "value": "Product.Write"
+        }
+      ]
     });
 
     const patchStub = sinon.stub(request, 'patch');
@@ -1005,57 +848,33 @@ describe(commands.APP_ROLE_REMOVE, () => {
   });
 
   it('deletes an app role when the role is in "disabled" state and valid appId, role id and --force option specified (debug)', async () => {
-
-    const getRequestStub = sinon.stub(request, 'get');
-
-    getRequestStub.onFirstCall().callsFake(async opts => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=displayName eq 'App-Name'&$select=id`) {
-        return {
-          "value": [
-            {
-              id: '5b31c38c-2584-42f0-aa47-657fb3a84230'
-            }
-          ]
-        };
-      }
-      throw `Invalid request ${JSON.stringify(opts)}`;
+    sinon.stub(entraApp, 'getAppRegistrationByAppName').resolves({
+      id: '5b31c38c-2584-42f0-aa47-657fb3a84230',
+      appRoles: [
+        {
+          "allowedMemberTypes": [
+            "User"
+          ],
+          "description": "Product read",
+          "displayName": "ProductRead",
+          "id": "c4352a0a-494f-46f9-b843-479855c173a7",
+          "isEnabled": false,
+          "origin": "Application",
+          "value": "Product.Read"
+        },
+        {
+          "allowedMemberTypes": [
+            "User"
+          ],
+          "description": "Product write",
+          "displayName": "ProductWrite",
+          "id": "54e8e043-86db-49bb-bfa8-c9c27ebdf3b6",
+          "isEnabled": true,
+          "origin": "Application",
+          "value": "Product.Write"
+        }
+      ]
     });
-
-    getRequestStub.onSecondCall().callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230?$select=id,appRoles') {
-        return {
-          id: '5b31c38c-2584-42f0-aa47-657fb3a84230',
-          appRoles: [
-            {
-              "allowedMemberTypes": [
-                "User"
-              ],
-              "description": "Product read",
-              "displayName": "ProductRead",
-              "id": "c4352a0a-494f-46f9-b843-479855c173a7",
-              "isEnabled": false,
-              "lang": null,
-              "origin": "Application",
-              "value": "Product.Read"
-            },
-            {
-              "allowedMemberTypes": [
-                "User"
-              ],
-              "description": "Product write",
-              "displayName": "ProductWrite",
-              "id": "54e8e043-86db-49bb-bfa8-c9c27ebdf3b6",
-              "isEnabled": true,
-              "lang": null,
-              "origin": "Application",
-              "value": "Product.Write"
-            }
-          ]
-        };
-      }
-      throw `Invalid request ${JSON.stringify(opts)}`;
-    });
-
     const patchStub = sinon.stub(request, 'patch');
 
     patchStub.onSecondCall().callsFake(async opts => {
@@ -1084,55 +903,32 @@ describe(commands.APP_ROLE_REMOVE, () => {
   });
 
   it('deletes an app role when the role is in "disabled" state and valid appId, role claim and --force option specified (debug)', async () => {
-
-    const getRequestStub = sinon.stub(request, 'get');
-
-    getRequestStub.onFirstCall().callsFake(async opts => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=displayName eq 'App-Name'&$select=id`) {
-        return {
-          "value": [
-            {
-              id: '5b31c38c-2584-42f0-aa47-657fb3a84230'
-            }
-          ]
-        };
-      }
-      throw `Invalid request ${JSON.stringify(opts)}`;
-    });
-
-    getRequestStub.onSecondCall().callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230?$select=id,appRoles') {
-        return {
-          id: '5b31c38c-2584-42f0-aa47-657fb3a84230',
-          appRoles: [
-            {
-              "allowedMemberTypes": [
-                "User"
-              ],
-              "description": "Product read",
-              "displayName": "ProductRead",
-              "id": "c4352a0a-494f-46f9-b843-479855c173a7",
-              "isEnabled": false,
-              "lang": null,
-              "origin": "Application",
-              "value": "Product.Read"
-            },
-            {
-              "allowedMemberTypes": [
-                "User"
-              ],
-              "description": "Product write",
-              "displayName": "ProductWrite",
-              "id": "54e8e043-86db-49bb-bfa8-c9c27ebdf3b6",
-              "isEnabled": true,
-              "lang": null,
-              "origin": "Application",
-              "value": "Product.Write"
-            }
-          ]
-        };
-      }
-      throw `Invalid request ${JSON.stringify(opts)}`;
+    sinon.stub(entraApp, 'getAppRegistrationByAppName').resolves({
+      id: '5b31c38c-2584-42f0-aa47-657fb3a84230',
+      appRoles: [
+        {
+          "allowedMemberTypes": [
+            "User"
+          ],
+          "description": "Product read",
+          "displayName": "ProductRead",
+          "id": "c4352a0a-494f-46f9-b843-479855c173a7",
+          "isEnabled": false,
+          "origin": "Application",
+          "value": "Product.Read"
+        },
+        {
+          "allowedMemberTypes": [
+            "User"
+          ],
+          "description": "Product write",
+          "displayName": "ProductWrite",
+          "id": "54e8e043-86db-49bb-bfa8-c9c27ebdf3b6",
+          "isEnabled": true,
+          "origin": "Application",
+          "value": "Product.Write"
+        }
+      ]
     });
 
     const patchStub = sinon.stub(request, 'patch');
@@ -1163,55 +959,32 @@ describe(commands.APP_ROLE_REMOVE, () => {
   });
 
   it('deletes an app role when the role is in "disabled" state and valid appId, role name and --force option specified (debug)', async () => {
-
-    const getRequestStub = sinon.stub(request, 'get');
-
-    getRequestStub.onFirstCall().callsFake(async opts => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=displayName eq 'App-Name'&$select=id`) {
-        return {
-          "value": [
-            {
-              id: '5b31c38c-2584-42f0-aa47-657fb3a84230'
-            }
-          ]
-        };
-      }
-      throw `Invalid request ${JSON.stringify(opts)}`;
-    });
-
-    getRequestStub.onSecondCall().callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230?$select=id,appRoles') {
-        return {
-          id: '5b31c38c-2584-42f0-aa47-657fb3a84230',
-          appRoles: [
-            {
-              "allowedMemberTypes": [
-                "User"
-              ],
-              "description": "Product read",
-              "displayName": "ProductRead",
-              "id": "c4352a0a-494f-46f9-b843-479855c173a7",
-              "isEnabled": false,
-              "lang": null,
-              "origin": "Application",
-              "value": "Product.Read"
-            },
-            {
-              "allowedMemberTypes": [
-                "User"
-              ],
-              "description": "Product write",
-              "displayName": "ProductWrite",
-              "id": "54e8e043-86db-49bb-bfa8-c9c27ebdf3b6",
-              "isEnabled": true,
-              "lang": null,
-              "origin": "Application",
-              "value": "Product.Write"
-            }
-          ]
-        };
-      }
-      throw `Invalid request ${JSON.stringify(opts)}`;
+    sinon.stub(entraApp, 'getAppRegistrationByAppName').resolves({
+      id: '5b31c38c-2584-42f0-aa47-657fb3a84230',
+      appRoles: [
+        {
+          "allowedMemberTypes": [
+            "User"
+          ],
+          "description": "Product read",
+          "displayName": "ProductRead",
+          "id": "c4352a0a-494f-46f9-b843-479855c173a7",
+          "isEnabled": false,
+          "origin": "Application",
+          "value": "Product.Read"
+        },
+        {
+          "allowedMemberTypes": [
+            "User"
+          ],
+          "description": "Product write",
+          "displayName": "ProductWrite",
+          "id": "54e8e043-86db-49bb-bfa8-c9c27ebdf3b6",
+          "isEnabled": true,
+          "origin": "Application",
+          "value": "Product.Write"
+        }
+      ]
     });
 
     const patchStub = sinon.stub(request, 'patch');
@@ -1242,31 +1015,8 @@ describe(commands.APP_ROLE_REMOVE, () => {
   });
 
   it('handles error when multiple apps with the specified appName found and --force option is specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const getRequestStub = sinon.stub(request, 'get');
-
-    getRequestStub.callsFake(async opts => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=displayName eq 'App-Name'&$select=id`) {
-        return {
-          "value": [
-            {
-              id: '5b31c38c-2584-42f0-aa47-657fb3a84230'
-            },
-            {
-              id: 'a39c738c-939e-433b-930d-b02f2931a08b'
-            }
-          ]
-        };
-      }
-      throw `Invalid request ${JSON.stringify(opts)}`;
-    });
+    const error = `Multiple apps with name 'App-Name' found in Microsoft Entra ID. Found: 5b31c38c-2584-42f0-aa47-657fb3a84230, a39c738c-939e-433b-930d-b02f2931a08b.`;
+    sinon.stub(entraApp, 'getAppRegistrationByAppName').rejects(new Error(error));
 
     await assert.rejects(command.action(logger, {
       options: {
@@ -1274,161 +1024,54 @@ describe(commands.APP_ROLE_REMOVE, () => {
         claim: 'Product.Read',
         force: true
       }
-    }), new CommandError(`Multiple Microsoft Entra application registrations with name 'App-Name' found. Found: 5b31c38c-2584-42f0-aa47-657fb3a84230, a39c738c-939e-433b-930d-b02f2931a08b.`));
-  });
-
-  it('handles selecting single result when multiple apps with the specified name found and cli is set to prompt', async () => {
-    let removeRequestIssued = false;
-
-    sinon.stub(request, 'get').callsFake(async opts => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=displayName eq 'App-Name'&$select=id`) {
-        return {
-          "value": [
-            {
-              id: '5b31c38c-2584-42f0-aa47-657fb3a84230'
-            },
-            {
-              id: 'a39c738c-939e-433b-930d-b02f2931a08b'
-            }
-          ]
-        };
-      }
-
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230?$select=id,appRoles') {
-        return {
-          id: '5b31c38c-2584-42f0-aa47-657fb3a84230',
-          appRoles: [
-            {
-              "allowedMemberTypes": [
-                "User"
-              ],
-              "description": "Product read",
-              "displayName": "ProductRead",
-              "id": "c4352a0a-494f-46f9-b843-479855c173a7",
-              "isEnabled": false,
-              "lang": null,
-              "origin": "Application",
-              "value": "Product.Read"
-            },
-            {
-              "allowedMemberTypes": [
-                "User"
-              ],
-              "description": "Product write",
-              "displayName": "ProductWrite",
-              "id": "54e8e043-86db-49bb-bfa8-c9c27ebdf3b6",
-              "isEnabled": true,
-              "lang": null,
-              "origin": "Application",
-              "value": "Product.Write"
-            }
-          ]
-        };
-      }
-
-      throw `Invalid request ${JSON.stringify(opts)}`;
-    });
-
-    sinon.stub(cli, 'handleMultipleResultsFound').resolves({ id: '5b31c38c-2584-42f0-aa47-657fb3a84230' });
-
-    sinon.stub(request, 'patch').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230' &&
-        opts.data &&
-        opts.data.appRoles.length === 1) {
-        const appRole = opts.data.appRoles[0];
-        if (appRole.value === "Product.Write" &&
-          appRole.id === '54e8e043-86db-49bb-bfa8-c9c27ebdf3b6' &&
-          appRole.isEnabled === true) {
-          removeRequestIssued = true;
-          return;
-        }
-      }
-
-      throw `Invalid request ${JSON.stringify(opts)}`;
-    });
-
-    await command.action(logger, {
-      options: {
-        debug: true,
-        appName: 'App-Name',
-        name: 'ProductRead',
-        force: true
-      }
-    });
-    assert(removeRequestIssued);
+    }), new CommandError(error));
   });
 
   it('handles when multiple roles with the same name are found and --force option specified', async () => {
+    sinon.stub(entraApp, 'getAppRegistrationByAppName').resolves({
+      id: '5b31c38c-2584-42f0-aa47-657fb3a84230',
+      appRoles: [
+        {
+          "allowedMemberTypes": [
+            "User"
+          ],
+          "description": "Product read",
+          "displayName": "ProductRead",
+          "id": "c4352a0a-494f-46f9-b843-479855c173a7",
+          "isEnabled": true,
+          "origin": "Application",
+          "value": "Product.Read"
+        },
+        {
+          "allowedMemberTypes": [
+            "User"
+          ],
+          "description": "Product get",
+          "displayName": "ProductRead",
+          "id": "9267ab18-8d09-408d-8c94-834662ed16d1",
+          "isEnabled": true,
+          "origin": "Application",
+          "value": "Product.Get"
+        },
+        {
+          "allowedMemberTypes": [
+            "User"
+          ],
+          "description": "Product write",
+          "displayName": "ProductWrite",
+          "id": "54e8e043-86db-49bb-bfa8-c9c27ebdf3b6",
+          "isEnabled": true,
+          "origin": "Application",
+          "value": "Product.Write"
+        }
+      ]
+    });
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
       if (settingName === settingsNames.prompt) {
         return false;
       }
 
       return defaultValue;
-    });
-
-    const getRequestStub = sinon.stub(request, 'get');
-
-    getRequestStub.onFirstCall().callsFake(async opts => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=displayName eq 'App-Name'&$select=id`) {
-        return {
-          "value": [
-            {
-              id: '5b31c38c-2584-42f0-aa47-657fb3a84230'
-            }
-          ]
-        };
-      }
-
-      throw `Invalid request ${JSON.stringify(opts)}`;
-    });
-
-    getRequestStub.onSecondCall().callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230?$select=id,appRoles') {
-        return {
-          id: '5b31c38c-2584-42f0-aa47-657fb3a84230',
-          appRoles: [
-            {
-              "allowedMemberTypes": [
-                "User"
-              ],
-              "description": "Product read",
-              "displayName": "ProductRead",
-              "id": "c4352a0a-494f-46f9-b843-479855c173a7",
-              "isEnabled": true,
-              "lang": null,
-              "origin": "Application",
-              "value": "Product.Read"
-            },
-            {
-              "allowedMemberTypes": [
-                "User"
-              ],
-              "description": "Product get",
-              "displayName": "ProductRead",
-              "id": "9267ab18-8d09-408d-8c94-834662ed16d1",
-              "isEnabled": true,
-              "lang": null,
-              "origin": "Application",
-              "value": "Product.Get"
-            },
-            {
-              "allowedMemberTypes": [
-                "User"
-              ],
-              "description": "Product write",
-              "displayName": "ProductWrite",
-              "id": "54e8e043-86db-49bb-bfa8-c9c27ebdf3b6",
-              "isEnabled": true,
-              "lang": null,
-              "origin": "Application",
-              "value": "Product.Write"
-            }
-          ]
-        };
-      }
-
-      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
     await assert.rejects(command.action(logger, {
@@ -1442,56 +1085,32 @@ describe(commands.APP_ROLE_REMOVE, () => {
 
   it('handles selecting single result when multiple roles with the specified name found and cli is set to prompt', async () => {
     let removeRequestIssued = false;
-    const getRequestStub = sinon.stub(request, 'get');
-
-    getRequestStub.onFirstCall().callsFake(async opts => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=displayName eq 'App-Name'&$select=id`) {
-        return {
-          "value": [
-            {
-              id: '5b31c38c-2584-42f0-aa47-657fb3a84230'
-            }
-          ]
-        };
-      }
-
-      throw `Invalid request ${JSON.stringify(opts)}`;
-    });
-
-    getRequestStub.onSecondCall().callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230?$select=id,appRoles') {
-        return {
-          id: '5b31c38c-2584-42f0-aa47-657fb3a84230',
-          appRoles: [
-            {
-              "allowedMemberTypes": [
-                "User"
-              ],
-              "description": "Product read",
-              "displayName": "ProductRead",
-              "id": "c4352a0a-494f-46f9-b843-479855c173a7",
-              "isEnabled": true,
-              "lang": null,
-              "origin": "Application",
-              "value": "Product.Read"
-            },
-            {
-              "allowedMemberTypes": [
-                "User"
-              ],
-              "description": "Product get",
-              "displayName": "ProductRead",
-              "id": "9267ab18-8d09-408d-8c94-834662ed16d1",
-              "isEnabled": true,
-              "lang": null,
-              "origin": "Application",
-              "value": "Product.Get"
-            }
-          ]
-        };
-      }
-
-      throw `Invalid request ${JSON.stringify(opts)}`;
+    sinon.stub(entraApp, 'getAppRegistrationByAppName').resolves({
+      id: '5b31c38c-2584-42f0-aa47-657fb3a84230',
+      appRoles: [
+        {
+          "allowedMemberTypes": [
+            "User"
+          ],
+          "description": "Product read",
+          "displayName": "ProductRead",
+          "id": "c4352a0a-494f-46f9-b843-479855c173a7",
+          "isEnabled": true,
+          "origin": "Application",
+          "value": "Product.Read"
+        },
+        {
+          "allowedMemberTypes": [
+            "User"
+          ],
+          "description": "Product get",
+          "displayName": "ProductRead",
+          "id": "9267ab18-8d09-408d-8c94-834662ed16d1",
+          "isEnabled": true,
+          "origin": "Application",
+          "value": "Product.Get"
+        }
+      ]
     });
 
     sinon.stub(cli, 'handleMultipleResultsFound').resolves({ id: 'c4352a0a-494f-46f9-b843-479855c173a7' });
@@ -1524,32 +1143,9 @@ describe(commands.APP_ROLE_REMOVE, () => {
   });
 
   it('handles when no roles with the specified name are found and --force option specified', async () => {
-
-    const getRequestStub = sinon.stub(request, 'get');
-
-    getRequestStub.onFirstCall().callsFake(async opts => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=displayName eq 'App-Name'&$select=id`) {
-        return {
-          "value": [
-            {
-              id: '5b31c38c-2584-42f0-aa47-657fb3a84230'
-            }
-          ]
-        };
-      }
-
-      throw `Invalid request ${JSON.stringify(opts)}`;
-    });
-
-    getRequestStub.onSecondCall().callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230?$select=id,appRoles') {
-        return {
-          id: '5b31c38c-2584-42f0-aa47-657fb3a84230',
-          appRoles: []
-        };
-      }
-
-      throw `Invalid request ${JSON.stringify(opts)}`;
+    sinon.stub(entraApp, 'getAppRegistrationByAppName').resolves({
+      id: '5b31c38c-2584-42f0-aa47-657fb3a84230',
+      appRoles: []
     });
 
     await assert.rejects(command.action(logger, {
@@ -1562,32 +1158,9 @@ describe(commands.APP_ROLE_REMOVE, () => {
   });
 
   it('handles when no roles with the specified claim are found and --force option specified', async () => {
-
-    const getRequestStub = sinon.stub(request, 'get');
-
-    getRequestStub.onFirstCall().callsFake(async opts => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=displayName eq 'App-Name'&$select=id`) {
-        return {
-          "value": [
-            {
-              id: '5b31c38c-2584-42f0-aa47-657fb3a84230'
-            }
-          ]
-        };
-      }
-
-      throw `Invalid request ${JSON.stringify(opts)}`;
-    });
-
-    getRequestStub.onSecondCall().callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230?$select=id,appRoles') {
-        return {
-          id: '5b31c38c-2584-42f0-aa47-657fb3a84230',
-          appRoles: []
-        };
-      }
-
-      throw `Invalid request ${JSON.stringify(opts)}`;
+    sinon.stub(entraApp, 'getAppRegistrationByAppName').resolves({
+      id: '5b31c38c-2584-42f0-aa47-657fb3a84230',
+      appRoles: []
     });
 
     await assert.rejects(command.action(logger, {
@@ -1600,32 +1173,9 @@ describe(commands.APP_ROLE_REMOVE, () => {
   });
 
   it('handles when no roles with the specified id are found and --force option specified', async () => {
-
-    const getRequestStub = sinon.stub(request, 'get');
-
-    getRequestStub.onFirstCall().callsFake(async opts => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=displayName eq 'App-Name'&$select=id`) {
-        return {
-          "value": [
-            {
-              id: '5b31c38c-2584-42f0-aa47-657fb3a84230'
-            }
-          ]
-        };
-      }
-
-      throw `Invalid request ${JSON.stringify(opts)}`;
-    });
-
-    getRequestStub.onSecondCall().callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230?$select=id,appRoles') {
-        return {
-          id: '5b31c38c-2584-42f0-aa47-657fb3a84230',
-          appRoles: []
-        };
-      }
-
-      throw `Invalid request ${JSON.stringify(opts)}`;
+    sinon.stub(entraApp, 'getAppRegistrationByAppName').resolves({
+      id: '5b31c38c-2584-42f0-aa47-657fb3a84230',
+      appRoles: []
     });
 
     await assert.rejects(command.action(logger, {
@@ -1650,47 +1200,35 @@ describe(commands.APP_ROLE_REMOVE, () => {
   });
 
   it('deletes an app role when the role is in enabled state and valid appObjectId, role claim and the prompt is confirmed (debug)', async () => {
-
+    sinon.stub(entraApp, 'getAppRegistrationByObjectId').resolves({
+      id: '5b31c38c-2584-42f0-aa47-657fb3a84230',
+      appRoles: [
+        {
+          "allowedMemberTypes": [
+            "User"
+          ],
+          "description": "Product read",
+          "displayName": "ProductRead",
+          "id": "c4352a0a-494f-46f9-b843-479855c173a7",
+          "isEnabled": true,
+          "origin": "Application",
+          "value": "Product.Read"
+        },
+        {
+          "allowedMemberTypes": [
+            "User"
+          ],
+          "description": "Product write",
+          "displayName": "ProductWrite",
+          "id": "54e8e043-86db-49bb-bfa8-c9c27ebdf3b6",
+          "isEnabled": true,
+          "origin": "Application",
+          "value": "Product.Write"
+        }
+      ]
+    });
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
-
-    const getRequestStub = sinon.stub(request, 'get');
-
-    getRequestStub.callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230?$select=id,appRoles') {
-        return {
-          id: '5b31c38c-2584-42f0-aa47-657fb3a84230',
-          appRoles: [
-            {
-              "allowedMemberTypes": [
-                "User"
-              ],
-              "description": "Product read",
-              "displayName": "ProductRead",
-              "id": "c4352a0a-494f-46f9-b843-479855c173a7",
-              "isEnabled": true,
-              "lang": null,
-              "origin": "Application",
-              "value": "Product.Read"
-            },
-            {
-              "allowedMemberTypes": [
-                "User"
-              ],
-              "description": "Product write",
-              "displayName": "ProductWrite",
-              "id": "54e8e043-86db-49bb-bfa8-c9c27ebdf3b6",
-              "isEnabled": true,
-              "lang": null,
-              "origin": "Application",
-              "value": "Product.Write"
-            }
-          ]
-        };
-      }
-
-      throw `Invalid request ${JSON.stringify(opts)}`;
-    });
 
     const patchStub = sinon.stub(request, 'patch');
 
@@ -1734,42 +1272,32 @@ describe(commands.APP_ROLE_REMOVE, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
-    sinon.stub(entraApp, 'getAppRegistrationByAppId').resolves(appResponse.value[0]);
-
-    sinon.stub(request, 'get').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230?$select=id,appRoles') {
-        return {
-          id: '5b31c38c-2584-42f0-aa47-657fb3a84230',
-          appRoles: [
-            {
-              "allowedMemberTypes": [
-                "User"
-              ],
-              "description": "Product read",
-              "displayName": "ProductRead",
-              "id": "c4352a0a-494f-46f9-b843-479855c173a7",
-              "isEnabled": true,
-              "lang": null,
-              "origin": "Application",
-              "value": "Product.Read"
-            },
-            {
-              "allowedMemberTypes": [
-                "User"
-              ],
-              "description": "Product write",
-              "displayName": "ProductWrite",
-              "id": "54e8e043-86db-49bb-bfa8-c9c27ebdf3b6",
-              "isEnabled": true,
-              "lang": null,
-              "origin": "Application",
-              "value": "Product.Write"
-            }
-          ]
-        };
-      }
-
-      throw `Invalid request ${JSON.stringify(opts)}`;
+    sinon.stub(entraApp, 'getAppRegistrationByAppId').resolves({
+      id: '5b31c38c-2584-42f0-aa47-657fb3a84230',
+      appRoles: [
+        {
+          "allowedMemberTypes": [
+            "User"
+          ],
+          "description": "Product read",
+          "displayName": "ProductRead",
+          "id": "c4352a0a-494f-46f9-b843-479855c173a7",
+          "isEnabled": true,
+          "origin": "Application",
+          "value": "Product.Read"
+        },
+        {
+          "allowedMemberTypes": [
+            "User"
+          ],
+          "description": "Product write",
+          "displayName": "ProductWrite",
+          "id": "54e8e043-86db-49bb-bfa8-c9c27ebdf3b6",
+          "isEnabled": true,
+          "origin": "Application",
+          "value": "Product.Write"
+        }
+      ]
     });
 
     const patchStub = sinon.stub(request, 'patch');
@@ -1813,41 +1341,32 @@ describe(commands.APP_ROLE_REMOVE, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
-    sinon.stub(entraApp, 'getAppRegistrationByAppId').resolves(appResponse.value[0]);
-
-    sinon.stub(request, 'get').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230?$select=id,appRoles') {
-        return {
-          id: '5b31c38c-2584-42f0-aa47-657fb3a84230',
-          appRoles: [
-            {
-              "allowedMemberTypes": [
-                "User"
-              ],
-              "description": "Product read",
-              "displayName": "ProductRead",
-              "id": "c4352a0a-494f-46f9-b843-479855c173a7",
-              "isEnabled": true,
-              "lang": null,
-              "origin": "Application",
-              "value": "Product.Read"
-            },
-            {
-              "allowedMemberTypes": [
-                "User"
-              ],
-              "description": "Product write",
-              "displayName": "ProductWrite",
-              "id": "54e8e043-86db-49bb-bfa8-c9c27ebdf3b6",
-              "isEnabled": true,
-              "lang": null,
-              "origin": "Application",
-              "value": "Product.Write"
-            }
-          ]
-        };
-      }
-      throw `Invalid request ${JSON.stringify(opts)}`;
+    sinon.stub(entraApp, 'getAppRegistrationByAppId').resolves({
+      id: '5b31c38c-2584-42f0-aa47-657fb3a84230',
+      appRoles: [
+        {
+          "allowedMemberTypes": [
+            "User"
+          ],
+          "description": "Product read",
+          "displayName": "ProductRead",
+          "id": "c4352a0a-494f-46f9-b843-479855c173a7",
+          "isEnabled": true,
+          "origin": "Application",
+          "value": "Product.Read"
+        },
+        {
+          "allowedMemberTypes": [
+            "User"
+          ],
+          "description": "Product write",
+          "displayName": "ProductWrite",
+          "id": "54e8e043-86db-49bb-bfa8-c9c27ebdf3b6",
+          "isEnabled": true,
+          "origin": "Application",
+          "value": "Product.Write"
+        }
+      ]
     });
 
     const patchStub = sinon.stub(request, 'patch');
@@ -1910,22 +1429,16 @@ describe(commands.APP_ROLE_REMOVE, () => {
   });
 
   it('handles error when the app specified with appObjectId not found', async () => {
-    sinon.stub(request, 'get').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230?$select=id,appRoles') {
-        throw {
-          "error": {
-            "code": "Request_ResourceNotFound",
-            "message": "Resource '5b31c38c-2584-42f0-aa47-657fb3a84230' does not exist or one of its queried reference-property objects are not present.",
-            "innerError": {
-              "date": "2021-04-20T17:22:30",
-              "request-id": "f58cc4de-b427-41de-b37c-46ee4925a26d",
-              "client-request-id": "f58cc4de-b427-41de-b37c-46ee4925a26d"
-            }
-          }
-        };
+    sinon.stub(entraApp, 'getAppRegistrationByObjectId').throws({
+      "error": {
+        "code": "Request_ResourceNotFound",
+        "message": "Resource '5b31c38c-2584-42f0-aa47-657fb3a84230' does not exist or one of its queried reference-property objects are not present.",
+        "innerError": {
+          "date": "2021-04-20T17:22:30",
+          "request-id": "f58cc4de-b427-41de-b37c-46ee4925a26d",
+          "client-request-id": "f58cc4de-b427-41de-b37c-46ee4925a26d"
+        }
       }
-
-      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
     await assert.rejects(command.action(logger, {
@@ -1951,13 +1464,8 @@ describe(commands.APP_ROLE_REMOVE, () => {
   });
 
   it('handles error when the app specified with appName not found', async () => {
-    sinon.stub(request, 'get').callsFake(async opts => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=displayName eq 'My%20app'&$select=id`) {
-        return { value: [] };
-      }
-
-      throw `Invalid request ${JSON.stringify(opts)}`;
-    });
+    const error = `App with name 'My app' not found in Microsoft Entra ID`;
+    sinon.stub(entraApp, 'getAppRegistrationByAppName').rejects(new Error(error));
 
     await assert.rejects(command.action(logger, {
       options: {
@@ -1965,7 +1473,7 @@ describe(commands.APP_ROLE_REMOVE, () => {
         name: 'App-Role',
         force: true
       }
-    }), new CommandError(`No Microsoft Entra application registration with name My app found`));
+    }), new CommandError(error));
   });
 
   it('fails validation if appId and appObjectId specified', async () => {
