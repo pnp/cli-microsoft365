@@ -39,7 +39,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     if ((opts.url as string).indexOf(`_api/web?$select=Id`) > -1) {
       return { "Id": WEB_ID };
     }
-    if ((opts.url as string).indexOf(`/_api/lists/GetByTitle('${LIST_TITLE}')?$select=Id`) > -1) {
+    if ((opts.url as string).indexOf(`/_api/web/lists/getByTitle('${LIST_TITLE}')?$select=Id`) > -1) {
       return { "Id": LIST_ID };
     }
     if (opts.url === 'https://contoso.sharepoint.com/_api/web/GetList(\'%2Fshared%20documents\')?$select=Id') {
