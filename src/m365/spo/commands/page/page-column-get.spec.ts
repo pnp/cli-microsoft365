@@ -335,11 +335,12 @@ describe(commands.PAGE_COLUMN_GET, () => {
     });
 
     await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', output: 'json', section: 1, column: 1 } });
-    assert.strictEqual(JSON.stringify(log[0]), JSON.stringify({
+    const result = JSON.stringify(log[0]).replace(/zoneId&quot;&#58;&quot;[a-f0-9-]+&quot;/g, 'zoneId&quot;&#58;&quot;c6a3f6b3-1c7a-4e33-bf3d-f76280f5e964&quot;');
+    assert.strictEqual(result, JSON.stringify({
       "factor": 6,
       "order": 1,
       "dataVersion": "1.0",
-      "jsonData": "&#123;&quot;displayMode&quot;&#58;2,&quot;position&quot;&#58;&#123;&quot;sectionFactor&quot;&#58;6,&quot;sectionIndex&quot;&#58;1,&quot;zoneIndex&quot;&#58;1&#125;&#125;",
+      "jsonData": "&#123;&quot;position&quot;&#58;&#123;&quot;sectionFactor&quot;&#58;6,&quot;sectionIndex&quot;&#58;1,&quot;zoneIndex&quot;&#58;1,&quot;zoneId&quot;&#58;&quot;c6a3f6b3-1c7a-4e33-bf3d-f76280f5e964&quot;,&quot;layoutIndex&quot;&#58;1&#125;&#125;",
       "controls": [{ "controlType": 4, "dataVersion": "1.0", "order": 1, "id": "ccaa96dc-4d16-4940-bf0d-7b179628a8fd", "controlData": { "controlType": 4, "displayMode": 2, "id": "ccaa96dc-4d16-4940-bf0d-7b179628a8fd", "position": { "zoneIndex": 1, "sectionIndex": 1, "controlIndex": 1, "sectionFactor": 6 }, "editorType": "CKEditor" }, "_text": "<p>asd</p>" }]
     }));
   });

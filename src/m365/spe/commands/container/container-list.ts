@@ -5,8 +5,8 @@ import { odata } from '../../../../utils/odata.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
-import { ContainerProperties } from '../../ContainerProperties.js';
-import { ContainerTypeProperties, spo } from '../../../../utils/spo.js';
+import { ContainerProperties, spe } from '../../../../utils/spe.js';
+import { spo } from '../../../../utils/spo.js';
 
 interface CommandArgs {
   options: Options;
@@ -101,17 +101,7 @@ class SpeContainerListCommand extends GraphCommand {
     }
 
     const spoAdminUrl = await spo.getSpoAdminUrl(logger, this.debug);
-    const containerTypes: ContainerTypeProperties[] = await spo.getAllContainerTypes(spoAdminUrl, logger, this.debug);
-
-    // Get id of the container type by name
-    const containerType: ContainerTypeProperties | undefined = containerTypes.find(c => c.DisplayName === options.containerTypeName);
-    if (!containerType) {
-      throw new Error(`Container type with name ${options.containerTypeName} not found`);
-    }
-
-    // The value is returned as "/Guid(073269af-f1d2-042d-2ef5-5bdd6ac83115)/". We need to extract the GUID from it.
-    const containerTypeValue = containerType.ContainerTypeId.toString();
-    return containerTypeValue.substring(containerTypeValue.indexOf('(') + 1, containerTypeValue.lastIndexOf(')'));
+    return spe.getContainerTypeIdByName(spoAdminUrl, options.containerTypeName!);
   }
 }
 

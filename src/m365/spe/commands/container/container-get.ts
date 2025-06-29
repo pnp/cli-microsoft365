@@ -3,7 +3,7 @@ import { Logger } from '../../../../cli/Logger.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 import request, { CliRequestOptions } from '../../../../request.js';
-import { ContainerProperties } from '../../ContainerProperties.js';
+import { ContainerProperties } from '../../../../utils/spe.js';
 
 interface CommandArgs {
   options: Options;

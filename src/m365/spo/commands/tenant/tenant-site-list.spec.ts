@@ -15,9 +15,6 @@ import commands from '../../commands.js';
 import command from './tenant-site-list.js';
 
 describe(commands.TENANT_SITE_LIST, () => {
-  const spoUrl = 'https://contoso.sharepoint.com';
-  const adminUrl = 'https://contoso-admin.sharepoint.com';
-
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -28,10 +25,9 @@ describe(commands.TENANT_SITE_LIST, () => {
     sinon.stub(telemetry, 'trackEvent').resolves();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
-    sinon.stub(spo, 'getSpoAdminUrl').resolves(adminUrl);
     sinon.stub(spo, 'getRequestDigest').resolves({ FormDigestValue: 'abc', FormDigestTimeoutSeconds: 1800, FormDigestExpiresAt: new Date(), WebFullUrl: 'https://contoso.sharepoint.com' });
     auth.connection.active = true;
-    auth.connection.spoUrl = spoUrl;
+    auth.connection.spoUrl = 'https://contoso.sharepoint.com';
     commandInfo = cli.getCommandInfo(command);
   });
 
@@ -53,9 +49,7 @@ describe(commands.TENANT_SITE_LIST, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      request.post,
-      spo.getSpoAdminUrl,
-      spo.getAllSites
+      request.post
     ]);
   });
 
@@ -97,13 +91,18 @@ describe(commands.TENANT_SITE_LIST, () => {
     assert.notStrictEqual(actual, true);
   });
 
+  it('fails validation if withOneDriveSites is specified together with the type option', async () => {
+    const actual = await command.validate({ options: { type: 'TeamSite', withOneDriveSites: '1' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
   it('fails validation if includeOneDriveSites is specified together with the type option', async () => {
     const actual = await command.validate({ options: { type: 'TeamSite', includeOneDriveSites: '1' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if includeOneDriveSites is specified together with the webTemplate option', async () => {
-    const actual = await command.validate({ options: { webTemplate: 'STS#3', includeOneDriveSites: '1' } }, commandInfo);
+  it('fails validation if withOneDriveSites is specified together with the webTemplate option', async () => {
+    const actual = await command.validate({ options: { webTemplate: 'STS#3', withOneDriveSites: '1' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
@@ -222,7 +221,10 @@ describe(commands.TENANT_SITE_LIST, () => {
     ]));
   });
 
-  it('retrieves list of sites when no filter and includeOneDriveSites is specified', async () => {
+  it(`correctly shows deprecation warning for option 'includeOneDriveSites'`, async () => {
+    const chalk = (await import('chalk')).default;
+    const loggerErrSpy = sinon.spy(logger, 'logToStderr');
+
     sinon.stub(spo, 'getAllSites').resolves([
       {
         "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SiteProperties", "_ObjectIdentity_": "487c379e-80f8-4000-80be-1d37a4995717|908bed80-a04a-4433-b4a0-883d9847d110:67753f63-bc14-4012-869e-f808a43fe023\nSiteProperties\nhttps%3a%2f%2fm365x324230-my.sharepoint.com%2fpersonal%2ffoo_bar_com", "AllowDownloadingNonWebViewableFiles": false, "AllowEditing": false, "AllowSelfServiceUpgrade": true, "AverageResourceUsage": 0, "CommentsOnSitePagesDisabled": false, "CompatibilityLevel": 15, "ConditionalAccessPolicy": 0, "CurrentResourceUsage": 0, "DenyAddAndCustomizePages": 2, "DisableAppViews": 0, "DisableCompanyWideSharingLinks": 0, "DisableFlows": 0, "HasHolds": false, "LastContentModifiedDate": "\/Date(2017,11,17,4,12,28,997)\/", "Lcid": 1033, "LockIssue": null, "LockState": "Unlock", "NewUrl": "", "Owner": "", "OwnerEmail": null, "PWAEnabled": 0, "RestrictedToRegion": 3, "SandboxedCodeActivationCapability": 0, "SharingAllowedDomainList": null, "SharingBlockedDomainList": null, "SharingCapability": 1, "SharingDomainRestrictionMode": 0, "ShowPeoplePickerSuggestionsForGuestUsers": false, "SiteDefinedSharingCapability": 0, "Status": "Active", "StorageMaximumLevel": 26214400, "StorageQuotaType": null, "StorageUsage": 1, "StorageWarningLevel": 25574400, "Template": "STS#0", "TimeZoneId": 13, "Title": "Foo Bar", "Url": "https:\u002f\u002fm365x324230-my.sharepoint.com\u002fpersonal\u002ffoo_bar_com", "UserCodeMaximumLevel": 300, "UserCodeWarningLevel": 200, "WebsCount": 0
@@ -232,6 +234,21 @@ describe(commands.TENANT_SITE_LIST, () => {
     );
 
     await command.action(logger, { options: { debug: true, includeOneDriveSites: '1' } });
+    assert(loggerErrSpy.calledWith(chalk.yellow(`Parameter 'includeOneDriveSites' is deprecated. Please use 'withOneDriveSites' instead`)));
+
+    sinonUtil.restore(loggerErrSpy);
+  });
+
+  it('retrieves list of sites when no filter and withOneDriveSites is specified', async () => {
+    sinon.stub(spo, 'getAllSites').resolves([
+      {
+        "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SiteProperties", "_ObjectIdentity_": "487c379e-80f8-4000-80be-1d37a4995717|908bed80-a04a-4433-b4a0-883d9847d110:67753f63-bc14-4012-869e-f808a43fe023\nSiteProperties\nhttps%3a%2f%2fm365x324230-my.sharepoint.com%2fpersonal%2ffoo_bar_com", "AllowDownloadingNonWebViewableFiles": false, "AllowEditing": false, "AllowSelfServiceUpgrade": true, "AverageResourceUsage": 0, "CommentsOnSitePagesDisabled": false, "CompatibilityLevel": 15, "ConditionalAccessPolicy": 0, "CurrentResourceUsage": 0, "DenyAddAndCustomizePages": 2, "DisableAppViews": 0, "DisableCompanyWideSharingLinks": 0, "DisableFlows": 0, "HasHolds": false, "LastContentModifiedDate": "\/Date(2017,11,17,4,12,28,997)\/", "Lcid": 1033, "LockIssue": null, "LockState": "Unlock", "NewUrl": "", "Owner": "", "OwnerEmail": null, "PWAEnabled": 0, "RestrictedToRegion": 3, "SandboxedCodeActivationCapability": 0, "SharingAllowedDomainList": null, "SharingBlockedDomainList": null, "SharingCapability": 1, "SharingDomainRestrictionMode": 0, "ShowPeoplePickerSuggestionsForGuestUsers": false, "SiteDefinedSharingCapability": 0, "Status": "Active", "StorageMaximumLevel": 26214400, "StorageQuotaType": null, "StorageUsage": 1, "StorageWarningLevel": 25574400, "Template": "STS#0", "TimeZoneId": 13, "Title": "Foo Bar", "Url": "https:\u002f\u002fm365x324230-my.sharepoint.com\u002fpersonal\u002ffoo_bar_com", "UserCodeMaximumLevel": 300, "UserCodeWarningLevel": 200, "WebsCount": 0
+      }, {
+        "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SiteProperties", "_ObjectIdentity_": "487c379e-80f8-4000-80be-1d37a4995717|908bed80-a04a-4433-b4a0-883d9847d110:67753f63-bc14-4012-869e-f808a43fe023\nSiteProperties\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fctest_1010", "AllowDownloadingNonWebViewableFiles": false, "AllowEditing": false, "AllowSelfServiceUpgrade": true, "AverageResourceUsage": 0, "CommentsOnSitePagesDisabled": false, "CompatibilityLevel": 15, "ConditionalAccessPolicy": 0, "CurrentResourceUsage": 0, "DenyAddAndCustomizePages": 2, "DisableAppViews": 0, "DisableCompanyWideSharingLinks": 0, "DisableFlows": 0, "HasHolds": false, "LastContentModifiedDate": "\/Date(2017,11,17,17,46,0,910)\/", "Lcid": 1033, "LockIssue": null, "LockState": "Unlock", "NewUrl": "", "Owner": "", "OwnerEmail": null, "PWAEnabled": 0, "RestrictedToRegion": 3, "SandboxedCodeActivationCapability": 0, "SharingAllowedDomainList": null, "SharingBlockedDomainList": null, "SharingCapability": 1, "SharingDomainRestrictionMode": 0, "ShowPeoplePickerSuggestionsForGuestUsers": false, "SiteDefinedSharingCapability": 0, "Status": "Active", "StorageMaximumLevel": 1048576, "StorageQuotaType": null, "StorageUsage": 1, "StorageWarningLevel": 1022361, "Template": "STS#0", "TimeZoneId": 13, "Title": "Team site 1010", "Url": "https:\u002f\u002fcontoso.sharepoint.com\u002fsites\u002fctest_1010", "UserCodeMaximumLevel": 300, "UserCodeWarningLevel": 200, "WebsCount": 0
+      }] as any
+    );
+
+    await command.action(logger, { options: { debug: true, withOneDriveSites: '1' } });
     assert(loggerLogSpy.calledOnceWithExactly([
       {
         "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SiteProperties", "_ObjectIdentity_": "487c379e-80f8-4000-80be-1d37a4995717|908bed80-a04a-4433-b4a0-883d9847d110:67753f63-bc14-4012-869e-f808a43fe023\nSiteProperties\nhttps%3a%2f%2fm365x324230-my.sharepoint.com%2fpersonal%2ffoo_bar_com", "AllowDownloadingNonWebViewableFiles": false, "AllowEditing": false, "AllowSelfServiceUpgrade": true, "AverageResourceUsage": 0, "CommentsOnSitePagesDisabled": false, "CompatibilityLevel": 15, "ConditionalAccessPolicy": 0, "CurrentResourceUsage": 0, "DenyAddAndCustomizePages": 2, "DisableAppViews": 0, "DisableCompanyWideSharingLinks": 0, "DisableFlows": 0, "HasHolds": false, "LastContentModifiedDate": "\/Date(2017,11,17,4,12,28,997)\/", "Lcid": 1033, "LockIssue": null, "LockState": "Unlock", "NewUrl": "", "Owner": "", "OwnerEmail": null, "PWAEnabled": 0, "RestrictedToRegion": 3, "SandboxedCodeActivationCapability": 0, "SharingAllowedDomainList": null, "SharingBlockedDomainList": null, "SharingCapability": 1, "SharingDomainRestrictionMode": 0, "ShowPeoplePickerSuggestionsForGuestUsers": false, "SiteDefinedSharingCapability": 0, "Status": "Active", "StorageMaximumLevel": 26214400, "StorageQuotaType": null, "StorageUsage": 1, "StorageWarningLevel": 25574400, "Template": "STS#0", "TimeZoneId": 13, "Title": "Foo Bar", "Url": "https:\u002f\u002fm365x324230-my.sharepoint.com\u002fpersonal\u002ffoo_bar_com", "UserCodeMaximumLevel": 300, "UserCodeWarningLevel": 200, "WebsCount": 0

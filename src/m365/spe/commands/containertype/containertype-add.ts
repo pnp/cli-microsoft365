@@ -35,7 +35,7 @@ export interface Options extends GlobalOptions {
   region?: string;
 }
 
-class SpeContainertypeAddCommand extends SpoCommand {
+class SpeContainerTypeAddCommand extends SpoCommand {
   public get name(): string {
     return commands.CONTAINERTYPE_ADD;
   }
@@ -151,7 +151,7 @@ class SpeContainertypeAddCommand extends SpoCommand {
       await logger.log(result);
     }
     catch (err: any) {
-      this.handleRejectedPromise(err);
+      this.handleRejectedODataJsonPromise(err);
     }
   }
 
@@ -167,4 +167,4 @@ class SpeContainertypeAddCommand extends SpoCommand {
   }
 }
 
-export default new SpeContainertypeAddCommand();
+export default new SpeContainerTypeAddCommand();

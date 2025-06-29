@@ -1,18 +1,20 @@
+import { z } from 'zod';
 import { cli } from '../../../cli/cli.js';
 import { Logger } from '../../../cli/Logger.js';
-import GlobalOptions from '../../../GlobalOptions.js';
 import { settingsNames } from '../../../settingsNames.js';
 import { browserUtil } from '../../../utils/browserUtil.js';
-import AppCommand from '../../base/AppCommand.js';
+import AppCommand, { appCommandOptions } from '../../base/AppCommand.js';
 import commands from '../commands.js';
+
+const options = appCommandOptions
+  .extend({
+    preview: z.boolean().optional().default(false)
+  })
+  .strict();
+type Options = z.infer<typeof options>;
 
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  appId?: string;
-  preview?: boolean;
 }
 
 class AppOpenCommand extends AppCommand {
@@ -24,27 +26,8 @@ class AppOpenCommand extends AppCommand {
     return 'Opens Microsoft Entra app in the Microsoft Entra ID portal';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        appId: typeof args.options.appId !== 'undefined',
-        preview: typeof args.options.preview !== 'undefined'
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      { option: '--appId [appId]' },
-      { option: '--preview' }
-    );
+  public get schema(): z.ZodTypeAny | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

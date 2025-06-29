@@ -93,14 +93,16 @@
   - Power Apps
   - Power Platform
   - Purview
-  - Skype for Business
+  - SharePoint Embedded
   - SharePoint Online
+  - SharePoint Premium
   - To Do
 - Supported authentication methods
   - Azure Managed Identity
   - Certificate
   - Client Secret
   - Device Code
+  - Federated identity
   - Username and Password
 - Manage your SharePoint Framework projects
   - Upgrade your projects
@@ -110,7 +112,7 @@
 
 ## Install
 
-To use the CLI for Microsoft 365 you need [`Node.js`](https://nodejs.org). The CLI has been tested with Node.js versions 18 and higher, but we recommend you to use the Node.js LTS version available at the moment.
+To use the CLI for Microsoft 365 you need [`Node.js`](https://nodejs.org). The CLI has been tested with Node.js versions 20 and higher, but we recommend you to use the Node.js LTS version available at the moment.
 
 ```
 npm install -g @pnp/cli-microsoft365

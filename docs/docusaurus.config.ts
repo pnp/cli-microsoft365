@@ -38,6 +38,10 @@ const config: Config = {
   },
 
   future: {
+    v4: {
+      removeLegacyPostBuildHeadAttribute: true,
+      useCssCascadeLayers: true,
+    },
     experimental_faster: true
   },
 
