@@ -170,13 +170,7 @@ describe(commands.TENANT_SITE_GET, () => {
     auth.connection.spoUrl = spoUrl;
     commandInfo = cli.getCommandInfo(command);
     commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName: string, defaultValue: any) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName: string, defaultValue: any) => settingName === settingsNames.prompt ? false : defaultValue);
   });
 
   beforeEach(() => {
@@ -220,59 +214,57 @@ describe(commands.TENANT_SITE_GET, () => {
   });
 
   it('fails validation if id is not a valid GUID', () => {
-    const actual = commandOptionsSchema.safeParse({
-      id: 'foo'
-    });
+    const actual = commandOptionsSchema.safeParse({ id: 'foo' });
     assert.notStrictEqual(actual.success, true);
   });
 
   it('fails validation when all options are specified', async () => {
     const actual = commandOptionsSchema.safeParse({
-      options: {
-        id: id,
-        title: title,
-        url: url
-      }
+      options: { id: id, title: title, url: url }
     });
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation when no options are specified', async () => {
     const actual = commandOptionsSchema.safeParse({
-      options: {
-      }
+      options: {}
     });
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation when id and title options are specified', async () => {
     const actual = commandOptionsSchema.safeParse({
-      options: {
-        id: id,
-        title: title
-      }
+      options: { id: id, title: title }
     });
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation when id and url options are specified', async () => {
     const actual = commandOptionsSchema.safeParse({
-      options: {
-        id: id,
-        url: url
-      }
+      options: { id: id, url: url }
     });
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation when title and url options are specified', async () => {
     const actual = commandOptionsSchema.safeParse({
-      options: {
-        title: title,
-        url: url
-      }
+      options: { title: title, url: url }
     });
     assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if url is not a valid SharePoint URL', async () => {
+    const actual = commandOptionsSchema.safeParse({
+      options: { url: 'invalid' }
+    });
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('passes validation with only url', () => {
+    const actual = commandOptionsSchema.safeParse({
+      url: url
+    });
+    assert.strictEqual(actual.success, true);
   });
 
   it('retrieves tenant site information by id', async () => {
@@ -284,31 +276,27 @@ describe(commands.TENANT_SITE_GET, () => {
       throw 'Invalid request';
     });
 
-    const parsedSchema = commandOptionsSchema.safeParse({
-      id: id,
-      verbose: true
+    await command.action(logger, {
+      options: { id: id, verbose: true }
     });
 
-    await command.action(logger, { options: parsedSchema.data });
     assert(loggerLogSpy.calledWith(tenantSiteResponse.value[0]));
   });
 
   it('retrieves tenant site information by url', async () => {
     sinon.stub(spo, 'getSiteAdminPropertiesByUrl').resolves(tenantSiteResponse.value[0] as any);
 
-    const parsedSchema = commandOptionsSchema.safeParse({
-      url: url,
-      verbose: true
+    await command.action(logger, {
+      options: { url: url, verbose: true }
     });
 
-    await command.action(logger, { options: parsedSchema.data });
     assert(loggerLogSpy.calledWith(tenantSiteResponse.value[0]));
   });
 
   it('retrieves tenant site information by title', async () => {
     sinon.stub(spo, 'getAllSites').resolves([
       {
-        "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SiteProperties", "_ObjectIdentity_": "487c379e-80f8-4000-80be-1d37a4995717|908bed80-a04a-4433-b4a0-883d9847d110:67753f63-bc14-4012-869e-f808a43fe023\nSiteProperties\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fctest_101", "AllowDownloadingNonWebViewableFiles": false, "AllowEditing": false, "AllowSelfServiceUpgrade": true, "AverageResourceUsage": 0, "CommentsOnSitePagesDisabled": false, "CompatibilityLevel": 15, "ConditionalAccessPolicy": 0, "CurrentResourceUsage": 0, "DenyAddAndCustomizePages": 2, "DisableAppViews": 0, "DisableCompanyWideSharingLinks": 0, "DisableFlows": 0, "HasHolds": false, "LastContentModifiedDate": "\/Date(2017,11,17,4,12,28,997)\/", "Lcid": 1033, "LockIssue": null, "LockState": "Unlock", "NewUrl": "", "Owner": "", "OwnerEmail": null, "PWAEnabled": 0, "RestrictedToRegion": 3, "SandboxedCodeActivationCapability": 0, "SharingAllowedDomainList": null, "SharingBlockedDomainList": null, "SharingCapability": 1, "SharingDomainRestrictionMode": 0, "ShowPeoplePickerSuggestionsForGuestUsers": false, "SiteDefinedSharingCapability": 0, "Status": "Active", "StorageMaximumLevel": 26214400, "StorageQuotaType": null, "StorageUsage": 1, "StorageWarningLevel": 25574400, "Template": "STS#0", "TimeZoneId": 13, "Title": "Marketing", "Url": "https:\u002f\u002fcontoso.sharepoint.com\u002fsites\u002fcMarketing", "SiteId": "\/Guid(3ae83bc5-1f27-45c1-9eee-1bd1e2ddce69)\/", "UserCodeMaximumLevel": 300, "UserCodeWarningLevel": 200, "WebsCount": 0
+        "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SiteProperties", "_ObjectIdentity_": "487c379e-80f8-4000-80be-1d37a4995717|908bed80-a04a-4433-b4a0-883d9847d110:67753f63-bc14-4012-869e-f808a43fe023\nSiteProperties\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fctest_101", "AllowDownloadingNonWebViewableFiles": false, "AllowEditing": false, "AllowSelfServiceUpgrade": true, "AverageResourceUsage": 0, "CommentsOnSitePagesDisabled": false, "CompatibilityLevel": 15, "ConditionalAccessPolicy": 0, "CurrentResourceUsage": 0, "DenyAddAndCustomizePages": 2, "DisableAppViews": 0, "DisableCompanyWideSharingLinks": 0, "DisableFlows": 0, "HasHolds": false, "LastContentModifiedDate": "\/Date(2017,11,17,4,12,28,997)\/", "Lcid": 1033, "LockIssue": null, "LockState": "Unlock", "NewUrl": "", "Owner": "", "OwnerEmail": null, "PWAEnabled": 0, "RestrictedToRegion": 3, "SandboxedCodeActivationCapability": 0, "SharingAllowedDomainList": null, "SharingBlockedDomainList": null, "SharingCapability": 1, "SharingDomainRestrictionMode": 0, "ShowPeoplePickerSuggestionsForGuestUsers": false, "SiteDefinedSharingCapability": 0, "Status": "Active", "StorageMaximumLevel": 26214400, "StorageQuotaType": null, "StorageUsage": 1, "StorageWarningLevel": 25574400, "Template": "STS#0", "TimeZoneId": 13, "Title": "Marketing", "Url": "https:\u002f\u002fcontoso.sharepoint.com\u002fsites\u002fMarketing", "SiteId": "\/Guid(3ae83bc5-1f27-45c1-9eee-1bd1e2ddce69)\/", "UserCodeMaximumLevel": 300, "UserCodeWarningLevel": 200, "WebsCount": 0
       }] as any
     );
 
@@ -320,12 +308,10 @@ describe(commands.TENANT_SITE_GET, () => {
       throw 'Invalid request';
     });
 
-    const parsedSchema = commandOptionsSchema.safeParse({
-      title: title,
-      verbose: true
+    await command.action(logger, {
+      options: { title: title, verbose: true }
     });
 
-    await command.action(logger, { options: parsedSchema.data });
     assert(loggerLogSpy.calledWith(tenantSiteResponse.value[0]));
   });
 
@@ -350,19 +336,17 @@ describe(commands.TENANT_SITE_GET, () => {
 
     sinon.stub(cli, 'handleMultipleResultsFound').resolves({ SiteId: '3ae83bc5-1f27-45c1-9eee-1bd1e2ddce69' });
 
-    const parsedSchema = commandOptionsSchema.safeParse({
-      title: title,
-      verbose: true
+    await command.action(logger, {
+      options: { title: 'Marketing', verbose: true }
     });
 
-    await command.action(logger, { options: parsedSchema.data });
     assert(loggerLogSpy.calledWith(tenantSiteResponse.value[0]));
   });
 
   it('fails when the specified tenant site does not exist', async () => {
     sinon.stub(spo, 'getAllSites').resolves([] as any);
 
-    await assert.rejects(command.action(logger, { options: { debug: true, title: title } } as any), new CommandError(`No sites found with title '${title}'`));
+    await assert.rejects(command.action(logger, { options: { debug: true, title: title } } as any), new CommandError(`No site found with title '${title}'`));
   });
 
   it('correctly handles random API error', async () => {

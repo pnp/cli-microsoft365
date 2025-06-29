@@ -275,8 +275,6 @@ export interface ContainerTypeProperties {
 }
 
 export const spo = {
-  allSites: [] as TenantSiteProperties[],
-
   async getRequestDigest(siteUrl: string): Promise<FormDigestInfo> {
     const requestOptions: CliRequestOptions = {
       url: `${siteUrl}/_api/contextinfo`,
@@ -2315,35 +2313,39 @@ export const spo = {
     return request.post<TenantSiteProperties>(requestOptions);
   },
 
-  async getAllSites(spoAdminUrl: string, filter: string | undefined, startIndex: string | undefined, personalSite: string, webTemplate: string, formDigest: FormDigestInfo | undefined | undefined, logger: Logger, verbose: boolean): Promise<TenantSiteProperties[]> {
-    const res: FormDigestInfo = await spo.ensureFormDigest(spoAdminUrl, logger, formDigest, verbose);
+  async getAllSites(spoAdminUrl: string, logger: Logger, verbose: boolean, filter?: string, personalSites?: boolean, webTemplate?: string): Promise<TenantSiteProperties[]> {
+    let startIndex: string = '0';
+    const allSites: TenantSiteProperties[] = [];
 
-    const requestBody: string = `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="2" ObjectPathId="1" /><ObjectPath Id="4" ObjectPathId="3" /><Query Id="5" ObjectPathId="3"><Query SelectAllProperties="true"><Properties /></Query><ChildItemQuery SelectAllProperties="true"><Properties /></ChildItemQuery></Query></Actions><ObjectPaths><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /><Method Id="3" ParentId="1" Name="GetSitePropertiesFromSharePointByFilters"><Parameters><Parameter TypeId="{b92aeee2-c92c-4b67-abcc-024e471bc140}"><Property Name="Filter" Type="String">${filter}</Property><Property Name="IncludeDetail" Type="Boolean">false</Property><Property Name="IncludePersonalSite" Type="Enum">${personalSite}</Property><Property Name="StartIndex" Type="String">${startIndex}</Property><Property Name="Template" Type="String">${webTemplate}</Property></Parameter></Parameters></Method></ObjectPaths></Request>`;
-    const requestOptions: CliRequestOptions = {
-      url: `${spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
-      headers: {
-        'X-RequestDigest': res.FormDigestValue
-      },
-      data: requestBody
-    };
+    const formDigestInfo: FormDigestInfo = await spo.ensureFormDigest(spoAdminUrl, logger, undefined, verbose);
 
-    const response: string = await request.post(requestOptions);
-    const json: ClientSvcResponse = JSON.parse(response);
-    const responseContent: ClientSvcResponseContents = json[0];
+    do {
+      const personalSitesString: string = personalSites ? '1' : '0';
+      const requestBody: string = `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="2" ObjectPathId="1" /><ObjectPath Id="4" ObjectPathId="3" /><Query Id="5" ObjectPathId="3"><Query SelectAllProperties="true"><Properties /></Query><ChildItemQuery SelectAllProperties="true"><Properties /></ChildItemQuery></Query></Actions><ObjectPaths><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /><Method Id="3" ParentId="1" Name="GetSitePropertiesFromSharePointByFilters"><Parameters><Parameter TypeId="{b92aeee2-c92c-4b67-abcc-024e471bc140}"><Property Name="Filter" Type="String">${filter}</Property><Property Name="IncludeDetail" Type="Boolean">false</Property><Property Name="IncludePersonalSite" Type="Enum">${personalSitesString}</Property><Property Name="StartIndex" Type="String">${startIndex}</Property><Property Name="Template" Type="String">${webTemplate}</Property></Parameter></Parameters></Method></ObjectPaths></Request>`;
 
-    if (responseContent.ErrorInfo) {
-      throw responseContent.ErrorInfo.ErrorMessage;
-    }
-    else {
-      const sites: SPOTenantSitePropertiesEnumerable = json[json.length - 1];
-      spo.allSites!.push(...(sites._Child_Items_ as TenantSiteProperties[]));
+      const requestOptions: CliRequestOptions = {
+        url: `${spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
+        headers: {
+          'X-RequestDigest': formDigestInfo.FormDigestValue
+        },
+        data: requestBody
+      };
 
-      if (sites.NextStartIndexFromSharePoint) {
-        await spo.getAllSites(spoAdminUrl, filter, sites.NextStartIndexFromSharePoint, personalSite, webTemplate, formDigest, logger, verbose);
+      const response: string = await request.post(requestOptions);
+      const json: ClientSvcResponse = JSON.parse(response);
+      const responseContent: ClientSvcResponseContents = json[0];
+
+      if (responseContent.ErrorInfo) {
+        throw responseContent.ErrorInfo.ErrorMessage;
       }
 
-      return spo.allSites!;
-    }
+      const sites: SPOTenantSitePropertiesEnumerable = json[json.length - 1];
+      allSites.push(...(sites._Child_Items_ as TenantSiteProperties[]));
+
+      startIndex = sites.NextStartIndexFromSharePoint;
+    } while (startIndex);
+
+    return allSites;
   },
 
   /**
