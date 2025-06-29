@@ -18,7 +18,6 @@ import { CommandError } from '../../../../Command.js';
 
 describe(commands.TENANT_SITE_GET, () => {
   const spoUrl = 'https://contoso.sharepoint.com';
-  const adminUrl = 'https://contoso-admin.sharepoint.com';
   const id = '3ae83bc5-1f27-45c1-9eee-1bd1e2ddce69';
   const title = 'Marketing';
   const url = 'https://contoso.sharepoint.com/sites/Marketing';
