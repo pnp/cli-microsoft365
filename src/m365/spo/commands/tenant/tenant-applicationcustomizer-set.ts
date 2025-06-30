@@ -1,18 +1,16 @@
-import Command from '../../../../Command.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
-import { odata } from '../../../../utils/odata.js';
 import { spo } from '../../../../utils/spo.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 import { ListItemInstance } from '../listitem/ListItemInstance.js';
-import spoListItemListCommand, { Options as spoListItemListCommandOptions } from '../listitem/listitem-list.js';
 import { Solution } from './Solution.js';
+import { ListItemListOptions, spoListItem } from '../../../../utils/spoListItem.js';
 
 interface CommandArgs {
   options: Options;
@@ -156,25 +154,31 @@ class SpoTenantApplicationCustomizerSetCommand extends SpoCommand {
 
   private async getListItemId(appCatalogUrl: string, options: Options, listServerRelativeUrl: string, logger: Logger): Promise<number> {
     const { title, id, clientSideComponentId } = options;
-    const filter = title ? `Title eq '${title}'` : id ? `Id eq '${id}'` : `TenantWideExtensionComponentId eq '${clientSideComponentId}'`;
 
     if (this.verbose) {
       await logger.logToStderr(`Getting tenant-wide application customizer: "${title || id || clientSideComponentId}"...`);
     }
+    const defaultFilter = `TenantWideExtensionLocation eq 'ClientSideExtension.ApplicationCustomizer'`;
 
-    const listItemInstances = await odata.getAllItems<ListItemInstance>(`${appCatalogUrl}/_api/web/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')/items?$filter=TenantWideExtensionLocation eq 'ClientSideExtension.ApplicationCustomizer' and ${filter}`);
+    const listOptions: ListItemListOptions = {
+      webUrl: appCatalogUrl,
+      listUrl: listServerRelativeUrl,
+      filter: title ? `${defaultFilter} and Title eq '${title}'` : id ? `${defaultFilter} and Id eq '${id}'` : `${defaultFilter} and TenantWideExtensionComponentId eq '${clientSideComponentId}'`
+    };
 
-    if (!listItemInstances || listItemInstances.length === 0) {
+    const listItems = await spoListItem.getListItems(listOptions, logger, this.verbose) as any[];
+
+    if (!listItems || listItems.length === 0) {
       throw 'The specified application customizer was not found';
     }
 
-    if (listItemInstances.length > 1) {
-      const resultAsKeyValuePair = formatting.convertArrayToHashTable('Id', listItemInstances);
+    if (listItems.length > 1) {
+      const resultAsKeyValuePair = formatting.convertArrayToHashTable('Id', listItems);
       const result = await cli.handleMultipleResultsFound<ListItemInstance>(`Multiple application customizers with ${title ? `title '${title}'` : `ClientSideComponentId '${clientSideComponentId}'`} found.`, resultAsKeyValuePair);
       return result.Id;
     }
 
-    return listItemInstances[0].Id;
+    return listItems[0].Id;
   }
 
   private async getComponentManifest(appCatalogUrl: string, clientSideComponentId: string, logger: Logger): Promise<any> {
@@ -182,29 +186,19 @@ class SpoTenantApplicationCustomizerSetCommand extends SpoCommand {
       await logger.logToStderr('Retrieving component manifest item from the ComponentManifests list on the app catalog site so that we get the solution id');
     }
 
-    const camlQuery = `<View><ViewFields><FieldRef Name='ClientComponentId'></FieldRef><FieldRef Name='SolutionId'></FieldRef><FieldRef Name='ClientComponentManifest'></FieldRef></ViewFields><Query><Where><Eq><FieldRef Name='ClientComponentId' /><Value Type='Guid'>${clientSideComponentId}</Value></Eq></Where></Query></View>`;
-    const commandOptions: spoListItemListCommandOptions = {
+    const options: ListItemListOptions = {
       webUrl: appCatalogUrl,
       listUrl: `${urlUtil.getServerRelativeSiteUrl(appCatalogUrl)}/Lists/ComponentManifests`,
-      camlQuery: camlQuery,
-      verbose: this.verbose,
-      debug: this.debug,
-      output: 'json'
+      camlQuery: `<View><ViewFields><FieldRef Name='ClientComponentId'></FieldRef><FieldRef Name='SolutionId'></FieldRef><FieldRef Name='ClientComponentManifest'></FieldRef></ViewFields><Query><Where><Eq><FieldRef Name='ClientComponentId' /><Value Type='Guid'>${clientSideComponentId}</Value></Eq></Where></Query></View>`
     };
 
-    const output = await cli.executeCommandWithOutput(spoListItemListCommand as Command, { options: { ...commandOptions, _: [] } });
+    const output = await spoListItem.getListItems(options, logger, this.verbose);
 
-    if (this.verbose) {
-      await logger.logToStderr(output.stderr);
-    }
-
-    const outputParsed = JSON.parse(output.stdout);
-
-    if (outputParsed.length === 0) {
+    if (output.length === 0) {
       throw 'No component found with the specified clientSideComponentId found in the component manifest list. Make sure that the application is added to the application catalog';
     }
 
-    return outputParsed[0];
+    return output[0];
   }
 
   private async getSolutionFromAppCatalog(appCatalogUrl: string, solutionId: string, logger: Logger): Promise<Solution> {
@@ -212,29 +206,19 @@ class SpoTenantApplicationCustomizerSetCommand extends SpoCommand {
       await logger.logToStderr(`Retrieving solution with id ${solutionId} from the application catalog`);
     }
 
-    const camlQuery = `<View><ViewFields><FieldRef Name='SkipFeatureDeployment'></FieldRef><FieldRef Name='ContainsTenantWideExtension'></FieldRef></ViewFields><Query><Where><Eq><FieldRef Name='AppProductID' /><Value Type='Guid'>${solutionId}</Value></Eq></Where></Query></View>`;
-    const commandOptions: spoListItemListCommandOptions = {
+    const options: ListItemListOptions = {
       webUrl: appCatalogUrl,
       listUrl: `${urlUtil.getServerRelativeSiteUrl(appCatalogUrl)}/AppCatalog`,
-      camlQuery: camlQuery,
-      verbose: this.verbose,
-      debug: this.debug,
-      output: 'json'
+      camlQuery: `<View><ViewFields><FieldRef Name='SkipFeatureDeployment'></FieldRef><FieldRef Name='ContainsTenantWideExtension'></FieldRef></ViewFields><Query><Where><Eq><FieldRef Name='AppProductID' /><Value Type='Guid'>${solutionId}</Value></Eq></Where></Query></View>`
     };
 
-    const output = await cli.executeCommandWithOutput(spoListItemListCommand as Command, { options: { ...commandOptions, _: [] } });
+    const output = await spoListItem.getListItems(options, logger, this.verbose) as any[];
 
-    if (this.verbose) {
-      await logger.logToStderr(output.stderr);
-    }
-
-    const outputParsed = JSON.parse(output.stdout);
-
-    if (outputParsed.length === 0) {
+    if (output.length === 0) {
       throw `No component found with the solution id ${solutionId}. Make sure that the solution is available in the app catalog`;
     }
 
-    return outputParsed[0];
+    return output[0];
   }
 
   private async updateTenantWideExtension(appCatalogUrl: string, options: Options, listServerRelativeUrl: string, itemId: number, logger: Logger): Promise<void> {
