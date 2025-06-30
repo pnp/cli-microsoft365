@@ -61,7 +61,7 @@ To detect the minimal permissions for a command:
     - Run the command:
 
       ```PowerShell
-      m365 spo web list -u /
+      m365 spo web list -u https://contoso.sharepoint.com
       ```
 
   </TabItem>
@@ -70,7 +70,7 @@ To detect the minimal permissions for a command:
     - Run the command:
 
       ```bash
-      HTTPS_PROXY=http://127.0.0.1:8000 NODE_TLS_REJECT_UNAUTHORIZED=0 m365 spo web list -u /
+      HTTPS_PROXY=http://127.0.0.1:8000 NODE_TLS_REJECT_UNAUTHORIZED=0 m365 spo web list -u https://contoso.sharepoint.com
       ```
 
   </TabItem>
@@ -144,7 +144,7 @@ Execute the command through Dev Proxy, for example:
     - Run the command:
     
       ```PowerShell
-      m365 spo web list -u /
+      m365 spo web list -u https://contoso.sharepoint.com
       ```
   </TabItem>
   <TabItem label="zsh/bash" value="sh">
@@ -152,7 +152,7 @@ Execute the command through Dev Proxy, for example:
     - Run the command:
 
       ```bash
-      HTTPS_PROXY=http://127.0.0.1:8000 NODE_TLS_REJECT_UNAUTHORIZED=0 m365 spo web list -u /
+      HTTPS_PROXY=http://127.0.0.1:8000 NODE_TLS_REJECT_UNAUTHORIZED=0 m365 spo web list -u https://contoso.sharepoint.com
       ```
   </TabItem>
 </Tabs>
