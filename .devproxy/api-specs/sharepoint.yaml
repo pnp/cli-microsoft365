@@ -4,10 +4,12 @@ info:
   description: SharePoint REST API
   version: v1.0
 servers:
-  - url: https://{tenant}.sharepoint.com
+  - url: https://{tenant}.sharepoint.com/{site}
     variables:
       tenant:
         default: contoso
+      site:
+        default: ""
 components:
   securitySchemes:
     delegated:
