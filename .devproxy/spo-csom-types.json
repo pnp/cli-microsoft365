@@ -1,0 +1,54 @@
+{
+  "$schema": "https://raw.githubusercontent.com/dotnet/dev-proxy/main/schemas/v1.0.0/minimalcsompermissions.types.schema.json",
+  "types": {
+    "104e8f06-1e00-4675-99c6-1b9b504ed8d8": "Microsoft.Online.SharePoint.TenantAdministration.Internal.SPOWebAppServicePrincipal",
+    "268004ae-ef6b-4e9b-8425-127220d84719": "Microsoft.Online.SharePoint.TenantAdministration.Tenant",
+    "3747adcd-a3c3-41b9-bfab-4a64dd2f1e0a": "Microsoft.SharePoint.Client.RequestContext"
+  },
+  "returnTypes": {
+    "Microsoft.SharePoint.Client.RequestContext.Current.Site": "Microsoft.SharePoint.Client.Site"
+  },
+  "actions": {
+    "Microsoft.SharePoint.Client.RequestContext.Current": {
+      "delegated": [
+        "AllSites.Read",
+        "AllSites.Write",
+        "AllSites.Manage",
+        "AllSites.FullControl"
+      ],
+      "application": []
+    },
+    "Microsoft.SharePoint.Client.Site.setProperty": {
+      "delegated": [
+        "AllSites.FullControl"
+      ],
+      "application": []
+    },
+    "Microsoft.Online.SharePoint.TenantAdministration.Tenant.ctor": {
+      "delegated": [
+        "AllSites.Read",
+        "AllSites.Write",
+        "AllSites.Manage",
+        "AllSites.FullControl"
+      ],
+      "application": [
+      ]
+    },
+    "Microsoft.Online.SharePoint.TenantAdministration.Tenant.query": {
+      "delegated": [
+        "AllSites.Write",
+        "AllSites.Manage",
+        "AllSites.FullControl"
+      ],
+      "application": [
+      ]
+    },
+    "Microsoft.Online.SharePoint.TenantAdministration.Tenant.GetSitePropertiesFromSharePointByFilters": {
+      "delegated": [
+        "AllSites.FullControl"
+      ],
+      "application": [
+      ]
+    }
+  }
+}
