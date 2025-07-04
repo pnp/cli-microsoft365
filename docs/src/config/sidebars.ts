@@ -676,6 +676,15 @@ const sidebars: SidebarsConfig = {
           ]
         },
         {
+          roleassignment: [
+            {
+              type: 'doc',
+              label: 'roleassignment add',
+              id: 'cmd/entra/roleassignment/roleassignment-add'
+            }
+          ]
+        },
+        {
           roledefinition: [
             {
               type: 'doc',
