@@ -1,0 +1,135 @@
+import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# entra roleassignment add
+
+Assign a Entra ID role to either a user, a group, or a service principal and specify the scope for which the principal has been granted access
+
+## Usage
+
+```sh
+m365 entra roleassignment add [options]
+```
+
+## Options
+
+```md definition-list
+`--roleDefinitionId [roleDefinitionId]`
+: Id of a role to be assigned. Specify either `roleDefinitionId` or `roleDefinitionName`, but not both.
+
+`--roleDefinitionName [roleDefinitionName]`
+: Name of a role to be assigned. Specify either `roleDefinitionId` or `roleDefinitionName`, but not both.
+
+`--principal <principal>`
+: Id of a user, group or service principal or user principal name or group mail nickname to which the assignment is granted.
+
+`--administrativeUnitId [administrativeUnitId]`
+: Id of an administrative unit to which the assignment is scoped.
+
+`--administrativeUnitName [administrativeUnitName]`
+: Name of an administrative unit to which the assignment is scoped.
+
+`--applicationId [applicationId]`
+: Id of an application to which the assignment is scoped.
+
+`--applicationName [applicationName]`
+: Name of an application to which the assignment is scoped.
+
+`--servicePrincipalId [servicePrincipalId]`
+: Id of an application to which the assignment is scoped.
+
+`--servicePrincipalName [servicePrincipalName]`
+: Name of an application to which the assignment is scoped.
+
+`--groupId [groupId]`
+: Id of a group to which the assignment is scoped.
+
+`--groupName [groupName]`
+: Name of a group to which the assignment is scoped.
+```
+
+<Global />
+
+## Examples
+
+Assign a role specified by name to a user specified by id and scope the assignment to the whole tenant
+
+```sh
+m365 entra roleassignment add --roleDefinitionName 'SharePoint Administrator' --principal 7a2ca997-9461-402e-9882-58088a370889
+```
+
+Assign a role specified by id to a user specified by UPN and scope the assignment to a service principal specified by id
+
+```sh
+m365 entra roleassignment add --roleDefinitionId 777b752-f9b7-4205-a2b1-5db0d6a0ccfc --principal john.doe@contoso.com --servicePrincipalId a4738dd8-fc0f-4646-87fb-47539f5c651b
+```
+
+Assign a role specified by name to a group specified by mail nickname and scope the assignment to an administrative unit specified by name
+
+```sh
+m365 entra roleassignment add --roleDefinitionName 'User Administrator' --principal 'contoso-group' --administrativeUnitName 'Marketing'
+```
+
+Assign a role specified by name to a service principal specified by id and scope the assignment to an application specified by id
+
+```sh
+m365 entra roleassignment add --roleDefinitionName 'Application Administrator' --principal ab2ca997-9461-402e-9882-58088a370889 --applicationId 47539fd8-fc0f-4646-87fb-a4738d5c651b
+```
+
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  {
+    "id": "s4awkmfj8k64aR3hKPuYbhaRP4kk4MZLjphUwkUSlIU-1",
+    "principalId": "3844129d-f748-4c03-8165-4412ee9b4ceb",
+    "directoryScopeId": "/",
+    "roleDefinitionId": "92b086b3-e367-4ef2-b869-1de128fb986e"
+  }
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  directoryScopeId: /
+  id              : s4awkmfj8k64aR3hKPuYbhaRP4kk4MZLjphUwkUSlIU-1
+  principalId     : 3844129d-f748-4c03-8165-4412ee9b4ceb
+  roleDefinitionId: 92b086b3-e367-4ef2-b869-1de128fb986e
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  id,principalId,directoryScopeId,roleDefinitionId
+  s4awkmfj8k64aR3hKPuYbhaRP4kk4MZLjphUwkUSlIU-1,3844129d-f748-4c03-8165-4412ee9b4ceb,/,92b086b3-e367-4ef2-b869-1de128fb986e
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # entra roleassignment add --debug "false" --verbose "false" --roleDefinitionId "92b086b3-e367-4ef2-b869-1de128fb986e" --principal "3844129d-f748-4c03-8165-4412ee9b4ceb"
+
+  Date: 7/3/2025
+
+  ## s4awkmfj8k64aR3hKPuYbhaRP4kk4MZLjphUwkUSlIU-1
+
+  Property | Value
+  ---------|-------
+  id | s4awkmfj8k64aR3hKPuYbhaRP4kk4MZLjphUwkUSlIU-1
+  principalId | 3844129d-f748-4c03-8165-4412ee9b4ceb
+  directoryScopeId | /
+  roleDefinitionId | 92b086b3-e367-4ef2-b869-1de128fb986e
+  ```
+
+  </TabItem>
+</Tabs>
+
+## More information
+
+- https://learn.microsoft.com/graph/api/rbacapplication-post-roleassignments

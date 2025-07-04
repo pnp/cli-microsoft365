@@ -92,6 +92,7 @@ export default {
   PIM_ROLE_REQUEST_LIST: `${prefix} pim role request list`,
   POLICY_LIST: `${prefix} policy list`,
   RESOURCENAMESPACE_LIST: `${prefix} resourcenamespace list`,
+  ROLEASSIGNMENT_ADD: `${prefix} roleassignment add`,
   ROLEDEFINITION_ADD: `${prefix} roledefinition add`,
   ROLEDEFINITION_LIST: `${prefix} roledefinition list`,
   ROLEDEFINITION_GET: `${prefix} roledefinition get`,

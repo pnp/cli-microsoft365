@@ -45,7 +45,7 @@ describe('utils/entraAdministrativeUnit', () => {
 
   it('correctly get single administrative unit id by name using getAdministrativeUnitByDisplayName with specified properties', async () => {
     sinon.stub(request, 'get').callsFake(async opts => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/directory/administrativeUnits?$filter=displayName eq '${formatting.encodeQueryParameter(displayName)}'?$select=id,displayName`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/directory/administrativeUnits?$filter=displayName eq '${formatting.encodeQueryParameter(displayName)}'&$select=id,displayName`) {
         return {
           value: [
             {
