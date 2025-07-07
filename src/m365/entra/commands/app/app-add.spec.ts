@@ -6602,6 +6602,36 @@ describe(commands.APP_ADD, () => {
     assert.strictEqual(actual, true);
   });
 
+  it('passes validation if platform is apple and bundleId is specified', async () => {
+    const actual = await command.validate({ options: { name: 'My Microsoft Entra app', platform: 'apple', bundleId: 'com.contoso.app' } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('fails validation if platform is apple, but bundleId is missing', async () => {
+    const actual = await command.validate({ options: { name: 'My Microsoft Entra app', platform: 'apple' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('passes validation if platform is android and bundleId and signatureHash is specified', async () => {
+    const actual = await command.validate({ options: { name: 'My Microsoft Entra app', platform: 'apple', bundleId: 'com.contoso.app', signatureHash: '2pmj9i4rSx0yEb/viWBYkE/ZQrk=' } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('fails validation if platform is android, but bundleId is missing', async () => {
+    const actual = await command.validate({ options: { name: 'My Microsoft Entra app', platform: 'android', signatureHash: '2pmj9i4rSx0yEb/viWBYkE/ZQrk=' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if platform is android, but signatureHash is missing', async () => {
+    const actual = await command.validate({ options: { name: 'My Microsoft Entra app', platform: 'android', bundleId: 'com.contoso.app' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if platform is android, but bundleId and signatureHash is missing', async () => {
+    const actual = await command.validate({ options: { name: 'My Microsoft Entra app', platform: 'android' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
   it('creates Microsoft Entra app reg for a web app from a manifest with redirectUris and options overriding them', async () => {
     sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames') {
@@ -7980,6 +8010,205 @@ describe(commands.APP_ADD, () => {
     assert(loggerLogSpy.calledWith({
       appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
       objectId: '5b31c38c-2584-42f0-aa47-657fb3a84230',
+      tenantId: ''
+    }));
+  });
+
+  it('creates Microsoft Entra app reg for an apple app with the specified redirect URI', async () => {
+    sinon.stub(request, 'get').rejects('Issues GET request');
+    sinon.stub(request, 'patch').rejects('Issued PATCH request');
+    sinon.stub(request, 'post').callsFake(async opts => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
+        JSON.stringify(opts.data) === JSON.stringify({
+          "displayName": "My Microsoft Entra app",
+          "signInAudience": "AzureADMyOrg",
+          "publicClient": {
+            "redirectUris": [
+              "msauth://code/msauth.com.contoso.app%3A%2F%2Fauth",
+              "msauth.com.contoso.app://auth"
+            ]
+          }
+        })) {
+        return {
+          "id": "f1bb2138-bff1-491e-b082-9f447f3742b8",
+          "deletedDateTime": null,
+          "appId": "1ce0287c-9ccc-457e-a0cf-3ec5b734c092",
+          "applicationTemplateId": null,
+          "createdDateTime": "2020-12-31T14:56:17.4207858Z",
+          "displayName": "My Microsoft Entra app",
+          "description": null,
+          "groupMembershipClaims": null,
+          "identifierUris": [],
+          "isDeviceOnlyAuthSupported": null,
+          "isFallbackPublicClient": null,
+          "notes": null,
+          "optionalClaims": null,
+          "publisherDomain": "M365x271534.onmicrosoft.com",
+          "signInAudience": "AzureADMyOrg",
+          "tags": [],
+          "tokenEncryptionKeyId": null,
+          "verifiedPublisher": {
+            "displayName": null,
+            "verifiedPublisherId": null,
+            "addedDateTime": null
+          },
+          "spa": {
+            "redirectUris": []
+          },
+          "defaultRedirectUri": null,
+          "addIns": [],
+          "api": {
+            "acceptMappedClaims": null,
+            "knownClientApplications": [],
+            "requestedAccessTokenVersion": null,
+            "oauth2PermissionScopes": [],
+            "preAuthorizedApplications": []
+          },
+          "appRoles": [],
+          "info": {
+            "logoUrl": null,
+            "marketingUrl": null,
+            "privacyStatementUrl": null,
+            "supportUrl": null,
+            "termsOfServiceUrl": null
+          },
+          "keyCredentials": [],
+          "parentalControlSettings": {
+            "countriesBlockedForMinors": [],
+            "legalAgeGroupRule": "Allow"
+          },
+          "passwordCredentials": [],
+          "publicClient": {
+            "redirectUris": [
+              "msauth://code/msauth.com.contoso.app%3A%2F%2Fauth",
+              "msauth.com.contoso.app://auth"
+            ]
+          },
+          "requiredResourceAccess": [],
+          "web": {
+            "homePageUrl": null,
+            "logoutUrl": null,
+            "redirectUris": [],
+            "implicitGrantSettings": {
+              "enableAccessTokenIssuance": false,
+              "enableIdTokenIssuance": false
+            }
+          }
+        };
+      }
+
+      throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
+    });
+
+    await command.action(logger, {
+      options: {
+        name: 'My Microsoft Entra app',
+        platform: 'apple',
+        bundleId: 'com.contoso.app'
+      }
+    });
+    assert(loggerLogSpy.calledWith({
+      appId: '1ce0287c-9ccc-457e-a0cf-3ec5b734c092',
+      objectId: 'f1bb2138-bff1-491e-b082-9f447f3742b8',
+      tenantId: ''
+    }));
+  });
+
+  it('creates Microsoft Entra app reg for an android app with the specified redirect URI', async () => {
+    sinon.stub(request, 'get').rejects('Issues GET request');
+    sinon.stub(request, 'patch').rejects('Issued PATCH request');
+    sinon.stub(request, 'post').callsFake(async opts => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
+        JSON.stringify(opts.data) === JSON.stringify({
+          "displayName": "My Microsoft Entra app",
+          "signInAudience": "AzureADMyOrg",
+          "publicClient": {
+            "redirectUris": [
+              "msauth://com.contoso.app/2pmj9i4rSx0yEb%2FviWBYkE%2FZQrk%3D"
+            ]
+          }
+        })) {
+        return {
+          "id": "f1bb2138-bff1-491e-b082-9f447f3742b8",
+          "deletedDateTime": null,
+          "appId": "1ce0287c-9ccc-457e-a0cf-3ec5b734c092",
+          "applicationTemplateId": null,
+          "createdDateTime": "2020-12-31T14:56:17.4207858Z",
+          "displayName": "My Microsoft Entra app",
+          "description": null,
+          "groupMembershipClaims": null,
+          "identifierUris": [],
+          "isDeviceOnlyAuthSupported": null,
+          "isFallbackPublicClient": null,
+          "notes": null,
+          "optionalClaims": null,
+          "publisherDomain": "M365x271534.onmicrosoft.com",
+          "signInAudience": "AzureADMyOrg",
+          "tags": [],
+          "tokenEncryptionKeyId": null,
+          "verifiedPublisher": {
+            "displayName": null,
+            "verifiedPublisherId": null,
+            "addedDateTime": null
+          },
+          "spa": {
+            "redirectUris": []
+          },
+          "defaultRedirectUri": null,
+          "addIns": [],
+          "api": {
+            "acceptMappedClaims": null,
+            "knownClientApplications": [],
+            "requestedAccessTokenVersion": null,
+            "oauth2PermissionScopes": [],
+            "preAuthorizedApplications": []
+          },
+          "appRoles": [],
+          "info": {
+            "logoUrl": null,
+            "marketingUrl": null,
+            "privacyStatementUrl": null,
+            "supportUrl": null,
+            "termsOfServiceUrl": null
+          },
+          "keyCredentials": [],
+          "parentalControlSettings": {
+            "countriesBlockedForMinors": [],
+            "legalAgeGroupRule": "Allow"
+          },
+          "passwordCredentials": [],
+          "publicClient": {
+            "redirectUris": [
+              "msauth://com.contoso.app/2pmj9i4rSx0yEb%2FviWBYkE%2FZQrk%3D"
+            ]
+          },
+          "requiredResourceAccess": [],
+          "web": {
+            "homePageUrl": null,
+            "logoutUrl": null,
+            "redirectUris": [],
+            "implicitGrantSettings": {
+              "enableAccessTokenIssuance": false,
+              "enableIdTokenIssuance": false
+            }
+          }
+        };
+      }
+
+      throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
+    });
+
+    await command.action(logger, {
+      options: {
+        name: 'My Microsoft Entra app',
+        platform: 'android',
+        bundleId: 'com.contoso.app',
+        signatureHash: '2pmj9i4rSx0yEb/viWBYkE/ZQrk='
+      }
+    });
+    assert(loggerLogSpy.calledWith({
+      appId: '1ce0287c-9ccc-457e-a0cf-3ec5b734c092',
+      objectId: 'f1bb2138-bff1-491e-b082-9f447f3742b8',
       tenantId: ''
     }));
   });
