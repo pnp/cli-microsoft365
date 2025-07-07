@@ -31,7 +31,7 @@ m365 entra appregistration add [options]
 : Comma-separated list of redirect URIs. Requires `platform` to be specified.
 
 `-p, --platform [platform]`
-: Platform for which the `redirectUris` should be configured. Allowed values `spa`, `web`, `publicClient`. Requires `redirectUris` to be specified.
+: Platform for which the app should be configured. Allowed values `spa`, `web`, `publicClient`, `apple`, `android`.
 
 `--implicitFlow`
 : Specify, to indicate that the authorization endpoint should return ID and access tokens.
@@ -74,6 +74,12 @@ m365 entra appregistration add [options]
 
 `--manifest [manifest]`
 : App manifest as retrieved from Entra ID to create the app registration from. Specify either `name` or `manifest` but not both.
+
+`--bundleId [bundleId]`
+: Specify a bundle Id to add the iOS / macOS or Android platform to the application. Required when platform is `apple` or `android`.
+
+`--signatureHash [signatureHash]`
+: A required hash when specifying a bundle Id and platform `android`.
 
 `--save`
 : Use to store the information about the created app in a local file.
