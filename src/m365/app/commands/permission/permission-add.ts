@@ -6,6 +6,7 @@ import { formatting } from '../../../../utils/formatting.js';
 import { odata } from '../../../../utils/odata.js';
 import AppCommand, { appCommandOptions } from '../../../base/AppCommand.js';
 import commands from '../../commands.js';
+import { entraServicePrincipal } from '../../../../utils/entraServicePrincipal.js';
 
 const options = appCommandOptions
   .extend({
@@ -82,7 +83,13 @@ class AppPermissionAddCommand extends AppCommand {
       await request.patch(addPermissionsRequestOptions);
 
       if (args.options.grantAdminConsent) {
-        const appServicePrincipal = servicePrincipals.find(sp => sp.appId === this.appId);
+        let appServicePrincipal = servicePrincipals.find(sp => sp.appId === this.appId);
+        if (!appServicePrincipal) {
+          if (this.verbose) {
+            await logger.logToStderr(`Creating service principal for app ${this.appId}...`);
+          }
+          appServicePrincipal = await entraServicePrincipal.createServicePrincipal(this.appId!);
+        }
         await this.grantAdminConsent(appServicePrincipal!, appPermissions, logger);
       }
 

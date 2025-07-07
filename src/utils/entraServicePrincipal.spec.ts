@@ -6,15 +6,22 @@ import request from '../request.js';
 import { sinonUtil } from './sinonUtil.js';
 import { formatting } from './formatting.js';
 import { settingsNames } from '../settingsNames.js';
+import { ServicePrincipal } from '@microsoft/microsoft-graph-types';
 
 describe('utils/entraServicePrincipal', () => {
   const servicePrincipalId = 'fc33aa61-cf0e-46b6-9506-f633347202ab';
   const appId = '7f5df2f4-9ed6-4df7-86d7-eefbfc4ab091';
   const appName = 'ContosoApp';
   const secondServicePrincipalId = 'fc33aa61-cf0e-1234-9506-f633347202ac';
+  const servicePrincipal: ServicePrincipal = {
+    id: servicePrincipalId,
+    appId: appId,
+    displayName: appName
+  };
   afterEach(() => {
     sinonUtil.restore([
       request.get,
+      request.post,
       cli.getSettingWithDefaultValue,
       cli.handleMultipleResultsFound
     ]);
@@ -165,5 +172,18 @@ describe('utils/entraServicePrincipal', () => {
 
     const actual = await entraServicePrincipal.getServicePrincipals('id');
     assert.deepStrictEqual(actual, allServicePrincipals);
+  });
+
+  it('correctly creates a service principal for an app specified by application id', async () => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/servicePrincipals`) {
+        return servicePrincipal;
+      }
+
+      throw 'Invalid Request';
+    });
+
+    const actual = await entraServicePrincipal.createServicePrincipal(appId);
+    assert.deepStrictEqual(actual, servicePrincipal);
   });
 });
