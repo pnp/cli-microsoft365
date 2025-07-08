@@ -17,6 +17,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './permission-add.js';
+import { entraServicePrincipal } from '../../../../utils/entraServicePrincipal.js';
 
 describe(commands.PERMISSION_ADD, () => {
   //#region Mocked responses
@@ -246,6 +247,46 @@ describe(commands.PERMISSION_ADD, () => {
       }
       throw 'Invalid request';
     });
+
+    await command.action(logger, { options: commandOptionsSchema.parse({ delegatedPermissions: delegatedPermissions, applicationPermissions: applicationPermissions, grantAdminConsent: true, verbose: true }) });
+    assert.strictEqual(amountOfPostCalls, 3);
+  });
+
+  it('adds delegated and application permissions to appId while granting admin consent and create a service principal', async () => {
+    let amountOfPostCalls = 0;
+
+    sinon.stub(odata, 'getAllItems').callsFake(async (url: string) => {
+      switch (url) {
+        case 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames':
+          return servicePrincipals.slice(1);
+        case `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=appId eq '${appId}'&$select=id,requiredResourceAccess`:
+          return applications;
+        default:
+          throw 'Invalid request';
+      }
+    });
+
+    sinon.stub(request, 'patch').callsFake(async opts => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications/${applications[0].id}`) {
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinon.stub(request, 'post').callsFake(async opts => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/oauth2PermissionGrants`) {
+        amountOfPostCalls++;
+        return;
+      }
+      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/servicePrincipals/${servicePrincipalId}/appRoleAssignments`) {
+        amountOfPostCalls++;
+        return;
+      }
+      throw 'Invalid request';
+    });
+
+    sinon.stub(entraServicePrincipal, 'createServicePrincipal').resolves(servicePrincipals[0]);
 
     await command.action(logger, { options: commandOptionsSchema.parse({ delegatedPermissions: delegatedPermissions, applicationPermissions: applicationPermissions, grantAdminConsent: true, verbose: true }) });
     assert.strictEqual(amountOfPostCalls, 3);
