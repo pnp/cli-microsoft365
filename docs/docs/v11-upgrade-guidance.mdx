@@ -25,6 +25,14 @@ The [spo list view add](./cmd/spo/list/list-view-add.mdx) command has been updat
 - **If you want paged views (most common)**: No action required as this is now the default behavior.
 - **If you want static views**: Explicitly specify `--paged false` when creating views that should not fetch new items while scrolling.
 
+### `spo serviceprincipal grant list` command output updated
+
+In order to align our commands with the latest updates done by Microsoft we had to update the API endpoint used by the [spo serviceprincipal grant list](./cmd/spo/serviceprincipal/serviceprincipal-grant-list.mdx) command. As a result, the output of this command has changed.
+
+#### What action do I need to take?
+
+- **If you parse the output of this command**: Update your scripts to handle the new output format. 
+
 ## SharePoint Framework
 
 ### Updated `spfx project upgrade` commands default behavior

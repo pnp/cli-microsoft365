@@ -1,12 +1,12 @@
 import { Logger } from '../../../../cli/Logger.js';
-import config from '../../../../config.js';
-import request from '../../../../request.js';
-import { ClientSvcResponse, ClientSvcResponseContents, spo } from '../../../../utils/spo.js';
-import SpoCommand from '../../../base/SpoCommand.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 import { SPOWebAppServicePrincipalPermissionGrant } from './SPOWebAppServicePrincipalPermissionGrant.js';
 
-class SpoServicePrincipalGrantListCommand extends SpoCommand {
+class SpoServicePrincipalGrantListCommand extends GraphCommand {
+  private readonly spoServicePrincipalDisplayName = 'SharePoint Online Web Client Extensibility';
+
   public get name(): string {
     return commands.SERVICEPRINCIPAL_GRANT_LIST;
   }
@@ -21,41 +21,31 @@ class SpoServicePrincipalGrantListCommand extends SpoCommand {
 
   public async commandAction(logger: Logger): Promise<void> {
     try {
-      const spoAdminUrl = await spo.getSpoAdminUrl(logger, this.debug);
-
       if (this.verbose) {
-        await logger.logToStderr(`Retrieving request digest...`);
+        await logger.logToStderr(`Retrieving permissions granted to the service principal '${this.spoServicePrincipalDisplayName}'...`);
       }
 
-      const reqDigest = await spo.getRequestDigest(spoAdminUrl);
-
-      const requestOptions: any = {
-        url: `${spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
+      const requestOptions: CliRequestOptions = {
+        url: `${this.resource}/v1.0/servicePrincipals?$filter=displayName eq '${this.spoServicePrincipalDisplayName}'&$select=id`,
         headers: {
-          'X-RequestDigest': reqDigest.FormDigestValue
+          accept: 'application/json;odata.metadata=none'
         },
-        data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="4" ObjectPathId="3" /><ObjectPath Id="6" ObjectPathId="5" /><Query Id="7" ObjectPathId="5"><Query SelectAllProperties="true"><Properties /></Query><ChildItemQuery SelectAllProperties="true"><Properties /></ChildItemQuery></Query></Actions><ObjectPaths><Constructor Id="3" TypeId="{104e8f06-1e00-4675-99c6-1b9b504ed8d8}" /><Property Id="5" ParentId="3" Name="PermissionGrants" /></ObjectPaths></Request>`
+        responseType: 'json'
       };
 
-      const res = await request.post<string>(requestOptions);
+      const response = await request.get<{ value: { id: string }[] }>(requestOptions);
 
-      const json: ClientSvcResponse = JSON.parse(res);
-      const response: ClientSvcResponseContents = json[0];
-      if (response.ErrorInfo) {
-        throw response.ErrorInfo.ErrorMessage;
+      if (response.value.length === 0) {
+        throw `Service principal '${this.spoServicePrincipalDisplayName}' not found`;
       }
-      else {
-        const result: SPOWebAppServicePrincipalPermissionGrant[] = json[json.length - 1]._Child_Items_;
-        await logger.log(result.map(r => {
-          delete r._ObjectType_;
-          delete r.ClientId;
-          delete r.ConsentType;
-          return r;
-        }));
-      }
+
+      requestOptions.url = `${this.resource}/v1.0/servicePrincipals/${response.value[0].id}/oauth2PermissionGrants`;
+      const result = await request.get<{ value: SPOWebAppServicePrincipalPermissionGrant[] }>(requestOptions);
+
+      await logger.log(result.value);
     }
     catch (err: any) {
-      this.handleRejectedPromise(err);
+      this.handleRejectedODataJsonPromise(err);
     }
   }
 }
