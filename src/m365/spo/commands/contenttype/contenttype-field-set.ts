@@ -181,37 +181,11 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
       }
 
       if (!this.siteId) {
-        if (this.verbose) {
-          await logger.logToStderr(`Retrieving site collection id...`);
-        }
-
-        requestOptions = {
-          url: `${args.options.webUrl}/_api/site?$select=Id`,
-          headers: {
-            accept: 'application/json;odata=nometadata'
-          },
-          responseType: 'json'
-        };
-
-        const site = await request.get<{ Id: string }>(requestOptions);
-        this.siteId = site.Id;
+        this.siteId = await spo.getSiteIdBySPApi(args.options.webUrl, logger, this.verbose);
       }
 
       if (!this.webId) {
-        if (this.verbose) {
-          await logger.logToStderr(`Retrieving site id...`);
-        }
-
-        requestOptions = {
-          url: `${args.options.webUrl}/_api/web?$select=Id`,
-          headers: {
-            accept: 'application/json;odata=nometadata'
-          },
-          responseType: 'json'
-        };
-
-        const web = await request.get<{ Id: string }>(requestOptions);
-        this.webId = web.Id;
+        this.webId = await spo.getWebId(args.options.webUrl, logger, this.verbose);
       }
 
       if (this.verbose) {
@@ -263,36 +237,8 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
 
     await this.updateField(xField, requiresUpdate, logger, args);
 
-    if (this.verbose) {
-      await logger.logToStderr(`Retrieving site collection id...`);
-    }
-
-    const requestOptionsSiteId: CliRequestOptions = {
-      url: `${args.options.webUrl}/_api/site?$select=Id`,
-      headers: {
-        accept: 'application/json;odata=nometadata'
-      },
-      responseType: 'json'
-    };
-
-    const resSiteId = await request.get<{ Id: string }>(requestOptionsSiteId);
-    this.siteId = resSiteId.Id;
-
-    if (this.verbose) {
-      await logger.logToStderr(`Retrieving site id...`);
-    }
-
-    const requestOptionsWebId: CliRequestOptions = {
-      url: `${args.options.webUrl}/_api/web?$select=Id`,
-      headers: {
-        accept: 'application/json;odata=nometadata'
-      },
-      responseType: 'json'
-    };
-
-    const resWebId = await request.get<{ Id: string }>(requestOptionsWebId);
-
-    this.webId = resWebId.Id;
+    this.siteId = await spo.getSiteIdBySPApi(args.options.webUrl, logger, this.verbose);
+    this.webId = await spo.getWebId(args.options.webUrl, logger, this.verbose);
 
     await this.ensureRequestDigest(args.options.webUrl, logger);
 

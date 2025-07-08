@@ -162,7 +162,7 @@ class SpoPageAddCommand extends SpoCommand {
       const file = await spo.getFileAsListItemByUrl(args.options.webUrl, serverRelativeFileUrl, logger, this.verbose);
       const listItemId = file.Id;
 
-      const pageProps = await Page.checkout(pageName, args.options.webUrl, logger, this.debug, this.verbose);
+      const pageProps = await Page.checkout(pageName, args.options.webUrl, logger, this.verbose);
       if (pageProps) {
         pageId = pageProps.Id;
 

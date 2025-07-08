@@ -10,6 +10,7 @@ import { StandardWebPart, StandardWebPartUtils } from '../../StandardWebPartType
 import { Control } from './canvasContent.js';
 import { ClientSidePageProperties } from './ClientSidePageProperties.js';
 import { ClientSidePageComponent, ClientSideWebpart } from './clientsidepages.js';
+import { Page } from './Page.js';
 
 interface CommandArgs {
   options: Options;
@@ -189,15 +190,7 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
 
       let page = await request.get<ClientSidePageProperties>(requestOptions);
       if (!page.IsPageCheckedOutToCurrentUser) {
-        const requestOptions: any = {
-          url: `${args.options.webUrl}/_api/sitepages/pages/GetByUrl('sitepages/${formatting.encodeQueryParameter(pageFullName)}')/checkoutpage`,
-          headers: {
-            'accept': 'application/json;odata=nometadata'
-          },
-          responseType: 'json'
-        };
-
-        page = await request.post<ClientSidePageProperties>(requestOptions);
+        page = await Page.checkout(pageFullName, args.options.webUrl, logger, this.verbose);
       }
 
       if (page) {

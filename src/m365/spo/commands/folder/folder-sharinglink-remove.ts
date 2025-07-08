@@ -100,7 +100,7 @@ class SpoFolderSharingLinkRemoveCommand extends SpoCommand {
         const absoluteFolderUrl: string = urlUtil.getAbsoluteUrl(args.options.webUrl, relFolderUrl);
         const folderUrl: URL = new URL(absoluteFolderUrl);
 
-        const siteId: string = await spo.getSiteId(args.options.webUrl);
+        const siteId: string = await spo.getSiteIdByMSGraph(args.options.webUrl);
         const driveDetails: Drive = await drive.getDriveByUrl(siteId, folderUrl, logger, args.options.verbose);
         const itemId: string = await drive.getDriveItemId(driveDetails, folderUrl, logger, args.options.verbose);
 

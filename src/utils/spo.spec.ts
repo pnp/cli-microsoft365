@@ -2048,7 +2048,7 @@ describe('utils/spo', () => {
       throw 'Invalid request';
     });
 
-    const id = await spo.getSiteId('https://contoso.sharepoint.com', logger);
+    const id = await spo.getSiteIdByMSGraph('https://contoso.sharepoint.com', logger);
 
     assert.strictEqual(id, 'contoso.sharepoint.com,ea49a393-e3e6-4760-a1b2-e96539e15372,66e2861c-96d9-4418-a75c-0ed1bca68b42');
   });
@@ -3405,5 +3405,241 @@ describe('utils/spo', () => {
     catch (ex) {
       assert.deepStrictEqual(ex, Error(`The specified role definition name 'Unknown' does not exist.`));
     }
+  });
+
+  it('retrieves site id successfully', async () => {
+    const webUrl = 'https://contoso.sharepoint.com/sites/sales';
+    const siteId = 'b2307a39-e878-458b-bc90-03bc578531d6';
+
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `${webUrl}/_api/site?$select=Id`) {
+        return { Id: siteId };
+      }
+
+      throw `Invalid request ${opts.url}`;
+    });
+
+    const actual = await spo.getSiteIdBySPApi(webUrl, logger, true);
+    assert.strictEqual(actual, siteId);
+  });
+
+  it('throws an error when site id cannot be retrieved', async () => {
+    const webUrl = 'https://contoso.sharepoint.com/sites/sales';
+
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `${webUrl}/_api/site?$select=Id`) {
+        throw new Error('Site not found');
+      }
+
+      throw `Invalid request ${opts.url}`;
+    });
+
+    await assert.rejects(
+      spo.getSiteIdBySPApi(webUrl, logger, true),
+      new Error('Site not found')
+    );
+  });
+
+  it('logs verbose output when retrieving site id', async () => {
+    const webUrl = 'https://contoso.sharepoint.com/sites/sales';
+    const siteId = 'b2307a39-e878-458b-bc90-03bc578531d6';
+    const logStub = sinon.stub(logger, 'logToStderr');
+
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `${webUrl}/_api/site?$select=Id`) {
+        return { Id: siteId };
+      }
+
+      throw `Invalid request ${opts.url}`;
+    });
+
+    const actual = await spo.getSiteIdBySPApi(webUrl, logger, true);
+    assert.strictEqual(actual, siteId);
+    assert(logStub.calledWith(`Getting site id for URL: ${webUrl}...`));
+  });
+
+  it('does not log verbose output when verbose is false while getting site id', async () => {
+    const webUrl = 'https://contoso.sharepoint.com/sites/sales';
+    const siteId = 'b2307a39-e878-458b-bc90-03bc578531d6';
+    const logStub = sinon.stub(logger, 'logToStderr');
+
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `${webUrl}/_api/site?$select=Id`) {
+        return { Id: siteId };
+      }
+
+      throw `Invalid request ${opts.url}`;
+    });
+
+    const actual = await spo.getSiteIdBySPApi(webUrl, logger, false);
+    assert.strictEqual(actual, siteId);
+    assert(logStub.notCalled);
+  });
+
+  it('retrieves web id successfully', async () => {
+    const webUrl = 'https://contoso.sharepoint.com/sites/sales';
+    const webId = 'b2307a39-e878-458b-bc90-03bc578531d6';
+
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `${webUrl}/_api/web?$select=Id`) {
+        return { Id: webId };
+      }
+
+      throw `Invalid request ${opts.url}`;
+    });
+
+    const actual = await spo.getWebId(webUrl, logger, true);
+    assert.strictEqual(actual, webId);
+  });
+
+  it('throws an error when web id cannot be retrieved', async () => {
+    const webUrl = 'https://contoso.sharepoint.com/sites/sales';
+
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `${webUrl}/_api/web?$select=Id`) {
+        throw new Error('Web not found');
+      }
+
+      throw `Invalid request ${opts.url}`;
+    });
+
+    await assert.rejects(
+      spo.getWebId(webUrl, logger, true),
+      new Error('Web not found')
+    );
+  });
+
+  it('logs verbose output when retrieving web id', async () => {
+    const webUrl = 'https://contoso.sharepoint.com/sites/sales';
+    const webId = 'b2307a39-e878-458b-bc90-03bc578531d6';
+    const logStub = sinon.stub(logger, 'logToStderr');
+
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `${webUrl}/_api/web?$select=Id`) {
+        return { Id: webId };
+      }
+
+      throw `Invalid request ${opts.url}`;
+    });
+
+    const actual = await spo.getWebId(webUrl, logger, true);
+    assert.strictEqual(actual, webId);
+    assert(logStub.calledWith(`Getting web id for URL: ${webUrl}...`));
+  });
+
+  it('does not log verbose output when verbose is false while getting web id', async () => {
+    const webUrl = 'https://contoso.sharepoint.com/sites/sales';
+    const webId = 'b2307a39-e878-458b-bc90-03bc578531d6';
+    const logStub = sinon.stub(logger, 'logToStderr');
+
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `${webUrl}/_api/web?$select=Id`) {
+        return { Id: webId };
+      }
+
+      throw `Invalid request ${opts.url}`;
+    });
+
+    const actual = await spo.getWebId(webUrl, logger, false);
+    assert.strictEqual(actual, webId);
+    assert(logStub.notCalled);
+  });
+
+  it('retrieves list id by title successfully', async () => {
+    const webUrl = 'https://contoso.sharepoint.com/sites/sales';
+    const listTitle = 'Documents';
+    const listId = 'b2307a39-e878-458b-bc90-03bc578531d6';
+
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `${webUrl}/_api/web/lists/getByTitle('${formatting.encodeQueryParameter(listTitle)}')?$select=Id`) {
+        return { Id: listId };
+      }
+
+      throw `Invalid request ${opts.url}`;
+    });
+
+    const actual = await spo.getListId(webUrl, listTitle, undefined, logger, true);
+    assert.strictEqual(actual, listId);
+  });
+
+  it('retrieves list id by URL successfully', async () => {
+    const webUrl = 'https://contoso.sharepoint.com/sites/sales';
+    const listUrl = '/sites/sales/Lists/TestList';
+    const listId = 'b2307a39-e878-458b-bc90-03bc578531d6';
+
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `${webUrl}/_api/web/GetList('${formatting.encodeQueryParameter(listUrl)}')?$select=Id`) {
+        return { Id: listId };
+      }
+
+      throw `Invalid request ${opts.url}`;
+    });
+
+    const actual = await spo.getListId(webUrl, undefined, listUrl, logger, true);
+    assert.strictEqual(actual, listId);
+  });
+
+  it('throws an error when neither listTitle nor listUrl is provided', async () => {
+    const webUrl = 'https://contoso.sharepoint.com/sites/sales';
+
+    await assert.rejects(
+      spo.getListId(webUrl, undefined, undefined, logger, true),
+      new Error('Either listTitle or listUrl must be provided.')
+    );
+  });
+
+  it('throws an error when list title does not exist', async () => {
+    const webUrl = 'https://contoso.sharepoint.com/sites/sales';
+    const listTitle = 'NonExistentList';
+
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `${webUrl}/_api/web/lists/getByTitle('${formatting.encodeQueryParameter(listTitle)}')?$select=Id`) {
+        throw new Error('List not found');
+      }
+
+      throw `Invalid request ${opts.url}`;
+    });
+
+    await assert.rejects(
+      spo.getListId(webUrl, listTitle, undefined, logger, true),
+      new Error('List not found')
+    );
+  });
+
+  it('throws an error when list URL does not exist', async () => {
+    const webUrl = 'https://contoso.sharepoint.com/sites/sales';
+    const listUrl = '/sites/sales/Lists/NonExistentList';
+
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `${webUrl}/_api/web/GetList('${formatting.encodeQueryParameter(listUrl)}')?$select=Id`) {
+        throw new Error('List not found');
+      }
+
+      throw `Invalid request ${opts.url}`;
+    });
+
+    await assert.rejects(
+      spo.getListId(webUrl, undefined, listUrl, logger, true),
+      new Error('List not found')
+    );
+  });
+
+  it('logs verbose output when retrieving list id by title', async () => {
+    const webUrl = 'https://contoso.sharepoint.com/sites/sales';
+    const listTitle = 'Documents';
+    const listId = 'b2307a39-e878-458b-bc90-03bc578531d6';
+    const logStub = sinon.stub(logger, 'logToStderr');
+
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `${webUrl}/_api/web/lists/getByTitle('${formatting.encodeQueryParameter(listTitle)}')?$select=Id`) {
+        return { Id: listId };
+      }
+
+      throw `Invalid request ${opts.url}`;
+    });
+
+    const actual = await spo.getListId(webUrl, listTitle, undefined, logger, true);
+    assert.strictEqual(actual, listId);
+    assert(logStub.calledWith('Retrieving list id...'));
   });
 });

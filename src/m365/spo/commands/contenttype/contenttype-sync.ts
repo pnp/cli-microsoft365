@@ -115,7 +115,7 @@ class SpoContentTypeSyncCommand extends SpoCommand {
     const baseUrl = 'https://graph.microsoft.com/v1.0/sites/';
 
     try {
-      const siteUrl = url.pathname === '/' ? url.host : await spo.getSiteId(webUrl, logger, this.verbose);
+      const siteUrl = url.pathname === '/' ? url.host : await spo.getSiteIdByMSGraph(webUrl, logger, this.verbose);
       const listPath = listId || listTitle || listUrl ? `/lists/${listId || listTitle || await this.getListIdByUrl(webUrl, listUrl!, logger)}` : '';
       const contentTypeId = await this.getContentTypeId(baseUrl, url, args.options, logger);
 
@@ -152,7 +152,7 @@ class SpoContentTypeSyncCommand extends SpoCommand {
       return options.id;
     }
 
-    const siteId = await spo.getSiteId(`${url.origin}/sites/contenttypehub`, logger, this.verbose);
+    const siteId = await spo.getSiteIdByMSGraph(`${url.origin}/sites/contenttypehub`, logger, this.verbose);
 
     if (this.verbose) {
       await logger.logToStderr(`Retrieving content type Id by name...`);

@@ -37,7 +37,7 @@ describe(commands.FOLDER_SHARINGLINK_REMOVE, () => {
 
   const getStubs: any = (options: any) => {
     sinon.stub(spo, 'getFolderServerRelativeUrl').resolves(options.folderUrl);
-    sinon.stub(spo, 'getSiteId').resolves(options.siteId);
+    sinon.stub(spo, 'getSiteIdByMSGraph').resolves(options.siteId);
     sinon.stub(drive, 'getDriveByUrl').resolves(options.drive);
     sinon.stub(drive, 'getDriveItemId').resolves(options.itemId);
   };
@@ -77,7 +77,7 @@ describe(commands.FOLDER_SHARINGLINK_REMOVE, () => {
     sinonUtil.restore([
       request.delete,
       cli.promptForConfirmation,
-      spo.getSiteId,
+      spo.getSiteIdByMSGraph,
       spo.getFolderServerRelativeUrl,
       drive.getDriveByUrl,
       drive.getDriveItemId
@@ -193,7 +193,7 @@ describe(commands.FOLDER_SHARINGLINK_REMOVE, () => {
 
   it('throws error when drive not found by url', async () => {
     sinon.stub(spo, 'getFolderServerRelativeUrl').resolves(folderUrl);
-    sinon.stub(spo, 'getSiteId').resolves(siteId);
+    sinon.stub(spo, 'getSiteIdByMSGraph').resolves(siteId);
     sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/sites/${siteId}/drives?$select=webUrl,id`) {
         return {

@@ -99,7 +99,7 @@ class SpoFolderSharingLinkGetCommand extends SpoCommand {
       const absoluteFolderUrl: string = urlUtil.getAbsoluteUrl(args.options.webUrl, relFolderUrl);
       const folderUrl: URL = new URL(absoluteFolderUrl);
 
-      const siteId: string = await spo.getSiteId(args.options.webUrl);
+      const siteId: string = await spo.getSiteIdByMSGraph(args.options.webUrl);
       const drive: Drive = await driveItem.getDriveByUrl(siteId, folderUrl);
       const itemId: string = await driveItem.getDriveItemId(drive, folderUrl);
 

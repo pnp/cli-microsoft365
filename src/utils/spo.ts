@@ -1880,15 +1880,14 @@ export const spo = {
     await request.post(requestOptions);
   },
 
-
   /**
-   * Retrieves the site ID for a given web URL.
+   * Retrieves the site ID for a given web URL by the MS Graph.
    * @param webUrl The web URL for which to retrieve the site ID.
    * @param logger The logger object.
    * @param verbose Set for verbose logging
-   * @returns A promise that resolves to the site ID.
+   * @returns The site ID as a string.
    */
-  async getSiteId(webUrl: string, logger?: Logger, verbose?: boolean): Promise<string> {
+  async getSiteIdByMSGraph(webUrl: string, logger?: Logger, verbose?: boolean): Promise<string> {
     if (verbose && logger) {
       await logger.logToStderr(`Getting site id for URL: ${webUrl}...`);
     }
@@ -1905,6 +1904,101 @@ export const spo = {
     const site: Site = await request.get<Site>(requestOptions);
 
     return site.id as string;
+  },
+
+  /**
+   * Retrieves the SharePoint Online site ID for the specified web URL by the SharePoint REST API.
+   * @param webUrl The web URL of the SharePoint Online site to retrieve the site ID for.
+   * @param logger The logger object.
+   * @param verbose Set for verbose logging
+   * @returns The site ID as a string.
+   */
+  async getSiteIdBySPApi(webUrl: string, logger?: Logger, verbose?: boolean): Promise<string> {
+    if (verbose && logger) {
+      await logger.logToStderr(`Getting site id for URL: ${webUrl}...`);
+    }
+
+    const requestOptions: CliRequestOptions = {
+      url: `${webUrl}/_api/site?$select=Id`,
+      headers: {
+        accept: 'application/json;odata=nometadata'
+      },
+      responseType: 'json'
+    };
+
+    const siteResponse = await request.get<{ Id: string }>(requestOptions);
+    return siteResponse.Id;
+  },
+
+  /**
+   * Retrieves the id of a SharePoint web for the specified web URL.
+   * @param webUrl The web URL for which to retrieve the web ID.
+   * @param logger The logger object for logging messages.
+   * @param verbose Set to true for verbose logging.
+   * @returns The web ID as a string.
+   */
+  async getWebId(webUrl: string, logger?: Logger, verbose?: boolean): Promise<string> {
+    if (verbose && logger) {
+      await logger.logToStderr(`Getting web id for URL: ${webUrl}...`);
+    }
+
+    const requestOptions: CliRequestOptions = {
+      url: `${webUrl}/_api/web?$select=Id`,
+      headers: {
+        accept: 'application/json;odata=nometadata'
+      },
+      responseType: 'json'
+    };
+
+    const webResponse = await request.get<{ Id: string }>(requestOptions);
+    return webResponse.Id;
+  },
+
+  /**
+   * Retrieves the ID of a SharePoint list by its title or URL.
+   * @param webUrl The base URL of the SharePoint site.
+   * @param listTitle The title of the list (optional).
+   * @param listUrl The server-relative URL of the list (optional).
+   * @param logger The logger object for logging messages (optional).
+   * @param verbose Set to true for verbose logging (optional).
+   * @returns The list ID as a string.
+   */
+  async getListId(webUrl: string, listTitle?: string, listUrl?: string, logger?: Logger, verbose?: boolean): Promise<string> {
+    if (verbose && logger) {
+      await logger.logToStderr(`Retrieving list id...`);
+    }
+
+    if (!listTitle && !listUrl) {
+      throw new Error('Either listTitle or listUrl must be provided.');
+    }
+
+    let listId = '';
+
+    if (listTitle) {
+      const requestOptions: CliRequestOptions = {
+        url: `${webUrl}/_api/web/lists/getByTitle('${formatting.encodeQueryParameter(listTitle)}')?$select=Id`,
+        headers: {
+          accept: 'application/json;odata=nometadata'
+        },
+        responseType: 'json'
+      };
+      const listResponse = await request.get<{ Id: string }>(requestOptions);
+      listId = listResponse.Id;
+    }
+    else if (listUrl) {
+      const listServerRelativeUrl: string = urlUtil.getServerRelativePath(webUrl, listUrl);
+      const requestOptions: CliRequestOptions = {
+        url: `${webUrl}/_api/web/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')?$select=Id`,
+        headers: {
+          accept: 'application/json;odata=nometadata'
+        },
+        responseType: 'json'
+      };
+      const listResponse = await request.get<{ Id: string }>(requestOptions);
+      listId = listResponse.Id;
+    }
+
+    return listId;
   },
 
   /**

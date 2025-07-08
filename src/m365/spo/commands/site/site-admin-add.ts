@@ -9,7 +9,7 @@ import { FormDigestInfo, spo } from '../../../../utils/spo.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
-import { AdminResult, AdminUserResult, ISiteOwner, ISiteUser, ISPSite } from './SiteAdmin.js';
+import { AdminResult, AdminUserResult, ISiteOwner, ISiteUser } from './SiteAdmin.js';
 
 interface CommandArgs {
   options: Options;
@@ -226,7 +226,7 @@ class SpoSiteAdminAddCommand extends SpoCommand {
     await this.setSiteAdmin(args.options.siteUrl, loginNameToAdd);
 
     if (args.options.primary) {
-      const siteId = await this.getSiteId(args.options.siteUrl);
+      const siteId = await spo.getSiteIdBySPApi(args.options.siteUrl, logger, this.verbose);
       const previousPrimaryOwner = await this.getSiteOwnerLoginName(args.options.siteUrl);
       await this.setPrimaryOwnerLoginFromSite(logger, args.options.siteUrl, siteId, ensuredUserData);
       await this.setSiteAdmin(args.options.siteUrl, previousPrimaryOwner);
@@ -260,19 +260,6 @@ class SpoSiteAdminAddCommand extends SpoCommand {
       responseType: 'json'
     };
     return request.post(requestOptions);
-  }
-
-  private async getSiteId(siteUrl: string): Promise<string> {
-    const requestOptions: CliRequestOptions = {
-      url: `${siteUrl}/_api/site?$select=Id`,
-      headers: {
-        accept: 'application/json;odata=nometadata'
-      },
-      responseType: 'json'
-    };
-
-    const response = await request.get<ISPSite>(requestOptions);
-    return response.Id;
   }
 
   private async getSiteOwnerLoginName(siteUrl: string): Promise<string> {

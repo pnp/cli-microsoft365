@@ -2,10 +2,12 @@ import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
+import { spo } from '../../../../utils/spo.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 import { ClientSidePageProperties } from './ClientSidePageProperties.js';
+import { Page } from './Page.js';
 import { PageControl } from './PageControl.js';
 import { CustomPageHeader, CustomPageHeaderProperties, CustomPageHeaderServerProcessedContent, PageHeader } from './PageHeader.js';
 
@@ -281,15 +283,7 @@ class SpoPageHeaderSetCommand extends SpoCommand {
         pageData = await request.get<ClientSidePageProperties>(requestOptions);
       }
       else {
-        const requestOptions: any = {
-          url: `${args.options.webUrl}/_api/sitepages/pages/GetByUrl('sitepages/${formatting.encodeQueryParameter(pageFullName)}')/checkoutpage`,
-          headers: {
-            'accept': 'application/json;odata=nometadata'
-          },
-          responseType: 'json'
-        };
-
-        pageData = await request.post<ClientSidePageProperties>(requestOptions);
+        pageData = await Page.checkout(pageFullName, args.options.webUrl, logger, this.verbose);
       }
 
       switch (args.options.type) {
@@ -362,24 +356,24 @@ class SpoPageHeaderSetCommand extends SpoCommand {
         }
         else {
           const res = await Promise.all([
-            this.getSiteId(args.options.webUrl, this.verbose, logger),
-            this.getWebId(args.options.webUrl, this.verbose, logger),
+            spo.getSiteIdBySPApi(args.options.webUrl, logger, this.verbose),
+            spo.getWebId(args.options.webUrl, logger, this.verbose),
             this.getImageInfo(args.options.webUrl, args.options.imageUrl as string, this.verbose, logger)
           ]);
 
           (header.serverProcessedContent as CustomPageHeaderServerProcessedContent).customMetadata = {
             imageSource: {
-              siteId: res[0].Id,
-              webId: res[1].Id,
+              siteId: res[0],
+              webId: res[1],
               listId: res[2].ListId,
               uniqueId: res[2].UniqueId
             }
           };
           const properties: CustomPageHeaderProperties = header.properties as CustomPageHeaderProperties;
           properties.listId = res[2].ListId;
-          properties.siteId = res[0].Id;
+          properties.siteId = res[0];
           properties.uniqueId = res[2].UniqueId;
-          properties.webId = res[1].Id;
+          properties.webId = res[1];
           header.properties = properties;
         }
       }
@@ -454,38 +448,6 @@ class SpoPageHeaderSetCommand extends SpoCommand {
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
-  }
-
-  private async getSiteId(siteUrl: string, verbose: boolean, logger: Logger): Promise<any> {
-    if (verbose) {
-      await logger.logToStderr(`Retrieving information about the site collection...`);
-    }
-
-    const requestOptions: any = {
-      url: `${siteUrl}/_api/site?$select=Id`,
-      headers: {
-        accept: 'application/json;odata=nometadata'
-      },
-      responseType: 'json'
-    };
-
-    return request.get(requestOptions);
-  }
-
-  private async getWebId(siteUrl: string, verbose: boolean, logger: Logger): Promise<any> {
-    if (verbose) {
-      await logger.logToStderr(`Retrieving information about the site...`);
-    }
-
-    const requestOptions: any = {
-      url: `${siteUrl}/_api/web?$select=Id`,
-      headers: {
-        accept: 'application/json;odata=nometadata'
-      },
-      responseType: 'json'
-    };
-
-    return request.get(requestOptions);
   }
 
   private async getImageInfo(siteUrl: string, imageUrl: string, verbose: boolean, logger: Logger): Promise<any> {

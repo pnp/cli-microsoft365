@@ -6,7 +6,6 @@ import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { ClientSvcResponse, ClientSvcResponseContents, spo } from '../../../../utils/spo.js';
-import { urlUtil } from '../../../../utils/urlUtil.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
@@ -169,79 +168,10 @@ class SpoContentTypeAddCommand extends SpoCommand {
   }
 
   private async getParentInfo(options: Options, logger: Logger): Promise<string> {
-    const siteId: string = await this.getSiteId(options.webUrl, logger);
-    const webId: string = await this.getWebId(options.webUrl, logger);
-    const listId: string = await this.getListId(options, logger);
+    const siteId: string = await spo.getSiteIdBySPApi(options.webUrl, logger, this.verbose);
+    const webId: string = await spo.getWebId(options.webUrl, logger, this.verbose);
+    const listId: string = options.listId ? options.listId : await spo.getListId(options.webUrl, options.listTitle, options.listUrl, logger, this.verbose);
     return `<Identity Id="5" Name="1a48869e-c092-0000-1f61-81ec89809537|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:${siteId}:web:${webId}:list:${listId}" />`;
-  }
-
-  private async getSiteId(webUrl: string, logger: Logger): Promise<string> {
-    if (this.verbose) {
-      await logger.logToStderr(`Retrieving site collection id...`);
-    }
-
-    const requestOptions: CliRequestOptions = {
-      url: `${webUrl}/_api/site?$select=Id`,
-      headers: {
-        accept: 'application/json;odata=nometadata'
-      },
-      responseType: 'json'
-    };
-
-    const siteResponse = await request.get<{ Id: string }>(requestOptions);
-    return siteResponse.Id;
-  }
-
-  private async getWebId(webUrl: string, logger: Logger): Promise<string> {
-    if (this.verbose) {
-      await logger.logToStderr(`Retrieving web id...`);
-    }
-
-    const requestOptions: CliRequestOptions = {
-      url: `${webUrl}/_api/web?$select=Id`,
-      headers: {
-        accept: 'application/json;odata=nometadata'
-      },
-      responseType: 'json'
-    };
-
-    const webResponse = await request.get<{ Id: string }>(requestOptions);
-    return webResponse.Id;
-  }
-
-  private async getListId(options: Options, logger: Logger): Promise<string> {
-    if (this.verbose) {
-      await logger.logToStderr(`Retrieving list id...`);
-    }
-    let listId = '';
-    if (options.listId) {
-      return options.listId;
-    }
-    else if (options.listTitle) {
-      const requestOptions: CliRequestOptions = {
-        url: `${options.webUrl}/_api/web/lists/getByTitle('${formatting.encodeQueryParameter(options.listTitle)}')?$select=Id`,
-        headers: {
-          accept: 'application/json;odata=nometadata'
-        },
-        responseType: 'json'
-      };
-      const listResponse = await request.get<{ Id: string }>(requestOptions);
-      listId = listResponse.Id;
-    }
-    else if (options.listUrl) {
-      const listServerRelativeUrl: string = urlUtil.getServerRelativePath(options.webUrl, options.listUrl);
-      const requestOptions: CliRequestOptions = {
-        url: `${options.webUrl}/_api/web/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')?$select=Id`,
-        headers: {
-          accept: 'application/json;odata=nometadata'
-        },
-        responseType: 'json'
-      };
-      const listResponse = await request.get<{ Id: string }>(requestOptions);
-      listId = listResponse.Id;
-    }
-
-    return listId;
   }
 }
 

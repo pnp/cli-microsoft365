@@ -114,7 +114,7 @@ class FileMoveCommand extends GraphCommand {
   }
 
   private async getDriveIdAndItemId(webUrl: string, folderUrl: string, sourceUrl: string, logger: Logger, verbose?: boolean): Promise<{ driveId: string, itemId: string }> {
-    const siteId: string = await spo.getSiteId(webUrl, logger, verbose);
+    const siteId: string = await spo.getSiteIdByMSGraph(webUrl, logger, verbose);
     const driveDetails: Drive = await drive.getDriveByUrl(siteId, new URL(folderUrl), logger, verbose);
     const itemId: string = await drive.getDriveItemId(driveDetails, new URL(folderUrl), logger, verbose);
     return { driveId: driveDetails.id!, itemId };

@@ -134,7 +134,7 @@ class SpoPageControlSetCommand extends SpoCommand {
       }
 
       // Check out the page
-      const page = await Page.checkout(pageName, args.options.webUrl, logger, this.debug, this.verbose);
+      const page = await Page.checkout(pageName, args.options.webUrl, logger, this.verbose);
       // Update the web part data
       const canvasContent: ClientSideControl[] = JSON.parse(page.CanvasContent1);
       if (this.debug) {
