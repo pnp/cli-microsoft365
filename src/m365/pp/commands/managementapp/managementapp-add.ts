@@ -1,12 +1,10 @@
-import { Application } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request from '../../../../request.js';
-import { formatting } from '../../../../utils/formatting.js';
 import { validation } from '../../../../utils/validation.js';
 import PowerPlatformCommand from '../../../base/PowerPlatformCommand.js';
 import commands from '../../commands.js';
-import { cli } from '../../../../cli/cli.js';
+import { entraApp } from '../../../../utils/entraApp.js';
 
 interface CommandArgs {
   options: Options;
@@ -102,32 +100,14 @@ class PpManagementAppAddCommand extends PowerPlatformCommand {
 
     const { objectId, name } = args.options;
 
-    const filter: string = objectId ?
-      `id eq '${formatting.encodeQueryParameter(objectId)}'` :
-      `displayName eq '${formatting.encodeQueryParameter(name as string)}'`;
-
-    const requestOptions: any = {
-      url: `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=${filter}&$select=appId`,
-      headers: {
-        accept: 'application/json;odata.metadata=none'
-      },
-      responseType: 'json'
-    };
-
-    const entraApps: { value: Application[] } = await request.get<{ value: Application[] }>((requestOptions));
-
-    if (entraApps.value.length === 0) {
-      const applicationIdentifier = objectId ? `ID ${objectId}` : `name ${name}`;
-      throw `No Microsoft Entra application registration with ${applicationIdentifier} found`;
+    if (objectId) {
+      const app = await entraApp.getAppRegistrationByObjectId(objectId, ['appId']);
+      return app.appId!;
     }
-
-    if (entraApps.value.length === 1 && entraApps.value[0].appId) {
-      return entraApps.value[0].appId;
+    else {
+      const app = await entraApp.getAppRegistrationByAppName(name!, ['appId']);
+      return app.appId!;
     }
-
-    const resultAsKeyValuePair = formatting.convertArrayToHashTable('appId', entraApps.value);
-    const result = await cli.handleMultipleResultsFound<Application>(`Multiple Microsoft Entra application registrations with name '${name}' found.`, resultAsKeyValuePair);
-    return result.appId!;
   }
 }
 

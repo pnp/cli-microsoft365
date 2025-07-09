@@ -62,7 +62,8 @@ describe(commands.APP_ROLE_LIST, () => {
       request.get,
       cli.getSettingWithDefaultValue,
       cli.handleMultipleResultsFound,
-      entraApp.getAppRegistrationByAppId
+      entraApp.getAppRegistrationByAppId,
+      entraApp.getAppRegistrationByAppName
     ]);
   });
 
@@ -147,15 +148,8 @@ describe(commands.APP_ROLE_LIST, () => {
   });
 
   it('lists roles for the specified appName (debug)', async () => {
+    sinon.stub(entraApp, 'getAppRegistrationByAppName').resolves(appResponse.value[0]);
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=displayName eq 'My%20app'&$select=id`) {
-        return {
-          value: [{
-            id: '5b31c38c-2584-42f0-aa47-657fb3a84230'
-          }]
-        };
-      }
-
       if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230/appRoles`) {
         return {
           value: [
@@ -215,7 +209,7 @@ describe(commands.APP_ROLE_LIST, () => {
     ]));
   });
 
-  it('lists roles for the specified appId', async () => {
+  it('lists roles for the specified appObjectId', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230/appRoles`) {
         return {
@@ -327,120 +321,25 @@ describe(commands.APP_ROLE_LIST, () => {
   });
 
   it('handles error when the app specified with appName not found', async () => {
-    sinon.stub(request, 'get').callsFake(async opts => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=displayName eq 'My%20app'&$select=id`) {
-        return { value: [] };
-      }
-
-      throw `Invalid request ${JSON.stringify(opts)}`;
-    });
+    const error = `App with name 'My app' not found in Microsoft Entra ID`;
+    sinon.stub(entraApp, 'getAppRegistrationByAppName').rejects(new Error(error));
 
     await assert.rejects(command.action(logger, {
       options: {
         appName: 'My app'
       }
-    }), new CommandError(`No Microsoft Entra application registration with name My app found`));
+    }), new CommandError(error));
   });
 
   it('handles error when multiple apps with the specified appName found', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    sinon.stub(request, 'get').callsFake(async opts => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=displayName eq 'My%20app'&$select=id`) {
-        return {
-          value: [
-            { id: '9b1b1e42-794b-4c71-93ac-5ed92488b67f' },
-            { id: '9b1b1e42-794b-4c71-93ac-5ed92488b67g' }
-          ]
-        };
-      }
-
-      throw `Invalid request ${JSON.stringify(opts)}`;
-    });
+    const error = `Multiple apps with name 'My app' found in Microsoft Entra ID. Found: 9b1b1e42-794b-4c71-93ac-5ed92488b67f, 9b1b1e42-794b-4c71-93ac-5ed92488b67g.`;
+    sinon.stub(entraApp, 'getAppRegistrationByAppName').rejects(new Error(error));
 
     await assert.rejects(command.action(logger, {
       options: {
         appName: 'My app'
       }
-    }), new CommandError(`Multiple Microsoft Entra application registrations with name 'My app' found. Found: 9b1b1e42-794b-4c71-93ac-5ed92488b67f, 9b1b1e42-794b-4c71-93ac-5ed92488b67g.`));
-  });
-
-  it('handles selecting single result when multiple apps with the specified name found and cli is set to prompt', async () => {
-    sinon.stub(request, 'get').callsFake(async opts => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=displayName eq 'My%20app'&$select=id`) {
-        return {
-          value: [
-            { id: '9b1b1e42-794b-4c71-93ac-5ed92488b67f' },
-            { id: '9b1b1e42-794b-4c71-93ac-5ed92488b67g' }
-          ]
-        };
-      }
-
-      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230/appRoles`) {
-        return {
-          value: [
-            {
-              "allowedMemberTypes": [
-                "User"
-              ],
-              "description": "Readers",
-              "displayName": "Readers",
-              "id": "ca12d0da-cd83-4dc9-8e4c-b6a529bebbb4",
-              "isEnabled": true,
-              "origin": "Application",
-              "value": "readers"
-            },
-            {
-              "allowedMemberTypes": [
-                "User"
-              ],
-              "description": "Writers",
-              "displayName": "Writers",
-              "id": "85c03d41-b438-48ea-bccd-8389c0e327bc",
-              "isEnabled": true,
-              "origin": "Application",
-              "value": "writers"
-            }
-          ]
-        };
-      }
-
-      throw `Invalid request ${JSON.stringify(opts)}`;
-    });
-
-    sinon.stub(cli, 'handleMultipleResultsFound').resolves({ id: '5b31c38c-2584-42f0-aa47-657fb3a84230' });
-
-    await command.action(logger, { options: { appName: 'My app' } });
-    assert(loggerLogSpy.calledWith([
-      {
-        "allowedMemberTypes": [
-          "User"
-        ],
-        "description": "Readers",
-        "displayName": "Readers",
-        "id": "ca12d0da-cd83-4dc9-8e4c-b6a529bebbb4",
-        "isEnabled": true,
-        "origin": "Application",
-        "value": "readers"
-      },
-      {
-        "allowedMemberTypes": [
-          "User"
-        ],
-        "description": "Writers",
-        "displayName": "Writers",
-        "id": "85c03d41-b438-48ea-bccd-8389c0e327bc",
-        "isEnabled": true,
-        "origin": "Application",
-        "value": "writers"
-      }
-    ]));
+    }), new CommandError(error));
   });
 
   it('handles error when retrieving information about app through appName failed', async () => {
