@@ -23,6 +23,7 @@ describe(commands.COMMANDSET_SET, () => {
   const validUrl = 'https://contoso.sharepoint.com';
   const validId = 'e7000aef-f756-4997-9420-01cc84f9ac9c';
   const validTitle = 'Commandset title';
+  const validDescription = 'Commandset description';
   const validClientSideComponentId = 'b206e130-1a5b-4ae7-86a7-4f91c9924d0a';
   const validNewTitle = 'I have no inspiration whatsoever';
   const validClientSideComponentProperties = '{"testMessage":"Test message"}';
@@ -35,7 +36,7 @@ describe(commands.COMMANDSET_SET, () => {
         "ClientSideComponentId": "b206e130-1a5b-4ae7-86a7-4f91c9924d0a",
         "ClientSideComponentProperties": "",
         "CommandUIExtension": null,
-        "Description": null,
+        "Description": validDescription,
         "Group": null,
         "HostProperties": "",
         "Id": "e7000aef-f756-4997-9420-01cc84f9ac9c",
@@ -372,7 +373,7 @@ describe(commands.COMMANDSET_SET, () => {
 
     await assert.doesNotReject(command.action(logger, {
       options: {
-        verbose: true, webUrl: validUrl, id: validId, newTitle: validNewTitle, listType: validListType, clientSideComponentProperties: validClientSideComponentProperties, location: validLocation
+        verbose: true, webUrl: validUrl, id: validId, newTitle: validNewTitle, description: validDescription, listType: validListType, clientSideComponentProperties: validClientSideComponentProperties, location: validLocation
       }
     }));
   });
