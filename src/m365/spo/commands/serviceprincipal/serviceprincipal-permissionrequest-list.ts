@@ -50,16 +50,16 @@ class SpoServicePrincipalPermissionRequestListCommand extends SpoCommand {
         const result: SPOWebAppServicePrincipalPermissionRequest[] = json[json.length - 1]._Child_Items_;
         if (result.length > 0) {
           const spoClientExtensibilityWebApplicationPrincipalId = await this.getSPOClientExtensibilityWebApplicationPrincipalId();
-          
+
           if (spoClientExtensibilityWebApplicationPrincipalId !== null) {
             const oAuth2PermissionGrants: string[] | null = await this.getOAuth2PermissionGrants(spoClientExtensibilityWebApplicationPrincipalId);
-            
+
             if (oAuth2PermissionGrants) {
               spoWebAppServicePrincipalPermissionRequestResult = result.filter(x => oAuth2PermissionGrants.indexOf(x.Scope) === -1);
             }
           }
         }
-        
+
         if (spoWebAppServicePrincipalPermissionRequestResult.length === 0) {
           spoWebAppServicePrincipalPermissionRequestResult = result;
         }
@@ -89,16 +89,26 @@ class SpoServicePrincipalPermissionRequestListCommand extends SpoCommand {
     };
 
     const response: ODataResponse<OAuth2PermissionGrant> = await request.get<ODataResponse<OAuth2PermissionGrant>>(requestOptions);
-    if (response.value && response.value.length > 0) {
-      return response.value[0].scope!.split(' ');
+    if (!response.value || response.value.length === 0) {
+      return null;
     }
 
-    return null;
+    const scopes: string[] = [];
+    response.value.forEach(grant => {
+      if (grant.scope) {
+        grant.scope.split(' ')
+          .map(permission => permission.trim())
+          .filter(Boolean)
+          .forEach(permission => scopes.push(permission));
+      }
+    });
+
+    return scopes;
   }
 
   private async getSPOClientExtensibilityWebApplicationPrincipalId(): Promise<string | null> {
     const requestOptions: CliRequestOptions = {
-      url: `https://graph.microsoft.com/v1.0/servicePrincipals/?$filter=displayName eq 'SharePoint Online Client Extensibility Web Application Principal'`,
+      url: `https://graph.microsoft.com/v1.0/servicePrincipals/?$filter=displayName eq 'SharePoint Online Web Client Extensibility'`,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },
