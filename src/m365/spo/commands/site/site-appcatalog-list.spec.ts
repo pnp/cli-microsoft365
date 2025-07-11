@@ -8,6 +8,7 @@ import { telemetry } from '../../../../telemetry.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
+import { spo } from '../../../../utils/spo.js';
 import commands from '../../commands.js';
 import command from './site-appcatalog-list.js';
 
@@ -61,7 +62,8 @@ describe(commands.SITE_APPCATALOG_LIST, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      request.get
+      request.get,
+      spo.getWeb
     ]);
   });
 
@@ -96,6 +98,21 @@ describe(commands.SITE_APPCATALOG_LIST, () => {
     assert(loggerLogSpy.calledWith(appCatalogResponseValue));
   });
 
+  it('retrieves site collection app catalogs within the tenant and exclude inaccessible sites', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso.sharepoint.com/_api/Web/TenantAppCatalog/SiteCollectionAppCatalogsSites') {
+        return { value: appCatalogResponseValue };
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinon.stub(spo, 'getWeb').resolves();
+
+    await command.action(logger, { options: { verbose: true, excludeDeletedSites: true } });
+    assert(loggerLogSpy.calledWith(appCatalogResponseValue));
+  });
+
   it('correctly handles error when retrieving site collection app catalogs', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/_api/Web/TenantAppCatalog/SiteCollectionAppCatalogsSites') {
@@ -106,5 +123,51 @@ describe(commands.SITE_APPCATALOG_LIST, () => {
     });
 
     await assert.rejects(command.action(logger, { options: {} }), new CommandError('Something went wrong'));
+  });
+
+  it('correctly handles error when retrieving site collection app catalogs and excluding inaccessible sites with 404 status', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso.sharepoint.com/_api/Web/TenantAppCatalog/SiteCollectionAppCatalogsSites') {
+        return { value: appCatalogResponseValue };
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinon.stub(spo, 'getWeb').rejects({ status: 404, statusText: 'Not Found' });
+
+    await command.action(logger, { options: { excludeDeletedSites: true, debug: true } });
+
+    assert(loggerLogSpy.calledWith([]));
+  });
+
+  it('correctly handles error when retrieving site collection app catalogs and excluding inaccessible sites with 403 status', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso.sharepoint.com/_api/Web/TenantAppCatalog/SiteCollectionAppCatalogsSites') {
+        return { value: appCatalogResponseValue };
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinon.stub(spo, 'getWeb').rejects({ status: 403, statusText: 'Forbidden' });
+
+    await command.action(logger, { options: { excludeDeletedSites: true, debug: true } });
+
+    assert(loggerLogSpy.calledWith([]));
+  });
+
+  it('correctly handles unexpected error when retrieving site collection app catalogs and excluding inaccessible sites', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso.sharepoint.com/_api/Web/TenantAppCatalog/SiteCollectionAppCatalogsSites') {
+        return { value: appCatalogResponseValue };
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinon.stub(spo, 'getWeb').rejects({ status: 500, statusText: 'Internal Server Error' });
+
+    await assert.rejects(command.action(logger, { options: { excludeDeletedSites: true, debug: true } }));
   });
 });
