@@ -4938,6 +4938,11 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
+              label: 'engage role list',
+              id: 'cmd/viva/engage/engage-role-list'
+            },
+            {
+              type: 'doc',
               label: 'engage role member list',
               id: 'cmd/viva/engage/engage-role-member-list'
             },
