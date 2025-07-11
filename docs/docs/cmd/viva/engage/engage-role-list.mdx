@@ -1,0 +1,109 @@
+import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# viva engage role list
+
+Retrieves the roles that can be assigned in Viva Engage
+
+## Usage
+
+```sh
+m365 viva engage role list [options]
+```
+
+## Options
+
+<Global />
+
+## Remarks
+
+:::warning
+
+This command is based on an API that is currently in preview and is subject to change once the API reaches general availability.
+
+:::
+
+## Examples
+  
+List all Viva Engage roles
+
+```sh
+m365 viva engage role list
+```
+
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  [
+    {
+      "id": "ec759127-089f-4f91-8dfc-03a30b51cb38",
+      "displayName": "Network Admin"
+    },
+    {
+      "id": "966b8ec4-6457-4f22-bd3c-5a2520e98f4a",
+      "displayName": "Verified Admin"
+    },
+    {
+      "id": "77aa47ad-96fe-4ecc-8024-fd1ac5e28f17",
+      "displayName": "Corporate Communicator"
+    }
+  ]
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  id                                    displayName
+  ------------------------------------  ----------------------
+  ec759127-089f-4f91-8dfc-03a30b51cb38  Network Admin
+  966b8ec4-6457-4f22-bd3c-5a2520e98f4a  Verified Admin
+  77aa47ad-96fe-4ecc-8024-fd1ac5e28f17  Corporate Communicator
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  id,displayName
+  ec759127-089f-4f91-8dfc-03a30b51cb38,Network Admin
+  966b8ec4-6457-4f22-bd3c-5a2520e98f4a,Verified Admin
+  77aa47ad-96fe-4ecc-8024-fd1ac5e28f17,Corporate Communicator
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # viva engage role list
+
+  Date: 7/11/2025
+
+  ## Network Admin (ec759127-089f-4f91-8dfc-03a30b51cb38)
+
+  Property | Value
+  ---------|-------
+  id | ec759127-089f-4f91-8dfc-03a30b51cb38
+  displayName | Network Admin
+
+  ## Verified Admin (966b8ec4-6457-4f22-bd3c-5a2520e98f4a)
+
+  Property | Value
+  ---------|-------
+  id | 966b8ec4-6457-4f22-bd3c-5a2520e98f4a
+  displayName | Verified Admin
+
+  ## Corporate Communicator (77aa47ad-96fe-4ecc-8024-fd1ac5e28f17)
+
+  Property | Value
+  ---------|-------
+  id | 77aa47ad-96fe-4ecc-8024-fd1ac5e28f17
+  displayName | Corporate Communicator
+  ```
+
+  </TabItem>
+</Tabs>
