@@ -28,7 +28,7 @@ interface Options extends GlobalOptions, AppCreationOptions {
 }
 
 class EntraAppAddCommand extends GraphCommand {
-  private static entraApplicationPlatform: string[] = ['spa', 'web', 'publicClient'];
+  private static entraApplicationPlatform: string[] = ['spa', 'web', 'publicClient', 'apple', 'android'];
   private static entraAppScopeConsentBy: string[] = ['admins', 'adminsAndUsers'];
   private manifest: any;
   private appName: string = '';
@@ -72,7 +72,9 @@ class EntraAppAddCommand extends GraphCommand {
         certificateBase64Encoded: typeof args.options.certificateBase64Encoded !== 'undefined',
         certificateDisplayName: typeof args.options.certificateDisplayName !== 'undefined',
         grantAdminConsent: typeof args.options.grantAdminConsent !== 'undefined',
-        allowPublicClientFlows: typeof args.options.allowPublicClientFlows !== 'undefined'
+        allowPublicClientFlows: typeof args.options.allowPublicClientFlows !== 'undefined',
+        bundleId: typeof args.options.bundleId !== 'undefined',
+        signatureHash: typeof args.options.signatureHash !== 'undefined'
       });
     });
   }
@@ -131,6 +133,12 @@ class EntraAppAddCommand extends GraphCommand {
       },
       {
         option: '--manifest [manifest]'
+      },
+      {
+        option: '--bundleId [bundleId]'
+      },
+      {
+        option: '--signatureHash [signatureHash]'
       },
       {
         option: '--save'
@@ -201,6 +209,14 @@ class EntraAppAddCommand extends GraphCommand {
           catch (e) {
             return `Error while parsing the specified manifest: ${e}`;
           }
+        }
+
+        if (args.options.platform === 'apple' && !args.options.bundleId) {
+          return `When you use platform apple, you'll need to specify bundleId`;
+        }
+
+        if (args.options.platform === 'android' && (!args.options.bundleId || !args.options.signatureHash)) {
+          return `When you use platform android, you'll need to specify bundleId and signatureHash`;
         }
 
         return true;
