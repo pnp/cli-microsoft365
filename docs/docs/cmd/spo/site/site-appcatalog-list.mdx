@@ -14,6 +14,11 @@ m365 spo site appcatalog list [options]
 
 ## Options
 
+```md definition-list
+`--excludeDeletedSites [excludeDeletedSites]`
+: Exclude site collections that are no longer active
+```
+
 <Global />
 
 ## Remarks
@@ -30,6 +35,12 @@ List all site collection app catalogs within the tenant
 
 ```sh
 m365 spo site appcatalog list
+```
+
+List all site collection app catalogs within the tenant and exclude deleted sites.
+
+```sh
+m365 spo site appcatalog list --excludeDeletedSites
 ```
 
 ## Response
