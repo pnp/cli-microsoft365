@@ -32,19 +32,6 @@
     background-color: var(--ifm-background-surface-color);
   }
 
-  .theme-back-to-top-button {
-    @media only screen and (max-width: 699px) {
-      right: 2.6rem !important;
-      bottom: 6rem !important;
-    }
-
-    // Mendable button switches from mobile to desktop at 700px
-    @media only screen and (min-width: 700px) {
-      right: 3.25rem !important;
-      bottom: 8.5rem !important;
-    }
-  }
-
   [data-theme='light'] {
     .menu__link {
       color: var(--ifm-color-emphasis-800);
@@ -147,14 +134,6 @@
       var(--ifm-color-emphasis-200) 0%,
       var(--ifm-color-emphasis-100) 100%
     );
-  }
-}
-
-//* Mendable
-
-:global {
-  .ms-z-\[100\][data-headlessui-state="open"] {
-    z-index: 200;
   }
 }
 
