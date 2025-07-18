@@ -4323,6 +4323,15 @@ const sidebars: SidebarsConfig = {
           ]
         },
         {
+          callrecord: [
+            {
+              type: 'doc',
+              label: 'callrecord list',
+              id: 'cmd/teams/callrecord/callrecord-list'
+            }
+          ]
+        },
+        {
           channel: [
             {
               type: 'doc',

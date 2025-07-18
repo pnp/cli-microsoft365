@@ -2,11 +2,11 @@ import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../Auth.js';
 import { telemetry } from '../../telemetry.js';
-import DelegatedGraphCommand from './DelegatedGraphCommand.js';
+import GraphDelegatedCommand from './GraphDelegatedCommand.js';
 import { accessToken } from '../../utils/accessToken.js';
 import { CommandError } from '../../Command.js';
 
-class MockCommand extends DelegatedGraphCommand {
+class MockCommand extends GraphDelegatedCommand {
   public get name(): string {
     return 'mock';
   }
@@ -22,7 +22,7 @@ class MockCommand extends DelegatedGraphCommand {
   }
 }
 
-describe('DelegatedGraphCommand', () => {
+describe('GraphDelegatedCommand', () => {
   const cmd = new MockCommand();
 
   before(() => {
@@ -51,6 +51,6 @@ describe('DelegatedGraphCommand', () => {
 
   it('throws error when using application-only permissions', async () => {
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
-    await assert.rejects(() => (cmd as any).initAction({ options: {} }, {}), new CommandError('This command does not support application-only permissions.'));
+    await assert.rejects(() => (cmd as any).initAction({ options: {} }, {}), new CommandError('This command requires delegated permissions.'));
   });
 });
