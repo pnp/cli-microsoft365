@@ -25,6 +25,7 @@ import { FN002001_DEVDEP_microsoft_sp_build_web } from "./rules/FN002001_DEVDEP_
 import { FN002002_DEVDEP_microsoft_sp_module_interfaces } from "./rules/FN002002_DEVDEP_microsoft_sp_module_interfaces.js";
 import { FN002015_DEVDEP_types_react } from "./rules/FN002015_DEVDEP_types_react.js";
 import { FN002016_DEVDEP_types_react_dom } from "./rules/FN002016_DEVDEP_types_react_dom.js";
+import { FN002019_DEVDEP_spfx_fast_serve_helpers } from "./rules/FN002019_DEVDEP_spfx_fast_serve_helpers.js";
 import { FN002022_DEVDEP_microsoft_eslint_plugin_spfx } from "./rules/FN002022_DEVDEP_microsoft_eslint_plugin_spfx.js";
 import { FN002023_DEVDEP_microsoft_eslint_config_spfx } from "./rules/FN002023_DEVDEP_microsoft_eslint_config_spfx.js";
 import { FN010001_YORC_version } from "./rules/FN010001_YORC_version.js";
@@ -65,6 +66,7 @@ export default [
   new FN002002_DEVDEP_microsoft_sp_module_interfaces('1.16.0'),
   new FN002015_DEVDEP_types_react('17.0.45'),
   new FN002016_DEVDEP_types_react_dom('17.0.17'),
+  new FN002019_DEVDEP_spfx_fast_serve_helpers('1.16.6'),
   new FN010001_YORC_version('1.16.0'),
   new FN010008_YORC_nodeVersion(),
   new FN010009_YORC_sdkVersions_microsoft_graph_client('3.0.2'),

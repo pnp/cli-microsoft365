@@ -20,6 +20,7 @@ import { FN001032_DEP_microsoft_sp_page_context } from './rules/FN001032_DEP_mic
 import { FN001034_DEP_microsoft_sp_adaptive_card_extension_base } from './rules/FN001034_DEP_microsoft_sp_adaptive_card_extension_base.js';
 import { FN002001_DEVDEP_microsoft_sp_build_web } from './rules/FN002001_DEVDEP_microsoft_sp_build_web.js';
 import { FN002002_DEVDEP_microsoft_sp_module_interfaces } from './rules/FN002002_DEVDEP_microsoft_sp_module_interfaces.js';
+import { FN002019_DEVDEP_spfx_fast_serve_helpers } from './rules/FN002019_DEVDEP_spfx_fast_serve_helpers.js';
 import { FN002021_DEVDEP_rushstack_eslint_config } from './rules/FN002021_DEVDEP_rushstack_eslint_config.js';
 import { FN002022_DEVDEP_microsoft_eslint_plugin_spfx } from './rules/FN002022_DEVDEP_microsoft_eslint_plugin_spfx.js';
 import { FN002023_DEVDEP_microsoft_eslint_config_spfx } from './rules/FN002023_DEVDEP_microsoft_eslint_config_spfx.js';
@@ -50,6 +51,7 @@ export default [
   new FN001034_DEP_microsoft_sp_adaptive_card_extension_base('1.20.0'),
   new FN002001_DEVDEP_microsoft_sp_build_web('1.20.2'),
   new FN002002_DEVDEP_microsoft_sp_module_interfaces('1.20.2'),
+  new FN002019_DEVDEP_spfx_fast_serve_helpers('1.20.4'),
   new FN002024_DEVDEP_eslint('8.57.0'),
   new FN002021_DEVDEP_rushstack_eslint_config('4.0.1'),
   new FN002022_DEVDEP_microsoft_eslint_plugin_spfx('1.20.2'),
