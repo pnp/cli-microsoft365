@@ -286,12 +286,7 @@ describe(commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_LIST, () => {
       throw 'Invalid request';
     });
     await command.action(logger, { options: {} });
-    assert(loggerLogSpy.calledWith([{
-      Id: '4dc4c043-25ee-40f2-81d3-b3bf63da7538',
-      Resource: 'Microsoft Graph',
-      ResourceId: 'Microsoft Graph',
-      Scope: 'Mail.Read'
-    }]));
+    assert(loggerLogSpy.calledWith([]));
   });
 
   it('lists pending permission requests when no oAuth2Permissiongrants are found', async () => {
@@ -332,12 +327,7 @@ describe(commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_LIST, () => {
       throw 'Invalid request';
     });
     await command.action(logger, { options: {} });
-    assert(loggerLogSpy.calledWith([{
-      Id: '4dc4c043-25ee-40f2-81d3-b3bf63da7538',
-      Resource: 'Microsoft Graph',
-      ResourceId: 'Microsoft Graph',
-      Scope: 'Mail.Read'
-    }]));
+    assert(loggerLogSpy.calledWith([]));
   });
 
   it('correctly handles error when retrieving pending permission requests', async () => {

@@ -60,10 +60,6 @@ class SpoServicePrincipalPermissionRequestListCommand extends SpoCommand {
           }
         }
 
-        if (spoWebAppServicePrincipalPermissionRequestResult.length === 0) {
-          spoWebAppServicePrincipalPermissionRequestResult = result;
-        }
-
         await logger.log(spoWebAppServicePrincipalPermissionRequestResult.map(r => {
           return {
             Id: r.Id.replace('/Guid(', '').replace(')/', ''),
