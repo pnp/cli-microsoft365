@@ -886,6 +886,33 @@ describe(commands.DOCTOR, () => {
     assert(loggerLogSpy.calledWith(getStatus(0, 'gulp-cli v2.3.0')));
   });
 
+  it('skips gulp-cli check when gulp-cli not required', async () => {
+    sandbox = sinon.createSandbox();
+    sandbox.stub(process, 'version').value('v10.18.0');
+
+    sinon.stub(child_process, 'exec').callsFake((file, callback: any) => {
+      const packageName: string = file.split(' ')[2];
+      switch (packageName) {
+        case '@microsoft/sp-core-library':
+          callback(null, packageVersionResponse(packageName, '1.10.0'), '');
+          break;
+        default:
+          callback(new Error(`${file} ENOENT`), '', '');
+      }
+      return {} as child_process.ChildProcess;
+    });
+    let getPackageVersionSpy;
+    try {
+      getPackageVersionSpy = sinon.spy(command as any, 'getPackageVersion');
+
+      await command.action(logger, { options: { spfxVersion: '1.22.0-beta.1' } });
+      assert(getPackageVersionSpy.neverCalledWith('gulp-cli'));
+    }
+    finally {
+      sinonUtil.restore(getPackageVersionSpy);
+    }
+  });
+
   it('fails gulp-cli check when gulp-cli not found', async () => {
     sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v10.18.0');
