@@ -1,0 +1,57 @@
+{
+  "extends": "@rushstack/heft-jest-plugin/includes/jest-shared.config.json",
+
+  "roots": ["<rootDir>/lib"],
+
+  "testMatch": ["<rootDir>/lib/**/*.test.js"],
+
+  "collectCoverageFrom": [
+    "lib/**/*.js",
+    "!lib/**/*.d.ts",
+    "!lib/**/*.test.js",
+    "!lib/**/test/**",
+    "!lib/**/__tests__/**",
+    "!lib/**/__fixtures__/**",
+    "!lib/**/__mocks__/**"
+  ],
+
+  "transformIgnorePatterns": ["[\\/]lib[\\/](.*)\\.js$"],
+
+  "testEnvironment": "jest-environment-jsdom",
+  "testEnvironmentOptions": {
+    "customExportConditions": ["require", "node", "umd"]
+  },
+
+  "moduleFileExtensions": ["cjs", "js", "json", "node", "css"],
+
+  // Enable code coverage for Jest
+  "collectCoverage": true,
+  "coverageDirectory": "<rootDir>/jest-output/coverage",
+  "coverageReporters": [
+    [
+      "cobertura",
+      {
+        "file": "cobertura/cobertura-coverage.xml"
+      }
+    ],
+    "html",
+    "json-summary"
+  ],
+
+  // Use v8 coverage provider to avoid Babel
+  "coverageProvider": "v8",
+
+  // Enable junit reporting for Jest
+  "reporters": [
+    "default",
+    [
+      "jest-junit",
+      {
+        "outputDirectory": "<rootDir>/jest-output",
+        "outputName": "JUnit.xml", // QTest expects this casing.
+        "classNameTemplate": "{classname} > ",
+        "titleTemplate": "{title} ({filepath})"
+      }
+    ]
+  ]
+}
