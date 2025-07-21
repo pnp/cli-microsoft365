@@ -13,7 +13,7 @@ import auth from '../../../../Auth.js';
 const options = globalOptionsZod
   .extend({
     name: zod.alias('n', z.string().optional().default('CLI for M365')),
-    scopes: zod.alias('s', z.enum(['minimal', 'all']).optional().default('minimal')),
+    scopes: zod.alias('s', z.string().optional().default('minimal')),
     saveToConfig: z.boolean().optional()
   })
   .strict();
@@ -28,17 +28,38 @@ class CliAppAddCommand extends GraphCommand {
   public get name(): string {
     return commands.APP_ADD;
   }
+
   public get description(): string {
     return 'Creates a Microsoft Entra application registration for CLI for Microsoft 365';
   }
+
   public get schema(): z.ZodTypeAny | undefined {
     return options;
   }
+
+  public getRefinedSchema(schema: typeof options): z.ZodEffects<any> | undefined {
+    return schema
+      .refine(options => {
+        const scopes = options.scopes;
+
+        if (!scopes.includes(',')) {
+          return scopes === 'minimal' || scopes === 'all';
+        }
+
+        const scopeList = scopes.split(',').map(s => s.trim());
+
+        return scopeList.every(scope => scope.startsWith('https'));
+      }, {
+        message: "Scopes must be 'minimal', 'all', or comma-separated list of URLs starting with 'https'. 'minimal' and 'all' cannot be combined with other scopes.",
+        path: ['scopes']
+      });
+  }
+
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       const options: AppCreationOptions = {
         allowPublicClientFlows: true,
-        apisDelegated: (args.options.scopes === 'all' ? config.allScopes : config.minimalScopes).join(','),
+        apisDelegated: this.getScopes(args.options),
         implicitFlow: false,
         multitenant: false,
         name: args.options.name,
@@ -76,6 +97,16 @@ class CliAppAddCommand extends GraphCommand {
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
+  }
+
+  private getScopes(options: Options): string {
+    if (options.scopes === 'all') {
+      return config.allScopes.join(',');
+    }
+    else if (options.scopes === 'minimal') {
+      return config.minimalScopes.join(',');
+    }
+    return options.scopes;
   }
 }
 

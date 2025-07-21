@@ -79,7 +79,7 @@ describe(commands.APP_ADD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation is scopes is not a valid scope option', () => {
+  it('fails validation if scopes is not a valid scope option', () => {
     const actual = commandOptionsSchema.safeParse({
       name: 'Custom App',
       scopes: 'foo'
@@ -87,7 +87,7 @@ describe(commands.APP_ADD, () => {
     assert.notStrictEqual(actual.success, true);
   });
 
-  it('passes validation is scopes is minimal', () => {
+  it('passes validation if scopes is minimal', () => {
     const actual = commandOptionsSchema.safeParse({
       name: 'Custom App',
       scopes: 'minimal'
@@ -95,10 +95,18 @@ describe(commands.APP_ADD, () => {
     assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation is scopes is all', () => {
+  it('passes validation if scopes is all', () => {
     const actual = commandOptionsSchema.safeParse({
       name: 'Custom App',
       scopes: 'all'
+    });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('passes validation if scopes contains list of scopes', () => {
+    const actual = commandOptionsSchema.safeParse({
+      name: 'Custom App',
+      scopes: 'https://graph.microsoft.com/User.Read,https://graph.microsoft.com/Group.Read'
     });
     assert.strictEqual(actual.success, true);
   });
@@ -196,6 +204,55 @@ describe(commands.APP_ADD, () => {
     });
     Object.keys(expected).forEach(setting => {
       assert(configSetSpy.calledWith(setting, (expected as any)[setting]), `Incorrect setting for ${setting}`);
+    });
+  });
+
+  it('correctly creates an app registration with list of scopes and custom name without saving the app registration info to the CLI config', async () => {
+    sinon.stub(accessToken, 'getTenantIdFromAccessToken').returns('00000000-0000-0000-0000-000000000003');
+    const scopes = [
+      {
+        resourceAppId: '00000003-0000-0000-c000-000000000000',
+        resourceAccess: [
+          {
+            id: 'e1fe6dd8-ba31-4d61-89e7-88639da4683d',
+            type: 'Scope'
+          },
+          {
+            id: '5f8c59db-677d-491f-a6b8-5f174b11ec1d',
+            type: 'Scope'
+          }
+        ]
+      }
+    ];
+    sinon.stub(entraApp, 'resolveApis').resolves(scopes);
+    const createAppRegistrationSpy = sinon.stub(entraApp, 'createAppRegistration').resolves({
+      appId: '00000000-0000-0000-0000-000000000001',
+      id: '00000000-0000-0000-0000-000000000002',
+      tenantId: '00000000-0000-0000-0000-000000000003',
+      requiredResourceAccess: scopes
+    });
+    sinon.stub(entraApp, 'grantAdminConsent').resolves();
+    const parsedSchema = commandOptionsSchema.safeParse({
+      name: 'Custom App',
+      scopes: 'https://graph.microsoft.com/User.Read,https://graph.microsoft.com/Group.Read.All',
+      verbose: true
+    });
+    await command.action(logger, { options: parsedSchema.data });
+    assert.deepEqual(createAppRegistrationSpy.getCall(0).args[0], {
+      options: {
+        allowPublicClientFlows: true,
+        apisDelegated: 'https://graph.microsoft.com/User.Read,https://graph.microsoft.com/Group.Read.All',
+        implicitFlow: false,
+        multitenant: false,
+        name: 'Custom App',
+        platform: 'publicClient',
+        redirectUris: 'http://localhost,https://localhost,https://login.microsoftonline.com/common/oauth2/nativeclient'
+      },
+      unknownOptions: {},
+      apis: scopes,
+      logger: logger,
+      verbose: true,
+      debug: false
     });
   });
 
