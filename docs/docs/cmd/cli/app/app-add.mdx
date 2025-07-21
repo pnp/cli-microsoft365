@@ -17,7 +17,7 @@ m365 cli app add [options]
 : Name of the app registration. Defaults to CLI for M365
 
 `-s, --scopes [scopes]`
-: Which scopes should be added? Valid values are: `minimal`, `all`. Defaults to `minimal`.
+: Which scopes should be added? Valid values are: `minimal`, `all`, or a list of scopes. Defaults to `minimal`.
 
 `--saveToConfig`
 : Save the app registration info to the CLI config. This way the new app registration will be used as the default app registration to sign in.
@@ -37,6 +37,12 @@ Create a new app registration with all permission scopes and a custom name
 
 ```sh
 m365 cli app add --name "Contoso CLI app" --scopes all
+```
+
+Create a new app registration with self-defined scopes
+
+```sh
+m365 cli app add --scopes "https://graph.microsoft.com/User.Read,https://graph.microsoft.com/Group.Read.All"
 ```
 
 ## Response
