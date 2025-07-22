@@ -2,7 +2,7 @@
 
 ## Project Overview
 - This is a cross-platform CLI tool to manage Microsoft 365 tenants and SharePoint Framework (SPFx) projects.
-- Written in TypeScript, targeting Node.js 22+ (see `package.json`, `tsconfig.json`).
+- Written in TypeScript, targeting Node.js LTS (see `package.json`, `tsconfig.json`).
 - Main entry: `src/index.ts` → `src/cli/cli.ts` (command parsing/execution).
 - Commands are modular, organized under `src/m365/` by workload (e.g., `spo`, `entra`, `teams`).
 - Each command is a class extending `Command` (`src/Command.ts`).
@@ -34,7 +34,7 @@
 - **SPFx support**: Special logic for SPFx project upgrades and compatibility checks in `src/m365/spfx/`.
 - **Output**: Prefer returning objects/arrays; formatting handled by CLI core.
 - **No direct file/console output in commands**: Use provided logger and output mechanisms.
-- **Testing**: Mocha-based, see test files alongside source (e.g., `*.spec.ts`).
+- **Testing**: Mocha-based, see test files alongside source (e.g., `*.spec.ts`). 100% code coverage.
 - **Custom ESLint rules**: See `eslint-rules/` and `eslint-plugin-cli-microsoft365` in `package.json`.
 
 ## Integration & External Dependencies
@@ -44,14 +44,10 @@
 - **Docs**: Docusaurus, see `docs/` and `docs/docusaurus.config.ts`.
 
 ## Examples
-- Add a new command: create a class in the appropriate `src/m365/<workload>/commands/` folder, extend `Command`, implement `commandAction`, register options, and ensure it is discoverable.
+- Add a new command: create a class in the appropriate `src/m365/<workload>/commands/` folder, extend `Command`, implement `commandAction`, register options, and ensure it is discoverable. Create a test file next to the command file. Create a reference page in the documentation in `docs/docs/cmd/<workload>`. The reference page file name is the same as the command file name, but with the `.mdx` extension.
 - Add a global option: update `src/GlobalOptions.ts` and propagate to command parsing in `src/cli/cli.ts`.
 
 ## References
 - [Main README](../README.md)
 - [Contributing Guide](../CONTRIBUTING.md)
 - [Docs site](https://pnp.github.io/cli-microsoft365/)
-
----
-
-If any section is unclear or missing, please provide feedback to improve these instructions.
