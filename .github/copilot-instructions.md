@@ -4,7 +4,7 @@
 - This is a cross-platform CLI tool to manage Microsoft 365 tenants and SharePoint Framework (SPFx) projects.
 - Written in TypeScript, targeting Node.js 22+ (see `package.json`, `tsconfig.json`).
 - Main entry: `src/index.ts` → `src/cli/cli.ts` (command parsing/execution).
-- Commands are modular, organized under `src/m365/` by workload (e.g., `spo`, `aad`, `teams`).
+- Commands are modular, organized under `src/m365/` by workload (e.g., `spo`, `entra`, `teams`).
 - Each command is a class extending `Command` (`src/Command.ts`).
 - Command metadata and options: see `src/cli/CommandInfo.ts`, `src/cli/CommandOptionInfo.ts`.
 - Command discovery/build: see `scripts/write-all-commands.js` (generates `allCommands.json`).
