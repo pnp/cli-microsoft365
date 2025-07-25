@@ -1,18 +1,19 @@
 import assert from 'assert';
 import sinon from 'sinon';
+import { z } from 'zod';
 import auth from '../../../../Auth.js';
-import commands from '../../commands.js';
-import request from '../../../../request.js';
-import { telemetry } from '../../../../telemetry.js';
+import { cli } from '../../../../cli/cli.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
-import { cli } from '../../../../cli/cli.js';
-import { CommandInfo } from '../../../../cli/CommandInfo.js';
-import command from './administrativeunit-remove.js';
+import { telemetry } from '../../../../telemetry.js';
+import request from '../../../../request.js';
 import { entraAdministrativeUnit } from '../../../../utils/entraAdministrativeUnit.js';
+import commands from '../../commands.js';
+import command from './administrativeunit-remove.js';
 
 describe(commands.ADMINISTRATIVEUNIT_REMOVE, () => {
   const administrativeUnitId = 'fc33aa61-cf0e-46b6-9506-f633347202ab';
@@ -21,6 +22,7 @@ describe(commands.ADMINISTRATIVEUNIT_REMOVE, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: z.ZodTypeAny;
   let promptIssued: boolean;
 
   before(() => {
@@ -30,6 +32,7 @@ describe(commands.ADMINISTRATIVEUNIT_REMOVE, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
   });
 
   beforeEach(() => {
@@ -73,6 +76,32 @@ describe(commands.ADMINISTRATIVEUNIT_REMOVE, () => {
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
+  });
+
+  it('fails validation when neither id nor displayName is specified', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('passes validation when id is specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: administrativeUnitId
+    });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('passes validation when displayName is specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      displayName: displayName
+    });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation when id is not a valid UUID', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: 'invalid'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
   it('removes the specified administrative unit by id without prompting for confirmation', async () => {
@@ -141,15 +170,5 @@ describe(commands.ADMINISTRATIVEUNIT_REMOVE, () => {
 
     await command.action(logger, { options: { id: administrativeUnitId } });
     assert(deleteSpy.notCalled);
-  });
-
-  it('fails validation if id is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { id: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('passes validation when id is a valid GUID', async () => {
-    const actual = await command.validate({ options: { id: administrativeUnitId } }, commandInfo);
-    assert.strictEqual(actual, true);
   });
 });

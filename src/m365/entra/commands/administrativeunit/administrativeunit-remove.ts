@@ -1,20 +1,25 @@
+import { z } from 'zod';
+import { cli } from '../../../../cli/cli.js';
+import { Logger } from '../../../../cli/Logger.js';
+import { globalOptionsZod } from '../../../../Command.js';
+import request, { CliRequestOptions } from '../../../../request.js';
 import { entraAdministrativeUnit } from '../../../../utils/entraAdministrativeUnit.js';
-import GlobalOptions from "../../../../GlobalOptions.js";
-import { Logger } from "../../../../cli/Logger.js";
-import { validation } from "../../../../utils/validation.js";
-import request, { CliRequestOptions } from "../../../../request.js";
-import GraphCommand from "../../../base/GraphCommand.js";
-import commands from "../../commands.js";
-import { cli } from "../../../../cli/cli.js";
+import { zod } from '../../../../utils/zod.js';
+import GraphCommand from '../../../base/GraphCommand.js';
+import commands from '../../commands.js';
+
+const options = globalOptionsZod
+  .extend({
+    id: zod.alias('i', z.string().uuid().optional()),
+    displayName: zod.alias('n', z.string().optional()),
+    force: zod.alias('f', z.boolean().optional())
+  })
+  .strict();
+
+declare type Options = z.infer<typeof options>;
 
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  id?: string;
-  displayName?: string;
-  force?: boolean
 }
 
 class EntraAdministrativeUnitRemoveCommand extends GraphCommand {
@@ -25,62 +30,15 @@ class EntraAdministrativeUnitRemoveCommand extends GraphCommand {
     return 'Removes an administrative unit';
   }
 
-  constructor() {
-    super();
-
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
-    this.#initTelemetry();
-    this.#initTypes();
+  public get schema(): z.ZodTypeAny | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        id: args.options.id !== 'undefined',
-        displayName: args.options.displayName !== 'undefined',
-        force: !!args.options.force
+  public getRefinedSchema(schema: typeof options): z.ZodEffects<any> | undefined {
+    return schema
+      .refine(options => options.id || options.displayName, {
+        message: 'Specify either id or displayName'
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-i, --id [id]'
-      },
-      {
-        option: '-n, --displayName [displayName]'
-      },
-      {
-        option: '-f, --force'
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push(
-      {
-        options: ['id', 'displayName']
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.id && !validation.isValidGuid(args.options.id)) {
-          return `${args.options.id} is not a valid GUID for option id.`;
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initTypes(): void {
-    this.types.string.push('id', 'displayName');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
