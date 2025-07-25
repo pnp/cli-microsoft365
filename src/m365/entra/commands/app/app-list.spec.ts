@@ -1,6 +1,9 @@
 import assert from 'assert';
 import sinon from 'sinon';
+import { z } from 'zod';
 import auth from '../../../../Auth.js';
+import { cli } from '../../../../cli/cli.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
 import request from '../../../../request.js';
@@ -15,6 +18,8 @@ describe(commands.APP_LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
+  let commandOptionsSchema: z.ZodTypeAny;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -22,6 +27,8 @@ describe(commands.APP_LIST, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
+    commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
   });
 
   beforeEach(() => {
@@ -63,6 +70,16 @@ describe(commands.APP_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['appId', 'id', 'displayName', 'signInAudience']);
   });
 
+  it('passes validation when no properties are specified', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('passes validation when properties are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ properties: 'id,displayName' });
+    assert.strictEqual(actual.success, true);
+  });
+
   it(`should get a list of Microsoft Entra app registrations`, async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/applications`) {
@@ -90,7 +107,7 @@ describe(commands.APP_LIST, () => {
     });
 
     await command.action(logger, {
-      options: {}
+      options: commandOptionsSchema.parse({})
     });
 
     assert(
@@ -134,7 +151,7 @@ describe(commands.APP_LIST, () => {
     });
 
     await command.action(logger, {
-      options: { properties: 'id,displayName' }
+      options: commandOptionsSchema.parse({ properties: 'id,displayName' })
     });
 
     assert(
@@ -160,7 +177,9 @@ describe(commands.APP_LIST, () => {
     });
 
     await assert.rejects(
-      command.action(logger, { options: {} } as any),
+      command.action(logger, {
+        options: commandOptionsSchema.parse({})
+      }),
       new CommandError('An error has occurred')
     );
   });
