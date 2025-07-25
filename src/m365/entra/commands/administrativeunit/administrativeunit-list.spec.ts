@@ -92,8 +92,7 @@ describe(commands.ADMINISTRATIVEUNIT_LIST, () => {
       throw 'Invalid request';
     });
 
-    const parsedSchema = commandOptionsSchema.safeParse({});
-    await command.action(logger, { options: parsedSchema.data });
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
 
     assert(
       loggerLogSpy.calledWith([
@@ -131,8 +130,7 @@ describe(commands.ADMINISTRATIVEUNIT_LIST, () => {
       throw 'Invalid request';
     });
 
-    const parsedSchema = commandOptionsSchema.safeParse({ properties: 'id,displayName' });
-    await command.action(logger, { options: parsedSchema.data });
+    await command.action(logger, { options: commandOptionsSchema.parse({ properties: 'id,displayName' }) });
 
     assert(
       loggerLogSpy.calledWith([
@@ -156,9 +154,8 @@ describe(commands.ADMINISTRATIVEUNIT_LIST, () => {
       throw `Invalid request`;
     });
 
-    const parsedSchema = commandOptionsSchema.safeParse({});
     await assert.rejects(
-      command.action(logger, { options: parsedSchema.data }),
+      command.action(logger, { options: commandOptionsSchema.parse({}) }),
       new CommandError('An error has occurred')
     );
   });
