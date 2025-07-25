@@ -1,20 +1,25 @@
 import { AdministrativeUnit } from "@microsoft/microsoft-graph-types";
-import GlobalOptions from "../../../../GlobalOptions.js";
+import { z } from 'zod';
 import { Logger } from "../../../../cli/Logger.js";
-import { validation } from "../../../../utils/validation.js";
 import request, { CliRequestOptions } from "../../../../request.js";
 import GraphCommand from "../../../base/GraphCommand.js";
 import commands from "../../commands.js";
 import { entraAdministrativeUnit } from "../../../../utils/entraAdministrativeUnit.js";
+import { globalOptionsZod } from "../../../../Command.js";
+import { zod } from "../../../../utils/zod.js";
+
+const options = globalOptionsZod
+  .extend({
+    id: zod.alias('i', z.string().uuid().optional()),
+    displayName: zod.alias('n', z.string().optional()),
+    properties: zod.alias('p', z.string().optional())
+  })
+  .strict();
+
+declare type Options = z.infer<typeof options>;
 
 interface CommandArgs {
   options: Options;
-}
-
-export interface Options extends GlobalOptions {
-  id?: string;
-  displayName?: string;
-  properties?: string;
 }
 
 class EntraAdministrativeUnitGetCommand extends GraphCommand {
@@ -26,58 +31,15 @@ class EntraAdministrativeUnitGetCommand extends GraphCommand {
     return 'Gets information about a specific administrative unit';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
-    this.#initTypes();
+  public get schema(): z.ZodTypeAny | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        id: typeof args.options.id !== 'undefined',
-        displayName: typeof args.options.displayName !== 'undefined',
-        properties: typeof args.options.properties !== 'undefined'
+  public getRefinedSchema(schema: typeof options): z.ZodEffects<any> | undefined {
+    return schema
+      .refine(options => [options.id, options.displayName].filter(Boolean).length === 1, {
+        message: 'Specify either id or displayName'
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-i, --id [id]'
-      },
-      {
-        option: '-n, --displayName [displayName]'
-      },
-      {
-        option: '-p, --properties [properties]'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.id && !validation.isValidGuid(args.options.id as string)) {
-          return `${args.options.id} is not a valid GUID`;
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push({ options: ['id', 'displayName'] });
-  }
-
-  #initTypes(): void {
-    this.types.string.push('displayName');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
