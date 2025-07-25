@@ -1,5 +1,6 @@
 import assert from 'assert';
 import sinon from 'sinon';
+import { z } from 'zod';
 import auth from '../../../../Auth.js';
 import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
@@ -35,6 +36,7 @@ describe(commands.APP_PERMISSION_LIST, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: z.ZodTypeAny;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -43,6 +45,7 @@ describe(commands.APP_PERMISSION_LIST, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName: string, defaultValue: any) => {
       if (settingName === 'prompt') {
         return false;
@@ -91,23 +94,23 @@ describe(commands.APP_PERMISSION_LIST, () => {
   });
 
   it('fails validation if the appId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { appId: '123' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ appId: '123' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('passes validation if the appId is a valid GUID', async () => {
-    const actual = await command.validate({ options: { appId: appId } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ appId: appId });
+    assert.strictEqual(actual.success, true);
   });
 
   it('fails validation if the appObjectId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { appObjectId: '123' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ appObjectId: '123' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('passes validation if the appObjectId is a valid GUID', async () => {
-    const actual = await command.validate({ options: { appObjectId: appObjectId } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ appObjectId: appObjectId });
+    assert.strictEqual(actual.success, true);
   });
 
   it('fails validation if neither the appId, appName, nor appObjectId are provided.', async () => {
@@ -119,12 +122,8 @@ describe(commands.APP_PERMISSION_LIST, () => {
       return defaultValue;
     });
 
-    const actual = await command.validate({
-      options: {
-        type: 'all'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ type: 'all' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('fails validation when appId, appName, and appObjectId are specified', async () => {
@@ -136,19 +135,17 @@ describe(commands.APP_PERMISSION_LIST, () => {
       return defaultValue;
     });
 
-    const actual = await command.validate({
-      options: {
-        appId: appId,
-        appName: appName,
-        appObjectId: appObjectId
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      appId: appId,
+      appName: appName,
+      appObjectId: appObjectId
+    });
+    assert.strictEqual(actual.success, false);
   });
 
   it('fails validation if the type is not a valid permission type', async () => {
-    const actual = await command.validate({ options: { appId: appId, type: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ appId: appId, type: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('lists the permissions of an app registration when using objectId', async () => {
@@ -201,7 +198,7 @@ describe(commands.APP_PERMISSION_LIST, () => {
     });
 
 
-    await command.action(logger, { options: { appObjectId: appObjectId, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ appObjectId: appObjectId, verbose: true }) });
     assert(loggerLogSpy.calledWith(allPermissionsResponse));
   });
 
@@ -246,7 +243,7 @@ describe(commands.APP_PERMISSION_LIST, () => {
       throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
-    await command.action(logger, { options: { appObjectId: appObjectId, type: 'application' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ appObjectId: appObjectId, type: 'application' }) });
     assert(loggerLogSpy.calledWith(applicationPermissionsResponse));
   });
 
@@ -297,7 +294,7 @@ describe(commands.APP_PERMISSION_LIST, () => {
       throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
-    await command.action(logger, { options: { appId: appId, type: 'delegated', debug: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ appId: appId, type: 'delegated', debug: true }) });
     assert(loggerLogSpy.calledWith(delegatedPermissionsResponse));
   });
 
@@ -346,7 +343,7 @@ describe(commands.APP_PERMISSION_LIST, () => {
       throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
-    await command.action(logger, { options: { appName: appName, type: 'delegated' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ appName: appName, type: 'delegated' }) });
     assert(loggerLogSpy.calledWith(delegatedPermissionsResponse));
   });
 
@@ -373,9 +370,9 @@ describe(commands.APP_PERMISSION_LIST, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         appName: appName
-      }
+      })
     }), new CommandError(`Multiple Entra application registrations with name 'My App' found. Found: 9b1b1e42-794b-4c71-93ac-5ed92488b67f, 9b1b1e42-794b-4c71-93ac-5ed92488b67g.`));
   });
 
@@ -439,7 +436,7 @@ describe(commands.APP_PERMISSION_LIST, () => {
 
     sinon.stub(cli, 'handleMultipleResultsFound').resolves({ id: '9b1b1e42-794b-4c71-93ac-5ed92488b67f' });
 
-    await command.action(logger, { options: { appName: appName, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ appName: appName, verbose: true }) });
     assert(loggerLogSpy.calledWith(allPermissionsResponse));
   });
 
@@ -447,7 +444,7 @@ describe(commands.APP_PERMISSION_LIST, () => {
     const error = `App with appId '${appId}' not found in Microsoft Entra ID`;
     sinon.stub(entraApp, 'getAppRegistrationByAppId').rejects(new Error(error));
 
-    await assert.rejects(command.action(logger, { options: { appId: appId } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ appId: appId }) }),
       new CommandError(error));
   });
 
@@ -460,7 +457,7 @@ describe(commands.APP_PERMISSION_LIST, () => {
       throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
-    await assert.rejects(command.action(logger, { options: { appName: appName } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ appName: appName }) }),
       new CommandError(`No Microsoft Entra application registration with name ${appName} found`));
   });
 
@@ -473,7 +470,7 @@ describe(commands.APP_PERMISSION_LIST, () => {
       throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
-    await command.action(logger, { options: { appObjectId: appObjectId } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ appObjectId: appObjectId }) });
     assert(loggerLogSpy.calledWith([]));
   });
 
@@ -526,7 +523,7 @@ describe(commands.APP_PERMISSION_LIST, () => {
       throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
-    await command.action(logger, { options: { appObjectId: appObjectId } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ appObjectId: appObjectId }) });
     assert(loggerLogSpy.calledWith(allUnknownPermissionsResponse));
   });
 
@@ -551,7 +548,7 @@ describe(commands.APP_PERMISSION_LIST, () => {
       throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
-    await command.action(logger, { options: { appObjectId: appObjectId } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ appObjectId: appObjectId }) });
     assert(loggerLogSpy.calledWith(allUnkownServicePrincipalPermissionsResponse));
   });
 
@@ -572,16 +569,16 @@ describe(commands.APP_PERMISSION_LIST, () => {
       throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
-    await assert.rejects(command.action(logger, { options: { appObjectId: appObjectId } }), new CommandError(`An error has occurred`));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ appObjectId: appObjectId }) }), new CommandError(`An error has occurred`));
   });
 
   it('handles error when retrieving Entra app registration using name', async () => {
     sinon.stub(request, 'get').rejects(new Error('An error has occurred'));
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         appName: 'My app'
-      }
+      })
     } as any), new CommandError('An error has occurred'));
   });
 });
