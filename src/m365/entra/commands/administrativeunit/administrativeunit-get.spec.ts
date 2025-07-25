@@ -1,5 +1,6 @@
 import assert from 'assert';
 import sinon from "sinon";
+import { z } from 'zod';
 import auth from '../../../../Auth.js';
 import { CommandInfo } from "../../../../cli/CommandInfo.js";
 import { Logger } from "../../../../cli/Logger.js";
@@ -19,6 +20,7 @@ describe(commands.ADMINISTRATIVEUNIT_GET, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: z.ZodTypeAny;
   const administrativeUnitsReponse = {
     value: [
       {
@@ -43,6 +45,7 @@ describe(commands.ADMINISTRATIVEUNIT_GET, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
   });
 
   beforeEach(() => {
@@ -82,6 +85,32 @@ describe(commands.ADMINISTRATIVEUNIT_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
+  it('fails validation when id or displayName are not specified', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('passes validation when id is specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: validId
+    });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('passes validation when displayName is specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      displayName: validDisplayName
+    });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation if the id is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: '123'
+    });
+    assert.strictEqual(actual.success, false);
+  });
+
   it('retrieves information about the specified administrative unit by id', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/directory/administrativeUnits/${validId}`) {
@@ -91,7 +120,7 @@ describe(commands.ADMINISTRATIVEUNIT_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { id: validId } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: validId }) });
     assert(loggerLogSpy.calledOnceWithExactly(administrativeUnitsReponse.value[0]));
   });
 
@@ -104,14 +133,14 @@ describe(commands.ADMINISTRATIVEUNIT_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { id: validId, properties: 'id,displayName,visibility' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: validId, properties: 'id,displayName,visibility' }) });
     assert(loggerLogSpy.calledOnceWithExactly(administrativeUnitsReponse.value[0]));
   });
 
   it('retrieves information about the specified administrative unit by displayName', async () => {
     sinon.stub(entraAdministrativeUnit, 'getAdministrativeUnitByDisplayName').resolves(administrativeUnitsReponse.value[0]);
 
-    await command.action(logger, { options: { displayName: validDisplayName } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ displayName: validDisplayName }) });
     assert(loggerLogSpy.calledOnceWithExactly(administrativeUnitsReponse.value[0]));
   });
 
@@ -119,21 +148,6 @@ describe(commands.ADMINISTRATIVEUNIT_GET, () => {
     const errorMessage = 'Something went wrong';
     sinon.stub(request, 'get').rejects(new Error(errorMessage));
 
-    await assert.rejects(command.action(logger, { options: { id: validId } }), new CommandError(errorMessage));
-  });
-
-  it('fails validation if the id is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { id: '123' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('passes validation if the id is a valid GUID', async () => {
-    const actual = await command.validate({ options: { id: validId } }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
-
-  it('passes validation if required options specified (displayName)', async () => {
-    const actual = await command.validate({ options: { displayName: validDisplayName } }, commandInfo);
-    assert.strictEqual(actual, true);
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ id: validId }) }), new CommandError(errorMessage));
   });
 });
