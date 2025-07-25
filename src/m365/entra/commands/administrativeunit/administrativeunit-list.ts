@@ -1,3 +1,4 @@
+import { z } from 'zod';
 import { AdministrativeUnit } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli/Logger.js';
 import { globalOptionsZod } from '../../../../Command.js';
@@ -5,7 +6,6 @@ import { odata } from '../../../../utils/odata.js';
 import { zod } from '../../../../utils/zod.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
-import { z } from 'zod';
 
 const options = globalOptionsZod
   .extend({
@@ -32,20 +32,6 @@ class EntraAdministrativeUnitListCommand extends GraphCommand {
 
   public defaultProperties(): string[] | undefined {
     return ['id', 'displayName', 'visibility'];
-  }
-
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        properties: typeof args.options.properties !== 'undefined'
-      });
-    });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
