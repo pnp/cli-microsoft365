@@ -1,17 +1,20 @@
 import { AdministrativeUnit } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli/Logger.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import { odata } from '../../../../utils/odata.js';
+import { zod } from '../../../../utils/zod.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
+import { z } from 'zod';
 
-import GlobalOptions from '../../../../GlobalOptions.js';
+const options = globalOptionsZod
+  .extend({
+    properties: zod.alias('p', z.string().optional())
+  }).strict();
+declare type Options = z.infer<typeof options>;
 
 interface CommandArgs {
   options: Options;
-}
-
-export interface Options extends GlobalOptions {
-  properties?: string;
 }
 
 class EntraAdministrativeUnitListCommand extends GraphCommand {
@@ -23,6 +26,10 @@ class EntraAdministrativeUnitListCommand extends GraphCommand {
     return 'Retrieves a list of administrative units';
   }
 
+  public get schema(): z.ZodTypeAny | undefined {
+    return options;
+  }
+
   public defaultProperties(): string[] | undefined {
     return ['id', 'displayName', 'visibility'];
   }
@@ -31,7 +38,6 @@ class EntraAdministrativeUnitListCommand extends GraphCommand {
     super();
 
     this.#initTelemetry();
-    this.#initOptions();
   }
 
   #initTelemetry(): void {
@@ -40,12 +46,6 @@ class EntraAdministrativeUnitListCommand extends GraphCommand {
         properties: typeof args.options.properties !== 'undefined'
       });
     });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      { option: '-p, --properties [properties]' }
-    );
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
