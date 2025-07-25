@@ -38,6 +38,9 @@ class EntraAdministrativeUnitRemoveCommand extends GraphCommand {
     return schema
       .refine(options => options.id || options.displayName, {
         message: 'Specify either id or displayName'
+      })
+      .refine(options => !(options.id && options.displayName), {
+        message: 'Specify either id or displayName but not both'
       });
   }
 

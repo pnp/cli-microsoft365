@@ -104,6 +104,14 @@ describe(commands.ADMINISTRATIVEUNIT_REMOVE, () => {
     assert.strictEqual(actual.success, false);
   });
 
+  it('fails validation when both id and displayName are specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: administrativeUnitId,
+      displayName: displayName
+    });
+    assert.strictEqual(actual.success, false);
+  });
+
   it('removes the specified administrative unit by id without prompting for confirmation', async () => {
     const deleteRequestStub = sinon.stub(request, 'delete').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/directory/administrativeUnits/${administrativeUnitId}`) {
@@ -113,7 +121,12 @@ describe(commands.ADMINISTRATIVEUNIT_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { id: administrativeUnitId, force: true } });
+    await command.action(logger, { 
+      options: commandOptionsSchema.parse({ 
+        id: administrativeUnitId, 
+        force: true 
+      }) 
+    });
     assert(deleteRequestStub.called);
   });
 
@@ -131,7 +144,11 @@ describe(commands.ADMINISTRATIVEUNIT_REMOVE, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
-    await command.action(logger, { options: { displayName: displayName } });
+    await command.action(logger, { 
+      options: commandOptionsSchema.parse({ 
+        displayName: displayName 
+      }) 
+    });
     assert(deleteRequestStub.called);
   });
 
@@ -155,12 +172,21 @@ describe(commands.ADMINISTRATIVEUNIT_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { id: administrativeUnitId, force: true } }),
+    await assert.rejects(command.action(logger, { 
+      options: commandOptionsSchema.parse({ 
+        id: administrativeUnitId, 
+        force: true 
+      }) 
+    }),
       new CommandError(error.error.message));
   });
 
   it('prompts before removing the specified administrative unit when confirm option not passed', async () => {
-    await command.action(logger, { options: { id: administrativeUnitId } });
+    await command.action(logger, { 
+      options: commandOptionsSchema.parse({ 
+        id: administrativeUnitId 
+      }) 
+    });
 
     assert(promptIssued);
   });
@@ -168,7 +194,11 @@ describe(commands.ADMINISTRATIVEUNIT_REMOVE, () => {
   it('aborts removing administrative unit when prompt not confirmed', async () => {
     const deleteSpy = sinon.stub(request, 'delete').resolves();
 
-    await command.action(logger, { options: { id: administrativeUnitId } });
+    await command.action(logger, { 
+      options: commandOptionsSchema.parse({ 
+        id: administrativeUnitId 
+      }) 
+    });
     assert(deleteSpy.notCalled);
   });
 });
