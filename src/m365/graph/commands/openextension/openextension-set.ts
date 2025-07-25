@@ -16,7 +16,8 @@ const options = globalOptionsZod
     resourceType: zod.alias('t', z.enum(['user', 'group', 'device', 'organization'])),
     keepUnchangedProperties: zod.alias('k', z.boolean().optional())
   })
-  .and(z.any());
+  .and(z.unknown());
+
 declare type Options = z.infer<typeof options>;
 
 interface CommandArgs {
