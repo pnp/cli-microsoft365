@@ -1,6 +1,8 @@
 import assert from 'assert';
 import sinon from 'sinon';
+import { z } from 'zod';
 import auth from '../../../../Auth.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
 import request from '../../../../request.js';
@@ -8,6 +10,7 @@ import { telemetry } from '../../../../telemetry.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
+import { cli } from '../../../../cli/cli.js';
 import commands from '../../commands.js';
 import command from './administrativeunit-list.js';
 
@@ -15,6 +18,8 @@ describe(commands.ADMINISTRATIVEUNIT_LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
+  let commandOptionsSchema: z.ZodTypeAny;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -22,6 +27,8 @@ describe(commands.ADMINISTRATIVEUNIT_LIST, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
+    commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
   });
 
   beforeEach(() => {
@@ -85,9 +92,7 @@ describe(commands.ADMINISTRATIVEUNIT_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, {
-      options: {}
-    });
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
 
     assert(
       loggerLogSpy.calledWith([
@@ -125,9 +130,7 @@ describe(commands.ADMINISTRATIVEUNIT_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, {
-      options: { properties: 'id,displayName' }
-    });
+    await command.action(logger, { options: commandOptionsSchema.parse({ properties: 'id,displayName' }) });
 
     assert(
       loggerLogSpy.calledWith([
@@ -152,7 +155,7 @@ describe(commands.ADMINISTRATIVEUNIT_LIST, () => {
     });
 
     await assert.rejects(
-      command.action(logger, { options: {} } as any),
+      command.action(logger, { options: commandOptionsSchema.parse({}) }),
       new CommandError('An error has occurred')
     );
   });
