@@ -11,8 +11,8 @@ LABEL name="m365pnp/cli-microsoft365:${CLI_VERSION}" \
   Arjun Menon <arjun.umenon@gmail.com>, \
   Adam Wojcik <adam.wojcik.it@gmail.com>, \
   Martin Lingstuyl <mlingstuyl@live.com>, \
-  Jasey Waegebaert <jaseyw@gmigroup.be>, \
-  Milan Holemans <Milan.Holemans@vanroey.be>" \
+  Jasey Waegebaert <38426621+Jwaegebaert@users.noreply.github.com>, \
+  Milan Holemans <11723921+milanholemans@users.noreply.github.com>" \
   com.azure.dev.pipelines.agent.handler.node.path="/usr/bin/node"
 
 RUN apk add --no-cache \
