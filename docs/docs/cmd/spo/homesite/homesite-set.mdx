@@ -4,7 +4,7 @@ import TabItem from '@theme/TabItem';
 
 # spo homesite set
 
-Sets the specified site as the Home Site
+Updates an existing SharePoint home site.
 
 ## Usage
 
@@ -15,11 +15,23 @@ m365 spo homesite set [options]
 ## Options
 
 ```md definition-list
-`-u, --siteUrl <siteUrl>`
-: The URL of the site to set as Home site.
+`-u, --url <url>`
+: The URL of the home site
+
+`--draftMode [draftMode]` 
+: Set draft status. Valid values are: `true`, `false`.
+
+`--audienceIds [audienceIds]` 
+: Comma-separated list of group Ids to set as audiences. Specify either `audienceIds` or `audienceNames`, but not both.
+
+`--audienceNames [audienceNames]` 
+: Comma-separated list of group names to set as audiences. You must use either `audienceIds` or `audienceNames`, but not both. Pass `''` to clear audience.
+
+`--targetedLicenseType [targetedLicenseType]` 
+: Value of either `everyone`, `frontLineWorkers` or `informationWorkers` to create an experience for a distinct audience by license type.
 
 `--vivaConnectionsDefaultStart [vivaConnectionsDefaultStart]`
-: When set to `true`, the Viva Connections landing experience is set to the SharePoint home site. If set to `false`, the Viva Connections home experience will be used.
+: Specifies whether the home site is the default start for Viva Connections. Accepts `true` or `false`.
 ```
 
 <Global />
@@ -34,22 +46,46 @@ To use this command you must be a Global or SharePoint administrator.
 
 ## Examples
 
-Set the specified site as the Home Site.
+Sets the home site to the provided site collection url and sets the Viva Connections landing experience to the SharePoint home site
 
 ```sh
-m365 spo homesite set --siteUrl https://contoso.sharepoint.com/sites/comms
+m365 spo homesite set --url https://contoso.sharepoint.com/sites/comms --vivaConnectionsDefaultStart true
 ```
 
-Sets the Home site to the provided site collection url and sets the Viva Connections landing experience to the SharePoint home site
+Set the home site in draft mode
 
 ```sh
-m365 spo homesite set --siteUrl https://contoso.sharepoint.com/sites/comms --vivaConnectionsDefaultStart true
+m365 spo homesite set --url https://contoso.sharepoint.com/sites/contosoportal --draftMode true
 ```
 
-Sets the Home site to the provided site collection url and sets the Viva Connections landing experience to the default experience
+Set the audience to everyone
 
 ```sh
-m365 spo homesite set --siteUrl https://contoso.sharepoint.com/sites/comms --vivaConnectionsDefaultStart false
+m365 spo homesite set --url https://contoso.sharepoint.com/sites/contosoportal --targetedLicenseType "everyone"
+```
+
+Set the audience to groups using groups Ids
+
+```sh
+m365 spo homesite set --url https://contoso.sharepoint.com/sites/contosoportal --audienceIds "978b5280-4f80-47ea-a1db-b0d1d2fb1ba4,21af775d-17b3-4637-94a4-2ba8625277cb"
+```
+
+Set the audience to using their display name
+
+```sh
+m365 spo homesite set --url https://contoso.sharepoint.com/sites/contosoportal --audienceNames "Marketing, IT department"
+```
+
+Clear the audience and set to draft 
+
+```sh
+m365 spo homesite set --url https://contoso.sharepoint.com/sites/contosoportal --audienceNames '' --draftMode true
+```
+
+Configure multiple options
+
+```sh
+m365 spo homesite set --url https://contoso.sharepoint.com/sites/contosoportal --audienceNames 'Marketing, IT department' --draftMode true --targetedLicenseType "everyone" --vivaConnectionsDefaultStart true
 ```
 
 ## Response
@@ -60,65 +96,69 @@ m365 spo homesite set --siteUrl https://contoso.sharepoint.com/sites/comms --viv
   <TabItem value="JSON">
 
   ```json
-  "The Home site has been set to https://contoso.sharepoint.com. It may take some time for the change to apply. Check aka.ms/homesites for details."
+  {
+    "Audiences": [
+      {
+        "Email": "active@contoso.onmicrosoft.com",
+        "Id": "7a1eea7f-9ab0-40ff-8f2e-0083d9d63451",
+        "Title": "active Members"
+      }
+    ],
+    "IsInDraftMode": true,
+    "IsVivaBackendSite": false,
+    "SiteId": "431d7819-4aaf-49a1-b664-b2fe9e609b63",
+    "TargetedLicenseType": 2,
+    "Title": "The Landing",
+    "Url": "https://contoso.sharepoint.com/sites/TheLanding",
+    "VivaConnectionsDefaultStart": true,
+    "WebId": "626c1724-8ac8-45d5-af87-c07c752fab75"
+  }
   ```
 
   </TabItem>
   <TabItem value="Text">
 
   ```text
-  The Home site has been set to https://contoso.sharepoint.com. It may take some time for the change to apply. Check aka.ms/homesites for details.
+  Audiences                  : [{"Email":"active@contoso.onmicrosoft.com","Id":"7a1eea7f-9ab0-40ff-8f2e-0083d9d63451","Title":"active Members"}]
+  IsInDraftMode              : true
+  IsVivaBackendSite          : false
+  SiteId                     : 431d7819-4aaf-49a1-b664-b2fe9e609b63
+  TargetedLicenseType        : 2
+  Title                      : The Landing
+  Url                        : https://contoso.sharepoint.com/sites/TheLanding
+  VivaConnectionsDefaultStart: true
+  WebId                      : 626c1724-8ac8-45d5-af87-c07c752fab75
   ```
 
   </TabItem>
   <TabItem value="CSV">
 
   ```csv
-  The Home site has been set to https://contoso.sharepoint.com. It may take some time for the change to apply. Check aka.ms/homesites for details.
+  IsInDraftMode,IsVivaBackendSite,SiteId,TargetedLicenseType,Title,Url,VivaConnectionsDefaultStart,WebId
+  1,0,431d7819-4aaf-49a1-b664-b2fe9e609b63,2,The Landing,https://contoso.sharepoint.com/sites/TheLanding,1,626c1724-8ac8-45d5-af87-c07c752fab75
   ```
-
+  
   </TabItem>
   <TabItem value="Markdown">
 
   ```md
-  The Home site has been set to https://contoso.sharepoint.com. It may take some time for the change to apply. Check aka.ms/homesites for details.
+  # spo homesite set --url "https://contoso.sharepoint.com/sites/TheLanding" --vivaConnectionsDefaultStart "true" --audienceNames "active"
+
+  Date: 7/27/2025
+
+  ## The Landing (https://contoso.sharepoint.com/sites/TheLanding)
+
+  Property | Value
+  ---------|-------
+  IsInDraftMode | true
+  IsVivaBackendSite | false
+  SiteId | 431d7819-4aaf-49a1-b664-b2fe9e609b63
+  TargetedLicenseType | 2
+  Title | The Landing
+  Url | https://contoso.sharepoint.com/sites/TheLanding
+  VivaConnectionsDefaultStart | true
+  WebId | 626c1724-8ac8-45d5-af87-c07c752fab75
   ```
-
-  </TabItem>
-</Tabs>
-
-### `vivaConnectionsDefaultStart` response
-
-When we make use of the option `vivaConnectionsDefaultStart` the response will differ. 
-
-<Tabs>
-  <TabItem value="JSON">
-
-  ```json
-  "The Home site has been set to https://contoso.sharepoint.com and the Viva Connections default experience to True. It may take some time for the change to apply. Check aka.ms/homesites for details."
-  ```
-
-  </TabItem>
-  <TabItem value="Text">
-
-  ```text
-  The Home site has been set to https://contoso.sharepoint.com and the Viva Connections default experience to True. It may take some time for the change to apply. Check aka.ms/homesites for details.
-  ```
-
-  </TabItem>
-  <TabItem value="CSV">
-
-  ```csv
-  The Home site has been set to https://contoso.sharepoint.com and the Viva Connections default experience to True. It may take some time for the change to apply. Check aka.ms/homesites for details.
-  ```
-
-  </TabItem>
-  <TabItem value="Markdown">
-
-  ```md
-  The Home site has been set to https://contoso.sharepoint.com and the Viva Connections default experience to True. It may take some time for the change to apply. Check aka.ms/homesites for details.
-  ```
-
   </TabItem>
 </Tabs>
 
