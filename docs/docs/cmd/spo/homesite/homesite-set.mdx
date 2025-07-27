@@ -18,9 +18,6 @@ m365 spo homesite set [options]
 `-u, --siteUrl <siteUrl>`
 : The URL of the site to set as Home site.
 
-`--vivaConnectionsDefaultStart [vivaConnectionsDefaultStart]`
-: When set to `true`, the Viva Connections landing experience is set to the SharePoint home site. If set to `false`, the Viva Connections home experience will be used.
-
 `--draftMode [draftMode]` 
 : Set draft status. Valid values are: `true`, `false`.
 
@@ -30,11 +27,12 @@ m365 spo homesite set [options]
 `--audienceNames [audienceNames]` 
 : Comma-separated list of M365 group names to set as audiences. Specify either `audienceIds` or `audienceNames`, but not both.
 
-`--targetedLicenseType [TargetedLicenseType]` 
+`--targetedLicenseType [targetedLicenseType]` 
 : Value of either `everyone`, `frontLineWorkers` or `informationWorkers`.
 
 `--vivaConnectionsDefaultStart [vivaConnectionsDefaultStart]`
 : Specifies whether the home site is the default start for Viva Connections. Accepts `true` or `false`.
+```
 
 <Global />
 
@@ -66,46 +64,46 @@ Sets the Home site to the provided site collection url and sets the Viva Connect
 m365 spo homesite set --siteUrl https://contoso.sharepoint.com/sites/comms --vivaConnectionsDefaultStart false
 ```
 
-Disables the Home site viva connection experience
+Set the Home site in draft mode
 
 ```sh
-m365 spo homesite set -u https://contoso.sharepoint.com/sites/contosoportal  --draftMode false
+m365 spo homesite set -u https://contoso.sharepoint.com/sites/contosoportal --draftMode true
 ```
 
-Enables the Home site viva connection experience
+Set the Home site live (not in draft mode)
 
 ```sh
-m365 spo homesite set -u https://contoso.sharepoint.com/sites/contosoportal  --draftMode true
+m365 spo homesite set -u https://contoso.sharepoint.com/sites/contosoportal --draftMode false
 ```
 
 Set the audience to everyone
 
 ```sh
-m365 spo homesite set -u https://contoso.sharepoint.com/sites/contosoportal  --TargetedLicenseType "everyone"
+m365 spo homesite set -u https://contoso.sharepoint.com/sites/contosoportal --targetedLicenseType "everyone"
 ```
 
 Set the audience to frontline workers
 
 ```sh
-m365 spo homesite set -u https://contoso.sharepoint.com/sites/contosoportal  --TargetedLicenseType "frontLineWorkers"
+m365 spo homesite set -u https://contoso.sharepoint.com/sites/contosoportal --targetedLicenseType "frontLineWorkers"
 ```
 
 Set the audience to information workers
 
 ```sh
-m365 spo homesite set -u https://contoso.sharepoint.com/sites/contosoportal  --TargetedLicenseType "informationworkers"
+m365 spo homesite set -u https://contoso.sharepoint.com/sites/contosoportal --targetedLicenseType "informationWorkers"
 ```
 
 Set the audience to M365 groups using M365 Groups Ids
 
 ```sh
-m365 spo homesite set -u https://contoso.sharepoint.com/sites/contosoportal  --audienceIds "978b5280-4f80-47ea-a1db-b0d1d2fb1ba4,21af775d-17b3-4637-94a4-2ba8625277cb"
+m365 spo homesite set -u https://contoso.sharepoint.com/sites/contosoportal --audienceIds "978b5280-4f80-47ea-a1db-b0d1d2fb1ba4,21af775d-17b3-4637-94a4-2ba8625277cb"
 ```
 
 Set the audience to M365 groups using M365 Groups Names
 
 ```sh
-m365 spo homesite set -u https://contoso.sharepoint.com/sites/contosoportal  --audienceNames "Marketing, IT department"
+m365 spo homesite set -u https://contoso.sharepoint.com/sites/contosoportal --audienceNames "Marketing, IT department"
 ```
 
 ## Response
@@ -179,7 +177,6 @@ m365 spo homesite set -u https://contoso.sharepoint.com/sites/contosoportal  --a
   VivaConnectionsDefaultStart | true
   WebId | 626c1724-8ac8-45d5-af87-c07c752fab75
   ```
-
   </TabItem>
 </Tabs>
 
