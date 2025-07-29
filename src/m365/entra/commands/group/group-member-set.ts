@@ -16,6 +16,7 @@ interface Options extends GlobalOptions {
   groupDisplayName?: string;
   groupName?: string;
   ids?: string;
+  userIds?: string;
   userNames?: string;
   role: string;
 }
@@ -48,6 +49,7 @@ class EntraGroupMemberSetCommand extends GraphCommand {
         groupDisplayName: typeof args.options.groupDisplayName !== 'undefined',
         groupName: typeof args.options.groupName !== 'undefined',
         ids: typeof args.options.ids !== 'undefined',
+        userIds: typeof args.options.userIds !== 'undefined',
         userNames: typeof args.options.userNames !== 'undefined'
       });
     });
@@ -66,6 +68,9 @@ class EntraGroupMemberSetCommand extends GraphCommand {
       },
       {
         option: '--ids [ids]'
+      },
+      {
+        option: '--userIds [userIds]'
       },
       {
         option: '--userNames [userNames]'
@@ -91,6 +96,13 @@ class EntraGroupMemberSetCommand extends GraphCommand {
           }
         }
 
+        if (args.options.userIds) {
+          const isValidGUIDArrayResult = validation.isValidGuidArray(args.options.userIds);
+          if (isValidGUIDArrayResult !== true) {
+            return `The following GUIDs are invalid for the option 'userIds': ${isValidGUIDArrayResult}.`;
+          }
+        }
+
         if (args.options.userNames) {
           const isValidUserPrincipalNameArray = validation.isValidUserPrincipalNameArray(args.options.userNames);
           if (isValidUserPrincipalNameArray !== true) {
@@ -110,12 +122,12 @@ class EntraGroupMemberSetCommand extends GraphCommand {
   #initOptionSets(): void {
     this.optionSets.push(
       { options: ['groupId', 'groupDisplayName', 'groupName'] },
-      { options: ['ids', 'userNames'] }
+      { options: ['ids', 'userIds', 'userNames'] }
     );
   }
 
   #initTypes(): void {
-    this.types.string.push('groupId', 'groupDisplayName', 'groupName', 'ids', 'userNames', 'role');
+    this.types.string.push('groupId', 'groupDisplayName', 'groupName', 'ids', 'userIds', 'userNames', 'role');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -124,8 +136,12 @@ class EntraGroupMemberSetCommand extends GraphCommand {
         await this.warn(logger, `Option 'groupDisplayName' is deprecated and will be removed in the next major release.`);
       }
 
+      if (args.options.ids) {
+        await this.warn(logger, `Option 'ids' is deprecated and will be removed in the next major release. Please use 'userIds' instead.`);
+      }
+
       if (this.verbose) {
-        await logger.logToStderr(`Adding member(s) ${args.options.ids || args.options.userNames} to role ${args.options.role} of group ${args.options.groupId || args.options.groupDisplayName || args.options.groupName}...`);
+        await logger.logToStderr(`Adding member(s) ${args.options.ids || args.options.userIds || args.options.userNames} to role ${args.options.role} of group ${args.options.groupId || args.options.groupDisplayName || args.options.groupName}...`);
       }
 
       const groupId = await this.getGroupId(logger, args.options);
@@ -158,6 +174,10 @@ class EntraGroupMemberSetCommand extends GraphCommand {
   private async getUserIds(logger: Logger, options: Options): Promise<string[]> {
     if (options.ids) {
       return options.ids.split(',').map(i => i.trim());
+    }
+
+    if (options.userIds) {
+      return options.userIds.split(',').map(i => i.trim());
     }
 
     if (this.verbose) {

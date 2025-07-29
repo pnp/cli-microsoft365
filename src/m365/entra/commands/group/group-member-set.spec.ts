@@ -79,6 +79,11 @@ describe(commands.GROUP_MEMBER_SET, () => {
     assert.notStrictEqual(actual, true);
   });
 
+  it('fails validation if userIds contains an invalid GUID', async () => {
+    const actual = await command.validate({ options: { groupId: groupId, userIds: `${userIds[0]},foo`, role: 'Member' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
   it('fails validation if userNames contains an invalid UPN', async () => {
     const actual = await command.validate({ options: { groupId: groupId, userNames: `${userUpns[0]},foo`, role: 'Member' } }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -96,6 +101,16 @@ describe(commands.GROUP_MEMBER_SET, () => {
 
   it('passes validation when all required parameters are valid with ids with leading spaces', async () => {
     const actual = await command.validate({ options: { groupId: groupId, ids: userIds.map(i => ' ' + i).join(','), role: 'Member' } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('passes validation when all required parameters are valid with userIds', async () => {
+    const actual = await command.validate({ options: { groupId: groupId, userIds: userIds.join(','), role: 'Member' } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('passes validation when all required parameters are valid with userIds with leading spaces', async () => {
+    const actual = await command.validate({ options: { groupId: groupId, userIds: userIds.map(i => ' ' + i).join(','), role: 'Member' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
@@ -158,8 +173,63 @@ describe(commands.GROUP_MEMBER_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { groupDisplayName: 'Contoso', ids: userIds.join(','), role: 'Member', verbose: true } });
+    await command.action(logger, { options: { groupDisplayName: 'Contoso', userIds: userIds.join(','), role: 'Member', verbose: true } });
     assert(loggerErrSpy.calledWith(chalk.yellow(`Option 'groupDisplayName' is deprecated and will be removed in the next major release.`)));
+
+    sinonUtil.restore(loggerErrSpy);
+  });
+
+  it(`correctly shows deprecation warning for option 'ids'`, async () => {
+    const chalk = (await import('chalk')).default;
+    const loggerErrSpy = sinon.spy(logger, 'logToStderr');
+
+    sinon.stub(entraGroup, 'getGroupIdByDisplayName').resolves(groupId);
+    sinon.stub(entraUser, 'getUserIdsByUpns').resolves(userIds);
+
+    sinon.stub(request, 'post').callsFake(async opts => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/$batch' &&
+        opts.data.requests[0].method === 'PATCH') {
+        return {
+          responses: Array(2).fill({
+            status: 204,
+            body: {}
+          })
+        };
+      }
+
+      if (opts.url === 'https://graph.microsoft.com/v1.0/$batch' &&
+        opts.data.requests[0].method === 'GET') {
+        return {
+          responses: [
+            {
+              id: userIds[0],
+              status: 200,
+              body: 1
+            },
+            {
+              id: userIds[2],
+              status: 200,
+              body: 1
+            }
+          ]
+        };
+      }
+
+      if (opts.url === 'https://graph.microsoft.com/v1.0/$batch' &&
+        opts.data.requests[0].method === 'DELETE') {
+        return {
+          responses: Array(2).fill({
+            status: 204,
+            body: {}
+          })
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { groupDisplayName: 'Contoso', ids: userIds.join(','), role: 'Member', verbose: true } });
+    assert(loggerErrSpy.calledWith(chalk.yellow(`Option 'ids' is deprecated and will be removed in the next major release. Please use 'userIds' instead.`)));
 
     sinonUtil.restore(loggerErrSpy);
   });
@@ -275,6 +345,139 @@ describe(commands.GROUP_MEMBER_SET, () => {
 
     const ids = userIds.map(id => id + ' ').join(',');
     await command.action(logger, { options: { groupId: groupId, ids: ids, role: 'Member', verbose: true } });
+    assert.deepStrictEqual(postStub.firstCall.args[0].data.requests, [
+      {
+        id: 1,
+        method: 'PATCH',
+        url: `/groups/${groupId}`,
+        headers: { 'content-type': 'application/json;odata.metadata=none' },
+        body: {
+          'members@odata.bind': userIds.slice(0, 20).map(u => `https://graph.microsoft.com/v1.0/directoryObjects/${u}`)
+        }
+      },
+      {
+        id: 21,
+        method: 'PATCH',
+        url: `/groups/${groupId}`,
+        headers: { 'content-type': 'application/json;odata.metadata=none' },
+        body: {
+          'members@odata.bind': userIds.slice(20, 40).map(u => `https://graph.microsoft.com/v1.0/directoryObjects/${u}`)
+        }
+      }
+    ]);
+  });
+
+  it('successfully updates roles for users with userIds in the group', async () => {
+    const postStub = sinon.stub(request, 'post').callsFake(async opts => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/$batch' &&
+        opts.data.requests[0].method === 'PATCH') {
+        return {
+          responses: Array(2).fill({
+            status: 204,
+            body: {}
+          })
+        };
+      }
+
+      if (opts.url === 'https://graph.microsoft.com/v1.0/$batch' &&
+        opts.data.requests[0].method === 'GET') {
+        return {
+          responses: [
+            {
+              id: userIds[0],
+              status: 200,
+              body: 1
+            },
+            {
+              id: userIds[2],
+              status: 200,
+              body: 1
+            }
+          ]
+        };
+      }
+
+      if (opts.url === 'https://graph.microsoft.com/v1.0/$batch' &&
+        opts.data.requests[0].method === 'DELETE') {
+        return {
+          responses: Array(2).fill({
+            status: 204,
+            body: {}
+          })
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { groupId: groupId, userIds: userIds.join(','), role: 'Member', verbose: true } });
+    assert.deepStrictEqual(postStub.firstCall.args[0].data.requests, [
+      {
+        id: 1,
+        method: 'PATCH',
+        url: `/groups/${groupId}`,
+        headers: { 'content-type': 'application/json;odata.metadata=none' },
+        body: {
+          'members@odata.bind': userIds.slice(0, 20).map(u => `https://graph.microsoft.com/v1.0/directoryObjects/${u}`)
+        }
+      },
+      {
+        id: 21,
+        method: 'PATCH',
+        url: `/groups/${groupId}`,
+        headers: { 'content-type': 'application/json;odata.metadata=none' },
+        body: {
+          'members@odata.bind': userIds.slice(20, 40).map(u => `https://graph.microsoft.com/v1.0/directoryObjects/${u}`)
+        }
+      }
+    ]);
+  });
+
+  it('successfully updates roles for users with userIds with trailing spaces in the group', async () => {
+    const postStub = sinon.stub(request, 'post').callsFake(async opts => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/$batch' &&
+        opts.data.requests[0].method === 'PATCH') {
+        return {
+          responses: Array(2).fill({
+            status: 204,
+            body: {}
+          })
+        };
+      }
+
+      if (opts.url === 'https://graph.microsoft.com/v1.0/$batch' &&
+        opts.data.requests[0].method === 'GET') {
+        return {
+          responses: [
+            {
+              id: userIds[0],
+              status: 200,
+              body: 1
+            },
+            {
+              id: userIds[2],
+              status: 200,
+              body: 1
+            }
+          ]
+        };
+      }
+
+      if (opts.url === 'https://graph.microsoft.com/v1.0/$batch' &&
+        opts.data.requests[0].method === 'DELETE') {
+        return {
+          responses: Array(2).fill({
+            status: 204,
+            body: {}
+          })
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    const ids = userIds.map(id => id + ' ').join(',');
+    await command.action(logger, { options: { groupId: groupId, userIds: ids, role: 'Member', verbose: true } });
     assert.deepStrictEqual(postStub.firstCall.args[0].data.requests, [
       {
         id: 1,
