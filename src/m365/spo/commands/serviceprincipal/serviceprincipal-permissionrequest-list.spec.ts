@@ -17,6 +17,7 @@ describe(commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  const spoServicePrincipalDisplayName = 'SharePoint Online Web Client Extensibility';
   const oAuth2PermissionGrantsResponse = {
     value: [
       {
@@ -39,7 +40,7 @@ describe(commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_LIST, () => {
         deletedDateTime: null,
         accountEnabled: true,
         alternativeNames: [],
-        appDisplayName: 'SharePoint Online Client Extensibility Web Application Principal',
+        appDisplayName: spoServicePrincipalDisplayName,
         appDescription: null,
         appId: '912a70e1-da16-417d-a789-57c122d180cd',
         applicationTemplateId: null,
@@ -48,7 +49,7 @@ describe(commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_LIST, () => {
         createdDateTime: '2022-09-20T13:02:57Z',
         description: null,
         disabledByMicrosoftStatus: null,
-        displayName: 'SharePoint Online Client Extensibility Web Application Principal',
+        displayName: spoServicePrincipalDisplayName,
         homepage: null,
         loginUrl: null,
         logoutUrl: null,
@@ -161,7 +162,7 @@ describe(commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_LIST, () => {
 
   it('lists pending permission requests (debug)', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/servicePrincipals/?$filter=displayName eq 'SharePoint Online Client Extensibility Web Application Principal'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/servicePrincipals/?$filter=displayName eq '${spoServicePrincipalDisplayName}'`) {
         return spoClientExtensibilityWebApplicationPrincipalResponse;
       }
 
@@ -207,7 +208,7 @@ describe(commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_LIST, () => {
 
   it('lists pending permission requests', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/servicePrincipals/?$filter=displayName eq 'SharePoint Online Client Extensibility Web Application Principal'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/servicePrincipals/?$filter=displayName eq '${spoServicePrincipalDisplayName}'`) {
         return spoClientExtensibilityWebApplicationPrincipalResponse;
       }
 
@@ -253,7 +254,7 @@ describe(commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_LIST, () => {
 
   it('lists pending permission requests when no service principal is found', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/servicePrincipals/?$filter=displayName eq 'SharePoint Online Client Extensibility Web Application Principal'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/servicePrincipals/?$filter=displayName eq '${spoServicePrincipalDisplayName}'`) {
         return { value: [] };
       }
 
@@ -285,17 +286,12 @@ describe(commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_LIST, () => {
       throw 'Invalid request';
     });
     await command.action(logger, { options: {} });
-    assert(loggerLogSpy.calledWith([{
-      Id: '4dc4c043-25ee-40f2-81d3-b3bf63da7538',
-      Resource: 'Microsoft Graph',
-      ResourceId: 'Microsoft Graph',
-      Scope: 'Mail.Read'
-    }]));
+    assert(loggerLogSpy.calledWith([]));
   });
 
   it('lists pending permission requests when no oAuth2Permissiongrants are found', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/servicePrincipals/?$filter=displayName eq 'SharePoint Online Client Extensibility Web Application Principal'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/servicePrincipals/?$filter=displayName eq '${spoServicePrincipalDisplayName}'`) {
         return spoClientExtensibilityWebApplicationPrincipalResponse;
       }
 
@@ -331,17 +327,12 @@ describe(commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_LIST, () => {
       throw 'Invalid request';
     });
     await command.action(logger, { options: {} });
-    assert(loggerLogSpy.calledWith([{
-      Id: '4dc4c043-25ee-40f2-81d3-b3bf63da7538',
-      Resource: 'Microsoft Graph',
-      ResourceId: 'Microsoft Graph',
-      Scope: 'Mail.Read'
-    }]));
+    assert(loggerLogSpy.calledWith([]));
   });
 
   it('correctly handles error when retrieving pending permission requests', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/servicePrincipals/?$filter=displayName eq 'SharePoint Online Client Extensibility Web Application Principal'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/servicePrincipals/?$filter=displayName eq '${spoServicePrincipalDisplayName}'`) {
         return spoClientExtensibilityWebApplicationPrincipalResponse;
       }
 
@@ -367,7 +358,7 @@ describe(commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_LIST, () => {
 
   it('correctly handles random API error', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/servicePrincipals/?$filter=displayName eq 'SharePoint Online Client Extensibility Web Application Principal'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/servicePrincipals/?$filter=displayName eq '${spoServicePrincipalDisplayName}'`) {
         return spoClientExtensibilityWebApplicationPrincipalResponse;
       }
 
