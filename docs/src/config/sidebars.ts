@@ -2729,6 +2729,11 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
+              label: 'file version keep',
+              id: 'cmd/spo/file/file-version-keep'
+            },
+            {
+              type: 'doc',
               label: 'file version list',
               id: 'cmd/spo/file/file-version-list'
             },
