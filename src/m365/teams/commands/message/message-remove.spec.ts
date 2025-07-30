@@ -33,7 +33,7 @@ describe(commands.MESSAGE_REMOVE, () => {
     sinon.stub(telemetry, 'trackEvent').resolves();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
-    sinon.stub(accessToken, 'assertDelegatedAccessToken').resolves();
+    sinon.stub(accessToken, 'assertAccessTokenType').resolves();
     sinon.stub(teams, 'getTeamIdByDisplayName').resolves(teamId);
     sinon.stub(teams, 'getChannelIdByDisplayName').resolves(channelId);
     auth.connection.active = true;

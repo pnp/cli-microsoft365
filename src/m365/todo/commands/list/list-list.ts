@@ -1,10 +1,10 @@
 import { Logger } from '../../../../cli/Logger.js';
 import { odata } from '../../../../utils/odata.js';
-import DelegatedGraphCommand from '../../../base/DelegatedGraphCommand.js';
+import GraphDelegatedCommand from '../../../base/GraphDelegatedCommand.js';
 import commands from '../../commands.js';
 import { ToDoList } from '../../ToDoList.js';
 
-class TodoListListCommand extends DelegatedGraphCommand {
+class TodoListListCommand extends GraphDelegatedCommand {
   public get name(): string {
     return commands.LIST_LIST;
   }

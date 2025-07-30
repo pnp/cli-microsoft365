@@ -61,7 +61,7 @@ describe(commands.APP_PERMISSION_REMOVE, () => {
     sinon.stub(telemetry, 'trackEvent').resolves();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
-    sinon.stub(accessToken, 'assertDelegatedAccessToken').returns();
+    sinon.stub(accessToken, 'assertAccessTokenType').returns();
     auth.connection.accessTokens[auth.defaultResource] = {
       expiresOn: '123',
       accessToken: 'abc'
