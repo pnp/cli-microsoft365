@@ -4849,21 +4849,6 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
-              label: 'engage group list',
-              id: 'cmd/viva/engage/engage-group-list'
-            },
-            {
-              type: 'doc',
-              label: 'engage group user add',
-              id: 'cmd/viva/engage/engage-group-user-add'
-            },
-            {
-              type: 'doc',
-              label: 'engage group user remove',
-              id: 'cmd/viva/engage/engage-group-user-remove'
-            },
-            {
-              type: 'doc',
               label: 'engage message add',
               id: 'cmd/viva/engage/engage-message-add'
             },
