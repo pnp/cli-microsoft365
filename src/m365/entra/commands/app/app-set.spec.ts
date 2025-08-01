@@ -1,9 +1,9 @@
 import assert from 'assert';
 import fs from 'fs';
 import sinon from 'sinon';
+import { z } from 'zod';
 import auth from '../../../../Auth.js';
 import { cli } from '../../../../cli/cli.js';
-import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
 import request from '../../../../request.js';
@@ -15,6 +15,7 @@ import commands from '../../commands.js';
 import command from './app-set.js';
 import { settingsNames } from '../../../../settingsNames.js';
 import { entraApp } from '../../../../utils/entraApp.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
 
 describe(commands.APP_SET, () => {
 
@@ -33,6 +34,7 @@ describe(commands.APP_SET, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: z.ZodTypeAny;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -41,6 +43,7 @@ describe(commands.APP_SET, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
   });
 
   beforeEach(() => {
@@ -101,11 +104,11 @@ describe(commands.APP_SET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
         uris: 'https://contoso.com/bc724b77-da87-43a9-b385-6ebaaf969db8'
-      }
+      })
     });
   });
 
@@ -131,12 +134,12 @@ describe(commands.APP_SET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
         uris: 'https://contoso.com/bc724b77-da87-43a9-b385-6ebaaf969db8',
         extension_b7d8e648520f41d3b9c0fdeb91768a0a_jobGroupTracker: 'JobGroupN'
-      }
+      })
     });
   });
 
@@ -155,11 +158,11 @@ describe(commands.APP_SET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
         uris: 'https://contoso.com/bc724b77-da87-43a9-b385-6ebaaf969db8,api://testapi'
-      }
+      })
     });
   });
 
@@ -175,10 +178,10 @@ describe(commands.APP_SET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         objectId: '5b31c38c-2584-42f0-aa47-657fb3a84230',
         uris: 'https://contoso.com/bc724b77-da87-43a9-b385-6ebaaf969db8'
-      }
+      })
     });
   });
 
@@ -195,10 +198,10 @@ describe(commands.APP_SET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         objectId: '5b31c38c-2584-42f0-aa47-657fb3a84230',
         uris: 'https://contoso.com/bc724b77-da87-43a9-b385-6ebaaf969db8,api://testapi'
-      }
+      })
     });
   });
 
@@ -225,11 +228,11 @@ describe(commands.APP_SET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         name: 'My app',
         uris: 'https://contoso.com/bc724b77-da87-43a9-b385-6ebaaf969db8'
-      }
+      })
     });
   });
 
@@ -257,19 +260,19 @@ describe(commands.APP_SET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         name: 'My app',
         uris: 'https://contoso.com/bc724b77-da87-43a9-b385-6ebaaf969db8,api://testapi'
-      }
+      })
     });
   });
 
   it('skips updating uris if no uris specified', async () => {
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         objectId: '5b31c38c-2584-42f0-aa47-657fb3a84230'
-      }
+      })
     });
   });
 
@@ -405,12 +408,12 @@ describe(commands.APP_SET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         objectId: 'e4528262-097a-42eb-98e1-19f073dbee45',
         redirectUris: 'https://24c4-2001-1c00-80c-d00-e5da-977c-7c52-5194.ngrok.io/auth',
         platform: 'spa'
-      }
+      })
     });
   });
 
@@ -552,12 +555,12 @@ describe(commands.APP_SET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         objectId: '95cfe30d-ed44-4f9d-b73d-c66560f72e83',
         redirectUris: 'https://foo.com',
         platform: 'web'
-      }
+      })
     });
   });
 
@@ -703,12 +706,12 @@ describe(commands.APP_SET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         objectId: '95cfe30d-ed44-4f9d-b73d-c66560f72e83',
         redirectUris: 'https://foo1.com',
         platform: 'publicClient'
-      }
+      })
     });
   });
 
@@ -848,13 +851,13 @@ describe(commands.APP_SET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         objectId: '95cfe30d-ed44-4f9d-b73d-c66560f72e83',
         redirectUris: 'https://244e-2001-1c00-80c-d00-e5da-977c-7c52-5194.ngrok.io/auth',
         platform: 'spa',
         redirectUrisToRemove: 'https://244e-2001-1c00-80c-d00-e5da-977c-7c52-5193.ngrok.io/auth'
-      }
+      })
     });
   });
 
@@ -889,12 +892,12 @@ describe(commands.APP_SET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         objectId: '95cfe30d-ed44-4f9d-b73d-c66560f72e83',
         certificateDisplayName: 'some certificate',
         certificateBase64Encoded: 'somecertificatebase64string'
-      }
+      })
     });
   });
 
@@ -929,12 +932,12 @@ describe(commands.APP_SET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         objectId: '95cfe30d-ed44-4f9d-b73d-c66560f72e83',
         certificateDisplayName: 'some certificate',
         certificateBase64Encoded: 'somecertificatebase64string'
-      }
+      })
     });
   });
 
@@ -971,12 +974,12 @@ describe(commands.APP_SET, () => {
     sinon.stub(fs, 'readFileSync').returns("somecertificatebase64string");
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         objectId: '95cfe30d-ed44-4f9d-b73d-c66560f72e83',
         certificateDisplayName: 'some certificate',
         certificateFile: 'C:\\temp\\some-certificate.cer'
-      }
+      })
     });
   });
 
@@ -994,11 +997,11 @@ describe(commands.APP_SET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
         allowPublicClientFlows: true
-      }
+      })
     });
   });
 
@@ -1015,12 +1018,12 @@ describe(commands.APP_SET, () => {
     sinon.stub(fs, 'readFileSync').throws(new Error("An error has occurred"));
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         objectId: '95cfe30d-ed44-4f9d-b73d-c66560f72e83',
         certificateDisplayName: 'some certificate',
         certificateFile: 'C:\\temp\\some-certificate.cer'
-      }
+      })
     }), new CommandError(`Error reading certificate file: Error: An error has occurred. Please add the certificate using base64 option '--certificateBase64Encoded'.`));
   });
 
@@ -1028,10 +1031,10 @@ describe(commands.APP_SET, () => {
     sinon.stub(request, 'patch').rejects(new Error(`Resource '5b31c38c-2584-42f0-aa47-657fb3a84230' does not exist or one of its queried reference-property objects are not present.`));
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         objectId: '5b31c38c-2584-42f0-aa47-657fb3a84230',
         uris: 'https://contoso.com/bc724b77-da87-43a9-b385-6ebaaf969db8'
-      }
+      })
     }), new CommandError(`Resource '5b31c38c-2584-42f0-aa47-657fb3a84230' does not exist or one of its queried reference-property objects are not present.`));
   });
 
@@ -1042,10 +1045,10 @@ describe(commands.APP_SET, () => {
     sinon.stub(request, 'patch').rejects('PATCH request executed');
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f',
         uris: 'https://contoso.com/bc724b77-da87-43a9-b385-6ebaaf969db8'
-      }
+      })
     }), new CommandError(`App with appId '9b1b1e42-794b-4c71-93ac-5ed92488b67f' not found in Microsoft Entra ID`));
   });
 
@@ -1060,10 +1063,10 @@ describe(commands.APP_SET, () => {
     sinon.stub(request, 'patch').rejects('PATCH request executed');
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         name: 'My app',
         uris: 'https://contoso.com/bc724b77-da87-43a9-b385-6ebaaf969db8'
-      }
+      })
     }), new CommandError(`No Microsoft Entra application registration with name My app found`));
   });
 
@@ -1091,10 +1094,10 @@ describe(commands.APP_SET, () => {
     sinon.stub(request, 'patch').rejects('PATCH request executed');
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         name: 'My app',
         uris: 'https://contoso.com/bc724b77-da87-43a9-b385-6ebaaf969db8'
-      }
+      })
     }), new CommandError(`Multiple Microsoft Entra application registration with name 'My app' found. Found: 9b1b1e42-794b-4c71-93ac-5ed92488b67f, 9b1b1e42-794b-4c71-93ac-5ed92488b67g.`));
   });
 
@@ -1235,12 +1238,12 @@ describe(commands.APP_SET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         name: 'My app',
         redirectUris: 'https://24c4-2001-1c00-80c-d00-e5da-977c-7c52-5194.ngrok.io/auth',
         platform: 'spa'
-      }
+      })
     });
     assert(updateRequestIssued);
   });
@@ -1249,10 +1252,10 @@ describe(commands.APP_SET, () => {
     sinon.stub(request, 'get').rejects(new Error('An error has occurred'));
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         name: 'My app',
         uris: 'https://contoso.com/bc724b77-da87-43a9-b385-6ebaaf969db8'
-      }
+      })
     }), new CommandError(`An error has occurred`));
   });
 
@@ -1265,8 +1268,8 @@ describe(commands.APP_SET, () => {
       return defaultValue;
     });
 
-    const actual = await command.validate({ options: { appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', objectId: 'c75be2e1-0204-4f95-857d-51a37cf40be8' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', objectId: 'c75be2e1-0204-4f95-857d-51a37cf40be8' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('fails validation if appId and name specified', async () => {
@@ -1278,8 +1281,8 @@ describe(commands.APP_SET, () => {
       return defaultValue;
     });
 
-    const actual = await command.validate({ options: { appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', name: 'My app' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', name: 'My app' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('fails validation if objectId and name specified', async () => {
@@ -1291,8 +1294,8 @@ describe(commands.APP_SET, () => {
       return defaultValue;
     });
 
-    const actual = await command.validate({ options: { objectId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', name: 'My app' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ objectId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', name: 'My app' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('fails validation if neither appId, objectId nor name specified', async () => {
@@ -1304,87 +1307,86 @@ describe(commands.APP_SET, () => {
       return defaultValue;
     });
 
-    const actual = await command.validate({ options: {} }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, false);
   });
 
   it('fails validation if redirectUris specified without platform', async () => {
-    const actual = await command.validate({ options: { objectId: 'c75be2e1-0204-4f95-857d-51a37cf40be8', redirectUris: 'https://foo.com' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ objectId: 'c75be2e1-0204-4f95-857d-51a37cf40be8', redirectUris: 'https://foo.com' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('fails validation if invalid platform specified', async () => {
-    const actual = await command.validate({ options: { objectId: 'c75be2e1-0204-4f95-857d-51a37cf40be8', redirectUris: 'https://foo.com', platform: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ objectId: 'c75be2e1-0204-4f95-857d-51a37cf40be8', redirectUris: 'https://foo.com', platform: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('fails validation if certificateDisplayName is specified without certificate', async () => {
-    const actual = await command.validate({ options: { objectId: 'c75be2e1-0204-4f95-857d-51a37cf40be8', certificateDisplayName: 'Some certificate' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ objectId: 'c75be2e1-0204-4f95-857d-51a37cf40be8', certificateDisplayName: 'Some certificate' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('fails validation if both certificateBase64Encoded and certificateFile are specified', async () => {
-    const actual = await command.validate({ options: { objectId: 'c75be2e1-0204-4f95-857d-51a37cf40be8', certificateFile: 'c:\\temp\\some-certificate.cer', certificateBase64Encoded: 'somebase64string' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ objectId: 'c75be2e1-0204-4f95-857d-51a37cf40be8', certificateFile: 'c:\\temp\\some-certificate.cer', certificateBase64Encoded: 'somebase64string' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('passes validation if certificateFile specified with certificateDisplayName', async () => {
     sinon.stub(fs, 'existsSync').callsFake(_ => true);
 
-    const actual = await command.validate({ options: { name: 'My Microsoft Entra app', certificateDisplayName: 'Some certificate', certificateFile: 'c:\\temp\\some-certificate.cer' } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ name: 'My Microsoft Entra app', certificateDisplayName: 'Some certificate', certificateFile: 'c:\\temp\\some-certificate.cer' });
+    assert.strictEqual(actual.success, true);
   });
 
   it('fails validation when certificate file is not found', async () => {
     sinon.stub(fs, 'existsSync').callsFake(_ => false);
 
-    const actual = await command.validate({ options: { debug: true, objectId: '95cfe30d-ed44-4f9d-b73d-c66560f72e83', certificateDisplayName: 'some certificate', certificateFile: 'C:\\temp\\some-certificate.cer' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ debug: true, objectId: '95cfe30d-ed44-4f9d-b73d-c66560f72e83', certificateDisplayName: 'some certificate', certificateFile: 'C:\\temp\\some-certificate.cer' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('passes validation if required options specified (appId)', async () => {
-    const actual = await command.validate({ options: { appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', uris: 'https://contoso.com/bc724b77-da87-43a9-b385-6ebaaf969db8' } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', uris: 'https://contoso.com/bc724b77-da87-43a9-b385-6ebaaf969db8' });
+    assert.strictEqual(actual.success, true);
   });
 
   it('passes validation if required options specified (objectId)', async () => {
-    const actual = await command.validate({ options: { objectId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', uris: 'https://contoso.com/bc724b77-da87-43a9-b385-6ebaaf969db8' } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ objectId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', uris: 'https://contoso.com/bc724b77-da87-43a9-b385-6ebaaf969db8' });
+    assert.strictEqual(actual.success, true);
   });
 
   it('passes validation if required options specified (name)', async () => {
-    const actual = await command.validate({ options: { name: 'My app', uris: 'https://contoso.com/bc724b77-da87-43a9-b385-6ebaaf969db8' } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ name: 'My app', uris: 'https://contoso.com/bc724b77-da87-43a9-b385-6ebaaf969db8' });
+    assert.strictEqual(actual.success, true);
   });
 
   it('passes validation when redirectUris specified with spa', async () => {
-    const actual = await command.validate({ options: { appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', redirectUris: 'https://foo.com', platform: 'spa' } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', redirectUris: 'https://foo.com', platform: 'spa' });
+    assert.strictEqual(actual.success, true);
   });
 
   it('passes validation when redirectUris specified with publicClient', async () => {
-    const actual = await command.validate({ options: { appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', redirectUris: 'https://foo.com', platform: 'publicClient' } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', redirectUris: 'https://foo.com', platform: 'publicClient' });
+    assert.strictEqual(actual.success, true);
   });
 
   it('passes validation when redirectUris specified with web', async () => {
-    const actual = await command.validate({ options: { appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', redirectUris: 'https://foo.com', platform: 'web' } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', redirectUris: 'https://foo.com', platform: 'web' });
+    assert.strictEqual(actual.success, true);
   });
 
   it('passes validation when allowPublicClientFlows is specified as true', async () => {
-    const actual = await command.validate({ options: { appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', allowPublicClientFlows: true } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', allowPublicClientFlows: true });
+    assert.strictEqual(actual.success, true);
   });
 
   it('passes validation when allowPublicClientFlows is specified as false', async () => {
-    const actual = await command.validate({ options: { appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', allowPublicClientFlows: false } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', allowPublicClientFlows: false });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when allowPublicClientFlows is not correct boolean value', async () => {
-    const actual = await command.validate({ options: { appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', allowPublicClientFlows: 'foo' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('fails validation when allowPublicClientFlows is not correct boolean value', async () => {
+    const actual = commandOptionsSchema.safeParse({ appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', allowPublicClientFlows: 'foo' });
+    assert.strictEqual(actual.success, false);
   });
-
 });

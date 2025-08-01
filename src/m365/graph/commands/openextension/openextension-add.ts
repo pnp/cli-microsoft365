@@ -15,7 +15,8 @@ const options = globalOptionsZod
     resourceId: zod.alias('i', z.string()),
     resourceType: zod.alias('t', z.enum(['user', 'group', 'device', 'organization']))
   })
-  .and(z.any());
+  .and(z.unknown());
+
 declare type Options = z.infer<typeof options>;
 
 interface CommandArgs {
