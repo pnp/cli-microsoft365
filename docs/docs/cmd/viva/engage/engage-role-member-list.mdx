@@ -1,0 +1,114 @@
+import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# viva engage role member list
+
+Lists all users assigned to a Viva Engage role
+
+## Usage
+
+```sh
+m365 viva engage role member list [options]
+```
+
+## Options
+
+```md definition-list
+`-i, --roleId [roleId]`
+: The id of the Viva Engage role. Specify either `roleId` or `roleName`, but not both.
+
+`-n, --roleName [roleName]`
+: The name of the Viva Engage role. Specify either `roleId` or `roleName`, but not both.
+```
+
+<Global />
+
+## Remarks
+
+:::warning
+
+This command is based on an API that is currently in preview and is subject to change once the API reaches general availability.
+
+:::
+
+## Examples
+
+Get all users assigned to a Viva Engage role specified by id
+
+```sh
+m365 viva engage role member list --roleId 77aa47ad-96fe-4ecc-8024-fd1ac5e28f17
+```
+
+Get all users assigned to a Viva Engage role specified by name
+
+```sh
+m365 viva engage role member list --roleName 'Verified Admin'
+```
+
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  [
+    {
+      "id": "1f5595b2-aa07-445d-9801-a45ea18160b2",
+      "createdDateTime": "2024-05-22T15:43:08.368Z",
+      "userId": "1f5595b2-aa07-445d-9801-a45ea18160b2"
+    },
+    {
+      "id": "717f1683-00fa-488c-b68d-5d0051f6bcfa",
+      "createdDateTime": "2025-07-16T02:51:22.602Z",
+      "userId": "717f1683-00fa-488c-b68d-5d0051f6bcfa"
+    }
+  ]
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  id                                    userId
+  ------------------------------------  ------------------------------------
+  1f5595b2-aa07-445d-9801-a45ea18160b2  1f5595b2-aa07-445d-9801-a45ea18160b2
+  717f1683-00fa-488c-b68d-5d0051f6bcfa  717f1683-00fa-488c-b68d-5d0051f6bcfa
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  id,createdDateTime,userId
+  1f5595b2-aa07-445d-9801-a45ea18160b2,2024-05-22T15:43:08.406Z,1f5595b2-aa07-445d-9801-a45ea18160b2
+  717f1683-00fa-488c-b68d-5d0051f6bcfa,2025-07-16T02:51:22.621Z,717f1683-00fa-488c-b68d-5d0051f6bcfa
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # viva engage role member list --debug "false" --verbose "false" --roleId "966b8ec4-6457-4f22-bd3c-5a2520e98f4a"
+
+  Date: 8/1/2025
+
+  ## 1f5595b2-aa07-445d-9801-a45ea18160b2
+
+  Property | Value
+  ---------|-------
+  id | 1f5595b2-aa07-445d-9801-a45ea18160b2
+  createdDateTime | 2024-05-22T15:43:08.406Z
+  userId | 1f5595b2-aa07-445d-9801-a45ea18160b2
+
+  ## 717f1683-00fa-488c-b68d-5d0051f6bcfa
+
+  Property | Value
+  ---------|-------
+  id | 717f1683-00fa-488c-b68d-5d0051f6bcfa
+  createdDateTime | 2025-07-16T02:51:22.621Z
+  userId | 717f1683-00fa-488c-b68d-5d0051f6bcfa
+  ```
+
+  </TabItem>
+</Tabs>
