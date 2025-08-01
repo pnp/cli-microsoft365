@@ -1,5 +1,5 @@
 ---
-title: Automate your CI/CD workflow using CLI for Microsoft 365 GitHub Actions
+title: Automate your CI/CD workflow using CLI for Microsoft 365 in GitHub Workflows
 sidebar_position: 12
 ---
 
@@ -25,7 +25,7 @@ This action is required to be executed in a step before any other CLI for Micros
 
 This action simplifies the installation and deployment of a SharePoint Framework app to either a tenant level or site collection level app catalog.
 
-### Microsoft 365 Run Script
+### CLI for Microsoft 365 Run Script
 
 This action provides the ability to execute an inline script or script file using either `bash` or `PowerShell` as the executing shell.
 
@@ -111,7 +111,7 @@ We will update the initial configuration as shown below, replacing the existing 
       steps:
 
       - name: Login to tenant
-        uses: pnp/action-cli-login@v2.2.1
+        uses: pnp/action-cli-login@v3.0.1
         with:
           ADMIN_USERNAME:  ${{ secrets.ADMIN_USERNAME }}
           ADMIN_PASSWORD:  ${{ secrets.ADMIN_PASSWORD }}
@@ -132,7 +132,7 @@ We will update the initial configuration as shown below, replacing the existing 
       steps:
 
       - name: Login to tenant
-        uses: pnp/action-cli-login@v2.2.1
+        uses: pnp/action-cli-login@v3.0.1
         with:
           APP_ID: ${{ secrets.APP_ID }}
           CERTIFICATE_ENCODED: ${{ secrets.CERTIFICATE_ENCODED }}
@@ -177,7 +177,7 @@ The `CLI for Microsoft 365 Login` action provides an optional input to specify a
       steps:
 
       - name: Login to tenant
-        uses: pnp/action-cli-login@v2.2.1
+        uses: pnp/action-cli-login@v3.0.1
         with:
           APP_ID: ${{ secrets.APP_ID }}
           CERTIFICATE_ENCODED: ${{ secrets.CERTIFICATE_ENCODED }}
@@ -205,7 +205,7 @@ The `CLI for Microsoft 365 Login` allows you to indicate the targeting tenant (d
       steps:
 
       - name: Login to tenant
-        uses: pnp/action-cli-login@v2.2.1
+        uses: pnp/action-cli-login@v3.0.1
         with:
           APP_ID: ${{ secrets.APP_ID }}
           CERTIFICATE_ENCODED: ${{ secrets.CERTIFICATE_ENCODED }}
@@ -246,7 +246,7 @@ jobs:
     ##
 
     - name: Login to tenant
-      uses: pnp/action-cli-login@v2.2.1
+      uses: pnp/action-cli-login@v3.0.1
       with:
         APP_ID: ${{ secrets.APP_ID }}
         CERTIFICATE_ENCODED: ${{ secrets.CERTIFICATE_ENCODED }}
@@ -255,7 +255,7 @@ jobs:
 
     - name: Deploy app to tenant app catalog
       id: M365clideploy
-      uses: pnp/action-cli-deploy@v3.0.1
+      uses: pnp/action-cli-deploy@v5.0.0
       with:
         APP_FILE_PATH: sharepoint/solution/spfx-m365-cli-action.sppkg
         SKIP_FEATURE_DEPLOYMENT: true
@@ -270,7 +270,7 @@ Alternatively, you can deploy the app to a site collection based app catalog by 
 ```yaml
 - name: Deploy app to a site collection app catalog
   id: M365clideploy
-  uses: pnp/action-cli-deploy@v3.0.1
+  uses: pnp/action-cli-deploy@v5.0.0
   with:
     APP_FILE_PATH: sharepoint/solution/spfx-m365-cli-action.sppkg
     SCOPE: sitecollection
@@ -283,7 +283,7 @@ Add this step to a `.yaml` build file contained within the `.github/workflows` f
 
 ```yaml
 - name: Send email
-      uses: pnp/action-cli-runscript@v2.0.1
+      uses: pnp/action-cli-runscript@v3.0.0
       with:
         M365_CLI_SCRIPT: m365 spo mail send --webUrl https://contoso.sharepoint.com/sites/teamsite --to 'user@contoso.onmicrosoft.com' --subject 'Deployment done' --body '<h2>CLI for Microsoft 365</h2> <p>The deployment is complete.</p> <br/> Email sent via CLI for Microsoft 365 GitHub Action.'
 ```
@@ -294,7 +294,7 @@ Add the respective script file to your repository and this step to a `.yaml` bui
 
 ```yaml
 - name: Create lists
-      uses: pnp/action-cli-runscript@v2.0.1
+      uses: pnp/action-cli-runscript@v3.0.0
       with:
         M365_CLI_SCRIPT_PATH: ./script/lists.ps1 
 ```
