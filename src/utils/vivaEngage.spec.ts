@@ -12,6 +12,11 @@ describe('utils/vivaEngage', () => {
   const invalidDisplayName = 'All Compayn';
   const entraGroupId = '0bed8b86-5026-4a93-ac7d-56750cc099f1';
   const communityId = 'eyJfdHlwZSI6Ikdyb3VwIiwiaWQiOiI0NzY5MTM1ODIwOSJ9';
+
+  const roleId = 'ec759127-089f-4f91-8dfc-03a30b51cb38';
+  const roleName = 'Network Admin';
+  const invalidRoleDisplayName = 'Network Admins';
+
   const communityResponse = {
     "id": "eyJfdHlwZSI6Ikdyb3VwIiwiaWQiOiI0NzY5MTM1ODIwOSJ9",
     "description": "This is the default group for everyone in the network",
@@ -188,5 +193,121 @@ describe('utils/vivaEngage', () => {
     });
 
     await assert.rejects(vivaEngage.getCommunityById(communityId, ['groupId'])), Error(`The specified Viva Engage community with ID '${communityId}' does not exist.`);
+  });
+
+  it('correctly get single role id by name using getRoleIdByName', async () => {
+    sinon.stub(request, 'get').callsFake(async opts => {
+      if (opts.url === `https://graph.microsoft.com/beta/employeeExperience/roles`) {
+        return {
+          value: [
+            {
+              "id": "ec759127-089f-4f91-8dfc-03a30b51cb38",
+              "displayName": "Network Admin"
+            },
+            {
+              "id": "966b8ec4-6457-4f22-bd3c-5a2520e98f4a",
+              "displayName": "Verified Admin"
+            },
+            {
+              "id": "77aa47ad-96fe-4ecc-8024-fd1ac5e28f17",
+              "displayName": "Corporate Communicator"
+            }
+          ]
+        };
+      }
+
+      return 'Invalid Request';
+    });
+
+    const actual = await vivaEngage.getRoleIdByName(roleName);
+    assert.deepStrictEqual(actual, roleId);
+  });
+
+  it('handles selecting single role when multiple roles with the specified name found using getRoleIdByName and cli is set to prompt', async () => {
+    sinon.stub(request, 'get').callsFake(async opts => {
+      if (opts.url === `https://graph.microsoft.com/beta/employeeExperience/roles`) {
+        return {
+          value: [
+            {
+              "id": "ec759127-089f-4f91-8dfc-03a30b51cb38",
+              "displayName": "Network Admin"
+            },
+            {
+              "id": "966b8ec4-6457-4f22-bd3c-5a2520e98f4a",
+              "displayName": "Network Admin"
+            },
+            {
+              "id": "77aa47ad-96fe-4ecc-8024-fd1ac5e28f17",
+              "displayName": "Corporate Communicator"
+            }
+          ]
+        };
+      }
+
+      return 'Invalid Request';
+    });
+
+    sinon.stub(cli, 'handleMultipleResultsFound').resolves({ id: roleId });
+
+    const actual = await vivaEngage.getRoleIdByName(roleName);
+    assert.deepStrictEqual(actual, roleId);
+  });
+
+  it('throws error message when no role was found using getRoleIdByName', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/beta/employeeExperience/roles`) {
+        return {
+          value: [
+            {
+              "id": "ec759127-089f-4f91-8dfc-03a30b51cb38",
+              "displayName": "Network Admin"
+            },
+            {
+              "id": "966b8ec4-6457-4f22-bd3c-5a2520e98f4a",
+              "displayName": "Verified Admin"
+            },
+            {
+              "id": "77aa47ad-96fe-4ecc-8024-fd1ac5e28f17",
+              "displayName": "Corporate Communicator"
+            }
+          ]
+        };
+      }
+
+      throw 'Invalid Request';
+    });
+
+    await assert.rejects(vivaEngage.getRoleIdByName(invalidRoleDisplayName),
+      Error(`The specified Viva Engage role '${invalidRoleDisplayName}' does not exist.`));
+  });
+
+  it('throws error message when multiple communities were found using getRoleIdByName', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => settingName === settingsNames.prompt ? false : defaultValue);
+
+    sinon.stub(request, 'get').callsFake(async opts => {
+      if (opts.url === `https://graph.microsoft.com/beta/employeeExperience/roles`) {
+        return {
+          value: [
+            {
+              "id": "ec759127-089f-4f91-8dfc-03a30b51cb38",
+              "displayName": "Network Admin"
+            },
+            {
+              "id": "966b8ec4-6457-4f22-bd3c-5a2520e98f4a",
+              "displayName": "Network Admin"
+            },
+            {
+              "id": "77aa47ad-96fe-4ecc-8024-fd1ac5e28f17",
+              "displayName": "Corporate Communicator"
+            }
+          ]
+        };
+      }
+
+      return 'Invalid Request';
+    });
+
+    await assert.rejects(vivaEngage.getRoleIdByName(roleName),
+      Error(`Multiple Viva Engage roles with name '${roleName}' found. Found: ${roleId}, 966b8ec4-6457-4f22-bd3c-5a2520e98f4a.`));
   });
 });

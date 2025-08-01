@@ -69,5 +69,28 @@ export const vivaEngage = {
     }
 
     return filteredCommunity;
+  },
+
+  /**
+   * Get the ID of a Viva Engage role by its display name.
+   * @param roleName The display name of the role.
+   * @returns The ID of the role.
+   */
+  async getRoleIdByName(roleName: string): Promise<string> {
+    // This endpoint doesn't support filtering by displayName
+    const response = await odata.getAllItems<{ id: string; displayName: string }>('https://graph.microsoft.com/beta/employeeExperience/roles');
+    const roles = response.filter(role => role.displayName.toLowerCase() === roleName.toLowerCase());
+
+    if (roles.length === 0) {
+      throw new Error(`The specified Viva Engage role '${roleName}' does not exist.`);
+    }
+
+    if (roles.length > 1) {
+      const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', roles);
+      const selectedRole = await cli.handleMultipleResultsFound<{ id: string; displayName: string }>(`Multiple Viva Engage roles with name '${roleName}' found.`, resultAsKeyValuePair);
+      return selectedRole.id;
+    }
+
+    return roles[0].id;
   }
 };
