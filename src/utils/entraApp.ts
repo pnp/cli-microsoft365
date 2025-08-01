@@ -39,6 +39,8 @@ export interface AppCreationOptions {
   certificateBase64Encoded?: string;
   certificateDisplayName?: string;
   allowPublicClientFlows?: boolean;
+  bundleId?: string;
+  signatureHash?: string;
 }
 
 export interface AppPermissions {
@@ -237,6 +239,23 @@ export const entraApp = {
     if (options.redirectUris) {
       applicationInfo[options.platform!] = {
         redirectUris: options.redirectUris.split(',').map(u => u.trim())
+      };
+    }
+
+    if (options.platform === 'android') {
+      applicationInfo['publicClient'] = {
+        redirectUris: [
+          `msauth://${options.bundleId}/${formatting.encodeQueryParameter(options.signatureHash!)}`
+        ]
+      };
+    }
+
+    if (options.platform === 'apple') {
+      applicationInfo['publicClient'] = {
+        redirectUris: [
+          `msauth://code/msauth.${options.bundleId}%3A%2F%2Fauth`,
+          `msauth.${options.bundleId}://auth`
+        ]
       };
     }
 
