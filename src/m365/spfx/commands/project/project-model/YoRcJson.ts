@@ -14,6 +14,7 @@ export interface YoRcJson extends JsonFile {
       "@microsoft/teams-js"?: string;
     };
     template?: string;
+    useGulp?: boolean;
     version?: string;
   }
 }

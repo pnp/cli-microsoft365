@@ -46,6 +46,7 @@ export abstract class BaseProjectCommand extends AnonymousCommand {
     this.readAndParseJsonFile(path.join(projectRootPath, 'tslint.json'), project, 'tsLintJsonRoot');
     this.readAndParseJsonFile(path.join(projectRootPath, 'config', 'write-manifests.json'), project, 'writeManifestsJson');
     this.readAndParseJsonFile(path.join(projectRootPath, '.yo-rc.json'), project, 'yoRcJson');
+    this.readAndParseJsonFile(path.join(projectRootPath, 'config', 'sass.json'), project, 'sassJson');
 
     const gulpfileJsPath: string = path.join(projectRootPath, 'gulpfile.js');
     if (fs.existsSync(gulpfileJsPath)) {

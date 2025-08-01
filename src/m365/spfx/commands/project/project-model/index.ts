@@ -11,6 +11,7 @@ export * from './PackageJson.js';
 export * from './PackageSolutionJson.js';
 export * from './Project.js';
 export * from './ScssFile.js';
+export * from './SassJson.js';
 export * from './ServeJson.js';
 export * from './TsConfigJson.js';
 export * from './TsFile.js';
