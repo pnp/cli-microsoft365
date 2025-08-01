@@ -3,13 +3,11 @@ import sinon from 'sinon';
 import auth from '../../../../Auth.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
-import config from '../../../../config.js';
 import request from '../../../../request.js';
 import { telemetry } from '../../../../telemetry.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
-import { spo } from '../../../../utils/spo.js';
 import commands from '../../commands.js';
 import command from './serviceprincipal-grant-list.js';
 
@@ -17,20 +15,36 @@ describe(commands.SERVICEPRINCIPAL_GRANT_LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  const spoServicePrincipalDisplayName = 'SharePoint Online Web Client Extensibility';
+  const spoServicePrincipalID = '00000000-0000-0000-0000-000000000000';
+  const graphUrl = 'https://graph.microsoft.com/v1.0';
+  const oauth2PermissionGrants = {
+    value: [
+      {
+        clientId: '1e551032-3e2d-4d6b-9392-9b25451313a0',
+        consentType: 'AllPrincipals',
+        id: '50NAzUm3C0K9B6p8ORLtIhpPRByju_JCmZ9BBsWxwgw',
+        principalId: null,
+        resourceId: '1c444f1a-bba3-42f2-999f-4106c5b1c20c',
+        scope: 'Group.ReadWrite.All'
+      },
+      {
+        clientId: '1e551032-3e2d-4d6b-9392-9b25451313a0',
+        consentType: 'AllPrincipals',
+        id: '50NAzUm3C0K9B6p8ORLtIvNe8tzf4ndKg51reFehHHg',
+        principalId: null,
+        resourceId: 'dcf25ef3-e2df-4a77-839d-6b7857a11c78',
+        scope: 'MyFiles.Read'
+      }
+    ]
+  };
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').resolves();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
-    sinon.stub(spo, 'getRequestDigest').resolves({
-      FormDigestValue: 'ABC',
-      FormDigestTimeoutSeconds: 1800,
-      FormDigestExpiresAt: new Date(),
-      WebFullUrl: 'https://contoso.sharepoint.com'
-    });
     auth.connection.active = true;
-    auth.connection.spoUrl = 'https://contoso.sharepoint.com';
   });
 
   beforeEach(() => {
@@ -51,14 +65,13 @@ describe(commands.SERVICEPRINCIPAL_GRANT_LIST, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      request.post
+      request.get
     ]);
   });
 
   after(() => {
     sinon.restore();
     auth.connection.active = false;
-    auth.connection.spoUrl = undefined;
   });
 
   it('has correct name', () => {
@@ -69,110 +82,56 @@ describe(commands.SERVICEPRINCIPAL_GRANT_LIST, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('lists permissions granted to the service principal (debug)', async () => {
-    sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
-        opts.headers &&
-        opts.headers['X-RequestDigest'] &&
-        opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="4" ObjectPathId="3" /><ObjectPath Id="6" ObjectPathId="5" /><Query Id="7" ObjectPathId="5"><Query SelectAllProperties="true"><Properties /></Query><ChildItemQuery SelectAllProperties="true"><Properties /></ChildItemQuery></Query></Actions><ObjectPaths><Constructor Id="3" TypeId="{104e8f06-1e00-4675-99c6-1b9b504ed8d8}" /><Property Id="5" ParentId="3" Name="PermissionGrants" /></ObjectPaths></Request>`) {
-        return JSON.stringify([
-          {
-            "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7213.1200", "ErrorInfo": null, "TraceCorrelationId": "a2a03a9e-602c-4000-879b-1783ec06ba67"
-          }, 4, {
-            "IsNull": false
-          }, 6, {
-            "IsNull": false
-          }, 7, {
-            "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.Internal.SPOWebAppServicePrincipalPermissionGrantCollection", "_Child_Items_": [
-              {
-                "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.Internal.SPOWebAppServicePrincipalPermissionGrant", "ClientId": "cd4043e7-b749-420b-bd07-aa7c3912ed22", "ConsentType": "AllPrincipals", "ObjectId": "50NAzUm3C0K9B6p8ORLtIhpPRByju_JCmZ9BBsWxwgw", "Resource": "Windows Azure Active Directory", "ResourceId": "1c444f1a-bba3-42f2-999f-4106c5b1c20c", "Scope": "Group.ReadWrite.All"
-              }, {
-                "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.Internal.SPOWebAppServicePrincipalPermissionGrant", "ClientId": "cd4043e7-b749-420b-bd07-aa7c3912ed22", "ConsentType": "AllPrincipals", "ObjectId": "50NAzUm3C0K9B6p8ORLtIvNe8tzf4ndKg51reFehHHg", "Resource": "Microsoft 365 SharePoint Online", "ResourceId": "dcf25ef3-e2df-4a77-839d-6b7857a11c78", "Scope": "MyFiles.Read"
-              }
-            ]
-          }
-        ]);
-      }
-
-      throw 'Invalid request';
-    });
-    await command.action(logger, { options: { debug: true } });
-    assert(loggerLogSpy.calledWith([
-      {
-        ObjectId: '50NAzUm3C0K9B6p8ORLtIhpPRByju_JCmZ9BBsWxwgw',
-        Resource: 'Windows Azure Active Directory',
-        ResourceId: '1c444f1a-bba3-42f2-999f-4106c5b1c20c',
-        Scope: 'Group.ReadWrite.All'
-      },
-      {
-        ObjectId: '50NAzUm3C0K9B6p8ORLtIvNe8tzf4ndKg51reFehHHg',
-        Resource: 'Microsoft 365 SharePoint Online',
-        ResourceId: 'dcf25ef3-e2df-4a77-839d-6b7857a11c78',
-        Scope: 'MyFiles.Read'
-      }]));
-  });
-
   it('lists permissions granted to the service principal', async () => {
-    sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
-        opts.headers &&
-        opts.headers['X-RequestDigest'] &&
-        opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="4" ObjectPathId="3" /><ObjectPath Id="6" ObjectPathId="5" /><Query Id="7" ObjectPathId="5"><Query SelectAllProperties="true"><Properties /></Query><ChildItemQuery SelectAllProperties="true"><Properties /></ChildItemQuery></Query></Actions><ObjectPaths><Constructor Id="3" TypeId="{104e8f06-1e00-4675-99c6-1b9b504ed8d8}" /><Property Id="5" ParentId="3" Name="PermissionGrants" /></ObjectPaths></Request>`) {
-        return JSON.stringify([
-          {
-            "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7213.1200", "ErrorInfo": null, "TraceCorrelationId": "a2a03a9e-602c-4000-879b-1783ec06ba67"
-          }, 4, {
-            "IsNull": false
-          }, 6, {
-            "IsNull": false
-          }, 7, {
-            "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.Internal.SPOWebAppServicePrincipalPermissionGrantCollection", "_Child_Items_": [
-              {
-                "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.Internal.SPOWebAppServicePrincipalPermissionGrant", "ClientId": "cd4043e7-b749-420b-bd07-aa7c3912ed22", "ConsentType": "AllPrincipals", "ObjectId": "50NAzUm3C0K9B6p8ORLtIhpPRByju_JCmZ9BBsWxwgw", "Resource": "Windows Azure Active Directory", "ResourceId": "1c444f1a-bba3-42f2-999f-4106c5b1c20c", "Scope": "Group.ReadWrite.All"
-              }, {
-                "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.Internal.SPOWebAppServicePrincipalPermissionGrant", "ClientId": "cd4043e7-b749-420b-bd07-aa7c3912ed22", "ConsentType": "AllPrincipals", "ObjectId": "50NAzUm3C0K9B6p8ORLtIvNe8tzf4ndKg51reFehHHg", "Resource": "Microsoft 365 SharePoint Online", "ResourceId": "dcf25ef3-e2df-4a77-839d-6b7857a11c78", "Scope": "MyFiles.Read"
-              }
-            ]
-          }
-        ]);
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `${graphUrl}/servicePrincipals?$filter=displayName eq '${spoServicePrincipalDisplayName}'&$select=id`) {
+        return {
+          value: [
+            { id: spoServicePrincipalID }
+          ]
+        };
+      }
+
+      if (opts.url === `${graphUrl}/servicePrincipals/${spoServicePrincipalID}/oauth2PermissionGrants`) {
+        return oauth2PermissionGrants;
       }
 
       throw 'Invalid request';
     });
-    await command.action(logger, { options: {} });
-    assert(loggerLogSpy.calledWith([
-      {
-        ObjectId: '50NAzUm3C0K9B6p8ORLtIhpPRByju_JCmZ9BBsWxwgw',
-        Resource: 'Windows Azure Active Directory',
-        ResourceId: '1c444f1a-bba3-42f2-999f-4106c5b1c20c',
-        Scope: 'Group.ReadWrite.All'
-      },
-      {
-        ObjectId: '50NAzUm3C0K9B6p8ORLtIvNe8tzf4ndKg51reFehHHg',
-        Resource: 'Microsoft 365 SharePoint Online',
-        ResourceId: 'dcf25ef3-e2df-4a77-839d-6b7857a11c78',
-        Scope: 'MyFiles.Read'
-      }]));
+
+    await command.action(logger, { options: { verbose: true } });
+    assert(loggerLogSpy.calledOnceWithExactly(oauth2PermissionGrants.value));
   });
 
-  it('correctly handles error when retrieving permissions granted to the service principal', async () => {
-    sinon.stub(request, 'post').callsFake(async () => {
-      return JSON.stringify([
-        {
-          "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7018.1204", "ErrorInfo": {
-            "ErrorMessage": "File Not Found.", "ErrorValue": null, "TraceCorrelationId": "9e54299e-208a-4000-8546-cc4139091b26", "ErrorCode": -2147024894, "ErrorTypeName": "System.IO.FileNotFoundException"
-          }, "TraceCorrelationId": "9e54299e-208a-4000-8546-cc4139091b26"
-        }
-      ]);
+  it('returns error when the Service principal does not exist', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `${graphUrl}/servicePrincipals?$filter=displayName eq '${spoServicePrincipalDisplayName}'&$select=id`) {
+        return { "value": [] };
+      }
+
+      throw 'Invalid request';
     });
+
     await assert.rejects(command.action(logger, { options: {} } as any),
-      new CommandError('File Not Found.'));
+      new CommandError(`Service principal '${spoServicePrincipalDisplayName}' not found`));
   });
 
   it('correctly handles random API error', async () => {
-    sinon.stub(request, 'post').callsFake(() => { throw 'An error has occurred'; });
+    const error = {
+      "error": {
+        "code": "Request_ResourceNotFound",
+        "message": "Resource '20c5353f-acc6-424a-bf81-bc80fbd74cdb' does not exist or one of its queried reference-property objects are not present.",
+        "innerError": {
+          "date": "2025-07-07T13:43:51",
+          "request-id": "5b16fbbb-61ef-432e-91d7-fa259efc184c",
+          "client-request-id": "75b16fbbb-61ef-432e-91d7-fa259efc184c"
+        }
+      }
+    };
+
+    sinon.stub(request, 'get').rejects(error);
     await assert.rejects(command.action(logger, { options: {} } as any),
-      new CommandError('An error has occurred'));
+      new CommandError(`Resource '20c5353f-acc6-424a-bf81-bc80fbd74cdb' does not exist or one of its queried reference-property objects are not present.`));
   });
 
   it('defines alias', () => {
