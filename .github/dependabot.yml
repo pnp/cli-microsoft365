@@ -1,0 +1,67 @@
+version: 2
+updates:
+  # Monthly dependency updates
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    labels:
+      - pr-priority
+    ignore:
+      - dependency-name: "*"
+        update-types:
+          - "version-update:semver-major"
+    groups:
+      update-dependencies:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 1
+
+  # Monthly docs dependency updates
+  - package-ecosystem: "npm"
+    directory: "/docs"
+    schedule:
+      interval: "monthly"
+    labels:
+      - pr-priority
+    ignore:
+      - dependency-name: "*"
+        update-types:
+          - "version-update:semver-major"
+    groups:
+      update-dependencies:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 1
+
+  # Monthly GitHub Actions dependency updates
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    ignore:
+      - dependency-name: "*"
+        update-types:
+          - "version-update:semver-major"
+    groups:
+      update-dependencies:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 1
+
+  # Monthly Docker dependency updates
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    labels:
+      - pr-priority
+    ignore:
+      - dependency-name: "*"
+        update-types:
+          - "version-update:semver-major"
+    groups:
+      update-dependencies:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 1
