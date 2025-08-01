@@ -24,7 +24,7 @@ export const entraAdministrativeUnit = {
     }
 
     const queryString = queryParameters.length > 0
-      ? `?${queryParameters.join('&')}`
+      ? `&${queryParameters.join('&')}`
       : '';
 
     const graphResource = 'https://graph.microsoft.com';
