@@ -73,31 +73,15 @@ class SpoHomeSiteSetCommand extends SpoCommand {
         data: {}
       };
 
-      const isMultipleVivaConnectionsEnabled = await this.getIsMultipleVivaConnectionsFlightEnabled(spoAdminUrl, logger);
       const homeSiteCount = await this.getHomeSiteCount(spoAdminUrl, logger);
 
-      const shouldUseSimpleSetSPHSite = homeSiteCount <= 1 &&
-        this.vivaConnectionsOnlySpecified(args.options);
-
-      if (shouldUseSimpleSetSPHSite) {
-        requestOptions.url += '/SetSPHSite';
-        requestOptions.data.sphSiteUrl = args.options.siteUrl;
-        if (args.options.vivaConnectionsDefaultStart !== undefined) {
-          requestOptions.data.vivaConnectionsDefaultStart = args.options.vivaConnectionsDefaultStart;
-        }
-      }
-      else if (args.options.vivaConnectionsDefaultStart !== undefined ||
+      if (args.options.vivaConnectionsDefaultStart !== undefined ||
         args.options.draftMode !== undefined ||
         args.options.audienceIds !== undefined ||
         args.options.audienceNames !== undefined ||
-        args.options.targetedLicenseType !== undefined) {
-        if (isMultipleVivaConnectionsEnabled) {
-          requestOptions.url += '/UpdateTargetedSite';
-        }
-        else {
-          requestOptions.url += '/SetSPHSiteWithConfiguration';
-        }
-        requestOptions.data.siteUrl = args.options.siteUrl;
+        args.options.targetedLicenseType !== undefined ||
+        args.options.order !== undefined) {
+
         const configuration: any = {};
         if (args.options.vivaConnectionsDefaultStart !== undefined) {
           configuration.IsVivaConnectionsDefaultStartPresent = true;
@@ -123,13 +107,26 @@ class SpoHomeSiteSetCommand extends SpoCommand {
           configuration.IsOrderPresent = true;
           configuration.Order = args.options.order;
         }
-        requestOptions.data.configurationParam = configuration;
-      }
-      else {
-        if (isMultipleVivaConnectionsEnabled) {
+        const hasOnlyVivaConnectionsDefaultStart = args.options.vivaConnectionsDefaultStart !== undefined &&
+          args.options.draftMode === undefined &&
+          args.options.audienceIds === undefined &&
+          args.options.audienceNames === undefined &&
+          args.options.targetedLicenseType === undefined &&
+          args.options.order === undefined;
+        if (homeSiteCount <= 1 && hasOnlyVivaConnectionsDefaultStart) {
+          requestOptions.url += '/SetSPHSiteWithConfiguration';
+          requestOptions.data.sphSiteUrl = args.options.siteUrl;
+          requestOptions.data.configuration = { vivaConnectionsDefaultStart: args.options.vivaConnectionsDefaultStart };;
+        }
+        else {
           requestOptions.url += '/UpdateTargetedSite';
           requestOptions.data.siteUrl = args.options.siteUrl;
+          requestOptions.data.configurationParam = configuration;
         }
+      }
+      else if (homeSiteCount <= 1) {
+        requestOptions.url += '/SetSPHSite';
+        requestOptions.data.sphSiteUrl = args.options.siteUrl;
       }
 
       const res = await request.post(requestOptions);
@@ -178,48 +175,6 @@ class SpoHomeSiteSetCommand extends SpoCommand {
         await logger.logToStderr(`Warning: Could not retrieve home site count. Defaulting to 0. Error: ${err.message}`);
       }
       return 0;
-    }
-  }
-
-  private vivaConnectionsOnlySpecified(options: Options): boolean {
-    const hasVivaConnections = options.vivaConnectionsDefaultStart !== undefined;
-
-    // Check if only siteUrl or vivaConnectionsDefaultStart (or both) are specified, and no other options
-    const otherOptions = [
-      'draftMode',
-      'audienceIds',
-      'audienceNames',
-      'targetedLicenseType',
-      'order'
-    ];
-
-    const hasOtherOptions = otherOptions.some(opt => options[opt as keyof Options] !== undefined);
-
-    return (hasVivaConnections) && !hasOtherOptions;
-  }
-
-  private async getIsMultipleVivaConnectionsFlightEnabled(spoAdminUrl: string, logger: Logger): Promise<boolean> {
-    try {
-      if (this.verbose) {
-        await logger.logToStderr('Checking IsMultipleVivaConnectionsFlightEnabled tenant property...');
-      }
-
-      const requestOptions: CliRequestOptions = {
-        url: `${spoAdminUrl}/_api/SPO.Tenant?$select=IsMultipleVivaConnectionsFlightEnabled`,
-        headers: {
-          accept: 'application/json;odata=nometadata'
-        },
-        responseType: 'json'
-      };
-
-      const res = await request.get<{ IsMultipleVivaConnectionsFlightEnabled: boolean }>(requestOptions);
-      return res.IsMultipleVivaConnectionsFlightEnabled;
-    }
-    catch (err: any) {
-      if (this.verbose) {
-        await logger.logToStderr(`Warning: Could not retrieve IsMultipleVivaConnectionsFlightEnabled property. Defaulting to false. Error: ${err.message}`);
-      }
-      return false;
     }
   }
 

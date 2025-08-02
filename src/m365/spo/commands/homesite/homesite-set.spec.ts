@@ -27,14 +27,6 @@ describe(commands.HOMESITE_SET, () => {
     "value": `The Home site has been set to ${siteUrl}. It may take some time for the change to apply. Check aka.ms/homesites for details.`
   };
 
-  const multipleVivaConnectionsEnabledResponse = {
-    IsMultipleVivaConnectionsFlightEnabled: true
-  };
-
-  const multipleVivaConnectionsDisabledResponse = {
-    IsMultipleVivaConnectionsFlightEnabled: false
-  };
-
   const homeSiteCountResponse = {
     value: [
       { Url: 'https://contoso.sharepoint.com/sites/home1' }
@@ -122,11 +114,8 @@ describe(commands.HOMESITE_SET, () => {
 
   it('uses SetSPHSite when home site count is 1 and only siteUrl and vivaConnectionsDefaultStart are specified', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `${spoAdminUrl}/_api/SPO.Tenant?$select=IsMultipleVivaConnectionsFlightEnabled`) {
-        return multipleVivaConnectionsDisabledResponse;
-      }
-      if (opts.url === `${spoAdminUrl}/_api/SPO.Tenant/GetSPHSite`) {
-        return homeSiteCountResponse;
+      if (opts.url === `${spoAdminUrl}/_api/SPO.Tenant/GetTargetedSitesDetails`) {
+        return emptyHomeSiteCountResponse;
       }
       return 'Invalid request';
     });
@@ -140,14 +129,12 @@ describe(commands.HOMESITE_SET, () => {
 
     await command.action(logger, {
       options: {
-        siteUrl: siteUrl,
-        vivaConnectionsDefaultStart: true
+        siteUrl: siteUrl
       }
     } as any);
 
     assert.deepStrictEqual(postRequestStub.lastCall.args[0].data, {
-      sphSiteUrl: siteUrl,
-      vivaConnectionsDefaultStart: true
+      sphSiteUrl: siteUrl
     });
   });
 
@@ -169,18 +156,17 @@ describe(commands.HOMESITE_SET, () => {
     assert(loggerLogSpy.calledWith());
   });
 
-  it('sets the specified site as the Home Site with vivaConnectionsDefaultStart using SetSPHSiteWithConfiguration when multiple viva connections is disabled', async () => {
+  it('sets the specified site as the Home Site with vivaConnectionsDefaultStart using SetSPHSiteWithConfiguration when home site is 1 or less', async () => {
     const requestBody = {
-      siteUrl: siteUrl,
-      configurationParam: { IsVivaConnectionsDefaultStartPresent: true, vivaConnectionsDefaultStart: true }
+      sphSiteUrl: siteUrl,
+      configuration: { vivaConnectionsDefaultStart: true }
     };
 
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `${spoAdminUrl}/_api/SPO.Tenant?$select=IsMultipleVivaConnectionsFlightEnabled`) {
-        return multipleVivaConnectionsDisabledResponse;
-      }
+
       if (opts.url === `${spoAdminUrl}/_api/SPO.Tenant/GetTargetedSitesDetails`) {
-        return multipleHomeSiteCountResponse;
+        return homeSiteCountResponse;
+        ;
       }
       return 'Invalid request';
     });
@@ -202,16 +188,14 @@ describe(commands.HOMESITE_SET, () => {
     assert.deepStrictEqual(postRequestStub.lastCall.args[0].data, requestBody);
   });
 
-  it('sets the specified site as the Home Site with vivaConnectionsDefaultStart using UpdateTargetedSite when multiple viva connections is enabled', async () => {
+  it('sets the specified site as the Home Site with vivaConnectionsDefaultStart using UpdateTargetedSite when multiple home sites', async () => {
     const requestBody = {
       siteUrl: siteUrl,
       configurationParam: { IsVivaConnectionsDefaultStartPresent: true, vivaConnectionsDefaultStart: true }
     };
 
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `${spoAdminUrl}/_api/SPO.Tenant?$select=IsMultipleVivaConnectionsFlightEnabled`) {
-        return multipleVivaConnectionsEnabledResponse;
-      }
+
       if (opts.url === `${spoAdminUrl}/_api/SPO.Tenant/GetTargetedSitesDetails`) {
         return multipleHomeSiteCountResponse;
       }
@@ -242,9 +226,6 @@ describe(commands.HOMESITE_SET, () => {
     };
 
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `${spoAdminUrl}/_api/SPO.Tenant?$select=IsMultipleVivaConnectionsFlightEnabled`) {
-        return multipleVivaConnectionsDisabledResponse;
-      }
       if (opts.url === `${spoAdminUrl}/_api/SPO.Tenant/GetTargetedSitesDetails`) {
         return emptyHomeSiteCountResponse;
       }
@@ -252,11 +233,8 @@ describe(commands.HOMESITE_SET, () => {
     });
 
     const postRequestStub = sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `${spoAdminUrl}/_api/SPO.Tenant/SetSPHSiteWithConfiguration`) {
+      if (opts.url === `${spoAdminUrl}/_api/SPO.Tenant/UpdateTargetedSite`) {
         return defaultResponse;
-      }
-      if (opts.url === `${spoAdminUrl}/_api/SPO.Tenant/GetTargetedSitesDetails`) {
-        return multipleHomeSiteCountResponse;
       }
       return 'Invalid request';
     });
@@ -278,9 +256,6 @@ describe(commands.HOMESITE_SET, () => {
     };
 
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `${spoAdminUrl}/_api/SPO.Tenant?$select=IsMultipleVivaConnectionsFlightEnabled`) {
-        return multipleVivaConnectionsDisabledResponse;
-      }
       if (opts.url === `${spoAdminUrl}/_api/SPO.Tenant/GetTargetedSitesDetails`) {
         return multipleHomeSiteCountResponse;
       }
@@ -288,7 +263,7 @@ describe(commands.HOMESITE_SET, () => {
     });
 
     const postRequestStub = sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `${spoAdminUrl}/_api/SPO.Tenant/SetSPHSiteWithConfiguration`) {
+      if (opts.url === `${spoAdminUrl}/_api/SPO.Tenant/UpdateTargetedSite`) {
         return defaultResponse;
       }
       return 'Invalid request';
@@ -311,9 +286,6 @@ describe(commands.HOMESITE_SET, () => {
     };
 
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `${spoAdminUrl}/_api/SPO.Tenant?$select=IsMultipleVivaConnectionsFlightEnabled`) {
-        return multipleVivaConnectionsDisabledResponse;
-      }
       if (opts.url === `${spoAdminUrl}/_api/SPO.Tenant/GetTargetedSitesDetails`) {
         return multipleHomeSiteCountResponse;
       }
@@ -324,7 +296,7 @@ describe(commands.HOMESITE_SET, () => {
     });
 
     const postRequestStub = sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `${spoAdminUrl}/_api/SPO.Tenant/SetSPHSiteWithConfiguration`) {
+      if (opts.url === `${spoAdminUrl}/_api/SPO.Tenant/UpdateTargetedSite`) {
         return defaultResponse;
       }
       return 'Invalid request';
@@ -347,14 +319,14 @@ describe(commands.HOMESITE_SET, () => {
     };
 
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `${spoAdminUrl}/_api/SPO.Tenant?$select=IsMultipleVivaConnectionsFlightEnabled`) {
-        return multipleVivaConnectionsDisabledResponse;
+      if (opts.url === `${spoAdminUrl}/_api/SPO.Tenant/GetTargetedSitesDetails`) {
+        return multipleHomeSiteCountResponse;
       }
       return 'Invalid request';
     });
 
     const postRequestStub = sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `${spoAdminUrl}/_api/SPO.Tenant/SetSPHSiteWithConfiguration`) {
+      if (opts.url === `${spoAdminUrl}/_api/SPO.Tenant/UpdateTargetedSite`) {
         return defaultResponse;
       }
       return 'Invalid request';
@@ -377,14 +349,14 @@ describe(commands.HOMESITE_SET, () => {
     };
 
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `${spoAdminUrl}/_api/SPO.Tenant?$select=IsMultipleVivaConnectionsFlightEnabled`) {
-        return multipleVivaConnectionsDisabledResponse;
+      if (opts.url === `${spoAdminUrl}/_api/SPO.Tenant/GetTargetedSitesDetails`) {
+        return multipleHomeSiteCountResponse;
       }
       return 'Invalid request';
     });
 
     const postRequestStub = sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `${spoAdminUrl}/_api/SPO.Tenant/SetSPHSiteWithConfiguration`) {
+      if (opts.url === `${spoAdminUrl}/_api/SPO.Tenant/UpdateTargetedSite`) {
         return defaultResponse;
       }
       return 'Invalid request';
@@ -418,42 +390,6 @@ describe(commands.HOMESITE_SET, () => {
     };
 
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `${spoAdminUrl}/_api/SPO.Tenant?$select=IsMultipleVivaConnectionsFlightEnabled`) {
-        return multipleVivaConnectionsDisabledResponse;
-      }
-      return 'Invalid request';
-    });
-
-    const postRequestStub = sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `${spoAdminUrl}/_api/SPO.Tenant/SetSPHSiteWithConfiguration`) {
-        return defaultResponse;
-      }
-      return 'Invalid request';
-    });
-
-    await command.action(logger, {
-      options: {
-        siteUrl: siteUrl,
-        vivaConnectionsDefaultStart: true,
-        draftMode: false,
-        audienceIds: '00000000-0000-0000-0000-000000000001',
-        targetedLicenseType: "everyone",
-        order: 1
-      }
-    } as any);
-
-    assert.deepStrictEqual(postRequestStub.lastCall.args[0].data, requestBody);
-  });
-
-  it('sets the specified site as the Home Site using UpdateTargetedSite when multiple viva connections is enabled and no configuration options provided', async () => {
-    const requestBody = {
-      siteUrl: siteUrl
-    };
-
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `${spoAdminUrl}/_api/SPO.Tenant?$select=IsMultipleVivaConnectionsFlightEnabled`) {
-        return multipleVivaConnectionsEnabledResponse;
-      }
       if (opts.url === `${spoAdminUrl}/_api/SPO.Tenant/GetTargetedSitesDetails`) {
         return multipleHomeSiteCountResponse;
       }
@@ -469,19 +405,21 @@ describe(commands.HOMESITE_SET, () => {
 
     await command.action(logger, {
       options: {
-        siteUrl: siteUrl
+        siteUrl: siteUrl,
+        vivaConnectionsDefaultStart: true,
+        draftMode: false,
+        audienceIds: '00000000-0000-0000-0000-000000000001',
+        targetedLicenseType: "everyone",
+        order: 1,
+        verbose: true
       }
     } as any);
 
     assert.deepStrictEqual(postRequestStub.lastCall.args[0].data, requestBody);
-    assert(postRequestStub.calledWith(sinon.match({ url: `${spoAdminUrl}/_api/SPO.Tenant/UpdateTargetedSite` })));
   });
 
   it('throws error when group is not found for audienceNames', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `${spoAdminUrl}/_api/SPO.Tenant?$select=IsMultipleVivaConnectionsFlightEnabled`) {
-        return multipleVivaConnectionsDisabledResponse;
-      }
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq 'NonExistent Group'&$select=id`) {
         return noGroupsResponse;
       }
@@ -500,9 +438,6 @@ describe(commands.HOMESITE_SET, () => {
 
   it('throws error when multiple groups found with same name for audienceNames', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `${spoAdminUrl}/_api/SPO.Tenant?$select=IsMultipleVivaConnectionsFlightEnabled`) {
-        return multipleVivaConnectionsDisabledResponse;
-      }
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq 'Duplicate Group'&$select=id`) {
         return multipleGroupsResponse;
       }
@@ -625,31 +560,5 @@ describe(commands.HOMESITE_SET, () => {
 
     assert(log.some(entry => entry.includes('Setting the SharePoint home site')));
     assert(log.some(entry => entry.includes('Attempting to retrieve the SharePoint admin URL')));
-  });
-
-  it('handles warning when IsMultipleVivaConnectionsFlightEnabled cannot be retrieved', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `${spoAdminUrl}/_api/SPO.Tenant?$select=IsMultipleVivaConnectionsFlightEnabled`) {
-        throw new Error('Access denied');
-      }
-      return 'Invalid request';
-    });
-
-    sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `${spoAdminUrl}/_api/SPO.Tenant/SetSPHSiteWithConfiguration`) {
-        return defaultResponse;
-      }
-      return 'Invalid request';
-    });
-
-    await command.action(logger, {
-      options: {
-        siteUrl: siteUrl,
-        vivaConnectionsDefaultStart: true,
-        verbose: true
-      }
-    } as any);
-
-    assert(log.some(entry => entry.includes('Warning: Could not retrieve IsMultipleVivaConnectionsFlightEnabled')));
   });
 });
