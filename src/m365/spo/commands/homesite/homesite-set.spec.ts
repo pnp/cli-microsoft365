@@ -35,6 +35,23 @@ describe(commands.HOMESITE_SET, () => {
     IsMultipleVivaConnectionsFlightEnabled: false
   };
 
+  const homeSiteCountResponse = {
+    value: [
+      { Url: 'https://contoso.sharepoint.com/sites/home1' }
+    ]
+  };
+
+  const emptyHomeSiteCountResponse = {
+    value: []
+  };
+
+  const multipleHomeSiteCountResponse = {
+    value: [
+      { Url: 'https://contoso.sharepoint.com/sites/home1' },
+      { Url: 'https://contoso.sharepoint.com/sites/home2' }
+    ]
+  };
+
   const groupResponse = {
     '@odata.context': 'https://graph.microsoft.com/v1.0/$metadata#groups(id)',
     value: [
@@ -103,6 +120,37 @@ describe(commands.HOMESITE_SET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
+  it('uses SetSPHSite when home site count is 1 and only siteUrl and vivaConnectionsDefaultStart are specified', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `${spoAdminUrl}/_api/SPO.Tenant?$select=IsMultipleVivaConnectionsFlightEnabled`) {
+        return multipleVivaConnectionsDisabledResponse;
+      }
+      if (opts.url === `${spoAdminUrl}/_api/SPO.Tenant/GetSPHSite`) {
+        return homeSiteCountResponse;
+      }
+      return 'Invalid request';
+    });
+
+    const postRequestStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `${spoAdminUrl}/_api/SPO.Tenant/SetSPHSite`) {
+        return defaultResponse;
+      }
+      return 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options: {
+        siteUrl: siteUrl,
+        vivaConnectionsDefaultStart: true
+      }
+    } as any);
+
+    assert.deepStrictEqual(postRequestStub.lastCall.args[0].data, {
+      sphSiteUrl: siteUrl,
+      vivaConnectionsDefaultStart: true
+    });
+  });
+
   it('sets the specified site as the Home Site', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `${spoAdminUrl}/_api/SPO.Tenant/SetSPHSite`) {
@@ -130,6 +178,9 @@ describe(commands.HOMESITE_SET, () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `${spoAdminUrl}/_api/SPO.Tenant?$select=IsMultipleVivaConnectionsFlightEnabled`) {
         return multipleVivaConnectionsDisabledResponse;
+      }
+      if (opts.url === `${spoAdminUrl}/_api/SPO.Tenant/GetTargetedSitesDetails`) {
+        return multipleHomeSiteCountResponse;
       }
       return 'Invalid request';
     });
@@ -161,6 +212,9 @@ describe(commands.HOMESITE_SET, () => {
       if (opts.url === `${spoAdminUrl}/_api/SPO.Tenant?$select=IsMultipleVivaConnectionsFlightEnabled`) {
         return multipleVivaConnectionsEnabledResponse;
       }
+      if (opts.url === `${spoAdminUrl}/_api/SPO.Tenant/GetTargetedSitesDetails`) {
+        return multipleHomeSiteCountResponse;
+      }
       return 'Invalid request';
     });
 
@@ -184,12 +238,15 @@ describe(commands.HOMESITE_SET, () => {
   it('sets the specified site as the Home Site with draftMode', async () => {
     const requestBody = {
       siteUrl: siteUrl,
-      configurationParam: { IsInDraftModePresent: true, draftMode: true }
+      configurationParam: { IsInDraftModePresent: true, isInDraftMode: true }
     };
 
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `${spoAdminUrl}/_api/SPO.Tenant?$select=IsMultipleVivaConnectionsFlightEnabled`) {
         return multipleVivaConnectionsDisabledResponse;
+      }
+      if (opts.url === `${spoAdminUrl}/_api/SPO.Tenant/GetTargetedSitesDetails`) {
+        return emptyHomeSiteCountResponse;
       }
       return 'Invalid request';
     });
@@ -197,6 +254,9 @@ describe(commands.HOMESITE_SET, () => {
     const postRequestStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `${spoAdminUrl}/_api/SPO.Tenant/SetSPHSiteWithConfiguration`) {
         return defaultResponse;
+      }
+      if (opts.url === `${spoAdminUrl}/_api/SPO.Tenant/GetTargetedSitesDetails`) {
+        return multipleHomeSiteCountResponse;
       }
       return 'Invalid request';
     });
@@ -220,6 +280,9 @@ describe(commands.HOMESITE_SET, () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `${spoAdminUrl}/_api/SPO.Tenant?$select=IsMultipleVivaConnectionsFlightEnabled`) {
         return multipleVivaConnectionsDisabledResponse;
+      }
+      if (opts.url === `${spoAdminUrl}/_api/SPO.Tenant/GetTargetedSitesDetails`) {
+        return multipleHomeSiteCountResponse;
       }
       return 'Invalid request';
     });
@@ -251,6 +314,9 @@ describe(commands.HOMESITE_SET, () => {
       if (opts.url === `${spoAdminUrl}/_api/SPO.Tenant?$select=IsMultipleVivaConnectionsFlightEnabled`) {
         return multipleVivaConnectionsDisabledResponse;
       }
+      if (opts.url === `${spoAdminUrl}/_api/SPO.Tenant/GetTargetedSitesDetails`) {
+        return multipleHomeSiteCountResponse;
+      }
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq 'Marketing Team'&$select=id`) {
         return groupResponse;
       }
@@ -274,10 +340,10 @@ describe(commands.HOMESITE_SET, () => {
     assert.deepStrictEqual(postRequestStub.lastCall.args[0].data, requestBody);
   });
 
-  it('sets the specified site as the Home Site with targetedLicenseType', async () => {
+  it('sets the specified site as the Home Site with targetedLicenseType to frontLineWorkers', async () => {
     const requestBody = {
       siteUrl: siteUrl,
-      configurationParam: { IsTargetedLicenseTypePresent: true, targetedLicenseType: 'informationWorkers' }
+      configurationParam: { IsTargetedLicenseTypePresent: true, TargetedLicenseType: 1 }
     };
 
     sinon.stub(request, 'get').callsFake(async (opts) => {
@@ -297,7 +363,37 @@ describe(commands.HOMESITE_SET, () => {
     await command.action(logger, {
       options: {
         siteUrl: siteUrl,
-        targetedLicenseType: 'informationWorkers'
+        targetedLicenseType: "frontLineWorkers"
+      }
+    } as any);
+
+    assert.deepStrictEqual(postRequestStub.lastCall.args[0].data, requestBody);
+  });
+
+  it('sets the specified site as the Home Site with targetedLicenseType to informationWorkers', async () => {
+    const requestBody = {
+      siteUrl: siteUrl,
+      configurationParam: { IsTargetedLicenseTypePresent: true, TargetedLicenseType: 2 }
+    };
+
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `${spoAdminUrl}/_api/SPO.Tenant?$select=IsMultipleVivaConnectionsFlightEnabled`) {
+        return multipleVivaConnectionsDisabledResponse;
+      }
+      return 'Invalid request';
+    });
+
+    const postRequestStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `${spoAdminUrl}/_api/SPO.Tenant/SetSPHSiteWithConfiguration`) {
+        return defaultResponse;
+      }
+      return 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options: {
+        siteUrl: siteUrl,
+        targetedLicenseType: "informationWorkers"
       }
     } as any);
 
@@ -308,14 +404,16 @@ describe(commands.HOMESITE_SET, () => {
     const requestBody = {
       siteUrl: siteUrl,
       configurationParam: {
-        IsVivaConnectionsDefaultStartPresent: true,
-        vivaConnectionsDefaultStart: true,
-        IsInDraftModePresent: true,
-        draftMode: false,
         IsAudiencesPresent: true,
-        Audiences: ['00000000-0000-0000-0000-000000000001'],
+        IsInDraftModePresent: true,
+        IsVivaConnectionsDefaultStartPresent: true,
+        IsOrderPresent: true,
         IsTargetedLicenseTypePresent: true,
-        targetedLicenseType: 'everyone'
+        Order: 1,
+        TargetedLicenseType: 0,
+        isInDraftMode: false,
+        vivaConnectionsDefaultStart: true,
+        Audiences: ['00000000-0000-0000-0000-000000000001']
       }
     };
 
@@ -339,7 +437,8 @@ describe(commands.HOMESITE_SET, () => {
         vivaConnectionsDefaultStart: true,
         draftMode: false,
         audienceIds: '00000000-0000-0000-0000-000000000001',
-        targetedLicenseType: 'everyone'
+        targetedLicenseType: "everyone",
+        order: 1
       }
     } as any);
 
@@ -354,6 +453,9 @@ describe(commands.HOMESITE_SET, () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `${spoAdminUrl}/_api/SPO.Tenant?$select=IsMultipleVivaConnectionsFlightEnabled`) {
         return multipleVivaConnectionsEnabledResponse;
+      }
+      if (opts.url === `${spoAdminUrl}/_api/SPO.Tenant/GetTargetedSitesDetails`) {
+        return multipleHomeSiteCountResponse;
       }
       return 'Invalid request';
     });
@@ -499,6 +601,11 @@ describe(commands.HOMESITE_SET, () => {
       }, commandInfo);
       assert.strictEqual(actual, true);
     }
+  });
+
+  it('correctly handles non-integer order', async () => {
+    const actual = commandOptionsSchema.safeParse({ siteUrl: 'https://contoso.sharepoint.com', order: -1 });
+    assert.strictEqual(actual.success, false);
   });
 
   it('handles verbose mode correctly', async () => {
