@@ -32,6 +32,25 @@ This command is based on an API that is currently in preview and is subject to c
 
 :::
 
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource        | Permissions                           |
+  |-----------------|---------------------------------------|
+  | Microsoft Graph | EngagementRole.Read.All, EngagementRole.ReadWrite.All |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource        | Permissions                               |
+  |-----------------|-------------------------------------------|
+  | Microsoft Graph | EngagementRole.Read.All, EngagementRole.ReadWrite.All |
+
+  </TabItem>
+</Tabs>
+
 ## Examples
 
 Get all users assigned to a Viva Engage role specified by id
@@ -57,11 +76,6 @@ m365 viva engage role member list --roleName 'Verified Admin'
       "id": "1f5595b2-aa07-445d-9801-a45ea18160b2",
       "createdDateTime": "2024-05-22T15:43:08.368Z",
       "userId": "1f5595b2-aa07-445d-9801-a45ea18160b2"
-    },
-    {
-      "id": "717f1683-00fa-488c-b68d-5d0051f6bcfa",
-      "createdDateTime": "2025-07-16T02:51:22.602Z",
-      "userId": "717f1683-00fa-488c-b68d-5d0051f6bcfa"
     }
   ]
   ```
@@ -73,7 +87,6 @@ m365 viva engage role member list --roleName 'Verified Admin'
   id                                    userId
   ------------------------------------  ------------------------------------
   1f5595b2-aa07-445d-9801-a45ea18160b2  1f5595b2-aa07-445d-9801-a45ea18160b2
-  717f1683-00fa-488c-b68d-5d0051f6bcfa  717f1683-00fa-488c-b68d-5d0051f6bcfa
   ```
 
   </TabItem>
@@ -82,7 +95,6 @@ m365 viva engage role member list --roleName 'Verified Admin'
   ```csv
   id,createdDateTime,userId
   1f5595b2-aa07-445d-9801-a45ea18160b2,2024-05-22T15:43:08.406Z,1f5595b2-aa07-445d-9801-a45ea18160b2
-  717f1683-00fa-488c-b68d-5d0051f6bcfa,2025-07-16T02:51:22.621Z,717f1683-00fa-488c-b68d-5d0051f6bcfa
   ```
 
   </TabItem>
@@ -100,14 +112,6 @@ m365 viva engage role member list --roleName 'Verified Admin'
   id | 1f5595b2-aa07-445d-9801-a45ea18160b2
   createdDateTime | 2024-05-22T15:43:08.406Z
   userId | 1f5595b2-aa07-445d-9801-a45ea18160b2
-
-  ## 717f1683-00fa-488c-b68d-5d0051f6bcfa
-
-  Property | Value
-  ---------|-------
-  id | 717f1683-00fa-488c-b68d-5d0051f6bcfa
-  createdDateTime | 2025-07-16T02:51:22.621Z
-  userId | 717f1683-00fa-488c-b68d-5d0051f6bcfa
   ```
 
   </TabItem>

@@ -135,7 +135,7 @@ describe(commands.ENGAGE_ROLE_MEMBER_LIST, () => {
     });
 
     assert(
-      loggerLogSpy.calledWith([
+      loggerLogSpy.calledOnceWith([
         {
           "id": "1f5595b2-aa07-445d-9801-a45ea18160b2",
           "createdDateTime": "2024-05-22T15:43:08.368Z",
@@ -178,7 +178,7 @@ describe(commands.ENGAGE_ROLE_MEMBER_LIST, () => {
     });
 
     assert(
-      loggerLogSpy.calledWith([
+      loggerLogSpy.calledOnceWith([
         {
           "id": "1f5595b2-aa07-445d-9801-a45ea18160b2",
           "createdDateTime": "2024-05-22T15:43:08.368Z",
@@ -202,7 +202,7 @@ describe(commands.ENGAGE_ROLE_MEMBER_LIST, () => {
     });
 
     await assert.rejects(
-      command.action(logger, { options: { roleId: roleId } } as any),
+      command.action(logger, { options: { roleId: roleId } }),
       new CommandError('An error has occurred')
     );
   });
