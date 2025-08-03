@@ -98,7 +98,7 @@ describe(commands.HOMESITE_SET, () => {
 
     await command.action(logger, {
       options: {
-        siteUrl: siteUrl,
+        url: siteUrl,
         verbose: true
       }
     } as any);
@@ -116,7 +116,7 @@ describe(commands.HOMESITE_SET, () => {
 
     await command.action(logger, {
       options: {
-        siteUrl: siteUrl,
+        url: siteUrl,
         vivaConnectionsDefaultStart: true
       }
     } as any);
@@ -130,18 +130,18 @@ describe(commands.HOMESITE_SET, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        siteUrl: siteUrl
+        url: siteUrl
       }
     } as any), new CommandError(outputErrorResponse));
   });
 
-  it('fails validation if the siteUrl option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { siteUrl: 'foo' } }, commandInfo);
+  it('fails validation if the url option is not a valid SharePoint site URL', async () => {
+    const actual = await command.validate({ options: { url: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the siteUrl option is a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com' } }, commandInfo);
+  it('passes validation if the url option is a valid SharePoint site URL', async () => {
+    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 });

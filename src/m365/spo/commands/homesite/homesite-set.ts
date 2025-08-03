@@ -11,7 +11,7 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  siteUrl: string;
+  url: string;
   vivaConnectionsDefaultStart?: boolean;
 }
 
@@ -43,7 +43,7 @@ class SpoHomeSiteSetCommand extends SpoCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '-u, --siteUrl <siteUrl>'
+        option: '-u, --url <url>'
       },
       {
         option: '--vivaConnectionsDefaultStart [vivaConnectionsDefaultStart]',
@@ -54,7 +54,7 @@ class SpoHomeSiteSetCommand extends SpoCommand {
 
   #initValidators(): void {
     this.validators.push(
-      async (args: CommandArgs) => validation.isValidSharePointUrl(args.options.siteUrl)
+      async (args: CommandArgs) => validation.isValidSharePointUrl(args.options.url)
     );
   }
 
@@ -65,7 +65,7 @@ class SpoHomeSiteSetCommand extends SpoCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       if (this.verbose) {
-        await logger.logToStderr(`Setting the SharePoint home site to: ${args.options.siteUrl}...`);
+        await logger.logToStderr(`Setting the SharePoint home site to: ${args.options.url}...`);
         await logger.logToStderr('Attempting to retrieve the SharePoint admin URL.');
       }
 
@@ -78,7 +78,7 @@ class SpoHomeSiteSetCommand extends SpoCommand {
         },
         responseType: 'json',
         data: {
-          sphSiteUrl: args.options.siteUrl
+          sphSiteUrl: args.options.url
         }
       };
 

@@ -133,7 +133,7 @@ describe(commands.GROUP_MEMBER_ADD, () => {
   });
 
   it('passes validation when all required parameters are valid with names', async () => {
-    const actual = await command.validate({ options: { groupDisplayName: 'IT department', userNames: userUpns.join(','), role: 'Owner' } }, commandInfo);
+    const actual = await command.validate({ options: { groupName: 'IT department', userNames: userUpns.join(','), role: 'Owner' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
@@ -143,7 +143,7 @@ describe(commands.GROUP_MEMBER_ADD, () => {
   });
 
   it('passes validation when all required parameters are valid with names with trailing spaces', async () => {
-    const actual = await command.validate({ options: { groupDisplayName: 'IT department', userNames: userUpns.map(u => u + ' ').join(','), role: 'Member' } }, commandInfo);
+    const actual = await command.validate({ options: { groupName: 'IT department', userNames: userUpns.map(u => u + ' ').join(','), role: 'Member' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
@@ -489,7 +489,7 @@ describe(commands.GROUP_MEMBER_ADD, () => {
     });
 
     const userNames = userUpns.map(u => ' ' + u).join(',');
-    await command.action(logger, { options: { groupDisplayName: 'Contoso', userNames: userNames, role: 'Owner', verbose: true } });
+    await command.action(logger, { options: { groupName: 'Contoso', userNames: userNames, role: 'Owner', verbose: true } });
     assert.deepStrictEqual(postStub.lastCall.args[0].data.requests, [
       {
         id: 1,
