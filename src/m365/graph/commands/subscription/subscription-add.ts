@@ -18,7 +18,6 @@ interface Options extends GlobalOptions {
   lifecycleNotificationUrl?: string;
   notificationUrlAppId?: string;
   latestTLSVersion?: string;
-  includeResourceData?: boolean;
   withResourceData?: boolean;
   encryptionCertificate?: string;
   encryptionCertificateId?: string;
@@ -71,7 +70,6 @@ class GraphSubscriptionAddCommand extends GraphCommand {
         lifecycleNotificationUrl: typeof args.options.lifecycleNotificationUrl !== 'undefined',
         notificationUrlAppId: typeof args.options.notificationUrlAppId !== 'undefined',
         latestTLSVersion: typeof args.options.latestTLSVersion !== 'undefined',
-        includeResourceData: !!args.options.includeResourceData,
         withResourceData: !!args.options.withResourceData,
         encryptionCertificate: typeof args.options.encryptionCertificate !== 'undefined',
         encryptionCertificateId: typeof args.options.encryptionCertificateId !== 'undefined'
@@ -106,9 +104,6 @@ class GraphSubscriptionAddCommand extends GraphCommand {
       {
         option: '--latestTLSVersion [latestTLSVersion]',
         autocomplete: this.allowedTlsVersions
-      },
-      {
-        option: '--includeResourceData [includeResourceData]'
       },
       {
         option: '--withResourceData [withResourceData]'
@@ -153,12 +148,11 @@ class GraphSubscriptionAddCommand extends GraphCommand {
           return `${args.options.latestTLSVersion} is not a valid TLS version. Allowed values are ${this.allowedTlsVersions.join(', ')}`;
         }
 
-        const shouldIncludeResourceData: boolean | undefined = args.options.includeResourceData || args.options.withResourceData;
-        if (shouldIncludeResourceData && !args.options.encryptionCertificate) {
+        if (args.options.withResourceData && !args.options.encryptionCertificate) {
           return `The 'encryptionCertificate' options is required to include the changed resource data`;
         }
 
-        if (shouldIncludeResourceData && !args.options.encryptionCertificateId) {
+        if (args.options.withResourceData && !args.options.encryptionCertificateId) {
           return `The 'encryptionCertificateId' options is required to include the changed resource data`;
         }
 
@@ -178,7 +172,7 @@ class GraphSubscriptionAddCommand extends GraphCommand {
       notificationUrl: args.options.notificationUrl,
       expirationDateTime: await this.getExpirationDateTimeOrDefault(logger, args),
       clientState: args.options.clientState,
-      includeResourceData: args.options.withResourceData || args.options.includeResourceData,
+      includeResourceData: args.options.withResourceData,
       encryptionCertificate: args.options.encryptionCertificate,
       encryptionCertificateId: args.options.encryptionCertificateId,
       lifecycleNotificationUrl: args.options.lifecycleNotificationUrl,
@@ -197,10 +191,6 @@ class GraphSubscriptionAddCommand extends GraphCommand {
     };
 
     try {
-      if (args.options.includeResourceData) {
-        await this.warn(logger, `Parameter 'includeResourceData' is deprecated. Please use 'withResourceData' instead`);
-      }
-
       const res = await request.post(requestOptions);
       await logger.log(res);
     }

@@ -16,7 +16,6 @@ interface Options extends GlobalOptions {
   userName?: string;
   role?: string;
   visibleHistoryStartDateTime?: string;
-  includeAllHistory?: boolean;
   withAllHistory?: boolean;
 }
 
@@ -47,7 +46,6 @@ class TeamsChatMemberAddCommand extends GraphCommand {
         userName: typeof args.options.userName !== 'undefined',
         role: typeof args.options.role !== 'undefined',
         visibleHistoryStartDateTime: typeof args.options.visibleHistoryStartDateTime !== 'undefined',
-        includeAllHistory: !!args.options.includeAllHistory,
         withAllHistory: !!args.options.withAllHistory
       });
     });
@@ -70,9 +68,6 @@ class TeamsChatMemberAddCommand extends GraphCommand {
       },
       {
         option: '--visibleHistoryStartDateTime [visibleHistoryStartDateTime]'
-      },
-      {
-        option: '--includeAllHistory'
       },
       {
         option: '--withAllHistory'
@@ -112,8 +107,8 @@ class TeamsChatMemberAddCommand extends GraphCommand {
     this.optionSets.push(
       { options: ['userId', 'userName'] },
       {
-        options: ['visibleHistoryStartDateTime', 'includeAllHistory', 'withAllHistory'],
-        runsWhen: (args) => args.options.visibleHistoryStartDateTime || args.options.includeAllHistory || args.options.withAllHistory
+        options: ['visibleHistoryStartDateTime', 'withAllHistory'],
+        runsWhen: (args) => args.options.visibleHistoryStartDateTime || args.options.withAllHistory
       });
   }
 
@@ -121,10 +116,6 @@ class TeamsChatMemberAddCommand extends GraphCommand {
     try {
       if (this.verbose) {
         await logger.logToStderr(`Adding member ${args.options.userId || args.options.userName} to chat with id ${args.options.chatId}...`);
-      }
-
-      if (args.options.includeAllHistory) {
-        await this.warn(logger, `Parameter 'includeAllHistory' is deprecated. Please use 'withAllHistory' instead`);
       }
 
       const chatMemberAddOptions: CliRequestOptions = {
@@ -136,7 +127,7 @@ class TeamsChatMemberAddCommand extends GraphCommand {
         data: {
           '@odata.type': '#microsoft.graph.aadUserConversationMember',
           'user@odata.bind': `https://graph.microsoft.com/v1.0/users/${args.options.userId || formatting.encodeQueryParameter(args.options.userName!)}`,
-          visibleHistoryStartDateTime: (args.options.includeAllHistory || args.options.withAllHistory) ? '0001-01-01T00:00:00Z' : args.options.visibleHistoryStartDateTime,
+          visibleHistoryStartDateTime: args.options.withAllHistory ? '0001-01-01T00:00:00Z' : args.options.visibleHistoryStartDateTime,
           roles: [args.options.role || 'owner']
         }
       };

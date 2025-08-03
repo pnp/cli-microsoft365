@@ -290,7 +290,7 @@ describe(commands.HOMESITE_SET, () => {
     assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if the siteUrl option is a valid SharePoint site URL', async () => {
+  it('passes validation if the url option is a valid SharePoint site URL', async () => {
     const actual = commandOptionsSchema.safeParse({ url: 'https://contoso.sharepoint.com', audienceIds: '00000000-0000-0000-0000-000000000001' });
     assert.strictEqual(actual.success, true);
   });

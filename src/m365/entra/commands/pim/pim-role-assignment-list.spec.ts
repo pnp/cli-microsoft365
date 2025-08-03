@@ -325,26 +325,6 @@ describe(commands.PIM_ROLE_ASSIGNMENT_LIST, () => {
     assert(loggerLogSpy.calledOnceWithExactly([unifiedRoleAssignmentScheduleInstanceResponse[1]]));
   });
 
-  it(`correctly shows deprecation warning for option 'includePrincipalDetails'`, async () => {
-    const chalk = (await import('chalk')).default;
-    const loggerErrSpy = sinon.spy(logger, 'logToStderr');
-
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/roleManagement/directory/roleAssignmentScheduleInstances?$expand=roleDefinition($select=displayName),principal`) {
-        return {
-          value: unifiedRoleAssignmentScheduleInstanceWithPrincipalResponse
-        };
-      }
-
-      throw 'Invalid request';
-    });
-
-    await command.action(logger, { options: { includePrincipalDetails: true } });
-    assert(loggerErrSpy.calledWith(chalk.yellow(`Parameter 'includePrincipalDetails' is deprecated. Please use 'withPrincipalDetails' instead`)));
-
-    sinonUtil.restore(loggerErrSpy);
-  });
-
   it('should get a list of role assignments with details about principal that were assigned', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/roleManagement/directory/roleAssignmentScheduleInstances?$expand=roleDefinition($select=displayName),principal`) {
