@@ -398,35 +398,6 @@ describe(commands.LIST, () => {
       new CommandError('An error has occurred'));
   });
 
-  it(`correctly shows deprecation warning for option 'includeSolutions'`, async () => {
-    const chalk = (await import('chalk')).default;
-    const loggerErrSpy = sinon.spy(logger, 'logToStderr');
-
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://api.flow.microsoft.com/providers/Microsoft.ProcessSimple/environments/${environmentName}/flows?api-version=2016-11-01&include=includeSolutionCloudFlows`) {
-        return {
-          value: [
-            {
-              name: "1c6ee23a-a835-44bc-a4f5-462b658efc13",
-              id: "/providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c5/flows/1c6ee23a-a835-44bc-a4f5-462b658efc13",
-              properties: {
-                "apiId": "/providers/Microsoft.PowerApps/apis/shared_logicflows",
-                "displayName": "Get a daily digest of the top CNN news"
-              }
-            }
-          ]
-        };
-      }
-
-      throw 'Invalid request';
-    });
-
-    await command.action(logger, { options: { environmentName: environmentName, includeSolutions: true } } as any);
-
-    assert(loggerErrSpy.calledWith(chalk.yellow(`Parameter 'includeSolutions' is deprecated. Please use 'withSolutions' instead`)));
-    sinonUtil.restore(loggerErrSpy);
-  });
-
   it('retrieves flows including flows from solutions', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://api.flow.microsoft.com/providers/Microsoft.ProcessSimple/environments/${environmentName}/flows?api-version=2016-11-01&include=includeSolutionCloudFlows`) {
