@@ -14,7 +14,6 @@ interface Options extends GlobalOptions {
   environmentName: string;
   flowName: string;
   name: string;
-  includeTriggerInformation?: boolean
   withTrigger?: boolean;
   withActions?: string | boolean;
 }
@@ -100,9 +99,6 @@ class FlowRunGetCommand extends PowerAutomateCommand {
         option: '-e, --environmentName <environmentName>'
       },
       {
-        option: '--includeTriggerInformation'
-      },
-      {
         option: '--withTrigger'
       },
       {
@@ -130,7 +126,6 @@ class FlowRunGetCommand extends PowerAutomateCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        includeTriggerInformation: !!args.options.includeTriggerInformation,
         withTrigger: !!args.options.withTrigger,
         withActions: typeof args.options.withActions !== 'undefined'
       });
@@ -140,10 +135,6 @@ class FlowRunGetCommand extends PowerAutomateCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
       await logger.logToStderr(`Retrieving information about run ${args.options.name} of Microsoft Flow ${args.options.flowName}...`);
-    }
-
-    if (args.options.includeTriggerInformation) {
-      await this.warn(logger, `Parameter 'includeTriggerInformation' is deprecated. Please use 'withTrigger' instead`);
     }
 
     const actionsParameter = args.options.withActions ? '$expand=properties%2Factions&' : '';
@@ -162,7 +153,7 @@ class FlowRunGetCommand extends PowerAutomateCommand {
       res.status = res.properties.status;
       res.triggerName = res.properties.trigger.name;
 
-      if ((args.options.includeTriggerInformation || args.options.withTrigger) && res.properties.trigger.outputsLink) {
+      if (args.options.withTrigger && res.properties.trigger.outputsLink) {
         res.triggerInformation = await this.getTriggerInformation(res);
       }
 

@@ -20,7 +20,6 @@ interface Options extends GlobalOptions {
   id?: string;
   title?: string;
   url?: string;
-  includeAssociatedSites?: boolean;
   withAssociatedSites?: boolean;
 }
 
@@ -48,7 +47,6 @@ class SpoHubSiteGetCommand extends SpoCommand {
         id: typeof args.options.id !== 'undefined',
         title: typeof args.options.title !== 'undefined',
         url: typeof args.options.url !== 'undefined',
-        includeAssociatedSites: args.options.includeAssociatedSites === true,
         withAssociatedSites: args.options.withAssociatedSites === true
       });
     });
@@ -59,7 +57,6 @@ class SpoHubSiteGetCommand extends SpoCommand {
       { option: '-i, --id [id]' },
       { option: '-t, --title [title]' },
       { option: '-u, --url [url]' },
-      { option: '--includeAssociatedSites' },
       { option: '--withAssociatedSites' }
     );
   }
@@ -86,23 +83,14 @@ class SpoHubSiteGetCommand extends SpoCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
-      if (args.options.includeAssociatedSites) {
-        await this.warn(logger, `Parameter 'includeAssociatedSites' is deprecated. Please use 'withAssociatedSites' instead`);
-      }
-
       const spoUrl = await spo.getSpoUrl(logger, this.debug);
       const hubSite = args.options.id ? await this.getHubSiteById(spoUrl, args.options) : await this.getHubSite(spoUrl, args.options);
 
-      if ((args.options.includeAssociatedSites || args.options.withAssociatedSites) && (args.options.output && args.options.output !== 'json')) {
-        if (args.options.includeAssociatedSites) {
-          throw 'includeAssociatedSites option is only allowed with json output mode';
-        }
-        else {
-          throw 'withAssociatedSites option is only allowed with json output mode';
-        }
+      if (args.options.withAssociatedSites && (args.options.output && args.options.output !== 'json')) {
+        throw 'withAssociatedSites option is only allowed with json output mode';
       }
 
-      if ((args.options.includeAssociatedSites === true || args.options.withAssociatedSites === true) && args.options.output && !cli.shouldTrimOutput(args.options.output)) {
+      if (args.options.withAssociatedSites === true && args.options.output && !cli.shouldTrimOutput(args.options.output)) {
         const spoAdminUrl = await spo.getSpoAdminUrl(logger, this.debug);
         const associatedSitesCommandOutput = await this.getAssociatedSites(spoAdminUrl, hubSite.SiteId, logger, args);
         const associatedSites: AssociatedSite[] = JSON.parse((associatedSitesCommandOutput as CommandOutput).stdout) as AssociatedSite[];

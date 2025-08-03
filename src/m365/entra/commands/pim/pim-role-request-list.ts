@@ -19,7 +19,6 @@ interface Options extends GlobalOptions {
   groupName?: string;
   createdDateTime?: string;
   status?: string;
-  includePrincipalDetails?: boolean;
   withPrincipalDetails?: boolean;
 }
 
@@ -59,7 +58,6 @@ class EntraPimRoleRequestListCommand extends GraphCommand {
         groupName: typeof args.options.groupName !== 'undefined',
         createdDateTime: typeof args.options.createdDateTime !== 'undefined',
         status: typeof args.options.status !== 'undefined',
-        includePrincipalDetails: !!args.options.includePrincipalDetails,
         withPrincipalDetails: !!args.options.withPrincipalDetails
       });
     });
@@ -85,9 +83,6 @@ class EntraPimRoleRequestListCommand extends GraphCommand {
       {
         option: '-s, --status [status]',
         autocomplete: this.allowedStatuses
-      },
-      {
-        option: '--includePrincipalDetails'
       },
       {
         option: '--withPrincipalDetails'
@@ -131,10 +126,6 @@ class EntraPimRoleRequestListCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    if (args.options.includePrincipalDetails) {
-      await this.warn(logger, `Parameter 'includePrincipalDetails' is deprecated. Please use 'withPrincipalDetails' instead`);
-    }
-
     if (this.verbose) {
       await logger.logToStderr(`Retrieving list of PIM roles requests for ${args.options.userId || args.options.userName || args.options.groupId || args.options.groupName || 'all users'}...`);
     }
@@ -163,7 +154,7 @@ class EntraPimRoleRequestListCommand extends GraphCommand {
 
       expands.push('roleDefinition($select=displayName)');
 
-      if (args.options.includePrincipalDetails || args.options.withPrincipalDetails) {
+      if (args.options.withPrincipalDetails) {
         expands.push('principal');
       }
 

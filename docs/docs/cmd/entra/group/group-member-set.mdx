@@ -14,13 +14,10 @@ m365 entra group member set [options]
 
 ```md definition-list
 `-i, --groupId [groupId]`
-: The ID of the Entra ID group. Specify `groupId`, `groupDisplayName` or `groupName` but not multiple.
+: The ID of the Entra ID group. Specify `groupId`, or `groupName` but not both.
 
-`-n, --groupDisplayName [groupDisplayName]`
-: (deprecated. Use option `groupName` instead) The display name of the Entra ID group. Specify `groupId`, `groupDisplayName` or `groupName` but not multiple.
-
-`--groupName [groupName]`
-: The display name of the Microsoft Entra group. Specify `groupId`, `groupDisplayName` or `groupName` but not multiple.
+`-n, --groupName [groupName]`
+: The display name of the Microsoft Entra group. Specify `groupId`, `groupName` but not both.
 
 `--ids [ids]`
 : (deprecated. Use option `userIds` instead) Comma-separated list of user IDs. Specify either `ids`, `userIds` or `userNames` but not multiple.
@@ -55,12 +52,6 @@ Update multiple members specified by ID to members of a group specified by ID
 
 ```sh
 m365 entra group member set --groupId a03c0c35-ef9a-419b-8cab-f89e0a8d2d2a --userIds "098b9f52-f48c-4401-819f-29c33794c3f5,f1e06e31-3abf-4746-83c2-1513d71f38b8" --role Member
-```
-
-Update a single member specified by UPN to an owner of a group specified by display name
-
-```sh
-m365 entra group member set --groupDisplayName Developers --userNames john.doe@contoso.com --role Owner
 ```
 
 Update a single member specified by UPN to an owner of a group specified by group name
