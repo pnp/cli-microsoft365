@@ -133,7 +133,7 @@ describe(commands.GROUP_MEMBER_ADD, () => {
   });
 
   it('passes validation when all required parameters are valid with names', async () => {
-    const actual = await command.validate({ options: { groupDisplayName: 'IT department', userNames: userUpns.join(','), role: 'Owner' } }, commandInfo);
+    const actual = await command.validate({ options: { groupName: 'IT department', userNames: userUpns.join(','), role: 'Owner' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
@@ -143,39 +143,8 @@ describe(commands.GROUP_MEMBER_ADD, () => {
   });
 
   it('passes validation when all required parameters are valid with names with trailing spaces', async () => {
-    const actual = await command.validate({ options: { groupDisplayName: 'IT department', userNames: userUpns.map(u => u + ' ').join(','), role: 'Member' } }, commandInfo);
+    const actual = await command.validate({ options: { groupName: 'IT department', userNames: userUpns.map(u => u + ' ').join(','), role: 'Member' } }, commandInfo);
     assert.strictEqual(actual, true);
-  });
-
-  it('passes validation when all required parameters are valid with group names with trailing spaces', async () => {
-    const actual = await command.validate({ options: { groupDisplayName: 'IT department', subgroupNames: groupNames.map(u => u + ' ').join(','), role: 'Member' } }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
-
-  it(`correctly shows deprecation warning for option 'groupDisplayName'`, async () => {
-    const chalk = (await import('chalk')).default;
-    const loggerErrSpy = sinon.spy(logger, 'logToStderr');
-
-    sinon.stub(entraGroup, 'getGroupIdByDisplayName').resolves(groupId);
-    sinon.stub(entraUser, 'getUserIdsByUpns').resolves(userIds);
-
-    sinon.stub(request, 'post').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/$batch') {
-        return {
-          responses: Array(2).fill({
-            status: 204,
-            body: {}
-          })
-        };
-      }
-
-      throw 'Invalid request';
-    });
-
-    await command.action(logger, { options: { groupDisplayName: 'IT department', userIds: userIds.join(','), role: 'Member', verbose: true } });
-    assert(loggerErrSpy.calledWith(chalk.yellow(`Option 'groupDisplayName' is deprecated and will be removed in the next major release.`)));
-
-    sinonUtil.restore(loggerErrSpy);
   });
 
   it(`correctly shows deprecation warning for option 'ids'`, async () => {
@@ -489,7 +458,7 @@ describe(commands.GROUP_MEMBER_ADD, () => {
     });
 
     const userNames = userUpns.map(u => ' ' + u).join(',');
-    await command.action(logger, { options: { groupDisplayName: 'Contoso', userNames: userNames, role: 'Owner', verbose: true } });
+    await command.action(logger, { options: { groupName: 'Contoso', userNames: userNames, role: 'Owner', verbose: true } });
     assert.deepStrictEqual(postStub.lastCall.args[0].data.requests, [
       {
         id: 1,

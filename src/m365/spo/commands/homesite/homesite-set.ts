@@ -36,6 +36,11 @@ interface CommandArgs {
   options: Options;
 }
 
+interface Options extends GlobalOptions {
+  url: string;
+  vivaConnectionsDefaultStart?: boolean;
+}
+
 class SpoHomeSiteSetCommand extends SpoCommand {
   public get name(): string {
     return commands.HOMESITE_SET;

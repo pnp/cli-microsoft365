@@ -12,7 +12,6 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   environmentName: string;
   sharingStatus?: string;
-  includeSolutions?: boolean;
   withSolutions?: boolean;
   asAdmin?: boolean;
 }
@@ -54,7 +53,6 @@ class FlowListCommand extends PowerAutomateCommand {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
         sharingStatus: typeof args.options.sharingStatus !== 'undefined',
-        includeSolutions: !!args.options.includeSolutions,
         withSolutions: !!args.options.withSolutions,
         asAdmin: !!args.options.asAdmin
       });
@@ -69,9 +67,6 @@ class FlowListCommand extends PowerAutomateCommand {
       {
         option: '--sharingStatus [sharingStatus]',
         autocomplete: this.allowedSharingStatuses
-      },
-      {
-        option: '--includeSolutions'
       },
       {
         option: '--withSolutions'
@@ -100,14 +95,10 @@ class FlowListCommand extends PowerAutomateCommand {
 
   #initTypes(): void {
     this.types.string.push('environmentName', 'sharingStatus');
-    this.types.boolean.push('includeSolutions', 'withSolutions', 'asAdmin');
+    this.types.boolean.push('withSolutions', 'asAdmin');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    if (args.options.includeSolutions) {
-      await this.warn(logger, `Parameter 'includeSolutions' is deprecated. Please use 'withSolutions' instead`);
-    }
-
     if (this.verbose) {
       await logger.logToStderr(`Getting Power Automate flows${args.options.asAdmin ? ' as admin' : ''} in environment '${args.options.environmentName}'...`);
     }
@@ -117,31 +108,29 @@ class FlowListCommand extends PowerAutomateCommand {
         environmentName,
         asAdmin,
         sharingStatus,
-        includeSolutions,
         withSolutions
       } = args.options;
 
       let items: PowerAutomateFlow[] = [];
-      const shouldIncludeSolutions: boolean | undefined = withSolutions || includeSolutions;
 
       if (sharingStatus === 'personal') {
-        const url = this.getApiUrl(environmentName, asAdmin, shouldIncludeSolutions, 'personal');
+        const url = this.getApiUrl(environmentName, asAdmin, withSolutions, 'personal');
         items = await odata.getAllItems<PowerAutomateFlow>(url);
       }
       else if (sharingStatus === 'sharedWithMe') {
-        const url = this.getApiUrl(environmentName, asAdmin, shouldIncludeSolutions, 'team');
+        const url = this.getApiUrl(environmentName, asAdmin, withSolutions, 'team');
         items = await odata.getAllItems<PowerAutomateFlow>(url);
       }
       else if (sharingStatus === 'all') {
-        let url = this.getApiUrl(environmentName, asAdmin, shouldIncludeSolutions, 'personal');
+        let url = this.getApiUrl(environmentName, asAdmin, withSolutions, 'personal');
         items = await odata.getAllItems<PowerAutomateFlow>(url);
 
-        url = this.getApiUrl(environmentName, asAdmin, shouldIncludeSolutions, 'team');
+        url = this.getApiUrl(environmentName, asAdmin, withSolutions, 'team');
         const teamFlows = await odata.getAllItems<PowerAutomateFlow>(url);
         items = items.concat(teamFlows);
       }
       else {
-        const url = this.getApiUrl(environmentName, asAdmin, shouldIncludeSolutions);
+        const url = this.getApiUrl(environmentName, asAdmin, withSolutions);
         items = await odata.getAllItems<PowerAutomateFlow>(url);
       }
 
