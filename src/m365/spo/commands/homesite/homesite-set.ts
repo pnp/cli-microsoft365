@@ -50,7 +50,7 @@ class SpoHomeSiteSetCommand extends SpoCommand {
 
   public getRefinedSchema(schema: z.ZodTypeAny): z.ZodEffects<any> | undefined {
     return schema
-      .refine((options: Options) => !options.audienceIds || [options.audienceIds, options.audienceNames].filter(o => o !== undefined).length === 1, {
+      .refine((options: Options) => [options.audienceIds, options.audienceNames].filter(o => o !== undefined).length <= 1, {
         message: 'Use one of the following options when specifying the audience name: audienceIds or audienceNames.'
       });
   }
