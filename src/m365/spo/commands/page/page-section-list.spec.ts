@@ -13,6 +13,7 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import { ClientSidePage } from './clientsidepages.js';
 import command from './page-section-list.js';
+import { mockOneColumnSectionHTML, mockPageSettingsHTML, mockVerticalSectionHTML } from './page.mock.js';
 
 describe(commands.PAGE_SECTION_LIST, () => {
   let log: string[];
@@ -296,6 +297,80 @@ describe(commands.PAGE_SECTION_LIST, () => {
         "dataVersion": "1.0",
         "jsonData": "&#123;&quot;position&quot;&#58;&#123;&quot;sectionFactor&quot;&#58;6,&quot;sectionIndex&quot;&#58;2,&quot;zoneIndex&quot;&#58;2,&quot;zoneId&quot;&#58;&quot;f14c54a6-6d2b-4fc3-aa90-902d38d18bdb&quot;,&quot;layoutIndex&quot;&#58;1&#125;,&quot;id&quot;&#58;&quot;emptySection&quot;,&quot;controlType&quot;&#58;1&#125;"
       }]
+    }]));
+  });
+
+  it('lists the sections on the modern page and indicates which one is a vertical section', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if ((opts.url as string).indexOf(`/_api/web/GetFileByServerRelativePath(DecodedUrl='/sites/team-a/SitePages/home.aspx')`) > -1) {
+        return {
+          "ListItemAllFields": {
+            "CommentsDisabled": false,
+            "FileSystemObjectType": 0,
+            "Id": 1,
+            "ServerRedirectedEmbedUri": null,
+            "ServerRedirectedEmbedUrl": "",
+            "ContentTypeId": "0x0101080088E2A2ED69D0324A8981DD7FAC103494",
+            "FileLeafRef": "Home.aspx",
+            "ComplianceAssetId": null,
+            "Title": null,
+            "ClientSideApplicationId": "b6917cb1-93a0-4b97-a84d-7cf49975d4ec",
+            "PageLayoutType": null,
+            "CanvasContent1": `<div>${mockVerticalSectionHTML()}${mockOneColumnSectionHTML(2)}${mockPageSettingsHTML}</div>`,
+            "BannerImageUrl": null,
+            "Description": null,
+            "PromotedState": null,
+            "FirstPublishedDate": null,
+            "LayoutWebpartsContent": null,
+            "AuthorsId": null,
+            "AuthorsStringId": null,
+            "OriginalSourceUrl": null,
+            "ID": 1,
+            "Created": "2018-03-19T17:52:56",
+            "AuthorId": 1073741823,
+            "Modified": "2018-03-24T07:14:28",
+            "EditorId": 1073741823,
+            "OData__CopySource": null,
+            "CheckoutUserId": null,
+            "OData__UIVersionString": "1.0",
+            "GUID": "19ac5510-bba6-427b-9c1b-a3329a3b0cad"
+          },
+          "CheckInComment": "",
+          "CheckOutType": 2,
+          "ContentTag": "{8F33F78C-9F39-48E2-B99D-01C2937A56BB},4,1",
+          "CustomizedPageStatus": 1,
+          "ETag": "\"{8F33F78C-9F39-48E2-B99D-01C2937A56BB},4\"",
+          "Exists": true,
+          "IrmEnabled": false,
+          "Length": "3356",
+          "Level": 1,
+          "LinkingUri": null,
+          "LinkingUrl": "",
+          "MajorVersion": 1,
+          "MinorVersion": 0,
+          "Name": "home.aspx",
+          "ServerRelativeUrl": "/sites/team-a/SitePages/home.aspx",
+          "TimeCreated": "2018-03-20T00:52:56Z",
+          "TimeLastModified": "2018-03-24T14:14:28Z",
+          "Title": null,
+          "UIVersion": 512,
+          "UIVersionLabel": "1.0",
+          "UniqueId": "8f33f78c-9f39-48e2-b99d-01c2937a56bb"
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home', output: 'text' } });
+    assert(loggerLogSpy.calledWith([{
+      "order": 1,
+      "columns": 1,
+      "isVertical": true
+    },
+    {
+      "order": 2,
+      "columns": 1
     }]));
   });
 
