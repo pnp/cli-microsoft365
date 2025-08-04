@@ -13,6 +13,7 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './homesite-set.js';
 import { z } from 'zod';
+import { entraGroup } from '../../../../utils/entraGroup.js';
 
 describe(commands.HOMESITE_SET, () => {
   let log: any[];
@@ -34,7 +35,7 @@ describe(commands.HOMESITE_SET, () => {
   };
 
   const emptyHomeSiteCountResponse = {
-    value: []
+    value: null
   };
 
   const multipleHomeSiteCountResponse = {
@@ -42,26 +43,6 @@ describe(commands.HOMESITE_SET, () => {
       { Url: 'https://contoso.sharepoint.com/sites/home1' },
       { Url: 'https://contoso.sharepoint.com/sites/home2' }
     ]
-  };
-
-  const groupResponse = {
-    '@odata.context': 'https://graph.microsoft.com/v1.0/$metadata#groups(id)',
-    value: [
-      { id: '00000000-0000-0000-0000-000000000001' }
-    ]
-  };
-
-  const multipleGroupsResponse = {
-    '@odata.context': 'https://graph.microsoft.com/v1.0/$metadata#groups(id)',
-    value: [
-      { id: '00000000-0000-0000-0000-000000000001' },
-      { id: '00000000-0000-0000-0000-000000000002' }
-    ]
-  };
-
-  const noGroupsResponse = {
-    '@odata.context': 'https://graph.microsoft.com/v1.0/$metadata#groups(id)',
-    value: []
   };
 
   before(() => {
@@ -112,10 +93,10 @@ describe(commands.HOMESITE_SET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('uses SetSPHSite when home site count is 1 and only siteUrl and vivaConnectionsDefaultStart are specified', async () => {
+  it('uses SetSPHSite when home site count is 1 and only siteUrl is specified', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `${spoAdminUrl}/_api/SPO.Tenant/GetTargetedSitesDetails`) {
-        return emptyHomeSiteCountResponse;
+        return homeSiteCountResponse; // 1 home site
       }
       return 'Invalid request';
     });
@@ -249,69 +230,6 @@ describe(commands.HOMESITE_SET, () => {
     assert.deepStrictEqual(postRequestStub.lastCall.args[0].data, requestBody);
   });
 
-  it('sets the specified site as the Home Site with audienceIds', async () => {
-    const requestBody = {
-      siteUrl: siteUrl,
-      configurationParam: { IsAudiencesPresent: true, Audiences: ['00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000002'] }
-    };
-
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `${spoAdminUrl}/_api/SPO.Tenant/GetTargetedSitesDetails`) {
-        return multipleHomeSiteCountResponse;
-      }
-      return 'Invalid request';
-    });
-
-    const postRequestStub = sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `${spoAdminUrl}/_api/SPO.Tenant/UpdateTargetedSite`) {
-        return defaultResponse;
-      }
-      return 'Invalid request';
-    });
-
-    await command.action(logger, {
-      options: {
-        siteUrl: siteUrl,
-        audienceIds: '00000000-0000-0000-0000-000000000001, 00000000-0000-0000-0000-000000000002'
-      }
-    } as any);
-
-    assert.deepStrictEqual(postRequestStub.lastCall.args[0].data, requestBody);
-  });
-
-  it('sets the specified site as the Home Site with audienceNames by transforming to audienceIds', async () => {
-    const requestBody = {
-      siteUrl: siteUrl,
-      configurationParam: { IsAudiencesPresent: true, Audiences: ['00000000-0000-0000-0000-000000000001'] }
-    };
-
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `${spoAdminUrl}/_api/SPO.Tenant/GetTargetedSitesDetails`) {
-        return multipleHomeSiteCountResponse;
-      }
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq 'Marketing Team'&$select=id`) {
-        return groupResponse;
-      }
-      return 'Invalid request';
-    });
-
-    const postRequestStub = sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `${spoAdminUrl}/_api/SPO.Tenant/UpdateTargetedSite`) {
-        return defaultResponse;
-      }
-      return 'Invalid request';
-    });
-
-    await command.action(logger, {
-      options: {
-        siteUrl: siteUrl,
-        audienceNames: 'Marketing Team'
-      }
-    } as any);
-
-    assert.deepStrictEqual(postRequestStub.lastCall.args[0].data, requestBody);
-  });
-
   it('sets the specified site as the Home Site with targetedLicenseType to frontLineWorkers', async () => {
     const requestBody = {
       siteUrl: siteUrl,
@@ -372,6 +290,75 @@ describe(commands.HOMESITE_SET, () => {
     assert.deepStrictEqual(postRequestStub.lastCall.args[0].data, requestBody);
   });
 
+  it('covers transformAudienceNamesToIds with multiple audience names', async () => {
+    const requestBody = {
+      siteUrl: siteUrl,
+      configurationParam: {
+        IsAudiencesPresent: true,
+        Audiences: ['00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000002']
+      }
+    };
+
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `${spoAdminUrl}/_api/SPO.Tenant/GetTargetedSitesDetails`) {
+        return multipleHomeSiteCountResponse;
+      }
+      return 'Invalid request';
+    });
+
+    // Mock entraGroup.getGroupIdByDisplayName to return different IDs for different names
+    const entraGroupStub = sinon.stub(entraGroup, 'getGroupIdByDisplayName');
+    entraGroupStub.withArgs('Marketing Team').resolves('00000000-0000-0000-0000-000000000001');
+    entraGroupStub.withArgs('Sales Team').resolves('00000000-0000-0000-0000-000000000002');
+
+    const postRequestStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `${spoAdminUrl}/_api/SPO.Tenant/UpdateTargetedSite`) {
+        return defaultResponse;
+      }
+      return 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options: {
+        siteUrl: siteUrl,
+        audienceNames: 'Marketing Team, Sales Team'
+      }
+    } as any);
+
+    assert.deepStrictEqual(postRequestStub.lastCall.args[0].data, requestBody);
+    assert(entraGroupStub.calledWith('Marketing Team'));
+    assert(entraGroupStub.calledWith('Sales Team'));
+    assert.strictEqual(entraGroupStub.callCount, 2);
+
+    entraGroupStub.restore();
+  });
+
+  it('uses SetSPHSite when home site count is 0 and only siteUrl is specified', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `${spoAdminUrl}/_api/SPO.Tenant/GetTargetedSitesDetails`) {
+        return emptyHomeSiteCountResponse; // 0 home sites
+      }
+      return 'Invalid request';
+    });
+
+    const postRequestStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `${spoAdminUrl}/_api/SPO.Tenant/SetSPHSite`) {
+        return defaultResponse;
+      }
+      return 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options: {
+        siteUrl: siteUrl
+      }
+    } as any);
+
+    assert.deepStrictEqual(postRequestStub.lastCall.args[0].data, {
+      sphSiteUrl: siteUrl
+    });
+  });
+
   it('sets the specified site as the Home Site with multiple configuration options', async () => {
     const requestBody = {
       siteUrl: siteUrl,
@@ -416,42 +403,6 @@ describe(commands.HOMESITE_SET, () => {
     } as any);
 
     assert.deepStrictEqual(postRequestStub.lastCall.args[0].data, requestBody);
-  });
-
-  it('throws error when group is not found for audienceNames', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq 'NonExistent Group'&$select=id`) {
-        return noGroupsResponse;
-      }
-      return 'Invalid request';
-    });
-
-    await assert.rejects(command.action(logger, {
-      options: {
-        siteUrl: siteUrl,
-        audienceNames: 'NonExistent Group'
-      }
-    } as any), (err: Error) => {
-      return err.message === "Failed to get group ID for 'NonExistent Group': Group 'NonExistent Group' not found";
-    });
-  });
-
-  it('throws error when multiple groups found with same name for audienceNames', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq 'Duplicate Group'&$select=id`) {
-        return multipleGroupsResponse;
-      }
-      return 'Invalid request';
-    });
-
-    await assert.rejects(command.action(logger, {
-      options: {
-        siteUrl: siteUrl,
-        audienceNames: 'Duplicate Group'
-      }
-    } as any), (err: Error) => {
-      return err.message === "Failed to get group ID for 'Duplicate Group': Multiple groups found with name 'Duplicate Group'. Please use group ID instead.";
-    });
   });
 
   it('correctly handles error when setting the Home Site', async () => {

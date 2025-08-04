@@ -7,6 +7,7 @@ import { spo } from '../../../../utils/spo.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
+import { entraGroup } from '../../../../utils/entraGroup.js';
 
 const optionsSchema = globalOptionsZod
   .extend({
@@ -58,6 +59,7 @@ class SpoHomeSiteSetCommand extends SpoCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       if (this.verbose) {
+        await logger.logToStderr('Will not set the home site anymore, only update existing ones...');
         await logger.logToStderr(`Setting the SharePoint home site to: ${args.options.siteUrl}...`);
         await logger.logToStderr('Attempting to retrieve the SharePoint admin URL.');
       }
@@ -74,13 +76,21 @@ class SpoHomeSiteSetCommand extends SpoCommand {
       };
 
       const homeSiteCount = await this.getHomeSiteCount(spoAdminUrl, logger);
+      // Determine if we should use legacy endpoints (easier to remove later)
+      const shouldUseLegacyEndpoints = this.shouldUseLegacyEndpoints(args.options, homeSiteCount);
 
-      if (args.options.vivaConnectionsDefaultStart !== undefined ||
-        args.options.draftMode !== undefined ||
-        args.options.audienceIds !== undefined ||
-        args.options.audienceNames !== undefined ||
-        args.options.targetedLicenseType !== undefined ||
-        args.options.order !== undefined) {
+      if (shouldUseLegacyEndpoints) {
+        requestOptions.data.sphSiteUrl = args.options.siteUrl;
+        if (args.options.vivaConnectionsDefaultStart !== undefined) {
+          requestOptions.url += '/SetSPHSiteWithConfiguration';
+          requestOptions.data.configuration = { vivaConnectionsDefaultStart: args.options.vivaConnectionsDefaultStart };
+        }
+        else {
+          requestOptions.url += '/SetSPHSite';
+        }
+      }
+      else {
+        await logger.logToStderr('DEPRECATION WARNING: Using \'spo homesite set\' to add new home sites is deprecated. Use \'spo homesite add\' instead to add a new home site.');
 
         const configuration: any = {};
         if (args.options.vivaConnectionsDefaultStart !== undefined) {
@@ -107,34 +117,31 @@ class SpoHomeSiteSetCommand extends SpoCommand {
           configuration.IsOrderPresent = true;
           configuration.Order = args.options.order;
         }
-        const hasOnlyVivaConnectionsDefaultStart = args.options.vivaConnectionsDefaultStart !== undefined &&
-          args.options.draftMode === undefined &&
-          args.options.audienceIds === undefined &&
-          args.options.audienceNames === undefined &&
-          args.options.targetedLicenseType === undefined &&
-          args.options.order === undefined;
-        if (homeSiteCount <= 1 && hasOnlyVivaConnectionsDefaultStart) {
-          requestOptions.url += '/SetSPHSiteWithConfiguration';
-          requestOptions.data.sphSiteUrl = args.options.siteUrl;
-          requestOptions.data.configuration = { vivaConnectionsDefaultStart: args.options.vivaConnectionsDefaultStart };;
-        }
-        else {
-          requestOptions.url += '/UpdateTargetedSite';
-          requestOptions.data.siteUrl = args.options.siteUrl;
-          requestOptions.data.configurationParam = configuration;
-        }
+        requestOptions.url += '/UpdateTargetedSite';
+        requestOptions.data.siteUrl = args.options.siteUrl;
+        requestOptions.data.configurationParam = configuration;
       }
-      else if (homeSiteCount <= 1) {
-        requestOptions.url += '/SetSPHSite';
-        requestOptions.data.sphSiteUrl = args.options.siteUrl;
-      }
-
       const res = await request.post(requestOptions);
       await logger.log(res);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
+  }
+
+  private shouldUseLegacyEndpoints(options: Options, homeSiteCount: number): boolean {
+    // Check if only basic options are specified and home site count is low
+    const hasAdvancedOptions = options.draftMode !== undefined ||
+      options.audienceIds !== undefined ||
+      options.audienceNames !== undefined ||
+      options.targetedLicenseType !== undefined ||
+      options.order !== undefined;
+
+    const hasOnlyVivaConnectionsDefaultStart = options.vivaConnectionsDefaultStart !== undefined &&
+      !hasAdvancedOptions;
+
+    // Use legacy endpoints only for simple cases with low home site count
+    return homeSiteCount <= 1 && (!hasAdvancedOptions || hasOnlyVivaConnectionsDefaultStart);
   }
 
   private convertTargetedLicenseTypeToNumber(licenseType: string): number {
@@ -178,39 +185,12 @@ class SpoHomeSiteSetCommand extends SpoCommand {
     }
   }
 
-  private async getGroupIdByName(groupName: string): Promise<string> {
-    try {
-      const requestOptions: CliRequestOptions = {
-        url: `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${groupName.replace(/'/g, "''")}'&$select=id`,
-        headers: {
-          accept: 'application/json'
-        },
-        responseType: 'json'
-      };
-
-      const res = await request.get<{ value: { id: string }[] }>(requestOptions);
-
-      if (res.value.length === 0) {
-        throw new Error(`Group '${groupName}' not found`);
-      }
-
-      if (res.value.length > 1) {
-        throw new Error(`Multiple groups found with name '${groupName}'. Please use group ID instead.`);
-      }
-
-      return res.value[0].id;
-    }
-    catch (err: any) {
-      throw new Error(`Failed to get group ID for '${groupName}': ${err.message}`);
-    }
-  }
-
   private async transformAudienceNamesToIds(audienceNames: string): Promise<string[]> {
     const names = audienceNames.split(',').map(name => name.trim());
     const ids: string[] = [];
 
     for (const name of names) {
-      const id = await this.getGroupIdByName(name);
+      const id = await entraGroup.getGroupIdByDisplayName(name);
       ids.push(id);
     }
 
