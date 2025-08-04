@@ -27,7 +27,7 @@ class SpoFileVersionListCommand extends SpoCommand {
   }
 
   public defaultProperties(): string[] | undefined {
-    return ['Created', 'ID', 'IsCurrentVersion', 'VersionLabel'];
+    return ['Created', 'ID', 'IsCurrentVersion', 'VersionLabel', 'ExpirationDate'];
   }
 
   constructor() {
@@ -97,7 +97,8 @@ class SpoFileVersionListCommand extends SpoCommand {
       else {
         requestUrl += `/GetFileById('${args.options.fileId}')`;
       }
-      requestUrl += `/versions`;
+
+      requestUrl += `/versions?$select=*,ExpirationDate`;
 
       const response = await odata.getAllItems<any>(requestUrl);
       await logger.log(response);

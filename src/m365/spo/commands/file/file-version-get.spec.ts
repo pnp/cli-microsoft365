@@ -28,6 +28,7 @@ describe(commands.FILE_VERSION_GET, () => {
       {
         "CheckInComment": "",
         "Created": "2022-10-30T12:03:06Z",
+        "ExpirationDate": "2026-01-31T08:23:43.0000000Z",
         "ID": 512,
         "IsCurrentVersion": false,
         "Length": "18898",
@@ -37,6 +38,7 @@ describe(commands.FILE_VERSION_GET, () => {
       }
     ]
   };
+  const selectQueryString = "$select=*,ExpirationDate";
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -110,7 +112,7 @@ describe(commands.FILE_VERSION_GET, () => {
 
   it('retrieves version from a file with the fileUrl options', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `${validWebUrl}/_api/web/GetFileByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(validFileUrl)}')/versions/?$filter=VersionLabel eq '${validLabel}'`) {
+      if (opts.url === `${validWebUrl}/_api/web/GetFileByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(validFileUrl)}')/versions/?$filter=VersionLabel eq '${validLabel}'&${selectQueryString}`) {
         return fileVersionResponse;
       }
       throw 'Invalid request';
@@ -129,7 +131,7 @@ describe(commands.FILE_VERSION_GET, () => {
 
   it('retrieves version from a file with the fileId options', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `${validWebUrl}/_api/web/GetFileById('${validFileId}')/versions/?$filter=VersionLabel eq '${validLabel}'`) {
+      if (opts.url === `${validWebUrl}/_api/web/GetFileById('${validFileId}')/versions/?$filter=VersionLabel eq '${validLabel}'&${selectQueryString}`) {
         return fileVersionResponse;
       }
       throw 'Invalid request';
@@ -148,10 +150,11 @@ describe(commands.FILE_VERSION_GET, () => {
 
   it('properly escapes single quotes in fileUrl', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url = `${validWebUrl}/_api/web/GetFileByServerRelativePath(DecodedUrl='Shared%20Documents%2FFo''lde''r')/versions/?$filter=VersionLabel eq '${validLabel}'`) {
+      if (opts.url === `${validWebUrl}/_api/web/GetFileByServerRelativePath(DecodedUrl='%2FShared%20Documents%2FFo''lde''r')/versions/?$filter=VersionLabel eq '${validLabel}'&${selectQueryString}`) {
         return fileVersionResponse;
       }
-      throw 'Invalid request';
+
+      throw 'Invalid GET request ' + opts.url;
     });
 
     await command.action(logger, {
