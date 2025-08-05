@@ -97,7 +97,8 @@ class SpoFileVersionListCommand extends SpoCommand {
       else {
         requestUrl += `/GetFileById('${args.options.fileId}')`;
       }
-      requestUrl += `/versions?$select=CheckInComment,Created,ID,IsCurrentVersion,Length,Size,Url,VersionLabel,ExpirationDate`;
+
+      requestUrl += `/versions?$select=*,ExpirationDate`;
 
       const response = await odata.getAllItems<any>(requestUrl);
       await logger.log(response);

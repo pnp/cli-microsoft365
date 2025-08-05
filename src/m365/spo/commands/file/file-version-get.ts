@@ -107,7 +107,7 @@ class SpoFileVersionGetCommand extends SpoCommand {
       requestUrl += `GetFileById('${args.options.fileId}')/versions/?$filter=VersionLabel eq '${args.options.label}'`;
     }
 
-    requestUrl += `&$select=CheckInComment,Created,ID,IsCurrentVersion,Length,Size,Url,VersionLabel,ExpirationDate`;
+    requestUrl += `&$select=*,ExpirationDate`;
 
     const requestOptions: CliRequestOptions = {
       url: requestUrl,

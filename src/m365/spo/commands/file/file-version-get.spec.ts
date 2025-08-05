@@ -38,7 +38,7 @@ describe(commands.FILE_VERSION_GET, () => {
       }
     ]
   };
-  const selectQueryString = "$select=CheckInComment,Created,ID,IsCurrentVersion,Length,Size,Url,VersionLabel,ExpirationDate";
+  const selectQueryString = "$select=*,ExpirationDate";
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
