@@ -75,73 +75,43 @@ class SpoHomeSiteSetCommand extends SpoCommand {
         data: {}
       };
 
-      const homeSiteCount = await this.getHomeSiteCount(spoAdminUrl, logger);
-      // Determine if we should use legacy endpoints (easier to remove later)
-      const shouldUseLegacyEndpoints = this.shouldUseLegacyEndpoints(args.options, homeSiteCount);
+      await logger.logToStderr('DEPRECATION WARNING: Using \'spo homesite set\' to add new home sites is deprecated. Use \'spo homesite add\' instead to add a new home site.');
 
-      if (shouldUseLegacyEndpoints) {
-        requestOptions.data.sphSiteUrl = args.options.siteUrl;
-        if (args.options.vivaConnectionsDefaultStart !== undefined) {
-          requestOptions.url += '/SetSPHSiteWithConfiguration';
-          requestOptions.data.configuration = { vivaConnectionsDefaultStart: args.options.vivaConnectionsDefaultStart };
-        }
-        else {
-          requestOptions.url += '/SetSPHSite';
-        }
+      const configuration: any = {};
+      if (args.options.vivaConnectionsDefaultStart !== undefined) {
+        configuration.IsVivaConnectionsDefaultStartPresent = true;
+        configuration.vivaConnectionsDefaultStart = args.options.vivaConnectionsDefaultStart;
       }
-      else {
-        await logger.logToStderr('DEPRECATION WARNING: Using \'spo homesite set\' to add new home sites is deprecated. Use \'spo homesite add\' instead to add a new home site.');
+      if (args.options.draftMode !== undefined) {
+        configuration.IsInDraftModePresent = true;
+        configuration.isInDraftMode = args.options.draftMode;
+      }
+      if (args.options.audienceIds !== undefined) {
+        configuration.IsAudiencesPresent = true;
+        configuration.Audiences = args.options.audienceIds.split(',').map(id => id.trim());
+      }
+      if (args.options.audienceNames !== undefined) {
+        configuration.IsAudiencesPresent = true;
+        configuration.Audiences = await this.transformAudienceNamesToIds(args.options.audienceNames);
+      }
+      if (args.options.targetedLicenseType !== undefined) {
+        configuration.IsTargetedLicenseTypePresent = true;
+        configuration.TargetedLicenseType = this.convertTargetedLicenseTypeToNumber(args.options.targetedLicenseType);
+      }
+      if (args.options.order !== undefined) {
+        configuration.IsOrderPresent = true;
+        configuration.Order = args.options.order;
+      }
+      requestOptions.url += '/UpdateTargetedSite';
+      requestOptions.data.siteUrl = args.options.siteUrl;
+      requestOptions.data.configurationParam = configuration;
 
-        const configuration: any = {};
-        if (args.options.vivaConnectionsDefaultStart !== undefined) {
-          configuration.IsVivaConnectionsDefaultStartPresent = true;
-          configuration.vivaConnectionsDefaultStart = args.options.vivaConnectionsDefaultStart;
-        }
-        if (args.options.draftMode !== undefined) {
-          configuration.IsInDraftModePresent = true;
-          configuration.isInDraftMode = args.options.draftMode;
-        }
-        if (args.options.audienceIds !== undefined) {
-          configuration.IsAudiencesPresent = true;
-          configuration.Audiences = args.options.audienceIds.split(',').map(id => id.trim());
-        }
-        if (args.options.audienceNames !== undefined) {
-          configuration.IsAudiencesPresent = true;
-          configuration.Audiences = await this.transformAudienceNamesToIds(args.options.audienceNames);
-        }
-        if (args.options.targetedLicenseType !== undefined) {
-          configuration.IsTargetedLicenseTypePresent = true;
-          configuration.TargetedLicenseType = this.convertTargetedLicenseTypeToNumber(args.options.targetedLicenseType);
-        }
-        if (args.options.order !== undefined) {
-          configuration.IsOrderPresent = true;
-          configuration.Order = args.options.order;
-        }
-        requestOptions.url += '/UpdateTargetedSite';
-        requestOptions.data.siteUrl = args.options.siteUrl;
-        requestOptions.data.configurationParam = configuration;
-      }
       const res = await request.post(requestOptions);
       await logger.log(res);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
-  }
-
-  private shouldUseLegacyEndpoints(options: Options, homeSiteCount: number): boolean {
-    // Check if only basic options are specified and home site count is low
-    const hasAdvancedOptions = options.draftMode !== undefined ||
-      options.audienceIds !== undefined ||
-      options.audienceNames !== undefined ||
-      options.targetedLicenseType !== undefined ||
-      options.order !== undefined;
-
-    const hasOnlyVivaConnectionsDefaultStart = options.vivaConnectionsDefaultStart !== undefined &&
-      !hasAdvancedOptions;
-
-    // Use legacy endpoints only for simple cases with low home site count
-    return homeSiteCount <= 1 && (!hasAdvancedOptions || hasOnlyVivaConnectionsDefaultStart);
   }
 
   private convertTargetedLicenseTypeToNumber(licenseType: string): number {
@@ -152,37 +122,6 @@ class SpoHomeSiteSetCommand extends SpoCommand {
     };
     const result = licenseTypeMap[licenseType];
     return result;
-  }
-
-  private async getHomeSiteCount(spoAdminUrl: string, logger: Logger): Promise<number> {
-    try {
-      if (this.verbose) {
-        await logger.logToStderr('Retrieving current home site count...');
-      }
-
-      const requestOptions: CliRequestOptions = {
-        url: `${spoAdminUrl}/_api/SPO.Tenant/GetTargetedSitesDetails`,
-        headers: {
-          accept: 'application/json;odata=nometadata'
-        },
-        responseType: 'json'
-      };
-
-      const res = await request.get<{ value: any[] }>(requestOptions);
-      const count = res.value ? res.value.length : 0;
-
-      if (this.verbose) {
-        await logger.logToStderr(`Current home site count: ${count}`);
-      }
-
-      return count;
-    }
-    catch (err: any) {
-      if (this.verbose) {
-        await logger.logToStderr(`Warning: Could not retrieve home site count. Defaulting to 0. Error: ${err.message}`);
-      }
-      return 0;
-    }
   }
 
   private async transformAudienceNamesToIds(audienceNames: string): Promise<string[]> {

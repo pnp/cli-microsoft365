@@ -19,32 +19,31 @@ describe(commands.HOMESITE_SET, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
-  let loggerLogSpy: sinon.SinonSpy;
   let commandOptionsSchema: z.ZodTypeAny;
   const siteUrl = 'https://contoso.sharepoint.com/sites/Work';
   const spoAdminUrl = 'https://contoso-admin.sharepoint.com';
 
   const defaultResponse = {
-    "value": `The Home site has been set to ${siteUrl}. It may take some time for the change to apply. Check aka.ms/homesites for details.`
-  };
-
-  const homeSiteCountResponse = {
-    value: [
-      { Url: 'https://contoso.sharepoint.com/sites/home1' }
+    "value": [
+      {
+        "Audiences": [
+          {
+            "Email": "work@contoso.onmicrosoft.com",
+            "Id": "7a1eea7f-9ab0-40ff-8f2e-0083d9d63451",
+            "Title": "active Members"
+          }
+        ],
+        "IsInDraftMode": true,
+        "IsVivaBackendSite": false,
+        "SiteId": "431d7819-4aaf-49a1-b664-b2fe9e609b63",
+        "TargetedLicenseType": 2,
+        "Title": "Work",
+        "Url": "https://contoso.sharepoint.com/sites/Work",
+        "VivaConnectionsDefaultStart": true,
+        "WebId": "626c1724-8ac8-45d5-af87-c07c752fab75"
+      }
     ]
   };
-
-  const emptyHomeSiteCountResponse = {
-    value: null
-  };
-
-  const multipleHomeSiteCountResponse = {
-    value: [
-      { Url: 'https://contoso.sharepoint.com/sites/home1' },
-      { Url: 'https://contoso.sharepoint.com/sites/home2' }
-    ]
-  };
-
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').resolves();
@@ -69,7 +68,6 @@ describe(commands.HOMESITE_SET, () => {
         log.push(msg);
       }
     };
-    loggerLogSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -93,96 +91,11 @@ describe(commands.HOMESITE_SET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('uses SetSPHSite when home site count is 1 and only siteUrl is specified', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `${spoAdminUrl}/_api/SPO.Tenant/GetTargetedSitesDetails`) {
-        return homeSiteCountResponse; // 1 home site
-      }
-      return 'Invalid request';
-    });
-
-    const postRequestStub = sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `${spoAdminUrl}/_api/SPO.Tenant/SetSPHSite`) {
-        return defaultResponse;
-      }
-      return 'Invalid request';
-    });
-
-    await command.action(logger, {
-      options: {
-        siteUrl: siteUrl
-      }
-    } as any);
-
-    assert.deepStrictEqual(postRequestStub.lastCall.args[0].data, {
-      sphSiteUrl: siteUrl
-    });
-  });
-
-  it('sets the specified site as the Home Site', async () => {
-    sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `${spoAdminUrl}/_api/SPO.Tenant/SetSPHSite`) {
-        return defaultResponse;
-      }
-
-      return 'Invalid request';
-    });
-
-    await command.action(logger, {
-      options: {
-        siteUrl: siteUrl,
-        verbose: true
-      }
-    } as any);
-    assert(loggerLogSpy.calledWith());
-  });
-
-  it('sets the specified site as the Home Site with vivaConnectionsDefaultStart using SetSPHSiteWithConfiguration when home site is 1 or less', async () => {
-    const requestBody = {
-      sphSiteUrl: siteUrl,
-      configuration: { vivaConnectionsDefaultStart: true }
-    };
-
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-
-      if (opts.url === `${spoAdminUrl}/_api/SPO.Tenant/GetTargetedSitesDetails`) {
-        return homeSiteCountResponse;
-        ;
-      }
-      return 'Invalid request';
-    });
-
-    const postRequestStub = sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `${spoAdminUrl}/_api/SPO.Tenant/SetSPHSiteWithConfiguration`) {
-        return defaultResponse;
-      }
-      return 'Invalid request';
-    });
-
-    await command.action(logger, {
-      options: {
-        siteUrl: siteUrl,
-        vivaConnectionsDefaultStart: true
-      }
-    } as any);
-
-    assert.deepStrictEqual(postRequestStub.lastCall.args[0].data, requestBody);
-  });
-
   it('sets the specified site as the Home Site with vivaConnectionsDefaultStart using UpdateTargetedSite when multiple home sites', async () => {
     const requestBody = {
       siteUrl: siteUrl,
       configurationParam: { IsVivaConnectionsDefaultStartPresent: true, vivaConnectionsDefaultStart: true }
     };
-
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-
-      if (opts.url === `${spoAdminUrl}/_api/SPO.Tenant/GetTargetedSitesDetails`) {
-        return multipleHomeSiteCountResponse;
-      }
-      return 'Invalid request';
-    });
-
     const postRequestStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `${spoAdminUrl}/_api/SPO.Tenant/UpdateTargetedSite`) {
         return defaultResponse;
@@ -205,13 +118,6 @@ describe(commands.HOMESITE_SET, () => {
       siteUrl: siteUrl,
       configurationParam: { IsInDraftModePresent: true, isInDraftMode: true }
     };
-
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `${spoAdminUrl}/_api/SPO.Tenant/GetTargetedSitesDetails`) {
-        return emptyHomeSiteCountResponse;
-      }
-      return 'Invalid request';
-    });
 
     const postRequestStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `${spoAdminUrl}/_api/SPO.Tenant/UpdateTargetedSite`) {
@@ -236,13 +142,6 @@ describe(commands.HOMESITE_SET, () => {
       configurationParam: { IsTargetedLicenseTypePresent: true, TargetedLicenseType: 1 }
     };
 
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `${spoAdminUrl}/_api/SPO.Tenant/GetTargetedSitesDetails`) {
-        return multipleHomeSiteCountResponse;
-      }
-      return 'Invalid request';
-    });
-
     const postRequestStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `${spoAdminUrl}/_api/SPO.Tenant/UpdateTargetedSite`) {
         return defaultResponse;
@@ -265,14 +164,6 @@ describe(commands.HOMESITE_SET, () => {
       siteUrl: siteUrl,
       configurationParam: { IsTargetedLicenseTypePresent: true, TargetedLicenseType: 2 }
     };
-
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `${spoAdminUrl}/_api/SPO.Tenant/GetTargetedSitesDetails`) {
-        return multipleHomeSiteCountResponse;
-      }
-      return 'Invalid request';
-    });
-
     const postRequestStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `${spoAdminUrl}/_api/SPO.Tenant/UpdateTargetedSite`) {
         return defaultResponse;
@@ -298,14 +189,6 @@ describe(commands.HOMESITE_SET, () => {
         Audiences: ['00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000002']
       }
     };
-
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `${spoAdminUrl}/_api/SPO.Tenant/GetTargetedSitesDetails`) {
-        return multipleHomeSiteCountResponse;
-      }
-      return 'Invalid request';
-    });
-
     // Mock entraGroup.getGroupIdByDisplayName to return different IDs for different names
     const entraGroupStub = sinon.stub(entraGroup, 'getGroupIdByDisplayName');
     entraGroupStub.withArgs('Marketing Team').resolves('00000000-0000-0000-0000-000000000001');
@@ -333,32 +216,6 @@ describe(commands.HOMESITE_SET, () => {
     entraGroupStub.restore();
   });
 
-  it('uses SetSPHSite when home site count is 0 and only siteUrl is specified', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `${spoAdminUrl}/_api/SPO.Tenant/GetTargetedSitesDetails`) {
-        return emptyHomeSiteCountResponse; // 0 home sites
-      }
-      return 'Invalid request';
-    });
-
-    const postRequestStub = sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `${spoAdminUrl}/_api/SPO.Tenant/SetSPHSite`) {
-        return defaultResponse;
-      }
-      return 'Invalid request';
-    });
-
-    await command.action(logger, {
-      options: {
-        siteUrl: siteUrl
-      }
-    } as any);
-
-    assert.deepStrictEqual(postRequestStub.lastCall.args[0].data, {
-      sphSiteUrl: siteUrl
-    });
-  });
-
   it('sets the specified site as the Home Site with multiple configuration options', async () => {
     const requestBody = {
       siteUrl: siteUrl,
@@ -375,13 +232,6 @@ describe(commands.HOMESITE_SET, () => {
         Audiences: ['00000000-0000-0000-0000-000000000001']
       }
     };
-
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `${spoAdminUrl}/_api/SPO.Tenant/GetTargetedSitesDetails`) {
-        return multipleHomeSiteCountResponse;
-      }
-      return 'Invalid request';
-    });
 
     const postRequestStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `${spoAdminUrl}/_api/SPO.Tenant/UpdateTargetedSite`) {
