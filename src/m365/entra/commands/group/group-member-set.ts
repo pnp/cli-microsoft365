@@ -137,7 +137,7 @@ class EntraGroupMemberSetCommand extends GraphCommand {
       }
 
       if (args.options.ids) {
-        await this.warn(logger, `Option 'ids' is deprecated and will be removed in the next major release. Please use 'userIds' instead`);
+        await this.warn(logger, `Option 'ids' is deprecated and will be removed in the next major release. Please use 'userIds' instead.`);
       }
 
       if (this.verbose) {

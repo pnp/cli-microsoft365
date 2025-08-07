@@ -127,6 +127,10 @@ class EntraGroupMemberAddCommand extends GraphCommand {
           }
         }
 
+        if ((args.options.subgroupIds || args.options.subgroupNames) && args.options.role === 'Owner') {
+          return `Subgroups cannot be set as owners.`;
+        }
+
         if (this.roleValues.indexOf(args.options.role) === -1) {
           return `Option 'role' must be one of the following values: ${this.roleValues.join(', ')}.`;
         }
@@ -154,7 +158,7 @@ class EntraGroupMemberAddCommand extends GraphCommand {
       }
 
       if (args.options.ids) {
-        await this.warn(logger, `Option 'ids' is deprecated and will be removed in the next major release. Please use 'userIds' instead`);
+        await this.warn(logger, `Option 'ids' is deprecated and will be removed in the next major release. Please use 'userIds' instead.`);
       }
 
       if (this.verbose) {
@@ -219,10 +223,15 @@ class EntraGroupMemberAddCommand extends GraphCommand {
 
   private async getObjectIds(logger: Logger, options: Options): Promise<string[]> {
     if (options.ids || options.userIds || options.userNames) {
-      return await this.getUserIds(logger, options);
+      return this.getUserIds(logger, options);
     }
 
-    return await this.getGroupIds(logger, options);
+    return this.getGroupIds(logger, options);
+    //if (options.ids || options.userIds || options.userNames) {
+    //  return await this.getUserIds(logger, options);
+    //}
+
+    //return await this.getGroupIds(logger, options);
   }
 
   private async getUserIds(logger: Logger, options: Options): Promise<string[]> {

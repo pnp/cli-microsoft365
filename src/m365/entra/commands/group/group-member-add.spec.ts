@@ -102,6 +102,16 @@ describe(commands.GROUP_MEMBER_ADD, () => {
     assert.notStrictEqual(actual, true);
   });
 
+  it('fails validation if subgroups specified by ids are added as owners', async () => {
+    const actual = await command.validate({ options: { groupId: groupId, subgroupIds: groupIds.join(','), role: 'Owner' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if subgroups specified by names are added as owners', async () => {
+    const actual = await command.validate({ options: { groupId: groupId, subgroupNames: groupNames.join(','), role: 'Owner' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
   it('passes validation when all required parameters are valid with ids', async () => {
     const actual = await command.validate({ options: { groupId: groupId, ids: userIds.join(','), role: 'Member' } }, commandInfo);
     assert.strictEqual(actual, true);
@@ -128,17 +138,17 @@ describe(commands.GROUP_MEMBER_ADD, () => {
   });
 
   it('passes validation when all required parameters are valid with group names', async () => {
-    const actual = await command.validate({ options: { groupDisplayName: 'IT department', subgroupNames: groupNames.join(','), role: 'Owner' } }, commandInfo);
+    const actual = await command.validate({ options: { groupDisplayName: 'IT department', subgroupNames: groupNames.join(','), role: 'Member' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('passes validation when all required parameters are valid with names with trailing spaces', async () => {
-    const actual = await command.validate({ options: { groupDisplayName: 'IT department', userNames: userUpns.map(u => u + ' ').join(','), role: 'Owner' } }, commandInfo);
+    const actual = await command.validate({ options: { groupDisplayName: 'IT department', userNames: userUpns.map(u => u + ' ').join(','), role: 'Member' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('passes validation when all required parameters are valid with group names with trailing spaces', async () => {
-    const actual = await command.validate({ options: { groupDisplayName: 'IT department', subgroupNames: groupNames.map(u => u + ' ').join(','), role: 'Owner' } }, commandInfo);
+    const actual = await command.validate({ options: { groupDisplayName: 'IT department', subgroupNames: groupNames.map(u => u + ' ').join(','), role: 'Member' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
@@ -189,7 +199,7 @@ describe(commands.GROUP_MEMBER_ADD, () => {
     });
 
     await command.action(logger, { options: { groupDisplayName: 'IT department', ids: userIds.join(','), role: 'Member', verbose: true } });
-    assert(loggerErrSpy.calledWith(chalk.yellow(`Option 'ids' is deprecated and will be removed in the next major release. Please use 'userIds' instead`)));
+    assert(loggerErrSpy.calledWith(chalk.yellow(`Option 'ids' is deprecated and will be removed in the next major release. Please use 'userIds' instead.`)));
 
     sinonUtil.restore(loggerErrSpy);
   });

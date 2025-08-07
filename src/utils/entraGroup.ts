@@ -212,7 +212,10 @@ export const entraGroup = {
           groupIds.push(response.body.value[0].id);
         }
         else if (response.body.value.length > 1) {
-          throw Error(`Multiple groups with the name '${namesChunk[response.id - 1]}' found.`);
+          const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', response.body.value);
+          const result = await cli.handleMultipleResultsFound<Group>(`Multiple groups with the name '${namesChunk[response.id - 1]}' found.`, resultAsKeyValuePair);
+          groupIds.push(result.id!);
+          //throw Error(`Multiple groups with the name '${namesChunk[response.id - 1]}' found.`);
         }
         else {
           throw Error(`The specified group with name '${namesChunk[response.id - 1]}' does not exist.`);

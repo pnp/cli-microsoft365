@@ -229,7 +229,7 @@ describe(commands.GROUP_MEMBER_SET, () => {
     });
 
     await command.action(logger, { options: { groupDisplayName: 'Contoso', ids: userIds.join(','), role: 'Member', verbose: true } });
-    assert(loggerErrSpy.calledWith(chalk.yellow(`Option 'ids' is deprecated and will be removed in the next major release. Please use 'userIds' instead`)));
+    assert(loggerErrSpy.calledWith(chalk.yellow(`Option 'ids' is deprecated and will be removed in the next major release. Please use 'userIds' instead.`)));
 
     sinonUtil.restore(loggerErrSpy);
   });

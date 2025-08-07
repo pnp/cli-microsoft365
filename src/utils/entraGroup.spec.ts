@@ -419,12 +419,12 @@ describe('utils/entraGroup', () => {
     await assert.rejects(entraGroup.getGroupIdsByDisplayNames(groupNames), Error(`The specified group with name '${groupNames[groupNames.length - 1]}' does not exist.`));
   });
 
-  it('correctly throws error when multiple groups were found with a specific display name', async () => {
+  it('handles selecting single result when multiple groups were found with a specific display name  and cli is set to prompt with specified properties', async () => {
     const groupNames = ['group1', 'group2', 'group3', 'group4', 'group5', 'group6', 'group7', 'group8', 'group9', 'group10', 'group11', 'group12', 'group13', 'group14', 'group15', 'group16', 'group17', 'group18', 'group19', 'group20', 'group21', 'group22', 'group23', 'group24', 'group25'];
     const groupIds = ['5acd04e0-1234-abcd-0a9c-000000000001', '5acd04e0-1234-abcd-0a9c-000000000002', '5acd04e0-1234-abcd-0a9c-000000000003', '5acd04e0-1234-abcd-0a9c-000000000004', '5acd04e0-1234-abcd-0a9c-000000000005', '5acd04e0-1234-abcd-0a9c-000000000006', '5acd04e0-1234-abcd-0a9c-000000000007', '5acd04e0-1234-abcd-0a9c-000000000008', '5acd04e0-1234-abcd-0a9c-000000000009', '5acd04e0-1234-abcd-0a9c-000000000010', '5acd04e0-1234-abcd-0a9c-000000000011', '5acd04e0-1234-abcd-0a9c-000000000012', '5acd04e0-1234-abcd-0a9c-000000000013', '5acd04e0-1234-abcd-0a9c-000000000014', '5acd04e0-1234-abcd-0a9c-000000000015', '5acd04e0-1234-abcd-0a9c-000000000016', '5acd04e0-1234-abcd-0a9c-000000000017', '5acd04e0-1234-abcd-0a9c-000000000018', '5acd04e0-1234-abcd-0a9c-000000000019', '5acd04e0-1234-abcd-0a9c-000000000020', '5acd04e0-1234-abcd-0a9c-000000000021', '5acd04e0-1234-abcd-0a9c-000000000022', '5acd04e0-1234-abcd-0a9c-000000000023', '5acd04e0-1234-abcd-0a9c-000000000024', '5acd04e0-1234-abcd-0a9c-000000000025'];
 
     let counter = 0;
-    sinon.stub(request, 'post').callsFake(async opts => {
+    const postStub = sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/$batch`) {
         return {
           responses: groupIds.slice(counter, counter + 20).map(groupId => {
@@ -459,6 +459,11 @@ describe('utils/entraGroup', () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(entraGroup.getGroupIdsByDisplayNames(groupNames), Error(`Multiple groups with the name '${groupNames[groupNames.length - 1]}' found.`));
+    sinon.stub(cli, 'handleMultipleResultsFound').resolves({ id: '5acd04e0-1234-abcd-0a9c-000000000025' });
+
+    const actual = await entraGroup.getGroupIdsByDisplayNames(groupNames);
+    assert.deepStrictEqual(postStub.firstCall.args[0].data.requests, groupNames.slice(0, 20).map((name, i) => ({ id: i + 1, method: 'GET', url: `/groups?$filter=displayName eq '${formatting.encodeQueryParameter(name)}'&$select=id`, headers: { accept: 'application/json;odata.metadata=none' } })));
+    assert.deepStrictEqual(postStub.lastCall.args[0].data.requests, groupNames.slice(20, 40).map((name, i) => ({ id: i + 1, method: 'GET', url: `/groups?$filter=displayName eq '${formatting.encodeQueryParameter(name)}'&$select=id`, headers: { accept: 'application/json;odata.metadata=none' } })));
+    assert.deepStrictEqual(actual, groupIds);
   });
 }); 
