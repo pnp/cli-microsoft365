@@ -227,11 +227,6 @@ class EntraGroupMemberAddCommand extends GraphCommand {
     }
 
     return this.getGroupIds(logger, options);
-    //if (options.ids || options.userIds || options.userNames) {
-    //  return await this.getUserIds(logger, options);
-    //}
-
-    //return await this.getGroupIds(logger, options);
   }
 
   private async getUserIds(logger: Logger, options: Options): Promise<string[]> {
