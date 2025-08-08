@@ -1,0 +1,29 @@
+# v11 Upgrade Guidance
+
+The v11 release of CLI for Microsoft 365 introduces several breaking changes. To assist you in upgrading to the latest version, we’ve outlined the changes and the actions you may need to take.
+
+## Viva Engage
+
+### Removed command `viva engage group list`
+
+The command used an unstable undocumented API that required extra scopes to be consented on the app registration.
+
+#### What action do I need to take?
+
+Instead of using the `viva engage group list` command, use the [viva engage community list](.cmd/viva/engage/engage-community-list.mdx) command.
+
+### Removed command `viva engage group user add`
+
+The command used an unstable undocumented API that required extra scopes to be consented on the app registration.
+
+#### What action do I need to take?
+
+Instead of using the `viva engage group user add` command, use the [viva engage community user add](.cmd/viva/engage/engage-community-user-add.mdx) command.
+
+### Removed command `viva engage group user remove`
+
+The command used an unstable undocumented API that required extra scopes to be consented on the app registration.
+
+#### What action do I need to take?
+
+Instead of using the `viva engage group user remove` command, use the [viva engage community user remove](.cmd/viva/engage/engage-community-user-remove.mdx) command.
