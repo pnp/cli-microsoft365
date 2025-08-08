@@ -4,6 +4,7 @@ import { Logger } from '../../../../cli/Logger.js';
 import request from '../../../../request.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { Page } from './Page.js';
+import { formatting } from '../../../../utils/formatting.js';
 
 describe('Page', () => {
   let log: string[];
@@ -216,7 +217,7 @@ describe('Page', () => {
     });
 
     Page
-      .checkout('page.aspx', 'https://contoso.sharepoint.com', logger, false, false)
+      .checkout('page.aspx', 'https://contoso.sharepoint.com', logger, false)
       .then((): void => {
         done();
       }, (): void => {
@@ -230,7 +231,7 @@ describe('Page', () => {
     });
 
     Page
-      .checkout('page.aspx', 'https://contoso.sharepoint.com', logger, false, false)
+      .checkout('page.aspx', 'https://contoso.sharepoint.com', logger, false)
       .then((): void => {
         done(new Error('Parsing page didn\'t fail while expected'));
       }, (): void => {
@@ -248,7 +249,7 @@ describe('Page', () => {
     });
 
     Page
-      .checkout('page.aspx', 'https://contoso.sharepoint.com', logger, false, false)
+      .checkout('page.aspx', 'https://contoso.sharepoint.com', logger, false)
       .then((): void => {
         done(new Error('Parsing page didn\'t fail while expected'));
       }, (): void => {
@@ -256,5 +257,18 @@ describe('Page', () => {
       });
 
     assert(getCallIssued);
+  });
+
+  it('correctly publishes a modern page', async () => {
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/marketing/_api/web/GetFileByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter('/sites/marketing/SitePages/home.aspx')}')/Publish()`) {
+        return;
+      }
+
+      throw 'Invalid request: ' + opts.url;
+    });
+
+    await Page.publishPage('https://contoso.sharepoint.com/sites/marketing', 'home.aspx');
+    assert(postStub.calledOnce);
   });
 });

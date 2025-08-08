@@ -75,7 +75,19 @@ describe(commands.PAGE_SECTION_ADD, () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://contoso.sharepoint.com/sites/newsletter/_api/sitepages/pages/GetByUrl('sitepages/home.aspx')/checkoutpage`) {
         checkedOut = true;
-        return;
+        return {
+          Title: "article",
+          Id: 1,
+          TopicHeader: "TopicHeader",
+          AuthorByline: "AuthorByline",
+          Description: "Description",
+          BannerImageUrl: {
+            Description: '/_layouts/15/images/sitepagethumbnail.png',
+            Url: `https://contoso.sharepoint.com/_layouts/15/images/sitepagethumbnail.png`
+          },
+          CanvasContent1: "{}",
+          LayoutWebpartsContent: "{}"
+        };
       }
 
       if (opts.url === `https://contoso.sharepoint.com/sites/newsletter/_api/sitepages/pages/GetByUrl('sitepages/home.aspx')/savepage`) {
@@ -824,7 +836,7 @@ describe(commands.PAGE_SECTION_ADD, () => {
         iconAlignment: 'Right'
       }
     });
-    assert.deepStrictEqual(postStub.lastCall.args[0].data, { "CanvasContent1": "[{\"displayMode\":2,\"position\":{\"zoneIndex\":1,\"sectionIndex\":1,\"sectionFactor\":12,\"layoutIndex\":1},\"emphasis\":{},\"zoneGroupMetadata\":{\"type\":1,\"isExpanded\":false,\"showDividerLine\":false,\"iconAlignment\":\"right\"}},{\"controlType\":0,\"pageSettingsSlice\":{\"isDefaultDescription\":true,\"isDefaultThumbnail\":true}}]" });
+    assert.deepStrictEqual(postStub.lastCall.args[0].data, { "CanvasContent1": "[{\"displayMode\":2,\"position\":{\"zoneIndex\":1,\"sectionIndex\":1,\"sectionFactor\":12,\"layoutIndex\":1},\"emphasis\":{},\"zoneGroupMetadata\":{\"type\":1,\"isExpanded\":false,\"showDividerLine\":false,\"iconAlignment\":\"right\",\"headingLevel\":2}},{\"controlType\":0,\"pageSettingsSlice\":{\"isDefaultDescription\":true,\"isDefaultThumbnail\":true}}]" });
   });
 
   it('adds a OneColumn section at the end to an uncustomized page with collapsible setting and left iconAlignment', async () => {
@@ -857,7 +869,7 @@ describe(commands.PAGE_SECTION_ADD, () => {
         iconAlignment: 'Left'
       }
     });
-    assert.deepStrictEqual(postStub.lastCall.args[0].data, { "CanvasContent1": "[{\"displayMode\":2,\"position\":{\"zoneIndex\":1,\"sectionIndex\":1,\"sectionFactor\":12,\"layoutIndex\":1},\"emphasis\":{},\"zoneGroupMetadata\":{\"type\":1,\"isExpanded\":false,\"showDividerLine\":false,\"iconAlignment\":\"left\"}},{\"controlType\":0,\"pageSettingsSlice\":{\"isDefaultDescription\":true,\"isDefaultThumbnail\":true}}]" });
+    assert.deepStrictEqual(postStub.lastCall.args[0].data, { "CanvasContent1": "[{\"displayMode\":2,\"position\":{\"zoneIndex\":1,\"sectionIndex\":1,\"sectionFactor\":12,\"layoutIndex\":1},\"emphasis\":{},\"zoneGroupMetadata\":{\"type\":1,\"isExpanded\":false,\"showDividerLine\":false,\"iconAlignment\":\"left\",\"headingLevel\":2}},{\"controlType\":0,\"pageSettingsSlice\":{\"isDefaultDescription\":true,\"isDefaultThumbnail\":true}}]" });
   });
 
   it('adds a OneColumn section at the end to an uncustomized page with collapsible setting and section title', async () => {
@@ -891,7 +903,104 @@ describe(commands.PAGE_SECTION_ADD, () => {
         collapsibleTitle: 'Collapsible section title'
       }
     });
-    assert.deepStrictEqual(postStub.lastCall.args[0].data, { "CanvasContent1": "[{\"displayMode\":2,\"position\":{\"zoneIndex\":1,\"sectionIndex\":1,\"sectionFactor\":12,\"layoutIndex\":1},\"emphasis\":{},\"zoneGroupMetadata\":{\"type\":1,\"isExpanded\":false,\"showDividerLine\":false,\"iconAlignment\":\"right\",\"displayName\":\"Collapsible section title\"}},{\"controlType\":0,\"pageSettingsSlice\":{\"isDefaultDescription\":true,\"isDefaultThumbnail\":true}}]" });
+    assert.deepStrictEqual(postStub.lastCall.args[0].data, { "CanvasContent1": "[{\"displayMode\":2,\"position\":{\"zoneIndex\":1,\"sectionIndex\":1,\"sectionFactor\":12,\"layoutIndex\":1},\"emphasis\":{},\"zoneGroupMetadata\":{\"type\":1,\"isExpanded\":false,\"showDividerLine\":false,\"iconAlignment\":\"right\",\"displayName\":\"Collapsible section title\",\"headingLevel\":2}},{\"controlType\":0,\"pageSettingsSlice\":{\"isDefaultDescription\":true,\"isDefaultThumbnail\":true}}]" });
+  });
+
+  it('adds a OneColumn section at the end to an uncustomized page with collapsible setting and headingLevel', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/newsletter/_api/sitepages/pages/GetByUrl('sitepages/home.aspx')?$select=CanvasContent1,IsPageCheckedOutToCurrentUser`) {
+        return {
+          "IsPageCheckedOutToCurrentUser": true,
+          "CanvasContent1": "[{\"controlType\":0,\"pageSettingsSlice\":{\"isDefaultDescription\":true,\"isDefaultThumbnail\":true}}]"
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/newsletter/_api/sitepages/pages/GetByUrl('sitepages/home.aspx')/savepage`) {
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options:
+      {
+        pageName: 'home.aspx',
+        webUrl: 'https://contoso.sharepoint.com/sites/newsletter',
+        sectionTemplate: 'OneColumn',
+        isCollapsibleSection: true,
+        headingLevel: 3
+      }
+    });
+    assert.deepStrictEqual(postStub.lastCall.args[0].data, { "CanvasContent1": "[{\"displayMode\":2,\"position\":{\"zoneIndex\":1,\"sectionIndex\":1,\"sectionFactor\":12,\"layoutIndex\":1},\"emphasis\":{},\"zoneGroupMetadata\":{\"type\":1,\"isExpanded\":false,\"showDividerLine\":false,\"iconAlignment\":\"left\",\"headingLevel\":3}},{\"controlType\":0,\"pageSettingsSlice\":{\"isDefaultDescription\":true,\"isDefaultThumbnail\":true}}]" });
+  });
+
+  it('adds a Flexible section at the end to an uncustomized page', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/newsletter/_api/sitepages/pages/GetByUrl('sitepages/home.aspx')?$select=CanvasContent1,IsPageCheckedOutToCurrentUser`) {
+        return {
+          "IsPageCheckedOutToCurrentUser": true,
+          "CanvasContent1": "[{\"controlType\":0,\"pageSettingsSlice\":{\"isDefaultDescription\":true,\"isDefaultThumbnail\":true}}]"
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/newsletter/_api/sitepages/pages/GetByUrl('sitepages/home.aspx')/savepage`) {
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options:
+      {
+        pageName: 'home.aspx',
+        webUrl: 'https://contoso.sharepoint.com/sites/newsletter',
+        sectionTemplate: 'Flexible'
+      }
+    });
+    assert.deepStrictEqual(postStub.lastCall.args[0].data, { "CanvasContent1": "[{\"displayMode\":2,\"position\":{\"zoneIndex\":1,\"sectionIndex\":1,\"sectionFactor\":100,\"layoutIndex\":1},\"emphasis\":{},\"zoneReflowStrategy\":{\"axis\":0}},{\"controlType\":0,\"pageSettingsSlice\":{\"isDefaultDescription\":true,\"isDefaultThumbnail\":true}}]" });
+  });
+
+  it('adds a Flexible section at the end to an uncustomized page with zoneHeight and zoneReflowStrategy parameters', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/newsletter/_api/sitepages/pages/GetByUrl('sitepages/home.aspx')?$select=CanvasContent1,IsPageCheckedOutToCurrentUser`) {
+        return {
+          "IsPageCheckedOutToCurrentUser": true,
+          "CanvasContent1": "[{\"controlType\":0,\"pageSettingsSlice\":{\"isDefaultDescription\":true,\"isDefaultThumbnail\":true}}]"
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/newsletter/_api/sitepages/pages/GetByUrl('sitepages/home.aspx')/savepage`) {
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options:
+      {
+        pageName: 'home.aspx',
+        webUrl: 'https://contoso.sharepoint.com/sites/newsletter',
+        sectionTemplate: 'Flexible',
+        zoneHeight: 500,
+        zoneReflowStrategy: 'TopToBottom'
+      }
+    });
+    assert.deepStrictEqual(postStub.lastCall.args[0].data, { "CanvasContent1": "[{\"displayMode\":2,\"position\":{\"zoneIndex\":1,\"sectionIndex\":1,\"sectionFactor\":100,\"layoutIndex\":1},\"emphasis\":{},\"zoneReflowStrategy\":{\"axis\":0},\"zoneHeight\":500},{\"controlType\":0,\"pageSettingsSlice\":{\"isDefaultDescription\":true,\"isDefaultThumbnail\":true}}]" });
   });
 
   it('correctly handles random API error', async () => {
@@ -908,6 +1017,66 @@ describe(commands.PAGE_SECTION_ADD, () => {
         order: 2
       }
     } as any), new CommandError('An error has occurred'));
+  });
+
+  it('fails when trying to add a vertical section while a full-width section is already on the page.', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/newsletter/_api/sitepages/pages/GetByUrl('sitepages/home.aspx')?$select=CanvasContent1,IsPageCheckedOutToCurrentUser`) {
+        return {
+          "IsPageCheckedOutToCurrentUser": true,
+          "CanvasContent1": "[{\"position\":{\"layoutIndex\":1,\"zoneIndex\":1,\"sectionIndex\":1,\"controlIndex\":1,\"sectionFactor\":0,\"zoneId\":\"0158a0e8-20ad-4d8d-9cdc-6e1fde815a35\"},\"id\":\"emptySection\",\"addedFromPersistedData\":true},{\"controlType\":0,\"pageSettingsSlice\":{\"isDefaultDescription\":true,\"isDefaultThumbnail\":true}}]"
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/newsletter/_api/sitepages/pages/GetByUrl('sitepages/home.aspx')/savepage`) {
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await assert.rejects(command.action(logger, {
+      options:
+      {
+        pageName: 'home.aspx',
+        webUrl: 'https://contoso.sharepoint.com/sites/newsletter',
+        sectionTemplate: 'Vertical'
+      }
+    } as any), new CommandError('A full-width section already exists on the page. A vertical section cannot be added to a page that already has a full-width section.'));
+  });
+
+  it('fails when trying to add a full-width section while a vertical section is already on the page.', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/newsletter/_api/sitepages/pages/GetByUrl('sitepages/home.aspx')?$select=CanvasContent1,IsPageCheckedOutToCurrentUser`) {
+        return {
+          "IsPageCheckedOutToCurrentUser": true,
+          "CanvasContent1": "[{\"position\":{\"layoutIndex\":2,\"zoneIndex\":1,\"sectionIndex\":1,\"controlIndex\":1,\"sectionFactor\":12,\"zoneId\":\"0158a0e8-20ad-4d8d-9cdc-6e1fde815a35\"},\"id\":\"emptySection\",\"addedFromPersistedData\":true},{\"controlType\":0,\"pageSettingsSlice\":{\"isDefaultDescription\":true,\"isDefaultThumbnail\":true}}]"
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/newsletter/_api/sitepages/pages/GetByUrl('sitepages/home.aspx')/savepage`) {
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await assert.rejects(command.action(logger, {
+      options:
+      {
+        pageName: 'home.aspx',
+        webUrl: 'https://contoso.sharepoint.com/sites/newsletter',
+        sectionTemplate: 'OneColumnFullWidth'
+      }
+    } as any), new CommandError('A vertical section already exists on the page. A full-width section cannot be added to a page that already has a vertical section.'));
   });
 
   it('fails validation if order has invalid (negative) value', async () => {
@@ -1098,6 +1267,68 @@ describe(commands.PAGE_SECTION_ADD, () => {
     }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
+
+  it('fails validation if zoneReflowStrategy is valid but sectionTemplate is not Flexible', async () => {
+    const actual = await command.validate({
+      options: {
+        pageName: 'page.aspx',
+        webUrl: 'https://contoso.sharepoint.com',
+        sectionTemplate: 'OneColumn',
+        zoneReflowStrategy: 'LeftToRight'
+      }
+    }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if zoneHeight is valid but sectionTemplate is not Flexible', async () => {
+    const actual = await command.validate({
+      options: {
+        pageName: 'page.aspx',
+        webUrl: 'https://contoso.sharepoint.com',
+        sectionTemplate: 'OneColumn',
+        zoneHeight: 300
+      }
+    }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if zoneReflowStrategy is not valid and sectionTemplate is Flexible', async () => {
+    const actual = await command.validate({
+      options: {
+        pageName: 'page.aspx',
+        webUrl: 'https://contoso.sharepoint.com',
+        sectionTemplate: 'Flexible',
+        zoneReflowStrategy: 'Invalid'
+      }
+    }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if zoneHeight is not valid and sectionTemplate is Flexible', async () => {
+    const actual = await command.validate({
+      options: {
+        pageName: 'page.aspx',
+        webUrl: 'https://contoso.sharepoint.com',
+        sectionTemplate: 'Flexible',
+        zoneHeight: -1
+      }
+    }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if headingLevel is not valid', async () => {
+    const actual = await command.validate({
+      options: {
+        pageName: 'page.aspx',
+        webUrl: 'https://contoso.sharepoint.com',
+        sectionTemplate: 'OneColumn',
+        isCollapsibleSection: true,
+        headingLevel: 6
+      }
+    }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
 
   it('passes validation if all the parameters are specified for a regular Section', async () => {
     const actual = await command.validate({

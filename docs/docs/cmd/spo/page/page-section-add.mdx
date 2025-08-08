@@ -20,7 +20,7 @@ m365 spo page section add [options]
 : URL of the site where the page to retrieve is located.
 
 `-t, --sectionTemplate <sectionTemplate>`
-: Type of section to add. Allowed values `OneColumn`, `OneColumnFullWidth`, `TwoColumn`, `ThreeColumn`, `TwoColumnLeft`, `TwoColumnRight`, `Vertical`.
+: Type of section to add. Allowed values `OneColumn`, `OneColumnFullWidth`, `TwoColumn`, `ThreeColumn`, `TwoColumnLeft`, `TwoColumnRight`, `Vertical`, `Flexible`.
 
 `--order [order]`
 : Order of the section to add.
@@ -42,6 +42,9 @@ m365 spo page section add [options]
 
 `--isExpanded`
 : Sets the default display state of the collapsible section. Sets `false` if not specified.
+
+`--headingLevel [headingLevel]`	
+: Heading level of collapsible section Allowed values `2`, `3`, `4`.
 
 `--gradientText [gradientText]`
 : Sets the gradient setting of the background of a section. Required when `zoneEmphasis` is `Gradient`.
@@ -68,7 +71,13 @@ m365 spo page section add [options]
 : The overlay opacity for the background. Applied only when `zoneEmphasis` is `Image` or `Gradient`. Sets `60` value if not specified.
 
 `--collapsibleTitle [collapsibleTitle]`	
-: The display name of the collapsible section
+: The display name of the collapsible section.
+
+`--zoneReflowStrategy [zoneReflowStrategy]`	
+: Mobile and email reflow. Allowed values `TopToBottom`, `LeftToRight`. Applied only for `Flexible` section.
+
+`--zoneHeight [zoneHeight]`	
+: Section height. Minimum value is `34`. Applied only for `Flexible` section.
 ```
 
 <Global />
@@ -115,6 +124,12 @@ Add OneColumn section as a collapsible section as expanded with icon aligned to 
 m365 spo page section add --pageName home.aspx --webUrl https://contoso.sharepoint.com/sites/newsletter --sectionTemplate OneColumn --isCollapsibleSection --isExpanded --iconAlignment Left
 ```
 
+Add OneColumn section as a collapsible section as expanded with headingLevel 3
+
+```sh
+m365 spo page section add --pageName home.aspx --webUrl https://contoso.sharepoint.com/sites/newsletter --sectionTemplate OneColumn --isCollapsibleSection --isExpanded --headingLevel 3
+```
+
 Add TwoColumn section with Image background
 
 ```sh
@@ -127,6 +142,11 @@ Add OneColumn section with Gradient background
 m365 spo page section add --pageName home.aspx --webUrl https://contoso.sharepoint.com/sites/newsletter --sectionTemplate TwoColumn --zoneEmphasis Gradient --gradientText "linear-gradient(72.44deg, #E6FBFE 0%, #EDDDFB 100%)"
 ```
 
+Add a Flexible section to the modern page with mobile and email reflow and section height.
+
+```sh
+m365 spo page section add --pageName home.aspx --webUrl https://contoso.sharepoint.com/sites/newsletter --sectionTemplate Flexible --zoneHeight 100 --zoneReflowStrategy LeftToRight
+```
 
 ## Response
 

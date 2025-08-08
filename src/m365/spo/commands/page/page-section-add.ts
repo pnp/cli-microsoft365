@@ -8,6 +8,7 @@ import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 import { BackgroundControl, Control } from './canvasContent.js';
 import { CanvasColumnFactorType, CanvasSectionTemplate } from './clientsidepages.js';
+import { Page } from './Page.js';
 
 interface CommandArgs {
   options: Options;
@@ -33,13 +34,18 @@ interface Options extends GlobalOptions {
   overlayColor?: string;
   overlayOpacity?: number;
   collapsibleTitle?: string;
+  zoneReflowStrategy?: string;
+  zoneHeight?: number;
+  headingLevel?: number;
 }
 
 class SpoPageSectionAddCommand extends SpoCommand {
-  public readonly sectionTemplate: string[] = ['OneColumn', 'OneColumnFullWidth', 'TwoColumn', 'ThreeColumn', 'TwoColumnLeft', 'TwoColumnRight', 'Vertical'];
+  public readonly sectionTemplate: string[] = ['OneColumn', 'OneColumnFullWidth', 'TwoColumn', 'ThreeColumn', 'TwoColumnLeft', 'TwoColumnRight', 'Vertical', 'Flexible'];
   public readonly zoneEmphasis: string[] = ['None', 'Neutral', 'Soft', 'Strong', 'Image', 'Gradient'];
   public readonly iconAlignment: string[] = ['Left', 'Right'];
   public readonly fillMode: string[] = ['ScaleToFill', 'ScaleToFit', 'Tile', 'OriginalSize'];
+  public readonly zoneReflowStrategy: string[] = ['TopToBottom', 'LeftToRight'];
+  readonly MINIMUM_ZONE_HEIGHT: number = 34;
 
   public get name(): string {
     return commands.PAGE_SECTION_ADD;
@@ -76,7 +82,10 @@ class SpoPageSectionAddCommand extends SpoCommand {
         useLightText: !!args.options.useLightText,
         overlayColor: typeof args.options.overlayColor !== 'undefined',
         overlayOpacity: typeof args.options.overlayOpacity !== 'undefined',
-        collapsibleTitle: typeof args.options.collapsibleTitle !== 'undefined'
+        collapsibleTitle: typeof args.options.collapsibleTitle !== 'undefined',
+        zoneReflowStrategy: typeof args.options.zoneReflowStrategy !== 'undefined',
+        zoneHeight: typeof args.options.zoneHeight !== 'undefined',
+        headingLevel: typeof args.options.headingLevel !== 'undefined'
       });
     });
   }
@@ -143,6 +152,16 @@ class SpoPageSectionAddCommand extends SpoCommand {
       },
       {
         option: '--collapsibleTitle [collapsibleTitle]'
+      },
+      {
+        option: '--zoneReflowStrategy [zoneReflowStrategy]',
+        autocomplete: this.zoneReflowStrategy
+      },
+      {
+        option: '--zoneHeight [zoneHeight]'
+      },
+      {
+        option: '--headingLevel [headingLevel]'
       }
     );
   }
@@ -151,7 +170,7 @@ class SpoPageSectionAddCommand extends SpoCommand {
     this.validators.push(
       async (args: CommandArgs) => {
         if (!(args.options.sectionTemplate in CanvasSectionTemplate)) {
-          return `${args.options.sectionTemplate} is not a valid section template. Allowed values are OneColumn|OneColumnFullWidth|TwoColumn|ThreeColumn|TwoColumnLeft|TwoColumnRight|Vertical`;
+          return `${args.options.sectionTemplate} is not a valid section template. Allowed values are OneColumn|OneColumnFullWidth|TwoColumn|ThreeColumn|TwoColumnLeft|TwoColumnRight|Vertical|Flexible`;
         }
 
         if (typeof args.options.order !== 'undefined') {
@@ -161,7 +180,7 @@ class SpoPageSectionAddCommand extends SpoCommand {
         }
 
         if (typeof args.options.zoneEmphasis !== 'undefined') {
-          if (!this.zoneEmphasis.some(zoneEmphasisValue => zoneEmphasisValue.toLocaleLowerCase() === args.options.zoneEmphasis?.toLowerCase())) {
+          if (!this.zoneEmphasis.some(zoneEmphasisValue => zoneEmphasisValue.toLowerCase() === args.options.zoneEmphasis?.toLowerCase())) {
             return `The value of parameter zoneEmphasis must be ${this.zoneEmphasis.join(', ')}`;
           }
         }
@@ -173,23 +192,35 @@ class SpoPageSectionAddCommand extends SpoCommand {
         }
 
         if (typeof args.options.iconAlignment !== 'undefined') {
-          if (!this.iconAlignment.some(iconAlignmentValue => iconAlignmentValue.toLocaleLowerCase() === args.options.iconAlignment?.toLowerCase())) {
+          if (!this.iconAlignment.some(iconAlignmentValue => iconAlignmentValue.toLowerCase() === args.options.iconAlignment?.toLowerCase())) {
             return `The value of parameter iconAlignment must be ${this.iconAlignment.join(', ')}`;
           }
         }
 
         if (typeof args.options.fillMode !== 'undefined') {
-          if (!this.fillMode.some(fillModeValue => fillModeValue.toLocaleLowerCase() === args.options.fillMode?.toLowerCase())) {
+          if (!this.fillMode.some(fillModeValue => fillModeValue.toLowerCase() === args.options.fillMode?.toLowerCase())) {
             return `The value of parameter fillMode must be ${this.fillMode.join(', ')}`;
           }
         }
 
-        if (args.options.zoneEmphasis?.toLocaleLowerCase() !== 'image' && (args.options.imageUrl || args.options.imageWidth ||
+        if (typeof args.options.zoneReflowStrategy !== 'undefined') {
+          if (!this.zoneReflowStrategy.some(zoneReflowStrategyValue => zoneReflowStrategyValue.toLowerCase() === args.options.zoneReflowStrategy?.toLowerCase())) {
+            return `The value of parameter zoneReflowStrategy must be ${this.zoneReflowStrategy.join(', ')}`;
+          }
+        }
+
+        if (typeof args.options.headingLevel !== 'undefined') {
+          if (![2, 3, 4].some(headingLevelValue => headingLevelValue === args.options.headingLevel)) {
+            return `The value of parameter headingLevel must be 2, 3 or 4`;
+          }
+        }
+
+        if (args.options.zoneEmphasis?.toLowerCase() !== 'image' && (args.options.imageUrl || args.options.imageWidth ||
           args.options.imageHeight || args.options.fillMode)) {
           return 'Specify imageUrl, imageWidth, imageHeight or fillMode only when zoneEmphasis is set to Image';
         }
 
-        if (args.options.zoneEmphasis?.toLocaleLowerCase() === 'image' && !args.options.imageUrl) {
+        if (args.options.zoneEmphasis?.toLowerCase() === 'image' && !args.options.imageUrl) {
           return 'Specify imageUrl when zoneEmphasis is set to Image';
         }
 
@@ -213,13 +244,23 @@ class SpoPageSectionAddCommand extends SpoCommand {
           return 'Specify overlayColor or overlayOpacity only when zoneEmphasis is set to Image or Gradient';
         }
 
+        if (args.options.sectionTemplate?.toLowerCase() !== 'flexible' && (args.options.zoneReflowStrategy || args.options.zoneHeight)) {
+          return 'Specify zoneReflowStrategy or zoneHeight only when sectionTemplate is set to Flexible';
+        }
+
+        if (typeof args.options.zoneHeight !== 'undefined') {
+          if (!Number.isInteger(args.options.zoneHeight) || args.options.zoneHeight < this.MINIMUM_ZONE_HEIGHT) {
+            return `The value of parameter zoneHeight must be ${this.MINIMUM_ZONE_HEIGHT} or higher`;
+          }
+        }
+
         return validation.isValidSharePointUrl(args.options.webUrl);
       }
     );
   }
 
   #initTypes(): void {
-    this.types.string = ['pageName', 'webUrl', 'sectionTemplate', 'zoneEmphasis', 'iconAlignment', 'gradientText', 'imageUrl', 'fillMode', 'overlayColor', 'collapsibleTitle'];
+    this.types.string = ['pageName', 'webUrl', 'sectionTemplate', 'zoneEmphasis', 'iconAlignment', 'gradientText', 'imageUrl', 'fillMode', 'overlayColor', 'collapsibleTitle', 'zoneReflowStrategy'];
     this.types.boolean = ['isLayoutReflowOnTop', 'isCollapsibleSection', 'showDivider', 'isExpanded', 'useLightText'];
   }
 
@@ -247,16 +288,16 @@ class SpoPageSectionAddCommand extends SpoCommand {
       const res = await request.get<{ CanvasContent1: string; IsPageCheckedOutToCurrentUser: boolean }>(requestOptions);
       canvasContent = JSON.parse(res.CanvasContent1 || "[{\"controlType\":0,\"pageSettingsSlice\":{\"isDefaultDescription\":true,\"isDefaultThumbnail\":true}}]");
 
-      if (!res.IsPageCheckedOutToCurrentUser) {
-        requestOptions = {
-          url: `${args.options.webUrl}/_api/sitepages/pages/GetByUrl('sitepages/${formatting.encodeQueryParameter(pageFullName)}')/checkoutpage`,
-          headers: {
-            'accept': 'application/json;odata=nometadata'
-          },
-          responseType: 'json'
-        };
+      if (args.options.sectionTemplate === 'OneColumnFullWidth') {
+        this.ensureFullWidthSectionCanBeAdded(canvasContent);
+      }
 
-        await request.post(requestOptions);
+      if (args.options.sectionTemplate === 'Vertical') {
+        this.ensureVerticalSectionCanBeAdded(canvasContent);
+      }
+
+      if (!res.IsPageCheckedOutToCurrentUser) {
+        await Page.checkout(pageFullName, args.options.webUrl, logger, this.verbose);
       }
 
       // get unique zoneIndex values given each section can have 1 or more
@@ -361,6 +402,9 @@ class SpoPageSectionAddCommand extends SpoCommand {
       case 'Vertical':
         columns.push(this.getVerticalColumn(args, zoneId));
         break;
+      case 'Flexible':
+        columns.push(this.getFlexibleColumn(zoneIndex, sectionIndex++, args, zoneId));
+        break;
       case 'OneColumn':
       default:
         columns.push(this.getColumn(zoneIndex, sectionIndex++, 12, args, zoneId));
@@ -385,9 +429,9 @@ class SpoPageSectionAddCommand extends SpoCommand {
       }
     };
 
-    if (zoneEmphasis && ['none', 'neutral', 'soft', 'strong'].includes(zoneEmphasis?.toLocaleLowerCase())) {
+    if (zoneEmphasis && ['none', 'neutral', 'soft', 'strong'].includes(zoneEmphasis?.toLowerCase())) {
       // Just these zoneEmphasis values should be added to column emphasis
-      const zoneEmphasisValue: number = ['none', 'neutral', 'soft', 'strong'].indexOf(zoneEmphasis.toLocaleLowerCase());
+      const zoneEmphasisValue: number = ['none', 'neutral', 'soft', 'strong'].indexOf(zoneEmphasis.toLowerCase());
       columnValue.emphasis = { zoneEmphasis: zoneEmphasisValue };
     }
 
@@ -396,8 +440,9 @@ class SpoPageSectionAddCommand extends SpoCommand {
         type: 1,
         isExpanded: !!isExpanded,
         showDividerLine: !!showDivider,
-        iconAlignment: iconAlignment && iconAlignment.toLocaleLowerCase() === "right" ? "right" : "left",
-        displayName: collapsibleTitle
+        iconAlignment: iconAlignment && iconAlignment.toLowerCase() === "right" ? "right" : "left",
+        displayName: collapsibleTitle,
+        headingLevel: args.options.headingLevel ? args.options.headingLevel : 2 //2 is a default heading level
       };
     }
 
@@ -409,6 +454,16 @@ class SpoPageSectionAddCommand extends SpoCommand {
     columnValue.position.isLayoutReflowOnTop = args.options.isLayoutReflowOnTop !== undefined;
     columnValue.position.layoutIndex = 2;
     columnValue.position.controlIndex = 1;
+
+    return columnValue;
+  }
+
+  private getFlexibleColumn(zoneIndex: number, sectionIndex: number, args: CommandArgs, zoneId?: string): Control {
+    const columnValue: Control = this.getColumn(zoneIndex, sectionIndex, 100, args, zoneId);
+    columnValue.zoneReflowStrategy = { axis: args.options.zoneReflowStrategy ? this.zoneReflowStrategy.indexOf(args.options.zoneReflowStrategy) : 0 };
+    if (args.options.zoneHeight) {
+      columnValue.zoneHeight = args.options.zoneHeight;
+    }
 
     return columnValue;
   }
@@ -472,6 +527,26 @@ class SpoPageSectionAddCommand extends SpoCommand {
     }
 
     return backgroundDetails;
+  }
+
+  private ensureFullWidthSectionCanBeAdded(canvasContent: (Control | BackgroundControl)[]): void {
+    const hasVerticalSection = canvasContent.some((c: Control | BackgroundControl) =>
+      c.position?.layoutIndex === 2 && c.position.sectionFactor === 12
+    );
+
+    if (hasVerticalSection) {
+      throw "A vertical section already exists on the page. A full-width section cannot be added to a page that already has a vertical section.";
+    }
+  }
+
+  private ensureVerticalSectionCanBeAdded(canvasContent: (Control | BackgroundControl)[]): void {
+    const hasFullWidthSection = canvasContent.some((c: Control | BackgroundControl) =>
+      c.position?.layoutIndex === 1 && c.position.sectionFactor === 0
+    );
+
+    if (hasFullWidthSection) {
+      throw "A full-width section already exists on the page. A vertical section cannot be added to a page that already has a full-width section.";
+    }
   }
 }
 

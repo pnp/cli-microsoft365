@@ -185,7 +185,7 @@ class SpoPageSetCommand extends SpoCommand {
     try {
       const requestDigestResult = await spo.getRequestDigest(args.options.webUrl);
       const requestDigest = requestDigestResult.FormDigestValue;
-      const page = await Page.checkout(args.options.name, args.options.webUrl, logger, this.debug, this.verbose);
+      const page = await Page.checkout(args.options.name, args.options.webUrl, logger, this.verbose);
 
       if (page) {
         pageTitle = pageTitle || page.Title;

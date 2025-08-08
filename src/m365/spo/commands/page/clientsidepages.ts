@@ -36,7 +36,11 @@ export enum CanvasSectionTemplate {
   /// <summary>
   /// Vertical
   /// </summary>
-  Vertical
+  Vertical,
+  /// <summary>
+  /// Flexible
+  /// </summary>
+  Flexible
 }
 
 /**
@@ -112,14 +116,19 @@ function getGUID(): string {
 }
 
 /**
- * Column size factor. Max value is 12 (= one column), other options are 8,6,4 or 0
+ * Column size factor. Max value is 100 (= flexible section), other options are 8,6,4 or 0
  */
-export type CanvasColumnFactorType = 0 | 2 | 4 | 6 | 8 | 12;
+export type CanvasColumnFactorType = 0 | 2 | 4 | 6 | 8 | 12 | 100;
 
 /**
  * Column Layout index where 1 is the default layout and 2 is the Vertical layout
  */
 export type CanvasColumnLayoutIndex = 1 | 2;
+
+/**
+ * ZoneReflowStrategyType where 0 is TopToBottom, and 1 is LeftToRight
+ */
+export type ZoneReflowStrategyType = 0 | 1;
 
 /**
  * Gets the next order value 1 based for the provided collection
@@ -1172,6 +1181,11 @@ export interface ZoneGroupMetadata {
   showDividerLine: boolean;
   iconAlignment: string;
   displayName?: string;
+  headingLevel: number;
+}
+
+export interface ZoneReflowStrategy {
+  axis: number;
 }
 
 export interface ClientSideControlData {

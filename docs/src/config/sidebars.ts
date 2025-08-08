@@ -614,6 +614,11 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'organization list',
               id: 'cmd/entra/organization/organization-list'
+            },
+            {
+              type: 'doc',
+              label: 'organization set',
+              id: 'cmd/entra/organization/organization-set'
             }
           ]
         },
@@ -3472,6 +3477,11 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
+              label: 'page control remove',
+              id: 'cmd/spo/page/page-control-remove'
+            },
+            {
+              type: 'doc',
               label: 'page control set',
               id: 'cmd/spo/page/page-control-set'
             },
@@ -4982,10 +4992,15 @@ const sidebars: SidebarsConfig = {
         },
         {
           type: 'doc',
-          label: 'Help page',
+          label: 'Docs page',
           id: 'contribute/new-command/writing-the-docs'
         }
       ]
+    },
+    {
+      type: 'doc',
+      label: 'Documenting minimal permissions',
+      id: 'contribute/document-minimal-permissions'
     },
     {
       type: 'doc',

@@ -40,10 +40,6 @@ export interface ISiteOwner {
   LoginName: string;
 }
 
-export interface ISPSite {
-  Id: string;
-}
-
 export interface ISiteUser {
   Id: number;
 }

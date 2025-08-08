@@ -46,7 +46,7 @@ let currentCommandName: string | undefined;
 let optionsFromArgs: { options: yargs.Arguments } | undefined;
 const defaultHelpMode = 'options';
 const defaultHelpTarget = 'console';
-const helpModes: string[] = ['options', 'examples', 'remarks', 'response', 'full'];
+const helpModes: string[] = ['options', 'examples', 'remarks', 'permissions', 'response', 'full'];
 const helpTargets: string[] = ['console', 'web'];
 const yargsConfiguration: Partial<yargs.Configuration> = {
   'parse-numbers': true,
@@ -938,7 +938,7 @@ async function closeWithError(error: any, args: CommandArgs, showHelpIfEnabled: 
   let errorMessage: string = error instanceof CommandError ? error.message : error;
 
   if (error instanceof ZodError) {
-    errorMessage = error.errors.map(e => `${e.path.join('.')}: ${e.message}`).join(os.EOL);
+    errorMessage = error.errors.map(e => (e.path.length > 0 ? `${e.path.join('.')}: ${e.message}` : e.message)).join(os.EOL);
   }
 
   if ((!args.options.output || args.options.output === 'json') &&
