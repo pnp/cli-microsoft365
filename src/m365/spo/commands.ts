@@ -194,7 +194,6 @@ export default {
   LISTITEM_ROLEINHERITANCE_BREAK: `${prefix} listitem roleinheritance break`,
   LISTITEM_ROLEINHERITANCE_RESET: `${prefix} listitem roleinheritance reset`,
   LISTITEM_SET: `${prefix} listitem set`,
-  MAIL_SEND: `${prefix} mail send`,
   NAVIGATION_NODE_ADD: `${prefix} navigation node add`,
   NAVIGATION_NODE_GET: `${prefix} navigation node get`,
   NAVIGATION_NODE_LIST: `${prefix} navigation node list`,
