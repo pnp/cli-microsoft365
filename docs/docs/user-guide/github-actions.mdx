@@ -279,13 +279,13 @@ Alternatively, you can deploy the app to a site collection based app catalog by 
 
 ### Execute an inline script using the CLI for Microsoft 365 Run Script action
 
-Add this step to a `.yaml` build file contained within the `.github/workflows` folder to send an email from SharePoint to a user by executing the `spo mail send` command as an inline script.
+Add this step to a `.yaml` build file contained within the `.github/workflows` folder to send an email to a user by executing the `outlook mail send` command as an inline script.
 
 ```yaml
 - name: Send email
       uses: pnp/action-cli-runscript@v2.0.1
       with:
-        M365_CLI_SCRIPT: m365 spo mail send --webUrl https://contoso.sharepoint.com/sites/teamsite --to 'user@contoso.onmicrosoft.com' --subject 'Deployment done' --body '<h2>CLI for Microsoft 365</h2> <p>The deployment is complete.</p> <br/> Email sent via CLI for Microsoft 365 GitHub Action.'
+        M365_CLI_SCRIPT: m365 outlook mail send --sender 'teamsite_admin@contoso.onmicrosoft.com' --to 'user@contoso.onmicrosoft.com' --subject 'Deployment done' --bodyContents '<h2>CLI for Microsoft 365</h2> <p>The deployment is complete.</p> <br/> Email sent via CLI for Microsoft 365 GitHub Action.' --bodyContentType HTML
 ```
 
 ### Execute a script file using the CLI for Microsoft 365 Run Script action

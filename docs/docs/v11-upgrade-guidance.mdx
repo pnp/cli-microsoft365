@@ -1,0 +1,27 @@
+﻿# v11 Upgrade Guidance
+
+The v11 release of CLI for Microsoft 365 introduces several breaking changes. To assist you in upgrading to the latest version, weve outlined the changes and the actions you may need to take.
+
+## SharePoint
+
+### Removed command `spo mail send`
+
+The command used the SharePoint SendEmail API which has been deprecated.
+
+#### What action do I need to take?
+
+Update your scripts to use the [outlook mail send](./cmd/outlook/mail/mail-send.mdx) command.
+
+## Skype
+
+### Removed command `skype report activitycounts`
+
+Skype for Business Online has been retired and API used by the `skype report activitycounts` will no longer return any data.
+
+### Removed command `skype report activityusercounts`
+
+Skype for Business Online has been retired and API used by the `skype report activityusercounts` will no longer return any data.
+
+### Removed command `skype report activityuserdetail`
+
+Skype for Business Online has been retired and API used by the `skype report activityusercounts` will no longer return any data.

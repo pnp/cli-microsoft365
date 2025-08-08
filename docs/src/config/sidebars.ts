@@ -3,6 +3,7 @@ import type { SidebarsConfig } from '@docusaurus/plugin-content-docs';
 const sidebars: SidebarsConfig = {
   home: [
     'index',
+    'v11-upgrade-guidance',
     'v10-upgrade-guidance',
     'v9-upgrade-guidance',
     'v8-upgrade-guidance',
@@ -2130,29 +2131,6 @@ const sidebars: SidebarsConfig = {
       ]
     },
     {
-      'Skype (skype)': [
-        {
-          report: [
-            {
-              type: 'doc',
-              label: 'report activitycounts',
-              id: 'cmd/skype/report/report-activitycounts'
-            },
-            {
-              type: 'doc',
-              label: 'report activityusercounts',
-              id: 'cmd/skype/report/report-activityusercounts'
-            },
-            {
-              type: 'doc',
-              label: 'report activityuserdetail',
-              id: 'cmd/skype/report/report-activityuserdetail'
-            }
-          ]
-        }
-      ]
-    },
-    {
       'SharePoint Embedded (spe)': [
         {
           container: [
@@ -3334,15 +3312,6 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'listitem record unlock',
               id: 'cmd/spo/listitem/listitem-record-unlock'
-            }
-          ]
-        },
-        {
-          mail: [
-            {
-              type: 'doc',
-              label: 'mail send',
-              id: 'cmd/spo/mail/mail-send'
             }
           ]
         },
