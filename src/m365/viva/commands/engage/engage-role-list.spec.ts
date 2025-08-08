@@ -92,7 +92,7 @@ describe(commands.ENGAGE_ROLE_LIST, () => {
     });
 
     assert(
-      loggerLogSpy.calledWith([
+      loggerLogSpy.calledOnceWith([
         {
           "id": "ec759127-089f-4f91-8dfc-03a30b51cb38",
           "displayName": "Network Admin"
@@ -118,7 +118,7 @@ describe(commands.ENGAGE_ROLE_LIST, () => {
     });
 
     await assert.rejects(
-      command.action(logger, { options: {} } as any),
+      command.action(logger, { options: {} }),
       new CommandError('An error has occurred')
     );
   });
