@@ -17,10 +17,10 @@ export const options = globalOptionsZod
       }))
     ),
     fileUrl: z.string().optional(),
-    fileId: zod.alias('i', z.string().optional()
+    fileId: zod.alias('i', z.string()
       .refine(id => id === undefined || validation.isValidGuid(id), id => ({
         message: `'${id}' is not a valid GUID.`
-      }))
+      })).optional()
     ),
     label: z.string()
   })
@@ -47,7 +47,7 @@ class SpoFileVersionKeepCommand extends SpoCommand {
 
   public getRefinedSchema(schema: z.ZodTypeAny): z.ZodEffects<any> | undefined {
     return schema
-      .refine(options => (options.fileUrl !== undefined) !== (options.fileId !== undefined), {
+      .refine(options => [options.fileUrl, options.fileId].filter(o => o !== undefined).length === 1, {
         message: `Specify 'fileUrl' or 'fileId', but not both.`
       });
   }
@@ -58,12 +58,12 @@ class SpoFileVersionKeepCommand extends SpoCommand {
     }
 
     try {
-      const fileUrl = this.getFileUrl(args.options.webUrl, args.options.fileUrl, args.options.fileId);
+      const baseApiUrl = this.getBaseApiUrl(args.options.webUrl, args.options.fileUrl, args.options.fileId);
 
       const requestVersionOptions: CliRequestOptions = {
-        url: `${fileUrl}/versions/?$filter=VersionLabel eq '${args.options.label}'`,
+        url: `${baseApiUrl}/versions/?$filter=VersionLabel eq '${args.options.label}'&$select=Id`,
         headers: {
-          'accept': 'application/json;odata=nometadata'
+          accept: 'application/json;odata=nometadata'
         },
         responseType: 'json'
       };
@@ -76,9 +76,9 @@ class SpoFileVersionKeepCommand extends SpoCommand {
       }
 
       const requestExpirationOptions: CliRequestOptions = {
-        url: `${fileUrl}/versions(${version.ID})/SetExpirationDate()`,
+        url: `${baseApiUrl}/versions(${version.ID})/SetExpirationDate()`,
         headers: {
-          'accept': 'application/json;odata=nometadata',
+          accept: 'application/json;odata=nometadata',
           'content-type': 'application/json'
         },
         responseType: 'json'
@@ -91,7 +91,7 @@ class SpoFileVersionKeepCommand extends SpoCommand {
     }
   }
 
-  private getFileUrl(webUrl: string, fileUrl?: string, fileId?: string): string {
+  private getBaseApiUrl(webUrl: string, fileUrl?: string, fileId?: string): string {
     let requestUrl: string;
 
     if (fileUrl) {
