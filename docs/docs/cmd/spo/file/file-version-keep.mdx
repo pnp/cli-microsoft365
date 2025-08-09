@@ -1,4 +1,6 @@
 import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 # spo file version keep
 
@@ -28,15 +30,34 @@ m365 spo file version keep [options]
 
 <Global />
 
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated" label="Delegated">
+  
+  | Resource   | Permissions                                      |
+  |------------|--------------------------------------------------|
+  | SharePoint | AllSites.Write, AllSites.Manage, AllSites.FullControl |
+
+  </TabItem>
+  <TabItem value="Application" label="Application">
+  
+  | Resource   | Permissions                                         |
+  |------------|-----------------------------------------------------|
+  | SharePoint | Sites.ReadWrite.All, Sites.Manage.All, Sites.FullControl.All |
+
+  </TabItem>
+</Tabs>
+
 ## Examples
 
-Mark a file version as never expiring by webUrl and fileUrl.
+Mark a file version as never expiring by file URL.
 
 ```sh
 m365 spo file version keep --webUrl "https://contoso.sharepoint.com/sites/marketing" --fileUrl "/sites/marketing/Documents/report.docx" --label "6.0"
 ```
 
-Mark a file version as never expiring by webUrl and fileId.
+Mark a file version as never expiring by file ID.
 
 ```sh
 m365 spo file version keep --webUrl "https://contoso.sharepoint.com/sites/marketing" --fileId "12345678-90ab-cdef-1234-567890abcdef" --label "6.0"

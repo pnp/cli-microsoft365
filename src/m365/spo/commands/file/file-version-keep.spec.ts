@@ -85,6 +85,11 @@ describe(commands.FILE_VERSION_KEEP, () => {
     assert.strictEqual(actual.success, false);
   });
 
+  it('fails validation if label is not specified', async () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: validWebUrl, fileUrl: validFileUrl });
+    assert.strictEqual(actual.success, false);
+  });
+
   it('passes validation if fileUrl is specified', async () => {
     const actual = await command.validate({ options: { webUrl: validWebUrl, label: validLabel, fileUrl: validFileUrl } }, commandInfo);
     assert.strictEqual(actual, true);
@@ -97,7 +102,7 @@ describe(commands.FILE_VERSION_KEEP, () => {
 
   it('ensures that a specific file version will never expire (fileUrl)', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `${validWebUrl}/_api/web/GetFileByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(validFileUrl)}')/versions/?$filter=VersionLabel eq '${validLabel}'`) {
+      if (opts.url === `${validWebUrl}/_api/web/GetFileByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(validFileUrl)}')/versions/?$filter=VersionLabel eq '${validLabel}'&$select=Id`) {
         return {
           value: [
             {
@@ -111,7 +116,7 @@ describe(commands.FILE_VERSION_KEEP, () => {
       throw 'Invalid request';
     });
 
-    sinon.stub(request, 'post').callsFake(async (opts) => {
+    const postStub: sinon.SinonStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `${validWebUrl}/_api/web/GetFileByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(validFileUrl)}')/versions(1)/SetExpirationDate()`) {
         return;
       }
@@ -120,11 +125,12 @@ describe(commands.FILE_VERSION_KEEP, () => {
     });
 
     await command.action(logger, { options: { webUrl: validWebUrl, fileUrl: validFileUrl, label: validLabel, verbose: true } });
+    assert.strictEqual(postStub.lastCall.args[0].url, `${validWebUrl}/_api/web/GetFileByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(validFileUrl)}')/versions(1)/SetExpirationDate()`);
   });
 
   it('ensures that a specific file version will never expire (fileId)', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `${validWebUrl}/_api/web/GetFileById('${validFileId}')/versions/?$filter=VersionLabel eq '${validLabel}'`) {
+      if (opts.url === `${validWebUrl}/_api/web/GetFileById('${validFileId}')/versions/?$filter=VersionLabel eq '${validLabel}'&$select=Id`) {
         return {
           value: [
             {
@@ -138,7 +144,7 @@ describe(commands.FILE_VERSION_KEEP, () => {
       throw 'Invalid request';
     });
 
-    sinon.stub(request, 'post').callsFake(async (opts) => {
+    const postStub: sinon.SinonStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `${validWebUrl}/_api/web/GetFileById('${validFileId}')/versions(1)/SetExpirationDate()`) {
         return;
       }
@@ -147,11 +153,12 @@ describe(commands.FILE_VERSION_KEEP, () => {
     });
 
     await command.action(logger, { options: { webUrl: validWebUrl, fileId: validFileId, label: validLabel, verbose: true } });
+    assert.strictEqual(postStub.lastCall.args[0].url, `${validWebUrl}/_api/web/GetFileById('${validFileId}')/versions(1)/SetExpirationDate()`);
   });
 
   it('correctly handles error when the specified version does not exist', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `${validWebUrl}/_api/web/GetFileByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(validFileUrl)}')/versions/?$filter=VersionLabel eq '${validLabel}'`) {
+      if (opts.url === `${validWebUrl}/_api/web/GetFileByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(validFileUrl)}')/versions/?$filter=VersionLabel eq '${validLabel}'&$select=Id`) {
         return { value: [] };
       }
 
@@ -163,7 +170,7 @@ describe(commands.FILE_VERSION_KEEP, () => {
 
   it('correctly handles API OData error', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `${validWebUrl}/_api/web/GetFileById('${validFileId}')/versions/?$filter=VersionLabel eq '${validLabel}'`) {
+      if (opts.url === `${validWebUrl}/_api/web/GetFileById('${validFileId}')/versions/?$filter=VersionLabel eq '${validLabel}'&$select=Id`) {
         throw {
           error: {
             'odata.error': {
