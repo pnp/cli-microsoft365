@@ -1,4 +1,4 @@
-import { satisfies, minVersion } from 'semver';
+import { minVersion, satisfies } from 'semver';
 import { JsonRule } from '../../JsonRule.js';
 import { Project } from '../../project-model/index.js';
 import { Finding } from '../../report-model/index.js';
@@ -11,10 +11,10 @@ export class FN002022_DEVDEP_typescript extends JsonRule {
     return 'FN002022';
   }
   get title(): string {
-    return 'TypeScript version';
+    return 'TypeScript version mismatch';
   }
   get description(): string {
-    return `TypeScript version in package.json should be at least @${this.version}`;
+    return `TypeScript version in package.json should be at least ~${this.version}`;
   }
   get severity(): string {
     return 'Required';
@@ -33,10 +33,10 @@ export class FN002022_DEVDEP_typescript extends JsonRule {
     if (!tsVersion) {
       const node = this.getAstNodeFromFile(project.packageJson, 'devDependencies') ||
         this.getAstNodeFromFile(project.packageJson, 'dependencies');
-      this.addFindingWithCustomInfo(`TypeScript is not specified`, `Add TypeScript devDependency at least @${this.version}`,
+      this.addFindingWithCustomInfo(`TypeScript is not specified`, `Add TypeScript devDependency at least ${this.version}`,
         [{
           file: this.file,
-          resolution: `installDev typescript@${this.version}`,
+          resolution: `installDev typescript@~${this.version}`,
           position: this.getPositionFromNode(node)
         }],
         findings
@@ -45,15 +45,16 @@ export class FN002022_DEVDEP_typescript extends JsonRule {
     }
 
     const minTsVersion = minVersion(tsVersion);
-    if (minTsVersion && satisfies(minTsVersion.version, this.version)) {
+    if (minTsVersion && satisfies(minTsVersion.version, `~${this.version}`)) {
       return;
     }
+
     const node = this.getAstNodeFromFile(project.packageJson, 'devDependencies.typescript') ||
       this.getAstNodeFromFile(project.packageJson, 'dependencies.typescript');
-    this.addFindingWithCustomInfo(`TypeScript version is lower than @${this.version}`, `Update TypeScript to at least @${this.version}`,
+    this.addFindingWithCustomInfo(`TypeScript version does not match the required ~${this.version}`, `Update TypeScript to at least ${this.version}`,
       [{
         file: this.file,
-        resolution: `installDev typescript@${this.version}`,
+        resolution: `installDev typescript@~${this.version}`,
         position: this.getPositionFromNode(node)
       }],
       findings

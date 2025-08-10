@@ -8,7 +8,7 @@ describe('FN002022_DEVDEP_typescript', () => {
 
   beforeEach(() => {
     findings = [];
-    rule = new FN002022_DEVDEP_typescript('~5.3.3');
+    rule = new FN002022_DEVDEP_typescript('5.3.3');
   });
 
   it('has the correct id', () => {
@@ -16,7 +16,7 @@ describe('FN002022_DEVDEP_typescript', () => {
   });
 
   it('has the correct title', () => {
-    assert.strictEqual(rule.title, 'TypeScript version');
+    assert.strictEqual(rule.title, 'TypeScript version mismatch');
   });
 
   it('has a description', () => {
@@ -98,4 +98,31 @@ describe('FN002022_DEVDEP_typescript', () => {
     assert.strictEqual(findings.length, 1);
     assert.strictEqual(findings[0].occurrences[0].resolution, 'installDev typescript@~5.3.3');
   });
+
+  it('returns finding when typescript is one patch lower than ~5.3.3', () => {
+    const project: any = {
+      packageJson: {
+        devDependencies: {
+          typescript: '~5.3.2'
+        }
+      }
+    };
+    rule.visit(project, findings);
+    assert.strictEqual(findings.length, 1);
+    assert.strictEqual(findings[0].occurrences[0].resolution, 'installDev typescript@~5.3.3');
+  });
+
+  it('does not return finding when typescript is one patch higher than ~5.3.3 within same minor version', () => {
+    const project: any = {
+      packageJson: {
+        devDependencies: {
+          typescript: '~5.3.4'
+        }
+      }
+    };
+    rule.visit(project, findings);
+    assert.strictEqual(findings.length, 0);
+  });
+
 });
+
