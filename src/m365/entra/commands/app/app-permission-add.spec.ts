@@ -1,12 +1,14 @@
 import { Application, ServicePrincipal } from '@microsoft/microsoft-graph-types';
 import assert from 'assert';
 import sinon from 'sinon';
+import { z } from 'zod';
 import auth from '../../../../Auth.js';
 import { CommandError } from '../../../../Command.js';
 import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import request from '../../../../request.js';
+import { settingsNames } from '../../../../settingsNames.js';
 import { telemetry } from '../../../../telemetry.js';
 import { odata } from '../../../../utils/odata.js';
 import { pid } from '../../../../utils/pid.js';
@@ -14,7 +16,6 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './app-permission-add.js';
-import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.APP_PERMISSION_ADD, () => {
   const appId = '9c79078b-815e-4a3e-bb80-2aaf2d9e9b3d';
@@ -30,6 +31,7 @@ describe(commands.APP_PERMISSION_ADD, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: z.ZodTypeAny;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -38,6 +40,7 @@ describe(commands.APP_PERMISSION_ADD, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName: string, defaultValue: any) => {
       if (settingName === 'prompt') {
         return false;
@@ -104,7 +107,7 @@ describe(commands.APP_PERMISSION_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { appObjectId: appObjectId, applicationPermissions: applicationPermissions, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ appObjectId: appObjectId, applicationPermissions: applicationPermissions, verbose: true }) });
     assert(patchStub.called);
   });
 
@@ -127,7 +130,7 @@ describe(commands.APP_PERMISSION_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { appName: appName, applicationPermissions: applicationPermissions, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ appName: appName, applicationPermissions: applicationPermissions, verbose: true }) });
     assert(patchStub.called);
   });
 
@@ -150,7 +153,7 @@ describe(commands.APP_PERMISSION_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { appId: appId, applicationPermissions: applicationPermissions, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ appId: appId, applicationPermissions: applicationPermissions, verbose: true }) });
     assert(patchStub.called);
   });
 
@@ -182,7 +185,7 @@ describe(commands.APP_PERMISSION_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { appId: appId, applicationPermissions: applicationPermissions, grantAdminConsent: true, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ appId: appId, applicationPermissions: applicationPermissions, grantAdminConsent: true, verbose: true }) });
     assert.strictEqual(amountOfPostCalls, 2);
   });
 
@@ -219,7 +222,7 @@ describe(commands.APP_PERMISSION_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { appId: appId, applicationPermissions: applicationPermissions, grantAdminConsent: true, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ appId: appId, applicationPermissions: applicationPermissions, grantAdminConsent: true, verbose: true }) });
     assert.strictEqual(numberOfPostCalls, 3);
   });
 
@@ -257,7 +260,7 @@ describe(commands.APP_PERMISSION_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { appId: appId, delegatedPermissions: delegatedPermissions, applicationPermissions: applicationPermissions, grantAdminConsent: true, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ appId: appId, delegatedPermissions: delegatedPermissions, applicationPermissions: applicationPermissions, grantAdminConsent: true, verbose: true }) });
     assert.strictEqual(amountOfPostCalls, 3);
   });
 
@@ -273,7 +276,7 @@ describe(commands.APP_PERMISSION_ADD, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { appId: appId, applicationPermissions: applicationPermissions, verbose: true } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ appId: appId, applicationPermissions: applicationPermissions, verbose: true }) }),
       new CommandError(`App with client id ${appId} not found in Microsoft Entra ID`));
   });
 
@@ -289,7 +292,7 @@ describe(commands.APP_PERMISSION_ADD, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { appObjectId: appObjectId, applicationPermissions: applicationPermissions, verbose: true } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ appObjectId: appObjectId, applicationPermissions: applicationPermissions, verbose: true }) }),
       new CommandError(`App with object id ${appObjectId} not found in Microsoft Entra ID`));
   });
 
@@ -308,7 +311,7 @@ describe(commands.APP_PERMISSION_ADD, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { appId: appId, applicationPermissions: api, verbose: true } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ appId: appId, applicationPermissions: api, verbose: true }) }),
       new CommandError(`Service principal ${servicePrincipalName} not found`));
   });
 
@@ -328,7 +331,7 @@ describe(commands.APP_PERMISSION_ADD, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { appId: appId, applicationPermissions: api, verbose: true } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ appId: appId, applicationPermissions: api, verbose: true }) }),
       new CommandError(`Permission ${permissionName} for service principal ${servicePrincipalName} not found`));
   });
 
@@ -353,9 +356,10 @@ describe(commands.APP_PERMISSION_ADD, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
-        appName: appName
-      }
+      options: commandOptionsSchema.parse({
+        appName: appName,
+        applicationPermissions: applicationPermissions
+      })
     }), new CommandError(`Multiple Entra application registrations with name 'My App' found. Found: 9b1b1e42-794b-4c71-93ac-5ed92488b67f, 9b1b1e42-794b-4c71-93ac-5ed92488b67g.`));
   });
 
@@ -371,7 +375,7 @@ describe(commands.APP_PERMISSION_ADD, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { appName: appName } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ appName: appName, applicationPermissions: applicationPermissions }) }),
       new CommandError(`App with name ${appName} not found in Microsoft Entra ID`));
   });
 
@@ -396,23 +400,23 @@ describe(commands.APP_PERMISSION_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { appName: appName, applicationPermissions: applicationPermissions, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ appName: appName, applicationPermissions: applicationPermissions, verbose: true }) });
     assert(patchStub.called);
   });
 
   it('passes validation if applicationPermission is passed', async () => {
-    const actual = await command.validate({ options: { appId: appId, applicationPermissions: applicationPermissions } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ appId: appId, applicationPermissions: applicationPermissions });
+    assert.strictEqual(actual.success, true);
   });
 
   it('passes validation if delegatedPermission is passed', async () => {
-    const actual = await command.validate({ options: { appId: appId, delegatedPermissions: delegatedPermissions } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ appId: appId, delegatedPermissions: delegatedPermissions });
+    assert.strictEqual(actual.success, true);
   });
 
   it('passes validation if both applicationPermission or delegatedPermission are passed', async () => {
-    const actual = await command.validate({ options: { appId: appId, applicationPermissions: applicationPermissions, delegatedPermissions: delegatedPermissions } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ appId: appId, applicationPermissions: applicationPermissions, delegatedPermissions: delegatedPermissions });
+    assert.strictEqual(actual.success, true);
   });
 
   it('fails validation if both applicationPermission or delegatedPermission is not passed', async () => {
@@ -424,28 +428,28 @@ describe(commands.APP_PERMISSION_ADD, () => {
       return defaultValue;
     });
 
-    const actual = await command.validate({ options: {} }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, false);
   });
 
   it('fails validation if the appId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { appId: '123', applicationPermissions: applicationPermissions } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ appId: '123', applicationPermissions: applicationPermissions });
+    assert.strictEqual(actual.success, false);
   });
 
   it('passes validation if the appId is a valid GUID', async () => {
-    const actual = await command.validate({ options: { appId: appId, applicationPermissions: applicationPermissions } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ appId: appId, applicationPermissions: applicationPermissions });
+    assert.strictEqual(actual.success, true);
   });
 
   it('fails validation if the appObjectId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { appObjectId: '123', applicationPermissions: applicationPermissions } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ appObjectId: '123', applicationPermissions: applicationPermissions });
+    assert.strictEqual(actual.success, false);
   });
 
   it('passes validation if the appObjectId is a valid GUID', async () => {
-    const actual = await command.validate({ options: { appObjectId: appObjectId, applicationPermissions: applicationPermissions } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ appObjectId: appObjectId, applicationPermissions: applicationPermissions });
+    assert.strictEqual(actual.success, true);
   });
 
   it('fails validation if neither the appId nor the appObjectId are provided.', async () => {
@@ -457,12 +461,10 @@ describe(commands.APP_PERMISSION_ADD, () => {
       return defaultValue;
     });
 
-    const actual = await command.validate({
-      options: {
-        applicationPermissions: applicationPermissions
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      applicationPermissions: applicationPermissions
+    });
+    assert.strictEqual(actual.success, false);
   });
 
   it('fails validation when both appId and appObjectId are specified', async () => {
@@ -474,13 +476,11 @@ describe(commands.APP_PERMISSION_ADD, () => {
       return defaultValue;
     });
 
-    const actual = await command.validate({
-      options: {
-        appId: appId,
-        appObjectId: appObjectId,
-        applicationPermissions: applicationPermissions
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      appId: appId,
+      appObjectId: appObjectId,
+      applicationPermissions: applicationPermissions
+    });
+    assert.strictEqual(actual.success, false);
   });
 });
