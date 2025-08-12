@@ -324,7 +324,10 @@ describe(commands.APPLICATIONCUSTOMIZER_SET, () => {
 
     const updateCallsSpy: sinon.SinonStub = defaultUpdateCallsStub();
     await command.action(logger, { options: { verbose: true, id: id, webUrl: webUrl, scope: 'Web', newTitle: newTitle, description: description } } as any);
-    assert(updateCallsSpy.calledOnce);
+    assert.deepStrictEqual(updateCallsSpy.lastCall.args[0].data, {
+      Description: description,
+      Title: newTitle
+    });
   });
 
   it('should update the application customizer from the site collection by its ID', async () => {

@@ -131,7 +131,7 @@ class SpoCommandSetSetCommand extends SpoCommand {
           return `${args.options.location} is not a valid location. Allowed values are ${SpoCommandSetSetCommand.locations.join(', ')}`;
         }
 
-        if (!args.options.newTitle && !args.options.listType && !args.options.clientSideComponentProperties && !args.options.location && !args.options.newClientSideComponentId) {
+        if (!args.options.newTitle && !args.options.description && !args.options.listType && !args.options.clientSideComponentProperties && !args.options.location && !args.options.newClientSideComponentId) {
           return `Please specify option to be updated`;
         }
 
@@ -158,14 +158,12 @@ class SpoCommandSetSetCommand extends SpoCommand {
     const location: string = this.getLocation(args.options.location ? args.options.location : '');
 
     try {
-      const requestBody: any = {};
+      const requestBody: any = {
+        Description: args.options.description
+      };
 
       if (args.options.newTitle) {
         requestBody.Title = args.options.newTitle;
-      }
-
-      if (args.options.description) {
-        requestBody.Description = args.options.description;
       }
 
       if (args.options.location) {

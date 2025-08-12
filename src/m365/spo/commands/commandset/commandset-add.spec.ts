@@ -156,7 +156,7 @@ describe(commands.COMMANDSET_ADD, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if all required options specified', async () => {
+  it('passes validation if all options specified', async () => {
     const actual = await command.validate({ options: { title: validTitle, webUrl: validWebUrl, listType: validListType, clientSideComponentId: validClientSideComponentId, description: validDescription, scope: 'Web', location: 'Both', clientSideComponentProperties: validClientSideComponentProperties } }, commandInfo);
     assert.strictEqual(actual, true);
   });
@@ -275,5 +275,60 @@ describe(commands.COMMANDSET_ADD, () => {
       }
     }
     assert(false);
+  });
+
+  it('includes description in request body when provided', async () => {
+    let actualRequestBody: any;
+
+    sinon.stub(request, 'post').callsFake(async opts => {
+      if ((opts.url === `https://contoso.sharepoint.com/_api/Web/UserCustomActions`)) {
+        actualRequestBody = opts.data;
+        return commandactionResponse;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options: {
+        webUrl: validWebUrl,
+        title: validTitle,
+        description: validDescription,
+        clientSideComponentId: validClientSideComponentId,
+        listType: validListType
+      }
+    });
+
+    assert.strictEqual(actualRequestBody.Description, validDescription);
+    assert.strictEqual(actualRequestBody.Title, validTitle);
+    assert.strictEqual(actualRequestBody.ClientSideComponentId, validClientSideComponentId);
+    assert.strictEqual(actualRequestBody.RegistrationId, '100'); // List type
+    assert.strictEqual(actualRequestBody.RegistrationType, 1);
+  });
+
+  it('includes undefined description in request body when not provided', async () => {
+    let actualRequestBody: any;
+
+    sinon.stub(request, 'post').callsFake(async opts => {
+      if ((opts.url === `https://contoso.sharepoint.com/_api/Web/UserCustomActions`)) {
+        actualRequestBody = opts.data;
+        return commandactionResponse;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options: {
+        webUrl: validWebUrl,
+        title: validTitle,
+        clientSideComponentId: validClientSideComponentId,
+        listType: validListType
+      }
+    });
+
+    assert.strictEqual(actualRequestBody.Description, undefined);
+    assert.strictEqual(actualRequestBody.Title, validTitle);
+    assert.strictEqual(actualRequestBody.ClientSideComponentId, validClientSideComponentId);
   });
 });
