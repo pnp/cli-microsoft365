@@ -134,7 +134,7 @@ describe(commands.M365GROUP_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', verbose: true }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, {
       description: 'My awesome group',
       displayName: 'My group',
@@ -162,7 +162,7 @@ describe(commands.M365GROUP_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', visibility: 'Private' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', visibility: 'Private' }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, {
       description: 'My awesome group',
       displayName: 'My group',
@@ -190,7 +190,7 @@ describe(commands.M365GROUP_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', allowMembersToPost: true, hideGroupInOutlook: true, subscribeNewGroupMembers: true, welcomeEmailDisabled: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', allowMembersToPost: true, hideGroupInOutlook: true, subscribeNewGroupMembers: true, welcomeEmailDisabled: true }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, {
       description: 'My awesome group',
       displayName: 'My group',
@@ -223,7 +223,7 @@ describe(commands.M365GROUP_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', logoPath: 'logo.png' } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', logoPath: 'logo.png' }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, {
       description: 'My awesome group',
       displayName: 'My group',
@@ -258,7 +258,7 @@ describe(commands.M365GROUP_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', logoPath: 'logo.jpg' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', logoPath: 'logo.jpg' }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, {
       description: 'My awesome group',
       displayName: 'My group',
@@ -296,7 +296,7 @@ describe(commands.M365GROUP_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', logoPath: 'logo.gif' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', logoPath: 'logo.gif' }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, {
       description: 'My awesome group',
       displayName: 'My group',
@@ -334,7 +334,7 @@ describe(commands.M365GROUP_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', logoPath: 'logo.png' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', logoPath: 'logo.png' }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, {
       description: 'My awesome group',
       displayName: 'My group',
@@ -361,7 +361,7 @@ describe(commands.M365GROUP_ADD, () => {
     });
     sinon.stub(request, 'put').rejects(new Error('Invalid request'));
 
-    await assert.rejects(command.action(logger, { options: { debug: true, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', logoPath: 'logo.png' } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ debug: true, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', logoPath: 'logo.png' }) }),
       new CommandError('Invalid request'));
 
     assert.deepStrictEqual(postStub.lastCall.args[0].data, {
@@ -405,7 +405,7 @@ describe(commands.M365GROUP_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', owners: 'user@contoso.onmicrosoft.com' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', owners: 'user@contoso.onmicrosoft.com' }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data['@odata.id'], 'https://graph.microsoft.com/v1.0/users/949b16c1-a032-453e-a8ae-89a52bfc1d8a');
     assert(loggerLogSpy.calledOnceWith(groupResponse));
   });
@@ -452,7 +452,7 @@ describe(commands.M365GROUP_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', owners: 'user1@contoso.onmicrosoft.com,user2@contoso.onmicrosoft.com' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', owners: 'user1@contoso.onmicrosoft.com,user2@contoso.onmicrosoft.com' }) });
     assert.deepStrictEqual(postStub.getCall(-2).args[0].data, {
       '@odata.id': 'https://graph.microsoft.com/v1.0/users/949b16c1-a032-453e-a8ae-89a52bfc1d8a'
     });
@@ -488,7 +488,7 @@ describe(commands.M365GROUP_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', members: 'user@contoso.onmicrosoft.com' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', members: 'user@contoso.onmicrosoft.com' }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data['@odata.id'], 'https://graph.microsoft.com/v1.0/users/949b16c1-a032-453e-a8ae-89a52bfc1d8a');
     assert(loggerLogSpy.calledOnceWith(groupResponse));
   });
@@ -531,7 +531,7 @@ describe(commands.M365GROUP_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', members: 'user1@contoso.onmicrosoft.com,user2@contoso.onmicrosoft.com' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', members: 'user1@contoso.onmicrosoft.com,user2@contoso.onmicrosoft.com' }) });
     assert.deepStrictEqual(postStub.getCall(-2).args[0].data, {
       '@odata.id': 'https://graph.microsoft.com/v1.0/users/949b16c1-a032-453e-a8ae-89a52bfc1d8a'
     });
@@ -562,7 +562,7 @@ describe(commands.M365GROUP_ADD, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', owners: 'user1@contoso.onmicrosoft.com,user2@contoso.onmicrosoft.com' } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', owners: 'user1@contoso.onmicrosoft.com,user2@contoso.onmicrosoft.com' }) }),
       new CommandError('Cannot proceed with group creation. The following users provided are invalid : user2@contoso.onmicrosoft.com'));
   });
 
@@ -588,7 +588,7 @@ describe(commands.M365GROUP_ADD, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: true, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', owners: 'user1@contoso.onmicrosoft.com,user2@contoso.onmicrosoft.com' } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ debug: true, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', owners: 'user1@contoso.onmicrosoft.com,user2@contoso.onmicrosoft.com' }) }),
       new CommandError('Cannot proceed with group creation. The following users provided are invalid : user2@contoso.onmicrosoft.com'));
   });
 
@@ -614,7 +614,7 @@ describe(commands.M365GROUP_ADD, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', members: 'user1@contoso.onmicrosoft.com,user2@contoso.onmicrosoft.com' } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', members: 'user1@contoso.onmicrosoft.com,user2@contoso.onmicrosoft.com' }) }),
       new CommandError('Cannot proceed with group creation. The following users provided are invalid : user2@contoso.onmicrosoft.com'));
   });
 
@@ -640,7 +640,7 @@ describe(commands.M365GROUP_ADD, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: true, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', members: 'user1@contoso.onmicrosoft.com,user2@contoso.onmicrosoft.com' } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ debug: true, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', members: 'user1@contoso.onmicrosoft.com,user2@contoso.onmicrosoft.com' }) }),
       new CommandError('Cannot proceed with group creation. The following users provided are invalid : user2@contoso.onmicrosoft.com'));
   });
 
@@ -656,7 +656,7 @@ describe(commands.M365GROUP_ADD, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { clientId: '6a7b1395-d313-4682-8ed4-65a6265a6320', resourceId: '6a7b1395-d313-4682-8ed4-65a6265a6320', scope: 'user_impersonation' } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group' }) }),
       new CommandError('Invalid request'));
   });
 
@@ -667,12 +667,12 @@ describe(commands.M365GROUP_ADD, () => {
 
   it('fails validation when mailNickname contains spaces', () => {
     const actual = commandOptionsSchema.safeParse({ displayName: 'My group', description: 'My awesome group', mailNickname: 'my group' });
-    assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.success, false);
   });
 
   it('fails validation if one of the owners is invalid', () => {
     const actual = commandOptionsSchema.safeParse({ displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', owners: 'user' });
-    assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.success, false);
   });
 
   it('passes validation if the owner is valid', () => {
@@ -692,7 +692,7 @@ describe(commands.M365GROUP_ADD, () => {
 
   it('fails validation if one of the members is invalid', () => {
     const actual = commandOptionsSchema.safeParse({ displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', members: 'user' });
-    assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.success, false);
   });
 
   it('passes validation if the member is valid', () => {
@@ -712,7 +712,7 @@ describe(commands.M365GROUP_ADD, () => {
 
   it('fails validation if logoPath points to a non-existent file', () => {
     const actual = commandOptionsSchema.safeParse({ displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', logoPath: 'some-image.png' });
-    assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.success, false);
   });
 
   it('fails validation if logoPath points to a folder', () => {
@@ -721,7 +721,7 @@ describe(commands.M365GROUP_ADD, () => {
     sinon.stub(fsStats, 'isDirectory').callsFake(() => true);
 
     const actual = commandOptionsSchema.safeParse({ displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', logoPath: 'some-folder' });
-    assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.success, false);
   });
 
   it('fails validation if incorrect visibility is specified.', () => {
@@ -731,7 +731,7 @@ describe(commands.M365GROUP_ADD, () => {
       mailNickname: 'my_group',
       visibility: "invalid"
     });
-    assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.success, false);
   });
 
   it('passes validation if logoPath points to an existing file', () => {
