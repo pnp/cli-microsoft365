@@ -12,59 +12,15 @@ import { zod } from '../../../../utils/zod.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 
-enum Visibility {
-  Private = 'Private',
-  Public = 'Public',
-  HiddenMembership = 'HiddenMembership'
-}
-
 const options = globalOptionsZod
   .extend({
     displayName: zod.alias('n', z.string()),
-    mailNickname: zod.alias('m', z.string().refine(mailNickname => mailNickname.indexOf(' ') === -1, () => ({
-      message: 'The option mailNickname cannot contain spaces.'
-    }))),
+    mailNickname: zod.alias('m', z.string()),
     description: zod.alias('d', z.string().optional()),
-    owners: z.string().refine(owners => validation.isValidUserPrincipalNameArray(owners) === true, owners => ({
-      message: `The following owners are invalid: ${validation.isValidUserPrincipalNameArray(owners)}.`
-    })).optional(),
-    members: z.string().refine(members => validation.isValidUserPrincipalNameArray(members) === true, members => ({
-      message: `The following members are invalid: ${validation.isValidUserPrincipalNameArray(members)}.`
-    })).optional(),
-    visibility: zod.coercedEnum(Visibility).optional(),
-    logoPath: zod.alias('l', z.string().optional().refine(logoPath => {
-      if (!logoPath) {
-        return true; // Skip validation if not provided
-      }
-      
-      const fullPath: string = path.resolve(logoPath);
-      
-      if (!fs.existsSync(fullPath)) {
-        return false;
-      }
-      
-      if (fs.lstatSync(fullPath).isDirectory()) {
-        return false;
-      }
-      
-      return true;
-    }, logoPath => {
-      if (!logoPath) {
-        return { message: '' }; // Should never hit this case
-      }
-      
-      const fullPath: string = path.resolve(logoPath);
-      
-      if (!fs.existsSync(fullPath)) {
-        return { message: `File '${fullPath}' not found` };
-      }
-      
-      if (fs.lstatSync(fullPath).isDirectory()) {
-        return { message: `Path '${fullPath}' points to a directory` };
-      }
-      
-      return { message: `Invalid file path` };
-    })),
+    owners: z.string().optional(),
+    members: z.string().optional(),
+    visibility: z.string().optional(),
+    logoPath: zod.alias('l', z.string().optional()),
     allowMembersToPost: z.boolean().optional(),
     hideGroupInOutlook: z.boolean().optional(),
     subscribeNewGroupMembers: z.boolean().optional(),
@@ -81,6 +37,7 @@ interface CommandArgs {
 class EntraM365GroupAddCommand extends GraphCommand {
   private static numRepeat: number = 15;
   private pollingInterval: number = 500;
+  private allowedVisibilities: string[] = ['Private', 'Public', 'HiddenMembership'];
 
   public get name(): string {
     return commands.M365GROUP_ADD;
@@ -94,10 +51,73 @@ class EntraM365GroupAddCommand extends GraphCommand {
     return options;
   }
 
+  public getRefinedSchema(schema: typeof options): z.ZodEffects<any> | undefined {
+    return schema
+      .refine(options => !options.mailNickname || options.mailNickname.indexOf(' ') === -1, {
+        message: 'The option mailNickname cannot contain spaces.',
+        path: ['mailNickname']
+      })
+      .refine(options => !options.owners || validation.isValidUserPrincipalNameArray(options.owners) === true, options => ({
+        message: `The following owners are invalid: ${validation.isValidUserPrincipalNameArray(options.owners)}.`,
+        path: ['owners']
+      }))
+      .refine(options => !options.members || validation.isValidUserPrincipalNameArray(options.members) === true, options => ({
+        message: `The following members are invalid: ${validation.isValidUserPrincipalNameArray(options.members)}.`,
+        path: ['members']
+      }))
+      .refine(options => {
+        if (!options.logoPath) {
+          return true;
+        }
+        
+        const fullPath: string = path.resolve(options.logoPath);
+        
+        if (!fs.existsSync(fullPath)) {
+          return false;
+        }
+        
+        if (fs.lstatSync(fullPath).isDirectory()) {
+          return false;
+        }
+        
+        return true;
+      }, options => {
+        if (!options.logoPath) {
+          return { message: '' };
+        }
+        
+        const fullPath: string = path.resolve(options.logoPath);
+        
+        if (!fs.existsSync(fullPath)) {
+          return { message: `File '${fullPath}' not found`, path: ['logoPath'] };
+        }
+        
+        if (fs.lstatSync(fullPath).isDirectory()) {
+          return { message: `Path '${fullPath}' points to a directory`, path: ['logoPath'] };
+        }
+        
+        return { message: `Invalid file path`, path: ['logoPath'] };
+      })
+      .refine(options => {
+        if (!options.visibility) {
+          return true;
+        }
+        
+        const allowedVisibilities = ['Private', 'Public', 'HiddenMembership'];
+        return allowedVisibilities.map(x => x.toLowerCase()).indexOf(options.visibility!.toLowerCase()) !== -1;
+      }, options => ({
+        message: `${options.visibility} is not a valid visibility. Allowed values are Private, Public, HiddenMembership`,
+        path: ['visibility']
+      }));
+  }
+
   constructor() {
     super();
 
     this.#initTelemetry();
+    this.#initOptions();
+    this.#initTypes();
+    this.#initValidators();
   }
 
   #initTelemetry(): void {
@@ -116,12 +136,106 @@ class EntraM365GroupAddCommand extends GraphCommand {
     });
   }
 
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-n, --displayName <displayName>'
+      },
+      {
+        option: '-m, --mailNickname <mailNickname>'
+      },
+      {
+        option: '-d, --description [description]'
+      },
+      {
+        option: '--owners [owners]'
+      },
+      {
+        option: '--members [members]'
+      },
+      {
+        option: '--visibility [visibility]',
+        autocomplete: this.allowedVisibilities
+      },
+      {
+        option: '--allowMembersToPost [allowMembersToPost]',
+        autocomplete: ['true', 'false']
+      },
+      {
+        option: '--hideGroupInOutlook [hideGroupInOutlook]',
+        autocomplete: ['true', 'false']
+      },
+      {
+        option: '--subscribeNewGroupMembers [subscribeNewGroupMembers]',
+        autocomplete: ['true', 'false']
+      },
+      {
+        option: '--welcomeEmailDisabled [welcomeEmailDisabled]',
+        autocomplete: ['true', 'false']
+      },
+      {
+        option: '-l, --logoPath [logoPath]'
+      }
+    );
+  }
+
+  #initTypes(): void {
+    this.types.string.push('displayName', 'mailNickname', 'description', 'owners', 'members', 'visibility', 'logoPath');
+    this.types.boolean.push('allowMembersToPost', 'hideGroupInOutlook', 'subscribeNewGroupMembers', 'welcomeEmailDisabled');
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (args.options.owners) {
+          const owners: string[] = args.options.owners.split(',').map(o => o.trim());
+          for (let i = 0; i < owners.length; i++) {
+            if (owners[i].indexOf('@') < 0) {
+              return `${owners[i]} is not a valid userPrincipalName`;
+            }
+          }
+        }
+
+        if (args.options.members) {
+          const members: string[] = args.options.members.split(',').map(m => m.trim());
+          for (let i = 0; i < members.length; i++) {
+            if (members[i].indexOf('@') < 0) {
+              return `${members[i]} is not a valid userPrincipalName`;
+            }
+          }
+        }
+
+        if (args.options.mailNickname.indexOf(' ') !== -1) {
+          return 'The option mailNickname cannot contain spaces.';
+        }
+
+        if (args.options.logoPath) {
+          const fullPath: string = path.resolve(args.options.logoPath);
+
+          if (!fs.existsSync(fullPath)) {
+            return `File '${fullPath}' not found`;
+          }
+
+          if (fs.lstatSync(fullPath).isDirectory()) {
+            return `Path '${fullPath}' points to a directory`;
+          }
+        }
+
+        if (args.options.visibility && this.allowedVisibilities.map(x => x.toLowerCase()).indexOf(args.options.visibility.toLowerCase()) === -1) {
+          return `${args.options.visibility} is not a valid visibility. Allowed values are ${this.allowedVisibilities.join(', ')}`;
+        }
+
+        return true;
+      }
+    );
+  }
+
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     let group: Group;
     let ownerIds: string[] = [];
     let memberIds: string[] = [];
     const resourceBehaviorOptionsCollection: string[] = [];
-    const resolvedVisibility = args.options.visibility || Visibility.Public;
+    const resolvedVisibility = args.options.visibility || 'Public';
 
     if (this.verbose) {
       await logger.logToStderr('Creating Microsoft 365 Group...');
