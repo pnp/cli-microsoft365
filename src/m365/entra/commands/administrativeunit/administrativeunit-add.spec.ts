@@ -1,17 +1,18 @@
 import assert from 'assert';
 import sinon from 'sinon';
+import { z } from 'zod';
 import auth from '../../../../Auth.js';
 import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
-import commands from '../../commands.js';
-import command from './administrativeunit-add.js';
+import { Logger } from '../../../../cli/Logger.js';
+import { CommandError } from '../../../../Command.js';
+import request from '../../../../request.js';
 import { telemetry } from '../../../../telemetry.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
-import request from '../../../../request.js';
-import { Logger } from '../../../../cli/Logger.js';
-import { CommandError } from '../../../../Command.js';
+import commands from '../../commands.js';
+import command from './administrativeunit-add.js';
 
 describe(commands.ADMINISTRATIVEUNIT_ADD, () => {
   const administrativeUnitReponse: any = {
@@ -33,6 +34,7 @@ describe(commands.ADMINISTRATIVEUNIT_ADD, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: z.ZodTypeAny;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -41,6 +43,7 @@ describe(commands.ADMINISTRATIVEUNIT_ADD, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
   });
 
   beforeEach(() => {
@@ -83,6 +86,27 @@ describe(commands.ADMINISTRATIVEUNIT_ADD, () => {
     assert.strictEqual(command.allowUnknownOptions(), true);
   });
 
+  it('fails validation when displayName is not specified', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('passes validation when displayName is specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      displayName: 'European Division'
+    });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('passes validation when displayName, description and hiddenMembership are specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      displayName: 'European Division',
+      description: 'European Division Administration',
+      hiddenMembership: true
+    });
+    assert.strictEqual(actual.success, true);
+  });
+
   it('creates an administrative unit with a specific display name', async () => {
     const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/directory/administrativeUnits') {
@@ -92,7 +116,7 @@ describe(commands.ADMINISTRATIVEUNIT_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { displayName: 'European Division' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ displayName: 'European Division' }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, {
       displayName: 'European Division',
       description: undefined,
@@ -113,7 +137,7 @@ describe(commands.ADMINISTRATIVEUNIT_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { displayName: 'European Division', description: 'European Division Administration' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ displayName: 'European Division', description: 'European Division Administration' }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, {
       displayName: 'European Division',
       description: 'European Division Administration',
@@ -132,12 +156,11 @@ describe(commands.ADMINISTRATIVEUNIT_ADD, () => {
     });
 
     await command.action(logger, {
-      options:
-      {
+      options: commandOptionsSchema.parse({
         displayName: 'European Division',
         description: 'European Division Administration',
         extension_b7d8e648520f41d3b9c0fdeb91768a0a_jobGroupTracker: 'JobGroupN'
-      }
+      })
     });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, {
       displayName: 'European Division',
@@ -161,7 +184,7 @@ describe(commands.ADMINISTRATIVEUNIT_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { displayName: 'European Division', description: 'European Division Administration', hiddenMembership: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ displayName: 'European Division', description: 'European Division Administration', hiddenMembership: true }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, {
       displayName: 'European Division',
       description: 'European Division Administration',
@@ -182,17 +205,7 @@ describe(commands.ADMINISTRATIVEUNIT_ADD, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('Invalid request'));
-  });
-
-  it('passes validation when only displayName is specified', async () => {
-    const actual = await command.validate({ options: { displayName: 'European Division' } }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
-
-  it('passes validation when the displayName, description and hiddenMembership are specified', async () => {
-    const actual = await command.validate({ options: { displayName: 'European Division', description: 'European Division Administration', hiddenMembership: true } }, commandInfo);
-    assert.strictEqual(actual, true);
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ displayName: 'European Division' }) } as any), new CommandError('Invalid request'));
   });
 
   it('supports specifying displayName', () => {
