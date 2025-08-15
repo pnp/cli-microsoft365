@@ -1,18 +1,24 @@
 import { AdministrativeUnit } from "@microsoft/microsoft-graph-types";
-import GlobalOptions from "../../../../GlobalOptions.js";
+import { z } from 'zod';
 import { Logger } from "../../../../cli/Logger.js";
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from "../../../../request.js";
+import { zod } from '../../../../utils/zod.js';
 import GraphCommand from "../../../base/GraphCommand.js";
 import commands from "../../commands.js";
 
+const options = globalOptionsZod
+  .extend({
+    displayName: zod.alias('n', z.string()),
+    description: zod.alias('d', z.string().optional()),
+    hiddenMembership: z.boolean().optional()
+  })
+  .passthrough();
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  displayName: string;
-  description?: string;
-  hiddenMembership?: boolean;
 }
 
 class EntraAdministrativeUnitAddCommand extends GraphCommand {
@@ -28,33 +34,8 @@ class EntraAdministrativeUnitAddCommand extends GraphCommand {
     return true;
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        hiddenMembership: !!args.options.hiddenMembership
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-n, --displayName <displayName>'
-      },
-      {
-        option: '-d, --description [description]'
-      },
-      {
-        option: '--hiddenMembership'
-      }
-    );
+  public get schema(): z.ZodTypeAny | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -64,7 +45,7 @@ class EntraAdministrativeUnitAddCommand extends GraphCommand {
       visibility: args.options.hiddenMembership ? 'HiddenMembership' : null
     };
 
-    this.addUnknownOptionsToPayload(requestBody, args.options);
+    this.addUnknownOptionsToPayloadZod(requestBody, args.options);
 
     const requestOptions: CliRequestOptions = {
       url: `${this.resource}/v1.0/directory/administrativeUnits`,

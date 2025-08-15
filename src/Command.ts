@@ -495,6 +495,11 @@ export default abstract class Command {
     optionsUtils.addUnknownOptionsToPayload(payload, unknownOptions);
   }
 
+  protected addUnknownOptionsToPayloadZod(payload: any, options: any): void {
+    const unknownOptions: any = optionsUtils.getUnknownOptions(options, zod.schemaToOptions(this.schema!));
+    optionsUtils.addUnknownOptionsToPayload(payload, unknownOptions);
+  }
+
   private loadValuesFromAccessToken(args: CommandArgs): void {
     if (!auth.connection.accessTokens[auth.defaultResource]) {
       return;
