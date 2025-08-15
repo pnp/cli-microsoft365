@@ -95,10 +95,17 @@ export class Page {
   }
 
   public static getSectionInformation(section: CanvasSection, isJSONOutput: boolean): any {
-    return {
-      order: section.order,
-      columns: section.columns.map(column => this.getColumnsInformation(column, isJSONOutput))
+    const sectionOutput: any = {
+      order: section.order
     };
+
+    if (this.isVerticalSection(section)) {
+      sectionOutput.isVertical = true;
+    }
+
+    sectionOutput.columns = section.columns.map(column => this.getColumnsInformation(column, isJSONOutput));
+
+    return sectionOutput;
   }
 
   /**
@@ -125,5 +132,9 @@ export class Page {
     }
 
     return pageName;
+  }
+
+  private static isVerticalSection(section: CanvasSection): boolean {
+    return section.layoutIndex === 2 && section?.controlData?.position?.sectionFactor === 12;
   }
 }

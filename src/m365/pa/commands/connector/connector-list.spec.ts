@@ -23,7 +23,7 @@ describe(commands.CONNECTOR_LIST, () => {
     sinon.stub(telemetry, 'trackEvent').resolves();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
-    sinon.stub(accessToken, 'assertDelegatedAccessToken').returns();
+    sinon.stub(accessToken, 'assertAccessTokenType').returns();
     auth.connection.active = true;
   });
 

@@ -3,7 +3,7 @@ import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { validation } from '../../../../utils/validation.js';
-import DelegatedGraphCommand from '../../../base/DelegatedGraphCommand.js';
+import GraphDelegatedCommand from '../../../base/GraphDelegatedCommand.js';
 import commands from '../../commands.js';
 
 interface CommandArgs {
@@ -26,7 +26,7 @@ interface Options extends GlobalOptions {
   startDateTime?: string;
 }
 
-class TodoTaskSetCommand extends DelegatedGraphCommand {
+class TodoTaskSetCommand extends GraphDelegatedCommand {
   public get name(): string {
     return commands.TASK_SET;
   }

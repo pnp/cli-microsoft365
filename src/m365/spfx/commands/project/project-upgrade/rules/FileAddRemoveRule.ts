@@ -46,6 +46,13 @@ ${this.contents}
     if ((!this.add && fs.existsSync(targetPath)) ||
       (this.add && !fs.existsSync(targetPath))) {
       this.addFinding(notifications);
+      return;
+    }
+    if (this.add && this.contents) {
+      const fileContent: string = fs.readFileSync(path.join(project.path, this.filePath), 'utf8');
+      if (fileContent !== this.contents) {
+        this.addFinding(notifications);
+      }
     }
   }
 }

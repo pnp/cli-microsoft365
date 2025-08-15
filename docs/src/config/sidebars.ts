@@ -75,6 +75,11 @@ const sidebars: SidebarsConfig = {
           app: [
             {
               type: 'doc',
+              label: 'app add',
+              id: 'cmd/cli/app/app-add'
+            },
+            {
+              type: 'doc',
               label: 'app reconsent',
               id: 'cmd/cli/app/app-reconsent'
             }
@@ -2190,6 +2195,11 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'container recyclebinitem list',
               id: 'cmd/spe/container/container-recyclebinitem-list'
+            },
+            {
+              type: 'doc',
+              label: 'container recyclebinitem restore',
+              id: 'cmd/spe/container/container-recyclebinitem-restore'
             }
           ]
         },
@@ -4324,6 +4334,15 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'cache remove',
               id: 'cmd/teams/cache/cache-remove'
+            }
+          ]
+        },
+        {
+          callrecord: [
+            {
+              type: 'doc',
+              label: 'callrecord list',
+              id: 'cmd/teams/callrecord/callrecord-list'
             }
           ]
         },

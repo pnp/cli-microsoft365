@@ -63,10 +63,15 @@ class SpoPageSectionListCommand extends SpoCommand {
         }
         else {
           await logger.log(output.map(s => {
-            return {
+            const sectionOutput: any = {
               order: s.order,
               columns: s.columns.length
             };
+
+            if (s.isVertical) {
+              sectionOutput.isVertical = s.isVertical;
+            }
+            return sectionOutput;
           }));
         }
       }

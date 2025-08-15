@@ -1,0 +1,41 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/heft/v0/heft.schema.json",
+
+  "extends": "@microsoft/spfx-web-build-rig/profiles/default/config/heft.json",
+
+  "phasesByName": {
+    "build": {
+      "tasksByName": {
+        // copies the localization js files to the lib folder
+        "copy-strings": {
+          "taskPlugin": {
+            "pluginPackage": "@rushstack/heft",
+            "pluginName": "copy-files-plugin",
+            "options": {
+              "copyOperations": [
+                {
+                  "sourcePath": "./src",
+                  "destinationFolders": ["./lib", "./lib-commonjs"],
+                  "fileExtensions": [".js"]
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
+    "eject-webpack": {
+      "tasksByName": {
+        "eject-webpack": {
+          "taskPlugin": {
+            "pluginPackage": "@rushstack/heft",
+            "pluginName": "run-script-plugin",
+            "options": {
+              "scriptPath": "node_modules/@microsoft/spfx-heft-plugins/lib-commonjs/plugins/ejectWebpackPlugin/EjectWebpackPlugin.js"
+            }
+          }
+        }
+      }
+    }
+  }
+}

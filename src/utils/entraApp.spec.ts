@@ -59,6 +59,38 @@ describe('utils/entraApp', () => {
     assert.deepStrictEqual(actual.id, appObjectId);
   });
 
+  it('correctly get single app by appObjectId using getAppRegistrationByObjectId', async () => {
+    sinon.stub(request, 'get').callsFake(async opts => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/applications/${appObjectId}`) {
+        return {
+          id: appObjectId,
+          displayName: appName
+        };
+      }
+
+      return 'Invalid Request';
+    });
+
+    const actual = await entraApp.getAppRegistrationByObjectId(appObjectId);
+    assert.deepStrictEqual(actual.displayName, appName);
+  });
+
+  it('correctly get single app with specified properties by appObjectId using getAppRegistrationByObjectId', async () => {
+    sinon.stub(request, 'get').callsFake(async opts => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/applications/${appObjectId}?$select=id,displayName`) {
+        return {
+          id: appObjectId,
+          displayName: appName
+        };
+      }
+
+      return 'Invalid Request';
+    });
+
+    const actual = await entraApp.getAppRegistrationByObjectId(appObjectId, ["id", "displayName"]);
+    assert.deepStrictEqual(actual.displayName, appName);
+  });
+
   it('handles selecting single application when multiple applications with the specified name found using getAppRegistrationByAppName and cli is set to prompt', async () => {
     sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/applications?$filter=displayName eq '${formatting.encodeQueryParameter(appName)}'&$select=id`) {
