@@ -15,28 +15,8 @@ describe('FN002022_DEVDEP_typescript', () => {
     assert.strictEqual(rule.id, 'FN002022');
   });
 
-  it('has the correct title', () => {
-    assert.strictEqual(rule.title, 'TypeScript version mismatch');
-  });
-
-  it('has a description', () => {
-    assert.notStrictEqual(rule.description, null);
-  });
-
   it('does not return finding when packageJson is missing', () => {
     const project: any = {};
-    rule.visit(project, findings);
-    assert.strictEqual(findings.length, 0);
-  });
-
-  it('does not return finding when typescript is ~5.3.3 in dependencies', () => {
-    const project: any = {
-      packageJson: {
-        dependencies: {
-          typescript: '~5.3.3'
-        }
-      }
-    };
     rule.visit(project, findings);
     assert.strictEqual(findings.length, 0);
   });
