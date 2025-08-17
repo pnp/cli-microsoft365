@@ -2304,6 +2304,15 @@ const sidebars: SidebarsConfig = {
           id: 'cmd/spo/spo-set'
         },
         {
+          agent: [
+            {
+              type: 'doc',
+              label: 'agent add',
+              id: 'cmd/spo/agent/agent-add'
+            },
+          ]
+        },
+        {
           app: [
             {
               type: 'doc',

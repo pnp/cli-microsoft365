@@ -1,0 +1,171 @@
+import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# spo agent add
+
+Adds a new SharePoint agent
+
+## Usage
+
+```sh
+m365 spo agent add [options]
+```
+
+## Options
+
+```md definition-list
+`-u, --webUrl <webUrl>`
+: URL of the site where the agent should be added.
+
+`-n, --name <name>`
+: The name of the agent.
+
+`-a, --agentInstructions <agentInstructions>`
+: The definition of the agent's role, tone, and limitations.
+
+`-w, --welcomeMessage <welcomeMessage>`
+: The welcome message.
+
+`-s, --sourceUrls <sourceUrls>`
+: Comma-separated list of URLs of the SharePoint sites, libraries, or files that are the sources of information.
+
+`-d, --description <description>`
+: The brief description of the agent's objective.
+
+`-i, --icon [icon]`
+: The URL of the icon.
+
+`-c, --conversationStarters [conversationStarters]`
+: Starter prompts. Please provide each prompt separated by a comma.
+```
+
+<Global />
+
+## Examples
+
+Add a SharePoint agent with site and library sources.
+
+```sh
+m365 spo agent add --webUrl https://contoso.sharepoint.com/sites/projectSite --name "Project Assistant" --agentInstructions "You are a helpful assistant for project management tasks. Be professional and concise." --welcomeMessage "Hello! I'm here to help you with project management tasks." --sourceUrls "https://contoso.sharepoint.com/sites/projectSite,https://contoso.sharepoint.com/sites/projectSite/Shared Documents/Forms/AllItems.aspx" --description "A helpful agent for project management assistance"
+```
+
+Add a SharePoint agent with icon and conversation starters.
+
+```sh
+m365 spo agent add --webUrl https://contoso.sharepoint.com/sites/projectSite --name "HR Assistant" --agentInstructions "You are an HR assistant. Help with HR policies and procedures." --welcomeMessage "Welcome! I can help you with HR-related questions." --sourceUrls "https://contoso.sharepoint.com/sites/hr" --icon "https://contoso.sharepoint.com/sites/projectSite/SiteAssets/hr-icon.png" --conversationStarters "What are the vacation policies?,How do I submit a timesheet?,Where can I find the employee handbook?" --description "A helpful agent for project management assistance"
+```
+
+Add a basic SharePoint agent with minimal configuration.
+
+```sh
+m365 spo agent add --webUrl https://contoso.sharepoint.com/sites/marketing --name "Marketing Bot" --agentInstructions "Assist with marketing campaign information and resources." --welcomeMessage "Hi! I can help you find marketing resources." --sourceUrls "https://contoso.sharepoint.com/sites/marketing/Campaigns" --description "A helpful agent for project management assistance"
+```
+
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  {
+    "CheckInComment": "",
+    "CheckOutType": 2,
+    "ContentTag": "{95784749-23D7-410D-BAEF-E694328F89AB},1,1",
+    "CustomizedPageStatus": 0,
+    "ETag": "\"{95784749-23D7-410D-BAEF-E694328F89AB},1\"",
+    "Exists": true,
+    "ExistsAllowThrowForPolicyFailures": true,
+    "ExistsWithException": true,
+    "IrmEnabled": false,
+    "Length": "4543",
+    "Level": 1,
+    "LinkingUri": null,
+    "LinkingUrl": "",
+    "MajorVersion": 1,
+    "MinorVersion": 0,
+    "Name": "Test Agent (4).agent",
+    "ServerRelativeUrl": "/sites/TestSite/SiteAssets/Copilots/Test Agent.agent",
+    "TimeCreated": "2025-08-19T06:49:03Z",
+    "TimeLastModified": "2025-08-19T06:49:03Z",
+    "Title": null,
+    "UIVersion": 512,
+    "UIVersionLabel": "1.0",
+    "UniqueId": "95784749-23d7-410d-baef-e694328f89ab"
+  }
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  CheckOutType                     : 2
+  ContentTag                       : {802D355C-0917-44D9-A51C-6FD873572700},1,1
+  CustomizedPageStatus             : 0
+  ETag                             : "{802D355C-0917-44D9-A51C-6FD873572700},1"
+  Exists                           : true
+  ExistsAllowThrowForPolicyFailures: true
+  ExistsWithException              : true
+  IrmEnabled                       : false
+  Length                           : 4543
+  Level                            : 1
+  LinkingUri                       : null
+  LinkingUrl                       :
+  MajorVersion                     : 1
+  MinorVersion                     : 0
+  Name                             : Test Agent.agent
+  ServerRelativeUrl                : /sites/TestSite/SiteAssets/Copilots/Test Agent.agent
+  TimeCreated                      : 2025-08-19T06:48:26Z
+  TimeLastModified                 : 2025-08-19T06:48:26Z
+  Title                            : null
+  UIVersion                        : 512
+  UIVersionLabel                   : 1.0
+  UniqueId                         : 802d355c-0917-44d9-a51c-6fd873572700
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  CheckInComment,CheckOutType,ContentTag,CustomizedPageStatus,ETag,Exists,ExistsAllowThrowForPolicyFailures,ExistsWithException,IrmEnabled,Length,Level,Linkin
+  gUri,LinkingUrl,MajorVersion,MinorVersion,Name,ServerRelativeUrl,TimeCreated,TimeLastModified,Title,UIVersion,UIVersionLabel,UniqueId
+  ,2,"{A8541C6C-163E-48B9-AD8C-33D9669C148A},1,1",0,"""{A8541C6C-163E-48B9-AD8C-33D9669C148A},1""",1,1,1,0,4543,1,,,1,0,Test Agent.agent,/sites/TestSite/SiteAssets/Copilots/Test Agent.agent,2025-08-19T06:47:57Z,2025-08-19T06:47:57Z,,512,1.0,a8541c6c-163e-48b9-ad8c-33d9669c148a
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # spo agent add --debug "false" --verbose "false" --webUrl "https://contoso.sharepoint.com/sites/TestSite/" --name "Test Agent" --
+agentInstructions "You are a comprehensive test agent" --welcomeMessage "Welcome to the comprehensive test agent" --sourceUrls "https://contoso.sharepoint.com/sites/TestSite/Shared%20Documents/Forms/AllItems" --description "A comprehensive test agent"
+  Date: 19/08/2025
+
+  ## Test Agent.agent (ad6f7a4e-4582-4cc4-bae6-65ade97e5e71)
+
+  Property | Value
+  ---------|-------
+  CheckInComment |
+  CheckOutType | 2
+  ContentTag | {AD6F7A4E-4582-4CC4-BAE6-65ADE97E5E71},1,1
+  CustomizedPageStatus | 0
+  ETag | "{AD6F7A4E-4582-4CC4-BAE6-65ADE97E5E71},1"
+  Exists | true
+  ExistsAllowThrowForPolicyFailures | true
+  ExistsWithException | true
+  IrmEnabled | false
+  Length | 4543
+  Level | 1
+  LinkingUrl |
+  MajorVersion | 1
+  MinorVersion | 0
+  Name | Test Agent.agent
+  ServerRelativeUrl | /sites/TestSite/SiteAssets/Copilots/Test Agent.agent
+  TimeCreated | 2025-08-19T06:46:30Z
+  TimeLastModified | 2025-08-19T06:46:30Z
+  UIVersion | 512
+  UIVersionLabel | 1.0
+  UniqueId | ad6f7a4e-4582-4cc4-bae6-65ade97e5e71
+  ```
+
+  </TabItem>
+</Tabs>
