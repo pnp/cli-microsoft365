@@ -20,6 +20,11 @@ sidebar_position: 4
 
 - [teams callrecord list](../cmd/teams/callrecord/callrecord-list.mdx) - lists all Teams calls within the tenant [#6737](https://github.com/pnp/cli-microsoft365/issues/6737)
 
+**Viva:**
+
+- [viva engage role list](../cmd/viva/engage/engage-role-list.mdx) - lists all Viva Engage roles [#6796](https://github.com/pnp/cli-microsoft365/issues/6796)
+- [viva engage role member list](../cmd/viva/engage/engage-role-member-list.mdx) - lists all users assigned to a Viva Engage role [#6820](https://github.com/pnp/cli-microsoft365/issues/6820)
+
 ### Changes
 
 - added Azure DevOps guidance and updates GitHub Actions guidance [#5879](https://github.com/pnp/cli-microsoft365/issues/5879)
@@ -27,10 +32,13 @@ sidebar_position: 4
 - added dependabot
 - enhanced docs to be v4 ready [#6800](https://github.com/pnp/cli-microsoft365/issues/6800)
 - enhanced app commands to use getAppRegistrationByAppName util [#6679](https://github.com/pnp/cli-microsoft365/issues/6679)
-- updated 'spo serviceprincipal permissionrequest list' command [#6788](https://github.com/pnp/cli-microsoft365/pull/6788)
-- updated 'spo site appcatalog list' command [#6794](https://github.com/pnp/cli-microsoft365/pull/6794)
-- updated 'spo page section' commands [#6743](https://github.com/pnp/cli-microsoft365/pull/6743)
-- updated 'spo tenant site unarchive' warning prompt
+- updated [spo serviceprincipal permissionrequest list](../cmd/spo/serviceprincipal/serviceprincipal-permissionrequest-list.mdx) command where the output was not consistent [#6788](https://github.com/pnp/cli-microsoft365/pull/6788)
+- updated [spo site appcatalog list](../cmd/spo/site/site-appcatalog-list.mdx) command with ability to ignore deleted sites [#6794](https://github.com/pnp/cli-microsoft365/pull/6794)
+- updated `spo page section` commands to support vertical sections [#6743](https://github.com/pnp/cli-microsoft365/pull/6743)
+- updated [spo tenant site unarchive](../cmd/spo/tenant/tenant-site-unarchive.mdx) warning prompt [#6753](https://github.com/pnp/cli-microsoft365/pull/6753)
+- updated [spfx project doctor](../cmd/spfx/project/project-doctor.mdx) command to check the Typescript version of the project [#6716](https://github.com/pnp/cli-microsoft365/issues/6716)
+- updated [entra group member add](../cmd/entra/group/group-member-add.mdx) command to support adding subgroups [#6480](https://github.com/pnp/cli-microsoft365/issues/6480)
+- updated [spo file version list](../cmd/spo/file/file-version-list.mdx) and [spo file version get](../cmd/spo/file/file-version-get.mdx) response to include `ExpirationDate` property [#6773](https://github.com/pnp/cli-microsoft365/issues/6773)
 
 ## [v10.10.0](https://github.com/pnp/cli-microsoft365/releases/tag/v10.10.0)
 
