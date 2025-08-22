@@ -1,29 +1,17 @@
 # v11 Upgrade Guidance
 
-The v11 release of CLI for Microsoft 365 introduces several breaking changes. To assist you in upgrading to the latest version, we’ve outlined the changes and the actions you may need to take.
+The v11 release of CLI for Microsoft 365 introduces several breaking changes. To assist you in upgrading to the latest version, we've outlined the changes and the actions you may need to take.
 
-## Viva Engage
+## General
 
-### Removed command `viva engage group list`
+### Removed commands
 
-The command used an unstable undocumented API that required extra scopes to be consented on the app registration.
+Some commands were removed because they used either undocumented APIs that required extra scope to be consented on the app registration or obsolete APIs.
 
-#### What action do I need to take?
+Read the documentation for alternative commands to find out how to use them and what permissions are required.
 
-Instead of using the `viva engage group list` command, use the [viva engage community list](./cmd/viva/engage/engage-community-list.mdx) command.
-
-### Removed command `viva engage group user add`
-
-The command used an unstable undocumented API that required extra scopes to be consented on the app registration.
-
-#### What action do I need to take?
-
-Instead of using the `viva engage group user add` command, use the [viva engage community user add](./cmd/viva/engage/engage-community-user-add.mdx) command.
-
-### Removed command `viva engage group user remove`
-
-The command used an unstable undocumented API that required extra scopes to be consented on the app registration.
-
-#### What action do I need to take?
-
-Instead of using the `viva engage group user remove` command, use the [viva engage community user remove](./cmd/viva/engage/engage-community-user-remove.mdx) command.
+command | alternative
+--- | ---
+`viva engage group list` | [viva engage community list](./cmd/viva/engage/engage-community-list.mdx)
+`viva engage group user add` | [viva engage community user add](./cmd/viva/engage/engage-community-user-add.mdx)
+`viva engage group user remove` | [viva engage community user remove](./cmd/viva/engage/engage-community-user-remove.mdx)
