@@ -3,7 +3,6 @@ import { odata } from '../../../../utils/odata.js';
 import { spo } from '../../../../utils/spo.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
-import { CliRequestOptions } from "../../../../request.js";
 
 class SpoHomeSiteListCommand extends SpoCommand {
   public get name(): string {
@@ -27,17 +26,10 @@ class SpoHomeSiteListCommand extends SpoCommand {
 
     try {
       const spoAdminUrl: string = await spo.getSpoAdminUrl(logger, this.verbose);
-      const requestOptions: CliRequestOptions = {
-        url: `${spoAdminUrl}/_api/SPO.Tenant/GetTargetedSitesDetails`,
-        headers: {
-          accept: 'application/json;odata=nometadata'
-        },
-        responseType: 'json'
-      };
       if (this.verbose) {
         await logger.logToStderr(`Retrieving all home sites...`);
       }
-      const res = await odata.getAllItems(requestOptions);
+      const res = await odata.getAllItems(`${spoAdminUrl}/_api/SPO.Tenant/GetTargetedSitesDetails`);
       await logger.log(res);
     }
     catch (err: any) {
