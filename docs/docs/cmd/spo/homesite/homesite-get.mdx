@@ -4,7 +4,7 @@ import TabItem from '@theme/TabItem';
 
 # spo homesite get
 
-Gets information about the Home Site
+Gets information about a home site
 
 ## Usage
 
@@ -14,14 +14,19 @@ m365 spo homesite get [options]
 
 ## Options
 
+```md definition-list
+`-u, --url <url>`
+: URL of the home site.
+```
+
 <Global />
 
 ## Examples
 
-Get information about the Home Site.
+Get information about a home site.
 
 ```sh
-m365 spo homesite get
+m365 spo homesite get --url https://contoso.sharepoint.com/sites/Home
 ```
 
 ## Response
@@ -31,11 +36,21 @@ m365 spo homesite get
 
   ```json
   {
-    "SiteId": "af80c11f-0138-4d72-bb37-514542c3aabb",
-    "WebId": "6f90666d-b0e7-40c3-991f-4ab051d00a70",
-    "LogoUrl": "https://contoso.sharepoint.com/sites/intra/siteassets/work.png",
-    "Title": "Intranet",
-    "Url": "https://contoso.sharepoint.com/sites/intra"
+    "Audiences": [
+      {
+        "Email": "Marketing@contoso.onmicrosoft.com",
+        "Id": "contoso73155a8f-4db7-42e7-baf4-c724d24bf373",
+        "Title": "Marketing Members"
+      }
+    ],
+    "IsInDraftMode": false,
+    "IsVivaBackendSite": false,
+    "SiteId": "e16a5a81-67fb-4a5e-a959-1f33ae44c69f",
+    "TargetedLicenseType": 0,
+    "Title": "Home",
+    "Url": "https://contoso.sharepoint.com/",
+    "VivaConnectionsDefaultStart": false,
+    "WebId": "2779dcbb-fae0-4b0c-a845-89ab4c941fab"
   }
   ```
 
@@ -43,39 +58,45 @@ m365 spo homesite get
   <TabItem value="Text">
 
   ```text
-  LogoUrl: https://contoso.sharepoint.com/sites/intra/siteassets/work.png
-  SiteId : af80c11f-0138-4d72-bb37-514542c3aabb
-  Title  : Intranet
-  Url    : https://contoso.sharepoint.com/sites/intra
-  WebId  : 6f90666d-b0e7-40c3-991f-4ab051d00a70
+  Audiences                  : [{"Email":"Marketing@contoso.onmicrosoft.com","Id":"contoso73155a8f-4db7-42e7-baf4-c724d24bf373","Title":"Marketing Members"}]
+  IsInDraftMode              : false
+  IsVivaBackendSite          : false
+  SiteId                     : e16a5a81-67fb-4a5e-a959-1f33ae44c69f
+  TargetedLicenseType        : 0
+  Title                      : Home
+  Url                        : https://contoso.sharepoint.com/
+  VivaConnectionsDefaultStart: false
+  WebId                      : 2779dcbb-fae0-4b0c-a845-89ab4c941fab
   ```
 
   </TabItem>
   <TabItem value="CSV">
 
   ```csv
-  SiteId,WebId,LogoUrl,Title,Url
-  af80c11f-0138-4d72-bb37-514542c3aabb,6f90666d-b0e7-40c3-991f-4ab051d00a70,https://contoso.sharepoint.com/sites/intra/siteassets/work.png,Intranet,https://contoso.sharepoint.com/sites/intra
+  IsInDraftMode,IsVivaBackendSite,SiteId,TargetedLicenseType,Title,Url,VivaConnectionsDefaultStart,WebId
+  0,0,e16a5a81-67fb-4a5e-a959-1f33ae44c69f,0,Home,https://contoso.sharepoint.com/,0,2779dcbb-fae0-4b0c-a845-89ab4c941fab
   ```
 
   </TabItem>
   <TabItem value="Markdown">
 
   ```md
-  # spo homesite get
+  # spo homesite get --url "https://contoso.sharepoint.com"
 
-  Date: 2/20/2023
+  Date: 23/08/2025
 
-  ## Intranet (https://contoso.sharepoint.com/sites/intra)
+  ## Home (https://contoso.sharepoint.com/)
 
   Property | Value
   ---------|-------
   IsInDraftMode | false
-  SiteId | af80c11f-0138-4d72-bb37-514542c3aabb
-  WebId |6f90666d-b0e7-40c3-991f-4ab051d00a70
-  LogoUrl | https://contoso.sharepoint.com/sites/intra/siteassets/work.png
-  Title | Intranet
-  Url | https://contoso.sharepoint.com/sites/intra
+  IsVivaBackendSite | false
+  SiteId | e16a5a81-67fb-4a5e-a959-1f33ae44c69f
+  TargetedLicenseType | 0
+  Title | Home
+  Url | https://contoso.sharepoint.com/
+  VivaConnectionsDefaultStart | false
+  WebId | 2779dcbb-fae0-4b0c-a845-89ab4c941fab
   ```
 
   </TabItem>

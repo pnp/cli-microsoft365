@@ -25,6 +25,26 @@ The [spo list view add](./cmd/spo/list/list-view-add.mdx) command has been updat
 - **If you want paged views (most common)**: No action required as this is now the default behavior.
 - **If you want static views**: Explicitly specify `--paged false` when creating views that should not fetch new items while scrolling.
 
+### Updated `homesite` commands and options
+
+In the beginning when SharePoint home sites were introduced, you could only setup one single home site per tenant.
+Nowadays, you can have multiple home sites in your tenant.
+To reflect this change, we had to update our `spo homesite` commands to always require a URL to identify the home site to work with.
+
+For the following commands, the `url` option is now required.
+
+- [spo homesite get](./cmd/spo/homesite/homesite-get.mdx)
+- [spo homesite remove](./cmd/spo/homesite/homesite-remove.mdx)
+
+Additionally, the `spo homesite remove` command will not return a command output anymore. Since the command output was more informative in the past, we decided to just drop it.
+
+Due to a change in the underlying API, the command output of `spo homesite get` has also been changed. Check the documentation for the latest output format.
+
+#### What action do I need to take?
+
+Update your scripts to use the required `url` option in `spo homesite get` and `spo homesite remove` commands.
+Additionally, update your scripts to handle the changed output of the `spo homesite get` command and the lack of output of the `spo homesite remove` command.
+
 ### `spo serviceprincipal grant list` command output updated
 
 In order to align our commands with the latest updates done by Microsoft we had to update the API endpoint used by the [spo serviceprincipal grant list](./cmd/spo/serviceprincipal/serviceprincipal-grant-list.mdx) command. As a result, the output of this command has changed.
