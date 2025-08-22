@@ -61,10 +61,10 @@ paths:
     post:
       security:
         - delegated:
-          - AllSites.Read
-          - AllSites.Write
-          - AllSites.Manage
-          - AllSites.FullControl
+            - AllSites.Read
+            - AllSites.Write
+            - AllSites.Manage
+            - AllSites.FullControl
       responses:
         200:
           description: OK
@@ -72,10 +72,33 @@ paths:
     get:
       security:
         - delegated:
-          - AllSites.Read
-          - AllSites.Write
-          - AllSites.Manage
-          - AllSites.FullControl
+            - AllSites.Read
+            - AllSites.Write
+            - AllSites.Manage
+            - AllSites.FullControl
+      responses:
+        200:
+          description: OK
+  /_api/site/VersionPolicyForNewLibrariesTemplate:
+    get:
+      parameters:
+        - name: $expand
+          in: query
+          required: false
+          schema:
+            type: string
+          example: VersionPolicies
+      security:
+        - delegated:
+            - AllSites.Read
+            - AllSites.Write
+            - AllSites.Manage
+            - AllSites.FullControl
+        - application:
+            - Sites.Read.All
+            - Sites.ReadWrite.All
+            - Sites.Manage.All
+            - Sites.FullControl.All
       responses:
         200:
           description: OK
@@ -83,10 +106,10 @@ paths:
     get:
       security:
         - delegated:
-          - AllSites.Read
-          - AllSites.Write
-          - AllSites.Manage
-          - AllSites.FullControl
+            - AllSites.Read
+            - AllSites.Write
+            - AllSites.Manage
+            - AllSites.FullControl
       responses:
         200:
           description: OK
@@ -102,9 +125,9 @@ paths:
           example: "'%2FShared%20Documents%2FMy%20Folder%20Name'"
       security:
         - delegated:
-          - AllSites.Write
-          - AllSites.Manage
-          - AllSites.FullControl
+            - AllSites.Write
+            - AllSites.Manage
+            - AllSites.FullControl
       responses:
         200:
           description: OK
@@ -170,10 +193,10 @@ paths:
           example: "'%2FShared%20Documents'"
       security:
         - delegated:
-          - AllSites.Read
-          - AllSites.Write
-          - AllSites.Manage
-          - AllSites.FullControl
+            - AllSites.Read
+            - AllSites.Write
+            - AllSites.Manage
+            - AllSites.FullControl
       responses:
         200:
           description: OK
@@ -196,9 +219,9 @@ paths:
           example: "url='README.md',%20overwrite=true"
       security:
         - delegated:
-          - AllSites.Write
-          - AllSites.Manage
-          - AllSites.FullControl
+            - AllSites.Write
+            - AllSites.Manage
+            - AllSites.FullControl
       responses:
         200:
           description: OK
@@ -206,15 +229,15 @@ paths:
     get:
       security:
         - delegated:
-          - AllSites.Read
-          - AllSites.Write
-          - AllSites.Manage
-          - AllSites.FullControl
+            - AllSites.Read
+            - AllSites.Write
+            - AllSites.Manage
+            - AllSites.FullControl
         - application:
-          - Sites.Read.All
-          - Sites.Manage.All
-          - Sites.ReadWrite.All
-          - Sites.FullControl.All
+            - Sites.Read.All
+            - Sites.Manage.All
+            - Sites.ReadWrite.All
+            - Sites.FullControl.All
       responses:
         200:
           description: OK
@@ -222,14 +245,14 @@ paths:
     get:
       security:
         - delegated:
-          - AllSites.Write
-          - AllSites.Manage
-          - AllSites.FullControl
+            - AllSites.Write
+            - AllSites.Manage
+            - AllSites.FullControl
         - application:
-          - Sites.Read.All
-          - Sites.Manage.All
-          - Sites.ReadWrite.All
-          - Sites.FullControl.All
+            - Sites.Read.All
+            - Sites.Manage.All
+            - Sites.ReadWrite.All
+            - Sites.FullControl.All
       responses:
         200:
           description: OK
@@ -252,7 +275,7 @@ paths:
           example: "overwrite=false,%20url='spfx.sppkg'"
       security:
         - delegated:
-          - AllSites.FullControl
+            - AllSites.FullControl
       responses:
         200:
           description: OK
@@ -275,7 +298,7 @@ paths:
           example: "'f55e3c17-63ea-456a-8451-48d2839760f7'"
       security:
         - delegated:
-          - AllSites.FullControl
+            - AllSites.FullControl
       responses:
         200:
           description: OK
