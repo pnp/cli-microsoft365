@@ -1,6 +1,4 @@
 import Global from '/docs/cmd/_global.mdx';
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
 
 # spo homesite remove
 
@@ -15,11 +13,11 @@ m365 spo homesite remove [options]
 ## Options
 
 ```md definition-list
-`-u, --url [url]`
+`-u, --url <url>`
 : URL of the home site to remove.
 
 `-f, --force`
-: Do not prompt for confirmation before removing the Home Site.
+: Do not prompt for confirmation.
 ```
 
 <Global />
@@ -34,44 +32,21 @@ To use this command you must be either **SharePoint Administrator** or **Global 
 
 ## Examples
 
+Removes a Home site specified by URL.
+
+```sh
+m365 spo homesite remove --url "https://contoso.sharepoint.com/sites/Europe"
+```
+
 Removes a Home site specified by URL without prompting for confirmation.
 
 ```sh
-m365 spo homesite remove --url "https://contoso.sharepoint.com/sites/testcomms" --force
+m365 spo homesite remove --url "https://contoso.sharepoint.com/sites/Europe" --force
 ```
 
 ## Response
 
-<Tabs>
-  <TabItem value="JSON">
-
-  ```json
-  "https://contoso.sharepoint.com has been removed as a Home site. It may take some time for the change to apply. Check aka.ms/homesites for details."
-  ```
-
-  </TabItem>
-  <TabItem value="Text">
-
-  ```text
-  https://contoso.sharepoint.com has been removed as a Home site. It may take some time for the change to apply. Check aka.ms/homesites for details.
-  ```
-
-  </TabItem>
-  <TabItem value="CSV">
-
-  ```csv
-  https://contoso.sharepoint.com has been removed as a Home site. It may take some time for the change to apply. Check aka.ms/homesites for details.
-  ```
-
-  </TabItem>
-  <TabItem value="Markdown">
-
-  ```md
-  https://contoso.sharepoint.com has been removed as a Home site. It may take some time for the change to apply. Check aka.ms/homesites for details.
-  ```
-
-  </TabItem>
-</Tabs>
+The command won't return a response on success.
 
 ## More information
 
