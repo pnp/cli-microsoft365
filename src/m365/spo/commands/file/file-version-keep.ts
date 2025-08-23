@@ -8,6 +8,7 @@ import { validation } from '../../../../utils/validation.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
+import { odata } from '../../../../utils/odata.js';
 
 export const options = globalOptionsZod
   .extend({
@@ -18,7 +19,7 @@ export const options = globalOptionsZod
     ),
     fileUrl: z.string().optional(),
     fileId: zod.alias('i', z.string()
-      .refine(id => id === undefined || validation.isValidGuid(id), id => ({
+      .refine(id => validation.isValidGuid(id), id => ({
         message: `'${id}' is not a valid GUID.`
       })).optional()
     ),
@@ -60,23 +61,14 @@ class SpoFileVersionKeepCommand extends SpoCommand {
     try {
       const baseApiUrl = this.getBaseApiUrl(args.options.webUrl, args.options.fileUrl, args.options.fileId);
 
-      const requestVersionOptions: CliRequestOptions = {
-        url: `${baseApiUrl}/versions/?$filter=VersionLabel eq '${args.options.label}'&$select=Id`,
-        headers: {
-          accept: 'application/json;odata=nometadata'
-        },
-        responseType: 'json'
-      };
+      const response = await odata.getAllItems<{ ID: string }>(`${baseApiUrl}/versions?$filter=VersionLabel eq '${formatting.encodeQueryParameter(args.options.label)}'&$select=ID`);
 
-      const response = await request.get<{ value: { ID: number }[] }>(requestVersionOptions);
-      const version: { ID: number; } | undefined = response.value[0];
-
-      if (version === undefined) {
-        throw `Version with label '${args.options.label}' not found.`;
+      if (response.length === 0) {
+        throw new Error(`Version with label '${args.options.label}' not found.`);
       }
 
       const requestExpirationOptions: CliRequestOptions = {
-        url: `${baseApiUrl}/versions(${version.ID})/SetExpirationDate()`,
+        url: `${baseApiUrl}/versions(${response[0].ID})/SetExpirationDate()`,
         headers: {
           accept: 'application/json;odata=nometadata',
           'content-type': 'application/json'

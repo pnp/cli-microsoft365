@@ -10,6 +10,10 @@ servers:
         default: contoso
       site:
         default: ""
+  - url: https://{tenant}.sharepoint.com
+    variables:
+      tenant:
+        default: contoso
 components:
   securitySchemes:
     delegated:
@@ -104,7 +108,7 @@ paths:
       responses:
         200:
           description: OK
-  /_api/web/GetFileById({fileId})/versions/:
+  /_api/web/GetFileById({fileId})/versions:
     get:
       parameters:
         - name: fileId
@@ -119,6 +123,11 @@ paths:
             - AllSites.Write
             - AllSites.Manage
             - AllSites.FullControl
+        - application:
+            - Sites.Read.All
+            - Sites.ReadWrite.All
+            - Sites.Manage.All
+            - Sites.FullControl.All
       responses:
         200:
           description: OK
@@ -142,6 +151,10 @@ paths:
             - AllSites.Write
             - AllSites.Manage
             - AllSites.FullControl
+        - application:
+            - Sites.ReadWrite.All
+            - Sites.Manage.All
+            - Sites.FullControl.All
       responses:
         200:
           description: OK

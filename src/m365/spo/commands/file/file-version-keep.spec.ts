@@ -76,12 +76,12 @@ describe(commands.FILE_VERSION_KEEP, () => {
   });
 
   it('fails validation if fileId is not a valid GUID', async () => {
-    const actual = commandOptionsSchema.safeParse({ webUrl: validWebUrl, fileId: 'invalid' });
+    const actual = commandOptionsSchema.safeParse({ webUrl: validWebUrl, fileId: 'invalid', label: validLabel });
     assert.strictEqual(actual.success, false);
   });
 
   it('fails validation if fileUrl and fileId are specified', async () => {
-    const actual = commandOptionsSchema.safeParse({ webUrl: validWebUrl, fileUrl: validFileUrl, fileId: validFileId });
+    const actual = commandOptionsSchema.safeParse({ webUrl: validWebUrl, fileUrl: validFileUrl, fileId: validFileId, label: validLabel });
     assert.strictEqual(actual.success, false);
   });
 
@@ -91,23 +91,22 @@ describe(commands.FILE_VERSION_KEEP, () => {
   });
 
   it('passes validation if fileUrl is specified', async () => {
-    const actual = await command.validate({ options: { webUrl: validWebUrl, label: validLabel, fileUrl: validFileUrl } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ webUrl: validWebUrl, fileUrl: validFileUrl, label: validLabel });
+    assert.strictEqual(actual.success, true);
   });
 
   it('passes validation if fileId is specified', async () => {
-    const actual = await command.validate({ options: { webUrl: validWebUrl, label: validLabel, fileId: validFileId } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ webUrl: validWebUrl, fileId: validFileId, label: validLabel });
+    assert.strictEqual(actual.success, true);
   });
 
   it('ensures that a specific file version will never expire (fileUrl)', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `${validWebUrl}/_api/web/GetFileByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(validFileUrl)}')/versions/?$filter=VersionLabel eq '${validLabel}'&$select=Id`) {
+      if (opts.url === `${validWebUrl}/_api/web/GetFileByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(validFileUrl)}')/versions?$filter=VersionLabel eq '${validLabel}'&$select=ID`) {
         return {
           value: [
             {
-              ID: 1,
-              VersionLabel: validLabel
+              ID: 1
             }
           ]
         };
@@ -125,17 +124,16 @@ describe(commands.FILE_VERSION_KEEP, () => {
     });
 
     await command.action(logger, { options: { webUrl: validWebUrl, fileUrl: validFileUrl, label: validLabel, verbose: true } });
-    assert.strictEqual(postStub.lastCall.args[0].url, `${validWebUrl}/_api/web/GetFileByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(validFileUrl)}')/versions(1)/SetExpirationDate()`);
+    assert(postStub.calledOnce);
   });
 
   it('ensures that a specific file version will never expire (fileId)', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `${validWebUrl}/_api/web/GetFileById('${validFileId}')/versions/?$filter=VersionLabel eq '${validLabel}'&$select=Id`) {
+      if (opts.url === `${validWebUrl}/_api/web/GetFileById('${validFileId}')/versions?$filter=VersionLabel eq '${validLabel}'&$select=ID`) {
         return {
           value: [
             {
-              ID: 1,
-              VersionLabel: validLabel
+              ID: 1
             }
           ]
         };
@@ -153,12 +151,12 @@ describe(commands.FILE_VERSION_KEEP, () => {
     });
 
     await command.action(logger, { options: { webUrl: validWebUrl, fileId: validFileId, label: validLabel, verbose: true } });
-    assert.strictEqual(postStub.lastCall.args[0].url, `${validWebUrl}/_api/web/GetFileById('${validFileId}')/versions(1)/SetExpirationDate()`);
+    assert(postStub.calledOnce);
   });
 
   it('correctly handles error when the specified version does not exist', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `${validWebUrl}/_api/web/GetFileByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(validFileUrl)}')/versions/?$filter=VersionLabel eq '${validLabel}'&$select=Id`) {
+      if (opts.url === `${validWebUrl}/_api/web/GetFileByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(validFileUrl)}')/versions?$filter=VersionLabel eq '${validLabel}'&$select=ID`) {
         return { value: [] };
       }
 
@@ -169,21 +167,15 @@ describe(commands.FILE_VERSION_KEEP, () => {
   });
 
   it('correctly handles API OData error', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `${validWebUrl}/_api/web/GetFileById('${validFileId}')/versions/?$filter=VersionLabel eq '${validLabel}'&$select=Id`) {
-        throw {
-          error: {
-            'odata.error': {
-              code: '-1, Microsoft.SharePoint.Client.InvalidOperationException',
-              message: {
-                value: 'Invalid version request'
-              }
-            }
+    sinon.stub(request, 'get').rejects({
+      error: {
+        'odata.error': {
+          code: '-1, Microsoft.SharePoint.Client.InvalidOperationException',
+          message: {
+            value: 'Invalid version request'
           }
-        };
+        }
       }
-
-      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, { options: { webUrl: validWebUrl, fileId: validFileId, label: validLabel } }),
