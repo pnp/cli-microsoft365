@@ -15,6 +15,7 @@ import command from './applicationcustomizer-add.js';
 describe(commands.APPLICATIONCUSTOMIZER_ADD, () => {
   const webUrl = 'https://contoso.sharepoint.com';
   const title = 'PageFooter';
+  const description = 'Page footer customizer';
   const clientSideComponentId = '76d5f8c8-6228-4df8-a2da-b94cbc8115bc';
   const clientSideComponentProperties = '{"testMessage":"Test message"}';
   const customActionError = {
@@ -23,15 +24,15 @@ describe(commands.APPLICATIONCUSTOMIZER_ADD, () => {
     "statusText": "Bad Request"
   };
   const customActionAddResponse = {
-    ClientSideComponentId: '799883f5-7962-4384-a10a-105adaec6ffc',
-    ClientSideComponentProperties: '',
+    ClientSideComponentId: '76d5f8c8-6228-4df8-a2da-b94cbc8115bc',
+    ClientSideComponentProperties: clientSideComponentProperties,
     CommandUIExtension: null,
-    Description: null,
+    Description: description,
     Group: null,
     Id: 'bdcea35f-d5d9-45a2-a075-4d1e2f519e74',
     ImageUrl: null,
     Location: 'ClientSideExtension.ApplicationCustomizer',
-    Name: 'Some customizer',
+    Name: title,
     RegistrationId: null,
     RegistrationType: 0,
     Rights: '{"High":"0","Low":"0"}',
@@ -39,7 +40,7 @@ describe(commands.APPLICATIONCUSTOMIZER_ADD, () => {
     ScriptBlock: null,
     ScriptSrc: null,
     Sequence: 0,
-    Title: 'Some customizer',
+    Title: title,
     Url: null,
     VersionOfUserCustomAction: '16.0.1.0'
   };
@@ -111,7 +112,7 @@ describe(commands.APPLICATIONCUSTOMIZER_ADD, () => {
   });
 
   it('adds the application customizer to a specific site while specifying clientSideComponentProperties', async () => {
-    sinon.stub(request, 'post').callsFake(async (opts) => {
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/_api/Site/UserCustomActions'
         && opts.data['Location'] === 'ClientSideExtension.ApplicationCustomizer'
         && opts.data['ClientSideComponentId'] === clientSideComponentId
@@ -123,8 +124,15 @@ describe(commands.APPLICATIONCUSTOMIZER_ADD, () => {
       throw customActionError;
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, title: title, clientSideComponentId: clientSideComponentId, clientSideComponentProperties: clientSideComponentProperties, verbose: true } } as any);
-    assert(loggerLogToStderrSpy.called);
+    await command.action(logger, { options: { webUrl: webUrl, title: title, clientSideComponentId: clientSideComponentId, description: description, clientSideComponentProperties: clientSideComponentProperties, verbose: true } } as any);
+    assert.deepStrictEqual(postStub.lastCall.args[0].data, {
+      Title: title,
+      Name: title,
+      Description: description,
+      Location: 'ClientSideExtension.ApplicationCustomizer',
+      ClientSideComponentId: clientSideComponentId,
+      ClientSideComponentProperties: clientSideComponentProperties
+    });
   });
 
   it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
