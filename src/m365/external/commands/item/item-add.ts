@@ -128,7 +128,7 @@ class ExternalItemAddCommand extends GraphCommand {
     // we need to rewrite the @odata properties to the correct format
     // to extract multiple values for collections into arrays
     this.rewriteCollectionProperties(args.options);
-    this.addUnknownOptionsToPayload(requestBody, args.options);
+    this.addUnknownOptionsToPayload(requestBody.properties, args.options);
 
     const requestOptions: CliRequestOptions = {
       url: `${this.resource}/v1.0/external/connections/${args.options.externalConnectionId}/items/${args.options.id}`,
