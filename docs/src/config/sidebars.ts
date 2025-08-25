@@ -1820,30 +1820,6 @@ const sidebars: SidebarsConfig = {
           ]
         },
         {
-          card: [
-            {
-              type: 'doc',
-              label: 'card clone',
-              id: 'cmd/pp/card/card-clone'
-            },
-            {
-              type: 'doc',
-              label: 'card get',
-              id: 'cmd/pp/card/card-get'
-            },
-            {
-              type: 'doc',
-              label: 'card list',
-              id: 'cmd/pp/card/card-list'
-            },
-            {
-              type: 'doc',
-              label: 'card remove',
-              id: 'cmd/pp/card/card-remove'
-            }
-          ]
-        },
-        {
           copilot: [
             {
               type: 'doc',
