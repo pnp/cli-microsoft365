@@ -3,6 +3,7 @@ import type { SidebarsConfig } from '@docusaurus/plugin-content-docs';
 const sidebars: SidebarsConfig = {
   home: [
     'index',
+    'v11-upgrade-guidance',
     'v10-upgrade-guidance',
     'v9-upgrade-guidance',
     'v8-upgrade-guidance',
@@ -1815,30 +1816,6 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'aibuildermodel remove',
               id: 'cmd/pp/aibuildermodel/aibuildermodel-remove'
-            }
-          ]
-        },
-        {
-          card: [
-            {
-              type: 'doc',
-              label: 'card clone',
-              id: 'cmd/pp/card/card-clone'
-            },
-            {
-              type: 'doc',
-              label: 'card get',
-              id: 'cmd/pp/card/card-get'
-            },
-            {
-              type: 'doc',
-              label: 'card list',
-              id: 'cmd/pp/card/card-list'
-            },
-            {
-              type: 'doc',
-              label: 'card remove',
-              id: 'cmd/pp/card/card-remove'
             }
           ]
         },
