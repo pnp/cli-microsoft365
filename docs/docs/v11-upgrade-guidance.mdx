@@ -1,0 +1,17 @@
+# v11 Upgrade Guidance
+
+The v11 release of CLI for Microsoft 365 introduces several breaking changes. To assist you in upgrading to the latest version, we've outlined the changes and the actions you may need to take.
+
+## General
+
+### Ensured output for `list` commands
+
+We noticed that some of the `list` commands were not returning any output when no items were found. We've updated all `list` commands to return an empty array when no items are found.
+
+The commands impacted by this change are:
+
+- [spo customaction list](./cmd/spo/customaction/customaction-list.mdx)
+
+#### What action do I need to take?
+
+Update your scripts to expect an empty array when no items are found.

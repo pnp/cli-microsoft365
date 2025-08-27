@@ -18,7 +18,6 @@ describe(commands.CUSTOMACTION_LIST, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
-  let loggerLogToStderrSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -43,7 +42,6 @@ describe(commands.CUSTOMACTION_LIST, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
-    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
   });
 
   afterEach(() => {
@@ -94,7 +92,7 @@ describe(commands.CUSTOMACTION_LIST, () => {
   });
 
 
-  it('correctly handles no custom actions when All scope specified (verbose)', async () => {
+  it('return an empty array when All scope specified (verbose)', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/Web/UserCustomActions') > -1) {
         return { value: [] };
@@ -107,14 +105,19 @@ describe(commands.CUSTOMACTION_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, {
-      options: {
-        verbose: true,
-        webUrl: 'https://contoso.sharepoint.com',
-        scope: 'All'
-      }
-    });
-    assert(loggerLogToStderrSpy.calledWith(`Custom actions not found`));
+    try {
+      await command.action(logger, {
+        options: {
+          verbose: true,
+          webUrl: 'https://contoso.sharepoint.com',
+          scope: 'All'
+        }
+      });
+      assert(loggerLogSpy.calledWith([]));
+    }
+    finally {
+      sinonUtil.restore((command as any)['getCustomActions']);
+    }
   });
 
   it('correctly handles web custom action reject request', async () => {
