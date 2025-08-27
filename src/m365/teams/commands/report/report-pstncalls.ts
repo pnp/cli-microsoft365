@@ -1,7 +1,7 @@
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
-import request from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
+import { odata } from '../../../../utils/odata.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
@@ -83,17 +83,9 @@ class TeamsReportPstncallsCommand extends GraphCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const toDateTimeParameter: string = formatting.encodeQueryParameter(args.options.toDateTime ? args.options.toDateTime : new Date().toISOString());
 
-    const requestOptions: any = {
-      url: `${this.resource}/v1.0/communications/callRecords/getPstnCalls(fromDateTime=${formatting.encodeQueryParameter(args.options.fromDateTime)},toDateTime=${toDateTimeParameter})`,
-      headers: {
-        accept: 'application/json;odata.metadata=none'
-      },
-      responseType: 'json'
-    };
-
     try {
-      const res: { value: any[] } = await request.get<{ value: any[] }>(requestOptions);
-      await logger.log(res);
+      const response = await odata.getAllItems<any>(`${this.resource}/v1.0/communications/callRecords/getPstnCalls(fromDateTime=${formatting.encodeQueryParameter(args.options.fromDateTime)},toDateTime=${toDateTimeParameter})`);
+      await logger.log(response);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);

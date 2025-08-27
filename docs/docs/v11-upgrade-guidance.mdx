@@ -1,0 +1,18 @@
+# v11 Upgrade Guidance
+
+The v11 release of CLI for Microsoft 365 introduces several breaking changes. To assist you in upgrading to the latest version, we've outlined the changes and the actions you may need to take.
+
+## General
+
+### Changed ouput for commands
+
+We noticed that some of the commands were not returning an array, but an object with the `value` property. We've updated those commands to return an array of items.
+
+The commands impacted by this change are:
+
+- [teams report directroutingcalls](./cmd/teams/report/report-directroutingcalls-list.mdx)
+- [teams report pstncalls](./cmd/teams/report/report-pstncalls-list.mdx)
+
+#### What action do I need to take?
+
+Update your scripts to expect an array of items.

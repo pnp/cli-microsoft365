@@ -17,11 +17,10 @@ import command from './report-directroutingcalls.js';
 describe(commands.REPORT_DIRECTROUTINGCALLS, () => {
   let log: string[];
   let logger: Logger;
+  let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
 
   const jsonOutput = {
-    "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#Collection(microsoft.graph.callRecords.directRoutingLogRow)",
-    "@odata.count": 1000,
     "value": [{
       "id": "9e8bba57-dc14-533a-a7dd-f0da6575eed1",
       "correlationId": "c98e1515-a937-4b81-b8a8-3992afde64e0",
@@ -44,8 +43,7 @@ describe(commands.REPORT_DIRECTROUTINGCALLS, () => {
       "finalSipCodePhrase": "BYE",
       "trunkFullyQualifiedDomainName": "tll-audiocodes01.adatum.biz",
       "mediaBypassEnabled": false
-    }],
-    "@odata.nextLink": "https://graph.microsoft.com/v1.0/communications/callRecords/getDirectRoutingCalls(fromDateTime=2019-11-01,toDateTime=2019-12-01)?$skip=1000"
+    }]
   };
 
   before(() => {
@@ -71,6 +69,7 @@ describe(commands.REPORT_DIRECTROUTINGCALLS, () => {
       }
     };
     (command as any).items = [];
+    loggerLogSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -148,7 +147,7 @@ describe(commands.REPORT_DIRECTROUTINGCALLS, () => {
   });
 
   it('gets directroutingcalls in teams', async () => {
-    const requestStub: sinon.SinonStub = sinon.stub(request, 'get').callsFake(async (opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/communications/callRecords/getDirectRoutingCalls(fromDateTime=2019-11-01,toDateTime=2019-12-01)`) {
         return jsonOutput;
       }
@@ -157,8 +156,7 @@ describe(commands.REPORT_DIRECTROUTINGCALLS, () => {
     });
 
     await command.action(logger, { options: { fromDateTime: '2019-11-01', toDateTime: '2019-12-01' } });
-    assert.strictEqual(requestStub.lastCall.args[0].url, "https://graph.microsoft.com/v1.0/communications/callRecords/getDirectRoutingCalls(fromDateTime=2019-11-01,toDateTime=2019-12-01)");
-    assert.strictEqual(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
+    assert(loggerLogSpy.calledWith(jsonOutput.value));
   });
 
   it('gets directroutingcalls in teams with no toDateTime specified', async () => {
@@ -166,7 +164,7 @@ describe(commands.REPORT_DIRECTROUTINGCALLS, () => {
     const fakeTimers = sinon.useFakeTimers(now);
     const toDateTime: string = formatting.encodeQueryParameter(now.toISOString());
 
-    const requestStub: sinon.SinonStub = sinon.stub(request, 'get').callsFake(async (opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/communications/callRecords/getDirectRoutingCalls(fromDateTime=2019-11-01,toDateTime=${toDateTime})`) {
         return jsonOutput;
       }
@@ -175,8 +173,7 @@ describe(commands.REPORT_DIRECTROUTINGCALLS, () => {
     });
 
     await command.action(logger, { options: { fromDateTime: '2019-11-01' } });
-    assert.strictEqual(requestStub.lastCall.args[0].url, `https://graph.microsoft.com/v1.0/communications/callRecords/getDirectRoutingCalls(fromDateTime=2019-11-01,toDateTime=${toDateTime})`);
-    assert.strictEqual(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
+    assert(loggerLogSpy.calledWith(jsonOutput.value));
     fakeTimers.restore();
   });
 
