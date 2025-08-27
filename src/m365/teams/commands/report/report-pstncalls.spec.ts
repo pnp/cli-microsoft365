@@ -17,11 +17,10 @@ import command from './report-pstncalls.js';
 describe(commands.REPORT_PSTNCALLS, () => {
   let log: string[];
   let logger: Logger;
+  let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
 
   const jsonOutput = {
-    "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#Collection(microsoft.graph.callRecords.pstnCallLogRow)",
-    "@odata.count": 1000,
     "value": [{
       "id": "9c4984c7-6c3c-427d-a30c-bd0b2eacee90",
       "callId": "1835317186_112562680@61.221.3.176",
@@ -44,8 +43,7 @@ describe(commands.REPORT_PSTNCALLS, () => {
       "conferenceId": null,
       "licenseCapability": "MCOPSTNU",
       "inventoryType": "Subscriber"
-    }],
-    "@odata.nextLink": "https://graph.microsoft.com/v1.0/communications/callRecords/getPstnCalls(from=2019-11-01,to=2019-12-01)?$skip=1000"
+    }]
   };
 
   before(() => {
@@ -71,6 +69,7 @@ describe(commands.REPORT_PSTNCALLS, () => {
       }
     };
     (command as any).items = [];
+    loggerLogSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -148,7 +147,7 @@ describe(commands.REPORT_PSTNCALLS, () => {
   });
 
   it('gets pstncalls in teams', async () => {
-    const requestStub: sinon.SinonStub = sinon.stub(request, 'get').callsFake(async (opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/communications/callRecords/getPstnCalls(fromDateTime=2019-11-01,toDateTime=2019-12-01)`) {
         return jsonOutput;
       }
@@ -157,8 +156,7 @@ describe(commands.REPORT_PSTNCALLS, () => {
     });
 
     await command.action(logger, { options: { fromDateTime: '2019-11-01', toDateTime: '2019-12-01' } });
-    assert.strictEqual(requestStub.lastCall.args[0].url, "https://graph.microsoft.com/v1.0/communications/callRecords/getPstnCalls(fromDateTime=2019-11-01,toDateTime=2019-12-01)");
-    assert.strictEqual(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
+    assert(loggerLogSpy.calledWith(jsonOutput.value));
   });
 
   it('gets pstncalls in teams with no toDateTime specified', async () => {
@@ -166,7 +164,7 @@ describe(commands.REPORT_PSTNCALLS, () => {
     const fakeTimers = sinon.useFakeTimers(now);
     const toDateTime: string = formatting.encodeQueryParameter(now.toISOString());
 
-    const requestStub: sinon.SinonStub = sinon.stub(request, 'get').callsFake(async (opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/communications/callRecords/getPstnCalls(fromDateTime=2019-11-01,toDateTime=${toDateTime})`) {
         return jsonOutput;
       }
@@ -175,8 +173,7 @@ describe(commands.REPORT_PSTNCALLS, () => {
     });
 
     await command.action(logger, { options: { fromDateTime: '2019-11-01' } });
-    assert.strictEqual(requestStub.lastCall.args[0].url, `https://graph.microsoft.com/v1.0/communications/callRecords/getPstnCalls(fromDateTime=2019-11-01,toDateTime=${toDateTime})`);
-    assert.strictEqual(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
+    assert(loggerLogSpy.calledWith(jsonOutput.value));
     fakeTimers.restore();
   });
 
