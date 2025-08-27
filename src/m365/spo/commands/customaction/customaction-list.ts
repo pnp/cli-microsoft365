@@ -87,18 +87,11 @@ class SpoCustomActionListCommand extends SpoCommand {
 
       const customActions = await spo.getCustomActions(args.options.webUrl, args.options.scope);
 
-      if (customActions.length === 0) {
-        if (this.verbose) {
-          await logger.logToStderr(`Custom actions not found`);
-        }
+      if (args.options.output !== 'json') {
+        customActions.forEach(a => a.Scope = this.humanizeScope(a.Scope) as any);
       }
-      else {
-        if (args.options.output !== 'json') {
-          customActions.forEach(a => a.Scope = this.humanizeScope(a.Scope) as any);
-        }
 
-        await logger.log(customActions);
-      }
+      await logger.log(customActions);
     }
     catch (err: any) {
       this.handleRejectedPromise(err);

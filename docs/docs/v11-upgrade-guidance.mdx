@@ -15,6 +15,18 @@ The [spo homesite set](./cmd/spo/homesite/homesite-set.mdx) command has been upd
 
 ## General
 
+### Ensured output for `list` commands
+
+We noticed that some of the `list` commands were not returning any output when no items were found. We've updated all `list` commands to return an empty array when no items are found.
+
+The commands impacted by this change are:
+
+- [spo customaction list](./cmd/spo/customaction/customaction-list.mdx)
+
+#### What action do I need to take?
+
+Update your scripts to expect an empty array when no items are found.
+
 ### Removed commands
 
 Some commands were removed because their API endpoint became deprecated or the product began an end-of-life phase.
