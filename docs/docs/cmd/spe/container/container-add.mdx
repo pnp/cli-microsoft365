@@ -39,6 +39,35 @@ m365 spe container add [options]
 
 <Global />
 
+## Remarks
+
+:::warning
+
+The command is based on an API that is currently in preview and is subject to change once the API reached general availability.
+
+:::
+
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource        | Permissions                                                        |
+  |-----------------|--------------------------------------------------------------------|
+  | Microsoft Graph | FileStorageContainer.Selected, FileStorageContainerType.Manage.All |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  This command only supports application permissions when using the `containerTypeId` option.
+
+  | Resource        | Permissions                   |
+  |-----------------|-------------------------------|
+  | Microsoft Graph | FileStorageContainer.Selected |
+
+  </TabItem>
+</Tabs>
+
 ## Examples
 
 Creates a new container by specifying the container type ID

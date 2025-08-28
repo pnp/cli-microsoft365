@@ -1,4 +1,6 @@
 import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 # spe container remove
 
@@ -33,6 +35,35 @@ m365 spe container remove [options]
 ```
 
 <Global />
+
+## Remarks
+
+:::warning
+
+The command is based on an API that is currently in preview and is subject to change once the API reached general availability.
+
+:::
+
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource        | Permissions                                                        |
+  |-----------------|--------------------------------------------------------------------|
+  | Microsoft Graph | FileStorageContainer.Selected, FileStorageContainerType.Manage.All |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  This command only supports application permissions when **not** using the `containerTypeName` option.
+
+  | Resource        | Permissions                   |
+  |-----------------|-------------------------------|
+  | Microsoft Graph | FileStorageContainer.Selected |
+
+  </TabItem>
+</Tabs>
 
 ## Examples
 

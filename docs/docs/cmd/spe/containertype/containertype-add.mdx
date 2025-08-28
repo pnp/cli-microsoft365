@@ -4,7 +4,7 @@ import TabItem from '@theme/TabItem';
 
 # spe containertype add
 
-Creates a new Container Type for your app
+Creates a new container type
 
 ## Usage
 
@@ -18,50 +18,105 @@ m365 spe containertype add [options]
 `-n, --name <name>`
 : Container type name.
 
-`--applicationId <applicationId>`
-: Application ID of the Microsoft Entra ID app that will be the owner of the Container Type.
+`--appId [appId]`
+: Application ID of the Microsoft Entra ID app that will be the owner of the container type. By default, the current app is used.
 
-`--trial`
-: Specify if the Container Type should be a trial.
+`--billingType [billingType]`
+: The billing type. The possible values are: `standard`, `trial`, `directToCustomer`, `unknownFutureValue`. The default value is `standard`.
 
-`--azureSubscriptionId [azureSubscriptionId]`
-: Azure Subscription Id. Required unless the `trial` option was specified.
+`--consumingTenantOverridables [consumingTenantOverridables]`
+: A comma-separated list of settings that can be overridden in the consuming tenant. The possible values are: `urlTemplate`, `isDiscoverabilityEnabled`, `isSearchEnabled`, `isItemVersioningEnabled`, `itemMajorVersionLimit`, `maxStoragePerContainerInBytes`.
 
-`--resourceGroup [resourceGroup]`
-: Azure Resource group for billing. Required unless the `trial` option was specified.
+`--isDiscoverabilityEnabled [isDiscoverabilityEnabled]`
+: Indicates whether items from containers are surfaced in experiences such as My Activity or Microsoft 365. Valid values: `true`, `false`. The default value is `false`.
 
-`--region [region]`
-: Region. Required unless the `trial` option was specified.
+`--isItemVersioningEnabled [isItemVersioningEnabled]`
+: Indicates whether item versioning is enabled for the container. Valid values: `true`, `false`. The default value is `true`.
+
+`--itemMajorVersionLimit [itemMajorVersionLimit]`
+: Maximum number of versions. `isItemVersioningEnabled` must be enabled. Default value is `500`.
+
+`--isSearchEnabled [isSearchEnabled]`
+: Indicates whether search is enabled. Valid values: `true`, `false`. The default value is `true`.
+
+`--isSharingRestricted [isSharingRestricted]`
+: Only the manager and owner can share files in the container if restricted sharing is enabled. Valid values: `true`, `false`. The default value is `false`.
+
+`--maxStoragePerContainerInBytes [maxStoragePerContainerInBytes]`
+: Controls maximum storage in bytes.
+
+`--sharingCapability [sharingCapability]`
+: Sharing capabilities permitted for containers. The possible values are: `disabled`, `externalUserSharingOnly`, `externalUserAndGuestSharing`, `existingExternalUserSharingOnly`.
+
+`--urlTemplate [urlTemplate]`
+: Pattern used to redirect files.
 ```
 
 <Global />
 
 ## Remarks
 
-:::info
+:::warning
 
-To use this command you must be either **SharePoint Administrator** or **Global Administrator**.
+The command is based on an API that is currently in preview and is subject to change once the API reached general availability.
 
 :::
 
 :::note
 
-You can only create one Trial container type per tenant, a single application registration can only contain one container type and a tenant can contain a maximum of five containers types in total.
+The tenant must own the application that is assigned as the owner of the container type.
 
 :::
 
+:::note
+
+You can only create **one** Trial container type per tenant, a single application registration can only contain **one** container type and a tenant can contain a maximum of **five** containers types in total.
+
+:::
+
+The registration of a container type in a newly created tenant can fail if the tenant isn't yet fully ready. You might need to wait at least an hour before you can register a container type in a new tenant.
+
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource        | Permissions                         |
+  |-----------------|-------------------------------------|
+  | Microsoft Graph | FileStorageContainerType.Manage.All |
+
+  :::info
+
+  To use this command you must be either **SharePoint Administrator** or **Global Administrator**.
+
+  :::
+
+  </TabItem>
+  <TabItem value="Application">
+
+  This command does not support application permissions.
+
+  </TabItem>
+</Tabs>
+
 ## Examples
 
-Adds a new trial Container Type
+Adds a new trial container type.
 
 ```sh
-m365 spe containertype add --name 'trial container' --applicationId '1b3b8660-9a44-4a7c-9c02-657f3ff5d5ac' --trial
+m365 spe containertype add --name 'trial container' --applicationId '1b3b8660-9a44-4a7c-9c02-657f3ff5d5ac' --billingType trial
 ```
 
-Adds a new Container Type using a standard Container Type.
+Adds a new container type using a standard billing type for the current application.
 
 ```sh
-m365 spe containertype add --name 'standard container' --applicationId '1b3b8660-9a44-4a7c-9c02-657f3ff5d5ac' --azureSubscriptionId 'f08575e2-36c4-407f-a891-eabae23f66bc' --region 'West Europe' --resourceGroup 'Standard group'
+m365 spe containertype add --name 'standard container'
+```
+
+Adds a new container type with additional settings
+
+```sh
+m365 spe containertype add --name 'Contoso container type' --appId 5181cccf-7a36-44c1-a00d-62581ca4d14a --billingType directToCustomer --consumingTenantOverridables "isDiscoverabilityEnabled, isSearchEnabled" --isDiscoverabilityEnabled true --isItemVersioningEnabled true --isSearchEnabled false --itemMajorVersionLimit 25 --isSharingRestricted true --maxStoragePerContainerInBytes 102030 --sharingCapability externalUserSharingOnly --urlTemplate "https://app.contoso.com/redirect?item={item-id}"
 ```
 
 ## Response
@@ -71,17 +126,24 @@ m365 spe containertype add --name 'standard container' --applicationId '1b3b8660
 
   ```json
   {
-    "AzureSubscriptionId": "f08575e2-36c4-407f-a891-eabae23f66bc",
-    "ContainerTypeId": "c33cfee5-c9b6-0a2a-02ee-060693a57f37",
-    "CreationDate": "3/11/2024 2:38:56 PM",
-    "DisplayName": "standard container",
-    "ExpiryDate": null,
-    "IsBillingProfileRequired": true,
-    "OwningAppId": "1b3b8660-9a44-4a7c-9c02-657f3ff5d5ac",
-    "OwningTenantId": "e1dd4023-a656-480a-8a0e-c1b1eec51e1d",
-    "Region": "West Europe",
-    "ResourceGroup": "Standard group",
-    "SPContainerTypeBillingClassification": "Standard"
+    "id": "ac8ac926-f924-4f89-bdc0-4e569c143a4d",
+    "name": "Contoso container types",
+    "owningAppId": "0e083c20-ad1c-4b45-93a6-6dd58fe4d694",
+    "billingClassification": "trial",
+    "billingStatus": "valid",
+    "createdDateTime": "2025-08-28T06:13:12.0080609Z",
+    "etag": "MC4wLjAuMA==",
+    "settings": {
+      "sharingCapability": "externalUserSharingOnly",
+      "urlTemplate": "https://app.contoso.com/redirect?tenant={tenant-id}&drive={drive-id}&folder={folder-id}&item={item-id}",
+      "isDiscoverabilityEnabled": false,
+      "isSearchEnabled": true,
+      "isItemVersioningEnabled": true,
+      "itemMajorVersionLimit": 500,
+      "maxStoragePerContainerInBytes": 27487790694400,
+      "isSharingRestricted": false,
+      "consumingTenantOverridables": "isSearchEnabled,itemMajorVersionLimit"
+    }
   }
   ```
 
@@ -89,49 +151,43 @@ m365 spe containertype add --name 'standard container' --applicationId '1b3b8660
   <TabItem value="Text">
 
   ```text
-  AzureSubscriptionId                 : f08575e2-36c4-407f-a891-eabae23f66bc
-  ContainerTypeId                     : 331f3b15-b4f6-05e0-05de-2d8c370462b3
-  CreationDate                        : 3/11/2024 2:47:16 PM
-  DisplayName                         : Standard container
-  ExpiryDate                          : null
-  IsBillingProfileRequired            : false
-  OwningAppId                         : 1b3b8660-9a44-4a7c-9c02-657f3ff5d5ac
-  OwningTenantId                      : e1dd4023-a656-480a-8a0e-c1b1eec51e1d
-  Region                              : West Europe
-  ResourceGroup                       : Standard group
-  SPContainerTypeBillingClassification: Standard
+  billingClassification: trial
+  billingStatus        : valid
+  createdDateTime      : 2025-08-28T06:13:12.0080609Z
+  etag                 : MC4wLjAuMA==
+  id                   : ac8ac926-f924-4f89-bdc0-4e569c143a4d
+  name                 : Contoso container types
+  owningAppId          : 0e083c20-ad1c-4b45-93a6-6dd58fe4d694
+  settings             : {"sharingCapability":"externalUserSharingOnly","urlTemplate":"https://app.contoso.com/redirect?tenant={tenant-id}&drive={drive-id}&folder={folder-id}&item={item-id}","isDiscoverabilityEnabled":false,"isSearchEnabled":true,"isItemVersioningEnabled":true,"itemMajorVersionLimit":500,"maxStoragePerContainerInBytes":27487790694400,"isSharingRestricted":false,"consumingTenantOverridables":"isSearchEnabled,itemMajorVersionLimit"}
   ```
 
   </TabItem>
   <TabItem value="CSV">
 
   ```csv
-  AzureSubscriptionId,ContainerTypeId,CreationDate,DisplayName,ExpiryDate,IsBillingProfileRequired,OwningAppId,OwningTenantId,Region,ResourceGroup,SPContainerTypeBillingClassification
-  f08575e2-36c4-407f-a891-eabae23f66bc,331f3b15-b4f6-05e0-05de-2d8c370462b3,3/11/2024 2:48:13 PM,Standard container,,,1b3b8660-9a44-4a7c-9c02-657f3ff5d5ac,e1dd4023-a656-480a-8a0e-c1b1eec51e1d,West Europe,Standard group,Standard
+  id,name,owningAppId,billingClassification,billingStatus,createdDateTime,etag
+  ac8ac926-f924-4f89-bdc0-4e569c143a4d,Contoso container types,0e083c20-ad1c-4b45-93a6-6dd58fe4d694,trial,valid,2025-08-28T06:13:12.0080609Z,MC4wLjAuMA==
   ```
 
   </TabItem>
   <TabItem value="Markdown">
 
   ```md
-  # spe containertype add --name 'Standard container' --applicationId '1b3b8660-9a44-4a7c-9c02-657f3ff5d5ac' --azureSubscriptionId 'f08575e2-36c4-407f-a891-eabae23f66bc' --region 'West Europe' --resourceGroup 'Standard group'
+  # spe containertype add --name "Contoso container types" --billingType "trial" --consumingTenantOverridables "isSearchEnabled,itemMajorVersionLimit" --sharingCapability "externalUserSharingOnly" --urlTemplate "https://app.contoso.com/redirect?tenant={tenant-id}&drive={drive-id}&folder={folder-id}&item={item-id}"
 
-  Date: 11/03/2024
+  Date: 28/08/2025
 
-  ## Standard container
+  ## Contoso container types (ac8ac926-f924-4f89-bdc0-4e569c143a4d)
 
   Property | Value
   ---------|-------
-  AzureSubscriptionId | f08575e2-36c4-407f-a891-eabae23f66bc
-  ContainerTypeId | 331f3b15-b4f6-05e0-05de-2d8c370462b3
-  CreationDate | 3/11/2024 2:49:16 PM
-  DisplayName | Standard Container
-  IsBillingProfileRequired | false
-  OwningAppId | 1b3b8660-9a44-4a7c-9c02-657f3ff5d5ac
-  OwningTenantId | e1dd4023-a656-480a-8a0e-c1b1eec51e1d
-  Region | West Europe
-  ResourceGroup | Standard group
-  SPContainerTypeBillingClassification | Standard
+  id | ac8ac926-f924-4f89-bdc0-4e569c143a4d
+  name | Contoso container types
+  owningAppId | 0e083c20-ad1c-4b45-93a6-6dd58fe4d694
+  billingClassification | trial
+  billingStatus | valid
+  createdDateTime | 2025-08-28T06:13:12.0080609Z
+  etag | MC4wLjAuMA==
   ```
 
   </TabItem>

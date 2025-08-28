@@ -16,7 +16,6 @@ import { z } from 'zod';
 import { CommandError } from '../../../../Command.js';
 
 describe(commands.CONTAINER_REMOVE, () => {
-  const spoAdminUrl = 'https://contoso-admin.sharepoint.com';
   const containerTypeId = 'c6f08d91-77fa-485f-9369-f246ec0fc19c';
   const containerTypeName = 'Container type name';
   const containerId = 'b!McTeU0-dW0GxKwECWdW04TIvEK-Js9xJib_RFqF-CqZxNe3OHVAIT4SqBxGm4fND';
@@ -34,11 +33,10 @@ describe(commands.CONTAINER_REMOVE, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
 
-    sinon.stub(spe, 'getContainerTypeIdByName').withArgs(spoAdminUrl, containerTypeName).resolves(containerTypeId);
+    sinon.stub(spe, 'getContainerTypeIdByName').withArgs(containerTypeName).resolves(containerTypeId);
     sinon.stub(spe, 'getContainerIdByName').withArgs(containerTypeId, containerName).resolves(containerId);
 
     auth.connection.active = true;
-    auth.connection.spoUrl = spoAdminUrl.replace('-admin.sharepoint.com', '.sharepoint.com');
     commandInfo = cli.getCommandInfo(command);
     commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
   });
@@ -70,7 +68,6 @@ describe(commands.CONTAINER_REMOVE, () => {
   after(() => {
     sinon.restore();
     auth.connection.active = false;
-    auth.connection.spoUrl = undefined;
   });
 
   it('has correct name', () => {

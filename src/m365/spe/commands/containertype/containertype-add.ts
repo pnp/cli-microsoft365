@@ -1,169 +1,108 @@
 import { Logger } from '../../../../cli/Logger.js';
-import config from '../../../../config.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
+import { z } from 'zod';
+import { zod } from '../../../../utils/zod.js';
 import request, { CliRequestOptions } from '../../../../request.js';
-import { ClientSvcResponse, ClientSvcResponseContents, FormDigestInfo, spo } from '../../../../utils/spo.js';
 import { validation } from '../../../../utils/validation.js';
-import SpoCommand from '../../../base/SpoCommand.js';
+import GraphDelegatedCommand from '../../../base/GraphDelegatedCommand.js';
 import commands from '../../commands.js';
+import Auth from '../../../../Auth.js';
 
-interface ContainerType {
-  _ObjectType_?: string;
-  AzureSubscriptionId: string;
-  ContainerTypeId: string;
-  CreationDate: string;
-  DisplayName: string;
-  ExpiryDate: string;
-  IsBillingProfileRequired: boolean;
-  OwningAppId: string;
-  OwningTenantId: string;
-  Region?: string;
-  ResourceGroup?: string;
-  SPContainerTypeBillingClassification: string;
-}
+const consumingTenantOverridablesOptions = ['urlTemplate', 'isDiscoverabilityEnabled', 'isSearchEnabled', 'isItemVersioningEnabled', 'itemMajorVersionLimit', 'maxStoragePerContainerInBytes'];
+
+const options = globalOptionsZod
+  .extend({
+    name: zod.alias('n', z.string()),
+    appId: z.string()
+      .refine(id => validation.isValidGuid(id), id => ({
+        message: `'${id}' is not a valid GUID.`
+      })).optional(),
+    billingType: z.enum(['standard', 'trial', 'directToCustomer']).default('standard'),
+    consumingTenantOverridables: z.string()
+      .refine(values => values.split(',').every(v => consumingTenantOverridablesOptions.includes(v.trim())), values => ({
+        message: `'${values}' is not a valid value. Valid options are: ${consumingTenantOverridablesOptions.join(', ')}.`
+      })).optional(),
+    isDiscoverabilityEnabled: z.boolean().optional(),
+    isItemVersioningEnabled: z.boolean().optional(),
+    isSearchEnabled: z.boolean().optional(),
+    isSharingRestricted: z.boolean().optional(),
+    itemMajorVersionLimit: z.number()
+      .refine(n => validation.isValidPositiveInteger(n), n => ({
+        message: `'${n}' is not a valid positive integer.`
+      })).optional(),
+    maxStoragePerContainerInBytes: z.number()
+      .refine(n => validation.isValidPositiveInteger(n), n => ({
+        message: `'${n}' is not a valid positive integer.`
+      })).optional(),
+    sharingCapability: z.enum(['disabled', 'externalUserSharingOnly', 'externalUserAndGuestSharing', 'existingExternalUserSharingOnly']).optional(),
+    urlTemplate: z.string().optional()
+  })
+  .strict();
+
+declare type Options = z.infer<typeof options>;
 
 interface CommandArgs {
   options: Options;
 }
 
-export interface Options extends GlobalOptions {
-  name: string;
-  applicationId: string;
-  trial?: boolean;
-  azureSubscriptionId?: string;
-  resourceGroup?: string;
-  region?: string;
-}
-
-class SpeContainerTypeAddCommand extends SpoCommand {
+class SpeContainerTypeAddCommand extends GraphDelegatedCommand {
   public get name(): string {
     return commands.CONTAINERTYPE_ADD;
   }
 
   public get description(): string {
-    return 'Creates a new Container Type for your app';
+    return 'Creates a new container type';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
+  public get schema(): z.ZodTypeAny {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        trial: !!args.options.trial,
-        azureSubscriptionId: typeof args.options.azureSubscriptionId !== 'undefined',
-        resourceGroup: typeof args.options.resourceGroup !== 'undefined',
-        region: typeof args.options.region !== 'undefined'
+  public getRefinedSchema(schema: typeof options): z.ZodEffects<any> | undefined {
+    return schema
+      .refine(options => !options.itemMajorVersionLimit || options.isItemVersioningEnabled !== false, {
+        message: `Cannot set itemMajorVersionLimit when isItemVersioningEnabled is false.`
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-n, --name <name>'
-      },
-      {
-        option: '--applicationId <applicationId>'
-      },
-      {
-        option: '--trial'
-      },
-      {
-        option: '--azureSubscriptionId [azureSubscriptionId]'
-      },
-      {
-        option: '--resourceGroup [resourceGroup]'
-      },
-      {
-        option: '--region [region]'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (!validation.isValidGuid(args.options.applicationId)) {
-          return `${args.options.applicationId} is not a valid GUID for option applicationId.`;
-        }
-
-        if (args.options.trial === undefined && !args.options.azureSubscriptionId) {
-          return 'You must specify the azureSubscriptionId when creating a non-trial environment.';
-        }
-
-        if (args.options.trial === undefined && !args.options.resourceGroup) {
-          return 'You must specify the resourceGroup when creating a non-trial environment.';
-        }
-
-        if (args.options.trial === undefined && !args.options.region) {
-          return 'You must specify the region when creating a non-trial environment.';
-        }
-
-        if (args.options.azureSubscriptionId && !validation.isValidGuid(args.options.azureSubscriptionId)) {
-          return `${args.options.azureSubscriptionId} is not a valid GUID for option azureSubscriptionId.`;
-        }
-
-        return true;
-      }
-    );
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       if (this.verbose) {
-        await logger.logToStderr(`Creating a new Container Type for your app with name ${args.options.name}`);
+        await logger.logToStderr(`Creating a new Container Type for your app with name '${args.options.name}'.`);
       }
 
-      const adminUrl = await spo.getSpoAdminUrl(logger, this.debug);
-      const requestBody = this.getRequestBody(args.options);
+      const appId = args.options.appId ?? Auth.connection.appId!;
 
-      const formDigestInfo: FormDigestInfo = await spo.ensureFormDigest(adminUrl, logger, undefined, this.debug);
       const requestOptions: CliRequestOptions = {
-        url: `${adminUrl}/_vti_bin/client.svc/ProcessQuery`,
+        url: `${this.resource}/beta/storage/fileStorage/containerTypes`,
         headers: {
-          'X-RequestDigest': formDigestInfo.FormDigestValue
+          accept: 'application/json;odata.metadata=none'
         },
-        data: requestBody
+        responseType: 'json',
+        data: {
+          name: args.options.name,
+          owningAppId: appId,
+          billingClassification: args.options.billingType,
+          settings: {
+            consumingTenantOverridables: args.options.consumingTenantOverridables?.split(',').map(s => s.trim()).join(','),
+            isDiscoverabilityEnabled: args.options.isDiscoverabilityEnabled,
+            isItemVersioningEnabled: args.options.isItemVersioningEnabled,
+            isSearchEnabled: args.options.isSearchEnabled,
+            isSharingRestricted: args.options.isSharingRestricted,
+            itemMajorVersionLimit: args.options.itemMajorVersionLimit,
+            maxStoragePerContainerInBytes: args.options.maxStoragePerContainerInBytes,
+            sharingCapability: args.options.sharingCapability,
+            urlTemplate: args.options.urlTemplate
+          }
+        }
       };
 
-      const res = await request.post<string>(requestOptions);
-      const json: ClientSvcResponse = JSON.parse(res);
-      const response: ClientSvcResponseContents = json[0];
-
-      if (response.ErrorInfo) {
-        throw response.ErrorInfo.ErrorMessage;
-      }
-      const result: ContainerType = json.pop();
-
-      delete result._ObjectType_;
-      result.SPContainerTypeBillingClassification = args.options.trial ? 'Trial' : 'Standard';
-      result.AzureSubscriptionId = this.replaceString(result.AzureSubscriptionId);
-      result.OwningAppId = this.replaceString(result.OwningAppId);
-      result.OwningTenantId = this.replaceString(result.OwningTenantId);
-      result.ContainerTypeId = this.replaceString(result.ContainerTypeId);
-
-      await logger.log(result);
+      const response = await request.post<any>(requestOptions);
+      await logger.log(response);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
-  }
-
-  private replaceString(s: string): string {
-    return s.replace('/Guid(', '').replace(')/', '');
-  }
-
-  private getRequestBody(options: Options): string {
-    if (options.trial) {
-      return `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="4" ObjectPathId="3" /><Method Name="NewSPOContainerType" Id="5" ObjectPathId="3"><Parameters><Parameter TypeId="{5466648e-c306-441b-9df4-c09deef25cb1}"><Property Name="AzureSubscriptionId" Type="Guid">{00000000-0000-0000-0000-000000000000}</Property><Property Name="ContainerTypeId" Type="Guid">{00000000-0000-0000-0000-000000000000}</Property><Property Name="CreationDate" Type="Null" /><Property Name="DisplayName" Type="String">${options.name}</Property><Property Name="ExpiryDate" Type="Null" /><Property Name="IsBillingProfileRequired" Type="Boolean">false</Property><Property Name="OwningAppId" Type="Guid">{${options.applicationId}}</Property><Property Name="OwningTenantId" Type="Guid">{00000000-0000-0000-0000-000000000000}</Property><Property Name="Region" Type="Null" /><Property Name="ResourceGroup" Type="Null" /><Property Name="SPContainerTypeBillingClassification" Type="Enum">1</Property></Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="3" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`;
-    }
-    return `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Method Name="NewSPOContainerType" Id="4" ObjectPathId="1"><Parameters><Parameter TypeId="{5466648e-c306-441b-9df4-c09deef25cb1}"><Property Name="AzureSubscriptionId" Type="Guid">{${options.azureSubscriptionId}}</Property><Property Name="ContainerTypeId" Type="Guid">{00000000-0000-0000-0000-000000000000}</Property><Property Name="CreationDate" Type="Null" /><Property Name="DisplayName" Type="String">${options.name}</Property><Property Name="ExpiryDate" Type="Null" /><Property Name="IsBillingProfileRequired" Type="Boolean">false</Property><Property Name="OwningAppId" Type="Guid">{${options.applicationId}}</Property><Property Name="OwningTenantId" Type="Guid">{00000000-0000-0000-0000-000000000000}</Property><Property Name="Region" Type="String">${options.region}</Property><Property Name="ResourceGroup" Type="String">${options.resourceGroup}</Property><Property Name="SPContainerTypeBillingClassification" Type="Enum">0</Property></Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`;
   }
 }
 

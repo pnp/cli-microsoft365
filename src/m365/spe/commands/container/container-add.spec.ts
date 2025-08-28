@@ -161,22 +161,6 @@ describe(commands.CONTAINER_ADD, () => {
       throw 'Invalid POST request: ' + opts.url;
     });
 
-    sinon.stub(spe, 'getAllContainerTypes').resolves([
-      {
-        AzureSubscriptionId: '/Guid(f08575e2-36c4-407f-a891-eabae23f66bc)/',
-        ContainerTypeId: `/Guid(${containerTypeId})/`,
-        CreationDate: '3/11/2024 2:38:56 PM',
-        DisplayName: containerTypeName,
-        ExpiryDate: '3/11/2028 2:38:56 PM',
-        IsBillingProfileRequired: true,
-        OwningAppId: '/Guid(1b3b8660-9a44-4a7c-9c02-657f3ff5d5ac)/',
-        OwningTenantId: '/Guid(e1dd4023-a656-480a-8a0e-c1b1eec51e1d)/',
-        Region: 'West Europe',
-        ResourceGroup: 'Standard group',
-        SPContainerTypeBillingClassification: 'Standard'
-      }
-    ]);
-
     await command.action(logger, { options: { name: containerName, description: 'Lorem ipsum', ocrEnabled: true, itemMajorVersionLimit: 250, itemVersioningEnabled: true, containerTypeName: containerTypeName, verbose: true } });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, {
       displayName: containerName,
