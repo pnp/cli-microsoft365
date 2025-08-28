@@ -11,42 +11,40 @@ import commands from '../../commands.js';
 import command from './containertype-add.js';
 import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
-import { spo } from '../../../../utils/spo.js';
 import { CommandError } from '../../../../Command.js';
+import { z } from 'zod';
+import { accessToken } from '../../../../utils/accessToken.js';
 
 describe(commands.CONTAINERTYPE_ADD, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandOptionsSchema: z.ZodTypeAny;
 
   let commandInfo: CommandInfo;
 
   const applicationId = 'f08575e2-36c4-407f-a891-eabae23f66bc';
   const containerName = 'New Container';
-  const azureSubscriptionId = '440132a1-d85c-4e1a-b087-8c32ae189a4e';
-  const region = 'West Europe';
-  const resourceGroup = 'Resource Group';
-  const adminUrl = 'https://contoso-admin.sharepoint.com';
 
-  const errorMessageTooManyContainers = 'Maximum number of allowed Trial Container Types has been exceeded.';
-  const errorMessageContainerAlreadyExists = `Container Type with Id c33cfee5-c9b6-0a2a-02ee-060693a57f37 already exists for Owning Application ${applicationId}`;
-
-  const csomContainerAlreadyExistsError = `[{"SchemaVersion":"15.0.0.0","LibraryVersion":"16.0.24621.12009","ErrorInfo":{"ErrorMessage":"${errorMessageContainerAlreadyExists}","ErrorValue":null,"TraceCorrelationId":"380514a1-50e2-8000-6705-77935619cb19","ErrorCode":-2146232832,"ErrorTypeName":"Microsoft.SharePoint.SPException"},"TraceCorrelationId":"380514a1-50e2-8000-6705-77935619cb19"}]`;
-  const csomTrialError = `[{"SchemaVersion":"15.0.0.0","LibraryVersion":"16.0.24621.12009","ErrorInfo":{"ErrorMessage":"${errorMessageTooManyContainers}","ErrorValue":null,"TraceCorrelationId":"df0214a1-d093-8000-4a04-15fbbddb489b","ErrorCode":-2146232832,"ErrorTypeName":"Microsoft.SharePoint.SPException"},"TraceCorrelationId":"df0214a1-d093-8000-4a04-15fbbddb489b"}]`;
-  const csomOutput = `[{"SchemaVersion":"15.0.0.0","LibraryVersion":"16.0.24621.12009","ErrorInfo":null,"TraceCorrelationId":"1dfe13a1-9073-8000-4a04-123c4e4bf45e"},4,{"_ObjectType_":"Microsoft.Online.SharePoint.TenantAdministration.SPContainerTypeProperties","AzureSubscriptionId":"\/Guid(${azureSubscriptionId})\/","ContainerTypeId":"\/Guid(fafa338d-8bd5-04fe-3ea1-763649bff2df)\/","CreationDate":"3\u002f11\u002f2024 1:30:21 PM","DisplayName":"${containerName}","ExpiryDate":null,"IsBillingProfileRequired":true,"OwningAppId":"\/Guid(${applicationId})\/","OwningTenantId":"\/Guid(e1dd4023-a656-480a-8a0e-c1b1eec51e1d)\/","Region":"${region}","ResourceGroup":"${resourceGroup}","SPContainerTypeBillingClassification":0}]`;
-
-  const jsonResponse = {
-    AzureSubscriptionId: azureSubscriptionId,
-    ContainerTypeId: 'fafa338d-8bd5-04fe-3ea1-763649bff2df',
-    CreationDate: "3/11/2024 1:30:21 PM",
-    DisplayName: containerName,
-    ExpiryDate: null,
-    IsBillingProfileRequired: true,
-    OwningAppId: applicationId,
-    OwningTenantId: "e1dd4023-a656-480a-8a0e-c1b1eec51e1d",
-    Region: region,
-    ResourceGroup: resourceGroup,
-    SPContainerTypeBillingClassification: "Standard"
+  const containerTypeResponse = {
+    id: 'de988700-d700-020e-0a00-0831f3042f00',
+    name: 'Test Trial Container',
+    owningAppId: '11335700-9a00-4c00-84dd-0c210f203f00',
+    billingClassification: 'trial',
+    billingStatus: 'valid',
+    createdDateTime: '01/20/2025',
+    expirationDateTime: '02/20/2025',
+    etag: 'RVRhZw==',
+    settings: {
+      urlTemplate: '',
+      isDiscoverabilityEnabled: true,
+      isSearchEnabled: true,
+      isItemVersioningEnabled: true,
+      itemMajorVersionLimit: 50,
+      maxStoragePerContainerInBytes: 104857600,
+      isSharingRestricted: false,
+      consumingTenantOverridables: 'isSearchEnabled,itemMajorVersionLimit'
+    }
   };
 
   before(() => {
@@ -54,11 +52,12 @@ describe(commands.CONTAINERTYPE_ADD, () => {
     sinon.stub(telemetry, 'trackEvent').resolves();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
-    sinon.stub(spo, 'getSpoAdminUrl').resolves(adminUrl);
-    sinon.stub(spo, 'ensureFormDigest').resolves({ FormDigestValue: 'abc', FormDigestTimeoutSeconds: 1800, FormDigestExpiresAt: new Date(), WebFullUrl: adminUrl });
+    sinon.stub(accessToken, 'assertAccessTokenType').withArgs('delegated').resolves();
 
     auth.connection.active = true;
+    auth.connection.appId = 'a0de833a-3629-489a-8fc8-4dd0c431878c';
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
   });
 
   beforeEach(() => {
@@ -86,6 +85,7 @@ describe(commands.CONTAINERTYPE_ADD, () => {
   after(() => {
     sinon.restore();
     auth.connection.active = false;
+    auth.connection.appId = undefined;
   });
 
   it('has correct name', () => {
@@ -96,88 +96,143 @@ describe(commands.CONTAINERTYPE_ADD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('creates a new trial Container Type', async () => {
-    sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `${adminUrl}/_vti_bin/client.svc/ProcessQuery`) {
-        return csomOutput;
-      }
-      throw 'Invalid request';
-    });
-
-    await command.action(logger, { options: { name: containerName, applicationId: applicationId, trial: true, verbose: true } });
-    const jsonResponseClone = { ...jsonResponse };
-    jsonResponseClone.SPContainerTypeBillingClassification = "Trial";
-    assert(loggerLogSpy.calledWith(jsonResponseClone));
-  });
-
-  it('creates a new standard Container Type', async () => {
-    sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `${adminUrl}/_vti_bin/client.svc/ProcessQuery`) {
-        return csomOutput;
-      }
-      throw 'Invalid request';
-    });
-
-    await command.action(logger, { options: { name: containerName, applicationId: applicationId, region: region, azureSubscriptionId: azureSubscriptionId, resourceGroup: resourceGroup, verbose: true } });
-    assert(loggerLogSpy.calledWith(jsonResponse));
-  });
-
-  it('throws an error when too many trial containers have been created', async () => {
-    sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `${adminUrl}/_vti_bin/client.svc/ProcessQuery`) {
-        return csomTrialError;
-      }
-      throw 'Invalid request';
-    });
-
-    await assert.rejects(command.action(logger, { options: { name: containerName, applicationId: applicationId, trial: true, verbose: true } })
-      , new CommandError(errorMessageTooManyContainers));
-  });
-
-  it('throws an error when container with application id has already been created', async () => {
-    sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `${adminUrl}/_vti_bin/client.svc/ProcessQuery`) {
-        return csomContainerAlreadyExistsError;
-      }
-      throw 'Invalid request';
-    });
-
-    await assert.rejects(command.action(logger, { options: { name: containerName, applicationId: applicationId, azureSubscriptionId: azureSubscriptionId, resourceGroup: resourceGroup, region: region, verbose: true } })
-      , new CommandError(errorMessageContainerAlreadyExists));
-  });
-
   it('fails validation if the specified applicationId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { name: containerName, applicationId: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ name: containerName, appId: 'invalid' });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('passes validation if the specified applicationId is a valid GUID and trial is specified', async () => {
-    const actual = await command.validate({ options: { name: containerName, applicationId: applicationId, trial: true } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the specified applicationId is a valid GUID', async () => {
+    const actual = commandOptionsSchema.safeParse({ name: containerName, appId: applicationId });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if azureSubscriptionId is not passed and trial is not passed', async () => {
-    const actual = await command.validate({ options: { name: containerName, applicationId: applicationId } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if itemMajorVersionLimit is a negative number', async () => {
+    const actual = commandOptionsSchema.safeParse({ name: containerName, itemMajorVersionLimit: -1 });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if resourceGroup is not passed and trial is not passed', async () => {
-    const actual = await command.validate({ options: { name: containerName, applicationId: applicationId, azureSubscriptionId: azureSubscriptionId } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if itemMajorVersionLimit is float number', async () => {
+    const actual = commandOptionsSchema.safeParse({ name: containerName, itemMajorVersionLimit: 1.5 });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if region is not passed and trial is not passed', async () => {
-    const actual = await command.validate({ options: { name: containerName, applicationId: applicationId, azureSubscriptionId: azureSubscriptionId, resourceGroup: resourceGroup } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if itemMajorVersionLimit is specified and isItemVersioningEnabled is false', async () => {
+    const actual = commandOptionsSchema.safeParse({ name: containerName, itemMajorVersionLimit: 10, isItemVersioningEnabled: false });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if azureSubscriptionId is not a valid GUID and trial is not passed', async () => {
-    const actual = await command.validate({ options: { name: containerName, applicationId: applicationId, azureSubscriptionId: 'invalid', region: region, resourceGroup: resourceGroup } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if maxStoragePerContainerInBytes is a negative number', async () => {
+    const actual = commandOptionsSchema.safeParse({ name: containerName, maxStoragePerContainerInBytes: -1 });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if all options are passed and it is not a trial', async () => {
-    const actual = await command.validate({ options: { name: containerName, applicationId: applicationId, azureSubscriptionId: azureSubscriptionId, region: region, resourceGroup: resourceGroup } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('fails validation if maxStoragePerContainerInBytes is float number', async () => {
+    const actual = commandOptionsSchema.safeParse({ name: containerName, maxStoragePerContainerInBytes: 1.5 });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation when billingType has an invalid value', async () => {
+    const actual = commandOptionsSchema.safeParse({ name: containerName, billingType: 'invalid' });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation when sharingCapability has an invalid value', async () => {
+    const actual = commandOptionsSchema.safeParse({ name: containerName, sharingCapability: 'invalid' });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation if consumingTenantOverridables contains an invalid value', async () => {
+    const actual = commandOptionsSchema.safeParse({ name: containerName, consumingTenantOverridables: 'isDiscoverabilityEnabled, invalid, isItemVersioningEnabled' });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('passes validation if all options are passed', async () => {
+    const actual = commandOptionsSchema.safeParse({ name: containerName, appId: applicationId, billingType: 'trial', consumingTenantOverridables: 'isItemVersioningEnabled,isDiscoverabilityEnabled', isDiscoverabilityEnabled: true, isItemVersioningEnabled: true, isSearchEnabled: true, isSharingRestricted: true, itemMajorVersionLimit: 23, maxStoragePerContainerInBytes: 12345, sharingCapability: 'disabled', urlTemplate: 'https://microsoft.com' });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('creates a container type and outputs a result', async () => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/beta/storage/fileStorage/containerTypes`) {
+        return containerTypeResponse;
+      }
+
+      throw 'Invalid request: ' + opts.url;
+    });
+
+    await command.action(logger, { options: { name: containerName, verbose: true } });
+    assert(loggerLogSpy.calledOnceWith(containerTypeResponse));
+  });
+
+  it('creates a container type correctly', async () => {
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/beta/storage/fileStorage/containerTypes`) {
+        return containerTypeResponse;
+      }
+
+      throw 'Invalid request: ' + opts.url;
+    });
+
+    await command.action(logger, { options: { name: containerName, appId: applicationId, billingType: 'trial', consumingTenantOverridables: 'isItemVersioningEnabled, isDiscoverabilityEnabled', isDiscoverabilityEnabled: true, isItemVersioningEnabled: true, isSearchEnabled: true, isSharingRestricted: true, itemMajorVersionLimit: 23, maxStoragePerContainerInBytes: 12345, sharingCapability: 'disabled', urlTemplate: 'https://microsoft.com' } });
+    assert.deepStrictEqual(postStub.firstCall.args[0]?.data, {
+      name: containerName,
+      owningAppId: applicationId,
+      billingClassification: 'trial',
+      settings: {
+        consumingTenantOverridables: 'isItemVersioningEnabled,isDiscoverabilityEnabled',
+        isDiscoverabilityEnabled: true,
+        isItemVersioningEnabled: true,
+        isSearchEnabled: true,
+        isSharingRestricted: true,
+        itemMajorVersionLimit: 23,
+        maxStoragePerContainerInBytes: 12345,
+        sharingCapability: 'disabled',
+        urlTemplate: 'https://microsoft.com'
+      }
+    });
+  });
+
+  it('creates a container type correctly for current app', async () => {
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/beta/storage/fileStorage/containerTypes`) {
+        return containerTypeResponse;
+      }
+
+      throw 'Invalid request: ' + opts.url;
+    });
+
+    await command.action(logger, { options: { name: containerName, billingType: 'directToCustomer', consumingTenantOverridables: 'itemMajorVersionLimit,urlTemplate, maxStoragePerContainerInBytes', isDiscoverabilityEnabled: true, isItemVersioningEnabled: true, isSearchEnabled: false, isSharingRestricted: true, itemMajorVersionLimit: 23, maxStoragePerContainerInBytes: 12345, sharingCapability: 'disabled', urlTemplate: 'https://microsoft.com' } });
+    assert.deepStrictEqual(postStub.firstCall.args[0]?.data, {
+      name: containerName,
+      owningAppId: 'a0de833a-3629-489a-8fc8-4dd0c431878c',
+      billingClassification: 'directToCustomer',
+      settings: {
+        consumingTenantOverridables: 'itemMajorVersionLimit,urlTemplate,maxStoragePerContainerInBytes',
+        isDiscoverabilityEnabled: true,
+        isItemVersioningEnabled: true,
+        isSearchEnabled: false,
+        isSharingRestricted: true,
+        itemMajorVersionLimit: 23,
+        maxStoragePerContainerInBytes: 12345,
+        sharingCapability: 'disabled',
+        urlTemplate: 'https://microsoft.com'
+      }
+    });
+  });
+
+  it('throws an error when container type with application id has already been created', async () => {
+    sinon.stub(request, 'post').rejects({
+      error: {
+        code: 'invalidRequest',
+        message: 'Invalid request',
+        innerError: {
+          'request-id': '56ad0703-c9a5-4413-a86f-5617ee07f903',
+          'client-request-id': '56ad0703-c9a5-4413-a86f-5617ee07f903'
+        }
+      }
+    });
+
+    await assert.rejects(command.action(logger, { options: { name: containerName } }),
+      new CommandError('Invalid request'));
   });
 });

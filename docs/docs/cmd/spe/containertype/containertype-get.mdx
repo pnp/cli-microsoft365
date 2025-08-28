@@ -4,7 +4,7 @@ import TabItem from '@theme/TabItem';
 
 # spe containertype get
 
-Get a specific Container Type
+Gets a specific container type
 
 ## Usage
 
@@ -16,34 +16,57 @@ m365 containertype get [options]
 
 ```md definition-list
 `-i, --id [id]`
-: The Id of the Container Type. Specify either id or name but not both.
+: The ID of the container type. Specify either id or name but not both.
 
 `-n, --name [name]`
-: The Container Type name. Specify either id or name but not both.
+: The container type name. Specify either id or name but not both.
 ```
 
 <Global />
 
 ## Remarks
 
-:::info
+:::warning
 
-To use this command you must be either **SharePoint Administrator** or **Global Administrator**.
+The command is based on an API that is currently in preview and is subject to change once the API reached general availability.
 
 :::
 
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource        | Permissions                         |
+  |-----------------|-------------------------------------|
+  | Microsoft Graph | FileStorageContainerType.Manage.All |
+
+  :::info
+
+  To use this command you must be either **SharePoint Administrator** or **Global Administrator**.
+
+  :::
+
+  </TabItem>
+  <TabItem value="Application">
+
+  This command does not support application permissions.
+
+  </TabItem>
+</Tabs>
+
 ## Examples
 
-Gets Container Type by id
+Gets container type by ID
 
 ```sh
-m365 spe containertype get --id '4ec4aefd-4fa3-0e4a-20c3-6e68389e7138'
+m365 spe containertype get --id 5de5c251-61c2-40f5-8947-5a719c1c0b71
 ```
 
-Gets Container Type by name
+Gets container type by name
 
 ```sh
-m365 spe containertype get --name 'test container'
+m365 spe containertype get --name 'Container Type 1'
 ```
 
 ## Response
@@ -53,19 +76,23 @@ m365 spe containertype get --name 'test container'
 
   ```json
   {
-    "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SPContainerTypeProperties",
-    "ApplicationRedirectUrl": null,
-    "AzureSubscriptionId": "/Guid(00000000-0000-0000-0000-000000000000)/",
-    "ContainerTypeId": "/Guid(073269af-f1d2-042d-2ef5-5bdd6ac83115)/",
-    "CreationDate": null,
-    "DisplayName": "test1",
-    "ExpiryDate": null,
-    "IsBillingProfileRequired": true,
-    "OwningAppId": "/Guid(df4085cc-9a38-4255-badc-5c5225610475)/",
-    "OwningTenantId": "/Guid(00000000-0000-0000-0000-000000000000)/",
-    "Region": null,
-    "ResourceGroup": null,
-    "SPContainerTypeBillingClassification": 0
+    "id": "5de5c251-61c2-40f5-8947-5a719c1c0b71",
+    "name": "Container Type 1",
+    "owningAppId": "a6f79b17-a0f5-47d1-bfde-9995caebc2a3",
+    "billingClassification": "standard",
+    "billingStatus": "invalid",
+    "createdDateTime": "2025-06-19T05:17:32.0760075Z",
+    "etag": "MC4wLjAuMA==",
+    "settings": {
+      "urlTemplate": "",
+      "isDiscoverabilityEnabled": false,
+      "isSearchEnabled": true,
+      "isItemVersioningEnabled": true,
+      "itemMajorVersionLimit": 500,
+      "maxStoragePerContainerInBytes": 27487790694400,
+      "isSharingRestricted": false,
+      "consumingTenantOverridables": ""
+    }
   }
   ```
 
@@ -73,39 +100,43 @@ m365 spe containertype get --name 'test container'
   <TabItem value="Text">
 
   ```text
-ContainerTypeId                               DisplayName                                    OwningAppId                                 
---------------------------------------------  ---------------------------------------------  --------------------------------------------
-/Guid(073269af-f1d2-042d-2ef5-5bdd6ac83115)/  test1                                          /Guid(df4085cc-9a38-4255-badc-5c5225610475)/
+  billingClassification: standard
+  billingStatus        : invalid
+  createdDateTime      : 2025-06-19T05:17:32.0760075Z
+  etag                 : MC4wLjAuMA==
+  id                   : 5de5c251-61c2-40f5-8947-5a719c1c0b71
+  name                 : Container Type 1
+  owningAppId          : a6f79b17-a0f5-47d1-bfde-9995caebc2a3
+  settings             : {"urlTemplate":"","isDiscoverabilityEnabled":false,"isSearchEnabled":true,"isItemVersioningEnabled":true,"itemMajorVersionLimit":500,"maxStoragePerContainerInBytes":27487790694400,"isSharingRestricted":false,"consumingTenantOverridables":""}
   ```
 
   </TabItem>
   <TabItem value="CSV">
 
   ```csv
-  _ObjectType_,ApplicationRedirectUrl,AzureSubscriptionId,ContainerTypeId,CreationDate,DisplayName,ExpiryDate,IsBillingProfileRequired,OwningAppId,OwningTenantId,Region,ResourceGroup,SPContainerTypeBillingClassification
-  Microsoft.Online.SharePoint.TenantAdministration.SPContainerTypeProperties,,/Guid(00000000-0000-0000-0000-000000000000)/,/Guid(073269af-f1d2-042d-2ef5-5bdd6ac83115)/,,test1,,1,/Guid(df4085cc-9a38-4255-badc-5c5225610475)/,/Guid(00000000-0000-0000-0000-000000000000)/,,,0
+  id,name,owningAppId,billingClassification,billingStatus,createdDateTime,etag
+  5de5c251-61c2-40f5-8947-5a719c1c0b71,Container Type 1,a6f79b17-a0f5-47d1-bfde-9995caebc2a3,standard,invalid,2025-06-19T05:17:32.0760075Z,MC4wLjAuMA==
   ```
 
   </TabItem>
   <TabItem value="Markdown">
 
   ```md
-  # spe containertype list 
+  # spe containertype get --id "5de5c251-61c2-40f5-8947-5a719c1c0b71"
 
-  Date: 5/11/2024
+  Date: 27/08/2025
 
-  ## test1
+  ## Container Type 1 (5de5c251-61c2-40f5-8947-5a719c1c0b71)
 
   Property | Value
   ---------|-------
-  \_ObjectType\_ | Microsoft.Online.SharePoint.TenantAdministration.SPContainerTypeProperties
-  AzureSubscriptionId | /Guid(00000000-0000-0000-0000-000000000000)/
-  ContainerTypeId | /Guid(073269af-f1d2-042d-2ef5-5bdd6ac83115)/
-  DisplayName | test1
-  IsBillingProfileRequired | true
-  OwningAppId | /Guid(df4085cc-9a38-4255-badc-5c5225610475)/
-  OwningTenantId | /Guid(00000000-0000-0000-0000-000000000000)/
-  SPContainerTypeBillingClassification | 0
+  id | 5de5c251-61c2-40f5-8947-5a719c1c0b71
+  name | Container Type 1
+  owningAppId | a6f79b17-a0f5-47d1-bfde-9995caebc2a3
+  billingClassification | standard
+  billingStatus | invalid
+  createdDateTime | 2025-06-19T05:17:32.0760075Z
+  etag | MC4wLjAuMA==
   ```
 
   </TabItem>

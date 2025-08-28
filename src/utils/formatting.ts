@@ -192,7 +192,7 @@ export const formatting = {
     }
   },
 
-  convertArrayToHashTable(key: string, array: any[]): any {
+  convertArrayToHashTable<T>(key: keyof T, array: T[]): any {
     const resultAsKeyValuePair: any = {};
     array.forEach((obj) => {
       resultAsKeyValuePair[obj[key]] = obj;

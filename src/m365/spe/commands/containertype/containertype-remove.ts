@@ -4,12 +4,17 @@ import { z } from 'zod';
 import { zod } from '../../../../utils/zod.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
-import { spo } from '../../../../utils/spo.js';
-import { spe } from '../../../../utils/spe.js';
+import { ClientSvcResponse, ClientSvcResponseContents, spo } from '../../../../utils/spo.js';
 import { cli } from '../../../../cli/cli.js';
 import { validation } from '../../../../utils/validation.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import config from '../../../../config.js';
+import { formatting } from '../../../../utils/formatting.js';
+
+interface CsomContainerType {
+  DisplayName: string;
+  ContainerTypeId: string;
+}
 
 const options = globalOptionsZod
   .extend({
@@ -63,16 +68,15 @@ class SpeContainerTypeRemoveCommand extends SpoCommand {
     try {
       const spoAdminUrl = await spo.getSpoAdminUrl(logger, this.verbose);
       const containerTypeId = await this.getContainerTypeId(args.options, spoAdminUrl, logger);
-      const formDigestInfo = await spo.ensureFormDigest(spoAdminUrl, logger, undefined, this.debug);
 
       if (this.verbose) {
-        await logger.logToStderr(`Removing container type ${args.options.id || args.options.name}...`);
+        await logger.logToStderr(`Removing container type '${args.options.id || args.options.name}'...`);
       }
 
       const requestOptions: CliRequestOptions = {
         url: `${spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
         headers: {
-          'X-RequestDigest': formDigestInfo.FormDigestValue
+          accept: 'application/json;odata=nometadata'
         },
         responseType: 'json',
         data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="7" ObjectPathId="6" /><Method Name="RemoveSPOContainerType" Id="8" ObjectPathId="6"><Parameters><Parameter TypeId="{b66ab1ca-fd51-44f9-8cfc-01f5c2a21f99}"><Property Name="ContainerTypeId" Type="Guid">{${containerTypeId}}</Property></Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="6" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`
@@ -97,7 +101,36 @@ class SpeContainerTypeRemoveCommand extends SpoCommand {
       await logger.logToStderr(`Retrieving container type id for container type '${options.name}'...`);
     }
 
-    return spe.getContainerTypeIdByName(spoAdminUrl, options.name!);
+    const requestOptions: CliRequestOptions = {
+      url: `${spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
+      headers: {
+        accept: 'application/json;odata=nometadata'
+      },
+      responseType: 'json',
+      data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="46" ObjectPathId="45" /><Method Name="GetSPOContainerTypes" Id="47" ObjectPathId="45"><Parameters><Parameter Type="Enum">1</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="45" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`
+    };
+
+    const json = await request.post<ClientSvcResponse>(requestOptions);
+    const response: ClientSvcResponseContents = json[0];
+
+    if (response.ErrorInfo) {
+      throw new Error(response.ErrorInfo.ErrorMessage);
+    }
+
+    const allContainerTypes: CsomContainerType[] = json[json.length - 1];
+    const containerTypes = allContainerTypes.filter(ct => ct.DisplayName.toLowerCase() === options.name!.toLowerCase());
+
+    if (containerTypes.length === 0) {
+      throw new Error(`The specified container type '${options.name}' does not exist.`);
+    }
+
+    if (containerTypes.length > 1) {
+      const containerTypeKeyValuePair = formatting.convertArrayToHashTable('ContainerTypeId', containerTypes);
+      const containerType = await cli.handleMultipleResultsFound<CsomContainerType>(`Multiple container types with name '${options.name}' found.`, containerTypeKeyValuePair);
+      return formatting.extractCsomGuid(containerType.ContainerTypeId);
+    }
+
+    return formatting.extractCsomGuid(containerTypes[0].ContainerTypeId);
   }
 }
 

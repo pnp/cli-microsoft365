@@ -16,7 +16,6 @@ import { z } from 'zod';
 import { CommandError } from '../../../../Command.js';
 
 describe(commands.CONTAINER_RECYCLEBINITEM_RESTORE, () => {
-  const spoAdminUrl = 'https://contoso-admin.sharepoint.com';
   const containerTypeId = 'c6f08d91-77fa-485f-9369-f246ec0fc19c';
   const containerTypeName = 'Container type name';
   const containerId = 'b!McTeU0-dW0GxKwECWdW04TIvEK-Js9xJib_RFqF-CqZxNe3OHVAIT4SqBxGm4fND';
@@ -46,7 +45,6 @@ describe(commands.CONTAINER_RECYCLEBINITEM_RESTORE, () => {
     sinon.stub(session, 'getId').returns('');
 
     auth.connection.active = true;
-    auth.connection.spoUrl = spoAdminUrl.replace('-admin.sharepoint.com', '.sharepoint.com');
     commandInfo = cli.getCommandInfo(command);
     commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
   });
@@ -77,7 +75,6 @@ describe(commands.CONTAINER_RECYCLEBINITEM_RESTORE, () => {
   after(() => {
     sinon.restore();
     auth.connection.active = false;
-    auth.connection.spoUrl = undefined;
   });
 
   it('has correct name', () => {
@@ -167,7 +164,7 @@ describe(commands.CONTAINER_RECYCLEBINITEM_RESTORE, () => {
   });
 
   it('correctly restores a container by name and container type name', async () => {
-    sinon.stub(spe, 'getContainerTypeIdByName').callsFake(async (spoAdminUrl, name) => {
+    sinon.stub(spe, 'getContainerTypeIdByName').callsFake(async (name) => {
       if (name === containerTypeName) {
         return containerTypeId;
       }

@@ -20,7 +20,6 @@ describe(commands.CONTAINER_LIST, () => {
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
 
-  const adminUrl = 'https://contoso-admin.sharepoint.com';
   const containersList = [{
     "id": "b!ISJs1WRro0y0EWgkUYcktDa0mE8zSlFEqFzqRn70Zwp1CEtDEBZgQICPkRbil_5Z",
     "displayName": "My File Storage Container",
@@ -41,7 +40,6 @@ describe(commands.CONTAINER_LIST, () => {
     sinon.stub(session, 'getId').returns('');
 
     auth.connection.active = true;
-    auth.connection.spoUrl = 'https://contoso.sharepoint.com';
     commandInfo = cli.getCommandInfo(command);
   });
 
@@ -60,7 +58,7 @@ describe(commands.CONTAINER_LIST, () => {
     };
     loggerLogSpy = sinon.spy(logger, 'log');
 
-    sinon.stub(spe, 'getContainerTypeIdByName').withArgs(adminUrl, 'standard container').resolves('e2756c4d-fa33-4452-9c36-2325686e1082');
+    sinon.stub(spe, 'getContainerTypeIdByName').withArgs('standard container').resolves('e2756c4d-fa33-4452-9c36-2325686e1082');
   });
 
   afterEach(() => {
@@ -74,7 +72,6 @@ describe(commands.CONTAINER_LIST, () => {
   after(() => {
     sinon.restore();
     auth.connection.active = false;
-    auth.connection.spoUrl = undefined;
   });
 
   it('has correct name', () => {
