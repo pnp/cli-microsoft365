@@ -34,7 +34,9 @@ The MCP Server is installed as a Node.js package. You can install it globally us
 npm i -g @pnp/cli-microsoft365-mcp-server@latest
 ```
 
+:::warning
 The MCP server will not do any authentication for you. You will need to first authenticate using CLI for Microsoft 365 using [m365 login](../cmd/login) command. Once you are authenticated, the MCP server will use the same authentication context.
+:::
 
 ## Add MCP to VS Code
 
@@ -54,16 +56,16 @@ As a result, you should have the following configuration:
 
 ```json title="/.vscode/mcp.json"
 {
-    "servers": {
-        "CLI for Microsoft 365 MCP Server": {
-            "type": "stdio",
-            "command": "npx",
-            "args": [
-                "-y",
-                "@pnp/cli-microsoft365-mcp-server@latest"
-          ]
-        }
+  "servers": {
+    "CLI for Microsoft 365 MCP Server": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@pnp/cli-microsoft365-mcp-server@latest"
+      ]
     }
+  }
 }
 ```
 
@@ -80,8 +82,8 @@ In the following example, the MCP server created a SharePoint list with new colu
 prompt: 
 
 ```
-  Add a new list to the site with title "awesome ducks". Then add new columns to that list including them in the default view. The first should be a text description column and the second should be a user column.
-  Finally, add 3 items to this list with some funny jokes about docs, added to the description column and assign my user to the user column. Use emojis 🙂
+Add a new list to the site with title "awesome ducks". Then add new columns to that list including them in the default view. The first should be a text description column and the second should be a user column.
+Finally, add 3 items to this list with some funny jokes about docs, added to the description column and assign my user to the user column. Use emojis 🙂
 ```
 
 ![Screenshot of Visual Studio Code with GitHub Copilot chat with a prompt to create a new SharePoint list and a web browser presenting the newly created SharePoint list with newly created columns and items](../images/cli-mcp-server/mcp-example-1.png)
