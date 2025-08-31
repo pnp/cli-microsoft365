@@ -120,8 +120,7 @@ class SpoHomeSiteSetCommand extends SpoCommand {
       'frontLineWorkers': 1,
       'informationWorkers': 2
     };
-    const result = licenseTypeMap[licenseType];
-    return result;
+    return licenseTypeMap[licenseType];
   }
 
   private async transformAudienceNamesToIds(audienceNames: string): Promise<string[]> {
