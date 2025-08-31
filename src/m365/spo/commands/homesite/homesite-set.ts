@@ -59,7 +59,7 @@ class SpoHomeSiteSetCommand extends SpoCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       if (this.verbose) {
-        await logger.logToStderr('Will not set the home site anymore, only update existing ones...');
+        await logger.logToStderr("This command now only updates existing home sites. Use 'spo homesite add' to add new home sites.");
         await logger.logToStderr(`Setting the SharePoint home site to: ${args.options.siteUrl}...`);
         await logger.logToStderr('Attempting to retrieve the SharePoint admin URL.');
       }
