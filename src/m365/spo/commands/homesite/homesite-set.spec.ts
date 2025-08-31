@@ -346,7 +346,7 @@ describe(commands.HOMESITE_SET, () => {
 
   it('handles verbose mode correctly', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `${spoAdminUrl}/_api/SPO.Tenant/SetSPHSite`) {
+      if (opts.url === `${spoAdminUrl}/_api/SPO.Tenant/UpdateTargetedSite`) {
         return defaultResponse;
       }
       return 'Invalid request';
