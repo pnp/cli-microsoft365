@@ -1,12 +1,9 @@
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
-import { formatting } from '../../../../utils/formatting.js';
-import { odata } from '../../../../utils/odata.js';
 import { spo } from '../../../../utils/spo.js';
-import { urlUtil } from '../../../../utils/urlUtil.js';
+import { ListItemListOptions, spoListItem } from '../../../../utils/spoListItem.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
-import { ListItemInstance } from '../listitem/ListItemInstance.js';
 
 class SpoTenantCommandSetListCommand extends SpoCommand {
   public get name(): string {
@@ -32,11 +29,14 @@ class SpoTenantCommandSetListCommand extends SpoCommand {
       await logger.logToStderr('Retrieving a list of ListView Command Sets that are installed tenant-wide');
     }
 
-    const listServerRelativeUrl: string = urlUtil.getServerRelativePath(appCatalogUrl, '/lists/TenantWideExtensions');
-
     try {
-      const listItems = await odata.getAllItems<ListItemInstance>(`${appCatalogUrl}/_api/web/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')/items?$filter=startswith(TenantWideExtensionLocation, 'ClientSideExtension.ListViewCommandSet')`);
-      listItems.forEach(i => delete i.ID);
+      const options: ListItemListOptions = {
+        webUrl: appCatalogUrl,
+        listUrl: '/Lists/TenantWideExtensions',
+        filter: `startswith(TenantWideExtensionLocation, 'ClientSideExtension.ListViewCommandSet')`
+      };
+
+      const listItems = await spoListItem.getListItems(options, logger, this.verbose);
 
       await logger.log(listItems);
     }
