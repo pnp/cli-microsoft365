@@ -3,7 +3,7 @@ import GlobalOptions from '../../../../GlobalOptions.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { odata } from '../../../../utils/odata.js';
 import { validation } from '../../../../utils/validation.js';
-import GraphCommand from '../../../base/GraphCommand.js';
+import GraphApplicationCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 
 interface CommandArgs {
@@ -15,7 +15,7 @@ interface DateTimeOptions extends GlobalOptions {
   toDateTime?: string;
 }
 
-class TeamsReportPstncallsCommand extends GraphCommand {
+class TeamsReportPstncallsCommand extends GraphApplicationCommand {
   protected get allowedOutputs(): string[] {
     return ['json', 'csv'];
   }

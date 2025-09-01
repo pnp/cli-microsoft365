@@ -56,10 +56,6 @@ Get details about PSTN calls made between 2020-10-31 and 2020-12-31 and exports 
 m365 teams report pstncalls --fromDateTime 2020-10-31 --toDateTime 2020-12-31 --output json > "pstncalls.json"
 ```
 
-## More information
-
-- List PSTN calls: [https://learn.microsoft.com/graph/api/callrecords-callrecord-getpstncalls?view=graph-rest-1.0](https://learn.microsoft.com/graph/api/callrecords-callrecord-getpstncalls?view=graph-rest-1.0)
-
 ## Response
 
 <Tabs>
@@ -94,25 +90,9 @@ m365 teams report pstncalls --fromDateTime 2020-10-31 --toDateTime 2020-12-31 --
   ```
 
   </TabItem>
-  <TabItem value="Text">
-
-  ``` text
-  id,calleeNumber,callerNumber,startDateTime
-  9c4984c7-6c3c-427d-a30c-bd0b2eacee90,+1234567890,+0123456789,2019-11-01T00:00:08.2589935Z
-  ```
-
-  </TabItem>
   <TabItem value="CSV">
 
   ``` text
-  id,calleeNumber,callerNumber,startDateTime
-  9c4984c7-6c3c-427d-a30c-bd0b2eacee90,+1234567890,+0123456789,2019-11-01T00:00:08.2589935Z
-  ```
-
-  </TabItem>
-  <TabItem value="Markdown">
-
-  ```md
   id,calleeNumber,callerNumber,startDateTime
   9c4984c7-6c3c-427d-a30c-bd0b2eacee90,+1234567890,+0123456789,2019-11-01T00:00:08.2589935Z
   ```

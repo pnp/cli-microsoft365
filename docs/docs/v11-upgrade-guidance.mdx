@@ -1,3 +1,6 @@
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
 # v11 Upgrade Guidance
 
 The v11 release of CLI for Microsoft 365 introduces several breaking changes. To assist you in upgrading to the latest version, we've outlined the changes and the actions you may need to take.
@@ -6,7 +9,144 @@ The v11 release of CLI for Microsoft 365 introduces several breaking changes. To
 
 ### Changed ouput for commands
 
-We noticed that some of the commands were not returning an array, but an object with the `value` property. We've updated those commands to return an array of items.
+We noticed that some of the `list` commands were not returning an array, but an object with the `value` property. We've updated those commands to return an array of items.
+
+<details>
+  <summary>Click here to compare the different command outputs</summary>
+
+<Tabs>
+  <TabItem value="v10 output of the 'teams report directroutingcalls' command">
+
+  ```json
+  {
+    "@odata.count": 1,
+    "value": [
+      {
+        "id": "9e8bba57-dc14-533a-a7dd-f0da6575eed1",
+        "correlationId": "c98e1515-a937-4b81-b8a8-3992afde64e0",
+        "userId": "db03c14b-06eb-4189-939b-7cbf3a20ba27",
+        "userPrincipalName": "richard.malk@contoso.com",
+        "userDisplayName": "Richard Malk",
+        "startDateTime": "2019-11-01T00:00:25.105Z",
+        "inviteDateTime": "2019-11-01T00:00:21.949Z",
+        "failureDateTime": "0001-01-01T00:00:00Z",
+        "endDateTime": "2019-11-01T00:00:30.105Z",
+        "duration": 5,
+        "callType": "ByotIn",
+        "successfulCall": true,
+        "callerNumber": "+12345678***",
+        "calleeNumber": "+01234567***",
+        "mediaPathLocation": "USWE",
+        "signalingLocation": "EUNO",
+        "finalSipCode": 0,
+        "callEndSubReason": 540000,
+        "finalSipCodePhrase": "BYE",
+        "trunkFullyQualifiedDomainName": "tll-audiocodes01.adatum.biz",
+        "mediaBypassEnabled": false
+      }
+    ]
+  }
+  ```
+
+  </TabItem>
+  <TabItem value="v11 output of the 'teams report directroutingcalls' command">
+
+  ```json
+  [
+    {
+      "id": "9e8bba57-dc14-533a-a7dd-f0da6575eed1",
+      "correlationId": "c98e1515-a937-4b81-b8a8-3992afde64e0",
+      "userId": "db03c14b-06eb-4189-939b-7cbf3a20ba27",
+      "userPrincipalName": "richard.malk@contoso.com",
+      "userDisplayName": "Richard Malk",
+      "startDateTime": "2019-11-01T00:00:25.105Z",
+      "inviteDateTime": "2019-11-01T00:00:21.949Z",
+      "failureDateTime": "0001-01-01T00:00:00Z",
+      "endDateTime": "2019-11-01T00:00:30.105Z",
+      "duration": 5,
+      "callType": "ByotIn",
+      "successfulCall": true,
+      "callerNumber": "+12345678***",
+      "calleeNumber": "+01234567***",
+      "mediaPathLocation": "USWE",
+      "signalingLocation": "EUNO",
+      "finalSipCode": 0,
+      "callEndSubReason": 540000,
+      "finalSipCodePhrase": "BYE",
+      "trunkFullyQualifiedDomainName": "tll-audiocodes01.adatum.biz",
+      "mediaBypassEnabled": false
+    }
+  ]
+  ```
+
+  </TabItem>
+  <TabItem value="v10 output of the 'teams report pstncalls' command">
+
+  ```json
+  {
+    "@odata.count": 1,
+    "value": [
+      {
+        "id": "9c4984c7-6c3c-427d-a30c-bd0b2eacee90",
+        "callId": "1835317186_112562680@61.221.3.176",
+        "userId": "db03c14b-06eb-4189-939b-7cbf3a20ba27",
+        "userPrincipalName": "richard.malk@contoso.com",
+        "userDisplayName": "Richard Malk",
+        "startDateTime": "2019-11-01T00:00:08.2589935Z",
+        "endDateTime": "2019-11-01T00:03:47.2589935Z",
+        "duration": 219,
+        "charge": 0.00,
+        "callType": "user_in",
+        "currency": "USD",
+        "calleeNumber": "+1234567890",
+        "usageCountryCode": "US",
+        "tenantCountryCode": "US",
+        "connectionCharge": 0.00,
+        "callerNumber": "+0123456789",
+        "destinationContext": null,
+        "destinationName": "United States",
+        "conferenceId": null,
+        "licenseCapability": "MCOPSTNU",
+        "inventoryType": "Subscriber"
+      }
+    ]
+  }
+  ```
+
+  </TabItem>
+  <TabItem value="v11 output of the 'teams report pstncalls' command">
+
+  ```json
+  [
+    {
+      "id": "9c4984c7-6c3c-427d-a30c-bd0b2eacee90",
+      "callId": "1835317186_112562680@61.221.3.176",
+      "userId": "db03c14b-06eb-4189-939b-7cbf3a20ba27",
+      "userPrincipalName": "richard.malk@contoso.com",
+      "userDisplayName": "Richard Malk",
+      "startDateTime": "2019-11-01T00:00:08.2589935Z",
+      "endDateTime": "2019-11-01T00:03:47.2589935Z",
+      "duration": 219,
+      "charge": 0.00,
+      "callType": "user_in",
+      "currency": "USD",
+      "calleeNumber": "+1234567890",
+      "usageCountryCode": "US",
+      "tenantCountryCode": "US",
+      "connectionCharge": 0.00,
+      "callerNumber": "+0123456789",
+      "destinationContext": null,
+      "destinationName": "United States",
+      "conferenceId": null,
+      "licenseCapability": "MCOPSTNU",
+      "inventoryType": "Subscriber"
+    }
+  ]
+  ```
+
+  </TabItem>
+</Tabs>
+</details>
 
 The commands impacted by this change are:
 
