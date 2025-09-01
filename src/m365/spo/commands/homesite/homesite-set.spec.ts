@@ -108,7 +108,7 @@ describe(commands.HOMESITE_SET, () => {
         siteUrl: siteUrl,
         vivaConnectionsDefaultStart: true
       }
-    } as any);
+    });
 
     assert.deepStrictEqual(postRequestStub.lastCall.args[0].data, requestBody);
   });
