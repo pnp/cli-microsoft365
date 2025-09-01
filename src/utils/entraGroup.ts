@@ -176,5 +176,52 @@ export const entraGroup = {
 
     const group = await request.get<{ groupTypes: string[] }>(requestOptions);
     return group.groupTypes!.some(type => type === 'Unified');
+  },
+
+  /**
+   * Retrieve the IDs of groups by their display names. There is no guarantee that the order of the returned IDs will match the order of the specified names.
+   * @param names Array of group names.
+   * @returns Array of group IDs.
+   */
+  async getGroupIdsByDisplayNames(names: string[]): Promise<string[]> {
+    const groupIds: string[] = [];
+
+    for (let i = 0; i < names.length; i += 20) {
+      const namesChunk = names.slice(i, i + 20);
+      const requestOptions: CliRequestOptions = {
+        url: `${graphResource}/v1.0/$batch`,
+        headers: {
+          accept: 'application/json;odata.metadata=none'
+        },
+        responseType: 'json',
+        data: {
+          requests: namesChunk.map((name, index) => ({
+            id: index + 1,
+            method: 'GET',
+            url: `/groups?$filter=displayName eq '${formatting.encodeQueryParameter(name)}'&$select=id`,
+            headers: {
+              accept: 'application/json;odata.metadata=none'
+            }
+          }))
+        }
+      };
+      const res = await request.post<{ responses: { id: number; status: number; body: { value: [{ id: string }] } }[] }>(requestOptions);
+
+      for (const response of res.responses) {
+        if (response.body.value.length === 1) {
+          groupIds.push(response.body.value[0].id);
+        }
+        else if (response.body.value.length > 1) {
+          const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', response.body.value);
+          const result = await cli.handleMultipleResultsFound<Group>(`Multiple groups with the name '${namesChunk[response.id - 1]}' found.`, resultAsKeyValuePair);
+          groupIds.push(result.id!);
+        }
+        else {
+          throw Error(`The specified group with name '${namesChunk[response.id - 1]}' does not exist.`);
+        }
+      }
+    }
+
+    return groupIds;
   }
 };

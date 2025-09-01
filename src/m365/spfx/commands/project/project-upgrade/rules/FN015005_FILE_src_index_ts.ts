@@ -1,7 +1,7 @@
 import { FileAddRemoveRule } from "./FileAddRemoveRule.js";
 
 export class FN015005_FILE_src_index_ts extends FileAddRemoveRule {
-  constructor(add: boolean, contents: string) {
+  constructor(add: boolean, contents?: string | undefined) {
     super('./src/index.ts', add, contents);
   }
 

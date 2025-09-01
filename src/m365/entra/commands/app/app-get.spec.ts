@@ -26,7 +26,9 @@ describe(commands.APP_GET, () => {
   const appResponse = {
     value: [
       {
-        "id": "340a4aa3-1af6-43ac-87d8-189819003952"
+        "id": "340a4aa3-1af6-43ac-87d8-189819003952",
+        "appId": "9b1b1e42-794b-4c71-93ac-5ed92488b67f",
+        "displayName": "My App"
       }
     ]
   };
@@ -64,8 +66,9 @@ describe(commands.APP_GET, () => {
       fs.readFileSync,
       fs.writeFileSync,
       cli.getSettingWithDefaultValue,
-      cli.handleMultipleResultsFound,
-      entraApp.getAppRegistrationByAppId
+      entraApp.getAppRegistrationByAppId,
+      entraApp.getAppRegistrationByAppName,
+      entraApp.getAppRegistrationByObjectId
     ]);
   });
 
@@ -94,90 +97,25 @@ describe(commands.APP_GET, () => {
   });
 
   it('handles error when the app with the specified the name not found', async () => {
-    sinon.stub(request, 'get').callsFake(async opts => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=displayName eq 'My%20app'&$select=id`) {
-        return { value: [] };
-      }
-
-      throw `Invalid request ${JSON.stringify(opts)}`;
-    });
+    const error = `App with name 'My app' not found in Microsoft Entra ID`;
+    sinon.stub(entraApp, 'getAppRegistrationByAppName').rejects(new Error(error));
 
     await assert.rejects(command.action(logger, {
       options: {
         name: 'My app'
       }
-    }), new CommandError(`No Microsoft Entra application registration with name My app found`));
+    }), new CommandError(`App with name 'My app' not found in Microsoft Entra ID`));
   });
 
   it('handles error when multiple apps with the specified name found', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    sinon.stub(request, 'get').callsFake(async opts => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=displayName eq 'My%20app'&$select=id`) {
-        return {
-          value: [
-            { id: '9b1b1e42-794b-4c71-93ac-5ed92488b67f' },
-            { id: '9b1b1e42-794b-4c71-93ac-5ed92488b67g' }
-          ]
-        };
-      }
-
-      throw `Invalid request ${JSON.stringify(opts)}`;
-    });
+    const error = `Multiple apps with name 'My app' found in Microsoft Entra ID. Found: 9b1b1e42-794b-4c71-93ac-5ed92488b67f, 9b1b1e42-794b-4c71-93ac-5ed92488b67g.`;
+    sinon.stub(entraApp, 'getAppRegistrationByAppName').rejects(new Error(error));
 
     await assert.rejects(command.action(logger, {
       options: {
         name: 'My app'
       }
-    }), new CommandError(`Multiple Microsoft Entra application registrations with name 'My app' found. Found: 9b1b1e42-794b-4c71-93ac-5ed92488b67f, 9b1b1e42-794b-4c71-93ac-5ed92488b67g.`));
-  });
-
-  it('handles selecting single result when multiple apps with the specified name found and cli is set to prompt', async () => {
-    sinon.stub(request, 'get').callsFake(async opts => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=displayName eq 'My%20App'&$select=id`) {
-        return {
-          value: [
-            { id: '9b1b1e42-794b-4c71-93ac-5ed92488b67f' },
-            { id: '9b1b1e42-794b-4c71-93ac-5ed92488b67g' }
-          ]
-        };
-      }
-
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/9b1b1e42-794b-4c71-93ac-5ed92488b67f') {
-        return {
-          "id": "340a4aa3-1af6-43ac-87d8-189819003952",
-          "appId": "9b1b1e42-794b-4c71-93ac-5ed92488b67f",
-          "createdDateTime": "2019-10-29T17:46:55Z",
-          "displayName": "My App",
-          "description": null
-        };
-      }
-
-      throw `Invalid request ${JSON.stringify(opts)}`;
-    });
-
-    sinon.stub(cli, 'handleMultipleResultsFound').resolves({ id: '9b1b1e42-794b-4c71-93ac-5ed92488b67f' });
-
-    await command.action(logger, {
-      options: {
-        name: 'My App',
-        debug: true
-      }
-    });
-    const call: sinon.SinonSpyCall = loggerLogSpy.lastCall;
-    assert.deepEqual(call.args[0], {
-      "id": "340a4aa3-1af6-43ac-87d8-189819003952",
-      "appId": "9b1b1e42-794b-4c71-93ac-5ed92488b67f",
-      "createdDateTime": "2019-10-29T17:46:55Z",
-      "displayName": "My App",
-      "description": null
-    });
+    }), new CommandError(error));
   });
 
   it('handles error when retrieving information about app through name failed', async () => {
@@ -270,23 +208,13 @@ describe(commands.APP_GET, () => {
   it(`should get an Microsoft Entra app registration by its app (client) ID. Doesn't save the app info if not requested`, async () => {
     sinon.stub(entraApp, 'getAppRegistrationByAppId').resolves(appResponse.value[0]);
 
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === "https://graph.microsoft.com/v1.0/myorganization/applications/340a4aa3-1af6-43ac-87d8-189819003952?$select=id,appId,displayName") {
-        return {
-          "id": "340a4aa3-1af6-43ac-87d8-189819003952",
-          "appId": "9b1b1e42-794b-4c71-93ac-5ed92488b67f",
-          "displayName": "My App"
-        };
-      }
-
-      throw 'Invalid request';
-    });
     const fsWriteFileSyncSpy = sinon.spy(fs, 'writeFileSync');
 
     await command.action(logger, {
       options: {
         appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f',
-        properties: 'id,appId,displayName'
+        properties: 'id,appId,displayName',
+        verbose: true
       }
     });
     const call: sinon.SinonSpyCall = loggerLogSpy.lastCall;
@@ -297,38 +225,13 @@ describe(commands.APP_GET, () => {
   });
 
   it(`should get an Microsoft Entra app registration by its name. Doesn't save the app info if not requested`, async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=displayName eq 'My%20App'&$select=id`) {
-        return {
-          value: [
-            {
-              "id": "340a4aa3-1af6-43ac-87d8-189819003952",
-              "appId": "9b1b1e42-794b-4c71-93ac-5ed92488b67f",
-              "createdDateTime": "2019-10-29T17:46:55Z",
-              "displayName": "My App",
-              "description": null
-            }
-          ]
-        };
-      }
-
-      if ((opts.url as string).indexOf('/v1.0/myorganization/applications/') > -1) {
-        return {
-          "id": "340a4aa3-1af6-43ac-87d8-189819003952",
-          "appId": "9b1b1e42-794b-4c71-93ac-5ed92488b67f",
-          "createdDateTime": "2019-10-29T17:46:55Z",
-          "displayName": "My App",
-          "description": null
-        };
-      }
-
-      throw 'Invalid request';
-    });
+    sinon.stub(entraApp, 'getAppRegistrationByAppName').resolves(appResponse.value[0]);
     const fsWriteFileSyncSpy = sinon.spy(fs, 'writeFileSync');
 
     await command.action(logger, {
       options: {
-        name: 'My App'
+        name: 'My App',
+        verbose: true
       }
     });
     const call: sinon.SinonSpyCall = loggerLogSpy.lastCall;
@@ -339,24 +242,14 @@ describe(commands.APP_GET, () => {
   });
 
   it(`should get an Microsoft Entra app registration by its object ID. Doesn't save the app info if not requested`, async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications/340a4aa3-1af6-43ac-87d8-189819003952?$select=id,appId,displayName`) {
-        return {
-          "id": "340a4aa3-1af6-43ac-87d8-189819003952",
-          "appId": "9b1b1e42-794b-4c71-93ac-5ed92488b67f",
-          "createdDateTime": "2019-10-29T17:46:55Z",
-          "displayName": "My App",
-          "description": null
-        };
-      }
-      throw 'Invalid request';
-    });
+    sinon.stub(entraApp, 'getAppRegistrationByObjectId').resolves(appResponse.value[0]);
     const fsWriteFileSyncSpy = sinon.spy(fs, 'writeFileSync');
 
     await command.action(logger, {
       options: {
         objectId: '340a4aa3-1af6-43ac-87d8-189819003952',
-        properties: 'id,appId,displayName'
+        properties: 'id,appId,displayName',
+        verbose: true
       }
     });
     const call: sinon.SinonSpyCall = loggerLogSpy.lastCall;
@@ -372,19 +265,6 @@ describe(commands.APP_GET, () => {
 
     sinon.stub(entraApp, 'getAppRegistrationByAppId').resolves(appResponse.value[0]);
 
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf('/v1.0/myorganization/applications/') > -1) {
-        return {
-          "id": "340a4aa3-1af6-43ac-87d8-189819003952",
-          "appId": "9b1b1e42-794b-4c71-93ac-5ed92488b67f",
-          "createdDateTime": "2019-10-29T17:46:55Z",
-          "displayName": "My App",
-          "description": null
-        };
-      }
-
-      throw 'Invalid request';
-    });
     sinon.stub(fs, 'existsSync').returns(false);
     sinon.stub(fs, 'writeFileSync').callsFake((_, contents) => {
       filePath = _.toString();
@@ -416,19 +296,6 @@ describe(commands.APP_GET, () => {
 
     sinon.stub(entraApp, 'getAppRegistrationByAppId').resolves(appResponse.value[0]);
 
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf('/v1.0/myorganization/applications/') > -1) {
-        return {
-          "id": "340a4aa3-1af6-43ac-87d8-189819003952",
-          "appId": "9b1b1e42-794b-4c71-93ac-5ed92488b67f",
-          "createdDateTime": "2019-10-29T17:46:55Z",
-          "displayName": "My App",
-          "description": null
-        };
-      }
-
-      throw 'Invalid request';
-    });
     sinon.stub(fs, 'existsSync').returns(true);
     sinon.stub(fs, 'readFileSync').returns('');
     sinon.stub(fs, 'writeFileSync').callsFake((_, contents) => {
@@ -460,20 +327,6 @@ describe(commands.APP_GET, () => {
     let filePath: string | undefined;
 
     sinon.stub(entraApp, 'getAppRegistrationByAppId').resolves(appResponse.value[0]);
-
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf('/v1.0/myorganization/applications/') > -1) {
-        return {
-          "id": "340a4aa3-1af6-43ac-87d8-189819003952",
-          "appId": "9b1b1e42-794b-4c71-93ac-5ed92488b67f",
-          "createdDateTime": "2019-10-29T17:46:55Z",
-          "displayName": "My App",
-          "description": null
-        };
-      }
-
-      throw 'Invalid request';
-    });
     sinon.stub(fs, 'existsSync').returns(true);
     sinon.stub(fs, 'readFileSync').returns(JSON.stringify({
       "apps": [
@@ -517,20 +370,6 @@ describe(commands.APP_GET, () => {
     let filePath: string | undefined;
 
     sinon.stub(entraApp, 'getAppRegistrationByAppId').resolves(appResponse.value[0]);
-
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf('/v1.0/myorganization/applications/') > -1) {
-        return {
-          "id": "340a4aa3-1af6-43ac-87d8-189819003952",
-          "appId": "9b1b1e42-794b-4c71-93ac-5ed92488b67f",
-          "createdDateTime": "2019-10-29T17:46:55Z",
-          "displayName": "My App",
-          "description": null
-        };
-      }
-
-      throw 'Invalid request';
-    });
     sinon.stub(fs, 'existsSync').returns(true);
     sinon.stub(fs, 'readFileSync').returns(JSON.stringify({
       "apps": [
@@ -572,20 +411,6 @@ describe(commands.APP_GET, () => {
 
   it(`doesn't save app info in the .m365rc.json file when there was error reading file contents`, async () => {
     sinon.stub(entraApp, 'getAppRegistrationByAppId').resolves(appResponse.value[0]);
-
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf('/v1.0/myorganization/applications/') > -1) {
-        return {
-          "id": "340a4aa3-1af6-43ac-87d8-189819003952",
-          "appId": "9b1b1e42-794b-4c71-93ac-5ed92488b67f",
-          "createdDateTime": "2019-10-29T17:46:55Z",
-          "displayName": "My App",
-          "description": null
-        };
-      }
-
-      throw 'Invalid request';
-    });
     sinon.stub(fs, 'existsSync').returns(true);
     sinon.stub(fs, 'readFileSync').throws(new Error('An error has occurred'));
     const fsWriteFileSyncSpy = sinon.spy(fs, 'writeFileSync');
@@ -601,20 +426,6 @@ describe(commands.APP_GET, () => {
 
   it(`doesn't save app info in the .m365rc.json file when file has invalid JSON`, async () => {
     sinon.stub(entraApp, 'getAppRegistrationByAppId').resolves(appResponse.value[0]);
-
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf('/v1.0/myorganization/applications/') > -1) {
-        return {
-          "id": "340a4aa3-1af6-43ac-87d8-189819003952",
-          "appId": "9b1b1e42-794b-4c71-93ac-5ed92488b67f",
-          "createdDateTime": "2019-10-29T17:46:55Z",
-          "displayName": "My App",
-          "description": null
-        };
-      }
-
-      throw 'Invalid request';
-    });
     sinon.stub(fs, 'existsSync').returns(true);
     sinon.stub(fs, 'readFileSync').returns('{');
     const fsWriteFileSyncSpy = sinon.spy(fs, 'writeFileSync');
@@ -630,20 +441,6 @@ describe(commands.APP_GET, () => {
 
   it(`doesn't fail execution when error occurred while saving app info`, async () => {
     sinon.stub(entraApp, 'getAppRegistrationByAppId').resolves(appResponse.value[0]);
-
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf('/v1.0/myorganization/applications/') > -1) {
-        return {
-          "id": "340a4aa3-1af6-43ac-87d8-189819003952",
-          "appId": "9b1b1e42-794b-4c71-93ac-5ed92488b67f",
-          "createdDateTime": "2019-10-29T17:46:55Z",
-          "displayName": "My App",
-          "description": null
-        };
-      }
-
-      throw 'Invalid request';
-    });
     sinon.stub(fs, 'existsSync').returns(false);
     sinon.stub(fs, 'writeFileSync').throws(new Error('Error occurred while saving app info'));
 

@@ -27,6 +27,7 @@ describe(commands.FILE_VERSION_LIST, () => {
       {
         "CheckInComment": "",
         "Created": "2022-10-30T12:03:06Z",
+        "ExpirationDate": "2026-01-31T08:23:43.0000000Z",
         "ID": 512,
         "IsCurrentVersion": false,
         "Length": "18898",
@@ -37,6 +38,7 @@ describe(commands.FILE_VERSION_LIST, () => {
       {
         "CheckInComment": "",
         "Created": "2022-10-30T12:06:13Z",
+        "ExpirationDate": null,
         "ID": 1024,
         "IsCurrentVersion": false,
         "Length": "21098",
@@ -46,6 +48,7 @@ describe(commands.FILE_VERSION_LIST, () => {
       }
     ]
   };
+  const queryString = "$select=*,ExpirationDate";
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -92,7 +95,7 @@ describe(commands.FILE_VERSION_LIST, () => {
   });
 
   it('defines correct properties for the default output', () => {
-    assert.deepStrictEqual(command.defaultProperties(), ['Created', 'ID', 'IsCurrentVersion', 'VersionLabel']);
+    assert.deepStrictEqual(command.defaultProperties(), ['Created', 'ID', 'IsCurrentVersion', 'VersionLabel', 'ExpirationDate']);
   });
 
   it('fails validation if fileId is not a valid guid', async () => {
@@ -122,7 +125,7 @@ describe(commands.FILE_VERSION_LIST, () => {
 
   it('retrieves versions from a file with the fileUrl option', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `${validWebUrl}/_api/web/GetFileByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(validFileUrl)}')/versions`) {
+      if (opts.url === `${validWebUrl}/_api/web/GetFileByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(validFileUrl)}')/versions?${queryString}`) {
         return fileVersionResponse;
       }
       throw 'Invalid request';
@@ -140,7 +143,7 @@ describe(commands.FILE_VERSION_LIST, () => {
 
   it('retrieves versions from a file with the fileId option', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `${validWebUrl}/_api/web/GetFileById('${validFileId}')/versions`) {
+      if (opts.url === `${validWebUrl}/_api/web/GetFileById('${validFileId}')/versions?${queryString}`) {
         return fileVersionResponse;
       }
       throw 'Invalid request';
@@ -159,7 +162,7 @@ describe(commands.FILE_VERSION_LIST, () => {
   it('handles a random API error correctly', async () => {
     const err = 'Invalid versions request';
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `${validWebUrl}/_api/web/GetFileById('${validFileId}')/versions`) {
+      if (opts.url === `${validWebUrl}/_api/web/GetFileById('${validFileId}')/versions?${queryString}`) {
         throw { error: { 'odata.error': { message: { value: err } } } };
       }
 

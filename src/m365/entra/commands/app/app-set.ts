@@ -3,10 +3,8 @@ import fs from 'fs';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import { Logger } from '../../../../cli/Logger.js';
 import request, { CliRequestOptions } from '../../../../request.js';
-import { formatting } from '../../../../utils/formatting.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
-import { cli } from '../../../../cli/cli.js';
 import { optionsUtils } from '../../../../utils/optionsUtils.js';
 import { entraApp } from '../../../../utils/entraApp.js';
 
@@ -161,27 +159,8 @@ class EntraAppSetCommand extends GraphCommand {
       return app.id!;
     }
     else {
-      const requestOptions: CliRequestOptions = {
-        url: `${this.resource}/v1.0/myorganization/applications?$filter=displayName eq '${formatting.encodeQueryParameter(name as string)}'&$select=id`,
-        headers: {
-          accept: 'application/json;odata.metadata=none'
-        },
-        responseType: 'json'
-      };
-
-      const res = await request.get<{ value: { id: string }[] }>(requestOptions);
-
-      if (res.value.length === 1) {
-        return res.value[0].id;
-      }
-
-      if (res.value.length === 0) {
-        throw `No Microsoft Entra application registration with name ${name} found`;
-      }
-
-      const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', res.value);
-      const result = await cli.handleMultipleResultsFound<{ id: string }>(`Multiple Microsoft Entra application registration with name '${name}' found.`, resultAsKeyValuePair);
-      return result.id;
+      const app = await entraApp.getAppRegistrationByAppName(name!, ["id"]);
+      return app.id!;
     }
   }
 

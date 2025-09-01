@@ -76,6 +76,11 @@ const sidebars: SidebarsConfig = {
           app: [
             {
               type: 'doc',
+              label: 'app add',
+              id: 'cmd/cli/app/app-add'
+            },
+            {
+              type: 'doc',
               label: 'app reconsent',
               id: 'cmd/cli/app/app-reconsent'
             }
@@ -2191,6 +2196,11 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'container recyclebinitem list',
               id: 'cmd/spe/container/container-recyclebinitem-list'
+            },
+            {
+              type: 'doc',
+              label: 'container recyclebinitem restore',
+              id: 'cmd/spe/container/container-recyclebinitem-restore'
             }
           ]
         },
@@ -4329,6 +4339,15 @@ const sidebars: SidebarsConfig = {
           ]
         },
         {
+          callrecord: [
+            {
+              type: 'doc',
+              label: 'callrecord list',
+              id: 'cmd/teams/callrecord/callrecord-list'
+            }
+          ]
+        },
+        {
           channel: [
             {
               type: 'doc',
@@ -4917,6 +4936,16 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'engage report groupsactivitygroupcounts',
               id: 'cmd/viva/engage/engage-report-groupsactivitygroupcounts'
+            },
+            {
+              type: 'doc',
+              label: 'engage role list',
+              id: 'cmd/viva/engage/engage-role-list'
+            },
+            {
+              type: 'doc',
+              label: 'engage role member list',
+              id: 'cmd/viva/engage/engage-role-member-list'
             },
             {
               type: 'doc',

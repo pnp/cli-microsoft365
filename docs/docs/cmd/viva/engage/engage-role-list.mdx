@@ -1,0 +1,102 @@
+import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# viva engage role list
+
+Lists all Viva Engage roles
+
+## Usage
+
+```sh
+m365 viva engage role list [options]
+```
+
+## Options
+
+<Global />
+
+## Remarks
+
+:::warning
+
+This command is based on an API that is currently in preview and is subject to change once the API reaches general availability.
+
+:::
+
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource        | Permissions             |
+  |-----------------|-------------------------|
+  | Microsoft Graph | EngagementRole.Read.All |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource        | Permissions             |
+  |-----------------|-------------------------|
+  | Microsoft Graph | EngagementRole.Read.All |
+
+  </TabItem>
+</Tabs>
+
+## Examples
+  
+List all Viva Engage roles
+
+```sh
+m365 viva engage role list
+```
+
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  [
+    {
+      "id": "ec759127-089f-4f91-8dfc-03a30b51cb38",
+      "displayName": "Network Admin"
+    }
+  ]
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  id                                    displayName
+  ------------------------------------  -------------
+  ec759127-089f-4f91-8dfc-03a30b51cb38  Network Admin
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  id,displayName
+  ec759127-089f-4f91-8dfc-03a30b51cb38,Network Admin
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # viva engage role list
+
+  Date: 7/11/2025
+
+  ## Network Admin (ec759127-089f-4f91-8dfc-03a30b51cb38)
+
+  Property | Value
+  ---------|-------
+  id | ec759127-089f-4f91-8dfc-03a30b51cb38
+  displayName | Network Admin
+  ```
+
+  </TabItem>
+</Tabs>

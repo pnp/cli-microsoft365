@@ -17,6 +17,7 @@ export default {
     'https://graph.microsoft.com/Community.ReadWrite.All',
     'https://graph.microsoft.com/Directory.AccessAsUser.All',
     'https://graph.microsoft.com/Directory.ReadWrite.All',
+    'https://graph.microsoft.com/EngagementRole.ReadWrite.All',
     'https://graph.microsoft.com/ExternalConnection.ReadWrite.All',
     'https://graph.microsoft.com/ExternalItem.ReadWrite.All',
     'https://graph.microsoft.com/FileStorageContainer.Selected',

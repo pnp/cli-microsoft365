@@ -16,7 +16,10 @@ interface Options extends GlobalOptions {
   groupDisplayName?: string;
   groupName?: string;
   ids?: string;
+  userIds?: string;
   userNames?: string;
+  subgroupIds?: string;
+  subgroupNames?: string;
   role: string;
 }
 
@@ -48,7 +51,10 @@ class EntraGroupMemberAddCommand extends GraphCommand {
         groupDisplayName: typeof args.options.groupDisplayName !== 'undefined',
         groupName: typeof args.options.groupName !== 'undefined',
         ids: typeof args.options.ids !== 'undefined',
-        userNames: typeof args.options.userNames !== 'undefined'
+        userIds: typeof args.options.userIds !== 'undefined',
+        userNames: typeof args.options.userNames !== 'undefined',
+        subgroupIds: typeof args.options.subgroupIds !== 'undefined',
+        subgroupNames: typeof args.options.subgroupNames !== 'undefined'
       });
     });
   }
@@ -68,7 +74,16 @@ class EntraGroupMemberAddCommand extends GraphCommand {
         option: '--ids [ids]'
       },
       {
+        option: '--userIds [userIds]'
+      },
+      {
         option: '--userNames [userNames]'
+      },
+      {
+        option: '--subgroupIds [subgroupIds]'
+      },
+      {
+        option: '--subgroupNames [subgroupNames]'
       },
       {
         option: '-r, --role <role>',
@@ -91,11 +106,29 @@ class EntraGroupMemberAddCommand extends GraphCommand {
           }
         }
 
+        if (args.options.userIds) {
+          const isValidGUIDArrayResult = validation.isValidGuidArray(args.options.userIds);
+          if (isValidGUIDArrayResult !== true) {
+            return `The following GUIDs are invalid for the option 'userIds': ${isValidGUIDArrayResult}.`;
+          }
+        }
+
         if (args.options.userNames) {
           const isValidUPNArrayResult = validation.isValidUserPrincipalNameArray(args.options.userNames);
           if (isValidUPNArrayResult !== true) {
             return `The following user principal names are invalid for the option 'userNames': ${isValidUPNArrayResult}.`;
           }
+        }
+
+        if (args.options.subgroupIds) {
+          const isValidGUIDArrayResult = validation.isValidGuidArray(args.options.subgroupIds);
+          if (isValidGUIDArrayResult !== true) {
+            return `The following GUIDs are invalid for the option 'subgroupIds': ${isValidGUIDArrayResult}.`;
+          }
+        }
+
+        if ((args.options.subgroupIds || args.options.subgroupNames) && args.options.role === 'Owner') {
+          return `Subgroups cannot be set as owners.`;
         }
 
         if (this.roleValues.indexOf(args.options.role) === -1) {
@@ -110,12 +143,12 @@ class EntraGroupMemberAddCommand extends GraphCommand {
   #initOptionSets(): void {
     this.optionSets.push(
       { options: ['groupId', 'groupDisplayName', 'groupName'] },
-      { options: ['ids', 'userNames'] }
+      { options: ['ids', 'userIds', 'userNames', 'subgroupIds', 'subgroupNames'] }
     );
   }
 
   #initTypes(): void {
-    this.types.string.push('groupId', 'groupDisplayName', 'groupName', 'ids', 'userNames', 'role');
+    this.types.string.push('groupId', 'groupDisplayName', 'groupName', 'ids', 'userIds', 'userNames', 'subgroupIds', 'subgroupNames', 'role');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -124,15 +157,19 @@ class EntraGroupMemberAddCommand extends GraphCommand {
         await this.warn(logger, `Option 'groupDisplayName' is deprecated and will be removed in the next major release.`);
       }
 
+      if (args.options.ids) {
+        await this.warn(logger, `Option 'ids' is deprecated and will be removed in the next major release. Please use 'userIds' instead.`);
+      }
+
       if (this.verbose) {
-        await logger.logToStderr(`Adding member(s) ${args.options.ids || args.options.userNames} to group ${args.options.groupId || args.options.groupDisplayName || args.options.groupName}...`);
+        await logger.logToStderr(`Adding member(s) ${args.options.ids || args.options.userIds || args.options.userNames || args.options.subgroupIds || args.options.subgroupNames} to group ${ args.options.groupId || args.options.groupDisplayName || args.options.groupName }...`);
       }
 
       const groupId = await this.getGroupId(logger, args.options);
-      const userIds = await this.getUserIds(logger, args.options);
+      const objectIds = await this.getObjectIds(logger, args.options);
 
-      for (let i = 0; i < userIds.length; i += 400) {
-        const userIdsBatch = userIds.slice(i, i + 400);
+      for (let i = 0; i < objectIds.length; i += 400) {
+        const objectIdsBatch = objectIds.slice(i, i + 400);
         const requestOptions: CliRequestOptions = {
           url: `${this.resource}/v1.0/$batch`,
           headers: {
@@ -144,8 +181,8 @@ class EntraGroupMemberAddCommand extends GraphCommand {
           }
         };
 
-        for (let j = 0; j < userIdsBatch.length; j += 20) {
-          const userIdsChunk = userIdsBatch.slice(j, j + 20);
+        for (let j = 0; j < objectIdsBatch.length; j += 20) {
+          const objectIdsChunk = objectIdsBatch.slice(j, j + 20);
           requestOptions.data.requests.push({
             id: j + 1,
             method: 'PATCH',
@@ -154,7 +191,7 @@ class EntraGroupMemberAddCommand extends GraphCommand {
               'content-type': 'application/json;odata.metadata=none'
             },
             body: {
-              [`${args.options.role === 'Member' ? 'members' : 'owners'}@odata.bind`]: userIdsChunk.map(u => `${this.resource}/v1.0/directoryObjects/${u}`)
+              [`${args.options.role === 'Member' ? 'members' : 'owners'}@odata.bind`]: objectIdsChunk.map(u => `${this.resource}/v1.0/directoryObjects/${u}`)
             }
           });
         }
@@ -184,9 +221,21 @@ class EntraGroupMemberAddCommand extends GraphCommand {
     return entraGroup.getGroupIdByDisplayName(options.groupDisplayName! || options.groupName!);
   }
 
+  private async getObjectIds(logger: Logger, options: Options): Promise<string[]> {
+    if (options.ids || options.userIds || options.userNames) {
+      return this.getUserIds(logger, options);
+    }
+
+    return this.getGroupIds(logger, options);
+  }
+
   private async getUserIds(logger: Logger, options: Options): Promise<string[]> {
     if (options.ids) {
       return options.ids.split(',').map(i => i.trim());
+    }
+
+    if (options.userIds) {
+      return options.userIds.split(',').map(i => i.trim());
     }
 
     if (this.verbose) {
@@ -194,6 +243,18 @@ class EntraGroupMemberAddCommand extends GraphCommand {
     }
 
     return entraUser.getUserIdsByUpns(options.userNames!.split(',').map(u => u.trim()));
+  }
+
+  private async getGroupIds(logger: Logger, options: Options): Promise<string[]> {
+    if (options.subgroupIds) {
+      return options.subgroupIds.split(',').map(i => i.trim());
+    }
+
+    if (this.verbose) {
+      await logger.logToStderr('Retrieving ID(s) of group(s)...');
+    }
+
+    return entraGroup.getGroupIdsByDisplayNames(options.subgroupNames!.split(',').map(u => u.trim()));
   }
 }
 

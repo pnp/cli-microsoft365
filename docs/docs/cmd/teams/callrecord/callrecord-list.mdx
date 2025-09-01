@@ -1,0 +1,173 @@
+import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# teams callrecord list
+
+Lists all Teams calls within the tenant
+
+## Usage
+
+```sh
+m365 teams callrecord list [options]
+```
+
+## Options
+
+```md definition-list
+`--userId [userId]`
+: Filters call records to only include those where the user participated. Use the Entra user ID of the user. Specify either `userId` or `userName` but not both.
+
+`--userName [userName]`
+: Filters call records to only include those where the user participated. Use the UPN of the user. Specify either `userId` or `userName` but not both.
+
+`--startDateTime [startDateTime]`
+: Only show calls that started after this time. Defaults to 30 days ago.
+
+`--endDateTime [endDateTime]`
+: Only show calls that started before this time (exclusive). Defaults to now.
+```
+
+<Global />
+
+## Remarks
+
+:::info
+
+This command only supports application permissions. Use scope `CallRecords.Read.All`.
+
+:::
+
+:::note
+
+It is only possible to retrieve call records from the past 30 days.
+
+:::
+
+## Examples
+
+Get all call records from the past 30 days.
+
+```sh
+m365 teams callrecord list
+```
+
+Get all call records where a specific user participated in.
+
+```sh
+m365 teams callrecord list --userName "john.doe@contoso.com"
+```
+
+Get all call records that started within a specific timeframe.
+
+```sh
+m365 teams callrecord list --startDateTime "2025-05-1T00:00:00Z" --endDateTime "2025-05-14T00:00:00Z"
+```
+
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  [
+    {
+      "id": "145ae53b-7781-47c4-a5f7-b0e043012624",
+      "version": 1,
+      "type": "peerToPeer",
+      "modalities": [
+        "audio"
+      ],
+      "lastModifiedDateTime": "2025-05-29T17:41:33.5066667Z",
+      "startDateTime": "2025-05-29T17:27:20.428943Z",
+      "endDateTime": "2025-05-29T17:37:20.428943Z",
+      "joinWebUrl": "",
+      "organizer": {
+        "acsUser": null,
+        "spoolUser": null,
+        "phone": null,
+        "guest": null,
+        "encrypted": null,
+        "onPremises": null,
+        "acsApplicationInstance": null,
+        "spoolApplicationInstance": null,
+        "applicationInstance": null,
+        "application": null,
+        "device": null,
+        "user": {
+          "id": "b51efc8b-0adf-486c-ba54-b239ffa7c1f9",
+          "displayName": "John Doe",
+          "tenantId": "de5e90f2-9a07-4ed1-b903-f801afa7b1fd"
+        }
+      },
+      "participants": [],
+      "organizer_v2": {
+        "id": "b51efc8b-0adf-486c-ba54-b239ffa7c1f9",
+        "identity": {
+          "endpointType": null,
+          "acsUser": null,
+          "spoolUser": null,
+          "phone": null,
+          "guest": null,
+          "encrypted": null,
+          "onPremises": null,
+          "acsApplicationInstance": null,
+          "spoolApplicationInstance": null,
+          "applicationInstance": null,
+          "application": null,
+          "device": null,
+          "azureCommunicationServicesUser": null,
+          "assertedIdentity": null,
+          "user": {
+            "id": "b51efc8b-0adf-486c-ba54-b239ffa7c1f9",
+            "displayName": "John Doe",
+            "tenantId": "de5e90f2-9a07-4ed1-b903-f801afa7b1fd",
+            "userPrincipalName": "john.doe@contoso.com"
+          }
+        },
+        "administrativeUnitInfos": []
+      }
+    }
+  ]
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  id                                    type        startDateTime                 endDateTime
+  ------------------------------------  ----------  ----------------------------  ----------------------------
+  145ae53b-7781-47c4-a5f7-b0e043012624  peerToPeer  2025-05-29T17:27:20.428943Z   2025-05-29T17:37:20.428943Z
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  id,version,type,lastModifiedDateTime,startDateTime,endDateTime,joinWebUrl
+  145ae53b-7781-47c4-a5f7-b0e043012624,1,peerToPeer,2025-05-29T17:41:33.5066667Z,2025-05-29T17:27:20.428943Z,2025-05-29T17:37:20.428943Z,
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # teams callrecord list
+
+  Date: 03/06/2025
+
+  ## 145ae53b-7781-47c4-a5f7-b0e043012624
+
+  Property | Value
+  ---------|-------
+  id | 145ae53b-7781-47c4-a5f7-b0e043012624
+  version | 1
+  type | peerToPeer
+  lastModifiedDateTime | 2025-05-29T17:41:33.5066667Z
+  startDateTime | 2025-05-29T17:27:20.428943Z
+  endDateTime | 2025-05-29T17:37:20.428943Z
+  joinWebUrl |
+  ```
+
+  </TabItem>
+</Tabs>
