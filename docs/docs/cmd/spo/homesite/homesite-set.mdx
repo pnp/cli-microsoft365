@@ -4,7 +4,7 @@ import TabItem from '@theme/TabItem';
 
 # spo homesite set
 
-Sets the specified site as the Home Site
+Configures the specified SharePoint Home Site setting options such as draft mode, audiences, targeted license type, and Viva Connections default start.
 
 ## Usage
 
@@ -16,7 +16,7 @@ m365 spo homesite set [options]
 
 ```md definition-list
 `-u, --siteUrl <siteUrl>`
-: The URL of the site to set as Home site.
+: The URL of the Home Site
 
 `--draftMode [draftMode]` 
 : Set draft status. Valid values are: `true`, `false`.
@@ -25,7 +25,7 @@ m365 spo homesite set [options]
 : Comma-separated list of M365 group Ids to set as audiences. Specify either `audienceIds` or `audienceNames`, but not both.
 
 `--audienceNames [audienceNames]` 
-: Comma-separated list of M365 group names to set as audiences. Specify either `audienceIds` or `audienceNames`, but not both.
+: Comma-separated list of M365 group names or Active Directory security groups to set as audiences. Specify either `audienceIds` or `audienceNames`, but not both.
 
 `--targetedLicenseType [targetedLicenseType]` 
 : Value of either `everyone`, `frontLineWorkers` or `informationWorkers`.
@@ -46,52 +46,22 @@ To use this command you must be a Global or SharePoint administrator.
 
 ## Examples
 
-Set the specified site as the Home Site.
-
-```sh
-m365 spo homesite set --siteUrl https://contoso.sharepoint.com/sites/comms
-```
-
 Sets the Home site to the provided site collection url and sets the Viva Connections landing experience to the SharePoint home site
 
 ```sh
 m365 spo homesite set --siteUrl https://contoso.sharepoint.com/sites/comms --vivaConnectionsDefaultStart true
 ```
 
-Sets the Home site to the provided site collection url and sets the Viva Connections landing experience to the default experience
-
-```sh
-m365 spo homesite set --siteUrl https://contoso.sharepoint.com/sites/comms --vivaConnectionsDefaultStart false
-```
-
 Set the Home site in draft mode
 
 ```sh
-m365 spo homesite set -u https://contoso.sharepoint.com/sites/contosoportal --draftMode true
-```
-
-Set the Home site live (not in draft mode)
-
-```sh
-m365 spo homesite set -u https://contoso.sharepoint.com/sites/contosoportal --draftMode false
+m365 spo homesite set -siteUrl https://contoso.sharepoint.com/sites/contosoportal --draftMode true
 ```
 
 Set the audience to everyone
 
 ```sh
-m365 spo homesite set -u https://contoso.sharepoint.com/sites/contosoportal --targetedLicenseType "everyone"
-```
-
-Set the audience to frontline workers
-
-```sh
-m365 spo homesite set -u https://contoso.sharepoint.com/sites/contosoportal --targetedLicenseType "frontLineWorkers"
-```
-
-Set the audience to information workers
-
-```sh
-m365 spo homesite set -u https://contoso.sharepoint.com/sites/contosoportal --targetedLicenseType "informationWorkers"
+m365 spo homesite set -siteUrl https://contoso.sharepoint.com/sites/contosoportal --targetedLicenseType "everyone"
 ```
 
 Set the audience to M365 groups using M365 Groups Ids
@@ -100,10 +70,23 @@ Set the audience to M365 groups using M365 Groups Ids
 m365 spo homesite set -u https://contoso.sharepoint.com/sites/contosoportal --audienceIds "978b5280-4f80-47ea-a1db-b0d1d2fb1ba4,21af775d-17b3-4637-94a4-2ba8625277cb"
 ```
 
-Set the audience to M365 groups using M365 Groups Names
+Set the audience to M365 groups or Azure Directory security groups using names 
 
 ```sh
 m365 spo homesite set -u https://contoso.sharepoint.com/sites/contosoportal --audienceNames "Marketing, IT department"
+```
+
+Clear the audience and set to draft 
+
+```sh
+m365 spo homesite set -u https://contoso.sharepoint.com/sites/contosoportal --audienceNames '' --draftMode true
+```
+
+
+Configure multiple options
+
+```sh
+m365 spo homesite set -u https://contoso.sharepoint.com/sites/contosoportal --audienceNames 'Marketing, IT department' --draftMode true --targetedLicenseType "everyone" --vivaConnectionsDefaultStart true
 ```
 
 ## Response
@@ -115,21 +98,21 @@ m365 spo homesite set -u https://contoso.sharepoint.com/sites/contosoportal --au
 
   ```json
   {
-  "Audiences": [
-    {
-      "Email": "active@contoso.onmicrosoft.com",
-      "Id": "7a1eea7f-9ab0-40ff-8f2e-0083d9d63451",
-      "Title": "active Members"
-    }
-  ],
-  "IsInDraftMode": true,
-  "IsVivaBackendSite": false,
-  "SiteId": "431d7819-4aaf-49a1-b664-b2fe9e609b63",
-  "TargetedLicenseType": 2,
-  "Title": "The Landing",
-  "Url": "https://contoso.sharepoint.com/sites/TheLanding",
-  "VivaConnectionsDefaultStart": true,
-  "WebId": "626c1724-8ac8-45d5-af87-c07c752fab75"
+    "Audiences": [
+      {
+        "Email": "active@contoso.onmicrosoft.com",
+        "Id": "7a1eea7f-9ab0-40ff-8f2e-0083d9d63451",
+        "Title": "active Members"
+      }
+    ],
+    "IsInDraftMode": true,
+    "IsVivaBackendSite": false,
+    "SiteId": "431d7819-4aaf-49a1-b664-b2fe9e609b63",
+    "TargetedLicenseType": 2,
+    "Title": "The Landing",
+    "Url": "https://contoso.sharepoint.com/sites/TheLanding",
+    "VivaConnectionsDefaultStart": true,
+    "WebId": "626c1724-8ac8-45d5-af87-c07c752fab75"
   }
   ```
 

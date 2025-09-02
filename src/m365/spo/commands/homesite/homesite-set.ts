@@ -28,7 +28,19 @@ const optionsSchema = globalOptionsZod
       .refine(order => validation.isValidPositiveInteger(order) === true, order => ({
         message: `'${order}' is not a positive integer.`
       })).optional()
-  });
+  })
+  .refine(
+    (options) =>
+      options.vivaConnectionsDefaultStart !== undefined ||
+      options.draftMode !== undefined ||
+      options.audienceIds !== undefined ||
+      options.audienceNames !== undefined ||
+      options.targetedLicenseType !== undefined ||
+      options.order !== undefined,
+    {
+      message: 'You must specify at least one option to configure apart from siteUrl.'
+    }
+  );
 
 type Options = z.infer<typeof optionsSchema>;
 
@@ -42,7 +54,7 @@ class SpoHomeSiteSetCommand extends SpoCommand {
   }
 
   public get description(): string {
-    return 'Sets the specified site as the Home Site';
+    return 'Configures the specified SharePoint Home Site setting options such as draft mode, audiences, targeted license type, and Viva Connections default start.';
   }
 
   public get schema(): z.ZodTypeAny {
@@ -59,23 +71,11 @@ class SpoHomeSiteSetCommand extends SpoCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       if (this.verbose) {
-        await logger.logToStderr("This command now only updates existing home sites. Use 'spo homesite add' to add new home sites.");
-        await logger.logToStderr(`Setting the SharePoint home site to: ${args.options.siteUrl}...`);
+        await logger.logToStderr('Configuring SharePoint home site:');
         await logger.logToStderr('Attempting to retrieve the SharePoint admin URL.');
       }
 
       const spoAdminUrl = await spo.getSpoAdminUrl(logger, this.debug);
-      const requestOptions: CliRequestOptions = {
-        url: `${spoAdminUrl}/_api/SPO.Tenant`,
-        headers: {
-          accept: 'application/json;odata=nometadata',
-          'content-Type': 'application/json'
-        },
-        responseType: 'json',
-        data: {}
-      };
-
-      await logger.logToStderr('DEPRECATION WARNING: Using \'spo homesite set\' to add new home sites is deprecated. Use \'spo homesite add\' instead to add a new home site.');
 
       const configuration: any = {};
       if (args.options.vivaConnectionsDefaultStart !== undefined) {
@@ -92,7 +92,7 @@ class SpoHomeSiteSetCommand extends SpoCommand {
       }
       if (args.options.audienceNames !== undefined) {
         configuration.IsAudiencesPresent = true;
-        configuration.Audiences = await this.transformAudienceNamesToIds(args.options.audienceNames);
+        configuration.Audiences = args.options.audienceNames.trim() === '' ? [] : await this.transformAudienceNamesToIds(args.options.audienceNames);
       }
       if (args.options.targetedLicenseType !== undefined) {
         configuration.IsTargetedLicenseTypePresent = true;
@@ -102,9 +102,19 @@ class SpoHomeSiteSetCommand extends SpoCommand {
         configuration.IsOrderPresent = true;
         configuration.Order = args.options.order;
       }
-      requestOptions.url += '/UpdateTargetedSite';
-      requestOptions.data.siteUrl = args.options.siteUrl;
-      requestOptions.data.configurationParam = configuration;
+
+      const requestOptions: CliRequestOptions = {
+        url: `${spoAdminUrl}/_api/SPO.Tenant/UpdateTargetedSite`,
+        headers: {
+          accept: 'application/json;odata=nometadata',
+          'content-Type': 'application/json'
+        },
+        responseType: 'json',
+        data: {
+          siteUrl: args.options.siteUrl,
+          configurationParam: configuration
+        }
+      };
 
       const res = await request.post(requestOptions);
       await logger.log(res);

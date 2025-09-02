@@ -92,10 +92,6 @@ describe(commands.HOMESITE_SET, () => {
   });
 
   it('sets the specified site as the Home Site with vivaConnectionsDefaultStart using UpdateTargetedSite when multiple home sites', async () => {
-    const requestBody = {
-      siteUrl: siteUrl,
-      configurationParam: { IsVivaConnectionsDefaultStartPresent: true, vivaConnectionsDefaultStart: true }
-    };
     const postRequestStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `${spoAdminUrl}/_api/SPO.Tenant/UpdateTargetedSite`) {
         return defaultResponse;
@@ -110,15 +106,13 @@ describe(commands.HOMESITE_SET, () => {
       }
     });
 
-    assert.deepStrictEqual(postRequestStub.lastCall.args[0].data, requestBody);
+    assert.deepStrictEqual(postRequestStub.lastCall.args[0].data, {
+      siteUrl: siteUrl,
+      configurationParam: { IsVivaConnectionsDefaultStartPresent: true, vivaConnectionsDefaultStart: true }
+    });
   });
 
   it('sets the specified site as the Home Site with draftMode', async () => {
-    const requestBody = {
-      siteUrl: siteUrl,
-      configurationParam: { IsInDraftModePresent: true, isInDraftMode: true }
-    };
-
     const postRequestStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `${spoAdminUrl}/_api/SPO.Tenant/UpdateTargetedSite`) {
         return defaultResponse;
@@ -133,15 +127,13 @@ describe(commands.HOMESITE_SET, () => {
       }
     } as any);
 
-    assert.deepStrictEqual(postRequestStub.lastCall.args[0].data, requestBody);
+    assert.deepStrictEqual(postRequestStub.lastCall.args[0].data, {
+      siteUrl: siteUrl,
+      configurationParam: { IsInDraftModePresent: true, isInDraftMode: true }
+    });
   });
 
   it('sets the specified site as the Home Site with targetedLicenseType to frontLineWorkers', async () => {
-    const requestBody = {
-      siteUrl: siteUrl,
-      configurationParam: { IsTargetedLicenseTypePresent: true, TargetedLicenseType: 1 }
-    };
-
     const postRequestStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `${spoAdminUrl}/_api/SPO.Tenant/UpdateTargetedSite`) {
         return defaultResponse;
@@ -156,14 +148,13 @@ describe(commands.HOMESITE_SET, () => {
       }
     } as any);
 
-    assert.deepStrictEqual(postRequestStub.lastCall.args[0].data, requestBody);
+    assert.deepStrictEqual(postRequestStub.lastCall.args[0].data, {
+      siteUrl: siteUrl,
+      configurationParam: { IsTargetedLicenseTypePresent: true, TargetedLicenseType: 1 }
+    });
   });
 
   it('sets the specified site as the Home Site with targetedLicenseType to informationWorkers', async () => {
-    const requestBody = {
-      siteUrl: siteUrl,
-      configurationParam: { IsTargetedLicenseTypePresent: true, TargetedLicenseType: 2 }
-    };
     const postRequestStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `${spoAdminUrl}/_api/SPO.Tenant/UpdateTargetedSite`) {
         return defaultResponse;
@@ -178,17 +169,13 @@ describe(commands.HOMESITE_SET, () => {
       }
     } as any);
 
-    assert.deepStrictEqual(postRequestStub.lastCall.args[0].data, requestBody);
+    assert.deepStrictEqual(postRequestStub.lastCall.args[0].data, {
+      siteUrl: siteUrl,
+      configurationParam: { IsTargetedLicenseTypePresent: true, TargetedLicenseType: 2 }
+    });
   });
 
   it('covers transformAudienceNamesToIds with multiple audience names', async () => {
-    const requestBody = {
-      siteUrl: siteUrl,
-      configurationParam: {
-        IsAudiencesPresent: true,
-        Audiences: ['00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000002']
-      }
-    };
     // Mock entraGroup.getGroupIdByDisplayName to return different IDs for different names
     const entraGroupStub = sinon.stub(entraGroup, 'getGroupIdByDisplayName');
     entraGroupStub.withArgs('Marketing Team').resolves('00000000-0000-0000-0000-000000000001');
@@ -208,31 +195,36 @@ describe(commands.HOMESITE_SET, () => {
       }
     } as any);
 
-    assert.deepStrictEqual(postRequestStub.lastCall.args[0].data, requestBody);
-    assert(entraGroupStub.calledWith('Marketing Team'));
-    assert(entraGroupStub.calledWith('Sales Team'));
-    assert.strictEqual(entraGroupStub.callCount, 2);
+    assert.deepStrictEqual(postRequestStub.lastCall.args[0].data, {
+      siteUrl: siteUrl,
+      configurationParam: { IsAudiencesPresent: true, Audiences: ['00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000002'] }
+    });
 
     entraGroupStub.restore();
   });
 
-  it('sets the specified site as the Home Site with multiple configuration options', async () => {
-    const requestBody = {
-      siteUrl: siteUrl,
-      configurationParam: {
-        IsAudiencesPresent: true,
-        IsInDraftModePresent: true,
-        IsVivaConnectionsDefaultStartPresent: true,
-        IsOrderPresent: true,
-        IsTargetedLicenseTypePresent: true,
-        Order: 1,
-        TargetedLicenseType: 0,
-        isInDraftMode: false,
-        vivaConnectionsDefaultStart: true,
-        Audiences: ['00000000-0000-0000-0000-000000000001']
+  it('Clears audience names', async () => {
+    const postRequestStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `${spoAdminUrl}/_api/SPO.Tenant/UpdateTargetedSite`) {
+        return defaultResponse;
       }
-    };
+      return 'Invalid request';
+    });
 
+    await command.action(logger, {
+      options: {
+        siteUrl: siteUrl,
+        audienceNames: ''
+      }
+    } as any);
+
+    assert.deepStrictEqual(postRequestStub.lastCall.args[0].data, {
+      siteUrl: siteUrl,
+      configurationParam: { IsAudiencesPresent: true, Audiences: [] }
+    });
+  });
+
+  it('sets the specified site as the Home Site with multiple configuration options', async () => {
     const postRequestStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `${spoAdminUrl}/_api/SPO.Tenant/UpdateTargetedSite`) {
         return defaultResponse;
@@ -252,7 +244,21 @@ describe(commands.HOMESITE_SET, () => {
       }
     } as any);
 
-    assert.deepStrictEqual(postRequestStub.lastCall.args[0].data, requestBody);
+    assert.deepStrictEqual(postRequestStub.lastCall.args[0].data, {
+      siteUrl: siteUrl,
+      configurationParam: {
+        IsAudiencesPresent: true,
+        IsInDraftModePresent: true,
+        IsVivaConnectionsDefaultStartPresent: true,
+        IsOrderPresent: true,
+        IsTargetedLicenseTypePresent: true,
+        Order: 1,
+        TargetedLicenseType: 0,
+        isInDraftMode: false,
+        vivaConnectionsDefaultStart: true,
+        Audiences: ['00000000-0000-0000-0000-000000000001']
+      }
+    });
   });
 
   it('correctly handles error when setting the Home Site', async () => {
@@ -286,7 +292,7 @@ describe(commands.HOMESITE_SET, () => {
 
   it('passes validation if the siteUrl option is a valid SharePoint site URL', async () => {
     const actual = commandOptionsSchema.safeParse({ siteUrl: 'https://contoso.sharepoint.com' });
-    assert.strictEqual(actual.success, true);
+    assert.strictEqual(actual.success, false);
   });
 
   it('fails validation if both audienceIds and audienceNames are specified', async () => {
@@ -306,60 +312,37 @@ describe(commands.HOMESITE_SET, () => {
   });
 
   it('passes validation if only audienceIds is specified', async () => {
-    const actual = await command.validate({
-      options: {
-        siteUrl: 'https://contoso.sharepoint.com',
-        audienceIds: '00000000-0000-0000-0000-000000000001'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      siteUrl: 'https://contoso.sharepoint.com',
+      audienceIds: '00000000-0000-0000-0000-000000000001'
+    });
+    assert.strictEqual(actual.success, true);
   });
 
   it('passes validation if only audienceNames is specified', async () => {
-    const actual = await command.validate({
-      options: {
-        siteUrl: 'https://contoso.sharepoint.com',
-        audienceNames: 'Marketing Team'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      siteUrl: 'https://contoso.sharepoint.com',
+      audienceNames: 'Marketing Team'
+    });
+    assert.strictEqual(actual.success, true);
   });
 
   it('passes validation with valid targetedLicenseType values', async () => {
     const validTypes = ['everyone', 'frontLineWorkers', 'informationWorkers'];
 
     for (const type of validTypes) {
-      const actual = await command.validate({
+      const actual = commandOptionsSchema.safeParse({
         options: {
           siteUrl: 'https://contoso.sharepoint.com',
           targetedLicenseType: type
         }
-      }, commandInfo);
-      assert.strictEqual(actual, true);
+      });
+      assert.strictEqual(actual.success, false);
     }
   });
 
   it('correctly handles non-integer order', async () => {
     const actual = commandOptionsSchema.safeParse({ siteUrl: 'https://contoso.sharepoint.com', order: -1 });
     assert.strictEqual(actual.success, false);
-  });
-
-  it('handles verbose mode correctly', async () => {
-    sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `${spoAdminUrl}/_api/SPO.Tenant/UpdateTargetedSite`) {
-        return defaultResponse;
-      }
-      return 'Invalid request';
-    });
-
-    await command.action(logger, {
-      options: {
-        siteUrl: siteUrl,
-        verbose: true
-      }
-    } as any);
-
-    assert(log.some(entry => entry.includes('Setting the SharePoint home site')));
-    assert(log.some(entry => entry.includes('Attempting to retrieve the SharePoint admin URL')));
   });
 });

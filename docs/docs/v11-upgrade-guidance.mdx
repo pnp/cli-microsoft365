@@ -4,14 +4,11 @@ The v11 release of CLI for Microsoft 365 introduces several breaking changes. To
 
 ## SharePoint
 
-### `m365 spo homesite set` no longer adds new home sites
+### `spo homesite set` no longer adds new home sites
 
-The [m365 spo homesite set](./cmd/spo/homesite/homesite-set.mdx) command has been updated to only modify existing home sites. It will no longer add new sites as home sites.
+The [spo homesite set](./cmd/spo/homesite/homesite-set.mdx) command has been updated to only modify existing home sites. It will no longer add new sites as home sites.
 
 #### What action do I need to take?
 
-- **For adding new home sites**: Use the new [m365 spo homesite add](./cmd/spo/homesite/homesite-add.mdx) command instead
-- **For updating existing home sites**: Continue using `m365 spo homesite set` as before with additional options
-
-**Note:** The `m365 spo homesite set` command will display a deprecation warning when attempting to add a new home site and recommend using `m365 spo homesite add` instead.
-
+- **For adding new home sites**: Use the new [spo homesite add](./cmd/spo/homesite/homesite-add.mdx) command instead
+- **For updating existing home sites**: Continue using [spo homesite set](./cmd/spo/homesite/homesite-set.mdx) as before with additional options
