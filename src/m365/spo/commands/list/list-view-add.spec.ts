@@ -336,6 +336,28 @@ describe(commands.LIST_VIEW_ADD, () => {
     assert.strictEqual(actual.success, true);
   });
 
+  it('correctly sets default paged value when paged option is not specified', async () => {
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `${validWebUrl}/_api/web/lists/getByTitle('${formatting.encodeQueryParameter(validListTitle)}')/views/add`) {
+        return viewCreationResponse;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options: {
+        webUrl: validWebUrl,
+        listTitle: validListTitle,
+        title: validTitle,
+        fields: validFieldsInput
+      }
+    });
+
+    // Verify that Paged defaults to true when not specified
+    assert.strictEqual(postStub.lastCall.args[0].data.parameters.Paged, true);
+  });
+
   it('correctly logs an output', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `${validWebUrl}/_api/web/lists/getByTitle('${formatting.encodeQueryParameter(validListTitle)}')/views/add`) {
@@ -383,7 +405,7 @@ describe(commands.LIST_VIEW_ADD, () => {
       Query: undefined,
       PersonalView: false,
       SetAsDefaultView: false,
-      Paged: false,
+      Paged: true,
       RowLimit: 30
     });
   });
@@ -418,7 +440,7 @@ describe(commands.LIST_VIEW_ADD, () => {
       ViewData: '<FieldRef Name="Status" Type="KanbanPivotColumn" />',
       PersonalView: false,
       SetAsDefaultView: false,
-      Paged: false,
+      Paged: true,
       RowLimit: 30,
       ViewType2: 'KANBAN'
     });
@@ -454,7 +476,7 @@ describe(commands.LIST_VIEW_ADD, () => {
       Query: undefined,
       PersonalView: false,
       SetAsDefaultView: false,
-      Paged: false,
+      Paged: true,
       RowLimit: 100,
       ViewType2: 'TILES'
     });
@@ -492,7 +514,7 @@ describe(commands.LIST_VIEW_ADD, () => {
       CustomFormatter: undefined,
       PersonalView: false,
       SetAsDefaultView: false,
-      Paged: false,
+      Paged: true,
       RowLimit: 30,
       ViewType2: 'MODERNCALENDAR'
     });
@@ -534,7 +556,7 @@ describe(commands.LIST_VIEW_ADD, () => {
       CustomFormatter: JSON.stringify({ someProperty: 'someValue' }),
       PersonalView: false,
       SetAsDefaultView: false,
-      Paged: false,
+      Paged: true,
       RowLimit: 30,
       ViewType2: 'MODERNCALENDAR'
     });

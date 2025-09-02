@@ -129,7 +129,7 @@ class SpoListViewAddCommand extends SpoCommand {
             Query: args.options.viewQuery,
             PersonalView: !!args.options.personal,
             SetAsDefaultView: !!args.options.default,
-            Paged: !!args.options.paged,
+            Paged: args.options.paged ?? true,
             RowLimit: args.options.rowLimit ?? 30,
             CustomFormatter: args.options.customFormatter
           }
