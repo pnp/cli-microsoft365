@@ -125,7 +125,7 @@ describe(commands.HOMESITE_SET, () => {
         siteUrl: siteUrl,
         draftMode: true
       }
-    } as any);
+    });
 
     assert.deepStrictEqual(postRequestStub.lastCall.args[0].data, {
       siteUrl: siteUrl,
@@ -146,7 +146,7 @@ describe(commands.HOMESITE_SET, () => {
         siteUrl: siteUrl,
         targetedLicenseType: "frontLineWorkers"
       }
-    } as any);
+    });
 
     assert.deepStrictEqual(postRequestStub.lastCall.args[0].data, {
       siteUrl: siteUrl,
@@ -167,7 +167,7 @@ describe(commands.HOMESITE_SET, () => {
         siteUrl: siteUrl,
         targetedLicenseType: "informationWorkers"
       }
-    } as any);
+    });
 
     assert.deepStrictEqual(postRequestStub.lastCall.args[0].data, {
       siteUrl: siteUrl,
@@ -176,7 +176,6 @@ describe(commands.HOMESITE_SET, () => {
   });
 
   it('covers transformAudienceNamesToIds with multiple audience names', async () => {
-    // Mock entraGroup.getGroupIdByDisplayName to return different IDs for different names
     const entraGroupStub = sinon.stub(entraGroup, 'getGroupIdByDisplayName');
     entraGroupStub.withArgs('Marketing Team').resolves('00000000-0000-0000-0000-000000000001');
     entraGroupStub.withArgs('Sales Team').resolves('00000000-0000-0000-0000-000000000002');
@@ -188,19 +187,22 @@ describe(commands.HOMESITE_SET, () => {
       return 'Invalid request';
     });
 
-    await command.action(logger, {
-      options: {
+    try {
+      await command.action(logger, {
+        options: {
+          siteUrl: siteUrl,
+          audienceNames: 'Marketing Team, Sales Team'
+        }
+      });
+
+      assert.deepStrictEqual(postRequestStub.lastCall.args[0].data, {
         siteUrl: siteUrl,
-        audienceNames: 'Marketing Team, Sales Team'
-      }
-    } as any);
-
-    assert.deepStrictEqual(postRequestStub.lastCall.args[0].data, {
-      siteUrl: siteUrl,
-      configurationParam: { IsAudiencesPresent: true, Audiences: ['00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000002'] }
-    });
-
-    entraGroupStub.restore();
+        configurationParam: { IsAudiencesPresent: true, Audiences: ['00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000002'] }
+      });
+    }
+    finally {
+      entraGroupStub.restore();
+    }
   });
 
   it('Clears audience names', async () => {
@@ -216,7 +218,7 @@ describe(commands.HOMESITE_SET, () => {
         siteUrl: siteUrl,
         audienceNames: ''
       }
-    } as any);
+    });
 
     assert.deepStrictEqual(postRequestStub.lastCall.args[0].data, {
       siteUrl: siteUrl,
@@ -242,7 +244,7 @@ describe(commands.HOMESITE_SET, () => {
         order: 1,
         verbose: true
       }
-    } as any);
+    });
 
     assert.deepStrictEqual(postRequestStub.lastCall.args[0].data, {
       siteUrl: siteUrl,
@@ -262,37 +264,35 @@ describe(commands.HOMESITE_SET, () => {
   });
 
   it('correctly handles error when setting the Home Site', async () => {
-    const errorResponse = {
-      error: {
-        "odata.error": {
-          "code": "-2147213238, Microsoft.SharePoint.SPException",
-          "message": {
-            "lang": "en-US",
-            "value": "The provided site url can't be set as a Home site."
+    sinon.stub(request, 'post').callsFake(async () => {
+      throw {
+        error: {
+          "odata.error": {
+            "code": "-2147213238, Microsoft.SharePoint.SPException",
+            "message": {
+              "lang": "en-US",
+              "value": "The provided site url can't be set as a Home site."
+            }
           }
         }
-      }
-    };
-
-    sinon.stub(request, 'post').callsFake(async () => {
-      throw errorResponse;
+      };
     });
 
     await assert.rejects(command.action(logger, {
       options: {
         siteUrl: siteUrl
       }
-    } as any), new CommandError("The provided site url can't be set as a Home site."));
+    }), new CommandError("The provided site url can't be set as a Home site."));
   });
 
   it('fails validation if the url is not a valid SharePoint url', async () => {
-    const actual = commandOptionsSchema.safeParse({ siteUrl: 'invalid' });
+    const actual = commandOptionsSchema.safeParse({ siteUrl: 'invalid', audienceIds: '00000000-0000-0000-0000-000000000001' });
     assert.strictEqual(actual.success, false);
   });
 
   it('passes validation if the siteUrl option is a valid SharePoint site URL', async () => {
-    const actual = commandOptionsSchema.safeParse({ siteUrl: 'https://contoso.sharepoint.com' });
-    assert.strictEqual(actual.success, false);
+    const actual = commandOptionsSchema.safeParse({ siteUrl: 'https://contoso.sharepoint.com', audienceIds: '00000000-0000-0000-0000-000000000001' });
+    assert.strictEqual(actual.success, true);
   });
 
   it('fails validation if both audienceIds and audienceNames are specified', async () => {
@@ -325,20 +325,6 @@ describe(commands.HOMESITE_SET, () => {
       audienceNames: 'Marketing Team'
     });
     assert.strictEqual(actual.success, true);
-  });
-
-  it('passes validation with valid targetedLicenseType values', async () => {
-    const validTypes = ['everyone', 'frontLineWorkers', 'informationWorkers'];
-
-    for (const type of validTypes) {
-      const actual = commandOptionsSchema.safeParse({
-        options: {
-          siteUrl: 'https://contoso.sharepoint.com',
-          targetedLicenseType: type
-        }
-      });
-      assert.strictEqual(actual.success, false);
-    }
   });
 
   it('correctly handles non-integer order', async () => {

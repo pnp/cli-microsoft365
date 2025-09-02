@@ -28,19 +28,7 @@ const optionsSchema = globalOptionsZod
       .refine(order => validation.isValidPositiveInteger(order) === true, order => ({
         message: `'${order}' is not a positive integer.`
       })).optional()
-  })
-  .refine(
-    (options) =>
-      options.vivaConnectionsDefaultStart !== undefined ||
-      options.draftMode !== undefined ||
-      options.audienceIds !== undefined ||
-      options.audienceNames !== undefined ||
-      options.targetedLicenseType !== undefined ||
-      options.order !== undefined,
-    {
-      message: 'You must specify at least one option to configure apart from siteUrl.'
-    }
-  );
+  });
 
 type Options = z.infer<typeof optionsSchema>;
 
@@ -54,25 +42,41 @@ class SpoHomeSiteSetCommand extends SpoCommand {
   }
 
   public get description(): string {
-    return 'Configures the specified SharePoint Home Site setting options such as draft mode, audiences, targeted license type, and Viva Connections default start.';
+    return 'Updates an existing SharePoint home site.';
   }
 
   public get schema(): z.ZodTypeAny {
     return optionsSchema;
   }
 
+
   public getRefinedSchema(schema: z.ZodTypeAny): z.ZodEffects<any> | undefined {
     return schema
-      .refine((options: Options) => [options.audienceIds, options.audienceNames].filter(o => o !== undefined).length <= 1, {
-        message: 'Use one of the following options when specifying the audience name: audienceIds or audienceNames.'
-      });
+      .refine(
+        (options: Options) => [options.audienceIds, options.audienceNames].filter(o => o !== undefined).length <= 1,
+        {
+          message: 'You must specify either audienceIds or audienceNames but not both.'
+        }
+      )
+      .refine(
+        (options: Options) =>
+          options.vivaConnectionsDefaultStart !== undefined ||
+          options.draftMode !== undefined ||
+          options.audienceIds !== undefined ||
+          options.audienceNames !== undefined ||
+          options.targetedLicenseType !== undefined ||
+          options.order !== undefined,
+        {
+          message: 'You must specify at least one option to configure apart from siteUrl.'
+        }
+      );
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       if (this.verbose) {
-        await logger.logToStderr('Configuring SharePoint home site:');
-        await logger.logToStderr('Attempting to retrieve the SharePoint admin URL.');
+        await logger.logToStderr(`Configuring SharePoint home site: ${args.options.siteUrl}...`);
+        await logger.logToStderr(`Attempting to retrieve the SharePoint admin URL.`);
       }
 
       const spoAdminUrl = await spo.getSpoAdminUrl(logger, this.debug);
@@ -134,11 +138,11 @@ class SpoHomeSiteSetCommand extends SpoCommand {
   }
 
   private async transformAudienceNamesToIds(audienceNames: string): Promise<string[]> {
-    const names = audienceNames.split(',').map(name => name.trim());
+    const names = audienceNames.split(',');
     const ids: string[] = [];
 
     for (const name of names) {
-      const id = await entraGroup.getGroupIdByDisplayName(name);
+      const id = await entraGroup.getGroupIdByDisplayName(name.trim());
       ids.push(id);
     }
 
