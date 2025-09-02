@@ -64,7 +64,7 @@ m365 spo list view add [options]
 : View will be set as default view, if specified.
 
 `--paged`
-: View supports paging, if specified (recommended to use this).
+: View supports paging. Defaults to `true`.
 
 `--rowLimit [rowLimit]`
 : Sets the number of items to display for the view. Default value is 30.
@@ -76,7 +76,7 @@ m365 spo list view add [options]
 
 :::tip
 
-We recommend using the `paged` option. When specified, the view supports displaying more items page by page (default behavior). When not specified, the `rowLimit` is absolute, and there is no link to see more items.
+We recommend using the `paged` option. Paging is enabled by default: the view shows items page by page, up to the specified `rowLimit` per page. To disable paging, set `paged` to false; in a non-paged view, the `rowLimit` is absolute and there is no link to see more items.
 
 :::
 
@@ -85,43 +85,43 @@ We recommend using the `paged` option. When specified, the view supports display
 Add a list view called to a list with specific title.
 
 ```sh
-m365 spo list view add --webUrl https://contoso.sharepoint.com/sites/Sales --listTitle "Customers" --title "All customers" --fields "LinkTitle,Country,Sector,Country,Address,Contact" --paged
+m365 spo list view add --webUrl https://contoso.sharepoint.com/sites/Sales --listTitle "Customers" --title "All customers" --fields "LinkTitle,Country,Sector,Country,Address,Contact"
 ```
 
 Add a gallery view as default view to a list with a specific URL.
 
 ```sh
-m365 spo list view add --webUrl https://contoso.sharepoint.com/sites/Sales --listUrl "/Lists/Customers" --title "All customers" --type gallery --fields "LinkTitle,Country,Sector,Country,Address,Contact" --paged --default
+m365 spo list view add --webUrl https://contoso.sharepoint.com/sites/Sales --listUrl "/Lists/Customers" --title "All customers" --type gallery --fields "LinkTitle,Country,Sector,Country,Address,Contact" --default
 ```
 
 Add a view with defined filter and sorting.
 
 ```sh
-m365 spo list view add --webUrl https://contoso.sharepoint.com/sites/Sales --listTitle "Customers" --title "Transport customers" --fields "LinkTitle,Country,Country,Address,Contact" --viewQuery "<OrderBy><FieldRef Name='LinkTitle' Ascending='TRUE' /></OrderBy><Where><Eq><FieldRef Name='Sector' /><Value Type='Text'>Transportation</Value></Eq></Where>" --paged
+m365 spo list view add --webUrl https://contoso.sharepoint.com/sites/Sales --listTitle "Customers" --title "Transport customers" --fields "LinkTitle,Country,Country,Address,Contact" --viewQuery "<OrderBy><FieldRef Name='LinkTitle' Ascending='TRUE' /></OrderBy><Where><Eq><FieldRef Name='Sector' /><Value Type='Text'>Transportation</Value></Eq></Where>"
 ```
 
 Add a gallery view as personal view.
 
 ```sh
-m365 spo list view add --webUrl https://contoso.sharepoint.com/sites/Sales --listTitle "Customers" --title "All customers" --type gallery --fields "LinkTitle,Country,Sector,Country,Address,Contact" --paged --personal
+m365 spo list view add --webUrl https://contoso.sharepoint.com/sites/Sales --listTitle "Customers" --title "All customers" --type gallery --fields "LinkTitle,Country,Sector,Country,Address,Contact" --personal
 ```
 
 Add a calendar view with month layout.
 
 ```sh
-m365 spo list view add --webUrl https://contoso.sharepoint.com/sites/Sales --listTitle "Events" --title "All events" --type calendar --fields "EventType,InternalExternal" --calendarStartDateField EventStartDate --calendarEndDateField EventEndDate --calendarTitleField LinkTitle --paged
+m365 spo list view add --webUrl https://contoso.sharepoint.com/sites/Sales --listTitle "Events" --title "All events" --type calendar --fields "EventType,InternalExternal" --calendarStartDateField EventStartDate --calendarEndDateField EventEndDate --calendarTitleField LinkTitle
 ```
 
 Add a calendar view with week layout and subtitle.
 
 ```sh
-m365 spo list view add --webUrl https://contoso.sharepoint.com/sites/Sales --listTitle "Events" --title "All events" --type calendar --fields "EventType,InternalExternal" --calendarStartDateField EventStartDate --calendarEndDateField EventEndDate --calendarTitleField LinkTitle --calendarSubTitleField Location --calendarDefaultLayout week --paged
+m365 spo list view add --webUrl https://contoso.sharepoint.com/sites/Sales --listTitle "Events" --title "All events" --type calendar --fields "EventType,InternalExternal" --calendarStartDateField EventStartDate --calendarEndDateField EventEndDate --calendarTitleField LinkTitle --calendarSubTitleField Location --calendarDefaultLayout week
 ```
 
 Add a Kanban board view.
 
 ```sh
-m365 spo list view add --webUrl https://contoso.sharepoint.com/sites/Sales --listTitle "Tasks" --title "All tasks" --type kanban --fields "Title,AssignedTo" --kanbanBucketField Status --paged
+m365 spo list view add --webUrl https://contoso.sharepoint.com/sites/Sales --listTitle "Tasks" --title "All tasks" --type kanban --fields "Title,AssignedTo" --kanbanBucketField Status
 ```
 
 ## Response
@@ -252,7 +252,7 @@ m365 spo list view add --webUrl https://contoso.sharepoint.com/sites/Sales --lis
   <TabItem value="Markdown">
 
   ```md
-  # spo list view add --webUrl "https://contoso.sharepoint.com" --listTitle "Test" --title "All events" --fields "FieldName1" --viewQuery "<OrderBy><FieldRef Name='Created' Ascending='FALSE' /></OrderBy><Where><Eq><FieldRef Name='TextFieldName' /><Value Type='Text'>Field value</Value></Eq></Where>" --paged "true"
+  # spo list view add --webUrl "https://contoso.sharepoint.com" --listTitle "Test" --title "All events" --fields "FieldName1" --viewQuery "<OrderBy><FieldRef Name='Created' Ascending='FALSE' /></OrderBy><Where><Eq><FieldRef Name='TextFieldName' /><Value Type='Text'>Field value</Value></Eq></Where>"
 
   Date: 2/20/2023
 
