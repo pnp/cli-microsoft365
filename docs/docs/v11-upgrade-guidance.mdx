@@ -25,6 +25,17 @@ The [spo list view add](./cmd/spo/list/list-view-add.mdx) command has been updat
 - **If you want paged views (most common)**: No action required as this is now the default behavior.
 - **If you want static views**: Explicitly specify `--paged false` when creating views that should not fetch new items while scrolling.
 
+## SharePoint Framework
+
+### Updated `spfx project upgrade` commands default behavior
+
+The [spfx project upgrade](./cmd/spfx/project/project-upgrade.mdx) command has been updated to use PowerShell as the default shell instead of bash. This change reflects the current usage patterns where PowerShell is more commonly used than bash. 
+
+#### What action do I need to take?
+
+- **If you prefer bash**: Explicitly specify the `--shell` option with `bash` value when running the command
+- **If you use PowerShell**: No action required as this is now the default behavior
+
 ## Teams
 
 ### Ensure list output for `teams report` commands

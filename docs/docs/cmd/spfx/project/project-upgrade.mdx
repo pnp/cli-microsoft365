@@ -22,13 +22,26 @@ m365 spfx project upgrade [options]
 : The package manager you use. Supported managers `npm`, `pnpm`, `yarn`. Default `npm`
 
 `--shell [shell]`
-: The shell you use. Supported shells `bash`, `powershell`, `cmd`. Default `bash`
+: The shell you use. Supported shells `bash`, `powershell`, `cmd`. Default `powershell`
 
 `--preview`
 : Upgrade project to the latest SPFx preview version
-```
 
-<Global />
+`-h, --help [help]`
+: Output usage information. Optionally, specify which section of command's help you want to see. Allowed values are `options`, `examples`, `remarks`, `permissions`, `response`, `full`. Default is `options`.
+
+`--query [query]`
+: JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples.
+
+`-o, --output [output]`
+: Output type. `json`, `text`, `csv`, `md`, `tour`, `none`. Default `json`.
+
+`--verbose`
+: Runs command with verbose logging.
+
+`--debug`
+: Runs command with debug logging.
+```
 
 ## Remarks
 
@@ -83,7 +96,7 @@ m365 spfx project upgrade --output text
 Get instructions to upgrade the current SharePoint Framework project to the latest SharePoint Framework version supported by the CLI for Microsoft 365 using PowerShell
 
 ```sh
-m365 spfx project upgrade --shell powershell --output text
+m365 spfx project upgrade --output text
 ```
 
 Get instructions to upgrade the current SharePoint Framework project to the latest version of SharePoint Framework and save the findings in a [CodeTour](https://aka.ms/codetour) file
@@ -134,7 +147,7 @@ When upgrading an SPFx project built using version 1.15.0 to SPFx version 1.15.2
   <TabItem value="Text">
 
   ```text
-  Execute in bash
+  Execute in powershell
   -----------------------
   npm i -SE @microsoft/sp-core-library@1.15.2
 
