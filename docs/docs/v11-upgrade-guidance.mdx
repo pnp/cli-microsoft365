@@ -16,6 +16,17 @@ The [spo homesite set](./cmd/spo/homesite/homesite-set.mdx) command has been upd
 - **For adding new home sites**: Use the new [spo homesite add](./cmd/spo/homesite/homesite-add.mdx) command instead
 - **For updating existing home sites**: Continue using [spo homesite set](./cmd/spo/homesite/homesite-set.mdx) as before with required option `siteUrl`.
 
+## SharePoint Framework
+
+### Updated `spfx project upgrade` commands default behavior
+
+The [spfx project upgrade](./cmd/spfx/project/project-upgrade.mdx) command has been updated to use PowerShell as the default shell instead of bash. This change reflects the current usage patterns where PowerShell is more commonly used than bash. 
+
+#### What action do I need to take?
+
+- **If you prefer bash**: Explicitly specify the `--shell` option with `bash` value when running the command
+- **If you use PowerShell**: No action required as this is now the default behavior
+
 ## Teams
 
 ### Ensure list output for `teams report` commands
