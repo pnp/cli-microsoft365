@@ -101,7 +101,7 @@ describe(commands.HOMESITE_SET, () => {
 
     await command.action(logger, {
       options: {
-        siteUrl: siteUrl,
+        url: siteUrl,
         vivaConnectionsDefaultStart: true
       }
     });
@@ -122,7 +122,7 @@ describe(commands.HOMESITE_SET, () => {
 
     await command.action(logger, {
       options: {
-        siteUrl: siteUrl,
+        url: siteUrl,
         draftMode: true
       }
     });
@@ -143,7 +143,7 @@ describe(commands.HOMESITE_SET, () => {
 
     await command.action(logger, {
       options: {
-        siteUrl: siteUrl,
+        url: siteUrl,
         targetedLicenseType: "frontLineWorkers"
       }
     });
@@ -164,7 +164,7 @@ describe(commands.HOMESITE_SET, () => {
 
     await command.action(logger, {
       options: {
-        siteUrl: siteUrl,
+        url: siteUrl,
         targetedLicenseType: "informationWorkers"
       }
     });
@@ -190,7 +190,7 @@ describe(commands.HOMESITE_SET, () => {
     try {
       await command.action(logger, {
         options: {
-          siteUrl: siteUrl,
+          url: siteUrl,
           audienceNames: 'Marketing Team, Sales Team'
         }
       });
@@ -215,7 +215,7 @@ describe(commands.HOMESITE_SET, () => {
 
     await command.action(logger, {
       options: {
-        siteUrl: siteUrl,
+        url: siteUrl,
         audienceNames: ''
       }
     });
@@ -236,7 +236,7 @@ describe(commands.HOMESITE_SET, () => {
 
     await command.action(logger, {
       options: {
-        siteUrl: siteUrl,
+        url: siteUrl,
         vivaConnectionsDefaultStart: true,
         draftMode: false,
         audienceIds: '00000000-0000-0000-0000-000000000001',
@@ -280,25 +280,25 @@ describe(commands.HOMESITE_SET, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        siteUrl: siteUrl
+        url: siteUrl
       }
     }), new CommandError("The provided site url can't be set as a Home site."));
   });
 
   it('fails validation if the url is not a valid SharePoint url', async () => {
-    const actual = commandOptionsSchema.safeParse({ siteUrl: 'invalid', audienceIds: '00000000-0000-0000-0000-000000000001' });
+    const actual = commandOptionsSchema.safeParse({ url: 'invalid', audienceIds: '00000000-0000-0000-0000-000000000001' });
     assert.strictEqual(actual.success, false);
   });
 
   it('passes validation if the siteUrl option is a valid SharePoint site URL', async () => {
-    const actual = commandOptionsSchema.safeParse({ siteUrl: 'https://contoso.sharepoint.com', audienceIds: '00000000-0000-0000-0000-000000000001' });
+    const actual = commandOptionsSchema.safeParse({ url: 'https://contoso.sharepoint.com', audienceIds: '00000000-0000-0000-0000-000000000001' });
     assert.strictEqual(actual.success, true);
   });
 
   it('fails validation if both audienceIds and audienceNames are specified', async () => {
     const actual = commandOptionsSchema.safeParse({
       options: {
-        siteUrl: 'https://contoso.sharepoint.com',
+        url: 'https://contoso.sharepoint.com',
         audienceIds: '00000000-0000-0000-0000-000000000001',
         audienceNames: 'Marketing Team'
       }
@@ -307,13 +307,13 @@ describe(commands.HOMESITE_SET, () => {
   });
 
   it('correctly handles invalid GUIDs in audiences', async () => {
-    const actual = commandOptionsSchema.safeParse({ siteUrl: 'https://contoso.sharepoint.com', audienceIds: 'invalid-guid' });
+    const actual = commandOptionsSchema.safeParse({ url: 'https://contoso.sharepoint.com', audienceIds: 'invalid-guid' });
     assert.strictEqual(actual.success, false);
   });
 
   it('passes validation if only audienceIds is specified', async () => {
     const actual = commandOptionsSchema.safeParse({
-      siteUrl: 'https://contoso.sharepoint.com',
+      url: 'https://contoso.sharepoint.com',
       audienceIds: '00000000-0000-0000-0000-000000000001'
     });
     assert.strictEqual(actual.success, true);
@@ -321,14 +321,14 @@ describe(commands.HOMESITE_SET, () => {
 
   it('passes validation if only audienceNames is specified', async () => {
     const actual = commandOptionsSchema.safeParse({
-      siteUrl: 'https://contoso.sharepoint.com',
+      url: 'https://contoso.sharepoint.com',
       audienceNames: 'Marketing Team'
     });
     assert.strictEqual(actual.success, true);
   });
 
   it('correctly handles non-integer order', async () => {
-    const actual = commandOptionsSchema.safeParse({ siteUrl: 'https://contoso.sharepoint.com', order: -1 });
+    const actual = commandOptionsSchema.safeParse({ url: 'https://contoso.sharepoint.com', order: -1 });
     assert.strictEqual(actual.success, false);
   });
 });

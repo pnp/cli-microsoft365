@@ -11,7 +11,7 @@ import { entraGroup } from '../../../../utils/entraGroup.js';
 
 const optionsSchema = globalOptionsZod
   .extend({
-    siteUrl: zod.alias('u', z.string()
+    url: zod.alias('u', z.string()
       .refine((url: string) => validation.isValidSharePointUrl(url) === true, url => ({
         message: `'${url}' is not a valid SharePoint Online site URL.`
       }))
@@ -75,7 +75,7 @@ class SpoHomeSiteSetCommand extends SpoCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       if (this.verbose) {
-        await logger.logToStderr(`Configuring SharePoint home site: ${args.options.siteUrl}...`);
+        await logger.logToStderr(`Configuring SharePoint home site: ${args.options.url}...`);
         await logger.logToStderr(`Attempting to retrieve the SharePoint admin URL.`);
       }
 
@@ -115,7 +115,7 @@ class SpoHomeSiteSetCommand extends SpoCommand {
         },
         responseType: 'json',
         data: {
-          siteUrl: args.options.siteUrl,
+          siteUrl: args.options.url,
           configurationParam: configuration
         }
       };
