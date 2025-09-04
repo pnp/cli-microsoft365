@@ -67,7 +67,7 @@ class SpoHomeSiteSetCommand extends SpoCommand {
           options.targetedLicenseType !== undefined ||
           options.order !== undefined,
         {
-          message: 'You must specify at least one option to configure apart from siteUrl.'
+          message: 'You must specify at least one option to configure.'
         }
       );
   }
