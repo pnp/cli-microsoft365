@@ -10,6 +10,10 @@ servers:
         default: contoso
       site:
         default: ""
+  - url: https://{tenant}.sharepoint.com
+    variables:
+      tenant:
+        default: contoso
 components:
   securitySchemes:
     delegated:
@@ -101,6 +105,56 @@ paths:
           - AllSites.Write
           - AllSites.Manage
           - AllSites.FullControl
+      responses:
+        200:
+          description: OK
+  /_api/web/GetFileById({fileId})/versions:
+    get:
+      parameters:
+        - name: fileId
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "'19bbfec4-4425-4660-95cb-da1887baa7b9'"
+      security:
+        - delegated:
+            - AllSites.Read
+            - AllSites.Write
+            - AllSites.Manage
+            - AllSites.FullControl
+        - application:
+            - Sites.Read.All
+            - Sites.ReadWrite.All
+            - Sites.Manage.All
+            - Sites.FullControl.All
+      responses:
+        200:
+          description: OK
+  /_api/web/GetFileById({fileId})/versions({versionId})/SetExpirationDate():
+    post:
+      parameters:
+        - name: fileId
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "'19bbfec4-4425-4660-95cb-da1887baa7b9'"
+        - name: versionId
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 1030
+      security:
+        - delegated:
+            - AllSites.Write
+            - AllSites.Manage
+            - AllSites.FullControl
+        - application:
+            - Sites.ReadWrite.All
+            - Sites.Manage.All
+            - Sites.FullControl.All
       responses:
         200:
           description: OK
