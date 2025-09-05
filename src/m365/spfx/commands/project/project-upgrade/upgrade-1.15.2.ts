@@ -353,7 +353,7 @@ export default [
         // STANDARDIZED BY:   eslint\\conf\\eslint-recommended.js
         'no-with': 2,
         // RATIONALE:         Makes logic easier to understand, since constants always have a known value
-        // @typescript-eslint\eslint-plugin\dist\configs\eslint-recommended.js
+        // @typescript-eslint\\eslint-plugin\\dist\\configs\\eslint-recommended.js
         'prefer-const': 1,
         // RATIONALE:         Catches a common coding mistake where "resolve" and "reject" are confused.
         'promise/param-names': 2,

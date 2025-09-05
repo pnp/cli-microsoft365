@@ -89,7 +89,7 @@ class AppPermissionListCommand extends AppCommand {
     const permissionsPromises = [];
 
     switch (mode) {
-      case GetServicePrincipal.withPermissions:
+      case GetServicePrincipal.withPermissions: {
         const appRoleAssignmentsRequestOptions: CliRequestOptions = {
           url: `${this.resource}/v1.0/servicePrincipals/${servicePrincipal.id}/appRoleAssignments`,
           headers: {
@@ -109,7 +109,8 @@ class AppPermissionListCommand extends AppCommand {
           request.get<{ value: OAuth2PermissionGrant[] }>(oauth2PermissionGrantsRequestOptions)
         ]);
         break;
-      case GetServicePrincipal.withPermissionDefinitions:
+      }
+      case GetServicePrincipal.withPermissionDefinitions: {
         const oauth2PermissionScopesRequestOptions: CliRequestOptions = {
           url: `${this.resource}/v1.0/servicePrincipals/${servicePrincipal.id}/oauth2PermissionScopes`,
           headers: {
@@ -129,6 +130,7 @@ class AppPermissionListCommand extends AppCommand {
           request.get<{ value: AppRole[] }>(appRolesRequestOptions)
         ]);
         break;
+      }
     }
 
     const permissions = await Promise.all(permissionsPromises);

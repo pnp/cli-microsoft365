@@ -25,7 +25,7 @@ describe(commands.LISTITEM_RECORD_UNDECLARE, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
-  const postFakes = async (opts: any) => {
+  const postFakes = async (opts: any): Promise<string | undefined> => {
     if ((opts.url as string).indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
       // requestObjectIdentity mock
       if (opts.data.indexOf('Name="Current"') > -1) {
@@ -60,7 +60,7 @@ describe(commands.LISTITEM_RECORD_UNDECLARE, () => {
     throw 'Invalid request';
   };
 
-  const getFakes = async (opts: any) => {
+  const getFakes = async (opts: any): Promise<{ Id: string }> => {
     if (opts.url === `${webUrl}/_api/web/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')?$select=Id`) {
       return { Id: '81f0ecee-75a8-46f0-b384-c8f4f9f31d99' };
     }

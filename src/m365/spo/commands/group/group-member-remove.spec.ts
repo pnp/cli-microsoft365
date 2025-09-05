@@ -29,13 +29,11 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
   const userId = 14;
 
   const spoGroupMemberListCommandOutput = `[{ "Id": 13, "IsHiddenInUI": false, "LoginName": "c:0t.c|tenant|4b468129-3b44-4414-bd45-aa5bde29df2f", "Title": "Microsoft Entra Security Group 2", "PrincipalType": 1, "Email": "", "Expiration": "", "IsEmailAuthenticationGuestUser": false, "IsShareByEmailGuestUser": false, "IsSiteAdmin": false, "UserId": null, "UserPrincipalName": null },{ "Id": 13, "IsHiddenInUI": false, "LoginName": "c:0t.c|tenant|3f10f4af-8704-4394-80c0-ee8cef5eae27", "Title": "Microsoft Entra Security Group", "PrincipalType": 1, "Email": "", "Expiration": "", "IsEmailAuthenticationGuestUser": false, "IsShareByEmailGuestUser": false, "IsSiteAdmin": false, "UserId": null, "UserPrincipalName": null }, { "Id": 17, "IsHiddenInUI": false, "LoginName": "c:0o.c|federateddirectoryclaimprovider|5786b8e8-c495-4734-b345-756733960730", "Title": "Office 365 Group", "PrincipalType": 4, "Email": "office365group@contoso.onmicrosoft.com", "Expiration": "", "IsEmailAuthenticationGuestUser": false, "IsShareByEmailGuestUser": false, "IsSiteAdmin": false, "UserId": null, "UserPrincipalName": null }]`;
-  const UserRemovalJSONResponse =
-  {
+  const UserRemovalJSONResponse = {
     "odata.null": true
   };
 
-  const userInformation: any =
-  {
+  const userInformation: any = {
     businessPhones: [],
     displayName: "Alex Wilber",
     givenName: "Alex Wilber",

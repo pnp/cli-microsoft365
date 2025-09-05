@@ -175,7 +175,7 @@ class GraphSchemaExtensionSetCommand extends GraphCommand {
     try {
       properties = JSON.parse(propertiesString);
     }
-    catch (e) {
+    catch {
       return 'The specified properties is not a valid JSON string';
     }
 

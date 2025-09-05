@@ -27,7 +27,7 @@ describe(commands.LISTITEM_RECORD_DECLARE, () => {
   const listUrl = '/sites/project-x/lists/TestList';
   const listServerRelativeUrl: string = urlUtil.getServerRelativePath(webUrl, listUrl);
 
-  const postFakes = async (opts: any) => {
+  const postFakes = async (opts: any): Promise<string> => {
     if ((opts.url as string).indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
 
       // requestObjectIdentity mock
@@ -83,7 +83,7 @@ describe(commands.LISTITEM_RECORD_DECLARE, () => {
     throw 'Invalid request';
   };
 
-  const getFakes = async (opts: any) => {
+  const getFakes = async (opts: any): Promise<{ Id: string }> => {
     if ((opts.url as string).indexOf('/_api/web/lists') > -1 &&
       (opts.url as string).indexOf('$select=Id') > -1) {
       await logger.log('faked!');

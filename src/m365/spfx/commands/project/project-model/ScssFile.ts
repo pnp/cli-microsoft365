@@ -7,7 +7,9 @@ export class ScssFile {
       try {
         this._source = fs.readFileSync(this.path, 'utf-8');
       }
-      catch { }
+      catch {
+        // Do nothing
+      }
     }
 
     return this._source;

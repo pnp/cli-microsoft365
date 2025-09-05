@@ -19,7 +19,7 @@ describe(commands.COPY, () => {
   let logger: Logger;
   let commandInfo: CommandInfo;
 
-  const defaultPostStub = () => {
+  const defaultPostStub = (): sinon.SinonStub => {
     return sinon.stub(request, 'post').callsFake(async (opts) => {
       const url: string = opts.url as string;
 
@@ -28,7 +28,7 @@ describe(commands.COPY, () => {
         url === 'https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com,ea49a393-e3e6-4760-a1b2-e96539e15372,66e2861c-96d9-4418-a75c-0ed1bca68b42/drives/b!k6NJ6ubjYEehsullOeFTchyG4mbZlhhEp1wO0bymi0KkhVdx52mJQ5y68EfLYQYU/items/01YNDLPYN6Y2GOVW7725BZO354PWSELRRZ/copy?@microsoft.graph.conflictBehavior=replace' ||
         url === 'https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com,ea49a393-e3e6-4760-a1b2-e96539e15372,66e2861c-96d9-4418-a75c-0ed1bca68b42/drives/b!k6NJ6ubjYEehsullOeFTchyG4mbZlhhEp1wO0bymi0KkhVdx52mJQ5y68EfLYQYU/items/01YNDLPYN6Y2GOVW7725BZO354PWSELRRZ/copy?@microsoft.graph.conflictBehavior=rename'
       ) {
-        return Promise.resolve({ response: { status: 202 } });
+        return { response: { status: 202 } };
       }
 
       throw 'Invalid request';
@@ -65,10 +65,6 @@ describe(commands.COPY, () => {
             "id": "01YNDLPYN6Y2GOVW7725BZO354PWSELRRZ"
           };
         case 'https://graph.microsoft.com/v1.0/drives/b!k6NJ6ubjYEehsullOeFTchyG4mbZlhhEp1wO0bymi0KkhVdx52mJQ5y68EfLYQYU/root?$select=id':
-          return {
-            "id": "01YNDLPYN6Y2GOVW7725BZO354PWSELRRZ"
-          };
-        case 'https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com:/teams/finance?$select=id':
           return {
             "id": "01YNDLPYN6Y2GOVW7725BZO354PWSELRRZ"
           };

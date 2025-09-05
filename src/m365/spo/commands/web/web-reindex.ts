@@ -101,26 +101,21 @@ class SpoWebReindexCommand extends SpoCommand {
   }
 
   private async reindexLists(webUrl: string, requestDigest: string, logger: Logger, webIdentityResp: IdentityResponse): Promise<void> {
-    try {
-      if (this.debug) {
-        await logger.logToStderr(`Retrieving information about lists...`);
-      }
-
-      const requestOptions: CliRequestOptions = {
-        url: `${webUrl}/_api/web/lists?$select=NoCrawl,Title,RootFolder/Properties,RootFolder/ServerRelativeUrl&$expand=RootFolder/Properties`,
-        headers: {
-          'accept': 'application/json;odata=nometadata'
-        },
-        responseType: 'json'
-      };
-
-      const lists: { value: { NoCrawl: boolean; Title: string; RootFolder: { Properties: any; ServerRelativeUrl: string; } }[] } = await request.get(requestOptions);
-      const promises: Promise<void>[] = lists.value.map(l => this.reindexList(l, webUrl, requestDigest, webIdentityResp, logger));
-      await Promise.all(promises);
+    if (this.debug) {
+      await logger.logToStderr(`Retrieving information about lists...`);
     }
-    catch (err) {
-      throw err;
-    }
+
+    const requestOptions: CliRequestOptions = {
+      url: `${webUrl}/_api/web/lists?$select=NoCrawl,Title,RootFolder/Properties,RootFolder/ServerRelativeUrl&$expand=RootFolder/Properties`,
+      headers: {
+        'accept': 'application/json;odata=nometadata'
+      },
+      responseType: 'json'
+    };
+
+    const lists: { value: { NoCrawl: boolean; Title: string; RootFolder: { Properties: any; ServerRelativeUrl: string; } }[] } = await request.get(requestOptions);
+    const promises: Promise<void>[] = lists.value.map(l => this.reindexList(l, webUrl, requestDigest, webIdentityResp, logger));
+    await Promise.all(promises);
   }
 
   private async reindexList(list: { NoCrawl: boolean; Title: string; RootFolder: { Properties: any; ServerRelativeUrl: string; } }, webUrl: string, requestDigest: string, webIdentityResp: IdentityResponse, logger: Logger): Promise<void> {
@@ -131,18 +126,13 @@ class SpoWebReindexCommand extends SpoCommand {
       return;
     }
 
-    try {
-      const folderIdentityResp: IdentityResponse = await spo.getFolderIdentity(webIdentityResp.objectIdentity, webUrl, list.RootFolder.ServerRelativeUrl, requestDigest);
+    const folderIdentityResp: IdentityResponse = await spo.getFolderIdentity(webIdentityResp.objectIdentity, webUrl, list.RootFolder.ServerRelativeUrl, requestDigest);
 
-      let searchversion: number = list.RootFolder.Properties.vti_x005f_searchversion || 0;
-      searchversion++;
+    let searchversion: number = list.RootFolder.Properties.vti_x005f_searchversion || 0;
+    searchversion++;
 
-      await SpoPropertyBagBaseCommand.setProperty('vti_searchversion', searchversion.toString(), webUrl, requestDigest, folderIdentityResp, logger, this.debug, list.RootFolder.ServerRelativeUrl);
-      return;
-    }
-    catch (err) {
-      throw (err);
-    }
+    await SpoPropertyBagBaseCommand.setProperty('vti_searchversion', searchversion.toString(), webUrl, requestDigest, folderIdentityResp, logger, this.debug, list.RootFolder.ServerRelativeUrl);
+    return;
   }
 }
 

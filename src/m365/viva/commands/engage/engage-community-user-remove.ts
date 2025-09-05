@@ -60,7 +60,7 @@ class VivaEngageCommunityUserRemoveCommand extends GraphCommand {
       .refine(options => options.id || options.userName, {
         message: 'Specify either of id or userName.'
       })
-      .refine(options => typeof options.userName !== undefined && typeof options.id !== undefined, {
+      .refine(options => options.userName !== undefined || options.id !== undefined, {
         message: 'Specify either id or userName, but not both.'
       });
   }

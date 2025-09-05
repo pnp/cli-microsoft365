@@ -397,6 +397,7 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
         (webPart as any).webPartData.properties = this.extend((webPart as any).webPartData.properties, properties);
       }
       catch {
+        // Do nothing
       }
     }
 

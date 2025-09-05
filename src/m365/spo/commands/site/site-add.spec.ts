@@ -1268,7 +1268,7 @@ describe(commands.SITE_ADD, () => {
             }, 199, {
               "IsNull": false
             }, 200, {
-              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SiteProperties", "_ObjectIdentity_": "c340489e-80cc-5000-c5b4-01b2ce71e9bf|908bed80-a04a-4433-b4a0-883d9847d110:67753f63-bc14-4012-869e-f808a43fe023\nSiteProperties\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fteam", "AllowDownloadingNonWebViewableFiles": true, "AllowEditing": true, "AllowSelfServiceUpgrade": true, "AverageResourceUsage": 0, "CommentsOnSitePagesDisabled": false, "CompatibilityLevel": 15, "ConditionalAccessPolicy": 0, "CurrentResourceUsage": 0, "DenyAddAndCustomizePages": 1, "DisableAppViews": 2, "DisableCompanyWideSharingLinks": 2, "DisableFlows": 2, "HasHolds": false, "LastContentModifiedDate": "\/Date(2018,1,7,19,9,58,513)\/", "Lcid": 1033, "LockIssue": null, "LockState": "Unlock", "NewUrl": "", "Owner": "admin@contoso.onmicrosoft.com", "OwnerEmail": "admin@contoso.onmicrosoft.com", "PWAEnabled": 0, "RestrictedToRegion": 3, "SandboxedCodeActivationCapability": 2, "SharingAllowedDomainList": "", "SharingBlockedDomainList": "", "SharingCapability": 0, "SharingDomainRestrictionMode": 0, "ShowPeoplePickerSuggestionsForGuestUsers": false, "SiteDefinedSharingCapability": 0, "Status": "Active", "StorageMaximumLevel": 26214400, "StorageQuotaType": null, "StorageUsage": 2, "StorageWarningLevel": 25574400, "Template": "STS#0", "TimeZoneId": 4, "Title": "Team", "Url": "https:\u002f\u002fcontoso.sharepoint.com\u002fsites\u002fteam", "UserCodeMaximumLevel": 0, "UserCodeWarningLevel": 0, "WebsCount": 1
+              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SiteProperties", "_ObjectIdentity_": "c340489e-80cc-5000-c5b4-01b2ce71e9bf|908bed80-a04a-4433-b4a0-883d9847d110:67753f63-bc14-4012-869e-f808a43fe023\nSiteProperties\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fteam", "AllowDownloadingNonWebViewableFiles": true, "AllowEditing": true, "AllowSelfServiceUpgrade": true, "AverageResourceUsage": 0, "CommentsOnSitePagesDisabled": false, "CompatibilityLevel": 15, "ConditionalAccessPolicy": 0, "CurrentResourceUsage": 0, "DenyAddAndCustomizePages": 1, "DisableAppViews": 2, "DisableCompanyWideSharingLinks": 2, "DisableFlows": 2, "HasHolds": false, "LastContentModifiedDate": "/Date(2018,1,7,19,9,58,513)/", "Lcid": 1033, "LockIssue": null, "LockState": "Unlock", "NewUrl": "", "Owner": "admin@contoso.onmicrosoft.com", "OwnerEmail": "admin@contoso.onmicrosoft.com", "PWAEnabled": 0, "RestrictedToRegion": 3, "SandboxedCodeActivationCapability": 2, "SharingAllowedDomainList": "", "SharingBlockedDomainList": "", "SharingCapability": 0, "SharingDomainRestrictionMode": 0, "ShowPeoplePickerSuggestionsForGuestUsers": false, "SiteDefinedSharingCapability": 0, "Status": "Active", "StorageMaximumLevel": 26214400, "StorageQuotaType": null, "StorageUsage": 2, "StorageWarningLevel": 25574400, "Template": "STS#0", "TimeZoneId": 4, "Title": "Team", "Url": "https:\u002f\u002fcontoso.sharepoint.com\u002fsites\u002fteam", "UserCodeMaximumLevel": 0, "UserCodeWarningLevel": 0, "WebsCount": 1
             }
           ]);
         }
@@ -1328,7 +1328,7 @@ describe(commands.SITE_ADD, () => {
             }, 199, {
               "IsNull": false
             }, 200, {
-              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SiteProperties", "_ObjectIdentity_": "c340489e-80cc-5000-c5b4-01b2ce71e9bf|908bed80-a04a-4433-b4a0-883d9847d110:67753f63-bc14-4012-869e-f808a43fe023\nSiteProperties\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fteam", "AllowDownloadingNonWebViewableFiles": true, "AllowEditing": true, "AllowSelfServiceUpgrade": true, "AverageResourceUsage": 0, "CommentsOnSitePagesDisabled": false, "CompatibilityLevel": 15, "ConditionalAccessPolicy": 0, "CurrentResourceUsage": 0, "DenyAddAndCustomizePages": 1, "DisableAppViews": 2, "DisableCompanyWideSharingLinks": 2, "DisableFlows": 2, "HasHolds": false, "LastContentModifiedDate": "\/Date(2018,1,7,19,9,58,513)\/", "Lcid": 1033, "LockIssue": null, "LockState": "Unlock", "NewUrl": "", "Owner": "admin@contoso.onmicrosoft.com", "OwnerEmail": "admin@contoso.onmicrosoft.com", "PWAEnabled": 0, "RestrictedToRegion": 3, "SandboxedCodeActivationCapability": 2, "SharingAllowedDomainList": "", "SharingBlockedDomainList": "", "SharingCapability": 0, "SharingDomainRestrictionMode": 0, "ShowPeoplePickerSuggestionsForGuestUsers": false, "SiteDefinedSharingCapability": 0, "Status": "Recycled", "StorageMaximumLevel": 26214400, "StorageQuotaType": null, "StorageUsage": 2, "StorageWarningLevel": 25574400, "Template": "STS#0", "TimeZoneId": 4, "Title": "Team", "Url": "https:\u002f\u002fcontoso.sharepoint.com\u002fsites\u002fteam", "UserCodeMaximumLevel": 0, "UserCodeWarningLevel": 0, "WebsCount": 1
+              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SiteProperties", "_ObjectIdentity_": "c340489e-80cc-5000-c5b4-01b2ce71e9bf|908bed80-a04a-4433-b4a0-883d9847d110:67753f63-bc14-4012-869e-f808a43fe023\nSiteProperties\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fteam", "AllowDownloadingNonWebViewableFiles": true, "AllowEditing": true, "AllowSelfServiceUpgrade": true, "AverageResourceUsage": 0, "CommentsOnSitePagesDisabled": false, "CompatibilityLevel": 15, "ConditionalAccessPolicy": 0, "CurrentResourceUsage": 0, "DenyAddAndCustomizePages": 1, "DisableAppViews": 2, "DisableCompanyWideSharingLinks": 2, "DisableFlows": 2, "HasHolds": false, "LastContentModifiedDate": "/Date(2018,1,7,19,9,58,513)/", "Lcid": 1033, "LockIssue": null, "LockState": "Unlock", "NewUrl": "", "Owner": "admin@contoso.onmicrosoft.com", "OwnerEmail": "admin@contoso.onmicrosoft.com", "PWAEnabled": 0, "RestrictedToRegion": 3, "SandboxedCodeActivationCapability": 2, "SharingAllowedDomainList": "", "SharingBlockedDomainList": "", "SharingCapability": 0, "SharingDomainRestrictionMode": 0, "ShowPeoplePickerSuggestionsForGuestUsers": false, "SiteDefinedSharingCapability": 0, "Status": "Recycled", "StorageMaximumLevel": 26214400, "StorageQuotaType": null, "StorageUsage": 2, "StorageWarningLevel": 25574400, "Template": "STS#0", "TimeZoneId": 4, "Title": "Team", "Url": "https:\u002f\u002fcontoso.sharepoint.com\u002fsites\u002fteam", "UserCodeMaximumLevel": 0, "UserCodeWarningLevel": 0, "WebsCount": 1
             }
           ]);
         }
@@ -1448,7 +1448,7 @@ describe(commands.SITE_ADD, () => {
             }, 181, {
               "IsNull": false
             }, 182, {
-              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.DeletedSiteProperties", "_ObjectIdentity_": "e13c489e-8041-5000-8242-77f6c560fa5e|908bed80-a04a-4433-b4a0-883d9847d110:67753f63-bc14-4012-869e-f808a43fe023\nDeletedSiteProperties\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fteam", "DaysRemaining": 30, "DeletionTime": "\/Date(2018,1,7,18,57,20,530)\/", "SiteId": "\/Guid(cb09f194-0ee7-4c48-a44f-8c112fff4d4e)\/", "Status": "Recycled", "StorageMaximumLevel": 26214400, "Url": "https:\u002f\u002fcontoso.sharepoint.com\u002fsites\u002fteam", "UserCodeMaximumLevel": 0
+              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.DeletedSiteProperties", "_ObjectIdentity_": "e13c489e-8041-5000-8242-77f6c560fa5e|908bed80-a04a-4433-b4a0-883d9847d110:67753f63-bc14-4012-869e-f808a43fe023\nDeletedSiteProperties\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fteam", "DaysRemaining": 30, "DeletionTime": "/Date(2018,1,7,18,57,20,530)/", "SiteId": "/Guid(cb09f194-0ee7-4c48-a44f-8c112fff4d4e)/", "Status": "Recycled", "StorageMaximumLevel": 26214400, "Url": "https:\u002f\u002fcontoso.sharepoint.com\u002fsites\u002fteam", "UserCodeMaximumLevel": 0
             }
           ]);
         }
@@ -1518,7 +1518,7 @@ describe(commands.SITE_ADD, () => {
             }, 181, {
               "IsNull": false
             }, 182, {
-              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.DeletedSiteProperties", "_ObjectIdentity_": "e13c489e-8041-5000-8242-77f6c560fa5e|908bed80-a04a-4433-b4a0-883d9847d110:67753f63-bc14-4012-869e-f808a43fe023\nDeletedSiteProperties\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fteam", "DaysRemaining": 30, "DeletionTime": "\/Date(2018,1,7,18,57,20,530)\/", "SiteId": "\/Guid(cb09f194-0ee7-4c48-a44f-8c112fff4d4e)\/", "Status": "Invalid", "StorageMaximumLevel": 26214400, "Url": "https:\u002f\u002fcontoso.sharepoint.com\u002fsites\u002fteam", "UserCodeMaximumLevel": 0
+              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.DeletedSiteProperties", "_ObjectIdentity_": "e13c489e-8041-5000-8242-77f6c560fa5e|908bed80-a04a-4433-b4a0-883d9847d110:67753f63-bc14-4012-869e-f808a43fe023\nDeletedSiteProperties\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fteam", "DaysRemaining": 30, "DeletionTime": "/Date(2018,1,7,18,57,20,530)/", "SiteId": "/Guid(cb09f194-0ee7-4c48-a44f-8c112fff4d4e)/", "Status": "Invalid", "StorageMaximumLevel": 26214400, "Url": "https:\u002f\u002fcontoso.sharepoint.com\u002fsites\u002fteam", "UserCodeMaximumLevel": 0
             }
           ]);
         }
@@ -1588,7 +1588,7 @@ describe(commands.SITE_ADD, () => {
             }, 181, {
               "IsNull": false
             }, 182, {
-              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.DeletedSiteProperties", "_ObjectIdentity_": "e13c489e-8041-5000-8242-77f6c560fa5e|908bed80-a04a-4433-b4a0-883d9847d110:67753f63-bc14-4012-869e-f808a43fe023\nDeletedSiteProperties\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fteam", "DaysRemaining": 30, "DeletionTime": "\/Date(2018,1,7,18,57,20,530)\/", "SiteId": "\/Guid(cb09f194-0ee7-4c48-a44f-8c112fff4d4e)\/", "Status": "Recycled", "StorageMaximumLevel": 26214400, "Url": "https:\u002f\u002fcontoso.sharepoint.com\u002fsites\u002fteam", "UserCodeMaximumLevel": 0
+              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.DeletedSiteProperties", "_ObjectIdentity_": "e13c489e-8041-5000-8242-77f6c560fa5e|908bed80-a04a-4433-b4a0-883d9847d110:67753f63-bc14-4012-869e-f808a43fe023\nDeletedSiteProperties\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fteam", "DaysRemaining": 30, "DeletionTime": "/Date(2018,1,7,18,57,20,530)/", "SiteId": "/Guid(cb09f194-0ee7-4c48-a44f-8c112fff4d4e)/", "Status": "Recycled", "StorageMaximumLevel": 26214400, "Url": "https:\u002f\u002fcontoso.sharepoint.com\u002fsites\u002fteam", "UserCodeMaximumLevel": 0
             }
           ]);
         }
@@ -1658,7 +1658,7 @@ describe(commands.SITE_ADD, () => {
             }, 181, {
               "IsNull": false
             }, 182, {
-              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.DeletedSiteProperties", "_ObjectIdentity_": "e13c489e-8041-5000-8242-77f6c560fa5e|908bed80-a04a-4433-b4a0-883d9847d110:67753f63-bc14-4012-869e-f808a43fe023\nDeletedSiteProperties\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fteam", "DaysRemaining": 30, "DeletionTime": "\/Date(2018,1,7,18,57,20,530)\/", "SiteId": "\/Guid(cb09f194-0ee7-4c48-a44f-8c112fff4d4e)\/", "Status": "Recycled", "StorageMaximumLevel": 26214400, "Url": "https:\u002f\u002fcontoso.sharepoint.com\u002fsites\u002fteam", "UserCodeMaximumLevel": 0
+              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.DeletedSiteProperties", "_ObjectIdentity_": "e13c489e-8041-5000-8242-77f6c560fa5e|908bed80-a04a-4433-b4a0-883d9847d110:67753f63-bc14-4012-869e-f808a43fe023\nDeletedSiteProperties\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fteam", "DaysRemaining": 30, "DeletionTime": "/Date(2018,1,7,18,57,20,530)/", "SiteId": "/Guid(cb09f194-0ee7-4c48-a44f-8c112fff4d4e)/", "Status": "Recycled", "StorageMaximumLevel": 26214400, "Url": "https:\u002f\u002fcontoso.sharepoint.com\u002fsites\u002fteam", "UserCodeMaximumLevel": 0
             }
           ]);
         }
@@ -1859,7 +1859,7 @@ describe(commands.SITE_ADD, () => {
             }, 181, {
               "IsNull": false
             }, 182, {
-              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.DeletedSiteProperties", "_ObjectIdentity_": "e13c489e-8041-5000-8242-77f6c560fa5e|908bed80-a04a-4433-b4a0-883d9847d110:67753f63-bc14-4012-869e-f808a43fe023\nDeletedSiteProperties\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fteam", "DaysRemaining": 30, "DeletionTime": "\/Date(2018,1,7,18,57,20,530)\/", "SiteId": "\/Guid(cb09f194-0ee7-4c48-a44f-8c112fff4d4e)\/", "Status": "Recycled", "StorageMaximumLevel": 26214400, "Url": "https:\u002f\u002fcontoso.sharepoint.com\u002fsites\u002fteam", "UserCodeMaximumLevel": 0
+              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.DeletedSiteProperties", "_ObjectIdentity_": "e13c489e-8041-5000-8242-77f6c560fa5e|908bed80-a04a-4433-b4a0-883d9847d110:67753f63-bc14-4012-869e-f808a43fe023\nDeletedSiteProperties\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fteam", "DaysRemaining": 30, "DeletionTime": "/Date(2018,1,7,18,57,20,530)/", "SiteId": "/Guid(cb09f194-0ee7-4c48-a44f-8c112fff4d4e)/", "Status": "Recycled", "StorageMaximumLevel": 26214400, "Url": "https:\u002f\u002fcontoso.sharepoint.com\u002fsites\u002fteam", "UserCodeMaximumLevel": 0
             }
           ]);
         }
@@ -1977,7 +1977,7 @@ describe(commands.SITE_ADD, () => {
             }, 181, {
               "IsNull": false
             }, 182, {
-              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.DeletedSiteProperties", "_ObjectIdentity_": "e13c489e-8041-5000-8242-77f6c560fa5e|908bed80-a04a-4433-b4a0-883d9847d110:67753f63-bc14-4012-869e-f808a43fe023\nDeletedSiteProperties\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fteam", "DaysRemaining": 30, "DeletionTime": "\/Date(2018,1,7,18,57,20,530)\/", "SiteId": "\/Guid(cb09f194-0ee7-4c48-a44f-8c112fff4d4e)\/", "Status": "Recycled", "StorageMaximumLevel": 26214400, "Url": "https:\u002f\u002fcontoso.sharepoint.com\u002fsites\u002fteam", "UserCodeMaximumLevel": 0
+              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.DeletedSiteProperties", "_ObjectIdentity_": "e13c489e-8041-5000-8242-77f6c560fa5e|908bed80-a04a-4433-b4a0-883d9847d110:67753f63-bc14-4012-869e-f808a43fe023\nDeletedSiteProperties\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fteam", "DaysRemaining": 30, "DeletionTime": "/Date(2018,1,7,18,57,20,530)/", "SiteId": "/Guid(cb09f194-0ee7-4c48-a44f-8c112fff4d4e)/", "Status": "Recycled", "StorageMaximumLevel": 26214400, "Url": "https:\u002f\u002fcontoso.sharepoint.com\u002fsites\u002fteam", "UserCodeMaximumLevel": 0
             }
           ]);
         }
@@ -2069,7 +2069,7 @@ describe(commands.SITE_ADD, () => {
             }, 181, {
               "IsNull": false
             }, 182, {
-              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.DeletedSiteProperties", "_ObjectIdentity_": "e13c489e-8041-5000-8242-77f6c560fa5e|908bed80-a04a-4433-b4a0-883d9847d110:67753f63-bc14-4012-869e-f808a43fe023\nDeletedSiteProperties\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fteam", "DaysRemaining": 30, "DeletionTime": "\/Date(2018,1,7,18,57,20,530)\/", "SiteId": "\/Guid(cb09f194-0ee7-4c48-a44f-8c112fff4d4e)\/", "Status": "Recycled", "StorageMaximumLevel": 26214400, "Url": "https:\u002f\u002fcontoso.sharepoint.com\u002fsites\u002fteam", "UserCodeMaximumLevel": 0
+              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.DeletedSiteProperties", "_ObjectIdentity_": "e13c489e-8041-5000-8242-77f6c560fa5e|908bed80-a04a-4433-b4a0-883d9847d110:67753f63-bc14-4012-869e-f808a43fe023\nDeletedSiteProperties\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fteam", "DaysRemaining": 30, "DeletionTime": "/Date(2018,1,7,18,57,20,530)/", "SiteId": "/Guid(cb09f194-0ee7-4c48-a44f-8c112fff4d4e)/", "Status": "Recycled", "StorageMaximumLevel": 26214400, "Url": "https:\u002f\u002fcontoso.sharepoint.com\u002fsites\u002fteam", "UserCodeMaximumLevel": 0
             }
           ]);
         }
@@ -2161,7 +2161,7 @@ describe(commands.SITE_ADD, () => {
             }, 181, {
               "IsNull": false
             }, 182, {
-              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.DeletedSiteProperties", "_ObjectIdentity_": "e13c489e-8041-5000-8242-77f6c560fa5e|908bed80-a04a-4433-b4a0-883d9847d110:67753f63-bc14-4012-869e-f808a43fe023\nDeletedSiteProperties\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fteam", "DaysRemaining": 30, "DeletionTime": "\/Date(2018,1,7,18,57,20,530)\/", "SiteId": "\/Guid(cb09f194-0ee7-4c48-a44f-8c112fff4d4e)\/", "Status": "Recycled", "StorageMaximumLevel": 26214400, "Url": "https:\u002f\u002fcontoso.sharepoint.com\u002fsites\u002fteam", "UserCodeMaximumLevel": 0
+              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.DeletedSiteProperties", "_ObjectIdentity_": "e13c489e-8041-5000-8242-77f6c560fa5e|908bed80-a04a-4433-b4a0-883d9847d110:67753f63-bc14-4012-869e-f808a43fe023\nDeletedSiteProperties\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fteam", "DaysRemaining": 30, "DeletionTime": "/Date(2018,1,7,18,57,20,530)/", "SiteId": "/Guid(cb09f194-0ee7-4c48-a44f-8c112fff4d4e)/", "Status": "Recycled", "StorageMaximumLevel": 26214400, "Url": "https:\u002f\u002fcontoso.sharepoint.com\u002fsites\u002fteam", "UserCodeMaximumLevel": 0
             }
           ]);
         }
@@ -2253,7 +2253,7 @@ describe(commands.SITE_ADD, () => {
             }, 181, {
               "IsNull": false
             }, 182, {
-              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.DeletedSiteProperties", "_ObjectIdentity_": "e13c489e-8041-5000-8242-77f6c560fa5e|908bed80-a04a-4433-b4a0-883d9847d110:67753f63-bc14-4012-869e-f808a43fe023\nDeletedSiteProperties\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fteam", "DaysRemaining": 30, "DeletionTime": "\/Date(2018,1,7,18,57,20,530)\/", "SiteId": "\/Guid(cb09f194-0ee7-4c48-a44f-8c112fff4d4e)\/", "Status": "Recycled", "StorageMaximumLevel": 26214400, "Url": "https:\u002f\u002fcontoso.sharepoint.com\u002fsites\u002fteam", "UserCodeMaximumLevel": 0
+              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.DeletedSiteProperties", "_ObjectIdentity_": "e13c489e-8041-5000-8242-77f6c560fa5e|908bed80-a04a-4433-b4a0-883d9847d110:67753f63-bc14-4012-869e-f808a43fe023\nDeletedSiteProperties\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fteam", "DaysRemaining": 30, "DeletionTime": "/Date(2018,1,7,18,57,20,530)/", "SiteId": "/Guid(cb09f194-0ee7-4c48-a44f-8c112fff4d4e)/", "Status": "Recycled", "StorageMaximumLevel": 26214400, "Url": "https:\u002f\u002fcontoso.sharepoint.com\u002fsites\u002fteam", "UserCodeMaximumLevel": 0
             }
           ]);
         }
@@ -2300,7 +2300,7 @@ describe(commands.SITE_ADD, () => {
             }, 181, {
               "IsNull": false
             }, 182, {
-              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.DeletedSiteProperties", "_ObjectIdentity_": "e13c489e-8041-5000-8242-77f6c560fa5e|908bed80-a04a-4433-b4a0-883d9847d110:67753f63-bc14-4012-869e-f808a43fe023\nDeletedSiteProperties\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fteam", "DaysRemaining": 30, "DeletionTime": "\/Date(2018,1,7,18,57,20,530)\/", "SiteId": "\/Guid(cb09f194-0ee7-4c48-a44f-8c112fff4d4e)\/", "Status": "Recycled", "StorageMaximumLevel": 26214400, "Url": "https:\u002f\u002fcontoso.sharepoint.com\u002fsites\u002fteam", "UserCodeMaximumLevel": 0
+              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.DeletedSiteProperties", "_ObjectIdentity_": "e13c489e-8041-5000-8242-77f6c560fa5e|908bed80-a04a-4433-b4a0-883d9847d110:67753f63-bc14-4012-869e-f808a43fe023\nDeletedSiteProperties\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fteam", "DaysRemaining": 30, "DeletionTime": "/Date(2018,1,7,18,57,20,530)/", "SiteId": "/Guid(cb09f194-0ee7-4c48-a44f-8c112fff4d4e)/", "Status": "Recycled", "StorageMaximumLevel": 26214400, "Url": "https:\u002f\u002fcontoso.sharepoint.com\u002fsites\u002fteam", "UserCodeMaximumLevel": 0
             }
           ]);
         }
@@ -2643,3 +2643,4 @@ describe(commands.SITE_ADD, () => {
     assert.strictEqual(actual, true);
   });
 });
+

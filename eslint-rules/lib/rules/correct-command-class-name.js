@@ -42,7 +42,7 @@ function capitalizeWord(word, capitalized) {
   return word.substr(0, 1).toUpperCase() + word.substr(1).toLowerCase();
 }
 
-function breakWords(longWord, dictionary) { 
+function breakWords(longWord, dictionary) {
   const words = [];
   for (let i = 0; i < dictionary.length; i++) {
     if (longWord.indexOf(dictionary[i]) === 0) {
@@ -72,7 +72,19 @@ module.exports = {
     fixable: 'code',
     messages: {
       invalidName: "'{{ actualClassName }}' is not a valid command class name. Expected '{{ expectedClassName }}'"
-    }
+    },
+    schema: [
+      {
+        type: 'array',
+        items: { type: 'string' },
+        uniqueItems: true
+      },
+      {
+        type: 'array',
+        items: { type: 'string' },
+        uniqueItems: true
+      }
+    ]
   },
   create: context => {
     return {
