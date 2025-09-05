@@ -16,6 +16,27 @@ The [spo homesite set](./cmd/spo/homesite/homesite-set.mdx) command has been upd
 - **For adding new home sites**: Use the new [spo homesite add](./cmd/spo/homesite/homesite-add.mdx) command instead
 - **For updating existing home sites**: Continue using [spo homesite set](./cmd/spo/homesite/homesite-set.mdx) as before with required option `siteUrl`.
 
+### Updated `homesite` commands and options
+
+In the beginning when SharePoint home sites were introduced, you could only setup one single home site per tenant.
+Nowadays, you can have multiple home sites in your tenant.
+To reflect this change, we had to update our `spo homesite` commands to always require a URL to identify the home site to work with.
+
+For the following commands, the `url` option is now required.
+
+- [spo homesite get](./cmd/spo/homesite/homesite-get.mdx)
+- [spo homesite remove](./cmd/spo/homesite/homesite-remove.mdx)
+
+Additionally, the `spo homesite remove` command will not return a command output anymore. Since the command output was more informative in the past, we decided to just drop it.
+
+Due to a change in the underlying API, the command output of `spo homesite get` has also been changed. Check the documentation for the latest output format.
+
+#### What action do I need to take?
+
+Update your scripts to use the required `url` option in `spo homesite get` and `spo homesite remove` commands.
+Additionally, update your scripts to handle the changed output of the `spo homesite get` command and the lack of output of the `spo homesite remove` command.
+
+
 ## Teams
 
 ### Ensure list output for `teams report` commands
