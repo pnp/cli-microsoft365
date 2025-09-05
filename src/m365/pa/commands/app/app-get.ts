@@ -126,7 +126,7 @@ class PaAppGetCommand extends PowerAppsCommand {
             return a.properties.displayName.toLowerCase() === `${args.options.displayName}`.toLowerCase();
           });
 
-          if (!!app) {
+          if (app) {
             await logger.log(this.setProperties(app));
           }
           else {

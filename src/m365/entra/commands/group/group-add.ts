@@ -87,7 +87,7 @@ class EntraGroupAddCommand extends GraphCommand {
 
         if (args.options.mailNickname) {
           if (!validation.isValidMailNickname(args.options.mailNickname)) {
-            return `Value for option 'mailNickname' must contain only characters in the ASCII character set 0-127 except the following: @ () \ [] " ; : <> , SPACE.`;
+            return `Value for option 'mailNickname' must contain only characters in the ASCII character set 0-127 except the following: @ () \\ [] " ; : <> , SPACE.`;
           }
 
           if (args.options.mailNickname.length > 64) {

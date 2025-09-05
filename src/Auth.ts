@@ -190,6 +190,7 @@ export class Auth {
       this._connection = Object.assign(this._connection, connection);
     }
     catch {
+      // Do nothing
     }
   }
 
@@ -383,16 +384,18 @@ export class Auth {
   }
 
   private retrieveAuthCodeWithBrowser(resource: string, logger: Logger, debug: boolean): Promise<InteractiveAuthorizationCodeResponse> {
-    return new Promise<InteractiveAuthorizationCodeResponse>(async (resolve: (error: InteractiveAuthorizationCodeResponse) => void, reject: (error: InteractiveAuthorizationErrorResponse) => void): Promise<void> => {
+    return new Promise<InteractiveAuthorizationCodeResponse>((resolve: (error: InteractiveAuthorizationCodeResponse) => void, reject: (error: InteractiveAuthorizationErrorResponse) => void): void => {
       // _authServer is never set before hitting this line, but this check
       // is implemented so that we can support lazy loading
       // but also stub it for testing
-      /* c8 ignore next 3 */
-      if (!this._authServer) {
-        this._authServer = (await import('./AuthServer.js')).default;
-      }
+      (async () => {
+        /* c8 ignore next 3 */
+        if (!this._authServer) {
+          this._authServer = (await import('./AuthServer.js')).default;
+        }
 
-      (this._authServer as AuthServer).initializeServer(this.connection, resource, resolve, reject, logger, debug);
+        (this._authServer as AuthServer).initializeServer(this.connection, resource, resolve, reject, logger, debug);
+      })().catch(reject);
     });
   }
 
@@ -515,7 +518,7 @@ export class Auth {
           this.connection.thumbprint = await this.calculateThumbprint(pemCert);
         }
       }
-      catch (e) {
+      catch {
         this.connection.certificateType = CertificateType.Binary;
       }
     }

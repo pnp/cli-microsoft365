@@ -72,7 +72,7 @@ export class FN021007_PKG_only_one_rush_stack_compiler_installed extends JsonRul
       return;
     }
 
-    const match = /@microsoft\/rush-stack-compiler[^\/]+/.exec(tsConfigExtends);
+    const match = /@microsoft\/rush-stack-compiler[^/]+/.exec(tsConfigExtends);
     if (!match) {
       return;
     }

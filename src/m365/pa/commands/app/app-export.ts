@@ -108,7 +108,7 @@ class PaAppExportCommand extends PowerPlatformCommand {
       let filename = args.options.name;
       if (args.options.packageDisplayName) {
         //Replace all illegal characters from the file name
-        const illegalCharsRegEx = /[\\\/:*?"<>|]/g;
+        const illegalCharsRegEx = /[\\/:*?"<>|]/g;
         filename = args.options.packageDisplayName.replace(illegalCharsRegEx, '_');
       }
 

@@ -34,7 +34,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
   // with a static GUID
   const replaceId = (str: string): string => {
     const id: string[] = [];
-    let s = str.replace(/(\"instanceId\\\"\:\\\")([^\\]+)(\\\")/g, (match: string, p1: string, p2: string, p3: string): string => {
+    let s = str.replace(/("instanceId\\":\\")([^\\]+)(\\")/g, (match: string, p1: string, p2: string, p3: string): string => {
       id.push(p2);
       return `${p1}89c644b3-f69c-4e84-85d7-dfa04c6163b5${p3}`;
     });

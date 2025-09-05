@@ -92,6 +92,7 @@ describe('utils/directoryExtension', () => {
       throw 'Invalid Request';
     });
 
-    await assert.rejects(directoryExtension.getDirectoryExtensionByName(invalidName, appObjectId)), Error(`The specified directory extension '${invalidName}' does not exist.`);
+    await assert.rejects(directoryExtension.getDirectoryExtensionByName(invalidName, appObjectId),
+      new Error(`The specified directory extension '${invalidName}' does not exist.`));
   });
 });

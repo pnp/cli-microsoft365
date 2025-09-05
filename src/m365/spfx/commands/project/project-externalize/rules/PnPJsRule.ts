@@ -66,7 +66,7 @@ export class PnPJsRule extends BasicDependencyRule {
       fileEdits.push(...files.map(x => ({
         action: "add",
         path: x,
-        targetValue: 'require(\"tslib\");'
+        targetValue: 'require("tslib");'
       } as FileEdit)));
     }
 
@@ -89,9 +89,11 @@ export class PnPJsRule extends BasicDependencyRule {
           ...moduleConfiguration,
           path: `https://unpkg.com/${moduleConfiguration.key}@${version}/dist/${moduleName.replace('@pnp/', '')}.es5.umd${moduleName === '@pnp/common' || moduleName === ' @pnp/pnpjs' ? '.bundle' : ''}.min.js`
         });
-        moduleConfiguration.globalDependencies && moduleConfiguration.globalDependencies.forEach(dependency => {
-          result.push(...this.getModuleAndParents(project, `@${dependency.replace('/', '.')}`));
-        });
+        if (moduleConfiguration.globalDependencies) {
+          moduleConfiguration.globalDependencies.forEach(dependency => {
+            result.push(...this.getModuleAndParents(project, `@${dependency.replace('/', '.')}`));
+          });
+        }
       }
     }
 

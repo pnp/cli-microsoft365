@@ -107,7 +107,7 @@ describe(commands.TERM_SET_LIST, () => {
           }, 67, {
             "_ObjectType_": "SP.Taxonomy.TermSetCollection", "_Child_Items_": [
               {
-                "_ObjectType_": "SP.Taxonomy.TermSet", "_ObjectIdentity_": "ec3f929e-2007-0000-2cdb-ebdf7451c224|fec14c62-7c3b-481b-851b-c80d7802b224:se:YU1+cBy9wUuh\u002ffzgFZGpUV45jw5Y\u002f0VNn\u002ffjMatyi+tHfBZ6NyvQQZTQ6WLBpPLt", "CreatedDate": "\/Date(1536839573337)\/", "Id": "\/Guid(7a167c47-2b37-41d0-94d0-e962c1a4f2ed)\/", "LastModifiedDate": "\/Date(1536840826883)\/", "Name": "PnP-CollabFooter-SharedLinks", "CustomProperties": {
+                "_ObjectType_": "SP.Taxonomy.TermSet", "_ObjectIdentity_": "ec3f929e-2007-0000-2cdb-ebdf7451c224|fec14c62-7c3b-481b-851b-c80d7802b224:se:YU1+cBy9wUuh\u002ffzgFZGpUV45jw5Y\u002f0VNn\u002ffjMatyi+tHfBZ6NyvQQZTQ6WLBpPLt", "CreatedDate": "/Date(1536839573337)/", "Id": "/Guid(7a167c47-2b37-41d0-94d0-e962c1a4f2ed)/", "LastModifiedDate": "/Date(1536840826883)/", "Name": "PnP-CollabFooter-SharedLinks", "CustomProperties": {
                   "_Sys_Nav_IsNavigationTermSet": "True"
                 }, "CustomSortOrder": "a359ee29-cf72-4235-a4ef-1ed96bf4eaea:60d165e6-8cb1-4c20-8fad-80067c4ca767:da7bfb84-008b-48ff-b61f-bfe40da2602f", "IsAvailableForTagging": true, "Owner": "i:0#.f|membership|admin@m365x035040.onmicrosoft.com", "Contact": "", "Description": "", "IsOpenForTermCreation": false, "Names": {
                   "1033": "PnP-CollabFooter-SharedLinks"
@@ -115,7 +115,7 @@ describe(commands.TERM_SET_LIST, () => {
 
                 ]
               }, {
-                "_ObjectType_": "SP.Taxonomy.TermSet", "_ObjectIdentity_": "ec3f929e-2007-0000-2cdb-ebdf7451c224|fec14c62-7c3b-481b-851b-c80d7802b224:se:YU1+cBy9wUuh\u002ffzgFZGpUV45jw5Y\u002f0VNn\u002ffjMatyi+ts4nkUgBOoQZGDcrxallG7", "CreatedDate": "\/Date(1536839575147)\/", "Id": "\/Guid(1479e26c-1380-41a8-9183-72bc5a9651bb)\/", "LastModifiedDate": "\/Date(1536840827383)\/", "Name": "PnP-Organizations", "CustomProperties": {
+                "_ObjectType_": "SP.Taxonomy.TermSet", "_ObjectIdentity_": "ec3f929e-2007-0000-2cdb-ebdf7451c224|fec14c62-7c3b-481b-851b-c80d7802b224:se:YU1+cBy9wUuh\u002ffzgFZGpUV45jw5Y\u002f0VNn\u002ffjMatyi+ts4nkUgBOoQZGDcrxallG7", "CreatedDate": "/Date(1536839575147)/", "Id": "/Guid(1479e26c-1380-41a8-9183-72bc5a9651bb)/", "LastModifiedDate": "/Date(1536840827383)/", "Name": "PnP-Organizations", "CustomProperties": {
 
                 }, "CustomSortOrder": "02cf219e-8ce9-4e85-ac04-a913a44a5d2b:247543b6-45f2-4232-b9e8-66c5bf53c31e:ffc3608f-1250-4d28-b388-381fad8d4602", "IsAvailableForTagging": true, "Owner": "i:0#.f|membership|admin@m365x035040.onmicrosoft.com", "Contact": "", "Description": "", "IsOpenForTermCreation": false, "Names": {
                   "1033": "PnP-Organizations"
@@ -202,7 +202,7 @@ describe(commands.TERM_SET_LIST, () => {
           }, 67, {
             "_ObjectType_": "SP.Taxonomy.TermSetCollection", "_Child_Items_": [
               {
-                "_ObjectType_": "SP.Taxonomy.TermSet", "_ObjectIdentity_": "ec3f929e-2007-0000-2cdb-ebdf7451c224|fec14c62-7c3b-481b-851b-c80d7802b224:se:YU1+cBy9wUuh\u002ffzgFZGpUV45jw5Y\u002f0VNn\u002ffjMatyi+tHfBZ6NyvQQZTQ6WLBpPLt", "CreatedDate": "\/Date(1536839573337)\/", "Id": "\/Guid(7a167c47-2b37-41d0-94d0-e962c1a4f2ed)\/", "LastModifiedDate": "\/Date(1536840826883)\/", "Name": "PnP-CollabFooter-SharedLinks", "CustomProperties": {
+                "_ObjectType_": "SP.Taxonomy.TermSet", "_ObjectIdentity_": "ec3f929e-2007-0000-2cdb-ebdf7451c224|fec14c62-7c3b-481b-851b-c80d7802b224:se:YU1+cBy9wUuh\u002ffzgFZGpUV45jw5Y\u002f0VNn\u002ffjMatyi+tHfBZ6NyvQQZTQ6WLBpPLt", "CreatedDate": "/Date(1536839573337)/", "Id": "/Guid(7a167c47-2b37-41d0-94d0-e962c1a4f2ed)/", "LastModifiedDate": "/Date(1536840826883)/", "Name": "PnP-CollabFooter-SharedLinks", "CustomProperties": {
                   "_Sys_Nav_IsNavigationTermSet": "True"
                 }, "CustomSortOrder": "a359ee29-cf72-4235-a4ef-1ed96bf4eaea:60d165e6-8cb1-4c20-8fad-80067c4ca767:da7bfb84-008b-48ff-b61f-bfe40da2602f", "IsAvailableForTagging": true, "Owner": "i:0#.f|membership|admin@m365x035040.onmicrosoft.com", "Contact": "", "Description": "", "IsOpenForTermCreation": false, "Names": {
                   "1033": "PnP-CollabFooter-SharedLinks"
@@ -210,7 +210,7 @@ describe(commands.TERM_SET_LIST, () => {
 
                 ]
               }, {
-                "_ObjectType_": "SP.Taxonomy.TermSet", "_ObjectIdentity_": "ec3f929e-2007-0000-2cdb-ebdf7451c224|fec14c62-7c3b-481b-851b-c80d7802b224:se:YU1+cBy9wUuh\u002ffzgFZGpUV45jw5Y\u002f0VNn\u002ffjMatyi+ts4nkUgBOoQZGDcrxallG7", "CreatedDate": "\/Date(1536839575147)\/", "Id": "\/Guid(1479e26c-1380-41a8-9183-72bc5a9651bb)\/", "LastModifiedDate": "\/Date(1536840827383)\/", "Name": "PnP-Organizations", "CustomProperties": {
+                "_ObjectType_": "SP.Taxonomy.TermSet", "_ObjectIdentity_": "ec3f929e-2007-0000-2cdb-ebdf7451c224|fec14c62-7c3b-481b-851b-c80d7802b224:se:YU1+cBy9wUuh\u002ffzgFZGpUV45jw5Y\u002f0VNn\u002ffjMatyi+ts4nkUgBOoQZGDcrxallG7", "CreatedDate": "/Date(1536839575147)/", "Id": "/Guid(1479e26c-1380-41a8-9183-72bc5a9651bb)/", "LastModifiedDate": "/Date(1536840827383)/", "Name": "PnP-Organizations", "CustomProperties": {
 
                 }, "CustomSortOrder": "02cf219e-8ce9-4e85-ac04-a913a44a5d2b:247543b6-45f2-4232-b9e8-66c5bf53c31e:ffc3608f-1250-4d28-b388-381fad8d4602", "IsAvailableForTagging": true, "Owner": "i:0#.f|membership|admin@m365x035040.onmicrosoft.com", "Contact": "", "Description": "", "IsOpenForTermCreation": false, "Names": {
                   "1033": "PnP-Organizations"
@@ -297,7 +297,7 @@ describe(commands.TERM_SET_LIST, () => {
           }, 67, {
             "_ObjectType_": "SP.Taxonomy.TermSetCollection", "_Child_Items_": [
               {
-                "_ObjectType_": "SP.Taxonomy.TermSet", "_ObjectIdentity_": "ec3f929e-2007-0000-2cdb-ebdf7451c224|fec14c62-7c3b-481b-851b-c80d7802b224:se:YU1+cBy9wUuh\u002ffzgFZGpUV45jw5Y\u002f0VNn\u002ffjMatyi+tHfBZ6NyvQQZTQ6WLBpPLt", "CreatedDate": "\/Date(1536839573337)\/", "Id": "\/Guid(7a167c47-2b37-41d0-94d0-e962c1a4f2ed)\/", "LastModifiedDate": "\/Date(1536840826883)\/", "Name": "PnP-CollabFooter-SharedLinks", "CustomProperties": {
+                "_ObjectType_": "SP.Taxonomy.TermSet", "_ObjectIdentity_": "ec3f929e-2007-0000-2cdb-ebdf7451c224|fec14c62-7c3b-481b-851b-c80d7802b224:se:YU1+cBy9wUuh\u002ffzgFZGpUV45jw5Y\u002f0VNn\u002ffjMatyi+tHfBZ6NyvQQZTQ6WLBpPLt", "CreatedDate": "/Date(1536839573337)/", "Id": "/Guid(7a167c47-2b37-41d0-94d0-e962c1a4f2ed)/", "LastModifiedDate": "/Date(1536840826883)/", "Name": "PnP-CollabFooter-SharedLinks", "CustomProperties": {
                   "_Sys_Nav_IsNavigationTermSet": "True"
                 }, "CustomSortOrder": "a359ee29-cf72-4235-a4ef-1ed96bf4eaea:60d165e6-8cb1-4c20-8fad-80067c4ca767:da7bfb84-008b-48ff-b61f-bfe40da2602f", "IsAvailableForTagging": true, "Owner": "i:0#.f|membership|admin@m365x035040.onmicrosoft.com", "Contact": "", "Description": "", "IsOpenForTermCreation": false, "Names": {
                   "1033": "PnP-CollabFooter-SharedLinks"
@@ -305,7 +305,7 @@ describe(commands.TERM_SET_LIST, () => {
 
                 ]
               }, {
-                "_ObjectType_": "SP.Taxonomy.TermSet", "_ObjectIdentity_": "ec3f929e-2007-0000-2cdb-ebdf7451c224|fec14c62-7c3b-481b-851b-c80d7802b224:se:YU1+cBy9wUuh\u002ffzgFZGpUV45jw5Y\u002f0VNn\u002ffjMatyi+ts4nkUgBOoQZGDcrxallG7", "CreatedDate": "\/Date(1536839575147)\/", "Id": "\/Guid(1479e26c-1380-41a8-9183-72bc5a9651bb)\/", "LastModifiedDate": "\/Date(1536840827383)\/", "Name": "PnP-Organizations", "CustomProperties": {
+                "_ObjectType_": "SP.Taxonomy.TermSet", "_ObjectIdentity_": "ec3f929e-2007-0000-2cdb-ebdf7451c224|fec14c62-7c3b-481b-851b-c80d7802b224:se:YU1+cBy9wUuh\u002ffzgFZGpUV45jw5Y\u002f0VNn\u002ffjMatyi+ts4nkUgBOoQZGDcrxallG7", "CreatedDate": "/Date(1536839575147)/", "Id": "/Guid(1479e26c-1380-41a8-9183-72bc5a9651bb)/", "LastModifiedDate": "/Date(1536840827383)/", "Name": "PnP-Organizations", "CustomProperties": {
 
                 }, "CustomSortOrder": "02cf219e-8ce9-4e85-ac04-a913a44a5d2b:247543b6-45f2-4232-b9e8-66c5bf53c31e:ffc3608f-1250-4d28-b388-381fad8d4602", "IsAvailableForTagging": true, "Owner": "i:0#.f|membership|admin@m365x035040.onmicrosoft.com", "Contact": "", "Description": "", "IsOpenForTermCreation": false, "Names": {
                   "1033": "PnP-Organizations"
@@ -392,7 +392,7 @@ describe(commands.TERM_SET_LIST, () => {
           }, 67, {
             "_ObjectType_": "SP.Taxonomy.TermSetCollection", "_Child_Items_": [
               {
-                "_ObjectType_": "SP.Taxonomy.TermSet", "_ObjectIdentity_": "ec3f929e-2007-0000-2cdb-ebdf7451c224|fec14c62-7c3b-481b-851b-c80d7802b224:se:YU1+cBy9wUuh\u002ffzgFZGpUV45jw5Y\u002f0VNn\u002ffjMatyi+tHfBZ6NyvQQZTQ6WLBpPLt", "CreatedDate": "\/Date(1536839573337)\/", "Id": "\/Guid(7a167c47-2b37-41d0-94d0-e962c1a4f2ed)\/", "LastModifiedDate": "\/Date(1536840826883)\/", "Name": "PnP-CollabFooter-SharedLinks", "CustomProperties": {
+                "_ObjectType_": "SP.Taxonomy.TermSet", "_ObjectIdentity_": "ec3f929e-2007-0000-2cdb-ebdf7451c224|fec14c62-7c3b-481b-851b-c80d7802b224:se:YU1+cBy9wUuh\u002ffzgFZGpUV45jw5Y\u002f0VNn\u002ffjMatyi+tHfBZ6NyvQQZTQ6WLBpPLt", "CreatedDate": "/Date(1536839573337)/", "Id": "/Guid(7a167c47-2b37-41d0-94d0-e962c1a4f2ed)/", "LastModifiedDate": "/Date(1536840826883)/", "Name": "PnP-CollabFooter-SharedLinks", "CustomProperties": {
                   "_Sys_Nav_IsNavigationTermSet": "True"
                 }, "CustomSortOrder": "a359ee29-cf72-4235-a4ef-1ed96bf4eaea:60d165e6-8cb1-4c20-8fad-80067c4ca767:da7bfb84-008b-48ff-b61f-bfe40da2602f", "IsAvailableForTagging": true, "Owner": "i:0#.f|membership|admin@m365x035040.onmicrosoft.com", "Contact": "", "Description": "", "IsOpenForTermCreation": false, "Names": {
                   "1033": "PnP-CollabFooter-SharedLinks"
@@ -400,7 +400,7 @@ describe(commands.TERM_SET_LIST, () => {
 
                 ]
               }, {
-                "_ObjectType_": "SP.Taxonomy.TermSet", "_ObjectIdentity_": "ec3f929e-2007-0000-2cdb-ebdf7451c224|fec14c62-7c3b-481b-851b-c80d7802b224:se:YU1+cBy9wUuh\u002ffzgFZGpUV45jw5Y\u002f0VNn\u002ffjMatyi+ts4nkUgBOoQZGDcrxallG7", "CreatedDate": "\/Date(1536839575147)\/", "Id": "\/Guid(1479e26c-1380-41a8-9183-72bc5a9651bb)\/", "LastModifiedDate": "\/Date(1536840827383)\/", "Name": "PnP-Organizations", "CustomProperties": {
+                "_ObjectType_": "SP.Taxonomy.TermSet", "_ObjectIdentity_": "ec3f929e-2007-0000-2cdb-ebdf7451c224|fec14c62-7c3b-481b-851b-c80d7802b224:se:YU1+cBy9wUuh\u002ffzgFZGpUV45jw5Y\u002f0VNn\u002ffjMatyi+ts4nkUgBOoQZGDcrxallG7", "CreatedDate": "/Date(1536839575147)/", "Id": "/Guid(1479e26c-1380-41a8-9183-72bc5a9651bb)/", "LastModifiedDate": "/Date(1536840827383)/", "Name": "PnP-Organizations", "CustomProperties": {
 
                 }, "CustomSortOrder": "02cf219e-8ce9-4e85-ac04-a913a44a5d2b:247543b6-45f2-4232-b9e8-66c5bf53c31e:ffc3608f-1250-4d28-b388-381fad8d4602", "IsAvailableForTagging": true, "Owner": "i:0#.f|membership|admin@m365x035040.onmicrosoft.com", "Contact": "", "Description": "", "IsOpenForTermCreation": false, "Names": {
                   "1033": "PnP-Organizations"
@@ -487,7 +487,7 @@ describe(commands.TERM_SET_LIST, () => {
           }, 67, {
             "_ObjectType_": "SP.Taxonomy.TermSetCollection", "_Child_Items_": [
               {
-                "_ObjectType_": "SP.Taxonomy.TermSet", "_ObjectIdentity_": "ec3f929e-2007-0000-2cdb-ebdf7451c224|fec14c62-7c3b-481b-851b-c80d7802b224:se:YU1+cBy9wUuh\u002ffzgFZGpUV45jw5Y\u002f0VNn\u002ffjMatyi+tHfBZ6NyvQQZTQ6WLBpPLt", "CreatedDate": "\/Date(1536839573337)\/", "Id": "\/Guid(7a167c47-2b37-41d0-94d0-e962c1a4f2ed)\/", "LastModifiedDate": "\/Date(1536840826883)\/", "Name": "PnP-CollabFooter-SharedLinks", "CustomProperties": {
+                "_ObjectType_": "SP.Taxonomy.TermSet", "_ObjectIdentity_": "ec3f929e-2007-0000-2cdb-ebdf7451c224|fec14c62-7c3b-481b-851b-c80d7802b224:se:YU1+cBy9wUuh\u002ffzgFZGpUV45jw5Y\u002f0VNn\u002ffjMatyi+tHfBZ6NyvQQZTQ6WLBpPLt", "CreatedDate": "/Date(1536839573337)/", "Id": "/Guid(7a167c47-2b37-41d0-94d0-e962c1a4f2ed)/", "LastModifiedDate": "/Date(1536840826883)/", "Name": "PnP-CollabFooter-SharedLinks", "CustomProperties": {
                   "_Sys_Nav_IsNavigationTermSet": "True"
                 }, "CustomSortOrder": "a359ee29-cf72-4235-a4ef-1ed96bf4eaea:60d165e6-8cb1-4c20-8fad-80067c4ca767:da7bfb84-008b-48ff-b61f-bfe40da2602f", "IsAvailableForTagging": true, "Owner": "i:0#.f|membership|admin@m365x035040.onmicrosoft.com", "Contact": "", "Description": "", "IsOpenForTermCreation": false, "Names": {
                   "1033": "PnP-CollabFooter-SharedLinks"
@@ -495,7 +495,7 @@ describe(commands.TERM_SET_LIST, () => {
 
                 ]
               }, {
-                "_ObjectType_": "SP.Taxonomy.TermSet", "_ObjectIdentity_": "ec3f929e-2007-0000-2cdb-ebdf7451c224|fec14c62-7c3b-481b-851b-c80d7802b224:se:YU1+cBy9wUuh\u002ffzgFZGpUV45jw5Y\u002f0VNn\u002ffjMatyi+ts4nkUgBOoQZGDcrxallG7", "CreatedDate": "\/Date(1536839575147)\/", "Id": "\/Guid(1479e26c-1380-41a8-9183-72bc5a9651bb)\/", "LastModifiedDate": "\/Date(1536840827383)\/", "Name": "PnP-Organizations", "CustomProperties": {
+                "_ObjectType_": "SP.Taxonomy.TermSet", "_ObjectIdentity_": "ec3f929e-2007-0000-2cdb-ebdf7451c224|fec14c62-7c3b-481b-851b-c80d7802b224:se:YU1+cBy9wUuh\u002ffzgFZGpUV45jw5Y\u002f0VNn\u002ffjMatyi+ts4nkUgBOoQZGDcrxallG7", "CreatedDate": "/Date(1536839575147)/", "Id": "/Guid(1479e26c-1380-41a8-9183-72bc5a9651bb)/", "LastModifiedDate": "/Date(1536840827383)/", "Name": "PnP-Organizations", "CustomProperties": {
 
                 }, "CustomSortOrder": "02cf219e-8ce9-4e85-ac04-a913a44a5d2b:247543b6-45f2-4232-b9e8-66c5bf53c31e:ffc3608f-1250-4d28-b388-381fad8d4602", "IsAvailableForTagging": true, "Owner": "i:0#.f|membership|admin@m365x035040.onmicrosoft.com", "Contact": "", "Description": "", "IsOpenForTermCreation": false, "Names": {
                   "1033": "PnP-Organizations"
@@ -656,3 +656,4 @@ describe(commands.TERM_SET_LIST, () => {
     await assert.rejects(command.action(logger, { options: { termGroupId: '0e8f395e-ff58-4d45-9ff7-e331ab728beb' } } as any), new CommandError('getRequestDigest error'));
   });
 });
+

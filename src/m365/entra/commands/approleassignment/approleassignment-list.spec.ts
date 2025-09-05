@@ -361,7 +361,7 @@ class InternalRequestStub {
 }
 
 class RequestStub {
-  static retrieveAppRoles = (async (opts: any) => {
+  static retrieveAppRoles = (async (opts: any): Promise<any> => {
     // we need to fake three calls:
     // 1. query the service principal endpoint based on input parameters
     // 2. get the service principal for the assigned resource(s)
