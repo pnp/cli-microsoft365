@@ -16,6 +16,15 @@ The [spo homesite set](./cmd/spo/homesite/homesite-set.mdx) command has been upd
 - **For adding new home sites**: Use the new [spo homesite add](./cmd/spo/homesite/homesite-add.mdx) command instead
 - **For updating existing home sites**: Continue using [spo homesite set](./cmd/spo/homesite/homesite-set.mdx) as before with required option `siteUrl`.
 
+### `spo list view add` default paged option changed
+
+The [spo list view add](./cmd/spo/list/list-view-add.mdx) command has been updated to change the default value of the `paged` option from `false` to `true`. This change reflects the common usage pattern where most views allow paging and fetch new items while scrolling down.
+
+#### What action do I need to take?
+
+- **If you want paged views (most common)**: No action required as this is now the default behavior
+- **If you want static views**: Explicitly specify `--paged false` when creating views that should not fetch new items while scrolling
+
 ## Teams
 
 ### Ensure list output for `teams report` commands
