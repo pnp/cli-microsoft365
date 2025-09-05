@@ -36,7 +36,7 @@ class PpEnvironmentGetCommand extends PowerPlatformCommand {
 
   public getRefinedSchema(schema: typeof options): z.ZodEffects<any> | undefined {
     return schema
-      .refine(options => !options.name !== !options.default, {
+      .refine(options => !!options.name !== !!options.default, {
         message: `Specify either name or default, but not both.`
       });
   }

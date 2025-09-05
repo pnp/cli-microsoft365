@@ -111,10 +111,10 @@ describe(commands.ENVIRONMENT_GET, () => {
     });
 
     await command.action(logger, {
-      options: commandOptionsSchema.parse({
+      options: {
         verbose: true,
         default: true
-      })
+      }
     });
     assert(loggerLogSpy.calledWith(env));
   });
@@ -135,10 +135,10 @@ describe(commands.ENVIRONMENT_GET, () => {
     });
 
     await command.action(logger, {
-      options: commandOptionsSchema.parse({
+      options: {
         verbose: true,
         name: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c5'
-      })
+      }
     });
     assert(loggerLogSpy.calledWith(env));
   });
@@ -152,9 +152,9 @@ describe(commands.ENVIRONMENT_GET, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: commandOptionsSchema.parse({
+      options: {
         name: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6'
-      })
+      }
     }), new CommandError(`Access to the environment 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6' is denied.`));
   });
 
@@ -171,9 +171,9 @@ describe(commands.ENVIRONMENT_GET, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: commandOptionsSchema.parse({
+      options: {
         name: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c5'
-      })
+      }
     }), new CommandError('An error has occurred'));
   });
 });

@@ -140,10 +140,10 @@ describe(commands.ENVIRONMENT_GET, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: commandOptionsSchema.parse({
+      options: {
         debug: true,
         name: environmentName
-      })
+      }
     }), new CommandError(errorMessage));
   });
 
@@ -161,10 +161,10 @@ describe(commands.ENVIRONMENT_GET, () => {
     });
 
     await command.action(logger, {
-      options: commandOptionsSchema.parse({
+      options: {
         name: environmentName,
         verbose: true
-      })
+      }
     });
     assert(loggerLogSpy.calledWith(environmentResponse));
   });
@@ -183,10 +183,10 @@ describe(commands.ENVIRONMENT_GET, () => {
     });
 
     await command.action(logger, {
-      options: commandOptionsSchema.parse({
+      options: {
         default: true,
         verbose: true
-      })
+      }
     });
     assert(loggerLogSpy.calledWith(environmentResponse));
   });
@@ -205,11 +205,11 @@ describe(commands.ENVIRONMENT_GET, () => {
     });
 
     await command.action(logger, {
-      options: commandOptionsSchema.parse({
+      options: {
         name: environmentName,
         asAdmin: true,
         verbose: true
-      })
+      }
     });
 
     assert(loggerLogSpy.calledWith(environmentResponse));

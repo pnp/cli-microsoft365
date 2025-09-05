@@ -106,6 +106,18 @@ Update your scripts to expect an array of items.
 
 ## General
 
+### Changed the way to retrieve default environments
+
+We've changed how Power Platform commands retrieve default environments for consistency across our commands. Previously, some commands would return the default environment when you didn't specify any options. Now, you need to explicitly specify the `--default` option to get the default environment.
+
+#### What action do I need to take?
+
+Update your scripts to include the `--default` option when you want to retrieve the default environment from the following commands:
+
+- [pp environment get](./cmd/pp/environment/environment-get.mdx)
+- [flow environment get](./cmd/flow/environment/environment-get.mdx)
+- [pa environment get](./cmd/pa/environment/environment-get.mdx)
+
 ### Ensured output for `list` commands
 
 We noticed that some of the `list` commands were not returning any output when no items were found. We've updated all `list` commands to return an empty array when no items are found.
