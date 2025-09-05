@@ -1,47 +1,34 @@
 import { Logger } from '../../../../cli/Logger.js';
-import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
-import { spe } from '../../../../utils/spe.js';
-import { spo } from '../../../../utils/spo.js';
+import GraphDelegatedCommand from '../../../base/GraphDelegatedCommand.js';
+import { odata } from '../../../../utils/odata.js';
 
-class SpeContainerTypeListCommand extends SpoCommand {
+class SpeContainerTypeListCommand extends GraphDelegatedCommand {
 
   public get name(): string {
     return commands.CONTAINERTYPE_LIST;
   }
 
   public get description(): string {
-    return 'Lists all Container Types';
+    return 'Lists all container types';
   }
 
   public defaultProperties(): string[] | undefined {
-    return ['ContainerTypeId', 'DisplayName', 'OwningAppId'];
+    return ['id', 'name', 'owningAppId'];
   }
 
   public async commandAction(logger: Logger): Promise<void> {
     try {
-      const spoAdminUrl = await spo.getSpoAdminUrl(logger, this.debug);
-
       if (this.verbose) {
         await logger.logToStderr(`Retrieving list of Container types...`);
       }
 
-      const allContainerTypes = await spe.getAllContainerTypes(spoAdminUrl);
+      const containerTypes = await odata.getAllItems<any>(`${this.resource}/beta/storage/fileStorage/containerTypes`);
 
-      // The following conversion is done in order not to make breaking changes
-      const result = allContainerTypes.map(ct => ({
-        _ObjectType_: 'Microsoft.Online.SharePoint.TenantAdministration.SPContainerTypeProperties',
-        ...ct,
-        AzureSubscriptionId: `/Guid(${ct.AzureSubscriptionId})/`,
-        ContainerTypeId: `/Guid(${ct.ContainerTypeId})/`,
-        OwningAppId: `/Guid(${ct.OwningAppId})/`,
-        OwningTenantId: `/Guid(${ct.OwningTenantId})/`
-      }));
-
-      await logger.log(result);
+      await logger.log(containerTypes);
     }
     catch (err: any) {
-      this.handleRejectedPromise(err);
+      this.handleRejectedODataJsonPromise(err);
     }
   }
 }

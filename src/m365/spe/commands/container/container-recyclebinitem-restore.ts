@@ -3,9 +3,8 @@ import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
 import commands from '../../commands.js';
 import { validation } from '../../../../utils/validation.js';
-import { spo } from '../../../../utils/spo.js';
 import GraphCommand from '../../../base/GraphCommand.js';
-import { ContainerProperties, spe } from '../../../../utils/spe.js';
+import { SpeContainer, spe } from '../../../../utils/spe.js';
 import { odata } from '../../../../utils/odata.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { cli } from '../../../../cli/cli.js';
@@ -89,7 +88,7 @@ class SpeContainerRecycleBinItemRestoreCommand extends GraphCommand {
 
     const containerTypeId = await this.getContainerTypeId(options, logger);
 
-    const containers = await odata.getAllItems<ContainerProperties>(`${this.resource}/v1.0/storage/fileStorage/deletedContainers?$filter=containerTypeId eq ${containerTypeId}&$select=id,displayName`);
+    const containers = await odata.getAllItems<SpeContainer>(`${this.resource}/v1.0/storage/fileStorage/deletedContainers?$filter=containerTypeId eq ${containerTypeId}&$select=id,displayName`);
     const matchingContainers = containers.filter(c => c.displayName.toLowerCase() === options.name!.toLowerCase());
 
     if (matchingContainers.length === 0) {
@@ -98,7 +97,7 @@ class SpeContainerRecycleBinItemRestoreCommand extends GraphCommand {
 
     if (matchingContainers.length > 1) {
       const containerKeyValuePair = formatting.convertArrayToHashTable('id', matchingContainers);
-      const container = await cli.handleMultipleResultsFound<ContainerProperties>(`Multiple containers with name '${options.name}' found.`, containerKeyValuePair);
+      const container = await cli.handleMultipleResultsFound<SpeContainer>(`Multiple containers with name '${options.name}' found.`, containerKeyValuePair);
       return container.id;
     }
 
@@ -114,8 +113,7 @@ class SpeContainerRecycleBinItemRestoreCommand extends GraphCommand {
       await logger.logToStderr(`Getting container type with name '${options.containerTypeName}'...`);
     }
 
-    const adminUrl = await spo.getSpoAdminUrl(logger, this.verbose);
-    return spe.getContainerTypeIdByName(adminUrl, options.containerTypeName!);
+    return spe.getContainerTypeIdByName(options.containerTypeName!);
   }
 }
 

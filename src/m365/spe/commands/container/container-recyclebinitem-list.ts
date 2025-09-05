@@ -3,7 +3,6 @@ import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
 import commands from '../../commands.js';
 import { validation } from '../../../../utils/validation.js';
-import { spo } from '../../../../utils/spo.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import { spe } from '../../../../utils/spe.js';
 import { odata } from '../../../../utils/odata.js';
@@ -73,8 +72,7 @@ class SpeContainerRecycleBinItemListCommand extends GraphCommand {
       await logger.logToStderr(`Retrieving container type id for container type '${options.containerTypeName}'...`);
     }
 
-    const adminUrl = await spo.getSpoAdminUrl(logger, this.verbose);
-    return spe.getContainerTypeIdByName(adminUrl, options.containerTypeName!);
+    return spe.getContainerTypeIdByName(options.containerTypeName!);
   }
 }
 
