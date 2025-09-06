@@ -16,8 +16,7 @@ describe(commands.PEOPLE_PROFILECARDPROPERTY_LIST, () => {
   const profileCardPropertyName2 = 'customAttribute2';
 
   //#region Mocked responses
-  const response =
-  {
+  const response = {
     value: [
       {
         directoryPropertyName: profileCardPropertyName1,

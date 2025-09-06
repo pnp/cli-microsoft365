@@ -191,7 +191,7 @@ class SpoPageAddCommand extends SpoCommand {
             };
             await request.post(requestOptions);
             break;
-          case 'NewsPage':
+          case 'NewsPage': {
             const listItemSetOptions: any = {
               FirstPublishedDate: new Date().toISOString()
             };
@@ -200,7 +200,8 @@ class SpoPageAddCommand extends SpoCommand {
 
             await spo.systemUpdateListItem(requestUrl, listItemId, logger, this.verbose, listItemSetOptions);
             break;
-          case 'Template':
+          }
+          case 'Template': {
             requestOptions.url = `${args.options.webUrl}/_api/SitePages/Pages(${listItemId})/SavePageAsTemplate`;
             requestOptions.headers = {
               'X-RequestDigest': requestDigest,
@@ -226,6 +227,7 @@ class SpoPageAddCommand extends SpoCommand {
 
             await request.post(requestOptions);
             break;
+          }
         }
       }
 

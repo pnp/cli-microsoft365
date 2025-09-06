@@ -33,7 +33,7 @@ describe(commands.CONTAINERTYPE_ADD, () => {
 
   const csomContainerAlreadyExistsError = `[{"SchemaVersion":"15.0.0.0","LibraryVersion":"16.0.24621.12009","ErrorInfo":{"ErrorMessage":"${errorMessageContainerAlreadyExists}","ErrorValue":null,"TraceCorrelationId":"380514a1-50e2-8000-6705-77935619cb19","ErrorCode":-2146232832,"ErrorTypeName":"Microsoft.SharePoint.SPException"},"TraceCorrelationId":"380514a1-50e2-8000-6705-77935619cb19"}]`;
   const csomTrialError = `[{"SchemaVersion":"15.0.0.0","LibraryVersion":"16.0.24621.12009","ErrorInfo":{"ErrorMessage":"${errorMessageTooManyContainers}","ErrorValue":null,"TraceCorrelationId":"df0214a1-d093-8000-4a04-15fbbddb489b","ErrorCode":-2146232832,"ErrorTypeName":"Microsoft.SharePoint.SPException"},"TraceCorrelationId":"df0214a1-d093-8000-4a04-15fbbddb489b"}]`;
-  const csomOutput = `[{"SchemaVersion":"15.0.0.0","LibraryVersion":"16.0.24621.12009","ErrorInfo":null,"TraceCorrelationId":"1dfe13a1-9073-8000-4a04-123c4e4bf45e"},4,{"_ObjectType_":"Microsoft.Online.SharePoint.TenantAdministration.SPContainerTypeProperties","AzureSubscriptionId":"\/Guid(${azureSubscriptionId})\/","ContainerTypeId":"\/Guid(fafa338d-8bd5-04fe-3ea1-763649bff2df)\/","CreationDate":"3\u002f11\u002f2024 1:30:21 PM","DisplayName":"${containerName}","ExpiryDate":null,"IsBillingProfileRequired":true,"OwningAppId":"\/Guid(${applicationId})\/","OwningTenantId":"\/Guid(e1dd4023-a656-480a-8a0e-c1b1eec51e1d)\/","Region":"${region}","ResourceGroup":"${resourceGroup}","SPContainerTypeBillingClassification":0}]`;
+  const csomOutput = `[{"SchemaVersion":"15.0.0.0","LibraryVersion":"16.0.24621.12009","ErrorInfo":null,"TraceCorrelationId":"1dfe13a1-9073-8000-4a04-123c4e4bf45e"},4,{"_ObjectType_":"Microsoft.Online.SharePoint.TenantAdministration.SPContainerTypeProperties","AzureSubscriptionId":"/Guid(${azureSubscriptionId})/","ContainerTypeId":"/Guid(fafa338d-8bd5-04fe-3ea1-763649bff2df)/","CreationDate":"3\u002f11\u002f2024 1:30:21 PM","DisplayName":"${containerName}","ExpiryDate":null,"IsBillingProfileRequired":true,"OwningAppId":"/Guid(${applicationId})/","OwningTenantId":"/Guid(e1dd4023-a656-480a-8a0e-c1b1eec51e1d)/","Region":"${region}","ResourceGroup":"${resourceGroup}","SPContainerTypeBillingClassification":0}]`;
 
   const jsonResponse = {
     AzureSubscriptionId: azureSubscriptionId,
@@ -181,3 +181,4 @@ describe(commands.CONTAINERTYPE_ADD, () => {
     assert.strictEqual(actual, true);
   });
 });
+

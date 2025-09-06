@@ -29,7 +29,7 @@ describe(commands.LISTITEM_ISRECORD, () => {
   let commandInfo: CommandInfo;
   let loggerLogToStderrSpy: sinon.SinonSpy;
 
-  const postFakes = async (opts: any) => {
+  const postFakes = async (opts: any): Promise<string> => {
     // requestObjectIdentity mock
     if (opts.data.indexOf('Name="Current"') > -1) {
       if ((opts.url as string).indexOf('returnerror.sharepoint.com') > -1) {
@@ -80,7 +80,7 @@ describe(commands.LISTITEM_ISRECORD, () => {
     return Promise.reject('Invalid request');
   };
 
-  const getFakes = async (opts: any) => {
+  const getFakes = async (opts: any): Promise<{ Id: string }> => {
     // Get list mock
     if ((opts.url as string).indexOf('/_api/web/lists') > -1 &&
       (opts.url as string).indexOf('$select=Id') > -1) {

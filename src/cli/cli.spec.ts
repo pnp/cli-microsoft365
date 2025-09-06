@@ -1399,8 +1399,7 @@ describe('cli', () => {
   });
 
   it('formats a simple object as csv', async () => {
-    const input =
-    {
+    const input = {
       "header1": "value1item1",
       "header2": "value2item1"
     };
@@ -1410,8 +1409,7 @@ describe('cli', () => {
   });
 
   it('does not produce headers when csvHeader config is set to false ', async () => {
-    const input =
-    {
+    const input = {
       "header1": "value1item1",
       "header2": "value2item1"
     };
@@ -1428,8 +1426,7 @@ describe('cli', () => {
   });
 
   it('quotes all non-empty fields even if not required when csvQuoted config is set to true', async () => {
-    const input =
-    {
+    const input = {
       "header1": "value1item1",
       "header2": "value2item1"
     };
@@ -1446,8 +1443,7 @@ describe('cli', () => {
   });
 
   it('quotes all empty fields if csvQuotedEmpty config is set to true', async () => {
-    const input =
-    {
+    const input = {
       "header1": "value1item1",
       "header2": ""
     };
@@ -1464,8 +1460,7 @@ describe('cli', () => {
   });
 
   it('quotes all fields with character set in csvQuote config', async () => {
-    const input =
-    {
+    const input = {
       "header1": "value1item1",
       "header2": "value2item1"
     };
@@ -1592,24 +1587,22 @@ describe('cli', () => {
   });
 
   it('formats object with array as md', async () => {
-    const input =
-      [{
-        "header1": "value1item1",
-        "header2": "value2item1"
-      },
-      {
-        "header1": "value1item2",
-        "header2": "value2item2"
-      }
-      ];
+    const input = [{
+      "header1": "value1item1",
+      "header2": "value2item1"
+    },
+    {
+      "header1": "value1item2",
+      "header2": "value2item2"
+    }
+    ];
     const actual = await cli.formatOutput(mockCommand, input, { output: 'md' });
     const match = actual.match(/^## /gm);
     assert.strictEqual(match, null);
   });
 
   it('formats a simple object as md', async () => {
-    const input =
-    {
+    const input = {
       "header1": "value1item1",
       "header2": "value2item1"
     };
@@ -1853,7 +1846,7 @@ describe('cli', () => {
       await cli.closeWithError(new CommandError('Error'), { options: { output: 'json' } });
       assert.fail(`Didn't fail while expected`);
     }
-    catch (err) {
+    catch {
       assert(cliErrorStub.calledWith(JSON.stringify({ error: 'Error' })));
     }
   });

@@ -56,7 +56,7 @@ describe(commands.LISTITEM_LIST, () => {
   const expectedArrayLength = 2;
   let returnArrayLength = 0;
 
-  const postFakes = async (opts: any) => {
+  const postFakes = async (opts: any): Promise<any> => {
     if (opts.url.indexOf('/_api/web/lists') > -1) {
       if ((opts.url as string).indexOf('/GetItems') > -1) {
         returnArrayLength = 2;
@@ -67,7 +67,7 @@ describe(commands.LISTITEM_LIST, () => {
     throw 'Invalid request';
   };
 
-  const getFakes = async (opts: any) => {
+  const getFakes = async (opts: any): Promise<any> => {
     if (opts.url.indexOf('/_api/web/lists') > -1) {
       if ((opts.url as string).indexOf('/items') > -1 && (opts.url as string).indexOf('$top=6') > -1) {
         returnArrayLength = 0;

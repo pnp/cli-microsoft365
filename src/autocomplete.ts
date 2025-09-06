@@ -25,7 +25,9 @@ class Autocomplete {
         const data: string = fs.readFileSync(Autocomplete.autocompleteFilePath, 'utf-8');
         this.commands = JSON.parse(data);
       }
-      catch { }
+      catch {
+        // Do nothing
+      }
     }
 
     this.omelette = omelette('m365_comp|m365|microsoft365');
@@ -70,7 +72,9 @@ class Autocomplete {
           replies = Object.keys(replies);
         }
       }
-      catch { }
+      catch {
+        // Do nothing
+      }
     }
 
     if (!replies) {
