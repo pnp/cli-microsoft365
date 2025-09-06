@@ -44,10 +44,10 @@
 - **Docs**: Docusaurus, see `docs/` and `docs/docusaurus.config.ts`.
 
 ## Examples
-- Add a new command: create a class in the appropriate `src/m365/<workload>/commands/` folder, extend `Command`, implement `commandAction`, register options, and ensure it is discoverable. Create a test file next to the command file. Create a reference page in the documentation in `docs/docs/cmd/<workload>`. The reference page file name is the same as the command file name, but with the `.mdx` extension.
+- Add a new command: Get the latest information about building commands from [the docs](../docs/docs/contribute/new-command/build-command-logic.mdx). Create a class in the appropriate `src/m365/<workload>/commands/` folder, extend `Command`, implement `commandAction`, register options, and ensure it is discoverable. Create a test file next to the command file. Create a reference page in the documentation in `docs/docs/cmd/<workload>`. The reference page file name is the same as the command file name, but with the `.mdx` extension.
 - Add a global option: update `src/GlobalOptions.ts` and propagate to command parsing in `src/cli/cli.ts`.
 
 ## References
 - [Main README](../README.md)
-- [Contributing Guide](../CONTRIBUTING.md)
+- [Contributing Guide](../docs/docs/contribute/contributing-guide.mdx)
 - [Docs site](https://pnp.github.io/cli-microsoft365/)
