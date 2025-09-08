@@ -6,21 +6,29 @@ sidebar_position: 4
 
 ## v11.0.0 (beta)
 
+### New commands
+
 **Outlook:**
 
 - [outlook mail searchfolder add](../cmd/outlook/mail/mail-searchfolder-add.mdx) - creates a new mail search folder in the user's mailbox [#6276](https://github.com/pnp/cli-microsoft365/issues/6276)
+
+**SharePoint:**
+
+- [spo file version keep](../cmd/spo/file/file-version-keep.mdx) - ensure that a specific file version will never expire [#6774](https://github.com/pnp/cli-microsoft365/issues/6774)
 
 ### Changes
 
 - added CLI for Microsoft 365 MCP server guide [#6817](https://github.com/pnp/cli-microsoft365/pull/6817)
 - fixed dependabot updates
-- added additional platform options to `entra app add command`. [6570](https://github.com/pnp/cli-microsoft365/issues/6570)
+- added additional platform options to [entra app add](../cmd/entra/app/app-add.mdx) command [6570](https://github.com/pnp/cli-microsoft365/issues/6570)
 
 ### ⚠️ Breaking changes
 
  - updated [spo homesite set](../cmd/spo/homesite/homesite-set.mdx) command to work with multiple home sites [#6489](https://github.com/pnp/cli-microsoft365/issues/6489)
  - ensured `list` commands always have an output [#6824](https://github.com/pnp/cli-microsoft365/issues/6824)
- - updated `teams report` commands to return an array of items [#6739](https://github.com/pnp/cli-microsoft365/issues/6739)
+ - updated `teams report` commands to return an array of items for `get` commands [#6739](https://github.com/pnp/cli-microsoft365/issues/6739)
+ - updated the default value of the `paged` option for [spo list view add](../cmd/spo/list/list-view-add.mdx) [#6741](https://github.com/pnp/cli-microsoft365/issues/6741)
+ - updated the way to retrieve default objects [#6545](https://github.com/pnp/cli-microsoft365/issues/6545)
  - removed `viva engage group` commands [#6285](https://github.com/pnp/cli-microsoft365/issues/6285)
  - removed deprecated commands [#6577](https://github.com/pnp/cli-microsoft365/issues/6577)
  - removed `pp card` commands [#6852](https://github.com/pnp/cli-microsoft365/issues/6852)
