@@ -21,6 +21,7 @@ export default {
     'https://graph.microsoft.com/ExternalConnection.ReadWrite.All',
     'https://graph.microsoft.com/ExternalItem.ReadWrite.All',
     'https://graph.microsoft.com/FileStorageContainer.Selected',
+    'https://graph.microsoft.com/FileStorageContainerType.Manage.All',
     'https://graph.microsoft.com/Group.ReadWrite.All',
     'https://graph.microsoft.com/IdentityProvider.ReadWrite.All',
     'https://graph.microsoft.com/InformationProtectionPolicy.Read',

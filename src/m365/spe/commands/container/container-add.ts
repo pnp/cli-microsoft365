@@ -5,7 +5,6 @@ import { Logger } from '../../../../cli/Logger.js';
 import commands from '../../commands.js';
 import { validation } from '../../../../utils/validation.js';
 import { spe } from '../../../../utils/spe.js';
-import { spo } from '../../../../utils/spo.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 
@@ -96,8 +95,7 @@ class SpeContainerAddCommand extends GraphCommand {
       await logger.logToStderr(`Getting container type with name '${options.containerTypeName}'...`);
     }
 
-    const adminUrl = await spo.getSpoAdminUrl(logger, this.verbose);
-    return spe.getContainerTypeIdByName(adminUrl, options.containerTypeName!);
+    return spe.getContainerTypeIdByName(options.containerTypeName!);
   }
 }
 

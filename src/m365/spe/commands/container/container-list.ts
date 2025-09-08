@@ -5,8 +5,7 @@ import { odata } from '../../../../utils/odata.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
-import { ContainerProperties, spe } from '../../../../utils/spe.js';
-import { spo } from '../../../../utils/spo.js';
+import { SpeContainer, spe } from '../../../../utils/spe.js';
 
 interface CommandArgs {
   options: Options;
@@ -87,7 +86,7 @@ class SpeContainerListCommand extends GraphCommand {
       }
 
       const containerTypeId = await this.getContainerTypeId(logger, args.options);
-      const allContainers = await odata.getAllItems<ContainerProperties>(`${this.resource}/v1.0/storage/fileStorage/containers?$filter=containerTypeId eq ${formatting.encodeQueryParameter(containerTypeId)}`);
+      const allContainers = await odata.getAllItems<SpeContainer>(`${this.resource}/v1.0/storage/fileStorage/containers?$filter=containerTypeId eq ${formatting.encodeQueryParameter(containerTypeId)}`);
       await logger.log(allContainers);
     }
     catch (err: any) {
@@ -100,8 +99,7 @@ class SpeContainerListCommand extends GraphCommand {
       return options.containerTypeId;
     }
 
-    const spoAdminUrl = await spo.getSpoAdminUrl(logger, this.debug);
-    return spe.getContainerTypeIdByName(spoAdminUrl, options.containerTypeName!);
+    return spe.getContainerTypeIdByName(options.containerTypeName!);
   }
 }
 

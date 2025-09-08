@@ -53,7 +53,6 @@ describe(commands.CONTAINER_RECYCLEBINITEM_LIST, () => {
     sinon.stub(spe, 'getContainerTypeIdByName').resolves(containerTypeId);
 
     auth.connection.active = true;
-    auth.connection.spoUrl = 'https://contoso.sharepoint.com';
     commandInfo = cli.getCommandInfo(command);
     commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
   });
@@ -83,7 +82,6 @@ describe(commands.CONTAINER_RECYCLEBINITEM_LIST, () => {
   after(() => {
     sinon.restore();
     auth.connection.active = false;
-    auth.connection.spoUrl = undefined;
   });
 
   it('has correct name', () => {
