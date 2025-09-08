@@ -115,68 +115,13 @@ describe(commands.GROUP_MEMBER_SET, () => {
   });
 
   it('passes validation when all required parameters are valid with names', async () => {
-    const actual = await command.validate({ options: { groupDisplayName: 'IT department', userNames: userUpns.join(','), role: 'Owner' } }, commandInfo);
+    const actual = await command.validate({ options: { groupName: 'IT department', userNames: userUpns.join(','), role: 'Owner' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('passes validation when all required parameters are valid with names with trailing spaces', async () => {
-    const actual = await command.validate({ options: { groupDisplayName: 'IT department', userNames: userUpns.map(u => u + ' ').join(','), role: 'Owner' } }, commandInfo);
+    const actual = await command.validate({ options: { groupName: 'IT department', userNames: userUpns.map(u => u + ' ').join(','), role: 'Owner' } }, commandInfo);
     assert.strictEqual(actual, true);
-  });
-
-  it(`correctly shows deprecation warning for option 'groupDisplayName'`, async () => {
-    const chalk = (await import('chalk')).default;
-    const loggerErrSpy = sinon.spy(logger, 'logToStderr');
-
-    sinon.stub(entraGroup, 'getGroupIdByDisplayName').resolves(groupId);
-    sinon.stub(entraUser, 'getUserIdsByUpns').resolves(userIds);
-
-    sinon.stub(request, 'post').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/$batch' &&
-        opts.data.requests[0].method === 'PATCH') {
-        return {
-          responses: Array(2).fill({
-            status: 204,
-            body: {}
-          })
-        };
-      }
-
-      if (opts.url === 'https://graph.microsoft.com/v1.0/$batch' &&
-        opts.data.requests[0].method === 'GET') {
-        return {
-          responses: [
-            {
-              id: userIds[0],
-              status: 200,
-              body: 1
-            },
-            {
-              id: userIds[2],
-              status: 200,
-              body: 1
-            }
-          ]
-        };
-      }
-
-      if (opts.url === 'https://graph.microsoft.com/v1.0/$batch' &&
-        opts.data.requests[0].method === 'DELETE') {
-        return {
-          responses: Array(2).fill({
-            status: 204,
-            body: {}
-          })
-        };
-      }
-
-      throw 'Invalid request';
-    });
-
-    await command.action(logger, { options: { groupDisplayName: 'Contoso', userIds: userIds.join(','), role: 'Member', verbose: true } });
-    assert(loggerErrSpy.calledWith(chalk.yellow(`Option 'groupDisplayName' is deprecated and will be removed in the next major release.`)));
-
-    sinonUtil.restore(loggerErrSpy);
   });
 
   it(`correctly shows deprecation warning for option 'ids'`, async () => {
@@ -500,74 +445,6 @@ describe(commands.GROUP_MEMBER_SET, () => {
     ]);
   });
 
-  it('successfully updates roles for users with names in the group', async () => {
-    sinon.stub(entraGroup, 'getGroupIdByDisplayName').resolves(groupId);
-    sinon.stub(entraUser, 'getUserIdsByUpns').resolves(userIds);
-
-    const postStub = sinon.stub(request, 'post').callsFake(async opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/$batch' &&
-        opts.data.requests[0].method === 'PATCH') {
-        return {
-          responses: Array(2).fill({
-            status: 204,
-            body: {}
-          })
-        };
-      }
-
-      if (opts.url === 'https://graph.microsoft.com/v1.0/$batch' &&
-        opts.data.requests[0].method === 'GET') {
-        return {
-          responses: [
-            {
-              id: userIds[0],
-              status: 200,
-              body: 1
-            },
-            {
-              id: userIds[2],
-              status: 200,
-              body: 1
-            }
-          ]
-        };
-      }
-
-      if (opts.url === 'https://graph.microsoft.com/v1.0/$batch' &&
-        opts.data.requests[0].method === 'DELETE') {
-        return {
-          responses: Array(2).fill({
-            status: 204,
-            body: {}
-          })
-        };
-      }
-
-      throw 'Invalid request';
-    });
-
-    await command.action(logger, { options: { groupDisplayName: 'Contoso', userNames: userUpns.join(','), role: 'Owner', verbose: true } });
-    assert.deepStrictEqual(postStub.firstCall.args[0].data.requests, [
-      {
-        id: 1,
-        method: 'PATCH',
-        url: `/groups/${groupId}`,
-        headers: { 'content-type': 'application/json;odata.metadata=none' },
-        body: {
-          'owners@odata.bind': userIds.slice(0, 20).map(u => `https://graph.microsoft.com/v1.0/directoryObjects/${u}`)
-        }
-      },
-      {
-        id: 21,
-        method: 'PATCH',
-        url: `/groups/${groupId}`,
-        headers: { 'content-type': 'application/json;odata.metadata=none' },
-        body: {
-          'owners@odata.bind': userIds.slice(20, 40).map(u => `https://graph.microsoft.com/v1.0/directoryObjects/${u}`)
-        }
-      }
-    ]);
-  });
 
   it('successfully updates roles for users using groupName and userNames', async () => {
     sinon.stub(entraGroup, 'getGroupIdByDisplayName').resolves(groupId);
@@ -685,7 +562,7 @@ describe(commands.GROUP_MEMBER_SET, () => {
     });
 
     const userNames = userUpns.map(u => ' ' + u).join(',');
-    await command.action(logger, { options: { groupDisplayName: 'Contoso', userNames: userNames, role: 'Owner', verbose: true } });
+    await command.action(logger, { options: { groupName: 'Contoso', userNames: userNames, role: 'Owner', verbose: true } });
     assert.deepStrictEqual(postStub.firstCall.args[0].data.requests, [
       {
         id: 1,

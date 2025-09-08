@@ -14,7 +14,6 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   id?: string;
   displayName?: string;
-  includeSiteUrl?: boolean;
   withSiteUrl?: boolean;
 }
 
@@ -40,7 +39,6 @@ class EntraM365GroupGetCommand extends GraphCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        includeSiteUrl: !!args.options.includeSiteUrl,
         withSiteUrl: !!args.options.withSiteUrl
       });
     });
@@ -53,9 +51,6 @@ class EntraM365GroupGetCommand extends GraphCommand {
       },
       {
         option: '-n, --displayName [displayName]'
-      },
-      {
-        option: '--includeSiteUrl'
       },
       {
         option: '--withSiteUrl'
@@ -84,10 +79,6 @@ class EntraM365GroupGetCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    if (args.options.includeSiteUrl) {
-      await this.warn(logger, `Parameter 'includeSiteUrl' is deprecated. Please use 'withSiteUrl' instead`);
-    }
-
     let group: GroupExtended;
 
     try {
@@ -114,7 +105,7 @@ class EntraM365GroupGetCommand extends GraphCommand {
       const groupExtended = await request.get<{ allowExternalSenders: boolean, autoSubscribeNewMembers: boolean, hideFromAddressLists: boolean, hideFromOutlookClients: boolean, isSubscribedByMail: boolean }>(requestExtendedOptions);
       group = { ...group, ...groupExtended };
 
-      if (args.options.includeSiteUrl || args.options.withSiteUrl) {
+      if (args.options.withSiteUrl) {
         const requestOptions: CliRequestOptions = {
           url: `${this.resource}/v1.0/groups/${group.id}/drive?$select=webUrl`,
           headers: {
