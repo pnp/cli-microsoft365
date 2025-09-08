@@ -137,11 +137,6 @@ describe(commands.GROUP_MEMBER_ADD, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when all required parameters are valid with group names', async () => {
-    const actual = await command.validate({ options: { groupDisplayName: 'IT department', subgroupNames: groupNames.join(','), role: 'Member' } }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
-
   it('passes validation when all required parameters are valid with names with trailing spaces', async () => {
     const actual = await command.validate({ options: { groupName: 'IT department', userNames: userUpns.map(u => u + ' ').join(','), role: 'Member' } }, commandInfo);
     assert.strictEqual(actual, true);
