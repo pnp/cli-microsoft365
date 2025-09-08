@@ -160,3 +160,39 @@ Command | Alternative
 `viva engage group list` | [viva engage community list](./cmd/viva/engage/engage-community-list.mdx)
 `viva engage group user add` | [viva engage community user add](./cmd/viva/engage/engage-community-user-add.mdx)
 `viva engage group user remove` | [viva engage community user remove](./cmd/viva/engage/engage-community-user-remove.mdx)
+
+### Aligned naming options
+
+Just like with command names, we also have to rename options to reflect the changes in the product. We also try to make the options more descriptive and clearer to make it easier for you to use the CLI.
+These changes aim to make it easier for you to use the CLI.
+
+We've updated the following options:
+
+Command | Old option | New option
+------- | ---------- | ----------
+[entra group member add](./cmd/entra/group/group-member-add.mdx) | `groupDisplayName` | `groupName`
+[entra group member add](./cmd/entra/group/group-member-add.mdx) | `ids` | `userIds`
+[entra group member set](./cmd/entra/group/group-member-set.mdx) | `groupDisplayName` | `groupName`
+[entra group member set](./cmd/entra/group/group-member-set.mdx) | `ids` | `userIds`
+[entra m365group get](./cmd/entra/m365group/m365group-set.mdx) | `includeSiteUrl` | `withSiteUrl`
+[entra m365group list](./cmd/entra/m365group/m365group-list.mdx) | `includeSiteUrl` | `withSiteUrl`
+[entra pim role assignment eligibility list](./cmd/entra/pim/pim-role-assignment-eligibility-list.mdx) | `includePrincipalDetails` | `withPrincipalDetails`
+[entra pim role assignment list](./cmd/entra/pim/pim-role-assignment-list.mdx) | `includePrincipalDetails` | `withPrincipalDetails`
+[entra pim role request list](./cmd/entra/pim/pim-role-request-list.mdx) | `includePrincipalDetails` | `withPrincipalDetails`
+[flow list](./cmd/flow/flow-list.mdx) | `includeSolutions` | `withSolutions`
+[flow run list](./cmd/flow/run/run-list.mdx) | `includeTriggerInformation` | `withTrigger`
+[graph subscription add](./cmd/graph/subscription/subscription-add.mdx) | `includeResourceData` | `withResourceData`
+[pp solution publisher list](./cmd/pp/solution/solution-publisher-list.mdx) | `includeMicrosoftPublishers` | `withMicrosoftPublishers`
+[purview threatassessment get](./cmd/purview/threatassessment/threatassessment-get.mdx) | `includeResults` | `withResults`
+[spo file move](./cmd/spo/file/file-move.mdx) | `includeItemPermissions` | `withItemPermissions`
+[spo homesite set](./cmd/spo/homesite/homesite-set.mdx) | `siteUrl ` | `url`
+[spo hubsite get](./cmd/spo/hubsite/hubsite-get.mdx) | `includeAssociatedSites` | `withAssociatedSites`
+[spo hubsite list](./cmd/spo/hubsite/hubsite-list.mdx) | `includeAssociatedSites` | `withAssociatedSites`
+[spo tenant site list](./cmd/spo/tenant/tenant-site-list.mdx) | `includeOneDriveSites` | `withOneDriveSites`
+[spo term list](./cmd/spo/term/term-list.mdx) | `includeChildTerms` | `withChildTerms`
+[teams chat member add](./cmd/teams/chat/chat-member-add.mdx) | `includeAllHistory` | `withAllHistory`
+[viva engage network list](./cmd/viva/engage/engage-network-list.mdx) | `includeSuspended` | `withSuspended`
+
+#### What action do I need to take?
+
+If you use any of the commands listed above, ensure that you use the new option names.
