@@ -82,7 +82,7 @@ function extend(target: any, source: any, noOverwrite = false): any {
   }
 
   // ensure we don't overwrite things we don't want overwritten
-  const check: (o: any, i: string) => Boolean = noOverwrite ? (o, i) => !(i in o) : () => true;
+  const check: (o: any, i: string) => boolean = noOverwrite ? (o, i) => !(i in o) : () => true;
 
   return Object.getOwnPropertyNames(source)
     .filter((v: string) => check(target, v))
@@ -151,7 +151,7 @@ function getNextOrder(collection: { order: number }[]): number {
  * @param regex A regex or string to match
  * @param startpos A starting position from which the search will begin
  */
-function regexIndexOf(this: string, regex: RegExp | string, startpos = 0) {
+function regexIndexOf(this: string, regex: RegExp | string, startpos = 0): number {
   const indexOf = this.substring(startpos).search(regex);
   return (indexOf >= 0) ? (indexOf + (startpos)) : indexOf;
 }
@@ -220,7 +220,8 @@ function getBoundedDivMarkup<T>(html: string, boundaryStartPattern: RegExp | str
       if (nextDivOpen < nextCloseDiv) {
         openCounter++;
         searchIndex = nextDivOpen + 1;
-      } else if (nextCloseDiv < nextDivOpen) {
+      }
+      else if (nextCloseDiv < nextDivOpen) {
         openCounter--;
         searchIndex = nextCloseDiv + 1;
       }
@@ -268,7 +269,8 @@ function reindex(collection?: { order: number, columns?: { order: number }[], co
     collection[i].order = i + 1;
     if (hOP(collection[i], "columns")) {
       reindex(collection[i].columns);
-    } else if (hOP(collection[i], "controls")) {
+    }
+    else if (hOP(collection[i], "controls")) {
       reindex(collection[i].controls);
     }
   }
@@ -293,11 +295,11 @@ export class ClientSidePage {
       .replace(/:/g, "&#58;")
       .replace(/{/g, "&#123;")
       .replace(/}/g, "&#125;")
-      .replace(/\[/g, "\[")
-      .replace(/\]/g, "\]")
-      .replace(/\*/g, "\*")
-      .replace(/\$/g, "\$")
-      .replace(/\./g, "\.");
+      .replace(/\[/g, "[")
+      .replace(/\]/g, "]")
+      .replace(/\*/g, "*")
+      .replace(/\$/g, "$")
+      .replace(/\./g, ".");
   }
 
   /**
@@ -315,7 +317,7 @@ export class ClientSidePage {
         [/\\/g, "\\\\"], [/&quot;/g, "\""], [/&#58;/g, ":"], [/&#123;/g, "{"], [/&#125;/g, "}"],
         [/\\\\/g, "\\"], [/\\\?/g, "?"], [/\\\./g, "."], [/\\\[/g, "["], [/\\\]/g, "]"],
         [/\\\(/g, "("], [/\\\)/g, ")"], [/\\\|/g, "|"], [/\\\+/g, "+"], [/\\\*/g, "*"],
-        [/\\\$/g, "$"],
+        [/\\\$/g, "$"]
       ];
       return mapDict.reduce((r, m) => r.replace(m[0], m[1] as string), escaped);
     };
@@ -369,7 +371,7 @@ export class ClientSidePage {
       const ct = /controlType&quot;&#58;(\d*?)(,|&)/i.exec(markup);
 
       // if no control type is present this is a column which we give type 0 to let us process it
-      const controlType = ct == null || ct.length < 0 ? -1 : parseInt(ct[1], 10);
+      const controlType = ct === null || ct.length < 0 ? -1 : parseInt(ct[1], 10);
 
       let control: CanvasControl | null = null;
 
@@ -475,7 +477,8 @@ export class ClientSidePage {
     if (sections.length < 1) {
       section = new CanvasSection(this, zoneIndex, [], control?.controlData);
       this.sections.push(section);
-    } else {
+    }
+    else {
       section = sections[0];
     }
 
@@ -483,7 +486,8 @@ export class ClientSidePage {
     if (columns.length < 1) {
       column = new CanvasColumn(section, sectionIndex, sectionFactor);
       section.columns.push(column);
-    } else {
+    }
+    else {
       column = columns[0];
     }
 
@@ -506,7 +510,8 @@ export class ClientSidePage {
     if (sections.length < 1) {
       section = new CanvasSection(this, order, [], column.controlData);
       this.sections.push(section);
-    } else {
+    }
+    else {
       section = sections[0];
     }
 
@@ -537,7 +542,6 @@ export class CanvasSection {
    * Default column (this.columns[0]) for this section
    */
   public get defaultColumn(): CanvasColumn {
-
     if (this.columns.length < 1) {
       this.addColumn(12);
     }
@@ -549,14 +553,12 @@ export class CanvasSection {
    * Adds a new column to this section
    */
   public addColumn(factor: CanvasColumnFactorType): CanvasColumn {
-
     const column = new CanvasColumn(this, getNextOrder(this.columns), factor);
     this.columns.push(column);
     return column;
   }
 
   public toHtml(): string {
-
     const html = [];
 
     for (let i = 0; i < this.columns.length; i++) {
@@ -654,9 +656,8 @@ export class CanvasColumn extends CanvasControl {
     if (this.controls.length < 1) {
 
       html.push(`<div data-sp-canvascontrol="" data-sp-canvasdataversion="${this.dataVersion}" data-sp-controldata="${this.jsonData}"></div>`);
-
-    } else {
-
+    }
+    else {
       for (let i = 0; i < this.controls.length; i++) {
         html.push(this.controls[i].toHtml(i + 1));
       }
@@ -686,7 +687,7 @@ export class CanvasColumn extends CanvasControl {
         sectionIndex: this.order,
         zoneIndex: this.section?.order || 0,
         zoneId: this.section?.zoneId,
-        layoutIndex: this.section?.layoutIndex,
+        layoutIndex: this.section?.layoutIndex
       },
       zoneGroupMetadata: this.section?.zoneGroupMetadata,
       emphasis: this.section?.emphasis
@@ -754,7 +755,7 @@ export class BackgroundSettings extends ClientSidePart {
       dataVersion: this.dataVersion,
       instanceId: this.id,
       properties: this.propertieJson,
-      serverProcessedContent: this.serverProcessedContent,
+      serverProcessedContent: this.serverProcessedContent
     };
 
     const html: string[] = [];
@@ -846,7 +847,7 @@ export class ClientSideText extends ClientSidePart {
         layoutIndex: this.column?.section?.layoutIndex
       },
       zoneGroupMetadata: this.column?.section?.zoneGroupMetadata,
-      emphasis: this.column?.section?.emphasis,
+      emphasis: this.column?.section?.emphasis
     };
 
     if (this.column?.section?.isLayoutReflowOnTop !== undefined) {
@@ -1004,11 +1005,11 @@ export class ClientSideWebpart extends ClientSidePart {
         sectionIndex: this.column ? this.column.order : 0,
         zoneIndex: this.column && this.column.section ? this.column.section.order : 0,
         zoneId: this.column?.section?.zoneId,
-        layoutIndex: this.column?.section?.layoutIndex,
+        layoutIndex: this.column?.section?.layoutIndex
       },
       webPartId: this.webPartId,
       zoneGroupMetadata: this.column?.section?.zoneGroupMetadata,
-      emphasis: this.column?.section?.emphasis,
+      emphasis: this.column?.section?.emphasis
     };
 
     if (this.column?.section?.isLayoutReflowOnTop !== undefined) {
@@ -1016,7 +1017,6 @@ export class ClientSideWebpart extends ClientSidePart {
     }
 
     return controlData;
-
   }
 
   protected renderHtmlProperties(): string {
@@ -1027,8 +1027,8 @@ export class ClientSideWebpart extends ClientSidePart {
 
       html.push(this.htmlProperties);
 
-    } else if (typeof this.serverProcessedContent !== "undefined") {
-
+    }
+    else if (typeof this.serverProcessedContent !== "undefined") {
       if (typeof this.serverProcessedContent.searchablePlainTexts !== "undefined") {
 
         const keys = Object.keys(this.serverProcessedContent.searchablePlainTexts);
@@ -1048,7 +1048,6 @@ export class ClientSideWebpart extends ClientSidePart {
       }
 
       if (typeof this.serverProcessedContent.links !== "undefined") {
-
         const keys = Object.keys(this.serverProcessedContent.links);
         for (let i = 0; i < keys.length; i++) {
           html.push(`<a data-sp-prop-name="${keys[i]}" href="${this.serverProcessedContent.links[keys[i]]}"></a>`);
@@ -1064,36 +1063,43 @@ export class ClientSideWebpart extends ClientSidePart {
     // If the web part has the serverProcessedContent property then keep this one as it might be needed as input to render the web part HTML later on
     if (typeof props.webPartData !== "undefined" && typeof props.webPartData.serverProcessedContent !== "undefined") {
       this.serverProcessedContent = props.webPartData.serverProcessedContent;
-    } else if (typeof props.serverProcessedContent !== "undefined") {
+    }
+    else if (typeof props.serverProcessedContent !== "undefined") {
       this.serverProcessedContent = props.serverProcessedContent;
-    } else {
+    }
+    else {
       this.serverProcessedContent = null;
     }
 
     if (typeof props.webPartData !== "undefined" && typeof props.webPartData.dynamicDataPaths !== "undefined") {
       this.dynamicDataPaths = props.webPartData.dynamicDataPaths;
-    } else if (typeof props.dynamicDataPaths !== "undefined") {
+    }
+    else if (typeof props.dynamicDataPaths !== "undefined") {
       this.dynamicDataPaths = props.dynamicDataPaths;
-    } else {
+    }
+    else {
       this.dynamicDataPaths = null;
     }
 
     if (typeof props.webPartData !== "undefined" && typeof props.webPartData.dynamicDataValues !== "undefined") {
       this.dynamicDataValues = props.webPartData.dynamicDataValues;
-    } else if (typeof props.dynamicDataValues !== "undefined") {
+    }
+    else if (typeof props.dynamicDataValues !== "undefined") {
       this.dynamicDataValues = props.dynamicDataValues;
-    } else {
+    }
+    else {
       this.dynamicDataValues = null;
     }
 
     if (typeof props.webPartData !== "undefined" && typeof props.webPartData.properties !== "undefined") {
       return props.webPartData.properties;
-    } else if (typeof props.properties !== "undefined") {
+    }
+    else if (typeof props.properties !== "undefined") {
       return props.properties;
-    } else {
+    }
+    else {
       return props;
     }
-
   }
 }
 
@@ -1211,7 +1217,4 @@ interface ClientSideWebpartData {
   serverProcessedContent?: ServerProcessedContent;
   dynamicDataPaths?: any;
   dynamicDataValues?: any;
-}
-
-export module ClientSideWebpartPropertyTypes {
 }

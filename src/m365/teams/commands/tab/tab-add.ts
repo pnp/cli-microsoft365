@@ -141,9 +141,15 @@ class TeamsTabAddCommand extends GraphCommand {
     if (options.contentUrl) {
       requestBody.configuration.contentUrl = options.contentUrl;
     }
-    options.entityId ? requestBody.configuration.entityId = options.entityId : null;
-    options.removeUrl ? requestBody.configuration.removeUrl = options.removeUrl : null;
-    options.websiteUrl ? requestBody.configuration.websiteUrl = options.websiteUrl : null;
+    if (options.entityId) {
+      requestBody.configuration.entityId = options.entityId;
+    }
+    if (options.removeUrl) {
+      requestBody.configuration.removeUrl = options.removeUrl;
+    }
+    if (options.websiteUrl) {
+      requestBody.configuration.websiteUrl = options.websiteUrl;
+    }
     Object.keys(options).forEach(key => {
       if (excludeOptions.indexOf(key) === -1) {
         requestBody.configuration[key] = `${(<any>options)[key]}`;

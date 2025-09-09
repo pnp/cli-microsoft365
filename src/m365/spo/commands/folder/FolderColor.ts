@@ -1,5 +1,4 @@
-export const FolderColorValues: { [key: string]: string } =
-{
+export const FolderColorValues: { [key: string]: string } = {
   yellow: '0',
   darkRed: '1',
   darkOrange: '2',

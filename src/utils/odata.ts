@@ -17,10 +17,13 @@ export interface GraphResponseError {
   }
 }
 
+/* eslint-disable no-redeclare */
 function getAllItems<T>(url: string): Promise<T[]>;
 function getAllItems<T>(options: CliRequestOptions): Promise<T[]>;
 function getAllItems<T>(url: string, metadata: 'none' | 'minimal' | 'full'): Promise<T[]>;
+/* eslint-enable no-redeclare */
 
+// eslint-disable-next-line no-redeclare
 async function getAllItems<T>(param1: unknown, metadata?: 'none' | 'minimal' | 'full'): Promise<T[]> {
   let items: T[] = [];
 

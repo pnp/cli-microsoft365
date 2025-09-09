@@ -142,10 +142,11 @@ async function runConversationTurn(conversationId: number, question: string): Pr
   const result = await prompt.forSelection({ message: 'What would you like to do next?', choices });
 
   switch (result) {
-    case 'ask':
+    case 'ask': {
       const prompt = await promptForPrompt();
       await runConversationTurn(conversationId, prompt);
       break;
+    }
     case 'end':
       await endConversation(conversationId);
       console.log('');

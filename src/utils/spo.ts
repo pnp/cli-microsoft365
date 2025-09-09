@@ -108,12 +108,12 @@ interface CreateFolderCopyJobsOptions {
 export enum CreateFileCopyJobsNameConflictBehavior {
   Fail = 0,
   Replace = 1,
-  Rename = 2,
+  Rename = 2
 }
 
 export enum CreateFolderCopyJobsNameConflictBehavior {
   Fail = 0,
-  Rename = 2,
+  Rename = 2
 }
 
 interface CreateCopyJobInfo {
@@ -363,7 +363,7 @@ export const spo = {
     try {
       await auth.storeConnectionInfo();
     }
-    catch (e: any) {
+    catch {
       if (debug) {
         await logger.logToStderr('Error while storing connection info');
       }
@@ -373,7 +373,7 @@ export const spo = {
 
   async getSpoAdminUrl(logger: Logger, debug: boolean): Promise<string> {
     const spoUrl = await spo.getSpoUrl(logger, debug);
-    return (spoUrl.replace(/(https:\/\/)([^\.]+)(.*)/, '$1$2-admin$3'));
+    return (spoUrl.replace(/(https:\/\/)([^.]+)(.*)/, '$1$2-admin$3'));
   },
 
   async getTenantId(logger: Logger, debug: boolean): Promise<string> {
@@ -407,7 +407,7 @@ export const spo = {
     try {
       await auth.storeConnectionInfo();
     }
-    catch (e: any) {
+    catch {
       if (debug) {
         await logger.logToStderr('Error while storing connection info');
       }
@@ -1117,10 +1117,7 @@ export const spo = {
         }
       }
       else {
-        if (siteDesignId) {
-          siteDesignId = siteDesignId;
-        }
-        else {
+        if (!siteDesignId) {
           if (siteDesign) {
             switch (siteDesign) {
               case 'Topic':
@@ -2102,10 +2099,12 @@ export const spo = {
       formValues: requestBodyOptions
     };
 
-    contentTypeName && requestBody.formValues.push({
-      FieldName: 'ContentType',
-      FieldValue: contentTypeName
-    });
+    if (contentTypeName) {
+      requestBody.formValues.push({
+        FieldName: 'ContentType',
+        FieldValue: contentTypeName
+      });
+    }
 
     const requestOptions: CliRequestOptions = {
       url: `${absoluteListUrl}/items(${itemId})/ValidateUpdateListItem()`,

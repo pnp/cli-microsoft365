@@ -19,7 +19,7 @@ describe(commands.MOVE, () => {
   let logger: Logger;
   let commandInfo: CommandInfo;
 
-  const defaultPostStub = () => {
+  const defaultPostStub = (): sinon.SinonStub => {
     return sinon.stub(request, 'post').callsFake(async (opts) => {
       const url: string = opts.url as string;
 
@@ -51,7 +51,7 @@ describe(commands.MOVE, () => {
     });
   };
 
-  const defaultPatchStub = () => {
+  const defaultPatchStub = (): sinon.SinonStub => {
     return sinon.stub(request, 'patch').callsFake(async (opts) => {
       const url: string = opts.url as string;
 
@@ -154,7 +154,7 @@ describe(commands.MOVE, () => {
     });
   };
 
-  const defaultDeleteStub = () => {
+  const defaultDeleteStub = (): sinon.SinonStub => {
     return sinon.stub(request, 'delete').callsFake(async (opts) => {
       const url: string = opts.url as string;
 

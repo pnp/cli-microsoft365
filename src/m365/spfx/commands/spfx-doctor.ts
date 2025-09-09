@@ -1058,13 +1058,13 @@ class SpfxDoctorCommand extends BaseProjectCommand {
     }
   }
 
-  private getPackageVersionFromNpm(args: string[]): Promise<string> {
-    return new Promise<string>(async (resolve: (version: string) => void, reject: (error: string) => void): Promise<void> => {
-      const packageName: string = args[1];
+  private async getPackageVersionFromNpm(args: string[]): Promise<string> {
+    if (this.debug) {
+      await this.logger.logToStderr(`Executing npm: ${args.join(' ')}...`);
+    }
 
-      if (this.debug) {
-        await this.logger.logToStderr(`Executing npm: ${args.join(' ')}...`);
-      }
+    return new Promise<string>((resolve: (version: string) => void, reject: (error: string) => void) => {
+      const packageName: string = args[1];
 
       child_process.exec(`npm ${args.join(' ')}`, (err: child_process.ExecException | null, stdout: string): void => {
         if (err) {

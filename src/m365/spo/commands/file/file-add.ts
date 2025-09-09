@@ -191,7 +191,7 @@ class SpoFileAddCommand extends SpoCommand {
         };
         await request.get<void>(requestOptions);
       }
-      catch (err: any) {
+      catch {
         // folder does not exist so will attempt to create the folder tree
         await spo.ensureFolder(args.options.webUrl, folderPath, logger, this.verbose);
       }
@@ -494,7 +494,9 @@ class SpoFileAddCommand extends SpoCommand {
           fs.closeSync(fd);
           /* c8 ignore next */
         }
-        catch { }
+        catch {
+          // Do nothing
+        }
       }
 
       if (--info.RetriesLeft > 0) {

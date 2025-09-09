@@ -34,11 +34,11 @@ describe(commands.LISTITEM_ADD, () => {
   const expectedContentType = 'Item';
   let actualContentType = '';
 
-  const postFakes = async (opts: any) => {
+  const postFakes = async (opts: any): Promise<any> => {
     if (opts.url.indexOf('/_api/web/lists') > -1) {
       if ((opts.url as string).indexOf('AddValidateUpdateItemUsingPath') > -1) {
         const bodyString = JSON.stringify(opts.data);
-        const ctMatch = bodyString.match(/\"?FieldName\"?:\s*\"?ContentType\"?,\s*\"?FieldValue\"?:\s*\"?(\w*)\"?/i);
+        const ctMatch = bodyString.match(/"?FieldName"?:\s*"?ContentType"?,\s*"?FieldValue"?:\s*"?(\w*)"?/i);
         actualContentType = ctMatch ? ctMatch[1] : "";
         if (bodyString.indexOf("fail adding me") > -1) { return Promise.resolve({ value: [{ ErrorMessage: 'failed updating', 'FieldName': 'Title', 'HasException': true }] }); }
         return { value: [{ FieldName: "Id", FieldValue: expectedId, HasException: false }] };
@@ -46,7 +46,7 @@ describe(commands.LISTITEM_ADD, () => {
     }
     if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')/AddValidateUpdateItemUsingPath()`) {
       const bodyString = JSON.stringify(opts.data);
-      const ctMatch = bodyString.match(/\"?FieldName\"?:\s*\"?ContentType\"?,\s*\"?FieldValue\"?:\s*\"?(\w*)\"?/i);
+      const ctMatch = bodyString.match(/"?FieldName"?:\s*"?ContentType"?,\s*"?FieldValue"?:\s*"?(\w*)"?/i);
       actualContentType = ctMatch ? ctMatch[1] : "";
       if (bodyString.indexOf("fail adding me") > -1) { return Promise.resolve({ value: [] }); }
       return { value: [{ FieldName: "Id", FieldValue: expectedId }] };
@@ -54,7 +54,7 @@ describe(commands.LISTITEM_ADD, () => {
     throw 'Invalid request';
   };
 
-  const getFakes = async (opts: any) => {
+  const getFakes = async (opts: any): Promise<any> => {
     if (opts.url.indexOf('/_api/web/lists') > -1) {
       if ((opts.url as string).indexOf('contenttypes') > -1) {
         return { value: [{ Id: { StringValue: expectedContentType }, Name: "Item" }] };
