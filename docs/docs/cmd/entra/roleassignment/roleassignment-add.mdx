@@ -4,7 +4,7 @@ import TabItem from '@theme/TabItem';
 
 # entra roleassignment add
 
-Assign a Entra ID role to either a user, a group, or a service principal and specify the scope for which the principal has been granted access
+Assign a Entra ID role to a user and specify the scope for which the user has been granted access
 
 ## Usage
 
@@ -24,6 +24,12 @@ m365 entra roleassignment add [options]
 `--principal <principal>`
 : Id of a user, group or service principal or user principal name or group mail nickname to which the assignment is granted.
 
+`--userId [userId]`
+: Id of a user to which the assignment is scoped.
+
+`--userName [userName]`
+: User principal name of a user to which the assignment is scoped.
+
 `--administrativeUnitId [administrativeUnitId]`
 : Id of an administrative unit to which the assignment is scoped.
 
@@ -33,14 +39,17 @@ m365 entra roleassignment add [options]
 `--applicationId [applicationId]`
 : Id of an application to which the assignment is scoped.
 
+`applicationObjectId [applicationObjectId]`
+: Object Id of an application to which the assignment is scoped.
+
 `--applicationName [applicationName]`
 : Name of an application to which the assignment is scoped.
 
 `--servicePrincipalId [servicePrincipalId]`
-: Id of an application to which the assignment is scoped.
+: Id of a service principal to which the assignment is scoped.
 
 `--servicePrincipalName [servicePrincipalName]`
-: Name of an application to which the assignment is scoped.
+: Name of a service principal to which the assignment is scoped.
 
 `--groupId [groupId]`
 : Id of a group to which the assignment is scoped.
@@ -50,6 +59,25 @@ m365 entra roleassignment add [options]
 ```
 
 <Global />
+
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource        | Permissions                        |
+  |-----------------|------------------------------------|
+  | Microsoft Graph | RoleManagement.ReadWrite.Directory |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource        | Permissions                        |
+  |-----------------|------------------------------------|
+  | Microsoft Graph | RoleManagement.ReadWrite.Directory |
+
+  </TabItem>
+</Tabs>
 
 ## Examples
 
@@ -113,7 +141,7 @@ m365 entra roleassignment add --roleDefinitionName 'Application Administrator' -
   <TabItem value="Markdown">
 
   ```md
-  # entra roleassignment add --debug "false" --verbose "false" --roleDefinitionId "92b086b3-e367-4ef2-b869-1de128fb986e" --principal "3844129d-f748-4c03-8165-4412ee9b4ceb"
+  # entra roleassignment add --roleDefinitionId "92b086b3-e367-4ef2-b869-1de128fb986e" --principal "3844129d-f748-4c03-8165-4412ee9b4ceb"
 
   Date: 7/3/2025
 

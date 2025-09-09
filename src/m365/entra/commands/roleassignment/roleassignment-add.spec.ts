@@ -813,9 +813,9 @@ describe(commands.ROLEASSIGNMENT_ADD, () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/roleManagement/directory/roleAssignments` &&
         JSON.stringify(opts.data) === JSON.stringify({
-          "roleDefinitionId": roleDefinitionId,
-          "principalId": principalId,
-          "directoryScopeId": "/"
+          roleDefinitionId: roleDefinitionId,
+          principalId: principalId,
+          directoryScopeId: "/"
         })) {
         return unifiedRoleAssignmentScopeTenant;
       }
@@ -838,9 +838,9 @@ describe(commands.ROLEASSIGNMENT_ADD, () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/roleManagement/directory/roleAssignments` &&
         JSON.stringify(opts.data) === JSON.stringify({
-          "roleDefinitionId": roleDefinitionId,
-          "principalId": principalId,
-          "directoryScopeId": "/"
+          roleDefinitionId: roleDefinitionId,
+          principalId: principalId,
+          directoryScopeId: "/"
         })) {
         return unifiedRoleAssignmentScopeTenant;
       }
@@ -862,9 +862,9 @@ describe(commands.ROLEASSIGNMENT_ADD, () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/roleManagement/directory/roleAssignments` &&
         JSON.stringify(opts.data) === JSON.stringify({
-          "roleDefinitionId": roleDefinitionId,
-          "principalId": principalId,
-          "directoryScopeId": `/${userId}`
+          roleDefinitionId: roleDefinitionId,
+          principalId: principalId,
+          directoryScopeId: `/${userId}`
         })) {
         return unifiedRoleAssignmentScopeUser;
       }
@@ -888,9 +888,9 @@ describe(commands.ROLEASSIGNMENT_ADD, () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/roleManagement/directory/roleAssignments` &&
         JSON.stringify(opts.data) === JSON.stringify({
-          "roleDefinitionId": roleDefinitionId,
-          "principalId": principalId,
-          "directoryScopeId": `/${userId}`
+          roleDefinitionId: roleDefinitionId,
+          principalId: principalId,
+          directoryScopeId: `/${userId}`
         })) {
         return unifiedRoleAssignmentScopeUser;
       }
@@ -913,9 +913,9 @@ describe(commands.ROLEASSIGNMENT_ADD, () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/roleManagement/directory/roleAssignments` &&
         JSON.stringify(opts.data) === JSON.stringify({
-          "roleDefinitionId": roleDefinitionId,
-          "principalId": principalId,
-          "directoryScopeId": `/administrativeUnits/${administrativeUnitId}`
+          roleDefinitionId: roleDefinitionId,
+          principalId: principalId,
+          directoryScopeId: `/administrativeUnits/${administrativeUnitId}`
         })) {
         return unifiedRoleAssignmentScopeAdministrativeUnit;
       }
@@ -939,9 +939,9 @@ describe(commands.ROLEASSIGNMENT_ADD, () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/roleManagement/directory/roleAssignments` &&
         JSON.stringify(opts.data) === JSON.stringify({
-          "roleDefinitionId": roleDefinitionId,
-          "principalId": principalId,
-          "directoryScopeId": `/administrativeUnits/${administrativeUnitId}`
+          roleDefinitionId: roleDefinitionId,
+          principalId: principalId,
+          directoryScopeId: `/administrativeUnits/${administrativeUnitId}`
         })) {
         return unifiedRoleAssignmentScopeAdministrativeUnit;
       }
@@ -960,13 +960,13 @@ describe(commands.ROLEASSIGNMENT_ADD, () => {
     assert(loggerLogSpy.calledOnceWithExactly(unifiedRoleAssignmentScopeAdministrativeUnit));
   });
 
-  it('correctly creates the role assignment for the role specified by id and the principal specified by id with the scope restricted to the application specified by id', async () => {
+  it('correctly creates the role assignment for the role specified by id and the principal specified by id with the scope restricted to the application specified by object id', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/roleManagement/directory/roleAssignments` &&
         JSON.stringify(opts.data) === JSON.stringify({
-          "roleDefinitionId": roleDefinitionId,
-          "principalId": principalId,
-          "directoryScopeId": `/${applicationObjectId}`
+          roleDefinitionId: roleDefinitionId,
+          principalId: principalId,
+          directoryScopeId: `/${applicationObjectId}`
         })) {
         return unifiedRoleAssignmentScopeApplication;
       }
@@ -990,9 +990,9 @@ describe(commands.ROLEASSIGNMENT_ADD, () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/roleManagement/directory/roleAssignments` &&
         JSON.stringify(opts.data) === JSON.stringify({
-          "roleDefinitionId": roleDefinitionId,
-          "principalId": principalId,
-          "directoryScopeId": `/${applicationObjectId}`
+          roleDefinitionId: roleDefinitionId,
+          principalId: principalId,
+          directoryScopeId: `/${applicationObjectId}`
         })) {
         return unifiedRoleAssignmentScopeApplication;
       }
@@ -1016,9 +1016,9 @@ describe(commands.ROLEASSIGNMENT_ADD, () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/roleManagement/directory/roleAssignments` &&
         JSON.stringify(opts.data) === JSON.stringify({
-          "roleDefinitionId": roleDefinitionId,
-          "principalId": principalId,
-          "directoryScopeId": `/${applicationObjectId}`
+          roleDefinitionId: roleDefinitionId,
+          principalId: principalId,
+          directoryScopeId: `/${applicationObjectId}`
         })) {
         return unifiedRoleAssignmentScopeApplication;
       }
@@ -1041,9 +1041,9 @@ describe(commands.ROLEASSIGNMENT_ADD, () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/roleManagement/directory/roleAssignments` &&
         JSON.stringify(opts.data) === JSON.stringify({
-          "roleDefinitionId": roleDefinitionId,
-          "principalId": principalId,
-          "directoryScopeId": `/${servicePrincipalId}`
+          roleDefinitionId: roleDefinitionId,
+          principalId: principalId,
+          directoryScopeId: `/${servicePrincipalId}`
         })) {
         return unifiedRoleAssignmentScopeServicePrincipal;
       }
@@ -1092,9 +1092,9 @@ describe(commands.ROLEASSIGNMENT_ADD, () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/roleManagement/directory/roleAssignments` &&
         JSON.stringify(opts.data) === JSON.stringify({
-          "roleDefinitionId": roleDefinitionId,
-          "principalId": principalId,
-          "directoryScopeId": `/${groupId}`
+          roleDefinitionId: roleDefinitionId,
+          principalId: principalId,
+          directoryScopeId: `/${groupId}`
         })) {
         return unifiedRoleAssignmentScopeGroup;
       }
@@ -1118,9 +1118,9 @@ describe(commands.ROLEASSIGNMENT_ADD, () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/roleManagement/directory/roleAssignments` &&
         JSON.stringify(opts.data) === JSON.stringify({
-          "roleDefinitionId": roleDefinitionId,
-          "principalId": principalId,
-          "directoryScopeId": `/${groupId}`
+          roleDefinitionId: roleDefinitionId,
+          principalId: principalId,
+          directoryScopeId: `/${groupId}`
         })) {
         return unifiedRoleAssignmentScopeGroup;
       }
@@ -1144,9 +1144,9 @@ describe(commands.ROLEASSIGNMENT_ADD, () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/roleManagement/directory/roleAssignments` &&
         JSON.stringify(opts.data) === JSON.stringify({
-          "roleDefinitionId": roleDefinitionId,
-          "principalId": principalId,
-          "directoryScopeId": "/"
+          roleDefinitionId: roleDefinitionId,
+          principalId: principalId,
+          directoryScopeId: "/"
         })) {
         return unifiedRoleAssignmentScopeTenant;
       }
@@ -1169,9 +1169,9 @@ describe(commands.ROLEASSIGNMENT_ADD, () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/roleManagement/directory/roleAssignments` &&
         JSON.stringify(opts.data) === JSON.stringify({
-          "roleDefinitionId": roleDefinitionId,
-          "principalId": principalId,
-          "directoryScopeId": "/"
+          roleDefinitionId: roleDefinitionId,
+          principalId: principalId,
+          directoryScopeId: "/"
         })) {
         return unifiedRoleAssignmentScopeTenant;
       }

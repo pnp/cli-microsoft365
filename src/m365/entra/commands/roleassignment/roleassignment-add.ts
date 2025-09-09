@@ -62,7 +62,7 @@ class EntraRoleAssignmentAddCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'Assigns a Microsoft Entra ID role to a user, group, or service principal at a specified scope';
+    return 'Assign a Entra ID role to a user and specify the scope for which the user has been granted access';
   }
 
   public get schema(): z.ZodTypeAny | undefined {
@@ -71,10 +71,7 @@ class EntraRoleAssignmentAddCommand extends GraphCommand {
 
   public getRefinedSchema(schema: typeof options): z.ZodEffects<any> | undefined {
     return schema
-      .refine(options => !options.roleDefinitionId !== !options.roleDefinitionName, {
-        message: 'Specify either roleDefinitionId or roleDefinitionName, but not both'
-      })
-      .refine(options => options.roleDefinitionId || options.roleDefinitionName, {
+      .refine(options => [options.roleDefinitionId, options.roleDefinitionName].filter(o => o !== undefined).length === 1, {
         message: 'Specify either roleDefinitionId or roleDefinitionName'
       })
       .refine(options => Object.values([options.userId, options.userName, options.administrativeUnitId, options.administrativeUnitName, options.applicationId, options.applicationObjectId, options.applicationName,
