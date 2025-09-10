@@ -2,6 +2,7 @@ import { Group } from '@microsoft/microsoft-graph-types';
 import assert from 'assert';
 import fs from 'fs';
 import sinon from 'sinon';
+import { z } from 'zod';
 import auth from '../../../../Auth.js';
 import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
@@ -53,6 +54,7 @@ describe(commands.M365GROUP_SET, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: z.ZodTypeAny;
   let loggerLogToStderrSpy: sinon.SinonSpy;
   const groupId = 'f3db5c2b-068f-480d-985b-ec78b9fa0e76';
 
@@ -70,6 +72,7 @@ describe(commands.M365GROUP_SET, () => {
       };
     }
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
   });
 
   beforeEach(() => {
@@ -129,7 +132,7 @@ describe(commands.M365GROUP_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { displayName: groupName, newDisplayName: 'My group', verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ displayName: groupName, newDisplayName: 'My group', verbose: true }) });
     assert(patchStub.calledOnce);
   });
 
@@ -146,7 +149,7 @@ describe(commands.M365GROUP_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, id: '28beab62-7540-4db1-a23f-29a6018a3848', description: 'My group' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, id: '28beab62-7540-4db1-a23f-29a6018a3848', description: 'My group' }) });
     assert(loggerLogToStderrSpy.called);
   });
 
@@ -159,7 +162,7 @@ describe(commands.M365GROUP_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { id: groupId, description: '' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: groupId, description: '' }) });
     assert.deepStrictEqual(JSON.parse(JSON.stringify(patchStub.firstCall.args[0].data)), { description: null });
   });
 
@@ -176,7 +179,7 @@ describe(commands.M365GROUP_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', isPrivate: false } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: '28beab62-7540-4db1-a23f-29a6018a3848', isPrivate: false }) });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -193,11 +196,13 @@ describe(commands.M365GROUP_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', isPrivate: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: '28beab62-7540-4db1-a23f-29a6018a3848', isPrivate: true }) });
     assert(loggerLogSpy.notCalled);
   });
 
   it('updates Microsoft 365 Group logo with a png image', async () => {
+    sinon.stub(fs, 'existsSync').returns(true);
+    sinon.stub(fs, 'lstatSync').returns(fsStats);
     sinon.stub(fs, 'readFileSync').returns('abc');
     sinon.stub(request, 'put').callsFake(async (opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups/28beab62-7540-4db1-a23f-29a6018a3848/photo/$value' &&
@@ -209,11 +214,13 @@ describe(commands.M365GROUP_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', logoPath: 'logo.png' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: '28beab62-7540-4db1-a23f-29a6018a3848', logoPath: 'logo.png' }) });
     assert(loggerLogSpy.notCalled);
   });
 
   it('updates Microsoft 365 Group logo with a jpg image (debug)', async () => {
+    sinon.stub(fs, 'existsSync').returns(true);
+    sinon.stub(fs, 'lstatSync').returns(fsStats);
     sinon.stub(fs, 'readFileSync').returns('abc');
     sinon.stub(request, 'put').callsFake(async (opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups/f3db5c2b-068f-480d-985b-ec78b9fa0e76/photo/$value' &&
@@ -225,11 +232,13 @@ describe(commands.M365GROUP_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, id: 'f3db5c2b-068f-480d-985b-ec78b9fa0e76', logoPath: 'logo.jpg' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, id: 'f3db5c2b-068f-480d-985b-ec78b9fa0e76', logoPath: 'logo.jpg' }) });
     assert(loggerLogToStderrSpy.called);
   });
 
   it('updates Microsoft 365 Group logo with a gif image', async () => {
+    sinon.stub(fs, 'existsSync').returns(true);
+    sinon.stub(fs, 'lstatSync').returns(fsStats);
     sinon.stub(fs, 'readFileSync').returns('abc');
     sinon.stub(request, 'put').callsFake(async (opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups/f3db5c2b-068f-480d-985b-ec78b9fa0e76/photo/$value' &&
@@ -241,12 +250,14 @@ describe(commands.M365GROUP_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { id: 'f3db5c2b-068f-480d-985b-ec78b9fa0e76', logoPath: 'logo.gif' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: 'f3db5c2b-068f-480d-985b-ec78b9fa0e76', logoPath: 'logo.gif' }) });
     assert(loggerLogSpy.notCalled);
   });
 
   it('handles failure when updating Microsoft 365 Group logo and succeeds after 10 attempts', async () => {
     let amountOfCalls = 1;
+    sinon.stub(fs, 'existsSync').returns(true);
+    sinon.stub(fs, 'lstatSync').returns(fsStats);
     sinon.stub(fs, 'readFileSync').returns('abc');
     const putStub = sinon.stub(request, 'put').callsFake(async (opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups/f3db5c2b-068f-480d-985b-ec78b9fa0e76/photo/$value' && amountOfCalls < 10) {
@@ -261,7 +272,7 @@ describe(commands.M365GROUP_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { id: 'f3db5c2b-068f-480d-985b-ec78b9fa0e76', logoPath: 'logo.png' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: 'f3db5c2b-068f-480d-985b-ec78b9fa0e76', logoPath: 'logo.png' }) });
     assert.strictEqual(putStub.callCount, 10);
   });
 
@@ -271,6 +282,8 @@ describe(commands.M365GROUP_SET, () => {
         message: 'An error has occurred'
       }
     };
+    sinon.stub(fs, 'existsSync').returns(true);
+    sinon.stub(fs, 'lstatSync').returns(fsStats);
     sinon.stub(fs, 'readFileSync').returns('abc');
     sinon.stub(request, 'put').callsFake(async (opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups/f3db5c2b-068f-480d-985b-ec78b9fa0e76/photo/$value') {
@@ -280,7 +293,7 @@ describe(commands.M365GROUP_SET, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { id: 'f3db5c2b-068f-480d-985b-ec78b9fa0e76', logoPath: 'logo.png' } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ id: 'f3db5c2b-068f-480d-985b-ec78b9fa0e76', logoPath: 'logo.png' }) } as any),
       new CommandError('An error has occurred'));
   });
 
@@ -290,6 +303,8 @@ describe(commands.M365GROUP_SET, () => {
         message: 'An error has occurred'
       }
     };
+    sinon.stub(fs, 'existsSync').returns(true);
+    sinon.stub(fs, 'lstatSync').returns(fsStats);
     sinon.stub(fs, 'readFileSync').returns('abc');
     sinon.stub(request, 'put').callsFake(async (opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups/f3db5c2b-068f-480d-985b-ec78b9fa0e76/photo/$value') {
@@ -299,7 +314,7 @@ describe(commands.M365GROUP_SET, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: true, id: 'f3db5c2b-068f-480d-985b-ec78b9fa0e76', logoPath: 'logo.png' } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ debug: true, id: 'f3db5c2b-068f-480d-985b-ec78b9fa0e76', logoPath: 'logo.png' }) } as any),
       new CommandError('An error has occurred'));
   });
 
@@ -342,7 +357,7 @@ describe(commands.M365GROUP_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { id: 'f3db5c2b-068f-480d-985b-ec78b9fa0e76', memberIds: '949b16c1-a032-453e-a8ae-89a52bfc1d8a', verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: 'f3db5c2b-068f-480d-985b-ec78b9fa0e76', memberIds: '949b16c1-a032-453e-a8ae-89a52bfc1d8a', verbose: true }) });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -404,7 +419,7 @@ describe(commands.M365GROUP_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { id: 'f3db5c2b-068f-480d-985b-ec78b9fa0e76', memberUserNames: 'user@contoso.onmicrosoft.com', verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: 'f3db5c2b-068f-480d-985b-ec78b9fa0e76', memberUserNames: 'user@contoso.onmicrosoft.com', verbose: true }) });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -447,7 +462,7 @@ describe(commands.M365GROUP_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { id: 'f3db5c2b-068f-480d-985b-ec78b9fa0e76', ownerIds: '3527dada-9368-4cdd-a958-5460f5658e0e', verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: 'f3db5c2b-068f-480d-985b-ec78b9fa0e76', ownerIds: '3527dada-9368-4cdd-a958-5460f5658e0e', verbose: true }) });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -509,7 +524,7 @@ describe(commands.M365GROUP_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { id: 'f3db5c2b-068f-480d-985b-ec78b9fa0e76', ownerUserNames: 'user@contoso.onmicrosoft.com', verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: 'f3db5c2b-068f-480d-985b-ec78b9fa0e76', ownerUserNames: 'user@contoso.onmicrosoft.com', verbose: true }) });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -522,7 +537,7 @@ describe(commands.M365GROUP_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { id: groupId, allowExternalSenders: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: groupId, allowExternalSenders: true }) });
     assert.deepStrictEqual(JSON.parse(JSON.stringify(patchStub.firstCall.args[0].data)), { allowExternalSenders: true });
   });
 
@@ -535,7 +550,7 @@ describe(commands.M365GROUP_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { id: groupId, autoSubscribeNewMembers: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: groupId, autoSubscribeNewMembers: true }) });
     assert.deepStrictEqual(JSON.parse(JSON.stringify(patchStub.firstCall.args[0].data)), { autoSubscribeNewMembers: true });
   });
 
@@ -548,7 +563,7 @@ describe(commands.M365GROUP_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { id: groupId, autoSubscribeNewMembers: true, hideFromAddressLists: false } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: groupId, autoSubscribeNewMembers: true, hideFromAddressLists: false }) });
     assert.deepStrictEqual(JSON.parse(JSON.stringify(patchStub.firstCall.args[0].data)), { autoSubscribeNewMembers: true, hideFromAddressLists: false });
   });
 
@@ -561,7 +576,7 @@ describe(commands.M365GROUP_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { id: groupId, hideFromOutlookClients: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: groupId, hideFromOutlookClients: true }) });
     assert.deepStrictEqual(JSON.parse(JSON.stringify(patchStub.firstCall.args[0].data)), { hideFromOutlookClients: true });
   });
 
@@ -589,7 +604,7 @@ describe(commands.M365GROUP_SET, () => {
       };
     });
 
-    await assert.rejects(command.action(logger, { options: { id: groupId, ownerIds: userIds.join(',') } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ id: groupId, ownerIds: userIds.join(',') }) }),
       new CommandError(`One or more added object references already exist for the following modified properties: 'members'.`));
   });
 
@@ -626,7 +641,7 @@ describe(commands.M365GROUP_SET, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { id: groupId, ownerIds: userIds.join(',') } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ id: groupId, ownerIds: userIds.join(',') }) }),
       new CommandError('Service unavailable.'));
   });
 
@@ -642,7 +657,7 @@ describe(commands.M365GROUP_SET, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', newDisplayName: 'My group' } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ id: '28beab62-7540-4db1-a23f-29a6018a3848', newDisplayName: 'My group' }) } as any),
       new CommandError('An error has occurred'));
   });
 
@@ -650,7 +665,7 @@ describe(commands.M365GROUP_SET, () => {
     sinonUtil.restore(entraGroup.isUnifiedGroup);
     sinon.stub(entraGroup, 'isUnifiedGroup').resolves(false);
 
-    await assert.rejects(command.action(logger, { options: { id: groupId, newDisplayName: 'Updated title' } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ id: groupId, newDisplayName: 'Updated title' }) }),
       new CommandError(`Specified group with id '${groupId}' is not a Microsoft 365 group.`));
   });
 
@@ -658,7 +673,7 @@ describe(commands.M365GROUP_SET, () => {
     sinonUtil.restore(accessToken.isAppOnlyAccessToken);
     sinon.stub(accessToken, 'isAppOnlyAccessToken').resolves(true);
 
-    await assert.rejects(command.action(logger, { options: { id: groupId, allowExternalSenders: true } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ id: groupId, allowExternalSenders: true }) }),
       new CommandError(`Option 'allowExternalSenders' and 'autoSubscribeNewMembers' can only be used when using delegated permissions.`));
   });
 
@@ -666,99 +681,109 @@ describe(commands.M365GROUP_SET, () => {
     sinonUtil.restore(accessToken.isAppOnlyAccessToken);
     sinon.stub(accessToken, 'isAppOnlyAccessToken').resolves(true);
 
-    await assert.rejects(command.action(logger, { options: { id: groupId, autoSubscribeNewMembers: true } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ id: groupId, autoSubscribeNewMembers: true }) }),
       new CommandError(`Option 'allowExternalSenders' and 'autoSubscribeNewMembers' can only be used when using delegated permissions.`));
   });
 
   it('fails validation if the id is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { id: 'invalid', description: 'My awesome group' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ id: 'invalid', description: 'My awesome group' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('passes validation when the id is a valid GUID and displayName specified', async () => {
-    const actual = await command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', newDisplayName: 'My group' } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ id: '28beab62-7540-4db1-a23f-29a6018a3848', newDisplayName: 'My group' });
+    assert.strictEqual(actual.success, true);
   });
 
   it('passes validation when the id is a valid GUID and description specified', async () => {
-    const actual = await command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', description: 'My awesome group' } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ id: '28beab62-7540-4db1-a23f-29a6018a3848', description: 'My awesome group' });
+    assert.strictEqual(actual.success, true);
   });
 
   it('fails validation if no property to update is specified', async () => {
-    const actual = await command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ id: '28beab62-7540-4db1-a23f-29a6018a3848' });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation if ownerIds and ownerUserNames options are both specified', async () => {
+    const actual = commandOptionsSchema.safeParse({ id: '28beab62-7540-4db1-a23f-29a6018a3848', ownerIds: '7167b488-1ffb-43f1-9547-35969469bada', ownerUserNames: 'john.doe@contoso.com' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('fails validation if ownerIds contains invalid GUID', async () => {
     const ownerIds = ['7167b488-1ffb-43f1-9547-35969469bada', 'foo'];
-    const actual = await command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', ownerIds: ownerIds.join(',') } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ id: '28beab62-7540-4db1-a23f-29a6018a3848', ownerIds: ownerIds.join(',') });
+    assert.strictEqual(actual.success, false);
   });
 
   it('fails validation if ownerUserNames contains invalid user principal name', async () => {
     const ownerUserNames = ['john.doe@contoso.com', 'foo'];
-    const actual = await command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', ownerUserNames: ownerUserNames.join(',') } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ id: '28beab62-7540-4db1-a23f-29a6018a3848', ownerUserNames: ownerUserNames.join(',') });
+    assert.strictEqual(actual.success, false);
   });
 
   it('fails validation if memberIds contains invalid GUID', async () => {
     const memberIds = ['7167b488-1ffb-43f1-9547-35969469bada', 'foo'];
-    const actual = await command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', memberIds: memberIds.join(',') } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ id: '28beab62-7540-4db1-a23f-29a6018a3848', memberIds: memberIds.join(',') });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation if memberIds and memberUserNames are both specified', async () => {
+    const actual = commandOptionsSchema.safeParse({ id: '28beab62-7540-4db1-a23f-29a6018a3848', memberIds: '7167b488-1ffb-43f1-9547-35969469bada', memberUserNames: 'john.doe@contoso.com' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('fails validation if memberUserNames contains invalid user principal name', async () => {
     const memberUserNames = ['john.doe@contoso.com', 'foo'];
-    const actual = await command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', memberUserNames: memberUserNames.join(',') } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ id: '28beab62-7540-4db1-a23f-29a6018a3848', memberUserNames: memberUserNames.join(',') });
+    assert.strictEqual(actual.success, false);
   });
 
   it('passes validation if isPrivate is true', async () => {
-    const actual = await command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', isPrivate: true } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ id: '28beab62-7540-4db1-a23f-29a6018a3848', isPrivate: true });
+    assert.strictEqual(actual.success, true);
   });
 
   it('passes validation if isPrivate is false', async () => {
-    const actual = await command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', isPrivate: false } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ id: '28beab62-7540-4db1-a23f-29a6018a3848', isPrivate: false });
+    assert.strictEqual(actual.success, true);
   });
 
   it('passes validation when all required parameters are valid with ids', async () => {
-    const actual = await command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', ownerIds: userIds.join(',') } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ id: '28beab62-7540-4db1-a23f-29a6018a3848', ownerIds: userIds.join(',') });
+    assert.strictEqual(actual.success, true);
   });
 
   it('passes validation when all required parameters are valid with user names', async () => {
-    const actual = await command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', memberUserNames: userUpns.join(',') } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ id: '28beab62-7540-4db1-a23f-29a6018a3848', memberUserNames: userUpns.join(',') });
+    assert.strictEqual(actual.success, true);
   });
 
   it('fails validation if logoPath points to a non-existent file', async () => {
     sinon.stub(fs, 'existsSync').returns(false);
-    const actual = await command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', logoPath: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ id: '28beab62-7540-4db1-a23f-29a6018a3848', logoPath: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('fails validation if logoPath points to a folder', async () => {
     const stats = { ...fsStats, isDirectory: () => true };
     sinon.stub(fs, 'existsSync').returns(true);
     sinon.stub(fs, 'lstatSync').returns(stats);
-    const actual = await command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', logoPath: 'folder' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ id: '28beab62-7540-4db1-a23f-29a6018a3848', logoPath: 'folder' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('passes validation if logoPath points to an existing file', async () => {
     sinon.stub(fs, 'existsSync').returns(true);
     sinon.stub(fs, 'lstatSync').returns(fsStats);
-    const actual = await command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', logoPath: 'folder' } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ id: '28beab62-7540-4db1-a23f-29a6018a3848', logoPath: 'folder' });
+    assert.strictEqual(actual.success, true);
   });
 
   it('passes validation if all options are being set', async () => {
     sinon.stub(fs, 'existsSync').returns(true);
     sinon.stub(fs, 'lstatSync').returns(fsStats);
-    const actual = await command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', newDisplayName: 'Title', description: 'Description', logoPath: 'logo.png', ownerIds: userIds.join(','), memberIds: userIds.join(','), isPrivate: false, allowExternalSenders: false, autoSubscribeNewMembers: false, hideFromAddressLists: false, hideFromOutlookClients: false } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ id: '28beab62-7540-4db1-a23f-29a6018a3848', newDisplayName: 'Title', description: 'Description', logoPath: 'logo.png', ownerIds: userIds.join(','), memberIds: userIds.join(','), isPrivate: false, allowExternalSenders: false, autoSubscribeNewMembers: false, hideFromAddressLists: false, hideFromOutlookClients: false });
+    assert.strictEqual(actual.success, true);
   });
 });

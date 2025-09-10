@@ -1,25 +1,32 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { validation } from '../../../../utils/validation.js';
 import { formatting } from '../../../../utils/formatting.js';
+import { zod } from '../../../../utils/zod.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 import { entraGroup } from '../../../../utils/entraGroup.js';
 import { entraUser } from '../../../../utils/entraUser.js';
+import teamsCommands from '../../../teams/commands.js';
+
+const options = globalOptionsZod
+  .extend({
+    ids: zod.alias('ids', z.string().optional()),
+    userNames: zod.alias('userNames', z.string().optional()),
+    groupId: zod.alias('i', z.string().uuid().optional()),
+    groupName: zod.alias('groupName', z.string().optional()),
+    teamId: zod.alias('teamId', z.string().uuid().optional()),
+    teamName: zod.alias('teamName', z.string().optional()),
+    role: zod.alias('r', z.string())
+  })
+  .strict();
+
+declare type Options = z.infer<typeof options>;
 
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  ids?: string;
-  userNames?: string;
-  groupId?: string;
-  groupName?: string;
-  teamId?: string;
-  teamName?: string;
-  role: string;
 }
 
 class EntraM365GroupUserSetCommand extends GraphCommand {
@@ -33,97 +40,45 @@ class EntraM365GroupUserSetCommand extends GraphCommand {
     return 'Updates role of the specified user in the specified Microsoft 365 Group or Microsoft Teams team';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
-    this.#initTypes();
+  public get schema(): z.ZodTypeAny | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        teamId: typeof args.options.teamId !== 'undefined',
-        teamName: typeof args.options.teamName !== 'undefined',
-        groupId: typeof args.options.groupId !== 'undefined',
-        groupName: typeof args.options.groupName !== 'undefined',
-        ids: typeof args.options.ids !== 'undefined',
-        userNames: typeof args.options.userNames !== 'undefined'
-      });
-    });
+  public alias(): string[] | undefined {
+    return [teamsCommands.USER_SET];
   }
 
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '--ids [ids]'
-      },
-      {
-        option: '--userNames [userNames]'
-      },
-      {
-        option: '-i, --groupId [groupId]'
-      },
-      {
-        option: '--groupName [groupName]'
-      },
-      {
-        option: '--teamId [teamId]'
-      },
-      {
-        option: '--teamName [teamName]'
-      },
-      {
-        option: '-r, --role <role>',
-        autocomplete: this.allowedRoles
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.teamId && !validation.isValidGuid(args.options.teamId)) {
-          return `'${args.options.teamId}' is not a valid GUID for option 'teamId'.`;
+  public getRefinedSchema(schema: typeof options): z.ZodEffects<any> | undefined {
+    return schema
+      .refine(options => [options.groupId, options.groupName, options.teamId, options.teamName].filter(Boolean).length === 1, {
+        message: 'Specify either groupId, groupName, teamId, or teamName'
+      })
+      .refine(options => [options.ids, options.userNames].filter(Boolean).length === 1, {
+        message: 'Specify either ids or userNames'
+      })
+      .refine(options => {
+        if (options.ids) {
+          const isValidGUIDArrayResult = validation.isValidGuidArray(options.ids);
+          return isValidGUIDArrayResult === true;
         }
-
-        if (args.options.groupId && !validation.isValidGuid(args.options.groupId)) {
-          return `'${args.options.groupId}' is not a valid GUID for option 'groupId'.`;
-        }
-
-        if (args.options.ids) {
-          const isValidGUIDArrayResult = validation.isValidGuidArray(args.options.ids);
-          if (isValidGUIDArrayResult !== true) {
-            return `The following GUIDs are invalid for the option 'ids': ${isValidGUIDArrayResult}.`;
-          }
-        }
-
-        if (args.options.userNames) {
-          const isValidUPNArrayResult = validation.isValidUserPrincipalNameArray(args.options.userNames);
-          if (isValidUPNArrayResult !== true) {
-            return `The following user principal names are invalid for the option 'userNames': ${isValidUPNArrayResult}.`;
-          }
-        }
-
-        if (args.options.role && !this.allowedRoles.some(role => role.toLowerCase() === args.options.role.toLowerCase())) {
-          return `'${args.options.role}' is not a valid role. Allowed values are: ${this.allowedRoles.join(',')}`;
-        }
-
         return true;
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push({ options: ['groupId', 'groupName', 'teamId', 'teamName'] });
-    this.optionSets.push({ options: ['ids', 'userNames'] });
-  }
-
-  #initTypes(): void {
-    this.types.string.push('ids', 'userNames', 'groupId', 'groupName', 'teamId', 'teamName', 'role');
+      }, {
+        message: 'Specify valid GUIDs for the option \'ids\''
+      })
+      .refine(options => {
+        if (options.userNames) {
+          const isValidUPNArrayResult = validation.isValidUserPrincipalNameArray(options.userNames);
+          return isValidUPNArrayResult === true;
+        }
+        return true;
+      }, {
+        message: 'The following user principal names are invalid for the option \'userNames\''
+      })
+      .refine(options => {
+        return this.allowedRoles.some(role => role.toLowerCase() === options.role.toLowerCase());
+      }, {
+        message: 'Invalid role value. Allowed values are: owner,member'
+      });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

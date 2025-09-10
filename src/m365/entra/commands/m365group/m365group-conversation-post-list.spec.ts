@@ -1,5 +1,6 @@
 import assert from 'assert';
 import sinon from 'sinon';
+import { z } from 'zod';
 import auth from '../../../../Auth.js';
 import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
@@ -20,6 +21,7 @@ describe(commands.M365GROUP_CONVERSATION_POST_LIST, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: z.ZodTypeAny;
 
   const jsonOutput = {
     "value": [
@@ -83,6 +85,7 @@ describe(commands.M365GROUP_CONVERSATION_POST_LIST, () => {
     sinon.stub(entraGroup, 'isUnifiedGroup').resolves(true);
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
   });
 
   beforeEach(() => {
@@ -134,8 +137,8 @@ describe(commands.M365GROUP_CONVERSATION_POST_LIST, () => {
       return defaultValue;
     });
 
-    const actual = await command.validate({ options: { groupId: '1caf7dcd-7e83-4c3a-94f7-932a1299c844', groupName: 'MyGroup', threadId: '123' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ groupId: '1caf7dcd-7e83-4c3a-94f7-932a1299c844', groupName: 'MyGroup', threadId: '123' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('fails validation if neither groupId nor groupName specified', async () => {
@@ -147,18 +150,18 @@ describe(commands.M365GROUP_CONVERSATION_POST_LIST, () => {
       return defaultValue;
     });
 
-    const actual = await command.validate({ options: { threadId: '123' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ threadId: '123' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('fails validation if the groupId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { groupId: 'not-c49b-4fd4-8223-28f0ac3a6402', threadId: '123' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ groupId: 'not-c49b-4fd4-8223-28f0ac3a6402', threadId: '123' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('passes validation if the groupId is a valid GUID', async () => {
-    const actual = await command.validate({ options: { groupId: '1caf7dcd-7e83-4c3a-94f7-932a1299c844', threadId: '123' } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ groupId: '1caf7dcd-7e83-4c3a-94f7-932a1299c844', threadId: '123' });
+    assert.strictEqual(actual.success, true);
   });
 
   it('Retrieve posts for the specified conversation threadId of m365 group groupId in the tenant (verbose)', async () => {
@@ -170,11 +173,11 @@ describe(commands.M365GROUP_CONVERSATION_POST_LIST, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         groupId: "00000000-0000-0000-0000-000000000000",
         threadId: "AAQkADkwN2Q2NDg1LWQ3ZGYtNDViZi1iNGRiLTVhYjJmN2Q5NDkxZQAQAOnRAfDf71lIvrdK85FAn5E="
-      }
+      })
     });
     assert(loggerLogSpy.calledWith(
       jsonOutput.value
@@ -200,11 +203,11 @@ describe(commands.M365GROUP_CONVERSATION_POST_LIST, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         groupName: "MyGroup",
         threadId: "AAQkADkwN2Q2NDg1LWQ3ZGYtNDViZi1iNGRiLTVhYjJmN2Q5NDkxZQAQAOnRAfDf71lIvrdK85FAn5E="
-      }
+      })
     });
     assert(loggerLogSpy.calledWith(
       jsonOutput.value
@@ -215,10 +218,10 @@ describe(commands.M365GROUP_CONVERSATION_POST_LIST, () => {
     sinon.stub(request, 'get').rejects(new Error('An error has occurred'));
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         groupId: "00000000-0000-0000-0000-000000000000",
         threadId: "AAQkADkwN2Q2NDg1LWQ3ZGYtNDViZi1iNGRiLTVhYjJmN2Q5NDkxZQAQAOnRAfDf71lIvrdK85FAn5E="
-      }
+      })
     } as any), new CommandError('An error has occurred'));
   });
 
@@ -228,7 +231,7 @@ describe(commands.M365GROUP_CONVERSATION_POST_LIST, () => {
     sinonUtil.restore(entraGroup.isUnifiedGroup);
     sinon.stub(entraGroup, 'isUnifiedGroup').resolves(false);
 
-    await assert.rejects(command.action(logger, { options: { groupId: groupId, threadId: 'AAQkADkwN2Q2NDg1LWQ3ZGYtNDViZi1iNGRiLTVhYjJmN2Q5NDkxZQAQAOnRAfDf71lIvrdK85FAn5E=' } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ groupId: groupId, threadId: 'AAQkADkwN2Q2NDg1LWQ3ZGYtNDViZi1iNGRiLTVhYjJmN2Q5NDkxZQAQAOnRAfDf71lIvrdK85FAn5E=' }) } as any),
       new CommandError(`Specified group with id '${groupId}' is not a Microsoft 365 group.`));
   });
 });
