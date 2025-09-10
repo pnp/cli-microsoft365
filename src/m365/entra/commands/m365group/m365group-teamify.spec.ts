@@ -1,5 +1,6 @@
 import assert from 'assert';
 import sinon from 'sinon';
+import { z } from 'zod';
 import auth from '../../../../Auth.js';
 import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
@@ -19,6 +20,7 @@ describe(commands.M365GROUP_TEAMIFY, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: z.ZodTypeAny;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -28,6 +30,7 @@ describe(commands.M365GROUP_TEAMIFY, () => {
     sinon.stub(entraGroup, 'isUnifiedGroup').resolves(true);
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
   });
 
   beforeEach(() => {
@@ -77,11 +80,8 @@ describe(commands.M365GROUP_TEAMIFY, () => {
       return defaultValue;
     });
 
-    const actual = await command.validate({
-      options: {
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, false);
   });
 
   it('fails validation if id, displayName and mailNickname options are passed', async () => {
@@ -93,22 +93,18 @@ describe(commands.M365GROUP_TEAMIFY, () => {
       return defaultValue;
     });
 
-    const actual = await command.validate({
-      options: {
-        id: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee',
-        mailNickname: 'GroupName'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      id: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee',
+      mailNickname: 'GroupName'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
   it('validates for a correct id', async () => {
-    const actual = await command.validate({
-      options: {
-        id: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      id: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee'
+    });
+    assert.strictEqual(actual.success, true);
   });
 
   it('fails to get M365 group when it does not exists', async () => {
@@ -120,10 +116,10 @@ describe(commands.M365GROUP_TEAMIFY, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         mailNickname: 'GroupName'
-      }
+      })
     }), new CommandError(`The specified group 'GroupName' does not exist.`));
   });
 
@@ -232,10 +228,10 @@ describe(commands.M365GROUP_TEAMIFY, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         mailNickname: 'GroupName'
-      }
+      })
     }), new CommandError("Multiple groups with mail nickname 'GroupName' found. Found: 00000000-0000-0000-0000-000000000000."));
   });
 
@@ -426,7 +422,7 @@ describe(commands.M365GROUP_TEAMIFY, () => {
     });
 
     await command.action(logger, {
-      options: { mailNickname: 'groupname' }
+      options: commandOptionsSchema.parse({ mailNickname: 'groupname' })
     });
     assert.strictEqual(requestStub.lastCall.args[0].url, 'https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/team');
   });
@@ -480,7 +476,7 @@ describe(commands.M365GROUP_TEAMIFY, () => {
     });
 
     await command.action(logger, {
-      options: { id: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee' }
+      options: commandOptionsSchema.parse({ id: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee' })
     });
     assert.strictEqual(requestStub.lastCall.args[0].url, 'https://graph.microsoft.com/v1.0/groups/8231f9f2-701f-4c6e-93ce-ecb563e3c1ee/team');
   });
@@ -588,7 +584,7 @@ describe(commands.M365GROUP_TEAMIFY, () => {
     });
 
     await command.action(logger, {
-      options: { mailNickname: 'groupname' }
+      options: commandOptionsSchema.parse({ mailNickname: 'groupname' })
     });
     assert.strictEqual(requestStub.lastCall.args[0].url, 'https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/team');
   });
@@ -696,7 +692,7 @@ describe(commands.M365GROUP_TEAMIFY, () => {
     });
 
     await command.action(logger, {
-      options: { displayName: 'GroupName' }
+      options: commandOptionsSchema.parse({ displayName: 'GroupName' })
     });
     assert.strictEqual(requestStub.lastCall.args[0].url, 'https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/team');
   });
@@ -725,13 +721,13 @@ describe(commands.M365GROUP_TEAMIFY, () => {
   });
 
   it('fails validation if the id is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { id: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ id: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('passes validation if the id is a valid GUID', async () => {
-    const actual = await command.validate({ options: { id: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee' } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ id: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee' });
+    assert.strictEqual(actual.success, true);
   });
 
   it('throws error when the group is not a unified group', async () => {
@@ -740,7 +736,7 @@ describe(commands.M365GROUP_TEAMIFY, () => {
     sinonUtil.restore(entraGroup.isUnifiedGroup);
     sinon.stub(entraGroup, 'isUnifiedGroup').resolves(false);
 
-    await assert.rejects(command.action(logger, { options: { id: groupId } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ id: groupId }) } as any),
       new CommandError(`Specified group with id '${groupId}' is not a Microsoft 365 group.`));
   });
 });

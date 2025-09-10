@@ -1,26 +1,33 @@
+import { z } from 'zod';
 import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request from '../../../../request.js';
 import { entraGroup } from '../../../../utils/entraGroup.js';
 import { entraUser } from '../../../../utils/entraUser.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { validation } from '../../../../utils/validation.js';
+import { zod } from '../../../../utils/zod.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
+import teamsCommands from '../../../teams/commands.js';
+
+const options = globalOptionsZod
+  .extend({
+    teamId: zod.alias('teamId', z.string().uuid().optional()),
+    teamName: zod.alias('teamName', z.string().optional()),
+    groupId: zod.alias('i', z.string().uuid().optional()),
+    groupName: zod.alias('groupName', z.string().optional()),
+    ids: zod.alias('ids', z.string().optional()),
+    userNames: zod.alias('userNames', z.string().optional()),
+    force: zod.alias('f', z.boolean().optional())
+  })
+  .strict();
+
+declare type Options = z.infer<typeof options>;
 
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  teamId?: string;
-  teamName?: string;
-  groupId?: string;
-  groupName?: string;
-  ids?: string;
-  userNames?: string;
-  force?: boolean;
 }
 
 class EntraM365GroupUserRemoveCommand extends GraphCommand {
@@ -32,100 +39,40 @@ class EntraM365GroupUserRemoveCommand extends GraphCommand {
     return 'Removes the specified user from specified Microsoft 365 Group or Microsoft Teams team';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
-    this.#initTypes();
+  public get schema(): z.ZodTypeAny | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        force: !!args.options.force,
-        teamId: typeof args.options.teamId !== 'undefined',
-        groupId: typeof args.options.groupId !== 'undefined',
-        teamName: typeof args.options.teamName !== 'undefined',
-        groupName: typeof args.options.groupName !== 'undefined',
-        ids: typeof args.options.ids !== 'undefined',
-        userNames: typeof args.options.userNames !== 'undefined'
-      });
-    });
+  public alias(): string[] | undefined {
+    return [teamsCommands.USER_REMOVE];
   }
 
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-i, --groupId [groupId]'
-      },
-      {
-        option: '--groupName [groupName]'
-      },
-      {
-        option: '--teamId [teamId]'
-      },
-      {
-        option: '--teamName [teamName]'
-      },
-      {
-        option: '--ids [ids]'
-      },
-      {
-        option: '--userNames [userNames]'
-      },
-      {
-        option: '-f, --force'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.teamId && !validation.isValidGuid(args.options.teamId as string)) {
-          return `${args.options.teamId} is not a valid GUID for option 'teamId'.`;
+  public getRefinedSchema(schema: typeof options): z.ZodEffects<any> | undefined {
+    return schema
+      .refine(options => !!(options.groupId || options.groupName || options.teamId || options.teamName), {
+        message: 'Specify either groupId, groupName, teamId, or teamName'
+      })
+      .refine(options => !!(options.ids || options.userNames), {
+        message: 'Specify either ids or userNames'
+      })
+      .refine(options => {
+        if (options.ids) {
+          const isValidGUIDArrayResult = validation.isValidGuidArray(options.ids);
+          return isValidGUIDArrayResult === true;
         }
-
-        if (args.options.groupId && !validation.isValidGuid(args.options.groupId as string)) {
-          return `${args.options.groupId} is not a valid GUID for option 'groupId'.`;
-        }
-
-        if (args.options.ids) {
-          const isValidGUIDArrayResult = validation.isValidGuidArray(args.options.ids);
-          if (isValidGUIDArrayResult !== true) {
-            return `The following GUIDs are invalid for the option 'ids': ${isValidGUIDArrayResult}.`;
-          }
-        }
-
-        if (args.options.userNames) {
-          const isValidUPNArrayResult = validation.isValidUserPrincipalNameArray(args.options.userNames);
-          if (isValidUPNArrayResult !== true) {
-            return `The following user principal names are invalid for the option 'userNames': ${isValidUPNArrayResult}.`;
-          }
-        }
-
         return true;
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push(
-      {
-        options: ['groupId', 'teamId', 'groupName', 'teamName']
-      },
-      {
-        options: ['ids', 'userNames']
-      }
-    );
-  }
-
-  #initTypes(): void {
-    this.types.string.push('groupId', 'groupName', 'teamId', 'teamName', 'ids', 'userNames');
-    this.types.boolean.push('force');
+      }, {
+        message: 'The following GUIDs are invalid for the option \'ids\''
+      })
+      .refine(options => {
+        if (options.userNames) {
+          const isValidUPNArrayResult = validation.isValidUserPrincipalNameArray(options.userNames);
+          return isValidUPNArrayResult === true;
+        }
+        return true;
+      }, {
+        message: 'The following user principal names are invalid for the option \'userNames\''
+      });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

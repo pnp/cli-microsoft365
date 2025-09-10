@@ -1,5 +1,6 @@
 import assert from 'assert';
 import sinon from 'sinon';
+import { z } from 'zod';
 import auth from '../../../../Auth.js';
 import { CommandError } from '../../../../Command.js';
 import { cli } from '../../../../cli/cli.js';
@@ -19,6 +20,7 @@ describe(commands.M365GROUP_GET, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: z.ZodTypeAny;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -28,6 +30,7 @@ describe(commands.M365GROUP_GET, () => {
     sinon.stub(entraGroup, 'isUnifiedGroup').resolves(true);
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
   });
 
   beforeEach(() => {
@@ -109,7 +112,7 @@ describe(commands.M365GROUP_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { id: '1caf7dcd-7e83-4c3a-94f7-932a1299c844' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: '1caf7dcd-7e83-4c3a-94f7-932a1299c844' }) });
     assert(loggerLogSpy.calledWith({
       "id": "1caf7dcd-7e83-4c3a-94f7-932a1299c844",
       "deletedDateTime": null,
@@ -189,7 +192,7 @@ describe(commands.M365GROUP_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { displayName: 'Finance' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ displayName: 'Finance' }) });
     assert(loggerLogSpy.calledWith({
       "id": "1caf7dcd-7e83-4c3a-94f7-932a1299c844",
       "deletedDateTime": null,
@@ -265,7 +268,7 @@ describe(commands.M365GROUP_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, id: '1caf7dcd-7e83-4c3a-94f7-932a1299c844' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, id: '1caf7dcd-7e83-4c3a-94f7-932a1299c844' }) });
     assert(loggerLogSpy.calledWith({
       "id": "1caf7dcd-7e83-4c3a-94f7-932a1299c844",
       "deletedDateTime": null,
@@ -346,7 +349,7 @@ describe(commands.M365GROUP_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { id: '1caf7dcd-7e83-4c3a-94f7-932a1299c844', includeSiteUrl: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: '1caf7dcd-7e83-4c3a-94f7-932a1299c844', includeSiteUrl: true }) });
     assert(loggerErrSpy.calledWith(chalk.yellow(`Parameter 'includeSiteUrl' is deprecated. Please use 'withSiteUrl' instead`)));
 
     sinonUtil.restore(loggerErrSpy);
@@ -397,7 +400,7 @@ describe(commands.M365GROUP_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { id: '1caf7dcd-7e83-4c3a-94f7-932a1299c844', withSiteUrl: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: '1caf7dcd-7e83-4c3a-94f7-932a1299c844', withSiteUrl: true }) });
     assert(loggerLogSpy.calledWith({
       "id": "1caf7dcd-7e83-4c3a-94f7-932a1299c844",
       "deletedDateTime": null,
@@ -478,7 +481,7 @@ describe(commands.M365GROUP_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, id: '1caf7dcd-7e83-4c3a-94f7-932a1299c844', withSiteUrl: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, id: '1caf7dcd-7e83-4c3a-94f7-932a1299c844', withSiteUrl: true }) });
     assert(loggerLogSpy.calledWith({
       "id": "1caf7dcd-7e83-4c3a-94f7-932a1299c844",
       "deletedDateTime": null,
@@ -559,7 +562,7 @@ describe(commands.M365GROUP_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { id: '1caf7dcd-7e83-4c3a-94f7-932a1299c844', withSiteUrl: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: '1caf7dcd-7e83-4c3a-94f7-932a1299c844', withSiteUrl: true }) });
     assert(loggerLogSpy.calledWith({
       "id": "1caf7dcd-7e83-4c3a-94f7-932a1299c844",
       "deletedDateTime": null,
@@ -597,28 +600,39 @@ describe(commands.M365GROUP_GET, () => {
     const errorMessage = 'Something went wrong';
     sinon.stub(request, 'get').rejects(new Error(errorMessage));
 
-    await assert.rejects(command.action(logger, { options: { id: '1caf7dcd-7e83-4c3a-94f7-932a1299c844' } }), new CommandError(errorMessage));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ id: '1caf7dcd-7e83-4c3a-94f7-932a1299c844' }) }), new CommandError(errorMessage));
   });
 
-  it('fails validation if the id is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { id: '123' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when id and displayName are not specified', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if the id is a valid GUID', async () => {
-    const actual = await command.validate({ options: { id: '1caf7dcd-7e83-4c3a-94f7-932a1299c844' } }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
-
-  it('supports specifying id', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--id') > -1) {
-        containsOption = true;
-      }
+  it('fails validation when both id and displayName are specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: '1caf7dcd-7e83-4c3a-94f7-932a1299c844',
+      displayName: 'Finance'
     });
-    assert(containsOption);
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation if the id is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ id: '123' });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('passes validation if the id is a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: '1caf7dcd-7e83-4c3a-94f7-932a1299c844'
+    });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('passes validation when displayName is specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      displayName: 'Finance'
+    });
+    assert.strictEqual(actual.success, true);
   });
 
   it('shows error when the group is not a unified group', async () => {
@@ -650,7 +664,7 @@ describe(commands.M365GROUP_GET, () => {
     sinonUtil.restore(entraGroup.isUnifiedGroup);
     sinon.stub(entraGroup, 'isUnifiedGroup').resolves(false);
 
-    await assert.rejects(command.action(logger, { options: { id: groupId } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ id: groupId }) }),
       new CommandError(`Specified group with id '${groupId}' is not a Microsoft 365 group.`));
   });
 });

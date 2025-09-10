@@ -1,22 +1,28 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { odata } from '../../../../utils/odata.js';
+import { zod } from '../../../../utils/zod.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 import { GroupExtended } from './GroupExtended.js';
 
+const options = globalOptionsZod
+  .extend({
+    displayName: zod.alias('d', z.string().optional()),
+    mailNickname: zod.alias('m', z.string().optional()),
+    includeSiteUrl: z.boolean().optional(),
+    withSiteUrl: z.boolean().optional(),
+    orphaned: z.boolean().optional()
+  })
+  .strict();
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  displayName?: string;
-  mailNickname?: string;
-  includeSiteUrl?: boolean;
-  withSiteUrl?: boolean;
-  orphaned?: boolean;
 }
 
 class EntraM365GroupListCommand extends GraphCommand {
@@ -28,43 +34,8 @@ class EntraM365GroupListCommand extends GraphCommand {
     return 'Lists Microsoft 365 Groups in the current tenant';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        displayName: typeof args.options.displayName !== 'undefined',
-        mailNickname: typeof args.options.mailNickname !== 'undefined',
-        includeSiteUrl: args.options.includeSiteUrl,
-        withSiteUrl: !!args.options.withSiteUrl,
-        orphaned: !!args.options.orphaned
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-d, --displayName [displayName]'
-      },
-      {
-        option: '-m, --mailNickname [displayName]'
-      },
-      {
-        option: '--includeSiteUrl'
-      },
-      {
-        option: '--withSiteUrl'
-      },
-      {
-        option: '--orphaned'
-      }
-    );
+  public get schema(): z.ZodTypeAny | undefined {
+    return options;
   }
 
   public defaultProperties(): string[] | undefined {
