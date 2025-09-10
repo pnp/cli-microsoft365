@@ -3779,6 +3779,11 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'site sharingpermission set',
               id: 'cmd/spo/site/site-sharingpermission-set'
+            },
+            {
+              type: 'doc',
+              label: 'site versionpolicy get',
+              id: 'cmd/spo/site/site-versionpolicy-get'
             }
           ]
         },
