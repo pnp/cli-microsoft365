@@ -1,6 +1,9 @@
 import assert from 'assert';
 import sinon from 'sinon';
+import { z } from 'zod';
 import auth from '../../../../Auth.js';
+import { cli } from '../../../../cli/cli.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
 import request from '../../../../request.js';
@@ -15,6 +18,8 @@ describe(commands.M365GROUP_RECYCLEBINITEM_LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
+  let commandOptionsSchema: z.ZodTypeAny;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -22,6 +27,8 @@ describe(commands.M365GROUP_RECYCLEBINITEM_LIST, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
+    commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
   });
 
   beforeEach(() => {
@@ -126,7 +133,7 @@ describe(commands.M365GROUP_RECYCLEBINITEM_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: {} });
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     assert(loggerLogSpy.calledWith([
       {
         "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
@@ -243,7 +250,7 @@ describe(commands.M365GROUP_RECYCLEBINITEM_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true }) });
     assert(loggerLogSpy.calledWith([
       {
         "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
@@ -360,7 +367,7 @@ describe(commands.M365GROUP_RECYCLEBINITEM_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { groupName: 'Deleted' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ groupName: 'Deleted' }) });
     assert(loggerLogSpy.calledWith([
       {
         "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
@@ -477,7 +484,7 @@ describe(commands.M365GROUP_RECYCLEBINITEM_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { groupMailNickname: 'd_team' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ groupMailNickname: 'd_team' }) });
     assert(loggerLogSpy.calledWith([
       {
         "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
@@ -594,7 +601,7 @@ describe(commands.M365GROUP_RECYCLEBINITEM_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { groupName: 'Deleted', groupMailNickname: 'd_team' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ groupName: 'Deleted', groupMailNickname: 'd_team' }) });
     assert(loggerLogSpy.calledWith([
       {
         "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
@@ -653,28 +660,6 @@ describe(commands.M365GROUP_RECYCLEBINITEM_LIST, () => {
     const errorMessage = 'Something went wrong';
     sinon.stub(request, 'get').rejects(new Error(errorMessage));
 
-    await assert.rejects(command.action(logger, { options: { mailNickname: 'd_team' } }), new CommandError(errorMessage));
-  });
-
-  it('supports specifying groupName', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--groupName') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
-
-  it('supports specifying groupMailNickname', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--groupMailNickname') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ groupMailNickname: 'd_team' }) }), new CommandError(errorMessage));
   });
 });

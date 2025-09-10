@@ -1,23 +1,28 @@
 import { User } from '@microsoft/microsoft-graph-types';
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import { odata } from '../../../../utils/odata.js';
-import { validation } from '../../../../utils/validation.js';
+import { zod } from '../../../../utils/zod.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 import { entraGroup } from '../../../../utils/entraGroup.js';
 import { CliRequestOptions } from '../../../../request.js';
 
+const options = globalOptionsZod
+  .extend({
+    filter: zod.alias('f', z.string().optional()),
+    groupId: zod.alias('i', z.string().uuid().optional()),
+    groupDisplayName: zod.alias('d', z.string().optional()),
+    properties: zod.alias('p', z.string().optional()),
+    role: zod.alias('r', z.string().optional())
+  })
+  .strict();
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  filter?: string;
-  groupId?: string;
-  groupDisplayName?: string;
-  properties?: string;
-  role?: string;
 }
 
 interface ExtendedUser extends User {
@@ -33,72 +38,23 @@ class EntraM365GroupUserListCommand extends GraphCommand {
     return "Lists users for the specified Microsoft 365 group";
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initOptionSets();
-    this.#initValidators();
+  public get schema(): z.ZodTypeAny | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        groupId: typeof args.options.groupId !== 'undefined',
-        groupDisplayName: typeof args.options.groupDisplayName !== 'undefined',
-        role: typeof args.options.role !== 'undefined',
-        properties: typeof args.options.properties !== 'undefined',
-        filter: typeof args.options.filter !== 'undefined'
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: "-i, --groupId [groupId]"
-      },
-      {
-        option: "-n, --groupDisplayName [groupDisplayName]"
-      },
-      {
-        option: "-r, --role [type]",
-        autocomplete: ["Owner", "Member"]
-      },
-      {
-        option: "-p, --properties [properties]"
-      },
-      {
-        option: "-f, --filter [filter]"
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push(
-      {
-        options: ['groupId', 'groupDisplayName']
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.groupId && !validation.isValidGuid(args.options.groupId as string)) {
-          return `${args.options.groupId} is not a valid GUID`;
+  public getRefinedSchema(schema: typeof options): z.ZodEffects<any> | undefined {
+    return schema
+      .refine(options => !!(options.groupId || options.groupDisplayName), {
+        message: 'Specify either groupId or groupDisplayName'
+      })
+      .refine(options => {
+        if (options.role && !['Owner', 'Member'].includes(options.role)) {
+          return false;
         }
-
-        if (args.options.role) {
-          if (['Owner', 'Member'].indexOf(args.options.role) === -1) {
-            return `${args.options.role} is not a valid role value. Allowed values Owner|Member`;
-          }
-        }
-
         return true;
-      }
-    );
+      }, {
+        message: 'Invalid role value. Allowed values Owner|Member'
+      });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
