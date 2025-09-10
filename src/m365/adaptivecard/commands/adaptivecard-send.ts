@@ -18,7 +18,7 @@ export const options = globalOptionsZod
     card: z.string().optional(),
     cardData: z.string().optional()
   })
-  .and(z.any());
+  .passthrough();
 
 declare type Options = z.infer<typeof options>;
 
