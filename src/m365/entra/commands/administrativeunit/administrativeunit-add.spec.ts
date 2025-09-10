@@ -208,36 +208,5 @@ describe(commands.ADMINISTRATIVEUNIT_ADD, () => {
     await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ displayName: 'European Division' }) } as any), new CommandError('Invalid request'));
   });
 
-  it('supports specifying displayName', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--displayName') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
 
-  it('supports specifying description', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--description') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
-
-  it('supports specifying hiddenMembership', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--hiddenMembership') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
 });
