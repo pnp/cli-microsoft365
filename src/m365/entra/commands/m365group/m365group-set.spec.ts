@@ -2,6 +2,7 @@ import { Group } from '@microsoft/microsoft-graph-types';
 import assert from 'assert';
 import fs from 'fs';
 import sinon from 'sinon';
+import { z } from 'zod';
 import auth from '../../../../Auth.js';
 import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
@@ -53,6 +54,7 @@ describe(commands.M365GROUP_SET, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: z.ZodTypeAny;
   let loggerLogToStderrSpy: sinon.SinonSpy;
   const groupId = 'f3db5c2b-068f-480d-985b-ec78b9fa0e76';
 
@@ -70,6 +72,7 @@ describe(commands.M365GROUP_SET, () => {
       };
     }
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
   });
 
   beforeEach(() => {
@@ -671,94 +674,94 @@ describe(commands.M365GROUP_SET, () => {
   });
 
   it('fails validation if the id is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { id: 'invalid', description: 'My awesome group' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ id: 'invalid', description: 'My awesome group' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('passes validation when the id is a valid GUID and displayName specified', async () => {
-    const actual = await command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', newDisplayName: 'My group' } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ id: '28beab62-7540-4db1-a23f-29a6018a3848', newDisplayName: 'My group' });
+    assert.strictEqual(actual.success, true);
   });
 
   it('passes validation when the id is a valid GUID and description specified', async () => {
-    const actual = await command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', description: 'My awesome group' } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ id: '28beab62-7540-4db1-a23f-29a6018a3848', description: 'My awesome group' });
+    assert.strictEqual(actual.success, true);
   });
 
   it('fails validation if no property to update is specified', async () => {
-    const actual = await command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ id: '28beab62-7540-4db1-a23f-29a6018a3848' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('fails validation if ownerIds contains invalid GUID', async () => {
     const ownerIds = ['7167b488-1ffb-43f1-9547-35969469bada', 'foo'];
-    const actual = await command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', ownerIds: ownerIds.join(',') } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ id: '28beab62-7540-4db1-a23f-29a6018a3848', ownerIds: ownerIds.join(',') });
+    assert.strictEqual(actual.success, false);
   });
 
   it('fails validation if ownerUserNames contains invalid user principal name', async () => {
     const ownerUserNames = ['john.doe@contoso.com', 'foo'];
-    const actual = await command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', ownerUserNames: ownerUserNames.join(',') } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ id: '28beab62-7540-4db1-a23f-29a6018a3848', ownerUserNames: ownerUserNames.join(',') });
+    assert.strictEqual(actual.success, false);
   });
 
   it('fails validation if memberIds contains invalid GUID', async () => {
     const memberIds = ['7167b488-1ffb-43f1-9547-35969469bada', 'foo'];
-    const actual = await command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', memberIds: memberIds.join(',') } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ id: '28beab62-7540-4db1-a23f-29a6018a3848', memberIds: memberIds.join(',') });
+    assert.strictEqual(actual.success, false);
   });
 
   it('fails validation if memberUserNames contains invalid user principal name', async () => {
     const memberUserNames = ['john.doe@contoso.com', 'foo'];
-    const actual = await command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', memberUserNames: memberUserNames.join(',') } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ id: '28beab62-7540-4db1-a23f-29a6018a3848', memberUserNames: memberUserNames.join(',') });
+    assert.strictEqual(actual.success, false);
   });
 
   it('passes validation if isPrivate is true', async () => {
-    const actual = await command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', isPrivate: true } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ id: '28beab62-7540-4db1-a23f-29a6018a3848', isPrivate: true });
+    assert.strictEqual(actual.success, true);
   });
 
   it('passes validation if isPrivate is false', async () => {
-    const actual = await command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', isPrivate: false } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ id: '28beab62-7540-4db1-a23f-29a6018a3848', isPrivate: false });
+    assert.strictEqual(actual.success, true);
   });
 
   it('passes validation when all required parameters are valid with ids', async () => {
-    const actual = await command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', ownerIds: userIds.join(',') } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ id: '28beab62-7540-4db1-a23f-29a6018a3848', ownerIds: userIds.join(',') });
+    assert.strictEqual(actual.success, true);
   });
 
   it('passes validation when all required parameters are valid with user names', async () => {
-    const actual = await command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', memberUserNames: userUpns.join(',') } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ id: '28beab62-7540-4db1-a23f-29a6018a3848', memberUserNames: userUpns.join(',') });
+    assert.strictEqual(actual.success, true);
   });
 
   it('fails validation if logoPath points to a non-existent file', async () => {
     sinon.stub(fs, 'existsSync').returns(false);
-    const actual = await command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', logoPath: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ id: '28beab62-7540-4db1-a23f-29a6018a3848', logoPath: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('fails validation if logoPath points to a folder', async () => {
     const stats = { ...fsStats, isDirectory: () => true };
     sinon.stub(fs, 'existsSync').returns(true);
     sinon.stub(fs, 'lstatSync').returns(stats);
-    const actual = await command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', logoPath: 'folder' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ id: '28beab62-7540-4db1-a23f-29a6018a3848', logoPath: 'folder' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('passes validation if logoPath points to an existing file', async () => {
     sinon.stub(fs, 'existsSync').returns(true);
     sinon.stub(fs, 'lstatSync').returns(fsStats);
-    const actual = await command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', logoPath: 'folder' } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ id: '28beab62-7540-4db1-a23f-29a6018a3848', logoPath: 'folder' });
+    assert.strictEqual(actual.success, true);
   });
 
   it('passes validation if all options are being set', async () => {
     sinon.stub(fs, 'existsSync').returns(true);
     sinon.stub(fs, 'lstatSync').returns(fsStats);
-    const actual = await command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', newDisplayName: 'Title', description: 'Description', logoPath: 'logo.png', ownerIds: userIds.join(','), memberIds: userIds.join(','), isPrivate: false, allowExternalSenders: false, autoSubscribeNewMembers: false, hideFromAddressLists: false, hideFromOutlookClients: false } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ id: '28beab62-7540-4db1-a23f-29a6018a3848', newDisplayName: 'Title', description: 'Description', logoPath: 'logo.png', ownerIds: userIds.join(','), memberIds: userIds.join(','), isPrivate: false, allowExternalSenders: false, autoSubscribeNewMembers: false, hideFromAddressLists: false, hideFromOutlookClients: false });
+    assert.strictEqual(actual.success, true);
   });
 });
