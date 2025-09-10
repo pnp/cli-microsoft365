@@ -15,7 +15,8 @@ const options = globalOptionsZod
     resourceId: zod.alias('i', z.string()),
     resourceType: zod.alias('t', z.enum(['user', 'group', 'device', 'organization']))
   })
-  .and(z.any());
+  .passthrough();
+
 declare type Options = z.infer<typeof options>;
 
 interface CommandArgs {
@@ -53,7 +54,7 @@ class GraphOpenExtensionAddCommand extends GraphCommand {
 
       requestBody["extensionName"] = args.options.name;
 
-      const unknownOptions: any = optionsUtils.getUnknownOptions(args.options, this.options);
+      const unknownOptions: any = optionsUtils.getUnknownOptions(args.options, zod.schemaToOptions(this.schema!));
       const unknownOptionsNames: string[] = Object.getOwnPropertyNames(unknownOptions);
 
       unknownOptionsNames.forEach(async o => {

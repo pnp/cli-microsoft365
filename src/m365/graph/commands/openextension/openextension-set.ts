@@ -16,7 +16,8 @@ const options = globalOptionsZod
     resourceType: zod.alias('t', z.enum(['user', 'group', 'device', 'organization'])),
     keepUnchangedProperties: zod.alias('k', z.boolean().optional())
   })
-  .and(z.any());
+  .passthrough();
+
 declare type Options = z.infer<typeof options>;
 
 interface CommandArgs {
@@ -24,7 +25,6 @@ interface CommandArgs {
 }
 
 class GraphOpenExtensionSetCommand extends GraphCommand {
-  private readonly commandOptions = ['keepUnchangedProperties', 'resourceType', 'resourceId', 'name'];
   private readonly defaultOpenExtensionProperties = ['id', 'extensionName'];
 
   public get name(): string {
@@ -60,14 +60,10 @@ class GraphOpenExtensionSetCommand extends GraphCommand {
 
       requestBody["@odata.type"] = '#microsoft.graph.openTypeExtension';
 
-      const unknownOptions: any = optionsUtils.getUnknownOptions(args.options, this.options);
+      const unknownOptions: any = optionsUtils.getUnknownOptions(args.options, zod.schemaToOptions(this.schema!));
       const unknownOptionsNames: string[] = Object.getOwnPropertyNames(unknownOptions);
 
       unknownOptionsNames.forEach(async option => {
-        if (this.commandOptions.includes(option)) {
-          return;
-        }
-
         const value = unknownOptions[option];
         if (value === "") {
           requestBody[option] = null;
