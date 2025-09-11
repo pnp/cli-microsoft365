@@ -1,21 +1,26 @@
+import { z } from 'zod';
 import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { entraApp } from '../../../../utils/entraApp.js';
-import { validation } from '../../../../utils/validation.js';
+import { zod } from '../../../../utils/zod.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 
+const options = globalOptionsZod
+  .extend({
+    appId: z.string().uuid().optional(),
+    objectId: z.string().uuid().optional(),
+    name: z.string().optional(),
+    force: zod.alias('f', z.boolean().optional())
+  })
+  .strict();
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  appId?: string;
-  objectId?: string;
-  name?: string;
-  force?: boolean;
 }
 
 class EntraAppRemoveCommand extends GraphCommand {
@@ -27,53 +32,15 @@ class EntraAppRemoveCommand extends GraphCommand {
     return 'Removes an Entra app registration';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
+  public get schema(): z.ZodTypeAny | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        appId: typeof args.options.appId !== 'undefined',
-        objectId: typeof args.options.objectId !== 'undefined',
-        name: typeof args.options.name !== 'undefined',
-        force: (!(!args.options.force)).toString()
+  public getRefinedSchema(schema: typeof options): z.ZodEffects<any> | undefined {
+    return schema
+      .refine(options => [options.appId, options.objectId, options.name].filter(Boolean).length === 1, {
+        message: 'Specify either appId, objectId, or name'
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      { option: '--appId [appId]' },
-      { option: '--objectId [objectId]' },
-      { option: '--name [name]' },
-      { option: '-f, --force' }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.appId && !validation.isValidGuid(args.options.appId as string)) {
-          return `${args.options.appId} is not a valid GUID`;
-        }
-
-        if (args.options.objectId && !validation.isValidGuid(args.options.objectId as string)) {
-          return `${args.options.objectId} is not a valid GUID`;
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push({ options: ['appId', 'objectId', 'name'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

@@ -1,35 +1,55 @@
 import fs from 'fs';
 import { v4 } from 'uuid';
+import { z } from 'zod';
 import auth from '../../../../Auth.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
 import { Logger } from '../../../../cli/Logger.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 import { AppCreationOptions, AppInfo, entraApp } from '../../../../utils/entraApp.js';
+import { optionsUtils } from '../../../../utils/optionsUtils.js';
+import { zod } from '../../../../utils/zod.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import { M365RcJson } from '../../../base/M365RcJson.js';
 import commands from '../../commands.js';
-import { optionsUtils } from '../../../../utils/optionsUtils.js';
+
+const entraApplicationPlatform = ['spa', 'web', 'publicClient', 'apple', 'android'] as const;
+const entraAppScopeConsentBy = ['admins', 'adminsAndUsers'] as const;
+
+const options = globalOptionsZod
+  .extend({
+    name: zod.alias('n', z.string().optional()),
+    multitenant: z.boolean().optional(),
+    redirectUris: zod.alias('r', z.string().optional()),
+    platform: zod.alias('p', z.enum(entraApplicationPlatform).optional()),
+    implicitFlow: z.boolean().optional(),
+    withSecret: zod.alias('s', z.boolean().optional()),
+    apisDelegated: z.string().optional(),
+    apisApplication: z.string().optional(),
+    uri: zod.alias('u', z.string().optional()),
+    scopeName: z.string().optional(),
+    scopeConsentBy: z.enum(entraAppScopeConsentBy).optional(),
+    scopeAdminConsentDisplayName: z.string().optional(),
+    scopeAdminConsentDescription: z.string().optional(),
+    certificateFile: z.string().optional(),
+    certificateBase64Encoded: z.string().optional(),
+    certificateDisplayName: z.string().optional(),
+    manifest: z.string().optional(),
+    save: z.boolean().optional(),
+    grantAdminConsent: z.boolean().optional(),
+    allowPublicClientFlows: z.boolean().optional(),
+    bundleId: z.string().optional(),
+    signatureHash: z.string().optional()
+  })
+  .passthrough();
+
+declare type Options = z.infer<typeof options> & AppCreationOptions;
 
 interface CommandArgs {
   options: Options;
 }
 
-interface Options extends GlobalOptions, AppCreationOptions {
-  grantAdminConsent?: boolean;
-  manifest?: string;
-  save?: boolean;
-  scopeAdminConsentDescription?: string;
-  scopeAdminConsentDisplayName?: string;
-  scopeConsentBy?: string;
-  scopeName?: string;
-  uri?: string;
-  withSecret: boolean;
-}
-
 class EntraAppAddCommand extends GraphCommand {
-  private static entraApplicationPlatform: string[] = ['spa', 'web', 'publicClient', 'apple', 'android'];
-  private static entraAppScopeConsentBy: string[] = ['admins', 'adminsAndUsers'];
   private manifest: any;
   private appName: string = '';
 
@@ -45,189 +65,105 @@ class EntraAppAddCommand extends GraphCommand {
     return true;
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
+  public get schema(): z.ZodTypeAny | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        apis: typeof args.options.apisDelegated !== 'undefined',
-        implicitFlow: args.options.implicitFlow,
-        multitenant: args.options.multitenant,
-        platform: args.options.platform,
-        redirectUris: typeof args.options.redirectUris !== 'undefined',
-        scopeAdminConsentDescription: typeof args.options.scopeAdminConsentDescription !== 'undefined',
-        scopeAdminConsentDisplayName: typeof args.options.scopeAdminConsentDisplayName !== 'undefined',
-        scopeConsentBy: args.options.scopeConsentBy,
-        scopeName: typeof args.options.scopeName !== 'undefined',
-        uri: typeof args.options.uri !== 'undefined',
-        withSecret: args.options.withSecret,
-        certificateFile: typeof args.options.certificateFile !== 'undefined',
-        certificateBase64Encoded: typeof args.options.certificateBase64Encoded !== 'undefined',
-        certificateDisplayName: typeof args.options.certificateDisplayName !== 'undefined',
-        grantAdminConsent: typeof args.options.grantAdminConsent !== 'undefined',
-        allowPublicClientFlows: typeof args.options.allowPublicClientFlows !== 'undefined',
-        bundleId: typeof args.options.bundleId !== 'undefined',
-        signatureHash: typeof args.options.signatureHash !== 'undefined'
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-n, --name [name]'
-      },
-      {
-        option: '--multitenant'
-      },
-      {
-        option: '-r, --redirectUris [redirectUris]'
-      },
-      {
-        option: '-p, --platform [platform]',
-        autocomplete: EntraAppAddCommand.entraApplicationPlatform
-      },
-      {
-        option: '--implicitFlow'
-      },
-      {
-        option: '-s, --withSecret'
-      },
-      {
-        option: '--apisDelegated [apisDelegated]'
-      },
-      {
-        option: '--apisApplication [apisApplication]'
-      },
-      {
-        option: '-u, --uri [uri]'
-      },
-      {
-        option: '--scopeName [scopeName]'
-      },
-      {
-        option: '--scopeConsentBy [scopeConsentBy]',
-        autocomplete: EntraAppAddCommand.entraAppScopeConsentBy
-      },
-      {
-        option: '--scopeAdminConsentDisplayName [scopeAdminConsentDisplayName]'
-      },
-      {
-        option: '--scopeAdminConsentDescription [scopeAdminConsentDescription]'
-      },
-      {
-        option: '--certificateFile [certificateFile]'
-      },
-      {
-        option: '--certificateBase64Encoded [certificateBase64Encoded]'
-      },
-      {
-        option: '--certificateDisplayName [certificateDisplayName]'
-      },
-      {
-        option: '--manifest [manifest]'
-      },
-      {
-        option: '--bundleId [bundleId]'
-      },
-      {
-        option: '--signatureHash [signatureHash]'
-      },
-      {
-        option: '--save'
-      },
-      {
-        option: '--grantAdminConsent'
-      },
-      {
-        option: '--allowPublicClientFlows'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.platform &&
-          EntraAppAddCommand.entraApplicationPlatform.indexOf(args.options.platform) < 0) {
-          return `${args.options.platform} is not a valid value for platform. Allowed values are ${EntraAppAddCommand.entraApplicationPlatform.join(', ')}`;
+  public getRefinedSchema(schema: typeof options): z.ZodEffects<any> | undefined {
+    return schema
+      .refine(options => {
+        if (options.redirectUris && !options.platform) {
+          return false;
         }
-
-        if (args.options.redirectUris && !args.options.platform) {
-          return `When you specify redirectUris you also need to specify platform`;
+        return true;
+      }, {
+        message: 'When you specify redirectUris you also need to specify platform'
+      })
+      .refine(options => {
+        if (options.platform && ['spa', 'web', 'publicClient'].includes(options.platform) && !options.redirectUris) {
+          return false;
         }
-
-        if (args.options.platform && ['spa', 'web', 'publicClient'].indexOf(args.options.platform) > -1 && !args.options.redirectUris) {
-          return `When you use platform spa, web or publicClient, you'll need to specify redirectUris`;
+        return true;
+      }, {
+        message: 'When you use platform spa, web or publicClient, you\'ll need to specify redirectUris'
+      })
+      .refine(options => {
+        if (options.certificateFile && options.certificateBase64Encoded) {
+          return false;
         }
-
-        if (args.options.certificateFile && args.options.certificateBase64Encoded) {
-          return 'Specify either certificateFile or certificateBase64Encoded but not both';
+        return true;
+      }, {
+        message: 'Specify either certificateFile or certificateBase64Encoded but not both'
+      })
+      .refine(options => {
+        if (options.certificateDisplayName && !options.certificateFile && !options.certificateBase64Encoded) {
+          return false;
         }
-
-        if (args.options.certificateDisplayName && !args.options.certificateFile && !args.options.certificateBase64Encoded) {
-          return 'When you specify certificateDisplayName you also need to specify certificateFile or certificateBase64Encoded';
+        return true;
+      }, {
+        message: 'When you specify certificateDisplayName you also need to specify certificateFile or certificateBase64Encoded'
+      })
+      .refine(options => {
+        if (options.certificateFile && !fs.existsSync(options.certificateFile)) {
+          return false;
         }
-
-        if (args.options.certificateFile && !fs.existsSync(args.options.certificateFile as string)) {
-          return 'Certificate file not found';
-        }
-
-        if (args.options.scopeName) {
-          if (!args.options.uri) {
-            return `When you specify scopeName you also need to specify uri`;
+        return true;
+      }, {
+        message: 'Certificate file not found'
+      })
+      .refine(options => {
+        if (options.scopeName) {
+          if (!options.uri) {
+            return false;
           }
-
-          if (!args.options.scopeAdminConsentDescription) {
-            return `When you specify scopeName you also need to specify scopeAdminConsentDescription`;
+          if (!options.scopeAdminConsentDescription) {
+            return false;
           }
-
-          if (!args.options.scopeAdminConsentDisplayName) {
-            return `When you specify scopeName you also need to specify scopeAdminConsentDisplayName`;
+          if (!options.scopeAdminConsentDisplayName) {
+            return false;
           }
         }
-
-        if (args.options.scopeConsentBy &&
-          EntraAppAddCommand.entraAppScopeConsentBy.indexOf(args.options.scopeConsentBy) < 0) {
-          return `${args.options.scopeConsentBy} is not a valid value for scopeConsentBy. Allowed values are ${EntraAppAddCommand.entraAppScopeConsentBy.join(', ')}`;
-        }
-
-        if (args.options.manifest) {
+        return true;
+      }, {
+        message: 'When you specify scopeName you also need to specify uri, scopeAdminConsentDescription, and scopeAdminConsentDisplayName'
+      })
+      .refine(options => {
+        if (options.manifest) {
           try {
-            this.manifest = JSON.parse(args.options.manifest);
-            if (!args.options.name && !this.manifest.name) {
-              return `Specify the name of the app to create either through the 'name' option or the 'name' property in the manifest`;
+            const manifest = JSON.parse(options.manifest);
+            if (!options.name && !manifest.name) {
+              return false;
             }
+            this.manifest = manifest;
+            return true;
           }
           catch (e) {
-            return `Error while parsing the specified manifest: ${e}`;
+            return false;
           }
         }
-
-        if (args.options.platform === 'apple' && !args.options.bundleId) {
-          return `When you use platform apple, you'll need to specify bundleId`;
-        }
-
-        if (args.options.platform === 'android' && (!args.options.bundleId || !args.options.signatureHash)) {
-          return `When you use platform android, you'll need to specify bundleId and signatureHash`;
-        }
-
         return true;
-      },
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push(
-      { options: ['name', 'manifest'] }
-    );
+      }, {
+        message: 'Specify the name of the app to create either through the \'name\' option or the \'name\' property in the manifest'
+      })
+      .refine(options => options.name || options.manifest, {
+        message: 'Specify either name or manifest'
+      })
+      .refine(options => {
+        if (options.platform === 'apple' && !options.bundleId) {
+          return false;
+        }
+        return true;
+      }, {
+        message: 'When you use platform apple, you\'ll need to specify bundleId'
+      })
+      .refine(options => {
+        if (options.platform === 'android' && (!options.bundleId || !options.signatureHash)) {
+          return false;
+        }
+        return true;
+      }, {
+        message: 'When you use platform android, you\'ll need to specify bundleId and signatureHash'
+      });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -246,7 +182,7 @@ class EntraAppAddCommand extends GraphCommand {
       });
       let appInfo: any = await entraApp.createAppRegistration({
         options: args.options,
-        unknownOptions: optionsUtils.getUnknownOptions(args.options, this.options),
+        unknownOptions: optionsUtils.getUnknownOptions(args.options, zod.schemaToOptions(this.schema!)),
         apis,
         logger,
         verbose: this.verbose,

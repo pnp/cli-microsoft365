@@ -1,34 +1,40 @@
 import { Application, KeyCredential, PublicClientApplication, SpaApplication, WebApplication } from '@microsoft/microsoft-graph-types';
 import fs from 'fs';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
+import { entraApp } from '../../../../utils/entraApp.js';
+import { optionsUtils } from '../../../../utils/optionsUtils.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
-import { optionsUtils } from '../../../../utils/optionsUtils.js';
-import { entraApp } from '../../../../utils/entraApp.js';
+import { zod } from '../../../../utils/zod.js';
+
+const entraIDApplicationPlatform = ['spa', 'web', 'publicClient'] as const;
+
+const options = globalOptionsZod
+  .extend({
+    appId: z.string().uuid().optional(),
+    objectId: z.string().uuid().optional(),
+    name: z.string().optional(),
+    platform: z.enum(entraIDApplicationPlatform).optional(),
+    redirectUris: z.string().optional(),
+    redirectUrisToRemove: z.string().optional(),
+    uris: z.string().optional(),
+    certificateFile: z.string().optional(),
+    certificateBase64Encoded: z.string().optional(),
+    certificateDisplayName: z.string().optional(),
+    allowPublicClientFlows: z.boolean().optional()
+  })
+  .passthrough();
+
+declare type Options = z.infer<typeof options>;
 
 interface CommandArgs {
   options: Options;
 }
 
-interface Options extends GlobalOptions {
-  appId?: string;
-  objectId?: string;
-  name?: string;
-  platform?: string;
-  redirectUris?: string;
-  redirectUrisToRemove?: string;
-  uris?: string;
-  certificateFile?: string;
-  certificateBase64Encoded?: string;
-  certificateDisplayName?: string;
-  allowPublicClientFlows?: boolean;
-}
-
 class EntraAppSetCommand extends GraphCommand {
-  private static aadApplicationPlatform: string[] = ['spa', 'web', 'publicClient'];
-
   public get name(): string {
     return commands.APP_SET;
   }
@@ -43,90 +49,39 @@ class EntraAppSetCommand extends GraphCommand {
 
   constructor() {
     super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
-    this.#initTypes();
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        appId: typeof args.options.appId !== 'undefined',
-        objectId: typeof args.options.objectId !== 'undefined',
-        name: typeof args.options.name !== 'undefined',
-        platform: typeof args.options.platform !== 'undefined',
-        redirectUris: typeof args.options.redirectUris !== 'undefined',
-        redirectUrisToRemove: typeof args.options.redirectUrisToRemove !== 'undefined',
-        uris: typeof args.options.uris !== 'undefined',
-        certificateFile: typeof args.options.certificateFile !== 'undefined',
-        certificateBase64Encoded: typeof args.options.certificateBase64Encoded !== 'undefined',
-        certificateDisplayName: typeof args.options.certificateDisplayName !== 'undefined',
-        allowPublicClientFlows: typeof args.options.allowPublicClientFlows !== 'undefined'
-      });
-      this.trackUnknownOptions(this.telemetryProperties, args.options);
-    });
+  public get schema(): z.ZodTypeAny | undefined {
+    return options;
   }
 
-  #initOptions(): void {
-    this.options.unshift(
-      { option: '--appId [appId]' },
-      { option: '--objectId [objectId]' },
-      { option: '-n, --name [name]' },
-      { option: '-u, --uris [uris]' },
-      { option: '-r, --redirectUris [redirectUris]' },
-      { option: '--certificateFile [certificateFile]' },
-      { option: '--certificateBase64Encoded [certificateBase64Encoded]' },
-      { option: '--certificateDisplayName [certificateDisplayName]' },
-      {
-        option: '--platform [platform]',
-        autocomplete: EntraAppSetCommand.aadApplicationPlatform
-      },
-      { option: '--redirectUrisToRemove [redirectUrisToRemove]' },
-      {
-        option: '--allowPublicClientFlows [allowPublicClientFlows]',
-        autocomplete: ['true', 'false']
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.certificateFile && args.options.certificateBase64Encoded) {
-          return 'Specify either certificateFile or certificateBase64Encoded but not both';
+  public getRefinedSchema(schema: typeof options): z.ZodEffects<any> | undefined {
+    return schema
+      .refine(options => [options.appId, options.objectId, options.name].filter(Boolean).length === 1, {
+        message: 'Specify either appId, objectId, or name but not multiple'
+      })
+      .refine(options => !options.redirectUris || !!options.platform, {
+        message: 'When you specify redirectUris you also need to specify platform'
+      })
+      .refine(options => !(options.certificateFile && options.certificateBase64Encoded), {
+        message: 'Specify either certificateFile or certificateBase64Encoded but not both'
+      })
+      .refine(options => {
+        if (options.certificateDisplayName && !options.certificateFile && !options.certificateBase64Encoded) {
+          return false;
         }
-
-        if (args.options.certificateDisplayName && !args.options.certificateFile && !args.options.certificateBase64Encoded) {
-          return 'When you specify certificateDisplayName you also need to specify certificateFile or certificateBase64Encoded';
-        }
-
-        if (args.options.certificateFile && !fs.existsSync(args.options.certificateFile as string)) {
-          return 'Certificate file not found';
-        }
-
-        if (args.options.redirectUris && !args.options.platform) {
-          return `When you specify redirectUris you also need to specify platform`;
-        }
-
-        if (args.options.platform &&
-          EntraAppSetCommand.aadApplicationPlatform.indexOf(args.options.platform) < 0) {
-          return `${args.options.platform} is not a valid value for platform. Allowed values are ${EntraAppSetCommand.aadApplicationPlatform.join(', ')}`;
-        }
-
         return true;
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push({ options: ['appId', 'objectId', 'name'] });
-  }
-
-  #initTypes(): void {
-    this.types.boolean.push('allowPublicClientFlows');
+      }, {
+        message: 'When you specify certificateDisplayName you also need to specify certificateFile or certificateBase64Encoded'
+      })
+      .refine(options => {
+        if (options.certificateFile && !fs.existsSync(options.certificateFile)) {
+          return false;
+        }
+        return true;
+      }, {
+        message: 'Certificate file not found'
+      });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -165,7 +120,7 @@ class EntraAppSetCommand extends GraphCommand {
   }
 
   private async updateUnknownOptions(args: CommandArgs, objectId: string): Promise<string> {
-    const unknownOptions = optionsUtils.getUnknownOptions(args.options, this.options);
+    const unknownOptions = optionsUtils.getUnknownOptions(args.options, zod.schemaToOptions(this.schema!));
 
     if (Object.keys(unknownOptions).length > 0) {
       const requestBody = {};

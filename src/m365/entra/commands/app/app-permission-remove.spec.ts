@@ -1,6 +1,7 @@
 import { Application, ServicePrincipal } from '@microsoft/microsoft-graph-types';
 import assert from 'assert';
 import sinon from 'sinon';
+import { z } from 'zod';
 import auth from '../../../../Auth.js';
 import { CommandError } from '../../../../Command.js';
 import { cli } from '../../../../cli/cli.js';
@@ -27,11 +28,13 @@ describe(commands.APP_PERMISSION_REMOVE, () => {
   const applications: Application[] = [{ id: appObjectId, appId: appId, requiredResourceAccess: [{ resourceAppId: "00000003-0000-0000-c000-000000000000", resourceAccess: [{ id: "e4aa47b9-9a69-4109-82ed-36ec70d85ff1", type: "Scope" }, { id: "7427e0e9-2fba-42fe-b0c0-848c9e6a8182", type: "Scope" }, { id: "332a536c-c7ef-4017-ab91-336970924f0d", type: "Role" }] }] }];
   const applicationPermissions = 'https://graph.microsoft.com/User.ReadWrite.All https://graph.microsoft.com/User.Read.All';
   const delegatedPermissions = 'https://graph.microsoft.com/offline_access';
+  const selectProperties = '$select=id,appId,requiredResourceAccess';
 
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: z.ZodTypeAny;
   let promptIssued: boolean = false;
 
   before(() => {
@@ -41,6 +44,7 @@ describe(commands.APP_PERMISSION_REMOVE, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
   });
 
   beforeEach(() => {
@@ -104,7 +108,7 @@ describe(commands.APP_PERMISSION_REMOVE, () => {
   });
 
   it('prompts before removing the app when force option not passed', async () => {
-    await command.action(logger, { options: { appId: appId, applicationPermissions: applicationPermissions } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ appId: appId, applicationPermissions: applicationPermissions }) });
     assert(promptIssued);
   });
 
@@ -112,7 +116,7 @@ describe(commands.APP_PERMISSION_REMOVE, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(false);
 
-    await command.action(logger, { options: { appId: appId, applicationPermissions: applicationPermissions, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ appId: appId, applicationPermissions: applicationPermissions, verbose: true }) });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -191,7 +195,7 @@ describe(commands.APP_PERMISSION_REMOVE, () => {
       }
     });
 
-    await command.action(logger, { options: { appName: appName, applicationPermissions: applicationPermissions, revokeAdminConsent: true, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ appName: appName, applicationPermissions: applicationPermissions, revokeAdminConsent: true, verbose: true }) });
     assert(deleteStub.calledTwice);
   });
 
@@ -251,7 +255,7 @@ describe(commands.APP_PERMISSION_REMOVE, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
-    await command.action(logger, { options: { appObjectId: appObjectId, delegatedPermissions: delegatedPermissions, revokeAdminConsent: true, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ appObjectId: appObjectId, delegatedPermissions: delegatedPermissions, revokeAdminConsent: true, verbose: true }) });
     assert(patchStub.lastCall.args[0].data.scope === 'AgreementAcceptance.Read');
   });
 
@@ -297,7 +301,7 @@ describe(commands.APP_PERMISSION_REMOVE, () => {
       }
     });
 
-    await command.action(logger, { options: { appObjectId: appObjectId, delegatedPermissions: delegatedPermissions, revokeAdminConsent: true, debug: true, force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ appObjectId: appObjectId, delegatedPermissions: delegatedPermissions, revokeAdminConsent: true, debug: true, force: true }) });
     assert(patchStub.calledOnce);
     assert(!patchStub.lastCall.args[0].url!.includes('oauth2PermissionGrants'));
   });
@@ -342,7 +346,7 @@ describe(commands.APP_PERMISSION_REMOVE, () => {
 
     sinon.stub(cli, 'handleMultipleResultsFound').resolves({ id: appObjectId });
 
-    await command.action(logger, { options: { appId: appId, delegatedPermissions: delegatedPermissions, force: true, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ appId: appId, delegatedPermissions: delegatedPermissions, force: true, verbose: true }) });
     assert(patchStub.calledOnce);
   });
 
@@ -373,7 +377,7 @@ describe(commands.APP_PERMISSION_REMOVE, () => {
 
     sinon.stub(cli, 'handleMultipleResultsFound').resolves({ id: appObjectId });
 
-    await command.action(logger, { options: { appId: appId, delegatedPermissions: 'https://graph.microsoft.com/TeamTemplates.Read https://graph.microsoft.com/offline_access', force: true, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ appId: appId, delegatedPermissions: 'https://graph.microsoft.com/TeamTemplates.Read https://graph.microsoft.com/offline_access', force: true, verbose: true }) });
     assert(patchStub.calledOnce);
   });
 
@@ -404,8 +408,32 @@ describe(commands.APP_PERMISSION_REMOVE, () => {
 
     sinon.stub(cli, 'handleMultipleResultsFound').resolves({ id: appObjectId });
 
-    await command.action(logger, { options: { appId: appId, applicationPermissions: 'https://graph.microsoft.com/User.ReadWrite.All', force: true, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ appId: appId, applicationPermissions: 'https://graph.microsoft.com/User.ReadWrite.All', force: true, verbose: true }) });
     assert(patchStub.calledOnce);
+  });
+
+  it('throws error if application specified by name cannot be found', async () => {
+    sinon.stub(odata, 'getAllItems').callsFake(async (url) => {
+      if (url === `https://graph.microsoft.com/v1.0/applications?$filter=displayName eq '${encodeURIComponent(appName)}'&${selectProperties}`) {
+        return [];
+      }
+
+      throw `Invalid request ${url}`;
+    });
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, appName: appName, delegatedPermissions: delegatedPermissions, force: true }) }),
+      new CommandError(`App with name '${appName}' not found in Microsoft Entra ID`));
+  });
+
+  it('throws error if application specified by appId cannot be found', async () => {
+    sinon.stub(odata, 'getAllItems').callsFake(async (url) => {
+      if (url === `https://graph.microsoft.com/v1.0/applications?$filter=appId eq '${appId}'&${selectProperties}`) {
+        return [];
+      }
+
+      throw `Invalid request ${url}`;
+    });
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, appId: appId, delegatedPermissions: delegatedPermissions, force: true }) }),
+      new CommandError(`App with appId '${appId}' not found in Microsoft Entra ID`));
   });
 
   it('throws an error when service principal is not found', async () => {
@@ -422,7 +450,7 @@ describe(commands.APP_PERMISSION_REMOVE, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { appId: appId, applicationPermissions: applicationPermission, verbose: true, force: true } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ appId: appId, applicationPermissions: applicationPermission, verbose: true, force: true }) }),
       new CommandError(`Service principal ${servicePrincipalName} not found`));
   });
 
@@ -441,67 +469,67 @@ describe(commands.APP_PERMISSION_REMOVE, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { appId: appId, applicationPermissions: applicationPermission, verbose: true, force: true } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ appId: appId, applicationPermissions: applicationPermission, verbose: true, force: true }) }),
       new CommandError(`Permission ${permissionName} for service principal ${servicePrincipalName} not found`));
   });
 
   it('fails validation if the appId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { appId: 'invalid', applicationPermissions: applicationPermissions } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ appId: 'invalid', applicationPermissions: applicationPermissions });
+    assert.strictEqual(actual.success, false);
   });
 
   it('passes validation if the appId is a valid GUID', async () => {
-    const actual = await command.validate({ options: { appId: appId, applicationPermissions: applicationPermissions } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ appId: appId, applicationPermissions: applicationPermissions });
+    assert.strictEqual(actual.success, true);
   });
 
   it('fails validation if the appObjectId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { appObjectId: 'invalid', applicationPermissions: applicationPermissions } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ appObjectId: 'invalid', applicationPermissions: applicationPermissions });
+    assert.strictEqual(actual.success, false);
   });
 
   it('passes validation if the appObjectId is a valid GUID', async () => {
-    const actual = await command.validate({ options: { appObjectId: appObjectId, applicationPermissions: applicationPermissions } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ appObjectId: appObjectId, applicationPermissions: applicationPermissions });
+    assert.strictEqual(actual.success, true);
   });
 
   it('passes validation if the one scope in delegatedPermissions is fully-qualified', async () => {
-    const actual = await command.validate({ options: { appObjectId: appObjectId, delegatedPermissions: delegatedPermissions } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ appObjectId: appObjectId, delegatedPermissions: delegatedPermissions });
+    assert.strictEqual(actual.success, true);
   });
 
   it('fails validation if the one scope in delegatedPermissions is not fully-qualified', async () => {
-    const actual = await command.validate({ options: { appObjectId: appObjectId, delegatedPermissions: 'User.Read' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ appObjectId: appObjectId, delegatedPermissions: 'User.Read' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('passes validation if all scopes in delegatedPermissions are fully-qualified', async () => {
-    const actual = await command.validate({ options: { appObjectId: appObjectId, delegatedPermissions: 'https://graph.microsoft.com/User.Read https://graph.microsoft.com/User.ReadWrite' } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ appObjectId: appObjectId, delegatedPermissions: 'https://graph.microsoft.com/User.Read https://graph.microsoft.com/User.ReadWrite' });
+    assert.strictEqual(actual.success, true);
   });
 
   it('fails validation if one scope in delegatedPermissions is fully-qualified and the other is not', async () => {
-    const actual = await command.validate({ options: { appObjectId: appObjectId, delegatedPermissions: 'https://graph.microsoft.com/User.Read User.ReadWrite' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ appObjectId: appObjectId, delegatedPermissions: 'https://graph.microsoft.com/User.Read User.ReadWrite' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('passes validation if the one scope in applicationPermissions is fully-qualified', async () => {
-    const actual = await command.validate({ options: { appObjectId: appObjectId, applicationPermissions: applicationPermissions } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ appObjectId: appObjectId, applicationPermissions: applicationPermissions });
+    assert.strictEqual(actual.success, true);
   });
 
   it('fails validation if the one scope in applicationPermissions is not fully-qualified', async () => {
-    const actual = await command.validate({ options: { appObjectId: appObjectId, applicationPermissions: 'User.Read.All' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ appObjectId: appObjectId, applicationPermissions: 'User.Read.All' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('passes validation if all scopes in applicationPermissions are fully-qualified', async () => {
-    const actual = await command.validate({ options: { appObjectId: appObjectId, applicationPermissions: 'https://graph.microsoft.com/User.Read.All https://graph.microsoft.com/User.ReadWrite.All' } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ appObjectId: appObjectId, applicationPermissions: 'https://graph.microsoft.com/User.Read.All https://graph.microsoft.com/User.ReadWrite.All' });
+    assert.strictEqual(actual.success, true);
   });
 
   it('fails validation if one scope in applicationPermissions is fully-qualified and the other is not', async () => {
-    const actual = await command.validate({ options: { appObjectId: appObjectId, applicationPermissions: 'https://graph.microsoft.com/User.Read.All User.ReadWrite.All' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ appObjectId: appObjectId, applicationPermissions: 'https://graph.microsoft.com/User.Read.All User.ReadWrite.All' });
+    assert.strictEqual(actual.success, false);
   });
 });
