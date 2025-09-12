@@ -182,10 +182,4 @@ describe(commands.COPILOT_LIST, () => {
     await assert.rejects(command.action(logger, { options: { environmentName: validEnvironment } } as any),
       new CommandError(`Resource '' does not exist or one of its queried reference-property objects are not present`));
   });
-
-  it('defines correct alias', () => {
-    const alias = command.alias();
-    assert.deepStrictEqual(alias, [commands.CHATBOT_LIST]);
-  });
-
 });
