@@ -98,10 +98,6 @@ describe(commands.HOMESITE_LIST, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('has an alias', () => {
-    assert.notStrictEqual(command.alias(), commands.TENANT_HOMESITE_LIST);
-  });
-
   it('defines correct properties for the default output', () => {
     assert.deepStrictEqual(command.defaultProperties(), ['Url', 'Title']);
   });
