@@ -326,7 +326,6 @@ export default {
   TENANT_COMMANDSET_LIST: `${prefix} tenant commandset list`,
   TENANT_COMMANDSET_REMOVE: `${prefix} tenant commandset remove`,
   TENANT_COMMANDSET_SET: `${prefix} tenant commandset set`,
-  TENANT_HOMESITE_LIST: `${prefix} tenant homesite list`,
   TENANT_RECYCLEBINITEM_LIST: `${prefix} tenant recyclebinitem list`,
   TENANT_RECYCLEBINITEM_REMOVE: `${prefix} tenant recyclebinitem remove`,
   TENANT_RECYCLEBINITEM_RESTORE: `${prefix} tenant recyclebinitem restore`,

@@ -23,10 +23,6 @@ class PpCopilotListCommand extends PowerPlatformCommand {
     return 'Lists Microsoft Power Platform copilots in the specified Power Platform environment';
   }
 
-  public alias(): string[] | undefined {
-    return [commands.CHATBOT_LIST];
-  }
-
   public defaultProperties(): string[] | undefined {
     return ['name', 'botid', 'publishedOn', 'createdOn', 'botModifiedOn'];
   }
@@ -58,7 +54,6 @@ class PpCopilotListCommand extends PowerPlatformCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    await this.showDeprecationWarning(logger, commands.CHATBOT_LIST, commands.COPILOT_LIST);
     if (this.verbose) {
       await logger.logToStderr(`Retrieving list of copilots for environment '${args.options.environmentName}'.`);
     }

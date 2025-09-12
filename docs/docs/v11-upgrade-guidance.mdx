@@ -180,6 +180,19 @@ The commands impacted by this change are:
 
 Update your scripts to expect an empty array when no items are found.
 
+### Removed aliasses
+
+We've removed some aliasses to streamline the command set and avoid confusion. The following aliasses have been removed:
+
+- `pp chatbot get` is now [pp copilot get](./cmd/pp/copilot/copilot-get.mdx)
+- `pp chatbot list` is now [pp copilot list](./cmd/pp/copilot/copilot-list.mdx)
+- `pp chatbot remove` is now [pp copilot remove](./cmd/pp/copilot/copilot-remove.mdx)
+- `spo tenant homesite list` is now [spo homesite list](./cmd/spo/homesite/homesite-list.mdx)
+
+#### What action do I need to take?
+
+Update any `pp chatbot` and `spo tenant homesite` references in your scripts to `pp copilot` and `spo homesite` for compatibility.
+
 ### Removed commands
 
 Some commands were removed because their API endpoint became deprecated or the product began an end-of-life phase.

@@ -31,10 +31,6 @@ class PpCopilotRemoveCommand extends PowerPlatformCommand {
     return 'Removes the specified copilot';
   }
 
-  public alias(): string[] | undefined {
-    return [commands.CHATBOT_REMOVE];
-  }
-
   constructor() {
     super();
 
@@ -94,7 +90,6 @@ class PpCopilotRemoveCommand extends PowerPlatformCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    await this.showDeprecationWarning(logger, commands.CHATBOT_REMOVE, commands.COPILOT_REMOVE);
     if (this.verbose) {
       await logger.logToStderr(`Removing copilot '${args.options.id || args.options.name}'...`);
     }

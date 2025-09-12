@@ -13,17 +13,11 @@ class SpoHomeSiteListCommand extends SpoCommand {
     return 'Lists all home sites';
   }
 
-  public alias(): string[] | undefined {
-    return [commands.TENANT_HOMESITE_LIST];
-  }
-
   public defaultProperties(): string[] | undefined {
     return ['Url', 'Title'];
   }
 
   public async commandAction(logger: Logger): Promise<void> {
-    await this.showDeprecationWarning(logger, commands.TENANT_HOMESITE_LIST, commands.HOMESITE_LIST);
-
     try {
       const spoAdminUrl: string = await spo.getSpoAdminUrl(logger, this.verbose);
       if (this.verbose) {
