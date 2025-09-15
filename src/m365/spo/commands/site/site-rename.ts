@@ -25,13 +25,13 @@ interface SiteRenameJob {
   JobState: string;
 }
 
-class SpoTenantSiteRenameCommand extends SpoCommand {
+class SpoSiteRenameCommand extends SpoCommand {
   private context?: FormDigestInfo;
   private operationData?: SiteRenameJob;
   private static readonly checkIntervalInMs: number = 5000;
 
   public get name(): string {
-    return commands.TENANT_SITE_RENAME;
+    return commands.SITE_RENAME;
   }
 
   public get description(): string {
@@ -159,7 +159,7 @@ class SpoTenantSiteRenameCommand extends SpoCommand {
     }
   }
 
-  protected async waitForRenameCompletion(command: SpoTenantSiteRenameCommand, isVerbose: boolean, spoAdminUrl: string, siteUrl: string, iteration: number): Promise<void> {
+  protected async waitForRenameCompletion(command: SpoSiteRenameCommand, isVerbose: boolean, spoAdminUrl: string, siteUrl: string, iteration: number): Promise<void> {
     iteration++;
 
     const requestOptions: CliRequestOptions = {
@@ -181,9 +181,9 @@ class SpoTenantSiteRenameCommand extends SpoCommand {
       return;
     }
 
-    await timersUtil.setTimeout(SpoTenantSiteRenameCommand.checkIntervalInMs);
+    await timersUtil.setTimeout(SpoSiteRenameCommand.checkIntervalInMs);
     await command.waitForRenameCompletion(command, isVerbose, spoAdminUrl, siteUrl, iteration);
   }
 }
 
-export default new SpoTenantSiteRenameCommand();
+export default new SpoSiteRenameCommand();

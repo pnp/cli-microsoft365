@@ -33,11 +33,11 @@ interface IUserInfo {
   associatedGroupType?: string;
 }
 
-class SpoTenantSiteMembershipListCommand extends SpoCommand {
+class SpoSiteMembershipListCommand extends SpoCommand {
   public static readonly RoleNames: string[] = ['Owner', 'Member', 'Visitor'];
 
   public get name(): string {
-    return commands.TENANT_SITE_MEMBERSHIP_LIST;
+    return commands.SITE_MEMBERSHIP_LIST;
   }
 
   public get description(): string {
@@ -72,7 +72,7 @@ class SpoTenantSiteMembershipListCommand extends SpoCommand {
       },
       {
         option: '-r, --role [role]',
-        autocomplete: SpoTenantSiteMembershipListCommand.RoleNames
+        autocomplete: SpoSiteMembershipListCommand.RoleNames
       }
     );
   }
@@ -80,8 +80,8 @@ class SpoTenantSiteMembershipListCommand extends SpoCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (args.options.role && !SpoTenantSiteMembershipListCommand.RoleNames.some(roleName => roleName.toLocaleLowerCase() === args.options.role!.toLocaleLowerCase())) {
-          return `'${args.options.role}' is not a valid value for option 'role'. Valid values are: ${SpoTenantSiteMembershipListCommand.RoleNames.join(', ')}`;
+        if (args.options.role && !SpoSiteMembershipListCommand.RoleNames.some(roleName => roleName.toLocaleLowerCase() === args.options.role!.toLocaleLowerCase())) {
+          return `'${args.options.role}' is not a valid value for option 'role'. Valid values are: ${SpoSiteMembershipListCommand.RoleNames.join(', ')}`;
         }
 
         return validation.isValidSharePointUrl(args.options.siteUrl);
@@ -163,4 +163,4 @@ class SpoTenantSiteMembershipListCommand extends SpoCommand {
   }
 }
 
-export default new SpoTenantSiteMembershipListCommand();
+export default new SpoSiteMembershipListCommand();

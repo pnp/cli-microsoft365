@@ -9,13 +9,13 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './tenant-site-unarchive.js';
+import command from './site-unarchive.js';
 import request from '../../../../request.js';
 import config from '../../../../config.js';
 import { spo } from '../../../../utils/spo.js';
 import { CommandError } from '../../../../Command.js';
 
-describe(commands.TENANT_SITE_UNARCHIVE, () => {
+describe(commands.SITE_UNARCHIVE, () => {
   const url = 'https://contoso.sharepoint.com/sites/project-x';
   const adminUrl = 'https://contoso-admin.sharepoint.com';
   const response = '[{"SchemaVersion":"15.0.0.0","LibraryVersion":"16.0.24817.12008","ErrorInfo":null,"TraceCorrelationId":"ab1127a1-5044-8000-b17c-4aafdd265386"},2,{"IsNull":false},4,{"IsNull":false}]';
@@ -90,7 +90,7 @@ describe(commands.TENANT_SITE_UNARCHIVE, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name, commands.TENANT_SITE_UNARCHIVE);
+    assert.strictEqual(command.name, commands.SITE_UNARCHIVE);
   });
 
   it('has a description', () => {
