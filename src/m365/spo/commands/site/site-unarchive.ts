@@ -17,7 +17,7 @@ interface Options extends GlobalOptions {
   force?: boolean;
 }
 
-class SpoTenantSiteUnarchiveCommand extends SpoCommand {
+class SpoSiteUnarchiveCommand extends SpoCommand {
   public get name(): string {
     return commands.SITE_UNARCHIVE;
   }
@@ -122,4 +122,4 @@ class SpoTenantSiteUnarchiveCommand extends SpoCommand {
   }
 }
 
-export default new SpoTenantSiteUnarchiveCommand();
+export default new SpoSiteUnarchiveCommand();

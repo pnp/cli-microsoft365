@@ -6,8 +6,8 @@ import { formatting } from '../../../../utils/formatting.js';
 import { ClientSvcResponse, ClientSvcResponseContents, FormDigestInfo, spo } from '../../../../utils/spo.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
-import { TenantSiteProperties } from './TenantSiteProperties.js';
-import { SPOTenantSitePropertiesEnumerable } from './SPOTenantSitePropertiesEnumerable.js';
+import { SiteProperties } from './SiteProperties.js';
+import { SPOSitePropertiesEnumerable } from './SPOSitePropertiesEnumerable.js';
 
 interface CommandArgs {
   options: Options;
@@ -21,8 +21,8 @@ interface Options extends GlobalOptions {
   withOneDriveSites?: boolean;
 }
 
-class SpoTenantSiteListCommand extends SpoCommand {
-  private allSites?: TenantSiteProperties[];
+class SpoSiteListCommand extends SpoCommand {
+  private allSites?: SiteProperties[];
 
   public get name(): string {
     return commands.SITE_LIST;
@@ -155,7 +155,7 @@ class SpoTenantSiteListCommand extends SpoCommand {
       throw responseContent.ErrorInfo.ErrorMessage;
     }
     else {
-      const sites: SPOTenantSitePropertiesEnumerable = json[json.length - 1];
+      const sites: SPOSitePropertiesEnumerable = json[json.length - 1];
       this.allSites!.push(...sites._Child_Items_);
 
       if (sites.NextStartIndexFromSharePoint) {
@@ -186,4 +186,4 @@ class SpoTenantSiteListCommand extends SpoCommand {
   }
 }
 
-export default new SpoTenantSiteListCommand();
+export default new SpoSiteListCommand();
