@@ -2,14 +2,14 @@ import Global from '/docs/cmd/_global.mdx';
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-# spo tenant site membership list
+# spo site membership list
 
 Retrieves information about default site groups' membership
 
 ## Usage
 
 ```sh
-m365 spo tenant site membership list [options]
+m365 spo site membership list [options]
 ```
 
 ## Options
@@ -39,13 +39,13 @@ For other scenarios, refer to the [spo web get --withGroups](../web/web-get.mdx)
 Retrieve information about default site groups' owners, members, and visitors of the site.
 
 ```sh
-m365 spo tenant site membership list --siteUrl https://contoso.sharepoint.com
+m365 spo site membership list --siteUrl https://contoso.sharepoint.com
 ```
 
 Retrieve information about site owners.
 
 ```sh
-m365 spo tenant site membership list --siteUrl https://contoso.sharepoint.com --role Owner
+m365 spo site membership list --siteUrl https://contoso.sharepoint.com --role Owner
 ```
 
 ## Response
@@ -102,7 +102,7 @@ m365 spo tenant site membership list --siteUrl https://contoso.sharepoint.com --
   <TabItem value="Markdown">
 
   ```md
-  # spo tenant site membership list --siteUrl "https://contoso.sharepoint.com/sites/AudienceTest"
+  # spo site membership list --siteUrl "https://contoso.sharepoint.com/sites/AudienceTest"
 
   Date: 11/08/2024
 

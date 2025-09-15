@@ -25,7 +25,7 @@ class SpoTenantSiteListCommand extends SpoCommand {
   private allSites?: TenantSiteProperties[];
 
   public get name(): string {
-    return commands.TENANT_SITE_LIST;
+    return commands.SITE_LIST;
   }
 
   public get description(): string {

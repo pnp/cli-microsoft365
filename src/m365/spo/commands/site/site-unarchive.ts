@@ -19,7 +19,7 @@ interface Options extends GlobalOptions {
 
 class SpoTenantSiteUnarchiveCommand extends SpoCommand {
   public get name(): string {
-    return commands.TENANT_SITE_UNARCHIVE;
+    return commands.SITE_UNARCHIVE;
   }
 
   public get description(): string {

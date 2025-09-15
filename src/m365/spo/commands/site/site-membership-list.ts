@@ -37,7 +37,7 @@ class SpoTenantSiteMembershipListCommand extends SpoCommand {
   public static readonly RoleNames: string[] = ['Owner', 'Member', 'Visitor'];
 
   public get name(): string {
-    return commands.TENANT_SITE_MEMBERSHIP_LIST;
+    return commands.SITE_MEMBERSHIP_LIST;
   }
 
   public get description(): string {

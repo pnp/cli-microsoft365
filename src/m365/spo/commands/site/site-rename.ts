@@ -31,7 +31,7 @@ class SpoTenantSiteRenameCommand extends SpoCommand {
   private static readonly checkIntervalInMs: number = 5000;
 
   public get name(): string {
-    return commands.TENANT_SITE_RENAME;
+    return commands.SITE_RENAME;
   }
 
   public get description(): string {
