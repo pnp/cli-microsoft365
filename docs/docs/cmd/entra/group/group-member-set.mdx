@@ -19,14 +19,11 @@ m365 entra group member set [options]
 `-n, --groupName [groupName]`
 : The display name of the Microsoft Entra group. Specify `groupId`, `groupName` but not both.
 
-`--ids [ids]`
-: (deprecated. Use option `userIds` instead) Comma-separated list of user IDs. Specify either `ids`, `userIds` or `userNames` but not multiple.
-
 `--userIds [userIds]`
-: Comma-separated list of user IDs. Specify either `ids`, `userIds` or `userNames` but not multiple.
+: Comma-separated list of user IDs. Specify either `userIds` or `userNames` but not multiple.
 
 `--userNames [userNames]`
-: The user principal names of users. You can also pass a comma-separated list of UPNs. Specify either `ids` or `userNames` but not both.
+: The user principal names of users. You can also pass a comma-separated list of UPNs. Specify either `userIds` or `userNames` but not both.
 
 `-r, --role <role>`
 : The new role to be assigned to the members. Valid values: `Owner`, `Member`.
@@ -35,12 +32,6 @@ m365 entra group member set [options]
 <Global />
 
 ## Examples
-
-Update a single member specified by ID to a member of a group specified by display name
-
-```sh
-m365 entra group member set --groupDisplayName Developers --userIds 098b9f52-f48c-4401-819f-29c33794c3f5 --role Member
-```
 
 Update a single member specified by ID to a member of a group specified by group name
 

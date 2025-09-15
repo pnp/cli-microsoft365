@@ -14,7 +14,6 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   groupId?: string;
   groupName?: string;
-  ids?: string;
   userIds?: string;
   userNames?: string;
   role: string;
@@ -46,7 +45,6 @@ class EntraGroupMemberSetCommand extends GraphCommand {
       Object.assign(this.telemetryProperties, {
         groupId: typeof args.options.groupId !== 'undefined',
         groupName: typeof args.options.groupName !== 'undefined',
-        ids: typeof args.options.ids !== 'undefined',
         userIds: typeof args.options.userIds !== 'undefined',
         userNames: typeof args.options.userNames !== 'undefined'
       });
@@ -60,9 +58,6 @@ class EntraGroupMemberSetCommand extends GraphCommand {
       },
       {
         option: '-n, --groupName [groupName]'
-      },
-      {
-        option: '--ids [ids]'
       },
       {
         option: '--userIds [userIds]'
@@ -82,13 +77,6 @@ class EntraGroupMemberSetCommand extends GraphCommand {
       async (args: CommandArgs) => {
         if (args.options.groupId && !validation.isValidGuid(args.options.groupId)) {
           return `${args.options.groupId} is not a valid GUID for option groupId.`;
-        }
-
-        if (args.options.ids) {
-          const isValidGUIDArrayResult = validation.isValidGuidArray(args.options.ids);
-          if (isValidGUIDArrayResult !== true) {
-            return `'${isValidGUIDArrayResult}' is not a valid GUID for option 'ids'.`;
-          }
         }
 
         if (args.options.userIds) {
@@ -117,22 +105,18 @@ class EntraGroupMemberSetCommand extends GraphCommand {
   #initOptionSets(): void {
     this.optionSets.push(
       { options: ['groupId', 'groupName'] },
-      { options: ['ids', 'userIds', 'userNames'] }
+      { options: ['userIds', 'userNames'] }
     );
   }
 
   #initTypes(): void {
-    this.types.string.push('groupId', 'groupName', 'ids', 'userIds', 'userNames', 'role');
+    this.types.string.push('groupId', 'groupName', 'userIds', 'userNames', 'role');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
-      if (args.options.ids) {
-        await this.warn(logger, `Option 'ids' is deprecated and will be removed in the next major release. Please use 'userIds' instead.`);
-      }
-
       if (this.verbose) {
-        await logger.logToStderr(`Adding member(s) ${args.options.ids || args.options.userIds || args.options.userNames} to role ${args.options.role} of group ${args.options.groupId || args.options.groupName}...`);
+        await logger.logToStderr(`Adding member(s) ${args.options.userIds || args.options.userNames} to role ${args.options.role} of group ${args.options.groupId || args.options.groupName}...`);
       }
 
       const groupId = await this.getGroupId(logger, args.options);
@@ -163,10 +147,6 @@ class EntraGroupMemberSetCommand extends GraphCommand {
   }
 
   private async getUserIds(logger: Logger, options: Options): Promise<string[]> {
-    if (options.ids) {
-      return options.ids.split(',').map(i => i.trim());
-    }
-
     if (options.userIds) {
       return options.userIds.split(',').map(i => i.trim());
     }
