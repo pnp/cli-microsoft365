@@ -3653,7 +3653,7 @@ const sidebars: SidebarsConfig = {
             {
               type: 'doc',
               label: 'site list',
-              id: 'cmd/spo/tenant/tenant-site-list'
+              id: 'cmd/spo/site/site-list'
             },
             {
               type: 'doc',
