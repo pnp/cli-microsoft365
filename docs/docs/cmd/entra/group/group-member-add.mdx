@@ -18,21 +18,17 @@ m365 entra group member add [options]
 
 `-n, --groupName [groupName]`
 : The display name of the Microsoft Entra group. Specify `groupId` or `groupName` but not both.
-
-`--ids [ids]`
-: (deprecated. Use option `userIds` instead) Microsoft Entra IDs of users. You can also pass a comma-separated list of IDs. Specify either `ids`, `userIds`,`userNames`, `subgroupIds`, or `subgroupNames` but not multiple.
-
 `--userIds [userIds]`
-: Microsoft Entra IDs of users. You can also pass a comma-separated list of IDs. Specify either `ids`, `userIds`,`userNames`, `subgroupIds`, or `subgroupNames` but not multiple.
+: Microsoft Entra IDs of users. You can also pass a comma-separated list of IDs. Specify either `userIds`,`userNames`, `subgroupIds`, or `subgroupNames` but not multiple.
 
 `--userNames [userNames]`
-: The user principal names of users. You can also pass a comma-separated list of UPNs. Specify either `ids`, `userIds`,`userNames`, `subgroupIds`, or `subgroupNames` but not multiple.
+: The user principal names of users. You can also pass a comma-separated list of UPNs. Specify either `userIds`,`userNames`, `subgroupIds`, or `subgroupNames` but not multiple.
 
 `--subgroupIds [subgroupIds]`
-: Comma-separated list of Microsoft Entra group IDs to add. Specify either `ids`, `userIds`,`userNames`, `subgroupIds`, or `subgroupNames` but not multiple.
+: Comma-separated list of Microsoft Entra group IDs to add. Specify either `userIds`,`userNames`, `subgroupIds`, or `subgroupNames` but not multiple.
 
 `--subgroupNames [subgroupNames]`
-: Comma-separated list of Microsoft Entra group titles to add. Specify either `ids`, `userIds`,`userNames`, `subgroupIds`, or `subgroupNames` but not multiple.
+: Comma-separated list of Microsoft Entra group titles to add. Specify either `userIds`,`userNames`, `subgroupIds`, or `subgroupNames` but not multiple.
 
 `-r, --role <role>`
 : The role to be assigned to the new users. Valid values: `Owner`, `Member`.
@@ -41,12 +37,6 @@ m365 entra group member add [options]
 <Global />
 
 ## Examples
-
-Add a single member specified by ID as a member to a group specified by display name.
-
-```sh
-m365 entra group member add --groupDisplayName Developers --userIds 098b9f52-f48c-4401-819f-29c33794c3f5 --role Member
-```
 
 Add a single member specified by ID as a member to a group specified by group name.
 
