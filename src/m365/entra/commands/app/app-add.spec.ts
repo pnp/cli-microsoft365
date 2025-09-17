@@ -1,6 +1,7 @@
 import assert from 'assert';
 import fs from 'fs';
 import sinon from 'sinon';
+import { z } from 'zod';
 import auth from '../../../../Auth.js';
 import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
@@ -145,6 +146,7 @@ describe(commands.APP_ADD, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: z.ZodTypeAny;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -160,6 +162,7 @@ describe(commands.APP_ADD, () => {
       };
     }
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
   });
 
   beforeEach(() => {
@@ -285,9 +288,9 @@ describe(commands.APP_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         name: 'My Microsoft Entra app'
-      }
+      })
     });
     assert(loggerLogSpy.calledWith({
       appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
@@ -375,10 +378,10 @@ describe(commands.APP_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         name: 'My Microsoft Entra app',
         extension_b7d8e648520f41d3b9c0fdeb91768a0a_jobGroupTracker: 'JobGroupN'
-      }
+      })
     });
     assert(loggerLogSpy.calledWith({
       appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
@@ -465,10 +468,10 @@ describe(commands.APP_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         name: 'My Microsoft Entra app',
         multitenant: true
-      }
+      })
     });
     assert(loggerLogSpy.calledWith({
       appId: '62f0f128-987f-47f2-827a-be50d0d894c7',
@@ -564,11 +567,11 @@ describe(commands.APP_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         name: 'My Microsoft Entra app',
         redirectUris: 'https://myapp.azurewebsites.net,http://localhost:4000',
         platform: 'web'
-      }
+      })
     });
     assert(loggerLogSpy.calledWith({
       appId: 'd2941a3b-aad4-49e0-8a1d-b82de0b46067',
@@ -662,11 +665,11 @@ describe(commands.APP_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         name: 'My Microsoft Entra app',
         redirectUris: 'https://login.microsoftonline.com/common/oauth2/nativeclient',
         platform: 'publicClient'
-      }
+      })
     });
     assert(loggerLogSpy.calledWith({
       appId: '1ce0287c-9ccc-457e-a0cf-3ec5b734c092',
@@ -766,10 +769,10 @@ describe(commands.APP_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         name: 'My Microsoft Entra app',
         withSecret: true
-      }
+      })
     });
     assert(loggerLogSpy.calledWith({
       appId: '3c5bd51d-f1ac-4344-bd16-43396cadff14',
@@ -873,11 +876,11 @@ describe(commands.APP_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         name: 'My Microsoft Entra app',
         withSecret: true
-      }
+      })
     });
     assert(loggerLogSpy.calledWith({
       appId: '3c5bd51d-f1ac-4344-bd16-43396cadff14',
@@ -1027,11 +1030,11 @@ describe(commands.APP_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         name: 'My Microsoft Entra app',
         withSecret: true,
         apisApplication: 'https://graph.microsoft.com/Group.ReadWrite.All,https://graph.microsoft.com/Directory.Read.All'
-      }
+      })
     });
     assert(loggerLogSpy.calledWith({
       appId: 'dbfdad7a-5105-45fc-8290-eb0b0b24ac58',
@@ -1189,12 +1192,12 @@ describe(commands.APP_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         name: 'My Microsoft Entra app',
         withSecret: true,
         apisApplication: 'https://graph.microsoft.com/Group.ReadWrite.All,https://graph.microsoft.com/Directory.Read.All',
         apisDelegated: 'https://graph.microsoft.com/Directory.Read.All'
-      }
+      })
     });
     assert(loggerLogSpy.calledWith({
       appId: 'dbfdad7a-5105-45fc-8290-eb0b0b24ac58',
@@ -1346,13 +1349,13 @@ describe(commands.APP_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         name: 'My Microsoft Entra app',
         platform: 'spa',
         redirectUris: 'https://myspa.azurewebsites.net,http://localhost:8080',
         apisDelegated: 'https://graph.microsoft.com/Calendars.Read,https://graph.microsoft.com/Directory.Read.All',
         implicitFlow: true
-      }
+      })
     });
     assert(loggerLogSpy.calledWith({
       appId: 'c505d465-9e4e-4bb4-b653-7b36d77cc94a',
@@ -1500,14 +1503,14 @@ describe(commands.APP_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         name: 'My Microsoft Entra app',
         platform: 'spa',
         redirectUris: 'https://myspa.azurewebsites.net,http://localhost:8080',
         apisDelegated: 'https://graph.microsoft.com/Calendars.Read,https://graph.microsoft.com/Directory.Read.All',
         implicitFlow: true
-      }
+      })
     });
     assert(loggerLogSpy.calledWith({
       appId: 'c505d465-9e4e-4bb4-b653-7b36d77cc94a',
@@ -1605,10 +1608,10 @@ describe(commands.APP_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         name: 'My Microsoft Entra app',
         uri: 'https://contoso.onmicrosoft.com/myapp'
-      }
+      })
     });
     assert(loggerLogSpy.calledWith({
       appId: 'b08d9318-5612-4f87-9f94-7414ef6f0c8a',
@@ -1706,11 +1709,11 @@ describe(commands.APP_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         name: 'My Microsoft Entra app',
         uri: 'https://contoso.onmicrosoft.com/myapp'
-      }
+      })
     });
     assert(loggerLogSpy.calledWith({
       appId: 'b08d9318-5612-4f87-9f94-7414ef6f0c8a',
@@ -1822,14 +1825,14 @@ describe(commands.APP_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         name: 'My Microsoft Entra app',
         uri: 'api://caf406b91cd4.ngrok.io/_appId_',
         scopeName: 'access_as_user',
         scopeAdminConsentDescription: 'Access as a user',
         scopeAdminConsentDisplayName: 'Access as a user',
         scopeConsentBy: 'admins'
-      }
+      })
     });
     assert(loggerLogSpy.calledWith({
       appId: '13e11551-2967-4985-8c55-cd2aaa6b80ad',
@@ -1941,14 +1944,14 @@ describe(commands.APP_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         name: 'My Microsoft Entra app',
         uri: 'api://caf406b91cd4.ngrok.io/_appId_',
         scopeName: 'access_as_user',
         scopeAdminConsentDescription: 'Access as a user',
         scopeAdminConsentDisplayName: 'Access as a user',
         scopeConsentBy: 'adminsAndUsers'
-      }
+      })
     });
     assert(loggerLogSpy.calledWith({
       appId: '13e11551-2967-4985-8c55-cd2aaa6b80ad',
@@ -2043,11 +2046,11 @@ describe(commands.APP_ADD, () => {
     sinon.stub(fs, 'readFileSync').returns("somecertificatebase64string");
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         name: 'My Microsoft Entra app',
         certificateDisplayName: 'some certificate',
         certificateFile: 'C:\\temp\\some-certificate.cer'
-      }
+      })
     });
     assert(loggerLogSpy.calledWith({
       appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
@@ -2140,11 +2143,11 @@ describe(commands.APP_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         name: 'My Microsoft Entra app',
         certificateDisplayName: 'some certificate',
         certificateBase64Encoded: 'somecertificatebase64string'
-      }
+      })
     });
     assert(loggerLogSpy.calledWith({
       appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
@@ -2300,12 +2303,12 @@ describe(commands.APP_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         name: 'My Microsoft Entra app',
         apisApplication: 'https://graph.microsoft.com/Group.ReadWrite.All',
         grantAdminConsent: true,
         debug: true
-      }
+      })
     });
     assert(loggerLogSpy.calledWith({
       appId: 'dbfdad7a-5105-45fc-8290-eb0b0b24ac58',
@@ -2324,11 +2327,11 @@ describe(commands.APP_ADD, () => {
     sinon.stub(request, 'post').rejects('Issued POST request');
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         name: 'My Microsoft Entra app',
         withSecret: true,
         apisApplication: 'https://graph.microsoft.com/Group.ReadWrite.All,https://graph.microsoft.com/Directory.Read.All'
-      }
+      })
     } as any), new CommandError('An error has occurred'));
   });
 
@@ -2471,12 +2474,13 @@ describe(commands.APP_ADD, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         name: 'My Microsoft Entra app',
         platform: 'spa',
         apisDelegated: 'https://myapi.onmicrosoft.com/access_as_user',
-        implicitFlow: true
-      }
+        implicitFlow: true,
+        redirectUris: 'http://localhost'
+      })
     } as any), new CommandError('Service principal https://myapi.onmicrosoft.com not found'));
   });
 
@@ -2619,12 +2623,13 @@ describe(commands.APP_ADD, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         name: 'My Microsoft Entra app',
         platform: 'spa',
         apisDelegated: 'https://graph.microsoft.com/Read.Everything',
-        implicitFlow: true
-      }
+        implicitFlow: true,
+        redirectUris: 'http://localhost'
+      })
     } as any), new CommandError('Permission Read.Everything for service principal https://graph.microsoft.com not found'));
   });
 
@@ -2714,10 +2719,10 @@ describe(commands.APP_ADD, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         name: 'My Microsoft Entra app',
         withSecret: true
-      }
+      })
     } as any), new CommandError('An error has occurred'));
   });
 
@@ -2727,9 +2732,9 @@ describe(commands.APP_ADD, () => {
     sinon.stub(request, 'post').rejects({ error: { message: 'An error has occurred' } });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         name: 'My Microsoft Entra app'
-      }
+      })
     } as any), new CommandError('An error has occurred'));
   });
 
@@ -2811,10 +2816,10 @@ describe(commands.APP_ADD, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         name: 'My Microsoft Entra app',
         uri: 'https://contoso.onmicrosoft.com/myapp'
-      }
+      })
     } as any), new CommandError('An error has occurred'));
   });
 
@@ -2823,12 +2828,12 @@ describe(commands.APP_ADD, () => {
     sinon.stub(fs, 'readFileSync').throws(new Error("An error has occurred"));
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         name: 'My Microsoft Entra app',
         certificateDisplayName: 'some certificate',
         certificateFile: 'C:\\temp\\some-certificate.cer'
-      }
+      })
     } as any), new CommandError(`Error reading certificate file: Error: An error has occurred. Please add the certificate using base64 option '--certificateBase64Encoded'.`));
   });
 
@@ -2956,12 +2961,12 @@ describe(commands.APP_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         name: 'My Microsoft Entra app',
         platform: 'web',
         redirectUris: 'https://global.consent.azure-apim.net/redirect',
         apisDelegated: 'https://admin.services.crm.dynamics.com/user_impersonation'
-      }
+      })
     });
     assert(loggerLogSpy.calledWith({
       appId: '702e65ba-cacb-4a2f-aa5c-e6460967bc20',
@@ -3206,9 +3211,9 @@ describe(commands.APP_ADD, () => {
 
     (command as any).manifest = manifest;
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         manifest: JSON.stringify(manifest)
-      }
+      })
     });
     assert(loggerLogSpy.calledWith({
       appId: '689d2d97-7b80-4283-9185-ee24b5648607',
@@ -3453,9 +3458,9 @@ describe(commands.APP_ADD, () => {
 
     (command as any).manifest = manifest;
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         manifest: JSON.stringify(manifest)
-      }
+      })
     });
     assert(loggerLogSpy.calledWith({
       appId: '689d2d97-7b80-4283-9185-ee24b5648607',
@@ -3687,9 +3692,9 @@ describe(commands.APP_ADD, () => {
 
     (command as any).manifest = manifest;
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         manifest: JSON.stringify(manifest)
-      }
+      })
     });
     assert(loggerLogSpy.calledWith({
       appId: '689d2d97-7b80-4283-9185-ee24b5648607',
@@ -4007,9 +4012,9 @@ describe(commands.APP_ADD, () => {
 
     (command as any).manifest = manifest;
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         manifest: JSON.stringify(manifest)
-      }
+      })
     });
     assert(loggerLogSpy.calledWith({
       appId: '19180b97-8f30-43ac-8a22-19565de0b064',
@@ -4327,9 +4332,9 @@ describe(commands.APP_ADD, () => {
 
     (command as any).manifest = manifest;
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         manifest: JSON.stringify(manifest)
-      }
+      })
     });
     assert(loggerLogSpy.calledWith({
       appId: '19180b97-8f30-43ac-8a22-19565de0b064',
@@ -4647,9 +4652,9 @@ describe(commands.APP_ADD, () => {
 
     (command as any).manifest = manifest;
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         manifest: JSON.stringify(manifest)
-      }
+      })
     });
     assert(loggerLogSpy.calledWith({
       appId: '19180b97-8f30-43ac-8a22-19565de0b064',
@@ -4956,9 +4961,9 @@ describe(commands.APP_ADD, () => {
 
     (command as any).manifest = manifest;
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         manifest: JSON.stringify(manifest)
-      }
+      })
     });
     assert(loggerLogSpy.calledWith({
       appId: '19180b97-8f30-43ac-8a22-19565de0b064',
@@ -5305,9 +5310,9 @@ describe(commands.APP_ADD, () => {
 
     (command as any).manifest = manifest;
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         manifest: JSON.stringify(manifest)
-      }
+      })
     });
     assert(loggerLogSpy.calledWith({
       appId: '19180b97-8f30-43ac-8a22-19565de0b064',
@@ -5688,10 +5693,10 @@ describe(commands.APP_ADD, () => {
 
     (command as any).manifest = manifest;
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         manifest: JSON.stringify(manifest),
         apisApplication: 'https://graph.microsoft.com/Group.ReadWrite.All,https://graph.microsoft.com/Directory.Read.All'
-      }
+      })
     });
     assert(loggerLogSpy.calledWith({
       appId: '19180b97-8f30-43ac-8a22-19565de0b064',
@@ -5779,9 +5784,9 @@ describe(commands.APP_ADD, () => {
     const fsWriteFileSyncSpy = sinon.spy(fs, 'writeFileSync');
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         name: 'My Microsoft Entra app'
-      }
+      })
     });
     assert(fsWriteFileSyncSpy.notCalled);
   });
@@ -5871,10 +5876,10 @@ describe(commands.APP_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         name: 'My Microsoft Entra app',
         save: true
-      }
+      })
     });
     assert.strictEqual(filePath, '.m365rc.json');
     assert.strictEqual(fileContents, JSON.stringify({
@@ -5971,10 +5976,10 @@ describe(commands.APP_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         name: 'My Microsoft Entra app',
         save: true
-      }
+      })
     });
     assert.strictEqual(filePath, '.m365rc.json');
     assert.strictEqual(fileContents, JSON.stringify({
@@ -6078,10 +6083,10 @@ describe(commands.APP_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         name: 'My Microsoft Entra app',
         save: true
-      }
+      })
     });
     assert.strictEqual(filePath, '.m365rc.json');
     assert.strictEqual(fileContents, JSON.stringify({
@@ -6190,11 +6195,11 @@ describe(commands.APP_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         name: 'My Microsoft Entra app',
         save: true
-      }
+      })
     });
     assert.strictEqual(filePath, '.m365rc.json');
     assert.strictEqual(fileContents, JSON.stringify({
@@ -6291,10 +6296,10 @@ describe(commands.APP_ADD, () => {
     const fsWriteFileSyncSpy = sinon.spy(fs, 'writeFileSync');
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         name: 'My Microsoft Entra app',
         save: true
-      }
+      })
     });
     assert(fsWriteFileSyncSpy.notCalled);
   });
@@ -6380,10 +6385,10 @@ describe(commands.APP_ADD, () => {
     const fsWriteFileSyncSpy = sinon.spy(fs, 'writeFileSync');
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         name: 'My Microsoft Entra app',
         save: true
-      }
+      })
     });
     assert(fsWriteFileSyncSpy.notCalled);
   });
@@ -6468,168 +6473,168 @@ describe(commands.APP_ADD, () => {
     sinon.stub(fs, 'writeFileSync').throws(new Error('Error occurred while saving app info'));
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         name: 'My Microsoft Entra app',
         save: true
-      }
+      })
     });
   });
 
-  it('fails validation if specified platform value is not valid', async () => {
-    const actual = await command.validate({ options: { name: 'My Microsoft Entra app', platform: 'abc' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if specified platform value is not valid', () => {
+    const actual = commandOptionsSchema.safeParse({ name: 'My Microsoft Entra app', platform: 'abc' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if platform value is spa', async () => {
-    const actual = await command.validate({ options: { name: 'My Microsoft Entra app', platform: 'spa', redirectUris: 'http://localhost:8080' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if platform value is spa', () => {
+    const actual = commandOptionsSchema.safeParse({ name: 'My Microsoft Entra app', platform: 'spa', redirectUris: 'http://localhost:8080' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if platform value is web', async () => {
-    const actual = await command.validate({ options: { name: 'My Microsoft Entra app', platform: 'web', redirectUris: 'http://localhost:8080' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if platform value is web', () => {
+    const actual = commandOptionsSchema.safeParse({ name: 'My Microsoft Entra app', platform: 'web', redirectUris: 'http://localhost:8080' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if platform value is publicClient', async () => {
-    const actual = await command.validate({ options: { name: 'My Microsoft Entra app', platform: 'publicClient', redirectUris: 'http://localhost:8080' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if platform value is publicClient', () => {
+    const actual = commandOptionsSchema.safeParse({ name: 'My Microsoft Entra app', platform: 'publicClient', redirectUris: 'http://localhost:8080' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if redirectUris specified without platform', async () => {
-    const actual = await command.validate({ options: { name: 'My Microsoft Entra app', redirectUris: 'http://localhost:8080' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if redirectUris specified without platform', () => {
+    const actual = commandOptionsSchema.safeParse({ name: 'My Microsoft Entra app', redirectUris: 'http://localhost:8080' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if redirectUris specified with platform', async () => {
-    const actual = await command.validate({ options: { name: 'My Microsoft Entra app', redirectUris: 'http://localhost:8080', platform: 'spa' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if redirectUris specified with platform', () => {
+    const actual = commandOptionsSchema.safeParse({ name: 'My Microsoft Entra app', redirectUris: 'http://localhost:8080', platform: 'spa' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if platform is spa and redirectUris is not specified', async () => {
-    const actual = await command.validate({ options: { name: 'My Microsoft Entra app', platform: 'spa' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if platform is spa and redirectUris is not specified', () => {
+    const actual = commandOptionsSchema.safeParse({ name: 'My Microsoft Entra app', platform: 'spa' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if platform is web and redirectUris is not specified', async () => {
-    const actual = await command.validate({ options: { name: 'My Microsoft Entra app', platform: 'web' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if platform is web and redirectUris is not specified', () => {
+    const actual = commandOptionsSchema.safeParse({ name: 'My Microsoft Entra app', platform: 'web' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if platform is publicClient and redirectUris is not specified', async () => {
-    const actual = await command.validate({ options: { name: 'My Microsoft Entra app', platform: 'publicClient' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if platform is publicClient and redirectUris is not specified', () => {
+    const actual = commandOptionsSchema.safeParse({ name: 'My Microsoft Entra app', platform: 'publicClient' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if scopeName specified without uri', async () => {
-    const actual = await command.validate({ options: { name: 'My Microsoft Entra app', scopeName: 'access_as_user', scopeAdminConsentDescription: 'Access as user', scopeAdminConsentDisplayName: 'Access as user' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if scopeName specified without uri', () => {
+    const actual = commandOptionsSchema.safeParse({ name: 'My Microsoft Entra app', scopeName: 'access_as_user', scopeAdminConsentDescription: 'Access as user', scopeAdminConsentDisplayName: 'Access as user' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if scopeName specified without scopeAdminConsentDescription', async () => {
-    const actual = await command.validate({ options: { name: 'My Microsoft Entra app', scopeName: 'access_as_user', uri: 'https://contoso.onmicrosoft.com/myapp', scopeAdminConsentDisplayName: 'Access as user' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if scopeName specified without scopeAdminConsentDescription', () => {
+    const actual = commandOptionsSchema.safeParse({ name: 'My Microsoft Entra app', scopeName: 'access_as_user', uri: 'https://contoso.onmicrosoft.com/myapp', scopeAdminConsentDisplayName: 'Access as user' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if scopeName specified without scopeAdminConsentDisplayName', async () => {
-    const actual = await command.validate({ options: { name: 'My Microsoft Entra app', scopeName: 'access_as_user', uri: 'https://contoso.onmicrosoft.com/myapp', scopeAdminConsentDescription: 'Access as user' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if scopeName specified without scopeAdminConsentDisplayName', () => {
+    const actual = commandOptionsSchema.safeParse({ name: 'My Microsoft Entra app', scopeName: 'access_as_user', uri: 'https://contoso.onmicrosoft.com/myapp', scopeAdminConsentDescription: 'Access as user' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if scopeName specified with uri, scopeAdminConsentDisplayName and scopeAdminConsentDescription', async () => {
-    const actual = await command.validate({ options: { name: 'My Microsoft Entra app', scopeName: 'access_as_user', uri: 'https://contoso.onmicrosoft.com/myapp', scopeAdminConsentDescription: 'Access as user', scopeAdminConsentDisplayName: 'Access as user' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if scopeName specified with uri, scopeAdminConsentDisplayName and scopeAdminConsentDescription', () => {
+    const actual = commandOptionsSchema.safeParse({ name: 'My Microsoft Entra app', scopeName: 'access_as_user', uri: 'https://contoso.onmicrosoft.com/myapp', scopeAdminConsentDescription: 'Access as user', scopeAdminConsentDisplayName: 'Access as user' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if specified scopeConsentBy value is not valid', async () => {
-    const actual = await command.validate({ options: { name: 'My Microsoft Entra app', scopeConsentBy: 'abc' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if specified scopeConsentBy value is not valid', () => {
+    const actual = commandOptionsSchema.safeParse({ name: 'My Microsoft Entra app', scopeConsentBy: 'abc' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if scopeConsentBy is admins', async () => {
-    const actual = await command.validate({ options: { name: 'My Microsoft Entra app', scopeConsentBy: 'admins' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if scopeConsentBy is admins', () => {
+    const actual = commandOptionsSchema.safeParse({ name: 'My Microsoft Entra app', scopeConsentBy: 'admins' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if scopeConsentBy is adminsAndUsers', async () => {
-    const actual = await command.validate({ options: { name: 'My Microsoft Entra app', scopeConsentBy: 'adminsAndUsers' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if scopeConsentBy is adminsAndUsers', () => {
+    const actual = commandOptionsSchema.safeParse({ name: 'My Microsoft Entra app', scopeConsentBy: 'adminsAndUsers' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if specified manifest is not a valid JSON string', async () => {
+  it('fails validation if specified manifest is not a valid JSON string', () => {
     const manifest = '{';
-    const actual = await command.validate({ options: { manifest: manifest } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ manifest: manifest });
+    assert.strictEqual(actual.success, false);
   });
 
-  it(`fails validation if manifest is valid JSON but it doesn't contain name and name option not specified`, async () => {
+  it(`fails validation if manifest is valid JSON but it doesn't contain name and name option not specified`, () => {
     const manifest = '{}';
-    const actual = await command.validate({ options: { manifest: manifest } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ manifest: manifest });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if certificateDisplayName is specified without certificate', async () => {
-    const actual = await command.validate({ options: { name: 'My Microsoft Entra app', certificateDisplayName: 'Some certificate' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if certificateDisplayName is specified without certificate', () => {
+    const actual = commandOptionsSchema.safeParse({ name: 'My Microsoft Entra app', certificateDisplayName: 'Some certificate' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if both certificateBase64Encoded and certificateFile are specified', async () => {
-    const actual = await command.validate({ options: { name: 'My Microsoft Entra app', certificateFile: 'c:\\temp\\some-certificate.cer', certificateBase64Encoded: 'somebase64string' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if both certificateBase64Encoded and certificateFile are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ name: 'My Microsoft Entra app', certificateFile: 'c:\\temp\\some-certificate.cer', certificateBase64Encoded: 'somebase64string' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if certificateFile specified with certificateDisplayName', async () => {
+  it('passes validation if certificateFile specified with certificateDisplayName', () => {
     sinon.stub(fs, 'existsSync').callsFake(_ => true);
 
-    const actual = await command.validate({ options: { name: 'My Microsoft Entra app', certificateDisplayName: 'Some certificate', certificateFile: 'c:\\temp\\some-certificate.cer' } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ name: 'My Microsoft Entra app', certificateDisplayName: 'Some certificate', certificateFile: 'c:\\temp\\some-certificate.cer' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation when certificate file is not found', async () => {
+  it('fails validation when certificate file is not found', () => {
     sinon.stub(fs, 'existsSync').callsFake(_ => false);
 
-    const actual = await command.validate({ options: { debug: true, name: 'My Microsoft Entra app', certificateDisplayName: 'some certificate', certificateFile: 'C:\\temp\\some-certificate.cer' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ debug: true, name: 'My Microsoft Entra app', certificateDisplayName: 'some certificate', certificateFile: 'C:\\temp\\some-certificate.cer' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if certificateBase64Encoded specified with certificateDisplayName', async () => {
-    const actual = await command.validate({ options: { name: 'My Microsoft Entra app', certificateDisplayName: 'Some certificate', certificateBase64Encoded: 'somebase64string' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if certificateBase64Encoded specified with certificateDisplayName', () => {
+    const actual = commandOptionsSchema.safeParse({ name: 'My Microsoft Entra app', certificateDisplayName: 'Some certificate', certificateBase64Encoded: 'somebase64string' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if manifest is valid JSON', async () => {
+  it('passes validation if manifest is valid JSON', () => {
     const manifest = '{"name": "My app"}';
-    const actual = await command.validate({ options: { manifest: manifest } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ manifest: manifest });
+    assert.strictEqual(actual.success, true);
   });
 
   it('passes validation if platform is apple and bundleId is specified', async () => {
-    const actual = await command.validate({ options: { name: 'My Microsoft Entra app', platform: 'apple', bundleId: 'com.contoso.app' } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ name: 'My Microsoft Entra app', platform: 'apple', bundleId: 'com.contoso.app' });
+    assert.strictEqual(actual.success, true);
   });
 
   it('fails validation if platform is apple, but bundleId is missing', async () => {
-    const actual = await command.validate({ options: { name: 'My Microsoft Entra app', platform: 'apple' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ name: 'My Microsoft Entra app', platform: 'apple' });
+    assert.notStrictEqual(actual.success, true);
   });
 
   it('passes validation if platform is android and bundleId and signatureHash is specified', async () => {
-    const actual = await command.validate({ options: { name: 'My Microsoft Entra app', platform: 'apple', bundleId: 'com.contoso.app', signatureHash: '2pmj9i4rSx0yEb/viWBYkE/ZQrk=' } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ name: 'My Microsoft Entra app', platform: 'apple', bundleId: 'com.contoso.app', signatureHash: '2pmj9i4rSx0yEb/viWBYkE/ZQrk=' });
+    assert.strictEqual(actual.success, true);
   });
 
   it('fails validation if platform is android, but bundleId is missing', async () => {
-    const actual = await command.validate({ options: { name: 'My Microsoft Entra app', platform: 'android', signatureHash: '2pmj9i4rSx0yEb/viWBYkE/ZQrk=' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ name: 'My Microsoft Entra app', platform: 'android', signatureHash: '2pmj9i4rSx0yEb/viWBYkE/ZQrk=' });
+    assert.notStrictEqual(actual.success, true);
   });
 
   it('fails validation if platform is android, but signatureHash is missing', async () => {
-    const actual = await command.validate({ options: { name: 'My Microsoft Entra app', platform: 'android', bundleId: 'com.contoso.app' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ name: 'My Microsoft Entra app', platform: 'android', bundleId: 'com.contoso.app' });
+    assert.notStrictEqual(actual.success, true);
   });
 
   it('fails validation if platform is android, but bundleId and signatureHash is missing', async () => {
-    const actual = await command.validate({ options: { name: 'My Microsoft Entra app', platform: 'android' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ name: 'My Microsoft Entra app', platform: 'android' });
+    assert.notStrictEqual(actual.success, true);
   });
 
   it('creates Microsoft Entra app reg for a web app from a manifest with redirectUris and options overriding them', async () => {
@@ -6868,11 +6873,11 @@ describe(commands.APP_ADD, () => {
 
     (command as any).manifest = manifest;
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         manifest: JSON.stringify(manifest),
         platform: "spa",
         redirectUris: "http://localhost/auth,https://24c4-2001-1c00-80c-d00-e5da-977c-7c52-5197.ngrok.io/auth"
-      }
+      })
     });
 
     assert(loggerLogSpy.calledWith({
@@ -7124,10 +7129,10 @@ describe(commands.APP_ADD, () => {
 
     (command as any).manifest = manifest;
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         manifest: JSON.stringify(manifest),
         apisApplication: 'https://graph.microsoft.com/Group.ReadWrite.All,https://graph.microsoft.com/Directory.Read.All'
-      }
+      })
     });
 
     assert(loggerLogSpy.calledWith({
@@ -7275,11 +7280,11 @@ describe(commands.APP_ADD, () => {
 
     (command as any).manifest = manifestWithSecret;
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         name: 'My Microsoft Entra app',
         manifest: JSON.stringify(manifestWithSecret),
         withSecret: true
-      }
+      })
     });
 
     assert(loggerLogSpy.calledWith({
@@ -7434,12 +7439,12 @@ describe(commands.APP_ADD, () => {
 
     (command as any).manifest = basicManifest;
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         name: 'My Microsoft Entra app',
         manifest: JSON.stringify(basicManifest),
         certificateDisplayName: 'some certificate',
         certificateBase64Encoded: 'somecertificatebase64string'
-      }
+      })
     });
 
     assert(loggerLogSpy.calledWith({
@@ -7585,12 +7590,12 @@ describe(commands.APP_ADD, () => {
 
     (command as any).manifest = basicManifest;
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         name: 'My Microsoft Entra app',
         manifest: JSON.stringify(basicManifest),
         platform: 'publicClient',
         redirectUris: 'https://login.microsoftonline.com/common/oauth2/nativeclient'
-      }
+      })
     });
 
     assert(loggerLogSpy.calledWith({
@@ -7736,12 +7741,12 @@ describe(commands.APP_ADD, () => {
 
     (command as any).manifest = basicManifest;
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         name: 'My Microsoft Entra app',
         manifest: JSON.stringify(basicManifest),
         implicitFlow: true,
         multitenant: true
-      }
+      })
     });
 
     assert(loggerLogSpy.calledWith({
@@ -7905,7 +7910,7 @@ describe(commands.APP_ADD, () => {
 
     (command as any).manifest = basicManifest;
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         name: 'My Microsoft Entra app',
         manifest: JSON.stringify(basicManifest),
         uri: 'api://caf406b91cd4.ngrok.io/_appId_',
@@ -7913,7 +7918,7 @@ describe(commands.APP_ADD, () => {
         scopeAdminConsentDescription: 'Access as a user',
         scopeAdminConsentDisplayName: 'Access as a user',
         scopeConsentBy: 'adminsAndUsers'
-      }
+      })
     });
 
     assert(loggerLogSpy.calledWith({
@@ -8002,10 +8007,10 @@ describe(commands.APP_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         name: 'My AAD app',
         allowPublicClientFlows: true
-      }
+      })
     });
     assert(loggerLogSpy.calledWith({
       appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
@@ -8101,11 +8106,11 @@ describe(commands.APP_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         name: 'My Microsoft Entra app',
         platform: 'apple',
         bundleId: 'com.contoso.app'
-      }
+      })
     });
     assert(loggerLogSpy.calledWith({
       appId: '1ce0287c-9ccc-457e-a0cf-3ec5b734c092',
@@ -8199,12 +8204,12 @@ describe(commands.APP_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         name: 'My Microsoft Entra app',
         platform: 'android',
         bundleId: 'com.contoso.app',
         signatureHash: '2pmj9i4rSx0yEb/viWBYkE/ZQrk='
-      }
+      })
     });
     assert(loggerLogSpy.calledWith({
       appId: '1ce0287c-9ccc-457e-a0cf-3ec5b734c092',

@@ -1,28 +1,35 @@
 import { Application } from '@microsoft/microsoft-graph-types';
 import { v4 } from 'uuid';
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
+import { entraApp } from '../../../../utils/entraApp.js';
+import { zod } from '../../../../utils/zod.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
-import { entraApp } from '../../../../utils/entraApp.js';
+
+const allowedMembers = ['usersGroups', 'applications', 'both'] as const;
+
+const options = globalOptionsZod
+  .extend({
+    allowedMembers: zod.alias('m', z.enum(allowedMembers)),
+    appId: z.string().uuid().optional(),
+    appObjectId: z.string().uuid().optional(),
+    appName: z.string().optional(),
+    claim: zod.alias('c', z.string()),
+    name: zod.alias('n', z.string()),
+    description: zod.alias('d', z.string())
+  })
+  .strict();
+
+declare type Options = z.infer<typeof options>;
 
 interface CommandArgs {
   options: Options;
 }
-interface Options extends GlobalOptions {
-  allowedMembers: string;
-  appId?: string;
-  appObjectId?: string;
-  appName?: string;
-  claim: string;
-  name: string;
-  description: string;
-}
 
 class EntraAppRoleAddCommand extends GraphCommand {
-  private static readonly allowedMembers: string[] = ['usersGroups', 'applications', 'both'];
-
   public get name(): string {
     return commands.APP_ROLE_ADD;
   }
@@ -31,67 +38,24 @@ class EntraAppRoleAddCommand extends GraphCommand {
     return 'Adds role to the specified Entra app registration';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
+  public get schema(): z.ZodTypeAny | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        appId: typeof args.options.appId !== 'undefined',
-        appObjectId: typeof args.options.appObjectId !== 'undefined',
-        appName: typeof args.options.appName !== 'undefined'
+  public getRefinedSchema(schema: typeof options): z.ZodEffects<any> | undefined {
+    return schema
+      .refine(options => [options.appId, options.appObjectId, options.appName].filter(Boolean).length === 1, {
+        message: 'Specify either appId, appObjectId, or appName but not multiple'
+      })
+      .refine(options => options.claim.length <= 120, {
+        message: 'Claim must not be longer than 120 characters'
+      })
+      .refine(options => !options.claim.startsWith('.'), {
+        message: 'Claim must not begin with .'
+      })
+      .refine(options => /^[\w:!#$%&'()*+,-.\/:;<=>?@\[\]^+_`{|}~]+$/.test(options.claim), {
+        message: 'Claim can contain only the following characters a-z, A-Z, 0-9, :!#$%&\'()*+,-./:;<=>?@[]^+_`{|}~]+'
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      { option: '--appId [appId]' },
-      { option: '--appObjectId [appObjectId]' },
-      { option: '--appName [appName]' },
-      { option: '-n, --name <name>' },
-      { option: '-d, --description <description>' },
-      {
-        option: '-m, --allowedMembers <allowedMembers>', autocomplete: EntraAppRoleAddCommand.allowedMembers
-      },
-      { option: '-c, --claim <claim>' }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        const { allowedMembers, claim } = args.options;
-
-        if (EntraAppRoleAddCommand.allowedMembers.indexOf(allowedMembers) < 0) {
-          return `${allowedMembers} is not a valid value for allowedMembers. Valid values are ${EntraAppRoleAddCommand.allowedMembers.join(', ')}`;
-        }
-
-        if (claim.length > 120) {
-          return `Claim must not be longer than 120 characters`;
-        }
-
-        if (claim.startsWith('.')) {
-          return 'Claim must not begin with .';
-        }
-
-        if (!/^[\w:!#$%&'()*+,-.\/:;<=>?@\[\]^+_`{|}~]+$/.test(claim)) {
-          return `Claim can contain only the following characters a-z, A-Z, 0-9, :!#$%&'()*+,-./:;<=>?@[]^+_\`{|}~]+`;
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push({ options: ['appId', 'appObjectId', 'appName'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -133,9 +97,8 @@ class EntraAppRoleAddCommand extends GraphCommand {
       case 'applications':
         return ['Application'];
       case 'both':
-        return ['User', 'Application'];
       default:
-        return [];
+        return ['User', 'Application'];
     }
   }
 
@@ -143,7 +106,7 @@ class EntraAppRoleAddCommand extends GraphCommand {
     const { appObjectId, appId, appName } = args.options;
 
     if (this.verbose) {
-      await logger.logToStderr(`Retrieving information about Microsoft Entra app ${appObjectId ? appObjectId : (appId ? appId : appName) }...`);
+      await logger.logToStderr(`Retrieving information about Microsoft Entra app ${appObjectId ? appObjectId : (appId ? appId : appName)}...`);
     }
 
     if (appObjectId) {

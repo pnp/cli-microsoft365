@@ -1,21 +1,28 @@
 import { AppRole, Application, PermissionScope, RequiredResourceAccess, ResourceAccess, ServicePrincipal } from "@microsoft/microsoft-graph-types";
-import GlobalOptions from "../../../../GlobalOptions.js";
+import { z } from 'zod';
+import { Logger } from "../../../../cli/Logger.js";
+import { globalOptionsZod } from "../../../../Command.js";
+import request, { CliRequestOptions } from "../../../../request.js";
+import { entraApp } from "../../../../utils/entraApp.js";
+import { zod } from "../../../../utils/zod.js";
 import GraphCommand from "../../../base/GraphCommand.js";
 import commands from "../../commands.js";
-import request, { CliRequestOptions } from "../../../../request.js";
-import { Logger } from "../../../../cli/Logger.js";
-import { validation } from "../../../../utils/validation.js";
-import { entraApp } from "../../../../utils/entraApp.js";
+
+const allowedTypes = ['delegated', 'application', 'all'] as const;
+
+const options = globalOptionsZod
+  .extend({
+    appId: zod.alias('i', z.string().uuid().optional()),
+    appName: zod.alias('n', z.string().optional()),
+    appObjectId: z.string().uuid().optional(),
+    type: z.enum(allowedTypes).optional()
+  })
+  .strict();
+
+declare type Options = z.infer<typeof options>;
 
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  appId?: string;
-  appName?: string;
-  appObjectId?: string;
-  type?: string;
 }
 
 interface ApiPermission {
@@ -31,8 +38,6 @@ interface ServicePrincipalInfo {
 }
 
 class EntraAppPermissionListCommand extends GraphCommand {
-  private allowedTypes: string[] = ['delegated', 'application', 'all'];
-
   public get name(): string {
     return commands.APP_PERMISSION_LIST;
   }
@@ -41,57 +46,15 @@ class EntraAppPermissionListCommand extends GraphCommand {
     return 'Lists the application and delegated permissions for a specified Entra Application Registration';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
+  public get schema(): z.ZodTypeAny | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        appId: typeof args.options.appId !== 'undefined',
-        appName: typeof args.options.appName !== 'undefined',
-        appObjectId: typeof args.options.appObjectId !== 'undefined',
-        type: typeof args.options.type !== 'undefined'
+  public getRefinedSchema(schema: typeof options): z.ZodEffects<any> | undefined {
+    return schema
+      .refine(options => [options.appId, options.appName, options.appObjectId].filter(Boolean).length === 1, {
+        message: 'Specify either appId, appName, or appObjectId'
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      { option: '-i, --appId [appId]' },
-      { option: '-n, --appName [appName]' },
-      { option: '--appObjectId [appObjectId]' },
-      { option: '--type [type]', autocomplete: this.allowedTypes }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.appId && !validation.isValidGuid(args.options.appId as string)) {
-          return `${args.options.appId} is not a valid GUID`;
-        }
-
-        if (args.options.appObjectId && !validation.isValidGuid(args.options.appObjectId as string)) {
-          return `${args.options.appObjectId} is not a valid GUID`;
-        }
-
-        if (args.options.type && this.allowedTypes.indexOf(args.options.type.toLowerCase()) === -1) {
-          return `${args.options.type} is not a valid type. Allowed types are ${this.allowedTypes.join(', ')}`;
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push({ options: ['appId', 'appName', 'appObjectId'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
