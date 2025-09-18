@@ -7,6 +7,7 @@ import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 import request, { CliRequestOptions } from '../../../../request.js';
+import { entraGroup } from '../../../../utils/entraGroup.js';
 
 const options = globalOptionsZod
   .extend({
@@ -19,6 +20,11 @@ const options = globalOptionsZod
       .refine(audiences => validation.isValidGuidArray(audiences) === true, audiences => ({
         message: `The following GUIDs are invalid: ${validation.isValidGuidArray(audiences)}.`
       })).optional(),
+    audienceIds: z.string()
+      .refine(audiences => validation.isValidGuidArray(audiences) === true, audiences => ({
+        message: `The following GUIDs are invalid: ${validation.isValidGuidArray(audiences)}.`
+      })).optional(),
+    audienceNames: z.string().optional(),
     vivaConnectionsDefaultStart: z.boolean().optional(),
     isInDraftMode: z.boolean().optional(),
     order: z.number()
@@ -46,7 +52,32 @@ class SpoHomeSiteAddCommand extends SpoCommand {
     return options;
   }
 
+  public getRefinedSchema(schema: z.ZodTypeAny): z.ZodEffects<any> | undefined {
+    return schema
+      .refine(
+        (options: Options) => [options.audiences, options.audienceIds, options.audienceNames].filter(o => o !== undefined).length <= 1,
+        {
+          message: 'You must specify either audiences, audienceIds or audienceNames but not multiple.'
+        }
+      );
+  }
+
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    if (args.options.audiences) {
+      await this.warn(logger, `Option 'audiences' is deprecated and will be removed in the next major release.`);
+    }
+
+    let audiences: string[] = [];
+    if (args.options.audiences) {
+      audiences = args.options.audiences?.split(',');
+    }
+    if (args.options.audienceIds) {
+      audiences = args.options.audienceIds.split(',').map(id => id.trim());
+    }
+    else if (args.options.audienceNames) {
+      audiences = await this.transformAudienceNamesToIds(args.options.audienceNames);
+    }
+
     try {
       const spoAdminUrl: string = await spo.getSpoAdminUrl(logger, this.verbose);
       const requestOptions: CliRequestOptions = {
@@ -57,7 +88,7 @@ class SpoHomeSiteAddCommand extends SpoCommand {
         responseType: 'json',
         data: {
           siteUrl: args.options.url,
-          audiences: args.options.audiences?.split(','),
+          audiences: audiences,
           vivaConnectionsDefaultStart: args.options.vivaConnectionsDefaultStart ?? true,
           isInDraftMode: args.options.isInDraftMode ?? false,
           order: args.options.order
@@ -74,6 +105,18 @@ class SpoHomeSiteAddCommand extends SpoCommand {
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
+  }
+
+  private async transformAudienceNamesToIds(audienceNames: string): Promise<string[]> {
+    const names = audienceNames.split(',');
+    const ids: string[] = [];
+
+    for (const name of names) {
+      const id = await entraGroup.getGroupIdByDisplayName(name.trim());
+      ids.push(id);
+    }
+
+    return ids;
   }
 }
 
