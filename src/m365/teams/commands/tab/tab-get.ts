@@ -8,10 +8,6 @@ import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 
-interface ExtendedGroup extends Group {
-  resourceProvisioningOptions: string[];
-}
-
 interface CommandArgs {
   options: Options;
 }

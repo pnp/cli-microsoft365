@@ -206,7 +206,7 @@ export const urlUtil = {
     const fullUrl: string = url.startsWith('https://') ? url : urlUtil.getAbsoluteUrl(webUrl, url);
 
     // Pattern to match SharePoint URLs
-    const urlPattern = /https:\/\/[\w\-]+\.sharepoint\.com\/(teams|sites|personal)\/([\w\-]+)/;
+    const urlPattern = /https:\/\/[\w-]+\.sharepoint\.com\/(teams|sites|personal)\/([\w-]+)/;
 
     const match = fullUrl.match(urlPattern);
 

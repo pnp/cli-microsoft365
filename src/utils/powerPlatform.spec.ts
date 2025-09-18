@@ -445,7 +445,7 @@ describe('utils/powerPlatform', () => {
   //#region Solutions
   it('handles selecting single result when multiple solutions with the specified name were found and cli is set to prompt', async () => {
     sinon.stub(request, 'get').callsFake(async opts => {
-      if ((opts.url === `https://contoso-dev.api.crm4.dynamics.com/api/data/v9.0/solutions?$filter=isvisible eq true and uniquename eq \'${validSolutionName}\'&$expand=publisherid($select=friendlyname)&$select=solutionid,uniquename,version,publisherid,installedon,solutionpackageversion,friendlyname,versionnumber&api-version=9.1`)) {
+      if ((opts.url === `https://contoso-dev.api.crm4.dynamics.com/api/data/v9.0/solutions?$filter=isvisible eq true and uniquename eq '${validSolutionName}'&$expand=publisherid($select=friendlyname)&$select=solutionid,uniquename,version,publisherid,installedon,solutionpackageversion,friendlyname,versionnumber&api-version=9.1`)) {
         if ((opts.headers?.accept as string)?.indexOf('application/json') === 0) {
           return MultipleSolutionResponseWithSameName;
         }
@@ -462,7 +462,7 @@ describe('utils/powerPlatform', () => {
 
   it('throws error when multiple solutions with same name were found', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url === `https://contoso-dev.api.crm4.dynamics.com/api/data/v9.0/solutions?$filter=isvisible eq true and uniquename eq \'${validSolutionName}\'&$expand=publisherid($select=friendlyname)&$select=solutionid,uniquename,version,publisherid,installedon,solutionpackageversion,friendlyname,versionnumber&api-version=9.1`)) {
+      if ((opts.url === `https://contoso-dev.api.crm4.dynamics.com/api/data/v9.0/solutions?$filter=isvisible eq true and uniquename eq '${validSolutionName}'&$expand=publisherid($select=friendlyname)&$select=solutionid,uniquename,version,publisherid,installedon,solutionpackageversion,friendlyname,versionnumber&api-version=9.1`)) {
         if ((opts.headers?.accept as string)?.indexOf('application/json') === 0) {
           return MultipleSolutionResponseWithSameName;
         }
@@ -477,7 +477,7 @@ describe('utils/powerPlatform', () => {
 
   it('throws error when no solution found', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url === `https://contoso-dev.api.crm4.dynamics.com/api/data/v9.0/solutions?$filter=isvisible eq true and uniquename eq \'${validSolutionName}\'&$expand=publisherid($select=friendlyname)&$select=solutionid,uniquename,version,publisherid,installedon,solutionpackageversion,friendlyname,versionnumber&api-version=9.1`)) {
+      if ((opts.url === `https://contoso-dev.api.crm4.dynamics.com/api/data/v9.0/solutions?$filter=isvisible eq true and uniquename eq '${validSolutionName}'&$expand=publisherid($select=friendlyname)&$select=solutionid,uniquename,version,publisherid,installedon,solutionpackageversion,friendlyname,versionnumber&api-version=9.1`)) {
         if ((opts.headers?.accept as string)?.indexOf('application/json') === 0) {
           return ({ "value": [] });
         }
@@ -497,7 +497,7 @@ describe('utils/powerPlatform', () => {
 
   it('retrieves a specific solution with the name parameter', async () => {
     sinon.stub(request, 'get').callsFake(async opts => {
-      if ((opts.url === `https://contoso-dev.api.crm4.dynamics.com/api/data/v9.0/solutions?$filter=isvisible eq true and uniquename eq \'${validSolutionName}\'&$expand=publisherid($select=friendlyname)&$select=solutionid,uniquename,version,publisherid,installedon,solutionpackageversion,friendlyname,versionnumber&api-version=9.1`)) {
+      if ((opts.url === `https://contoso-dev.api.crm4.dynamics.com/api/data/v9.0/solutions?$filter=isvisible eq true and uniquename eq '${validSolutionName}'&$expand=publisherid($select=friendlyname)&$select=solutionid,uniquename,version,publisherid,installedon,solutionpackageversion,friendlyname,versionnumber&api-version=9.1`)) {
         if ((opts.headers?.accept as string)?.indexOf('application/json') === 0) {
           return solutionResponse;
         }

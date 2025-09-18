@@ -120,12 +120,7 @@ class FileConvertPdfCommand extends GraphCommand {
           await logger.logToStderr(`Deleting the temporary PDF file at ${localTargetFilePath}...`);
         }
 
-        try {
-          fs.unlinkSync(localTargetFilePath);
-        }
-        catch (e) {
-          throw e;
-        }
+        fs.unlinkSync(localTargetFilePath);
       }
       else {
         if (this.debug) {

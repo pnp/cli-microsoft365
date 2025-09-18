@@ -74,7 +74,7 @@ export const powerPlatform = {
       const response = await request.get<PowerPageWebsite>(requestOptions);
       return response;
     }
-    catch (ex: any) {
+    catch {
       throw Error(`The specified Power Page website with id '${id}' does not exist.`);
     }
   },
@@ -147,7 +147,7 @@ export const powerPlatform = {
  */
   async getSolutionByName(dynamicsApiUrl: string, name: string): Promise<any> {
     const requestOptions: CliRequestOptions = {
-      url: `${dynamicsApiUrl}/api/data/v9.0/solutions?$filter=isvisible eq true and uniquename eq \'${name}\'&$expand=publisherid($select=friendlyname)&$select=solutionid,uniquename,version,publisherid,installedon,solutionpackageversion,friendlyname,versionnumber&api-version=9.1`,
+      url: `${dynamicsApiUrl}/api/data/v9.0/solutions?$filter=isvisible eq true and uniquename eq '${name}'&$expand=publisherid($select=friendlyname)&$select=solutionid,uniquename,version,publisherid,installedon,solutionpackageversion,friendlyname,versionnumber&api-version=9.1`,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },

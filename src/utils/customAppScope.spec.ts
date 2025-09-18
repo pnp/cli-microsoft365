@@ -123,7 +123,8 @@ describe('utils/customAppScope', () => {
       throw 'Invalid Request';
     });
 
-    await assert.rejects(customAppScope.getCustomAppScopeByDisplayName(invalidDisplayName)), Error(`The specified custom application scope '${invalidDisplayName}' does not exist.`);
+    await assert.rejects(customAppScope.getCustomAppScopeByDisplayName(invalidDisplayName),
+      new Error(`The specified custom application scope '${invalidDisplayName}' does not exist.`));
   });
 
   it('throws error message when multiple custom application scopes were found using getCustomAppScopeByDisplayName', async () => {

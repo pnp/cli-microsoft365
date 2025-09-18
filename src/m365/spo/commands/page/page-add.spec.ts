@@ -19,8 +19,7 @@ describe(commands.PAGE_ADD, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
-  const fileResponse =
-  {
+  const fileResponse = {
     Attachments: false,
     AuthorId: 3,
     ContentTypeId: '0x0100B21BD271A810EE488B570BE49963EA34',

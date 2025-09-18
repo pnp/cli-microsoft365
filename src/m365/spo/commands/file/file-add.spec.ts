@@ -186,7 +186,7 @@ describe(commands.FILE_ADD, () => {
     });
   };
 
-  const stubFs = () => {
+  const stubFs = (): void => {
     sinon.stub(fs, 'readFileSync').returns(Buffer.from('abc'));
     sinon.stub(fs, 'statSync').returns({ size: 1234 } as any);
     sinon.stub(fs, 'openSync').returns(3);
@@ -264,7 +264,7 @@ describe(commands.FILE_ADD, () => {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
-        path: 'C:\Users\Velin\Desktop\MS365.jpg',
+        path: 'C:\\Users\\Velin\\Desktop\\MS365.jpg',
         debug: true,
         verbose: true
       }
@@ -282,7 +282,7 @@ describe(commands.FILE_ADD, () => {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
-        path: 'C:\Users\Velin\Desktop\MS365.jpg',
+        path: 'C:\\Users\\Velin\\Desktop\\MS365.jpg',
         checkOut: true
       }
     }));
@@ -299,7 +299,7 @@ describe(commands.FILE_ADD, () => {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
-        path: 'C:\Users\Velin\Desktop\MS365.jpg',
+        path: 'C:\\Users\\Velin\\Desktop\\MS365.jpg',
         checkOut: true,
         debug: true
       }
@@ -317,7 +317,7 @@ describe(commands.FILE_ADD, () => {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
-        path: 'C:\Users\Velin\Desktop\MS365.jpg',
+        path: 'C:\\Users\\Velin\\Desktop\\MS365.jpg',
         checkOut: true,
         debug: true
       }
@@ -335,7 +335,7 @@ describe(commands.FILE_ADD, () => {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
-        path: 'C:\Users\Velin\Desktop\MS365.jpg',
+        path: 'C:\\Users\\Velin\\Desktop\\MS365.jpg',
         contentType: 'abc',
         debug: true
       }
@@ -353,7 +353,7 @@ describe(commands.FILE_ADD, () => {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
-        path: 'C:\Users\Velin\Desktop\MS365.jpg',
+        path: 'C:\\Users\\Velin\\Desktop\\MS365.jpg',
         contentType: 'abc',
         debug: true
       }
@@ -370,7 +370,7 @@ describe(commands.FILE_ADD, () => {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: folderServerRelativePath,
-        path: 'C:\Users\Velin\Desktop\MS365.jpg',
+        path: 'C:\\Users\\Velin\\Desktop\\MS365.jpg',
         contentType: 'abc',
         debug: true
       }
@@ -405,7 +405,7 @@ describe(commands.FILE_ADD, () => {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
-        path: 'C:\Users\Velin\Desktop\MS365.jpg',
+        path: 'C:\\Users\\Velin\\Desktop\\MS365.jpg',
         contentType: 'abc',
         debug: true
       }
@@ -423,7 +423,7 @@ describe(commands.FILE_ADD, () => {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
-        path: 'C:\Users\Velin\Desktop\MS365.jpg',
+        path: 'C:\\Users\\Velin\\Desktop\\MS365.jpg',
         contentType: 'Picture',
         debug: true
       }
@@ -441,7 +441,7 @@ describe(commands.FILE_ADD, () => {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
-        path: 'C:\Users\Velin\Desktop\MS365.jpg',
+        path: 'C:\\Users\\Velin\\Desktop\\MS365.jpg',
         contentType: 'Picture',
         debug: true
       }
@@ -459,7 +459,7 @@ describe(commands.FILE_ADD, () => {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
-        path: 'C:\Users\Velin\Desktop\MS365.jpg',
+        path: 'C:\\Users\\Velin\\Desktop\\MS365.jpg',
         checkOut: true,
         checkInComment: 'abc',
         debug: true
@@ -478,7 +478,7 @@ describe(commands.FILE_ADD, () => {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
-        path: 'C:\Users\Velin\Desktop\MS365.jpg',
+        path: 'C:\\Users\\Velin\\Desktop\\MS365.jpg',
         approve: true,
         verbose: true,
         debug: true
@@ -497,7 +497,7 @@ describe(commands.FILE_ADD, () => {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
-        path: 'C:\Users\Velin\Desktop\MS365.jpg',
+        path: 'C:\\Users\\Velin\\Desktop\\MS365.jpg',
         publish: true,
         verbose: true,
         debug: true
@@ -516,7 +516,7 @@ describe(commands.FILE_ADD, () => {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
-        path: 'C:\Users\Velin\Desktop\MS365.jpg',
+        path: 'C:\\Users\\Velin\\Desktop\\MS365.jpg',
         publish: true
       }
     }), new CommandError('The file cannot be published without approval. Moderation for this list is enabled. Use the --approve option instead of --publish to approve and publish the file'));
@@ -531,7 +531,7 @@ describe(commands.FILE_ADD, () => {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
-        path: 'C:\Users\Velin\Desktop\MS365.jpg',
+        path: 'C:\\Users\\Velin\\Desktop\\MS365.jpg',
         contentType: 'Picture',
         Title: 'abc',
         publish: true,
@@ -559,7 +559,7 @@ describe(commands.FILE_ADD, () => {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
-        path: 'C:\Users\Velin\Desktop\MS365.jpg',
+        path: 'C:\\Users\\Velin\\Desktop\\MS365.jpg',
         debug: true,
         verbose: true
       }
@@ -579,7 +579,7 @@ describe(commands.FILE_ADD, () => {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
-        path: 'C:\Users\Velin\Desktop\MS365.jpg',
+        path: 'C:\\Users\\Velin\\Desktop\\MS365.jpg',
         debug: true,
         verbose: true
       }
@@ -620,7 +620,7 @@ describe(commands.FILE_ADD, () => {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
-        path: 'C:\Users\Velin\Desktop\MS365.jpg',
+        path: 'C:\\Users\\Velin\\Desktop\\MS365.jpg',
         debug: true,
         verbose: true
       }
@@ -639,7 +639,7 @@ describe(commands.FILE_ADD, () => {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
-        path: 'C:\Users\Velin\Desktop\MS365.jpg',
+        path: 'C:\\Users\\Velin\\Desktop\\MS365.jpg',
         debug: true,
         verbose: true
       }
@@ -650,7 +650,7 @@ describe(commands.FILE_ADD, () => {
     stubGetResponses();
     stubPostResponses();
 
-    sinonUtil.restore([fs.statSync, fs.openSync, , fs.readSync, , fs.closeSync]);
+    sinonUtil.restore([fs.statSync, fs.openSync, fs.readSync, fs.closeSync]);
     sinon.stub(fs, 'statSync').returns({ size: 251 * 1024 * 1024 } as any); // 250 MB
     sinon.stub(fs, 'openSync').returns(3);
     sinon.stub(fs, 'readSync').throws(new Error('readSync error'));
@@ -660,7 +660,7 @@ describe(commands.FILE_ADD, () => {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
-        path: 'C:\Users\Velin\Desktop\MS365.jpg',
+        path: 'C:\\Users\\Velin\\Desktop\\MS365.jpg',
         debug: true,
         verbose: true
       }
@@ -676,7 +676,7 @@ describe(commands.FILE_ADD, () => {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
-        path: 'C:\Users\Velin\Desktop\MS365.jpg',
+        path: 'C:\\Users\\Velin\\Desktop\\MS365.jpg',
         contentType: 'Picture',
         Title: 'abc',
         publish: true
@@ -724,7 +724,7 @@ describe(commands.FILE_ADD, () => {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
-        path: 'C:\Users\Velin\Desktop\MS365.jpg',
+        path: 'C:\\Users\\Velin\\Desktop\\MS365.jpg',
         contentType: 'Picture',
         Title: 'abc',
         Folder: 'Folder',
@@ -742,7 +742,7 @@ describe(commands.FILE_ADD, () => {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
-        path: 'C:\Users\Velin\Desktop\MS365.jpg',
+        path: 'C:\\Users\\Velin\\Desktop\\MS365.jpg',
         approve: true
       }
     });
@@ -758,7 +758,7 @@ describe(commands.FILE_ADD, () => {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
-        path: 'C:\Users\Velin\Desktop\MS365.jpg',
+        path: 'C:\\Users\\Velin\\Desktop\\MS365.jpg',
         checkOut: true
       }
     });
@@ -777,7 +777,7 @@ describe(commands.FILE_ADD, () => {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
-        path: 'C:\Users\Velin\Desktop\MS365.jpg',
+        path: 'C:\\Users\\Velin\\Desktop\\MS365.jpg',
         checkOut: true,
         debug: true,
         verbose: true
@@ -797,7 +797,7 @@ describe(commands.FILE_ADD, () => {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
-        path: 'C:\Users\Velin\Desktop\MS365.jpg',
+        path: 'C:\\Users\\Velin\\Desktop\\MS365.jpg',
         checkOut: true
       }
     }), new CommandError(expectedFileAddError));

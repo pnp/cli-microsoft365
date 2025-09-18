@@ -231,7 +231,7 @@ class SpoPageSetCommand extends SpoCommand {
             };
             await request.post(requestOptions);
             break;
-          case 'NewsPage':
+          case 'NewsPage': {
             const newsPageItem = await spo.getFileAsListItemByUrl(args.options.webUrl, serverRelativeFileUrl, logger, this.verbose);
             const newsPageItemId = newsPageItem.Id;
             const listItemSetOptions: any = {
@@ -240,7 +240,8 @@ class SpoPageSetCommand extends SpoCommand {
             };
             await spo.systemUpdateListItem(requestUrl, newsPageItemId, logger, this.verbose, listItemSetOptions);
             break;
-          case 'Template':
+          }
+          case 'Template': {
             const templateItem = await spo.getFileAsListItemByUrl(args.options.webUrl, serverRelativeFileUrl, logger, this.verbose);
             const templateItemId = templateItem.Id;
             requestOptions.headers = {
@@ -269,6 +270,7 @@ class SpoPageSetCommand extends SpoCommand {
             }
             pageId = res.Id;
             break;
+          }
         }
       }
 

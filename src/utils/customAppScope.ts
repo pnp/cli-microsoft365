@@ -37,7 +37,7 @@ export const customAppScope = {
     const customAppScopes = await odata.getAllItems<CustomAppScope>(url);
 
     if (customAppScopes.length === 0) {
-      throw `The specified custom application scope '${displayName}' does not exist.`;
+      throw new Error(`The specified custom application scope '${displayName}' does not exist.`);
     }
 
     if (customAppScopes.length > 1) {

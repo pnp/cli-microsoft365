@@ -124,7 +124,7 @@ class VivaConnectionsAppCreateCommand extends AnonymousCommand {
       const appPortalUrl: string = `${args.options.portalUrl}${args.options.portalUrl.indexOf('?') > -1 ? '&' : '?'}app=portals`;
       let searchUrlPath: string = portalUrl.hostname;
       if (portalUrl.pathname.indexOf('/teams') > -1 || portalUrl.pathname.indexOf('/sites') > -1) {
-        const firstTwoUrlSegments = portalUrl.pathname.match(/^\/[^\/]+\/[^\/]+/);
+        const firstTwoUrlSegments = portalUrl.pathname.match(/^\/[^/]+\/[^/]+/);
         if (firstTwoUrlSegments) {
           searchUrlPath += firstTwoUrlSegments[0];
         }

@@ -32,7 +32,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
   let commandInfo: CommandInfo;
   let promptIssued: boolean = false;
 
-  const getStubCalls = async (opts: any) => {
+  const getStubCalls = async (opts: any): Promise<{ Id: string }> => {
     if ((opts.url as string).indexOf(`_api/site?$select=Id`) > -1) {
       return { "Id": SITE_ID };
     }
@@ -48,7 +48,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
 
     throw 'Invalid request';
   };
-  const postStubSuccCalls = async (opts: any) => {
+  const postStubSuccCalls = async (opts: any): Promise<string> => {
     if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
       // Web CT
       if (opts.data.toLowerCase() === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName=".NET Library" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="77" ObjectPathId="76" /><ObjectPath Id="79" ObjectPathId="78" /><Method Name="DeleteObject" Id="80" ObjectPathId="78" /><Method Name="Update" Id="81" ObjectPathId="24"><Parameters><Parameter Type="Boolean">false</Parameter></Parameters></Method></Actions><ObjectPaths><Property Id="76" ParentId="24" Name="FieldLinks" /><Method Id="78" ParentId="76" Name="GetById"><Parameters><Parameter Type="Guid">{${FIELD_LINK_ID}}</Parameter></Parameters></Method><Identity Id="24" Name="6b3ec69e-00a7-0000-55a3-61f8d779d2b3|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:${SITE_ID}:web:${WEB_ID}:contenttype:${CONTENT_TYPE_ID}" /></ObjectPaths></Request>`.toLowerCase()) {
@@ -87,7 +87,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
 
     throw 'Invalid request';
   };
-  const postStubFailedCalls = async (opts: any) => {
+  const postStubFailedCalls = async (opts: any): Promise<string> => {
     if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
       // WEB CT
       if (opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName=".NET Library" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="77" ObjectPathId="76" /><ObjectPath Id="79" ObjectPathId="78" /><Method Name="DeleteObject" Id="80" ObjectPathId="78" /><Method Name="Update" Id="81" ObjectPathId="24"><Parameters><Parameter Type="Boolean">false</Parameter></Parameters></Method></Actions><ObjectPaths><Property Id="76" ParentId="24" Name="FieldLinks" /><Method Id="78" ParentId="76" Name="GetById"><Parameters><Parameter Type="Guid">{${FIELD_LINK_ID}}</Parameter></Parameters></Method><Identity Id="24" Name="6b3ec69e-00a7-0000-55a3-61f8d779d2b3|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:${SITE_ID}:web:${WEB_ID}:contenttype:${CONTENT_TYPE_ID}" /></ObjectPaths></Request>`) {

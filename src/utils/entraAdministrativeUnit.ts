@@ -31,7 +31,7 @@ export const entraAdministrativeUnit = {
     const administrativeUnits = await odata.getAllItems<AdministrativeUnit>(`${graphResource}/v1.0/directory/administrativeUnits?$filter=displayName eq '${formatting.encodeQueryParameter(displayName)}'${queryString}`);
 
     if (administrativeUnits.length === 0) {
-      throw `The specified administrative unit '${displayName}' does not exist.`;
+      throw new Error(`The specified administrative unit '${displayName}' does not exist.`);
     }
 
     if (administrativeUnits.length > 1) {
