@@ -283,6 +283,7 @@ export default {
   SITE_REMOVE: `${prefix} site remove`,
   SITE_SET: `${prefix} site set`,
   SITE_SHARINGPERMISSION_SET: `${prefix} site sharingpermission set`,
+  SITE_VERSIONPOLICY_GET: `${prefix} site versionpolicy get`,
   SITE_CHROME_SET: `${prefix} site chrome set`,
   SITEDESIGN_ADD: `${prefix} sitedesign add`,
   SITEDESIGN_APPLY: `${prefix} sitedesign apply`,
