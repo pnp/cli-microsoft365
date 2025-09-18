@@ -24,8 +24,11 @@ m365 spo homesite add [options]
 `--vivaConnectionsDefaultStart [vivaConnectionsDefaultStart]`
 : Specifies whether the home site is the default start for Viva Connections. Accepts `true` or `false`. Default is `true`.
 
-`--audiences [audiences]`
-: Comma-separated list of Microsoft Entra group IDs that will be used as audience.
+`--audienceIds [audienceIds]` 
+: Comma-separated list of Microsoft Entra group IDs to be used as audiences. Specify either `audienceIds` or `audienceNames`, but not both.
+
+`--audienceNames [audienceNames]` 
+: Comma-separated list of Microsoft Entra group names to be used as audiences. You must use either `audienceIds` or `audienceNames`, but not both.
 
 `--order [order]`
 : Order of the home site. Must be a positive integer.
@@ -41,10 +44,16 @@ Add a home site
 m365 spo homesite add --url "https://contoso.sharepoint.com/sites/testcomms"
 ```
 
-Add a home site with additional options
+Add a home site with audiences specified by their groups ids and with additional options
 
 ```sh
-m365 spo homesite add --url "https://contoso.sharepoint.com/sites/testcomms" --isInDraftMode true --vivaConnectionsDefaultStart false --audiences "af8c0bc8-7b1b-44b4-b087-ffcc8df70d16,754ff15c-76b1-44cb-88c7-0065a4d3cfb7" --order 2 
+m365 spo homesite add --url "https://contoso.sharepoint.com/sites/testcomms" --isInDraftMode true --vivaConnectionsDefaultStart false --audienceIds "af8c0bc8-7b1b-44b4-b087-ffcc8df70d16,754ff15c-76b1-44cb-88c7-0065a4d3cfb7" --order 2 
+```
+
+Add a home site with audiences specified by their groups names and with additional options
+
+```sh
+m365 spo homesite add --url "https://contoso.sharepoint.com/sites/testcomms" --isInDraftMode true --vivaConnectionsDefaultStart false --audienceNames "Marketing, IT department" --order 2 
 ```
 
 ## Response
