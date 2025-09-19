@@ -120,24 +120,6 @@ describe(commands.THREATASSESSMENT_GET, () => {
     assert(loggerLogSpy.calledWith(threatAssessmentGetResponse));
   });
 
-  it(`correctly shows deprecation warning for option 'includeResults'`, async () => {
-    const chalk = (await import('chalk')).default;
-    const loggerErrSpy = sinon.spy(logger, 'logToStderr');
-
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/informationProtection/threatAssessmentRequests/${threatAssessmentId}?$expand=results`) {
-        return threatAssessmentGetResponseIncludingResults;
-      }
-
-      throw 'Invalid request';
-    });
-
-    await command.action(logger, { options: { id: threatAssessmentId, includeResults: true, verbose: true } });
-    assert(loggerErrSpy.calledWith(chalk.yellow(`Parameter 'includeResults' is deprecated. Please use 'withResults' instead`)));
-
-    sinonUtil.restore(loggerErrSpy);
-  });
-
   it('retrieves threat assessment by specified id including results', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/informationProtection/threatAssessmentRequests/${threatAssessmentId}?$expand=results`) {
