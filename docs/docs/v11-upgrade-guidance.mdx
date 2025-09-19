@@ -5,7 +5,40 @@ import TabItem from '@theme/TabItem';
 
 The v11 release of CLI for Microsoft 365 introduces several breaking changes. To assist you in upgrading to the latest version, we've outlined the changes and the actions you may need to take.
 
-## SharePoint
+## SharePoint Embedded
+
+### Updated container type commands
+
+We have updated all `spe containertype` commands to use a new preview endpoint. This endpoint provides more capabilities and configuration options, enabling us to introduce additional commands for SharePoint Embedded in the future. Once Microsoft makes a stable endpoint available, we will move our commands to that version.
+
+As part of this change, the options available in `spe containertype add` have been replaced with new ones. These new options allow you to configure more settings on a container type than before.
+
+The only exception is the `spe containertype remove` command. Due to significant limitations in the current preview API, we decided not to update this command at this time. As a result, `spe containertype remove` requires different permissions compared to the other `spe containertype` commands. Once Microsoft addresses these limitations, we will align the command with the others.
+
+Additionally, if you use `spe container` commands and specify the container type by name (instead of by ID), you will need to consent to different permissions on your app registration. Please refer to the documentation page for the specific command you're using to verify which permissions are required.
+
+**Affected commands:**
+
+Commands with updated options:
+
+- [spe containertype add](./cmd/spe/containertype/containertype-add)
+
+Commands with updated permission scopes:
+
+- [spe containertype add](./cmd/spe/containertype/containertype-add)
+- [spe containertype get](./cmd/spe/containertype/containertype-get)
+- [spe containertype list](./cmd/spe/containertype/containertype-list)
+- [spe container add](./cmd/spe/container/container-add)
+- [spe container list](./cmd/spe/container/container-list)
+- [spe container remove](./cmd/spe/container/container-remove)
+- [spe container recyclebinitem list](./cmd/spe/container/container-recyclebinitem-list)
+- [spe container recyclebinitem restore](./cmd/spe/container/container-recyclebinitem-restore)
+
+#### What action do I need to take?
+
+Check the documentation of each of the commands above to see the updated options and permissions. If you use `spe containertype remove`, no action is needed at this time.
+
+## SharePoint Online
 
 ### `spo homesite set` no longer adds new home sites
 
