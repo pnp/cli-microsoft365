@@ -45,7 +45,7 @@ class EntraAdministrativeUnitAddCommand extends GraphCommand {
       visibility: args.options.hiddenMembership ? 'HiddenMembership' : null
     };
 
-    this.addUnknownOptionsToPayload(requestBody, args.options);
+    this.addUnknownOptionsToPayloadZod(requestBody, args.options);
 
     const requestOptions: CliRequestOptions = {
       url: `${this.resource}/v1.0/directory/administrativeUnits`,
