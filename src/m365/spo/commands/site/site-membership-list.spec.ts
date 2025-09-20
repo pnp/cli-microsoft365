@@ -9,12 +9,12 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { spo } from '../../../../utils/spo.js';
 import commands from '../../commands.js';
-import command from './tenant-site-membership-list.js';
+import command from './site-membership-list.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { cli } from '../../../../cli/cli.js';
 import { CommandError } from '../../../../Command.js';
 
-describe(commands.TENANT_SITE_MEMBERSHIP_LIST, () => {
+describe(commands.SITE_MEMBERSHIP_LIST, () => {
   let log: any[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -155,7 +155,7 @@ describe(commands.TENANT_SITE_MEMBERSHIP_LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name, commands.TENANT_SITE_MEMBERSHIP_LIST);
+    assert.strictEqual(command.name, commands.SITE_MEMBERSHIP_LIST);
   });
 
   it('has a description', () => {

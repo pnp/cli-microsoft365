@@ -13,9 +13,9 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { spo } from '../../../../utils/spo.js';
 import commands from '../../commands.js';
-import command from './tenant-site-archive.js';
+import command from './site-archive.js';
 
-describe(commands.TENANT_SITE_ARCHIVE, () => {
+describe(commands.SITE_ARCHIVE, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
@@ -114,7 +114,7 @@ describe(commands.TENANT_SITE_ARCHIVE, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name, commands.TENANT_SITE_ARCHIVE);
+    assert.strictEqual(command.name, commands.SITE_ARCHIVE);
   });
 
   it('has a description', () => {

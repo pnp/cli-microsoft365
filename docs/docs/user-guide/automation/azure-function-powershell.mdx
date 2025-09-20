@@ -191,7 +191,7 @@ Open the `Azure` tab in Visual Studio Code and click the `Create Function` butto
       $hubSite = m365 spo site get --url "$hubSiteUrl" | ConvertFrom-Json
 
       Write-Host "Hub site ID: '$($hubSite.Id)'."
-      $sites = m365 spo tenant site list --query "[?HubSiteId == '/Guid($($hubSite.Id))/']" | ConvertFrom-Json
+      $sites = m365 spo site list --query "[?HubSiteId == '/Guid($($hubSite.Id))/']" | ConvertFrom-Json
       
       Write-Host "Return '$($sites.Count)' linked sites."
       Push-OutputBinding -Name Response -Value ([HttpResponseContext]@{

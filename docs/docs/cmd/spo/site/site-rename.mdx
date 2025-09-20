@@ -2,14 +2,14 @@ import Global from '/docs/cmd/_global.mdx';
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-# spo tenant site rename
+# spo site rename
 
 Renames the URL and title of a site collection
 
 ## Usage
 
 ```sh
-m365 spo tenant site rename [options]
+m365 spo site rename [options]
 ```
 
 ## Options
@@ -38,7 +38,7 @@ m365 spo tenant site rename [options]
 
 ## Remarks
 
-Renaming site collections is by default asynchronous and depending on the current state of Microsoft 365, might take up to few minutes. If you're building a script with steps that require the operation to complete fully, you should use the `--wait` flag. When using this flag, the `spo tenant site rename` command  will keep running until it receives confirmation from Microsoft 365 that the site rename operation has completed.
+Renaming site collections is by default asynchronous and depending on the current state of Microsoft 365, might take up to few minutes. If you're building a script with steps that require the operation to complete fully, you should use the `--wait` flag. When using this flag, the `spo site rename` command  will keep running until it receives confirmation from Microsoft 365 that the site rename operation has completed.
 
 :::info
 
@@ -51,19 +51,19 @@ To use this command you must have permissions to access the tenant admin site.
 Starts the rename of the site collection with name "samplesite" to "renamed" without modifying the title
 
 ```sh
-m365 spo tenant site rename --url http://contoso.sharepoint.com/samplesite --newUrl http://contoso.sharepoint.com/renamed
+m365 spo site rename --url http://contoso.sharepoint.com/samplesite --newUrl http://contoso.sharepoint.com/renamed
 ```
 
 Starts the rename of the site collection with name "samplesite" to "renamed" modifying the title of the site to "New Title"
 
 ```sh
-m365 spo tenant site rename --url http://contoso.sharepoint.com/samplesite --newUrl http://contoso.sharepoint.com/renamed --newTitle "New Title"
+m365 spo site rename --url http://contoso.sharepoint.com/samplesite --newUrl http://contoso.sharepoint.com/renamed --newTitle "New Title"
 ```
 
 Renames the specified site collection and waits for the operation to complete
 
 ```sh
-m365 spo tenant site rename --url http://contoso.sharepoint.com/samplesite --newUrl http://contoso.sharepoint.com/renamed --newTitle "New Title" --wait
+m365 spo site rename --url http://contoso.sharepoint.com/samplesite --newUrl http://contoso.sharepoint.com/renamed --newTitle "New Title" --wait
 ```
 
 ## Response
@@ -130,7 +130,7 @@ m365 spo tenant site rename --url http://contoso.sharepoint.com/samplesite --new
   <TabItem value="Markdown">
 
   ```md
-  # spo tenant site rename --url "https://contoso.sharepoint.com/sites/team1" --newUrl "https://contoso.sharepoint.com/sites/team2"
+  # spo site rename --url "https://contoso.sharepoint.com/sites/team1" --newUrl "https://contoso.sharepoint.com/sites/team2"
 
   Date: 2023-06-21
 

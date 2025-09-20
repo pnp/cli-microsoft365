@@ -13,9 +13,9 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { spo } from '../../../../utils/spo.js';
 import commands from '../../commands.js';
-import command from './tenant-site-list.js';
+import command from './site-list.js';
 
-describe(commands.TENANT_SITE_LIST, () => {
+describe(commands.SITE_LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -61,7 +61,7 @@ describe(commands.TENANT_SITE_LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name, commands.TENANT_SITE_LIST);
+    assert.strictEqual(command.name, commands.SITE_LIST);
   });
 
   it('has a description', () => {

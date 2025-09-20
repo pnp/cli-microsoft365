@@ -17,9 +17,9 @@ interface Options extends GlobalOptions {
   force?: boolean;
 }
 
-class SpoTenantSiteArchiveCommand extends SpoCommand {
+class SpoSiteArchiveCommand extends SpoCommand {
   public get name(): string {
-    return commands.TENANT_SITE_ARCHIVE;
+    return commands.SITE_ARCHIVE;
   }
 
   public get description(): string {
@@ -123,4 +123,4 @@ class SpoTenantSiteArchiveCommand extends SpoCommand {
   }
 }
 
-export default new SpoTenantSiteArchiveCommand();
+export default new SpoSiteArchiveCommand();

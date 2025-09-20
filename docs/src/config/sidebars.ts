@@ -3646,6 +3646,11 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
+              label: 'site archive',
+              id: 'cmd/spo/site/site-archive'
+            },
+            {
+              type: 'doc',
               label: 'site ensure',
               id: 'cmd/spo/site/site-ensure'
             },
@@ -3662,7 +3667,7 @@ const sidebars: SidebarsConfig = {
             {
               type: 'doc',
               label: 'site list',
-              id: 'cmd/spo/tenant/tenant-site-list'
+              id: 'cmd/spo/site/site-list'
             },
             {
               type: 'doc',
@@ -3671,8 +3676,18 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
+              label: 'site rename',
+              id: 'cmd/spo/site/site-rename'
+            },
+            {
+              type: 'doc',
               label: 'site set',
               id: 'cmd/spo/site/site-set'
+            },
+            {
+              type: 'doc',
+              label: 'site unarchive',
+              id: 'cmd/spo/site/site-unarchive'
             },
             {
               type: 'doc',
@@ -3758,6 +3773,11 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'site inplacerecordsmanagement set',
               id: 'cmd/spo/site/site-inplacerecordsmanagement-set'
+            },
+            {
+              type: 'doc',
+              label: 'site membership list',
+              id: 'cmd/spo/site/site-membership-list'
             },
             {
               type: 'doc',
@@ -4004,31 +4024,6 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'tenant settings set',
               id: 'cmd/spo/tenant/tenant-settings-set'
-            },
-            {
-              type: 'doc',
-              label: 'tenant site archive',
-              id: 'cmd/spo/tenant/tenant-site-archive'
-            },
-            {
-              type: 'doc',
-              label: 'tenant site list',
-              id: 'cmd/spo/tenant/tenant-site-list'
-            },
-            {
-              type: 'doc',
-              label: 'tenant site rename',
-              id: 'cmd/spo/tenant/tenant-site-rename'
-            },
-            {
-              type: 'doc',
-              label: 'tenant site unarchive',
-              id: 'cmd/spo/tenant/tenant-site-unarchive'
-            },
-            {
-              type: 'doc',
-              label: 'tenant site membership list',
-              id: 'cmd/spo/tenant/tenant-site-membership-list'
             }
           ]
         },
