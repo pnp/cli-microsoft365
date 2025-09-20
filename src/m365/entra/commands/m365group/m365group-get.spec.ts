@@ -298,60 +298,6 @@ describe(commands.M365GROUP_GET, () => {
     }));
   });
 
-  it(`correctly shows deprecation warning for option 'includeSiteUrl'`, async () => {
-    const chalk = (await import('chalk')).default;
-    const loggerErrSpy = sinon.spy(logger, 'logToStderr');
-
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups/1caf7dcd-7e83-4c3a-94f7-932a1299c844`) {
-        return {
-          "id": "1caf7dcd-7e83-4c3a-94f7-932a1299c844",
-          "deletedDateTime": null,
-          "classification": null,
-          "createdDateTime": "2017-11-29T03:27:05Z",
-          "description": "This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more.",
-          "displayName": "Finance",
-          "groupTypes": [
-            "Unified"
-          ],
-          "mail": "finance@contoso.onmicrosoft.com",
-          "mailEnabled": true,
-          "mailNickname": "finance",
-          "onPremisesLastSyncDateTime": null,
-          "onPremisesProvisioningErrors": [],
-          "onPremisesSecurityIdentifier": null,
-          "onPremisesSyncEnabled": null,
-          "preferredDataLocation": null,
-          "proxyAddresses": [
-            "SMTP:finance@contoso.onmicrosoft.com"
-          ],
-          "renewedDateTime": "2017-11-29T03:27:05Z",
-          "securityEnabled": false,
-          "visibility": "Public"
-        };
-      }
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups/1caf7dcd-7e83-4c3a-94f7-932a1299c844?$select=allowExternalSenders,autoSubscribeNewMembers,hideFromAddressLists,hideFromOutlookClients,isSubscribedByMail`) {
-        return {
-          "allowExternalSenders": false,
-          "autoSubscribeNewMembers": false,
-          "isSubscribedByMail": false,
-          "hideFromOutlookClients": false,
-          "hideFromAddressLists": false
-        };
-      }
-
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups/1caf7dcd-7e83-4c3a-94f7-932a1299c844/drive?$select=webUrl`) {
-        return { webUrl: "https://contoso.sharepoint.com/sites/finance/Shared%20Documents" };
-      }
-      throw 'Invalid request';
-    });
-
-    await command.action(logger, { options: { id: '1caf7dcd-7e83-4c3a-94f7-932a1299c844', includeSiteUrl: true } });
-    assert(loggerErrSpy.calledWith(chalk.yellow(`Parameter 'includeSiteUrl' is deprecated. Please use 'withSiteUrl' instead`)));
-
-    sinonUtil.restore(loggerErrSpy);
-  });
-
   it('retrieves information about the specified Microsoft 365 Group including its site URL', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/1caf7dcd-7e83-4c3a-94f7-932a1299c844`) {

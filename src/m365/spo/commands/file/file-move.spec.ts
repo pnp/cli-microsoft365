@@ -401,35 +401,6 @@ describe(commands.FILE_MOVE, () => {
     ]);
   });
 
-  it(`correctly shows deprecation warning for option 'includeItemPermissions'`, async () => {
-    const chalk = (await import('chalk')).default;
-    const loggerErrSpy = sinon.spy(logger, 'logToStderr');
-
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `${destWebUrl}/_api/Web/GetFileById('${destDocId}')`) {
-        return destFileResponse;
-      }
-
-      throw 'Invalid request: ' + opts.url;
-    });
-
-    await command.action(logger, {
-      options: {
-        webUrl: sourceWebUrl,
-        sourceUrl: sourceServerRelUrl,
-        targetUrl: destAbsoluteTargetUrl,
-        nameConflictBehavior: 'rename',
-        bypassSharedLock: true,
-        includeItemPermissions: true,
-        newName: 'Document-renamed.pdf'
-      }
-    });
-
-    assert(loggerErrSpy.calledWith(chalk.yellow(`Parameter 'includeItemPermissions' is deprecated. Please use 'withItemPermissions' instead`)));
-
-    sinonUtil.restore(loggerErrSpy);
-  });
-
   it('correctly moves a file when using sourceUrl with extra options', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `${destWebUrl}/_api/Web/GetFileById('${destDocId}')`) {

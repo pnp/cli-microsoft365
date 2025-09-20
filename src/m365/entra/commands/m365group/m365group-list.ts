@@ -14,7 +14,6 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   displayName?: string;
   mailNickname?: string;
-  includeSiteUrl?: boolean;
   withSiteUrl?: boolean;
   orphaned?: boolean;
 }
@@ -40,7 +39,6 @@ class EntraM365GroupListCommand extends GraphCommand {
       Object.assign(this.telemetryProperties, {
         displayName: typeof args.options.displayName !== 'undefined',
         mailNickname: typeof args.options.mailNickname !== 'undefined',
-        includeSiteUrl: args.options.includeSiteUrl,
         withSiteUrl: !!args.options.withSiteUrl,
         orphaned: !!args.options.orphaned
       });
@@ -56,9 +54,6 @@ class EntraM365GroupListCommand extends GraphCommand {
         option: '-m, --mailNickname [displayName]'
       },
       {
-        option: '--includeSiteUrl'
-      },
-      {
         option: '--withSiteUrl'
       },
       {
@@ -72,10 +67,6 @@ class EntraM365GroupListCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    if (args.options.includeSiteUrl) {
-      await this.warn(logger, `Parameter 'includeSiteUrl' is deprecated. Please use 'withSiteUrl' instead`);
-    }
-
     const groupFilter: string = `?$filter=groupTypes/any(c:c+eq+'Unified')`;
     const displayNameFilter: string = args.options.displayName ? ` and startswith(DisplayName,'${formatting.encodeQueryParameter(args.options.displayName)}')` : '';
     const mailNicknameFilter: string = args.options.mailNickname ? ` and startswith(MailNickname,'${formatting.encodeQueryParameter(args.options.mailNickname)}')` : '';
@@ -98,7 +89,7 @@ class EntraM365GroupListCommand extends GraphCommand {
         groups = orphanedGroups;
       }
 
-      if (args.options.includeSiteUrl || args.options.withSiteUrl) {
+      if (args.options.withSiteUrl) {
         const res = await Promise.all(groups.map(g => this.getGroupSiteUrl(g.id as string)));
         res.forEach(r => {
           for (let i: number = 0; i < groups.length; i++) {
