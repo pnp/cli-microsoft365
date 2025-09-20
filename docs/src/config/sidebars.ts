@@ -3637,6 +3637,11 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
+              label: 'site archive',
+              id: 'cmd/spo/site/site-archive'
+            },
+            {
+              type: 'doc',
               label: 'site ensure',
               id: 'cmd/spo/site/site-ensure'
             },
@@ -3662,8 +3667,18 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
+              label: 'site rename',
+              id: 'cmd/spo/site/site-rename'
+            },
+            {
+              type: 'doc',
               label: 'site set',
               id: 'cmd/spo/site/site-set'
+            },
+            {
+              type: 'doc',
+              label: 'site unarchive',
+              id: 'cmd/spo/site/site-unarchive'
             },
             {
               type: 'doc',
@@ -3722,11 +3737,6 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
-              label: 'site archive',
-              id: 'cmd/spo/site/site-archive'
-            },
-            {
-              type: 'doc',
               label: 'site chrome set',
               id: 'cmd/spo/site/site-chrome-set'
             },
@@ -3754,11 +3764,6 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'site inplacerecordsmanagement set',
               id: 'cmd/spo/site/site-inplacerecordsmanagement-set'
-            },
-            {
-              type: 'doc',
-              label: 'site list',
-              id: 'cmd/spo/site/site-list'
             },
             {
               type: 'doc',
@@ -3792,19 +3797,9 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
-              label: 'site rename',
-              id: 'cmd/spo/site/site-rename'
-            },
-            {
-              type: 'doc',
               label: 'site sharingpermission set',
               id: 'cmd/spo/site/site-sharingpermission-set'
-            },
-            {
-              type: 'doc',
-              label: 'site unarchive',
-              id: 'cmd/spo/site/site-unarchive'
-            },
+            }
           ]
         },
         {
