@@ -16,10 +16,6 @@ const options = globalOptionsZod
         message: `'${url}' is not a valid SharePoint Online site URL.`
       }))
     ),
-    audiences: z.string()
-      .refine(audiences => validation.isValidGuidArray(audiences) === true, audiences => ({
-        message: `The following GUIDs are invalid: ${validation.isValidGuidArray(audiences)}.`
-      })).optional(),
     audienceIds: z.string()
       .refine(audiences => validation.isValidGuidArray(audiences) === true, audiences => ({
         message: `The following GUIDs are invalid: ${validation.isValidGuidArray(audiences)}.`
@@ -55,22 +51,15 @@ class SpoHomeSiteAddCommand extends SpoCommand {
   public getRefinedSchema(schema: z.ZodTypeAny): z.ZodEffects<any> | undefined {
     return schema
       .refine(
-        (options: Options) => [options.audiences, options.audienceIds, options.audienceNames].filter(o => o !== undefined).length <= 1,
+        (options: Options) => [options.audienceIds, options.audienceNames].filter(o => o !== undefined).length <= 1,
         {
-          message: 'You must specify either audiences, audienceIds or audienceNames but not multiple.'
+          message: 'You must specify either audienceIds or audienceNames but not both.'
         }
       );
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    if (args.options.audiences) {
-      await this.warn(logger, `Option 'audiences' is deprecated and will be removed in the next major release.`);
-    }
-
     let audiences: string[] = [];
-    if (args.options.audiences) {
-      audiences = args.options.audiences?.split(',');
-    }
     if (args.options.audienceIds) {
       audiences = args.options.audienceIds.split(',').map(id => id.trim());
     }

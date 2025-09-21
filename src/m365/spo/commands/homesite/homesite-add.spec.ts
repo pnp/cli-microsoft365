@@ -114,62 +114,6 @@ describe(commands.HOMESITE_ADD, () => {
     assert(loggerLogSpy.calledWith(homeSites));
   });
 
-  it('correctly shows deprecation warning for option audiences', async () => {
-    const chalk = (await import('chalk')).default;
-    const loggerErrSpy = sinon.spy(logger, 'logToStderr');
-
-    sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `https://contoso-admin.sharepoint.com/_api/SPHSite/AddHomeSite`) {
-        return homeSiteConfig;
-      }
-      throw 'Invalid request';
-    });
-
-    await command.action(logger, {
-      options: {
-        url: homeSite,
-        isInDraftMode: true,
-        vivaConnectionsDefaultStart: false,
-        audiences: 'af8c0bc8-7b1b-44b4-b087-ffcc8df70d16',
-        order: 2
-      }
-    });
-
-    assert(loggerErrSpy.calledWith(chalk.yellow(`Option 'audiences' is deprecated and will be removed in the next major release.`)));
-
-    sinonUtil.restore(loggerErrSpy);
-  });
-
-  it('adds a home site with the specified URL, isInDraftMode, vivaConnectionsDefaultStart, and audiences', async () => {
-    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `https://contoso-admin.sharepoint.com/_api/SPHSite/AddHomeSite`) {
-        return homeSiteConfig;
-      }
-      throw 'Invalid request';
-    });
-
-    await command.action(logger, {
-      options: {
-        url: homeSite,
-        isInDraftMode: true,
-        vivaConnectionsDefaultStart: false,
-        audiences: 'af8c0bc8-7b1b-44b4-b087-ffcc8df70d16',
-        order: 2
-      }
-    });
-
-    const expectedData = {
-      "audiences": [
-        "af8c0bc8-7b1b-44b4-b087-ffcc8df70d16"
-      ],
-      "isInDraftMode": true,
-      "order": 2,
-      "siteUrl": "https://contoso.sharepoint.com/sites/testcomms",
-      "vivaConnectionsDefaultStart": false
-    };
-    assert.deepStrictEqual(postStub.lastCall.args[0].data, expectedData);
-  });
-
   it('adds a home site with the specified URL, isInDraftMode, and vivaConnectionsDefaultStart', async () => {
     const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://contoso-admin.sharepoint.com/_api/SPHSite/AddHomeSite`) {
@@ -278,35 +222,8 @@ describe(commands.HOMESITE_ADD, () => {
     assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if both audiences and audienceNames are specified', async () => {
-    const actual = commandOptionsSchema.safeParse({
-      options: {
-        url: 'https://contoso.sharepoint.com',
-        audiences: '00000000-0000-0000-0000-000000000001',
-        audienceNames: 'Marketing Team'
-      }
-    });
-    assert.strictEqual(actual.success, false);
-  });
-
-  it('fails validation if both audiences and audienceIds are specified', async () => {
-    const actual = commandOptionsSchema.safeParse({
-      options: {
-        url: 'https://contoso.sharepoint.com',
-        audiences: '00000000-0000-0000-0000-000000000001',
-        audienceIds: '00000000-0000-0000-0000-000000000002'
-      }
-    });
-    assert.strictEqual(actual.success, false);
-  });
-
   it('correctly handles non-integer order', async () => {
     const actual = commandOptionsSchema.safeParse({ url: homeSite, order: -1 });
-    assert.strictEqual(actual.success, false);
-  });
-
-  it('correctly handles invalid GUIDs in audiences', async () => {
-    const actual = commandOptionsSchema.safeParse({ url: homeSite, audiences: 'invalid-guid' });
     assert.strictEqual(actual.success, false);
   });
 

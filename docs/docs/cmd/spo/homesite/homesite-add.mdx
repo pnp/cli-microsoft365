@@ -24,14 +24,11 @@ m365 spo homesite add [options]
 `--vivaConnectionsDefaultStart [vivaConnectionsDefaultStart]`
 : Specifies whether the home site is the default start for Viva Connections. Accepts `true` or `false`. Default is `true`.
 
-`--audiences [audiences]`
-: (deprecated. Use option `audienceIds` instead)  Comma-separated list of Microsoft Entra group IDs that will be used as audience. Specify either `audiences`, `audienceIds` or `audienceNames`, but not multiple.
-
 `--audienceIds [audienceIds]` 
-: Comma-separated list of Microsoft Entra group IDs to be used as audiences. Specify either `audiences`, `audienceIds` or `audienceNames`, but not multiple.
+: Comma-separated list of Microsoft Entra group IDs to be used as audiences. Specify either `audienceIds` or `audienceNames`, but not both.
 
 `--audienceNames [audienceNames]` 
-: Comma-separated list of Microsoft Entra group names to be used as audiences. You must use either `audiences`, `audienceIds` or `audienceNames`, but not multiple.
+: Comma-separated list of Microsoft Entra group names to be used as audiences. You must use either `audienceIds` or `audienceNames`, but not both.
 
 `--order [order]`
 : Order of the home site. Must be a positive integer.
