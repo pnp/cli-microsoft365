@@ -3,23 +3,23 @@ import TabItem from '@theme/TabItem';
 
 # v11 Upgrade Guidance
 
-The v11 release of CLI for Microsoft 365 introduces several breaking changes. To assist you in upgrading to the latest version, we've outlined the changes and the actions you may need to take.
+The v11 release of CLI for Microsoft 365 introduces several breaking changes. This guide outlines those changes and the actions you may need to take to upgrade smoothly from v10 to v11.
 
 ## SharePoint Embedded
 
 ### Updated container type commands
 
-We have updated all `spe containertype` commands to use a new preview endpoint. This endpoint provides more capabilities and configuration options, enabling us to introduce additional commands for SharePoint Embedded in the future. Once Microsoft makes a stable endpoint available, we will move our commands to that version.
+We have updated all `spe containertype` commands to use a new preview endpoint. This endpoint offers more capabilities and configuration options, enabling us to introduce additional SharePoint Embedded commands in the future. Once Microsoft releases a stable endpoint, we will update our commands accordingly.
 
-As part of this change, the options available in `spe containertype add` have been replaced with new ones. These new options allow you to configure more settings on a container type than before.
+As part of this change, the options available in `spe containertype add` have been replaced with new ones, allowing you to configure more container-type settings than before.
 
-The only exception is the `spe containertype remove` command. Due to significant limitations in the current preview API, we decided not to update this command at this time. As a result, `spe containertype remove` requires different permissions compared to the other `spe containertype` commands. Once Microsoft addresses these limitations, we will align the command with the others.
+The **exception** is the `spe containertype remove` command. Due to significant limitations in the current preview API, this command has not been updated. As a result, `spe containertype remove` requires different permissions compared to other `spe containertype` commands. Once Microsoft addresses these limitations, we will align it with the rest.
 
-Additionally, if you use `spe container` commands and specify the container type by name (instead of by ID), you will need to consent to different permissions on your app registration. Please refer to the documentation page for the specific command you're using to verify which permissions are required.
+Additionally, if you use `spe container` commands and specify the container type by name (instead of ID), you will need to consent to extra permissions in your app registration. Check the documentation for each command to verify which permissions are required.
 
 **Affected commands:**
 
-Commands with updated options:
+Commands with new options:
 
 - [spe containertype add](./cmd/spe/containertype/containertype-add)
 
@@ -36,75 +36,69 @@ Commands with updated permission scopes:
 
 #### What action do I need to take?
 
-Check the documentation of each of the commands above to see the updated options and permissions. If you use `spe containertype remove`, no action is needed at this time.
+- Review the documentation for each updated command to learn about the new options and permissions.  
+- If you use `spe containertype remove`, no action is required at this time.
 
 ## SharePoint Online
 
-### `spo homesite set` no longer adds new home sites
+### Changed default for `spo list view add` paged option
 
-The [spo homesite set](./cmd/spo/homesite/homesite-set.mdx) command has been updated to only modify existing home sites. It will no longer add a new site as home site if you don't have any configured yet.
-
-#### What action do I need to take?
-
-- **For adding new home sites**: Use the new [spo homesite add](./cmd/spo/homesite/homesite-add.mdx) command instead
-- **For updating existing home sites**: Continue using [spo homesite set](./cmd/spo/homesite/homesite-set.mdx) as before with required option `siteUrl`.
-
-### `spo list view add` default paged option changed
-
-The [spo list view add](./cmd/spo/list/list-view-add.mdx) command has been updated to change the default value of the `paged` option from `false` to `true`. This change reflects the common usage pattern where most views allow paging and fetch new items while scrolling down.
+The [spo list view add](./cmd/spo/list/list-view-add.mdx) command now defaults the `paged` option to `true` (previously `false`). This reflects common usage patterns, where most views support paging and fetch new items while scrolling.
 
 #### What action do I need to take?
 
-- **If you want paged views (most common)**: No action required as this is now the default behavior.
-- **If you want static views**: Explicitly specify `--paged false` when creating views that should not fetch new items while scrolling.
+- If you want paged views (the most common scenario), no action is required.  
+- If you want static views, explicitly specify `--paged false`.
 
-### Updated `homesite` commands and options
+### Updated behavior for `spo homesite` commands
 
-In the beginning when SharePoint home sites were introduced, you could only setup one single home site per tenant.
-Nowadays, you can have multiple home sites in your tenant.
-To reflect this change, we had to update our `spo homesite` commands to always require a URL to identify the home site to work with.
+When SharePoint home sites were first introduced, only one home site was supported per tenant. Now, you can configure multiple home sites. To reflect this change, the `spo homesite` commands now require a URL to identify the specific home site.
 
-For the following commands, the `url` option is now required.
+Commands affected:
 
 - [spo homesite get](./cmd/spo/homesite/homesite-get.mdx)
 - [spo homesite remove](./cmd/spo/homesite/homesite-remove.mdx)
+- [spo homesite set](./cmd/spo/homesite/homesite-set.mdx)
 
-Additionally, the `spo homesite remove` command will not return a command output anymore. Since the command output was more informative in the past, we decided to just drop it.
+**Changes in detail:**
 
-Due to a change in the underlying API, the command output of `spo homesite get` has also been changed. Check the documentation for the latest output format.
-
-#### What action do I need to take?
-
-Update your scripts to use the required `url` option in `spo homesite get` and `spo homesite remove` commands.
-Additionally, update your scripts to handle the changed output of the `spo homesite get` command and the lack of output of the `spo homesite remove` command.
-
-### `spo serviceprincipal grant list` command output updated
-
-In order to align our commands with the latest updates done by Microsoft we had to update the API endpoint used by the [spo serviceprincipal grant list](./cmd/spo/serviceprincipal/serviceprincipal-grant-list.mdx) command. As a result, the output of this command has changed.
+- **spo homesite get**: The command output format has changed due to updates in the underlying API.  
+- **spo homesite remove**: This command no longer returns output. Since the previous output was limited in value, we removed it entirely.  
+- **spo homesite set**: This command now only updates existing home sites. It no longer adds a new home site if none are configured. Use the new `spo homesite add` command instead.
 
 #### What action do I need to take?
 
-- **If you parse the output of this command**: Update your scripts to handle the new output format. 
+- Update your scripts to always include the required `url` option.  
+- Adjust your scripts to handle the changed output of `spo homesite get` and the lack of output for `spo homesite remove`.  
+- Use [spo homesite add](./cmd/spo/homesite/homesite-add.mdx) to add a new home site.
 
-## SharePoint Framework
+### Updated output for `spo serviceprincipal grant list`
 
-### Updated `spfx project upgrade` commands default behavior
-
-The [spfx project upgrade](./cmd/spfx/project/project-upgrade.mdx) command has been updated to use PowerShell as the default shell instead of bash. This change reflects the current usage patterns where PowerShell is more commonly used than bash. 
+The [spo serviceprincipal grant list](./cmd/spo/serviceprincipal/serviceprincipal-grant-list.mdx) command now uses an updated API endpoint. As a result, its output has changed.
 
 #### What action do I need to take?
 
-- **If you prefer bash**: Explicitly specify the `--shell` option with `bash` value when running the command
-- **If you use PowerShell**: No action required as this is now the default behavior
+Update your scripts to handle the new output format, check the command docs for the new output.
+
+## SharePoint Framework (SPFx)
+
+### Updated default shell for `spfx project upgrade`
+
+The [spfx project upgrade](./cmd/spfx/project/project-upgrade.mdx) command now defaults to **PowerShell** instead of Bash. This change reflects current usage trends, where most developers use PowerShell.
+
+#### What action do I need to take?
+
+- If you prefer Bash, explicitly set `--shell bash`.  
+- If you use PowerShell, no action is required.
 
 ## Teams
 
-### Ensure list output for `teams report` commands
+### Consistent list output for `teams report` commands
 
-We noticed that some of the `list` commands were not returning an array, but an object with a `value` property. We've updated those commands to return an array of items.
+Previously, some `teams report` commands returned an object with a `value` property instead of a direct array. We've updated them to return a proper array for consistency.
 
 <details>
-  <summary>Click here to compare the different command outputs of an affected command</summary>
+  <summary>Click here to compare output differences</summary>
 
 <Tabs>
   <TabItem value="v10 output">
@@ -175,7 +169,7 @@ We noticed that some of the `list` commands were not returning an array, but an 
 </Tabs>
 </details>
 
-The commands impacted by this change are:
+**Impacted commands:**
 
 - [teams report directroutingcalls](./cmd/teams/report/report-directroutingcalls.mdx)
 - [teams report pstncalls](./cmd/teams/report/report-pstncalls.mdx)
@@ -184,74 +178,68 @@ The commands impacted by this change are:
 
 Update your scripts to expect an array of items.
 
-
 ## General
 
-### Changed the way to retrieve default environments
+### Explicit option for default environments
 
-We've changed how Power Platform commands retrieve default environments for consistency across our commands. Previously, some commands would return the default environment when you didn't specify any options. Now, you need to explicitly specify the `--default` option to get the default environment.
+We changed how Power Platform commands retrieve default environments for consistency.  
+Previously, commands would automatically return the default environment if no options were specified.  
+Now, you must explicitly use the `--default` option.
 
-Affected commands:
+**Affected commands:**
 
-- [pp environment get](./cmd/pp/environment/environment-get.mdx)
-- [flow environment get](./cmd/flow/environment/environment-get.mdx)
-- [pa environment get](./cmd/pa/environment/environment-get.mdx)
+- [pp environment get](./cmd/pp/environment/environment-get.mdx)  
+- [flow environment get](./cmd/flow/environment/environment-get.mdx)  
+- [pa environment get](./cmd/pa/environment/environment-get.mdx)  
 
 #### What action do I need to take?
 
-Update your scripts to include the `--default` option when you want to retrieve the default environment.
+Update your scripts to include `--default` when retrieving the default environment.
 
-### Ensured output for `list` commands
+### Consistent output for empty `list` commands
 
-We noticed that some of the `list` commands were not returning any output when no items were found. We've updated all `list` commands to return an empty array when no items are found.
+Some `list` commands previously returned no output when no items were found. They now return an empty array (`[]`).
 
-The commands impacted by this change are:
+**Impacted command:**
 
 - [spo customaction list](./cmd/spo/customaction/customaction-list.mdx)
 
 #### What action do I need to take?
 
-Update your scripts to expect an empty array when no items are found.
-
-### Removed aliasses
-
-We've removed some aliasses to streamline the command set and avoid confusion. The following aliasses have been removed:
-
-- `pp chatbot get` is now [pp copilot get](./cmd/pp/copilot/copilot-get.mdx)
-- `pp chatbot list` is now [pp copilot list](./cmd/pp/copilot/copilot-list.mdx)
-- `pp chatbot remove` is now [pp copilot remove](./cmd/pp/copilot/copilot-remove.mdx)
-- `spo tenant homesite list` is now [spo homesite list](./cmd/spo/homesite/homesite-list.mdx)
-
-#### What action do I need to take?
-
-Update any `pp chatbot` and `spo tenant homesite` references in your scripts to `pp copilot` and `spo homesite` for compatibility.
+- Update your scripts to handle an empty array when no results are found.
 
 ### Removed commands
 
-Some commands were removed because their API endpoint became deprecated or the product began an end-of-life phase.
-
-Read the documentation for alternative commands to find out how to use them and what permissions are required.
+We removed some commands due to deprecated APIs or product end-of-life.  
 
 Command | Alternative
---- | ---
-`pp card clone` | None
-`pp card get` | None
-`pp card list` | None
-`pp card remove` | None
+------- | -----------
+`pp card clone` | None (product is end-of-life)
+`pp card get` | None (product is end-of-life)
+`pp card list` | None (product is end-of-life)
+`pp card remove` | None (product is end-of-life)
 `spo mail send` | [outlook mail send](./cmd/outlook/mail/mail-send.mdx)
-`skype report activitycounts` | None
-`skype report activityusercounts` | None
-`skype report activityuserdetail` | None
+`skype report activitycounts` | None (product is end-of-life)
+`skype report activityusercounts` | None (product is end-of-life)
+`skype report activityuserdetail` | None (product is end-of-life)
 `viva engage group list` | [viva engage community list](./cmd/viva/engage/engage-community-list.mdx)
 `viva engage group user add` | [viva engage community user add](./cmd/viva/engage/engage-community-user-add.mdx)
 `viva engage group user remove` | [viva engage community user remove](./cmd/viva/engage/engage-community-user-remove.mdx)
 
-### Aligned command names
+#### What action do I need to take?
 
-Some command names have been updated to reflect the latest Microsoft 365 terminology. Additionally, command improvements sometimes lead to renaming for better functionality alignment.
+Update your scripts to use the alternative commands, if available.
+
+### Renamed commands for alignment
+
+We renamed some commands to align with the latest Microsoft 365 terminology and to better reflect functionality.
 
 v10 command | v11 command
---- | ---
+----------- | -----------
+`pp chatbot get` | [pp copilot get](./cmd/pp/copilot/copilot-get.mdx)
+`pp chatbot list` | [pp copilot list](./cmd/pp/copilot/copilot-list.mdx)
+`pp chatbot remove` | [pp copilot remove](./cmd/pp/copilot/copilot-remove.mdx)
+`spo tenant homesite list` | [spo homesite list](./cmd/spo/homesite/homesite-list.mdx)
 `spo tenant site archive` | [spo site archive](./cmd/spo/site/site-archive.mdx)
 `spo tenant site list` | [spo site list](./cmd/spo/site/site-list.mdx)
 `spo tenant site membership list` | [spo site membership list](./cmd/spo/site/site-membership-list.mdx)
@@ -260,14 +248,11 @@ v10 command | v11 command
 
 #### What action do I need to take?
 
-Update your scripts to use the new command names listed.
+Update your scripts to use the new command names.
 
-### Aligned naming options
+### Renamed options for clarity
 
-Just like with command names, we also have to rename options to reflect the changes in the product. We also try to make the options more descriptive and clearer to make it easier for you to use the CLI.
-These changes aim to make it easier for you to use the CLI.
-
-We've updated the following options:
+We also renamed some options to reflect product changes and make them more descriptive.
 
 Command | Old option | New option
 ------- | ---------- | ----------
@@ -286,8 +271,8 @@ Command | Old option | New option
 [pp solution publisher list](./cmd/pp/solution/solution-publisher-list.mdx) | `includeMicrosoftPublishers` | `withMicrosoftPublishers`
 [purview threatassessment get](./cmd/purview/threatassessment/threatassessment-get.mdx) | `includeResults` | `withResults`
 [spo file move](./cmd/spo/file/file-move.mdx) | `includeItemPermissions` | `withItemPermissions`
-[spo homesite add](./cmd/spo/homesite/homesite-add.mdx) | `audiences ` | `audienceIds`
-[spo homesite set](./cmd/spo/homesite/homesite-set.mdx) | `siteUrl ` | `url`
+[spo homesite add](./cmd/spo/homesite/homesite-add.mdx) | `audiences` | `audienceIds`
+[spo homesite set](./cmd/spo/homesite/homesite-set.mdx) | `siteUrl` | `url`
 [spo hubsite get](./cmd/spo/hubsite/hubsite-get.mdx) | `includeAssociatedSites` | `withAssociatedSites`
 [spo hubsite list](./cmd/spo/hubsite/hubsite-list.mdx) | `includeAssociatedSites` | `withAssociatedSites`
 [spo site list](./cmd/spo/site/site-list.mdx) | `includeOneDriveSites` | `withOneDriveSites`
@@ -297,4 +282,4 @@ Command | Old option | New option
 
 #### What action do I need to take?
 
-If you use any of the commands listed above, ensure that you use the new option names.
+If you use any of these commands, update your scripts to reflect the new option names.
