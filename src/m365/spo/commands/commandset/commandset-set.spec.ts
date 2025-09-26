@@ -23,6 +23,7 @@ describe(commands.COMMANDSET_SET, () => {
   const validUrl = 'https://contoso.sharepoint.com';
   const validId = 'e7000aef-f756-4997-9420-01cc84f9ac9c';
   const validTitle = 'Commandset title';
+  const validDescription = 'Commandset description';
   const validClientSideComponentId = 'b206e130-1a5b-4ae7-86a7-4f91c9924d0a';
   const validNewTitle = 'I have no inspiration whatsoever';
   const validClientSideComponentProperties = '{"testMessage":"Test message"}';
@@ -35,7 +36,7 @@ describe(commands.COMMANDSET_SET, () => {
         "ClientSideComponentId": "b206e130-1a5b-4ae7-86a7-4f91c9924d0a",
         "ClientSideComponentProperties": "",
         "CommandUIExtension": null,
-        "Description": null,
+        "Description": validDescription,
         "Group": null,
         "HostProperties": "",
         "Id": "e7000aef-f756-4997-9420-01cc84f9ac9c",
@@ -354,6 +355,8 @@ describe(commands.COMMANDSET_SET, () => {
   });
 
   it('updates a commandset with the id parameter', async () => {
+    let actualRequestBody: any;
+
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url?.startsWith('https://contoso.sharepoint.com/_api/') && opts.url?.endsWith(`/UserCustomActions(guid'${validId}')`)) {
         return commandsetSingleResponse.value[0];
@@ -364,17 +367,26 @@ describe(commands.COMMANDSET_SET, () => {
 
     sinon.stub(request, 'post').callsFake(async opts => {
       if ((opts.url === `https://contoso.sharepoint.com/_api/Web/UserCustomActions('${validId}')`)) {
+        actualRequestBody = opts.data;
         return;
       }
 
       throw `Invalid request`;
     });
 
-    await assert.doesNotReject(command.action(logger, {
+    await command.action(logger, {
       options: {
-        verbose: true, webUrl: validUrl, id: validId, newTitle: validNewTitle, listType: validListType, clientSideComponentProperties: validClientSideComponentProperties, location: validLocation
+        verbose: true, webUrl: validUrl, id: validId, newTitle: validNewTitle, description: validDescription, listType: validListType, clientSideComponentProperties: validClientSideComponentProperties, location: validLocation
       }
-    }));
+    });
+
+    assert.deepStrictEqual(actualRequestBody, {
+      Description: validDescription,
+      Title: validNewTitle,
+      Location: 'ClientSideExtension.ListViewCommandSet.ContextMenu',
+      RegistrationId: '100',
+      ClientSideComponentProperties: validClientSideComponentProperties
+    });
   });
 
   it('updates the Client Side Component Id', async () => {
@@ -450,7 +462,6 @@ describe(commands.COMMANDSET_SET, () => {
     });
 
     await command.action(logger, { options: { verbose: true, webUrl: validUrl, title: validTitle, newTitle: validNewTitle, listType: 'Library', location: 'Both' } });
-
   });
 
   it('updates a commandset with the clientSideComponentId parameter', async () => {
