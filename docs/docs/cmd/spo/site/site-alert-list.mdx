@@ -1,0 +1,220 @@
+import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# spo site alert list
+
+Lists all SharePoint list alerts
+
+## Usage
+
+```sh
+m365 spo site alert list [options]
+```
+
+## Options
+
+```md definition-list
+`-u, --webUrl <webUrl>`
+: The URL of the SharePoint site.
+
+`--listId [listId]`
+: The ID of the SharePoint list. Specify either `listId`, `listUrl`, or `listTitle`, but not more than one.
+
+`--listUrl [listUrl]`
+: The URL of the SharePoint list. Specify either `listId`, `listUrl`, or `listTitle`, but not more than one.
+
+`--listTitle [listTitle]`
+: The title of the SharePoint list. Specify either `listId`, `listUrl`, or `listTitle`, but not more than one.
+
+`--userName [userName]`
+: The user name to filter alerts for. Specify either `userName` or `userId`, but not both.
+
+`--userId [userId]`
+: The user ID to filter alerts for. Specify either `userName` or `userId`, but not both.
+```
+
+<Global />
+
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource   | Permissions        |
+  |------------|--------------------|
+  | SharePoint | AllSites.FullControl |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  Application permissions are not supported for this command.
+
+  </TabItem>
+</Tabs>
+
+## Examples
+
+List all alerts for a SharePoint site:
+
+```sh
+m365 spo site alert list --webUrl https://contoso.sharepoint.com/sites/Marketing
+```
+
+List alerts for a SharePoint list by listUrl:
+
+```sh
+m365 spo site alert list --webUrl https://contoso.sharepoint.com/sites/Marketing --listUrl /sites/Marketing/lists/Tasks
+```
+
+List alerts for a specific user by userId:
+
+```sh
+m365 spo site alert list --webUrl https://contoso.sharepoint.com/sites/Marketing --userId 7cbb4c8d-8e4d-4d2e-9c6f-3f1d8b2e6a0e
+```
+
+List alerts for a specific list by title and user by username:
+
+```sh
+m365 spo site alert list --webUrl https://contoso.sharepoint.com/sites/Marketing --listTitle "Tasks" --userName jane.doe@contos
+```
+
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  [
+    {
+      "AlertFrequency": 0,
+      "AlertTemplateName": "SPAlertTemplateType.DocumentLibrary",
+      "AlertType": 0,
+      "AlwaysNotify": false,
+      "DeliveryChannels": 1,
+      "EventType": -1,
+      "Filter": "",
+      "ID": "edf49cf4-d91e-4084-866d-2b9ff5582189",
+      "Properties": [
+        {
+          "Key": "dispformurl",
+          "Value": "Shared Documents/Forms/DispForm.aspx",
+          "ValueType": "Edm.String"
+        },
+        {
+          "Key": "filterindex",
+          "Value": "0",
+          "ValueType": "Edm.String"
+        },
+        {
+          "Key": "defaultitemopen",
+          "Value": "Browser",
+          "ValueType": "Edm.String"
+        },
+        {
+          "Key": "sendurlinsms",
+          "Value": "False",
+          "ValueType": "Edm.String"
+        },
+        {
+          "Key": "mobileurl",
+          "Value": "https://contoso.sharepoint.com/_layouts/15/mobile/",
+          "ValueType": "Edm.String"
+        },
+        {
+          "Key": "eventtypeindex",
+          "Value": "0",
+          "ValueType": "Edm.String"
+        },
+        {
+          "Key": "siteurl",
+          "Value": "https://contoso.sharepoint.com",
+          "ValueType": "Edm.String"
+        }
+      ],
+      "Status": 0,
+      "Title": "Documents",
+      "UserId": 6,
+      "List": {
+        "Id": "39d9e102-9e8f-4e74-8f17-84a92f972fcf",
+        "Title": "Documents",
+        "RootFolder": {
+          "ServerRelativeUrl": "/Shared Documents"
+        }
+      },
+      "User": {
+        "Id": 6,
+        "IsHiddenInUI": false,
+        "LoginName": "i:0#.f|membership|jane.doe@contoso.onmicrosoft.com",
+        "Title": "Saurabh",
+        "PrincipalType": 1,
+        "Email": "jane.doe@contoso.onmicrosoft.com",
+        "Expiration": "",
+        "IsEmailAuthenticationGuestUser": false,
+        "IsShareByEmailGuestUser": false,
+        "IsSiteAdmin": false,
+        "UserId": {
+          "NameId": "10037ffeaed549a5",
+          "NameIdIssuer": "urn:federation:microsoftonline"
+        },
+        "UserPrincipalName": "jane.doe@contoso.onmicrosoft.com"
+      }
+    }
+  ]
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```txt
+  AlertFrequency   : 0
+  AlertTemplateName: SPAlertTemplateType.DocumentLibrary
+  AlertType        : 0
+  AlwaysNotify     : false
+  DeliveryChannels : 1
+  EventType        : -1
+  Filter           :
+  ID               : edf49cf4-d91e-4084-866d-2b9ff5582189
+  List             : {"Id":"39d9e102-9e8f-4e74-8f17-84a92f972fcf","Title":"Documents","RootFolder":{"ServerRelativeUrl":"/Shared Documents"}}
+  Properties       : [{"Key":"dispformurl","Value":"Shared Documents/Forms/DispForm.aspx","ValueType":"Edm.String"},{"Key":"filterindex","Value":"0","ValueType":"Edm.String"},{"Key":"defaultitemopen","Value":"Browser","ValueType":"Edm.String"},{"Key":"sendurlinsms","Value":"False","ValueType":"Edm.String"},{"Key":"mobileurl","Value":"https://contoso.sharepoint.com/_layouts/15/mobile/","ValueType":"Edm.String"},{"Key":"eventtypeindex","Value":"0","ValueType":"Edm.String"},{"Key":"siteurl","Value":"https://contoso.sharepoint.com","ValueType":"Edm.String"}]
+  Status           : 0
+  Title            : Documents
+  User             : {"Id":6,"IsHiddenInUI":false,"LoginName":"i:0#.f|membership|jane.doe@contoso.onmicrosoft.com","Title":"Saurabh","PrincipalType":1,"Email":"jane.doe@contoso.onmicrosoft.com","Expiration":"","IsEmailAuthenticationGuestUser":false,"IsShareByEmailGuestUser":false,"IsSiteAdmin":false,"UserId":{"NameId":"10037ffeaed549a5","NameIdIssuer":"urn:federation:microsoftonline"},"UserPrincipalName":"jane.doe@contoso.onmicrosoft.com"}
+  UserId           : 6
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  AlertFrequency,AlertTemplateName,AlertType,AlwaysNotify,DeliveryChannels,EventType,Filter,ID,Status,Title,UserId
+  0,SPAlertTemplateType.DocumentLibrary,0,0,1,-1,,edf49cf4-d91e-4084-866d-2b9ff5582189,0,Documents,6
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # spo site alert list --debug "false" --verbose "false" --webUrl "https://contoso.sharepoint.com" --listTitle "Documents"
+
+  Date: 9/26/2025
+
+  ## Documents (edf49cf4-d91e-4084-866d-2b9ff5582189)
+
+  Property | Value
+  ---------|-------
+  AlertFrequency | 0
+  AlertTemplateName | SPAlertTemplateType.DocumentLibrary
+  AlertType | 0
+  AlwaysNotify | false
+  DeliveryChannels | 1
+  EventType | -1
+  Filter |
+  ID | edf49cf4-d91e-4084-866d-2b9ff5582189
+  Status | 0
+  Title | Documents
+  UserId | 6
+  ```
+
+  </TabItem>
+</Tabs>
