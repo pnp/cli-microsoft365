@@ -2,6 +2,10 @@ import { Logger } from '../../../../cli/Logger.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import PowerAppsCommand from '../../../base/PowerAppsCommand.js';
 import commands from '../../commands.js';
+import { globalOptionsZod } from '../../../../Command.js';
+import { z } from 'zod';
+
+const options = globalOptionsZod.strict();
 
 class PaEnvironmentListCommand extends PowerAppsCommand {
   public get name(): string {
@@ -10,6 +14,10 @@ class PaEnvironmentListCommand extends PowerAppsCommand {
 
   public get description(): string {
     return 'Lists Microsoft Power Apps environments in the current tenant';
+  }
+
+  public get schema(): z.ZodTypeAny | undefined {
+    return options;
   }
 
   public defaultProperties(): string[] | undefined {
