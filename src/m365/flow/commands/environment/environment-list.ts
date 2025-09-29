@@ -3,6 +3,10 @@ import { Logger } from '../../../../cli/Logger.js';
 import { odata } from '../../../../utils/odata.js';
 import PowerAutomateCommand from '../../../base/PowerAutomateCommand.js';
 import commands from '../../commands.js';
+import { z } from 'zod';
+import { globalOptionsZod } from '../../../../Command.js';
+
+const options = globalOptionsZod.strict();
 
 class FlowEnvironmentListCommand extends PowerAutomateCommand {
   public get name(): string {
@@ -11,6 +15,10 @@ class FlowEnvironmentListCommand extends PowerAutomateCommand {
 
   public get description(): string {
     return 'Lists Microsoft Flow environments in the current tenant';
+  }
+
+  public get schema(): z.ZodTypeAny | undefined {
+    return options;
   }
 
   public defaultProperties(): string[] | undefined {
