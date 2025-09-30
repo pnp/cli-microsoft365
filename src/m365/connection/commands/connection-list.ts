@@ -1,8 +1,11 @@
 import assert from 'assert';
+import { z } from 'zod';
 import auth from '../../../Auth.js';
 import { Logger } from '../../../cli/Logger.js';
-import Command, { CommandArgs, CommandError } from '../../../Command.js';
+import Command, { CommandArgs, CommandError, globalOptionsZod } from '../../../Command.js';
 import commands from '../commands.js';
+
+const options = globalOptionsZod.strict();
 
 class ConnectionListCommand extends Command {
   public get name(): string {
@@ -11,6 +14,10 @@ class ConnectionListCommand extends Command {
 
   public get description(): string {
     return 'Show the list of available connections';
+  }
+
+  public get schema(): z.ZodTypeAny | undefined {
+    return options;
   }
 
   public defaultProperties(): string[] | undefined {
