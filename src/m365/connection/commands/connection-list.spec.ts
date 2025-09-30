@@ -1,6 +1,9 @@
 import assert from 'assert';
 import sinon from 'sinon';
+import { z } from 'zod';
 import auth, { AuthType, CertificateType, CloudType } from '../../../Auth.js';
+import { cli } from '../../../cli/cli.js';
+import { CommandInfo } from '../../../cli/CommandInfo.js';
 import { Logger } from '../../../cli/Logger.js';
 import { telemetry } from '../../../telemetry.js';
 import { pid } from '../../../utils/pid.js';
@@ -15,6 +18,8 @@ describe(commands.LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
+  let commandOptionsSchema: z.ZodTypeAny;
 
   const mockListResponse = [
     {
@@ -86,6 +91,9 @@ describe(commands.LIST, () => {
         }
       }
     ];
+
+    commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
   });
 
   beforeEach(() => {
@@ -125,13 +133,13 @@ describe(commands.LIST, () => {
   });
 
   it('shows a list of connections', async () => {
-    await command.action(logger, { options: {} });
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     assert(loggerLogSpy.calledOnceWithExactly(mockListResponse));
   });
 
   it('shows an empty list of connections', async () => {
     sinon.stub(auth, 'getAllConnections').resolves([]);
-    await command.action(logger, { options: {} });
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     assert(loggerLogSpy.calledOnceWithExactly([]));
     sinonUtil.restore((auth as any).getAllConnections);
   });
@@ -168,13 +176,13 @@ describe(commands.LIST, () => {
     ];
 
     sinon.stub((auth as any), 'getAllConnections').resolves(mockConnectionsList);
-    await command.action(logger, { options: {} });
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     assert(loggerLogSpy.calledOnceWithExactly(mockConnectionsResponse));
     sinonUtil.restore((auth as any).getAllConnections);
   });
 
   it('shows a list of connections (debug)', async () => {
-    await command.action(logger, { options: { debug: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true }) });
     assert(loggerLogSpy.calledOnceWithExactly(mockListResponse));
   });
 
@@ -183,7 +191,7 @@ describe(commands.LIST, () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.reject('An error has occurred'));
 
     try {
-      await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred'));
+      await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({}) }), new CommandError('An error has occurred'));
     }
     finally {
       sinonUtil.restore(auth.restoreAuth);
