@@ -45,7 +45,7 @@ describe(commands.ENVIRONMENT_LIST, () => {
       logToStderr: async (msg: string) => {
         log.push(msg);
       }
-    } as Logger;
+    };
     loggerLogSpy = sinon.spy(logger, 'log');
   });
 
