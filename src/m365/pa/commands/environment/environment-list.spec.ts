@@ -78,7 +78,7 @@ describe(commands.ENVIRONMENT_LIST, () => {
   });
 
   it('fails validation with unknown options', () => {
-    const actual = commandOptionsSchema.safeParse({ "option": "value" });
+    const actual = commandOptionsSchema.safeParse({ option: "value" });
     assert.strictEqual(actual.success, false);
   });
 
