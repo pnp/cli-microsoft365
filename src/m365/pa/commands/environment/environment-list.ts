@@ -6,6 +6,7 @@ import { globalOptionsZod } from '../../../../Command.js';
 import { z } from 'zod';
 
 const options = globalOptionsZod.strict();
+
 class PaEnvironmentListCommand extends PowerAppsCommand {
   public get name(): string {
     return commands.ENVIRONMENT_LIST;
