@@ -1,9 +1,8 @@
 name: Release next
 
 on:
-  push:
-    branches: [main]
-
+  workflow_dispatch:        
+      
 jobs:
   build:
     if: github.repository_owner == 'pnp'
