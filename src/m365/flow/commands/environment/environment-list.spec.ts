@@ -10,11 +10,16 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './environment-list.js';
+import { z } from 'zod';
+import { cli } from '../../../../cli/cli.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
 
 describe(commands.ENVIRONMENT_LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
+  let commandOptionsSchema: z.ZodTypeAny;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -22,6 +27,8 @@ describe(commands.ENVIRONMENT_LIST, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
+    commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
   });
 
   beforeEach(() => {
@@ -133,7 +140,7 @@ describe(commands.ENVIRONMENT_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true }) });
     assert(loggerLogSpy.calledWith([
       {
         "name": "Default-d87a7535-dd31-4437-bfe1-95340acd55c5",
@@ -264,7 +271,7 @@ describe(commands.ENVIRONMENT_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: {} });
+    await command.action(logger, { options: commandOptionsSchema.safeParse({}) });
     assert(loggerLogSpy.calledWith([
       {
         "name": "Default-d87a7535-dd31-4437-bfe1-95340acd55c5",
@@ -395,7 +402,7 @@ describe(commands.ENVIRONMENT_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { output: 'text' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ output: 'text' }) });
     assert(loggerLogSpy.calledWith([
       {
         "name": "Default-d87a7535-dd31-4437-bfe1-95340acd55c5",
@@ -526,7 +533,7 @@ describe(commands.ENVIRONMENT_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { output: 'json' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ output: 'json' }) });
     assert(loggerLogSpy.calledWithExactly([
       {
         "name": "Default-d87a7535-dd31-4437-bfe1-95340acd55c5",
@@ -598,7 +605,7 @@ describe(commands.ENVIRONMENT_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: {} });
+    await command.action(logger, { options: commandOptionsSchema.safeParse({}) });
     assert(loggerLogSpy.calledWithExactly([]));
   });
 
@@ -614,7 +621,7 @@ describe(commands.ENVIRONMENT_LIST, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: {} } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.safeParse({}) } as any),
       new CommandError(`Resource '' does not exist or one of its queried reference-property objects are not present`));
   });
 });
