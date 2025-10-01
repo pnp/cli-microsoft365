@@ -11,11 +11,16 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './environment-list.js';
 import { accessToken } from '../../../../utils/accessToken.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
+import { cli } from '../../../../cli/cli.js';
+import { z } from 'zod';
 
 describe(commands.ENVIRONMENT_LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
+  let commandOptionsSchema: z.ZodTypeAny;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -24,6 +29,8 @@ describe(commands.ENVIRONMENT_LIST, () => {
     sinon.stub(session, 'getId').returns('');
     sinon.stub(accessToken, 'assertAccessTokenType').returns();
     auth.connection.active = true;
+    commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
   });
 
   beforeEach(() => {
@@ -221,7 +228,7 @@ describe(commands.ENVIRONMENT_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true }) });
     assert(loggerLogSpy.calledWith(env.value));
   });
 
@@ -381,7 +388,7 @@ describe(commands.ENVIRONMENT_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: {} });
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     assert(loggerLogSpy.calledWith(env.value));
   });
 
@@ -541,9 +548,10 @@ describe(commands.ENVIRONMENT_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { asAdmin: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ asAdmin: true }) });
     assert(loggerLogSpy.calledWith(env.value));
   });
+
   it('correctly handles no environments', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/providers/Microsoft.BusinessAppPlatform/environments?api-version=2020-10-01`) > -1) {
@@ -559,7 +567,7 @@ describe(commands.ENVIRONMENT_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: {} });
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     assert(loggerLogSpy.calledOnceWithExactly([]));
   });
 
@@ -577,7 +585,7 @@ describe(commands.ENVIRONMENT_LIST, () => {
       };
     });
 
-    await assert.rejects(command.action(logger, { options: {} } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({}) } as any),
       new CommandError(`Resource '' does not exist or one of its queried reference-property objects are not present`));
   });
 });
