@@ -4,7 +4,7 @@ sidebar_position: 4
 
 # Release notes
 
-## v11.0.0 (beta)
+## [v11.0.0](https://github.com/pnp/cli-microsoft365/releases/tag/v11.0.0)
 
 ### New commands
 
@@ -23,15 +23,12 @@ sidebar_position: 4
 ### Changes
 
 - added CLI for Microsoft 365 MCP server guide [#6817](https://github.com/pnp/cli-microsoft365/pull/6817)
-- fixed dependabot updates
-- added additional platform options to [entra app add](../cmd/entra/app/app-add.mdx) command [6570](https://github.com/pnp/cli-microsoft365/issues/6570)
-- added Copilot instructions
-- migrated 'entra administrativeunit list' to Zod. [6810](https://github.com/pnp/cli-microsoft365/issues/6810)
-- migrated 'entra administrative unit get' to Zod. [6809](https://github.com/pnp/cli-microsoft365/issues/6809)
-- migrated 'entra administrativeunit remove' to Zod. [6812](https://github.com/pnp/cli-microsoft365/issues/6812)
-- migrated 'entra administrativeunit add' to Zod. [6814](https://github.com/pnp/cli-microsoft365/issues/6814)
-- refactored how unknown options are configured for zod for some commands. [6889](https://github.com/pnp/cli-microsoft365/issues/6889)
-- restructured v11 upgrade guidance. [6887](https://github.com/pnp/cli-microsoft365/issues/6887)
+- added additional platform options to [entra app add](../cmd/entra/app/app-add.mdx) command [#6570](https://github.com/pnp/cli-microsoft365/issues/6570)
+- migrated [entra administrativeunit list](../cmd/entra/administrativeunit/administrativeunit-list.mdx) to Zod [#6810](https://github.com/pnp/cli-microsoft365/issues/6810)
+- migrated [entra administrative unit get](../cmd/entra/administrativeunit/administrativeunit-get.mdx) to Zod [#6809](https://github.com/pnp/cli-microsoft365/issues/6809)
+- migrated [entra administrativeunit remove](../cmd/entra/administrativeunit/administrativeunit-remove.mdx) to Zod [#6812](https://github.com/pnp/cli-microsoft365/issues/6812)
+- migrated [entra administrativeunit add](../cmd/entra/administrativeunit/administrativeunit-add.mdx) to Zod [#6814](https://github.com/pnp/cli-microsoft365/issues/6814)
+- refactored how unknown options are configured for zod for some commands [#6889](https://github.com/pnp/cli-microsoft365/issues/6889)
 
 ### ⚠️ Breaking changes
 
@@ -48,9 +45,9 @@ sidebar_position: 4
  - updated `spo homesite` options and output [#6731](https://github.com/pnp/cli-microsoft365/issues/6731)
  - removed deprecated aliases [#6532](https://github.com/pnp/cli-microsoft365/issues/6532)
  - removed deprecated options [#6481](https://github.com/pnp/cli-microsoft365/issues/6481)
- - moved 'spo tenant site' commands to 'spo site' [#6879](https://github.com/pnp/cli-microsoft365/issues/6879)
- - updated 'spe containertype' commands to use Graph [#6840](https://github.com/pnp/cli-microsoft365/issues/6840)
- - updated 'spo homesite add' options [#6881](https://github.com/pnp/cli-microsoft365/issues/6881)
+ - moved `spo tenant site` commands to 'spo site' [#6879](https://github.com/pnp/cli-microsoft365/issues/6879)
+ - updated `spe containertype` commands to use Graph [#6840](https://github.com/pnp/cli-microsoft365/issues/6840)
+ - updated [spo homesite add](../cmd/spo/homesite/homesite-add.mdx) options [#6881](https://github.com/pnp/cli-microsoft365/issues/6881)
 
 ## [v10.11.0](https://github.com/pnp/cli-microsoft365/releases/tag/v10.11.0)
 
@@ -77,7 +74,6 @@ sidebar_position: 4
 
 - added Azure DevOps guidance and updates GitHub Actions guidance [#5879](https://github.com/pnp/cli-microsoft365/issues/5879)
 - added support for SPFx v1.22.0-beta.1 [#6765](https://github.com/pnp/cli-microsoft365/issues/6765)
-- added dependabot
 - enhanced docs to be v4 ready [#6800](https://github.com/pnp/cli-microsoft365/issues/6800)
 - enhanced app commands to use getAppRegistrationByAppName util [#6679](https://github.com/pnp/cli-microsoft365/issues/6679)
 - updated [spo serviceprincipal permissionrequest list](../cmd/spo/serviceprincipal/serviceprincipal-permissionrequest-list.mdx) command where the output was not consistent [#6788](https://github.com/pnp/cli-microsoft365/pull/6788)
@@ -94,7 +90,7 @@ sidebar_position: 4
 
 **Entra ID:**
 
-- [entra organization set](../cmd/entra/organization/organization-set.mdx) - Updates info about the organization [#6581](https://github.com/pnp/cli-microsoft365/issues/6581)
+- [entra organization set](../cmd/entra/organization/organization-set.mdx) - updates info about the organization [#6581](https://github.com/pnp/cli-microsoft365/issues/6581)
 
 **SharePoint:**
 
@@ -140,7 +136,7 @@ sidebar_position: 4
 
 **Entra ID:**
 
-- [entra organization list](../cmd/entra/organization/organization-list.mdx) - Retrieves a list of organizations [#6580](https://github.com/pnp/cli-microsoft365/issues/6580)
+- [entra organization list](../cmd/entra/organization/organization-list.mdx) - retrieves a list of organizations [#6580](https://github.com/pnp/cli-microsoft365/issues/6580)
 
 **Microsoft Graph:**
 
@@ -558,9 +554,9 @@ sidebar_position: 4
 
 - [entra enterpriseapp remove](../cmd/entra/enterpriseapp/enterpriseapp-remove.mdx) - deletes an enterprise application (or service principal) [#6111](https://github.com/pnp/cli-microsoft365/issues/6111)
 - [entra group set](../cmd/entra/group/group-set.mdx) - updates a Microsoft Entra group [#5479](https://github.com/pnp/cli-microsoft365/issues/5479)
-- [entra multitenant add](../cmd/entra/multitenant/multitenant-add.mdx) - creates a new multitenant organization [#6006](https://github.com/pnp/cli-microsoft365/issues/6006)
-- [entra multitenant remove](../cmd/entra/multitenant/multitenant-remove.mdx) - removes a multitenant organization [#6009](https://github.com/pnp/cli-microsoft365/issues/6009)
-- [entra multitenant set](../cmd/entra/multitenant/multitenant-set.mdx) - updates the properties of a multitenant organization [#6008](https://github.com/pnp/cli-microsoft365/issues/6008)
+- [entra multitenant add](../cmd/entra/multitenant/multitenant-add.mdx) - creates a new multi-tenant organization [#6006](https://github.com/pnp/cli-microsoft365/issues/6006)
+- [entra multitenant remove](../cmd/entra/multitenant/multitenant-remove.mdx) - removes a multi-tenant organization [#6009](https://github.com/pnp/cli-microsoft365/issues/6009)
+- [entra multitenant set](../cmd/entra/multitenant/multitenant-set.mdx) - updates the properties of a multi-tenant organization [#6008](https://github.com/pnp/cli-microsoft365/issues/6008)
 
 **Onenote:**
 
@@ -602,7 +598,7 @@ sidebar_position: 4
 
 **Entra ID:**
 
-- [entra multitenant get](../cmd/entra/multitenant/multitenant-get.mdx) - gets properties of the multitenant organization [#6007](https://github.com/pnp/cli-microsoft365/issues/6007)
+- [entra multitenant get](../cmd/entra/multitenant/multitenant-get.mdx) - gets properties of the multi-tenant organization [#6007](https://github.com/pnp/cli-microsoft365/issues/6007)
 
 **SharePoint:**
 
@@ -887,7 +883,6 @@ sidebar_position: 4
 - add extra validation for short options [#5657](https://github.com/pnp/cli-microsoft365/issues/5657)
 - extended the 'entra group list' command with a 'type' option [#5424](https://github.com/pnp/cli-microsoft365/issues/5424)
 - removed deprecated 'outputFile' options from report documentation [#5681](https://github.com/pnp/cli-microsoft365/issues/5681)
-- refactored codebase to remove Cli.getInstance()
 - extended 'teams app install' command with '--name' option [#5704](https://github.com/pnp/cli-microsoft365/issues/5704)
 - added 'userName' option to 'teams user app add' [#5702](https://github.com/pnp/cli-microsoft365/issues/5702)
 - extended Power Automate commands to use new API endpoint [#5715](https://github.com/pnp/cli-microsoft365/issues/5715)

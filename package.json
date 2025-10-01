@@ -1,6 +1,6 @@
 {
   "name": "@pnp/cli-microsoft365",
-  "version": "11.0.0",
+  "version": "11.1.0",
   "description": "Manage Microsoft 365 and SharePoint Framework projects on any platform",
   "license": "MIT",
   "main": "./dist/api.js",
@@ -101,6 +101,11 @@
       "name": "Martin Lingstuyl",
       "email": "mlingstuyl@live.com",
       "web": "https://www.blimped.nl/"
+    },
+    {
+      "name": "Martin Machacek",
+      "email": "machacek@edhouse.cz",
+      "web": "https://github.com/MartinM85"
     },
     {
       "name": "Jasey Waegebaert",
