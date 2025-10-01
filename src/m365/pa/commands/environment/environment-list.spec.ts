@@ -71,6 +71,7 @@ describe(commands.ENVIRONMENT_LIST, () => {
   it('defines correct properties for the default output', () => {
     assert.deepStrictEqual(command.defaultProperties(), ['name', 'displayName']);
   });
+
   it('passes validation with no options', () => {
     const actual = commandOptionsSchema.safeParse({});
     assert.strictEqual(actual.success, true);
