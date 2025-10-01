@@ -2,15 +2,13 @@ import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
-import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { spo } from '../../../../utils/spo.js';
-import { urlUtil } from '../../../../utils/urlUtil.js';
+import { ListItemListOptions, spoListItem } from '../../../../utils/spoListItem.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 import { ListItemInstance } from '../listitem/ListItemInstance';
-import { ListItemInstanceCollection } from '../listitem/ListItemInstanceCollection.js';
 
 interface CommandArgs {
   options: Options;
@@ -101,47 +99,43 @@ class SpoTenantCommandSetGetCommand extends SpoCommand {
       throw new CommandError('No app catalog URL found');
     }
 
-    let filter: string = `startswith(TenantWideExtensionLocation,'ClientSideExtension.ListViewCommandSet')`;
+    let filter: string;
 
     if (args.options.title) {
-      filter += ` and Title eq '${args.options.title}'`;
+      filter = `Title eq '${args.options.title}'`;
     }
     else if (args.options.id) {
-      filter += ` and Id eq ${args.options.id}`;
+      filter = `Id eq ${args.options.id}`;
     }
-    else if (args.options.clientSideComponentId) {
-      filter += ` and TenantWideExtensionComponentId eq '${args.options.clientSideComponentId}'`;
+    else {
+      filter = `TenantWideExtensionComponentId eq '${args.options.clientSideComponentId}'`;
     }
-
-    const listServerRelativeUrl: string = urlUtil.getServerRelativePath(appCatalogUrl, '/lists/TenantWideExtensions');
-    const reqOptions: CliRequestOptions = {
-      url: `${appCatalogUrl}/_api/web/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')/items?$filter=${filter}`,
-      headers: {
-        accept: 'application/json;odata=nometadata'
-      },
-      responseType: 'json'
-    };
 
     try {
-      const listItemInstances = await request.get<ListItemInstanceCollection>(reqOptions);
+      const options: ListItemListOptions = {
+        webUrl: appCatalogUrl,
+        listUrl: '/Lists/TenantWideExtensions',
+        filter: `startswith(TenantWideExtensionLocation,'ClientSideExtension.ListViewCommandSet') and ${filter}`
+      };
 
-      if (listItemInstances?.value.length > 0) {
-        listItemInstances.value.forEach(v => delete v['ID']);
+      const listItems = await spoListItem.getListItems(options, logger, this.verbose);
 
-        let listItemInstance: ListItemInstance;
-        if (listItemInstances.value.length > 1) {
-          const resultAsKeyValuePair = formatting.convertArrayToHashTable('Id', listItemInstances.value);
-          listItemInstance = await cli.handleMultipleResultsFound<ListItemInstance>(`Multiple ListView Command Sets with ${args.options.title || args.options.clientSideComponentId} were found.`, resultAsKeyValuePair);
+      if (listItems?.length > 0) {
+
+        let listItem: ListItemInstance;
+        if (listItems.length > 1) {
+          const resultAsKeyValuePair = formatting.convertArrayToHashTable('Id', listItems);
+          listItem = await cli.handleMultipleResultsFound<ListItemInstance>(`Multiple ListView Command Sets with ${args.options.title || args.options.clientSideComponentId} were found.`, resultAsKeyValuePair);
         }
         else {
-          listItemInstance = listItemInstances.value[0];
+          listItem = listItems[0];
         }
 
         if (!args.options.tenantWideExtensionComponentProperties) {
-          await logger.log(listItemInstance);
+          await logger.log(listItem);
         }
         else {
-          const properties = formatting.tryParseJson((listItemInstance as any).TenantWideExtensionComponentProperties);
+          const properties = formatting.tryParseJson((listItem as any).TenantWideExtensionComponentProperties);
           await logger.log(properties);
         }
       }
