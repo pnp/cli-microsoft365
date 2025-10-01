@@ -551,6 +551,7 @@ describe(commands.ENVIRONMENT_LIST, () => {
     await command.action(logger, { options: commandOptionsSchema.parse({ asAdmin: true }) });
     assert(loggerLogSpy.calledWith(env.value));
   });
+
   it('correctly handles no environments', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/providers/Microsoft.BusinessAppPlatform/environments?api-version=2020-10-01`) > -1) {
@@ -566,7 +567,7 @@ describe(commands.ENVIRONMENT_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, commandOptionsSchema.parse({ options: {} }));
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     assert(loggerLogSpy.calledOnceWithExactly([]));
   });
 
