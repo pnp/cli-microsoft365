@@ -1,7 +1,11 @@
+import { z } from 'zod';
 import auth from '../../Auth.js';
 import { Logger } from '../../cli/Logger.js';
-import Command, { CommandArgs, CommandError } from '../../Command.js';
+import Command, { CommandArgs, CommandError, globalOptionsZod } from '../../Command.js';
 import commands from './commands.js';
+
+const options = globalOptionsZod.strict();
+
 
 class StatusCommand extends Command {
   public get name(): string {
@@ -10,6 +14,10 @@ class StatusCommand extends Command {
 
   public get description(): string {
     return 'Shows Microsoft 365 login status';
+  }
+
+  public get schema(): z.ZodTypeAny | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger): Promise<void> {

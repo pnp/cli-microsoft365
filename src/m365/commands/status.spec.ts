@@ -1,7 +1,10 @@
 import assert from 'assert';
 import sinon from 'sinon';
+import { z } from 'zod';
 import auth, { AuthType, CertificateType, CloudType } from '../../Auth.js';
 import { CommandError } from '../../Command.js';
+import { cli } from '../../cli/cli.js';
+import { CommandInfo } from '../../cli/CommandInfo.js';
 import { Logger } from '../../cli/Logger.js';
 import { telemetry } from '../../telemetry.js';
 import { accessToken } from '../../utils/accessToken.js';
@@ -16,12 +19,17 @@ describe(commands.STATUS, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let loggerLogToStderrSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
+  let commandOptionsSchema: z.ZodTypeAny;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(telemetry, 'trackEvent').resolves();
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     sinon.stub(session, 'getId').callsFake(() => '');
+    
+    commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
   });
 
   beforeEach(() => {
@@ -112,26 +120,26 @@ describe(commands.STATUS, () => {
   it('shows logged out status when not logged in and no connections available', async () => {
     auth.connection.active = false;
     (auth as any)._allConnections = [];
-    await command.action(logger, { options: {} });
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     assert(loggerLogSpy.calledWith('Logged out'));
   });
 
   it('shows logged out status when not logged in and no connections available (verbose)', async () => {
     auth.connection.active = false;
     (auth as any)._allConnections = [];
-    await command.action(logger, { options: { verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true }) });
     assert(loggerLogToStderrSpy.calledWith('Logged out'));
   });
 
   it('shows logged out status when not logged in with connections available', async () => {
     auth.connection.active = false;
-    await command.action(logger, { options: {} });
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     assert(loggerLogSpy.calledWith('Logged out, signed in connections available'));
   });
 
   it('shows logged out status when not logged in with connections available (verbose)', async () => {
     auth.connection.active = false;
-    await command.action(logger, { options: { verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true }) });
     assert(loggerLogToStderrSpy.calledWith('Logged out, signed in connections available'));
   });
 
@@ -143,7 +151,7 @@ describe(commands.STATUS, () => {
 
     auth.connection.active = true;
     sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.reject(new Error('Error')); });
-    await assert.rejects(command.action(logger, { options: {} }), new CommandError(`Your login has expired. Sign in again to continue. Error`));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({}) }), new CommandError(`Your login has expired. Sign in again to continue. Error`));
   });
 
   it('shows logged out status when refresh token is expired (debug)', async () => {
@@ -155,7 +163,7 @@ describe(commands.STATUS, () => {
     auth.connection.active = true;
     const error = new Error('Error');
     sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.reject(error); });
-    await assert.rejects(command.action(logger, { options: { debug: true } }), new CommandError(`Your login has expired. Sign in again to continue. Error`));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ debug: true }) }), new CommandError(`Your login has expired. Sign in again to continue. Error`));
     assert(loggerLogToStderrSpy.calledWith(error));
   });
 
@@ -167,7 +175,7 @@ describe(commands.STATUS, () => {
 
     sinon.stub(auth, 'ensureAccessToken').callsFake(() => Promise.resolve(''));
     sinon.stub(accessToken, 'getUserNameFromAccessToken').callsFake(() => { return 'admin@contoso.onmicrosoft.com'; });
-    await command.action(logger, { options: {} });
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     assert(loggerLogSpy.calledWith({
       connectedAs: 'alexw@contoso.com',
       connectionName: '028de82d-7fd9-476e-a9fd-be9714280ff3',
@@ -187,7 +195,7 @@ describe(commands.STATUS, () => {
         accessToken: 'abc'
       }
     };
-    await command.action(logger, { options: { debug: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true }) });
     assert(loggerLogSpy.calledWith({
       connectedAs: 'alexw@contoso.com',
       connectionName: '028de82d-7fd9-476e-a9fd-be9714280ff3',
@@ -202,6 +210,6 @@ describe(commands.STATUS, () => {
   it('correctly handles error when restoring auth', async () => {
     sinonUtil.restore(auth.restoreAuth);
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.reject('An error has occurred'));
-    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({}) } as any), new CommandError('An error has occurred'));
   });
 });
