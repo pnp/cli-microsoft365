@@ -21,7 +21,7 @@ m365 entra organization list [options]
 
 <Global />
 
-## Remarks
+## Permissions
 
 :::info
 
@@ -29,8 +29,6 @@ Applications granted the `User.Read` permission are able to read only the id, di
 All other properties return with null values. To read all properties, use at least `Organization.Read.All`.
 
 :::
-
-## Permissions
 
 <Tabs>
   <TabItem value="Delegated">
@@ -44,7 +42,7 @@ All other properties return with null values. To read all properties, use at lea
 
   | Resource        | Permissions                                      |
   |-----------------|--------------------------------------------------|
-  | Microsoft Graph | Organization.Read.All, User.Read                 |
+  | Microsoft Graph | Organization.Read.All                            |
 
   </TabItem>
 </Tabs>
