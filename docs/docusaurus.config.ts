@@ -13,6 +13,7 @@ const config: Config = {
   baseUrl: '/cli-microsoft365/',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'throw',
+  onDuplicateRoutes: 'throw',
   onBrokenAnchors: 'throw',
   favicon: 'img/favicon.ico',
   organizationName: 'pnp',
