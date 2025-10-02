@@ -1,6 +1,9 @@
 import assert from 'assert';
 import sinon from 'sinon';
+import { z } from 'zod';
 import auth from '../../../Auth.js';
+import { cli } from '../../../cli/cli.js';
+import { CommandInfo } from '../../../cli/CommandInfo.js';
 import { Logger } from '../../../cli/Logger.js';
 import { CommandError } from '../../../Command.js';
 import config from '../../../config.js';
@@ -17,6 +20,8 @@ describe(commands.LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
+  let commandOptionsSchema: z.ZodTypeAny;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -24,7 +29,10 @@ describe(commands.LIST, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     sinon.stub(spo, 'ensureFormDigest').resolves({ FormDigestValue: 'abc', FormDigestTimeoutSeconds: 1800, FormDigestExpiresAt: new Date(), WebFullUrl: 'https://contoso.sharepoint.com' });
+
     auth.connection.active = true;
+    commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
     auth.connection.spoUrl = 'https://contoso.sharepoint.com';
   });
 
@@ -68,10 +76,20 @@ describe(commands.LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['Title', 'Url']);
   });
 
+  it('passes validation with no options', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ option: "value" });
+    assert.strictEqual(actual.success, false);
+  });
+
   it('correctly handles random API error', async () => {
     sinon.stub(request, 'post').rejects(new Error('An error has occurred'));
 
-    await assert.rejects(command.action(logger, { options: { debug: true } } as any), new CommandError("An error has occurred"));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ debug: true }) }), new CommandError("An error has occurred"));
   });
 
   it('retrieves list of OneDrive sites', async () => {
@@ -105,7 +123,7 @@ describe(commands.LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: {} });
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     assert(loggerLogSpy.calledWith([
       {
         "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SiteProperties", "_ObjectIdentity_": "2d63d39f-3016-0000-a532-30514e76ae73|908bed80-a04a-4433-b4a0-883d9847d110:d23a1d52-e19a-4bc5-be17-463a24e17fa2\nSiteProperties\nhttps%3a%2f%2fcontoso-my.sharepoint.com%2fpersonal%2fjohn_doe_contoso_onmicrosoft_com", "AllowDownloadingNonWebViewableFiles": false, "AllowEditing": false, "AllowSelfServiceUpgrade": true, "AnonymousLinkExpirationInDays": 0, "AuthContextStrength": null, "AverageResourceUsage": 0, "BlockDownloadLinksFileType": 0, "CommentsOnSitePagesDisabled": false, "CompatibilityLevel": 15, "ConditionalAccessPolicy": 0, "CurrentResourceUsage": 0, "DefaultLinkPermission": 0, "DefaultLinkToExistingAccess": false, "DefaultLinkToExistingAccessReset": false, "DefaultSharingLinkType": 0, "DenyAddAndCustomizePages": 2, "Description": null, "DisableAppViews": 0, "DisableCompanyWideSharingLinks": 0, "DisableFlows": 0, "ExternalUserExpirationInDays": 0, "GroupId": "\/Guid(00000000-0000-0000-0000-000000000000)\/", "GroupOwnerLoginName": null, "HasHolds": false, "HubSiteId": "\/Guid(00000000-0000-0000-0000-000000000000)\/", "IBMode": null, "IBSegments": [], "IBSegmentsToAdd": null, "IBSegmentsToRemove": null, "IsGroupOwnerSiteAdmin": false, "IsHubSite": false, "LastContentModifiedDate": "\/Date(2021,3,1,16,45,15,517)\/", "Lcid": 1033, "LimitedAccessFileType": 0, "LockIssue": null, "LockState": "Unlock", "OverrideBlockUserInfoVisibility": 0, "OverrideTenantAnonymousLinkExpirationPolicy": false, "OverrideTenantExternalUserExpirationPolicy": false, "Owner": "lidiah@dev365.onmicrosoft.com", "OwnerEmail": null, "OwnerLoginName": null, "OwnerName": null, "PWAEnabled": 1, "RelatedGroupId": "\/Guid(00000000-0000-0000-0000-000000000000)\/", "RestrictedToRegion": 3, "SandboxedCodeActivationCapability": 0, "SensitivityLabel": "\/Guid(00000000-0000-0000-0000-000000000000)\/", "SensitivityLabel2": null, "SetOwnerWithoutUpdatingSecondaryAdmin": false, "SharingAllowedDomainList": null, "SharingBlockedDomainList": null, "SharingCapability": 2, "SharingDomainRestrictionMode": 0, "ShowPeoplePickerSuggestionsForGuestUsers": false, "SiteDefinedSharingCapability": 2, "SocialBarOnSitePagesDisabled": false, "Status": "Active", "StorageMaximumLevel": 1048576, "StorageQuotaType": null, "StorageUsage": 1, "StorageWarningLevel": 943718, "Template": "SPSPERS#10", "TimeZoneId": 13, "Title": "Lidia Holloway", "Url": "https:\u002f\u002fdev365-my.sharepoint.com\u002fpersonal\u002flidiah_dev365_onmicrosoft_com", "UserCodeMaximumLevel": 300, "UserCodeWarningLevel": 200, "WebsCount": 0
@@ -147,7 +165,7 @@ describe(commands.LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true }) });
     assert(loggerLogSpy.calledWith([
       {
         "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SiteProperties", "_ObjectIdentity_": "2d63d39f-3016-0000-a532-30514e76ae73|908bed80-a04a-4433-b4a0-883d9847d110:d23a1d52-e19a-4bc5-be17-463a24e17fa2\nSiteProperties\nhttps%3a%2f%2fcontoso-my.sharepoint.com%2fpersonal%2fjohn_doe_contoso_onmicrosoft_com", "AllowDownloadingNonWebViewableFiles": false, "AllowEditing": false, "AllowSelfServiceUpgrade": true, "AnonymousLinkExpirationInDays": 0, "AuthContextStrength": null, "AverageResourceUsage": 0, "BlockDownloadLinksFileType": 0, "CommentsOnSitePagesDisabled": false, "CompatibilityLevel": 15, "ConditionalAccessPolicy": 0, "CurrentResourceUsage": 0, "DefaultLinkPermission": 0, "DefaultLinkToExistingAccess": false, "DefaultLinkToExistingAccessReset": false, "DefaultSharingLinkType": 0, "DenyAddAndCustomizePages": 2, "Description": null, "DisableAppViews": 0, "DisableCompanyWideSharingLinks": 0, "DisableFlows": 0, "ExternalUserExpirationInDays": 0, "GroupId": "\/Guid(00000000-0000-0000-0000-000000000000)\/", "GroupOwnerLoginName": null, "HasHolds": false, "HubSiteId": "\/Guid(00000000-0000-0000-0000-000000000000)\/", "IBMode": null, "IBSegments": [], "IBSegmentsToAdd": null, "IBSegmentsToRemove": null, "IsGroupOwnerSiteAdmin": false, "IsHubSite": false, "LastContentModifiedDate": "\/Date(2021,3,1,16,45,15,517)\/", "Lcid": 1033, "LimitedAccessFileType": 0, "LockIssue": null, "LockState": "Unlock", "OverrideBlockUserInfoVisibility": 0, "OverrideTenantAnonymousLinkExpirationPolicy": false, "OverrideTenantExternalUserExpirationPolicy": false, "Owner": "lidiah@dev365.onmicrosoft.com", "OwnerEmail": null, "OwnerLoginName": null, "OwnerName": null, "PWAEnabled": 1, "RelatedGroupId": "\/Guid(00000000-0000-0000-0000-000000000000)\/", "RestrictedToRegion": 3, "SandboxedCodeActivationCapability": 0, "SensitivityLabel": "\/Guid(00000000-0000-0000-0000-000000000000)\/", "SensitivityLabel2": null, "SetOwnerWithoutUpdatingSecondaryAdmin": false, "SharingAllowedDomainList": null, "SharingBlockedDomainList": null, "SharingCapability": 2, "SharingDomainRestrictionMode": 0, "ShowPeoplePickerSuggestionsForGuestUsers": false, "SiteDefinedSharingCapability": 2, "SocialBarOnSitePagesDisabled": false, "Status": "Active", "StorageMaximumLevel": 1048576, "StorageQuotaType": null, "StorageUsage": 1, "StorageWarningLevel": 943718, "Template": "SPSPERS#10", "TimeZoneId": 13, "Title": "Lidia Holloway", "Url": "https:\u002f\u002fdev365-my.sharepoint.com\u002fpersonal\u002flidiah_dev365_onmicrosoft_com", "UserCodeMaximumLevel": 300, "UserCodeWarningLevel": 200, "WebsCount": 0
@@ -213,7 +231,7 @@ describe(commands.LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: {} });
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     assert(loggerLogSpy.calledWith([
       {
         "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SiteProperties", "_ObjectIdentity_": "2d63d39f-3016-0000-a532-30514e76ae73|908bed80-a04a-4433-b4a0-883d9847d110:d23a1d52-e19a-4bc5-be17-463a24e17fa2\nSiteProperties\nhttps%3a%2f%2fcontoso-my.sharepoint.com%2fpersonal%2fjohn_doe_contoso_onmicrosoft_com", "AllowDownloadingNonWebViewableFiles": false, "AllowEditing": false, "AllowSelfServiceUpgrade": true, "AnonymousLinkExpirationInDays": 0, "AuthContextStrength": null, "AverageResourceUsage": 0, "BlockDownloadLinksFileType": 0, "CommentsOnSitePagesDisabled": false, "CompatibilityLevel": 15, "ConditionalAccessPolicy": 0, "CurrentResourceUsage": 0, "DefaultLinkPermission": 0, "DefaultLinkToExistingAccess": false, "DefaultLinkToExistingAccessReset": false, "DefaultSharingLinkType": 0, "DenyAddAndCustomizePages": 2, "Description": null, "DisableAppViews": 0, "DisableCompanyWideSharingLinks": 0, "DisableFlows": 0, "ExternalUserExpirationInDays": 0, "GroupId": "\/Guid(00000000-0000-0000-0000-000000000000)\/", "GroupOwnerLoginName": null, "HasHolds": false, "HubSiteId": "\/Guid(00000000-0000-0000-0000-000000000000)\/", "IBMode": null, "IBSegments": [], "IBSegmentsToAdd": null, "IBSegmentsToRemove": null, "IsGroupOwnerSiteAdmin": false, "IsHubSite": false, "LastContentModifiedDate": "\/Date(2021,3,1,16,45,15,517)\/", "Lcid": 1033, "LimitedAccessFileType": 0, "LockIssue": null, "LockState": "Unlock", "OverrideBlockUserInfoVisibility": 0, "OverrideTenantAnonymousLinkExpirationPolicy": false, "OverrideTenantExternalUserExpirationPolicy": false, "Owner": "lidiah@dev365.onmicrosoft.com", "OwnerEmail": null, "OwnerLoginName": null, "OwnerName": null, "PWAEnabled": 1, "RelatedGroupId": "\/Guid(00000000-0000-0000-0000-000000000000)\/", "RestrictedToRegion": 3, "SandboxedCodeActivationCapability": 0, "SensitivityLabel": "\/Guid(00000000-0000-0000-0000-000000000000)\/", "SensitivityLabel2": null, "SetOwnerWithoutUpdatingSecondaryAdmin": false, "SharingAllowedDomainList": null, "SharingBlockedDomainList": null, "SharingCapability": 2, "SharingDomainRestrictionMode": 0, "ShowPeoplePickerSuggestionsForGuestUsers": false, "SiteDefinedSharingCapability": 2, "SocialBarOnSitePagesDisabled": false, "Status": "Active", "StorageMaximumLevel": 1048576, "StorageQuotaType": null, "StorageUsage": 1, "StorageWarningLevel": 943718, "Template": "SPSPERS#10", "TimeZoneId": 13, "Title": "Lidia Holloway", "Url": "https:\u002f\u002fdev365-my.sharepoint.com\u002fpersonal\u002flidiah_dev365_onmicrosoft_com", "UserCodeMaximumLevel": 300, "UserCodeWarningLevel": 200, "WebsCount": 0
@@ -250,7 +268,7 @@ describe(commands.LIST, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: true } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ debug: true }) }),
       new CommandError("FillSiteCollectionDTOInfo: Could not obtain valid templateId (-1) from provided template filter 'SPS-PERSONAL'"));
   });
 });

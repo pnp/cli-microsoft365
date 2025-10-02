@@ -1,4 +1,6 @@
+import { z } from 'zod';
 import { Logger } from '../../../cli/Logger.js';
+import { globalOptionsZod } from '../../../Command.js';
 import config from "../../../config.js";
 import request, { CliRequestOptions } from "../../../request.js";
 import { ClientSvcResponse, ClientSvcResponseContents, FormDigestInfo, spo } from "../../../utils/spo.js";
@@ -6,6 +8,8 @@ import SpoCommand from "../../base/SpoCommand.js";
 import { SiteProperties } from "../../spo/commands/site/SiteProperties.js";
 import { SPOSitePropertiesEnumerable } from "../../spo/commands/site/SPOSitePropertiesEnumerable.js";
 import commands from "../commands.js";
+
+const options = globalOptionsZod.strict();
 
 class OneDriveListCommand extends SpoCommand {
   private allSites?: SiteProperties[];
@@ -16,6 +20,10 @@ class OneDriveListCommand extends SpoCommand {
 
   public get description(): string {
     return "Retrieves a list of OneDrive sites";
+  }
+
+  public get schema(): z.ZodTypeAny | undefined {
+    return options;
   }
 
   public defaultProperties(): string[] | undefined {
