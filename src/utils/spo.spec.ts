@@ -3642,4 +3642,96 @@ describe('utils/spo', () => {
     assert.strictEqual(actual, listId);
     assert(logStub.calledWith('Retrieving list id...'));
   });
+
+  describe('convertDefaultColumnXmlToJson', () => {
+    it('should convert XML with single folder and single default value', () => {
+      const xml = `<MetadataDefaults>
+        <a href="/sites/project/documents">
+          <DefaultValue FieldName="Department">Engineering</DefaultValue>
+        </a>
+      </MetadataDefaults>`;
+
+      const result = spo.convertDefaultColumnXmlToJson(xml);
+
+      assert.strictEqual(result.length, 1);
+      assert.strictEqual(result[0].fieldName, 'Department');
+      assert.strictEqual(result[0].fieldValue, 'Engineering');
+      assert.strictEqual(result[0].folderUrl, '/sites/project/documents');
+    });
+
+    it('should convert XML with single folder and multiple default values', () => {
+      const xml = `<MetadataDefaults>
+        <a href="/sites/project/documents">
+          <DefaultValue FieldName="Department">Engineering</DefaultValue>
+          <DefaultValue FieldName="Status">Active</DefaultValue>
+        </a>
+      </MetadataDefaults>`;
+
+      const result = spo.convertDefaultColumnXmlToJson(xml);
+
+      assert.strictEqual(result.length, 2);
+      assert.strictEqual(result[0].fieldName, 'Department');
+      assert.strictEqual(result[0].fieldValue, 'Engineering');
+      assert.strictEqual(result[0].folderUrl, '/sites/project/documents');
+      assert.strictEqual(result[1].fieldName, 'Status');
+      assert.strictEqual(result[1].fieldValue, 'Active');
+      assert.strictEqual(result[1].folderUrl, '/sites/project/documents');
+    });
+
+    it('should convert XML with multiple folders and default values', () => {
+      const xml = `<MetadataDefaults>
+        <a href="/sites/project/documents">
+          <DefaultValue FieldName="Department">Engineering</DefaultValue>
+        </a>
+        <a href="/sites/project/archive">
+          <DefaultValue FieldName="Department">Archive</DefaultValue>
+          <DefaultValue FieldName="Status">Closed</DefaultValue>
+        </a>
+      </MetadataDefaults>`;
+
+      const result = spo.convertDefaultColumnXmlToJson(xml);
+
+      assert.strictEqual(result.length, 3);
+      assert.strictEqual(result[0].fieldName, 'Department');
+      assert.strictEqual(result[0].fieldValue, 'Engineering');
+      assert.strictEqual(result[0].folderUrl, '/sites/project/documents');
+      assert.strictEqual(result[1].fieldName, 'Department');
+      assert.strictEqual(result[1].fieldValue, 'Archive');
+      assert.strictEqual(result[1].folderUrl, '/sites/project/archive');
+      assert.strictEqual(result[2].fieldName, 'Status');
+      assert.strictEqual(result[2].fieldValue, 'Closed');
+      assert.strictEqual(result[2].folderUrl, '/sites/project/archive');
+    });
+
+    it('should decode URL-encoded folder URLs', () => {
+      const xml = `<MetadataDefaults>
+        <a href="/sites/project/My%20Documents">
+          <DefaultValue FieldName="Title">Test</DefaultValue>
+        </a>
+      </MetadataDefaults>`;
+
+      const result = spo.convertDefaultColumnXmlToJson(xml);
+
+      assert.strictEqual(result.length, 1);
+      assert.strictEqual(result[0].folderUrl, '/sites/project/My Documents');
+    });
+
+    it('should return empty array when XML has no folder links', () => {
+      const xml = `<MetadataDefaults></MetadataDefaults>`;
+
+      const result = spo.convertDefaultColumnXmlToJson(xml);
+
+      assert.strictEqual(result.length, 0);
+    });
+
+    it('should return empty array when folder has no default values', () => {
+      const xml = `<MetadataDefaults>
+        <a href="/sites/project/documents"></a>
+      </MetadataDefaults>`;
+
+      const result = spo.convertDefaultColumnXmlToJson(xml);
+
+      assert.strictEqual(result.length, 0);
+    });
+  });
 });
