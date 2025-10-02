@@ -3071,6 +3071,11 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
+              label: 'list defaultvalue get',
+              id: 'cmd/spo/list/list-defaultvalue-get'
+            },
+            {
+              type: 'doc',
               label: 'list defaultvalue list',
               id: 'cmd/spo/list/list-defaultvalue-list'
             },

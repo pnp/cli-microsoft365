@@ -222,6 +222,25 @@ paths:
       responses:
         200:
           description: OK
+  /_api/web/GetFileByServerRelativePath(DecodedUrl={filePath})/$value:
+    get:
+      parameters:
+        - name: filePath
+          in: path
+          required: true
+          description: URL-encoded server-relative path to the file
+          schema:
+            type: string
+          example: "'%2FShared%20Documents%2FForms%2Fclient_LocationBasedDefaults.html'"
+      security:
+        - delegated:
+          - AllSites.Read
+          - AllSites.Write
+          - AllSites.Manage
+          - AllSites.FullControl
+      responses:
+        200:
+          description: OK
   /_api/web/GetFolderByServerRelativePath(DecodedUrl={folderPath}):
     get:
       parameters:
@@ -268,6 +287,30 @@ paths:
           description: OK
   /_api/web/lists:
     get:
+      security:
+        - delegated:
+          - AllSites.Read
+          - AllSites.Write
+          - AllSites.Manage
+          - AllSites.FullControl
+        - application:
+          - Sites.Read.All
+          - Sites.Manage.All
+          - Sites.ReadWrite.All
+          - Sites.FullControl.All
+      responses:
+        200:
+          description: OK
+  /_api/web/lists({listId}):
+    get:
+      parameters:
+        - name: listId
+          in: path
+          required: true
+          description: list GUID
+          schema:
+            type: string
+          example: "'56bbfec4-4425-4660-95cb-da1887baa7b9'"
       security:
         - delegated:
           - AllSites.Read
