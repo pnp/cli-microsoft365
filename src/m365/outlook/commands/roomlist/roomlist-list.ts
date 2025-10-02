@@ -1,8 +1,12 @@
 import { RoomList } from '@microsoft/microsoft-graph-types';
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import { odata } from '../../../../utils/odata.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
+
+const options = globalOptionsZod.strict();
 
 class OutlookRoomListListCommand extends GraphCommand {
   public get name(): string {
@@ -11,6 +15,10 @@ class OutlookRoomListListCommand extends GraphCommand {
 
   public get description(): string {
     return 'Get a collection of available roomlists';
+  }
+
+  public get schema(): z.ZodTypeAny | undefined {
+    return options;
   }
 
   public defaultProperties(): string[] | undefined {
