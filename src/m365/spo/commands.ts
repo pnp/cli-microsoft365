@@ -286,6 +286,7 @@ export default {
   SITE_RENAME: `${prefix} site rename`,
   SITE_SET: `${prefix} site set`,
   SITE_SHARINGPERMISSION_SET: `${prefix} site sharingpermission set`,
+  SITE_VERSIONPOLICY_GET: `${prefix} site versionpolicy get`,
   SITE_CHROME_SET: `${prefix} site chrome set`,
   SITE_UNARCHIVE: `${prefix} site unarchive`,
   SITEDESIGN_ADD: `${prefix} sitedesign add`,
