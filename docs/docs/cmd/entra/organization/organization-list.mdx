@@ -23,13 +23,6 @@ m365 entra organization list [options]
 
 ## Permissions
 
-:::info
-
-Applications granted the `User.Read` permission are able to read only the id, displayName, and verifiedDomains properties of the organization. 
-All other properties return with null values. To read all properties, use at least `Organization.Read.All`.
-
-:::
-
 <Tabs>
   <TabItem value="Delegated">
 
@@ -46,6 +39,13 @@ All other properties return with null values. To read all properties, use at lea
 
   </TabItem>
 </Tabs>
+
+:::info
+
+Applications granted the `User.Read` permission are able to read only the id, displayName, and verifiedDomains properties of the organization. 
+All other properties return with null values. To read all properties, use at least `Organization.Read.All`.
+
+:::
 
 ## Examples
 
