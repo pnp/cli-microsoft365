@@ -1,8 +1,11 @@
 import assert from 'assert';
 import sinon from 'sinon';
+import { z } from 'zod';
 import auth from '../../../../Auth.js';
-import { CommandError } from '../../../../Command.js';
+import { cli } from '../../../../cli/cli.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
+import { CommandError } from '../../../../Command.js';
 import request from '../../../../request.js';
 import { telemetry } from '../../../../telemetry.js';
 import { pid } from '../../../../utils/pid.js';
@@ -65,6 +68,8 @@ describe(commands.LICENSE_LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
+  let commandOptionsSchema: z.ZodTypeAny;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -72,6 +77,8 @@ describe(commands.LICENSE_LIST, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
+    commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
   });
 
   beforeEach(() => {
@@ -109,6 +116,11 @@ describe(commands.LICENSE_LIST, () => {
     assert.notStrictEqual(command.description, null);
   });
 
+  it('validates the schema', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, true);
+  });
+
   it('defines correct properties for the default output', () => {
     assert.deepStrictEqual(command.defaultProperties(), ['id', 'skuId', 'skuPartNumber']);
   });
@@ -122,7 +134,7 @@ describe(commands.LICENSE_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     assert(loggerLogSpy.calledWith(licenseResponse.value));
 
   });
@@ -136,7 +148,7 @@ describe(commands.LICENSE_LIST, () => {
     sinon.stub(request, 'get').rejects(error);
 
     await assert.rejects(command.action(logger, {
-      options: {}
+      options: commandOptionsSchema.parse({})
     }), new CommandError(error.error.message));
   });
 });
