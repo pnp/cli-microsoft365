@@ -21,6 +21,25 @@ m365 entra groupsetting add [options]
 
 <Global />
 
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource        | Permissions                                  |
+  |-----------------|----------------------------------------------|
+  | Microsoft Graph | GroupSettings.ReadWrite.All, Directory.ReadWrite.All |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource        | Permissions  |
+  |-----------------|--------------|
+  | Microsoft Graph | GroupSettings.ReadWrite.All, Directory.ReadWrite.All |
+
+  </TabItem>
+</Tabs>
+
 ## Remarks
 
 To create a group setting, you have to specify the ID of the group setting template that should be used to create the setting. You can retrieve the ID of the template using the [entra groupsettingtemplate list](../groupsettingtemplate/groupsettingtemplate-list.mdx) command.
