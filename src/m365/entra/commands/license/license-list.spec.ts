@@ -68,6 +68,7 @@ describe(commands.LICENSE_LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let loggerStderrSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
   let commandOptionsSchema: z.ZodTypeAny;
 
@@ -95,6 +96,7 @@ describe(commands.LICENSE_LIST, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
+    loggerStderrSpy = sinon.spy(logger, 'logToStderr');
   });
 
   afterEach(() => {
@@ -125,18 +127,47 @@ describe(commands.LICENSE_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['id', 'skuId', 'skuPartNumber']);
   });
 
+  it('uses default properties when retrieving licenses', async () => {
+    sinon.stub(request, 'get').callsFake(async opts => {
+      if ((opts.url === `https://graph.microsoft.com/v1.0/subscribedSkus`)) {
+        return licenseResponse;
+      }
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { output: 'json', query: '' } });
+
+    assert(loggerLogSpy.calledOnce);
+    const loggedValue = loggerLogSpy.firstCall.args[0];
+    assert(Array.isArray(loggedValue));
+
+    const defaultProps = command.defaultProperties();
+    loggedValue.forEach(license => {
+      // Check all default properties exist
+      defaultProps?.forEach(prop => {
+        assert(license.hasOwnProperty(prop), `License should have ${prop} property`);
+      });
+    });
+  });
+
   it('retrieves licenses', async () => {
     sinon.stub(request, 'get').callsFake(async opts => {
       if ((opts.url === `https://graph.microsoft.com/v1.0/subscribedSkus`)) {
         return licenseResponse;
       }
-
       throw 'Invalid request';
     });
 
     await command.action(logger, { options: commandOptionsSchema.parse({}) });
     assert(loggerLogSpy.calledWith(licenseResponse.value));
+  });
 
+  it('logs retrieving message in verbose mode', async () => {
+    sinon.stub(request, 'get').resolves({ value: [] });
+
+    await command.action(logger, { options: { verbose: true } });
+
+    assert(loggerStderrSpy.calledWith('Retrieving the commercial subscriptions that an organization has acquired'));
   });
 
   it('correctly handles random API error', async () => {
