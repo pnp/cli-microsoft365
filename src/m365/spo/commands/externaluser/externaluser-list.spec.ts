@@ -88,7 +88,7 @@ describe(commands.EXTERNALUSER_LIST, () => {
             "_ObjectType_": "Microsoft.Online.SharePoint.TenantManagement.GetExternalUsersResults", "TotalUserCount": 1, "UserCollectionPosition": -1, "ExternalUserCollection": {
               "_ObjectType_": "Microsoft.Online.SharePoint.TenantManagement.ExternalUserCollection", "_Child_Items_": [
                 {
-                  "_ObjectType_": "Microsoft.Online.SharePoint.TenantManagement.ExternalUser", "DisplayName": "Dear Vesa", "InvitedAs": "me@dearvesa.fi", "UniqueId": "100300009BF10C95", "AcceptedAs": "me@dearvesa.fi", "WhenCreated": "\/Date(2016,10,2,21,50,52,0)\/", "InvitedBy": null
+                  "_ObjectType_": "Microsoft.Online.SharePoint.TenantManagement.ExternalUser", "DisplayName": "Dear Vesa", "InvitedAs": "me@dearvesa.fi", "UniqueId": "100300009BF10C95", "AcceptedAs": "me@dearvesa.fi", "WhenCreated": "/Date(2016,10,2,21,50,52,0)/", "InvitedBy": null
                 }
               ]
             }
@@ -124,7 +124,7 @@ describe(commands.EXTERNALUSER_LIST, () => {
             "_ObjectType_": "Microsoft.Online.SharePoint.TenantManagement.GetExternalUsersResults", "TotalUserCount": 1, "UserCollectionPosition": -1, "ExternalUserCollection": {
               "_ObjectType_": "Microsoft.Online.SharePoint.TenantManagement.ExternalUserCollection", "_Child_Items_": [
                 {
-                  "_ObjectType_": "Microsoft.Online.SharePoint.TenantManagement.ExternalUser", "DisplayName": "Dear Vesa", "InvitedAs": "me@dearvesa.fi", "UniqueId": "100300009BF10C95", "AcceptedAs": "me@dearvesa.fi", "WhenCreated": "\/Date(2016,10,2,21,50,52,0)\/", "InvitedBy": null
+                  "_ObjectType_": "Microsoft.Online.SharePoint.TenantManagement.ExternalUser", "DisplayName": "Dear Vesa", "InvitedAs": "me@dearvesa.fi", "UniqueId": "100300009BF10C95", "AcceptedAs": "me@dearvesa.fi", "WhenCreated": "/Date(2016,10,2,21,50,52,0)/", "InvitedBy": null
                 }
               ]
             }
@@ -160,7 +160,7 @@ describe(commands.EXTERNALUSER_LIST, () => {
             "_ObjectType_": "Microsoft.Online.SharePoint.TenantManagement.GetExternalUsersResults", "TotalUserCount": 1, "UserCollectionPosition": -1, "ExternalUserCollection": {
               "_ObjectType_": "Microsoft.Online.SharePoint.TenantManagement.ExternalUserCollection", "_Child_Items_": [
                 {
-                  "_ObjectType_": "Microsoft.Online.SharePoint.TenantManagement.ExternalUser", "DisplayName": "Dear Vesa", "InvitedAs": "me@dearvesa.fi", "UniqueId": "100300009BF10C95", "AcceptedAs": "me@dearvesa.fi", "WhenCreated": "\/Date(2016,10,2,21,50,52,0)\/", "InvitedBy": null
+                  "_ObjectType_": "Microsoft.Online.SharePoint.TenantManagement.ExternalUser", "DisplayName": "Dear Vesa", "InvitedAs": "me@dearvesa.fi", "UniqueId": "100300009BF10C95", "AcceptedAs": "me@dearvesa.fi", "WhenCreated": "/Date(2016,10,2,21,50,52,0)/", "InvitedBy": null
                 }
               ]
             }
@@ -196,7 +196,7 @@ describe(commands.EXTERNALUSER_LIST, () => {
             "_ObjectType_": "Microsoft.Online.SharePoint.TenantManagement.GetExternalUsersResults", "TotalUserCount": 1, "UserCollectionPosition": -1, "ExternalUserCollection": {
               "_ObjectType_": "Microsoft.Online.SharePoint.TenantManagement.ExternalUserCollection", "_Child_Items_": [
                 {
-                  "_ObjectType_": "Microsoft.Online.SharePoint.TenantManagement.ExternalUser", "DisplayName": "Dear Vesa", "InvitedAs": "me@dearvesa.fi", "UniqueId": "100300009BF10C95", "AcceptedAs": "me@dearvesa.fi", "WhenCreated": "\/Date(2016,10,2,21,50,52,0)\/", "InvitedBy": null
+                  "_ObjectType_": "Microsoft.Online.SharePoint.TenantManagement.ExternalUser", "DisplayName": "Dear Vesa", "InvitedAs": "me@dearvesa.fi", "UniqueId": "100300009BF10C95", "AcceptedAs": "me@dearvesa.fi", "WhenCreated": "/Date(2016,10,2,21,50,52,0)/", "InvitedBy": null
                 }
               ]
             }
@@ -232,7 +232,7 @@ describe(commands.EXTERNALUSER_LIST, () => {
             "_ObjectType_": "Microsoft.Online.SharePoint.TenantManagement.GetExternalUsersResults", "TotalUserCount": 1, "UserCollectionPosition": -1, "ExternalUserCollection": {
               "_ObjectType_": "Microsoft.Online.SharePoint.TenantManagement.ExternalUserCollection", "_Child_Items_": [
                 {
-                  "_ObjectType_": "Microsoft.Online.SharePoint.TenantManagement.ExternalUser", "DisplayName": "Vesa", "InvitedAs": "me@dearvesa.fi", "UniqueId": "100300009BF10C95", "AcceptedAs": "me@dearvesa.fi", "WhenCreated": "\/Date(2016,10,2,21,50,52,0)\/", "InvitedBy": null
+                  "_ObjectType_": "Microsoft.Online.SharePoint.TenantManagement.ExternalUser", "DisplayName": "Vesa", "InvitedAs": "me@dearvesa.fi", "UniqueId": "100300009BF10C95", "AcceptedAs": "me@dearvesa.fi", "WhenCreated": "/Date(2016,10,2,21,50,52,0)/", "InvitedBy": null
                 }
               ]
             }
@@ -268,7 +268,7 @@ describe(commands.EXTERNALUSER_LIST, () => {
             "_ObjectType_": "Microsoft.Online.SharePoint.TenantManagement.GetExternalUsersResults", "TotalUserCount": 1, "UserCollectionPosition": -1, "ExternalUserCollection": {
               "_ObjectType_": "Microsoft.Online.SharePoint.TenantManagement.ExternalUserCollection", "_Child_Items_": [
                 {
-                  "_ObjectType_": "Microsoft.Online.SharePoint.TenantManagement.ExternalUser", "DisplayName": "Dear Vesa", "InvitedAs": "me@dearvesa.fi", "UniqueId": "100300009BF10C95", "AcceptedAs": "me@dearvesa.fi", "WhenCreated": "\/Date(2016,10,2,21,50,52,0)\/", "InvitedBy": null
+                  "_ObjectType_": "Microsoft.Online.SharePoint.TenantManagement.ExternalUser", "DisplayName": "Dear Vesa", "InvitedAs": "me@dearvesa.fi", "UniqueId": "100300009BF10C95", "AcceptedAs": "me@dearvesa.fi", "WhenCreated": "/Date(2016,10,2,21,50,52,0)/", "InvitedBy": null
                 }
               ]
             }
@@ -304,7 +304,7 @@ describe(commands.EXTERNALUSER_LIST, () => {
             "_ObjectType_": "Microsoft.Online.SharePoint.TenantManagement.GetExternalUsersResults", "TotalUserCount": 1, "UserCollectionPosition": -1, "ExternalUserCollection": {
               "_ObjectType_": "Microsoft.Online.SharePoint.TenantManagement.ExternalUserCollection", "_Child_Items_": [
                 {
-                  "_ObjectType_": "Microsoft.Online.SharePoint.TenantManagement.ExternalUser", "DisplayName": "Dear Vesa", "InvitedAs": "me@dearvesa.fi", "UniqueId": "100300009BF10C95", "AcceptedAs": "me@dearvesa.fi", "WhenCreated": "\/Date(2016,10,2,21,50,52,0)\/", "InvitedBy": null
+                  "_ObjectType_": "Microsoft.Online.SharePoint.TenantManagement.ExternalUser", "DisplayName": "Dear Vesa", "InvitedAs": "me@dearvesa.fi", "UniqueId": "100300009BF10C95", "AcceptedAs": "me@dearvesa.fi", "WhenCreated": "/Date(2016,10,2,21,50,52,0)/", "InvitedBy": null
                 }
               ]
             }
@@ -340,7 +340,7 @@ describe(commands.EXTERNALUSER_LIST, () => {
             "_ObjectType_": "Microsoft.Online.SharePoint.TenantManagement.GetExternalUsersResults", "TotalUserCount": 1, "UserCollectionPosition": -1, "ExternalUserCollection": {
               "_ObjectType_": "Microsoft.Online.SharePoint.TenantManagement.ExternalUserCollection", "_Child_Items_": [
                 {
-                  "_ObjectType_": "Microsoft.Online.SharePoint.TenantManagement.ExternalUser", "DisplayName": "Dear Vesa", "InvitedAs": "me@dearvesa.fi", "UniqueId": "100300009BF10C95", "AcceptedAs": "me@dearvesa.fi", "WhenCreated": "\/Date(2016,10,2,21,50,52,0)\/", "InvitedBy": null
+                  "_ObjectType_": "Microsoft.Online.SharePoint.TenantManagement.ExternalUser", "DisplayName": "Dear Vesa", "InvitedAs": "me@dearvesa.fi", "UniqueId": "100300009BF10C95", "AcceptedAs": "me@dearvesa.fi", "WhenCreated": "/Date(2016,10,2,21,50,52,0)/", "InvitedBy": null
                 }
               ]
             }
@@ -376,7 +376,7 @@ describe(commands.EXTERNALUSER_LIST, () => {
             "_ObjectType_": "Microsoft.Online.SharePoint.TenantManagement.GetExternalUsersResults", "TotalUserCount": 1, "UserCollectionPosition": -1, "ExternalUserCollection": {
               "_ObjectType_": "Microsoft.Online.SharePoint.TenantManagement.ExternalUserCollection", "_Child_Items_": [
                 {
-                  "_ObjectType_": "Microsoft.Online.SharePoint.TenantManagement.ExternalUser", "DisplayName": "Dear Vesa", "InvitedAs": "me@dearvesa.fi", "UniqueId": "100300009BF10C95", "AcceptedAs": "me@dearvesa.fi", "WhenCreated": "\/Date(2016,10,2,21,50,52,0)\/", "InvitedBy": null
+                  "_ObjectType_": "Microsoft.Online.SharePoint.TenantManagement.ExternalUser", "DisplayName": "Dear Vesa", "InvitedAs": "me@dearvesa.fi", "UniqueId": "100300009BF10C95", "AcceptedAs": "me@dearvesa.fi", "WhenCreated": "/Date(2016,10,2,21,50,52,0)/", "InvitedBy": null
                 }
               ]
             }
@@ -412,7 +412,7 @@ describe(commands.EXTERNALUSER_LIST, () => {
             "_ObjectType_": "Microsoft.Online.SharePoint.TenantManagement.GetExternalUsersResults", "TotalUserCount": 1, "UserCollectionPosition": -1, "ExternalUserCollection": {
               "_ObjectType_": "Microsoft.Online.SharePoint.TenantManagement.ExternalUserCollection", "_Child_Items_": [
                 {
-                  "_ObjectType_": "Microsoft.Online.SharePoint.TenantManagement.ExternalUser", "DisplayName": "Dear Vesa", "InvitedAs": "me@dearvesa.fi", "UniqueId": "100300009BF10C95", "AcceptedAs": "me@dearvesa.fi", "WhenCreated": "\/Date(2016,10,2,21,50,52,0)\/", "InvitedBy": null
+                  "_ObjectType_": "Microsoft.Online.SharePoint.TenantManagement.ExternalUser", "DisplayName": "Dear Vesa", "InvitedAs": "me@dearvesa.fi", "UniqueId": "100300009BF10C95", "AcceptedAs": "me@dearvesa.fi", "WhenCreated": "/Date(2016,10,2,21,50,52,0)/", "InvitedBy": null
                 }
               ]
             }
@@ -448,7 +448,7 @@ describe(commands.EXTERNALUSER_LIST, () => {
             "_ObjectType_": "Microsoft.Online.SharePoint.TenantManagement.GetExternalUsersResults", "TotalUserCount": 1, "UserCollectionPosition": -1, "ExternalUserCollection": {
               "_ObjectType_": "Microsoft.Online.SharePoint.TenantManagement.ExternalUserCollection", "_Child_Items_": [
                 {
-                  "_ObjectType_": "Microsoft.Online.SharePoint.TenantManagement.ExternalUser", "DisplayName": "Vesa", "InvitedAs": "me@dearvesa.fi", "UniqueId": "100300009BF10C95", "AcceptedAs": "me@dearvesa.fi", "WhenCreated": "\/Date(2016,10,2,21,50,52,0)\/", "InvitedBy": null
+                  "_ObjectType_": "Microsoft.Online.SharePoint.TenantManagement.ExternalUser", "DisplayName": "Vesa", "InvitedAs": "me@dearvesa.fi", "UniqueId": "100300009BF10C95", "AcceptedAs": "me@dearvesa.fi", "WhenCreated": "/Date(2016,10,2,21,50,52,0)/", "InvitedBy": null
                 }
               ]
             }
@@ -484,7 +484,7 @@ describe(commands.EXTERNALUSER_LIST, () => {
             "_ObjectType_": "Microsoft.Online.SharePoint.TenantManagement.GetExternalUsersResults", "TotalUserCount": 1, "UserCollectionPosition": -1, "ExternalUserCollection": {
               "_ObjectType_": "Microsoft.Online.SharePoint.TenantManagement.ExternalUserCollection", "_Child_Items_": [
                 {
-                  "_ObjectType_": "Microsoft.Online.SharePoint.TenantManagement.ExternalUser", "DisplayName": "Dear Vesa", "InvitedAs": "me@dearvesa.fi", "UniqueId": "100300009BF10C95", "AcceptedAs": "me@dearvesa.fi", "WhenCreated": "\/Date(2016,10,2,21,50,52,0)\/", "InvitedBy": null
+                  "_ObjectType_": "Microsoft.Online.SharePoint.TenantManagement.ExternalUser", "DisplayName": "Dear Vesa", "InvitedAs": "me@dearvesa.fi", "UniqueId": "100300009BF10C95", "AcceptedAs": "me@dearvesa.fi", "WhenCreated": "/Date(2016,10,2,21,50,52,0)/", "InvitedBy": null
                 }
               ]
             }
@@ -520,7 +520,7 @@ describe(commands.EXTERNALUSER_LIST, () => {
             "_ObjectType_": "Microsoft.Online.SharePoint.TenantManagement.GetExternalUsersResults", "TotalUserCount": 1, "UserCollectionPosition": -1, "ExternalUserCollection": {
               "_ObjectType_": "Microsoft.Online.SharePoint.TenantManagement.ExternalUserCollection", "_Child_Items_": [
                 {
-                  "_ObjectType_": "Microsoft.Online.SharePoint.TenantManagement.ExternalUser", "DisplayName": "<Vesa", "InvitedAs": "me@dearvesa.fi", "UniqueId": "100300009BF10C95", "AcceptedAs": "me@dearvesa.fi", "WhenCreated": "\/Date(2016,10,2,21,50,52,0)\/", "InvitedBy": null
+                  "_ObjectType_": "Microsoft.Online.SharePoint.TenantManagement.ExternalUser", "DisplayName": "<Vesa", "InvitedAs": "me@dearvesa.fi", "UniqueId": "100300009BF10C95", "AcceptedAs": "me@dearvesa.fi", "WhenCreated": "/Date(2016,10,2,21,50,52,0)/", "InvitedBy": null
                 }
               ]
             }
@@ -705,3 +705,4 @@ describe(commands.EXTERNALUSER_LIST, () => {
     assert.strictEqual(actual, true);
   });
 });
+

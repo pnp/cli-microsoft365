@@ -37,6 +37,10 @@ describe('utils/entraUser', () => {
     ]);
   });
 
+  after(() => {
+    sinon.restore();
+  });
+
   it('correctly get user id by upn', async () => {
     sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq '${formatting.encodeQueryParameter(validUserName)}'&$select=Id`) {

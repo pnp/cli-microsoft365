@@ -503,7 +503,7 @@ describe(commands.PAGE_SET, () => {
         return;
       }
 
-      if ((opts.url as string).indexOf(`_api/web/GetFileByServerRelativePath(DecodedUrl='/sites/team-a/sitepages/page.aspx')/CheckIn(comment=@a1,checkintype=@a2)?@a1=\'\'&@a2=1`) > -1) {
+      if ((opts.url as string).indexOf(`_api/web/GetFileByServerRelativePath(DecodedUrl='/sites/team-a/sitepages/page.aspx')/CheckIn(comment=@a1,checkintype=@a2)?@a1=''&@a2=1`) > -1) {
         return;
       }
 

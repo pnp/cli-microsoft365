@@ -237,7 +237,8 @@ describe('utils/roleDefinition', () => {
       throw 'Invalid Request';
     });
 
-    await assert.rejects(roleDefinition.getRoleDefinitionByDisplayName(invalidDisplayName)), Error(`The specified role definition '${invalidDisplayName}' does not exist.`);
+    await assert.rejects(roleDefinition.getRoleDefinitionByDisplayName(invalidDisplayName),
+      new Error(`The specified role definition '${invalidDisplayName}' does not exist.`));
   });
 
   it('throws error message when multiple role definition were found using getDirectoryRoleDefinitionByDisplayName', async () => {
@@ -411,7 +412,8 @@ describe('utils/roleDefinition', () => {
       throw 'Invalid Request';
     });
 
-    await assert.rejects(roleDefinition.getExchangeRoleDefinitionByDisplayName(invalidDisplayName)), Error(`The specified role definition '${invalidDisplayName}' does not exist.`);
+    await assert.rejects(roleDefinition.getExchangeRoleDefinitionByDisplayName(invalidDisplayName),
+      new Error(`The specified role definition '${invalidDisplayName}' does not exist.`));
   });
 
   it('throws error message when multiple role definition were found using getExchangeRoleDefinitionByDisplayName', async () => {

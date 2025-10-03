@@ -157,7 +157,7 @@ class FlowRunGetCommand extends PowerAutomateCommand {
         res.triggerInformation = await this.getTriggerInformation(res);
       }
 
-      if (!!args.options.withActions) {
+      if (args.options.withActions) {
         res.actions = await this.getActionsInformation(res, args.options.withActions);
       }
 
@@ -180,11 +180,11 @@ class FlowRunGetCommand extends PowerAutomateCommand {
       if (!res.properties.actions[action] || (chosenActions && chosenActions.indexOf(action) === -1)) { continue; }
 
       actionsResult[action] = res.properties.actions[action];
-      if (!!res.properties.actions[action].inputsLink?.uri) {
+      if (res.properties.actions[action].inputsLink?.uri) {
         actionsResult[action].input = await this.requestAdditionalInformation(res.properties.actions[action].inputsLink?.uri);
       }
 
-      if (!!res.properties.actions[action].outputsLink?.uri) {
+      if (res.properties.actions[action].outputsLink?.uri) {
         actionsResult[action].output = await this.requestAdditionalInformation(res.properties.actions[action].outputsLink?.uri);
       }
     }

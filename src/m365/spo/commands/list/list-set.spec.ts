@@ -67,7 +67,7 @@ describe(commands.LIST_SET, () => {
     const newTitle = 'List 1';
     let actual = '';
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`_api/web/lists/getByTitle(\'Documents\')`) > -1) {
+      if ((opts.url as string).indexOf(`_api/web/lists/getByTitle('Documents')`) > -1) {
         actual = opts.data.Title;
         return { ErrorMessage: null };
       }

@@ -24,7 +24,9 @@ async function trackTelemetry(object: any): Promise<void> {
     }
     await appInsights.flush();
   }
-  catch { }
+  catch {
+    // Do nothing
+  }
 }
 
 export const telemetry = {

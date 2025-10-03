@@ -85,7 +85,7 @@ describe(commands.HUBSITE_SET, () => {
           }, 36, {
             "IsNull": false
           }, 37, {
-            "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.HubSiteProperties", "Description": "Description", "ID": "\/Guid(255a50b2-527f-4413-8485-57f4c17a24d1)\/", "LogoUrl": "https:\u002f\u002fcontoso.com\u002flogo.png", "SiteId": "\/Guid(255a50b2-527f-4413-8485-57f4c17a24d1)\/", "SiteUrl": "https:\u002f\u002fcontoso.sharepoint.com\u002fsites\u002fSales", "Title": "Sales"
+            "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.HubSiteProperties", "Description": "Description", "ID": "/Guid(255a50b2-527f-4413-8485-57f4c17a24d1)/", "LogoUrl": "https:\u002f\u002fcontoso.com\u002flogo.png", "SiteId": "/Guid(255a50b2-527f-4413-8485-57f4c17a24d1)/", "SiteUrl": "https:\u002f\u002fcontoso.sharepoint.com\u002fsites\u002fSales", "Title": "Sales"
           }
         ]);
       }
@@ -116,7 +116,7 @@ describe(commands.HUBSITE_SET, () => {
           }, 36, {
             "IsNull": false
           }, 37, {
-            "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.HubSiteProperties", "Description": "All things sales", "ID": "\/Guid(255a50b2-527f-4413-8485-57f4c17a24d1)\/", "LogoUrl": "https:\u002f\u002fcontoso.com\u002flogo.png", "SiteId": "\/Guid(255a50b2-527f-4413-8485-57f4c17a24d1)\/", "SiteUrl": "https:\u002f\u002fcontoso.sharepoint.com\u002fsites\u002fSales", "Title": "Sales"
+            "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.HubSiteProperties", "Description": "All things sales", "ID": "/Guid(255a50b2-527f-4413-8485-57f4c17a24d1)/", "LogoUrl": "https:\u002f\u002fcontoso.com\u002flogo.png", "SiteId": "/Guid(255a50b2-527f-4413-8485-57f4c17a24d1)/", "SiteUrl": "https:\u002f\u002fcontoso.sharepoint.com\u002fsites\u002fSales", "Title": "Sales"
           }
         ]);
       }
@@ -147,7 +147,7 @@ describe(commands.HUBSITE_SET, () => {
           }, 36, {
             "IsNull": false
           }, 37, {
-            "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.HubSiteProperties", "Description": "All things sales", "ID": "\/Guid(255a50b2-527f-4413-8485-57f4c17a24d1)\/", "LogoUrl": "https:\u002f\u002fcontoso.com\u002flogo.png", "SiteId": "\/Guid(255a50b2-527f-4413-8485-57f4c17a24d1)\/", "SiteUrl": "https:\u002f\u002fcontoso.sharepoint.com\u002fsites\u002fSales", "Title": "Sales"
+            "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.HubSiteProperties", "Description": "All things sales", "ID": "/Guid(255a50b2-527f-4413-8485-57f4c17a24d1)/", "LogoUrl": "https:\u002f\u002fcontoso.com\u002flogo.png", "SiteId": "/Guid(255a50b2-527f-4413-8485-57f4c17a24d1)/", "SiteUrl": "https:\u002f\u002fcontoso.sharepoint.com\u002fsites\u002fSales", "Title": "Sales"
           }
         ]);
       }
@@ -178,7 +178,7 @@ describe(commands.HUBSITE_SET, () => {
           }, 36, {
             "IsNull": false
           }, 37, {
-            "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.HubSiteProperties", "Description": "All things sales", "ID": "\/Guid(255a50b2-527f-4413-8485-57f4c17a24d1)\/", "LogoUrl": "https:\u002f\u002fcontoso.com\u002flogo.png", "SiteId": "\/Guid(255a50b2-527f-4413-8485-57f4c17a24d1)\/", "SiteUrl": "https:\u002f\u002fcontoso.sharepoint.com\u002fsites\u002fSales", "Title": "Sales"
+            "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.HubSiteProperties", "Description": "All things sales", "ID": "/Guid(255a50b2-527f-4413-8485-57f4c17a24d1)/", "LogoUrl": "https:\u002f\u002fcontoso.com\u002flogo.png", "SiteId": "/Guid(255a50b2-527f-4413-8485-57f4c17a24d1)/", "SiteUrl": "https:\u002f\u002fcontoso.sharepoint.com\u002fsites\u002fSales", "Title": "Sales"
           }
         ]);
       }
@@ -209,7 +209,7 @@ describe(commands.HUBSITE_SET, () => {
           }, 36, {
             "IsNull": false
           }, 37, {
-            "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.HubSiteProperties", "Description": "<All things sales>", "ID": "\/Guid(255a50b2-527f-4413-8485-57f4c17a24d1)\/", "LogoUrl": "<https:\u002f\u002fcontoso.com\u002flogo.png>", "SiteId": "\/Guid(255a50b2-527f-4413-8485-57f4c17a24d1)\/", "SiteUrl": "https:\u002f\u002fcontoso.sharepoint.com\u002fsites\u002fSales", "Title": "<Sales>"
+            "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.HubSiteProperties", "Description": "<All things sales>", "ID": "/Guid(255a50b2-527f-4413-8485-57f4c17a24d1)/", "LogoUrl": "<https:\u002f\u002fcontoso.com\u002flogo.png>", "SiteId": "/Guid(255a50b2-527f-4413-8485-57f4c17a24d1)/", "SiteUrl": "https:\u002f\u002fcontoso.sharepoint.com\u002fsites\u002fSales", "Title": "<Sales>"
           }
         ]);
       }
@@ -240,7 +240,7 @@ describe(commands.HUBSITE_SET, () => {
           }, 36, {
             "IsNull": false
           }, 37, {
-            "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.HubSiteProperties", "Description": "Description", "ID": "\/Guid(255a50b2-527f-4413-8485-57f4c17a24d1)\/", "LogoUrl": "https:\u002f\u002fcontoso.com\u002flogo.png", "SiteId": "\/Guid(255a50b2-527f-4413-8485-57f4c17a24d1)\/", "SiteUrl": "https:\u002f\u002fcontoso.sharepoint.com\u002fsites\u002fSales", "Title": ""
+            "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.HubSiteProperties", "Description": "Description", "ID": "/Guid(255a50b2-527f-4413-8485-57f4c17a24d1)/", "LogoUrl": "https:\u002f\u002fcontoso.com\u002flogo.png", "SiteId": "/Guid(255a50b2-527f-4413-8485-57f4c17a24d1)/", "SiteUrl": "https:\u002f\u002fcontoso.sharepoint.com\u002fsites\u002fSales", "Title": ""
           }
         ]);
       }
@@ -271,7 +271,7 @@ describe(commands.HUBSITE_SET, () => {
           }, 36, {
             "IsNull": false
           }, 37, {
-            "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.HubSiteProperties", "Description": "", "ID": "\/Guid(255a50b2-527f-4413-8485-57f4c17a24d1)\/", "LogoUrl": "https:\u002f\u002fcontoso.com\u002flogo.png", "SiteId": "\/Guid(255a50b2-527f-4413-8485-57f4c17a24d1)\/", "SiteUrl": "https:\u002f\u002fcontoso.sharepoint.com\u002fsites\u002fSales", "Title": "Sales"
+            "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.HubSiteProperties", "Description": "", "ID": "/Guid(255a50b2-527f-4413-8485-57f4c17a24d1)/", "LogoUrl": "https:\u002f\u002fcontoso.com\u002flogo.png", "SiteId": "/Guid(255a50b2-527f-4413-8485-57f4c17a24d1)/", "SiteUrl": "https:\u002f\u002fcontoso.sharepoint.com\u002fsites\u002fSales", "Title": "Sales"
           }
         ]);
       }
@@ -302,7 +302,7 @@ describe(commands.HUBSITE_SET, () => {
           }, 36, {
             "IsNull": false
           }, 37, {
-            "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.HubSiteProperties", "Description": "All things sales", "ID": "\/Guid(255a50b2-527f-4413-8485-57f4c17a24d1)\/", "LogoUrl": "", "SiteId": "\/Guid(255a50b2-527f-4413-8485-57f4c17a24d1)\/", "SiteUrl": "https:\u002f\u002fcontoso.sharepoint.com\u002fsites\u002fSales", "Title": "Sales"
+            "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.HubSiteProperties", "Description": "All things sales", "ID": "/Guid(255a50b2-527f-4413-8485-57f4c17a24d1)/", "LogoUrl": "", "SiteId": "/Guid(255a50b2-527f-4413-8485-57f4c17a24d1)/", "SiteUrl": "https:\u002f\u002fcontoso.sharepoint.com\u002fsites\u002fSales", "Title": "Sales"
           }
         ]);
       }
@@ -370,3 +370,4 @@ describe(commands.HUBSITE_SET, () => {
     assert.strictEqual(actual, true);
   });
 });
+

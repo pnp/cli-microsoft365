@@ -75,7 +75,8 @@ describe('utils/entraDevice', () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
-    await assert.rejects(entraDevice.getDeviceByDisplayName(invalidDisplayName)), Error(`The specified device '${invalidDisplayName}' does not exist.`);
+    await assert.rejects(entraDevice.getDeviceByDisplayName(invalidDisplayName),
+      new Error(`The specified device '${invalidDisplayName}' does not exist.`));
   });
 
   it('throws error message when multiple devices were found using getDeviceByDisplayName', async () => {
@@ -100,6 +101,7 @@ describe('utils/entraDevice', () => {
       return 'Invalid Request';
     });
 
-    await assert.rejects(entraDevice.getDeviceByDisplayName(displayName), Error(`Multiple devices with name '${displayName}' found. Found: ${deviceId}.`));
+    await assert.rejects(entraDevice.getDeviceByDisplayName(displayName),
+      new Error(`Multiple devices with name '${displayName}' found. Found: ${deviceId}.`));
   });
 });

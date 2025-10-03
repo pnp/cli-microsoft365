@@ -22,6 +22,7 @@ describe('TsFile', () => {
 
   it('doesn\'t throw exception if the specified file doesn\'t exist', () => {
     sinon.stub(fs, 'existsSync').callsFake(() => false);
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
     tsFile.source;
     assert(true);
   });

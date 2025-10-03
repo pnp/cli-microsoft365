@@ -116,7 +116,7 @@ export const formatting = {
 
   openTypesEncoder(value: string): string {
     return value
-      .replace(/\%/g, '%25')
+      .replace(/%/g, '%25')
       .replace(/\./g, '%2E')
       .replace(/:/g, '%3A')
       .replace(/@/g, '%40')

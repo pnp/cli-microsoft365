@@ -523,7 +523,7 @@ describe(commands.FOLDER_GET, () => {
   });
 
   it('should show tip when root folder is used withPermissions', async () => {
-    const error = "Please ensure the specified folder URL or folder Id does not refer to a root folder. Use \'spo list get\' with withPermissions instead.";
+    const error = "Please ensure the specified folder URL or folder Id does not refer to a root folder. Use 'spo list get' with withPermissions instead.";
 
     sinon.stub(request, 'get').callsFake(async opts => {
       if ((opts.url === `https://contoso.sharepoint.com/_api/web/GetFolderByServerRelativePath(DecodedUrl='%2FShared%20Documents')?$expand=ListItemAllFields/HasUniqueRoleAssignments,ListItemAllFields/RoleAssignments/Member,ListItemAllFields/RoleAssignments/RoleDefinitionBindings`)) {

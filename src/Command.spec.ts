@@ -55,12 +55,12 @@ class MockCommand1 extends Command {
     await this.showDeprecationWarning(logger, 'mc1', this.name);
   }
 
-  public trackUnknownOptionsPublic(telemetryProps: any, options: any) {
-    return this.trackUnknownOptions(telemetryProps, options);
+  public trackUnknownOptionsPublic(telemetryProps: any, options: any): void {
+    this.trackUnknownOptions(telemetryProps, options);
   }
 
-  public addUnknownOptionsToPayloadPublic(payload: any, options: any) {
-    return this.addUnknownOptionsToPayload(payload, options);
+  public addUnknownOptionsToPayloadPublic(payload: any, options: any): void {
+    this.addUnknownOptionsToPayload(payload, options);
   }
 }
 

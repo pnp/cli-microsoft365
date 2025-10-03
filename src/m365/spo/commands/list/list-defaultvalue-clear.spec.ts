@@ -32,7 +32,7 @@ describe(commands.LIST_DEFAULTVALUE_CLEAR, () => {
   const folderUrl = '/sites/marketing/Shared Documents/Logos';
   const fieldName = 'DocumentType';
 
-  const defaultColumnXml = `<MetadataDefaults><a href=\"/sites/Marketing/Shared%20Documents\"><DefaultValue FieldName=\"Countries\">19;#Belgium|442affc2-7fab-4f33-9590-330403a579c2;#18;#Croatia|59f1ab85-235b-4cf8-b669-4373cc9393c6</DefaultValue><DefaultValue FieldName=\"DocumentType\">General</DefaultValue></a><a href=\"/sites/Marketing/Shared%20Documents/Logos\"><DefaultValue FieldName=\"Countries\">20;#Canada|e3d25461-68ef-4070-8523-5ba439f6d4d5</DefaultValue><DefaultValue FieldName=\"DocumentType\">Logo</DefaultValue></a><a href=\"/sites/Marketing/Shared%20Documents/Templates\"><DefaultValue FieldName=\"DocumentType\">Template</DefaultValue></a></MetadataDefaults>`;
+  const defaultColumnXml = `<MetadataDefaults><a href="/sites/Marketing/Shared%20Documents"><DefaultValue FieldName="Countries">19;#Belgium|442affc2-7fab-4f33-9590-330403a579c2;#18;#Croatia|59f1ab85-235b-4cf8-b669-4373cc9393c6</DefaultValue><DefaultValue FieldName="DocumentType">General</DefaultValue></a><a href="/sites/Marketing/Shared%20Documents/Logos"><DefaultValue FieldName="Countries">20;#Canada|e3d25461-68ef-4070-8523-5ba439f6d4d5</DefaultValue><DefaultValue FieldName="DocumentType">Logo</DefaultValue></a><a href="/sites/Marketing/Shared%20Documents/Templates"><DefaultValue FieldName="DocumentType">Template</DefaultValue></a></MetadataDefaults>`;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -216,7 +216,7 @@ describe(commands.LIST_DEFAULTVALUE_CLEAR, () => {
     });
 
     await command.action(logger, { options: { webUrl: siteUrl, listId: listId, folderUrl: folderUrl, verbose: true, force: true } });
-    const expectedXml = `<MetadataDefaults><a href=\"/sites/Marketing/Shared%20Documents\"><DefaultValue FieldName=\"Countries\">19;#Belgium|442affc2-7fab-4f33-9590-330403a579c2;#18;#Croatia|59f1ab85-235b-4cf8-b669-4373cc9393c6</DefaultValue><DefaultValue FieldName=\"DocumentType\">General</DefaultValue></a><a href=\"/sites/Marketing/Shared%20Documents/Templates\"><DefaultValue FieldName=\"DocumentType\">Template</DefaultValue></a></MetadataDefaults>`;
+    const expectedXml = `<MetadataDefaults><a href="/sites/Marketing/Shared%20Documents"><DefaultValue FieldName="Countries">19;#Belgium|442affc2-7fab-4f33-9590-330403a579c2;#18;#Croatia|59f1ab85-235b-4cf8-b669-4373cc9393c6</DefaultValue><DefaultValue FieldName="DocumentType">General</DefaultValue></a><a href="/sites/Marketing/Shared%20Documents/Templates"><DefaultValue FieldName="DocumentType">Template</DefaultValue></a></MetadataDefaults>`;
 
     assert.deepStrictEqual(putStub.firstCall.args[0].data, expectedXml);
   });
@@ -239,7 +239,7 @@ describe(commands.LIST_DEFAULTVALUE_CLEAR, () => {
     });
 
     await command.action(logger, { options: { webUrl: siteUrl, listTitle: listTitle, fieldName: fieldName, verbose: true, force: true } });
-    const expectedXml = `<MetadataDefaults><a href=\"/sites/Marketing/Shared%20Documents\"><DefaultValue FieldName=\"Countries\">19;#Belgium|442affc2-7fab-4f33-9590-330403a579c2;#18;#Croatia|59f1ab85-235b-4cf8-b669-4373cc9393c6</DefaultValue></a><a href=\"/sites/Marketing/Shared%20Documents/Logos\"><DefaultValue FieldName=\"Countries\">20;#Canada|e3d25461-68ef-4070-8523-5ba439f6d4d5</DefaultValue></a></MetadataDefaults>`;
+    const expectedXml = `<MetadataDefaults><a href="/sites/Marketing/Shared%20Documents"><DefaultValue FieldName="Countries">19;#Belgium|442affc2-7fab-4f33-9590-330403a579c2;#18;#Croatia|59f1ab85-235b-4cf8-b669-4373cc9393c6</DefaultValue></a><a href="/sites/Marketing/Shared%20Documents/Logos"><DefaultValue FieldName="Countries">20;#Canada|e3d25461-68ef-4070-8523-5ba439f6d4d5</DefaultValue></a></MetadataDefaults>`;
 
     assert.deepStrictEqual(putStub.firstCall.args[0].data, expectedXml);
   });
