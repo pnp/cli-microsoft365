@@ -58,6 +58,25 @@ m365 entra m365group set [options]
 
 <Global />
 
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource        | Permissions                                  |
+  |-----------------|----------------------------------------------|
+  | Microsoft Graph | Group.ReadWrite.All
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource        | Permissions  |
+  |-----------------|--------------|
+  | Microsoft Graph | Group.ReadWrite.All |
+
+  </TabItem>
+</Tabs>
+
 ## Remarks
 
 When updating group's owners and members, the command will remove existing owners/members from the group, and the specified users will be added.

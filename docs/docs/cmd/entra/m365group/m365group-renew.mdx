@@ -22,6 +22,25 @@ m365 entra m365group renew [options]
 
 <Global />
 
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource        | Permissions                                  |
+  |-----------------|----------------------------------------------|
+  | Microsoft Graph | Group.ReadWrite.All |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource        | Permissions  |
+  |-----------------|--------------|
+  | Microsoft Graph | Group.ReadWrite.All |
+
+  </TabItem>
+</Tabs>
+
 ## Remarks
 
 If the specified _id_ doesn't refer to an existing group, you will get a `The remote server returned an error: (404) Not Found.` error.

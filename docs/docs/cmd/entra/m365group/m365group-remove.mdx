@@ -28,6 +28,25 @@ m365 entra m365group remove [options]
 
 <Global />
 
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource        | Permissions                                  |
+  |-----------------|----------------------------------------------|
+  | Microsoft Graph | Group.ReadWrite.All |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource        | Permissions  |
+  |-----------------|--------------|
+  | Microsoft Graph | Group.ReadWrite.All |
+
+  </TabItem>
+</Tabs>
+
 ## Remarks
 
 If the specified _id_ doesn't refer to an existing group, you will get a `Resource does not exist` error. Additionally, if you do not have access to the group or the associated group-connected site, you will get an `Access denied` error.
