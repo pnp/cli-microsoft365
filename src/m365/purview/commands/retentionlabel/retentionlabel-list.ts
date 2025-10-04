@@ -1,7 +1,11 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import { odata } from '../../../../utils/odata.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
+
+const options = globalOptionsZod.strict();
 
 class PurviewRetentionLabelListCommand extends GraphCommand {
   public get name(): string {
@@ -10,6 +14,10 @@ class PurviewRetentionLabelListCommand extends GraphCommand {
 
   public get description(): string {
     return 'Get a list of retention labels';
+  }
+
+  public get schema(): z.ZodTypeAny | undefined {
+    return options;
   }
 
   public defaultProperties(): string[] | undefined {
