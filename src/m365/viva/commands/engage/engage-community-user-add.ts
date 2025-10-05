@@ -1,7 +1,6 @@
 import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
 import { globalOptionsZod } from '../../../../Command.js';
-import { zod } from '../../../../utils/zod.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 import { validation } from '../../../../utils/validation.js';
@@ -10,25 +9,21 @@ import request, { CliRequestOptions } from '../../../../request.js';
 import { entraUser } from '../../../../utils/entraUser.js';
 import { formatting } from '../../../../utils/formatting.js';
 
-const options = globalOptionsZod
-  .extend({
-    communityId: z.string().optional(),
-    communityDisplayName: zod.alias('n', z.string().optional()),
-    entraGroupId: z.string()
-      .refine(id => validation.isValidGuid(id), id => ({
-        message: `'${id}' is not a valid GUID.`
-      })).optional(),
-    ids: z.string()
-      .refine(ids => validation.isValidGuidArray(ids) === true, invalidIds => ({
-        message: `The following GUIDs are invalid: ${invalidIds}.`
-      })).optional(),
-    userNames: z.string()
-      .refine(userNames => validation.isValidUserPrincipalNameArray(userNames) === true, invalidUserNames => ({
-        message: `The following user principal names are invalid: ${invalidUserNames}.`
-      })).optional(),
-    role: zod.alias('r', z.enum(['Admin', 'Member']))
-  })
-  .strict();
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  communityId: z.string().optional(),
+  communityDisplayName: z.string().optional().alias('n'),
+  entraGroupId: z.uuid().optional(),
+  ids: z.string()
+    .refine(ids => validation.isValidGuidArray(ids) === true, {
+      error: e => `The following GUIDs are invalid: ${e.input}.`
+    }).optional(),
+  userNames: z.string()
+    .refine(userNames => validation.isValidUserPrincipalNameArray(userNames) === true, {
+      error: e => `The following user principal names are invalid: ${e.input}.`
+    }).optional(),
+  role: z.enum(['Admin', 'Member']).alias('r')
+});
 declare type Options = z.infer<typeof options>;
 
 interface CommandArgs {
@@ -45,23 +40,23 @@ class VivaEngageCommunityUserAddCommand extends GraphCommand {
     return 'Adds a user to a specific Microsoft 365 Viva Engage community';
   }
 
-  public get schema(): z.ZodTypeAny {
+  public get schema(): z.ZodType {
     return options;
   }
 
-  public getRefinedSchema(schema: typeof options): z.ZodEffects<any> | undefined {
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
       .refine(options => [options.communityId, options.communityDisplayName, options.entraGroupId].filter(x => x !== undefined).length === 1, {
-        message: 'Specify either communityId, communityDisplayName, or entraGroupId, but not multiple.'
+        error: 'Specify either communityId, communityDisplayName, or entraGroupId, but not multiple.'
       })
       .refine(options => options.communityId || options.communityDisplayName || options.entraGroupId, {
-        message: 'Specify at least one of communityId, communityDisplayName, or entraGroupId.'
+        error: 'Specify at least one of communityId, communityDisplayName, or entraGroupId.'
       })
       .refine(options => options.ids || options.userNames, {
-        message: 'Specify either of ids or userNames.'
+        error: 'Specify either of ids or userNames.'
       })
-      .refine(options => options.userNames !== undefined || options.ids !== undefined, {
-        message: 'Specify either ids or userNames, but not both.'
+      .refine(options => typeof options.userNames !== 'undefined' || typeof options.ids !== 'undefined', {
+        error: 'Specify either ids or userNames, but not both.'
       });
   }
 

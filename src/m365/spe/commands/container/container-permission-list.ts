@@ -1,6 +1,5 @@
 import { cli } from '../../../../cli/cli.js';
 import { z } from 'zod';
-import { zod } from '../../../../utils/zod.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { globalOptionsZod } from '../../../../Command.js';
 import commands from '../../commands.js';
@@ -8,11 +7,10 @@ import GraphCommand from '../../../base/GraphCommand.js';
 import { odata } from '../../../../utils/odata.js';
 import { formatting } from '../../../../utils/formatting.js';
 
-const options = globalOptionsZod
-  .extend({
-    containerId: zod.alias('i', z.string())
-  })
-  .strict();
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  containerId: z.string().alias('i')
+});
 declare type Options = z.infer<typeof options>;
 
 interface CommandArgs {
@@ -32,7 +30,7 @@ class SpeContainerPermissionListCommand extends GraphCommand {
     return ['id', 'userPrincipalName', 'roles'];
   }
 
-  public get schema(): z.ZodTypeAny {
+  public get schema(): z.ZodType {
     return options;
   }
 

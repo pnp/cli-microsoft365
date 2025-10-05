@@ -4,13 +4,11 @@ import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 import { z } from 'zod';
 import { globalOptionsZod } from '../../../../Command.js';
-import { zod } from '../../../../utils/zod.js';
 
-const options = globalOptionsZod
-  .extend({
-    displayConcealedNames: zod.alias('d', z.boolean())
-  })
-  .strict();
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  displayConcealedNames: z.boolean().alias('d')
+});
 
 declare type Options = z.infer<typeof options>;
 
@@ -27,7 +25,7 @@ class TenantReportSettingsSetCommand extends GraphCommand {
     return 'Update tenant-level settings for Microsoft 365 reports';
   }
 
-  public get schema(): z.ZodTypeAny | undefined {
+  public get schema(): z.ZodType | undefined {
     return options;
   }
 

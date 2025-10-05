@@ -1,5 +1,5 @@
 import os from 'os';
-import { ZodTypeAny, z } from 'zod';
+import { ZodType, z } from 'zod';
 import auth from './Auth.js';
 import GlobalOptions from './GlobalOptions.js';
 import { CommandInfo } from './cli/CommandInfo.js';
@@ -12,9 +12,9 @@ import { telemetry } from './telemetry.js';
 import { accessToken } from './utils/accessToken.js';
 import { md } from './utils/md.js';
 import { GraphResponseError } from './utils/odata.js';
+import { optionsUtils } from './utils/optionsUtils.js';
 import { prompt } from './utils/prompt.js';
 import { zod } from './utils/zod.js';
-import { optionsUtils } from './utils/optionsUtils.js';
 
 export interface CommandOption {
   option: string;
@@ -48,7 +48,7 @@ interface ODataError {
 
 export const globalOptionsZod = z.object({
   query: z.string().optional(),
-  output: zod.alias('o', z.enum(['csv', 'json', 'md', 'text', 'none']).optional()),
+  output: z.enum(['csv', 'json', 'md', 'text', 'none']).optional().alias('o'),
   debug: z.boolean().default(false),
   verbose: z.boolean().default(false)
 });
@@ -85,17 +85,17 @@ export default abstract class Command {
 
   public abstract get name(): string;
   public abstract get description(): string;
-  public get schema(): ZodTypeAny | undefined {
+  public get schema(): ZodType | undefined {
     return undefined;
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public getRefinedSchema(schema: ZodTypeAny): z.ZodEffects<any> | undefined {
+  public getRefinedSchema(schema: ZodType): z.ZodType | undefined {
     return undefined;
   }
 
-  public getSchemaToParse(): z.ZodTypeAny | undefined {
-    return this.getRefinedSchema(this.schema as z.ZodTypeAny) ?? this.schema;
+  public getSchemaToParse(): z.ZodType | undefined {
+    return this.getRefinedSchema(this.schema as z.ZodType) ?? this.schema;
   }
 
   // metadata for command's options

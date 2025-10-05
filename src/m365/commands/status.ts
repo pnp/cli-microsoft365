@@ -4,8 +4,7 @@ import { Logger } from '../../cli/Logger.js';
 import Command, { CommandArgs, CommandError, globalOptionsZod } from '../../Command.js';
 import commands from './commands.js';
 
-const options = globalOptionsZod.strict();
-
+export const options = z.strictObject({ ...globalOptionsZod.shape });
 
 class StatusCommand extends Command {
   public get name(): string {
@@ -16,7 +15,7 @@ class StatusCommand extends Command {
     return 'Shows Microsoft 365 login status';
   }
 
-  public get schema(): z.ZodTypeAny | undefined {
+  public get schema(): z.ZodType | undefined {
     return options;
   }
 

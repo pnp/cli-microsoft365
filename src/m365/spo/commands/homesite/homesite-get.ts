@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import { zod } from '../../../../utils/zod.js';
 import { globalOptionsZod } from '../../../../Command.js';
 import { validation } from '../../../../utils/validation.js';
 import { Logger } from '../../../../cli/Logger.js';
@@ -9,15 +8,14 @@ import commands from '../../commands.js';
 import { odata } from '../../../../utils/odata.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
 
-const options = globalOptionsZod
-  .extend({
-    url: zod.alias('u', z.string()
-      .refine(url => validation.isValidSharePointUrl(url) === true, url => ({
-        message: `'${url}' is not a valid SharePoint Online site URL.`
-      }))
-    )
-  })
-  .strict();
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  url: z.string()
+    .refine(url => validation.isValidSharePointUrl(url) === true, {
+      error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
+    })
+    .alias('u')
+});
 
 declare type Options = z.infer<typeof options>;
 interface CommandArgs {
@@ -33,7 +31,7 @@ class SpoHomeSiteGetCommand extends SpoCommand {
     return 'Gets information about a home site';
   }
 
-  public get schema(): z.ZodTypeAny {
+  public get schema(): z.ZodType {
     return options;
   }
 

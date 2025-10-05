@@ -1,6 +1,5 @@
 import assert from 'assert';
 import sinon from 'sinon';
-import { z } from 'zod';
 import auth from '../../../../Auth.js';
 import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
@@ -8,13 +7,13 @@ import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
 import request from '../../../../request.js';
 import { telemetry } from '../../../../telemetry.js';
+import { formatting } from '../../../../utils/formatting.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
-import commands from '../../commands.js';
-import command from './page-publish.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
-import { formatting } from '../../../../utils/formatting.js';
+import commands from '../../commands.js';
+import command, { options } from './page-publish.js';
 
 describe(commands.PAGE_PUBLISH, () => {
   let log: string[];
@@ -22,7 +21,7 @@ describe(commands.PAGE_PUBLISH, () => {
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
   let postStub: sinon.SinonStub;
-  let commandOptionsSchema: z.ZodTypeAny;
+  let commandOptionsSchema: typeof options;
 
   const webUrl = 'https://contoso.sharepoint.com/sites/Marketing';
   const serverRelativeUrl = urlUtil.getServerRelativeSiteUrl(webUrl);
@@ -35,7 +34,7 @@ describe(commands.PAGE_PUBLISH, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
-    commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {

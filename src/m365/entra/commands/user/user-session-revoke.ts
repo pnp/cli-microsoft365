@@ -1,6 +1,5 @@
 import { z } from 'zod';
 import { globalOptionsZod } from '../../../../Command.js';
-import { zod } from '../../../../utils/zod.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 import { validation } from '../../../../utils/validation.js';
@@ -9,17 +8,14 @@ import request, { CliRequestOptions } from '../../../../request.js';
 import { cli } from '../../../../cli/cli.js';
 import { formatting } from '../../../../utils/formatting.js';
 
-const options = globalOptionsZod
-  .extend({
-    userId: zod.alias('i', z.string().refine(id => validation.isValidGuid(id), id => ({
-      message: `'${id}' is not a valid GUID.`
-    })).optional()),
-    userName: zod.alias('n', z.string().refine(name => validation.isValidUserPrincipalName(name), name => ({
-      message: `'${name}' is not a valid UPN.`
-    })).optional()),
-    force: zod.alias('f', z.boolean().optional())
-  })
-  .strict();
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  userId: z.uuid().optional().alias('i'),
+  userName: z.string().refine(name => validation.isValidUserPrincipalName(name), {
+    error: e => `'${e.input}' is not a valid UPN.`
+  }).optional().alias('n'),
+  force: z.boolean().optional().alias('f')
+});
 
 declare type Options = z.infer<typeof options>;
 
@@ -34,13 +30,13 @@ class EntraUserSessionRevokeCommand extends GraphCommand {
   public get description(): string {
     return 'Revokes all sign-in sessions for a given user';
   }
-  public get schema(): z.ZodTypeAny | undefined {
+  public get schema(): z.ZodType | undefined {
     return options;
   }
-  public getRefinedSchema(schema: typeof options): z.ZodEffects<any> | undefined {
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
       .refine(options => [options.userId, options.userName].filter(o => o !== undefined).length === 1, {
-        message: `Specify either 'userId' or 'userName'.`
+        error: `Specify either 'userId' or 'userName'.`
       });
   }
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

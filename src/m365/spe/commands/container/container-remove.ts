@@ -1,27 +1,21 @@
 import { globalOptionsZod } from '../../../../Command.js';
 import { z } from 'zod';
-import { zod } from '../../../../utils/zod.js';
 import { Logger } from '../../../../cli/Logger.js';
 import commands from '../../commands.js';
-import { validation } from '../../../../utils/validation.js';
 import { spe } from '../../../../utils/spe.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { cli } from '../../../../cli/cli.js';
 
-const options = globalOptionsZod
-  .extend({
-    id: zod.alias('i', z.string().optional()),
-    name: zod.alias('n', z.string().optional()),
-    containerTypeId: z.string()
-      .refine(id => validation.isValidGuid(id), id => ({
-        message: `'${id}' is not a valid GUID.`
-      })).optional(),
-    containerTypeName: z.string().optional(),
-    recycle: z.boolean().optional(),
-    force: zod.alias('f', z.boolean().optional())
-  })
-  .strict();
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  id: z.string().optional().alias('i'),
+  name: z.string().optional().alias('n'),
+  containerTypeId: z.uuid().optional(),
+  containerTypeName: z.string().optional(),
+  recycle: z.boolean().optional(),
+  force: z.boolean().optional().alias('f')
+});
 
 declare type Options = z.infer<typeof options>;
 
@@ -38,20 +32,20 @@ class SpeContainerRemoveCommand extends GraphCommand {
     return 'Removes a container';
   }
 
-  public get schema(): z.ZodTypeAny {
+  public get schema(): z.ZodType {
     return options;
   }
 
-  public getRefinedSchema(schema: z.ZodTypeAny): z.ZodEffects<any> | undefined {
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
       .refine((options: Options) => [options.id, options.name].filter(o => o !== undefined).length === 1, {
-        message: 'Use one of the following options: id or name.'
+        error: 'Use one of the following options: id or name.'
       })
       .refine((options: Options) => !options.name || [options.containerTypeId, options.containerTypeName].filter(o => o !== undefined).length === 1, {
-        message: 'Use one of the following options when specifying the container name: containerTypeId or containerTypeName.'
+        error: 'Use one of the following options when specifying the container name: containerTypeId or containerTypeName.'
       })
       .refine((options: Options) => options.name || [options.containerTypeId, options.containerTypeName].filter(o => o !== undefined).length === 0, {
-        message: 'Options containerTypeId and containerTypeName are only required when deleting a container by name.'
+        error: 'Options containerTypeId and containerTypeName are only required when deleting a container by name.'
       });
   }
 

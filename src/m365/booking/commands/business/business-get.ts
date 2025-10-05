@@ -5,16 +5,14 @@ import { Logger } from '../../../../cli/Logger.js';
 import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
-import { zod } from '../../../../utils/zod.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 
-const options = globalOptionsZod
-  .extend({
-    id: zod.alias('i', z.string().optional()),
-    name: zod.alias('n', z.string().optional())
-  })
-  .strict();
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  id: z.string().optional().alias('i'),
+  name: z.string().optional().alias('n')
+});
 
 declare type Options = z.infer<typeof options>;
 
@@ -31,14 +29,14 @@ class BookingBusinessGetCommand extends GraphCommand {
     return 'Retrieve the specified Microsoft Bookings business.';
   }
 
-  public get schema(): z.ZodTypeAny | undefined {
+  public get schema(): z.ZodType | undefined {
     return options;
   }
 
-  public getRefinedSchema(schema: typeof options): z.ZodEffects<any> | undefined {
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
       .refine(options => options.id || options.name, {
-        message: 'Specify either id or name'
+        error: 'Specify either id or name'
       });
   }
 

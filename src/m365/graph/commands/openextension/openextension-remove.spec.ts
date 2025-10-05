@@ -1,18 +1,17 @@
 import assert from 'assert';
 import sinon from 'sinon';
-import { z } from 'zod';
 import auth from '../../../../Auth.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
-import commands from '../../commands.js';
+import { CommandError } from '../../../../Command.js';
+import request from '../../../../request.js';
 import { telemetry } from '../../../../telemetry.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
-import { cli } from '../../../../cli/cli.js';
-import command from './openextension-remove.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
-import request from '../../../../request.js';
-import { CommandError } from '../../../../Command.js';
+import commands from '../../commands.js';
+import command, { options } from './openextension-remove.js';
 
 describe(commands.OPENEXTENSION_REMOVE, () => {
   const resourceId = 'f4099688-dd3f-4a55-a9f5-ddd7417c227a';
@@ -22,7 +21,7 @@ describe(commands.OPENEXTENSION_REMOVE, () => {
   let logger: Logger;
   let promptIssued: boolean;
   let commandInfo: CommandInfo;
-  let commandOptionsSchema: z.ZodTypeAny;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -31,7 +30,7 @@ describe(commands.OPENEXTENSION_REMOVE, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
-    commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -140,7 +139,7 @@ describe(commands.OPENEXTENSION_REMOVE, () => {
       name: 'com.contoso.roamingSettings'
     });
 
-    await command.action(logger, { options: parsedSchema.data });
+    await command.action(logger, { options: parsedSchema.data! });
     assert(promptIssued);
   });
 
@@ -153,7 +152,7 @@ describe(commands.OPENEXTENSION_REMOVE, () => {
       name: 'com.contoso.roamingSettings'
     });
 
-    await command.action(logger, { options: parsedSchema.data });
+    await command.action(logger, { options: parsedSchema.data! });
     assert(deleteSpy.notCalled);
   });
 
@@ -223,7 +222,7 @@ describe(commands.OPENEXTENSION_REMOVE, () => {
       force: true
     });
 
-    await command.action(logger, { options: parsedSchema.data });
+    await command.action(logger, { options: parsedSchema.data! });
     assert(deleteRequestStub.calledOnce);
   });
 
@@ -244,7 +243,7 @@ describe(commands.OPENEXTENSION_REMOVE, () => {
       force: true
     });
 
-    await command.action(logger, { options: parsedSchema.data });
+    await command.action(logger, { options: parsedSchema.data! });
     assert(deleteRequestStub.calledOnce);
   });
 
@@ -266,7 +265,7 @@ describe(commands.OPENEXTENSION_REMOVE, () => {
       name: 'com.contoso.roamingSettings'
     });
 
-    await command.action(logger, { options: parsedSchema.data });
+    await command.action(logger, { options: parsedSchema.data! });
     assert(deleteRequestStub.calledOnce);
   });
 
@@ -286,7 +285,7 @@ describe(commands.OPENEXTENSION_REMOVE, () => {
       force: true
     });
 
-    await command.action(logger, { options: parsedSchema.data });
+    await command.action(logger, { options: parsedSchema.data! });
     assert(deleteRequestStub.calledOnce);
   });
 
@@ -312,6 +311,6 @@ describe(commands.OPENEXTENSION_REMOVE, () => {
       force: true
     });
 
-    await assert.rejects(command.action(logger, { options: parsedSchema.data }), new CommandError('Extension with given id not found.'));
+    await assert.rejects(command.action(logger, { options: parsedSchema.data! }), new CommandError('Extension with given id not found.'));
   });
 });

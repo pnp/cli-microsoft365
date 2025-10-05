@@ -3,29 +3,23 @@ import { Logger } from '../../../../cli/Logger.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import { globalOptionsZod } from '../../../../Command.js';
 import { z } from 'zod';
-import { zod } from '../../../../utils/zod.js';
 import { validation } from '../../../../utils/validation.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { odata } from '../../../../utils/odata.js';
 
-export const options = globalOptionsZod
-  .extend({
-    webUrl: zod.alias('u', z.string()
-      .refine(url => validation.isValidSharePointUrl(url) === true, url => ({
-        message: `'${url}' is not a valid SharePoint Online site URL.`
-      }))
-    ),
-    fileUrl: z.string().optional(),
-    fileId: zod.alias('i', z.string()
-      .refine(id => validation.isValidGuid(id), id => ({
-        message: `'${id}' is not a valid GUID.`
-      })).optional()
-    ),
-    label: z.string()
-  })
-  .strict();
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  webUrl: z.string()
+    .refine(url => validation.isValidSharePointUrl(url) === true, {
+      error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
+    })
+    .alias('u'),
+  fileUrl: z.string().optional(),
+  fileId: z.uuid().optional().alias('i'),
+  label: z.string()
+});
 
 declare type Options = z.infer<typeof options>;
 
@@ -42,14 +36,14 @@ class SpoFileVersionKeepCommand extends SpoCommand {
     return 'Ensure that a specific file version will never expire';
   }
 
-  public get schema(): z.ZodTypeAny | undefined {
+  public get schema(): z.ZodType | undefined {
     return options;
   }
 
-  public getRefinedSchema(schema: z.ZodTypeAny): z.ZodEffects<any> | undefined {
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
       .refine(options => [options.fileUrl, options.fileId].filter(o => o !== undefined).length === 1, {
-        message: `Specify 'fileUrl' or 'fileId', but not both.`
+        error: `Specify 'fileUrl' or 'fileId', but not both.`
       });
   }
 

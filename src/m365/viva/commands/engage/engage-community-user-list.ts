@@ -1,26 +1,20 @@
 import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
 import { globalOptionsZod } from '../../../../Command.js';
-import { zod } from '../../../../utils/zod.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
-import { validation } from '../../../../utils/validation.js';
 import { vivaEngage } from '../../../../utils/vivaEngage.js';
 import { CliRequestOptions } from '../../../../request.js';
 import { User } from '@microsoft/microsoft-graph-types';
 import { odata } from '../../../../utils/odata.js';
 
-const options = globalOptionsZod
-  .extend({
-    communityId: z.string().optional(),
-    communityDisplayName: zod.alias('n', z.string().optional()),
-    entraGroupId: z.string()
-      .refine(name => validation.isValidGuid(name), name => ({
-        message: `'${name}' is not a valid GUID.`
-      })).optional(),
-    role: zod.alias('r', z.enum(['Admin', 'Member']).optional())
-  })
-  .strict();
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  communityId: z.string().optional(),
+  communityDisplayName: z.string().optional().alias('n'),
+  entraGroupId: z.uuid().optional(),
+  role: z.enum(['Admin', 'Member']).optional().alias('r')
+});
 declare type Options = z.infer<typeof options>;
 
 interface CommandArgs {
@@ -41,17 +35,17 @@ class VivaEngageCommunityUserListCommand extends GraphCommand {
     return 'Lists all users within a specified Microsoft 365 Viva Engage community';
   }
 
-  public get schema(): z.ZodTypeAny {
+  public get schema(): z.ZodType {
     return options;
   }
 
-  public getRefinedSchema(schema: typeof options): z.ZodEffects<any> | undefined {
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
       .refine(options => [options.communityId, options.communityDisplayName, options.entraGroupId].filter(x => x !== undefined).length === 1, {
-        message: 'Specify either communityId, communityDisplayName, or entraGroupId, but not multiple.'
+        error: 'Specify either communityId, communityDisplayName, or entraGroupId, but not multiple.'
       })
       .refine(options => options.communityId || options.communityDisplayName || options.entraGroupId, {
-        message: 'Specify at least one of communityId, communityDisplayName, or entraGroupId.'
+        error: 'Specify at least one of communityId, communityDisplayName, or entraGroupId.'
       });
   }
 

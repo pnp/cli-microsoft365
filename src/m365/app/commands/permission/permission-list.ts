@@ -31,7 +31,7 @@ class AppPermissionListCommand extends AppCommand {
     return 'Lists API permissions for the current Microsoft Entra app';
   }
 
-  public get schema(): z.ZodTypeAny | undefined {
+  public get schema(): z.ZodType | undefined {
     return appCommandOptions;
   }
 

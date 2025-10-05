@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import { zod } from '../../../../utils/zod.js';
 import { globalOptionsZod } from '../../../../Command.js';
 import { validation } from '../../../../utils/validation.js';
 import { cli } from '../../../../cli/cli.js';
@@ -9,16 +8,15 @@ import { spo } from '../../../../utils/spo.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 
-const options = globalOptionsZod
-  .extend({
-    url: zod.alias('u', z.string()
-      .refine(url => validation.isValidSharePointUrl(url) === true, url => ({
-        message: `'${url}' is not a valid SharePoint Online site URL.`
-      }))
-    ),
-    force: zod.alias('f', z.boolean().optional())
-  })
-  .strict();
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  url: z.string()
+    .refine(url => validation.isValidSharePointUrl(url) === true, {
+      error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
+    })
+    .alias('u'),
+  force: z.boolean().optional().alias('f')
+});
 
 declare type Options = z.infer<typeof options>;
 interface CommandArgs {
@@ -34,7 +32,7 @@ class SpoHomeSiteRemoveCommand extends SpoCommand {
     return 'Removes a Home Site';
   }
 
-  public get schema(): z.ZodTypeAny {
+  public get schema(): z.ZodType {
     return options;
   }
 

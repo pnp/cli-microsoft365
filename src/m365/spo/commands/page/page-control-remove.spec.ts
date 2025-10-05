@@ -1,20 +1,19 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from "../../../../cli/CommandInfo.js";
 import { Logger } from '../../../../cli/Logger.js';
+import { CommandError } from '../../../../Command.js';
 import request from '../../../../request.js';
 import { telemetry } from '../../../../telemetry.js';
+import { formatting } from '../../../../utils/formatting.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
-import { cli } from '../../../../cli/cli.js';
 import commands from '../../commands.js';
-import command from './page-control-remove.js';
-import { z } from 'zod';
-import { CommandError } from '../../../../Command.js';
+import command, { options } from './page-control-remove.js';
 import { Page } from './Page.js';
-import { formatting } from '../../../../utils/formatting.js';
 
 describe(commands.PAGE_CONTROL_REMOVE, () => {
   const spRootUrl = 'https://contoso.sharepoint.com';
@@ -32,7 +31,7 @@ describe(commands.PAGE_CONTROL_REMOVE, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
-  let commandOptionsSchema: z.ZodTypeAny;
+  let commandOptionsSchema: typeof options;
   let loggerLogSpy: sinon.SinonSpy;
   let confirmationPromptStub: sinon.SinonStub;
   let pagePublishStub: sinon.SinonStub;
@@ -46,7 +45,7 @@ describe(commands.PAGE_CONTROL_REMOVE, () => {
 
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
-    commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {

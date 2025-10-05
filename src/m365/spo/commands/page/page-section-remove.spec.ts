@@ -1,7 +1,6 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
-import { z } from 'zod';
 import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
@@ -11,16 +10,16 @@ import { telemetry } from '../../../../telemetry.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
-import commands from '../../commands.js';
-import command from './page-section-remove.js';
 import { spo } from '../../../../utils/spo.js';
+import commands from '../../commands.js';
+import command, { options } from './page-section-remove.js';
 import { mockBackgroundControlHTML, mockEmptyPage, mockOneColumnSectionHTML, mockPageSettingsHTML, mockThreeColumnSectionHTML, mockTwoColumnLeftSectionHTML, mockTwoColumnRightSectionHTML, mockTwoColumnsSectionHTML, mockVerticalSectionHTML } from './page.mock.js';
 
 describe(commands.PAGE_SECTION_REMOVE, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
-  let commandOptionsSchema: z.ZodTypeAny;
+  let commandOptionsSchema: typeof options;
 
   const apiResponse = {
     "ListItemAllFields": {
@@ -95,7 +94,7 @@ describe(commands.PAGE_SECTION_REMOVE, () => {
     });
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
-    commandOptionsSchema = commandInfo.command.schema!;
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {

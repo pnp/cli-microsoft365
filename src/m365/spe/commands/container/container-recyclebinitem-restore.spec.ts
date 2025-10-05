@@ -1,19 +1,18 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from "../../../../cli/CommandInfo.js";
 import { Logger } from '../../../../cli/Logger.js';
+import { CommandError } from '../../../../Command.js';
 import request from '../../../../request.js';
 import { telemetry } from '../../../../telemetry.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
-import { cli } from '../../../../cli/cli.js';
-import commands from '../../commands.js';
-import command from './container-recyclebinitem-restore.js';
 import { spe } from '../../../../utils/spe.js';
-import { z } from 'zod';
-import { CommandError } from '../../../../Command.js';
+import commands from '../../commands.js';
+import command, { options } from './container-recyclebinitem-restore.js';
 
 describe(commands.CONTAINER_RECYCLEBINITEM_RESTORE, () => {
   const containerTypeId = 'c6f08d91-77fa-485f-9369-f246ec0fc19c';
@@ -35,7 +34,7 @@ describe(commands.CONTAINER_RECYCLEBINITEM_RESTORE, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
-  let commandOptionsSchema: z.ZodTypeAny;
+  let commandOptionsSchema: typeof options;
   let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
@@ -46,7 +45,7 @@ describe(commands.CONTAINER_RECYCLEBINITEM_RESTORE, () => {
 
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
-    commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {

@@ -2,25 +2,23 @@ import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
 import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
-import { zod } from '../../../../utils/zod.js';
 import commands from '../../commands.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import { ExtensionProperty } from '@microsoft/microsoft-graph-types';
 import { validation } from '../../../../utils/validation.js';
 import { entraApp } from '../../../../utils/entraApp.js';
 
-const options = globalOptionsZod
-  .extend({
-    name: zod.alias('n', z.string()),
-    appId: z.string().optional(),
-    appObjectId: z.string().optional(),
-    appName: z.string().optional(),
-    dataType: z.enum(['Binary', 'Boolean', 'DateTime', 'Integer', 'LargeInteger', 'String']),
-    targetObjects: z.string().transform((value) => value.split(',').map(String))
-      .pipe(z.enum(['User', 'Group', 'Application', 'AdministrativeUnit', 'Device', 'Organization']).array()),
-    isMultiValued: z.boolean().optional()
-  })
-  .strict();
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  name: z.string().alias('n'),
+  appId: z.string().optional(),
+  appObjectId: z.string().optional(),
+  appName: z.string().optional(),
+  dataType: z.enum(['Binary', 'Boolean', 'DateTime', 'Integer', 'LargeInteger', 'String']),
+  targetObjects: z.string().transform((value) => value.split(',').map(String))
+    .pipe(z.enum(['User', 'Group', 'Application', 'AdministrativeUnit', 'Device', 'Organization']).array()),
+  isMultiValued: z.boolean().optional()
+});
 declare type Options = z.infer<typeof options>;
 
 interface CommandArgs {
@@ -36,25 +34,25 @@ class GraphDirectoryExtensionAddCommand extends GraphCommand {
     return 'Creates a new directory extension';
   }
 
-  public get schema(): z.ZodTypeAny | undefined {
+  public get schema(): z.ZodType | undefined {
     return options;
   }
 
-  public getRefinedSchema(schema: typeof options): z.ZodEffects<any> | undefined {
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
       .refine(options => Object.values([options.appId, options.appObjectId, options.appName]).filter(v => typeof v !== 'undefined').length === 1, {
-        message: 'Specify either appId, appObjectId or appName, but not multiple'
+        error: 'Specify either appId, appObjectId or appName, but not multiple'
       })
       .refine(options => (!options.appId && !options.appObjectId && !options.appName) || options.appObjectId || options.appName ||
-        (options.appId && validation.isValidGuid(options.appId)), options => ({
-        message: `The '${options.appId}' must be a valid GUID`,
+        (options.appId && validation.isValidGuid(options.appId)), {
+        error: e => `The '${e.input}' must be a valid GUID`,
         path: ['appId']
-      }))
+      })
       .refine(options => (!options.appId && !options.appObjectId && !options.appName) || options.appId || options.appName ||
-        (options.appObjectId && validation.isValidGuid(options.appObjectId)), options => ({
-        message: `The '${options.appObjectId}' must be a valid GUID`,
+        (options.appObjectId && validation.isValidGuid(options.appObjectId)), {
+        error: e => `The '${e.input}' must be a valid GUID`,
         path: ['appObjectId']
-      }));
+      });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

@@ -1,19 +1,18 @@
 import assert from 'assert';
 import sinon from 'sinon';
-import { z } from 'zod';
 import auth from '../../../../Auth.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
-import commands from '../../commands.js';
+import { CommandError } from '../../../../Command.js';
+import request from '../../../../request.js';
 import { telemetry } from '../../../../telemetry.js';
+import { accessToken } from '../../../../utils/accessToken.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
-import command from './mail-searchfolder-add.js';
-import { cli } from '../../../../cli/cli.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
-import request from '../../../../request.js';
-import { CommandError } from '../../../../Command.js';
-import { accessToken } from '../../../../utils/accessToken.js';
+import commands from '../../commands.js';
+import command, { options } from './mail-searchfolder-add.js';
 
 describe(commands.MAIL_SEARCHFOLDER_ADD, () => {
   const userId = 'ae0e8388-cd70-427f-9503-c57498ee3337';
@@ -59,7 +58,7 @@ describe(commands.MAIL_SEARCHFOLDER_ADD, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
-  let commandOptionsSchema: z.ZodTypeAny;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -74,7 +73,7 @@ describe(commands.MAIL_SEARCHFOLDER_ADD, () => {
       };
     }
     commandInfo = cli.getCommandInfo(command);
-    commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -177,7 +176,7 @@ describe(commands.MAIL_SEARCHFOLDER_ADD, () => {
       messageFilter: filterQuery,
       sourceFoldersIds: sourceFolderId1
     });
-    await command.action(logger, { options: parsedSchema.data });
+    await command.action(logger, { options: parsedSchema.data! });
     assert(loggerLogSpy.calledOnceWithExactly(response));
   });
 
@@ -199,7 +198,7 @@ describe(commands.MAIL_SEARCHFOLDER_ADD, () => {
       messageFilter: filterQuery,
       sourceFoldersIds: sourceFolderId1
     });
-    await command.action(logger, { options: parsedSchema.data });
+    await command.action(logger, { options: parsedSchema.data! });
     assert(loggerLogSpy.calledOnceWithExactly(response));
   });
 
@@ -223,7 +222,7 @@ describe(commands.MAIL_SEARCHFOLDER_ADD, () => {
       includeNestedFolders: true,
       verbose: true
     });
-    await command.action(logger, { options: parsedSchema.data });
+    await command.action(logger, { options: parsedSchema.data! });
     assert(loggerLogSpy.calledOnceWithExactly(responseWithNestedFolders));
   });
 
@@ -238,7 +237,7 @@ describe(commands.MAIL_SEARCHFOLDER_ADD, () => {
       includeNestedFolders: true,
       verbose: true
     });
-    await assert.rejects(command.action(logger, { options: parsedSchema.data }), new CommandError('When running with application permissions either userId or userName is required'));
+    await assert.rejects(command.action(logger, { options: parsedSchema.data! }), new CommandError('When running with application permissions either userId or userName is required'));
   });
 
   it('fails creating a mail search folder for signed-in user if userId is specified', async () => {
@@ -250,7 +249,7 @@ describe(commands.MAIL_SEARCHFOLDER_ADD, () => {
       includeNestedFolders: true,
       verbose: true
     });
-    await assert.rejects(command.action(logger, { options: parsedSchema.data }), new CommandError('You can create mail search folder for other users only if CLI is authenticated in app-only mode'));
+    await assert.rejects(command.action(logger, { options: parsedSchema.data! }), new CommandError('You can create mail search folder for other users only if CLI is authenticated in app-only mode'));
   });
 
   it('fails creating a mail search folder for signed-in user if userName is specified', async () => {
@@ -262,7 +261,7 @@ describe(commands.MAIL_SEARCHFOLDER_ADD, () => {
       includeNestedFolders: true,
       verbose: true
     });
-    await assert.rejects(command.action(logger, { options: parsedSchema.data }), new CommandError('You can create mail search folder for other users only if CLI is authenticated in app-only mode'));
+    await assert.rejects(command.action(logger, { options: parsedSchema.data! }), new CommandError('You can create mail search folder for other users only if CLI is authenticated in app-only mode'));
   });
 
   it('correctly handles error when invalid folder id is specified', async () => {
@@ -280,7 +279,7 @@ describe(commands.MAIL_SEARCHFOLDER_ADD, () => {
       messageFilter: filterQuery,
       sourceFoldersIds: 'foo'
     });
-    await assert.rejects(command.action(logger, { options: parsedSchema.data }), new CommandError('Id is malformed.'));
+    await assert.rejects(command.action(logger, { options: parsedSchema.data! }), new CommandError('Id is malformed.'));
   });
 
   it('correctly handles error when invalid query is specified', async () => {
@@ -298,6 +297,6 @@ describe(commands.MAIL_SEARCHFOLDER_ADD, () => {
       messageFilter: "contais(subject, 'CLI for Microsoft 365')",
       sourceFoldersIds: 'foo'
     });
-    await assert.rejects(command.action(logger, { options: parsedSchema.data }), new CommandError(`An unknown function with name 'contais' was found. This may also be a function import or a key lookup on a navigation property, which is not allowed.`));
+    await assert.rejects(command.action(logger, { options: parsedSchema.data! }), new CommandError(`An unknown function with name 'contais' was found. This may also be a function import or a key lookup on a navigation property, which is not allowed.`));
   });
 });

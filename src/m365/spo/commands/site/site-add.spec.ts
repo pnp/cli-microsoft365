@@ -15,8 +15,8 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { spo } from '../../../../utils/spo.js';
 import commands from '../../commands.js';
-
 import command from './site-add.js';
+
 describe(commands.SITE_ADD, () => {
   let log: string[];
   let logger: Logger;

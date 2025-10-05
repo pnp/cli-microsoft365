@@ -1,20 +1,19 @@
 import assert from 'assert';
 import sinon from 'sinon';
-import { z } from 'zod';
 import auth from '../../../../Auth.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
-import commands from '../../commands.js';
+import { CommandError } from '../../../../Command.js';
+import request from '../../../../request.js';
 import { telemetry } from '../../../../telemetry.js';
+import { directoryExtension } from '../../../../utils/directoryExtension.js';
+import { entraApp } from '../../../../utils/entraApp.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
-import { cli } from '../../../../cli/cli.js';
-import command from './directoryextension-get.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
-import request from '../../../../request.js';
-import { entraApp } from '../../../../utils/entraApp.js';
-import { CommandError } from '../../../../Command.js';
-import { directoryExtension } from '../../../../utils/directoryExtension.js';
+import commands from '../../commands.js';
+import command, { options } from './directoryextension-get.js';
 
 describe(commands.DIRECTORYEXTENSION_GET, () => {
   const appId = '7f5df2f4-9ed6-4df7-86d7-eefbfc4ab091';
@@ -40,7 +39,7 @@ describe(commands.DIRECTORYEXTENSION_GET, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
-  let commandOptionsSchema: z.ZodTypeAny;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -49,7 +48,7 @@ describe(commands.DIRECTORYEXTENSION_GET, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
-    commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -177,7 +176,7 @@ describe(commands.DIRECTORYEXTENSION_GET, () => {
       verbose: true
     });
 
-    await command.action(logger, { options: parsedSchema.data });
+    await command.action(logger, { options: parsedSchema.data! });
     assert(loggerLogSpy.calledWith(response));
   });
 
@@ -199,7 +198,7 @@ describe(commands.DIRECTORYEXTENSION_GET, () => {
       verbose: true
     });
 
-    await command.action(logger, { options: parsedSchema.data });
+    await command.action(logger, { options: parsedSchema.data! });
     assert(loggerLogSpy.calledWith(response));
   });
 
@@ -221,7 +220,7 @@ describe(commands.DIRECTORYEXTENSION_GET, () => {
       verbose: true
     });
 
-    await command.action(logger, { options: parsedSchema.data });
+    await command.action(logger, { options: parsedSchema.data! });
     assert(loggerLogSpy.calledWith(response));
   });
 
@@ -246,7 +245,7 @@ describe(commands.DIRECTORYEXTENSION_GET, () => {
     });
 
     await assert.rejects(
-      command.action(logger, { options: parsedSchema.data }),
+      command.action(logger, { options: parsedSchema.data! }),
       new CommandError(`Resource '${appObjectId}' does not exist or one of its queried reference-property objects are not present.`)
     );
   });
@@ -272,7 +271,7 @@ describe(commands.DIRECTORYEXTENSION_GET, () => {
     });
 
     await assert.rejects(
-      command.action(logger, { options: parsedSchema.data }),
+      command.action(logger, { options: parsedSchema.data! }),
       new CommandError(`Resource '${extensionId}' does not exist or one of its queried reference-property objects are not present.`)
     );
   });

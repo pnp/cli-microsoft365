@@ -2,7 +2,6 @@ import { Application, ServicePrincipal } from '@microsoft/microsoft-graph-types'
 import assert from 'assert';
 import fs from 'fs';
 import sinon from 'sinon';
-import { z } from 'zod';
 import auth from '../../../../Auth.js';
 import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
@@ -11,13 +10,13 @@ import { CommandError } from '../../../../Command.js';
 import request from '../../../../request.js';
 import { settingsNames } from '../../../../settingsNames.js';
 import { telemetry } from '../../../../telemetry.js';
+import { entraServicePrincipal } from '../../../../utils/entraServicePrincipal.js';
 import { odata } from '../../../../utils/odata.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './permission-add.js';
-import { entraServicePrincipal } from '../../../../utils/entraServicePrincipal.js';
+import command, { options } from './permission-add.js';
 
 describe(commands.PERMISSION_ADD, () => {
   //#region Mocked responses
@@ -32,7 +31,7 @@ describe(commands.PERMISSION_ADD, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
-  let commandOptionsSchema: z.ZodTypeAny;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -50,7 +49,7 @@ describe(commands.PERMISSION_ADD, () => {
     }));
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
-    commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName: string, defaultValue: any) => {
       if (settingName === 'prompt') {
         return false;

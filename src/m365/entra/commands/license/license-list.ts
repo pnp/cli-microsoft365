@@ -5,7 +5,7 @@ import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 import { globalOptionsZod } from '../../../../Command.js';
 
-const options = globalOptionsZod.strict();
+export const options = globalOptionsZod.strict();
 
 class EntraLicenseListCommand extends GraphCommand {
   public get name(): string {

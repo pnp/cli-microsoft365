@@ -6,7 +6,7 @@ import commands from '../../commands.js';
 import { z } from 'zod';
 import { globalOptionsZod } from '../../../../Command.js';
 
-const options = globalOptionsZod.strict();
+export const options = z.strictObject({ ...globalOptionsZod.shape });
 
 class FlowEnvironmentListCommand extends PowerAutomateCommand {
   public get name(): string {
@@ -17,7 +17,7 @@ class FlowEnvironmentListCommand extends PowerAutomateCommand {
     return 'Lists Microsoft Flow environments in the current tenant';
   }
 
-  public get schema(): z.ZodTypeAny | undefined {
+  public get schema(): z.ZodType | undefined {
     return options;
   }
 

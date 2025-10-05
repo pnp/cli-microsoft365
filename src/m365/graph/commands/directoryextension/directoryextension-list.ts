@@ -4,22 +4,16 @@ import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import commands from '../../commands.js';
 import GraphCommand from '../../../base/GraphCommand.js';
-import { validation } from '../../../../utils/validation.js';
 import { entraApp } from '../../../../utils/entraApp.js';
 import { odata } from '../../../../utils/odata.js';
 import { ExtensionProperty } from '@microsoft/microsoft-graph-types';
 
-const options = globalOptionsZod
-  .extend({
-    appId: z.string().refine(id => validation.isValidGuid(id), id => ({
-      message: `'${id}' is not a valid GUID.`
-    })).optional(),
-    appObjectId: z.string().refine(id => validation.isValidGuid(id), id => ({
-      message: `'${id}' is not a valid GUID.`
-    })).optional(),
-    appName: z.string().optional()
-  })
-  .strict();
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  appId: z.uuid().optional(),
+  appObjectId: z.uuid().optional(),
+  appName: z.string().optional()
+});
 
 declare type Options = z.infer<typeof options>;
 
@@ -40,15 +34,15 @@ class GraphDirectoryExtensionListCommand extends GraphCommand {
     return ['id', 'name', 'appDisplayName'];
   }
 
-  public get schema(): z.ZodTypeAny | undefined {
+  public get schema(): z.ZodType | undefined {
     return options;
   }
 
-  public getRefinedSchema(schema: typeof options): z.ZodEffects<any> | undefined {
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
       .refine(options =>
         ([options.appId, options.appObjectId, options.appName].filter(x => x !== undefined).length <= 1), {
-        message: 'Specify either appId, appObjectId, or appName, but not multiple.'
+        error: 'Specify either appId, appObjectId, or appName, but not multiple.'
       });
   }
 

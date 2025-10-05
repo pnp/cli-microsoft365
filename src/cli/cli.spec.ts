@@ -255,8 +255,8 @@ class MockCommandWithSchema extends AnonymousCommand {
   public get description(): string {
     return 'Mock command with schema';
   }
-  public get schema(): z.ZodTypeAny {
-    return globalOptionsZod.strict();
+  public get schema(): z.ZodType {
+    return z.strictObject({ ...globalOptionsZod.shape });
   }
   public async commandAction(): Promise<void> {
   }
@@ -269,12 +269,11 @@ class MockCommandWithSchemaAndRequiredOptions extends AnonymousCommand {
   public get description(): string {
     return 'Mock command with schema and required options';
   }
-  public get schema(): z.ZodTypeAny {
-    return globalOptionsZod
-      .extend({
-        url: z.string()
-      })
-      .strict();
+  public get schema(): z.ZodType {
+    return z.strictObject({
+      ...globalOptionsZod.shape,
+      url: z.string()
+    });
   }
   public async commandAction(): Promise<void> {
   }
@@ -287,13 +286,12 @@ class MockCommandWithSchemaAndBoolRequiredOption extends AnonymousCommand {
   public get description(): string {
     return 'Mock command with schema and required options';
   }
-  public get schema(): z.ZodTypeAny {
-    return globalOptionsZod
-      .extend({
-        url: z.string(),
-        bool: z.boolean()
-      })
-      .strict();
+  public get schema(): z.ZodType {
+    return z.strictObject({
+      ...globalOptionsZod.shape,
+      url: z.string(),
+      bool: z.boolean()
+    });
   }
   public async commandAction(): Promise<void> {
   }

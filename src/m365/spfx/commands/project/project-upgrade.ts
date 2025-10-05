@@ -8,7 +8,6 @@ import { Logger } from '../../../../cli/Logger.js';
 import Command, { CommandError, globalOptionsZod } from '../../../../Command.js';
 import { fsUtil } from '../../../../utils/fsUtil.js';
 import { packageManager } from '../../../../utils/packageManager.js';
-import { zod } from '../../../../utils/zod.js';
 import { Dictionary, Hash } from '../../../../utils/types.js';
 import commands from '../../commands.js';
 import { BaseProjectCommand } from './base-project-command.js';
@@ -18,15 +17,14 @@ import { Finding, FindingToReport, FindingTour, FindingTourStep } from './report
 import { ReportData, ReportDataModification } from './report-model/ReportData.js';
 import { Rule } from './Rule.js';
 
-const options = globalOptionsZod
-  .extend({
-    packageManager: z.enum(['npm', 'pnpm', 'yarn']).default('npm'),
-    preview: z.boolean().optional(),
-    toVersion: zod.alias('v', z.string().optional()),
-    shell: z.enum(['bash', 'powershell', 'cmd']).default('powershell'),
-    output: z.enum(['json', 'text', 'md', 'tour', 'csv', 'none']).optional()
-  })
-  .strict();
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  packageManager: z.enum(['npm', 'pnpm', 'yarn']).default('npm'),
+  preview: z.boolean().optional(),
+  toVersion: z.string().optional().alias('v'),
+  shell: z.enum(['bash', 'powershell', 'cmd']).default('powershell'),
+  output: z.enum(['json', 'text', 'md', 'tour', 'csv', 'none']).optional()
+});
 
 declare type Options = z.infer<typeof options>;
 
@@ -109,7 +107,7 @@ class SpfxProjectUpgradeCommand extends BaseProjectCommand {
     return ['json', 'text', 'md', 'tour'];
   }
 
-  public get schema(): z.ZodTypeAny {
+  public get schema(): z.ZodType {
     return options;
   }
 

@@ -8,17 +8,16 @@ import { zod } from '../../../utils/zod.js';
 import AnonymousCommand from '../../base/AnonymousCommand.js';
 import commands from '../commands.js';
 
-export const options = globalOptionsZod
-  .extend({
-    url: z.string(),
-    title: zod.alias('t', z.string().optional()),
-    description: zod.alias('d', z.string().optional()),
-    imageUrl: zod.alias('i', z.string().optional()),
-    actionUrl: zod.alias('a', z.string().optional()),
-    card: z.string().optional(),
-    cardData: z.string().optional()
-  })
-  .passthrough();
+export const options = z.looseObject({
+  ...globalOptionsZod.shape,
+  url: z.string(),
+  title: z.string().optional().alias('t'),
+  description: z.string().optional().alias('d'),
+  imageUrl: z.string().optional().alias('i'),
+  actionUrl: z.string().optional().alias('a'),
+  card: z.string().optional(),
+  cardData: z.string().optional()
+});
 
 declare type Options = z.infer<typeof options>;
 
@@ -35,14 +34,14 @@ class AdaptiveCardSendCommand extends AnonymousCommand {
     return 'Sends adaptive card to the specified URL';
   }
 
-  public get schema(): z.ZodTypeAny | undefined {
+  public get schema(): z.ZodType | undefined {
     return options;
   }
 
-  public getRefinedSchema(schema: typeof options): z.ZodEffects<any> | undefined {
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
       .refine(options => !options.cardData || options.card, {
-        message: 'When you specify cardData, you must also specify card.',
+        error: 'When you specify cardData, you must also specify card.',
         path: ['cardData']
       })
       .refine(options => {
@@ -57,7 +56,7 @@ class AdaptiveCardSendCommand extends AnonymousCommand {
         }
         return true;
       }, {
-        message: 'Specified card is not a valid JSON string.',
+        error: 'Specified card is not a valid JSON string.',
         path: ['card']
       })
       .refine(options => {
@@ -72,7 +71,7 @@ class AdaptiveCardSendCommand extends AnonymousCommand {
         }
         return true;
       }, {
-        message: 'Specified cardData is not a valid JSON string.',
+        error: 'Specified cardData is not a valid JSON string.',
         path: ['cardData']
       });
   }

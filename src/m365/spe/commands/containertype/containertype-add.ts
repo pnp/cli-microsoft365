@@ -1,7 +1,6 @@
 import { Logger } from '../../../../cli/Logger.js';
 import { globalOptionsZod } from '../../../../Command.js';
 import { z } from 'zod';
-import { zod } from '../../../../utils/zod.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphDelegatedCommand from '../../../base/GraphDelegatedCommand.js';
@@ -10,34 +9,30 @@ import Auth from '../../../../Auth.js';
 
 const consumingTenantOverridablesOptions = ['urlTemplate', 'isDiscoverabilityEnabled', 'isSearchEnabled', 'isItemVersioningEnabled', 'itemMajorVersionLimit', 'maxStoragePerContainerInBytes'];
 
-const options = globalOptionsZod
-  .extend({
-    name: zod.alias('n', z.string()),
-    appId: z.string()
-      .refine(id => validation.isValidGuid(id), id => ({
-        message: `'${id}' is not a valid GUID.`
-      })).optional(),
-    billingType: z.enum(['standard', 'trial', 'directToCustomer']).default('standard'),
-    consumingTenantOverridables: z.string()
-      .refine(values => values.split(',').every(v => consumingTenantOverridablesOptions.includes(v.trim())), values => ({
-        message: `'${values}' is not a valid value. Valid options are: ${consumingTenantOverridablesOptions.join(', ')}.`
-      })).optional(),
-    isDiscoverabilityEnabled: z.boolean().optional(),
-    isItemVersioningEnabled: z.boolean().optional(),
-    isSearchEnabled: z.boolean().optional(),
-    isSharingRestricted: z.boolean().optional(),
-    itemMajorVersionLimit: z.number()
-      .refine(n => validation.isValidPositiveInteger(n), n => ({
-        message: `'${n}' is not a valid positive integer.`
-      })).optional(),
-    maxStoragePerContainerInBytes: z.number()
-      .refine(n => validation.isValidPositiveInteger(n), n => ({
-        message: `'${n}' is not a valid positive integer.`
-      })).optional(),
-    sharingCapability: z.enum(['disabled', 'externalUserSharingOnly', 'externalUserAndGuestSharing', 'existingExternalUserSharingOnly']).optional(),
-    urlTemplate: z.string().optional()
-  })
-  .strict();
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  name: z.string().alias('n'),
+  appId: z.uuid().optional(),
+  billingType: z.enum(['standard', 'trial', 'directToCustomer']).default('standard'),
+  consumingTenantOverridables: z.string()
+    .refine(values => values.split(',').every(v => consumingTenantOverridablesOptions.includes(v.trim())), {
+      error: e => `'${e.input}' is not a valid value. Valid options are: ${consumingTenantOverridablesOptions.join(', ')}.`
+    }).optional(),
+  isDiscoverabilityEnabled: z.boolean().optional(),
+  isItemVersioningEnabled: z.boolean().optional(),
+  isSearchEnabled: z.boolean().optional(),
+  isSharingRestricted: z.boolean().optional(),
+  itemMajorVersionLimit: z.number()
+    .refine(n => validation.isValidPositiveInteger(n), {
+      error: e => `'${e.input}' is not a valid positive integer.`
+    }).optional(),
+  maxStoragePerContainerInBytes: z.number()
+    .refine(n => validation.isValidPositiveInteger(n), {
+      error: e => `'${e.input}' is not a valid positive integer.`
+    }).optional(),
+  sharingCapability: z.enum(['disabled', 'externalUserSharingOnly', 'externalUserAndGuestSharing', 'existingExternalUserSharingOnly']).optional(),
+  urlTemplate: z.string().optional()
+});
 
 declare type Options = z.infer<typeof options>;
 
@@ -54,14 +49,14 @@ class SpeContainerTypeAddCommand extends GraphDelegatedCommand {
     return 'Creates a new container type';
   }
 
-  public get schema(): z.ZodTypeAny {
+  public get schema(): z.ZodType {
     return options;
   }
 
-  public getRefinedSchema(schema: typeof options): z.ZodEffects<any> | undefined {
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
       .refine(options => !options.itemMajorVersionLimit || options.isItemVersioningEnabled !== false, {
-        message: `Cannot set itemMajorVersionLimit when isItemVersioningEnabled is false.`
+        error: `Cannot set itemMajorVersionLimit when isItemVersioningEnabled is false.`
       });
   }
 

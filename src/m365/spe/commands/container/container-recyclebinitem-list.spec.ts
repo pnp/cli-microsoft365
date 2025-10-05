@@ -1,19 +1,18 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
+import { CommandError } from '../../../../Command.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
+import { cli } from '../../../../cli/cli.js';
 import request from '../../../../request.js';
 import { telemetry } from '../../../../telemetry.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
-import commands from '../../commands.js';
-import command from './container-recyclebinitem-list.js';
 import { spe } from '../../../../utils/spe.js';
-import { CommandError } from '../../../../Command.js';
-import { CommandInfo } from '../../../../cli/CommandInfo.js';
-import { z } from 'zod';
-import { cli } from '../../../../cli/cli.js';
+import commands from '../../commands.js';
+import command, { options } from './container-recyclebinitem-list.js';
 
 describe(commands.CONTAINER_RECYCLEBINITEM_LIST, () => {
   const containerTypeId = 'dda3cb36-a16a-40b9-8f04-b01e39fc035d';
@@ -42,7 +41,7 @@ describe(commands.CONTAINER_RECYCLEBINITEM_LIST, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
-  let commandOptionsSchema: z.ZodTypeAny;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -54,7 +53,7 @@ describe(commands.CONTAINER_RECYCLEBINITEM_LIST, () => {
 
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
-    commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {

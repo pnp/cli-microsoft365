@@ -9,13 +9,12 @@ import request, { CliRequestOptions } from '../../../../request.js';
 import { Extension } from '@microsoft/microsoft-graph-types';
 import { optionsUtils } from '../../../../utils/optionsUtils.js';
 
-const options = globalOptionsZod
-  .extend({
-    name: zod.alias('n', z.string()),
-    resourceId: zod.alias('i', z.string()),
-    resourceType: zod.alias('t', z.enum(['user', 'group', 'device', 'organization']))
-  })
-  .passthrough();
+const options = z.looseObject({
+  ...globalOptionsZod.shape,
+  name: z.string().alias('n'),
+  resourceId: z.string().alias('i'),
+  resourceType: z.enum(['user', 'group', 'device', 'organization']).alias('t')
+});
 
 declare type Options = z.infer<typeof options>;
 
@@ -32,20 +31,20 @@ class GraphOpenExtensionAddCommand extends GraphCommand {
     return 'Adds an open extension to a resource';
   }
 
-  public get schema(): z.ZodTypeAny | undefined {
+  public get schema(): z.ZodType | undefined {
     return options;
   }
 
-  public getRefinedSchema(schema: typeof options): z.ZodEffects<any> | undefined {
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
-      .refine(options => options.resourceType !== 'group' && options.resourceType !== 'device' && options.resourceType !== 'organization' || (options.resourceId && validation.isValidGuid(options.resourceId)), options => ({
-        message: `The '${options.resourceId}' must be a valid GUID`,
+      .refine(options => options.resourceType !== 'group' && options.resourceType !== 'device' && options.resourceType !== 'organization' || (options.resourceId && validation.isValidGuid(options.resourceId)), {
+        error: e => `The '${e.input}' must be a valid GUID`,
         path: ['resourceId']
-      }))
-      .refine(options => options.resourceType !== 'user' || (options.resourceId && (validation.isValidGuid(options.resourceId) || validation.isValidUserPrincipalName(options.resourceId))), options => ({
-        message: `The '${options.resourceId}' must be a valid GUID or user principal name`,
+      })
+      .refine(options => options.resourceType !== 'user' || (options.resourceId && (validation.isValidGuid(options.resourceId) || validation.isValidUserPrincipalName(options.resourceId))), {
+        error: e => `The '${e.input}' must be a valid GUID or user principal name`,
         path: ['resourceId']
-      }));
+      });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

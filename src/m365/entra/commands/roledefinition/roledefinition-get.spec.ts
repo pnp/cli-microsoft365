@@ -1,19 +1,18 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
-import commands from '../../commands.js';
-import request from '../../../../request.js';
+import { CommandError } from '../../../../Command.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
+import { cli } from '../../../../cli/cli.js';
+import request from '../../../../request.js';
 import { telemetry } from '../../../../telemetry.js';
+import { formatting } from '../../../../utils/formatting.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
-import command from './roledefinition-get.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
-import { CommandError } from '../../../../Command.js';
-import { formatting } from '../../../../utils/formatting.js';
-import { z } from 'zod';
-import { CommandInfo } from '../../../../cli/CommandInfo.js';
-import { cli } from '../../../../cli/cli.js';
+import commands from '../../commands.js';
+import command, { options } from './roledefinition-get.js';
 
 describe(commands.ROLEDEFINITION_GET, () => {
   const roleId = 'abcd1234-de71-4623-b4af-96380a352509';
@@ -52,7 +51,7 @@ describe(commands.ROLEDEFINITION_GET, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
-  let commandOptionsSchema: z.ZodTypeAny;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -61,7 +60,7 @@ describe(commands.ROLEDEFINITION_GET, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
-    commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {

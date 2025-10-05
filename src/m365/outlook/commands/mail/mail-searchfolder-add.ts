@@ -5,27 +5,22 @@ import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 import { z } from 'zod';
 import { globalOptionsZod } from '../../../../Command.js';
-import { zod } from '../../../../utils/zod.js';
 import { validation } from '../../../../utils/validation.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 import auth from '../../../../Auth.js';
 
-const options = globalOptionsZod
-  .extend({
-    userId: zod.alias('i', z.string()
-      .refine(userId => validation.isValidGuid(userId), userId => ({
-        message: `'${userId}' is not a valid GUID.`
-      })).optional()),
-    userName: zod.alias('n', z.string()
-      .refine(userName => validation.isValidUserPrincipalName(userName), userName => ({
-        message: `'${userName}' is not a valid UPN.`
-      })).optional()),
-    folderName: z.string(),
-    messageFilter: z.string(),
-    sourceFoldersIds: z.string().transform((value) => value.split(',')).pipe(z.string().array()),
-    includeNestedFolders: z.boolean().optional()
-  })
-  .strict();
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  userId: z.uuid().optional().alias('i'),
+  userName: z.string()
+    .refine(userName => validation.isValidUserPrincipalName(userName), {
+      error: e => `'${e.input}' is not a valid UPN.`
+    }).optional().alias('n'),
+  folderName: z.string(),
+  messageFilter: z.string(),
+  sourceFoldersIds: z.string().transform((value) => value.split(',')).pipe(z.string().array()),
+  includeNestedFolders: z.boolean().optional()
+});
 
 declare type Options = z.infer<typeof options>;
 
@@ -42,14 +37,14 @@ class OutlookMailSearchFolderAddCommand extends GraphCommand {
     return `Creates a new mail search folder in the user's mailbox`;
   }
 
-  public get schema(): z.ZodTypeAny | undefined {
+  public get schema(): z.ZodType | undefined {
     return options;
   }
 
-  public getRefinedSchema(schema: typeof options): z.ZodEffects<any> | undefined {
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
       .refine(options => !(options.userId && options.userName), {
-        message: 'Specify either userId or userName, but not both'
+        error: 'Specify either userId or userName, but not both'
       });
   }
 

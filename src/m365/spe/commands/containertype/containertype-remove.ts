@@ -1,12 +1,10 @@
 import { Logger } from '../../../../cli/Logger.js';
 import { globalOptionsZod } from '../../../../Command.js';
 import { z } from 'zod';
-import { zod } from '../../../../utils/zod.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 import { ClientSvcResponse, ClientSvcResponseContents, spo } from '../../../../utils/spo.js';
 import { cli } from '../../../../cli/cli.js';
-import { validation } from '../../../../utils/validation.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import config from '../../../../config.js';
 import { formatting } from '../../../../utils/formatting.js';
@@ -16,18 +14,12 @@ interface CsomContainerType {
   ContainerTypeId: string;
 }
 
-const options = globalOptionsZod
-  .extend({
-    id: zod.alias('i', z.string()
-      .refine(id => validation.isValidGuid(id), id => ({
-        message: `'${id}' is not a valid GUID.`
-      }))
-      .optional()
-    ),
-    name: zod.alias('n', z.string().optional()),
-    force: zod.alias('f', z.boolean().optional())
-  })
-  .strict();
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  id: z.uuid().optional().alias('i'),
+  name: z.string().optional().alias('n'),
+  force: z.boolean().optional().alias('f')
+});
 
 declare type Options = z.infer<typeof options>;
 
@@ -45,14 +37,14 @@ class SpeContainerTypeRemoveCommand extends SpoCommand {
     return 'Remove a specific container type';
   }
 
-  public get schema(): z.ZodTypeAny {
+  public get schema(): z.ZodType {
     return options;
   }
 
-  public getRefinedSchema(schema: z.ZodTypeAny): z.ZodEffects<any> | undefined {
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
       .refine(options => [options.id, options.name].filter(o => o !== undefined).length === 1, {
-        message: 'Use one of the following options: id, name.'
+        error: 'Use one of the following options: id, name.'
       });
   }
 

@@ -8,13 +8,12 @@ import AppCommand, { appCommandOptions } from '../../../base/AppCommand.js';
 import commands from '../../commands.js';
 import { entraServicePrincipal } from '../../../../utils/entraServicePrincipal.js';
 
-const options = appCommandOptions
-  .extend({
-    applicationPermissions: z.string().optional(),
-    delegatedPermissions: z.string().optional(),
-    grantAdminConsent: z.boolean().optional()
-  })
-  .strict();
+export const options = z.strictObject({
+  ...appCommandOptions.shape,
+  applicationPermissions: z.string().optional(),
+  delegatedPermissions: z.string().optional(),
+  grantAdminConsent: z.boolean().optional()
+});
 
 type Options = z.infer<typeof options>;
 
@@ -42,14 +41,14 @@ class AppPermissionAddCommand extends AppCommand {
     return 'Adds the specified application and/or delegated permissions to the current Microsoft Entra app API permissions';
   }
 
-  public get schema(): z.ZodTypeAny | undefined {
+  public get schema(): z.ZodType | undefined {
     return options;
   }
 
-  public getRefinedSchema(schema: typeof options): z.ZodEffects<any> | undefined {
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
       .refine(options => options.applicationPermissions || options.delegatedPermissions, {
-        message: 'Specify at least one of applicationPermissions or delegatedPermissions, or both.',
+        error: 'Specify at least one of applicationPermissions or delegatedPermissions, or both.',
         path: ['delegatedPermissions']
       });
   }

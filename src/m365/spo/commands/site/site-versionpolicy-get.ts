@@ -1,21 +1,18 @@
-import commands from '../../commands.js';
-import { Logger } from '../../../../cli/Logger.js';
-import SpoCommand from '../../../base/SpoCommand.js';
-import { globalOptionsZod } from '../../../../Command.js';
 import { z } from 'zod';
-import { zod } from '../../../../utils/zod.js';
-import { validation } from '../../../../utils/validation.js';
+import { Logger } from '../../../../cli/Logger.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
 
-export const options = globalOptionsZod
-  .extend({
-    siteUrl: zod.alias('u', z.string()
-      .refine(url => validation.isValidSharePointUrl(url) === true, url => ({
-        message: `'${url}' is not a valid SharePoint Online site URL.`
-      }))
-    )
-  })
-  .strict();
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  siteUrl: z.string().alias('u')
+    .refine(url => validation.isValidSharePointUrl(url) === true, {
+      error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
+    })
+});
 
 declare type Options = z.infer<typeof options>;
 

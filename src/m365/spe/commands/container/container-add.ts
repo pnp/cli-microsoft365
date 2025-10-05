@@ -1,6 +1,5 @@
 import { globalOptionsZod } from '../../../../Command.js';
 import { z } from 'zod';
-import { zod } from '../../../../utils/zod.js';
 import { Logger } from '../../../../cli/Logger.js';
 import commands from '../../commands.js';
 import { validation } from '../../../../utils/validation.js';
@@ -8,23 +7,19 @@ import { spe } from '../../../../utils/spe.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 
-const options = globalOptionsZod
-  .extend({
-    name: zod.alias('n', z.string()),
-    description: zod.alias('d', z.string().optional()),
-    containerTypeId: z.string()
-      .refine(id => validation.isValidGuid(id), id => ({
-        message: `'${id}' is not a valid GUID.`
-      })).optional(),
-    containerTypeName: z.string().optional(),
-    ocrEnabled: z.boolean().optional(),
-    itemMajorVersionLimit: z.number()
-      .refine(numb => validation.isValidPositiveInteger(numb), numb => ({
-        message: `'${numb}' is not a valid positive integer.`
-      })).optional(),
-    itemVersioningEnabled: z.boolean().optional()
-  })
-  .strict();
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  name: z.string().alias('n'),
+  description: z.string().optional().alias('d'),
+  containerTypeId: z.uuid().optional(),
+  containerTypeName: z.string().optional(),
+  ocrEnabled: z.boolean().optional(),
+  itemMajorVersionLimit: z.number()
+    .refine(numb => validation.isValidPositiveInteger(numb), {
+      error: e => `'${e.input}' is not a valid positive integer.`
+    }).optional(),
+  itemVersioningEnabled: z.boolean().optional()
+});
 
 declare type Options = z.infer<typeof options>;
 
@@ -41,14 +36,14 @@ class SpeContainerAddCommand extends GraphCommand {
     return 'Creates a new container';
   }
 
-  public get schema(): z.ZodTypeAny {
+  public get schema(): z.ZodType {
     return options;
   }
 
-  public getRefinedSchema(schema: z.ZodTypeAny): z.ZodEffects<any> | undefined {
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
       .refine((options: Options) => [options.containerTypeId, options.containerTypeName].filter(o => o !== undefined).length === 1, {
-        message: 'Use one of the following options: containerTypeId or containerTypeName.'
+        error: 'Use one of the following options: containerTypeId or containerTypeName.'
       });
   }
 

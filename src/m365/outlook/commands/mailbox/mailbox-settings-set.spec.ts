@@ -1,19 +1,18 @@
 ﻿import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
-import commands from '../../commands.js';
-import request from '../../../../request.js';
+import { CommandError } from '../../../../Command.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
+import { cli } from '../../../../cli/cli.js';
+import request from '../../../../request.js';
 import { telemetry } from '../../../../telemetry.js';
+import { accessToken } from '../../../../utils/accessToken.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
-import command from './mailbox-settings-set.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
-import { CommandError } from '../../../../Command.js';
-import { z } from 'zod';
-import { CommandInfo } from '../../../../cli/CommandInfo.js';
-import { cli } from '../../../../cli/cli.js';
-import { accessToken } from '../../../../utils/accessToken.js';
+import commands from '../../commands.js';
+import command, { options } from './mailbox-settings-set.js';
 
 describe(commands.MAILBOX_SETTINGS_SET, () => {
   const userId = 'abcd1234-de71-4623-b4af-96380a352509';
@@ -63,7 +62,7 @@ describe(commands.MAILBOX_SETTINGS_SET, () => {
   let logger: Logger;
   let commandInfo: CommandInfo;
   let loggerLogSpy: sinon.SinonSpy;
-  let commandOptionsSchema: z.ZodTypeAny;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -78,7 +77,7 @@ describe(commands.MAILBOX_SETTINGS_SET, () => {
       };
     }
     commandInfo = cli.getCommandInfo(command);
-    commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -244,7 +243,7 @@ describe(commands.MAILBOX_SETTINGS_SET, () => {
     });
 
     await command.action(logger, {
-      options: result.data
+      options: result.data!
     });
     assert(loggerLogSpy.calledOnceWith(mailboxSettingsResponse));
   });
@@ -271,7 +270,7 @@ describe(commands.MAILBOX_SETTINGS_SET, () => {
     });
 
     await command.action(logger, {
-      options: result.data
+      options: result.data!
     });
 
     assert.deepStrictEqual(patchStub.lastCall.args[0].data, {
@@ -306,7 +305,7 @@ describe(commands.MAILBOX_SETTINGS_SET, () => {
     });
 
     await command.action(logger, {
-      options: result.data
+      options: result.data!
     });
 
     assert.deepStrictEqual(patchStub.lastCall.args[0].data, {
@@ -340,7 +339,7 @@ describe(commands.MAILBOX_SETTINGS_SET, () => {
       verbose: true
     });
 
-    await command.action(logger, { options: result.data });
+    await command.action(logger, { options: result.data! });
 
     assert.deepStrictEqual(patchStub.lastCall.args[0].data, {
       workingHours: {
@@ -365,7 +364,7 @@ describe(commands.MAILBOX_SETTINGS_SET, () => {
     });
 
     await command.action(logger, {
-      options: result.data
+      options: result.data!
     });
 
     assert.deepStrictEqual(patchStub.lastCall.args[0].data, {
@@ -389,7 +388,7 @@ describe(commands.MAILBOX_SETTINGS_SET, () => {
     });
 
     await command.action(logger, {
-      options: result.data
+      options: result.data!
     });
 
     assert.deepStrictEqual(patchStub.lastCall.args[0].data, {
@@ -413,7 +412,7 @@ describe(commands.MAILBOX_SETTINGS_SET, () => {
     });
 
     await command.action(logger, {
-      options: result.data
+      options: result.data!
     });
 
     assert.deepStrictEqual(patchStub.lastCall.args[0].data, {
@@ -437,7 +436,7 @@ describe(commands.MAILBOX_SETTINGS_SET, () => {
     });
 
     await command.action(logger, {
-      options: result.data
+      options: result.data!
     });
 
     assert.deepStrictEqual(patchStub.lastCall.args[0].data, {
@@ -461,7 +460,7 @@ describe(commands.MAILBOX_SETTINGS_SET, () => {
     });
 
     await command.action(logger, {
-      options: result.data
+      options: result.data!
     });
 
     assert.deepStrictEqual(patchStub.lastCall.args[0].data, {
@@ -485,7 +484,7 @@ describe(commands.MAILBOX_SETTINGS_SET, () => {
     });
 
     await command.action(logger, {
-      options: result.data
+      options: result.data!
     });
 
     assert.deepStrictEqual(patchStub.lastCall.args[0].data, {
@@ -511,7 +510,7 @@ describe(commands.MAILBOX_SETTINGS_SET, () => {
     });
 
     await command.action(logger, {
-      options: result.data
+      options: result.data!
     });
 
     assert.deepStrictEqual(patchStub.lastCall.args[0].data, {
@@ -537,7 +536,7 @@ describe(commands.MAILBOX_SETTINGS_SET, () => {
     });
 
     await command.action(logger, {
-      options: result.data
+      options: result.data!
     });
 
     assert.deepStrictEqual(patchStub.lastCall.args[0].data, {
@@ -563,7 +562,7 @@ describe(commands.MAILBOX_SETTINGS_SET, () => {
     });
 
     await command.action(logger, {
-      options: result.data
+      options: result.data!
     });
 
     assert.deepStrictEqual(patchStub.lastCall.args[0].data, {
@@ -589,7 +588,7 @@ describe(commands.MAILBOX_SETTINGS_SET, () => {
     });
 
     await command.action(logger, {
-      options: result.data
+      options: result.data!
     });
 
     assert.deepStrictEqual(patchStub.lastCall.args[0].data, {
@@ -605,17 +604,17 @@ describe(commands.MAILBOX_SETTINGS_SET, () => {
 
     const result = commandOptionsSchema.safeParse({ timeFormat: 'HH:mm', verbose: true });
 
-    await assert.rejects(command.action(logger, { options: result.data }), new CommandError('When running with application permissions either userId or userName is required'));
+    await assert.rejects(command.action(logger, { options: result.data! }), new CommandError('When running with application permissions either userId or userName is required'));
   });
 
   it('fails updating mailbox settings of the signed-in user if userId is specified', async () => {
     const result = commandOptionsSchema.safeParse({ userId: userId, timeFormat: 'HH:mm', verbose: true });
-    await assert.rejects(command.action(logger, { options: result.data }), new CommandError('You can update mailbox settings of other users only if CLI is authenticated in app-only mode'));
+    await assert.rejects(command.action(logger, { options: result.data! }), new CommandError('You can update mailbox settings of other users only if CLI is authenticated in app-only mode'));
   });
 
   it('fails updating mailbox settings of the signed-in user if userName is specified', async () => {
     const result = commandOptionsSchema.safeParse({ userName: userName, timeFormat: 'HH:mm', verbose: true });
-    await assert.rejects(command.action(logger, { options: result.data }), new CommandError('You can update mailbox settings of other users only if CLI is authenticated in app-only mode'));
+    await assert.rejects(command.action(logger, { options: result.data! }), new CommandError('You can update mailbox settings of other users only if CLI is authenticated in app-only mode'));
   });
 
   it('correctly handles API OData error', async () => {
@@ -630,6 +629,6 @@ describe(commands.MAILBOX_SETTINGS_SET, () => {
       }
     });
     const result = commandOptionsSchema.safeParse({ dateFormat: 'dd.MM.yyy' });
-    await assert.rejects(command.action(logger, { options: result.data }), new CommandError('Invalid request'));
+    await assert.rejects(command.action(logger, { options: result.data! }), new CommandError('Invalid request'));
   });
 });

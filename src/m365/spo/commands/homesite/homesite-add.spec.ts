@@ -2,25 +2,24 @@ import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
 import { cli } from '../../../../cli/cli.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
-import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import request from '../../../../request.js';
 import { telemetry } from '../../../../telemetry.js';
+import { entraGroup } from '../../../../utils/entraGroup.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from '../homesite/homesite-add.js';
-import { z } from 'zod';
-import { entraGroup } from '../../../../utils/entraGroup.js';
+import command, { options } from '../homesite/homesite-add.js';
 
 describe(commands.HOMESITE_ADD, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
-  let commandOptionsSchema: z.ZodTypeAny;
+  let commandOptionsSchema: typeof options;
 
   const homeSite = "https://contoso.sharepoint.com/sites/testcomms";
   const homeSites = {
@@ -61,7 +60,7 @@ describe(commands.HOMESITE_ADD, () => {
     auth.connection.active = true;
     auth.connection.spoUrl = 'https://contoso.sharepoint.com';
     commandInfo = cli.getCommandInfo(command);
-    commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {

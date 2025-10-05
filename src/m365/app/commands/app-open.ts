@@ -6,11 +6,10 @@ import { browserUtil } from '../../../utils/browserUtil.js';
 import AppCommand, { appCommandOptions } from '../../base/AppCommand.js';
 import commands from '../commands.js';
 
-const options = appCommandOptions
-  .extend({
-    preview: z.boolean().optional().default(false)
-  })
-  .strict();
+export const options = z.strictObject({
+  ...appCommandOptions.shape,
+  preview: z.boolean().optional().default(false)
+});
 type Options = z.infer<typeof options>;
 
 interface CommandArgs {
@@ -26,7 +25,7 @@ class AppOpenCommand extends AppCommand {
     return 'Opens Microsoft Entra app in the Microsoft Entra ID portal';
   }
 
-  public get schema(): z.ZodTypeAny | undefined {
+  public get schema(): z.ZodType | undefined {
     return options;
   }
 

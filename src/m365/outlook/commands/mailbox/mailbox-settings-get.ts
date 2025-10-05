@@ -1,6 +1,5 @@
 ﻿import { z } from 'zod';
 import { globalOptionsZod } from '../../../../Command.js';
-import { zod } from '../../../../utils/zod.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import { Logger } from '../../../../cli/Logger.js';
 import commands from '../../commands.js';
@@ -10,16 +9,13 @@ import { MailboxSettings } from '@microsoft/microsoft-graph-types';
 import { accessToken } from '../../../../utils/accessToken.js';
 import auth from '../../../../Auth.js';
 
-const options = globalOptionsZod
-  .extend({
-    userId: zod.alias('i', z.string().refine(id => validation.isValidGuid(id), id => ({
-      message: `'${id}' is not a valid GUID.`
-    })).optional()),
-    userName: zod.alias('n', z.string().refine(name => validation.isValidUserPrincipalName(name), name => ({
-      message: `'${name}' is not a valid UPN.`
-    })).optional())
-  })
-  .strict();
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  userId: z.uuid().optional().alias('i'),
+  userName: z.string().refine(name => validation.isValidUserPrincipalName(name), {
+    error: e => `'${e.input}' is not a valid UPN.`
+  }).optional().alias('n')
+});
 
 declare type Options = z.infer<typeof options>;
 
@@ -36,14 +32,14 @@ class OutlookMailboxSettingsGetCommand extends GraphCommand {
     return `Get the user's mailbox settings`;
   }
 
-  public get schema(): z.ZodTypeAny | undefined {
+  public get schema(): z.ZodType | undefined {
     return options;
   }
 
-  public getRefinedSchema(schema: typeof options): z.ZodEffects<any> | undefined {
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
       .refine(options => !(options.userId && options.userName), {
-        message: 'Specify either userId or userName, but not both'
+        error: 'Specify either userId or userName, but not both'
       });
   }
 

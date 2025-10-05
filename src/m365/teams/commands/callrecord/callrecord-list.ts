@@ -7,46 +7,42 @@ import { validation } from '../../../../utils/validation.js';
 import { entraUser } from '../../../../utils/entraUser.js';
 import { odata } from '../../../../utils/odata.js';
 
-const options = globalOptionsZod
-  .extend({
-    userId: z.string()
-      .refine((val) => validation.isValidGuid(val), {
-        message: 'Invalid GUID.'
-      }).optional(),
-    userName: z.string()
-      .refine((val) => validation.isValidUserPrincipalName(val), {
-        message: 'Invalid user principal name.'
-      }).optional(),
-    startDateTime: z.string()
-      .refine((val) => {
-        if (!validation.isValidISODateTime(val)) {
-          return false;
-        }
-        const date = new Date(val);
-        const maxDate = new Date();
-        const minDate = new Date();
-        minDate.setDate(maxDate.getDate() - 30);
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  userId: z.uuid().optional(),
+  userName: z.string()
+    .refine((val) => validation.isValidUserPrincipalName(val), {
+      message: 'Invalid user principal name.'
+    }).optional(),
+  startDateTime: z.string()
+    .refine((val) => {
+      if (!validation.isValidISODateTime(val)) {
+        return false;
+      }
+      const date = new Date(val);
+      const maxDate = new Date();
+      const minDate = new Date();
+      minDate.setDate(maxDate.getDate() - 30);
 
-        return date >= minDate && date <= maxDate;
-      }, {
-        message: 'Date must be a valid ISO date within the last 30 days and not in the future.'
-      }).optional(),
-    endDateTime: z.string()
-      .refine((val) => {
-        if (!validation.isValidISODateTime(val)) {
-          return false;
-        }
-        const date = new Date(val);
-        const maxDate = new Date();
-        const minDate = new Date();
-        minDate.setDate(maxDate.getDate() - 30);
+      return date >= minDate && date <= maxDate;
+    }, {
+      message: 'Date must be a valid ISO date within the last 30 days and not in the future.'
+    }).optional(),
+  endDateTime: z.string()
+    .refine((val) => {
+      if (!validation.isValidISODateTime(val)) {
+        return false;
+      }
+      const date = new Date(val);
+      const maxDate = new Date();
+      const minDate = new Date();
+      minDate.setDate(maxDate.getDate() - 30);
 
-        return date >= minDate && date <= maxDate;
-      }, {
-        message: 'Date must be a valid ISO date within the last 30 days and not in the future.'
-      }).optional()
-  })
-  .strict();
+      return date >= minDate && date <= maxDate;
+    }, {
+      message: 'Date must be a valid ISO date within the last 30 days and not in the future.'
+    }).optional()
+});
 declare type Options = z.infer<typeof options>;
 
 interface CommandArgs {
@@ -66,14 +62,14 @@ class TeamsCallRecordListCommand extends GraphApplicationCommand {
     return ['id', 'type', 'startDateTime', 'endDateTime'];
   }
 
-  public get schema(): z.ZodTypeAny {
+  public get schema(): z.ZodType {
     return options;
   }
 
-  public getRefinedSchema(schema: z.ZodTypeAny): z.ZodEffects<any> | undefined {
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
       .refine((options: Options) => [options.userId, options.userName].filter(o => o !== undefined).length <= 1, {
-        message: 'Use one of the following options: userId or userName but not both.'
+        error: 'Use one of the following options: userId or userName but not both.'
       })
       .refine((options: Options) => [options.startDateTime, options.endDateTime].filter(o => o !== undefined).length <= 1 || new Date(options.startDateTime!) < new Date(options.endDateTime!), {
         message: 'Value of startDateTime, must be before endDateTime.'

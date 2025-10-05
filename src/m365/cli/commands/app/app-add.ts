@@ -1,6 +1,5 @@
 import { z } from 'zod';
 import { globalOptionsZod } from '../../../../Command.js';
-import { zod } from '../../../../utils/zod.js';
 import config from '../../../../config.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
@@ -10,13 +9,12 @@ import { AppCreationOptions, AppInfo, entraApp } from '../../../../utils/entraAp
 import { accessToken } from '../../../../utils/accessToken.js';
 import auth from '../../../../Auth.js';
 
-const options = globalOptionsZod
-  .extend({
-    name: zod.alias('n', z.string().optional().default('CLI for M365')),
-    scopes: zod.alias('s', z.string().optional().default('minimal')),
-    saveToConfig: z.boolean().optional()
-  })
-  .strict();
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  name: z.string().optional().default('CLI for M365').alias('n'),
+  scopes: z.string().optional().default('minimal').alias('s'),
+  saveToConfig: z.boolean().optional()
+});
 
 declare type Options = z.infer<typeof options>;
 
@@ -33,11 +31,11 @@ class CliAppAddCommand extends GraphCommand {
     return 'Creates a Microsoft Entra application registration for CLI for Microsoft 365';
   }
 
-  public get schema(): z.ZodTypeAny | undefined {
+  public get schema(): z.ZodType | undefined {
     return options;
   }
 
-  public getRefinedSchema(schema: typeof options): z.ZodEffects<any> | undefined {
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
       .refine(options => {
         const scopes = options.scopes;

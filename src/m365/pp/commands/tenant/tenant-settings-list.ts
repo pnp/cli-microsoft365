@@ -5,7 +5,7 @@ import request, { CliRequestOptions } from '../../../../request.js';
 import PowerPlatformCommand from '../../../base/PowerPlatformCommand.js';
 import commands from '../../commands.js';
 
-const options = globalOptionsZod.strict();
+export const options = globalOptionsZod.strict();
 
 class PpTenantSettingsListCommand extends PowerPlatformCommand {
   public get name(): string {

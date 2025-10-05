@@ -2,37 +2,28 @@ import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
 import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
-import { zod } from '../../../../utils/zod.js';
 import commands from '../../commands.js';
 import GraphCommand from '../../../base/GraphCommand.js';
-import { validation } from '../../../../utils/validation.js';
 import { entraApp } from '../../../../utils/entraApp.js';
 import { cli } from '../../../../cli/cli.js';
 import { directoryExtension } from '../../../../utils/directoryExtension.js';
 
-const options = globalOptionsZod
-  .extend({
-    id: zod.alias('i', z.string().refine(id => validation.isValidGuid(id), id => ({
-      message: `'${id}' is not a valid GUID.`
-    })).optional()),
-    name: zod.alias('n', z.string().optional()),
-    appId: z.string().refine(id => validation.isValidGuid(id), id => ({
-      message: `'${id}' is not a valid GUID.`
-    })).optional(),
-    appObjectId: z.string().refine(id => validation.isValidGuid(id), id => ({
-      message: `'${id}' is not a valid GUID.`
-    })).optional(),
-    appName: z.string().optional(),
-    force: zod.alias('f', z.boolean().optional())
-  })
-  .strict();
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  id: z.uuid().optional().alias('i'),
+  name: z.string().optional().alias('n'),
+  appId: z.uuid().optional(),
+  appObjectId: z.uuid().optional(),
+  appName: z.string().optional(),
+  force: z.boolean().optional().alias('f')
+});
 declare type Options = z.infer<typeof options>;
 
 interface CommandArgs {
   options: Options;
 }
 
-class GraphDirectoryExtensionRemoveCommand extends GraphCommand{
+class GraphDirectoryExtensionRemoveCommand extends GraphCommand {
   public get name(): string {
     return commands.DIRECTORYEXTENSION_REMOVE;
   }
@@ -41,20 +32,20 @@ class GraphDirectoryExtensionRemoveCommand extends GraphCommand{
     return 'Removes a directory extension';
   }
 
-  public get schema(): z.ZodTypeAny | undefined {
+  public get schema(): z.ZodType | undefined {
     return options;
   }
 
-  public getRefinedSchema(schema: typeof options): z.ZodEffects<any> | undefined {
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
       .refine(options => !options.id !== !options.name, {
-        message: 'Specify either id or name, but not both'
+        error: 'Specify either id or name, but not both'
       })
       .refine(options => options.id || options.name, {
-        message: 'Specify either id or name'
+        error: 'Specify either id or name'
       })
       .refine(options => Object.values([options.appId, options.appObjectId, options.appName]).filter(v => typeof v !== 'undefined').length === 1, {
-        message: 'Specify either appId, appObjectId or appName, but not multiple'
+        error: 'Specify either appId, appObjectId or appName, but not multiple'
       });
   }
 

@@ -11,15 +11,14 @@ import { formatting } from '../../../../utils/formatting.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
-import { z } from 'zod';
 import commands from '../../commands.js';
-import command from './file-version-keep.js';
+import command, { options } from './file-version-keep.js';
 
 describe(commands.FILE_VERSION_KEEP, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
-  let commandOptionsSchema: z.ZodTypeAny;
+  let commandOptionsSchema: typeof options;
   const validWebUrl = "https://contoso.sharepoint.com";
   const validFileUrl = "/Shared Documents/Document.docx";
   const validFileId = "7a9b8bb6-d5c4-4de9-ab76-5210a7879e89";
@@ -31,7 +30,7 @@ describe(commands.FILE_VERSION_KEEP, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     commandInfo = cli.getCommandInfo(command);
-    commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
     auth.connection.active = true;
   });
 

@@ -1,18 +1,17 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
-import commands from '../../commands.js';
-import request from '../../../../request.js';
+import { CommandError } from '../../../../Command.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
+import { cli } from '../../../../cli/cli.js';
+import request from '../../../../request.js';
 import { telemetry } from '../../../../telemetry.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
-import command from './rolepermission-list.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
-import { CommandError } from '../../../../Command.js';
-import { z } from 'zod';
-import { CommandInfo } from '../../../../cli/CommandInfo.js';
-import { cli } from '../../../../cli/cli.js';
+import commands from '../../commands.js';
+import command, { options } from './rolepermission-list.js';
 
 describe(commands.ROLEDEFINITION_LIST, () => {
   const resourceNamespace = 'microsoft.directory';
@@ -75,7 +74,7 @@ describe(commands.ROLEDEFINITION_LIST, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
-  let commandOptionsSchema: z.ZodTypeAny;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -84,7 +83,7 @@ describe(commands.ROLEDEFINITION_LIST, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
-    commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -142,7 +141,7 @@ describe(commands.ROLEDEFINITION_LIST, () => {
       verbose: true
     });
     await command.action(logger, {
-      options: parsedSchema.data
+      options: parsedSchema.data!
     });
 
     assert(loggerLogSpy.calledWith(resourceActions));
@@ -165,7 +164,7 @@ describe(commands.ROLEDEFINITION_LIST, () => {
       verbose: true
     });
     await command.action(logger, {
-      options: parsedSchema.data
+      options: parsedSchema.data!
     });
 
     assert(loggerLogSpy.calledWith(filteredResourceActions));
@@ -184,7 +183,7 @@ describe(commands.ROLEDEFINITION_LIST, () => {
       verbose: true
     });
     await assert.rejects(
-      command.action(logger, { options: parsedSchema.data }),
+      command.action(logger, { options: parsedSchema.data! }),
       new CommandError('An error has occurred')
     );
   });

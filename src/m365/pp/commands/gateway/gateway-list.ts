@@ -5,7 +5,7 @@ import request from '../../../../request.js';
 import PowerBICommand from '../../../base/PowerBICommand.js';
 import commands from '../../commands.js';
 
-const options = globalOptionsZod.strict();
+export const options = globalOptionsZod.strict();
 
 class PpGatewayListCommand extends PowerBICommand {
   public get name(): string {

@@ -3,17 +3,15 @@ import { z } from 'zod';
 import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError, globalOptionsZod } from '../../../../Command.js';
-import { zod } from '../../../../utils/zod.js';
 import ContextCommand from '../../../base/ContextCommand.js';
 import { M365RcJson } from '../../../base/M365RcJson.js';
 import commands from '../../commands.js';
 
-const options = globalOptionsZod
-  .extend({
-    name: zod.alias('n', z.string()),
-    force: zod.alias('f', z.boolean().optional())
-  })
-  .strict();
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  name: z.string().alias('n'),
+  force: z.boolean().optional().alias('f')
+});
 
 declare type Options = z.infer<typeof options>;
 
@@ -30,7 +28,7 @@ class ContextOptionRemoveCommand extends ContextCommand {
     return 'Removes an already available name from local context file.';
   }
 
-  public get schema(): z.ZodTypeAny | undefined {
+  public get schema(): z.ZodType | undefined {
     return options;
   }
 

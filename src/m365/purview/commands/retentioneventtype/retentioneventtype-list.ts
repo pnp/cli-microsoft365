@@ -5,7 +5,7 @@ import { odata } from '../../../../utils/odata.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 
-const options = globalOptionsZod.strict();
+export const options = globalOptionsZod.strict();
 
 class PurviewRetentionEventTypeListCommand extends GraphCommand {
   public get name(): string {

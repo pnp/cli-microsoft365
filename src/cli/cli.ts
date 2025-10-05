@@ -186,15 +186,15 @@ async function execute(rawArgs: string[]): Promise<void> {
         break;
       }
       else {
-        const hasNonRequiredErrors = result.error.errors.some(e => e.code !== 'invalid_type' || e.received !== 'undefined');
+        const hasNonRequiredErrors = result.error.issues.some(i => i.code !== 'invalid_type');
         const shouldPrompt = cli.getSettingWithDefaultValue<boolean>(settingsNames.prompt, true);
 
         if (hasNonRequiredErrors === false &&
           shouldPrompt) {
           await cli.error('🌶️  Provide values for the following parameters:');
 
-          for (const error of result.error.errors) {
-            const optionName = error.path.join('.');
+          for (const issue of result.error.issues) {
+            const optionName = issue.path.join('.');
             const optionInfo = cli.commandToExecute.options.find(o => o.name === optionName);
             const answer = await cli.promptForValue(optionInfo!);
             // coerce the answer to the correct type
@@ -208,10 +208,10 @@ async function execute(rawArgs: string[]): Promise<void> {
           }
         }
         else {
-          result.error.errors.forEach(e => {
-            if (e.code === 'invalid_type' &&
-              e.received === 'undefined') {
-              e.message = `Required option not specified`;
+          result.error.issues.forEach(i => {
+            if (i.code === 'invalid_type' &&
+              i.input === undefined) {
+              (i.message as any) = `Required option not specified`;
             }
           });
           return cli.closeWithError(result.error, cli.optionsFromArgs, true);
@@ -940,7 +940,7 @@ async function closeWithError(error: any, args: CommandArgs, showHelpIfEnabled: 
   let errorMessage: string = error instanceof CommandError ? error.message : error;
 
   if (error instanceof ZodError) {
-    errorMessage = error.errors.map(e => (e.path.length > 0 ? `${e.path.join('.')}: ${e.message}` : e.message)).join(os.EOL);
+    errorMessage = error.issues.map(i => (i.path.length > 0 ? `${i.path.join('.')}: ${i.message}` : i.message)).join(os.EOL);
   }
 
   if ((!args.options.output || args.options.output === 'json') &&

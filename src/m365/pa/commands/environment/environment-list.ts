@@ -5,7 +5,7 @@ import commands from '../../commands.js';
 import { globalOptionsZod } from '../../../../Command.js';
 import { z } from 'zod';
 
-const options = globalOptionsZod.strict();
+export const options = z.strictObject({ ...globalOptionsZod.shape });
 
 class PaEnvironmentListCommand extends PowerAppsCommand {
   public get name(): string {
@@ -16,7 +16,7 @@ class PaEnvironmentListCommand extends PowerAppsCommand {
     return 'Lists Microsoft Power Apps environments in the current tenant';
   }
 
-  public get schema(): z.ZodTypeAny | undefined {
+  public get schema(): z.ZodType | undefined {
     return options;
   }
 

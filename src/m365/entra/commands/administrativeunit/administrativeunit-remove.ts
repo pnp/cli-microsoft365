@@ -4,17 +4,15 @@ import { Logger } from '../../../../cli/Logger.js';
 import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { entraAdministrativeUnit } from '../../../../utils/entraAdministrativeUnit.js';
-import { zod } from '../../../../utils/zod.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 
-const options = globalOptionsZod
-  .extend({
-    id: zod.alias('i', z.string().uuid().optional()),
-    displayName: zod.alias('n', z.string().optional()),
-    force: zod.alias('f', z.boolean().optional())
-  })
-  .strict();
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  id: z.uuid().optional().alias('i'),
+  displayName: z.string().optional().alias('n'),
+  force: z.boolean().optional().alias('f')
+});
 
 declare type Options = z.infer<typeof options>;
 
@@ -30,17 +28,17 @@ class EntraAdministrativeUnitRemoveCommand extends GraphCommand {
     return 'Removes an administrative unit';
   }
 
-  public get schema(): z.ZodTypeAny | undefined {
+  public get schema(): z.ZodType | undefined {
     return options;
   }
 
-  public getRefinedSchema(schema: typeof options): z.ZodEffects<any> | undefined {
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
       .refine(options => options.id || options.displayName, {
-        message: 'Specify either id or displayName'
+        error: 'Specify either id or displayName'
       })
       .refine(options => !(options.id && options.displayName), {
-        message: 'Specify either id or displayName but not both'
+        error: 'Specify either id or displayName but not both'
       });
   }
 

@@ -4,7 +4,6 @@ import { Logger } from '../../../../cli/Logger.js';
 import commands from '../../commands.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
-import { zod } from '../../../../utils/zod.js';
 import { cli } from '../../../../cli/cli.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
@@ -14,21 +13,18 @@ import { PageControl } from './PageControl.js';
 import { ClientSideControl } from './ClientSideControl.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
 
-const options = globalOptionsZod
-  .extend({
-    webUrl: zod.alias('u', z.string())
-      .refine(url => validation.isValidSharePointUrl(url) === true, url => ({
-        message: `'${url}' is not a valid SharePoint URL.`
-      })),
-    pageName: zod.alias('n', z.string()),
-    id: zod.alias('i', z.string())
-      .refine(id => validation.isValidGuid(id), id => ({
-        message: `'${id}' is not a valid GUID.`
-      })),
-    draft: z.boolean().optional(),
-    force: zod.alias('f', z.boolean().optional())
-  })
-  .strict();
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  webUrl: z.string()
+    .refine(url => validation.isValidSharePointUrl(url) === true, {
+      error: e => `'${e.input}' is not a valid SharePoint URL.`
+    })
+    .alias('u'),
+  pageName: z.string().alias('n'),
+  id: z.uuid().alias('i'),
+  draft: z.boolean().optional(),
+  force: z.boolean().optional().alias('f')
+});
 
 declare type Options = z.infer<typeof options>;
 
@@ -45,7 +41,7 @@ class SpoPageControlRemoveCommand extends SpoCommand {
     return 'Removes a control from a modern page';
   }
 
-  public get schema(): z.ZodTypeAny {
+  public get schema(): z.ZodType {
     return options;
   }
 

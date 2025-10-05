@@ -1,19 +1,18 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from "../../../../cli/CommandInfo.js";
 import { Logger } from '../../../../cli/Logger.js';
+import { CommandError } from '../../../../Command.js';
+import config from '../../../../config.js';
 import request from '../../../../request.js';
 import { telemetry } from '../../../../telemetry.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
-import { cli } from '../../../../cli/cli.js';
 import commands from '../../commands.js';
-import command from './containertype-remove.js';
-import { z } from 'zod';
-import { CommandError } from '../../../../Command.js';
-import config from '../../../../config.js';
+import command, { options } from './containertype-remove.js';
 
 describe(commands.CONTAINERTYPE_REMOVE, () => {
   const spoAdminUrl = 'https://contoso-admin.sharepoint.com';
@@ -23,7 +22,7 @@ describe(commands.CONTAINERTYPE_REMOVE, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
-  let commandOptionsSchema: z.ZodTypeAny;
+  let commandOptionsSchema: typeof options;
   let confirmationPromptStub: sinon.SinonStub;
 
   const CsomContainerTypeResponse = [
@@ -68,7 +67,7 @@ describe(commands.CONTAINERTYPE_REMOVE, () => {
     auth.connection.active = true;
     auth.connection.spoUrl = spoAdminUrl.replace('-admin.sharepoint.com', '.sharepoint.com');
     commandInfo = cli.getCommandInfo(command);
-    commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {

@@ -7,7 +7,6 @@ import { telemetry } from '../../../telemetry.js';
 import { pid } from '../../../utils/pid.js';
 import { session } from '../../../utils/session.js';
 import commands from '../commands.js';
-
 import { browserUtil } from '../../../utils/browserUtil.js';
 import command from './cli-issue.js';
 

@@ -1,6 +1,5 @@
 import { z } from 'zod';
 import { globalOptionsZod } from '../../../../Command.js';
-import { zod } from '../../../../utils/zod.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import { Logger } from '../../../../cli/Logger.js';
 import commands from '../../commands.js';
@@ -9,28 +8,25 @@ import request, { CliRequestOptions } from '../../../../request.js';
 import { Organization } from '@microsoft/microsoft-graph-types';
 import { odata } from '../../../../utils/odata.js';
 
-const options = globalOptionsZod
-  .extend({
-    id: zod.alias('i', z.string().refine(id => validation.isValidGuid(id), id => ({
-      message: `'${id}' is not a valid GUID.`
-    })).optional()),
-    displayName: zod.alias('d', z.string().optional()),
-    marketingNotificationEmails: z.string().refine(emails => validation.isValidUserPrincipalNameArray(emails) === true, invalidEmails => ({
-      message: `The following marketing notification emails are invalid: ${invalidEmails}.`
-    })).transform((value) => value.split(',')).optional(),
-    securityComplianceNotificationMails: z.string().refine(emails => validation.isValidUserPrincipalNameArray(emails) === true, invalidEmails => ({
-      message: `The following security compliance notification emails are invalid: ${invalidEmails}.`
-    })).transform((value) => value.split(',')).optional(),
-    securityComplianceNotificationPhones: z.string().transform((value) => value.split(',')).optional(),
-    technicalNotificationMails: z.string().refine(emails => validation.isValidUserPrincipalNameArray(emails) === true, invalidEmails => ({
-      message: `The following technical notification emails are invalid: ${invalidEmails}.`
-    })).transform((value) => value.split(',')).optional(),
-    contactEmail: z.string().refine(id => validation.isValidUserPrincipalName(id), id => ({
-      message: `'${id}' is not a valid email.`
-    })).optional(),
-    statementUrl: z.string().optional()
-  })
-  .strict();
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  id: z.uuid().optional().alias('i'),
+  displayName: z.string().optional().alias('d'),
+  marketingNotificationEmails: z.string().refine(emails => validation.isValidUserPrincipalNameArray(emails) === true, {
+    error: e => `The following marketing notification emails are invalid: ${e.input}.`
+  }).transform((value) => value.split(',')).optional(),
+  securityComplianceNotificationMails: z.string().refine(emails => validation.isValidUserPrincipalNameArray(emails) === true, {
+    error: e => `The following security compliance notification emails are invalid: ${e.input}.`
+  }).transform((value) => value.split(',')).optional(),
+  securityComplianceNotificationPhones: z.string().transform((value) => value.split(',')).optional(),
+  technicalNotificationMails: z.string().refine(emails => validation.isValidUserPrincipalNameArray(emails) === true, {
+    error: e => `The following technical notification emails are invalid: ${e.input}.`
+  }).transform((value) => value.split(',')).optional(),
+  contactEmail: z.string().refine(id => validation.isValidUserPrincipalName(id), {
+    error: e => `'${e.input}' is not a valid email.`
+  }).optional(),
+  statementUrl: z.string().optional()
+});
 declare type Options = z.infer<typeof options>;
 
 interface CommandArgs {
@@ -46,21 +42,22 @@ class EntraOrganizationSetCommand extends GraphCommand {
     return 'Updates info about the organization';
   }
 
-  public get schema(): z.ZodTypeAny | undefined {
+  public get schema(): z.ZodType | undefined {
     return options;
   }
 
-  public getRefinedSchema(schema: typeof options): z.ZodEffects<any> | undefined {
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
       .refine(options => !(options.id && options.displayName), {
-        message: 'Specify either id or displayName, but not both'
+        error: 'Specify either id or displayName, but not both'
       })
       .refine(options => options.id || options.displayName, {
-        message: 'Specify either id or displayName'
+        error: 'Specify either id or displayName'
       })
-      .refine(options => [options.contactEmail, options.marketingNotificationEmails, options.securityComplianceNotificationMails, options.securityComplianceNotificationPhones,
+      .refine(options => [
+        options.contactEmail, options.marketingNotificationEmails, options.securityComplianceNotificationMails, options.securityComplianceNotificationPhones,
         options.statementUrl, options.technicalNotificationMails].filter(o => o !== undefined).length > 0, {
-        message: 'Specify at least one of the following options: contactEmail, marketingNotificationEmails, securityComplianceNotificationMails, securityComplianceNotificationPhones, statementUrl, or technicalNotificationMails'
+        error: 'Specify at least one of the following options: contactEmail, marketingNotificationEmails, securityComplianceNotificationMails, securityComplianceNotificationPhones, statementUrl, or technicalNotificationMails'
       });
   }
 

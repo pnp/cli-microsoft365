@@ -5,14 +5,12 @@ import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 import { z } from 'zod';
 import { globalOptionsZod } from '../../../../Command.js';
-import { zod } from '../../../../utils/zod.js';
 
-const options = globalOptionsZod
-  .extend({
-    properties: zod.alias('p', z.string().optional()),
-    filter: zod.alias('f', z.string().optional())
-  })
-  .strict();
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  properties: z.string().optional().alias('p'),
+  filter: z.string().optional().alias('f')
+});
 
 declare type Options = z.infer<typeof options>;
 
@@ -33,7 +31,7 @@ class EntraRoleDefinitionListCommand extends GraphCommand {
     return ['id', 'displayName', 'isBuiltIn', 'isEnabled'];
   }
 
-  public get schema(): z.ZodTypeAny | undefined {
+  public get schema(): z.ZodType | undefined {
     return options;
   }
 

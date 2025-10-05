@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import { zod } from '../../../../utils/zod.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { globalOptionsZod } from '../../../../Command.js';
 import { spo } from '../../../../utils/spo.js';
@@ -9,26 +8,24 @@ import commands from '../../commands.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { entraGroup } from '../../../../utils/entraGroup.js';
 
-const options = globalOptionsZod
-  .extend({
-    url: zod.alias('u', z.string()
-      .refine((url: string) => validation.isValidSharePointUrl(url) === true, url => ({
-        message: `'${url}' is not a valid SharePoint Online site URL.`
-      }))
-    ),
-    audienceIds: z.string()
-      .refine(audiences => validation.isValidGuidArray(audiences) === true, audiences => ({
-        message: `The following GUIDs are invalid: ${validation.isValidGuidArray(audiences)}.`
-      })).optional(),
-    audienceNames: z.string().optional(),
-    vivaConnectionsDefaultStart: z.boolean().optional(),
-    isInDraftMode: z.boolean().optional(),
-    order: z.number()
-      .refine(order => validation.isValidPositiveInteger(order) === true, order => ({
-        message: `'${order}' is not a positive integer.`
-      })).optional()
-  })
-  .strict();
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  url: z.string()
+    .refine(url => validation.isValidSharePointUrl(url) === true, {
+      error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
+    }).alias('u'),
+  audienceIds: z.string()
+    .refine(audiences => validation.isValidGuidArray(audiences) === true, {
+      error: e => `The following GUIDs are invalid: ${e.input}.`
+    }).optional(),
+  audienceNames: z.string().optional(),
+  vivaConnectionsDefaultStart: z.boolean().optional(),
+  isInDraftMode: z.boolean().optional(),
+  order: z.number()
+    .refine(order => validation.isValidPositiveInteger(order) === true, {
+      error: e => `'${e.input}' is not a positive integer.`
+    }).optional()
+});
 
 declare type Options = z.infer<typeof options>;
 interface CommandArgs {
@@ -44,11 +41,11 @@ class SpoHomeSiteAddCommand extends SpoCommand {
     return 'Adds a home site';
   }
 
-  public get schema(): z.ZodTypeAny {
+  public get schema(): z.ZodType {
     return options;
   }
 
-  public getRefinedSchema(schema: z.ZodTypeAny): z.ZodEffects<any> | undefined {
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
       .refine(
         (options: Options) => [options.audienceIds, options.audienceNames].filter(o => o !== undefined).length <= 1,

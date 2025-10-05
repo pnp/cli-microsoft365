@@ -2,17 +2,15 @@ import { z } from 'zod';
 import { globalOptionsZod } from '../../../../Command.js';
 import { Logger } from '../../../../cli/Logger.js';
 import request, { CliRequestOptions } from '../../../../request.js';
-import { zod } from '../../../../utils/zod.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 
-const options = globalOptionsZod
-  .extend({
-    enabled: zod.alias('e', z.boolean())
-  })
-  .strict();
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  enabled: z.boolean().alias('e')
+});
 
-declare type Options = z.infer<typeof options>;
+export declare type Options = z.infer<typeof options>;
 
 interface CommandArgs {
   options: Options;
@@ -27,7 +25,7 @@ class TenantPeoplePronounsSetCommand extends GraphCommand {
     return 'Manage pronouns settings for an organization';
   }
 
-  public get schema(): z.ZodTypeAny | undefined {
+  public get schema(): z.ZodType | undefined {
     return options;
   }
 

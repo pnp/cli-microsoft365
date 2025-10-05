@@ -4,17 +4,16 @@ import auth from '../../../../Auth.js';
 import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
+import { CommandError } from '../../../../Command.js';
 import { telemetry } from '../../../../telemetry.js';
+import { accessToken } from '../../../../utils/accessToken.js';
+import { entraUser } from '../../../../utils/entraUser.js';
+import { odata } from '../../../../utils/odata.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
-import { z } from 'zod';
 import commands from '../../commands.js';
-import command from './callrecord-list.js';
-import { odata } from '../../../../utils/odata.js';
-import { accessToken } from '../../../../utils/accessToken.js';
-import { entraUser } from '../../../../utils/entraUser.js';
-import { CommandError } from '../../../../Command.js';
+import command, { options } from './callrecord-list.js';
 
 describe(commands.CALLRECORD_LIST, () => {
   const validStartDateTime = new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString();
@@ -201,7 +200,7 @@ describe(commands.CALLRECORD_LIST, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
-  let commandOptionsSchema: z.ZodTypeAny;
+  let commandOptionsSchema: typeof options;
   let assertAccessTokenTypeStub: sinon.SinonStub;
 
   before(() => {
@@ -212,7 +211,7 @@ describe(commands.CALLRECORD_LIST, () => {
 
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
-    commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {

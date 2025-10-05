@@ -2,22 +2,21 @@ import { Logger } from '../../../../cli/Logger.js';
 import { globalOptionsZod } from '../../../../Command.js';
 import { powerPlatform } from '../../../../utils/powerPlatform.js';
 import { validation } from '../../../../utils/validation.js';
-import { zod } from '../../../../utils/zod.js';
 import PowerPlatformCommand from '../../../base/PowerPlatformCommand.js';
 import commands from '../../commands.js';
 import { z } from 'zod';
 
-const options = globalOptionsZod
-  .extend({
-    url: zod.alias('u', z.string().optional()
-      .refine(url => url === undefined || validation.isValidPowerPagesUrl(url) === true, url => ({
-        message: `'${url}' is not a valid Power Pages URL.`
-      }))
-    ),
-    id: zod.alias('i', z.string().uuid().optional()),
-    name: zod.alias('n', z.string().optional()),
-    environmentName: zod.alias('e', z.string())
-  }).strict();
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  url: z.string().optional()
+    .refine(url => url === undefined || validation.isValidPowerPagesUrl(url) === true, {
+      error: e => `'${e.input}' is not a valid Power Pages URL.`
+    })
+    .alias('u'),
+  id: z.uuid().optional().alias('i'),
+  name: z.string().optional().alias('n'),
+  environmentName: z.string().alias('e')
+});
 declare type Options = z.infer<typeof options>;
 
 interface CommandArgs {
@@ -33,14 +32,14 @@ class PpWebSiteGetCommand extends PowerPlatformCommand {
     return 'Gets information about the specified Power Pages website.';
   }
 
-  public get schema(): z.ZodTypeAny | undefined {
+  public get schema(): z.ZodType | undefined {
     return options;
   }
 
-  public getRefinedSchema(schema: typeof options): z.ZodEffects<any> | undefined {
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
       .refine(options => [options.url, options.id, options.name].filter(x => x !== undefined).length === 1, {
-        message: `Specify either url, id or name, but not multiple.`
+        error: `Specify either url, id or name, but not multiple.`
       });
   }
 

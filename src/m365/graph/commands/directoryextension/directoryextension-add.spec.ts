@@ -1,19 +1,18 @@
 import assert from 'assert';
 import sinon from 'sinon';
-import { z } from 'zod';
 import auth from '../../../../Auth.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
-import commands from '../../commands.js';
+import { CommandError } from '../../../../Command.js';
+import request from '../../../../request.js';
 import { telemetry } from '../../../../telemetry.js';
+import { entraApp } from '../../../../utils/entraApp.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
-import { cli } from '../../../../cli/cli.js';
-import command from './directoryextension-add.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
-import request from '../../../../request.js';
-import { entraApp } from '../../../../utils/entraApp.js';
-import { CommandError } from '../../../../Command.js';
+import commands from '../../commands.js';
+import command, { options } from './directoryextension-add.js';
 
 describe(commands.DIRECTORYEXTENSION_ADD, () => {
   const appId = '7f5df2f4-9ed6-4df7-86d7-eefbfc4ab091';
@@ -61,7 +60,7 @@ describe(commands.DIRECTORYEXTENSION_ADD, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
-  let commandOptionsSchema: z.ZodTypeAny;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -70,7 +69,7 @@ describe(commands.DIRECTORYEXTENSION_ADD, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
-    commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -243,7 +242,7 @@ describe(commands.DIRECTORYEXTENSION_ADD, () => {
       targetObjects: 'User',
       verbose: true
     });
-    await command.action(logger, { options: parsedSchema.data });
+    await command.action(logger, { options: parsedSchema.data! });
     assert(loggerLogSpy.calledOnceWithExactly(response));
   });
 
@@ -264,7 +263,7 @@ describe(commands.DIRECTORYEXTENSION_ADD, () => {
       targetObjects: 'User',
       isMultiValued: true
     });
-    await command.action(logger, { options: parsedSchema.data });
+    await command.action(logger, { options: parsedSchema.data! });
     assert(loggerLogSpy.calledOnceWithExactly(responseForMultiValued));
   });
 
@@ -284,7 +283,7 @@ describe(commands.DIRECTORYEXTENSION_ADD, () => {
       dataType: 'Boolean',
       targetObjects: 'User,Application,Device'
     });
-    await command.action(logger, { options: parsedSchema.data });
+    await command.action(logger, { options: parsedSchema.data! });
     assert(loggerLogSpy.calledOnceWithExactly(responseWithMultipleTargets));
   });
 
@@ -306,6 +305,6 @@ describe(commands.DIRECTORYEXTENSION_ADD, () => {
       dataType: 'Boolean',
       targetObjects: 'User,Application,Device'
     });
-    await assert.rejects(command.action(logger, { options: parsedSchema.data }), new CommandError('An extension property exists with the name extension_7f5df2f49ed64df786d7eefbfc4ab091_ForServiceUseOnly.'));
+    await assert.rejects(command.action(logger, { options: parsedSchema.data! }), new CommandError('An extension property exists with the name extension_7f5df2f49ed64df786d7eefbfc4ab091_ForServiceUseOnly.'));
   });
 });

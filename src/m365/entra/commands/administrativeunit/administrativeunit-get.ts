@@ -6,15 +6,13 @@ import GraphCommand from "../../../base/GraphCommand.js";
 import commands from "../../commands.js";
 import { entraAdministrativeUnit } from "../../../../utils/entraAdministrativeUnit.js";
 import { globalOptionsZod } from "../../../../Command.js";
-import { zod } from "../../../../utils/zod.js";
 
-const options = globalOptionsZod
-  .extend({
-    id: zod.alias('i', z.string().uuid().optional()),
-    displayName: zod.alias('n', z.string().optional()),
-    properties: zod.alias('p', z.string().optional())
-  })
-  .strict();
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  id: z.uuid().optional().alias('i'),
+  displayName: z.string().optional().alias('n'),
+  properties: z.string().optional().alias('p')
+});
 
 declare type Options = z.infer<typeof options>;
 
@@ -31,14 +29,14 @@ class EntraAdministrativeUnitGetCommand extends GraphCommand {
     return 'Gets information about a specific administrative unit';
   }
 
-  public get schema(): z.ZodTypeAny | undefined {
+  public get schema(): z.ZodType | undefined {
     return options;
   }
 
-  public getRefinedSchema(schema: typeof options): z.ZodEffects<any> | undefined {
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
       .refine(options => [options.id, options.displayName].filter(Boolean).length === 1, {
-        message: 'Specify either id or displayName'
+        error: 'Specify either id or displayName'
       });
   }
 

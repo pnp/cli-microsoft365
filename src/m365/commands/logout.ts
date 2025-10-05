@@ -4,7 +4,7 @@ import { Logger } from '../../cli/Logger.js';
 import Command, { CommandError, globalOptionsZod } from '../../Command.js';
 import commands from './commands.js';
 
-const options = globalOptionsZod.strict();
+export const options = globalOptionsZod.strict();
 
 declare type Options = z.infer<typeof options>;
 

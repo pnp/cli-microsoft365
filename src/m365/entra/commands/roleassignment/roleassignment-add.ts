@@ -13,42 +13,27 @@ import { entraGroup } from '../../../../utils/entraGroup.js';
 import { roleDefinition } from '../../../../utils/roleDefinition.js';
 import { entraUser } from '../../../../utils/entraUser.js';
 
-const options = globalOptionsZod
-  .extend({
-    roleDefinitionId: z.string().refine(id => validation.isValidGuid(id), id => ({
-      message: `'${id}' is not a valid GUID.`
-    })).optional(),
-    roleDefinitionName: z.string().optional(),
-    principal: z.string().refine(principal => validation.isValidGuid(principal) || validation.isValidUserPrincipalName(principal) || validation.isValidMailNickname(principal), principal => ({
-      message: `'${principal}' is not a valid GUID, UPN or group mail nickname.`
-    })),
-    userId: z.string().refine(id => validation.isValidGuid(id), id => ({
-      message: `'${id}' is not a valid GUID.`
-    })).optional(),
-    userName: z.string().refine(upn => validation.isValidUserPrincipalName(upn), upn => ({
-      message: `'${upn}' is not a valid UPN.`
-    })).optional(),
-    administrativeUnitId: z.string().refine(id => validation.isValidGuid(id), id => ({
-      message: `'${id}' is not a valid GUID.`
-    })).optional(),
-    administrativeUnitName: z.string().optional(),
-    applicationId: z.string().refine(id => validation.isValidGuid(id), id => ({
-      message: `'${id}' is not a valid GUID.`
-    })).optional(),
-    applicationObjectId: z.string().refine(id => validation.isValidGuid(id), id => ({
-      message: `'${id}' is not a valid GUID.`
-    })).optional(),
-    applicationName: z.string().optional(),
-    servicePrincipalId: z.string().refine(id => validation.isValidGuid(id), id => ({
-      message: `'${id}' is not a valid GUID.`
-    })).optional(),
-    servicePrincipalName: z.string().optional(),
-    groupId: z.string().refine(id => validation.isValidGuid(id), id => ({
-      message: `'${id}' is not a valid GUID.`
-    })).optional(),
-    groupName: z.string().optional()
-  })
-  .strict();
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  roleDefinitionId: z.uuid().optional(),
+  roleDefinitionName: z.string().optional(),
+  principal: z.string().refine(principal => validation.isValidGuid(principal) || validation.isValidUserPrincipalName(principal) || validation.isValidMailNickname(principal), {
+    error: e => `'${e.input}' is not a valid GUID, UPN or group mail nickname.`
+  }),
+  userId: z.uuid().optional(),
+  userName: z.string().refine(upn => validation.isValidUserPrincipalName(upn), {
+    error: e => `'${e.input}' is not a valid UPN.`
+  }).optional(),
+  administrativeUnitId: z.uuid().optional(),
+  administrativeUnitName: z.string().optional(),
+  applicationId: z.uuid().optional(),
+  applicationObjectId: z.uuid().optional(),
+  applicationName: z.string().optional(),
+  servicePrincipalId: z.uuid().optional(),
+  servicePrincipalName: z.string().optional(),
+  groupId: z.uuid().optional(),
+  groupName: z.string().optional()
+});
 
 declare type Options = z.infer<typeof options>;
 
@@ -65,16 +50,17 @@ class EntraRoleAssignmentAddCommand extends GraphCommand {
     return 'Assign a Entra ID role to a user and specify the scope for which the user has been granted access';
   }
 
-  public get schema(): z.ZodTypeAny | undefined {
+  public get schema(): z.ZodType | undefined {
     return options;
   }
 
-  public getRefinedSchema(schema: typeof options): z.ZodEffects<any> | undefined {
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
       .refine(options => [options.roleDefinitionId, options.roleDefinitionName].filter(o => o !== undefined).length === 1, {
-        message: 'Specify either roleDefinitionId or roleDefinitionName'
+        error: 'Specify either roleDefinitionId or roleDefinitionName'
       })
-      .refine(options => Object.values([options.userId, options.userName, options.administrativeUnitId, options.administrativeUnitName, options.applicationId, options.applicationObjectId, options.applicationName,
+      .refine(options => Object.values([
+        options.userId, options.userName, options.administrativeUnitId, options.administrativeUnitName, options.applicationId, options.applicationObjectId, options.applicationName,
         options.servicePrincipalId, options.servicePrincipalName, options.groupId, options.groupName]).filter(v => typeof v !== 'undefined').length < 2, {
         message: 'Provide value for only one of the following parameters: userId, userName, administrativeUnitId, administrativeUnitName, applicationId, applicationObjectId, applicationName, servicePrincipalId, servicePrincipalName, groupId or groupName'
       });

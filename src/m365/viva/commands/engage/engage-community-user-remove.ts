@@ -1,7 +1,6 @@
 import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
 import { globalOptionsZod } from '../../../../Command.js';
-import { zod } from '../../../../utils/zod.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 import { validation } from '../../../../utils/validation.js';
@@ -10,25 +9,18 @@ import request, { CliRequestOptions } from '../../../../request.js';
 import { entraUser } from '../../../../utils/entraUser.js';
 import { cli } from '../../../../cli/cli.js';
 
-const options = globalOptionsZod
-  .extend({
-    communityId: z.string().optional(),
-    communityDisplayName: zod.alias('n', z.string().optional()),
-    entraGroupId: z.string()
-      .refine(id => validation.isValidGuid(id), id => ({
-        message: `'${id}' is not a valid GUID.`
-      })).optional(),
-    id: z.string()
-      .refine(id => validation.isValidGuid(id), id => ({
-        message: `'${id}' is not a valid GUID.`
-      })).optional(),
-    userName: z.string()
-      .refine(userName => validation.isValidUserPrincipalName(userName), userName => ({
-        message: `'${userName}' is not a valid user principal name.`
-      })).optional(),
-    force: z.boolean().optional()
-  })
-  .strict();
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  communityId: z.string().optional(),
+  communityDisplayName: z.string().optional().alias('n'),
+  entraGroupId: z.uuid().optional(),
+  id: z.uuid().optional(),
+  userName: z.string()
+    .refine(userName => validation.isValidUserPrincipalName(userName), {
+      error: e => `'${e.input}' is not a valid user principal name.`
+    }).optional(),
+  force: z.boolean().optional()
+});
 declare type Options = z.infer<typeof options>;
 
 interface CommandArgs {
@@ -45,23 +37,23 @@ class VivaEngageCommunityUserRemoveCommand extends GraphCommand {
     return 'Removes a specified user from a Microsoft 365 Viva Engage community';
   }
 
-  public get schema(): z.ZodTypeAny {
+  public get schema(): z.ZodType {
     return options;
   }
 
-  public getRefinedSchema(schema: typeof options): z.ZodEffects<any> | undefined {
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
       .refine(options => [options.communityId, options.communityDisplayName, options.entraGroupId].filter(x => x !== undefined).length === 1, {
-        message: 'Specify either communityId, communityDisplayName, or entraGroupId, but not multiple.'
+        error: 'Specify either communityId, communityDisplayName, or entraGroupId, but not multiple.'
       })
       .refine(options => options.communityId || options.communityDisplayName || options.entraGroupId, {
-        message: 'Specify at least one of communityId, communityDisplayName, or entraGroupId.'
+        error: 'Specify at least one of communityId, communityDisplayName, or entraGroupId.'
       })
       .refine(options => options.id || options.userName, {
-        message: 'Specify either of id or userName.'
+        error: 'Specify either of id or userName.'
       })
-      .refine(options => options.userName !== undefined || options.id !== undefined, {
-        message: 'Specify either id or userName, but not both.'
+      .refine(options => typeof options.userName !== 'undefined' || typeof options.id !== 'undefined', {
+        error: 'Specify either id or userName, but not both.'
       });
   }
 

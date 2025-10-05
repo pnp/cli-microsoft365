@@ -4,15 +4,13 @@ import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 import { z } from 'zod';
 import { globalOptionsZod } from '../../../../Command.js';
-import { zod } from '../../../../utils/zod.js';
 import { UnifiedRbacResourceAction } from '@microsoft/microsoft-graph-types';
 
-const options = globalOptionsZod
-  .extend({
-    resourceNamespace: zod.alias('n', z.string()),
-    privileged: zod.alias('p', z.boolean().optional())
-  })
-  .strict();
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  resourceNamespace: z.string().alias('n'),
+  privileged: z.boolean().optional().alias('p')
+});
 
 declare type Options = z.infer<typeof options>;
 
@@ -37,7 +35,7 @@ class EntraRolePermissionListCommand extends GraphCommand {
     return ['id', 'name', 'actionVerb', 'isPrivileged'];
   }
 
-  public get schema(): z.ZodTypeAny | undefined {
+  public get schema(): z.ZodType | undefined {
     return options;
   }
 

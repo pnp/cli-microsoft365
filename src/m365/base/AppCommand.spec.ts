@@ -1,14 +1,13 @@
 import assert from 'assert';
 import fs from 'fs';
 import sinon from 'sinon';
-import { z } from 'zod';
 import { cli } from '../../cli/cli.js';
 import { CommandInfo } from '../../cli/CommandInfo.js';
 import { Logger } from '../../cli/Logger.js';
 import Command, { CommandError } from '../../Command.js';
 import { telemetry } from '../../telemetry.js';
 import { sinonUtil } from '../../utils/sinonUtil.js';
-import AppCommand from './AppCommand.js';
+import AppCommand, { appCommandOptions } from './AppCommand.js';
 
 class MockCommand extends AppCommand {
   public get name(): string {
@@ -31,11 +30,11 @@ describe('AppCommand', () => {
   let logger: Logger;
   let log: string[];
   let commandInfo: CommandInfo;
-  let commandOptionsSchema: z.ZodTypeAny;
+  let commandOptionsSchema: typeof appCommandOptions;
 
   before(() => {
     commandInfo = cli.getCommandInfo(new MockCommand());
-    commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof appCommandOptions;
     sinon.stub(telemetry, 'trackEvent').resolves();
   });
 

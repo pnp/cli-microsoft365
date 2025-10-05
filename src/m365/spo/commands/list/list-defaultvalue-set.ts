@@ -1,7 +1,6 @@
 import SpoCommand from '../../../base/SpoCommand.js';
 import { globalOptionsZod } from '../../../../Command.js';
 import { z } from 'zod';
-import { zod } from '../../../../utils/zod.js';
 import { Logger } from '../../../../cli/Logger.js';
 import commands from '../../commands.js';
 import { DOMParser } from '@xmldom/xmldom';
@@ -10,27 +9,22 @@ import { urlUtil } from '../../../../utils/urlUtil.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 
-const options = globalOptionsZod
-  .extend({
-    webUrl: zod.alias('u', z.string()
-      .refine(url => validation.isValidSharePointUrl(url) === true, url => ({
-        message: `'${url}' is not a valid SharePoint Online site URL.`
-      }))
-    ),
-    listId: zod.alias('i', z.string().optional()
-      .refine(id => id === undefined || validation.isValidGuid(id), id => ({
-        message: `'${id}' is not a valid GUID.`
-      }))
-    ),
-    listTitle: zod.alias('t', z.string().optional()),
-    listUrl: z.string().optional(),
-    fieldName: z.string(),
-    fieldValue: z.string()
-      .refine(value => value !== '', `The value cannot be empty. Use 'spo list defaultvalue remove' to remove a default column value.`),
-    folderUrl: z.string().optional()
-      .refine(url => url === undefined || (!url.includes('#') && !url.includes('%')), 'Due to limitations in SharePoint Online, setting default column values for folders with a # or % character in their path is not supported.')
-  })
-  .strict();
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  webUrl: z.string()
+    .refine(url => validation.isValidSharePointUrl(url) === true, {
+      error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
+    })
+    .alias('u'),
+  listId: z.uuid().optional().alias('i'),
+  listTitle: z.string().optional().alias('t'),
+  listUrl: z.string().optional(),
+  fieldName: z.string(),
+  fieldValue: z.string()
+    .refine(value => value !== '', `The value cannot be empty. Use 'spo list defaultvalue remove' to remove a default column value.`),
+  folderUrl: z.string().optional()
+    .refine(url => url === undefined || (!url.includes('#') && !url.includes('%')), 'Due to limitations in SharePoint Online, setting default column values for folders with a # or % character in their path is not supported.')
+});
 
 declare type Options = z.infer<typeof options>;
 
@@ -47,14 +41,14 @@ class SpoListDefaultValueSetCommand extends SpoCommand {
     return 'Sets default column values for a specific document library';
   }
 
-  public get schema(): z.ZodTypeAny {
+  public get schema(): z.ZodType {
     return options;
   }
 
-  public getRefinedSchema(schema: z.ZodTypeAny): z.ZodEffects<any> | undefined {
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
       .refine(options => [options.listId, options.listTitle, options.listUrl].filter(o => o !== undefined).length === 1, {
-        message: 'Use one of the following options: listId, listTitle, listUrl.'
+        error: 'Use one of the following options: listId, listTitle, listUrl.'
       });
   }
 
