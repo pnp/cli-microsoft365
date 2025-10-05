@@ -1,52 +1,53 @@
-import { ZodTypeAny, z } from 'zod';
+import { z } from 'zod';
+import { JSONSchema } from 'zod/v4/core';
+import { EnumLike } from 'zod/v4/core/util.cjs';
 import { CommandOptionInfo } from '../cli/CommandOptionInfo';
 import { CommandOption } from '../Command';
 
-function parseEffect(def: z.ZodEffectsDef, _options: CommandOptionInfo[], _currentOption?: CommandOptionInfo): z.ZodTypeDef | undefined {
-  return def.schema._def;
+declare module 'zod' {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  interface ZodType<out Output = unknown, out Input = unknown, out Internals extends z.core.$ZodTypeInternals<Output, Input> = z.core.$ZodTypeInternals<Output, Input>> {
+    alias(name: string): this & { alias?: string };
+  }
 }
 
-function parseIntersection(def: z.ZodIntersectionDef, _options: CommandOptionInfo[], _currentOption?: CommandOptionInfo): z.ZodTypeDef | undefined {
-  if (def.left._def.typeName !== z.ZodFirstPartyTypeKind.ZodAny) {
-    return def.left._def;
-  }
+z.ZodType.prototype.alias = function (name: string) {
+  (this.def as any).alias = name;
+  return this;
+};
 
-  if (def.right._def.typeName !== z.ZodFirstPartyTypeKind.ZodAny) {
-    return def.right._def;
-  }
-
-  return;
-}
-
-function parseObject(def: z.ZodObjectDef, options: CommandOptionInfo[], _currentOption?: CommandOptionInfo): z.ZodTypeDef | undefined {
-  const properties = def.shape();
-  for (const key in properties) {
-    const property = properties[key];
+function parseObject(schema: JSONSchema.JSONSchema, options: CommandOptionInfo[], _currentOption?: CommandOptionInfo): JSONSchema.JSONSchema | undefined {
+  for (const key in schema.properties) {
+    const property = schema.properties[key];
 
     const option: CommandOptionInfo = {
       name: key,
       long: key,
-      short: property._def.alias,
-      required: true,
+      short: (property as any)['x-alias'],
+      required: schema.required?.includes(key) && (property as any).default === undefined || false,
       type: 'string'
     };
 
-    parseDef(property._def, options, option);
+    parseJSONSchema(property as JSONSchema.JSONSchema, options, option);
     options.push(option);
   }
 
   return;
 }
 
-function parseString(_def: z.ZodStringDef, _options: CommandOptionInfo[], currentOption?: CommandOptionInfo): z.ZodTypeDef | undefined {
+function parseString(schema: JSONSchema.JSONSchema, _options: CommandOptionInfo[], currentOption?: CommandOptionInfo): JSONSchema.JSONSchema | undefined {
   if (currentOption) {
     currentOption.type = 'string';
+
+    if (schema.enum) {
+      currentOption.autocomplete = schema.enum.map(e => String(e));
+    }
   }
 
   return;
 }
 
-function parseNumber(_def: z.ZodNumberDef, _options: CommandOptionInfo[], currentOption?: CommandOptionInfo): z.ZodTypeDef | undefined {
+function parseNumber(schema: JSONSchema.JSONSchema, _options: CommandOptionInfo[], currentOption?: CommandOptionInfo): JSONSchema.JSONSchema | undefined {
   if (currentOption) {
     currentOption.type = 'number';
   }
@@ -54,7 +55,7 @@ function parseNumber(_def: z.ZodNumberDef, _options: CommandOptionInfo[], curren
   return;
 }
 
-function parseBoolean(_def: z.ZodBooleanDef, _options: CommandOptionInfo[], currentOption?: CommandOptionInfo): z.ZodTypeDef | undefined {
+function parseBoolean(schema: JSONSchema.JSONSchema, _options: CommandOptionInfo[], currentOption?: CommandOptionInfo): JSONSchema.JSONSchema | undefined {
   if (currentOption) {
     currentOption.type = 'boolean';
   }
@@ -62,82 +63,41 @@ function parseBoolean(_def: z.ZodBooleanDef, _options: CommandOptionInfo[], curr
   return;
 }
 
-function parseOptional(def: z.ZodOptionalDef, _options: CommandOptionInfo[], currentOption?: CommandOptionInfo): z.ZodTypeDef | undefined {
-  if (currentOption) {
-    currentOption.required = false;
-  }
-
-  return def.innerType._def;
-}
-
-function parseDefault(def: z.ZodDefaultDef, _options: CommandOptionInfo[], currentOption?: CommandOptionInfo): z.ZodTypeDef | undefined {
-  if (currentOption) {
-    currentOption.required = false;
-  }
-
-  return def.innerType._def;
-}
-
-function parseEnum(def: z.ZodEnumDef, _options: CommandOptionInfo[], currentOption?: CommandOptionInfo): z.ZodTypeDef | undefined {
-  if (currentOption) {
-    currentOption.type = 'string';
-    currentOption.autocomplete = [...def.values];
-  }
-
-  return;
-}
-
-function parseNativeEnum(def: z.ZodNativeEnumDef, _options: CommandOptionInfo[], currentOption?: CommandOptionInfo): z.ZodTypeDef | undefined {
-  if (currentOption) {
-    currentOption.type = 'string';
-    currentOption.autocomplete = Object.values(def.values).map(v => String(v));
-  }
-
-  return;
-}
-
-function getParseFn(typeName: z.ZodFirstPartyTypeKind): undefined | ((def: any, options: CommandOptionInfo[], currentOption?: CommandOptionInfo) => z.ZodTypeDef | undefined) {
+function getParseFn(typeName?: "object" | "array" | "string" | "number" | "boolean" | "null" | "integer"): undefined | ((schema: JSONSchema.JSONSchema, options: CommandOptionInfo[], currentOption?: CommandOptionInfo) => JSONSchema.JSONSchema | undefined) {
   switch (typeName) {
-    case z.ZodFirstPartyTypeKind.ZodEffects:
-      return parseEffect;
-    case z.ZodFirstPartyTypeKind.ZodObject:
+    case 'object':
       return parseObject;
-    case z.ZodFirstPartyTypeKind.ZodOptional:
-      return parseOptional;
-    case z.ZodFirstPartyTypeKind.ZodString:
+    case 'string':
       return parseString;
-    case z.ZodFirstPartyTypeKind.ZodNumber:
+    case 'number':
+    case 'integer':
       return parseNumber;
-    case z.ZodFirstPartyTypeKind.ZodBoolean:
+    case 'boolean':
       return parseBoolean;
-    case z.ZodFirstPartyTypeKind.ZodEnum:
-      return parseEnum;
-    case z.ZodFirstPartyTypeKind.ZodNativeEnum:
-      return parseNativeEnum;
-    case z.ZodFirstPartyTypeKind.ZodDefault:
-      return parseDefault;
-    case z.ZodFirstPartyTypeKind.ZodIntersection:
-      return parseIntersection;
     default:
       return;
   }
 }
 
-function parseDef(def: z.ZodTypeDef, options: CommandOptionInfo[], currentOption?: CommandOptionInfo): void {
-  let parsedDef: z.ZodTypeDef | undefined = def;
+function parseJSONSchema(jsonSchema: JSONSchema.JSONSchema, options: CommandOptionInfo[], currentOption?: CommandOptionInfo): void {
+  let parsedSchema: JSONSchema.JSONSchema | undefined = jsonSchema;
 
   do {
-    const parse = getParseFn((parsedDef as any).typeName);
+    if (parsedSchema.allOf) {
+      parsedSchema.allOf.forEach(s => parseJSONSchema(s, options, currentOption));
+    }
+
+    const parse = getParseFn(parsedSchema.type);
     if (!parse) {
       break;
     }
 
-    parsedDef = parse(parsedDef as any, options, currentOption);
-    if (!parsedDef) {
+    parsedSchema = parse(parsedSchema, options, currentOption);
+    if (!parsedSchema) {
       break;
     }
 
-  } while (parsedDef);
+  } while (parsedSchema);
 }
 
 function optionToString(optionInfo: CommandOptionInfo): string {
@@ -159,20 +119,20 @@ function optionToString(optionInfo: CommandOptionInfo): string {
   return s;
 };
 
-type EnumLike = {
-  [k: string]: string | number
-  [nu: number]: string
-};
-
 export const zod = {
-  alias<T extends ZodTypeAny>(alias: string, type: T): T {
-    type._def.alias = alias;
-    return type;
-  },
-
   schemaToOptionInfo(schema: z.ZodSchema<any>): CommandOptionInfo[] {
+    const jsonSchema = z.toJSONSchema(schema, {
+      override: s => {
+        const alias = ((s.zodSchema as unknown as z.core.$ZodTypeInternals).def as any).alias;
+        if (alias) {
+          s.jsonSchema['x-alias'] = alias;
+        }
+      },
+      unrepresentable: 'any'
+    });
+
     const options: CommandOptionInfo[] = [];
-    parseDef(schema._def, options);
+    parseJSONSchema(jsonSchema, options);
     return options;
   },
 
@@ -187,7 +147,7 @@ export const zod = {
     return options;
   },
 
-  coercedEnum: <T extends EnumLike>(e: T): z.ZodEffects<z.ZodNativeEnum<T>, T[keyof T], unknown> =>
+  coercedEnum: <T extends EnumLike>(e: T): z.ZodPipe<z.ZodTransform<string | number | null, unknown>, z.ZodEnum<T>> =>
     z.preprocess(val => {
       const target = String(val)?.toLowerCase();
       for (const k of Object.values(e)) {
@@ -197,5 +157,5 @@ export const zod = {
       }
 
       return null;
-    }, z.nativeEnum(e))
+    }, z.enum(e))
 };

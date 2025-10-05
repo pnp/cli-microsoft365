@@ -9,20 +9,18 @@ import commands from '../../commands.js';
 import { Page } from './Page.js';
 import { z } from 'zod';
 import { globalOptionsZod } from '../../../../Command.js';
-import { zod } from '../../../../utils/zod.js';
 
-const options = globalOptionsZod
-  .extend({
-    webUrl: zod.alias('u', z.string()
-      .refine(url => validation.isValidSharePointUrl(url) === true, url => ({
-        message: `'${url}' is not a valid SharePoint Online site URL.`
-      }))
-    ),
-    pageName: zod.alias('n', z.string()),
-    section: zod.alias('s', z.number()),
-    force: zod.alias('f', z.boolean().optional())
-  })
-  .strict();
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  webUrl: z.string()
+    .refine(url => validation.isValidSharePointUrl(url) === true, {
+      error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
+    })
+    .alias('u'),
+  pageName: z.string().alias('n'),
+  section: z.number().alias('s'),
+  force: z.boolean().optional().alias('f')
+});
 
 declare type Options = z.infer<typeof options>;
 
@@ -39,7 +37,7 @@ class SpoPageSectionRemoveCommand extends SpoCommand {
     return 'Removes the specified section from the modern page';
   }
 
-  public get schema(): z.ZodTypeAny {
+  public get schema(): z.ZodType {
     return options;
   }
 

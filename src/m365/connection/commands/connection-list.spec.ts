@@ -1,25 +1,24 @@
 import assert from 'assert';
 import sinon from 'sinon';
-import { z } from 'zod';
 import auth, { AuthType, CertificateType, CloudType } from '../../../Auth.js';
 import { cli } from '../../../cli/cli.js';
 import { CommandInfo } from '../../../cli/CommandInfo.js';
 import { Logger } from '../../../cli/Logger.js';
+import { CommandError } from '../../../Command.js';
 import { telemetry } from '../../../telemetry.js';
 import { pid } from '../../../utils/pid.js';
 import { session } from '../../../utils/session.js';
+import { sinonUtil } from '../../../utils/sinonUtil.js';
 import { spo } from '../../../utils/spo.js';
 import commands from '../commands.js';
-import command from './connection-list.js';
-import { sinonUtil } from '../../../utils/sinonUtil.js';
-import { CommandError } from '../../../Command.js';
+import command, { options } from './connection-list.js';
 
 describe(commands.LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
-  let commandOptionsSchema: z.ZodTypeAny;
+  let commandOptionsSchema: typeof options;
 
   const mockListResponse = [
     {
@@ -93,7 +92,7 @@ describe(commands.LIST, () => {
     ];
 
     commandInfo = cli.getCommandInfo(command);
-    commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {

@@ -2,17 +2,16 @@ import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
 import { CommandError } from '../../../../Command.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
+import { cli } from '../../../../cli/cli.js';
 import request from '../../../../request.js';
 import { telemetry } from '../../../../telemetry.js';
 import { pid } from '../../../../utils/pid.js';
-import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './site-sharingpermission-set.js';
-import { z } from 'zod';
-import { cli } from '../../../../cli/cli.js';
+import command, { options } from './site-sharingpermission-set.js';
 
 describe(commands.SITE_SHARINGPERMISSION_SET, () => {
   const siteUrl = 'https://contoso.sharepoint.com/sites/marketing';
@@ -22,7 +21,7 @@ describe(commands.SITE_SHARINGPERMISSION_SET, () => {
   let loggerLogSpy: sinon.SinonSpy;
   let patchStub: sinon.SinonStub;
   let commandInfo: CommandInfo;
-  let commandOptionsSchema: z.ZodTypeAny;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -31,7 +30,7 @@ describe(commands.SITE_SHARINGPERMISSION_SET, () => {
     sinon.stub(session, 'getId').returns('');
 
     commandInfo = cli.getCommandInfo(command);
-    commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
     auth.connection.active = true;
   });
 

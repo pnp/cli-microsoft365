@@ -3,17 +3,15 @@ import { Logger } from '../../../../cli/Logger.js';
 import { globalOptionsZod } from '../../../../Command.js';
 import request from '../../../../request.js';
 import { validation } from '../../../../utils/validation.js';
-import { zod } from '../../../../utils/zod.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 
-const options = globalOptionsZod
-  .extend({
-    url: zod.alias('u', z.string().refine(url => validation.isValidSharePointUrl(url) === true, {
-      message: 'Specify a valid SharePoint site URL'
-    }))
-  })
-  .strict();
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  url: z.string().refine(url => validation.isValidSharePointUrl(url) === true, {
+    error: 'Specify a valid SharePoint site URL'
+  }).alias('u')
+});
 declare type Options = z.infer<typeof options>;
 
 interface CommandArgs {
@@ -29,7 +27,7 @@ class SpoSiteGetCommand extends SpoCommand {
     return 'Gets information about the specific site collection';
   }
 
-  public get schema(): z.ZodTypeAny | undefined {
+  public get schema(): z.ZodType | undefined {
     return options;
   }
 

@@ -2,20 +2,15 @@ import { globalOptionsZod } from '../../../../Command.js';
 import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
 import commands from '../../commands.js';
-import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import { spe } from '../../../../utils/spe.js';
 import { odata } from '../../../../utils/odata.js';
 
-const options = globalOptionsZod
-  .extend({
-    containerTypeId: z.string()
-      .refine(id => validation.isValidGuid(id), id => ({
-        message: `'${id}' is not a valid GUID.`
-      })).optional(),
-    containerTypeName: z.string().optional()
-  })
-  .strict();
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  containerTypeId: z.uuid().optional(),
+  containerTypeName: z.string().optional()
+});
 
 declare type Options = z.infer<typeof options>;
 
@@ -32,7 +27,7 @@ class SpeContainerRecycleBinItemListCommand extends GraphCommand {
     return 'Lists deleted containers of a specific container type';
   }
 
-  public get schema(): z.ZodTypeAny {
+  public get schema(): z.ZodType {
     return options;
   }
 
@@ -40,10 +35,10 @@ class SpeContainerRecycleBinItemListCommand extends GraphCommand {
     return ['id', 'displayName'];
   }
 
-  public getRefinedSchema(schema: z.ZodTypeAny): z.ZodEffects<any> | undefined {
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
       .refine((options: Options) => [options.containerTypeId, options.containerTypeName].filter(o => o !== undefined).length === 1, {
-        message: 'Use one of the following options: containerTypeId or containerTypeName.'
+        error: 'Use one of the following options: containerTypeId or containerTypeName.'
       });
   }
 

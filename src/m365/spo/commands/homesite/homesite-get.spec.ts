@@ -1,18 +1,17 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
+import { cli } from '../../../../cli/cli.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
 import { telemetry } from '../../../../telemetry.js';
+import { odata } from '../../../../utils/odata.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './homesite-get.js';
-import { odata } from '../../../../utils/odata.js';
-import { CommandInfo } from '../../../../cli/CommandInfo.js';
-import { cli } from '../../../../cli/cli.js';
-import { z } from 'zod';
+import command, { options } from './homesite-get.js';
 
 describe(commands.HOMESITE_GET, () => {
   const spoAdminUrl = 'https://contoso-admin.sharepoint.com';
@@ -59,7 +58,7 @@ describe(commands.HOMESITE_GET, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
-  let commandOptionsSchema: z.ZodTypeAny;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -70,7 +69,7 @@ describe(commands.HOMESITE_GET, () => {
     auth.connection.spoUrl = 'https://contoso.sharepoint.com';
 
     commandInfo = cli.getCommandInfo(command);
-    commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {

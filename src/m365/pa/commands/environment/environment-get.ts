@@ -3,16 +3,14 @@ import { Logger } from '../../../../cli/Logger.js';
 import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
-import { zod } from '../../../../utils/zod.js';
 import PowerAppsCommand from '../../../base/PowerAppsCommand.js';
 import commands from '../../commands.js';
 
-const options = globalOptionsZod
-  .extend({
-    name: zod.alias('n', z.string().optional()),
-    default: z.boolean().optional()
-  })
-  .strict();
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  name: z.string().optional().alias('n'),
+  default: z.boolean().optional()
+});
 
 declare type Options = z.infer<typeof options>;
 
@@ -29,14 +27,14 @@ class PaEnvironmentGetCommand extends PowerAppsCommand {
     return 'Gets information about the specified Microsoft Power Apps environment';
   }
 
-  public get schema(): z.ZodTypeAny {
+  public get schema(): z.ZodType {
     return options;
   }
 
-  public getRefinedSchema(schema: typeof options): z.ZodEffects<any> | undefined {
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
       .refine(options => !!options.name !== !!options.default, {
-        message: `Specify either name or default, but not both.`
+        error: `Specify either name or default, but not both.`
       });
   }
 
