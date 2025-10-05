@@ -12,9 +12,9 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { spo } from '../../../../utils/spo.js';
 import commands from '../../commands.js';
-
 import command from './contenttype-field-remove.js';
 import { settingsNames } from '../../../../settingsNames.js';
+
 const WEB_URL = 'https://contoso.sharepoint.com';
 const FIELD_LINK_ID = "5ee2dd25-d941-455a-9bdb-7f2c54aed11b";
 const CONTENT_TYPE_ID = "0x0100558D85B7216F6A489A499DB361E1AE2F";

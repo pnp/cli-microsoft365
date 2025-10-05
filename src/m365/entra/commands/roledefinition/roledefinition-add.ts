@@ -1,21 +1,19 @@
 import { z } from 'zod';
 import { globalOptionsZod } from '../../../../Command.js';
-import { zod } from '../../../../utils/zod.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 import { Logger } from '../../../../cli/Logger.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { UnifiedRoleDefinition } from '@microsoft/microsoft-graph-types';
 
-const options = globalOptionsZod
-  .extend({
-    displayName: zod.alias('n', z.string()),
-    allowedResourceActions: zod.alias('a', z.string().transform((value) => value.split(',').map(String))),
-    description: zod.alias('d', z.string().optional()),
-    enabled: zod.alias('e', z.boolean().optional()),
-    version: zod.alias('v', z.string().optional())
-  })
-  .strict();
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  displayName: z.string().alias('n'),
+  allowedResourceActions: z.string().transform((value) => value.split(',').map(String)).alias('a'),
+  description: z.string().optional().alias('d'),
+  enabled: z.boolean().optional().alias('e'),
+  version: z.string().optional().alias('v')
+});
 
 declare type Options = z.infer<typeof options>;
 
@@ -32,7 +30,7 @@ class EntraRoleDefinitionAddCommand extends GraphCommand {
     return 'Creates a custom Microsoft Entra ID role definition';
   }
 
-  public get schema(): z.ZodTypeAny | undefined {
+  public get schema(): z.ZodType | undefined {
     return options;
   }
 

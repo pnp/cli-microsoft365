@@ -1,25 +1,24 @@
+import { AdministrativeUnit, Application, ServicePrincipal, UnifiedRoleAssignment, UnifiedRoleDefinition } from '@microsoft/microsoft-graph-types';
 import assert from 'assert';
 import sinon from 'sinon';
-import { z } from 'zod';
 import auth from '../../../../Auth.js';
-import { Logger } from '../../../../cli/Logger.js';
-import { telemetry } from '../../../../telemetry.js';
-import { pid } from '../../../../utils/pid.js';
-import { session } from '../../../../utils/session.js';
 import { cli } from '../../../../cli/cli.js';
-import { roleDefinition } from '../../../../utils/roleDefinition.js';
-import commands from '../../commands.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
+import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
 import request from '../../../../request.js';
-import { entraUser } from '../../../../utils/entraUser.js';
-import { entraGroup } from '../../../../utils/entraGroup.js';
+import { telemetry } from '../../../../telemetry.js';
 import { entraAdministrativeUnit } from '../../../../utils/entraAdministrativeUnit.js';
-import { entraServicePrincipal } from '../../../../utils/entraServicePrincipal.js';
 import { entraApp } from '../../../../utils/entraApp.js';
-import { CommandInfo } from '../../../../cli/CommandInfo.js';
-import command from './roleassignment-add.js';
+import { entraGroup } from '../../../../utils/entraGroup.js';
+import { entraServicePrincipal } from '../../../../utils/entraServicePrincipal.js';
+import { entraUser } from '../../../../utils/entraUser.js';
+import { pid } from '../../../../utils/pid.js';
+import { roleDefinition } from '../../../../utils/roleDefinition.js';
+import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
-import { AdministrativeUnit, Application, ServicePrincipal, UnifiedRoleAssignment, UnifiedRoleDefinition } from '@microsoft/microsoft-graph-types';
+import commands from '../../commands.js';
+import command, { options } from './roleassignment-add.js';
 
 describe(commands.ROLEASSIGNMENT_ADD, () => {
   const principalId = 'fc33aa61-cf0e-46b6-9506-f633347202ab';
@@ -98,7 +97,7 @@ describe(commands.ROLEASSIGNMENT_ADD, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
-  let commandOptionsSchema: z.ZodTypeAny;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -107,7 +106,7 @@ describe(commands.ROLEASSIGNMENT_ADD, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
-    commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -824,7 +823,7 @@ describe(commands.ROLEASSIGNMENT_ADD, () => {
       verbose: true
     });
     await command.action(logger, {
-      options: result.data
+      options: result.data!
     });
     assert(loggerLogSpy.calledOnceWithExactly(unifiedRoleAssignmentScopeTenant));
   });
@@ -849,7 +848,7 @@ describe(commands.ROLEASSIGNMENT_ADD, () => {
       verbose: true
     });
     await command.action(logger, {
-      options: result.data
+      options: result.data!
     });
     assert(loggerLogSpy.calledOnceWithExactly(unifiedRoleAssignmentScopeTenant));
   });
@@ -874,7 +873,7 @@ describe(commands.ROLEASSIGNMENT_ADD, () => {
       verbose: true
     });
     await command.action(logger, {
-      options: result.data
+      options: result.data!
     });
     assert(loggerLogSpy.calledOnceWithExactly(unifiedRoleAssignmentScopeUser));
   });
@@ -900,7 +899,7 @@ describe(commands.ROLEASSIGNMENT_ADD, () => {
       verbose: true
     });
     await command.action(logger, {
-      options: result.data
+      options: result.data!
     });
     assert(loggerLogSpy.calledOnceWithExactly(unifiedRoleAssignmentScopeUser));
   });
@@ -925,7 +924,7 @@ describe(commands.ROLEASSIGNMENT_ADD, () => {
       verbose: true
     });
     await command.action(logger, {
-      options: result.data
+      options: result.data!
     });
     assert(loggerLogSpy.calledOnceWithExactly(unifiedRoleAssignmentScopeAdministrativeUnit));
   });
@@ -951,7 +950,7 @@ describe(commands.ROLEASSIGNMENT_ADD, () => {
       verbose: true
     });
     await command.action(logger, {
-      options: result.data
+      options: result.data!
     });
     assert(loggerLogSpy.calledOnceWithExactly(unifiedRoleAssignmentScopeAdministrativeUnit));
   });
@@ -976,7 +975,7 @@ describe(commands.ROLEASSIGNMENT_ADD, () => {
       verbose: true
     });
     await command.action(logger, {
-      options: result.data
+      options: result.data!
     });
     assert(loggerLogSpy.calledOnceWithExactly(unifiedRoleAssignmentScopeApplication));
   });
@@ -1002,7 +1001,7 @@ describe(commands.ROLEASSIGNMENT_ADD, () => {
       verbose: true
     });
     await command.action(logger, {
-      options: result.data
+      options: result.data!
     });
     assert(loggerLogSpy.calledOnceWithExactly(unifiedRoleAssignmentScopeApplication));
   });
@@ -1028,7 +1027,7 @@ describe(commands.ROLEASSIGNMENT_ADD, () => {
       verbose: true
     });
     await command.action(logger, {
-      options: result.data
+      options: result.data!
     });
     assert(loggerLogSpy.calledOnceWithExactly(unifiedRoleAssignmentScopeApplication));
   });
@@ -1053,7 +1052,7 @@ describe(commands.ROLEASSIGNMENT_ADD, () => {
       verbose: true
     });
     await command.action(logger, {
-      options: result.data
+      options: result.data!
     });
     assert(loggerLogSpy.calledOnceWithExactly(unifiedRoleAssignmentScopeServicePrincipal));
   });
@@ -1079,7 +1078,7 @@ describe(commands.ROLEASSIGNMENT_ADD, () => {
       verbose: true
     });
     await command.action(logger, {
-      options: result.data
+      options: result.data!
     });
     assert(loggerLogSpy.calledOnceWithExactly(unifiedRoleAssignmentScopeServicePrincipal));
   });
@@ -1104,7 +1103,7 @@ describe(commands.ROLEASSIGNMENT_ADD, () => {
       verbose: true
     });
     await command.action(logger, {
-      options: result.data
+      options: result.data!
     });
     assert(loggerLogSpy.calledOnceWithExactly(unifiedRoleAssignmentScopeGroup));
   });
@@ -1130,7 +1129,7 @@ describe(commands.ROLEASSIGNMENT_ADD, () => {
       verbose: true
     });
     await command.action(logger, {
-      options: result.data
+      options: result.data!
     });
     assert(loggerLogSpy.calledOnceWithExactly(unifiedRoleAssignmentScopeGroup));
   });
@@ -1155,7 +1154,7 @@ describe(commands.ROLEASSIGNMENT_ADD, () => {
       verbose: true
     });
     await command.action(logger, {
-      options: result.data
+      options: result.data!
     });
     assert(loggerLogSpy.calledOnceWithExactly(unifiedRoleAssignmentScopeTenant));
   });
@@ -1180,7 +1179,7 @@ describe(commands.ROLEASSIGNMENT_ADD, () => {
       verbose: true
     });
     await command.action(logger, {
-      options: result.data
+      options: result.data!
     });
     assert(loggerLogSpy.calledOnceWithExactly(unifiedRoleAssignmentScopeTenant));
   });
@@ -1201,7 +1200,7 @@ describe(commands.ROLEASSIGNMENT_ADD, () => {
       principal: principalId
     });
     await assert.rejects(command.action(logger, {
-      options: result.data
+      options: result.data!
     }), new CommandError('Invalid request'));
   });
 });

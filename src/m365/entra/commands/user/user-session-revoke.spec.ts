@@ -1,19 +1,18 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
-import commands from '../../commands.js';
-import request from '../../../../request.js';
+import { CommandError } from '../../../../Command.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
+import { cli } from '../../../../cli/cli.js';
+import request from '../../../../request.js';
 import { telemetry } from '../../../../telemetry.js';
+import { formatting } from '../../../../utils/formatting.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
-import command from './user-session-revoke.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
-import { CommandError } from '../../../../Command.js';
-import { z } from 'zod';
-import { CommandInfo } from '../../../../cli/CommandInfo.js';
-import { cli } from '../../../../cli/cli.js';
-import { formatting } from '../../../../utils/formatting.js';
+import commands from '../../commands.js';
+import command, { options } from './user-session-revoke.js';
 
 describe(commands.USER_SESSION_REVOKE, () => {
   const userId = 'abcd1234-de71-4623-b4af-96380a352509';
@@ -23,7 +22,7 @@ describe(commands.USER_SESSION_REVOKE, () => {
   let logger: Logger;
   let promptIssued: boolean;
   let commandInfo: CommandInfo;
-  let commandOptionsSchema: z.ZodTypeAny;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -32,7 +31,7 @@ describe(commands.USER_SESSION_REVOKE, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
-    commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -104,7 +103,7 @@ describe(commands.USER_SESSION_REVOKE, () => {
 
   it('prompts before revoking all sign-in sessions when confirm option not passed', async () => {
     const parsedSchema = commandOptionsSchema.safeParse({ userId: userId });
-    await command.action(logger, { options: parsedSchema.data });
+    await command.action(logger, { options: parsedSchema.data! });
 
     assert(promptIssued);
   });
@@ -113,7 +112,7 @@ describe(commands.USER_SESSION_REVOKE, () => {
     const postStub = sinon.stub(request, 'post').resolves();
 
     const parsedSchema = commandOptionsSchema.safeParse({ userId: userId });
-    await command.action(logger, { options: parsedSchema.data });
+    await command.action(logger, { options: parsedSchema.data! });
     assert(postStub.notCalled);
   });
 
@@ -129,7 +128,7 @@ describe(commands.USER_SESSION_REVOKE, () => {
     });
 
     const parsedSchema = commandOptionsSchema.safeParse({ userId: userId, force: true, verbose: true });
-    await command.action(logger, { options: parsedSchema.data });
+    await command.action(logger, { options: parsedSchema.data! });
     assert(postStub.calledOnce);
   });
 
@@ -148,7 +147,7 @@ describe(commands.USER_SESSION_REVOKE, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     const parsedSchema = commandOptionsSchema.safeParse({ userName: userName });
-    await command.action(logger, { options: parsedSchema.data });
+    await command.action(logger, { options: parsedSchema.data! });
     assert(postRequestStub.calledOnce);
   });
 
@@ -166,7 +165,7 @@ describe(commands.USER_SESSION_REVOKE, () => {
 
     const parsedSchema = commandOptionsSchema.safeParse({ userId: userId });
     await assert.rejects(
-      command.action(logger, { options: parsedSchema.data }),
+      command.action(logger, { options: parsedSchema.data! }),
       new CommandError(`Resource '${userId}' does not exist or one of its queried reference-property objects are not present.`)
     );
   });

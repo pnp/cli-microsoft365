@@ -7,49 +7,45 @@ import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 import { z } from 'zod';
-import { zod } from '../../../../utils/zod.js';
 
-const options = globalOptionsZod
-  .extend({
-    webUrl: zod.alias('u', z.string()
-      .refine(url => validation.isValidSharePointUrl(url) === true, {
-        message: 'webUrl is not a valid SharePoint site URL.'
-      })),
-    listId: z.string()
-      .refine(id => validation.isValidGuid(id), id => ({
-        message: `'${id}' is not a valid GUID.`
-      })).optional(),
-    listTitle: z.string().optional(),
-    listUrl: z.string().optional(),
-    title: z.string().min(1, 'Cannot be empty.'),
-    fields: z.string().optional(),
-    viewQuery: z.string().optional(),
-    personal: z.boolean().optional(),
-    default: z.boolean().optional(),
-    paged: z.boolean().optional(),
-    rowLimit: z.number().int().positive().optional(),
-    customFormatter: z.string()
-      .refine(formatter => {
-        try {
-          JSON.parse(formatter);
-          return true;
-        }
-        catch {
-          return false;
-        }
-      }, {
-        message: 'Custom formatter must be a valid JSON string.'
-      })
-      .optional(),
-    type: z.enum(['list', 'calendar', 'gallery', 'kanban']).optional(),
-    calendarStartDateField: z.string().min(1, 'Cannot be empty.').optional(),
-    calendarEndDateField: z.string().min(1, 'Cannot be empty.').optional(),
-    calendarTitleField: z.string().min(1, 'Cannot be empty.').optional(),
-    calendarSubTitleField: z.string().min(1, 'Cannot be empty.').optional(),
-    calendarDefaultLayout: z.enum(['month', 'week', 'workWeek', 'day']).optional(),
-    kanbanBucketField: z.string().min(1, 'Cannot be empty.').optional()
-  })
-  .strict();
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  webUrl: z.string()
+    .refine(url => validation.isValidSharePointUrl(url) === true, {
+      error: 'webUrl is not a valid SharePoint site URL.'
+    })
+    .alias('u'),
+  listId: z.uuid().optional(),
+  listTitle: z.string().optional(),
+  listUrl: z.string().optional(),
+  title: z.string().min(1, 'Cannot be empty.'),
+  fields: z.string().optional(),
+  viewQuery: z.string().optional(),
+  personal: z.boolean().optional(),
+  default: z.boolean().optional(),
+  paged: z.boolean().optional(),
+  rowLimit: z.number().int().positive().optional(),
+  customFormatter: z.string()
+    .refine(formatter => {
+      try {
+        JSON.parse(formatter);
+        return true;
+      }
+      catch {
+        return false;
+      }
+    }, {
+      error: 'Custom formatter must be a valid JSON string.'
+    })
+    .optional(),
+  type: z.enum(['list', 'calendar', 'gallery', 'kanban']).optional(),
+  calendarStartDateField: z.string().min(1, 'Cannot be empty.').optional(),
+  calendarEndDateField: z.string().min(1, 'Cannot be empty.').optional(),
+  calendarTitleField: z.string().min(1, 'Cannot be empty.').optional(),
+  calendarSubTitleField: z.string().min(1, 'Cannot be empty.').optional(),
+  calendarDefaultLayout: z.enum(['month', 'week', 'workWeek', 'day']).optional(),
+  kanbanBucketField: z.string().min(1, 'Cannot be empty.').optional()
+});
 
 declare type Options = z.infer<typeof options>;
 
@@ -66,32 +62,32 @@ class SpoListViewAddCommand extends SpoCommand {
     return 'Adds a new view to a SharePoint list';
   }
 
-  public get schema(): z.ZodTypeAny {
+  public get schema(): z.ZodType {
     return options;
   }
 
-  public getRefinedSchema(schema: z.ZodTypeAny): z.ZodEffects<any> | undefined {
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
       .refine((options: Options) => [options.listId, options.listTitle, options.listUrl].filter(o => o !== undefined).length === 1, {
-        message: 'Use one of the following options: listId, listTitle, or listUrl.'
+        error: 'Use one of the following options: listId, listTitle, or listUrl.'
       })
       .refine((options: Options) => !options.personal || !options.default, {
-        message: 'Default view cannot be a personal view.'
+        error: 'Default view cannot be a personal view.'
       })
       .refine((options: Options) => options.type !== 'calendar' || [options.calendarStartDateField, options.calendarEndDateField, options.calendarTitleField].filter(o => o === undefined).length === 0, {
-        message: 'When type is calendar, do specify calendarStartDateField, calendarEndDateField, and calendarTitleField.'
+        error: 'When type is calendar, do specify calendarStartDateField, calendarEndDateField, and calendarTitleField.'
       })
       .refine((options: Options) => options.type === 'calendar' || [options.calendarStartDateField, options.calendarEndDateField, options.calendarTitleField].filter(o => o === undefined).length === 3, {
-        message: 'When type is not calendar, do not specify calendarStartDateField, calendarEndDateField, and calendarTitleField.'
+        error: 'When type is not calendar, do not specify calendarStartDateField, calendarEndDateField, and calendarTitleField.'
       })
       .refine((options: Options) => options.type !== 'kanban' || options.kanbanBucketField !== undefined, {
-        message: 'When type is kanban, do specify kanbanBucketField.'
+        error: 'When type is kanban, do specify kanbanBucketField.'
       })
       .refine((options: Options) => options.type === 'kanban' || options.kanbanBucketField === undefined, {
-        message: 'When type is not kanban, do not specify kanbanBucketField.'
+        error: 'When type is not kanban, do not specify kanbanBucketField.'
       })
       .refine((options: Options) => options.type === 'calendar' || options.fields !== undefined, {
-        message: 'When type is not calendar, do specify fields.'
+        error: 'When type is not calendar, do specify fields.'
       });
   }
 

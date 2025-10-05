@@ -1,28 +1,27 @@
 import assert from 'assert';
 import Configstore from 'configstore';
 import sinon from 'sinon';
-import { z } from 'zod';
 import auth from '../../../../Auth.js';
-import cliConfig from '../../../../config.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
-import commands from '../../commands.js';
+import { CommandError } from '../../../../Command.js';
+import cliConfig from '../../../../config.js';
+import request from '../../../../request.js';
 import { telemetry } from '../../../../telemetry.js';
+import { accessToken } from '../../../../utils/accessToken.js';
+import { entraApp } from '../../../../utils/entraApp.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
-import { cli } from '../../../../cli/cli.js';
-import command from './app-add.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
-import { CommandError } from '../../../../Command.js';
-import { entraApp } from '../../../../utils/entraApp.js';
-import { accessToken } from '../../../../utils/accessToken.js';
-import request from '../../../../request.js';
+import commands from '../../commands.js';
+import command, { options } from './app-add.js';
 
 describe(commands.APP_ADD, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
-  let commandOptionsSchema: z.ZodTypeAny;
+  let commandOptionsSchema: typeof options;
   let config: Configstore;
   let configSetSpy: sinon.SinonSpy;
 
@@ -33,7 +32,7 @@ describe(commands.APP_ADD, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
-    commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
     config = cli.getConfig();
     configSetSpy = sinon.stub(config, 'set').returns();
   });
@@ -137,7 +136,7 @@ describe(commands.APP_ADD, () => {
       scopes: 'all',
       verbose: true
     });
-    await command.action(logger, { options: parsedSchema.data });
+    await command.action(logger, { options: parsedSchema.data! });
     assert.deepEqual(createAppRegistrationSpy.getCall(0).args[0], {
       options: {
         allowPublicClientFlows: true,
@@ -181,7 +180,7 @@ describe(commands.APP_ADD, () => {
       saveToConfig: true,
       verbose: true
     });
-    await command.action(logger, { options: parsedSchema.data });
+    await command.action(logger, { options: parsedSchema.data! });
     const expected = {
       clientId: '00000000-0000-0000-0000-000000000001',
       tenantId: '00000000-0000-0000-0000-000000000003'
@@ -237,7 +236,7 @@ describe(commands.APP_ADD, () => {
       scopes: 'https://graph.microsoft.com/User.Read,https://graph.microsoft.com/Group.Read.All',
       verbose: true
     });
-    await command.action(logger, { options: parsedSchema.data });
+    await command.action(logger, { options: parsedSchema.data! });
     assert.deepEqual(createAppRegistrationSpy.getCall(0).args[0], {
       options: {
         allowPublicClientFlows: true,
@@ -284,6 +283,6 @@ describe(commands.APP_ADD, () => {
       saveToConfig: true,
       verbose: true
     });
-    await assert.rejects(command.action(logger, { options: parsedSchema.data }), new CommandError('Invalid request'));
+    await assert.rejects(command.action(logger, { options: parsedSchema.data! }), new CommandError('Invalid request'));
   });
 });

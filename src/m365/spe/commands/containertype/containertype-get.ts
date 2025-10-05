@@ -1,9 +1,7 @@
 import { Logger } from '../../../../cli/Logger.js';
-import { validation } from '../../../../utils/validation.js';
 import commands from '../../commands.js';
 import { globalOptionsZod } from '../../../../Command.js';
 import { z } from 'zod';
-import { zod } from '../../../../utils/zod.js';
 import GraphDelegatedCommand from '../../../base/GraphDelegatedCommand.js';
 import { formatting } from '../../../../utils/formatting.js';
 import request, { CliRequestOptions } from '../../../../request.js';
@@ -11,17 +9,11 @@ import { odata } from '../../../../utils/odata.js';
 import { cli } from '../../../../cli/cli.js';
 import { SpeContainerType } from '../../../../utils/spe.js';
 
-const options = globalOptionsZod
-  .extend({
-    id: zod.alias('i', z.string()
-      .refine(id => validation.isValidGuid(id), id => ({
-        message: `'${id}' is not a valid GUID.`
-      }))
-      .optional()
-    ),
-    name: zod.alias('n', z.string().optional())
-  })
-  .strict();
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  id: z.uuid().optional().alias('i'),
+  name: z.string().optional().alias('n')
+});
 
 declare type Options = z.infer<typeof options>;
 
@@ -38,14 +30,14 @@ class SpeContainerTypeGetCommand extends GraphDelegatedCommand {
     return 'Gets a container type';
   }
 
-  public get schema(): z.ZodTypeAny {
+  public get schema(): z.ZodType {
     return options;
   }
 
-  public getRefinedSchema(schema: typeof options): z.ZodEffects<any> | undefined {
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
       .refine(options => [options.id, options.name].filter(o => o !== undefined).length === 1, {
-        message: 'Use one of the following options: id or name.'
+        error: 'Use one of the following options: id or name.'
       });
   }
 

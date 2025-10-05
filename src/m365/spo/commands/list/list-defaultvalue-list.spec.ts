@@ -1,19 +1,18 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
+import { cli } from '../../../../cli/cli.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
+import { CommandError } from '../../../../Command.js';
 import request from '../../../../request.js';
 import { telemetry } from '../../../../telemetry.js';
+import { formatting } from '../../../../utils/formatting.js';
 import { pid } from '../../../../utils/pid.js';
-import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './list-defaultvalue-list.js';
-import { z } from 'zod';
-import { cli } from '../../../../cli/cli.js';
-import { formatting } from '../../../../utils/formatting.js';
-import { CommandError } from '../../../../Command.js';
+import command, { options } from './list-defaultvalue-list.js';
 
 describe(commands.LIST_DEFAULTVALUE_LIST, () => {
   const siteUrl = 'https://contoso.sharepoint.com/sites/marketing';
@@ -69,7 +68,7 @@ describe(commands.LIST_DEFAULTVALUE_LIST, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
-  let commandOptionsSchema: z.ZodTypeAny;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -78,7 +77,7 @@ describe(commands.LIST_DEFAULTVALUE_LIST, () => {
     sinon.stub(session, 'getId').returns('');
 
     commandInfo = cli.getCommandInfo(command);
-    commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
     auth.connection.active = true;
   });
 

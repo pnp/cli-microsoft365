@@ -1,23 +1,16 @@
 import PowerAutomateCommand from '../../../base/PowerAutomateCommand.js';
 import { globalOptionsZod } from '../../../../Command.js';
 import { z } from 'zod';
-import { zod } from '../../../../utils/zod.js';
 import { Logger } from '../../../../cli/Logger.js';
 import commands from '../../commands.js';
-import { validation } from '../../../../utils/validation.js';
 import { formatting } from '../../../../utils/formatting.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 
-const options = globalOptionsZod
-  .extend({
-    environmentName: zod.alias('e', z.string()),
-    flowName: zod.alias('n', z.string()
-      .refine(name => validation.isValidGuid(name), name => ({
-        message: `'${name}' is not a valid GUID.`
-      }))
-    )
-  })
-  .strict();
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  environmentName: z.string().alias('e'),
+  flowName: z.uuid().alias('n')
+});
 declare type Options = z.infer<typeof options>;
 
 interface CommandArgs {
@@ -33,7 +26,7 @@ class FlowRecycleBinItemRestoreCommand extends PowerAutomateCommand {
     return 'Restores a soft-deleted Power Automate flow';
   }
 
-  public get schema(): z.ZodTypeAny {
+  public get schema(): z.ZodType {
     return options;
   }
 

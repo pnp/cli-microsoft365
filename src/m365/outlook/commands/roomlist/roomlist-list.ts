@@ -6,7 +6,7 @@ import { odata } from '../../../../utils/odata.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 
-const options = globalOptionsZod.strict();
+export const options = z.strictObject({ ...globalOptionsZod.shape });
 
 class OutlookRoomListListCommand extends GraphCommand {
   public get name(): string {
@@ -17,7 +17,7 @@ class OutlookRoomListListCommand extends GraphCommand {
     return 'Get a collection of available roomlists';
   }
 
-  public get schema(): z.ZodTypeAny | undefined {
+  public get schema(): z.ZodType | undefined {
     return options;
   }
 

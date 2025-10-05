@@ -11,7 +11,6 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { spo } from '../../../../utils/spo.js';
 import commands from '../../commands.js';
-
 import command from './contenttypehub-get.js';
 
 describe(commands.CONTENTTYPEHUB_GET, () => {

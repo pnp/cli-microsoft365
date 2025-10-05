@@ -3,17 +3,15 @@ import { z } from 'zod';
 import { Logger } from "../../../../cli/Logger.js";
 import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from "../../../../request.js";
-import { zod } from '../../../../utils/zod.js';
 import GraphCommand from "../../../base/GraphCommand.js";
 import commands from "../../commands.js";
 
-const options = globalOptionsZod
-  .extend({
-    displayName: zod.alias('n', z.string()),
-    description: zod.alias('d', z.string().optional()),
-    hiddenMembership: z.boolean().optional()
-  })
-  .passthrough();
+const options = z.looseObject({
+  ...globalOptionsZod.shape,
+  displayName: z.string().alias('n'),
+  description: z.string().optional().alias('d'),
+  hiddenMembership: z.boolean().optional()
+});
 
 declare type Options = z.infer<typeof options>;
 
@@ -34,7 +32,7 @@ class EntraAdministrativeUnitAddCommand extends GraphCommand {
     return true;
   }
 
-  public get schema(): z.ZodTypeAny | undefined {
+  public get schema(): z.ZodType | undefined {
     return options;
   }
 

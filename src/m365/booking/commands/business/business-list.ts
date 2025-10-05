@@ -6,7 +6,7 @@ import { odata } from '../../../../utils/odata.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 
-const options = globalOptionsZod.strict();
+export const options = z.strictObject({ ...globalOptionsZod.shape });
 
 class BookingBusinessListCommand extends GraphCommand {
   public get name(): string {
@@ -17,7 +17,7 @@ class BookingBusinessListCommand extends GraphCommand {
     return 'Lists all Microsoft Bookings businesses that are created for the tenant.';
   }
 
-  public get schema(): z.ZodTypeAny | undefined {
+  public get schema(): z.ZodType | undefined {
     return options;
   }
 
