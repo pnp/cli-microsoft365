@@ -85,7 +85,7 @@ const config: Config = {
 
   themeConfig:
     {
-      image: 'img/cli-m365-site-preview.png',
+      image: 'img/cli-m365-site-preview.jpg',
       navbar: {
         title: '',
         style: 'primary',
