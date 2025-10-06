@@ -5,7 +5,7 @@ import { globalOptionsZod } from '../../../../Command.js';
 import { z } from 'zod';
 import { zod } from '../../../../utils/zod.js';
 import { validation } from '../../../../utils/validation.js';
-import { urlUtil } from '../../../../utils/urlUtil.js';
+import { spo } from '../../../../utils/spo.js';
 import { entraUser } from '../../../../utils/entraUser.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { odata } from '../../../../utils/odata.js';
@@ -13,9 +13,9 @@ import { odata } from '../../../../utils/odata.js';
 export const options = globalOptionsZod
   .extend({
     webUrl: zod.alias('u', z.string()
-      .refine(url => validation.isValidSharePointUrl(url) === true, {
-        message: 'webUrl is not a valid SharePoint site URL.'
-      })),
+      .refine(url => validation.isValidSharePointUrl(url) === true, url => ({
+        message: `'${url}' is not a valid SharePoint site URL.`
+      }))),
     listId: z.string()
       .refine(id => validation.isValidGuid(id), id => ({
         message: `'${id}' is not a valid GUID.`
@@ -47,7 +47,7 @@ class SpoSiteAlertListCommand extends SpoCommand {
   }
 
   public defaultProperties(): string[] | undefined {
-    return ['id', 'title', 'userId'];
+    return ['ID', 'Title', 'UserPrincipalName'];
   }
 
   public get schema(): z.ZodTypeAny | undefined {
@@ -83,17 +83,19 @@ class SpoSiteAlertListCommand extends SpoCommand {
     }
 
     let requestUrl = `${args.options.webUrl}/_api/web/alerts?$expand=List,User,List/Rootfolder,Item&$select=*,List/Id,List/Title,List/Rootfolder/ServerRelativeUrl,Item/ID,Item/FileRef,Item/Guid`;
+
     const filters: string[] = [];
+    let listId: string | undefined;
 
     if (args.options.listId) {
-      filters.push(`List/Id eq guid'${formatting.encodeQueryParameter(args.options.listId)}'`);
+      listId = args.options.listId;
     }
-    else if (args.options.listUrl) {
-      const listServerRelativeUrl = urlUtil.getServerRelativePath(args.options.webUrl, args.options.listUrl);
-      filters.push(`List/RootFolder/ServerRelativeUrl eq '${formatting.encodeQueryParameter(listServerRelativeUrl)}'`);
+    else if (args.options.listUrl || args.options.listTitle) {
+      listId = await spo.getListId(args.options.webUrl, args.options.listTitle, args.options.listUrl, logger, this.verbose);
     }
-    else if (args.options.listTitle) {
-      filters.push(`List/Title eq '${formatting.encodeQueryParameter(args.options.listTitle)}'`);
+
+    if (listId) {
+      filters.push(`List/Id eq guid'${formatting.encodeQueryParameter(listId)}'`);
     }
 
     if (args.options.userName) {
@@ -109,7 +111,16 @@ class SpoSiteAlertListCommand extends SpoCommand {
     }
 
     try {
-      const res = await odata.getAllItems<any>(`${requestUrl}`);
+      const res = await odata.getAllItems<any>(requestUrl);
+      res.forEach(alert => {
+        if (alert.Item) {
+          delete alert.Item['ID'];
+        }
+
+        if (args.options.output !== 'json' && alert.User && alert.User.UserPrincipalName) {
+          alert.UserPrincipalName = alert.User.UserPrincipalName;
+        }
+      });
       await logger.log(res);
     }
     catch (err: any) {

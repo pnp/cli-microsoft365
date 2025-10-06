@@ -41,14 +41,16 @@ m365 spo site alert list [options]
 <Tabs>
   <TabItem value="Delegated">
 
-  | Resource   | Permissions        |
-  |------------|--------------------|
+  | Resource   | Permissions          |
+  |------------|----------------------|
   | SharePoint | AllSites.FullControl |
 
   </TabItem>
   <TabItem value="Application">
 
-  Application permissions are not supported for this command.
+  | Resource   | Permissions           |
+  |------------|-----------------------|
+  | SharePoint | Sites.FullControl.All |
 
   </TabItem>
 </Tabs>
@@ -76,7 +78,7 @@ m365 spo site alert list --webUrl https://contoso.sharepoint.com/sites/Marketing
 List alerts for a specific list by title and user by username:
 
 ```sh
-m365 spo site alert list --webUrl https://contoso.sharepoint.com/sites/Marketing --listTitle "Tasks" --userName jane.doe@contos
+m365 spo site alert list --webUrl https://contoso.sharepoint.com/sites/Marketing --listTitle "Tasks" --userName jane.doe@contoso.com
 ```
 
 ## Response
@@ -89,64 +91,39 @@ m365 spo site alert list --webUrl https://contoso.sharepoint.com/sites/Marketing
     {
       "AlertFrequency": 0,
       "AlertTemplateName": "SPAlertTemplateType.DocumentLibrary",
-      "AlertType": 0,
+      "AlertType": 1,
       "AlwaysNotify": false,
       "DeliveryChannels": 1,
       "EventType": -1,
       "Filter": "",
-      "ID": "edf49cf4-d91e-4084-866d-2b9ff5582189",
+      "ID": "c52b4bf0-add0-4323-b670-f765bb46337b",
       "Properties": [
         {
           "Key": "dispformurl",
           "Value": "Shared Documents/Forms/DispForm.aspx",
           "ValueType": "Edm.String"
-        },
-        {
-          "Key": "filterindex",
-          "Value": "0",
-          "ValueType": "Edm.String"
-        },
-        {
-          "Key": "defaultitemopen",
-          "Value": "Browser",
-          "ValueType": "Edm.String"
-        },
-        {
-          "Key": "sendurlinsms",
-          "Value": "False",
-          "ValueType": "Edm.String"
-        },
-        {
-          "Key": "mobileurl",
-          "Value": "https://contoso.sharepoint.com/_layouts/15/mobile/",
-          "ValueType": "Edm.String"
-        },
-        {
-          "Key": "eventtypeindex",
-          "Value": "0",
-          "ValueType": "Edm.String"
-        },
-        {
-          "Key": "siteurl",
-          "Value": "https://contoso.sharepoint.com",
-          "ValueType": "Edm.String"
         }
       ],
       "Status": 0,
-      "Title": "Documents",
-      "UserId": 6,
+      "Title": "Documents: ProjectPlan.docx",
+      "UserId": 9,
+      "Item": {
+        "Id": 37326,
+        "FileRef": "/sites/marketing/Shared Documents/ProjectPlan.docx",
+        "GUID": "ef5cc60b-71c0-4357-a291-14274234efde"
+      },
       "List": {
-        "Id": "39d9e102-9e8f-4e74-8f17-84a92f972fcf",
+        "Id": "6b4f195c-02da-47f4-8237-065b96258cf3",
         "Title": "Documents",
         "RootFolder": {
-          "ServerRelativeUrl": "/Shared Documents"
+          "ServerRelativeUrl": "/sites/marketing/Shared Documents"
         }
       },
       "User": {
-        "Id": 6,
+        "Id": 9,
         "IsHiddenInUI": false,
         "LoginName": "i:0#.f|membership|jane.doe@contoso.onmicrosoft.com",
-        "Title": "Saurabh",
+        "Title": "Jane Doe",
         "PrincipalType": 1,
         "Email": "jane.doe@contoso.onmicrosoft.com",
         "Expiration": "",
@@ -167,53 +144,43 @@ m365 spo site alert list --webUrl https://contoso.sharepoint.com/sites/Marketing
   <TabItem value="Text">
 
   ```txt
-  AlertFrequency   : 0
-  AlertTemplateName: SPAlertTemplateType.DocumentLibrary
-  AlertType        : 0
-  AlwaysNotify     : false
-  DeliveryChannels : 1
-  EventType        : -1
-  Filter           :
-  ID               : edf49cf4-d91e-4084-866d-2b9ff5582189
-  List             : {"Id":"39d9e102-9e8f-4e74-8f17-84a92f972fcf","Title":"Documents","RootFolder":{"ServerRelativeUrl":"/Shared Documents"}}
-  Properties       : [{"Key":"dispformurl","Value":"Shared Documents/Forms/DispForm.aspx","ValueType":"Edm.String"},{"Key":"filterindex","Value":"0","ValueType":"Edm.String"},{"Key":"defaultitemopen","Value":"Browser","ValueType":"Edm.String"},{"Key":"sendurlinsms","Value":"False","ValueType":"Edm.String"},{"Key":"mobileurl","Value":"https://contoso.sharepoint.com/_layouts/15/mobile/","ValueType":"Edm.String"},{"Key":"eventtypeindex","Value":"0","ValueType":"Edm.String"},{"Key":"siteurl","Value":"https://contoso.sharepoint.com","ValueType":"Edm.String"}]
-  Status           : 0
-  Title            : Documents
-  User             : {"Id":6,"IsHiddenInUI":false,"LoginName":"i:0#.f|membership|jane.doe@contoso.onmicrosoft.com","Title":"Saurabh","PrincipalType":1,"Email":"jane.doe@contoso.onmicrosoft.com","Expiration":"","IsEmailAuthenticationGuestUser":false,"IsShareByEmailGuestUser":false,"IsSiteAdmin":false,"UserId":{"NameId":"10037ffeaed549a5","NameIdIssuer":"urn:federation:microsoftonline"},"UserPrincipalName":"jane.doe@contoso.onmicrosoft.com"}
-  UserId           : 6
+  ID                                    Title                        UserPrincipalName
+  ------------------------------------  ---------------------------  --------------------
+  fa5115ee-0c72-4d17-9fda-ee2451ba1c6d  Documents: ProjectPlan.docx  jane.doe@contoso.com
   ```
 
   </TabItem>
   <TabItem value="CSV">
 
   ```csv
-  AlertFrequency,AlertTemplateName,AlertType,AlwaysNotify,DeliveryChannels,EventType,Filter,ID,Status,Title,UserId
-  0,SPAlertTemplateType.DocumentLibrary,0,0,1,-1,,edf49cf4-d91e-4084-866d-2b9ff5582189,0,Documents,6
+  AlertFrequency,AlertTemplateName,AlertType,AlwaysNotify,DeliveryChannels,EventType,Filter,ID,Status,Title,UserId,UserPrincipalName
+  0,SPAlertTemplateType.DocumentLibrary,1,0,1,-1,,fa5115ee-0c72-4d17-9fda-ee2451ba1c6d,0,Documents: ProjectPlan.docx,6,jane.doe@contoso.com
   ```
 
   </TabItem>
   <TabItem value="Markdown">
 
   ```md
-  # spo site alert list --debug "false" --verbose "false" --webUrl "https://contoso.sharepoint.com" --listTitle "Documents"
+  # spo site alert list --webUrl "https://contoso.sharepoint.com/sites/marketing" --listUrl "/sites/marketing/Shared Documents"
 
-  Date: 9/26/2025
+  Date: 10/6/2025
 
-  ## Documents (edf49cf4-d91e-4084-866d-2b9ff5582189)
+  ## Documents: ProjectPlan.docx (c52b4bf0-add0-4323-b670-f765bb46337b)
 
   Property | Value
   ---------|-------
   AlertFrequency | 0
   AlertTemplateName | SPAlertTemplateType.DocumentLibrary
-  AlertType | 0
+  AlertType | 1
   AlwaysNotify | false
   DeliveryChannels | 1
   EventType | -1
   Filter |
-  ID | edf49cf4-d91e-4084-866d-2b9ff5582189
+  ID | c52b4bf0-add0-4323-b670-f765bb46337b
   Status | 0
-  Title | Documents
-  UserId | 6
+  Title | Documents: ProjectPlan.docx
+  UserId | 9
+  UserPrincipalName | jane.doe@contoso.com
   ```
 
   </TabItem>

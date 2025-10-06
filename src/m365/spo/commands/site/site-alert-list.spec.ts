@@ -6,6 +6,7 @@ import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
 import { odata } from '../../../../utils/odata.js';
+import request from '../../../../request.js';
 import { telemetry } from '../../../../telemetry.js';
 import { entraUser } from '../../../../utils/entraUser.js';
 import { formatting } from '../../../../utils/formatting.js';
@@ -27,6 +28,7 @@ describe(commands.SITE_ALERT_LIST, () => {
   const listId = '39d9e102-9e8f-4e74-8f17-84a92f972fcf';
   const listTitle = 'Tasks';
   const listUrl = '/sites/marketing/lists/tasks';
+  const fileUrl = '/sites/marketing/Shared Documents/ProjectPlan.docx';
   const userName = 'jane.doe@contoso.com';
   const userId = '7cbb4c8d-8e4d-4d2e-9c6f-3f1d8b2e6a0e';
 
@@ -80,6 +82,12 @@ describe(commands.SITE_ALERT_LIST, () => {
       "Status": 0,
       "Title": listTitle,
       "UserId": 8,
+      "Item": {
+        "Id": 37326,
+        "ID": 37326,
+        "FileRef": fileUrl,
+        "GUID": "ef5cc60b-71c0-4357-a291-14274234efde"
+      },
       "List": {
         "Id": listId,
         "Title": listTitle,
@@ -136,6 +144,7 @@ describe(commands.SITE_ALERT_LIST, () => {
   afterEach(() => {
     sinonUtil.restore([
       odata.getAllItems,
+      request.get,
       entraUser.getUpnByUserId
     ]);
   });
@@ -237,8 +246,16 @@ describe(commands.SITE_ALERT_LIST, () => {
   });
 
   it('successfully gets all alerts when listUrl is specified', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `${webUrl}/_api/web/GetList('${formatting.encodeQueryParameter(listUrl)}')?$select=Id`) {
+        return { Id: listId };
+      }
+
+      throw 'Invalid request';
+    });
+
     const odataStub = sinon.stub(odata, 'getAllItems').callsFake(async url => {
-      if (url === `${webUrl}/_api/web/alerts?$expand=List,User,List/Rootfolder,Item&$select=*,List/Id,List/Title,List/Rootfolder/ServerRelativeUrl,Item/ID,Item/FileRef,Item/Guid&$filter=List/RootFolder/ServerRelativeUrl eq '${formatting.encodeQueryParameter(listUrl)}'`) {
+      if (url === `${webUrl}/_api/web/alerts?$expand=List,User,List/Rootfolder,Item&$select=*,List/Id,List/Title,List/Rootfolder/ServerRelativeUrl,Item/ID,Item/FileRef,Item/Guid&$filter=List/Id eq guid'${listId}'`) {
         return alertResponse;
       }
 
@@ -251,8 +268,16 @@ describe(commands.SITE_ALERT_LIST, () => {
   });
 
   it('successfully gets all alerts when listTitle is specified', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts: any) => {
+      if (opts.url === `${webUrl}/_api/web/lists/getByTitle('${formatting.encodeQueryParameter(listTitle)}')?$select=Id`) {
+        return { Id: listId };
+      }
+
+      throw 'Invalid request';
+    });
+
     const odataStub = sinon.stub(odata, 'getAllItems').callsFake(async url => {
-      if (url === `${webUrl}/_api/web/alerts?$expand=List,User,List/Rootfolder,Item&$select=*,List/Id,List/Title,List/Rootfolder/ServerRelativeUrl,Item/ID,Item/FileRef,Item/Guid&$filter=List/Title eq '${listTitle}'`) {
+      if (url === `${webUrl}/_api/web/alerts?$expand=List,User,List/Rootfolder,Item&$select=*,List/Id,List/Title,List/Rootfolder/ServerRelativeUrl,Item/ID,Item/FileRef,Item/Guid&$filter=List/Id eq guid'${listId}'`) {
         return alertResponse;
       }
 
@@ -279,7 +304,7 @@ describe(commands.SITE_ALERT_LIST, () => {
   });
 
   it('successfully gets all alerts when listId and userId are specified', async () => {
-    sinon.stub(entraUser, 'getUpnByUserId').resolves(userName);
+    const getUserStub = sinon.stub(entraUser, 'getUpnByUserId').resolves(userName);
 
     const odataStub = sinon.stub(odata, 'getAllItems').callsFake(async url => {
       if (url === `${webUrl}/_api/web/alerts?$expand=List,User,List/Rootfolder,Item&$select=*,List/Id,List/Title,List/Rootfolder/ServerRelativeUrl,Item/ID,Item/FileRef,Item/Guid&$filter=List/Id eq guid'${listId}' and User/UserPrincipalName eq '${formatting.encodeQueryParameter(userName)}'`) {
@@ -291,6 +316,7 @@ describe(commands.SITE_ALERT_LIST, () => {
 
     await command.action(logger, { options: { webUrl: webUrl, listId: listId, userId: userId, verbose: true } });
     assert(odataStub.calledOnce);
+    assert(getUserStub.calledOnceWith(userId));
     assert(loggerLogSpy.calledWith(alertResponse));
   });
 
@@ -303,7 +329,7 @@ describe(commands.SITE_ALERT_LIST, () => {
     };
     sinon.stub(odata, 'getAllItems').rejects(error);
 
-    await assert.rejects(command.action(logger, { options: {} }),
+    await assert.rejects(command.action(logger, { options: { webUrl: webUrl } }),
       new CommandError(`An unknown error has occurred.`));
   });
 });
