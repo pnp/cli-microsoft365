@@ -1,36 +1,21 @@
-import os from 'os';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import { Logger } from '../../../../cli/Logger.js';
-import request from '../../../../request.js';
-import { basic } from '../../../../utils/basic.js';
-import { formatting } from '../../../../utils/formatting.js';
-import { ODataResponse } from '../../../../utils/odata.js';
-import { spo } from '../../../../utils/spo.js';
-import { urlUtil } from '../../../../utils/urlUtil.js';
+import { ListItemAddOptions, spoListItem } from '../../../../utils/spoListItem.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
-import { ListItemFieldValueResult } from './ListItemFieldValueResult.js';
-import { ListItemInstance } from './ListItemInstance.js';
 
 interface CommandArgs {
   options: Options;
 }
 
-export interface Options extends GlobalOptions {
+interface Options extends GlobalOptions {
   webUrl: string;
   listId?: string;
   listTitle?: string;
   listUrl?: string;
   contentType?: string;
   folder?: string;
-}
-
-interface ContentType {
-  Id: {
-    StringValue: string;
-  };
-  Name: string;
 }
 
 class SpoListItemAddCommand extends SpoCommand {
@@ -126,148 +111,17 @@ class SpoListItemAddCommand extends SpoCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
-
-      let requestUrl = `${args.options.webUrl}/_api/web`;
-
-      if (args.options.listId) {
-        requestUrl += `/lists(guid'${formatting.encodeQueryParameter(args.options.listId)}')`;
-      }
-      else if (args.options.listTitle) {
-        requestUrl += `/lists/getByTitle('${formatting.encodeQueryParameter(args.options.listTitle)}')`;
-      }
-      else if (args.options.listUrl) {
-        const listServerRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.listUrl);
-        requestUrl += `/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')`;
-      }
-
-      let contentTypeName: string = '';
-      let targetFolderServerRelativeUrl: string = '';
-
-      if (this.verbose) {
-        await logger.logToStderr(`Getting content types for list ${args.options.listId || args.options.listTitle || args.options.listUrl}...`);
-      }
-
-      let requestOptions: any = {
-        url: `${requestUrl}/contenttypes?$select=Name,Id`,
-        headers: {
-          'accept': 'application/json;odata=nometadata'
-        },
-        responseType: 'json'
+      const options: ListItemAddOptions = {
+        webUrl: args.options.webUrl,
+        listId: args.options.listId,
+        listUrl: args.options.listUrl,
+        listTitle: args.options.listTitle,
+        contentType: args.options.contentType,
+        folder: args.options.folder,
+        fieldValues: this.mapUnknownProperties(args.options)
       };
 
-      const ctypes = await request.get<ODataResponse<ContentType>>(requestOptions);
-      if (args.options.contentType) {
-        const foundContentType = await basic.asyncFilter<ContentType>(ctypes.value, async (ct: ContentType) => {
-          const contentTypeMatch: boolean = ct.Id.StringValue === args.options.contentType || ct.Name === args.options.contentType;
-
-          if (this.debug) {
-            await logger.logToStderr(`Checking content type value [${ct.Name}]: ${contentTypeMatch}`);
-          }
-
-          return contentTypeMatch;
-        });
-
-        if (this.debug) {
-          await logger.logToStderr('content type filter output...');
-          await logger.logToStderr(foundContentType);
-        }
-
-        if (foundContentType.length > 0) {
-          contentTypeName = foundContentType[0].Name;
-        }
-
-        // After checking for content types, throw an error if the name is blank
-        if (!contentTypeName || contentTypeName === '') {
-          throw `Specified content type '${args.options.contentType}' doesn't exist on the target list`;
-        }
-
-        if (this.debug) {
-          await logger.logToStderr(`using content type name: ${contentTypeName}`);
-        }
-      }
-
-      if (args.options.folder) {
-        if (this.debug) {
-          await logger.logToStderr('setting up folder lookup response ...');
-        }
-
-        requestOptions = {
-          url: `${requestUrl}/rootFolder`,
-          headers: {
-            'accept': 'application/json;odata=nometadata'
-          },
-          responseType: 'json'
-        };
-
-        const rootFolderResponse = await request.get<any>(requestOptions);
-        targetFolderServerRelativeUrl = urlUtil.getServerRelativePath(rootFolderResponse["ServerRelativeUrl"], args.options.folder as string);
-        await spo.ensureFolder(args.options.webUrl, targetFolderServerRelativeUrl, logger, this.debug);
-      }
-
-      if (this.verbose) {
-        await logger.logToStderr(`Creating item in list ${args.options.listId || args.options.listTitle || args.options.listUrl} in site ${args.options.webUrl}...`);
-      }
-
-      const requestBody: any = {
-        formValues: this.mapRequestBody(args.options)
-      };
-
-      if (args.options.folder) {
-        requestBody.listItemCreateInfo = {
-          FolderPath: {
-            DecodedUrl: targetFolderServerRelativeUrl
-          }
-        };
-      }
-
-      if (args.options.contentType && contentTypeName !== '') {
-        if (this.debug) {
-          await logger.logToStderr(`Specifying content type name [${contentTypeName}] in request body`);
-        }
-
-        requestBody.formValues.push({
-          FieldName: 'ContentType',
-          FieldValue: contentTypeName
-        });
-      }
-
-      requestOptions = {
-        url: `${requestUrl}/AddValidateUpdateItemUsingPath()`,
-        headers: {
-          'accept': 'application/json;odata=nometadata'
-        },
-        data: requestBody,
-        responseType: 'json'
-      };
-
-      const response = await request.post<any>(requestOptions);
-
-      // Response is from /AddValidateUpdateItemUsingPath POST call, perform get on added item to get all field values
-      const fieldValues: ListItemFieldValueResult[] = response.value;
-      if (fieldValues.some(f => f.HasException)) {
-        throw `Creating the item failed with the following errors: ${os.EOL}${fieldValues.filter(f => f.HasException).map(f => { return `- ${f.FieldName} - ${f.ErrorMessage}`; }).join(os.EOL)}`;
-      }
-
-      const idField = fieldValues.filter((thisField) => {
-        return (thisField.FieldName === "Id");
-      });
-
-      if (this.debug) {
-        await logger.logToStderr(`Field values returned:`);
-        await logger.logToStderr(fieldValues);
-        await logger.logToStderr(`Id returned by AddValidateUpdateItemUsingPath: ${idField[0].FieldValue}`);
-      }
-
-      requestOptions = {
-        url: `${requestUrl}/items(${idField[0].FieldValue})`,
-        headers: {
-          'accept': 'application/json;odata=nometadata'
-        },
-        responseType: 'json'
-      };
-
-      const item = await request.get<ListItemInstance>(requestOptions);
-      delete item.ID;
+      const item = await spoListItem.addListItem(options, logger, this.verbose, this.debug);
       await logger.log(item);
     }
     catch (err: any) {
@@ -275,8 +129,8 @@ class SpoListItemAddCommand extends SpoCommand {
     }
   }
 
-  private mapRequestBody(options: Options): any {
-    const requestBody: any = [];
+  private mapUnknownProperties(options: Options): any {
+    const fieldValues: { [key: string]: any } = {};
     const excludeOptions: string[] = [
       'listTitle',
       'listId',
@@ -292,10 +146,11 @@ class SpoListItemAddCommand extends SpoCommand {
 
     Object.keys(options).forEach(key => {
       if (excludeOptions.indexOf(key) === -1) {
-        requestBody.push({ FieldName: key, FieldValue: `${(<any>options)[key]}` });
+        fieldValues[key] = `${(<any>options)[key]}`;
       }
     });
-    return requestBody;
+
+    return fieldValues;
   }
 }
 

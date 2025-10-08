@@ -2,8 +2,8 @@ import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
-import { odata } from '../../../../utils/odata.js';
 import { spo } from '../../../../utils/spo.js';
+import { ListItemListOptions, spoListItem } from '../../../../utils/spoListItem.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
@@ -72,7 +72,7 @@ class SpoTenantRecycleBinItemRestoreCommand extends SpoCommand {
 
       await request.post(requestOptions);
 
-      const groupId = await this.getSiteGroupId(adminUrl, siteUrl);
+      const groupId = await this.getSiteGroupId(adminUrl, siteUrl, logger);
 
       if (groupId && groupId !== '00000000-0000-0000-0000-000000000000') {
         if (this.verbose) {
@@ -96,9 +96,17 @@ class SpoTenantRecycleBinItemRestoreCommand extends SpoCommand {
     }
   }
 
-  private async getSiteGroupId(adminUrl: string, url: string): Promise<string | undefined> {
-    const sites = await odata.getAllItems<{ GroupId?: string }>(`${adminUrl}/_api/web/lists/GetByTitle('DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECOLLECTIONS')/items?$filter=SiteUrl eq '${formatting.encodeQueryParameter(url)}'&$select=GroupId`);
-    return sites[0].GroupId;
+  private async getSiteGroupId(adminUrl: string, url: string, logger: Logger): Promise<string | undefined> {
+    const options: ListItemListOptions = {
+      webUrl: adminUrl,
+      listTitle: 'DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECOLLECTIONS',
+      filter: `SiteUrl eq '${formatting.encodeQueryParameter(url)}'`,
+      fields: ['GroupId']
+    };
+
+    const listItems = await spoListItem.getListItems(options, logger, this.verbose);
+
+    return (listItems[0] as any).GroupId;
   }
 }
 

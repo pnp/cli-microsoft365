@@ -10,11 +10,11 @@ import { telemetry } from '../../../../telemetry.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
-import { urlUtil } from '../../../../utils/urlUtil.js';
 import commands from '../../commands.js';
-import spoListItemListCommand from '../listitem/listitem-list.js';
 import command from './tenant-applicationcustomizer-set.js';
 import { settingsNames } from '../../../../settingsNames.js';
+import { ListItemListOptions, spoListItem } from '../../../../utils/spoListItem.js';
+import { spo } from '../../../../utils/spo.js';
 
 describe(commands.TENANT_APPLICATIONCUSTOMIZER_SET, () => {
   const title = 'Some customizer';
@@ -32,55 +32,53 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_SET, () => {
   const solutionResponse = [solution];
   const application = { "FileSystemObjectType": 0, "Id": 31, "ServerRedirectedEmbedUri": null, "ServerRedirectedEmbedUrl": "", "SkipFeatureDeployment": true, "ContainsTenantWideExtension": true, "Modified": "2022-11-03T11:26:03", "CheckoutUserId": null, "EditorId": 9 };
   const applicationResponse = [application];
-  const applicationCustomizerResponse = {
-    value:
-      [{
-        "FileSystemObjectType": 0,
-        "Id": id,
-        "ServerRedirectedEmbedUri": null,
-        "ServerRedirectedEmbedUrl": "",
-        "ContentTypeId": "0x00693E2C487575B448BD420C12CEAE7EFE",
-        "Title": title,
-        "Modified": "2023-01-11T15:47:38Z",
-        "Created": "2023-01-11T15:47:38Z",
-        "AuthorId": 9,
-        "EditorId": 9,
-        "OData__UIVersionString": "1.0",
-        "Attachments": false,
-        "GUID": '14125658-a9bc-4ddf-9c75-1b5767c9a337',
-        "ComplianceAssetId": null,
-        "TenantWideExtensionComponentId": clientSideComponentId,
-        "TenantWideExtensionComponentProperties": "{\"testMessage\":\"Test message\"}",
-        "TenantWideExtensionWebTemplate": null,
-        "TenantWideExtensionListTemplate": 0,
-        "TenantWideExtensionLocation": "ClientSideExtension.ApplicationCustomizer",
-        "TenantWideExtensionSequence": 0,
-        "TenantWideExtensionHostProperties": null,
-        "TenantWideExtensionDisabled": false
-      }]
-  };
-  const multipleResponses = {
-    value:
-      [
-        { Title: title, Id: 3, TenantWideExtensionComponentId: clientSideComponentId },
-        { Title: title, Id: 4, TenantWideExtensionComponentId: clientSideComponentId }
-      ]
-  };
+  const applicationCustomizerResponse = [{
+    "FileSystemObjectType": 0,
+    "Id": id,
+    "ServerRedirectedEmbedUri": null,
+    "ServerRedirectedEmbedUrl": "",
+    "ContentTypeId": "0x00693E2C487575B448BD420C12CEAE7EFE",
+    "Title": title,
+    "Modified": "2023-01-11T15:47:38Z",
+    "Created": "2023-01-11T15:47:38Z",
+    "AuthorId": 9,
+    "EditorId": 9,
+    "OData__UIVersionString": "1.0",
+    "Attachments": false,
+    "GUID": '14125658-a9bc-4ddf-9c75-1b5767c9a337',
+    "ComplianceAssetId": null,
+    "TenantWideExtensionComponentId": clientSideComponentId,
+    "TenantWideExtensionComponentProperties": "{\"testMessage\":\"Test message\"}",
+    "TenantWideExtensionWebTemplate": null,
+    "TenantWideExtensionListTemplate": 0,
+    "TenantWideExtensionLocation": "ClientSideExtension.ApplicationCustomizer",
+    "TenantWideExtensionSequence": 0,
+    "TenantWideExtensionHostProperties": null,
+    "TenantWideExtensionDisabled": false
+  }];
+  const multipleResponses = [
+    { Title: title, Id: 3, TenantWideExtensionComponentId: clientSideComponentId },
+    { Title: title, Id: 4, TenantWideExtensionComponentId: clientSideComponentId }
+  ];
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
 
   const defaultGetCallStub = (filter: string): sinon.SinonStub => {
-    return sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `${spoUrl}/_api/SP_TenantSettings_Current`) {
-        return { CorporateCatalogUrl: appCatalogUrl };
+    return sinon.stub(spoListItem, 'getListItems').callsFake(async (options: ListItemListOptions) => {
+      if (options.webUrl === appCatalogUrl) {
+        if (options.listUrl === '/sites/apps/Lists/ComponentManifests') {
+          return solutionResponse as any[];
+        }
+        else if (options.listUrl === '/sites/apps/AppCatalog') {
+          return applicationResponse as any[];
+        }
+        else if (options.listUrl === `/sites/apps/lists/TenantWideExtensions` && options.filter === `TenantWideExtensionLocation eq 'ClientSideExtension.ApplicationCustomizer' and ${filter}`) {
+          return applicationCustomizerResponse as any;
+        }
       }
 
-      if (opts.url === `https://contoso.sharepoint.com/sites/apps/_api/web/GetList('%2Fsites%2Fapps%2Flists%2FTenantWideExtensions')/items?$filter=TenantWideExtensionLocation eq 'ClientSideExtension.ApplicationCustomizer' and ${filter}`) {
-        return applicationCustomizerResponse;
-      }
-
-      throw 'Invalid request';
+      throw 'Invalid request: ' + JSON.stringify(options);
     });
   };
 
@@ -97,7 +95,7 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_SET, () => {
         };
       }
 
-      throw 'Invalid request';
+      throw 'Invalid request: ' + JSON.stringify(opts);
     });
   };
 
@@ -114,7 +112,7 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_SET, () => {
         };
       }
 
-      throw 'Invalid request';
+      throw 'Invalid request: ' + JSON.stringify(opts);
     });
   };
 
@@ -145,12 +143,12 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_SET, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      request.get,
+      spo.getTenantAppCatalogUrl,
+      spoListItem.addListItem,
+      spoListItem.getListItems,
       request.post,
       cli.getSettingWithDefaultValue,
-      cli.handleMultipleResultsFound,
-      cli.executeCommand,
-      cli.executeCommandWithOutput
+      cli.handleMultipleResultsFound
     ]);
   });
 
@@ -220,13 +218,8 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_SET, () => {
   it('handles error when tenant app catalog doesn\'t exist', async () => {
     const errorMessage = 'No app catalog URL found';
 
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `${spoUrl}/_api/SP_TenantSettings_Current`) {
-        return { CorporateCatalogUrl: null };
-      }
 
-      throw 'Invalid request';
-    });
+    sinon.stub(spo, 'getTenantAppCatalogUrl').resolves(null);
 
     await assert.rejects(command.action(logger, {
       options: {
@@ -238,18 +231,21 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_SET, () => {
 
   it('handles error when no application customizer with the specified title found', async () => {
     const errorMessage = 'The specified application customizer was not found';
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `${spoUrl}/_api/SP_TenantSettings_Current`) {
-        return { CorporateCatalogUrl: appCatalogUrl };
+
+    sinon.stub(spo, 'getTenantAppCatalogUrl').resolves(appCatalogUrl);
+    sinon.stub(spoListItem, 'getListItems').callsFake(async (options: ListItemListOptions) => {
+      if (options.webUrl === appCatalogUrl) {
+        if (options.listUrl === '/sites/apps/Lists/ComponentManifests') {
+          return [];
+        }
+
+        if (options.listUrl === `/sites/apps/lists/TenantWideExtensions`) {
+          return [];
+        }
       }
 
-      if (opts.url === `https://contoso.sharepoint.com/sites/apps/_api/web/GetList('%2Fsites%2Fapps%2Flists%2FTenantWideExtensions')/items?$filter=TenantWideExtensionLocation eq 'ClientSideExtension.ApplicationCustomizer' and Title eq 'Some customizer'`) {
-        return { value: [] };
-      }
-
-      throw 'Invalid request';
+      throw 'Invalid request: ' + JSON.stringify(options);
     });
-
     await assert.rejects(command.action(logger, {
       options: {
         title: title, newTitle: newTitle
@@ -266,16 +262,19 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_SET, () => {
       return defaultValue;
     });
 
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `${spoUrl}/_api/SP_TenantSettings_Current`) {
-        return { CorporateCatalogUrl: appCatalogUrl };
+    sinon.stub(spo, 'getTenantAppCatalogUrl').resolves(appCatalogUrl);
+    sinon.stub(spoListItem, 'getListItems').callsFake(async (options: ListItemListOptions) => {
+      if (options.webUrl === appCatalogUrl) {
+        if (options.listUrl === '/sites/apps/Lists/ComponentManifests') {
+          return [];
+        }
+
+        if (options.listUrl === `/sites/apps/lists/TenantWideExtensions`) {
+          return multipleResponses as any;
+        }
       }
 
-      if (opts.url === `https://contoso.sharepoint.com/sites/apps/_api/web/GetList('%2Fsites%2Fapps%2Flists%2FTenantWideExtensions')/items?$filter=TenantWideExtensionLocation eq 'ClientSideExtension.ApplicationCustomizer' and Title eq 'Some customizer'`) {
-        return multipleResponses;
-      }
-
-      throw 'Invalid request';
+      throw 'Invalid request: ' + JSON.stringify(options);
     });
 
     await assert.rejects(command.action(logger, {
@@ -294,16 +293,19 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_SET, () => {
       return defaultValue;
     });
 
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `${spoUrl}/_api/SP_TenantSettings_Current`) {
-        return { CorporateCatalogUrl: appCatalogUrl };
+    sinon.stub(spo, 'getTenantAppCatalogUrl').resolves(appCatalogUrl);
+    sinon.stub(spoListItem, 'getListItems').callsFake(async (options: ListItemListOptions) => {
+      if (options.webUrl === appCatalogUrl) {
+        if (options.listUrl === '/sites/apps/Lists/ComponentManifests') {
+          return [];
+        }
+
+        if (options.listUrl === `/sites/apps/lists/TenantWideExtensions`) {
+          return multipleResponses as any;
+        }
       }
 
-      if (opts.url === `https://contoso.sharepoint.com/sites/apps/_api/web/GetList('%2Fsites%2Fapps%2Flists%2FTenantWideExtensions')/items?$filter=TenantWideExtensionLocation eq 'ClientSideExtension.ApplicationCustomizer' and TenantWideExtensionComponentId eq '7096cded-b83d-4eab-96f0-df477ed7c0bc'`) {
-        return multipleResponses;
-      }
-
-      throw 'Invalid request';
+      throw 'Invalid request: ' + JSON.stringify(options);
     });
 
     await assert.rejects(command.action(logger, {
@@ -314,19 +316,22 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_SET, () => {
   });
 
   it('handles selecting single result when multiple application customizers with the specified name found and cli is set to prompt', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `${spoUrl}/_api/SP_TenantSettings_Current`) {
-        return { CorporateCatalogUrl: appCatalogUrl };
+    sinon.stub(spo, 'getTenantAppCatalogUrl').resolves(appCatalogUrl);
+    sinon.stub(spoListItem, 'getListItems').callsFake(async (options: ListItemListOptions) => {
+      if (options.webUrl === appCatalogUrl) {
+        if (options.listUrl === '/sites/apps/Lists/ComponentManifests') {
+          return [];
+        }
+
+        if (options.listUrl === `/sites/apps/lists/TenantWideExtensions`) {
+          return multipleResponses as any;
+        }
       }
 
-      if (opts.url === `https://contoso.sharepoint.com/sites/apps/_api/web/GetList('%2Fsites%2Fapps%2Flists%2FTenantWideExtensions')/items?$filter=TenantWideExtensionLocation eq 'ClientSideExtension.ApplicationCustomizer' and Title eq 'Some customizer'`) {
-        return multipleResponses;
-      }
-
-      throw 'Invalid request';
+      throw 'Invalid request: ' + JSON.stringify(options);
     });
 
-    sinon.stub(cli, 'handleMultipleResultsFound').resolves(applicationCustomizerResponse.value[0]);
+    sinon.stub(cli, 'handleMultipleResultsFound').resolves(applicationCustomizerResponse[0]);
 
     const executeCallsStub: sinon.SinonStub = defaultPostCallsStub();
     await command.action(logger, {
@@ -339,16 +344,20 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_SET, () => {
 
   it('handles error when listItemInstances are falsy', async () => {
     const errorMessage = 'The specified application customizer was not found';
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `${spoUrl}/_api/SP_TenantSettings_Current`) {
-        return { CorporateCatalogUrl: appCatalogUrl };
+
+    sinon.stub(spo, 'getTenantAppCatalogUrl').resolves(appCatalogUrl);
+    sinon.stub(spoListItem, 'getListItems').callsFake(async (options: ListItemListOptions) => {
+      if (options.webUrl === appCatalogUrl) {
+        if (options.listUrl === '/sites/apps/Lists/ComponentManifests') {
+          return [];
+        }
+
+        if (options.listUrl === `/sites/apps/lists/TenantWideExtensions`) {
+          return [];
+        }
       }
 
-      if (opts.url === `https://contoso.sharepoint.com/sites/apps/_api/web/GetList('%2Fsites%2Fapps%2Flists%2FTenantWideExtensions')/items?$filter=TenantWideExtensionLocation eq 'ClientSideExtension.ApplicationCustomizer' and Title eq 'Some customizer'`) {
-        return { value: undefined };
-      }
-
-      throw 'Invalid request';
+      throw 'Invalid request: ' + JSON.stringify(options);
     });
 
     await assert.rejects(command.action(logger, {
@@ -360,16 +369,14 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_SET, () => {
 
   it('handles error when executing command', async () => {
     const errorMessage = 'An error has occurred';
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `${spoUrl}/_api/SP_TenantSettings_Current`) {
-        return { CorporateCatalogUrl: appCatalogUrl };
-      }
 
-      if (opts.url === `https://contoso.sharepoint.com/sites/apps/_api/web/GetList('%2Fsites%2Fapps%2Flists%2FTenantWideExtensions')/items?$filter=TenantWideExtensionLocation eq 'ClientSideExtension.ApplicationCustomizer' and TenantWideExtensionComponentId eq '7096cded-b83d-4eab-96f0-df477ed7c0bc'`) {
+    sinon.stub(spo, 'getTenantAppCatalogUrl').resolves(appCatalogUrl);
+    sinon.stub(spoListItem, 'getListItems').callsFake(async (options: ListItemListOptions) => {
+      if (options.webUrl === appCatalogUrl) {
         throw errorMessage;
       }
 
-      throw 'Invalid request';
+      throw 'Invalid request: ' + JSON.stringify(options);
     });
 
     await assert.rejects(command.action(logger, {
@@ -380,6 +387,7 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_SET, () => {
   });
 
   it('updates title of an application customizer by title', async () => {
+    sinon.stub(spo, 'getTenantAppCatalogUrl').resolves(appCatalogUrl);
     defaultGetCallStub("Title eq 'Some customizer'");
     const executeCallsStub: sinon.SinonStub = defaultPostCallsStub();
     await command.action(logger, {
@@ -392,20 +400,9 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_SET, () => {
   });
 
   it('updates client side component id of an application customizer by title', async () => {
-    sinon.stub(cli, 'executeCommandWithOutput').callsFake(async (command, args): Promise<any> => {
-      if (command === spoListItemListCommand) {
-        if (args.options.listUrl === `${urlUtil.getServerRelativeSiteUrl(appCatalogUrl)}/Lists/ComponentManifests`) {
-          return { 'stdout': JSON.stringify(solutionResponse) };
-        }
-        if (args.options.listUrl === `${urlUtil.getServerRelativeSiteUrl(appCatalogUrl)}/AppCatalog`) {
-          return { 'stdout': JSON.stringify(applicationResponse) };
-        }
-      }
-
-      throw 'Invalid request';
-    });
-
+    sinon.stub(spo, 'getTenantAppCatalogUrl').resolves(appCatalogUrl);
     defaultGetCallStub("Title eq 'Some customizer'");
+
     const executeCallsStub: sinon.SinonStub = postCallsStubClientSideComponentId();
     await command.action(logger, {
       options: {
@@ -416,7 +413,9 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_SET, () => {
   });
 
   it('updates properties of an application customizer by id', async () => {
+    sinon.stub(spo, 'getTenantAppCatalogUrl').resolves(appCatalogUrl);
     defaultGetCallStub("Id eq '3'");
+
     const executeCallsStub: sinon.SinonStub = defaultPostCallsStub();
     await command.action(logger, {
       options: {
@@ -427,7 +426,9 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_SET, () => {
   });
 
   it('updates an application customizer by clientSideComponentId', async () => {
+    sinon.stub(spo, 'getTenantAppCatalogUrl').resolves(appCatalogUrl);
     defaultGetCallStub("TenantWideExtensionComponentId eq '7096cded-b83d-4eab-96f0-df477ed7c0bc'");
+
     const executeCallsStub: sinon.SinonStub = defaultPostCallsStub();
     await command.action(logger, {
       options: {
@@ -438,17 +439,17 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_SET, () => {
   });
 
   it('throws an error when specific client side component is not found in manifest list', async () => {
-    sinon.stub(cli, 'executeCommandWithOutput').callsFake(async (command, args): Promise<any> => {
-      if (command === spoListItemListCommand) {
-        if (args.options.listUrl === `${urlUtil.getServerRelativeSiteUrl(appCatalogUrl)}/Lists/ComponentManifests`) {
-          return { 'stdout': JSON.stringify([]) };
+    sinon.stub(spo, 'getTenantAppCatalogUrl').resolves(appCatalogUrl);
+    sinon.stub(spoListItem, 'getListItems').callsFake(async (options: ListItemListOptions) => {
+      if (options.webUrl === appCatalogUrl) {
+        if (options.listUrl === '/sites/apps/Lists/ComponentManifests') {
+          return [];
         }
       }
 
-      throw 'Invalid request';
+      throw 'Invalid request: ' + JSON.stringify(options);
     });
 
-    defaultGetCallStub("Id eq '3'");
     postCallsStubClientSideComponentId();
 
     await assert.rejects(command.action(logger, { options: { id: id, newClientSideComponentId: newClientSideComponentId, verbose: true } }),
@@ -456,20 +457,23 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_SET, () => {
   });
 
   it('throws an error when client side component to update is not of type application customizer', async () => {
-    sinon.stub(cli, 'executeCommandWithOutput').callsFake(async (command, args): Promise<any> => {
-      if (command === spoListItemListCommand) {
-        if (args.options.listUrl === `${urlUtil.getServerRelativeSiteUrl(appCatalogUrl)}/Lists/ComponentManifests`) {
+    sinon.stub(spo, 'getTenantAppCatalogUrl').resolves(appCatalogUrl);
+    sinon.stub(spoListItem, 'getListItems').callsFake(async (options: ListItemListOptions) => {
+      if (options.webUrl === appCatalogUrl) {
+        if (options.listUrl === '/sites/apps/Lists/ComponentManifests') {
           const faultyClientComponentManifest = "{\"id\":\"6b2a54c5-3317-49eb-8621-1bbb76263629\",\"alias\":\"HelloWorldApplicationCustomizer\",\"componentType\":\"Extension\",\"extensionType\":\"FormCustomizer\",\"version\":\"0.0.1\",\"manifestVersion\":2,\"loaderConfig\":{\"internalModuleBaseUrls\":[\"HTTPS://SPCLIENTSIDEASSETLIBRARY/\"],\"entryModuleId\":\"hello-world-application-customizer\",\"scriptResources\":{\"hello-world-application-customizer\":{\"type\":\"path\",\"path\":\"hello-world-application-customizer_b47769f9eca3d3b6c4d5.js\"},\"HelloWorldApplicationCustomizerStrings\":{\"type\":\"path\",\"path\":\"HelloWorldApplicationCustomizerStrings_en-us_72ca11838ac9bae2790a8692c260e1ac.js\"},\"@microsoft/sp-application-base\":{\"type\":\"component\",\"id\":\"4df9bb86-ab0a-4aab-ab5f-48bf167048fb\",\"version\":\"1.15.2\"},\"@microsoft/sp-core-library\":{\"type\":\"component\",\"id\":\"7263c7d0-1d6a-45ec-8d85-d4d1d234171b\",\"version\":\"1.15.2\"}}},\"mpnId\":\"Undefined-1.15.2\",\"clientComponentDeveloper\":\"\"}";
           const solutionDuplicate = { ...solution };
           solutionDuplicate.ClientComponentManifest = faultyClientComponentManifest;
-          return { 'stdout': JSON.stringify([solutionDuplicate]) };
+          return [solutionDuplicate];
+        }
+        else if (options.listUrl === '/sites/apps/AppCatalog') {
+          return applicationResponse as any[];
         }
       }
 
-      throw 'Invalid request';
+      throw 'Invalid request: ' + JSON.stringify(options);
     });
 
-    defaultGetCallStub("Id eq '3'");
     postCallsStubClientSideComponentId();
 
     await assert.rejects(command.action(logger, { options: { id: id, newClientSideComponentId: newClientSideComponentId, verbose: true } }),
@@ -477,20 +481,20 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_SET, () => {
   });
 
   it('throws an error when solution is not found in app catalog', async () => {
-    sinon.stub(cli, 'executeCommandWithOutput').callsFake(async (command, args): Promise<any> => {
-      if (command === spoListItemListCommand) {
-        if (args.options.listUrl === `${urlUtil.getServerRelativeSiteUrl(appCatalogUrl)}/Lists/ComponentManifests`) {
-          return { 'stdout': JSON.stringify(solutionResponse) };
+    sinon.stub(spo, 'getTenantAppCatalogUrl').resolves(appCatalogUrl);
+    sinon.stub(spoListItem, 'getListItems').callsFake(async (options: ListItemListOptions) => {
+      if (options.webUrl === appCatalogUrl) {
+        if (options.listUrl === '/sites/apps/Lists/ComponentManifests') {
+          return solutionResponse as any[];
         }
-        if (args.options.listUrl === `${urlUtil.getServerRelativeSiteUrl(appCatalogUrl)}/AppCatalog`) {
-          return { 'stdout': JSON.stringify([]) };
+        else if (options.listUrl === '/sites/apps/AppCatalog') {
+          return [];
         }
       }
 
-      throw 'Invalid request';
+      throw 'Invalid request: ' + JSON.stringify(options);
     });
 
-    defaultGetCallStub("Id eq '3'");
     postCallsStubClientSideComponentId();
 
     await assert.rejects(command.action(logger, { options: { id: id, newClientSideComponentId: newClientSideComponentId, verbose: true } }),
@@ -498,22 +502,22 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_SET, () => {
   });
 
   it('throws an error when solution does not contain extension that can be deployed tenant-wide', async () => {
-    sinon.stub(cli, 'executeCommandWithOutput').callsFake(async (command, args): Promise<any> => {
-      if (command === spoListItemListCommand) {
-        if (args.options.listUrl === `${urlUtil.getServerRelativeSiteUrl(appCatalogUrl)}/Lists/ComponentManifests`) {
-          return { 'stdout': JSON.stringify(solutionResponse) };
+    sinon.stub(spo, 'getTenantAppCatalogUrl').resolves(appCatalogUrl);
+    sinon.stub(spoListItem, 'getListItems').callsFake(async (options: ListItemListOptions) => {
+      if (options.webUrl === appCatalogUrl) {
+        if (options.listUrl === '/sites/apps/Lists/ComponentManifests') {
+          return solutionResponse as any[];
         }
-        if (args.options.listUrl === `${urlUtil.getServerRelativeSiteUrl(appCatalogUrl)}/AppCatalog`) {
+        else if (options.listUrl === '/sites/apps/AppCatalog') {
           const faultyApplication = { ...application };
           faultyApplication.ContainsTenantWideExtension = false;
-          return { 'stdout': JSON.stringify([faultyApplication]) };
+          return [faultyApplication];
         }
       }
 
-      throw 'Invalid request';
+      throw 'Invalid request: ' + JSON.stringify(options);
     });
 
-    defaultGetCallStub("Id eq '3'");
     postCallsStubClientSideComponentId();
 
     await assert.rejects(command.action(logger, { options: { id: id, newClientSideComponentId: newClientSideComponentId, verbose: true } }),
@@ -521,22 +525,22 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_SET, () => {
   });
 
   it('throws an error when solution is not deployed globally', async () => {
-    sinon.stub(cli, 'executeCommandWithOutput').callsFake(async (command, args): Promise<any> => {
-      if (command === spoListItemListCommand) {
-        if (args.options.listUrl === `${urlUtil.getServerRelativeSiteUrl(appCatalogUrl)}/Lists/ComponentManifests`) {
-          return { 'stdout': JSON.stringify(solutionResponse) };
+    sinon.stub(spo, 'getTenantAppCatalogUrl').resolves(appCatalogUrl);
+    sinon.stub(spoListItem, 'getListItems').callsFake(async (options: ListItemListOptions) => {
+      if (options.webUrl === appCatalogUrl) {
+        if (options.listUrl === '/sites/apps/Lists/ComponentManifests') {
+          return solutionResponse as any[];
         }
-        if (args.options.listUrl === `${urlUtil.getServerRelativeSiteUrl(appCatalogUrl)}/AppCatalog`) {
+        else if (options.listUrl === '/sites/apps/AppCatalog') {
           const faultyApplication = { ...application };
           faultyApplication.SkipFeatureDeployment = false;
-          return { 'stdout': JSON.stringify([faultyApplication]) };
+          return [faultyApplication];
         }
       }
 
-      throw 'Invalid request';
+      throw 'Invalid request: ' + JSON.stringify(options);
     });
 
-    defaultGetCallStub("Id eq '3'");
     postCallsStubClientSideComponentId();
 
     await assert.rejects(command.action(logger, { options: { id: id, newClientSideComponentId: newClientSideComponentId, verbose: true } }),

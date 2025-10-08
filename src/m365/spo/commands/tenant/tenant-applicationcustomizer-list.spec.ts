@@ -3,13 +3,14 @@ import sinon from 'sinon';
 import auth from '../../../../Auth.js';
 import { CommandError } from '../../../../Command.js';
 import { Logger } from '../../../../cli/Logger.js';
-import request from '../../../../request.js';
 import { telemetry } from '../../../../telemetry.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './tenant-applicationcustomizer-list.js';
+import { ListItemListOptions, spoListItem } from '../../../../utils/spoListItem.js';
+import { spo } from '../../../../utils/spo.js';
 
 describe(commands.TENANT_APPLICATIONCUSTOMIZER_LIST, () => {
   const spoUrl = 'https://contoso.sharepoint.com';
@@ -40,12 +41,9 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_LIST, () => {
     "TenantWideExtensionDisabled": false
   };
 
-  const applicationCustomizerResponse = {
-    value:
-      [
-        { ...applicationCustomizer, "ID": 8 }
-      ]
-  };
+  const applicationCustomizerList = [
+    { ...applicationCustomizer }
+  ];
 
   let log: any[];
   let logger: Logger;
@@ -78,7 +76,8 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_LIST, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      request.get
+      spo.getTenantAppCatalogUrl,
+      spoListItem.getListItems
     ]);
   });
 
@@ -103,28 +102,23 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_LIST, () => {
   it('throws error when tenant app catalog doesn\'t exist', async () => {
     const errorMessage = 'No app catalog URL found';
 
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `${spoUrl}/_api/SP_TenantSettings_Current`) {
-        return { CorporateCatalogUrl: null };
-      }
-
-      throw 'Invalid request';
-    });
+    sinon.stub(spo, 'getTenantAppCatalogUrl').resolves(null);
 
     await assert.rejects(command.action(logger, { options: {} }), new CommandError(errorMessage));
   });
 
   it('retrieves application customizers that are installed tenant wide', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `${spoUrl}/_api/SP_TenantSettings_Current`) {
-        return { CorporateCatalogUrl: appCatalogUrl };
+    sinon.stub(spo, 'getTenantAppCatalogUrl').resolves(appCatalogUrl);
+    sinon.stub(spoListItem, 'getListItems').callsFake(async (options: ListItemListOptions) => {
+      if (options.webUrl === appCatalogUrl) {
+        if (options.listUrl === `/Lists/TenantWideExtensions` &&
+          options.filter === `TenantWideExtensionLocation eq 'ClientSideExtension.ApplicationCustomizer'`
+        ) {
+          return applicationCustomizerList as any;
+        }
       }
 
-      if (opts.url === `https://contoso.sharepoint.com/sites/apps/_api/web/GetList('%2Fsites%2Fapps%2Flists%2FTenantWideExtensions')/items?$filter=TenantWideExtensionLocation eq 'ClientSideExtension.ApplicationCustomizer'`) {
-        return applicationCustomizerResponse;
-      }
-
-      throw 'Invalid request';
+      throw 'Invalid request: ' + JSON.stringify(options);
     });
 
     await command.action(logger, { options: {} });
@@ -134,16 +128,17 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_LIST, () => {
   it('handles error when retrieving tenant wide installed application customizers', async () => {
     const errorMessage = 'An error has occurred';
 
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `${spoUrl}/_api/SP_TenantSettings_Current`) {
-        return { CorporateCatalogUrl: appCatalogUrl };
+    sinon.stub(spo, 'getTenantAppCatalogUrl').resolves(appCatalogUrl);
+    sinon.stub(spoListItem, 'getListItems').callsFake(async (options: ListItemListOptions) => {
+      if (options.webUrl === appCatalogUrl) {
+        if (options.listUrl === `/Lists/TenantWideExtensions` &&
+          options.filter === `TenantWideExtensionLocation eq 'ClientSideExtension.ApplicationCustomizer'`
+        ) {
+          throw errorMessage;
+        }
       }
 
-      if (opts.url === `https://contoso.sharepoint.com/sites/apps/_api/web/GetList('%2Fsites%2Fapps%2Flists%2FTenantWideExtensions')/items?$filter=TenantWideExtensionLocation eq 'ClientSideExtension.ApplicationCustomizer'`) {
-        throw errorMessage;
-      }
-
-      throw 'Invalid request';
+      throw 'Invalid request: ' + JSON.stringify(options);
     });
 
     await assert.rejects(command.action(logger, { options: {} }), new CommandError(errorMessage));
