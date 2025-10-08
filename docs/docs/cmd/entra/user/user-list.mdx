@@ -34,6 +34,13 @@ To filter the list of users, include additional options that match the user prop
 
 Certain properties cannot be returned within a user collection. The following properties are only supported when retrieving an single user using: `aboutMe`, `birthday`, `hireDate`, `interests`, `mySite`, `pastProjects`, `preferredName`, `responsibilities`, `schools`, `skills`, `mailboxSettings`.
 
+## Permissions
+
+| Permission type | Required permissions |
+|-----------------|----------------------|
+| Delegated (work or school account) | Microsoft Graph: User.Read.All, Directory.Read.All |
+| Application | Microsoft Graph: User.Read.All |
+
 ## Examples
 
 List all users in the tenant.

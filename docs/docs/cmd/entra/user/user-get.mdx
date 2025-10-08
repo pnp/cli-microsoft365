@@ -39,6 +39,13 @@ You can retrieve information about a user, either by specifying that user's id, 
 
 If the user with the specified id, user name, or email doesn't exist, you will get a `Resource 'xyz' does not exist or one of its queried reference-property objects are not present.` error.
 
+## Permissions
+
+| Permission type | Required permissions |
+|-----------------|----------------------|
+| Delegated (work or school account) | Microsoft Graph: User.Read.All |
+| Application | Microsoft Graph: User.Read.All |
+
 ## Examples
 
 Get information about the user by id.
