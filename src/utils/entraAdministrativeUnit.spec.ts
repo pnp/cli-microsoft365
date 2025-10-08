@@ -92,7 +92,8 @@ describe('utils/entraAdministrativeUnit', () => {
       throw 'Invalid Request';
     });
 
-    await assert.rejects(entraAdministrativeUnit.getAdministrativeUnitByDisplayName(invalidDisplayName)), Error(`The specified administrative unit '${invalidDisplayName}' does not exist.`);
+    await assert.rejects(entraAdministrativeUnit.getAdministrativeUnitByDisplayName(invalidDisplayName),
+      new Error(`The specified administrative unit '${invalidDisplayName}' does not exist.`));
   });
 
   it('throws error message when multiple administrative units were found using getAdministrativeUnitByDisplayName', async () => {

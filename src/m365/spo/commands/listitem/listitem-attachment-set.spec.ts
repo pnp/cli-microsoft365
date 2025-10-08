@@ -56,7 +56,7 @@ describe(commands.LISTITEM_ATTACHMENT_SET, () => {
   });
 
   afterEach(() => {
-    sinonUtil.restore([,
+    sinonUtil.restore([
       fs.existsSync,
       fs.readFileSync,
       request.put,

@@ -18,6 +18,7 @@ describe('utils/entraServicePrincipal', () => {
     appId: appId,
     displayName: appName
   };
+
   afterEach(() => {
     sinonUtil.restore([
       request.get,
@@ -94,7 +95,8 @@ describe('utils/entraServicePrincipal', () => {
       throw 'Invalid Request';
     });
 
-    await assert.rejects(entraServicePrincipal.getServicePrincipalByAppId(appId, 'id')), Error(`App with appId '${appId}' not found in Microsoft Entra ID`);
+    await assert.rejects(entraServicePrincipal.getServicePrincipalByAppId(appId, 'id'),
+      new Error(`Service principal with appId '${appId}' not found in Microsoft Entra ID.`));
   });
 
   it('throws error message when no service principal was found using getServicePrincipalFromAppName', async () => {
@@ -106,7 +108,8 @@ describe('utils/entraServicePrincipal', () => {
       throw 'Invalid Request';
     });
 
-    await assert.rejects(entraServicePrincipal.getServicePrincipalByAppName(appName)), Error(`Service principal with name '${appName}' not found in Microsoft Entra ID`);
+    await assert.rejects(entraServicePrincipal.getServicePrincipalByAppName(appName),
+      new Error(`Service principal with name '${appName}' not found in Microsoft Entra ID.`));
   });
 
   it('throws error message when multiple service principals were found using getServicePrincipalFromAppName', async () => {
@@ -131,7 +134,8 @@ describe('utils/entraServicePrincipal', () => {
       return 'Invalid Request';
     });
 
-    await assert.rejects(entraServicePrincipal.getServicePrincipalByAppName(appName), Error(`Multiple service principals with name '${appName}' found in Microsoft Entra ID. Found: ${servicePrincipalId}, ${secondServicePrincipalId}.`));
+    await assert.rejects(entraServicePrincipal.getServicePrincipalByAppName(appName),
+      new Error(`Multiple service principals with name '${appName}' found in Microsoft Entra ID. Found: ${servicePrincipalId}, ${secondServicePrincipalId}.`));
   });
 
   it('correctly get all service principals using getServicePrincipals', async () => {

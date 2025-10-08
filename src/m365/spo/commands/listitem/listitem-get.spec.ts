@@ -33,7 +33,7 @@ describe(commands.LISTITEM_GET, () => {
 
   let actualId = 0;
 
-  const getFakes = async (opts: any) => {
+  const getFakes = async (opts: any): Promise<any> => {
     if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')/items(147)/RoleAssignments?$expand=Member,RoleDefinitionBindings` ||
       opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/lists/getByTitle('${formatting.encodeQueryParameter(listTitle)}')/items(147)/RoleAssignments?$expand=Member,RoleDefinitionBindings`
     ) {

@@ -159,7 +159,7 @@ class SetupCommand extends AnonymousCommand {
       };
       preferences.entraApp = await cli.promptForSelection(entraAppConfig);
       switch (preferences.entraApp) {
-        case EntraAppConfig.Create:
+        case EntraAppConfig.Create: {
           const newEntraAppScopesConfig: SelectionConfig<NewEntraAppScopes> = {
             message: 'What scopes should the new app registration have?',
             choices: [
@@ -169,10 +169,12 @@ class SetupCommand extends AnonymousCommand {
           };
           preferences.newEntraAppScopes = await cli.promptForSelection(newEntraAppScopesConfig);
           break;
-        case EntraAppConfig.UseExisting:
+        }
+        case EntraAppConfig.UseExisting: {
           const existingApp = await this.configureExistingEntraApp(logger);
           Object.assign(preferences, existingApp);
           break;
+        }
       }
     }
     else {
@@ -418,7 +420,7 @@ class SetupCommand extends AnonymousCommand {
     logger: Logger
   }): Promise<void> {
     switch (preferences.entraApp) {
-      case EntraAppConfig.Create:
+      case EntraAppConfig.Create: {
         if (this.verbose) {
           await logger.logToStderr('Creating a new Entra app...');
         }
@@ -432,6 +434,7 @@ class SetupCommand extends AnonymousCommand {
         cli.getConfig().delete(settingsNames.clientCertificateBase64Encoded);
         cli.getConfig().delete(settingsNames.clientCertificatePassword);
         break;
+      }
       case EntraAppConfig.UseExisting:
         Object.assign(settings, {
           clientId: preferences.clientId,

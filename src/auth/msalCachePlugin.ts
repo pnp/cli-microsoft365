@@ -10,7 +10,9 @@ class MsalCachePlugin implements ICachePlugin {
       const data: string = await this.fileTokenStorage.get();
       tokenCacheContext.tokenCache.deserialize(data);
     }
-    catch { }
+    catch {
+      // Do nothing
+    }
   }
 
   public async afterCacheAccess(tokenCacheContext: TokenCacheContext): Promise<void> {
@@ -21,7 +23,9 @@ class MsalCachePlugin implements ICachePlugin {
     try {
       await this.fileTokenStorage.set(tokenCacheContext.tokenCache.serialize());
     }
-    catch { }
+    catch {
+      // Do nothing
+    }
   }
 }
 

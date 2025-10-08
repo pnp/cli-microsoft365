@@ -51,7 +51,7 @@ class AdaptiveCardSendCommand extends AnonymousCommand {
             JSON.parse(options.card);
             return true;
           }
-          catch (e) {
+          catch {
             return false;
           }
         }
@@ -66,7 +66,7 @@ class AdaptiveCardSendCommand extends AnonymousCommand {
             JSON.parse(options.cardData);
             return true;
           }
-          catch (e) {
+          catch {
             return false;
           }
         }

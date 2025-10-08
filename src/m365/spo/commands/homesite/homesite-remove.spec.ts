@@ -153,7 +153,7 @@ describe(commands.HOMESITE_REMOVE, () => {
 
     await assert.rejects(
       command.action(logger, { options: { debug: true, force: true } } as any),
-      new CommandError('[Error ID: 03fc404e-0f70-4607-82e8-8fdb014e8658] The site with ID \"8e4686ed-b00c-4c5f-a0e2-4197081df5d5\" has not been added as a home site or Viva Connections. Check aka.ms/homesites for details.')
+      new CommandError('[Error ID: 03fc404e-0f70-4607-82e8-8fdb014e8658] The site with ID "8e4686ed-b00c-4c5f-a0e2-4197081df5d5" has not been added as a home site or Viva Connections. Check aka.ms/homesites for details.')
     );
   });
 });

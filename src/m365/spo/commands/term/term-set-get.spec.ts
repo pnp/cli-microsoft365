@@ -73,9 +73,9 @@ describe(commands.TERM_SET_GET, () => {
     {
       "_ObjectType_": "SP.Taxonomy.TermSet",
       "_ObjectIdentity_": "2994929e-20f1-0000-2cdb-e577d70db169|fec14c62-7c3b-481b-851b-c80d7802b224:se:YU1+cBy9wUuh\u002ffzgFZGpUV45jw5Y\u002f0VNn\u002ffjMatyi+tHfBZ6NyvQQZTQ6WLBpPLt",
-      "CreatedDate": "\/Date(1536839573337)\/",
-      "Id": "\/Guid(7a167c47-2b37-41d0-94d0-e962c1a4f2ed)\/",
-      "LastModifiedDate": "\/Date(1536840826883)\/",
+      "CreatedDate": "/Date(1536839573337)/",
+      "Id": "/Guid(7a167c47-2b37-41d0-94d0-e962c1a4f2ed)/",
+      "LastModifiedDate": "/Date(1536840826883)/",
       "Name": "PnP-CollabFooter-SharedLinks",
       "CustomProperties": {
         "_Sys_Nav_IsNavigationTermSet": "True"
@@ -308,9 +308,9 @@ describe(commands.TERM_SET_GET, () => {
           {
             "_ObjectType_": "SP.Taxonomy.TermSet",
             "_ObjectIdentity_": "2994929e-20f1-0000-2cdb-e577d70db169|fec14c62-7c3b-481b-851b-c80d7802b224:se:YU1+cBy9wUuh\u002ffzgFZGpUV45jw5Y\u002f0VNn\u002ffjMatyi+tHfBZ6NyvQQZTQ6WLBpPLt",
-            "CreatedDate": "\/Date(1536839573337)\/",
-            "Id": "\/Guid(7a167c47-2b37-41d0-94d0-e962c1a4f2ed)\/",
-            "LastModifiedDate": "\/Date(1536840826883)\/",
+            "CreatedDate": "/Date(1536839573337)/",
+            "Id": "/Guid(7a167c47-2b37-41d0-94d0-e962c1a4f2ed)/",
+            "LastModifiedDate": "/Date(1536840826883)/",
             "Name": "PnP-CollabFooter-SharedLinks",
             "CustomProperties": {
               "_Sys_Nav_IsNavigationTermSet": "True"
@@ -411,9 +411,9 @@ describe(commands.TERM_SET_GET, () => {
           {
             "_ObjectType_": "SP.Taxonomy.TermSet",
             "_ObjectIdentity_": "2994929e-20f1-0000-2cdb-e577d70db169|fec14c62-7c3b-481b-851b-c80d7802b224:se:YU1+cBy9wUuh\u002ffzgFZGpUV45jw5Y\u002f0VNn\u002ffjMatyi+tHfBZ6NyvQQZTQ6WLBpPLt",
-            "CreatedDate": "\/Date(1536839573337)\/",
-            "Id": "\/Guid(7a167c47-2b37-41d0-94d0-e962c1a4f2ed)\/",
-            "LastModifiedDate": "\/Date(1536840826883)\/",
+            "CreatedDate": "/Date(1536839573337)/",
+            "Id": "/Guid(7a167c47-2b37-41d0-94d0-e962c1a4f2ed)/",
+            "LastModifiedDate": "/Date(1536840826883)/",
             "Name": "PnP-CollabFooter-SharedLinks",
             "CustomProperties": {
               "_Sys_Nav_IsNavigationTermSet": "True"

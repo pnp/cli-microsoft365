@@ -151,12 +151,10 @@ class SpoFileRenameCommand extends SpoCommand {
       await cli.executeCommand(removeCommand as Command, { options: { ...removeOptions, _: [] } });
     }
     catch (err: any) {
-      if (err.error !== undefined && err.error.message !== undefined && err.error.message.includes('does not exist')) {
-
+      if (err?.error?.message?.includes('does not exist')) {
+        return;
       }
-      else {
-        throw err;
-      }
+      throw err;
     }
   }
 }

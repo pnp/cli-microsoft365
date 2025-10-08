@@ -22,7 +22,7 @@ interface Options extends GlobalOptions {
 enum CheckinType {
   Minor = 0,
   Major = 1,
-  Overwrite = 2,
+  Overwrite = 2
 }
 
 class SpoFileCheckinCommand extends SpoCommand {

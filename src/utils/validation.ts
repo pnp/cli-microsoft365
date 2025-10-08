@@ -354,7 +354,7 @@ export const validation = {
     }
 
     const hasInvalidProperties = validThemeProperties.map((property) => {
-      return theme.hasOwnProperty(property);
+      return Object.prototype.hasOwnProperty.call(theme, property);
     }).includes(false);
 
     if (hasInvalidProperties) {

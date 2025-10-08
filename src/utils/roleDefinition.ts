@@ -22,7 +22,7 @@ export const roleDefinition = {
     const roleDefinitions = await odata.getAllItems<UnifiedRoleDefinition>(url);
 
     if (roleDefinitions.length === 0) {
-      throw `The specified role definition '${displayName}' does not exist.`;
+      throw new Error(`The specified role definition '${displayName}' does not exist.`);
     }
 
     if (roleDefinitions.length > 1) {
@@ -76,7 +76,7 @@ export const roleDefinition = {
     const roleDefinitions = await odata.getAllItems<UnifiedRoleDefinition>(url);
 
     if (roleDefinitions.length === 0) {
-      throw `The specified role definition '${displayName}' does not exist.`;
+      throw new Error(`The specified role definition '${displayName}' does not exist.`);
     }
 
     if (roleDefinitions.length > 1) {

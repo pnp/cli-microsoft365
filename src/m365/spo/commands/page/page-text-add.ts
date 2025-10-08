@@ -122,6 +122,7 @@ class SpoPageTextAddCommand extends SpoCommand {
       // Add a new section when page does not contain any sections
       if (page.sections.length < 1) {
         const newSection = new CanvasSection(page, 1);
+        // eslint-disable-next-line @typescript-eslint/no-unused-expressions
         newSection.defaultColumn;
         page.sections.push(newSection);
       }

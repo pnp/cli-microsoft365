@@ -21,7 +21,7 @@ export const directoryExtension = {
     const extensionProperties = await odata.getAllItems<ExtensionProperty>(url);
 
     if (extensionProperties.length === 0) {
-      throw `The specified directory extension '${name}' does not exist.`;
+      throw new Error(`The specified directory extension '${name}' does not exist.`);
     }
 
     // there can be only one directory extension with a given name

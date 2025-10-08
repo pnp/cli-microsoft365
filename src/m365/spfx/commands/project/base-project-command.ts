@@ -22,7 +22,9 @@ export abstract class BaseProjectCommand extends AnonymousCommand {
           source: fs.readFileSync(gitignorePath, 'utf-8')
         };
       }
-      catch { }
+      catch {
+        // Do nothing
+      }
     }
 
     const npmignorePath: string = path.join(projectRootPath, '.npmignore');
@@ -32,7 +34,9 @@ export abstract class BaseProjectCommand extends AnonymousCommand {
           source: fs.readFileSync(npmignorePath, 'utf-8')
         };
       }
-      catch { }
+      catch {
+        // Do nothing
+      }
     }
 
     this.readAndParseJsonFile(path.join(projectRootPath, 'config', 'config.json'), project, 'configJson');
@@ -126,7 +130,9 @@ export abstract class BaseProjectCommand extends AnonymousCommand {
           }
         }
       }
-      catch { }
+      catch {
+        // Do nothing
+      }
     }
 
     const packageJsonPath: string = path.resolve(this.projectRootPath as string, 'package.json');
@@ -136,10 +142,12 @@ export abstract class BaseProjectCommand extends AnonymousCommand {
         packageJson.dependencies &&
         packageJson.dependencies['@microsoft/sp-core-library']) {
         const coreLibVersion: string = packageJson.dependencies['@microsoft/sp-core-library'];
-        return coreLibVersion.replace(/[^0-9\.]/g, '');
+        return coreLibVersion.replace(/[^0-9.]/g, '');
       }
     }
-    catch { }
+    catch {
+      // Do nothing
+    }
 
     return undefined;
   }

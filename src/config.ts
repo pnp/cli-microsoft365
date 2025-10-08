@@ -65,7 +65,6 @@ export default {
     'https://microsoft.sharepoint-df.com/User.ReadWrite.All'
   ],
   applicationName: `CLI for Microsoft 365 v${app.packageJson().version}`,
-  delimiter: 'm365\$',
   configstoreName: 'cli-m365-config',
   minimalScopes: [
     'https://graph.microsoft.com/User.Read'

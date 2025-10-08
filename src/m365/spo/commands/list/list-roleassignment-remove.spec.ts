@@ -266,7 +266,7 @@ describe(commands.LIST_ROLEASSIGNMENT_REMOVE, () => {
 
   it('removes role assignment from list by url', async () => {
     const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/_api/web/GetList(\'%2Fsites%2Fdocuments\')/roleassignments/removeroleassignment(principalid='11')`) {
+      if (opts.url === `https://contoso.sharepoint.com/_api/web/GetList('%2Fsites%2Fdocuments')/roleassignments/removeroleassignment(principalid='11')`) {
         return;
       }
 

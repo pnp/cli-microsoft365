@@ -58,7 +58,7 @@ describe(commands.SEARCH, () => {
   const urlContains = (opts: any, substring: string): boolean => {
     return opts.url.toUpperCase().indexOf(substring.toUpperCase()) > -1;
   };
-  const filterRows = (rows: ResultTableRow[], key: string, value: string) => {
+  const filterRows = (rows: ResultTableRow[], key: string, value: string): ResultTableRow[] => {
     return rows.filter(row => {
       return row.Cells.filter(cell => {
         return (cell.Key.toUpperCase() === key.toUpperCase() && cell.Value.toUpperCase() === value.toUpperCase());
@@ -177,7 +177,7 @@ describe(commands.SEARCH, () => {
       "TriggeredRules": []
     };
   };
-  const getFakes = async (opts: any) => {
+  const getFakes = async (opts: any): Promise<any> => {
     if (urlContains(opts, 'QUERYTEXT=\'ISDOCUMENT:1\'')) {
       const rows = filterRows(fakeRows, 'ISDOCUMENT', 'TRUE');
 
@@ -199,7 +199,7 @@ describe(commands.SEARCH, () => {
       executedTest = TestID.QueryDocuments_NoParameterTest;
       return getQueryResult(rows);
     }
-    if (urlContains(opts, `QUERYTEXT=\'ISDOCUMENT:1 INDEXDOCID>0\'`)) {
+    if (urlContains(opts, `QUERYTEXT='ISDOCUMENT:1 INDEXDOCID>0'`)) {
       const rows = filterRows(fakeRows, 'ISDOCUMENT', 'TRUE');
 
       if (urlContains(opts, 'ROWLIMIT=500')) {
@@ -211,12 +211,12 @@ describe(commands.SEARCH, () => {
         return getQueryResult([rows[0]], 2);
       }
     }
-    if (urlContains(opts, `QUERYTEXT=\'ISDOCUMENT:1 INDEXDOCID>1\'`)) {
+    if (urlContains(opts, `QUERYTEXT='ISDOCUMENT:1 INDEXDOCID>1'`)) {
       const rows = filterRows(fakeRows, 'ISDOCUMENT', 'TRUE');
       executedTest = TestID.QueryDocuments_WithDocId1Test;
       return getQueryResult([rows[1]], 1);
     }
-    if (urlContains(opts, `QUERYTEXT=\'ISDOCUMENT:1 INDEXDOCID>2\'`)) {
+    if (urlContains(opts, `QUERYTEXT='ISDOCUMENT:1 INDEXDOCID>2'`)) {
       executedTest = TestID.QueryDocuments_WithDocId2Test;
       return getQueryResult([], 0);
     }

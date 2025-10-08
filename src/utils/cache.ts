@@ -34,7 +34,9 @@ export const cache = {
       // eslint-disable-next-line @typescript-eslint/no-empty-function
       fs.writeFile(cacheFilePath, value, () => { });
     }
-    catch { }
+    catch {
+      // Do nothing
+    }
   },
 
   clearExpired(cb?: () => void): void {
@@ -68,7 +70,6 @@ export const cache = {
           // remove files that haven't been accessed in the last 24 hours
           if (stats.atime.getTime() < Date.now() - 24 * 60 * 60 * 1000) {
             // we don't need to wait for the file to be deleted
-            // eslint-disable-next-line @typescript-eslint/no-empty-function
             fs.unlink(path.join(cacheFolderPath, file), () => {
               if (cb && index === numFiles - 1) {
                 cb();
