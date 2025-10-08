@@ -445,7 +445,7 @@ export const entraApp = {
     const apps = await odata.getAllItems<Application>(url);
 
     if (apps.length === 0) {
-      throw `App with appId '${appId}' not found in Microsoft Entra ID`;
+      throw new Error(`App with appId '${appId}' not found in Microsoft Entra ID.`);
     }
 
     return apps[0];
@@ -460,7 +460,7 @@ export const entraApp = {
     const apps = await odata.getAllItems<Application>(url);
 
     if (apps.length === 0) {
-      throw `App with name '${appName}' not found in Microsoft Entra ID`;
+      throw new Error(`App with name '${appName}' not found in Microsoft Entra ID.`);
     }
 
     if (apps.length > 1) {

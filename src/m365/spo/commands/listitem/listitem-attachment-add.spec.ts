@@ -60,7 +60,7 @@ describe(commands.LISTITEM_ATTACHMENT_ADD, () => {
   });
 
   afterEach(() => {
-    sinonUtil.restore([,
+    sinonUtil.restore([
       fs.existsSync,
       fs.readFileSync,
       request.post,
@@ -136,7 +136,7 @@ describe(commands.LISTITEM_ATTACHMENT_ADD, () => {
     sinon.stub(fs, 'existsSync').returns(true);
     sinon.stub(fs, 'readFileSync').returns('content read');
     sinon.stub(request, 'post').callsFake(async (args) => {
-      if (args.url === `${webUrl}/_api/web/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')/items(${listItemId})/AttachmentFiles/add(FileName='${filePath.replace(/^.*[\\\/]/, '')}')`) {
+      if (args.url === `${webUrl}/_api/web/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')/items(${listItemId})/AttachmentFiles/add(FileName='${filePath.replace(/^.*[\\/]/, '')}')`) {
         return response;
       }
 

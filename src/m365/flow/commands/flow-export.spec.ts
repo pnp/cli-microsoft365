@@ -32,7 +32,7 @@ describe(commands.EXPORT, () => {
   const foundEnvironmentId = 'Default-cf409f12-a06f-426e-9955-20f5d7a31dd3';
   const nonZipFileFlowId = '694d21e4-49be-4e19-987b-074889e45c75';
 
-  const postFakes = async (opts: CliRequestOptions) => {
+  const postFakes = async (opts: CliRequestOptions): Promise<any> => {
     if (opts.url === `https://api.bap.microsoft.com/providers/Microsoft.BusinessAppPlatform/environments/${formatting.encodeQueryParameter(notFoundEnvironmentId)}/listPackageResources?api-version=2016-11-01`) {
       throw {
         "error": {
@@ -79,7 +79,7 @@ describe(commands.EXPORT, () => {
     throw 'Invalid request';
   };
 
-  const getFakes = async (opts: CliRequestOptions) => {
+  const getFakes = async (opts: CliRequestOptions): Promise<any> => {
     if (opts.url === `https://api.bap.microsoft.com/providers/Microsoft.BusinessAppPlatform/environments/${formatting.encodeQueryParameter(notFoundEnvironmentId)}/exportPackage?api-version=2016-11-01`) {
       throw {
         "error": {
@@ -96,7 +96,7 @@ describe(commands.EXPORT, () => {
         }]
       };
     }
-    if (opts.url!.match(/\/flows\/[^\?]+\?api-version\=2016-11-01/i)) {
+    if (opts.url!.match(/\/flows\/[^?]+\?api-version=2016-11-01/i)) {
       return {
         "id": `/providers/Microsoft.ProcessSimple/environments/${foundEnvironmentId}/flows/${foundFlowName}`,
         "name": `${foundFlowName}`,
@@ -111,7 +111,7 @@ describe(commands.EXPORT, () => {
     throw 'Invalid request';
   };
 
-  const writeFileSyncFake = () => { };
+  const writeFileSyncFake = (): void => { };
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -199,7 +199,7 @@ describe(commands.EXPORT, () => {
 
   it('exports the specified flow in json format with illegal characters', async () => {
     sinon.stub(request, 'get').callsFake(async (opts: any) => {
-      if (opts.url.match(/\/flows\/[^\?]+\?api-version\=2016-11-01/i)) {
+      if (opts.url.match(/\/flows\/[^?]+\?api-version=2016-11-01/i)) {
         return {
           id: `/providers/Microsoft.ProcessSimple/environments/${foundEnvironmentId}/flows/${foundFlowName}`,
           name: `${foundFlowName}`,

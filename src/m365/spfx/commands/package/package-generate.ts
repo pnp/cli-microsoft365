@@ -209,6 +209,7 @@ class SpfxPackageGenerateCommand extends AnonymousCommand {
       error = err.message;
     }
     finally {
+      /* eslint-disable no-unsafe-finally */
       try {
         if (tmpDir) {
           if (this.verbose) {
@@ -227,11 +228,12 @@ class SpfxPackageGenerateCommand extends AnonymousCommand {
 
         throw `An error has occurred while removing the temp folder at ${tmpDir}. Please remove it manually.`;
       }
+      /* eslint-enable no-unsafe-finally */
     }
   }
 
   private static replaceTokens(s: string, tokens: any): string {
-    return s.replace(/\$([^\$]+)\$/g, (substring: string, token: string): string => {
+    return s.replace(/\$([^$]+)\$/g, (substring: string, token: string): string => {
       if (tokens[token]) {
         return tokens[token];
       }

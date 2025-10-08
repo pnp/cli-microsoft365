@@ -81,7 +81,7 @@ class EntraAppRoleAddCommand extends GraphCommand {
           return 'Claim must not begin with .';
         }
 
-        if (!/^[\w:!#$%&'()*+,-.\/:;<=>?@\[\]^+_`{|}~]+$/.test(claim)) {
+        if (!/^[\w:!#$%&'()*+,-./:;<=>?@[\]^+_`{|}~]+$/.test(claim)) {
           return `Claim can contain only the following characters a-z, A-Z, 0-9, :!#$%&'()*+,-./:;<=>?@[]^+_\`{|}~]+`;
         }
 
@@ -143,7 +143,7 @@ class EntraAppRoleAddCommand extends GraphCommand {
     const { appObjectId, appId, appName } = args.options;
 
     if (this.verbose) {
-      await logger.logToStderr(`Retrieving information about Microsoft Entra app ${appObjectId ? appObjectId : (appId ? appId : appName) }...`);
+      await logger.logToStderr(`Retrieving information about Microsoft Entra app ${appObjectId ? appObjectId : (appId ? appId : appName)}...`);
     }
 
     if (appObjectId) {

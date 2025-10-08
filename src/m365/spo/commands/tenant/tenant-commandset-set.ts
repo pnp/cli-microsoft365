@@ -197,8 +197,7 @@ class SpoTenantCommandSetSetCommand extends SpoCommand {
       });
     }
 
-    const requestOptions: CliRequestOptions =
-    {
+    const requestOptions: CliRequestOptions = {
       url: `${appCatalogUrl}/_api/web/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')/Items(${options.id})/ValidateUpdateListItem()`,
       headers: {
         'accept': 'application/json;odata=nometadata'

@@ -32,7 +32,7 @@ describe(commands.PACKAGE_GENERATE, () => {
     sinon.stub(session, 'getId').returns('');
     (command as any).archive = admZipMock;
     commandInfo = cli.getCommandInfo(command);
-    cli.getConfig;
+    cli.getConfig();
   });
 
   beforeEach(() => {

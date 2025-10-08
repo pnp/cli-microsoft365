@@ -43,7 +43,7 @@ function convertDd(md: string): string {
 }
 
 function convertHyperlinks(md: string): string {
-  return md.replace(/(?!\[1m)(?!\[22m)\[([^\]]+)\]\(([^\)]+)\)/gm, (match, label: string, url: string) => {
+  return md.replace(/(?!\[1m)(?!\[22m)\[([^\]]+)\]\(([^)]+)\)/gm, (match, label: string, url: string) => {
     // if the link is the same as the content, return just the link
     if (label === url) {
       return url;
@@ -69,7 +69,7 @@ function convertContentTabs(md: string): string {
 }
 
 function convertCodeFences(md: string): string {
-  const regex = new RegExp('^```.*?(?:\r?\n)(.*?)```(?:\r?\n)', 'gms');
+  const regex = /^```.*?(?:\r?\n)(.*?)```(?:\r?\n)/gms;
   return md.replace(regex, (match, code: string) => {
     return `${code.replace(/^(.+)$/gm, '  $1')}${EOL}`;
   });

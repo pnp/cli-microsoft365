@@ -140,7 +140,7 @@ class SpoListItemAttachmentAddCommand extends SpoCommand {
 
   private getFileName(filePath: string, fileName?: string): string {
     if (!fileName) {
-      return filePath.replace(/^.*[\\\/]/, '');
+      return filePath.replace(/^.*[\\/]/, '');
     }
 
     const extension = filePath.split('.').pop();

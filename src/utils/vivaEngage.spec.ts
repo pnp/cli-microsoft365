@@ -88,7 +88,8 @@ describe('utils/vivaEngage', () => {
       throw 'Invalid Request';
     });
 
-    await assert.rejects(vivaEngage.getCommunityByDisplayName(invalidDisplayName, ['id'])), Error(`The specified Viva Engage community '${invalidDisplayName}' does not exist.`);
+    await assert.rejects(vivaEngage.getCommunityByDisplayName(invalidDisplayName, ['id']),
+      new Error(`The specified Viva Engage community '${invalidDisplayName}' does not exist.`));
   });
 
   it('throws error message when multiple communities were found using getCommunityByDisplayName', async () => {
@@ -167,7 +168,8 @@ describe('utils/vivaEngage', () => {
       throw 'Invalid Request';
     });
 
-    await assert.rejects(vivaEngage.getCommunityByEntraGroupId(entraGroupId, ['id'])), Error(`The Microsoft Entra group with id '${entraGroupId}' is not associated with any Viva Engage community.`);
+    await assert.rejects(vivaEngage.getCommunityByEntraGroupId(entraGroupId, ['id']),
+      new Error(`The Microsoft Entra group with id '${entraGroupId}' is not associated with any Viva Engage community.`));
   });
 
   it('correctly gets Entra group ID by community ID using getEntraGroupIdByCommunityId', async () => {
@@ -192,7 +194,8 @@ describe('utils/vivaEngage', () => {
       throw 'Invalid Request';
     });
 
-    await assert.rejects(vivaEngage.getCommunityById(communityId, ['groupId'])), Error(`The specified Viva Engage community with ID '${communityId}' does not exist.`);
+    await assert.rejects(vivaEngage.getCommunityById(communityId, ['groupId']),
+      new Error(`The specified Viva Engage community with ID '${communityId}' does not exist.`));
   });
 
   it('correctly get single role id by name using getRoleIdByName', async () => {

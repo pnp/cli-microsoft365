@@ -279,8 +279,7 @@ export const applicationWithUnknownPermissions = {
 };
 
 // 5d72c3ba-e836-4be3-94fb-fa6057b1611b
-export const graphApplication =
-{
+export const graphApplication = {
   "value": [
     {
       "allowedMemberTypes": [
@@ -385,8 +384,7 @@ export const graphApplication =
 };
 
 // 6aac2819-1b16-4d85-be7b-4bc1d1a456a7
-export const spOnlineApplication =
-{
+export const spOnlineApplication = {
   "value": [
     {
       "allowedMemberTypes": [
@@ -4913,8 +4911,7 @@ export const spOnlineApplication =
 };
 
 //5d72c3ba-e836-4be3-94fb-fa6057b1611b
-export const graphOauth2PermissionScope =
-{
+export const graphOauth2PermissionScope = {
   "value": [
     {
       "adminConsentDescription": "Allows the app to read user profiles and to read basic site info on behalf of the signed-in user.",
@@ -5100,8 +5097,7 @@ export const graphOauth2PermissionScope =
 };
 
 // 6aac2819-1b16-4d85-be7b-4bc1d1a456a7
-export const spOnlineOauth2PermissionScope =
-{
+export const spOnlineOauth2PermissionScope = {
   "value": [
     {
       "adminConsentDescription": "Allows the app to read access reviews, reviewers, decisions and settings that the signed-in user has access to in the organization.",

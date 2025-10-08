@@ -108,7 +108,7 @@ class PpSolutionPublisherGetCommand extends PowerPlatformCommand {
         return result;
       }
 
-      requestOptions.url = `${dynamicsApiUrl}/api/data/v9.0/publishers?$filter=friendlyname eq \'${args.options.name}\'&$select=publisherid,uniquename,friendlyname,versionnumber,isreadonly,description,customizationprefix,customizationoptionvalueprefix&api-version=9.1`;
+      requestOptions.url = `${dynamicsApiUrl}/api/data/v9.0/publishers?$filter=friendlyname eq '${args.options.name}'&$select=publisherid,uniquename,friendlyname,versionnumber,isreadonly,description,customizationprefix,customizationoptionvalueprefix&api-version=9.1`;
       const result = await request.get<{ value: Publisher[] }>(requestOptions);
 
       if (result.value.length === 0) {

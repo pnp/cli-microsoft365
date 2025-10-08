@@ -23,7 +23,7 @@ describe(commands.FILE_LIST, () => {
     CheckOutType: 2,
     ContentTag: '{F09C4EFE-B8C0-4E89-A166-03418661B89B},9,12',
     CustomizedPageStatus: 0,
-    ETag: '\"{F09C4EFE-B8C0-4E89-A166-03418661B89B},9\"',
+    ETag: '"{F09C4EFE-B8C0-4E89-A166-03418661B89B},9"',
     Exists: true,
     IrmEnabled: false,
     Length: '331673',

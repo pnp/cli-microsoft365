@@ -120,7 +120,8 @@ describe('utils/entraApp', () => {
       throw 'Invalid Request';
     });
 
-    await assert.rejects(entraApp.getAppRegistrationByAppId(appId, ['id', 'displayName'])), Error(`App with appId '${appId}' not found in Microsoft Entra ID`);
+    await assert.rejects(entraApp.getAppRegistrationByAppId(appId, ['id', 'displayName']),
+      new Error(`App with appId '${appId}' not found in Microsoft Entra ID.`));
   });
 
   it('throws error message when no application was found using getAppRegistrationByAppName', async () => {
@@ -132,7 +133,8 @@ describe('utils/entraApp', () => {
       throw 'Invalid Request';
     });
 
-    await assert.rejects(entraApp.getAppRegistrationByAppName(appName, ['id'])), Error(`App with name '${appName}' not found in Microsoft Entra ID`);
+    await assert.rejects(entraApp.getAppRegistrationByAppName(appName, ['id']),
+      new Error(`App with name '${appName}' not found in Microsoft Entra ID.`));
   });
 
   it('throws error message when multiple applications were found using getAppRegistrationByAppName', async () => {

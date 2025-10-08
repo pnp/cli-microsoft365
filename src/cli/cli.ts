@@ -422,7 +422,7 @@ async function loadOptionsFromContext(commandOptions: CommandOptionInfo[], debug
       m365rc = JSON.parse(fileContents);
     }
   }
-  catch (e) {
+  catch {
     await cli.closeWithError(`Error parsing ${filePath}`, { options: {} });
     /* c8 ignore next */
   }
@@ -473,7 +473,9 @@ async function loadCommandFromFile(commandFileUrl: string): Promise<void> {
       cli.commandToExecute = cli.getCommandInfo(command.default, commandFileUrl, commandInfo?.help);
     }
   }
-  catch { }
+  catch {
+    // Do nothing
+  }
 }
 
 function getCommandInfo(command: Command, filePath: string = '', helpFilePath: string = ''): CommandInfo {

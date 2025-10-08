@@ -48,8 +48,7 @@ describe(commands.FOLDER_SHARINGLINK_GET, () => {
     }
   };
 
-  const getDriveResponse: any =
-  {
+  const getDriveResponse: any = {
     "id": driveId,
     "webUrl": `${webUrl}/Shared%20Documents`
   };
