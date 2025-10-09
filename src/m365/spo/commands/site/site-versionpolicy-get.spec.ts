@@ -73,8 +73,8 @@ describe(commands.SITE_VERSIONPOLICY_GET, () => {
   });
 
   it('passes validation if valid site URL is specified', async () => {
-    const actual = await command.validate({ options: { siteUrl: validSiteUrl } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ siteUrl: validSiteUrl });
+    assert.strictEqual(actual.success, true);
   });
 
   it('retrieves "age" version policy settings for the specified site', async () => {
@@ -92,7 +92,7 @@ describe(commands.SITE_VERSIONPOLICY_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { siteUrl: validSiteUrl } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: validSiteUrl }) });
     assert(loggerLogSpy.calledWith({
       defaultTrimMode: 'age',
       defaultExpireAfterDays: 200,
@@ -115,7 +115,7 @@ describe(commands.SITE_VERSIONPOLICY_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { siteUrl: validSiteUrl } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: validSiteUrl }) });
     assert(loggerLogSpy.calledWith({
       defaultTrimMode: 'automatic',
       defaultExpireAfterDays: 30,
@@ -138,7 +138,7 @@ describe(commands.SITE_VERSIONPOLICY_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { siteUrl: validSiteUrl, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: validSiteUrl, verbose: true }) });
     assert(loggerLogSpy.calledWith({
       defaultTrimMode: 'number',
       defaultExpireAfterDays: 0,
@@ -157,7 +157,7 @@ describe(commands.SITE_VERSIONPOLICY_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { siteUrl: validSiteUrl, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: validSiteUrl, verbose: true }) });
     assert(loggerLogSpy.calledWith({
       defaultTrimMode: 'inheritTenant',
       defaultExpireAfterDays: null,
@@ -168,7 +168,7 @@ describe(commands.SITE_VERSIONPOLICY_GET, () => {
   it('correctly handles API OData error', async () => {
     sinon.stub(request, 'get').rejects(new Error('An error has occurred'));
 
-    await assert.rejects(command.action(logger, { options: { siteUrl: validSiteUrl } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: validSiteUrl }) }),
       new CommandError('An error has occurred'));
   });
 });
