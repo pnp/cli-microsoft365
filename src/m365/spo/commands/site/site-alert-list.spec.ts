@@ -231,6 +231,25 @@ describe(commands.SITE_ALERT_LIST, () => {
     assert(loggerLogSpy.calledWith(alertResponse));
   });
 
+  it('successfully gets all alerts with text output', async () => {
+    const odataStub = sinon.stub(odata, 'getAllItems').callsFake(async url => {
+      if (url === `${webUrl}/_api/web/alerts?$expand=List,User,List/Rootfolder,Item&$select=*,List/Id,List/Title,List/Rootfolder/ServerRelativeUrl,Item/ID,Item/FileRef,Item/Guid`) {
+        return alertResponse;
+      }
+
+      throw 'Invalid request';
+    });
+
+    const result = alertResponse.map(a => ({
+      ...a,
+      UserPrincipalName: a.User?.UserPrincipalName
+    }));
+
+    await command.action(logger, { options: { webUrl: webUrl, output: 'text' } });
+    assert(odataStub.calledOnce);
+    assert(loggerLogSpy.calledWith(result));
+  });
+
   it('successfully gets all alerts when listId is specified', async () => {
     const odataStub = sinon.stub(odata, 'getAllItems').callsFake(async url => {
       if (url === `${webUrl}/_api/web/alerts?$expand=List,User,List/Rootfolder,Item&$select=*,List/Id,List/Title,List/Rootfolder/ServerRelativeUrl,Item/ID,Item/FileRef,Item/Guid&$filter=List/Id eq guid'${listId}'`) {
