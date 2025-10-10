@@ -9,6 +9,7 @@ import { spo } from '../../../../utils/spo.js';
 import { entraUser } from '../../../../utils/entraUser.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { odata } from '../../../../utils/odata.js';
+import { cli } from '../../../../cli/cli.js';
 
 export const options = globalOptionsZod
   .extend({
@@ -117,8 +118,8 @@ class SpoSiteAlertListCommand extends SpoCommand {
           delete alert.Item['ID'];
         }
 
-        if (args.options.output !== 'json' && alert.User && alert.User.UserPrincipalName) {
-          alert.UserPrincipalName = alert.User.UserPrincipalName;
+        if (cli.shouldTrimOutput(args.options.output)) {
+          alert.UserPrincipalName = alert.User?.UserPrincipalName;
         }
       });
       await logger.log(res);

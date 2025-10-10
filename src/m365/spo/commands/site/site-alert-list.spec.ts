@@ -304,7 +304,12 @@ describe(commands.SITE_ALERT_LIST, () => {
   });
 
   it('successfully gets all alerts when listId and userId are specified', async () => {
-    const getUserStub = sinon.stub(entraUser, 'getUpnByUserId').resolves(userName);
+    sinon.stub(entraUser, 'getUpnByUserId').callsFake(async (userIdentifier) => {
+      if (userId === userIdentifier) {
+        return userName;
+      }
+      throw 'Invalid userId: ' + userIdentifier;
+    });
 
     const odataStub = sinon.stub(odata, 'getAllItems').callsFake(async url => {
       if (url === `${webUrl}/_api/web/alerts?$expand=List,User,List/Rootfolder,Item&$select=*,List/Id,List/Title,List/Rootfolder/ServerRelativeUrl,Item/ID,Item/FileRef,Item/Guid&$filter=List/Id eq guid'${listId}' and User/UserPrincipalName eq '${formatting.encodeQueryParameter(userName)}'`) {
@@ -316,7 +321,6 @@ describe(commands.SITE_ALERT_LIST, () => {
 
     await command.action(logger, { options: { webUrl: webUrl, listId: listId, userId: userId, verbose: true } });
     assert(odataStub.calledOnce);
-    assert(getUserStub.calledOnceWith(userId));
     assert(loggerLogSpy.calledWith(alertResponse));
   });
 
