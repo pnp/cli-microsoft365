@@ -31,6 +31,24 @@ m365 entra group get [options]
 
 Using the `--properties` option, you can specify a comma-separated list of group properties to retrieve from the Microsoft Graph. If you don't specify any properties, the command will output the default properties returned by Graph.
 
+## Permissions
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource        | Permissions    |
+  |-----------------|----------------|
+  | Microsoft Graph | Group.Read.All |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource        | Permissions    |
+  |-----------------|----------------|
+  | Microsoft Graph | Group.Read.All |
+
+  </TabItem>
+</Tabs>
+
 ## Examples
 
 Get information about an Entra Group by id.
