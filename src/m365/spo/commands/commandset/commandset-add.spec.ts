@@ -163,10 +163,8 @@ describe(commands.COMMANDSET_ADD, () => {
 
   it('adds commandset with scope Web, list type list and location Both', async () => {
     sinon.stub(request, 'post').callsFake(async opts => {
-      if ((opts.url === `https://contoso.sharepoint.com/_api/Web/UserCustomActions`)) {
-        {
-          return commandactionResponse;
-        }
+      if (opts.url === `https://contoso.sharepoint.com/_api/Web/UserCustomActions`) {
+        return commandactionResponse;
       }
 
       throw 'Invalid request';
@@ -178,10 +176,8 @@ describe(commands.COMMANDSET_ADD, () => {
 
   it('adds commandset with scope Web and list type library', async () => {
     sinon.stub(request, 'post').callsFake(async opts => {
-      if ((opts.url === `https://contoso.sharepoint.com/_api/Web/UserCustomActions`)) {
-        {
-          return commandactionResponse;
-        }
+      if (opts.url === `https://contoso.sharepoint.com/_api/Web/UserCustomActions`) {
+        return commandactionResponse;
       }
 
       throw 'Invalid request';
@@ -196,10 +192,8 @@ describe(commands.COMMANDSET_ADD, () => {
     response.Location = 'ClientSideExtension.ListViewCommandSet.ContextMenu';
 
     sinon.stub(request, 'post').callsFake(async opts => {
-      if ((opts.url === `https://contoso.sharepoint.com/_api/Site/UserCustomActions`)) {
-        {
-          return response;
-        }
+      if (opts.url === `https://contoso.sharepoint.com/_api/Site/UserCustomActions`) {
+        return response;
       }
 
       throw 'Invalid request';
@@ -214,10 +208,8 @@ describe(commands.COMMANDSET_ADD, () => {
     response.Location = 'ClientSideExtension.ListViewCommandSet.CommandBar';
 
     sinon.stub(request, 'post').callsFake(async opts => {
-      if ((opts.url === `https://contoso.sharepoint.com/_api/Site/UserCustomActions`)) {
-        {
-          return response;
-        }
+      if (opts.url === `https://contoso.sharepoint.com/_api/Site/UserCustomActions`) {
+        return response;
       }
 
       throw 'Invalid request';
