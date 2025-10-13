@@ -1,0 +1,108 @@
+---
+tags:
+  - reports
+  - alerts
+  - retirement
+  - tenant
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# List SharePoint alerts usage across the tenant
+
+Author: [Saurabh Tripathi](https://github.com/saurabh7019)
+
+SharePoint Online list alerts are being gradually retired. This script scans all sites across the tenant and generates a comprehensive CSV report of existing alerts. This information helps administrators identify and plan the migration of critical alerts to modern alternatives.
+
+<Tabs>
+  <TabItem value="PowerShell">
+
+  ```powershell
+  $fileExportPath = "Alerts.csv"
+
+  try {
+    $m365Status = m365 status --output text
+
+    if ($m365Status -eq "Logged Out") {
+      # Connection to Microsoft 365
+      m365 login
+    }
+
+    $results = @()
+    Write-Host "Retrieving all sites..."
+    $sites = m365 spo site list --output json | ConvertFrom-Json
+    $count = $sites.Count
+    $iCnt = 0
+
+    Write-Host "Processing $count sites..."
+
+    foreach ($site in $sites) {
+      $iCnt++
+      Write-Host "($iCnt/$count) Scanning '$($site.Url)' for alerts..."
+      
+      try {
+        $alerts = m365 spo site alert list --webUrl $site.Url --output json | ConvertFrom-Json
+        
+        if ($alerts.Count -gt 0) {
+          Write-Host "  Found $($alerts.Count) alert(s)" -ForegroundColor Yellow
+        
+          foreach ($alert in $alerts) {
+            $targetPath = $alert.List.RootFolder.ServerRelativeUrl
+
+            $filterPath = ($alert.Properties | Where-Object { $_.Key -eq "filterpath" }).Value
+            if ($filterPath) {
+              $targetPath = $filterPath
+            }
+            elseif ($alert.Item) {
+              $targetPath = $alert.Item.FileRef
+            }
+            
+            $frequency = switch ($alert.AlertFrequency) {
+              0 { "Immediate" }
+              1 { "Daily" }
+              2 { "Weekly" }
+              default { "Unknown" }
+            }
+            
+            $results += [PSCustomObject][ordered]@{
+              SiteTitle  = $site.Title
+              SiteUrl    = $site.Url
+              AlertTitle = $alert.Title
+              AlertId    = $alert.ID
+              TargetPath = $targetPath
+              Frequency  = $frequency
+              AlertType  = $alert.AlertTemplateName
+              UserName   = $alert.User.Title
+              UserEmail  = $alert.User.Email
+            }
+          }
+        }
+        else {
+          Write-Host "  No alerts found" -ForegroundColor Green
+        }
+      }
+      catch {
+        Write-Host "  Error: $($_.Exception.Message)" -ForegroundColor Red
+      }
+    }
+
+    if ($results.Count -gt 0) {
+      Write-Host "`nExporting $($results.Count) alerts to $fileExportPath..."
+      $results | Export-Csv -Path $fileExportPath -NoTypeInformation -Encoding UTF8
+      Write-Host "Report saved successfully!"
+    }
+    else {
+      Write-Host "`nNo legacy alerts found across the tenant."
+    }
+  }
+  catch {
+    Write-Host "Error: $($_.Exception.Message)" -ForegroundColor Red
+  }
+
+  Write-Host "`nCompleted." -ForegroundColor Cyan
+  ```
+
+  </TabItem>
+</Tabs>
+
