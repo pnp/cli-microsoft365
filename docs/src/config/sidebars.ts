@@ -3706,6 +3706,11 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
+              label: 'site alert get',
+              id: 'cmd/spo/site/site-alert-get'
+            },
+            {
+              type: 'doc',
               label: 'site alert list',
               id: 'cmd/spo/site/site-alert-list'
             },
