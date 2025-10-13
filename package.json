@@ -320,6 +320,7 @@
     "mocha": "^11.7.4",
     "rimraf": "^6.0.1",
     "sinon": "^21.0.0",
-    "source-map-support": "^0.5.21"
+    "source-map-support": "^0.5.21",
+    "tsc-watch": "^7.2.0"
   }
 }
