@@ -37,6 +37,27 @@ m365 entra m365group user set [options]
 
 <Global />
 
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource        | Permissions                 |
+  |-----------------|-----------------------------|
+  | Microsoft Graph | Group.ReadWrite.All |
+  | Microsoft Graph | GroupMember.ReadWrite.All |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource        | Permissions                 |
+  |-----------------|-----------------------------|
+  | Microsoft Graph | Group.ReadWrite.All |
+  | Microsoft Graph | GroupMember.ReadWrite.All |
+
+  </TabItem>
+</Tabs>
+
 ## Remarks
 
 The command will return an error if the user already has the specified role in the given Microsoft 365 Group or Microsoft Teams team.
