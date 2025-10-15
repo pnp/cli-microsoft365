@@ -1,0 +1,189 @@
+import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# spo site alert get
+
+Retrieves details of a specific alert from a SharePoint list
+
+## Usage
+
+```sh
+m365 spo site alert get [options]
+```
+
+## Options
+
+```md definition-list
+`-u, --webUrl <webUrl>`
+: The URL of the SharePoint site
+
+`--id <id>`
+: The ID of the alert
+```
+
+<Global />
+
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource   | Permissions          |
+  |------------|----------------------|
+  | SharePoint | AllSites.FullControl |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource   | Permissions           |
+  |------------|-----------------------|
+  | SharePoint | Sites.FullControl.All |
+
+  </TabItem>
+</Tabs>
+
+## Examples
+
+Get details of an alert by ID
+
+```sh
+m365 spo site alert get --webUrl https://contoso.sharepoint.com/sites/Marketing --id 7cbb4c8d-8e4d-4d2e-9c6f-3f1d8b2e6a0e
+```
+
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  {
+    "AlertFrequency": 0,
+    "AlertTemplateName": "SPAlertTemplateType.DocumentLibrary",
+    "AlertType": 0,
+    "AlwaysNotify": false,
+    "DeliveryChannels": 1,
+    "EventType": -1,
+    "Filter": "",
+    "ID": "a188ee89-72e2-4327-9802-8d0c408ec129",
+    "List": {
+      "Id": "1ec04825-b082-46f8-9a1c-b6b54d83bc46",
+      "RootFolder": {
+        "ServerRelativeUrl": "/sites/Marketing/Documents"
+      },
+      "Title": "Documents"
+    },
+    "Properties": [
+      {
+        "Key": "dispformurl",
+        "Value": "Documents/Forms/DispForm.aspx",
+        "ValueType": "Edm.String"
+      },
+      {
+        "Key": "filterindex",
+        "Value": "0",
+        "ValueType": "Edm.String"
+      },
+      {
+        "Key": "defaultitemopen",
+        "Value": "Browser",
+        "ValueType": "Edm.String"
+      },
+      {
+        "Key": "sendurlinsms",
+        "Value": "False",
+        "ValueType": "Edm.String"
+      },
+      {
+        "Key": "mobileurl",
+        "Value": "https://contoso.sharepoint.com/_layouts/15/mobile/",
+        "ValueType": "Edm.String"
+      },
+      {
+        "Key": "eventtypeindex",
+        "Value": "0",
+        "ValueType": "Edm.String"
+      },
+      {
+        "Key": "siteurl",
+        "Value": "https://contoso.sharepoint.com",
+        "ValueType": "Edm.String"
+      }
+    ],
+    "Status": 0,
+    "Title": "Documents",
+    "User": {
+      "Email": "admin@contoso.onmicrosoft.com",
+      "Expiration": "",
+      "Id": 10,
+      "IsEmailAuthenticationGuestUser": false,
+      "IsHiddenInUI": false,
+      "IsShareByEmailGuestUser": false,
+      "IsSiteAdmin": true,
+      "LoginName": "i:0#.f|membership|admin@contoso.onmicrosoft.com",
+      "PrincipalType": 1,
+      "Title": "Admin User",
+      "UserId": {
+        "NameId": "100320009d8267fc",
+        "NameIdIssuer": "urn:federation:microsoftonline"
+      },
+      "UserPrincipalName": "admin@contoso.onmicrosoft.com"
+    },
+    "UserId": 10
+  }
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  AlertFrequency   : 0
+  AlertTemplateName: SPAlertTemplateType.DocumentLibrary
+  AlertType        : 0
+  AlwaysNotify     : false
+  DeliveryChannels : 1
+  EventType        : -1
+  Filter           : 
+  ID               : a188ee89-72e2-4327-9802-8d0c408ec129
+  List             : {"RootFolder":{"ServerRelativeUrl":"/FlowTest"},"Id":"1ec04825-b082-46f8-9a1c-b6b54d83bc46","Title":"FlowTest"}
+  Properties       : [{"Key":"dispformurl","Value":"FlowTest/Forms/DispForm.aspx","ValueType":"Edm.String"},{"Key":"filterindex","Value":"0","ValueType":"Edm.String"},{"Key":"defaultitemopen","Value":"Browser","ValueType":"Edm.String"},{"Key":"sendurlinsms","Value":"False","ValueType":"Edm.String"},{"Key":"mobileurl","Value":"https://contoso.sharepoint.com/_layouts/15/mobile/","ValueType":"Edm.String"},{"Key":"eventtypeindex","Value":"0","ValueType":"Edm.String"},{"Key":"siteurl","Value":"https://contoso.sharepoint.com","ValueType":"Edm.String"}]
+  Status           : 0
+  Title            : FlowTest
+  User             : {"Id":10,"IsHiddenInUI":false,"LoginName":"i:0#.f|membership|admin@contoso.onmicrosoft.com","Title":"Admin","PrincipalType":1,"Email":"admin@contoso.onmicrosoft.com","Expiration":"","IsEmailAuthenticationGuestUser":false,"IsShareByEmailGuestUser":false,"IsSiteAdmin":true,"UserId":{"NameId":"100320009d8267fc","NameIdIssuer":"urn:federation:microsoftonline"},"UserPrincipalName":"admin@contoso.onmicrosoft.com"}
+  UserId           : 10
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  AlertFrequency,AlertTemplateName,AlertType,AlwaysNotify,DeliveryChannels,EventType,Filter,ID,Status,Title,UserId
+  0,SPAlertTemplateType.DocumentLibrary,0,false,1,-1,,a188ee89-72e2-4327-9802-8d0c408ec129,0,Documents,10
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # spo site alert get --webUrl "https://contoso.sharepoint.com/sites/Marketing" --id "7cbb4c8d-8e4d-4d2e-9c6f-3f1d8b2e6a0e"
+
+  Date: 10/1/2025
+
+  Property | Value
+  ---------|-------
+  AlertFrequency | 0
+  AlertTemplateName | SPAlertTemplateType.DocumentLibrary
+  AlertType | 0
+  AlwaysNotify | false
+  DeliveryChannels | 1
+  EventType | -1
+  Filter |
+  ID | a188ee89-72e2-4327-9802-8d0c408ec129
+  Status | 0
+  Title | Documents
+  UserId | 10
+  ```
+
+  </TabItem>
+</Tabs>
+

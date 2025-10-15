@@ -90,6 +90,35 @@ paths:
       responses:
         200:
           description: OK
+  /_api/web/alerts/GetById({alertId}):
+    get:
+      parameters:
+        - name: alertId
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "'7cbb4c8d-8e4d-4d2e-9c6f-3f1d8b2e6a0e'"
+        - name: $expand
+          in: query
+          required: false
+          schema:
+            type: string
+          example: "List,User,List/Rootfolder,Item"
+        - name: $select
+          in: query
+          required: false
+          schema:
+            type: string
+          example: "*,List/Id,List/Title,List/Rootfolder/ServerRelativeUrl,Item/ID,Item/FileRef,Item/Guid"
+      security:
+        - delegated:
+          - AllSites.FullControl
+        - application:
+          - Sites.FullControl.All
+      responses:
+        200:
+          description: OK
   /_api/web/alerts:
     get:
       parameters:
