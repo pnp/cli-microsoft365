@@ -311,9 +311,7 @@ In the end, your command file will look something like this: [group-get.ts](http
 
 ## Running it locally
 
-Before creating a PR, you should test your code locally. This will help you catch bugs, errors, and performance issues early on and ensure that the code functions as intended before it is made available to real users. 
-
-Execute `npm run clean` to remove temporary files, directories, or other artifacts created during the previous build process. Followed by execute `npm run build` to build the entire project. After that, you can execute `npm run watch` to start a live watcher. A watcher will ensure that every time a file is saved, an incremental build is triggered. This means that not the entire project is rebuilt, but only the changed files. This makes it easy to make quick changes and test them immediately after saving them.
+Before creating a PR, you should test your code locally. This will help you catch bugs, errors, and performance issues early on and ensure that the code functions as intended before it is made available to real users. You can execute `npm run watch` to start a live watcher. This will build the entire project first, and after that, a watcher will ensure that every time a file is saved, an incremental build is triggered. This means that not the entire project is rebuilt, but only the changed files. This makes it easy to make quick changes and test them immediately after saving them.
 
 If this command fails, be sure to check if your environment has been set up correctly following the guidelines of [Setting up your local project](../environment-setup.mdx#setting-up-your-local-project) or if you use a dev container or GitHub Codespaces: [GitHub Codespaces & Visual Studio Remote Development Container](./../github-codespaces-and-devcontainer.mdx).
 

@@ -22,7 +22,7 @@
   "type": "module",
   "scripts": {
     "build": "tsc -p . && node scripts/write-all-commands.js && node scripts/copy-files.js",
-    "watch": "tsc -w -p .",
+    "watch": "tsc-watch --onSuccess \"node scripts/write-all-commands.js\"",
     "clean": "rimraf ./dist",
     "test": "npm run test:version && npm run lint && npm run test:cov",
     "test:version": "node scripts/check-version.js",
