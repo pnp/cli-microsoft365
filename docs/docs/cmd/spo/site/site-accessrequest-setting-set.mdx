@@ -1,0 +1,77 @@
+import Global from '/docs/cmd/_global.mdx';
+
+# spo site accessrequest setting set
+
+Update access requests for a specific site
+
+## Usage
+
+```sh
+m365 spo site accessrequest setting set [options]
+```
+
+## Options
+
+```md definition-list
+`-u, --siteUrl <siteUrl>`
+: URL of the site collection.
+
+`--disabled`
+: Disable site requests for the entire site. Specify either `disabled`, `ownerGroup`, or `email`.
+
+`--ownerGroup`
+: Send access requests to the owner group. Specify either `disabled`, `ownerGroup`, or `email`.
+
+`--email [email]`
+: Send access requests to a specific email. Specify either `disabled`, `ownerGroup`, or `email`.
+
+`--message [message]`
+: Add a custom message to the access request page.
+```
+
+<Global />
+
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource   | Permissions          |
+  |------------|----------------------|
+  | SharePoint | AllSites.FullControl |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource   | Permissions           |
+  |------------|-----------------------|
+  | SharePoint | Sites.FullControl.All |
+
+  </TabItem>
+</Tabs>
+
+## Examples
+
+Disable access requests for a specific site.
+
+```sh
+m365 spo site accessrequest setting set --siteUrl https://contoso.sharepoint.com/sites/Management --disabled
+```
+
+Send all access requests to the owner group of a specific site.
+
+```sh
+m365 spo site accessrequest setting set --siteUrl https://contoso.sharepoint.com/sites/Management --ownerGroup
+```
+
+Send all access requests to a specific email address and set a custom message.
+
+```sh
+m365 spo site accessrequest setting set --siteUrl https://contoso.sharepoint.com/sites/Management --email john.doe@contoso.com --message "Motivate why you need access."
+```
+
+## Response
+
+The command won't return a response on success.
+
+

@@ -254,6 +254,7 @@ export default {
   SERVICEPRINCIPAL_PERMISSIONREQUEST_LIST: `${prefix} serviceprincipal permissionrequest list`,
   SERVICEPRINCIPAL_SET: `${prefix} serviceprincipal set`,
   SET: `${prefix} set`,
+  SITE_ACCESSREQUEST_SETTING_SET: `${prefix} site accessrequest setting set`,
   SITE_ADD: `${prefix} site add`,
   SITE_ADMIN_ADD: `${prefix} site admin add`,
   SITE_ADMIN_LIST: `${prefix} site admin list`,

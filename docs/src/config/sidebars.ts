@@ -3691,6 +3691,11 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
+              label: 'site accessrequest setting set',
+              id: 'cmd/spo/site/site-accessrequest-setting-set'
+            },
+            {
+              type: 'doc',
               label: 'site admin add',
               id: 'cmd/spo/site/site-admin-add'
             },
