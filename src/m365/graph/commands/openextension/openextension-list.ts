@@ -10,7 +10,7 @@ import { odata } from '../../../../utils/odata.js';
 
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
-  resourceId: z.string().alias('i'),
+  resourceId: z.uuid().alias('i'),
   resourceType: z.enum(['user', 'group', 'device', 'organization']).alias('t')
 });
 declare type Options = z.infer<typeof options>;
