@@ -127,7 +127,7 @@ interface CommandArgs {
 class SpoGroupGetCommand extends SpoCommand {
   // ...
 
-  public get schema(): z.ZodObject | undefined {
+  public get schema(): z.ZodType | undefined {
     return options;
   }
 
