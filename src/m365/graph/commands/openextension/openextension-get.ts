@@ -9,7 +9,7 @@ import { Extension } from '@microsoft/microsoft-graph-types';
 
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
-  resourceId: z.string().alias('i'),
+  resourceId: z.uuid().alias('i'),
   resourceType: z.enum(['user', 'group', 'device', 'organization']).alias('t'),
   name: z.string().alias('n')
 });
