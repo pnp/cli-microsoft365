@@ -12,7 +12,7 @@ import commands from '../../commands.js';
 const options = z.looseObject({
   ...globalOptionsZod.shape,
   name: z.string().alias('n'),
-  resourceId: z.string().alias('i'),
+  resourceId: z.uuid().alias('i'),
   resourceType: z.enum(['user', 'group', 'device', 'organization']).alias('t'),
   keepUnchangedProperties: z.boolean().optional().alias('k')
 });
