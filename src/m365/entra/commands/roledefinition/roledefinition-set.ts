@@ -10,7 +10,7 @@ import { UnifiedRoleDefinition } from '@microsoft/microsoft-graph-types';
 
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
-  id: z.string().optional().alias('i'),
+  id: z.uuid().optional().alias('i'),
   displayName: z.string().optional().alias('n'),
   newDisplayName: z.string().optional(),
   allowedResourceActions: z.string().optional().alias('a'),
