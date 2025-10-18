@@ -107,7 +107,7 @@ describe(commands.APPLICATIONCUSTOMIZER_ADD, () => {
       throw customActionError;
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, title: title, clientSideComponentId: clientSideComponentId, scope: 'Web' } } as any);
+    await command.action(logger, { options: { webUrl: webUrl, title: title, clientSideComponentId: clientSideComponentId, scope: 'Web' } });
     assert(loggerLogToStderrSpy.notCalled);
   });
 
@@ -124,7 +124,7 @@ describe(commands.APPLICATIONCUSTOMIZER_ADD, () => {
       throw customActionError;
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, title: title, clientSideComponentId: clientSideComponentId, description: description, clientSideComponentProperties: clientSideComponentProperties, verbose: true } } as any);
+    await command.action(logger, { options: { webUrl: webUrl, title: title, clientSideComponentId: clientSideComponentId, description: description, clientSideComponentProperties: clientSideComponentProperties, verbose: true } });
     assert(loggerLogToStderrSpy.called);
   });
 

@@ -111,13 +111,10 @@ class SpoApplicationCustomizerAddCommand extends SpoCommand {
     const requestBody: any = {
       Title: args.options.title,
       Name: args.options.title,
+      Description: args.options.description,
       Location: 'ClientSideExtension.ApplicationCustomizer',
       ClientSideComponentId: args.options.clientSideComponentId
     };
-
-    if (args.options.description) {
-      requestBody.Description = args.options.description;
-    }
 
     if (args.options.clientSideComponentProperties) {
       requestBody.ClientSideComponentProperties = args.options.clientSideComponentProperties;

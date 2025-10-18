@@ -121,15 +121,12 @@ class SpoCommandSetAddCommand extends SpoCommand {
     try {
       const requestBody: any = {
         Title: args.options.title,
+        Description: args.options.description,
         Location: location,
         ClientSideComponentId: args.options.clientSideComponentId,
         RegistrationId: listType,
         RegistrationType: 1
       };
-
-      if (args.options.description) {
-        requestBody.Description = args.options.description;
-      }
 
       if (args.options.clientSideComponentProperties) {
         requestBody.ClientSideComponentProperties = args.options.clientSideComponentProperties;

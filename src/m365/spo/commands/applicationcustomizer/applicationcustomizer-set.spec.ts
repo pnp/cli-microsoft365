@@ -310,7 +310,7 @@ describe(commands.APPLICATIONCUSTOMIZER_SET, () => {
     sinon.stub(cli, 'handleMultipleResultsFound').resolves(singleResponse.value[0]);
 
     const updateCallsSpy: sinon.SinonStub = defaultUpdateCallsStub();
-    await command.action(logger, { options: { verbose: true, title: title, webUrl: webUrl, scope: 'Site', newTitle: newTitle } } as any);
+    await command.action(logger, { options: { verbose: true, title: title, webUrl: webUrl, scope: 'Site', newTitle: newTitle } });
     assert(updateCallsSpy.calledOnce);
   });
 
@@ -323,7 +323,7 @@ describe(commands.APPLICATIONCUSTOMIZER_SET, () => {
     });
 
     const updateCallsSpy: sinon.SinonStub = defaultUpdateCallsStub();
-    await command.action(logger, { options: { verbose: true, id: id, webUrl: webUrl, scope: 'Web', newTitle: newTitle, description: description } } as any);
+    await command.action(logger, { options: { verbose: true, id: id, webUrl: webUrl, scope: 'Web', newTitle: newTitle, description: description } });
     assert(updateCallsSpy.calledOnce);
   });
 
@@ -338,7 +338,7 @@ describe(commands.APPLICATIONCUSTOMIZER_SET, () => {
     });
 
     const updateCallsSpy: sinon.SinonStub = defaultUpdateCallsStub();
-    await command.action(logger, { options: { verbose: true, id: id, webUrl: webUrl, scope: 'Site', newTitle: newTitle } } as any);
+    await command.action(logger, { options: { verbose: true, id: id, webUrl: webUrl, scope: 'Site', newTitle: newTitle } });
     assert(updateCallsSpy.calledOnce);
   });
 
@@ -354,7 +354,7 @@ describe(commands.APPLICATIONCUSTOMIZER_SET, () => {
     });
 
     const updateCallsSpy: sinon.SinonStub = defaultUpdateCallsStub();
-    await command.action(logger, { options: { verbose: true, clientSideComponentId: clientSideComponentId, webUrl: webUrl, scope: 'Web', clientSideComponentProperties: clientSideComponentProperties } } as any);
+    await command.action(logger, { options: { verbose: true, clientSideComponentId: clientSideComponentId, webUrl: webUrl, scope: 'Web', clientSideComponentProperties: clientSideComponentProperties } });
     assert(updateCallsSpy.calledOnce);
   });
 });
