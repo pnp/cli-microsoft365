@@ -11,10 +11,10 @@ import { cli } from '../../../../cli/cli.js';
 
 const options = globalOptionsZod
   .extend({
-    webUrl: zod.alias('u', z.string())
+    webUrl: zod.alias('u', z.string()
       .refine(url => validation.isValidSharePointUrl(url) === true, url => ({
         message: `'${url}' is not a valid SharePoint URL.`
-      })),
+      }))),
     id: z.string()
       .refine(id => validation.isValidGuid(id), id => ({
         message: `'${id}' is not a valid GUID.`
@@ -35,7 +35,7 @@ class SpoSiteAlertRemoveCommand extends SpoCommand {
   }
 
   public get description(): string {
-    return 'Removes an alert from a SharePoint site';
+    return 'Removes an alert from a SharePoint list';
   }
 
   public get schema(): z.ZodTypeAny | undefined {
@@ -59,7 +59,7 @@ class SpoSiteAlertRemoveCommand extends SpoCommand {
       const requestOptions: CliRequestOptions = {
         url: `${args.options.webUrl}/_api/web/Alerts/DeleteAlert('${formatting.encodeQueryParameter(args.options.id)}')`,
         headers: {
-          accept: 'application/json;odata.metadata=none'
+          accept: 'application/json;'
         },
         responseType: 'json'
       };
@@ -67,7 +67,7 @@ class SpoSiteAlertRemoveCommand extends SpoCommand {
       await request.delete(requestOptions);
     }
     catch (err: any) {
-      this.handleRejectedPromise(err);
+      this.handleRejectedODataJsonPromise(err);
     }
   }
 }

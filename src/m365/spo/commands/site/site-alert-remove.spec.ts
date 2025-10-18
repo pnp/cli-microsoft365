@@ -87,14 +87,14 @@ describe(commands.SITE_ALERT_REMOVE, () => {
   });
 
   it('prompts before removing the alert', async () => {
-    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, id: alertId }) });
+    await command.action(logger, { options: { webUrl: webUrl, id: alertId } });
     assert(confirmationPromptStub.calledOnce);
   });
 
   it('aborts removing the alert when prompt is not confirmed', async () => {
-    const deleteStub = sinon.stub(request, 'delete').resolves({});
+    const deleteStub = sinon.stub(request, 'delete').resolves();
 
-    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, id: alertId }) });
+    await command.action(logger, { options: { webUrl: webUrl, id: alertId } });
     assert(deleteStub.notCalled);
   });
 
@@ -107,16 +107,24 @@ describe(commands.SITE_ALERT_REMOVE, () => {
       throw 'Invalid request: ' + opts.url;
     });
 
-    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, id: alertId, force: true, verbose: true }) });
+    await command.action(logger, { options: { webUrl: webUrl, id: alertId, force: true, verbose: true } });
     assert(deleteStub.calledOnce);
   });
 
-  it('correctly handles random API error', async () => {
-    sinon.stub(request, 'delete').rejects(
-      new Error('The alert you are trying to access does not exist or has just been deleted.')
-    );
+  it('handles error correctly', async () => {
+    const error = {
+      error: {
+        'odata.error': {
+          code: '-2146232832, Microsoft.SharePoint.SPException',
+          message: {
+            value: 'The alert you are trying to access does not exist or has just been deleted.'
+          }
+        }
+      }
+    };
+    sinon.stub(request, 'delete').rejects(error);
 
     await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ force: true, webUrl: webUrl, id: alertId }) }),
-      new CommandError(`The alert you are trying to access does not exist or has just been deleted.`));
+      new CommandError(error.error['odata.error'].message.value));
   });
 });
