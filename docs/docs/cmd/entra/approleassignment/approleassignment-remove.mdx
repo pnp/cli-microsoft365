@@ -1,4 +1,6 @@
 import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 # entra approleassignment remove
 
@@ -43,6 +45,24 @@ Specify either the `appId`, `appObjectId` or `appDisplayName` but not multiple. 
 Autocomplete values for the `resource` option do not mean allowed values. The autocomplete will just suggest some known names, but that doesn't restrict you to use name of your own custom application or other application within your tenant.
 
 This command can also be used to assign permissions to system- or user-assigned managed identity.
+
+## Permissions
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource        | Permissions                     |
+  |-----------------|---------------------------------|
+  | Microsoft Graph | AppRoleAssignment.ReadWrite.All |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource        | Permissions                     |
+  |-----------------|---------------------------------|
+  | Microsoft Graph | AppRoleAssignment.ReadWrite.All |
+  
+  </TabItem>
+</Tabs>
 
 ## Examples
 
