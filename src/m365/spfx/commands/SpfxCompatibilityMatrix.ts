@@ -573,8 +573,8 @@ export const versions: { [version: string]: SpfxVersionPrerequisites } = {
       fix: 'npm i -g gulp-cli@3'
     },
     node: {
-      range: '>=22.14.0 < 23.0.0',
-      fix: 'Install Node.js >=22.14.0 < 23.0.0'
+      range: '>=22.14.0 <23.0.0',
+      fix: 'Install Node.js >=22.14.0 <23.0.0'
     },
     sp: SharePointVersion.SPO,
     yo: {
@@ -588,8 +588,8 @@ export const versions: { [version: string]: SpfxVersionPrerequisites } = {
       fix: 'npm i -g gulp-cli@3'
     },
     node: {
-      range: '>=22.14.0 < 23.0.0',
-      fix: 'Install Node.js >=22.14.0 < 23.0.0'
+      range: '>=22.14.0 <23.0.0',
+      fix: 'Install Node.js >=22.14.0 <23.0.0'
     },
     sp: SharePointVersion.SPO,
     yo: {
@@ -599,8 +599,8 @@ export const versions: { [version: string]: SpfxVersionPrerequisites } = {
   },
   '1.22.0-beta.1': {
     node: {
-      range: '>=22.14.0 < 23.0.0',
-      fix: 'Install Node.js >=22.14.0 < 23.0.0'
+      range: '>=22.14.0 <23.0.0',
+      fix: 'Install Node.js >=22.14.0 <23.0.0'
     },
     sp: SharePointVersion.SPO,
     yo: {

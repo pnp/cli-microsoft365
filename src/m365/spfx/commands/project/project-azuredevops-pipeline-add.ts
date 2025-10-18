@@ -160,20 +160,18 @@ class SpfxProjectAzureDevOpsPipelineAddCommand extends BaseProjectCommand {
     const version = this.getProjectVersion();
 
     if (!version) {
-      throw 'Unable to determine the version of the current SharePoint Framework project';
+      throw 'Unable to determine the version of the current SharePoint Framework project. Could not find the correct version based on @microsoft/generator-sharepoint property in the .yo-rc.json file.';
     }
 
     const versionRequirements = versions[version];
 
     if (!versionRequirements) {
-      throw `Could not find Node version for ${version} of SharePoint Framework`;
+      throw `Could not find Node version for version '${version}' of SharePoint Framework.`;
     }
 
     const nodeVersion: string = spfx.getHighestNodeVersion(versionRequirements.node.range);
 
-    if (nodeVersion) {
-      this.assignPipelineVariables(pipeline, 'NodeVersion', nodeVersion);
-    }
+    this.assignPipelineVariables(pipeline, 'NodeVersion', nodeVersion);
 
     const script = this.getScriptAction(pipeline);
     if (script.script) {

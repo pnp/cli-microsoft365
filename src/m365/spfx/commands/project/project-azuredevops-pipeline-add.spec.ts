@@ -23,7 +23,7 @@ describe(commands.PROJECT_AZUREDEVOPS_PIPELINE_ADD, () => {
   before(() => {
     sinon.stub(telemetry, 'trackEvent').resolves();
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(spfx, 'getHighestNodeVersion').callsFake(() => '22.0.x');
+    sinon.stub(spfx, 'getHighestNodeVersion').returns('22.0.x');
     sinon.stub(session, 'getId').callsFake(() => '');
     commandInfo = cli.getCommandInfo(command);
   });
@@ -185,10 +185,10 @@ describe(commands.PROJECT_AZUREDEVOPS_PIPELINE_ADD, () => {
 
     sinon.stub(command as any, 'getProjectVersion').returns('');
 
-    sinon.stub(fs, 'writeFileSync').callsFake(() => { throw 'error'; });
+    sinon.stub(fs, 'writeFileSync').throws('error');
 
     await assert.rejects(command.action(logger, { options: {} } as any),
-      new CommandError(`Unable to determine the version of the current SharePoint Framework project`, undefined));
+      new CommandError(`Unable to determine the version of the current SharePoint Framework project`));
   });
 
   it('handles error with not found node version', async () => {
@@ -215,10 +215,10 @@ describe(commands.PROJECT_AZUREDEVOPS_PIPELINE_ADD, () => {
 
     sinon.stub(command as any, 'getProjectVersion').returns('99.99.99');
 
-    sinon.stub(fs, 'writeFileSync').callsFake(() => { throw 'error'; });
+    sinon.stub(fs, 'writeFileSync').throws('error');
 
     await assert.rejects(command.action(logger, { options: {} } as any),
-      new CommandError(`Could not find Node version for 99.99.99 of SharePoint Framework`, undefined));
+      new CommandError(`Could not find Node version for 99.99.99 of SharePoint Framework`));
   });
 
   it('handles unexpected error', async () => {

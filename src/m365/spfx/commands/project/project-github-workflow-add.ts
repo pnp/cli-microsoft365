@@ -160,7 +160,7 @@ class SpfxProjectGithubWorkflowAddCommand extends BaseProjectCommand {
     const version = this.getProjectVersion();
 
     if (!version) {
-      throw 'Unable to determine the version of the current SharePoint Framework project';
+      throw 'Unable to determine the version of the current SharePoint Framework project. Could not find the correct version based on @microsoft/generator-sharepoint property in the .yo-rc.json file.';
     }
 
     const versionRequirements = versions[version];
@@ -171,9 +171,7 @@ class SpfxProjectGithubWorkflowAddCommand extends BaseProjectCommand {
 
     const nodeVersion: string = spfx.getHighestNodeVersion(versionRequirements.node.range);
 
-    if (nodeVersion) {
-      this.assignNodeVersion(workflow, nodeVersion);
-    }
+    this.assignNodeVersion(workflow, nodeVersion);
 
     if (options.manuallyTrigger) {
       // eslint-disable-next-line camelcase
