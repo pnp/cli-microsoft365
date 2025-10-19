@@ -177,9 +177,12 @@ class FlowExportCommand extends PowerPlatformCommand {
         // adds suggestedCreationType property to all resources
         // see https://github.com/pnp/cli-microsoft365/issues/1845
         Object.keys(res.resources).forEach((key) => {
-          res.resources[key].type === 'Microsoft.Flow/flows'
-            ? res.resources[key].suggestedCreationType = 'Update'
-            : res.resources[key].suggestedCreationType = 'Existing';
+          if (res.resources[key].type === 'Microsoft.Flow/flows') {
+            res.resources[key].suggestedCreationType = 'Update';
+          }
+          else {
+            res.resources[key].suggestedCreationType = 'Existing';
+          }
         });
 
         requestOptions.data = {
@@ -203,10 +206,10 @@ class FlowExportCommand extends PowerPlatformCommand {
       }
 
       const downloadFileUrl: string = formatArgument === 'json' ? '' : res.packageLink.value;
-      const filenameRegEx: RegExp = /([^\/]+\.zip)/i;
+      const filenameRegEx: RegExp = /([^/]+\.zip)/i;
       filenameFromApi = formatArgument === 'json' ? `${res.properties.displayName}.json` : (filenameRegEx.exec(downloadFileUrl) || ['output.zip'])[0];
       // Replace all illegal characters from the file name
-      const illegalCharsRegEx = /[\\\/:*?"<>|]/g;
+      const illegalCharsRegEx = /[\\/:*?"<>|]/g;
       filenameFromApi = filenameFromApi.replace(illegalCharsRegEx, '_');
 
       if (this.verbose) {

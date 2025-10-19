@@ -20,6 +20,7 @@ export const accessToken = {
       isAppOnlyAccessToken = token.idtyp === 'app';
     }
     catch {
+      // Do nothing
     }
 
     return isAppOnlyAccessToken;
@@ -43,6 +44,7 @@ export const accessToken = {
       tenantId = token.tid;
     }
     catch {
+      // Do nothing
     }
 
     return tenantId;
@@ -68,6 +70,7 @@ export const accessToken = {
       userName = token.upn || token.app_displayname;
     }
     catch {
+      // Do nothing
     }
 
     return userName;
@@ -91,6 +94,7 @@ export const accessToken = {
       userId = token.oid;
     }
     catch {
+      // Do nothing
     }
 
     return userId;

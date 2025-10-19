@@ -22,7 +22,7 @@ export const entraServicePrincipal = {
     const apps = await odata.getAllItems<ServicePrincipal>(url);
 
     if (apps.length === 0) {
-      throw `Service principal with appId '${appId}' not found in Microsoft Entra ID`;
+      throw new Error(`Service principal with appId '${appId}' not found in Microsoft Entra ID.`);
     }
 
     return apps[0];
@@ -44,7 +44,7 @@ export const entraServicePrincipal = {
     const apps = await odata.getAllItems<ServicePrincipal>(url);
 
     if (apps.length === 0) {
-      throw `Service principal with name '${appName}' not found in Microsoft Entra ID`;
+      throw new Error(`Service principal with name '${appName}' not found in Microsoft Entra ID.`);
     }
 
     if (apps.length > 1) {

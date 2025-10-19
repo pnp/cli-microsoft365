@@ -1,7 +1,11 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import PlannerCommand from '../../../base/PlannerCommand.js';
 import commands from '../../commands.js';
+
+const options = globalOptionsZod.strict();
 
 class PlannerTenantSettingsListCommand extends PlannerCommand {
   public get name(): string {
@@ -10,6 +14,10 @@ class PlannerTenantSettingsListCommand extends PlannerCommand {
 
   public get description(): string {
     return 'Lists the Microsoft Planner configuration of the tenant';
+  }
+
+  public get schema(): z.ZodTypeAny | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger): Promise<void> {

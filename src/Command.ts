@@ -361,7 +361,7 @@ export default abstract class Command {
     /* c8 ignore next 4 */
     if (this.debug && typeof global.it === 'undefined') {
       const error = new Error();
-      cli.error(error.stack).then(() => { }).catch(() => { });
+      cli.error(error.stack).catch(() => undefined);
     }
 
     if (res.error) {
@@ -406,7 +406,7 @@ export default abstract class Command {
     /* c8 ignore next 4 */
     if (this.debug && typeof global.it === 'undefined') {
       const error = new Error();
-      cli.error(error.stack).then(() => { }).catch(() => { });
+      cli.error(error.stack).catch(() => undefined);
     }
 
     if (response.error &&

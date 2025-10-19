@@ -14,7 +14,9 @@ export class TsFile {
       try {
         this._sourceFile = tsUtil.createSourceFile(path.basename(this.path), this.source, ts.ScriptTarget.Latest, true);
       }
-      catch { }
+      catch {
+        // Do nothing
+      }
     }
 
     return this._sourceFile;
@@ -39,7 +41,9 @@ export class TsFile {
       try {
         this._source = fs.readFileSync(this.path, 'utf-8');
       }
-      catch { }
+      catch {
+        // Do nothing
+      }
     }
 
     return this._source;

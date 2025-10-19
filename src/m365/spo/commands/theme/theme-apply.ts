@@ -180,7 +180,7 @@ class SpoThemeApplyCommand extends SpoCommand {
 
     return `{
       'name': '${themeName}' ,
-      'themeJson': '{\"palette\": {${palette}}}'
+      'themeJson': '{"palette": {${palette}}}'
     }`;
   }
 }

@@ -31,6 +31,24 @@ m365 entra approleassignment list [options]
 
 Specify either the `appId`, `appObjectId` or `appDisplayName`. If you specify more than one option value, the command will fail with an error.
 
+## Permissions
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource        | Permissions          |
+  |-----------------|----------------------|
+  | Microsoft Graph | Application.Read.All |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource        | Permissions          |
+  |-----------------|----------------------|
+  | Microsoft Graph | Application.Read.All |
+
+  </TabItem>
+</Tabs>
+
 ## Examples
 
 List app roles assigned to service principal with Application (client) ID _b2307a39-e878-458b-bc90-03bc578531d6_.

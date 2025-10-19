@@ -85,21 +85,21 @@ describe(commands.ORGASSETSLIBRARY_LIST, () => {
                   "_ObjectType_": "SP.ResourcePath",
                   "DecodedUrl": "sites\u002fsitedesigns\u002fSiteAssets"
                 },
-                "ListId": "\/Guid(96c2e234-c996-4877-b3a6-8aebd8ab45b6)\/",
+                "ListId": "/Guid(96c2e234-c996-4877-b3a6-8aebd8ab45b6)/",
                 "OrgAssetType": 1,
                 "ThumbnailUrl": {
                   "_ObjectType_": "SP.ResourcePath",
                   "DecodedUrl": "SiteAssets\u002f__siteIcon__.jpg"
                 },
-                "UniqueId": "\/Guid(0d3c9e72-60f5-40f8-9e29-b91036f5630e)\/"
+                "UniqueId": "/Guid(0d3c9e72-60f5-40f8-9e29-b91036f5630e)/"
               }]
             },
-            "SiteId": "\/Guid(9f0e0a96-14ec-4d4f-9b04-a8698367cd36)\/",
+            "SiteId": "/Guid(9f0e0a96-14ec-4d4f-9b04-a8698367cd36)/",
             "Url": {
               "_ObjectType_": "SP.ResourcePath",
               "DecodedUrl": "\u002fsites\u002fsitedesigns"
             },
-            "WebId": "\/Guid(030c8d27-1bb4-4042-a252-dce8ac1e9f00)\/"
+            "WebId": "/Guid(030c8d27-1bb4-4042-a252-dce8ac1e9f00)/"
           }
         ]);
       }
@@ -132,13 +132,13 @@ describe(commands.ORGASSETSLIBRARY_LIST, () => {
                   "_ObjectType_": "SP.ResourcePath",
                   "DecodedUrl": "sites\u002fsitedesigns\u002fSiteAssets"
                 },
-                "ListId": "\/Guid(96c2e234-c996-4877-b3a6-8aebd8ab45b6)\/",
+                "ListId": "/Guid(96c2e234-c996-4877-b3a6-8aebd8ab45b6)/",
                 "OrgAssetType": 1,
                 "ThumbnailUrl": {
                   "_ObjectType_": "SP.ResourcePath",
                   "DecodedUrl": "SiteAssets\u002f__siteIcon__.jpg"
                 },
-                "UniqueId": "\/Guid(0d3c9e72-60f5-40f8-9e29-b91036f5630e)\/"
+                "UniqueId": "/Guid(0d3c9e72-60f5-40f8-9e29-b91036f5630e)/"
               }, {
                 "_ObjectType_": "Microsoft.SharePoint.Administration.OrgAssetsLibrary",
                 "DisplayName": "Site Assets 2",
@@ -147,18 +147,18 @@ describe(commands.ORGASSETSLIBRARY_LIST, () => {
                   "_ObjectType_": "SP.ResourcePath",
                   "DecodedUrl": "sites\u002fsitedesigns\u002fSiteAssets2"
                 },
-                "ListId": "\/Guid(86c2e234-c996-4877-b3a6-8aebd8ab45b6)\/",
+                "ListId": "/Guid(86c2e234-c996-4877-b3a6-8aebd8ab45b6)/",
                 "OrgAssetType": 1,
                 "ThumbnailUrl": null,
-                "UniqueId": "\/Guid(1d3c9e72-60f5-40f8-9e29-b91036f5630e)\/"
+                "UniqueId": "/Guid(1d3c9e72-60f5-40f8-9e29-b91036f5630e)/"
               }]
             },
-            "SiteId": "\/Guid(9f0e0a96-14ec-4d4f-9b04-a8698367cd36)\/",
+            "SiteId": "/Guid(9f0e0a96-14ec-4d4f-9b04-a8698367cd36)/",
             "Url": {
               "_ObjectType_": "SP.ResourcePath",
               "DecodedUrl": "\u002fsites\u002fsitedesigns"
             },
-            "WebId": "\/Guid(030c8d27-1bb4-4042-a252-dce8ac1e9f00)\/"
+            "WebId": "/Guid(030c8d27-1bb4-4042-a252-dce8ac1e9f00)/"
           }
         ]);
       }
@@ -190,18 +190,18 @@ describe(commands.ORGASSETSLIBRARY_LIST, () => {
                   "_ObjectType_": "SP.ResourcePath",
                   "DecodedUrl": "sites\u002fsitedesigns\u002fSiteAssets"
                 },
-                "ListId": "\/Guid(96c2e234-c996-4877-b3a6-8aebd8ab45b6)\/",
+                "ListId": "/Guid(96c2e234-c996-4877-b3a6-8aebd8ab45b6)/",
                 "OrgAssetType": 1,
                 "ThumbnailUrl": null,
-                "UniqueId": "\/Guid(0d3c9e72-60f5-40f8-9e29-b91036f5630e)\/"
+                "UniqueId": "/Guid(0d3c9e72-60f5-40f8-9e29-b91036f5630e)/"
               }]
             },
-            "SiteId": "\/Guid(9f0e0a96-14ec-4d4f-9b04-a8698367cd36)\/",
+            "SiteId": "/Guid(9f0e0a96-14ec-4d4f-9b04-a8698367cd36)/",
             "Url": {
               "_ObjectType_": "SP.ResourcePath",
               "DecodedUrl": "\u002fsites\u002fsitedesigns"
             },
-            "WebId": "\/Guid(030c8d27-1bb4-4042-a252-dce8ac1e9f00)\/"
+            "WebId": "/Guid(030c8d27-1bb4-4042-a252-dce8ac1e9f00)/"
           }
         ]);
       }
@@ -391,3 +391,4 @@ describe(commands.ORGASSETSLIBRARY_LIST, () => {
       new CommandError('An error has occurred'));
   });
 });
+

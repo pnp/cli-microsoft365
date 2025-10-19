@@ -1,4 +1,6 @@
 import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 # entra oauth2grant remove
 
@@ -31,6 +33,24 @@ If the `objectId` listed when using the [entra oauth2grant list](./oauth2grant-l
 ```sh
 m365 entra oauth2grant remove --grantId \\-Zc1JRY8REeLxmXz5KtixAYU3Q6noCBPlhwGiX7pxmU
 ```
+
+## Permissions
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource        | Permissions                            |
+  |-----------------|----------------------------------------|
+  | Microsoft Graph | DelegatedPermissionGrant.ReadWrite.All |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource        | Permissions                            |
+  |-----------------|----------------------------------------|
+  | Microsoft Graph | DelegatedPermissionGrant.ReadWrite.All |
+
+  </TabItem>
+</Tabs>
 
 ## Examples
 

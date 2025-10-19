@@ -43,6 +43,24 @@ Autocomplete values for the `resource` option do not mean allowed values. The au
 
 This command can also be used to assign permissions to system or user-assigned managed identity.
 
+## Permissions
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource        | Permissions                                           |
+  |-----------------|-------------------------------------------------------|
+  | Microsoft Graph | AppRoleAssignment.ReadWrite.All, Application.Read.All |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource        | Permissions                                           |
+  |-----------------|-------------------------------------------------------|
+  | Microsoft Graph | AppRoleAssignment.ReadWrite.All, Application.Read.All |
+
+  </TabItem>
+</Tabs>
+
 ## Examples
 
 Adds SharePoint _Sites.Read.All_ application permissions to Entra application with app id _57907bf8-73fa-43a6-89a5-1f603e29e451_

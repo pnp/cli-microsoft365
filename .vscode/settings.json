@@ -19,7 +19,7 @@
   "[markdown][mdx]": {
     "files.insertFinalNewline": true
   },
-  "[typescript]": {
+  "[javascript][typescript]": {
     "editor.defaultFormatter": "vscode.typescript-language-features",
     "editor.formatOnSave": true
   }

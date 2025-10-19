@@ -40,7 +40,7 @@ describe(commands.LISTITEM_ATTACHMENT_GET, () => {
     "ServerRelativeUrl": "/sites/project-x/Lists/DemoListAttachments/147/File1.jpg"
   };
 
-  const getFakes = async (opts: any) => {
+  const getFakes = async (opts: any): Promise<any> => {
     if ((opts.url as string).indexOf('/_api/web/lists') > -1) {
       return attachmentResponse;
     }

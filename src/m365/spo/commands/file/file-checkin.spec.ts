@@ -234,7 +234,7 @@ describe(commands.FILE_CHECKIN, () => {
         type: 'minor'
       }
     });
-    assert.strictEqual(postStub.lastCall.args[0].url, "https://contoso.sharepoint.com/sites/project-x/_api/web/GetFileById(\'0CD891EF-AFCE-4E55-B836-FCE03286CCCF\')/checkin(comment='',checkintype=0)");
+    assert.strictEqual(postStub.lastCall.args[0].url, "https://contoso.sharepoint.com/sites/project-x/_api/web/GetFileById('0CD891EF-AFCE-4E55-B836-FCE03286CCCF')/checkin(comment='',checkintype=0)");
   });
 
   it('should call correctly the API when type is overwrite (id)', async () => {
@@ -247,7 +247,7 @@ describe(commands.FILE_CHECKIN, () => {
         type: 'overwrite'
       }
     });
-    assert.strictEqual(postStub.lastCall.args[0].url, "https://contoso.sharepoint.com/sites/project-x/_api/web/GetFileById(\'0CD891EF-AFCE-4E55-B836-FCE03286CCCF\')/checkin(comment='',checkintype=2)");
+    assert.strictEqual(postStub.lastCall.args[0].url, "https://contoso.sharepoint.com/sites/project-x/_api/web/GetFileById('0CD891EF-AFCE-4E55-B836-FCE03286CCCF')/checkin(comment='',checkintype=2)");
   });
 
   it('should call correctly the API when comment specified (id)', async () => {
@@ -260,7 +260,7 @@ describe(commands.FILE_CHECKIN, () => {
         comment: 'abc1'
       }
     });
-    assert.strictEqual(postStub.lastCall.args[0].url, "https://contoso.sharepoint.com/sites/project-x/_api/web/GetFileById(\'0CD891EF-AFCE-4E55-B836-FCE03286CCCF\')/checkin(comment='abc1',checkintype=1)");
+    assert.strictEqual(postStub.lastCall.args[0].url, "https://contoso.sharepoint.com/sites/project-x/_api/web/GetFileById('0CD891EF-AFCE-4E55-B836-FCE03286CCCF')/checkin(comment='abc1',checkintype=1)");
   });
 
   it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {

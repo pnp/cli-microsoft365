@@ -17,8 +17,7 @@ describe(commands.CONNECTION_GET, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
 
-  const externalConnection: ExternalConnectors.ExternalConnection =
-  {
+  const externalConnection: ExternalConnectors.ExternalConnection = {
     "id": "contosohr",
     "name": "Contoso HR",
     "description": "Connection to index Contoso HR system",

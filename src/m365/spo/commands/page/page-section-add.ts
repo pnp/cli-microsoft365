@@ -1,7 +1,7 @@
 import { v4 } from 'uuid';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
-import request from '../../../../request.js';
+import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
@@ -277,7 +277,7 @@ class SpoPageSectionAddCommand extends SpoCommand {
     }
 
     try {
-      let requestOptions: any = {
+      let requestOptions: CliRequestOptions = {
         url: `${args.options.webUrl}/_api/sitepages/pages/GetByUrl('sitepages/${formatting.encodeQueryParameter(pageFullName)}')?$select=CanvasContent1,IsPageCheckedOutToCurrentUser`,
         headers: {
           'accept': 'application/json;odata=nometadata'

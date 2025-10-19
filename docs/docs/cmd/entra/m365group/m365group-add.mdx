@@ -66,6 +66,25 @@ Public | Anyone can join the group without needing owner permission. Anyone can 
 Private | Owner permission is needed to join the group. Anyone can view the attributes of the group. Anyone can see the members of the group.
 HiddenMembership | Owner permission is needed to join the group. Guest users cannot view the attributes of the group. Non-members cannot see the members of the group. Administrators (global, company, user, and helpdesk) can view the membership of the group. The group appears in the global address book (GAL).
 
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource        | Permissions         |
+  |-----------------|---------------------|
+  | Microsoft Graph | Group.ReadWrite.All |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource        | Permissions  |
+  |-----------------|--------------|
+  | Microsoft Graph | Group.Create |
+
+  </TabItem>
+</Tabs>
+
 ## Examples
 
 Create a public Microsoft 365 Group.

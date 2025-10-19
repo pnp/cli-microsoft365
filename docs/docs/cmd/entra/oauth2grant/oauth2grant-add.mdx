@@ -1,4 +1,6 @@
 import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 # entra oauth2grant add
 
@@ -34,6 +36,24 @@ The resource for which you want to grant permissions is designated using its `ob
 When granting OAuth2 permissions, you have to specify which permission scopes you want to grant the service principal. You can get the list of available permission scopes either from the resource documentation or from the `appRoles` property when retrieving information about the service principal using the [entra enterpriseapp get](../enterpriseapp/enterpriseapp-get.mdx) command. Multiple permission scopes can be specified separated by a space.
 
 When granting OAuth2 permissions, the values of the `clientId` and `resourceId` properties form a unique key. If a grant for the same `clientId`-`resourceId` pair already exists, running the `entra oauth2grant add` command will fail with an error. If you want to change permissions on an existing OAuth2 grant use the [entra oauth2grant set](./oauth2grant-set.mdx) command instead.
+
+## Permissions
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource        | Permissions                            |
+  |-----------------|----------------------------------------|
+  | Microsoft Graph | DelegatedPermissionGrant.ReadWrite.All |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource        | Permissions                            |
+  |-----------------|----------------------------------------|
+  | Microsoft Graph | DelegatedPermissionGrant.ReadWrite.All |
+
+  </TabItem>
+</Tabs>
 
 ## Examples
 

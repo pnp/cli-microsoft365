@@ -127,7 +127,7 @@ class SpoListItemBatchSetCommand extends SpoCommand {
       const amountOfRows = jsonContent.length;
       const idColumn = args.options.idColumn || 'ID';
 
-      if (!jsonContent[0].hasOwnProperty(idColumn)) {
+      if (!Object.prototype.hasOwnProperty.call(jsonContent[0], idColumn)) {
         throw `The specified value for idColumn does not exist in the array. Specified idColumn is '${args.options.idColumn || 'ID'}'. Please specify the correct value.`;
       }
 
@@ -199,26 +199,30 @@ class SpoListItemBatchSetCommand extends SpoCommand {
       }
       else {
         switch (field.TypeAsString) {
-          case 'User':
+          case 'User': {
             const userDetail = users.find(us => us.email === row[field.InternalName])!;
             actionString += `<Method Name="ParseAndSetFieldValue" Id="${index += 1}" ObjectPathId="${objectPathId}"><Parameters><Parameter Type="String">${field.InternalName}</Parameter><Parameter Type="String">${userDetail.id}</Parameter></Parameters></Method>`;
             break;
-          case 'UserMulti':
+          }
+          case 'UserMulti': {
             const userMultiString: string[] = row[field.InternalName].toString().split(';').map((element: string) => {
               const userDetail = users.find(us => us.email === element)!;
               return `<Object TypeId="{c956ab54-16bd-4c18-89d2-996f57282a6f}"><Property Name="Email" Type="Null" /><Property Name="LookupId" Type="Int32">${userDetail.id}</Property><Property Name="LookupValue" Type="Null" /></Object>`;
             });
             actionString += `<Method Name="SetFieldValue" Id="${index += 1}" ObjectPathId="${objectPathId}"><Parameters><Parameter Type="String">${field.InternalName}</Parameter><Parameter Type="Array">${userMultiString.join('')}</Parameter></Parameters></Method>`;
             break;
-          case 'Lookup':
+          }
+          case 'Lookup': {
             actionString += `<Method Name="SetFieldValue" Id="${index += 1}" ObjectPathId="${objectPathId}"><Parameters><Parameter Type="String">${field.InternalName}</Parameter><Parameter TypeId="{f1d34cc0-9b50-4a78-be78-d5facfcccfb7}"><Property Name="LookupId" Type="Int32">${row[field.InternalName]}</Property><Property Name="LookupValue" Type="Null"/></Parameter></Parameters></Method>`;
             break;
-          case 'LookupMulti':
+          }
+          case 'LookupMulti': {
             const lookupMultiString: string[] = row[field.InternalName].toString().split(';').map((element: string) => {
               return `<Object TypeId="{f1d34cc0-9b50-4a78-be78-d5facfcccfb7}"><Property Name="LookupId" Type="Int32">${element}</Property><Property Name="LookupValue" Type="Null" /></Object>`;
             });
             actionString += `<Method Name="SetFieldValue" Id="${index += 1}" ObjectPathId="${objectPathId}"><Parameters><Parameter Type="String">${field.InternalName}</Parameter><Parameter Type="Array">${lookupMultiString.join('')}</Parameter></Parameters></Method>`;
             break;
+          }
           default:
             actionString += `<Method Name="ParseAndSetFieldValue" Id="${index += 1}" ObjectPathId="${objectPathId}"><Parameters><Parameter Type="String">${field.InternalName}</Parameter><Parameter Type="String">${formatting.escapeXml((<any>row)[field.InternalName].toString())}</Parameter></Parameters></Method>`;
             break;

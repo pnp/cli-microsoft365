@@ -45,7 +45,7 @@ describe(commands.TERM_LIST, () => {
     }, 87, {
       "_ObjectType_": "SP.Taxonomy.TermCollection", "_Child_Items_": [
         {
-          "_ObjectType_": "SP.Taxonomy.Term", "_ObjectIdentity_": "1e1e969e-7056-0000-2cdb-ea009f6c99c8|fec14c62-7c3b-481b-851b-c80d7802b224:te:YU1+cBy9wUuh\u002ffzgFZGpUV45jw5Y\u002f0VNn\u002ffjMatyi+ts4nkUgBOoQZGDcrxallG7niHPAumMhU6sBKkTpEpdKw==", "CreatedDate": "\/Date(1536839575320)\/", "Id": "\/Guid(02cf219e-8ce9-4e85-ac04-a913a44a5d2b)\/", "LastModifiedDate": "\/Date(1536839575337)\/", "Name": "HR", "CustomProperties": {
+          "_ObjectType_": "SP.Taxonomy.Term", "_ObjectIdentity_": "1e1e969e-7056-0000-2cdb-ea009f6c99c8|fec14c62-7c3b-481b-851b-c80d7802b224:te:YU1+cBy9wUuh\u002ffzgFZGpUV45jw5Y\u002f0VNn\u002ffjMatyi+ts4nkUgBOoQZGDcrxallG7niHPAumMhU6sBKkTpEpdKw==", "CreatedDate": "/Date(1536839575320)/", "Id": "/Guid(02cf219e-8ce9-4e85-ac04-a913a44a5d2b)/", "LastModifiedDate": "/Date(1536839575337)/", "Name": "HR", "CustomProperties": {
 
           }, "CustomSortOrder": null, "IsAvailableForTagging": true, "Owner": "i:0#.f|membership|admin@contoso.onmicrosoft.com", "Description": "", "IsDeprecated": false, "IsKeyword": false, "IsPinned": false, "IsPinnedRoot": false, "IsReused": false, "IsRoot": true, "IsSourceTerm": true, "LocalCustomProperties": {
 
@@ -53,7 +53,7 @@ describe(commands.TERM_LIST, () => {
 
           ], "PathOfTerm": "HR", "TermsCount": 0
         }, {
-          "_ObjectType_": "SP.Taxonomy.Term", "_ObjectIdentity_": "1e1e969e-7056-0000-2cdb-ea009f6c99c8|fec14c62-7c3b-481b-851b-c80d7802b224:te:YU1+cBy9wUuh\u002ffzgFZGpUV45jw5Y\u002f0VNn\u002ffjMatyi+ts4nkUgBOoQZGDcrxallG7tkN1JPJFMkK56GbFv1PDHg==", "CreatedDate": "\/Date(1536839575477)\/", "Id": "\/Guid(247543b6-45f2-4232-b9e8-66c5bf53c31e)\/", "LastModifiedDate": "\/Date(1536839575490)\/", "Name": "IT", "CustomProperties": {
+          "_ObjectType_": "SP.Taxonomy.Term", "_ObjectIdentity_": "1e1e969e-7056-0000-2cdb-ea009f6c99c8|fec14c62-7c3b-481b-851b-c80d7802b224:te:YU1+cBy9wUuh\u002ffzgFZGpUV45jw5Y\u002f0VNn\u002ffjMatyi+ts4nkUgBOoQZGDcrxallG7tkN1JPJFMkK56GbFv1PDHg==", "CreatedDate": "/Date(1536839575477)/", "Id": "/Guid(247543b6-45f2-4232-b9e8-66c5bf53c31e)/", "LastModifiedDate": "/Date(1536839575490)/", "Name": "IT", "CustomProperties": {
 
           }, "CustomSortOrder": null, "IsAvailableForTagging": true, "Owner": "i:0#.f|membership|admin@contoso.onmicrosoft.com", "Description": "", "IsDeprecated": false, "IsKeyword": false, "IsPinned": false, "IsPinnedRoot": false, "IsReused": false, "IsRoot": true, "IsSourceTerm": true, "LocalCustomProperties": {
 
@@ -61,7 +61,7 @@ describe(commands.TERM_LIST, () => {
 
           ], "PathOfTerm": "IT", "TermsCount": 0
         }, {
-          "_ObjectType_": "SP.Taxonomy.Term", "_ObjectIdentity_": "1e1e969e-7056-0000-2cdb-ea009f6c99c8|fec14c62-7c3b-481b-851b-c80d7802b224:te:YU1+cBy9wUuh\u002ffzgFZGpUV45jw5Y\u002f0VNn\u002ffjMatyi+ts4nkUgBOoQZGDcrxallG7j2DD\u002f1ASKE2ziDgfrY1GAg==", "CreatedDate": "\/Date(1536839575600)\/", "Id": "\/Guid(ffc3608f-1250-4d28-b388-381fad8d4602)\/", "LastModifiedDate": "\/Date(1536839575617)\/", "Name": "Leadership", "CustomProperties": {
+          "_ObjectType_": "SP.Taxonomy.Term", "_ObjectIdentity_": "1e1e969e-7056-0000-2cdb-ea009f6c99c8|fec14c62-7c3b-481b-851b-c80d7802b224:te:YU1+cBy9wUuh\u002ffzgFZGpUV45jw5Y\u002f0VNn\u002ffjMatyi+ts4nkUgBOoQZGDcrxallG7j2DD\u002f1ASKE2ziDgfrY1GAg==", "CreatedDate": "/Date(1536839575600)/", "Id": "/Guid(ffc3608f-1250-4d28-b388-381fad8d4602)/", "LastModifiedDate": "/Date(1536839575617)/", "Name": "Leadership", "CustomProperties": {
 
           }, "CustomSortOrder": null, "IsAvailableForTagging": true, "Owner": "i:0#.f|membership|admin@contoso.onmicrosoft.com", "Description": "", "IsDeprecated": false, "IsKeyword": false, "IsPinned": false, "IsPinnedRoot": false, "IsReused": false, "IsRoot": true, "IsSourceTerm": true, "LocalCustomProperties": {
 
@@ -101,7 +101,7 @@ describe(commands.TERM_LIST, () => {
     }, 87, {
       "_ObjectType_": "SP.Taxonomy.TermCollection", "_Child_Items_": [
         {
-          "_ObjectType_": "SP.Taxonomy.Term", "_ObjectIdentity_": "6ede85a0-70c8-6000-02cc-23cfae5cac8f|fec14c62-7c3b-481b-851b-c80d7802b224:te:kTm3XibpGUiE5nxBtVMTf14Jch8b6X1EtvEo9yq4/mCesjVWlBPHRaBqFOZeTRSNHOmHw1O1kkuIa5r3F81zsA==", "CreatedDate": "\/Date(1536839575320)\/", "Id": "\/Guid(c387e91c-b553-4b92-886b-9af717cd73b0)\/", "LastModifiedDate": "\/Date(1536839575337)\/", "Name": "Child 1", "CustomProperties": {
+          "_ObjectType_": "SP.Taxonomy.Term", "_ObjectIdentity_": "6ede85a0-70c8-6000-02cc-23cfae5cac8f|fec14c62-7c3b-481b-851b-c80d7802b224:te:kTm3XibpGUiE5nxBtVMTf14Jch8b6X1EtvEo9yq4/mCesjVWlBPHRaBqFOZeTRSNHOmHw1O1kkuIa5r3F81zsA==", "CreatedDate": "/Date(1536839575320)/", "Id": "/Guid(c387e91c-b553-4b92-886b-9af717cd73b0)/", "LastModifiedDate": "/Date(1536839575337)/", "Name": "Child 1", "CustomProperties": {
 
           }, "CustomSortOrder": null, "IsAvailableForTagging": true, "Owner": "i:0#.f|membership|admin@contoso.onmicrosoft.com", "Description": "", "IsDeprecated": false, "IsKeyword": false, "IsPinned": false, "IsPinnedRoot": false, "IsReused": false, "IsRoot": true, "IsSourceTerm": true, "LocalCustomProperties": {
 
@@ -141,7 +141,7 @@ describe(commands.TERM_LIST, () => {
     }, 87, {
       "_ObjectType_": "SP.Taxonomy.TermCollection", "_Child_Items_": [
         {
-          "_ObjectType_": "SP.Taxonomy.Term", "_ObjectIdentity_": "94ff85a0-d037-6000-02cc-2f3cb55cae2a|fec14c62-7c3b-481b-851b-c80d7802b224:te:kTm3XibpGUiE5nxBtVMTf14Jch8b6X1EtvEo9yq4/mCesjVWlBPHRaBqFOZeTRSN+zepP1QYfkGbYiwj/kPrgw==", "CreatedDate": "\/Date(1536839575320)\/", "Id": "\/Guid(3fa937fb-1854-417e-9b62-2c23fe43eb83)\/", "LastModifiedDate": "\/Date(1536839575337)\/", "Name": "Child 2", "CustomProperties": {
+          "_ObjectType_": "SP.Taxonomy.Term", "_ObjectIdentity_": "94ff85a0-d037-6000-02cc-2f3cb55cae2a|fec14c62-7c3b-481b-851b-c80d7802b224:te:kTm3XibpGUiE5nxBtVMTf14Jch8b6X1EtvEo9yq4/mCesjVWlBPHRaBqFOZeTRSN+zepP1QYfkGbYiwj/kPrgw==", "CreatedDate": "/Date(1536839575320)/", "Id": "/Guid(3fa937fb-1854-417e-9b62-2c23fe43eb83)/", "LastModifiedDate": "/Date(1536839575337)/", "Name": "Child 2", "CustomProperties": {
 
           }, "CustomSortOrder": null, "IsAvailableForTagging": true, "Owner": "i:0#.f|membership|admin@contoso.onmicrosoft.com", "Description": "", "IsDeprecated": false, "IsKeyword": false, "IsPinned": false, "IsPinnedRoot": false, "IsReused": false, "IsRoot": true, "IsSourceTerm": true, "LocalCustomProperties": {
 

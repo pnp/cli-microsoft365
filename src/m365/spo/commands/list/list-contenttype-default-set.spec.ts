@@ -226,14 +226,14 @@ describe(commands.LIST_CONTENTTYPE_DEFAULT_SET, () => {
 
   it('configures specified visible content type as default. List specified using URL. UniqueContentTypeOrder not null', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/_api/web/GetList(\'%2Fsites%2Fdocuments\')/RootFolder`) {
+      if (opts.url === `https://contoso.sharepoint.com/_api/web/GetList('%2Fsites%2Fdocuments')/RootFolder`) {
         return;
       }
 
       throw 'Invalid request';
     });
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/_api/web/GetList(\'%2Fsites%2Fdocuments\')/RootFolder?$select=ContentTypeOrder,UniqueContentTypeOrder`) {
+      if (opts.url === `https://contoso.sharepoint.com/_api/web/GetList('%2Fsites%2Fdocuments')/RootFolder?$select=ContentTypeOrder,UniqueContentTypeOrder`) {
         return {
           "ContentTypeOrder": [
             {
@@ -254,7 +254,7 @@ describe(commands.LIST_CONTENTTYPE_DEFAULT_SET, () => {
         };
       }
 
-      if (opts.url === `https://contoso.sharepoint.com/_api/web/GetList(\'%2Fsites%2Fdocuments\')/ContentTypes?$select=Id`) {
+      if (opts.url === `https://contoso.sharepoint.com/_api/web/GetList('%2Fsites%2Fdocuments')/ContentTypes?$select=Id`) {
         return {
           value: [
             {

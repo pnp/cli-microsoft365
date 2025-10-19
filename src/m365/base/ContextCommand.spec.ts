@@ -16,7 +16,7 @@ class MockCommand extends ContextCommand {
     return 'Mock command';
   }
 
-  public mockSaveContextInfo(contextInfo: Hash) {
+  public mockSaveContextInfo(contextInfo: Hash): void {
     this.saveContextInfo(contextInfo);
   }
 

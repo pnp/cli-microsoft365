@@ -192,7 +192,7 @@ describe(commands.FIELD_REMOVE, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     const getStub = sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/web/GetList(\'%2Fsites%2Fportal%2FLists%2FEvents\')/fields`) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/web/GetList('%2Fsites%2Fportal%2FLists%2FEvents')/fields`) {
         return {
           'value': [{
             'Id': '03e45e84-1992-4d42-9116-26f756012634',

@@ -51,7 +51,7 @@ describe(commands.LISTITEM_SET, () => {
   const expectedTitle = `List Item 1`;
   const expectedContentType = 'Item';
 
-  const getFakes = async (opts: any) => {
+  const getFakes = async (opts: any): Promise<any> => {
     if (opts.url.indexOf('/_api/web/lists') > -1) {
       if ((opts.url as string).indexOf('contenttypes') > -1) {
         return { value: [{ Id: { StringValue: expectedContentType }, Name: "Item" }] };

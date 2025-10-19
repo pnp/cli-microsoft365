@@ -90,6 +90,29 @@ paths:
       responses:
         200:
           description: OK
+  /_api/web/alerts:
+    get:
+      parameters:
+        - name: $expand
+          in: query
+          required: false
+          schema:
+            type: string
+          example: "List,User,List/Rootfolder,Item"
+        - name: $select
+          in: query
+          required: false
+          schema:
+            type: string
+          example: "*,List/Id,List/Title,List/Rootfolder/ServerRelativeUrl,Item/ID,Item/FileRef,Item/Guid"
+      security:
+        - delegated:
+          - AllSites.FullControl
+        - application:
+          - Sites.FullControl.All
+      responses:
+        200:
+          description: OK
   /_api/web/folders/addUsingPath(decodedUrl={folderPath}):
     post:
       parameters:

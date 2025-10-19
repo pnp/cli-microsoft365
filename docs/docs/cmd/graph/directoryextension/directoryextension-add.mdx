@@ -39,6 +39,24 @@ m365 graph directoryextension add [options]
 
 <Global />
 
+## Permissions
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource        | Permissions               |
+  |-----------------|---------------------------|
+  | Microsoft Graph | Application.ReadWrite.All |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource        | Permissions                   |
+  |-----------------|-------------------------------|
+  | Microsoft Graph | Application.ReadWrite.OwnedBy |
+
+  </TabItem>
+</Tabs>
+
 ## Examples
 
 Create a new directory extension of string type defined for user resource.

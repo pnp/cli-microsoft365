@@ -23,7 +23,7 @@ export const vivaEngage = {
     const community = await request.get<Community>(requestOptions);
 
     if (!community) {
-      throw `The specified Viva Engage community with ID '${communityId}' does not exist.`;
+      throw new Error(`The specified Viva Engage community with ID '${communityId}' does not exist.`);
     }
 
     return community;
@@ -39,7 +39,7 @@ export const vivaEngage = {
     const communities = await odata.getAllItems<Community>(`https://graph.microsoft.com/v1.0/employeeExperience/communities?$filter=displayName eq '${formatting.encodeQueryParameter(displayName)}'&$select=${selectProperties.join(',')}`);
 
     if (communities.length === 0) {
-      throw `The specified Viva Engage community '${displayName}' does not exist.`;
+      throw new Error(`The specified Viva Engage community '${displayName}' does not exist.`);
     }
 
     if (communities.length > 1) {
@@ -65,7 +65,7 @@ export const vivaEngage = {
     const filteredCommunity = communities.find(c => c.groupId === entraGroupId);
 
     if (!filteredCommunity) {
-      throw `The Microsoft Entra group with id '${entraGroupId}' is not associated with any Viva Engage community.`;
+      throw new Error(`The Microsoft Entra group with id '${entraGroupId}' is not associated with any Viva Engage community.`);
     }
 
     return filteredCommunity;

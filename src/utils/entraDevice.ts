@@ -16,7 +16,7 @@ export const entraDevice = {
     const devices = await odata.getAllItems<Device>(`${graphResource}/v1.0/devices?$filter=displayName eq '${formatting.encodeQueryParameter(displayName)}'`);
 
     if (devices.length === 0) {
-      throw `The specified device '${displayName}' does not exist.`;
+      throw new Error(`The specified device '${displayName}' does not exist.`);
     }
 
     if (devices.length > 1) {
