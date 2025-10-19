@@ -1,4 +1,6 @@
 import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 # graph schemaextension set
 
@@ -46,21 +48,39 @@ When using the `--properties` option it's possible to enter a JSON string. In Po
 
 :::
 
+## Permissions
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource        | Permissions               |
+  |-----------------|---------------------------|
+  | Microsoft Graph | Application.ReadWrite.All |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource        | Permissions                                        |
+  |-----------------|----------------------------------------------------|
+  | Microsoft Graph | Application.ReadWrite.All, Directory.ReadWrite.All |
+
+  </TabItem>
+</Tabs>
+
 ## Examples
 
- Update the description of a schema extension
+Update the description of a schema extension.
 
 ```sh
 m365 graph schemaextension set --id MySchemaExtension --owner 62375ab9-6b52-47ed-826b-58e47e0e304b --description "My schema extension" 
 ```
 
-Update the target types and properties of a schema extension
+Update the target types and properties of a schema extension.
 
 ```sh
 m365 graph schemaextension set --id contoso_MySchemaExtension --owner 62375ab9-6b52-47ed-826b-58e47e0e304b --targetTypes "Group,User" --properties '[{"name":"myProp1","type":"Integer"},{"name":"myProp2","type":"String"}]'
 ```
 
-Change the status of a schema extension to 'Available'
+Change the status of a schema extension to 'Available'.
 
 ```sh
 m365 graph schemaextension set --id contoso_MySchemaExtension --owner 62375ab9-6b52-47ed-826b-58e47e0e304b --status Available
