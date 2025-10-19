@@ -131,7 +131,7 @@ class SpoCommandSetSetCommand extends SpoCommand {
           return `${args.options.location} is not a valid location. Allowed values are ${SpoCommandSetSetCommand.locations.join(', ')}`;
         }
 
-        if (!args.options.newTitle && !args.options.description && !args.options.listType && !args.options.clientSideComponentProperties && !args.options.location && !args.options.newClientSideComponentId) {
+        if (!args.options.newTitle && args.options.description === undefined && !args.options.listType && !args.options.clientSideComponentProperties && !args.options.location && !args.options.newClientSideComponentId) {
           return `Please specify option to be updated`;
         }
 
@@ -164,7 +164,7 @@ class SpoCommandSetSetCommand extends SpoCommand {
         requestBody.Title = args.options.newTitle;
       }
 
-      if (args.options.description) {
+      if (args.options.description !== undefined) {
         requestBody.Description = args.options.description;
       }
 

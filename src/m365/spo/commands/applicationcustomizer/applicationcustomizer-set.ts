@@ -102,7 +102,7 @@ class SpoApplicationCustomizerSetCommand extends SpoCommand {
           return `'${args.options.scope}' is not a valid application customizer scope. Allowed values are: ${this.allowedScopes.join(',')}`;
         }
 
-        if (!args.options.newTitle && !args.options.description && !args.options.clientSideComponentProperties) {
+        if (!args.options.newTitle && args.options.description === undefined && !args.options.clientSideComponentProperties) {
           return `Please specify an option to be updated`;
         }
 
@@ -140,7 +140,7 @@ class SpoApplicationCustomizerSetCommand extends SpoCommand {
       requestBody.Title = newTitle;
     }
 
-    if (description) {
+    if (description !== undefined) {
       requestBody.Description = description;
     }
 
