@@ -6,11 +6,7 @@ import commands from '../../commands.js';
 import { globalOptionsZod } from '../../../../Command.js';
 
 const options = globalOptionsZod.strict();
-declare type Options = z.infer<typeof options>;
 
-interface CommandArgs {
-  options: Options;
-}
 
 class EntraLicenseListCommand extends GraphCommand {
   public get name(): string {
@@ -29,7 +25,7 @@ class EntraLicenseListCommand extends GraphCommand {
     return ['id', 'skuId', 'skuPartNumber'];
   }
 
-  public async commandAction(logger: Logger, _args: CommandArgs): Promise<void> {
+  public async commandAction(logger: Logger): Promise<void> {
     if (this.verbose) {
       await logger.logToStderr(`Retrieving the commercial subscriptions that an organization has acquired`);
     }

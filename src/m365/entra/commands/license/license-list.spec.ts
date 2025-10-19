@@ -118,36 +118,13 @@ describe(commands.LICENSE_LIST, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('validates the schema', () => {
+  it('passes validation with no options', () => {
     const actual = commandOptionsSchema.safeParse({});
     assert.strictEqual(actual.success, true);
   });
 
   it('defines correct properties for the default output', () => {
     assert.deepStrictEqual(command.defaultProperties(), ['id', 'skuId', 'skuPartNumber']);
-  });
-
-  it('uses default properties when retrieving licenses', async () => {
-    sinon.stub(request, 'get').callsFake(async opts => {
-      if ((opts.url === `https://graph.microsoft.com/v1.0/subscribedSkus`)) {
-        return licenseResponse;
-      }
-      throw 'Invalid request';
-    });
-
-    await command.action(logger, { options: { output: 'json', query: '' } });
-
-    assert(loggerLogSpy.calledOnce);
-    const loggedValue = loggerLogSpy.firstCall.args[0];
-    assert(Array.isArray(loggedValue));
-
-    const defaultProps = command.defaultProperties();
-    loggedValue.forEach(license => {
-      // Check all default properties exist
-      defaultProps?.forEach(prop => {
-        assert(license.hasOwnProperty(prop), `License should have ${prop} property`);
-      });
-    });
   });
 
   it('retrieves licenses', async () => {
@@ -158,14 +135,14 @@ describe(commands.LICENSE_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: commandOptionsSchema.parse({}) });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true }) });
     assert(loggerLogSpy.calledWith(licenseResponse.value));
   });
 
   it('logs retrieving message in verbose mode', async () => {
     sinon.stub(request, 'get').resolves({ value: [] });
 
-    await command.action(logger, { options: { verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true }) });
 
     assert(loggerStderrSpy.calledWith('Retrieving the commercial subscriptions that an organization has acquired'));
   });
