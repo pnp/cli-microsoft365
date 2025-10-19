@@ -132,7 +132,7 @@ describe(commands.LICENSE_LIST, () => {
       if ((opts.url === `https://graph.microsoft.com/v1.0/subscribedSkus`)) {
         return licenseResponse;
       }
-      throw 'Invalid request';
+      throw new Error('Invalid request');
     });
 
     await command.action(logger, { options: commandOptionsSchema.parse({ debug: true }) });
