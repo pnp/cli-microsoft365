@@ -15,23 +15,97 @@ Author: [Saurabh Tripathi](https://github.com/saurabh7019)
 
 SharePoint Online list alerts are being gradually retired. This script scans all sites across the tenant and generates a comprehensive CSV report of existing alerts. This information helps administrators identify and plan the migration of critical alerts to modern alternatives.
 
+- Prerequisites: This script requires app-only permissions with full control on all site collections to run.
+
 <Tabs>
   <TabItem value="PowerShell">
 
   ```powershell
   $fileExportPath = "Alerts.csv"
 
-  try {
-    $m365Status = m365 status --output text
+  function Get-AlertsToResults {
+    param(
+      [array]$Alerts,
+      [string]$SiteTitle,
+      [string]$SiteUrl
+    )
 
-    if ($m365Status -eq "Logged Out") {
-      # Connection to Microsoft 365
-      m365 login
+    $alertResults = @()
+
+    foreach ($alert in $Alerts) {
+      $targetPath = $alert.List.RootFolder.ServerRelativeUrl
+
+      $filterPath = ($alert.Properties | Where-Object { $_.Key -eq "filterpath" }).Value
+      if ($filterPath) {
+        $targetPath = $filterPath
+      }
+      elseif ($alert.Item) {
+        $targetPath = $alert.Item.FileRef
+      }
+
+      $frequency = switch ($alert.AlertFrequency) {
+        0 { "Immediate" }
+        1 { "Daily" }
+        2 { "Weekly" }
+        default { "Unknown" }
+      }
+
+      $alertResults += [PSCustomObject][ordered]@{
+        SiteTitle  = $SiteTitle
+        SiteUrl    = $SiteUrl
+        AlertTitle = $alert.Title
+        AlertId    = $alert.ID
+        TargetPath = $targetPath
+        Frequency  = $frequency
+        AlertType  = $alert.AlertTemplateName
+        UserName   = $alert.User.Title
+        UserEmail  = $alert.User.Email
+      }
     }
+
+    return $alertResults
+  }
+
+  function Get-DeprecatedAlertsRecursively {
+    param(
+      [string]$SiteUrl,
+      [string]$SiteTitle
+    )
+
+    $results = @()
+
+    try {
+      # Get deprecated alerts from specific site
+      $alerts = m365 spo web alert list --webUrl $SiteUrl --output json --query "[?!(Properties[].Key && contains(Properties[].Key, 'ruletitle'))]" | ConvertFrom-Json
+
+      if ($alerts.Count -gt 0) {
+        Write-Host "`tFound $($alerts.Count) alert(s)" -ForegroundColor Yellow
+        $results += Get-AlertsToResults -Alerts $alerts -SiteTitle $SiteTitle -SiteUrl $SiteUrl
+      }
+      else {
+        Write-Host "`tNo alerts found" -ForegroundColor Green
+      }
+
+      $webs = m365 spo web list --url $SiteUrl --output json | ConvertFrom-Json
+      foreach ($web in $webs) {
+        Write-Host "`tScanning subsite '$($web.Url)'..." -ForegroundColor Gray
+        $results += Get-DeprecatedAlertsRecursively -SiteUrl $web.Url -SiteTitle $SiteTitle
+      }
+    }
+    catch {
+      Write-Host "`tError: $($_.Exception.Message)" -ForegroundColor Red
+    }
+
+    return $results
+  }
+
+  try {
+    m365 login --ensure
 
     $results = @()
     Write-Host "Retrieving all sites..."
     $sites = m365 spo site list --output json | ConvertFrom-Json
+    $sites = $sites | Where-Object { $_.ArchiveStatus -eq "NotArchived" }
     $count = $sites.Count
     $iCnt = 0
 
@@ -39,56 +113,13 @@ SharePoint Online list alerts are being gradually retired. This script scans all
 
     foreach ($site in $sites) {
       $iCnt++
-      Write-Host "($iCnt/$count) Scanning '$($site.Url)' for alerts..."
-      
-      try {
-        $alerts = m365 spo site alert list --webUrl $site.Url --output json | ConvertFrom-Json
-        
-        if ($alerts.Count -gt 0) {
-          Write-Host "  Found $($alerts.Count) alert(s)" -ForegroundColor Yellow
-        
-          foreach ($alert in $alerts) {
-            $targetPath = $alert.List.RootFolder.ServerRelativeUrl
-
-            $filterPath = ($alert.Properties | Where-Object { $_.Key -eq "filterpath" }).Value
-            if ($filterPath) {
-              $targetPath = $filterPath
-            }
-            elseif ($alert.Item) {
-              $targetPath = $alert.Item.FileRef
-            }
-            
-            $frequency = switch ($alert.AlertFrequency) {
-              0 { "Immediate" }
-              1 { "Daily" }
-              2 { "Weekly" }
-              default { "Unknown" }
-            }
-            
-            $results += [PSCustomObject][ordered]@{
-              SiteTitle  = $site.Title
-              SiteUrl    = $site.Url
-              AlertTitle = $alert.Title
-              AlertId    = $alert.ID
-              TargetPath = $targetPath
-              Frequency  = $frequency
-              AlertType  = $alert.AlertTemplateName
-              UserName   = $alert.User.Title
-              UserEmail  = $alert.User.Email
-            }
-          }
-        }
-        else {
-          Write-Host "  No alerts found" -ForegroundColor Green
-        }
-      }
-      catch {
-        Write-Host "  Error: $($_.Exception.Message)" -ForegroundColor Red
-      }
+      Write-Host "($iCnt/$count) Scanning '$($site.Url)'..."
+      $results += Get-DeprecatedAlertsRecursively -SiteUrl $site.Url -SiteTitle $site.Title
     }
 
     if ($results.Count -gt 0) {
-      Write-Host "`nExporting $($results.Count) alerts to $fileExportPath..."
+      $location = Get-Location
+      Write-Host ("`nExporting {0} alerts to {1}\{2}..." -f $results.Count, $location.Path, $fileExportPath)
       $results | Export-Csv -Path $fileExportPath -NoTypeInformation -Encoding UTF8
       Write-Host "Report saved successfully!"
     }
@@ -100,7 +131,7 @@ SharePoint Online list alerts are being gradually retired. This script scans all
     Write-Host "Error: $($_.Exception.Message)" -ForegroundColor Red
   }
 
-  Write-Host "`nCompleted." -ForegroundColor Cyan
+  Write-Host "`nCompleted." -ForegroundColor Green
   ```
 
   </TabItem>
