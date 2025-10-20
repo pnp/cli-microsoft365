@@ -15,19 +15,96 @@ Author: [Saurabh Tripathi](https://github.com/saurabh7019)
 
 SharePoint Online list alerts are being gradually retired. This script scans all sites across the tenant and generates a comprehensive CSV report of existing alerts. This information helps administrators identify and plan the migration of critical alerts to modern alternatives.
 
+- Prerequisites: This script requires app-only permissions with full control on all site collections to run.
+
 <Tabs>
   <TabItem value="PowerShell">
 
   ```powershell
   $fileExportPath = "Alerts.csv"
 
-  try {
-    $m365Status = m365 status --output text
+  function Add-AlertsToResults {
+    param(
+      [array]$Alerts,
+      [string]$SiteTitle,
+      [string]$SiteUrl
+    )
+      
+    $alertResults = @()
+      
+    foreach ($alert in $Alerts) {
+      $targetPath = $alert.List.RootFolder.ServerRelativeUrl
 
-    if ($m365Status -eq "Logged Out") {
-      # Connection to Microsoft 365
-      m365 login
+      $filterPath = ($alert.Properties | Where-Object { $_.Key -eq "filterpath" }).Value
+      if ($filterPath) {
+        $targetPath = $filterPath
+      }
+      elseif ($alert.Item) {
+        $targetPath = $alert.Item.FileRef
+      }
+    
+      $frequency = switch ($alert.AlertFrequency) {
+        0 { "Immediate" }
+        1 { "Daily" }
+        2 { "Weekly" }
+        default { "Unknown" }
+      }
+    
+      $alertResults += [PSCustomObject][ordered]@{
+        SiteTitle  = $SiteTitle
+        SiteUrl    = $SiteUrl
+        AlertTitle = $alert.Title
+        AlertId    = $alert.ID
+        TargetPath = $targetPath
+        Frequency  = $frequency
+        AlertType  = $alert.AlertTemplateName
+        UserName   = $alert.User.Title
+        UserEmail  = $alert.User.Email
+      }
     }
+      
+    return $alertResults
+  }
+
+  function Get-SubSiteAlerts {
+    param(
+      [string]$SiteUrl,
+      [string]$SiteTitle
+    )
+    
+    $allResults = @()
+
+    try {
+      $subSites = m365 spo web list --url $SiteUrl --output json | ConvertFrom-Json
+        
+      if ($subSites -and $subSites.Count -gt 0) {
+        foreach ($subSite in $subSites) {
+          Write-Host "`t`tScanning subsite '$($subSite.Url)' for alerts..." -ForegroundColor Gray
+          
+          $subSiteAlerts = m365 spo site alert list --webUrl $subSite.Url --output json | ConvertFrom-Json
+          
+          if ($subSiteAlerts.Count -gt 0) {
+            Write-Host "`t`t`tFound $($subSiteAlerts.Count) alert(s)" -ForegroundColor Yellow
+            $allResults += Add-AlertsToResults -Alerts $subSiteAlerts -SiteTitle $SiteTitle -SiteUrl $subSite.Url
+          }
+          else {
+            Write-Host "`t`t`tNo alerts found" -ForegroundColor Green
+          }
+          
+          $nestedResults = Get-SubSiteAlerts -SiteUrl $subSite.Url -SiteTitle $SiteTitle
+          $allResults += $nestedResults
+        }
+      }
+    }
+    catch {
+      Write-Host "`tError: $($_.Exception.Message)" -ForegroundColor Red
+    }
+    
+    return $allResults
+  }
+
+  try {
+    m365 login --ensure
 
     $results = @()
     Write-Host "Retrieving all sites..."
@@ -40,50 +117,24 @@ SharePoint Online list alerts are being gradually retired. This script scans all
     foreach ($site in $sites) {
       $iCnt++
       Write-Host "($iCnt/$count) Scanning '$($site.Url)' for alerts..."
-      
+    
       try {
         $alerts = m365 spo site alert list --webUrl $site.Url --output json | ConvertFrom-Json
         
         if ($alerts.Count -gt 0) {
-          Write-Host "  Found $($alerts.Count) alert(s)" -ForegroundColor Yellow
-        
-          foreach ($alert in $alerts) {
-            $targetPath = $alert.List.RootFolder.ServerRelativeUrl
-
-            $filterPath = ($alert.Properties | Where-Object { $_.Key -eq "filterpath" }).Value
-            if ($filterPath) {
-              $targetPath = $filterPath
-            }
-            elseif ($alert.Item) {
-              $targetPath = $alert.Item.FileRef
-            }
-            
-            $frequency = switch ($alert.AlertFrequency) {
-              0 { "Immediate" }
-              1 { "Daily" }
-              2 { "Weekly" }
-              default { "Unknown" }
-            }
-            
-            $results += [PSCustomObject][ordered]@{
-              SiteTitle  = $site.Title
-              SiteUrl    = $site.Url
-              AlertTitle = $alert.Title
-              AlertId    = $alert.ID
-              TargetPath = $targetPath
-              Frequency  = $frequency
-              AlertType  = $alert.AlertTemplateName
-              UserName   = $alert.User.Title
-              UserEmail  = $alert.User.Email
-            }
-          }
+          Write-Host "`tFound $($alerts.Count) alert(s)" -ForegroundColor Yellow
+          $results += Add-AlertsToResults -Alerts $alerts -SiteTitle $site.Title -SiteUrl $site.Url
         }
         else {
-          Write-Host "  No alerts found" -ForegroundColor Green
+          Write-Host "`tNo alerts found" -ForegroundColor Green
         }
+        
+        # scan subsites
+        $subSiteResults = Get-SubSiteAlerts -SiteUrl $site.Url -SiteTitle $site.Title
+        $results += $subSiteResults
       }
       catch {
-        Write-Host "  Error: $($_.Exception.Message)" -ForegroundColor Red
+        Write-Host "`tError: $($_.Exception.Message)" -ForegroundColor Red
       }
     }
 
