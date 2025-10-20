@@ -24,6 +24,24 @@ m365 booking business get [options]
 
 <Global />
 
+## Permissions
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource        | Permissions       |
+  |-----------------|-------------------|
+  | Microsoft Graph | Bookings.Read.All |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource        | Permissions                       |
+  |-----------------|-----------------------------------|
+  | Microsoft Graph | BookingsAppointment.ReadWrite.All |
+
+  </TabItem>
+</Tabs>
+
 ## Examples
 
 Retrieve the specified Microsoft Bookings business with the specified id.
@@ -186,4 +204,3 @@ m365 booking business get --name 'business name'
   
   </TabItem>
 </Tabs>
-
