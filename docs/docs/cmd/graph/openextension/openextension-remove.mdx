@@ -34,22 +34,16 @@ m365 graph openextension remove [options]
 <Tabs>
   <TabItem value="Delegated">
 
-  | Resource        | Permissions                |
-  |-----------------|----------------------------|
-  | Microsoft Graph | User.ReadWrite             |
-  | Microsoft Graph | Group.ReadWrite.All        |
-  | Microsoft Graph | Directory.AccessAsUser.All |
-  | Microsoft Graph | Organization.ReadWrite.All |
+  | Resource        | Permissions                                                                                 |
+  |-----------------|---------------------------------------------------------------------------------------------|
+  | Microsoft Graph | Directory.AccessAsUser.All, Group.ReadWrite.All, Organization.ReadWrite.All, User.ReadWrite |
 
   </TabItem>
   <TabItem value="Application">
 
-  | Resource        | Permissions                |
-  |-----------------|----------------------------|
-  | Microsoft Graph | User.ReadWrite.All         |
-  | Microsoft Graph | Group.ReadWrite.All        |
-  | Microsoft Graph | Device.ReadWrite.All       |
-  | Microsoft Graph | Organization.ReadWrite.All |
+  | Resource        | Permissions                                                                               |
+  |-----------------|-------------------------------------------------------------------------------------------|
+  | Microsoft Graph | Device.ReadWrite.All, Group.ReadWrite.All, Organization.ReadWrite.All, User.ReadWrite.All |
 
   </TabItem>
 </Tabs>
