@@ -36,6 +36,25 @@ m365 outlook message list [options]
 
 <Global />
 
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource        | Permissions               |
+  |-----------------|---------------------------|
+  | Microsoft Graph | Mail.ReadBasic            |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource        | Permissions                    |
+  |-----------------|--------------------------------|
+  | Microsoft Graph | Mail.ReadBasic.All             |
+
+  </TabItem>
+</Tabs>
+
 ## Examples
 
 List all messages from a folder with the specified name received within a specific time frame.
