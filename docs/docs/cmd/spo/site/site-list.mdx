@@ -16,7 +16,7 @@ m365 spo site list [options]
 
 ```md definition-list
 `-t, --type [type]`
-: convenience option for type of sites to list. Allowed values are `TeamSite,CommunicationSite`.
+: convenience option for type of sites to list. Allowed values are `TeamSite,CommunicationSite,fullyArchived,recentlyArchived,archived`.
 
 `--webTemplate [webTemplate]`
 : type of sites to list. To be used with values like `GROUP#0` and `SITEPAGEPUBLISHING#0`. Specify either `type` or `webTemplate`, but not both.  
@@ -31,6 +31,11 @@ m365 spo site list [options]
 <Global />
 
 ## Remarks
+When providing a value for option `type`, consider the following:
+
+- `fullyArchived`: return sites that are fully archived (longer than 7 days)
+- `recentlyArchived`: return sites that are recently archived (within 7 days)
+- `archived`: return both recently archived and fully archived sites
 
 Using the `--filter` option you can specify which sites you want to retrieve. For example, to get sites with _project_ in their URL, use `Url -like 'project'` as the filter.
 
