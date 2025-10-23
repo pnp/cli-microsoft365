@@ -1,4 +1,6 @@
 import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 # entra app set
 
@@ -62,6 +64,24 @@ For best performance use the `objectId` option to reference the Entra applicatio
 If the command finds multiple Entra application registrations with the specified app name, it will prompt you to disambiguate which app it should use, listing the discovered object IDs.
 
 When a certificate is specified it will be added to the list of certificates of the app without changing existing certificates.
+
+## Permissions
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource        | Permissions               |
+  |-----------------|---------------------------|
+  | Microsoft Graph | Application.ReadWrite.All |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource        | Permissions                   |
+  |-----------------|-------------------------------|
+  | Microsoft Graph | Application.ReadWrite.OwnedBy |
+
+  </TabItem>
+</Tabs>
 
 ## Examples
 

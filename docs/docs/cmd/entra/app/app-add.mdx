@@ -120,6 +120,24 @@ If you want to store the information about the created Entra app registration, u
 
 When specifying `--grantAdminConsent` option, an enterprise application will be created for the app registration.
 
+## Permissions
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource        | Permissions               |
+  |-----------------|---------------------------|
+  | Microsoft Graph | Application.ReadWrite.All |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource        | Permissions                   |
+  |-----------------|-------------------------------|
+  | Microsoft Graph | Application.ReadWrite.OwnedBy |
+
+  </TabItem>
+</Tabs>
+
 ## Examples
 
 Create new Entra app registration with the specified name
