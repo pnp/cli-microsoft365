@@ -43,7 +43,8 @@ class PpTenantSettingsListCommand extends PowerPlatformCommand {
       if (args) {
         const res = await request.post<any>(requestOptions);
         await logger.log(res);
-      } else {
+      }
+      else {
         throw 'Invalid arguments';
       }
     }
