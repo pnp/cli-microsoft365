@@ -1,7 +1,11 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import PowerPlatformCommand from '../../../base/PowerPlatformCommand.js';
 import commands from '../../commands.js';
+
+const options = globalOptionsZod.strict();
 
 class PpTenantSettingsListCommand extends PowerPlatformCommand {
   public get name(): string {
@@ -10,6 +14,10 @@ class PpTenantSettingsListCommand extends PowerPlatformCommand {
 
   public get description(): string {
     return 'Lists the global Power Platform tenant settings';
+  }
+
+  public get schema(): z.ZodTypeAny | undefined {
+    return options;
   }
 
   public defaultProperties(): string[] | undefined {
