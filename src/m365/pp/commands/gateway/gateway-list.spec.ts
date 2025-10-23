@@ -1,5 +1,6 @@
 import assert from 'assert';
 import sinon from 'sinon';
+import { z } from 'zod';
 import auth from '../../../../Auth.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
@@ -8,14 +9,18 @@ import { telemetry } from '../../../../telemetry.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
+import { cli } from '../../../../cli/cli.js';
 import commands from '../../commands.js';
 import command from './gateway-list.js';
 import { accessToken } from '../../../../utils/accessToken.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
 
 describe(commands.GATEWAY_LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
+  let commandOptionsSchema: z.ZodTypeAny;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -24,6 +29,8 @@ describe(commands.GATEWAY_LIST, () => {
     sinon.stub(session, 'getId').returns('');
     sinon.stub(accessToken, 'assertAccessTokenType').returns();
     auth.connection.active = true;
+    commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
   });
 
   beforeEach(() => {
@@ -94,7 +101,7 @@ describe(commands.GATEWAY_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true }) });
     assert(loggerLogSpy.calledWith(gateways.value));
   });
 
@@ -112,7 +119,7 @@ describe(commands.GATEWAY_LIST, () => {
       };
     });
 
-    await assert.rejects(command.action(logger, { options: {} } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({}) } as any),
       new CommandError(`Resource '' does not exist or one of its queried reference-property objects are not present`));
   });
 });

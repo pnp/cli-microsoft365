@@ -1,7 +1,17 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request from '../../../../request.js';
 import PowerBICommand from '../../../base/PowerBICommand.js';
 import commands from '../../commands.js';
+
+const options = globalOptionsZod.strict();
+
+declare type Options = z.infer<typeof options>;
+
+interface CommandArgs {
+  options: Options;
+}
 
 class PpGatewayListCommand extends PowerBICommand {
   public get name(): string {
@@ -12,11 +22,15 @@ class PpGatewayListCommand extends PowerBICommand {
     return 'Returns a list of gateways for which the user is an admin';
   }
 
+  public get schema(): z.ZodTypeAny | undefined {
+    return options;
+  }
+
   public defaultProperties(): string[] | undefined {
     return ['id', 'name'];
   }
 
-  public async commandAction(logger: Logger): Promise<void> {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
       await logger.logToStderr(`Retrieving list of gateways for which the user is an admin...`);
     }
