@@ -22,6 +22,7 @@ describe(commands.APPLICATIONCUSTOMIZER_SET, () => {
   const clientSideComponentId = '015e0fcf-fe9d-4037-95af-0a4776cdfbb4';
   const title = 'SiteGuidedTour';
   const newTitle = 'New Title';
+  const description = 'Site guided tour customizer';
   const clientSideComponentProperties = '{"testMessage":"Updated message"}';
   let log: any[];
   let logger: Logger;
@@ -32,7 +33,7 @@ describe(commands.APPLICATIONCUSTOMIZER_SET, () => {
         "ClientSideComponentId": clientSideComponentId,
         "ClientSideComponentProperties": "{\"testMessage\":\"Test message\"}",
         "CommandUIExtension": null,
-        "Description": null,
+        "Description": description,
         "Group": null,
         "Id": id,
         "ImageUrl": null,
@@ -309,7 +310,7 @@ describe(commands.APPLICATIONCUSTOMIZER_SET, () => {
     sinon.stub(cli, 'handleMultipleResultsFound').resolves(singleResponse.value[0]);
 
     const updateCallsSpy: sinon.SinonStub = defaultUpdateCallsStub();
-    await command.action(logger, { options: { verbose: true, title: title, webUrl: webUrl, scope: 'Site', newTitle: newTitle } } as any);
+    await command.action(logger, { options: { verbose: true, title: title, webUrl: webUrl, scope: 'Site', newTitle: newTitle } });
     assert(updateCallsSpy.calledOnce);
   });
 
@@ -322,7 +323,7 @@ describe(commands.APPLICATIONCUSTOMIZER_SET, () => {
     });
 
     const updateCallsSpy: sinon.SinonStub = defaultUpdateCallsStub();
-    await command.action(logger, { options: { verbose: true, id: id, webUrl: webUrl, scope: 'Web', newTitle: newTitle } } as any);
+    await command.action(logger, { options: { verbose: true, id: id, webUrl: webUrl, scope: 'Web', newTitle: newTitle, description: description } });
     assert(updateCallsSpy.calledOnce);
   });
 
@@ -337,7 +338,7 @@ describe(commands.APPLICATIONCUSTOMIZER_SET, () => {
     });
 
     const updateCallsSpy: sinon.SinonStub = defaultUpdateCallsStub();
-    await command.action(logger, { options: { verbose: true, id: id, webUrl: webUrl, scope: 'Site', newTitle: newTitle } } as any);
+    await command.action(logger, { options: { verbose: true, id: id, webUrl: webUrl, scope: 'Site', newTitle: newTitle } });
     assert(updateCallsSpy.calledOnce);
   });
 
@@ -353,7 +354,7 @@ describe(commands.APPLICATIONCUSTOMIZER_SET, () => {
     });
 
     const updateCallsSpy: sinon.SinonStub = defaultUpdateCallsStub();
-    await command.action(logger, { options: { verbose: true, clientSideComponentId: clientSideComponentId, webUrl: webUrl, scope: 'Web', clientSideComponentProperties: clientSideComponentProperties } } as any);
+    await command.action(logger, { options: { verbose: true, clientSideComponentId: clientSideComponentId, webUrl: webUrl, scope: 'Web', clientSideComponentProperties: clientSideComponentProperties } });
     assert(updateCallsSpy.calledOnce);
   });
 });

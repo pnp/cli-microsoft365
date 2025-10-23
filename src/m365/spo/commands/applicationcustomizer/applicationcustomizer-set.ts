@@ -19,6 +19,7 @@ interface Options extends GlobalOptions {
   id?: string;
   clientSideComponentId?: string;
   newTitle?: string;
+  description?: string;
   clientSideComponentProperties?: string;
   scope?: string;
 }
@@ -61,6 +62,9 @@ class SpoApplicationCustomizerSetCommand extends SpoCommand {
         option: '--newTitle [newTitle]'
       },
       {
+        option: '--description [description]'
+      },
+      {
         option: '-p, --clientSideComponentProperties [clientSideComponentProperties]'
       },
       {
@@ -76,6 +80,7 @@ class SpoApplicationCustomizerSetCommand extends SpoCommand {
         id: typeof args.options.id !== 'undefined',
         clientSideComponentId: typeof args.options.clientSideComponentId !== 'undefined',
         newTitle: typeof args.options.newTitle !== 'undefined',
+        description: typeof args.options.description !== 'undefined',
         clientSideComponentProperties: typeof args.options.clientSideComponentProperties !== 'undefined',
         scope: typeof args.options.scope !== 'undefined'
       });
@@ -97,7 +102,7 @@ class SpoApplicationCustomizerSetCommand extends SpoCommand {
           return `'${args.options.scope}' is not a valid application customizer scope. Allowed values are: ${this.allowedScopes.join(',')}`;
         }
 
-        if (!args.options.newTitle && !args.options.clientSideComponentProperties) {
+        if (!args.options.newTitle && args.options.description === undefined && !args.options.clientSideComponentProperties) {
           return `Please specify an option to be updated`;
         }
 
@@ -123,7 +128,7 @@ class SpoApplicationCustomizerSetCommand extends SpoCommand {
   }
 
   private async updateAppCustomizer(logger: Logger, options: Options, appCustomizer: CustomAction): Promise<void> {
-    const { clientSideComponentProperties, webUrl, newTitle }: Options = options;
+    const { clientSideComponentProperties, webUrl, newTitle, description }: Options = options;
 
     if (this.verbose) {
       await logger.logToStderr(`Updating application customizer with ID '${appCustomizer.Id}' on the site '${webUrl}'...`);
@@ -133,6 +138,10 @@ class SpoApplicationCustomizerSetCommand extends SpoCommand {
 
     if (newTitle) {
       requestBody.Title = newTitle;
+    }
+
+    if (description !== undefined) {
+      requestBody.Description = description;
     }
 
     if (clientSideComponentProperties !== undefined) {
