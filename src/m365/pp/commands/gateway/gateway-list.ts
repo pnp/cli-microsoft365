@@ -1,7 +1,11 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request from '../../../../request.js';
 import PowerBICommand from '../../../base/PowerBICommand.js';
 import commands from '../../commands.js';
+
+const options = globalOptionsZod.strict();
 
 class PpGatewayListCommand extends PowerBICommand {
   public get name(): string {
@@ -10,6 +14,10 @@ class PpGatewayListCommand extends PowerBICommand {
 
   public get description(): string {
     return 'Returns a list of gateways for which the user is an admin';
+  }
+
+  public get schema(): z.ZodTypeAny | undefined {
+    return options;
   }
 
   public defaultProperties(): string[] | undefined {
