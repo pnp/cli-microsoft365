@@ -71,12 +71,11 @@ describe(commands.ITEM_ADD, () => {
       "content": {
         "value": "Something went wrong",
         "type": "text"
-      },
-      "activities": []
+      }
     };
-    sinon.stub(request, 'put').callsFake(async (opts: any) => {
+    const putStub = sinon.stub(request, 'put').callsFake(async (opts: any) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/external/connections/connection/items/ticket1`) {
-        return externalItem;
+        return;
       }
       throw 'Invalid request';
     });
@@ -91,7 +90,7 @@ describe(commands.ITEM_ADD, () => {
       assignee: 'Steve'
     };
     await command.action(logger, { options } as any);
-    assert(loggerLogSpy.calledWith(externalItem));
+    assert.deepStrictEqual(putStub.lastCall.args[0].data, externalItem);
   });
 
   it('adds an external item with a collection properties', async () => {
@@ -113,12 +112,11 @@ describe(commands.ITEM_ADD, () => {
       "content": {
         "value": "Something went wrong",
         "type": "text"
-      },
-      "activities": []
+      }
     };
-    sinon.stub(request, 'put').callsFake(async (opts: any) => {
+    const putStub = sinon.stub(request, 'put').callsFake(async (opts: any) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/external/connections/connection/items/ticket1`) {
-        return externalItem;
+        return;
       }
       throw 'Invalid request';
     });
@@ -133,7 +131,7 @@ describe(commands.ITEM_ADD, () => {
       assignee: 'Steve;#Brian'
     };
     await command.action(logger, { options } as any);
-    assert(loggerLogSpy.calledWith(externalItem));
+    assert.deepStrictEqual(putStub.lastCall.args[0].data, externalItem);
   });
 
   it('outputs properties in csv output', async () => {
