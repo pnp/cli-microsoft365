@@ -30,7 +30,7 @@ class PpGatewayListCommand extends PowerBICommand {
     return ['id', 'name'];
   }
 
-  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+  public async commandAction(logger: Logger): Promise<void> {
     if (this.verbose) {
       await logger.logToStderr(`Retrieving list of gateways for which the user is an admin...`);
     }
