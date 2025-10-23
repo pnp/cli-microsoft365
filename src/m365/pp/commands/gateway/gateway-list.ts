@@ -44,9 +44,11 @@ class PpGatewayListCommand extends PowerBICommand {
     };
 
     try {
-      const res = await request.get<{ value: any[] }>(requestOptions);
       if (args) {
+        const res = await request.get<{ value: any[] }>(requestOptions);
         await logger.log(res.value);
+      } else {
+        throw 'Invalid arguments';
       }
     }
     catch (err: any) {
