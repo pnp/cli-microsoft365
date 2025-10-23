@@ -1,5 +1,6 @@
 import assert from 'assert';
 import sinon from 'sinon';
+import { z } from 'zod';
 import auth from '../../../../Auth.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
@@ -8,9 +9,11 @@ import { telemetry } from '../../../../telemetry.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
+import { cli } from '../../../../cli/cli.js';
 import commands from '../../commands.js';
 import command from './tenant-settings-list.js';
 import { accessToken } from '../../../../utils/accessToken.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
 
 describe(commands.TENANT_SETTINGS_LIST, () => {
   const successResponse = {
@@ -52,6 +55,8 @@ describe(commands.TENANT_SETTINGS_LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
+  let commandOptionsSchema: z.ZodTypeAny;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -60,6 +65,8 @@ describe(commands.TENANT_SETTINGS_LIST, () => {
     sinon.stub(session, 'getId').returns('');
     sinon.stub(accessToken, 'assertAccessTokenType').returns();
     auth.connection.active = true;
+    commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
   });
 
   beforeEach(() => {
@@ -109,7 +116,7 @@ describe(commands.TENANT_SETTINGS_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: {} } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({}) } as any);
     assert(loggerLogSpy.calledWith(successResponse));
   });
 
@@ -118,6 +125,6 @@ describe(commands.TENANT_SETTINGS_LIST, () => {
       throw 'An error has occurred';
     });
 
-    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({}) } as any), new CommandError('An error has occurred'));
   });
 });
