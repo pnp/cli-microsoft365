@@ -36,6 +36,25 @@ To get the member of a hidden membership in an administrative unit, the `Member.
 
 When the `properties` option includes values with a `/`, for example: `manager/displayName`, an additional `$expand` query parameter will be included on manager.
 
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource        | Permissions                 |
+  |-----------------|-----------------------------|
+  | Microsoft Graph | AdministrativeUnit.Read.All |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource        | Permissions                 |
+  |-----------------|-----------------------------|
+  | Microsoft Graph | AdministrativeUnit.Read.All |
+
+  </TabItem>
+</Tabs>
+
 ## Examples
 
 Get information about a member specified by id from an administrative unit specified by id
