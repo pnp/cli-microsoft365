@@ -31,6 +31,25 @@ m365 entra administrativeunit get [options]
 
 Using the `--properties` option, you can specify a comma-separated list of administrative unit properties to retrieve from the Microsoft Graph. If you don't specify any properties, the command will output the default properties returned by Graph.
 
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource        | Permissions                 |
+  |-----------------|-----------------------------|
+  | Microsoft Graph | AdministrativeUnit.Read.All |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource        | Permissions                 |
+  |-----------------|-----------------------------|
+  | Microsoft Graph | AdministrativeUnit.Read.All |
+
+  </TabItem>
+</Tabs>
+
 ## Examples
 
 Get information about the administrative unit by its id.
