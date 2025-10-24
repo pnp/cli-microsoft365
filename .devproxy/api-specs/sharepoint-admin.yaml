@@ -62,6 +62,46 @@ paths:
       responses:
         200:
           description: OK
+  /_api/SPO.Tenant/sites('{id}'):
+    get:
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The site collection ID (GUID)
+        - name: $select
+          in: query
+          required: false
+          schema:
+            type: string
+          description: e.g. "$select=Url" to retrieve only the site URL
+      security:
+        - delegated:
+          - AllSites.FullControl
+        - application:
+          - Sites.FullControl.All
+      responses:
+        200:
+          description: OK
+  /_api/web/lists/GetByTitle('{listTitle}')/RenderListDataAsStream:
+    post:
+      parameters:
+        - name: listTitle
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The list title (e.g. DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECOLLECTIONS)
+      security:
+        - delegated:
+          - AllSites.FullControl
+        - application:
+          - Sites.FullControl.All
+      responses:
+        200:
+          description: OK
 x-ms-generated-by:
   toolName: Dev Proxy
   toolVersion: 0.25.0
