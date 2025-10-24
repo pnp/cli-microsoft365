@@ -3711,6 +3711,11 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
+              label: 'site alert remove',
+              id: 'cmd/spo/site/site-alert-remove'
+            },
+            {
+              type: 'doc',
               label: 'site appcatalog add',
               id: 'cmd/spo/site/site-appcatalog-add'
             },

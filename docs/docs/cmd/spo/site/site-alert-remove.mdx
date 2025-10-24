@@ -1,0 +1,65 @@
+import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# spo site alert remove
+
+Removes an alert from a SharePoint list
+
+## Usage
+
+```sh
+m365 spo site alert remove [options]
+```
+
+## Options
+
+```md definition-list
+`-u, --webUrl <webUrl>`
+: The URL of the SharePoint site.
+
+`--id <id>`
+: The ID of the alert.
+
+`-f, --force`
+: Don't prompt for confirmation.
+```
+
+<Global />
+
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource   | Permissions          |
+  |------------|----------------------|
+  | SharePoint | AllSites.FullControl |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource   | Permissions           |
+  |------------|-----------------------|
+  | SharePoint | Sites.FullControl.All |
+
+  </TabItem>
+</Tabs>
+
+## Examples
+
+Remove an alert by ID
+
+```sh
+m365 spo site alert remove --webUrl https://contoso.sharepoint.com/sites/Marketing --id 7cbb4c8d-8e4d-4d2e-9c6f-3f1d8b2e6a0e
+```
+
+Remove another alert without confirmation
+
+```sh
+m365 spo site alert remove --webUrl https://contoso.sharepoint.com/sites/Marketing --id 2b6f1c8a-3e6a-4c7e-b8c0-7bf4c8e6d7f1 --force
+```
+
+## Response
+
+The command won't return a response on success.
