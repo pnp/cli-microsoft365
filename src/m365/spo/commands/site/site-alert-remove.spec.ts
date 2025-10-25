@@ -72,7 +72,7 @@ describe(commands.SITE_ALERT_REMOVE, () => {
   });
 
   it('fails validation if webUrl is not a valid URL', async () => {
-    const actual = commandOptionsSchema.safeParse({ webUrl: 'foo' });
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'foo', id: alertId });
     assert.strictEqual(actual.success, false);
   });
 
@@ -124,7 +124,7 @@ describe(commands.SITE_ALERT_REMOVE, () => {
     };
     sinon.stub(request, 'delete').rejects(error);
 
-    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ force: true, webUrl: webUrl, id: alertId }) }),
+    await assert.rejects(command.action(logger, { options: { force: true, webUrl: webUrl, id: alertId } }),
       new CommandError(error.error['odata.error'].message.value));
   });
 });

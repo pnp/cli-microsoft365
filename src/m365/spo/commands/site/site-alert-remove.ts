@@ -59,7 +59,7 @@ class SpoSiteAlertRemoveCommand extends SpoCommand {
       const requestOptions: CliRequestOptions = {
         url: `${args.options.webUrl}/_api/web/Alerts/DeleteAlert('${formatting.encodeQueryParameter(args.options.id)}')`,
         headers: {
-          accept: 'application/json;'
+          accept: 'application/json;odata=nometadata'
         },
         responseType: 'json'
       };
