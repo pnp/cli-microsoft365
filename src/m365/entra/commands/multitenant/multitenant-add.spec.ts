@@ -1,5 +1,6 @@
 import assert from 'assert';
 import sinon from 'sinon';
+import { z } from 'zod';
 import auth from '../../../../Auth.js';
 import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
@@ -33,6 +34,7 @@ describe(commands.MULTITENANT_ADD, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: z.ZodTypeAny;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -41,6 +43,7 @@ describe(commands.MULTITENANT_ADD, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
   });
 
   beforeEach(() => {
@@ -80,12 +83,14 @@ describe(commands.MULTITENANT_ADD, () => {
   });
 
   it('passes validation when only displayName is specified', async () => {
-    const actual = await command.validate({ options: { displayName: 'Contoso organization' } }, commandInfo);
+    const parseResult = commandOptionsSchema.safeParse({ displayName: 'Contoso organization' });
+    const actual = await command.validate({ options: parseResult.data }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('passes validation when the displayName and description are specified', async () => {
-    const actual = await command.validate({ options: { displayName: 'Contoso organization', description: 'Contoso and partners' } }, commandInfo);
+    const parseResult = commandOptionsSchema.safeParse({ displayName: 'Contoso organization', description: 'Contoso and partners' });
+    const actual = await command.validate({ options: parseResult.data }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
@@ -98,7 +103,8 @@ describe(commands.MULTITENANT_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { displayName: 'Contoso organization', verbose: true } });
+    const parseResult = commandOptionsSchema.safeParse({ displayName: 'Contoso organization', verbose: true });
+    await command.action(logger, { options: parseResult.data });
     assert(loggerLogSpy.calledOnceWithExactly(multitenantOrganizationShortReponse));
   });
 
@@ -111,7 +117,8 @@ describe(commands.MULTITENANT_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { displayName: 'Contoso organization', description: 'Contoso and partners' } });
+    const parseResult = commandOptionsSchema.safeParse({ displayName: 'Contoso organization', description: 'Contoso and partners' });
+    await command.action(logger, { options: parseResult.data });
     assert(loggerLogSpy.calledOnceWithExactly(multitenantOrganizationReponse));
   });
 
@@ -127,7 +134,7 @@ describe(commands.MULTITENANT_ADD, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('Invalid request'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ displayName: 'Contoso organization' }) }), new CommandError('Invalid request'));
   });
 
   it('correctly handles API OData error when the multitenant organization already exist', async () => {
@@ -143,6 +150,6 @@ describe(commands.MULTITENANT_ADD, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('Method not supported for update operation.'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ displayName: 'Contoso organization' }) }), new CommandError('Method not supported for update operation.'));
   });
 });
