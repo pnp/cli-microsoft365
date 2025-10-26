@@ -1,6 +1,9 @@
 import assert from 'assert';
 import sinon from 'sinon';
+import { z } from 'zod';
 import auth from '../../Auth.js';
+import { cli } from '../../cli/cli.js';
+import { CommandInfo } from '../../cli/CommandInfo.js';
 import { Logger } from '../../cli/Logger.js';
 import { CommandError } from '../../Command.js';
 import { telemetry } from '../../telemetry.js';
@@ -14,6 +17,8 @@ describe(commands.LOGOUT, () => {
   let log: string[];
   let logger: Logger;
   let authClearConnectionInfoStub: sinon.SinonStub;
+  let commandInfo: CommandInfo;
+  let commandOptionsSchema: z.ZodTypeAny;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -21,6 +26,9 @@ describe(commands.LOGOUT, () => {
     sinon.stub(telemetry, 'trackEvent').resolves();
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     sinon.stub(session, 'getId').callsFake(() => '');
+
+    commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
   });
 
   beforeEach(() => {
@@ -50,21 +58,41 @@ describe(commands.LOGOUT, () => {
     assert.notStrictEqual(command.description, null);
   });
 
+  it('passs validation with default options', async () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('passs validation with unknown options', async () => {
+    const actual = commandOptionsSchema.safeParse({ option: "value" });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('logs verbose message when verbose flag is set', async () => {
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true }) });
+    assert(log.some(msg => msg.includes('Logging out from Microsoft 365...')));
+  });
+
+  it('doesn\'t log verbose message when verbose flag is not set', async () => {
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
+    assert(!log.some(msg => msg.includes('Logging out from Microsoft 365...')));
+  });
+
   it('logs out from Microsoft 365 when logged in', async () => {
     auth.connection.active = true;
-    await command.action(logger, { options: { debug: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true }) });
     assert(!auth.connection.active);
   });
 
   it('logs out from Microsoft 365 when not logged in', async () => {
     auth.connection.active = false;
-    await command.action(logger, { options: { debug: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true }) });
     assert(!auth.connection.active);
   });
 
   it('clears persisted connection info when logging out', async () => {
     auth.connection.active = true;
-    await command.action(logger, { options: { debug: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true }) });
     assert(authClearConnectionInfoStub.called);
   });
 
@@ -75,7 +103,7 @@ describe(commands.LOGOUT, () => {
     auth.connection.active = true;
 
     try {
-      await command.action(logger, { options: {} });
+      await command.action(logger, { options: commandOptionsSchema.parse({}) });
       assert(logoutSpy.called);
     }
     finally {
@@ -92,7 +120,7 @@ describe(commands.LOGOUT, () => {
     auth.connection.active = true;
 
     try {
-      await command.action(logger, { options: { debug: true } });
+      await command.action(logger, { options: commandOptionsSchema.parse({ debug: true }) });
       assert(logoutSpy.called);
     }
     finally {
@@ -108,7 +136,7 @@ describe(commands.LOGOUT, () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.reject('An error has occurred'));
 
     try {
-      await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred'));
+      await assert.rejects(command.action(logger, commandOptionsSchema.parse({})), new CommandError('An error has occurred'));
     }
     finally {
       sinonUtil.restore([

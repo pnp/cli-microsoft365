@@ -1,7 +1,16 @@
+import { z } from 'zod';
 import auth from '../../Auth.js';
 import { Logger } from '../../cli/Logger.js';
-import Command, { CommandArgs, CommandError } from '../../Command.js';
+import Command, { CommandError, globalOptionsZod } from '../../Command.js';
 import commands from './commands.js';
+
+const options = globalOptionsZod.strict();
+
+declare type Options = z.infer<typeof options>;
+
+interface CommandArgs {
+  options: Options;
+}
 
 class LogoutCommand extends Command {
   public get name(): string {
@@ -10,6 +19,10 @@ class LogoutCommand extends Command {
 
   public get description(): string {
     return 'Log out from Microsoft 365';
+  }
+
+  public get schema(): z.ZodTypeAny | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger): Promise<void> {
