@@ -72,6 +72,16 @@ describe(commands.GATEWAY_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['id', 'name']);
   });
 
+  it('passes validation with no options', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ option: "value" });
+    assert.strictEqual(actual.success, false);
+  });
+
   it('retrieves list of gateways (debug)', async () => {
     const gateways: any = {
       "value": [
