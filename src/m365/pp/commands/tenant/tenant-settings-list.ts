@@ -7,12 +7,6 @@ import commands from '../../commands.js';
 
 const options = globalOptionsZod.strict();
 
-declare type Options = z.infer<typeof options>;
-
-interface CommandArgs {
-  options: Options;
-}
-
 class PpTenantSettingsListCommand extends PowerPlatformCommand {
   public get name(): string {
     return commands.TENANT_SETTINGS_LIST;
@@ -30,7 +24,7 @@ class PpTenantSettingsListCommand extends PowerPlatformCommand {
     return ['disableCapacityAllocationByEnvironmentAdmins', 'disableEnvironmentCreationByNonAdminUsers', 'disableNPSCommentsReachout', 'disablePortalsCreationByNonAdminUsers', 'disableSupportTicketsVisibleByAllUsers', 'disableSurveyFeedback', 'disableTrialEnvironmentCreationByNonAdminUsers', 'walkMeOptOut'];
   }
 
-  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+  public async commandAction(logger: Logger): Promise<void> {
     const requestOptions: CliRequestOptions = {
       url: `${this.resource}/providers/Microsoft.BusinessAppPlatform/listtenantsettings?api-version=2020-10-01`,
       headers: {
@@ -40,13 +34,8 @@ class PpTenantSettingsListCommand extends PowerPlatformCommand {
     };
 
     try {
-      if (args) {
-        const res = await request.post<any>(requestOptions);
-        await logger.log(res);
-      }
-      else {
-        throw 'Invalid arguments';
-      }
+      const res = await request.post<any>(requestOptions);
+      await logger.log(res);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
