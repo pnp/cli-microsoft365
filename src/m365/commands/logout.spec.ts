@@ -1,6 +1,9 @@
 import assert from 'assert';
 import sinon from 'sinon';
+import { z } from 'zod';
 import auth from '../../Auth.js';
+import { cli } from '../../cli/cli.js';
+import { CommandInfo } from '../../cli/CommandInfo.js';
 import { Logger } from '../../cli/Logger.js';
 import { CommandError } from '../../Command.js';
 import { telemetry } from '../../telemetry.js';
@@ -14,6 +17,8 @@ describe(commands.LOGOUT, () => {
   let log: string[];
   let logger: Logger;
   let authClearConnectionInfoStub: sinon.SinonStub;
+  let commandInfo: CommandInfo;
+  let commandOptionsSchema: z.ZodTypeAny;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -21,6 +26,9 @@ describe(commands.LOGOUT, () => {
     sinon.stub(telemetry, 'trackEvent').resolves();
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     sinon.stub(session, 'getId').callsFake(() => '');
+
+    commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
   });
 
   beforeEach(() => {
@@ -52,19 +60,19 @@ describe(commands.LOGOUT, () => {
 
   it('logs out from Microsoft 365 when logged in', async () => {
     auth.connection.active = true;
-    await command.action(logger, { options: { debug: true } });
+    await command.action(logger, { options: commandOptionsSchema.safeParse({ debug: true }) as any });
     assert(!auth.connection.active);
   });
 
   it('logs out from Microsoft 365 when not logged in', async () => {
     auth.connection.active = false;
-    await command.action(logger, { options: { debug: true } });
+    await command.action(logger, { options: commandOptionsSchema.safeParse({ debug: true }) as any });
     assert(!auth.connection.active);
   });
 
   it('clears persisted connection info when logging out', async () => {
     auth.connection.active = true;
-    await command.action(logger, { options: { debug: true } });
+    await command.action(logger, { options: commandOptionsSchema.safeParse({ debug: true }) as any });
     assert(authClearConnectionInfoStub.called);
   });
 
@@ -75,7 +83,7 @@ describe(commands.LOGOUT, () => {
     auth.connection.active = true;
 
     try {
-      await command.action(logger, { options: {} });
+      await command.action(logger, { options: commandOptionsSchema.safeParse({}) as any });
       assert(logoutSpy.called);
     }
     finally {
@@ -92,7 +100,7 @@ describe(commands.LOGOUT, () => {
     auth.connection.active = true;
 
     try {
-      await command.action(logger, { options: { debug: true } });
+      await command.action(logger, { options: commandOptionsSchema.safeParse({ debug: true }) as any });
       assert(logoutSpy.called);
     }
     finally {
@@ -108,7 +116,7 @@ describe(commands.LOGOUT, () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.reject('An error has occurred'));
 
     try {
-      await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred'));
+      await assert.rejects(command.action(logger, commandOptionsSchema.parse({ options: {} })), new CommandError('An error has occurred'));
     }
     finally {
       sinonUtil.restore([
