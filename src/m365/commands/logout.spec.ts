@@ -58,6 +58,16 @@ describe(commands.LOGOUT, () => {
     assert.notStrictEqual(command.description, null);
   });
 
+  it('passs validation with default options', async () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('passs validation with unknown options', async () => {
+    const actual = commandOptionsSchema.safeParse({ option: "value" });
+    assert.strictEqual(actual.success, false);
+  });
+
   it('logs out from Microsoft 365 when logged in', async () => {
     auth.connection.active = true;
     await command.action(logger, { options: commandOptionsSchema.safeParse({ debug: true }) as any });
