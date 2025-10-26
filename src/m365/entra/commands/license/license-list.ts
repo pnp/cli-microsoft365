@@ -1,7 +1,11 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
 import { odata } from '../../../../utils/odata.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
+import { globalOptionsZod } from '../../../../Command.js';
+
+const options = globalOptionsZod.strict();
 
 class EntraLicenseListCommand extends GraphCommand {
   public get name(): string {
@@ -10,6 +14,10 @@ class EntraLicenseListCommand extends GraphCommand {
 
   public get description(): string {
     return 'Lists commercial subscriptions that an organization has acquired';
+  }
+
+  public get schema(): z.ZodTypeAny | undefined {
+    return options;
   }
 
   public defaultProperties(): string[] | undefined {
