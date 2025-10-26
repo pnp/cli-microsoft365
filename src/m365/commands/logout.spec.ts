@@ -59,12 +59,12 @@ describe(commands.LOGOUT, () => {
   });
 
   it('passs validation with default options', async () => {
-    const actual = commandOptionsSchema.safeParse({});
+    const actual = commandOptionsSchema.parse({});
     assert.strictEqual(actual.success, true);
   });
 
   it('passs validation with unknown options', async () => {
-    const actual = commandOptionsSchema.safeParse({ option: "value" });
+    const actual = commandOptionsSchema.parse({ option: "value" });
     assert.strictEqual(actual.success, false);
   });
 
@@ -80,19 +80,19 @@ describe(commands.LOGOUT, () => {
 
   it('logs out from Microsoft 365 when logged in', async () => {
     auth.connection.active = true;
-    await command.action(logger, { options: commandOptionsSchema.safeParse({ debug: true }) as any });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true }) });
     assert(!auth.connection.active);
   });
 
   it('logs out from Microsoft 365 when not logged in', async () => {
     auth.connection.active = false;
-    await command.action(logger, { options: commandOptionsSchema.safeParse({ debug: true }) as any });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true }) });
     assert(!auth.connection.active);
   });
 
   it('clears persisted connection info when logging out', async () => {
     auth.connection.active = true;
-    await command.action(logger, { options: commandOptionsSchema.safeParse({ debug: true }) as any });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true }) });
     assert(authClearConnectionInfoStub.called);
   });
 
@@ -103,7 +103,7 @@ describe(commands.LOGOUT, () => {
     auth.connection.active = true;
 
     try {
-      await command.action(logger, { options: commandOptionsSchema.safeParse({}) as any });
+      await command.action(logger, { options: commandOptionsSchema.parse({}) });
       assert(logoutSpy.called);
     }
     finally {
@@ -120,7 +120,7 @@ describe(commands.LOGOUT, () => {
     auth.connection.active = true;
 
     try {
-      await command.action(logger, { options: commandOptionsSchema.safeParse({ debug: true }) as any });
+      await command.action(logger, { options: commandOptionsSchema.parse({ debug: true }) });
       assert(logoutSpy.called);
     }
     finally {
