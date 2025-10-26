@@ -59,12 +59,12 @@ describe(commands.LOGOUT, () => {
   });
 
   it('passs validation with default options', async () => {
-    const actual = commandOptionsSchema.parse({});
+    const actual = commandOptionsSchema.safeParse({});
     assert.strictEqual(actual.success, true);
   });
 
   it('passs validation with unknown options', async () => {
-    const actual = commandOptionsSchema.parse({ option: "value" });
+    const actual = commandOptionsSchema.safeParse({ option: "value" });
     assert.strictEqual(actual.success, false);
   });
 
