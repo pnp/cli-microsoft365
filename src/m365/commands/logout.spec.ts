@@ -116,7 +116,7 @@ describe(commands.LOGOUT, () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.reject('An error has occurred'));
 
     try {
-      await assert.rejects(command.action(logger, commandOptionsSchema.parse({ options: {} })), new CommandError('An error has occurred'));
+      await assert.rejects(command.action(logger, commandOptionsSchema.parse({})), new CommandError('An error has occurred'));
     }
     finally {
       sinonUtil.restore([
