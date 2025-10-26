@@ -116,7 +116,7 @@ describe(commands.TENANT_SETTINGS_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: commandOptionsSchema.parse({}) } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     assert(loggerLogSpy.calledWith(successResponse));
   });
 
@@ -125,6 +125,6 @@ describe(commands.TENANT_SETTINGS_LIST, () => {
       throw 'An error has occurred';
     });
 
-    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({}) } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({}) }), new CommandError('An error has occurred'));
   });
 });
