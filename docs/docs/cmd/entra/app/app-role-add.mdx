@@ -1,4 +1,6 @@
 import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 # entra app role add
 
@@ -48,6 +50,25 @@ m365 entra appregistration role add [options]
 For best performance use the `appObjectId` option to reference the Entra application registration for which to add the role. If you use `appId` or `appName`, this command will first need to find the corresponding object ID for that application.
 
 If the command finds multiple Entra application registrations with the specified app name, it will prompt you to disambiguate which app it should use, listing the discovered object IDs.
+
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+| Resource        | Permissions                 |
+| --------------- | --------------------------- |
+| Microsoft Graph | Application.ReadWrite.All |
+
+  </TabItem>
+  <TabItem value="Application">
+
+| Resource        | Permissions                     |
+| --------------- | ------------------------------- |
+| Microsoft Graph | Application.ReadWrite.OwnedBy |
+
+  </TabItem>
+</Tabs>
 
 ## Examples
 
