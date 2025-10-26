@@ -7,12 +7,6 @@ import commands from '../../commands.js';
 
 const options = globalOptionsZod.strict();
 
-declare type Options = z.infer<typeof options>;
-
-interface CommandArgs {
-  options: Options;
-}
-
 class PpGatewayListCommand extends PowerBICommand {
   public get name(): string {
     return commands.GATEWAY_LIST;
@@ -30,7 +24,7 @@ class PpGatewayListCommand extends PowerBICommand {
     return ['id', 'name'];
   }
 
-  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+  public async commandAction(logger: Logger): Promise<void> {
     if (this.verbose) {
       await logger.logToStderr(`Retrieving list of gateways for which the user is an admin...`);
     }
@@ -44,13 +38,8 @@ class PpGatewayListCommand extends PowerBICommand {
     };
 
     try {
-      if (args) {
-        const res = await request.get<{ value: any[] }>(requestOptions);
-        await logger.log(res.value);
-      }
-      else {
-        throw 'Invalid arguments';
-      }
+      const res = await request.get<{ value: any[] }>(requestOptions);
+      await logger.log(res.value);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
