@@ -68,6 +68,16 @@ describe(commands.LOGOUT, () => {
     assert.strictEqual(actual.success, false);
   });
 
+  it('logs verbose message when verbose flag is set', async () => {
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true }) });
+    assert(log.some(msg => msg.includes('Logging out from Microsoft 365...')));
+  });
+
+  it('doesn\'t log verbose message when verbose flag is not set', async () => {
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
+    assert(!log.some(msg => msg.includes('Logging out from Microsoft 365...')));
+  });
+
   it('logs out from Microsoft 365 when logged in', async () => {
     auth.connection.active = true;
     await command.action(logger, { options: commandOptionsSchema.safeParse({ debug: true }) as any });
