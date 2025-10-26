@@ -127,4 +127,14 @@ describe(commands.TENANT_SETTINGS_LIST, () => {
 
     await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({}) }), new CommandError('An error has occurred'));
   });
+
+  it('passes validation with no options', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ option: "value" });
+    assert.strictEqual(actual.success, false);
+  });
 });
