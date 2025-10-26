@@ -3706,16 +3706,6 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
-              label: 'site alert list',
-              id: 'cmd/spo/site/site-alert-list'
-            },
-            {
-              type: 'doc',
-              label: 'site alert remove',
-              id: 'cmd/spo/site/site-alert-remove'
-            },
-            {
-              type: 'doc',
               label: 'site appcatalog add',
               id: 'cmd/spo/site/site-appcatalog-add'
             },
@@ -4184,6 +4174,16 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'web set',
               id: 'cmd/spo/web/web-set'
+            },
+            {
+              type: 'doc',
+              label: 'web alert list',
+              id: 'cmd/spo/web/web-alert-list'
+            },
+            {
+              type: 'doc',
+              label: 'web alert remove',
+              id: 'cmd/spo/web/web-alert-remove'
             },
             {
               type: 'doc',

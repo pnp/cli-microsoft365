@@ -29,9 +29,9 @@ interface CommandArgs {
   options: Options;
 }
 
-class SpoSiteAlertRemoveCommand extends SpoCommand {
+class SpoWebAlertRemoveCommand extends SpoCommand {
   public get name(): string {
-    return commands.SITE_ALERT_REMOVE;
+    return commands.WEB_ALERT_REMOVE;
   }
 
   public get description(): string {
@@ -72,4 +72,4 @@ class SpoSiteAlertRemoveCommand extends SpoCommand {
   }
 }
 
-export default new SpoSiteAlertRemoveCommand();
+export default new SpoWebAlertRemoveCommand();

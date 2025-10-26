@@ -15,9 +15,9 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { z } from 'zod';
 import commands from '../../commands.js';
-import command from './site-alert-list.js';
+import command from './web-alert-list.js';
 
-describe(commands.SITE_ALERT_LIST, () => {
+describe(commands.WEB_ALERT_LIST, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
@@ -155,7 +155,7 @@ describe(commands.SITE_ALERT_LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name, commands.SITE_ALERT_LIST);
+    assert.strictEqual(command.name, commands.WEB_ALERT_LIST);
   });
 
   it('has a description', () => {

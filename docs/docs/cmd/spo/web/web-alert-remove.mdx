@@ -2,14 +2,14 @@ import Global from '/docs/cmd/_global.mdx';
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-# spo site alert remove
+# spo web alert remove
 
 Removes an alert from a SharePoint list
 
 ## Usage
 
 ```sh
-m365 spo site alert remove [options]
+m365 spo web alert remove [options]
 ```
 
 ## Options
@@ -51,13 +51,13 @@ m365 spo site alert remove [options]
 Remove an alert by ID
 
 ```sh
-m365 spo site alert remove --webUrl https://contoso.sharepoint.com/sites/Marketing --id 7cbb4c8d-8e4d-4d2e-9c6f-3f1d8b2e6a0e
+m365 spo web alert remove --webUrl https://contoso.sharepoint.com/sites/Marketing --id 7cbb4c8d-8e4d-4d2e-9c6f-3f1d8b2e6a0e
 ```
 
 Remove another alert without confirmation
 
 ```sh
-m365 spo site alert remove --webUrl https://contoso.sharepoint.com/sites/Marketing --id 2b6f1c8a-3e6a-4c7e-b8c0-7bf4c8e6d7f1 --force
+m365 spo web alert remove --webUrl https://contoso.sharepoint.com/sites/Marketing --id 2b6f1c8a-3e6a-4c7e-b8c0-7bf4c8e6d7f1 --force
 ```
 
 ## Response

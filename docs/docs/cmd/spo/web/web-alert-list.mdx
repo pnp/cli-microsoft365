@@ -2,14 +2,14 @@ import Global from '/docs/cmd/_global.mdx';
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-# spo site alert list
+# spo web alert list
 
 Lists all SharePoint list alerts
 
 ## Usage
 
 ```sh
-m365 spo site alert list [options]
+m365 spo web alert list [options]
 ```
 
 ## Options
@@ -60,25 +60,25 @@ m365 spo site alert list [options]
 List all alerts for a SharePoint site:
 
 ```sh
-m365 spo site alert list --webUrl https://contoso.sharepoint.com/sites/Marketing
+m365 spo web alert list --webUrl https://contoso.sharepoint.com/sites/Marketing
 ```
 
 List alerts for a SharePoint list by listUrl:
 
 ```sh
-m365 spo site alert list --webUrl https://contoso.sharepoint.com/sites/Marketing --listUrl /sites/Marketing/lists/Tasks
+m365 spo web alert list --webUrl https://contoso.sharepoint.com/sites/Marketing --listUrl /sites/Marketing/lists/Tasks
 ```
 
 List alerts for a specific user by userId:
 
 ```sh
-m365 spo site alert list --webUrl https://contoso.sharepoint.com/sites/Marketing --userId 7cbb4c8d-8e4d-4d2e-9c6f-3f1d8b2e6a0e
+m365 spo web alert list --webUrl https://contoso.sharepoint.com/sites/Marketing --userId 7cbb4c8d-8e4d-4d2e-9c6f-3f1d8b2e6a0e
 ```
 
 List alerts for a specific list by title and user by username:
 
 ```sh
-m365 spo site alert list --webUrl https://contoso.sharepoint.com/sites/Marketing --listTitle "Tasks" --userName jane.doe@contoso.com
+m365 spo web alert list --webUrl https://contoso.sharepoint.com/sites/Marketing --listTitle "Tasks" --userName jane.doe@contoso.com
 ```
 
 ## Response
@@ -161,7 +161,7 @@ m365 spo site alert list --webUrl https://contoso.sharepoint.com/sites/Marketing
   <TabItem value="Markdown">
 
   ```md
-  # spo site alert list --webUrl "https://contoso.sharepoint.com/sites/marketing" --listUrl "/sites/marketing/Shared Documents"
+  # spo web alert list --webUrl "https://contoso.sharepoint.com/sites/marketing" --listUrl "/sites/marketing/Shared Documents"
 
   Date: 10/6/2025
 

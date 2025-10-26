@@ -38,9 +38,9 @@ interface CommandArgs {
   options: Options;
 }
 
-class SpoSiteAlertListCommand extends SpoCommand {
+class SpoWebAlertListCommand extends SpoCommand {
   public get name(): string {
-    return commands.SITE_ALERT_LIST;
+    return commands.WEB_ALERT_LIST;
   }
 
   public get description(): string {
@@ -130,4 +130,4 @@ class SpoSiteAlertListCommand extends SpoCommand {
   }
 }
 
-export default new SpoSiteAlertListCommand();
+export default new SpoWebAlertListCommand();
