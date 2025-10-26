@@ -73,12 +73,12 @@ describe(commands.GATEWAY_LIST, () => {
   });
 
   it('passes validation with no options', () => {
-    const actual = commandOptionsSchema.safeParse({});
+    const actual = commandOptionsSchema.parse({});
     assert.strictEqual(actual.success, true);
   });
 
   it('fails validation with unknown options', () => {
-    const actual = commandOptionsSchema.safeParse({ option: "value" });
+    const actual = commandOptionsSchema.parse({ option: "value" });
     assert.strictEqual(actual.success, false);
   });
 
