@@ -34,6 +34,25 @@ m365 entra app permission list [options]
 
 For best performance use the `objectId` option to reference the Entra application registration to get. If you use `appId`, this command will first need to find the corresponding object ID for that application.
 
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource         | Permissions          |
+  |------------------|----------------------|
+  | Microsoft Graph  | Application.Read.All |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource         | Permissions          |
+  |------------------|----------------------|
+  | Microsoft Graph  | Application.Read.All |
+
+  </TabItem>
+</Tabs>
+
 ## Examples
 
 Retrieves all permissions for an Entra application registration specified by client id.
