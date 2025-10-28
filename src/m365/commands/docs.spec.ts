@@ -1,6 +1,8 @@
 import assert from 'assert';
 import sinon from 'sinon';
+import { z } from 'zod';
 import { cli } from '../../cli/cli.js';
+import { CommandInfo } from '../../cli/CommandInfo.js';
 import { Logger } from '../../cli/Logger.js';
 import { telemetry } from '../../telemetry.js';
 import { app } from '../../utils/app.js';
@@ -16,11 +18,15 @@ describe(commands.DOCS, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let getSettingWithDefaultValueStub: sinon.SinonStub;
+  let commandInfo: CommandInfo;
+  let commandOptionsSchema: z.ZodTypeAny;
 
   before(() => {
     sinon.stub(telemetry, 'trackEvent').resolves();
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     sinon.stub(session, 'getId').callsFake(() => '');
+    commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
   });
 
   beforeEach(() => {
@@ -59,8 +65,18 @@ describe(commands.DOCS, () => {
     assert.notStrictEqual(command.description, null);
   });
 
+  it('passes validation with no options', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ option: "value" });
+    assert.strictEqual(actual.success, false);
+  });
+
   it('should log a message and return if autoOpenLinksInBrowser is false', async () => {
-    await command.action(logger, { options: {} });
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     assert(loggerLogSpy.calledWith(app.packageJson().homepage));
   });
 
@@ -74,7 +90,7 @@ describe(commands.DOCS, () => {
       }
       throw 'Invalid url';
     });
-    await command.action(logger, { options: {} });
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     assert(openStub.calledWith(app.packageJson().homepage));
   });
 });
