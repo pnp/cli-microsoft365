@@ -1,0 +1,118 @@
+import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# spo list defaultvalue get
+
+Gets a specific default column value from a specific document library
+
+## Usage
+
+```sh
+m365 spo list defaultvalue get [options]
+```
+
+## Options
+
+```md definition-list
+`-u, --webUrl <webUrl>`
+: URL of the site where the list is located.
+
+`-i, --listId [listId]`
+: ID of the list. Specify either `listTitle`, `listId`, or `listUrl`.
+
+`-t, --listTitle [listTitle]`
+: Title of the list. Specify either `listTitle`, `listId`, or `listUrl`.
+
+`--listUrl [listUrl]`
+: Server- or site-relative URL of the list. Specify either `listTitle`, `listId`, or `listUrl`.
+
+`--fieldName <fieldName>`
+: Internal name of the field.
+
+`--folderUrl [folderUrl]`
+: Get a specific field of a specific folder by specifying a server- or site-relative URL.
+```
+
+<Global />
+
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource   | Permissions   |
+  |------------|---------------|
+  | SharePoint | AllSites.Read |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource   | Permissions    |
+  |------------|----------------|
+  | SharePoint | Sites.Read.All |
+
+  </TabItem>
+</Tabs>
+
+## Examples
+
+Get default column value from the root folder of the list
+
+```sh
+m365 spo list defaultvalue get --webUrl https://contoso.sharepoint.com/sites/Marketing --listTitle Logos --fieldName Company
+```
+
+Get default column value from a specific folder of the list
+
+```sh
+m365 spo list defaultvalue get --webUrl https://contoso.sharepoint.com/sites/Marketing --listTitle Logos --fieldName Company --folderUrl "/sites/Marketing/Logos/Contoso"
+```
+
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  {
+    "fieldName": "Company",
+    "fieldValue": "Contoso",
+    "folderUrl": "sites/Marketing/Logos"
+  }
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  fieldName : Company
+  fieldValue: Contoso
+  folderUrl : sites/Marketing/Logos
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  fieldName,fieldValue,folderUrl
+  Company,Contoso,sites/Marketing/Logos
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # spo list defaultvalue get --webUrl "https://contoso.sharepoint.com/sites/Marketing" --listTitle "Logos" --fieldName "Company"
+
+  Date: 2/20/2023
+
+  Property | Value
+  ---------|-------
+  fieldName | Company
+  fieldValue | Contoso
+  folderUrl | sites/Marketing/Logos
+  ```
+
+  </TabItem>
+</Tabs>
