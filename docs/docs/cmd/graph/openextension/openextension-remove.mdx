@@ -30,6 +30,24 @@ m365 graph openextension remove [options]
 
 <Global />
 
+## Permissions
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource        | Permissions                                                                                 |
+  |-----------------|---------------------------------------------------------------------------------------------|
+  | Microsoft Graph | Directory.AccessAsUser.All, Group.ReadWrite.All, Organization.ReadWrite.All, User.ReadWrite |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource        | Permissions                                                                               |
+  |-----------------|-------------------------------------------------------------------------------------------|
+  | Microsoft Graph | Device.ReadWrite.All, Group.ReadWrite.All, Organization.ReadWrite.All, User.ReadWrite.All |
+
+  </TabItem>
+</Tabs>
+
 ## Examples
 
 Remove a specified open extension for a user specified by id.
