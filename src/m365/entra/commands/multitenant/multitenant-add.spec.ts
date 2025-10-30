@@ -84,14 +84,12 @@ describe(commands.MULTITENANT_ADD, () => {
 
   it('passes validation when only displayName is specified', async () => {
     const parseResult = commandOptionsSchema.safeParse({ displayName: 'Contoso organization' });
-    const actual = await command.validate({ options: parseResult.data }, commandInfo);
-    assert.strictEqual(actual, true);
+    assert.strictEqual(parseResult.success, true);
   });
 
   it('passes validation when the displayName and description are specified', async () => {
     const parseResult = commandOptionsSchema.safeParse({ displayName: 'Contoso organization', description: 'Contoso and partners' });
-    const actual = await command.validate({ options: parseResult.data }, commandInfo);
-    assert.strictEqual(actual, true);
+    assert.strictEqual(parseResult.success, true);
   });
 
   it('creates a multitenant organization with a displayName only', async () => {

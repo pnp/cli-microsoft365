@@ -5,11 +5,12 @@ import request, { CliRequestOptions } from '../../../../request.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 import { MultitenantOrganization } from './MultitenantOrganization.js';
+import { zod } from '../../../../utils/zod.js';
 
 const options = globalOptionsZod
   .extend({
-    displayName: z.string(),
-    description: z.string().optional()
+    displayName: zod.alias('n', z.string()),
+    description: zod.alias('d', z.string().optional())
   }).strict();
 declare type Options = z.infer<typeof options>;
 
