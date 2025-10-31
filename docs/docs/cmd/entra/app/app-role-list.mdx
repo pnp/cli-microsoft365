@@ -39,6 +39,25 @@ For best performance use the `appObjectId` option to reference the Entra applica
 
 If the command finds multiple Entra application registrations with the specified app name, it will prompt you to disambiguate which app it should use, listing the discovered object IDs.
 
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+| Resource        | Permissions           |
+| --------------- | --------------------- |
+| Microsoft Graph | Application.Read.All |
+
+  </TabItem>
+  <TabItem value="Application">
+
+| Resource        | Permissions           |
+| --------------- | --------------------- |
+| Microsoft Graph | Application.Read.All |
+
+  </TabItem>
+</Tabs>
+
 ## Examples
 
 Get roles for the Entra application registration specified by its object ID
