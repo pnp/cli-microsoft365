@@ -101,8 +101,7 @@ describe(commands.MULTITENANT_ADD, () => {
       throw 'Invalid request';
     });
 
-    const parseResult = commandOptionsSchema.safeParse({ displayName: 'Contoso organization', verbose: true });
-    await command.action(logger, { options: parseResult.data });
+    await command.action(logger, { options: commandOptionsSchema.parse({ displayName: 'Contoso organization', verbose: true }) });
     assert(loggerLogSpy.calledOnceWithExactly(multitenantOrganizationShortReponse));
   });
 
@@ -115,8 +114,7 @@ describe(commands.MULTITENANT_ADD, () => {
       throw 'Invalid request';
     });
 
-    const parseResult = commandOptionsSchema.safeParse({ displayName: 'Contoso organization', description: 'Contoso and partners' });
-    await command.action(logger, { options: parseResult.data });
+    await command.action(logger, { options: commandOptionsSchema.parse({ displayName: 'Contoso organization', description: 'Contoso and partners' }) });
     assert(loggerLogSpy.calledOnceWithExactly(multitenantOrganizationReponse));
   });
 
