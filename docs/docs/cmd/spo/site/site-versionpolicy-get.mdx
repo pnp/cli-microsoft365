@@ -1,0 +1,97 @@
+import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# spo site versionpolicy get
+
+Retrieves the version policy settings of a specific site.
+
+## Usage
+
+```sh
+m365 spo site versionpolicy get [options]
+```
+
+## Options
+
+```md definition-list
+`-u, --siteUrl <siteUrl>`
+: URL of the site.
+```
+
+<Global />
+
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource   | Permissions   |
+  |------------|---------------|
+  | SharePoint | AllSites.Read |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource   | Permissions    |
+  |------------|----------------|
+  | SharePoint | Sites.Read.All |
+
+  </TabItem>
+</Tabs>
+
+## Examples
+
+Retrieve the version policy settings of a specific site.
+
+```sh
+m365 spo site versionpolicy get --siteUrl "https://contoso.sharepoint.com/sites/Marketing"
+```
+
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  {
+    "defaultTrimMode": "automatic",
+    "defaultExpireAfterDays": 30,
+    "majorVersionLimit": 500
+  }
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  defaultExpireAfterDays: 30
+  defaultTrimMode       : automatic
+  majorVersionLimit     : 500
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  defaultTrimMode,defaultExpireAfterDays,majorVersionLimit
+  automatic,30,500
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # spo site versionpolicy get --debug "false" --verbose "false" --siteUrl "https://contoso.sharepoint.com/"
+
+  Date: 8/23/2025
+
+  Property | Value
+  ---------|-------
+  defaultTrimMode | automatic
+  defaultExpireAfterDays | 30
+  majorVersionLimit | 500
+  ```
+
+  </TabItem>
+</Tabs>

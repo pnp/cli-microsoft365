@@ -79,6 +79,29 @@ paths:
       responses:
         200:
           description: OK
+  /_api/site/VersionPolicyForNewLibrariesTemplate:
+    get:
+      parameters:
+        - name: $expand
+          in: query
+          required: false
+          schema:
+            type: string
+          example: VersionPolicies
+      security:
+        - delegated:
+          - AllSites.Read
+          - AllSites.Write
+          - AllSites.Manage
+          - AllSites.FullControl
+        - application:
+          - Sites.Read.All
+          - Sites.ReadWrite.All
+          - Sites.Manage.All
+          - Sites.FullControl.All
+      responses:
+        200:
+          description: OK
   /_api/web:
     get:
       security:
@@ -160,15 +183,15 @@ paths:
           example: "'19bbfec4-4425-4660-95cb-da1887baa7b9'"
       security:
         - delegated:
-            - AllSites.Read
-            - AllSites.Write
-            - AllSites.Manage
-            - AllSites.FullControl
+          - AllSites.Read
+          - AllSites.Write
+          - AllSites.Manage
+          - AllSites.FullControl
         - application:
-            - Sites.Read.All
-            - Sites.ReadWrite.All
-            - Sites.Manage.All
-            - Sites.FullControl.All
+          - Sites.Read.All
+          - Sites.ReadWrite.All
+          - Sites.Manage.All
+          - Sites.FullControl.All
       responses:
         200:
           description: OK
@@ -189,13 +212,13 @@ paths:
           example: 1030
       security:
         - delegated:
-            - AllSites.Write
-            - AllSites.Manage
-            - AllSites.FullControl
+          - AllSites.Write
+          - AllSites.Manage
+          - AllSites.FullControl
         - application:
-            - Sites.ReadWrite.All
-            - Sites.Manage.All
-            - Sites.FullControl.All
+          - Sites.ReadWrite.All
+          - Sites.Manage.All
+          - Sites.FullControl.All
       responses:
         200:
           description: OK
