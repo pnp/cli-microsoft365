@@ -1,17 +1,21 @@
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { z } from 'zod';
+import { globalOptionsZod } from '../../../../Command.js';
 import { Logger } from '../../../../cli/Logger.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 import { MultitenantOrganization } from './MultitenantOrganization.js';
+import { zod } from '../../../../utils/zod.js';
+
+const options = globalOptionsZod
+  .extend({
+    displayName: zod.alias('n', z.string()),
+    description: zod.alias('d', z.string().optional())
+  }).strict();
+declare type Options = z.infer<typeof options>;
 
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  displayName: string;
-  description?: string;
 }
 
 class EntraMultitenantAddCommand extends GraphCommand {
@@ -23,36 +27,8 @@ class EntraMultitenantAddCommand extends GraphCommand {
     return 'Creates a new multitenant organization';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initTypes();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        displayName: typeof args.options.displayName !== 'undefined',
-        description: typeof args.options.description !== 'undefined'
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-n, --displayName <displayName>'
-      },
-      {
-        option: '-d, --description [description]'
-      }
-    );
-  }
-
-  #initTypes(): void {
-    this.types.string.push('displayName', 'description');
+  public get schema(): z.ZodTypeAny | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
