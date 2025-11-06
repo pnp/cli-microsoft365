@@ -15,6 +15,8 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { spo } from '../../../../utils/spo.js';
 import commands from '../../commands.js';
+import { brandCenter } from '../../../../utils/brandCenter.js';
+
 import command from './site-add.js';
 
 describe(commands.SITE_ADD, () => {
@@ -62,7 +64,10 @@ describe(commands.SITE_ADD, () => {
     sinonUtil.restore([
       request.post,
       spo.ensureFormDigest,
-      spo.waitUntilFinished
+      spo.waitUntilFinished,
+      spo.getSpoAdminUrl,
+      brandCenter.getBrandCenterConfiguration,
+      cli.promptForConfirmation
     ]);
   });
 
@@ -2385,6 +2390,103 @@ describe(commands.SITE_ADD, () => {
 
     await command.action(logger, { options: { type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', wait: true, removeDeletedSite: true } });
     assert(loggerLogSpy.calledWithExactly('https://contoso.sharepoint.com/sites/team'));
+  });
+
+  it('creates a brand center site using the correct endpoint', async () => {
+    sinon.stub(spo, 'getSpoAdminUrl').resolves('https://contoso-admin.sharepoint.com');
+    sinon.stub(brandCenter, 'getBrandCenterConfiguration').resolves({
+      IsBrandCenterSiteFeatureEnabled: false
+    } as any);
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
+
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if ((opts.url as string).indexOf(`/_api/SPSiteManager/Create`) > -1) {
+        return { SiteStatus: 2, SiteUrl: "https://contoso.sharepoint.com/sites/BrandCenter" };
+      }
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { type: 'BrandCenter', url: 'https://contoso.sharepoint.com/sites/brandcenter', title: 'Brand Center' } });
+
+    assert.deepStrictEqual(postStub.lastCall.args[0].data.request.AdditionalSiteFeatureIds, ["99cd6e8b-189b-4611-ae89-f89105876e43"]);
+  });
+
+  it('creates a brand center site with --force flag without user confirmation', async () => {
+    sinon.stub(spo, 'getSpoAdminUrl').resolves('https://contoso-admin.sharepoint.com');
+    sinon.stub(brandCenter, 'getBrandCenterConfiguration').resolves({
+      IsBrandCenterSiteFeatureEnabled: false
+    } as any);
+
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if ((opts.url as string).indexOf(`/_api/SPSiteManager/Create`) > -1) {
+        return { SiteStatus: 2, SiteUrl: "https://contoso.sharepoint.com/sites/BrandCenter" };
+      }
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { type: 'BrandCenter', url: 'https://contoso.sharepoint.com/sites/brandcenter', title: 'Brand Center', force: true } });
+
+    assert.deepStrictEqual(postStub.lastCall.args[0].data.request.AdditionalSiteFeatureIds, ["99cd6e8b-189b-4611-ae89-f89105876e43"]);
+  });
+
+  it('does not activate brand center feature when user declines confirmation', async () => {
+    sinon.stub(spo, 'getSpoAdminUrl').resolves('https://contoso-admin.sharepoint.com');
+    sinon.stub(brandCenter, 'getBrandCenterConfiguration').resolves({
+      IsBrandCenterSiteFeatureEnabled: false
+    } as any);
+    sinon.stub(cli, 'promptForConfirmation').resolves(false);
+
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if ((opts.url as string).indexOf(`/_api/SPSiteManager/Create`) > -1) {
+        return { SiteStatus: 2, SiteUrl: "https://contoso.sharepoint.com/sites/BrandCenter" };
+      }
+      throw 'Invalid request';
+    });
+
+    await assert.rejects(command.action(logger, { options: { type: 'BrandCenter', url: 'https://contoso.sharepoint.com/sites/brandcenter', title: 'Brand Center' } }), new CommandError('Operation cancelled by the user.'));
+  });
+
+  it('does not activate brand center feature when already enabled', async () => {
+    sinon.stub(spo, 'getSpoAdminUrl').resolves('https://contoso-admin.sharepoint.com');
+    sinon.stub(brandCenter, 'getBrandCenterConfiguration').resolves({
+      IsBrandCenterSiteFeatureEnabled: true
+    } as any);
+
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if ((opts.url as string).indexOf(`/_api/SPSiteManager/Create`) > -1) {
+        return { SiteStatus: 2, SiteUrl: "https://contoso.sharepoint.com/sites/BrandCenter" };
+      }
+      throw 'Invalid request';
+    });
+
+    await assert.rejects(command.action(logger, { options: { type: 'BrandCenter', url: 'https://contoso.sharepoint.com/sites/brandcenter', title: 'Brand Center' } }), new CommandError('Brand center site is already created in the tenant.'));
+  });
+
+  it('logs warning message when brand center feature is already enabled', async () => {
+    sinon.stub(spo, 'getSpoAdminUrl').resolves('https://contoso-admin.sharepoint.com');
+    sinon.stub(brandCenter, 'getBrandCenterConfiguration').resolves({
+      IsBrandCenterSiteFeatureEnabled: true
+    } as any);
+
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if ((opts.url as string).indexOf(`/_api/SPSiteManager/Create`) > -1) {
+        return { SiteStatus: 2, SiteUrl: "https://contoso.sharepoint.com/sites/BrandCenter" };
+      }
+      throw 'Invalid request';
+    });
+
+    await assert.rejects(command.action(logger, { options: { type: 'BrandCenter', url: 'https://contoso.sharepoint.com/sites/brandcenter', title: 'Brand Center' } }), new CommandError('Brand center site is already created in the tenant.'));
+  });
+
+  it('passes validation when BrandCenter type is specified', async () => {
+    const actual = await command.validate({
+      options: {
+        type: 'BrandCenter',
+        title: 'Brand Center',
+        url: 'https://contoso.sharepoint.com/sites/brandcenter'
+      }
+    }, commandInfo);
+    assert.strictEqual(actual, true);
   });
 
   it('escapes XML in the request', async () => {

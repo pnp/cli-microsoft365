@@ -16,7 +16,7 @@ m365 spo site add [options]
 
 ```md definition-list
 `--type [type]`
-: Type of sites to add. Allowed values `TeamSite`, `CommunicationSite`, `ClassicSite`, default `TeamSite`
+: Type of sites to add. Allowed values `TeamSite`, `CommunicationSite`, `ClassicSite`, `BrandCenter`, default `TeamSite`
 
 `-t, --title <title>`
 : Site title
@@ -25,7 +25,7 @@ m365 spo site add [options]
 : Site alias, used in the URL and in the team site group e-mail (applies to type TeamSite)
 
 `-u, --url [url]`
-: Site URL  (applies to type CommunicationSite, ClassicSite)
+: Site URL  (applies to type CommunicationSite, ClassicSite, BrandCenter)
 
 `-z, --timeZone [timeZone]`
 : Integer representing time zone to use for the site (applies to type ClassicSite)
@@ -43,7 +43,7 @@ m365 spo site add [options]
 : Determines if the associated group is public or not (applies to type TeamSite)
 
 `-c, --classification [classification]`
-: Site classification (applies to type TeamSite, CommunicationSite)
+: Site classification (applies to type TeamSite, CommunicationSite, BrandCenter)
 
 `--siteDesign [siteDesign]`
 : Type of communication site to create. Allowed values `Topic`, `Showcase`, `Blank`, default `Topic`. When creating a communication site, specify either `siteDesign` or `siteDesignId` (applies to type CommunicationSite)
@@ -52,7 +52,7 @@ m365 spo site add [options]
 : Id of the custom site design to use to create the site. When creating a communication site, specify either `siteDesign` or `siteDesignId` (applies to type CommunicationSite)
 
 `--shareByEmailEnabled`
-: Determines whether it's allowed to share file with guests (applies to type CommunicationSite)
+: Determines whether it's allowed to share file with guests (applies to type CommunicationSite, BrandCenter)
 
 `-w, --webTemplate [webTemplate]`
 : Template to use for creating the site. Default `STS#0`  (applies to type ClassicSite)
@@ -77,6 +77,9 @@ m365 spo site add [options]
 
 `--wait`
 : Wait for the site to be provisioned before completing the command  (applies to type ClassicSite)
+
+`-f, --force`
+: Don't prompt for confirmation to create BrandCenter
 ```
 
 <Global />
@@ -99,7 +102,7 @@ Deleting and creating classic site collections is by default asynchronous and de
 
 ## Remarks for modern sites
 
-The `--owners` option is mandatory for creating `CommunicationSite` sites with app-only permissions.
+The `--owners` option is mandatory for creating `CommunicationSite or `BrandCenter` sites with app-only permissions.
 
 When trying to create a team site using app-only permissions, you will get an _Insufficient privileges to complete the operation._ error. As a workaround, you can use the [`entra m365group add`](../../entra/m365group/m365group-add.mdx) command, followed by [`spo site set`](./site-set.mdx) to further configure the Team site.
 
@@ -199,6 +202,12 @@ Create a new classic site and enable the site collection app catalog
 
 ```sh
 m365 spo site add --type ClassicSite --url https://contoso.sharepoint.com/sites/team --title Team --owners admin@contoso.onmicrosoft.com --timeZone 4 --webTemplate STS#0 --withAppCatalog
+```
+
+Create a brand center site
+
+```sh
+m365 spo site add --type BrandCenter --url https://contoso.sharepoint.com/sites/brandcenter --title Branding
 ```
 
 ## Response
