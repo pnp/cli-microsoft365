@@ -28,7 +28,7 @@ npm start
 
 With our help file created, we can start writing down the command specs. A help file for a command will have at minimum the following topics. The command name as the title, a description, the usage, options, a few examples on how to use them, and a sample response output. We'll start with the `title`, `description`, and `usage`.
 
-````md title="docs\docs\cmd\spo\group\group-get.mdx"
+````md title="docs/docs/cmd/spo/group/group-get.mdx"
 # spo group get
 
 Gets site group
@@ -44,7 +44,7 @@ m365 spo group get [options]
 
 Most commands will have unique options but every command will make use of our global options. This can be achieved by including `<Global />` under the heading options. This will include the global options in the help page. Before we can use the global options tag, we need to import it from `/docs/cmd/_global.mdx`. This can be done by adding the following import at the top of your help file.
 
-````md title="docs\docs\cmd\spo\group\group-get.mdx"
+````md title="docs/docs/cmd/spo/group/group-get.mdx"
 import Global from '/docs/cmd/_global.mdx';
 
 <!-- ... -->
@@ -86,7 +86,7 @@ node ./scripts/generate-docs-permissions.mjs
 
 The script above will output the permissions section, you can find an example below.
 
-```md title="docs\docs\cmd\spo\group\group-get.mdx"
+```md title="docs/docs/cmd/spo/group/group-get.mdx"
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
@@ -116,7 +116,7 @@ import TabItem from '@theme/TabItem';
 
 As they say, a picture is worth a thousand words, same goes for examples of code. This is why we strive to add several examples for each command with some logical option data. This gives more insight to users on how they can implement the command in their script. We require at least 2 examples per command (if possible).
 
-````md title="docs\docs\cmd\spo\group\group-get.mdx"
+````md title="docs/docs/cmd/spo/group/group-get.mdx"
 ## Examples
 
 Get a specific group by its ID
@@ -147,7 +147,7 @@ Some pointers to keep in mind when including sample data in our examples.
 
 We include the response output for each command to give more insight into what users can expect from this command. This is especially useful for commands that return a lot of data. We include the response output in the following formats: JSON, Text, CSV, and Markdown. This is done by using the `Tabs` component from the Docusaurus library. This component allows us to include multiple tabs with different content. The `TabItem` component is used to include the content for each tab. The `value` attribute is used to specify the name of the tab. Make sure to include the `Tabs` and `TabItem` imports at the top of your help file.
 
-````md title="docs\docs\cmd\spo\group\group-get.mdx"
+````md title="docs/docs/cmd/spo/group/group-get.mdx"
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
@@ -197,7 +197,7 @@ import TabItem from '@theme/TabItem';
 
   ```csv
   Id,IsHiddenInUI,LoginName,Title,PrincipalType,AllowMembersEditMembership,AllowRequestToJoinLeave,AutoAcceptRequestToJoinLeave,Description,OnlyAllowMembersViewMembership,OwnerTitle,RequestToJoinLeaveEmailSetting
-  1,,Contoso Visitors,Contoso Visitors,8,,,,Contoso Visitors,,Contoso Owners,
+  1,0,Contoso Visitors,Contoso Visitors,8,0,0,0,Contoso Visitors,0,Contoso Owners,
   ```
 
   </TabItem>
@@ -233,30 +233,26 @@ import TabItem from '@theme/TabItem';
 Each different verb of command can return a different type of response. This means that a `get` command will return a single object response while a `list` command returns an object list. Below you'll find different examples for different scenarios.
 
 - **A single object response** (planner plan get)
-
-[The docs article](https://pnp.github.io/cli-microsoft365/cmd/planner/plan/plan-get/)
-[The MarkDown file location](https://github.com/pnp/cli-microsoft365/blob/main/docs/docs/cmd/planner/plan/plan-get.mdx?plain=1)
+  - [The docs article](https://pnp.github.io/cli-microsoft365/cmd/planner/plan/plan-get/)
+  - [The MarkDown file location](https://github.com/pnp/cli-microsoft365/blob/main/docs/docs/cmd/planner/plan/plan-get.mdx?plain=1)
 
 - **An object list response** (planner plan list)
+  - [The docs article](https://pnp.github.io/cli-microsoft365/cmd/planner/plan/plan-list/)
+  - [The MarkDown file location](https://github.com/pnp/cli-microsoft365/blob/main/docs/docs/cmd/planner/plan/plan-list.mdx?plain=1)
 
-[The docs article](https://pnp.github.io/cli-microsoft365/cmd/planner/plan/plan-list/)
-[The MarkDown file location](https://github.com/pnp/cli-microsoft365/blob/main/docs/docs/cmd/planner/plan/plan-list.mdx?plain=1)
+    :::warning
 
-:::warning
+    Make sure the `Text` output is also in the list format with a single object.
 
-Make sure the `Text` output is also in the list format with a single object.
-
-:::
+    :::
 
 - **Multiple responses based on the options used** (planner plan add)
-
-[The docs article](https://pnp.github.io/cli-microsoft365/cmd/planner/plan/plan-add/)
-[The MarkDown file location](https://github.com/pnp/cli-microsoft365/blob/main/docs/docs/cmd/planner/plan/plan-add.mdx?plain=1)
+  - [The docs article](https://pnp.github.io/cli-microsoft365/cmd/planner/plan/plan-add/)
+  - [The MarkDown file location](https://github.com/pnp/cli-microsoft365/blob/main/docs/docs/cmd/planner/plan/plan-add.mdx?plain=1)
 
 - **No response** (planner plan remove)
-
-[The docs article](https://pnp.github.io/cli-microsoft365/cmd/planner/plan/plan-remove/)
-[The MarkDown file location](https://github.com/pnp/cli-microsoft365/blob/main/docs/docs/cmd/planner/plan/plan-remove.mdx?plain=1)
+  - [The docs article](https://pnp.github.io/cli-microsoft365/cmd/planner/plan/plan-remove/)
+  - [The MarkDown file location](https://github.com/pnp/cli-microsoft365/blob/main/docs/docs/cmd/planner/plan/plan-remove.mdx?plain=1)
 
 Some general pointers to keep in mind when writing the verbose output.
 
@@ -277,7 +273,7 @@ It is possible that a command needs to include some more information. Some addit
 
 This heading can be used to communicate some important details about your command to the user. This could be to communicate that you used a preview API or that a number option is specified as a 0-based index. Remarks headings are most commonly placed between the headings `Options` and `Examples`.
 
-```md title="graph/schemaextension/schemaextension-list.mdx"
+```md title="docs/docs/cmd/graph/schemaextension/schemaextension-list.mdx"
 ## Remarks
 
 pageNumber is specified as a 0-based index. A value of 2 returns the third page of items. 
@@ -287,7 +283,7 @@ pageNumber is specified as a 0-based index. A value of 2 returns the third page 
 
 Here we can include some links to the APIs we used in the command or some documentation pages that explain the command usage in more detail. This isn't required but it is nice to have. This heading is most commonly placed at the end of your help page.
 
-```md title="spo/homesite/homesite-get.mdx"
+```md title="docs/docs/cmd/spo/homesite/homesite-get.mdx"
 ## More information
 
 - SharePoint home sites: a landing for your organization on the intelligent intranet: https://techcommunity.microsoft.com/t5/Microsoft-SharePoint-Blog/SharePoint-home-sites-a-landing-for-your-organization-on-the/ba-p/621933
@@ -295,7 +291,7 @@ Here we can include some links to the APIs we used in the command or some docume
 
 ## Include into the command navigation
 
-Now that your page is finished, we need to make it available from the command navigation, most commonly found on the left side of the page. To include this, we need to edit the file `sidebars.js` found in the folder `src/config`. Navigate through the section `commands` and locate your commands command group. Here you can add the path to your new help page. 
+Now that your page is finished, we need to make it available from the command navigation, most commonly found on the left side of the page. To include this, we need to edit the file `sidebars.js` found in the folder `src/config`. Navigate through the section `commands` and locate your commands command group. Here you can add the path to your new help page. Note that all navigation nodes are somewhat sorted alphabetically.
 
 ```js title="src/config/sidebars.js"
 const sidebars = {

@@ -46,11 +46,21 @@ class SpoGroupGetCommand extends SpoCommand {
 export default new SpoGroupGetCommand();
 ```
 
+Each command in the CLI for Microsoft 365 follows a consistent class naming convention to ensure clarity and maintainability. The command class name is based on the command's name and follows PascalCase. It is composed of the command's hierarchy segments joined together, followed by the suffix Command. For example, for the command `spo group get`, the class name would be `SpoGroupGetCommand`.
+
+:::warning
+
+To prevent an uncontrolled expansion of command names, we maintain a dictionary of approved command words that can be used when defining a command. This dictionary is located in the [`eslint.config.mjs`](https://github.com/pnp/cli-microsoft365/blob/main/eslint.config.mjs) file.
+
+If a desired command name includes a word that isn't in the approved list, that word should be added to the dictionary to allow the automated workflow to pass successfully.
+
+:::
+
 Depending on your command and the service for which you're building the command, there might be a base class that you can use to simplify the implementation. For example, for SPO, you can inherit from the [SpoCommand](https://github.com/pnp/cli-microsoft365/blob/main/src/m365/base/SpoCommand.ts) base class. This class contains several helper methods to simplify your implementation.
 
 ### Include command name
 
-When you create the minimum file, you'll get an error about a nonexistent type within `commands`. This is correct because we haven't defined the name of the command yet. Let's add this to the `commands` export located in `src/m365/spo/commands.ts`:
+When you create the minimum file, you'll get an error about a nonexistent type within `commands`. This is correct because we haven't defined the name of the command yet. Let's add this to the `commands` export located in `src/m365/spo/commands.ts`.
 
 ```ts title="src/m365/spo/commands.ts"
 const prefix: string = 'spo';
@@ -61,6 +71,31 @@ export default {
   // ...
 };
 ```
+
+:::note
+
+When defining commands, you should group them by their base command and sort the groups alphabetically. Commands within the same group should also be listed alphabetically. Check the example below.
+
+<details>
+  <summary>Example of command sorting</summary>
+
+  ```ts title="src/m365/spo/commands.ts"
+  const prefix: string = 'spo';
+
+  export default {
+    GROUP_ADD: `${prefix} group add`,
+    GROUP_GET: `${prefix} group get`,
+    GROUP_LIST: `${prefix} group list`,
+    GROUP_REMOVE: `${prefix} group remove`,
+    GROUP_SET: `${prefix} group set`,
+    GROUP_MEMBER_ADD: `${prefix} group member add`,
+    GROUP_MEMBER_LIST: `${prefix} group member list`,
+    GROUP_MEMBER_REMOVE: `${prefix} group member remove`,
+  };
+  ```
+</details>
+
+:::
 
 Next, to enhance our command with options, validators, telemetry, there are a bunch of methods already available for you. When you make use of a method we order them alphabetically.
 
@@ -232,7 +267,7 @@ enum AssociatedGroup {
 export const options = globalOptionsZod
   .extend({
     webUrl: zod.alias('u', z.string().refine(url => validation.isValidSharePointUrl(url) === true, url => ({
-      message: `Specified URL ${url} is not a valid SharePoint URL`,
+      message: `Specified URL '${url}' is not a valid SharePoint URL.`,
     }))),
     id: zod.alias('i', z.number().optional()),
     name: z.string().optional(),
@@ -254,14 +289,14 @@ class SpoGroupGetCommand extends SpoCommand {
 
   public getRefinedSchema(schema: typeof options): z.ZodEffects<any> | undefined {
     return schema
-      .refine(options => options.id !== undefined || options.name !== undefined && !(options.id !== undefined && options.name !== undefined), {
+      .refine(options => [options.id, options.name].filter(x => x !== undefined).length === 1, {
         message: `Either id or name is required, but not both.`
       });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      await logger.logToStderr(`Retrieving information for group in site at ${args.options.webUrl}...`);
+      await logger.logToStderr(`Retrieving information for group in site at '${args.options.webUrl}'...`);
     }
 
     // Command implementation goes here
