@@ -15,7 +15,8 @@ Author: [Saurabh Tripathi](https://github.com/saurabh7019)
 
 SharePoint Online list alerts are being gradually retired. This script scans all sites across the tenant and generates a comprehensive CSV report of existing alerts. This information helps administrators identify and plan the migration of critical alerts to modern alternatives.
 
-- Prerequisites: This script requires app-only permissions with full control on all site collections to run.
+**Prerequisites:**
+This script assumes you have permissions to all sites in the tenant. We recommend running this script with application-only permissions using Sites.FullControl.All permissions.
 
 <Tabs>
   <TabItem value="PowerShell">
@@ -23,7 +24,7 @@ SharePoint Online list alerts are being gradually retired. This script scans all
   ```powershell
   $fileExportPath = "Alerts.csv"
 
-  function Get-AlertsToResults {
+  function Convert-AlertsToResults {
     param(
       [array]$Alerts,
       [string]$SiteTitle,
@@ -80,7 +81,7 @@ SharePoint Online list alerts are being gradually retired. This script scans all
 
       if ($alerts.Count -gt 0) {
         Write-Host "`tFound $($alerts.Count) alert(s)" -ForegroundColor Yellow
-        $results += Get-AlertsToResults -Alerts $alerts -SiteTitle $SiteTitle -SiteUrl $SiteUrl
+        $results += Convert-AlertsToResults -Alerts $alerts -SiteTitle $SiteTitle -SiteUrl $SiteUrl
       }
       else {
         Write-Host "`tNo alerts found" -ForegroundColor Green
@@ -89,7 +90,7 @@ SharePoint Online list alerts are being gradually retired. This script scans all
       $webs = m365 spo web list --url $SiteUrl --output json | ConvertFrom-Json
       foreach ($web in $webs) {
         Write-Host "`tScanning subsite '$($web.Url)'..." -ForegroundColor Gray
-        $results += Get-DeprecatedAlertsRecursively -SiteUrl $web.Url -SiteTitle $SiteTitle
+        $results += Get-DeprecatedAlertsRecursively -SiteUrl $web.Url -SiteTitle $web.Title
       }
     }
     catch {
@@ -104,8 +105,7 @@ SharePoint Online list alerts are being gradually retired. This script scans all
 
     $results = @()
     Write-Host "Retrieving all sites..."
-    $sites = m365 spo site list --output json | ConvertFrom-Json
-    $sites = $sites | Where-Object { $_.ArchiveStatus -eq "NotArchived" }
+    $sites = m365 spo site list --output json --query "[?ArchiveStatus == 'NotArchived']" | ConvertFrom-Json
     $count = $sites.Count
     $iCnt = 0
 
@@ -119,7 +119,7 @@ SharePoint Online list alerts are being gradually retired. This script scans all
 
     if ($results.Count -gt 0) {
       $location = Get-Location
-      Write-Host ("`nExporting {0} alerts to {1}\{2}..." -f $results.Count, $location.Path, $fileExportPath)
+      Write-Host ("`nExporting {0} alerts to '{1}\{2}'..." -f $results.Count, $location.Path, $fileExportPath)
       $results | Export-Csv -Path $fileExportPath -NoTypeInformation -Encoding UTF8
       Write-Host "Report saved successfully!"
     }
