@@ -180,6 +180,11 @@ describe(commands.APPLICATIONCUSTOMIZER_SET, () => {
     assert.strictEqual(actual, true);
   });
 
+  it('passes validation when an empty description is passed', async () => {
+    const actual = await command.validate({ options: { webUrl: webUrl, id: id, description: '' } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
   it('fails validation when all parameters are empty', async () => {
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
       if (settingName === settingsNames.prompt) {
@@ -356,5 +361,22 @@ describe(commands.APPLICATIONCUSTOMIZER_SET, () => {
     const updateCallsSpy: sinon.SinonStub = defaultUpdateCallsStub();
     await command.action(logger, { options: { verbose: true, clientSideComponentId: clientSideComponentId, webUrl: webUrl, scope: 'Web', clientSideComponentProperties: clientSideComponentProperties } });
     assert(updateCallsSpy.calledOnce);
+  });
+
+  it('should update the application customizer from the site when description is empty', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/_api/Web/UserCustomActions(guid'${id}')`) {
+        return singleResponse.value[0];
+      }
+      throw 'Invalid request: ' + opts.url;
+    });
+
+    const updateCallsSpy: sinon.SinonStub = defaultUpdateCallsStub();
+    await command.action(logger, { options: { id: id, webUrl: webUrl, scope: 'Web', description: '' } });
+
+    assert(updateCallsSpy.calledOnce);
+    assert.deepStrictEqual(updateCallsSpy.firstCall.args[0].data, {
+      Description: ''
+    });
   });
 });

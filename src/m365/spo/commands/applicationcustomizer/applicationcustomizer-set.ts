@@ -1,6 +1,6 @@
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
-import request from '../../../../request.js';
+import request, { CliRequestOptions } from '../../../../request.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
@@ -148,7 +148,7 @@ class SpoApplicationCustomizerSetCommand extends SpoCommand {
       requestBody.ClientSideComponentProperties = clientSideComponentProperties;
     }
 
-    const requestOptions: any = {
+    const requestOptions: CliRequestOptions = {
       url: `${webUrl}/_api/${appCustomizer.Scope.toString() === '2' ? 'Site' : 'Web'}/UserCustomActions('${appCustomizer.Id}')`,
       headers: {
         accept: 'application/json;odata=nometadata',

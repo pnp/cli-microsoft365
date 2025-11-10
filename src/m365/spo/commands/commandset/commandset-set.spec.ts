@@ -175,6 +175,17 @@ describe(commands.COMMANDSET_SET, () => {
     assert.strictEqual(actual, true);
   });
 
+  it('passes validation when description is empty', async () => {
+    const actual = await command.validate({
+      options: {
+        webUrl: validUrl,
+        id: validId,
+        description: ''
+      }
+    }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
   it('fails if the specified URL is invalid', async () => {
     const actual = await command.validate({ options: { id: validId, webUrl: 'foo', newTitle: validNewTitle } }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -376,6 +387,34 @@ describe(commands.COMMANDSET_SET, () => {
         verbose: true, webUrl: validUrl, id: validId, newTitle: validNewTitle, description: validDescription, listType: validListType, clientSideComponentProperties: validClientSideComponentProperties, location: validLocation
       }
     }));
+  });
+
+  it('updates a commandset with an empty description', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/_api/Web/UserCustomActions(guid'${validId}')`) {
+        return commandsetSingleResponse.value[0];
+      }
+
+      throw 'Invalid request: ' + opts.url;
+    });
+
+    const postStub = sinon.stub(request, 'post').callsFake(async opts => {
+      if (opts.url === `https://contoso.sharepoint.com/_api/Web/UserCustomActions('${validId}')`) {
+        return;
+      }
+
+      throw `Invalid request: ` + opts.url;
+    });
+
+    await assert.doesNotReject(command.action(logger, {
+      options: {
+        webUrl: validUrl,
+        id: validId,
+        description: ''
+      }
+    }));
+    assert(postStub.calledOnce);
+    assert.deepStrictEqual(postStub.firstCall.args[0].data, { Description: '' });
   });
 
   it('updates the Client Side Component Id', async () => {
