@@ -15,6 +15,7 @@ import command from './applicationcustomizer-add.js';
 describe(commands.APPLICATIONCUSTOMIZER_ADD, () => {
   const webUrl = 'https://contoso.sharepoint.com';
   const title = 'PageFooter';
+  const description = 'Page footer customizer';
   const clientSideComponentId = '76d5f8c8-6228-4df8-a2da-b94cbc8115bc';
   const clientSideComponentProperties = '{"testMessage":"Test message"}';
   const customActionError = {
@@ -26,7 +27,7 @@ describe(commands.APPLICATIONCUSTOMIZER_ADD, () => {
     ClientSideComponentId: '799883f5-7962-4384-a10a-105adaec6ffc',
     ClientSideComponentProperties: '',
     CommandUIExtension: null,
-    Description: null,
+    Description: description,
     Group: null,
     Id: 'bdcea35f-d5d9-45a2-a075-4d1e2f519e74',
     ImageUrl: null,
@@ -106,7 +107,7 @@ describe(commands.APPLICATIONCUSTOMIZER_ADD, () => {
       throw customActionError;
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, title: title, clientSideComponentId: clientSideComponentId, scope: 'Web' } } as any);
+    await command.action(logger, { options: { webUrl: webUrl, title: title, clientSideComponentId: clientSideComponentId, scope: 'Web' } });
     assert(loggerLogToStderrSpy.notCalled);
   });
 
@@ -123,7 +124,7 @@ describe(commands.APPLICATIONCUSTOMIZER_ADD, () => {
       throw customActionError;
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, title: title, clientSideComponentId: clientSideComponentId, clientSideComponentProperties: clientSideComponentProperties, verbose: true } } as any);
+    await command.action(logger, { options: { webUrl: webUrl, title: title, clientSideComponentId: clientSideComponentId, description: description, clientSideComponentProperties: clientSideComponentProperties, verbose: true } });
     assert(loggerLogToStderrSpy.called);
   });
 

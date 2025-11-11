@@ -23,6 +23,7 @@ describe(commands.COMMANDSET_SET, () => {
   const validUrl = 'https://contoso.sharepoint.com';
   const validId = 'e7000aef-f756-4997-9420-01cc84f9ac9c';
   const validTitle = 'Commandset title';
+  const validDescription = 'Commandset description';
   const validClientSideComponentId = 'b206e130-1a5b-4ae7-86a7-4f91c9924d0a';
   const validNewTitle = 'I have no inspiration whatsoever';
   const validClientSideComponentProperties = '{"testMessage":"Test message"}';
@@ -35,7 +36,7 @@ describe(commands.COMMANDSET_SET, () => {
         "ClientSideComponentId": "b206e130-1a5b-4ae7-86a7-4f91c9924d0a",
         "ClientSideComponentProperties": "",
         "CommandUIExtension": null,
-        "Description": null,
+        "Description": validDescription,
         "Group": null,
         "HostProperties": "",
         "Id": "e7000aef-f756-4997-9420-01cc84f9ac9c",
@@ -169,6 +170,17 @@ describe(commands.COMMANDSET_SET, () => {
     const actual = await command.validate({
       options: {
         webUrl: validUrl, id: validId, newTitle: validNewTitle, listType: validListType, clientSideComponentProperties: validClientSideComponentProperties, scope: validScope, location: validLocation
+      }
+    }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('passes validation when description is empty', async () => {
+    const actual = await command.validate({
+      options: {
+        webUrl: validUrl,
+        id: validId,
+        description: ''
       }
     }, commandInfo);
     assert.strictEqual(actual, true);
@@ -372,9 +384,37 @@ describe(commands.COMMANDSET_SET, () => {
 
     await assert.doesNotReject(command.action(logger, {
       options: {
-        verbose: true, webUrl: validUrl, id: validId, newTitle: validNewTitle, listType: validListType, clientSideComponentProperties: validClientSideComponentProperties, location: validLocation
+        verbose: true, webUrl: validUrl, id: validId, newTitle: validNewTitle, description: validDescription, listType: validListType, clientSideComponentProperties: validClientSideComponentProperties, location: validLocation
       }
     }));
+  });
+
+  it('updates a commandset with an empty description', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/_api/Web/UserCustomActions(guid'${validId}')`) {
+        return commandsetSingleResponse.value[0];
+      }
+
+      throw 'Invalid request: ' + opts.url;
+    });
+
+    const postStub = sinon.stub(request, 'post').callsFake(async opts => {
+      if (opts.url === `https://contoso.sharepoint.com/_api/Web/UserCustomActions('${validId}')`) {
+        return;
+      }
+
+      throw `Invalid request: ` + opts.url;
+    });
+
+    await assert.doesNotReject(command.action(logger, {
+      options: {
+        webUrl: validUrl,
+        id: validId,
+        description: ''
+      }
+    }));
+    assert(postStub.calledOnce);
+    assert.deepStrictEqual(postStub.firstCall.args[0].data, { Description: '' });
   });
 
   it('updates the Client Side Component Id', async () => {

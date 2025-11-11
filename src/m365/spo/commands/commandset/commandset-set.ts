@@ -19,7 +19,8 @@ interface Options extends GlobalOptions {
   id?: string;
   clientSideComponentId?: string;
   newClientSideComponentId?: string;
-  newTitle: string;
+  newTitle?: string;
+  description?: string;
   listType?: string;
   clientSideComponentProperties?: string;
   scope?: string;
@@ -55,6 +56,8 @@ class SpoCommandSetSetCommand extends SpoCommand {
         id: typeof args.options.id !== 'undefined',
         clientSideComponentId: typeof args.options.clientSideComponentId !== 'undefined',
         newClientSideComponentId: typeof args.options.newClientSideComponentId !== 'undefined',
+        newTitle: typeof args.options.newTitle !== 'undefined',
+        description: typeof args.options.description !== 'undefined',
         listType: typeof args.options.listType !== 'undefined',
         clientSideComponentProperties: typeof args.options.clientSideComponentProperties !== 'undefined',
         scope: typeof args.options.scope !== 'undefined',
@@ -82,6 +85,9 @@ class SpoCommandSetSetCommand extends SpoCommand {
       },
       {
         option: '--newTitle [newTitle]'
+      },
+      {
+        option: '--description [description]'
       },
       {
         option: '-l, --listType [listType]', autocomplete: SpoCommandSetSetCommand.listTypes
@@ -125,7 +131,7 @@ class SpoCommandSetSetCommand extends SpoCommand {
           return `${args.options.location} is not a valid location. Allowed values are ${SpoCommandSetSetCommand.locations.join(', ')}`;
         }
 
-        if (!args.options.newTitle && !args.options.listType && !args.options.clientSideComponentProperties && !args.options.location && !args.options.newClientSideComponentId) {
+        if (!args.options.newTitle && args.options.description === undefined && !args.options.listType && !args.options.clientSideComponentProperties && !args.options.location && !args.options.newClientSideComponentId) {
           return `Please specify option to be updated`;
         }
 
@@ -156,6 +162,10 @@ class SpoCommandSetSetCommand extends SpoCommand {
 
       if (args.options.newTitle) {
         requestBody.Title = args.options.newTitle;
+      }
+
+      if (args.options.description !== undefined) {
+        requestBody.Description = args.options.description;
       }
 
       if (args.options.location) {
