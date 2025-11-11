@@ -1,0 +1,139 @@
+---
+tags:
+  - reports
+  - alerts
+  - retirement
+  - tenant
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# List SharePoint alerts usage across the tenant
+
+Author: [Saurabh Tripathi](https://github.com/saurabh7019)
+
+SharePoint Online list alerts are being gradually retired. This script scans all sites across the tenant and generates a comprehensive CSV report of existing alerts. This information helps administrators identify and plan the migration of critical alerts to modern alternatives.
+
+**Prerequisites:**
+This script assumes you have permissions to all sites in the tenant. We recommend running this script with application-only permissions using Sites.FullControl.All permissions.
+
+<Tabs>
+  <TabItem value="PowerShell">
+
+  ```powershell
+  $fileExportPath = "Alerts.csv"
+
+  function Convert-AlertsToResults {
+    param(
+      [array]$Alerts,
+      [string]$SiteTitle,
+      [string]$SiteUrl
+    )
+
+    $alertResults = @()
+
+    foreach ($alert in $Alerts) {
+      $targetPath = $alert.List.RootFolder.ServerRelativeUrl
+
+      $filterPath = ($alert.Properties | Where-Object { $_.Key -eq "filterpath" }).Value
+      if ($filterPath) {
+        $targetPath = $filterPath
+      }
+      elseif ($alert.Item) {
+        $targetPath = $alert.Item.FileRef
+      }
+
+      $frequency = switch ($alert.AlertFrequency) {
+        0 { "Immediate" }
+        1 { "Daily" }
+        2 { "Weekly" }
+        default { "Unknown" }
+      }
+
+      $alertResults += [PSCustomObject][ordered]@{
+        SiteTitle  = $SiteTitle
+        SiteUrl    = $SiteUrl
+        AlertTitle = $alert.Title
+        AlertId    = $alert.ID
+        TargetPath = $targetPath
+        Frequency  = $frequency
+        AlertType  = $alert.AlertTemplateName
+        UserName   = $alert.User.Title
+        UserEmail  = $alert.User.Email
+      }
+    }
+
+    return $alertResults
+  }
+
+  function Get-DeprecatedAlertsRecursively {
+    param(
+      [string]$SiteUrl,
+      [string]$SiteTitle
+    )
+
+    $results = @()
+
+    try {
+      # Get deprecated alerts from specific site
+      $alerts = m365 spo web alert list --webUrl $SiteUrl --output json --query "[?!(Properties[].Key && contains(Properties[].Key, 'ruletitle'))]" | ConvertFrom-Json
+
+      if ($alerts.Count -gt 0) {
+        Write-Host "`tFound $($alerts.Count) alert(s)" -ForegroundColor Yellow
+        $results += Convert-AlertsToResults -Alerts $alerts -SiteTitle $SiteTitle -SiteUrl $SiteUrl
+      }
+      else {
+        Write-Host "`tNo alerts found" -ForegroundColor Green
+      }
+
+      $webs = m365 spo web list --url $SiteUrl --output json | ConvertFrom-Json
+      foreach ($web in $webs) {
+        Write-Host "`tScanning subsite '$($web.Url)'..." -ForegroundColor Gray
+        $results += Get-DeprecatedAlertsRecursively -SiteUrl $web.Url -SiteTitle $web.Title
+      }
+    }
+    catch {
+      Write-Host "`tError: $($_.Exception.Message)" -ForegroundColor Red
+    }
+
+    return $results
+  }
+
+  try {
+    m365 login --ensure
+
+    $results = @()
+    Write-Host "Retrieving all sites..."
+    $sites = m365 spo site list --output json --query "[?ArchiveStatus == 'NotArchived']" | ConvertFrom-Json
+    $count = $sites.Count
+    $iCnt = 0
+
+    Write-Host "Processing $count sites..."
+
+    foreach ($site in $sites) {
+      $iCnt++
+      Write-Host "($iCnt/$count) Scanning '$($site.Url)'..."
+      $results += Get-DeprecatedAlertsRecursively -SiteUrl $site.Url -SiteTitle $site.Title
+    }
+
+    if ($results.Count -gt 0) {
+      $location = Get-Location
+      Write-Host ("`nExporting {0} alerts to '{1}\{2}'..." -f $results.Count, $location.Path, $fileExportPath)
+      $results | Export-Csv -Path $fileExportPath -NoTypeInformation -Encoding UTF8
+      Write-Host "Report saved successfully!"
+    }
+    else {
+      Write-Host "`nNo legacy alerts found across the tenant."
+    }
+  }
+  catch {
+    Write-Host "Error: $($_.Exception.Message)" -ForegroundColor Red
+  }
+
+  Write-Host "`nCompleted." -ForegroundColor Green
+  ```
+
+  </TabItem>
+</Tabs>
+

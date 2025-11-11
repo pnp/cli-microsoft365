@@ -1,0 +1,57 @@
+[
+  {
+    "name": "pnp-list-tenant-alert-usage",
+    "source": "pnp",
+    "title": "List SharePoint alerts usage across the tenant",
+    "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/spo/list-tenant-alert-usage",
+    "creationDateTime": "2025-10-13",
+    "updateDateTime": "2025-10-13",
+    "shortDescription": "Generate a tenant-wide report of legacy SharePoint Online list alerts before their retirement.",
+    "longDescription": [
+      "SharePoint Online list alerts are being gradually retired. This script scans all sites across the tenant and generates a comprehensive CSV report of existing alerts. This information helps administrators identify and plan the migration of critical alerts to modern alternatives."
+    ],
+    "products": [
+      "SharePoint"
+    ],
+    "categories": [],
+    "tags": [
+      "reports",
+      "alerts",
+      "retirement",
+      "tenant"
+    ],
+    "metadata": [
+      {
+        "key": "CLI-FOR-MICROSOFT365",
+        "value": "11.1.0"
+      }
+    ],
+    "thumbnails": [
+      {
+        "type": "image",
+        "order": 100,
+        "url": "https://raw.githubusercontent.com/pnp/cli-microsoft365/main/docs/docs/sample-scripts/spo/list-tenant-alert-usage/assets/preview.png",
+        "alt": "preview image for the sample"
+      }
+    ],
+    "authors": [
+      {
+        "gitHubAccount": "saurabh7019",
+        "pictureUrl": "https://avatars.githubusercontent.com/u/18114579?v=4",
+        "name": "Saurabh Tripathi"
+      }
+    ],
+    "references": [
+      {
+        "name": "Want to learn more about CLI for Microsoft 365 and the commands",
+        "description": "Check out the CLI for Microsoft 365 site to get started and for the reference to the commands.",
+        "url": "https://aka.ms/cli-m365"
+      },
+      {
+        "name": "SharePoint Alerts retirement announcement",
+        "description": "Official Microsoft announcement about the retirement of SharePoint alerts.",
+        "url": "https://support.microsoft.com/en-us/office/sharepoint-alerts-retirement-813a90c7-3ff1-47a9-8a2f-152f48b2486f"
+      }
+    ]
+  }
+]
