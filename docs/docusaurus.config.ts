@@ -12,7 +12,6 @@ const config: Config = {
   url: 'https://pnp.github.io',
   baseUrl: '/cli-microsoft365/',
   onBrokenLinks: 'throw',
-  onBrokenMarkdownLinks: 'throw',
   onDuplicateRoutes: 'throw',
   onBrokenAnchors: 'throw',
   favicon: 'img/favicon.ico',
@@ -27,6 +26,10 @@ const config: Config = {
   markdown: {
     format: 'mdx',
     mermaid: true,
+    hooks: {
+      onBrokenMarkdownLinks: 'throw',
+      onBrokenMarkdownImages: 'throw'
+    },
     mdx1Compat: {
       comments: false,
       admonitions: false,
