@@ -5,11 +5,10 @@ import commands from '../../commands.js';
 import { z } from 'zod';
 import { globalOptionsZod } from '../../../../Command.js';
 
-const options = globalOptionsZod
-  .extend({
-    asAdmin: z.boolean().optional()
-  })
-  .strict();
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  asAdmin: z.boolean().optional()
+});
 
 declare type Options = z.infer<typeof options>;
 
@@ -26,7 +25,7 @@ class PpEnvironmentListCommand extends PowerPlatformCommand {
     return 'Lists Microsoft Power Platform environments';
   }
 
-  public get schema(): z.ZodTypeAny | undefined {
+  public get schema(): z.ZodType | undefined {
     return options;
   }
 

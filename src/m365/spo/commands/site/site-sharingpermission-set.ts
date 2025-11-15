@@ -1,22 +1,19 @@
 import SpoCommand from '../../../base/SpoCommand.js';
 import { globalOptionsZod } from '../../../../Command.js';
 import { z } from 'zod';
-import { zod } from '../../../../utils/zod.js';
 import { Logger } from '../../../../cli/Logger.js';
 import commands from '../../commands.js';
 import { validation } from '../../../../utils/validation.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 
-const options = globalOptionsZod
-  .extend({
-    siteUrl: zod.alias('u', z.string()
-      .refine(url => validation.isValidSharePointUrl(url) === true, url => ({
-        message: `'${url}' is not a valid SharePoint Online site URL.`
-      }))
-    ),
-    capability: z.enum(['full', 'limited', 'ownersOnly'])
-  })
-  .strict();
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  siteUrl: z.string()
+    .refine(url => validation.isValidSharePointUrl(url) === true, {
+      error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
+    }).alias('u'),
+  capability: z.enum(['full', 'limited', 'ownersOnly'])
+});
 declare type Options = z.infer<typeof options>;
 
 interface CommandArgs {
@@ -32,7 +29,7 @@ class SpoSiteSharingPermissionSetCommand extends SpoCommand {
     return 'Controls how a site and its components can be shared';
   }
 
-  public get schema(): z.ZodTypeAny {
+  public get schema(): z.ZodType {
     return options;
   }
 

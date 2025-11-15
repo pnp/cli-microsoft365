@@ -1,20 +1,19 @@
 import assert from 'assert';
 import sinon from 'sinon';
-import { z } from 'zod';
 import auth from '../../../../Auth.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
-import commands from '../../commands.js';
+import { CommandError } from '../../../../Command.js';
+import request from '../../../../request.js';
 import { telemetry } from '../../../../telemetry.js';
+import { directoryExtension } from '../../../../utils/directoryExtension.js';
+import { entraApp } from '../../../../utils/entraApp.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
-import { cli } from '../../../../cli/cli.js';
-import command from './directoryextension-remove.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
-import request from '../../../../request.js';
-import { entraApp } from '../../../../utils/entraApp.js';
-import { CommandError } from '../../../../Command.js';
-import { directoryExtension } from '../../../../utils/directoryExtension.js';
+import commands from '../../commands.js';
+import command, { options } from './directoryextension-remove.js';
 
 describe(commands.DIRECTORYEXTENSION_REMOVE, () => {
   const appId = '7f5df2f4-9ed6-4df7-86d7-eefbfc4ab091';
@@ -27,7 +26,7 @@ describe(commands.DIRECTORYEXTENSION_REMOVE, () => {
   let logger: Logger;
   let promptIssued: boolean;
   let commandInfo: CommandInfo;
-  let commandOptionsSchema: z.ZodTypeAny;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -36,7 +35,7 @@ describe(commands.DIRECTORYEXTENSION_REMOVE, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
-    commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -161,7 +160,7 @@ describe(commands.DIRECTORYEXTENSION_REMOVE, () => {
       appId: appId,
       name: extensionName
     });
-    await command.action(logger, { options: parsedSchema.data });
+    await command.action(logger, { options: parsedSchema.data! });
 
     assert(promptIssued);
   });
@@ -173,7 +172,7 @@ describe(commands.DIRECTORYEXTENSION_REMOVE, () => {
       appId: appId,
       name: extensionName
     });
-    await command.action(logger, { options: parsedSchema.data });
+    await command.action(logger, { options: parsedSchema.data! });
     assert(deleteSpy.notCalled);
   });
 
@@ -193,7 +192,7 @@ describe(commands.DIRECTORYEXTENSION_REMOVE, () => {
       verbose: true
     });
 
-    await command.action(logger, { options: parsedSchema.data });
+    await command.action(logger, { options: parsedSchema.data! });
     assert(deleteRequestStub.called);
   });
 
@@ -216,7 +215,7 @@ describe(commands.DIRECTORYEXTENSION_REMOVE, () => {
       verbose: true
     });
 
-    await command.action(logger, { options: parsedSchema.data });
+    await command.action(logger, { options: parsedSchema.data! });
     assert(deleteRequestStub.called);
   });
 
@@ -241,7 +240,7 @@ describe(commands.DIRECTORYEXTENSION_REMOVE, () => {
       verbose: true
     });
 
-    await command.action(logger, { options: parsedSchema.data });
+    await command.action(logger, { options: parsedSchema.data! });
     assert(deleteRequestStub.called);
   });
 
@@ -269,7 +268,7 @@ describe(commands.DIRECTORYEXTENSION_REMOVE, () => {
     });
 
     await assert.rejects(
-      command.action(logger, { options: parsedSchema.data }),
+      command.action(logger, { options: parsedSchema.data! }),
       new CommandError(`Resource '${appObjectId}' does not exist or one of its queried reference-property objects are not present.`)
     );
   });
@@ -299,7 +298,7 @@ describe(commands.DIRECTORYEXTENSION_REMOVE, () => {
     });
 
     await assert.rejects(
-      command.action(logger, { options: parsedSchema.data }),
+      command.action(logger, { options: parsedSchema.data! }),
       new CommandError(`Resource '${extensionId}' does not exist or one of its queried reference-property objects are not present.`)
     );
   });

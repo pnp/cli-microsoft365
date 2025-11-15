@@ -1,29 +1,28 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from "../../../../cli/CommandInfo.js";
 import { Logger } from '../../../../cli/Logger.js';
+import { CommandError } from '../../../../Command.js';
 import request from '../../../../request.js';
 import { telemetry } from '../../../../telemetry.js';
+import { accessToken } from '../../../../utils/accessToken.js';
+import { formatting } from '../../../../utils/formatting.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
-import { cli } from '../../../../cli/cli.js';
 import commands from '../../commands.js';
-import command from './containertype-get.js';
-import { CommandError } from '../../../../Command.js';
-import { z } from 'zod';
-import { formatting } from '../../../../utils/formatting.js';
-import { accessToken } from '../../../../utils/accessToken.js';
+import command, { options } from './containertype-get.js';
 
 describe(commands.CONTAINERTYPE_GET, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
-  let commandOptionsSchema: z.ZodTypeAny;
+  let commandOptionsSchema: typeof options;
 
-  const containerTypeId = '3ec7c59d-ef31-0752-1ab5-5c343a5e8557';
+  const containerTypeId = '11335700-9a00-4c00-84dd-0c210f203f01';
   const containerTypeName = 'SharePoint Embedded Free Trial Container Type';
   const containerTypeResponse = {
     "id": containerTypeId,
@@ -54,7 +53,7 @@ describe(commands.CONTAINERTYPE_GET, () => {
     auth.connection.active = true;
     auth.connection.spoUrl = 'https://contoso.sharepoint.com';
     commandInfo = cli.getCommandInfo(command);
-    commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
     sinon.stub(accessToken, 'assertAccessTokenType').withArgs('delegated').returns();
   });
 

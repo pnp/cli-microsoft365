@@ -6,10 +6,10 @@ import Command, { CommandError, globalOptionsZod } from '../../Command.js';
 import { formatting } from '../../utils/formatting.js';
 import { M365RcJson, M365RcJsonApp } from './M365RcJson.js';
 
-export const appCommandOptions = globalOptionsZod
-  .extend({
-    appId: z.string().uuid().optional()
-  });
+export const appCommandOptions = z.object({
+  ...globalOptionsZod.shape,
+  appId: z.uuid().optional()
+});
 type Options = z.infer<typeof appCommandOptions>;
 
 export interface AppCommandArgs {
@@ -24,7 +24,7 @@ export default abstract class AppCommand extends Command {
     return 'https://graph.microsoft.com';
   }
 
-  public get schema(): z.ZodTypeAny | undefined {
+  public get schema(): z.ZodType | undefined {
     return appCommandOptions;
   }
 

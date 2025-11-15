@@ -1,27 +1,22 @@
-import commands from '../../commands.js';
-import { Logger } from '../../../../cli/Logger.js';
-import SpoCommand from '../../../base/SpoCommand.js';
-import { globalOptionsZod } from '../../../../Command.js';
 import { z } from 'zod';
-import { zod } from '../../../../utils/zod.js';
-import { validation } from '../../../../utils/validation.js';
-import { formatting } from '../../../../utils/formatting.js';
-import request, { CliRequestOptions } from '../../../../request.js';
 import { cli } from '../../../../cli/cli.js';
+import { Logger } from '../../../../cli/Logger.js';
+import { globalOptionsZod } from '../../../../Command.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
 
-const options = globalOptionsZod
-  .extend({
-    webUrl: zod.alias('u', z.string()
-      .refine(url => validation.isValidSharePointUrl(url) === true, url => ({
-        message: `'${url}' is not a valid SharePoint URL.`
-      }))),
-    id: z.string()
-      .refine(id => validation.isValidGuid(id), id => ({
-        message: `'${id}' is not a valid GUID.`
-      })),
-    force: zod.alias('f', z.boolean().optional())
-  })
-  .strict();
+const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  webUrl: z.string().alias('u')
+    .refine(url => validation.isValidSharePointUrl(url) === true, {
+      error: e => `'${e.input}' is not a valid SharePoint URL.`
+    }),
+  id: z.uuid(),
+  force: z.boolean().optional().alias('f')
+});
 
 declare type Options = z.infer<typeof options>;
 

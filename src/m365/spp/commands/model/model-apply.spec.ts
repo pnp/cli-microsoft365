@@ -4,23 +4,22 @@ import auth from '../../../../Auth.js';
 import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
+import { CommandError } from '../../../../Command.js';
 import request from '../../../../request.js';
 import { telemetry } from '../../../../telemetry.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
-import commands from '../../commands.js';
-import command from './model-apply.js';
 import { spp } from '../../../../utils/spp.js';
-import { CommandError } from '../../../../Command.js';
-import { z } from 'zod';
+import commands from '../../commands.js';
+import command, { options } from './model-apply.js';
 
 describe(commands.MODEL_APPLY, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
-  let commandOptionsSchema: z.ZodTypeAny;
+  let commandOptionsSchema: typeof options;
 
   const publicationsResult = {
     Details: [
@@ -51,7 +50,7 @@ describe(commands.MODEL_APPLY, () => {
     sinon.stub(spp, 'assertSiteIsContentCenter').resolves();
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
-    commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {

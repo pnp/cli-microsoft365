@@ -1,18 +1,16 @@
 import PowerAutomateCommand from '../../../base/PowerAutomateCommand.js';
 import { globalOptionsZod } from '../../../../Command.js';
 import { z } from 'zod';
-import { zod } from '../../../../utils/zod.js';
 import { Logger } from '../../../../cli/Logger.js';
 import commands from '../../commands.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { odata } from '../../../../utils/odata.js';
 import { cli } from '../../../../cli/cli.js';
 
-const options = globalOptionsZod
-  .extend({
-    environmentName: zod.alias('e', z.string())
-  })
-  .strict();
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  environmentName: z.string().alias('e')
+});
 declare type Options = z.infer<typeof options>;
 
 interface CommandArgs {
@@ -32,7 +30,7 @@ class FlowRecycleBinItemListCommand extends PowerAutomateCommand {
     return ['name', 'displayName'];
   }
 
-  public get schema(): z.ZodTypeAny {
+  public get schema(): z.ZodType {
     return options;
   }
 

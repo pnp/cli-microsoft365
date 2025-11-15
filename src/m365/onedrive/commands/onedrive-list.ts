@@ -9,7 +9,7 @@ import { SiteProperties } from "../../spo/commands/site/SiteProperties.js";
 import { SPOSitePropertiesEnumerable } from "../../spo/commands/site/SPOSitePropertiesEnumerable.js";
 import commands from "../commands.js";
 
-const options = globalOptionsZod.strict();
+export const options = z.strictObject({ ...globalOptionsZod.shape });
 
 class OneDriveListCommand extends SpoCommand {
   private allSites?: SiteProperties[];
@@ -22,7 +22,7 @@ class OneDriveListCommand extends SpoCommand {
     return "Retrieves a list of OneDrive sites";
   }
 
-  public get schema(): z.ZodTypeAny | undefined {
+  public get schema(): z.ZodType | undefined {
     return options;
   }
 

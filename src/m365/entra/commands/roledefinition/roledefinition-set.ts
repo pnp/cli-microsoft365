@@ -1,6 +1,5 @@
 import { z } from 'zod';
 import { globalOptionsZod } from '../../../../Command.js';
-import { zod } from '../../../../utils/zod.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 import { Logger } from '../../../../cli/Logger.js';
@@ -9,17 +8,16 @@ import { roleDefinition } from '../../../../utils/roleDefinition.js';
 import { validation } from '../../../../utils/validation.js';
 import { UnifiedRoleDefinition } from '@microsoft/microsoft-graph-types';
 
-const options = globalOptionsZod
-  .extend({
-    id: zod.alias('i', z.string().optional()),
-    displayName: zod.alias('n', z.string().optional()),
-    newDisplayName: z.string().optional(),
-    allowedResourceActions: zod.alias('a', z.string().optional()),
-    description: zod.alias('d', z.string().optional()),
-    enabled: zod.alias('e', z.boolean().optional()),
-    version: zod.alias('v', z.string().optional())
-  })
-  .strict();
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  id: z.uuid().optional().alias('i'),
+  displayName: z.string().optional().alias('n'),
+  newDisplayName: z.string().optional(),
+  allowedResourceActions: z.string().optional().alias('a'),
+  description: z.string().optional().alias('d'),
+  enabled: z.boolean().optional().alias('e'),
+  version: z.string().optional().alias('v')
+});
 
 declare type Options = z.infer<typeof options>;
 
@@ -36,24 +34,24 @@ class EntraRoleDefinitionSetCommand extends GraphCommand {
     return 'Updates a custom Microsoft Entra ID role definition';
   }
 
-  public get schema(): z.ZodTypeAny | undefined {
+  public get schema(): z.ZodType | undefined {
     return options;
   }
 
-  public getRefinedSchema(schema: typeof options): z.ZodEffects<any> | undefined {
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
       .refine(options => !options.id !== !options.displayName, {
-        message: 'Specify either id or displayName, but not both'
+        error: 'Specify either id or displayName, but not both'
       })
       .refine(options => options.id || options.displayName, {
-        message: 'Specify either id or displayName'
+        error: 'Specify either id or displayName'
       })
-      .refine(options => (!options.id && !options.displayName) || options.displayName || (options.id && validation.isValidGuid(options.id)), options => ({
-        message: `The '${options.id}' must be a valid GUID`,
+      .refine(options => (!options.id && !options.displayName) || options.displayName || (options.id && validation.isValidGuid(options.id)), {
+        error: e => `The '${e.input}' must be a valid GUID`,
         path: ['id']
-      }))
+      })
       .refine(options => Object.values([options.newDisplayName, options.description, options.allowedResourceActions, options.enabled, options.version]).filter(v => typeof v !== 'undefined').length > 0, {
-        message: 'Provide value for at least one of the following parameters: newDisplayName, description, allowedResourceActions, enabled or version'
+        error: 'Provide value for at least one of the following parameters: newDisplayName, description, allowedResourceActions, enabled or version'
       });
   }
 

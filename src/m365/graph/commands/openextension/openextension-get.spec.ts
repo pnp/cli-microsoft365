@@ -1,18 +1,17 @@
 import assert from 'assert';
 import sinon from 'sinon';
-import { z } from 'zod';
 import auth from '../../../../Auth.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
-import commands from '../../commands.js';
+import { CommandError } from '../../../../Command.js';
+import request from '../../../../request.js';
 import { telemetry } from '../../../../telemetry.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
-import { cli } from '../../../../cli/cli.js';
-import command from './openextension-get.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
-import request from '../../../../request.js';
-import { CommandError } from '../../../../Command.js';
+import commands from '../../commands.js';
+import command, { options } from './openextension-get.js';
 
 describe(commands.OPENEXTENSION_GET, () => {
   const resourceId = 'f4099688-dd3f-4a55-a9f5-ddd7417c227a';
@@ -33,7 +32,7 @@ describe(commands.OPENEXTENSION_GET, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
-  let commandOptionsSchema: z.ZodTypeAny;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -42,7 +41,7 @@ describe(commands.OPENEXTENSION_GET, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
-    commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -203,7 +202,7 @@ describe(commands.OPENEXTENSION_GET, () => {
       verbose: true
     });
 
-    await command.action(logger, { options: parsedSchema.data });
+    await command.action(logger, { options: parsedSchema.data! });
     assert(loggerLogSpy.calledOnceWithExactly(response));
   });
 
@@ -223,7 +222,7 @@ describe(commands.OPENEXTENSION_GET, () => {
       verbose: true
     });
 
-    await command.action(logger, { options: parsedSchema.data });
+    await command.action(logger, { options: parsedSchema.data! });
     assert(loggerLogSpy.calledOnceWithExactly(response));
   });
 
@@ -243,7 +242,7 @@ describe(commands.OPENEXTENSION_GET, () => {
       verbose: true
     });
 
-    await command.action(logger, { options: parsedSchema.data });
+    await command.action(logger, { options: parsedSchema.data! });
     assert(loggerLogSpy.calledOnceWithExactly(response));
   });
 
@@ -263,7 +262,7 @@ describe(commands.OPENEXTENSION_GET, () => {
       verbose: true
     });
 
-    await command.action(logger, { options: parsedSchema.data });
+    await command.action(logger, { options: parsedSchema.data! });
     assert(loggerLogSpy.calledOnceWithExactly(response));
   });
 
@@ -289,6 +288,6 @@ describe(commands.OPENEXTENSION_GET, () => {
       verbose: true
     });
 
-    await assert.rejects(command.action(logger, { options: parsedSchema.data }), new CommandError('Extension with given id not found.'));
+    await assert.rejects(command.action(logger, { options: parsedSchema.data! }), new CommandError('Extension with given id not found.'));
   });
 });

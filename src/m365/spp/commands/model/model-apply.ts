@@ -9,34 +9,26 @@ import { ListInstance } from '../../../spo/commands/list/ListInstance.js';
 import commands from '../../commands.js';
 import { z } from 'zod';
 import { globalOptionsZod } from '../../../../Command.js';
-import { zod } from '../../../../utils/zod.js';
 
-const options = globalOptionsZod
-  .extend({
-    contentCenterUrl: zod.alias('c', z.string()
-      .refine(url => validation.isValidSharePointUrl(url) === true, url => ({
-        message: `'${url}' is not a valid SharePoint Online site URL.`
-      }))
-    ),
-    webUrl: zod.alias('u', z.string()
-      .refine(url => validation.isValidSharePointUrl(url) === true, url => ({
-        message: `'${url}' is not a valid SharePoint Online site URL.`
-      }))
-    ),
-    id: zod.alias('i', z.string()
-      .refine(id => validation.isValidGuid(id) === true, id => ({
-        message: `${id} is not a valid GUID.`
-      })).optional()),
-    title: zod.alias('t', z.string()).optional(),
-    listTitle: z.string().optional(),
-    listId: z.string()
-      .refine(listId => validation.isValidGuid(listId) === true, listId => ({
-        message: `${listId} is not a valid GUID.`
-      })).optional(),
-    listUrl: z.string().optional(),
-    viewOption: z.enum(['NewViewAsDefault', 'DoNotChangeDefault', 'TileViewAsDefault']).optional()
-  })
-  .strict();
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  contentCenterUrl: z.string()
+    .refine(url => validation.isValidSharePointUrl(url) === true, {
+      error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
+    })
+    .alias('c'),
+  webUrl: z.string()
+    .refine(url => validation.isValidSharePointUrl(url) === true, {
+      error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
+    })
+    .alias('u'),
+  id: z.uuid().optional().alias('i'),
+  title: z.string().optional().alias('t'),
+  listTitle: z.string().optional(),
+  listId: z.uuid().optional(),
+  listUrl: z.string().optional(),
+  viewOption: z.enum(['NewViewAsDefault', 'DoNotChangeDefault', 'TileViewAsDefault']).optional()
+});
 
 declare type Options = z.infer<typeof options>;
 
@@ -53,17 +45,17 @@ class SppModelApplyCommand extends SpoCommand {
     return 'Applies (or syncs) a trained document understanding model to a document library';
   }
 
-  public get schema(): z.ZodTypeAny | undefined {
+  public get schema(): z.ZodType | undefined {
     return options;
   }
 
-  public getRefinedSchema(schema: typeof options): z.ZodEffects<any> | undefined {
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
       .refine(options => [options.id, options.title].filter(x => x !== undefined).length === 1, {
-        message: `Specify exactly one of the following options: 'id' or 'title'.`
+        error: `Specify exactly one of the following options: 'id' or 'title'.`
       })
       .refine(options => [options.listTitle, options.listId, options.listUrl].filter(x => x !== undefined).length === 1, {
-        message: `Specify exactly one of the following options: 'listTitle', 'listId' or 'listUrl'.`
+        error: `Specify exactly one of the following options: 'listTitle', 'listId' or 'listUrl'.`
       });
   }
 

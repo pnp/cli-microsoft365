@@ -1,7 +1,6 @@
 import SpoCommand from '../../../base/SpoCommand.js';
 import { globalOptionsZod } from '../../../../Command.js';
 import { z } from 'zod';
-import { zod } from '../../../../utils/zod.js';
 import { Logger } from '../../../../cli/Logger.js';
 import commands from '../../commands.js';
 import { DOMParser } from '@xmldom/xmldom';
@@ -16,23 +15,18 @@ interface DefaultColumnValue {
   folderUrl: string
 }
 
-const options = globalOptionsZod
-  .extend({
-    webUrl: zod.alias('u', z.string()
-      .refine(url => validation.isValidSharePointUrl(url) === true, url => ({
-        message: `'${url}' is not a valid SharePoint Online site URL.`
-      }))
-    ),
-    listId: zod.alias('i', z.string().optional()
-      .refine(id => id === undefined || validation.isValidGuid(id), id => ({
-        message: `'${id}' is not a valid GUID.`
-      }))
-    ),
-    listTitle: zod.alias('t', z.string().optional()),
-    listUrl: z.string().optional(),
-    folderUrl: z.string().optional()
-  })
-  .strict();
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  webUrl: z.string()
+    .refine(url => validation.isValidSharePointUrl(url) === true, {
+      error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
+    })
+    .alias('u'),
+  listId: z.uuid().optional().alias('i'),
+  listTitle: z.string().optional().alias('t'),
+  listUrl: z.string().optional(),
+  folderUrl: z.string().optional()
+});
 declare type Options = z.infer<typeof options>;
 
 interface CommandArgs {
@@ -48,14 +42,14 @@ class SpoListDefaultValueListCommand extends SpoCommand {
     return 'Retrieves default column values for a specific document library';
   }
 
-  public get schema(): z.ZodTypeAny {
+  public get schema(): z.ZodType {
     return options;
   }
 
-  public getRefinedSchema(schema: z.ZodTypeAny): z.ZodEffects<any> | undefined {
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
       .refine(options => [options.listId, options.listTitle, options.listUrl].filter(o => o !== undefined).length === 1, {
-        message: 'Use one of the following options: listId, listTitle, listUrl.'
+        error: 'Use one of the following options: listId, listTitle, listUrl.'
       });
   }
 

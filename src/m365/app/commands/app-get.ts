@@ -13,7 +13,7 @@ class AppGetCommand extends AppCommand {
     return 'Retrieves information about the current Microsoft Entra app';
   }
 
-  public get schema(): z.ZodTypeAny | undefined {
+  public get schema(): z.ZodType | undefined {
     return appCommandOptions;
   }
 

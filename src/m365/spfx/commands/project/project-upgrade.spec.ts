@@ -2,7 +2,6 @@ import assert from 'assert';
 import fs from 'fs';
 import path from 'path';
 import sinon from 'sinon';
-import { z } from 'zod';
 import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
@@ -15,14 +14,14 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import { Manifest, Project, VsCode } from './project-model/index.js';
-import command from './project-upgrade.js';
+import command, { options } from './project-upgrade.js';
 import { Finding, FindingToReport } from './report-model/index.js';
 
 describe(commands.PROJECT_UPGRADE, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
-  let commandOptionsSchema: z.ZodTypeAny;
+  let commandOptionsSchema: typeof options;
   let trackEvent: any;
   let telemetryCommandName: any;
   let packagesDevExact: string[];
@@ -41,7 +40,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     sinon.stub(session, 'getId').returns('');
     project141webPartNoLib = (command as any).getProject(projectPath);
     commandInfo = cli.getCommandInfo(command);
-    commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {

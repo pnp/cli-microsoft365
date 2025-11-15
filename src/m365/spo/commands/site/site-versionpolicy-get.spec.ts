@@ -10,16 +10,15 @@ import { telemetry } from '../../../../telemetry.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
-import { z } from 'zod';
 import commands from '../../commands.js';
-import command from './site-versionpolicy-get.js';
+import command, { options } from './site-versionpolicy-get.js';
 
 describe(commands.SITE_VERSIONPOLICY_GET, () => {
   let log: any[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
-  let commandOptionsSchema: z.ZodTypeAny;
+  let commandOptionsSchema: typeof options;
   const validSiteUrl = "https://contoso.sharepoint.com";
 
   before(() => {
@@ -28,7 +27,7 @@ describe(commands.SITE_VERSIONPOLICY_GET, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     commandInfo = cli.getCommandInfo(command);
-    commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
     auth.connection.active = true;
   });
 

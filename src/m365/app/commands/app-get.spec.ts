@@ -1,7 +1,6 @@
 import assert from 'assert';
 import fs from 'fs';
 import sinon from 'sinon';
-import { z } from 'zod';
 import auth from '../../../Auth.js';
 import { cli } from '../../../cli/cli.js';
 import { CommandInfo } from '../../../cli/CommandInfo.js';
@@ -13,6 +12,7 @@ import { entraApp } from '../../../utils/entraApp.js';
 import { pid } from '../../../utils/pid.js';
 import { session } from '../../../utils/session.js';
 import { sinonUtil } from '../../../utils/sinonUtil.js';
+import { appCommandOptions } from '../../base/AppCommand.js';
 import commands from '../commands.js';
 import command from './app-get.js';
 
@@ -21,7 +21,7 @@ describe(commands.GET, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
-  let commandOptionsSchema: z.ZodTypeAny;
+  let commandOptionsSchema: typeof appCommandOptions;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -39,7 +39,7 @@ describe(commands.GET, () => {
     }));
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
-    commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof appCommandOptions;
   });
 
   beforeEach(() => {

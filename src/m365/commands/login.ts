@@ -10,25 +10,24 @@ import { settingsNames } from '../../settingsNames.js';
 import { zod } from '../../utils/zod.js';
 import commands from './commands.js';
 
-const options = globalOptionsZod
-  .extend({
-    authType: zod.alias('t', zod.coercedEnum(AuthType).optional()),
-    cloud: zod.coercedEnum(CloudType).optional().default(CloudType.Public),
-    userName: zod.alias('u', z.string().optional()),
-    password: zod.alias('p', z.string().optional()),
-    certificateFile: zod.alias('c', z.string().optional()
-      .refine(filePath => !filePath || fs.existsSync(filePath), filePath => ({
-        message: `Certificate file ${filePath} does not exist`
-      }))),
-    certificateBase64Encoded: z.string().optional(),
-    thumbprint: z.string().optional(),
-    appId: z.string().optional(),
-    tenant: z.string().optional(),
-    secret: zod.alias('s', z.string().optional()),
-    connectionName: z.string().optional(),
-    ensure: z.boolean().optional()
-  })
-  .strict();
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  authType: zod.coercedEnum(AuthType).optional().alias('t'),
+  cloud: zod.coercedEnum(CloudType).optional().default(CloudType.Public),
+  userName: z.string().optional().alias('u'),
+  password: z.string().optional().alias('p'),
+  certificateFile: z.string().optional().alias('c')
+    .refine(filePath => !filePath || fs.existsSync(filePath), {
+      error: e => `Certificate file ${e.input} does not exist`
+    }),
+  certificateBase64Encoded: z.string().optional(),
+  thumbprint: z.string().optional(),
+  appId: z.string().optional(),
+  tenant: z.string().optional(),
+  secret: z.string().optional().alias('s'),
+  connectionName: z.string().optional(),
+  ensure: z.boolean().optional()
+});
 declare type Options = z.infer<typeof options>;
 
 interface CommandArgs {
@@ -44,26 +43,26 @@ class LoginCommand extends Command {
     return 'Log in to Microsoft 365';
   }
 
-  public get schema(): z.ZodTypeAny | undefined {
+  public get schema(): z.ZodType | undefined {
     return options;
   }
 
-  public getRefinedSchema(schema: typeof options): z.ZodEffects<any> | undefined {
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
       .refine(options => typeof options.appId !== 'undefined' || cli.getClientId() || options.authType === 'identity' || options.authType === 'federatedIdentity', {
-        message: `appId is required. TIP: use the "m365 setup" command to configure the default appId.`,
+        error: `appId is required. TIP: use the "m365 setup" command to configure the default appId.`,
         path: ['appId']
       })
       .refine(options => options.authType !== 'password' || options.userName, {
-        message: 'Username is required when using password authentication.',
+        error: 'Username is required when using password authentication.',
         path: ['userName']
       })
       .refine(options => options.authType !== 'password' || options.password, {
-        message: 'Password is required when using password authentication.',
+        error: 'Password is required when using password authentication.',
         path: ['password']
       })
       .refine(options => options.authType !== 'certificate' || !(options.certificateFile && options.certificateBase64Encoded), {
-        message: 'Specify either certificateFile or certificateBase64Encoded, but not both.',
+        error: 'Specify either certificateFile or certificateBase64Encoded, but not both.',
         path: ['certificateBase64Encoded']
       })
       .refine(options => options.authType !== 'certificate' ||
@@ -71,13 +70,13 @@ class LoginCommand extends Command {
         options.certificateBase64Encoded ||
         cli.getConfig().get(settingsNames.clientCertificateFile) ||
         cli.getConfig().get(settingsNames.clientCertificateBase64Encoded), {
-        message: 'Specify either certificateFile or certificateBase64Encoded.',
+        error: 'Specify either certificateFile or certificateBase64Encoded.',
         path: ['certificateFile']
       })
       .refine(options => options.authType !== 'secret' ||
         options.secret ||
         cli.getConfig().get(settingsNames.clientSecret), {
-        message: 'Secret is required when using secret authentication.',
+        error: 'Secret is required when using secret authentication.',
         path: ['secret']
       });
   }

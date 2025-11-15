@@ -1,6 +1,5 @@
 import { z } from 'zod';
 import { globalOptionsZod } from '../../../../Command.js';
-import { zod } from '../../../../utils/zod.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import { Logger } from '../../../../cli/Logger.js';
 import commands from '../../commands.js';
@@ -8,11 +7,10 @@ import { CliRequestOptions } from '../../../../request.js';
 import { Organization } from '@microsoft/microsoft-graph-types';
 import { odata } from '../../../../utils/odata.js';
 
-const options = globalOptionsZod
-  .extend({
-    properties: zod.alias('p', z.string().optional())
-  })
-  .strict();
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  properties: z.string().optional().alias('p')
+});
 declare type Options = z.infer<typeof options>;
 
 interface CommandArgs {
@@ -32,7 +30,7 @@ class EntraOrganizationListCommand extends GraphCommand {
     return ['id', 'displayName', 'tenantType'];
   }
 
-  public get schema(): z.ZodTypeAny | undefined {
+  public get schema(): z.ZodType | undefined {
     return options;
   }
 

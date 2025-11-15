@@ -2,7 +2,6 @@ import assert from 'assert';
 import Configstore from 'configstore';
 import fs from 'fs';
 import sinon from 'sinon';
-import { z } from 'zod';
 import auth, { AuthType, CloudType } from '../../Auth.js';
 import { CommandArgs, CommandError } from '../../Command.js';
 import { CommandInfo } from '../../cli/CommandInfo.js';
@@ -14,13 +13,13 @@ import { pid } from '../../utils/pid.js';
 import { session } from '../../utils/session.js';
 import { sinonUtil } from '../../utils/sinonUtil.js';
 import commands from './commands.js';
-import command from './login.js';
+import command, { options } from './login.js';
 
 describe(commands.LOGIN, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
-  let commandOptionsSchema: z.ZodTypeAny;
+  let commandOptionsSchema: typeof options;
   let config: Configstore;
   let deactivateStub: sinon.SinonStub;
 
@@ -32,7 +31,7 @@ describe(commands.LOGIN, () => {
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     sinon.stub(session, 'getId').callsFake(() => '');
     commandInfo = cli.getCommandInfo(command);
-    commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
     auth.connection.accessTokens[auth.defaultResource] = {
       expiresOn: '123',
       accessToken: 'abc'

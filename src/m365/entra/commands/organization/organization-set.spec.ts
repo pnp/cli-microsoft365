@@ -1,18 +1,17 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
-import commands from '../../commands.js';
-import request from '../../../../request.js';
+import { CommandError } from '../../../../Command.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
+import { cli } from '../../../../cli/cli.js';
+import request from '../../../../request.js';
 import { telemetry } from '../../../../telemetry.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
-import command from './organization-set.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
-import { CommandError } from '../../../../Command.js';
-import { z } from 'zod';
-import { CommandInfo } from '../../../../cli/CommandInfo.js';
-import { cli } from '../../../../cli/cli.js';
+import commands from '../../commands.js';
+import command, { options } from './organization-set.js';
 
 describe(commands.ORGANIZATION_SET, () => {
   const organizationId = '84841066-274d-4ec0-a5c1-276be684bdd3';
@@ -21,7 +20,7 @@ describe(commands.ORGANIZATION_SET, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
-  let commandOptionsSchema: z.ZodTypeAny;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -30,7 +29,7 @@ describe(commands.ORGANIZATION_SET, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
-    commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -148,7 +147,7 @@ describe(commands.ORGANIZATION_SET, () => {
       statementUrl: 'https://contoso.com/privacyStatement',
       verbose: true
     });
-    await command.action(logger, { options: parsedSchema.data });
+    await command.action(logger, { options: parsedSchema.data! });
     assert(patchRequestStub.called);
   });
 
@@ -183,7 +182,7 @@ describe(commands.ORGANIZATION_SET, () => {
       contactEmail: 'contact@contoso.com',
       statementUrl: 'https://contoso.com/privacyStatement'
     });
-    await command.action(logger, { options: parsedSchema.data });
+    await command.action(logger, { options: parsedSchema.data! });
     assert(patchRequestStub.called);
   });
 
@@ -211,7 +210,7 @@ describe(commands.ORGANIZATION_SET, () => {
       statementUrl: 'https://contoso.com/privacyStatement'
     });
 
-    await assert.rejects(command.action(logger, { options: parsedSchema.data }), new CommandError(`The specified organization '${organizationName}' does not exist.`));
+    await assert.rejects(command.action(logger, { options: parsedSchema.data! }), new CommandError(`The specified organization '${organizationName}' does not exist.`));
   });
 
   it('correctly handles API OData error', async () => {
@@ -232,7 +231,7 @@ describe(commands.ORGANIZATION_SET, () => {
       marketingNotificationEmails: 'marketing@contoso.com'
     });
     await assert.rejects(command.action(logger, {
-      options: parsedSchema.data
+      options: parsedSchema.data!
     }), new CommandError('Invalid tenant identifier; it must match that of the requested tenant.'));
   });
 });

@@ -1,7 +1,6 @@
 import assert from 'assert';
 import fs from 'fs';
 import sinon from 'sinon';
-import { z } from 'zod';
 import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
@@ -9,19 +8,19 @@ import { CommandError } from '../../../../Command.js';
 import { telemetry } from '../../../../telemetry.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './option-remove.js';
+import command, { options } from './option-remove.js';
 
 describe(commands.OPTION_REMOVE, () => {
   let log: any[];
   let logger: Logger;
   let promptIssued: boolean = false;
   let commandInfo: CommandInfo;
-  let commandOptionsSchema: z.ZodTypeAny;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(telemetry, 'trackEvent').resolves();
     commandInfo = cli.getCommandInfo(command);
-    commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {

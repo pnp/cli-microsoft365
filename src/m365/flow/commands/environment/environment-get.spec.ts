@@ -1,6 +1,5 @@
 import assert from 'assert';
 import sinon from 'sinon';
-import { z } from 'zod';
 import auth from '../../../../Auth.js';
 import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
@@ -12,7 +11,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './environment-get.js';
+import command, { options } from './environment-get.js';
 import { FlowEnvironmentDetails } from './FlowEnvironmentDetails.js';
 
 describe(commands.ENVIRONMENT_GET, () => {
@@ -20,7 +19,7 @@ describe(commands.ENVIRONMENT_GET, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
-  let commandOptionsSchema: z.ZodTypeAny;
+  let commandOptionsSchema: typeof options;
   const flowResponse: FlowEnvironmentDetails = {
     name: "Default-d87a7535-dd31-4437-bfe1-95340acd55c5",
     location: "europe",
@@ -89,7 +88,7 @@ describe(commands.ENVIRONMENT_GET, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
-    commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {

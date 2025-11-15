@@ -1,25 +1,24 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
+import { cli } from '../../../../cli/cli.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
+import { CommandError } from '../../../../Command.js';
 import request from '../../../../request.js';
 import { telemetry } from '../../../../telemetry.js';
+import { accessToken } from '../../../../utils/accessToken.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './containertype-add.js';
-import { cli } from '../../../../cli/cli.js';
-import { CommandInfo } from '../../../../cli/CommandInfo.js';
-import { CommandError } from '../../../../Command.js';
-import { z } from 'zod';
-import { accessToken } from '../../../../utils/accessToken.js';
+import command, { options } from './containertype-add.js';
 
 describe(commands.CONTAINERTYPE_ADD, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
-  let commandOptionsSchema: z.ZodTypeAny;
+  let commandOptionsSchema: typeof options;
 
   let commandInfo: CommandInfo;
 
@@ -57,7 +56,7 @@ describe(commands.CONTAINERTYPE_ADD, () => {
     auth.connection.active = true;
     auth.connection.appId = 'a0de833a-3629-489a-8fc8-4dd0c431878c';
     commandInfo = cli.getCommandInfo(command);
-    commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
