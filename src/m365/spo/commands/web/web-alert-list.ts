@@ -1,36 +1,29 @@
-import commands from '../../commands.js';
-import { Logger } from '../../../../cli/Logger.js';
-import SpoCommand from '../../../base/SpoCommand.js';
-import { globalOptionsZod } from '../../../../Command.js';
 import { z } from 'zod';
-import { zod } from '../../../../utils/zod.js';
-import { validation } from '../../../../utils/validation.js';
-import { spo } from '../../../../utils/spo.js';
+import { cli } from '../../../../cli/cli.js';
+import { Logger } from '../../../../cli/Logger.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import { entraUser } from '../../../../utils/entraUser.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { odata } from '../../../../utils/odata.js';
-import { cli } from '../../../../cli/cli.js';
+import { spo } from '../../../../utils/spo.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
 
-export const options = globalOptionsZod
-  .extend({
-    webUrl: zod.alias('u', z.string()
-      .refine(url => validation.isValidSharePointUrl(url) === true, url => ({
-        message: `'${url}' is not a valid SharePoint site URL.`
-      }))),
-    listId: z.string()
-      .refine(id => validation.isValidGuid(id), id => ({
-        message: `'${id}' is not a valid GUID.`
-      })).optional(),
-    listUrl: z.string().optional(),
-    listTitle: z.string().optional(),
-    userName: z.string().refine(upn => validation.isValidUserPrincipalName(upn), upn => ({
-      message: `'${upn}' is not a valid UPN.`
-    })).optional(),
-    userId: z.string().refine(id => validation.isValidGuid(id), id => ({
-      message: `'${id}' is not a valid GUID.`
-    })).optional()
-  })
-  .strict();
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  webUrl: z.string().alias('u')
+    .refine(url => validation.isValidSharePointUrl(url) === true, {
+      error: e => `'${e.input}' is not a valid SharePoint site URL.`
+    }),
+  listId: z.uuid().optional(),
+  listUrl: z.string().optional(),
+  listTitle: z.string().optional(),
+  userName: z.string().optional().refine(upn => typeof upn === 'undefined' || validation.isValidUserPrincipalName(upn as string), {
+    error: e => `'${e.input}' is not a valid UPN.`
+  }),
+  userId: z.uuid().optional()
+});
 
 declare type Options = z.infer<typeof options>;
 
@@ -51,17 +44,17 @@ class SpoWebAlertListCommand extends SpoCommand {
     return ['ID', 'Title', 'UserPrincipalName'];
   }
 
-  public get schema(): z.ZodTypeAny | undefined {
+  public get schema(): z.ZodType | undefined {
     return options;
   }
 
-  public getRefinedSchema(schema: z.ZodTypeAny): z.ZodEffects<any> | undefined {
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
       .refine(options => [options.listId, options.listUrl, options.listTitle].filter(x => x !== undefined).length <= 1, {
-        message: `Specify either listId, listUrl, or listTitle, but not more than one.`
+        error: `Specify either listId, listUrl, or listTitle, but not more than one.`
       })
       .refine(options => [options.userName, options.userId].filter(x => x !== undefined).length <= 1, {
-        message: `Specify either userName or userId, but not both.`
+        error: `Specify either userName or userId, but not both.`
       });
   }
 

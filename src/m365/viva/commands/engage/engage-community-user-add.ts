@@ -55,7 +55,7 @@ class VivaEngageCommunityUserAddCommand extends GraphCommand {
       .refine(options => options.ids || options.userNames, {
         error: 'Specify either of ids or userNames.'
       })
-      .refine(options => typeof options.userNames !== undefined && typeof options.ids !== undefined, {
+      .refine(options => typeof options.userNames !== 'undefined' || typeof options.ids !== 'undefined', {
         error: 'Specify either ids or userNames, but not both.'
       });
   }

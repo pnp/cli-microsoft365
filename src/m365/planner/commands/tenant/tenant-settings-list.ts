@@ -5,7 +5,7 @@ import request, { CliRequestOptions } from '../../../../request.js';
 import PlannerCommand from '../../../base/PlannerCommand.js';
 import commands from '../../commands.js';
 
-const options = globalOptionsZod.strict();
+export const options = globalOptionsZod.strict();
 
 class PlannerTenantSettingsListCommand extends PlannerCommand {
   public get name(): string {

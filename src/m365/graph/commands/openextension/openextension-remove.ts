@@ -9,7 +9,7 @@ import request, { CliRequestOptions } from '../../../../request.js';
 
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
-  resourceId: z.uuid().alias('i'),
+  resourceId: z.string().alias('i'),
   resourceType: z.enum(['user', 'group', 'device', 'organization']).alias('t'),
   name: z.string().alias('n'),
   force: z.boolean().optional().alias('f')

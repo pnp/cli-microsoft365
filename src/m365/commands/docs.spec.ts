@@ -1,6 +1,5 @@
 import assert from 'assert';
 import sinon from 'sinon';
-import { z } from 'zod';
 import { cli } from '../../cli/cli.js';
 import { CommandInfo } from '../../cli/CommandInfo.js';
 import { Logger } from '../../cli/Logger.js';
@@ -11,7 +10,7 @@ import { pid } from '../../utils/pid.js';
 import { session } from '../../utils/session.js';
 import { sinonUtil } from '../../utils/sinonUtil.js';
 import commands from './commands.js';
-import command from './docs.js';
+import command, { options } from './docs.js';
 
 describe(commands.DOCS, () => {
   let log: any[];
@@ -19,14 +18,14 @@ describe(commands.DOCS, () => {
   let loggerLogSpy: sinon.SinonSpy;
   let getSettingWithDefaultValueStub: sinon.SinonStub;
   let commandInfo: CommandInfo;
-  let commandOptionsSchema: z.ZodTypeAny;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(telemetry, 'trackEvent').resolves();
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     sinon.stub(session, 'getId').callsFake(() => '');
     commandInfo = cli.getCommandInfo(command);
-    commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
