@@ -1,13 +1,13 @@
 {
   "@microsoft/generator-sharepoint": {
     "useGulp": false,
-    "plusBeta": true,
+    "plusBeta": false,
     "isCreatingSolution": true,
     "nodeVersion": "22.14.0",
     "sdksVersions": {},
-    "version": "1.22.0-beta.1",
+    "version": "1.22.0-rc.0",
     "libraryName": "spfx-webpart-react",
-    "libraryId": "e4bb2a99-7d22-4f50-9dc4-031e34a12dcd",
+    "libraryId": "8bd9da99-4dcf-47bc-9263-5ff013bb3b6b",
     "environment": "spo",
     "packageManager": "npm",
     "solutionName": "spfx-webpart-react",

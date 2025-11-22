@@ -2,7 +2,7 @@
   "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/package-solution.schema.json",
   "solution": {
     "name": "spfx-webpart-react-client-side-solution",
-    "id": "e4bb2a99-7d22-4f50-9dc4-031e34a12dcd",
+    "id": "8bd9da99-4dcf-47bc-9263-5ff013bb3b6b",
     "version": "1.0.0.0",
     "includeClientSideAssets": true,
     "skipFeatureDeployment": true,
@@ -12,7 +12,7 @@
       "websiteUrl": "",
       "privacyUrl": "",
       "termsOfUseUrl": "",
-      "mpnId": "Undefined-1.22.0-beta.1"
+      "mpnId": "Undefined-1.22.0-rc.0"
     },
     "metadata": {
       "shortDescription": {
@@ -29,7 +29,7 @@
       {
         "title": "spfx-webpart-react Feature",
         "description": "The feature that activates elements of the spfx-webpart-react solution.",
-        "id": "2e6efda9-8a25-4ab8-b952-70fafc851380",
+        "id": "f0f5ac39-6eca-41a3-8249-3df919856c50",
         "version": "1.0.0.0"
       }
     ]

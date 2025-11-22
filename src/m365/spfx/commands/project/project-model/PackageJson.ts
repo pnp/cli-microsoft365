@@ -18,5 +18,8 @@ export interface PackageJson extends JsonFile {
     'package-solution'?: string;
     start?: string;
     test?: string;
+    'test-only'?: string;
+    'trust-dev-cert'?: string;
+    'untrust-dev-cert'?: string;
   }
 }

@@ -905,7 +905,7 @@ describe(commands.DOCTOR, () => {
     try {
       getPackageVersionSpy = sinon.spy(command as any, 'getPackageVersion');
 
-      await command.action(logger, { options: { spfxVersion: '1.22.0-beta.1' } });
+      await command.action(logger, { options: { spfxVersion: '1.22.0-rc.0' } });
       assert(getPackageVersionSpy.neverCalledWith('gulp-cli'));
     }
     finally {
