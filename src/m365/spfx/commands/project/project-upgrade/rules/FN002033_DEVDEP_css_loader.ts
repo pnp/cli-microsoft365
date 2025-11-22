@@ -1,8 +1,8 @@
 import { DependencyRule } from "./DependencyRule.js";
 
-export class FN002033_DEVDEP_jest_junit extends DependencyRule {
+export class FN002033_DEVDEP_css_loader extends DependencyRule {
   constructor(packageVersion: string) {
-    super('jest-junit', packageVersion, true);
+    super('css-loader', packageVersion, true);
   }
 
   get id(): string {

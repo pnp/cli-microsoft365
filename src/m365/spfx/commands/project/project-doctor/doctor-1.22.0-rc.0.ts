@@ -15,7 +15,7 @@ export default [
   new FN002013_DEVDEP_types_webpack_env('~1.15.2'),
   new FN002015_DEVDEP_types_react('17'),
   new FN002016_DEVDEP_types_react_dom('17'),
-  new FN002021_DEVDEP_rushstack_eslint_config('4.3.0'),
-  new FN002022_DEVDEP_typescript('5.3.3'),
+  new FN002021_DEVDEP_rushstack_eslint_config('4.5.2'),
+  new FN002022_DEVDEP_typescript('~5.8.0'),
   new FN021001_PKG_spfx_deps_versions_match_project_version(true)
 ];

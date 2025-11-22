@@ -641,15 +641,15 @@ class SpfxDoctorCommand extends BaseProjectCommand {
         fix: 'npm i -g yo@5'
       }
     },
-    '1.22.0-beta.1': {
+    '1.22.0-rc.0': {
       node: {
         range: '>=22.14.0 < 23.0.0',
         fix: 'Install Node.js >=22.14.0 < 23.0.0'
       },
       sp: SharePointVersion.SPO,
       yo: {
-        range: '^4 || ^5',
-        fix: 'npm i -g yo@5'
+        range: '^4 || ^5 || ^6',
+        fix: 'npm i -g yo@6'
       }
     }
   };
