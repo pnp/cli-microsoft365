@@ -8,6 +8,7 @@ import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { telemetry } from '../../../../telemetry.js';
 import { pid } from '../../../../utils/pid.js';
+import { spfx } from '../../../../utils/spfx.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
@@ -22,6 +23,7 @@ describe(commands.PROJECT_GITHUB_WORKFLOW_ADD, () => {
   before(() => {
     sinon.stub(telemetry, 'trackEvent').resolves();
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
+    sinon.stub(spfx, 'getHighestNodeVersion').returns('22.0.x');
     sinon.stub(session, 'getId').callsFake(() => '');
     commandInfo = cli.getCommandInfo(command);
   });
@@ -44,6 +46,7 @@ describe(commands.PROJECT_GITHUB_WORKFLOW_ADD, () => {
   afterEach(() => {
     sinonUtil.restore([
       (command as any).getProjectRoot,
+      (command as any).getProjectVersion,
       fs.existsSync,
       fs.readFileSync,
       fs.writeFileSync
@@ -116,6 +119,8 @@ describe(commands.PROJECT_GITHUB_WORKFLOW_ADD, () => {
       return '';
     });
 
+    sinon.stub(command as any, 'getProjectVersion').returns('1.21.1');
+
     const writeFileSyncStub: sinon.SinonStub = sinon.stub(fs, 'writeFileSync').resolves({});
 
     await command.action(logger, { options: { debug: true } } as any);
@@ -149,10 +154,73 @@ describe(commands.PROJECT_GITHUB_WORKFLOW_ADD, () => {
       return '';
     });
 
+    sinon.stub(command as any, 'getProjectVersion').returns('1.21.1');
+
     const writeFileSyncStub: sinon.SinonStub = sinon.stub(fs, 'writeFileSync').resolves({});
 
     await command.action(logger, { options: { name: 'test', branchName: 'dev', manuallyTrigger: true, skipFeatureDeployment: true, loginMethod: 'user', scope: 'sitecollection' } } as any);
     assert(writeFileSyncStub.calledWith(path.join(process.cwd(), projectPath, '/.github', 'workflows', 'deploy-spfx-solution.yml')), 'workflow file not created');
+  });
+
+  it('handles error with unknown version of SPFx', async () => {
+    sinon.stub(command as any, 'getProjectRoot').returns(path.join(process.cwd(), projectPath));
+
+    sinon.stub(fs, 'readFileSync').callsFake((path, options) => {
+      if (path.toString().endsWith('package.json') && options === 'utf-8') {
+        return '{"name": "test"}';
+      }
+
+      return '';
+    });
+
+    sinon.stub(fs, 'existsSync').callsFake((fakePath) => {
+      if (fakePath.toString().endsWith('.github')) {
+        return true;
+      }
+      else if (fakePath.toString().endsWith('workflows')) {
+        return true;
+      }
+
+      return false;
+    });
+
+    sinon.stub(command as any, 'getProjectVersion').returns(undefined);
+
+    sinon.stub(fs, 'writeFileSync').throws(new Error('writeFileSync failed'));
+
+    await assert.rejects(command.action(logger, { options: {} }),
+      new CommandError('Unable to determine the version of the current SharePoint Framework project. Could not find the correct version based on @microsoft/generator-sharepoint property in the .yo-rc.json file.'));
+
+  });
+
+  it('handles error with not found node version', async () => {
+    sinon.stub(command as any, 'getProjectRoot').returns(path.join(process.cwd(), projectPath));
+
+    sinon.stub(fs, 'readFileSync').callsFake((path, options) => {
+      if (path.toString().endsWith('package.json') && options === 'utf-8') {
+        return '{"name": "test"}';
+      }
+
+      return '';
+    });
+
+    sinon.stub(fs, 'existsSync').callsFake((fakePath) => {
+      if (fakePath.toString().endsWith('.github')) {
+        return true;
+      }
+      else if (fakePath.toString().endsWith('workflows')) {
+        return true;
+      }
+
+      return false;
+    });
+
+    sinon.stub(command as any, 'getProjectVersion').returns('99.99.99');
+
+    sinon.stub(fs, 'writeFileSync').throws(new Error('writeFileSync failed'));
+
+    await assert.rejects(command.action(logger, { options: {} }),
+      new CommandError(`Could not find Node version for 99.99.99 of SharePoint Framework`));
   });
 
   it('handles unexpected error', async () => {
@@ -177,9 +245,45 @@ describe(commands.PROJECT_GITHUB_WORKFLOW_ADD, () => {
       return false;
     });
 
-    sinon.stub(fs, 'writeFileSync').callsFake(() => { throw 'error'; });
+    sinon.stub(command as any, 'getProjectVersion').returns('1.21.1');
+
+    sinon.stub(fs, 'writeFileSync').callsFake(() => {
+      throw new Error('writeFileSync failed');
+    });
 
     await assert.rejects(command.action(logger, { options: {} } as any),
-      new CommandError('error'));
+      new CommandError('writeFileSync failed'));
+  });
+
+  it('handles unexpected non-error value', async () => {
+    sinon.stub(command as any, 'getProjectRoot').returns(path.join(process.cwd(), projectPath));
+
+    sinon.stub(fs, 'readFileSync').callsFake((path, options) => {
+      if (path.toString().endsWith('package.json') && options === 'utf-8') {
+        return '{"name": "test"}';
+      }
+
+      return '';
+    });
+
+    sinon.stub(fs, 'existsSync').callsFake((fakePath) => {
+      if (fakePath.toString().endsWith('.github')) {
+        return true;
+      }
+      else if (fakePath.toString().endsWith('workflows')) {
+        return true;
+      }
+
+      return false;
+    });
+
+    sinon.stub(command as any, 'getProjectVersion').returns('1.21.1');
+
+    sinon.stub(fs, 'writeFileSync').callsFake(() => {
+      throw 'string failure';
+    });
+
+    await assert.rejects(command.action(logger, { options: {} } as any),
+      new CommandError('string failure'));
   });
 });

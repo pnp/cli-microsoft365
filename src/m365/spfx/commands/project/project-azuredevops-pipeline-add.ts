@@ -10,6 +10,8 @@ import { pipeline } from './DeployWorkflow.js';
 import { fsUtil } from '../../../../utils/fsUtil.js';
 import { AzureDevOpsPipeline, AzureDevOpsPipelineStep } from './project-azuredevops-pipeline-model.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
+import { versions } from '../SpfxCompatibilityMatrix.js';
+import { spfx } from '../../../../utils/spfx.js';
 
 interface CommandArgs {
   options: Options;
@@ -128,7 +130,12 @@ class SpfxProjectAzureDevOpsPipelineAddCommand extends BaseProjectCommand {
       this.savePipeline(pipeline);
     }
     catch (error: any) {
-      throw new CommandError(error);
+      if (error instanceof CommandError) {
+        throw error;
+      }
+
+      const message = error instanceof Error ? error.message : String(error);
+      throw new CommandError(message);
     }
   }
 
@@ -154,6 +161,22 @@ class SpfxProjectAzureDevOpsPipelineAddCommand extends BaseProjectCommand {
     if (options.branchName) {
       pipeline.trigger.branches.include[0] = options.branchName;
     }
+
+    const version = this.getProjectVersion();
+
+    if (!version) {
+      throw new CommandError('Unable to determine the version of the current SharePoint Framework project. Could not find the correct version based on @microsoft/generator-sharepoint property in the .yo-rc.json file.');
+    }
+
+    const versionRequirements = versions[version];
+
+    if (!versionRequirements) {
+      throw new CommandError(`Could not find Node version for version '${version}' of SharePoint Framework.`);
+    }
+
+    const nodeVersion: string = spfx.getHighestNodeVersion(versionRequirements.node.range);
+
+    this.assignPipelineVariables(pipeline, 'NodeVersion', nodeVersion);
 
     const script = this.getScriptAction(pipeline);
     if (script.script) {
