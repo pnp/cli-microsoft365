@@ -13,6 +13,7 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './channel-add.js';
 import { settingsNames } from '../../../../settingsNames.js';
+import { teams } from '../../../../utils/teams.js';
 
 describe(commands.CHANNEL_ADD, () => {
   let log: string[];
@@ -51,7 +52,8 @@ describe(commands.CHANNEL_ADD, () => {
       request.get,
       request.post,
       cli.getSettingWithDefaultValue,
-      cli.handleMultipleResultsFound
+      cli.handleMultipleResultsFound,
+      teams.getTeamIdByDisplayName
     ]);
   });
 
@@ -228,170 +230,6 @@ describe(commands.CHANNEL_ADD, () => {
     } as any), new CommandError('The specified team does not exist in the Microsoft Teams'));
   });
 
-  it('fails when multiple teams with same name exists', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/me/joinedTeams') {
-        return {
-          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#teams",
-          "@odata.count": 2,
-          "value": [
-            {
-              "id": "00000000-0000-0000-0000-000000000000",
-              "createdDateTime": null,
-              "displayName": "Team Name",
-              "description": "Team Description",
-              "internalId": null,
-              "classification": null,
-              "specialization": null,
-              "visibility": null,
-              "webUrl": null,
-              "isArchived": false,
-              "isMembershipLimitedToOwners": null,
-              "memberSettings": null,
-              "guestSettings": null,
-              "messagingSettings": null,
-              "funSettings": null,
-              "discoverySettings": null
-            },
-            {
-              "id": "00000000-0000-0000-0000-000000000000",
-              "createdDateTime": null,
-              "displayName": "Team Name",
-              "description": "Team Description",
-              "internalId": null,
-              "classification": null,
-              "specialization": null,
-              "visibility": null,
-              "webUrl": null,
-              "isArchived": false,
-              "isMembershipLimitedToOwners": null,
-              "memberSettings": null,
-              "guestSettings": null,
-              "messagingSettings": null,
-              "funSettings": null,
-              "discoverySettings": null
-            }
-          ]
-        };
-      }
-
-      throw 'Invalid request';
-    });
-
-    await assert.rejects(command.action(logger, {
-      options: {
-        debug: true,
-        teamName: 'Team Name',
-        name: 'Architecture Discussion',
-        description: 'Architecture'
-      }
-    } as any), new CommandError('Multiple Microsoft Teams teams with name Team Name found. Found: 00000000-0000-0000-0000-000000000000.'));
-  });
-
-  it('handles selecting single result when multiple teams with the specified name found and cli is set to prompt', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/me/joinedTeams') {
-        return {
-          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#teams",
-          "@odata.count": 2,
-          "value": [
-            {
-              "id": "00000000-0000-0000-0000-000000000000",
-              "createdDateTime": null,
-              "displayName": "Team Name",
-              "description": "Team Description",
-              "internalId": null,
-              "classification": null,
-              "specialization": null,
-              "visibility": null,
-              "webUrl": null,
-              "isArchived": false,
-              "isMembershipLimitedToOwners": null,
-              "memberSettings": null,
-              "guestSettings": null,
-              "messagingSettings": null,
-              "funSettings": null,
-              "discoverySettings": null
-            },
-            {
-              "id": "00000000-0000-0000-0000-000000000000",
-              "createdDateTime": null,
-              "displayName": "Team Name",
-              "description": "Team Description",
-              "internalId": null,
-              "classification": null,
-              "specialization": null,
-              "visibility": null,
-              "webUrl": null,
-              "isArchived": false,
-              "isMembershipLimitedToOwners": null,
-              "memberSettings": null,
-              "guestSettings": null,
-              "messagingSettings": null,
-              "funSettings": null,
-              "discoverySettings": null
-            }
-          ]
-        };
-      }
-
-      throw 'Invalid request';
-    });
-
-    sinon.stub(cli, 'handleMultipleResultsFound').resolves({
-      "id": "00000000-0000-0000-0000-000000000000",
-      "createdDateTime": null,
-      "displayName": "Team Name",
-      "description": "Team Description",
-      "internalId": null,
-      "classification": null,
-      "specialization": null,
-      "visibility": null,
-      "webUrl": null,
-      "isArchived": false,
-      "isMembershipLimitedToOwners": null,
-      "memberSettings": null,
-      "guestSettings": null,
-      "messagingSettings": null,
-      "funSettings": null,
-      "discoverySettings": null
-    });
-
-    sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/channels`) > -1) {
-        return {
-          "id": "19:d9c63a6d6a2644af960d74ea927bdfb0@thread.skype",
-          "displayName": "Architecture Discussion",
-          "description": null
-        };
-      }
-
-      throw 'Invalid request';
-    });
-
-    await command.action(logger, {
-      options: {
-        debug: true,
-        teamName: 'Team Name',
-        name: 'Architecture Discussion'
-      }
-    });
-
-    assert(loggerLogSpy.calledWith({
-      "id": "19:d9c63a6d6a2644af960d74ea927bdfb0@thread.skype",
-      "displayName": "Architecture Discussion",
-      "description": null
-    }));
-  });
-
   it('creates channel within the Microsoft Teams team in the tenant with description by team id', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/6703ac8a-c49b-4fd4-8223-28f0ac3a6402/channels`) {
@@ -506,37 +344,16 @@ describe(commands.CHANNEL_ADD, () => {
   });
 
   it('creates channel within the Microsoft Teams team in the tenant by team name', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/me/joinedTeams') {
-        return {
-          "value": [
-            {
-              "id": "00000000-0000-0000-0000-000000000000",
-              "createdDateTime": null,
-              "displayName": "Team Name",
-              "description": "Team Description",
-              "internalId": null,
-              "classification": null,
-              "specialization": null,
-              "visibility": null,
-              "webUrl": null,
-              "isArchived": false,
-              "isMembershipLimitedToOwners": null,
-              "memberSettings": null,
-              "guestSettings": null,
-              "messagingSettings": null,
-              "funSettings": null,
-              "discoverySettings": null
-            }
-          ]
-        };
+    sinon.stub(teams, 'getTeamIdByDisplayName').callsFake(async (name) => {
+      if (name === 'Team Name') {
+        return '00000000-0000-0000-0000-000000000000';
       }
 
-      throw 'Invalid request';
+      throw 'Invalid parameter passed to teams.getTeamIdByDisplayName: ' + name;
     });
 
-    sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/channels`) > -1) {
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams/00000000-0000-0000-0000-000000000000/channels`) {
         return {
           "id": "19:d9c63a6d6a2644af960d74ea927bdfb0@thread.skype",
           "displayName": "Architecture Discussion",
@@ -549,17 +366,17 @@ describe(commands.CHANNEL_ADD, () => {
 
     await command.action(logger, {
       options: {
-        debug: true,
+        verbose: true,
         teamName: 'Team Name',
         name: 'Architecture Discussion'
       }
     });
 
-    assert(loggerLogSpy.calledWith({
-      "id": "19:d9c63a6d6a2644af960d74ea927bdfb0@thread.skype",
-      "displayName": "Architecture Discussion",
-      "description": null
-    }));
+    assert(postStub.calledOnce);
+    assert.deepStrictEqual(postStub.firstCall.args[0].data, {
+      membershipType: 'standard',
+      displayName: 'Architecture Discussion'
+    });
   });
 
   it('correctly handles error when adding a channel', async () => {

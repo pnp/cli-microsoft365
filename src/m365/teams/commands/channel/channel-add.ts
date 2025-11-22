@@ -1,12 +1,10 @@
-import { Team } from '@microsoft/microsoft-graph-types';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import { Logger } from '../../../../cli/Logger.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from "../../../base/GraphCommand.js";
 import commands from '../../commands.js';
-import { cli } from '../../../../cli/cli.js';
-import { formatting } from '../../../../utils/formatting.js';
+import { teams } from '../../../../utils/teams.js';
 
 interface CommandArgs {
   options: Options;
@@ -103,36 +101,23 @@ class TeamsChannelAddCommand extends GraphCommand {
     this.optionSets.push({ options: ['teamId', 'teamName'] });
   }
 
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    try {
+      const teamId: string = await this.getTeamId(args);
+      const res: any = await this.createChannel(args, teamId);
+      await logger.log(res);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
+  }
+
   private async getTeamId(args: CommandArgs): Promise<string> {
     if (args.options.teamId) {
       return args.options.teamId;
     }
 
-    const teamRequestOptions: CliRequestOptions = {
-      url: `${this.resource}/v1.0/me/joinedTeams`,
-      headers: {
-        accept: 'application/json;odata.metadata=none'
-      },
-      responseType: 'json'
-    };
-
-    const response = await request.get<{ value: Team[] }>(teamRequestOptions);
-
-    const matchingTeams: string[] = response.value
-      .filter(team => team.displayName! === args.options.teamName)
-      .map(team => team.id!);
-
-    if (matchingTeams.length < 1) {
-      throw `The specified team does not exist in the Microsoft Teams`;
-    }
-
-    if (matchingTeams.length > 1) {
-      const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', response.value);
-      const result = await cli.handleMultipleResultsFound<Team>(`Multiple Microsoft Teams teams with name ${args.options.teamName} found.`, resultAsKeyValuePair);
-      return result.id!;
-    }
-
-    return matchingTeams[0];
+    return await teams.getTeamIdByDisplayName(args.options.teamName!);
   }
 
   private async createChannel(args: CommandArgs, teamId: string): Promise<void> {
@@ -154,24 +139,13 @@ class TeamsChannelAddCommand extends GraphCommand {
       requestOptions.data.members = [
         {
           '@odata.type': '#microsoft.graph.aadUserConversationMember',
-          'user@odata.bind': `https://graph.microsoft.com/v1.0/users('${args.options.owner}')`,
+          'user@odata.bind': `${this.resource}/v1.0/users('${args.options.owner}')`,
           roles: ['owner']
         }
       ];
     }
 
     return request.post(requestOptions);
-  }
-
-  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    try {
-      const teamId: string = await this.getTeamId(args);
-      const res: any = await this.createChannel(args, teamId);
-      await logger.log(res);
-    }
-    catch (err: any) {
-      this.handleRejectedODataJsonPromise(err);
-    }
   }
 }
 
