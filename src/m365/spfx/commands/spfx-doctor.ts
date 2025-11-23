@@ -648,8 +648,8 @@ class SpfxDoctorCommand extends BaseProjectCommand {
       },
       sp: SharePointVersion.SPO,
       yo: {
-        range: '^4 || ^5',
-        fix: 'npm i -g yo@5'
+        range: '^4 || ^5 || ^6',
+        fix: 'npm i -g yo@6'
       }
     }
   };

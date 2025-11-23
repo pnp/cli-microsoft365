@@ -60,7 +60,7 @@ import { FN023004_GITIGNORE_libcommonjs } from './rules/FN023004_GITIGNORE_libco
 import { FN023005_GITIGNORE_libesm } from './rules/FN023005_GITIGNORE_libesm.js';
 import { FN023006_GITIGNORE_jestoutput } from './rules/FN023006_GITIGNORE_jestoutput.js';
 import { FN025002_ESLINTRCJS_rushstack_import_requires_chunk_name } from './rules/FN025002_ESLINTRCJS_rushstack_import_requires_chunk_name.js';
-import { FN025003_ESLINTRCJS_rushstack_pair_react_dom_render_unmount } from './rules/FN025003_ESLINTRCJS_rushstack_pair_react_dom_render_unmount copy.js';
+import { FN025003_ESLINTRCJS_rushstack_pair_react_dom_render_unmount } from './rules/FN025003_ESLINTRCJS_rushstack_pair_react_dom_render_unmount.js';
 import { FN025004_ESLINTRCJS_microsoft_spfx_import_requires_chunk_name } from './rules/FN025004_ESLINTRCJS_microsoft_spfx_import_requires_chunk_name.js';
 import { FN025005_ESLINTRCJS_microsoft_spfx_pair_react_dom_render_unmount } from './rules/FN025005_ESLINTRCJS_microsoft_spfx_pair_react_dom_render_unmount.js';
 import { FN026001_CFG_SASS_schema } from './rules/FN026001_CFG_SASS_schema.js';
@@ -94,16 +94,16 @@ export default [
   new FN002021_DEVDEP_rushstack_eslint_config('4.5.2'),
   new FN002022_DEVDEP_microsoft_eslint_plugin_spfx('1.22.0-rc.0'),
   new FN002023_DEVDEP_microsoft_eslint_config_spfx('1.22.0-rc.0'),
-  new FN002026_DEVDEP_typescript('~5.8.0'),
+  new FN002026_DEVDEP_typescript('5.8.0'),
   new FN002029_DEVDEP_microsoft_rush_stack_compiler_5_3('0.1.0', false),
   new FN002030_DEVDEP_microsoft_spfx_web_build_rig('1.22.0-rc.0'),
   new FN002031_DEVDEP_rushstack_heft('1.1.2'),
   new FN002032_DEVDEP_typescript_eslint_parser('8.46.2'),
-  new FN002033_DEVDEP_css_loader('~7.1.2'),
+  new FN002033_DEVDEP_css_loader('7.1.2'),
   new FN002034_DEVDEP_microsoft_spfx_heft_plugins('1.22.0-rc.0'),
   new FN002035_DEVDEP_types_heft_jest('1.0.2'),
   new FN010001_YORC_version('1.22.0-rc.0'),
-  new FN010011_YORC_useGulp(true),
+  new FN010011_YORC_useGulp(false),
   new FN015005_FILE_src_index_ts(false),
   new FN015010_FILE_gulpfile_js(false),
   new FN015011_FILE_tsconfig_json(true, `{
