@@ -14,6 +14,8 @@ import commands from '../../commands.js';
 import command from './notebook-add.js';
 import { entraGroup } from '../../../../utils/entraGroup.js';
 import { spo } from '../../../../utils/spo.js';
+import { accessToken } from '../../../../utils/accessToken.js';
+import { formatting } from '../../../../utils/formatting.js';
 
 describe(commands.NOTEBOOK_ADD, () => {
   const name = 'My Notebook';
@@ -54,6 +56,7 @@ describe(commands.NOTEBOOK_ADD, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let accessTokenStub: sinon.SinonStub;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -78,11 +81,13 @@ describe(commands.NOTEBOOK_ADD, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
+    accessTokenStub = sinon.stub(accessToken, 'assertAccessTokenType').resolves();
   });
 
   afterEach(() => {
     sinonUtil.restore([
-      request.post
+      request.post,
+      accessToken.assertAccessTokenType
     ]);
   });
 
@@ -128,6 +133,13 @@ describe(commands.NOTEBOOK_ADD, () => {
   it('passes validation if no option but name specified', async () => {
     const actual = await command.validate({ options: { name: name } }, commandInfo);
     assert.strictEqual(actual, true);
+  });
+
+  it('enforces the user to use delegated permissions', async () => {
+    sinon.stub(request, 'post').resolves();
+
+    await command.action(logger, { options: {} });
+    assert(accessTokenStub.calledOnceWithExactly('delegated'));
   });
 
   it('adds notebook for the currently logged in user', async () => {
@@ -209,7 +221,7 @@ describe(commands.NOTEBOOK_ADD, () => {
     const userName = 'john@contoso.com';
 
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users/${userName}/onenote/notebooks`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users/${formatting.encodeQueryParameter(userName)}/onenote/notebooks`) {
         return addResponse;
       }
 

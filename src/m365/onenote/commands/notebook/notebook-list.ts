@@ -1,12 +1,13 @@
 import { Notebook } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
-import request, { CliRequestOptions } from '../../../../request.js';
 import { entraGroup } from '../../../../utils/entraGroup.js';
 import { odata } from '../../../../utils/odata.js';
 import { validation } from '../../../../utils/validation.js';
-import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
+import { formatting } from '../../../../utils/formatting.js';
+import GraphDelegatedCommand from '../../../base/GraphDelegatedCommand.js';
+import { spo } from '../../../../utils/spo.js';
 
 interface CommandArgs {
   options: Options;
@@ -20,7 +21,7 @@ interface Options extends GlobalOptions {
   webUrl?: string;
 }
 
-class OneNoteNotebookListCommand extends GraphCommand {
+class OneNoteNotebookListCommand extends GraphDelegatedCommand {
   public get name(): string {
     return commands.NOTEBOOK_LIST;
   }
@@ -101,7 +102,7 @@ class OneNoteNotebookListCommand extends GraphCommand {
       endpoint += `users/${args.options.userId}`;
     }
     else if (args.options.userName) {
-      endpoint += `users/${args.options.userName}`;
+      endpoint += `users/${formatting.encodeQueryParameter(args.options.userName)}`;
     }
     else if (args.options.groupId) {
       endpoint += `groups/${args.options.groupId}`;
@@ -111,7 +112,7 @@ class OneNoteNotebookListCommand extends GraphCommand {
       endpoint += `groups/${groupId}`;
     }
     else if (args.options.webUrl) {
-      const siteId = await this.getSpoSiteId(args.options.webUrl);
+      const siteId = await spo.getSpoGraphSiteId(args.options.webUrl);
       endpoint += `sites/${siteId}`;
     }
     else {
@@ -124,20 +125,6 @@ class OneNoteNotebookListCommand extends GraphCommand {
   private async getGroupId(groupName: string): Promise<string> {
     const group = await entraGroup.getGroupByDisplayName(groupName);
     return group.id!;
-  }
-
-  private async getSpoSiteId(webUrl: string): Promise<string> {
-    const url = new URL(webUrl);
-    const requestOptions: CliRequestOptions = {
-      url: `${this.resource}/v1.0/sites/${url.hostname}:${url.pathname}`,
-      headers: {
-        accept: 'application/json;odata.metadata=none'
-      },
-      responseType: 'json'
-    };
-
-    const site = await request.get<{ id: string }>(requestOptions);
-    return site.id;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
