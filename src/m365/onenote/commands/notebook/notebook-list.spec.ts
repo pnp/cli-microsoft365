@@ -12,12 +12,15 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './notebook-list.js';
+import { accessToken } from '../../../../utils/accessToken.js';
+import { formatting } from '../../../../utils/formatting.js';
 
 describe(commands.NOTEBOOK_LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let accessTokenStub: sinon.SinonStub;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -42,12 +45,13 @@ describe(commands.NOTEBOOK_LIST, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
-    (command as any).items = [];
+    accessTokenStub = sinon.stub(accessToken, 'assertAccessTokenType').resolves();
   });
 
   afterEach(() => {
     sinonUtil.restore([
-      request.get
+      request.get,
+      accessToken.assertAccessTokenType
     ]);
   });
 
@@ -91,6 +95,13 @@ describe(commands.NOTEBOOK_LIST, () => {
   it('passes validation if no option specified', async () => {
     const actual = await command.validate({ options: {} }, commandInfo);
     assert.strictEqual(actual, true);
+  });
+
+  it('enforces the user to use delegated permissions', async () => {
+    sinon.stub(request, 'get').resolves([]);
+
+    await command.action(logger, { options: {} });
+    assert(accessTokenStub.calledOnceWithExactly('delegated'));
   });
 
   it('lists Microsoft OneNote notebooks for the currently logged in user (debug)', async () => {
@@ -351,7 +362,7 @@ describe(commands.NOTEBOOK_LIST, () => {
 
   it('lists Microsoft OneNote notebooks for user by name', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users/user1@contoso.onmicrosoft.com/onenote/notebooks`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users/${formatting.encodeQueryParameter('user1@contoso.onmicrosoft.com')}/onenote/notebooks`) {
         return {
           "value": [
             {
