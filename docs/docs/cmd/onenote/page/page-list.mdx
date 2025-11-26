@@ -35,7 +35,24 @@ m365 onenote page list [options]
 
 ## Remarks
 
-When we don't specify either `userId`, `userName`, `groupId`, `groupName` or `webUrl`, the OneNote pages will be retrieved of the currently logged in user.
+When you don't specify either `userId`, `userName`, `groupId`, `groupName` or `webUrl`, the OneNote pages will be retrieved of the currently logged in user.
+
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource        | Permissions                                                        |
+  |-----------------|--------------------------------------------------------------------|
+  | Microsoft Graph | Notes.Read.All, Sites.Read.All, User.ReadBasic.All, Group.Read.All |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  This command does not support application permissions.
+
+  </TabItem>
+</Tabs>
 
 ## Examples
 

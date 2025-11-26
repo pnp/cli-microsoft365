@@ -3,9 +3,10 @@ import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { entraGroup } from '../../../../utils/entraGroup.js';
 import { validation } from '../../../../utils/validation.js';
-import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 import { spo } from '../../../../utils/spo.js';
+import GraphDelegatedCommand from '../../../base/GraphDelegatedCommand.js';
+import { formatting } from '../../../../utils/formatting.js';
 
 interface CommandArgs {
   options: Options;
@@ -20,7 +21,7 @@ interface Options extends GlobalOptions {
   webUrl?: string;
 }
 
-class OneNoteNotebookAddCommand extends GraphCommand {
+class OneNoteNotebookAddCommand extends GraphDelegatedCommand {
   public get name(): string {
     return commands.NOTEBOOK_ADD;
   }
@@ -146,7 +147,7 @@ class OneNoteNotebookAddCommand extends GraphCommand {
       endpoint += `users/${args.options.userId}`;
     }
     else if (args.options.userName) {
-      endpoint += `users/${args.options.userName}`;
+      endpoint += `users/${formatting.encodeQueryParameter(args.options.userName)}`;
     }
     else if (args.options.groupId) {
       endpoint += `groups/${args.options.groupId}`;

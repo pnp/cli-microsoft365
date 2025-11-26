@@ -5,8 +5,9 @@ import { entraGroup } from '../../../../utils/entraGroup.js';
 import { odata } from '../../../../utils/odata.js';
 import { spo } from '../../../../utils/spo.js';
 import { validation } from '../../../../utils/validation.js';
-import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
+import GraphDelegatedCommand from '../../../base/GraphDelegatedCommand.js';
+import { formatting } from '../../../../utils/formatting.js';
 
 interface CommandArgs {
   options: Options;
@@ -20,7 +21,7 @@ interface Options extends GlobalOptions {
   webUrl?: string;
 }
 
-class OneNotePageListCommand extends GraphCommand {
+class OneNotePageListCommand extends GraphDelegatedCommand {
   public get name(): string {
     return commands.PAGE_LIST;
   }
@@ -101,13 +102,13 @@ class OneNotePageListCommand extends GraphCommand {
       endpoint += `users/${args.options.userId}`;
     }
     else if (args.options.userName) {
-      endpoint += `users/${args.options.userName}`;
+      endpoint += `users/${formatting.encodeQueryParameter(args.options.userName)}`;
     }
     else if (args.options.groupId) {
       endpoint += `groups/${args.options.groupId}`;
     }
     else if (args.options.groupName) {
-      const groupId = await this.getGroupId(args.options.groupName);
+      const groupId = await entraGroup.getGroupIdByDisplayName(args.options.groupName);
       endpoint += `groups/${groupId}`;
     }
     else if (args.options.webUrl) {
@@ -119,11 +120,6 @@ class OneNotePageListCommand extends GraphCommand {
     }
     endpoint += '/onenote/pages';
     return endpoint;
-  }
-
-  private async getGroupId(groupName: string): Promise<string> {
-    const group = await entraGroup.getGroupByDisplayName(groupName);
-    return group.id!;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

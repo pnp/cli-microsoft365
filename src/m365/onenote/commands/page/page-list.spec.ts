@@ -14,6 +14,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './page-list.js';
+import { accessToken } from '../../../../utils/accessToken.js';
 import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.PAGE_LIST, () => {
@@ -76,6 +77,7 @@ describe(commands.PAGE_LIST, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let accessTokenStub: sinon.SinonStub;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -84,13 +86,7 @@ describe(commands.PAGE_LIST, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName: string, defaultValue: any) => {
-      if (settingName === 'prompt') {
-        return false;
-      }
-
-      return defaultValue;
-    });
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName: string, defaultValue: any) => settingName === settingsNames.prompt ? false : defaultValue);
   });
 
   beforeEach(() => {
@@ -107,14 +103,14 @@ describe(commands.PAGE_LIST, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
-    (command as any).items = [];
+    accessTokenStub = sinon.stub(accessToken, 'assertAccessTokenType').resolves();
   });
 
   afterEach(() => {
     sinonUtil.restore([
       request.get,
       odata.getAllItems,
-      cli.getSettingWithDefaultValue
+      accessToken.assertAccessTokenType
     ]);
   });
 
@@ -165,6 +161,13 @@ describe(commands.PAGE_LIST, () => {
     assert.strictEqual(actual, true);
   });
 
+  it('enforces the user to use delegated permissions', async () => {
+    sinon.stub(odata, 'getAllItems').resolves([]);
+
+    await command.action(logger, { options: {} });
+    assert(accessTokenStub.calledOnceWithExactly('delegated'));
+  });
+
   it('lists Microsoft OneNote pages for the currently logged in user', async () => {
     sinon.stub(odata, 'getAllItems').callsFake(async (url: string) => {
       if (url === `https://graph.microsoft.com/v1.0/me/onenote/pages`) {
@@ -191,7 +194,7 @@ describe(commands.PAGE_LIST, () => {
 
   it('lists Microsoft OneNote pages for user by name', async () => {
     sinon.stub(odata, 'getAllItems').callsFake(async (url: string) => {
-      if (url === `https://graph.microsoft.com/v1.0/users/${userName}/onenote/pages`) {
+      if (url === `https://graph.microsoft.com/v1.0/users/${formatting.encodeQueryParameter(userName)}/onenote/pages`) {
         return pageResponse.value;
       }
       throw 'Invalid request';
@@ -215,7 +218,7 @@ describe(commands.PAGE_LIST, () => {
 
   it('lists Microsoft OneNote pages in group by name', async () => {
     sinon.stub(odata, 'getAllItems').callsFake(async (url: string) => {
-      if (url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(groupName)}'`) {
+      if (url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(groupName)}'&$select=id`) {
         return [{
           "id": groupId,
           "description": groupName,
@@ -277,7 +280,7 @@ describe(commands.PAGE_LIST, () => {
 
   it('throws error if group by displayName returns no results', async () => {
     sinon.stub(odata, 'getAllItems').callsFake(async (url: string) => {
-      if (url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(groupName)}'`) {
+      if (url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(groupName)}'&$select=id`) {
         return [];
       }
       throw 'Invalid request';
@@ -287,17 +290,9 @@ describe(commands.PAGE_LIST, () => {
   });
 
   it('throws an error if group by displayName returns multiple results', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
     const duplicateGroupId = '9f3c2c36-1682-4922-9ae1-f57d2caf0de1';
     sinon.stub(odata, 'getAllItems').callsFake(async (url: string) => {
-      if (url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(groupName)}'`) {
+      if (url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(groupName)}'&$select=id`) {
         return [{
           "id": groupId,
           "description": groupName,
@@ -311,6 +306,7 @@ describe(commands.PAGE_LIST, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { groupName: groupName } } as any), new CommandError("Multiple groups with name 'Dummy Group A' found. Found: bba4c915-0ac8-47a1-bd05-087a44c92d3b, 9f3c2c36-1682-4922-9ae1-f57d2caf0de1."));
+    await assert.rejects(command.action(logger, { options: { groupName: groupName } }),
+      new CommandError("Multiple groups with name 'Dummy Group A' found. Found: bba4c915-0ac8-47a1-bd05-087a44c92d3b, 9f3c2c36-1682-4922-9ae1-f57d2caf0de1."));
   });
 });
