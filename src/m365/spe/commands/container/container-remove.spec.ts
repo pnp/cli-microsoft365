@@ -34,7 +34,7 @@ describe(commands.CONTAINER_REMOVE, () => {
     sinon.stub(session, 'getId').returns('');
 
     sinon.stub(spe, 'getContainerTypeIdByName').withArgs(containerTypeName).resolves(containerTypeId);
-    sinon.stub(spe, 'getContainerIdByName').withArgs(containerTypeId, containerName).resolves(containerId);
+    sinon.stub(spe, 'getContainerIdByNameAndContainerTypeId').withArgs(containerTypeId, containerName).resolves(containerId);
 
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
