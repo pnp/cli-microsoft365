@@ -2530,7 +2530,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.15.2', output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 15);
+    assert.strictEqual(findings.length, 14);
   });
 
   it('e2e: shows correct number of findings for upgrading field customizer react 1.15.0 project to 1.15.2', async () => {
@@ -2538,7 +2538,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.15.2', output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 14);
+    assert.strictEqual(findings.length, 13);
   });
 
   it('e2e: shows correct number of findings for upgrading list view command set 1.15.0 project to 1.15.2', async () => {
@@ -2546,7 +2546,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.15.2', output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 15);
+    assert.strictEqual(findings.length, 14);
   });
 
   it('e2e: shows correct number of findings for upgrading no framework web part 1.15.0 project to 1.15.2', async () => {
@@ -2554,7 +2554,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.15.2', output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 16);
+    assert.strictEqual(findings.length, 15);
   });
 
   it('e2e: shows correct number of findings for upgrading react web part 1.15.0 project to 1.15.2', async () => {
@@ -2562,7 +2562,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.15.2', output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 16);
+    assert.strictEqual(findings.length, 15);
   });
 
   it('e2e: shows correct number of findings for upgrading web part with optional dependencies 1.15.0 project to 1.15.2', async () => {
@@ -2570,7 +2570,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.15.2', output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 27);
+    assert.strictEqual(findings.length, 26);
   });
 
   it('e2e: shows correct number of findings for upgrading ace 1.15.0 project to 1.15.2', async () => {
@@ -2596,7 +2596,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.16.0', output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 15);
+    assert.strictEqual(findings.length, 14);
   });
 
   it('e2e: shows correct number of findings for upgrading field customizer react 1.15.2 project to 1.16.0', async () => {
@@ -2604,7 +2604,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.16.0', output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 20);
+    assert.strictEqual(findings.length, 19);
   });
 
   it('e2e: shows correct number of findings for upgrading form customizer react 1.15.2 project to 1.16.0', async () => {
@@ -2612,7 +2612,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.16.0', output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 22);
+    assert.strictEqual(findings.length, 21);
   });
 
   it('e2e: shows correct number of findings for upgrading list view command set 1.15.2 project to 1.16.0', async () => {
@@ -2620,7 +2620,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.16.0', output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 15);
+    assert.strictEqual(findings.length, 14);
   });
 
   it('e2e: shows correct number of findings for upgrading no framework web part 1.15.2 project to 1.16.0', async () => {
@@ -2628,7 +2628,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.16.0', output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 16);
+    assert.strictEqual(findings.length, 15);
   });
 
   it('e2e: shows correct number of findings for upgrading react web part 1.15.2 project to 1.16.0', async () => {
@@ -2636,7 +2636,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.16.0', output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 23);
+    assert.strictEqual(findings.length, 22);
   });
 
   it('e2e: shows correct number of findings for upgrading web part with optional dependencies 1.15.2 project to 1.16.0', async () => {
@@ -2644,7 +2644,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.16.0', output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 26);
+    assert.strictEqual(findings.length, 25);
   });
   //#endregion
 
@@ -2662,7 +2662,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.16.1', output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 12);
+    assert.strictEqual(findings.length, 11);
   });
 
   it('e2e: shows correct number of findings for upgrading field customizer react 1.16.0 project to 1.16.1', async () => {
@@ -2670,7 +2670,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.16.1', output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 11);
+    assert.strictEqual(findings.length, 10);
   });
 
   it('e2e: shows correct number of findings for upgrading form customizer react 1.16.0 project to 1.16.1', async () => {
@@ -2678,7 +2678,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.16.1', output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 13);
+    assert.strictEqual(findings.length, 12);
   });
 
   it('e2e: shows correct number of findings for upgrading list view command set 1.16.0 project to 1.16.1', async () => {
@@ -2686,7 +2686,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.16.1', output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 12);
+    assert.strictEqual(findings.length, 11);
   });
 
   it('e2e: shows correct number of findings for upgrading no framework web part 1.16.0 project to 1.16.1', async () => {
@@ -2694,7 +2694,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.16.1', output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 13);
+    assert.strictEqual(findings.length, 12);
   });
 
   it('e2e: shows correct number of findings for upgrading react web part 1.16.0 project to 1.16.1', async () => {
@@ -2702,7 +2702,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.16.1', output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 13);
+    assert.strictEqual(findings.length, 12);
   });
 
   it('e2e: shows correct number of findings for upgrading web part with optional dependencies 1.16.0 project to 1.16.1', async () => {
@@ -2710,7 +2710,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.16.1', output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 23);
+    assert.strictEqual(findings.length, 22);
   });
   //#endregion
 
@@ -2728,7 +2728,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.17.0', output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 17);
+    assert.strictEqual(findings.length, 16);
   });
 
   it('e2e: shows correct number of findings for upgrading field customizer react 1.16.1 project to 1.17.0', async () => {
@@ -2736,7 +2736,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.17.0', output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 16);
+    assert.strictEqual(findings.length, 15);
   });
 
   it('e2e: shows correct number of findings for upgrading form customizer react 1.16.1 project to 1.17.0', async () => {
@@ -2744,7 +2744,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.17.0', output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 18);
+    assert.strictEqual(findings.length, 17);
   });
 
   it('e2e: shows correct number of findings for upgrading list view command set 1.16.1 project to 1.17.0', async () => {
@@ -2752,7 +2752,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.17.0', output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 17);
+    assert.strictEqual(findings.length, 16);
   });
 
   it('e2e: shows correct number of findings for upgrading no framework web part 1.16.1 project to 1.17.0', async () => {
@@ -2760,7 +2760,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.17.0', output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 18);
+    assert.strictEqual(findings.length, 17);
   });
 
   it('e2e: shows correct number of findings for upgrading react web part 1.16.1 project to 1.17.0', async () => {
@@ -2768,7 +2768,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.17.0', output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 18);
+    assert.strictEqual(findings.length, 17);
   });
 
   it('e2e: shows correct number of findings for upgrading web part with optional dependencies 1.16.1 project to 1.17.0', async () => {
@@ -2776,7 +2776,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.17.0', output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 28);
+    assert.strictEqual(findings.length, 27);
   });
   //#endregion
 
@@ -2794,7 +2794,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.17.1', output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 11);
+    assert.strictEqual(findings.length, 10);
   });
 
   it('e2e: shows correct number of findings for upgrading field customizer react 1.17.0 project to 1.17.1', async () => {
@@ -2802,7 +2802,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.17.1', output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 10);
+    assert.strictEqual(findings.length, 9);
   });
 
   it('e2e: shows correct number of findings for upgrading form customizer react 1.17.0 project to 1.17.1', async () => {
@@ -2810,7 +2810,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.17.1', output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 12);
+    assert.strictEqual(findings.length, 11);
   });
 
   it('e2e: shows correct number of findings for upgrading list view command set 1.17.0 project to 1.17.1', async () => {
@@ -2818,7 +2818,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.17.1', output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 11);
+    assert.strictEqual(findings.length, 10);
   });
 
   it('e2e: shows correct number of findings for upgrading no framework web part 1.17.0 project to 1.17.1', async () => {
@@ -2826,7 +2826,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.17.1', output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 12);
+    assert.strictEqual(findings.length, 11);
   });
 
   it('e2e: shows correct number of findings for upgrading react web part 1.17.0 project to 1.17.1', async () => {
@@ -2834,7 +2834,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.17.1', output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 12);
+    assert.strictEqual(findings.length, 11);
   });
 
   it('e2e: shows correct number of findings for upgrading web part with optional dependencies 1.17.0 project to 1.17.1', async () => {
@@ -2842,7 +2842,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.17.1', output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 22);
+    assert.strictEqual(findings.length, 21);
   });
   //#endregion
 
@@ -2860,7 +2860,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.17.2', output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 13);
+    assert.strictEqual(findings.length, 12);
   });
 
   it('e2e: shows correct number of findings for upgrading field customizer react 1.17.1 project to 1.17.2', async () => {
@@ -2868,7 +2868,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.17.2', output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 13);
+    assert.strictEqual(findings.length, 12);
   });
 
   it('e2e: shows correct number of findings for upgrading form customizer react 1.17.1 project to 1.17.2', async () => {
@@ -2876,7 +2876,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.17.2', output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 15);
+    assert.strictEqual(findings.length, 14);
   });
 
   it('e2e: shows correct number of findings for upgrading list view command set 1.17.1 project to 1.17.2', async () => {
@@ -2884,7 +2884,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.17.2', output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 13);
+    assert.strictEqual(findings.length, 12);
   });
 
   it('e2e: shows correct number of findings for upgrading no framework web part 1.17.1 project to 1.17.2', async () => {
@@ -2892,7 +2892,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.17.2', output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 14);
+    assert.strictEqual(findings.length, 13);
   });
 
   it('e2e: shows correct number of findings for upgrading react web part 1.17.1 project to 1.17.2', async () => {
@@ -2900,7 +2900,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.17.2', output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 15);
+    assert.strictEqual(findings.length, 14);
   });
 
   it('e2e: shows correct number of findings for upgrading web part with optional dependencies 1.17.1 project to 1.17.2', async () => {
@@ -2908,7 +2908,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.17.2', output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 24);
+    assert.strictEqual(findings.length, 23);
   });
   //#endregion
 
@@ -2926,7 +2926,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.17.3', output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 11);
+    assert.strictEqual(findings.length, 10);
   });
 
   it('e2e: shows correct number of findings for upgrading field customizer react 1.17.2 project to 1.17.3', async () => {
@@ -2934,7 +2934,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.17.3', output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 11);
+    assert.strictEqual(findings.length, 10);
   });
 
   it('e2e: shows correct number of findings for upgrading form customizer react 1.17.2 project to 1.17.3', async () => {
@@ -2942,7 +2942,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.17.3', output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 13);
+    assert.strictEqual(findings.length, 12);
   });
 
   it('e2e: shows correct number of findings for upgrading list view command set 1.17.2 project to 1.17.3', async () => {
@@ -2950,7 +2950,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.17.3', output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 11);
+    assert.strictEqual(findings.length, 10);
   });
 
   it('e2e: shows correct number of findings for upgrading no framework web part 1.17.2 project to 1.17.3', async () => {
@@ -2958,7 +2958,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.17.3', output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 14);
+    assert.strictEqual(findings.length, 13);
   });
 
   it('e2e: shows correct number of findings for upgrading react web part 1.17.2 project to 1.17.3', async () => {
@@ -2966,7 +2966,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.17.3', output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 15);
+    assert.strictEqual(findings.length, 14);
   });
 
   it('e2e: shows correct number of findings for upgrading web part with optional dependencies 1.17.2 project to 1.17.3', async () => {
@@ -2974,7 +2974,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.17.3', output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 23);
+    assert.strictEqual(findings.length, 22);
   });
   //#endregion
 
@@ -2992,7 +2992,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.17.4', output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 11);
+    assert.strictEqual(findings.length, 10);
   });
 
   it('e2e: shows correct number of findings for upgrading field customizer react 1.17.3 project to 1.17.4', async () => {
@@ -3000,7 +3000,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.17.4', output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 10);
+    assert.strictEqual(findings.length, 9);
   });
 
   it('e2e: shows correct number of findings for upgrading form customizer react 1.17.3 project to 1.17.4', async () => {
@@ -3008,7 +3008,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.17.4', output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 12);
+    assert.strictEqual(findings.length, 11);
   });
 
   it('e2e: shows correct number of findings for upgrading list view command set 1.17.3 project to 1.17.4', async () => {
@@ -3016,7 +3016,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.17.4', output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 11);
+    assert.strictEqual(findings.length, 10);
   });
 
   it('e2e: shows correct number of findings for upgrading no framework web part 1.17.3 project to 1.17.4', async () => {
@@ -3024,7 +3024,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.17.4', output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 13);
+    assert.strictEqual(findings.length, 12);
   });
 
   it('e2e: shows correct number of findings for upgrading react web part 1.17.3 project to 1.17.4', async () => {
@@ -3032,7 +3032,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.17.4', output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 13);
+    assert.strictEqual(findings.length, 12);
   });
 
   it('e2e: shows correct number of findings for upgrading web part with optional dependencies 1.17.3 project to 1.17.4', async () => {
@@ -3040,7 +3040,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.17.4', output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 22);
+    assert.strictEqual(findings.length, 21);
   });
   //#endregion
 
@@ -3058,7 +3058,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.18.0', preview: true, output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 16);
+    assert.strictEqual(findings.length, 15);
   });
 
   it('e2e: shows correct number of findings for upgrading field customizer react 1.17.4 project to 1.18.0', async () => {
@@ -3066,7 +3066,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.18.0', preview: true, output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 17);
+    assert.strictEqual(findings.length, 16);
   });
 
   it('e2e: shows correct number of findings for upgrading form customizer react 1.17.4 project to 1.18.0', async () => {
@@ -3074,7 +3074,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.18.0', preview: true, output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 19);
+    assert.strictEqual(findings.length, 18);
   });
 
   it('e2e: shows correct number of findings for upgrading list view command set 1.17.4 project to 1.18.0', async () => {
@@ -3082,7 +3082,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.18.0', preview: true, output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 16);
+    assert.strictEqual(findings.length, 15);
   });
 
   it('e2e: shows correct number of findings for upgrading no framework web part 1.17.4 project to 1.18.0', async () => {
@@ -3090,7 +3090,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.18.0', preview: true, output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 18);
+    assert.strictEqual(findings.length, 17);
   });
 
   it('e2e: shows correct number of findings for upgrading react web part 1.17.4 project to 1.18.0', async () => {
@@ -3098,7 +3098,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.18.0', preview: true, output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 20);
+    assert.strictEqual(findings.length, 19);
   });
 
   it('e2e: shows correct number of findings for upgrading web part with optional dependencies 1.17.4 project to 1.18.0', async () => {
@@ -3106,7 +3106,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.18.0', preview: true, output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 27);
+    assert.strictEqual(findings.length, 26);
   });
   //#endregion
 
@@ -3124,7 +3124,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.18.1', preview: true, output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 12);
+    assert.strictEqual(findings.length, 11);
   });
 
   it('e2e: shows correct number of findings for upgrading field customizer react 1.18.0 project to 1.18.1', async () => {
@@ -3132,7 +3132,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.18.1', preview: true, output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 11);
+    assert.strictEqual(findings.length, 10);
   });
 
   it('e2e: shows correct number of findings for upgrading form customizer react 1.18.0 project to 1.18.1', async () => {
@@ -3140,7 +3140,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.18.1', preview: true, output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 13);
+    assert.strictEqual(findings.length, 12);
   });
 
   it('e2e: shows correct number of findings for upgrading list view command set 1.18.0 project to 1.18.1', async () => {
@@ -3148,7 +3148,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.18.1', preview: true, output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 12);
+    assert.strictEqual(findings.length, 11);
   });
 
   it('e2e: shows correct number of findings for upgrading no framework web part 1.18.0 project to 1.18.1', async () => {
@@ -3156,7 +3156,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.18.1', preview: true, output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 14);
+    assert.strictEqual(findings.length, 13);
   });
 
   it('e2e: shows correct number of findings for upgrading react web part 1.18.0 project to 1.18.1', async () => {
@@ -3164,7 +3164,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.18.1', preview: true, output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 14);
+    assert.strictEqual(findings.length, 13);
   });
 
   it('e2e: shows correct number of findings for upgrading web part with optional dependencies 1.18.0 project to 1.18.1', async () => {
@@ -3172,7 +3172,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.18.1', preview: true, output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 23);
+    assert.strictEqual(findings.length, 22);
   });
   //#endregion
 
@@ -3190,7 +3190,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.18.2', preview: true, output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 11);
+    assert.strictEqual(findings.length, 10);
   });
 
   it('e2e: shows correct number of findings for upgrading field customizer react 1.18.1 project to 1.18.2', async () => {
@@ -3198,7 +3198,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.18.2', preview: true, output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 10);
+    assert.strictEqual(findings.length, 9);
   });
 
   it('e2e: shows correct number of findings for upgrading form customizer react 1.18.1 project to 1.18.2', async () => {
@@ -3206,7 +3206,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.18.2', preview: true, output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 12);
+    assert.strictEqual(findings.length, 11);
   });
 
   it('e2e: shows correct number of findings for upgrading list view command set 1.18.1 project to 1.18.2', async () => {
@@ -3214,7 +3214,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.18.2', preview: true, output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 11);
+    assert.strictEqual(findings.length, 10);
   });
 
   it('e2e: shows correct number of findings for upgrading no framework web part 1.18.1 project to 1.18.2', async () => {
@@ -3222,7 +3222,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.18.2', preview: true, output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 13);
+    assert.strictEqual(findings.length, 12);
   });
 
   it('e2e: shows correct number of findings for upgrading react web part 1.18.1 project to 1.18.2', async () => {
@@ -3230,7 +3230,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.18.2', preview: true, output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 13);
+    assert.strictEqual(findings.length, 12);
   });
 
   it('e2e: shows correct number of findings for upgrading web part with optional dependencies 1.18.1 project to 1.18.2', async () => {
@@ -3238,7 +3238,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.18.2', preview: true, output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 22);
+    assert.strictEqual(findings.length, 21);
   });
   //#endregion
 
@@ -3256,7 +3256,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.19.0', preview: true, output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 11);
+    assert.strictEqual(findings.length, 10);
   });
 
   it('e2e: shows correct number of findings for upgrading field customizer react 1.18.2 project to 1.19.0', async () => {
@@ -3264,7 +3264,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.19.0', preview: true, output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 10);
+    assert.strictEqual(findings.length, 9);
   });
 
   it('e2e: shows correct number of findings for upgrading form customizer react 1.18.2 project to 1.19.0', async () => {
@@ -3272,7 +3272,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.19.0', preview: true, output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 12);
+    assert.strictEqual(findings.length, 11);
   });
 
   it('e2e: shows correct number of findings for upgrading list view command set 1.18.2 project to 1.19.0', async () => {
@@ -3280,7 +3280,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.19.0', preview: true, output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 11);
+    assert.strictEqual(findings.length, 10);
   });
 
   it('e2e: shows correct number of findings for upgrading no framework web part 1.18.2 project to 1.19.0', async () => {
@@ -3288,7 +3288,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.19.0', preview: true, output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 13);
+    assert.strictEqual(findings.length, 12);
   });
 
   it('e2e: shows correct number of findings for upgrading react web part 1.18.2 project to 1.19.0', async () => {
@@ -3296,7 +3296,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.19.0', preview: true, output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 13);
+    assert.strictEqual(findings.length, 12);
   });
 
   it('e2e: shows correct number of findings for upgrading web part with optional dependencies 1.18.2 project to 1.19.0', async () => {
@@ -3304,7 +3304,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.19.0', preview: true, output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 22);
+    assert.strictEqual(findings.length, 21);
   });
   //#endregion
 
@@ -3322,7 +3322,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.20.0', preview: true, output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 14);
+    assert.strictEqual(findings.length, 13);
   });
 
   it('e2e: shows correct number of findings for upgrading field customizer react 1.19.0 project to 1.20.0', async () => {
@@ -3330,7 +3330,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.20.0', preview: true, output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 13);
+    assert.strictEqual(findings.length, 12);
   });
 
   it('e2e: shows correct number of findings for upgrading form customizer react 1.19.0 project to 1.20.0', async () => {
@@ -3338,7 +3338,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.20.0', preview: true, output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 15);
+    assert.strictEqual(findings.length, 14);
   });
 
   it('e2e: shows correct number of findings for upgrading list view command set 1.19.0 project to 1.20.0', async () => {
@@ -3346,7 +3346,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.20.0', preview: true, output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 14);
+    assert.strictEqual(findings.length, 13);
   });
 
   it('e2e: shows correct number of findings for upgrading no framework web part 1.19.0 project to 1.20.0', async () => {
@@ -3354,7 +3354,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.20.0', preview: true, output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 16);
+    assert.strictEqual(findings.length, 15);
   });
 
   it('e2e: shows correct number of findings for upgrading react web part 1.19.0 project to 1.20.0', async () => {
@@ -3362,7 +3362,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.20.0', preview: true, output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 16);
+    assert.strictEqual(findings.length, 15);
   });
 
   it('e2e: shows correct number of findings for upgrading web part with optional dependencies 1.19.0 project to 1.20.0', async () => {
@@ -3370,7 +3370,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.20.0', preview: true, output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 25);
+    assert.strictEqual(findings.length, 24);
   });
   //#endregion
 
@@ -3388,7 +3388,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.21.0', preview: true, output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 16);
+    assert.strictEqual(findings.length, 15);
   });
 
   it('e2e: shows correct number of findings for upgrading field customizer react 1.20.0 project to 1.21.0', async () => {
@@ -3396,7 +3396,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.21.0', preview: true, output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 15);
+    assert.strictEqual(findings.length, 14);
   });
 
   it('e2e: shows correct number of findings for upgrading form customizer react 1.20.0 project to 1.21.0', async () => {
@@ -3404,7 +3404,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.21.0', preview: true, output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 17);
+    assert.strictEqual(findings.length, 16);
   });
 
   it('e2e: shows correct number of findings for upgrading list view command set 1.20.0 project to 1.21.0', async () => {
@@ -3412,7 +3412,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.21.0', preview: true, output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 16);
+    assert.strictEqual(findings.length, 15);
   });
 
   it('e2e: shows correct number of findings for upgrading no framework web part 1.20.0 project to 1.21.0', async () => {
@@ -3420,7 +3420,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.21.0', preview: true, output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 18);
+    assert.strictEqual(findings.length, 17);
   });
 
   it('e2e: shows correct number of findings for upgrading react web part 1.20.0 project to 1.21.0', async () => {
@@ -3428,7 +3428,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.21.0', preview: true, output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 18);
+    assert.strictEqual(findings.length, 17);
   });
 
   it('e2e: shows correct number of findings for upgrading web part with optional dependencies 1.20.0 project to 1.21.0', async () => {
@@ -3436,7 +3436,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.21.0', preview: true, output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 28);
+    assert.strictEqual(findings.length, 27);
   });
   //#endregion
 
@@ -3454,7 +3454,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.21.1', preview: true, output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 16);
+    assert.strictEqual(findings.length, 15);
   });
 
   it('e2e: shows correct number of findings for upgrading field customizer react 1.21.0 project to 1.21.1', async () => {
@@ -3462,7 +3462,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.21.1', preview: true, output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 15);
+    assert.strictEqual(findings.length, 14);
   });
 
   it('e2e: shows correct number of findings for upgrading form customizer react 1.21.0 project to 1.21.1', async () => {
@@ -3470,7 +3470,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.21.1', preview: true, output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 17);
+    assert.strictEqual(findings.length, 16);
   });
 
   it('e2e: shows correct number of findings for upgrading list view command set 1.21.0 project to 1.21.1', async () => {
@@ -3478,7 +3478,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.21.1', preview: true, output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 16);
+    assert.strictEqual(findings.length, 15);
   });
 
   it('e2e: shows correct number of findings for upgrading no framework web part 1.21.0 project to 1.21.1', async () => {
@@ -3486,7 +3486,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.21.1', preview: true, output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 18);
+    assert.strictEqual(findings.length, 17);
   });
 
   it('e2e: shows correct number of findings for upgrading react web part 1.21.0 project to 1.21.1', async () => {
@@ -3494,7 +3494,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.21.1', preview: true, output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 18);
+    assert.strictEqual(findings.length, 17);
   });
 
   it('e2e: shows correct number of findings for upgrading web part with optional dependencies 1.21.0 project to 1.21.1', async () => {
@@ -3502,7 +3502,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.21.1', preview: true, output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 28);
+    assert.strictEqual(findings.length, 27);
   });
   //#endregion
 
@@ -3520,7 +3520,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.22.0-rc.0', preview: true, output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 52);
+    assert.strictEqual(findings.length, 51);
   });
 
   it('e2e: shows correct number of findings for upgrading field customizer react 1.21.1 project to 1.22.0-rc.0', async () => {
@@ -3528,7 +3528,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.22.0-rc.0', preview: true, output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 52);
+    assert.strictEqual(findings.length, 51);
   });
 
   it('e2e: shows correct number of findings for upgrading form customizer react 1.21.1 project to 1.22.0-rc.0', async () => {
@@ -3536,7 +3536,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.22.0-rc.0', preview: true, output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 54);
+    assert.strictEqual(findings.length, 53);
   });
 
   it('e2e: shows correct number of findings for upgrading list view command set 1.21.1 project to 1.22.0-rc.0', async () => {
@@ -3544,7 +3544,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.22.0-rc.0', preview: true, output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 52);
+    assert.strictEqual(findings.length, 51);
   });
 
   it('e2e: shows correct number of findings for upgrading no framework web part 1.21.1 project to 1.22.0-rc.0', async () => {
@@ -3552,7 +3552,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.22.0-rc.0', preview: true, output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 54);
+    assert.strictEqual(findings.length, 53);
   });
 
   it('e2e: shows correct number of findings for upgrading react web part 1.21.1 project to 1.22.0-rc.0', async () => {
@@ -3560,7 +3560,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.22.0-rc.0', preview: true, output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 55);
+    assert.strictEqual(findings.length, 54);
   });
 
   it('e2e: shows correct number of findings for upgrading web part with optional dependencies 1.21.1 project to 1.22.0-rc.0', async () => {
@@ -3568,7 +3568,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.22.0-rc.0', preview: true, output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 63);
+    assert.strictEqual(findings.length, 62);
   });
   //#endregion
 

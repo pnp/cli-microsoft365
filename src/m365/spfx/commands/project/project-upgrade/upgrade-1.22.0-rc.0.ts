@@ -94,7 +94,7 @@ export default [
   new FN002021_DEVDEP_rushstack_eslint_config('4.5.2'),
   new FN002022_DEVDEP_microsoft_eslint_plugin_spfx('1.22.0-rc.0'),
   new FN002023_DEVDEP_microsoft_eslint_config_spfx('1.22.0-rc.0'),
-  new FN002026_DEVDEP_typescript('5.8.0'),
+  new FN002026_DEVDEP_typescript('~5.8.0'),
   new FN002029_DEVDEP_microsoft_rush_stack_compiler_5_3('0.1.0', false),
   new FN002030_DEVDEP_microsoft_spfx_web_build_rig('1.22.0-rc.0'),
   new FN002031_DEVDEP_rushstack_heft('1.1.2'),
