@@ -113,7 +113,7 @@ describe('utils/spe', () => {
     assert.strictEqual(actual, 'de988700-d700-020e-0a00-0831f3042f00');
   });
 
-  it('correctly gets a container by its name using getContainerIdByName', async () => {
+  it('correctly gets a container by its name using getContainerIdByNameAndContainerTypeId', async () => {
     const containerTypeId = '0e95d161-d90d-4e3f-8b94-788a6b40aa48';
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/storage/fileStorage/containers?$filter=containerTypeId eq ${containerTypeId}&$select=id,displayName`) {
@@ -134,11 +134,11 @@ describe('utils/spe', () => {
       throw 'Invalid GET request:' + opts.url;
     });
 
-    const actual = await spe.getContainerIdByName(containerTypeId, 'my FILE storage Container 2');
+    const actual = await spe.getContainerIdByNameAndContainerTypeId(containerTypeId, 'my FILE storage Container 2');
     assert.strictEqual(actual, 'b!t18F8ybsHUq1z3LTz8xvZqP8zaSWjkFNhsME-Fepo75dTf9vQKfeRblBZjoSQrd7');
   });
 
-  it('correctly throws error when container was not found using getContainerIdByName', async () => {
+  it('correctly throws error when container was not found using getContainerIdByNameAndContainerTypeId', async () => {
     const containerTypeId = '0e95d161-d90d-4e3f-8b94-788a6b40aa48';
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/storage/fileStorage/containers?$filter=containerTypeId eq ${containerTypeId}&$select=id,displayName`) {
@@ -159,11 +159,11 @@ describe('utils/spe', () => {
       throw 'Invalid GET request:' + opts.url;
     });
 
-    await assert.rejects(spe.getContainerIdByName(containerTypeId, 'nonexistent container'),
+    await assert.rejects(spe.getContainerIdByNameAndContainerTypeId(containerTypeId, 'nonexistent container'),
       new Error(`The specified container 'nonexistent container' does not exist.`));
   });
 
-  it('correctly handles multiple results when using getContainerIdByName', async () => {
+  it('correctly handles multiple results when using getContainerIdByNameAndContainerTypeId', async () => {
     const containerTypeId = '0e95d161-d90d-4e3f-8b94-788a6b40aa48';
     const containers = [
       {
@@ -192,7 +192,7 @@ describe('utils/spe', () => {
 
     const stubMultiResults = sinon.stub(cli, 'handleMultipleResultsFound').resolves(containers.find(c => c.id === 'b!McTeU0-dW0GxKwECWdW04TIvEK-Js9xJib_RFqF-CqZxNe3OHVAIT4SqBxGm4fND')!);
 
-    const actual = await spe.getContainerIdByName(containerTypeId, 'My File Storage Container');
+    const actual = await spe.getContainerIdByNameAndContainerTypeId(containerTypeId, 'My File Storage Container');
     assert(stubMultiResults.calledOnce);
     assert.strictEqual(actual, 'b!McTeU0-dW0GxKwECWdW04TIvEK-Js9xJib_RFqF-CqZxNe3OHVAIT4SqBxGm4fND');
   });

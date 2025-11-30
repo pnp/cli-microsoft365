@@ -104,7 +104,7 @@ class SpeContainerRemoveCommand extends GraphCommand {
       await logger.logToStderr(`Getting container ID for container with name '${options.name}'...`);
     }
 
-    return spe.getContainerIdByName(containerTypeId, options.name!);
+    return spe.getContainerIdByNameAndContainerTypeId(containerTypeId, options.name!);
   }
 
   private async getContainerTypeId(options: Options, logger: Logger): Promise<string> {
