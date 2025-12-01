@@ -163,7 +163,7 @@ class EntraM365GroupRemoveCommand extends GraphCommand {
     }
 
     const requestOptions: CliRequestOptions = {
-      url: `${spoAdminUrl}/_api/GroupSiteManager/Delete?siteUrl='${url}'`,
+      url: `${spoAdminUrl}/_api/GroupSiteManager/Delete?siteUrl='${formatting.encodeQueryParameter(url)}'`,
       headers: {
         accept: 'application/json;odata=nometadata'
       },

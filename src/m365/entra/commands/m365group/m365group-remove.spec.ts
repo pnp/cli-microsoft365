@@ -41,7 +41,7 @@ describe(commands.M365GROUP_REMOVE, () => {
 
   const defaultPostStub = (): sinon.SinonStub => {
     return sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `https://contoso-admin.sharepoint.com/_api/GroupSiteManager/Delete?siteUrl='https://contoso.sharepoint.com/teams/sales'`) {
+      if (opts.url === `https://contoso-admin.sharepoint.com/_api/GroupSiteManager/Delete?siteUrl='https%3A%2F%2Fcontoso.sharepoint.com%2Fteams%2Fsales'`) {
         return Promise.resolve({
           "data": {
             "odata.null": true
@@ -247,7 +247,7 @@ describe(commands.M365GROUP_REMOVE, () => {
       .onSecondCall().resolves({ id: groupId });
 
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `https://contoso-admin.sharepoint.com/_api/GroupSiteManager/Delete?siteUrl='https://contoso.sharepoint.com/teams/sales'`) {
+      if (opts.url === `https://contoso-admin.sharepoint.com/_api/GroupSiteManager/Delete?siteUrl='https%3A%2F%2Fcontoso.sharepoint.com%2Fteams%2Fsales'`) {
         return Promise.resolve({
           "data": {
             "odata.null": true
