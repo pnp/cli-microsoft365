@@ -1,7 +1,6 @@
 import assert from 'assert';
 import fs from 'fs';
 import sinon from 'sinon';
-import { z } from 'zod';
 import auth from '../../../../Auth.js';
 import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
@@ -13,6 +12,7 @@ import { entraApp } from '../../../../utils/entraApp.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
+import { appCommandOptions } from '../../../base/AppCommand.js';
 import commands from '../../commands.js';
 import command from './permission-list.js';
 import { appRegApplicationPermissions, appRegDelegatedPermissionsMultipleResources, appRegNoApiPermissions, flowServiceOAuth2PermissionScopes, msGraphPrincipalAppRoles, msGraphPrincipalOAuth2PermissionScopes } from './permission-list.mock.js';
@@ -23,7 +23,7 @@ describe(commands.PERMISSION_LIST, () => {
   let loggerLogSpy: sinon.SinonSpy;
   let loggerLogToStderrSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
-  let commandOptionsSchema: z.ZodTypeAny;
+  let commandOptionsSchema: typeof appCommandOptions;
 
   //#region Mocked Responses 
   const appId = '9c79078b-815e-4a3e-bb80-2aaf2d9e9b3d';
@@ -46,7 +46,7 @@ describe(commands.PERMISSION_LIST, () => {
     sinon.stub(fs, 'readFileSync').returns(JSON.stringify(appResponse));
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
-    commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof appCommandOptions;
   });
 
   beforeEach(() => {

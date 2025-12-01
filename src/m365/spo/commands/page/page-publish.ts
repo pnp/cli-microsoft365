@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import { zod } from '../../../../utils/zod.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { globalOptionsZod } from '../../../../Command.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
@@ -8,16 +7,15 @@ import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 import { Page } from './Page.js';
 
-const options = globalOptionsZod
-  .extend({
-    webUrl: zod.alias('u', z.string()
-      .refine(url => validation.isValidSharePointUrl(url) === true, url => ({
-        message: `'${url}' is not a valid SharePoint Online site URL.`
-      }))
-    ),
-    name: zod.alias('n', z.string())
-  })
-  .strict();
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  webUrl: z.string()
+    .refine(url => validation.isValidSharePointUrl(url) === true, {
+      error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
+    })
+    .alias('u'),
+  name: z.string().alias('n')
+});
 declare type Options = z.infer<typeof options>;
 
 interface CommandArgs {
@@ -33,7 +31,7 @@ class SpoPagePublishCommand extends SpoCommand {
     return 'Publishes a modern page';
   }
 
-  public get schema(): z.ZodTypeAny {
+  public get schema(): z.ZodType {
     return options;
   }
 

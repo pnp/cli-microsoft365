@@ -2,20 +2,19 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
+import { cli } from '../../../../cli/cli.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
 import request from '../../../../request.js';
 import { telemetry } from '../../../../telemetry.js';
+import { entraUser } from '../../../../utils/entraUser.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
-import commands from '../../commands.js';
-import command from './engage-community-user-add.js';
-import { CommandInfo } from '../../../../cli/CommandInfo.js';
-import { z } from 'zod';
-import { cli } from '../../../../cli/cli.js';
 import { vivaEngage } from '../../../../utils/vivaEngage.js';
-import { entraUser } from '../../../../utils/entraUser.js';
+import commands from '../../commands.js';
+import command, { options } from './engage-community-user-add.js';
 
 describe(commands.ENGAGE_COMMUNITY_USER_ADD, () => {
   const communityId = 'eyJfdHlwZSI6Ikdyb3VwIiwiaWQiOiIzNjAyMDAxMTAwOSJ9';
@@ -28,7 +27,7 @@ describe(commands.ENGAGE_COMMUNITY_USER_ADD, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
-  let commandOptionsSchema: z.ZodTypeAny;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -37,7 +36,7 @@ describe(commands.ENGAGE_COMMUNITY_USER_ADD, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
-    commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
     sinon.stub(entraUser, 'getUserIdsByUpns').resolves(userIds);
     sinon.stub(vivaEngage, 'getCommunityByDisplayName').resolves({ groupId: entraGroupId });
     sinon.stub(vivaEngage, 'getCommunityById').resolves({ groupId: entraGroupId });

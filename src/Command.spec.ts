@@ -155,7 +155,7 @@ class MockCommandWithSchema extends Command {
     return 'Mock command description';
   }
 
-  public get schema(): z.ZodTypeAny | undefined {
+  public get schema(): z.ZodType | undefined {
     return globalOptionsZod;
   }
 

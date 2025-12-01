@@ -1,17 +1,15 @@
 import { z } from 'zod';
 import { globalOptionsZod } from '../../../../Command.js';
-import { zod } from '../../../../utils/zod.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { odata } from '../../../../utils/odata.js';
 import { spo } from '../../../../utils/spo.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 
-const options = globalOptionsZod
-  .extend({
-    excludeDeletedSites: zod.alias('excludeDeletedSites', z.boolean().optional())
-  })
-  .strict();
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  excludeDeletedSites: z.boolean().optional()
+});
 declare type Options = z.infer<typeof options>;
 
 interface CommandArgs {
@@ -27,7 +25,7 @@ class SpoSiteAppCatalogListCommand extends SpoCommand {
     return 'List all site collection app catalogs within the tenant';
   }
 
-  public get schema(): z.ZodTypeAny | undefined {
+  public get schema(): z.ZodType | undefined {
     return options;
   }
 

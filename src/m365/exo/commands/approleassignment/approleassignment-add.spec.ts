@@ -1,25 +1,24 @@
+import { AdministrativeUnit, UnifiedRoleAssignment, UnifiedRoleDefinition } from '@microsoft/microsoft-graph-types';
 import assert from 'assert';
 import sinon from 'sinon';
-import { z } from 'zod';
 import auth from '../../../../Auth.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
-import commands from '../../commands.js';
-import { telemetry } from '../../../../telemetry.js';
-import { pid } from '../../../../utils/pid.js';
-import { session } from '../../../../utils/session.js';
-import { cli } from '../../../../cli/cli.js';
-import command from './approleassignment-add.js';
-import { sinonUtil } from '../../../../utils/sinonUtil.js';
-import request from '../../../../request.js';
 import { CommandError } from '../../../../Command.js';
-import { roleDefinition } from '../../../../utils/roleDefinition.js';
-import { AdministrativeUnit, UnifiedRoleAssignment, UnifiedRoleDefinition } from '@microsoft/microsoft-graph-types';
-import { entraServicePrincipal } from '../../../../utils/entraServicePrincipal.js';
-import { entraUser } from '../../../../utils/entraUser.js';
+import request from '../../../../request.js';
+import { telemetry } from '../../../../telemetry.js';
+import { customAppScope } from '../../../../utils/customAppScope.js';
 import { entraAdministrativeUnit } from '../../../../utils/entraAdministrativeUnit.js';
 import { entraGroup } from '../../../../utils/entraGroup.js';
-import { customAppScope } from '../../../../utils/customAppScope.js';
+import { entraServicePrincipal } from '../../../../utils/entraServicePrincipal.js';
+import { entraUser } from '../../../../utils/entraUser.js';
+import { pid } from '../../../../utils/pid.js';
+import { roleDefinition } from '../../../../utils/roleDefinition.js';
+import { session } from '../../../../utils/session.js';
+import { sinonUtil } from '../../../../utils/sinonUtil.js';
+import commands from '../../commands.js';
+import command, { options } from './approleassignment-add.js';
 
 describe(commands.APPROLEASSIGNMENT_ADD, () => {
   const principalId = 'fc33aa61-cf0e-46b6-9506-f633347202ab';
@@ -86,7 +85,7 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
-  let commandOptionsSchema: z.ZodTypeAny;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -95,7 +94,7 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
-    commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -966,7 +965,7 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
       verbose: true
     });
     await command.action(logger, {
-      options: result.data
+      options: result.data!
     });
     assert(loggerLogSpy.calledOnceWithExactly(unifiedRoleAssignmentScopeTenant));
   });
@@ -993,7 +992,7 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
       verbose: true
     });
     await command.action(logger, {
-      options: result.data
+      options: result.data!
     });
     assert(loggerLogSpy.calledOnceWithExactly(unifiedRoleAssignmentScopeTenant));
   });
@@ -1020,7 +1019,7 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
       verbose: true
     });
     await command.action(logger, {
-      options: result.data
+      options: result.data!
     });
     assert(loggerLogSpy.calledOnceWithExactly(unifiedRoleAssignmentScopeTenant));
   });
@@ -1047,7 +1046,7 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
       verbose: true
     });
     await command.action(logger, {
-      options: result.data
+      options: result.data!
     });
     assert(loggerLogSpy.calledOnceWithExactly(unifiedRoleAssignmentScopeUser));
   });
@@ -1075,7 +1074,7 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
       verbose: true
     });
     await command.action(logger, {
-      options: result.data
+      options: result.data!
     });
     assert(loggerLogSpy.calledOnceWithExactly(unifiedRoleAssignmentScopeUser));
   });
@@ -1102,7 +1101,7 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
       verbose: true
     });
     await command.action(logger, {
-      options: result.data
+      options: result.data!
     });
     assert(loggerLogSpy.calledOnceWithExactly(unifiedRoleAssignmentScopeGroup));
   });
@@ -1130,7 +1129,7 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
       verbose: true
     });
     await command.action(logger, {
-      options: result.data
+      options: result.data!
     });
     assert(loggerLogSpy.calledOnceWithExactly(unifiedRoleAssignmentScopeGroup));
   });
@@ -1157,7 +1156,7 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
       verbose: true
     });
     await command.action(logger, {
-      options: result.data
+      options: result.data!
     });
     assert(loggerLogSpy.calledOnceWithExactly(unifiedRoleAssignmentScopeAdministrativeUnit));
   });
@@ -1185,7 +1184,7 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
       verbose: true
     });
     await command.action(logger, {
-      options: result.data
+      options: result.data!
     });
     assert(loggerLogSpy.calledOnceWithExactly(unifiedRoleAssignmentScopeAdministrativeUnit));
   });
@@ -1212,7 +1211,7 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
       verbose: true
     });
     await command.action(logger, {
-      options: result.data
+      options: result.data!
     });
     assert(loggerLogSpy.calledOnceWithExactly(unifiedRoleAssignmentScopeCustom));
   });
@@ -1240,7 +1239,7 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
       verbose: true
     });
     await command.action(logger, {
-      options: result.data
+      options: result.data!
     });
     assert(loggerLogSpy.calledOnceWithExactly(unifiedRoleAssignmentScopeCustom));
   });
@@ -1262,7 +1261,7 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
       scope: 'tenant'
     });
     await assert.rejects(command.action(logger, {
-      options: result.data
+      options: result.data!
     }), new CommandError('Invalid request'));
   });
 });

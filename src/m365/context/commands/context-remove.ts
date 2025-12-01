@@ -3,16 +3,14 @@ import { z } from 'zod';
 import { cli } from '../../../cli/cli.js';
 import { Logger } from '../../../cli/Logger.js';
 import { CommandError, globalOptionsZod } from '../../../Command.js';
-import { zod } from '../../../utils/zod.js';
 import AnonymousCommand from '../../base/AnonymousCommand.js';
 import { M365RcJson } from '../../base/M365RcJson.js';
 import commands from '../commands.js';
 
-const options = globalOptionsZod
-  .extend({
-    force: zod.alias('f', z.boolean().optional())
-  })
-  .strict();
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  force: z.boolean().optional().alias('f')
+});
 
 declare type Options = z.infer<typeof options>;
 
@@ -29,7 +27,7 @@ class ContextRemoveCommand extends AnonymousCommand {
     return 'Removes the CLI for Microsoft 365 context in the current working folder';
   }
 
-  public get schema(): z.ZodTypeAny | undefined {
+  public get schema(): z.ZodType | undefined {
     return options;
   }
 

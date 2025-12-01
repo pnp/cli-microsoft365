@@ -1,6 +1,5 @@
 ﻿import { z } from 'zod';
 import { globalOptionsZod } from '../../../../Command.js';
-import { zod } from '../../../../utils/zod.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import { Logger } from '../../../../cli/Logger.js';
 import commands from '../../commands.js';
@@ -10,33 +9,32 @@ import { MailboxSettings } from '@microsoft/microsoft-graph-types';
 import { accessToken } from '../../../../utils/accessToken.js';
 import auth from '../../../../Auth.js';
 
-const options = globalOptionsZod
-  .extend({
-    userId: zod.alias('i', z.string().refine(id => validation.isValidGuid(id), id => ({
-      message: `'${id}' is not a valid GUID.`
-    })).optional()),
-    userName: zod.alias('n', z.string().refine(name => validation.isValidUserPrincipalName(name), name => ({
-      message: `'${name}' is not a valid UPN.`
-    })).optional()),
-    dateFormat: z.string().optional(),
-    timeFormat: z.string().optional(),
-    timeZone: z.string().optional(),
-    language: z.string().optional(),
-    delegateMeetingMessageDeliveryOptions: z.enum(['sendToDelegateAndInformationToPrincipal', 'sendToDelegateAndPrincipal', 'sendToDelegateOnly']).optional(),
-    workingDays: z.string().transform((value) => value.split(',')).pipe(z.enum(['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']).array()).optional(),
-    workingHoursStartTime: z.string().optional(),
-    workingHoursEndTime: z.string().optional(),
-    workingHoursTimeZone: z.string().optional(),
-    autoReplyExternalAudience: z.enum(['none', 'all', 'contactsOnly']).optional(),
-    autoReplyExternalMessage: z.string().optional(),
-    autoReplyInternalMessage: z.string().optional(),
-    autoReplyStartDateTime: z.string().optional(),
-    autoReplyStartTimeZone: z.string().optional(),
-    autoReplyEndDateTime: z.string().optional(),
-    autoReplyEndTimeZone: z.string().optional(),
-    autoReplyStatus: z.enum(['disabled', 'scheduled', 'alwaysEnabled']).optional()
-  })
-  .strict();
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  userId: z.string().refine(id => validation.isValidGuid(id), {
+    error: e => `'${e.input}' is not a valid GUID.`
+  }).optional().alias('i'),
+  userName: z.string().refine(name => validation.isValidUserPrincipalName(name), {
+    error: e => `'${e.input}' is not a valid UPN.`
+  }).optional().alias('n'),
+  dateFormat: z.string().optional(),
+  timeFormat: z.string().optional(),
+  timeZone: z.string().optional(),
+  language: z.string().optional(),
+  delegateMeetingMessageDeliveryOptions: z.enum(['sendToDelegateAndInformationToPrincipal', 'sendToDelegateAndPrincipal', 'sendToDelegateOnly']).optional(),
+  workingDays: z.string().transform((value) => value.split(',')).pipe(z.enum(['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']).array()).optional(),
+  workingHoursStartTime: z.string().optional(),
+  workingHoursEndTime: z.string().optional(),
+  workingHoursTimeZone: z.string().optional(),
+  autoReplyExternalAudience: z.enum(['none', 'all', 'contactsOnly']).optional(),
+  autoReplyExternalMessage: z.string().optional(),
+  autoReplyInternalMessage: z.string().optional(),
+  autoReplyStartDateTime: z.string().optional(),
+  autoReplyStartTimeZone: z.string().optional(),
+  autoReplyEndDateTime: z.string().optional(),
+  autoReplyEndTimeZone: z.string().optional(),
+  autoReplyStatus: z.enum(['disabled', 'scheduled', 'alwaysEnabled']).optional()
+});
 
 declare type Options = z.infer<typeof options>;
 
@@ -53,20 +51,21 @@ class OutlookMailboxSettingsSetCommand extends GraphCommand {
     return 'Updates user mailbox settings';
   }
 
-  public get schema(): z.ZodTypeAny | undefined {
+  public get schema(): z.ZodType | undefined {
     return options;
   }
 
-  public getRefinedSchema(schema: typeof options): z.ZodEffects<any> | undefined {
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
       .refine(options => !(options.userId && options.userName), {
-        message: 'Specify either userId or userName, but not both'
+        error: 'Specify either userId or userName, but not both'
       })
-      .refine(options => [options.workingDays, options.workingHoursStartTime, options.workingHoursEndTime, options.workingHoursTimeZone,
+      .refine(options => [
+        options.workingDays, options.workingHoursStartTime, options.workingHoursEndTime, options.workingHoursTimeZone,
         options.autoReplyStatus, options.autoReplyExternalAudience, options.autoReplyExternalMessage, options.autoReplyInternalMessage,
         options.autoReplyStartDateTime, options.autoReplyStartTimeZone, options.autoReplyEndDateTime, options.autoReplyEndTimeZone,
         options.timeFormat, options.timeZone, options.dateFormat, options.delegateMeetingMessageDeliveryOptions, options.language].filter(o => o !== undefined).length > 0, {
-        message: 'Specify at least one of the following options: workingDays, workingHoursStartTime, workingHoursEndTime, workingHoursTimeZone, autoReplyStatus, autoReplyExternalAudience, autoReplyExternalMessage, autoReplyInternalMessage, autoReplyStartDateTime, autoReplyStartTimeZone, autoReplyEndDateTime, autoReplyEndTimeZone, timeFormat, timeZone, dateFormat, delegateMeetingMessageDeliveryOptions, or language'
+        error: 'Specify at least one of the following options: workingDays, workingHoursStartTime, workingHoursEndTime, workingHoursTimeZone, autoReplyStatus, autoReplyExternalAudience, autoReplyExternalMessage, autoReplyInternalMessage, autoReplyStartDateTime, autoReplyStartTimeZone, autoReplyEndDateTime, autoReplyEndTimeZone, timeFormat, timeZone, dateFormat, delegateMeetingMessageDeliveryOptions, or language'
       });
   }
 

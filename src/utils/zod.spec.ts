@@ -4,17 +4,17 @@ import { zod } from '../utils/zod.js';
 
 describe('utils/zod', () => {
   it('parses string option', () => {
-    const schema = z.object({
+    const schema = z.strictObject({
       stringOption: z.string()
-    }).strict();
+    });
     const options = zod.schemaToOptionInfo(schema);
     assert.strictEqual(options[0].type, 'string');
   });
 
   it('parses enum option', () => {
-    const schema = z.object({
+    const schema = z.strictObject({
       enumOption: z.enum(['a', 'b', 'c'])
-    }).strict();
+    });
     const options = zod.schemaToOptionInfo(schema);
     assert.deepStrictEqual(options[0].autocomplete, ['a', 'b', 'c']);
   });
@@ -25,58 +25,57 @@ describe('utils/zod', () => {
       B = 'B',
       C = 'C'
     }
-    const schema = z.object({
-      enumOption: z.nativeEnum(TestEnum)
-    }).strict();
+    const schema = z.strictObject({
+      enumOption: z.enum(TestEnum)
+    });
     const options = zod.schemaToOptionInfo(schema);
     assert.deepStrictEqual(options[0].autocomplete, ['A', 'B', 'C']);
   });
 
   it('parses boolean option', () => {
-    const schema = z.object({
+    const schema = z.strictObject({
       booleanOption: z.boolean()
-    }).strict();
+    });
     const options = zod.schemaToOptionInfo(schema);
     assert.strictEqual(options[0].type, 'boolean');
   });
 
   it('parses number option', () => {
-    const schema = z.object({
+    const schema = z.strictObject({
       numberOption: z.number()
-    }).strict();
+    });
     const options = zod.schemaToOptionInfo(schema);
     assert.strictEqual(options[0].type, 'number');
   });
 
   it('parses required string option', () => {
-    const schema = z.object({
+    const schema = z.strictObject({
       stringOption: z.string()
-    }).strict();
+    });
     const options = zod.schemaToOptionInfo(schema);
     assert.strictEqual(options[0].required, true);
   });
 
   it('parses optional string option', () => {
-    const schema = z.object({
+    const schema = z.strictObject({
       stringOption: z.string().optional()
-    }).strict();
+    });
     const options = zod.schemaToOptionInfo(schema);
     assert.strictEqual(options[0].required, false);
   });
 
   it('parses optional boolean option with a default value', () => {
-    const schema = z.object({
+    const schema = z.strictObject({
       boolOption: z.boolean().default(false)
-    }).strict();
+    });
     const options = zod.schemaToOptionInfo(schema);
     assert.strictEqual(options[0].required, false);
   });
 
   it('parses refined schema', () => {
-    const schema = z.object({
+    const schema = z.strictObject({
       boolOption: z.boolean().default(false)
     })
-      .strict()
       .refine(data => data.boolOption === true, {
         message: 'boolOption must be true'
       });

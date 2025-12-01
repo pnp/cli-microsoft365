@@ -8,7 +8,7 @@ import { browserUtil } from '../../utils/browserUtil.js';
 import AnonymousCommand from '../base/AnonymousCommand.js';
 import commands from './commands.js';
 
-const options = globalOptionsZod.strict();
+export const options = globalOptionsZod.strict();
 
 class DocsCommand extends AnonymousCommand {
   public get name(): string {
