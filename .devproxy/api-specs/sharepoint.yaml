@@ -57,6 +57,22 @@ components:
             User.Read.All: User.Read.All
             User.ReadWrite.All: User.ReadWrite.All
 paths:
+  /_api/Brandcenter/Configuration:
+    get:
+      security:
+        - delegated:
+          - AllSites.Read
+          - AllSites.Write
+          - AllSites.Manage
+          - AllSites.FullControl
+        - application:
+          - Sites.Read.All
+          - Sites.ReadWrite.All
+          - Sites.Manage.All
+          - Sites.FullControl.All
+      responses:
+        200:
+          description: OK
   /_api/contextinfo:
     post:
       security:
