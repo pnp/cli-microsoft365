@@ -1,12 +1,12 @@
+import commands from '../../commands.js';
+import { Logger } from '../../../../cli/Logger.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import { globalOptionsZod } from '../../../../Command.js';
 import { z } from 'zod';
 import { zod } from '../../../../utils/zod.js';
-import { Logger } from '../../../../cli/Logger.js';
-import commands from '../../commands.js';
-import { DOMParser } from '@xmldom/xmldom';
 import { validation } from '../../../../utils/validation.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
+import { DOMParser } from '@xmldom/xmldom';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { DefaultColumnValue } from "./DefaultColumnValue";
@@ -25,6 +25,7 @@ const options = globalOptionsZod
     ),
     listTitle: zod.alias('t', z.string().optional()),
     listUrl: z.string().optional(),
+    fieldName: z.string(),
     folderUrl: z.string().optional()
   })
   .strict();
@@ -34,13 +35,13 @@ interface CommandArgs {
   options: Options;
 }
 
-class SpoListDefaultValueListCommand extends SpoCommand {
+class SpoListDefaultValueGetCommand extends SpoCommand {
   public get name(): string {
-    return commands.LIST_DEFAULTVALUE_LIST;
+    return commands.LIST_DEFAULTVALUE_GET;
   }
 
   public get description(): string {
-    return 'Retrieves default column values for a specific document library';
+    return 'Gets a specific default column value from a list';
   }
 
   public get schema(): z.ZodTypeAny {
@@ -57,12 +58,11 @@ class SpoListDefaultValueListCommand extends SpoCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       if (this.verbose) {
-        await logger.logToStderr(`Retrieving default column values for list '${args.options.listId || args.options.listTitle || args.options.listUrl}'...`);
+        await logger.logToStderr(`Retrieving default column value for field '${args.options.fieldName}' in list '${args.options.listId || args.options.listTitle || args.options.listUrl}'...`);
         await logger.logToStderr('Retrieving list information...');
       }
 
       const listServerRelUrl = await this.getServerRelativeListUrl(args.options);
-
       if (this.verbose) {
         await logger.logToStderr('Retrieving default column values...');
       }
@@ -79,12 +79,21 @@ class SpoListDefaultValueListCommand extends SpoCommand {
         // For lists that have never had default column values set, the client_LocationBasedDefaults.html file does not exist.
         defaultValues = [];
       }
+      defaultValues = defaultValues.filter(d => d.fieldName.toLowerCase() === args.options.fieldName.toLowerCase());
 
       if (args.options.folderUrl) {
         const serverRelFolderUrl = urlUtil.removeTrailingSlashes(urlUtil.getServerRelativePath(args.options.webUrl, args.options.folderUrl));
         defaultValues = defaultValues.filter(d => d.folderUrl.toLowerCase() === serverRelFolderUrl.toLowerCase());
       }
-      await logger.log(defaultValues);
+      else {
+        defaultValues = defaultValues.filter(d => d.folderUrl.toLowerCase() === listServerRelUrl.toLowerCase());
+      }
+
+      if (defaultValues.length === 0) {
+        throw `No default column value found for field '${args.options.fieldName}'${args.options.folderUrl ? ` in folder '${args.options.folderUrl}'` : ''}.`;
+      }
+
+      await logger.log(defaultValues[0]);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
@@ -135,7 +144,7 @@ class SpoListDefaultValueListCommand extends SpoCommand {
       headers: {
         accept: 'application/json;odata=nometadata'
       },
-      responseType: 'json'
+      responseType: 'text'
     };
     const defaultValuesXml = await request.get<string>(requestOptions);
     return defaultValuesXml;
@@ -163,9 +172,8 @@ class SpoListDefaultValueListCommand extends SpoCommand {
         });
       }
     }
-
     return results;
   }
 }
 
-export default new SpoListDefaultValueListCommand();
+export default new SpoListDefaultValueGetCommand();
