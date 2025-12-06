@@ -9,12 +9,7 @@ import { validation } from '../../../../utils/validation.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
-
-interface DefaultColumnValue {
-  fieldName: string;
-  fieldValue: string;
-  folderUrl: string
-}
+import { DefaultColumnValue } from "./DefaultColumnValue";
 
 const options = globalOptionsZod
   .extend({

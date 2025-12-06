@@ -9,12 +9,7 @@ import { urlUtil } from '../../../../utils/urlUtil.js';
 import { DOMParser } from '@xmldom/xmldom';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
-
-interface DefaultColumnValue {
-  fieldName: string;
-  fieldValue: string;
-  folderUrl: string
-}
+import { DefaultColumnValue } from "./DefaultColumnValue";
 
 const options = globalOptionsZod
   .extend({
@@ -149,7 +144,7 @@ class SpoListDefaultValueGetCommand extends SpoCommand {
       headers: {
         accept: 'application/json;odata=nometadata'
       },
-      responseType: 'json'
+      responseType: 'text'
     };
     const defaultValuesXml = await request.get<string>(requestOptions);
     return defaultValuesXml;
@@ -177,7 +172,6 @@ class SpoListDefaultValueGetCommand extends SpoCommand {
         });
       }
     }
-
     return results;
   }
 }
