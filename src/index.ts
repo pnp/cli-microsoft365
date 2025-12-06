@@ -17,5 +17,14 @@ await (async () => {
     updateNotifier.default({ pkg: app.packageJson() as any }).notify({ defer: false });
   }
 
-  await cli.execute(process.argv.slice(2));
+  try {
+    await cli.execute(process.argv.slice(2));
+  }
+  catch (err) {
+    if (err instanceof Error && err.name === 'ExitPromptError') {
+      process.exit(1);
+    }
+
+    cli.closeWithError(err, cli.optionsFromArgs || { options: {} });
+  }
 })();
