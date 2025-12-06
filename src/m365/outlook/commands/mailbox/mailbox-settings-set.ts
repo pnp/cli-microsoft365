@@ -58,14 +58,21 @@ class OutlookMailboxSettingsSetCommand extends GraphCommand {
   public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
       .refine(options => !(options.userId && options.userName), {
-        error: 'Specify either userId or userName, but not both'
+        error: 'Specify either userId or userName, but not both',
+        params: {
+          customCode: 'optionSet',
+          options: ['userId', 'userName']
+        }
       })
       .refine(options => [
         options.workingDays, options.workingHoursStartTime, options.workingHoursEndTime, options.workingHoursTimeZone,
         options.autoReplyStatus, options.autoReplyExternalAudience, options.autoReplyExternalMessage, options.autoReplyInternalMessage,
         options.autoReplyStartDateTime, options.autoReplyStartTimeZone, options.autoReplyEndDateTime, options.autoReplyEndTimeZone,
         options.timeFormat, options.timeZone, options.dateFormat, options.delegateMeetingMessageDeliveryOptions, options.language].filter(o => o !== undefined).length > 0, {
-        error: 'Specify at least one of the following options: workingDays, workingHoursStartTime, workingHoursEndTime, workingHoursTimeZone, autoReplyStatus, autoReplyExternalAudience, autoReplyExternalMessage, autoReplyInternalMessage, autoReplyStartDateTime, autoReplyStartTimeZone, autoReplyEndDateTime, autoReplyEndTimeZone, timeFormat, timeZone, dateFormat, delegateMeetingMessageDeliveryOptions, or language'
+        error: 'Specify at least one of the following options: workingDays, workingHoursStartTime, workingHoursEndTime, workingHoursTimeZone, autoReplyStatus, autoReplyExternalAudience, autoReplyExternalMessage, autoReplyInternalMessage, autoReplyStartDateTime, autoReplyStartTimeZone, autoReplyEndDateTime, autoReplyEndTimeZone, timeFormat, timeZone, dateFormat, delegateMeetingMessageDeliveryOptions, or language',
+        params: {
+          customCode: 'required'
+        }
       });
   }
 

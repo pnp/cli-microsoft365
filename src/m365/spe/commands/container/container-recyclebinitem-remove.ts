@@ -40,10 +40,18 @@ class SpeContainerRecycleBinItemRemoveCommand extends GraphCommand {
   public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
       .refine((options: Options) => [options.id, options.name].filter(o => o !== undefined).length === 1, {
-        error: 'Use one of the following options: id or name.'
+        error: 'Use one of the following options: id or name.',
+        params: {
+          customCode: 'optionSet',
+          options: ['id', 'name']
+        }
       })
       .refine((options: Options) => !options.name || [options.containerTypeId, options.containerTypeName].filter(o => o !== undefined).length === 1, {
-        error: 'Use one of the following options when specifying the container name: containerTypeId or containerTypeName.'
+        error: 'Use one of the following options when specifying the container name: containerTypeId or containerTypeName.',
+        params: {
+          customCode: 'optionSet',
+          options: ['containerTypeId', 'containerTypeName']
+        }
       })
       .refine((options: Options) => options.name || [options.containerTypeId, options.containerTypeName].filter(o => o !== undefined).length === 0, {
         error: 'Options containerTypeId and containerTypeName are only required when removing a container by name.'

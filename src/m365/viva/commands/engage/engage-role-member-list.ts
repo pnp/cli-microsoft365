@@ -33,7 +33,11 @@ class VivaEngageRoleMemberListCommand extends GraphCommand {
   public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
       .refine(options => [options.roleId, options.roleName].filter(x => x !== undefined).length === 1, {
-        error: 'Specify either roleId, or roleName, but not both.'
+        error: 'Specify either roleId, or roleName, but not both.',
+        params: {
+          customCode: 'optionSet',
+          options: ['roleId', 'roleName']
+        }
       });
   }
 

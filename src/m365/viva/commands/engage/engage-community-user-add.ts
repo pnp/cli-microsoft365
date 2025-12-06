@@ -47,16 +47,32 @@ class VivaEngageCommunityUserAddCommand extends GraphCommand {
   public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
       .refine(options => [options.communityId, options.communityDisplayName, options.entraGroupId].filter(x => x !== undefined).length === 1, {
-        error: 'Specify either communityId, communityDisplayName, or entraGroupId, but not multiple.'
+        error: 'Specify either communityId, communityDisplayName, or entraGroupId, but not multiple.',
+        params: {
+          customCode: 'optionSet',
+          options: ['communityId', 'communityDisplayName', 'entraGroupId']
+        }
       })
       .refine(options => options.communityId || options.communityDisplayName || options.entraGroupId, {
-        error: 'Specify at least one of communityId, communityDisplayName, or entraGroupId.'
+        error: 'Specify at least one of communityId, communityDisplayName, or entraGroupId.',
+        params: {
+          customCode: 'optionSet',
+          options: ['communityId', 'communityDisplayName', 'entraGroupId']
+        }
       })
       .refine(options => options.ids || options.userNames, {
-        error: 'Specify either of ids or userNames.'
+        error: 'Specify either of ids or userNames.',
+        params: {
+          customCode: 'optionSet',
+          options: ['ids', 'userNames']
+        }
       })
       .refine(options => typeof options.userNames !== 'undefined' || typeof options.ids !== 'undefined', {
-        error: 'Specify either ids or userNames, but not both.'
+        error: 'Specify either ids or userNames, but not both.',
+        params: {
+          customCode: 'optionSet',
+          options: ['ids', 'userNames']
+        }
       });
   }
 

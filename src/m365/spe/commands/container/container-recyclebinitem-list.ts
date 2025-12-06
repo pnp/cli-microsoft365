@@ -38,7 +38,11 @@ class SpeContainerRecycleBinItemListCommand extends GraphCommand {
   public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
       .refine((options: Options) => [options.containerTypeId, options.containerTypeName].filter(o => o !== undefined).length === 1, {
-        error: 'Use one of the following options: containerTypeId or containerTypeName.'
+        error: 'Use one of the following options: containerTypeId or containerTypeName.',
+        params: {
+          customCode: 'optionSet',
+          options: ['containerTypeId', 'containerTypeName']
+        }
       });
   }
 
