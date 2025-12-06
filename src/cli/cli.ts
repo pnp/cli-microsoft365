@@ -5,7 +5,7 @@ import os from 'os';
 import path from 'path';
 import { fileURLToPath, pathToFileURL } from 'url';
 import yargs from 'yargs-parser';
-import { ZodError } from 'zod';
+import { ZodCustomIssue, ZodError, ZodIssue } from 'zod';
 import Command, { CommandArgs, CommandError } from '../Command.js';
 import GlobalOptions from '../GlobalOptions.js';
 import config from '../config.js';
@@ -186,15 +186,35 @@ async function execute(rawArgs: string[]): Promise<void> {
         break;
       }
       else {
-        const hasNonRequiredErrors = result.error.issues.some(i => i.code !== 'invalid_type');
         const shouldPrompt = cli.getSettingWithDefaultValue<boolean>(settingsNames.prompt, true);
 
-        if (hasNonRequiredErrors === false &&
-          shouldPrompt) {
+        if (!shouldPrompt) {
+          result.error.errors.forEach(e => {
+            if (e.code === 'invalid_type' &&
+              e.received === 'undefined') {
+              e.message = `Required option not specified`;
+            }
+          });
+          return cli.closeWithError(result.error, cli.optionsFromArgs, true);
+        }
+
+        const missingRequiredValuesErrors: ZodIssue[] = result.error.errors
+          .filter(e => (e.code === 'invalid_type' && e.received === 'undefined') ||
+            (e.code === 'custom' && e.params?.customCode === 'required'));
+        const optionSetErrors: ZodCustomIssue[] = result.error.errors
+          .filter(e => e.code === 'custom' && e.params?.customCode === 'optionSet') as ZodCustomIssue[];
+        const otherErrors: ZodIssue[] = result.error.errors
+          .filter(e => !missingRequiredValuesErrors.includes(e) && !optionSetErrors.includes(e as ZodCustomIssue));
+
+        if (otherErrors.some(e => e)) {
+          return cli.closeWithError(result.error, cli.optionsFromArgs, true);
+        }
+
+        if (missingRequiredValuesErrors.some(e => e)) {
           await cli.error('🌶️  Provide values for the following parameters:');
 
-          for (const issue of result.error.issues) {
-            const optionName = issue.path.join('.');
+          for (const error of missingRequiredValuesErrors) {
+            const optionName = error.path.join('.');
             const optionInfo = cli.commandToExecute.options.find(o => o.name === optionName);
             const answer = await cli.promptForValue(optionInfo!);
             // coerce the answer to the correct type
@@ -206,15 +226,14 @@ async function execute(rawArgs: string[]): Promise<void> {
               return cli.closeWithError(e.message, cli.optionsFromArgs, true);
             }
           }
+
+          continue;
         }
-        else {
-          result.error.issues.forEach(i => {
-            if (i.code === 'invalid_type' &&
-              i.input === undefined) {
-              (i.message as any) = `Required option not specified`;
-            }
-          });
-          return cli.closeWithError(result.error, cli.optionsFromArgs, true);
+
+        if (optionSetErrors.some(e => e)) {
+          for (const error of optionSetErrors) {
+            await promptForOptionSetNameAndValue(cli.optionsFromArgs, error.params?.options);
+          }
         }
       }
     }
@@ -1055,6 +1074,16 @@ function loadOptionValuesFromFiles(args: { options: yargs.Arguments }): void {
 
 function shouldTrimOutput(output: string | undefined): boolean {
   return output === 'text';
+}
+
+async function promptForOptionSetNameAndValue(args: CommandArgs, options: string[]): Promise<void> {
+  await cli.error(`🌶️  Please specify one of the following options:`);
+
+  const selectedOptionName = await prompt.forSelection<string>({ message: `Option to use:`, choices: options.map((choice: any) => { return { name: choice, value: choice }; }) });
+  const optionValue = await prompt.forInput({ message: `${selectedOptionName}:` });
+
+  args.options[selectedOptionName] = optionValue;
+  await cli.error('');
 }
 
 export const cli = {
