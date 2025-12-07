@@ -118,7 +118,7 @@ Log in to Microsoft 365 using your own Microsoft Entra application and a persona
 m365 login --authType certificate --appId 31359c7f-bd7e-475c-86db-fdb8c937548c --tenant 31359c7f-bd7e-475c-86db-fdb8c937548a --certificateFile /Users/user/dev/localhost.pfx --password 'pass@word1'
 ```
 
-Log in to Microsoft 365 using a user name and password with the application and tenant specified.
+Log in to Microsoft 365 using a user name and password by providing the application and tenant identifiers explicitly.
 
 ```sh
 m365 login --authType password --appId 31359c7f-bd7e-475c-86db-fdb8c937548c --tenant 31359c7f-bd7e-475c-86db-fdb8c937548a --userName user@contoso.com --password pass@word1
