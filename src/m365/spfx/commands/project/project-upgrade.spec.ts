@@ -1552,7 +1552,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.5.0', output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 26);
+    assert.strictEqual(findings.length, 25);
   });
 
   it('e2e: shows correct number of findings for upgrading react web part 1.4.1 project to 1.5.0', async () => {
@@ -1560,7 +1560,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.5.0', debug: true, output: 'json' } } as any);
     const findings: Finding[] = log[3];
-    assert.strictEqual(findings.length, 26);
+    assert.strictEqual(findings.length, 25);
   });
 
   it('e2e: shows correct number of findings for upgrading web part with optional dependencies 1.4.1 project to 1.5.0', async () => {
@@ -1568,7 +1568,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.5.0', output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 33);
+    assert.strictEqual(findings.length, 32);
   });
 
   it('e2e: shows correct number of findings for upgrading application customizer 1.4.1 project to 1.5.0', async () => {
@@ -1576,7 +1576,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.5.0', output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 26);
+    assert.strictEqual(findings.length, 25);
   });
 
   it('e2e: shows correct number of findings for upgrading list view command set 1.4.1 project to 1.5.0', async () => {
@@ -1584,7 +1584,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.5.0', output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 26);
+    assert.strictEqual(findings.length, 25);
   });
 
   it('e2e: shows correct number of findings for upgrading field customizer react 1.4.1 project to 1.5.0', async () => {
@@ -1592,7 +1592,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.5.0', output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 25);
+    assert.strictEqual(findings.length, 24);
   });
   //#endregion
 
@@ -2934,7 +2934,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.17.3', output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 10);
+    assert.strictEqual(findings.length, 9);
   });
 
   it('e2e: shows correct number of findings for upgrading form customizer react 1.17.2 project to 1.17.3', async () => {
@@ -2942,7 +2942,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.17.3', output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 12);
+    assert.strictEqual(findings.length, 11);
   });
 
   it('e2e: shows correct number of findings for upgrading list view command set 1.17.2 project to 1.17.3', async () => {
@@ -2966,7 +2966,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.17.3', output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 14);
+    assert.strictEqual(findings.length, 13);
   });
 
   it('e2e: shows correct number of findings for upgrading web part with optional dependencies 1.17.2 project to 1.17.3', async () => {
@@ -3602,7 +3602,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.6.0', output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 32);
+    assert.strictEqual(findings.length, 31);
   });
   //#endregion
 

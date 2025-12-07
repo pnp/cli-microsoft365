@@ -186,6 +186,87 @@ describe('DependencyRule', () => {
     assert.strictEqual(findings.length, 0);
   });
 
+  it('returns notification when rule version is higher than open-ended range', () => {
+    const project: Project = {
+      path: '/usr/tmp',
+      packageJson: {
+        dependencies: {
+          'test-package': '>=0.5.0 <0.9.0'
+        },
+        devDependencies: {},
+        source: JSON.stringify({
+          dependencies: {
+            'test-package': '>=0.5.0 <0.9.0'
+          },
+          devDependencies: {}
+        }, null, 2)
+      }
+    };
+    depRule.visit(project, findings);
+    assert.strictEqual(findings.length, 1, 'Incorrect number of findings');
+    assert.strictEqual(findings[0].occurrences[0].position?.line, 3, 'Incorrect line number');
+  });
+
+  it('handles version range with multiple upper bounds correctly', () => {
+    const project: Project = {
+      path: '/usr/tmp',
+      packageJson: {
+        dependencies: {
+          'test-package': '>=0.2.0 <=0.3.0 || >=0.4.0 <=0.9.0'
+        },
+        devDependencies: {},
+        source: JSON.stringify({
+          dependencies: {
+            'test-package': '>=0.2.0 <=0.3.0 || >=0.4.0 <=0.9.0'
+          },
+          devDependencies: {}
+        }, null, 2)
+      }
+    };
+    depRule.visit(project, findings);
+    assert.strictEqual(findings.length, 1, 'Incorrect number of findings');
+  });
+
+  it('handles version range without upper bound correctly', () => {
+    const project: Project = {
+      path: '/usr/tmp',
+      packageJson: {
+        dependencies: {
+          'test-package': '>=1.5.0'
+        },
+        devDependencies: {},
+        source: JSON.stringify({
+          dependencies: {
+            'test-package': '>=1.5.0'
+          },
+          devDependencies: {}
+        }, null, 2)
+      }
+    };
+    depRule.visit(project, findings);
+    assert.strictEqual(findings.length, 0, 'Incorrect number of findings');
+  });
+
+  it('handles version range with only upper bounds correctly', () => {
+    const project: Project = {
+      path: '/usr/tmp',
+      packageJson: {
+        dependencies: {
+          'test-package': '<=0.9.0'
+        },
+        devDependencies: {},
+        source: JSON.stringify({
+          dependencies: {
+            'test-package': '<=0.9.0'
+          },
+          devDependencies: {}
+        }, null, 2)
+      }
+    };
+    depRule.visit(project, findings);
+    assert.strictEqual(findings.length, 1, 'Incorrect number of findings');
+  });
+
   it('returns uninstall resolution for uninstall a dev dependency', () => {
     const rule: DependencyRule = new DevDepRule2();
     assert.strictEqual(rule.resolution, 'uninstallDev test-package');
