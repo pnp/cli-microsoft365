@@ -26,11 +26,11 @@ describe(commands.LIST_DEFAULTVALUE_GET, () => {
 
   const defaultColumnXml = `
   <MetadataDefaults>
-    <a href=\"/sites/Marketing/Shared Documents\">
-      <DefaultValue FieldName=\"DocumentType\">General</DefaultValue>
+    <a href="/sites/Marketing/Shared Documents">
+      <DefaultValue FieldName="DocumentType">General</DefaultValue>
     </a>
-    <a href=\"/sites/Marketing/Shared Documents/Logos\">
-      <DefaultValue FieldName=\"DocumentType\">Logo</DefaultValue>
+    <a href="/sites/Marketing/Shared Documents/Logos">
+      <DefaultValue FieldName="DocumentType">Logo</DefaultValue>
     </a>
   </MetadataDefaults>`;
 
