@@ -1,9 +1,10 @@
 import { Finding } from '../../report-model/index.js';
 import { Project } from '../../project-model/index.js';
 import { Rule } from '../../Rule.js';
+import { stringUtil } from '../../../../../../utils/stringUtil.js';
 
 export class FN014003_CODE_launch extends Rule {
-  constructor() {
+  constructor(private contents: string) {
     super();
   }
 
@@ -20,48 +21,7 @@ export class FN014003_CODE_launch extends Rule {
   }
 
   get resolution(): string {
-    return `{
-  /**
-    Install Chrome Debugger Extension for Visual Studio Code
-    to debug your components with the Chrome browser:
-    https://aka.ms/spfx-debugger-extensions
-    */
-  "version": "0.2.0",
-  "configurations": [{
-      "name": "Local workbench",
-      "type": "chrome",
-      "request": "launch",
-      "url": "https://localhost:4321/temp/workbench.html",
-      "webRoot": "\${workspaceRoot}",
-      "sourceMaps": true,
-      "sourceMapPathOverrides": {
-        "webpack:///../../../src/*": "\${webRoot}/src/*",
-        "webpack:///../../../../src/*": "\${webRoot}/src/*",
-        "webpack:///../../../../../src/*": "\${webRoot}/src/*"
-      },
-      "runtimeArgs": [
-        "--remote-debugging-port=9222"
-      ]
-    },
-    {
-      "name": "Hosted workbench",
-      "type": "chrome",
-      "request": "launch",
-      "url": "https://enter-your-SharePoint-site/_layouts/workbench.aspx",
-      "webRoot": "\${workspaceRoot}",
-      "sourceMaps": true,
-      "sourceMapPathOverrides": {
-        "webpack:///../../../src/*": "\${webRoot}/src/*",
-        "webpack:///../../../../src/*": "\${webRoot}/src/*",
-        "webpack:///../../../../../src/*": "\${webRoot}/src/*"
-      },
-      "runtimeArgs": [
-        "--remote-debugging-port=9222",
-        "-incognito"
-      ]
-    }
-  ]
-}`;
+    return this.contents;
   }
 
   get resolutionType(): string {
@@ -77,7 +37,9 @@ export class FN014003_CODE_launch extends Rule {
   }
 
   visit(project: Project, findings: Finding[]): void {
-    if (!project.vsCode || !project.vsCode.launchJson) {
+    if (!project.vsCode ||
+      !project.vsCode.launchJson ||
+      stringUtil.normalizeLineEndings(project.vsCode.launchJson.source) !== stringUtil.normalizeLineEndings(this.contents)) {
       this.addFinding(findings);
     }
   }

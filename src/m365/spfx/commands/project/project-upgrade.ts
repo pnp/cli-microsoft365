@@ -2,7 +2,7 @@ import fs from 'fs';
 import os from 'os';
 import path from 'path';
 // uncomment to support upgrading to preview releases
-import { prerelease } from 'semver';
+// import { prerelease } from 'semver';
 import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
 import Command, { CommandError, globalOptionsZod } from '../../../../Command.js';
@@ -87,7 +87,8 @@ class SpfxProjectUpgradeCommand extends BaseProjectCommand {
     '1.20.0',
     '1.21.0',
     '1.21.1',
-    '1.22.0-rc.0'
+    '1.22.0',
+    '1.22.1'
   ];
 
   public static ERROR_NO_PROJECT_ROOT_FOLDER: number = 1;
@@ -124,15 +125,15 @@ class SpfxProjectUpgradeCommand extends BaseProjectCommand {
 
     this.toVersion = args.options.toVersion ? args.options.toVersion : this.supportedVersions[this.supportedVersions.length - 1];
     // uncomment to support upgrading to preview releases
-    if (!args.options.toVersion &&
-      !args.options.preview &&
-      prerelease(this.toVersion)) {
-      // no version and no preview specified while the current version to
-      // upgrade to is a prerelease so let's grab the first non-preview version
-      // since we're supporting only one preview version, it's sufficient for
-      // us to take second to last version
-      this.toVersion = this.supportedVersions[this.supportedVersions.length - 2];
-    }
+    // if (!args.options.toVersion &&
+    //   !args.options.preview &&
+    //   prerelease(this.toVersion)) {
+    //   // no version and no preview specified while the current version to
+    //   // upgrade to is a prerelease so let's grab the first non-preview version
+    //   // since we're supporting only one preview version, it's sufficient for
+    //   // us to take second to last version
+    //   this.toVersion = this.supportedVersions[this.supportedVersions.length - 2];
+    // }
     this.packageManager = args.options.packageManager || 'npm';
     this.shell = args.options.shell || 'powershell';
 

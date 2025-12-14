@@ -78,7 +78,8 @@ class SpfxProjectDoctorCommand extends BaseProjectCommand {
     '1.20.0',
     '1.21.0',
     '1.21.1',
-    '1.22.0-rc.0'
+    '1.22.0',
+    '1.22.1'
   ];
 
   protected get allowedOutputs(): string[] {
