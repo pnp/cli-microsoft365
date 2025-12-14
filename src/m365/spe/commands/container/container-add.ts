@@ -11,7 +11,7 @@ import request, { CliRequestOptions } from '../../../../request.js';
 const options = globalOptionsZod
   .extend({
     name: zod.alias('n', z.string()),
-    description: zod.alias('d', z.string()).optional(),
+    description: zod.alias('d', z.string().optional()),
     containerTypeId: z.string()
       .refine(id => validation.isValidGuid(id), id => ({
         message: `'${id}' is not a valid GUID.`
