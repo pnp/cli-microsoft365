@@ -56,6 +56,7 @@ enum SharePointVersion {
 
 interface SpfxVersionPrerequisites {
   gulpCli?: VersionCheck;
+  heft?: VersionCheck;
   node: VersionCheck;
   sp: SharePointVersion;
   yo: VersionCheck;
@@ -641,7 +642,26 @@ class SpfxDoctorCommand extends BaseProjectCommand {
         fix: 'npm i -g yo@5'
       }
     },
-    '1.22.0-rc.0': {
+    '1.22.0': {
+      heft: {
+        range: '^1',
+        fix: 'npm i -g @rushstack/heft@1'
+      },
+      node: {
+        range: '>=22.14.0 < 23.0.0',
+        fix: 'Install Node.js >=22.14.0 < 23.0.0'
+      },
+      sp: SharePointVersion.SPO,
+      yo: {
+        range: '^4 || ^5 || ^6',
+        fix: 'npm i -g yo@6'
+      }
+    },
+    '1.22.1': {
+      heft: {
+        range: '^1',
+        fix: 'npm i -g @rushstack/heft@1'
+      },
       node: {
         range: '>=22.14.0 < 23.0.0',
         fix: 'Install Node.js >=22.14.0 < 23.0.0'
@@ -793,6 +813,7 @@ class SpfxDoctorCommand extends BaseProjectCommand {
       await this.checkYo(prerequisites);
       await this.checkGulp();
       await this.checkGulpCli(prerequisites);
+      await this.checkHeft(prerequisites);
       await this.checkTypeScript();
 
       if (this.resultsObject.some(y => y.fix !== undefined)) {
@@ -928,6 +949,28 @@ class SpfxDoctorCommand extends BaseProjectCommand {
         passed: false,
         message: message,
         fix: prerequisites.gulpCli.fix
+      });
+      await this.logMessage(formatting.getStatus(CheckStatus.Failure, message));
+    }
+  }
+
+  private async checkHeft(prerequisites: SpfxVersionPrerequisites): Promise<void> {
+    if (!prerequisites.heft) {
+      // heft is not required for this version of SPFx
+      return;
+    }
+
+    const heftVersion: string = await this.getPackageVersion('@rushstack/heft', PackageSearchMode.GlobalOnly, HandlePromise.Continue);
+    if (heftVersion) {
+      await this.checkStatus('@rushstack/heft', heftVersion, prerequisites.heft);
+    }
+    else {
+      const message = '@rushstack/heft not found';
+      this.resultsObject.push({
+        check: '@rushstack/heft',
+        passed: false,
+        message: message,
+        fix: prerequisites.heft.fix
       });
       await this.logMessage(formatting.getStatus(CheckStatus.Failure, message));
     }

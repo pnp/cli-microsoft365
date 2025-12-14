@@ -3,7 +3,7 @@ import { Project } from "../../project-model/index.js";
 import { Finding } from "../../report-model/index.js";
 
 export class FN021005_PKG_scripts_test extends JsonRule {
-  constructor(private script: string) {
+  constructor(private script: string, private add: boolean = true) {
     super();
   }
 
@@ -16,13 +16,13 @@ export class FN021005_PKG_scripts_test extends JsonRule {
   }
 
   get description(): string {
-    return 'Update package.json scripts.test property';
+    return `${this.add ? 'Update' : 'Remove'} package.json scripts.test property`;
   }
 
   get resolution(): string {
     return `{
   "scripts": {
-    "test": "${this.script}"
+    "test": ${this.add ? `"${this.script}"` : '""'}
   }
 }`;
   }
@@ -44,12 +44,20 @@ export class FN021005_PKG_scripts_test extends JsonRule {
       return;
     }
 
-    if (!project.packageJson.scripts ||
-      typeof project.packageJson.scripts !== 'object' ||
-      !project.packageJson.scripts.test ||
-      project.packageJson.scripts.test !== this.script) {
-      const node = this.getAstNodeFromFile(project.packageJson, 'scripts.test');
-      this.addFindingWithPosition(findings, node);
+    if (this.add) {
+      if (!project.packageJson.scripts ||
+        typeof project.packageJson.scripts !== 'object' ||
+        !project.packageJson.scripts.test ||
+        project.packageJson.scripts.test !== this.script) {
+        const node = this.getAstNodeFromFile(project.packageJson, 'scripts.test');
+        this.addFindingWithPosition(findings, node);
+      }
+    }
+    else {
+      if (project.packageJson.scripts?.test === this.script) {
+        const node = this.getAstNodeFromFile(project.packageJson, 'scripts.test');
+        this.addFindingWithPosition(findings, node);
+      }
     }
   }
 }

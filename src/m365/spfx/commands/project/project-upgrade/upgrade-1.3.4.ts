@@ -43,5 +43,46 @@ export default [
   new FN002007_DEVDEP_ajv('5.2.2'),
   new FN010001_YORC_version('1.3.4'),
   new FN014002_CODE_extensions(),
-  new FN014003_CODE_launch()
+  new FN014003_CODE_launch(`{
+  /**
+    Install Chrome Debugger Extension for Visual Studio Code
+    to debug your components with the Chrome browser:
+    https://aka.ms/spfx-debugger-extensions
+    */
+  "version": "0.2.0",
+  "configurations": [{
+      "name": "Local workbench",
+      "type": "chrome",
+      "request": "launch",
+      "url": "https://localhost:4321/temp/workbench.html",
+      "webRoot": "\${workspaceRoot}",
+      "sourceMaps": true,
+      "sourceMapPathOverrides": {
+        "webpack:///../../../src/*": "\${webRoot}/src/*",
+        "webpack:///../../../../src/*": "\${webRoot}/src/*",
+        "webpack:///../../../../../src/*": "\${webRoot}/src/*"
+      },
+      "runtimeArgs": [
+        "--remote-debugging-port=9222"
+      ]
+    },
+    {
+      "name": "Hosted workbench",
+      "type": "chrome",
+      "request": "launch",
+      "url": "https://enter-your-SharePoint-site/_layouts/workbench.aspx",
+      "webRoot": "\${workspaceRoot}",
+      "sourceMaps": true,
+      "sourceMapPathOverrides": {
+        "webpack:///../../../src/*": "\${webRoot}/src/*",
+        "webpack:///../../../../src/*": "\${webRoot}/src/*",
+        "webpack:///../../../../../src/*": "\${webRoot}/src/*"
+      },
+      "runtimeArgs": [
+        "--remote-debugging-port=9222",
+        "-incognito"
+      ]
+    }
+  ]
+}`)
 ];
