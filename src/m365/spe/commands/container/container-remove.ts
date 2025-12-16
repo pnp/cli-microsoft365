@@ -11,8 +11,8 @@ import { cli } from '../../../../cli/cli.js';
 
 const options = globalOptionsZod
   .extend({
-    id: zod.alias('i', z.string()).optional(),
-    name: zod.alias('n', z.string()).optional(),
+    id: zod.alias('i', z.string().optional()),
+    name: zod.alias('n', z.string().optional()),
     containerTypeId: z.string()
       .refine(id => validation.isValidGuid(id), id => ({
         message: `'${id}' is not a valid GUID.`
