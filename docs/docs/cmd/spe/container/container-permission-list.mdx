@@ -15,8 +15,11 @@ m365 spe container permission list [options]
 ## Options
 
 ```md definition-list
-`-i, --containerId <id>`
-: The ID of the SharePoint Embedded Container.
+`-i, --containerId [id]`
+: The ID of the SharePoint Embedded Container. Specify either `containerId` or `containerName` but not both.
+
+`-n, --containerName [containerName]`
+: Display name of the SharePoint Embedded Container. Specify either `containerId` or `containerName` but not both.
 ```
 
 <Global />
@@ -42,10 +45,16 @@ m365 spe container permission list [options]
 
 ## Examples
 
-Lists Container permissions.
+Lists Container permissions by id.
 
 ```sh
 m365 spe container permission list --containerId "b!ISJs1WRro0y0EWgkUYcktDa0mE8zSlFEqFzqRn70Zwp1CEtDEBZgQICPkRbil_5Z"
+```
+
+Lists Container permissions by display name.
+
+```sh
+m365 spe container permission list --containerName "My Application Storage Container"
 ```
 
 ## Response
