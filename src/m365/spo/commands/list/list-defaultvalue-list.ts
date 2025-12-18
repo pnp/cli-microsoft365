@@ -4,9 +4,9 @@ import { z } from 'zod';
 import { zod } from '../../../../utils/zod.js';
 import { Logger } from '../../../../cli/Logger.js';
 import commands from '../../commands.js';
-import { DOMParser } from '@xmldom/xmldom';
 import { validation } from '../../../../utils/validation.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
+import { spo } from '../../../../utils/spo.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { DefaultColumnValue } from "./DefaultColumnValue";
@@ -70,7 +70,7 @@ class SpoListDefaultValueListCommand extends SpoCommand {
       let defaultValues: DefaultColumnValue[];
       try {
         const defaultValuesXml = await this.getDefaultColumnValuesXml(args.options.webUrl, listServerRelUrl);
-        defaultValues = this.convertXmlToJson(defaultValuesXml);
+        defaultValues = spo.convertDefaultColumnXmlToJson(defaultValuesXml);
       }
       catch (err: any) {
         if (err.status !== 404) {
@@ -139,32 +139,6 @@ class SpoListDefaultValueListCommand extends SpoCommand {
     };
     const defaultValuesXml = await request.get<string>(requestOptions);
     return defaultValuesXml;
-  }
-
-  private convertXmlToJson(xml: string): DefaultColumnValue[] {
-    const results: DefaultColumnValue[] = [];
-
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(xml, 'application/xml');
-
-    const folderLinks = doc.getElementsByTagName('a');
-    for (let i = 0; i < folderLinks.length; i++) {
-      const folderUrl = folderLinks[i].getAttribute('href')!;
-      const defaultValues = folderLinks[i].getElementsByTagName('DefaultValue');
-
-      for (let j = 0; j < defaultValues.length; j++) {
-        const fieldName = defaultValues[j].getAttribute('FieldName')!;
-        const fieldValue = defaultValues[j].textContent!;
-
-        results.push({
-          fieldName: fieldName,
-          fieldValue: fieldValue,
-          folderUrl: decodeURIComponent(folderUrl)
-        });
-      }
-    }
-
-    return results;
   }
 }
 
