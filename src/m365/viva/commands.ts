@@ -27,6 +27,7 @@ export default {
   ENGAGE_REPORT_GROUPSACTIVITYGROUPCOUNTS: `${prefix} engage report groupsactivitygroupcounts`,
   ENGAGE_ROLE_LIST: `${prefix} engage role list`,
   ENGAGE_ROLE_MEMBER_LIST: `${prefix} engage role member list`,
+  ENGAGE_ROLE_MEMBER_REMOVE: `${prefix} engage role member remove`,
   ENGAGE_SEARCH: `${prefix} engage search`,
   ENGAGE_USER_GET: `${prefix} engage user get`,
   ENGAGE_USER_LIST: `${prefix} engage user list`

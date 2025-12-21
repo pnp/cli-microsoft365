@@ -1,0 +1,71 @@
+import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# viva engage role member remove
+
+Revokes a Viva Engage role from a user
+
+## Usage
+
+```sh
+m365 viva engage role member remove [options]
+```
+
+## Options
+
+```md definition-list
+`--roleId [roleId]`
+: The id of the Viva Engage role. Specify either `roleId` or `roleName`, but not both.
+
+`--roleName [roleName]`
+: The name of the Viva Engage role. Specify either `roleId` or `roleName`, but not both.
+
+`--userId [userId]`
+: The Microsoft Entra ID of the user to remove from the specified Viva Engage role. Specify either `userId` or `userName`, but not both.
+
+`--userName [userName]`
+: The UPN of the user to remove from the specified Viva Engage role. Specify either `userId` or `userName`, but not both.
+
+`--force`
+: Do not prompt for confirmation
+```
+
+<Global />
+
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource        | Permissions                  |
+  |-----------------|------------------------------|
+  | Microsoft Graph | EngagementRole.ReadWrite.All |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource        | Permissions                  |
+  |-----------------|------------------------------|
+  | Microsoft Graph | EngagementRole.ReadWrite.All |
+
+  </TabItem>
+</Tabs>
+
+## Examples
+
+Revoke a user specified by id from a Viva Engage role specified by a name
+
+```sh
+m365 viva engage role member remove --userId 7a2ca997-9461-402e-9882-58088a370889 --roleName 'Verified Admin'
+```
+
+Revoke a user specified by UPN from a Viva Engage role specified by id and do not prompt for confirmation
+
+```sh
+m365 viva engage role member remove --userName john.doe@contoso.com --roleId 77aa47ad-96fe-4ecc-8024-fd1ac5e28f17 --force
+```
+
+## Response
+
+The command won't return a response on success.
