@@ -9,9 +9,8 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './engage-role-member-remove.js';
+import command, { options } from './engage-role-member-remove.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
-import { z } from 'zod';
 import { cli } from '../../../../cli/cli.js';
 import { vivaEngage } from '../../../../utils/vivaEngage.js';
 import { entraUser } from '../../../../utils/entraUser.js';
@@ -25,7 +24,7 @@ describe(commands.ENGAGE_ROLE_MEMBER_REMOVE, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
-  let commandOptionsSchema: z.ZodTypeAny;
+  let commandOptionsSchema: typeof options;
   let promptIssued: boolean;
 
   before(() => {
@@ -35,7 +34,7 @@ describe(commands.ENGAGE_ROLE_MEMBER_REMOVE, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
-    commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
