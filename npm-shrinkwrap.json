@@ -1146,6 +1146,7 @@
       "resolved": "https://registry.npmjs.org/@opentelemetry/api/-/api-1.9.0.tgz",
       "integrity": "sha512-3giAOQvZiH5F9bMlMiv8+GSPMeqg0dbaeo58/0SlA9sxSqZhnUtxzX9/2FzyhS9sWQf5S0GJE0AKBrFqjpeYcg==",
       "license": "Apache-2.0",
+      "peer": true,
       "engines": {
         "node": ">=8.0.0"
       }
@@ -2119,6 +2120,7 @@
       "resolved": "https://registry.npmjs.org/@types/node/-/node-22.19.3.tgz",
       "integrity": "sha512-1N9SBnWYOJTrNZCdh/yJE+t910Y128BoyY+zBLWhL3r0TYzlTmFdXrPwHL9DyFZmlEXNQQolTZh3KHV31QDhyA==",
       "license": "MIT",
+      "peer": true,
       "dependencies": {
         "undici-types": "~6.21.0"
       }
@@ -2262,6 +2264,7 @@
       "integrity": "sha512-6/cmF2piao+f6wSxUsJLZjck7OQsYyRtcOZS02k7XINSNlz93v6emM8WutDQSXnroG2xwYlEVHJI+cPA7CPM3Q==",
       "dev": true,
       "license": "MIT",
+      "peer": true,
       "dependencies": {
         "@typescript-eslint/scope-manager": "8.50.0",
         "@typescript-eslint/types": "8.50.0",
@@ -2475,6 +2478,7 @@
       "resolved": "https://registry.npmjs.org/acorn/-/acorn-8.15.0.tgz",
       "integrity": "sha512-NZyJarBfL7nWwIq+FDL6Zp/yHEhePMNnnJ0y3qfieCrmNvYct8uvtiV41UvlSe6apAfk0fY1FbWx+NwfmpvtTg==",
       "license": "MIT",
+      "peer": true,
       "bin": {
         "acorn": "bin/acorn"
       },
@@ -3344,6 +3348,7 @@
       "resolved": "https://registry.npmjs.org/diagnostic-channel/-/diagnostic-channel-1.1.1.tgz",
       "integrity": "sha512-r2HV5qFkUICyoaKlBEpLKHjxMXATUf/l+h8UZPGBHGLy4DDiY2sOLcIctax4eRnTw5wH2jTMExLntGPJ8eOJxw==",
       "license": "MIT",
+      "peer": true,
       "dependencies": {
         "semver": "^7.5.3"
       }
@@ -3535,6 +3540,7 @@
       "integrity": "sha512-LEyamqS7W5HB3ujJyvi0HQK/dtVINZvd5mAAp9eT5S/ujByGjiZLCzPcHVzuXbpJDJF/cxwHlfceVUDZ2lnSTw==",
       "dev": true,
       "license": "MIT",
+      "peer": true,
       "dependencies": {
         "@eslint-community/eslint-utils": "^4.8.0",
         "@eslint-community/regexpp": "^4.12.1",
@@ -6337,6 +6343,7 @@
       "resolved": "https://registry.npmjs.org/typescript/-/typescript-5.9.3.tgz",
       "integrity": "sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw==",
       "license": "Apache-2.0",
+      "peer": true,
       "bin": {
         "tsc": "bin/tsc",
         "tsserver": "bin/tsserver"

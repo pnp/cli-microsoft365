@@ -7,20 +7,20 @@ import commands from '../../commands.js';
 import { vivaEngage } from '../../../../utils/vivaEngage.js';
 import { entraUser } from '../../../../utils/entraUser.js';
 import request, { CliRequestOptions } from '../../../../request.js';
-import { zod } from '../../../../utils/zod.js';
 import { validation } from '../../../../utils/validation.js';
 
-const options = globalOptionsZod
-  .extend({
-    roleId: z.string().uuid().optional(),
-    roleName: z.string().optional(),
-    userId: z.string().uuid().optional(),
-    userName: z.string().refine(upn => validation.isValidUserPrincipalName(upn), upn => ({
-      message: `'${upn}' is not a valid UPN.`
-    })).optional(),
-    force: zod.alias('f', z.boolean().optional())
-  })
-  .strict();
+
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  roleId: z.uuid().optional(),
+  roleName: z.string().optional(),
+  userId: z.uuid().optional(),
+  userName: z.string().refine(upn => validation.isValidUserPrincipalName(upn), {
+    error: e => `'${e.input}' is not a valid UPN.`
+  }).optional(),
+  force: z.boolean().optional().alias('f')
+});
+
 declare type Options = z.infer<typeof options>;
 
 interface CommandArgs {
@@ -40,7 +40,7 @@ class VivaEngageRoleMemberRemoveCommand extends GraphCommand {
     return options;
   }
 
-  public getRefinedSchema(schema: typeof options): z.ZodEffects<any> | undefined {
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
       .refine(options => [options.roleId, options.roleName].filter(x => x !== undefined).length === 1, {
         message: 'Specify either roleId, or roleName, but not both.'
