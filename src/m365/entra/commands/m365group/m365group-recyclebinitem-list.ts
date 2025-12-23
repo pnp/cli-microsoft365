@@ -1,18 +1,24 @@
 import { DirectoryObject } from '@microsoft/microsoft-graph-types';
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { odata } from '../../../../utils/odata.js';
+import { zod } from '../../../../utils/zod.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 
+const options = globalOptionsZod
+  .extend({
+    groupName: zod.alias('d', z.string().optional()),
+    groupMailNickname: zod.alias('m', z.string().optional())
+  })
+  .strict();
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  groupName?: string;
-  groupMailNickname?: string;
 }
 
 class EntraM365GroupRecycleBinItemListCommand extends GraphCommand {
@@ -24,31 +30,8 @@ class EntraM365GroupRecycleBinItemListCommand extends GraphCommand {
     return 'Lists Microsoft 365 Groups deleted in the current tenant';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        groupName: typeof args.options.groupName !== 'undefined',
-        groupMailNickname: typeof args.options.groupMailNickname !== 'undefined'
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-d, --groupName [groupName]'
-      },
-      {
-        option: '-m, --groupMailNickname [groupMailNickname]'
-      }
-    );
+  public get schema(): z.ZodTypeAny | undefined {
+    return options;
   }
 
   public defaultProperties(): string[] | undefined {
