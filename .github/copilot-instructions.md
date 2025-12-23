@@ -25,7 +25,7 @@
 - **Lint**: `npm run lint` (uses custom ESLint rules from `eslint-rules/`)
 - **Watch**: `npm run watch` (TypeScript in watch mode)
 - **Symlink for local CLI**: `npm link` (after build)
-- **Node version**: Must be 22 (see `scripts/check-version.js`)
+- **Node version**: Must be 24 (see `scripts/check-version.js`)
 - **Docs**: Docusaurus site in `docs/` (config: `docs/docusaurus.config.ts`)
 
 ## Project-Specific Notes
