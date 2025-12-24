@@ -5,7 +5,11 @@ import { PackageRule } from './PackageRule.js';
 
 class ResRule extends PackageRule {
   constructor() {
-    super('main', true, '1.0.0');
+    super({
+      propertyName: 'main',
+      add: true,
+      propertyValue: '1.0.0'
+    });
   }
 
   get id(): string {
@@ -15,7 +19,10 @@ class ResRule extends PackageRule {
 
 class ResRule2 extends PackageRule {
   constructor() {
-    super('main', false);
+    super({
+      propertyName: 'main',
+      add: false
+    });
   }
 
   get id(): string {

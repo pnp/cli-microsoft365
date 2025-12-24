@@ -8,7 +8,10 @@ import { FileAddRemoveRule } from './FileAddRemoveRule.js';
 
 class FileAddRule extends FileAddRemoveRule {
   constructor(add: boolean) {
-    super('test-file.ext', add);
+    super({
+      filePath: 'test-file.ext',
+      add
+    });
   }
 
   get id(): string {
