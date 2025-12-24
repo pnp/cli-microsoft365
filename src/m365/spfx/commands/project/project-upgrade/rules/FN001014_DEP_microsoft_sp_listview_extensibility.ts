@@ -2,7 +2,11 @@ import { DependencyRule } from "./DependencyRule.js";
 
 export class FN001014_DEP_microsoft_sp_listview_extensibility extends DependencyRule {
   constructor(packageVersion: string) {
-    super('@microsoft/sp-listview-extensibility', packageVersion, false, true);
+    super({
+      packageName: '@microsoft/sp-listview-extensibility',
+      packageVersion,
+      isOptional: true
+    });
   }
 
   get id(): string {

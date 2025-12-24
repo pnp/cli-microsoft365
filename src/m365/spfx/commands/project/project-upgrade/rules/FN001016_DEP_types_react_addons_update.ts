@@ -4,7 +4,12 @@ import { DependencyRule } from "./DependencyRule.js";
 
 export class FN001016_DEP_types_react_addons_update extends DependencyRule {
   constructor(packageVersion: string, add: boolean) {
-    super('@types/react-addons-update', packageVersion, false, true, add);
+    super({
+      packageName: '@types/react-addons-update',
+      packageVersion,
+      isOptional: true,
+      add
+    });
   }
 
   get id(): string {

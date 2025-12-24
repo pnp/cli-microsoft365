@@ -2,7 +2,13 @@ import { DependencyRule } from './DependencyRule.js';
 
 export class FN002027_DEVDEP_fluentui_react extends DependencyRule {
   constructor(packageVersion: string, add: boolean) {
-    super('@fluentui/react', packageVersion, true, true, add);
+    super({
+      packageName: '@fluentui/react',
+      packageVersion,
+      isDevDep: true,
+      isOptional: true,
+      add
+    });
   }
 
   get id(): string {

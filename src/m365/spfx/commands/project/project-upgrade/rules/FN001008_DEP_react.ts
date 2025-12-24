@@ -4,7 +4,11 @@ import { DependencyRule } from "./DependencyRule.js";
 
 export class FN001008_DEP_react extends DependencyRule {
   constructor(packageVersion: string) {
-    super('react', packageVersion, false, true);
+    super({
+      packageName: 'react',
+      packageVersion,
+      isOptional: true
+    });
   }
 
   get id(): string {

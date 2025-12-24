@@ -2,7 +2,12 @@ import { DependencyRule } from "./DependencyRule.js";
 
 export class FN002005_DEVDEP_types_chai extends DependencyRule {
   constructor(packageVersion: string, add: boolean = true) {
-    super('@types/chai', packageVersion, true, false, add);
+    super({
+      packageName: '@types/chai',
+      packageVersion,
+      isDevDep: true,
+      add
+    });
   }
 
   get id(): string {

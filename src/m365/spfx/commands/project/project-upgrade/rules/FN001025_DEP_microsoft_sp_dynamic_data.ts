@@ -2,7 +2,11 @@ import { DependencyRule } from "./DependencyRule.js";
 
 export class FN001025_DEP_microsoft_sp_dynamic_data extends DependencyRule {
   constructor(packageVersion: string) {
-    super('@microsoft/sp-dynamic-data', packageVersion, false, true);
+    super({
+      packageName: '@microsoft/sp-dynamic-data',
+      packageVersion,
+      isOptional: true
+    });
   }
 
   get id(): string {

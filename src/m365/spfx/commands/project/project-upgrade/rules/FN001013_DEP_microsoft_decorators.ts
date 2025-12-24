@@ -2,7 +2,11 @@ import { DependencyRule } from "./DependencyRule.js";
 
 export class FN001013_DEP_microsoft_decorators extends DependencyRule {
   constructor(packageVersion: string) {
-    super('@microsoft/decorators', packageVersion, false, true);
+    super({
+      packageName: '@microsoft/decorators',
+      packageVersion,
+      isOptional: true
+    });
   }
 
   get id(): string {

@@ -2,7 +2,11 @@ import { FileAddRemoveRule } from "./FileAddRemoveRule.js";
 
 export class FN015009_FILE_config_sass_json extends FileAddRemoveRule {
   constructor(add: boolean, contents: string) {
-    super('./config/sass.json', add, contents);
+    super({
+      filePath: './config/sass.json',
+      add,
+      contents
+    });
   }
 
   get id(): string {

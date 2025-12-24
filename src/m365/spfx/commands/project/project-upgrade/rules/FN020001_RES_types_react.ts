@@ -4,7 +4,10 @@ import { ResolutionRule } from './ResolutionRule.js';
 
 export class FN020001_RES_types_react extends ResolutionRule {
   constructor(packageVersion: string) {
-    super('@types/react', packageVersion);
+    super({
+      packageName: '@types/react',
+      packageVersion
+    });
   }
 
   get id(): string {

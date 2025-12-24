@@ -2,7 +2,11 @@ import { DependencyRule } from "./DependencyRule.js";
 
 export class FN001011_DEP_microsoft_sp_dialog extends DependencyRule {
   constructor(packageVersion: string) {
-    super('@microsoft/sp-dialog', packageVersion, false, true);
+    super({
+      packageName: '@microsoft/sp-dialog',
+      packageVersion,
+      isOptional: true
+    });
   }
 
   get id(): string {

@@ -3,7 +3,11 @@ import { DependencyRule } from "./DependencyRule.js";
 
 export class FN001021_DEP_microsoft_sp_property_pane extends DependencyRule {
   constructor(packageVersion: string) {
-    super('@microsoft/sp-property-pane', packageVersion, false, true);
+    super({
+      packageName: '@microsoft/sp-property-pane',
+      packageVersion,
+      isOptional: true
+    });
   }
 
   get id(): string {

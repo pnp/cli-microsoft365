@@ -4,7 +4,11 @@ import { DependencyRule } from "./DependencyRule.js";
 
 export class FN001019_DEP_knockout extends DependencyRule {
   constructor(packageVersion: string) {
-    super('knockout', packageVersion, false, true);
+    super({
+      packageName: 'knockout',
+      packageVersion,
+      isOptional: true
+    });
   }
 
   get id(): string {

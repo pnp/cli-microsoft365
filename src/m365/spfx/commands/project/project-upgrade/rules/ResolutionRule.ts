@@ -2,9 +2,19 @@ import { JsonRule } from '../../JsonRule.js';
 import { Project } from '../../project-model/index.js';
 import { Finding } from '../../report-model/index.js';
 
+export interface ResolutionRuleOptions {
+  packageName: string;
+  packageVersion: string;
+}
+
 export abstract class ResolutionRule extends JsonRule {
-  constructor(protected packageName: string, protected packageVersion: string) {
+  protected packageName: string;
+  protected packageVersion: string;
+
+  constructor(options: ResolutionRuleOptions) {
     super();
+    this.packageName = options.packageName;
+    this.packageVersion = options.packageVersion;
   }
 
   get title(): string {

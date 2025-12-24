@@ -2,7 +2,10 @@ import { FileAddRemoveRule } from "./FileAddRemoveRule.js";
 
 export class FN015007_FILE_config_copy_assets_json extends FileAddRemoveRule {
   constructor(add: boolean) {
-    super('./config/copy-assets.json', add);
+    super({
+      filePath: './config/copy-assets.json',
+      add
+    });
   }
 
   get id(): string {

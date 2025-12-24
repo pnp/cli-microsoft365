@@ -2,9 +2,22 @@ import { JsonRule } from '../../JsonRule.js';
 import { Project } from '../../project-model/index.js';
 import { Finding } from '../../report-model/index.js';
 
+export interface PackageRuleOptions {
+  propertyName: string;
+  add: boolean;
+  propertyValue?: string;
+}
+
 export abstract class PackageRule extends JsonRule {
-  constructor(protected propertyName: string, protected add: boolean, protected propertyValue?: string) {
+  protected propertyName: string;
+  protected add: boolean;
+  protected propertyValue?: string;
+
+  constructor(options: PackageRuleOptions) {
     super();
+    this.propertyName = options.propertyName;
+    this.add = options.add;
+    this.propertyValue = options.propertyValue;
   }
 
   get title(): string {

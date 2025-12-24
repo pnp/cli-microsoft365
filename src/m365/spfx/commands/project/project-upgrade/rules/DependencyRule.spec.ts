@@ -5,7 +5,10 @@ import { DependencyRule } from './DependencyRule.js';
 
 class DepRule extends DependencyRule {
   constructor() {
-    super('test-package', '1.0.0');
+    super({
+      packageName: 'test-package',
+      packageVersion: '1.0.0'
+    });
   }
 
   get id(): string {
@@ -15,7 +18,10 @@ class DepRule extends DependencyRule {
 
 class DepRule2 extends DependencyRule {
   constructor() {
-    super('test-package', '1.0.1');
+    super({
+      packageName: 'test-package',
+      packageVersion: '1.0.1'
+    });
   }
 
   get id(): string {
@@ -25,7 +31,11 @@ class DepRule2 extends DependencyRule {
 
 class DevDepRule extends DependencyRule {
   constructor() {
-    super('test-package', '1.0.0', true);
+    super({
+      packageName: 'test-package',
+      packageVersion: '1.0.0',
+      isDevDep: true
+    });
   }
 
   get id(): string {
@@ -35,7 +45,13 @@ class DevDepRule extends DependencyRule {
 
 class DevDepRule2 extends DependencyRule {
   constructor() {
-    super('test-package', '1.0.0', true, false, false);
+    super({
+      packageName: 'test-package',
+      packageVersion: '1.0.0',
+      isDevDep: true,
+      isOptional: false,
+      add: false
+    });
   }
 
   get id(): string {

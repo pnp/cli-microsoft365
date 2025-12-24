@@ -2,7 +2,10 @@ import { DependencyRule } from "./DependencyRule.js";
 
 export class FN001033_DEP_tslib extends DependencyRule {
   constructor(packageVersion: string) {
-    super('tslib', packageVersion, false, false);
+    super({
+      packageName: 'tslib',
+      packageVersion
+    });
   }
 
   get id(): string {

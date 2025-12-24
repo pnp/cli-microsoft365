@@ -4,7 +4,12 @@ import { DependencyRule } from "./DependencyRule.js";
 
 export class FN001015_DEP_types_react_addons_shallow_compare extends DependencyRule {
   constructor(packageVersion: string, add: boolean) {
-    super('@types/react-addons-shallow-compare', packageVersion, false, true, add);
+    super({
+      packageName: '@types/react-addons-shallow-compare',
+      packageVersion,
+      isOptional: true,
+      add
+    });
   }
 
   get id(): string {
