@@ -4,8 +4,8 @@ export class FN001014_DEP_microsoft_sp_listview_extensibility extends Dependency
   constructor(options: { packageVersion: string }) {
     super({
       packageName: '@microsoft/sp-listview-extensibility',
-      packageVersion: options.packageVersion,
-      isOptional: true
+      isOptional: true,
+      ...options
     });
   }
 

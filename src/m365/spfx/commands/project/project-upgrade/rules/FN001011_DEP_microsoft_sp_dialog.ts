@@ -4,8 +4,8 @@ export class FN001011_DEP_microsoft_sp_dialog extends DependencyRule {
   constructor(options: { packageVersion: string }) {
     super({
       packageName: '@microsoft/sp-dialog',
-      packageVersion: options.packageVersion,
-      isOptional: true
+      isOptional: true,
+      ...options
     });
   }
 

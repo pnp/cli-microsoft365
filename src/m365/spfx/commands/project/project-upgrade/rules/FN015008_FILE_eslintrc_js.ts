@@ -7,8 +7,7 @@ export class FN015008_FILE_eslintrc_js extends FileAddRemoveRule {
   constructor(options: { add: boolean; contents: string }) {
     super({
       filePath: './.eslintrc.js',
-      add: options.add,
-      contents: options.contents
+      ...options
     });
   }
 

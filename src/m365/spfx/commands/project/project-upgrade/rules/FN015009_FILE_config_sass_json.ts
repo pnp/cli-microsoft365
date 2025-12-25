@@ -4,8 +4,7 @@ export class FN015009_FILE_config_sass_json extends FileAddRemoveRule {
   constructor(options: { add: boolean; contents: string }) {
     super({
       filePath: './config/sass.json',
-      add: options.add,
-      contents: options.contents
+      ...options
     });
   }
 

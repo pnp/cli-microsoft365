@@ -4,8 +4,8 @@ export class FN002026_DEVDEP_typescript extends DependencyRule {
   constructor(options: { packageVersion: string }) {
     super({
       packageName: 'typescript',
-      packageVersion: options.packageVersion,
-      isDevDep: true
+      isDevDep: true,
+      ...options
     });
   }
 

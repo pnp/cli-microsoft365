@@ -4,7 +4,7 @@ export class FN015001_FILE_typings_tsd_d_ts extends FileAddRemoveRule {
   constructor(options: { add: boolean }) {
     super({
       filePath: './typings/tsd.d.ts',
-      add: options.add
+      ...options
     });
   }
 

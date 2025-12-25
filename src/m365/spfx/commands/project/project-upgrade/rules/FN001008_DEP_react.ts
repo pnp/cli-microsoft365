@@ -6,8 +6,8 @@ export class FN001008_DEP_react extends DependencyRule {
   constructor(options: { packageVersion: string }) {
     super({
       packageName: 'react',
-      packageVersion: options.packageVersion,
-      isOptional: true
+      isOptional: true,
+      ...options
     });
   }
 

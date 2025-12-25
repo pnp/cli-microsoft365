@@ -6,9 +6,8 @@ export class FN001006_DEP_types_react_dom extends DependencyRule {
   constructor(options: { packageVersion: string; add?: boolean }) {
     super({
       packageName: '@types/react-dom',
-      packageVersion: options.packageVersion,
       isOptional: true,
-      add: options.add
+      ...options
     });
   }
 

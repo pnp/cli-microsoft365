@@ -4,8 +4,8 @@ export class FN001012_DEP_microsoft_sp_application_base extends DependencyRule {
   constructor(options: { packageVersion: string }) {
     super({
       packageName: '@microsoft/sp-application-base',
-      packageVersion: options.packageVersion,
-      isOptional: true
+      isOptional: true,
+      ...options
     });
   }
 

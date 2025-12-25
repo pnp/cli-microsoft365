@@ -6,9 +6,8 @@ export class FN001015_DEP_types_react_addons_shallow_compare extends DependencyR
   constructor(options: { packageVersion: string; add: boolean }) {
     super({
       packageName: '@types/react-addons-shallow-compare',
-      packageVersion: options.packageVersion,
       isOptional: true,
-      add: options.add
+      ...options
     });
   }
 

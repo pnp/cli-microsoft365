@@ -4,8 +4,8 @@ export class FN002033_DEVDEP_css_loader extends DependencyRule {
   constructor(options: { packageVersion: string }) {
     super({
       packageName: 'css-loader',
-      packageVersion: options.packageVersion,
-      isDevDep: true
+      isDevDep: true,
+      ...options
     });
   }
 

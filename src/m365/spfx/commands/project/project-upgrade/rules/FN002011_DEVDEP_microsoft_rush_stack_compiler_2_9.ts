@@ -4,9 +4,8 @@ export class FN002011_DEVDEP_microsoft_rush_stack_compiler_2_9 extends Dependenc
   constructor(options: { packageVersion: string; isOptional?: boolean }) {
     super({
       packageName: '@microsoft/rush-stack-compiler-2.9',
-      packageVersion: options.packageVersion,
       isDevDep: true,
-      isOptional: options.isOptional
+      ...options
     });
   }
 

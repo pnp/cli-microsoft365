@@ -4,8 +4,8 @@ export class FN002002_DEVDEP_microsoft_sp_module_interfaces extends DependencyRu
   constructor(options: { packageVersion: string }) {
     super({
       packageName: '@microsoft/sp-module-interfaces',
-      packageVersion: options.packageVersion,
-      isDevDep: true
+      isDevDep: true,
+      ...options
     });
   }
 

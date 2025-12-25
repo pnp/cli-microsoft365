@@ -5,8 +5,8 @@ export class FN001021_DEP_microsoft_sp_property_pane extends DependencyRule {
   constructor(options: { packageVersion: string }) {
     super({
       packageName: '@microsoft/sp-property-pane',
-      packageVersion: options.packageVersion,
-      isOptional: true
+      isOptional: true,
+      ...options
     });
   }
 

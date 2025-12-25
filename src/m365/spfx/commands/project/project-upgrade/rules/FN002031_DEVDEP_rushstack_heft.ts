@@ -4,8 +4,8 @@ export class FN002031_DEVDEP_rushstack_heft extends DependencyRule {
   constructor(options: { packageVersion: string }) {
     super({
       packageName: '@rushstack/heft',
-      packageVersion: options.packageVersion,
-      isDevDep: true
+      isDevDep: true,
+      ...options
     });
   }
 

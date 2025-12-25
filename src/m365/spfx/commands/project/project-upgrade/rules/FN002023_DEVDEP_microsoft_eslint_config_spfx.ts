@@ -4,8 +4,8 @@ export class FN002023_DEVDEP_microsoft_eslint_config_spfx extends DependencyRule
   constructor(options: { packageVersion: string }) {
     super({
       packageName: '@microsoft/eslint-config-spfx',
-      packageVersion: options.packageVersion,
-      isDevDep: true
+      isDevDep: true,
+      ...options
     });
   }
 

@@ -4,8 +4,7 @@ export class FN015014_FILE_config_rig_json extends FileAddRemoveRule {
   constructor(options: { add: boolean; contents?: string }) {
     super({
       filePath: './config/rig.json',
-      add: options.add,
-      contents: options.contents
+      ...options
     });
   }
 

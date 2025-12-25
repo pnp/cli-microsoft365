@@ -4,8 +4,8 @@ export class FN001004_DEP_microsoft_sp_webpart_base extends DependencyRule {
   constructor(options: { packageVersion: string }) {
     super({
       packageName: '@microsoft/sp-webpart-base',
-      packageVersion: options.packageVersion,
-      isOptional: true
+      isOptional: true,
+      ...options
     });
   }
 

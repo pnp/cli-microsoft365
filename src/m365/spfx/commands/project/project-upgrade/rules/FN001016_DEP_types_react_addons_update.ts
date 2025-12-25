@@ -6,9 +6,8 @@ export class FN001016_DEP_types_react_addons_update extends DependencyRule {
   constructor(options: { packageVersion: string; add: boolean }) {
     super({
       packageName: '@types/react-addons-update',
-      packageVersion: options.packageVersion,
       isOptional: true,
-      add: options.add
+      ...options
     });
   }
 

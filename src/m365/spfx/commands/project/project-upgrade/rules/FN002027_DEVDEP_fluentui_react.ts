@@ -4,10 +4,9 @@ export class FN002027_DEVDEP_fluentui_react extends DependencyRule {
   constructor(options: { packageVersion: string; add: boolean }) {
     super({
       packageName: '@fluentui/react',
-      packageVersion: options.packageVersion,
       isDevDep: true,
       isOptional: true,
-      add: options.add
+      ...options
     });
   }
 

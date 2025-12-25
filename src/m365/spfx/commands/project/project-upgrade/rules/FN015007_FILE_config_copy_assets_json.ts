@@ -4,7 +4,7 @@ export class FN015007_FILE_config_copy_assets_json extends FileAddRemoveRule {
   constructor(options: { add: boolean }) {
     super({
       filePath: './config/copy-assets.json',
-      add: options.add
+      ...options
     });
   }
 

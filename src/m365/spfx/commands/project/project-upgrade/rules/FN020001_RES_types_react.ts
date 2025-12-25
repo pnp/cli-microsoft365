@@ -6,7 +6,7 @@ export class FN020001_RES_types_react extends ResolutionRule {
   constructor(options: { packageVersion: string }) {
     super({
       packageName: '@types/react',
-      packageVersion: options.packageVersion
+      ...options
     });
   }
 

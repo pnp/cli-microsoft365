@@ -4,8 +4,8 @@ export class FN001003_DEP_microsoft_sp_office_ui_fabric_core extends DependencyR
   constructor(options: { packageVersion: string }) {
     super({
       packageName: '@microsoft/sp-office-ui-fabric-core',
-      packageVersion: options.packageVersion,
-      isOptional: true
+      isOptional: true,
+      ...options
     });
   }
 

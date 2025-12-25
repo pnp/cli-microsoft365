@@ -4,7 +4,7 @@ export class FN015010_FILE_gulpfile_js extends FileAddRemoveRule {
   constructor(options: { add: boolean }) {
     super({
       filePath: './gulpfile.js',
-      add: options.add
+      ...options
     });
   }
 

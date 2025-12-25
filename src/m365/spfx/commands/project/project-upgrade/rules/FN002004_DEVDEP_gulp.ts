@@ -4,9 +4,8 @@ export class FN002004_DEVDEP_gulp extends DependencyRule {
   constructor(options: { packageVersion: string; add?: boolean }) {
     super({
       packageName: 'gulp',
-      packageVersion: options.packageVersion,
       isDevDep: true,
-      add: options.add
+      ...options
     });
   }
 

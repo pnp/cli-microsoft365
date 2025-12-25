@@ -6,8 +6,8 @@ export class FN001019_DEP_knockout extends DependencyRule {
   constructor(options: { packageVersion: string }) {
     super({
       packageName: 'knockout',
-      packageVersion: options.packageVersion,
-      isOptional: true
+      isOptional: true,
+      ...options
     });
   }
 

@@ -4,8 +4,7 @@ export class FN021002_PKG_engines extends PackageRule {
   constructor(options: { add: boolean; propertyValue?: string }) {
     super({
       propertyName: 'engines',
-      add: options.add,
-      propertyValue: options.propertyValue
+      ...options
     });
   }
 

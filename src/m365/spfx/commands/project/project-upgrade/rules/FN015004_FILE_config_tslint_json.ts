@@ -4,7 +4,7 @@ export class FN015004_FILE_config_tslint_json extends FileAddRemoveRule {
   constructor(options: { add: boolean }) {
     super({
       filePath: './config/tslint.json',
-      add: options.add
+      ...options
     });
   }
 

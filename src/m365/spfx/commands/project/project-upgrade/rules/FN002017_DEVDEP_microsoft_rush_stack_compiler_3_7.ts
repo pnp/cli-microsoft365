@@ -4,9 +4,8 @@ export class FN002017_DEVDEP_microsoft_rush_stack_compiler_3_7 extends Dependenc
   constructor(options: { packageVersion: string; add?: boolean }) {
     super({
       packageName: '@microsoft/rush-stack-compiler-3.7',
-      packageVersion: options.packageVersion,
       isDevDep: true,
-      add: options.add
+      ...options
     });
   }
 
