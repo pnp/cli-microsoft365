@@ -9,7 +9,7 @@ describe('FN011003_MAN_listViewCommandSet_schema', () => {
 
   beforeEach(() => {
     findings = [];
-    rule = new FN011003_MAN_listViewCommandSet_schema('test-schema');
+    rule = new FN011003_MAN_listViewCommandSet_schema({ version: 'test-schema' });
   });
 
   it('doesn\'t return notifications if no manifests collected', () => {

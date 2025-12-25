@@ -54,6 +54,6 @@ export default [
   new FN002001_DEVDEP_microsoft_sp_build_web({ packageVersion: '1.17.2' }),
   new FN002002_DEVDEP_microsoft_sp_module_interfaces({ packageVersion: '1.17.2' }),
   new FN002020_DEVDEP_microsoft_rush_stack_compiler_4_5({ packageVersion: '0.5.0' }),
-  new FN010001_YORC_version('1.17.2'),
-  new FN014008_CODE_launch_hostedWorkbench_type('msedge')
+  new FN010001_YORC_version({ version: '1.17.2' }),
+  new FN014008_CODE_launch_hostedWorkbench_type({ type: 'msedge' })
 ];

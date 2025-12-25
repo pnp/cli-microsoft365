@@ -9,7 +9,7 @@ describe('FN012011_TSC_outDir', () => {
 
   beforeEach(() => {
     findings = [];
-    rule = new FN012011_TSC_outDir('lib');
+    rule = new FN012011_TSC_outDir({ version: 'lib' });
   });
 
   it('doesn\'t return notification if outDir is already up-to-date', () => {

@@ -61,13 +61,13 @@ export default [
   new FN002003_DEVDEP_microsoft_sp_webpart_workbench({ packageVersion: '1.7.0' }),
   new FN002008_DEVDEP_tslint_microsoft_contrib('', false),
   new FN002009_DEVDEP_microsoft_sp_tslint_rules({ packageVersion: '1.7.0' }),
-  new FN006003_CFG_PS_isDomainIsolated(false),
-  new FN010001_YORC_version('1.7.0'),
-  new FN010007_YORC_isDomainIsolated(false),
+  new FN006003_CFG_PS_isDomainIsolated({ isDomainIsolated: false }),
+  new FN010001_YORC_version({ version: '1.7.0' }),
+  new FN010007_YORC_isDomainIsolated({ value: false }),
   new FN018001_TEAMS_folder(),
   new FN018002_TEAMS_manifest(),
-  new FN018003_TEAMS_tab20x20_png('tab20x20.png'),
-  new FN018004_TEAMS_tab96x96_png('tab96x96.png'),
+  new FN018003_TEAMS_tab20x20_png({ fixedFileName: 'tab20x20.png' }),
+  new FN018004_TEAMS_tab96x96_png({ fixedFileName: 'tab96x96.png' }),
   new FN019001_TSL_rulesDirectory(),
-  new FN019002_TSL_extends('@microsoft/sp-tslint-rules/base-tslint.json')
+  new FN019002_TSL_extends({ path: '@microsoft/sp-tslint-rules/base-tslint.json' })
 ];

@@ -9,7 +9,7 @@ describe('FN012020_TSC_noImplicitAny', () => {
 
   beforeEach(() => {
     findings = [];
-    rule = new FN012020_TSC_noImplicitAny(true);
+    rule = new FN012020_TSC_noImplicitAny({ true: true });
   });
 
   it('doesn\'t return notification if noImplicitAny is already up-to-date', () => {

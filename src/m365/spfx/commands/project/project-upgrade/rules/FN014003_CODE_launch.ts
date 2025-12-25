@@ -4,8 +4,10 @@ import { Rule } from '../../Rule.js';
 import { stringUtil } from '../../../../../../utils/stringUtil.js';
 
 export class FN014003_CODE_launch extends Rule {
-  constructor(private contents: string) {
+  private contents: string;
+  constructor(options: { contents: string }) {
     super();
+    this.contents = options.contents;
   }
 
   get id(): string {

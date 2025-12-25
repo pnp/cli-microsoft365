@@ -9,7 +9,7 @@ describe('FN001021_DEP_microsoft_sp_property_pane', () => {
 
   beforeEach(() => {
     findings = [];
-    rule = new FN001021_DEP_microsoft_sp_property_pane('15.6.6');
+    rule = new FN001021_DEP_microsoft_sp_property_pane({ version: '15.6.6' });
   });
 
   it('returns notification if version is not up-to-date', () => {

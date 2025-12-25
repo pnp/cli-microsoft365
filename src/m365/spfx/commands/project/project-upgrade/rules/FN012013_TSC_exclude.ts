@@ -3,8 +3,12 @@ import { Project, TsConfigJson } from '../../project-model/index.js';
 import { Finding } from '../../report-model/index.js';
 
 export class FN012013_TSC_exclude extends JsonRule {
-  constructor(private exclude: string[], private add: boolean = true) {
+  private add: boolean;
+  private exclude: string;
+  constructor(options: { exclude: string; add?: boolean }) {
     super();
+    this.exclude = options.exclude;
+    this.add = options.add ?? true;
   }
 
   get id(): string {

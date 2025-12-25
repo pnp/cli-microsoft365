@@ -9,7 +9,7 @@ describe('FN026002_CFG_SASS_extends', () => {
 
   beforeEach(() => {
     findings = [];
-    rule = new FN026002_CFG_SASS_extends('@microsoft/spfx-web-build-rig/profiles/default/config/sass.json');
+    rule = new FN026002_CFG_SASS_extends({ version: '@microsoft/spfx-web-build-rig/profiles/default/config/sass.json' });
   });
 
   it(`doesn't return notification if sass.json is not available`, () => {

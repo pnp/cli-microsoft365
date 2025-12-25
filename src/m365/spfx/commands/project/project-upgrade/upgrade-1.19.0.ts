@@ -51,5 +51,5 @@ export default [
   new FN002019_DEVDEP_spfx_fast_serve_helpers({ packageVersion: '1.19.6' }),
   new FN002022_DEVDEP_microsoft_eslint_plugin_spfx({ packageVersion: '1.20.1' }),
   new FN002023_DEVDEP_microsoft_eslint_config_spfx({ packageVersion: '1.20.1' }),
-  new FN010001_YORC_version('1.19.0')
+  new FN010001_YORC_version({ version: '1.19.0' })
 ];

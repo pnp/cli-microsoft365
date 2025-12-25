@@ -68,7 +68,7 @@ export default [
   new FN002015_DEVDEP_types_react({ packageVersion: '16.8.8' }),
   new FN002016_DEVDEP_types_react_dom({ packageVersion: '16.8.3' }),
   new FN006004_CFG_PS_developer(),
-  new FN010001_YORC_version('1.11.0'),
+  new FN010001_YORC_version({ version: '1.11.0' }),
   new FN012012_TSC_include([
     'src/**/*.tsx'
   ])

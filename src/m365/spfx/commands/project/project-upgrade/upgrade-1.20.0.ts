@@ -56,6 +56,6 @@ export default [
   new FN002021_DEVDEP_rushstack_eslint_config({ packageVersion: '4.0.1' }),
   new FN002022_DEVDEP_microsoft_eslint_plugin_spfx({ packageVersion: '1.20.2' }),
   new FN002023_DEVDEP_microsoft_eslint_config_spfx({ packageVersion: '1.20.2' }),
-  new FN010001_YORC_version('1.20.0'),
-  new FN010010_YORC_sdkVersions_teams_js('2.24.0')
+  new FN010001_YORC_version({ version: '1.20.0' }),
+  new FN010010_YORC_sdkVersions_teams_js({ version: '2.24.0' })
 ];

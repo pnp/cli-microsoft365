@@ -4,8 +4,10 @@ import { Finding, Occurrence } from '../../report-model/index.js';
 import { TsRule } from './TsRule.js';
 
 export class FN025001_ESLINTRCJS_overrides extends TsRule {
-  constructor(private contents: string) {
+  private contents: string;
+  constructor(options: { contents: string }) {
     super();
+    this.contents = options.contents;
   }
 
   get id(): string {

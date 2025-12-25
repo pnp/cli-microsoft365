@@ -3,8 +3,10 @@ import { Project } from '../../project-model/index.js';
 import { Finding } from '../../report-model/index.js';
 
 export class FN012016_TSC_noUnusedLocals extends JsonRule {
-  constructor(private noUnusedLocals: boolean) {
+  private noUnusedLocals: boolean;
+  constructor(options: { noUnusedLocals: boolean }) {
     super();
+    this.noUnusedLocals = options.noUnusedLocals;
   }
 
   get id(): string {

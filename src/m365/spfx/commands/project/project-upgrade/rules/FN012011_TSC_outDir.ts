@@ -3,8 +3,10 @@ import { Project } from '../../project-model/index.js';
 import { Finding } from '../../report-model/index.js';
 
 export class FN012011_TSC_outDir extends JsonRule {
-  constructor(private outDir: string) {
+  private outDir: string;
+  constructor(options: { outDir: string }) {
     super();
+    this.outDir = options.outDir;
   }
 
   get id(): string {

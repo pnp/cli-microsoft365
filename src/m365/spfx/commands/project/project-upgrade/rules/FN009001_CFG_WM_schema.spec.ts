@@ -9,7 +9,7 @@ describe('FN009001_CFG_WM_schema', () => {
 
   beforeEach(() => {
     findings = [];
-    rule = new FN009001_CFG_WM_schema('test-schema');
+    rule = new FN009001_CFG_WM_schema({ version: 'test-schema' });
   });
 
   it('doesn\'t return notification if write-manifests.json found', () => {

@@ -18,7 +18,7 @@ describe('FN025001_ESLINTRCJS_overrides', () => {
   });
 
   beforeEach(() => {
-    rule = new FN025001_ESLINTRCJS_overrides('{ foo: bar }');
+    rule = new FN025001_ESLINTRCJS_overrides({ version: '{ foo: bar }' });
     findings = [];
   });
 

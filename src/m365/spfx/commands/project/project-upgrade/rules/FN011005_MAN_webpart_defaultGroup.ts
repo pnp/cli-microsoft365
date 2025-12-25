@@ -3,8 +3,12 @@ import { Project } from '../../project-model/index.js';
 import { ManifestRule } from "./ManifestRule.js";
 
 export class FN011005_MAN_webpart_defaultGroup extends ManifestRule {
-  constructor(private oldDefaultGroup: string, private newDefaultGroup: string) {
+  private newDefaultGroup: string;
+  private oldDefaultGroup: string;
+  constructor(options: { oldDefaultGroup: string; newDefaultGroup: string }) {
     super();
+    this.oldDefaultGroup = options.oldDefaultGroup;
+    this.newDefaultGroup = options.newDefaultGroup;
   }
 
   get id(): string {

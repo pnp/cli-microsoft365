@@ -3,8 +3,10 @@ import { Project } from '../../project-model/index.js';
 import { Finding } from '../../report-model/index.js';
 
 export class FN004002_CFG_CA_deployCdnPath extends JsonRule {
-  constructor(private deployCdnPath: string) {
+  private deployCdnPath: string;
+  constructor(options: { deployCdnPath: string }) {
     super();
+    this.deployCdnPath = options.deployCdnPath;
   }
 
   get id(): string {

@@ -63,11 +63,11 @@ export default [
   new FN002009_DEVDEP_microsoft_sp_tslint_rules({ packageVersion: '1.9.1' }),
   new FN002011_DEVDEP_microsoft_rush_stack_compiler_2_9({ packageVersion: '0.7.16' }),
   new FN002019_DEVDEP_spfx_fast_serve_helpers({ packageVersion: '1.11.0' }),
-  new FN010001_YORC_version('1.9.1'),
+  new FN010001_YORC_version({ version: '1.9.1' }),
   new FN020001_RES_types_react({ packageVersion: '16.8.8' }),
   new FN021001_PKG_main({ add: true, propertyValue: "lib/index.js" }),
   new FN001008_DEP_react({ packageVersion: '16.8.5' }),
   new FN001009_DEP_react_dom({ packageVersion: '16.8.5' }),
-  new FN022001_SCSS_remove_fabric_react('~@microsoft/sp-office-ui-fabric-core/dist/sass/SPFabricCore.scss'),
-  new FN022002_SCSS_add_fabric_react('~office-ui-fabric-react/dist/sass/References.scss', '~@microsoft/sp-office-ui-fabric-core/dist/sass/SPFabricCore.scss')
+  new FN022001_SCSS_remove_fabric_react({ oldValue: '~@microsoft/sp-office-ui-fabric-core/dist/sass/SPFabricCore.scss' }),
+  new FN022002_SCSS_add_fabric_react({ newValue: '~office-ui-fabric-react/dist/sass/References.scss', oldValue: '~@microsoft/sp-office-ui-fabric-core/dist/sass/SPFabricCore.scss' })
 ]; 

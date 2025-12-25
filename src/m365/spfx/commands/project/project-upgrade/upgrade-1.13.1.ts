@@ -46,6 +46,6 @@ export default [
   new FN002001_DEVDEP_microsoft_sp_build_web({ packageVersion: '1.13.1' }),
   new FN002002_DEVDEP_microsoft_sp_module_interfaces({ packageVersion: '1.13.1' }),
   new FN002009_DEVDEP_microsoft_sp_tslint_rules({ packageVersion: '1.13.1' }),
-  new FN006004_CFG_PS_developer('1.13.1'),
-  new FN010001_YORC_version('1.13.1')
+  new FN006004_CFG_PS_developer({ version: '1.13.1' }),
+  new FN010001_YORC_version({ version: '1.13.1' })
 ];

@@ -3,8 +3,10 @@ import { Project } from '../../project-model/index.js';
 import { Finding } from '../../report-model/index.js';
 
 export class FN010003_YORC_packageManager extends JsonRule {
-  constructor(private packageManager: string) {
+  private packageManager: string;
+  constructor(options: { packageManager: string }) {
     super();
+    this.packageManager = options.packageManager;
   }
 
   get id(): string {

@@ -3,8 +3,10 @@ import { Project } from '../../project-model/index.js';
 import { Finding } from '../../report-model/index.js';
 
 export class FN007002_CFG_S_initialPage extends JsonRule {
-  constructor(private initialPage: string) {
+  private initialPage: string;
+  constructor(options: { initialPage: string }) {
     super();
+    this.initialPage = options.initialPage;
   }
 
   get id(): string {

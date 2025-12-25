@@ -14,7 +14,7 @@ describe('FN014009_CODE_launch_hostedWorkbench_url', () => {
 
   beforeEach(() => {
     findings = [];
-    rule = new FN014009_CODE_launch_hostedWorkbench_url('https://{tenantDomain}/_layouts/workbench.aspx');
+    rule = new FN014009_CODE_launch_hostedWorkbench_url({ version: 'https://{tenantDomain}/_layouts/workbench.aspx' });
   });
 
   it('doesn\'t return notifications if vscode folder doesn\'t exist', () => {

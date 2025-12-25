@@ -51,9 +51,9 @@ export default [
   new FN002002_DEVDEP_microsoft_sp_module_interfaces({ packageVersion: '1.14.0' }),
   new FN002009_DEVDEP_microsoft_sp_tslint_rules({ packageVersion: '1.14.0' }),
   new FN002019_DEVDEP_spfx_fast_serve_helpers({ packageVersion: '1.14.0' }),
-  new FN006004_CFG_PS_developer('1.14.0'),
+  new FN006004_CFG_PS_developer({ version: '1.14.0' }),
   new FN006005_CFG_PS_metadata(),
   new FN006006_CFG_PS_features(),
-  new FN010001_YORC_version('1.14.0'),
-  new FN014008_CODE_launch_hostedWorkbench_type('pwa-chrome')
+  new FN010001_YORC_version({ version: '1.14.0' }),
+  new FN014008_CODE_launch_hostedWorkbench_type({ type: 'pwa-chrome' })
 ];

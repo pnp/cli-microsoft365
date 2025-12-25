@@ -59,9 +59,9 @@ export default [
   new FN002019_DEVDEP_spfx_fast_serve_helpers({ packageVersion: '1.17.10' }),
   new FN002020_DEVDEP_microsoft_rush_stack_compiler_4_5({ packageVersion: '0.4.0' }),
   new FN002024_DEVDEP_eslint({ packageVersion: '8.7.0' }),
-  new FN007002_CFG_S_initialPage('https://{tenantDomain}/_layouts/workbench.aspx'),
-  new FN010001_YORC_version('1.17.0'),
-  new FN010010_YORC_sdkVersions_teams_js('2.9.1'),
-  new FN014008_CODE_launch_hostedWorkbench_type('edge'),
-  new FN014009_CODE_launch_hostedWorkbench_url('https://{tenantDomain}/_layouts/workbench.aspx')
+  new FN007002_CFG_S_initialPage({ initialPage: 'https://{tenantDomain}/_layouts/workbench.aspx' }),
+  new FN010001_YORC_version({ version: '1.17.0' }),
+  new FN010010_YORC_sdkVersions_teams_js({ version: '2.9.1' }),
+  new FN014008_CODE_launch_hostedWorkbench_type({ type: 'edge' }),
+  new FN014009_CODE_launch_hostedWorkbench_url({ url: 'https://{tenantDomain}/_layouts/workbench.aspx' })
 ];

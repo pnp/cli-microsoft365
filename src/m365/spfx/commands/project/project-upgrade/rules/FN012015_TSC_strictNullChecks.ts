@@ -3,8 +3,10 @@ import { Project } from '../../project-model/index.js';
 import { Finding } from '../../report-model/index.js';
 
 export class FN012015_TSC_strictNullChecks extends JsonRule {
-  constructor(private strictNullChecks: boolean) {
+  private strictNullChecks: boolean;
+  constructor(options: { strictNullChecks: boolean }) {
     super();
+    this.strictNullChecks = options.strictNullChecks;
   }
 
   get id(): string {

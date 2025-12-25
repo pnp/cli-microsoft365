@@ -4,8 +4,12 @@ import { Project } from '../../project-model/index.js';
 import { Finding, Occurrence } from '../../report-model/index.js';
 
 export class FN014006_CODE_launch_sourceMapPathOverrides extends JsonRule {
-  constructor(private overrideKey: string, private overrideValue: string) {
+  private overrideValue: string;
+  private overrideKey: string;
+  constructor(options: { overrideKey: string; overrideValue: string }) {
     super();
+    this.overrideKey = options.overrideKey;
+    this.overrideValue = options.overrideValue;
   }
 
   get id(): string {

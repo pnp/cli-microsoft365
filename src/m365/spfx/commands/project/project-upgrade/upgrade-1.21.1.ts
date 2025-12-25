@@ -49,5 +49,5 @@ export default [
   new FN002002_DEVDEP_microsoft_sp_module_interfaces({ packageVersion: '1.21.1' }),
   new FN002022_DEVDEP_microsoft_eslint_plugin_spfx({ packageVersion: '1.21.1' }),
   new FN002023_DEVDEP_microsoft_eslint_config_spfx({ packageVersion: '1.21.1' }),
-  new FN010001_YORC_version('1.21.1')
+  new FN010001_YORC_version({ version: '1.21.1' })
 ];

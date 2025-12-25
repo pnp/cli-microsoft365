@@ -20,7 +20,7 @@ describe('FN016001_TS_msgraphclient_packageName', () => {
 
   beforeEach(() => {
     findings = [];
-    rule = new FN016001_TS_msgraphclient_packageName('@microsoft/sp-http');
+    rule = new FN016001_TS_msgraphclient_packageName({ version: '@microsoft/sp-http' });
   });
 
   it('returns empty resolution', () => {

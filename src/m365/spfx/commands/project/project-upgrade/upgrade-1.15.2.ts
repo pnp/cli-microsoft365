@@ -56,9 +56,9 @@ export default [
   new FN002002_DEVDEP_microsoft_sp_module_interfaces({ packageVersion: '1.15.2' }),
   new FN002019_DEVDEP_spfx_fast_serve_helpers({ packageVersion: '1.15.4' }),
   new FN002026_DEVDEP_typescript({ packageVersion: '4.5.5' }),
-  new FN010001_YORC_version('1.15.2'),
-  new FN012020_TSC_noImplicitAny(true),
-  new FN007001_CFG_S_schema('https://developer.microsoft.com/json-schemas/spfx-build/spfx-serve.schema.json'),
+  new FN010001_YORC_version({ version: '1.15.2' }),
+  new FN012020_TSC_noImplicitAny({ value: true }),
+  new FN007001_CFG_S_schema({ schema: 'https://developer.microsoft.com/json-schemas/spfx-build/spfx-serve.schema.json' }),
   new FN025001_ESLINTRCJS_overrides(`{
       files: ['*.ts', '*.tsx'],
       parser: '@typescript-eslint/parser',

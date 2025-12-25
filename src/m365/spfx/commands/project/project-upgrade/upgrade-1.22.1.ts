@@ -51,5 +51,5 @@ export default [
   new FN002023_DEVDEP_microsoft_eslint_config_spfx({ packageVersion: '1.22.1' }),
   new FN002030_DEVDEP_microsoft_spfx_web_build_rig({ packageVersion: '1.22.1' }),
   new FN002034_DEVDEP_microsoft_spfx_heft_plugins({ packageVersion: '1.22.1' }),
-  new FN010001_YORC_version('1.22.1')
+  new FN010001_YORC_version({ version: '1.22.1' })
 ];

@@ -9,7 +9,7 @@ describe('FN004002_CFG_CA_deployCdnPath', () => {
 
   beforeEach(() => {
     findings = [];
-    rule = new FN004002_CFG_CA_deployCdnPath('./release/assets/');
+    rule = new FN004002_CFG_CA_deployCdnPath({ version: './release/assets/' });
   });
 
   it(`doesn't return notification if no copy-assets.json found`, () => {

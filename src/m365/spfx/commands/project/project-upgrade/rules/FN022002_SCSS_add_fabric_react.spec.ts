@@ -23,7 +23,7 @@ describe('FN022002_SCSS_add_fabric_react', () => {
   });
 
   it('doesn\'t return notifications if import is already there', () => {
-    rule = new FN022002_SCSS_add_fabric_react('~fabric-ui/react');
+    rule = new FN022002_SCSS_add_fabric_react({ version: '~fabric-ui/react' });
 
     fileStub = sinon.stub(fs, 'readFileSync').returns('~fabric-ui/react');
     const project: Project = {
@@ -37,7 +37,7 @@ describe('FN022002_SCSS_add_fabric_react', () => {
   });
 
   it('returns notifications if import is missing and no condition', () => {
-    rule = new FN022002_SCSS_add_fabric_react('~fabric-ui/react');
+    rule = new FN022002_SCSS_add_fabric_react({ version: '~fabric-ui/react' });
     fileStub = sinon.stub(fs, 'readFileSync').returns('');
     const project: Project = {
       path: '/usr/tmp',
@@ -77,7 +77,7 @@ describe('FN022002_SCSS_add_fabric_react', () => {
   });
 
   it('doesn\'t return notifications if scss is not in react web part', () => {
-    rule = new FN022002_SCSS_add_fabric_react('~fabric-ui/react');
+    rule = new FN022002_SCSS_add_fabric_react({ version: '~fabric-ui/react' });
     utilsStub.restore();
     utilsStub = sinon.stub(spfx, 'isReactProject').returns(false);
 
@@ -94,7 +94,7 @@ describe('FN022002_SCSS_add_fabric_react', () => {
   });
 
   it('doesn\'t return notifications if no scss files', () => {
-    rule = new FN022002_SCSS_add_fabric_react('~fabric-ui/react');
+    rule = new FN022002_SCSS_add_fabric_react({ version: '~fabric-ui/react' });
     fileStub = sinon.stub(fs, 'readFileSync').returns('');
 
     const project: Project = {
@@ -106,7 +106,7 @@ describe('FN022002_SCSS_add_fabric_react', () => {
   });
 
   it('rule file name is empty', () => {
-    rule = new FN022002_SCSS_add_fabric_react('~fabric-ui/react');
+    rule = new FN022002_SCSS_add_fabric_react({ version: '~fabric-ui/react' });
     fileStub = sinon.stub(fs, 'readFileSync').returns('');
 
     const project: Project = {

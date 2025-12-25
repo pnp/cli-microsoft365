@@ -9,7 +9,7 @@ describe('FN004001_CFG_CA_schema', () => {
 
   beforeEach(() => {
     findings = [];
-    rule = new FN004001_CFG_CA_schema('test-schema');
+    rule = new FN004001_CFG_CA_schema({ version: 'test-schema' });
   });
 
   it('doesn\'t return notification if no copy-assets.json found', () => {

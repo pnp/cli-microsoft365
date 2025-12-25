@@ -9,7 +9,7 @@ describe('FN010007_YORC_isDomainIsolated', () => {
 
   beforeEach(() => {
     findings = [];
-    rule = new FN010007_YORC_isDomainIsolated(false);
+    rule = new FN010007_YORC_isDomainIsolated({ false: false });
   });
 
   it('doesn\'t return notification if no .yo-rc.json found', () => {

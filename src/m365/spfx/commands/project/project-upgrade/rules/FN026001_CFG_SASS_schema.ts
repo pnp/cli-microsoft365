@@ -3,8 +3,10 @@ import { Project } from '../../project-model/index.js';
 import { Finding } from '../../report-model/index.js';
 
 export class FN026001_CFG_SASS_schema extends JsonRule {
-  constructor(private schema: string) {
+  private schema: string;
+  constructor(options: { schema: string }) {
     super();
+    this.schema = options.schema;
   }
 
   get id(): string {

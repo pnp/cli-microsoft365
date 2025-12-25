@@ -53,7 +53,7 @@ export default [
   new FN002009_DEVDEP_microsoft_sp_tslint_rules({ packageVersion: '1.10.0' }),
   new FN002011_DEVDEP_microsoft_rush_stack_compiler_2_9('0.7.16', true),
   new FN002012_DEVDEP_microsoft_rush_stack_compiler_3_3({ packageVersion: '0.3.5' }),
-  new FN010001_YORC_version('1.10.0'),
-  new FN012017_TSC_extends('./node_modules/@microsoft/rush-stack-compiler-3.3/includes/tsconfig-web.json'),
+  new FN010001_YORC_version({ version: '1.10.0' }),
+  new FN012017_TSC_extends({ path: './node_modules/@microsoft/rush-stack-compiler-3.3/includes/tsconfig-web.json' }),
   new FN016004_TS_property_pane_property_import()
 ];

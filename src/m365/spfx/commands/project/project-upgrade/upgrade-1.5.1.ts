@@ -41,5 +41,5 @@ export default [
   new FN002001_DEVDEP_microsoft_sp_build_web({ packageVersion: '1.5.1' }),
   new FN002002_DEVDEP_microsoft_sp_module_interfaces({ packageVersion: '1.5.1' }),
   new FN002003_DEVDEP_microsoft_sp_webpart_workbench({ packageVersion: '1.5.1' }),
-  new FN010001_YORC_version('1.5.1')
+  new FN010001_YORC_version({ version: '1.5.1' })
 ];

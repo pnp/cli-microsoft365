@@ -50,8 +50,8 @@ export default [
   new FN002002_DEVDEP_microsoft_sp_module_interfaces({ packageVersion: '1.12.1' }),
   new FN002003_DEVDEP_microsoft_sp_webpart_workbench({ packageVersion: '1.12.1' }),
   new FN002009_DEVDEP_microsoft_sp_tslint_rules({ packageVersion: '1.12.1' }),
-  new FN004002_CFG_CA_deployCdnPath('./release/assets/'),
-  new FN005002_CFG_DAS_workingDir('./release/assets/'),
-  new FN010001_YORC_version('1.12.1'),
+  new FN004002_CFG_CA_deployCdnPath({ deployCdnPath: './release/assets/' }),
+  new FN005002_CFG_DAS_workingDir({ workingDir: './release/assets/' }),
+  new FN010001_YORC_version({ version: '1.12.1' }),
   new FN023001_GITIGNORE_release()
 ];

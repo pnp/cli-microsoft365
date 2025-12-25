@@ -4,8 +4,10 @@ import { Finding, Occurrence } from '../../report-model/index.js';
 import { ScssRule } from './ScssRule.js';
 
 export class FN022001_SCSS_remove_fabric_react extends ScssRule {
-  constructor(private importValue: string) {
+  private importValue: string;
+  constructor(options: { importValue: string }) {
     super();
+    this.importValue = options.importValue;
   }
 
   get id(): string {

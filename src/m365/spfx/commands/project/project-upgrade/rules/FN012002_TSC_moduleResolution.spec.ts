@@ -9,7 +9,7 @@ describe('FN012002_TSC_moduleResolution', () => {
 
   beforeEach(() => {
     findings = [];
-    rule = new FN012002_TSC_moduleResolution('node');
+    rule = new FN012002_TSC_moduleResolution({ version: 'node' });
   });
 
   it('doesn\'t return notification if moduleResolution is already up-to-date', () => {

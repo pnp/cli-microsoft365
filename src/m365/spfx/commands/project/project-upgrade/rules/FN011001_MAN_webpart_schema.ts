@@ -3,8 +3,10 @@ import { Project } from '../../project-model/index.js';
 import { ManifestRule } from "./ManifestRule.js";
 
 export class FN011001_MAN_webpart_schema extends ManifestRule {
-  constructor(private schema: string) {
+  private schema: string;
+  constructor(options: { schema: string }) {
     super();
+    this.schema = options.schema;
   }
 
   get id(): string {

@@ -52,8 +52,8 @@ export default [
   new FN002002_DEVDEP_microsoft_sp_module_interfaces({ packageVersion: '1.6.0' }),
   new FN002003_DEVDEP_microsoft_sp_webpart_workbench({ packageVersion: '1.6.0' }),
   new FN002008_DEVDEP_tslint_microsoft_contrib({ packageVersion: '5.0.0' }),
-  new FN010001_YORC_version('1.6.0'),
-  new FN012011_TSC_outDir('lib'),
+  new FN010001_YORC_version({ version: '1.6.0' }),
+  new FN012011_TSC_outDir({ outDir: 'lib' }),
   new FN012012_TSC_include([
     'src/**/*.ts'
   ]),
@@ -96,7 +96,7 @@ export default [
   new FN015004_FILE_config_tslint_json({ add: false }),
   new FN015005_FILE_src_index_ts({ add: true, contents: `// A file is required to be in the root of the /src directory by the TypeScript compiler
 ` }),
-  new FN016001_TS_msgraphclient_packageName('@microsoft/sp-http'),
+  new FN016001_TS_msgraphclient_packageName({ packageName: '@microsoft/sp-http' }),
   new FN016002_TS_msgraphclient_instance(),
   new FN016003_TS_aadhttpclient_instance()
 ];

@@ -5,7 +5,7 @@ import { FN011009_MAN_webpart_safeWithCustomScriptDisabled } from "./rules/FN011
 
 export default [
   new FN002002_DEVDEP_microsoft_sp_module_interfaces({ packageVersion: '1.1.1' }),
-  new FN010001_YORC_version('1.1.3'),
+  new FN010001_YORC_version({ version: '1.1.3' }),
   new FN011008_MAN_requiresCustomScript(),
-  new FN011009_MAN_webpart_safeWithCustomScriptDisabled(false)
+  new FN011009_MAN_webpart_safeWithCustomScriptDisabled({ add: false })
 ];

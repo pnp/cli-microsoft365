@@ -3,8 +3,10 @@ import { Project } from '../../project-model/index.js';
 import { Finding } from '../../report-model/index.js';
 
 export class FN012020_TSC_noImplicitAny extends JsonRule {
-  constructor(private noImplicitAny: boolean) {
+  private noImplicitAny: boolean;
+  constructor(options: { noImplicitAny: boolean }) {
     super();
+    this.noImplicitAny = options.noImplicitAny;
   }
 
   get id(): string {

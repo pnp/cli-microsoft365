@@ -3,8 +3,10 @@ import { Project } from '../../project-model/index.js';
 import { Finding } from '../../report-model/index.js';
 
 export class FN012019_TSC_types_es6_promise extends JsonRule {
-  constructor(private add: boolean) {
+  private add: boolean;
+  constructor(options: { add: boolean }) {
     super();
+    this.add = options.add;
   }
 
   get id(): string {

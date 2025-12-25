@@ -62,8 +62,8 @@ export default [
   new FN002023_DEVDEP_microsoft_eslint_config_spfx({ packageVersion: '1.18.0' }),
   new FN002026_DEVDEP_typescript({ packageVersion: '4.7.4' }),
   new FN002028_DEVDEP_microsoft_rush_stack_compiler_4_7({ packageVersion: '0.1.0' }),
-  new FN010001_YORC_version('1.18.0'),
-  new FN010010_YORC_sdkVersions_teams_js('2.12.0'),
-  new FN012017_TSC_extends('./node_modules/@microsoft/rush-stack-compiler-4.7/includes/tsconfig-web.json'),
+  new FN010001_YORC_version({ version: '1.18.0' }),
+  new FN010010_YORC_sdkVersions_teams_js({ version: '2.12.0' }),
+  new FN012017_TSC_extends({ path: './node_modules/@microsoft/rush-stack-compiler-4.7/includes/tsconfig-web.json' }),
   new FN021003_PKG_engines_node('>=16.13.0 <17.0.0 || >=18.17.1 <19.0.0')
 ];

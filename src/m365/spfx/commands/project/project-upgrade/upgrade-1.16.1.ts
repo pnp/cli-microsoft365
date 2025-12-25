@@ -50,7 +50,7 @@ export default [
   new FN002023_DEVDEP_microsoft_eslint_config_spfx({ packageVersion: '1.16.1' }),
   new FN002001_DEVDEP_microsoft_sp_build_web({ packageVersion: '1.16.1' }),
   new FN002002_DEVDEP_microsoft_sp_module_interfaces({ packageVersion: '1.16.1' }),
-  new FN010001_YORC_version('1.16.1'),
+  new FN010001_YORC_version({ version: '1.16.1' }),
   new FN015009_FILE_config_sass_json({ add: true, contents: `{
   "$schema": "https://developer.microsoft.com/json-schemas/core-build/sass.schema.json"
 }` })

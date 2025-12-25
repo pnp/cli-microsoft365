@@ -3,8 +3,10 @@ import { Project } from '../../project-model/index.js';
 import { ManifestRule } from "./ManifestRule.js";
 
 export class FN011009_MAN_webpart_safeWithCustomScriptDisabled extends ManifestRule {
-  constructor(private add: boolean) {
+  private add: boolean;
+  constructor(options: { add: boolean }) {
     super();
+    this.add = options.add;
   }
 
   get id(): string {

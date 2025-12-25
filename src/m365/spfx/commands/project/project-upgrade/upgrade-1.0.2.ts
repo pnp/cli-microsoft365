@@ -7,5 +7,5 @@ export default [
   new FN001019_DEP_knockout({ packageVersion: '3.4.0' }),
   new FN001020_DEP_types_knockout({ packageVersion: '3.4.39' }),
   new FN008003_CFG_TSL_preferConst(),
-  new FN010001_YORC_version('1.0.2')
+  new FN010001_YORC_version({ version: { version: '1.0.2' } })
 ];

@@ -3,8 +3,10 @@ import { Project } from '../../project-model/index.js';
 import { Finding } from '../../report-model/index.js';
 
 export class FN010009_YORC_sdkVersions_microsoft_graph_client extends JsonRule {
-  constructor(private version: string) {
+  private version: string;
+  constructor(options: { version: string }) {
     super();
+    this.version = options.version;
   }
 
   get id(): string {

@@ -49,5 +49,5 @@ export default [
   new FN002023_DEVDEP_microsoft_eslint_config_spfx({ packageVersion: '1.17.4' }),
   new FN002001_DEVDEP_microsoft_sp_build_web({ packageVersion: '1.17.4' }),
   new FN002002_DEVDEP_microsoft_sp_module_interfaces({ packageVersion: '1.17.4' }),
-  new FN010001_YORC_version('1.17.4')
+  new FN010001_YORC_version({ version: '1.17.4' })
 ];

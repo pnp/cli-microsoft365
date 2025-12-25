@@ -74,9 +74,9 @@ export default [
   new FN002023_DEVDEP_microsoft_eslint_config_spfx({ packageVersion: '1.15.0' }),
   new FN002024_DEVDEP_eslint({ packageVersion: '8.7.0' }),
   new FN002025_DEVDEP_eslint_plugin_react_hooks({ packageVersion: '4.3.0' }),
-  new FN006004_CFG_PS_developer('1.15.0'),
-  new FN010001_YORC_version('1.15.0'),
-  new FN012017_TSC_extends('./node_modules/@microsoft/rush-stack-compiler-4.5/includes/tsconfig-web.json'),
+  new FN006004_CFG_PS_developer({ version: '1.15.0' }),
+  new FN010001_YORC_version({ version: '1.15.0' }),
+  new FN012017_TSC_extends({ path: './node_modules/@microsoft/rush-stack-compiler-4.5/includes/tsconfig-web.json' }),
   new FN015003_FILE_tslint_json({ add: false, contents: '' }),
   new FN015008_FILE_eslintrc_js({ add: true, contents: `require('@rushstack/eslint-config/patch/modern-module-resolution');
 export default {

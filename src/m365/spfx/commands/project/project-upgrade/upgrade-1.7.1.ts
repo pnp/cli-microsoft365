@@ -48,8 +48,8 @@ export default [
   new FN002002_DEVDEP_microsoft_sp_module_interfaces({ packageVersion: '1.7.1' }),
   new FN002003_DEVDEP_microsoft_sp_webpart_workbench({ packageVersion: '1.7.1' }),
   new FN002009_DEVDEP_microsoft_sp_tslint_rules({ packageVersion: '1.7.1' }),
-  new FN010001_YORC_version('1.7.1'),
-  new FN014006_CODE_launch_sourceMapPathOverrides('webpack:///.././src/*', '${webRoot}/src/*'),
+  new FN010001_YORC_version({ version: '1.7.1' }),
+  new FN014006_CODE_launch_sourceMapPathOverrides({ sourceMapPathOverrides: 'webpack:///.././src/*', newValue: '${webRoot}/src/*' }),
   new FN020001_RES_types_react({ packageVersion: '16.4.2' }),
   new FN018005_TEAMS_deprecated_manifest()
 ];

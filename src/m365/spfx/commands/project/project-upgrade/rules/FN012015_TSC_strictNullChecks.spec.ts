@@ -9,7 +9,7 @@ describe('FN012015_TSC_strictNullChecks', () => {
 
   beforeEach(() => {
     findings = [];
-    rule = new FN012015_TSC_strictNullChecks(false);
+    rule = new FN012015_TSC_strictNullChecks({ false: false });
   });
 
   it('doesn\'t return notification if strictNullChecks is already up-to-date', () => {

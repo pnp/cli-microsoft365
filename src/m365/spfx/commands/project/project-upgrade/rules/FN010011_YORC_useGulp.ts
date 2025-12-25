@@ -3,8 +3,10 @@ import { Project } from '../../project-model/index.js';
 import { Finding } from '../../report-model/index.js';
 
 export class FN010011_YORC_useGulp extends JsonRule {
-  constructor(private useGulp: boolean) {
+  private useGulp: boolean;
+  constructor(options: { useGulp: boolean }) {
     super();
+    this.useGulp = options.useGulp;
   }
 
   get id(): string {

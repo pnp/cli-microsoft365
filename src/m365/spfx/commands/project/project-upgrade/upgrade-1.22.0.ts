@@ -96,8 +96,8 @@ export default [
   new FN002033_DEVDEP_css_loader({ packageVersion: '7.1.2' }),
   new FN002034_DEVDEP_microsoft_spfx_heft_plugins({ packageVersion: '1.22.0' }),
   new FN002035_DEVDEP_types_heft_jest({ packageVersion: '1.0.2' }),
-  new FN010001_YORC_version('1.22.0'),
-  new FN010011_YORC_useGulp(false),
+  new FN010001_YORC_version({ version: '1.22.0' }),
+  new FN010011_YORC_useGulp({ value: false }),
   new FN014003_CODE_launch(`{
   "version": "0.2.0",
   "configurations": [
@@ -161,6 +161,6 @@ export default [
   new FN025003_ESLINTRCJS_rushstack_pair_react_dom_render_unmount(),
   new FN025004_ESLINTRCJS_microsoft_spfx_import_requires_chunk_name(),
   new FN025005_ESLINTRCJS_microsoft_spfx_pair_react_dom_render_unmount(),
-  new FN026001_CFG_SASS_schema('https://developer.microsoft.com/json-schemas/heft/v0/heft-sass-plugin.schema.json'),
-  new FN026002_CFG_SASS_extends('@microsoft/spfx-web-build-rig/profiles/default/config/sass.json')
+  new FN026001_CFG_SASS_schema({ schema: 'https://developer.microsoft.com/json-schemas/heft/v0/heft-sass-plugin.schema.json' }),
+  new FN026002_CFG_SASS_extends({ path: '@microsoft/spfx-web-build-rig/profiles/default/config/sass.json' })
 ];

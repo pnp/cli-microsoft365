@@ -9,7 +9,7 @@ describe('FN021004_PKG_scripts_build', () => {
 
   beforeEach(() => {
     findings = [];
-    rule = new FN021004_PKG_scripts_build('heft test --clean');
+    rule = new FN021004_PKG_scripts_build({ version: 'heft test --clean' });
   });
 
   it(`doesn't return notification if package.json is not available`, () => {

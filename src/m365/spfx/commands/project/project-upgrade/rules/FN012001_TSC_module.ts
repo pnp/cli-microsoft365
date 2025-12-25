@@ -3,8 +3,10 @@ import { Project } from '../../project-model/index.js';
 import { Finding } from '../../report-model/index.js';
 
 export class FN012001_TSC_module extends JsonRule {
-  constructor(private module: string) {
+  private module: string;
+  constructor(options: { module: string }) {
     super();
+    this.module = options.module;
   }
 
   get id(): string {

@@ -3,8 +3,10 @@ import { Project } from '../../project-model/index.js';
 import { Finding } from '../../report-model/index.js';
 
 export class FN008001_CFG_TSL_schema extends JsonRule {
-  constructor(private schema: string) {
+  private schema: string;
+  constructor(options: { schema: string }) {
     super();
+    this.schema = options.schema;
   }
 
   get id(): string {

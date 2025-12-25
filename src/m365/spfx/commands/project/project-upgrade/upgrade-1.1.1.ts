@@ -13,5 +13,5 @@ export default [
   new FN001027_DEP_microsoft_sp_http({ packageVersion: '1.1.1' }),
   new FN001029_DEP_microsoft_sp_loader({ packageVersion: '1.1.1' }),
   new FN001030_DEP_microsoft_sp_module_interfaces({ packageVersion: '1.1.1' }),
-  new FN010001_YORC_version('1.1.1')
+  new FN010001_YORC_version({ version: '1.1.1' })
 ];

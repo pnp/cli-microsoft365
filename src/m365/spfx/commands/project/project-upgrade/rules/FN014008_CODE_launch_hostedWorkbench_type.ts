@@ -4,8 +4,10 @@ import { Project } from '../../project-model/index.js';
 import { Finding, Occurrence } from '../../report-model/index.js';
 
 export class FN014008_CODE_launch_hostedWorkbench_type extends JsonRule {
-  constructor(private type: string) {
+  private type: string;
+  constructor(options: { type: string }) {
     super();
+    this.type = options.type;
   }
 
   get id(): string {

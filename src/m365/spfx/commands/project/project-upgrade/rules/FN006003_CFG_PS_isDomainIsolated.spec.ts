@@ -9,7 +9,7 @@ describe('FN006003_CFG_PS_isDomainIsolated', () => {
 
   beforeEach(() => {
     findings = [];
-    rule = new FN006003_CFG_PS_isDomainIsolated(false);
+    rule = new FN006003_CFG_PS_isDomainIsolated({ false: false });
   });
 
   it('doesn\'t return notification if isDomainIsolated is already up-to-date', () => {

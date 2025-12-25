@@ -67,11 +67,11 @@ export default [
   new FN002015_DEVDEP_types_react({ packageVersion: '17.0.45' }),
   new FN002016_DEVDEP_types_react_dom({ packageVersion: '17.0.17' }),
   new FN002019_DEVDEP_spfx_fast_serve_helpers({ packageVersion: '1.16.6' }),
-  new FN010001_YORC_version('1.16.0'),
+  new FN010001_YORC_version({ version: '1.16.0' }),
   new FN010008_YORC_nodeVersion(),
-  new FN010009_YORC_sdkVersions_microsoft_graph_client('3.0.2'),
-  new FN010010_YORC_sdkVersions_teams_js('2.4.1'),
+  new FN010009_YORC_sdkVersions_microsoft_graph_client({ version: '3.0.2' }),
+  new FN010010_YORC_sdkVersions_teams_js({ version: '2.4.1' }),
   new FN021003_PKG_engines_node('>=16.13.0 <17.0.0'),
-  new FN022001_SCSS_remove_fabric_react('~office-ui-fabric-react/dist/sass/References.scss'),
-  new FN022002_SCSS_add_fabric_react('~@fluentui/react/dist/sass/References.scss')
+  new FN022001_SCSS_remove_fabric_react({ oldValue: '~office-ui-fabric-react/dist/sass/References.scss' }),
+  new FN022002_SCSS_add_fabric_react({ newValue: '~@fluentui/react/dist/sass/References.scss' })
 ];
