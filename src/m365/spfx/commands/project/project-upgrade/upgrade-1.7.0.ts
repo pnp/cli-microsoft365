@@ -59,7 +59,7 @@ export default [
   new FN002001_DEVDEP_microsoft_sp_build_web({ packageVersion: '1.7.0' }),
   new FN002002_DEVDEP_microsoft_sp_module_interfaces({ packageVersion: '1.7.0' }),
   new FN002003_DEVDEP_microsoft_sp_webpart_workbench({ packageVersion: '1.7.0' }),
-  new FN002008_DEVDEP_tslint_microsoft_contrib('', false),
+  new FN002008_DEVDEP_tslint_microsoft_contrib({ packageVersion: '', add: false }),
   new FN002009_DEVDEP_microsoft_sp_tslint_rules({ packageVersion: '1.7.0' }),
   new FN006003_CFG_PS_isDomainIsolated({ isDomainIsolated: false }),
   new FN010001_YORC_version({ version: '1.7.0' }),

@@ -52,6 +52,6 @@ export default [
   new FN002002_DEVDEP_microsoft_sp_module_interfaces({ packageVersion: '1.17.3' }),
   new FN002022_DEVDEP_microsoft_eslint_plugin_spfx({ packageVersion: '1.17.3' }),
   new FN002023_DEVDEP_microsoft_eslint_config_spfx({ packageVersion: '1.17.3' }),
-  new FN002027_DEVDEP_fluentui_react('', false),
+  new FN002027_DEVDEP_fluentui_react({ packageVersion: '', add: false }),
   new FN010001_YORC_version({ version: '1.17.3' })
 ];

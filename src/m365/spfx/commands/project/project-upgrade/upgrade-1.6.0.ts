@@ -54,9 +54,7 @@ export default [
   new FN002008_DEVDEP_tslint_microsoft_contrib({ packageVersion: '5.0.0' }),
   new FN010001_YORC_version({ version: '1.6.0' }),
   new FN012011_TSC_outDir({ outDir: 'lib' }),
-  new FN012012_TSC_include([
-    'src/**/*.ts'
-  ]),
+  new FN012012_TSC_include({ include: ['src/**/*.ts'] }),
   new FN012013_TSC_exclude([
     'node_modules',
     'lib'

@@ -39,10 +39,10 @@ export default [
   new FN001002_DEP_microsoft_sp_lodash_subset({ packageVersion: '1.11.0' }),
   new FN001003_DEP_microsoft_sp_office_ui_fabric_core({ packageVersion: '1.11.0' }),
   new FN001004_DEP_microsoft_sp_webpart_base({ packageVersion: '1.11.0' }),
-  new FN001005_DEP_types_react('16.8.8', false),
-  new FN001006_DEP_types_react_dom('16.8.3', false),
-  new FN001007_DEP_types_webpack_env('1.13.1', false),
-  new FN001010_DEP_types_es6_promise('0.0.33', false),
+  new FN001005_DEP_types_react({ packageVersion: '16.8.8', add: false }),
+  new FN001006_DEP_types_react_dom({ packageVersion: '16.8.3', add: false }),
+  new FN001007_DEP_types_webpack_env({ packageVersion: '1.13.1', add: false }),
+  new FN001010_DEP_types_es6_promise({ packageVersion: '0.0.33', add: false }),
   new FN001011_DEP_microsoft_sp_dialog({ packageVersion: '1.11.0' }),
   new FN001012_DEP_microsoft_sp_application_base({ packageVersion: '1.11.0' }),
   new FN001013_DEP_microsoft_decorators({ packageVersion: '1.11.0' }),
@@ -69,7 +69,5 @@ export default [
   new FN002016_DEVDEP_types_react_dom({ packageVersion: '16.8.3' }),
   new FN006004_CFG_PS_developer(),
   new FN010001_YORC_version({ version: '1.11.0' }),
-  new FN012012_TSC_include([
-    'src/**/*.tsx'
-  ])
+  new FN012012_TSC_include({ include: ['src/**/*.tsx'] })
 ];

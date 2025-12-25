@@ -59,7 +59,7 @@ export default [
   new FN010001_YORC_version({ version: '1.15.2' }),
   new FN012020_TSC_noImplicitAny({ value: true }),
   new FN007001_CFG_S_schema({ schema: 'https://developer.microsoft.com/json-schemas/spfx-build/spfx-serve.schema.json' }),
-  new FN025001_ESLINTRCJS_overrides(`{
+  new FN025001_ESLINTRCJS_overrides({ value: `{
       files: ['*.ts', '*.tsx'],
       parser: '@typescript-eslint/parser',
       'parserOptions': {
@@ -429,5 +429,5 @@ export default [
         'variable-name': 0,
         whitespace: 0
       }
-    }`)
+    }` })
 ];

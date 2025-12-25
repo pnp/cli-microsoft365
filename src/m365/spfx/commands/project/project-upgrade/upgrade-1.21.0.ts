@@ -61,5 +61,5 @@ export default [
   new FN002029_DEVDEP_microsoft_rush_stack_compiler_5_3({ packageVersion: '0.1.0' }),
   new FN010001_YORC_version({ version: '1.21.0' }),
   new FN012017_TSC_extends({ path: './node_modules/@microsoft/rush-stack-compiler-5.3/includes/tsconfig-web.json' }),
-  new FN021003_PKG_engines_node('>=22.14.0 < 23.0.0')
+  new FN021003_PKG_engines_node({ node: '>=22.14.0 < 23.0.0' })
 ];

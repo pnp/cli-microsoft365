@@ -69,12 +69,12 @@ export default [
   new FN002002_DEVDEP_microsoft_sp_module_interfaces({ packageVersion: '1.12.0' }),
   new FN002003_DEVDEP_microsoft_sp_webpart_workbench({ packageVersion: '1.12.0' }),
   new FN002004_DEVDEP_gulp({ packageVersion: '4.0.2' }),
-  new FN002005_DEVDEP_types_chai('', false),
-  new FN002006_DEVDEP_types_mocha('', false),
+  new FN002005_DEVDEP_types_chai({ packageVersion: '', add: false }),
+  new FN002006_DEVDEP_types_mocha({ packageVersion: '', add: false }),
   new FN002009_DEVDEP_microsoft_sp_tslint_rules({ packageVersion: '1.12.0' }),
-  new FN002012_DEVDEP_microsoft_rush_stack_compiler_3_3('', false),
+  new FN002012_DEVDEP_microsoft_rush_stack_compiler_3_3({ packageVersion: '', add: false }),
   new FN002017_DEVDEP_microsoft_rush_stack_compiler_3_7({ packageVersion: '0.2.3' }),
-  new FN002014_DEVDEP_types_es6_promise('', false),
+  new FN002014_DEVDEP_types_es6_promise({ packageVersion: '', add: false }),
   new FN002015_DEVDEP_types_react({ packageVersion: '16.9.36' }),
   new FN002016_DEVDEP_types_react_dom({ packageVersion: '16.9.8' }),
   new FN002019_DEVDEP_spfx_fast_serve_helpers({ packageVersion: '1.12.0' }),
@@ -85,5 +85,5 @@ export default [
   new FN012019_TSC_types_es6_promise({ add: false }),
   new FN013002_GULP_serveTask(),
   new FN019002_TSL_extends({ path: './node_modules/@microsoft/sp-tslint-rules/base-tslint.json' }),
-  new FN021002_PKG_engines(false)
+  new FN021002_PKG_engines({ add: false })
 ];

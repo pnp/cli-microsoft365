@@ -81,15 +81,15 @@ export default [
   new FN001032_DEP_microsoft_sp_page_context({ packageVersion: '1.22.0' }),
   new FN001013_DEP_microsoft_decorators({ packageVersion: '1.22.0' }),
   new FN001034_DEP_microsoft_sp_adaptive_card_extension_base({ packageVersion: '1.22.0' }),
-  new FN002001_DEVDEP_microsoft_sp_build_web('1.22.0', false),
+  new FN002001_DEVDEP_microsoft_sp_build_web({ packageVersion: '1.22.0', add: false }),
   new FN002002_DEVDEP_microsoft_sp_module_interfaces({ packageVersion: '1.22.0' }),
-  new FN002004_DEVDEP_gulp('4.0.2', false),
-  new FN002007_DEVDEP_ajv('6.12.6', false),
+  new FN002004_DEVDEP_gulp({ packageVersion: '4.0.2', add: false }),
+  new FN002007_DEVDEP_ajv({ packageVersion: '6.12.6', add: false }),
   new FN002021_DEVDEP_rushstack_eslint_config({ packageVersion: '4.5.2' }),
   new FN002022_DEVDEP_microsoft_eslint_plugin_spfx({ packageVersion: '1.22.0' }),
   new FN002023_DEVDEP_microsoft_eslint_config_spfx({ packageVersion: '1.22.0' }),
   new FN002026_DEVDEP_typescript({ packageVersion: '~5.8.0' }),
-  new FN002029_DEVDEP_microsoft_rush_stack_compiler_5_3('0.1.0', false),
+  new FN002029_DEVDEP_microsoft_rush_stack_compiler_5_3({ packageVersion: '0.1.0', add: false }),
   new FN002030_DEVDEP_microsoft_spfx_web_build_rig({ packageVersion: '1.22.0' }),
   new FN002031_DEVDEP_rushstack_heft({ packageVersion: '1.1.2' }),
   new FN002032_DEVDEP_typescript_eslint_parser({ packageVersion: '8.46.2' }),
@@ -98,7 +98,7 @@ export default [
   new FN002035_DEVDEP_types_heft_jest({ packageVersion: '1.0.2' }),
   new FN010001_YORC_version({ version: '1.22.0' }),
   new FN010011_YORC_useGulp({ value: false }),
-  new FN014003_CODE_launch(`{
+  new FN014003_CODE_launch({ configuration: `{
   "version": "0.2.0",
   "configurations": [
     {
@@ -120,7 +120,7 @@ export default [
       ]
     }
   ]
-}`),
+}` }),
   new FN015005_FILE_src_index_ts({ add: false }),
   new FN015010_FILE_gulpfile_js({ add: false }),
   new FN015011_FILE_tsconfig_json({ add: true, contents: `{

@@ -41,7 +41,7 @@ export default [
   new FN001012_DEP_microsoft_sp_application_base({ packageVersion: '1.18.0' }),
   new FN001014_DEP_microsoft_sp_listview_extensibility({ packageVersion: '1.18.0' }),
   new FN001021_DEP_microsoft_sp_property_pane({ packageVersion: '1.18.0' }),
-  new FN001022_DEP_office_ui_fabric_react('', false),
+  new FN001022_DEP_office_ui_fabric_react({ packageVersion: '', add: false }),
   new FN001023_DEP_microsoft_sp_component_base({ packageVersion: '1.18.0' }),
   new FN001024_DEP_microsoft_sp_diagnostics({ packageVersion: '1.18.0' }),
   new FN001025_DEP_microsoft_sp_dynamic_data({ packageVersion: '1.18.0' }),
@@ -65,5 +65,5 @@ export default [
   new FN010001_YORC_version({ version: '1.18.0' }),
   new FN010010_YORC_sdkVersions_teams_js({ version: '2.12.0' }),
   new FN012017_TSC_extends({ path: './node_modules/@microsoft/rush-stack-compiler-4.7/includes/tsconfig-web.json' }),
-  new FN021003_PKG_engines_node('>=16.13.0 <17.0.0 || >=18.17.1 <19.0.0')
+  new FN021003_PKG_engines_node({ node: '>=16.13.0 <17.0.0 || >=18.17.1 <19.0.0' })
 ];
