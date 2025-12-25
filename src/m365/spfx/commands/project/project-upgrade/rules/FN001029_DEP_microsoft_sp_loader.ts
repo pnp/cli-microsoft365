@@ -1,10 +1,12 @@
 import { DependencyRule } from "./DependencyRule.js";
 
 export class FN001029_DEP_microsoft_sp_loader extends DependencyRule {
-  constructor(packageVersion: string) {
+  constructor(options: { packageVersion: string }) {
     super({
+      
       packageName: '@microsoft/sp-loader',
-      packageVersion,
+      packageVersion: options.packageVersion,
+      
       isOptional: true
     });
   }

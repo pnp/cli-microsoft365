@@ -1,10 +1,12 @@
 import { DependencyRule } from "./DependencyRule.js";
 
 export class FN002034_DEVDEP_microsoft_spfx_heft_plugins extends DependencyRule {
-  constructor(packageVersion: string) {
+  constructor(options: { packageVersion: string }) {
     super({
+      
       packageName: '@microsoft/spfx-heft-plugins',
-      packageVersion,
+      packageVersion: options.packageVersion,
+      
       isDevDep: true
     });
   }

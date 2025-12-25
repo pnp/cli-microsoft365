@@ -1,10 +1,12 @@
 import { DependencyRule } from "./DependencyRule.js";
 
 export class FN001025_DEP_microsoft_sp_dynamic_data extends DependencyRule {
-  constructor(packageVersion: string) {
+  constructor(options: { packageVersion: string }) {
     super({
+      
       packageName: '@microsoft/sp-dynamic-data',
-      packageVersion,
+      packageVersion: options.packageVersion,
+      
       isOptional: true
     });
   }

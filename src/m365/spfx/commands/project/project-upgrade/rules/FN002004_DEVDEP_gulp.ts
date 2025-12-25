@@ -1,12 +1,14 @@
 import { DependencyRule } from "./DependencyRule.js";
 
 export class FN002004_DEVDEP_gulp extends DependencyRule {
-  constructor(packageVersion: string, add: boolean = true) {
+  constructor(options: { packageVersion: string; add?: boolean }) {
     super({
+      
       packageName: 'gulp',
-      packageVersion,
+      packageVersion: options.packageVersion,
+      
       isDevDep: true,
-      add
+      add: options.add
     });
   }
 

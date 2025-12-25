@@ -1,12 +1,14 @@
 import { DependencyRule } from "./DependencyRule.js";
 
 export class FN002003_DEVDEP_microsoft_sp_webpart_workbench extends DependencyRule {
-  constructor(packageVersion: string, add: boolean = true) {
+  constructor(options: { packageVersion: string; add?: boolean }) {
     super({
+      
       packageName: '@microsoft/sp-webpart-workbench',
-      packageVersion,
+      packageVersion: options.packageVersion,
+      
       isDevDep: true,
-      add
+      add: options.add
     });
   }
 

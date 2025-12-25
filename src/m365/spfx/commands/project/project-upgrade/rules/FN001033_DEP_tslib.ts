@@ -1,10 +1,11 @@
 import { DependencyRule } from "./DependencyRule.js";
 
 export class FN001033_DEP_tslib extends DependencyRule {
-  constructor(packageVersion: string) {
+  constructor(options: { packageVersion: string }) {
     super({
+      
       packageName: 'tslib',
-      packageVersion
+      packageVersion: options.packageVersion
     });
   }
 

@@ -3,11 +3,14 @@ import { Project } from "../../project-model/index.js";
 import { DependencyRule } from "./DependencyRule.js";
 
 export class FN002025_DEVDEP_eslint_plugin_react_hooks extends DependencyRule {
-  constructor(packageVersion: string) {
+  constructor(options: { packageVersion: string }) {
     super({
+      
       packageName: 'eslint-plugin-react-hooks',
-      packageVersion,
+      packageVersion: options.packageVersion,
+      
       isDevDep: true,
+      
       isOptional: true
     });
   }

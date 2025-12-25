@@ -1,10 +1,12 @@
 import { DependencyRule } from "./DependencyRule.js";
 
 export class FN002026_DEVDEP_typescript extends DependencyRule {
-  constructor(packageVersion: string) {
+  constructor(options: { packageVersion: string }) {
     super({
+      
       packageName: 'typescript',
-      packageVersion,
+      packageVersion: options.packageVersion,
+      
       isDevDep: true
     });
   }

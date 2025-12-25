@@ -3,10 +3,12 @@ import { Project } from '../../project-model/index.js';
 import { DependencyRule } from "./DependencyRule.js";
 
 export class FN001009_DEP_react_dom extends DependencyRule {
-  constructor(packageVersion: string) {
+  constructor(options: { packageVersion: string }) {
     super({
+      
       packageName: 'react-dom',
-      packageVersion,
+      packageVersion: options.packageVersion,
+      
       isOptional: true
     });
   }

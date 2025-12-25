@@ -1,11 +1,11 @@
 import { FileAddRemoveRule } from "./FileAddRemoveRule.js";
 
 export class FN015011_FILE_tsconfig_json extends FileAddRemoveRule {
-  constructor(add: boolean, contents: string | undefined) {
+  constructor(options: { add: boolean; contents?: string }) {
     super({
       filePath: './tsconfig.json',
-      add,
-      contents
+      add: options.add,
+      contents: options.contents
     });
   }
 

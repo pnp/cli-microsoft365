@@ -61,41 +61,41 @@ import { FN026001_CFG_SASS_schema } from './rules/FN026001_CFG_SASS_schema.js';
 import { FN026002_CFG_SASS_extends } from './rules/FN026002_CFG_SASS_extends.js';
 
 export default [
-  new FN001001_DEP_microsoft_sp_core_library('1.22.0'),
-  new FN001002_DEP_microsoft_sp_lodash_subset('1.22.0'),
-  new FN001003_DEP_microsoft_sp_office_ui_fabric_core('1.22.0'),
-  new FN001004_DEP_microsoft_sp_webpart_base('1.22.0'),
-  new FN001011_DEP_microsoft_sp_dialog('1.22.0'),
-  new FN001012_DEP_microsoft_sp_application_base('1.22.0'),
-  new FN001014_DEP_microsoft_sp_listview_extensibility('1.22.0'),
-  new FN001021_DEP_microsoft_sp_property_pane('1.22.0'),
-  new FN001023_DEP_microsoft_sp_component_base('1.22.0'),
-  new FN001024_DEP_microsoft_sp_diagnostics('1.22.0'),
-  new FN001025_DEP_microsoft_sp_dynamic_data('1.22.0'),
-  new FN001026_DEP_microsoft_sp_extension_base('1.22.0'),
-  new FN001027_DEP_microsoft_sp_http('1.22.0'),
-  new FN001028_DEP_microsoft_sp_list_subscription('1.22.0'),
-  new FN001029_DEP_microsoft_sp_loader('1.22.0'),
-  new FN001030_DEP_microsoft_sp_module_interfaces('1.22.0'),
-  new FN001031_DEP_microsoft_sp_odata_types('1.22.0'),
-  new FN001032_DEP_microsoft_sp_page_context('1.22.0'),
-  new FN001013_DEP_microsoft_decorators('1.22.0'),
-  new FN001034_DEP_microsoft_sp_adaptive_card_extension_base('1.22.0'),
+  new FN001001_DEP_microsoft_sp_core_library({ packageVersion: '1.22.0' }),
+  new FN001002_DEP_microsoft_sp_lodash_subset({ packageVersion: '1.22.0' }),
+  new FN001003_DEP_microsoft_sp_office_ui_fabric_core({ packageVersion: '1.22.0' }),
+  new FN001004_DEP_microsoft_sp_webpart_base({ packageVersion: '1.22.0' }),
+  new FN001011_DEP_microsoft_sp_dialog({ packageVersion: '1.22.0' }),
+  new FN001012_DEP_microsoft_sp_application_base({ packageVersion: '1.22.0' }),
+  new FN001014_DEP_microsoft_sp_listview_extensibility({ packageVersion: '1.22.0' }),
+  new FN001021_DEP_microsoft_sp_property_pane({ packageVersion: '1.22.0' }),
+  new FN001023_DEP_microsoft_sp_component_base({ packageVersion: '1.22.0' }),
+  new FN001024_DEP_microsoft_sp_diagnostics({ packageVersion: '1.22.0' }),
+  new FN001025_DEP_microsoft_sp_dynamic_data({ packageVersion: '1.22.0' }),
+  new FN001026_DEP_microsoft_sp_extension_base({ packageVersion: '1.22.0' }),
+  new FN001027_DEP_microsoft_sp_http({ packageVersion: '1.22.0' }),
+  new FN001028_DEP_microsoft_sp_list_subscription({ packageVersion: '1.22.0' }),
+  new FN001029_DEP_microsoft_sp_loader({ packageVersion: '1.22.0' }),
+  new FN001030_DEP_microsoft_sp_module_interfaces({ packageVersion: '1.22.0' }),
+  new FN001031_DEP_microsoft_sp_odata_types({ packageVersion: '1.22.0' }),
+  new FN001032_DEP_microsoft_sp_page_context({ packageVersion: '1.22.0' }),
+  new FN001013_DEP_microsoft_decorators({ packageVersion: '1.22.0' }),
+  new FN001034_DEP_microsoft_sp_adaptive_card_extension_base({ packageVersion: '1.22.0' }),
   new FN002001_DEVDEP_microsoft_sp_build_web('1.22.0', false),
-  new FN002002_DEVDEP_microsoft_sp_module_interfaces('1.22.0'),
+  new FN002002_DEVDEP_microsoft_sp_module_interfaces({ packageVersion: '1.22.0' }),
   new FN002004_DEVDEP_gulp('4.0.2', false),
   new FN002007_DEVDEP_ajv('6.12.6', false),
-  new FN002021_DEVDEP_rushstack_eslint_config('4.5.2'),
-  new FN002022_DEVDEP_microsoft_eslint_plugin_spfx('1.22.0'),
-  new FN002023_DEVDEP_microsoft_eslint_config_spfx('1.22.0'),
-  new FN002026_DEVDEP_typescript('~5.8.0'),
+  new FN002021_DEVDEP_rushstack_eslint_config({ packageVersion: '4.5.2' }),
+  new FN002022_DEVDEP_microsoft_eslint_plugin_spfx({ packageVersion: '1.22.0' }),
+  new FN002023_DEVDEP_microsoft_eslint_config_spfx({ packageVersion: '1.22.0' }),
+  new FN002026_DEVDEP_typescript({ packageVersion: '~5.8.0' }),
   new FN002029_DEVDEP_microsoft_rush_stack_compiler_5_3('0.1.0', false),
-  new FN002030_DEVDEP_microsoft_spfx_web_build_rig('1.22.0'),
-  new FN002031_DEVDEP_rushstack_heft('1.1.2'),
-  new FN002032_DEVDEP_typescript_eslint_parser('8.46.2'),
-  new FN002033_DEVDEP_css_loader('7.1.2'),
-  new FN002034_DEVDEP_microsoft_spfx_heft_plugins('1.22.0'),
-  new FN002035_DEVDEP_types_heft_jest('1.0.2'),
+  new FN002030_DEVDEP_microsoft_spfx_web_build_rig({ packageVersion: '1.22.0' }),
+  new FN002031_DEVDEP_rushstack_heft({ packageVersion: '1.1.2' }),
+  new FN002032_DEVDEP_typescript_eslint_parser({ packageVersion: '8.46.2' }),
+  new FN002033_DEVDEP_css_loader({ packageVersion: '7.1.2' }),
+  new FN002034_DEVDEP_microsoft_spfx_heft_plugins({ packageVersion: '1.22.0' }),
+  new FN002035_DEVDEP_types_heft_jest({ packageVersion: '1.0.2' }),
   new FN010001_YORC_version('1.22.0'),
   new FN010011_YORC_useGulp(false),
   new FN014003_CODE_launch(`{
@@ -121,21 +121,21 @@ export default [
     }
   ]
 }`),
-  new FN015005_FILE_src_index_ts(false),
-  new FN015010_FILE_gulpfile_js(false),
-  new FN015011_FILE_tsconfig_json(true, `{
+  new FN015005_FILE_src_index_ts({ add: false }),
+  new FN015010_FILE_gulpfile_js({ add: false }),
+  new FN015011_FILE_tsconfig_json({ add: true, contents: `{
   "extends": "./node_modules/@microsoft/spfx-web-build-rig/profiles/default/tsconfig-base.json"
 }
-`),
-  new FN015014_FILE_config_rig_json(true, `{
+` }),
+  new FN015014_FILE_config_rig_json({ add: true, contents: `{
   // The "rig.json" file directs tools to look for their config files in an external package.
   // Documentation for this system: https://www.npmjs.com/package/@rushstack/rig-package
   "$schema": "https://developer.microsoft.com/json-schemas/rig-package/rig.schema.json",
 
   "rigPackageName": "@microsoft/spfx-web-build-rig"
 }
-`),
-  new FN015015_FILE_config_typescript_json(true, `{
+` }),
+  new FN015015_FILE_config_typescript_json({ add: true, contents: `{
   "extends": "@microsoft/spfx-web-build-rig/profiles/default/config/typescript.json",
 
   "staticAssetsToCopy": {
@@ -144,9 +144,9 @@ export default [
     "includeGlobs": ["webparts/*/loc/*.js"]
   }
 }
-`),
-  new FN020001_RES_types_react('17.0.45'),
-  new FN021001_PKG_main(false),
+` }),
+  new FN020001_RES_types_react({ packageVersion: '17.0.45' }),
+  new FN021001_PKG_main({ add: false }),
   new FN021004_PKG_scripts_build('heft test --clean --production && heft package-solution --production'),
   new FN021005_PKG_scripts_test('gulp test', false),
   new FN021006_PKG_scripts_clean('heft clean'),

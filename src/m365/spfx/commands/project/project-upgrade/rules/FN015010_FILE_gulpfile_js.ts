@@ -1,10 +1,10 @@
 import { FileAddRemoveRule } from "./FileAddRemoveRule.js";
 
 export class FN015010_FILE_gulpfile_js extends FileAddRemoveRule {
-  constructor(add: boolean) {
+  constructor(options: { add: boolean }) {
     super({
       filePath: './gulpfile.js',
-      add
+      add: options.add
     });
   }
 

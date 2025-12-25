@@ -1,10 +1,12 @@
 import { DependencyRule } from "./DependencyRule.js";
 
 export class FN002024_DEVDEP_eslint extends DependencyRule {
-  constructor(packageVersion: string) {
+  constructor(options: { packageVersion: string }) {
     super({
+      
       packageName: 'eslint',
-      packageVersion,
+      packageVersion: options.packageVersion,
+      
       isDevDep: true
     });
   }

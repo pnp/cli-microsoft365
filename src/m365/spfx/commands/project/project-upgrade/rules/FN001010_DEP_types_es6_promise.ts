@@ -1,11 +1,12 @@
 import { DependencyRule } from "./DependencyRule.js";
 
 export class FN001010_DEP_types_es6_promise extends DependencyRule {
-  constructor(packageVersion: string, add: boolean = true) {
+  constructor(options: { packageVersion: string; add?: boolean }) {
     super({
+      
       packageName: '@types/es6-promise',
-      packageVersion,
-      add
+      packageVersion: options.packageVersion,
+      add: options.add
     });
   }
 

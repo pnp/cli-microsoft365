@@ -3,11 +3,14 @@ import { Project } from '../../project-model/index.js';
 import { DependencyRule } from "./DependencyRule.js";
 
 export class FN002015_DEVDEP_types_react extends DependencyRule {
-  constructor(packageVersion: string) {
+  constructor(options: { packageVersion: string }) {
     super({
+      
       packageName: '@types/react',
-      packageVersion,
+      packageVersion: options.packageVersion,
+      
       isDevDep: true,
+      
       isOptional: true
     });
   }

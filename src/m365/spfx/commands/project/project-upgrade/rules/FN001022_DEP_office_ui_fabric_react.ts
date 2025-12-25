@@ -3,12 +3,14 @@ import { Project } from '../../project-model/index.js';
 import { DependencyRule } from "./DependencyRule.js";
 
 export class FN001022_DEP_office_ui_fabric_react extends DependencyRule {
-  constructor(packageVersion: string, add: boolean = true) {
+  constructor(options: { packageVersion: string; add?: boolean }) {
     super({
+      
       packageName: 'office-ui-fabric-react',
-      packageVersion,
+      packageVersion: options.packageVersion,
+      
       isOptional: true,
-      add
+      add: options.add
     });
   }
 

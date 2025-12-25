@@ -1,10 +1,12 @@
 import { DependencyRule } from "./DependencyRule.js";
 
 export class FN002031_DEVDEP_rushstack_heft extends DependencyRule {
-  constructor(packageVersion: string) {
+  constructor(options: { packageVersion: string }) {
     super({
+      
       packageName: '@rushstack/heft',
-      packageVersion,
+      packageVersion: options.packageVersion,
+      
       isDevDep: true
     });
   }

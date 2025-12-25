@@ -1,10 +1,10 @@
 import { FileAddRemoveRule } from "./FileAddRemoveRule.js";
 
 export class FN015004_FILE_config_tslint_json extends FileAddRemoveRule {
-  constructor(add: boolean) {
+  constructor(options: { add: boolean }) {
     super({
       filePath: './config/tslint.json',
-      add
+      add: options.add
     });
   }
 

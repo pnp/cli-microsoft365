@@ -1,10 +1,10 @@
 import { FileAddRemoveRule } from "./FileAddRemoveRule.js";
 
 export class FN015002_FILE_typings__ms_odsp_d_ts extends FileAddRemoveRule {
-  constructor(add: boolean) {
+  constructor(options: { add: boolean }) {
     super({
       filePath: './typings/@ms/odsp.d.ts',
-      add
+      add: options.add
     });
   }
 

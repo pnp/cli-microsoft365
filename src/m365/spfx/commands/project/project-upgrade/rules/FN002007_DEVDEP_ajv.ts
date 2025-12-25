@@ -1,12 +1,14 @@
 import { DependencyRule } from "./DependencyRule.js";
 
 export class FN002007_DEVDEP_ajv extends DependencyRule {
-  constructor(packageVersion: string, add: boolean = true) {
+  constructor(options: { packageVersion: string; add?: boolean }) {
     super({
+      
       packageName: 'ajv',
-      packageVersion,
+      packageVersion: options.packageVersion,
+      
       isDevDep: true,
-      add
+      add: options.add
     });
   }
 

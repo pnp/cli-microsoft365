@@ -1,11 +1,11 @@
 import { PackageRule } from "./PackageRule.js";
 
 export class FN021001_PKG_main extends PackageRule {
-  constructor(add: boolean, propertyValue?: string) {
+  constructor(options: { add: boolean; propertyValue?: string }) {
     super({
       propertyName: 'main',
-      add,
-      propertyValue
+      add: options.add,
+      propertyValue: options.propertyValue
     });
   }
 

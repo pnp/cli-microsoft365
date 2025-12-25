@@ -1,10 +1,12 @@
 import { DependencyRule } from "./DependencyRule.js";
 
 export class FN002035_DEVDEP_types_heft_jest extends DependencyRule {
-  constructor(packageVersion: string) {
+  constructor(options: { packageVersion: string }) {
     super({
+      
       packageName: '@types/heft-jest',
-      packageVersion,
+      packageVersion: options.packageVersion,
+      
       isDevDep: true
     });
   }
