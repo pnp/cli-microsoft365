@@ -9,7 +9,7 @@ describe('FN012016_TSC_noUnusedLocals', () => {
 
   beforeEach(() => {
     findings = [];
-    rule = new FN012016_TSC_noUnusedLocals({ false: false });
+    rule = new FN012016_TSC_noUnusedLocals({ noUnusedLocals: false });
   });
 
   it('doesn\'t return notification if noUnusedLocals is already up-to-date', () => {

@@ -51,7 +51,7 @@ describe('FN018003_TEAMS_tab20x20_png', () => {
   });
 
   it('returns path to icon with the specified name when fixed name used', () => {
-    rule = new FN018003_TEAMS_tab20x20_png({ version: 'tab20x20.png' });
+    rule = new FN018003_TEAMS_tab20x20_png({ fixedFileName: 'tab20x20.png' });
     sinon.stub(fs, 'existsSync').callsFake(() => false);
     const project: Project = {
       path: '/usr/tmp',

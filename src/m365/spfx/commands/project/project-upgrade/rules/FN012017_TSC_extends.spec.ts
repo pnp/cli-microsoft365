@@ -9,7 +9,7 @@ describe('FN012017_TSC_extends', () => {
 
   beforeEach(() => {
     findings = [];
-    rule = new FN012017_TSC_extends({ version: './node_modules/@microsoft/rush-stack-compiler-2.7/includes/tsconfig-web.json' });
+    rule = new FN012017_TSC_extends({ _extends: './node_modules/@microsoft/rush-stack-compiler-2.7/includes/tsconfig-web.json' });
   });
 
   it('doesn\'t return notification if extends has the exact same elements', () => {

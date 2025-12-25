@@ -9,7 +9,7 @@ describe('FN019002_TSL_extends', () => {
 
   beforeEach(() => {
     findings = [];
-    rule = new FN019002_TSL_extends({ version: '@microsoft/sp-tslint-rules/base-tslint.json' });
+    rule = new FN019002_TSL_extends({ _extends: '@microsoft/sp-tslint-rules/base-tslint.json' });
   });
 
   it('doesn\'t return notification if extends is correctly configured', () => {

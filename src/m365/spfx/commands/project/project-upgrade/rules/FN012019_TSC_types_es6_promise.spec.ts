@@ -9,7 +9,7 @@ describe('FN012019_TSC_types_es6_promise', () => {
 
   beforeEach(() => {
     findings = [];
-    rule = new FN012019_TSC_types_es6_promise({ false: false });
+    rule = new FN012019_TSC_types_es6_promise({ add: false });
   });
 
   it('doesn\'t return notification if es6-promise should be removed and is not present', () => {
@@ -49,7 +49,7 @@ describe('FN012019_TSC_types_es6_promise', () => {
   });
 
   it('doesn\'t return notification if es6-promise should be added and is already present', () => {
-    rule = new FN012019_TSC_types_es6_promise({ true: true });
+    rule = new FN012019_TSC_types_es6_promise({ add: true });
     const project: Project = {
       path: '/usr/tmp',
       tsConfigJson: {
@@ -63,7 +63,7 @@ describe('FN012019_TSC_types_es6_promise', () => {
   });
 
   it('returns notification if es6-promise should be added but is not present', () => {
-    rule = new FN012019_TSC_types_es6_promise({ true: true });
+    rule = new FN012019_TSC_types_es6_promise({ add: true });
     const project: Project = {
       path: '/usr/tmp',
       tsConfigJson: {

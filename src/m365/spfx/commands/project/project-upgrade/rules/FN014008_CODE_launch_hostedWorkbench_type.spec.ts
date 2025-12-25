@@ -14,7 +14,7 @@ describe('FN014008_CODE_launch_hostedWorkbench_type', () => {
 
   beforeEach(() => {
     findings = [];
-    rule = new FN014008_CODE_launch_hostedWorkbench_type({ version: 'pwa-chrome' });
+    rule = new FN014008_CODE_launch_hostedWorkbench_type({ type: 'pwa-chrome' });
   });
 
   it('doesn\'t return notifications if vscode folder doesn\'t exist', () => {

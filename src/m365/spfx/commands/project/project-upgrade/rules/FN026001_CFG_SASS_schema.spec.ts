@@ -9,7 +9,7 @@ describe('FN026001_CFG_SASS_schema', () => {
 
   beforeEach(() => {
     findings = [];
-    rule = new FN026001_CFG_SASS_schema({ version: 'https://developer.microsoft.com/json-schemas/heft/v0/heft-sass-plugin.schema.json' });
+    rule = new FN026001_CFG_SASS_schema({ schema: 'https://developer.microsoft.com/json-schemas/heft/v0/heft-sass-plugin.schema.json' });
   });
 
   it(`doesn't return notification if sass.json is not available`, () => {

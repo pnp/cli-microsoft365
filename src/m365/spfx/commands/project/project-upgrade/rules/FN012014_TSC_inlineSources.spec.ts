@@ -9,7 +9,7 @@ describe('FN012014_TSC_inlineSources', () => {
 
   beforeEach(() => {
     findings = [];
-    rule = new FN012014_TSC_inlineSources({ false: false });
+    rule = new FN012014_TSC_inlineSources({ inlineSources: false });
   });
 
   it('doesn\'t return notification if inlineSources is already up-to-date', () => {
