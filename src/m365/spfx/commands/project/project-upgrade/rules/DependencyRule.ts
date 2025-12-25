@@ -21,11 +21,12 @@ export abstract class DependencyRule extends JsonRule {
 
   constructor(options: DependencyRuleOptions) {
     super();
-    this.packageName = options.packageName;
-    this.packageVersion = options.packageVersion;
-    this.isDevDep = options.isDevDep ?? false;
-    this.isOptional = options.isOptional ?? false;
-    this.add = options.add ?? true;
+    const { packageName, packageVersion, isDevDep = false, isOptional = false, add = true } = options;
+    this.packageName = packageName;
+    this.packageVersion = packageVersion;
+    this.isDevDep = isDevDep;
+    this.isOptional = isOptional;
+    this.add = add;
   }
 
   get title(): string {

@@ -5,10 +5,8 @@ import { DependencyRule } from "./DependencyRule.js";
 export class FN001022_DEP_office_ui_fabric_react extends DependencyRule {
   constructor(options: { packageVersion: string; add?: boolean }) {
     super({
-      
       packageName: 'office-ui-fabric-react',
       packageVersion: options.packageVersion,
-      
       isOptional: true,
       add: options.add
     });

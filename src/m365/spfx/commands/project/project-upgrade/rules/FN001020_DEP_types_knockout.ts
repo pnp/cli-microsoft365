@@ -5,10 +5,8 @@ import { DependencyRule } from "./DependencyRule.js";
 export class FN001020_DEP_types_knockout extends DependencyRule {
   constructor(options: { packageVersion: string }) {
     super({
-      
       packageName: '@types/knockout',
       packageVersion: options.packageVersion,
-      
       isOptional: true
     });
   }

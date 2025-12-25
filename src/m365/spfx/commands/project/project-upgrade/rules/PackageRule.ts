@@ -15,9 +15,10 @@ export abstract class PackageRule extends JsonRule {
 
   constructor(options: PackageRuleOptions) {
     super();
-    this.propertyName = options.propertyName;
-    this.add = options.add;
-    this.propertyValue = options.propertyValue;
+    const { propertyName, add, propertyValue } = options;
+    this.propertyName = propertyName;
+    this.add = add;
+    this.propertyValue = propertyValue;
   }
 
   get title(): string {

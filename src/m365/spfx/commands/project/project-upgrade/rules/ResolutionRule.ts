@@ -13,8 +13,9 @@ export abstract class ResolutionRule extends JsonRule {
 
   constructor(options: ResolutionRuleOptions) {
     super();
-    this.packageName = options.packageName;
-    this.packageVersion = options.packageVersion;
+    const { packageName, packageVersion } = options;
+    this.packageName = packageName;
+    this.packageVersion = packageVersion;
   }
 
   get title(): string {

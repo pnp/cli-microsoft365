@@ -17,9 +17,10 @@ export abstract class FileAddRemoveRule extends Rule {
 
   constructor(options: FileAddRemoveRuleOptions) {
     super();
-    this.filePath = path.normalize(options.filePath);
-    this.add = options.add;
-    this.contents = options.contents;
+    const { filePath, add, contents } = options;
+    this.filePath = path.normalize(filePath);
+    this.add = add;
+    this.contents = contents;
   }
 
   get title(): string {

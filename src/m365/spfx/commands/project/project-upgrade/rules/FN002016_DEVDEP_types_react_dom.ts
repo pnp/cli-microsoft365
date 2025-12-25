@@ -5,12 +5,9 @@ import { DependencyRule } from "./DependencyRule.js";
 export class FN002016_DEVDEP_types_react_dom extends DependencyRule {
   constructor(options: { packageVersion: string }) {
     super({
-      
       packageName: '@types/react-dom',
       packageVersion: options.packageVersion,
-      
       isDevDep: true,
-      
       isOptional: true
     });
   }
