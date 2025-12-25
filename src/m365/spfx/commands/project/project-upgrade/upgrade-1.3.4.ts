@@ -43,7 +43,7 @@ export default [
   new FN002007_DEVDEP_ajv({ packageVersion: '5.2.2' }),
   new FN010001_YORC_version({ version: '1.3.4' }),
   new FN014002_CODE_extensions(),
-  new FN014003_CODE_launch({ configuration: `{
+  new FN014003_CODE_launch({ contents: `{
   /**
     Install Chrome Debugger Extension for Visual Studio Code
     to debug your components with the Chrome browser:

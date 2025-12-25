@@ -3,8 +3,12 @@ import { Project } from "../../project-model/index.js";
 import { Finding } from "../../report-model/index.js";
 
 export class FN021003_PKG_engines_node extends JsonRule {
-  constructor(private version: string) {
+  constructor(private version: string | { node: string }) {
     super();
+    // Support both old string format and new object format for backward compatibility
+    if (typeof version === 'object') {
+      this.version = version.node;
+    }
   }
 
   get id(): string {

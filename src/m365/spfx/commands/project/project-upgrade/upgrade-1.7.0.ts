@@ -69,5 +69,5 @@ export default [
   new FN018003_TEAMS_tab20x20_png({ fixedFileName: 'tab20x20.png' }),
   new FN018004_TEAMS_tab96x96_png({ fixedFileName: 'tab96x96.png' }),
   new FN019001_TSL_rulesDirectory(),
-  new FN019002_TSL_extends({ path: '@microsoft/sp-tslint-rules/base-tslint.json' })
+  new FN019002_TSL_extends({ _extends: '@microsoft/sp-tslint-rules/base-tslint.json' })
 ];

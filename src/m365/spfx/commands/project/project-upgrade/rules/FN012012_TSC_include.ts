@@ -3,10 +3,11 @@ import { Project, TsConfigJson } from '../../project-model/index.js';
 import { Finding } from '../../report-model/index.js';
 
 export class FN012012_TSC_include extends JsonRule {
-  private include: string;
-  constructor(options: { include: string }) {
+  private include: string[];
+  constructor(options: { include: string | string[] }) {
     super();
-    this.include = options.include;
+    // Support both single string and array for backward compatibility
+    this.include = Array.isArray(options.include) ? options.include : [options.include];
   }
 
   get id(): string {

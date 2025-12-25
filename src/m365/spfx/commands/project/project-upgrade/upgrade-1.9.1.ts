@@ -68,6 +68,6 @@ export default [
   new FN021001_PKG_main({ add: true, propertyValue: "lib/index.js" }),
   new FN001008_DEP_react({ packageVersion: '16.8.5' }),
   new FN001009_DEP_react_dom({ packageVersion: '16.8.5' }),
-  new FN022001_SCSS_remove_fabric_react({ oldValue: '~@microsoft/sp-office-ui-fabric-core/dist/sass/SPFabricCore.scss' }),
-  new FN022002_SCSS_add_fabric_react({ newValue: '~office-ui-fabric-react/dist/sass/References.scss', oldValue: '~@microsoft/sp-office-ui-fabric-core/dist/sass/SPFabricCore.scss' })
+  new FN022001_SCSS_remove_fabric_react({ importValue: '~@microsoft/sp-office-ui-fabric-core/dist/sass/SPFabricCore.scss' }),
+  new FN022002_SCSS_add_fabric_react({ importValue: '~office-ui-fabric-react/dist/sass/References.scss' })
 ]; 

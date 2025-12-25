@@ -63,7 +63,7 @@ export default [
   new FN002003_DEVDEP_microsoft_sp_webpart_workbench({ packageVersion: '1.4.0' }),
   new FN006002_CFG_PS_includeClientSideAssets({ includeClientSideAssets: true }),
   new FN010001_YORC_version({ version: '1.4.0' }),
-  new FN012003_TSC_skipLibCheck({ value: true }),
+  new FN012003_TSC_skipLibCheck({ skipLibCheck: true }),
   new FN012004_TSC_typeRoots_types(),
   new FN012005_TSC_typeRoots_microsoft(),
   new FN012006_TSC_types_es6_collections({ add: false }),
@@ -71,5 +71,5 @@ export default [
   new FN012008_TSC_lib_dom(),
   new FN012009_TSC_lib_es2015_collection(),
   new FN013001_GULP_msGridSassSuppression(),
-  new FN014001_CODE_settings_jsonSchemas({ newValue: false })
+  new FN014001_CODE_settings_jsonSchemas({ add: false })
 ];

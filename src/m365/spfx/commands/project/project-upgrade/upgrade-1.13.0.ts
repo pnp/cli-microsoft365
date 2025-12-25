@@ -74,7 +74,7 @@ export default [
   new FN007003_CFG_S_api(),
   new FN008002_CFG_TSL_removeRule({ rule: 'no-use-before-declare' }),
   new FN010001_YORC_version({ version: '1.13.0' }),
-  new FN012017_TSC_extends({ path: './node_modules/@microsoft/rush-stack-compiler-3.9/includes/tsconfig-web.json' }),
+  new FN012017_TSC_extends({ _extends: './node_modules/@microsoft/rush-stack-compiler-3.9/includes/tsconfig-web.json' }),
   new FN014007_CODE_launch_localWorkbench(),
   new FN015007_FILE_config_copy_assets_json({ add: false }),
   new FN024001_NPMIGNORE_file()

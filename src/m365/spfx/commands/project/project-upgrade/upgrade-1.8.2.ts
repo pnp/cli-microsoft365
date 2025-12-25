@@ -60,6 +60,6 @@ export default [
   new FN002010_DEVDEP_microsoft_rush_stack_compiler_2_7({ packageVersion: '', add: false }),
   new FN002011_DEVDEP_microsoft_rush_stack_compiler_2_9({ packageVersion: '0.7.7', add: false }),
   new FN010001_YORC_version({ version: '1.8.2' }),
-  new FN012017_TSC_extends({ path: './node_modules/@microsoft/rush-stack-compiler-2.9/includes/tsconfig-web.json' }),
+  new FN012017_TSC_extends({ _extends: './node_modules/@microsoft/rush-stack-compiler-2.9/includes/tsconfig-web.json' }),
   new FN020001_RES_types_react({ packageVersion: '16.7.22' })
 ];

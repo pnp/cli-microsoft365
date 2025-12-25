@@ -55,10 +55,8 @@ export default [
   new FN010001_YORC_version({ version: '1.6.0' }),
   new FN012011_TSC_outDir({ outDir: 'lib' }),
   new FN012012_TSC_include({ include: ['src/**/*.ts'] }),
-  new FN012013_TSC_exclude([
-    'node_modules',
-    'lib'
-  ]),
+  new FN012013_TSC_exclude({ exclude: 'node_modules' }),
+  new FN012013_TSC_exclude({ exclude: 'lib' }),
   new FN015003_FILE_tslint_json({ add: true, contents: `{
   "rulesDirectory": [
     "tslint-microsoft-contrib"

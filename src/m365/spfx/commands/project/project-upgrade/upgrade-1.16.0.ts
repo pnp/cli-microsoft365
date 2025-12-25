@@ -72,6 +72,6 @@ export default [
   new FN010009_YORC_sdkVersions_microsoft_graph_client({ version: '3.0.2' }),
   new FN010010_YORC_sdkVersions_teams_js({ version: '2.4.1' }),
   new FN021003_PKG_engines_node({ node: '>=16.13.0 <17.0.0' }),
-  new FN022001_SCSS_remove_fabric_react({ oldValue: '~office-ui-fabric-react/dist/sass/References.scss' }),
-  new FN022002_SCSS_add_fabric_react({ newValue: '~@fluentui/react/dist/sass/References.scss' })
+  new FN022001_SCSS_remove_fabric_react({ importValue: '~office-ui-fabric-react/dist/sass/References.scss' }),
+  new FN022002_SCSS_add_fabric_react({ importValue: '~@fluentui/react/dist/sass/References.scss' })
 ];
