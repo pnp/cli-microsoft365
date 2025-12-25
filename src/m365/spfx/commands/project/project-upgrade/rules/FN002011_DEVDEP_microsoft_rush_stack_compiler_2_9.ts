@@ -6,7 +6,7 @@ export class FN002011_DEVDEP_microsoft_rush_stack_compiler_2_9 extends Dependenc
       packageName: '@microsoft/rush-stack-compiler-2.9',
       packageVersion: options.packageVersion,
       isDevDep: true,
-      isOptional
+      isOptional: options.isOptional
     });
   }
 

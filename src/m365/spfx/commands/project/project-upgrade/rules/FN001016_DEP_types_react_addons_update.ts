@@ -3,7 +3,7 @@ import { Project } from '../../project-model/index.js';
 import { DependencyRule } from "./DependencyRule.js";
 
 export class FN001016_DEP_types_react_addons_update extends DependencyRule {
-  constructor(packageVersion: string, add: boolean) {
+  constructor(options: { packageVersion: string; add: boolean }) {
     super({
       packageName: '@types/react-addons-update',
       packageVersion: options.packageVersion,
