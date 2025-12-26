@@ -79,7 +79,7 @@ export default [
   new FN002016_DEVDEP_types_react_dom({ packageVersion: '16.9.8' }),
   new FN002019_DEVDEP_spfx_fast_serve_helpers({ packageVersion: '1.12.0' }),
   new FN010001_YORC_version({ version: '1.12.0' }),
-  new FN012013_TSC_exclude({ exclude: 'node_modules', add: false }),
+  new FN012013_TSC_exclude({ exclude: ['node_modules'], add: false }),
   new FN012017_TSC_extends({ _extends: './node_modules/@microsoft/rush-stack-compiler-3.7/includes/tsconfig-web.json' }),
   new FN012018_TSC_lib_es2015_promise(),
   new FN012019_TSC_types_es6_promise({ add: false }),

@@ -4,8 +4,8 @@ import { Finding } from '../../report-model/index.js';
 
 export class FN012013_TSC_exclude extends JsonRule {
   private add: boolean;
-  private exclude: string;
-  constructor(options: { exclude: string; add?: boolean }) {
+  private exclude: string[];
+  constructor(options: { exclude: string[]; add?: boolean }) {
     super();
     this.exclude = options.exclude;
     this.add = options.add ?? true;
@@ -53,7 +53,7 @@ export class FN012013_TSC_exclude extends JsonRule {
 
     if (this.add) {
       if (!project.tsConfigJson.exclude ||
-        ((project.tsConfigJson as TsConfigJson).exclude as string[]).filter(e => this.exclude.indexOf(e) < 0).length > 0) {
+        this.exclude.filter(e => ((project.tsConfigJson as TsConfigJson).exclude as string[]).indexOf(e) < 0).length > 0) {
         const node = this.getAstNodeFromFile(project.tsConfigJson, 'exclude');
         this.addFindingWithPosition(findings, node);
       }

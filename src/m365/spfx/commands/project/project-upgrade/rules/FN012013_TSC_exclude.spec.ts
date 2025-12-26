@@ -9,7 +9,7 @@ describe('FN012013_TSC_exclude', () => {
 
   beforeEach(() => {
     findings = [];
-    rule = new FN012013_TSC_exclude({ exclude: 'node_modules' });
+    rule = new FN012013_TSC_exclude({ exclude: ['node_modules'] });
   });
 
   it('doesn\'t return notification if exclude has the exact same elements', () => {
