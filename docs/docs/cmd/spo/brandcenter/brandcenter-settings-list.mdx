@@ -1,0 +1,151 @@
+import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# spo brandcenter settings list
+
+Lists the brand center configuration
+
+## Usage
+
+```sh
+m365 spo brandcenter settings list [options]
+```
+
+## Options
+
+<Global />
+
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource        | Permissions     |
+  |-----------------|-----------------|
+  | Microsoft Graph | Sites.Read.All  |
+  | SharePoint      | AllSites.Read   |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource        | Permissions      |
+  |-----------------|------------------|
+  | Microsoft Graph | Sites.Read.All   |
+  | SharePoint      | Sites.Read.All   |
+
+  </TabItem>
+</Tabs>
+
+## Examples
+
+List all brand center config
+
+```sh
+m365 spo brandcenter settings list
+```
+
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  {
+    "BrandColorsListId": "00000000-0000-0000-0000-000000000000",
+    "BrandColorsListUrl": null,
+    "BrandFontLibraryId": "23af51de-856c-4d00-aa11-0d03af0e46e3",
+    "BrandFontLibraryUrl": {
+      "DecodedUrl": "https://contoso.sharepoint.com/sites/BrandGuide/Fonts"
+    },
+    "IsBrandCenterSiteFeatureEnabled": true,
+    "IsPublicCdnEnabled": true,
+    "OrgAssets": {
+      "CentralAssetRepositoryLibraries": null,
+      "Domain": {
+        "DecodedUrl": "https://contoso.sharepoint.com"
+      },
+      "OrgAssetsLibraries": {
+        "OrgAssetsLibraries": [
+          {
+            "DisplayName": "Fonts",
+            "FileType": "",
+            "LibraryUrl": {
+              "DecodedUrl": "sites/BrandGuide/Fonts"
+            },
+            "ListId": "23af51de-856c-4d00-aa11-0d03af0e46e3",
+            "OrgAssetFlags": 0,
+            "OrgAssetType": 8,
+            "ThumbnailUrl": null,
+            "UniqueId": "00000000-0000-0000-0000-000000000000"
+          }
+        ],
+        "Items": [
+          {
+            "DisplayName": "Fonts",
+            "FileType": "",
+            "LibraryUrl": {
+              "DecodedUrl": "sites/BrandGuide/Fonts"
+            },
+            "ListId": "23af51de-856c-4d00-aa11-0d03af0e46e3",
+            "OrgAssetFlags": 0,
+            "OrgAssetType": 8,
+            "ThumbnailUrl": null,
+            "UniqueId": "00000000-0000-0000-0000-000000000000"
+          }
+        ]
+      },
+      "SiteId": "52b46e48-9c0c-40cb-a955-13eb6c717ff3",
+      "Url": {
+        "DecodedUrl": "/sites/BrandGuide"
+      },
+      "WebId": "206988d5-e133-4a24-819d-24101f3407ce"
+    },
+    "SiteId": "52b46e48-9c0c-40cb-a955-13eb6c717ff3",
+    "SiteUrl": "https://contoso.sharepoint.com/sites/BrandGuide"
+  }
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```txt
+  BrandColorsListId              : 00000000-0000-0000-0000-000000000000
+  BrandColorsListUrl             : null
+  BrandFontLibraryId             : 23af51de-856c-4d00-aa11-0d03af0e46e3
+  BrandFontLibraryUrl            : {"DecodedUrl":"https://contoso.sharepoint.com/sites/BrandGuide/Fonts"}
+  IsBrandCenterSiteFeatureEnabled: true
+  IsPublicCdnEnabled             : true
+  OrgAssets                      : {"CentralAssetRepositoryLibraries":null,"Domain":{"DecodedUrl":"https://contoso.sharepoint.com"},"OrgAssetsLibraries":{"OrgAssetsLibraries":[{"DisplayName":"Fonts","FileType":"","LibraryUrl":{"DecodedUrl":"sites/BrandGuide/Fonts"},"ListId":"23af51de-856c-4d00-aa11-0d03af0e46e3","OrgAssetFlags":0,"OrgAssetType":8,"ThumbnailUrl":null,"UniqueId":"00000000-0000-0000-0000-000000000000"}],"Items":[{"DisplayName":"Fonts","FileType":"","LibraryUrl":{"DecodedUrl":"sites/BrandGuide/Fonts"},"ListId":"23af51de-856c-4d00-aa11-0d03af0e46e3","OrgAssetFlags":0,"OrgAssetType":8,"ThumbnailUrl":null,"UniqueId":"00000000-0000-0000-0000-000000000000"}]},"SiteId":"52b46e48-9c0c-40cb-a955-13eb6c717ff3","Url":{"DecodedUrl":"/sites/BrandGuide"},"WebId":"206988d5-e133-4a24-819d-24101f3407ce"}
+  SiteId                         : 52b46e48-9c0c-40cb-a955-13eb6c717ff3
+  SiteUrl                        : https://contoso.sharepoint.com/sites/BrandGuide
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  BrandColorsListId,BrandColorsListUrl,BrandFontLibraryId,IsBrandCenterSiteFeatureEnabled,IsPublicCdnEnabled,SiteId,SiteUrl
+  00000000-0000-0000-0000-000000000000,,23af51de-856c-4d00-aa11-0d03af0e46e3,1,1,52b46e48-9c0c-40cb-a955-13eb6c717ff3,https://contoso.sharepoint.com/sites/BrandGuide
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # spo brandcenter settings list --debug "false" --verbose "false"
+
+  Date: 12/1/2025
+
+  Property | Value
+  ---------|-------
+  BrandColorsListId | 00000000-0000-0000-0000-000000000000
+  BrandFontLibraryId | 23af51de-856c-4d00-aa11-0d03af0e46e3
+  IsBrandCenterSiteFeatureEnabled | true
+  IsPublicCdnEnabled | true
+  SiteId | 52b46e48-9c0c-40cb-a955-13eb6c717ff3
+  SiteUrl | https://contoso.sharepoint.com/sites/BrandGuide
+  ```
+
+  </TabItem>
+</Tabs>
