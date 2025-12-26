@@ -12,7 +12,7 @@ describe('FN011011_MAN_webpart_supportedHosts', () => {
   });
 
   it('doesn\'t return notifications if no manifests collected', () => {
-    rule = new FN011011_MAN_webpart_supportedHosts({ true: true });
+    rule = new FN011011_MAN_webpart_supportedHosts({ add: true });
     const project: Project = {
       path: '/usr/tmp'
     };
@@ -21,7 +21,7 @@ describe('FN011011_MAN_webpart_supportedHosts', () => {
   });
 
   it('doesn\'t return notifications if no supportedHosts found while it should be removed', () => {
-    rule = new FN011011_MAN_webpart_supportedHosts({ false: false });
+    rule = new FN011011_MAN_webpart_supportedHosts({ add: false });
     const project: Project = {
       path: '/usr/tmp',
       manifests: [
@@ -37,7 +37,7 @@ describe('FN011011_MAN_webpart_supportedHosts', () => {
   });
 
   it('doesn\'t return notifications if supportedHosts found while it should be added', () => {
-    rule = new FN011011_MAN_webpart_supportedHosts({ true: true });
+    rule = new FN011011_MAN_webpart_supportedHosts({ add: true });
     const project: Project = {
       path: '/usr/tmp',
       manifests: [
@@ -54,7 +54,7 @@ describe('FN011011_MAN_webpart_supportedHosts', () => {
   });
 
   it('returns notifications if supportedHosts not found while it should be added', () => {
-    rule = new FN011011_MAN_webpart_supportedHosts({ true: true });
+    rule = new FN011011_MAN_webpart_supportedHosts({ add: true });
     const project: Project = {
       path: '/usr/tmp',
       manifests: [
@@ -76,7 +76,7 @@ describe('FN011011_MAN_webpart_supportedHosts', () => {
   });
 
   it('returns notifications if supportedHosts found while it should be removed', () => {
-    rule = new FN011011_MAN_webpart_supportedHosts({ false: false });
+    rule = new FN011011_MAN_webpart_supportedHosts({ add: false });
     const project: Project = {
       path: '/usr/tmp',
       manifests: [

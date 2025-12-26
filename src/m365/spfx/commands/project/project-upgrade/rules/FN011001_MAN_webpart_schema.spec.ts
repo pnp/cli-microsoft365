@@ -9,7 +9,7 @@ describe('FN011001_MAN_webpart_schema', () => {
 
   beforeEach(() => {
     findings = [];
-    rule = new FN011001_MAN_webpart_schema({ version: 'test-schema' });
+    rule = new FN011001_MAN_webpart_schema({ schema: 'test-schema' });
   });
 
   it('doesn\'t return notifications if no manifests collected', () => {

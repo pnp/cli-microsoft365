@@ -9,7 +9,7 @@ describe('FN006001_CFG_PS_schema', () => {
 
   beforeEach(() => {
     findings = [];
-    rule = new FN006001_CFG_PS_schema({ version: 'test-schema' });
+    rule = new FN006001_CFG_PS_schema({ schema: 'test-schema' });
   });
 
   it('doesn\'t return notification if no package-solution.json found', () => {

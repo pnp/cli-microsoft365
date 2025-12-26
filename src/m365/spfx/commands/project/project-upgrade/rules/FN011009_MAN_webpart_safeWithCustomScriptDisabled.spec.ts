@@ -12,7 +12,7 @@ describe('FN011009_MAN_webpart_safeWithCustomScriptDisabled', () => {
   });
 
   it('doesn\'t return notifications if no manifests collected', () => {
-    rule = new FN011009_MAN_webpart_safeWithCustomScriptDisabled({ true: true });
+    rule = new FN011009_MAN_webpart_safeWithCustomScriptDisabled({ add: true });
     const project: Project = {
       path: '/usr/tmp'
     };
@@ -21,7 +21,7 @@ describe('FN011009_MAN_webpart_safeWithCustomScriptDisabled', () => {
   });
 
   it('doesn\'t return notifications if no safeWithCustomScriptDisabled found while it should be removed', () => {
-    rule = new FN011009_MAN_webpart_safeWithCustomScriptDisabled({ false: false });
+    rule = new FN011009_MAN_webpart_safeWithCustomScriptDisabled({ add: false });
     const project: Project = {
       path: '/usr/tmp',
       manifests: [
@@ -37,7 +37,7 @@ describe('FN011009_MAN_webpart_safeWithCustomScriptDisabled', () => {
   });
 
   it('returns notification if safeWithCustomScriptDisabled found and should be removed', () => {
-    rule = new FN011009_MAN_webpart_safeWithCustomScriptDisabled({ false: false });
+    rule = new FN011009_MAN_webpart_safeWithCustomScriptDisabled({ add: false });
     const project: Project = {
       path: '/usr/tmp',
       manifests: [
@@ -61,7 +61,7 @@ describe('FN011009_MAN_webpart_safeWithCustomScriptDisabled', () => {
   });
 
   it('doesn\'t return notifications if safeWithCustomScriptDisabled found while it should be added', () => {
-    rule = new FN011009_MAN_webpart_safeWithCustomScriptDisabled({ true: true });
+    rule = new FN011009_MAN_webpart_safeWithCustomScriptDisabled({ add: true });
     const project: Project = {
       path: '/usr/tmp',
       manifests: [
@@ -78,7 +78,7 @@ describe('FN011009_MAN_webpart_safeWithCustomScriptDisabled', () => {
   });
 
   it('returns notification if safeWithCustomScriptDisabled not found and it should be added', () => {
-    rule = new FN011009_MAN_webpart_safeWithCustomScriptDisabled({ true: true });
+    rule = new FN011009_MAN_webpart_safeWithCustomScriptDisabled({ add: true });
     const project: Project = {
       path: '/usr/tmp',
       manifests: [

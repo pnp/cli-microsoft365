@@ -9,7 +9,7 @@ describe('FN003001_CFG_schema', () => {
 
   beforeEach(() => {
     findings = [];
-    rule = new FN003001_CFG_schema({ version: 'test-schema' });
+    rule = new FN003001_CFG_schema({ schema: 'test-schema' });
   });
 
   it('doesn\'t return notification if no config.json found', () => {

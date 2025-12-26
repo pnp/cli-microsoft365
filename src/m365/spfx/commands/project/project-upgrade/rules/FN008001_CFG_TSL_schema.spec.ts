@@ -9,7 +9,7 @@ describe('FN008001_CFG_TSL_schema', () => {
 
   beforeEach(() => {
     findings = [];
-    rule = new FN008001_CFG_TSL_schema({ version: 'test-schema' });
+    rule = new FN008001_CFG_TSL_schema({ schema: 'test-schema' });
   });
 
   it('doesn\'t return notification if no tslint.json found', () => {

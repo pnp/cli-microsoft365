@@ -21,7 +21,7 @@ export default [
   new FN002015_DEVDEP_types_react('17'),
   new FN002016_DEVDEP_types_react_dom('17'),
   new FN002019_DEVDEP_microsoft_rush_stack_compiler(['4.7']),
-  new FN002021_DEVDEP_rushstack_eslint_config('4.0.1'),
+  new FN002021_DEVDEP_rushstack_eslint_config({ packageVersion: '4.0.1' }),
   new FN021001_PKG_spfx_deps_versions_match_project_version(false),
   new FN021013_PKG_spfx_devdeps_match_version('1.20.2')
 ];

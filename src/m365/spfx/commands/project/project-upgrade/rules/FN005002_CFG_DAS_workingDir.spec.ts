@@ -9,7 +9,7 @@ describe('FN005002_CFG_DAS_workingDir', () => {
 
   beforeEach(() => {
     findings = [];
-    rule = new FN005002_CFG_DAS_workingDir({ version: './release/assets/' });
+    rule = new FN005002_CFG_DAS_workingDir({ workingDir: './release/assets/' });
   });
 
   it('doesn\'t return notification if no deploy-azure-storage.json found', () => {

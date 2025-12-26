@@ -9,7 +9,7 @@ describe('FN010005_YORC_environment', () => {
 
   beforeEach(() => {
     findings = [];
-    rule = new FN010005_YORC_environment({ version: 'spo' });
+    rule = new FN010005_YORC_environment({ environment: 'spo' });
   });
 
   it('doesn\'t return notification if no .yo-rc.json found', () => {
