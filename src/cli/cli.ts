@@ -5,7 +5,7 @@ import os from 'os';
 import path from 'path';
 import { fileURLToPath, pathToFileURL } from 'url';
 import yargs from 'yargs-parser';
-import { ZodCustomIssue, ZodError, ZodIssue } from 'zod';
+import z, { ZodError } from 'zod';
 import Command, { CommandArgs, CommandError } from '../Command.js';
 import GlobalOptions from '../GlobalOptions.js';
 import config from '../config.js';
@@ -189,22 +189,22 @@ async function execute(rawArgs: string[]): Promise<void> {
         const shouldPrompt = cli.getSettingWithDefaultValue<boolean>(settingsNames.prompt, true);
 
         if (!shouldPrompt) {
-          result.error.errors.forEach(e => {
+          result.error.issues.forEach(e => {
             if (e.code === 'invalid_type' &&
-              e.received === 'undefined') {
-              e.message = `Required option not specified`;
+              e.input === 'undefined') {
+              (e.message as any) = `Required option not specified`;
             }
           });
           return cli.closeWithError(result.error, cli.optionsFromArgs, true);
         }
 
-        const missingRequiredValuesErrors: ZodIssue[] = result.error.errors
-          .filter(e => (e.code === 'invalid_type' && e.received === 'undefined') ||
+        const missingRequiredValuesErrors: z.core.$ZodIssue[] = result.error.issues
+          .filter(e => (e.code === 'invalid_type' && e.input === 'undefined') ||
             (e.code === 'custom' && e.params?.customCode === 'required'));
-        const optionSetErrors: ZodCustomIssue[] = result.error.errors
-          .filter(e => e.code === 'custom' && e.params?.customCode === 'optionSet') as ZodCustomIssue[];
-        const otherErrors: ZodIssue[] = result.error.errors
-          .filter(e => !missingRequiredValuesErrors.includes(e) && !optionSetErrors.includes(e as ZodCustomIssue));
+        const optionSetErrors: z.core.$ZodIssueCustom[] = result.error.issues
+          .filter(e => e.code === 'custom' && e.params?.customCode === 'optionSet') as z.core.$ZodIssueCustom[];
+        const otherErrors: z.core.$ZodIssue[] = result.error.issues
+          .filter(e => !missingRequiredValuesErrors.includes(e) && !optionSetErrors.includes(e as z.core.$ZodIssueCustom));
 
         if (otherErrors.some(e => e)) {
           return cli.closeWithError(result.error, cli.optionsFromArgs, true);
