@@ -4,8 +4,8 @@ import { Finding } from "../../report-model/index.js";
 import { FileAddRemoveRule } from "./FileAddRemoveRule.js";
 
 export class FN015008_FILE_eslintrc_js extends FileAddRemoveRule {
-  constructor(add: boolean, contents: string) {
-    super('./.eslintrc.js', add, contents);
+  constructor(options: { add: boolean; contents: string }) {
+    super({ filePath: './.eslintrc.js', ...options });
   }
 
   get id(): string {

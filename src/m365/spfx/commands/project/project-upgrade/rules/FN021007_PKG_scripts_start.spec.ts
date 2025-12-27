@@ -8,7 +8,7 @@ describe('FN021007_PKG_scripts_start', () => {
   let rule: FN021007_PKG_scripts_start;
   beforeEach(() => {
     findings = [];
-    rule = new FN021007_PKG_scripts_start('heft start --clean');
+    rule = new FN021007_PKG_scripts_start({ script: 'heft start --clean' });
   });
 
   it(`doesn't return notification if package.json is not available`, () => {

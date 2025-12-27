@@ -5,7 +5,7 @@ import { DependencyRule } from './DependencyRule.js';
 
 class MockDepRule extends DependencyRule {
   constructor() {
-    super('package', '1.0.0', false);
+    super({ packageName: 'package', supportedRange: '1.0.0' });
   }
 
   get id(): string {
@@ -15,7 +15,7 @@ class MockDepRule extends DependencyRule {
 
 class MockDevDepRule extends DependencyRule {
   constructor() {
-    super('package', '1.0.0', true);
+    super({ packageName: 'package', supportedRange: '1.0.0', isDevDep: true });
   }
 
   get id(): string {

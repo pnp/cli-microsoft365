@@ -9,7 +9,7 @@ describe('FN008002_CFG_TSL_removeRule', () => {
 
   beforeEach(() => {
     findings = [];
-    rule = new FN008002_CFG_TSL_removeRule('no-unused-imports');
+    rule = new FN008002_CFG_TSL_removeRule({ rule: 'no-unused-imports' });
   });
 
   it('doesn\'t return notification if no tslint.json', () => {

@@ -3,8 +3,11 @@ import { Project } from '../../project-model/index.js';
 import { Finding } from '../../report-model/index.js';
 
 export class FN006002_CFG_PS_includeClientSideAssets extends JsonRule {
-  constructor(private includeClientSideAssets: boolean) {
+  private includeClientSideAssets: boolean;
+
+  constructor(options: { includeClientSideAssets: boolean }) {
     super();
+    this.includeClientSideAssets = options.includeClientSideAssets;
   }
 
   get id(): string {

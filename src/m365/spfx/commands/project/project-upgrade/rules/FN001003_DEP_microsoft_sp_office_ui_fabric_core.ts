@@ -1,8 +1,8 @@
 import { DependencyRule } from "./DependencyRule.js";
 
 export class FN001003_DEP_microsoft_sp_office_ui_fabric_core extends DependencyRule {
-  constructor(packageVersion: string) {
-    super('@microsoft/sp-office-ui-fabric-core', packageVersion, false, true);
+  constructor(options: { packageVersion: string }) {
+    super({ ...options, packageName: '@microsoft/sp-office-ui-fabric-core', isOptional: true });
   }
 
   get id(): string {

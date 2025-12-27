@@ -9,7 +9,7 @@ describe('FN001020_DEP_types_knockout', () => {
 
   beforeEach(() => {
     findings = [];
-    rule = new FN001020_DEP_types_knockout('3.4.39');
+    rule = new FN001020_DEP_types_knockout({ packageVersion: '3.4.39' });
   });
 
   it('returns notification if types definitions are missing in knockout project', () => {

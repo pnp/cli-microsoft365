@@ -9,7 +9,7 @@ describe('FN007002_CFG_S_initialPage', () => {
 
   beforeEach(() => {
     findings = [];
-    rule = new FN007002_CFG_S_initialPage('https://enter-your-SharePoint-site/_layouts/workbench.aspx');
+    rule = new FN007002_CFG_S_initialPage({ initialPage: 'https://enter-your-SharePoint-site/_layouts/workbench.aspx' });
   });
 
   it('doesn\'t return notification if no serve.json found', () => {

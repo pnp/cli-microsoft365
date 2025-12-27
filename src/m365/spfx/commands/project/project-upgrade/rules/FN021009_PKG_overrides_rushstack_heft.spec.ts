@@ -9,7 +9,7 @@ describe('FN021009_PKG_overrides_rushstack_heft', () => {
 
   beforeEach(() => {
     findings = [];
-    rule = new FN021009_PKG_overrides_rushstack_heft('0.7.36');
+    rule = new FN021009_PKG_overrides_rushstack_heft({ version: '0.7.36' });
   });
 
   it(`doesn't return notification if package.json is not available`, () => {

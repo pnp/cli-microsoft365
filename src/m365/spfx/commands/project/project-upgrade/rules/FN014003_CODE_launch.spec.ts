@@ -9,9 +9,9 @@ describe('FN014003_CODE_launch', () => {
 
   beforeEach(() => {
     findings = [];
-    rule = new FN014003_CODE_launch(`{
+    rule = new FN014003_CODE_launch({ contents: `{
   version: '2.0'
-}`);
+}` });
   });
 
   it('doesn\'t return notification if launch.json has the same contents', () => {

@@ -3,8 +3,11 @@ import { Project } from '../../project-model/index.js';
 import { Finding } from '../../report-model/index.js';
 
 export class FN006003_CFG_PS_isDomainIsolated extends JsonRule {
-  constructor(private isDomainIsolated: boolean) {
+  private isDomainIsolated: boolean;
+
+  constructor(options: { isDomainIsolated: boolean }) {
     super();
+    this.isDomainIsolated = options.isDomainIsolated;
   }
 
   get id(): string {

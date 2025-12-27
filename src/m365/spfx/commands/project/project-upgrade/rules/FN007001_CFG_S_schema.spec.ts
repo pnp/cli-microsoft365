@@ -9,7 +9,7 @@ describe('FN007001_CFG_S_schema', () => {
 
   beforeEach(() => {
     findings = [];
-    rule = new FN007001_CFG_S_schema('test-schema');
+    rule = new FN007001_CFG_S_schema({ schema: 'test-schema' });
   });
 
   it('doesn\'t return notification if no serve.json found', () => {

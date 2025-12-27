@@ -9,7 +9,7 @@ describe('FN021008_PKG_scripts_eject_webpack', () => {
 
   beforeEach(() => {
     findings = [];
-    rule = new FN021008_PKG_scripts_eject_webpack('heft eject-webpack');
+    rule = new FN021008_PKG_scripts_eject_webpack({ script: 'heft eject-webpack' });
   });
 
   it(`doesn't return notification if package.json is not available`, () => {
