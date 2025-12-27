@@ -9,7 +9,7 @@ describe('FN012006_TSC_types_es6_collections', () => {
 
   beforeEach(() => {
     findings = [];
-    rule = new FN012006_TSC_types_es6_collections(false);
+    rule = new FN012006_TSC_types_es6_collections({ add: false });
   });
 
   it('doesn\'t return notification if es6-collection should be removed and is not present', () => {
@@ -49,7 +49,7 @@ describe('FN012006_TSC_types_es6_collections', () => {
   });
 
   it('doesn\'t return notification if es6-collection should be added and is already present', () => {
-    rule = new FN012006_TSC_types_es6_collections(true);
+    rule = new FN012006_TSC_types_es6_collections({ add: true });
     const project: Project = {
       path: '/usr/tmp',
       tsConfigJson: {
@@ -63,7 +63,7 @@ describe('FN012006_TSC_types_es6_collections', () => {
   });
 
   it('returns notification if es6-collection should be added but is not present', () => {
-    rule = new FN012006_TSC_types_es6_collections(true);
+    rule = new FN012006_TSC_types_es6_collections({ add: true });
     const project: Project = {
       path: '/usr/tmp',
       tsConfigJson: {

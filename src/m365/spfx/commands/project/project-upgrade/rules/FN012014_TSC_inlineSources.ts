@@ -3,8 +3,11 @@ import { Project } from '../../project-model/index.js';
 import { Finding } from '../../report-model/index.js';
 
 export class FN012014_TSC_inlineSources extends JsonRule {
-  constructor(private inlineSources: boolean) {
+  private inlineSources: boolean;
+
+  constructor(options: { inlineSources: boolean }) {
     super();
+    this.inlineSources = options.inlineSources;
   }
 
   get id(): string {

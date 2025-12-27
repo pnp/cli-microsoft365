@@ -3,8 +3,11 @@ import { Project } from "../../project-model/index.js";
 import { Finding } from "../../report-model/index.js";
 
 export class FN021006_PKG_scripts_clean extends JsonRule {
-  constructor(private script: string) {
+  private script: string;
+
+  constructor(options: { script: string }) {
     super();
+    this.script = options.script;
   }
 
   get id(): string {

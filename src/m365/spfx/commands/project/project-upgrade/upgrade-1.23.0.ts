@@ -82,11 +82,11 @@ module.exports = [
     }
   }
 ];`),
-  new FN015008_FILE_eslintrc_js(false),
-  new FN002021_DEVDEP_rushstack_eslint_config('4.5.2', false),
-  new FN002032_DEVDEP_typescript_eslint_parser('8.46.2', false),
-  new FN002035_DEVDEP_types_heft_jest('1.0.2', false),
-  new FN002036_DEVDEP_types_jest('30.0.0'),
-  new FN022001_SCSS_remove_fabric_react('~@fluentui/react/dist/sass/References.scss'),
-  new FN022002_SCSS_add_fabric_react('pkg:@fluentui/react/dist/sass/References.scss')
+  new FN015008_FILE_eslintrc_js({ add: false }),
+  new FN002021_DEVDEP_rushstack_eslint_config({ packageVersion: '4.5.2', add: false }),
+  new FN002032_DEVDEP_typescript_eslint_parser({ packageVersion: '8.46.2', add: false }),
+  new FN002035_DEVDEP_types_heft_jest({ packageVersion: '1.0.2', add: false }),
+  new FN002036_DEVDEP_types_jest({ packageVersion: '30.0.0' }),
+  new FN022001_SCSS_remove_fabric_react({ importValue: '~@fluentui/react/dist/sass/References.scss' }),
+  new FN022002_SCSS_add_fabric_react({ importValue: 'pkg:@fluentui/react/dist/sass/References.scss' })
 ];

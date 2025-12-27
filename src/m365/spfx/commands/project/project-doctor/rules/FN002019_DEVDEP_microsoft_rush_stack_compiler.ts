@@ -3,8 +3,11 @@ import { Project } from '../../project-model/index.js';
 import { Finding, Occurrence } from '../../report-model/index.js';
 
 export class FN002019_DEVDEP_microsoft_rush_stack_compiler extends JsonRule {
-  constructor(private supportedVersions: string[]) {
+  private supportedVersions: string[];
+
+  constructor(options: { supportedVersions: string[] }) {
     super();
+    this.supportedVersions = options.supportedVersions;
   }
 
   get id(): string {

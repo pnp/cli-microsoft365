@@ -1,8 +1,8 @@
 import { FileAddRemoveRule } from "./FileAddRemoveRule.js";
 
 export class FN015001_FILE_typings_tsd_d_ts extends FileAddRemoveRule {
-  constructor(add: boolean) {
-    super('./typings/tsd.d.ts', add);
+  constructor(options: { add: boolean }) {
+    super({ filePath: './typings/tsd.d.ts', ...options });
   }
 
   get id(): string {

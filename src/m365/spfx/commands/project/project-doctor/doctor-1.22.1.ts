@@ -9,13 +9,13 @@ import { FN002022_DEVDEP_typescript } from './rules/FN002022_DEVDEP_typescript.j
 import { FN021001_PKG_spfx_deps_versions_match_project_version } from './rules/FN021001_PKG_spfx_deps_versions_match_project_version.js';
 
 export default [
-  new FN001008_DEP_react('17'),
-  new FN001009_DEP_react_dom('17'),
-  new FN001035_DEP_fluentui_react('^8.106.4'),
-  new FN002013_DEVDEP_types_webpack_env('~1.15.2'),
-  new FN002015_DEVDEP_types_react('17'),
-  new FN002016_DEVDEP_types_react_dom('17'),
-  new FN002021_DEVDEP_rushstack_eslint_config('4.5.2'),
-  new FN002022_DEVDEP_typescript('~5.8.0'),
-  new FN021001_PKG_spfx_deps_versions_match_project_version(true)
+  new FN001008_DEP_react({ supportedRange: '17' }),
+  new FN001009_DEP_react_dom({ supportedRange: '17' }),
+  new FN001035_DEP_fluentui_react({ supportedRange: '^8.106.4' }),
+  new FN002013_DEVDEP_types_webpack_env({ supportedRange: '~1.15.2' }),
+  new FN002015_DEVDEP_types_react({ supportedRange: '17' }),
+  new FN002016_DEVDEP_types_react_dom({ supportedRange: '17' }),
+  new FN002021_DEVDEP_rushstack_eslint_config({ packageVersion: '4.5.2' }),
+  new FN002022_DEVDEP_typescript({ supportedRange: '~5.8.0' }),
+  new FN021001_PKG_spfx_deps_versions_match_project_version({ includeDevDeps: true })
 ];

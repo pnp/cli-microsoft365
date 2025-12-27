@@ -22,28 +22,28 @@ import { FN014002_CODE_extensions } from "./rules/FN014002_CODE_extensions.js";
 import { FN014003_CODE_launch } from "./rules/FN014003_CODE_launch.js";
 
 export default [
-  new FN001001_DEP_microsoft_sp_core_library('1.3.4'),
-  new FN001002_DEP_microsoft_sp_lodash_subset('1.3.4'),
-  new FN001003_DEP_microsoft_sp_office_ui_fabric_core('1.3.4'),
-  new FN001004_DEP_microsoft_sp_webpart_base('1.3.4'),
-  new FN001011_DEP_microsoft_sp_dialog('1.3.4'),
-  new FN001012_DEP_microsoft_sp_application_base('1.3.4'),
-  new FN001013_DEP_microsoft_decorators('1.3.4'),
-  new FN001014_DEP_microsoft_sp_listview_extensibility('1.3.4'),
-  new FN001023_DEP_microsoft_sp_component_base('1.3.4'),
-  new FN001026_DEP_microsoft_sp_extension_base('1.3.4'),
-  new FN001027_DEP_microsoft_sp_http('1.3.4'),
-  new FN001029_DEP_microsoft_sp_loader('1.3.4'),
-  new FN001030_DEP_microsoft_sp_module_interfaces('1.3.4'),
-  new FN001031_DEP_microsoft_sp_odata_types('1.3.4'),
-  new FN001032_DEP_microsoft_sp_page_context('1.3.4'),
-  new FN002001_DEVDEP_microsoft_sp_build_web('1.3.4'),
-  new FN002002_DEVDEP_microsoft_sp_module_interfaces('1.3.4'),
-  new FN002003_DEVDEP_microsoft_sp_webpart_workbench('1.3.4'),
-  new FN002007_DEVDEP_ajv('5.2.2'),
-  new FN010001_YORC_version('1.3.4'),
+  new FN001001_DEP_microsoft_sp_core_library({ packageVersion: '1.3.4' }),
+  new FN001002_DEP_microsoft_sp_lodash_subset({ packageVersion: '1.3.4' }),
+  new FN001003_DEP_microsoft_sp_office_ui_fabric_core({ packageVersion: '1.3.4' }),
+  new FN001004_DEP_microsoft_sp_webpart_base({ packageVersion: '1.3.4' }),
+  new FN001011_DEP_microsoft_sp_dialog({ packageVersion: '1.3.4' }),
+  new FN001012_DEP_microsoft_sp_application_base({ packageVersion: '1.3.4' }),
+  new FN001013_DEP_microsoft_decorators({ packageVersion: '1.3.4' }),
+  new FN001014_DEP_microsoft_sp_listview_extensibility({ packageVersion: '1.3.4' }),
+  new FN001023_DEP_microsoft_sp_component_base({ packageVersion: '1.3.4' }),
+  new FN001026_DEP_microsoft_sp_extension_base({ packageVersion: '1.3.4' }),
+  new FN001027_DEP_microsoft_sp_http({ packageVersion: '1.3.4' }),
+  new FN001029_DEP_microsoft_sp_loader({ packageVersion: '1.3.4' }),
+  new FN001030_DEP_microsoft_sp_module_interfaces({ packageVersion: '1.3.4' }),
+  new FN001031_DEP_microsoft_sp_odata_types({ packageVersion: '1.3.4' }),
+  new FN001032_DEP_microsoft_sp_page_context({ packageVersion: '1.3.4' }),
+  new FN002001_DEVDEP_microsoft_sp_build_web({ packageVersion: '1.3.4' }),
+  new FN002002_DEVDEP_microsoft_sp_module_interfaces({ packageVersion: '1.3.4' }),
+  new FN002003_DEVDEP_microsoft_sp_webpart_workbench({ packageVersion: '1.3.4' }),
+  new FN002007_DEVDEP_ajv({ packageVersion: '5.2.2' }),
+  new FN010001_YORC_version({ version: '1.3.4' }),
   new FN014002_CODE_extensions(),
-  new FN014003_CODE_launch(`{
+  new FN014003_CODE_launch({ contents: `{
   /**
     Install Chrome Debugger Extension for Visual Studio Code
     to debug your components with the Chrome browser:
@@ -84,5 +84,5 @@ export default [
       ]
     }
   ]
-}`)
+}` })
 ];

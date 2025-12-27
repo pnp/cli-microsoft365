@@ -5,7 +5,7 @@ import { ResolutionRule } from './ResolutionRule.js';
 
 class ResRule extends ResolutionRule {
   constructor() {
-    super('test-package', '1.0.0');
+    super({ packageName: 'test-package', packageVersion: '1.0.0' });
   }
 
   get id(): string {
@@ -15,7 +15,7 @@ class ResRule extends ResolutionRule {
 
 class ResRule2 extends ResolutionRule {
   constructor() {
-    super('test-package', '1.0.0');
+    super({ packageName: 'test-package', packageVersion: '1.0.0' });
   }
 
   get id(): string {

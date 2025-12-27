@@ -2,8 +2,8 @@ import { Project } from '../../project-model/index.js';
 import { DependencyRule } from "./DependencyRule.js";
 
 export class FN001021_DEP_microsoft_sp_property_pane extends DependencyRule {
-  constructor(packageVersion: string) {
-    super('@microsoft/sp-property-pane', packageVersion, false, true);
+  constructor(options: { packageVersion: string }) {
+    super({ ...options, packageName: '@microsoft/sp-property-pane', isOptional: true });
   }
 
   get id(): string {

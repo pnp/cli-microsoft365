@@ -3,8 +3,8 @@ import { Finding } from '../../report-model/index.js';
 import { DependencyRule } from "./DependencyRule.js";
 
 export class FN027001_OVERRIDES_rushstack_heft extends DependencyRule {
-  constructor(version: string) {
-    super('@rushstack/heft', version, false, false, true, true);
+  constructor(options: { version: string }) {
+    super({ packageName: '@rushstack/heft', packageVersion: options.version, isOverride: true });
   }
 
   get id(): string {

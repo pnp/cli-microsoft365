@@ -3,8 +3,8 @@ import { Project } from '../../project-model';
 import { DependencyRule } from './DependencyRule.js';
 
 export class FN001035_DEP_fluentui_react extends DependencyRule {
-  constructor(packageVersion: string) {
-    super('@fluentui/react', packageVersion, false, true);
+  constructor(options: { packageVersion: string }) {
+    super({ ...options, packageName: '@fluentui/react', isOptional: true });
   }
 
   get id(): string {

@@ -3,8 +3,8 @@ import { Project } from '../../project-model/index.js';
 import { ResolutionRule } from './ResolutionRule.js';
 
 export class FN020001_RES_types_react extends ResolutionRule {
-  constructor(packageVersion: string) {
-    super('@types/react', packageVersion);
+  constructor(options: { packageVersion: string }) {
+    super({ packageName: '@types/react', ...options });
   }
 
   get id(): string {

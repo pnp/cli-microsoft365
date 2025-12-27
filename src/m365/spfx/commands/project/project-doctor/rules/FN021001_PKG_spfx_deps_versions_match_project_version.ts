@@ -5,8 +5,11 @@ import { Finding } from '../../report-model/index.js';
 import * as spfxDeps from '../spfx-deps.js';
 
 export class FN021001_PKG_spfx_deps_versions_match_project_version extends JsonRule {
-  constructor(private includeDevDeps: boolean = true) {
+  private includeDevDeps: boolean;
+
+  constructor(options?: { includeDevDeps?: boolean }) {
     super();
+    this.includeDevDeps = options?.includeDevDeps ?? true;
   }
 
   get id(): string {

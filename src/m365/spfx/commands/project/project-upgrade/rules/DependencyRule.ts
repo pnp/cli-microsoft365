@@ -4,9 +4,31 @@ import { JsonRule } from '../../JsonRule.js';
 import { Project } from '../../project-model/index.js';
 import { Finding } from '../../report-model/index.js';
 
+export interface DependencyRuleOptions {
+  packageName: string;
+  packageVersion: string;
+  isDevDep?: boolean;
+  isOptional?: boolean;
+  add?: boolean;
+  isOverride?: boolean;
+}
+
 export abstract class DependencyRule extends JsonRule {
-  constructor(protected packageName: string, protected packageVersion: string, protected isDevDep: boolean = false, protected isOptional: boolean = false, protected add: boolean = true, protected isOverride: boolean = false) {
+  protected packageName: string;
+  protected packageVersion: string;
+  protected isDevDep: boolean;
+  protected isOptional: boolean;
+  protected add: boolean;
+  protected isOverride: boolean;
+
+  constructor(options: DependencyRuleOptions) {
     super();
+    this.packageName = options.packageName;
+    this.packageVersion = options.packageVersion;
+    this.isDevDep = options.isDevDep ?? false;
+    this.isOptional = options.isOptional ?? false;
+    this.add = options.add ?? true;
+    this.isOverride = options.isOverride ?? false;
   }
 
   get title(): string {

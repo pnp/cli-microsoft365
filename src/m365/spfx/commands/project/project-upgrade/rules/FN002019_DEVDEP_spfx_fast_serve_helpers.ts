@@ -1,8 +1,8 @@
 import { DependencyRule } from "./DependencyRule.js";
 
 export class FN002019_DEVDEP_spfx_fast_serve_helpers extends DependencyRule {
-  constructor(packageVersion: string) {
-    super('spfx-fast-serve-helpers', packageVersion, true, true);
+  constructor(options: { packageVersion: string }) {
+    super({ ...options, packageName: 'spfx-fast-serve-helpers', isDevDep: true, isOptional: true });
   }
 
   get id(): string {

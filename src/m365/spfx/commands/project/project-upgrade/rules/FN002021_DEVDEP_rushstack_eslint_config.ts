@@ -1,8 +1,8 @@
 import { DependencyRule } from "./DependencyRule.js";
 
 export class FN002021_DEVDEP_rushstack_eslint_config extends DependencyRule {
-  constructor(packageVersion: string, add: boolean = true) {
-    super('@rushstack/eslint-config', packageVersion, true, false, add);
+  constructor(options: { packageVersion: string; add?: boolean }) {
+    super({ ...options, packageName: '@rushstack/eslint-config', isDevDep: true, add: options.add ?? true });
   }
 
   get id(): string {
