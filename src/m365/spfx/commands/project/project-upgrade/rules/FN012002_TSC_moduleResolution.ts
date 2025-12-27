@@ -3,8 +3,11 @@ import { Project } from '../../project-model/index.js';
 import { Finding } from '../../report-model/index.js';
 
 export class FN012002_TSC_moduleResolution extends JsonRule {
-  constructor(private moduleResolution: string) {
+  private moduleResolution: string;
+
+  constructor(options: { moduleResolution: string }) {
     super();
+    this.moduleResolution = options.moduleResolution;
   }
 
   get id(): string {

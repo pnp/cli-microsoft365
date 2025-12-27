@@ -9,7 +9,7 @@ describe('FN021003_PKG_engines_node', () => {
 
   beforeEach(() => {
     findings = [];
-    rule = new FN021003_PKG_engines_node('>=16.13.0 <17.0.0');
+    rule = new FN021003_PKG_engines_node({ version: '>=16.13.0 <17.0.0' });
   });
 
   it(`doesn't return notification if package.json is not available`, () => {

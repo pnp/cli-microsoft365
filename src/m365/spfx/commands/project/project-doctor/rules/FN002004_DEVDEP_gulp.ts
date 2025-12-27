@@ -1,8 +1,8 @@
 import { DependencyRule } from './DependencyRule.js';
 
 export class FN002004_DEVDEP_gulp extends DependencyRule {
-  constructor(supportedRange: string) {
-    super('gulp', supportedRange, true);
+  constructor(options: { supportedRange: string }) {
+    super({ ...options, packageName: 'gulp', isDevDep: true });
   }
 
   get id(): string {

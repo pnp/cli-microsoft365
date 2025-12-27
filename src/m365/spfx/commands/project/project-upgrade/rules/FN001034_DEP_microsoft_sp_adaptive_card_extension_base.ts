@@ -1,8 +1,8 @@
 import { DependencyRule } from "./DependencyRule.js";
 
 export class FN001034_DEP_microsoft_sp_adaptive_card_extension_base extends DependencyRule {
-  constructor(packageVersion: string) {
-    super('@microsoft/sp-adaptive-card-extension-base', packageVersion, false, true);
+  constructor(options: { packageVersion: string }) {
+    super({ ...options, packageName: '@microsoft/sp-adaptive-card-extension-base', isOptional: true });
   }
 
   get id(): string {

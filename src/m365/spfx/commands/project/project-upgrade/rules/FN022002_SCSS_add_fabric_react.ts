@@ -4,8 +4,13 @@ import { Finding, Occurrence } from '../../report-model/index.js';
 import { ScssRule } from './ScssRule.js';
 
 export class FN022002_SCSS_add_fabric_react extends ScssRule {
-  constructor(private importValue: string, private addIfContains?: string) {
+  private importValue: string;
+  private addIfContains?: string;
+
+  constructor(options: { importValue: string; addIfContains?: string }) {
     super();
+    this.importValue = options.importValue;
+    this.addIfContains = options.addIfContains;
   }
 
   get id(): string {
