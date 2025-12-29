@@ -128,6 +128,23 @@ describe(commands.APPLICATIONCUSTOMIZER_ADD, () => {
     assert(loggerLogToStderrSpy.called);
   });
 
+  it('adds the application customizer to a specific site while specifying hostProperties', async () => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso.sharepoint.com/_api/Site/UserCustomActions'
+        && opts.data['Location'] === 'ClientSideExtension.ApplicationCustomizer'
+        && opts.data['ClientSideComponentId'] === clientSideComponentId
+        && opts.data['HostProperties'] === clientSideComponentProperties
+        && opts.data['Name'] === title) {
+        return customActionAddResponse;
+      }
+
+      throw customActionError;
+    });
+
+    await command.action(logger, { options: { webUrl: webUrl, title: title, clientSideComponentId: clientSideComponentId, description: description, hostProperties: clientSideComponentProperties, verbose: true } });
+    assert(loggerLogToStderrSpy.called);
+  });
+
   it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
     const actual = await command.validate({ options: { webUrl: 'foo', title: title, clientSideComponentId: clientSideComponentId } }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -148,8 +165,13 @@ describe(commands.APPLICATIONCUSTOMIZER_ADD, () => {
     assert.notStrictEqual(actual, true);
   });
 
+  it('fails validation if the hostProperties option is not a valid json string', async () => {
+    const actual = await command.validate({ options: { webUrl: webUrl, title: title, clientSideComponentId: clientSideComponentId, hostProperties: 'invalid json string' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
   it('passes validation if all options are passed', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, title: title, clientSideComponentId: clientSideComponentId, clientSideComponentProperties: clientSideComponentProperties, scope: 'Site' } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: webUrl, title: title, clientSideComponentId: clientSideComponentId, clientSideComponentProperties: clientSideComponentProperties, hostProperties: clientSideComponentProperties, scope: 'Site' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 }); 

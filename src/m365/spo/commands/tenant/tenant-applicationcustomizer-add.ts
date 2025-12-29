@@ -19,6 +19,7 @@ interface Options extends GlobalOptions {
   title: string;
   clientSideComponentId: string;
   clientSideComponentProperties?: string;
+  hostProperties?: string;
   webTemplate?: string;
 }
 
@@ -43,6 +44,7 @@ class SpoTenantApplicationCustomizerAddCommand extends SpoCommand {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
         clientSideComponentProperties: typeof args.options.clientSideComponentProperties !== 'undefined',
+        hostProperties: typeof args.options.hostProperties !== 'undefined',
         webTemplate: typeof args.options.webTemplate !== 'undefined'
       });
     });
@@ -58,6 +60,9 @@ class SpoTenantApplicationCustomizerAddCommand extends SpoCommand {
       },
       {
         option: '-p, --clientSideComponentProperties [clientSideComponentProperties]'
+      },
+      {
+        option: '--hostProperties [hostProperties]'
       },
       {
         option: '-w, --webTemplate [webTemplate]'
@@ -190,6 +195,7 @@ class SpoTenantApplicationCustomizerAddCommand extends SpoCommand {
       TenantWideExtensionSequence: 0,
       TenantWideExtensionListTemplate: 0,
       TenantWideExtensionComponentProperties: options.clientSideComponentProperties || '',
+      TenantWideExtensionHostProperties: options.hostProperties || '',
       TenantWideExtensionWebTemplate: options.webTemplate || '',
       TenantWideExtensionDisabled: false,
       verbose: this.verbose,

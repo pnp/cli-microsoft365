@@ -24,6 +24,7 @@ describe(commands.APPLICATIONCUSTOMIZER_SET, () => {
   const newTitle = 'New Title';
   const description = 'Site guided tour customizer';
   const clientSideComponentProperties = '{"testMessage":"Updated message"}';
+  const hostProperties = '{"preAllocatedApplicationCustomizerTopHeight":"50","preAllocatedApplicationCustomizerBottomHeight":"50"}';
   let log: any[];
   let logger: Logger;
 
@@ -377,6 +378,23 @@ describe(commands.APPLICATIONCUSTOMIZER_SET, () => {
     assert(updateCallsSpy.calledOnce);
     assert.deepStrictEqual(updateCallsSpy.firstCall.args[0].data, {
       Description: ''
+    });
+  });
+
+  it('should update the application customizer from the site when hostProperties is provided', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/_api/Web/UserCustomActions(guid'${id}')`) {
+        return singleResponse.value[0];
+      }
+      throw 'Invalid request: ' + opts.url;
+    });
+
+    const updateCallsSpy: sinon.SinonStub = defaultUpdateCallsStub();
+    await command.action(logger, { options: { id: id, webUrl: webUrl, scope: 'Web', hostProperties: hostProperties } });
+
+    assert(updateCallsSpy.calledOnce);
+    assert.deepStrictEqual(updateCallsSpy.firstCall.args[0].data, {
+      HostProperties: hostProperties
     });
   });
 });

@@ -2,7 +2,7 @@ import Global from '/docs/cmd/_global.mdx';
 
 # spo tenant applicationcustomizer add
 
-Add an application customizer as a tenant-wide extension
+Add an Application Customizer as a tenant-wide extension
 
 ## Usage
 
@@ -17,13 +17,16 @@ m365 spo tenant applicationcustomizer add [options]
 : The title of the Application Customizer.
 
 `-i, --clientSideComponentId <clientSideComponentId>`
-: The Client Side Component Id (GUID) of the application customizer.
+: The Client Side Component Id (GUID) of the Application Customizer.
 
 `-p, --clientSideComponentProperties [clientSideComponentProperties]`
-: The Client Side Component properties of the application customizer.
+: The Client Side Component properties of the Application Customizer.
+
+`--hostProperties [hostProperties]`
+: Set the host properties of the Application Customizer.
 
 `-w, --webTemplate [webTemplate]`
-: Optionally add a web template (e.g. STS#3, SITEPAGEPUBLISHING#0, etc) as a filter for what kind of sites the application customizer is registered on.
+: Optionally add a web template (e.g. STS#3, SITEPAGEPUBLISHING#0, etc) as a filter for what kind of sites the Application Customizer is registered on.
 ```
 
 <Global />
@@ -40,7 +43,7 @@ Note, how the clientSideComponentProperties option has escaped double quotes `'{
 
 :::warning[Escaping JSON in PowerShell]
 
-When using the `--clientSideComponentProperties` option it's possible to enter a JSON string. In PowerShell 5 to 7.2 [specific escaping rules](./../../../user-guide/using-cli.mdx#escaping-double-quotes-in-powershell) apply due to an issue. Remember that you can also use [file tokens](./../../../user-guide/using-cli.mdx#passing-complex-content-into-cli-options) instead.
+When using the `--clientSideComponentProperties` or `--hostProperties` options it's possible to enter a JSON string. In PowerShell 5 to 7.2 [specific escaping rules](./../../../user-guide/using-cli.mdx#escaping-double-quotes-in-powershell) apply due to an issue. Remember that you can also use [file tokens](./../../../user-guide/using-cli.mdx#passing-complex-content-into-cli-options) instead.
 
 :::
 
@@ -50,20 +53,20 @@ To use this command, you need to be a SharePoint Admin.
 
 :::
 
-This command can be used for configuring a tenant-wide application customizer. To configure an application customizer on a specific site, view our dedicated [spo applicationcustomizer add](../applicationcustomizer/applicationcustomizer-add.mdx) command.
+This command can be used for configuring a tenant-wide Application Customizer. To configure an Application Customizer on a specific site, view our dedicated [spo applicationcustomizer add](../applicationcustomizer/applicationcustomizer-add.mdx) command.
 
 ## Examples
 
-Adds an application customizer that's deployed tenant wide
+Adds an Application Customizer that's deployed tenant wide
 
 ```sh
-m365 spo tenant applicationcustomizer add --title "Some customizer" --clientSideComponentId  799883f5-7962-4384-a10a-105adaec6ffc 
+m365 spo tenant applicationcustomizer add --title "Some customizer" --clientSideComponentId 799883f5-7962-4384-a10a-105adaec6ffc 
 ```
 
-Adds an application customizer that is configured for all communication sites.
+Adds an Application Customizer that is configured for all communication sites.
 
 ```sh
-m365 spo tenant applicationcustomizer add --title "Some customizer" --clientSideComponentId  799883f5-7962-4384-a10a-105adaec6ffc --webTemplate "SITEPAGEPUBLISHING#0"
+m365 spo tenant applicationcustomizer add --title "Some customizer" --clientSideComponentId 799883f5-7962-4384-a10a-105adaec6ffc --webTemplate "SITEPAGEPUBLISHING#0"
 ```
 
 ## Response
