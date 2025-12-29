@@ -23,6 +23,7 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_SET, () => {
   const id = 3;
   const clientSideComponentId = '7096cded-b83d-4eab-96f0-df477ed7c0bc';
   const clientSideComponentProperties = '{ "someProperty": "Some value" }';
+  const hostProperties = '{"preAllocatedApplicationCustomizerTopHeight":"50","preAllocatedApplicationCustomizerBottomHeight":"50"}';
   const webTemplate = "GROUP#0";
   const spoUrl = 'https://contoso.sharepoint.com';
   const appCatalogUrl = 'https://contoso.sharepoint.com/sites/apps';
@@ -389,6 +390,32 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_SET, () => {
     });
 
     assert.deepEqual(executeCallsStub.firstCall.args[0].data, { formValues: [{ FieldName: 'Title', FieldValue: 'New customizer' }] });
+  });
+
+  it('updates host properties of an application customizer by id', async () => {
+    defaultGetCallStub("Id eq '3'");
+    const executeCallsStub: sinon.SinonStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/apps/_api/web/GetList('%2Fsites%2Fapps%2Flists%2FTenantWideExtensions')/Items(3)/ValidateUpdateListItem()`) {
+        return {
+          value: [
+            {
+              FieldName: "TenantWideExtensionHostProperties",
+              FieldValue: hostProperties
+            }
+          ]
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options: {
+        id: id, hostProperties: hostProperties
+      }
+    });
+
+    assert.deepEqual(executeCallsStub.firstCall.args[0].data, { formValues: [{ FieldName: 'TenantWideExtensionHostProperties', FieldValue: hostProperties }] });
   });
 
   it('updates client side component id of an application customizer by title', async () => {

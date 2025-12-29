@@ -136,6 +136,35 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_ADD, () => {
     assert.strictEqual(executeCommandCalled, true);
   });
 
+  it('adds a tenant-wide application customizer including hostProperties', async () => {
+    let executeCommandCalled = false;
+    sinon.stub(cli, 'executeCommandWithOutput').callsFake(async (command, args): Promise<any> => {
+      if (command === spoListItemListCommand) {
+        if (args.options.listUrl === `${urlUtil.getServerRelativeSiteUrl(appCatalogUrl)}/Lists/ComponentManifests`) {
+          return { 'stdout': JSON.stringify(solutionResponse) };
+        }
+        if (args.options.listUrl === `${urlUtil.getServerRelativeSiteUrl(appCatalogUrl)}/AppCatalog`) {
+          return { 'stdout': JSON.stringify(applicationResponse) };
+        }
+      }
+      if (command === spoTenantAppCatalogUrlGetCommand) {
+        return { 'stdout': appCatalogUrl };
+      }
+      throw 'Invalid request';
+    });
+
+    sinon.stub(cli, 'executeCommand').callsFake(async (command): Promise<void> => {
+      if (command === spoListItemAddCommand) {
+        executeCommandCalled = true;
+        return;
+      }
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { clientSideComponentId: clientSideComponentId, title: customizerTitle, hostProperties: '{ "preAllocatedApplicationCustomizerTopHeight": "50", "preAllocatedApplicationCustomizerBottomHeight": "50" }', verbose: true } });
+    assert.strictEqual(executeCommandCalled, true);
+  });
+
   it('throws an error when no app catalog is found', async () => {
     sinon.stub(cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
       if (command === spoTenantAppCatalogUrlGetCommand) {
