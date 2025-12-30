@@ -20,9 +20,12 @@ interface Options extends GlobalOptions {
   userEmails?: string;
   chatName?: string;
   message: string;
+  contentType?: string;
 }
 
 class TeamsChatMessageSendCommand extends GraphDelegatedCommand {
+  private readonly contentTypes = ['text', 'html'];
+
   public get name(): string {
     return commands.CHAT_MESSAGE_SEND;
   }
@@ -45,7 +48,8 @@ class TeamsChatMessageSendCommand extends GraphDelegatedCommand {
       Object.assign(this.telemetryProperties, {
         chatId: typeof args.options.chatId !== 'undefined',
         userEmails: typeof args.options.userEmails !== 'undefined',
-        chatName: typeof args.options.chatName !== 'undefined'
+        chatName: typeof args.options.chatName !== 'undefined',
+        contentType: args.options.contentType ?? 'text'
       });
     });
   }
@@ -63,6 +67,10 @@ class TeamsChatMessageSendCommand extends GraphDelegatedCommand {
       },
       {
         option: '-m, --message <message>'
+      },
+      {
+        option: '--contentType [contentType]',
+        autocomplete: this.contentTypes
       }
     );
   }
@@ -81,6 +89,10 @@ class TeamsChatMessageSendCommand extends GraphDelegatedCommand {
           }
         }
 
+        if (args.options.contentType && !this.contentTypes.includes(args.options.contentType)) {
+          return `'${args.options.contentType}' is not a valid value for option contentType. Allowed values are ${this.contentTypes.join(', ')}.`;
+        }
+
         return true;
       }
     );
@@ -93,7 +105,7 @@ class TeamsChatMessageSendCommand extends GraphDelegatedCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       const chatId = await this.getChatId(logger, args);
-      await this.sendChatMessage(chatId as string, args);
+      await this.sendChatMessage(chatId, args);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
@@ -112,7 +124,7 @@ class TeamsChatMessageSendCommand extends GraphDelegatedCommand {
 
   private async ensureChatIdByUserEmails(userEmailsOption: string): Promise<string> {
     const userEmails = userEmailsOption.trim().toLowerCase().split(',').filter(e => e && e !== '');
-    const currentUserEmail = accessToken.getUserNameFromAccessToken(auth.connection.accessTokens[this.resource].accessToken).toLowerCase();
+    const currentUserEmail = accessToken.getUserNameFromAccessToken(auth.connection.accessTokens[auth.defaultResource].accessToken).toLowerCase();
     const existingChats = await chatUtil.findExistingChatsByParticipants([currentUserEmail, ...userEmails]);
 
     if (!existingChats || existingChats.length === 0) {
@@ -189,11 +201,12 @@ class TeamsChatMessageSendCommand extends GraphDelegatedCommand {
       url: `${this.resource}/v1.0/chats/${chatId}/messages`,
       headers: {
         accept: 'application/json;odata.metadata=none',
-        'content-type': 'application/json;odata=nometadata'
+        'content-type': 'application/json'
       },
       responseType: 'json',
       data: {
         body: {
+          contentType: args.options.contentType || 'text',
           content: args.options.message
         }
       }

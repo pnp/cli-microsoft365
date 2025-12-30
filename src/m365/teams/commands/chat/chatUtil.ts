@@ -3,10 +3,9 @@ import { formatting } from '../../../../utils/formatting.js';
 import { odata } from '../../../../utils/odata.js';
 
 export const chatUtil = {
-
   /**
    * Finds existing Microsoft Teams chats by participants, using the Microsoft Graph
-   * @param expectedMemberEmails a string array of participant emailaddresses   
+   * @param expectedMemberEmails a string array of participant email addresses
    * @param logger a logger to pipe into the graph request odata helper.
    */
   async findExistingChatsByParticipants(expectedMemberEmails: string[]): Promise<Chat[]> {
