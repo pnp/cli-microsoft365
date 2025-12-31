@@ -1,21 +1,33 @@
 import { ItemBody, Message } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
 import { odata } from '../../../../utils/odata.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
-
-interface CommandArgs {
-  options: Options;
-}
-
-interface Options extends GlobalOptions {
-  chatId: string;
-}
+import { globalOptionsZod } from '../../../../Command.js';
+import { z } from 'zod';
 
 interface ExtendedMessage extends Message {
   shortBody?: string;
+}
+
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  chatId: z.string()
+    .refine(id => validation.isValidTeamsChatId(id), {
+      error: e => `'${e.input}' is not a valid value for option chatId.`
+    })
+    .alias('i'),
+  endDateTime: z.string()
+    .refine(time => validation.isValidISODateTime(time), {
+      error: e => `'${e.input}' is not a valid ISO date-time string for option endDateTime.`
+    })
+    .optional()
+});
+
+declare type Options = z.infer<typeof options>;
+interface CommandArgs {
+  options: Options;
 }
 
 class TeamsChatMessageListCommand extends GraphCommand {
@@ -28,42 +40,25 @@ class TeamsChatMessageListCommand extends GraphCommand {
   }
 
   public defaultProperties(): string[] | undefined {
-    return ['id', 'shortBody'];
+    return ['id', 'createdDateTime', 'shortBody'];
   }
 
-  constructor() {
-    super();
-
-    this.#initOptions();
-    this.#initValidators();
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-i, --chatId <chatId>'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (!validation.isValidTeamsChatId(args.options.chatId)) {
-          return `${args.options.chatId} is not a valid Teams chat ID`;
-        }
-
-        return true;
-      }
-    );
+  public get schema(): z.ZodType {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const endpoint: string = `${this.resource}/v1.0/chats/${args.options.chatId}/messages`;
-
     try {
-      const items = await odata.getAllItems<ExtendedMessage>(endpoint);
-      if (args.options.output !== 'json') {
+      let apiUrl = `${this.resource}/v1.0/chats/${args.options.chatId}/messages`;
+
+      if (args.options.endDateTime) {
+        // You can only filter results if the request URL contains the $orderby and $filter query parameters configured for the same property;
+        // otherwise, the $filter query option is ignored.
+        apiUrl += `?$filter=createdDateTime lt ${args.options.endDateTime}&$orderby=createdDateTime desc`;
+      }
+
+      const items = await odata.getAllItems<ExtendedMessage>(apiUrl);
+      if (args.options.output && args.options.output !== 'json') {
         items.forEach(i => {
           // hoist the content to body for readability
           i.body = (i.body as ItemBody).content as any;
