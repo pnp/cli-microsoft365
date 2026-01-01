@@ -5,9 +5,15 @@ import { Finding } from "../../report-model/Finding.js";
 import { Rule } from '../../Rule.js';
 
 export abstract class FileAddRemoveRule extends Rule {
-  constructor(protected filePath: string, protected add: boolean, protected contents?: string) {
+  protected filePath: string;
+  protected add: boolean;
+  protected contents?: string;
+
+  constructor(options: { filePath: string; add: boolean; contents?: string }) {
     super();
-    this.filePath = path.normalize(this.filePath);
+    this.filePath = path.normalize(options.filePath);
+    this.add = options.add;
+    this.contents = options.contents;
   }
 
   get title(): string {

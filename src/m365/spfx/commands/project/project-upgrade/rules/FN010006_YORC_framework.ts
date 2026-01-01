@@ -3,8 +3,13 @@ import { Project } from '../../project-model/index.js';
 import { Finding } from '../../report-model/index.js';
 
 export class FN010006_YORC_framework extends JsonRule {
-  constructor(private framework: string, private add: boolean) {
+  private framework: string;
+  private add: boolean;
+
+  constructor(options: { framework: string; add: boolean }) {
     super();
+    this.framework = options.framework;
+    this.add = options.add;
   }
 
   get id(): string {

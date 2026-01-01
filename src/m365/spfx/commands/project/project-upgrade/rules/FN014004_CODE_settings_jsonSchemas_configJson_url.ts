@@ -3,8 +3,11 @@ import { Project, VsCodeSettingsJsonJsonSchema } from '../../project-model/index
 import { Finding } from '../../report-model/index.js';
 
 export class FN014004_CODE_settings_jsonSchemas_configJson_url extends JsonRule {
-  constructor(private url: string) {
+  private url: string;
+
+  constructor(options: { url: string }) {
     super();
+    this.url = options.url;
   }
 
   get id(): string {

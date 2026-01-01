@@ -3,8 +3,11 @@ import { Project } from '../../project-model/index.js';
 import { Finding } from '../../report-model/index.js';
 
 export class FN010005_YORC_environment extends JsonRule {
-  constructor(private environment: string) {
+  private environment: string;
+
+  constructor(options: { environment: string }) {
     super();
+    this.environment = options.environment;
   }
 
   get id(): string {
