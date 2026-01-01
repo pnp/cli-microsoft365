@@ -26,14 +26,14 @@
     "docusaurus-plugin-sass": "^0.2.6",
     "mdast-util-from-markdown": "^2.0.2",
     "prism-react-renderer": "^2.4.1",
-    "react": "^19.2.0",
-    "react-dom": "^19.2.0",
+    "react": "^19.2.3",
+    "react-dom": "^19.2.3",
     "unist-util-visit": "^5.0.0"
   },
   "devDependencies": {
     "@docusaurus/module-type-aliases": "^3.9.2",
     "@docusaurus/tsconfig": "^3.9.2",
-    "asciinema-player": "^3.12.1",
+    "asciinema-player": "^3.13.5",
     "typescript": "^5.9.3"
   },
   "browserslist": {
