@@ -1,7 +1,6 @@
 import http, { IncomingMessage, ServerResponse } from 'http';
 import { AddressInfo } from 'net';
 import { ParsedUrlQuery } from 'querystring';
-import url from 'url';
 import { Auth, InteractiveAuthorizationCodeResponse, InteractiveAuthorizationErrorResponse, Connection } from './Auth.js';
 import { Logger } from './cli/Logger.js';
 import { browserUtil } from './utils/browserUtil.js';
@@ -73,9 +72,8 @@ export class AuthServer {
       await this.logger.logToStderr('');
     }
 
-    // url.parse is deprecated but we can't move to URL, because it doesn't
-    // support server-relative URLs
-    const queryString: ParsedUrlQuery = url.parse(request.url as string, true).query;
+    const urlObj = new URL(request.url as string, 'http://localhost');
+    const queryString: ParsedUrlQuery = Object.fromEntries(urlObj.searchParams.entries());
     const hasCode: boolean = queryString.code !== undefined;
     const hasError: boolean = queryString.error !== undefined;
 
