@@ -18,4 +18,6 @@ jobs:
             stale-issue-label: 'stale'
             close-issue-message: 'Close as not planned, feel free to reopen if new information arises.'
             close-issue-label: 'stale-closed'
-            exempt-issue-labels: 'keep-open,epic'
+            exempt-issue-labels: 'keep-open,epic,on hold'
+            days-before-pr-stale: -1
+            days-before-pr-close: -1
