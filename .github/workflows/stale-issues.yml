@@ -11,10 +11,13 @@ jobs:
     steps:
       - uses: actions/stale@v10
         with:
-            days-before-stale: 335
-            days-before-close: 30
+            days-before-issue-stale: 335
+            days-before-issue-close: 30
+            operations-per-run: 100
             stale-issue-message: 'This issue has been automatically marked as stale due to inactivity, and will be closed in 30 days if no further activity occurs. If you believe this issue should remain open, please comment on it to let us know. Any activity will reset the stale timer.'
             stale-issue-label: 'stale'
-            close-issue-message: 'Close as not planned, feel free to reopen if new information arises.'
+            close-issue-message: 'Closing as not planned, feel free to reopen if new information arises.'
             close-issue-label: 'stale-closed'
-            exempt-issue-labels: 'keep-open,epic'
+            exempt-issue-labels: 'keep-open,epic,on hold'
+            days-before-pr-stale: -1
+            days-before-pr-close: -1
