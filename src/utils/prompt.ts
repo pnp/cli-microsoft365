@@ -34,7 +34,7 @@ export interface SelectionConfig<Value> {
   choices: readonly (Separator | Choice<Value>)[];
   pageSize?: number;
   loop?: boolean;
-  default?: unknown;
+  default?: NoInfer<Value>;
   theme?: PartialDeep<SelectTheme>;
 }
 
