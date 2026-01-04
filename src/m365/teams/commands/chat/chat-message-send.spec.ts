@@ -48,6 +48,8 @@ describe(commands.CHAT_MESSAGE_SEND, () => {
     auth.connection.active = true;
     sinon.stub(accessToken, 'assertAccessTokenType').returns();
     commandInfo = cli.getCommandInfo(command);
+
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => settingName === settingsNames.prompt ? false : defaultValue);
   });
 
   beforeEach(() => {
@@ -101,7 +103,6 @@ describe(commands.CHAT_MESSAGE_SEND, () => {
       request.get,
       request.post,
       accessToken.getUserNameFromAccessToken,
-      cli.getSettingWithDefaultValue,
       cli.handleMultipleResultsFound
     ]);
   });
@@ -120,14 +121,6 @@ describe(commands.CHAT_MESSAGE_SEND, () => {
   });
 
   it('fails validation if chatId and chatName and userEmails are not specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
     const actual = await command.validate({
       options: {
         message: "Hello World"
@@ -187,14 +180,6 @@ describe(commands.CHAT_MESSAGE_SEND, () => {
   });
 
   it('fails validation if chatId and chatName properties are both defined', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
     const actual = await command.validate({
       options: {
         chatId: '19:8b081ef6-4792-4def-b2c9-c363a1bf41d5_5031bb31-22c0-4f6f-9f73-91d34ab2b32d',
@@ -206,14 +191,6 @@ describe(commands.CHAT_MESSAGE_SEND, () => {
   });
 
   it('fails validation if chatId and userEmails properties are both defined', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
     const actual = await command.validate({
       options: {
         chatId: '19:8b081ef6-4792-4def-b2c9-c363a1bf41d5_5031bb31-22c0-4f6f-9f73-91d34ab2b32d',
@@ -225,14 +202,6 @@ describe(commands.CHAT_MESSAGE_SEND, () => {
   });
 
   it('fails validation if chatName and userEmails properties are both defined', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
     const actual = await command.validate({
       options: {
         chatName: 'test',
@@ -244,14 +213,6 @@ describe(commands.CHAT_MESSAGE_SEND, () => {
   });
 
   it('fails validation if all three mutually exclusive properties are defined', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
     const actual = await command.validate({
       options: {
         chatId: '19:8b081ef6-4792-4def-b2c9-c363a1bf41d5_5031bb31-22c0-4f6f-9f73-91d34ab2b32d',
@@ -264,17 +225,20 @@ describe(commands.CHAT_MESSAGE_SEND, () => {
   });
 
   it('fails validation if message is not specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
     const actual = await command.validate({
       options: {
         chatId: "19:8b081ef6-4792-4def-b2c9-c363a1bf41d5_5031bb31-22c0-4f6f-9f73-91d34ab2b32d@unq.gbl.spaces"
+      }
+    }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if contentType is not valid', async () => {
+    const actual = await command.validate({
+      options: {
+        chatId: '19:8b081ef6-4792-4def-b2c9-c363a1bf41d5_5031bb31-22c0-4f6f-9f73-91d34ab2b32d@unq.gbl.spaces',
+        contentType: 'Invalid',
+        message: 'Hello World'
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -324,7 +288,19 @@ describe(commands.CHAT_MESSAGE_SEND, () => {
     await command.action(logger, {
       options: {
         chatId: "19:82fe7758-5bb3-4f0d-a43f-e555fd399c6f_8c0a1a67-50ce-4114-bb6c-da9c5dbcf6ca@unq.gbl.spaces",
-        message: "Hello World"
+        message: "Hello World",
+        contentType: "text"
+      }
+    });
+    assert(loggerLogSpy.notCalled);
+  });
+
+  it('sends chat message using chatId and contentType', async () => {
+    await command.action(logger, {
+      options: {
+        chatId: "19:82fe7758-5bb3-4f0d-a43f-e555fd399c6f_8c0a1a67-50ce-4114-bb6c-da9c5dbcf6ca@unq.gbl.spaces",
+        message: "<p>Hello World</p>",
+        contentType: "html"
       }
     });
     assert(loggerLogSpy.notCalled);
@@ -404,14 +380,6 @@ describe(commands.CHAT_MESSAGE_SEND, () => {
   });
 
   it('fails sending message with multiple found chat conversations by chatName', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
     await assert.rejects(command.action(logger, {
       options: {
         chatName: "Just a conversation with same name",
@@ -433,14 +401,6 @@ describe(commands.CHAT_MESSAGE_SEND, () => {
   });
 
   it('fails sending message with multiple found chat conversations by userEmails', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
     await assert.rejects(command.action(logger, {
       options: {
         userEmails: "AlexW@M365x214355.onmicrosoft.com,NateG@M365x214355.onmicrosoft.com",
@@ -501,6 +461,57 @@ describe(commands.CHAT_MESSAGE_SEND, () => {
       }
     });
     assert(loggerLogSpy.notCalled);
+  });
+
+  it('sends chat messages using HTML content type', async () => {
+    sinonUtil.restore(request.post);
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/chats/19:82fe7758-5bb3-4f0d-a43f-e555fd399c6f_8c0a1a67-50ce-4114-bb6c-da9c5dbcf6ca@unq.gbl.spaces/messages`) {
+        return messageSentResponse;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options: {
+        chatId: '19:82fe7758-5bb3-4f0d-a43f-e555fd399c6f_8c0a1a67-50ce-4114-bb6c-da9c5dbcf6ca@unq.gbl.spaces',
+        message: '<b>Hello World</b>',
+        contentType: 'html'
+      }
+    });
+
+    assert.deepStrictEqual(postStub.firstCall.args[0].data, {
+      body: {
+        contentType: 'html',
+        content: '<b>Hello World</b>'
+      }
+    });
+  });
+
+  it('sends chat messages using text content type when not specified', async () => {
+    sinonUtil.restore(request.post);
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/chats/19:82fe7758-5bb3-4f0d-a43f-e555fd399c6f_8c0a1a67-50ce-4114-bb6c-da9c5dbcf6ca@unq.gbl.spaces/messages`) {
+        return messageSentResponse;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options: {
+        chatId: '19:82fe7758-5bb3-4f0d-a43f-e555fd399c6f_8c0a1a67-50ce-4114-bb6c-da9c5dbcf6ca@unq.gbl.spaces',
+        message: 'Hello World'
+      }
+    });
+
+    assert.deepStrictEqual(postStub.firstCall.args[0].data, {
+      body: {
+        contentType: 'text',
+        content: 'Hello World'
+      }
+    });
   });
 
   // The following test is used to test the retry mechanism in use because of an intermittent Graph issue.

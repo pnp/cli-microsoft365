@@ -1,3 +1,5 @@
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 import Global from '/docs/cmd/_global.mdx';
 
 # teams chat message send
@@ -24,6 +26,9 @@ m365 teams chat message send [options]
 
 `-m, --message <message>`
 : The message to send
+
+`--contentType [contentType]`
+: The content type of the message. Allowed values are `text` and `html`. Default is `text`.
 ```
 
 <Global />
@@ -32,12 +37,29 @@ m365 teams chat message send [options]
 
 A new chat conversation will be created if no existing conversation with the participants specified with emails is found.
 
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource        | Permissions                 |
+  |-----------------|-----------------------------|
+  | Microsoft Graph | Chat.Read, ChatMessage.Send |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  This command does not support application permissions.
+
+  </TabItem>
+</Tabs>
+
 ## Examples
 
 Send a message to a Microsoft Teams chat conversation by id
 
 ```sh
-m365 teams chat message send --chatId 19:2da4c29f6d7041eca70b638b43d45437@thread.v2 --message "Welcome to Teams"
+m365 teams chat message send --chatId 19:2da4c29f6d7041eca70b638b43d45437@thread.v2 --message "<b>Welcome</b> to Teams" --contentType html
 ```
 
 Send a message to a single person
