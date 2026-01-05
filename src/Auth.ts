@@ -997,7 +997,7 @@ export class Auth {
     const oldName = connection.name;
 
     if (existingConnection) {
-      throw new CommandError(`The connection name '${newName}' is already in use`);
+      throw new CommandError(`The connection name '${newName}' is already in use.`);
     }
 
     connection.name = newName;

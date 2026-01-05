@@ -25,7 +25,11 @@ export const options = z.strictObject({
   appId: z.string().optional(),
   tenant: z.string().optional(),
   secret: z.string().optional().alias('s'),
-  connectionName: z.string().optional(),
+  connectionName: z.string()
+    .refine(async name => !(await auth.getAllConnections()).some(c => c.name === name), {
+      error: e => `Connection with name '${e.input}' already exists.`
+    })
+    .optional(),
   ensure: z.boolean().optional()
 });
 declare type Options = z.infer<typeof options>;
