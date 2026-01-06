@@ -18,6 +18,7 @@ export default {
   GATEWAY_LIST: `${prefix} gateway list`,
   MANAGEMENTAPP_ADD: `${prefix} managementapp add`,
   MANAGEMENTAPP_LIST: `${prefix} managementapp list`,
+  PIPELINE_LIST: `${prefix} pipeline list`,
   SOLUTION_GET: `${prefix} solution get`,
   SOLUTION_LIST: `${prefix} solution list`,
   SOLUTION_PUBLISH: `${prefix} solution publish`,
