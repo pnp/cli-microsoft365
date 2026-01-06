@@ -1,6 +1,7 @@
 import { Logger } from '../../../../cli/Logger.js';
+import { CommandError } from '../../../../Command.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
-import request from '../../../../request.js';
+import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { spo } from '../../../../utils/spo.js';
 import { validation } from '../../../../utils/validation.js';
@@ -24,6 +25,7 @@ interface Options extends GlobalOptions {
   pageName: string;
   showTopicHeader?: boolean;
   showPublishDate?: boolean;
+  showTimeToRead?: boolean;
   textAlignment?: string;
   translateX?: number;
   translateY?: number;
@@ -48,6 +50,7 @@ class SpoPageHeaderSetCommand extends SpoCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initTypes();
   }
 
   #initTelemetry(): void {
@@ -58,8 +61,9 @@ class SpoPageHeaderSetCommand extends SpoCommand {
         imageUrl: typeof args.options.imageUrl !== 'undefined',
         topicHeader: typeof args.options.topicHeader !== 'undefined',
         layout: args.options.layout,
-        showTopicHeader: args.options.showTopicHeader,
-        showPublishDate: args.options.showPublishDate,
+        showTopicHeader: !!args.options.showTopicHeader,
+        showPublishDate: !!args.options.showPublishDate,
+        showTimeToRead: !!args.options.showTimeToRead,
         textAlignment: args.options.textAlignment,
         translateX: typeof args.options.translateX !== 'undefined',
         translateY: typeof args.options.translateY !== 'undefined',
@@ -101,10 +105,16 @@ class SpoPageHeaderSetCommand extends SpoCommand {
         autocomplete: ['Left', 'Center']
       },
       {
-        option: '--showTopicHeader'
+        option: '--showTopicHeader [showTopicHeader]',
+        autocomplete: ['true', 'false']
       },
       {
-        option: '--showPublishDate'
+        option: '--showPublishDate [showPublishDate]',
+        autocomplete: ['true', 'false']
+      },
+      {
+        option: '--showTimeToRead [showTimeToRead]',
+        autocomplete: ['true', 'false']
       },
       {
         option: '--topicHeader [topicHeader]'
@@ -118,10 +128,7 @@ class SpoPageHeaderSetCommand extends SpoCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (args.options.type &&
-          args.options.type !== 'None' &&
-          args.options.type !== 'Default' &&
-          args.options.type !== 'Custom') {
+        if (args.options.type && !['None', 'Default', 'Custom'].includes(args.options.type)) {
           return `${args.options.type} is not a valid type value. Allowed values None|Default|Custom`;
         }
 
@@ -133,17 +140,11 @@ class SpoPageHeaderSetCommand extends SpoCommand {
           return `${args.options.translateY} is not a valid number`;
         }
 
-        if (args.options.layout &&
-          args.options.layout !== 'FullWidthImage' &&
-          args.options.layout !== 'NoImage' &&
-          args.options.layout !== 'ColorBlock' &&
-          args.options.layout !== 'CutInShape') {
+        if (args.options.layout && !['FullWidthImage', 'NoImage', 'ColorBlock', 'CutInShape'].includes(args.options.layout)) {
           return `${args.options.layout} is not a valid layout value. Allowed values FullWidthImage|NoImage|ColorBlock|CutInShape`;
         }
 
-        if (args.options.textAlignment &&
-          args.options.textAlignment !== 'Left' &&
-          args.options.textAlignment !== 'Center') {
+        if (args.options.textAlignment && !['Left', 'Center'].includes(args.options.textAlignment)) {
           return `${args.options.textAlignment} is not a valid textAlignment value. Allowed values Left|Center`;
         }
 
@@ -152,98 +153,105 @@ class SpoPageHeaderSetCommand extends SpoCommand {
     );
   }
 
+  #initTypes(): void {
+    this.types.boolean.push('showTimeToRead', 'showPublishDate', 'showTopicHeader');
+  }
+
   protected getExcludedOptionsWithUrls(): string[] | undefined {
     return ['imageUrl'];
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const noPageHeader: PageHeader = {
-      "id": BannerWebPartId,
-      "instanceId": BannerWebPartId,
-      "title": "Title Region",
-      "description": "Title Region Description",
-      "serverProcessedContent": {
-        "htmlStrings": {},
-        "searchablePlainTexts": {},
-        "imageSources": {},
-        "links": {}
+      id: BannerWebPartId,
+      instanceId: BannerWebPartId,
+      title: 'Title Region',
+      description: 'Title Region Description',
+      serverProcessedContent: {
+        htmlStrings: {},
+        searchablePlainTexts: {},
+        imageSources: {},
+        links: {}
       },
-      "dataVersion": "1.4",
-      "properties": {
-        "title": "",
-        "imageSourceType": 4,
-        "layoutType": "NoImage",
-        "textAlignment": "Left",
-        "showTopicHeader": false,
-        "showPublishDate": false,
-        "topicHeader": ""
+      dataVersion: '1.4',
+      properties: {
+        title: '',
+        imageSourceType: 4,
+        layoutType: 'NoImage',
+        textAlignment: 'Left',
+        showTopicHeader: false,
+        showPublishDate: false,
+        showTimeToRead: false,
+        topicHeader: ''
       }
     };
     const defaultPageHeader: PageHeader = {
-      "id": BannerWebPartId,
-      "instanceId": BannerWebPartId,
-      "title": "Title Region",
-      "description": "Title Region Description",
-      "serverProcessedContent": {
-        "htmlStrings": {},
-        "searchablePlainTexts": {},
-        "imageSources": {},
-        "links": {}
+      id: BannerWebPartId,
+      instanceId: BannerWebPartId,
+      title: 'Title Region',
+      description: 'Title Region Description',
+      serverProcessedContent: {
+        htmlStrings: {},
+        searchablePlainTexts: {},
+        imageSources: {},
+        links: {}
       },
-      "dataVersion": "1.4",
-      "properties": {
-        "title": "",
-        "imageSourceType": 4,
-        "layoutType": "FullWidthImage",
-        "textAlignment": "Left",
-        "showTopicHeader": false,
-        "showPublishDate": false,
-        "topicHeader": ""
+      dataVersion: '1.4',
+      properties: {
+        title: '',
+        imageSourceType: 4,
+        layoutType: 'FullWidthImage',
+        textAlignment: 'Left',
+        showTopicHeader: false,
+        showPublishDate: false,
+        showTimeToRead: false,
+        topicHeader: ''
       }
     };
     const customPageHeader: CustomPageHeader = {
-      "id": BannerWebPartId,
-      "instanceId": BannerWebPartId,
-      "title": "Title Region",
-      "description": "Title Region Description",
-      "serverProcessedContent": {
-        "htmlStrings": {},
-        "searchablePlainTexts": {},
-        "imageSources": {
-          "imageSource": ""
+      id: BannerWebPartId,
+      instanceId: BannerWebPartId,
+      title: 'Title Region',
+      description: 'Title Region Description',
+      serverProcessedContent: {
+        htmlStrings: {},
+        searchablePlainTexts: {},
+        imageSources: {
+          imageSource: ''
         },
-        "links": {},
-        "customMetadata": {
-          "imageSource": {
-            "siteId": "",
-            "webId": "",
-            "listId": "",
-            "uniqueId": ""
+        links: {},
+        customMetadata: {
+          imageSource: {
+            siteId: '',
+            webId: '',
+            listId: '',
+            uniqueId: ''
           }
         }
       },
-      "dataVersion": "1.4",
-      "properties": {
-        "title": "",
-        "imageSourceType": 2,
-        "layoutType": "FullWidthImage",
-        "textAlignment": "Left",
-        "showTopicHeader": false,
-        "showPublishDate": false,
-        "topicHeader": "",
-        "authors": [],
-        "altText": "",
-        "webId": "",
-        "siteId": "",
-        "listId": "",
-        "uniqueId": "",
-        "translateX": 0,
-        "translateY": 0
+      dataVersion: '1.4',
+      properties: {
+        title: '',
+        imageSourceType: 2,
+        layoutType: 'FullWidthImage',
+        textAlignment: 'Left',
+        showTopicHeader: false,
+        showPublishDate: false,
+        showTimeToRead: false,
+        topicHeader: '',
+        authors: [],
+        altText: '',
+        webId: '',
+        siteId: '',
+        listId: '',
+        uniqueId: '',
+        translateX: 0,
+        translateY: 0
       }
     };
     let header: PageHeader | CustomPageHeader = defaultPageHeader;
     let pageFullName: string = args.options.pageName.toLowerCase();
-    if (pageFullName.indexOf('.aspx') < 0) {
+    if (!pageFullName.endsWith('.aspx')) {
       pageFullName += '.aspx';
     }
 
@@ -259,10 +267,10 @@ class SpoPageHeaderSetCommand extends SpoCommand {
     }
 
     try {
-      let requestOptions: any = {
+      let requestOptions: CliRequestOptions = {
         url: `${args.options.webUrl}/_api/sitepages/pages/GetByUrl('sitepages/${formatting.encodeQueryParameter(pageFullName)}')?$select=IsPageCheckedOutToCurrentUser,Title`,
         headers: {
-          'accept': 'application/json;odata=nometadata'
+          accept: 'application/json;odata=nometadata'
         },
         responseType: 'json'
       };
@@ -272,10 +280,10 @@ class SpoPageHeaderSetCommand extends SpoCommand {
 
       let pageData: ClientSidePageProperties;
       if (page.IsPageCheckedOutToCurrentUser) {
-        const requestOptions: any = {
+        const requestOptions: CliRequestOptions = {
           url: `${args.options.webUrl}/_api/sitepages/pages/GetByUrl('sitepages/${formatting.encodeQueryParameter(pageFullName)}')?$expand=ListItemAllFields`,
           headers: {
-            'accept': 'application/json;odata=nometadata'
+            accept: 'application/json;odata=nometadata'
           },
           responseType: 'json'
         };
@@ -324,6 +332,7 @@ class SpoPageHeaderSetCommand extends SpoCommand {
       header.properties.showTopicHeader = args.options.showTopicHeader || false;
       header.properties.topicHeader = args.options.topicHeader || '';
       header.properties.showPublishDate = args.options.showPublishDate || false;
+      header.properties.showTimeToRead = args.options.showTimeToRead || false;
 
       if (args.options.type !== 'None') {
         header.properties.layoutType = args.options.layout as any || 'FullWidthImage';
@@ -446,6 +455,10 @@ class SpoPageHeaderSetCommand extends SpoCommand {
       return request.post(requestOptions);
     }
     catch (err: any) {
+      if (err.status === 404) {
+        throw new CommandError(`The specified page '${pageFullName}' does not exist.`);
+      }
+
       this.handleRejectedODataJsonPromise(err);
     }
   }
