@@ -1,0 +1,57 @@
+name: Deploy docs
+
+on:
+  workflow_dispatch:
+      
+jobs:
+  build_docs:
+    if: github.repository_owner == 'pnp'
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Number of commits to fetch. 0 indicates all history for all branches and tags. Default: 1
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Cache node modules
+        id: cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            **/docs/node_modules
+          key: docs_node_modules-${{ hashFiles('**/docs/package-lock.json') }}
+
+      - name: Restore dependencies
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: npm ci
+        working-directory: docs
+        
+      - name: Build docs
+        run: npm run build
+        working-directory: docs
+        
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs/build
+  deploy_docs:
+    if: github.repository_owner == 'pnp'
+    needs: build_docs
+
+    permissions:
+      pages: write
+      id-token: write
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
