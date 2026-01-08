@@ -26,6 +26,7 @@ interface Options extends GlobalOptions {
   title?: string;
   demoteFrom?: string;
   content?: string;
+  isRetired?: boolean;
 }
 
 class SpoPageSetCommand extends SpoCommand {
@@ -57,7 +58,8 @@ class SpoPageSetCommand extends SpoCommand {
         publishMessage: typeof args.options.publishMessage !== 'undefined',
         description: typeof args.options.description !== 'undefined',
         title: typeof args.options.title !== 'undefined',
-        content: typeof args.options.content !== 'undefined'
+        content: typeof args.options.content !== 'undefined',
+        isRetired: typeof args.options.isRetired !== 'undefined'
       });
     });
   }
@@ -100,12 +102,16 @@ class SpoPageSetCommand extends SpoCommand {
       },
       {
         option: '--content [content]'
+      },
+      {
+        option: '--isRetired [isRetired]',
+        autocomplete: ['true', 'false']
       }
     );
   }
 
   #initTypes(): void {
-    this.types.boolean.push('commentsEnabled');
+    this.types.boolean.push('commentsEnabled', 'isRetired');
   }
 
   #initValidators(): void {
@@ -116,7 +122,8 @@ class SpoPageSetCommand extends SpoCommand {
           return isValidSharePointUrl;
         }
 
-        if (!args.options.layoutType && !args.options.promoteAs && !args.options.demoteFrom && args.options.commentsEnabled === undefined && !args.options.publish && !args.options.description && !args.options.title && !args.options.content) {
+        if (!args.options.layoutType && !args.options.promoteAs && !args.options.demoteFrom && args.options.commentsEnabled === undefined &&
+          !args.options.publish && !args.options.description && !args.options.title && !args.options.content && args.options.isRetired === undefined) {
           return 'Specify at least one option to update.';
         }
 
@@ -180,28 +187,24 @@ class SpoPageSetCommand extends SpoCommand {
     const listUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, listServerRelativeUrl);
     const requestUrl = `${args.options.webUrl}/_api/web/GetList('${formatting.encodeQueryParameter(listUrl)}')`;
 
-    const needsToSavePage = !!args.options.title || !!args.options.description;
+    const needsToSavePage = !!args.options.title || !!args.options.description || !!args.options.content;
 
     try {
       const requestDigestResult = await spo.getRequestDigest(args.options.webUrl);
       const requestDigest = requestDigestResult.FormDigestValue;
       const page = await Page.checkout(args.options.name, args.options.webUrl, logger, this.verbose);
 
-      if (page) {
-        pageTitle = pageTitle || page.Title;
-        pageId = page.Id;
+      pageTitle = pageTitle || page.Title;
+      pageId = page.Id;
 
-        bannerImageUrl = page.BannerImageUrl;
-        canvasContent1 = args.options.content || page.CanvasContent1;
-        layoutWebpartsContent = page.LayoutWebpartsContent;
-        pageDescription = pageDescription || page.Description;
-        topicHeader = page.TopicHeader;
-        authorByline = page.AuthorByline;
-      }
+      bannerImageUrl = page.BannerImageUrl;
+      canvasContent1 = args.options.content || page.CanvasContent1;
+      layoutWebpartsContent = page.LayoutWebpartsContent;
+      pageDescription = pageDescription || page.Description;
+      topicHeader = page.TopicHeader;
+      authorByline = page.AuthorByline;
 
       if (args.options.layoutType) {
-        const file = await spo.getFileAsListItemByUrl(args.options.webUrl, serverRelativeFileUrl, logger, this.verbose);
-        const itemId = file.Id;
         const listItemSetOptions: any = {
           PageLayoutType: args.options.layoutType
         };
@@ -209,7 +212,7 @@ class SpoPageSetCommand extends SpoCommand {
           listItemSetOptions.PromotedState = 0;
           listItemSetOptions.BannerImageUrl = `${resource}/_layouts/15/images/sitepagethumbnail.png, /_layouts/15/images/sitepagethumbnail.png`;
         }
-        await spo.systemUpdateListItem(requestUrl, itemId, logger, this.verbose, listItemSetOptions);
+        await spo.systemUpdateListItem(requestUrl, pageId, logger, this.verbose, listItemSetOptions);
       }
       if (args.options.promoteAs) {
         const requestOptions: CliRequestOptions = {
@@ -232,18 +235,14 @@ class SpoPageSetCommand extends SpoCommand {
             await request.post(requestOptions);
             break;
           case 'NewsPage': {
-            const newsPageItem = await spo.getFileAsListItemByUrl(args.options.webUrl, serverRelativeFileUrl, logger, this.verbose);
-            const newsPageItemId = newsPageItem.Id;
             const listItemSetOptions: any = {
               PromotedState: 2,
               FirstPublishedDate: new Date().toISOString()
             };
-            await spo.systemUpdateListItem(requestUrl, newsPageItemId, logger, this.verbose, listItemSetOptions);
+            await spo.systemUpdateListItem(requestUrl, pageId, logger, this.verbose, listItemSetOptions);
             break;
           }
           case 'Template': {
-            const templateItem = await spo.getFileAsListItemByUrl(args.options.webUrl, serverRelativeFileUrl, logger, this.verbose);
-            const templateItemId = templateItem.Id;
             requestOptions.headers = {
               'X-RequestDigest': requestDigest,
               'content-type': 'application/json;odata=nometadata',
@@ -251,7 +250,7 @@ class SpoPageSetCommand extends SpoCommand {
               'IF-MATCH': '*',
               accept: 'application/json;odata=nometadata'
             };
-            requestOptions.url = `${args.options.webUrl}/_api/SitePages/Pages(${templateItemId})/SavePageAsTemplate`;
+            requestOptions.url = `${args.options.webUrl}/_api/SitePages/Pages(${pageId})/SavePageAsTemplate`;
             const res = await request.post<{ Id: number | null, BannerImageUrl: string, CanvasContent1: string, LayoutWebpartsContent: string }>(requestOptions);
             if (fileNameWithoutExtension) {
               pageData.Title = fileNameWithoutExtension;
@@ -347,12 +346,16 @@ class SpoPageSetCommand extends SpoCommand {
       }
 
       if (args.options.demoteFrom === 'NewsPage') {
-        const file = await spo.getFileAsListItemByUrl(args.options.webUrl, serverRelativeFileUrl, logger, this.verbose);
-        const fileId = file.Id;
         const listItemSetOptions: any = {
           PromotedState: 0
         };
-        await spo.systemUpdateListItem(requestUrl, fileId, logger, this.verbose, listItemSetOptions);
+        await spo.systemUpdateListItem(requestUrl, pageId!, logger, this.verbose, listItemSetOptions);
+      }
+
+      if (args.options.isRetired !== undefined) {
+        await spo.systemUpdateListItem(requestUrl, pageId!, logger, this.verbose, {
+          _SPIsRetired: args.options.isRetired
+        });
       }
 
       let requestOptions: CliRequestOptions;

@@ -1,4 +1,6 @@
 import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 # spo page set
 
@@ -20,16 +22,19 @@ m365 spo page set [options]
 : URL of the site where the page to update is located.
 
 `-l, --layoutType [layoutType]`
-: Layout of the page. Allowed values `Article`, `Home`, `SingleWebPartAppPage`, `RepostPage`, `HeaderlessSearchResults`, `Spaces`, `Topic`.
+: Layout of the page. Allowed values: `Article`, `Home`, `SingleWebPartAppPage`, `RepostPage`, `HeaderlessSearchResults`, `Spaces`, `Topic`.
 
 `-p, --promoteAs [promoteAs]`
-: Update the page purpose. Allowed values `HomePage`, `NewsPage`, `Template`.
+: Update the page purpose. Allowed values: `HomePage`, `NewsPage`, `Template`.
 
 `--demoteFrom [demoteFrom]`
-: Update the page purpose back to a regular article. Allowed values `NewsPage`.
+: Update the page purpose back to a regular article. Allowed values: `NewsPage`.
 
 `--commentsEnabled [commentsEnabled]`
-: Set to `true`, to enable comments on the page. Allowed values `true`, `false`.
+: Set to `true`, to enable comments on the page. Allowed values: `true`, `false`.
+
+`--isRetired [isRetired]`
+: Marks the page as retired, showing a message that the page may be out of date. Allowed values: `true`, `false`.
 
 `--publish`
 : Set to publish the page.
@@ -69,6 +74,25 @@ When using the `--content` option it's possible to enter a JSON string. In Power
 
 :::
 
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource   | Permissions    |
+  |------------|----------------|
+  | SharePoint | AllSites.Write |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource   | Permissions         |
+  |------------|---------------------|
+  | SharePoint | Sites.ReadWrite.All |
+
+  </TabItem>
+</Tabs>
+
 ## Examples
 
 Change the layout of the existing page to _Article_
@@ -89,7 +113,7 @@ Promote the existing article page as a template
 m365 spo page set --name page.aspx --webUrl https://contoso.sharepoint.com/sites/a-team --promoteAs Template
 ```
 
-Demote the existing newspage
+Demote the existing news page
 
 ```sh
 m365 spo page set --name page.aspx --webUrl https://contoso.sharepoint.com/sites/a-team --demoteFrom NewsPage
@@ -117,6 +141,12 @@ Set page description
 
 ```sh
 m365 spo page set --name page.aspx --webUrl https://contoso.sharepoint.com/sites/a-team --description "Description to add for the page"
+```
+
+Marks a page as retired
+
+```sh
+m365 spo page set --name page.aspx --webUrl https://contoso.sharepoint.com/sites/a-team --isRetired true
 ```
 
 Set page content

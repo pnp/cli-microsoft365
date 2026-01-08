@@ -1696,7 +1696,7 @@ export const spo = {
   * @param verbose If in verbose mode
   * @returns The updated list item object
   */
-  async systemUpdateListItem(absoluteListUrl: string, itemId: string, logger: Logger, verbose: boolean, properties?: object, contentTypeName?: string): Promise<ListItemInstance> {
+  async systemUpdateListItem(absoluteListUrl: string, itemId: number, logger: Logger, verbose: boolean, properties?: object, contentTypeName?: string): Promise<ListItemInstance> {
     if (!properties && !contentTypeName) {
       // Neither properties nor contentTypeName provided, no need to proceed
       throw 'Either properties or contentTypeName must be provided for systemUpdateListItem.';
@@ -1774,10 +1774,8 @@ export const spo = {
       throw `Error occurred in systemUpdate operation - ${response}`;
     }
 
-    const id = Number(itemId);
-
     const requestOptionsItems: CliRequestOptions = {
-      url: `${absoluteListUrl}/items(${id})`,
+      url: `${absoluteListUrl}/items(${itemId})`,
       headers: {
         'accept': 'application/json;odata=nometadata'
       },

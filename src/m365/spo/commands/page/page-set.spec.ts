@@ -14,6 +14,7 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { spo } from '../../../../utils/spo.js';
 import commands from '../../commands.js';
 import command from './page-set.js';
+import { ListItemInstance } from '../listitem/ListItemInstance.js';
 
 describe(commands.PAGE_SET, () => {
   let log: string[];
@@ -227,29 +228,71 @@ describe(commands.PAGE_SET, () => {
     sinon.stub(spo, 'systemUpdateListItem').resolves();
     sinon.stub(spo, 'getFileAsListItemByUrl').resolves(fileResponse);
 
-    sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/GetFileByServerRelativePath(DecodedUrl='/sites/team-a/sitepages/page.aspx')/ListItemAllFields`) > -1 &&
-        !opts.data) {
-        return { Id: '1' };
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/team-a/_api/SitePages/Pages(6)/SavePageAsTemplate`) {
+        return { Id: 2, BannerImageUrl: 'url', CanvasContent1: 'content1', LayoutWebpartsContent: 'content' };
       }
 
-      if ((opts.url as string).indexOf(`/_api/SitePages/Pages(6)/SavePageAsTemplate`) > -1) {
-        return { Id: '2', BannerImageUrl: 'url', CanvasContent1: 'content1', LayoutWebpartsContent: 'content' };
-      }
-
-      if ((opts.url as string).indexOf(`/_api/SitePages/Pages(2)/SavePage`) > -1) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/team-a/_api/SitePages/Pages(2)/SavePageAsDraft`) {
         return;
       }
 
-      if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/checkoutpage`) > -1) {
-        return {};
+      if (opts.url === `https://contoso.sharepoint.com/sites/team-a/_api/SitePages/Pages(2)/SavePage`) {
+        return;
       }
 
-      throw 'Invalid request';
+      if (opts.url === `https://contoso.sharepoint.com/sites/team-a/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/checkoutpage`) {
+        return {
+          Id: 6
+        };
+      }
+
+      throw 'Invalid request: ' + opts.url;
     });
 
     await command.action(logger, { options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', description: "template", promoteAs: 'Template' } } as any);
     assert(loggerLogSpy.notCalled);
+    assert.strictEqual(postStub.callCount, 4);
+  });
+
+  it('correctly marks the page as retired', async () => {
+    sinonUtil.restore([request.post]);
+
+    const systemUpdateItemStub = sinon.stub(spo, 'systemUpdateListItem').callsFake(async (requestUrl: string, listItemId: number) => {
+      if (requestUrl === `https://contoso.sharepoint.com/sites/team-a/_api/web/GetList('${formatting.encodeQueryParameter('/sites/team-a/sitepages')}')` && listItemId === 6) {
+        return {} as ListItemInstance;
+      }
+
+      throw 'Invalid systemUpdateListItem call.';
+    });
+
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/team-a/_api/web/GetFileByServerRelativePath(DecodedUrl='/sites/team-a/sitepages/page.aspx')/CheckIn(comment=@a1,checkintype=@a2)?@a1=''&@a2=1`) {
+        return;
+      }
+
+      if (opts.url === "https://contoso.sharepoint.com/sites/team-a/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/checkoutpage") {
+        return {
+          Title: "article",
+          Id: 6,
+          TopicHeader: "TopicHeader",
+          AuthorByline: "AuthorByline",
+          Description: "Description",
+          BannerImageUrl: {
+            Description: '/_layouts/15/images/sitepagethumbnail.png',
+            Url: `https://contoso.sharepoint.com/_layouts/15/images/sitepagethumbnail.png`
+          },
+          CanvasContent1: "{}",
+          LayoutWebpartsContent: "{}"
+        };
+      }
+
+      throw 'Invalid request: ' + opts.url;
+    });
+
+    await command.action(logger, { options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', isRetired: true, publish: true } });
+    assert.deepStrictEqual(systemUpdateItemStub.lastCall.args[4], { _SPIsRetired: true });
+    assert(postStub.calledTwice);
   });
 
   it('updates page layout to Home and promotes it as HomePage (debug)', async () => {
