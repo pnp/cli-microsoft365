@@ -151,6 +151,9 @@ describe('Auth', () => {
 
   after(() => {
     auth.connection.deactivate();
+    sinon.restore();
+
+    (auth as any)._allConnections = [];
   });
 
   it('returns existing access token if still valid', async () => {
@@ -1978,5 +1981,50 @@ describe('Auth', () => {
     const connections = await auth.getAllConnections();
     assert(stub.called);
     assert.strictEqual(connections.length, 0);
+  });
+
+  it(`fails with error if the newName is already in use`, async () => {
+    const connections = [
+      {
+        authType: AuthType.DeviceCode,
+        active: true,
+        name: 'Contoso',
+        identityName: 'alexw@contoso.com',
+        identityId: '028de82d-7fd9-476e-a9fd-be9714280ff3',
+        identityTenantId: 'db308122-52f3-4241-af92-1734aa6e2e50',
+        appId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
+        tenant: 'common',
+        cloudType: CloudType.Public,
+        certificateType: CertificateType.Unknown,
+        accessTokens: {
+          'https://graph.microsoft.com': {
+            expiresOn: '2024-01-22T20:22:54.814Z',
+            accessToken: 'abc'
+          }
+        }
+      },
+      {
+        authType: AuthType.Secret,
+        active: true,
+        name: 'Fabrikam',
+        identityName: 'Fabrikam Application',
+        identityId: 'acd6df42-10a9-4315-8928-53334f1c9d01',
+        identityTenantId: 'db308122-52f3-4241-af92-1734aa6e2e50',
+        appId: '39446e2e-5081-4887-980c-f285919fccca',
+        tenant: 'db308122-52f3-4241-af92-1734aa6e2e50',
+        cloudType: CloudType.Public,
+        certificateType: CertificateType.Unknown,
+        accessTokens: {
+          'https://graph.microsoft.com': {
+            expiresOn: (new Date()).toISOString(),
+            accessToken: 'abc'
+          }
+        }
+      }
+    ];
+    (auth as any)._allConnections = connections;
+
+    await assert.rejects(auth.updateConnection(connections[0] as any, 'Fabrikam'),
+      new CommandError(`The connection name 'Fabrikam' is already in use.`));
   });
 });

@@ -1,16 +1,25 @@
 import { Logger } from '../../../cli/Logger.js';
 import auth from '../../../Auth.js';
 import commands from '../commands.js';
-import Command, { CommandError } from '../../../Command.js';
-import GlobalOptions from '../../../GlobalOptions.js';
+import Command, { CommandError, globalOptionsZod } from '../../../Command.js';
+import z from 'zod';
+
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  name: z.string().alias('n')
+    .refine(async (name) => (await auth.getAllConnections()).some(c => c.name === name), {
+      error: e => `Connection with name '${e.input}' does not exist.`
+    }),
+  newName: z.string()
+    .refine(async (newName) => !(await auth.getAllConnections()).some(c => c.name === newName), {
+      error: e => `Connection with name '${e.input}' already exists.`
+    })
+});
+
+declare type Options = z.infer<typeof options>;
 
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  name: string;
-  newName: string;
 }
 
 class ConnectionSetCommand extends Command {
@@ -22,39 +31,8 @@ class ConnectionSetCommand extends Command {
     return 'Rename the specified connection';
   }
 
-  constructor() {
-    super();
-
-    this.#initOptions();
-    this.#initValidators();
-    this.#initTypes();
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-n, --name <name>'
-      },
-      {
-        option: '--newName <newName>'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.name === args.options.newName) {
-          return `Choose a name different from the current one`;
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initTypes(): void {
-    this.types.string.push('name', 'newName');
+  public get schema(): z.ZodType {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

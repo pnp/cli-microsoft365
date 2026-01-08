@@ -177,7 +177,7 @@ async function execute(rawArgs: string[]): Promise<void> {
   if (cli.commandToExecute?.command.schema) {
     while (true) {
       const startValidation = process.hrtime.bigint();
-      const result = cli.commandToExecute.command.getSchemaToParse()!.safeParse(cli.optionsFromArgs.options);
+      const result = await cli.commandToExecute.command.getSchemaToParse()!.safeParseAsync(cli.optionsFromArgs.options);
       const endValidation = process.hrtime.bigint();
       timings.validation.push(Number(endValidation - startValidation));
 

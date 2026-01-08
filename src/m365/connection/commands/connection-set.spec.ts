@@ -6,7 +6,7 @@ import { telemetry } from '../../../telemetry.js';
 import { pid } from '../../../utils/pid.js';
 import { session } from '../../../utils/session.js';
 import commands from '../commands.js';
-import command from './connection-set.js';
+import command, { options } from './connection-set.js';
 import { CommandInfo } from '../../../cli/CommandInfo.js';
 import { sinonUtil } from '../../../utils/sinonUtil.js';
 import { CommandError } from '../../../Command.js';
@@ -16,6 +16,7 @@ describe(commands.SET, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'clearConnectionInfo').resolves();
@@ -23,13 +24,15 @@ describe(commands.SET, () => {
     sinon.stub(telemetry, 'trackEvent').resolves();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
+
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
 
     sinon.stub(auth, 'ensureAccessToken').resolves();
 
     auth.connection.active = true;
     auth.connection.authType = AuthType.DeviceCode;
-    auth.connection.name = '028de82d-7fd9-476e-a9fd-be9714280ff3';
+    auth.connection.name = 'Contoso';
     auth.connection.identityName = 'alexw@contoso.com';
     auth.connection.identityId = '028de82d-7fd9-476e-a9fd-be9714280ff3';
     auth.connection.identityTenantId = 'db308122-52f3-4241-af92-1734aa6e2e50';
@@ -40,7 +43,7 @@ describe(commands.SET, () => {
       {
         authType: AuthType.DeviceCode,
         active: true,
-        name: '028de82d-7fd9-476e-a9fd-be9714280ff3',
+        name: 'Contoso',
         identityName: 'alexw@contoso.com',
         identityId: '028de82d-7fd9-476e-a9fd-be9714280ff3',
         identityTenantId: 'db308122-52f3-4241-af92-1734aa6e2e50',
@@ -58,7 +61,7 @@ describe(commands.SET, () => {
       {
         authType: AuthType.Secret,
         active: true,
-        name: 'acd6df42-10a9-4315-8928-53334f1c9d01',
+        name: 'Fabrikam',
         identityName: 'Contoso Application',
         identityId: 'acd6df42-10a9-4315-8928-53334f1c9d01',
         identityTenantId: 'db308122-52f3-4241-af92-1734aa6e2e50',
@@ -90,9 +93,9 @@ describe(commands.SET, () => {
       }
     };
 
-    auth.connection.name = '028de82d-7fd9-476e-a9fd-be9714280ff3';
-    (auth as any)._allConnections[0].name = '028de82d-7fd9-476e-a9fd-be9714280ff3';
-    (auth as any)._allConnections[1].name = 'acd6df42-10a9-4315-8928-53334f1c9d01';
+    auth.connection.name = 'Contoso';
+    (auth as any)._allConnections[0].name = 'Contoso';
+    (auth as any)._allConnections[1].name = 'Fabrikam';
   });
 
   afterEach(() => {
@@ -115,30 +118,28 @@ describe(commands.SET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if newName is the same as name', async () => {
-    const actual = await command.validate({ options: { name: 'test', newName: 'test' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if newName is already an existing connection name', async () => {
+    const actual = await commandOptionsSchema.safeParseAsync({ name: 'Contoso', newName: 'Fabrikam' });
+    assert.notStrictEqual(actual.success, true);
+  });
+
+  it('fails validation if name is not an existing connection name', async () => {
+    const actual = await commandOptionsSchema.safeParseAsync({ name: 'NonExistent', newName: 'Contoso Application' });
+    assert.notStrictEqual(actual.success, true);
   });
 
   it('passes validation if name and newName are correctly set', async () => {
-    const actual = await command.validate({ options: { name: 'oldname', newName: 'newname' } }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
-
-  it(`fails with error if the connection cannot be found`, async () => {
-    await assert.rejects(command.action(logger, { options: { name: 'Non-existent connection', newName: 'something new' } }), new CommandError(`The connection 'Non-existent connection' cannot be found.`));
-  });
-
-  it(`fails with error if the newName is already in use`, async () => {
-    await assert.rejects(command.action(logger, { options: { name: 'acd6df42-10a9-4315-8928-53334f1c9d01', newName: '028de82d-7fd9-476e-a9fd-be9714280ff3' } }), new CommandError(`The connection name '028de82d-7fd9-476e-a9fd-be9714280ff3' is already in use`));
+    const actual = await commandOptionsSchema.safeParseAsync({ name: 'Contoso', newName: 'Contoso Application' });
+    assert.strictEqual(actual.success, true);
   });
 
   it('fails with error when restoring auth information leads to error', async () => {
     sinonUtil.restore(auth.restoreAuth);
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.reject('An error has occurred'));
+    sinon.stub(auth, 'restoreAuth').callsFake(async () => { throw 'An error has occurred'; });
 
     try {
-      await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred'));
+      await assert.rejects(command.action(logger, { options: {} } as any),
+        new CommandError('An error has occurred'));
     }
     finally {
       sinonUtil.restore(auth.restoreAuth);
@@ -146,12 +147,12 @@ describe(commands.SET, () => {
   });
 
   it(`Updates the 'Contoso Application' connection`, async () => {
-    await command.action(logger, { options: { name: 'acd6df42-10a9-4315-8928-53334f1c9d01', newName: 'ContosoApplication' } });
+    await command.action(logger, { options: { name: 'Fabrikam', newName: 'ContosoApplication', verbose: false, debug: false } });
     assert.strictEqual((auth as any)._allConnections[1].name, 'ContosoApplication');
   });
 
   it(`Updates the active user connection (debug)`, async () => {
-    await command.action(logger, { options: { name: '028de82d-7fd9-476e-a9fd-be9714280ff3', newName: 'myalias', debug: true } });
+    await command.action(logger, { options: { name: 'Contoso', newName: 'myalias', verbose: false, debug: true } });
     assert.strictEqual(auth.connection.name, 'myalias');
   });
 });

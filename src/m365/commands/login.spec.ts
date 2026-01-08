@@ -2,7 +2,7 @@ import assert from 'assert';
 import Configstore from 'configstore';
 import fs from 'fs';
 import sinon from 'sinon';
-import auth, { AuthType, CloudType } from '../../Auth.js';
+import auth, { AuthType, CertificateType, CloudType } from '../../Auth.js';
 import { CommandArgs, CommandError } from '../../Command.js';
 import { CommandInfo } from '../../cli/CommandInfo.js';
 import { Logger } from '../../cli/Logger.js';
@@ -465,6 +465,44 @@ describe(commands.LOGIN, () => {
       cloud: 'invalid'
     });
     assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation if connection name is already in use', async () => {
+    (auth as any)._allConnections = [
+      {
+        authType: AuthType.DeviceCode,
+        active: true,
+        name: 'Contoso',
+        identityName: 'alexw@contoso.com',
+        identityId: '028de82d-7fd9-476e-a9fd-be9714280ff3',
+        identityTenantId: 'db308122-52f3-4241-af92-1734aa6e2e50',
+        appId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
+        tenant: 'common',
+        cloudType: CloudType.Public,
+        certificateType: CertificateType.Unknown,
+        accessTokens: {
+          'https://graph.microsoft.com': {
+            expiresOn: '2024-01-22T20:22:54.814Z',
+            accessToken: 'abc'
+          }
+        }
+      }
+    ];
+
+    try {
+      const actual = await commandOptionsSchema.safeParseAsync({
+        appId: '00000000-0000-0000-0000-000000000000',
+        tenant: '00000000-0000-0000-0000-000000000000',
+        authType: 'certificate',
+        certificateFile: 'certificate',
+        thumbprint: 'thumbprint',
+        connectionName: 'Contoso'
+      });
+      assert.notStrictEqual(actual.success, true);
+    }
+    finally {
+      (auth as any)._allConnections = [];
+    }
   });
 
   it('passes validation if authType is set to certificate and certificateFile and thumbprint are specified', () => {
