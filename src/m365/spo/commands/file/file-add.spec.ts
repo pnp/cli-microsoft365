@@ -23,6 +23,34 @@ describe(commands.FILE_ADD, () => {
   let loggerLogToStderrSpy: sinon.SinonSpy;
   let ensureFolderStub: sinon.SinonStub;
 
+  let localFolderPath: string;
+
+  const fileResponse = {
+    CheckInComment: '',
+    CheckOutType: 2,
+    ContentTag: '{56B8E3C8-8E8A-4600-B9E1-A63D27391799},2,5',
+    CustomizedPageStatus: 0,
+    ETag: '"{56B8E3C8-8E8A-4600-B9E1-A63D27391799},2"',
+    Exists: true,
+    ExistsAllowThrowForPolicyFailures: true,
+    ExistsWithException: true,
+    IrmEnabled: false,
+    Length: '19555',
+    Level: 1,
+    LinkingUri: 'https://contoso.sharepoint.com/sites/Finance/YearlyReports/Yearly%20report.xlsx?d=w56b8e3c88e8a4600b9e1a63d27391799',
+    LinkingUrl: 'https://contoso.sharepoint.com/sites/Finance/YearlyReports/Yearly report.xlsx?d=w56b8e3c88e8a4600b9e1a63d27391799',
+    MajorVersion: 1,
+    MinorVersion: 0,
+    Name: 'Yearly report.xlsx',
+    ServerRelativeUrl: '/sites/Finance/YearlyReports/Yearly report.xlsx',
+    TimeCreated: '2026-01-07T10:50:38Z',
+    TimeLastModified: '2026-01-07T10:50:38Z',
+    Title: '',
+    UIVersion: 512,
+    UIVersionLabel: '1.0',
+    UniqueId: '56b8e3c8-8e8a-4600-b9e1-a63d27391799'
+  };
+
   const stubPostResponses: any = (
     checkoutResp: any = null,
     fileAddResp: any = null,
@@ -51,8 +79,7 @@ describe(commands.FILE_ADD, () => {
             throw fileAddResp;
           }
           else {
-
-            return { "CheckInComment": "", "CheckOutType": 0, "ContentTag": "{B0BC16BB-C8D9-4A24-BC04-FB52045F8BEF},428,159", "CustomizedPageStatus": 0, "ETag": "\"{B0BC16BB-C8D9-4A24-BC04-FB52045F8BEF},428\"", "Exists": true, "IrmEnabled": false, "Length": "165114", "Level": 255, "LinkingUri": null, "LinkingUrl": "", "MajorVersion": 51, "MinorVersion": 15, "Name": "MS365.jpg", "ServerRelativeUrl": "/sites/VelinDev/Shared Documents/t1/MS365.jpg", "TimeCreated": "2018-10-21T21:46:08Z", "TimeLastModified": "2018-10-25T23:49:52Z", "Title": "title4", "UIVersion": 26127, "UIVersionLabel": "51.15", "UniqueId": "b0bc16bb-c8d9-4a24-bc04-fb52045f8bef" };
+            return fileResponse;
           }
 
         }
@@ -123,7 +150,7 @@ describe(commands.FILE_ADD, () => {
         }
         else if ((opts.url as string).indexOf('/FinishUpload') !== -1) {
 
-          return { "d": { "__metadata": { "id": "https://contoso.sharepoint.com/_api/Web/GetFileByServerRelativePath(decodedurl='/Shared Documents/IMG_9977.zip')", "uri": "https://contoso.sharepoint.com/_api/Web/GetFileByServerRelativePath(decodedurl='/Shared%20Documents/IMG_9977.zip')", "type": "SP.File" }, "Author": { "__deferred": { "uri": "https://contoso.sharepoint.com/_api/Web/GetFileByServerRelativePath(decodedurl='/Shared%20Documents/IMG_9977.zip')/Author" } }, "CheckedOutByUser": { "__deferred": { "uri": "https://contoso.sharepoint.com/_api/Web/GetFileByServerRelativePath(decodedurl='/Shared%20Documents/IMG_9977.zip')/CheckedOutByUser" } }, "EffectiveInformationRightsManagementSettings": { "__deferred": { "uri": "https://contoso.sharepoint.com/_api/Web/GetFileByServerRelativePath(decodedurl='/Shared%20Documents/IMG_9977.zip')/EffectiveInformationRightsManagementSettings" } }, "InformationRightsManagementSettings": { "__deferred": { "uri": "https://contoso.sharepoint.com/_api/Web/GetFileByServerRelativePath(decodedurl='/Shared%20Documents/IMG_9977.zip')/InformationRightsManagementSettings" } }, "ListItemAllFields": { "__deferred": { "uri": "https://contoso.sharepoint.com/_api/Web/GetFileByServerRelativePath(decodedurl='/Shared%20Documents/IMG_9977.zip')/ListItemAllFields" } }, "LockedByUser": { "__deferred": { "uri": "https://contoso.sharepoint.com/_api/Web/GetFileByServerRelativePath(decodedurl='/Shared%20Documents/IMG_9977.zip')/LockedByUser" } }, "ModifiedBy": { "__deferred": { "uri": "https://contoso.sharepoint.com/_api/Web/GetFileByServerRelativePath(decodedurl='/Shared%20Documents/IMG_9977.zip')/ModifiedBy" } }, "Properties": { "__deferred": { "uri": "https://contoso.sharepoint.com/_api/Web/GetFileByServerRelativePath(decodedurl='/Shared%20Documents/IMG_9977.zip')/Properties" } }, "VersionEvents": { "__deferred": { "uri": "https://contoso.sharepoint.com/_api/Web/GetFileByServerRelativePath(decodedurl='/Shared%20Documents/IMG_9977.zip')/VersionEvents" } }, "Versions": { "__deferred": { "uri": "https://contoso.sharepoint.com/_api/Web/GetFileByServerRelativePath(decodedurl='/Shared%20Documents/IMG_9977.zip')/Versions" } }, "CheckInComment": "", "CheckOutType": 2, "ContentTag": "{1CDD37BD-BC3E-41DD-AB6C-89E3E975EEEB},2,2", "CustomizedPageStatus": 0, "ETag": "\"{1CDD37BD-BC3E-41DD-AB6C-89E3E975EEEB},2\"", "Exists": true, "IrmEnabled": false, "Length": "638194380", "Level": 1, "LinkingUri": null, "LinkingUrl": "", "MajorVersion": 1, "MinorVersion": 0, "Name": "IMG_9977.zip", "ServerRelativeUrl": "/Shared Documents/IMG_9977.zip", "TimeCreated": "2020-01-21T12:30:16Z", "TimeLastModified": "2020-01-21T12:32:18Z", "Title": null, "UIVersion": 512, "UIVersionLabel": "1.0", "UniqueId": "1cdd37bd-bc3e-41dd-ab6c-89e3e975eeeb" } };
+          return fileResponse;
         }
       }
       throw 'Invalid request';
@@ -138,6 +165,17 @@ describe(commands.FILE_ADD, () => {
     parentListRespSuccess: any = null
   ) => {
     return sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/Web/GetFileByServerRelativePath(DecodedUrl='%2Fsites%2Fproject-x%2FShared%2520Documents%2Ft1%2FMS365.jpg')?$select=Exists`) {
+        throw {
+          'odata.error': {
+            code: '-2130575338, Microsoft.SharePoint.SPException',
+            message: {
+              lang: 'en-US',
+              value: 'The file /sites/project-x/Shared%20Documents/t1/MS365.jpg does not exist.'
+            }
+          }
+        };
+      }
 
       if ((opts.url as string).indexOf('/_api/web/GetFolderByServerRelativePath(DecodedUrl=') > -1) {
         if ((opts.url as string).indexOf('ParentList') > -1) {
@@ -203,6 +241,8 @@ describe(commands.FILE_ADD, () => {
     sinon.stub(Buffer, 'alloc').returns(Buffer.from('abc'));
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+
+    localFolderPath = process.platform === 'win32' ? 'C:\\Users\\Velin\\Desktop\\' : '/Users/Velin/Desktop/';
   });
 
   beforeEach(() => {
@@ -264,8 +304,7 @@ describe(commands.FILE_ADD, () => {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
-        path: 'C:\\Users\\Velin\\Desktop\\MS365.jpg',
-        debug: true,
+        path: localFolderPath + 'MS365.jpg',
         verbose: true
       }
     });
@@ -282,7 +321,7 @@ describe(commands.FILE_ADD, () => {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
-        path: 'C:\\Users\\Velin\\Desktop\\MS365.jpg',
+        path: localFolderPath + 'MS365.jpg',
         checkOut: true
       }
     }));
@@ -299,9 +338,9 @@ describe(commands.FILE_ADD, () => {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
-        path: 'C:\\Users\\Velin\\Desktop\\MS365.jpg',
+        path: localFolderPath + 'MS365.jpg',
         checkOut: true,
-        debug: true
+        verbose: true
       }
     }), new CommandError(expectedError));
   });
@@ -317,9 +356,9 @@ describe(commands.FILE_ADD, () => {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
-        path: 'C:\\Users\\Velin\\Desktop\\MS365.jpg',
+        path: localFolderPath + 'MS365.jpg',
         checkOut: true,
-        debug: true
+        verbose: true
       }
     }), new CommandError(expectedError));
   });
@@ -335,9 +374,9 @@ describe(commands.FILE_ADD, () => {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
-        path: 'C:\\Users\\Velin\\Desktop\\MS365.jpg',
+        path: localFolderPath + 'MS365.jpg',
         contentType: 'abc',
-        debug: true
+        verbose: true
       }
     }), new CommandError(expectedError));
   });
@@ -353,9 +392,9 @@ describe(commands.FILE_ADD, () => {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
-        path: 'C:\\Users\\Velin\\Desktop\\MS365.jpg',
+        path: localFolderPath + 'MS365.jpg',
         contentType: 'abc',
-        debug: true
+        verbose: true
       }
     }), new CommandError(expectedError));
   });
@@ -370,9 +409,10 @@ describe(commands.FILE_ADD, () => {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: folderServerRelativePath,
-        path: 'C:\\Users\\Velin\\Desktop\\MS365.jpg',
+        path: localFolderPath + 'MS365.jpg',
         contentType: 'abc',
-        debug: true
+        overwrite: false,
+        verbose: true
       }
     }));
     assert.strictEqual(loggerLogToStderrSpy.calledWith(`folder path: ${folderServerRelativePath}...`), true);
@@ -390,7 +430,7 @@ describe(commands.FILE_ADD, () => {
         folder: 'Shared%20Documents/t1',
         path: unsafePath,
         contentType: 'abc',
-        debug: true
+        verbose: true
       }
     }));
     assert.strictEqual(loggerLogToStderrSpy.calledWith(`file name: TEST''FILE.txt...`), true);
@@ -405,9 +445,9 @@ describe(commands.FILE_ADD, () => {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
-        path: 'C:\\Users\\Velin\\Desktop\\MS365.jpg',
+        path: localFolderPath + 'MS365.jpg',
         contentType: 'abc',
-        debug: true
+        verbose: true
       }
     }), new CommandError('Specified content type \'abc\' doesn\'t exist on the target list'));
   });
@@ -423,9 +463,9 @@ describe(commands.FILE_ADD, () => {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
-        path: 'C:\\Users\\Velin\\Desktop\\MS365.jpg',
+        path: localFolderPath + 'MS365.jpg',
         contentType: 'Picture',
-        debug: true
+        verbose: true
       }
     }), new CommandError(expectedError));
   });
@@ -441,9 +481,9 @@ describe(commands.FILE_ADD, () => {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
-        path: 'C:\\Users\\Velin\\Desktop\\MS365.jpg',
+        path: localFolderPath + 'MS365.jpg',
         contentType: 'Picture',
-        debug: true
+        verbose: true
       }
     }), new CommandError(`Update field value error: ${JSON.stringify(expectedResult.value)}`));
   });
@@ -459,10 +499,10 @@ describe(commands.FILE_ADD, () => {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
-        path: 'C:\\Users\\Velin\\Desktop\\MS365.jpg',
+        path: localFolderPath + 'MS365.jpg',
         checkOut: true,
         checkInComment: 'abc',
-        debug: true
+        verbose: true
       }
     }), new CommandError(expectedError));
   });
@@ -478,10 +518,9 @@ describe(commands.FILE_ADD, () => {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
-        path: 'C:\\Users\\Velin\\Desktop\\MS365.jpg',
+        path: localFolderPath + 'MS365.jpg',
         approve: true,
-        verbose: true,
-        debug: true
+        verbose: true
       }
     }), new CommandError(expectedError));
   });
@@ -497,10 +536,9 @@ describe(commands.FILE_ADD, () => {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
-        path: 'C:\\Users\\Velin\\Desktop\\MS365.jpg',
+        path: localFolderPath + 'MS365.jpg',
         publish: true,
-        verbose: true,
-        debug: true
+        verbose: true
       }
     }), new CommandError(expectedError));
   });
@@ -516,7 +554,7 @@ describe(commands.FILE_ADD, () => {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
-        path: 'C:\\Users\\Velin\\Desktop\\MS365.jpg',
+        path: localFolderPath + 'MS365.jpg',
         publish: true
       }
     }), new CommandError('The file cannot be published without approval. Moderation for this list is enabled. Use the --approve option instead of --publish to approve and publish the file'));
@@ -531,13 +569,13 @@ describe(commands.FILE_ADD, () => {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
-        path: 'C:\\Users\\Velin\\Desktop\\MS365.jpg',
+        path: localFolderPath + 'MS365.jpg',
         contentType: 'Picture',
         Title: 'abc',
         publish: true,
-        debug: true,
         verbose: true,
-        output: "text"
+        output: "text",
+        query: 'UniqueId'
       }
     });
     assert.deepEqual(postRequests.secondCall.args[0].data, {
@@ -559,12 +597,57 @@ describe(commands.FILE_ADD, () => {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
-        path: 'C:\\Users\\Velin\\Desktop\\MS365.jpg',
-        debug: true,
+        path: localFolderPath + 'MS365.jpg',
         verbose: true
       }
     });
     assert.notStrictEqual(postRequests.lastCall.args[0].url.indexOf(`/GetFolderByServerRelativePath(DecodedUrl='%2Fsites%2Fproject-x%2FShared%2520Documents%2Ft1')/Files/Add`), -1);
+  });
+
+  it('should perform single request upload for file up to 250 MB with new name', async () => {
+    stubFs();
+    const postRequests: sinon.SinonStub = stubPostResponses();
+    stubGetResponses();
+
+    sinonUtil.restore([fs.statSync]);
+    sinon.stub(fs, 'statSync').returns({ size: 250 * 1024 * 1024 } as any); // 250 MB
+
+    await command.action(logger, {
+      options: {
+        webUrl: 'https://contoso.sharepoint.com/sites/project-x',
+        folder: 'Shared%20Documents/t1',
+        path: localFolderPath + 'Icon.jpg',
+        fileName: 'MS365.jpg',
+        verbose: true
+      }
+    });
+    assert.notStrictEqual(postRequests.lastCall.args[0].url.indexOf(`/GetFolderByServerRelativePath(DecodedUrl='%2Fsites%2Fproject-x%2FShared%2520Documents%2Ft1')/Files/Add`), -1);
+  });
+
+  it('throws error when not overwriting and file exists', async () => {
+    stubFs();
+    stubPostResponses();
+
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/Web/GetFileByServerRelativePath(DecodedUrl='%2Fsites%2Fproject-x%2FShared%2520Documents%2Ft1%2FMS365.jpg')?$select=Exists`) {
+        return { Exists: true };
+      }
+
+      throw 'Invalid request: ' + opts.url;
+    });
+
+    sinonUtil.restore([fs.statSync]);
+    sinon.stub(fs, 'statSync').returns({ size: 250 * 1024 * 1024 } as any); // 250 MB
+
+    await assert.rejects(command.action(logger, {
+      options: {
+        webUrl: 'https://contoso.sharepoint.com/sites/project-x',
+        folder: 'Shared%20Documents/t1',
+        path: localFolderPath + 'MS365.jpg',
+        overwrite: false,
+        verbose: true
+      }
+    }), new CommandError("File 'MS365.jpg' already exists in folder '/sites/project-x/Shared%20Documents/t1'. To overwrite the file, use the --overwrite option."));
   });
 
   it('should perform chunk upload on files over 250 MB (debug)', async () => {
@@ -579,8 +662,7 @@ describe(commands.FILE_ADD, () => {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
-        path: 'C:\\Users\\Velin\\Desktop\\MS365.jpg',
-        debug: true,
+        path: localFolderPath + 'MS365.jpg',
         verbose: true
       }
     });
@@ -620,8 +702,7 @@ describe(commands.FILE_ADD, () => {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
-        path: 'C:\\Users\\Velin\\Desktop\\MS365.jpg',
-        debug: true,
+        path: localFolderPath + 'MS365.jpg',
         verbose: true
       }
     } as any), new CommandError('123'));
@@ -639,8 +720,7 @@ describe(commands.FILE_ADD, () => {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
-        path: 'C:\\Users\\Velin\\Desktop\\MS365.jpg',
-        debug: true,
+        path: localFolderPath + 'MS365.jpg',
         verbose: true
       }
     } as any), new CommandError('openSync error'));
@@ -660,8 +740,7 @@ describe(commands.FILE_ADD, () => {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
-        path: 'C:\\Users\\Velin\\Desktop\\MS365.jpg',
-        debug: true,
+        path: localFolderPath + 'MS365.jpg',
         verbose: true
       }
     } as any), new CommandError('readSync error'));
@@ -676,13 +755,14 @@ describe(commands.FILE_ADD, () => {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
-        path: 'C:\\Users\\Velin\\Desktop\\MS365.jpg',
+        path: localFolderPath + 'MS365.jpg',
         contentType: 'Picture',
         Title: 'abc',
         publish: true
       }
     });
-    assert.strictEqual(loggerLogSpy.notCalled, true);
+
+    assert(loggerLogSpy.calledOnceWith(fileResponse));
   });
 
   it('sets field with the same name as a command option but different casing', async () => {
@@ -724,7 +804,7 @@ describe(commands.FILE_ADD, () => {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
-        path: 'C:\\Users\\Velin\\Desktop\\MS365.jpg',
+        path: localFolderPath + 'MS365.jpg',
         contentType: 'Picture',
         Title: 'abc',
         Folder: 'Folder',
@@ -742,11 +822,12 @@ describe(commands.FILE_ADD, () => {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
-        path: 'C:\\Users\\Velin\\Desktop\\MS365.jpg',
+        path: localFolderPath + 'MS365.jpg',
         approve: true
       }
     });
-    assert.strictEqual(loggerLogSpy.notCalled, true);
+
+    assert(loggerLogSpy.calledOnceWith(fileResponse));
   });
 
   it('should succeed when with checkout option', async () => {
@@ -758,11 +839,13 @@ describe(commands.FILE_ADD, () => {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
-        path: 'C:\\Users\\Velin\\Desktop\\MS365.jpg',
-        checkOut: true
+        path: localFolderPath + 'MS365.jpg',
+        checkOut: true,
+        overwrite: false
       }
     });
-    assert.strictEqual(loggerLogSpy.notCalled, true);
+
+    assert(loggerLogSpy.calledOnceWith(fileResponse));
   });
 
   it('should error if cannot rollback checkout (verbose)', async () => {
@@ -777,9 +860,8 @@ describe(commands.FILE_ADD, () => {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
-        path: 'C:\\Users\\Velin\\Desktop\\MS365.jpg',
+        path: localFolderPath + 'MS365.jpg',
         checkOut: true,
-        debug: true,
         verbose: true
       }
     }), new CommandError(expectedFileAddError));
@@ -797,7 +879,7 @@ describe(commands.FILE_ADD, () => {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
-        path: 'C:\\Users\\Velin\\Desktop\\MS365.jpg',
+        path: localFolderPath + 'MS365.jpg',
         checkOut: true
       }
     }), new CommandError(expectedFileAddError));

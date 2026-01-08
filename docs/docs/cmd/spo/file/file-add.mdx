@@ -1,4 +1,6 @@
 import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 # spo file add
 
@@ -28,6 +30,12 @@ m365 spo file add [options]
 `--checkOut [checkOut]`
 : If versioning is enabled, this will check out the file first if it exists, upload the file, then check it in again.
 
+`--overwrite [overwrite]`
+: Overwrite the file if it already exists in the target folder. Possible values: `true`, `false`. Default is `true`.
+
+`--fileName [fileName]`
+: The name of the file in SharePoint after upload. If not specified, the name of the uploaded file will be used.
+
 `--checkInComment [checkInComment]`
 : Comment to set when checking the file in.
 
@@ -50,6 +58,25 @@ m365 spo file add [options]
 
 This command allows using unknown properties. Each property corresponds to the list item field that should be set when uploading the file.
 
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource   | Permissions    |
+  |------------|----------------|
+  | SharePoint | AllSites.Write |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource   | Permissions         |
+  |------------|---------------------|
+  | SharePoint | Sites.ReadWrite.All |
+
+  </TabItem>
+</Tabs>
+
 ## Examples
 
 Adds the specified file to the specified site in the specified folder.
@@ -68,6 +95,12 @@ Adds the specified file to the specified site in the specified folder specifying
 
 ```sh
 m365 spo file add --webUrl https://contoso.sharepoint.com/sites/project-x --folder '/sites/project-x/Shared Documents' --path 'C:\MS365.jpg'
+```
+
+Uploads a file to SharePoint with a different name.
+
+```sh
+m365 spo file add --webUrl https://contoso.sharepoint.com/sites/project-x --folder 'Shared Documents' --path 'C:\MS365.jpg' --fileName 'MS365-New.jpg'
 ```
 
 Adds the specified file to the specified site in the specified folder with specified content type.
@@ -156,7 +189,113 @@ m365 spo file add --webUrl https://contoso.sharepoint.com/sites/project-x --fold
 
 ## Response
 
-The command won't return a response on success.
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  {
+    "CheckInComment": "",
+    "CheckOutType": 2,
+    "ContentTag": "{56B8E3C8-8E8A-4600-B9E1-A63D27391799},2,5",
+    "CustomizedPageStatus": 0,
+    "ETag": "\"{56B8E3C8-8E8A-4600-B9E1-A63D27391799},2\"",
+    "Exists": true,
+    "ExistsAllowThrowForPolicyFailures": true,
+    "ExistsWithException": true,
+    "IrmEnabled": false,
+    "Length": "19555",
+    "Level": 1,
+    "LinkingUri": "https://contoso.sharepoint.com/sites/Finance/YearlyReports/Yearly%20report.xlsx?d=w56b8e3c88e8a4600b9e1a63d27391799",
+    "LinkingUrl": "https://contoso.sharepoint.com/sites/Finance/YearlyReports/Yearly report.xlsx?d=w56b8e3c88e8a4600b9e1a63d27391799",
+    "MajorVersion": 1,
+    "MinorVersion": 0,
+    "Name": "Yearly report.xlsx",
+    "ServerRelativeUrl": "/sites/Finance/YearlyReports/Yearly report.xlsx",
+    "TimeCreated": "2026-01-07T10:50:38Z",
+    "TimeLastModified": "2026-01-07T10:50:38Z",
+    "Title": "",
+    "UIVersion": 512,
+    "UIVersionLabel": "1.0",
+    "UniqueId": "56b8e3c8-8e8a-4600-b9e1-a63d27391799"
+  }
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  CheckInComment                   :
+  CheckOutType                     : 2
+  ContentTag                       : {56B8E3C8-8E8A-4600-B9E1-A63D27391799},2,5
+  CustomizedPageStatus             : 0
+  ETag                             : "{56B8E3C8-8E8A-4600-B9E1-A63D27391799},2"
+  Exists                           : true
+  ExistsAllowThrowForPolicyFailures: true
+  ExistsWithException              : true
+  IrmEnabled                       : false
+  Length                           : 19555
+  Level                            : 1
+  LinkingUri                       : https://contoso.sharepoint.com/sites/Finance/YearlyReports/Yearly%20report.xlsx?d=w56b8e3c88e8a4600b9e1a63d27391799
+  LinkingUrl                       : https://contoso.sharepoint.com/sites/Finance/YearlyReports/Yearly report.xlsx?d=w56b8e3c88e8a4600b9e1a63d27391799
+  MajorVersion                     : 2
+  MinorVersion                     : 0
+  Name                             : Yearly report.xlsx
+  ServerRelativeUrl                : /sites/Finance/YearlyReports/Yearly report.xlsx
+  TimeCreated                      : 2026-01-07T10:50:38Z
+  TimeLastModified                 : 2026-01-07T10:50:38Z
+  Title                            :
+  UIVersion                        : 512
+  UIVersionLabel                   : 1.0
+  UniqueId                         : 56b8e3c8-8e8a-4600-b9e1-a63d27391799
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  CheckInComment,CheckOutType,ContentTag,CustomizedPageStatus,ETag,Exists,ExistsAllowThrowForPolicyFailures,ExistsWithException,IrmEnabled,Length,Level,LinkingUri,LinkingUrl,MajorVersion,MinorVersion,Name,ServerRelativeUrl,TimeCreated,TimeLastModified,Title,UIVersion,UIVersionLabel,UniqueId
+  ,2,"{56B8E3C8-8E8A-4600-B9E1-A63D27391799},2,5",0,"""{56B8E3C8-8E8A-4600-B9E1-A63D27391799},2""",1,1,1,0,19555,1,https://contoso.sharepoint.com/sites/Finance/YearlyReports/Yearly%20report.xlsx?d=w56b8e3c88e8a4600b9e1a63d27391799,https://contoso.sharepoint.com/sites/Finance/YearlyReports/Yearly report.xlsx?d=w56b8e3c88e8a4600b9e1a63d27391799,3,0,Yearly report.xlsx,/sites/Finance/YearlyReports/Yearly report.xlsx,2026-01-07T10:50:38Z,2026-01-07T10:50:38Z,,512,1.0,56b8e3c8-8e8a-4600-b9e1-a63d27391799
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # spo file add --webUrl "https://contoso.sharepoint.com/sites/Finance" --folder "/YearlyReports" --path "C:\Yearly report.xlsx"
+
+  Date: 07/01/2026
+
+  ## 56b8e3c8-8e8a-4600-b9e1-a63d27391799
+
+  Property | Value
+  ---------|-------
+  CheckInComment |
+  CheckOutType | 2
+  ContentTag | {56B8E3C8-8E8A-4600-B9E1-A63D27391799},2,5
+  CustomizedPageStatus | 0
+  ETag | "{56B8E3C8-8E8A-4600-B9E1-A63D27391799},2"
+  Exists | true
+  ExistsAllowThrowForPolicyFailures | true
+  ExistsWithException | true
+  IrmEnabled | false
+  Length | 19555
+  Level | 1
+  LinkingUri | https://contoso.sharepoint.com/sites/Finance/YearlyReports/Yearly%20report.xlsx?d=w56b8e3c88e8a4600b9e1a63d27391799
+  LinkingUrl | https://contoso.sharepoint.com/sites/Finance/YearlyReports/Yearly report.xlsx?d=w56b8e3c88e8a4600b9e1a63d27391799
+  MajorVersion | 4
+  MinorVersion | 0
+  Name | Yearly report.xlsx
+  ServerRelativeUrl | /sites/Finance/YearlyReports/Yearly report.xlsx
+  TimeCreated | 2026-01-07T10:50:38Z
+  TimeLastModified | 2026-01-07T10:50:38Z
+  Title |
+  UIVersion | 512
+  UIVersionLabel | 1.0
+  UniqueId | 56b8e3c8-8e8a-4600-b9e1-a63d27391799
+  ```
+
+  </TabItem>
+</Tabs>
 
 ## More information
 

@@ -27,6 +27,8 @@ interface Options extends GlobalOptions {
   approveComment?: string;
   publish?: boolean;
   publishComment?: string;
+  overwrite?: boolean;
+  fileName?: string;
 }
 
 interface FieldValue {
@@ -93,7 +95,9 @@ class SpoFileAddCommand extends SpoCommand {
         approve: !!args.options.approve,
         approveComment: typeof args.options.approveComment !== 'undefined',
         publish: !!args.options.publish,
-        publishComment: typeof args.options.publishComment !== 'undefined'
+        publishComment: typeof args.options.publishComment !== 'undefined',
+        overwrite: !!args.options.overwrite,
+        fileName: typeof args.options.fileName !== 'undefined'
       });
     });
   }
@@ -129,6 +133,13 @@ class SpoFileAddCommand extends SpoCommand {
       },
       {
         option: '--publishComment [publishComment]'
+      },
+      {
+        option: '--overwrite [overwrite]',
+        autocomplete: ['true', 'false']
+      },
+      {
+        option: '--fileName [fileName]'
       }
     );
   }
@@ -159,14 +170,14 @@ class SpoFileAddCommand extends SpoCommand {
   }
 
   #initTypes(): void {
-    this.types.string.push('webUrl', 'folder', 'path', 'contentType', 'checkInComment', 'approveComment', 'publishComment');
-    this.types.boolean.push('checkOut', 'approve', 'publish');
+    this.types.string.push('webUrl', 'folder', 'path', 'contentType', 'checkInComment', 'approveComment', 'publishComment', 'fileName');
+    this.types.boolean.push('checkOut', 'approve', 'publish', 'overwrite');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const folderPath: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.folder);
     const fullPath: string = path.resolve(args.options.path);
-    const fileName: string = fsUtil.getSafeFileName(path.basename(fullPath));
+    const fileName: string = fsUtil.getSafeFileName(args.options.fileName ?? path.basename(fullPath));
 
     let isCheckedOut: boolean = false;
     let listSettings: ListSettings;
@@ -176,7 +187,35 @@ class SpoFileAddCommand extends SpoCommand {
       await logger.logToStderr(`folder path: ${folderPath}...`);
     }
 
+    if (args.options.overwrite === undefined) {
+      await this.warn(logger, 'In the next major version, the --overwrite option will default to false. To avoid this warning, please set the --overwrite option explicitly to true or false.');
+    }
+
     try {
+      if (args.options.overwrite === false) {
+        try {
+          const requestOptions: CliRequestOptions = {
+            url: `${args.options.webUrl}/_api/Web/GetFileByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(folderPath + '/' + fileName)}')?$select=Exists`,
+            headers: {
+              accept: 'application/json;odata=nometadata'
+            },
+            responseType: 'json'
+          };
+          await request.get<void>(requestOptions);
+
+          throw `File '${fileName}' already exists in folder '${folderPath}'. To overwrite the file, use the --overwrite option.`;
+        }
+        catch (err: any) {
+          if (typeof err === 'string') {
+            throw err;
+          }
+
+          if (this.verbose) {
+            await logger.logToStderr(`File '${fileName}' does not exist in folder '${folderPath}'. Proceeding with upload.`);
+          }
+        }
+      }
+
       try {
         if (this.verbose) {
           await logger.logToStderr('Check if the specified folder exists.');
@@ -213,6 +252,7 @@ class SpoFileAddCommand extends SpoCommand {
         await logger.logToStderr(`File size is ${fileSize} bytes`);
       }
 
+      let fileUploadResult: any;
       // only up to 250 MB are allowed in a single request
       if (fileSize > this.fileChunkingThreshold) {
         const fileChunkCount: number = Math.ceil(fileSize / this.fileChunkSize);
@@ -244,7 +284,7 @@ class SpoFileAddCommand extends SpoCommand {
         };
 
         try {
-          await this.uploadFileChunks(fileUploadInfo, logger);
+          fileUploadResult = await this.uploadFileChunks(fileUploadInfo, logger);
 
           if (this.verbose) {
             await logger.logToStderr(`Finished uploading ${fileUploadInfo.Position} bytes in ${fileChunkCount} chunks`);
@@ -268,7 +308,7 @@ class SpoFileAddCommand extends SpoCommand {
             throw err;
           }
           catch (err: any) {
-            if (this.debug) {
+            if (this.verbose) {
               await logger.logToStderr(`Failed to cancel upload session: ${err}`);
             }
             throw err;
@@ -287,10 +327,11 @@ class SpoFileAddCommand extends SpoCommand {
             accept: 'application/json;odata=nometadata',
             'content-length': bodyLength
           },
-          maxBodyLength: this.fileChunkingThreshold
+          maxBodyLength: this.fileChunkingThreshold,
+          responseType: 'json'
         };
 
-        await request.post(requestOptions);
+        fileUploadResult = await request.post<any>(requestOptions);
       }
 
       if (args.options.contentType || args.options.publish || args.options.approve) {
@@ -360,6 +401,8 @@ class SpoFileAddCommand extends SpoCommand {
 
         await request.post(requestOptions);
       }
+
+      await logger.log(fileUploadResult);
     }
     catch (err: any) {
       if (isCheckedOut) {
@@ -435,7 +478,7 @@ class SpoFileAddCommand extends SpoCommand {
     return request.post<void>(requestOptionsCheckOut);
   }
 
-  private async uploadFileChunks(info: FileUploadInfo, logger: any): Promise<void> {
+  private async uploadFileChunks(info: FileUploadInfo, logger: Logger): Promise<any> {
     let fd: number = 0;
     try {
       fd = fs.openSync(info.FilePath, 'r');
@@ -459,17 +502,18 @@ class SpoFileAddCommand extends SpoCommand {
           accept: 'application/json;odata=nometadata',
           'content-length': readCount
         },
-        maxBodyLength: this.fileChunkingThreshold
+        maxBodyLength: this.fileChunkingThreshold,
+        responseType: 'json'
       };
 
       try {
-        await request.post<void>(requestOptions);
+        const uploadResponse = await request.post<void>(requestOptions);
         if (this.verbose) {
           await logger.logToStderr(`Uploaded ${info.Position} of ${info.Size} bytes (${Math.round(100 * info.Position / info.Size)}%)`);
         }
 
         if (isLastChunk) {
-          return;
+          return uploadResponse;
         }
         else {
           return this.uploadFileChunks(info, logger);
@@ -588,9 +632,12 @@ class SpoFileAddCommand extends SpoCommand {
       'approveComment',
       'publish',
       'publishComment',
+      'overwrite',
+      'fileName',
       'debug',
       'verbose',
       'output',
+      'query',
       '_',
       'u',
       'p',
