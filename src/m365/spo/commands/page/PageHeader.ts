@@ -19,6 +19,7 @@ interface PageHeaderProperties {
   layoutType: "NoImage" | "FullWidthImage" | "ColorBlock" | "CutInShape";
   showTopicHeader: boolean;
   showPublishDate: boolean;
+  showTimeToRead: boolean;
   textAlignment: "Left" | "Center";
   title: string;
 }

@@ -1,4 +1,6 @@
 import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 # spo page header set
 
@@ -40,11 +42,14 @@ m365 spo page header set [options]
 `--textAlignment [textAlignment]`
 : How to align text in the header. Allowed values `Center`, `Left`. Default `Left`.
 
-`--showTopicHeader`
-: Set, to show the topic header.
+`--showTopicHeader [showTopicHeader]`
+: Show the topic header. Valid values: `true`, `false`. Defaults to `false`.
 
-`--showPublishDate`
-: Set, to show the publishing date.
+`--showPublishDate [showPublishDate]`
+: Show the publishing date. Valid values: `true`, `false`. Defaults to `false`.
+
+`--showTimeToRead [showTimeToRead]`
+: Show the estimated time to read the page. Valid values: `true`, `false`. Defaults to `false`.
 
 `--topicHeader [topicHeader]`
 : Text to show in the topic header, when `showTopicHeader` is set.
@@ -55,9 +60,24 @@ m365 spo page header set [options]
 
 <Global />
 
-## Remarks
+## Permissions
 
-If the specified `name` doesn't refer to an existing modern page, you will get a `File doesn't exists` error.
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource   | Permissions    |
+  |------------|----------------|
+  | SharePoint | AllSites.Write |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource   | Permissions         |
+  |------------|---------------------|
+  | SharePoint | Sites.ReadWrite.All |
+
+  </TabItem>
+</Tabs>
 
 ## Examples
 
@@ -79,10 +99,10 @@ Use the specified image focused on the given coordinates in the page header
 m365 spo page header set --webUrl https://contoso.sharepoint.com/sites/team-a --pageName home.aspx --type Custom --imageUrl /sites/team-a/SiteAssets/hero.jpg --altText 'Sunset over the ocean' --translateX 42.3837520042758 --translateY 56.4285714285714
 ```
 
-Center the page title in the header and show the publishing date
+Center the page title in the header and show the publishing date and time to read
 
 ```sh
-m365 spo page header set --webUrl https://contoso.sharepoint.com/sites/team-a --pageName home.aspx --textAlignment Center --showPublishDate
+m365 spo page header set --webUrl https://contoso.sharepoint.com/sites/team-a --pageName home.aspx --textAlignment Center --showPublishDate true --showTimeToRead true
 ```
 
 ## Response
