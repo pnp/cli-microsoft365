@@ -142,14 +142,17 @@ interface CopyJobObjectInfo {
 // Wrapping this into a settings object so we can alter the values in tests
 const pollingInterval = 3_000;
 
-interface TenantSiteProperties {
+export interface TenantSiteProperties {
   AllowDownloadingNonWebViewableFiles: boolean;
   AllowEditing: boolean;
+  AllowFileArchive: boolean;
   AllowSelfServiceUpgrade: boolean;
+  AllowWebPropertyBagUpdateWhenDenyAddAndCustomizePagesIsEnabled: boolean;
   AnonymousLinkExpirationInDays: number;
   ApplyToExistingDocumentLibraries: boolean;
   ApplyToNewDocumentLibraries: boolean;
   ArchivedBy: string;
+  ArchivedFileDiskUsed: string;
   ArchivedTime: string;
   ArchiveStatus: string;
   AuthContextStrength: any;
@@ -162,7 +165,9 @@ interface TenantSiteProperties {
   BlockDownloadPolicyFileTypeIds: any;
   BlockGuestsAsSiteAdmin: number;
   BonusDiskQuota: string;
+  ClearGroupId: boolean;
   ClearRestrictedAccessControl: boolean;
+  CreatedTime: string;
   CommentsOnSitePagesDisabled: boolean;
   CompatibilityLevel: number;
   ConditionalAccessPolicy: number;
@@ -178,21 +183,26 @@ interface TenantSiteProperties {
   DisableAppViews: number;
   DisableCompanyWideSharingLinks: number;
   DisableFlows: number;
+  DisableSiteBranding: boolean;
   EnableAutoExpirationVersionTrim: boolean;
   ExcludeBlockDownloadPolicySiteOwners: boolean;
   ExcludeBlockDownloadSharePointGroups: any[];
   ExcludedBlockDownloadGroupIds: any[];
   ExpireVersionsAfterDays: number;
   ExternalUserExpirationInDays: number;
+  FileTypesForVersionExpiration: any;
   GroupId: string;
-  GroupOwnerLoginName: string;
+  GroupOwnerLoginName: string | null;
   HasHolds: boolean;
+  HidePeoplePreviewingFiles: boolean;
+  HidePeopleWhoHaveListsOpen: boolean;
   HubSiteId: string;
   IBMode: string;
   IBSegments: any[];
   IBSegmentsToAdd: any;
   IBSegmentsToRemove: any;
   InheritVersionPolicyFromTenant: boolean;
+  IsAuthoritative: boolean;
   IsGroupOwnerSiteAdmin: boolean;
   IsHubSite: boolean;
   IsTeamsChannelConnected: boolean;
@@ -222,6 +232,7 @@ interface TenantSiteProperties {
   ReadOnlyForBlockDownloadPolicy: boolean;
   ReadOnlyForUnmanagedDevices: boolean;
   RelatedGroupId: string;
+  RemoveVersionExpirationFileTypeOverride: any;
   RequestFilesLinkEnabled: boolean;
   RequestFilesLinkExpirationInDays: number;
   RestrictContentOrgWideSearch: boolean;
@@ -229,6 +240,7 @@ interface TenantSiteProperties {
   RestrictedAccessControlGroups: any[];
   RestrictedAccessControlGroupsToAdd: any;
   RestrictedAccessControlGroupsToRemove: any;
+  RestrictedContentDiscoveryforCopilotAndAgents: boolean;
   RestrictedToRegion: number;
   SandboxedCodeActivationCapability: number;
   SensitivityLabel: string;
@@ -244,7 +256,7 @@ interface TenantSiteProperties {
   SiteDefinedSharingCapability: number;
   SiteId: string;
   SocialBarOnSitePagesDisabled: boolean;
-  Status: string;
+  Status: string | null;
   StorageMaximumLevel: string;
   StorageQuotaType: any;
   StorageUsage: string;
@@ -253,10 +265,13 @@ interface TenantSiteProperties {
   Template: string;
   TimeZoneId: number;
   Title: string;
-  TitleTranslations: Array<{ LCID: number; Value: string }>;
+  TitleTranslations: Array<{ LCID: number; Value: string }> | null;
   Url: string;
   UserCodeMaximumLevel: number;
   UserCodeWarningLevel: number;
+  VersionCount: string;
+  VersionPolicyFileTypeOverride: any;
+  VersionSize: string;
   WebsCount: number;
 }
 
