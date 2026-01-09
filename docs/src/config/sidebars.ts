@@ -2374,6 +2374,15 @@ const sidebars: SidebarsConfig = {
           ]
         },
         {
+          brandcenter: [
+            {
+              type: 'doc',
+              label: 'brandcenter settings list',
+              id: 'cmd/spo/brandcenter/brandcenter-settings-list'
+            }
+          ]
+        },
+        {
           cdn: [
             {
               type: 'doc',
