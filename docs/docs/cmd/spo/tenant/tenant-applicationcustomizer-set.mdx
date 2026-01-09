@@ -31,25 +31,28 @@ m365 spo tenant applicationcustomizer set [options]
 `-p, --clientSideComponentProperties [clientSideComponentProperties]`
 : The Client Side Component properties of the Application Customizer.
 
+`--hostProperties [hostProperties]`
+: Set the host properties of the Application Customizer. Set to an empty string to clear the value.
+
 `-w, --webTemplate [webTemplate]`
-: Optionally add a web template (e.g. STS#3, SITEPAGEPUBLISHING#0, etc) as a filter for what kind of sites the application customizer is registered on.
+: Optionally add a web template (e.g. STS#3, SITEPAGEPUBLISHING#0, etc) as a filter for what kind of sites the Application Customizer is registered on.
 ```
 
 <Global />
 
 ## Remarks
 
-Running this command from the Windows Command Shell (cmd.exe) or PowerShell for Windows OS XP, 7, 8, 8.1 without bash installed might require additional formatting for clientSideComponentProperties option that has JSON value because the command shell treats quotes differently. For example, this is how Application Customizer can be updated from the Windows cmd.exe:
+Running this command from the Windows Command Shell (cmd.exe) or PowerShell for Windows OS XP, 7, 8, 8.1 without bash installed might require additional formatting for `clientSideComponentProperties` and `hostProperties` options that have JSON values because the command shell treats quotes differently. For example, this is how Application Customizer can be updated from the Windows cmd.exe:
 
 ```sh
 m365 spo tenant applicationcustomizer set --id 3 --clientSideComponentProperties '{\"someProperty\":\"Some value\"}'
 ```
 
-Note, how the clientSideComponentProperties option (--clientSideComponentProperties) has escaped double quotes `'{\"someProperty\":\"Some value\"}'` compared to execution from bash `'{"someProperty": "Some value"}'`.
+Note, how the `--clientSideComponentProperties` option has escaped double quotes `'{\"someProperty\":\"Some value\"}'` compared to execution from bash `'{"someProperty": "Some value"}'`.
 
 :::warning[Escaping JSON in PowerShell]
     
-When using the `--clientSideComponentProperties` option it's possible to enter a JSON string. In PowerShell 5 to 7.2 [specific escaping rules](./../../../user-guide/using-cli.mdx#escaping-double-quotes-in-powershell) apply due to an issue. Remember that you can also use [file tokens](./../../../user-guide/using-cli.mdx#passing-complex-content-into-cli-options) instead.
+When using the `--clientSideComponentProperties` or `--hostProperties` options it's possible to enter a JSON string. In PowerShell 5 to 7.2 [specific escaping rules](./../../../user-guide/using-cli.mdx#escaping-double-quotes-in-powershell) apply due to an issue. Remember that you can also use [file tokens](./../../../user-guide/using-cli.mdx#passing-complex-content-into-cli-options) instead.
 
 :::
 
