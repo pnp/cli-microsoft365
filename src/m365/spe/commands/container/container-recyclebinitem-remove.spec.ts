@@ -10,9 +10,8 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { cli } from '../../../../cli/cli.js';
 import commands from '../../commands.js';
-import command from './container-recyclebinitem-remove.js';
+import command, { options } from './container-recyclebinitem-remove.js';
 import { spe } from '../../../../utils/spe.js';
-import { z } from 'zod';
 import { CommandError } from '../../../../Command.js';
 
 describe(commands.CONTAINER_RECYCLEBINITEM_REMOVE, () => {
@@ -35,7 +34,7 @@ describe(commands.CONTAINER_RECYCLEBINITEM_REMOVE, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
-  let commandOptionsSchema: z.ZodTypeAny;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -45,7 +44,7 @@ describe(commands.CONTAINER_RECYCLEBINITEM_REMOVE, () => {
 
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
-    commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
