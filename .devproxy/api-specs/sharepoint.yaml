@@ -386,6 +386,54 @@ paths:
       responses:
         200:
           description: OK
+  /_api/web:
+    patch:
+      requestBody:
+        required: true
+        content:
+          application/json:
+            example:
+              RequestAccessEmail: "john.doe@contoso.com"
+      security:
+        - delegated:
+          - AllSites.FullControl
+        - application:
+          - Sites.FullControl.All
+      responses:
+        200:
+          description: OK
+  /_api/web/SetUseAccessRequestDefaultAndUpdate:
+    post:
+      requestBody:
+        required: true
+        content:
+          application/json:
+            example:
+              useAccessRequestDefault: true
+      security:
+        - delegated:
+          - AllSites.FullControl
+        - application:
+          - Sites.FullControl.All
+      responses:
+        200:
+          description: OK
+  /_api/web/SetAccessRequestSiteDescriptionAndUpdate:
+    post:
+      requestBody:
+        required: true
+        content:
+          application/json:
+            example:
+              description: "Motivate why you need access."
+      security:
+        - delegated:
+          - AllSites.FullControl
+        - application:
+          - Sites.FullControl.All
+      responses:
+        200:
+          description: OK
 x-ms-generated-by:
   toolName: Dev Proxy
   toolVersion: 0.25.0
