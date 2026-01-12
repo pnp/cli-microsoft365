@@ -11,12 +11,14 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './site-hubsite-connect.js';
+import command, { options } from './site-hubsite-connect.js';
 
 describe(commands.SITE_HUBSITE_CONNECT, () => {
   let log: string[];
   let logger: Logger;
+  let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -24,7 +26,9 @@ describe(commands.SITE_HUBSITE_CONNECT, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
+    auth.connection.spoUrl = 'https://contoso.sharepoint.com';
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -40,6 +44,7 @@ describe(commands.SITE_HUBSITE_CONNECT, () => {
         log.push(msg);
       }
     };
+    loggerLogSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -51,6 +56,7 @@ describe(commands.SITE_HUBSITE_CONNECT, () => {
   after(() => {
     sinon.restore();
     auth.connection.active = false;
+    auth.connection.spoUrl = undefined;
   });
 
   it('has correct name', () => {
@@ -61,9 +67,18 @@ describe(commands.SITE_HUBSITE_CONNECT, () => {
     assert.notStrictEqual(command.description, null);
   });
 
+  it('outputs no result', async () => {
+    sinon.stub(request, 'post').resolves({
+      "odata.null": true
+    });
+
+    await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/sales', id: '255a50b2-527f-4413-8485-57f4c17a24d1', verbose: true } });
+    assert(loggerLogSpy.notCalled);
+  });
+
   it('connects site to the hub site', async () => {
     const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/site/JoinHubSite('255a50b2-527f-4413-8485-57f4c17a24d1')`) > -1) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/sales/_api/site/JoinHubSite('255a50b2-527f-4413-8485-57f4c17a24d1')`) {
         return {
           "odata.null": true
         };
@@ -73,7 +88,23 @@ describe(commands.SITE_HUBSITE_CONNECT, () => {
     });
 
     await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/sales', id: '255a50b2-527f-4413-8485-57f4c17a24d1', verbose: true } });
-    assert(postStub.called);
+    assert(postStub.calledOnce);
+  });
+
+  it('connects site to the hub site as admin', async () => {
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso-admin.sharepoint.com/_api/SPO.Tenant/ConnectSiteToHubSiteById`) {
+        return {
+          "odata.null": true
+        };
+      }
+
+      throw 'Invalid request: ' + opts.url;
+    });
+
+    await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/sales', id: '255a50b2-527f-4413-8485-57f4c17a24d1', asAdmin: true } });
+    assert(postStub.calledOnce);
+    assert.deepStrictEqual(postStub.lastCall.args[0].data, { siteUrl: 'https://contoso.sharepoint.com/sites/sales', hubSiteId: '255a50b2-527f-4413-8485-57f4c17a24d1' });
   });
 
   it('correctly handles error when the specified id doesn\'t point to a valid hub site', async () => {
@@ -96,17 +127,17 @@ describe(commands.SITE_HUBSITE_CONNECT, () => {
   });
 
   it('fails validation if the specified site collection URL is not a valid SharePoint URL', async () => {
-    const actual = await command.validate({ options: { siteUrl: 'site.com', id: '255a50b2-527f-4413-8485-57f4c17a24d1' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ siteUrl: 'site.com', id: '255a50b2-527f-4413-8485-57f4c17a24d1' });
+    assert.notStrictEqual(actual.success, true);
   });
 
   it('fails validation if the hub site ID is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com/sites/sales', id: 'abc' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ siteUrl: 'https://contoso.sharepoint.com/sites/sales', id: 'abc' });
+    assert.notStrictEqual(actual.success, true);
   });
 
   it('passes validation when all required parameters are valid', async () => {
-    const actual = await command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com/sites/sales', id: '255a50b2-527f-4413-8485-57f4c17a24d1' } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ siteUrl: 'https://contoso.sharepoint.com/sites/sales', id: '255a50b2-527f-4413-8485-57f4c17a24d1' });
+    assert.strictEqual(actual.success, true);
   });
 });

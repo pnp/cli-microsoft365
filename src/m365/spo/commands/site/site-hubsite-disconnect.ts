@@ -1,19 +1,28 @@
 import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
+import { globalOptionsZod } from '../../../../Command.js';
+import { z } from 'zod';
+import { spo } from '../../../../utils/spo.js';
 
 interface CommandArgs {
   options: Options;
 }
 
-interface Options extends GlobalOptions {
-  siteUrl: string;
-  force?: boolean;
-}
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  siteUrl: z.string()
+    .refine(url => validation.isValidSharePointUrl(url) === true, {
+      error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
+    })
+    .alias('u'),
+  asAdmin: z.boolean().optional(),
+  force: z.boolean().alias('f').optional()
+});
+declare type Options = z.infer<typeof options>;
 
 class SpoSiteHubSiteDisconnectCommand extends SpoCommand {
   public get name(): string {
@@ -24,37 +33,8 @@ class SpoSiteHubSiteDisconnectCommand extends SpoCommand {
     return 'Disconnects the specified site collection from its hub site';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        force: args.options.force || false
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-u, --siteUrl <siteUrl>'
-      },
-      {
-        option: '-f, --force'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => validation.isValidSharePointUrl(args.options.siteUrl)
-    );
+  public get schema(): z.ZodTypeAny {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -77,12 +57,23 @@ class SpoSiteHubSiteDisconnectCommand extends SpoCommand {
       }
 
       const requestOptions: CliRequestOptions = {
-        url: `${args.options.siteUrl}/_api/site/JoinHubSite('00000000-0000-0000-0000-000000000000')`,
         headers: {
           accept: 'application/json;odata=nometadata'
         },
         responseType: 'json'
       };
+
+      if (!args.options.asAdmin) {
+        requestOptions.url = `${args.options.siteUrl}/_api/site/JoinHubSite('00000000-0000-0000-0000-000000000000')`;
+      }
+      else {
+        const tenantAdminUrl = await spo.getSpoAdminUrl(logger, this.verbose);
+        requestOptions.url = `${tenantAdminUrl}/_api/SPO.Tenant/ConnectSiteToHubSiteById`;
+        requestOptions.data = {
+          siteUrl: args.options.siteUrl,
+          hubSiteId: '00000000-0000-0000-0000-000000000000'
+        };
+      }
 
       await request.post(requestOptions);
     }
