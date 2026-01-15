@@ -3,17 +3,12 @@ import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
 import commands from '../../commands.js';
 import GraphApplicationCommand from '../../../base/GraphApplicationCommand.js';
-import { validation } from '../../../../utils/validation.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 
-const options = globalOptionsZod
-  .extend({
-    id: z.string()
-      .refine((val) => validation.isValidGuid(val), {
-        message: 'Invalid GUID.'
-      }).optional()
-  })
-  .strict();
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  id: z.uuid()
+});
 declare type Options = z.infer<typeof options>;
 
 interface CommandArgs {
@@ -29,7 +24,7 @@ class TeamsCallRecordGetCommand extends GraphApplicationCommand {
     return 'Gets a specific Teams call';
   }
 
-  public get schema(): z.ZodTypeAny {
+  public get schema(): z.ZodType {
     return options;
   }
 
