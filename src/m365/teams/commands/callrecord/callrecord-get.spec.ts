@@ -8,9 +8,8 @@ import { telemetry } from '../../../../telemetry.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
-import { z } from 'zod';
 import commands from '../../commands.js';
-import command from './callrecord-get.js';
+import command, { options } from './callrecord-get.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 import { CommandError } from '../../../../Command.js';
 import request from '../../../../request.js';
@@ -1192,7 +1191,7 @@ describe(commands.CALLRECORD_GET, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
-  let commandOptionsSchema: z.ZodTypeAny;
+  let commandOptionsSchema: typeof options;
   let assertAccessTokenTypeStub: sinon.SinonStub;
 
   before(() => {
@@ -1203,7 +1202,7 @@ describe(commands.CALLRECORD_GET, () => {
 
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
-    commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
