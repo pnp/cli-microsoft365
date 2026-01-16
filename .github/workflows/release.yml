@@ -7,6 +7,9 @@ on:
     tags:
       - "v*"
 
+env:
+  NODE_VERSION: &node_version 24
+
 jobs:
   build:
     if: github.repository_owner == 'pnp'
@@ -14,10 +17,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - name: Use Node.js 24
+      - name: Use Node.js ${{ env.NODE_VERSION }}
         uses: actions/setup-node@v4
         with:
-          node-version: 24
+          node-version: ${{ env.NODE_VERSION }}
           registry-url: 'https://registry.npmjs.org'
       - name: Cache node modules
         id: cache
@@ -25,7 +28,7 @@ jobs:
         with:
           path: |
             **/node_modules
-          key: node_modules-ubuntu-latest-24-${{ hashFiles('**/npm-shrinkwrap.json') }}
+          key: node_modules-ubuntu-latest-${{ env.NODE_VERSION }}-${{ hashFiles('**/npm-shrinkwrap.json') }}
       - name: Restore dependencies
         if: steps.cache.outputs.cache-hit != 'true'
         run: npm ci
@@ -49,10 +52,10 @@ jobs:
           name: build
       - name: Unpack build artifact
         run: tar -xvf build.tar && rm build.tar
-      - name: Use Node.js 24
+      - name: Use Node.js ${{ env.NODE_VERSION }}
         uses: actions/setup-node@v4
         with:
-          node-version: 24
+          node-version: ${{ env.NODE_VERSION }}
           registry-url: 'https://registry.npmjs.org'
       - name: Cache node modules
         id: cache
@@ -60,7 +63,7 @@ jobs:
         with:
           path: |
             **/node_modules
-          key: node_modules-ubuntu-latest-24-${{ hashFiles('**/npm-shrinkwrap.json') }}
+          key: node_modules-ubuntu-latest-${{ env.NODE_VERSION }}-${{ hashFiles('**/npm-shrinkwrap.json') }}
       - name: Restore dependencies
         if: steps.cache.outputs.cache-hit != 'true'
         run: npm ci
@@ -70,7 +73,7 @@ jobs:
         with:
           path: |
             .eslintcache
-          key: eslintcache-${{ matrix.os }}-${{ hashFiles('npm-shrinkwrap.json', '.eslintrc.cjs') }}
+          key: eslintcache-ubuntu-latest-${{ env.NODE_VERSION }}-${{ hashFiles('npm-shrinkwrap.json', 'eslint.config.mjs') }}
       - name: Test
         run: npm test
         env:
@@ -91,7 +94,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 24
+          node-version: ${{ env.NODE_VERSION }}
 
       - name: Cache node modules
         id: cache
@@ -123,10 +126,10 @@ jobs:
           name: build
       - name: Unpack build artifact
         run: tar -xvf build.tar && rm build.tar
-      - name: Use Node.js 24
+      - name: Use Node.js ${{ env.NODE_VERSION }}
         uses: actions/setup-node@v4
         with:
-          node-version: 24
+          node-version: ${{ env.NODE_VERSION }}
           registry-url: 'https://registry.npmjs.org'
       - name: Cache node modules
         id: cache
@@ -134,7 +137,7 @@ jobs:
         with:
           path: |
             **/node_modules
-          key: node_modules-ubuntu-latest-24-${{ hashFiles('**/npm-shrinkwrap.json') }}
+          key: node_modules-ubuntu-latest-${{ env.NODE_VERSION }}-${{ hashFiles('**/npm-shrinkwrap.json') }}
       - name: Restore dependencies
         if: steps.cache.outputs.cache-hit != 'true'
         run: npm ci
@@ -153,10 +156,10 @@ jobs:
           name: build
       - name: Unpack build artifact
         run: tar -xvf build.tar && rm build.tar
-      - name: Use Node.js 24
+      - name: Use Node.js ${{ env.NODE_VERSION }}
         uses: actions/setup-node@v4
         with:
-          node-version: 24
+          node-version: ${{ env.NODE_VERSION }}
           registry-url: 'https://registry.npmjs.org'
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
