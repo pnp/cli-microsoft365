@@ -133,8 +133,8 @@ describe(commands.BRANDCENTER_SETTINGS_LIST, () => {
     assert.strictEqual(actual.success, false);
   });
 
-  it('successfully lists brand center settings', async () => {
-    const getStub = sinon.stub(request, 'get').callsFake(async (opts: any) => {
+  it('makes correct GET request to retrieve brand center settings', async () => {
+    const getStub = sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://contoso.sharepoint.com/_api/Brandcenter/Configuration`) {
         return successResponse;
       }
@@ -143,12 +143,11 @@ describe(commands.BRANDCENTER_SETTINGS_LIST, () => {
     });
 
     await command.action(logger, { options: {} });
-    assert(getStub.calledOnce);
-    assert(loggerLogSpy.calledWith(successResponse));
+    assert.strictEqual(getStub.firstCall.args[0].url, 'https://contoso.sharepoint.com/_api/Brandcenter/Configuration');
   });
 
-  it('successfully lists brand center settings with verbose output', async () => {
-    const getStub = sinon.stub(request, 'get').callsFake(async (opts: any) => {
+  it('successfully logs brand center settings', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://contoso.sharepoint.com/_api/Brandcenter/Configuration`) {
         return successResponse;
       }
@@ -157,20 +156,18 @@ describe(commands.BRANDCENTER_SETTINGS_LIST, () => {
     });
 
     await command.action(logger, { options: { verbose: true } });
-    assert(getStub.calledOnce);
     assert(loggerLogSpy.calledWith(successResponse));
   });
 
   it('correctly handles error when retrieving settings', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/_api/Brandcenter/Configuration') {
-        throw 'An unknown error has occurred';
+    sinon.stub(request, 'get').rejects({
+      "error": {
+        "code": "accessDenied",
+        "message": "Access denied"
       }
-
-      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, { options: {} }),
-      new CommandError(`An unknown error has occurred`));
+      new CommandError('Access denied'));
   });
 });

@@ -8,7 +8,7 @@ import { z } from 'zod';
 
 const options = globalOptionsZod.strict();
 
-class SpoBrandcenterSettingsListCommand extends SpoCommand {
+class SpoBrandCenterSettingsListCommand extends SpoCommand {
   public get name(): string {
     return commands.BRANDCENTER_SETTINGS_LIST;
   }
@@ -27,7 +27,7 @@ class SpoBrandcenterSettingsListCommand extends SpoCommand {
     }
 
     try {
-      const spoUrl: string = await spo.getSpoUrl(logger, this.debug);
+      const spoUrl: string = await spo.getSpoUrl(logger, this.verbose);
 
       const requestOptions: CliRequestOptions = {
         url: `${spoUrl}/_api/Brandcenter/Configuration`,
@@ -44,7 +44,6 @@ class SpoBrandcenterSettingsListCommand extends SpoCommand {
       this.handleRejectedODataJsonPromise(err);
     }
   }
-
 }
 
-export default new SpoBrandcenterSettingsListCommand();
+export default new SpoBrandCenterSettingsListCommand();
