@@ -72,6 +72,13 @@
       }
     }
   }
+
+  // Modify announcement bar close button color
+  .theme-announcement-bar {
+    button.close {
+      color: #f5f5f5;
+    }
+  }
 }
 
 //* Definition list
