@@ -1,22 +1,27 @@
 import { Group } from '@microsoft/microsoft-graph-types';
+import { z } from 'zod';
 import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
-import { validation } from '../../../../utils/validation.js';
+import { zod } from '../../../../utils/zod.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 
+const options = globalOptionsZod
+  .extend({
+    id: zod.alias('i', z.string().uuid().optional()),
+    displayName: zod.alias('d', z.string().optional()),
+    mailNickname: zod.alias('m', z.string().optional()),
+    force: zod.alias('f', z.boolean().optional())
+  })
+  .strict();
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  id?: string;
-  displayName?: string;
-  mailNickname?: string;
-  force: boolean;
 }
 
 class EntraM365GroupRecycleBinItemRemoveCommand extends GraphCommand {
@@ -28,57 +33,15 @@ class EntraM365GroupRecycleBinItemRemoveCommand extends GraphCommand {
     return 'Permanently deletes a Microsoft 365 Group from the recycle bin in the current tenant';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
+  public get schema(): z.ZodTypeAny | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        id: typeof args.options.id !== 'undefined',
-        displayName: typeof args.options.displayName !== 'undefined',
-        mailNickname: typeof args.options.mailNickname !== 'undefined',
-        force: !!args.options.force
+  public getRefinedSchema(schema: typeof options): z.ZodEffects<any> | undefined {
+    return schema
+      .refine(options => [options.id, options.displayName, options.mailNickname].filter(Boolean).length === 1, {
+        message: 'Specify either id, displayName, or mailNickname'
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-i, --id [id]'
-      },
-      {
-        option: '-d, --displayName [displayName]'
-      },
-      {
-        option: '-m, --mailNickname [mailNickname]'
-      },
-      {
-        option: '-f, --force'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.id && !validation.isValidGuid(args.options.id)) {
-          return `${args.options.id} is not a valid GUID`;
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push({ options: ['id', 'displayName', 'mailNickname'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
