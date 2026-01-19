@@ -3,8 +3,11 @@ import { Project } from '../../project-model/index.js';
 import { Finding } from '../../report-model/index.js';
 
 export class FN010010_YORC_sdkVersions_teams_js extends JsonRule {
-  constructor(private version: string) {
+  private version: string;
+
+  constructor(options: { version: string }) {
     super();
+    this.version = options.version;
   }
 
   get id(): string {

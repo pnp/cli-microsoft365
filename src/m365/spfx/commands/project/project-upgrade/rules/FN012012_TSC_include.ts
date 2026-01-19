@@ -3,8 +3,11 @@ import { Project, TsConfigJson } from '../../project-model/index.js';
 import { Finding } from '../../report-model/index.js';
 
 export class FN012012_TSC_include extends JsonRule {
-  constructor(private include: string[]) {
+  private include: string[];
+
+  constructor(options: { include: string[] }) {
     super();
+    this.include = options.include;
   }
 
   get id(): string {

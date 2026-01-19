@@ -9,7 +9,7 @@ describe('FN002019_DEVDEP_microsoft_rush_stack_compiler', () => {
 
   beforeEach(() => {
     findings = [];
-    rule = new FN002019_DEVDEP_microsoft_rush_stack_compiler(['3.9']);
+    rule = new FN002019_DEVDEP_microsoft_rush_stack_compiler({ supportedVersions: ['3.9'] });
   });
 
   it('returns empty description by default', () => {

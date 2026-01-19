@@ -3,9 +3,22 @@ import { JsonRule } from '../../JsonRule.js';
 import { Project } from '../../project-model/index.js';
 import { Finding } from '../../report-model/index.js';
 
+export interface DependencyRuleOptions {
+  packageName: string;
+  supportedRange: string;
+  isDevDep?: boolean;
+}
+
 export abstract class DependencyRule extends JsonRule {
-  constructor(protected packageName: string, protected supportedRange: string, protected isDevDep: boolean = false) {
+  protected packageName: string;
+  protected supportedRange: string;
+  protected isDevDep: boolean;
+
+  constructor(options: DependencyRuleOptions) {
     super();
+    this.packageName = options.packageName;
+    this.supportedRange = options.supportedRange;
+    this.isDevDep = options.isDevDep ?? false;
   }
 
   get title(): string {

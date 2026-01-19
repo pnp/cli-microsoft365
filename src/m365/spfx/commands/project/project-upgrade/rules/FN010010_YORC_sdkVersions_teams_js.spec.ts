@@ -9,7 +9,7 @@ describe('FN010010_YORC_sdkVersions_teams_js', () => {
 
   beforeEach(() => {
     findings = [];
-    rule = new FN010010_YORC_sdkVersions_teams_js('2.4.1');
+    rule = new FN010010_YORC_sdkVersions_teams_js({ version: '2.4.1' });
   });
 
   it(`doesn't return notification if .yo-rc.json is not available`, () => {
