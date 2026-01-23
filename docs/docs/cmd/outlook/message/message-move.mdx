@@ -1,4 +1,6 @@
 import Global from '/docs/cmd/_global.mdx';
+import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs';
 
 # outlook message move
 
@@ -30,6 +32,25 @@ m365 outlook message move [options]
 ```
 
 <Global />
+
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource        | Permissions               |
+  |-----------------|---------------------------|
+  | Microsoft Graph | Mail.ReadWrite            |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource        | Permissions                    |
+  |-----------------|--------------------------------|
+  | Microsoft Graph | Mail.ReadWrite                 |
+
+  </TabItem>
+</Tabs>
 
 ## Examples
 
