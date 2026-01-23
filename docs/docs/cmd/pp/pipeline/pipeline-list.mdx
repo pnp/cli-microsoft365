@@ -1,0 +1,105 @@
+import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# pp pipeline list
+
+Lists the Power Platform pipelines for the specified environment.
+
+## Usage
+
+```sh
+m365 pp pipeline list [options]
+```
+
+## Options
+
+`-e, --environmentName <environment>`
+: The name or id of the environment for which to list the pipelines.
+
+`--asAdmin`
+: Run the command as admin and retrieve pipelines from environments you do not have explicitly assigned permissions to.
+
+<Global />
+
+## Remarks
+
+:::warning
+
+This command is based on an API that is currently in preview and is subject to change once the API reaches general availability.
+
+Register the CLI for Microsoft 365 or Microsoft Entra application as a management application for the Power Platform using
+
+m365 pp managementapp add [options]
+
+:::
+
+## Examples
+
+Retrieve the list of deployment pipelines in the specified Power Platform environment.
+
+```sh 
+m365 pp pipeline list --environmentName Default-d87a7535-dd31-4437-bfe1-95340acd55c5
+```
+
+Retrieve the list of deployment pipelines as admin in the specified Power Platform environment.
+
+```sh 
+m365 pp pipeline list --environmentName Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --asAdmin
+```
+
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  [
+    {
+      "name": "Sales Pipeline",
+      "deploymentpipelineid": "3ef59632-f087-ef11-8a69-7c1e521ba3ec",
+      "ownerid": "27f5bb85-6b7a-ef11-ac22-000d3a4e3cc8",
+      "statuscode": 1
+    }
+  ]
+  ```
+  </TabItem>
+
+  <TabItem value="Text">
+
+  ```text
+  deploymentpipelineid: 3ef59632-f087-ef11-8a69-7c1e521ba3ec
+  name                : Sales Pipeline
+  ownerid             : 27f5bb85-6b7a-ef11-ac22-000d3a4e3cc8
+  statuscode          : 1
+  ```
+  </TabItem>
+
+  <TabItem value="CSV">
+
+  ```csv
+  name,deploymentpipelineid,ownerid,statuscode
+  Sales Pipeline,3ef59632-f087-ef11-8a69-7c1e521ba3ec,27f5bb85-6b7a-ef11-ac22-000d3a4e3cc8,1
+  ```
+  </TabItem>
+
+  <TabItem value="Markdown">
+
+  ```md
+  # m365 pp pipeline list --environmentName Default-d87a7535-dd31-4437-bfe1-95340acd55c5
+
+  Date: 17/10/2024
+
+  ## environmentName (default) (/providers/Microsoft.BusinessAppPlatform/environments/Default-e1dd4023-a656-480a-8a0e-c1b1eec51e1d)
+
+  Property | Value
+  ---------|-------
+  name | Sales Pipeline
+  deploymentpipelineid | 3ef59632-f087-ef11-8a69-7c1e521ba3ec
+  ownerid | 27f5bb85-6b7a-ef11-ac22-000d3a4e3cc8
+  statuscode | 1
+  ```
+
+  </TabItem>
+
+</Tabs>
