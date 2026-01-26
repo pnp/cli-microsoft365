@@ -1,4 +1,4 @@
-import { minVersion, SemVer, validRange } from 'semver';
+import { Range, validRange } from 'semver';
 import { Project } from '../m365/spfx/commands/project/project-model/index.js';
 
 export const spfx = {
@@ -27,48 +27,49 @@ export const spfx = {
       .map(range => range.trim())
       .filter(range => range.length > 0);
 
-    let highest: { version: SemVer; source: string } | null = null;
+    let highestMajor: number | null = null;
+    let exactVersion: string | null = null;
 
-    for (const range of ranges) {
-      const normalized = validRange(range);
+    for (const rangeString of ranges) {
+      const normalized = validRange(rangeString);
       if (!normalized) {
         continue;
       }
 
-      const minimum = minVersion(normalized);
-      if (!minimum) {
-        continue;
+      const rangeObj = new Range(normalized);
+      let maxMajor = 0;
+
+      // Analyze the range to find the maximum major version
+      for (const comparatorSet of rangeObj.set) {
+        for (const comparator of comparatorSet) {
+          if (comparator.operator === '<') {
+            // Exclusive upper bound: <17.0.0 means max major is 16
+            maxMajor = Math.max(maxMajor, comparator.semver.major - 1);
+          }
+          else if (comparator.operator === '<=') {
+            // Inclusive upper bound: <=17.0.0 means we can use exactly that version
+            maxMajor = Math.max(maxMajor, comparator.semver.major);
+            // Store the exact version for <= comparator
+            if (highestMajor === null || comparator.semver.major > highestMajor) {
+              exactVersion = comparator.semver.version;
+            }
+          }
+          else if (comparator.operator === '>=' || comparator.operator === '>' || comparator.operator === '') {
+            // For lower bounds or exact versions, use the major version
+            maxMajor = Math.max(maxMajor, comparator.semver.major);
+          }
+        }
       }
 
-      if (!highest || minimum.compare(highest.version) > 0) {
-        highest = {
-          version: minimum,
-          source: range
-        };
-      }
+      // Track the highest major version across all ranges
+      highestMajor = Math.max(highestMajor ?? 0, maxMajor);
     }
 
-    if (!highest) {
+    if (highestMajor === null) {
       throw new Error(`Unable to resolve the highest Node version for range '${versionRange}'.`);
     }
 
-    const source = highest.source.trim();
-    const compactSource = source.replace(/\s+/g, '');
-    const isCaretOrTilde = compactSource.startsWith('^') || compactSource.startsWith('~');
-    const isSimpleVersion = /^[0-9]+(\.[0-9]+){0,2}$/.test(compactSource);
-
-    if (isCaretOrTilde || isSimpleVersion) {
-      const numeric = isCaretOrTilde ? compactSource.substring(1) : compactSource;
-      const parts = numeric.split('.').filter(part => part.length > 0);
-      const { major } = highest.version;
-
-      if (parts.length >= 2) {
-        return `${major}.${parts[1]}.x`;
-      }
-
-      return `${major}.x`;
-    }
-
-    return highest.version.version;
+    // Return exact version if we have a <= comparator, otherwise use .x
+    return exactVersion || `${highestMajor}.x`;
   }
 };
