@@ -1,0 +1,104 @@
+import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# spp autofillcolumn set
+
+Applies the autofill option to the selected column
+
+## Usage
+
+```sh
+m365 spp autofillcolumn set [options]
+```
+
+## Options
+
+```md definition-list
+`-u, --siteUrl <siteUrl>`
+: The URL of the target site.
+
+`--listTitle [listTitle]`
+: The title of the library on which to apply the model. Specify either `listTitle`, `listId`, or `listUrl` but not multiple.
+
+`--listId [listId]`
+: The ID of the library on which to apply the model. Specify either `listTitle`, `listId`, or `listUrl` but not multiple.
+
+`--listUrl [listUrl]`
+: Server or web-relative URL of the library on which to apply the model. Specify either `listTitle`, `listId`, or `listUrl` but not multiple.
+
+`-i, --columnId [columnId]`
+: ID of the column to which the autofill option will be assigned. Specify either `columnId`, `columnTitle` or `columnInternalName`.
+
+`-t, --columnTitle [columnTitle]`
+: Title of the column to which the autofill option will be assigned. Specify either `columnId`, `columnTitle` or `columnInternalName`.
+
+`--columnInternalName [columnInternalName]`
+: The internal name (case-sensitive) of the column to which the autofill option will be assigned. Specify either `columnId`, `columnTitle` or `columnInternalName`.
+
+`--prompt [prompt]`
+: The text in natural language that will be used to extract specific information or generate information from files within a SharePoint library.
+
+`--isEnabled [isEnabled]`
+: Enables or disables the autofill column feature.
+```
+
+<Global />
+
+## Remarks
+
+The `prompt` parameter is required when setting the autofill column for the first time.
+
+## Examples
+
+Applies an autofill column on a selected column to a document library based on the list id.
+
+```sh
+m365 spp autofillcolumn set --siteUrl "https://contoso.sharepoint.com/sites/mainSite" --listId "7645e69d-21fb-4a24-a17a-9bdfa7cb63dc" --columnId "1045e69d-21fb-4214-a25a-9bdfa7cb63a2" --prompt "Write a 2-line summary of the document"
+```
+
+Applies an autofill column on a selected column to a document library based on the list title.
+
+```sh
+m365 spp autofillcolumn set --siteUrl "https://contoso.sharepoint.com/sites/mainSite" --listTitle "Documents" --columnId "1045e69d-21fb-4214-a25a-9bdfa7cb63a2" --prompt "Write a 2-line summary of the document"
+```
+
+Applies an autofill column on a selected column to a document library based on the list url.
+
+```sh
+m365 spp autofillcolumn set --siteUrl "https://contoso.sharepoint.com/sites/mainSite" --listUrl '/Shared Documents' --columnId "1045e69d-21fb-4214-a25a-9bdfa7cb63a2" --prompt "Write a 2-line summary of the document"
+```
+
+Applies an autofill column on a selected column to a document library based on the list id and column title.
+
+```sh
+m365 spp autofillcolumn set --siteUrl "https://contoso.sharepoint.com/sites/mainSite" --listId "7645e69d-21fb-4a24-a17a-9bdfa7cb63dc" --columnTitle "ColumnTitle" --prompt "Write a 2-line summary of the document"
+```
+
+Applies an autofill column on a selected column to a document library based on the list id and column internal name.
+
+```sh
+m365 spp autofillcolumn set --siteUrl "https://contoso.sharepoint.com/sites/mainSite" --listId "7645e69d-21fb-4a24-a17a-9bdfa7cb63dc" --columnInternalName "ColumnTitle" --prompt "Write a 2-line summary of the document"
+```
+
+Disables the autofill column for a selected column in a document library, based on the list id and column title.
+
+```sh
+m365 spp autofillcolumn set --siteUrl "https://contoso.sharepoint.com/sites/mainSite" --listId "7645e69d-21fb-4a24-a17a-9bdfa7cb63dc" --columnTitle "ColumnTitle" --isEnabled false
+```
+
+Reenable the autofill column for a selected column in a document library, based on the list id and column title.
+
+```sh
+m365 spp autofillcolumn set --siteUrl "https://contoso.sharepoint.com/sites/mainSite" --listId "7645e69d-21fb-4a24-a17a-9bdfa7cb63dc" --columnTitle "ColumnTitle" --isEnabled true
+```
+
+Modifies the prompt for the autofill column
+
+```sh
+m365 spp autofillcolumn set --siteUrl "https://contoso.sharepoint.com/sites/mainSite" --listId "7645e69d-21fb-4a24-a17a-9bdfa7cb63dc" --columnTitle "ColumnTitle" --isEnabled true --prompt "Write a 1-line summary of the document"
+```
+
+## Response
+
+The command won't return a response on success.
