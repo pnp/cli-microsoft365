@@ -8,6 +8,7 @@ import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { telemetry } from '../../../../telemetry.js';
 import { pid } from '../../../../utils/pid.js';
+import { spfx } from '../../../../utils/spfx.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
@@ -17,11 +18,12 @@ describe(commands.PROJECT_GITHUB_WORKFLOW_ADD, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
-  const projectPath: string = 'test-project';
+  const projectPath: string = path.resolve('/test-project');
 
   before(() => {
     sinon.stub(telemetry, 'trackEvent').resolves();
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
+    sinon.stub(spfx, 'getHighestNodeVersion').returns('22.0.x');
     sinon.stub(session, 'getId').callsFake(() => '');
     commandInfo = cli.getCommandInfo(command);
   });
@@ -44,6 +46,7 @@ describe(commands.PROJECT_GITHUB_WORKFLOW_ADD, () => {
   afterEach(() => {
     sinonUtil.restore([
       (command as any).getProjectRoot,
+      (command as any).getProjectVersion,
       fs.existsSync,
       fs.readFileSync,
       fs.writeFileSync
@@ -95,91 +98,202 @@ describe(commands.PROJECT_GITHUB_WORKFLOW_ADD, () => {
   });
 
   it('creates a default workflow (debug)', async () => {
-    sinon.stub(command as any, 'getProjectRoot').returns(path.join(process.cwd(), projectPath));
+    sinon.stub(command as any, 'getProjectRoot').returns(projectPath);
 
     sinon.stub(fs, 'existsSync').callsFake((fakePath) => {
-      if (fakePath.toString().endsWith('.github')) {
+      if (fakePath.toString() === path.join(projectPath, '.github')) {
         return true;
       }
-      else if (fakePath.toString().endsWith('workflows')) {
+      else if (fakePath.toString() === path.join(projectPath, '.github', 'workflows')) {
         return true;
       }
 
-      return false;
+      throw `Invalid path: ${fakePath}`;
     });
 
-    sinon.stub(fs, 'readFileSync').callsFake((path, options) => {
-      if (path.toString().endsWith('package.json') && options === 'utf-8') {
+    sinon.stub(fs, 'readFileSync').callsFake((filePath, options) => {
+      if (filePath.toString() === path.join(projectPath, 'package.json') && options === 'utf-8') {
         return '{"name": "test"}';
       }
 
-      return '';
+      throw `Invalid path: ${filePath}`;
     });
+
+    sinon.stub(command as any, 'getProjectVersion').returns('1.21.1');
 
     const writeFileSyncStub: sinon.SinonStub = sinon.stub(fs, 'writeFileSync').resolves({});
 
     await command.action(logger, { options: { debug: true } } as any);
-    assert(writeFileSyncStub.calledWith(path.join(process.cwd(), projectPath, '/.github', 'workflows', 'deploy-spfx-solution.yml')), 'workflow file not created');
+    assert(writeFileSyncStub.calledWith(path.resolve(path.join(projectPath, '.github', 'workflows', 'deploy-spfx-solution.yml'))), 'workflow file not created');
   });
 
   it('creates a default workflow with specifying options', async () => {
-    sinon.stub(command as any, 'getProjectRoot').returns(path.join(process.cwd(), projectPath));
+    sinon.stub(command as any, 'getProjectRoot').returns(projectPath);
 
     sinon.stub(fs, 'existsSync').callsFake((fakePath) => {
-      if (fakePath.toString().endsWith('workflows')) {
+      if (fakePath.toString() === path.join(projectPath, '.github', 'workflows')) {
         return true;
       }
 
       return false;
     });
 
-    sinon.stub(fs, 'readFileSync').callsFake((path, options) => {
-      if (path.toString().endsWith('package.json') && options === 'utf-8') {
+    sinon.stub(fs, 'readFileSync').callsFake((filePath, options) => {
+      if (filePath.toString() === path.join(projectPath, 'package.json') && options === 'utf-8') {
         return '{"name": "test"}';
       }
 
-      return '';
+      throw `Invalid path: ${filePath}`;
     });
 
-    sinon.stub(fs, 'mkdirSync').callsFake((path, options) => {
-      if (path.toString().endsWith('.github') && (options as fs.MakeDirectoryOptions).recursive) {
-        return `${projectPath}/.github`;
+    sinon.stub(fs, 'mkdirSync').callsFake((fakePath, options) => {
+      if (fakePath.toString() === path.join(projectPath, '.github') && (options as fs.MakeDirectoryOptions).recursive) {
+        return path.join(projectPath, '.github');
       }
 
-      return '';
+      throw `Invalid path: ${fakePath}`;
     });
+
+    sinon.stub(command as any, 'getProjectVersion').returns('1.21.1');
 
     const writeFileSyncStub: sinon.SinonStub = sinon.stub(fs, 'writeFileSync').resolves({});
 
     await command.action(logger, { options: { name: 'test', branchName: 'dev', manuallyTrigger: true, skipFeatureDeployment: true, loginMethod: 'user', scope: 'sitecollection' } } as any);
-    assert(writeFileSyncStub.calledWith(path.join(process.cwd(), projectPath, '/.github', 'workflows', 'deploy-spfx-solution.yml')), 'workflow file not created');
+    assert(writeFileSyncStub.calledWith(path.resolve(path.join(projectPath, '.github', 'workflows', 'deploy-spfx-solution.yml'))), 'workflow file not created');
   });
 
-  it('handles unexpected error', async () => {
-    sinon.stub(command as any, 'getProjectRoot').returns(path.join(process.cwd(), projectPath));
+  it('handles error with unknown version of SPFx', async () => {
+    sinon.stub(command as any, 'getProjectRoot').returns(projectPath);
 
-    sinon.stub(fs, 'readFileSync').callsFake((path, options) => {
-      if (path.toString().endsWith('package.json') && options === 'utf-8') {
+    sinon.stub(fs, 'readFileSync').callsFake((filePath, options) => {
+      if (filePath.toString() === path.join(projectPath, 'package.json') && options === 'utf-8') {
         return '{"name": "test"}';
       }
 
-      return '';
+      throw `Invalid path: ${filePath}`;
     });
 
     sinon.stub(fs, 'existsSync').callsFake((fakePath) => {
-      if (fakePath.toString().endsWith('.github')) {
+      if (fakePath.toString() === path.join(projectPath, '.github')) {
         return true;
       }
-      else if (fakePath.toString().endsWith('workflows')) {
+      else if (fakePath.toString() === path.join(projectPath, '.github', 'workflows')) {
         return true;
       }
 
-      return false;
+      throw `Invalid path: ${fakePath}`;
     });
 
-    sinon.stub(fs, 'writeFileSync').callsFake(() => { throw 'error'; });
+    sinon.stub(command as any, 'getProjectVersion').returns(undefined);
+
+    sinon.stub(fs, 'writeFileSync').throws(new Error('writeFileSync failed'));
+
+    await assert.rejects(command.action(logger, { options: {} }),
+      (err: any) => {
+        if (err instanceof CommandError && err.message.includes('Unable to determine the version')) {
+          return true;
+        }
+        return false;
+      });
+
+  });
+
+  it('handles error with not found node version', async () => {
+    sinon.stub(command as any, 'getProjectRoot').returns(projectPath);
+
+    sinon.stub(fs, 'readFileSync').callsFake((filePath, options) => {
+      if (filePath.toString() === path.join(projectPath, 'package.json') && options === 'utf-8') {
+        return '{"name": "test"}';
+      }
+
+      throw `Invalid path: ${filePath}`;
+    });
+
+    sinon.stub(fs, 'existsSync').callsFake((fakePath) => {
+      if (fakePath.toString() === path.join(projectPath, '.github')) {
+        return true;
+      }
+      else if (fakePath.toString() === path.join(projectPath, '.github', 'workflows')) {
+        return true;
+      }
+
+      throw `Invalid path: ${fakePath}`;
+    });
+
+    sinon.stub(command as any, 'getProjectVersion').returns('99.99.99');
+
+    sinon.stub(fs, 'writeFileSync').throws(new Error('writeFileSync failed'));
+
+    await assert.rejects(command.action(logger, { options: {} }),
+      (err: any) => {
+        if (err instanceof CommandError && err.message.includes('Could not find Node version')) {
+          return true;
+        }
+        return false;
+      });
+  });
+
+  it('handles unexpected error', async () => {
+    sinon.stub(command as any, 'getProjectRoot').returns(projectPath);
+
+    sinon.stub(fs, 'readFileSync').callsFake((filePath, options) => {
+      if (filePath.toString() === path.join(projectPath, 'package.json') && options === 'utf-8') {
+        return '{"name": "test"}';
+      }
+
+      throw `Invalid path: ${filePath}`;
+    });
+
+    sinon.stub(fs, 'existsSync').callsFake((fakePath) => {
+      if (fakePath.toString() === path.join(projectPath, '.github')) {
+        return true;
+      }
+      else if (fakePath.toString() === path.join(projectPath, '.github', 'workflows')) {
+        return true;
+      }
+
+      throw `Invalid path: ${fakePath}`;
+    });
+
+    sinon.stub(command as any, 'getProjectVersion').returns('1.21.1');
+
+    sinon.stub(fs, 'writeFileSync').callsFake(() => {
+      throw new Error('writeFileSync failed');
+    });
 
     await assert.rejects(command.action(logger, { options: {} } as any),
-      new CommandError('error'));
+      new CommandError('writeFileSync failed'));
+  });
+
+  it('handles unexpected non-error value', async () => {
+    sinon.stub(command as any, 'getProjectRoot').returns(projectPath);
+
+    sinon.stub(fs, 'readFileSync').callsFake((filePath, options) => {
+      if (filePath.toString() === path.join(projectPath, 'package.json') && options === 'utf-8') {
+        return '{"name": "test"}';
+      }
+
+      throw `Invalid path: ${filePath}`;
+    });
+
+    sinon.stub(fs, 'existsSync').callsFake((fakePath) => {
+      if (fakePath.toString() === path.join(projectPath, '.github')) {
+        return true;
+      }
+      else if (fakePath.toString() === path.join(projectPath, '.github', 'workflows')) {
+        return true;
+      }
+
+      throw `Invalid path: ${fakePath}`;
+    });
+
+    sinon.stub(command as any, 'getProjectVersion').returns('1.21.1');
+
+    sinon.stub(fs, 'writeFileSync').callsFake(() => {
+      throw 'string failure';
+    });
+
+    await assert.rejects(command.action(logger, { options: {} } as any),
+      new CommandError('string failure'));
   });
 });
