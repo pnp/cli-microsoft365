@@ -6,9 +6,8 @@ import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import { ListInstance } from '../../../spo/commands/list/ListInstance.js';
 import commands from '../../commands.js';
-import { zod } from '../../../../utils/zod.js';
-import { z } from 'zod';
 import { globalOptionsZod } from '../../../../Command.js';
+import z from 'zod';
 
 enum AllowedFieldTypeKind {
   Integer = 1,
@@ -44,28 +43,27 @@ interface CommandArgs {
   options: Options;
 }
 
-const options = globalOptionsZod
-  .extend({
-    siteUrl: zod.alias('u', z.string()
-      .refine(url => validation.isValidSharePointUrl(url) === true, url => ({
-        message: `'${url}' is not a valid SharePoint Online site URL.`
-      }))),
-    listTitle: z.string().optional(),
-    listId: z.string().uuid()
-      .refine(value => validation.isValidGuid(value), listId => ({
-        message: `${listId} in parameter listId is not a valid GUID`
-      })).optional(),
-    listUrl: z.string().optional(),
-    columnId: zod.alias('i', z.string().uuid()
-      .refine(value => validation.isValidGuid(value), columnId => ({
-        message: `${columnId} in parameter columnId is not a valid GUID`
-      })).optional()),
-    columnTitle: zod.alias('t', z.string().optional()),
-    columnInternalName: z.string().optional(),
-    prompt: z.string().optional(),
-    isEnabled: z.boolean().optional()
-  })
-  .strict();
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  siteUrl: z.string().refine(url =>
+    validation.isValidSharePointUrl(url) === true, {
+    error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
+  }).alias('u'),
+  listTitle: z.string().optional(),
+  listId: z.string().uuid()
+    .refine(value => validation.isValidGuid(value), {
+      error: e => `'${e.input}' in parameter listId is not a valid GUID.`
+    }).optional(),
+  listUrl: z.string().optional(),
+  columnId: z.string().uuid()
+    .refine(value => validation.isValidGuid(value), {
+      error: e => `'${e.input}' in parameter columnId is not a valid GUID.`
+    }).optional().alias('i'),
+  columnTitle: z.string().optional().alias('t'),
+  columnInternalName: z.string().optional(),
+  prompt: z.string().optional(),
+  isEnabled: z.boolean().optional()
+}).strict();
 
 declare type Options = z.infer<typeof options>;
 
@@ -78,11 +76,11 @@ class SppAutofillColumnSetCommand extends SpoCommand {
     return 'Applies the autofill option to the selected column';
   }
 
-  public get schema(): z.ZodTypeAny | undefined {
+  public get schema(): z.ZodType | undefined {
     return options;
   }
 
-  public getRefinedSchema(schema: typeof options): z.ZodEffects<any> | undefined {
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
       .refine(options => [options.columnId, options.columnTitle, options.columnInternalName].filter(Boolean).length === 1, {
         message: `Specify exactly one of the following options: 'columnId', 'columnTitle' or 'columnInternalName'.`
