@@ -11,13 +11,14 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './site-hubsite-disconnect.js';
+import command, { options } from './site-hubsite-disconnect.js';
 
 describe(commands.SITE_HUBSITE_DISCONNECT, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let loggerLogToStderrSpy: sinon.SinonSpy;
   let promptIssued: boolean = false;
 
@@ -27,7 +28,9 @@ describe(commands.SITE_HUBSITE_DISCONNECT, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
+    auth.connection.spoUrl = 'https://contoso.sharepoint.com';
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -63,6 +66,7 @@ describe(commands.SITE_HUBSITE_DISCONNECT, () => {
   after(() => {
     sinon.restore();
     auth.connection.active = false;
+    auth.connection.spoUrl = undefined;
   });
 
   it('has correct name', () => {
@@ -88,7 +92,7 @@ describe(commands.SITE_HUBSITE_DISCONNECT, () => {
     assert(loggerLogSpy.notCalled);
   });
 
-  it('disconnects the site from its hub site without prompting for confirmation when force option specified (debug)', async () => {
+  it('disconnects the site from its hub site without prompting for confirmation when force option specified (verbose)', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://contoso.sharepoint.com/sites/Sales/_api/site/JoinHubSite('00000000-0000-0000-0000-000000000000')`) {
         return {
@@ -99,11 +103,28 @@ describe(commands.SITE_HUBSITE_DISCONNECT, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, siteUrl: 'https://contoso.sharepoint.com/sites/Sales', force: true } });
+    await command.action(logger, { options: { verbose: true, siteUrl: 'https://contoso.sharepoint.com/sites/Sales', force: true } });
     assert(loggerLogToStderrSpy.called);
   });
 
+  it('disconnects site from the hub site as admin', async () => {
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso-admin.sharepoint.com/_api/SPO.Tenant/ConnectSiteToHubSiteById`) {
+        return {
+          "odata.null": true
+        };
+      }
+
+      throw 'Invalid request: ' + opts.url;
+    });
+
+    await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/sales', asAdmin: true, force: true } });
+    assert(postStub.calledOnce);
+    assert.deepStrictEqual(postStub.lastCall.args[0].data, { siteUrl: 'https://contoso.sharepoint.com/sites/sales', hubSiteId: '00000000-0000-0000-0000-000000000000' });
+  });
+
   it('prompts before disconnecting the specified site from its hub site when force option not passed', async () => {
+    sinon.stub(request, 'post').resolves();
     await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/Sales' } });
 
     assert(promptIssued);
@@ -148,24 +169,13 @@ describe(commands.SITE_HUBSITE_DISCONNECT, () => {
       new CommandError('Exception of type \'Microsoft.SharePoint.Client.ResourceNotFoundException\' was thrown.'));
   });
 
-  it('supports specifying site URL', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--siteUrl') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
-
   it('fails validation if url is not a valid SharePoint URL', async () => {
-    const actual = await command.validate({ options: { siteUrl: 'abc' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ siteUrl: 'abc' });
+    assert.notStrictEqual(actual.success, true);
   });
 
   it('passes validation when url is a valid SharePoint URL', async () => {
-    const actual = await command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com/sites/Sales' } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ siteUrl: 'https://contoso.sharepoint.com/sites/Sales' });
+    assert.strictEqual(actual.success, true);
   });
 });
