@@ -41,10 +41,6 @@ updates:
     directory: /
     schedule:
       interval: monthly
-    ignore:
-      - dependency-name: "*"
-        update-types:
-          - version-update:semver-major
     groups:
       update-dependencies:
         patterns:
@@ -58,10 +54,6 @@ updates:
       interval: monthly
     labels:
       - pr-priority
-    ignore:
-      - dependency-name: "*"
-        update-types:
-          - version-update:semver-major
     groups:
       update-dependencies:
         patterns:
