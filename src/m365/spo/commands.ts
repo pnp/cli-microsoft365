@@ -19,6 +19,7 @@ export default {
   APPLICATIONCUSTOMIZER_SET: `${prefix} applicationcustomizer set`,
   APPPAGE_ADD: `${prefix} apppage add`,
   APPPAGE_SET: `${prefix} apppage set`,
+  BRANDCENTER_SETTINGS_LIST: `${prefix} brandcenter settings list`,
   CDN_GET: `${prefix} cdn get`,
   CDN_ORIGIN_ADD: `${prefix} cdn origin add`,
   CDN_ORIGIN_LIST: `${prefix} cdn origin list`,
