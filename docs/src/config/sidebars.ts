@@ -4334,6 +4334,11 @@ const sidebars: SidebarsConfig = {
           callrecord: [
             {
               type: 'doc',
+              label: 'callrecord get',
+              id: 'cmd/teams/callrecord/callrecord-get'
+            },
+            {
+              type: 'doc',
               label: 'callrecord list',
               id: 'cmd/teams/callrecord/callrecord-list'
             }
