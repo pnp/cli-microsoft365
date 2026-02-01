@@ -9,20 +9,20 @@
       "version": "11.5.0",
       "license": "MIT",
       "dependencies": {
-        "@azure/msal-common": "^15.13.3",
-        "@azure/msal-node": "^3.8.4",
-        "@inquirer/confirm": "^6.0.3",
-        "@inquirer/input": "^5.0.3",
-        "@inquirer/select": "^5.0.3",
+        "@azure/msal-common": "^15.14.1",
+        "@azure/msal-node": "^3.8.6",
+        "@inquirer/confirm": "^6.0.4",
+        "@inquirer/input": "^5.0.4",
+        "@inquirer/select": "^5.0.4",
         "@xmldom/xmldom": "^0.9.8",
         "adaptive-expressions": "^4.23.3",
         "adaptivecards": "^3.0.5",
         "adaptivecards-templating": "^2.3.1",
         "adm-zip": "^0.5.16",
-        "applicationinsights": "^3.12.1",
-        "axios": "^1.13.2",
+        "applicationinsights": "^3.13.0",
+        "axios": "^1.13.4",
         "chalk": "^5.6.2",
-        "clipboardy": "^5.0.2",
+        "clipboardy": "^5.1.0",
         "configstore": "^7.1.0",
         "csv-parse": "^6.1.0",
         "csv-stringify": "^6.6.0",
@@ -39,7 +39,7 @@
         "uuid": "^13.0.0",
         "yaml": "^2.8.2",
         "yargs-parser": "^22.0.0",
-        "zod": "^4.3.5"
+        "zod": "^4.3.6"
       },
       "bin": {
         "m365": "dist/index.js",
@@ -48,15 +48,15 @@
         "microsoft365": "dist/index.js"
       },
       "devDependencies": {
-        "@actions/core": "^2.0.1",
+        "@actions/core": "^2.0.3",
         "@microsoft/microsoft-graph-types": "^2.43.1",
-        "@stylistic/eslint-plugin": "^5.6.1",
+        "@stylistic/eslint-plugin": "^5.7.1",
         "@types/adm-zip": "^0.5.7",
         "@types/jmespath": "^0.15.2",
         "@types/json-schema": "^7.0.15",
         "@types/json-to-ast": "^2.1.4",
         "@types/mocha": "^10.0.10",
-        "@types/node": "^24.10.4",
+        "@types/node": "^24.10.9",
         "@types/node-forge": "^1.3.14",
         "@types/omelette": "^0.4.5",
         "@types/semver": "^7.7.1",
@@ -64,7 +64,7 @@
         "@types/update-notifier": "^6.0.8",
         "@types/uuid": "^10.0.0",
         "@types/yargs-parser": "^21.0.3",
-        "@typescript-eslint/eslint-plugin": "^8.51.0",
+        "@typescript-eslint/eslint-plugin": "^8.54.0",
         "@typescript-eslint/parser": "^8.46.4",
         "c8": "^10.1.3",
         "eslint": "^9.39.2",
@@ -83,14 +83,14 @@
       "dev": true
     },
     "node_modules/@actions/core": {
-      "version": "2.0.1",
-      "resolved": "https://registry.npmjs.org/@actions/core/-/core-2.0.1.tgz",
-      "integrity": "sha512-oBfqT3GwkvLlo1fjvhQLQxuwZCGTarTE5OuZ2Wg10hvhBj7LRIlF611WT4aZS6fDhO5ZKlY7lCAZTlpmyaHaeg==",
+      "version": "2.0.3",
+      "resolved": "https://registry.npmjs.org/@actions/core/-/core-2.0.3.tgz",
+      "integrity": "sha512-Od9Thc3T1mQJYddvVPM4QGiLUewdh+3txmDYHHxoNdkqysR1MbCT+rFOtNUxYAz+7+6RIsqipVahY2GJqGPyxA==",
       "dev": true,
       "license": "MIT",
       "dependencies": {
         "@actions/exec": "^2.0.0",
-        "@actions/http-client": "^3.0.0"
+        "@actions/http-client": "^3.0.2"
       }
     },
     "node_modules/@actions/exec": {
@@ -104,14 +104,24 @@
       }
     },
     "node_modules/@actions/http-client": {
-      "version": "3.0.0",
-      "resolved": "https://registry.npmjs.org/@actions/http-client/-/http-client-3.0.0.tgz",
-      "integrity": "sha512-1s3tXAfVMSz9a4ZEBkXXRQD4QhY3+GAsWSbaYpeknPOKEeyRiU3lH+bHiLMZdo2x/fIeQ/hscL1wCkDLVM2DZQ==",
+      "version": "3.0.2",
+      "resolved": "https://registry.npmjs.org/@actions/http-client/-/http-client-3.0.2.tgz",
+      "integrity": "sha512-JP38FYYpyqvUsz+Igqlc/JG6YO9PaKuvqjM3iGvaLqFnJ7TFmcLyy2IDrY0bI0qCQug8E9K+elv5ZNfw62ZJzA==",
       "dev": true,
       "license": "MIT",
       "dependencies": {
         "tunnel": "^0.0.6",
-        "undici": "^5.28.5"
+        "undici": "^6.23.0"
+      }
+    },
+    "node_modules/@actions/http-client/node_modules/undici": {
+      "version": "6.23.0",
+      "resolved": "https://registry.npmjs.org/undici/-/undici-6.23.0.tgz",
+      "integrity": "sha512-VfQPToRA5FZs/qJxLIinmU59u0r7LXqoJkCzinq3ckNJp3vKEh7jTWN589YQ5+aoAC/TGRLyJLCPKcLQbM8r9g==",
+      "dev": true,
+      "license": "MIT",
+      "engines": {
+        "node": ">=18.17"
       }
     },
     "node_modules/@actions/io": {
@@ -323,16 +333,16 @@
       }
     },
     "node_modules/@azure/monitor-opentelemetry": {
-      "version": "1.14.2",
-      "resolved": "https://registry.npmjs.org/@azure/monitor-opentelemetry/-/monitor-opentelemetry-1.14.2.tgz",
-      "integrity": "sha512-IhDnnPglEoS6pVKU939E02CEbkLw8irtELKsonLFyFZ6Uayo1i8mgHJjJ3fvxD3AtY9dCgVhKSz29USoKf2m+g==",
+      "version": "1.15.1",
+      "resolved": "https://registry.npmjs.org/@azure/monitor-opentelemetry/-/monitor-opentelemetry-1.15.1.tgz",
+      "integrity": "sha512-Ybr8BfypmSt0L3TObjMFxv37B6qYI7TTX/fs9V0hi86LI75ZG2bvPAFr9Dt/L2LaNXaLck3fNVQ/ocuMJid7hQ==",
       "license": "MIT",
       "dependencies": {
         "@azure/core-auth": "^1.10.1",
         "@azure/core-client": "^1.10.1",
         "@azure/core-rest-pipeline": "^1.22.2",
         "@azure/logger": "^1.3.0",
-        "@azure/monitor-opentelemetry-exporter": "^1.0.0-beta.36",
+        "@azure/monitor-opentelemetry-exporter": "1.0.0-beta.38",
         "@azure/opentelemetry-instrumentation-azure-sdk": "^1.0.0-beta.9",
         "@microsoft/applicationinsights-web-snippet": "^1.2.3",
         "@opentelemetry/api": "^1.9.0",
@@ -362,9 +372,9 @@
       }
     },
     "node_modules/@azure/monitor-opentelemetry-exporter": {
-      "version": "1.0.0-beta.36",
-      "resolved": "https://registry.npmjs.org/@azure/monitor-opentelemetry-exporter/-/monitor-opentelemetry-exporter-1.0.0-beta.36.tgz",
-      "integrity": "sha512-2mdI+5AVDWhMTzj2iwurTf5HFIsbo0bniI/PXKZTH0jgqyZl+lq6LZD089xZ7os8Nes1aIEBFsuERrWbwJsD4Q==",
+      "version": "1.0.0-beta.38",
+      "resolved": "https://registry.npmjs.org/@azure/monitor-opentelemetry-exporter/-/monitor-opentelemetry-exporter-1.0.0-beta.38.tgz",
+      "integrity": "sha512-lzY9XpgRwWC94lzeAf2I1YXrP7oMx1B/vn83zoYA5RKW2ZBPzXZ+LUJjYCo/ItzLfT4eMQC80VL4lQC/VknIMA==",
       "license": "MIT",
       "dependencies": {
         "@azure/core-auth": "^1.9.0",
@@ -466,21 +476,21 @@
       }
     },
     "node_modules/@azure/msal-common": {
-      "version": "15.13.3",
-      "resolved": "https://registry.npmjs.org/@azure/msal-common/-/msal-common-15.13.3.tgz",
-      "integrity": "sha512-shSDU7Ioecya+Aob5xliW9IGq1Ui8y4EVSdWGyI1Gbm4Vg61WpP95LuzcY214/wEjSn6w4PZYD4/iVldErHayQ==",
+      "version": "15.14.1",
+      "resolved": "https://registry.npmjs.org/@azure/msal-common/-/msal-common-15.14.1.tgz",
+      "integrity": "sha512-IkzF7Pywt6QKTS0kwdCv/XV8x8JXknZDvSjj/IccooxnP373T5jaadO3FnOrbWo3S0UqkfIDyZNTaQ/oAgRdXw==",
       "license": "MIT",
       "engines": {
         "node": ">=0.8.0"
       }
     },
     "node_modules/@azure/msal-node": {
-      "version": "3.8.4",
-      "resolved": "https://registry.npmjs.org/@azure/msal-node/-/msal-node-3.8.4.tgz",
-      "integrity": "sha512-lvuAwsDpPDE/jSuVQOBMpLbXuVuLsPNRwWCyK3/6bPlBk0fGWegqoZ0qjZclMWyQ2JNvIY3vHY7hoFmFmFQcOw==",
+      "version": "3.8.6",
+      "resolved": "https://registry.npmjs.org/@azure/msal-node/-/msal-node-3.8.6.tgz",
+      "integrity": "sha512-XTmhdItcBckcVVTy65Xp+42xG4LX5GK+9AqAsXPXk4IqUNv+LyQo5TMwNjuFYBfAB2GTG9iSQGk+QLc03vhf3w==",
       "license": "MIT",
       "dependencies": {
-        "@azure/msal-common": "15.13.3",
+        "@azure/msal-common": "15.14.1",
         "jsonwebtoken": "^9.0.0",
         "uuid": "^8.3.0"
       },
@@ -546,6 +556,12 @@
         "@opentelemetry/api": "^1.3.0"
       }
     },
+    "node_modules/@azure/opentelemetry-instrumentation-azure-sdk/node_modules/cjs-module-lexer": {
+      "version": "1.4.3",
+      "resolved": "https://registry.npmjs.org/cjs-module-lexer/-/cjs-module-lexer-1.4.3.tgz",
+      "integrity": "sha512-9z8TZaGM1pfswYeXrUpzPrkx8UnWYdhJclsiYMm6x/w5+nN+8Tf/LnAgfLGQCm59qAOxU8WwHEq2vNwF6i4j+Q==",
+      "license": "MIT"
+    },
     "node_modules/@azure/opentelemetry-instrumentation-azure-sdk/node_modules/import-in-the-middle": {
       "version": "1.15.0",
       "resolved": "https://registry.npmjs.org/import-in-the-middle/-/import-in-the-middle-1.15.0.tgz",
@@ -592,9 +608,9 @@
       }
     },
     "node_modules/@eslint-community/eslint-utils": {
-      "version": "4.9.0",
-      "resolved": "https://registry.npmjs.org/@eslint-community/eslint-utils/-/eslint-utils-4.9.0.tgz",
-      "integrity": "sha512-ayVFHdtZ+hsq1t2Dy24wCmGXGe4q9Gu3smhLYALJrr473ZH27MsnSL+LKUlimp4BWJqMDMLmPpx/Q9R3OAlL4g==",
+      "version": "4.9.1",
+      "resolved": "https://registry.npmjs.org/@eslint-community/eslint-utils/-/eslint-utils-4.9.1.tgz",
+      "integrity": "sha512-phrYmNiYppR7znFEdqgfWHXR6NCkZEK7hwWDHZUjit/2/U0r6XvkDl0SYnoM51Hq7FhCGdLDT6zxCCOY1hexsQ==",
       "dev": true,
       "license": "MIT",
       "dependencies": {
@@ -905,22 +921,22 @@
       }
     },
     "node_modules/@inquirer/ansi": {
-      "version": "2.0.2",
-      "resolved": "https://registry.npmjs.org/@inquirer/ansi/-/ansi-2.0.2.tgz",
-      "integrity": "sha512-SYLX05PwJVnW+WVegZt1T4Ip1qba1ik+pNJPDiqvk6zS5Y/i8PhRzLpGEtVd7sW0G8cMtkD8t4AZYhQwm8vnww==",
+      "version": "2.0.3",
+      "resolved": "https://registry.npmjs.org/@inquirer/ansi/-/ansi-2.0.3.tgz",
+      "integrity": "sha512-g44zhR3NIKVs0zUesa4iMzExmZpLUdTLRMCStqX3GE5NT6VkPcxQGJ+uC8tDgBUC/vB1rUhUd55cOf++4NZcmw==",
       "license": "MIT",
       "engines": {
         "node": ">=23.5.0 || ^22.13.0 || ^21.7.0 || ^20.12.0"
       }
     },
     "node_modules/@inquirer/confirm": {
-      "version": "6.0.3",
-      "resolved": "https://registry.npmjs.org/@inquirer/confirm/-/confirm-6.0.3.tgz",
-      "integrity": "sha512-lyEvibDFL+NA5R4xl8FUmNhmu81B+LDL9L/MpKkZlQDJZXzG8InxiqYxiAlQYa9cqLLhYqKLQwZqXmSTqCLjyw==",
+      "version": "6.0.4",
+      "resolved": "https://registry.npmjs.org/@inquirer/confirm/-/confirm-6.0.4.tgz",
+      "integrity": "sha512-WdaPe7foUnoGYvXzH4jp4wH/3l+dBhZ3uwhKjXjwdrq5tEIFaANxj6zrGHxLdsIA0yKM0kFPVcEalOZXBB5ISA==",
       "license": "MIT",
       "dependencies": {
-        "@inquirer/core": "^11.1.0",
-        "@inquirer/type": "^4.0.2"
+        "@inquirer/core": "^11.1.1",
+        "@inquirer/type": "^4.0.3"
       },
       "engines": {
         "node": ">=23.5.0 || ^22.13.0 || ^21.7.0 || ^20.12.0"
@@ -935,14 +951,14 @@
       }
     },
     "node_modules/@inquirer/core": {
-      "version": "11.1.0",
-      "resolved": "https://registry.npmjs.org/@inquirer/core/-/core-11.1.0.tgz",
-      "integrity": "sha512-+jD/34T1pK8M5QmZD/ENhOfXdl9Zr+BrQAUc5h2anWgi7gggRq15ZbiBeLoObj0TLbdgW7TAIQRU2boMc9uOKQ==",
+      "version": "11.1.1",
+      "resolved": "https://registry.npmjs.org/@inquirer/core/-/core-11.1.1.tgz",
+      "integrity": "sha512-hV9o15UxX46OyQAtaoMqAOxGR8RVl1aZtDx1jHbCtSJy1tBdTfKxLPKf7utsE4cRy4tcmCQ4+vdV+ca+oNxqNA==",
       "license": "MIT",
       "dependencies": {
-        "@inquirer/ansi": "^2.0.2",
-        "@inquirer/figures": "^2.0.2",
-        "@inquirer/type": "^4.0.2",
+        "@inquirer/ansi": "^2.0.3",
+        "@inquirer/figures": "^2.0.3",
+        "@inquirer/type": "^4.0.3",
         "cli-width": "^4.1.0",
         "mute-stream": "^3.0.0",
         "signal-exit": "^4.1.0",
@@ -961,22 +977,22 @@
       }
     },
     "node_modules/@inquirer/figures": {
-      "version": "2.0.2",
-      "resolved": "https://registry.npmjs.org/@inquirer/figures/-/figures-2.0.2.tgz",
-      "integrity": "sha512-qXm6EVvQx/FmnSrCWCIGtMHwqeLgxABP8XgcaAoywsL0NFga9gD5kfG0gXiv80GjK9Hsoz4pgGwF/+CjygyV9A==",
+      "version": "2.0.3",
+      "resolved": "https://registry.npmjs.org/@inquirer/figures/-/figures-2.0.3.tgz",
+      "integrity": "sha512-y09iGt3JKoOCBQ3w4YrSJdokcD8ciSlMIWsD+auPu+OZpfxLuyz+gICAQ6GCBOmJJt4KEQGHuZSVff2jiNOy7g==",
       "license": "MIT",
       "engines": {
         "node": ">=23.5.0 || ^22.13.0 || ^21.7.0 || ^20.12.0"
       }
     },
     "node_modules/@inquirer/input": {
-      "version": "5.0.3",
-      "resolved": "https://registry.npmjs.org/@inquirer/input/-/input-5.0.3.tgz",
-      "integrity": "sha512-4R0TdWl53dtp79Vs6Df2OHAtA2FVNqya1hND1f5wjHWxZJxwDMSNB1X5ADZJSsQKYAJ5JHCTO+GpJZ42mK0Otw==",
+      "version": "5.0.4",
+      "resolved": "https://registry.npmjs.org/@inquirer/input/-/input-5.0.4.tgz",
+      "integrity": "sha512-4B3s3jvTREDFvXWit92Yc6jF1RJMDy2VpSqKtm4We2oVU65YOh2szY5/G14h4fHlyQdpUmazU5MPCFZPRJ0AOw==",
       "license": "MIT",
       "dependencies": {
-        "@inquirer/core": "^11.1.0",
-        "@inquirer/type": "^4.0.2"
+        "@inquirer/core": "^11.1.1",
+        "@inquirer/type": "^4.0.3"
       },
       "engines": {
         "node": ">=23.5.0 || ^22.13.0 || ^21.7.0 || ^20.12.0"
@@ -991,15 +1007,15 @@
       }
     },
     "node_modules/@inquirer/select": {
-      "version": "5.0.3",
-      "resolved": "https://registry.npmjs.org/@inquirer/select/-/select-5.0.3.tgz",
-      "integrity": "sha512-M+ynbwS0ecQFDYMFrQrybA0qL8DV0snpc4kKevCCNaTpfghsRowRY7SlQBeIYNzHqXtiiz4RG9vTOeb/udew7w==",
+      "version": "5.0.4",
+      "resolved": "https://registry.npmjs.org/@inquirer/select/-/select-5.0.4.tgz",
+      "integrity": "sha512-s8KoGpPYMEQ6WXc0dT9blX2NtIulMdLOO3LA1UKOiv7KFWzlJ6eLkEYTDBIi+JkyKXyn8t/CD6TinxGjyLt57g==",
       "license": "MIT",
       "dependencies": {
-        "@inquirer/ansi": "^2.0.2",
-        "@inquirer/core": "^11.1.0",
-        "@inquirer/figures": "^2.0.2",
-        "@inquirer/type": "^4.0.2"
+        "@inquirer/ansi": "^2.0.3",
+        "@inquirer/core": "^11.1.1",
+        "@inquirer/figures": "^2.0.3",
+        "@inquirer/type": "^4.0.3"
       },
       "engines": {
         "node": ">=23.5.0 || ^22.13.0 || ^21.7.0 || ^20.12.0"
@@ -1014,9 +1030,9 @@
       }
     },
     "node_modules/@inquirer/type": {
-      "version": "4.0.2",
-      "resolved": "https://registry.npmjs.org/@inquirer/type/-/type-4.0.2.tgz",
-      "integrity": "sha512-cae7mzluplsjSdgFA6ACLygb5jC8alO0UUnFPyu0E7tNRPrL+q/f8VcSXp+cjZQ7l5CMpDpi2G1+IQvkOiL1Lw==",
+      "version": "4.0.3",
+      "resolved": "https://registry.npmjs.org/@inquirer/type/-/type-4.0.3.tgz",
+      "integrity": "sha512-cKZN7qcXOpj1h+1eTTcGDVLaBIHNMT1Rz9JqJP5MnEJ0JhgVWllx7H/tahUp5YEK1qaByH2Itb8wLG/iScD5kw==",
       "license": "MIT",
       "engines": {
         "node": ">=23.5.0 || ^22.13.0 || ^21.7.0 || ^20.12.0"
@@ -1194,9 +1210,9 @@
       }
     },
     "node_modules/@opentelemetry/context-async-hooks": {
-      "version": "2.2.0",
-      "resolved": "https://registry.npmjs.org/@opentelemetry/context-async-hooks/-/context-async-hooks-2.2.0.tgz",
-      "integrity": "sha512-qRkLWiUEZNAmYapZ7KGS5C4OmBLcP/H2foXeOEaowYCR0wi89fHejrfYfbuLVCMLp/dWZXKvQusdbUEZjERfwQ==",
+      "version": "2.5.0",
+      "resolved": "https://registry.npmjs.org/@opentelemetry/context-async-hooks/-/context-async-hooks-2.5.0.tgz",
+      "integrity": "sha512-uOXpVX0ZjO7heSVjhheW2XEPrhQAWr2BScDPoZ9UDycl5iuHG+Usyc3AIfG6kZeC1GyLpMInpQ6X5+9n69yOFw==",
       "license": "Apache-2.0",
       "engines": {
         "node": "^18.19.0 || >=20.6.0"
@@ -1206,9 +1222,9 @@
       }
     },
     "node_modules/@opentelemetry/core": {
-      "version": "2.2.0",
-      "resolved": "https://registry.npmjs.org/@opentelemetry/core/-/core-2.2.0.tgz",
-      "integrity": "sha512-FuabnnUm8LflnieVxs6eP7Z383hgQU4W1e3KJS6aOG3RxWxcHyBxH8fDMHNgu/gFx/M2jvTOW/4/PHhLz6bjWw==",
+      "version": "2.5.0",
+      "resolved": "https://registry.npmjs.org/@opentelemetry/core/-/core-2.5.0.tgz",
+      "integrity": "sha512-ka4H8OM6+DlUhSAZpONu0cPBtPPTQKxbxVzC4CzVx5+K4JnroJVBtDzLAMx4/3CDTJXRvVFhpFjtl4SaiTNoyQ==",
       "license": "Apache-2.0",
       "dependencies": {
         "@opentelemetry/semantic-conventions": "^1.29.0"
@@ -1240,6 +1256,21 @@
         "@opentelemetry/api": "^1.3.0"
       }
     },
+    "node_modules/@opentelemetry/exporter-logs-otlp-grpc/node_modules/@opentelemetry/core": {
+      "version": "2.2.0",
+      "resolved": "https://registry.npmjs.org/@opentelemetry/core/-/core-2.2.0.tgz",
+      "integrity": "sha512-FuabnnUm8LflnieVxs6eP7Z383hgQU4W1e3KJS6aOG3RxWxcHyBxH8fDMHNgu/gFx/M2jvTOW/4/PHhLz6bjWw==",
+      "license": "Apache-2.0",
+      "dependencies": {
+        "@opentelemetry/semantic-conventions": "^1.29.0"
+      },
+      "engines": {
+        "node": "^18.19.0 || >=20.6.0"
+      },
+      "peerDependencies": {
+        "@opentelemetry/api": ">=1.0.0 <1.10.0"
+      }
+    },
     "node_modules/@opentelemetry/exporter-logs-otlp-http": {
       "version": "0.208.0",
       "resolved": "https://registry.npmjs.org/@opentelemetry/exporter-logs-otlp-http/-/exporter-logs-otlp-http-0.208.0.tgz",
@@ -1257,6 +1288,21 @@
       },
       "peerDependencies": {
         "@opentelemetry/api": "^1.3.0"
+      }
+    },
+    "node_modules/@opentelemetry/exporter-logs-otlp-http/node_modules/@opentelemetry/core": {
+      "version": "2.2.0",
+      "resolved": "https://registry.npmjs.org/@opentelemetry/core/-/core-2.2.0.tgz",
+      "integrity": "sha512-FuabnnUm8LflnieVxs6eP7Z383hgQU4W1e3KJS6aOG3RxWxcHyBxH8fDMHNgu/gFx/M2jvTOW/4/PHhLz6bjWw==",
+      "license": "Apache-2.0",
+      "dependencies": {
+        "@opentelemetry/semantic-conventions": "^1.29.0"
+      },
+      "engines": {
+        "node": "^18.19.0 || >=20.6.0"
+      },
+      "peerDependencies": {
+        "@opentelemetry/api": ">=1.0.0 <1.10.0"
       }
     },
     "node_modules/@opentelemetry/exporter-logs-otlp-proto": {
@@ -1278,6 +1324,54 @@
       },
       "peerDependencies": {
         "@opentelemetry/api": "^1.3.0"
+      }
+    },
+    "node_modules/@opentelemetry/exporter-logs-otlp-proto/node_modules/@opentelemetry/core": {
+      "version": "2.2.0",
+      "resolved": "https://registry.npmjs.org/@opentelemetry/core/-/core-2.2.0.tgz",
+      "integrity": "sha512-FuabnnUm8LflnieVxs6eP7Z383hgQU4W1e3KJS6aOG3RxWxcHyBxH8fDMHNgu/gFx/M2jvTOW/4/PHhLz6bjWw==",
+      "license": "Apache-2.0",
+      "dependencies": {
+        "@opentelemetry/semantic-conventions": "^1.29.0"
+      },
+      "engines": {
+        "node": "^18.19.0 || >=20.6.0"
+      },
+      "peerDependencies": {
+        "@opentelemetry/api": ">=1.0.0 <1.10.0"
+      }
+    },
+    "node_modules/@opentelemetry/exporter-logs-otlp-proto/node_modules/@opentelemetry/resources": {
+      "version": "2.2.0",
+      "resolved": "https://registry.npmjs.org/@opentelemetry/resources/-/resources-2.2.0.tgz",
+      "integrity": "sha512-1pNQf/JazQTMA0BiO5NINUzH0cbLbbl7mntLa4aJNmCCXSj0q03T5ZXXL0zw4G55TjdL9Tz32cznGClf+8zr5A==",
+      "license": "Apache-2.0",
+      "dependencies": {
+        "@opentelemetry/core": "2.2.0",
+        "@opentelemetry/semantic-conventions": "^1.29.0"
+      },
+      "engines": {
+        "node": "^18.19.0 || >=20.6.0"
+      },
+      "peerDependencies": {
+        "@opentelemetry/api": ">=1.3.0 <1.10.0"
+      }
+    },
+    "node_modules/@opentelemetry/exporter-logs-otlp-proto/node_modules/@opentelemetry/sdk-trace-base": {
+      "version": "2.2.0",
+      "resolved": "https://registry.npmjs.org/@opentelemetry/sdk-trace-base/-/sdk-trace-base-2.2.0.tgz",
+      "integrity": "sha512-xWQgL0Bmctsalg6PaXExmzdedSp3gyKV8mQBwK/j9VGdCDu2fmXIb2gAehBKbkXCpJ4HPkgv3QfoJWRT4dHWbw==",
+      "license": "Apache-2.0",
+      "dependencies": {
+        "@opentelemetry/core": "2.2.0",
+        "@opentelemetry/resources": "2.2.0",
+        "@opentelemetry/semantic-conventions": "^1.29.0"
+      },
+      "engines": {
+        "node": "^18.19.0 || >=20.6.0"
+      },
+      "peerDependencies": {
+        "@opentelemetry/api": ">=1.3.0 <1.10.0"
       }
     },
     "node_modules/@opentelemetry/exporter-metrics-otlp-grpc": {
@@ -1302,6 +1396,53 @@
         "@opentelemetry/api": "^1.3.0"
       }
     },
+    "node_modules/@opentelemetry/exporter-metrics-otlp-grpc/node_modules/@opentelemetry/core": {
+      "version": "2.2.0",
+      "resolved": "https://registry.npmjs.org/@opentelemetry/core/-/core-2.2.0.tgz",
+      "integrity": "sha512-FuabnnUm8LflnieVxs6eP7Z383hgQU4W1e3KJS6aOG3RxWxcHyBxH8fDMHNgu/gFx/M2jvTOW/4/PHhLz6bjWw==",
+      "license": "Apache-2.0",
+      "dependencies": {
+        "@opentelemetry/semantic-conventions": "^1.29.0"
+      },
+      "engines": {
+        "node": "^18.19.0 || >=20.6.0"
+      },
+      "peerDependencies": {
+        "@opentelemetry/api": ">=1.0.0 <1.10.0"
+      }
+    },
+    "node_modules/@opentelemetry/exporter-metrics-otlp-grpc/node_modules/@opentelemetry/resources": {
+      "version": "2.2.0",
+      "resolved": "https://registry.npmjs.org/@opentelemetry/resources/-/resources-2.2.0.tgz",
+      "integrity": "sha512-1pNQf/JazQTMA0BiO5NINUzH0cbLbbl7mntLa4aJNmCCXSj0q03T5ZXXL0zw4G55TjdL9Tz32cznGClf+8zr5A==",
+      "license": "Apache-2.0",
+      "dependencies": {
+        "@opentelemetry/core": "2.2.0",
+        "@opentelemetry/semantic-conventions": "^1.29.0"
+      },
+      "engines": {
+        "node": "^18.19.0 || >=20.6.0"
+      },
+      "peerDependencies": {
+        "@opentelemetry/api": ">=1.3.0 <1.10.0"
+      }
+    },
+    "node_modules/@opentelemetry/exporter-metrics-otlp-grpc/node_modules/@opentelemetry/sdk-metrics": {
+      "version": "2.2.0",
+      "resolved": "https://registry.npmjs.org/@opentelemetry/sdk-metrics/-/sdk-metrics-2.2.0.tgz",
+      "integrity": "sha512-G5KYP6+VJMZzpGipQw7Giif48h6SGQ2PFKEYCybeXJsOCB4fp8azqMAAzE5lnnHK3ZVwYQrgmFbsUJO/zOnwGw==",
+      "license": "Apache-2.0",
+      "dependencies": {
+        "@opentelemetry/core": "2.2.0",
+        "@opentelemetry/resources": "2.2.0"
+      },
+      "engines": {
+        "node": "^18.19.0 || >=20.6.0"
+      },
+      "peerDependencies": {
+        "@opentelemetry/api": ">=1.9.0 <1.10.0"
+      }
+    },
     "node_modules/@opentelemetry/exporter-metrics-otlp-http": {
       "version": "0.208.0",
       "resolved": "https://registry.npmjs.org/@opentelemetry/exporter-metrics-otlp-http/-/exporter-metrics-otlp-http-0.208.0.tgz",
@@ -1319,6 +1460,53 @@
       },
       "peerDependencies": {
         "@opentelemetry/api": "^1.3.0"
+      }
+    },
+    "node_modules/@opentelemetry/exporter-metrics-otlp-http/node_modules/@opentelemetry/core": {
+      "version": "2.2.0",
+      "resolved": "https://registry.npmjs.org/@opentelemetry/core/-/core-2.2.0.tgz",
+      "integrity": "sha512-FuabnnUm8LflnieVxs6eP7Z383hgQU4W1e3KJS6aOG3RxWxcHyBxH8fDMHNgu/gFx/M2jvTOW/4/PHhLz6bjWw==",
+      "license": "Apache-2.0",
+      "dependencies": {
+        "@opentelemetry/semantic-conventions": "^1.29.0"
+      },
+      "engines": {
+        "node": "^18.19.0 || >=20.6.0"
+      },
+      "peerDependencies": {
+        "@opentelemetry/api": ">=1.0.0 <1.10.0"
+      }
+    },
+    "node_modules/@opentelemetry/exporter-metrics-otlp-http/node_modules/@opentelemetry/resources": {
+      "version": "2.2.0",
+      "resolved": "https://registry.npmjs.org/@opentelemetry/resources/-/resources-2.2.0.tgz",
+      "integrity": "sha512-1pNQf/JazQTMA0BiO5NINUzH0cbLbbl7mntLa4aJNmCCXSj0q03T5ZXXL0zw4G55TjdL9Tz32cznGClf+8zr5A==",
+      "license": "Apache-2.0",
+      "dependencies": {
+        "@opentelemetry/core": "2.2.0",
+        "@opentelemetry/semantic-conventions": "^1.29.0"
+      },
+      "engines": {
+        "node": "^18.19.0 || >=20.6.0"
+      },
+      "peerDependencies": {
+        "@opentelemetry/api": ">=1.3.0 <1.10.0"
+      }
+    },
+    "node_modules/@opentelemetry/exporter-metrics-otlp-http/node_modules/@opentelemetry/sdk-metrics": {
+      "version": "2.2.0",
+      "resolved": "https://registry.npmjs.org/@opentelemetry/sdk-metrics/-/sdk-metrics-2.2.0.tgz",
+      "integrity": "sha512-G5KYP6+VJMZzpGipQw7Giif48h6SGQ2PFKEYCybeXJsOCB4fp8azqMAAzE5lnnHK3ZVwYQrgmFbsUJO/zOnwGw==",
+      "license": "Apache-2.0",
+      "dependencies": {
+        "@opentelemetry/core": "2.2.0",
+        "@opentelemetry/resources": "2.2.0"
+      },
+      "engines": {
+        "node": "^18.19.0 || >=20.6.0"
+      },
+      "peerDependencies": {
+        "@opentelemetry/api": ">=1.9.0 <1.10.0"
       }
     },
     "node_modules/@opentelemetry/exporter-metrics-otlp-proto": {
@@ -1341,6 +1529,53 @@
         "@opentelemetry/api": "^1.3.0"
       }
     },
+    "node_modules/@opentelemetry/exporter-metrics-otlp-proto/node_modules/@opentelemetry/core": {
+      "version": "2.2.0",
+      "resolved": "https://registry.npmjs.org/@opentelemetry/core/-/core-2.2.0.tgz",
+      "integrity": "sha512-FuabnnUm8LflnieVxs6eP7Z383hgQU4W1e3KJS6aOG3RxWxcHyBxH8fDMHNgu/gFx/M2jvTOW/4/PHhLz6bjWw==",
+      "license": "Apache-2.0",
+      "dependencies": {
+        "@opentelemetry/semantic-conventions": "^1.29.0"
+      },
+      "engines": {
+        "node": "^18.19.0 || >=20.6.0"
+      },
+      "peerDependencies": {
+        "@opentelemetry/api": ">=1.0.0 <1.10.0"
+      }
+    },
+    "node_modules/@opentelemetry/exporter-metrics-otlp-proto/node_modules/@opentelemetry/resources": {
+      "version": "2.2.0",
+      "resolved": "https://registry.npmjs.org/@opentelemetry/resources/-/resources-2.2.0.tgz",
+      "integrity": "sha512-1pNQf/JazQTMA0BiO5NINUzH0cbLbbl7mntLa4aJNmCCXSj0q03T5ZXXL0zw4G55TjdL9Tz32cznGClf+8zr5A==",
+      "license": "Apache-2.0",
+      "dependencies": {
+        "@opentelemetry/core": "2.2.0",
+        "@opentelemetry/semantic-conventions": "^1.29.0"
+      },
+      "engines": {
+        "node": "^18.19.0 || >=20.6.0"
+      },
+      "peerDependencies": {
+        "@opentelemetry/api": ">=1.3.0 <1.10.0"
+      }
+    },
+    "node_modules/@opentelemetry/exporter-metrics-otlp-proto/node_modules/@opentelemetry/sdk-metrics": {
+      "version": "2.2.0",
+      "resolved": "https://registry.npmjs.org/@opentelemetry/sdk-metrics/-/sdk-metrics-2.2.0.tgz",
+      "integrity": "sha512-G5KYP6+VJMZzpGipQw7Giif48h6SGQ2PFKEYCybeXJsOCB4fp8azqMAAzE5lnnHK3ZVwYQrgmFbsUJO/zOnwGw==",
+      "license": "Apache-2.0",
+      "dependencies": {
+        "@opentelemetry/core": "2.2.0",
+        "@opentelemetry/resources": "2.2.0"
+      },
+      "engines": {
+        "node": "^18.19.0 || >=20.6.0"
+      },
+      "peerDependencies": {
+        "@opentelemetry/api": ">=1.9.0 <1.10.0"
+      }
+    },
     "node_modules/@opentelemetry/exporter-prometheus": {
       "version": "0.208.0",
       "resolved": "https://registry.npmjs.org/@opentelemetry/exporter-prometheus/-/exporter-prometheus-0.208.0.tgz",
@@ -1356,6 +1591,53 @@
       },
       "peerDependencies": {
         "@opentelemetry/api": "^1.3.0"
+      }
+    },
+    "node_modules/@opentelemetry/exporter-prometheus/node_modules/@opentelemetry/core": {
+      "version": "2.2.0",
+      "resolved": "https://registry.npmjs.org/@opentelemetry/core/-/core-2.2.0.tgz",
+      "integrity": "sha512-FuabnnUm8LflnieVxs6eP7Z383hgQU4W1e3KJS6aOG3RxWxcHyBxH8fDMHNgu/gFx/M2jvTOW/4/PHhLz6bjWw==",
+      "license": "Apache-2.0",
+      "dependencies": {
+        "@opentelemetry/semantic-conventions": "^1.29.0"
+      },
+      "engines": {
+        "node": "^18.19.0 || >=20.6.0"
+      },
+      "peerDependencies": {
+        "@opentelemetry/api": ">=1.0.0 <1.10.0"
+      }
+    },
+    "node_modules/@opentelemetry/exporter-prometheus/node_modules/@opentelemetry/resources": {
+      "version": "2.2.0",
+      "resolved": "https://registry.npmjs.org/@opentelemetry/resources/-/resources-2.2.0.tgz",
+      "integrity": "sha512-1pNQf/JazQTMA0BiO5NINUzH0cbLbbl7mntLa4aJNmCCXSj0q03T5ZXXL0zw4G55TjdL9Tz32cznGClf+8zr5A==",
+      "license": "Apache-2.0",
+      "dependencies": {
+        "@opentelemetry/core": "2.2.0",
+        "@opentelemetry/semantic-conventions": "^1.29.0"
+      },
+      "engines": {
+        "node": "^18.19.0 || >=20.6.0"
+      },
+      "peerDependencies": {
+        "@opentelemetry/api": ">=1.3.0 <1.10.0"
+      }
+    },
+    "node_modules/@opentelemetry/exporter-prometheus/node_modules/@opentelemetry/sdk-metrics": {
+      "version": "2.2.0",
+      "resolved": "https://registry.npmjs.org/@opentelemetry/sdk-metrics/-/sdk-metrics-2.2.0.tgz",
+      "integrity": "sha512-G5KYP6+VJMZzpGipQw7Giif48h6SGQ2PFKEYCybeXJsOCB4fp8azqMAAzE5lnnHK3ZVwYQrgmFbsUJO/zOnwGw==",
+      "license": "Apache-2.0",
+      "dependencies": {
+        "@opentelemetry/core": "2.2.0",
+        "@opentelemetry/resources": "2.2.0"
+      },
+      "engines": {
+        "node": "^18.19.0 || >=20.6.0"
+      },
+      "peerDependencies": {
+        "@opentelemetry/api": ">=1.9.0 <1.10.0"
       }
     },
     "node_modules/@opentelemetry/exporter-trace-otlp-grpc": {
@@ -1379,6 +1661,54 @@
         "@opentelemetry/api": "^1.3.0"
       }
     },
+    "node_modules/@opentelemetry/exporter-trace-otlp-grpc/node_modules/@opentelemetry/core": {
+      "version": "2.2.0",
+      "resolved": "https://registry.npmjs.org/@opentelemetry/core/-/core-2.2.0.tgz",
+      "integrity": "sha512-FuabnnUm8LflnieVxs6eP7Z383hgQU4W1e3KJS6aOG3RxWxcHyBxH8fDMHNgu/gFx/M2jvTOW/4/PHhLz6bjWw==",
+      "license": "Apache-2.0",
+      "dependencies": {
+        "@opentelemetry/semantic-conventions": "^1.29.0"
+      },
+      "engines": {
+        "node": "^18.19.0 || >=20.6.0"
+      },
+      "peerDependencies": {
+        "@opentelemetry/api": ">=1.0.0 <1.10.0"
+      }
+    },
+    "node_modules/@opentelemetry/exporter-trace-otlp-grpc/node_modules/@opentelemetry/resources": {
+      "version": "2.2.0",
+      "resolved": "https://registry.npmjs.org/@opentelemetry/resources/-/resources-2.2.0.tgz",
+      "integrity": "sha512-1pNQf/JazQTMA0BiO5NINUzH0cbLbbl7mntLa4aJNmCCXSj0q03T5ZXXL0zw4G55TjdL9Tz32cznGClf+8zr5A==",
+      "license": "Apache-2.0",
+      "dependencies": {
+        "@opentelemetry/core": "2.2.0",
+        "@opentelemetry/semantic-conventions": "^1.29.0"
+      },
+      "engines": {
+        "node": "^18.19.0 || >=20.6.0"
+      },
+      "peerDependencies": {
+        "@opentelemetry/api": ">=1.3.0 <1.10.0"
+      }
+    },
+    "node_modules/@opentelemetry/exporter-trace-otlp-grpc/node_modules/@opentelemetry/sdk-trace-base": {
+      "version": "2.2.0",
+      "resolved": "https://registry.npmjs.org/@opentelemetry/sdk-trace-base/-/sdk-trace-base-2.2.0.tgz",
+      "integrity": "sha512-xWQgL0Bmctsalg6PaXExmzdedSp3gyKV8mQBwK/j9VGdCDu2fmXIb2gAehBKbkXCpJ4HPkgv3QfoJWRT4dHWbw==",
+      "license": "Apache-2.0",
+      "dependencies": {
+        "@opentelemetry/core": "2.2.0",
+        "@opentelemetry/resources": "2.2.0",
+        "@opentelemetry/semantic-conventions": "^1.29.0"
+      },
+      "engines": {
+        "node": "^18.19.0 || >=20.6.0"
+      },
+      "peerDependencies": {
+        "@opentelemetry/api": ">=1.3.0 <1.10.0"
+      }
+    },
     "node_modules/@opentelemetry/exporter-trace-otlp-http": {
       "version": "0.208.0",
       "resolved": "https://registry.npmjs.org/@opentelemetry/exporter-trace-otlp-http/-/exporter-trace-otlp-http-0.208.0.tgz",
@@ -1396,6 +1726,54 @@
       },
       "peerDependencies": {
         "@opentelemetry/api": "^1.3.0"
+      }
+    },
+    "node_modules/@opentelemetry/exporter-trace-otlp-http/node_modules/@opentelemetry/core": {
+      "version": "2.2.0",
+      "resolved": "https://registry.npmjs.org/@opentelemetry/core/-/core-2.2.0.tgz",
+      "integrity": "sha512-FuabnnUm8LflnieVxs6eP7Z383hgQU4W1e3KJS6aOG3RxWxcHyBxH8fDMHNgu/gFx/M2jvTOW/4/PHhLz6bjWw==",
+      "license": "Apache-2.0",
+      "dependencies": {
+        "@opentelemetry/semantic-conventions": "^1.29.0"
+      },
+      "engines": {
+        "node": "^18.19.0 || >=20.6.0"
+      },
+      "peerDependencies": {
+        "@opentelemetry/api": ">=1.0.0 <1.10.0"
+      }
+    },
+    "node_modules/@opentelemetry/exporter-trace-otlp-http/node_modules/@opentelemetry/resources": {
+      "version": "2.2.0",
+      "resolved": "https://registry.npmjs.org/@opentelemetry/resources/-/resources-2.2.0.tgz",
+      "integrity": "sha512-1pNQf/JazQTMA0BiO5NINUzH0cbLbbl7mntLa4aJNmCCXSj0q03T5ZXXL0zw4G55TjdL9Tz32cznGClf+8zr5A==",
+      "license": "Apache-2.0",
+      "dependencies": {
+        "@opentelemetry/core": "2.2.0",
+        "@opentelemetry/semantic-conventions": "^1.29.0"
+      },
+      "engines": {
+        "node": "^18.19.0 || >=20.6.0"
+      },
+      "peerDependencies": {
+        "@opentelemetry/api": ">=1.3.0 <1.10.0"
+      }
+    },
+    "node_modules/@opentelemetry/exporter-trace-otlp-http/node_modules/@opentelemetry/sdk-trace-base": {
+      "version": "2.2.0",
+      "resolved": "https://registry.npmjs.org/@opentelemetry/sdk-trace-base/-/sdk-trace-base-2.2.0.tgz",
+      "integrity": "sha512-xWQgL0Bmctsalg6PaXExmzdedSp3gyKV8mQBwK/j9VGdCDu2fmXIb2gAehBKbkXCpJ4HPkgv3QfoJWRT4dHWbw==",
+      "license": "Apache-2.0",
+      "dependencies": {
+        "@opentelemetry/core": "2.2.0",
+        "@opentelemetry/resources": "2.2.0",
+        "@opentelemetry/semantic-conventions": "^1.29.0"
+      },
+      "engines": {
+        "node": "^18.19.0 || >=20.6.0"
+      },
+      "peerDependencies": {
+        "@opentelemetry/api": ">=1.3.0 <1.10.0"
       }
     },
     "node_modules/@opentelemetry/exporter-trace-otlp-proto": {
@@ -1417,6 +1795,54 @@
         "@opentelemetry/api": "^1.3.0"
       }
     },
+    "node_modules/@opentelemetry/exporter-trace-otlp-proto/node_modules/@opentelemetry/core": {
+      "version": "2.2.0",
+      "resolved": "https://registry.npmjs.org/@opentelemetry/core/-/core-2.2.0.tgz",
+      "integrity": "sha512-FuabnnUm8LflnieVxs6eP7Z383hgQU4W1e3KJS6aOG3RxWxcHyBxH8fDMHNgu/gFx/M2jvTOW/4/PHhLz6bjWw==",
+      "license": "Apache-2.0",
+      "dependencies": {
+        "@opentelemetry/semantic-conventions": "^1.29.0"
+      },
+      "engines": {
+        "node": "^18.19.0 || >=20.6.0"
+      },
+      "peerDependencies": {
+        "@opentelemetry/api": ">=1.0.0 <1.10.0"
+      }
+    },
+    "node_modules/@opentelemetry/exporter-trace-otlp-proto/node_modules/@opentelemetry/resources": {
+      "version": "2.2.0",
+      "resolved": "https://registry.npmjs.org/@opentelemetry/resources/-/resources-2.2.0.tgz",
+      "integrity": "sha512-1pNQf/JazQTMA0BiO5NINUzH0cbLbbl7mntLa4aJNmCCXSj0q03T5ZXXL0zw4G55TjdL9Tz32cznGClf+8zr5A==",
+      "license": "Apache-2.0",
+      "dependencies": {
+        "@opentelemetry/core": "2.2.0",
+        "@opentelemetry/semantic-conventions": "^1.29.0"
+      },
+      "engines": {
+        "node": "^18.19.0 || >=20.6.0"
+      },
+      "peerDependencies": {
+        "@opentelemetry/api": ">=1.3.0 <1.10.0"
+      }
+    },
+    "node_modules/@opentelemetry/exporter-trace-otlp-proto/node_modules/@opentelemetry/sdk-trace-base": {
+      "version": "2.2.0",
+      "resolved": "https://registry.npmjs.org/@opentelemetry/sdk-trace-base/-/sdk-trace-base-2.2.0.tgz",
+      "integrity": "sha512-xWQgL0Bmctsalg6PaXExmzdedSp3gyKV8mQBwK/j9VGdCDu2fmXIb2gAehBKbkXCpJ4HPkgv3QfoJWRT4dHWbw==",
+      "license": "Apache-2.0",
+      "dependencies": {
+        "@opentelemetry/core": "2.2.0",
+        "@opentelemetry/resources": "2.2.0",
+        "@opentelemetry/semantic-conventions": "^1.29.0"
+      },
+      "engines": {
+        "node": "^18.19.0 || >=20.6.0"
+      },
+      "peerDependencies": {
+        "@opentelemetry/api": ">=1.3.0 <1.10.0"
+      }
+    },
     "node_modules/@opentelemetry/exporter-zipkin": {
       "version": "2.2.0",
       "resolved": "https://registry.npmjs.org/@opentelemetry/exporter-zipkin/-/exporter-zipkin-2.2.0.tgz",
@@ -1433,6 +1859,54 @@
       },
       "peerDependencies": {
         "@opentelemetry/api": "^1.0.0"
+      }
+    },
+    "node_modules/@opentelemetry/exporter-zipkin/node_modules/@opentelemetry/core": {
+      "version": "2.2.0",
+      "resolved": "https://registry.npmjs.org/@opentelemetry/core/-/core-2.2.0.tgz",
+      "integrity": "sha512-FuabnnUm8LflnieVxs6eP7Z383hgQU4W1e3KJS6aOG3RxWxcHyBxH8fDMHNgu/gFx/M2jvTOW/4/PHhLz6bjWw==",
+      "license": "Apache-2.0",
+      "dependencies": {
+        "@opentelemetry/semantic-conventions": "^1.29.0"
+      },
+      "engines": {
+        "node": "^18.19.0 || >=20.6.0"
+      },
+      "peerDependencies": {
+        "@opentelemetry/api": ">=1.0.0 <1.10.0"
+      }
+    },
+    "node_modules/@opentelemetry/exporter-zipkin/node_modules/@opentelemetry/resources": {
+      "version": "2.2.0",
+      "resolved": "https://registry.npmjs.org/@opentelemetry/resources/-/resources-2.2.0.tgz",
+      "integrity": "sha512-1pNQf/JazQTMA0BiO5NINUzH0cbLbbl7mntLa4aJNmCCXSj0q03T5ZXXL0zw4G55TjdL9Tz32cznGClf+8zr5A==",
+      "license": "Apache-2.0",
+      "dependencies": {
+        "@opentelemetry/core": "2.2.0",
+        "@opentelemetry/semantic-conventions": "^1.29.0"
+      },
+      "engines": {
+        "node": "^18.19.0 || >=20.6.0"
+      },
+      "peerDependencies": {
+        "@opentelemetry/api": ">=1.3.0 <1.10.0"
+      }
+    },
+    "node_modules/@opentelemetry/exporter-zipkin/node_modules/@opentelemetry/sdk-trace-base": {
+      "version": "2.2.0",
+      "resolved": "https://registry.npmjs.org/@opentelemetry/sdk-trace-base/-/sdk-trace-base-2.2.0.tgz",
+      "integrity": "sha512-xWQgL0Bmctsalg6PaXExmzdedSp3gyKV8mQBwK/j9VGdCDu2fmXIb2gAehBKbkXCpJ4HPkgv3QfoJWRT4dHWbw==",
+      "license": "Apache-2.0",
+      "dependencies": {
+        "@opentelemetry/core": "2.2.0",
+        "@opentelemetry/resources": "2.2.0",
+        "@opentelemetry/semantic-conventions": "^1.29.0"
+      },
+      "engines": {
+        "node": "^18.19.0 || >=20.6.0"
+      },
+      "peerDependencies": {
+        "@opentelemetry/api": ">=1.3.0 <1.10.0"
       }
     },
     "node_modules/@opentelemetry/instrumentation": {
@@ -1487,6 +1961,21 @@
         "@opentelemetry/api": "^1.3.0"
       }
     },
+    "node_modules/@opentelemetry/instrumentation-http/node_modules/@opentelemetry/core": {
+      "version": "2.2.0",
+      "resolved": "https://registry.npmjs.org/@opentelemetry/core/-/core-2.2.0.tgz",
+      "integrity": "sha512-FuabnnUm8LflnieVxs6eP7Z383hgQU4W1e3KJS6aOG3RxWxcHyBxH8fDMHNgu/gFx/M2jvTOW/4/PHhLz6bjWw==",
+      "license": "Apache-2.0",
+      "dependencies": {
+        "@opentelemetry/semantic-conventions": "^1.29.0"
+      },
+      "engines": {
+        "node": "^18.19.0 || >=20.6.0"
+      },
+      "peerDependencies": {
+        "@opentelemetry/api": ">=1.0.0 <1.10.0"
+      }
+    },
     "node_modules/@opentelemetry/instrumentation-mongodb": {
       "version": "0.61.0",
       "resolved": "https://registry.npmjs.org/@opentelemetry/instrumentation-mongodb/-/instrumentation-mongodb-0.61.0.tgz",
@@ -1519,9 +2008,9 @@
       }
     },
     "node_modules/@opentelemetry/instrumentation-pg": {
-      "version": "0.61.1",
-      "resolved": "https://registry.npmjs.org/@opentelemetry/instrumentation-pg/-/instrumentation-pg-0.61.1.tgz",
-      "integrity": "sha512-VKKts/XcOCa7IPBxVjL2B4UyG+YTNa4Dh1Xx2vqL0jOEQBJlNsv++I12BUw/8NRLEr2K/gOM5tpVU7QqhWA65A==",
+      "version": "0.61.2",
+      "resolved": "https://registry.npmjs.org/@opentelemetry/instrumentation-pg/-/instrumentation-pg-0.61.2.tgz",
+      "integrity": "sha512-l1tN4dX8Ig1bKzMu81Q1EBXWFRy9wqchXbeHDRniJsXYND5dC8u1Uhah7wz1zZta3fbBWflP2mJZcDPWNsAMRg==",
       "license": "Apache-2.0",
       "dependencies": {
         "@opentelemetry/core": "^2.0.0",
@@ -1539,9 +2028,9 @@
       }
     },
     "node_modules/@opentelemetry/instrumentation-redis": {
-      "version": "0.57.1",
-      "resolved": "https://registry.npmjs.org/@opentelemetry/instrumentation-redis/-/instrumentation-redis-0.57.1.tgz",
-      "integrity": "sha512-iP564P8On9NPPi06T2MyL56sBN0RsF29DX/RC5fW0yOOFdUHcvCDmJnp11eZyymTvYj5HX8tvpoO+vDb6+Lv8A==",
+      "version": "0.57.2",
+      "resolved": "https://registry.npmjs.org/@opentelemetry/instrumentation-redis/-/instrumentation-redis-0.57.2.tgz",
+      "integrity": "sha512-vD1nzOUDOPjnvDCny7fmRSX/hMTFzPUCZKADF5tQ5DvBqlOEV/de/tOkwvIwo9YX956EBMT+8qSjhd7qPXFkRw==",
       "license": "Apache-2.0",
       "dependencies": {
         "@opentelemetry/instrumentation": "^0.208.0",
@@ -1587,6 +2076,21 @@
         "@opentelemetry/api": "^1.3.0"
       }
     },
+    "node_modules/@opentelemetry/otlp-exporter-base/node_modules/@opentelemetry/core": {
+      "version": "2.2.0",
+      "resolved": "https://registry.npmjs.org/@opentelemetry/core/-/core-2.2.0.tgz",
+      "integrity": "sha512-FuabnnUm8LflnieVxs6eP7Z383hgQU4W1e3KJS6aOG3RxWxcHyBxH8fDMHNgu/gFx/M2jvTOW/4/PHhLz6bjWw==",
+      "license": "Apache-2.0",
+      "dependencies": {
+        "@opentelemetry/semantic-conventions": "^1.29.0"
+      },
+      "engines": {
+        "node": "^18.19.0 || >=20.6.0"
+      },
+      "peerDependencies": {
+        "@opentelemetry/api": ">=1.0.0 <1.10.0"
+      }
+    },
     "node_modules/@opentelemetry/otlp-grpc-exporter-base": {
       "version": "0.208.0",
       "resolved": "https://registry.npmjs.org/@opentelemetry/otlp-grpc-exporter-base/-/otlp-grpc-exporter-base-0.208.0.tgz",
@@ -1603,6 +2107,21 @@
       },
       "peerDependencies": {
         "@opentelemetry/api": "^1.3.0"
+      }
+    },
+    "node_modules/@opentelemetry/otlp-grpc-exporter-base/node_modules/@opentelemetry/core": {
+      "version": "2.2.0",
+      "resolved": "https://registry.npmjs.org/@opentelemetry/core/-/core-2.2.0.tgz",
+      "integrity": "sha512-FuabnnUm8LflnieVxs6eP7Z383hgQU4W1e3KJS6aOG3RxWxcHyBxH8fDMHNgu/gFx/M2jvTOW/4/PHhLz6bjWw==",
+      "license": "Apache-2.0",
+      "dependencies": {
+        "@opentelemetry/semantic-conventions": "^1.29.0"
+      },
+      "engines": {
+        "node": "^18.19.0 || >=20.6.0"
+      },
+      "peerDependencies": {
+        "@opentelemetry/api": ">=1.0.0 <1.10.0"
       }
     },
     "node_modules/@opentelemetry/otlp-transformer": {
@@ -1626,6 +2145,70 @@
         "@opentelemetry/api": "^1.3.0"
       }
     },
+    "node_modules/@opentelemetry/otlp-transformer/node_modules/@opentelemetry/core": {
+      "version": "2.2.0",
+      "resolved": "https://registry.npmjs.org/@opentelemetry/core/-/core-2.2.0.tgz",
+      "integrity": "sha512-FuabnnUm8LflnieVxs6eP7Z383hgQU4W1e3KJS6aOG3RxWxcHyBxH8fDMHNgu/gFx/M2jvTOW/4/PHhLz6bjWw==",
+      "license": "Apache-2.0",
+      "dependencies": {
+        "@opentelemetry/semantic-conventions": "^1.29.0"
+      },
+      "engines": {
+        "node": "^18.19.0 || >=20.6.0"
+      },
+      "peerDependencies": {
+        "@opentelemetry/api": ">=1.0.0 <1.10.0"
+      }
+    },
+    "node_modules/@opentelemetry/otlp-transformer/node_modules/@opentelemetry/resources": {
+      "version": "2.2.0",
+      "resolved": "https://registry.npmjs.org/@opentelemetry/resources/-/resources-2.2.0.tgz",
+      "integrity": "sha512-1pNQf/JazQTMA0BiO5NINUzH0cbLbbl7mntLa4aJNmCCXSj0q03T5ZXXL0zw4G55TjdL9Tz32cznGClf+8zr5A==",
+      "license": "Apache-2.0",
+      "dependencies": {
+        "@opentelemetry/core": "2.2.0",
+        "@opentelemetry/semantic-conventions": "^1.29.0"
+      },
+      "engines": {
+        "node": "^18.19.0 || >=20.6.0"
+      },
+      "peerDependencies": {
+        "@opentelemetry/api": ">=1.3.0 <1.10.0"
+      }
+    },
+    "node_modules/@opentelemetry/otlp-transformer/node_modules/@opentelemetry/sdk-metrics": {
+      "version": "2.2.0",
+      "resolved": "https://registry.npmjs.org/@opentelemetry/sdk-metrics/-/sdk-metrics-2.2.0.tgz",
+      "integrity": "sha512-G5KYP6+VJMZzpGipQw7Giif48h6SGQ2PFKEYCybeXJsOCB4fp8azqMAAzE5lnnHK3ZVwYQrgmFbsUJO/zOnwGw==",
+      "license": "Apache-2.0",
+      "dependencies": {
+        "@opentelemetry/core": "2.2.0",
+        "@opentelemetry/resources": "2.2.0"
+      },
+      "engines": {
+        "node": "^18.19.0 || >=20.6.0"
+      },
+      "peerDependencies": {
+        "@opentelemetry/api": ">=1.9.0 <1.10.0"
+      }
+    },
+    "node_modules/@opentelemetry/otlp-transformer/node_modules/@opentelemetry/sdk-trace-base": {
+      "version": "2.2.0",
+      "resolved": "https://registry.npmjs.org/@opentelemetry/sdk-trace-base/-/sdk-trace-base-2.2.0.tgz",
+      "integrity": "sha512-xWQgL0Bmctsalg6PaXExmzdedSp3gyKV8mQBwK/j9VGdCDu2fmXIb2gAehBKbkXCpJ4HPkgv3QfoJWRT4dHWbw==",
+      "license": "Apache-2.0",
+      "dependencies": {
+        "@opentelemetry/core": "2.2.0",
+        "@opentelemetry/resources": "2.2.0",
+        "@opentelemetry/semantic-conventions": "^1.29.0"
+      },
+      "engines": {
+        "node": "^18.19.0 || >=20.6.0"
+      },
+      "peerDependencies": {
+        "@opentelemetry/api": ">=1.3.0 <1.10.0"
+      }
+    },
     "node_modules/@opentelemetry/propagator-b3": {
       "version": "2.2.0",
       "resolved": "https://registry.npmjs.org/@opentelemetry/propagator-b3/-/propagator-b3-2.2.0.tgz",
@@ -1641,6 +2224,21 @@
         "@opentelemetry/api": ">=1.0.0 <1.10.0"
       }
     },
+    "node_modules/@opentelemetry/propagator-b3/node_modules/@opentelemetry/core": {
+      "version": "2.2.0",
+      "resolved": "https://registry.npmjs.org/@opentelemetry/core/-/core-2.2.0.tgz",
+      "integrity": "sha512-FuabnnUm8LflnieVxs6eP7Z383hgQU4W1e3KJS6aOG3RxWxcHyBxH8fDMHNgu/gFx/M2jvTOW/4/PHhLz6bjWw==",
+      "license": "Apache-2.0",
+      "dependencies": {
+        "@opentelemetry/semantic-conventions": "^1.29.0"
+      },
+      "engines": {
+        "node": "^18.19.0 || >=20.6.0"
+      },
+      "peerDependencies": {
+        "@opentelemetry/api": ">=1.0.0 <1.10.0"
+      }
+    },
     "node_modules/@opentelemetry/propagator-jaeger": {
       "version": "2.2.0",
       "resolved": "https://registry.npmjs.org/@opentelemetry/propagator-jaeger/-/propagator-jaeger-2.2.0.tgz",
@@ -1648,6 +2246,21 @@
       "license": "Apache-2.0",
       "dependencies": {
         "@opentelemetry/core": "2.2.0"
+      },
+      "engines": {
+        "node": "^18.19.0 || >=20.6.0"
+      },
+      "peerDependencies": {
+        "@opentelemetry/api": ">=1.0.0 <1.10.0"
+      }
+    },
+    "node_modules/@opentelemetry/propagator-jaeger/node_modules/@opentelemetry/core": {
+      "version": "2.2.0",
+      "resolved": "https://registry.npmjs.org/@opentelemetry/core/-/core-2.2.0.tgz",
+      "integrity": "sha512-FuabnnUm8LflnieVxs6eP7Z383hgQU4W1e3KJS6aOG3RxWxcHyBxH8fDMHNgu/gFx/M2jvTOW/4/PHhLz6bjWw==",
+      "license": "Apache-2.0",
+      "dependencies": {
+        "@opentelemetry/semantic-conventions": "^1.29.0"
       },
       "engines": {
         "node": "^18.19.0 || >=20.6.0"
@@ -1683,12 +2296,12 @@
       }
     },
     "node_modules/@opentelemetry/resources": {
-      "version": "2.2.0",
-      "resolved": "https://registry.npmjs.org/@opentelemetry/resources/-/resources-2.2.0.tgz",
-      "integrity": "sha512-1pNQf/JazQTMA0BiO5NINUzH0cbLbbl7mntLa4aJNmCCXSj0q03T5ZXXL0zw4G55TjdL9Tz32cznGClf+8zr5A==",
+      "version": "2.5.0",
+      "resolved": "https://registry.npmjs.org/@opentelemetry/resources/-/resources-2.5.0.tgz",
+      "integrity": "sha512-F8W52ApePshpoSrfsSk1H2yJn9aKjCrbpQF1M9Qii0GHzbfVeFUB+rc3X4aggyZD8x9Gu3Slua+s6krmq6Dt8g==",
       "license": "Apache-2.0",
       "dependencies": {
-        "@opentelemetry/core": "2.2.0",
+        "@opentelemetry/core": "2.5.0",
         "@opentelemetry/semantic-conventions": "^1.29.0"
       },
       "engines": {
@@ -1715,14 +2328,45 @@
         "@opentelemetry/api": ">=1.4.0 <1.10.0"
       }
     },
-    "node_modules/@opentelemetry/sdk-metrics": {
+    "node_modules/@opentelemetry/sdk-logs/node_modules/@opentelemetry/core": {
       "version": "2.2.0",
-      "resolved": "https://registry.npmjs.org/@opentelemetry/sdk-metrics/-/sdk-metrics-2.2.0.tgz",
-      "integrity": "sha512-G5KYP6+VJMZzpGipQw7Giif48h6SGQ2PFKEYCybeXJsOCB4fp8azqMAAzE5lnnHK3ZVwYQrgmFbsUJO/zOnwGw==",
+      "resolved": "https://registry.npmjs.org/@opentelemetry/core/-/core-2.2.0.tgz",
+      "integrity": "sha512-FuabnnUm8LflnieVxs6eP7Z383hgQU4W1e3KJS6aOG3RxWxcHyBxH8fDMHNgu/gFx/M2jvTOW/4/PHhLz6bjWw==",
+      "license": "Apache-2.0",
+      "dependencies": {
+        "@opentelemetry/semantic-conventions": "^1.29.0"
+      },
+      "engines": {
+        "node": "^18.19.0 || >=20.6.0"
+      },
+      "peerDependencies": {
+        "@opentelemetry/api": ">=1.0.0 <1.10.0"
+      }
+    },
+    "node_modules/@opentelemetry/sdk-logs/node_modules/@opentelemetry/resources": {
+      "version": "2.2.0",
+      "resolved": "https://registry.npmjs.org/@opentelemetry/resources/-/resources-2.2.0.tgz",
+      "integrity": "sha512-1pNQf/JazQTMA0BiO5NINUzH0cbLbbl7mntLa4aJNmCCXSj0q03T5ZXXL0zw4G55TjdL9Tz32cznGClf+8zr5A==",
       "license": "Apache-2.0",
       "dependencies": {
         "@opentelemetry/core": "2.2.0",
-        "@opentelemetry/resources": "2.2.0"
+        "@opentelemetry/semantic-conventions": "^1.29.0"
+      },
+      "engines": {
+        "node": "^18.19.0 || >=20.6.0"
+      },
+      "peerDependencies": {
+        "@opentelemetry/api": ">=1.3.0 <1.10.0"
+      }
+    },
+    "node_modules/@opentelemetry/sdk-metrics": {
+      "version": "2.5.0",
+      "resolved": "https://registry.npmjs.org/@opentelemetry/sdk-metrics/-/sdk-metrics-2.5.0.tgz",
+      "integrity": "sha512-BeJLtU+f5Gf905cJX9vXFQorAr6TAfK3SPvTFqP+scfIpDQEJfRaGJWta7sJgP+m4dNtBf9y3yvBKVAZZtJQVA==",
+      "license": "Apache-2.0",
+      "dependencies": {
+        "@opentelemetry/core": "2.5.0",
+        "@opentelemetry/resources": "2.5.0"
       },
       "engines": {
         "node": "^18.19.0 || >=20.6.0"
@@ -1767,7 +2411,66 @@
         "@opentelemetry/api": ">=1.3.0 <1.10.0"
       }
     },
-    "node_modules/@opentelemetry/sdk-trace-base": {
+    "node_modules/@opentelemetry/sdk-node/node_modules/@opentelemetry/context-async-hooks": {
+      "version": "2.2.0",
+      "resolved": "https://registry.npmjs.org/@opentelemetry/context-async-hooks/-/context-async-hooks-2.2.0.tgz",
+      "integrity": "sha512-qRkLWiUEZNAmYapZ7KGS5C4OmBLcP/H2foXeOEaowYCR0wi89fHejrfYfbuLVCMLp/dWZXKvQusdbUEZjERfwQ==",
+      "license": "Apache-2.0",
+      "engines": {
+        "node": "^18.19.0 || >=20.6.0"
+      },
+      "peerDependencies": {
+        "@opentelemetry/api": ">=1.0.0 <1.10.0"
+      }
+    },
+    "node_modules/@opentelemetry/sdk-node/node_modules/@opentelemetry/core": {
+      "version": "2.2.0",
+      "resolved": "https://registry.npmjs.org/@opentelemetry/core/-/core-2.2.0.tgz",
+      "integrity": "sha512-FuabnnUm8LflnieVxs6eP7Z383hgQU4W1e3KJS6aOG3RxWxcHyBxH8fDMHNgu/gFx/M2jvTOW/4/PHhLz6bjWw==",
+      "license": "Apache-2.0",
+      "dependencies": {
+        "@opentelemetry/semantic-conventions": "^1.29.0"
+      },
+      "engines": {
+        "node": "^18.19.0 || >=20.6.0"
+      },
+      "peerDependencies": {
+        "@opentelemetry/api": ">=1.0.0 <1.10.0"
+      }
+    },
+    "node_modules/@opentelemetry/sdk-node/node_modules/@opentelemetry/resources": {
+      "version": "2.2.0",
+      "resolved": "https://registry.npmjs.org/@opentelemetry/resources/-/resources-2.2.0.tgz",
+      "integrity": "sha512-1pNQf/JazQTMA0BiO5NINUzH0cbLbbl7mntLa4aJNmCCXSj0q03T5ZXXL0zw4G55TjdL9Tz32cznGClf+8zr5A==",
+      "license": "Apache-2.0",
+      "dependencies": {
+        "@opentelemetry/core": "2.2.0",
+        "@opentelemetry/semantic-conventions": "^1.29.0"
+      },
+      "engines": {
+        "node": "^18.19.0 || >=20.6.0"
+      },
+      "peerDependencies": {
+        "@opentelemetry/api": ">=1.3.0 <1.10.0"
+      }
+    },
+    "node_modules/@opentelemetry/sdk-node/node_modules/@opentelemetry/sdk-metrics": {
+      "version": "2.2.0",
+      "resolved": "https://registry.npmjs.org/@opentelemetry/sdk-metrics/-/sdk-metrics-2.2.0.tgz",
+      "integrity": "sha512-G5KYP6+VJMZzpGipQw7Giif48h6SGQ2PFKEYCybeXJsOCB4fp8azqMAAzE5lnnHK3ZVwYQrgmFbsUJO/zOnwGw==",
+      "license": "Apache-2.0",
+      "dependencies": {
+        "@opentelemetry/core": "2.2.0",
+        "@opentelemetry/resources": "2.2.0"
+      },
+      "engines": {
+        "node": "^18.19.0 || >=20.6.0"
+      },
+      "peerDependencies": {
+        "@opentelemetry/api": ">=1.9.0 <1.10.0"
+      }
+    },
+    "node_modules/@opentelemetry/sdk-node/node_modules/@opentelemetry/sdk-trace-base": {
       "version": "2.2.0",
       "resolved": "https://registry.npmjs.org/@opentelemetry/sdk-trace-base/-/sdk-trace-base-2.2.0.tgz",
       "integrity": "sha512-xWQgL0Bmctsalg6PaXExmzdedSp3gyKV8mQBwK/j9VGdCDu2fmXIb2gAehBKbkXCpJ4HPkgv3QfoJWRT4dHWbw==",
@@ -1784,7 +2487,7 @@
         "@opentelemetry/api": ">=1.3.0 <1.10.0"
       }
     },
-    "node_modules/@opentelemetry/sdk-trace-node": {
+    "node_modules/@opentelemetry/sdk-node/node_modules/@opentelemetry/sdk-trace-node": {
       "version": "2.2.0",
       "resolved": "https://registry.npmjs.org/@opentelemetry/sdk-trace-node/-/sdk-trace-node-2.2.0.tgz",
       "integrity": "sha512-+OaRja3f0IqGG2kptVeYsrZQK9nKRSpfFrKtRBq4uh6nIB8bTBgaGvYQrQoRrQWQMA5dK5yLhDMDc0dvYvCOIQ==",
@@ -1801,14 +2504,48 @@
         "@opentelemetry/api": ">=1.0.0 <1.10.0"
       }
     },
-    "node_modules/@opentelemetry/sdk-trace-web": {
-      "version": "2.2.0",
-      "resolved": "https://registry.npmjs.org/@opentelemetry/sdk-trace-web/-/sdk-trace-web-2.2.0.tgz",
-      "integrity": "sha512-x/LHsDBO3kfqaFx5qSzBljJ5QHsRXrvS4MybBDy1k7Svidb8ZyIPudWVzj3s5LpPkYZIgi9e+7tdsNCnptoelw==",
+    "node_modules/@opentelemetry/sdk-trace-base": {
+      "version": "2.5.0",
+      "resolved": "https://registry.npmjs.org/@opentelemetry/sdk-trace-base/-/sdk-trace-base-2.5.0.tgz",
+      "integrity": "sha512-VzRf8LzotASEyNDUxTdaJ9IRJ1/h692WyArDBInf5puLCjxbICD6XkHgpuudis56EndyS7LYFmtTMny6UABNdQ==",
       "license": "Apache-2.0",
       "dependencies": {
-        "@opentelemetry/core": "2.2.0",
-        "@opentelemetry/sdk-trace-base": "2.2.0"
+        "@opentelemetry/core": "2.5.0",
+        "@opentelemetry/resources": "2.5.0",
+        "@opentelemetry/semantic-conventions": "^1.29.0"
+      },
+      "engines": {
+        "node": "^18.19.0 || >=20.6.0"
+      },
+      "peerDependencies": {
+        "@opentelemetry/api": ">=1.3.0 <1.10.0"
+      }
+    },
+    "node_modules/@opentelemetry/sdk-trace-node": {
+      "version": "2.5.0",
+      "resolved": "https://registry.npmjs.org/@opentelemetry/sdk-trace-node/-/sdk-trace-node-2.5.0.tgz",
+      "integrity": "sha512-O6N/ejzburFm2C84aKNrwJVPpt6HSTSq8T0ZUMq3xT2XmqT4cwxUItcL5UWGThYuq8RTcbH8u1sfj6dmRci0Ow==",
+      "license": "Apache-2.0",
+      "dependencies": {
+        "@opentelemetry/context-async-hooks": "2.5.0",
+        "@opentelemetry/core": "2.5.0",
+        "@opentelemetry/sdk-trace-base": "2.5.0"
+      },
+      "engines": {
+        "node": "^18.19.0 || >=20.6.0"
+      },
+      "peerDependencies": {
+        "@opentelemetry/api": ">=1.0.0 <1.10.0"
+      }
+    },
+    "node_modules/@opentelemetry/sdk-trace-web": {
+      "version": "2.5.0",
+      "resolved": "https://registry.npmjs.org/@opentelemetry/sdk-trace-web/-/sdk-trace-web-2.5.0.tgz",
+      "integrity": "sha512-xWibakHs+xbx6vxH7Q8TbFS6zjf812o/kIS4xBDB32qSL9wF+Z5IZl2ZAGu4rtmPBQ7coZcOd684DobMhf8dKw==",
+      "license": "Apache-2.0",
+      "dependencies": {
+        "@opentelemetry/core": "2.5.0",
+        "@opentelemetry/sdk-trace-base": "2.5.0"
       },
       "engines": {
         "node": "^18.19.0 || >=20.6.0"
@@ -1818,9 +2555,9 @@
       }
     },
     "node_modules/@opentelemetry/semantic-conventions": {
-      "version": "1.38.0",
-      "resolved": "https://registry.npmjs.org/@opentelemetry/semantic-conventions/-/semantic-conventions-1.38.0.tgz",
-      "integrity": "sha512-kocjix+/sSggfJhwXqClZ3i9Y/MI0fp7b+g7kCRm6psy2dsf8uApTRclwG18h8Avm7C9+fnt+O36PspJ/OzoWg==",
+      "version": "1.39.0",
+      "resolved": "https://registry.npmjs.org/@opentelemetry/semantic-conventions/-/semantic-conventions-1.39.0.tgz",
+      "integrity": "sha512-R5R9tb2AXs2IRLNKLBJDynhkfmx7mX0vi8NkhZb3gUkPWHn6HXk5J8iQ/dql0U3ApfWym4kXXmBDRGO+oeOfjg==",
       "license": "Apache-2.0",
       "engines": {
         "node": ">=14"
@@ -2030,14 +2767,14 @@
       }
     },
     "node_modules/@stylistic/eslint-plugin": {
-      "version": "5.6.1",
-      "resolved": "https://registry.npmjs.org/@stylistic/eslint-plugin/-/eslint-plugin-5.6.1.tgz",
-      "integrity": "sha512-JCs+MqoXfXrRPGbGmho/zGS/jMcn3ieKl/A8YImqib76C8kjgZwq5uUFzc30lJkMvcchuRn6/v8IApLxli3Jyw==",
+      "version": "5.7.1",
+      "resolved": "https://registry.npmjs.org/@stylistic/eslint-plugin/-/eslint-plugin-5.7.1.tgz",
+      "integrity": "sha512-zjTUwIsEfT+k9BmXwq1QEFYsb4afBlsI1AXFyWQBgggMzwBFOuu92pGrE5OFx90IOjNl+lUbQoTG7f8S0PkOdg==",
       "dev": true,
       "license": "MIT",
       "dependencies": {
-        "@eslint-community/eslint-utils": "^4.9.0",
-        "@typescript-eslint/types": "^8.47.0",
+        "@eslint-community/eslint-utils": "^4.9.1",
+        "@typescript-eslint/types": "^8.53.1",
         "eslint-visitor-keys": "^4.2.1",
         "espree": "^10.4.0",
         "estraverse": "^5.3.0",
@@ -2146,9 +2883,9 @@
       }
     },
     "node_modules/@types/node": {
-      "version": "24.10.4",
-      "resolved": "https://registry.npmjs.org/@types/node/-/node-24.10.4.tgz",
-      "integrity": "sha512-vnDVpYPMzs4wunl27jHrfmwojOGKya0xyM3sH+UE5iv5uPS6vX7UIoh6m+vQc5LGBq52HBKPIn/zcSZVzeDEZg==",
+      "version": "24.10.9",
+      "resolved": "https://registry.npmjs.org/@types/node/-/node-24.10.9.tgz",
+      "integrity": "sha512-ne4A0IpG3+2ETuREInjPNhUGis1SFjv1d5asp8MzEAGtOZeTeHVDOYqOgqfhvseqg/iXty2hjBf1zAOb7RNiNw==",
       "license": "MIT",
       "dependencies": {
         "undici-types": "~7.16.0"
@@ -2259,20 +2996,20 @@
       "license": "MIT"
     },
     "node_modules/@typescript-eslint/eslint-plugin": {
-      "version": "8.51.0",
-      "resolved": "https://registry.npmjs.org/@typescript-eslint/eslint-plugin/-/eslint-plugin-8.51.0.tgz",
-      "integrity": "sha512-XtssGWJvypyM2ytBnSnKtHYOGT+4ZwTnBVl36TA4nRO2f4PRNGz5/1OszHzcZCvcBMh+qb7I06uoCmLTRdR9og==",
+      "version": "8.54.0",
+      "resolved": "https://registry.npmjs.org/@typescript-eslint/eslint-plugin/-/eslint-plugin-8.54.0.tgz",
+      "integrity": "sha512-hAAP5io/7csFStuOmR782YmTthKBJ9ND3WVL60hcOjvtGFb+HJxH4O5huAcmcZ9v9G8P+JETiZ/G1B8MALnWZQ==",
       "dev": true,
       "license": "MIT",
       "dependencies": {
-        "@eslint-community/regexpp": "^4.10.0",
-        "@typescript-eslint/scope-manager": "8.51.0",
-        "@typescript-eslint/type-utils": "8.51.0",
-        "@typescript-eslint/utils": "8.51.0",
-        "@typescript-eslint/visitor-keys": "8.51.0",
-        "ignore": "^7.0.0",
+        "@eslint-community/regexpp": "^4.12.2",
+        "@typescript-eslint/scope-manager": "8.54.0",
+        "@typescript-eslint/type-utils": "8.54.0",
+        "@typescript-eslint/utils": "8.54.0",
+        "@typescript-eslint/visitor-keys": "8.54.0",
+        "ignore": "^7.0.5",
         "natural-compare": "^1.4.0",
-        "ts-api-utils": "^2.2.0"
+        "ts-api-utils": "^2.4.0"
       },
       "engines": {
         "node": "^18.18.0 || ^20.9.0 || >=21.1.0"
@@ -2282,23 +3019,23 @@
         "url": "https://opencollective.com/typescript-eslint"
       },
       "peerDependencies": {
-        "@typescript-eslint/parser": "^8.51.0",
+        "@typescript-eslint/parser": "^8.54.0",
         "eslint": "^8.57.0 || ^9.0.0",
         "typescript": ">=4.8.4 <6.0.0"
       }
     },
     "node_modules/@typescript-eslint/parser": {
-      "version": "8.51.0",
-      "resolved": "https://registry.npmjs.org/@typescript-eslint/parser/-/parser-8.51.0.tgz",
-      "integrity": "sha512-3xP4XzzDNQOIqBMWogftkwxhg5oMKApqY0BAflmLZiFYHqyhSOxv/cd/zPQLTcCXr4AkaKb25joocY0BD1WC6A==",
+      "version": "8.54.0",
+      "resolved": "https://registry.npmjs.org/@typescript-eslint/parser/-/parser-8.54.0.tgz",
+      "integrity": "sha512-BtE0k6cjwjLZoZixN0t5AKP0kSzlGu7FctRXYuPAm//aaiZhmfq1JwdYpYr1brzEspYyFeF+8XF5j2VK6oalrA==",
       "dev": true,
       "license": "MIT",
       "dependencies": {
-        "@typescript-eslint/scope-manager": "8.51.0",
-        "@typescript-eslint/types": "8.51.0",
-        "@typescript-eslint/typescript-estree": "8.51.0",
-        "@typescript-eslint/visitor-keys": "8.51.0",
-        "debug": "^4.3.4"
+        "@typescript-eslint/scope-manager": "8.54.0",
+        "@typescript-eslint/types": "8.54.0",
+        "@typescript-eslint/typescript-estree": "8.54.0",
+        "@typescript-eslint/visitor-keys": "8.54.0",
+        "debug": "^4.4.3"
       },
       "engines": {
         "node": "^18.18.0 || ^20.9.0 || >=21.1.0"
@@ -2313,15 +3050,15 @@
       }
     },
     "node_modules/@typescript-eslint/project-service": {
-      "version": "8.51.0",
-      "resolved": "https://registry.npmjs.org/@typescript-eslint/project-service/-/project-service-8.51.0.tgz",
-      "integrity": "sha512-Luv/GafO07Z7HpiI7qeEW5NW8HUtZI/fo/kE0YbtQEFpJRUuR0ajcWfCE5bnMvL7QQFrmT/odMe8QZww8X2nfQ==",
+      "version": "8.54.0",
+      "resolved": "https://registry.npmjs.org/@typescript-eslint/project-service/-/project-service-8.54.0.tgz",
+      "integrity": "sha512-YPf+rvJ1s7MyiWM4uTRhE4DvBXrEV+d8oC3P9Y2eT7S+HBS0clybdMIPnhiATi9vZOYDc7OQ1L/i6ga6NFYK/g==",
       "dev": true,
       "license": "MIT",
       "dependencies": {
-        "@typescript-eslint/tsconfig-utils": "^8.51.0",
-        "@typescript-eslint/types": "^8.51.0",
-        "debug": "^4.3.4"
+        "@typescript-eslint/tsconfig-utils": "^8.54.0",
+        "@typescript-eslint/types": "^8.54.0",
+        "debug": "^4.4.3"
       },
       "engines": {
         "node": "^18.18.0 || ^20.9.0 || >=21.1.0"
@@ -2335,14 +3072,14 @@
       }
     },
     "node_modules/@typescript-eslint/scope-manager": {
-      "version": "8.51.0",
-      "resolved": "https://registry.npmjs.org/@typescript-eslint/scope-manager/-/scope-manager-8.51.0.tgz",
-      "integrity": "sha512-JhhJDVwsSx4hiOEQPeajGhCWgBMBwVkxC/Pet53EpBVs7zHHtayKefw1jtPaNRXpI9RA2uocdmpdfE7T+NrizA==",
+      "version": "8.54.0",
+      "resolved": "https://registry.npmjs.org/@typescript-eslint/scope-manager/-/scope-manager-8.54.0.tgz",
+      "integrity": "sha512-27rYVQku26j/PbHYcVfRPonmOlVI6gihHtXFbTdB5sb6qA0wdAQAbyXFVarQ5t4HRojIz64IV90YtsjQSSGlQg==",
       "dev": true,
       "license": "MIT",
       "dependencies": {
-        "@typescript-eslint/types": "8.51.0",
-        "@typescript-eslint/visitor-keys": "8.51.0"
+        "@typescript-eslint/types": "8.54.0",
+        "@typescript-eslint/visitor-keys": "8.54.0"
       },
       "engines": {
         "node": "^18.18.0 || ^20.9.0 || >=21.1.0"
@@ -2353,9 +3090,9 @@
       }
     },
     "node_modules/@typescript-eslint/tsconfig-utils": {
-      "version": "8.51.0",
-      "resolved": "https://registry.npmjs.org/@typescript-eslint/tsconfig-utils/-/tsconfig-utils-8.51.0.tgz",
-      "integrity": "sha512-Qi5bSy/vuHeWyir2C8u/uqGMIlIDu8fuiYWv48ZGlZ/k+PRPHtaAu7erpc7p5bzw2WNNSniuxoMSO4Ar6V9OXw==",
+      "version": "8.54.0",
+      "resolved": "https://registry.npmjs.org/@typescript-eslint/tsconfig-utils/-/tsconfig-utils-8.54.0.tgz",
+      "integrity": "sha512-dRgOyT2hPk/JwxNMZDsIXDgyl9axdJI3ogZ2XWhBPsnZUv+hPesa5iuhdYt2gzwA9t8RE5ytOJ6xB0moV0Ujvw==",
       "dev": true,
       "license": "MIT",
       "engines": {
@@ -2370,17 +3107,17 @@
       }
     },
     "node_modules/@typescript-eslint/type-utils": {
-      "version": "8.51.0",
-      "resolved": "https://registry.npmjs.org/@typescript-eslint/type-utils/-/type-utils-8.51.0.tgz",
-      "integrity": "sha512-0XVtYzxnobc9K0VU7wRWg1yiUrw4oQzexCG2V2IDxxCxhqBMSMbjB+6o91A+Uc0GWtgjCa3Y8bi7hwI0Tu4n5Q==",
+      "version": "8.54.0",
+      "resolved": "https://registry.npmjs.org/@typescript-eslint/type-utils/-/type-utils-8.54.0.tgz",
+      "integrity": "sha512-hiLguxJWHjjwL6xMBwD903ciAwd7DmK30Y9Axs/etOkftC3ZNN9K44IuRD/EB08amu+Zw6W37x9RecLkOo3pMA==",
       "dev": true,
       "license": "MIT",
       "dependencies": {
-        "@typescript-eslint/types": "8.51.0",
-        "@typescript-eslint/typescript-estree": "8.51.0",
-        "@typescript-eslint/utils": "8.51.0",
-        "debug": "^4.3.4",
-        "ts-api-utils": "^2.2.0"
+        "@typescript-eslint/types": "8.54.0",
+        "@typescript-eslint/typescript-estree": "8.54.0",
+        "@typescript-eslint/utils": "8.54.0",
+        "debug": "^4.4.3",
+        "ts-api-utils": "^2.4.0"
       },
       "engines": {
         "node": "^18.18.0 || ^20.9.0 || >=21.1.0"
@@ -2395,9 +3132,9 @@
       }
     },
     "node_modules/@typescript-eslint/types": {
-      "version": "8.51.0",
-      "resolved": "https://registry.npmjs.org/@typescript-eslint/types/-/types-8.51.0.tgz",
-      "integrity": "sha512-TizAvWYFM6sSscmEakjY3sPqGwxZRSywSsPEiuZF6d5GmGD9Gvlsv0f6N8FvAAA0CD06l3rIcWNbsN1e5F/9Ag==",
+      "version": "8.54.0",
+      "resolved": "https://registry.npmjs.org/@typescript-eslint/types/-/types-8.54.0.tgz",
+      "integrity": "sha512-PDUI9R1BVjqu7AUDsRBbKMtwmjWcn4J3le+5LpcFgWULN3LvHC5rkc9gCVxbrsrGmO1jfPybN5s6h4Jy+OnkAA==",
       "dev": true,
       "license": "MIT",
       "engines": {
@@ -2409,21 +3146,21 @@
       }
     },
     "node_modules/@typescript-eslint/typescript-estree": {
-      "version": "8.51.0",
-      "resolved": "https://registry.npmjs.org/@typescript-eslint/typescript-estree/-/typescript-estree-8.51.0.tgz",
-      "integrity": "sha512-1qNjGqFRmlq0VW5iVlcyHBbCjPB7y6SxpBkrbhNWMy/65ZoncXCEPJxkRZL8McrseNH6lFhaxCIaX+vBuFnRng==",
+      "version": "8.54.0",
+      "resolved": "https://registry.npmjs.org/@typescript-eslint/typescript-estree/-/typescript-estree-8.54.0.tgz",
+      "integrity": "sha512-BUwcskRaPvTk6fzVWgDPdUndLjB87KYDrN5EYGetnktoeAvPtO4ONHlAZDnj5VFnUANg0Sjm7j4usBlnoVMHwA==",
       "dev": true,
       "license": "MIT",
       "dependencies": {
-        "@typescript-eslint/project-service": "8.51.0",
-        "@typescript-eslint/tsconfig-utils": "8.51.0",
-        "@typescript-eslint/types": "8.51.0",
-        "@typescript-eslint/visitor-keys": "8.51.0",
-        "debug": "^4.3.4",
-        "minimatch": "^9.0.4",
-        "semver": "^7.6.0",
+        "@typescript-eslint/project-service": "8.54.0",
+        "@typescript-eslint/tsconfig-utils": "8.54.0",
+        "@typescript-eslint/types": "8.54.0",
+        "@typescript-eslint/visitor-keys": "8.54.0",
+        "debug": "^4.4.3",
+        "minimatch": "^9.0.5",
+        "semver": "^7.7.3",
         "tinyglobby": "^0.2.15",
-        "ts-api-utils": "^2.2.0"
+        "ts-api-utils": "^2.4.0"
       },
       "engines": {
         "node": "^18.18.0 || ^20.9.0 || >=21.1.0"
@@ -2437,16 +3174,16 @@
       }
     },
     "node_modules/@typescript-eslint/utils": {
-      "version": "8.51.0",
-      "resolved": "https://registry.npmjs.org/@typescript-eslint/utils/-/utils-8.51.0.tgz",
-      "integrity": "sha512-11rZYxSe0zabiKaCP2QAwRf/dnmgFgvTmeDTtZvUvXG3UuAdg/GU02NExmmIXzz3vLGgMdtrIosI84jITQOxUA==",
+      "version": "8.54.0",
+      "resolved": "https://registry.npmjs.org/@typescript-eslint/utils/-/utils-8.54.0.tgz",
+      "integrity": "sha512-9Cnda8GS57AQakvRyG0PTejJNlA2xhvyNtEVIMlDWOOeEyBkYWhGPnfrIAnqxLMTSTo6q8g12XVjjev5l1NvMA==",
       "dev": true,
       "license": "MIT",
       "dependencies": {
-        "@eslint-community/eslint-utils": "^4.7.0",
-        "@typescript-eslint/scope-manager": "8.51.0",
-        "@typescript-eslint/types": "8.51.0",
-        "@typescript-eslint/typescript-estree": "8.51.0"
+        "@eslint-community/eslint-utils": "^4.9.1",
+        "@typescript-eslint/scope-manager": "8.54.0",
+        "@typescript-eslint/types": "8.54.0",
+        "@typescript-eslint/typescript-estree": "8.54.0"
       },
       "engines": {
         "node": "^18.18.0 || ^20.9.0 || >=21.1.0"
@@ -2461,13 +3198,13 @@
       }
     },
     "node_modules/@typescript-eslint/visitor-keys": {
-      "version": "8.51.0",
-      "resolved": "https://registry.npmjs.org/@typescript-eslint/visitor-keys/-/visitor-keys-8.51.0.tgz",
-      "integrity": "sha512-mM/JRQOzhVN1ykejrvwnBRV3+7yTKK8tVANVN3o1O0t0v7o+jqdVu9crPy5Y9dov15TJk/FTIgoUGHrTOVL3Zg==",
+      "version": "8.54.0",
+      "resolved": "https://registry.npmjs.org/@typescript-eslint/visitor-keys/-/visitor-keys-8.54.0.tgz",
+      "integrity": "sha512-VFlhGSl4opC0bprJiItPQ1RfUhGDIBokcPwaFH4yiBCaNPeld/9VeXbiPO1cLyorQi1G1vL+ecBk1x8o1axORA==",
       "dev": true,
       "license": "MIT",
       "dependencies": {
-        "@typescript-eslint/types": "8.51.0",
+        "@typescript-eslint/types": "8.54.0",
         "eslint-visitor-keys": "^4.2.1"
       },
       "engines": {
@@ -2705,17 +3442,17 @@
       "license": "BSD-3-Clause"
     },
     "node_modules/applicationinsights": {
-      "version": "3.12.1",
-      "resolved": "https://registry.npmjs.org/applicationinsights/-/applicationinsights-3.12.1.tgz",
-      "integrity": "sha512-7utizn+8/Uxy5y1qAzQqU16UG3G+BA3cBfV6LSh3RsC+tQ5Xd7Rgs4UHbHSwBto0L8++ezU7nYXU/4qG0jcFlQ==",
+      "version": "3.13.0",
+      "resolved": "https://registry.npmjs.org/applicationinsights/-/applicationinsights-3.13.0.tgz",
+      "integrity": "sha512-1zH4HjiXKUmxVUJ7KLvz9+U6CSkEWKAK+/YKU6P6DvjU8dJfiX3rzo5rNpZGYg0YrQrXK1ryM//izd4Wx1vGTQ==",
       "license": "MIT",
       "dependencies": {
         "@azure/core-auth": "^1.9.0",
         "@azure/functions": "^4.6.0",
         "@azure/functions-old": "npm:@azure/functions@3.5.1",
         "@azure/identity": "^4.6.0",
-        "@azure/monitor-opentelemetry": "^1.14.2",
-        "@azure/monitor-opentelemetry-exporter": "^1.0.0-beta.36",
+        "@azure/monitor-opentelemetry": "^1.15.1",
+        "@azure/monitor-opentelemetry-exporter": "^1.0.0-beta.38",
         "@azure/opentelemetry-instrumentation-azure-sdk": "^1.0.0-beta.7",
         "@opentelemetry/api": "^1.9.0",
         "@opentelemetry/api-logs": "^0.208.0",
@@ -2768,9 +3505,9 @@
       }
     },
     "node_modules/axios": {
-      "version": "1.13.2",
-      "resolved": "https://registry.npmjs.org/axios/-/axios-1.13.2.tgz",
-      "integrity": "sha512-VPk9ebNqPcy5lRGuSlKx752IlDatOjT9paPlm8A7yOuW2Fbvp4X3JznJtT4f0GzGLLiWE9W8onz51SqLYwzGaA==",
+      "version": "1.13.4",
+      "resolved": "https://registry.npmjs.org/axios/-/axios-1.13.4.tgz",
+      "integrity": "sha512-1wVkUaAO6WyaYtCkcYCOx12ZgpGf9Zif+qXa4n+oYzK558YryKqiL6UWwd5DqiH3VRW0GYhTZQ/vlgJrCoNQlg==",
       "license": "MIT",
       "dependencies": {
         "follow-redirects": "^1.15.6",
@@ -3008,9 +3745,9 @@
       }
     },
     "node_modules/cjs-module-lexer": {
-      "version": "1.4.3",
-      "resolved": "https://registry.npmjs.org/cjs-module-lexer/-/cjs-module-lexer-1.4.3.tgz",
-      "integrity": "sha512-9z8TZaGM1pfswYeXrUpzPrkx8UnWYdhJclsiYMm6x/w5+nN+8Tf/LnAgfLGQCm59qAOxU8WwHEq2vNwF6i4j+Q==",
+      "version": "2.2.0",
+      "resolved": "https://registry.npmjs.org/cjs-module-lexer/-/cjs-module-lexer-2.2.0.tgz",
+      "integrity": "sha512-4bHTS2YuzUvtoLjdy+98ykbNB5jS0+07EvFNXerqZQJ89F7DI6ET7OQo/HJuW6K0aVsKA9hj9/RVb2kQVOrPDQ==",
       "license": "MIT"
     },
     "node_modules/cli-boxes": {
@@ -3035,16 +3772,29 @@
       }
     },
     "node_modules/clipboardy": {
-      "version": "5.0.2",
-      "resolved": "https://registry.npmjs.org/clipboardy/-/clipboardy-5.0.2.tgz",
-      "integrity": "sha512-3IG8i8Yfb410yqDlCx9Ve3lYLFN3bD1IkrWcowT1kyTo6y4bwYf2guK9Q8a6zck5vWm7afm6Y61i7BG/Ir3FMA==",
+      "version": "5.1.0",
+      "resolved": "https://registry.npmjs.org/clipboardy/-/clipboardy-5.1.0.tgz",
+      "integrity": "sha512-w8Faf7egtk+6eZ+QJSYhCc8W5GKKd36Et6Qtl+c/dOFtPSjgCkJn9+QHr7D3EbdAO6rJb8I76sizRQAJpwOoLg==",
       "license": "MIT",
       "dependencies": {
-        "execa": "^9.6.0",
+        "execa": "^9.6.1",
         "is-wayland": "^0.1.0",
         "is-wsl": "^3.1.0",
-        "is64bit": "^2.0.0"
+        "is64bit": "^2.0.0",
+        "powershell-utils": "^0.2.0"
       },
+      "engines": {
+        "node": ">=20"
+      },
+      "funding": {
+        "url": "https://github.com/sponsors/sindresorhus"
+      }
+    },
+    "node_modules/clipboardy/node_modules/powershell-utils": {
+      "version": "0.2.0",
+      "resolved": "https://registry.npmjs.org/powershell-utils/-/powershell-utils-0.2.0.tgz",
+      "integrity": "sha512-ZlsFlG7MtSFCoc5xreOvBAozCJ6Pf06opgJjh9ONEv418xpZSAzNjstD36C6+JwOnfSqOW/9uDkqKjezTdxZhw==",
+      "license": "MIT",
       "engines": {
         "node": ">=20"
       },
@@ -3813,9 +4563,9 @@
       }
     },
     "node_modules/execa": {
-      "version": "9.6.0",
-      "resolved": "https://registry.npmjs.org/execa/-/execa-9.6.0.tgz",
-      "integrity": "sha512-jpWzZ1ZhwUmeWRhS7Qv3mhpOhLfwI+uAX4e5fOcXqwMR7EcJ0pj2kV1CVzHVMX/LphnKWD3LObjZCoJ71lKpHw==",
+      "version": "9.6.1",
+      "resolved": "https://registry.npmjs.org/execa/-/execa-9.6.1.tgz",
+      "integrity": "sha512-9Be3ZoN4LmYR90tUoVu2te2BsbzHfhJyfEiAVfz7N5/zv+jduIfLrV2xdQXOHbaD6KgpGdO9PRPM1Y4Q9QkPkA==",
       "license": "MIT",
       "dependencies": {
         "@sindresorhus/merge-streams": "^4.0.0",
@@ -4353,15 +5103,15 @@
       }
     },
     "node_modules/import-in-the-middle": {
-      "version": "2.0.0",
-      "resolved": "https://registry.npmjs.org/import-in-the-middle/-/import-in-the-middle-2.0.0.tgz",
-      "integrity": "sha512-yNZhyQYqXpkT0AKq3F3KLasUSK4fHvebNH5hOsKQw2dhGSALvQ4U0BqUc5suziKvydO5u5hgN2hy1RJaho8U5A==",
+      "version": "2.0.6",
+      "resolved": "https://registry.npmjs.org/import-in-the-middle/-/import-in-the-middle-2.0.6.tgz",
+      "integrity": "sha512-3vZV3jX0XRFW3EJDTwzWoZa+RH1b8eTTx6YOCjglrLyPuepwoBti1k3L2dKwdCUrnVEfc5CuRuGstaC/uQJJaw==",
       "license": "Apache-2.0",
       "dependencies": {
-        "acorn": "^8.14.0",
+        "acorn": "^8.15.0",
         "acorn-import-attributes": "^1.9.5",
-        "cjs-module-lexer": "^1.2.2",
-        "module-details-from-path": "^1.0.3"
+        "cjs-module-lexer": "^2.2.0",
+        "module-details-from-path": "^1.0.4"
       }
     },
     "node_modules/imurmurhash": {
@@ -5434,9 +6184,9 @@
       }
     },
     "node_modules/pg-protocol": {
-      "version": "1.10.3",
-      "resolved": "https://registry.npmjs.org/pg-protocol/-/pg-protocol-1.10.3.tgz",
-      "integrity": "sha512-6DIBgBQaTKDJyxnXaLiLR8wBpQQcGWuAESkRBX/t6OwA8YsqP+iVSiond2EDy6Y/dsGk8rh/jtax3js5NeV7JQ==",
+      "version": "1.11.0",
+      "resolved": "https://registry.npmjs.org/pg-protocol/-/pg-protocol-1.11.0.tgz",
+      "integrity": "sha512-pfsxk2M9M3BuGgDOfuy37VNRRX3jmKgMjcvAcWqNDpZSf4cUmv8HSOl5ViRQFsfARFn0KuUQTgLxVMbNq5NW3g==",
       "license": "MIT"
     },
     "node_modules/pg-types": {
@@ -5485,9 +6235,9 @@
       }
     },
     "node_modules/postgres-bytea": {
-      "version": "1.0.0",
-      "resolved": "https://registry.npmjs.org/postgres-bytea/-/postgres-bytea-1.0.0.tgz",
-      "integrity": "sha512-xy3pmLuQqRBZBXDULy7KbaitYqLcmxigw14Q5sj8QBVLqEwXfeybIKVWiqAXTlcvdvb0+xkOtDbfQMOf4lST1w==",
+      "version": "1.0.1",
+      "resolved": "https://registry.npmjs.org/postgres-bytea/-/postgres-bytea-1.0.1.tgz",
+      "integrity": "sha512-5+5HqXnsZPE65IJZSMkZtURARZelel2oXUEO8rH83VS/hxH5vv1uHquPg5wZs8yMAfdv971IU+kcPUczi7NVBQ==",
       "license": "MIT",
       "engines": {
         "node": ">=0.10.0"
@@ -6313,9 +7063,9 @@
       }
     },
     "node_modules/ts-api-utils": {
-      "version": "2.3.0",
-      "resolved": "https://registry.npmjs.org/ts-api-utils/-/ts-api-utils-2.3.0.tgz",
-      "integrity": "sha512-6eg3Y9SF7SsAvGzRHQvvc1skDAhwI4YQ32ui1scxD1Ccr0G5qIIbUBT3pFTKX8kmWIQClHobtUdNuaBgwdfdWg==",
+      "version": "2.4.0",
+      "resolved": "https://registry.npmjs.org/ts-api-utils/-/ts-api-utils-2.4.0.tgz",
+      "integrity": "sha512-3TaVTaAv2gTiMB35i3FiGJaRfwb3Pyn/j3m/bfAvGe8FB7CF6u+LMYqYlDh7reQf7UNvoTvdfAqHGmPGOSsPmA==",
       "dev": true,
       "license": "MIT",
       "engines": {
@@ -6987,9 +7737,9 @@
       }
     },
     "node_modules/zod": {
-      "version": "4.3.5",
-      "resolved": "https://registry.npmjs.org/zod/-/zod-4.3.5.tgz",
-      "integrity": "sha512-k7Nwx6vuWx1IJ9Bjuf4Zt1PEllcwe7cls3VNzm4CQ1/hgtFUK2bRNG3rvnpPUhFjmqJKAKtjV576KnUkHocg/g==",
+      "version": "4.3.6",
+      "resolved": "https://registry.npmjs.org/zod/-/zod-4.3.6.tgz",
+      "integrity": "sha512-rftlrkhHZOcjDwkGlnUtZZkvaPHCsDATp4pGpuOOMDaTdDDXF91wuVDJoWoPsKX/3YPQ5fHuF3STjcYyKr+Qhg==",
       "license": "MIT",
       "funding": {
         "url": "https://github.com/sponsors/colinhacks"
