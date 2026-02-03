@@ -34,6 +34,15 @@ To filter the list of users, include additional options that match the user prop
 
 Certain properties cannot be returned within a user collection. The following properties are only supported when retrieving an single user using: `aboutMe`, `birthday`, `hireDate`, `interests`, `mySite`, `pastProjects`, `preferredName`, `responsibilities`, `schools`, `skills`, `mailboxSettings`.
 
+### Permissions
+
+The following permissions are required to run this command:
+
+| Permission Type                   | Permission(s)                     | Description                                 |
+|---------------------------------- |---------------------------------- |---------------------------------------------|
+| Delegated (work or school account)| Directory.Read.All, User.Read.All | Allows reading directory data and user info |
+| Application                       | User.Read.All                     | Allows reading user info                    |
+
 ## Examples
 
 List all users in the tenant.
