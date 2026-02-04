@@ -23,7 +23,7 @@ export const options = z.strictObject({
   preview: z.boolean().optional(),
   toVersion: z.string().optional().alias('v'),
   shell: z.enum(['bash', 'powershell', 'cmd']).default('powershell'),
-  output: z.enum(['json', 'text', 'md', 'tour', 'csv', 'none']).optional()
+  output: z.enum(['json', 'text', 'md', 'tour', 'csv', 'none']).alias('o').optional()
 });
 
 declare type Options = z.infer<typeof options>;
@@ -86,7 +86,8 @@ class SpfxProjectUpgradeCommand extends BaseProjectCommand {
     '1.21.0',
     '1.21.1',
     '1.22.0',
-    '1.22.1'
+    '1.22.1',
+    '1.22.2'
   ];
 
   public static ERROR_NO_PROJECT_ROOT_FOLDER: number = 1;
