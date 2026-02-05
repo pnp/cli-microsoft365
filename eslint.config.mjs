@@ -27,6 +27,7 @@ const dictionary = [
   'azure',
   'bin',
   'builder',
+  'calendar',
   'call',
   'card',
   'catalog',
