@@ -1303,6 +1303,13 @@ const sidebars: SidebarsConfig = {
     {
       'Outlook (outlook)': [
         {
+          calendar: [
+            {
+              type: 'doc',
+              label: 'calendar get',
+              id: 'cmd/outlook/calendar/calendar-get'
+            }
+          ],
           mail: [
             {
               type: 'doc',
