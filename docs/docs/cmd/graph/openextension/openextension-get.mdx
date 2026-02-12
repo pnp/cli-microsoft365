@@ -27,6 +27,24 @@ m365 graph openextension get [options]
 
 <Global />
 
+## Permissions
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource        | Permissions                                   |
+  |-----------------|-----------------------------------------------|
+  | Microsoft Graph | Directory.Read.All, Group.Read.All, User.Read |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource        | Permissions                                                           |
+  |-----------------|-----------------------------------------------------------------------|
+  | Microsoft Graph | Device.Read.All, Group.Read.All, Organization.Read.All, User.Read.All |
+
+  </TabItem>
+</Tabs>
+
 ## Examples
 
 Retrieve a specified open extension for a user specified by id.
