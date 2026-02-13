@@ -9,7 +9,7 @@ describe('FN010009_YORC_sdkVersions_microsoft_graph_client', () => {
 
   beforeEach(() => {
     findings = [];
-    rule = new FN010009_YORC_sdkVersions_microsoft_graph_client('3.0.2');
+    rule = new FN010009_YORC_sdkVersions_microsoft_graph_client({ version: '3.0.2' });
   });
 
   it(`doesn't return notification if .yo-rc.json is not available`, () => {

@@ -3,8 +3,8 @@ import { Project } from '../../project-model/index.js';
 import { DependencyRule } from "./DependencyRule.js";
 
 export class FN001020_DEP_types_knockout extends DependencyRule {
-  constructor(packageVersion: string) {
-    super('@types/knockout', packageVersion, false, true);
+  constructor(options: { packageVersion: string }) {
+    super({ ...options, packageName: '@types/knockout', isOptional: true });
   }
 
   get id(): string {

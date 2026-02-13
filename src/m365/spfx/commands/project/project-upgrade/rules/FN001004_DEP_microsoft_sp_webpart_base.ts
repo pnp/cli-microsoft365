@@ -1,8 +1,8 @@
 import { DependencyRule } from "./DependencyRule.js";
 
 export class FN001004_DEP_microsoft_sp_webpart_base extends DependencyRule {
-  constructor(packageVersion: string) {
-    super('@microsoft/sp-webpart-base', packageVersion, false, true);
+  constructor(options: { packageVersion: string }) {
+    super({ ...options, packageName: '@microsoft/sp-webpart-base', isOptional: true });
   }
 
   get id(): string {

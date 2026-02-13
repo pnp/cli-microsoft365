@@ -3,8 +3,11 @@ import { Project } from '../../project-model/index.js';
 import { Finding } from '../../report-model/index.js';
 
 export class FN012003_TSC_skipLibCheck extends JsonRule {
-  constructor(private skipLibCheck: boolean) {
+  private skipLibCheck: boolean;
+
+  constructor(options: { skipLibCheck: boolean }) {
     super();
+    this.skipLibCheck = options.skipLibCheck;
   }
 
   get id(): string {

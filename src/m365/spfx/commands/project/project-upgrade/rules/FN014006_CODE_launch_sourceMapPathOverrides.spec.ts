@@ -14,7 +14,7 @@ describe('FN014006_CODE_launch_sourceMapPathOverrides', () => {
 
   beforeEach(() => {
     findings = [];
-    rule = new FN014006_CODE_launch_sourceMapPathOverrides('webpack:///.././src/*', '${webRoot}/src/*');
+    rule = new FN014006_CODE_launch_sourceMapPathOverrides({ overrideKey: 'webpack:///.././src/*', overrideValue: '${webRoot}/src/*' });
   });
 
   it('doesn\'t return notifications if vscode folder doesn\'t exist', () => {

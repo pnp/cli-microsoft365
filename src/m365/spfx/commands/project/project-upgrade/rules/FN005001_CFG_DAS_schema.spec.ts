@@ -9,7 +9,7 @@ describe('FN005001_CFG_DAS_schema', () => {
 
   beforeEach(() => {
     findings = [];
-    rule = new FN005001_CFG_DAS_schema('test-schema');
+    rule = new FN005001_CFG_DAS_schema({ schema: 'test-schema' });
   });
 
   it('doesn\'t return notification if no deploy-azure-storage.json found', () => {

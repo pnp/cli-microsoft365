@@ -3,8 +3,13 @@ import { Project } from '../../project-model/index.js';
 import { Finding } from '../../report-model/index.js';
 
 export abstract class ResolutionRule extends JsonRule {
-  constructor(protected packageName: string, protected packageVersion: string) {
+  protected packageName: string;
+  protected packageVersion: string;
+
+  constructor(options: { packageName: string; packageVersion: string }) {
     super();
+    this.packageName = options.packageName;
+    this.packageVersion = options.packageVersion;
   }
 
   get title(): string {

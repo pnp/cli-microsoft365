@@ -3,8 +3,11 @@ import { Project } from '../../project-model/index.js';
 import { Finding } from '../../report-model/index.js';
 
 export class FN005002_CFG_DAS_workingDir extends JsonRule {
-  constructor(private workingDir: string) {
+  private workingDir: string;
+
+  constructor(options: { workingDir: string }) {
     super();
+    this.workingDir = options.workingDir;
   }
 
   get id(): string {
