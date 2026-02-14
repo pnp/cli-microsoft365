@@ -33,7 +33,7 @@
   "devDependencies": {
     "@docusaurus/module-type-aliases": "^3.9.2",
     "@docusaurus/tsconfig": "^3.9.2",
-    "asciinema-player": "^3.14.0",
+    "asciinema-player": "^3.14.15",
     "typescript": "^5.9.3"
   },
   "browserslist": {
