@@ -1,0 +1,86 @@
+import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# outlook calendar remove
+
+Removes the calendar of a user.
+
+## Usage
+
+```sh
+m365 outlook calendar remove [options]
+```
+
+## Options
+
+```md definition-list
+`-i, --id [id]`
+: ID of the calendar. Specify either `id` or `name`, but not both.
+
+`-n, --name [name]`
+: Name of the calendar. Specify either `id` or `name`, but not both.
+
+`--userId [userId]`
+: ID of the user. Specify either `userId` or `userName`, but not both.
+
+`--userName [userName]`
+: UPN of the user. Specify either `userId` or `userName`, but not both.
+
+`--calendarGroupId [calendarGroupId]`
+: ID of the calendar group. Specify either `calendarGroupId` or `calendarGroupName`, but not both.
+
+`--calendarGroupName [calendarGroupName]`
+: Name of the calendar group. Specify either `calendarGroupId` or `calendarGroupName`, but not both.
+
+`--permanent`
+: Permanently remove the calendar, don't send it to the recycle bin.
+
+`-f, --force`
+: Don't prompt for confirmation.
+```
+
+<Global />
+
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource        | Permissions        |
+  |-----------------|--------------------|
+  | Microsoft Graph | Calendar.ReadWrite |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource        | Permissions        |
+  |-----------------|--------------------|
+  | Microsoft Graph | Calendar.ReadWrite |
+
+  </TabItem>
+</Tabs>
+
+## Examples
+
+Remove the calendar for the current signed-in user by id.
+
+```sh
+m365 outlook calendar remove --userId "@meId" --id "AAMkAGI2TGuLAAA=" 
+```
+
+Permanently remove the calendar from a specific calendar group for the current signed-in user by name.
+
+```sh
+m365 outlook calendar remove --userId "@meId" --calendarGroupName "Colleague calendars" --name "Calendar"  --permanent
+```
+
+Remove the calendar from a specific calendar group for a specific user by name.
+
+```sh
+m365 outlook calendar remove --userId b743445a-112c-4fda-9afd-05943f9c7b36 --calendarGroupId "AAMkADIxYjJiYmIzLTFmNjYtNGNhMy0YOkcEEh3vhfAAAGgdFjAAA="  --name "Calendar" 
+```
+
+## Response
+
+The command won't return a response on success.
