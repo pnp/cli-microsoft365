@@ -1,5 +1,5 @@
-const mocha = require('mocha');
-const core = require('@actions/core');
+import mocha from 'mocha';
+import * as core from '@actions/core';
 
 const { EVENT_RUN_END, EVENT_TEST_FAIL, EVENT_RUN_BEGIN } =
   mocha.Runner.constants;
@@ -78,13 +78,13 @@ class TestSummaryReporter {
     // Generate accordion for each item in suite
     Object.keys(suiteObject).forEach(
       (item) =>
-        (detailsContent =
-          detailsContent +
-          this.generateAccordion(
-            `${suitePrefix}${this.suiteIndenter}`,
-            item,
-            suiteObject[item]
-          ))
+      (detailsContent =
+        detailsContent +
+        this.generateAccordion(
+          `${suitePrefix}${this.suiteIndenter}`,
+          item,
+          suiteObject[item]
+        ))
     );
 
     // First level does not require accordion
@@ -116,10 +116,10 @@ class TestSummaryReporter {
     );
     this.summary = this.summary.addRaw(
       '<div style="width: 50%; background-color: red; text-align: center; color: white;"><div style="width:' +
-        percentagePassed +
-        '%; height: 18px; background-color: green;"></div></div>'
+      percentagePassed +
+      '%; height: 18px; background-color: green;"></div></div>'
     );
   }
 }
 
-module.exports = TestSummaryReporter;
+export default TestSummaryReporter;

@@ -4,7 +4,7 @@
     "**/*.mock.js",
     "**/clientsidepages.js",
     "docs",
-    "**/ci-test-summary.cjs"
+    "**/ci-test-summary.mjs"
   ],
   "reporter": ["lcov", "text", "text-summary"],
   "check-coverage": true,
